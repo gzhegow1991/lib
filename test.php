@@ -1,16 +1,3 @@
-# Lib
-
-Библиотека вспомогательных функций для использования в проектах и остальных пакетах
-
-## Установка
-
-```
-composer require gzhegow/lib;
-```
-
-## Пример
-
-```php
 <?php
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -95,4 +82,3 @@ _assert_call($fn, [], <<<HEREDOC
 ""
 HEREDOC
 );
-```
