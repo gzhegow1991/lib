@@ -25,9 +25,10 @@ trait DebugTrait
         if (null === $output) {
             if (false
                 || is_null($var)
+                || is_bool($var)
             ) {
                 $output = [];
-                $output[] = "NULL";
+                $output[] = strtoupper(var_export($var, true));
 
                 $withBraces = true;
             }
@@ -35,7 +36,6 @@ trait DebugTrait
 
         if (null === $output) {
             if (false
-                || is_bool($var)
                 || is_numeric($var)
             ) {
                 $output = [];
