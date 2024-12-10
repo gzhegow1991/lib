@@ -206,6 +206,88 @@ trait StrTrait
 
 
     /**
+     * если строка начинается на искомую, отрезает ее и возвращает укороченную
+     * if (null !== ($substr = _str_starts('hello', 'h'))) {} // 'ello'
+     */
+    public static function str_starts(string $string, string $needle, bool $ignoreCase = null) : ?string
+    {
+        $ignoreCase = $ignoreCase ?? true;
+
+        if ('' === $string) return null;
+        if ('' === $needle) return $string;
+
+        $fnStrlen = static::str_mbfunc('strlen');
+        $fnSubstr = static::str_mbfunc('substr');
+        $fnStrpos = $ignoreCase
+            ? static::str_mbfunc('stripos')
+            : static::str_mbfunc('strpos');
+
+        $pos = $fnStrpos($string, $needle);
+
+        $result = 0 === $pos
+            ? $fnSubstr($string, $fnStrlen($needle))
+            : null;
+
+        return $result;
+    }
+
+    /**
+     * если строка заканчивается на искомую, отрезает ее и возвращает укороченную
+     * if (null !== ($substr = _str_ends('hello', 'o'))) {} // 'hell'
+     */
+    public static function str_ends(string $string, string $needle, bool $ignoreCase = null) : ?string
+    {
+        $ignoreCase = $ignoreCase ?? true;
+
+        if ('' === $string) return null;
+        if ('' === $needle) return $string;
+
+        $fnStrlen = static::str_mbfunc('strlen');
+        $fnSubstr = static::str_mbfunc('substr');
+        $fnStrrpos = $ignoreCase
+            ? static::str_mbfunc('strripos')
+            : static::str_mbfunc('strrpos');
+
+        $pos = $fnStrrpos($string, $needle);
+
+        $result = $pos === $fnStrlen($string) - $fnStrlen($needle)
+            ? $fnSubstr($string, 0, $pos)
+            : null;
+
+        return $result;
+    }
+
+    /**
+     * ищет подстроку в строке и разбивает по ней результат
+     */
+    public static function str_contains(string $string, string $needle, bool $ignoreCase = null, int $limit = null) : array
+    {
+        $ignoreCase = $ignoreCase ?? true;
+
+        if ('' === $string) return [];
+        if ('' === $needle) return [ $string ];
+
+        $strCase = $ignoreCase
+            ? str_ireplace($needle, $needle, $string)
+            : $string;
+
+        $result = [];
+
+        $fnStrpos = $ignoreCase
+            ? static::str_mbfunc('stripos')
+            : static::str_mbfunc('strpos');
+
+        if (false !== $fnStrpos($strCase, $needle)) {
+            $result = null
+                ?? (isset($limit) ? explode($needle, $strCase, $limit) : null)
+                ?? (explode($needle, $strCase));
+        }
+
+        return $result;
+    }
+
+
+    /**
      * Обрезает у строки подстроку с начала (ltrim, только для строк а не букв)
      */
     public static function str_lcrop(string $string, string $needle, bool $ignoreCase = null, int $limit = -1) : string
@@ -294,88 +376,6 @@ trait StrTrait
         $result = $string;
         $result = static::str_lcrop($result, $needleLcrop, $ignoreCase, $limit);
         $result = static::str_rcrop($result, $needleRcrop, $ignoreCase, $limit);
-
-        return $result;
-    }
-
-
-    /**
-     * если строка начинается на искомую, отрезает ее и возвращает укороченную
-     * if (null !== ($substr = _str_starts('hello', 'h'))) {} // 'ello'
-     */
-    public static function str_starts(string $string, string $needle, bool $ignoreCase = null) : ?string
-    {
-        $ignoreCase = $ignoreCase ?? true;
-
-        if ('' === $string) return null;
-        if ('' === $needle) return $string;
-
-        $fnStrlen = static::str_mbfunc('strlen');
-        $fnSubstr = static::str_mbfunc('substr');
-        $fnStrpos = $ignoreCase
-            ? static::str_mbfunc('stripos')
-            : static::str_mbfunc('strpos');
-
-        $pos = $fnStrpos($string, $needle);
-
-        $result = 0 === $pos
-            ? $fnSubstr($string, $fnStrlen($needle))
-            : null;
-
-        return $result;
-    }
-
-    /**
-     * если строка заканчивается на искомую, отрезает ее и возвращает укороченную
-     * if (null !== ($substr = _str_ends('hello', 'o'))) {} // 'hell'
-     */
-    public static function str_ends(string $string, string $needle, bool $ignoreCase = null) : ?string
-    {
-        $ignoreCase = $ignoreCase ?? true;
-
-        if ('' === $string) return null;
-        if ('' === $needle) return $string;
-
-        $fnStrlen = static::str_mbfunc('strlen');
-        $fnSubstr = static::str_mbfunc('substr');
-        $fnStrrpos = $ignoreCase
-            ? static::str_mbfunc('strripos')
-            : static::str_mbfunc('strrpos');
-
-        $pos = $fnStrrpos($string, $needle);
-
-        $result = $pos === $fnStrlen($string) - $fnStrlen($needle)
-            ? $fnSubstr($string, 0, $pos)
-            : null;
-
-        return $result;
-    }
-
-    /**
-     * ищет подстроку в строке и разбивает по ней результат
-     */
-    public static function str_contains(string $string, string $needle, bool $ignoreCase = null, int $limit = null) : array
-    {
-        $ignoreCase = $ignoreCase ?? true;
-
-        if ('' === $string) return [];
-        if ('' === $needle) return [ $string ];
-
-        $strCase = $ignoreCase
-            ? str_ireplace($needle, $needle, $string)
-            : $string;
-
-        $result = [];
-
-        $fnStrpos = $ignoreCase
-            ? static::str_mbfunc('stripos')
-            : static::str_mbfunc('strpos');
-
-        if (false !== $fnStrpos($strCase, $needle)) {
-            $result = null
-                ?? (isset($limit) ? explode($needle, $strCase, $limit) : null)
-                ?? (explode($needle, $strCase));
-        }
 
         return $result;
     }
