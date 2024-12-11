@@ -92,27 +92,35 @@ function _assert_call(\Closure $fn, array $expectResult = [], string $expectOutp
 $fn = function () {
     _dump_ln('[ TEST 1 ]');
 
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value(null));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value(false));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value(1));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value(1.1));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value('string'));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value([]));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value((object) []));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value(STDOUT));
+    echo \Gzhegow\Lib\Lib::debug_value(null) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value(false) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value(1) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value(1.1) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value('string') . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value([]) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_array(
+            [
+                [ '1', 'apple' ],
+                [ '2', 'apples' ],
+                [ '1.5', 'apples' ],
+            ]
+        ) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value((object) []) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value(STDOUT) . PHP_EOL;
 
     _dump('');
 };
 _assert_call($fn, [], <<<HEREDOC
 "[ TEST 1 ]"
-"{ NULL }"
-"{ FALSE }"
+NULL
+FALSE
 1
 1.1
-""string""
-"[  ]"
-"{ object # stdClass }"
-"{ resource(stream) }"
+"string"
+[  ]
+[ [ "1", "apple" ], [ "2", "apples" ], [ "1.5", "apples" ] ]
+{ object # stdClass }
+{ resource(stream) }
 ""
 HEREDOC
 );
@@ -132,18 +140,15 @@ $fn = function () {
     _dump_ln(\Gzhegow\Lib\Lib::str_ucfirst('привет'));
     _dump_ln(\Gzhegow\Lib\Lib::str_lcwords('ПРИВЕТ МИР'));
     _dump_ln(\Gzhegow\Lib\Lib::str_ucwords('привет мир'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_lcrop('азаза_привет_азаза', 'аза'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_rcrop('азаза_привет_азаза', 'аза'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_crop('азаза_привет_азаза', 'аза'));
     _dump_ln(\Gzhegow\Lib\Lib::str_starts('привет', 'при'));
     _dump_ln(\Gzhegow\Lib\Lib::str_ends('привет', 'вет'));
     _dump_ln(\Gzhegow\Lib\Lib::str_contains('привет', 'ив'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_unltrim('"привет"', '"'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_unrtrim('"привет"', '"'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_untrim('"привет"', '"'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_prepend('привет, мир', 'при'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_append('привет, мир', 'мир'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_wrap('привет, мир', [ 'при', 'мир' ]));
+    _dump_ln(\Gzhegow\Lib\Lib::str_lcrop('азаза_привет_азаза', 'аза'));
+    _dump_ln(\Gzhegow\Lib\Lib::str_rcrop('азаза_привет_азаза', 'аза'));
+    _dump_ln(\Gzhegow\Lib\Lib::str_crop('азаза_привет_азаза', 'аза'));
+    _dump_ln(\Gzhegow\Lib\Lib::str_unlcrop('"привет"', '"'));
+    _dump_ln(\Gzhegow\Lib\Lib::str_unrcrop('"привет"', '"'));
+    _dump_ln(\Gzhegow\Lib\Lib::str_uncrop('"привет"', '"'));
     _dump_ln(\Gzhegow\Lib\Lib::str_replace_limit('за', '_', 'азазазазазаза', 3));
     _dump_ln(\Gzhegow\Lib\Lib::str_space('hello-world-foo-bar'));
     _dump_ln(\Gzhegow\Lib\Lib::str_snake('hello-world-foo-bar'));
@@ -164,18 +169,15 @@ _assert_call($fn, [], <<<HEREDOC
 "Привет"
 "пРИВЕТ мИР"
 "Привет Мир"
-"за_привет_азаза"
-"азаза_привет_аз"
-"за_привет_аз"
 "вет"
 "при"
 [ "пр", "ет" ]
-"""привет""
-""привет"""
-"""привет"""
-"привет, мир"
-"привет, мир"
-"привет, мир"
+"за_привет_азаза"
+"азаза_привет_аз"
+"за_привет_аз"
+"\"привет\""
+"\"привет\""
+"\"привет\""
 "а___зазаза"
 "hello world foo bar"
 "hello_world_foo_bar"

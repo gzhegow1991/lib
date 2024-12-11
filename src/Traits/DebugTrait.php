@@ -4,7 +4,7 @@ namespace Gzhegow\Lib\Traits;
 
 trait DebugTrait
 {
-    public static function debug_var_dump($var, array $options = [], int $level = 0) // : int|float|string
+    public static function debug_var_dump($var, array $options = []) // : int|float|string
     {
         $withType = $options[ 'with_type' ] ?? true;
         $withId = $options[ 'with_id' ] ?? true;
@@ -66,31 +66,31 @@ trait DebugTrait
                 $arrayCopy = $var;
                 $arrayCount = count($var);
 
-                if (! (true
-                    && (null !== $maxArrayLevel)
-                    && ($maxArrayLevel >= $level)
-                )) {
-                    $withType = true;
-                    $withValue = false;
-                }
-
                 $dump = null;
                 if ($withValue) {
-                    foreach ( $arrayCopy as $key => $value ) {
-                        // ! recursion
-                        $_value = static::debug_var_dump(
-                            $value,
-                            $options,
-                            $level + 1
-                        );
+                    foreach ( static::array_walk(
+                        $arrayCopy,
+                        _ARRAY_WALK_WITH_EMPTY_ARRAYS | _ARRAY_WALK_WITH_PARENTS
+                    ) as $path => &$value ) {
+                        /** @var array $path */
 
-                        if (is_string($value)) {
-                            $arrayCopy[ $key ] = trim($_value, '"');
-
-                        } else {
-                            $arrayCopy[ $key ] = $_value;
+                        if (count($path) <= $maxArrayLevel) {
+                            continue;
                         }
+
+                        if (! is_array($value)) {
+                            continue;
+                        }
+
+                        $value = static::debug_var_dump($value,
+                            [
+                                'with_type'       => true,
+                                'with_value'      => false,
+                                'max_array_level' => 0,
+                            ] + $options
+                        );
                     }
+                    unset($value);
 
                     $dump = static::debug_var_export(
                         $arrayCopy,
@@ -258,9 +258,8 @@ trait DebugTrait
             $options + [
                 'with_type'       => true,
                 'with_id'         => false,
-                'with_dump'       => false,
-                'newline'         => null,
-                'max_array_level' => 0,
+                'with_value'      => false,
+                'max_array_level' => 1,
             ]
         );
 
@@ -272,24 +271,9 @@ trait DebugTrait
         $output = static::debug_var_dump($value,
             $options + [
                 'with_type'       => true,
-                'with_id'         => false,
-                'with_dump'       => true,
+                'with_id'         => true,
+                'with_value'      => false,
                 'max_array_level' => 1,
-            ]
-        );
-
-        return $output;
-    }
-
-    public static function debug_value($value, array $options = []) : string
-    {
-        $output = static::debug_var_dump($value,
-            $options + [
-                'with_type'       => false,
-                'with_id'         => false,
-                'with_dump'       => true,
-                'newline'         => ' ',
-                'max_array_level' => 0,
             ]
         );
 
@@ -302,7 +286,22 @@ trait DebugTrait
             $options + [
                 'with_type'       => true,
                 'with_id'         => false,
-                'with_dump'       => true,
+                'with_value'      => true,
+                'max_array_level' => 1,
+            ]
+        );
+
+        return $output;
+    }
+
+
+    public static function debug_value($value, array $options = []) : string
+    {
+        $output = static::debug_var_dump($value,
+            $options + [
+                'with_type'       => false,
+                'with_id'         => false,
+                'with_value'      => true,
                 'newline'         => ' ',
                 'max_array_level' => 0,
             ]
@@ -310,6 +309,22 @@ trait DebugTrait
 
         return $output;
     }
+
+    public static function debug_array($value, array $options = []) : string
+    {
+        $output = static::debug_var_dump($value,
+            $options + [
+                'with_type'       => false,
+                'with_id'         => false,
+                'with_value'      => true,
+                'newline'         => ' ',
+                'max_array_level' => 1,
+            ]
+        );
+
+        return $output;
+    }
+
 
 
     public static function debug_diff(string $a, string $b, string &$result = null) : bool
