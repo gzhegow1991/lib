@@ -10,16 +10,15 @@ trait DebugTrait
         $withId = $options[ 'with_id' ] ?? true;
         $withValue = $options[ 'with_value' ] ?? true;
 
-        $withBraces = $withType || $withId;
-
-        $braces = $options[ 'braces' ] ?? [ '{ ', ' }' ];
         $newline = $options[ 'newline' ] ?? "\n";
 
         $maxArrayLevel = $options[ 'max_array_level' ] ?? null;
 
-        $type = gettype($var);
-
         $output = null;
+
+        $withBraces = false;
+
+        $type = gettype($var);
 
         if (null === $output) {
             if (false
@@ -28,8 +27,6 @@ trait DebugTrait
             ) {
                 $output = [];
                 $output[] = strtoupper(var_export($var, true));
-
-                $withBraces = true;
             }
         }
 
@@ -38,8 +35,12 @@ trait DebugTrait
                 || is_numeric($var)
             ) {
                 $output = [];
-                if ($withType) $output[] = $type;
-                if ($withValue) $output[] = $var;
+                if ($withType) {
+                    $output[] = $type;
+                }
+                if ($withValue) {
+                    $output[] = $var;
+                }
             }
         }
 
@@ -48,7 +49,9 @@ trait DebugTrait
                 $stringLen = strlen($var);
 
                 $output = [];
-                if ($withType) $output[] = "{$type}({$stringLen})";
+                if ($withType) {
+                    $output[] = "{$type}({$stringLen})";
+                }
                 if ($withValue) {
                     $_var = $var;
                     $_var = str_replace('"', '\"', $_var);
@@ -63,30 +66,45 @@ trait DebugTrait
                 $arrayCopy = $var;
                 $arrayCount = count($var);
 
-                $isDump = $withValue;
-                if (null !== $maxArrayLevel) {
-                    $isDump = $isDump && ($maxArrayLevel >= $level);
+                if (! (true
+                    && (null !== $maxArrayLevel)
+                    && ($maxArrayLevel >= $level)
+                )) {
+                    $withType = true;
+                    $withValue = false;
                 }
 
                 $dump = null;
-                if ($isDump) {
+                if ($withValue) {
                     foreach ( $arrayCopy as $key => $value ) {
                         // ! recursion
-                        $_value = static::debug_var_dump($value, $options, $level + 1);
+                        $_value = static::debug_var_dump(
+                            $value,
+                            $options,
+                            $level + 1
+                        );
 
-                        $arrayCopy[ $key ] = is_string($value)
-                            ? trim($_value, '"')
-                            : $_value;
+                        if (is_string($value)) {
+                            $arrayCopy[ $key ] = trim($_value, '"');
+
+                        } else {
+                            $arrayCopy[ $key ] = $_value;
+                        }
                     }
 
-                    $dump = static::debug_var_export($arrayCopy,
+                    $dump = static::debug_var_export(
+                        $arrayCopy,
                         [ 'addcslashes' => false ]
                     );
                 }
 
                 $output = [];
-                if ($withType) $output[] = "{$type}({$arrayCount})";
-                if (null !== $dump) $output[] = $dump;
+                if ($withType) {
+                    $output[] = "{$type}({$arrayCount})";
+                }
+                if ($withValue) {
+                    $output[] = $dump;
+                }
             }
         }
 
@@ -106,7 +124,9 @@ trait DebugTrait
                 $output = [];
                 $output[] = "{$type}{$subtype}";
                 $output[] = $objectClass;
-                if ($withId) $output[] = $objectId;
+                if ($withId) {
+                    $output[] = $objectId;
+                }
 
                 $withBraces = true;
             }
@@ -121,17 +141,20 @@ trait DebugTrait
 
                 $output = [];
                 $output[] = "{$type}({$resourceType})";
-                if ($withId) $output[] = $resourceId;
+                if ($withId) {
+                    $output[] = $resourceId;
+                }
 
                 $withBraces = true;
             }
         }
 
-        if (count($output) > 1) {
+        $cnt = count($output);
+        if ($cnt > 1) {
             $output = implode(" # ", $output);
 
-        } else {
-            [ $output ] = $output;
+        } elseif ($cnt === 1) {
+            $output = $output[ 0 ];
         }
 
         if ("\n" !== $newline) {
@@ -149,8 +172,10 @@ trait DebugTrait
             }
         }
 
+        $withBraces = $withBraces || $withType || $withId;
+
         $output = $withBraces
-            ? "{$braces[0]}{$output}{$braces[1]}"
+            ? '{ ' . $output . ' }'
             : $output;
 
         return $output;
@@ -163,7 +188,7 @@ trait DebugTrait
         $addcslashes = $options[ 'addcslashes' ] ?? true;
 
         switch ( gettype($var) ) {
-            case "NULL":
+            case "null":
                 $result = "NULL";
                 break;
 

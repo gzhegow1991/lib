@@ -79,27 +79,27 @@ function _assert_call(\Closure $fn, array $expectResult = [], string $expectOutp
 $fn = function () {
     _dump_ln('[ TEST 1 ]');
 
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value(null));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value(false));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value(1));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value(1.1));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value('string'));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value([]));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value((object) []));
-    _dump_ln(\Gzhegow\Lib\Lib::debug_value(STDOUT));
+    echo \Gzhegow\Lib\Lib::debug_value(null) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value(false) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value(1) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value(1.1) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value('string') . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value([]) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value((object) []) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value(STDOUT) . PHP_EOL;
 
     _dump('');
 };
 _assert_call($fn, [], <<<HEREDOC
 "[ TEST 1 ]"
-"{ NULL }"
-"{ FALSE }"
+NULL
+FALSE
 1
 1.1
-"\"string\""
-"[  ]"
-"{ object # stdClass }"
-"{ resource(stream) }"
+"string"
+[  ]
+{ object # stdClass }
+{ resource(stream) }
 ""
 HEREDOC
 );
