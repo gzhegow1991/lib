@@ -96,7 +96,7 @@ _assert_call($fn, [], <<<HEREDOC
 "{ FALSE }"
 1
 1.1
-""string""
+"\"string\""
 "[  ]"
 "{ object # stdClass }"
 "{ resource(stream) }"
@@ -119,18 +119,15 @@ $fn = function () {
     _dump_ln(\Gzhegow\Lib\Lib::str_ucfirst('привет'));
     _dump_ln(\Gzhegow\Lib\Lib::str_lcwords('ПРИВЕТ МИР'));
     _dump_ln(\Gzhegow\Lib\Lib::str_ucwords('привет мир'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_lcrop('азаза_привет_азаза', 'аза'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_rcrop('азаза_привет_азаза', 'аза'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_crop('азаза_привет_азаза', 'аза'));
     _dump_ln(\Gzhegow\Lib\Lib::str_starts('привет', 'при'));
     _dump_ln(\Gzhegow\Lib\Lib::str_ends('привет', 'вет'));
     _dump_ln(\Gzhegow\Lib\Lib::str_contains('привет', 'ив'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_unltrim('"привет"', '"'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_unrtrim('"привет"', '"'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_untrim('"привет"', '"'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_prepend('привет, мир', 'при'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_append('привет, мир', 'мир'));
-    _dump_ln(\Gzhegow\Lib\Lib::str_wrap('привет, мир', [ 'при', 'мир' ]));
+    _dump_ln(\Gzhegow\Lib\Lib::str_lcrop('азаза_привет_азаза', 'аза'));
+    _dump_ln(\Gzhegow\Lib\Lib::str_rcrop('азаза_привет_азаза', 'аза'));
+    _dump_ln(\Gzhegow\Lib\Lib::str_crop('азаза_привет_азаза', 'аза'));
+    _dump_ln(\Gzhegow\Lib\Lib::str_unlcrop('"привет"', '"'));
+    _dump_ln(\Gzhegow\Lib\Lib::str_unrcrop('"привет"', '"'));
+    _dump_ln(\Gzhegow\Lib\Lib::str_uncrop('"привет"', '"'));
     _dump_ln(\Gzhegow\Lib\Lib::str_replace_limit('за', '_', 'азазазазазаза', 3));
     _dump_ln(\Gzhegow\Lib\Lib::str_space('hello-world-foo-bar'));
     _dump_ln(\Gzhegow\Lib\Lib::str_snake('hello-world-foo-bar'));
@@ -151,18 +148,15 @@ _assert_call($fn, [], <<<HEREDOC
 "Привет"
 "пРИВЕТ мИР"
 "Привет Мир"
-"за_привет_азаза"
-"азаза_привет_аз"
-"за_привет_аз"
 "вет"
 "при"
 [ "пр", "ет" ]
-"""привет""
-""привет"""
-"""привет"""
-"привет, мир"
-"привет, мир"
-"привет, мир"
+"за_привет_азаза"
+"азаза_привет_аз"
+"за_привет_аз"
+"\"привет\""
+"\"привет\""
+"\"привет\""
 "а___зазаза"
 "hello world foo bar"
 "hello_world_foo_bar"

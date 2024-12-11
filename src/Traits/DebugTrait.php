@@ -14,7 +14,6 @@ trait DebugTrait
 
         $braces = $options[ 'braces' ] ?? [ '{ ', ' }' ];
         $newline = $options[ 'newline' ] ?? "\n";
-        $quotes = $options[ 'quotes' ] ?? [ '"', '"' ];
 
         $maxArrayLevel = $options[ 'max_array_level' ] ?? null;
 
@@ -50,7 +49,12 @@ trait DebugTrait
 
                 $output = [];
                 if ($withType) $output[] = "{$type}({$stringLen})";
-                if ($withValue) $output[] = "{$quotes[0]}{$var}{$quotes[1]}";
+                if ($withValue) {
+                    $_var = $var;
+                    $_var = str_replace('"', '\"', $_var);
+
+                    $output[] = '"' . $_var . '"';
+                }
             }
         }
 
@@ -68,16 +72,16 @@ trait DebugTrait
                 if ($isDump) {
                     foreach ( $arrayCopy as $key => $value ) {
                         // ! recursion
-                        $value = static::debug_var_dump(
-                            $value,
-                            [ 'quotes' => [ '', '' ] ] + $options,
-                            $level + 1
-                        );
+                        $_value = static::debug_var_dump($value, $options, $level + 1);
 
-                        $arrayCopy[ $key ] = $value;
+                        $arrayCopy[ $key ] = is_string($value)
+                            ? trim($_value, '"')
+                            : $_value;
                     }
 
-                    $dump = static::debug_var_export($arrayCopy, [ 'addcslashes' => false ]);
+                    $dump = static::debug_var_export($arrayCopy,
+                        [ 'addcslashes' => false ]
+                    );
                 }
 
                 $output = [];

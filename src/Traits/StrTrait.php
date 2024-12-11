@@ -290,12 +290,12 @@ trait StrTrait
     /**
      * Обрезает у строки подстроку с начала (ltrim, только для строк а не букв)
      */
-    public static function str_lcrop(string $string, string $needle, bool $ignoreCase = null, int $limit = -1) : string
+    public static function str_lcrop(string $string, string $lcrop, bool $ignoreCase = null, int $limit = -1) : string
     {
         $ignoreCase = $ignoreCase ?? true;
 
         if ('' === $string) return $string;
-        if ('' === $needle) return $string;
+        if ('' === $lcrop) return $string;
 
         $result = $string;
 
@@ -305,7 +305,7 @@ trait StrTrait
             ? static::str_mbfunc('stripos')
             : static::str_mbfunc('strpos');
 
-        $pos = $fnStrpos($result, $needle);
+        $pos = $fnStrpos($result, $lcrop);
 
         while ( $pos === 0 ) {
             if (! $limit--) {
@@ -313,10 +313,10 @@ trait StrTrait
             }
 
             $result = $fnSubstr($result,
-                $fnStrlen($needle)
+                $fnStrlen($lcrop)
             );
 
-            $pos = $fnStrpos($result, $needle);
+            $pos = $fnStrpos($result, $lcrop);
         }
 
         return $result;
@@ -325,12 +325,12 @@ trait StrTrait
     /**
      * Обрезает у строки подстроку с конца (rtrim, только для строк а не букв)
      */
-    public static function str_rcrop(string $string, string $needle, bool $ignoreCase = null, int $limit = -1) : string
+    public static function str_rcrop(string $string, string $rcrop, bool $ignoreCase = null, int $limit = -1) : string
     {
         $ignoreCase = $ignoreCase ?? true;
 
         if ('' === $string) return $string;
-        if ('' === $needle) return $string;
+        if ('' === $rcrop) return $string;
 
         $result = $string;
 
@@ -341,16 +341,16 @@ trait StrTrait
             : static::str_mbfunc('strrpos');
 
 
-        $pos = $fnStrrpos($result, $needle);
+        $pos = $fnStrrpos($result, $rcrop);
 
-        while ( $pos === ($fnStrlen($result) - $fnStrlen($needle)) ) {
+        while ( $pos === ($fnStrlen($result) - $fnStrlen($rcrop)) ) {
             if (! $limit--) {
                 break;
             }
 
             $result = $fnSubstr($result, 0, $pos);
 
-            $pos = $fnStrrpos($result, $needle);
+            $pos = $fnStrrpos($result, $rcrop);
         }
 
         return $result;
@@ -359,19 +359,19 @@ trait StrTrait
     /**
      * Обрезает у строки подстроки с обеих сторон (trim, только для строк а не букв)
      */
-    public static function str_crop(string $string, $needles, bool $ignoreCase = null, int $limit = -1) : string
+    public static function str_crop(string $string, $crops, bool $ignoreCase = null, int $limit = -1) : string
     {
-        $needles = is_array($needles)
-            ? $needles
-            : ($needles ? [ $needles ] : []);
+        $crops = is_array($crops)
+            ? $crops
+            : ($crops ? [ $crops ] : []);
 
-        if (! $needles) {
+        if (! $crops) {
             return $string;
         }
 
-        $needleRcrop = $needleLcrop = array_shift($needles);
+        $needleRcrop = $needleLcrop = array_shift($crops);
 
-        if ($needles) $needleRcrop = array_shift($needles);
+        if ($crops) $needleRcrop = array_shift($crops);
 
         $result = $string;
         $result = static::str_lcrop($result, $needleLcrop, $ignoreCase, $limit);
@@ -382,80 +382,19 @@ trait StrTrait
 
 
     /**
-     * Добавляет подстроку в начале строки
-     */
-    public static function str_unltrim(string $string, string $repeat = null, int $times = null) : string
-    {
-        $repeat = $repeat ?? '';
-        $times = $times ?? 1;
-
-        if ('' === $repeat) return $string;
-
-        $times = max(0, $times);
-
-        $result = str_repeat($repeat, $times) . $string;
-
-        return $result;
-    }
-
-    /**
-     * Добавляет подстроку в конце строки
-     */
-    public static function str_unrtrim(string $string, string $repeat = null, int $times = null) : string
-    {
-        $repeat = $repeat ?? '';
-        $times = $times ?? 1;
-
-        if ('' === $repeat) return $string;
-
-        $times = max(0, $times);
-
-        $result = $string . str_repeat($repeat, $times);
-
-        return $result;
-    }
-
-    /**
-     * Оборачивает строку в подстроки, например в кавычки
-     */
-    public static function str_untrim(string $string, $repeats, int $times = null) : string
-    {
-        $repeats = is_array($repeats)
-            ? $repeats
-            : ($repeats ? [ $repeats ] : []);
-
-        if (! $repeats) {
-            return $string;
-        }
-
-        $repeatUnrtrim = $repeatUnltrim = array_shift($repeats);
-
-        if ($repeats) $repeatUnrtrim = array_shift($repeats);
-
-        $result = $string;
-        $result = static::str_unltrim($result, $repeatUnltrim, $times);
-        $result = static::str_unrtrim($result, $repeatUnrtrim, $times);
-
-        return $result;
-    }
-
-
-    /**
      * Добавляет подстроку в начало строки, если её уже там нет
      */
-    public static function str_prepend(string $string, string $prepend, bool $ignoreCase = null) : string
+    public static function str_unlcrop(string $string, string $lcrop, int $times = null, bool $ignoreCase = null) : string
     {
+        $times = $times ?? 1;
         $ignoreCase = $ignoreCase ?? true;
 
-        if ('' === $prepend) return $string;
+        if ('' === $lcrop) return $string;
+        if ($times < 1) $times = 1;
 
-        $fnStrpos = $ignoreCase
-            ? static::str_mbfunc('stripos')
-            : static::str_mbfunc('strpos');
-
-        $result = 0 === $fnStrpos($string, $prepend)
-            ? $string
-            : $prepend . $string;
+        $result = $string;
+        $result = static::str_lcrop($result, $lcrop, $ignoreCase);
+        $result = str_repeat($lcrop, $times) . $result;
 
         return $result;
     }
@@ -463,44 +402,41 @@ trait StrTrait
     /**
      * Добавляет подстроку в конец строки, если её уже там нет
      */
-    public static function str_append(string $string, string $append, bool $ignoreCase = null) : string
+    public static function str_unrcrop(string $string, string $rcrop, int $times = null, bool $ignoreCase = null) : string
     {
+        $times = $times ?? 1;
         $ignoreCase = $ignoreCase ?? true;
 
-        if ('' === $append) return $string;
+        if ('' === $rcrop) return $string;
+        if ($times < 1) $times = 1;
 
-        $fnStrlen = static::str_mbfunc('strlen');
-        $fnStrrpos = $ignoreCase
-            ? static::str_mbfunc('strripos')
-            : static::str_mbfunc('strrpos');
-
-        $result = (($fnStrlen($string) - $fnStrlen($append)) === $fnStrrpos($string, $append))
-            ? $string
-            : $string . $append;
+        $result = $string;
+        $result = static::str_rcrop($result, $rcrop, $ignoreCase);
+        $result = $result . str_repeat($rcrop, $times);
 
         return $result;
     }
 
     /**
      * Оборачивает строку в подстроки, если их уже там нет
+     *
+     * @param string|string[] $crops
+     * @param int|int[]       $times
      */
-    public static function str_wrap(string $string, $wraps, bool $ignoreCase = null) : string
+    public static function str_uncrop(string $string, $crops, $times = null, bool $ignoreCase = null) : string
     {
-        $wraps = is_array($wraps)
-            ? $wraps
-            : ($wraps ? [ $wraps ] : []);
+        $times = $times ?? 1;
 
-        if (! $wraps) {
+        $_crops = (array) $crops;
+        $_times = (array) $times;
+
+        if (! $_crops) {
             return $string;
         }
 
-        $wrapAppend = $wrapPrepend = array_shift($wraps);
-
-        if ($wraps) $wrapAppend = array_shift($wraps);
-
         $result = $string;
-        $result = static::str_prepend($result, $wrapPrepend, $ignoreCase);
-        $result = static::str_append($result, $wrapAppend, $ignoreCase);
+        $result = static::str_unlcrop($result, $_crops[ 0 ], $_times[ 0 ], $ignoreCase);
+        $result = static::str_unrcrop($result, $_crops[ 1 ] ?? $_crops[ 0 ], $_times[ 1 ] ?? $_times[ 0 ], $ignoreCase);
 
         return $result;
     }
