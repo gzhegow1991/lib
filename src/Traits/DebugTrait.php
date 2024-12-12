@@ -181,7 +181,7 @@ trait DebugTrait
         return $output;
     }
 
-    public static function debug_var_export($var, array $options = []) : ?string
+    public static function debug_var_export($var, array $options = [], int $level = 0) : ?string
     {
         $indent = $options[ 'indent' ] ?? "  ";
         $newline = $options[ 'newline' ] ?? "\n";
@@ -222,7 +222,7 @@ trait DebugTrait
 
                 $lines = [];
                 foreach ( $var as $key => $value ) {
-                    $line = $indent;
+                    $line = str_repeat($indent, $level + 1);
 
                     if (! $isListIndexed) {
                         $line .= is_string($key) ? "\"{$key}\"" : $key;
@@ -230,15 +230,15 @@ trait DebugTrait
                     }
 
                     // ! recursion
-                    $line .= static::debug_var_export($value, $options);
+                    $line .= static::debug_var_export($value, $options, $level + 1);
 
                     $lines[] = $line;
                 }
 
-                $result = "["
-                    . $newline
+                $result = ""
+                    . (($level > 0) ? str_repeat($indent, $level - 1) : "") . "[" . $newline
                     . implode("," . $newline, $lines) . $newline
-                    . $indent . "]";
+                    . str_repeat($indent, $level) . "]";
 
                 break;
 
@@ -326,40 +326,78 @@ trait DebugTrait
     }
 
 
+    public static function debug_value_multiline($value, array $options = []) : string
+    {
+        $output = static::debug_var_dump($value,
+            $options + [
+                'with_type'       => false,
+                'with_id'         => false,
+                'with_value'      => true,
+                'max_array_level' => 0,
+            ]
+        );
 
-    public static function debug_diff(string $a, string $b, string &$result = null) : bool
+        return $output;
+    }
+
+    public static function debug_array_multiline($value, array $options = []) : string
+    {
+        $output = static::debug_var_dump($value,
+            $options + [
+                'with_type'       => false,
+                'with_id'         => false,
+                'with_value'      => true,
+                'max_array_level' => 1,
+            ]
+        );
+
+        return $output;
+    }
+
+
+
+    public static function debug_diff(string $a, string $b = null, string &$result = null) : bool
     {
         $result = null;
 
+        $hasB = (null !== $b);
+
         static::str_eol($a, $aLines);
-        static::str_eol($b, $bLines);
 
-        $cnt = max(
-            count($aLines),
-            count($bLines)
-        );
+        $cnt = $cntA = count($aLines);
 
-        $lines = [];
+        if ($hasB) {
+            static::str_eol($b, $bLines);
+
+            $cnt = max($cntA, $cntB = count($bLines));
+        }
+
+        $linesA = [];
+        $linesB = [];
 
         $isDiff = false;
-
         for ( $i = 0; $i < $cnt; $i++ ) {
-            $aLine = ($aLines[ $i ] ?? '{ NULL }') ?: '""';
-            $bLine = ($bLines[ $i ] ?? '{ NULL }') ?: '""';
+            $aLine = ($aLines[ $i ] ?? ' ') ?: '""';
+            $bLine = ($bLines[ $i ] ?? ' ') ?: '""';
 
-            if ($aLine === $bLine) {
-                $lines[] = $aLine;
+            if (! $hasB) {
+                $linesA[] = $aLine;
 
-                continue;
+            } else {
+                if ($aLine === $bLine) {
+                    $linesA[] = $aLine;
+
+                    continue;
+                }
+
+                $linesA[] = "[{$i}] " . '--- ' . $aLine;
+                $linesB[] = "[{$i}] " . '+++ ' . $bLine;
             }
-
-            $lines[] = '--- ' . $aLine;
-            $lines[] = '+++ ' . $bLine;
 
             $isDiff = true;
         }
 
-        $result = implode(PHP_EOL, $lines);
+        $result = implode(PHP_EOL, array_merge($linesA, [ '' ], $linesB));
 
         return $isDiff;
     }

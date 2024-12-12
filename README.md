@@ -98,6 +98,18 @@ $fn = function () {
     echo \Gzhegow\Lib\Lib::debug_value(1.1) . PHP_EOL;
     echo \Gzhegow\Lib\Lib::debug_value('string') . PHP_EOL;
     echo \Gzhegow\Lib\Lib::debug_value([]) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value((object) []) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_value(STDOUT) . PHP_EOL;
+
+    _dump_ln('');
+
+    echo \Gzhegow\Lib\Lib::debug_value(
+            [
+                [ '1', 'apple' ],
+                [ '2', 'apples' ],
+                [ '1.5', 'apples' ],
+            ]
+        ) . PHP_EOL;
     echo \Gzhegow\Lib\Lib::debug_array(
             [
                 [ '1', 'apple' ],
@@ -105,8 +117,22 @@ $fn = function () {
                 [ '1.5', 'apples' ],
             ]
         ) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug_value((object) []) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug_value(STDOUT) . PHP_EOL;
+
+    _dump_ln('');
+
+    echo \Gzhegow\Lib\Lib::debug_value_multiline(
+            [
+                [ '1', 'apple' ],
+                [ '2', 'apples' ],
+                [ '1.5', 'apples' ],
+            ]
+        ) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug_array_multiline(
+            [
+                [ '1', 'apple' ],
+                [ '2', 'apples' ],
+                [ '1.5', 'apples' ],
+            ]) . PHP_EOL;
 
     _dump('');
 };
@@ -118,9 +144,31 @@ FALSE
 1.1
 "string"
 [  ]
-[ [ "1", "apple" ], [ "2", "apples" ], [ "1.5", "apples" ] ]
 { object # stdClass }
 { resource(stream) }
+""
+[ "{ array(2) }", "{ array(2) }", "{ array(2) }" ]
+[ [ "1", "apple" ], [ "2", "apples" ], [ "1.5", "apples" ] ]
+""
+[
+  "{ array(2) }",
+  "{ array(2) }",
+  "{ array(2) }"
+]
+[
+  [
+    "1",
+    "apple"
+  ],
+  [
+    "2",
+    "apples"
+  ],
+  [
+    "1.5",
+    "apples"
+  ]
+]
 ""
 HEREDOC
 );
