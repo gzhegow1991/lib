@@ -2,9 +2,15 @@
 
 namespace Gzhegow\Lib\Traits;
 
+use Gzhegow\Lib\Exception\RuntimeException;
+
+
 trait DebugTrait
 {
-    public static function debug_var_dump($var, array $options = []) // : int|float|string
+    /**
+     * @return string|float|int|null
+     */
+    public static function debug_var_dump($var, array $options = []) // : int|float|string|null
     {
         $withType = $options[ 'with_type' ] ?? true;
         $withId = $options[ 'with_id' ] ?? true;
@@ -62,53 +68,6 @@ trait DebugTrait
         }
 
         if (null === $output) {
-            if (is_array($var)) {
-                $arrayCopy = $var;
-                $arrayCount = count($var);
-
-                $dump = null;
-                if ($withValue) {
-                    foreach ( static::array_walk(
-                        $arrayCopy,
-                        _ARRAY_WALK_WITH_EMPTY_ARRAYS | _ARRAY_WALK_WITH_PARENTS
-                    ) as $path => &$value ) {
-                        /** @var array $path */
-
-                        if (count($path) <= $maxArrayLevel) {
-                            continue;
-                        }
-
-                        if (! is_array($value)) {
-                            continue;
-                        }
-
-                        $value = static::debug_var_dump($value,
-                            [
-                                'with_type'       => true,
-                                'with_value'      => false,
-                                'max_array_level' => 0,
-                            ] + $options
-                        );
-                    }
-                    unset($value);
-
-                    $dump = static::debug_var_export(
-                        $arrayCopy,
-                        [ 'addcslashes' => false ]
-                    );
-                }
-
-                $output = [];
-                if ($withType) {
-                    $output[] = "{$type}({$arrayCount})";
-                }
-                if ($withValue) {
-                    $output[] = $dump;
-                }
-            }
-        }
-
-        if (null === $output) {
             if (is_object($var)) {
                 $objectClass = get_class($var);
                 $objectId = spl_object_id($var);
@@ -133,7 +92,75 @@ trait DebugTrait
         }
 
         if (null === $output) {
-            if (is_resource($var)) {
+            if (is_array($var)) {
+                $arrayCopy = $var;
+                $arrayCount = count($var);
+
+                $dump = null;
+                if ($withValue) {
+                    foreach ( static::array_walk(
+                        $arrayCopy,
+                        _ARRAY_WALK_WITH_EMPTY_ARRAYS | _ARRAY_WALK_WITH_PARENTS
+                    ) as $path => &$value ) {
+                        /** @var array $path */
+
+                        if (count($path) <= $maxArrayLevel) {
+                            continue;
+                        }
+
+                        if (is_object($value)) {
+                            $value = static::debug_var_dump($value,
+                                [
+                                    'with_type'  => true,
+                                    'with_value' => false,
+                                ] + $options
+                            );
+
+                            continue;
+                        }
+
+                        if (is_array($value)) {
+                            $value = static::debug_var_dump($value,
+                                [
+                                    'with_type'       => true,
+                                    'with_value'      => false,
+                                    //
+                                    'max_array_level' => 0,
+                                ] + $options
+                            );
+
+                            continue;
+                        }
+
+                        if (null !== static::parse_resource($value)) {
+                            $value = static::debug_var_dump($value,
+                                [
+                                    'with_type'  => true,
+                                    'with_value' => false,
+                                ] + $options
+                            );
+                        }
+                    }
+                    unset($value);
+
+                    $dump = static::debug_var_export(
+                        $arrayCopy,
+                        [ 'addcslashes' => false ]
+                    );
+                }
+
+                $output = [];
+                if ($withType) {
+                    $output[] = "{$type}({$arrayCount})";
+                }
+                if ($withValue) {
+                    $output[] = $dump;
+                }
+            }
+        }
+
+        if (null === $output) {
+            if (null !== static::parse_resource($var)) {
                 $resourceType = get_resource_type($var);
                 $resourceId = PHP_VERSION_ID > 80000
                     ? get_resource_id($var)
@@ -155,6 +182,14 @@ trait DebugTrait
 
         } elseif ($cnt === 1) {
             $output = $output[ 0 ];
+
+        } else {
+            throw new RuntimeException(
+                [
+                    'Unable to dump',
+                    $var,
+                ]
+            );
         }
 
         if ("\n" !== $newline) {
@@ -181,19 +216,27 @@ trait DebugTrait
         return $output;
     }
 
-    public static function debug_var_export($var, array $options = [], int $level = 0) : ?string
+    /**
+     * @return string|float|int|null
+     */
+    public static function debug_var_export($var, array $options = [], int $level = 0) // : string|float|int|null
     {
         $indent = $options[ 'indent' ] ?? "  ";
         $newline = $options[ 'newline' ] ?? "\n";
         $addcslashes = $options[ 'addcslashes' ] ?? true;
 
         switch ( gettype($var) ) {
-            case "null":
+            case "NULL":
                 $result = "NULL";
                 break;
 
             case "boolean":
                 $result = ($var === true) ? "TRUE" : "FALSE";
+                break;
+
+            case "integer":
+            case "double":
+                $result = $var;
                 break;
 
             case "string":

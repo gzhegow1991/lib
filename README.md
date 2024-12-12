@@ -103,18 +103,19 @@ $fn = function () {
 
     _dump_ln('');
 
+    $stdClass = (object) [];
     echo \Gzhegow\Lib\Lib::debug_value(
             [
-                [ '1', 'apple' ],
-                [ '2', 'apples' ],
-                [ '1.5', 'apples' ],
+                [ 1, 'apple', $stdClass ],
+                [ 2, 'apples', $stdClass ],
+                [ 1.5, 'apples', $stdClass ],
             ]
         ) . PHP_EOL;
     echo \Gzhegow\Lib\Lib::debug_array(
             [
-                [ '1', 'apple' ],
-                [ '2', 'apples' ],
-                [ '1.5', 'apples' ],
+                [ 1, 'apple', $stdClass ],
+                [ 2, 'apples', $stdClass ],
+                [ 1.5, 'apples', $stdClass ],
             ]
         ) . PHP_EOL;
 
@@ -122,16 +123,16 @@ $fn = function () {
 
     echo \Gzhegow\Lib\Lib::debug_value_multiline(
             [
-                [ '1', 'apple' ],
-                [ '2', 'apples' ],
-                [ '1.5', 'apples' ],
+                [ 1, 'apple', $stdClass ],
+                [ 2, 'apples', $stdClass ],
+                [ 1.5, 'apples', $stdClass ],
             ]
         ) . PHP_EOL;
     echo \Gzhegow\Lib\Lib::debug_array_multiline(
             [
-                [ '1', 'apple' ],
-                [ '2', 'apples' ],
-                [ '1.5', 'apples' ],
+                [ 1, 'apple', $stdClass ],
+                [ 2, 'apples', $stdClass ],
+                [ 1.5, 'apples', $stdClass ],
             ]) . PHP_EOL;
 
     _dump('');
@@ -147,26 +148,29 @@ FALSE
 { object # stdClass }
 { resource(stream) }
 ""
-[ "{ array(2) }", "{ array(2) }", "{ array(2) }" ]
-[ [ "1", "apple" ], [ "2", "apples" ], [ "1.5", "apples" ] ]
+[ "{ array(3) }", "{ array(3) }", "{ array(3) }" ]
+[ [ 1, "apple", "{ object # stdClass }" ], [ 2, "apples", "{ object # stdClass }" ], [ 1.5, "apples", "{ object # stdClass }" ] ]
 ""
 [
-  "{ array(2) }",
-  "{ array(2) }",
-  "{ array(2) }"
+  "{ array(3) }",
+  "{ array(3) }",
+  "{ array(3) }"
 ]
 [
   [
-    "1",
-    "apple"
+    1,
+    "apple",
+    "{ object # stdClass }"
   ],
   [
-    "2",
-    "apples"
+    2,
+    "apples",
+    "{ object # stdClass }"
   ],
   [
-    "1.5",
-    "apples"
+    1.5,
+    "apples",
+    "{ object # stdClass }"
   ]
 ]
 ""
