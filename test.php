@@ -1,5 +1,6 @@
 <?php
 
+require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 
@@ -75,7 +76,7 @@ function _assert_call(\Closure $fn, array $expectResult = [], string $expectOutp
 // >>> ЗАПУСКАЕМ!
 
 // >>> TEST
-// > это пример теста
+// > тесты DebugTrait
 $fn = function () {
     _dump_ln('[ TEST 1 ]');
 
@@ -165,7 +166,7 @@ HEREDOC
 );
 
 // >>> TEST
-// > это пример теста
+// > тесты StrTrait
 $fn = function () {
     _dump_ln('[ TEST 2 ]');
 
@@ -222,6 +223,59 @@ _assert_call($fn, [], <<<HEREDOC
 "hello_world_foo_bar"
 "helloWorldFooBar"
 "HelloWorldFooBar"
+""
+HEREDOC
+);
+
+// >>> TEST
+// > тесты FsTrait
+$fn = function () {
+    _dump_ln('[ TEST 3 ]');
+
+    $result = \Gzhegow\Lib\Lib::fs_file_put_contents(__DIR__ . '/var/1/1.txt', '123');
+    _dump_ln($result);
+
+    $result = \Gzhegow\Lib\Lib::fs_file_put_contents(__DIR__ . '/var/1/1/1.txt', '123');
+    _dump_ln($result);
+
+
+    $result = \Gzhegow\Lib\Lib::fs_file_put_contents(__DIR__ . '/var/1/1/1/1.txt', '123');
+    _dump_ln($result);
+
+    $result = \Gzhegow\Lib\Lib::fs_file_get_contents(__DIR__ . '/var/1/1/1/1.txt', '123');
+    _dump_ln($result);
+
+
+    $result = \Gzhegow\Lib\Lib::fs_unlink(__DIR__ . '/var/1.txt');
+    _dump_ln($result);
+
+    try {
+        \Gzhegow\Lib\Lib::fs_unlink(__DIR__ . '/var/1/1', $isRecursive = false);
+    }
+    catch ( \Throwable $e ) {
+        _dump_ln('[ CATCH ]');
+    }
+
+    $result = \Gzhegow\Lib\Lib::fs_unlink(__DIR__ . '/var/1/1', $isRecursive = true);
+    _dump_ln($result);
+
+
+    $result = \Gzhegow\Lib\Lib::fs_rmdir_recursive(__DIR__ . '/var/1');
+    _dump_ln($result);
+
+
+    _dump('');
+};
+_assert_call($fn, [], <<<HEREDOC
+"[ TEST 3 ]"
+3
+3
+3
+123
+TRUE
+"[ CATCH ]"
+TRUE
+TRUE
 ""
 HEREDOC
 );

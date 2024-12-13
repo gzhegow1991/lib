@@ -250,6 +250,38 @@ trait PhpTrait
     }
 
 
+    public static function php_dirname(?string $path, string $separator = null, int $levels = null) : ?string
+    {
+        $separator = $separator ?? DIRECTORY_SEPARATOR;
+        $levels = $levels ?? 1;
+
+        if (null === $path) return null;
+        if ('' === $path) return null;
+
+        $_value = $path;
+
+        $hasSeparator = (false !== strpos($_value, $separator));
+
+        $_value = $hasSeparator
+            ? str_replace([ '\\', DIRECTORY_SEPARATOR, $separator ], '/', $_value)
+            : str_replace([ '\\', DIRECTORY_SEPARATOR ], '/', $_value);
+
+        $_value = ltrim($_value, '/');
+
+        if (false === strpos($_value, '/')) {
+            $_value = null;
+
+        } else {
+            $_value = preg_replace('~/+~', '/', $_value);
+
+            $_value = dirname($_value, $levels);
+            $_value = str_replace('/', $separator, $_value);
+        }
+
+        return $_value;
+    }
+
+
     /**
      * @param class-string<\Exception|\LogicException|\RuntimeException>|null $throwable
      *

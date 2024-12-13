@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib;
 
+use Gzhegow\Lib\Traits\FsTrait;
 use Gzhegow\Lib\Traits\PhpTrait;
 use Gzhegow\Lib\Traits\StrTrait;
 use Gzhegow\Lib\Traits\BoolTrait;
@@ -17,6 +18,7 @@ class Lib
     use AssertTrait;
     use BoolTrait;
     use DebugTrait;
+    use FsTrait;
     use ParseTrait;
     use PhpTrait;
     use StrTrait;

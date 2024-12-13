@@ -622,28 +622,6 @@ trait ParseTrait
         return $_value;
     }
 
-    public static function parse_realpath(
-        $value, array $optional = [],
-        array &$pathinfo = null
-    ) : ?string
-    {
-        $_value = static::parse_path(
-            $value, $optional,
-            $pathinfo
-        );
-
-        if (null === $_value) {
-            return null;
-        }
-
-        if (false === ($_value = realpath($_value))) {
-            return null;
-        }
-
-        return $_value;
-    }
-
-
     public static function parse_dirpath(
         $value, array $optional = [],
         array &$pathinfo = null
@@ -658,7 +636,13 @@ trait ParseTrait
             return null;
         }
 
-        if (file_exists($_value) && ! is_dir($_value)) {
+        $status = file_exists($_value);
+
+        if (false === $status) {
+            return $_value;
+        }
+
+        if (! is_dir($_value)) {
             return null;
         }
 
@@ -681,7 +665,93 @@ trait ParseTrait
             return null;
         }
 
-        if (file_exists($_value) && ! is_file($_value)) {
+        $status = file_exists($_value);
+
+        if (false === $status) {
+            return $_value;
+        }
+
+        if (! is_file($_value)) {
+            return null;
+        }
+
+        $_value = realpath($_value);
+
+        return $_value;
+    }
+
+
+    public static function parse_path_realpath(
+        $value, array $optional = [],
+        array &$pathinfo = null
+    ) : ?string
+    {
+        $_value = static::parse_path(
+            $value, $optional,
+            $pathinfo
+        );
+
+        if (null === $_value) {
+            return null;
+        }
+
+        if (false === ($_value = realpath($_value))) {
+            return null;
+        }
+
+        return $_value;
+    }
+
+    public static function parse_dirpath_realpath(
+        $value, array $optional = [],
+        array &$pathinfo = null
+    ) : ?string
+    {
+        $_value = static::parse_path(
+            $value, $optional,
+            $pathinfo
+        );
+
+        if (null === $_value) {
+            return null;
+        }
+
+        $status = file_exists($_value);
+
+        if (false === $status) {
+            return null;
+        }
+
+        if (! is_dir($_value)) {
+            return null;
+        }
+
+        $_value = realpath($_value);
+
+        return $_value;
+    }
+
+    public static function parse_filepath_realpath(
+        $value, array $optional = [],
+        array &$pathinfo = null
+    ) : ?string
+    {
+        $_value = static::parse_path(
+            $value, $optional,
+            $pathinfo
+        );
+
+        if (null === $_value) {
+            return null;
+        }
+
+        $status = file_exists($_value);
+
+        if (false === $status) {
+            return null;
+        }
+
+        if (! is_file($_value)) {
             return null;
         }
 
