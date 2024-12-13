@@ -7,6 +7,83 @@ use Gzhegow\Lib\Exception\LogicException;
 
 trait PhpTrait
 {
+    public static function php_count($value) : ?int
+    {
+        if (is_array($value)) {
+            return count($value);
+        }
+
+        if (static::parse_countable($value)) {
+            return count($value);
+        }
+
+        return null;
+    }
+
+
+    public static function php_debug_backtrace($options = null, $limit = null) : array
+    {
+        $options = $options ?? DEBUG_BACKTRACE_IGNORE_ARGS;
+        if ($options < 0) $options = DEBUG_BACKTRACE_IGNORE_ARGS;
+
+        $limit = $limit ?? 0;
+        if ($limit < 0) $limit = 1;
+
+        $result = debug_backtrace($options, $limit);
+
+        return $result;
+    }
+
+
+    public static function php_dirname(?string $path, string $separator = null, int $levels = null) : ?string
+    {
+        $separator = $separator ?? DIRECTORY_SEPARATOR;
+        $levels = $levels ?? 1;
+
+        if (null === $path) return null;
+        if ('' === $path) return null;
+
+        $_value = $path;
+
+        $hasSeparator = (false !== strpos($_value, $separator));
+
+        $_value = $hasSeparator
+            ? str_replace([ '\\', DIRECTORY_SEPARATOR, $separator ], '/', $_value)
+            : str_replace([ '\\', DIRECTORY_SEPARATOR ], '/', $_value);
+
+        $_value = ltrim($_value, '/');
+
+        if (false === strpos($_value, '/')) {
+            $_value = null;
+
+        } else {
+            $_value = preg_replace('~/+~', '/', $_value);
+
+            $_value = dirname($_value, $levels);
+            $_value = str_replace('/', $separator, $_value);
+        }
+
+        return $_value;
+    }
+
+
+    public static function php_get_defined_functions() : array
+    {
+        $getDefinedFunctions = get_defined_functions();
+
+        $flipInternal = array_fill_keys($getDefinedFunctions[ 'internal' ] ?? [], true);
+        $flipUser = array_fill_keys($getDefinedFunctions[ 'user' ] ?? [], true);
+
+        ksort($flipInternal);
+        ksort($flipUser);
+
+        $result = [];
+        $result[ 'internal' ] += $flipInternal;
+        $result[ 'user' ] += $flipUser;
+
+        return $result;
+    }
+
     public static function php_get_error_handler() : ?callable
     {
         $handler = set_error_handler(static function () { });
@@ -21,20 +98,6 @@ trait PhpTrait
         restore_exception_handler();
 
         return $handler;
-    }
-
-
-    function php_debug_backtrace($options = null, $limit = null) : array
-    {
-        $options = $options ?? DEBUG_BACKTRACE_IGNORE_ARGS;
-        if ($options < 0) $options = DEBUG_BACKTRACE_IGNORE_ARGS;
-
-        $limit = $limit ?? 0;
-        if ($limit < 0) $limit = 1;
-
-        $result = debug_backtrace($options, $limit);
-
-        return $result;
     }
 
 
@@ -118,167 +181,6 @@ trait PhpTrait
         $current->list[] = $error;
 
         return $result;
-    }
-
-
-    /**
-     * @param callable|string $function
-     */
-    public static function php_function_exists($function) : ?string
-    {
-        if (! is_string($function)) return null;
-
-        if (function_exists($function)) {
-            return $function;
-        }
-
-        return null;
-    }
-
-    /**
-     * @param callable|array|object|class-string     $mixed
-     *
-     * @param array{0: class-string, 1: string}|null $resultArray
-     * @param callable|string|null                   $resultString
-     *
-     * @return array{0: class-string|object, 1: string}|null
-     */
-    public static function php_method_exists(
-        $mixed, $method = null,
-        array &$resultArray = null, string &$resultString = null
-    ) : ?array
-    {
-        $resultArray = null;
-        $resultString = null;
-
-        $method = $method ?? '';
-
-        $_class = null;
-        $_object = null;
-        $_method = null;
-        if (is_object($mixed)) {
-            $_object = $mixed;
-
-        } elseif (is_array($mixed)) {
-            $list = array_values($mixed);
-
-            [ $classOrObject, $_method ] = $list + [ '', '' ];
-
-            is_object($classOrObject)
-                ? ($_object = $classOrObject)
-                : ($_class = $classOrObject);
-
-        } elseif (is_string($mixed)) {
-            [ $_class, $_method ] = explode('::', $mixed) + [ '', '' ];
-
-            $_method = $_method ?? $method;
-        }
-
-        if (isset($_method) && ! is_string($_method)) {
-            return null;
-        }
-
-        if ($_object) {
-            if ($_object instanceof \Closure) {
-                return null;
-            }
-
-            if (method_exists($_object, $_method)) {
-                $class = get_class($_object);
-
-                $resultArray = [ $class, $_method ];
-                $resultString = $class . '::' . $_method;
-
-                return [ $_object, $_method ];
-            }
-
-        } elseif ($_class) {
-            if (method_exists($_class, $_method)) {
-                $resultArray = [ $_class, $_method ];
-                $resultString = $_class . '::' . $_method;
-
-                return [ $_class, $_method ];
-            }
-        }
-
-        return null;
-    }
-
-
-    public static function php_fn($fn, array $args = []) : \Closure
-    {
-        return function (...$arguments) use ($fn, $args) {
-            $_args = array_merge($arguments, $args);
-
-            return call_user_func_array($fn, $_args);
-        };
-    }
-
-    public static function php_fn_not($fn, array $args = []) : \Closure
-    {
-        return function (...$arguments) use ($fn, $args) {
-            $_args = array_merge($arguments, $args);
-
-            return ! call_user_func_array($fn, $_args);
-        };
-    }
-
-
-    public static function php_count($value) : ?int
-    {
-        if (is_array($value)) {
-            return count($value);
-        }
-
-        if (static::parse_countable($value)) {
-            return count($value);
-        }
-
-        return null;
-    }
-
-
-    public static function php_microtime(\DateTimeInterface $date = null) : float
-    {
-        $date = $date ?? new \DateTime();
-
-        return floatval(
-            $date->format('U')
-            . '.'
-            . str_pad($date->format('u'), 6, '0')
-        );
-    }
-
-
-    public static function php_dirname(?string $path, string $separator = null, int $levels = null) : ?string
-    {
-        $separator = $separator ?? DIRECTORY_SEPARATOR;
-        $levels = $levels ?? 1;
-
-        if (null === $path) return null;
-        if ('' === $path) return null;
-
-        $_value = $path;
-
-        $hasSeparator = (false !== strpos($_value, $separator));
-
-        $_value = $hasSeparator
-            ? str_replace([ '\\', DIRECTORY_SEPARATOR, $separator ], '/', $_value)
-            : str_replace([ '\\', DIRECTORY_SEPARATOR ], '/', $_value);
-
-        $_value = ltrim($_value, '/');
-
-        if (false === strpos($_value, '/')) {
-            $_value = null;
-
-        } else {
-            $_value = preg_replace('~/+~', '/', $_value);
-
-            $_value = dirname($_value, $levels);
-            $_value = str_replace('/', $separator, $_value);
-        }
-
-        return $_value;
     }
 
 
@@ -440,19 +342,163 @@ trait PhpTrait
     }
 
 
-    public static function php_get_defined_functions() : array
+    public static function php_microtime(\DateTimeInterface $date = null) : float
     {
-        $getDefinedFunctions = get_defined_functions();
+        $date = $date ?? new \DateTime();
 
-        $flipInternal = array_fill_keys($getDefinedFunctions[ 'internal' ] ?? [], true);
-        $flipUser = array_fill_keys($getDefinedFunctions[ 'user' ] ?? [], true);
+        return floatval(
+            $date->format('U')
+            . '.'
+            . str_pad($date->format('u'), 6, '0')
+        );
+    }
 
-        ksort($flipInternal);
-        ksort($flipUser);
 
-        $result = [];
-        $result[ 'internal' ] += $flipInternal;
-        $result[ 'user' ] += $flipUser;
+    /**
+     * @param callable|string $function
+     */
+    public static function php_function_exists($function) : ?string
+    {
+        if (! is_string($function)) return null;
+
+        if (function_exists($function)) {
+            return $function;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param callable|array|object|class-string     $mixed
+     *
+     * @param array{0: class-string, 1: string}|null $resultArray
+     * @param callable|string|null                   $resultString
+     *
+     * @return array{0: class-string|object, 1: string}|null
+     */
+    public static function php_method_exists(
+        $mixed, $method = null,
+        array &$resultArray = null, string &$resultString = null
+    ) : ?array
+    {
+        $resultArray = null;
+        $resultString = null;
+
+        $method = $method ?? '';
+
+        $_class = null;
+        $_object = null;
+        $_method = null;
+        if (is_object($mixed)) {
+            $_object = $mixed;
+
+        } elseif (is_array($mixed)) {
+            $list = array_values($mixed);
+
+            [ $classOrObject, $_method ] = $list + [ '', '' ];
+
+            is_object($classOrObject)
+                ? ($_object = $classOrObject)
+                : ($_class = $classOrObject);
+
+        } elseif (is_string($mixed)) {
+            [ $_class, $_method ] = explode('::', $mixed) + [ '', '' ];
+
+            $_method = $_method ?? $method;
+        }
+
+        if (isset($_method) && ! is_string($_method)) {
+            return null;
+        }
+
+        if ($_object) {
+            if ($_object instanceof \Closure) {
+                return null;
+            }
+
+            if (method_exists($_object, $_method)) {
+                $class = get_class($_object);
+
+                $resultArray = [ $class, $_method ];
+                $resultString = $class . '::' . $_method;
+
+                return [ $_object, $_method ];
+            }
+
+        } elseif ($_class) {
+            if (method_exists($_class, $_method)) {
+                $resultArray = [ $_class, $_method ];
+                $resultString = $_class . '::' . $_method;
+
+                return [ $_class, $_method ];
+            }
+        }
+
+        return null;
+    }
+
+
+    public static function php_fn($fn, array $args = []) : \Closure
+    {
+        return function (...$arguments) use ($fn, $args) {
+            $_args = array_merge($arguments, $args);
+
+            return call_user_func_array($fn, $_args);
+        };
+    }
+
+    public static function php_fn_not($fn, array $args = []) : \Closure
+    {
+        return function (...$arguments) use ($fn, $args) {
+            $_args = array_merge($arguments, $args);
+
+            return ! call_user_func_array($fn, $_args);
+        };
+    }
+
+
+    /**
+     * @param mixed $data
+     */
+    public static function php_serialize($data) : ?string
+    {
+        error_clear_last();
+
+        try {
+            $result = serialize($data);
+        }
+        catch ( \Throwable $e ) {
+            $result = null;
+        }
+
+        if (error_get_last()) {
+            $result = null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public static function php_unserialize(string $data) // : mixed|null
+    {
+        error_clear_last();
+
+        try {
+            $result = unserialize($data);
+        }
+        catch ( \Throwable $e ) {
+            $result = null;
+        }
+
+        if (error_get_last()) {
+            $result = null;
+        }
+
+        if (is_object($result) && (get_class($result) === '__PHP_Incomplete_Class')) {
+            $result = null;
+        }
 
         return $result;
     }
