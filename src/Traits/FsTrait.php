@@ -71,12 +71,12 @@ trait FsTrait
             }
         }
 
-        $result = file_put_contents(
+        $size = file_put_contents(
             $filepath, $data,
             ...$_filePutContentsArgs
         );
 
-        if (false === $result) {
+        if (false === $size) {
             throw new RuntimeException(
                 'Unable to write file: ' . $filepath
             );
@@ -95,7 +95,7 @@ trait FsTrait
             }
         }
 
-        return $result;
+        return $size;
     }
 
 
@@ -140,5 +140,68 @@ trait FsTrait
 
             yield $i => $spl;
         }
+    }
+
+
+    public static function fs_rm(
+        string $filepath,
+        array $unlinkArgs = null
+    ) : bool
+    {
+        $unlinkArgs = $unlinkArgs ?? [];
+
+        if (null === ($_filepath = static::parse_filepath($filepath))) {
+            throw new RuntimeException(
+                'Bad filepath: ' . $_filepath
+            );
+        }
+
+        if (! file_exists($_filepath)) {
+            return true;
+        }
+
+        $status = unlink(
+            $_filepath,
+            ...$unlinkArgs
+        );
+
+        if (false === $status) {
+            throw new RuntimeException(
+                'Unable to delete file: ' . $filepath
+            );
+        }
+
+        return true;
+    }
+
+    public static function fs_rmdir(
+        string $dirpath,
+        array $rmdirArgs = null
+    ) : bool
+    {
+        $rmdirArgs = $rmdirArgs ?? [];
+
+        if (null === ($_dirpath = static::parse_dirpath($dirpath))) {
+            throw new RuntimeException(
+                'Bad dirpath: ' . $_dirpath
+            );
+        }
+
+        if (! file_exists($_dirpath)) {
+            return true;
+        }
+
+        $status = rmdir(
+            $_dirpath,
+            ...$rmdirArgs
+        );
+
+        if (false === $status) {
+            throw new RuntimeException(
+                'Unable to delete directory: ' . $dirpath
+            );
+        }
+
+        return true;
     }
 }

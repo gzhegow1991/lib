@@ -265,10 +265,10 @@ $fn = function () {
         as $spl
     ) {
         $spl->isDir()
-            ? rmdir($spl->getRealPath())
-            : unlink($spl->getRealPath());
+            ? \Gzhegow\Lib\Lib::fs_rmdir($spl->getRealPath())
+            : \Gzhegow\Lib\Lib::fs_rm($spl->getRealPath());
     }
-    rmdir(__DIR__ . '/var/1');
+    \Gzhegow\Lib\Lib::fs_rmdir(__DIR__ . '/var/1');
 
     _dump('');
 };
