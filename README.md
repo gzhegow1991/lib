@@ -245,37 +245,30 @@ HEREDOC
 $fn = function () {
     _dump_ln('[ TEST 3 ]');
 
-    $result = \Gzhegow\Lib\Lib::fs_file_put_contents(__DIR__ . '/var/1/1.txt', '123');
+
+    $result = \Gzhegow\Lib\Lib::fs_file_put_contents(__DIR__ . '/var/1/1/1/1.txt', '123', [ 0775, true ]);
     _dump_ln($result);
 
     $result = \Gzhegow\Lib\Lib::fs_file_put_contents(__DIR__ . '/var/1/1/1.txt', '123');
     _dump_ln($result);
 
-
-    $result = \Gzhegow\Lib\Lib::fs_file_put_contents(__DIR__ . '/var/1/1/1/1.txt', '123');
-    _dump_ln($result);
-
-    $result = \Gzhegow\Lib\Lib::fs_file_get_contents(__DIR__ . '/var/1/1/1/1.txt', '123');
+    $result = \Gzhegow\Lib\Lib::fs_file_put_contents(__DIR__ . '/var/1/1.txt', '123');
     _dump_ln($result);
 
 
-    $result = \Gzhegow\Lib\Lib::fs_unlink(__DIR__ . '/var/1.txt');
+    $result = \Gzhegow\Lib\Lib::fs_file_get_contents(__DIR__ . '/var/1/1/1/1.txt');
     _dump_ln($result);
 
-    try {
-        \Gzhegow\Lib\Lib::fs_unlink(__DIR__ . '/var/1/1', $isRecursive = false);
+
+    foreach (
+        \Gzhegow\Lib\Lib::fs_dir_walk(__DIR__ . '/var/1')
+        as $spl
+    ) {
+        $spl->isDir()
+            ? rmdir($spl->getRealPath())
+            : unlink($spl->getRealPath());
     }
-    catch ( \Throwable $e ) {
-        _dump_ln('[ CATCH ]');
-    }
-
-    $result = \Gzhegow\Lib\Lib::fs_unlink(__DIR__ . '/var/1/1', $isRecursive = true);
-    _dump_ln($result);
-
-
-    $result = \Gzhegow\Lib\Lib::fs_rmdir_recursive(__DIR__ . '/var/1');
-    _dump_ln($result);
-
+    rmdir(__DIR__ . '/var/1');
 
     _dump('');
 };
@@ -285,10 +278,6 @@ _assert_call($fn, [], <<<HEREDOC
 3
 3
 123
-TRUE
-"[ CATCH ]"
-TRUE
-TRUE
 ""
 HEREDOC
 );
