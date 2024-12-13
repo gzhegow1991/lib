@@ -53,7 +53,6 @@ set_exception_handler(function (\Throwable $e) {
 
 
 // > добавляем несколько функция для тестирования
-// > добавляем несколько функция для тестирования
 function _dump(...$values) : void
 {
     $lines = [];
