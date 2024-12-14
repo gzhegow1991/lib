@@ -402,50 +402,50 @@ trait DebugTrait
     {
         $result = null;
 
-        $hasB = (null !== $actual);
+        $hasExpect = (null !== $expect);
 
-        static::str_eol($expect, $aLines);
+        static::str_eol($actual, $actualLines);
 
-        $cnt = $cntA = count($aLines);
+        $cnt = $cntA = count($actualLines);
 
-        if ($hasB) {
-            static::str_eol($actual, $bLines);
+        if ($hasExpect) {
+            static::str_eol($expect, $expectLines);
 
-            $cnt = max($cntA, $cntB = count($bLines));
+            $cnt = max($cntA, $cntB = count($expectLines));
         }
 
-        $linesA = [];
-        $linesB = [];
+        $actualLinesNew = [];
+        $expectLinesNew = [];
 
         $isDiff = false;
         for ( $i = 0; $i < $cnt; $i++ ) {
-            $aLine = ($aLines[ $i ] ?? ' ') ?: '""';
-            $bLine = ($bLines[ $i ] ?? ' ') ?: '""';
+            $actualLine = ($actualLines[ $i ] ?? ' ') ?: '""';
+            $expectLine = ($expectLines[ $i ] ?? ' ') ?: '""';
 
-            if (! $hasB) {
-                $linesA[] = $aLine;
+            if (! $hasExpect) {
+                $actualLinesNew[] = $actualLine;
 
             } else {
-                if ($aLine === $bLine) {
-                    $linesA[] = "[{$i}] " . $aLine;
-                    $linesB[] = "[{$i}] " . $bLine;
+                if ($actualLine === $expectLine) {
+                    $actualLinesNew[] = "[{$i}] " . $actualLine;
+                    $expectLinesNew[] = "[{$i}] " . $expectLine;
 
                     continue;
                 }
 
-                $linesA[] = "--- [{$i}] " . $aLine;
-                $linesB[] = "+++ [{$i}] " . $bLine;
+                $expectLinesNew[] = "--- [{$i}] " . $expectLine;
+                $actualLinesNew[] = "+++ [{$i}] " . $actualLine;
             }
 
             $isDiff = true;
         }
 
-        $lines[] = $linesA;
-
         if ($isDiff) {
+            $lines[] = $expectLinesNew;
             $lines[] = [ '' ];
-            $lines[] = $linesB;
         }
+
+        $lines[] = $actualLinesNew;
 
         $result = implode(PHP_EOL, array_merge(...$lines));
 
