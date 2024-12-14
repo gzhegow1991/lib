@@ -419,8 +419,11 @@ trait DebugTrait
 
         $isDiff = false;
         for ( $i = 0; $i < $cnt; $i++ ) {
-            $actualLine = ($actualLines[ $i ] ?? ' ') ?: '""';
-            $expectLine = ($expectLines[ $i ] ?? ' ') ?: '""';
+            $actualLine = $actualLines[ $i ] ?? ' ';
+            $expectLine = $expectLines[ $i ] ?? ' ';
+
+            if ('' === $actualLine) $actualLine = '""';
+            if ('' === $expectLine) $expectLine = '""';
 
             if (! $hasExpect) {
                 $actualLinesNew[] = $actualLine;
