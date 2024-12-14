@@ -2,119 +2,286 @@
 
 namespace Gzhegow\Lib\Traits;
 
+use Gzhegow\Lib\Exception\RuntimeException;
+
+
 trait AssertTrait
 {
     /**
-     * @param callable                                                          $fn
-     * @param object{ microtime?: float, output?: string, result?: mixed }|null $except
-     * @param array|null                                                        $error
-     * @param resource|null                                                     $stdout
+     * @param array{ 0?: resource|null } $stdout
+     *
+     * @return resource|null
      */
-    public static function assert_call(
+    public static function assert_stdout(array $stdout = [])
+    {
+        static $current;
+
+        if (count($stdout)) {
+            $previous = $current;
+
+            [ $current ] = $stdout;
+
+            return $previous;
+        }
+
+        return $current;
+    }
+
+
+    public static function assert_equals(
         array $trace,
-        $fn, object $except = null, array &$error = null,
-        $stdout = null
+        $value, $expect = null
     ) : bool
     {
-        $error = null;
+        $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
 
-        $microtime = microtime(true);
+        $_value = is_a($value, \Closure::class)
+            ? $value()
+            : $value;
+
+        $stdout = static::assert_stdout();
+
+        if ($_value !== $expect) {
+            $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
+
+            static::debug_diff_vars($_value, $expect, $diff);
+
+            if ($stdout) {
+                fwrite($stdout, '------' . PHP_EOL);
+                fwrite($stdout, $message . PHP_EOL);
+                fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                fwrite($stdout, $diff . PHP_EOL);
+                fwrite($stdout, '------' . PHP_EOL);
+
+                return false;
+            }
+
+            $e = new RuntimeException([ $message, $diff ]);
+            $e->trace = $trace;
+            $e->file = $traceFile;
+            $e->line = $traceLine;
+
+            throw $e;
+        }
+
+        if ($stdout) {
+            fwrite($stdout, '[ OK ] Test ' . __FUNCTION__ . '() passed.' . PHP_EOL);
+        }
+
+        return true;
+    }
+
+    public static function assert_not_equals(
+        array $trace,
+        $value, $expect = null
+    ) : bool
+    {
+        $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
+
+        $_value = is_a($value, \Closure::class)
+            ? $value()
+            : $value;
+
+        $stdout = static::assert_stdout();
+
+        if ($_value === $expect) {
+            $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
+
+            if ($stdout) {
+                fwrite($stdout, '------' . PHP_EOL);
+                fwrite($stdout, $message . PHP_EOL);
+                fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                fwrite($stdout, '------' . PHP_EOL);
+
+                return false;
+            }
+
+            $e = new RuntimeException([ $message ]);
+            $e->trace = $trace;
+            $e->file = $traceFile;
+            $e->line = $traceLine;
+
+            throw $e;
+        }
+
+        if ($stdout) {
+            fwrite($stdout, '[ OK ] Test ' . __FUNCTION__ . '() passed.' . PHP_EOL);
+        }
+
+        return true;
+    }
+
+
+    public static function assert_result(
+        array $trace,
+        \Closure $fn, $expect = null,
+        string &$result = null
+    ) : bool
+    {
+        $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
+
+        $var = $fn();
+
+        $result = $var;
+
+        $stdout = static::assert_stdout();
+
+        if ($result !== $expect) {
+            $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
+
+            static::debug_diff_vars($result, $expect, $diff);
+
+            if ($stdout) {
+                fwrite($stdout, '------' . PHP_EOL);
+                fwrite($stdout, $message . PHP_EOL);
+                fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                fwrite($stdout, $diff . PHP_EOL);
+                fwrite($stdout, '------' . PHP_EOL);
+
+                return false;
+            }
+
+            $e = new RuntimeException([ $message, $diff ]);
+            $e->trace = $trace;
+            $e->file = $traceFile;
+            $e->line = $traceLine;
+
+            throw $e;
+        }
+
+        if ($stdout) {
+            fwrite($stdout, '[ OK ] Test ' . __FUNCTION__ . '() passed.' . PHP_EOL);
+        }
+
+        return true;
+    }
+
+    public static function assert_output(
+        array $trace,
+        \Closure $fn, string $expect = null,
+        string &$output = null
+    ) : bool
+    {
+        $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
 
         ob_start();
-        $result = $fn();
-        $output = ob_get_clean();
+        $fn();
+        $var = ob_get_clean();
 
-        if (property_exists($except, 'result')) {
-            if ($except->result !== $result) {
-                $microtime = round(microtime(true) - $microtime, 6);
+        $output = $var;
 
-                static::debug_diff_vars($result, $except->result, $diff);
+        $stdout = static::assert_stdout();
 
-                $error = [
-                    'Test result check failed',
-                    [
-                        'result'    => $result,
-                        'expect'    => $except->result,
-                        'diff'      => $diff,
-                        'microtime' => $microtime,
-                        'file'      => $trace[ 0 ][ 'file' ],
-                        'line'      => $trace[ 0 ][ 'line' ],
-                    ],
-                ];
+        $isDiff = static::debug_diff($output, $expect, $diff);
 
-                if (null !== $stdout) {
-                    fwrite($stdout, '------' . PHP_EOL);
-                    fwrite($stdout, '[ ERROR ] Test result check failed. ' . $microtime . 's' . PHP_EOL);
-                    fwrite($stdout, $trace[ 0 ][ 'file' ] . ' / ' . $trace[ 0 ][ 'line' ] . PHP_EOL);
-                    fwrite($stdout, $diff . PHP_EOL);
-                    fwrite($stdout, '------' . PHP_EOL);
-                }
+        if ($isDiff) {
+            $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
+
+            if ($stdout) {
+                fwrite($stdout, '------' . PHP_EOL);
+                fwrite($stdout, $message . PHP_EOL);
+                fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                fwrite($stdout, $diff . PHP_EOL);
+                fwrite($stdout, '------' . PHP_EOL);
 
                 return false;
             }
+
+            $e = new RuntimeException([ $message, $diff ]);
+            $e->trace = $trace;
+            $e->file = $traceFile;
+            $e->line = $traceLine;
+
+            throw $e;
         }
 
-        if (property_exists($except, 'output')) {
-            $isDiff = static::debug_diff($output, $except->output, $diff);
+        if ($stdout) {
+            fwrite($stdout, '[ OK ] Test ' . __FUNCTION__ . '() passed.' . PHP_EOL);
+        }
 
-            if ($isDiff) {
-                $microtime = round(microtime(true) - $microtime, 6);
+        return true;
+    }
 
-                $error = [
-                    'Test result check failed',
-                    [
-                        'output'    => $output,
-                        'expect'    => $except->output,
-                        'diff'      => $diff,
-                        'microtime' => $microtime,
-                        'file'      => $trace[ 0 ][ 'file' ],
-                        'line'      => $trace[ 0 ][ 'line' ],
-                    ],
-                ];
+    public static function assert_microtime(
+        array $trace,
+        \Closure $fn, float $expectMax = null, float $expectMin = null,
+        float &$microtime = null
+    ) : bool
+    {
+        $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
 
-                if (null !== $stdout) {
-                    fwrite($stdout, '------' . PHP_EOL);
-                    fwrite($stdout, '[ ERROR ] Test output check failed. ' . $microtime . 's' . PHP_EOL);
-                    fwrite($stdout, $trace[ 0 ][ 'file' ] . ' / ' . $trace[ 0 ][ 'line' ] . PHP_EOL);
-                    fwrite($stdout, $diff . PHP_EOL);
-                    fwrite($stdout, '------' . PHP_EOL);
-                }
+        $mt = microtime(true);
 
-                return false;
+        $fn();
+
+        $var = round(microtime(true) - $mt, 6);
+
+        $microtime = $var;
+
+        $messageMax = null;
+        $messageMin = null;
+
+        $diffMax = null;
+        $diffMin = null;
+
+        $isError = false;
+
+        if (null !== $expectMax) {
+            if ($microtime > $expectMax) {
+                $messageMax = '[ ERROR ] Test ' . __FUNCTION__ . '() `$expectMax` failed.';
+                $diffMax = $microtime - $expectMax;
+
+                $isError = true;
             }
         }
 
-        $microtime = round(microtime(true) - $microtime, 6);
+        if (null !== $expectMin) {
+            if ($microtime < $expectMin) {
+                $messageMin = '[ ERROR ] Test ' . __FUNCTION__ . '() `$expectMin` failed.';
+                $diffMin = $expectMin - $microtime;
 
-        if (property_exists($except, 'microtime')) {
-            if ($except->microtime < $microtime) {
-                $diff = $microtime - $except->microtime;
-
-                $error = [
-                    'Test result check failed',
-                    [
-                        'microtime' => $microtime,
-                        'expect'    => $except->microtime,
-                        'diff'      => $diff,
-                        'file'      => $trace[ 0 ][ 'file' ],
-                        'line'      => $trace[ 0 ][ 'line' ],
-                    ],
-                ];
-
-                if (null !== $stdout) {
-                    fwrite($stdout, '------' . PHP_EOL);
-                    fwrite($stdout, '[ ERROR ] Test microtime check failed. ' . $microtime . 's' . PHP_EOL);
-                    fwrite($stdout, $trace[ 0 ][ 'file' ] . ' / ' . $trace[ 0 ][ 'line' ] . PHP_EOL);
-                    fwrite($stdout, $diff . PHP_EOL);
-                    fwrite($stdout, '------' . PHP_EOL);
-                }
-
-                return false;
+                $isError = true;
             }
         }
 
-        if (null !== $stdout) {
-            fwrite($stdout, '[ OK ] Test success. ' . $microtime . 's' . PHP_EOL);
+        $stdout = static::assert_stdout();
+
+        if ($isError) {
+            if ($stdout) {
+                fwrite($stdout, '------' . PHP_EOL);
+                if (null !== $messageMax) {
+                    fwrite($stdout, $messageMax . PHP_EOL);
+                }
+                if (null !== $messageMin) {
+                    fwrite($stdout, $messageMin . PHP_EOL);
+                }
+                fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                if (null !== $diffMax) {
+                    fwrite($stdout, $diffMax . PHP_EOL);
+                }
+                if (null !== $diffMin) {
+                    fwrite($stdout, $diffMin . PHP_EOL);
+                }
+                fwrite($stdout, '------' . PHP_EOL);
+
+                return false;
+            }
+
+            $e = new RuntimeException([ $messageMax ?? $messageMin, $diffMax ?? $diffMin ]);
+            $e->trace = $trace;
+            $e->file = $traceFile;
+            $e->line = $traceLine;
+
+            throw $e;
+        }
+
+        if ($stdout) {
+            fwrite($stdout, '[ OK ] Test ' . __FUNCTION__ . '() passed.' . PHP_EOL);
         }
 
         return true;

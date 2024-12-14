@@ -60,32 +60,14 @@ function _debug(...$values) : void
     echo implode(' | ', $lines) . PHP_EOL;
 }
 
-function _assert_call(
-    \Closure $fn,
-    array $expectResult = [], string $expectOutput = null, float $expectMicrotime = null
+function _assert_output(
+    \Closure $fn, string $expect = null
 ) : void
 {
     $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-    $expect = (object) [];
-
-    if (count($expectResult)) {
-        $expect->result = $expectResult[ 0 ];
-    }
-
-    if (null !== $expectOutput) {
-        $expect->output = $expectOutput;
-    }
-
-    if (null !== $expectMicrotime) {
-        $expect->microtime = $expectMicrotime;
-    }
-
-    $status = \Gzhegow\Lib\Lib::assert_call($trace, $fn, $expect, $error, STDOUT);
-
-    if (! $status) {
-        throw new \Gzhegow\Lib\Exception\LogicException();
-    }
+    \Gzhegow\Lib\Lib::assert_stdout([ STDOUT ]);
+    \Gzhegow\Lib\Lib::assert_output($trace, $fn, $expect);
 }
 
 
@@ -132,16 +114,18 @@ $fn = function () {
                 [ 1.5, 'apples', $stdClass ],
             ]
         ) . PHP_EOL;
+
     echo \Gzhegow\Lib\Lib::debug_array_multiline(
             [
                 [ 1, 'apple', $stdClass ],
                 [ 2, 'apples', $stdClass ],
                 [ 1.5, 'apples', $stdClass ],
-            ]) . PHP_EOL;
+            ]
+        ) . PHP_EOL;
 
     echo '';
 };
-_assert_call($fn, [], <<<HEREDOC
+_assert_output($fn, <<<HEREDOC
 "[ TEST 1 ]"
 NULL
 FALSE
@@ -213,7 +197,7 @@ $fn = function () {
 
     echo '';
 };
-_assert_call($fn, [], <<<HEREDOC
+_assert_output($fn, <<<HEREDOC
 "[ TEST 2 ]"
 [ "hello", "world" ]
 "hello world"
@@ -275,7 +259,7 @@ $fn = function () {
 
     echo '';
 };
-_assert_call($fn, [], <<<HEREDOC
+_assert_output($fn, <<<HEREDOC
 "[ TEST 3 ]"
 3
 3

@@ -398,19 +398,18 @@ trait DebugTrait
     }
 
 
-
-    public static function debug_diff(string $a, string $b = null, string &$result = null) : bool
+    public static function debug_diff(string $actual, string $expect = null, string &$result = null) : bool
     {
         $result = null;
 
-        $hasB = (null !== $b);
+        $hasB = (null !== $actual);
 
-        static::str_eol($a, $aLines);
+        static::str_eol($expect, $aLines);
 
         $cnt = $cntA = count($aLines);
 
         if ($hasB) {
-            static::str_eol($b, $bLines);
+            static::str_eol($actual, $bLines);
 
             $cnt = max($cntA, $cntB = count($bLines));
         }
@@ -428,31 +427,39 @@ trait DebugTrait
 
             } else {
                 if ($aLine === $bLine) {
-                    $linesA[] = $aLine;
+                    $linesA[] = "[{$i}] " . $aLine;
+                    $linesB[] = "[{$i}] " . $bLine;
 
                     continue;
                 }
 
-                $linesA[] = "[{$i}] " . '--- ' . $aLine;
-                $linesB[] = "[{$i}] " . '+++ ' . $bLine;
+                $linesA[] = "--- [{$i}] " . $aLine;
+                $linesB[] = "+++ [{$i}] " . $bLine;
             }
 
             $isDiff = true;
         }
 
-        $result = implode(PHP_EOL, array_merge($linesA, [ '' ], $linesB));
+        $lines[] = $linesA;
+
+        if ($isDiff) {
+            $lines[] = [ '' ];
+            $lines[] = $linesB;
+        }
+
+        $result = implode(PHP_EOL, array_merge(...$lines));
 
         return $isDiff;
     }
 
-    public static function debug_diff_vars($a, $b, string &$result = null) : bool
+    public static function debug_diff_vars($actual, $expect = null, string &$result = null) : bool
     {
         ob_start();
-        var_dump($a);
+        var_dump($actual);
         $aString = ob_get_clean();
 
         ob_start();
-        var_dump($b);
+        var_dump($expect);
         $bString = ob_get_clean();
 
         $isDiff = static::debug_diff(
