@@ -1,4 +1,7 @@
 <?php
+/**
+ * @noinspection PhpComposerExtensionStubsInspection
+ */
 
 namespace Gzhegow\Lib\Traits;
 
@@ -104,9 +107,62 @@ trait StrTrait
 
 
     /**
+     * заменяет все буквы на малые
+     */
+    public static function str_lower(string $string, string $mb_encoding = null) : string
+    {
+        if (static::str_mb()) {
+            $mbEncodingArgs = [];
+            if (null !== $mb_encoding) {
+                $mbEncodingArgs[] = $mb_encoding;
+            }
+
+            $result = mb_strtolower($string, ...$mbEncodingArgs);
+
+        } else {
+            if (static::str_is_utf8($string)) {
+                throw new RuntimeException(
+                    'You have to enable `php.ini` extension `mbstring` to prevent errors while converting multibyte symbols'
+                );
+            }
+
+            $result = strtolower($string);
+        }
+
+        return $result;
+    }
+
+    /**
+     * заменяет все буквы на большие
+     */
+    public static function str_upper(string $string, string $mb_encoding = null) : string
+    {
+        if (static::str_mb()) {
+            $mbEncodingArgs = [];
+            if (null !== $mb_encoding) {
+                $mbEncodingArgs[] = $mb_encoding;
+            }
+
+            $result = mb_strtoupper($string, ...$mbEncodingArgs);
+
+        } else {
+            if (static::str_is_utf8($string)) {
+                throw new RuntimeException(
+                    'You have to enable `php.ini` extension `mbstring` to prevent errors while converting multibyte symbols'
+                );
+            }
+
+            $result = strtoupper($string);
+        }
+
+        return $result;
+    }
+
+
+    /**
      * пишет слово с малой буквы
      */
-    public static function str_lcfirst(string $string, string $mb_encoding = null)
+    public static function str_lcfirst(string $string, string $mb_encoding = null) : string
     {
         if (static::str_mb()) {
             $mbEncodingArgs = [];
@@ -135,7 +191,7 @@ trait StrTrait
     /**
      * пишет слово с большой буквы
      */
-    public static function str_ucfirst(string $string, string $mb_encoding = null)
+    public static function str_ucfirst(string $string, string $mb_encoding = null) : string
     {
         if (static::str_mb()) {
             $mbEncodingArgs = [];
@@ -488,58 +544,6 @@ trait StrTrait
 
 
     /**
-     * 'the Space case'
-     */
-    public static function str_space(string $string) : string
-    {
-        if ('' === $string) return '';
-
-        $result = $string;
-
-        $regex = static::str_mb()
-            ? '/[^\p{L}\d ]+/iu'
-            : '/[^a-z\d ]+/i';
-
-        $result = preg_replace($regex, ' ', $result);
-
-        $regex = static::str_mb()
-            ? '/[ ]*\p{Lu}/u'
-            : '/[ ]*[A-Z]/';
-
-        $result = preg_replace($regex, ' $0', $result);
-
-        $result = ltrim($result, ' ');
-
-        return $result;
-    }
-
-    /**
-     * 'the_Snake_case'
-     */
-    public static function str_snake(string $string) : string
-    {
-        if ('' === $string) return '';
-
-        $result = $string;
-
-        $regex = static::str_mb()
-            ? '/[^\p{L}\d_]+/iu'
-            : '/[^a-z\d_]+/i';
-
-        $result = preg_replace($regex, '_', $result);
-
-        $regex = static::str_mb()
-            ? '/[_]*\p{Lu}/u'
-            : '/[_]*[A-Z]/';
-
-        $result = preg_replace($regex, '_$0', $result);
-
-        $result = ltrim($result, '_');
-
-        return $result;
-    }
-
-    /**
      * 'theCamelCase'
      */
     public static function str_camel(string $string) : string
@@ -548,9 +552,7 @@ trait StrTrait
 
         $result = $string;
 
-        $regex = static::str_mb()
-            ? '/[^\p{L}\d]+([\p{L}\d])/iu'
-            : '/[^a-z\d]+([a-z\d])/i';
+        $regex = '/[^\p{L}\d]+([\p{L}\d])/iu';
 
         $result = preg_replace_callback($regex, function ($m) {
             return static::str_mbfunc('strtoupper')($m[ 1 ]);
@@ -570,15 +572,154 @@ trait StrTrait
 
         $result = $string;
 
-        $regex = static::str_mb()
-            ? '/[^\p{L}\d]+([\p{L}\d])/iu'
-            : '/[^a-z\d]+([a-z\d])/i';
+        $regex = '/[^\p{L}\d]+([\p{L}\d])/iu';
 
         $result = preg_replace_callback($regex, function ($m) {
             return static::str_mbfunc('strtoupper')($m[ 1 ]);
         }, $result);
 
         $result = static::str_ucfirst($result);
+
+        return $result;
+    }
+
+
+    /**
+     * 'the Space case'
+     */
+    public static function str_space(string $string) : string
+    {
+        if ('' === $string) return '';
+
+        $result = $string;
+
+        $regex = '/[^\p{L}\d ]+/iu';
+
+        $result = preg_replace($regex, ' ', $result);
+
+        $regex = '/(?<=[^\p{Lu} ])(?=\p{Lu})/u';
+
+        $result = preg_replace($regex, ' $2', $result);
+
+        $result = ltrim($result, ' ');
+
+        return $result;
+    }
+
+    /**
+     * 'the_Snake_case'
+     */
+    public static function str_snake(string $string) : string
+    {
+        if ('' === $string) return '';
+
+        $result = $string;
+
+        $regex = '/[^\p{L}\d_]+/iu';
+
+        $result = preg_replace($regex, '_', $result);
+
+        $regex = '/(?<=[^\p{Lu}_])(?=\p{Lu})/u';
+
+        $result = preg_replace($regex, '_$2', $result);
+
+        $result = ltrim($result, '_');
+
+        return $result;
+    }
+
+    /**
+     * 'the-Kebab-case'
+     */
+    public static function str_kebab(string $string) : string
+    {
+        if ('' === $string) return '';
+
+        $result = $string;
+
+        $regex = '/[^\p{L}\d-]+/iu';
+
+        $result = preg_replace($regex, '-', $result);
+
+        $regex = '/(?<=[^\p{Lu}-])(?=\p{Lu})/u';
+
+        $result = preg_replace($regex, '-', $result);
+
+        $result = ltrim($result, '-');
+
+        return $result;
+    }
+
+
+    /**
+     * 'the space case'
+     */
+    public static function str_space_lower(string $string) : string
+    {
+        $result = $string;
+        $result = static::str_space($result);
+        $result = static::str_lower($result);
+
+        return $result;
+    }
+
+    /**
+     * 'the_snake_case'
+     */
+    public static function str_snake_lower(string $string) : string
+    {
+        $result = $string;
+        $result = static::str_snake($result);
+        $result = static::str_lower($result);
+
+        return $result;
+    }
+
+    /**
+     * 'the-kebab-case'
+     */
+    public static function str_kebab_lower(string $string) : string
+    {
+        $result = $string;
+        $result = static::str_kebab($result);
+        $result = static::str_lower($result);
+
+        return $result;
+    }
+
+
+    /**
+     * 'THE SPACE CASE'
+     */
+    public static function str_space_upper(string $string) : string
+    {
+        $result = $string;
+        $result = static::str_space($result);
+        $result = static::str_upper($result);
+
+        return $result;
+    }
+
+    /**
+     * 'THE_SNAKE_CASE'
+     */
+    public static function str_snake_upper(string $string) : string
+    {
+        $result = $string;
+        $result = static::str_snake($result);
+        $result = static::str_upper($result);
+
+        return $result;
+    }
+
+    /**
+     * 'THE-KEBAB-CASE'
+     */
+    public static function str_kebab_upper(string $string) : string
+    {
+        $result = $string;
+        $result = static::str_kebab($result);
+        $result = static::str_upper($result);
 
         return $result;
     }
