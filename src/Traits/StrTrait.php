@@ -601,8 +601,6 @@ trait StrTrait
 
         $result = preg_replace($regex, ' $2', $result);
 
-        $result = ltrim($result, ' ');
-
         return $result;
     }
 
@@ -623,8 +621,6 @@ trait StrTrait
 
         $result = preg_replace($regex, '_$2', $result);
 
-        $result = ltrim($result, '_');
-
         return $result;
     }
 
@@ -644,8 +640,6 @@ trait StrTrait
         $regex = '/(?<=[^\p{Lu}-])(?=\p{Lu})/u';
 
         $result = preg_replace($regex, '-', $result);
-
-        $result = ltrim($result, '-');
 
         return $result;
     }

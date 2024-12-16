@@ -203,20 +203,25 @@ $fn = function () {
 
     _dump(\Gzhegow\Lib\Lib::str_replace_limit('за', '_', 'азазазазазаза', 3));
 
-    _dump(\Gzhegow\Lib\Lib::str_camel('hello-world-foo-bar'));
-    _dump(\Gzhegow\Lib\Lib::str_pascal('hello-world-foo-bar'));
+    _dump(\Gzhegow\Lib\Lib::str_camel('-hello-world-foo-bar'));
+    _dump(\Gzhegow\Lib\Lib::str_camel('-helloWorldFooBar'));
+    _dump(\Gzhegow\Lib\Lib::str_camel('-HelloWorldFooBar'));
 
-    _dump(\Gzhegow\Lib\Lib::str_space('Hello_WORLD_Foo_BAR'));
-    _dump(\Gzhegow\Lib\Lib::str_snake('Hello-WORLD-Foo-BAR'));
-    _dump(\Gzhegow\Lib\Lib::str_kebab('Hello WORLD Foo BAR'));
+    _dump(\Gzhegow\Lib\Lib::str_pascal('-hello-world-foo-bar'));
+    _dump(\Gzhegow\Lib\Lib::str_pascal('-helloWorldFooBar'));
+    _dump(\Gzhegow\Lib\Lib::str_pascal('-HelloWorldFooBar'));
 
-    _dump(\Gzhegow\Lib\Lib::str_space_lower('Hello_WORLD_Foo_BAR'));
-    _dump(\Gzhegow\Lib\Lib::str_snake_lower('Hello-WORLD-Foo-BAR'));
-    _dump(\Gzhegow\Lib\Lib::str_kebab_lower('Hello WORLD Foo BAR'));
+    _dump(\Gzhegow\Lib\Lib::str_space('_Hello_WORLD_Foo_BAR'));
+    _dump(\Gzhegow\Lib\Lib::str_snake('-Hello-WORLD-Foo-BAR'));
+    _dump(\Gzhegow\Lib\Lib::str_kebab(' Hello WORLD Foo BAR'));
 
-    _dump(\Gzhegow\Lib\Lib::str_space_upper('Hello_WORLD_Foo_BAR'));
-    _dump(\Gzhegow\Lib\Lib::str_snake_upper('Hello-WORLD-Foo-BAR'));
-    _dump(\Gzhegow\Lib\Lib::str_kebab_upper('Hello WORLD Foo BAR'));
+    _dump(\Gzhegow\Lib\Lib::str_space_lower('_Hello_WORLD_Foo_BAR'));
+    _dump(\Gzhegow\Lib\Lib::str_snake_lower('-Hello-WORLD-Foo-BAR'));
+    _dump(\Gzhegow\Lib\Lib::str_kebab_lower(' Hello WORLD Foo BAR'));
+
+    _dump(\Gzhegow\Lib\Lib::str_space_upper('_Hello_WORLD_Foo_BAR'));
+    _dump(\Gzhegow\Lib\Lib::str_snake_upper('-Hello-WORLD-Foo-BAR'));
+    _dump(\Gzhegow\Lib\Lib::str_kebab_upper(' Hello WORLD Foo BAR'));
 
     echo '';
 };
@@ -245,16 +250,20 @@ _assert_output($fn, <<<HEREDOC
 "\"привет\""
 "а___зазаза"
 "helloWorldFooBar"
+"helloWorldFooBar"
+"helloWorldFooBar"
 "HelloWorldFooBar"
-"Hello WORLD Foo BAR"
-"Hello_WORLD_Foo_BAR"
-"Hello-WORLD-Foo-BAR"
-"hello world foo bar"
-"hello_world_foo_bar"
-"hello-world-foo-bar"
-"HELLO WORLD FOO BAR"
-"HELLO_WORLD_FOO_BAR"
-"HELLO-WORLD-FOO-BAR"
+"HelloWorldFooBar"
+"HelloWorldFooBar"
+" Hello WORLD Foo BAR"
+"_Hello_WORLD_Foo_BAR"
+"-Hello-WORLD-Foo-BAR"
+" hello world foo bar"
+"_hello_world_foo_bar"
+"-hello-world-foo-bar"
+" HELLO WORLD FOO BAR"
+"_HELLO_WORLD_FOO_BAR"
+"-HELLO-WORLD-FOO-BAR"
 ""
 HEREDOC
 );
