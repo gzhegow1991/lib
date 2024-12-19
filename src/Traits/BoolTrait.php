@@ -2,6 +2,8 @@
 
 namespace Gzhegow\Lib\Traits;
 
+if (! defined('_UNDEFINED')) define('_UNDEFINED', NAN);
+
 trait BoolTrait
 {
     public static function is_null($value) : bool
