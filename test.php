@@ -1,5 +1,6 @@
 <?php
 
+require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 
@@ -70,7 +71,7 @@ function _assert_output(
 {
     $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-    \Gzhegow\Lib\Lib::assert_stdout([ STDOUT ]);
+    \Gzhegow\Lib\Lib::assert_resource(STDOUT);
     \Gzhegow\Lib\Lib::assert_output($trace, $fn, $expect);
 }
 
@@ -273,9 +274,55 @@ HEREDOC
 );
 
 // >>> TEST
-// > тесты FsTrait
+// > тесты FormatTrait
 $fn = function () {
     _dump('[ TEST 3 ]');
+
+
+    $result = \Gzhegow\Lib\Lib::format_json_encode(
+        $value = [ 'hello' ]
+    );
+    _dump($result);
+
+    $result = \Gzhegow\Lib\Lib::format_json_encode(
+        $value = NAN,
+        $fallback = [ "NAN" ]
+    );
+    _dump($result);
+
+    try {
+        \Gzhegow\Lib\Lib::format_json_encode(
+            $value = NAN
+        );
+    }
+    catch ( \Throwable $e ) {
+        _dump('[ CATCH ]');
+    }
+
+
+    $jsonc = "[1,/* 2 */3]";
+    $result = \Gzhegow\Lib\Lib::format_jsonc_decode(
+        $json = $jsonc,
+        $associative = true
+    );
+    _dump($result);
+
+    echo '';
+};
+_assert_output($fn, <<<HEREDOC
+"[ TEST 3 ]"
+"[\"hello\"]"
+"NAN"
+"[ CATCH ]"
+[ 1, 3 ]
+""
+HEREDOC
+);
+
+// >>> TEST
+// > тесты FsTrait
+$fn = function () {
+    _dump('[ TEST 4 ]');
 
 
     $result = \Gzhegow\Lib\Lib::fs_file_put_contents(__DIR__ . '/var/1/1/1/1.txt', '123', [ 0775, true ]);
@@ -305,7 +352,7 @@ $fn = function () {
     echo '';
 };
 _assert_output($fn, <<<HEREDOC
-"[ TEST 3 ]"
+"[ TEST 4 ]"
 3
 3
 3

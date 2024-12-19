@@ -339,9 +339,9 @@ trait ParseTrait
     }
 
 
-    public static function parse_bcnum($value, int &$scaleValue = null) : ?string
+    public static function parse_bcnum($value, int &$scaleParsed = null) : ?string
     {
-        $scaleValue = null;
+        $scaleParsed = null;
 
         if (null === ($_value = static::parse_numeric($value))) {
             return null;
@@ -364,7 +364,7 @@ trait ParseTrait
         $valueAbsFloor = ltrim($valueAbsFloor, '0'); // 0000.1
         $valueAbsFrac = rtrim($valueAbsFrac, '0');   // 1.0000
 
-        $scaleValue = strlen($valueAbsFrac);
+        $scaleParsed = strlen($valueAbsFrac);
 
         $_value = ""
             . ($valueMinus ? '-' : '')
@@ -463,9 +463,14 @@ trait ParseTrait
             return null;
         }
 
+        preg_replace('/\s+/', '', $_value, 1, $count);
+        if ($count > 0) {
+            return null;
+        }
+
         $fnStrlen = extension_loaded('mbstring')
             ? 'mb_strlen'
-            : 'mb';
+            : 'strlen';
 
         if ($fnStrlen($_value) > 1) {
             return null;
@@ -480,11 +485,26 @@ trait ParseTrait
             return null;
         }
 
+        preg_replace('/\s+/', '', $_value, 1, $count);
+        if ($count > 0) {
+            return null;
+        }
+
         $fnStrlen = extension_loaded('mbstring')
             ? 'mb_strlen'
-            : 'mb';
+            : 'strlen';
 
         if ($fnStrlen($_value) <= 1) {
+            return null;
+        }
+
+        $fnStrSplit = extension_loaded('mbstring')
+            ? 'mb_str_split'
+            : 'str_split';
+
+        $array = $fnStrSplit($value);
+
+        if (count($array) !== count(array_unique($array))) {
             return null;
         }
 
@@ -540,6 +560,7 @@ trait ParseTrait
 
         return $value;
     }
+
 
     public static function parse_countable($value) : ?iterable
     {
@@ -785,9 +806,18 @@ trait ParseTrait
             return null;
         }
 
-        $before = error_reporting(0);
-        $status = @preg_match($regex, '');
-        error_reporting($before);
+        error_clear_last();
+
+        try {
+            $status = preg_match($regex, '');
+        }
+        catch ( \Throwable $e ) {
+            return null;
+        }
+
+        if (error_get_last()) {
+            return null;
+        }
 
         if (false === $status) {
             return null;
@@ -950,5 +980,19 @@ trait ParseTrait
         }
 
         return $_value;
+    }
+
+
+    public static function parse_ip(string $ip) : ?string
+    {
+        if (null === ($_ip = static::parse_string_not_empty($ip))) {
+            return null;
+        }
+
+        if (false === ($_ip = filter_var($_ip, FILTER_VALIDATE_IP))) {
+            return null;
+        }
+
+        return $_ip;
     }
 }

@@ -10,32 +10,6 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 trait StrTrait
 {
-    public static function str_mb(bool $bool = null) : bool
-    {
-        static $mb;
-
-        $mb = $bool ?? $mb ?? extension_loaded('mbstring');
-
-        if ($mb && ! extension_loaded('mbstring')) {
-            throw new RuntimeException('Unable to use multibyte mode without extension: mbstring');
-        }
-
-        return $mb;
-    }
-
-    /**
-     * @param callable|callable-string $fn
-     *
-     * @return callable|callable-string
-     */
-    public static function str_mbfunc(string $fn) : string
-    {
-        return static::str_mb()
-            ? 'mb_' . $fn
-            : $fn;
-    }
-
-
     public static function str_is_utf8(string $str) : bool
     {
         return preg_match('//u', $str) === 1;
@@ -111,7 +85,7 @@ trait StrTrait
      */
     public static function str_lower(string $string, string $mb_encoding = null) : string
     {
-        if (static::str_mb()) {
+        if (static::mb()) {
             $mbEncodingArgs = [];
             if (null !== $mb_encoding) {
                 $mbEncodingArgs[] = $mb_encoding;
@@ -137,7 +111,7 @@ trait StrTrait
      */
     public static function str_upper(string $string, string $mb_encoding = null) : string
     {
-        if (static::str_mb()) {
+        if (static::mb()) {
             $mbEncodingArgs = [];
             if (null !== $mb_encoding) {
                 $mbEncodingArgs[] = $mb_encoding;
@@ -164,7 +138,7 @@ trait StrTrait
      */
     public static function str_lcfirst(string $string, string $mb_encoding = null) : string
     {
-        if (static::str_mb()) {
+        if (static::mb()) {
             $mbEncodingArgs = [];
             if (null !== $mb_encoding) {
                 $mbEncodingArgs[] = $mb_encoding;
@@ -193,7 +167,7 @@ trait StrTrait
      */
     public static function str_ucfirst(string $string, string $mb_encoding = null) : string
     {
-        if (static::str_mb()) {
+        if (static::mb()) {
             $mbEncodingArgs = [];
             if (null !== $mb_encoding) {
                 $mbEncodingArgs[] = $mb_encoding;
@@ -272,11 +246,11 @@ trait StrTrait
         if ('' === $string) return null;
         if ('' === $needle) return $string;
 
-        $fnStrlen = static::str_mbfunc('strlen');
-        $fnSubstr = static::str_mbfunc('substr');
+        $fnStrlen = static::mbfunc('strlen');
+        $fnSubstr = static::mbfunc('substr');
         $fnStrpos = $ignoreCase
-            ? static::str_mbfunc('stripos')
-            : static::str_mbfunc('strpos');
+            ? static::mbfunc('stripos')
+            : static::mbfunc('strpos');
 
         $pos = $fnStrpos($string, $needle);
 
@@ -298,11 +272,11 @@ trait StrTrait
         if ('' === $string) return null;
         if ('' === $needle) return $string;
 
-        $fnStrlen = static::str_mbfunc('strlen');
-        $fnSubstr = static::str_mbfunc('substr');
+        $fnStrlen = static::mbfunc('strlen');
+        $fnSubstr = static::mbfunc('substr');
         $fnStrrpos = $ignoreCase
-            ? static::str_mbfunc('strripos')
-            : static::str_mbfunc('strrpos');
+            ? static::mbfunc('strripos')
+            : static::mbfunc('strrpos');
 
         $pos = $fnStrrpos($string, $needle);
 
@@ -330,8 +304,8 @@ trait StrTrait
         $result = [];
 
         $fnStrpos = $ignoreCase
-            ? static::str_mbfunc('stripos')
-            : static::str_mbfunc('strpos');
+            ? static::mbfunc('stripos')
+            : static::mbfunc('strpos');
 
         if (false !== $fnStrpos($strCase, $needle)) {
             $result = null
@@ -355,11 +329,11 @@ trait StrTrait
 
         $result = $string;
 
-        $fnStrlen = static::str_mbfunc('strlen');
-        $fnSubstr = static::str_mbfunc('substr');
+        $fnStrlen = static::mbfunc('strlen');
+        $fnSubstr = static::mbfunc('substr');
         $fnStrpos = $ignoreCase
-            ? static::str_mbfunc('stripos')
-            : static::str_mbfunc('strpos');
+            ? static::mbfunc('stripos')
+            : static::mbfunc('strpos');
 
         $pos = $fnStrpos($result, $lcrop);
 
@@ -390,11 +364,11 @@ trait StrTrait
 
         $result = $string;
 
-        $fnStrlen = static::str_mbfunc('strlen');
-        $fnSubstr = static::str_mbfunc('substr');
+        $fnStrlen = static::mbfunc('strlen');
+        $fnSubstr = static::mbfunc('substr');
         $fnStrrpos = $ignoreCase
-            ? static::str_mbfunc('strripos')
-            : static::str_mbfunc('strrpos');
+            ? static::mbfunc('strripos')
+            : static::mbfunc('strrpos');
 
 
         $pos = $fnStrrpos($result, $rcrop);
@@ -555,7 +529,7 @@ trait StrTrait
         $regex = '/[^\p{L}\d]+([\p{L}\d])/iu';
 
         $result = preg_replace_callback($regex, function ($m) {
-            return static::str_mbfunc('strtoupper')($m[ 1 ]);
+            return static::mbfunc('strtoupper')($m[ 1 ]);
         }, $result);
 
         $result = static::str_lcfirst($result);
@@ -575,7 +549,7 @@ trait StrTrait
         $regex = '/[^\p{L}\d]+([\p{L}\d])/iu';
 
         $result = preg_replace_callback($regex, function ($m) {
-            return static::str_mbfunc('strtoupper')($m[ 1 ]);
+            return static::mbfunc('strtoupper')($m[ 1 ]);
         }, $result);
 
         $result = static::str_ucfirst($result);

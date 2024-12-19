@@ -204,4 +204,93 @@ trait FsTrait
 
         return true;
     }
+
+
+
+    /**
+     * > gzhegow, по умолчанию для двойного расширения будет возвращено только последнее
+     */
+    public static function fs_pathinfo(string $path, int $flags = null) // : string|array
+    {
+        if (! isset($flags)) {
+            $basename = basename($path);
+            [ $filename, $extension ] = explode('.', $basename, 2) + [ null, null ];
+
+            $pi = pathinfo($path);
+            $pi[ 'filename' ] = $filename;
+            $pi[ 'extension' ] = $extension;
+
+            return $pi;
+        }
+
+        if ($flags & PATHINFO_EXTENSION) {
+            $basename = basename($path);
+            [ , $extension ] = explode('.', $basename, 2) + [ null, null ];
+
+            return $extension;
+
+        } elseif ($flags & PATHINFO_FILENAME) {
+            $basename = basename($path);
+            [ $filename, ] = explode('.', $basename, 2) + [ null, null ];
+
+            return $filename;
+        }
+
+        return pathinfo($path, $flags);
+    }
+
+
+    /**
+     * > gzhegow, разбирает последовательности /../ в пути до файла и возвращает путь через правый слеш
+     */
+    public static function fs_normalize(string $path) : string
+    {
+        if (null !== ($_path = static::parse_path_realpath($path))) {
+            $_path = str_replace(DIRECTORY_SEPARATOR, '/', $_path);
+
+        } else {
+            $_path = $path;
+
+            $root = ($_path[ 0 ] === '/') ? '/' : '';
+
+            $segments = explode('/', trim($_path, '/'));
+
+            $ret = [];
+            foreach ( $segments as $segment ) {
+                if ((! $segment) || ($segment == '.')) {
+                    continue;
+                }
+
+                ($segment == '..')
+                    ? array_pop($ret)
+                    : ($ret[] = $segment);
+            }
+
+            $_path = $root . implode('/', $ret);
+        }
+
+        return $_path;
+    }
+
+    /**
+     * > gzhegow, возвращает относительный путь до файла
+     */
+    public static function fs_relative(string $path, string $root) : string
+    {
+        $_path = static::fs_normalize($path);
+        $_root = static::fs_normalize($root);
+
+        if ($_path === $_root) {
+            throw new \RuntimeException('Path is equal to root: ' . $root);
+        }
+
+        if (0 !== strpos($_path, $_root)) {
+            throw new \RuntimeException('Path is not a child of root: ' . implode(' / ', [ $root, $path ]));
+        }
+
+        $result = substr($_path, mb_strlen($_root));
+        $result = ltrim($result, '/');
+
+        return $result;
+    }
 }

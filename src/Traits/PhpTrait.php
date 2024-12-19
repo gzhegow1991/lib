@@ -185,32 +185,40 @@ trait PhpTrait
 
 
     /**
-     * @param class-string<\Exception|\LogicException|\RuntimeException>|null $throwable
+     * @param class-string<\Exception|\LogicException|\RuntimeException>|null $throwableClass
      *
      * @return class-string<\Exception|\LogicException|\RuntimeException>
      */
-    public static function php_throwable(string $throwable = null) : string
+    public static function php_throwable(string $throwableClass = null) : string
     {
         static $current;
 
-        $current = $current ?? $throwable;
+        $current = $current ?? LogicException::class;
 
-        if (! (false
-            || is_subclass_of($current, \Exception::class)
-            || is_subclass_of($current, \LogicException::class)
-            || is_subclass_of($current, \RuntimeException::class)
-        )) {
-            throw new LogicException(
-                [
-                    'The `throwable` should be class that extends one of: '
-                    . implode('|', [
-                        \Exception::class,
-                        \LogicException::class,
-                        \RuntimeException::class,
-                    ]),
-                    $current,
-                ]
-            );
+        if (null !== $throwableClass) {
+            if (! (false
+                || is_a($current, \Exception::class, true)
+                || is_a($current, \LogicException::class, true)
+                || is_a($current, \RuntimeException::class, true)
+            )) {
+                throw new LogicException(
+                    [
+                        'The `throwableClass` should be class that extends one of: '
+                        . implode('|', [
+                            \Exception::class,
+                            \LogicException::class,
+                            \RuntimeException::class,
+                        ]),
+                        $current,
+                    ]
+                );
+            }
+
+            $last = $current;
+
+            $current = $throwableClass;
+
+            return $last;
         }
 
         return $current;
@@ -316,21 +324,35 @@ trait PhpTrait
         return $result;
     }
 
-    public static function php_throw(array $trace = null, ...$args)
+    public static function php_throw(...$throwableArgs)
     {
-        $trace = $trace ?? debug_backtrace();
-
         $throwableClass = static::php_throwable();
+
+        $trace = property_exists($throwableClass, 'trace')
+            ? debug_backtrace()
+            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        static::php_throw_trace($trace, ...$throwableArgs);
+    }
+
+    public static function php_throw_trace(array $trace = null, ...$throwableArgs)
+    {
+        $throwableClass = static::php_throwable();
+
+        if (null === $trace) {
+            $trace = property_exists($throwableClass, 'trace')
+                ? debug_backtrace()
+                : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        }
+
+        $throwableArgs = static::php_throwable_args(...$throwableArgs);
+        $throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $throwableArgs[ 'trace' ] = $trace;
 
         $e = new $throwableClass();
 
-        $throwableArgs = static::php_throwable_args(...$args);
-
-        (function () use ($trace, $throwableArgs) {
-            $this->trace = $trace;
-            $this->file = $trace[ 0 ][ 'file' ] ?? '{file}';
-            $this->line = $trace[ 0 ][ 'line' ] ?? '{line}';
-
+        (function () use ($throwableArgs) {
             foreach ( $throwableArgs as $key => $value ) {
                 if (property_exists($this, $key)) {
                     $this->{$key} = $value;
@@ -454,6 +476,24 @@ trait PhpTrait
 
             return ! call_user_func_array($fn, $_args);
         };
+    }
+
+
+    /**
+     * @param int[]    $results
+     * @param callable $fnCmp
+     */
+    public static function php_cmp($a, $b, array $results = [ 0 ], $fnCmp = null) : ?int
+    {
+        $result = (null === $fnCmp)
+            ? ($a <=> $b)
+            : $fnCmp($a, $b);
+
+        if (! in_array($result, $results, true)) {
+            return null;
+        }
+
+        return $result;
     }
 
 

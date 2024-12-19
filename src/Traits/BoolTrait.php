@@ -78,6 +78,11 @@ trait BoolTrait
     }
 
 
+    /**
+     * @noinspection PhpMissingReturnTypeInspection
+     *
+     * @return string
+     */
     public static function nil() // : mixed
     {
         return '{N}';

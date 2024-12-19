@@ -2,26 +2,36 @@
 
 namespace Gzhegow\Lib\Traits;
 
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
 trait AssertTrait
 {
     /**
-     * @param array{ 0?: resource|null } $stdout
+     * @param resource|null $resource
      *
      * @return resource|null
      */
-    public static function assert_stdout(array $stdout = [])
+    public static function assert_resource($resource = null)
     {
         static $current;
 
-        if (count($stdout)) {
-            $previous = $current;
+        if (null !== $resource) {
+            if (! is_resource($resource)) {
+                throw new LogicException(
+                    [
+                        'The `resource` must be opened resource',
+                        $resource,
+                    ]
+                );
+            }
 
-            [ $current ] = $stdout;
+            $last = $current;
 
-            return $previous;
+            $current = $resource;
+
+            return $last;
         }
 
         return $current;
@@ -40,7 +50,7 @@ trait AssertTrait
             ? $value()
             : $value;
 
-        $stdout = static::assert_stdout();
+        $stdout = static::assert_resource();
 
         if ($_value !== $expect) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
@@ -84,7 +94,7 @@ trait AssertTrait
             ? $value()
             : $value;
 
-        $stdout = static::assert_stdout();
+        $stdout = static::assert_resource();
 
         if ($_value === $expect) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
@@ -127,7 +137,7 @@ trait AssertTrait
 
         $result = $var;
 
-        $stdout = static::assert_stdout();
+        $stdout = static::assert_resource();
 
         if ($result !== $expect) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
@@ -174,7 +184,7 @@ trait AssertTrait
 
         $output = $var;
 
-        $stdout = static::assert_stdout();
+        $stdout = static::assert_resource();
 
         $isDiff = static::debug_diff($output, $expect, $diff);
 
@@ -249,7 +259,7 @@ trait AssertTrait
             }
         }
 
-        $stdout = static::assert_stdout();
+        $stdout = static::assert_resource();
 
         if ($isError) {
             if ($stdout) {

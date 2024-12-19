@@ -22,7 +22,9 @@
         "php": "^7.2|^8.0"
     },
     "require-dev": {
-        "ext-mbstring": "*"
+        "ext-bcmath": "*",
+        "ext-mbstring": "*",
+        "ext-json": "*"
     },
 
     "config": {
