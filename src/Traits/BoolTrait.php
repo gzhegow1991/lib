@@ -164,6 +164,43 @@ trait BoolTrait
     }
 
 
+    public static function is_undefined($value) : bool
+    {
+        return is_float($value) && is_nan($value);
+    }
+
+    public static function is_not_undefined($value, &$result = null) : bool
+    {
+        $result = null;
+
+        if (static::is_undefined($value)) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    public static function assert_not_undefined($value, ...$throwableArgs) // : ?mixed
+    {
+        static::is_not_undefined($value, $result) || static::php_throw(...$throwableArgs);
+
+        return $result;
+    }
+
+    public static function not_undefined(array $array) : array
+    {
+        foreach ( $array as $idx => $value ) {
+            if (static::is_undefined($value)) {
+                unset($array[ $idx ]);
+            }
+        }
+
+        return $array;
+    }
+
+
     public static function is_empty($value, &$result = null) : bool
     {
         if (empty($value)) {
