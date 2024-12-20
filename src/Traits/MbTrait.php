@@ -7,16 +7,16 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 trait MbTrait
 {
-    public static function mb(bool $mb = null) : bool
+    public static function mb_mode_static(bool $mode = null) : bool
     {
         static $current;
 
         $current = $current ?? extension_loaded('mbstring');
 
-        if (null !== $mb) {
+        if (null !== $mode) {
             $last = $current;
 
-            $current = $mb;
+            $current = $mode;
         }
 
         $result = $last ?? $current;
@@ -28,6 +28,12 @@ trait MbTrait
         return $result;
     }
 
+
+    public static function mb(bool $mode = null) : bool
+    {
+        return static::mb_mode_static($mode);
+    }
+
     /**
      * @param callable|callable-string $fn
      *
@@ -35,7 +41,7 @@ trait MbTrait
      */
     public static function mbfunc(string $fn) : string
     {
-        return static::mb()
+        return static::mb_mode_static()
             ? 'mb_' . $fn
             : $fn;
     }

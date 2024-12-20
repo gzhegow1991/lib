@@ -161,7 +161,7 @@ trait HttpTrait
     }
 
 
-    public static function http_cookies(Cookies $cookies = null) : Cookies
+    public static function http_cookies_static(Cookies $cookies = null) : Cookies
     {
         static $current;
 
@@ -240,7 +240,7 @@ trait HttpTrait
         $_path = $path ?: '/';
         $_domain = $domain ?: null;
 
-        $theCookies = static::http_cookies();
+        $theCookies = static::http_cookies_static();
 
         $_value = rawurlencode(static::parse_string_not_empty($value) ?? ' ');
         $_expires = $expires ?: 0;
@@ -284,7 +284,7 @@ trait HttpTrait
     }
 
 
-    public static function http_session(object $session = null) : ?object
+    public static function http_session_static(object $session = null) : ?object
     {
         /**
          * @noinspection PhpUndefinedNamespaceInspection
@@ -318,7 +318,7 @@ trait HttpTrait
             );
         }
 
-        $theSession = static::http_session();
+        $theSession = static::http_session_static();
 
         if (! $theSession->has($name)) {
             return false;
@@ -337,7 +337,7 @@ trait HttpTrait
             );
         }
 
-        $theSession = static::http_session();
+        $theSession = static::http_session_static();
 
         if (! $theSession->has($name)) {
             if ($fallback) {
@@ -364,7 +364,7 @@ trait HttpTrait
             );
         }
 
-        $theSession = static::http_session();
+        $theSession = static::http_session_static();
 
         $theSession->set($name, $value);
     }
@@ -377,7 +377,7 @@ trait HttpTrait
             );
         }
 
-        $theSession = static::http_session();
+        $theSession = static::http_session_static();
 
         $last = $theSession->remove($name);
 

@@ -13,7 +13,7 @@ trait AssertTrait
      *
      * @return resource|null
      */
-    public static function assert_resource($resource = null)
+    public static function assert_resource_static($resource = null) // : ?resource
     {
         static $current;
 
@@ -50,14 +50,14 @@ trait AssertTrait
             ? $value()
             : $value;
 
-        $stdout = static::assert_resource();
+        $stdout = static::assert_resource_static();
 
         if ($_value !== $expect) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
 
             static::debug_diff_vars($_value, $expect, $diff);
 
-            if ($stdout) {
+            if (null !== $stdout) {
                 fwrite($stdout, '------' . PHP_EOL);
                 fwrite($stdout, $message . PHP_EOL);
                 fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
@@ -75,7 +75,7 @@ trait AssertTrait
             throw $e;
         }
 
-        if ($stdout) {
+        if (null !== $stdout) {
             fwrite($stdout, '[ OK ] Test ' . __FUNCTION__ . '() passed.' . PHP_EOL);
         }
 
@@ -94,12 +94,12 @@ trait AssertTrait
             ? $value()
             : $value;
 
-        $stdout = static::assert_resource();
+        $stdout = static::assert_resource_static();
 
         if ($_value === $expect) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
 
-            if ($stdout) {
+            if (null !== $stdout) {
                 fwrite($stdout, '------' . PHP_EOL);
                 fwrite($stdout, $message . PHP_EOL);
                 fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
@@ -116,7 +116,7 @@ trait AssertTrait
             throw $e;
         }
 
-        if ($stdout) {
+        if (null !== $stdout) {
             fwrite($stdout, '[ OK ] Test ' . __FUNCTION__ . '() passed.' . PHP_EOL);
         }
 
@@ -137,14 +137,14 @@ trait AssertTrait
 
         $result = $var;
 
-        $stdout = static::assert_resource();
+        $stdout = static::assert_resource_static();
 
         if ($result !== $expect) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
 
             static::debug_diff_vars($result, $expect, $diff);
 
-            if ($stdout) {
+            if (null !== $stdout) {
                 fwrite($stdout, '------' . PHP_EOL);
                 fwrite($stdout, $message . PHP_EOL);
                 fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
@@ -162,7 +162,7 @@ trait AssertTrait
             throw $e;
         }
 
-        if ($stdout) {
+        if (null !== $stdout) {
             fwrite($stdout, '[ OK ] Test ' . __FUNCTION__ . '() passed.' . PHP_EOL);
         }
 
@@ -184,14 +184,14 @@ trait AssertTrait
 
         $output = $var;
 
-        $stdout = static::assert_resource();
+        $stdout = static::assert_resource_static();
 
         $isDiff = static::debug_diff($output, $expect, $diff);
 
         if ($isDiff) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
 
-            if ($stdout) {
+            if (null !== $stdout) {
                 fwrite($stdout, '------' . PHP_EOL);
                 fwrite($stdout, $message . PHP_EOL);
                 fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
@@ -209,7 +209,7 @@ trait AssertTrait
             throw $e;
         }
 
-        if ($stdout) {
+        if (null !== $stdout) {
             fwrite($stdout, '[ OK ] Test ' . __FUNCTION__ . '() passed.' . PHP_EOL);
         }
 
@@ -259,10 +259,10 @@ trait AssertTrait
             }
         }
 
-        $stdout = static::assert_resource();
+        $stdout = static::assert_resource_static();
 
         if ($isError) {
-            if ($stdout) {
+            if (null !== $stdout) {
                 fwrite($stdout, '------' . PHP_EOL);
                 if (null !== $messageMax) {
                     fwrite($stdout, $messageMax . PHP_EOL);
@@ -290,7 +290,7 @@ trait AssertTrait
             throw $e;
         }
 
-        if ($stdout) {
+        if (null !== $stdout) {
             fwrite($stdout, '[ OK ] Test ' . __FUNCTION__ . '() passed.' . PHP_EOL);
         }
 

@@ -44,16 +44,6 @@ set_exception_handler(function (\Throwable $e) {
 
 
 // > добавляем несколько функция для тестирования
-function _dump(...$values) : void
-{
-    $lines = [];
-    foreach ( $values as $value ) {
-        $lines[] = \Gzhegow\Lib\Lib::debug_value($value);
-    }
-
-    echo implode(' | ', $lines) . PHP_EOL;
-}
-
 function _debug(...$values) : void
 {
     $lines = [];
@@ -64,13 +54,32 @@ function _debug(...$values) : void
     echo implode(' | ', $lines) . PHP_EOL;
 }
 
+function _dump(...$values) : void
+{
+    $lines = [];
+    foreach ( $values as $value ) {
+        $lines[] = \Gzhegow\Lib\Lib::debug_value($value);
+    }
+
+    echo implode(' | ', $lines) . PHP_EOL;
+}
+
+function _dump_array($value, int $maxLevel = null, bool $multiline = false) : void
+{
+    $content = $multiline
+        ? \Gzhegow\Lib\Lib::debug_array_multiline($value, $maxLevel)
+        : \Gzhegow\Lib\Lib::debug_array($value, $maxLevel);
+
+    echo $content . PHP_EOL;
+}
+
 function _assert_output(
     \Closure $fn, string $expect = null
 ) : void
 {
     $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-    \Gzhegow\Lib\Lib::assert_resource(STDOUT);
+    \Gzhegow\Lib\Lib::assert_resource_static(STDOUT);
     \Gzhegow\Lib\Lib::assert_output($trace, $fn, $expect);
 }
 
@@ -356,6 +365,42 @@ _assert_output($fn, <<<HEREDOC
 3
 3
 123
+""
+HEREDOC
+);
+
+// >>> TEST
+// > тесты PhpTrait
+$fn = function () {
+    _dump('[ TEST 5 ]');
+
+
+    \Gzhegow\Lib\Lib::php_errors_start($b);
+
+    for ( $i = 0; $i < 3; $i++ ) {
+        \Gzhegow\Lib\Lib::php_error([ 'This is the error message' ]);
+    }
+
+    $errors = \Gzhegow\Lib\Lib::php_errors_end($b);
+
+    _dump_array($errors, 1, true);
+
+
+    echo '';
+};
+_assert_output($fn, <<<HEREDOC
+"[ TEST 5 ]"
+[
+  [
+    "This is the error message"
+  ],
+  [
+    "This is the error message"
+  ],
+  [
+    "This is the error message"
+  ]
+]
 ""
 HEREDOC
 );

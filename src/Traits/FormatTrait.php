@@ -8,7 +8,7 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 trait FormatTrait
 {
-    public static function format_json_depth(int $depth = null) : int
+    public static function format_json_depth_static(int $depth = null) : int
     {
         static $current;
 
@@ -25,7 +25,7 @@ trait FormatTrait
         return $current;
     }
 
-    public static function format_json_encode_flags(int $flags = null) : int
+    public static function format_json_encode_flags_static(int $flags = null) : int
     {
         static $current;
 
@@ -42,7 +42,7 @@ trait FormatTrait
         return $current;
     }
 
-    public static function format_json_decode_flags(int $flags = null)
+    public static function format_json_decode_flags_static(int $flags = null)
     {
         static $current;
 
@@ -101,8 +101,8 @@ trait FormatTrait
             );
         }
 
-        $depth = $depth ?? static::format_json_depth();
-        $flags = $flags ?? static::format_json_decode_flags();
+        $depth = $depth ?? static::format_json_depth_static();
+        $flags = $flags ?? static::format_json_decode_flags_static();
 
         error_clear_last();
 
@@ -149,8 +149,8 @@ trait FormatTrait
             );
         }
 
-        $flags = $flags ?? static::format_json_encode_flags();
-        $depth = $depth ?? static::format_json_depth();
+        $flags = $flags ?? static::format_json_encode_flags_static();
+        $depth = $depth ?? static::format_json_depth_static();
 
         if (false
             || is_resource($value)
@@ -196,7 +196,7 @@ trait FormatTrait
         int $flags = null, int $depth = null
     ) : ?string
     {
-        $flags = $flags ?? (static::format_json_encode_flags() | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $flags = $flags ?? (static::format_json_encode_flags_static() | JSON_UNESCAPED_LINE_TERMINATORS | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         $json = static::format_json_encode(
             $value, $fallback,

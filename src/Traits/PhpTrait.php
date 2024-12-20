@@ -102,7 +102,7 @@ trait PhpTrait
 
 
     /**
-     * @return object{ errors: array }
+     * @return object{ stack: array }
      */
     public static function php_errors() : object
     {
@@ -110,7 +110,7 @@ trait PhpTrait
 
         $stack = $stack
             ?? new class {
-                public $errors = [];
+                public $stack = [];
             };
 
         return $stack;
@@ -119,11 +119,13 @@ trait PhpTrait
     /**
      * @return object{ list: array }
      */
-    public static function php_errors_current() : object
+    public static function php_errors_current() : ?object
     {
         $stack = static::php_errors();
 
-        $errors = end($stack->errors);
+        $errors = count($stack->stack)
+            ? end($stack->stack)
+            : null;
 
         return $errors;
     }
@@ -148,7 +150,8 @@ trait PhpTrait
         $stack = static::php_errors();
 
         $errors = static::php_errors_new();
-        $stack->errors[] = $errors;
+
+        $stack->stack[] = $errors;
 
         return $errors;
     }
@@ -159,8 +162,8 @@ trait PhpTrait
 
         $errors = static::php_errors_new();
 
-        while ( count($stack->errors) ) {
-            $current = array_pop($stack->errors);
+        while ( count($stack->stack) ) {
+            $current = array_pop($stack->stack);
 
             foreach ( $current->list as $error ) {
                 $errors->list[] = $error;
@@ -178,7 +181,9 @@ trait PhpTrait
     {
         $current = static::php_errors_current();
 
-        $current->list[] = $error;
+        if (null !== $current) {
+            $current->list[] = $error;
+        }
 
         return $result;
     }
@@ -189,7 +194,7 @@ trait PhpTrait
      *
      * @return class-string<\Exception|\LogicException|\RuntimeException>
      */
-    public static function php_throwable(string $throwableClass = null) : string
+    public static function php_throwable_static(string $throwableClass = null) : string
     {
         static $current;
 
@@ -326,7 +331,7 @@ trait PhpTrait
 
     public static function php_throw(...$throwableArgs)
     {
-        $throwableClass = static::php_throwable();
+        $throwableClass = static::php_throwable_static();
 
         $trace = property_exists($throwableClass, 'trace')
             ? debug_backtrace()
@@ -337,7 +342,7 @@ trait PhpTrait
 
     public static function php_throw_trace(array $trace = null, ...$throwableArgs)
     {
-        $throwableClass = static::php_throwable();
+        $throwableClass = static::php_throwable_static();
 
         if (null === $trace) {
             $trace = property_exists($throwableClass, 'trace')

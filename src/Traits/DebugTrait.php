@@ -109,7 +109,9 @@ trait DebugTrait
                         }
 
                         if (is_object($value)) {
-                            $value = static::debug_var_dump($value,
+                            // ! recursion
+                            $value = static::debug_var_dump(
+                                $value,
                                 [
                                     'with_type'  => true,
                                     'with_value' => false,
@@ -120,7 +122,9 @@ trait DebugTrait
                         }
 
                         if (is_array($value)) {
-                            $value = static::debug_var_dump($value,
+                            // ! recursion
+                            $value = static::debug_var_dump(
+                                $value,
                                 [
                                     'with_type'       => true,
                                     'with_value'      => false,
@@ -133,7 +137,9 @@ trait DebugTrait
                         }
 
                         if (null !== static::parse_resource($value)) {
-                            $value = static::debug_var_dump($value,
+                            // ! recursion
+                            $value = static::debug_var_dump(
+                                $value,
                                 [
                                     'with_type'  => true,
                                     'with_value' => false,
@@ -353,15 +359,17 @@ trait DebugTrait
         return $output;
     }
 
-    public static function debug_array($value, array $options = []) : string
+    public static function debug_array($value, int $maxLevel = null, array $options = []) : string
     {
+        $maxLevel = $maxLevel ?? 1;
+
         $output = static::debug_var_dump($value,
             $options + [
                 'with_type'       => false,
                 'with_id'         => false,
                 'with_value'      => true,
                 'newline'         => ' ',
-                'max_array_level' => 1,
+                'max_array_level' => $maxLevel,
             ]
         );
 
@@ -383,14 +391,16 @@ trait DebugTrait
         return $output;
     }
 
-    public static function debug_array_multiline($value, array $options = []) : string
+    public static function debug_array_multiline($value, int $maxLevel = null, array $options = []) : string
     {
+        $maxLevel = $maxLevel ?? 1;
+
         $output = static::debug_var_dump($value,
             $options + [
                 'with_type'       => false,
                 'with_id'         => false,
                 'with_value'      => true,
-                'max_array_level' => 1,
+                'max_array_level' => $maxLevel,
             ]
         );
 

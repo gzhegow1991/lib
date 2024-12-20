@@ -7,7 +7,7 @@ use Gzhegow\Lib\Exception\LogicException;
 
 trait BcTrait
 {
-    public static function bc_scale_limit(int $scale = null) : int
+    public static function bc_scale_limit_static(int $scale = null) : int
     {
         static $current;
 
@@ -56,7 +56,7 @@ trait BcTrait
     {
         $scales = [];
 
-        $scaleLimit = static::bc_scale_limit();
+        $scaleLimit = static::bc_scale_limit_static();
 
         if (null !== $scale) {
             $_scale = null
@@ -88,7 +88,7 @@ trait BcTrait
     {
         $scales = [];
 
-        $scaleLimit = static::bc_scale_limit();
+        $scaleLimit = static::bc_scale_limit_static();
 
         if (null !== $scale) {
             $_scale = null
