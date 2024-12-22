@@ -104,7 +104,7 @@ trait DebugTrait
                     ) as $path => &$value ) {
                         /** @var array $path */
 
-                        if (count($path) <= $maxArrayLevel) {
+                        if (count($path) < $maxArrayLevel) {
                             continue;
                         }
 

@@ -383,7 +383,7 @@ $fn = function () {
 
     $errors = \Gzhegow\Lib\Lib::php_errors_end($b);
 
-    _dump_array($errors, 1, true);
+    _dump_array($errors, 2, true);
 
 
     echo '';

@@ -1,6 +1,7 @@
 {
     "name": "gzhegow/lib",
     "type": "library",
+    "version": "1.0.22",
 
     "minimum-stability": "dev",
     "prefer-stable": true,
