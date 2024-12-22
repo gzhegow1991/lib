@@ -115,7 +115,7 @@ $fn = function () {
                 [ 1, 'apple', $stdClass ],
                 [ 2, 'apples', $stdClass ],
                 [ 1.5, 'apples', $stdClass ],
-            ]
+            ], 2
         ) . PHP_EOL;
 
     echo PHP_EOL;
@@ -133,7 +133,7 @@ $fn = function () {
                 [ 1, 'apple', $stdClass ],
                 [ 2, 'apples', $stdClass ],
                 [ 1.5, 'apples', $stdClass ],
-            ]
+            ], 2
         ) . PHP_EOL;
 
     echo '';

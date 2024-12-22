@@ -440,14 +440,14 @@ trait DebugTrait
 
             } else {
                 if ($actualLine === $expectLine) {
-                    $actualLinesNew[] = "[{$i}] " . $actualLine;
-                    $expectLinesNew[] = "[{$i}] " . $expectLine;
+                    $actualLinesNew[] = "[{$i}] > " . $actualLine;
+                    $expectLinesNew[] = "[{$i}] > " . $expectLine;
 
                     continue;
                 }
 
-                $expectLinesNew[] = "--- [{$i}] " . $expectLine;
-                $actualLinesNew[] = "+++ [{$i}] " . $actualLine;
+                $expectLinesNew[] = "--- [{$i}] > " . $expectLine;
+                $actualLinesNew[] = "+++ [{$i}] > " . $actualLine;
             }
 
             $isDiff = true;

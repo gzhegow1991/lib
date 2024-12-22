@@ -57,6 +57,16 @@ set_exception_handler(function (\Throwable $e) {
 
 
 // > добавляем несколько функция для тестирования
+function _debug(...$values) : void
+{
+    $lines = [];
+    foreach ( $values as $value ) {
+        $lines[] = \Gzhegow\Lib\Lib::debug_type_id($value);
+    }
+
+    echo implode(' | ', $lines) . PHP_EOL;
+}
+
 function _dump(...$values) : void
 {
     $lines = [];
@@ -67,14 +77,13 @@ function _dump(...$values) : void
     echo implode(' | ', $lines) . PHP_EOL;
 }
 
-function _debug(...$values) : void
+function _dump_array($value, int $maxLevel = null, bool $multiline = false) : void
 {
-    $lines = [];
-    foreach ( $values as $value ) {
-        $lines[] = \Gzhegow\Lib\Lib::debug_type_id($value);
-    }
+    $content = $multiline
+        ? \Gzhegow\Lib\Lib::debug_array_multiline($value, $maxLevel)
+        : \Gzhegow\Lib\Lib::debug_array($value, $maxLevel);
 
-    echo implode(' | ', $lines) . PHP_EOL;
+    echo $content . PHP_EOL;
 }
 
 function _assert_output(
@@ -119,7 +128,7 @@ $fn = function () {
                 [ 1, 'apple', $stdClass ],
                 [ 2, 'apples', $stdClass ],
                 [ 1.5, 'apples', $stdClass ],
-            ]
+            ], 2
         ) . PHP_EOL;
 
     echo PHP_EOL;
@@ -137,7 +146,7 @@ $fn = function () {
                 [ 1, 'apple', $stdClass ],
                 [ 2, 'apples', $stdClass ],
                 [ 1.5, 'apples', $stdClass ],
-            ]
+            ], 2
         ) . PHP_EOL;
 
     echo '';
@@ -369,6 +378,42 @@ _assert_output($fn, <<<HEREDOC
 3
 3
 123
+""
+HEREDOC
+);
+
+// >>> TEST
+// > тесты PhpTrait
+$fn = function () {
+    _dump('[ TEST 5 ]');
+
+
+    \Gzhegow\Lib\Lib::php_errors_start($b);
+
+    for ( $i = 0; $i < 3; $i++ ) {
+        \Gzhegow\Lib\Lib::php_error([ 'This is the error message' ]);
+    }
+
+    $errors = \Gzhegow\Lib\Lib::php_errors_end($b);
+
+    _dump_array($errors, 2, true);
+
+
+    echo '';
+};
+_assert_output($fn, <<<HEREDOC
+"[ TEST 5 ]"
+[
+  [
+    "This is the error message"
+  ],
+  [
+    "This is the error message"
+  ],
+  [
+    "This is the error message"
+  ]
+]
 ""
 HEREDOC
 );
