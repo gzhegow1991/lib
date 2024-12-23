@@ -1,5 +1,6 @@
 <?php
 
+require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 
@@ -401,6 +402,61 @@ _assert_output($fn, <<<HEREDOC
     "This is the error message"
   ]
 ]
+""
+HEREDOC
+);
+
+
+// >>> TEST
+// > тесты ArrayOf
+$fn = function () {
+    _dump('[ TEST 6 ]');
+
+
+    $array = new \Gzhegow\Lib\ArrayOf\ArrayOf('object');
+    $array[] = 1;
+    $array[] = 2;
+    _dump($array, $array->getItems(), $array->isOfType('object'));
+
+    $array = new \Gzhegow\Lib\ArrayOf\ArrayOfType('object');
+    $array[] = new \stdClass();
+    $array[] = new \stdClass();
+    try {
+        $array[] = 1;
+    }
+    catch ( \Throwable $e ) {
+        _dump('[ CATCH ]');
+    }
+    _dump($array, $array->getItems(), $array->isOfType('object'));
+
+    $array = new \Gzhegow\Lib\ArrayOf\ArrayOfClass('string', \stdClass::class);
+    $array[] = new \stdClass();
+    $array[] = new \stdClass();
+    try {
+        $array[] = new class extends \stdClass {
+        };
+    }
+    catch ( \Throwable $e ) {
+        _dump('[ CATCH ]');
+    }
+    try {
+        $array[] = 1;
+    }
+    catch ( \Throwable $e ) {
+        _dump('[ CATCH ]');
+    }
+    _dump($array, $array->getItems(), $array->isOfType('object'));
+
+    echo '';
+};
+_assert_output($fn, <<<HEREDOC
+"[ TEST 6 ]"
+{ object(iterable countable(2)) # Gzhegow\Lib\ArrayOf\ArrayOf } | [ 1, 2 ] | TRUE
+"[ CATCH ]"
+{ object(iterable countable(2)) # Gzhegow\Lib\ArrayOf\ArrayOfType } | [ "{ object # stdClass }", "{ object # stdClass }" ] | TRUE
+"[ CATCH ]"
+"[ CATCH ]"
+{ object(iterable countable(2)) # Gzhegow\Lib\ArrayOf\ArrayOfClass } | [ "{ object # stdClass }", "{ object # stdClass }" ] | TRUE
 ""
 HEREDOC
 );

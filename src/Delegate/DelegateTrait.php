@@ -4,42 +4,38 @@ namespace Gzhegow\Lib\Delegate;
 
 trait DelegateTrait
 {
-    protected $delegate;
-
-
-    public function __isset($name)
+    public function delegateIsset(object $delegate, $name)
     {
         return (function ($name) {
             return isset($this->{$name});
-        })->call($this->delegate, $name);
+        })->call($delegate, $name);
     }
 
-    public function __get($name)
+    public function delegateGet(object $delegate, $name)
     {
         return (function ($name) {
             return $this->{$name};
-        })->call($this->delegate, $name);
+        })->call($delegate, $name);
     }
 
-    public function __set($name, $value)
+    public function delegateSet(object $delegate, $name, $value)
     {
         (function ($name, $value) {
             $this->{$name} = $value;
-        })->call($this->delegate, $name, $value);
+        })->call($delegate, $name, $value);
     }
 
-    public function __unset($name)
+    public function delegateUnset(object $delegate, $name)
     {
         (function ($name) {
             unset($this->{$name});
-        })->call($this->delegate, $name);
+        })->call($delegate, $name);
     }
 
-
-    public function __call($name, $arguments)
+    public function delegateCall(object $delegate, $name, $arguments)
     {
         return (function ($name, $arguments) {
             return call_user_func_array([ $this, $name ], $arguments);
-        })->call($this->delegate, $name, $arguments);
+        })->call($delegate, $name, $arguments);
     }
 }
