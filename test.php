@@ -421,6 +421,7 @@ $fn = function () {
     $array = new \Gzhegow\Lib\ArrayOf\ArrayOfType('object');
     $array[] = new \stdClass();
     $array[] = new \stdClass();
+    $array[] = new ArrayObject();
     try {
         $array[] = 1;
     }
@@ -432,6 +433,12 @@ $fn = function () {
     $array = new \Gzhegow\Lib\ArrayOf\ArrayOfClass('string', \stdClass::class);
     $array[] = new \stdClass();
     $array[] = new \stdClass();
+    try {
+        $array[] = new ArrayObject();
+    }
+    catch ( \Throwable $e ) {
+        _dump('[ CATCH ]');
+    }
     try {
         $array[] = new class extends \stdClass {
         };
@@ -453,7 +460,8 @@ _assert_output($fn, <<<HEREDOC
 "[ TEST 6 ]"
 { object(iterable countable(2)) # Gzhegow\Lib\ArrayOf\ArrayOf } | [ 1, 2 ] | TRUE
 "[ CATCH ]"
-{ object(iterable countable(2)) # Gzhegow\Lib\ArrayOf\ArrayOfType } | [ "{ object # stdClass }", "{ object # stdClass }" ] | TRUE
+{ object(iterable countable(3)) # Gzhegow\Lib\ArrayOf\ArrayOfType } | [ "{ object # stdClass }", "{ object # stdClass }", "{ object(iterable countable(0)) # ArrayObject }" ] | TRUE
+"[ CATCH ]"
 "[ CATCH ]"
 "[ CATCH ]"
 { object(iterable countable(2)) # Gzhegow\Lib\ArrayOf\ArrayOfClass } | [ "{ object # stdClass }", "{ object # stdClass }" ] | TRUE

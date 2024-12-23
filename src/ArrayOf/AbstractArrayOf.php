@@ -7,7 +7,7 @@ use Gzhegow\Lib\Exception\LogicException;
 
 
 /**
- * @template-covariant T of object
+ * @template T of object
  */
 abstract class AbstractArrayOf implements \ArrayAccess, \Countable, \Serializable, \IteratorAggregate
 {
