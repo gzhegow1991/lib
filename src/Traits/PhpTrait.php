@@ -582,37 +582,44 @@ trait PhpTrait
             $className = get_class($objectOrClass);
         }
 
-        $results = [];
+        $uses = [];
 
         $sources = []
             + array_reverse(class_parents($className))
             + [ $className => $className ];
 
         foreach ( $sources as $sourceClassName ) {
-            $results += static::php_class_uses($sourceClassName, $recursive);
+            $uses += static::php_class_uses($sourceClassName, $recursive);
         }
 
-        return array_unique($results);
+        $uses = array_unique($uses);
+
+        return $uses;
     }
 
     /**
-     * @param class-string $className
+     * @param object|class-string $objectOrClass
      *
      * @return class-string[]
      */
-    public static function php_class_uses(string $className, bool $recursive = null)
+    public static function php_class_uses($objectOrClass, bool $recursive = null)
     {
         $recursive = $recursive ?? false;
 
-        $traits = class_uses($className) ?: [];
+        $className = $objectOrClass;
+        if (is_object($objectOrClass)) {
+            $className = get_class($objectOrClass);
+        }
+
+        $uses = class_uses($className) ?: [];
 
         if ($recursive) {
-            foreach ( $traits as $trait ) {
+            foreach ( $uses as $usesItem ) {
                 // ! recursion
-                $traits += static::php_class_uses($trait);
+                $uses += static::php_class_uses($usesItem);
             }
         }
 
-        return $traits;
+        return $uses;
     }
 }
