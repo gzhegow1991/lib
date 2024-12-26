@@ -66,7 +66,7 @@ class ErrorHandler
     /**
      * @return static
      */
-    public function restoreErrorReporting() // : static
+    public function useErrorReporting() // : static
     {
         $last = error_reporting($this->errorReporting);
 
@@ -76,7 +76,7 @@ class ErrorHandler
     /**
      * @return static
      */
-    public function restoreErrorHandler() // : static
+    public function useErrorHandler() // : static
     {
         $last = set_error_handler($this->errorHandler);
 
@@ -86,7 +86,7 @@ class ErrorHandler
     /**
      * @return static
      */
-    public function restoreExceptionHandler() // : static
+    public function useExceptionHandler() // : static
     {
         $last = set_exception_handler($this->exceptionHandler);
 

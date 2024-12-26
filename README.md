@@ -22,9 +22,9 @@ ini_set('memory_limit', '32M');
 
 // > настраиваем обработку ошибок
 (new \Gzhegow\Lib\Exception\ErrorHandler())
-    ->restoreErrorReporting()
-    ->restoreErrorHandler()
-    ->restoreExceptionHandler()
+    ->useErrorReporting()
+    ->useErrorHandler()
+    ->useExceptionHandler()
 ;
 
 
