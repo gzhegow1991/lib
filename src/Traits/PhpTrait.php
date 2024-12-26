@@ -84,7 +84,11 @@ trait PhpTrait
         return $result;
     }
 
-    public static function php_get_error_handler() : ?callable
+
+    /**
+     * @return callable|null
+     */
+    public static function php_get_error_handler() // : ?callable
     {
         $handler = set_error_handler(static function () { });
         restore_error_handler();
@@ -92,7 +96,10 @@ trait PhpTrait
         return $handler;
     }
 
-    public static function php_get_exception_handler() : ?callable
+    /**
+     * @return callable|null
+     */
+    public static function php_get_exception_handler() // : ?callable
     {
         $handler = set_exception_handler(static function () { });
         restore_exception_handler();
@@ -244,15 +251,21 @@ trait PhpTrait
         for ( $i = 0; $i < $len; $i++ ) {
             $arg = $args[ $i ];
 
-            if (is_a($arg, \Throwable::class)) {
-                $previousList[ $i ] = $arg;
+            if (is_int($arg)) {
+                $codeList[ $i ] = $arg;
 
                 continue;
             }
 
-            if (
-                is_array($arg)
-                || is_a($arg, \stdClass::class)
+            if (is_string($arg) && ('' !== $arg)) {
+                $messageList[ $i ] = $arg;
+
+                continue;
+            }
+
+            if (false
+                || is_array($arg)
+                || $arg instanceof \stdClass
             ) {
                 $messageData = (array) $arg;
 
@@ -271,14 +284,8 @@ trait PhpTrait
                 continue;
             }
 
-            if (is_int($arg)) {
-                $codeList[ $i ] = $arg;
-
-                continue;
-            }
-
-            if ('' !== ($vString = (string) $arg)) {
-                $messageList[ $i ] = $vString;
+            if ($arg instanceof \Throwable) {
+                $previousList[ $i ] = $arg;
 
                 continue;
             }
@@ -546,5 +553,17 @@ trait PhpTrait
         }
 
         return $result;
+    }
+
+
+    public static function php_array($value) : array
+    {
+        if (is_object($value) && (! ($value instanceof \stdClass))) {
+            throw new LogicException(
+                [ 'The `value` being the object should be instance of: ' . \stdClass::class, $value ]
+            );
+        }
+
+        return (array) $value;
     }
 }

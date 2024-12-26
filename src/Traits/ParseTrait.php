@@ -516,6 +516,21 @@ trait ParseTrait
     {
         if (! is_array($value)) return null;
 
+        foreach ( array_keys($value) as $key ) {
+            if (is_string($key)) {
+                return null;
+            }
+        }
+
+        return $value;
+    }
+
+    public static function parse_list_strict($value) : ?array
+    {
+        if (! is_array($value)) {
+            return null;
+        }
+
         $keys = array_keys($value);
 
         foreach ( $keys as $key ) {
@@ -531,22 +546,11 @@ trait ParseTrait
         return $value;
     }
 
-    public static function parse_index($value) : ?array
-    {
-        if (! is_array($value)) return null;
-
-        foreach ( array_keys($value) as $key ) {
-            if (is_string($key)) {
-                return null;
-            }
-        }
-
-        return $value;
-    }
-
     public static function parse_dict($value) : ?array
     {
-        if (! is_array($value)) return null;
+        if (! is_array($value)) {
+            return null;
+        }
 
         foreach ( array_keys($value) as $key ) {
             if (is_int($key)) {
@@ -594,7 +598,7 @@ trait ParseTrait
     /**
      * @return resource|null
      */
-    function parse_resource_opened($value) // : ?resource
+    public static function parse_resource_opened($value) // : ?resource
     {
         return is_resource($value) ? $value : null;
     }
@@ -602,7 +606,7 @@ trait ParseTrait
     /**
      * @return resource|null
      */
-    function parse_resource_closed($value) // : ?resource
+    public static function parse_resource_closed($value) // : ?resource
     {
         if ('resource (closed)' === gettype($value)) {
             return $value;

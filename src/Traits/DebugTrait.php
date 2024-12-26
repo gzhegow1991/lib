@@ -72,7 +72,7 @@ trait DebugTrait
                 $objectClass = get_class($var);
                 $objectId = spl_object_id($var);
                 $objectSubtypeIterable = (is_iterable($var) ? 'iterable' : null);
-                $objectSubtypeCountable = (is_a($var, \Countable::class) ? 'countable(' . count($var) . ')' : null);
+                $objectSubtypeCountable = (($var instanceof \Countable) ? 'countable(' . count($var) . ')' : null);
 
                 $subtype = [];
                 if ($objectSubtypeIterable) $subtype[] = $objectSubtypeIterable;

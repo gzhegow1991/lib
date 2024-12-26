@@ -46,7 +46,7 @@ trait AssertTrait
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
         $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
 
-        $_value = is_a($value, \Closure::class)
+        $_value = $value instanceof \Closure
             ? $value()
             : $value;
 
@@ -90,7 +90,7 @@ trait AssertTrait
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
         $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
 
-        $_value = is_a($value, \Closure::class)
+        $_value = $value instanceof \Closure
             ? $value()
             : $value;
 
