@@ -573,7 +573,7 @@ trait PhpTrait
      *
      * @return class-string[]
      */
-    public static function php_uses_class($objectOrClass, bool $recursive = null)
+    public static function php_class_uses_with_parents($objectOrClass, bool $recursive = null)
     {
         $recursive = $recursive ?? false;
 
@@ -589,7 +589,7 @@ trait PhpTrait
             + [ $className => $className ];
 
         foreach ( $sources as $sourceClassName ) {
-            $results += static::php_uses_class_name($sourceClassName, $recursive);
+            $results += static::php_class_uses($sourceClassName, $recursive);
         }
 
         return array_unique($results);
@@ -600,7 +600,7 @@ trait PhpTrait
      *
      * @return class-string[]
      */
-    public static function php_uses_class_name(string $className, bool $recursive = null)
+    public static function php_class_uses(string $className, bool $recursive = null)
     {
         $recursive = $recursive ?? false;
 
@@ -609,7 +609,7 @@ trait PhpTrait
         if ($recursive) {
             foreach ( $traits as $trait ) {
                 // ! recursion
-                $traits += static::php_uses_class_name($trait);
+                $traits += static::php_class_uses($trait);
             }
         }
 
