@@ -566,4 +566,53 @@ trait PhpTrait
 
         return (array) $value;
     }
+
+
+    /**
+     * @param object|class-string $objectOrClass
+     *
+     * @return class-string[]
+     */
+    public static function php_uses_class($objectOrClass, bool $recursive = null)
+    {
+        $recursive = $recursive ?? false;
+
+        $className = $objectOrClass;
+        if (is_object($objectOrClass)) {
+            $className = get_class($objectOrClass);
+        }
+
+        $results = [];
+
+        $sources = []
+            + array_reverse(class_parents($className))
+            + [ $className => $className ];
+
+        foreach ( $sources as $sourceClassName ) {
+            $results += static::php_uses_class_name($sourceClassName, $recursive);
+        }
+
+        return array_unique($results);
+    }
+
+    /**
+     * @param class-string $className
+     *
+     * @return class-string[]
+     */
+    public static function php_uses_class_name(string $className, bool $recursive = null)
+    {
+        $recursive = $recursive ?? false;
+
+        $traits = class_uses($className) ?: [];
+
+        if ($recursive) {
+            foreach ( $traits as $trait ) {
+                // ! recursion
+                $traits += static::php_uses_class_name($trait);
+            }
+        }
+
+        return $traits;
+    }
 }
