@@ -5,8 +5,6 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 
 
-if (! defined('_UNDEFINED')) define('_UNDEFINED', NAN);
-
 class BoolModule
 {
     public function is_null($value) : bool

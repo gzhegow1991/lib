@@ -9,19 +9,21 @@ use Gzhegow\Lib\Modules\NetModule;
 use Gzhegow\Lib\Modules\PhpModule;
 use Gzhegow\Lib\Modules\StrModule;
 use Gzhegow\Lib\Modules\UrlModule;
+use Gzhegow\Lib\Modules\ArrModule;
 use Gzhegow\Lib\Modules\JsonModule;
 use Gzhegow\Lib\Modules\BoolModule;
 use Gzhegow\Lib\Modules\HttpModule;
 use Gzhegow\Lib\Modules\DebugModule;
 use Gzhegow\Lib\Modules\ParseModule;
 use Gzhegow\Lib\Modules\BcMathModule;
-use Gzhegow\Lib\Modules\ArrModule;
 use Gzhegow\Lib\Modules\AssertModule;
 use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
 use Gzhegow\Lib\Modules\ItertoolsModule;
 
+
+if (! defined('_UNDEFINED')) define('_UNDEFINED', NAN);
 
 class Lib
 {
