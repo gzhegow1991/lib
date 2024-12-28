@@ -113,7 +113,7 @@ class PhpModule
             $_value = (array) $value;
         }
 
-        return (array) $value;
+        return $_value;
     }
 
 
