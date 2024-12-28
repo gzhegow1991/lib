@@ -3,12 +3,28 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Http\Cookie\Cookies;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Modules\Http\Cookie\Cookies;
 
 
 class HttpModule
 {
+    /**
+     * @var Cookies
+     */
+    protected $cookies;
+    /**
+     * @var object
+     */
+    protected $session;
+
+
+    public function __construct()
+    {
+        $this->cookies = new Cookies();
+    }
+
+
     public function headers_flush() : array
     {
         $headers = headers_list();
@@ -164,19 +180,17 @@ class HttpModule
 
     public function cookies_static(Cookies $cookies = null) : Cookies
     {
-        static $current;
-
-        $current = $current ?? new Cookies();
-
         if (null !== $cookies) {
-            $last = $current;
+            $last = $this->cookies;
 
             $current = $cookies;
 
-            return $last;
+            $result = $last;
         }
 
-        return $current;
+        $result = $result ?? $this->cookies;
+
+        return $result;
     }
 
     public function cookie_has(string $name, &$result = null) : bool
@@ -294,19 +308,17 @@ class HttpModule
          * @see          \Symfony\Component\HttpFoundation\Session\SessionInterface
          */
 
-        static $current;
-
-        $current = $current ?? null;
-
         if (null !== $session) {
-            $last = $current;
+            $last = $this->session;
 
             $current = $session;
 
-            return $last;
+            $result = $last;
         }
 
-        return $current;
+        $result = $result ?? $this->session;
+
+        return $result;
     }
 
     public function session_has(string $name, &$result = null) : bool

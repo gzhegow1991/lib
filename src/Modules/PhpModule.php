@@ -13,6 +13,12 @@ use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
 
 class PhpModule
 {
+    /**
+     * @var class-string<\LogicException|\RuntimeException>
+     */
+    protected $throwableClass = LogicException::class;
+
+
     public function __construct()
     {
         if (! extension_loaded('date')) {
@@ -21,6 +27,7 @@ class PhpModule
             );
         }
     }
+
 
     public function toInt($value, array $options = []) : int
     {
@@ -140,12 +147,11 @@ class PhpModule
     }
 
 
-    public function dirname(?string $path, string $separator = null, int $levels = null) : ?string
+    public function dirname(string $path, string $separator = null, int $levels = null) : ?string
     {
         $separator = $separator ?? DIRECTORY_SEPARATOR;
         $levels = $levels ?? 1;
 
-        if (null === $path) return null;
         if ('' === $path) return null;
 
         $_value = $path;
@@ -162,7 +168,7 @@ class PhpModule
             $_value = null;
 
         } else {
-            $_value = preg_replace('~/+~', '/', $_value);
+            $_value = preg_replace('~[/]+~', '/', $_value);
 
             $_value = dirname($_value, $levels);
             $_value = str_replace('/', $separator, $_value);
@@ -306,16 +312,12 @@ class PhpModule
      *
      * @return class-string<\LogicException|\RuntimeException>
      */
-    public function throwable_static(string $throwableClass = null) : string
+    public function throwable_class_static(string $throwableClass = null) : string
     {
-        static $current;
-
-        $current = $current ?? LogicException::class;
-
         if (null !== $throwableClass) {
             if (! (false
-                || is_a($current, \LogicException::class, true)
-                || is_a($current, \RuntimeException::class, true)
+                || is_a($throwableClass, \LogicException::class, true)
+                || is_a($throwableClass, \RuntimeException::class, true)
             )) {
                 throw new LogicException(
                     [
@@ -324,19 +326,21 @@ class PhpModule
                             \LogicException::class,
                             \RuntimeException::class,
                         ]),
-                        $current,
+                        $throwableClass,
                     ]
                 );
             }
 
-            $last = $current;
+            $last = $this->throwableClass;
 
             $current = $throwableClass;
 
-            return $last;
+            $result = $last;
         }
 
-        return $current;
+        $result = $result ?? $this->throwableClass;
+
+        return $result;
     }
 
     public function throwable_args(...$args) : array
@@ -444,7 +448,7 @@ class PhpModule
      */
     public function throw(...$throwableArgs)
     {
-        $throwableClass = $this->throwable_static();
+        $throwableClass = $this->throwable_class_static();
 
         $trace = property_exists($throwableClass, 'trace')
             ? debug_backtrace()
@@ -458,7 +462,7 @@ class PhpModule
      */
     public function throw_trace(array $trace = null, ...$throwableArgs)
     {
-        $throwableClass = $this->throwable_static();
+        $throwableClass = $this->throwable_class_static();
 
         if (null === $trace) {
             $trace = property_exists($throwableClass, 'trace')
@@ -718,5 +722,24 @@ class PhpModule
         }
 
         return $uses;
+    }
+
+
+    /**
+     * > gzhegow, функция get_object_vars() возвращает все элементы для $this, в том числе protected/private
+     * > чтобы получить доступ только к публичным свойствам, её нужно вызвать в обертке
+     */
+    public function get_object_vars(object $object) : array
+    {
+        return get_object_vars($object);
+    }
+
+    /**
+     * > gzhegow, функция property_exists() возвращает все свойства, в том числе protected/private
+     * > чтобы получить доступ только к публичным свойствам, нужно прибегнуть к вот такой хитрости
+     */
+    public function property_exists(object $object_or_class, string $property) : bool
+    {
+        return array_key_exists($property, $this->get_object_vars($object_or_class));
     }
 }

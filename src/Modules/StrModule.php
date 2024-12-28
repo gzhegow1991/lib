@@ -7,39 +7,107 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Str\Slugger\Slugger;
+use Gzhegow\Lib\Modules\Str\Inflector\Inflector;
+use Gzhegow\Lib\Modules\Str\Slugger\SluggerInterface;
+use Gzhegow\Lib\Modules\Str\Inflector\InflectorInterface;
 
 
 class StrModule
 {
+    /**
+     * @var InflectorInterface
+     */
+    protected $inflector;
+    /**
+     * @var SluggerInterface
+     */
+    protected $slugger;
+
+    /**
+     * @var bool
+     */
+    protected $mbMode = false;
+
+
     public function __construct()
     {
         $mbMode = extension_loaded('mbstring');
 
-        $this->mb_mode_static($mbMode);
+        $this->inflector = new Inflector();
+        $this->slugger = new Slugger();
+
+        $this->mbMode = $mbMode;
     }
 
 
-    public function mb_mode_static(bool $mode = null) : bool
+    public function inflector_static(InflectorInterface $inflector = null) : InflectorInterface
     {
-        static $current;
+        if (null !== $inflector) {
+            $last = $this->inflector;
 
-        $current = $current ?? false;
+            $current = $inflector;
 
-        if (null !== $mode) {
-            $last = $current;
-
-            $current = $mode;
-
-            if ($current && ! extension_loaded('mbstring')) {
-                throw new RuntimeException(
-                    'Unable to enable `mb_mode` due to `mbstring` extension is missing'
-                );
-            }
+            $this->inflector = $current;
 
             $result = $last;
         }
 
-        $result = $result ?? $current;
+        $result = $result ?? $this->inflector;
+
+        return $result;
+    }
+
+    public function inflector() : InflectorInterface
+    {
+        return $this->inflector_static();
+    }
+
+
+    public function slugger_static(SluggerInterface $slugger = null) : SluggerInterface
+    {
+        if (null !== $slugger) {
+            $last = $this->slugger;
+
+            $current = $slugger;
+
+            $this->slugger = $current;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->slugger;
+
+        return $result;
+    }
+
+    public function slugger() : SluggerInterface
+    {
+        return $this->slugger_static();
+    }
+
+
+    public function mb_mode_static(bool $mbMode = null) : bool
+    {
+        if (null !== $mbMode) {
+            if ($mbMode) {
+                if (! extension_loaded('mbstring')) {
+                    throw new RuntimeException(
+                        'Unable to enable `mb_mode` due to `mbstring` extension is missing'
+                    );
+                }
+            }
+
+            $last = $this->mbMode;
+
+            $current = $mbMode;
+
+            $this->mbMode = $current;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->mbMode;
 
         return $result;
     }

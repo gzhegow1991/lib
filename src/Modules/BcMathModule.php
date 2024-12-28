@@ -12,6 +12,12 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 class BcMathModule
 {
+    /**
+     * @var int
+     */
+    protected $scaleLimit = 10;
+
+
     public function __construct()
     {
         if (! extension_loaded('bcmath')) {
@@ -22,23 +28,25 @@ class BcMathModule
     }
 
 
-    public function scale_limit_static(int $scale = null) : int
+    public function scale_limit_static(int $scaleLimit = null) : int
     {
-        static $current;
+        if (null !== $scaleLimit) {
+            if ($scaleLimit < 0) {
+                throw new LogicException(
+                    [ 'The `scaleLimit` must be non-negative integer', $scaleLimit ]
+                );
+            }
 
-        $current = $current ?? 10;
+            $last = $this->scaleLimit;
 
-        if (null !== $scale) {
-            $scale = ($scale > 0) ? $scale : 0;
+            $current = $scaleLimit;
 
-            $last = $current;
-
-            $current = $scale;
-
-            return $last;
+            $result = $last;
         }
 
-        return $current;
+        $result = $result ?? $this->scaleLimit;
+
+        return $result;
     }
 
 

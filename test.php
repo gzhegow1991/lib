@@ -209,6 +209,11 @@ $fn = function () {
     _dump(\Gzhegow\Lib\Lib::str()->snake_upper('-Hello-WORLD-Foo-BAR'));
     _dump(\Gzhegow\Lib\Lib::str()->kebab_upper(' Hello WORLD Foo BAR'));
 
+    _dump(\Gzhegow\Lib\Lib::str()->inflector()->singularize('users'));
+    _dump(\Gzhegow\Lib\Lib::str()->inflector()->pluralize('user'));
+
+    _dump(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир'));
+
     echo '';
 };
 _assert_output($fn, <<<HEREDOC
@@ -250,6 +255,9 @@ _assert_output($fn, <<<HEREDOC
 " HELLO WORLD FOO BAR"
 "_HELLO_WORLD_FOO_BAR"
 "-HELLO-WORLD-FOO-BAR"
+[ "user" ]
+[ "users" ]
+"privet-mir"
 ""
 HEREDOC
 );
@@ -575,6 +583,91 @@ _assert_output($fn, <<<HEREDOC
 9223372036854775807
 "zik0zj"
 "1y2p0ij32e8e7"
+""
+HEREDOC
+);
+
+
+// >>> TEST
+// > тесты BcMathModule
+$fn = function () {
+    _dump('[ TEST 8 ]');
+
+    $instance = new class extends \Gzhegow\Lib\Struct\AbstractGenericObject {
+        use \Gzhegow\Lib\Struct\Traits\WritablePropertiesTrait;
+
+
+        protected $foo = 1;
+    };
+    $instance->bar = 2;
+    _dump($instance->foo);
+    _dump($instance->bar);
+    echo PHP_EOL;
+
+    $instance = new class extends \Gzhegow\Lib\Struct\AbstractGenericObject {
+        use \Gzhegow\Lib\Struct\Traits\ReadonlyPropertiesTrait;
+
+
+        protected $foo = 1;
+    };
+    try {
+        $instance->bar = 2;
+    }
+    catch ( \Throwable $e ) {
+        _dump('[ CATCH ] SET');
+    }
+    _dump($instance->foo);
+    try {
+        _dump($instance->bar);
+    }
+    catch ( \Throwable $e ) {
+        _dump('[ CATCH ] GET');
+    }
+    echo PHP_EOL;
+
+    $instance = new class extends \Gzhegow\Lib\Struct\AbstractGenericObject {
+        use \Gzhegow\Lib\Struct\Traits\PublicPropertiesTrait;
+
+
+        protected $foo = 1;
+    };
+    $instance->bar = 2;
+    try {
+        _dump($instance->foo);
+    }
+    catch ( \Throwable $e ) {
+        _dump('[ CATCH ] GET');
+    }
+    _dump($instance->bar);
+    echo PHP_EOL;
+
+
+    $instance = new class extends \Gzhegow\Lib\Struct\AbstractGenericObject {
+        use \Gzhegow\Lib\Struct\Traits\ProtectedPropertiesTrait;
+
+
+        protected $foo = 1;
+    };
+    $instance->bar = 2;
+    _dump($instance->foo);
+    _dump($instance->bar);
+
+    echo '';
+};
+_assert_output($fn, <<<HEREDOC
+"[ TEST 8 ]"
+1
+2
+
+"[ CATCH ] SET"
+1
+"[ CATCH ] GET"
+
+"[ CATCH ] GET"
+2
+
+1
+2
 ""
 HEREDOC
 );

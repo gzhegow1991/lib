@@ -10,32 +10,35 @@ use Gzhegow\Lib\Exception\RuntimeException;
 class AssertModule
 {
     /**
+     * @var resource
+     */
+    protected $resource = STDOUT;
+
+
+    /**
      * @param resource|null $resource
      *
      * @return resource|null
      */
     public function resource_static($resource = null) // : ?resource
     {
-        static $current;
-
         if (null !== $resource) {
             if (! is_resource($resource)) {
                 throw new LogicException(
-                    [
-                        'The `resource` must be opened resource',
-                        $resource,
-                    ]
+                    [ 'The `resource` must be opened resource', $resource ]
                 );
             }
 
-            $last = $current;
+            $last = $this->resource;
 
             $current = $resource;
 
-            return $last;
+            $result = $last;
         }
 
-        return $current;
+        $result = $result ?? $this->resource;
+
+        return $result;
     }
 
 

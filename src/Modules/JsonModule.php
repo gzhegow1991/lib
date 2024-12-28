@@ -2,11 +2,26 @@
 
 namespace Gzhegow\Lib\Modules;
 
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
 class JsonModule
 {
+    /**
+     * @var int
+     */
+    protected $jsonDepth = 512;
+    /**
+     * @var int
+     */
+    protected $jsonEncodeFlags = 0;
+    /**
+     * @var int
+     */
+    protected $jsonDecodeFlags = 0;
+
+
     public function __construct()
     {
         if (! extension_loaded('json')) {
@@ -17,55 +32,67 @@ class JsonModule
     }
 
 
-    public function json_depth_static(int $depth = null) : int
+    public function json_depth_static(int $jsonDepth = null) : int
     {
-        static $current;
+        if (null !== $jsonDepth) {
+            if ($jsonDepth < 0) {
+                throw new LogicException(
+                    'The `jsonDepth` must be non-negative integer'
+                );
+            }
 
-        $current = $current ?? 512;
+            $last = $this->jsonDepth;
 
-        if (null !== $depth) {
-            $last = $current;
+            $current = $jsonDepth;
 
-            $current = $depth;
-
-            return $last;
+            $result = $last;
         }
 
-        return $current;
+        $result = $result ?? $this->jsonDepth;
+
+        return $result;
     }
 
-    public function json_encode_flags_static(int $flags = null) : int
+    public function json_encode_flags_static(int $jsonEncodeFlags = null) : int
     {
-        static $current;
+        if (null !== $jsonEncodeFlags) {
+            if ($jsonEncodeFlags < 0) {
+                throw new LogicException(
+                    'The `jsonEncodeFlags` must be non-negative integer'
+                );
+            }
 
-        $current = $current ?? 0;
+            $last = $this->jsonEncodeFlags;
 
-        if (null !== $flags) {
-            $last = $current;
+            $current = $jsonEncodeFlags;
 
-            $current = $flags;
-
-            return $last;
+            $result = $last;
         }
 
-        return $current;
+        $result = $result ?? $this->jsonEncodeFlags;
+
+        return $result;
     }
 
-    public function json_decode_flags_static(int $flags = null)
+    public function json_decode_flags_static(int $jsonDecodeFlags = null) : int
     {
-        static $current;
+        if (null !== $jsonDecodeFlags) {
+            if ($jsonDecodeFlags < 0) {
+                throw new LogicException(
+                    'The `jsonDecodeFlags` must be non-negative integer'
+                );
+            }
 
-        $current = $current ?? 0;
+            $last = $this->jsonDecodeFlags;
 
-        if (null !== $flags) {
-            $last = $current;
+            $current = $jsonDecodeFlags;
 
-            $current = $flags;
-
-            return $last;
+            $result = $last;
         }
 
-        return $current;
+        $result = $result ?? $this->jsonDecodeFlags;
+
+        return $result;
     }
 
 
