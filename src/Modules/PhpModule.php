@@ -104,9 +104,7 @@ class PhpModule
             $_value = $value->toArray($options);
 
         } else {
-            if (! false
-                || ($value instanceof \stdClass)
-            ) {
+            if (is_object($value) && ! ($value instanceof \stdClass)) {
                 throw new LogicException(
                     [ 'The `value` being the object should be instance of: ' . \stdClass::class, $value ]
                 );
