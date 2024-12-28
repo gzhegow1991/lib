@@ -2,44 +2,260 @@
 
 namespace Gzhegow\Lib;
 
-use Gzhegow\Lib\Traits\FsTrait;
-use Gzhegow\Lib\Traits\BcTrait;
-use Gzhegow\Lib\Traits\MbTrait;
-use Gzhegow\Lib\Traits\PhpTrait;
-use Gzhegow\Lib\Traits\StrTrait;
-use Gzhegow\Lib\Traits\CliTrait;
-use Gzhegow\Lib\Traits\UrlTrait;
-use Gzhegow\Lib\Traits\NetTrait;
-use Gzhegow\Lib\Traits\BoolTrait;
-use Gzhegow\Lib\Traits\HttpTrait;
-use Gzhegow\Lib\Traits\ArrayTrait;
-use Gzhegow\Lib\Traits\ParseTrait;
-use Gzhegow\Lib\Traits\DebugTrait;
-use Gzhegow\Lib\Traits\AssertTrait;
-use Gzhegow\Lib\Traits\FormatTrait;
-use Gzhegow\Lib\Traits\EscapeTrait;
-use Gzhegow\Lib\Traits\RandomTrait;
-use Gzhegow\Lib\Traits\ItertoolsTrait;
+use Gzhegow\Lib\Modules\FsModule;
+use Gzhegow\Lib\Modules\MbModule;
+use Gzhegow\Lib\Modules\CliModule;
+use Gzhegow\Lib\Modules\NetModule;
+use Gzhegow\Lib\Modules\PhpModule;
+use Gzhegow\Lib\Modules\StrModule;
+use Gzhegow\Lib\Modules\UrlModule;
+use Gzhegow\Lib\Modules\JsonModule;
+use Gzhegow\Lib\Modules\BoolModule;
+use Gzhegow\Lib\Modules\HttpModule;
+use Gzhegow\Lib\Modules\DebugModule;
+use Gzhegow\Lib\Modules\ParseModule;
+use Gzhegow\Lib\Modules\BcMathModule;
+use Gzhegow\Lib\Modules\ArrModule;
+use Gzhegow\Lib\Modules\AssertModule;
+use Gzhegow\Lib\Modules\EscapeModule;
+use Gzhegow\Lib\Modules\FormatModule;
+use Gzhegow\Lib\Modules\RandomModule;
+use Gzhegow\Lib\Modules\ItertoolsModule;
 
 
 class Lib
 {
-    use ArrayTrait;
-    use AssertTrait;
-    use BcTrait;
-    use BoolTrait;
-    use CliTrait;
-    use DebugTrait;
-    use EscapeTrait;
-    use FormatTrait;
-    use FsTrait;
-    use HttpTrait;
-    use ItertoolsTrait;
-    use MbTrait;
-    use NetTrait;
-    use ParseTrait;
-    use PhpTrait;
-    use RandomTrait;
-    use StrTrait;
-    use UrlTrait;
+    /**
+     * @return ArrModule
+     */
+    public static function arr(ArrModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new ArrModule();
+    }
+
+    /**
+     * @return AssertModule
+     */
+    public static function assert(AssertModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new AssertModule();
+    }
+
+    /**
+     * @return BcMathModule
+     */
+    public static function bcmath(BcMathModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new BcMathModule();
+    }
+
+    /**
+     * @return BoolModule
+     */
+    public static function bool(BoolModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new BoolModule();
+    }
+
+    /**
+     * @return CliModule
+     */
+    public static function cli(CliModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new CliModule();
+    }
+
+    /**
+     * @return DebugModule
+     */
+    public static function debug(DebugModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new DebugModule();
+    }
+
+    /**
+     * @return EscapeModule
+     */
+    public static function escape(EscapeModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new EscapeModule();
+    }
+
+    /**
+     * @return FormatModule
+     */
+    public static function format(FormatModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new FormatModule();
+    }
+
+    /**
+     * @return FsModule
+     */
+    public static function fs(FsModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new FsModule();
+    }
+
+    /**
+     * @return HttpModule
+     */
+    public static function http(HttpModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new HttpModule();
+    }
+
+    /**
+     * @return ItertoolsModule
+     */
+    public static function itertools(ItertoolsModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new ItertoolsModule();
+    }
+
+    /**
+     * @return ItertoolsModule
+     */
+    public static function json(JsonModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new JsonModule();
+    }
+
+    /**
+     * @return MbModule
+     */
+    public static function mb(MbModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new MbModule();
+    }
+
+    /**
+     * @return NetModule
+     */
+    public static function net(NetModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new NetModule();
+    }
+
+    /**
+     * @return ParseModule
+     */
+    public static function parse(ParseModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new ParseModule();
+    }
+
+    /**
+     * @return PhpModule
+     */
+    public static function php(PhpModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new PhpModule();
+    }
+
+    /**
+     * @return RandomModule
+     */
+    public static function random(RandomModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new RandomModule();
+    }
+
+    /**
+     * @return StrModule
+     */
+    public static function str(StrModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new StrModule();
+    }
+
+    /**
+     * @return UrlModule
+     */
+    public static function url(UrlModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new UrlModule();
+    }
+
+
+    /**
+     * @var array<string, mixed>
+     */
+    protected static $modules = [];
 }

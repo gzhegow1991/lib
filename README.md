@@ -33,7 +33,7 @@ function _debug(...$values) : void
 {
     $lines = [];
     foreach ( $values as $value ) {
-        $lines[] = \Gzhegow\Lib\Lib::debug_type_id($value);
+        $lines[] = \Gzhegow\Lib\Lib::debug()->type_id($value);
     }
 
     echo implode(' | ', $lines) . PHP_EOL;
@@ -43,7 +43,7 @@ function _dump(...$values) : void
 {
     $lines = [];
     foreach ( $values as $value ) {
-        $lines[] = \Gzhegow\Lib\Lib::debug_value($value);
+        $lines[] = \Gzhegow\Lib\Lib::debug()->value($value);
     }
 
     echo implode(' | ', $lines) . PHP_EOL;
@@ -52,8 +52,8 @@ function _dump(...$values) : void
 function _dump_array($value, int $maxLevel = null, bool $multiline = false) : void
 {
     $content = $multiline
-        ? \Gzhegow\Lib\Lib::debug_array_multiline($value, $maxLevel)
-        : \Gzhegow\Lib\Lib::debug_array($value, $maxLevel);
+        ? \Gzhegow\Lib\Lib::debug()->array_multiline($value, $maxLevel)
+        : \Gzhegow\Lib\Lib::debug()->array($value, $maxLevel);
 
     echo $content . PHP_EOL;
 }
@@ -64,38 +64,38 @@ function _assert_output(
 {
     $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-    \Gzhegow\Lib\Lib::assert_resource_static(STDOUT);
-    \Gzhegow\Lib\Lib::assert_output($trace, $fn, $expect);
+    \Gzhegow\Lib\Lib::assert()->resource_static(STDOUT);
+    \Gzhegow\Lib\Lib::assert()->output($trace, $fn, $expect);
 }
 
 
 // >>> ЗАПУСКАЕМ!
 
 // >>> TEST
-// > тесты DebugTrait
+// > тесты DebugModule
 $fn = function () {
     _dump('[ TEST 1 ]');
 
-    echo \Gzhegow\Lib\Lib::debug_value(null) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug_value(false) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug_value(1) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug_value(1.1) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug_value('string') . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug_value([]) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug_value((object) []) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug_value(STDOUT) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug()->value(null) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug()->value(false) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug()->value(1) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug()->value(1.1) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug()->value('string') . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug()->value([]) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug()->value((object) []) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug()->value(STDOUT) . PHP_EOL;
 
     echo PHP_EOL;
 
     $stdClass = (object) [];
-    echo \Gzhegow\Lib\Lib::debug_value(
+    echo \Gzhegow\Lib\Lib::debug()->value(
             [
                 [ 1, 'apple', $stdClass ],
                 [ 2, 'apples', $stdClass ],
                 [ 1.5, 'apples', $stdClass ],
             ]
         ) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug_array(
+    echo \Gzhegow\Lib\Lib::debug()->array(
             [
                 [ 1, 'apple', $stdClass ],
                 [ 2, 'apples', $stdClass ],
@@ -105,7 +105,7 @@ $fn = function () {
 
     echo PHP_EOL;
 
-    echo \Gzhegow\Lib\Lib::debug_value_multiline(
+    echo \Gzhegow\Lib\Lib::debug()->value_multiline(
             [
                 [ 1, 'apple', $stdClass ],
                 [ 2, 'apples', $stdClass ],
@@ -113,7 +113,7 @@ $fn = function () {
             ]
         ) . PHP_EOL;
 
-    echo \Gzhegow\Lib\Lib::debug_array_multiline(
+    echo \Gzhegow\Lib\Lib::debug()->array_multiline(
             [
                 [ 1, 'apple', $stdClass ],
                 [ 2, 'apples', $stdClass ],
@@ -163,63 +163,64 @@ FALSE
 HEREDOC
 );
 
+
 // >>> TEST
-// > тесты StrTrait
+// > тесты StrModule
 $fn = function () {
     _dump('[ TEST 2 ]');
 
-    _dump(\Gzhegow\Lib\Lib::str_lines("hello\nworld"));
+    _dump(\Gzhegow\Lib\Lib::str()->lines("hello\nworld"));
 
-    _dump(\Gzhegow\Lib\Lib::str_eol('hello' . PHP_EOL . 'world'));
+    _dump(\Gzhegow\Lib\Lib::str()->eol('hello' . PHP_EOL . 'world'));
 
-    _dump(\Gzhegow\Lib\Lib::str_len('Привет'));
-    _dump(\Gzhegow\Lib\Lib::str_len('Hello'));
+    _dump(\Gzhegow\Lib\Lib::str()->strlen('Привет'));
+    _dump(\Gzhegow\Lib\Lib::str()->strlen('Hello'));
 
-    _dump(\Gzhegow\Lib\Lib::str_size('Привет'));
-    _dump(\Gzhegow\Lib\Lib::str_size('Hello'));
+    _dump(\Gzhegow\Lib\Lib::str()->strsize('Привет'));
+    _dump(\Gzhegow\Lib\Lib::str()->strsize('Hello'));
 
-    _dump(\Gzhegow\Lib\Lib::str_lower('ПРИВЕТ'));
-    _dump(\Gzhegow\Lib\Lib::str_upper('привет'));
+    _dump(\Gzhegow\Lib\Lib::str()->lower('ПРИВЕТ'));
+    _dump(\Gzhegow\Lib\Lib::str()->upper('привет'));
 
-    _dump(\Gzhegow\Lib\Lib::str_lcfirst('ПРИВЕТ'));
-    _dump(\Gzhegow\Lib\Lib::str_ucfirst('привет'));
+    _dump(\Gzhegow\Lib\Lib::str()->lcfirst('ПРИВЕТ'));
+    _dump(\Gzhegow\Lib\Lib::str()->ucfirst('привет'));
 
-    _dump(\Gzhegow\Lib\Lib::str_lcwords('ПРИВЕТ МИР'));
-    _dump(\Gzhegow\Lib\Lib::str_ucwords('привет мир'));
+    _dump(\Gzhegow\Lib\Lib::str()->lcwords('ПРИВЕТ МИР'));
+    _dump(\Gzhegow\Lib\Lib::str()->ucwords('привет мир'));
 
-    _dump(\Gzhegow\Lib\Lib::str_starts('привет', 'при'));
-    _dump(\Gzhegow\Lib\Lib::str_ends('привет', 'вет'));
-    _dump(\Gzhegow\Lib\Lib::str_contains('привет', 'ив'));
+    _dump(\Gzhegow\Lib\Lib::str()->starts('привет', 'при'));
+    _dump(\Gzhegow\Lib\Lib::str()->ends('привет', 'вет'));
+    _dump(\Gzhegow\Lib\Lib::str()->contains('привет', 'ив'));
 
-    _dump(\Gzhegow\Lib\Lib::str_lcrop('азаза_привет_азаза', 'аза'));
-    _dump(\Gzhegow\Lib\Lib::str_rcrop('азаза_привет_азаза', 'аза'));
-    _dump(\Gzhegow\Lib\Lib::str_crop('азаза_привет_азаза', 'аза'));
+    _dump(\Gzhegow\Lib\Lib::str()->lcrop('азаза_привет_азаза', 'аза'));
+    _dump(\Gzhegow\Lib\Lib::str()->rcrop('азаза_привет_азаза', 'аза'));
+    _dump(\Gzhegow\Lib\Lib::str()->crop('азаза_привет_азаза', 'аза'));
 
-    _dump(\Gzhegow\Lib\Lib::str_unlcrop('"привет"', '"'));
-    _dump(\Gzhegow\Lib\Lib::str_unrcrop('"привет"', '"'));
-    _dump(\Gzhegow\Lib\Lib::str_uncrop('"привет"', '"'));
+    _dump(\Gzhegow\Lib\Lib::str()->unlcrop('"привет"', '"'));
+    _dump(\Gzhegow\Lib\Lib::str()->unrcrop('"привет"', '"'));
+    _dump(\Gzhegow\Lib\Lib::str()->uncrop('"привет"', '"'));
 
-    _dump(\Gzhegow\Lib\Lib::str_replace_limit('за', '_', 'азазазазазаза', 3));
+    _dump(\Gzhegow\Lib\Lib::str()->replace_limit('за', '_', 'азазазазазаза', 3));
 
-    _dump(\Gzhegow\Lib\Lib::str_camel('-hello-world-foo-bar'));
-    _dump(\Gzhegow\Lib\Lib::str_camel('-helloWorldFooBar'));
-    _dump(\Gzhegow\Lib\Lib::str_camel('-HelloWorldFooBar'));
+    _dump(\Gzhegow\Lib\Lib::str()->camel('-hello-world-foo-bar'));
+    _dump(\Gzhegow\Lib\Lib::str()->camel('-helloWorldFooBar'));
+    _dump(\Gzhegow\Lib\Lib::str()->camel('-HelloWorldFooBar'));
 
-    _dump(\Gzhegow\Lib\Lib::str_pascal('-hello-world-foo-bar'));
-    _dump(\Gzhegow\Lib\Lib::str_pascal('-helloWorldFooBar'));
-    _dump(\Gzhegow\Lib\Lib::str_pascal('-HelloWorldFooBar'));
+    _dump(\Gzhegow\Lib\Lib::str()->pascal('-hello-world-foo-bar'));
+    _dump(\Gzhegow\Lib\Lib::str()->pascal('-helloWorldFooBar'));
+    _dump(\Gzhegow\Lib\Lib::str()->pascal('-HelloWorldFooBar'));
 
-    _dump(\Gzhegow\Lib\Lib::str_space('_Hello_WORLD_Foo_BAR'));
-    _dump(\Gzhegow\Lib\Lib::str_snake('-Hello-WORLD-Foo-BAR'));
-    _dump(\Gzhegow\Lib\Lib::str_kebab(' Hello WORLD Foo BAR'));
+    _dump(\Gzhegow\Lib\Lib::str()->space('_Hello_WORLD_Foo_BAR'));
+    _dump(\Gzhegow\Lib\Lib::str()->snake('-Hello-WORLD-Foo-BAR'));
+    _dump(\Gzhegow\Lib\Lib::str()->kebab(' Hello WORLD Foo BAR'));
 
-    _dump(\Gzhegow\Lib\Lib::str_space_lower('_Hello_WORLD_Foo_BAR'));
-    _dump(\Gzhegow\Lib\Lib::str_snake_lower('-Hello-WORLD-Foo-BAR'));
-    _dump(\Gzhegow\Lib\Lib::str_kebab_lower(' Hello WORLD Foo BAR'));
+    _dump(\Gzhegow\Lib\Lib::str()->space_lower('_Hello_WORLD_Foo_BAR'));
+    _dump(\Gzhegow\Lib\Lib::str()->snake_lower('-Hello-WORLD-Foo-BAR'));
+    _dump(\Gzhegow\Lib\Lib::str()->kebab_lower(' Hello WORLD Foo BAR'));
 
-    _dump(\Gzhegow\Lib\Lib::str_space_upper('_Hello_WORLD_Foo_BAR'));
-    _dump(\Gzhegow\Lib\Lib::str_snake_upper('-Hello-WORLD-Foo-BAR'));
-    _dump(\Gzhegow\Lib\Lib::str_kebab_upper(' Hello WORLD Foo BAR'));
+    _dump(\Gzhegow\Lib\Lib::str()->space_upper('_Hello_WORLD_Foo_BAR'));
+    _dump(\Gzhegow\Lib\Lib::str()->snake_upper('-Hello-WORLD-Foo-BAR'));
+    _dump(\Gzhegow\Lib\Lib::str()->kebab_upper(' Hello WORLD Foo BAR'));
 
     echo '';
 };
@@ -266,25 +267,26 @@ _assert_output($fn, <<<HEREDOC
 HEREDOC
 );
 
+
 // >>> TEST
-// > тесты FormatTrait
+// > тесты FormatModule
 $fn = function () {
     _dump('[ TEST 3 ]');
 
 
-    $result = \Gzhegow\Lib\Lib::format_json_encode(
+    $result = \Gzhegow\Lib\Lib::json()->json_encode(
         $value = [ 'hello' ]
     );
     _dump($result);
 
-    $result = \Gzhegow\Lib\Lib::format_json_encode(
+    $result = \Gzhegow\Lib\Lib::json()->json_encode(
         $value = NAN,
         $fallback = [ "NAN" ]
     );
     _dump($result);
 
     try {
-        \Gzhegow\Lib\Lib::format_json_encode(
+        \Gzhegow\Lib\Lib::json()->json_encode(
             $value = NAN
         );
     }
@@ -294,7 +296,7 @@ $fn = function () {
 
 
     $jsonc = "[1,/* 2 */3]";
-    $result = \Gzhegow\Lib\Lib::format_jsonc_decode(
+    $result = \Gzhegow\Lib\Lib::json()->jsonc_decode(
         $json = $jsonc,
         $associative = true
     );
@@ -312,35 +314,36 @@ _assert_output($fn, <<<HEREDOC
 HEREDOC
 );
 
+
 // >>> TEST
-// > тесты FsTrait
+// > тесты FsModule
 $fn = function () {
     _dump('[ TEST 4 ]');
 
 
-    $result = \Gzhegow\Lib\Lib::fs_file_put_contents(__DIR__ . '/var/1/1/1/1.txt', '123', [ 0775, true ]);
+    $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(__DIR__ . '/var/1/1/1/1.txt', '123', [ 0775, true ]);
     _dump($result);
 
-    $result = \Gzhegow\Lib\Lib::fs_file_put_contents(__DIR__ . '/var/1/1/1.txt', '123');
+    $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(__DIR__ . '/var/1/1/1.txt', '123');
     _dump($result);
 
-    $result = \Gzhegow\Lib\Lib::fs_file_put_contents(__DIR__ . '/var/1/1.txt', '123');
+    $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(__DIR__ . '/var/1/1.txt', '123');
     _dump($result);
 
 
-    $result = \Gzhegow\Lib\Lib::fs_file_get_contents(__DIR__ . '/var/1/1/1/1.txt');
+    $result = \Gzhegow\Lib\Lib::fs()->file_get_contents(__DIR__ . '/var/1/1/1/1.txt');
     _dump($result);
 
 
     foreach (
-        \Gzhegow\Lib\Lib::fs_dir_walk(__DIR__ . '/var/1')
+        \Gzhegow\Lib\Lib::fs()->dir_walk(__DIR__ . '/var/1')
         as $spl
     ) {
         $spl->isDir()
-            ? \Gzhegow\Lib\Lib::fs_rmdir($spl->getRealPath())
-            : \Gzhegow\Lib\Lib::fs_rm($spl->getRealPath());
+            ? \Gzhegow\Lib\Lib::fs()->rmdir($spl->getRealPath())
+            : \Gzhegow\Lib\Lib::fs()->rm($spl->getRealPath());
     }
-    \Gzhegow\Lib\Lib::fs_rmdir(__DIR__ . '/var/1');
+    \Gzhegow\Lib\Lib::fs()->rmdir(__DIR__ . '/var/1');
 
     echo '';
 };
@@ -354,19 +357,20 @@ _assert_output($fn, <<<HEREDOC
 HEREDOC
 );
 
+
 // >>> TEST
-// > тесты PhpTrait
+// > тесты PhpModule
 $fn = function () {
     _dump('[ TEST 5 ]');
 
 
-    \Gzhegow\Lib\Lib::php_errors_start($b);
+    \Gzhegow\Lib\Lib::php()->errors_start($b);
 
     for ( $i = 0; $i < 3; $i++ ) {
-        \Gzhegow\Lib\Lib::php_error([ 'This is the error message' ]);
+        \Gzhegow\Lib\Lib::php()->error([ 'This is the error message' ]);
     }
 
-    $errors = \Gzhegow\Lib\Lib::php_errors_end($b);
+    $errors = \Gzhegow\Lib\Lib::php()->errors_end($b);
 
     _dump_array($errors, 2, true);
 
@@ -392,17 +396,17 @@ HEREDOC
 
 
 // >>> TEST
-// > тесты ArrayOf
+// > тесты ArrayModule
 $fn = function () {
     _dump('[ TEST 6 ]');
 
 
-    $array = new \Gzhegow\Lib\ArrayOf\ArrayOf('object');
+    $array = new \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf('object');
     $array[] = 1;
     $array[] = 2;
     _dump($array, $array->getItems(), $array->isOfType('object'));
 
-    $array = new \Gzhegow\Lib\ArrayOf\ArrayOfType('object');
+    $array = new \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType('object');
     $array[] = new \stdClass();
     $array[] = new \stdClass();
     $array[] = new ArrayObject();
@@ -414,7 +418,7 @@ $fn = function () {
     }
     _dump($array, $array->getItems(), $array->isOfType('object'));
 
-    $array = new \Gzhegow\Lib\ArrayOf\ArrayOfClass('string', \stdClass::class);
+    $array = new \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass('string', \stdClass::class);
     $array[] = new \stdClass();
     $array[] = new \stdClass();
     try {
@@ -442,13 +446,148 @@ $fn = function () {
 };
 _assert_output($fn, <<<HEREDOC
 "[ TEST 6 ]"
-{ object(iterable countable(2)) # Gzhegow\Lib\ArrayOf\ArrayOf } | [ 1, 2 ] | TRUE
+{ object(iterable countable(2)) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf } | [ 1, 2 ] | TRUE
 "[ CATCH ]"
-{ object(iterable countable(3)) # Gzhegow\Lib\ArrayOf\ArrayOfType } | [ "{ object # stdClass }", "{ object # stdClass }", "{ object(iterable countable(0)) # ArrayObject }" ] | TRUE
+{ object(iterable countable(3)) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType } | [ "{ object # stdClass }", "{ object # stdClass }", "{ object(iterable countable(0)) # ArrayObject }" ] | TRUE
 "[ CATCH ]"
 "[ CATCH ]"
 "[ CATCH ]"
-{ object(iterable countable(2)) # Gzhegow\Lib\ArrayOf\ArrayOfClass } | [ "{ object # stdClass }", "{ object # stdClass }" ] | TRUE
+{ object(iterable countable(2)) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass } | [ "{ object # stdClass }", "{ object # stdClass }" ] | TRUE
+""
+HEREDOC
+);
+
+
+// >>> TEST
+// > тесты BcMathModule
+$fn = function () {
+    _dump('[ TEST 7 ]');
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 0); // 2
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 2); // 1.01
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 0); // -1
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 2); // -1
+    _dump($result->getValue());
+    echo PHP_EOL;
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 0); // 2
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 2); // 1.01
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 0); // -2
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 2); // -1.01
+    _dump($result->getValue());
+    echo PHP_EOL;
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005', 0); // 1
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005', 2); // 1
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005', 0); // -2
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005', 2); // -1.01
+    _dump($result->getValue());
+    echo PHP_EOL;
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 0); // 1
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 2); // 1
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 0); // -1
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 2); // -1
+    _dump($result->getValue());
+    echo PHP_EOL;
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 0);
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.05', 0);
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 0);
+    _dump($result->getValue());
+    echo PHP_EOL;
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 2);
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.05', 2);
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 2);
+    _dump($result->getValue());
+    echo PHP_EOL;
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.5', 0);
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.05', 0);
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.005', 0);
+    _dump($result->getValue());
+    echo PHP_EOL;
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.5', 2);
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.05', 2);
+    _dump($result->getValue());
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.005', 2);
+    _dump($result->getValue());
+    echo PHP_EOL;
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->base_convert('2147483647', '0123456789', '0123456789');
+    _dump($result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->base_convert('9223372036854775807', '0123456789', '0123456789');
+    _dump($result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->base_convert('2147483647', '0123456789abcdefghijklmnopqrstuvwxyz', '0123456789');
+    _dump($result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->base_convert('9223372036854775807', '0123456789abcdefghijklmnopqrstuvwxyz', '0123456789');
+    _dump($result);
+
+    echo '';
+};
+_assert_output($fn, <<<HEREDOC
+"[ TEST 7 ]"
+2
+1.01
+-1
+-1
+
+2
+1.01
+-2
+-1.01
+
+1
+1
+-2
+-1.01
+
+1
+1
+-1
+-1
+
+2
+1
+1
+
+1.5
+1.05
+1.01
+
+-2
+-1
+-1
+
+-1.5
+-1.05
+-1.01
+
+2147483647
+9223372036854775807
+"zik0zj"
+"1y2p0ij32e8e7"
 ""
 HEREDOC
 );

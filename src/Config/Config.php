@@ -98,8 +98,6 @@ class Config
     }
 
     /**
-     * @param self $config
-     *
      * @return static
      */
     public function fill(self $config) // : static

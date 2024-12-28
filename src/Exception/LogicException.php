@@ -32,7 +32,7 @@ class LogicException extends \LogicException
 
     public function __construct(...$throwableArgs)
     {
-        foreach ( Lib::php_throwable_args(...$throwableArgs) as $k => $v ) {
+        foreach ( Lib::php()->throwable_args(...$throwableArgs) as $k => $v ) {
             if (property_exists($this, $k)) {
                 $this->{$k} = $v;
             }
