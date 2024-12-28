@@ -19,7 +19,7 @@ trait WritablePropertiesTrait
 
     protected function writablePropertiesTraitClear(string $name) : bool
     {
-        return property_exists($this, $name);
+        return $this->exists($name);
     }
 
     protected function writablePropertiesTraitSet(string $name) : bool
