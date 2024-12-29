@@ -40,43 +40,6 @@ abstract class AbstractContext
     }
 
 
-    /**
-     * @return static
-     */
-    public function toCamelCase() // : static
-    {
-        $instance = new static();
-
-        $theStr = Lib::str();
-
-        foreach ( Lib::php()->get_object_vars($this) as $key => $value ) {
-            $keyCamelCase = $theStr->camel($key);
-
-            $instance->set($keyCamelCase, $value);
-        }
-
-        return $instance;
-    }
-
-    /**
-     * @return static
-     */
-    public function toSnakeCase() // : static
-    {
-        $instance = new static();
-
-        $theStr = Lib::str();
-
-        foreach ( Lib::php()->get_object_vars($this) as $key => $value ) {
-            $keySnakeCase = $theStr->snake_lower($key);
-
-            $instance->set($keySnakeCase, $value);
-        }
-
-        return $instance;
-    }
-
-
     public function isset(string $name) : bool
     {
         $status = true;
@@ -267,6 +230,43 @@ abstract class AbstractContext
                 $this->set($key, $value);
             }
         }
+    }
+
+
+    /**
+     * @return static
+     */
+    public function toCamelCase() // : static
+    {
+        $instance = new static();
+
+        $theStr = Lib::str();
+
+        foreach ( Lib::php()->get_object_vars($this) as $key => $value ) {
+            $keyCamelCase = $theStr->camel($key);
+
+            $instance->set($keyCamelCase, $value);
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @return static
+     */
+    public function toSnakeCase() // : static
+    {
+        $instance = new static();
+
+        $theStr = Lib::str();
+
+        foreach ( Lib::php()->get_object_vars($this) as $key => $value ) {
+            $keySnakeCase = $theStr->snake_lower($key);
+
+            $instance->set($keySnakeCase, $value);
+        }
+
+        return $instance;
     }
 
 
