@@ -174,21 +174,6 @@ abstract class AbstractContext
             );
         }
 
-        // if (extension_loaded('ctype')) {
-        //     if (! ctype_alpha($name[ 0 ])) {
-        //         throw new LogicException(
-        //             'Keys have to start from letter: ' . $name
-        //         );
-        //     }
-        //
-        // } else {
-        //     if (! preg_match('/[a-zA-Z]/', $name[ 0 ])) {
-        //         throw new LogicException(
-        //             'Keys have to start from letter: ' . $name
-        //         );
-        //     }
-        // }
-
         $this->{$name} = $value;
     }
 
