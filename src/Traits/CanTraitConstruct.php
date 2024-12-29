@@ -7,7 +7,7 @@ use Gzhegow\Lib\Lib;
 
 trait CanTraitConstruct
 {
-    public function __traitConstruct(...$args)
+    protected function __traitConstruct(array $args = [])
     {
         $theParse = Lib::parse();
         $thePhp = Lib::php();
@@ -18,7 +18,7 @@ trait CanTraitConstruct
             $fn = '__construct' . $theParse->struct_basename($trait);
 
             if (method_exists($this, $fn)) {
-                call_user_func([ $this, $fn ], ...$args);
+                call_user_func_array([ $this, $fn ], $args);
             }
         }
     }

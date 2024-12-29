@@ -1,5 +1,6 @@
 <?php
 
+require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 
@@ -54,6 +55,21 @@ function _assert_output(
     \Gzhegow\Lib\Lib::assert()->resource_static(STDOUT);
     \Gzhegow\Lib\Lib::assert()->output($trace, $fn, $expect);
 }
+
+
+// // >>> TEST
+// // > тесты AbstractContext
+// $fn = function () {
+//     _dump('[ TEST 0 ]');
+//
+//     echo '';
+// };
+// _assert_output($fn, <<<HEREDOC
+// "[ TEST 0 ]"
+// ""
+// HEREDOC
+// );
+// dd();
 
 
 // >>> ЗАПУСКАЕМ!
@@ -589,85 +605,165 @@ HEREDOC
 
 
 // >>> TEST
-// > тесты BcMathModule
+// > тесты AbstractContext
 $fn = function () {
     _dump('[ TEST 8 ]');
-
-    $instance = new class extends \Gzhegow\Lib\Struct\AbstractGenericObject {
-        use \Gzhegow\Lib\Struct\Traits\WritablePropertiesTrait;
-
-
-        protected $foo = 1;
-    };
-    $instance->bar = 2;
-    _dump($instance->foo);
-    _dump($instance->bar);
     echo PHP_EOL;
 
-    $instance = new class extends \Gzhegow\Lib\Struct\AbstractGenericObject {
-        use \Gzhegow\Lib\Struct\Traits\ReadonlyPropertiesTrait;
+    $instances = [];
+    $instances[ \Gzhegow\Lib\Context\Traits\WritableTrait::class ] = new class extends \Gzhegow\Lib\Context\AbstractContext {
+        use \Gzhegow\Lib\Context\Traits\WritableTrait;
 
 
         protected $foo = 1;
     };
-    try {
-        $instance->bar = 2;
-    }
-    catch ( \Throwable $e ) {
-        _dump('[ CATCH ] SET');
-    }
-    _dump($instance->foo);
-    try {
-        _dump($instance->bar);
-    }
-    catch ( \Throwable $e ) {
-        _dump('[ CATCH ] GET');
-    }
-    echo PHP_EOL;
-
-    $instance = new class extends \Gzhegow\Lib\Struct\AbstractGenericObject {
-        use \Gzhegow\Lib\Struct\Traits\PublicPropertiesTrait;
+    $instances[ \Gzhegow\Lib\Context\Traits\EditonlyTrait::class ] = new class extends \Gzhegow\Lib\Context\AbstractContext {
+        use \Gzhegow\Lib\Context\Traits\EditonlyTrait;
 
 
         protected $foo = 1;
     };
-    $instance->bar = 2;
-    try {
-        _dump($instance->foo);
-    }
-    catch ( \Throwable $e ) {
-        _dump('[ CATCH ] GET');
-    }
-    _dump($instance->bar);
-    echo PHP_EOL;
-
-
-    $instance = new class extends \Gzhegow\Lib\Struct\AbstractGenericObject {
-        use \Gzhegow\Lib\Struct\Traits\ProtectedPropertiesTrait;
+    $instances[ \Gzhegow\Lib\Context\Traits\ReadonlyTrait::class ] = new class extends \Gzhegow\Lib\Context\AbstractContext {
+        use \Gzhegow\Lib\Context\Traits\ReadonlyTrait;
 
 
         protected $foo = 1;
     };
-    $instance->bar = 2;
-    _dump($instance->foo);
-    _dump($instance->bar);
+    $instances[ \Gzhegow\Lib\Context\Traits\AnyPropertiesTrait::class ] = new class extends \Gzhegow\Lib\Context\AbstractContext {
+        use \Gzhegow\Lib\Context\Traits\AnyPropertiesTrait;
+
+
+        protected $foo = 1;
+    };
+    $instances[ \Gzhegow\Lib\Context\Traits\PublicPropertiesTrait::class ] = new class extends \Gzhegow\Lib\Context\AbstractContext {
+        use \Gzhegow\Lib\Context\Traits\PublicPropertiesTrait;
+
+
+        protected $foo = 1;
+    };
+
+    foreach ( $instances as $key => $instance ) {
+        _dump($key);
+
+        _dump('<-foo');
+        try {
+            _dump('foo', $instance->foo);
+        }
+        catch ( \Throwable $e ) {
+            _dump("[ CATCH ] {$e->getMessage()}");
+        }
+
+        _dump('->foo');
+        try {
+            $instance->foo = 11;
+        }
+        catch ( \Throwable $e ) {
+            _dump("[ CATCH ] {$e->getMessage()}");
+        }
+
+        _dump('<-foo');
+        try {
+            _dump('foo', $instance->foo);
+        }
+        catch ( \Throwable $e ) {
+            _dump("[ CATCH ] {$e->getMessage()}");
+        }
+
+
+        _dump('<-bar');
+        try {
+            _dump('bar', $instance->bar);
+        }
+        catch ( \Throwable $e ) {
+            _dump("[ CATCH ] {$e->getMessage()}");
+        }
+
+        _dump('->bar');
+        try {
+            $instance->bar = 22;
+        }
+        catch ( \Throwable $e ) {
+            _dump("[ CATCH ] {$e->getMessage()}");
+        }
+
+        _dump('<-bar');
+        try {
+            _dump('bar', $instance->bar);
+        }
+        catch ( \Throwable $e ) {
+            _dump("[ CATCH ] {$e->getMessage()}");
+        }
+
+        echo PHP_EOL;
+    }
 
     echo '';
 };
 _assert_output($fn, <<<HEREDOC
 "[ TEST 8 ]"
-1
-2
 
-"[ CATCH ] SET"
-1
-"[ CATCH ] GET"
+"Gzhegow\Lib\Context\Traits\WritableTrait"
+"<-foo"
+"foo" | 1
+"->foo"
+"<-foo"
+"foo" | 11
+"<-bar"
+"[ CATCH ] Missing property: bar"
+"->bar"
+"<-bar"
+"bar" | 22
 
-"[ CATCH ] GET"
-2
+"Gzhegow\Lib\Context\Traits\EditonlyTrait"
+"<-foo"
+"foo" | 1
+"->foo"
+"<-foo"
+"foo" | 11
+"<-bar"
+"[ CATCH ] Missing property: bar"
+"->bar"
+"[ CATCH ] Unable to ->set() due to failed filter: editonlyTrait_set"
+"<-bar"
+"[ CATCH ] Missing property: bar"
 
-1
-2
+"Gzhegow\Lib\Context\Traits\ReadonlyTrait"
+"<-foo"
+"foo" | 1
+"->foo"
+"[ CATCH ] Unable to ->set() due to failed filter: readonlyTrait_set"
+"<-foo"
+"foo" | 1
+"<-bar"
+"[ CATCH ] Missing property: bar"
+"->bar"
+"<-bar"
+"bar" | 22
+
+"Gzhegow\Lib\Context\Traits\AnyPropertiesTrait"
+"<-foo"
+"foo" | 1
+"->foo"
+"<-foo"
+"foo" | 11
+"<-bar"
+"bar" | NULL
+"->bar"
+"<-bar"
+"bar" | 22
+
+"Gzhegow\Lib\Context\Traits\PublicPropertiesTrait"
+"<-foo"
+"[ CATCH ] Unable to ->get() due to failed filter: publicPropertiesTrait_get"
+"->foo"
+"<-foo"
+"[ CATCH ] Unable to ->get() due to failed filter: publicPropertiesTrait_get"
+"<-bar"
+"[ CATCH ] Unable to ->get() due to failed filter: publicPropertiesTrait_get"
+"->bar"
+"<-bar"
+"bar" | 22
+
 ""
 HEREDOC
 );

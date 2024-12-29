@@ -2,10 +2,10 @@
 
 namespace Gzhegow\Lib\Config;
 
-class Config
+abstract class AbstractConfig
 {
     /**
-     * @var Config[]
+     * @var AbstractConfig[]
      */
     protected $__sections = [];
 

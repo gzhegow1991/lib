@@ -1,21 +1,21 @@
 <?php
 
-namespace Gzhegow\Lib\Struct;
+namespace Gzhegow\Lib\Context;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Traits\CanTraitBoot;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Traits\CanTraitConstruct;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-abstract class AbstractGenericObject
+abstract class AbstractContext
 {
-    use CanTraitConstruct;
+    use CanTraitBoot;
 
 
     public function __construct()
     {
-        call_user_func_array([ $this, '__traitConstruct' ], func_get_args());
+        call_user_func_array([ static::class, '__traitBoot' ], func_get_args());
     }
 
 
@@ -81,36 +81,26 @@ abstract class AbstractGenericObject
     {
         $status = true;
 
-        if (! empty(static::$__filters[ $k = __FUNCTION__ ][ $kk = static::class ])) {
-            foreach ( static::$__filters[ $k ][ $kk ] as $fn ) {
-                if (! ($status = $fn($name))) {
-                    break;
-                }
-            }
+        $bool = $this->__tryExecuteFilters(__FUNCTION__, [ $name ]);
 
-        } else {
-            $status = isset($this->{$name});
+        if (null === $bool) {
+            return isset($this->{$name});
         }
 
-        return $status;
+        return $bool;
     }
 
     public function exists(string $name) : bool
     {
         $status = true;
 
-        if (! empty(static::$__filters[ $k = __FUNCTION__ ][ $kk = static::class ])) {
-            foreach ( static::$__filters[ $k ][ $kk ] as $fn ) {
-                if (! ($status = $fn($name))) {
-                    break;
-                }
-            }
+        $bool = $this->__tryExecuteFilters(__FUNCTION__, [ $name ]);
 
-        } else {
-            $status = property_exists($this, $name);
+        if (null === $bool) {
+            return property_exists($this, $name);
         }
 
-        return $status;
+        return $bool;
     }
 
 
@@ -120,19 +110,17 @@ abstract class AbstractGenericObject
 
         $status = true;
 
-        if (! empty(static::$__filters[ $k = __FUNCTION__ ][ $kk = static::class ])) {
-            foreach ( static::$__filters[ $k ][ $kk ] as $fn ) {
-                if (! ($status = $fn($name))) {
-                    break;
-                }
-            }
+        $bool = $this->__tryExecuteFilters(__FUNCTION__, [ $name ]);
+
+        if (null === $bool) {
+            $status = $this->exists($name);
 
         } else {
-            $status = $this->exists($name);
+            $status = $bool;
         }
 
         if ($status) {
-            $result = $this->{$name};
+            $result = $this->{$name} ?? null;
 
             return true;
         }
@@ -144,15 +132,13 @@ abstract class AbstractGenericObject
     {
         $status = true;
 
-        if (! empty(static::$__filters[ $k = __FUNCTION__ ][ $kk = static::class ])) {
-            foreach ( static::$__filters[ $k ][ $kk ] as $fn ) {
-                if (! ($status = $fn($name))) {
-                    break;
-                }
-            }
+        $bool = $this->__tryExecuteFilters(__FUNCTION__, [ $name ], $error);
+
+        if (null === $bool) {
+            $status = $this->exists($name);
 
         } else {
-            $status = $this->exists($name);
+            $status = $bool;
         }
 
         if (! $status) {
@@ -162,12 +148,17 @@ abstract class AbstractGenericObject
                 return $fallback;
             }
 
-            throw new RuntimeException(
-                'Missing property: ' . $name
-            );
+            if ($error) {
+                throw new RuntimeException($error);
+
+            } else {
+                throw new RuntimeException(
+                    'Missing property: ' . $name
+                );
+            }
         }
 
-        return $this->{$name};
+        return $this->{$name} ?? null;
     }
 
 
@@ -175,19 +166,7 @@ abstract class AbstractGenericObject
     {
         $status = true;
 
-        if (! empty(static::$__filters[ $k = __FUNCTION__ ][ $kk = static::class ])) {
-            foreach ( static::$__filters[ $k ][ $kk ] as $fn ) {
-                if (! ($status = $fn($name, $value))) {
-                    break;
-                }
-            }
-        }
-
-        if (! $status) {
-            throw new RuntimeException(
-                'Unable to set()'
-            );
-        }
+        $this->__executeFilters(__FUNCTION__, [ $name ]);
 
         if ('' === $name) {
             throw new LogicException(
@@ -195,20 +174,20 @@ abstract class AbstractGenericObject
             );
         }
 
-        if (extension_loaded('ctype')) {
-            if (! ctype_alpha($name[ 0 ])) {
-                throw new LogicException(
-                    'Keys have to start from letter: ' . $name
-                );
-            }
-
-        } else {
-            if (! preg_match('/[a-zA-Z]/', $name[ 0 ])) {
-                throw new LogicException(
-                    'Keys have to start from letter: ' . $name
-                );
-            }
-        }
+        // if (extension_loaded('ctype')) {
+        //     if (! ctype_alpha($name[ 0 ])) {
+        //         throw new LogicException(
+        //             'Keys have to start from letter: ' . $name
+        //         );
+        //     }
+        //
+        // } else {
+        //     if (! preg_match('/[a-zA-Z]/', $name[ 0 ])) {
+        //         throw new LogicException(
+        //             'Keys have to start from letter: ' . $name
+        //         );
+        //     }
+        // }
 
         $this->{$name} = $value;
     }
@@ -217,19 +196,7 @@ abstract class AbstractGenericObject
     {
         $status = true;
 
-        if (! empty(static::$__filters[ $k = __FUNCTION__ ][ $kk = static::class ])) {
-            foreach ( static::$__filters[ $k ][ $kk ] as $fn ) {
-                if (! ($status = $fn($name))) {
-                    break;
-                }
-            }
-        }
-
-        if (! $status) {
-            throw new RuntimeException(
-                'Unable to unset()'
-            );
-        }
+        $this->__executeFilters(__FUNCTION__, [ $name ]);
 
         unset($this->{$name});
     }
@@ -238,19 +205,7 @@ abstract class AbstractGenericObject
     {
         $status = true;
 
-        if (! empty(static::$__filters[ $k = __FUNCTION__ ][ $kk = static::class ])) {
-            foreach ( static::$__filters[ $k ][ $kk ] as $fn ) {
-                if (! ($status = $fn($name))) {
-                    break;
-                }
-            }
-        }
-
-        if (! $status) {
-            throw new RuntimeException(
-                'Unable to clear()'
-            );
-        }
+        $this->__executeFilters(__FUNCTION__, [ $name ]);
 
         $this->{$name} = null;
     }
@@ -331,17 +286,73 @@ abstract class AbstractGenericObject
 
 
     /**
-     * @param callable $fn
+     * @param callable-string $fn
      */
-    protected static function __filter(string $type, $fn) : void
+    protected static function __addFilter(string $filterType, string $fn) : void
     {
-        if (! isset(static::$__filters[ $type ])) {
+        if (! isset(static::$__filters[ $filterType ])) {
             throw new LogicException(
-                'Missing filter: ' . $type
+                'Unknown `filterType`: ' . $filterType
             );
         }
 
-        static::$__filters[ $type ][ static::class ][] = $fn;
+        if (! isset(static::$__filters[ $filterType ][ static::class ][ $fn ])) {
+            static::$__filters[ $filterType ][ static::class ][ $fn ] = true;
+        }
+    }
+
+    private function __executeFilters(string $filterType, array $arguments) : ?bool
+    {
+        if (empty(static::$__filters[ $filterType ][ $filterClass = static::class ])) {
+            return null;
+        }
+
+        $fnList = static::$__filters[ $filterType ][ $filterClass ];
+
+        $args = $arguments;
+        array_unshift($args, $this);
+
+        foreach ( $fnList as $fn => $bool ) {
+            if (! ($status = call_user_func_array($fn, $args))) {
+                $filterName = $fn;
+                if (0 === strpos($fn, 'class@anonymous')) {
+                    $filterName = explode('::', $fn)[ 1 ];
+                }
+
+                throw new RuntimeException(
+                    [ "Unable to ->{$filterType}() due to failed filter: {$filterName}", $fn, $args ]
+                );
+            }
+        }
+
+        return true;
+    }
+
+    private function __tryExecuteFilters(string $filterType, array $arguments, &$error = null) : ?bool
+    {
+        if (empty(static::$__filters[ $filterType ][ $filterClass = static::class ])) {
+            return null;
+        }
+
+        $fnList = static::$__filters[ $filterType ][ $filterClass ];
+
+        $args = $arguments;
+        array_unshift($args, $this);
+
+        foreach ( $fnList as $fn => $bool ) {
+            if (! ($status = call_user_func_array($fn, $args))) {
+                $filterName = $fn;
+                if (0 === strpos($fn, 'class@anonymous')) {
+                    $filterName = explode('::', $fn)[ 1 ];
+                }
+
+                $error = [ "Unable to ->{$filterType}() due to failed filter: {$filterName}", $fn, $args ];
+
+                return false;
+            }
+        }
+
+        return true;
     }
 
     protected static $__filters = [
