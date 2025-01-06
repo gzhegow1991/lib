@@ -555,7 +555,7 @@ class BcmathModule
         if (null === $scale) {
             if ($bcnum1->getFractionalPart() && $bcnum2->getFractionalPart()) {
                 throw new LogicException(
-                    [ 'The `scale` should be defined if both arguments have fractional parts', $num1, $num2 ]
+                    [ 'The `scale` should be passed if both arguments have fractional parts', $num1, $num2 ]
                 );
             }
         }
@@ -637,7 +637,7 @@ class BcmathModule
         if (null === $scale) {
             if ($bcnum->getFractionalPart()) {
                 throw new LogicException(
-                    [ 'The `scale` should be defined if `num` has fractional part', $num ]
+                    [ 'The `scale` should be passed if `num` has fractional part', $num ]
                 );
             }
         }

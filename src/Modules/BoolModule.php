@@ -5,6 +5,9 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 
 
+if (! defined('_BOOL_NIL')) define('_BOOL_NIL', '{N}');
+if (! defined('_BOOL_UNDEFINED')) define('_BOOL_UNDEFINED', NAN);
+
 class BoolModule
 {
     public function is_null($value) : bool
@@ -88,7 +91,7 @@ class BoolModule
      */
     public function nil() // : mixed
     {
-        return '{N}';
+        return _BOOL_NIL;
     }
 
     public function is_nil($value) : bool
@@ -164,6 +167,11 @@ class BoolModule
         return $array;
     }
 
+
+    public function undefined() : float
+    {
+        return _BOOL_UNDEFINED;
+    }
 
     public function is_undefined($value) : bool
     {

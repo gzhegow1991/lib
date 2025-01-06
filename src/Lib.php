@@ -24,8 +24,6 @@ use Gzhegow\Lib\Modules\RandomModule;
 use Gzhegow\Lib\Modules\ItertoolsModule;
 
 
-if (! defined('_UNDEFINED')) define('_UNDEFINED', NAN);
-
 class Lib
 {
     /**

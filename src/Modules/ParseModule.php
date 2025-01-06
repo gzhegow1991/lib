@@ -9,7 +9,6 @@ use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
 
 if (! defined('_PARSE_DECIMAL_POINT')) define('_PARSE_DECIMAL_POINT', localeconv()[ 'decimal_point' ]);
 
-
 class ParseModule
 {
     public function userbool($value) : ?bool

@@ -45,7 +45,7 @@ class DebugModule
         return $var;
     }
 
-    public function dd(?array $trace, $var, ...$vars)
+    public function dd(?array $trace, $var, ...$vars) : void
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
@@ -525,7 +525,9 @@ class DebugModule
                 'with_type'       => true,
                 'with_id'         => false,
                 'with_value'      => false,
+                'with_braces'     => false,
                 'max_array_level' => 1,
+                'newline'         => null,
             ]
         );
 
@@ -539,7 +541,9 @@ class DebugModule
                 'with_type'       => true,
                 'with_id'         => true,
                 'with_value'      => false,
+                'with_braces'     => false,
                 'max_array_level' => 1,
+                'newline'         => null,
             ]
         );
 
@@ -553,7 +557,9 @@ class DebugModule
                 'with_type'       => true,
                 'with_id'         => false,
                 'with_value'      => true,
+                'with_braces'     => false,
                 'max_array_level' => 1,
+                'newline'         => null,
             ]
         );
 
@@ -605,6 +611,7 @@ class DebugModule
                 'with_value'      => true,
                 'with_braces'     => false,
                 'max_array_level' => 0,
+                'newline'         => null,
             ]
         );
 
@@ -622,6 +629,7 @@ class DebugModule
                 'with_value'      => true,
                 'with_braces'     => false,
                 'max_array_level' => $maxLevel,
+                'newline'         => null,
             ]
         );
 
