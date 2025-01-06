@@ -3,7 +3,11 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Crypt\Alphabet;
 use Gzhegow\Lib\Modules\BcMath\BcNumber;
+
+
+if (! defined('_PARSE_DECIMAL_POINT')) define('_PARSE_DECIMAL_POINT', localeconv()[ 'decimal_point' ]);
 
 
 class ParseModule
@@ -45,42 +49,15 @@ class ParseModule
 
     public function int($value) : ?int
     {
-        if (is_int($value)) {
-            return $value;
+        if (null === ($num = $this->num($value))) {
+            return null;
         }
 
-        if (is_string($value)) {
-            if (! is_numeric($value)) {
-                return null;
-            }
+        if (! is_int($num)) {
+            return null;
         }
 
-        $valueOriginal = $value;
-
-        if (! is_scalar($valueOriginal)) {
-            if (null === ($_valueOriginal = $this->string($valueOriginal))) {
-                return null;
-            }
-
-            if (! is_numeric($_valueOriginal)) {
-                return null;
-            }
-
-            $valueOriginal = $_valueOriginal;
-        }
-
-        $_value = $valueOriginal;
-        $status = @settype($_value, 'integer');
-
-        if ($status) {
-            if ((float) $valueOriginal !== (float) $_value) {
-                return null;
-            }
-
-            return $_value;
-        }
-
-        return null;
+        return $num;
     }
 
     public function int_non_zero($value) : ?int
@@ -164,45 +141,30 @@ class ParseModule
             }
         }
 
-        if (is_string($value)) {
-            if (! is_numeric($value)) {
-                return null;
-            }
+        if (is_bool($value)) {
+            return (int) $value;
         }
 
-        $valueOriginal = $value;
-
-        if (! is_scalar($valueOriginal)) {
-            if (null === ($_valueOriginal = $this->string($valueOriginal))) {
-                return null;
-            }
-
-            if (! is_numeric($_valueOriginal)) {
-                return null;
-            }
-
-            $valueOriginal = $_valueOriginal;
+        $string = $this->string_not_empty($value);
+        if (null === $string) {
+            return null;
         }
 
-        $_value = $valueOriginal;
-
-        $_valueInt = $_value;
-        $statusInt = @settype($_valueInt, 'integer');
-
-        $_valueFloat = $_value;
-        $statusFloat = @settype($_valueFloat, 'float');
-
-        if ($statusInt) {
-            if ($_valueFloat === (float) $_valueInt) {
-                return $_valueInt;
-            }
+        if (! is_numeric($string)) {
+            return null;
         }
 
-        if ($statusFloat) {
-            return $_valueFloat;
+        $valueFloat = (float) $string;
+        if (($valueFloat < -PHP_INT_MAX) || (PHP_INT_MAX < $valueFloat)) {
+            return $valueFloat;
         }
 
-        return null;
+        $valueInt = (int) $string;
+        if ($valueFloat === (float) $valueInt) {
+            return $valueInt;
+        }
+
+        return $valueFloat;
     }
 
     public function num_non_zero($value) // : ?int|float
@@ -271,9 +233,109 @@ class ParseModule
     }
 
 
+    public function numeric_int($value) : ?string
+    {
+        if (null === ($_value = $this->numeric($value))) {
+            return null;
+        }
+
+        if (false !== stripos($_value, _PARSE_DECIMAL_POINT)) {
+            return null;
+        }
+
+        // > gzhegow, 0.000022 becomes 2.2E-5, so you need to pass formatted string instead of float
+        if (false !== stripos($_value, 'e')) {
+            return null;
+        }
+
+        return $_value;
+    }
+
+    public function numeric_int_non_zero($value) : ?string
+    {
+        if (null === ($_value = $this->numeric_int($value))) {
+            return null;
+        }
+
+        if ($_value == 0) {
+            return null;
+        }
+
+        return $_value;
+    }
+
+    public function numeric_int_non_negative($value) : ?string
+    {
+        if (null === ($_value = $this->numeric_int($value))) {
+            return null;
+        }
+
+        if ($_value == 0) {
+            return '0';
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            return null;
+        }
+
+        return $_value;
+    }
+
+    public function numeric_int_non_positive($value) : ?string
+    {
+        if (null === ($_value = $this->numeric_int($value))) {
+            return null;
+        }
+
+        if ($_value == 0) {
+            return '0';
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            return $_value;
+        }
+
+        return null;
+    }
+
+    public function numeric_int_negative($value) : ?string
+    {
+        if (null === ($_value = $this->numeric_int($value))) {
+            return null;
+        }
+
+        if ($_value == 0) {
+            return null;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            return $_value;
+        }
+
+        return null;
+    }
+
+    public function numeric_int_positive($value) : ?string
+    {
+        if (null === ($_value = $this->numeric_int($value))) {
+            return null;
+        }
+
+        if ($_value == 0) {
+            return null;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            return null;
+        }
+
+        return $_value;
+    }
+
+
     public function numeric($value) : ?string
     {
-        if (null === ($_value = $this->string($value))) {
+        if (null === ($_value = $this->string_not_empty($value))) {
             return null;
         }
 
@@ -281,72 +343,98 @@ class ParseModule
             return null;
         }
 
-        return $_value;
-    }
-
-    public function floor($value) : ?string
-    {
-        if (null === ($_value = $this->string($value))) {
+        if (in_array($_value, [ 'NAN', 'INF', '-INF' ])) {
             return null;
-        }
-
-        $minus = ('-' === $_value[ 0 ]) ? '-' : '';
-        if ($minus) {
-            $_value = substr($_value, 1);
-        }
-
-        if ('' === $_value) {
-            return null;
-        }
-
-        if (extension_loaded('ctype')) {
-            if (! ctype_digit($_value)) {
-                return null;
-            }
-
-        } else {
-            if (preg_match('/[^0-9]/', $_value)) {
-                return null;
-            }
-        }
-
-        return "{$minus}{$_value}";
-    }
-
-    public function frac($value) : ?string
-    {
-        if (null === ($_value = $this->string($value))) {
-            return null;
-        }
-
-        if ('.' !== $_value[ 0 ]) {
-            return null;
-        }
-
-        $test = substr($_value, 1);
-
-        if ('' === $test) {
-            return null;
-        }
-
-        if (extension_loaded('ctype')) {
-            if (! ctype_digit($test)) {
-                return null;
-            }
-
-        } else {
-            if (preg_match('/[^0-9]/', $test)) {
-                return null;
-            }
         }
 
         return $_value;
     }
 
-
-    public function bcnum($value, int &$scaleParsed = null) : ?BcNumber
+    public function numeric_non_zero($value) : ?string
     {
-        return Lib::bcmath()->parse_bcnum($value, $scaleParsed);
+        if (null === ($_value = $this->numeric($value))) {
+            return null;
+        }
+
+        if ($_value == 0) {
+            return null;
+        }
+
+        return $_value;
+    }
+
+    public function numeric_non_negative($value) : ?string
+    {
+        if (null === ($_value = $this->numeric($value))) {
+            return null;
+        }
+
+        if ($_value == 0) {
+            return '0';
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            return null;
+        }
+
+        return $_value;
+    }
+
+    public function numeric_non_positive($value) : ?string
+    {
+        if (null === ($_value = $this->numeric($value))) {
+            return null;
+        }
+
+        if ($_value == 0) {
+            return '0';
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            return $_value;
+        }
+
+        return null;
+    }
+
+    public function numeric_negative($value) : ?string
+    {
+        if (null === ($_value = $this->numeric($value))) {
+            return null;
+        }
+
+        if ($_value == 0) {
+            return null;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            return $_value;
+        }
+
+        return null;
+    }
+
+    public function numeric_positive($value) : ?string
+    {
+        if (null === ($_value = $this->numeric($value))) {
+            return null;
+        }
+
+        if ($_value == 0) {
+            return null;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            return null;
+        }
+
+        return $_value;
+    }
+
+
+    public function bcnum($value) : ?BcNumber
+    {
+        return Lib::bcmath()->parse_bcnum($value);
     }
 
 
@@ -375,8 +463,8 @@ class ParseModule
         }
 
         $_value = $value;
-        $status = @settype($_value, 'string');
 
+        $status = settype($_value, 'string');
         if ($status) {
             return $_value;
         }
@@ -413,6 +501,7 @@ class ParseModule
         return $_value;
     }
 
+
     public function letter($value) : ?string
     {
         if (null === ($_value = $this->string($value))) {
@@ -433,28 +522,75 @@ class ParseModule
         return $_value;
     }
 
-    public function alphabet($value) : ?string
+    public function alphabet($value) : ?Alphabet
     {
-        if (null === ($_value = $this->string($value))) {
+        return Lib::crypt()->parse_alphabet($value);
+    }
+
+
+    public function base($value, $alphabet) : ?string
+    {
+        if (null === ($_value = $this->string_not_empty($value))) {
             return null;
         }
 
-        preg_replace('/\s+/', '', $_value, 1, $count);
-        if ($count > 0) {
+        if (null === ($_alphabet = $this->alphabet($alphabet))) {
             return null;
         }
 
-        $fnStrlen = Lib::str()->mb_func('strlen');
-
-        if ($fnStrlen($_value) <= 1) {
+        if (preg_match($_alphabet->getRegexNot(), $_value, $m)) {
             return null;
         }
 
-        $fnStrSplit = Lib::str()->mb_func('str_split');
+        return $_value;
+    }
 
-        $array = $fnStrSplit($value);
+    public function baseBin($value) : ?string
+    {
+        if (null === ($_value = $this->string_not_empty($value))) {
+            return null;
+        }
 
-        if (count($array) !== count(array_unique($array))) {
+        if (preg_match('~[^01]~', $_value)) {
+            return null;
+        }
+
+        return $_value;
+    }
+
+    public function baseOct($value) : ?string
+    {
+        if (null === ($_value = $this->string_not_empty($value))) {
+            return null;
+        }
+
+        if (preg_match('~[^01234567]~', $_value)) {
+            return null;
+        }
+
+        return $_value;
+    }
+
+    public function baseDec($value) : ?string
+    {
+        if (null === ($_value = $this->string_not_empty($value))) {
+            return null;
+        }
+
+        if (preg_match('~[^0123456789]~', $_value)) {
+            return null;
+        }
+
+        return $_value;
+    }
+
+    public function baseHex($value) : ?string
+    {
+        if (null === ($_value = $this->string_not_empty($value))) {
+            return null;
+        }
+
+        if (preg_match('~[^0123456789ABCDEF]~', $_value)) {
             return null;
         }
 

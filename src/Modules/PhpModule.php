@@ -493,7 +493,7 @@ class PhpModule
 
         return floatval(
             $date->format('U')
-            . '.'
+            . _PARSE_DECIMAL_POINT
             . str_pad($date->format('u'), 6, '0')
         );
     }

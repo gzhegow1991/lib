@@ -9,199 +9,118 @@ use Gzhegow\Lib\Exception\RuntimeException;
 class DebugModule
 {
     /**
+     * @var callable
+     */
+    protected $dumpFn = 'var_dump';
+
+
+    /**
+     * @param callable $fn
+     *
+     * @return callable|null
+     */
+    public function dump_fn_static($fn = null) // : ?callable
+    {
+        if (null !== $fn) {
+            $last = $this->dumpFn;
+
+            $this->dumpFn = $fn;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->dumpFn;
+
+        return $result;
+    }
+
+    public function d(?array $trace, $var, ...$vars) // : mixed
+    {
+        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $fn = $this->dump_fn_static();
+
+        $fn($var, ...$vars);
+
+        return $var;
+    }
+
+    public function dd(?array $trace, $var, ...$vars)
+    {
+        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $fn = $this->dump_fn_static();
+
+        $fn($var, ...$vars);
+
+        die();
+    }
+
+    public function ddd(?array $trace, ?int $limit, $var, ...$vars) // : mixed|void
+    {
+        static $current;
+
+        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $limit = $limit ?? 1;
+        if ($limit < 1) $limit = 1;
+
+        $current = $current ?? $limit;
+
+        $fn = $this->dump_fn_static();
+
+        $fn($var, ...$vars);
+
+        if (0 === --$current) {
+            die();
+        }
+
+        return $var;
+    }
+
+
+    /**
      * @return string|float|int|null
      */
     public function var_dump($var, array $options = []) // : int|float|string|null
     {
+        $output = null
+            ?? $this->var_dump_output_null($var, $options)
+            ?? $this->var_dump_output_bool($var, $options)
+            ?? $this->var_dump_output_int($var, $options)
+            ?? $this->var_dump_output_float($var, $options)
+            ?? $this->var_dump_output_string($var, $options)
+            ?? $this->var_dump_output_object($var, $options)
+            ?? $this->var_dump_output_array($var, $options)
+            ?? $this->var_dump_output_resource($var, $options);
+
         $withType = $options[ 'with_type' ] ?? true;
         $withId = $options[ 'with_id' ] ?? true;
         $withValue = $options[ 'with_value' ] ?? true;
-
-        $newline = $options[ 'newline' ] ?? "\n";
+        $withBraces = $options[ 'with_braces' ] ?? false;
 
         $maxArrayLevel = $options[ 'max_array_level' ] ?? null;
+        $newline = $options[ 'newline' ] ?? null;
 
-        $output = null;
+        $content = null;
+        if (null !== $output) {
+            $cnt = count($output);
 
-        $withBraces = false;
+            if ($cnt > 1) {
+                $content = implode(" # ", $output);
 
-        $type = gettype($var);
-
-        if (null === $output) {
-            if (false
-                || is_null($var)
-                || is_bool($var)
-            ) {
-                $output = [];
-                $output[] = strtoupper(var_export($var, true));
+            } elseif ($cnt === 1) {
+                $content = $output[ 0 ];
             }
         }
-
-        if (null === $output) {
-            if (false
-                || is_numeric($var)
-            ) {
-                $output = [];
-                if ($withType) {
-                    $output[] = $type;
-                }
-                if ($withValue) {
-                    $output[] = $var;
-                }
-            }
-        }
-
-        if (null === $output) {
-            if (is_string($var)) {
-                $stringLen = strlen($var);
-
-                $output = [];
-                if ($withType) {
-                    $output[] = "{$type}({$stringLen})";
-                }
-                if ($withValue) {
-                    $_var = $var;
-                    $_var = str_replace('"', '\"', $_var);
-
-                    $output[] = '"' . $_var . '"';
-                }
-            }
-        }
-
-        if (null === $output) {
-            if (is_object($var)) {
-                $objectClass = get_class($var);
-                $objectId = spl_object_id($var);
-                $objectSubtypeIterable = (is_iterable($var) ? 'iterable' : null);
-                $objectSubtypeCountable = (($var instanceof \Countable) ? 'countable(' . count($var) . ')' : null);
-
-                $subtype = [];
-                if ($objectSubtypeIterable) $subtype[] = $objectSubtypeIterable;
-                if ($objectSubtypeCountable) $subtype[] = $objectSubtypeCountable;
-                $subtype = implode(' ', $subtype);
-                $subtype = ($subtype ? "({$subtype})" : null);
-
-                $output = [];
-                $output[] = "{$type}{$subtype}";
-                $output[] = $objectClass;
-                if ($withId) {
-                    $output[] = $objectId;
-                }
-
-                $withBraces = true;
-            }
-        }
-
-        if (null === $output) {
-            if (is_array($var)) {
-                $arrayCopy = $var;
-                $arrayCount = count($var);
-
-                $dump = null;
-                if ($withValue) {
-                    foreach ( Lib::arr()->walk(
-                        $arrayCopy,
-                        _ARRAY_WALK_WITH_EMPTY_ARRAYS | _ARRAY_WALK_WITH_PARENTS
-                    ) as $path => &$value ) {
-                        /** @var array $path */
-
-                        if (count($path) < $maxArrayLevel) {
-                            continue;
-                        }
-
-                        if (is_object($value)) {
-                            // ! recursion
-                            $value = $this->var_dump(
-                                $value,
-                                [
-                                    'with_type'  => true,
-                                    'with_value' => false,
-                                ] + $options
-                            );
-
-                            continue;
-                        }
-
-                        if (is_array($value)) {
-                            // ! recursion
-                            $value = $this->var_dump(
-                                $value,
-                                [
-                                    'with_type'       => true,
-                                    'with_value'      => false,
-                                    //
-                                    'max_array_level' => 0,
-                                ] + $options
-                            );
-
-                            continue;
-                        }
-
-                        if (null !== Lib::parse()->resource($value)) {
-                            // ! recursion
-                            $value = $this->var_dump(
-                                $value,
-                                [
-                                    'with_type'  => true,
-                                    'with_value' => false,
-                                ] + $options
-                            );
-                        }
-                    }
-                    unset($value);
-
-                    $dump = $this->var_export(
-                        $arrayCopy,
-                        [ 'addcslashes' => false ]
-                    );
-                }
-
-                $output = [];
-                if ($withType) {
-                    $output[] = "{$type}({$arrayCount})";
-                }
-                if ($withValue) {
-                    $output[] = $dump;
-                }
-            }
-        }
-
-        if (null === $output) {
-            if (null !== Lib::parse()->resource($var)) {
-                $resourceType = get_resource_type($var);
-                $resourceId = PHP_VERSION_ID > 80000
-                    ? get_resource_id($var)
-                    : (int) $var;
-
-                $output = [];
-                $output[] = "{$type}({$resourceType})";
-                if ($withId) {
-                    $output[] = $resourceId;
-                }
-
-                $withBraces = true;
-            }
-        }
-
-        $cnt = count($output);
-        if ($cnt > 1) {
-            $output = implode(" # ", $output);
-
-        } elseif ($cnt === 1) {
-            $output = $output[ 0 ];
-
-        } else {
+        if (null === $content) {
             throw new RuntimeException(
-                [
-                    'Unable to dump',
-                    $var,
-                ]
+                [ 'Unable to dump', $var ]
             );
         }
 
-        if ("\n" !== $newline) {
-            if (false !== strpos($output, "\n")) {
-                $lines = explode("\n", $output);
+        if (null !== $newline) {
+            if (false !== strpos($content, "\n")) {
+                $lines = explode("\n", $content);
 
                 foreach ( $lines as $i => $line ) {
                     $line = preg_replace('/\s+/', ' ', $line);
@@ -210,18 +129,315 @@ class DebugModule
                     $lines[ $i ] = $line;
                 }
 
-                $output = implode($newline, $lines);
+                $content = implode($newline, $lines);
             }
         }
 
-        $withBraces = $withBraces || $withType || $withId;
+        $forceBraces = $withBraces || $withType || $withId;
 
-        $output = $withBraces
-            ? '{ ' . $output . ' }'
-            : $output;
+        $content = $forceBraces
+            ? '{ ' . $content . ' }'
+            : $content;
+
+        return $content;
+    }
+
+    private function var_dump_output_null($var, array &$options = []) : ?array
+    {
+        if (! is_null($var)) return null;
+
+        $output = [];
+
+        $output[] = strtoupper(var_export($var, true));
 
         return $output;
     }
+
+    private function var_dump_output_bool($var, array &$options = []) : ?array
+    {
+        if (! is_bool($var)) return null;
+
+        $output = [];
+
+        $output[] = strtoupper(var_export($var, true));
+
+        return $output;
+    }
+
+    private function var_dump_output_int($var, array &$options = []) : ?array
+    {
+        if (! is_int($var)) return null;
+
+        $withType = $options[ 'with_type' ] ?? true;
+        $withId = $options[ 'with_id' ] ?? true;
+        $withValue = $options[ 'with_value' ] ?? true;
+
+        $type = gettype($var);
+
+        $output = [];
+
+        if ($withType) {
+            $output[] = $type;
+        }
+        if ($withValue) {
+            $output[] = is_finite($var)
+                ? $var
+                : (string) $var;
+        }
+
+        return $output;
+    }
+
+    private function var_dump_output_float($var, array &$options = []) : ?array
+    {
+        if (! is_float($var)) return null;
+
+        $withType = $options[ 'with_type' ] ?? true;
+        $withId = $options[ 'with_id' ] ?? true;
+        $withValue = $options[ 'with_value' ] ?? true;
+
+        $type = gettype($var);
+
+        $output = [];
+
+        if ($withType) {
+            $output[] = $type;
+        }
+        if ($withValue) {
+            $output[] = is_finite($var)
+                ? $var
+                : (string) $var;
+        }
+
+        return $output;
+    }
+
+    private function var_dump_output_string($var, array &$options = []) : ?array
+    {
+        if (! is_string($var)) return null;
+
+        $withType = $options[ 'with_type' ] ?? true;
+        $withId = $options[ 'with_id' ] ?? true;
+        $withValue = $options[ 'with_value' ] ?? true;
+
+        $type = gettype($var);
+
+        $stringLen = strlen($var);
+
+        $output = [];
+
+        if ($withType) {
+            $output[] = "{$type}({$stringLen})";
+        }
+        if ($withValue) {
+            $_var = $var;
+            $_var = str_replace('"', '\"', $_var);
+
+            $mapSpaces = [
+                "\n" => '\n',
+                "\r" => '\r',
+                "\t" => '\t',
+                "\v" => '\v',
+            ];
+
+            $found = false;
+
+            // $_var = preg_replace_callback('/[^[:print:]]/', static function ($m) use (
+            $_var = preg_replace_callback('/\p{C}/u', static function ($m) use (
+                &$mapSpaces,
+                //
+                &$found
+            ) {
+                $chr = $m[ 0 ];
+
+                if (isset($mapSpaces[ $chr ])) {
+                    return $mapSpaces[ $chr ] . $chr;
+                }
+
+                $res = ord($chr);
+                $res = dechex($res);
+                $res = str_pad($res, 2, '0', STR_PAD_LEFT);
+                $res = '\x' . $res;
+
+                $found = true;
+
+                return $res;
+            }, $_var);
+
+            if ($found) {
+                $_var = "b`{$_var}`";
+            }
+
+            $output[] = '"' . $_var . '"';
+        }
+
+        return $output;
+    }
+
+    private function var_dump_output_object($var, array &$options = []) : ?array
+    {
+        if (! is_object($var)) return null;
+
+        $withId = $options[ 'with_id' ] ?? true;
+        $withValue = $options[ 'with_value' ] ?? true;
+
+        $type = gettype($var);
+
+        $objectClass = get_class($var);
+        if (0 === strpos($objectClass, 'class@anonymous')) {
+            $objectClass = 'class@anonymous';
+        }
+
+        $objectId = spl_object_id($var);
+        $objectSubtypeCountable = (($var instanceof \Countable) ? 'countable(' . count($var) . ')' : null);
+        $objectSubtypeIterable = (is_iterable($var) ? 'iterable' : null);
+        $objectSubtypeStringable = (method_exists($var, '__toString') ? 'stringable' : null);
+
+        $subtype = [];
+        if ($objectSubtypeCountable) $subtype[] = $objectSubtypeCountable;
+        if ($objectSubtypeIterable) $subtype[] = $objectSubtypeIterable;
+        if ($objectSubtypeStringable) $subtype[] = $objectSubtypeStringable;
+        $subtype = implode(' ', $subtype);
+        $subtype = ($subtype ? "({$subtype})" : null);
+
+        $output = [];
+        $output[] = "{$type}{$subtype}";
+        $output[] = $objectClass;
+        if ($withId) {
+            $output[] = $objectId;
+        }
+        if ($withValue) {
+            if (method_exists($var, '__toString')) {
+                // ! recursion
+                $output[] = $this->var_dump(
+                    (string) $var,
+                    [
+                        'with_type'   => false,
+                        'with_id'     => false,
+                        'with_value'  => true,
+                        'with_braces' => false,
+                    ] + $options
+                );
+            }
+        }
+
+        $options[ 'with_braces' ] = true;
+
+        return $output;
+    }
+
+    private function var_dump_output_array($var, array &$options = []) : ?array
+    {
+        if (! is_array($var)) return null;
+
+        $theArr = Lib::arr();
+        $theParse = Lib::parse();
+
+        $withType = $options[ 'with_type' ] ?? true;
+        $withId = $options[ 'with_id' ] ?? true;
+        $withValue = $options[ 'with_value' ] ?? true;
+
+        $maxArrayLevel = $options[ 'max_array_level' ] ?? null;
+
+        $type = gettype($var);
+
+        $arrayCopy = $var;
+        $arrayCount = count($var);
+
+        $dump = null;
+        if ($withValue) {
+            foreach ( $theArr->walk_it(
+                $arrayCopy,
+                _ARR_WALK_WITH_EMPTY_ARRAYS | _ARR_WALK_WITH_PARENTS
+            ) as $path => &$value ) {
+                /** @var array $path */
+
+                if (count($path) < $maxArrayLevel) {
+                    continue;
+                }
+
+                if (is_object($value)) {
+                    // ! recursion
+                    $value = $this->var_dump(
+                        $value,
+                        [
+                            'with_type'  => true,
+                            'with_value' => false,
+                        ] + $options
+                    );
+
+                    continue;
+                }
+
+                if (is_array($value)) {
+                    // ! recursion
+                    $value = $this->var_dump(
+                        $value,
+                        [
+                            'with_type'       => true,
+                            'with_value'      => false,
+                            //
+                            'max_array_level' => 0,
+                        ] + $options
+                    );
+
+                    continue;
+                }
+
+                if (null !== $theParse->resource($value)) {
+                    // ! recursion
+                    $value = $this->var_dump(
+                        $value,
+                        [
+                            'with_type'  => true,
+                            'with_value' => false,
+                        ] + $options
+                    );
+                }
+            }
+            unset($value);
+
+            $dump = $this->var_export(
+                $arrayCopy,
+                [ 'addcslashes' => false ]
+            );
+        }
+
+        $output = [];
+        if ($withType) {
+            $output[] = "{$type}({$arrayCount})";
+        }
+        if ($withValue) {
+            $output[] = $dump;
+        }
+
+        return $output;
+    }
+
+    private function var_dump_output_resource($var, array &$options = []) : ?array
+    {
+        if (null === Lib::parse()->resource($var)) return null;
+
+        $withId = $options[ 'with_id' ] ?? true;
+
+        $type = gettype($var);
+
+        $resourceType = get_resource_type($var);
+        $resourceId = PHP_VERSION_ID > 80000
+            ? get_resource_id($var)
+            : (int) $var;
+
+        $output = [];
+        $output[] = "{$type}({$resourceType})";
+        if ($withId) {
+            $output[] = $resourceId;
+        }
+
+        $options[ 'with_braces' ] = true;
+
+        return $output;
+    }
+
 
     /**
      * @return string|float|int|null
@@ -352,8 +568,9 @@ class DebugModule
                 'with_type'       => false,
                 'with_id'         => false,
                 'with_value'      => true,
-                'newline'         => ' ',
+                'with_braces'     => false,
                 'max_array_level' => 0,
+                'newline'         => ' ',
             ]
         );
 
@@ -369,8 +586,9 @@ class DebugModule
                 'with_type'       => false,
                 'with_id'         => false,
                 'with_value'      => true,
-                'newline'         => ' ',
+                'with_braces'     => false,
                 'max_array_level' => $maxLevel,
+                'newline'         => ' ',
             ]
         );
 
@@ -385,6 +603,7 @@ class DebugModule
                 'with_type'       => false,
                 'with_id'         => false,
                 'with_value'      => true,
+                'with_braces'     => false,
                 'max_array_level' => 0,
             ]
         );
@@ -401,6 +620,7 @@ class DebugModule
                 'with_type'       => false,
                 'with_id'         => false,
                 'with_value'      => true,
+                'with_braces'     => false,
                 'max_array_level' => $maxLevel,
             ]
         );
@@ -433,8 +653,8 @@ class DebugModule
             $actualLine = $actualLines[ $i ] ?? ' ';
             $expectLine = $expectLines[ $i ] ?? ' ';
 
-            if ('' === $actualLine) $actualLine = '""';
-            if ('' === $expectLine) $expectLine = '""';
+            if ('' === $actualLine) $actualLine = ' ';
+            if ('' === $expectLine) $expectLine = ' ';
 
             if (! $hasExpect) {
                 $actualLinesNew[] = $actualLine;

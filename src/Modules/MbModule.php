@@ -17,6 +17,7 @@ class MbModule
         }
     }
 
+
     public function lcfirst(string $string, string $mb_encoding = null) : string
     {
         $mbEncodingArgs = [];
@@ -46,6 +47,7 @@ class MbModule
 
         return $result;
     }
+
 
     public function str_split(string $string, int $split_length = 1, string $mb_encoding = null) : array
     {

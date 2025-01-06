@@ -7,21 +7,21 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-if (! defined('_ARRAY_FN_USE_VALUE')) define('_ARRAY_FN_USE_VALUE', 1 << 0);
-if (! defined('_ARRAY_FN_USE_KEY')) define('_ARRAY_FN_USE_KEY', 1 << 1);
-if (! defined('_ARRAY_FN_USE_SRC')) define('_ARRAY_FN_USE_SRC', 1 << 2);
+if (! defined('_ARRAY_FN_USE_VALUE')) define('_ARR_FN_USE_VALUE', 1 << 0);
+if (! defined('_ARRAY_FN_USE_KEY')) define('_ARR_FN_USE_KEY', 1 << 1);
+if (! defined('_ARRAY_FN_USE_SRC')) define('_ARR_FN_USE_SRC', 1 << 2);
 
-if (! defined('_ARRAY_WALK_MODE_DEPTH_FIRST')) define('_ARRAY_WALK_MODE_DEPTH_FIRST', 1 << 0);
-if (! defined('_ARRAY_WALK_MODE_BREADTH_FIRST')) define('_ARRAY_WALK_MODE_BREADTH_FIRST', 1 << 1);
-if (! defined('_ARRAY_WALK_SORT_SELF_FIRST')) define('_ARRAY_WALK_SORT_SELF_FIRST', 1 << 2);
-if (! defined('_ARRAY_WALK_SORT_PARENT_FIRST')) define('_ARRAY_WALK_SORT_PARENT_FIRST', 1 << 3);
-if (! defined('_ARRAY_WALK_SORT_CHILD_FIRST')) define('_ARRAY_WALK_SORT_CHILD_FIRST', 1 << 4);
-if (! defined('_ARRAY_WALK_WITH_LEAVES')) define('_ARRAY_WALK_WITH_LEAVES', 1 << 5);
-if (! defined('_ARRAY_WALK_WITHOUT_LEAVES')) define('_ARRAY_WALK_WITHOUT_LEAVES', 1 << 6);
-if (! defined('_ARRAY_WALK_WITH_EMPTY_ARRAYS')) define('_ARRAY_WALK_WITH_EMPTY_ARRAYS', 1 << 7);
-if (! defined('_ARRAY_WALK_WITHOUT_EMPTY_ARRAYS')) define('_ARRAY_WALK_WITHOUT_EMPTY_ARRAYS', 1 << 8);
-if (! defined('_ARRAY_WALK_WITH_PARENTS')) define('_ARRAY_WALK_WITH_PARENTS', 1 << 9);
-if (! defined('_ARRAY_WALK_WITHOUT_PARENTS')) define('_ARRAY_WALK_WITHOUT_PARENTS', 1 << 10);
+if (! defined('_ARRAY_WALK_MODE_DEPTH_FIRST')) define('_ARR_WALK_MODE_DEPTH_FIRST', 1 << 0);
+if (! defined('_ARRAY_WALK_MODE_BREADTH_FIRST')) define('_ARR_WALK_MODE_BREADTH_FIRST', 1 << 1);
+if (! defined('_ARRAY_WALK_SORT_SELF_FIRST')) define('_ARR_WALK_SORT_SELF_FIRST', 1 << 2);
+if (! defined('_ARRAY_WALK_SORT_PARENT_FIRST')) define('_ARR_WALK_SORT_PARENT_FIRST', 1 << 3);
+if (! defined('_ARRAY_WALK_SORT_CHILD_FIRST')) define('_ARR_WALK_SORT_CHILD_FIRST', 1 << 4);
+if (! defined('_ARRAY_WALK_WITH_LEAVES')) define('_ARR_WALK_WITH_LEAVES', 1 << 5);
+if (! defined('_ARRAY_WALK_WITHOUT_LEAVES')) define('_ARR_WALK_WITHOUT_LEAVES', 1 << 6);
+if (! defined('_ARRAY_WALK_WITH_EMPTY_ARRAYS')) define('_ARR_WALK_WITH_EMPTY_ARRAYS', 1 << 7);
+if (! defined('_ARRAY_WALK_WITHOUT_EMPTY_ARRAYS')) define('_ARR_WALK_WITHOUT_EMPTY_ARRAYS', 1 << 8);
+if (! defined('_ARRAY_WALK_WITH_PARENTS')) define('_ARR_WALK_WITH_PARENTS', 1 << 9);
+if (! defined('_ARRAY_WALK_WITHOUT_PARENTS')) define('_ARR_WALK_WITHOUT_PARENTS', 1 << 10);
 
 
 class ArrModule
@@ -577,13 +577,13 @@ class ArrModule
             return [];
         }
 
-        $mode = $this->fn_mode() ?? _ARRAY_FN_USE_VALUE;
+        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARRAY_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARRAY_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARRAY_FN_USE_SRC) $args[] = $src;
+            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
+            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
+            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
 
             $src[ $key ] = call_user_func_array($fn, $args);
         }
@@ -613,13 +613,13 @@ class ArrModule
             return [];
         }
 
-        $mode = $this->fn_mode() ?? _ARRAY_FN_USE_VALUE;
+        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARRAY_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARRAY_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARRAY_FN_USE_SRC) $args[] = $src;
+            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
+            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
+            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
 
             if (call_user_func_array($fn, $args)) {
                 continue;
@@ -646,13 +646,13 @@ class ArrModule
             return $src;
         }
 
-        $mode = $this->fn_mode() ?? _ARRAY_FN_USE_VALUE;
+        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARRAY_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARRAY_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARRAY_FN_USE_SRC) $args[] = $src;
+            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
+            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
+            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
 
             if (call_user_func_array($fn, $args)) {
                 continue;
@@ -676,13 +676,13 @@ class ArrModule
             return $src;
         }
 
-        $mode = $this->fn_mode() ?? _ARRAY_FN_USE_VALUE;
+        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARRAY_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARRAY_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARRAY_FN_USE_SRC) $args[] = $src;
+            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
+            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
+            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
 
             if (call_user_func_array($fn, $args)) {
                 unset($src[ $key ]);
@@ -703,13 +703,13 @@ class ArrModule
             return $src;
         }
 
-        $mode = $this->fn_mode() ?? _ARRAY_FN_USE_VALUE;
+        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARRAY_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARRAY_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARRAY_FN_USE_SRC) $args[] = $src;
+            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
+            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
+            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
 
             if (call_user_func_array($fn, $args)) {
                 $src[ $key ] = $new;
@@ -732,13 +732,13 @@ class ArrModule
         $left = [];
         $right = [];
 
-        $mode = $this->fn_mode() ?? _ARRAY_FN_USE_VALUE;
+        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARRAY_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARRAY_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARRAY_FN_USE_SRC) $args[] = $src;
+            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
+            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
+            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
 
             call_user_func_array($fn, $args)
                 ? ($left[ $key ] = $val)
@@ -759,13 +759,13 @@ class ArrModule
     {
         $result = [];
 
-        $mode = $this->fn_mode() ?? _ARRAY_FN_USE_VALUE;
+        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARRAY_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARRAY_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARRAY_FN_USE_SRC) $args[] = $src;
+            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
+            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
+            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
 
             $groupNames = call_user_func_array($fn, $args);
 
@@ -927,7 +927,7 @@ class ArrModule
     {
         $result = [];
 
-        foreach ( $this->walk($values) as $value ) {
+        foreach ( $this->walk_it($values) as $value ) {
             $result[] = $value;
         }
 
@@ -939,7 +939,7 @@ class ArrModule
     {
         $result = [];
 
-        foreach ( $this->walk($array, _ARRAY_WALK_WITH_EMPTY_ARRAYS) as $path => $value ) {
+        foreach ( $this->walk_it($array, _ARR_WALK_WITH_EMPTY_ARRAYS) as $path => $value ) {
             $result[ implode('.', $path) ] = $value;
         }
 
@@ -971,23 +971,23 @@ class ArrModule
      *
      * @return \Iterator<array<int|string>, mixed>|\Generator<array<int|string>, mixed>
      */
-    public function &walk(array &$array, int $flags = null) : \Generator
+    public function &walk_it(array &$array, int $flags = null) : \Generator
     {
         if (! $array) return;
 
         $flags = $flags ?? 0;
 
-        $isModeDepthFirst = (bool) ($flags & _ARRAY_WALK_MODE_DEPTH_FIRST);
-        $isModeBreadthFirst = (bool) ($flags & _ARRAY_WALK_MODE_BREADTH_FIRST);
+        $isModeDepthFirst = (bool) ($flags & _ARR_WALK_MODE_DEPTH_FIRST);
+        $isModeBreadthFirst = (bool) ($flags & _ARR_WALK_MODE_BREADTH_FIRST);
         $sum = $isModeDepthFirst + $isModeBreadthFirst;
         if (! $sum || ($sum > 1)) {
             $isModeDepthFirst = true;
             $isModeBreadthFirst = false;
         }
 
-        $isSortSelfFirst = (bool) ($flags & _ARRAY_WALK_SORT_SELF_FIRST);
-        $isSortParentFirst = (bool) ($flags & _ARRAY_WALK_SORT_PARENT_FIRST);
-        $isSortChildFirst = (bool) ($flags & _ARRAY_WALK_SORT_CHILD_FIRST);
+        $isSortSelfFirst = (bool) ($flags & _ARR_WALK_SORT_SELF_FIRST);
+        $isSortParentFirst = (bool) ($flags & _ARR_WALK_SORT_PARENT_FIRST);
+        $isSortChildFirst = (bool) ($flags & _ARR_WALK_SORT_CHILD_FIRST);
         $sum = $isSortSelfFirst + $isSortParentFirst + $isSortChildFirst;
         if (! $sum || ($sum > 1)) {
             $isSortSelfFirst = true;
@@ -995,8 +995,8 @@ class ArrModule
             $isSortChildFirst = false;
         }
 
-        $isWithLeaves = (bool) ($flags & _ARRAY_WALK_WITH_LEAVES);
-        $isWithoutLeaves = (bool) ($flags & _ARRAY_WALK_WITHOUT_LEAVES);
+        $isWithLeaves = (bool) ($flags & _ARR_WALK_WITH_LEAVES);
+        $isWithoutLeaves = (bool) ($flags & _ARR_WALK_WITHOUT_LEAVES);
         $sum = $isWithLeaves + $isWithoutLeaves;
         if (! $sum || ($sum > 1)) {
             $isWithLeaves = true;
@@ -1005,8 +1005,8 @@ class ArrModule
         $withLeaves = $isWithLeaves && ! $isWithoutLeaves;
         unset($sum);
 
-        $isWithoutEmptyArrays = (bool) ($flags & _ARRAY_WALK_WITHOUT_EMPTY_ARRAYS);
-        $isWithEmptyArrays = (bool) ($flags & _ARRAY_WALK_WITH_EMPTY_ARRAYS);
+        $isWithoutEmptyArrays = (bool) ($flags & _ARR_WALK_WITHOUT_EMPTY_ARRAYS);
+        $isWithEmptyArrays = (bool) ($flags & _ARR_WALK_WITH_EMPTY_ARRAYS);
         $sum = $isWithoutEmptyArrays + $isWithEmptyArrays;
         if (! $sum || ($sum > 1)) {
             $isWithoutEmptyArrays = true;
@@ -1015,8 +1015,8 @@ class ArrModule
         $withEmptyArrays = $isWithEmptyArrays && ! $isWithoutEmptyArrays;
         unset($sum);
 
-        $isWithoutParents = (bool) ($flags & _ARRAY_WALK_WITHOUT_PARENTS);
-        $isWithParents = (bool) ($flags & _ARRAY_WALK_WITH_PARENTS);
+        $isWithoutParents = (bool) ($flags & _ARR_WALK_WITHOUT_PARENTS);
+        $isWithParents = (bool) ($flags & _ARR_WALK_WITH_PARENTS);
         $sum = $isWithoutParents + $isWithParents;
         if (! $sum || ($sum > 1)) {
             $isWithoutParents = true;
@@ -1139,7 +1139,7 @@ class ArrModule
      *
      * @return \Iterator<array<int|string>, T>|\Generator<array<int|string>, T>
      */
-    public function walk_tree(array $tree, array $list = null, $start = null) : \Generator
+    public function walk_tree_it(array $tree, array $list = null, $start = null) : \Generator
     {
         if (null === $start) {
             $start = null
@@ -1189,7 +1189,7 @@ class ArrModule
      * @return \Iterator<array<int|string>, array>|\Generator<array<int|string>, array>
      * @throws \LogicException
      */
-    public function walk_collect(array $arrayList, int $arrayWalkFlags = null, array $fallback = []) : \Generator
+    public function walk_collect_it(array $arrayList, int $arrayWalkFlags = null, array $fallback = []) : \Generator
     {
         $keyList = array_keys($arrayList);
 
@@ -1205,7 +1205,7 @@ class ArrModule
                 );
             }
 
-            $generators[ $key ] = $this->walk($arrayList[ $key ], $arrayWalkFlags);
+            $generators[ $key ] = $this->walk_it($arrayList[ $key ], $arrayWalkFlags);
         }
 
         $result = [];

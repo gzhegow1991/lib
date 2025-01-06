@@ -10,7 +10,7 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-class BcMathModule
+class BcmathModule
 {
     /**
      * @var int
@@ -52,8 +52,6 @@ class BcMathModule
 
     public function parse_bcnum($value, int &$scaleParsed = null) : ?BcNumber
     {
-        $scaleParsed = null;
-
         if ($value instanceof BcNumber) {
             return $value;
         }
@@ -62,19 +60,24 @@ class BcMathModule
             return null;
         }
 
-        // > gzhegow, parse()->numeric() converts to string
-        if (in_array($_value, [ 'NAN', 'INF', '-INF' ])) {
-            return null;
-        }
-
         // > gzhegow, 0.000022 becomes 2.2E-5, so you need to pass formatted string instead of float
-        if (false !== strpos(strtolower($_value), 'e')) {
+        if (false !== stripos($_value, 'e')) {
             return null;
         }
 
-        $valueMinus = ('-' === $_value[ 0 ]);
-        $valueAbs = $valueMinus ? substr($_value, 1) : $_value;
-        [ $valueAbsFloor, $valueAbsFrac ] = explode('.', $valueAbs) + [ 1 => '' ];
+        $valueMinus = '';
+        $valueAbs = $_value;
+
+        $isMinus = ('-' === $_value[ 0 ]);
+        if ($isMinus) {
+            $valueMinus = '-';
+            $valueAbs = substr($_value, 1);
+        }
+
+        [
+            $valueAbsFloor,
+            $valueAbsFrac,
+        ] = explode(_PARSE_DECIMAL_POINT, $valueAbs) + [ '0', '' ];
 
         $valueAbsFloor = ltrim($valueAbsFloor, '0');  // 0000.1
         $valueAbsFrac = rtrim($valueAbsFrac, '0');    // 1.0000
@@ -195,7 +198,7 @@ class BcMathModule
             );
         }
 
-        $fractional = $bcnum->getFractional();
+        $fractional = $bcnum->getFractionalPart();
 
         if (! $fractional) {
             return $bcnum;
@@ -251,7 +254,7 @@ class BcMathModule
             );
         }
 
-        $fractional = $bcnum->getFractional();
+        $fractional = $bcnum->getFractionalPart();
 
         if (! $fractional) {
             return $bcnum;
@@ -362,7 +365,7 @@ class BcMathModule
             );
         }
 
-        $fractional = $bcnum->getFractional();
+        $fractional = $bcnum->getFractionalPart();
 
         if (! $fractional) {
             return $bcnum;
@@ -421,7 +424,7 @@ class BcMathModule
             );
         }
 
-        $fractional = $bcnum->getFractional();
+        $fractional = $bcnum->getFractionalPart();
 
         if (! $fractional) {
             return $bcnum;
@@ -455,7 +458,7 @@ class BcMathModule
 
         $scaleParsed = 0;
 
-        $frac = strrchr($_number, '.');
+        $frac = strrchr($_number, _PARSE_DECIMAL_POINT);
 
         if (false !== $frac) {
             $scaleParsed = strlen($frac) - 1;
@@ -550,7 +553,7 @@ class BcMathModule
             ?? Lib::php()->throw([ 'The `num2` should be valid bcmath', $num2 ]);
 
         if (null === $scale) {
-            if ($bcnum1->getFractional() && $bcnum2->getFractional()) {
+            if ($bcnum1->getFractionalPart() && $bcnum2->getFractionalPart()) {
                 throw new LogicException(
                     [ 'The `scale` should be defined if both arguments have fractional parts', $num1, $num2 ]
                 );
@@ -614,8 +617,8 @@ class BcMathModule
             ?? Lib::php()->throw([ 'The `num2` should be valid bcmath', $num2 ]);
 
         $result = bcmod(
-            $bcnum1->getFloor(),
-            $bcnum2->getFloor(),
+            $bcnum1->getInteger(),
+            $bcnum2->getInteger(),
             0
         );
 
@@ -632,9 +635,9 @@ class BcMathModule
             ?? Lib::php()->throw([ 'The `num` should be valid bcmath', $num ]);
 
         if (null === $scale) {
-            if ($bcnum->getFractional()) {
+            if ($bcnum->getFractionalPart()) {
                 throw new LogicException(
-                    [ 'The `scale` should be defined if number has fractional part', $num ]
+                    [ 'The `scale` should be defined if `num` has fractional part', $num ]
                 );
             }
         }
@@ -674,229 +677,53 @@ class BcMathModule
     }
 
 
-    public function base_convert(
-        $num,
-        string $baseCharsTo, string $baseCharsFrom = null,
-        int $scale = null,
-        int $baseShiftTo = null, int $baseShiftFrom = null
-    ) : string
+    public function bcgcd($num1, $num2) : BcNumber
     {
-        $_num = null
-            ?? Lib::parse()->numeric($num)
-            ?? Lib::php()->throw([ 'The `num` should be valid numeric', $num ]);
+        $bcNum1 = null
+            ?? $this->parse_bcnum($num1)
+            ?? Lib::php()->throw([ 'The `a` should be valid bcmath', $num1 ]);
 
-        $minus = ('-' === $_num[ 0 ]) ? '-' : '';
+        $bcNum2 = null
+            ?? $this->parse_bcnum($num2)
+            ?? Lib::php()->throw([ 'The `b` should be valid bcmath', $num2 ]);
 
-        $numAbs = ltrim($_num, '-');
-        [ $numFloor, $numFrac ] = explode('.', $numAbs, 2) + [ '0', '' ];
+        $bcNum1Abs = $bcNum1->getAbsolute();
+        $bcNum2Abs = $bcNum2->getAbsolute();
 
-        $resultFloor = '';
-        if ('' !== $numFloor) {
-            $resultFloor = $this->base_convert_floor(
-                $numFloor,
-                $baseCharsTo, $baseCharsFrom,
-                $baseShiftTo, $baseShiftFrom
-            );
+        while ( $bcNum2Abs !== '0' ) {
+            $mod = bcmod($bcNum1Abs, $bcNum2Abs, 0);
+
+            $bcNum1Abs = $bcNum2Abs;
+            $bcNum2Abs = $mod;
         }
 
-        $resultFrac = '';
-        if ('' !== $numFrac) {
-            $resultFrac = $this->base_convert_frac(
-                $numFrac,
-                $baseCharsTo, $baseCharsFrom,
-                $scale
-            );
-        }
+        $bcgcd = $this->parse_bcnum($bcNum1Abs);
 
-        return "{$minus}{$resultFloor}{$resultFrac}";
+        return $bcgcd;
     }
 
-    public function base_convert_floor(
-        $floor,
-        string $baseCharsTo, string $baseCharsFrom = null,
-        int $baseShiftTo = null, int $baseShiftFrom = null
-    ) : string
+    public function bclcm($num1, $num2) : BcNumber
     {
-        $baseCharsFrom = $baseCharsFrom ?? '0123456789';
+        $bcNum1 = null
+            ?? $this->parse_bcnum($num1)
+            ?? Lib::php()->throw([ 'The `a` should be valid bcmath', $num1 ]);
 
-        $_floor = null
-            ?? Lib::parse()->floor($floor)
-            ?? Lib::php()->throw([ 'The `floor` should be valid floor part', $floor ]);
+        $bcNum2 = null
+            ?? $this->parse_bcnum($num2)
+            ?? Lib::php()->throw([ 'The `b` should be valid bcmath', $num2 ]);
 
-        $_baseCharsTo = null
-            ?? Lib::parse()->alphabet($baseCharsTo)
-            ?? Lib::php()->throw([ 'The `baseCharsTo` should be valid alphabet', $baseCharsTo ]);
+        $bcNum1Abs = $bcNum1->getAbsolute();
+        $bcNum2Abs = $bcNum2->getAbsolute();
 
-        $_baseCharsFrom = null
-            ?? Lib::parse()->alphabet($baseCharsFrom)
-            ?? Lib::php()->throw([ 'The `baseCharsFrom` should be valid alphabet', $baseCharsFrom ]);
+        $mul = bcmul($bcNum1Abs, $bcNum2Abs, 0);
 
-        $fnStrlen = Lib::str()->mb_func('strlen');
-        $fnStrSplit = Lib::str()->mb_func('str_split');
-        $fnSubstr = Lib::str()->mb_func('substr');
+        $bcGcd = $this->bcgcd($bcNum1Abs, $bcNum2Abs);
+        $bcGcdAbs = $bcGcd->getAbsolute();
 
-        $len = $fnStrlen($_floor);
-        if (! $len) {
-            return '';
-        }
+        $lcm = bcdiv($mul, $bcGcdAbs, 0);
 
-        $baseTo = $fnStrlen($_baseCharsTo);
-        $baseFrom = $fnStrlen($_baseCharsFrom);
+        $bcLcm = $this->parse_bcnum($lcm);
 
-        $baseCharsFromIndex = array_flip($fnStrSplit($_baseCharsFrom));
-
-        $baseChars10 = '0123456789';
-
-        if ($_baseCharsFrom === $_baseCharsTo) {
-            return $_floor;
-
-        } elseif ($_baseCharsFrom === $baseChars10) {
-            $result = [];
-
-            $div = $_floor;
-
-            $bccomp = bccomp(
-                bcadd($div, (string) $baseShiftTo, 0),
-                '0',
-                0
-            );
-            if (0 > $bccomp) {
-                throw new LogicException(
-                    [ 'Unable to convert cause of `baseShiftTo`', $div ]
-                );
-            }
-
-            do {
-                $div = bcadd($div, (string) $baseShiftTo, 0);
-
-                $mod = bcmod($div, (string) $baseTo);
-                $div = bcdiv($div, (string) $baseTo, 0);
-
-                $result[] = $fnSubstr($_baseCharsTo, (int) $mod, 1);
-            } while ( bccomp($div, '0', 1) );
-
-            $result = implode('', array_reverse($result));
-
-        } elseif ($_baseCharsTo === $baseChars10) {
-            $result = '0';
-
-            for ( $i = 1; $i <= $len; $i++ ) {
-                $idx = $baseCharsFromIndex[ $fnSubstr($_floor, $i - 1, 1) ];
-                $idx = bcsub($idx, (string) $baseShiftFrom, 0);
-
-                $pow = bcpow($baseFrom, (string) ($len - $i), 0);
-                $sum = bcmul($idx, $pow, 0);
-
-                $result = bcadd($result, $sum, 0);
-            }
-
-        } else {
-            $result = $_floor;
-            $result = $this->base_convert_floor(
-                $result,
-                $baseChars10, $_baseCharsFrom,
-                0, $baseShiftFrom
-            );
-            $result = $this->base_convert_frac(
-                $result,
-                $_baseCharsTo, $baseChars10,
-                $baseShiftTo
-            );
-        }
-
-        return $result;
-    }
-
-    public function base_convert_frac(
-        $frac,
-        string $baseCharsTo, string $baseCharsFrom = null,
-        int $scale = null
-    ) : string
-    {
-        $baseCharsFrom = $baseCharsFrom ?? '0123456789';
-
-        $_frac = null
-            ?? Lib::parse()->frac($frac)
-            ?? Lib::php()->throw([ 'The `frac` should be valid fractional part', $frac ]);
-
-        $_baseCharsTo = null
-            ?? Lib::parse()->alphabet($baseCharsTo)
-            ?? Lib::php()->throw([ 'The `baseCharsTo` should be valid alphabet', $baseCharsTo ]);
-
-        $_baseCharsFrom = null
-            ?? Lib::parse()->alphabet($baseCharsFrom)
-            ?? Lib::php()->throw([ 'The `baseCharsFrom` should be valid alphabet', $baseCharsFrom ]);
-
-        $_frac = ltrim($_frac, '.');
-
-        $fnStrlen = Lib::str()->mb_func('strlen');
-        $fnStrSplit = Lib::str()->mb_func('str_split');
-        $fnSubstr = Lib::str()->mb_func('substr');
-
-        $len = $fnStrlen($_frac);
-        if (! $len) {
-            return '';
-        }
-
-        $_scale = $this->scale_min($scale, '0.' . $_frac);
-
-        $baseTo = $fnStrlen($_baseCharsTo);
-        $baseFrom = $fnStrlen($_baseCharsFrom);
-
-        $baseCharsFromIndex = array_flip($fnStrSplit($_baseCharsFrom));
-
-        for ( $i = 0; $i < $len; $i++ ) {
-            if (! isset($baseCharsFromIndex[ $fnSubstr($_frac, $i, 1) ])) {
-                throw new LogicException(
-                    [ 'The `frac` contains char outside `baseCharsFrom`', $_frac[ $i ] ]
-                );
-            }
-        }
-
-        $baseChars10 = '0123456789';
-
-        if ($_baseCharsTo === $_baseCharsFrom) {
-            return $_frac;
-
-        } elseif ($_baseCharsFrom === $baseChars10) {
-            $result = [];
-
-            $mul = bcadd('0.' . $_frac, '0', $_scale);
-
-            $limit = $_scale;
-            while ( $limit-- ) {
-                $mul = bcmul($mul, $baseTo, $_scale);
-                $floor = bcadd($mul, '0', 0);
-
-                $mul = bcsub($mul, $floor, $_scale);
-
-                $result[] = $fnSubstr($_baseCharsTo, (int) $floor, 1);
-
-                if (0 === bccomp($mul, '0', $_scale)) break;
-            }
-
-            $result = implode('', $result);
-
-        } elseif ($_baseCharsTo === $baseChars10) {
-            $result = '0';
-
-            for ( $i = 1; $i <= $len; $i++ ) {
-                $idx = $baseCharsFromIndex[ $fnSubstr($_frac, $i - 1, 1) ];
-
-                $pow = bcpow($baseFrom, (string) (-$i), $_scale);
-                $sum = bcmul($idx, $pow, $_scale);
-
-                $result = bcadd($result, $sum, $_scale);
-            }
-
-            $result = explode('.', $result, 2)[ 1 ] ?? '0';
-
-        } else {
-            $result = $_frac;
-            $result = $this->base_convert_frac($result, $baseChars10, $_baseCharsFrom);
-            $result = $this->base_convert_frac($result, $_baseCharsTo, $baseChars10);
-        }
-
-        return '.' . $result;
+        return $bcLcm;
     }
 }

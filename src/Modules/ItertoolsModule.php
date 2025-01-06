@@ -14,7 +14,7 @@ class ItertoolsModule
      *
      * @return \Generator
      */
-    public function reversed(iterable $it) : \Generator
+    public function reversed_it(iterable $it) : \Generator
     {
         $reversed = [];
         foreach ( $it as $key => $item ) {
@@ -37,7 +37,7 @@ class ItertoolsModule
      *
      * @return \Generator
      */
-    public function range($start, $end, $step = null) : \Generator
+    public function range_it($start, $end, $step = null) : \Generator
     {
         $step = $step ?? 1;
 
@@ -120,8 +120,7 @@ class ItertoolsModule
 
         $i = $_start;
 
-        while (
-            false
+        while ( false
             || ($isReverse && ($i >= $_end))
             || ($i <= $_end)
         ) {
@@ -155,7 +154,7 @@ class ItertoolsModule
      *
      * @return \Generator
      */
-    public function product(iterable ...$iterables) : \Generator
+    public function product_it(iterable ...$iterables) : \Generator
     {
         $pools = [];
         foreach ( $iterables as $i => $iterable ) {
@@ -190,7 +189,7 @@ class ItertoolsModule
      *
      * @return \Generator
      */
-    public function product_repeat(int $repeat, iterable ...$iterables) : \Generator
+    public function product_repeat_it(int $repeat, iterable ...$iterables) : \Generator
     {
         $repeat = ($repeat > 1) ? $repeat : 1;
 
@@ -208,7 +207,7 @@ class ItertoolsModule
 
         $pools = array_merge(...$list);
 
-        yield from $this->product(...$pools);
+        yield from $this->product_it(...$pools);
     }
 
 
@@ -221,7 +220,7 @@ class ItertoolsModule
      *
      * @return \Generator
      */
-    public function combinations_unique(iterable $it, int $len) : ?\Generator
+    public function combinations_unique_it(iterable $it, int $len) : ?\Generator
     {
         $pool = [];
         foreach ( $it as $v ) {
@@ -236,7 +235,7 @@ class ItertoolsModule
 
         $row = [];
         $indexes = [];
-        foreach ( $this->range(0, $len - 1) as $i ) {
+        foreach ( $this->range_it(0, $len - 1) as $i ) {
             $row[] = $pool[ $i ];
             $indexes[] = $i;
         }
@@ -246,7 +245,7 @@ class ItertoolsModule
         while ( true ) {
             $found = null;
 
-            foreach ( $this->range($len - 1, 0, -1) as $i ) {
+            foreach ( $this->range_it($len - 1, 0, -1) as $i ) {
                 if ($indexes[ $i ] !== $i + $size - $len) {
                     $found = $i;
                     break;
@@ -261,7 +260,7 @@ class ItertoolsModule
 
             $indexes[ $i ] += 1;
 
-            foreach ( $this->range($i + 1, $len - 1) as $j ) {
+            foreach ( $this->range_it($i + 1, $len - 1) as $j ) {
                 $indexes[ $j ] = $indexes[ $j - 1 ] + 1;
             }
 
@@ -282,7 +281,7 @@ class ItertoolsModule
      *
      * @return \Generator
      */
-    public function combinations_all(iterable $it, int $len) : ?\Generator
+    public function combinations_all_it(iterable $it, int $len) : ?\Generator
     {
         $pool = [];
         foreach ( $it as $v ) {
@@ -297,7 +296,7 @@ class ItertoolsModule
 
         $row = [];
         $indices = [];
-        foreach ( $this->range(0, $len - 1) as $i ) {
+        foreach ( $this->range_it(0, $len - 1) as $i ) {
             $row[] = $pool[ 0 ];
             $indices[] = 0;
         }
@@ -307,7 +306,7 @@ class ItertoolsModule
         while ( true ) {
             $found = null;
 
-            foreach ( $this->range($len - 1, 0, -1) as $i ) {
+            foreach ( $this->range_it($len - 1, 0, -1) as $i ) {
                 if ($indices[ $i ] !== ($size - 1)) {
                     $found = $i;
                     break;
@@ -321,7 +320,7 @@ class ItertoolsModule
             $i = $found;
 
             $replace = [];
-            foreach ( $this->range(0, $len - $i - 1) as $ii ) {
+            foreach ( $this->range_it(0, $len - $i - 1) as $ii ) {
                 $replace[] = $indices[ $i ] + 1;
             }
 
@@ -346,7 +345,7 @@ class ItertoolsModule
      *
      * @return \Generator
      */
-    public function permutations(iterable $it, int $len = null) : \Generator
+    public function permutations_it(iterable $it, int $len = null) : \Generator
     {
         $pool = [];
         foreach ( $it as $v ) {
@@ -362,7 +361,7 @@ class ItertoolsModule
         }
 
         $indices = [];
-        foreach ( $this->range(0, $size - 1) as $i ) {
+        foreach ( $this->range_it(0, $size - 1) as $i ) {
             $indices[] = $i;
         }
 
@@ -374,12 +373,12 @@ class ItertoolsModule
         yield $row;
 
         $cycles = iterator_to_array(
-            $this->range($size, $size - $len - 1, -1)
+            $this->range_it($size, $size - $len - 1, -1)
         );
 
         while ( $size ) {
             $found = null;
-            foreach ( $this->range($len - 1, 0, -1) as $i ) {
+            foreach ( $this->range_it($len - 1, 0, -1) as $i ) {
                 $cycles[ $i ] -= 1;
 
                 if ($cycles[ $i ] === 0) {

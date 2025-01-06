@@ -122,9 +122,7 @@ class StrModule
             $result = $this->mb_mode_static();
 
         } else {
-            $_fn = $this->mb_mode_static()
-                ? 'mb_' . $fn
-                : $fn;
+            $_fn = $this->mb_func($fn);
 
             $result = $_fn(...$args);
         }
@@ -831,5 +829,54 @@ class StrModule
         $result = $this->upper($result);
 
         return $result;
+    }
+
+
+    /**
+     * @return \Generator<string>
+     */
+    public function trim_it($strings, string $characters = null) : \Generator
+    {
+        $_characters = $characters ?? " \n\r\t\v\0";
+
+        $_strings = is_iterable($strings)
+            ? $strings
+            : (is_string($strings) ? [ $strings ] : []);
+
+        foreach ( $_strings as $string ) {
+            yield trim($string, $_characters);
+        }
+    }
+
+    /**
+     * @return \Generator<string>
+     */
+    public function ltrim_it($strings, string $characters = null) : \Generator
+    {
+        $_characters = $characters ?? " \n\r\t\v\0";
+
+        $_strings = is_iterable($strings)
+            ? $strings
+            : (is_string($strings) ? [ $strings ] : []);
+
+        foreach ( $_strings as $string ) {
+            yield ltrim($string, $_characters);
+        }
+    }
+
+    /**
+     * @return \Generator<string>
+     */
+    public function rtrim_it($strings, string $characters = null) : \Generator
+    {
+        $_characters = $characters ?? " \n\r\t\v\0";
+
+        $_strings = is_iterable($strings)
+            ? $strings
+            : (is_string($strings) ? [ $strings ] : []);
+
+        foreach ( $_strings as $string ) {
+            yield rtrim($string, $_characters);
+        }
     }
 }

@@ -116,7 +116,7 @@ class FsModule
      *
      * @return \Generator<\SplFileInfo>
      */
-    public function dir_walk(
+    public function dir_walk_it(
         string $dirpath,
         array $recursiveDirectoryIteratorArgs = null,
         array $recursiveIteratorIteratorArgs = null

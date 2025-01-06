@@ -551,8 +551,8 @@ class Slugger implements SluggerInterface
                 $sequenceCase[ $idx ][] = $fnStrToUpper($letter);
             }
 
-            $keysCase = iterator_to_array($theItertools->product(...$keysCase));
-            $sequenceCase = iterator_to_array($theItertools->product(...$sequenceCase));
+            $keysCase = iterator_to_array($theItertools->product_it(...$keysCase));
+            $sequenceCase = iterator_to_array($theItertools->product_it(...$sequenceCase));
 
             foreach ( array_keys($keysCase) as $idx ) {
                 $search = implode('', $keysCase[ $idx ]);

@@ -53,7 +53,7 @@ class HttpModule
 
         $result = [];
 
-        foreach ( Lib::arr()->walk($headersArrays) as $path => $header ) {
+        foreach ( Lib::arr()->walk_it($headersArrays) as $path => $header ) {
             /** @var string[] $path */
 
             if (null === ($_header = Lib::parse()->string_not_empty($header))) {
@@ -413,9 +413,9 @@ class HttpModule
         $dataArraysKeys = array_keys($dataArrays);
 
         foreach (
-            Lib::arr()->walk_collect(
+            Lib::arr()->walk_collect_it(
                 $dataArrays,
-                _ARRAY_WALK_WITH_EMPTY_ARRAYS,
+                _ARR_WALK_WITH_EMPTY_ARRAYS,
                 [ null ]
             ) as $path => $values
         ) {
@@ -429,9 +429,9 @@ class HttpModule
         }
 
         foreach (
-            Lib::arr()->walk(
+            Lib::arr()->walk_it(
                 $dataArrays,
-                _ARRAY_WALK_WITH_EMPTY_ARRAYS
+                _ARR_WALK_WITH_EMPTY_ARRAYS
             )
             as $path => $value
         ) {
@@ -460,9 +460,9 @@ class HttpModule
         $dataArraysKeys = array_keys($dataArrays);
 
         foreach (
-            Lib::arr()->walk_collect(
+            Lib::arr()->walk_collect_it(
                 $dataArrays,
-                _ARRAY_WALK_WITH_EMPTY_ARRAYS,
+                _ARR_WALK_WITH_EMPTY_ARRAYS,
                 [ null ]
             ) as $path => $values
         ) {
@@ -476,9 +476,9 @@ class HttpModule
         }
 
         foreach (
-            Lib::arr()->walk(
+            Lib::arr()->walk_it(
                 $dataArrays,
-                _ARRAY_WALK_WITH_EMPTY_ARRAYS
+                _ARR_WALK_WITH_EMPTY_ARRAYS
             )
             as $path => $value
         ) {

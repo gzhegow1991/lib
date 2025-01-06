@@ -190,7 +190,11 @@ class AssertModule
 
         $stdout = $this->resource_static();
 
-        $isDiff = Lib::debug()->diff($output, $expect, $diff);
+        $isDiff = Lib::debug()->diff(
+            trim($output),
+            trim($expect),
+            $diff
+        );
 
         if ($isDiff) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';

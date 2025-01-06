@@ -6,6 +6,11 @@ namespace Gzhegow\Lib\Modules\BcMath;
 class BcNumber
 {
     /**
+     * @var string
+     */
+    protected $value;
+
+    /**
      * @var mixed
      */
     protected $original;
@@ -17,16 +22,38 @@ class BcNumber
     /**
      * @var string
      */
-    protected $integral;
+    protected $integerPart;
     /**
      * @var string
      */
-    protected $fractional;
+    protected $fractionalPart;
 
     /**
      * @var int
      */
     protected $scale;
+
+
+    public function __construct(
+        $original,
+        //
+        string $minus,
+        string $integerPart,
+        string $fractionalPart,
+        //
+        int $scale
+    )
+    {
+        $this->original = $original;
+
+        $this->minus = $minus;
+        $this->integerPart = $integerPart;
+        $this->fractionalPart = $fractionalPart;
+
+        $this->scale = $scale;
+
+        $this->value = "{$this->minus}{$this->integerPart}{$this->fractionalPart}";
+    }
 
 
     public function __toString()
@@ -35,23 +62,9 @@ class BcNumber
     }
 
 
-    public function __construct(
-        $original,
-        //
-        string $minus,
-        string $integral,
-        string $fractional,
-        //
-        int $scale
-    )
+    public function getOriginal() // : mixed
     {
-        $this->original = $original;
-
-        $this->minus = $minus;
-        $this->integral = $integral;
-        $this->fractional = $fractional;
-
-        $this->scale = $scale;
+        return $this->original;
     }
 
 
@@ -60,14 +73,14 @@ class BcNumber
         return $this->minus;
     }
 
-    public function getIntegral() : string
+    public function getIntegerPart() : string
     {
-        return $this->integral;
+        return $this->integerPart;
     }
 
-    public function getFractional() : string
+    public function getFractionalPart() : string
     {
-        return $this->fractional;
+        return $this->fractionalPart;
     }
 
 
@@ -79,16 +92,16 @@ class BcNumber
 
     public function getValue() : string
     {
-        return "{$this->minus}{$this->integral}{$this->fractional}";
+        return $this->value;
     }
 
     public function getAbsolute() : string
     {
-        return "{$this->integral}{$this->fractional}";
+        return "{$this->integerPart}{$this->fractionalPart}";
     }
 
-    public function getFloor() : string
+    public function getInteger() : string
     {
-        return "{$this->minus}{$this->integral}";
+        return "{$this->minus}{$this->integerPart}";
     }
 }
