@@ -10,6 +10,10 @@ if (! defined('_BOOL_UNDEFINED')) define('_BOOL_UNDEFINED', NAN);
 
 class BoolModule
 {
+    const NIL       = _BOOL_NIL;
+    const UNDEFINED = _BOOL_UNDEFINED;
+
+
     public function is_null($value) : bool
     {
         return null === $value;

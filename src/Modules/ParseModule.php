@@ -11,6 +11,9 @@ if (! defined('_PARSE_DECIMAL_POINT')) define('_PARSE_DECIMAL_POINT', localeconv
 
 class ParseModule
 {
+    const DECIMAL_POINT = _PARSE_DECIMAL_POINT;
+
+
     public function userbool($value) : ?bool
     {
         if (is_bool($value)) {
