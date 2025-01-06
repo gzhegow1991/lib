@@ -13,7 +13,6 @@ composer require gzhegow/lib;
 ```php
 <?php
 
-require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 
@@ -77,7 +76,6 @@ function _assert_output(
 {
     $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-    \Gzhegow\Lib\Lib::assert()->resource_static(STDOUT);
     \Gzhegow\Lib\Lib::assert()->output($trace, $fn, $expect);
 }
 

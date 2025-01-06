@@ -12,31 +12,35 @@ class AssertModule
     /**
      * @var resource
      */
-    protected $resource = STDOUT;
+    protected $stdoutResource = STDOUT;
 
 
     /**
-     * @param resource|null $resource
+     * @param array{ 0: resource|null }|null $stdoutResource
      *
      * @return resource|null
      */
-    public function resource_static($resource = null) // : ?resource
+    public function stdout_resource_static(array $stdoutResource = []) // : ?resource
     {
-        if (null !== $resource) {
-            if (! is_resource($resource)) {
-                throw new LogicException(
-                    [ 'The `resource` must be opened resource', $resource ]
-                );
+        if (count($stdoutResource)) {
+            [ $h ] = $stdoutResource;
+
+            if (null !== $h) {
+                if (! is_resource($stdoutResource)) {
+                    throw new LogicException(
+                        [ 'The `resource` must be opened resource', $stdoutResource ]
+                    );
+                }
             }
 
-            $last = $this->resource;
+            $last = $this->stdoutResource;
 
-            $current = $resource;
+            $current = $stdoutResource;
 
             $result = $last;
         }
 
-        $result = $result ?? $this->resource;
+        $result = $result ?? $this->stdoutResource;
 
         return $result;
     }
@@ -54,7 +58,7 @@ class AssertModule
             ? $value()
             : $value;
 
-        $stdout = $this->resource_static();
+        $stdout = $this->stdout_resource_static();
 
         if ($_value !== $expect) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
@@ -98,7 +102,7 @@ class AssertModule
             ? $value()
             : $value;
 
-        $stdout = Lib::assert()->resource_static();
+        $stdout = Lib::assert()->stdout_resource_static();
 
         if ($_value === $expect) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
@@ -141,7 +145,7 @@ class AssertModule
 
         $result = $var;
 
-        $stdout = $this->resource_static();
+        $stdout = $this->stdout_resource_static();
 
         if ($result !== $expect) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
@@ -188,7 +192,7 @@ class AssertModule
 
         $output = $var;
 
-        $stdout = $this->resource_static();
+        $stdout = $this->stdout_resource_static();
 
         $isDiff = Lib::debug()->diff(
             trim($output),
@@ -267,7 +271,7 @@ class AssertModule
             }
         }
 
-        $stdout = Lib::assert()->resource_static();
+        $stdout = Lib::assert()->stdout_resource_static();
 
         if ($isError) {
             if (null !== $stdout) {

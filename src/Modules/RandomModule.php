@@ -8,7 +8,48 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 class RandomModule
 {
+    /**
+     * @var callable
+     */
+    protected $uuidFn;
+
+
+    public function __construct()
+    {
+        $this->uuidFn = [ $this, '_uuid' ];
+    }
+
+
+    /**
+     * @param callable $fn
+     *
+     * @return callable|null
+     */
+    public function uuid_fn_static($fn = null) // : ?callable
+    {
+        if (null !== $fn) {
+            $last = $this->uuidFn;
+
+            $this->uuidFn = $fn;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->uuidFn;
+
+        return $result;
+    }
+
     public function uuid() : string
+    {
+        $fn = $this->uuid_fn_static();
+
+        $uuid = call_user_func($fn);
+
+        return $uuid;
+    }
+
+    protected function _uuid() : string
     {
         $bytes = $this->random_bytes(16);
 

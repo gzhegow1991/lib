@@ -63,7 +63,6 @@ function _assert_output(
 {
     $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-    \Gzhegow\Lib\Lib::assert()->resource_static(STDOUT);
     \Gzhegow\Lib\Lib::assert()->output($trace, $fn, $expect);
 }
 
