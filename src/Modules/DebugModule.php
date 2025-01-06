@@ -348,7 +348,7 @@ class DebugModule
         if ($withValue) {
             foreach ( $theArr->walk_it(
                 $arrayCopy,
-                _ARR_WALK_WITH_EMPTY_ARRAYS | _ARR_WALK_WITH_PARENTS
+                ArrModule::WALK_WITH_EMPTY_ARRAYS | ArrModule::WALK_WITH_PARENTS
             ) as $path => &$value ) {
                 /** @var array $path */
 

@@ -77,7 +77,7 @@ class BcmathModule
         [
             $valueAbsFloor,
             $valueAbsFrac,
-        ] = explode(_PARSE_DECIMAL_POINT, $valueAbs) + [ '0', '' ];
+        ] = explode(ParseModule::DECIMAL_POINT, $valueAbs) + [ '0', '' ];
 
         $valueAbsFloor = ltrim($valueAbsFloor, '0');  // 0000.1
         $valueAbsFrac = rtrim($valueAbsFrac, '0');    // 1.0000
@@ -458,7 +458,7 @@ class BcmathModule
 
         $scaleParsed = 0;
 
-        $frac = strrchr($_number, _PARSE_DECIMAL_POINT);
+        $frac = strrchr($_number, ParseModule::DECIMAL_POINT);
 
         if (false !== $frac) {
             $scaleParsed = strlen($frac) - 1;

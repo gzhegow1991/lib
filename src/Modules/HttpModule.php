@@ -415,7 +415,7 @@ class HttpModule
         foreach (
             Lib::arr()->walk_collect_it(
                 $dataArrays,
-                _ARR_WALK_WITH_EMPTY_ARRAYS,
+                ArrModule::WALK_WITH_EMPTY_ARRAYS,
                 [ null ]
             ) as $path => $values
         ) {
@@ -431,7 +431,7 @@ class HttpModule
         foreach (
             Lib::arr()->walk_it(
                 $dataArrays,
-                _ARR_WALK_WITH_EMPTY_ARRAYS
+                ArrModule::WALK_WITH_EMPTY_ARRAYS
             )
             as $path => $value
         ) {
@@ -462,7 +462,7 @@ class HttpModule
         foreach (
             Lib::arr()->walk_collect_it(
                 $dataArrays,
-                _ARR_WALK_WITH_EMPTY_ARRAYS,
+                ArrModule::WALK_WITH_EMPTY_ARRAYS,
                 [ null ]
             ) as $path => $values
         ) {
@@ -478,7 +478,7 @@ class HttpModule
         foreach (
             Lib::arr()->walk_it(
                 $dataArrays,
-                _ARR_WALK_WITH_EMPTY_ARRAYS
+                ArrModule::WALK_WITH_EMPTY_ARRAYS
             )
             as $path => $value
         ) {
