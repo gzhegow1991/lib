@@ -263,9 +263,9 @@ TRUE
 
 
 // >>> TEST
-// > тесты BcMathModule
+// > тесты BcmathModule
 $fn = function () {
-    _dump('[ BcMathModule ]');
+    _dump('[ BcmathModule ]');
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 0);
@@ -355,50 +355,50 @@ $fn = function () {
     echo PHP_EOL;
 };
 _assert_output($fn, '
-"[ BcMathModule ]"
+"[ BcmathModule ]"
 
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "2" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "1.01" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-1" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "2" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1.01" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1" }
 
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "2" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "1.01" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-2" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-1.01" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "2" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1.01" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-2" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1.01" }
 
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "1" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "1" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-2" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-1.01" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-2" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1.01" }
 
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "1" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "1" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-1" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1" }
 
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "2" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "1" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "2" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
 
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "1.5" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "1.05" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "1.01" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1.5" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1.05" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1.01" }
 
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-2" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-1" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-2" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1" }
 
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-1.5" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-1.05" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "-1.01" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1.5" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1.05" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1.01" }
 
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "4" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "4" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
 
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "24" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "40" }
-{ object(stringable) # Gzhegow\Lib\Modules\BcMath\BcNumber # "40" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "24" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "40" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "40" }
 ');
 
 

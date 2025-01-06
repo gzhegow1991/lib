@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\BcMath\BcNumber;
+use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
@@ -50,9 +50,9 @@ class BcmathModule
     }
 
 
-    public function parse_bcnum($value, int &$scaleParsed = null) : ?BcNumber
+    public function parse_bcnum($value, int &$scaleParsed = null) : ?Bcnumber
     {
-        if ($value instanceof BcNumber) {
+        if ($value instanceof Bcnumber) {
             return $value;
         }
 
@@ -88,7 +88,7 @@ class BcmathModule
         $integral = (('' !== $valueAbsFloor) ? $valueAbsFloor : "0");
         $fractional = (('' !== $valueAbsFrac) ? ".{$valueAbsFrac}" : "");
 
-        $bcnum = new BcNumber(
+        $bcnum = new Bcnumber(
             $value,
             $minus,
             $integral,
@@ -190,7 +190,7 @@ class BcmathModule
     }
 
 
-    public function bcceil($num, int $scale = 0) : BcNumber
+    public function bcceil($num, int $scale = 0) : Bcnumber
     {
         if (null === ($bcnum = $this->parse_bcnum($num))) {
             throw new LogicException(
@@ -246,7 +246,7 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcfloor($num, int $scale = 0) : BcNumber
+    public function bcfloor($num, int $scale = 0) : Bcnumber
     {
         if (null === ($bcnum = $this->parse_bcnum($num))) {
             throw new LogicException(
@@ -302,7 +302,7 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcround($num, int $scale = 0) : BcNumber
+    public function bcround($num, int $scale = 0) : Bcnumber
     {
         if (null === ($bcnum = $this->parse_bcnum($num))) {
             throw new LogicException(
@@ -357,7 +357,7 @@ class BcmathModule
     }
 
 
-    public function bcmoneyceil($num, int $scale = 0) : BcNumber
+    public function bcmoneyceil($num, int $scale = 0) : Bcnumber
     {
         if (null === ($bcnum = $this->parse_bcnum($num))) {
             throw new LogicException(
@@ -416,7 +416,7 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcmoneyfloor($num, int $scale = 0) : BcNumber
+    public function bcmoneyfloor($num, int $scale = 0) : Bcnumber
     {
         if (null === ($bcnum = $this->parse_bcnum($num))) {
             throw new LogicException(
@@ -492,7 +492,7 @@ class BcmathModule
     }
 
 
-    public function bcadd($num1, $num2, int $scale = null) : BcNumber
+    public function bcadd($num1, $num2, int $scale = null) : Bcnumber
     {
         $bcnum1 = null
             ?? $this->parse_bcnum($num1)
@@ -517,7 +517,7 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcsub($num1, $num2, int $scale = null) : BcNumber
+    public function bcsub($num1, $num2, int $scale = null) : Bcnumber
     {
         $bcnum1 = null
             ?? $this->parse_bcnum($num1)
@@ -542,7 +542,7 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcmul($num1, $num2, int $scale = null) : BcNumber
+    public function bcmul($num1, $num2, int $scale = null) : Bcnumber
     {
         $bcnum1 = null
             ?? $this->parse_bcnum($num1)
@@ -578,7 +578,7 @@ class BcmathModule
     /**
      * > gzhegow, поскольку при делении число дробных знаков может увелится, параметр $scale сделан обязательным
      */
-    public function bcdiv($num1, $num2, int $scale) : BcNumber
+    public function bcdiv($num1, $num2, int $scale) : Bcnumber
     {
         $bcnum1 = null
             ?? $this->parse_bcnum($num1)
@@ -606,7 +606,7 @@ class BcmathModule
      * > gzhegow, оригинальная функция ожидает три аргумента, но это противоречит самой идее получения остатка от деления
      * > перед взятием остатка дробная часть обоих чисел отбрасывается
      */
-    public function bcmod($num1, $num2) : BcNumber
+    public function bcmod($num1, $num2) : Bcnumber
     {
         $bcnum1 = null
             ?? $this->parse_bcnum($num1)
@@ -628,7 +628,7 @@ class BcmathModule
     }
 
 
-    public function bcpow($num, int $exponent, int $scale = null) : BcNumber
+    public function bcpow($num, int $exponent, int $scale = null) : Bcnumber
     {
         $bcnum = null
             ?? $this->parse_bcnum($num)
@@ -658,7 +658,7 @@ class BcmathModule
     }
 
 
-    public function bcsqrt($num, int $scale) : BcNumber
+    public function bcsqrt($num, int $scale) : Bcnumber
     {
         $bcnum = null
             ?? $this->parse_bcnum($num)
@@ -677,7 +677,7 @@ class BcmathModule
     }
 
 
-    public function bcgcd($num1, $num2) : BcNumber
+    public function bcgcd($num1, $num2) : Bcnumber
     {
         $bcNum1 = null
             ?? $this->parse_bcnum($num1)
@@ -702,7 +702,7 @@ class BcmathModule
         return $bcgcd;
     }
 
-    public function bclcm($num1, $num2) : BcNumber
+    public function bclcm($num1, $num2) : Bcnumber
     {
         $bcNum1 = null
             ?? $this->parse_bcnum($num1)

@@ -1,9 +1,9 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\BcMath;
+namespace Gzhegow\Lib\Modules\Bcmath;
 
 
-class BcNumber
+class Bcnumber
 {
     /**
      * @var string

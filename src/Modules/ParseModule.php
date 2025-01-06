@@ -4,7 +4,7 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Crypt\Alphabet;
-use Gzhegow\Lib\Modules\BcMath\BcNumber;
+use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
 
 
 if (! defined('_PARSE_DECIMAL_POINT')) define('_PARSE_DECIMAL_POINT', localeconv()[ 'decimal_point' ]);
@@ -432,7 +432,7 @@ class ParseModule
     }
 
 
-    public function bcnum($value) : ?BcNumber
+    public function bcnum($value) : ?Bcnumber
     {
         return Lib::bcmath()->parse_bcnum($value);
     }
