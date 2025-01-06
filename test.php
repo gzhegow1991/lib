@@ -66,6 +66,15 @@ function _assert_output(
     \Gzhegow\Lib\Lib::assert()->output($trace, $fn, $expect);
 }
 
+function _assert_microtime(
+    \Closure $fn, float $expectMax = null, float $expectMin = null
+) : void
+{
+    $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+    \Gzhegow\Lib\Lib::assert()->microtime($trace, $fn, $expectMax, $expectMin);
+}
+
 
 
 // >>> TEST
