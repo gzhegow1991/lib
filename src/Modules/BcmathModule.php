@@ -10,7 +10,7 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-class BcmathModule2
+class BcmathModule
 {
     /**
      * @var int

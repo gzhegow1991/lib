@@ -16,7 +16,7 @@ use Gzhegow\Lib\Modules\HttpModule;
 use Gzhegow\Lib\Modules\DebugModule;
 use Gzhegow\Lib\Modules\ParseModule;
 use Gzhegow\Lib\Modules\CryptModule;
-use Gzhegow\Lib\Modules\BcmathModule2;
+use Gzhegow\Lib\Modules\BcmathModule;
 use Gzhegow\Lib\Modules\AssertModule;
 use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
@@ -53,15 +53,15 @@ class Lib
     }
 
     /**
-     * @return BcmathModule2
+     * @return BcmathModule
      */
-    public static function bcmath(BcmathModule2 $instance = null)
+    public static function bcmath(BcmathModule $instance = null)
     {
         $key = __FUNCTION__;
 
         return static::$modules[ $key ] = $instance
             ?? static::$modules[ $key ]
-            ?? new BcmathModule2();
+            ?? new BcmathModule();
     }
 
     /**
