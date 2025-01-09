@@ -88,6 +88,86 @@ class BoolModule
     }
 
 
+    public function is_nan($value) : bool
+    {
+        return is_float($value) && is_nan($value);
+    }
+
+    public function is_not_nan($value, &$result = null) : bool
+    {
+        $result = null;
+
+        if ($this->is_nan($value)) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    public function assert_not_nan($value, ...$throwableArgs) // : ?mixed
+    {
+        $this->is_not_nan($value, $result) || Lib::php()->throw(...$throwableArgs);
+
+        return $result;
+    }
+
+    public function not_nan(array $array) : array
+    {
+        foreach ( $array as $idx => $value ) {
+            if ($this->is_nan($value)) {
+                unset($array[ $idx ]);
+            }
+        }
+
+        return $array;
+    }
+
+
+    public function is_empty($value, &$result = null) : bool
+    {
+        if (empty($value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function is_not_empty($value, &$result = null) : bool
+    {
+        $result = null;
+
+        if (empty($value)) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    public function assert_not_empty($value, ...$throwableArgs) // : ?mixed
+    {
+        $this->is_not_empty($value, $result) || Lib::php()->throw(...$throwableArgs);
+
+        return $result;
+    }
+
+    public function not_empty(array $array) : array
+    {
+        foreach ( $array as $idx => $value ) {
+            if ($this->is_empty($value)) {
+                unset($array[ $idx ]);
+            }
+        }
+
+        return $array;
+    }
+
+
     /**
      * @noinspection PhpMissingReturnTypeInspection
      *
@@ -135,43 +215,6 @@ class BoolModule
     }
 
 
-    public function is_nan($value) : bool
-    {
-        return is_float($value) && is_nan($value);
-    }
-
-    public function is_not_nan($value, &$result = null) : bool
-    {
-        $result = null;
-
-        if ($this->is_nan($value)) {
-            return false;
-        }
-
-        $result = $value;
-
-        return true;
-    }
-
-    public function assert_not_nan($value, ...$throwableArgs) // : ?mixed
-    {
-        $this->is_not_nan($value, $result) || Lib::php()->throw(...$throwableArgs);
-
-        return $result;
-    }
-
-    public function not_nan(array $array) : array
-    {
-        foreach ( $array as $idx => $value ) {
-            if ($this->is_nan($value)) {
-                unset($array[ $idx ]);
-            }
-        }
-
-        return $array;
-    }
-
-
     public function undefined() : float
     {
         return _BOOL_UNDEFINED;
@@ -206,49 +249,6 @@ class BoolModule
     {
         foreach ( $array as $idx => $value ) {
             if ($this->is_undefined($value)) {
-                unset($array[ $idx ]);
-            }
-        }
-
-        return $array;
-    }
-
-
-    public function is_empty($value, &$result = null) : bool
-    {
-        if (empty($value)) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public function is_not_empty($value, &$result = null) : bool
-    {
-        $result = null;
-
-        if (empty($value)) {
-            return false;
-        }
-
-        $result = $value;
-
-        return true;
-    }
-
-    public function assert_not_empty($value, ...$throwableArgs) // : ?mixed
-    {
-        $this->is_not_empty($value, $result) || Lib::php()->throw(...$throwableArgs);
-
-        return $result;
-    }
-
-    public function not_empty(array $array) : array
-    {
-        foreach ( $array as $idx => $value ) {
-            if ($this->is_empty($value)) {
                 unset($array[ $idx ]);
             }
         }

@@ -90,115 +90,14 @@ function _assert_microtime(
 
 
 
-// >>> TEST
-// > тесты StrModule
-$fn = function () {
-    _dump('[ StrModule ]');
-    echo PHP_EOL;
-
-    _dump(\Gzhegow\Lib\Lib::str()->lines("hello\nworld"));
-
-    _dump(\Gzhegow\Lib\Lib::str()->eol('hello' . PHP_EOL . 'world'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->strlen('Привет'));
-    _dump(\Gzhegow\Lib\Lib::str()->strlen('Hello'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->strsize('Привет'));
-    _dump(\Gzhegow\Lib\Lib::str()->strsize('Hello'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->lower('ПРИВЕТ'));
-    _dump(\Gzhegow\Lib\Lib::str()->upper('привет'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->lcfirst('ПРИВЕТ'));
-    _dump(\Gzhegow\Lib\Lib::str()->ucfirst('привет'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->lcwords('ПРИВЕТ МИР'));
-    _dump(\Gzhegow\Lib\Lib::str()->ucwords('привет мир'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->starts('привет', 'при'));
-    _dump(\Gzhegow\Lib\Lib::str()->ends('привет', 'вет'));
-    _dump(\Gzhegow\Lib\Lib::str()->contains('привет', 'ив'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->lcrop('азаза_привет_азаза', 'аза'));
-    _dump(\Gzhegow\Lib\Lib::str()->rcrop('азаза_привет_азаза', 'аза'));
-    _dump(\Gzhegow\Lib\Lib::str()->crop('азаза_привет_азаза', 'аза'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->unlcrop('"привет"', '"'));
-    _dump(\Gzhegow\Lib\Lib::str()->unrcrop('"привет"', '"'));
-    _dump(\Gzhegow\Lib\Lib::str()->uncrop('"привет"', '"'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->replace_limit('за', '_', 'азазазазазаза', 3));
-
-    _dump(\Gzhegow\Lib\Lib::str()->camel('-hello-world-foo-bar'));
-    _dump(\Gzhegow\Lib\Lib::str()->camel('-helloWorldFooBar'));
-    _dump(\Gzhegow\Lib\Lib::str()->camel('-HelloWorldFooBar'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->pascal('-hello-world-foo-bar'));
-    _dump(\Gzhegow\Lib\Lib::str()->pascal('-helloWorldFooBar'));
-    _dump(\Gzhegow\Lib\Lib::str()->pascal('-HelloWorldFooBar'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->space('_Hello_WORLD_Foo_BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->snake('-Hello-WORLD-Foo-BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->kebab(' Hello WORLD Foo BAR'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->space_lower('_Hello_WORLD_Foo_BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->snake_lower('-Hello-WORLD-Foo-BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->kebab_lower(' Hello WORLD Foo BAR'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->space_upper('_Hello_WORLD_Foo_BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->snake_upper('-Hello-WORLD-Foo-BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->kebab_upper(' Hello WORLD Foo BAR'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->inflector()->singularize('users'));
-    _dump(\Gzhegow\Lib\Lib::str()->inflector()->pluralize('user'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир'));
-};
-_assert_output($fn, '
-"[ StrModule ]"
-
-[ "hello", "world" ]
-"hello\n world"
-6
-5
-12
-5
-"привет"
-"ПРИВЕТ"
-"пРИВЕТ"
-"Привет"
-"пРИВЕТ мИР"
-"Привет Мир"
-"вет"
-"при"
-[ "пр", "ет" ]
-"за_привет_азаза"
-"азаза_привет_аз"
-"за_привет_аз"
-"\"привет\""
-"\"привет\""
-"\"привет\""
-"а___зазаза"
-"helloWorldFooBar"
-"helloWorldFooBar"
-"helloWorldFooBar"
-"HelloWorldFooBar"
-"HelloWorldFooBar"
-"HelloWorldFooBar"
-" Hello WORLD Foo BAR"
-"_Hello_WORLD_Foo_BAR"
-"-Hello-WORLD-Foo-BAR"
-" hello world foo bar"
-"_hello_world_foo_bar"
-"-hello-world-foo-bar"
-" HELLO WORLD FOO BAR"
-"_HELLO_WORLD_FOO_BAR"
-"-HELLO-WORLD-FOO-BAR"
-[ "user" ]
-[ "users" ]
-"privet-mir"
-
-');
+// // >>> TEST
+// $fn = function () {
+//     _dump('[ TEST ]');
+//     echo PHP_EOL;
+// };
+// _assert_output($fn, '
+// ');
+// dd();
 
 
 // >>> ЗАПУСКАЕМ!
@@ -276,89 +175,89 @@ $fn = function () {
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 0);
-    _dump($result); // "2"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 2);
-    _dump($result); // "1.01"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 0);
-    _dump($result); // "-1"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 2);
-    _dump($result); // "-1"
+    _dump($result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 0);
-    _dump($result); // "2"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 2);
-    _dump($result); // "1.01"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 0);
-    _dump($result); // "-2"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 2);
-    _dump($result); // "-1.01"
+    _dump($result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005', 0);
-    _dump($result); // "1"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005', 2);
-    _dump($result); // "1"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005', 0);
-    _dump($result); // "-2"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005', 2);
-    _dump($result); // "-1.01"
+    _dump($result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 0);
-    _dump($result); // "1"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 2);
-    _dump($result); // "1"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 0);
-    _dump($result); // "-1"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 2);
-    _dump($result); // "-1"
+    _dump($result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 0);
-    _dump($result); // "2"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.05', 0);
-    _dump($result); // "1"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 0);
-    _dump($result); // "1"
+    _dump($result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 2);
-    _dump($result); // "1.5"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.05', 2);
-    _dump($result); // "1.05"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 2);
-    _dump($result); // "1.01"
+    _dump($result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.5', 0);
-    _dump($result); // "-2"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.05', 0);
-    _dump($result); // "-1"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.005', 0);
-    _dump($result); // "-1"
+    _dump($result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.5', 2);
-    _dump($result); // "-1.5"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.05', 2);
-    _dump($result); // "-1.05"
+    _dump($result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.005', 2);
-    _dump($result); // "-1.01"
+    _dump($result);
     echo PHP_EOL;
 
     $gcd = \Gzhegow\Lib\Lib::bcmath()->bcgcd(8, 12);
-    _dump($gcd); // "4"
+    _dump($gcd);
     $gcd = \Gzhegow\Lib\Lib::bcmath()->bcgcd(7, 13);
-    _dump($gcd); // "1"
+    _dump($gcd);
     echo PHP_EOL;
 
     $lcm = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 6);
-    _dump($lcm); // "24"
+    _dump($lcm);
     $lcm = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 5);
-    _dump($lcm); // "40"
+    _dump($lcm);
     $lcm = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 10);
-    _dump($lcm); // "40"
+    _dump($lcm);
     echo PHP_EOL;
 };
 _assert_output($fn, '
@@ -416,39 +315,39 @@ $fn = function () {
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, '01');
-    _dump($enc); // "0"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '01');
-    _dump($dec); // "0"
+    _dump($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(3, '01');
-    _dump($enc); // "11"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '01');
-    _dump($dec); // "3"
+    _dump($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, '01234567');
-    _dump($enc); // "0"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '01234567');
-    _dump($dec); // "0"
+    _dump($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(15, '01234567');
-    _dump($enc); // "17"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '01234567');
-    _dump($dec); // "15"
+    _dump($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, '0123456789ABCDEF');
-    _dump($enc); // "0"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '0123456789ABCDEF');
-    _dump($dec); // "0"
+    _dump($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(31, '0123456789ABCDEF');
-    _dump($enc); // "1F"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '0123456789ABCDEF');
-    _dump($dec); // "31"
+    _dump($dec);
     echo PHP_EOL;
 
 
@@ -456,27 +355,27 @@ $fn = function () {
 
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($enc); // "A"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($dec); // "0"
+    _dump($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(10, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($enc); // "K"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($dec); // "10"
+    _dump($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(25, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($enc); // "Z"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($dec); // "25"
+    _dump($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(26, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($enc); // "BA"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($dec); // "26"
+    _dump($dec);
     echo PHP_EOL;
 
     try {
@@ -488,21 +387,21 @@ $fn = function () {
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(10, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _dump($enc); // "J"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _dump($dec); // "10"
+    _dump($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(26, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _dump($enc); // "Z"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _dump($dec); // "26"
+    _dump($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(27, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _dump($enc); // "AA"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _dump($dec); // "27"
+    _dump($dec);
     echo PHP_EOL;
 
 
@@ -532,17 +431,33 @@ $fn = function () {
 
 
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('1', '01');
-    _dump($enc); // "1"
+    _dump($enc);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('11', '0123');
-    _dump($enc); // "3"
+    _dump($enc);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('111', '01234567');
-    _dump($enc); // "7"
+    _dump($enc);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('1111', '0123456789ABCDEF');
-    _dump($enc); // "F"
+    _dump($enc);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('11111', '0123456789ABCDEFGHIJKLMNOPQRSTUV');
-    _dump($enc); // "V"
+    _dump($enc);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('111111', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/');
-    _dump($enc); // "/"
+    _dump($enc);
+    echo PHP_EOL;
+
+
+    echo PHP_EOL;
+
+
+    $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin([ '你' ]);
+    _dump_array($binaries);
+    $letters = \Gzhegow\Lib\Lib::crypt()->bin2text($binaries);
+    _dump_array($letters);
+    echo PHP_EOL;
+
+    $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin([ '你好' ]);
+    _dump_array($binaries);
+    $letters = \Gzhegow\Lib\Lib::crypt()->bin2text($binaries);
+    _dump_array($letters);
     echo PHP_EOL;
 
 
@@ -550,22 +465,26 @@ $fn = function () {
 
 
     $binary = decbin(5678);
-    _dump($binary); // "1011000101110"
+    _dump($binary);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase($binary, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    _dump($enc); // "uYB"
+    _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2bin($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    _dump($dec); // "001011000101110"
+    _dump($dec);
     $decimal = bindec($dec);
-    _dump($decimal); // "5678"
+    _dump($decimal);
     echo PHP_EOL;
 
-    $binaries = \Gzhegow\Lib\Lib::crypt()->letters_to_binaries([ 'hello' ]);
-    _dump_array($binaries); // [ "01101000", "01100101", "01101100", "01101100", "01101111" ]
+    $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin([ 'hello' ]);
+    _dump_array($binaries);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2base($binaries, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    _dump($enc); // "aGVsbG8"
+    _dump($enc);
     $list = \Gzhegow\Lib\Lib::crypt()->base2bin($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    _dump($list); // [ "01101000", "01100101", "01101100", "01101100", "01101111" ]
+    _dump($list);
     echo PHP_EOL;
+
+
+    echo PHP_EOL;
+
 
     $gen = (function () { yield 'hello'; })();
     $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($gen);
@@ -573,16 +492,21 @@ $fn = function () {
     foreach ( $gen as $letter ) {
         $enc .= $letter;
     }
-    _dump($enc);
     $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_it($enc);
-    $dec = iterator_to_array($gen);
+    $dec = '';
+    foreach ( $gen as $letter ) {
+        $dec .= $letter;
+    }
     _dump($dec);
     echo PHP_EOL;
 
     $gen = (function () { yield 'hello'; })();
     $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($gen);
     $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_it($gen);
-    $dec = iterator_to_array($gen);
+    $dec = '';
+    foreach ( $gen as $letter ) {
+        $dec .= $letter;
+    }
     _dump($dec);
     echo PHP_EOL;
 
@@ -692,6 +616,13 @@ _assert_output($fn, '
 "/"
 
 
+[ "111001001011110110100000" ]
+[ "你" ]
+
+[ "111001001011110110100000", "111001011010010110111101" ]
+[ "你", "好" ]
+
+
 "1011000101110"
 "uYB"
 "0001011000101110"
@@ -701,10 +632,10 @@ _assert_output($fn, '
 "aGVsbG8"
 [ "01101000", "01100101", "01101100", "01101100", "01101111" ]
 
-"aGVsbG8="
-[ "h", "e", "l", "l", "o" ]
 
-[ "h", "e", "l", "l", "o" ]
+"hello"
+
+"hello"
 
 
 "Cn8eVZg"
