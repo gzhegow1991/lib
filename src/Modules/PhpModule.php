@@ -726,20 +726,25 @@ class PhpModule
      * > gzhegow, функция get_object_vars() возвращает все элементы для $this, в том числе protected/private
      * > чтобы получить доступ только к публичным свойствам, её нужно вызвать в обертке
      */
-    public function get_object_vars(object $object, bool $publicOnly = null) : array
+    public function get_object_vars(object $object, bool $public = null) : array
     {
-        $publicOnly = $publicOnly ?? true;
-
-        if ($publicOnly) {
-            $fn = 'get_object_vars';
+        if ($public === true) {
+            $vars = get_object_vars($object);
 
         } else {
-            $fn = (function (object $object) {
+            $fn = (function (object $object) : array {
                 return get_object_vars($object);
             })->bindTo($object, $object);
-        }
 
-        $vars = $fn($object);
+            $vars = $fn();
+
+            if ($public === false) {
+                $vars = array_diff_key(
+                    $vars,
+                    get_object_vars($object)
+                );
+            }
+        }
 
         return $vars;
     }
@@ -748,11 +753,9 @@ class PhpModule
      * > gzhegow, функция property_exists() возвращает все свойства, в том числе protected/private
      * > чтобы получить доступ только к публичным свойствам, нужно прибегнуть к вот такой хитрости
      */
-    public function property_exists(object $object_or_class, string $property, bool $publicOnly = null) : bool
+    public function property_exists(object $object_or_class, string $property, bool $public = null) : bool
     {
-        $publicOnly = $publicOnly ?? true;
-
-        $vars = $this->get_object_vars($object_or_class, $publicOnly);
+        $vars = $this->get_object_vars($object_or_class, $public);
 
         return array_key_exists($property, $vars);
     }
