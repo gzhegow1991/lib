@@ -207,7 +207,7 @@ abstract class AbstractContext
         foreach ( $this->vars() as $key => $value ) {
             $keyCamelCase = $theStr->camel($key);
 
-            $instance->set($keyCamelCase, $value);
+            $instance->{$keyCamelCase} = $value;
         }
 
         return $instance;
@@ -225,7 +225,7 @@ abstract class AbstractContext
         foreach ( $this->vars() as $key => $value ) {
             $keySnakeCase = $theStr->snake_lower($key);
 
-            $instance->set($keySnakeCase, $value);
+            $instance->{$keySnakeCase} = $value;
         }
 
         return $instance;
