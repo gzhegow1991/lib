@@ -99,7 +99,9 @@ abstract class AbstractContext
      */
     public function clear(string $name) // : static
     {
-        $this->{$name} = null;
+        if ($this->exists($name)) {
+            $this->{$name} = null;
+        }
 
         return $this;
     }
@@ -113,7 +115,7 @@ abstract class AbstractContext
         $instance = new static();
 
         if ($instance->exists($name)) {
-            $this->{$name} = $this->get($name);
+            $this->{$name} = $instance->get($name);
         }
 
         return $this;
