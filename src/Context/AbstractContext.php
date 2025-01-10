@@ -134,7 +134,7 @@ abstract class AbstractContext
 
     public function vars() : array
     {
-        $vars = Lib::php()->get_object_vars($this);
+        $vars = get_object_vars($this);
 
         return $vars;
     }
