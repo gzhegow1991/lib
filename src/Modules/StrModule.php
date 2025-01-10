@@ -162,6 +162,135 @@ class StrModule
     }
 
 
+    /**
+     * @return string
+     */
+    public function loadTrims() : string
+    {
+        return " \t\n\r\0\x0B";
+    }
+
+    /**
+     * @return string
+     */
+    public function loadSeparators() : string
+    {
+        return " \t\r\n\f\v";
+    }
+
+    /**
+     * @return array
+     */
+    public function loadAccents() : array
+    {
+        $list = [
+            '' => '£',
+
+            'a' => 'àáâãāăȧảǎȁąạḁẚầấẫẩằắẵẳǡǟǻậặǽǣ',
+            'A' => 'ÀÁÂÃĀĂȦẢǍȀĄẠḀAʾẦẤẪẨẰẮẴẲǠǞǺẬẶǼǢ',
+
+            'aa' => 'å',
+            'Aa' => 'Å',
+
+            'ae' => 'äæ',
+            'Ae' => 'ÄÆ',
+
+            'c' => 'çćĉċč',
+            'C' => 'ÇĆĈĊČ',
+
+            'd' => 'ďđ',
+            'D' => 'ĎĐ',
+
+            'e' => 'èéêẽēĕėëẻěȅȇẹȩęḙḛềếễểḕḗệḝёє',
+            'E' => 'ÈÉÊẼĒĔĖËẺĚȄȆẸȨĘḘḚỀẾỄỂḔḖỆḜЁЄ€',
+
+            'g' => 'ĝğġģ',
+            'G' => 'ĜĞĠĢ',
+
+            'h' => 'ĥħ',
+            'H' => 'ĤĦ',
+
+            'i' => 'ìíîĩīĭïỉǐịįȉȋḭḯї',
+            'I' => 'ÌÍÎĨĪĬÏỈǏỊĮȈȊḬḮЇ',
+
+            'ij' => 'ĳ',
+            'IJ' => 'Ĳ',
+
+            'j' => 'ĵ',
+            'J' => 'Ĵ',
+
+            'k' => 'ķĸ',
+            'K' => 'Ķ',
+
+            'l' => 'ĺļľŀł',
+            'L' => 'ĹĻĽĿŁ',
+
+            'n' => 'ñńņňŊ',
+            'N' => 'ÑŃŅŇŉŋ',
+
+            'o' => 'òóôõōŏȯỏőǒȍȏơǫọøồốỗổȱȫȭṍṏṑṓờớỡởợǭộǿ',
+            'O' => 'ÒÓÔÕŌŎȮỎŐǑȌȎƠǪỌØỒỐỖỔȰȪȬṌṎṐṒỜỚỠỞỢǬỘǾ',
+
+            'oe' => 'öœ',
+            'Oe' => 'Ö',
+            'OE' => 'Œ',
+
+            'r' => 'ŕŗř',
+            'R' => 'ŔŖŘ',
+
+            's' => 'śŝşšſ',
+            'S' => 'ŚŜŞŠ',
+
+            'ss' => 'ß',
+
+            't' => 'ţťŧ',
+            'T' => 'ŢŤŦ',
+
+            'u' => 'ùúûũūŭủůűǔȕȗưụṳųṷṵṹṻǖǜǘǖǚừứữửựў',
+            'U' => 'ÙÚÛŨŪŬỦŮŰǓȔȖƯỤṲŲṶṴṸṺǕǛǗǕǙỪỨỮỬỰЎ',
+
+            'ue' => 'ü',
+            'Ue' => 'Ü',
+
+            'w' => 'ŵ',
+            'W' => 'Ŵ',
+
+            'y' => 'ýÿŷ',
+            'Y' => 'ÝŶŸ',
+
+            'z' => 'źżž',
+            'Z' => 'ŹŻŽ',
+        ];
+
+        return $list;
+    }
+
+    /**
+     * @return array
+     */
+    public function loadVowels() : array
+    {
+        $list = [
+            'a' => 'aàáâãāăȧäảåǎȁąạḁẚầấẫẩằắẵẳǡǟǻậặæǽǣая',
+            'A' => 'AÀÁÂÃĀĂȦÄẢÅǍȀĄẠḀAʾẦẤẪẨẰẮẴẲǠǞǺẬẶÆǼǢАЯ',
+
+            'e' => 'eèéêẽēĕėëẻěȅȇẹȩęḙḛềếễểḕḗệḝеёє',
+            'E' => 'EÈÉÊẼĒĔĖËẺĚȄȆẸȨĘḘḚỀẾỄỂḔḖỆḜЕЁЄ€',
+
+            'i' => 'iìíîĩīĭïỉǐịįȉȋḭḯиыії',
+            'I' => 'IÌÍÎĨĪĬÏỈǏỊĮȈȊḬḮИЫІЇ',
+
+            'o' => 'oòóôõōŏȯöỏőǒȍȏơǫọøồốỗổȱȫȭṍṏṑṓờớỡởợǭộǿœо',
+            'O' => 'OÒÓÔÕŌŎȮÖỎŐǑȌȎƠǪỌØỒỐỖỔȰȪȬṌṎṐṒỜỚỠỞỢǬỘǾŒО',
+
+            'u' => 'uùúûũūŭüủůűǔȕȗưụṳųṷṵṹṻǖǜǘǖǚừứữửựуюў',
+            'U' => 'UÙÚÛŨŪŬÜỦŮŰǓȔȖƯỤṲŲṶṴṸṺǕǛǗǕǙỪỨỮỬỰУЮЎ',
+        ];
+
+        return $list;
+    }
+
+
     public function is_utf8(string $str) : bool
     {
         return preg_match('//u', $str) === 1;
@@ -192,7 +321,7 @@ class StrModule
 
 
     /**
-     * возвращает число символов в строке
+     * > gzhegow, возвращает число символов в строке
      */
     public function strlen($value) : int
     {
@@ -212,7 +341,7 @@ class StrModule
     }
 
     /**
-     * возвращает размер строки в байтах
+     * > gzhegow, возвращает размер строки в байтах
      */
     public function strsize($value) : int
     {
@@ -236,7 +365,7 @@ class StrModule
 
 
     /**
-     * заменяет все буквы на малые
+     * > gzhegow, заменяет все буквы на малые
      */
     public function lower(string $string, string $mb_encoding = null) : string
     {
@@ -262,7 +391,7 @@ class StrModule
     }
 
     /**
-     * заменяет все буквы на большие
+     * > gzhegow, заменяет все буквы на большие
      */
     public function upper(string $string, string $mb_encoding = null) : string
     {
@@ -289,7 +418,7 @@ class StrModule
 
 
     /**
-     * пишет слово с малой буквы
+     * > gzhegow, пишет слово с малой буквы
      */
     public function lcfirst(string $string, string $mb_encoding = null) : string
     {
@@ -310,7 +439,7 @@ class StrModule
     }
 
     /**
-     * пишет слово с большой буквы
+     * > gzhegow, пишет слово с большой буквы
      */
     public function ucfirst(string $string, string $mb_encoding = null) : string
     {
@@ -332,7 +461,7 @@ class StrModule
 
 
     /**
-     * пишет каждое слово в предложении с малой буквы
+     * > gzhegow, пишет каждое слово в предложении с малой буквы
      */
     public function lcwords(string $string, string $separators = " \t\r\n\f\v", string $mb_encoding = null) : string
     {
@@ -353,7 +482,7 @@ class StrModule
     }
 
     /**
-     * пишет каждое слово в предложении с большой буквы
+     * > gzhegow, пишет каждое слово в предложении с большой буквы
      */
     public function ucwords(string $string, string $separators = " \t\r\n\f\v", string $mb_encoding = null) : string
     {
@@ -375,7 +504,7 @@ class StrModule
 
 
     /**
-     * если строка начинается на искомую, отрезает ее и возвращает укороченную
+     * > gzhegow, если строка начинается на искомую, отрезает ее и возвращает укороченную
      * if (null !== ($substr = _str_starts('hello', 'h'))) {} // 'ello'
      */
     public function starts(string $string, string $needle, bool $ignoreCase = null) : ?string
@@ -401,7 +530,7 @@ class StrModule
     }
 
     /**
-     * если строка заканчивается на искомую, отрезает ее и возвращает укороченную
+     * > gzhegow, если строка заканчивается на искомую, отрезает ее и возвращает укороченную
      * if (null !== ($substr = _str_ends('hello', 'o'))) {} // 'hell'
      */
     public function ends(string $string, string $needle, bool $ignoreCase = null) : ?string
@@ -427,7 +556,7 @@ class StrModule
     }
 
     /**
-     * ищет подстроку в строке и разбивает по ней результат
+     * > gzhegow, ищет подстроку в строке и разбивает по ней результат
      */
     public function contains(string $string, string $needle, bool $ignoreCase = null, int $limit = null) : array
     {
@@ -457,7 +586,7 @@ class StrModule
 
 
     /**
-     * Обрезает у строки подстроку с начала (ltrim, только для строк а не букв)
+     * > gzhegow, обрезает у строки подстроку с начала (ltrim, только для строк а не букв)
      */
     public function lcrop(string $string, string $lcrop, bool $ignoreCase = null, int $limit = -1) : string
     {
@@ -492,7 +621,7 @@ class StrModule
     }
 
     /**
-     * Обрезает у строки подстроку с конца (rtrim, только для строк а не букв)
+     * > gzhegow, обрезает у строки подстроку с конца (rtrim, только для строк а не букв)
      */
     public function rcrop(string $string, string $rcrop, bool $ignoreCase = null, int $limit = -1) : string
     {
@@ -526,7 +655,7 @@ class StrModule
     }
 
     /**
-     * Обрезает у строки подстроки с обеих сторон (trim, только для строк а не букв)
+     * > gzhegow, обрезает у строки подстроки с обеих сторон (trim, только для строк а не букв)
      */
     public function crop(string $string, $crops, bool $ignoreCase = null, int $limit = -1) : string
     {
@@ -551,7 +680,7 @@ class StrModule
 
 
     /**
-     * Добавляет подстроку в начало строки, если её уже там нет
+     * > gzhegow, добавляет подстроку в начало строки, если её уже там нет
      */
     public function unlcrop(string $string, string $lcrop, int $times = null, bool $ignoreCase = null) : string
     {
@@ -569,7 +698,7 @@ class StrModule
     }
 
     /**
-     * Добавляет подстроку в конец строки, если её уже там нет
+     * > gzhegow, добавляет подстроку в конец строки, если её уже там нет
      */
     public function unrcrop(string $string, string $rcrop, int $times = null, bool $ignoreCase = null) : string
     {
@@ -587,7 +716,7 @@ class StrModule
     }
 
     /**
-     * Оборачивает строку в подстроки, если их уже там нет
+     * > gzhegow, оборачивает строку в подстроки, если их уже там нет
      *
      * @param string|string[] $crops
      * @param int|int[]       $times
@@ -657,7 +786,7 @@ class StrModule
 
 
     /**
-     * 'theCamelCase'
+     * > gzhegow, 'theCamelCase'
      */
     public function camel(string $string) : string
     {
@@ -677,7 +806,7 @@ class StrModule
     }
 
     /**
-     * 'ThePascalCase'
+     * > gzhegow, 'ThePascalCase'
      */
     public function pascal(string $string) : string
     {
@@ -698,7 +827,7 @@ class StrModule
 
 
     /**
-     * 'the Space case'
+     * > gzhegow, 'the Space case'
      */
     public function space(string $string) : string
     {
@@ -718,7 +847,7 @@ class StrModule
     }
 
     /**
-     * 'the_Snake_case'
+     * > gzhegow, 'the_Snake_case'
      */
     public function snake(string $string) : string
     {
@@ -738,7 +867,7 @@ class StrModule
     }
 
     /**
-     * 'the-Kebab-case'
+     * > gzhegow, 'the-Kebab-case'
      */
     public function kebab(string $string) : string
     {
@@ -759,7 +888,7 @@ class StrModule
 
 
     /**
-     * 'the space case'
+     * > gzhegow, 'the space case'
      */
     public function space_lower(string $string) : string
     {
@@ -771,7 +900,7 @@ class StrModule
     }
 
     /**
-     * 'the_snake_case'
+     * > gzhegow, 'the_snake_case'
      */
     public function snake_lower(string $string) : string
     {
@@ -783,7 +912,7 @@ class StrModule
     }
 
     /**
-     * 'the-kebab-case'
+     * > gzhegow, 'the-kebab-case'
      */
     public function kebab_lower(string $string) : string
     {
@@ -796,7 +925,7 @@ class StrModule
 
 
     /**
-     * 'THE SPACE CASE'
+     * > gzhegow, 'THE SPACE CASE'
      */
     public function space_upper(string $string) : string
     {
@@ -808,7 +937,7 @@ class StrModule
     }
 
     /**
-     * 'THE_SNAKE_CASE'
+     * > gzhegow, 'THE_SNAKE_CASE'
      */
     public function snake_upper(string $string) : string
     {
@@ -820,7 +949,7 @@ class StrModule
     }
 
     /**
-     * 'THE-KEBAB-CASE'
+     * > gzhegow, 'THE-KEBAB-CASE'
      */
     public function kebab_upper(string $string) : string
     {
@@ -833,6 +962,7 @@ class StrModule
 
 
     /**
+     * > gzhegow, обычный трим завернутый в генератор
      * @return \Generator<string>
      */
     public function trim_it($strings, string $characters = null) : \Generator
@@ -849,6 +979,7 @@ class StrModule
     }
 
     /**
+     * > gzhegow, обычный трим завернутый в генератор
      * @return \Generator<string>
      */
     public function ltrim_it($strings, string $characters = null) : \Generator
@@ -865,6 +996,7 @@ class StrModule
     }
 
     /**
+     * > gzhegow, обычный трим завернутый в генератор
      * @return \Generator<string>
      */
     public function rtrim_it($strings, string $characters = null) : \Generator
@@ -878,5 +1010,68 @@ class StrModule
         foreach ( $_strings as $string ) {
             yield rtrim($string, $_characters);
         }
+    }
+
+
+    /**
+     * gzhegow, урезает английское слово до префикса из нескольких букв - когда имя индекса в бд слишком длинное
+     */
+    public function prefix(string $string, int $len = null) : string
+    {
+        if ('' === $string) {
+            return '';
+        }
+
+        $theMb = Lib::mb();
+
+        $len = $len ?? 3;
+        $len = max(0, $len);
+
+        $source = preg_replace('/(?:[^\w]|[_])+/u', '', $string);
+        $sourceLen = mb_strlen($source);
+
+        $len = min($len, $sourceLen);
+
+        if (0 === $len) {
+            return '';
+        }
+
+        $vowels = implode('', $this->loadVowels());
+
+        $sourceConsonants = [];
+        $sourceVowels = [];
+        for ( $i = 0; $i < $sourceLen; $i++ ) {
+            $letter = mb_substr($source, $i, 1);
+
+            ('' === trim($letter, $vowels))
+                ? ($sourceVowels[ $i ] = $letter)
+                : ($sourceConsonants[] = $letter);
+        }
+
+        $letters = [];
+
+        $hasVowel = false;
+        $left = $len;
+        for ( $i = 0; $i < $len; $i++ ) {
+            $letter = null;
+            if (isset($sourceVowels[ $i ])) {
+                if (! $hasVowel) {
+                    $letter = $sourceVowels[ $i ];
+                    $hasVowel = true;
+
+                } elseif ($left > count($sourceConsonants)) {
+                    $letter = $sourceVowels[ $i ];
+                }
+            }
+
+            $letter = $letter ?? array_shift($sourceConsonants);
+            $left--;
+
+            $letters[] = $letter;
+        }
+
+        $result = implode('', $letters);
+
+        return $result;
     }
 }
