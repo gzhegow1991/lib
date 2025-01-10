@@ -204,7 +204,7 @@ abstract class AbstractContext
 
         $theStr = Lib::str();
 
-        foreach ( Lib::php()->get_object_vars($this) as $key => $value ) {
+        foreach ( $this->vars() as $key => $value ) {
             $keyCamelCase = $theStr->camel($key);
 
             $instance->set($keyCamelCase, $value);
@@ -222,7 +222,7 @@ abstract class AbstractContext
 
         $theStr = Lib::str();
 
-        foreach ( Lib::php()->get_object_vars($this) as $key => $value ) {
+        foreach ( $this->vars() as $key => $value ) {
             $keySnakeCase = $theStr->snake_lower($key);
 
             $instance->set($keySnakeCase, $value);
