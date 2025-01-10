@@ -1041,60 +1041,68 @@ $fn = function () {
     echo PHP_EOL;
 
     _dump(\Gzhegow\Lib\Lib::str()->lines("hello\nworld"));
+    echo PHP_EOL;
 
     _dump(\Gzhegow\Lib\Lib::str()->eol('hello' . PHP_EOL . 'world'));
+    echo PHP_EOL;
 
     _dump(\Gzhegow\Lib\Lib::str()->strlen('Привет'));
     _dump(\Gzhegow\Lib\Lib::str()->strlen('Hello'));
-
     _dump(\Gzhegow\Lib\Lib::str()->strsize('Привет'));
     _dump(\Gzhegow\Lib\Lib::str()->strsize('Hello'));
+    echo PHP_EOL;
 
     _dump(\Gzhegow\Lib\Lib::str()->lower('ПРИВЕТ'));
     _dump(\Gzhegow\Lib\Lib::str()->upper('привет'));
-
     _dump(\Gzhegow\Lib\Lib::str()->lcfirst('ПРИВЕТ'));
     _dump(\Gzhegow\Lib\Lib::str()->ucfirst('привет'));
-
     _dump(\Gzhegow\Lib\Lib::str()->lcwords('ПРИВЕТ МИР'));
     _dump(\Gzhegow\Lib\Lib::str()->ucwords('привет мир'));
 
     _dump(\Gzhegow\Lib\Lib::str()->starts('привет', 'при'));
     _dump(\Gzhegow\Lib\Lib::str()->ends('привет', 'вет'));
     _dump(\Gzhegow\Lib\Lib::str()->contains('привет', 'ив'));
+    echo PHP_EOL;
 
     _dump(\Gzhegow\Lib\Lib::str()->lcrop('азаза_привет_азаза', 'аза'));
     _dump(\Gzhegow\Lib\Lib::str()->rcrop('азаза_привет_азаза', 'аза'));
     _dump(\Gzhegow\Lib\Lib::str()->crop('азаза_привет_азаза', 'аза'));
-
     _dump(\Gzhegow\Lib\Lib::str()->unlcrop('"привет"', '"'));
     _dump(\Gzhegow\Lib\Lib::str()->unrcrop('"привет"', '"'));
     _dump(\Gzhegow\Lib\Lib::str()->uncrop('"привет"', '"'));
+    echo PHP_EOL;
 
     _dump(\Gzhegow\Lib\Lib::str()->replace_limit('за', '_', 'азазазазазаза', 3));
+    echo PHP_EOL;
 
     _dump(\Gzhegow\Lib\Lib::str()->camel('-hello-world-foo-bar'));
     _dump(\Gzhegow\Lib\Lib::str()->camel('-helloWorldFooBar'));
     _dump(\Gzhegow\Lib\Lib::str()->camel('-HelloWorldFooBar'));
-
     _dump(\Gzhegow\Lib\Lib::str()->pascal('-hello-world-foo-bar'));
     _dump(\Gzhegow\Lib\Lib::str()->pascal('-helloWorldFooBar'));
     _dump(\Gzhegow\Lib\Lib::str()->pascal('-HelloWorldFooBar'));
-
     _dump(\Gzhegow\Lib\Lib::str()->space('_Hello_WORLD_Foo_BAR'));
     _dump(\Gzhegow\Lib\Lib::str()->snake('-Hello-WORLD-Foo-BAR'));
     _dump(\Gzhegow\Lib\Lib::str()->kebab(' Hello WORLD Foo BAR'));
-
     _dump(\Gzhegow\Lib\Lib::str()->space_lower('_Hello_WORLD_Foo_BAR'));
     _dump(\Gzhegow\Lib\Lib::str()->snake_lower('-Hello-WORLD-Foo-BAR'));
     _dump(\Gzhegow\Lib\Lib::str()->kebab_lower(' Hello WORLD Foo BAR'));
-
     _dump(\Gzhegow\Lib\Lib::str()->space_upper('_Hello_WORLD_Foo_BAR'));
     _dump(\Gzhegow\Lib\Lib::str()->snake_upper('-Hello-WORLD-Foo-BAR'));
     _dump(\Gzhegow\Lib\Lib::str()->kebab_upper(' Hello WORLD Foo BAR'));
+    echo PHP_EOL;
+
+    _dump(\Gzhegow\Lib\Lib::str()->prefix('primary'));
+    _dump(\Gzhegow\Lib\Lib::str()->prefix('unique'));
+    _dump(\Gzhegow\Lib\Lib::str()->prefix('index'));
+    _dump(\Gzhegow\Lib\Lib::str()->prefix('fulltext'));
+    _dump(\Gzhegow\Lib\Lib::str()->prefix('fullText'));
+    _dump(\Gzhegow\Lib\Lib::str()->prefix('spatialIndex'));
+    echo PHP_EOL;
 
     _dump(\Gzhegow\Lib\Lib::str()->inflector()->singularize('users'));
     _dump(\Gzhegow\Lib\Lib::str()->inflector()->pluralize('user'));
+    echo PHP_EOL;
 
     _dump(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир'));
 };
@@ -1102,11 +1110,14 @@ _assert_output($fn, '
 "[ StrModule ]"
 
 [ "hello", "world" ]
+
 "hello\n world"
+
 6
 5
 12
 5
+
 "привет"
 "ПРИВЕТ"
 "пРИВЕТ"
@@ -1116,13 +1127,16 @@ _assert_output($fn, '
 "вет"
 "при"
 [ "пр", "ет" ]
+
 "за_привет_азаза"
 "азаза_привет_аз"
 "за_привет_аз"
 "\"привет\""
 "\"привет\""
 "\"привет\""
+
 "а___зазаза"
+
 "helloWorldFooBar"
 "helloWorldFooBar"
 "helloWorldFooBar"
@@ -1138,7 +1152,16 @@ _assert_output($fn, '
 " HELLO WORLD FOO BAR"
 "_HELLO_WORLD_FOO_BAR"
 "-HELLO-WORLD-FOO-BAR"
+
+"pri"
+"unq"
+"ind"
+"ful"
+"ful"
+"spa"
+
 [ "user" ]
 [ "users" ]
+
 "privet-mir"
 ');

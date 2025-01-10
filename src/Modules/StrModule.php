@@ -353,11 +353,6 @@ class StrModule
             return 0;
         }
 
-        // > gzhegow, function results always are the same
-        // $size = $this->mb_mode_static()
-        //     ? mb_strlen($value, '8bit')
-        //     : strlen($value);
-
         $size = strlen($value);
 
         return $size;
