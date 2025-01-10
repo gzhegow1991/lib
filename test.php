@@ -76,82 +76,93 @@ function _assert_microtime(
 }
 
 
-
-// // >>> TEST
-// $fn = function () {
-//     _dump('[ TEST ]');
-//     echo PHP_EOL;
-// };
-// _assert_output($fn, '
-// ');
-// dd();
-
-
-// >>> ЗАПУСКАЕМ!
-
 // >>> TEST
 // > тесты ArrayModule
 $fn = function () {
     _dump('[ ArrModule ]');
     echo PHP_EOL;
 
+    $notAnObject = 1;
+    $object = new stdClass();
+    $anotherObject = new ArrayObject();
+    $anonymousObject = new class extends \stdClass {
+    };
+
+
     $array = new \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf('object');
-    $array[] = 1;
-    $array[] = 2;
-    _dump($array, $array->getItems());
+    $array[] = $notAnObject;
+    _dump($array);
+    _dump($array->getItems());
 
     // > be aware, `ArrayOf` WILL NOT check type when adding elements, so this check returns true
     // > if you use this feature carefully - you can avoid that check, and code becomes faster
-    // > it will work like TypeScript idea - check should exists directly for your colleagues who will read the sources
+    // > it will work like PHPDoc idea - check should remember your colleagues who will read the sources without actually check
     _dump($array->isOfType('object'));
+    echo PHP_EOL;
 
-    $array = new \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType('object');
-    $array[] = new \stdClass();
-    $array[] = new \stdClass();
-    $array[] = new ArrayObject();
-    try {
-        $array[] = 1;
-    }
-    catch ( \Throwable $e ) {
-    }
-    _dump('[ CATCH ] ' . $e->getMessage());
-    _dump($array, $array->getItems(), $array->isOfType('object'));
 
-    $array = new \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass('string', \stdClass::class);
-    $array[] = new \stdClass();
-    $array[] = new \stdClass();
+    $array = new \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType(
+        $types = [ 'mixed' => 'object' ]
+    );
+    $array[] = $object;
+    $array[] = $anotherObject;
     try {
-        $array[] = new ArrayObject();
+        $array[] = $notAnObject;
+    }
+    catch ( \Throwable $e ) {
+    }
+    _dump('[ CATCH ] ' . $e->getMessage());
+    _dump($array);
+    _dump($array->getItems());
+    _dump($array->isOfType('object'));
+    echo PHP_EOL;
+
+
+    $array = new \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass(
+        $keyType = 'string',
+        $objectClass = \stdClass::class
+    );
+    $array[] = $object;
+    try {
+        $array[] = $anotherObject;
     }
     catch ( \Throwable $e ) {
     }
     _dump('[ CATCH ] ' . $e->getMessage());
     try {
-        $array[] = new class extends \stdClass {
-        };
+        $array[] = $anonymousObject;
     }
     catch ( \Throwable $e ) {
     }
     _dump('[ CATCH ] ' . $e->getMessage());
     try {
-        $array[] = 1;
+        $array[] = $notAnObject;
     }
     catch ( \Throwable $e ) {
     }
     _dump('[ CATCH ] ' . $e->getMessage());
-    _dump($array, $array->getItems(), $array->isOfType('object'));
+    _dump($array);
+    _dump($array->getItems());
+    _dump($array->isOfType('object'));
 };
 _assert_output($fn, '
 "[ ArrModule ]"
 
-{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf } | [ 1, 2 ]
+{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf }
+[ 1 ]
 TRUE
+
 "[ CATCH ] The `value` should be of type: object / 1"
-{ object(countable(3) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType } | [ "{ object # stdClass }", "{ object # stdClass }", "{ object(countable(0) iterable) # ArrayObject }" ] | TRUE
+{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType }
+[ "{ object # stdClass }", "{ object(countable(0) iterable) # ArrayObject }" ]
+TRUE
+
 "[ CATCH ] The `value` should be of class: stdClass / { object(countable(0) iterable) # ArrayObject }"
 "[ CATCH ] The `value` should be of class: stdClass / { object # class@anonymous }"
 "[ CATCH ] The `value` should be of class: stdClass / 1"
-{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass } | [ "{ object # stdClass }", "{ object # stdClass }" ] | TRUE
+{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass }
+[ "{ object # stdClass }" ]
+TRUE
 ');
 
 
@@ -435,13 +446,17 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin([ '你' ]);
+    $strings = [ '你' ];
+    _dump_array($strings);
+    $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin($strings);
     _dump_array($binaries);
     $letters = \Gzhegow\Lib\Lib::crypt()->bin2text($binaries);
     _dump_array($letters);
     echo PHP_EOL;
 
-    $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin([ '你好' ]);
+    $strings = [ '你好' ];
+    _dump_array($strings);
+    $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin($strings);
     _dump_array($binaries);
     $letters = \Gzhegow\Lib\Lib::crypt()->bin2text($binaries);
     _dump_array($letters);
@@ -451,29 +466,37 @@ $fn = function () {
     echo PHP_EOL;
 
 
+    $number = 5678;
+    _dump($number);
     $binary = decbin(5678);
     _dump($binary);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase($binary, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
     _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2bin($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
     _dump($dec);
-    $decimal = bindec($dec);
-    _dump($decimal);
+    $number = bindec($dec);
+    _dump($number);
     echo PHP_EOL;
 
-    $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin([ 'hello' ]);
+    $strings = [ 'hello' ];
+    _dump_array($strings);
+    $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin($strings);
     _dump_array($binaries);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2base($binaries, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
     _dump($enc);
-    $list = \Gzhegow\Lib\Lib::crypt()->base2bin($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    _dump($list);
+    $dec = \Gzhegow\Lib\Lib::crypt()->base2bin($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
+    _dump_array($dec);
+    $text = implode('', array_map('chr', array_map('bindec', $dec)));
+    _dump($text);
     echo PHP_EOL;
 
 
     echo PHP_EOL;
 
 
-    $gen = (function () { yield 'hello'; })();
+    $src = 'HELLO';
+    _dump('input: ' . $src);
+    $gen = (function () use ($src) { yield $src; })();
     $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($gen);
     $enc = '';
     foreach ( $gen as $letter ) {
@@ -484,55 +507,115 @@ $fn = function () {
     foreach ( $gen as $letter ) {
         $dec .= $letter;
     }
-    _dump($dec);
+    _dump('result: ' . $dec);
     echo PHP_EOL;
 
-    $gen = (function () { yield 'hello'; })();
+    $src = 'HELLO';
+    _dump('input: ' . $src);
+    $gen = (function () use ($src) { yield $src; })();
     $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($gen);
     $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_it($gen);
     $dec = '';
     foreach ( $gen as $letter ) {
         $dec .= $letter;
     }
-    _dump($dec);
+    _dump('result: ' . $dec);
     echo PHP_EOL;
 
 
     echo PHP_EOL;
 
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode("hello");
+    $string = "hello";
+    _dump($string);
+    $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($string);
     _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
     _dump($dec);
     echo PHP_EOL;
 
     $src = "\x00\x00\x01\x00\xFF";
+    $srcDump = '';
+    $len = mb_strlen($src);
+    for ( $i = 0; $i < $len; $i++ ) {
+        $chr = mb_substr($src, $i, 1);
+        $chr = ord($chr);
+        $chr = dechex($chr);
+        $chr = str_pad($chr, 2, '0', STR_PAD_LEFT);
+        $chr = '\x' . $chr;
+
+        $srcDump .= $chr;
+    }
+    _dump('b`' . $srcDump . '`');
     $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($src);
     _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
-    _dump($dec === $src);
+    $decDump = '';
+    $len = mb_strlen($src);
+    for ( $i = 0; $i < $len; $i++ ) {
+        $chr = mb_substr($src, $i, 1);
+        $chr = ord($chr);
+        $chr = dechex($chr);
+        $chr = str_pad($chr, 2, '0', STR_PAD_LEFT);
+        $chr = '\x' . $chr;
+
+        $decDump .= $chr;
+    }
+    _dump('b`' . $decDump . '`');
     echo PHP_EOL;
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode("你好");
+    $string = "你好";
+    _dump($string);
+    $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($string);
     _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
     _dump($dec);
     echo PHP_EOL;
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode("hello");
+
+    echo PHP_EOL;
+
+
+    $string = "hello";
+    _dump($string);
+    $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode($string);
     _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
     _dump($dec);
     echo PHP_EOL;
 
     $src = "\x00\x00\x01\x00\xFF";
+    $srcDump = '';
+    $len = mb_strlen($src);
+    for ( $i = 0; $i < $len; $i++ ) {
+        $chr = mb_substr($src, $i, 1);
+        $chr = ord($chr);
+        $chr = dechex($chr);
+        $chr = str_pad($chr, 2, '0', STR_PAD_LEFT);
+        $chr = '\x' . $chr;
+
+        $srcDump .= $chr;
+    }
+    _dump('b`' . $srcDump . '`');
     $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode($src);
     _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
-    _dump($dec === $src);
+    $decDump = '';
+    $len = mb_strlen($src);
+    for ( $i = 0; $i < $len; $i++ ) {
+        $chr = mb_substr($src, $i, 1);
+        $chr = ord($chr);
+        $chr = dechex($chr);
+        $chr = str_pad($chr, 2, '0', STR_PAD_LEFT);
+        $chr = '\x' . $chr;
+
+        $decDump .= $chr;
+    }
+    _dump('b`' . $decDump . '`');
     echo PHP_EOL;
 
+    $string = '你好';
+    _dump($string);
     $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode("你好");
     _dump($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
@@ -603,43 +686,57 @@ _assert_output($fn, '
 "/"
 
 
+[ "你" ]
 [ "111001001011110110100000" ]
 [ "你" ]
 
+[ "你好" ]
 [ "111001001011110110100000", "111001011010010110111101" ]
 [ "你", "好" ]
 
 
+5678
 "1011000101110"
 "uYB"
 "0001011000101110"
 5678
 
+[ "hello" ]
 [ "01101000", "01100101", "01101100", "01101100", "01101111" ]
 "aGVsbG8"
 [ "01101000", "01100101", "01101100", "01101100", "01101111" ]
-
-
-"hello"
-
 "hello"
 
 
+"input: HELLO"
+"result: HELLO"
+
+"input: HELLO"
+"result: HELLO"
+
+
+"hello"
 "Cn8eVZg"
 "hello"
 
+"b`\x00\x00\x01\x00\xff`"
 "11LZL"
-TRUE
+"b`\x00\x00\x01\x00\xff`"
 
+"你好"
 "2xuZUfBKa"
 "你好"
 
+
+"hello"
 "7tQLFHz"
 "hello"
 
+"b`\x00\x00\x01\x00\xff`"
 "00H79"
-TRUE
+"b`\x00\x00\x01\x00\xff`"
 
+"你好"
 "19PqtKE1t"
 "你好"
 ');
@@ -1044,164 +1141,4 @@ _assert_output($fn, '
 [ "user" ]
 [ "users" ]
 "privet-mir"
-');
-
-
-// >>> TEST
-// > тесты AbstractContext
-$fn = function () {
-    _dump('[ AbstractContext ]');
-    echo PHP_EOL;
-
-    $instances = [];
-    $instances[ \Gzhegow\Lib\Context\Traits\WritableTrait::class ] = new class extends \Gzhegow\Lib\Context\AbstractContext {
-        use \Gzhegow\Lib\Context\Traits\WritableTrait;
-
-
-        protected $foo = 1;
-    };
-    $instances[ \Gzhegow\Lib\Context\Traits\EditonlyTrait::class ] = new class extends \Gzhegow\Lib\Context\AbstractContext {
-        use \Gzhegow\Lib\Context\Traits\EditonlyTrait;
-
-
-        protected $foo = 1;
-    };
-    $instances[ \Gzhegow\Lib\Context\Traits\ReadonlyTrait::class ] = new class extends \Gzhegow\Lib\Context\AbstractContext {
-        use \Gzhegow\Lib\Context\Traits\ReadonlyTrait;
-
-
-        protected $foo = 1;
-    };
-    $instances[ \Gzhegow\Lib\Context\Traits\AnyPropertiesTrait::class ] = new class extends \Gzhegow\Lib\Context\AbstractContext {
-        use \Gzhegow\Lib\Context\Traits\AnyPropertiesTrait;
-
-
-        protected $foo = 1;
-    };
-    $instances[ \Gzhegow\Lib\Context\Traits\PublicPropertiesTrait::class ] = new class extends \Gzhegow\Lib\Context\AbstractContext {
-        use \Gzhegow\Lib\Context\Traits\PublicPropertiesTrait;
-
-
-        protected $foo = 1;
-    };
-
-    foreach ( $instances as $key => $instance ) {
-        _dump($key);
-
-        _dump('<-foo');
-        try {
-            _dump('foo', $instance->foo);
-        }
-        catch ( \Throwable $e ) {
-            _dump("[ CATCH ] {$e->getMessage()}");
-        }
-
-        _dump('->foo');
-        try {
-            $instance->foo = 11;
-        }
-        catch ( \Throwable $e ) {
-            _dump("[ CATCH ] {$e->getMessage()}");
-        }
-
-        _dump('<-foo');
-        try {
-            _dump('foo', $instance->foo);
-        }
-        catch ( \Throwable $e ) {
-            _dump("[ CATCH ] {$e->getMessage()}");
-        }
-
-
-        _dump('<-bar');
-        try {
-            _dump('bar', $instance->bar);
-        }
-        catch ( \Throwable $e ) {
-            _dump("[ CATCH ] {$e->getMessage()}");
-        }
-
-        _dump('->bar');
-        try {
-            $instance->bar = 22;
-        }
-        catch ( \Throwable $e ) {
-            _dump("[ CATCH ] {$e->getMessage()}");
-        }
-
-        _dump('<-bar');
-        try {
-            _dump('bar', $instance->bar);
-        }
-        catch ( \Throwable $e ) {
-            _dump("[ CATCH ] {$e->getMessage()}");
-        }
-
-        echo PHP_EOL;
-    }
-};
-_assert_output($fn, '
-"[ AbstractContext ]"
-
-"Gzhegow\Lib\Context\Traits\WritableTrait"
-"<-foo"
-"foo" | 1
-"->foo"
-"<-foo"
-"foo" | 11
-"<-bar"
-"[ CATCH ] Missing property: bar"
-"->bar"
-"<-bar"
-"bar" | 22
-
-"Gzhegow\Lib\Context\Traits\EditonlyTrait"
-"<-foo"
-"foo" | 1
-"->foo"
-"<-foo"
-"foo" | 11
-"<-bar"
-"[ CATCH ] Missing property: bar"
-"->bar"
-"[ CATCH ] Unable to ->set() due to failed filter: editonlyTrait_set"
-"<-bar"
-"[ CATCH ] Missing property: bar"
-
-"Gzhegow\Lib\Context\Traits\ReadonlyTrait"
-"<-foo"
-"foo" | 1
-"->foo"
-"[ CATCH ] Unable to ->set() due to failed filter: readonlyTrait_set"
-"<-foo"
-"foo" | 1
-"<-bar"
-"[ CATCH ] Missing property: bar"
-"->bar"
-"<-bar"
-"bar" | 22
-
-"Gzhegow\Lib\Context\Traits\AnyPropertiesTrait"
-"<-foo"
-"foo" | 1
-"->foo"
-"<-foo"
-"foo" | 11
-"<-bar"
-"bar" | NULL
-"->bar"
-"<-bar"
-"bar" | 22
-
-"Gzhegow\Lib\Context\Traits\PublicPropertiesTrait"
-"<-foo"
-"[ CATCH ] Unable to ->get() due to failed filter: publicPropertiesTrait_get"
-"->foo"
-"<-foo"
-"[ CATCH ] Unable to ->get() due to failed filter: publicPropertiesTrait_get"
-"<-bar"
-"[ CATCH ] Unable to ->get() due to failed filter: publicPropertiesTrait_get"
-"->bar"
-"<-bar"
-"bar" | 22
 ');

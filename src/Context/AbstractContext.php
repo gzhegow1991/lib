@@ -3,22 +3,12 @@
 namespace Gzhegow\Lib\Context;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Traits\CanTraitBoot;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
 abstract class AbstractContext
 {
-    use CanTraitBoot;
-
-
-    public function __construct()
-    {
-        call_user_func_array([ static::class, '__traitBoot' ], func_get_args());
-    }
-
-
     public function __isset($name)
     {
         return $this->exists($name);
@@ -40,30 +30,14 @@ abstract class AbstractContext
     }
 
 
-    public function isset(string $name) : bool
-    {
-        $status = true;
-
-        $bool = $this->__tryExecuteFilters(__FUNCTION__, [ $name ]);
-
-        if (null === $bool) {
-            return isset($this->{$name});
-        }
-
-        return $bool;
-    }
-
     public function exists(string $name) : bool
     {
-        $status = true;
+        return property_exists($this, $name);
+    }
 
-        $bool = $this->__tryExecuteFilters(__FUNCTION__, [ $name ]);
-
-        if (null === $bool) {
-            return property_exists($this, $name);
-        }
-
-        return $bool;
+    public function isset(string $name) : bool
+    {
+        return isset($this->{$name});
     }
 
 
@@ -71,16 +45,7 @@ abstract class AbstractContext
     {
         $result = null;
 
-        $status = true;
-
-        $bool = $this->__tryExecuteFilters(__FUNCTION__, [ $name ]);
-
-        if (null === $bool) {
-            $status = $this->exists($name);
-
-        } else {
-            $status = $bool;
-        }
+        $status = $this->exists($name);
 
         if ($status) {
             $result = $this->{$name} ?? null;
@@ -95,14 +60,7 @@ abstract class AbstractContext
     {
         $status = true;
 
-        $bool = $this->__tryExecuteFilters(__FUNCTION__, [ $name ], $error);
-
-        if (null === $bool) {
-            $status = $this->exists($name);
-
-        } else {
-            $status = $bool;
-        }
+        $status = $this->exists($name);
 
         if (! $status) {
             if ($fallback) {
@@ -111,26 +69,20 @@ abstract class AbstractContext
                 return $fallback;
             }
 
-            if ($error) {
-                throw new RuntimeException($error);
-
-            } else {
-                throw new RuntimeException(
-                    'Missing property: ' . $name
-                );
-            }
+            throw new RuntimeException(
+                'Missing property: ' . $name
+            );
         }
 
         return $this->{$name} ?? null;
     }
 
 
-    public function set(string $name, $value) : void
+    /**
+     * @return static
+     */
+    public function set(string $name, $value) // : static
     {
-        $status = true;
-
-        $this->__executeFilters(__FUNCTION__, [ $name ]);
-
         if ('' === $name) {
             throw new LogicException(
                 'Empty `name` is not supported'
@@ -138,30 +90,56 @@ abstract class AbstractContext
         }
 
         $this->{$name} = $value;
+
+        return $this;
     }
 
-    public function unset(string $name) : void
+    /**
+     * @return static
+     */
+    public function clear(string $name) // : static
     {
-        $status = true;
-
-        $this->__executeFilters(__FUNCTION__, [ $name ]);
-
-        unset($this->{$name});
-    }
-
-    public function clear(string $name) : void
-    {
-        $status = true;
-
-        $this->__executeFilters(__FUNCTION__, [ $name ]);
-
         $this->{$name} = null;
+
+        return $this;
     }
 
+
+    /**
+     * @return static
+     */
+    public function reset(string $name) // : static
+    {
+        $instance = new static();
+
+        if ($instance->exists($name)) {
+            $this->{$name} = $this->get($name);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function unset(string $name) // : static
+    {
+        unset($this->{$name});
+
+        return $this;
+    }
+
+
+    public function vars() : array
+    {
+        $vars = Lib::php()->get_object_vars($this);
+
+        return $vars;
+    }
 
     public function keys() : array
     {
-        $vars = Lib::php()->get_object_vars($this);
+        $vars = $this->vars();
 
         $keys = array_keys($vars);
 
@@ -170,7 +148,7 @@ abstract class AbstractContext
 
     public function values() : array
     {
-        $vars = Lib::php()->get_object_vars($this);
+        $vars = $this->vars();
 
         $values = array_values($vars);
 
@@ -181,22 +159,13 @@ abstract class AbstractContext
     {
         $entries = [];
 
-        foreach ( Lib::php()->get_object_vars($this) as $key => $value ) {
+        foreach ( $vars = $this->vars() as $key => $value ) {
             $entries[] = [ $key, $value ];
         }
 
         return $entries;
     }
 
-
-    public function reset(array $data = null) : void
-    {
-        $this->unfill();
-
-        if (null !== $data) {
-            $this->replace($data);
-        }
-    }
 
     public function replace(array $data) : void
     {
@@ -214,19 +183,10 @@ abstract class AbstractContext
         }
     }
 
-    public function unfill(array $keys = null) : void
-    {
-        $keys = $keys ?? $this->keys();
-
-        foreach ( $keys as $key ) {
-            $this->clear($key);
-        }
-    }
-
     public function append(array $data) : void
     {
         foreach ( $data as $key => $value ) {
-            if (! $this->isset($key)) {
+            if (! $this->exists($key)) {
                 $this->set($key, $value);
             }
         }
@@ -268,85 +228,4 @@ abstract class AbstractContext
 
         return $instance;
     }
-
-
-    /**
-     * @param callable-string $fn
-     */
-    protected static function __addFilter(string $filterType, string $fn) : void
-    {
-        if (! isset(static::$__filters[ $filterType ])) {
-            throw new LogicException(
-                'Unknown `filterType`: ' . $filterType
-            );
-        }
-
-        if (! isset(static::$__filters[ $filterType ][ static::class ][ $fn ])) {
-            static::$__filters[ $filterType ][ static::class ][ $fn ] = true;
-        }
-    }
-
-    private function __executeFilters(string $filterType, array $arguments) : ?bool
-    {
-        if (empty(static::$__filters[ $filterType ][ $filterClass = static::class ])) {
-            return null;
-        }
-
-        $fnList = static::$__filters[ $filterType ][ $filterClass ];
-
-        $args = $arguments;
-        array_unshift($args, $this);
-
-        foreach ( $fnList as $fn => $bool ) {
-            if (! ($status = call_user_func_array($fn, $args))) {
-                $filterName = $fn;
-                if (0 === strpos($fn, 'class@anonymous')) {
-                    $filterName = explode('::', $fn)[ 1 ];
-                }
-
-                throw new RuntimeException(
-                    [ "Unable to ->{$filterType}() due to failed filter: {$filterName}", $fn, $args ]
-                );
-            }
-        }
-
-        return true;
-    }
-
-    private function __tryExecuteFilters(string $filterType, array $arguments, &$error = null) : ?bool
-    {
-        if (empty(static::$__filters[ $filterType ][ $filterClass = static::class ])) {
-            return null;
-        }
-
-        $fnList = static::$__filters[ $filterType ][ $filterClass ];
-
-        $args = $arguments;
-        array_unshift($args, $this);
-
-        foreach ( $fnList as $fn => $bool ) {
-            if (! ($status = call_user_func_array($fn, $args))) {
-                $filterName = $fn;
-                if (0 === strpos($fn, 'class@anonymous')) {
-                    $filterName = explode('::', $fn)[ 1 ];
-                }
-
-                $error = [ "Unable to ->{$filterType}() due to failed filter: {$filterName}", $fn, $args ];
-
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    protected static $__filters = [
-        'isset'  => [],
-        'exists' => [],
-        'has'    => [],
-        'get'    => [],
-        'set'    => [],
-        'unset'  => [],
-        'clear'  => [],
-    ];
 }
