@@ -10,7 +10,9 @@ use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Str\Slugger\Slugger;
 use Gzhegow\Lib\Modules\Str\Inflector\Inflector;
 use Gzhegow\Lib\Modules\Str\Slugger\SluggerInterface;
+use Gzhegow\Lib\Modules\Str\Interpolator\Interpolator;
 use Gzhegow\Lib\Modules\Str\Inflector\InflectorInterface;
+use Gzhegow\Lib\Modules\Str\Interpolator\InterpolatorInterface;
 
 
 class StrModule
@@ -19,6 +21,10 @@ class StrModule
      * @var InflectorInterface
      */
     protected $inflector;
+    /**
+     * @var InterpolatorInterface
+     */
+    protected $interpolator;
     /**
      * @var SluggerInterface
      */
@@ -35,6 +41,7 @@ class StrModule
         $mbMode = extension_loaded('mbstring');
 
         $this->inflector = new Inflector();
+        $this->interpolator = new Interpolator();
         $this->slugger = new Slugger();
 
         $this->mbMode = $mbMode;
@@ -61,6 +68,29 @@ class StrModule
     public function inflector() : InflectorInterface
     {
         return $this->inflector_static();
+    }
+
+
+    public function interpolator_static(InterpolatorInterface $interpolator = null) : InterpolatorInterface
+    {
+        if (null !== $interpolator) {
+            $last = $this->interpolator;
+
+            $current = $interpolator;
+
+            $this->interpolator = $current;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->interpolator;
+
+        return $result;
+    }
+
+    public function interpolator() : InterpolatorInterface
+    {
+        return $this->interpolator_static();
     }
 
 

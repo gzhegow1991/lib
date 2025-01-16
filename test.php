@@ -1104,6 +1104,9 @@ $fn = function () {
     _dump(\Gzhegow\Lib\Lib::str()->inflector()->pluralize('user'));
     echo PHP_EOL;
 
+    _dump(\Gzhegow\Lib\Lib::str()->interpolator()->interpolate('привет {{username}}', [ 'username' => 'медвед' ]));
+    echo PHP_EOL;
+
     _dump(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир'));
 };
 _assert_output($fn, '
@@ -1162,6 +1165,8 @@ _assert_output($fn, '
 
 [ "user" ]
 [ "users" ]
+
+"привет медвед"
 
 "privet-mir"
 ');
