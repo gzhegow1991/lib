@@ -5,9 +5,13 @@ namespace Gzhegow\Lib\Context;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 
 
-abstract class AbstractContext
+abstract class AbstractContext implements
+    ToArrayInterface,
+    //
+    \ArrayAccess
 {
     public function __isset($name)
     {
@@ -27,6 +31,27 @@ abstract class AbstractContext
     public function __unset($name)
     {
         $this->clear($name);
+    }
+
+
+    public function offsetExists($offset)
+    {
+        return $this->exists($offset);
+    }
+
+    public function offsetGet($offset)
+    {
+        return $this->get($offset);
+    }
+
+    public function offsetSet($offset, $value)
+    {
+        $this->set($offset, $value);
+    }
+
+    public function offsetUnset($offset)
+    {
+        $this->clear($offset);
     }
 
 
@@ -229,5 +254,11 @@ abstract class AbstractContext
         }
 
         return $instance;
+    }
+
+
+    public function toArray(array $options = []) : array
+    {
+        return $this->vars();
     }
 }
