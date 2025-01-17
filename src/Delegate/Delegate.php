@@ -14,14 +14,17 @@ class Delegate
 
 
     /**
-     * @param T $delegate
+     * @param T $object
      */
-    public function __construct(object $delegate)
+    public function __construct(object $object)
     {
-        $this->object = $delegate;
+        $this->object = $object;
     }
 
 
+    /**
+     * @return T
+     */
     public function getObject() : object
     {
         return $this->object;
