@@ -936,6 +936,45 @@ _assert_output($fn, '
 
 
 // >>> TEST
+// > тесты ParseModule
+$fn = function () {
+    _dump('[ ParseModule ]');
+    echo PHP_EOL;
+
+
+    $result = \Gzhegow\Lib\Lib::parse()->ctype_digit('123');
+    _dump($result);
+    echo PHP_EOL;
+
+
+    $result = \Gzhegow\Lib\Lib::parse()->ctype_alpha('abcABC');
+    _dump($result);
+
+    $result = \Gzhegow\Lib\Lib::parse()->ctype_alpha('abcABC', false);
+    _dump($result);
+    echo PHP_EOL;
+
+
+    $result = \Gzhegow\Lib\Lib::parse()->ctype_alnum('123abcABC');
+    _dump($result);
+
+    $result = \Gzhegow\Lib\Lib::parse()->ctype_alnum('123abcABC', false);
+    _dump($result);
+};
+_assert_output($fn, '
+"[ ParseModule ]"
+
+"123"
+
+"abcABC"
+NULL
+
+"123abcABC"
+NULL
+');
+
+
+// >>> TEST
 // > тесты PhpModule
 $fn = function () {
     _dump('[ PhpModule ]');

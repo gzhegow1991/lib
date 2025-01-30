@@ -530,6 +530,96 @@ class ParseModule
     }
 
 
+    public function ctype_digit(string $text) : ?string
+    {
+        if ('' === $text) {
+            return null;
+        }
+
+        $result = '';
+
+        if (extension_loaded('ctype')) {
+            $result = ctype_digit($text)
+                ? $text
+                : null;
+
+            return $result;
+        }
+
+        if (! preg_match('~[^0-9]~', $text)) {
+            return null;
+        }
+
+        return $text;
+    }
+
+    public function ctype_alpha(string $text, bool $ignoreCase = null) : ?string
+    {
+        $ignoreCase = $ignoreCase ?? true;
+
+        if ('' === $text) {
+            return null;
+        }
+
+        if (extension_loaded('ctype')) {
+            if (! $ignoreCase) {
+                if (strtolower($text) !== $text) {
+                    return null;
+                }
+            }
+
+            $result = ctype_alpha($text)
+                ? $text
+                : null;
+
+            return $result;
+        }
+
+        $regexFlags = $ignoreCase
+            ? 'i'
+            : '';
+
+        if (preg_match('~[^a-z]~' . $regexFlags, $text)) {
+            return null;
+        }
+
+        return $text;
+    }
+
+    public function ctype_alnum(string $text, bool $ignoreCase = null) : ?string
+    {
+        $ignoreCase = $ignoreCase ?? true;
+
+        if ('' === $text) {
+            return null;
+        }
+
+        if (extension_loaded('ctype')) {
+            if (! $ignoreCase) {
+                if (strtolower($text) !== $text) {
+                    return null;
+                }
+            }
+
+            $result = ctype_alnum($text)
+                ? $text
+                : null;
+
+            return $result;
+        }
+
+        $regexFlags = $ignoreCase
+            ? 'i'
+            : '';
+
+        if (preg_match('~[^0-9a-z]~' . $regexFlags, $text)) {
+            return null;
+        }
+
+        return $text;
+    }
+
+
     public function base($value, $alphabet) : ?string
     {
         if (null === ($_value = $this->string_not_empty($value))) {

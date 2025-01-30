@@ -550,7 +550,10 @@ class HttpModule
                 $acceptItem = array_shift($acceptVars);
 
                 foreach ( $acceptVars as $i => $acceptVar ) {
-                    [ $acceptVarName, $acceptVarValue ] = explode('=', $acceptVar, 2) + [ null, '' ];
+                    [
+                        $acceptVarName,
+                        $acceptVarValue,
+                    ] = explode('=', $acceptVar, 2) + [ null, '' ];
 
                     if ($acceptVarName === 'q') {
                         $qValue = $acceptVarValue;
