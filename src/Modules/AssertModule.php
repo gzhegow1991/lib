@@ -63,7 +63,7 @@ class AssertModule
         if ($_value !== $expect) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
 
-            Lib::debug()->diff_vars($_value, $expect, $diff);
+            Lib::debug()->diff_vars($_value, $expect, [ 1 => &$diff ]);
 
             if (null !== $stdout) {
                 fwrite($stdout, '------' . PHP_EOL);
@@ -150,7 +150,7 @@ class AssertModule
         if ($result !== $expect) {
             $message = '[ ERROR ] Test ' . __FUNCTION__ . '() failed.';
 
-            Lib::debug()->diff_vars($result, $expect, $diff);
+            Lib::debug()->diff_vars($result, $expect, [ 1 => &$diff ]);
 
             if (null !== $stdout) {
                 fwrite($stdout, '------' . PHP_EOL);
@@ -197,7 +197,7 @@ class AssertModule
         $isDiff = Lib::debug()->diff(
             trim($output),
             trim($expect),
-            $diff
+            [ 1 => &$diff ]
         );
 
         if ($isDiff) {

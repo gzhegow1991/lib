@@ -230,43 +230,63 @@ class DebugModule
             $output[] = "{$type}({$stringLen})";
         }
         if ($withValue) {
+            $theStr = Lib::str();
+
+            $foundBinary = false;
+
+            $asciiControlsNoTrims = $theStr->loadAsciiControlsNoTrims();
+            $trims = $theStr->loadTrims();
+
             $_var = $var;
+
             $_var = str_replace('"', '\"', $_var);
 
-            $mapSpaces = [
-                "\n" => '\n',
-                "\r" => '\r',
-                "\t" => '\t',
-                "\v" => '\v',
-            ];
+            $_var = str_replace(
+                array_keys($asciiControlsNoTrims),
+                array_values($asciiControlsNoTrims),
+                $_var,
+                $count
+            );
+            if ($count) {
+                $foundBinary = true;
+            }
 
-            $found = false;
+            if ($isUtf8 = $theStr->is_utf8($_var)) {
+                $invisibles = $theStr->loadInvisibles();
 
-            // $_var = preg_replace_callback('/[^[:print:]]/', static function ($m) use (
-            $_var = preg_replace_callback('/\p{C}/u', static function ($m) use (
-                &$mapSpaces,
-                //
-                &$found
-            ) {
-                $chr = $m[ 0 ];
+                $_var = str_replace(
+                    array_keys($invisibles),
+                    array_values($invisibles),
+                    $_var,
+                    $count
+                );
 
-                if (isset($mapSpaces[ $chr ])) {
-                    return $mapSpaces[ $chr ] . $chr;
+                if ($count) {
+                    $foundBinary = true;
                 }
 
-                $res = ord($chr);
-                $res = dechex($res);
-                $res = str_pad($res, 2, '0', STR_PAD_LEFT);
-                $res = '\x' . $res;
+            } else {
+                $_varUtf8 = $theStr->utf8_encode($_var);
 
-                $found = true;
+                if ($_varUtf8 !== $_var) {
+                    $_var = $_varUtf8;
 
-                return $res;
-            }, $_var);
+                    $foundBinary = true;
+                }
+            }
 
-            if ($found) {
+            if ($foundBinary) {
                 $_var = "b`{$_var}`";
             }
+
+            foreach ( $trims as $i => $v ) {
+                $trims[ $i ] .= $i;
+            }
+            $_var = str_replace(
+                array_keys($trims),
+                array_values($trims),
+                $_var
+            );
 
             $output[] = '"' . $_var . '"';
         }
@@ -637,77 +657,242 @@ class DebugModule
     }
 
 
-    public function diff(string $actual, string $expect = null, string &$result = null) : bool
+    public function print_table(array $table, bool $return = null) : ?string
     {
-        $result = null;
-
-        $hasExpect = (null !== $expect);
-
-        Lib::str()->eol($actual, $actualLines);
-
-        $cnt = $cntA = count($actualLines);
-
-        if ($hasExpect) {
-            Lib::str()->eol($expect, $expectLines);
-
-            $cnt = max($cntA, $cntB = count($expectLines));
+        if (! $cnt = count($table)) {
+            return null;
         }
 
-        $actualLinesNew = [];
-        $expectLinesNew = [];
-
-        $isDiff = false;
-        for ( $i = 0; $i < $cnt; $i++ ) {
-            $actualLine = $actualLines[ $i ] ?? ' ';
-            $expectLine = $expectLines[ $i ] ?? ' ';
-
-            if ('' === $actualLine) $actualLine = ' ';
-            if ('' === $expectLine) $expectLine = ' ';
-
-            if (! $hasExpect) {
-                $actualLinesNew[] = $actualLine;
-
-            } else {
-                if ($actualLine === $expectLine) {
-                    $actualLinesNew[] = "[{$i}] > " . $actualLine;
-                    $expectLinesNew[] = "[{$i}] > " . $expectLine;
-
-                    continue;
-                }
-
-                $expectLinesNew[] = "--- [{$i}] > " . $expectLine;
-                $actualLinesNew[] = "+++ [{$i}] > " . $actualLine;
+        $columns = [];
+        for ( $i = 0; $i < count($table); $i++ ) {
+            if (! is_array($table[ $i ])) {
+                throw new RuntimeException('The `table` should be array of arrays');
             }
 
-            $isDiff = true;
+            foreach ( $table[ $i ] as $newKey => $val ) {
+                if (! isset($columns[ $newKey ])) {
+                    $columns[ $newKey ] = $newKey;
+                }
+            }
         }
 
-        if ($isDiff) {
-            $lines[] = $expectLinesNew;
-            $lines[] = [ '' ];
+        $colWidths = array_map('strlen', $columns);
+
+        foreach ( $table as $row ) {
+            foreach ( $row as $iCol => $colValue ) {
+                $colWidths[ $iCol ] = max(
+                    $colWidths[ $iCol ] ?? 0,
+                    strlen((string) $colValue)
+                );
+            }
         }
 
-        $lines[] = $actualLinesNew;
+        if ($return) {
+            ob_start();
+        }
 
-        $result = implode(PHP_EOL, array_merge(...$lines));
+        $fnDrawLine = function () use ($colWidths) {
+            echo '+';
+            foreach ( $colWidths as $width ) {
+                echo str_repeat('-', $width + 2) . '+';
+            }
+            echo "\n";
+        };
+
+        $fnDrawLine();
+
+        echo '|';
+        foreach ( $columns as $col ) {
+            echo ' ' . str_pad($col, $colWidths[ $col ]) . ' |';
+        }
+        echo "\n";
+
+        $fnDrawLine();
+
+        foreach ( $table as $row ) {
+            echo '|';
+            foreach ( $columns as $col ) {
+                echo ' ' . str_pad($row[ $col ], $colWidths[ $col ]) . ' |';
+            }
+            echo "\n";
+        }
+
+        $fnDrawLine();
+
+        if ($return) {
+            $content = ob_get_clean();
+
+            return $content;
+        }
+
+        return null;
+    }
+
+
+    public function diff(
+        string $new, string $old,
+        array $refs = null
+    ) : bool
+    {
+        $refs = $refs ?? [];
+
+        $withResultLines = array_key_exists(0, $refs);
+        $withResultString = array_key_exists(1, $refs);
+
+        $oldLines = Lib::str()->lines($old);
+        $newLines = Lib::str()->lines($new);
+
+        $oldCnt = count($oldLines);
+        $newCnt = count($newLines);
+
+        $oldLinesIndex = array_flip($oldLines);
+        $newLinesIndex = array_flip($newLines);
+
+        $matrix = [];
+        for ( $iOld = 0; $iOld <= $oldCnt; $iOld++ ) {
+            for ( $iNew = 0; $iNew <= $newCnt; $iNew++ ) {
+                $matrix[ $iOld ][ $iNew ] = 0;
+            }
+        }
+
+        for ( $iOld = 1; $iOld <= $oldCnt; $iOld++ ) {
+            for ( $iNew = 1; $iNew <= $newCnt; $iNew++ ) {
+                if ($oldLines[ $iOld - 1 ] === $newLines[ $iNew - 1 ]) {
+                    $matrix[ $iOld ][ $iNew ] = $matrix[ $iOld - 1 ][ $iNew - 1 ] + 1;
+
+                } else {
+                    $matrix[ $iOld ][ $iNew ] = max(
+                        $matrix[ $iOld - 1 ][ $iNew ],
+                        $matrix[ $iOld ][ $iNew - 1 ]
+                    );
+                }
+            }
+        }
+
+        $iOld = $oldCnt;
+        $iNew = $newCnt;
+        $diffLines = [];
+
+        $isDiff = false;
+
+        $isRemovePrevious = [];
+        $isAddPrevious = [];
+        $isRemove = [];
+        $isAdd = [];
+        while ( true ) {
+            $iOldGt0 = $iOld > 0;
+            $iNewGt0 = $iNew > 0;
+            $iOldEq0 = $iOld === 0;
+            $iNewEq0 = $iNew === 0;
+
+            if (! ($iOldGt0 || $iNewGt0)) {
+                break;
+            }
+
+            $isRemovePrevious = $isRemove;
+            $isAddPrevious = $isAdd;
+
+            $isSame = [];
+            $isRemove = [];
+            $isAdd = [];
+
+            if (true
+                && $iOldGt0
+                && $iNewGt0
+                && ($oldLines[ $iOld - 1 ] === $newLines[ $iNew - 1 ])
+            ) {
+                $isSame = [ $oldLines[ $iOld - 1 ] ];
+
+                $iNew--;
+                $iOld--;
+
+            } elseif (true
+                && $iOldGt0
+                && (false
+                    || $iNewEq0
+                    || ($matrix[ $iOld ][ $iNew - 1 ] < $matrix[ $iOld - 1 ][ $iNew ])
+                )
+            ) {
+                $isRemove = [ $oldLines[ $iOld - 1 ] ];
+
+                $iOld--;
+
+            } elseif (true
+                && $iNewGt0
+                && (false
+                    || $iOldEq0
+                    || ($matrix[ $iOld ][ $iNew - 1 ] >= $matrix[ $iOld - 1 ][ $iNew ])
+                )
+            ) {
+                $isAdd = [ $newLines[ $iNew - 1 ] ];
+
+                $iNew--;
+            }
+
+            if ($isSame) {
+                $diffLines[] = $isSame[ 0 ];
+
+            } elseif ($isAdd) {
+                if (count($isRemovePrevious)) {
+                    $diffLines[ count($diffLines) - 1 ] = '+++ > ' . $isAdd[ 0 ] . ' @ --- ' . $isRemovePrevious[ 0 ];
+
+                    $isAdd = [];
+
+                } else {
+                    $diffLines[] = '+++ > ' . $isAdd[ 0 ];
+                }
+
+                $isDiff = true;
+
+            } elseif (count($isRemove)) {
+                if (count($isAddPrevious)) {
+                    $diffLines[ count($diffLines) - 1 ] = '+++ > ' . $isAddPrevious[ 0 ] . ' @ --- ' . $isRemove[ 0 ];
+
+                    $isRemove = [];
+
+                } else {
+                    $diffLines[] = '--- > ' . $isRemove[ 0 ];
+                }
+
+                $isDiff = true;
+            }
+        }
+
+        $diffLines = array_reverse($diffLines);
+
+        if ($withResultLines) {
+            $ref =& $refs[ 0 ];
+            $ref = $diffLines;
+            unset($ref);
+        }
+
+        if ($withResultString) {
+            $diffString = implode(PHP_EOL, $diffLines);
+
+            $ref =& $refs[ 1 ];
+            $ref = $diffString;
+            unset($ref);
+        }
 
         return $isDiff;
     }
 
-    public function diff_vars($actual, $expect = null, string &$result = null) : bool
+    public function diff_vars(
+        $new = null, $old = null,
+        array $results = null
+    ) : bool
     {
         ob_start();
-        var_dump($actual);
+        var_dump($new);
         $aString = ob_get_clean();
 
         ob_start();
-        var_dump($expect);
+        var_dump($old);
         $bString = ob_get_clean();
 
         $isDiff = $this->diff(
-            $aString,
-            $bString,
-            $result
+            $aString, $bString,
+            $results
         );
 
         return $isDiff;

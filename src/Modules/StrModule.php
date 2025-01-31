@@ -193,22 +193,6 @@ class StrModule
 
 
     /**
-     * @return string
-     */
-    public function loadTrims() : string
-    {
-        return " \t\n\r\0\x0B";
-    }
-
-    /**
-     * @return string
-     */
-    public function loadSeparators() : string
-    {
-        return " \t\r\n\f\v";
-    }
-
-    /**
      * @return array
      */
     public function loadAccents() : array
@@ -320,10 +304,194 @@ class StrModule
         return $list;
     }
 
+    /**
+     * @return array
+     */
+    public function loadTrims() : array
+    {
+        $list = [
+            chr(9)  => '\t',   // "\x09" // TAB (Horizontal Tab)  (ASCII 9)
+            chr(10) => '\n',   // "\x0A" // LF  (Line Feed)       (ASCII 10)
+            chr(11) => '\v',   // "\x0B" // VT  (Vertical Tab)    (ASCII 11)
+            chr(13) => '\r',   // "\x0D" // CR  (Carriage Return) (ASCII 13)
+        ];
+
+        return $list;
+    }
+
+    /**
+     * @return array
+     */
+    public function loadAsciiControls() : array
+    {
+        $list = [
+            chr(0)  => '\0',   // "\0"   // NULL (ASCII 0)
+            chr(1)  => '\x01', // "\x01" // SOH (Start of Heading) (ASCII 1)
+            chr(2)  => '\x02', // "\x02" // STX (Start of Text)   (ASCII 2)
+            chr(3)  => '\x03', // "\x03" // ETX (End of Text)     (ASCII 3)
+            chr(4)  => '\x04', // "\x04" // EOT (End of Transmission) (ASCII 4)
+            chr(5)  => '\x05', // "\x05" // ENQ (Enquiry)         (ASCII 5)
+            chr(6)  => '\x06', // "\x06" // ACK (Acknowledge)     (ASCII 6)
+            chr(7)  => '\a',   // "\x07" // BEL (Bell)            (ASCII 7)
+            chr(8)  => '\b',   // "\x08" // BS  (Backspace)       (ASCII 8)
+            chr(9)  => '\t',   // "\x09" // TAB (Horizontal Tab)  (ASCII 9)
+            chr(10) => '\n',   // "\x0A" // LF  (Line Feed)       (ASCII 10)
+            chr(11) => '\v',   // "\x0B" // VT  (Vertical Tab)    (ASCII 11)
+            chr(12) => '\f',   // "\x0C" // FF  (Form Feed)       (ASCII 12)
+            chr(13) => '\r',   // "\x0D" // CR  (Carriage Return) (ASCII 13)
+            chr(14) => '\x0E', // "\x0E" // SO  (Shift Out)       (ASCII 14)
+            chr(15) => '\x0F', // "\x0F" // SI  (Shift In)        (ASCII 15)
+            chr(16) => '\x10', // "\x10" // DLE (Data Link Escape)(ASCII 16)
+            chr(17) => '\x11', // "\x11" // DC1 (Device Control 1)(ASCII 17)
+            chr(18) => '\x12', // "\x12" // DC2 (Device Control 2)(ASCII 18)
+            chr(19) => '\x13', // "\x13" // DC3 (Device Control 3)(ASCII 19)
+            chr(20) => '\x14', // "\x14" // DC4 (Device Control 4)(ASCII 20)
+            chr(21) => '\x15', // "\x15" // NAK (Negative Acknowledge) (ASCII 21)
+            chr(22) => '\x16', // "\x16" // SYN (Synchronous Idle) (ASCII 22)
+            chr(23) => '\x17', // "\x17" // ETB (End of Block)    (ASCII 23)
+            chr(24) => '\x18', // "\x18" // CAN (Cancel)           (ASCII 24)
+            chr(25) => '\x19', // "\x19" // EM  (End of Medium)    (ASCII 25)
+            chr(26) => '\x1A', // "\x1A" // SUB (Substitute)       (ASCII 26)
+            chr(27) => '\e',   // "\x1B" // ESC (Escape)           (ASCII 27)
+            chr(28) => '\x1C', // "\x1C" // FS  (File Separator)   (ASCII 28)
+            chr(29) => '\x1D', // "\x1D" // GS  (Group Separator)  (ASCII 29)
+            chr(30) => '\x1E', // "\x1E" // RS  (Record Separator) (ASCII 30)
+            chr(31) => '\x1F', // "\x1F" // US  (Unit Separator)   (ASCII 31)
+        ];
+
+        return $list;
+    }
+
+    /**
+     * @return array
+     */
+    public function loadAsciiControlsNoTrims() : array
+    {
+        $list = [
+            // chr(9)  => '\t',   // "\x09" // TAB (Horizontal Tab)  (ASCII 9)
+            // chr(10) => '\n',   // "\x0A" // LF  (Line Feed)       (ASCII 10)
+            // chr(11) => '\v',   // "\x0B" // VT  (Vertical Tab)    (ASCII 11)
+            // chr(13) => '\r',   // "\x0D" // CR  (Carriage Return) (ASCII 13)
+            //
+            chr(0)  => '\0',   // "\0"   // NULL (ASCII 0)
+            chr(1)  => '\x01', // "\x01" // SOH (Start of Heading) (ASCII 1)
+            chr(2)  => '\x02', // "\x02" // STX (Start of Text)   (ASCII 2)
+            chr(3)  => '\x03', // "\x03" // ETX (End of Text)     (ASCII 3)
+            chr(4)  => '\x04', // "\x04" // EOT (End of Transmission) (ASCII 4)
+            chr(5)  => '\x05', // "\x05" // ENQ (Enquiry)         (ASCII 5)
+            chr(6)  => '\x06', // "\x06" // ACK (Acknowledge)     (ASCII 6)
+            chr(7)  => '\a',   // "\x07" // BEL (Bell)            (ASCII 7)
+            chr(8)  => '\b',   // "\x08" // BS  (Backspace)       (ASCII 8)
+            chr(12) => '\f',   // "\x0C" // FF  (Form Feed)       (ASCII 12)
+            chr(14) => '\x0E', // "\x0E" // SO  (Shift Out)       (ASCII 14)
+            chr(15) => '\x0F', // "\x0F" // SI  (Shift In)        (ASCII 15)
+            chr(16) => '\x10', // "\x10" // DLE (Data Link Escape)(ASCII 16)
+            chr(17) => '\x11', // "\x11" // DC1 (Device Control 1)(ASCII 17)
+            chr(18) => '\x12', // "\x12" // DC2 (Device Control 2)(ASCII 18)
+            chr(19) => '\x13', // "\x13" // DC3 (Device Control 3)(ASCII 19)
+            chr(20) => '\x14', // "\x14" // DC4 (Device Control 4)(ASCII 20)
+            chr(21) => '\x15', // "\x15" // NAK (Negative Acknowledge) (ASCII 21)
+            chr(22) => '\x16', // "\x16" // SYN (Synchronous Idle) (ASCII 22)
+            chr(23) => '\x17', // "\x17" // ETB (End of Block)    (ASCII 23)
+            chr(24) => '\x18', // "\x18" // CAN (Cancel)           (ASCII 24)
+            chr(25) => '\x19', // "\x19" // EM  (End of Medium)    (ASCII 25)
+            chr(26) => '\x1A', // "\x1A" // SUB (Substitute)       (ASCII 26)
+            chr(27) => '\e',   // "\x1B" // ESC (Escape)           (ASCII 27)
+            chr(28) => '\x1C', // "\x1C" // FS  (File Separator)   (ASCII 28)
+            chr(29) => '\x1D', // "\x1D" // GS  (Group Separator)  (ASCII 29)
+            chr(30) => '\x1E', // "\x1E" // RS  (Record Separator) (ASCII 30)
+            chr(31) => '\x1F', // "\x1F" // US  (Unit Separator)   (ASCII 31)
+        ];
+
+        return $list;
+    }
+
+    /**
+     * @return array
+     */
+    public function loadInvisibles() : array
+    {
+        $list = [
+            // mb_chr(0x0020, 'UTF-8') => '\u{0020}', // > \u{0020}	// Space // Обычный пробел (между словами).
+            //
+            mb_chr(0x00A0, 'UTF-8') => '\u{00A0}', // > \u{00A0} // No-Break Space (NBSP) // Неразрывный пробел, предотвращает перенос строки.
+            mb_chr(0x2000, 'UTF-8') => '\u{2000}', // > \u{2000} // En Quad // Пробел шириной с букву "N".
+            mb_chr(0x2001, 'UTF-8') => '\u{2001}', // > \u{2001} // Em Quad // Пробел шириной с букву "M".
+            mb_chr(0x2002, 'UTF-8') => '\u{2002}', // > \u{2002} // En Space // Половина ширины Em-пробела.
+            mb_chr(0x2003, 'UTF-8') => '\u{2003}', // > \u{2003} // Em Space // Ширина примерно как буква "M".
+            mb_chr(0x2004, 'UTF-8') => '\u{2004}', // > \u{2004} // Three-Per-Em Space // Треть от Em-пробела.
+            mb_chr(0x2005, 'UTF-8') => '\u{2005}', // > \u{2005} // Four-Per-Em Space // Четверть от Em-пробела.
+            mb_chr(0x2006, 'UTF-8') => '\u{2006}', // > \u{2006} // Six-Per-Em Space // Одна шестая Em-пробела.
+            mb_chr(0x2007, 'UTF-8') => '\u{2007}', // > \u{2007} // Figure Space // Ширина цифры в шрифте с фиксированной шириной.
+            mb_chr(0x2008, 'UTF-8') => '\u{2008}', // > \u{2008} // Punctuation Space // Ширина типографского знака препинания.
+            mb_chr(0x2009, 'UTF-8') => '\u{2009}', // > \u{2009} // Thin Space // Узкий пробел.
+            mb_chr(0x200A, 'UTF-8') => '\u{200A}', // > \u{200A} // Hair Space // Ещё более узкий пробел.
+            mb_chr(0x200B, 'UTF-8') => '\u{200B}', // > \u{200B} // Zero Width Space // Невидимый пробел (нулевая ширина).
+            mb_chr(0x200C, 'UTF-8') => '\u{200C}', // > \u{200C} // Zero Width Non-Joiner (ZWNJ) // Запрещает лигатуры между буквами.
+            mb_chr(0x200D, 'UTF-8') => '\u{200D}', // > \u{200D} // Zero Width Joiner (ZWJ) // Объединяет символы, создавая лигатуры.
+            mb_chr(0x200E, 'UTF-8') => '\u{200E}', // > \u{200E} // Left-to-Right Mark (LRM) // Управляет направлением текста (слева направо).
+            mb_chr(0x200F, 'UTF-8') => '\u{200F}', // > \u{200F} // Right-to-Left Mark (RLM) // Управляет направлением текста (справа налево).
+            mb_chr(0x202F, 'UTF-8') => '\u{202F}', // > \u{202F} // Narrow No-Break Space // Узкий неразрывный пробел.
+            mb_chr(0x205F, 'UTF-8') => '\u{205F}', // > \u{205F} // Medium Mathematical Space // Средний математический пробел.
+            mb_chr(0x2060, 'UTF-8') => '\u{2060}', // > \u{2060} // Word Joiner (WJ) // Запрещает разрывы слов, аналог NBSP, но нулевой ширины.
+            mb_chr(0x3000, 'UTF-8') => '\u{3000}', // > \u{3000} // Ideographic Space // Широкий пробел в китайском/японском тексте.
+            mb_chr(0xFEFF, 'UTF-8') => '\u{FEFF}', // > \u{FEFF} // Byte Order Mark (BOM) // Метка порядка байтов, часто используется для UTF-8.
+            mb_chr(0x2800, 'UTF-8') => '\u{2800}', // > \u{2800} // Braille Pattern Blank // Пробел в системе Брайля.
+            mb_chr(0x3164, 'UTF-8') => '\u{3164}', // > \u{3164} // Hangul Filler // Невидимый символ в корейском языке.
+        ];
+
+        return $list;
+    }
+
+
+    public function is_binary(string $str) : bool
+    {
+        for ( $i = 0; $i < strlen($str); $i++ ) {
+            $chr = $str[ $i ];
+            $ord = ord($chr);
+
+            if ($ord > 127) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public function is_utf8(string $str) : bool
     {
         return preg_match('//u', $str) === 1;
+    }
+
+
+    public function utf8_encode(string $string) : ?string
+    {
+        if (! \function_exists('iconv')) {
+            throw new RuntimeException(
+                'Unable to convert a non-UTF-8 string to UTF-8: required function iconv() does not exist. You should install ext-iconv or symfony/polyfill-iconv.'
+            );
+        }
+
+        $charset = null
+            ?? (\ini_get('php.output_encoding') ?: null)
+            ?? (\ini_get('default_charset') ?: null)
+            ?? 'UTF-8';
+
+        $stringConverted = @iconv($charset, 'UTF-8', $string);
+        if (false !== $stringConverted) {
+            return $stringConverted;
+        }
+
+        if (true
+            && ('CP1252' !== $charset)
+            && false !== $stringConverted = @iconv('CP1252', 'UTF-8', $string)
+        ) {
+            return $stringConverted;
+        }
+
+        $stringConverted = iconv('CP850', 'UTF-8', $string);
+
+        return $stringConverted;
     }
 
 

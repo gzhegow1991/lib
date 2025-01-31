@@ -1,5 +1,6 @@
 <?php
 
+require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 
@@ -311,6 +312,41 @@ _assert_output($fn, '
 $fn = function () {
     _dump('[ CryptModule ]');
     echo PHP_EOL;
+
+
+    $algos = [
+        'fnv1a32',
+        'crc32',
+        'md5',
+        'sha1',
+        'sha256',
+    ];
+    foreach ( $algos as $algo ) {
+        $hash = \Gzhegow\Lib\Lib::crypt()->hash($algo, 'hello world!', $binary = false);
+        _dump($hash);
+        $result = \Gzhegow\Lib\Lib::crypt()->hash_equals($hash, $algo, 'hello world!', $binary = false);
+        _dump($result);
+        echo PHP_EOL;
+
+        $hash = \Gzhegow\Lib\Lib::crypt()->hash($algo, 'hello world!', $binary = true);
+        $hash01 = '';
+        foreach ( str_split(bin2hex($hash), 2) as $hex ) {
+            $hash01 .= str_pad(
+                base_convert($hex, 16, 2),
+                8,
+                '0',
+                STR_PAD_LEFT
+            );
+        }
+        _dump($hash01);
+        $result = \Gzhegow\Lib\Lib::crypt()->hash_equals($hash, $algo, 'hello world!', $binary = true);
+        _dump($result);
+        echo PHP_EOL;
+    }
+
+
+    echo PHP_EOL;
+
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, '01');
     _dump($enc);
@@ -625,6 +661,37 @@ $fn = function () {
 _assert_output($fn, '
 "[ CryptModule ]"
 
+"b034fff2"
+TRUE
+
+"10110000001101001111111111110010"
+TRUE
+
+"b79584fd"
+TRUE
+
+"10110111100101011000010011111101"
+TRUE
+
+"fc3ff98e8c6a0d3087d515c0473f8677"
+TRUE
+
+"11111100001111111111100110001110100011000110101000001101001100001000011111010101000101011100000001000111001111111000011001110111"
+TRUE
+
+"430ce34d020724ed75a196dfc2ad67c77772d169"
+TRUE
+
+"0100001100001100111000110100110100000010000001110010010011101101011101011010000110010110110111111100001010101101011001111100011101110111011100101101000101101001"
+TRUE
+
+"7509e5bda0c762d2bac7f90d758b5b2263fa01ccbc542ab5e3df163be08e6ca9"
+TRUE
+
+"0111010100001001111001011011110110100000110001110110001011010010101110101100011111111001000011010111010110001011010110110010001001100011111110100000000111001100101111000101010000101010101101011110001111011111000101100011101111100000100011100110110010101001"
+TRUE
+
+
 "0"
 "0"
 
@@ -748,6 +815,93 @@ $fn = function () {
     _dump('[ DebugModule ]');
     echo PHP_EOL;
 
+
+    $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
+    $newText = "apple\nbanana\ncherry\ndamson\nelderberry";
+    $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
+    _dump($isDiff);
+    _dump_array($diffLines, 1, true);
+    echo PHP_EOL;
+
+
+    echo PHP_EOL;
+
+
+    $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
+    $newText = "apple2\nbanana\ncherry\ndamson\nelderberry";
+    $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
+    _dump($isDiff);
+    _dump_array($diffLines, 1, true);
+    echo PHP_EOL;
+
+    $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
+    $newText = "apple\nbanana\ncherry2\ndamson\nelderberry";
+    $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
+    _dump($isDiff);
+    _dump_array($diffLines, 1, true);
+    echo PHP_EOL;
+
+    $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
+    $newText = "apple\nbanana\ncherry\ndamson\nelderberry2";
+    $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
+    _dump($isDiff);
+    _dump_array($diffLines, 1, true);
+    echo PHP_EOL;
+
+
+    echo PHP_EOL;
+
+
+    $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
+    $newText = "fig\napple\nbanana\ncherry\ndamson\nelderberry";
+    $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
+    _dump($isDiff);
+    _dump_array($diffLines, 1, true);
+    echo PHP_EOL;
+
+    $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
+    $newText = "apple\nbanana\ncherry\nfig\ndamson\nelderberry";
+    $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
+    _dump($isDiff);
+    _dump_array($diffLines, 1, true);
+    echo PHP_EOL;
+
+    $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
+    $newText = "apple\nbanana\ncherry\ndamson\nelderberry\nfig";
+    $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
+    _dump($isDiff);
+    _dump_array($diffLines, 1, true);
+    echo PHP_EOL;
+
+
+    echo PHP_EOL;
+
+
+    $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
+    $newText = "banana\ncherry\ndamson\nelderberry";
+    $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
+    _dump($isDiff);
+    _dump_array($diffLines, 1, true);
+    echo PHP_EOL;
+
+    $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
+    $newText = "apple\nbanana\ndamson\nelderberry";
+    $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
+    _dump($isDiff);
+    _dump_array($diffLines, 1, true);
+    echo PHP_EOL;
+
+    $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
+    $newText = "apple\nbanana\ncherry\ndamson";
+    $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
+    _dump($isDiff);
+    _dump_array($diffLines, 1, true);
+    echo PHP_EOL;
+
+
+    echo PHP_EOL;
+
+
     echo \Gzhegow\Lib\Lib::debug()->value(null) . PHP_EOL;
     echo \Gzhegow\Lib\Lib::debug()->value(false) . PHP_EOL;
     echo \Gzhegow\Lib\Lib::debug()->value(1) . PHP_EOL;
@@ -777,7 +931,9 @@ $fn = function () {
     );
     echo PHP_EOL;
 
+
     echo PHP_EOL;
+
 
     echo \Gzhegow\Lib\Lib::debug()->value_multiline(
         [
@@ -799,6 +955,103 @@ $fn = function () {
 };
 _assert_output($fn, '
 "[ DebugModule ]"
+
+FALSE
+[
+  "apple",
+  "banana",
+  "cherry",
+  "damson",
+  "elderberry"
+]
+
+
+TRUE
+[
+  "+++ > apple @ --- apple2",
+  "banana",
+  "cherry",
+  "damson",
+  "elderberry"
+]
+
+TRUE
+[
+  "apple",
+  "banana",
+  "+++ > cherry @ --- cherry2",
+  "damson",
+  "elderberry"
+]
+
+TRUE
+[
+  "apple",
+  "banana",
+  "cherry",
+  "damson",
+  "+++ > elderberry @ --- elderberry2"
+]
+
+
+TRUE
+[
+  "--- > fig",
+  "apple",
+  "banana",
+  "cherry",
+  "damson",
+  "elderberry"
+]
+
+TRUE
+[
+  "apple",
+  "banana",
+  "cherry",
+  "--- > fig",
+  "damson",
+  "elderberry"
+]
+
+TRUE
+[
+  "apple",
+  "banana",
+  "cherry",
+  "damson",
+  "elderberry",
+  "--- > fig"
+]
+
+
+TRUE
+[
+  "+++ > apple",
+  "banana",
+  "cherry",
+  "damson",
+  "elderberry"
+]
+
+TRUE
+[
+  "apple",
+  "banana",
+  "+++ > cherry",
+  "damson",
+  "elderberry"
+]
+
+TRUE
+[
+  "apple",
+  "banana",
+  "cherry",
+  "damson",
+  "+++ > elderberry"
+]
+
 
 NULL
 FALSE

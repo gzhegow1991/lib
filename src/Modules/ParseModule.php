@@ -744,6 +744,53 @@ class ParseModule
     }
 
 
+    public function table($value) : ?array
+    {
+        if (! is_array($value)) {
+            return null;
+        }
+
+        $columns = [];
+        for ( $i = 0; $i < count($value); $i++ ) {
+            if (! is_array($value[ $i ])) {
+                return null;
+            }
+        }
+
+        return $value;
+    }
+
+    public function matrix($value) : ?array
+    {
+        if (! is_array($value)) {
+            return null;
+        }
+
+        for ( $i = 0; $i < count($value); $i++ ) {
+            if (null === $this->list($value[ $i ])) {
+                return null;
+            }
+        }
+
+        return $value;
+    }
+
+    public function matrix_strict($value) : ?array
+    {
+        if (! is_array($value)) {
+            return null;
+        }
+
+        for ( $i = 0; $i < count($value); $i++ ) {
+            if (null === $this->list_strict($value[ $i ])) {
+                return null;
+            }
+        }
+
+        return $value;
+    }
+
+
     public function countable($value) : ?iterable
     {
         if (PHP_VERSION_ID < 70300) {

@@ -97,6 +97,76 @@ class CryptModule
     }
 
 
+    public function hash(
+        string $algo,
+        string $datastring,
+        bool $binary = null, array $options = []
+    ) : string
+    {
+        $binary = $binary ?? false;
+
+        $result = null;
+
+        $result = PHP_VERSION_ID > 80100
+            ? hash($algo, $datastring, $binary, $options)
+            : hash($algo, $datastring, $binary);
+
+        if ($binary && ('' === $result)) {
+            $result = PHP_VERSION_ID > 80100
+                ? hash($algo, $datastring, false, $options)
+                : hash($algo, $datastring, false);
+
+            $result = hex2bin($result);
+        }
+
+        return $result;
+    }
+
+    public function hash_equals(
+        string $user_hash,
+        string $algo,
+        string $user_datastring,
+        bool $binary = null, array $options = []
+    )
+    {
+        $known_hash = $this->hash(
+            $algo,
+            $user_datastring,
+            $binary, $options
+        );
+
+        return hash_equals($known_hash, $user_hash);
+    }
+
+    public function hash_hmac(
+        string $algo, string $secret_key,
+        string $datastring,
+        bool $binary = null, array $options = []
+    )
+    {
+        $binary = $binary ?? false;
+
+        $hmac = hash_hmac($algo, $datastring, $secret_key, $binary);
+
+        return $hmac;
+    }
+
+    public function hash_hmac_equals(
+        string $user_hmac,
+        string $algo, string $secret_key,
+        string $user_datastring,
+        bool $binary = null, array $options = []
+    )
+    {
+        $known_hmac = $this->hash_hmac(
+            $algo, $secret_key,
+            $user_datastring,
+            $binary, $options
+        );
+
+        return hash_equals($known_hmac, $user_hmac);
+    }
+
 
     public function dec2numbase(string $decString, $alphabetTo, bool $oneBasedTo = null) : string
     {
