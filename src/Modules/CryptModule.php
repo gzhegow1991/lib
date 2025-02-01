@@ -107,17 +107,9 @@ class CryptModule
 
         $result = null;
 
-        $result = PHP_VERSION_ID > 80100
+        $result = (PHP_VERSION_ID > 80100)
             ? hash($algo, $datastring, $binary, $options)
             : hash($algo, $datastring, $binary);
-
-        if ($binary && ('' === $result)) {
-            $result = PHP_VERSION_ID > 80100
-                ? hash($algo, $datastring, false, $options)
-                : hash($algo, $datastring, false);
-
-            $result = hex2bin($result);
-        }
 
         return $result;
     }
