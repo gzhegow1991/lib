@@ -264,6 +264,129 @@ class CryptModule
     }
 
 
+    /**
+     * > gzhegow
+     * > функция переводит число из двоичной системы в другую, являющуюся степенью двойки, не переводя в десятичную систему
+     *
+     * > основное отличие `bin2numbase` от `bin2base` в считывании битов слева-направо и справа-налево соответственно
+     * > при переводе числа в систему счисления pow(2,n) (например, из bin(2^1) в hex(2^3)), данные читаются справа-налево (т.к. число имеет конец)
+     */
+    public function bin2numbase(string $binary, $alphabetTo) : string
+    {
+        $theParse = Lib::parse();
+        $theMb = Lib::mb();
+
+        $_binary = null
+            ?? $theParse->baseBin($binary)
+            ?? Lib::php()->throw([ 'The `base` should be valid `baseBin`', $binary ]);
+
+        $_alphabetTo = null
+            ?? $theParse->alphabet($alphabetTo)
+            ?? Lib::php()->throw([ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]);
+
+        $alphabetToValue = $_alphabetTo->getValue();
+        $alphabetToLen = $_alphabetTo->getLength();
+
+        if ($alphabetToValue === '01') {
+            return $_binary;
+        }
+
+        $binaryLen = strlen($_binary);
+
+        $baseTo = $alphabetToLen;
+        if (! $this->isPowerOf2($baseTo)) {
+            throw new LogicException(
+                [
+                    'The `alphabetTo` length should be a power of 2: ' . $alphabetTo,
+                    $alphabetTo,
+                ]
+            );
+        }
+
+        $bytesCnt = (int) log($baseTo, 2);
+
+        $result = '';
+
+        $buff = '';
+        $left = $bytesCnt;
+        for ( $i = $binaryLen; $i >= 1; $i-- ) {
+            $buff = $_binary[ $i - 1 ] . $buff;
+
+            $left--;
+
+            if ($left === 0) {
+                $idx = bindec($buff);
+
+                $result .= $alphabetToValue[ $idx ];
+
+                $left = $bytesCnt;
+                $buff = '';
+            }
+        }
+
+        if ('' !== $buff) {
+            $idx = bindec($buff);
+
+            $result .= $alphabetToValue[ $idx ];
+        }
+
+        return $result;
+    }
+
+    public function numbase2bin(string $numbaseString, $alphabetFrom) : string
+    {
+        $theParse = Lib::parse();
+        $theMb = Lib::mb();
+
+        $_numbaseString = null
+            ?? $theParse->base($numbaseString, $alphabetFrom)
+            ?? Lib::php()->throw([ 'The `powbin` should be valid `base` of given alphabet', $numbaseString ]);
+
+        $numbaseStringLen = mb_strlen($_numbaseString);
+
+        $alphabetFromLen = mb_strlen($alphabetFrom);
+
+        $baseFrom = $alphabetFromLen;
+        if (! $this->isPowerOf2($baseFrom)) {
+            throw new LogicException(
+                [
+                    'The `alphabetFrom` length should be a power of 2: ' . $alphabetFrom,
+                    $alphabetFrom,
+                ]
+            );
+        }
+
+        $bytesCnt = (int) log($baseFrom, 2);
+
+        $result = '';
+
+        $buff = '';
+        $left = 8;
+        for ( $i = 0; $i < $numbaseStringLen; $i++ ) {
+            $idx = mb_strpos($alphabetFrom, $_numbaseString[ $i ]);
+
+            $bin = decbin($idx);
+
+            $bin = str_pad($bin, $bytesCnt, '0', STR_PAD_LEFT);
+
+            for ( $ii = $bytesCnt; $ii >= 1; $ii-- ) {
+                $buff = $bin[ $ii - 1 ] . $buff;
+
+                $left--;
+
+                if ($left === 0) {
+                    $result = $buff . $result;
+
+                    $left = 8;
+                    $buff = '';
+                }
+            }
+        }
+
+        return $result;
+    }
+
+
     public function numbase2numbase(
         string $numbaseString,
         $alphabetTo, $alphabetFrom,
@@ -347,6 +470,111 @@ class CryptModule
         $result = $this->baseX_decode($numbaseString, static::ALPHABET_BASE_62);
 
         return $result;
+    }
+
+
+    public function base64_encode(string $string) : string
+    {
+        $gen = $this->base64_encode_it($string);
+
+        $result = '';
+        foreach ( $gen as $baseLetter ) {
+            $result .= $baseLetter;
+        }
+
+        return $result;
+    }
+
+    public function base64_decode(string $baseString) : string
+    {
+        $gen = $this->base64_decode_it($baseString);
+
+        $result = '';
+        foreach ( $gen as $chr ) {
+            $result .= $chr;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return \Generator<string>
+     */
+    public function base64_encode_it($strings) : \Generator
+    {
+        $gen = $this->baseX_encode_it(
+            $strings,
+            static::ALPHABET_BASE_64_RFC4648
+        );
+
+        return $gen;
+    }
+
+    /**
+     * @return \Generator<string>
+     */
+    public function base64_decode_it($base64Strings, bool $throw = null) : \Generator
+    {
+        $gen = $this->baseX_decode_it(
+            $base64Strings,
+            static::ALPHABET_BASE_64_RFC4648,
+            $throw
+        );
+
+        return $gen;
+    }
+
+
+    public function base64_encode_urlsafe(string $string) : string
+    {
+        $gen = $this->base64_encode_urlsafe_it($string);
+
+        $result = '';
+        foreach ( $gen as $baseLetter ) {
+            $result .= $baseLetter;
+        }
+
+        return $result;
+    }
+
+    public function base64_decode_urlsafe(string $baseString) : string
+    {
+        $gen = $this->base64_decode_urlsafe_it($baseString);
+
+        $result = '';
+        foreach ( $gen as $chr ) {
+            $result .= $chr;
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @return \Generator<string>
+     */
+    public function base64_encode_urlsafe_it($strings) : \Generator
+    {
+        $gen = $this->baseX_encode_it(
+            $strings,
+            static::ALPHABET_BASE_64_RFC4648_URLSAFE
+        );
+
+        return $gen;
+    }
+
+    /**
+     * @return \Generator<string>
+     */
+    public function base64_decode_urlsafe_it($base64Strings, bool $throw = null) : \Generator
+    {
+        $gen = $this->baseX_decode_it(
+            $base64Strings,
+            static::ALPHABET_BASE_64_RFC4648_URLSAFE,
+            $throw
+        );
+
+        return $gen;
     }
 
 
@@ -488,112 +716,6 @@ class CryptModule
         return $result;
     }
 
-
-    public function base64_encode(string $string) : string
-    {
-        $gen = $this->base64_encode_it($string);
-
-        $result = '';
-        foreach ( $gen as $baseLetter ) {
-            $result .= $baseLetter;
-        }
-
-        return $result;
-    }
-
-    public function base64_decode(string $baseString) : string
-    {
-        $gen = $this->base64_decode_it($baseString);
-
-        $result = '';
-        foreach ( $gen as $chr ) {
-            $result .= $chr;
-        }
-
-        return $result;
-    }
-
-
-    public function base64_encode_urlsafe(string $string) : string
-    {
-        $gen = $this->base64_encode_urlsafe_it($string);
-
-        $result = '';
-        foreach ( $gen as $baseLetter ) {
-            $result .= $baseLetter;
-        }
-
-        return $result;
-    }
-
-    public function base64_decode_urlsafe(string $baseString) : string
-    {
-        $gen = $this->base64_decode_urlsafe_it($baseString);
-
-        $result = '';
-        foreach ( $gen as $chr ) {
-            $result .= $chr;
-        }
-
-        return $result;
-    }
-
-
-    /**
-     * @return \Generator<string>
-     */
-    public function base64_encode_it($strings) : \Generator
-    {
-        $gen = $this->baseX_encode_it(
-            $strings,
-            static::ALPHABET_BASE_64_RFC4648
-        );
-
-        return $gen;
-    }
-
-    /**
-     * @return \Generator<string>
-     */
-    public function base64_decode_it($base64Strings, bool $throw = null) : \Generator
-    {
-        $gen = $this->baseX_decode_it(
-            $base64Strings,
-            static::ALPHABET_BASE_64_RFC4648,
-            $throw
-        );
-
-        return $gen;
-    }
-
-    /**
-     * @return \Generator<string>
-     */
-    public function base64_encode_urlsafe_it($strings) : \Generator
-    {
-        $gen = $this->baseX_encode_it(
-            $strings,
-            static::ALPHABET_BASE_64_RFC4648_URLSAFE
-        );
-
-        return $gen;
-    }
-
-    /**
-     * @return \Generator<string>
-     */
-    public function base64_decode_urlsafe_it($base64Strings, bool $throw = null) : \Generator
-    {
-        $gen = $this->baseX_decode_it(
-            $base64Strings,
-            static::ALPHABET_BASE_64_RFC4648_URLSAFE,
-            $throw
-        );
-
-        return $gen;
-    }
-
-
     /**
      * @return \Generator<string>
      */
@@ -661,129 +783,6 @@ class CryptModule
 
             yield $chr;
         }
-    }
-
-
-    /**
-     * > gzhegow
-     * > функция переводит число из двоичной системы в другую, являющуюся степенью двойки, не переводя в десятичную систему
-     *
-     * > основное отличие `bin2numbase` от `bin2base` в считывании битов слева-направо и справа-налево соответственно
-     * > при переводе числа в систему счисления pow(2,n) (например, из bin(2^1) в hex(2^3)), данные читаются справа-налево (т.к. число имеет конец)
-     */
-    public function bin2numbase(string $binary, $alphabetTo) : string
-    {
-        $theParse = Lib::parse();
-        $theMb = Lib::mb();
-
-        $_binary = null
-            ?? $theParse->baseBin($binary)
-            ?? Lib::php()->throw([ 'The `base` should be valid `baseBin`', $binary ]);
-
-        $_alphabetTo = null
-            ?? $theParse->alphabet($alphabetTo)
-            ?? Lib::php()->throw([ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]);
-
-        $alphabetToValue = $_alphabetTo->getValue();
-        $alphabetToLen = $_alphabetTo->getLength();
-
-        if ($alphabetToValue === '01') {
-            return $_binary;
-        }
-
-        $binaryLen = strlen($_binary);
-
-        $baseTo = $alphabetToLen;
-        if (! $this->isPowerOf2($baseTo)) {
-            throw new LogicException(
-                [
-                    'The `alphabetTo` length should be a power of 2: ' . $alphabetTo,
-                    $alphabetTo,
-                ]
-            );
-        }
-
-        $bytesCnt = (int) log($baseTo, 2);
-
-        $result = '';
-
-        $buff = '';
-        $left = $bytesCnt;
-        for ( $i = $binaryLen; $i >= 1; $i-- ) {
-            $buff = $_binary[ $i - 1 ] . $buff;
-
-            $left--;
-
-            if ($left === 0) {
-                $idx = bindec($buff);
-
-                $result .= $alphabetToValue[ $idx ];
-
-                $left = $bytesCnt;
-                $buff = '';
-            }
-        }
-
-        if ('' !== $buff) {
-            $idx = bindec($buff);
-
-            $result .= $alphabetToValue[ $idx ];
-        }
-
-        return $result;
-    }
-
-    public function numbase2bin(string $numbaseString, $alphabetFrom) : string
-    {
-        $theParse = Lib::parse();
-        $theMb = Lib::mb();
-
-        $_numbaseString = null
-            ?? $theParse->base($numbaseString, $alphabetFrom)
-            ?? Lib::php()->throw([ 'The `powbin` should be valid `base` of given alphabet', $numbaseString ]);
-
-        $numbaseStringLen = mb_strlen($_numbaseString);
-
-        $alphabetFromLen = mb_strlen($alphabetFrom);
-
-        $baseFrom = $alphabetFromLen;
-        if (! $this->isPowerOf2($baseFrom)) {
-            throw new LogicException(
-                [
-                    'The `alphabetFrom` length should be a power of 2: ' . $alphabetFrom,
-                    $alphabetFrom,
-                ]
-            );
-        }
-
-        $bytesCnt = (int) log($baseFrom, 2);
-
-        $result = '';
-
-        $buff = '';
-        $left = 8;
-        for ( $i = 0; $i < $numbaseStringLen; $i++ ) {
-            $idx = mb_strpos($alphabetFrom, $_numbaseString[ $i ]);
-
-            $bin = decbin($idx);
-
-            $bin = str_pad($bin, $bytesCnt, '0', STR_PAD_LEFT);
-
-            for ( $ii = $bytesCnt; $ii >= 1; $ii-- ) {
-                $buff = $bin[ $ii - 1 ] . $buff;
-
-                $left--;
-
-                if ($left === 0) {
-                    $result = $buff . $result;
-
-                    $left = 8;
-                    $buff = '';
-                }
-            }
-        }
-
-        return $result;
     }
 
 
@@ -1011,7 +1010,6 @@ class CryptModule
 
         return $result;
     }
-
 
     /**
      * @return \Generator<string>
