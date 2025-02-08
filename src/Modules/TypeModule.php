@@ -1,0 +1,1536 @@
+<?php
+
+namespace Gzhegow\Lib\Modules;
+
+use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Crypt\Alphabet;
+use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
+use Gzhegow\Lib\Modules\Type\Base\TypeModuleBase;
+
+
+class TypeModule extends TypeModuleBase
+{
+    /**
+     * @param null $result
+     */
+    public function null(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (null === $value) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed|null $result
+     */
+    public function not_null(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (null === $value) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
+    /**
+     * @param false|null $result
+     */
+    public function false(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (false === $value) {
+            $result = false;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed|null $result
+     */
+    public function not_false(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (false === $value) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
+    /**
+     * @param float|null $result
+     */
+    public function nan(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (is_float($value) && is_nan($value)) {
+            $result = NAN;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed|null $result
+     */
+    public function not_nan(&$result, $value) : bool
+    {
+        $result = null;
+
+        if ($this->nan($var, $value)) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
+    /**
+     * @param mixed|null $result
+     */
+    public function empty(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (empty($value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed|null $result
+     */
+    public function not_empty(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (empty($value)) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
+    /**
+     * @param mixed|null $result
+     */
+    public function nil(&$result, $value) : bool
+    {
+        $result = null;
+
+        if ($this->the_nil() === $value) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed|null $result
+     */
+    public function not_nil(&$result, $value) : bool
+    {
+        $result = null;
+
+        if ($this->the_nil() === $value) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
+    /**
+     * @param mixed|null $result
+     */
+    public function undefined(&$result, $value) : bool
+    {
+        $result = null;
+
+        $theUndefined = $this->the_undefined();
+
+        $isNan = is_float($theUndefined) && is_nan($theUndefined);
+
+        if ($isNan) {
+            if (is_float($value) && is_nan($value)) {
+                $result = NAN;
+
+                return true;
+            }
+
+        } else {
+            if ($theUndefined === $value) {
+                $result = $value;
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed|null $result
+     */
+    public function not_undefined(&$result, $value) : bool
+    {
+        $result = null;
+
+        if ($this->undefined($var, $value)) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
+    /**
+     * > gzhegow, NULL is nullable
+     * > gzhegow, NAN is nullable
+     * > gzhegow, NIL is nullable
+     *
+     * > gzhegow, '' is not nullable
+     *
+     * @param mixed|null $result
+     */
+    public function nullable(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (
+            (null === $value)
+            || $this->nil($var, $value)
+            || $this->nan($var, $value)
+            //
+            // > not nullable
+            // || ('' === $value) // user can send empty string as he wants
+        ) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed|null $result
+     */
+    public function not_nullable(&$result, $value) : bool
+    {
+        $result = null;
+
+        if ($this->nullable($var, $value)) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
+    /**
+     * > gzhegow, any empty is blank
+     * > gzhegow, any nullable is blank
+     *
+     * > gzhegow, non-empty-string is not blank
+     * > gzhegow, non-empty-array is not blank
+     * > gzhegow, non-empty-countable is not blank
+     *
+     * @param mixed|null $result
+     */
+    public function blank(&$result, $value) : bool
+    {
+        $result = null;
+
+        if ('' === $value) {
+            $result = $value;
+
+            return true;
+        }
+
+        if (
+            $this->nil($_value, $value)
+            || $this->nan($_value, $value)
+        ) {
+            $result = $_value;
+
+            return true;
+        }
+
+        if (is_scalar($value)) {
+            return false;
+        }
+
+        if (empty($value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        if (is_object($value)) {
+            if (null === ($cnt = Lib::php()->count($value))) {
+                return false;
+            }
+
+            if (0 === $cnt) {
+                $result = $value;
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed|null $result
+     */
+    public function not_blank(&$result, $value) : bool
+    {
+        $result = null;
+
+        if ($this->blank($var, $value)) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
+    /**
+     * значение отправлено пользователем
+     *
+     * > nil is passed
+     * > any non-nullable is passed
+     *
+     * @param mixed|null $result
+     */
+    public function passed(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (
+            $this->nil($_value, $value)
+            || ! $this->nullable($_value, $value)
+        ) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param mixed|null $result
+     */
+    public function not_passed(&$result, $value) : bool
+    {
+        $result = null;
+
+        if ($this->passed($var, $value)) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
+    /**
+     * @param bool|null $result
+     */
+    public function userbool(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (is_bool($value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        if ($this->int($_value, $value)) {
+            $result = (bool) $_value;
+
+            return true;
+        }
+
+        if (! $this->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        $_value = strtolower($_value);
+
+        switch ( $_value ):
+            case 'true':
+            case 'y':
+            case 'yes':
+            case 'on':
+                $result = true;
+
+                return true;
+
+            case 'false':
+            case 'n':
+            case 'no':
+            case 'off':
+                $result = false;
+
+                return true;
+
+        endswitch;
+
+        return false;
+    }
+
+
+    /**
+     * @param int|null $result
+     */
+    public function int(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->num($_value, $value)) {
+            return false;
+        }
+
+        if (! is_int($_value)) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|null $result
+     */
+    public function int_non_zero(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value === 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|null $result
+     */
+    public function int_non_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value < 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|null $result
+     */
+    public function int_non_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value > 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|null $result
+     */
+    public function int_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value >= 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|null $result
+     */
+    public function int_positive(&$result, $value) : bool
+    {
+        $result = false;
+
+        if (! $this->int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value <= 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (is_int($value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        if (is_float($value)) {
+            if (! is_finite($value)) {
+                return false;
+
+            } else {
+                $result = $value;
+
+                return true;
+            }
+        }
+
+        if (is_bool($value)) {
+            $result = (int) $value;
+
+            return true;
+        }
+
+        $status = $this->string_not_empty($string, $value);
+        if (! $status) {
+            return false;
+        }
+
+        if (! is_numeric($string)) {
+            return false;
+        }
+
+        $valueFloat = (float) $string;
+
+        if (($valueFloat < -PHP_INT_MAX) || (PHP_INT_MAX < $valueFloat)) {
+            $result = $valueFloat;
+
+            return true;
+        }
+
+        $valueInt = (int) $string;
+
+        if ($valueFloat === (float) $valueInt) {
+            $result = $valueInt;
+
+            return true;
+        }
+
+        $result = $valueFloat;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num_non_zero(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->num($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num_non_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->num($_value, $value)) {
+            return false;
+        }
+
+        if ($_value < 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num_non_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->num($_value, $value)) {
+            return false;
+        }
+
+        if ($_value > 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->num($_value, $value)) {
+            return false;
+        }
+
+        if ($_value >= 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->num($_value, $value)) {
+            return false;
+        }
+
+        if ($_value <= 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_int(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric($_value, $value)) {
+            return false;
+        }
+
+        $theDecimalPoint = $this->the_decimal_point();
+
+        if (false !== stripos($_value, $theDecimalPoint)) {
+            return false;
+        }
+
+        // > gzhegow, 0.000022 becomes 2.2E-5, so you need to pass formatted string instead of float
+        if (false !== stripos($_value, 'e')) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_int_non_zero(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric_int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_int_non_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric_int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            $result = '0';
+
+            return true;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_int_non_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric_int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            $result = '0';
+
+            return true;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_int_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric_int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            return false;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_int_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric_int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            return false;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        if (! is_numeric($_value)) {
+            return false;
+        }
+
+        if (in_array($_value, [ 'NAN', 'INF', '-INF' ])) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_non_zero(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_non_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            $result = '0';
+
+            return true;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_non_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            $result = '0';
+
+            return true;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            return false;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            return false;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+
+    /**
+     * @param Bcnumber|null $result
+     */
+    public function bcnum(&$result, $value) : bool
+    {
+        return Lib::bcmath()->type_bcnum($result, $value);
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function string(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (is_string($value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        if (
+            (null === $value)
+            || is_array($value)
+            || is_resource($value)
+        ) {
+            return false;
+        }
+
+        if (is_object($value)) {
+            if (method_exists($value, '__toString')) {
+                $_value = (string) $value;
+
+                $result = $_value;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        $_value = $value;
+
+        $status = settype($_value, 'string');
+        if ($status) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function string_not_empty(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->string($_value, $value)) {
+            return false;
+        }
+
+        if ('' === $_value) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function trim(&$result, $value, string $characters = null) : bool
+    {
+        $result = null;
+
+        $characters = $characters ?? " \n\r\t\v\0";
+
+        if (! $this->string($_value, $value)) {
+            return false;
+        }
+
+        $_value = trim($_value, $characters);
+
+        if ('' === $_value) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return $_value;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function ctype_digit(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (extension_loaded('ctype')) {
+            if (ctype_digit($value)) {
+                $result = $value;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        if (! preg_match('~[^0-9]~', $_value)) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function ctype_alpha(&$result, $value, bool $ignoreCase = null) : bool
+    {
+        $result = null;
+
+        $ignoreCase = $ignoreCase ?? true;
+
+        if (extension_loaded('ctype')) {
+            if (! $ignoreCase) {
+                if (strtolower($value) !== $value) {
+                    return false;
+                }
+            }
+
+            if (ctype_alpha($value)) {
+                $result = $value;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        $regexFlags = $ignoreCase
+            ? 'i'
+            : '';
+
+        if (preg_match('~[^a-z]~' . $regexFlags, $_value)) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function ctype_alnum(&$result, $value, bool $ignoreCase = null) : bool
+    {
+        $result = null;
+
+        $ignoreCase = $ignoreCase ?? true;
+
+        if (extension_loaded('ctype')) {
+            if (! $ignoreCase) {
+                if (strtolower($value) !== $value) {
+                    return false;
+                }
+            }
+
+            if (ctype_alnum($value)) {
+                $result = $value;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        $regexFlags = $ignoreCase
+            ? 'i'
+            : '';
+
+        if (preg_match('~[^0-9a-z]~' . $regexFlags, $_value)) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+
+    /**
+     * @param Alphabet|null $result
+     */
+    public function alphabet(&$result, $value) : bool
+    {
+        return Lib::crypt()->type_alphabet($result, $value);
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function base(&$result, $value, $alphabet) : bool
+    {
+        return Lib::crypt()->type_base($result, $value, $alphabet);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function base_bin(&$result, $value) : bool
+    {
+        return Lib::crypt()->type_base_bin($result, $value);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function base_oct(&$result, $value) : bool
+    {
+        return Lib::crypt()->type_base_oct($result, $value);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function base_dec(&$result, $value) : bool
+    {
+        return Lib::crypt()->type_base_dec($result, $value);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function base_hex(&$result, $value) : bool
+    {
+        return Lib::crypt()->type_base_hex($result, $value);
+    }
+
+
+    /**
+     * @param array|null $result
+     */
+    public function list(&$result, $value) : bool
+    {
+        return Lib::arr()->type_list($result, $value);
+    }
+
+    /**
+     * @param array|null $result
+     */
+    public function list_strict(&$result, $value) : bool
+    {
+        return Lib::arr()->type_list_strict($result, $value);
+    }
+
+    /**
+     * @param array|null $result
+     */
+    public function dict(&$result, $value) : bool
+    {
+        return Lib::arr()->type_dict($result, $value);
+    }
+
+
+    /**
+     * @param array|null $result
+     */
+    public function table(&$result, $value) : bool
+    {
+        return Lib::arr()->type_table($result, $value);
+    }
+
+    /**
+     * @param array|null $result
+     */
+    public function matrix(&$result, $value) : bool
+    {
+        return Lib::arr()->type_matrix($result, $value);
+    }
+
+    /**
+     * @param array|null $result
+     */
+    public function matrix_strict(&$result, $value) : bool
+    {
+        return Lib::arr()->type_matrix_strict($result, $value);
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function regex(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        error_clear_last();
+
+        try {
+            $status = preg_match($_value, '');
+        }
+        catch ( \Throwable $e ) {
+            return false;
+        }
+
+        if (error_get_last()) {
+            return false;
+        }
+
+        if (false === $status) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function ip(&$result, $value) : bool
+    {
+        return Lib::net()->type_ip($result, $value);
+    }
+
+
+    /**
+     * @param array|\Countable|null $result
+     */
+    public function countable(&$result, $value) : bool
+    {
+        return Lib::php()->type_countable($result, $value);
+    }
+
+
+    /**
+     * @param resource|null $result
+     */
+    public function resource(&$result, $value) : bool
+    {
+        return Lib::php()->type_resource($result, $value);
+    }
+
+    /**
+     * @param resource|null $result
+     */
+    public function resource_opened(&$result, $value) : bool
+    {
+        return Lib::php()->type_resource_opened($result, $value);
+    }
+
+    /**
+     * @param resource|null $result
+     */
+    public function resource_closed(&$result, $value) : bool
+    {
+        return Lib::php()->type_resource_closed($result, $value);
+    }
+
+
+    /**
+     * @param class-string|null $result
+     *
+     * @param callable          ...$fnExistsList
+     */
+    public function struct(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
+    {
+        return Lib::php()->type_struct($result, $value, $useRegex, ...$fnExistsList);
+    }
+
+    /**
+     * @param class-string|null $result
+     */
+    public function struct_class(&$result, $value, bool $useRegex = null) : bool
+    {
+        return Lib::php()->type_struct_class($result, $value, $useRegex);
+    }
+
+    /**
+     * @param class-string|null $result
+     */
+    public function struct_interface(&$result, $value, bool $useRegex = null) : bool
+    {
+        return Lib::php()->type_struct_interface($result, $value, $useRegex);
+    }
+
+    /**
+     * @param class-string|null $result
+     */
+    public function struct_trait(&$result, $value, bool $useRegex = null) : bool
+    {
+        return Lib::php()->type_struct_trait($result, $value, $useRegex);
+    }
+
+
+    /**
+     * @param class-string|null $result
+     *
+     * @param callable          ...$fnExistsList
+     */
+    public function struct_fqcn(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
+    {
+        return Lib::php()->type_struct_fqcn($result, $value, $useRegex, ...$fnExistsList);
+    }
+
+    /**
+     * @param string|null $result
+     *
+     * @param callable    ...$fnExistsList
+     */
+    public function struct_namespace(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
+    {
+        return Lib::php()->type_struct_namespace($result, $value, $useRegex, ...$fnExistsList);
+    }
+
+    /**
+     * @param string|null $result
+     *
+     * @param callable    ...$fnExistsList
+     */
+    public function struct_basename(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
+    {
+        return Lib::php()->type_struct_basename($result, $value, $useRegex, ...$fnExistsList);
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function path(
+        &$result,
+        $value, array $refs = []
+    ) : bool
+    {
+        return Lib::fs()->type_path($result, $value, $refs);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function dirpath(
+        &$result,
+        $value, array $refs = []
+    ) : bool
+    {
+        return Lib::fs()->type_dirpath($result, $value, $refs);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function filepath(
+        &$result,
+        $value, array $refs = []
+    ) : bool
+    {
+        return Lib::fs()->type_filepath($result, $value, $refs);
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function path_realpath(
+        &$result,
+        $value, array $refs = []
+    ) : bool
+    {
+        return Lib::fs()->type_path_realpath($result, $value, $refs);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function dirpath_realpath(
+        &$result,
+        $value, array $refs = []
+    ) : bool
+    {
+        return Lib::fs()->type_dirpath_realpath($result, $value, $refs);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function filepath_realpath(
+        &$result,
+        $value, array $refs = []
+    ) : bool
+    {
+        return Lib::fs()->type_filepath_realpath($result, $value, $refs);
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function filename(&$result, $value) : bool
+    {
+        return Lib::fs()->type_filename($result, $value);
+    }
+}

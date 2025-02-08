@@ -115,13 +115,13 @@ class ErrorHandler
             $splObjectId = spl_object_id($current);
             echo "{ {$gettype} # {$getClass} # {$splObjectId} }" . PHP_EOL;
 
-            echo $current->getMessage() . PHP_EOL;
+            echo '"' . $current->getMessage() . '"' . PHP_EOL;
 
             $file = $current->getFile() ?? '{file}';
             $line = $current->getLine() ?? '{line}';
             echo "{$file} : {$line}" . PHP_EOL;
 
-            foreach ( $e->getTrace() as $traceItem ) {
+            foreach ( $current->getTrace() as $traceItem ) {
                 $file = $traceItem[ 'file' ] ?? '{file}';
                 $line = $traceItem[ 'line' ] ?? '{line}';
 

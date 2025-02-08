@@ -28,6 +28,67 @@ class BcmathModule
     }
 
 
+    /**
+     * @param Bcnumber|null $result
+     */
+    public function type_bcnum(&$result, $value, int &$scaleParsed = null) : bool
+    {
+        $result = null;
+
+        if ($value instanceof Bcnumber) {
+            $result = $value;
+
+            return true;
+        }
+
+        $theType = Lib::type();
+
+        if (! $theType->numeric($_value, $value)) {
+            return false;
+        }
+
+        // > gzhegow, 0.000022 becomes 2.2E-5, so you need to pass formatted string instead of float
+        if (false !== stripos($_value, 'e')) {
+            return false;
+        }
+
+        $valueMinus = '';
+        $valueAbs = $_value;
+
+        $isMinus = ('-' === $_value[ 0 ]);
+        if ($isMinus) {
+            $valueMinus = '-';
+            $valueAbs = substr($_value, 1);
+        }
+
+        [
+            $valueAbsFloor,
+            $valueAbsFrac,
+        ] = explode($theType->the_decimal_point(), $valueAbs) + [ '0', '' ];
+
+        $valueAbsFloor = ltrim($valueAbsFloor, '0');  // 0000.1
+        $valueAbsFrac = rtrim($valueAbsFrac, '0');    // 1.0000
+
+        $scaleParsed = strlen($valueAbsFrac);
+
+        $minus = (($valueMinus && ($valueAbs != 0)) ? '-' : '');
+        $integral = (('' !== $valueAbsFloor) ? $valueAbsFloor : "0");
+        $fractional = (('' !== $valueAbsFrac) ? ".{$valueAbsFrac}" : "");
+
+        $bcnum = new Bcnumber(
+            $value,
+            $minus,
+            $integral,
+            $fractional,
+            $scaleParsed
+        );
+
+        $result = $bcnum;
+
+        return true;
+    }
+
+
     public function scale_limit_static(int $scaleLimit = null) : int
     {
         if (null !== $scaleLimit) {
@@ -47,56 +108,6 @@ class BcmathModule
         $result = $result ?? $this->scaleLimit;
 
         return $result;
-    }
-
-
-    public function parse_bcnum($value, int &$scaleParsed = null) : ?Bcnumber
-    {
-        if ($value instanceof Bcnumber) {
-            return $value;
-        }
-
-        if (null === ($_value = Lib::parse()->numeric($value))) {
-            return null;
-        }
-
-        // > gzhegow, 0.000022 becomes 2.2E-5, so you need to pass formatted string instead of float
-        if (false !== stripos($_value, 'e')) {
-            return null;
-        }
-
-        $valueMinus = '';
-        $valueAbs = $_value;
-
-        $isMinus = ('-' === $_value[ 0 ]);
-        if ($isMinus) {
-            $valueMinus = '-';
-            $valueAbs = substr($_value, 1);
-        }
-
-        [
-            $valueAbsFloor,
-            $valueAbsFrac,
-        ] = explode(ParseModule::DECIMAL_POINT, $valueAbs) + [ '0', '' ];
-
-        $valueAbsFloor = ltrim($valueAbsFloor, '0');  // 0000.1
-        $valueAbsFrac = rtrim($valueAbsFrac, '0');    // 1.0000
-
-        $scaleParsed = strlen($valueAbsFrac);
-
-        $minus = (($valueMinus && ($valueAbs != 0)) ? '-' : '');
-        $integral = (('' !== $valueAbsFloor) ? $valueAbsFloor : "0");
-        $fractional = (('' !== $valueAbsFrac) ? ".{$valueAbsFrac}" : "");
-
-        $bcnum = new Bcnumber(
-            $value,
-            $minus,
-            $integral,
-            $fractional,
-            $scaleParsed
-        );
-
-        return $bcnum;
     }
 
 
@@ -192,7 +203,7 @@ class BcmathModule
 
     public function bcceil($num, int $scale = 0) : Bcnumber
     {
-        if (null === ($bcnum = $this->parse_bcnum($num))) {
+        if (! $this->type_bcnum($bcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
             );
@@ -241,14 +252,14 @@ class BcmathModule
             );
         }
 
-        $bcresult = $this->parse_bcnum($result);
+        $this->type_bcnum($bcresult, $result);
 
         return $bcresult;
     }
 
     public function bcfloor($num, int $scale = 0) : Bcnumber
     {
-        if (null === ($bcnum = $this->parse_bcnum($num))) {
+        if (! $this->type_bcnum($bcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
             );
@@ -297,14 +308,14 @@ class BcmathModule
             );
         }
 
-        $bcresult = $this->parse_bcnum($result);
+        $this->type_bcnum($bcresult, $result);
 
         return $bcresult;
     }
 
     public function bcround($num, int $scale = 0) : Bcnumber
     {
-        if (null === ($bcnum = $this->parse_bcnum($num))) {
+        if (! $this->type_bcnum($bcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
             );
@@ -351,7 +362,7 @@ class BcmathModule
             );
         }
 
-        $bcresult = $this->parse_bcnum($result);
+        $this->type_bcnum($bcresult, $result);
 
         return $bcresult;
     }
@@ -359,7 +370,7 @@ class BcmathModule
 
     public function bcmoneyceil($num, int $scale = 0) : Bcnumber
     {
-        if (null === ($bcnum = $this->parse_bcnum($num))) {
+        if (! $this->type_bcnum($bcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
             );
@@ -411,14 +422,14 @@ class BcmathModule
             );
         }
 
-        $bcresult = $this->parse_bcnum($result);
+        $this->type_bcnum($bcresult, $result);
 
         return $bcresult;
     }
 
     public function bcmoneyfloor($num, int $scale = 0) : Bcnumber
     {
-        if (null === ($bcnum = $this->parse_bcnum($num))) {
+        if (! $this->type_bcnum($bcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
             );
@@ -440,7 +451,7 @@ class BcmathModule
             $_scale
         );
 
-        $bcresult = $this->parse_bcnum($result);
+        $this->type_bcnum($bcresult, $result);
 
         return $bcresult;
     }
@@ -450,6 +461,8 @@ class BcmathModule
     {
         $scaleParsed = null;
 
+        $theType = Lib::type();
+
         $frac = null;
 
         $_number = null
@@ -458,7 +471,7 @@ class BcmathModule
 
         $scaleParsed = 0;
 
-        $frac = strrchr($_number, ParseModule::DECIMAL_POINT);
+        $frac = strrchr($_number, $theType->the_decimal_point());
 
         if (false !== $frac) {
             $scaleParsed = strlen($frac) - 1;
@@ -470,13 +483,17 @@ class BcmathModule
 
     public function bccomp($num1, $num2, int $scale = null) : int
     {
-        $bcnum1 = null
-            ?? $this->parse_bcnum($num1)
-            ?? Lib::php()->throw([ 'The `num1` should be valid Bcnumber', $num1 ]);
+        if (! $this->type_bcnum($bcnum1, $num1)) {
+            throw new LogicException(
+                [ 'The `num1` should be valid Bcnumber', $num1 ]
+            );
+        }
 
-        $bcnum2 = null
-            ?? $this->parse_bcnum($num2)
-            ?? Lib::php()->throw([ 'The `num2` should be valid Bcnumber', $num2 ]);
+        if (! $this->type_bcnum($bcnum2, $num2)) {
+            throw new LogicException(
+                [ 'The `num2` should be valid Bcnumber', $num2 ]
+            );
+        }
 
         $_scale = null
             ?? $scale
@@ -494,13 +511,17 @@ class BcmathModule
 
     public function bcadd($num1, $num2, int $scale = null) : Bcnumber
     {
-        $bcnum1 = null
-            ?? $this->parse_bcnum($num1)
-            ?? Lib::php()->throw([ 'The `num1` should be valid Bcnumber', $num1 ]);
+        if (! $this->type_bcnum($bcnum1, $num1)) {
+            throw new LogicException(
+                [ 'The `num1` should be valid Bcnumber', $num1 ]
+            );
+        }
 
-        $bcnum2 = null
-            ?? $this->parse_bcnum($num2)
-            ?? Lib::php()->throw([ 'The `num2` should be valid Bcnumber', $num2 ]);
+        if (! $this->type_bcnum($bcnum2, $num2)) {
+            throw new LogicException(
+                [ 'The `num2` should be valid Bcnumber', $num2 ]
+            );
+        }
 
         $_scale = null
             ?? $this->scale_max($scale)
@@ -512,20 +533,24 @@ class BcmathModule
             $_scale
         );
 
-        $bcresult = $this->parse_bcnum($result);
+        $this->type_bcnum($bcresult, $result);
 
         return $bcresult;
     }
 
     public function bcsub($num1, $num2, int $scale = null) : Bcnumber
     {
-        $bcnum1 = null
-            ?? $this->parse_bcnum($num1)
-            ?? Lib::php()->throw([ 'The `num1` should be valid Bcnumber', $num1 ]);
+        if (! $this->type_bcnum($bcnum1, $num1)) {
+            throw new LogicException(
+                [ 'The `num1` should be valid Bcnumber', $num1 ]
+            );
+        }
 
-        $bcnum2 = null
-            ?? $this->parse_bcnum($num2)
-            ?? Lib::php()->throw([ 'The `num2` should be valid Bcnumber', $num2 ]);
+        if (! $this->type_bcnum($bcnum2, $num2)) {
+            throw new LogicException(
+                [ 'The `num2` should be valid Bcnumber', $num2 ]
+            );
+        }
 
         $_scale = null
             ?? $this->scale_max($scale)
@@ -537,20 +562,24 @@ class BcmathModule
             $_scale
         );
 
-        $bcresult = $this->parse_bcnum($result);
+        $this->type_bcnum($bcresult, $result);
 
         return $bcresult;
     }
 
     public function bcmul($num1, $num2, int $scale = null) : Bcnumber
     {
-        $bcnum1 = null
-            ?? $this->parse_bcnum($num1)
-            ?? Lib::php()->throw([ 'The `num1` should be valid Bcnumber', $num1 ]);
+        if (! $this->type_bcnum($bcnum1, $num1)) {
+            throw new LogicException(
+                [ 'The `num1` should be valid Bcnumber', $num1 ]
+            );
+        }
 
-        $bcnum2 = null
-            ?? $this->parse_bcnum($num2)
-            ?? Lib::php()->throw([ 'The `num2` should be valid Bcnumber', $num2 ]);
+        if (! $this->type_bcnum($bcnum2, $num2)) {
+            throw new LogicException(
+                [ 'The `num2` should be valid Bcnumber', $num2 ]
+            );
+        }
 
         if (null === $scale) {
             if ($bcnum1->getFractionalPart() && $bcnum2->getFractionalPart()) {
@@ -570,7 +599,7 @@ class BcmathModule
             $_scale
         );
 
-        $bcresult = $this->parse_bcnum($result);
+        $this->type_bcnum($bcresult, $result);
 
         return $bcresult;
     }
@@ -580,13 +609,17 @@ class BcmathModule
      */
     public function bcdiv($num1, $num2, int $scale) : Bcnumber
     {
-        $bcnum1 = null
-            ?? $this->parse_bcnum($num1)
-            ?? Lib::php()->throw([ 'The `num1` should be valid Bcnumber', $num1 ]);
+        if (! $this->type_bcnum($bcnum1, $num1)) {
+            throw new LogicException(
+                [ 'The `num1` should be valid Bcnumber', $num1 ]
+            );
+        }
 
-        $bcnum2 = null
-            ?? $this->parse_bcnum($num2)
-            ?? Lib::php()->throw([ 'The `num2` should be valid Bcnumber', $num2 ]);
+        if (! $this->type_bcnum($bcnum2, $num2)) {
+            throw new LogicException(
+                [ 'The `num2` should be valid Bcnumber', $num2 ]
+            );
+        }
 
         $_scale = $this->scale_max($scale);
 
@@ -596,7 +629,7 @@ class BcmathModule
             $_scale
         );
 
-        $bcresult = $this->parse_bcnum($result);
+        $this->type_bcnum($bcresult, $result);
 
         return $bcresult;
     }
@@ -608,13 +641,17 @@ class BcmathModule
      */
     public function bcmod($num1, $num2) : Bcnumber
     {
-        $bcnum1 = null
-            ?? $this->parse_bcnum($num1)
-            ?? Lib::php()->throw([ 'The `num1` should be valid Bcnumber', $num1 ]);
+        if (! $this->type_bcnum($bcnum1, $num1)) {
+            throw new LogicException(
+                [ 'The `num1` should be valid Bcnumber', $num1 ]
+            );
+        }
 
-        $bcnum2 = null
-            ?? $this->parse_bcnum($num2)
-            ?? Lib::php()->throw([ 'The `num2` should be valid Bcnumber', $num2 ]);
+        if (! $this->type_bcnum($bcnum2, $num2)) {
+            throw new LogicException(
+                [ 'The `num2` should be valid Bcnumber', $num2 ]
+            );
+        }
 
         $result = bcmod(
             $bcnum1->getInteger(),
@@ -622,7 +659,7 @@ class BcmathModule
             0
         );
 
-        $bcresult = $this->parse_bcnum($result);
+        $this->type_bcnum($bcresult, $result);
 
         return $bcresult;
     }
@@ -630,9 +667,11 @@ class BcmathModule
 
     public function bcpow($num, int $exponent, int $scale = null) : Bcnumber
     {
-        $bcnum = null
-            ?? $this->parse_bcnum($num)
-            ?? Lib::php()->throw([ 'The `num` should be valid Bcnumber', $num ]);
+        if (! $this->type_bcnum($bcnum, $num)) {
+            throw new LogicException(
+                [ 'The `num` should be valid Bcnumber', $num ]
+            );
+        }
 
         if (null === $scale) {
             if ($bcnum->getFractionalPart()) {
@@ -652,7 +691,7 @@ class BcmathModule
             $_scale
         );
 
-        $bcresult = $this->parse_bcnum($result);
+        $this->type_bcnum($bcresult, $result);
 
         return $bcresult;
     }
@@ -660,9 +699,11 @@ class BcmathModule
 
     public function bcsqrt($num, int $scale) : Bcnumber
     {
-        $bcnum = null
-            ?? $this->parse_bcnum($num)
-            ?? Lib::php()->throw([ 'The `num` should be valid Bcnumber', $num ]);
+        if (! $this->type_bcnum($bcnum, $num)) {
+            throw new LogicException(
+                [ 'The `num` should be valid Bcnumber', $num ]
+            );
+        }
 
         $_scale = $this->scale_max($scale);
 
@@ -671,7 +712,7 @@ class BcmathModule
             $_scale
         );
 
-        $bcresult = $this->parse_bcnum($result);
+        $this->type_bcnum($bcresult, $result);
 
         return $bcresult;
     }
@@ -679,51 +720,62 @@ class BcmathModule
 
     public function bcgcd($num1, $num2) : Bcnumber
     {
-        $bcNum1 = null
-            ?? $this->parse_bcnum($num1)
-            ?? Lib::php()->throw([ 'The `num1` should be valid Bcnumber', $num1 ]);
-
-        $bcNum2 = null
-            ?? $this->parse_bcnum($num2)
-            ?? Lib::php()->throw([ 'The `num2` should be valid Bcnumber', $num2 ]);
-
-        $bcNum1Abs = $bcNum1->getAbsolute();
-        $bcNum2Abs = $bcNum2->getAbsolute();
-
-        while ( $bcNum2Abs !== '0' ) {
-            $mod = bcmod($bcNum1Abs, $bcNum2Abs, 0);
-
-            $bcNum1Abs = $bcNum2Abs;
-            $bcNum2Abs = $mod;
+        if (! $this->type_bcnum($bcnum1, $num1)) {
+            throw new LogicException(
+                [ 'The `num1` should be valid Bcnumber', $num1 ]
+            );
         }
 
-        $bcgcd = $this->parse_bcnum($bcNum1Abs);
+        if (! $this->type_bcnum($bcnum2, $num2)) {
+            throw new LogicException(
+                [ 'The `num2` should be valid Bcnumber', $num2 ]
+            );
+        }
 
-        return $bcgcd;
+        $num1Abs = $bcnum1->getAbsolute();
+        $num2Abs = $bcnum2->getAbsolute();
+
+        while ( $num2Abs !== '0' ) {
+            $mod = bcmod($num1Abs, $num2Abs, 0);
+
+            $num1Abs = $num2Abs;
+            $num2Abs = $mod;
+        }
+
+        $result = $gcd = $num1Abs;
+
+        $this->type_bcnum($bcresult, $result);
+
+        return $bcresult;
     }
 
     public function bclcm($num1, $num2) : Bcnumber
     {
-        $bcNum1 = null
-            ?? $this->parse_bcnum($num1)
-            ?? Lib::php()->throw([ 'The `num1` should be valid Bcnumber', $num1 ]);
+        if (! $this->type_bcnum($bcnum1, $num1)) {
+            throw new LogicException(
+                [ 'The `num1` should be valid Bcnumber', $num1 ]
+            );
+        }
 
-        $bcNum2 = null
-            ?? $this->parse_bcnum($num2)
-            ?? Lib::php()->throw([ 'The `num2` should be valid Bcnumber', $num2 ]);
+        if (! $this->type_bcnum($bcnum2, $num2)) {
+            throw new LogicException(
+                [ 'The `num2` should be valid Bcnumber', $num2 ]
+            );
+        }
 
-        $bcNum1Abs = $bcNum1->getAbsolute();
-        $bcNum2Abs = $bcNum2->getAbsolute();
+        $num1Abs = $bcnum1->getAbsolute();
+        $num2Abs = $bcnum2->getAbsolute();
 
-        $mul = bcmul($bcNum1Abs, $bcNum2Abs, 0);
+        $mul = bcmul($num1Abs, $num2Abs, 0);
 
-        $bcGcd = $this->bcgcd($bcNum1Abs, $bcNum2Abs);
-        $bcGcdAbs = $bcGcd->getAbsolute();
+        $bcGcd = $this->bcgcd($num1Abs, $num2Abs);
 
-        $lcm = bcdiv($mul, $bcGcdAbs, 0);
+        $gcdAbs = $bcGcd->getAbsolute();
 
-        $bcLcm = $this->parse_bcnum($lcm);
+        $result = $lcm = bcdiv($mul, $gcdAbs, 0);
 
-        return $bcLcm;
+        $this->type_bcnum($bcresult, $result);
+
+        return $bcresult;
     }
 }

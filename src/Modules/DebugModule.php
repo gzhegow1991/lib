@@ -801,7 +801,7 @@ class DebugModule
                 && $iNewGt0
                 && ($oldLines[ $iOld - 1 ] === $newLines[ $iNew - 1 ])
             ) {
-                $isSame = [ $oldLines[ $iOld - 1 ] ];
+                $isSame = [ $oldLines[ $iOld - 1 ], $iOld ];
 
                 $iNew--;
                 $iOld--;
@@ -813,7 +813,7 @@ class DebugModule
                     || ($matrix[ $iOld ][ $iNew - 1 ] < $matrix[ $iOld - 1 ][ $iNew ])
                 )
             ) {
-                $isRemove = [ $oldLines[ $iOld - 1 ] ];
+                $isRemove = [ $oldLines[ $iOld - 1 ], $iOld ];
 
                 $iOld--;
 
@@ -824,7 +824,7 @@ class DebugModule
                     || ($matrix[ $iOld ][ $iNew - 1 ] >= $matrix[ $iOld - 1 ][ $iNew ])
                 )
             ) {
-                $isAdd = [ $newLines[ $iNew - 1 ] ];
+                $isAdd = [ $newLines[ $iNew - 1 ], $iNew ];
 
                 $iNew--;
             }
@@ -834,24 +834,30 @@ class DebugModule
 
             } elseif ($isAdd) {
                 if (count($isRemovePrevious)) {
-                    $diffLines[ count($diffLines) - 1 ] = '+++ > ' . $isAdd[ 0 ] . ' @ --- ' . $isRemovePrevious[ 0 ];
+                    $diffLines[ count($diffLines) - 1 ] = ""
+                        . "[ {$isAdd[ 1 ]} ] +++ > {$isAdd[ 0 ]}"
+                        . ' @ '
+                        . "--- {$isRemovePrevious[ 0 ]}";
 
                     $isAdd = [];
 
                 } else {
-                    $diffLines[] = '+++ > ' . $isAdd[ 0 ];
+                    $diffLines[] = "[ {$isAdd[ 1 ]} ] +++ > {$isAdd[ 0 ]}";
                 }
 
                 $isDiff = true;
 
             } elseif (count($isRemove)) {
                 if (count($isAddPrevious)) {
-                    $diffLines[ count($diffLines) - 1 ] = '+++ > ' . $isAddPrevious[ 0 ] . ' @ --- ' . $isRemove[ 0 ];
+                    $diffLines[ count($diffLines) - 1 ] = ""
+                        . "[ {$isAddPrevious[ 1 ]} ] +++ > {$isAddPrevious[ 0 ]}"
+                        . ' @ '
+                        . "--- {$isRemove[ 0 ]}";
 
                     $isRemove = [];
 
                 } else {
-                    $diffLines[] = '--- > ' . $isRemove[ 0 ];
+                    $diffLines[] = "[ {$isRemove[ 1 ]} ] --- > {$isRemove[ 0 ]}";
                 }
 
                 $isDiff = true;

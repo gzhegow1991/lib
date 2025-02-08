@@ -47,23 +47,28 @@ class CryptModule
     ];
 
 
-    public function parse_alphabet($value) : ?Alphabet
+    /**
+     * @param Alphabet|null $result
+     */
+    public function type_alphabet(&$result, $value) : bool
     {
-        $theParse = Lib::parse();
+        $result = null;
+
+        $theType = Lib::type();
         $theMb = Lib::mb();
 
-        if (null === ($_value = $theParse->string_not_empty($value))) {
-            return null;
+        if (! $theType->string_not_empty($_value, $value)) {
+            return false;
         }
 
         preg_replace('/\s+/', '', $_value, 1, $count);
         if ($count > 0) {
-            return null;
+            return false;
         }
 
         $len = mb_strlen($_value);
         if (mb_strlen($_value) <= 1) {
-            return null;
+            return false;
         }
 
         $split = $theMb->str_split($value);
@@ -75,7 +80,7 @@ class CryptModule
             $letter = mb_substr($_value, $i, 1);
 
             if (isset($seen[ $letter ])) {
-                return null;
+                return false;
             }
             $seen[ $letter ] = true;
 
@@ -93,7 +98,114 @@ class CryptModule
             $regexNot
         );
 
-        return $alphabet;
+        $result = $alphabet;
+
+        return true;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function type_base(&$result, $value, $alphabet) : bool
+    {
+        $result = null;
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        if (! $this->type_alphabet($_alphabet, $alphabet)) {
+            return false;
+        }
+
+        if (preg_match($_alphabet->getRegexNot(), $_value, $m)) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_base_bin(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        if (preg_match('~[^01]~', $_value)) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_base_oct(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        if (preg_match('~[^01234567]~', $_value)) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_base_dec(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        if (preg_match('~[^0123456789]~', $_value)) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_base_hex(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        if (preg_match('~[^0123456789ABCDEF]~', $_value)) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
     }
 
 
@@ -166,7 +278,7 @@ class CryptModule
         $theMb = Lib::mb();
 
         $_decString = null
-            ?? $theParse->baseDec($decString)
+            ?? $theParse->base_dec($decString)
             ?? Lib::php()->throw([ 'The `decInteger` should be valid `baseDec`', $decString ]);
 
         $_alphabetTo = null
@@ -277,7 +389,7 @@ class CryptModule
         $theMb = Lib::mb();
 
         $_binary = null
-            ?? $theParse->baseBin($binary)
+            ?? $theParse->base_bin($binary)
             ?? Lib::php()->throw([ 'The `base` should be valid `baseBin`', $binary ]);
 
         $_alphabetTo = null
@@ -724,9 +836,11 @@ class CryptModule
         $theBcmath = Lib::bcmath();
         $theMb = Lib::mb();
 
-        $_alphabetTo = null
-            ?? $this->parse_alphabet($alphabetTo)
-            ?? Lib::php()->throw([ 'The `alphabetFrom` should be valid alphabet', $alphabetTo ]);
+        if (! $this->type_alphabet($_alphabetTo, $alphabetTo)) {
+            throw new LogicException(
+                [ 'The `alphabetFrom` should be valid alphabet', $alphabetTo ]
+            );
+        }
 
         $baseTo = $_alphabetTo->getLength();
         if (! $this->isPowerOf2($baseTo)) {
@@ -860,7 +974,7 @@ class CryptModule
         $bitsLeft = $bitsCnt;
         foreach ( $_binaries as $binary ) {
             $_binary = null
-                ?? $theParse->baseBin($binary)
+                ?? $theParse->base_bin($binary)
                 ?? Lib::php()->throw([ 'Each of `binaries` must be valid `baseBin`', $binary ]);
 
             $binarySize = strlen($_binary);

@@ -1,5 +1,8 @@
 /.editorconfig
 /.idea
 
+/.generator
+/generator.php
+
 /vendor
 composer.lock

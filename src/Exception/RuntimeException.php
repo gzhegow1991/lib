@@ -8,7 +8,7 @@ use Gzhegow\Lib\Lib;
 class RuntimeException extends \RuntimeException
     implements ExceptionInterface
 {
-    use ExceptionTrait;
+    use ThrowableTrait;
 
 
     /**
@@ -23,11 +23,25 @@ class RuntimeException extends \RuntimeException
     /**
      * @var string
      */
-    protected $message;
+    public $message;
     /**
      * @var int
      */
-    protected $code;
+    public $code;
+
+    /**
+     * @var array
+     */
+    public $trace;
+
+    /**
+     * @var \Throwable
+     */
+    public $previous;
+    /**
+     * @var \Throwable[]
+     */
+    public $previousList = [];
 
 
     public function __construct(...$throwableArgs)

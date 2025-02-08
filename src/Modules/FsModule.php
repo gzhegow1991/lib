@@ -17,6 +17,248 @@ class FsModule
         }
     }
 
+
+    /**
+     * @param string|null $result
+     */
+    public function type_path(
+        &$result,
+        $value, array $refs = []
+    ) : bool
+    {
+        $result = null;
+
+        $withPathInfo = array_key_exists(0, $refs);
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        if (false !== strpos($_value, "\0")) {
+            return false;
+        }
+
+        if ($withPathInfo) {
+            $ref =& $refs[ 0 ];
+
+            try {
+                $ref = pathinfo($_value);
+            }
+            catch ( \Throwable $e ) {
+                return false;
+            }
+
+            unset($ref);
+        }
+
+        $result = $_value;
+
+        return $_value;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_dirpath(
+        &$result,
+        $value, array $refs = []
+    ) : bool
+    {
+        $result = null;
+
+        $status = $this->type_path(
+            $_value,
+            $value, $refs
+        );
+
+        if (! $status) {
+            return false;
+        }
+
+        $status = file_exists($_value);
+
+        if (! $status) {
+            // > dirpath is available
+            $result = $_value;
+
+            return true;
+        }
+
+        if (! is_dir($_value)) {
+            return false;
+        }
+
+        $_value = realpath($_value);
+
+        $result = $_value;
+
+        return $_value;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_filepath(
+        &$result,
+        $value, array $refs = []
+    ) : bool
+    {
+        $status = $this->type_path(
+            $_value,
+            $value, $refs
+        );
+
+        if (! $status) {
+            return false;
+        }
+
+        $status = file_exists($_value);
+
+        if (false === $status) {
+            // > filepath is available
+            $result = $_value;
+
+            return true;
+        }
+
+        if (! is_file($_value)) {
+            return false;
+        }
+
+        $_value = realpath($_value);
+
+        $result = $_value;
+
+        return $_value;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function type_path_realpath(
+        &$result,
+        $value, array $refs = []
+    ) : bool
+    {
+        $result = null;
+
+        $status = $this->type_path(
+            $_value,
+            $value, $refs
+        );
+
+        if (! $status) {
+            return false;
+        }
+
+        if (false === ($_value = realpath($_value))) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_dirpath_realpath(
+        &$result,
+        $value, array $refs = []
+    ) : bool
+    {
+        $result = null;
+
+        $status = $this->type_path(
+            $_value,
+            $value, $refs
+        );
+
+        if (! $status) {
+            return false;
+        }
+
+        $status = file_exists($_value);
+
+        if (! $status) {
+            return false;
+        }
+
+        if (! is_dir($_value)) {
+            return false;
+        }
+
+        $_value = realpath($_value);
+
+        $result = $_value;
+
+        return $_value;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_filepath_realpath(
+        &$result,
+        $value, array $refs = []
+    ) : bool
+    {
+        $result = null;
+
+        $status = $this->type_path(
+            $_value,
+            $value, $refs
+        );
+
+        if (! $status) {
+            return false;
+        }
+
+        $status = file_exists($_value);
+
+        if (! $status) {
+            return false;
+        }
+
+        if (! is_file($_value)) {
+            return false;
+        }
+
+        $_value = realpath($_value);
+
+        $result = $_value;
+
+        return true;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function type_filename(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        $forbidden = [ "\0", "/", "\\", DIRECTORY_SEPARATOR ];
+
+        foreach ( $forbidden as $f ) {
+            if (false !== strpos($_value, $f)) {
+                return false;
+            }
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+
     public function file_get_contents(
         string $filepath,
         array $fileGetContentsArgs = null
@@ -214,7 +456,6 @@ class FsModule
 
         return true;
     }
-
 
 
     /**

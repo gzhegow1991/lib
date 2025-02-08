@@ -18,17 +18,24 @@ class NetModule
     }
 
 
-    public function parse_ip(string $ip) : ?string
+    /**
+     * @param string|null $result
+     */
+    public function type_ip(&$result, $value) : bool
     {
-        if (null === ($_ip = Lib::parse()->string_not_empty($ip))) {
-            return null;
+        $result = null;
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
         }
 
-        if (false === ($_ip = filter_var($_ip, FILTER_VALIDATE_IP))) {
-            return null;
+        if (false === ($_value = filter_var($_value, FILTER_VALIDATE_IP))) {
+            return false;
         }
 
-        return $_ip;
+        $result = $_value;
+
+        return true;
     }
 
 

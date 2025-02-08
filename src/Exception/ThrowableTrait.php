@@ -2,14 +2,56 @@
 
 namespace Gzhegow\Lib\Exception;
 
-trait ExceptionTrait
+/**
+ * @mixin \Throwable
+ */
+trait ThrowableTrait
 {
+    /**
+     * @var string
+     */
+    public $file;
+    /**
+     * @var int
+     */
+    public $line;
+
+    /**
+     * @var string
+     */
+    public $message;
+    /**
+     * @var int
+     */
+    public $code;
+
+    /**
+     * @var array
+     */
+    public $trace;
+
     /**
      * @var \Throwable
      */
     public $previous;
+    /**
+     * @var \Throwable[]
+     */
+    public $previousList = [];
 
-    public function _getPrevious() : ?\Throwable
+
+    public function _getFile() : string
+    {
+        return $this->file;
+    }
+
+    public function _getLine() : int
+    {
+        return $this->line;
+    }
+
+
+    public function _getPrevious() : \Throwable
     {
         if (null === $this->previous) {
             return $this->getPrevious();
@@ -18,11 +60,6 @@ trait ExceptionTrait
         return $this->previous;
     }
 
-
-    /**
-     * @var array
-     */
-    public $trace;
 
     public function _getTrace() : array
     {
@@ -41,7 +78,7 @@ trait ExceptionTrait
 
         $rtn = "";
         $count = 0;
-        foreach ( $this->trace as $frame ) {
+        foreach ( $this->_getTrace() as $frame ) {
             $args = "";
 
             if (isset($frame[ 'args' ])) {
@@ -93,14 +130,9 @@ trait ExceptionTrait
 
 
     /**
-     * @var \Throwable[]
-     */
-    protected $previousList = [];
-
-    /**
      * @return \Throwable[]
      */
-    public function getPreviousList() : array
+    public function _getPreviousList() : array
     {
         return $this->previousList;
     }
@@ -108,12 +140,12 @@ trait ExceptionTrait
     /**
      * @return static
      */
-    public function setPreviousList(array $previousList)
+    public function _setPreviousList(array $previousList)
     {
         $this->previousList = [];
 
         foreach ( $previousList as $previous ) {
-            $this->addPrevious($previous);
+            $this->_addPreviousToList($previous);
         }
 
         return $this;
@@ -122,7 +154,7 @@ trait ExceptionTrait
     /**
      * @return static
      */
-    public function addPrevious(\Throwable $previous) // : static
+    public function _addPreviousToList(\Throwable $previous) // : static
     {
         $this->previousList[] = $previous;
 

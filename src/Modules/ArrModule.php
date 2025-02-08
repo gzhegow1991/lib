@@ -43,6 +43,151 @@ class ArrModule
     const WALK_WITH_PARENTS         = _ARR_WALK_WITH_PARENTS;
 
 
+    /**
+     * @param array|null $result
+     */
+    public function type_list(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        foreach ( array_keys($value) as $key ) {
+            if (is_string($key)) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    /**
+     * @param array|null $result
+     */
+    public function type_list_strict(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        $keys = array_keys($value);
+
+        foreach ( $keys as $key ) {
+            if (is_string($key)) {
+                return false;
+            }
+        }
+
+        if ($keys !== range(0, count($value))) {
+            return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    /**
+     * @param array|null $result
+     */
+    public function type_dict(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        foreach ( array_keys($value) as $key ) {
+            if (is_int($key)) {
+                return false;
+            }
+
+            if ('' === $key) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
+    /**
+     * @param array|null $result
+     */
+    public function type_table(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        $columns = [];
+        for ( $i = 0; $i < count($value); $i++ ) {
+            if (! is_array($value[ $i ])) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    /**
+     * @param array|null $result
+     */
+    public function type_matrix(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        for ( $i = 0; $i < count($value); $i++ ) {
+            if (! $this->type_list($var, $value[ $i ])) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    /**
+     * @param array|null $result
+     */
+    public function type_matrix_strict(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        for ( $i = 0; $i < count($value); $i++ ) {
+            if (! $this->type_list_strict($var, $value[ $i ])) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
     public function has(
         $array, $key,
         &$value = null, &$reference = null
@@ -977,16 +1122,19 @@ class ArrModule
 
 
     /**
-     * array_walk_recursive, позволяющий:
+     * Реализация array_walk_recursive, позволяющая:
      * - получить путь до элемента
      * - подменить значение по ссылке
-     * - сделать обход в ширину/глубину, т.е. (1 -> 1.1 -> 2 -> 2.1) => (1 -> 2 -> 1.1 -> 2.1)
-     * - пройти с потомками/пустыми-массивами/родителями
+     * - сделать обход в ширину/глубину, т.е. (1 -> 1.1 -> 2 -> 2.1) || (1 -> 2 -> 1.1 -> 2.1)
+     * - выводить потомки | пустые-массивы | родители
+     *
+     * @template TKey of int|string
+     * @template TValue
      *
      * @param array    $array
      * @param int|null $flags
      *
-     * @return \Iterator<array<int|string>, mixed>|\Generator<array<int|string>, mixed>
+     * @return \Iterator<array<TKey>, TValue>|\Generator<array<TKey>, TValue>
      */
     public function &walk_it(array &$array, int $flags = null) : \Generator
     {
@@ -1146,15 +1294,16 @@ class ArrModule
     }
 
     /**
-     * Обход дерева $tree: array<int, <int, bool>>, в итераторе будет элемент из $list: array<int, mixed>
+     * Обход дерева $tree, в итераторе будет элемент из $list
      *
-     * @template T
+     * @template TKey of int|string
+     * @template TValue
      *
-     * @param array<int|string, array<int|string, bool>> $tree
-     * @param array<int|string, T>|null                  $list
-     * @param int|string|null                            $start
+     * @param array<TKey, array<TKey, bool>> $tree
+     * @param array<TKey, TValue>|null       $list
+     * @param TKey|null                      $start
      *
-     * @return \Iterator<array<int|string>, T>|\Generator<array<int|string>, T>
+     * @return \Iterator<array<TKey>, TValue>|\Generator<array<TKey>, TValue>
      */
     public function walk_tree_it(array $tree, array $list = null, $start = null) : \Generator
     {
@@ -1179,12 +1328,12 @@ class ArrModule
         while ( null !== key($stack) ) {
             [ $current, $path ] = array_pop($stack);
 
-            $row = (null !== $list)
+            $item = (null !== $list)
                 ? ($list[ $current ] ?? null)
                 : $current;
 
-            if (null !== $row) {
-                yield $path => $row;
+            if (null !== $item) {
+                yield $path => $item;
             }
 
             if (isset($tree[ $current ])) {
@@ -1201,9 +1350,12 @@ class ArrModule
     }
 
     /**
-     * позволяет сделать add/merge/replace рекурсивно в цикле foreach с получением пути до элемента
+     * Позволяет сделать add/merge/replace массивов рекурсивно в цикле foreach с получением пути до элемента
      *
-     * @return \Iterator<array<int|string>, array>|\Generator<array<int|string>, array>
+     * @template TKey of int|string
+     * @template TValue
+     *
+     * @return \Iterator<array<TKey>, array<TValue>>|\Generator<array<TKey>, array<TValue>>
      * @throws \LogicException
      */
     public function walk_collect_it(array $arrayList, int $arrayWalkFlags = null, array $fallback = []) : \Generator

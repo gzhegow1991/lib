@@ -8,7 +8,7 @@ use Gzhegow\Lib\Lib;
 class Exception extends \Exception
     implements ExceptionInterface
 {
-    use ExceptionTrait;
+    use ThrowableTrait;
 
 
     /**
@@ -23,11 +23,25 @@ class Exception extends \Exception
     /**
      * @var string
      */
-    protected $message;
+    public $message;
     /**
      * @var int
      */
-    protected $code;
+    public $code;
+
+    /**
+     * @var array
+     */
+    public $trace;
+
+    /**
+     * @var \Throwable
+     */
+    public $previous;
+    /**
+     * @var \Throwable[]
+     */
+    public $previousList = [];
 
 
     public function __construct(...$throwableArgs)

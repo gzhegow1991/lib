@@ -13,11 +13,14 @@ use Gzhegow\Lib\Modules\ArrModule;
 use Gzhegow\Lib\Modules\JsonModule;
 use Gzhegow\Lib\Modules\BoolModule;
 use Gzhegow\Lib\Modules\HttpModule;
+use Gzhegow\Lib\Modules\TestModule;
+use Gzhegow\Lib\Modules\TypeModule;
 use Gzhegow\Lib\Modules\DebugModule;
 use Gzhegow\Lib\Modules\ParseModule;
 use Gzhegow\Lib\Modules\CryptModule;
 use Gzhegow\Lib\Modules\BcmathModule;
 use Gzhegow\Lib\Modules\AssertModule;
+use Gzhegow\Lib\Modules\Type\Base\AssertModuleBase;
 use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
@@ -252,6 +255,30 @@ class Lib
         return static::$modules[ $key ] = $instance
             ?? static::$modules[ $key ]
             ?? new StrModule();
+    }
+
+    /**
+     * @return TestModule
+     */
+    public static function test(TestModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new TestModule();
+    }
+
+    /**
+     * @return TypeModule
+     */
+    public static function type(TypeModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new TypeModule();
     }
 
     /**

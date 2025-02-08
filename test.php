@@ -1,6 +1,5 @@
 <?php
 
-require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 
@@ -45,11 +44,11 @@ function _dump(...$values) : string
     return $ret;
 }
 
-function _dump_array($value, int $maxLevel = null, bool $multiline = false) : string
+function _dump_array($value, int $maxLevel = null, array $options = []) : string
 {
-    $content = $multiline
-        ? \Gzhegow\Lib\Lib::debug()->array_multiline($value, $maxLevel)
-        : \Gzhegow\Lib\Lib::debug()->array($value, $maxLevel);
+    $content = \Gzhegow\Lib\Lib::debug()
+        ->array($value, $maxLevel, $options)
+    ;
 
     $ret = $content . PHP_EOL;
 
@@ -58,22 +57,58 @@ function _dump_array($value, int $maxLevel = null, bool $multiline = false) : st
     return $ret;
 }
 
-function _assert_output(
-    \Closure $fn, string $expect = null
+function _dump_array_multiline($value, int $maxLevel = null, array $options = []) : string
+{
+    $content = \Gzhegow\Lib\Lib::debug()
+        ->array_multiline($value, $maxLevel, $options)
+    ;
+
+    $ret = $content . PHP_EOL;
+
+    echo $ret;
+
+    return $ret;
+}
+
+function _assert_return(
+    \Closure $fn, array $fnArgs = [],
+    $expectedReturn = null
 ) : void
 {
     $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-    \Gzhegow\Lib\Lib::assert()->output($trace, $fn, $expect);
+    \Gzhegow\Lib\Lib::test()->assertReturn(
+        $trace,
+        $fn, $fnArgs,
+        $expectedReturn
+    );
+}
+
+function _assert_stdout(
+    \Closure $fn, array $fnArgs = [],
+    string $expectedStdout = null
+) : void
+{
+    $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+    \Gzhegow\Lib\Lib::test()->assertStdout($trace,
+        $fn, $fnArgs,
+        $expectedStdout
+    );
 }
 
 function _assert_microtime(
-    \Closure $fn, float $expectMax = null, float $expectMin = null
+    \Closure $fn, array $fnArgs = [],
+    float $expectedMicrotimeMax = null, float $expectedMicrotimeMin = null
 ) : void
 {
     $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-    \Gzhegow\Lib\Lib::assert()->microtime($trace, $fn, $expectMax, $expectMin);
+    \Gzhegow\Lib\Lib::test()->assertMicrotime(
+        $trace,
+        $fn, $fnArgs,
+        $expectedMicrotimeMax, $expectedMicrotimeMin
+    );
 }
 
 
@@ -146,7 +181,7 @@ $fn = function () {
     _dump($array->getItems());
     _dump($array->isOfType('object'));
 };
-_assert_output($fn, '
+_assert_stdout($fn, [], '
 "[ ArrModule ]"
 
 { object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf }
@@ -164,6 +199,40 @@ TRUE
 { object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass }
 [ "{ object # stdClass }" ]
 TRUE
+');
+
+
+// >>> TEST
+// > тесты AssertModule
+$fn = function () {
+    _dump('[ AssertModule ]');
+    echo PHP_EOL;
+
+    try {
+        $var = \Gzhegow\Lib\Lib::assert()
+            ->string_not_empty('')
+            ->orThrow('The value should be non-empty string')
+        ;
+    }
+    catch ( \Throwable $e ) {
+    }
+    _dump('[ CATCH ] ' . $e->getMessage());
+
+    try {
+        $var = \Gzhegow\Lib\Lib::assert()
+            ->numeric_positive('-1')
+            ->orThrow('The value should be positive numeric')
+        ;
+    }
+    catch ( \Throwable $e ) {
+    }
+    _dump('[ CATCH ] ' . $e->getMessage());
+};
+_assert_stdout($fn, [], '
+"[ AssertModule ]"
+
+"[ CATCH ] The value should be non-empty string"
+"[ CATCH ] The value should be positive numeric"
 ');
 
 
@@ -259,7 +328,7 @@ $fn = function () {
     _dump($lcm);
     echo PHP_EOL;
 };
-_assert_output($fn, '
+_assert_stdout($fn, [], '
 "[ BcmathModule ]"
 
 { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "2" }
@@ -658,7 +727,7 @@ $fn = function () {
     _dump($dec);
     echo PHP_EOL;
 };
-_assert_output($fn, '
+_assert_stdout($fn, [], '
 "[ CryptModule ]"
 
 "b034fff2"
@@ -820,7 +889,7 @@ $fn = function () {
     $newText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     _dump($isDiff);
-    _dump_array($diffLines, 1, true);
+    _dump_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
 
@@ -831,21 +900,21 @@ $fn = function () {
     $newText = "apple2\nbanana\ncherry\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     _dump($isDiff);
-    _dump_array($diffLines, 1, true);
+    _dump_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry2\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     _dump($isDiff);
-    _dump_array($diffLines, 1, true);
+    _dump_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\ndamson\nelderberry2";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     _dump($isDiff);
-    _dump_array($diffLines, 1, true);
+    _dump_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
 
@@ -856,21 +925,21 @@ $fn = function () {
     $newText = "fig\napple\nbanana\ncherry\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     _dump($isDiff);
-    _dump_array($diffLines, 1, true);
+    _dump_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\nfig\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     _dump($isDiff);
-    _dump_array($diffLines, 1, true);
+    _dump_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\ndamson\nelderberry\nfig";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     _dump($isDiff);
-    _dump_array($diffLines, 1, true);
+    _dump_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
 
@@ -881,21 +950,21 @@ $fn = function () {
     $newText = "banana\ncherry\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     _dump($isDiff);
-    _dump_array($diffLines, 1, true);
+    _dump_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     _dump($isDiff);
-    _dump_array($diffLines, 1, true);
+    _dump_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\ndamson";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     _dump($isDiff);
-    _dump_array($diffLines, 1, true);
+    _dump_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
 
@@ -953,7 +1022,7 @@ $fn = function () {
     );
     echo PHP_EOL;
 };
-_assert_output($fn, '
+_assert_stdout($fn, [], '
 "[ DebugModule ]"
 
 FALSE
@@ -968,7 +1037,7 @@ FALSE
 
 TRUE
 [
-  "+++ > apple @ --- apple2",
+  "[ 1 ] +++ > apple @ --- apple2",
   "banana",
   "cherry",
   "damson",
@@ -979,7 +1048,7 @@ TRUE
 [
   "apple",
   "banana",
-  "+++ > cherry @ --- cherry2",
+  "[ 3 ] +++ > cherry @ --- cherry2",
   "damson",
   "elderberry"
 ]
@@ -990,13 +1059,13 @@ TRUE
   "banana",
   "cherry",
   "damson",
-  "+++ > elderberry @ --- elderberry2"
+  "[ 5 ] +++ > elderberry @ --- elderberry2"
 ]
 
 
 TRUE
 [
-  "--- > fig",
+  "[ 1 ] --- > fig",
   "apple",
   "banana",
   "cherry",
@@ -1009,7 +1078,7 @@ TRUE
   "apple",
   "banana",
   "cherry",
-  "--- > fig",
+  "[ 4 ] --- > fig",
   "damson",
   "elderberry"
 ]
@@ -1021,13 +1090,13 @@ TRUE
   "cherry",
   "damson",
   "elderberry",
-  "--- > fig"
+  "[ 6 ] --- > fig"
 ]
 
 
 TRUE
 [
-  "+++ > apple",
+  "[ 1 ] +++ > apple",
   "banana",
   "cherry",
   "damson",
@@ -1038,7 +1107,7 @@ TRUE
 [
   "apple",
   "banana",
-  "+++ > cherry",
+  "[ 3 ] +++ > cherry",
   "damson",
   "elderberry"
 ]
@@ -1049,7 +1118,7 @@ TRUE
   "banana",
   "cherry",
   "damson",
-  "+++ > elderberry"
+  "[ 5 ] +++ > elderberry"
 ]
 
 
@@ -1125,7 +1194,7 @@ $fn = function () {
     );
     _dump($result);
 };
-_assert_output($fn, '
+_assert_stdout($fn, [], '
 "[ FormatModule ]"
 
 "[\"hello\"]"
@@ -1165,7 +1234,7 @@ $fn = function () {
     }
     \Gzhegow\Lib\Lib::fs()->rmdir(__DIR__ . '/var/1');
 };
-_assert_output($fn, '
+_assert_stdout($fn, [], '
 "[ FsModule ]"
 
 3
@@ -1201,7 +1270,7 @@ $fn = function () {
     $result = \Gzhegow\Lib\Lib::parse()->ctype_alnum('123abcABC', false);
     _dump($result);
 };
-_assert_output($fn, '
+_assert_stdout($fn, [], '
 "[ ParseModule ]"
 
 "123"
@@ -1220,7 +1289,6 @@ $fn = function () {
     _dump('[ PhpModule ]');
     echo PHP_EOL;
 
-
     \Gzhegow\Lib\Lib::php()->errors_start($b);
 
     for ( $i = 0; $i < 3; $i++ ) {
@@ -1229,9 +1297,9 @@ $fn = function () {
 
     $errors = \Gzhegow\Lib\Lib::php()->errors_end($b);
 
-    _dump_array($errors, 2, true);
+    _dump_array_multiline($errors, 2);
 };
-_assert_output($fn, '
+_assert_stdout($fn, [], '
 "[ PhpModule ]"
 
 [
@@ -1311,7 +1379,7 @@ $fn = function () {
     ;
     _dump(null !== $test);
 };
-_assert_output($fn, '
+_assert_stdout($fn, [], '
 "[ RandomModule ]"
 
 16 | TRUE
@@ -1401,7 +1469,7 @@ $fn = function () {
 
     _dump(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир'));
 };
-_assert_output($fn, '
+_assert_stdout($fn, [], '
 "[ StrModule ]"
 
 [ "hello", "world" ]
