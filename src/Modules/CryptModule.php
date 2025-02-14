@@ -219,7 +219,7 @@ class CryptModule
 
         $result = null;
 
-        $result = (PHP_VERSION_ID > 80100)
+        $result = (PHP_VERSION_ID >= 80100)
             ? hash($algo, $datastring, $binary, $options)
             : hash($algo, $datastring, $binary);
 
@@ -274,16 +274,19 @@ class CryptModule
 
     public function dec2numbase(string $decString, $alphabetTo, bool $oneBasedTo = null) : string
     {
-        $theParse = Lib::parse();
-        $theMb = Lib::mb();
+        $theBcmath = Lib::bcmath();
 
-        $_decString = null
-            ?? $theParse->base_dec($decString)
-            ?? Lib::php()->throw([ 'The `decInteger` should be valid `baseDec`', $decString ]);
+        if (! $this->type_base_dec($_decString, $decString)) {
+            throw new LogicException(
+                [ 'The `decString` should be valid `baseDec`', $decString ]
+            );
+        }
 
-        $_alphabetTo = null
-            ?? $theParse->alphabet($alphabetTo)
-            ?? Lib::php()->throw([ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]);
+        if (! $this->type_alphabet($_alphabetTo, $alphabetTo)) {
+            throw new LogicException(
+                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+            );
+        }
 
         $alphabetToValue = $_alphabetTo->getValue();
         $alphabetToLen = $_alphabetTo->getLength();
@@ -327,12 +330,18 @@ class CryptModule
 
     public function numbase2dec(string $numbaseString, $alphabetFrom, bool $oneBasedFrom = null) : string
     {
-        $theParse = Lib::parse();
+        $theBcmath = Lib::bcmath();
         $theMb = Lib::mb();
 
-        $_numbaseString = null
-            ?? $theParse->base($numbaseString, $alphabetFrom)
-            ?? Lib::php()->throw([ 'The `baseInteger` should be valid `base` for given alphabet', $numbaseString ]);
+        if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
+            throw new LogicException(
+                [
+                    'The `numbaseString` should be valid `base` for given alphabet',
+                    $numbaseString,
+                    $alphabetFrom,
+                ]
+            );
+        }
 
         if ($alphabetFrom === '0123456789') {
             return $_numbaseString;
@@ -377,7 +386,6 @@ class CryptModule
 
 
     /**
-     * > gzhegow
      * > функция переводит число из двоичной системы в другую, являющуюся степенью двойки, не переводя в десятичную систему
      *
      * > основное отличие `bin2numbase` от `bin2base` в считывании битов слева-направо и справа-налево соответственно
@@ -385,16 +393,17 @@ class CryptModule
      */
     public function bin2numbase(string $binary, $alphabetTo) : string
     {
-        $theParse = Lib::parse();
-        $theMb = Lib::mb();
+        if (! $this->type_base_bin($_binary, $binary)) {
+            throw new LogicException(
+                [ 'The `binary` should be valid `baseBin`', $binary ]
+            );
+        }
 
-        $_binary = null
-            ?? $theParse->base_bin($binary)
-            ?? Lib::php()->throw([ 'The `base` should be valid `baseBin`', $binary ]);
-
-        $_alphabetTo = null
-            ?? $theParse->alphabet($alphabetTo)
-            ?? Lib::php()->throw([ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]);
+        if (! $this->type_alphabet($_alphabetTo, $alphabetTo)) {
+            throw new LogicException(
+                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+            );
+        }
 
         $alphabetToValue = $_alphabetTo->getValue();
         $alphabetToLen = $_alphabetTo->getLength();
@@ -447,12 +456,17 @@ class CryptModule
 
     public function numbase2bin(string $numbaseString, $alphabetFrom) : string
     {
-        $theParse = Lib::parse();
         $theMb = Lib::mb();
 
-        $_numbaseString = null
-            ?? $theParse->base($numbaseString, $alphabetFrom)
-            ?? Lib::php()->throw([ 'The `powbin` should be valid `base` of given alphabet', $numbaseString ]);
+        if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
+            throw new LogicException(
+                [
+                    'The `numbaseString` should be valid `base` of given `alphabetFrom`',
+                    $numbaseString,
+                    $alphabetFrom,
+                ]
+            );
+        }
 
         $numbaseStringLen = mb_strlen($_numbaseString);
 
@@ -505,16 +519,21 @@ class CryptModule
         bool $oneBasedTo = null, bool $oneBasedFrom = null
     ) : string
     {
-        $theParse = Lib::parse();
-        $theStr = Lib::str();
+        if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
+            throw new LogicException(
+                [
+                    'The `numbaseString` should be valid `base` of given `alphabetFrom`',
+                    $numbaseString,
+                    $alphabetFrom,
+                ]
+            );
+        }
 
-        $_numbaseString = null
-            ?? $theParse->base($numbaseString, $alphabetFrom)
-            ?? Lib::php()->throw([ 'The `base` should be valid `base` of given `alphabetFrom`', $numbaseString ]);
-
-        $_alphabetTo = null
-            ?? $theParse->alphabet($alphabetTo)
-            ?? Lib::php()->throw([ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]);
+        if (! $this->type_alphabet($_alphabetTo, $alphabetTo)) {
+            throw new LogicException(
+                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+            );
+        }
 
         $result = null;
 
@@ -697,12 +716,12 @@ class CryptModule
         }
 
         $theBcmath = Lib::bcmath();
-        $theMb = Lib::mb();
-        $theParse = Lib::parse();
 
-        $_alphabetTo = null
-            ?? $theParse->alphabet($alphabetTo)
-            ?? Lib::php()->throw([ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]);
+        if (! $this->type_alphabet($_alphabetTo, $alphabetTo)) {
+            throw new LogicException(
+                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+            );
+        }
 
         $alphabetToValue = $_alphabetTo->getValue();
         $alphabetToLen = $_alphabetTo->getLength();
@@ -765,11 +784,16 @@ class CryptModule
 
         $theBcmath = Lib::bcmath();
         $theMb = Lib::mb();
-        $theParse = Lib::parse();
 
-        $_numbaseString = null
-            ?? $theParse->base($numbaseString, $alphabetFrom)
-            ?? Lib::php()->throw([ 'The `alphabetFrom` should be valid alphabet', $alphabetFrom ]);
+        if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
+            throw new LogicException(
+                [
+                    'The `numbaseString` should be valid `base` of given `alphabetFrom`',
+                    $numbaseString,
+                    $alphabetFrom,
+                ]
+            );
+        }
 
         $alphabetFromLen = mb_strlen($alphabetFrom);
         $alphabetFromZero = mb_substr($alphabetFrom, 0, 1);
@@ -901,7 +925,6 @@ class CryptModule
 
 
     /**
-     * > gzhegow
      * > функция кодирует двоичный поток бит по принципу base64_encode
      * > это очень похоже на перевод в другую систему счисления, только чтение бит происходит слева-направо
      *
@@ -942,16 +965,17 @@ class CryptModule
      */
     public function bin2base_it($binaries, $alphabetTo) : \Generator
     {
-        $theParse = Lib::parse();
-        $theMb = Lib::mb();
+        $theBcmath = Lib::bcmath();
 
         $_binaries = is_iterable($binaries)
             ? $binaries
             : (is_string($binaries) ? [ $binaries ] : []);
 
-        $_alphabetTo = null
-            ?? $theParse->alphabet($alphabetTo)
-            ?? Lib::php()->throw([ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]);
+        if (! $this->type_alphabet($_alphabetTo, $alphabetTo)) {
+            throw new LogicException(
+                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+            );
+        }
 
         $alphabetToValue = $_alphabetTo->getValue();
         $alphabetToLen = $_alphabetTo->getLength();
@@ -973,9 +997,11 @@ class CryptModule
 
         $bitsLeft = $bitsCnt;
         foreach ( $_binaries as $binary ) {
-            $_binary = null
-                ?? $theParse->base_bin($binary)
-                ?? Lib::php()->throw([ 'Each of `binaries` must be valid `baseBin`', $binary ]);
+            if (! $this->type_base_bin($_binary, $binary)) {
+                throw new LogicException(
+                    [ 'Each of `binaries` must be valid `baseBin`', $binary ]
+                );
+            }
 
             $binarySize = strlen($_binary);
 

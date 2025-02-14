@@ -258,9 +258,9 @@ class BoolModule
 
 
     /**
-     * > gzhegow, null is nullable
-     * > gzhegow, USERNULL is nullable
-     * > gzhegow, NAN is nullable
+     * > null is nullable
+     * > USERNULL is nullable
+     * > NAN is nullable
      */
     public function is_nullable($value, &$result = null) : bool
     {
@@ -310,11 +310,11 @@ class BoolModule
 
 
     /**
-     * > gzhegow, any empty is blank
-     * > gzhegow, any nullable is blank
-     * > gzhegow, non-empty-string is not blank
-     * > gzhegow, non-empty-array is not blank
-     * > gzhegow, non-empty-countable is not blank
+     * > any empty is blank
+     * > any nullable is blank
+     * > non-empty-string is not blank
+     * > non-empty-array is not blank
+     * > non-empty-countable is not blank
      */
     public function is_blank($value, &$result = null) : bool
     {
@@ -391,8 +391,8 @@ class BoolModule
 
 
     /**
-     * > gzhegow, any non-void is passed
-     * > gzhegow, '{N}' is passed
+     * > any non-void is passed
+     * > '{N}' is passed
      */
     public function is_passed($value, &$result = null) : bool
     {

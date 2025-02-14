@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
@@ -49,7 +50,7 @@ class RandomModule
         return $uuid;
     }
 
-    protected function _uuid() : string
+    private function _uuid() : string
     {
         $bytes = $this->random_bytes(16);
 
@@ -139,17 +140,21 @@ class RandomModule
 
     public function random_string(int $len, string $alphabet = null) : string
     {
-        $theParse = Lib::parse();
+        $theType = Lib::type();
 
         $alphabet = $alphabet ?? '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-        $_len = null
-            ?? $theParse->int_positive($len)
-            ?? Lib::php()->throw([ 'The `len` should be positive integer', $len ]);
+        if (! $theType->int_positive($_len, $len)) {
+            throw new LogicException(
+                [ 'The `len` should be positive integer', $len ]
+            );
+        }
 
-        $_alphabet = null
-            ?? $theParse->alphabet($alphabet)
-            ?? Lib::php()->throw([ 'The `alphabet` should be valid alphabet', $alphabet ]);
+        if (! $theType->alphabet($_alphabet, $alphabet)) {
+            throw new LogicException(
+                [ 'The `alphabet` should be valid alphabet', $alphabet ]
+            );
+        }
 
         $alphabetLen = $_alphabet->getLength();
 

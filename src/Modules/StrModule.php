@@ -175,7 +175,7 @@ class StrModule
 
         switch ( $fn ):
             case 'str_split':
-                $result = (PHP_VERSION_ID > 74000)
+                $result = (PHP_VERSION_ID >= 74000)
                     ? 'mb_str_split'
                     : [ Lib::mb(), 'str_split' ];
 
@@ -519,7 +519,7 @@ class StrModule
 
 
     /**
-     * > gzhegow, возвращает число символов в строке
+     * > возвращает число символов в строке
      */
     public function strlen($value) : int
     {
@@ -539,7 +539,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, возвращает размер строки в байтах
+     * > возвращает размер строки в байтах
      */
     public function strsize($value) : int
     {
@@ -558,7 +558,7 @@ class StrModule
 
 
     /**
-     * > gzhegow, заменяет все буквы на малые
+     * > заменяет все буквы на малые
      */
     public function lower(string $string, string $mb_encoding = null) : string
     {
@@ -584,7 +584,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, заменяет все буквы на большие
+     * > заменяет все буквы на большие
      */
     public function upper(string $string, string $mb_encoding = null) : string
     {
@@ -611,7 +611,7 @@ class StrModule
 
 
     /**
-     * > gzhegow, пишет слово с малой буквы
+     * > пишет слово с малой буквы
      */
     public function lcfirst(string $string, string $mb_encoding = null) : string
     {
@@ -632,7 +632,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, пишет слово с большой буквы
+     * > пишет слово с большой буквы
      */
     public function ucfirst(string $string, string $mb_encoding = null) : string
     {
@@ -654,7 +654,7 @@ class StrModule
 
 
     /**
-     * > gzhegow, пишет каждое слово в предложении с малой буквы
+     * > пишет каждое слово в предложении с малой буквы
      */
     public function lcwords(string $string, string $separators = " \t\r\n\f\v", string $mb_encoding = null) : string
     {
@@ -675,7 +675,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, пишет каждое слово в предложении с большой буквы
+     * > пишет каждое слово в предложении с большой буквы
      */
     public function ucwords(string $string, string $separators = " \t\r\n\f\v", string $mb_encoding = null) : string
     {
@@ -697,7 +697,7 @@ class StrModule
 
 
     /**
-     * > gzhegow, если строка начинается на искомую, отрезает ее и возвращает укороченную
+     * > если строка начинается на искомую, отрезает ее и возвращает укороченную
      * if (null !== ($substr = _str_starts('hello', 'h'))) {} // 'ello'
      */
     public function starts(string $string, string $needle, bool $ignoreCase = null) : ?string
@@ -723,7 +723,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, если строка заканчивается на искомую, отрезает ее и возвращает укороченную
+     * > если строка заканчивается на искомую, отрезает ее и возвращает укороченную
      * if (null !== ($substr = _str_ends('hello', 'o'))) {} // 'hell'
      */
     public function ends(string $string, string $needle, bool $ignoreCase = null) : ?string
@@ -749,7 +749,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, ищет подстроку в строке и разбивает по ней результат
+     * > ищет подстроку в строке и разбивает по ней результат
      */
     public function contains(string $string, string $needle, bool $ignoreCase = null, int $limit = null) : array
     {
@@ -779,7 +779,7 @@ class StrModule
 
 
     /**
-     * > gzhegow, обрезает у строки подстроку с начала (ltrim, только для строк а не букв)
+     * > обрезает у строки подстроку с начала (ltrim, только для строк а не букв)
      */
     public function lcrop(string $string, string $lcrop, bool $ignoreCase = null, int $limit = -1) : string
     {
@@ -814,7 +814,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, обрезает у строки подстроку с конца (rtrim, только для строк а не букв)
+     * > обрезает у строки подстроку с конца (rtrim, только для строк а не букв)
      */
     public function rcrop(string $string, string $rcrop, bool $ignoreCase = null, int $limit = -1) : string
     {
@@ -848,7 +848,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, обрезает у строки подстроки с обеих сторон (trim, только для строк а не букв)
+     * > обрезает у строки подстроки с обеих сторон (trim, только для строк а не букв)
      */
     public function crop(string $string, $crops, bool $ignoreCase = null, int $limit = -1) : string
     {
@@ -873,7 +873,7 @@ class StrModule
 
 
     /**
-     * > gzhegow, добавляет подстроку в начало строки, если её уже там нет
+     * > добавляет подстроку в начало строки, если её уже там нет
      */
     public function unlcrop(string $string, string $lcrop, int $times = null, bool $ignoreCase = null) : string
     {
@@ -891,7 +891,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, добавляет подстроку в конец строки, если её уже там нет
+     * > добавляет подстроку в конец строки, если её уже там нет
      */
     public function unrcrop(string $string, string $rcrop, int $times = null, bool $ignoreCase = null) : string
     {
@@ -909,7 +909,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, оборачивает строку в подстроки, если их уже там нет
+     * > оборачивает строку в подстроки, если их уже там нет
      *
      * @param string|string[] $crops
      * @param int|int[]       $times
@@ -934,7 +934,7 @@ class StrModule
 
 
     /**
-     * > gzhegow, str_replace с поддержкой limit замен
+     * > str_replace с поддержкой limit замен
      */
     public function replace_limit(
         $search, $replace, $subject, int $limit = null,
@@ -979,7 +979,7 @@ class StrModule
 
 
     /**
-     * > gzhegow, 'theCamelCase'
+     * > 'theCamelCase'
      */
     public function camel(string $string) : string
     {
@@ -999,7 +999,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, 'ThePascalCase'
+     * > 'ThePascalCase'
      */
     public function pascal(string $string) : string
     {
@@ -1020,7 +1020,7 @@ class StrModule
 
 
     /**
-     * > gzhegow, 'the Space case'
+     * > 'the Space case'
      */
     public function space(string $string) : string
     {
@@ -1040,7 +1040,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, 'the_Snake_case'
+     * > 'the_Snake_case'
      */
     public function snake(string $string) : string
     {
@@ -1060,7 +1060,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, 'the-Kebab-case'
+     * > 'the-Kebab-case'
      */
     public function kebab(string $string) : string
     {
@@ -1081,7 +1081,7 @@ class StrModule
 
 
     /**
-     * > gzhegow, 'the space case'
+     * > 'the space case'
      */
     public function space_lower(string $string) : string
     {
@@ -1093,7 +1093,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, 'the_snake_case'
+     * > 'the_snake_case'
      */
     public function snake_lower(string $string) : string
     {
@@ -1105,7 +1105,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, 'the-kebab-case'
+     * > 'the-kebab-case'
      */
     public function kebab_lower(string $string) : string
     {
@@ -1118,7 +1118,7 @@ class StrModule
 
 
     /**
-     * > gzhegow, 'THE SPACE CASE'
+     * > 'THE SPACE CASE'
      */
     public function space_upper(string $string) : string
     {
@@ -1130,7 +1130,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, 'THE_SNAKE_CASE'
+     * > 'THE_SNAKE_CASE'
      */
     public function snake_upper(string $string) : string
     {
@@ -1142,7 +1142,7 @@ class StrModule
     }
 
     /**
-     * > gzhegow, 'THE-KEBAB-CASE'
+     * > 'THE-KEBAB-CASE'
      */
     public function kebab_upper(string $string) : string
     {
@@ -1155,7 +1155,8 @@ class StrModule
 
 
     /**
-     * > gzhegow, обычный трим завернутый в генератор
+     * > обычный трим завернутый в генератор
+     *
      * @return \Generator<string>
      */
     public function trim_it($strings, string $characters = null) : \Generator
@@ -1172,7 +1173,8 @@ class StrModule
     }
 
     /**
-     * > gzhegow, обычный трим завернутый в генератор
+     * > обычный трим завернутый в генератор
+     *
      * @return \Generator<string>
      */
     public function ltrim_it($strings, string $characters = null) : \Generator
@@ -1189,7 +1191,8 @@ class StrModule
     }
 
     /**
-     * > gzhegow, обычный трим завернутый в генератор
+     * > обычный трим завернутый в генератор
+     *
      * @return \Generator<string>
      */
     public function rtrim_it($strings, string $characters = null) : \Generator

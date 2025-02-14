@@ -47,7 +47,7 @@ class BcmathModule
             return false;
         }
 
-        // > gzhegow, 0.000022 becomes 2.2E-5, so you need to pass formatted string instead of float
+        // > 0.000022 becomes 2.2E-5, so you need to pass formatted string instead of float
         if (false !== stripos($_value, 'e')) {
             return false;
         }
@@ -121,7 +121,7 @@ class BcmathModule
         $scales = [];
 
         foreach ( $numbers as $i => $number ) {
-            if (null === ($_number = Lib::parse()->numeric($number))) {
+            if (Lib::type()->numeric($_number, $number)) {
                 throw new LogicException(
                     [ 'Each of `numbers` should be numeric', $number, $i ]
                 );
@@ -143,9 +143,11 @@ class BcmathModule
         $scaleLimit = $this->scale_limit_static();
 
         if (null !== $scale) {
-            $_scale = null
-                ?? Lib::parse()->int_non_negative($scale)
-                ?? Lib::php()->throw([ 'The `scale` must be non negative integer', $scale ]);
+            if (! Lib::type()->int_non_negative($_scale, $scale)) {
+                throw new LogicException(
+                    [ 'The `scale` must be non negative integer', $scale ]
+                );
+            }
 
             $scales[] = $_scale;
         }
@@ -175,9 +177,11 @@ class BcmathModule
         $scaleLimit = $this->scale_limit_static();
 
         if (null !== $scale) {
-            $_scale = null
-                ?? Lib::parse()->int_non_negative($scale)
-                ?? Lib::php()->throw([ 'The `scale` must be non negative integer', $scale ]);
+            if (! Lib::type()->int_non_negative($_scale, $scale)) {
+                throw new LogicException(
+                    [ 'The `scale` must be non negative integer', $scale ]
+                );
+            }
 
             $scales[] = $_scale;
         }
@@ -465,13 +469,15 @@ class BcmathModule
 
         $frac = null;
 
-        $_number = null
-            ?? Lib::parse()->numeric($number)
-            ?? Lib::php()->throw([ 'The `number` should be number', $number ]);
+        if (! Lib::type()->int_non_negative($_number, $number)) {
+            throw new LogicException(
+                [ 'The `number` should be number', $number ]
+            );
+        }
 
         $scaleParsed = 0;
 
-        $frac = strrchr($_number, $theType->the_decimal_point());
+        $frac = strrchr((string) $_number, $theType->the_decimal_point());
 
         if (false !== $frac) {
             $scaleParsed = strlen($frac) - 1;
@@ -605,7 +611,7 @@ class BcmathModule
     }
 
     /**
-     * > gzhegow, поскольку при делении число дробных знаков может увелится, параметр $scale сделан обязательным
+     * > поскольку при делении число дробных знаков может увелится, параметр $scale сделан обязательным
      */
     public function bcdiv($num1, $num2, int $scale) : Bcnumber
     {
@@ -636,7 +642,7 @@ class BcmathModule
 
 
     /**
-     * > gzhegow, оригинальная функция ожидает три аргумента, но это противоречит самой идее получения остатка от деления
+     * > оригинальная функция ожидает три аргумента, но это противоречит самой идее получения остатка от деления
      * > перед взятием остатка дробная часть обоих чисел отбрасывается
      */
     public function bcmod($num1, $num2) : Bcnumber

@@ -42,7 +42,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return false|null
 	 */
-	public function false($value): ?bool
+	public function false($value)
 	{
 		if (Lib::type()->false($result, $value)) {
 		    return $result;
@@ -68,7 +68,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return float|null
 	 */
-	public function nan($value): ?float
+	public function nan($value)
 	{
 		if (Lib::type()->nan($result, $value)) {
 		    return $result;
@@ -118,6 +118,8 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
+	 * > NULL переданный пользователем через API, например '{N}'
+	 *
 	 * @return mixed|null
 	 */
 	public function nil($value)
@@ -144,6 +146,8 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
+	 * > Специальный тип, что свойство объекта ещё не имеет значения (если NULL - это допустимое значение)
+	 *
 	 * @return mixed|null
 	 */
 	public function undefined($value)
@@ -170,12 +174,13 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * > gzhegow, NULL is nullable
-	 * > gzhegow, NAN is nullable
-	 * > gzhegow, NIL is nullable
+	 * > Значение можно безопасно заменить NULL-ом
 	 *
-	 * > gzhegow, '' is not nullable
+	 * > NULL is nullable
+	 * > NAN is nullable
+	 * > NIL is nullable
 	 *
+	 * > '' is not nullable
 	 *
 	 * @return mixed|null
 	 */
@@ -203,13 +208,14 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * > gzhegow, any empty is blank
-	 * > gzhegow, any nullable is blank
+	 * > Значение можно отбросить или не учитывать, т.к. оно не несёт информации
 	 *
-	 * > gzhegow, non-empty-string is not blank
-	 * > gzhegow, non-empty-array is not blank
-	 * > gzhegow, non-empty-countable is not blank
+	 * > empty string is blank
+	 * > nullable is blank
+	 * > empty array is blank
+	 * > empty countable object is blank
 	 *
+	 * > '0' is not blank
 	 *
 	 * @return mixed|null
 	 */
@@ -237,11 +243,11 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * значение отправлено пользователем
+	 * Значение было отправлено пользователем
+	 * Если в АПИ пришло NULL - значит стоит "не трогать", а если NIL - значит надо "удалить"
 	 *
 	 * > nil is passed
 	 * > any non-nullable is passed
-	 *
 	 *
 	 * @return mixed|null
 	 */
@@ -271,7 +277,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return bool|null
 	 */
-	public function userbool($value): ?bool
+	public function userbool($value)
 	{
 		if (Lib::type()->userbool($result, $value)) {
 		    return $result;
@@ -284,7 +290,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return int|null
 	 */
-	public function int($value): ?int
+	public function int($value)
 	{
 		if (Lib::type()->int($result, $value)) {
 		    return $result;
@@ -297,7 +303,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return int|null
 	 */
-	public function int_non_zero($value): ?int
+	public function int_non_zero($value)
 	{
 		if (Lib::type()->int_non_zero($result, $value)) {
 		    return $result;
@@ -310,7 +316,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return int|null
 	 */
-	public function int_non_negative($value): ?int
+	public function int_non_negative($value)
 	{
 		if (Lib::type()->int_non_negative($result, $value)) {
 		    return $result;
@@ -323,7 +329,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return int|null
 	 */
-	public function int_non_positive($value): ?int
+	public function int_non_positive($value)
 	{
 		if (Lib::type()->int_non_positive($result, $value)) {
 		    return $result;
@@ -336,7 +342,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return int|null
 	 */
-	public function int_negative($value): ?int
+	public function int_negative($value)
 	{
 		if (Lib::type()->int_negative($result, $value)) {
 		    return $result;
@@ -349,7 +355,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return int|null
 	 */
-	public function int_positive($value): ?int
+	public function int_positive($value)
 	{
 		if (Lib::type()->int_positive($result, $value)) {
 		    return $result;
@@ -440,7 +446,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int($value): ?string
+	public function numeric_int($value)
 	{
 		if (Lib::type()->numeric_int($result, $value)) {
 		    return $result;
@@ -453,7 +459,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_non_zero($value): ?string
+	public function numeric_int_non_zero($value)
 	{
 		if (Lib::type()->numeric_int_non_zero($result, $value)) {
 		    return $result;
@@ -466,7 +472,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_non_negative($value): ?string
+	public function numeric_int_non_negative($value)
 	{
 		if (Lib::type()->numeric_int_non_negative($result, $value)) {
 		    return $result;
@@ -479,7 +485,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_non_positive($value): ?string
+	public function numeric_int_non_positive($value)
 	{
 		if (Lib::type()->numeric_int_non_positive($result, $value)) {
 		    return $result;
@@ -492,7 +498,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_negative($value): ?string
+	public function numeric_int_negative($value)
 	{
 		if (Lib::type()->numeric_int_negative($result, $value)) {
 		    return $result;
@@ -505,7 +511,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_positive($value): ?string
+	public function numeric_int_positive($value)
 	{
 		if (Lib::type()->numeric_int_positive($result, $value)) {
 		    return $result;
@@ -518,7 +524,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric($value): ?string
+	public function numeric($value)
 	{
 		if (Lib::type()->numeric($result, $value)) {
 		    return $result;
@@ -531,7 +537,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_non_zero($value): ?string
+	public function numeric_non_zero($value)
 	{
 		if (Lib::type()->numeric_non_zero($result, $value)) {
 		    return $result;
@@ -544,7 +550,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_non_negative($value): ?string
+	public function numeric_non_negative($value)
 	{
 		if (Lib::type()->numeric_non_negative($result, $value)) {
 		    return $result;
@@ -557,7 +563,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_non_positive($value): ?string
+	public function numeric_non_positive($value)
 	{
 		if (Lib::type()->numeric_non_positive($result, $value)) {
 		    return $result;
@@ -570,7 +576,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_negative($value): ?string
+	public function numeric_negative($value)
 	{
 		if (Lib::type()->numeric_negative($result, $value)) {
 		    return $result;
@@ -583,7 +589,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_positive($value): ?string
+	public function numeric_positive($value)
 	{
 		if (Lib::type()->numeric_positive($result, $value)) {
 		    return $result;
@@ -596,7 +602,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return Bcnumber|null
 	 */
-	public function bcnum($value): ?Bcnumber
+	public function bcnum($value)
 	{
 		if (Lib::type()->bcnum($result, $value)) {
 		    return $result;
@@ -609,7 +615,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function string($value): ?string
+	public function string($value)
 	{
 		if (Lib::type()->string($result, $value)) {
 		    return $result;
@@ -622,7 +628,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function string_not_empty($value): ?string
+	public function string_not_empty($value)
 	{
 		if (Lib::type()->string_not_empty($result, $value)) {
 		    return $result;
@@ -635,7 +641,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function trim($value, string $characters = null): ?string
+	public function trim($value, string $characters = null)
 	{
 		if (Lib::type()->trim($result, $value, $characters)) {
 		    return $result;
@@ -648,7 +654,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function ctype_digit($value): ?string
+	public function ctype_digit($value)
 	{
 		if (Lib::type()->ctype_digit($result, $value)) {
 		    return $result;
@@ -661,7 +667,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function ctype_alpha($value, bool $ignoreCase = null): ?string
+	public function ctype_alpha($value, bool $ignoreCase = null)
 	{
 		if (Lib::type()->ctype_alpha($result, $value, $ignoreCase)) {
 		    return $result;
@@ -674,7 +680,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function ctype_alnum($value, bool $ignoreCase = null): ?string
+	public function ctype_alnum($value, bool $ignoreCase = null)
 	{
 		if (Lib::type()->ctype_alnum($result, $value, $ignoreCase)) {
 		    return $result;
@@ -687,7 +693,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return Alphabet|null
 	 */
-	public function alphabet($value): ?Alphabet
+	public function alphabet($value)
 	{
 		if (Lib::type()->alphabet($result, $value)) {
 		    return $result;
@@ -700,7 +706,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function base($value, $alphabet): ?string
+	public function base($value, $alphabet)
 	{
 		if (Lib::type()->base($result, $value, $alphabet)) {
 		    return $result;
@@ -713,7 +719,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function base_bin($value): ?string
+	public function base_bin($value)
 	{
 		if (Lib::type()->base_bin($result, $value)) {
 		    return $result;
@@ -726,7 +732,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function base_oct($value): ?string
+	public function base_oct($value)
 	{
 		if (Lib::type()->base_oct($result, $value)) {
 		    return $result;
@@ -739,7 +745,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function base_dec($value): ?string
+	public function base_dec($value)
 	{
 		if (Lib::type()->base_dec($result, $value)) {
 		    return $result;
@@ -752,7 +758,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function base_hex($value): ?string
+	public function base_hex($value)
 	{
 		if (Lib::type()->base_hex($result, $value)) {
 		    return $result;
@@ -765,7 +771,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return array|null
 	 */
-	public function list($value): ?array
+	public function list($value)
 	{
 		if (Lib::type()->list($result, $value)) {
 		    return $result;
@@ -778,7 +784,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return array|null
 	 */
-	public function list_strict($value): ?array
+	public function list_strict($value)
 	{
 		if (Lib::type()->list_strict($result, $value)) {
 		    return $result;
@@ -791,7 +797,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return array|null
 	 */
-	public function dict($value): ?array
+	public function dict($value)
 	{
 		if (Lib::type()->dict($result, $value)) {
 		    return $result;
@@ -804,7 +810,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return array|null
 	 */
-	public function table($value): ?array
+	public function table($value)
 	{
 		if (Lib::type()->table($result, $value)) {
 		    return $result;
@@ -817,7 +823,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return array|null
 	 */
-	public function matrix($value): ?array
+	public function matrix($value)
 	{
 		if (Lib::type()->matrix($result, $value)) {
 		    return $result;
@@ -830,7 +836,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return array|null
 	 */
-	public function matrix_strict($value): ?array
+	public function matrix_strict($value)
 	{
 		if (Lib::type()->matrix_strict($result, $value)) {
 		    return $result;
@@ -843,7 +849,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function regex($value): ?string
+	public function regex($value)
 	{
 		if (Lib::type()->regex($result, $value)) {
 		    return $result;
@@ -856,7 +862,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function ip($value): ?string
+	public function ip($value)
 	{
 		if (Lib::type()->ip($result, $value)) {
 		    return $result;
@@ -923,7 +929,7 @@ class ParseModule extends ParseModuleBase
 	 *
 	 * @return class-string|null
 	 */
-	public function struct($value, bool $useRegex = null, ...$fnExistsList): ?string
+	public function struct($value, bool $useRegex = null, ...$fnExistsList)
 	{
 		if (Lib::type()->struct($result, $value, $useRegex, $fnExistsList)) {
 		    return $result;
@@ -936,7 +942,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return class-string|null
 	 */
-	public function struct_class($value, bool $useRegex = null): ?string
+	public function struct_class($value, bool $useRegex = null)
 	{
 		if (Lib::type()->struct_class($result, $value, $useRegex)) {
 		    return $result;
@@ -949,7 +955,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return class-string|null
 	 */
-	public function struct_interface($value, bool $useRegex = null): ?string
+	public function struct_interface($value, bool $useRegex = null)
 	{
 		if (Lib::type()->struct_interface($result, $value, $useRegex)) {
 		    return $result;
@@ -962,7 +968,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return class-string|null
 	 */
-	public function struct_trait($value, bool $useRegex = null): ?string
+	public function struct_trait($value, bool $useRegex = null)
 	{
 		if (Lib::type()->struct_trait($result, $value, $useRegex)) {
 		    return $result;
@@ -977,7 +983,7 @@ class ParseModule extends ParseModuleBase
 	 *
 	 * @return class-string|null
 	 */
-	public function struct_fqcn($value, bool $useRegex = null, ...$fnExistsList): ?string
+	public function struct_fqcn($value, bool $useRegex = null, ...$fnExistsList)
 	{
 		if (Lib::type()->struct_fqcn($result, $value, $useRegex, $fnExistsList)) {
 		    return $result;
@@ -992,7 +998,7 @@ class ParseModule extends ParseModuleBase
 	 *
 	 * @return string|null
 	 */
-	public function struct_namespace($value, bool $useRegex = null, ...$fnExistsList): ?string
+	public function struct_namespace($value, bool $useRegex = null, ...$fnExistsList)
 	{
 		if (Lib::type()->struct_namespace($result, $value, $useRegex, $fnExistsList)) {
 		    return $result;
@@ -1007,7 +1013,7 @@ class ParseModule extends ParseModuleBase
 	 *
 	 * @return string|null
 	 */
-	public function struct_basename($value, bool $useRegex = null, ...$fnExistsList): ?string
+	public function struct_basename($value, bool $useRegex = null, ...$fnExistsList)
 	{
 		if (Lib::type()->struct_basename($result, $value, $useRegex, $fnExistsList)) {
 		    return $result;
@@ -1018,9 +1024,188 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
+	 * @return array{
+	 */
+	public function method_array($value)
+	{
+		if (Lib::type()->method_array($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
 	 * @return string|null
 	 */
-	public function path($value, array $refs = []): ?string
+	public function method_string($value)
+	{
+		if (Lib::type()->method_string($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @param string|object $newScope
+	 *
+	 * @return callable|null
+	 */
+	public function callable($value, $newScope = 'static')
+	{
+		if (Lib::type()->callable($result, $value, $newScope)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return callable|\Closure|object|null
+	 */
+	public function callable_object($value, $newScope = 'static')
+	{
+		if (Lib::type()->callable_object($result, $value, $newScope)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return callable|object|null
+	 */
+	public function callable_object_closure($value, $newScope = 'static')
+	{
+		if (Lib::type()->callable_object_closure($result, $value, $newScope)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return callable|object|null
+	 */
+	public function callable_object_invokable($value, $newScope = 'static')
+	{
+		if (Lib::type()->callable_object_invokable($result, $value, $newScope)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @param string|object                                            $newScope
+	 *
+	 * @return callable|array{
+	 */
+	public function callable_array($value, $newScope = 'static')
+	{
+		if (Lib::type()->callable_array($result, $value, $newScope)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @param string|object                                            $newScope
+	 *
+	 * @return callable|array{
+	 */
+	public function callable_array_method($value, $newScope = 'static')
+	{
+		if (Lib::type()->callable_array_method($result, $value, $newScope)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @param string|object                                     $newScope
+	 *
+	 * @return callable|array{
+	 */
+	public function callable_array_method_static($value, $newScope = 'static')
+	{
+		if (Lib::type()->callable_array_method_static($result, $value, $newScope)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @param string|object                               $newScope
+	 *
+	 * @return callable|array{
+	 */
+	public function callable_array_method_non_static($value, $newScope = 'static')
+	{
+		if (Lib::type()->callable_array_method_non_static($result, $value, $newScope)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return callable-string|null
+	 */
+	public function callable_string($value, $newScope = 'static')
+	{
+		if (Lib::type()->callable_string($result, $value, $newScope)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return callable-string|null
+	 */
+	public function callable_string_function($value, $newScope = 'static')
+	{
+		if (Lib::type()->callable_string_function($result, $value, $newScope)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return callable-string|null
+	 */
+	public function callable_string_method_static($value, $newScope = 'static')
+	{
+		if (Lib::type()->callable_string_method_static($result, $value, $newScope)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function path($value, array $refs = [])
 	{
 		if (Lib::type()->path($result, $value, $refs)) {
 		    return $result;
@@ -1033,7 +1218,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function dirpath($value, array $refs = []): ?string
+	public function dirpath($value, array $refs = [])
 	{
 		if (Lib::type()->dirpath($result, $value, $refs)) {
 		    return $result;
@@ -1046,7 +1231,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function filepath($value, array $refs = []): ?string
+	public function filepath($value, array $refs = [])
 	{
 		if (Lib::type()->filepath($result, $value, $refs)) {
 		    return $result;
@@ -1059,7 +1244,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function path_realpath($value, array $refs = []): ?string
+	public function path_realpath($value, array $refs = [])
 	{
 		if (Lib::type()->path_realpath($result, $value, $refs)) {
 		    return $result;
@@ -1072,7 +1257,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function dirpath_realpath($value, array $refs = []): ?string
+	public function dirpath_realpath($value, array $refs = [])
 	{
 		if (Lib::type()->dirpath_realpath($result, $value, $refs)) {
 		    return $result;
@@ -1085,7 +1270,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function filepath_realpath($value, array $refs = []): ?string
+	public function filepath_realpath($value, array $refs = [])
 	{
 		if (Lib::type()->filepath_realpath($result, $value, $refs)) {
 		    return $result;
@@ -1098,7 +1283,7 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function filename($value): ?string
+	public function filename($value)
 	{
 		if (Lib::type()->filename($result, $value)) {
 		    return $result;

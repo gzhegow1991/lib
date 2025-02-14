@@ -436,16 +436,18 @@ class DebugModule
 
     private function var_dump_output_resource($var, array &$options = []) : ?array
     {
-        if (null === Lib::parse()->resource($var)) return null;
+        if (! Lib::type()->resource($_var, $var)) {
+            return null;
+        }
 
         $withId = $options[ 'with_id' ] ?? true;
 
-        $type = gettype($var);
+        $type = gettype($_var);
 
-        $resourceType = get_resource_type($var);
+        $resourceType = get_resource_type($_var);
         $resourceId = PHP_VERSION_ID > 80000
-            ? get_resource_id($var)
-            : (int) $var;
+            ? get_resource_id($_var)
+            : (int) $_var;
 
         $output = [];
         $output[] = "{$type}({$resourceType})";
@@ -587,6 +589,61 @@ class DebugModule
     }
 
 
+    public function types($separator = '', array $options = [], ...$values) : string
+    {
+        $_separator = (string) $separator;
+        if ('' === $_separator) {
+            $_separator = ' | ';
+        }
+
+        $list = [];
+
+        foreach ( $values as $value ) {
+            $list[] = $this->type($value, $options);
+        }
+
+        $content = implode($_separator, $list);
+
+        return $content;
+    }
+
+    public function type_ids($separator = '', array $options = [], ...$values) : string
+    {
+        $_separator = (string) $separator;
+        if ('' === $_separator) {
+            $_separator = ' | ';
+        }
+
+        $list = [];
+
+        foreach ( $values as $value ) {
+            $list[] = $this->type_id($value, $options);
+        }
+
+        $content = implode($_separator, $list);
+
+        return $content;
+    }
+
+    public function type_values($separator = '', array $options = [], ...$values) : string
+    {
+        $_separator = (string) $separator;
+        if ('' === $_separator) {
+            $_separator = ' | ';
+        }
+
+        $list = [];
+
+        foreach ( $values as $value ) {
+            $list[] = $this->type_value($value, $options);
+        }
+
+        $content = implode($_separator, $list);
+
+        return $content;
+    }
+
+
     public function value($value, array $options = []) : string
     {
         $output = $this->var_dump($value,
@@ -603,24 +660,23 @@ class DebugModule
         return $output;
     }
 
-    public function array($value, int $maxLevel = null, array $options = []) : string
+    public function values($separator = '', array $options = [], ...$values) : string
     {
-        $maxLevel = $maxLevel ?? 1;
+        $_separator = (string) $separator;
+        if ('' === $_separator) {
+            $_separator = ' | ';
+        }
 
-        $output = $this->var_dump($value,
-            $options + [
-                'with_type'       => false,
-                'with_id'         => false,
-                'with_value'      => true,
-                'with_braces'     => false,
-                'max_array_level' => $maxLevel,
-                'newline'         => ' ',
-            ]
-        );
+        $list = [];
 
-        return $output;
+        foreach ( $values as $value ) {
+            $list[] = $this->value($value, $options);
+        }
+
+        $content = implode($_separator, $list);
+
+        return $content;
     }
-
 
     public function value_multiline($value, array $options = []) : string
     {
@@ -638,7 +694,26 @@ class DebugModule
         return $output;
     }
 
-    public function array_multiline($value, int $maxLevel = null, array $options = []) : string
+
+    public function value_array($value, int $maxLevel = null, array $options = []) : string
+    {
+        $maxLevel = $maxLevel ?? 1;
+
+        $output = $this->var_dump($value,
+            $options + [
+                'with_type'       => false,
+                'with_id'         => false,
+                'with_value'      => true,
+                'with_braces'     => false,
+                'max_array_level' => $maxLevel,
+                'newline'         => ' ',
+            ]
+        );
+
+        return $output;
+    }
+
+    public function value_array_multiline($value, int $maxLevel = null, array $options = []) : string
     {
         $maxLevel = $maxLevel ?? 1;
 
@@ -663,25 +738,36 @@ class DebugModule
             return null;
         }
 
-        $columns = [];
-        for ( $i = 0; $i < count($table); $i++ ) {
-            if (! is_array($table[ $i ])) {
+        $rowKeys = array_fill_keys(
+            array_keys($table),
+            true
+        );
+
+        $colKeys = [];
+        foreach ( $rowKeys as $rowKey => $bool ) {
+            if (! is_array($table[ $rowKey ])) {
                 throw new RuntimeException('The `table` should be array of arrays');
             }
 
-            foreach ( $table[ $i ] as $newKey => $val ) {
-                if (! isset($columns[ $newKey ])) {
-                    $columns[ $newKey ] = $newKey;
+            foreach ( array_keys($table[ $rowKey ]) as $colKey ) {
+                if (! isset($colKeys[ $colKey ])) {
+                    $colKeys[ $colKey ] = true;
                 }
             }
         }
 
-        $colWidths = array_map('strlen', $columns);
+        $thWidth = max(
+            array_map('strlen', array_keys($rowKeys))
+        );
+        $tdWidths = array_combine(
+            $list = array_keys($colKeys),
+            array_map('strlen', $list)
+        );
 
-        foreach ( $table as $row ) {
-            foreach ( $row as $iCol => $colValue ) {
-                $colWidths[ $iCol ] = max(
-                    $colWidths[ $iCol ] ?? 0,
+        foreach ( $table as $rowKey => $row ) {
+            foreach ( $row as $colKey => $colValue ) {
+                $tdWidths[ $colKey ] = max(
+                    $tdWidths[ $colKey ] ?? 0,
                     strlen((string) $colValue)
                 );
             }
@@ -691,10 +777,11 @@ class DebugModule
             ob_start();
         }
 
-        $fnDrawLine = function () use ($colWidths) {
+        $fnDrawLine = function () use ($thWidth, $tdWidths) {
             echo '+';
-            foreach ( $colWidths as $width ) {
-                echo str_repeat('-', $width + 2) . '+';
+            echo str_repeat('-', $thWidth + 2) . '+';
+            foreach ( $tdWidths as $tdWidth ) {
+                echo str_repeat('-', $tdWidth + 2) . '+';
             }
             echo "\n";
         };
@@ -702,17 +789,19 @@ class DebugModule
         $fnDrawLine();
 
         echo '|';
-        foreach ( $columns as $col ) {
-            echo ' ' . str_pad($col, $colWidths[ $col ]) . ' |';
+        echo ' ' . str_pad('', $thWidth) . ' |';
+        foreach ( $colKeys as $colKey => $bool ) {
+            echo ' ' . str_pad($colKey, $tdWidths[ $colKey ]) . ' |';
         }
         echo "\n";
 
         $fnDrawLine();
 
-        foreach ( $table as $row ) {
+        foreach ( $table as $rowKey => $row ) {
             echo '|';
-            foreach ( $columns as $col ) {
-                echo ' ' . str_pad($row[ $col ], $colWidths[ $col ]) . ' |';
+            echo ' ' . str_pad($rowKey, $thWidth) . ' |';
+            foreach ( $colKeys as $colKey => $bool ) {
+                echo ' ' . str_pad($row[ $colKey ] ?? 'NULL', $tdWidths[ $colKey ]) . ' |';
             }
             echo "\n";
         }

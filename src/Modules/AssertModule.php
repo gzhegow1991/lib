@@ -100,6 +100,8 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
+	 * > NULL переданный пользователем через API, например '{N}'
+	 *
 	 * @return static
 	 */
 	public function nil($value)
@@ -122,6 +124,8 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
+	 * > Специальный тип, что свойство объекта ещё не имеет значения (если NULL - это допустимое значение)
+	 *
 	 * @return static
 	 */
 	public function undefined($value)
@@ -144,12 +148,13 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
-	 * > gzhegow, NULL is nullable
-	 * > gzhegow, NAN is nullable
-	 * > gzhegow, NIL is nullable
+	 * > Значение можно безопасно заменить NULL-ом
 	 *
-	 * > gzhegow, '' is not nullable
+	 * > NULL is nullable
+	 * > NAN is nullable
+	 * > NIL is nullable
 	 *
+	 * > '' is not nullable
 	 *
 	 * @return static
 	 */
@@ -173,13 +178,14 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
-	 * > gzhegow, any empty is blank
-	 * > gzhegow, any nullable is blank
+	 * > Значение можно отбросить или не учитывать, т.к. оно не несёт информации
 	 *
-	 * > gzhegow, non-empty-string is not blank
-	 * > gzhegow, non-empty-array is not blank
-	 * > gzhegow, non-empty-countable is not blank
+	 * > empty string is blank
+	 * > nullable is blank
+	 * > empty array is blank
+	 * > empty countable object is blank
 	 *
+	 * > '0' is not blank
 	 *
 	 * @return static
 	 */
@@ -203,11 +209,11 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
-	 * значение отправлено пользователем
+	 * Значение было отправлено пользователем
+	 * Если в АПИ пришло NULL - значит стоит "не трогать", а если NIL - значит надо "удалить"
 	 *
 	 * > nil is passed
 	 * > any non-nullable is passed
-	 *
 	 *
 	 * @return static
 	 */
@@ -860,6 +866,159 @@ class AssertModule extends AssertModuleBase
 	public function struct_basename($value, bool $useRegex = null, ...$fnExistsList)
 	{
 		$this->status = Lib::type()->struct_basename($this->result, $value, $useRegex, $fnExistsList);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function method_array($value)
+	{
+		$this->status = Lib::type()->method_array($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function method_string($value)
+	{
+		$this->status = Lib::type()->method_string($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string|object $newScope
+	 *
+	 * @return static
+	 */
+	public function callable($value, $newScope = 'static')
+	{
+		$this->status = Lib::type()->callable($this->result, $value, $newScope);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function callable_object($value, $newScope = 'static')
+	{
+		$this->status = Lib::type()->callable_object($this->result, $value, $newScope);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function callable_object_closure($value, $newScope = 'static')
+	{
+		$this->status = Lib::type()->callable_object_closure($this->result, $value, $newScope);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function callable_object_invokable($value, $newScope = 'static')
+	{
+		$this->status = Lib::type()->callable_object_invokable($this->result, $value, $newScope);
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string|object                                            $newScope
+	 *
+	 * @return static
+	 */
+	public function callable_array($value, $newScope = 'static')
+	{
+		$this->status = Lib::type()->callable_array($this->result, $value, $newScope);
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string|object                                            $newScope
+	 *
+	 * @return static
+	 */
+	public function callable_array_method($value, $newScope = 'static')
+	{
+		$this->status = Lib::type()->callable_array_method($this->result, $value, $newScope);
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string|object                                     $newScope
+	 *
+	 * @return static
+	 */
+	public function callable_array_method_static($value, $newScope = 'static')
+	{
+		$this->status = Lib::type()->callable_array_method_static($this->result, $value, $newScope);
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string|object                               $newScope
+	 *
+	 * @return static
+	 */
+	public function callable_array_method_non_static($value, $newScope = 'static')
+	{
+		$this->status = Lib::type()->callable_array_method_non_static($this->result, $value, $newScope);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function callable_string($value, $newScope = 'static')
+	{
+		$this->status = Lib::type()->callable_string($this->result, $value, $newScope);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function callable_string_function($value, $newScope = 'static')
+	{
+		$this->status = Lib::type()->callable_string_function($this->result, $value, $newScope);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function callable_string_method_static($value, $newScope = 'static')
+	{
+		$this->status = Lib::type()->callable_string_method_static($this->result, $value, $newScope);
 
 		return $this;
 	}

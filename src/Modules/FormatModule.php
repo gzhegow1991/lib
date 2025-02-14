@@ -154,9 +154,11 @@ class FormatModule
         $precision = $precision ?? 3;
         $lenUnit = $lenUnit ?? 2;
 
-        $devnull = null
-            ?? Lib::parse()->num_non_negative($bytes)
-            ?? Lib::php()->throw([ 'The `bytes` should be non-negative num', $bytes ]);
+        if (! Lib::type()->num_non_negative($var, $bytes)) {
+            throw new LogicException(
+                [ 'The `bytes` should be non-negative num', $bytes ]
+            );
+        }
 
         $units = [ 'B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ];
 

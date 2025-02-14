@@ -146,9 +146,25 @@ class Cookies
 
     protected function indexCookie(string $cookieName, string $cookiePath, string $cookieDomain = null) : string
     {
-        $devnull = Lib::parse()->string($cookieName) ?? Lib::php()->throw('The `cookieName` should be non empty string');
-        $devnull = Lib::parse()->string($cookiePath) ?? Lib::php()->throw('The `cookiePath` should be non empty string');
-        $devnull = Lib::parse()->string($cookieDomain) ?? Lib::php()->throw('The `cookieDomain` should be non empty string');
+        $theType = Lib::type();
+
+        if (! $theType->string($var, $cookieName)) {
+            throw new \LogicException(
+                'The `cookieName` should be non empty string'
+            );
+        }
+
+        if (! $theType->string($var, $cookiePath)) {
+            throw new \LogicException(
+                'The `cookiePath` should be non empty string'
+            );
+        }
+
+        if (! $theType->string($var, $cookieDomain)) {
+            throw new \LogicException(
+                'The `cookieDomain` should be non empty string'
+            );
+        }
 
         return "{$cookieDomain}\0{$cookiePath}\0{$cookieName}";
     }

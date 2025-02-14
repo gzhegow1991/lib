@@ -5,14 +5,22 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
+use Gzhegow\Lib\Modules\Php\CallableParser\CallableParser;
+use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
 
 class PhpModule
 {
+    /**
+     * @var CallableParserInterface
+     */
+    protected $callableParser;
+
     /**
      * @var class-string<\LogicException|\RuntimeException>
      */
@@ -21,11 +29,30 @@ class PhpModule
 
     public function __construct()
     {
-        if (! extension_loaded('date')) {
-            throw new RuntimeException(
-                'Missing PHP extension: date'
-            );
+        $this->callableParser = new CallableParser();
+    }
+
+
+    public function callable_parser_static(CallableParserInterface $callableParser = null) : CallableParserInterface
+    {
+        if (null !== $callableParser) {
+            $last = $this->callableParser;
+
+            $current = $callableParser;
+
+            $this->callableParser = $current;
+
+            $result = $last;
         }
+
+        $result = $result ?? $this->callableParser;
+
+        return $result;
+    }
+
+    public function callable_parser() : CallableParserInterface
+    {
+        return $this->callable_parser_static();
     }
 
 
@@ -268,6 +295,148 @@ class PhpModule
     }
 
 
+    /**
+     * > метод не всегда возвращает callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
+     * > используйте type_callable_array, если собираетесь вызывать метод
+     *
+     * @param array{ 0: class-string, 1: string }|null $result
+     */
+    public function type_method_array(&$result, $value) : bool
+    {
+        return $this->callable_parser()->typeMethodArray($result, $value);
+    }
+
+    /**
+     * > метод не всегда возвращает callable, поскольку строка 'class->method' не является callable
+     * > используйте type_callable_string, если собираетесь вызывать метод
+     *
+     * @param string|null $result
+     */
+    public function type_method_string(&$result, $value) : bool
+    {
+        return $this->callable_parser()->typeMethodString($result, $value);
+    }
+
+
+    /**
+     * > в версиях PHP до 8.0.0 публичный метод считался callable, если его проверить даже на имени класса
+     * > при этом вызвать MyClass::publicMethod было нельзя, т.к. вызываемым является только MyClass::publicStaticMethod
+     *
+     * @param callable|null $result
+     * @param string|object $newScope
+     */
+    public function type_callable(&$result, $value, $newScope = 'static') : bool
+    {
+        return $this->callable_parser()->typeCallable($result, $value, $newScope);
+    }
+
+
+    /**
+     * @param callable|\Closure|object|null $result
+     */
+    public function type_callable_object(&$result, $value, $newScope = 'static') : bool
+    {
+        return $this->callable_parser()->typeCallableObject($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable|object|null $result
+     */
+    public function type_callable_object_closure(&$result, $value, $newScope = 'static') : bool
+    {
+        return $this->callable_parser()->typeCallableObjectClosure($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable|object|null $result
+     */
+    public function type_callable_object_invokable(&$result, $value, $newScope = 'static') : bool
+    {
+        return $this->callable_parser()->typeCallableObjectInvokable($result, $value, $newScope);
+    }
+
+
+    /**
+     * @param callable|array{ 0: object|class-string, 1: string }|null $result
+     * @param string|object                                            $newScope
+     */
+    public function type_callable_array(&$result, $value, $newScope = 'static') : bool
+    {
+        return $this->callable_parser()->typeCallableArray($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable|array{ 0: object|class-string, 1: string }|null $result
+     * @param string|object                                            $newScope
+     */
+    public function type_callable_array_method(&$result, $value, $newScope = 'static') : bool
+    {
+        return $this->callable_parser()->typeCallableArrayMethod($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable|array{ 0: class-string, 1: string }|null $result
+     * @param string|object                                     $newScope
+     */
+    public function type_callable_array_method_static(&$result, $value, $newScope = 'static') : bool
+    {
+        return $this->callable_parser()->typeCallableArrayMethodStatic($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable|array{ 0: object, 1: string }|null $result
+     * @param string|object                               $newScope
+     */
+    public function type_callable_array_method_non_static(&$result, $value, $newScope = 'static') : bool
+    {
+        return $this->callable_parser()->typeCallableArrayMethodNonStatic($result, $value, $newScope);
+    }
+
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function type_callable_string(&$result, $value, $newScope = 'static') : bool
+    {
+        return $this->callable_parser()->typeCallableString($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function type_callable_string_function(&$result, $value, $newScope = 'static') : bool
+    {
+        return $this->callable_parser()->typeCallableStringFunction($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function type_callable_string_method_static(&$result, $value, $newScope = 'static') : bool
+    {
+        return $this->callable_parser()->typeCallableStringMethodStatic($result, $value, $newScope);
+    }
+
+
+    /**
+     * > is_callable является контекстно-зависимой функцией
+     * > будучи вызванной снаружи класса она не покажет методы protected/private
+     * > используя $newScope можно это обойти
+     *
+     * @param string|object $newScope
+     */
+    public function is_callable($value, $newScope = 'static') : bool
+    {
+        return $this->callable_parser()->isCallable($value, $newScope);
+    }
+
+
+    /**
+     * @return array{
+     *     internal: array<string, bool>,
+     *     user: array<string, bool>,
+     * }
+     */
     public function get_defined_functions() : array
     {
         $getDefinedFunctions = get_defined_functions();
@@ -281,6 +450,41 @@ class PhpModule
         $result = [];
         $result[ 'internal' ] += $flipInternal;
         $result[ 'user' ] += $flipUser;
+
+        return $result;
+    }
+
+    /**
+     * > метод по-умолчанию не сортирует, а также является контекстно-зависимым
+     *
+     * @param object|class-string $object_or_class
+     * @param object|class-string $newScope
+     *
+     * @return array<string, bool>
+     */
+    public function get_class_methods($object_or_class, $newScope = 'static') : array
+    {
+        $fnGetClassMethods = null;
+        if ('static' !== $newScope) {
+            $_newScope = null
+                ?? $newScope
+                ?? new class {
+                };
+
+            $fnGetClassMethods = (static function ($object_or_class) {
+                return get_class_methods($object_or_class);
+            })->bindTo(null, $_newScope);
+        }
+
+        $getClassMethods = $fnGetClassMethods
+            ? $fnGetClassMethods($object_or_class)
+            : get_class_methods($fnGetClassMethods);
+
+        $flip = array_fill_keys($getClassMethods, true);
+
+        ksort($flip);
+
+        $result = $flip;
 
         return $result;
     }
@@ -396,6 +600,46 @@ class PhpModule
         return $_value;
     }
 
+    /**
+     * @param callable $fnForceWrap
+     */
+    public function to_list($value, $fnForceWrap = null, array $options = []) : array
+    {
+        if (null === $value) {
+            throw new LogicException('The `value` should be not null');
+        }
+
+        if ('' === $value) {
+            throw new LogicException('The `value` should not be an empty string');
+        }
+
+        if (is_object($value)) {
+            if ($value instanceof ToListInterface) {
+                $_value = $value->toList($options);
+
+            } else {
+                $_value = [ $value ];
+            }
+
+        } elseif (is_array($value)) {
+            if ($fnForceWrap) {
+                $status = call_user_func_array($fnForceWrap, $value);
+
+                $_value = $status
+                    ? [ $value ]
+                    : $value;
+
+            } else {
+                $_value = $value;
+            }
+
+        } else {
+            $_value = (array) $value;
+        }
+
+        return $_value;
+    }
+
 
     public function count($value) : ?int
     {
@@ -403,35 +647,11 @@ class PhpModule
             return count($value);
         }
 
-        if (Lib::parse()->countable($value)) {
-            return count($value);
+        if ($this->type_countable($_value, $value)) {
+            return count($_value);
         }
 
         return null;
-    }
-
-
-    public function list($value, $fnIsArray = null) : array
-    {
-        if (is_null($value)) {
-            throw new LogicException('The `value` should be not null');
-        }
-
-        if (is_array($value)) {
-            $_value = $value;
-
-            if ($fnIsArray) {
-                $_value = call_user_func_array($fnIsArray, $value);
-            }
-
-            return $_value;
-        }
-
-        $_value = $value
-            ? [ $value ]
-            : [];
-
-        return $_value;
     }
 
 
@@ -441,9 +661,9 @@ class PhpModule
      */
     public function cmp($a, $b, array $results = [ 0 ], $fnCmp = null) : ?int
     {
-        $result = (null === $fnCmp)
-            ? ($a <=> $b)
-            : $fnCmp($a, $b);
+        $result = $fnCmp
+            ? $fnCmp($a, $b)
+            : ($a <=> $b);
 
         if (! in_array($result, $results, true)) {
             return null;
@@ -467,17 +687,31 @@ class PhpModule
     }
 
 
-    public function microtime(\DateTimeInterface $date = null) : float
+    public function microtime($date = null) : string
     {
-        $theType = Lib::type();
+        $mt = microtime();
 
-        $date = $date ?? new \DateTime();
+        [ $sec, $msec ] = explode(' ', $mt);
 
-        return floatval(
-            $date->format('U')
-            . $theType->the_decimal_point()
-            . str_pad($date->format('u'), 6, '0')
-        );
+        if (null === $date) {
+            $result = ''
+                . $sec
+                . Lib::type()->the_decimal_point()
+                . str_pad($msec, 6, '0');
+
+        } elseif (is_a($date, '\DateTimeInterface')) {
+            $result = ''
+                . $date->format('s')
+                . Lib::type()->the_decimal_point()
+                . str_pad($date->format('u'), 6, '0');
+
+        } else {
+            throw new LogicException(
+                [ 'The `date` must be instance of \DateTimeInterface', $date ]
+            );
+        }
+
+        return $result;
     }
 
 
@@ -538,7 +772,7 @@ class PhpModule
 
 
     /**
-     * > gzhegow, функция get_object_vars() возвращает все элементы для $this, в том числе protected/private
+     * > функция get_object_vars() возвращает все элементы для $this, в том числе protected/private
      * > чтобы получить доступ только к публичным свойствам, её нужно вызвать в обертке
      */
     public function get_object_vars(object $object, bool $public = null) : array
@@ -567,24 +801,48 @@ class PhpModule
     }
 
     /**
-     * > gzhegow, функция property_exists() возвращает все свойства, в том числе protected/private
+     * > функция property_exists() возвращает все свойства, в том числе protected/private
      * > чтобы получить доступ только к публичным свойствам, нужно прибегнуть к вот такой хитрости
+     *
+     * @param class-string|object $object_or_class
      */
-    public function property_exists(object $object_or_class, string $property, bool $public = null) : bool
+    public function property_exists($object_or_class, string $property, bool $public = null) : bool
     {
         $public = $public ?? false;
 
-        $vars = $this->get_object_vars($object_or_class, $public);
+        if (! $public) {
+            return property_exists($object_or_class, $property);
+        }
 
-        return array_key_exists($property, $vars);
+        if (is_object($object_or_class)) {
+            $vars = $this->get_object_vars($object_or_class, $public);
+
+            return array_key_exists($property, $vars);
+        }
+
+        $class = $object_or_class;
+
+        try {
+            $rp = new \ReflectionProperty($class, $property);
+
+            if ($rp->isPublic()) {
+                return true;
+            }
+        }
+        catch ( \Throwable $e ) {
+            return false;
+        }
+
+        return false;
     }
 
     /**
-     * todo rename
-     * > gzhegow, функция property_exists() возвращает все свойства, в том числе protected/private
+     * > функция method_exists() возвращает true для любых методов, в том числе protected/private
      * > чтобы получить доступ только к публичным свойствам, нужно прибегнуть к вот такой хитрости
+     *
+     * @param class-string|object $object_or_class
      */
-    public function method_exists2(object $object_or_class, string $method, bool $public = null) : bool
+    public function method_exists($object_or_class, string $method, bool $public = null) : bool
     {
         $public = $public ?? false;
 
@@ -593,12 +851,25 @@ class PhpModule
         }
 
         if ($public) {
-            if (! is_callable([ $object_or_class, $method ])) {
+            if (is_object($object_or_class)) {
+                if (is_callable([ $object_or_class, $method ])) {
+                    return true;
+                }
+            }
+
+            try {
+                $rm = new \ReflectionMethod($object_or_class, $method);
+
+                if ($rm->isPublic()) {
+                    return true;
+                }
+            }
+            catch ( \Throwable $e ) {
                 return false;
             }
         }
 
-        return true;
+        return false;
     }
 
 
@@ -646,91 +917,6 @@ class PhpModule
         }
 
         return $result;
-    }
-
-
-    /**
-     * @param callable|string $function
-     */
-    public function function_exists($function) : ?string
-    {
-        if (! is_string($function)) return null;
-
-        if (function_exists($function)) {
-            return $function;
-        }
-
-        return null;
-    }
-
-    /**
-     * todo rename
-     *
-     * @param callable|array|object|class-string     $mixed
-     *
-     * @param array{0: class-string, 1: string}|null $resultArray
-     * @param callable|string|null                   $resultString
-     *
-     * @return array{0: class-string|object, 1: string}|null
-     */
-    public function method_exists(
-        $mixed, $method = null,
-        array &$resultArray = null, string &$resultString = null
-    ) : ?array
-    {
-        $resultArray = null;
-        $resultString = null;
-
-        $method = $method ?? '';
-
-        $_class = null;
-        $_object = null;
-        $_method = null;
-        if (is_object($mixed)) {
-            $_object = $mixed;
-
-        } elseif (is_array($mixed)) {
-            $list = array_values($mixed);
-
-            [ $classOrObject, $_method ] = $list + [ '', '' ];
-
-            is_object($classOrObject)
-                ? ($_object = $classOrObject)
-                : ($_class = $classOrObject);
-
-        } elseif (is_string($mixed)) {
-            [ $_class, $_method ] = explode('::', $mixed) + [ '', '' ];
-
-            $_method = $_method ?? $method;
-        }
-
-        if (isset($_method) && ! is_string($_method)) {
-            return null;
-        }
-
-        if ($_object) {
-            if ($_object instanceof \Closure) {
-                return null;
-            }
-
-            if (method_exists($_object, $_method)) {
-                $class = get_class($_object);
-
-                $resultArray = [ $_object, $_method ];
-
-                return [ $_object, $_method ];
-            }
-
-        } elseif ($_class) {
-            if (method_exists($_class, $_method)) {
-                $resultArray = [ $_class, $_method ];
-                $resultString = $_class . '::' . $_method;
-
-                return [ $_class, $_method ];
-            }
-        }
-
-        return null;
     }
 
 
@@ -874,7 +1060,7 @@ class PhpModule
 
         $e = new $throwableClass(...$arguments);
 
-        $fn = (function () use ($throwableArgs) {
+        $fn = (function () use (&$throwableArgs) {
             foreach ( $throwableArgs as $key => $value ) {
                 if (property_exists($this, $key)) {
                     $this->{$key} = $value;

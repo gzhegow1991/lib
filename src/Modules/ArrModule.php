@@ -388,8 +388,11 @@ class ArrModule
         $array = [ $path, $pathes ];
 
         array_walk_recursive($array, function ($value) use (&$result) {
-            if (null !== $value) {
-                $result[] = Lib::parse()->string($value);
+            if (Lib::type()->string($_value, $value)) {
+                $result[] = $_value;
+
+            } else {
+                $result[] = null;
             }
         });
 
@@ -588,7 +591,7 @@ class ArrModule
 
 
     /**
-     * > gzhegow, разбивает массив на два, где в первом все цифровые ключи (список), во втором - все буквенные (словарь)
+     * > разбивает массив на два, где в первом все цифровые ключи (список), во втором - все буквенные (словарь)
      *
      * @return array{
      *     0: array<int, mixed>,
@@ -613,7 +616,7 @@ class ArrModule
 
 
     /**
-     * > gzhegow, выбросить указанные ключи
+     * > выбросить указанные ключи
      */
     public function drop_keys(array $src, $keys) : array
     {
@@ -635,7 +638,7 @@ class ArrModule
     }
 
     /**
-     * > gzhegow, заменить указанные ключи
+     * > заменить указанные ключи
      */
     public function drop_keys_new(array $src, $keys, $new = null) : array
     {
@@ -657,7 +660,7 @@ class ArrModule
     }
 
     /**
-     * > gzhegow, оставить в массиве указанные ключи, остальные выбросить
+     * > оставить в массиве указанные ключи, остальные выбросить
      */
     public function keep_keys(array $src, $keys) : array
     {
@@ -677,7 +680,7 @@ class ArrModule
     }
 
     /**
-     * > gzhegow, оставить в массиве указанные ключи, остальные заменить
+     * > оставить в массиве указанные ключи, остальные заменить
      */
     public function keep_keys_new(array $src, $keys, $new = null) : array
     {
@@ -729,7 +732,7 @@ class ArrModule
     }
 
     /**
-     * > gzhegow, выполнить array_map с учетом _array_fn_mode()
+     * > выполнить array_map с учетом _array_fn_mode()
      *
      * @param callable|null $fn
      */
@@ -754,7 +757,7 @@ class ArrModule
     }
 
     /**
-     * > gzhegow, выполнить array_filter с учетом _array_fn_mode()
+     * > выполнить array_filter с учетом _array_fn_mode()
      *
      * @param callable|null $fn
      */
@@ -765,7 +768,7 @@ class ArrModule
 
 
     /**
-     * > gzhegow, оставить в массиве значения, что прошли фильтр, остальные выбросить. По сути array_filter()
+     * > оставить в массиве значения, что прошли фильтр, остальные выбросить. По сути array_filter()
      *
      * @param callable|null $fn
      */
@@ -794,7 +797,7 @@ class ArrModule
     }
 
     /**
-     * > gzhegow, оставить в массиве значения, что прошли фильтр, остальные заменить
+     * > оставить в массиве значения, что прошли фильтр, остальные заменить
      *
      * @param callable|null $fn
      */
@@ -828,7 +831,7 @@ class ArrModule
 
 
     /**
-     * > gzhegow, выбросить значения по фильтру, по сути array_filter(!function)
+     * > выбросить значения по фильтру, по сути array_filter(!function)
      *
      * @param callable|null $fn
      */
@@ -855,7 +858,7 @@ class ArrModule
     }
 
     /**
-     * > gzhegow, заменить значения по фильтру, по сути array_filter(!function) с заменой на null
+     * > заменить значения по фильтру, по сути array_filter(!function) с заменой на null
      *
      * @param callable|null $fn
      */
@@ -883,7 +886,7 @@ class ArrModule
 
 
     /**
-     *  > gzhegow, разбивает массив на два по критерию
+     *  > разбивает массив на два по критерию
      *
      * @param callable $fn
      *
@@ -911,7 +914,7 @@ class ArrModule
     }
 
     /**
-     * > gzhegow, разбивает массив на группы, колбэк должен вернуть имена групп и значение попадет в эти группы
+     * > разбивает массив на группы, колбэк должен вернуть имена групп и значение попадет в эти группы
      *
      * @param callable $fn
      *
@@ -941,7 +944,7 @@ class ArrModule
 
 
     /**
-     * > gzhegow, строит индекс ключей (int)
+     * > строит индекс ключей (int)
      * > [ 0 => 1, 2 => true, 3 => false ] -> [ 1 => true, 2 => true, 3 => false ]
      *
      * @return array<int, bool>
@@ -975,7 +978,7 @@ class ArrModule
     }
 
     /**
-     * > gzhegow, строит индекс ключей (string)
+     * > строит индекс ключей (string)
      * > [ 0 => 'key1', 'key2' => true, 'key3' => false ] -> [ 'key1' => true, 'key2' => true, 'key3' => false ]
      *
      * @return array<string, bool>
@@ -1010,7 +1013,7 @@ class ArrModule
 
 
     /**
-     * > gzhegow, встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
+     * > встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
      */
     public function diff(array ...$arrays) : array
     {
@@ -1028,7 +1031,7 @@ class ArrModule
     }
 
     /**
-     * > gzhegow, встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
+     * > встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
      */
     public function diff_key(array ...$arrays) : array
     {
@@ -1046,7 +1049,7 @@ class ArrModule
     }
 
     /**
-     * > gzhegow, встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
+     * > встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
      */
     public function intersect(array ...$arrays) : array
     {
@@ -1064,7 +1067,7 @@ class ArrModule
     }
 
     /**
-     * > gzhegow, встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
+     * > встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
      */
     public function intersect_key(array ...$arrays) : array
     {
@@ -1083,7 +1086,7 @@ class ArrModule
 
 
     /**
-     * > gzhegow, превращает вложенный массив в одноуровневый, но теряет ключи
+     * > превращает вложенный массив в одноуровневый, но теряет ключи
      */
     public function plain(...$values) : array
     {

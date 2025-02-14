@@ -141,6 +141,8 @@ class TypeModule extends TypeModuleBase
 
 
     /**
+     * > NULL переданный пользователем через API, например '{N}'
+     *
      * @param mixed|null $result
      */
     public function nil(&$result, $value) : bool
@@ -174,6 +176,8 @@ class TypeModule extends TypeModuleBase
 
 
     /**
+     * > Специальный тип, что свойство объекта ещё не имеет значения (если NULL - это допустимое значение)
+     *
      * @param mixed|null $result
      */
     public function undefined(&$result, $value) : bool
@@ -220,11 +224,13 @@ class TypeModule extends TypeModuleBase
 
 
     /**
-     * > gzhegow, NULL is nullable
-     * > gzhegow, NAN is nullable
-     * > gzhegow, NIL is nullable
+     * > Значение можно безопасно заменить NULL-ом
      *
-     * > gzhegow, '' is not nullable
+     * > NULL is nullable
+     * > NAN is nullable
+     * > NIL is nullable
+     *
+     * > '' is not nullable
      *
      * @param mixed|null $result
      */
@@ -266,12 +272,14 @@ class TypeModule extends TypeModuleBase
 
 
     /**
-     * > gzhegow, any empty is blank
-     * > gzhegow, any nullable is blank
+     * > Значение можно отбросить или не учитывать, т.к. оно не несёт информации
      *
-     * > gzhegow, non-empty-string is not blank
-     * > gzhegow, non-empty-array is not blank
-     * > gzhegow, non-empty-countable is not blank
+     * > empty string is blank
+     * > nullable is blank
+     * > empty array is blank
+     * > empty countable object is blank
+     *
+     * > '0' is not blank
      *
      * @param mixed|null $result
      */
@@ -285,20 +293,24 @@ class TypeModule extends TypeModuleBase
             return true;
         }
 
-        if (
-            $this->nil($_value, $value)
-            || $this->nan($_value, $value)
-        ) {
+        if ($this->nullable($_value, $value)) {
             $result = $_value;
 
             return true;
         }
 
         if (is_scalar($value)) {
+            // bool
+            // int
+            // float
+            // string
+
             return false;
         }
 
         if (empty($value)) {
+            // empty array
+
             $result = $value;
 
             return true;
@@ -337,7 +349,8 @@ class TypeModule extends TypeModuleBase
 
 
     /**
-     * значение отправлено пользователем
+     * Значение было отправлено пользователем
+     * Если в АПИ пришло NULL - значит стоит "не трогать", а если NIL - значит надо "удалить"
      *
      * > nil is passed
      * > any non-nullable is passed
@@ -724,7 +737,7 @@ class TypeModule extends TypeModuleBase
             return false;
         }
 
-        // > gzhegow, 0.000022 becomes 2.2E-5, so you need to pass formatted string instead of float
+        // > 0.000022 becomes 2.2E-5, so you need to pass formatted string instead of float
         if (false !== stripos($_value, 'e')) {
             return false;
         }
@@ -1455,6 +1468,120 @@ class TypeModule extends TypeModuleBase
     public function struct_basename(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
     {
         return Lib::php()->type_struct_basename($result, $value, $useRegex, ...$fnExistsList);
+    }
+
+
+    /**
+     * @param array{ 0: class-string, 1: string }|null $result
+     */
+    public function method_array(&$result, $value) : bool
+    {
+        return Lib::php()->type_method_array($result, $value);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function method_string(&$result, $value) : bool
+    {
+        return Lib::php()->type_method_string($result, $value);
+    }
+
+
+    /**
+     * @param callable|null $result
+     * @param string|object $newScope
+     */
+    public function callable(&$result, $value, $newScope = 'static') : bool
+    {
+        return Lib::php()->type_callable_object($result, $value, $newScope);
+    }
+
+
+    /**
+     * @param callable|\Closure|object|null $result
+     */
+    public function callable_object(&$result, $value, $newScope = 'static') : bool
+    {
+        return Lib::php()->type_callable_object($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable|object|null $result
+     */
+    public function callable_object_closure(&$result, $value, $newScope = 'static') : bool
+    {
+        return Lib::php()->type_callable_object_closure($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable|object|null $result
+     */
+    public function callable_object_invokable(&$result, $value, $newScope = 'static') : bool
+    {
+        return Lib::php()->type_callable_object_invokable($result, $value, $newScope);
+    }
+
+
+    /**
+     * @param callable|array{ 0: object|class-string, 1: string }|null $result
+     * @param string|object                                            $newScope
+     */
+    public function callable_array(&$result, $value, $newScope = 'static') : bool
+    {
+        return Lib::php()->type_callable_array($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable|array{ 0: object|class-string, 1: string }|null $result
+     * @param string|object                                            $newScope
+     */
+    public function callable_array_method(&$result, $value, $newScope = 'static') : bool
+    {
+        return Lib::php()->type_callable_array_method($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable|array{ 0: class-string, 1: string }|null $result
+     * @param string|object                                     $newScope
+     */
+    public function callable_array_method_static(&$result, $value, $newScope = 'static') : bool
+    {
+        return Lib::php()->type_callable_array_method_static($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable|array{ 0: object, 1: string }|null $result
+     * @param string|object                               $newScope
+     */
+    public function callable_array_method_non_static(&$result, $value, $newScope = 'static') : bool
+    {
+        return Lib::php()->type_callable_array_method_non_static($result, $value, $newScope);
+    }
+
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function callable_string(&$result, $value, $newScope = 'static') : bool
+    {
+        return Lib::php()->type_callable_string($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function callable_string_function(&$result, $value, $newScope = 'static') : bool
+    {
+        return Lib::php()->type_callable_string_function($result, $value, $newScope);
+    }
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function callable_string_method_static(&$result, $value, $newScope = 'static') : bool
+    {
+        return Lib::php()->type_callable_string_method_static($result, $value, $newScope);
     }
 
 

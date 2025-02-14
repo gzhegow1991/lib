@@ -459,7 +459,7 @@ class FsModule
 
 
     /**
-     * > gzhegow, по умолчанию для двойного расширения будет возвращено только последнее
+     * > по умолчанию для двойного расширения будет возвращено только последнее
      */
     public function pathinfo(string $path, int $flags = null) // : string|array
     {
@@ -492,7 +492,7 @@ class FsModule
 
 
     /**
-     * > gzhegow, разбирает последовательности /../ в пути до файла и возвращает путь через правый слеш
+     * > разбирает последовательности /../ в пути до файла и возвращает путь через правый слеш
      */
     public function normalize(string $path) : string
     {
@@ -524,7 +524,7 @@ class FsModule
     }
 
     /**
-     * > gzhegow, возвращает относительный путь до файла
+     * > возвращает относительный путь до файла
      */
     public function relative(string $path, string $root) : string
     {
