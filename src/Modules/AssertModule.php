@@ -793,7 +793,7 @@ class AssertModule extends AssertModuleBase
 	 */
 	public function struct($value, bool $useRegex = null, ...$fnExistsList)
 	{
-		$this->status = Lib::type()->struct($this->result, $value, $useRegex, $fnExistsList);
+		$this->status = Lib::type()->struct($this->result, $value, $useRegex, ...$fnExistsList);
 
 		return $this;
 	}
@@ -839,7 +839,7 @@ class AssertModule extends AssertModuleBase
 	 */
 	public function struct_fqcn($value, bool $useRegex = null, ...$fnExistsList)
 	{
-		$this->status = Lib::type()->struct_fqcn($this->result, $value, $useRegex, $fnExistsList);
+		$this->status = Lib::type()->struct_fqcn($this->result, $value, $useRegex, ...$fnExistsList);
 
 		return $this;
 	}
@@ -852,7 +852,7 @@ class AssertModule extends AssertModuleBase
 	 */
 	public function struct_namespace($value, bool $useRegex = null, ...$fnExistsList)
 	{
-		$this->status = Lib::type()->struct_namespace($this->result, $value, $useRegex, $fnExistsList);
+		$this->status = Lib::type()->struct_namespace($this->result, $value, $useRegex, ...$fnExistsList);
 
 		return $this;
 	}
@@ -865,7 +865,7 @@ class AssertModule extends AssertModuleBase
 	 */
 	public function struct_basename($value, bool $useRegex = null, ...$fnExistsList)
 	{
-		$this->status = Lib::type()->struct_basename($this->result, $value, $useRegex, $fnExistsList);
+		$this->status = Lib::type()->struct_basename($this->result, $value, $useRegex, ...$fnExistsList);
 
 		return $this;
 	}

@@ -931,7 +931,7 @@ class ParseModule extends ParseModuleBase
 	 */
 	public function struct($value, bool $useRegex = null, ...$fnExistsList)
 	{
-		if (Lib::type()->struct($result, $value, $useRegex, $fnExistsList)) {
+		if (Lib::type()->struct($result, $value, $useRegex, ...$fnExistsList)) {
 		    return $result;
 		}
 
@@ -985,7 +985,7 @@ class ParseModule extends ParseModuleBase
 	 */
 	public function struct_fqcn($value, bool $useRegex = null, ...$fnExistsList)
 	{
-		if (Lib::type()->struct_fqcn($result, $value, $useRegex, $fnExistsList)) {
+		if (Lib::type()->struct_fqcn($result, $value, $useRegex, ...$fnExistsList)) {
 		    return $result;
 		}
 
@@ -1000,7 +1000,7 @@ class ParseModule extends ParseModuleBase
 	 */
 	public function struct_namespace($value, bool $useRegex = null, ...$fnExistsList)
 	{
-		if (Lib::type()->struct_namespace($result, $value, $useRegex, $fnExistsList)) {
+		if (Lib::type()->struct_namespace($result, $value, $useRegex, ...$fnExistsList)) {
 		    return $result;
 		}
 
@@ -1015,7 +1015,7 @@ class ParseModule extends ParseModuleBase
 	 */
 	public function struct_basename($value, bool $useRegex = null, ...$fnExistsList)
 	{
-		if (Lib::type()->struct_basename($result, $value, $useRegex, $fnExistsList)) {
+		if (Lib::type()->struct_basename($result, $value, $useRegex, ...$fnExistsList)) {
 		    return $result;
 		}
 
