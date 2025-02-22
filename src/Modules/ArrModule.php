@@ -1099,25 +1099,39 @@ class ArrModule
         return $result;
     }
 
-    /** > превращает вложенный массив в одноуровневый, соединяя путь через точку */
-    public function dot(array $array) : array
+    /**
+     * > превращает вложенный массив в одноуровневый, соединяя путь через точку
+     */
+    public function dot(array $array, string $dot = null) : array
     {
+        $dot = $dot ?? '.';
+
         $result = [];
 
-        foreach ( $this->walk_it($array, _ARR_WALK_WITH_EMPTY_ARRAYS) as $path => $value ) {
-            $result[ implode('.', $path) ] = $value;
+        $gen = $this->walk_it($array, _ARR_WALK_WITH_EMPTY_ARRAYS);
+
+        foreach ( $gen as $path => $value ) {
+            $result[ implode($dot, $path) ] = $value;
         }
 
         return $result;
     }
 
-    /** > превращает одноуровневый массив с ключами-точками во вложенный */
-    public function undot(array $arrayDot) : array
+    /**
+     * > превращает одноуровневый массив с ключами-точками во вложенный
+     */
+    public function undot(array $arrayDot, string $dot = null) : array
     {
+        $dot = $dot ?? '.';
+
         $result = [];
 
         foreach ( $arrayDot as $dotKey => $value ) {
-            $this->set_path($result, explode('.', $dotKey), $value);
+            $this->set_path(
+                $result,
+                explode($dot, $dotKey),
+                $value
+            );
         }
 
         return $result;
@@ -1125,11 +1139,11 @@ class ArrModule
 
 
     /**
-     * Реализация array_walk_recursive, позволяющая:
-     * - получить путь до элемента
-     * - подменить значение по ссылке
-     * - сделать обход в ширину/глубину, т.е. (1 -> 1.1 -> 2 -> 2.1) || (1 -> 2 -> 1.1 -> 2.1)
-     * - выводить потомки | пустые-массивы | родители
+     * > Реализация array_walk_recursive, позволяющая:
+     * > - получить путь до элемента
+     * > - подменить значение по ссылке
+     * > - сделать обход в ширину/глубину, т.е. (1 -> 1.1 -> 2 -> 2.1) || (1 -> 2 -> 1.1 -> 2.1)
+     * > - выводить потомки | пустые-массивы | родители
      *
      * @template TKey of int|string
      * @template TValue
@@ -1218,27 +1232,27 @@ class ArrModule
 
         if ($isModeDepthFirst) {
             $stack = [];
-            $buffer_ =& $stack;
+            $buffer =& $stack;
 
         } elseif ($isModeBreadthFirst) {
             $queue = [];
-            $buffer_ =& $queue;
+            $buffer =& $queue;
 
         } else {
             throw new LogicException('Invalid `mode`');
         }
 
-        // > value, fullpath, force
-        $buffer_[] = [ &$array, [], false ];
+        // > valueRef, fullpath, force
+        $buffer[] = [ &$array, [], false ];
 
         $isRoot = true;
-        while ( ! empty($buffer_) ) {
+        while ( ! empty($buffer) ) {
             $cur = [];
             if ($isModeDepthFirst) {
-                $cur = array_pop($buffer_);
+                $cur = array_pop($buffer);
 
             } elseif ($isModeBreadthFirst) {
-                $cur = array_shift($buffer_);
+                $cur = array_shift($buffer);
             }
 
             $isYieldLeaf = ! is_array($cur[ 0 ]);
@@ -1250,19 +1264,18 @@ class ArrModule
                 || ($withParents && $isYieldParent)
                 || ($withEmptyArrays && $isYieldEmptyArray)
             ) {
-                $before = $cur[ 0 ];
+                $valueBefore = $cur[ 0 ];
+                $valueReference =& $cur[ 0 ];
 
-                $after_ =& $cur[ 0 ];
+                yield $cur[ 1 ] => $valueReference;
 
-                yield $cur[ 1 ] => $after_;
-
-                if ($after_ !== $before) {
-                    $isYieldParent = is_array($after_) && ! empty($after_);
+                if ($valueReference !== $valueBefore) {
+                    $isYieldParent = is_array($valueReference) && ! empty($valueReference);
                 }
 
-                unset($before);
-                unset($after_);
-                $after_ = null;
+                unset($valueBefore);
+                unset($valueReference);
+                $valueReference = null;
             }
 
             if ($isRoot || $isYieldParent) {
@@ -1286,7 +1299,7 @@ class ArrModule
                     $fullpath = $cur[ 1 ];
                     $fullpath[] = $kk;
 
-                    $buffer_[] = [ &$cur[ 0 ][ $kk ], $fullpath ];
+                    $buffer[] = [ &$cur[ 0 ][ $kk ], $fullpath ];
                 }
 
                 unset($keys);
@@ -1297,7 +1310,7 @@ class ArrModule
     }
 
     /**
-     * Обход дерева $tree, в итераторе будет элемент из $list
+     * > Обход дерева $tree, в итераторе будет элемент из $list
      *
      * @template TKey of int|string
      * @template TValue
@@ -1353,7 +1366,7 @@ class ArrModule
     }
 
     /**
-     * Позволяет сделать add/merge/replace массивов рекурсивно в цикле foreach с получением пути до элемента
+     * > Позволяет сделать add/merge/replace массивов рекурсивно в цикле foreach с получением пути до элемента
      *
      * @template TKey of int|string
      * @template TValue

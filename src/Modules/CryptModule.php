@@ -371,10 +371,10 @@ class CryptModule
             }
 
             $mod = $_oneBasedFrom
-                ? bcadd((string) $mod, '1', 0)
-                : (string) $mod;
+                ? bcadd($mod, '1', 0)
+                : $mod;
 
-            $pow = bcpow($baseFromString, (string) ($numbaseStringLen - $i), 0);
+            $pow = bcpow($baseFromString, ($numbaseStringLen - $i), 0);
 
             $digit = bcmul($mod, $pow, 0);
 

@@ -724,6 +724,9 @@ class BcmathModule
     }
 
 
+    /**
+     * > Greatest Common Divisor
+     */
     public function bcgcd($num1, $num2) : Bcnumber
     {
         if (! $this->type_bcnum($bcnum1, $num1)) {
@@ -755,6 +758,9 @@ class BcmathModule
         return $bcresult;
     }
 
+    /**
+     * > Lowest Common Multiplier
+     */
     public function bclcm($num1, $num2) : Bcnumber
     {
         if (! $this->type_bcnum($bcnum1, $num1)) {

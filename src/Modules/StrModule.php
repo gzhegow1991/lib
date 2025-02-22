@@ -500,7 +500,7 @@ class StrModule
         $lines = explode("\n", $text);
 
         foreach ( $lines as $i => $line ) {
-            $line = rtrim($line, PHP_EOL);
+            $line = rtrim($line, "\r\n");
 
             $lines[ $i ] = $line;
         }
@@ -508,11 +508,16 @@ class StrModule
         return $lines;
     }
 
-    public function eol(string $text, array &$lines = null) : string
+    public function eol(string $text, $eol = null, array &$lines = null) : string
     {
+        $lines = null;
+
+        $_eol = $eol ?? "\n";
+        $_eol = (string) $_eol;
+
         $lines = $this->lines($text);
 
-        $output = implode("\n", $lines);
+        $output = implode($_eol, $lines);
 
         return $output;
     }

@@ -4,7 +4,6 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
@@ -454,41 +453,6 @@ class PhpModule
         return $result;
     }
 
-    /**
-     * > метод по-умолчанию не сортирует, а также является контекстно-зависимым
-     *
-     * @param object|class-string $object_or_class
-     * @param object|class-string $newScope
-     *
-     * @return array<string, bool>
-     */
-    public function get_class_methods($object_or_class, $newScope = 'static') : array
-    {
-        $fnGetClassMethods = null;
-        if ('static' !== $newScope) {
-            $_newScope = null
-                ?? $newScope
-                ?? new class {
-                };
-
-            $fnGetClassMethods = (static function ($object_or_class) {
-                return get_class_methods($object_or_class);
-            })->bindTo(null, $_newScope);
-        }
-
-        $getClassMethods = $fnGetClassMethods
-            ? $fnGetClassMethods($object_or_class)
-            : get_class_methods($fnGetClassMethods);
-
-        $flip = array_fill_keys($getClassMethods, true);
-
-        ksort($flip);
-
-        $result = $flip;
-
-        return $result;
-    }
-
 
     /**
      * @return callable|null
@@ -601,9 +565,9 @@ class PhpModule
     }
 
     /**
-     * @param callable $fnForceWrap
+     * @param callable $fnIsForceWrap
      */
-    public function to_list($value, $fnForceWrap = null, array $options = []) : array
+    public function to_list($value, $fnIsForceWrap = null, array $options = []) : array
     {
         if (null === $value) {
             throw new LogicException('The `value` should be not null');
@@ -622,8 +586,8 @@ class PhpModule
             }
 
         } elseif (is_array($value)) {
-            if ($fnForceWrap) {
-                $status = call_user_func_array($fnForceWrap, $value);
+            if ($fnIsForceWrap) {
+                $status = call_user_func_array($fnIsForceWrap, $value);
 
                 $_value = $status
                     ? [ $value ]
@@ -772,104 +736,266 @@ class PhpModule
 
 
     /**
-     * > функция get_object_vars() возвращает все элементы для $this, в том числе protected/private
-     * > чтобы получить доступ только к публичным свойствам, её нужно вызвать в обертке
+     * > функция get_class_vars() возвращает только публичные (и статические публичные) свойства для $object_or_class
+     * > чтобы получить доступ ко всем свойствам, её нужно вызвать в обертке
+     *
+     * @param string|object $newScope
      */
-    public function get_object_vars(object $object, bool $public = null) : array
+    public function get_class_vars($object_or_class, $newScope = 'static') : array
     {
-        $public = $public ?? true;
+        $fnGetClassVars = null;
+        if ('static' !== $newScope) {
+            $_newScope = null
+                ?? $newScope
+                ?? new class {
+                };
 
-        if ($public === true) {
-            $vars = get_object_vars($object);
-
-        } else {
-            $fn = (function (object $object) : array {
-                return get_object_vars($object);
-            })->bindTo($object, $object);
-
-            $vars = $fn();
-
-            if ($public === false) {
-                $vars = array_diff_key(
-                    $vars,
-                    get_object_vars($object)
-                );
-            }
+            $fnGetClassVars = (static function ($class) {
+                return get_class_vars($class);
+            })->bindTo(null, $_newScope);
         }
+
+        $class = is_object($object_or_class)
+            ? get_class($object_or_class)
+            : $object_or_class;
+
+        $vars = $fnGetClassVars
+            ? $fnGetClassVars($class)
+            : get_class_vars($class);
 
         return $vars;
     }
 
     /**
-     * > функция property_exists() возвращает все свойства, в том числе protected/private
-     * > чтобы получить доступ только к публичным свойствам, нужно прибегнуть к вот такой хитрости
+     * > функция get_class_methods() возвращает только публичные (и статические публичные) методы для $object_or_class
+     * > чтобы получить доступ ко всем методам, её нужно вызвать в обертке
+     *
+     * @param string|object $newScope
+     */
+    public function get_class_methods($object_or_class, $newScope = 'static') : array
+    {
+        $fnGetClassMethods = null;
+        if ('static' !== $newScope) {
+            $_newScope = null
+                ?? $newScope
+                ?? new class {
+                };
+
+            $fnGetClassMethods = (static function ($object_or_class) {
+                return get_class_methods($object_or_class);
+            })->bindTo(null, $_newScope);
+        }
+
+        $vars = $fnGetClassMethods
+            ? $fnGetClassMethods($object_or_class)
+            : get_class_vars($object_or_class);
+
+        return $vars;
+    }
+
+    /**
+     * > функция get_object_vars() возвращает только публичные свойства для $this
+     * > чтобы получить доступ ко всем свойствам, её нужно вызвать в обертке
+     *
+     * @param string|object $newScope
+     */
+    public function get_object_vars(object $object, $newScope = 'static') : array
+    {
+        $fnGetObjectVars = null;
+        if ('static' !== $newScope) {
+            $_newScope = null
+                ?? $newScope
+                ?? new class {
+                };
+
+            $fnGetObjectVars = (static function ($object) {
+                return get_object_vars($object);
+            })->bindTo(null, $_newScope);
+        }
+
+        $vars = $fnGetObjectVars
+            ? $fnGetObjectVars($object)
+            : get_object_vars($object);
+
+        return $vars;
+    }
+
+
+    /**
+     * > функция property_exists() возвращает true для любых свойств, в том числе protected/private и вне зависимости от static
+     * > эта используется, чтобы проверить публичные и/или статические свойства
      *
      * @param class-string|object $object_or_class
      */
-    public function property_exists($object_or_class, string $property, bool $public = null) : bool
+    public function property_exists(
+        $object_or_class, string $property,
+        bool $public = null, bool $static = null
+    ) : bool
     {
-        $public = $public ?? false;
-
-        if (! $public) {
-            return property_exists($object_or_class, $property);
+        $isObject = false;
+        $isClass = false;
+        if (! (false
+            || ($isObject = (is_object($object_or_class)))
+            || ($isClass = (is_string($object_or_class) && class_exists($object_or_class)))
+        )) {
+            return false;
         }
 
-        if (is_object($object_or_class)) {
-            $vars = $this->get_object_vars($object_or_class, $public);
+        $theObject = null;
+        $theClass = null;
+        if ($isObject) {
+            $theObject = $object_or_class;
+            $theClass = get_class($object_or_class);
 
-            return array_key_exists($property, $vars);
+        } elseif ($isClass) {
+            $theClass = $object_or_class;
         }
 
-        $class = $object_or_class;
+        $isPublic = $public === true;
+        $isNotPublic = $public === false;
+        $isMaybePublic = ! $isNotPublic;
+
+        $isStatic = $static === true;
+        $isNotStatic = $static === false;
+        $isMaybeStatic = ! $isNotStatic;
+        $isNotStaticOrDoesntMatter = ! $isStatic;
+
+        if ($isMaybePublic) {
+            if ($isMaybeStatic) {
+                if (isset($object_or_class::${$property})) {
+                    return true;
+                }
+            }
+
+            if ($theObject) {
+                if ($isNotStaticOrDoesntMatter) {
+                    if (isset($theObject->{$property})) {
+                        return true;
+                    }
+
+                    $vars = get_object_vars($theObject);
+                    if ($vars) {
+                        if (array_key_exists($property, $vars)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (! property_exists($object_or_class, $property)) {
+            return false;
+        }
+
+        $isMattersPublic = $public !== null;
+        $isMattersStatic = $static !== null;
+
+        if (! $isMattersPublic && ! $isMattersStatic) {
+            return true;
+        }
 
         try {
-            $rp = new \ReflectionProperty($class, $property);
+            $rp = new \ReflectionProperty($theClass, $property);
 
-            if ($rp->isPublic()) {
-                return true;
+            $isPublicProp = $rp->isPublic();
+            $isStaticProp = $rp->isStatic();
+
+            if (! $isPublicProp && $isPublic) {
+                return false;
+            }
+
+            if (! $isStaticProp && $isStatic) {
+                return false;
+            }
+
+            if ($isPublicProp && $isNotPublic) {
+                return false;
+            }
+
+            if ($isStaticProp && $isNotStatic) {
+                return false;
             }
         }
         catch ( \Throwable $e ) {
             return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
-     * > функция method_exists() возвращает true для любых методов, в том числе protected/private
-     * > чтобы получить доступ только к публичным свойствам, нужно прибегнуть к вот такой хитрости
+     * > функция method_exists() возвращает true для любых методов, в том числе protected/private и вне зависимости от static
+     * > эта используется, чтобы проверить публичные и/или статические методы
      *
      * @param class-string|object $object_or_class
      */
-    public function method_exists($object_or_class, string $method, bool $public = null) : bool
+    public function method_exists(
+        $object_or_class, string $method,
+        bool $public = null, bool $static = null
+    ) : bool
     {
-        $public = $public ?? false;
+        $isObject = false;
+        $isClass = false;
+        if (! (false
+            || ($isObject = (is_object($object_or_class)))
+            || ($isClass = (is_string($object_or_class) && class_exists($object_or_class)))
+        )) {
+            return false;
+        }
+
+        $theObject = null;
+        $theClass = null;
+        if ($isObject) {
+            $theObject = $object_or_class;
+            $theClass = get_class($object_or_class);
+
+        } elseif ($isClass) {
+            $theClass = $object_or_class;
+        }
 
         if (! method_exists($object_or_class, $method)) {
             return false;
         }
 
-        if ($public) {
-            if (is_object($object_or_class)) {
-                if (is_callable([ $object_or_class, $method ])) {
-                    return true;
-                }
+        $isMattersPublic = $public !== null;
+        $isMattersStatic = $static !== null;
+
+        if (! $isMattersPublic && ! $isMattersStatic) {
+            return true;
+        }
+
+        $isPublic = $public === true;
+        $isStatic = $static === true;
+        $isNotPublic = $public === false;
+        $isNotStatic = $static === false;
+
+        try {
+            $rm = new \ReflectionMethod($theClass, $method);
+
+            $isPublicMethod = $rm->isPublic();
+            $isStaticMethod = $rm->isStatic();
+
+            if (! $isPublicMethod && $isPublic) {
+                return false;
             }
 
-            try {
-                $rm = new \ReflectionMethod($object_or_class, $method);
-
-                if ($rm->isPublic()) {
-                    return true;
-                }
+            if (! $isStaticMethod && $isStatic) {
+                return false;
             }
-            catch ( \Throwable $e ) {
+
+            if ($isPublicMethod && $isNotPublic) {
+                return false;
+            }
+
+            if ($isStaticMethod && $isNotStatic) {
                 return false;
             }
         }
+        catch ( \Throwable $e ) {
+            return false;
+        }
 
-        return false;
+        return true;
     }
 
 
@@ -1038,7 +1164,7 @@ class PhpModule
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function throw_new(array $trace = null, ...$throwableArgs)
+    public function throw_new(?array $trace, ...$throwableArgs)
     {
         $throwableClass = $this->throwable_class_static();
 
@@ -1048,23 +1174,27 @@ class PhpModule
                 : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         }
 
-        $throwableArgs = $this->throwable_args(...$throwableArgs);
-        $throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? '{line}';
-        $throwableArgs[ 'trace' ] = $trace;
+        $_throwableArgs = $this->throwable_args(...$throwableArgs);
+        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $_throwableArgs[ 'trace' ] = $trace;
 
         $arguments = [];
-        $arguments[] = $throwableArgs[ 'message' ] ?? null;
-        $arguments[] = $throwableArgs[ 'code' ] ?? null;
-        $arguments[] = $throwableArgs[ 'previous' ] ?? null;
+        $arguments[] = $_throwableArgs[ 'message' ] ?? null;
+        $arguments[] = $_throwableArgs[ 'code' ] ?? null;
+        $arguments[] = $_throwableArgs[ 'previous' ] ?? null;
 
         $e = new $throwableClass(...$arguments);
 
-        $fn = (function () use (&$throwableArgs) {
-            foreach ( $throwableArgs as $key => $value ) {
-                if (property_exists($this, $key)) {
-                    $this->{$key} = $value;
-                }
+        foreach ( $_throwableArgs as $key => $value ) {
+            if (! property_exists($this, $key)) {
+                unset($_throwableArgs[ $key ]);
+            }
+        }
+
+        $fn = (function () use (&$_throwableArgs) {
+            foreach ( $_throwableArgs as $key => $value ) {
+                $this->{$key} = $value;
             }
         })->bindTo($e, $e);
 
@@ -1077,11 +1207,11 @@ class PhpModule
     {
         $len = count($throwableArgs);
 
-        $messageList = null;
-        $codeList = null;
-        $previousList = null;
-        $messageCodeList = null;
-        $messageDataList = null;
+        $messageList = [];
+        $messageDataList = [];
+        $codeIntegerList = [];
+        $codeStringList = [];
+        $previousList = [];
 
         $__unresolved = [];
 
@@ -1089,7 +1219,7 @@ class PhpModule
             $arg = $throwableArgs[ $i ];
 
             if (is_int($arg)) {
-                $codeList[ $i ] = $arg;
+                $codeIntegerList[ $i ] = $arg;
 
                 continue;
             }
@@ -1133,7 +1263,7 @@ class PhpModule
         for ( $i = 0; $i < $len; $i++ ) {
             if (isset($messageList[ $i ])) {
                 if (preg_match('/^[a-z](?!.*\s)/i', $messageList[ $i ])) {
-                    $messageCodeList[ $i ] = strtoupper($messageList[ $i ]);
+                    $codeStringList[ $i ] = strtoupper($messageList[ $i ]);
                 }
             }
         }
@@ -1141,18 +1271,19 @@ class PhpModule
         $result = [];
 
         $result[ 'messageList' ] = $messageList;
-        $result[ 'codeList' ] = $codeList;
-        $result[ 'previousList' ] = $previousList;
-
-        $result[ 'messageCodeList' ] = $messageCodeList;
         $result[ 'messageDataList' ] = $messageDataList;
+
+        $result[ 'codeIntegerList' ] = $codeIntegerList;
+        $result[ 'codeStringList' ] = $codeStringList;
+
+        $result[ 'previousList' ] = $previousList;
 
         $messageDataList = $messageDataList ?? [];
 
         $message = $messageList ? end($messageList) : null;
-        $code = $codeList ? end($codeList) : null;
+        $code = $codeIntegerList ? end($codeIntegerList) : null;
+        $codeString = $codeStringList ? end($codeStringList) : null;
         $previous = $previousList ? end($previousList) : null;
-        $messageCode = $messageCodeList ? end($messageCodeList) : null;
 
         $messageData = $messageDataList
             ? array_replace(...$messageDataList)
@@ -1161,13 +1292,13 @@ class PhpModule
         $messageObject = (object) ([ $message ] + $messageData);
 
         $result[ 'message' ] = $message;
-        $result[ 'code' ] = $code;
-        $result[ 'previous' ] = $previous;
-
-        $result[ 'messageCode' ] = $messageCode;
         $result[ 'messageData' ] = $messageData;
-
         $result[ 'messageObject' ] = $messageObject;
+
+        $result[ 'code' ] = $code;
+        $result[ 'codeString' ] = $codeString;
+
+        $result[ 'previous' ] = $previous;
 
         $result[ '__unresolved' ] = $__unresolved;
 

@@ -104,33 +104,44 @@ class ErrorHandler
         }
     }
 
-    public static function exception_handler(\Throwable $e) : void
+    public static function exception_handler(\Throwable $throwable, bool $exit = null) : void
     {
-        $current = $e;
-        do {
-            echo "\n";
+        $exit = $exit ?? true;
 
-            $gettype = gettype($current);
-            $getClass = get_class($current);
-            $splObjectId = spl_object_id($current);
-            echo "{ {$gettype} # {$getClass} # {$splObjectId} }" . PHP_EOL;
+        $it = new ExceptionIterator([ $throwable ]);
+        $iit = new \RecursiveIteratorIterator($it);
 
-            echo '"' . $current->getMessage() . '"' . PHP_EOL;
+        $messageLines = [];
+        foreach ( $iit as $track ) {
+            foreach ( $track as $i => $e ) {
+                $phpClass = get_class($e);
+                $phpId = spl_object_id($e);
+                $phpFile = $e->getFile() ?? '{file}';
+                $phpLine = $e->getLine() ?? '{line}';
 
-            $file = $current->getFile() ?? '{file}';
-            $line = $current->getLine() ?? '{line}';
-            echo "{$file} : {$line}" . PHP_EOL;
-
-            foreach ( $current->getTrace() as $traceItem ) {
-                $file = $traceItem[ 'file' ] ?? '{file}';
-                $line = $traceItem[ 'line' ] ?? '{line}';
-
-                echo "{$file} : {$line}" . PHP_EOL;
+                $messageLines[] = "[ {$i} ] {$e->getMessage()}";
+                $messageLines[] = "{ object # {$phpClass} # {$phpId} } ";
+                $messageLines[] = "{$phpFile} : {$phpLine}";
+                $messageLines[] = '';
             }
+        }
 
-            echo PHP_EOL;
-        } while ( $current = $current->getPrevious() );
+        $traceLines = [];
+        foreach ( $throwable->getTrace() as $traceItem ) {
+            $phpFile = $traceItem[ 'file' ] ?? '{file}';
+            $phpLine = $traceItem[ 'line' ] ?? '{line}';
 
-        die();
+            $traceLines[] = "{$phpFile} : {$phpLine}";
+        }
+
+        foreach ( $messageLines as $line ) {
+            echo $line . PHP_EOL;
+        }
+
+        echo PHP_EOL;
+
+        foreach ( $traceLines as $line ) {
+            echo $line . PHP_EOL;
+        }
     }
 }

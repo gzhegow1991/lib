@@ -5,10 +5,14 @@ namespace Gzhegow\Lib\Exception;
 use Gzhegow\Lib\Lib;
 
 
-class RuntimeException extends \RuntimeException
-    implements ExceptionInterface
+class RuntimeException extends \RuntimeException implements
+    AggregateExceptionInterface,
+    //
+    \IteratorAggregate
 {
     use ThrowableTrait;
+
+    use AggregateExceptionTrait;
 
 
     /**
@@ -21,37 +25,35 @@ class RuntimeException extends \RuntimeException
     public $line;
 
     /**
-     * @var string
-     */
-    public $message;
-    /**
-     * @var int
-     */
-    public $code;
-
-    /**
      * @var array
      */
     public $trace;
 
-    /**
-     * @var \Throwable
-     */
-    public $previous;
-    /**
-     * @var \Throwable[]
-     */
-    public $previousList = [];
-
 
     public function __construct(...$throwableArgs)
     {
-        foreach ( Lib::php()->throwable_args(...$throwableArgs) as $k => $v ) {
-            if (property_exists($this, $k)) {
-                $this->{$k} = $v;
-            }
-        }
+        $args = Lib::php()->throwable_args(...$throwableArgs);
 
-        parent::__construct($this->message, $this->code, $this->previous);
+        $this->previousList = array_values($args[ 'previousList' ]);
+
+        parent::__construct(
+            $args[ 'message' ],
+            $args[ 'code' ],
+            $args[ 'previous' ]
+        );
+    }
+
+
+    /**
+     * @return iterable<string, \Throwable[]>
+     */
+    public function getIterator()
+    {
+        /** @var iterable<string, \Throwable[]> $iit */
+
+        $it = new ExceptionIterator([ $this ]);
+        $iit = new \RecursiveIteratorIterator($it);
+
+        return $iit;
     }
 }

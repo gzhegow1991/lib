@@ -77,7 +77,7 @@ abstract class AbstractArrayOf implements \ArrayAccess, \Countable, \Serializabl
         ];
 
         $_keyType = (string) key($type);
-        $_type = (string) current($type);
+        $_valueType = (string) current($type);
 
         if (! isset($mapKeyTypes[ $_keyType ])) {
             $debugKeyType = Lib::debug()->value($_keyType);
@@ -90,22 +90,22 @@ abstract class AbstractArrayOf implements \ArrayAccess, \Countable, \Serializabl
             );
         }
 
-        if (! isset($mapTypes[ $_type ])) {
-            $debugKeyType = Lib::debug()->value($_type);
+        if (! isset($mapTypes[ $_valueType ])) {
+            $debugValueType = Lib::debug()->value($_valueType);
 
             throw new LogicException(
                 [
-                    "The `type` ({$debugKeyType}) should be one of: "
+                    "The `type` ({$debugValueType}) should be one of: "
                     . implode('|', array_keys($mapTypes)),
                 ]
             );
         }
 
         $this->keyType = $_keyType;
-        $this->type = $_type;
+        $this->type = $_valueType;
 
         if (null !== $objectClass) {
-            if ($_type !== 'object') {
+            if ($_valueType !== 'object') {
                 throw new LogicException('The `type` must be object to pass `objectClass`');
             }
 

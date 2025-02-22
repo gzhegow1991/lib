@@ -23,7 +23,8 @@
     "require": {
         "php": "^7.2|^8.0",
 
-        "ext-pcre": "*"
+        "ext-pcre": "*",
+        "symfony/var-dumper": "^5.4"
     },
     "suggest": {
         "ext-filter": "*",

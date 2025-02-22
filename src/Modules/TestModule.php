@@ -50,12 +50,13 @@ class TestModule
      * @param callable $fn
      */
     public function assertReturn(
-        array $trace,
+        ?array $trace,
         $fn, array $fnArgs = [],
         $expectedReturn = null,
         string &$result = null
     ) : bool
     {
+        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
         $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
 
@@ -68,19 +69,21 @@ class TestModule
         if ($result !== $expectedReturn) {
             $message = '[ ERROR ] Test ' . __METHOD__ . '() failed.';
 
-            Lib::debug()->diff_vars($result, $expectedReturn, [ 1 => &$diff ]);
+            $isDiff = Lib::debug()->diff_vars($result, $expectedReturn, [ &$diffLines ]);
+
+            $diffString = implode(PHP_EOL, $diffLines);
 
             if (null !== $stdout) {
                 fwrite($stdout, '------' . PHP_EOL);
                 fwrite($stdout, $message . PHP_EOL);
                 fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
-                fwrite($stdout, $diff . PHP_EOL);
+                fwrite($stdout, $diffString . PHP_EOL);
                 fwrite($stdout, '------' . PHP_EOL);
 
                 return false;
             }
 
-            $e = new RuntimeException([ $message, $diff ]);
+            $e = new RuntimeException([ $message, $diffString ]);
             $e->trace = $trace;
             $e->file = $traceFile;
             $e->line = $traceLine;
@@ -99,12 +102,13 @@ class TestModule
      * @param callable $fn
      */
     public function assertStdout(
-        array $trace,
+        ?array $trace,
         $fn, array $fnArgs = [],
         string $expectedStdout = null,
         string &$output = null
     ) : bool
     {
+        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
         $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
 
@@ -119,8 +123,13 @@ class TestModule
         $isDiff = Lib::debug()->diff(
             trim($output),
             trim($expectedStdout),
-            [ 1 => &$diff ]
+            [ &$diffLines ]
         );
+
+        $diffString = '';
+        if ($isDiff) {
+            $diffString = implode(PHP_EOL, $diffLines);
+        }
 
         if ($isDiff) {
             $message = '[ ERROR ] Test ' . __METHOD__ . '() failed.';
@@ -129,13 +138,13 @@ class TestModule
                 fwrite($stdout, '------' . PHP_EOL);
                 fwrite($stdout, $message . PHP_EOL);
                 fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
-                fwrite($stdout, $diff . PHP_EOL);
+                fwrite($stdout, $diffString . PHP_EOL);
                 fwrite($stdout, '------' . PHP_EOL);
 
                 return false;
             }
 
-            $e = new RuntimeException([ $message, $diff ]);
+            $e = new RuntimeException([ $message, $diffString ]);
             $e->trace = $trace;
             $e->file = $traceFile;
             $e->line = $traceLine;
@@ -154,12 +163,13 @@ class TestModule
      * @param callable $fn
      */
     public function assertMicrotime(
-        array $trace,
+        ?array $trace,
         $fn, array $fnArgs = [],
         float $expectedMicrotimeMax = null, float $expectedMicrotimeMin = null,
         float &$microtime = null
     ) : bool
     {
+        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
         $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
 

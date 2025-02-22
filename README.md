@@ -21,7 +21,7 @@ ini_set('memory_limit', '32M');
 
 
 // > настраиваем обработку ошибок
-(new \Gzhegow\Lib\Exception\ErrorHandler())
+($ex = new \Gzhegow\Lib\Exception\ErrorHandler())
     ->useErrorReporting()
     ->useErrorHandler()
     ->useExceptionHandler()
@@ -29,62 +29,39 @@ ini_set('memory_limit', '32M');
 
 
 // > добавляем несколько функция для тестирования
-function _rdebug(...$values) : string
+function _value($value) : string
 {
-    return \Gzhegow\Lib\Lib::debug()->types('', [], ...$values);
+    return \Gzhegow\Lib\Lib::debug()->value($value, []);
 }
 
-function _rdump(...$values) : string
+function _values($separator = null, ...$values) : string
 {
-    return \Gzhegow\Lib\Lib::debug()->values('', [], ...$values);
+    return \Gzhegow\Lib\Lib::debug()->values($separator, [], ...$values);
 }
 
-function _debug(...$values) : void
+function _array($value, int $maxLevel = null, array $options = []) : string
 {
-    echo _rdebug(...$values) . PHP_EOL;
+    return \Gzhegow\Lib\Lib::debug()->value_array($value, $maxLevel, $options);
 }
 
-function _dump(...$values) : void
+function _array_multiline($value, int $maxLevel = null, array $options = []) : string
 {
-    echo _rdump(...$values) . PHP_EOL;
+    return \Gzhegow\Lib\Lib::debug()->value_array_multiline($value, $maxLevel, $options);
 }
 
-function _dump_array($value, int $maxLevel = null, array $options = []) : string
+function _print(...$values) : void
 {
-    $ret = \Gzhegow\Lib\Lib::debug()
-        ->value_array($value, $maxLevel, $options)
-    ;
-
-    echo $ret . PHP_EOL;
-
-    return $ret;
+    echo _values(' | ', ...$values) . PHP_EOL;
 }
 
-function _dump_array_multiline($value, int $maxLevel = null, array $options = []) : string
+function _print_array($value, int $maxLevel = null, array $options = [])
 {
-    $content = \Gzhegow\Lib\Lib::debug()
-        ->value_array_multiline($value, $maxLevel, $options)
-    ;
-
-    $ret = $content . PHP_EOL;
-
-    echo $ret;
-
-    return $ret;
+    echo _array($value, $maxLevel, $options) . PHP_EOL;
 }
 
-function _assert_return(
-    \Closure $fn, array $fnArgs = [],
-    $expectedReturn = null
-) : void
+function _print_array_multiline($value, int $maxLevel = null, array $options = [])
 {
-    $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-    \Gzhegow\Lib\Lib::test()->assertReturn(
-        $trace,
-        $fn, $fnArgs,
-        $expectedReturn
-    );
+    echo _array_multiline($value, $maxLevel, $options) . PHP_EOL;
 }
 
 function _assert_stdout(
@@ -94,31 +71,110 @@ function _assert_stdout(
 {
     $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-    \Gzhegow\Lib\Lib::test()->assertStdout($trace,
+    \Gzhegow\Lib\Lib::test()->assertStdout(
+        $trace,
         $fn, $fnArgs,
         $expectedStdout
     );
 }
 
-function _assert_microtime(
-    \Closure $fn, array $fnArgs = [],
-    float $expectedMicrotimeMax = null, float $expectedMicrotimeMin = null
-) : void
-{
-    $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-    \Gzhegow\Lib\Lib::test()->assertMicrotime(
-        $trace,
-        $fn, $fnArgs,
-        $expectedMicrotimeMax, $expectedMicrotimeMin
-    );
-}
+// >>> TEST
+// > тесты Exceptions
+$fn = function () use ($ex) {
+    _print('[ Exceptions ]');
+    echo PHP_EOL;
+
+    $eeee1 = new \Exception('eeee1', 0);
+    $eeee2 = new \Exception('eeee2', 0);
+
+    $previousList = [ $eeee1, $eeee2 ];
+    $eee0 = new \Gzhegow\Lib\Exception\LogicException('eee', 0, ...$previousList);
+
+    $ee1 = new \Exception('ee1', 0, $previous = $eee0);
+    $ee2 = new \Exception('ee2', 0, $previous = $eee0);
+
+    $previousList = [ $ee1, $ee2 ];
+    $e0 = new \Gzhegow\Lib\Exception\RuntimeException('e', 0, ...$previousList);
+
+    $iit = $e0->getIterator();
+
+    // > or:
+    // $it = new \Gzhegow\Lib\Exception\ExceptionIterator([ $e0 ]);
+    // $iit = new \RecursiveIteratorIterator($it);
+
+    foreach ( $iit as $track ) {
+        foreach ( $track as $i => $e ) {
+            $phpClass = get_class($e);
+
+            echo "[ {$i} ] {$e->getMessage()}" . PHP_EOL;
+            echo "{ object # {$phpClass} }" . PHP_EOL;
+            echo PHP_EOL;
+        }
+
+        echo PHP_EOL;
+    }
+};
+_assert_stdout($fn, [], '
+"[ Exceptions ]"
+
+[ 0 ] e
+{ object # Gzhegow\Lib\Exception\RuntimeException }
+
+[ 0.0 ] ee1
+{ object # Exception }
+
+[ 0.0.0 ] eee
+{ object # Gzhegow\Lib\Exception\LogicException }
+
+[ 0.0.0.0 ] eeee1
+{ object # Exception }
+
+
+[ 0 ] e
+{ object # Gzhegow\Lib\Exception\RuntimeException }
+
+[ 0.0 ] ee1
+{ object # Exception }
+
+[ 0.0.0 ] eee
+{ object # Gzhegow\Lib\Exception\LogicException }
+
+[ 0.0.0.1 ] eeee2
+{ object # Exception }
+
+
+[ 0 ] e
+{ object # Gzhegow\Lib\Exception\RuntimeException }
+
+[ 0.1 ] ee2
+{ object # Exception }
+
+[ 0.1.0 ] eee
+{ object # Gzhegow\Lib\Exception\LogicException }
+
+[ 0.1.0.0 ] eeee1
+{ object # Exception }
+
+
+[ 0 ] e
+{ object # Gzhegow\Lib\Exception\RuntimeException }
+
+[ 0.1 ] ee2
+{ object # Exception }
+
+[ 0.1.0 ] eee
+{ object # Gzhegow\Lib\Exception\LogicException }
+
+[ 0.1.0.1 ] eeee2
+{ object # Exception }
+');
 
 
 // >>> TEST
 // > тесты ArrayModule
 $fn = function () {
-    _dump('[ ArrModule ]');
+    _print('[ ArrModule ]');
     echo PHP_EOL;
 
     $notAnObject = 1;
@@ -130,13 +186,13 @@ $fn = function () {
 
     $array = new \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf('object');
     $array[] = $notAnObject;
-    _dump($array);
-    _dump($array->getItems());
+    _print($array);
+    _print($array->getItems());
 
     // > be aware, `ArrayOf` WILL NOT check type when adding elements, so this check returns true
     // > if you use this feature carefully - you can avoid that check, and code becomes faster
     // > it will work like PHPDoc idea - check should remember your colleagues who will read the sources without actually check
-    _dump($array->isOfType('object'));
+    _print($array->isOfType('object'));
     echo PHP_EOL;
 
 
@@ -150,10 +206,10 @@ $fn = function () {
     }
     catch ( \Throwable $e ) {
     }
-    _dump('[ CATCH ] ' . $e->getMessage());
-    _dump($array);
-    _dump($array->getItems());
-    _dump($array->isOfType('object'));
+    _print('[ CATCH ] ' . $e->getMessage());
+    _print($array);
+    _print($array->getItems());
+    _print($array->isOfType('object'));
     echo PHP_EOL;
 
 
@@ -167,22 +223,22 @@ $fn = function () {
     }
     catch ( \Throwable $e ) {
     }
-    _dump('[ CATCH ] ' . $e->getMessage());
+    _print('[ CATCH ] ' . $e->getMessage());
     try {
         $array[] = $anonymousObject;
     }
     catch ( \Throwable $e ) {
     }
-    _dump('[ CATCH ] ' . $e->getMessage());
+    _print('[ CATCH ] ' . $e->getMessage());
     try {
         $array[] = $notAnObject;
     }
     catch ( \Throwable $e ) {
     }
-    _dump('[ CATCH ] ' . $e->getMessage());
-    _dump($array);
-    _dump($array->getItems());
-    _dump($array->isOfType('object'));
+    _print('[ CATCH ] ' . $e->getMessage());
+    _print($array);
+    _print($array->getItems());
+    _print($array->isOfType('object'));
 };
 _assert_stdout($fn, [], '
 "[ ArrModule ]"
@@ -208,7 +264,7 @@ TRUE
 // >>> TEST
 // > тесты AssertModule
 $fn = function () {
-    _dump('[ AssertModule ]');
+    _print('[ AssertModule ]');
     echo PHP_EOL;
 
     try {
@@ -219,7 +275,7 @@ $fn = function () {
     }
     catch ( \Throwable $e ) {
     }
-    _dump('[ CATCH ] ' . $e->getMessage());
+    _print('[ CATCH ] ' . $e->getMessage());
 
     try {
         $var = \Gzhegow\Lib\Lib::assert()
@@ -229,7 +285,7 @@ $fn = function () {
     }
     catch ( \Throwable $e ) {
     }
-    _dump('[ CATCH ] ' . $e->getMessage());
+    _print('[ CATCH ] ' . $e->getMessage());
 };
 _assert_stdout($fn, [], '
 "[ AssertModule ]"
@@ -242,147 +298,147 @@ _assert_stdout($fn, [], '
 // >>> TEST
 // > тесты BcmathModule
 $fn = function () {
-    _dump('[ BcmathModule ]');
+    _print('[ BcmathModule ]');
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 0);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 2);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 0);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 2);
-    _dump($result);
+    _print($result, (string) $result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 0);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 2);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 0);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 2);
-    _dump($result);
+    _print($result, (string) $result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005', 0);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005', 2);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005', 0);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005', 2);
-    _dump($result);
+    _print($result, (string) $result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 0);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 2);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 0);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 2);
-    _dump($result);
+    _print($result, (string) $result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 0);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.05', 0);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 0);
-    _dump($result);
+    _print($result, (string) $result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 2);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.05', 2);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 2);
-    _dump($result);
+    _print($result, (string) $result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.5', 0);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.05', 0);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.005', 0);
-    _dump($result);
+    _print($result, (string) $result);
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.5', 2);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.05', 2);
-    _dump($result);
+    _print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.005', 2);
-    _dump($result);
+    _print($result, (string) $result);
     echo PHP_EOL;
 
-    $gcd = \Gzhegow\Lib\Lib::bcmath()->bcgcd(8, 12);
-    _dump($gcd);
-    $gcd = \Gzhegow\Lib\Lib::bcmath()->bcgcd(7, 13);
-    _dump($gcd);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcgcd(8, 12);
+    _print($result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcgcd(7, 13);
+    _print($result, (string) $result);
     echo PHP_EOL;
 
-    $lcm = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 6);
-    _dump($lcm);
-    $lcm = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 5);
-    _dump($lcm);
-    $lcm = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 10);
-    _dump($lcm);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 6);
+    _print($result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 5);
+    _print($result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 10);
+    _print($result, (string) $result);
     echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
 "[ BcmathModule ]"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "2" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1.01" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.01"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "2" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1.01" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-2" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1.01" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.01"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-2"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-2" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1.01" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-2"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "2" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1.5" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1.05" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1.01" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.5"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.05"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.01"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-2" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-2"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1.5" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1.05" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "-1.01" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.5"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.05"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "4" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "1" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "4"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "24" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "40" }
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber # "40" }
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "24"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "40"
+{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "40"
 ');
 
 
-// // >>> TEST
-// // > тесты CryptModule
+// >>> TEST
+// > тесты CryptModule
 $fn = function () {
-    _dump('[ CryptModule ]');
+    _print('[ CryptModule ]');
     echo PHP_EOL;
 
 
@@ -395,9 +451,9 @@ $fn = function () {
     ];
     foreach ( $algos as $algo ) {
         $hash = \Gzhegow\Lib\Lib::crypt()->hash($algo, 'hello world!', $binary = false);
-        _dump($hash);
+        _print($hash);
         $result = \Gzhegow\Lib\Lib::crypt()->hash_equals($hash, $algo, 'hello world!', $binary = false);
-        _dump($result);
+        _print($result);
         echo PHP_EOL;
 
         $hash = \Gzhegow\Lib\Lib::crypt()->hash($algo, 'hello world!', $binary = true);
@@ -410,9 +466,9 @@ $fn = function () {
                 STR_PAD_LEFT
             );
         }
-        _dump($hash01);
+        _print($hash01);
         $result = \Gzhegow\Lib\Lib::crypt()->hash_equals($hash, $algo, 'hello world!', $binary = true);
-        _dump($result);
+        _print($result);
         echo PHP_EOL;
     }
 
@@ -421,39 +477,39 @@ $fn = function () {
 
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, '01');
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '01');
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(3, '01');
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '01');
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, '01234567');
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '01234567');
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(15, '01234567');
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '01234567');
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, '0123456789ABCDEF');
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '0123456789ABCDEF');
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(31, '0123456789ABCDEF');
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '0123456789ABCDEF');
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
 
@@ -461,27 +517,27 @@ $fn = function () {
 
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(10, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(25, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(26, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     try {
@@ -489,25 +545,25 @@ $fn = function () {
     }
     catch ( \Throwable $e ) {
     }
-    _dump('[ CATCH ] ' . $e->getMessage());
+    _print('[ CATCH ] ' . $e->getMessage());
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(10, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(26, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(27, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
 
@@ -515,21 +571,21 @@ $fn = function () {
 
 
     $enc = \Gzhegow\Lib\Lib::crypt()->numbase2numbase('2147483647', '0123456789', '0123456789');
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2numbase('9223372036854775807', '0123456789', '0123456789');
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->numbase2numbase('2147483647', '0123456789abcdefghijklmnopqrstuvwxyz', '0123456789');
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2numbase($enc, '0123456789', '0123456789abcdefghijklmnopqrstuvwxyz');
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $enc = \Gzhegow\Lib\Lib::crypt()->numbase2numbase('9223372036854775807', '0123456789abcdefghijklmnopqrstuvwxyz', '0123456789');
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2numbase($enc, '0123456789', '0123456789abcdefghijklmnopqrstuvwxyz');
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
 
@@ -537,17 +593,17 @@ $fn = function () {
 
 
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('1', '01');
-    _dump($enc);
+    _print($enc);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('11', '0123');
-    _dump($enc);
+    _print($enc);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('111', '01234567');
-    _dump($enc);
+    _print($enc);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('1111', '0123456789ABCDEF');
-    _dump($enc);
+    _print($enc);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('11111', '0123456789ABCDEFGHIJKLMNOPQRSTUV');
-    _dump($enc);
+    _print($enc);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('111111', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/');
-    _dump($enc);
+    _print($enc);
     echo PHP_EOL;
 
 
@@ -555,19 +611,19 @@ $fn = function () {
 
 
     $strings = [ '你' ];
-    _dump_array($strings);
+    _print_array($strings);
     $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin($strings);
-    _dump_array($binaries);
+    _print_array($binaries);
     $letters = \Gzhegow\Lib\Lib::crypt()->bin2text($binaries);
-    _dump_array($letters);
+    _print_array($letters);
     echo PHP_EOL;
 
     $strings = [ '你好' ];
-    _dump_array($strings);
+    _print_array($strings);
     $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin($strings);
-    _dump_array($binaries);
+    _print_array($binaries);
     $letters = \Gzhegow\Lib\Lib::crypt()->bin2text($binaries);
-    _dump_array($letters);
+    _print_array($letters);
     echo PHP_EOL;
 
 
@@ -575,27 +631,27 @@ $fn = function () {
 
 
     $number = 5678;
-    _dump($number);
+    _print($number);
     $binary = decbin(5678);
-    _dump($binary);
+    _print($binary);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase($binary, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2bin($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    _dump($dec);
+    _print($dec);
     $number = bindec($dec);
-    _dump($number);
+    _print($number);
     echo PHP_EOL;
 
     $strings = [ 'hello' ];
-    _dump_array($strings);
+    _print_array($strings);
     $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin($strings);
-    _dump_array($binaries);
+    _print_array($binaries);
     $enc = \Gzhegow\Lib\Lib::crypt()->bin2base($binaries, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base2bin($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    _dump_array($dec);
+    _print_array($dec);
     $text = implode('', array_map('chr', array_map('bindec', $dec)));
-    _dump($text);
+    _print($text);
     echo PHP_EOL;
 
 
@@ -603,7 +659,7 @@ $fn = function () {
 
 
     $src = 'HELLO';
-    _dump('input: ' . $src);
+    _print('input: ' . $src);
     $gen = (function () use ($src) { yield $src; })();
     $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($gen);
     $enc = '';
@@ -615,11 +671,11 @@ $fn = function () {
     foreach ( $gen as $letter ) {
         $dec .= $letter;
     }
-    _dump('result: ' . $dec);
+    _print('result: ' . $dec);
     echo PHP_EOL;
 
     $src = 'HELLO';
-    _dump('input: ' . $src);
+    _print('input: ' . $src);
     $gen = (function () use ($src) { yield $src; })();
     $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($gen);
     $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_it($gen);
@@ -627,7 +683,7 @@ $fn = function () {
     foreach ( $gen as $letter ) {
         $dec .= $letter;
     }
-    _dump('result: ' . $dec);
+    _print('result: ' . $dec);
     echo PHP_EOL;
 
 
@@ -635,11 +691,11 @@ $fn = function () {
 
 
     $string = "hello";
-    _dump($string);
+    _print($string);
     $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($string);
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $src = "\x00\x00\x01\x00\xFF";
@@ -654,9 +710,9 @@ $fn = function () {
 
         $srcDump .= $chr;
     }
-    _dump('b`' . $srcDump . '`');
+    _print('b`' . $srcDump . '`');
     $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($src);
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
     $decDump = '';
     $len = mb_strlen($src);
@@ -669,15 +725,15 @@ $fn = function () {
 
         $decDump .= $chr;
     }
-    _dump('b`' . $decDump . '`');
+    _print('b`' . $decDump . '`');
     echo PHP_EOL;
 
     $string = "你好";
-    _dump($string);
+    _print($string);
     $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($string);
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
 
@@ -685,11 +741,11 @@ $fn = function () {
 
 
     $string = "hello";
-    _dump($string);
+    _print($string);
     $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode($string);
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 
     $src = "\x00\x00\x01\x00\xFF";
@@ -704,9 +760,9 @@ $fn = function () {
 
         $srcDump .= $chr;
     }
-    _dump('b`' . $srcDump . '`');
+    _print('b`' . $srcDump . '`');
     $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode($src);
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
     $decDump = '';
     $len = mb_strlen($src);
@@ -719,15 +775,15 @@ $fn = function () {
 
         $decDump .= $chr;
     }
-    _dump('b`' . $decDump . '`');
+    _print('b`' . $decDump . '`');
     echo PHP_EOL;
 
     $string = '你好';
-    _dump($string);
+    _print($string);
     $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode("你好");
-    _dump($enc);
+    _print($enc);
     $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
-    _dump($dec);
+    _print($dec);
     echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
@@ -884,15 +940,15 @@ TRUE
 // >>> TEST
 // > тесты DebugModule
 $fn = function () {
-    _dump('[ DebugModule ]');
+    _print('[ DebugModule ]');
     echo PHP_EOL;
 
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
-    _dump($isDiff);
-    _dump_array_multiline($diffLines, 1);
+    _print($isDiff);
+    _print_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
 
@@ -902,22 +958,22 @@ $fn = function () {
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple2\nbanana\ncherry\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
-    _dump($isDiff);
-    _dump_array_multiline($diffLines, 1);
+    _print($isDiff);
+    _print_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry2\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
-    _dump($isDiff);
-    _dump_array_multiline($diffLines, 1);
+    _print($isDiff);
+    _print_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\ndamson\nelderberry2";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
-    _dump($isDiff);
-    _dump_array_multiline($diffLines, 1);
+    _print($isDiff);
+    _print_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
 
@@ -927,22 +983,22 @@ $fn = function () {
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "fig\napple\nbanana\ncherry\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
-    _dump($isDiff);
-    _dump_array_multiline($diffLines, 1);
+    _print($isDiff);
+    _print_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\nfig\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
-    _dump($isDiff);
-    _dump_array_multiline($diffLines, 1);
+    _print($isDiff);
+    _print_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\ndamson\nelderberry\nfig";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
-    _dump($isDiff);
-    _dump_array_multiline($diffLines, 1);
+    _print($isDiff);
+    _print_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
 
@@ -952,22 +1008,22 @@ $fn = function () {
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "banana\ncherry\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
-    _dump($isDiff);
-    _dump_array_multiline($diffLines, 1);
+    _print($isDiff);
+    _print_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
-    _dump($isDiff);
-    _dump_array_multiline($diffLines, 1);
+    _print($isDiff);
+    _print_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\ndamson";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
-    _dump($isDiff);
-    _dump_array_multiline($diffLines, 1);
+    _print($isDiff);
+    _print_array_multiline($diffLines, 1);
     echo PHP_EOL;
 
 
@@ -1024,11 +1080,54 @@ $fn = function () {
         ], 2
     );
     echo PHP_EOL;
+
+
+    function DebugModule_dump(...$vars)
+    {
+        $theDebug = \Gzhegow\Lib\Lib::debug();
+
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $theDebug->dumper_fn_static([ $theDebug, 'dumper_var_dump' ]);
+        // $theDebug->dumper_fn_static([ $theDebug, 'dumper_var_dump_native' ]);
+        // $theDebug->dumper_fn_static([ $theDebug, 'dumper_print_r' ]);
+        // $theDebug->dumper_fn_static([ $theDebug, 'dumper_var_export' ]);
+        // $theDebug->dumper_fn_static([ $theDebug, 'dumper_var_export_native' ]);
+        // $theDebug->dumper_fn_static([ $theDebug, 'dumper_symfony' ]);
+
+        $theDebug->dump_fn_static([ $theDebug, 'dump_echo' ]);
+        $options = [];
+
+        // $theDebug->dump_fn_static([ $theDebug, 'dump_stdout' ]);
+        // $options = [ STDOUT ];
+
+        // $theDebug->dump_fn_static([ $theDebug, 'dump_stdout_html' ]);
+        // $options = [ STDOUT ];
+
+        // $theDebug->dump_fn_static([ $theDebug, 'dump_browser_console' ]);
+        // $options = [];
+
+        // $theDebug->dump_fn_static([ $theDebug, 'dump_pdo' ]);
+        // $pdo = new \PDO('mysql:host=localhost;dbname=test', 'root', '');
+        // $table = 'dump';
+        // $column = 'var';
+        // $options = [ $pdo, $table, $column ];
+
+        $theDebug->dump($trace, $options, ...$vars) . PHP_EOL;
+    }
+
+    // ob_start();
+    // _dump('hello', 'world');
+    // echo ob_get_clean();
+    // // { string(53) # "D:\OpenServer\.org\@gzhegow\_1_\_1_lib\test.php: 1108" }
+    // // { string(5) # "hello" }
+    // // { string(5) # "world" }
 };
 _assert_stdout($fn, [], '
 "[ DebugModule ]"
 
 FALSE
+```
 [
   "apple",
   "banana",
@@ -1036,37 +1135,48 @@ FALSE
   "damson",
   "elderberry"
 ]
+```
 
 
 TRUE
+```
 [
-  "[ 1 ] +++ > apple @ --- apple2",
+  "[ 1 ] --- > apple2",
+  "[ 1 ] +++ > apple",
   "banana",
   "cherry",
   "damson",
   "elderberry"
 ]
+```
 
 TRUE
+```
 [
   "apple",
   "banana",
-  "[ 3 ] +++ > cherry @ --- cherry2",
+  "[ 3 ] --- > cherry2",
+  "[ 3 ] +++ > cherry",
   "damson",
   "elderberry"
 ]
+```
 
 TRUE
+```
 [
   "apple",
   "banana",
   "cherry",
   "damson",
-  "[ 5 ] +++ > elderberry @ --- elderberry2"
+  "[ 5 ] --- > elderberry2",
+  "[ 5 ] +++ > elderberry"
 ]
+```
 
 
 TRUE
+```
 [
   "[ 1 ] --- > fig",
   "apple",
@@ -1075,8 +1185,10 @@ TRUE
   "damson",
   "elderberry"
 ]
+```
 
 TRUE
+```
 [
   "apple",
   "banana",
@@ -1085,8 +1197,10 @@ TRUE
   "damson",
   "elderberry"
 ]
+```
 
 TRUE
+```
 [
   "apple",
   "banana",
@@ -1095,9 +1209,11 @@ TRUE
   "elderberry",
   "[ 6 ] --- > fig"
 ]
+```
 
 
 TRUE
+```
 [
   "[ 1 ] +++ > apple",
   "banana",
@@ -1105,8 +1221,10 @@ TRUE
   "damson",
   "elderberry"
 ]
+```
 
 TRUE
+```
 [
   "apple",
   "banana",
@@ -1114,8 +1232,10 @@ TRUE
   "damson",
   "elderberry"
 ]
+```
 
 TRUE
+```
 [
   "apple",
   "banana",
@@ -1123,6 +1243,7 @@ TRUE
   "damson",
   "[ 5 ] +++ > elderberry"
 ]
+```
 
 
 NULL
@@ -1137,11 +1258,14 @@ FALSE
 [ "{ array(3) }", "{ array(3) }", "{ array(3) }" ]
 [ [ 1, "apple", "{ object # stdClass }" ], [ 2, "apples", "{ object # stdClass }" ], [ 1.5, "apples", "{ object # stdClass }" ] ]
 
+```
 [
   "{ array(3) }",
   "{ array(3) }",
   "{ array(3) }"
 ]
+```
+```
 [
   [
     1,
@@ -1159,26 +1283,27 @@ FALSE
     "{ object # stdClass }"
   ]
 ]
+```
 ');
 
 
 // >>> TEST
 // > тесты FormatModule
 $fn = function () {
-    _dump('[ FormatModule ]');
+    _print('[ FormatModule ]');
     echo PHP_EOL;
 
 
     $result = \Gzhegow\Lib\Lib::json()->json_encode(
         $value = [ 'hello' ]
     );
-    _dump($result);
+    _print($result);
 
     $result = \Gzhegow\Lib\Lib::json()->json_encode(
         $value = NAN,
         $fallback = [ "NAN" ]
     );
-    _dump($result);
+    _print($result);
 
     try {
         \Gzhegow\Lib\Lib::json()->json_encode(
@@ -1187,7 +1312,7 @@ $fn = function () {
     }
     catch ( \Throwable $e ) {
     }
-    _dump('[ CATCH ] ' . $e->getMessage());
+    _print('[ CATCH ] ' . $e->getMessage());
 
 
     $jsonc = "[1,/* 2 */3]";
@@ -1195,7 +1320,7 @@ $fn = function () {
         $json = $jsonc,
         $associative = true
     );
-    _dump($result);
+    _print($result);
 };
 _assert_stdout($fn, [], '
 "[ FormatModule ]"
@@ -1210,21 +1335,21 @@ _assert_stdout($fn, [], '
 // >>> TEST
 // > тесты FsModule
 $fn = function () {
-    _dump('[ FsModule ]');
+    _print('[ FsModule ]');
     echo PHP_EOL;
 
     $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(__DIR__ . '/var/1/1/1/1.txt', '123', [ 0775, true ]);
-    _dump($result);
+    _print($result);
 
     $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(__DIR__ . '/var/1/1/1.txt', '123');
-    _dump($result);
+    _print($result);
 
     $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(__DIR__ . '/var/1/1.txt', '123');
-    _dump($result);
+    _print($result);
 
 
     $result = \Gzhegow\Lib\Lib::fs()->file_get_contents(__DIR__ . '/var/1/1/1/1.txt');
-    _dump($result);
+    _print($result);
 
 
     foreach (
@@ -1250,28 +1375,28 @@ _assert_stdout($fn, [], '
 // >>> TEST
 // > тесты ParseModule
 $fn = function () {
-    _dump('[ ParseModule ]');
+    _print('[ ParseModule ]');
     echo PHP_EOL;
 
 
     $result = \Gzhegow\Lib\Lib::parse()->ctype_digit('123');
-    _dump($result);
+    _print($result);
     echo PHP_EOL;
 
 
     $result = \Gzhegow\Lib\Lib::parse()->ctype_alpha('abcABC');
-    _dump($result);
+    _print($result);
 
     $result = \Gzhegow\Lib\Lib::parse()->ctype_alpha('abcABC', false);
-    _dump($result);
+    _print($result);
     echo PHP_EOL;
 
 
     $result = \Gzhegow\Lib\Lib::parse()->ctype_alnum('123abcABC');
-    _dump($result);
+    _print($result);
 
     $result = \Gzhegow\Lib\Lib::parse()->ctype_alnum('123abcABC', false);
-    _dump($result);
+    _print($result);
 };
 _assert_stdout($fn, [], '
 "[ ParseModule ]"
@@ -1289,7 +1414,7 @@ NULL
 // >>> TEST
 // > тесты PhpModule
 $fn = function () {
-    _dump('[ PhpModule ]');
+    _print('[ PhpModule ]');
     echo PHP_EOL;
 
 
@@ -1301,11 +1426,21 @@ $fn = function () {
 
     $errors = \Gzhegow\Lib\Lib::php()->errors_end($b);
 
-    _dump_array_multiline($errors, 2);
+    _print_array_multiline($errors, 2);
 
 
     echo PHP_EOL;
 
+
+    class PhpModuleDummy
+    {
+        public           $publicProperty;
+        protected        $protectedProperty;
+        private          $privateProperty;
+        public static    $publicStaticProperty;
+        protected static $protectedStaticProperty;
+        private static   $privateStaticProperty;
+    }
 
     class PhpModuleDummy1
     {
@@ -1362,6 +1497,126 @@ $fn = function () {
 
 
     $sources = [
+        $classDummy = \PhpModuleDummy::class,
+        $objectDummy = new \PhpModuleDummy(),
+    ];
+    $sourceProperties = [
+        'publicProperty',
+        'protectedProperty',
+        'privateProperty',
+        'publicStaticProperty',
+        'protectedStaticProperty',
+        'privateStaticProperty',
+        'publicDynamicProperty',
+    ];
+    $sourceFlags = [
+        // public, static
+        [ null, null ],
+        [ null, false ],
+        [ null, true ],
+        [ false, null ],
+        [ true, null ],
+        [ false, false ],
+        [ true, true ],
+        [ false, true ],
+        [ true, false ],
+    ];
+    $objectDummy->publicDynamicProperty = null;
+
+    $table = [];
+    foreach ( $sources as $src ) {
+        foreach ( $sourceProperties as $sourceProperty ) {
+            foreach ( $sourceFlags as [ $isPublic, $isStatic ] ) {
+                $status = \Gzhegow\Lib\Lib::php()->property_exists(
+                    $src,
+                    $sourceProperty,
+                    $isPublic,
+                    $isStatic
+                );
+
+                $tableColPublic = null
+                    ?? (($isPublic === true) ? 'PUBLIC' : null)
+                    ?? (($isPublic === null) ? '?PUBLIC' : null)
+                    ?? (($isPublic === false) ? '!PUBLIC' : null);
+
+                $tableColStatic = null
+                    ?? (($isStatic === true) ? 'STATIC' : null)
+                    ?? (($isStatic === null) ? '?STATIC' : null)
+                    ?? (($isStatic === false) ? '!STATIC' : null);
+
+                $tableRow = _values(' / ', $src, $sourceProperty);
+                $tableCol = _values(' / ', $tableColPublic, $tableColStatic);
+
+                $table[ $tableRow ][ $tableCol ] = _value($status);
+            }
+        }
+    }
+    \Gzhegow\Lib\Lib::debug()->print_table($table);
+
+
+    echo PHP_EOL;
+
+
+    $sources = [
+        $classDummy = \PhpModuleDummy1::class,
+        $objectDummy = new \PhpModuleDummy1(),
+    ];
+    $sourceMethods = [
+        'publicMethod',
+        'protectedMethod',
+        'privateMethod',
+        'publicStaticMethod',
+        'protectedStaticMethod',
+        'privateStaticMethod',
+    ];
+    $sourceFlags = [
+        // public, static
+        [ null, null ],
+        [ null, false ],
+        [ null, true ],
+        [ false, null ],
+        [ true, null ],
+        [ false, false ],
+        [ true, true ],
+        [ false, true ],
+        [ true, false ],
+    ];
+
+    $table = [];
+    foreach ( $sources as $src ) {
+        foreach ( $sourceMethods as $sourceMethod ) {
+            foreach ( $sourceFlags as [ $isPublic, $isStatic ] ) {
+                $status = \Gzhegow\Lib\Lib::php()->method_exists(
+                    $src,
+                    $sourceMethod,
+                    $isPublic,
+                    $isStatic
+                );
+
+                $tableColPublic = null
+                    ?? (($isPublic === true) ? 'PUBLIC' : null)
+                    ?? (($isPublic === null) ? '?PUBLIC' : null)
+                    ?? (($isPublic === false) ? '!PUBLIC' : null);
+
+                $tableColStatic = null
+                    ?? (($isStatic === true) ? 'STATIC' : null)
+                    ?? (($isStatic === null) ? '?STATIC' : null)
+                    ?? (($isStatic === false) ? '!STATIC' : null);
+
+                $tableRow = _values(' / ', $src, $sourceMethod);
+                $tableCol = _values(' / ', $tableColPublic, $tableColStatic);
+
+                $table[ $tableRow ][ $tableCol ] = _value($status);
+            }
+        }
+    }
+    \Gzhegow\Lib\Lib::debug()->print_table($table);
+
+
+    echo PHP_EOL;
+
+
+    $sources = [
         $functionInternal = 'strlen',
         $functionUser = 'PhpModule_dummy_function',
         $closure = function () { },
@@ -1379,64 +1634,51 @@ $fn = function () {
 
     $table = [];
     foreach ( $sources as $i => $src ) {
-        $srcKey = _rdump($src);
+        $tableRow = _value($src);
 
 
         $status = \Gzhegow\Lib\Lib::php()->type_method_string($result, $src);
-        $table[ $srcKey ][ 'method_string' ] = _rdump($status);
-        // _dump('type_method_string', $src, $status, $result);
+        $table[ $tableRow ][ 'method_string' ] = _value($status);
 
         $status = \Gzhegow\Lib\Lib::php()->type_method_array($result, $src);
-        $table[ $srcKey ][ 'method_array' ] = _rdump($status);
-        // _dump('type_method_array', $src, $status, $result);
+        $table[ $tableRow ][ 'method_array' ] = _value($status);
 
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable($result, $src);
-        $table[ $srcKey ][ 'callable' ] = _rdump($status);
-        // _dump('type_callable', $src, $status, $result);
+        $table[ $tableRow ][ 'callable' ] = _value($status);
 
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_object($result, $src);
-        $table[ $srcKey ][ 'callable_object' ] = rtrim(_rdump($status));
-        // _dump('type_callable_object', $src, $status, $result);
+        $table[ $tableRow ][ 'callable_object' ] = _value($status);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_object_closure($result, $src);
-        $table[ $srcKey ][ 'callable_object_closure' ] = _rdump($status);
-        // _dump('type_callable_object_closure', $src, $status, $result);
+        $table[ $tableRow ][ 'callable_object_closure' ] = _value($status);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_object_invokable($result, $src);
-        $table[ $srcKey ][ 'callable_object_invokable' ] = _rdump($status);
-        // _dump('type_callable_object_invokable', $src, $status, $result);
+        $table[ $tableRow ][ 'callable_object_invokable' ] = _value($status);
 
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_array($result, $src);
-        $table[ $srcKey ][ 'callable_array' ] = _rdump($status);
-        // _dump('type_callable_array', $src, $status, $result);
+        $table[ $tableRow ][ 'callable_array' ] = _value($status);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method($result, $src);
-        $table[ $srcKey ][ 'callable_array_method' ] = _rdump($status);
-        // _dump('type_callable_array_method', $src, $status, $result);
+        $table[ $tableRow ][ 'callable_array_method' ] = _value($status);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_static($result, $src);
-        $table[ $srcKey ][ 'callable_array_method_static' ] = _rdump($status);
-        // _dump('type_callable_array_method_static', $src, $status, $result);
+        $table[ $tableRow ][ 'callable_array_method_static' ] = _value($status);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_non_static($result, $src);
-        $table[ $srcKey ][ 'callable_array_method_non_static' ] = _rdump($status);
-        // _dump('type_callable_array_method_non_static', $src, $status, $result);
+        $table[ $tableRow ][ 'callable_array_method_non_static' ] = _value($status);
 
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_string($result, $src);
-        $table[ $srcKey ][ 'callable_string' ] = _rdump($status);
-        // _dump('type_callable_string', $src, $status, $result);
+        $table[ $tableRow ][ 'callable_string' ] = _value($status);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function($result, $src);
-        $table[ $srcKey ][ 'callable_string_function' ] = _rdump($status);
-        // _dump('type_callable_string_function', $src, $status, $result);
+        $table[ $tableRow ][ 'callable_string_function' ] = _value($status);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static($result, $src);
-        $table[ $srcKey ][ 'callable_string_method_static' ] = _rdump($status);
-        // _dump('type_callable_string_method_static', $src, $status, $result);
+        $table[ $tableRow ][ 'callable_string_method_static' ] = _value($status);
     }
     \Gzhegow\Lib\Lib::debug()->print_table($table);
 
@@ -1454,7 +1696,6 @@ $fn = function () {
     $table = [];
     foreach ( $sourceClasses as $sourceClass ) {
         $sourceObject = new $sourceClass();
-
         $sourceMethods = [
             'class::publicMethod'               => $sourceClass . '::publicMethod',
             'class::protectedMethod'            => $sourceClass . '::protectedMethod',
@@ -1464,6 +1705,10 @@ $fn = function () {
             'class::protectedStaticMethod'      => $sourceClass . '::protectedStaticMethod',
             'class::privateStaticMethod'        => $sourceClass . '::privateStaticMethod',
             //
+            'class::__invoke'                   => $sourceClass . '::__invoke',
+            'class::__call'                     => $sourceClass . '::__call',
+            'class::__callStatic'               => $sourceClass . '::__callStatic',
+            //
             '[ class, publicMethod ]'           => [ $sourceClass, 'publicMethod' ],
             '[ class, protectedMethod ]'        => [ $sourceClass, 'protectedMethod' ],
             '[ class, privateMethod ]'          => [ $sourceClass, 'privateMethod' ],
@@ -1472,6 +1717,10 @@ $fn = function () {
             '[ class, protectedStaticMethod ]'  => [ $sourceClass, 'protectedStaticMethod' ],
             '[ class, privateStaticMethod ]'    => [ $sourceClass, 'privateStaticMethod' ],
             //
+            '[ class, __invoke ]'               => [ $sourceClass, '__invoke' ],
+            '[ class, __call ]'                 => [ $sourceClass, '__call' ],
+            '[ class, __callStatic ]'           => [ $sourceClass, '__callStatic' ],
+            //
             '[ object, publicMethod ]'          => [ $sourceObject, 'publicMethod' ],
             '[ object, protectedMethod ]'       => [ $sourceObject, 'protectedMethod' ],
             '[ object, privateMethod ]'         => [ $sourceObject, 'privateMethod' ],
@@ -1479,27 +1728,34 @@ $fn = function () {
             '[ object, publicStaticMethod ]'    => [ $sourceObject, 'publicStaticMethod' ],
             '[ object, protectedStaticMethod ]' => [ $sourceObject, 'protectedStaticMethod' ],
             '[ object, privateStaticMethod ]'   => [ $sourceObject, 'privateStaticMethod' ],
+            //
+            '[ object, __invoke ]'              => [ $sourceObject, '__invoke' ],
+            '[ object, __call ]'                => [ $sourceObject, '__call' ],
+            '[ object, __callStatic ]'          => [ $sourceObject, '__callStatic' ],
         ];
-        $scopes = [
+        $sourceScopes = [
             'static' => 'static',
             'NULL'   => null,
             'class'  => $sourceClass,
         ];
-        foreach ( $sourceMethods as $sourceMethodKey => $sourceMethod ) {
-            $srcKey = _rdump($sourceMethod);
+
+        foreach ( $sourceMethods as $sourceMethod ) {
+            $tableRow = _value($sourceMethod);
 
             $status = \Gzhegow\Lib\Lib::php()->type_method_string($result, $sourceMethod);
-            $table[ $srcKey ][ _rdump('method_string') ] = _rdump($status);
+            $table[ $tableRow ][ 'method_string' ] = _value($status);
 
             $status = \Gzhegow\Lib\Lib::php()->type_method_array($result, $sourceMethod);
-            $table[ $srcKey ][ _rdump('method_array') ] = _rdump($status);
+            $table[ $tableRow ][ 'method_array' ] = _value($status);
 
-            foreach ( $scopes as $scopeKey => $scope ) {
+            foreach ( $sourceScopes as $scopeKey => $scope ) {
+                $tableCol = _values(' / ', 'callable_array', 'scope: ' . $scopeKey);
                 $status = \Gzhegow\Lib\Lib::php()->type_callable_array($result, $sourceMethod, $scope);
-                $table[ $srcKey ][ _rdump('callable_array', 'scope: ' . $scopeKey) ] = _rdump($status);
+                $table[ $tableRow ][ $tableCol ] = _value($status);
 
+                $tableCol = _values(' / ', 'callable_string', 'scope: ' . $scopeKey);
                 $status = \Gzhegow\Lib\Lib::php()->type_callable_string($result, $sourceMethod, $scope);
-                $table[ $srcKey ][ _rdump('callable_string', 'scope: ' . $scopeKey) ] = _rdump($status);
+                $table[ $tableRow ][ $tableCol ] = _value($status);
             }
         }
     }
@@ -1508,6 +1764,7 @@ $fn = function () {
 _assert_stdout($fn, [], '
 "[ PhpModule ]"
 
+```
 [
   [
     "This is the error message"
@@ -1519,121 +1776,194 @@ _assert_stdout($fn, [], '
     "This is the error message"
   ]
 ]
+```
 
-+------------------------------+---------------+--------------+----------+-----------------+-------------------------+---------------------------+----------------+-----------------------+------------------------------+----------------------------------+-----------------+--------------------------+-------------------------------+
-|                              | method_string | method_array | callable | callable_object | callable_object_closure | callable_object_invokable | callable_array | callable_array_method | callable_array_method_static | callable_array_method_non_static | callable_string | callable_string_function | callable_string_method_static |
-+------------------------------+---------------+--------------+----------+-----------------+-------------------------+---------------------------+----------------+-----------------------+------------------------------+----------------------------------+-----------------+--------------------------+-------------------------------+
-| "strlen"                     | FALSE         | FALSE        | TRUE     | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | TRUE            | TRUE                     | FALSE                         |
-| "PhpModule_dummy_function"   | FALSE         | FALSE        | TRUE     | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | TRUE            | TRUE                     | FALSE                         |
-| { object # Closure }         | FALSE         | FALSE        | TRUE     | TRUE            | TRUE                    | TRUE                      | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
-| "stdClass"                   | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
-| { object # stdClass }        | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
-| "PhpModuleDummy1"            | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
-| "PhpModuleDummy2"            | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
-| "PhpModuleDummy3"            | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
-| "PhpModuleDummy4"            | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
-| { object # PhpModuleDummy1 } | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
-| { object # PhpModuleDummy2 } | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
-| { object # PhpModuleDummy3 } | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
-| { object # PhpModuleDummy4 } | TRUE          | TRUE         | TRUE     | TRUE            | FALSE                   | TRUE                      | TRUE           | TRUE                  | FALSE                        | TRUE                             | FALSE           | FALSE                    | FALSE                         |
-+------------------------------+---------------+--------------+----------+-----------------+-------------------------+---------------------------+----------------+-----------------------+------------------------------+----------------------------------+-----------------+--------------------------+-------------------------------+
++---------------------------------------------------------+-----------------------+-----------------------+----------------------+-----------------------+----------------------+-----------------------+---------------------+----------------------+----------------------+
+|                                                         | "?PUBLIC" / "?STATIC" | "?PUBLIC" / "!STATIC" | "?PUBLIC" / "STATIC" | "!PUBLIC" / "?STATIC" | "PUBLIC" / "?STATIC" | "!PUBLIC" / "!STATIC" | "PUBLIC" / "STATIC" | "!PUBLIC" / "STATIC" | "PUBLIC" / "!STATIC" |
++---------------------------------------------------------+-----------------------+-----------------------+----------------------+-----------------------+----------------------+-----------------------+---------------------+----------------------+----------------------+
+| "PhpModuleDummy" / "publicProperty"                     | TRUE                  | TRUE                  | FALSE                | FALSE                 | TRUE                 | FALSE                 | FALSE               | FALSE                | TRUE                 |
+| "PhpModuleDummy" / "protectedProperty"                  | TRUE                  | TRUE                  | FALSE                | TRUE                  | FALSE                | TRUE                  | FALSE               | FALSE                | FALSE                |
+| "PhpModuleDummy" / "privateProperty"                    | TRUE                  | TRUE                  | FALSE                | TRUE                  | FALSE                | TRUE                  | FALSE               | FALSE                | FALSE                |
+| "PhpModuleDummy" / "publicStaticProperty"               | TRUE                  | FALSE                 | TRUE                 | FALSE                 | TRUE                 | FALSE                 | TRUE                | FALSE                | FALSE                |
+| "PhpModuleDummy" / "protectedStaticProperty"            | TRUE                  | FALSE                 | TRUE                 | TRUE                  | FALSE                | FALSE                 | FALSE               | TRUE                 | FALSE                |
+| "PhpModuleDummy" / "privateStaticProperty"              | TRUE                  | FALSE                 | TRUE                 | TRUE                  | FALSE                | FALSE                 | FALSE               | TRUE                 | FALSE                |
+| "PhpModuleDummy" / "publicDynamicProperty"              | FALSE                 | FALSE                 | FALSE                | FALSE                 | FALSE                | FALSE                 | FALSE               | FALSE                | FALSE                |
+| { object # PhpModuleDummy } / "publicProperty"          | TRUE                  | TRUE                  | FALSE                | FALSE                 | TRUE                 | FALSE                 | FALSE               | FALSE                | TRUE                 |
+| { object # PhpModuleDummy } / "protectedProperty"       | TRUE                  | TRUE                  | FALSE                | TRUE                  | FALSE                | TRUE                  | FALSE               | FALSE                | FALSE                |
+| { object # PhpModuleDummy } / "privateProperty"         | TRUE                  | TRUE                  | FALSE                | TRUE                  | FALSE                | TRUE                  | FALSE               | FALSE                | FALSE                |
+| { object # PhpModuleDummy } / "publicStaticProperty"    | TRUE                  | FALSE                 | TRUE                 | FALSE                 | TRUE                 | FALSE                 | TRUE                | FALSE                | FALSE                |
+| { object # PhpModuleDummy } / "protectedStaticProperty" | TRUE                  | FALSE                 | TRUE                 | TRUE                  | FALSE                | FALSE                 | FALSE               | TRUE                 | FALSE                |
+| { object # PhpModuleDummy } / "privateStaticProperty"   | TRUE                  | FALSE                 | TRUE                 | TRUE                  | FALSE                | FALSE                 | FALSE               | TRUE                 | FALSE                |
+| { object # PhpModuleDummy } / "publicDynamicProperty"   | TRUE                  | TRUE                  | FALSE                | FALSE                 | TRUE                 | FALSE                 | FALSE               | FALSE                | TRUE                 |
++---------------------------------------------------------+-----------------------+-----------------------+----------------------+-----------------------+----------------------+-----------------------+---------------------+----------------------+----------------------+
 
-+-------------------------------------------------------------+-----------------+----------------+------------------------------------+-------------------------------------+----------------------------------+-----------------------------------+-----------------------------------+------------------------------------+
-|                                                             | "method_string" | "method_array" | "callable_array" | "scope: static" | "callable_string" | "scope: static" | "callable_array" | "scope: NULL" | "callable_string" | "scope: NULL" | "callable_array" | "scope: class" | "callable_string" | "scope: class" |
-+-------------------------------------------------------------+-----------------+----------------+------------------------------------+-------------------------------------+----------------------------------+-----------------------------------+-----------------------------------+------------------------------------+
-| "PhpModuleDummy1::publicMethod"                             | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy1::protectedMethod"                          | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy1::privateMethod"                            | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy1::publicStaticMethod"                       | TRUE            | TRUE           | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
-| "PhpModuleDummy1::protectedStaticMethod"                    | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | TRUE                               |
-| "PhpModuleDummy1::privateStaticMethod"                      | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | TRUE                               |
-| [ "PhpModuleDummy1", "publicMethod" ]                       | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy1", "protectedMethod" ]                    | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy1", "privateMethod" ]                      | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy1", "publicStaticMethod" ]                 | TRUE            | TRUE           | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
-| [ "PhpModuleDummy1", "protectedStaticMethod" ]              | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | TRUE                               |
-| [ "PhpModuleDummy1", "privateStaticMethod" ]                | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | TRUE                               |
-| [ "{ object # PhpModuleDummy1 }", "publicMethod" ]          | TRUE            | TRUE           | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
-| [ "{ object # PhpModuleDummy1 }", "protectedMethod" ]       | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | FALSE                              |
-| [ "{ object # PhpModuleDummy1 }", "privateMethod" ]         | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | FALSE                              |
-| [ "{ object # PhpModuleDummy1 }", "publicStaticMethod" ]    | TRUE            | TRUE           | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
-| [ "{ object # PhpModuleDummy1 }", "protectedStaticMethod" ] | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | FALSE                              |
-| [ "{ object # PhpModuleDummy1 }", "privateStaticMethod" ]   | TRUE            | TRUE           | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | FALSE                              |
-| "PhpModuleDummy2::publicMethod"                             | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy2::protectedMethod"                          | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy2::privateMethod"                            | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy2::publicStaticMethod"                       | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy2::protectedStaticMethod"                    | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy2::privateStaticMethod"                      | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy2", "publicMethod" ]                       | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy2", "protectedMethod" ]                    | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy2", "privateMethod" ]                      | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy2", "publicStaticMethod" ]                 | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy2", "protectedStaticMethod" ]              | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy2", "privateStaticMethod" ]                | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy2 }", "publicMethod" ]          | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy2 }", "protectedMethod" ]       | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy2 }", "privateMethod" ]         | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy2 }", "publicStaticMethod" ]    | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy2 }", "protectedStaticMethod" ] | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy2 }", "privateStaticMethod" ]   | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy3::publicMethod"                             | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy3::protectedMethod"                          | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy3::privateMethod"                            | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy3::publicStaticMethod"                       | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy3::protectedStaticMethod"                    | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy3::privateStaticMethod"                      | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy3", "publicMethod" ]                       | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy3", "protectedMethod" ]                    | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy3", "privateMethod" ]                      | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy3", "publicStaticMethod" ]                 | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy3", "protectedStaticMethod" ]              | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy3", "privateStaticMethod" ]                | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy3 }", "publicMethod" ]          | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy3 }", "protectedMethod" ]       | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy3 }", "privateMethod" ]         | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy3 }", "publicStaticMethod" ]    | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy3 }", "protectedStaticMethod" ] | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy3 }", "privateStaticMethod" ]   | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy4::publicMethod"                             | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy4::protectedMethod"                          | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy4::privateMethod"                            | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy4::publicStaticMethod"                       | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy4::protectedStaticMethod"                    | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| "PhpModuleDummy4::privateStaticMethod"                      | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy4", "publicMethod" ]                       | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy4", "protectedMethod" ]                    | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy4", "privateMethod" ]                      | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy4", "publicStaticMethod" ]                 | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy4", "protectedStaticMethod" ]              | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "PhpModuleDummy4", "privateStaticMethod" ]                | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy4 }", "publicMethod" ]          | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy4 }", "protectedMethod" ]       | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy4 }", "privateMethod" ]         | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy4 }", "publicStaticMethod" ]    | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy4 }", "protectedStaticMethod" ] | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-| [ "{ object # PhpModuleDummy4 }", "privateStaticMethod" ]   | FALSE           | FALSE          | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
-+-------------------------------------------------------------+-----------------+----------------+------------------------------------+-------------------------------------+----------------------------------+-----------------------------------+-----------------------------------+------------------------------------+
++--------------------------------------------------------+-----------------------+-----------------------+----------------------+-----------------------+----------------------+-----------------------+---------------------+----------------------+----------------------+
+|                                                        | "?PUBLIC" / "?STATIC" | "?PUBLIC" / "!STATIC" | "?PUBLIC" / "STATIC" | "!PUBLIC" / "?STATIC" | "PUBLIC" / "?STATIC" | "!PUBLIC" / "!STATIC" | "PUBLIC" / "STATIC" | "!PUBLIC" / "STATIC" | "PUBLIC" / "!STATIC" |
++--------------------------------------------------------+-----------------------+-----------------------+----------------------+-----------------------+----------------------+-----------------------+---------------------+----------------------+----------------------+
+| "PhpModuleDummy1" / "publicMethod"                     | TRUE                  | TRUE                  | FALSE                | FALSE                 | TRUE                 | FALSE                 | FALSE               | FALSE                | TRUE                 |
+| "PhpModuleDummy1" / "protectedMethod"                  | TRUE                  | TRUE                  | FALSE                | TRUE                  | FALSE                | TRUE                  | FALSE               | FALSE                | FALSE                |
+| "PhpModuleDummy1" / "privateMethod"                    | TRUE                  | TRUE                  | FALSE                | TRUE                  | FALSE                | TRUE                  | FALSE               | FALSE                | FALSE                |
+| "PhpModuleDummy1" / "publicStaticMethod"               | TRUE                  | FALSE                 | TRUE                 | FALSE                 | TRUE                 | FALSE                 | TRUE                | FALSE                | FALSE                |
+| "PhpModuleDummy1" / "protectedStaticMethod"            | TRUE                  | FALSE                 | TRUE                 | TRUE                  | FALSE                | FALSE                 | FALSE               | TRUE                 | FALSE                |
+| "PhpModuleDummy1" / "privateStaticMethod"              | TRUE                  | FALSE                 | TRUE                 | TRUE                  | FALSE                | FALSE                 | FALSE               | TRUE                 | FALSE                |
+| { object # PhpModuleDummy1 } / "publicMethod"          | TRUE                  | TRUE                  | FALSE                | FALSE                 | TRUE                 | FALSE                 | FALSE               | FALSE                | TRUE                 |
+| { object # PhpModuleDummy1 } / "protectedMethod"       | TRUE                  | TRUE                  | FALSE                | TRUE                  | FALSE                | TRUE                  | FALSE               | FALSE                | FALSE                |
+| { object # PhpModuleDummy1 } / "privateMethod"         | TRUE                  | TRUE                  | FALSE                | TRUE                  | FALSE                | TRUE                  | FALSE               | FALSE                | FALSE                |
+| { object # PhpModuleDummy1 } / "publicStaticMethod"    | TRUE                  | FALSE                 | TRUE                 | FALSE                 | TRUE                 | FALSE                 | TRUE                | FALSE                | FALSE                |
+| { object # PhpModuleDummy1 } / "protectedStaticMethod" | TRUE                  | FALSE                 | TRUE                 | TRUE                  | FALSE                | FALSE                 | FALSE               | TRUE                 | FALSE                |
+| { object # PhpModuleDummy1 } / "privateStaticMethod"   | TRUE                  | FALSE                 | TRUE                 | TRUE                  | FALSE                | FALSE                 | FALSE               | TRUE                 | FALSE                |
++--------------------------------------------------------+-----------------------+-----------------------+----------------------+-----------------------+----------------------+-----------------------+---------------------+----------------------+----------------------+
+
++-----------------------------------------+---------------+--------------+----------+-----------------+-------------------------+---------------------------+----------------+-----------------------+------------------------------+----------------------------------+-----------------+--------------------------+-------------------------------+
+|                                         | method_string | method_array | callable | callable_object | callable_object_closure | callable_object_invokable | callable_array | callable_array_method | callable_array_method_static | callable_array_method_non_static | callable_string | callable_string_function | callable_string_method_static |
++-----------------------------------------+---------------+--------------+----------+-----------------+-------------------------+---------------------------+----------------+-----------------------+------------------------------+----------------------------------+-----------------+--------------------------+-------------------------------+
+| "strlen"                                | FALSE         | FALSE        | TRUE     | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | TRUE            | TRUE                     | FALSE                         |
+| "PhpModule_dummy_function"              | FALSE         | FALSE        | TRUE     | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | TRUE            | TRUE                     | FALSE                         |
+| { object(invokable) # Closure }         | FALSE         | FALSE        | TRUE     | TRUE            | TRUE                    | TRUE                      | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
+| "stdClass"                              | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
+| { object # stdClass }                   | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
+| "PhpModuleDummy1"                       | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
+| "PhpModuleDummy2"                       | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
+| "PhpModuleDummy3"                       | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
+| "PhpModuleDummy4"                       | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
+| { object # PhpModuleDummy1 }            | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
+| { object # PhpModuleDummy2 }            | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
+| { object # PhpModuleDummy3 }            | FALSE         | FALSE        | FALSE    | FALSE           | FALSE                   | FALSE                     | FALSE          | FALSE                 | FALSE                        | FALSE                            | FALSE           | FALSE                    | FALSE                         |
+| { object(invokable) # PhpModuleDummy4 } | TRUE          | TRUE         | TRUE     | TRUE            | FALSE                   | TRUE                      | TRUE           | TRUE                  | FALSE                        | TRUE                             | FALSE           | FALSE                    | FALSE                         |
++-----------------------------------------+---------------+--------------+----------+-----------------+-------------------------+---------------------------+----------------+-----------------------+------------------------------+----------------------------------+-----------------+--------------------------+-------------------------------+
+
++------------------------------------------------------------------------+---------------+--------------+------------------------------------+-------------------------------------+----------------------------------+-----------------------------------+-----------------------------------+------------------------------------+
+|                                                                        | method_string | method_array | "callable_array" / "scope: static" | "callable_string" / "scope: static" | "callable_array" / "scope: NULL" | "callable_string" / "scope: NULL" | "callable_array" / "scope: class" | "callable_string" / "scope: class" |
++------------------------------------------------------------------------+---------------+--------------+------------------------------------+-------------------------------------+----------------------------------+-----------------------------------+-----------------------------------+------------------------------------+
+| "PhpModuleDummy1::publicMethod"                                        | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy1::protectedMethod"                                     | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy1::privateMethod"                                       | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy1::publicStaticMethod"                                  | TRUE          | TRUE         | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| "PhpModuleDummy1::protectedStaticMethod"                               | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | TRUE                               |
+| "PhpModuleDummy1::privateStaticMethod"                                 | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | TRUE                               |
+| "PhpModuleDummy1::__invoke"                                            | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy1::__call"                                              | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy1::__callStatic"                                        | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy1", "publicMethod" ]                                  | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy1", "protectedMethod" ]                               | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy1", "privateMethod" ]                                 | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy1", "publicStaticMethod" ]                            | TRUE          | TRUE         | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "PhpModuleDummy1", "protectedStaticMethod" ]                         | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | TRUE                               |
+| [ "PhpModuleDummy1", "privateStaticMethod" ]                           | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | TRUE                               |
+| [ "PhpModuleDummy1", "__invoke" ]                                      | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy1", "__call" ]                                        | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy1", "__callStatic" ]                                  | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "{ object # PhpModuleDummy1 }", "publicMethod" ]                     | TRUE          | TRUE         | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy1 }", "protectedMethod" ]                  | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy1 }", "privateMethod" ]                    | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy1 }", "publicStaticMethod" ]               | TRUE          | TRUE         | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy1 }", "protectedStaticMethod" ]            | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy1 }", "privateStaticMethod" ]              | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy1 }", "__invoke" ]                         | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "{ object # PhpModuleDummy1 }", "__call" ]                           | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "{ object # PhpModuleDummy1 }", "__callStatic" ]                     | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy2::publicMethod"                                        | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy2::protectedMethod"                                     | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy2::privateMethod"                                       | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy2::publicStaticMethod"                                  | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy2::protectedStaticMethod"                               | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy2::privateStaticMethod"                                 | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy2::__invoke"                                            | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy2::__call"                                              | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy2::__callStatic"                                        | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy2", "publicMethod" ]                                  | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy2", "protectedMethod" ]                               | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy2", "privateMethod" ]                                 | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy2", "publicStaticMethod" ]                            | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy2", "protectedStaticMethod" ]                         | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy2", "privateStaticMethod" ]                           | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy2", "__invoke" ]                                      | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy2", "__call" ]                                        | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy2", "__callStatic" ]                                  | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "{ object # PhpModuleDummy2 }", "publicMethod" ]                     | FALSE         | FALSE        | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy2 }", "protectedMethod" ]                  | FALSE         | FALSE        | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy2 }", "privateMethod" ]                    | FALSE         | FALSE        | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy2 }", "publicStaticMethod" ]               | FALSE         | FALSE        | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy2 }", "protectedStaticMethod" ]            | FALSE         | FALSE        | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy2 }", "privateStaticMethod" ]              | FALSE         | FALSE        | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy2 }", "__invoke" ]                         | FALSE         | FALSE        | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy2 }", "__call" ]                           | TRUE          | TRUE         | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object # PhpModuleDummy2 }", "__callStatic" ]                     | FALSE         | FALSE        | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| "PhpModuleDummy3::publicMethod"                                        | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| "PhpModuleDummy3::protectedMethod"                                     | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| "PhpModuleDummy3::privateMethod"                                       | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| "PhpModuleDummy3::publicStaticMethod"                                  | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| "PhpModuleDummy3::protectedStaticMethod"                               | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| "PhpModuleDummy3::privateStaticMethod"                                 | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| "PhpModuleDummy3::__invoke"                                            | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| "PhpModuleDummy3::__call"                                              | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| "PhpModuleDummy3::__callStatic"                                        | TRUE          | TRUE         | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "PhpModuleDummy3", "publicMethod" ]                                  | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "PhpModuleDummy3", "protectedMethod" ]                               | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "PhpModuleDummy3", "privateMethod" ]                                 | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "PhpModuleDummy3", "publicStaticMethod" ]                            | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "PhpModuleDummy3", "protectedStaticMethod" ]                         | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "PhpModuleDummy3", "privateStaticMethod" ]                           | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "PhpModuleDummy3", "__invoke" ]                                      | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "PhpModuleDummy3", "__call" ]                                        | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "PhpModuleDummy3", "__callStatic" ]                                  | TRUE          | TRUE         | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "{ object # PhpModuleDummy3 }", "publicMethod" ]                     | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "{ object # PhpModuleDummy3 }", "protectedMethod" ]                  | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "{ object # PhpModuleDummy3 }", "privateMethod" ]                    | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "{ object # PhpModuleDummy3 }", "publicStaticMethod" ]               | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "{ object # PhpModuleDummy3 }", "protectedStaticMethod" ]            | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "{ object # PhpModuleDummy3 }", "privateStaticMethod" ]              | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "{ object # PhpModuleDummy3 }", "__invoke" ]                         | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "{ object # PhpModuleDummy3 }", "__call" ]                           | FALSE         | FALSE        | TRUE                               | TRUE                                | TRUE                             | TRUE                              | TRUE                              | TRUE                               |
+| [ "{ object # PhpModuleDummy3 }", "__callStatic" ]                     | TRUE          | TRUE         | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| "PhpModuleDummy4::publicMethod"                                        | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy4::protectedMethod"                                     | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy4::privateMethod"                                       | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy4::publicStaticMethod"                                  | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy4::protectedStaticMethod"                               | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy4::privateStaticMethod"                                 | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy4::__invoke"                                            | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy4::__call"                                              | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| "PhpModuleDummy4::__callStatic"                                        | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy4", "publicMethod" ]                                  | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy4", "protectedMethod" ]                               | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy4", "privateMethod" ]                                 | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy4", "publicStaticMethod" ]                            | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy4", "protectedStaticMethod" ]                         | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy4", "privateStaticMethod" ]                           | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy4", "__invoke" ]                                      | TRUE          | TRUE         | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy4", "__call" ]                                        | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "PhpModuleDummy4", "__callStatic" ]                                  | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "{ object(invokable) # PhpModuleDummy4 }", "publicMethod" ]          | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "{ object(invokable) # PhpModuleDummy4 }", "protectedMethod" ]       | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "{ object(invokable) # PhpModuleDummy4 }", "privateMethod" ]         | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "{ object(invokable) # PhpModuleDummy4 }", "publicStaticMethod" ]    | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "{ object(invokable) # PhpModuleDummy4 }", "protectedStaticMethod" ] | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "{ object(invokable) # PhpModuleDummy4 }", "privateStaticMethod" ]   | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "{ object(invokable) # PhpModuleDummy4 }", "__invoke" ]              | TRUE          | TRUE         | TRUE                               | FALSE                               | TRUE                             | FALSE                             | TRUE                              | FALSE                              |
+| [ "{ object(invokable) # PhpModuleDummy4 }", "__call" ]                | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
+| [ "{ object(invokable) # PhpModuleDummy4 }", "__callStatic" ]          | FALSE         | FALSE        | FALSE                              | FALSE                               | FALSE                            | FALSE                             | FALSE                             | FALSE                              |
++------------------------------------------------------------------------+---------------+--------------+------------------------------------+-------------------------------------+----------------------------------+-----------------------------------+-----------------------------------+------------------------------------+
 ');
 
 
 // >>> TEST
 // > тесты RandomModule
 $fn = function () {
-    _dump('[ RandomModule ]');
+    _print('[ RandomModule ]');
     echo PHP_EOL;
 
     $rand = \Gzhegow\Lib\Lib::random()->random_bytes(16);
-    _dump($len = strlen($rand), $len === 16);
+    _print($len = strlen($rand), $len === 16);
 
     $rand = \Gzhegow\Lib\Lib::random()->random_hex(16);
-    _dump($len = strlen($rand), $len === 32);
+    _print($len = strlen($rand), $len === 32);
 
     $rand = \Gzhegow\Lib\Lib::random()->random_int(1, 100);
-    _dump(1 <= $rand, $rand <= 100);
+    _print(1 <= $rand, $rand <= 100);
 
     $rand = \Gzhegow\Lib\Lib::random()->random_string(16);
-    _dump(mb_strlen($rand) === 16);
+    _print(mb_strlen($rand) === 16);
 
     $rand = \Gzhegow\Lib\Lib::random()->random_base64_urlsafe(16);
     $test = \Gzhegow\Lib\Lib::parse()
@@ -1642,7 +1972,7 @@ $fn = function () {
             \Gzhegow\Lib\Modules\CryptModule::ALPHABET_BASE_64_RFC4648_URLSAFE
         )
     ;
-    _dump(null !== $test);
+    _print(null !== $test);
 
     $rand = \Gzhegow\Lib\Lib::random()->random_base64(16);
     $test = \Gzhegow\Lib\Lib::parse()
@@ -1651,7 +1981,7 @@ $fn = function () {
             \Gzhegow\Lib\Modules\CryptModule::ALPHABET_BASE_64_RFC4648
         )
     ;
-    _dump(null !== $test);
+    _print(null !== $test);
 
     $rand = \Gzhegow\Lib\Lib::random()->random_base62(16);
     $test = \Gzhegow\Lib\Lib::parse()
@@ -1660,7 +1990,7 @@ $fn = function () {
             \Gzhegow\Lib\Modules\CryptModule::ALPHABET_BASE_62
         )
     ;
-    _dump(null !== $test);
+    _print(null !== $test);
 
     $rand = \Gzhegow\Lib\Lib::random()->random_base58(16);
     $test = \Gzhegow\Lib\Lib::parse()
@@ -1669,7 +1999,7 @@ $fn = function () {
             \Gzhegow\Lib\Modules\CryptModule::ALPHABET_BASE_58
         )
     ;
-    _dump(null !== $test);
+    _print(null !== $test);
 
     $rand = \Gzhegow\Lib\Lib::random()->random_base36(16);
     $test = \Gzhegow\Lib\Lib::parse()
@@ -1678,7 +2008,7 @@ $fn = function () {
             \Gzhegow\Lib\Modules\CryptModule::ALPHABET_BASE_36
         )
     ;
-    _dump(null !== $test);
+    _print(null !== $test);
 };
 _assert_stdout($fn, [], '
 "[ RandomModule ]"
@@ -1698,84 +2028,87 @@ TRUE
 // >>> TEST
 // > тесты StrModule
 $fn = function () {
-    _dump('[ StrModule ]');
+    _print('[ StrModule ]');
     echo PHP_EOL;
 
-    _dump(\Gzhegow\Lib\Lib::str()->lines("hello\nworld"));
+    _print(\Gzhegow\Lib\Lib::str()->lines("hello\nworld"));
+    _print(\Gzhegow\Lib\Lib::str()->eol("hello\nworld"));
+    _print(\Gzhegow\Lib\Lib::str()->lines('hello' . PHP_EOL . 'world'));
+    _print(\Gzhegow\Lib\Lib::str()->eol('hello' . PHP_EOL . 'world'));
     echo PHP_EOL;
 
-    _dump(\Gzhegow\Lib\Lib::str()->eol('hello' . PHP_EOL . 'world'));
+    _print(\Gzhegow\Lib\Lib::str()->strlen('Привет'));
+    _print(\Gzhegow\Lib\Lib::str()->strlen('Hello'));
+    _print(\Gzhegow\Lib\Lib::str()->strsize('Привет'));
+    _print(\Gzhegow\Lib\Lib::str()->strsize('Hello'));
     echo PHP_EOL;
 
-    _dump(\Gzhegow\Lib\Lib::str()->strlen('Привет'));
-    _dump(\Gzhegow\Lib\Lib::str()->strlen('Hello'));
-    _dump(\Gzhegow\Lib\Lib::str()->strsize('Привет'));
-    _dump(\Gzhegow\Lib\Lib::str()->strsize('Hello'));
+    _print(\Gzhegow\Lib\Lib::str()->lower('ПРИВЕТ'));
+    _print(\Gzhegow\Lib\Lib::str()->upper('привет'));
+    _print(\Gzhegow\Lib\Lib::str()->lcfirst('ПРИВЕТ'));
+    _print(\Gzhegow\Lib\Lib::str()->ucfirst('привет'));
+    _print(\Gzhegow\Lib\Lib::str()->lcwords('ПРИВЕТ МИР'));
+    _print(\Gzhegow\Lib\Lib::str()->ucwords('привет мир'));
+
+    _print(\Gzhegow\Lib\Lib::str()->starts('привет', 'при'));
+    _print(\Gzhegow\Lib\Lib::str()->ends('привет', 'вет'));
+    _print(\Gzhegow\Lib\Lib::str()->contains('привет', 'ив'));
     echo PHP_EOL;
 
-    _dump(\Gzhegow\Lib\Lib::str()->lower('ПРИВЕТ'));
-    _dump(\Gzhegow\Lib\Lib::str()->upper('привет'));
-    _dump(\Gzhegow\Lib\Lib::str()->lcfirst('ПРИВЕТ'));
-    _dump(\Gzhegow\Lib\Lib::str()->ucfirst('привет'));
-    _dump(\Gzhegow\Lib\Lib::str()->lcwords('ПРИВЕТ МИР'));
-    _dump(\Gzhegow\Lib\Lib::str()->ucwords('привет мир'));
-
-    _dump(\Gzhegow\Lib\Lib::str()->starts('привет', 'при'));
-    _dump(\Gzhegow\Lib\Lib::str()->ends('привет', 'вет'));
-    _dump(\Gzhegow\Lib\Lib::str()->contains('привет', 'ив'));
+    _print(\Gzhegow\Lib\Lib::str()->lcrop('азаза_привет_азаза', 'аза'));
+    _print(\Gzhegow\Lib\Lib::str()->rcrop('азаза_привет_азаза', 'аза'));
+    _print(\Gzhegow\Lib\Lib::str()->crop('азаза_привет_азаза', 'аза'));
+    _print(\Gzhegow\Lib\Lib::str()->unlcrop('"привет"', '"'));
+    _print(\Gzhegow\Lib\Lib::str()->unrcrop('"привет"', '"'));
+    _print(\Gzhegow\Lib\Lib::str()->uncrop('"привет"', '"'));
     echo PHP_EOL;
 
-    _dump(\Gzhegow\Lib\Lib::str()->lcrop('азаза_привет_азаза', 'аза'));
-    _dump(\Gzhegow\Lib\Lib::str()->rcrop('азаза_привет_азаза', 'аза'));
-    _dump(\Gzhegow\Lib\Lib::str()->crop('азаза_привет_азаза', 'аза'));
-    _dump(\Gzhegow\Lib\Lib::str()->unlcrop('"привет"', '"'));
-    _dump(\Gzhegow\Lib\Lib::str()->unrcrop('"привет"', '"'));
-    _dump(\Gzhegow\Lib\Lib::str()->uncrop('"привет"', '"'));
+    _print(\Gzhegow\Lib\Lib::str()->replace_limit('за', '_', 'азазазазазаза', 3));
     echo PHP_EOL;
 
-    _dump(\Gzhegow\Lib\Lib::str()->replace_limit('за', '_', 'азазазазазаза', 3));
+    _print(\Gzhegow\Lib\Lib::str()->camel('-hello-world-foo-bar'));
+    _print(\Gzhegow\Lib\Lib::str()->camel('-helloWorldFooBar'));
+    _print(\Gzhegow\Lib\Lib::str()->camel('-HelloWorldFooBar'));
+    _print(\Gzhegow\Lib\Lib::str()->pascal('-hello-world-foo-bar'));
+    _print(\Gzhegow\Lib\Lib::str()->pascal('-helloWorldFooBar'));
+    _print(\Gzhegow\Lib\Lib::str()->pascal('-HelloWorldFooBar'));
+    _print(\Gzhegow\Lib\Lib::str()->space('_Hello_WORLD_Foo_BAR'));
+    _print(\Gzhegow\Lib\Lib::str()->snake('-Hello-WORLD-Foo-BAR'));
+    _print(\Gzhegow\Lib\Lib::str()->kebab(' Hello WORLD Foo BAR'));
+    _print(\Gzhegow\Lib\Lib::str()->space_lower('_Hello_WORLD_Foo_BAR'));
+    _print(\Gzhegow\Lib\Lib::str()->snake_lower('-Hello-WORLD-Foo-BAR'));
+    _print(\Gzhegow\Lib\Lib::str()->kebab_lower(' Hello WORLD Foo BAR'));
+    _print(\Gzhegow\Lib\Lib::str()->space_upper('_Hello_WORLD_Foo_BAR'));
+    _print(\Gzhegow\Lib\Lib::str()->snake_upper('-Hello-WORLD-Foo-BAR'));
+    _print(\Gzhegow\Lib\Lib::str()->kebab_upper(' Hello WORLD Foo BAR'));
     echo PHP_EOL;
 
-    _dump(\Gzhegow\Lib\Lib::str()->camel('-hello-world-foo-bar'));
-    _dump(\Gzhegow\Lib\Lib::str()->camel('-helloWorldFooBar'));
-    _dump(\Gzhegow\Lib\Lib::str()->camel('-HelloWorldFooBar'));
-    _dump(\Gzhegow\Lib\Lib::str()->pascal('-hello-world-foo-bar'));
-    _dump(\Gzhegow\Lib\Lib::str()->pascal('-helloWorldFooBar'));
-    _dump(\Gzhegow\Lib\Lib::str()->pascal('-HelloWorldFooBar'));
-    _dump(\Gzhegow\Lib\Lib::str()->space('_Hello_WORLD_Foo_BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->snake('-Hello-WORLD-Foo-BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->kebab(' Hello WORLD Foo BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->space_lower('_Hello_WORLD_Foo_BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->snake_lower('-Hello-WORLD-Foo-BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->kebab_lower(' Hello WORLD Foo BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->space_upper('_Hello_WORLD_Foo_BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->snake_upper('-Hello-WORLD-Foo-BAR'));
-    _dump(\Gzhegow\Lib\Lib::str()->kebab_upper(' Hello WORLD Foo BAR'));
+    _print(\Gzhegow\Lib\Lib::str()->prefix('primary'));
+    _print(\Gzhegow\Lib\Lib::str()->prefix('unique'));
+    _print(\Gzhegow\Lib\Lib::str()->prefix('index'));
+    _print(\Gzhegow\Lib\Lib::str()->prefix('fulltext'));
+    _print(\Gzhegow\Lib\Lib::str()->prefix('fullText'));
+    _print(\Gzhegow\Lib\Lib::str()->prefix('spatialIndex'));
     echo PHP_EOL;
 
-    _dump(\Gzhegow\Lib\Lib::str()->prefix('primary'));
-    _dump(\Gzhegow\Lib\Lib::str()->prefix('unique'));
-    _dump(\Gzhegow\Lib\Lib::str()->prefix('index'));
-    _dump(\Gzhegow\Lib\Lib::str()->prefix('fulltext'));
-    _dump(\Gzhegow\Lib\Lib::str()->prefix('fullText'));
-    _dump(\Gzhegow\Lib\Lib::str()->prefix('spatialIndex'));
+    _print(\Gzhegow\Lib\Lib::str()->inflector()->singularize('users'));
+    _print(\Gzhegow\Lib\Lib::str()->inflector()->pluralize('user'));
     echo PHP_EOL;
 
-    _dump(\Gzhegow\Lib\Lib::str()->inflector()->singularize('users'));
-    _dump(\Gzhegow\Lib\Lib::str()->inflector()->pluralize('user'));
+    _print(\Gzhegow\Lib\Lib::str()->interpolator()->interpolate('привет {{username}}', [ 'username' => 'медвед' ]));
     echo PHP_EOL;
 
-    _dump(\Gzhegow\Lib\Lib::str()->interpolator()->interpolate('привет {{username}}', [ 'username' => 'медвед' ]));
-    echo PHP_EOL;
-
-    _dump(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир'));
+    _print(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир'));
 };
 _assert_stdout($fn, [], '
 "[ StrModule ]"
 
 [ "hello", "world" ]
-
-"hello\n world"
+"hello\n
+world"
+[ "hello", "world" ]
+"hello\n
+world"
 
 6
 5

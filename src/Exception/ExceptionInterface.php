@@ -2,6 +2,6 @@
 
 namespace Gzhegow\Lib\Exception;
 
-interface ExceptionInterface
+interface ExceptionInterface extends \Throwable
 {
 }
