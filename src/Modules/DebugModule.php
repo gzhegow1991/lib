@@ -261,16 +261,21 @@ class DebugModule
         return $content;
     }
 
+    /**
+     * @noinspection PhpFullyQualifiedNameUsageInspection
+     * @noinspection PhpUndefinedClassInspection
+     * @noinspection PhpUndefinedNamespaceInspection
+     */
     public function dumper_symfony(...$vars) : string
     {
         if (! class_exists('\Symfony\Component\VarDumper\VarDumper')) {
             throw new RuntimeException(
-                'Please install dumper using console: `composer require symfony/var-dumper`'
+                'Please run: `composer require symfony/var-dumper`'
             );
         }
 
         $cloner = new \Symfony\Component\VarDumper\Cloner\VarCloner();
-        $dumper = \in_array(\PHP_SAPI, [ 'cli', 'phpdbg' ])
+        $dumper = in_array(\PHP_SAPI, [ 'cli', 'phpdbg' ])
             ? new \Symfony\Component\VarDumper\Dumper\CliDumper()
             : new \Symfony\Component\VarDumper\Dumper\HtmlDumper();
 

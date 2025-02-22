@@ -40,80 +40,32 @@ class StrModule
     {
         $mbMode = extension_loaded('mbstring');
 
-        $this->inflector = new Inflector();
-        $this->interpolator = new Interpolator();
-        $this->slugger = new Slugger();
-
         $this->mbMode = $mbMode;
     }
 
 
-    public function inflector_static(InflectorInterface $inflector = null) : InflectorInterface
+    public function inflector(InflectorInterface $inflector = null) : InflectorInterface
     {
-        if (null !== $inflector) {
-            $last = $this->inflector;
-
-            $current = $inflector;
-
-            $this->inflector = $current;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->inflector;
-
-        return $result;
+        return $this->inflector = null
+            ?? $inflector
+            ?? $this->inflector
+            ?? new Inflector();
     }
 
-    public function inflector() : InflectorInterface
+    public function interpolator(InterpolatorInterface $interpolator = null) : InterpolatorInterface
     {
-        return $this->inflector_static();
+        return $this->interpolator = null
+            ?? $interpolator
+            ?? $this->interpolator
+            ?? new Interpolator();
     }
 
-
-    public function interpolator_static(InterpolatorInterface $interpolator = null) : InterpolatorInterface
+    public function slugger(SluggerInterface $slugger = null) : SluggerInterface
     {
-        if (null !== $interpolator) {
-            $last = $this->interpolator;
-
-            $current = $interpolator;
-
-            $this->interpolator = $current;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->interpolator;
-
-        return $result;
-    }
-
-    public function interpolator() : InterpolatorInterface
-    {
-        return $this->interpolator_static();
-    }
-
-
-    public function slugger_static(SluggerInterface $slugger = null) : SluggerInterface
-    {
-        if (null !== $slugger) {
-            $last = $this->slugger;
-
-            $current = $slugger;
-
-            $this->slugger = $current;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->slugger;
-
-        return $result;
-    }
-
-    public function slugger() : SluggerInterface
-    {
-        return $this->slugger_static();
+        return $this->slugger = null
+            ?? $slugger
+            ?? $this->slugger
+            ?? new Slugger();
     }
 
 
@@ -1154,6 +1106,65 @@ class StrModule
         $result = $string;
         $result = $this->kebab($result);
         $result = $this->upper($result);
+
+        return $result;
+    }
+
+
+    /**
+     * > 'привет мир' -> 'nPuBeT Mup'
+     */
+    public function ascii_ru(string $string) : string
+    {
+        $theMb = Lib::mb();
+
+        $dictionary = [
+            'а' => 'a',
+            'б' => '6',
+            'в' => 'B',
+            'г' => 'r',
+            'д' => 'g',
+            'е' => 'e',
+            'ж' => '}|{',
+            'з' => '3',
+            'и' => 'u',
+            'й' => 'u',
+            'к' => 'K',
+            'л' => 'JI',
+            'м' => 'M',
+            'н' => 'H',
+            'о' => 'o',
+            'п' => 'n',
+            'р' => 'p',
+            'с' => 'c',
+            'т' => 'T',
+            'у' => 'y',
+            'ф' => '(|)',
+            'х' => 'x',
+            'ц' => 'll,',
+            'ч' => '4',
+            'ш' => 'lll',
+            'щ' => 'lll,',
+            'ъ' => '\'b',
+            'ы' => 'bI',
+            'ь' => 'b',
+            'э' => 'e',
+            'ю' => 'I0',
+            'я' => '9I',
+            'ё' => 'e',
+        ];
+
+        $result = mb_strtolower($string);
+
+        $result = preg_replace('/[^а-яё0-9 ]+/u', ' ', $result);
+
+        $result = str_replace(
+            array_keys($dictionary),
+            array_values($dictionary),
+            $result
+        );
+
+        $result = trim($result, ' ');
 
         return $result;
     }

@@ -10,7 +10,7 @@ class CliModule
 {
     public function __construct()
     {
-        if (PHP_SAPI !== 'cli') {
+        if (in_array(\PHP_SAPI, [ 'cli', 'phpdbg' ])) {
             throw new RuntimeException('Module must be created in CLI mode');
         }
     }

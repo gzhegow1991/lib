@@ -2078,14 +2078,19 @@ $fn = function () {
     _print(\Gzhegow\Lib\Lib::str()->prefix('spatialIndex'));
     echo PHP_EOL;
 
+    _print(\Gzhegow\Lib\Lib::str()->ascii_ru('привет мир'));
+    echo PHP_EOL;
+
+    _print(\Gzhegow\Lib\Lib::str()->interpolator()->interpolate('привет {{username}}', [ 'username' => 'мир' ]));
+    echo PHP_EOL;
+
+    _print(\Gzhegow\Lib\Lib::str()->slugger()->translit(' привет мир '));
+    _print(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир'));
+    echo PHP_EOL;
+
     _print(\Gzhegow\Lib\Lib::str()->inflector()->singularize('users'));
     _print(\Gzhegow\Lib\Lib::str()->inflector()->pluralize('user'));
     echo PHP_EOL;
-
-    _print(\Gzhegow\Lib\Lib::str()->interpolator()->interpolate('привет {{username}}', [ 'username' => 'медвед' ]));
-    echo PHP_EOL;
-
-    _print(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир'));
 };
 _assert_stdout($fn, [], '
 "[ StrModule ]"
@@ -2144,10 +2149,13 @@ world"
 "ful"
 "spa"
 
+"npuBeT Mup"
+
+"привет мир"
+
+" privet mir "
+"privet-mir"
+
 [ "user" ]
 [ "users" ]
-
-"привет медвед"
-
-"privet-mir"
 ');
