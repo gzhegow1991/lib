@@ -19,7 +19,8 @@ class FsModule
 
 
     /**
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
     public function type_path(
         &$result,
@@ -30,6 +31,12 @@ class FsModule
 
         $withPathInfo = array_key_exists(0, $refs);
 
+        $refPathInfo = null;
+        if ($withPathInfo) {
+            $refPathInfo =& $refs[ 0 ];
+            $refPathInfo = null;
+        }
+
         if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
         }
@@ -39,25 +46,25 @@ class FsModule
         }
 
         if ($withPathInfo) {
-            $ref =& $refs[ 0 ];
-
             try {
-                $ref = pathinfo($_value);
+                $refPathInfo = pathinfo($_value);
+                unset($refPathInfo);
             }
             catch ( \Throwable $e ) {
                 return false;
             }
-
-            unset($ref);
         }
 
         $result = $_value;
+
+        unset($refPathInfo);
 
         return $_value;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
     public function type_dirpath(
         &$result,
@@ -96,7 +103,8 @@ class FsModule
     }
 
     /**
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
     public function type_filepath(
         &$result,
@@ -134,7 +142,8 @@ class FsModule
 
 
     /**
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
     public function type_path_realpath(
         &$result,
@@ -162,7 +171,8 @@ class FsModule
     }
 
     /**
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
     public function type_dirpath_realpath(
         &$result,
@@ -198,7 +208,8 @@ class FsModule
     }
 
     /**
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
     public function type_filepath_realpath(
         &$result,

@@ -403,7 +403,7 @@ class DebugModule
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $this->dump($trace, $var, ...$vars);
+        $this->dump($trace, $options, $var, ...$vars);
 
         return $var;
     }
@@ -412,7 +412,7 @@ class DebugModule
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $this->dump($trace, $var, ...$vars);
+        $this->dump($trace, $options, $var, ...$vars);
 
         die();
     }
@@ -427,7 +427,7 @@ class DebugModule
 
         $current = $current ?? $limit;
 
-        $this->dump($trace, $var, ...$vars);
+        $this->dump($trace, $options, $var, ...$vars);
 
         if (0 === --$current) {
             die();
@@ -1397,6 +1397,9 @@ class DebugModule
     }
 
 
+    /**
+     * @param array{ 0: string[]|null } $refs
+     */
     public function diff(
         string $new, string $old,
         array $refs = []
@@ -1405,7 +1408,12 @@ class DebugModule
         $theStr = Lib::str();
 
         $withResultLines = array_key_exists(0, $refs);
-        $withResultString = array_key_exists(1, $refs);
+
+        $refResultLines = null;
+        if ($withResultLines) {
+            $refResultLines =& $refs[ 0 ];
+            $refResultLines = null;
+        }
 
         $oldLines = $theStr->lines($old);
         $newLines = $theStr->lines($new);
@@ -1512,17 +1520,20 @@ class DebugModule
         }
 
         if ($withResultLines) {
-            $ref =& $refs[ 0 ];
-            $ref = $diffLines;
-            unset($ref);
+            $refResultLines = $diffLines;
         }
+
+        unset($refResultLines);
 
         return $isDiff;
     }
 
+    /**
+     * @param array{ 0: string[]|null } $refs
+     */
     public function diff_vars(
         $new = null, $old = null,
-        array $refs = null
+        array $refs = []
     ) : bool
     {
         ob_start();

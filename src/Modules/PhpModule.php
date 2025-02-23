@@ -4,6 +4,7 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
@@ -309,11 +310,12 @@ class PhpModule
      * > метод не всегда возвращает callable, поскольку строка 'class->method' не является callable
      * > используйте type_callable_string, если собираетесь вызывать метод
      *
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
-    public function type_method_string(&$result, $value) : bool
+    public function type_method_string(&$result, $value, array $refs = []) : bool
     {
-        return $this->callable_parser()->typeMethodString($result, $value);
+        return $this->callable_parser()->typeMethodString($result, $value, $refs);
     }
 
 
@@ -414,19 +416,6 @@ class PhpModule
     public function type_callable_string_method_static(&$result, $value, $newScope = 'static') : bool
     {
         return $this->callable_parser()->typeCallableStringMethodStatic($result, $value, $newScope);
-    }
-
-
-    /**
-     * > is_callable является контекстно-зависимой функцией
-     * > будучи вызванной снаружи класса она не покажет методы protected/private
-     * > используя $newScope можно это обойти
-     *
-     * @param string|object $newScope
-     */
-    public function is_callable($value, $newScope = 'static') : bool
-    {
-        return $this->callable_parser()->isCallable($value, $newScope);
     }
 
 
@@ -736,6 +725,45 @@ class PhpModule
 
 
     /**
+     * > is_callable является контекстно-зависимой функцией
+     * > будучи вызванной снаружи класса она не покажет методы protected/private
+     * > если её вызвать в обертке с указанием $newScope - это сработает
+     *
+     * @param string|object $newScope
+     */
+    public function is_callable($value, $newScope = 'static') : bool
+    {
+        $result = null;
+
+        if ('static' === $newScope) {
+            // > if you need `static` scope you may call the existing php function
+            throw new RuntimeException(
+                'You should pass constant __CLASS__ to second argument to keep scope `static`'
+            );
+        }
+
+        $fnIsCallable = null;
+        if (null !== $newScope) {
+            $fnIsCallable = (static function ($callable) {
+                return is_callable($callable);
+            })->bindTo(null, $newScope);
+        }
+
+        $status = $fnIsCallable
+            ? $fnIsCallable($value)
+            : is_callable($value);
+
+        if ($status) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
      * > функция get_class_vars() возвращает только публичные (и статические публичные) свойства для $object_or_class
      * > чтобы получить доступ ко всем свойствам, её нужно вызвать в обертке
      *
@@ -743,16 +771,18 @@ class PhpModule
      */
     public function get_class_vars($object_or_class, $newScope = 'static') : array
     {
-        $fnGetClassVars = null;
-        if ('static' !== $newScope) {
-            $_newScope = null
-                ?? $newScope
-                ?? new class {
-                };
+        if ('static' === $newScope) {
+            // > if you need `static` scope you may call the existing php function
+            throw new RuntimeException(
+                'You should pass constant __CLASS__ to second argument to keep scope `static`'
+            );
+        }
 
+        $fnGetClassVars = null;
+        if (null !== $newScope) {
             $fnGetClassVars = (static function ($class) {
                 return get_class_vars($class);
-            })->bindTo(null, $_newScope);
+            })->bindTo(null, $newScope);
         }
 
         $class = is_object($object_or_class)
@@ -774,16 +804,18 @@ class PhpModule
      */
     public function get_class_methods($object_or_class, $newScope = 'static') : array
     {
-        $fnGetClassMethods = null;
-        if ('static' !== $newScope) {
-            $_newScope = null
-                ?? $newScope
-                ?? new class {
-                };
+        if ('static' === $newScope) {
+            // > if you need `static` scope you may call the existing php function
+            throw new RuntimeException(
+                'You should pass constant __CLASS__ to second argument to keep scope `static`'
+            );
+        }
 
+        $fnGetClassMethods = null;
+        if (null !== $newScope) {
             $fnGetClassMethods = (static function ($object_or_class) {
                 return get_class_methods($object_or_class);
-            })->bindTo(null, $_newScope);
+            })->bindTo(null, $newScope);
         }
 
         $vars = $fnGetClassMethods
@@ -801,16 +833,18 @@ class PhpModule
      */
     public function get_object_vars(object $object, $newScope = 'static') : array
     {
-        $fnGetObjectVars = null;
-        if ('static' !== $newScope) {
-            $_newScope = null
-                ?? $newScope
-                ?? new class {
-                };
+        if ('static' === $newScope) {
+            // > if you need `static` scope you may call the existing php function
+            throw new RuntimeException(
+                'You should pass constant __CLASS__ to second argument to keep scope `static`'
+            );
+        }
 
+        $fnGetObjectVars = null;
+        if (null !== $newScope) {
             $fnGetObjectVars = (static function ($object) {
                 return get_object_vars($object);
-            })->bindTo(null, $_newScope);
+            })->bindTo(null, $newScope);
         }
 
         $vars = $fnGetObjectVars

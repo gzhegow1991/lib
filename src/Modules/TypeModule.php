@@ -1480,11 +1480,12 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
-    public function method_string(&$result, $value) : bool
+    public function method_string(&$result, $value, array $refs = []) : bool
     {
-        return Lib::php()->type_method_string($result, $value);
+        return Lib::php()->type_method_string($result, $value, $refs);
     }
 
 
@@ -1586,7 +1587,8 @@ class TypeModule extends TypeModuleBase
 
 
     /**
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
     public function path(
         &$result,
@@ -1597,7 +1599,8 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
     public function dirpath(
         &$result,
@@ -1620,7 +1623,8 @@ class TypeModule extends TypeModuleBase
 
 
     /**
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
     public function path_realpath(
         &$result,
@@ -1631,7 +1635,8 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
     public function dirpath_realpath(
         &$result,
@@ -1642,7 +1647,8 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param string|null $result
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
      */
     public function filepath_realpath(
         &$result,

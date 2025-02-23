@@ -1037,11 +1037,13 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return string|null
 	 */
-	public function method_string($value)
+	public function method_string($value, array $refs = [])
 	{
-		if (Lib::type()->method_string($result, $value)) {
+		if (Lib::type()->method_string($result, $value, $refs)) {
 		    return $result;
 		}
 
@@ -1203,6 +1205,8 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return string|null
 	 */
 	public function path($value, array $refs = [])
@@ -1216,6 +1220,8 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return string|null
 	 */
 	public function dirpath($value, array $refs = [])
@@ -1242,6 +1248,8 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return string|null
 	 */
 	public function path_realpath($value, array $refs = [])
@@ -1255,6 +1263,8 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return string|null
 	 */
 	public function dirpath_realpath($value, array $refs = [])
@@ -1268,6 +1278,8 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return string|null
 	 */
 	public function filepath_realpath($value, array $refs = [])

@@ -883,11 +883,13 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return static
 	 */
-	public function method_string($value)
+	public function method_string($value, array $refs = [])
 	{
-		$this->status = Lib::type()->method_string($this->result, $value);
+		$this->status = Lib::type()->method_string($this->result, $value, $refs);
 
 		return $this;
 	}
@@ -1025,6 +1027,8 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return static
 	 */
 	public function path($value, array $refs = [])
@@ -1036,6 +1040,8 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return static
 	 */
 	public function dirpath($value, array $refs = [])
@@ -1058,6 +1064,8 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return static
 	 */
 	public function path_realpath($value, array $refs = [])
@@ -1069,6 +1077,8 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return static
 	 */
 	public function dirpath_realpath($value, array $refs = [])
@@ -1080,6 +1090,8 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return static
 	 */
 	public function filepath_realpath($value, array $refs = [])
