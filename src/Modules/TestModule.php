@@ -49,51 +49,196 @@ class TestModule
     /**
      * @param callable $fn
      */
-    public function assertReturn(
+    public function assert(
         ?array $trace,
         $fn, array $fnArgs = [],
-        $expectedReturn = null,
-        string &$result = null
+        string $expectedStdout = null,
+        float $expectedSecondsMax = null, float $expectedSecondsMin = null,
+        array $expectedReturn = [],
+        array $refs = []
     ) : bool
     {
+        $withStdout = array_key_exists(0, $refs);
+        $withSeconds = array_key_exists(1, $refs);
+        $withReturn = array_key_exists(2, $refs);
+
+        $refStdout = null;
+        $refSeconds = null;
+        $refReturn = null;
+        if ($withStdout) {
+            $refStdout =& $refs[ 0 ];
+            $refStdout = null;
+        }
+        if ($withSeconds) {
+            $refSeconds =& $refs[ 1 ];
+            $refSeconds = null;
+        }
+        if ($withReturn) {
+            $refReturn =& $refs[ 2 ];
+            $refReturn = null;
+        }
+
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
         $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
 
-        $var = call_user_func_array($fn, $fnArgs);
+        $mt = microtime(true);
 
-        $result = $var;
+        ob_start();
+        $currentReturn = call_user_func_array($fn, $fnArgs);
+        $currentStdout = ob_get_clean();
 
-        $stdout = $this->stdout_resource_static();
+        $currentSeconds = round(microtime(true) - $mt, 6);
 
-        if ($result !== $expectedReturn) {
+        $refStdout = $currentStdout;
+        $refSeconds = $currentSeconds;
+        $refReturn = $currentReturn;
+
+        $resourceStdout = $this->stdout_resource_static();
+
+        $eArray = [];
+
+        if (null !== $expectedStdout) {
+            $isStdoutDiff = Lib::debug()->diff(
+                trim($currentStdout),
+                trim($expectedStdout),
+                [ &$diffLines ]
+            );
+
+            if ($isStdoutDiff) {
+                $message = '[ ERROR ] Test ' . __METHOD__ . '() `expectedStdout` failed.';
+
+                $diffString = implode(PHP_EOL, $diffLines);
+
+                if (null !== $resourceStdout) {
+                    fwrite($resourceStdout, '------' . PHP_EOL);
+                    fwrite($resourceStdout, $message . PHP_EOL);
+                    fwrite($resourceStdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                    fwrite($resourceStdout, $diffString . PHP_EOL);
+                    fwrite($resourceStdout, '------' . PHP_EOL);
+                }
+
+                $e = new RuntimeException([ $message, $diffString ]);
+                $e->trace = $trace;
+                $e->file = $traceFile;
+                $e->line = $traceLine;
+
+                $eArray[] = $e;
+            }
+        }
+
+        if (false
+            || (null !== $expectedSecondsMax)
+            || (null !== $expectedSecondsMin)
+        ) {
+            $isError = false;
+            $messageMax = null;
+            $messageMin = null;
+            $messageCaseMax = null;
+            $messageCaseMin = null;
+            if (null !== $expectedSecondsMax) {
+                if ($currentSeconds > $expectedSecondsMax) {
+                    $messageMax = '[ ERROR ] Test ' . __METHOD__ . '() `expectedSecondsMax` failed.';
+                    $messageCaseMax = ''
+                        . 'Case: '
+                        . sprintf('%.6f', $currentSeconds)
+                        . ' > '
+                        . sprintf('%.6f', $expectedSecondsMax);
+
+                    $isError = true;
+                }
+            }
+            if (null !== $expectedSecondsMin) {
+                if ($currentSeconds < $expectedSecondsMin) {
+                    $messageMin = '[ ERROR ] Test ' . __METHOD__ . '() `expectedSecondsMin` failed.';
+                    $messageCaseMin = ''
+                        . 'Case: '
+                        . sprintf('%.6f', $currentSeconds)
+                        . ' < '
+                        . sprintf('%.6f', $expectedSecondsMin);
+
+                    $isError = true;
+                }
+            }
+            if ($isError) {
+                $message = [
+                    $messageMax,
+                    $messageCaseMax,
+                    $messageMin,
+                    $messageCaseMin,
+                ];
+
+                if (null !== $resourceStdout) {
+                    fwrite($resourceStdout, '------' . PHP_EOL);
+                    if (null !== $messageMax) {
+                        fwrite($resourceStdout, $messageMax . PHP_EOL);
+                    }
+                    if (null !== $messageMin) {
+                        fwrite($resourceStdout, $messageMin . PHP_EOL);
+                    }
+                    fwrite($resourceStdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                    if (null !== $messageCaseMax) {
+                        fwrite($resourceStdout, $messageCaseMax . PHP_EOL);
+                    }
+                    if (null !== $messageCaseMin) {
+                        fwrite($resourceStdout, $messageCaseMin . PHP_EOL);
+                    }
+                    fwrite($resourceStdout, '------' . PHP_EOL);
+                }
+
+                $e = new RuntimeException(implode(' | ', array_filter($message)));
+                $e->trace = $trace;
+                $e->file = $traceFile;
+                $e->line = $traceLine;
+
+                $eArray[] = $e;
+            }
+        }
+
+        if (count($expectedReturn)) {
+            $expectedReturn = $expectedReturn[ 0 ] ?? null;
+
+            if ($currentReturn !== $expectedReturn) {
+                $message = '[ ERROR ] Test ' . __METHOD__ . '() `expectedReturn` failed.';
+
+                $isReturnDiff = Lib::debug()->diff_vars($currentReturn, $expectedReturn, [ &$diffLines ]);
+
+                $diffString = implode(PHP_EOL, $diffLines);
+
+                if (null !== $resourceStdout) {
+                    fwrite($resourceStdout, '------' . PHP_EOL);
+                    fwrite($resourceStdout, $message . PHP_EOL);
+                    fwrite($resourceStdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                    fwrite($resourceStdout, $diffString . PHP_EOL);
+                    fwrite($resourceStdout, '------' . PHP_EOL);
+                }
+
+                $e = new RuntimeException([ $message, $diffString ]);
+                $e->trace = $trace;
+                $e->file = $traceFile;
+                $e->line = $traceLine;
+
+                $eArray[] = $e;
+            }
+        }
+
+        if (count($eArray)) {
             $message = '[ ERROR ] Test ' . __METHOD__ . '() failed.';
 
-            $isDiff = Lib::debug()->diff_vars($result, $expectedReturn, [ &$diffLines ]);
-
-            $diffString = implode(PHP_EOL, $diffLines);
-
-            if (null !== $stdout) {
-                fwrite($stdout, '------' . PHP_EOL);
-                fwrite($stdout, $message . PHP_EOL);
-                fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
-                fwrite($stdout, $diffString . PHP_EOL);
-                fwrite($stdout, '------' . PHP_EOL);
-
+            if (null !== $resourceStdout) {
                 return false;
             }
 
-            $e = new RuntimeException([ $message, $diffString ]);
-            $e->trace = $trace;
-            $e->file = $traceFile;
-            $e->line = $traceLine;
-
-            throw $e;
+            throw new RuntimeException($message, ...$eArray);
         }
 
-        if (null !== $stdout) {
-            fwrite($stdout, '[ OK ] Test ' . __METHOD__ . '() passed.' . PHP_EOL);
+        if (null !== $resourceStdout) {
+            fwrite($resourceStdout, '[ OK ] Test ' . __METHOD__ . '() passed.' . PHP_EOL);
         }
+
+        unset($refStdout);
+        unset($refReturn);
+        unset($refSeconds);
 
         return true;
     }
@@ -105,7 +250,7 @@ class TestModule
         ?array $trace,
         $fn, array $fnArgs = [],
         string $expectedStdout = null,
-        string &$output = null
+        string &$stdout = null
     ) : bool
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -114,34 +259,29 @@ class TestModule
 
         ob_start();
         $var = call_user_func_array($fn, $fnArgs);
-        $var = ob_get_clean();
+        $currentStdout = ob_get_clean();
 
-        $output = $var;
+        $stdout = $currentStdout;
 
-        $stdout = $this->stdout_resource_static();
+        $resourceStdout = $this->stdout_resource_static();
 
         $isDiff = Lib::debug()->diff(
-            trim($output),
+            trim($currentStdout),
             trim($expectedStdout),
             [ &$diffLines ]
         );
 
-        $diffString = '';
-        if ($isDiff) {
-            $diffString = implode(PHP_EOL, $diffLines);
-        }
-
         if ($isDiff) {
             $message = '[ ERROR ] Test ' . __METHOD__ . '() failed.';
 
-            if (null !== $stdout) {
-                fwrite($stdout, '------' . PHP_EOL);
-                fwrite($stdout, $message . PHP_EOL);
-                fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
-                fwrite($stdout, $diffString . PHP_EOL);
-                fwrite($stdout, '------' . PHP_EOL);
+            $diffString = implode(PHP_EOL, $diffLines);
 
-                return false;
+            if (null !== $resourceStdout) {
+                fwrite($resourceStdout, '------' . PHP_EOL);
+                fwrite($resourceStdout, $message . PHP_EOL);
+                fwrite($resourceStdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                fwrite($resourceStdout, $diffString . PHP_EOL);
+                fwrite($resourceStdout, '------' . PHP_EOL);
             }
 
             $e = new RuntimeException([ $message, $diffString ]);
@@ -149,11 +289,15 @@ class TestModule
             $e->file = $traceFile;
             $e->line = $traceLine;
 
+            if (null !== $resourceStdout) {
+                return false;
+            }
+
             throw $e;
         }
 
-        if (null !== $stdout) {
-            fwrite($stdout, '[ OK ] Test ' . __METHOD__ . '() passed.' . PHP_EOL);
+        if (null !== $resourceStdout) {
+            fwrite($resourceStdout, '[ OK ] Test ' . __METHOD__ . '() passed.' . PHP_EOL);
         }
 
         return true;
@@ -165,8 +309,8 @@ class TestModule
     public function assertMicrotime(
         ?array $trace,
         $fn, array $fnArgs = [],
-        float $expectedMicrotimeMax = null, float $expectedMicrotimeMin = null,
-        float &$microtime = null
+        float $expectedSecondsMax = null, float $expectedSecondsMin = null,
+        float &$seconds = null
     ) : bool
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -177,69 +321,197 @@ class TestModule
 
         call_user_func_array($fn, $fnArgs);
 
-        $mtDiff = round(microtime(true) - $mt, 6);
+        $currentSeconds = round(microtime(true) - $mt, 6);
 
-        $microtime = $mtDiff;
+        $seconds = $currentSeconds;
 
-        $messageMax = null;
-        $messageMin = null;
-
-        $diffMax = null;
-        $diffMin = null;
+        $resourceStdout = $this->stdout_resource_static();
 
         $isError = false;
-
-        if (null !== $expectedMicrotimeMax) {
-            if ($mtDiff > $expectedMicrotimeMax) {
-                $messageMax = '[ ERROR ] Test ' . __METHOD__ . '() `$expectMax` failed.';
-                $diffMax = $mtDiff - $expectedMicrotimeMax;
-
-                $isError = true;
-            }
-        }
-
-        if (null !== $expectedMicrotimeMin) {
-            if ($mtDiff < $expectedMicrotimeMin) {
-                $messageMin = '[ ERROR ] Test ' . __METHOD__ . '() `$expectMin` failed.';
-                $diffMin = $expectedMicrotimeMin - $mtDiff;
+        $messageMax = null;
+        $messageMin = null;
+        $messageCaseMax = null;
+        $messageCaseMin = null;
+        if (null !== $expectedSecondsMax) {
+            if ($currentSeconds > $expectedSecondsMax) {
+                $messageMax = '[ ERROR ] Test ' . __METHOD__ . '() `expectedSecondsMax` failed.';
+                $messageCaseMax = ''
+                    . 'Case: '
+                    . sprintf('%.6f', $currentSeconds)
+                    . ' > '
+                    . sprintf('%.6f', $expectedSecondsMax);
 
                 $isError = true;
             }
         }
+        if (null !== $expectedSecondsMin) {
+            if ($currentSeconds < $expectedSecondsMin) {
+                $messageMin = '[ ERROR ] Test ' . __METHOD__ . '() `expectedSecondsMin` failed.';
+                $messageCaseMin = ''
+                    . 'Case: '
+                    . sprintf('%.6f', $currentSeconds)
+                    . ' < '
+                    . sprintf('%.6f', $expectedSecondsMin);
 
-        $stdout = $this->stdout_resource_static();
-
+                $isError = true;
+            }
+        }
         if ($isError) {
-            if (null !== $stdout) {
-                fwrite($stdout, '------' . PHP_EOL);
+            $message = [
+                $messageMax,
+                $messageCaseMax,
+                $messageMin,
+                $messageCaseMin,
+            ];
+
+            if (null !== $resourceStdout) {
+                fwrite($resourceStdout, '------' . PHP_EOL);
                 if (null !== $messageMax) {
-                    fwrite($stdout, $messageMax . PHP_EOL);
+                    fwrite($resourceStdout, $messageMax . PHP_EOL);
                 }
                 if (null !== $messageMin) {
-                    fwrite($stdout, $messageMin . PHP_EOL);
+                    fwrite($resourceStdout, $messageMin . PHP_EOL);
                 }
-                fwrite($stdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
-                if (null !== $diffMax) {
-                    fwrite($stdout, $diffMax . PHP_EOL);
+                fwrite($resourceStdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                if (null !== $messageCaseMax) {
+                    fwrite($resourceStdout, $messageCaseMax . PHP_EOL);
                 }
-                if (null !== $diffMin) {
-                    fwrite($stdout, $diffMin . PHP_EOL);
+                if (null !== $messageCaseMin) {
+                    fwrite($resourceStdout, $messageCaseMin . PHP_EOL);
                 }
-                fwrite($stdout, '------' . PHP_EOL);
-
-                return false;
+                fwrite($resourceStdout, '------' . PHP_EOL);
             }
 
-            $e = new RuntimeException([ $messageMax ?? $messageMin, $diffMax ?? $diffMin ]);
+            $e = new RuntimeException(implode(' | ', array_filter($message)));
             $e->trace = $trace;
             $e->file = $traceFile;
             $e->line = $traceLine;
 
+            if (null !== $resourceStdout) {
+                return false;
+            }
+
             throw $e;
         }
 
-        if (null !== $stdout) {
-            fwrite($stdout, '[ OK ] Test ' . __FUNCTION__ . '() passed.' . PHP_EOL);
+        if (null !== $resourceStdout) {
+            fwrite($resourceStdout, '[ OK ] Test ' . __METHOD__ . '() passed.' . PHP_EOL);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param callable $fn
+     */
+    public function assertReturn(
+        ?array $trace,
+        $fn, array $fnArgs = [],
+        array $expectedReturn = [],
+        string &$result = null
+    ) : bool
+    {
+        $expectedReturn = $expectedReturn[ 0 ] ?? null;
+
+        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
+
+        $currentReturn = call_user_func_array($fn, $fnArgs);
+
+        $result = $currentReturn;
+
+        $resourceStdout = $this->stdout_resource_static();
+
+        if ($currentReturn !== $expectedReturn) {
+            $message = '[ ERROR ] Test ' . __METHOD__ . '() failed.';
+
+            $isDiff = Lib::debug()->diff_vars($result, $expectedReturn, [ &$diffLines ]);
+
+            $diffString = implode(PHP_EOL, $diffLines);
+
+            if (null !== $resourceStdout) {
+                fwrite($resourceStdout, '------' . PHP_EOL);
+                fwrite($resourceStdout, $message . PHP_EOL);
+                fwrite($resourceStdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                fwrite($resourceStdout, $diffString . PHP_EOL);
+                fwrite($resourceStdout, '------' . PHP_EOL);
+            }
+
+            $e = new RuntimeException([ $message, $diffString ]);
+            $e->trace = $trace;
+            $e->file = $traceFile;
+            $e->line = $traceLine;
+
+            if (null !== $resourceStdout) {
+                return false;
+            }
+
+            throw $e;
+        }
+
+        if (null !== $resourceStdout) {
+            fwrite($resourceStdout, '[ OK ] Test ' . __METHOD__ . '() passed.' . PHP_EOL);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param callable $fn
+     */
+    public function assertMemory(
+        ?array $trace,
+        $fn, array $fnArgs = [],
+        float $expectedBytesMax = null,
+        float &$bytes = null
+    ) : bool
+    {
+        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+        $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
+
+        $mem = memory_get_usage();
+
+        $return = call_user_func_array($fn, $fnArgs);
+
+        $currentBytes = memory_get_usage() - $mem;
+        var_dump($mem, $currentBytes);
+
+        $bytes = $currentBytes;
+
+        $resourceStdout = $this->stdout_resource_static();
+
+        if ($currentBytes > $expectedBytesMax) {
+            $message = '[ ERROR ] Test ' . __METHOD__ . '() `expectedBytesMax` failed.';
+            $messageCase = ''
+                . 'Case: '
+                . sprintf('%d', $currentBytes)
+                . ' > '
+                . sprintf('%d', $expectedBytesMax);
+
+            if (null !== $resourceStdout) {
+                fwrite($resourceStdout, '------' . PHP_EOL);
+                fwrite($resourceStdout, $message . PHP_EOL);
+                fwrite($resourceStdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                fwrite($resourceStdout, $messageCase . PHP_EOL);
+                fwrite($resourceStdout, '------' . PHP_EOL);
+            }
+
+            $e = new RuntimeException($message);
+            $e->trace = $trace;
+            $e->file = $traceFile;
+            $e->line = $traceLine;
+
+            if (null !== $resourceStdout) {
+                return false;
+            }
+
+            throw $e;
+        }
+
+        if (null !== $resourceStdout) {
+            fwrite($resourceStdout, '[ OK ] Test ' . __METHOD__ . '() passed.' . PHP_EOL);
         }
 
         return true;
