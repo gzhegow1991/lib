@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Exception;
 
+
 /**
  * @mixin \Throwable
  */

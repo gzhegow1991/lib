@@ -74,10 +74,14 @@ class ExceptionIterator implements \RecursiveIterator
      */
     public function key()
     {
-        $fullpath = array_keys($this->track);
-        $fullpath[] = key($this->items);
+        $track = end($this->track);
 
-        return implode('.', $fullpath);
+        end($this->track);
+        $key = count($this->track)
+            ? key($this->track) . '.' . key($this->items)
+            : key($this->items);
+
+        return $key;
     }
 
 

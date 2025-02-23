@@ -2,6 +2,9 @@
 
 namespace Gzhegow\Lib\Exception;
 
+use Gzhegow\Lib\Lib;
+
+
 /**
  * @mixin \Throwable
  *
@@ -14,7 +17,7 @@ trait HasTraceOverrideTrait
      */
     public $file;
     /**
-     * @var int
+     * @var int|string
      */
     public $line;
 
@@ -24,35 +27,64 @@ trait HasTraceOverrideTrait
     public $trace;
 
 
-    public function getFileOverride() : string
+    public function getFileOverride(string $fileRoot = null) : string
     {
-        return $this->file;
-    }
+        $file = $this->file ?? $this->getFile();
 
-    public function getLineOverride() : int
-    {
-        return $this->line;
-    }
-
-
-    public function getTraceOverride() : array
-    {
-        if (null === $this->trace) {
-            return $this->getTrace();
+        if (null !== $fileRoot) {
+            $file = Lib::fs()->relative($file, $fileRoot);
         }
 
-        return $this->trace;
+        return $file;
     }
 
-    public function getTraceAsStringOverride() : string
+    /**
+     * @return int|string
+     */
+    public function getLineOverride()
+    {
+        /** @var int|string $line */
+
+        $line = $this->line ?? $this->getLine();
+
+        return $line;
+    }
+
+
+    public function getTraceOverride(string $fileRoot = null) : array
+    {
+        $trace = $this->trace ?? $this->getTrace();
+
+        if (null !== $fileRoot) {
+            $theFs = Lib::fs();
+
+            foreach ( $trace as $i => $frame ) {
+                if (isset($frame[ 'file' ])) {
+                    $trace[ $i ][ 'file' ] = $theFs->relative($frame[ 'file' ], $fileRoot);
+                }
+            }
+        }
+
+        return $trace;
+    }
+
+    public function getTraceAsStringOverride(string $fileRoot = null) : string
     {
         if (null === $this->trace) {
-            return $this->getTraceAsString();
+            $traceAsString = $this->getTraceAsString();
+
+            if (null !== $fileRoot) {
+                $fileRootRealpath = realpath($fileRoot) ?: null;
+
+                $traceAsString = str_replace($fileRootRealpath . DIRECTORY_SEPARATOR, '', $traceAsString);
+            }
+
+            return $traceAsString;
         }
 
         $rtn = "";
         $count = 0;
-        foreach ( $this->getTraceOverride() as $frame ) {
+        foreach ( $this->getTraceOverride($fileRoot) as $frame ) {
             $args = "";
 
             if (isset($frame[ 'args' ])) {

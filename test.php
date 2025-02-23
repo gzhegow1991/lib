@@ -90,17 +90,30 @@ $fn = function () use ($ex) {
     // $it = new \Gzhegow\Lib\Exception\ExceptionIterator([ $e0 ]);
     // $iit = new \RecursiveIteratorIterator($it);
 
-    foreach ( $iit as $track ) {
-        foreach ( $track as $i => $e ) {
+    foreach ( $iit as $i => $track ) {
+        foreach ( $track as $ii => $e ) {
             $phpClass = get_class($e);
 
-            echo "[ {$i} ] {$e->getMessage()}" . PHP_EOL;
+            echo "[ {$ii} ] {$e->getMessage()}" . PHP_EOL;
             echo "{ object # {$phpClass} }" . PHP_EOL;
             echo PHP_EOL;
         }
 
         echo PHP_EOL;
     }
+
+
+    $e = new \Gzhegow\Lib\Exception\RuntimeException();
+    $eTrace = $e->getTraceOverride(__DIR__);
+    foreach ( $eTrace as $i => $frame ) {
+        unset($eTrace[ $i ][ 'line' ]);
+    }
+
+    _print($e->getFileOverride(__DIR__));
+
+    echo PHP_EOL;
+
+    _print_array_multiline($eTrace, 2);
 };
 _assert_stdout($fn, [], '
 "[ Exceptions ]"
@@ -155,6 +168,36 @@ _assert_stdout($fn, [], '
 
 [ 0.1.0.1 ] eeee2
 { object # Exception }
+
+
+"test.php"
+
+```
+[
+  [
+    "function" => "{closure}",
+    "args" => "{ array(0) }"
+  ],
+  [
+    "file" => "src/Modules/TestModule.php",
+    "function" => "call_user_func_array",
+    "args" => "{ array(2) }"
+  ],
+  [
+    "file" => "test.php",
+    "function" => "assertStdout",
+    "class" => "Gzhegow\Lib\Modules\TestModule",
+    "type" => "->",
+    "args" => "{ array(4) }"
+  ],
+  [
+    "file" => "test.php",
+    "function" => "_assert_stdout",
+    "args" => "{ array(3) }"
+  ]
+]
+```
+
 ');
 
 
