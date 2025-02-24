@@ -178,7 +178,7 @@ class HttpModule
     }
 
 
-    public function cookies_static(Cookies $cookies = null) : Cookies
+    public function static_cookies(Cookies $cookies = null) : Cookies
     {
         if (null !== $cookies) {
             $last = $this->cookies;
@@ -255,7 +255,7 @@ class HttpModule
         $_path = $path ?: '/';
         $_domain = $domain ?: null;
 
-        $theCookies = $this->cookies_static();
+        $theCookies = $this->static_cookies();
 
         $_value = rawurlencode(Lib::parse()->string_not_empty($value) ?? ' ');
         $_expires = $expires ?: 0;
@@ -299,7 +299,7 @@ class HttpModule
     }
 
 
-    public function session_static(object $session = null) : ?object
+    public function static_session(object $session = null) : ?object
     {
         /**
          * @noinspection PhpUndefinedNamespaceInspection
@@ -331,7 +331,7 @@ class HttpModule
             );
         }
 
-        $theSession = $this->session_static();
+        $theSession = $this->static_session();
 
         if (! $theSession->has($name)) {
             return false;
@@ -350,7 +350,7 @@ class HttpModule
             );
         }
 
-        $theSession = $this->session_static();
+        $theSession = $this->static_session();
 
         if (! $theSession->has($name)) {
             if ($fallback) {
@@ -377,7 +377,7 @@ class HttpModule
             );
         }
 
-        $theSession = $this->session_static();
+        $theSession = $this->static_session();
 
         $theSession->set($name, $value);
     }
@@ -390,7 +390,7 @@ class HttpModule
             );
         }
 
-        $theSession = $this->session_static();
+        $theSession = $this->static_session();
 
         $last = $theSession->remove($name);
 

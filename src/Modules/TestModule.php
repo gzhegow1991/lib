@@ -20,7 +20,7 @@ class TestModule
      *
      * @return resource|null
      */
-    public function stdout_resource_static(array $stdoutResource = []) // : ?resource
+    public function static_stdout_resource(array $stdoutResource = []) // : ?resource
     {
         if (count($stdoutResource)) {
             [ $h ] = $stdoutResource;
@@ -94,7 +94,7 @@ class TestModule
         $refSeconds = $currentSeconds;
         $refReturn = $currentReturn;
 
-        $resourceStdout = $this->stdout_resource_static();
+        $resourceStdout = $this->static_stdout_resource();
 
         $eArray = [];
 
@@ -263,7 +263,7 @@ class TestModule
 
         $stdout = $currentStdout;
 
-        $resourceStdout = $this->stdout_resource_static();
+        $resourceStdout = $this->static_stdout_resource();
 
         $isDiff = Lib::debug()->diff(
             trim($currentStdout),
@@ -325,7 +325,7 @@ class TestModule
 
         $seconds = $currentSeconds;
 
-        $resourceStdout = $this->stdout_resource_static();
+        $resourceStdout = $this->static_stdout_resource();
 
         $isError = false;
         $messageMax = null;
@@ -421,7 +421,7 @@ class TestModule
 
         $result = $currentReturn;
 
-        $resourceStdout = $this->stdout_resource_static();
+        $resourceStdout = $this->static_stdout_resource();
 
         if ($currentReturn !== $expectedReturn) {
             $message = '[ ERROR ] Test ' . __METHOD__ . '() failed.';
@@ -480,7 +480,7 @@ class TestModule
 
         $bytes = $currentBytes;
 
-        $resourceStdout = $this->stdout_resource_static();
+        $resourceStdout = $this->static_stdout_resource();
 
         if ($currentBytes > $expectedBytesMax) {
             $message = '[ ERROR ] Test ' . __METHOD__ . '() `expectedBytesMax` failed.';

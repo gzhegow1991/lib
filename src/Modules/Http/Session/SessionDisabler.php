@@ -10,28 +10,28 @@ class SessionDisabler implements \ArrayAccess, \Countable
 {
     public function offsetExists($offset)
     {
-        /** @see HttpModule::session_static() */
+        /** @see HttpModule::static_session() */
 
         throw new RuntimeException('Native $_SESSION is disabled');
     }
 
     public function offsetGet($offset)
     {
-        /** @see HttpModule::session_static() */
+        /** @see HttpModule::static_session() */
 
         throw new RuntimeException('Native $_SESSION is disabled');
     }
 
     public function offsetSet($offset, $value)
     {
-        /** @see HttpModule::session_static() */
+        /** @see HttpModule::static_session() */
 
         throw new RuntimeException('Native $_SESSION is disabled');
     }
 
     public function offsetUnset($offset)
     {
-        /** @see HttpModule::session_static() */
+        /** @see HttpModule::static_session() */
 
         throw new RuntimeException('Native $_SESSION is disabled');
     }
@@ -39,7 +39,7 @@ class SessionDisabler implements \ArrayAccess, \Countable
 
     public function count()
     {
-        /** @see HttpModule::session_static() */
+        /** @see HttpModule::static_session() */
 
         throw new RuntimeException('Native $_SESSION is disabled');
     }

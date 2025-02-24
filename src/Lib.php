@@ -11,7 +11,6 @@ use Gzhegow\Lib\Modules\StrModule;
 use Gzhegow\Lib\Modules\UrlModule;
 use Gzhegow\Lib\Modules\ArrModule;
 use Gzhegow\Lib\Modules\JsonModule;
-use Gzhegow\Lib\Modules\BoolModule;
 use Gzhegow\Lib\Modules\HttpModule;
 use Gzhegow\Lib\Modules\TestModule;
 use Gzhegow\Lib\Modules\TypeModule;
@@ -20,7 +19,6 @@ use Gzhegow\Lib\Modules\ParseModule;
 use Gzhegow\Lib\Modules\CryptModule;
 use Gzhegow\Lib\Modules\BcmathModule;
 use Gzhegow\Lib\Modules\AssertModule;
-use Gzhegow\Lib\Modules\Type\Base\AssertModuleBase;
 use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
@@ -63,18 +61,6 @@ class Lib
         return static::$modules[ $key ] = $instance
             ?? static::$modules[ $key ]
             ?? new BcmathModule();
-    }
-
-    /**
-     * @return BoolModule
-     */
-    public static function bool(BoolModule $instance = null)
-    {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
-            ?? new BoolModule();
     }
 
     /**
@@ -291,6 +277,100 @@ class Lib
         return static::$modules[ $key ] = $instance
             ?? static::$modules[ $key ]
             ?? new UrlModule();
+    }
+
+
+    /**
+     * @throws \LogicException|\RuntimeException
+     */
+    public static function throw($throwableOrArg, ...$throwableArgs)
+    {
+        if (
+            ($throwableOrArg instanceof \LogicException)
+            || ($throwableOrArg instanceof \RuntimeException)
+        ) {
+            throw $throwableOrArg;
+        }
+
+        array_unshift($throwableArgs, $throwableOrArg);
+
+        $thePhp = Lib::php();
+
+        $throwableClass = $thePhp->static_throwable_class();
+
+        $trace = property_exists($throwableClass, 'trace')
+            ? debug_backtrace()
+            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $_throwableArgs = $thePhp->throwable_args(...$throwableArgs);
+        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $_throwableArgs[ 'trace' ] = $trace;
+
+        $exceptionArgs = [];
+        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
+
+        $e = new $throwableClass(...$exceptionArgs);
+
+        foreach ( $_throwableArgs as $key => $value ) {
+            if (! property_exists($e, $key)) {
+                unset($_throwableArgs[ $key ]);
+            }
+        }
+
+        $fn = (function () use (&$_throwableArgs) {
+            foreach ( $_throwableArgs as $key => $value ) {
+                $this->{$key} = $value;
+            }
+        })->bindTo($e, $e);
+
+        $fn();
+
+        throw $e;
+    }
+
+    /**
+     * @throws \LogicException|\RuntimeException
+     */
+    public static function throw_new(...$throwableArgs)
+    {
+        $thePhp = Lib::php();
+
+        $throwableClass = $thePhp->static_throwable_class();
+
+        $trace = property_exists($throwableClass, 'trace')
+            ? debug_backtrace()
+            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $_throwableArgs = $thePhp->throwable_args(...$throwableArgs);
+        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $_throwableArgs[ 'trace' ] = $trace;
+
+        $exceptionArgs = [];
+        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
+
+        $e = new $throwableClass(...$exceptionArgs);
+
+        foreach ( $_throwableArgs as $key => $value ) {
+            if (! property_exists($e, $key)) {
+                unset($_throwableArgs[ $key ]);
+            }
+        }
+
+        $fn = (function () use (&$_throwableArgs) {
+            foreach ( $_throwableArgs as $key => $value ) {
+                $this->{$key} = $value;
+            }
+        })->bindTo($e, $e);
+
+        $fn();
+
+        throw $e;
     }
 
 

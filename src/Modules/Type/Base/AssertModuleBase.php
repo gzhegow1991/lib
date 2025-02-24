@@ -68,7 +68,10 @@ abstract class AssertModuleBase
     public function orThrow($throwableOrArg, ...$throwableArgs)
     {
         if (! $this->status) {
-            Lib::php()->throw($throwableOrArg, ...$throwableArgs);
+            Lib::php()->throw(
+                debug_backtrace(),
+                $throwableOrArg, ...$throwableArgs
+            );
 
             return null;
         }

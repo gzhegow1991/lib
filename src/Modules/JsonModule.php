@@ -32,7 +32,7 @@ class JsonModule
     }
 
 
-    public function json_depth_static(int $jsonDepth = null) : int
+    public function static_json_depth(int $jsonDepth = null) : int
     {
         if (null !== $jsonDepth) {
             if ($jsonDepth < 0) {
@@ -53,7 +53,7 @@ class JsonModule
         return $result;
     }
 
-    public function json_encode_flags_static(int $jsonEncodeFlags = null) : int
+    public function static_json_encode_flags(int $jsonEncodeFlags = null) : int
     {
         if (null !== $jsonEncodeFlags) {
             if ($jsonEncodeFlags < 0) {
@@ -74,7 +74,7 @@ class JsonModule
         return $result;
     }
 
-    public function json_decode_flags_static(int $jsonDecodeFlags = null) : int
+    public function static_json_decode_flags(int $jsonDecodeFlags = null) : int
     {
         if (null !== $jsonDecodeFlags) {
             if ($jsonDecodeFlags < 0) {
@@ -105,8 +105,8 @@ class JsonModule
         int $depth = null, int $flags = null
     ) // : mixed
     {
-        $depth = $depth ?? $this->json_depth_static();
-        $flags = $flags ?? $this->json_decode_flags_static();
+        $depth = $depth ?? $this->static_json_depth();
+        $flags = $flags ?? $this->static_json_decode_flags();
 
         error_clear_last();
 
@@ -174,8 +174,8 @@ class JsonModule
         int $flags = null, int $depth = null
     ) : ?string
     {
-        $flags = $flags ?? $this->json_encode_flags_static();
-        $depth = $depth ?? $this->json_depth_static();
+        $flags = $flags ?? $this->static_json_encode_flags();
+        $depth = $depth ?? $this->static_json_depth();
 
         if (false
             || is_resource($value)
@@ -223,7 +223,7 @@ class JsonModule
     ) : ?string
     {
         $flags = $flags ?? (
-            $this->json_encode_flags_static()
+            $this->static_json_encode_flags()
             | JSON_UNESCAPED_LINE_TERMINATORS
             | JSON_UNESCAPED_UNICODE
             | JSON_UNESCAPED_SLASHES

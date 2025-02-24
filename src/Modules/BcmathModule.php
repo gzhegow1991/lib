@@ -89,7 +89,7 @@ class BcmathModule
     }
 
 
-    public function scale_limit_static(int $scaleLimit = null) : int
+    public function static_scale_limit(int $scaleLimit = null) : int
     {
         if (null !== $scaleLimit) {
             if ($scaleLimit < 0) {
@@ -140,7 +140,7 @@ class BcmathModule
     {
         $scales = [];
 
-        $scaleLimit = $this->scale_limit_static();
+        $scaleLimit = $this->static_scale_limit();
 
         if (null !== $scale) {
             if (! Lib::type()->int_non_negative($_scale, $scale)) {
@@ -174,7 +174,7 @@ class BcmathModule
     {
         $scales = [];
 
-        $scaleLimit = $this->scale_limit_static();
+        $scaleLimit = $this->static_scale_limit();
 
         if (null !== $scale) {
             if (! Lib::type()->int_non_negative($_scale, $scale)) {

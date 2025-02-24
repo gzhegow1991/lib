@@ -1131,14 +1131,14 @@ $fn = function () {
 
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $theDebug->dumper_fn_static([ $theDebug, 'dumper_var_dump' ]);
+        $theDebug->static_dumper_fn([ $theDebug, 'dumper_var_dump' ]);
         // $theDebug->dumper_fn_static([ $theDebug, 'dumper_var_dump_native' ]);
         // $theDebug->dumper_fn_static([ $theDebug, 'dumper_print_r' ]);
         // $theDebug->dumper_fn_static([ $theDebug, 'dumper_var_export' ]);
         // $theDebug->dumper_fn_static([ $theDebug, 'dumper_var_export_native' ]);
         // $theDebug->dumper_fn_static([ $theDebug, 'dumper_symfony' ]);
 
-        $theDebug->dump_fn_static([ $theDebug, 'dump_echo' ]);
+        $theDebug->static_dump_fn([ $theDebug, 'dump_echo' ]);
         $options = [];
 
         // $theDebug->dump_fn_static([ $theDebug, 'dump_stdout' ]);
@@ -2296,8 +2296,8 @@ $fn = function () {
     _print(\Gzhegow\Lib\Lib::str()->prefix('spatialIndex'));
     echo PHP_EOL;
 
-    _print(\Gzhegow\Lib\Lib::str()->translit_ascii_ru('привет мир'));
-    _print(\Gzhegow\Lib\Lib::str()->translit_ascii_ru('+привет +мир +100 abc', '-', '+'));
+    _print(\Gzhegow\Lib\Lib::str()->translit_ru2ascii('привет мир'));
+    _print(\Gzhegow\Lib\Lib::str()->translit_ru2ascii('+привет +мир +100 abc', '-', '+'));
     echo PHP_EOL;
 
     _print(\Gzhegow\Lib\Lib::str()->interpolator()->interpolate('привет {{username}}', [ 'username' => 'мир' ]));

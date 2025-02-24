@@ -70,7 +70,7 @@ class StrModule
     }
 
 
-    public function mb_mode_static(bool $mbMode = null) : bool
+    public function static_mb_mode(bool $mbMode = null) : bool
     {
         if (null !== $mbMode) {
             if ($mbMode) {
@@ -102,7 +102,7 @@ class StrModule
     public function mb(string $fn = null, ...$args)
     {
         if (null === $fn) {
-            $result = $this->mb_mode_static();
+            $result = $this->static_mb_mode();
 
         } else {
             $_fn = $this->mb_func($fn);
@@ -120,7 +120,7 @@ class StrModule
      */
     public function mb_func(string $fn)
     {
-        if (! $this->mb_mode_static()) {
+        if (! $this->static_mb_mode()) {
             return $fn;
         }
 
@@ -489,7 +489,7 @@ class StrModule
             return 0;
         }
 
-        $len = $this->mb_mode_static()
+        $len = $this->static_mb_mode()
             ? mb_strlen($value)
             : count(preg_split('//u', $value, -1, PREG_SPLIT_NO_EMPTY));
 
@@ -520,7 +520,7 @@ class StrModule
      */
     public function lower(string $string, string $mb_encoding = null) : string
     {
-        if ($this->mb_mode_static()) {
+        if ($this->static_mb_mode()) {
             $mbEncodingArgs = [];
             if (null !== $mb_encoding) {
                 $mbEncodingArgs[] = $mb_encoding;
@@ -546,7 +546,7 @@ class StrModule
      */
     public function upper(string $string, string $mb_encoding = null) : string
     {
-        if ($this->mb_mode_static()) {
+        if ($this->static_mb_mode()) {
             $mbEncodingArgs = [];
             if (null !== $mb_encoding) {
                 $mbEncodingArgs[] = $mb_encoding;
@@ -573,7 +573,7 @@ class StrModule
      */
     public function lcfirst(string $string, string $mb_encoding = null) : string
     {
-        if ($this->mb_mode_static()) {
+        if ($this->static_mb_mode()) {
             $result = Lib::mb()->lcfirst($string, $mb_encoding);
 
         } else {
@@ -594,7 +594,7 @@ class StrModule
      */
     public function ucfirst(string $string, string $mb_encoding = null) : string
     {
-        if ($this->mb_mode_static()) {
+        if ($this->static_mb_mode()) {
             $result = Lib::mb()->ucfirst($string, $mb_encoding);
 
         } else {
@@ -1118,7 +1118,7 @@ class StrModule
      *
      * @param array|string $ignoreSymbols
      */
-    public function translit_ascii_ru(string $string, string $delimiter = null, $ignoreSymbols = null) : string
+    public function translit_ru2ascii(string $string, string $delimiter = null, $ignoreSymbols = null) : string
     {
         $delimiter = $delimiter ?? '-';
 
@@ -1197,6 +1197,8 @@ class StrModule
                     );
                 }
 
+                $symbol = mb_strtolower($symbol);
+
                 $ignoreSymbolsRegex[ $symbol ] = true;
             }
         }
@@ -1205,7 +1207,7 @@ class StrModule
 
         $result = mb_strtolower($string);
 
-        $result = preg_replace("/[^а-яё0-9{$ignoreSymbolsRegex} ]/u", $delimiter, $result);
+        $result = preg_replace("/[^а-яё0-9{$ignoreSymbolsRegex} ]/iu", $delimiter, $result);
 
         $result = str_replace(
             array_keys($dictionary),

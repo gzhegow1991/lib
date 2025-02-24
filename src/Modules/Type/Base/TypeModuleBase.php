@@ -21,11 +21,11 @@ abstract class TypeModuleBase
 
     public function the_nil()
     {
-        return _BOOL_NIL;
+        return _TYPE_NIL;
     }
 
     public function the_undefined()
     {
-        return _BOOL_UNDEFINED;
+        return _TYPE_UNDEFINED;
     }
 }

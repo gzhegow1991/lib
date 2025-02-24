@@ -27,24 +27,24 @@ class DebugModule
 
 
     /**
-     * @param callable $fn
+     * @param callable $fnDumper
      *
      * @return callable|null
      */
-    public function dumper_fn_static($fn = null) // : ?callable
+    public function static_dumper_fn($fnDumper = null) // : ?callable
     {
-        if (null !== $fn) {
+        if (null !== $fnDumper) {
             $last = $this->dumperFn;
 
-            if ($last !== $fn) {
+            if ($last !== $fnDumper) {
                 $isValid = false;
 
                 $erf = null;
                 $erm = null;
 
-                $reflectionArgs = is_array($fn)
-                    ? $fn
-                    : [ $fn ];
+                $reflectionArgs = is_array($fnDumper)
+                    ? $fnDumper
+                    : [ $fnDumper ];
 
                 if (! $isValid) {
                     try {
@@ -90,7 +90,7 @@ class DebugModule
                     throw new LogicException('Invalid `dumperFn`', $erf, $erm);
                 }
 
-                $this->dumperFn = $fn;
+                $this->dumperFn = $fnDumper;
             }
 
             $result = $last;
@@ -102,22 +102,22 @@ class DebugModule
     }
 
     /**
-     * @param callable $fn
+     * @param callable $fnDump
      *
      * @return callable|null
      */
-    public function dump_fn_static($fn = null) // : ?callable
+    public function static_dump_fn($fnDump = null) // : ?callable
     {
-        if (null !== $fn) {
+        if (null !== $fnDump) {
             $last = $this->dumpFn;
 
-            if ($last !== $fn) {
+            if ($last !== $fnDump) {
                 $erf = null;
                 $erm = null;
 
-                $reflectionArgs = is_array($fn)
-                    ? $fn
-                    : [ $fn ];
+                $reflectionArgs = is_array($fnDump)
+                    ? $fnDump
+                    : [ $fnDump ];
 
                 $isValid = false;
 
@@ -163,7 +163,7 @@ class DebugModule
                     throw new LogicException('Invalid `dumpFn`', $erf, $erm);
                 }
 
-                $this->dumpFn = $fn;
+                $this->dumpFn = $fnDump;
             }
 
             $result = $last;
@@ -293,7 +293,7 @@ class DebugModule
 
     public function dump_echo(array $options, ...$vars)
     {
-        $fn = $this->dumper_fn_static();
+        $fn = $this->static_dumper_fn();
 
         $content = $fn(...$vars);
         $content .= PHP_EOL;
@@ -305,7 +305,7 @@ class DebugModule
     {
         $resource = $options[ 'stdout' ] ?? $options[ 0 ] ?? STDOUT;
 
-        $fn = $this->dumper_fn_static();
+        $fn = $this->static_dumper_fn();
 
         $content = $fn(...$vars);
         $content .= PHP_EOL;
@@ -317,7 +317,7 @@ class DebugModule
     {
         $resource = $options[ 'stdout' ] ?? $options[ 0 ] ?? STDOUT;
 
-        $fn = $this->dumper_fn_static();
+        $fn = $this->static_dumper_fn();
 
         $content = $fn(...$vars);
         $content .= PHP_EOL;
@@ -333,7 +333,7 @@ class DebugModule
 
     public function dump_browser_console(array $options, ...$vars)
     {
-        $fn = $this->dumper_fn_static();
+        $fn = $this->static_dumper_fn();
 
         $content = $fn(...$vars);
 
@@ -374,7 +374,7 @@ class DebugModule
             );
         }
 
-        $fn = $this->dumper_fn_static();
+        $fn = $this->static_dumper_fn();
 
         $content = $fn(...$vars);
 
@@ -392,7 +392,7 @@ class DebugModule
         $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
         $traceWhereIs = "{$traceFile}: {$traceLine}";
 
-        $fn = $this->dump_fn_static();
+        $fn = $this->static_dump_fn();
 
         $fn($options, $traceWhereIs, $var, ...$vars);
 

@@ -122,7 +122,6 @@ class ErrorHandler
                 $messageLines[] = "[ {$i} ] {$e->getMessage()}";
                 $messageLines[] = "{ object # {$phpClass} # {$phpId} } ";
                 $messageLines[] = "{$phpFile} : {$phpLine}";
-                $messageLines[] = '';
             }
         }
 
@@ -140,8 +139,12 @@ class ErrorHandler
 
         echo PHP_EOL;
 
-        foreach ( $traceLines as $line ) {
-            echo $line . PHP_EOL;
+        if (count($traceLines)) {
+            echo 'Trace: ' . PHP_EOL;
+
+            foreach ( $traceLines as $line ) {
+                echo $line . PHP_EOL;
+            }
         }
     }
 }

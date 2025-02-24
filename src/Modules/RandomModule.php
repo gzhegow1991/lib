@@ -22,16 +22,16 @@ class RandomModule
 
 
     /**
-     * @param callable $fn
+     * @param callable $fnUuid
      *
      * @return callable|null
      */
-    public function uuid_fn_static($fn = null) // : ?callable
+    public function static_uuid_fn($fnUuid = null) // : ?callable
     {
-        if (null !== $fn) {
+        if (null !== $fnUuid) {
             $last = $this->uuidFn;
 
-            $this->uuidFn = $fn;
+            $this->uuidFn = $fnUuid;
 
             $result = $last;
         }
@@ -43,7 +43,7 @@ class RandomModule
 
     public function uuid() : string
     {
-        $fn = $this->uuid_fn_static();
+        $fn = $this->static_uuid_fn();
 
         $uuid = call_user_func($fn);
 

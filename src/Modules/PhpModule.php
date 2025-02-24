@@ -11,6 +11,7 @@ use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParser;
+use Gzhegow\Lib\Modules\Php\DebugBacktracer\DebugBacktracer;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
 
@@ -27,32 +28,12 @@ class PhpModule
     protected $throwableClass = LogicException::class;
 
 
-    public function __construct()
+    public function callable_parser(CallableParserInterface $callableParser = null) : CallableParserInterface
     {
-        $this->callableParser = new CallableParser();
-    }
-
-
-    public function callable_parser_static(CallableParserInterface $callableParser = null) : CallableParserInterface
-    {
-        if (null !== $callableParser) {
-            $last = $this->callableParser;
-
-            $current = $callableParser;
-
-            $this->callableParser = $current;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->callableParser;
-
-        return $result;
-    }
-
-    public function callable_parser() : CallableParserInterface
-    {
-        return $this->callable_parser_static();
+        return $this->callableParser = null
+            ?? $callableParser
+            ?? $this->callableParser
+            ?? new CallableParser();
     }
 
 
@@ -626,17 +607,14 @@ class PhpModule
     }
 
 
-    public function debug_backtrace($options = null, $limit = null) : array
+    public function debug_backtrace(int $options = null, int $limit = null) : DebugBacktracer
     {
-        $options = $options ?? DEBUG_BACKTRACE_IGNORE_ARGS;
-        if ($options < 0) $options = DEBUG_BACKTRACE_IGNORE_ARGS;
+        $instance = new DebugBacktracer();
 
-        $limit = $limit ?? 0;
-        if ($limit < 0) $limit = 1;
+        if (null !== $options) $instance->options($options);
+        if (null !== $limit) $instance->limit($limit);
 
-        $result = debug_backtrace($options, $limit);
-
-        return $result;
+        return $instance;
     }
 
 
@@ -1141,7 +1119,7 @@ class PhpModule
      *
      * @return class-string<\LogicException|\RuntimeException>
      */
-    public function throwable_class_static(string $throwableClass = null) : string
+    public function static_throwable_class(string $throwableClass = null) : string
     {
         if (null !== $throwableClass) {
             if (! (false
@@ -1175,7 +1153,7 @@ class PhpModule
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function throw($throwableOrArg, ...$throwableArgs)
+    public function throw(?array $trace, $throwableOrArg, ...$throwableArgs)
     {
         if (
             ($throwableOrArg instanceof \LogicException)
@@ -1186,21 +1164,7 @@ class PhpModule
 
         array_unshift($throwableArgs, $throwableOrArg);
 
-        $throwableClass = $this->throwable_class_static();
-
-        $trace = property_exists($throwableClass, 'trace')
-            ? debug_backtrace()
-            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->throw_new($trace, ...$throwableArgs);
-    }
-
-    /**
-     * @throws \LogicException|\RuntimeException
-     */
-    public function throw_new(?array $trace, ...$throwableArgs)
-    {
-        $throwableClass = $this->throwable_class_static();
+        $throwableClass = $this->static_throwable_class();
 
         if (null === $trace) {
             $trace = property_exists($throwableClass, 'trace')
@@ -1213,15 +1177,57 @@ class PhpModule
         $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? '{line}';
         $_throwableArgs[ 'trace' ] = $trace;
 
-        $arguments = [];
-        $arguments[] = $_throwableArgs[ 'message' ] ?? null;
-        $arguments[] = $_throwableArgs[ 'code' ] ?? null;
-        $arguments[] = $_throwableArgs[ 'previous' ] ?? null;
+        $exceptionArgs = [];
+        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
 
-        $e = new $throwableClass(...$arguments);
+        $e = new $throwableClass(...$exceptionArgs);
 
         foreach ( $_throwableArgs as $key => $value ) {
-            if (! property_exists($this, $key)) {
+            if (! property_exists($e, $key)) {
+                unset($_throwableArgs[ $key ]);
+            }
+        }
+
+        $fn = (function () use (&$_throwableArgs) {
+            foreach ( $_throwableArgs as $key => $value ) {
+                $this->{$key} = $value;
+            }
+        })->bindTo($e, $e);
+
+        $fn();
+
+        throw $e;
+    }
+
+    /**
+     * @throws \LogicException|\RuntimeException
+     */
+    public function throw_new(?array $trace, ...$throwableArgs)
+    {
+        $throwableClass = $this->static_throwable_class();
+
+        if (null === $trace) {
+            $trace = property_exists($throwableClass, 'trace')
+                ? debug_backtrace()
+                : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        }
+
+        $_throwableArgs = $this->throwable_args(...$throwableArgs);
+        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $_throwableArgs[ 'trace' ] = $trace;
+
+        $exceptionArgs = [];
+        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
+
+        $e = new $throwableClass(...$exceptionArgs);
+
+        foreach ( $_throwableArgs as $key => $value ) {
+            if (! property_exists($e, $key)) {
                 unset($_throwableArgs[ $key ]);
             }
         }
