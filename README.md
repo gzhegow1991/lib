@@ -185,7 +185,7 @@ _assert_stdout($fn, [], '
 
 "test.php"
 
-```
+###
 [
   [
     "function" => "{closure}",
@@ -209,8 +209,7 @@ _assert_stdout($fn, [], '
     "args" => "{ array(3) }"
   ]
 ]
-```
-
+###
 ');
 
 
@@ -1170,7 +1169,7 @@ _assert_stdout($fn, [], '
 "[ DebugModule ]"
 
 FALSE
-```
+###
 [
   "apple",
   "banana",
@@ -1178,11 +1177,11 @@ FALSE
   "damson",
   "elderberry"
 ]
-```
+###
 
 
 TRUE
-```
+###
 [
   "[ 1 ] --- > apple2",
   "[ 1 ] +++ > apple",
@@ -1191,10 +1190,10 @@ TRUE
   "damson",
   "elderberry"
 ]
-```
+###
 
 TRUE
-```
+###
 [
   "apple",
   "banana",
@@ -1203,10 +1202,10 @@ TRUE
   "damson",
   "elderberry"
 ]
-```
+###
 
 TRUE
-```
+###
 [
   "apple",
   "banana",
@@ -1215,11 +1214,11 @@ TRUE
   "[ 5 ] --- > elderberry2",
   "[ 5 ] +++ > elderberry"
 ]
-```
+###
 
 
 TRUE
-```
+###
 [
   "[ 1 ] --- > fig",
   "apple",
@@ -1228,10 +1227,10 @@ TRUE
   "damson",
   "elderberry"
 ]
-```
+###
 
 TRUE
-```
+###
 [
   "apple",
   "banana",
@@ -1240,10 +1239,10 @@ TRUE
   "damson",
   "elderberry"
 ]
-```
+###
 
 TRUE
-```
+###
 [
   "apple",
   "banana",
@@ -1252,11 +1251,11 @@ TRUE
   "elderberry",
   "[ 6 ] --- > fig"
 ]
-```
+###
 
 
 TRUE
-```
+###
 [
   "[ 1 ] +++ > apple",
   "banana",
@@ -1264,10 +1263,10 @@ TRUE
   "damson",
   "elderberry"
 ]
-```
+###
 
 TRUE
-```
+###
 [
   "apple",
   "banana",
@@ -1275,10 +1274,10 @@ TRUE
   "damson",
   "elderberry"
 ]
-```
+###
 
 TRUE
-```
+###
 [
   "apple",
   "banana",
@@ -1286,7 +1285,7 @@ TRUE
   "damson",
   "[ 5 ] +++ > elderberry"
 ]
-```
+###
 
 
 NULL
@@ -1301,14 +1300,14 @@ FALSE
 [ "{ array(3) }", "{ array(3) }", "{ array(3) }" ]
 [ [ 1, "apple", "{ object # stdClass }" ], [ 2, "apples", "{ object # stdClass }" ], [ 1.5, "apples", "{ object # stdClass }" ] ]
 
-```
+###
 [
   "{ array(3) }",
   "{ array(3) }",
   "{ array(3) }"
 ]
-```
-```
+###
+###
 [
   [
     1,
@@ -1326,7 +1325,7 @@ FALSE
     "{ object # stdClass }"
   ]
 ]
-```
+###
 ');
 
 
@@ -1906,7 +1905,7 @@ $fn = function () {
 _assert_stdout($fn, [], '
 "[ PhpModule ]"
 
-```
+###
 [
   [
     "This is the error message"
@@ -1918,7 +1917,7 @@ _assert_stdout($fn, [], '
     "This is the error message"
   ]
 ]
-```
+###
 
 +---------------------------------------------------------+-----------------------+-----------------------+----------------------+-----------------------+----------------------+-----------------------+---------------------+----------------------+----------------------+
 |                                                         | "?PUBLIC" / "?STATIC" | "?PUBLIC" / "!STATIC" | "?PUBLIC" / "STATIC" | "!PUBLIC" / "?STATIC" | "PUBLIC" / "?STATIC" | "!PUBLIC" / "!STATIC" | "PUBLIC" / "STATIC" | "!PUBLIC" / "STATIC" | "PUBLIC" / "!STATIC" |

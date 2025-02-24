@@ -17,6 +17,10 @@ class DebugModule
      * @var callable
      */
     protected $dumpFn;
+    /**
+     * @var array
+     */
+    protected $varDumpOptions = [];
 
 
     public function __construct()
@@ -170,6 +174,24 @@ class DebugModule
         }
 
         $result = $result ?? $this->dumpFn;
+
+        return $result;
+    }
+
+    /**
+     * @return callable|null
+     */
+    public function static_var_dump_options(array $varDumpOptions = null) // : ?callable
+    {
+        if (null !== $varDumpOptions) {
+            $last = $this->varDumpOptions;
+
+            $this->varDumpOptions = $varDumpOptions;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->varDumpOptions;
 
         return $result;
     }
@@ -392,6 +414,8 @@ class DebugModule
         $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
         $traceWhereIs = "{$traceFile}: {$traceLine}";
 
+        $options = $options ?? [];
+
         $fn = $this->static_dump_fn();
 
         $fn($options, $traceWhereIs, $var, ...$vars);
@@ -441,14 +465,16 @@ class DebugModule
     {
         $options = []
             + $options
+            + $this->static_var_dump_options()
             + [
-                'with_type'       => true,
-                'with_id'         => true,
-                'with_value'      => true,
-                'with_braces'     => null,
-                'array_level_max' => 1,
-                'array_indent'    => '',
-                'array_newline'   => ' ',
+                'with_type'        => true,
+                'with_id'          => true,
+                'with_value'       => true,
+                'with_braces'      => null,
+                'array_level_max'  => 1,
+                'array_indent'     => '',
+                'array_newline'    => ' ',
+                'multiline_escape' => '###',
             ];
 
         $output = $this->var_dump_output(
@@ -832,9 +858,11 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
+            + $this->static_var_dump_options()
             + [
-                'with_braces'     => true,
-                'array_level_max' => 1,
+                'array_level_max'  => 1,
+                'multiline_escape' => '###',
+                'with_braces'      => true,
             ];
 
         $output = $this->var_dump_output(
@@ -876,9 +904,11 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
+            + $this->static_var_dump_options()
             + [
-                'with_braces'     => true,
-                'array_level_max' => 1,
+                'array_level_max'  => 1,
+                'multiline_escape' => '###',
+                'with_braces'      => true,
             ];
 
         $output = $this->var_dump_output(
@@ -924,9 +954,11 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
+            + $this->static_var_dump_options()
             + [
-                'with_braces'     => true,
-                'array_level_max' => 1,
+                'array_level_max'  => 1,
+                'multiline_escape' => '###',
+                'with_braces'      => true,
             ];
 
         $output = $this->var_dump_output(
@@ -971,9 +1003,11 @@ class DebugModule
                 'array_newline' => "\n",
             ]
             + $options
+            + $this->static_var_dump_options()
             + [
-                'with_braces'     => true,
-                'array_level_max' => 0,
+                'array_level_max'  => 0,
+                'multiline_escape' => '###',
+                'with_braces'      => true,
             ];
 
         $output = $this->var_dump_output(
@@ -1007,10 +1041,10 @@ class DebugModule
         }
 
         $content = ''
-            . '```' . "\n"
+            . $options[ 'multiline_escape' ] . "\n"
             . $printableType . "\n"
             . $printableValue . "\n"
-            . '```';
+            . $options[ 'multiline_escape' ];
 
         return $content;
     }
@@ -1027,9 +1061,11 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
+            + $this->static_var_dump_options()
             + [
-                'array_level_max' => 0,
-                'with_braces'     => null,
+                'array_level_max'  => 0,
+                'multiline_escape' => '###',
+                'with_braces'      => null,
             ];
 
         $output = $this->var_dump_output(
@@ -1079,9 +1115,11 @@ class DebugModule
                 'array_newline' => "\n",
             ]
             + $options
+            + $this->static_var_dump_options()
             + [
-                'array_level_max' => 0,
-                'with_braces'     => null,
+                'array_level_max'  => 0,
+                'multiline_escape' => '###',
+                'with_braces'      => null,
             ];
 
         $output = $this->var_dump_output(
@@ -1118,9 +1156,9 @@ class DebugModule
         }
 
         $content = ''
-            . '```' . "\n"
+            . $options[ 'multiline_escape' ] . "\n"
             . $content . "\n"
-            . '```';
+            . $options[ 'multiline_escape' ];
 
         return $content;
     }
@@ -1129,6 +1167,7 @@ class DebugModule
     public function value_array($value, int $levelMax = null, array $options = [], array &$context = []) : string
     {
         $levelMax = $levelMax ?? 1;
+        if ($levelMax < 0) $levelMax = 0;
 
         $options[ 'array_level_max' ] = $levelMax;
 
@@ -1140,6 +1179,7 @@ class DebugModule
     public function value_array_multiline($value, int $levelMax = null, array $options = [], array &$context = []) : string
     {
         $levelMax = $levelMax ?? 1;
+        if ($levelMax < 0) $levelMax = 0;
 
         $options[ 'array_level_max' ] = $levelMax;
 
