@@ -2253,7 +2253,8 @@ $fn = function () {
     _print(\Gzhegow\Lib\Lib::str()->ucfirst('привет'));
     _print(\Gzhegow\Lib\Lib::str()->lcwords('ПРИВЕТ МИР'));
     _print(\Gzhegow\Lib\Lib::str()->ucwords('привет мир'));
-
+    echo PHP_EOL;
+    
     _print(\Gzhegow\Lib\Lib::str()->starts('привет', 'при'));
     _print(\Gzhegow\Lib\Lib::str()->ends('привет', 'вет'));
     _print(\Gzhegow\Lib\Lib::str()->contains('привет', 'ив'));
@@ -2331,6 +2332,7 @@ world"
 "Привет"
 "пРИВЕТ мИР"
 "Привет Мир"
+
 "вет"
 "при"
 [ "пр", "ет" ]
