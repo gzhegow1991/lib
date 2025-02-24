@@ -10,7 +10,7 @@ class LogicException extends \LogicException implements
     //
     \IteratorAggregate
 {
-    use ThrowableTrait;
+    use ExceptionTrait;
 
     use AggregateExceptionTrait;
 

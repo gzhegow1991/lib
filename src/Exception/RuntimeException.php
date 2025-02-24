@@ -10,7 +10,7 @@ class RuntimeException extends \RuntimeException implements
     //
     \IteratorAggregate
 {
-    use ThrowableTrait;
+    use ExceptionTrait;
 
     use AggregateExceptionTrait;
 

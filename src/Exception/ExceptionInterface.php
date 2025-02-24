@@ -2,6 +2,9 @@
 
 namespace Gzhegow\Lib\Exception;
 
-interface ExceptionInterface extends \Throwable
+interface ExceptionInterface extends
+    \Throwable,
+    //
+    HasTraceOverrideInterface
 {
 }

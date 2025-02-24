@@ -4,12 +4,12 @@ namespace Gzhegow\Lib\Exception;
 
 interface HasTraceOverrideInterface
 {
-    public function getFileOverride() : string;
+    public function getFileOverride(string $fileRoot = null) : string;
 
-    public function getLineOverride() : int;
+    public function getLineOverride();
 
 
-    public function getTraceOverride() : array;
+    public function getTraceOverride(string $fileRoot = null) : array;
 
-    public function getTraceOverrideAsString() : string;
+    public function getTraceAsStringOverride(string $fileRoot = null) : string;
 }

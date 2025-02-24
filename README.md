@@ -2296,7 +2296,8 @@ $fn = function () {
     _print(\Gzhegow\Lib\Lib::str()->prefix('spatialIndex'));
     echo PHP_EOL;
 
-    _print(\Gzhegow\Lib\Lib::str()->ascii_ru('привет мир'));
+    _print(\Gzhegow\Lib\Lib::str()->translit_ascii_ru('привет мир'));
+    _print(\Gzhegow\Lib\Lib::str()->translit_ascii_ru('+привет +мир +100 abc', '-', '+'));
     echo PHP_EOL;
 
     _print(\Gzhegow\Lib\Lib::str()->interpolator()->interpolate('привет {{username}}', [ 'username' => 'мир' ]));
@@ -2368,6 +2369,7 @@ world"
 "spa"
 
 "npuBeT Mup"
+"+npuBeT +Mup +100 ---"
 
 "привет мир"
 

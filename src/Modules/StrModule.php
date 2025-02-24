@@ -6,6 +6,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Str\Slugger\Slugger;
 use Gzhegow\Lib\Modules\Str\Inflector\Inflector;
@@ -1113,9 +1114,14 @@ class StrModule
 
     /**
      * > 'привет мир' -> 'nPuBeT Mup'
+     * > '+привет +мир +100 abc' -> '+nPuBeT +Mup +100 ???'
+     *
+     * @param array|string $ignoreSymbols
      */
-    public function ascii_ru(string $string) : string
+    public function translit_ascii_ru(string $string, string $delimiter = null, $ignoreSymbols = null) : string
     {
+        $delimiter = $delimiter ?? '-';
+
         $theMb = Lib::mb();
 
         $dictionary = [
@@ -1152,11 +1158,54 @@ class StrModule
             'ю' => 'I0',
             'я' => '9I',
             'ё' => 'e',
+            //
+            '0' => '0',
+            '1' => '1',
+            '2' => '2',
+            '3' => '3',
+            '4' => '4',
+            '5' => '5',
+            '6' => '6',
+            '7' => '7',
+            '8' => '8',
+            '9' => '9',
         ];
+
+        if (isset($dictionary[ $delimiter ])) {
+            throw new LogicException(
+                [ 'The `delimiter` should not be in dictionary', $delimiter ]
+            );
+        }
+
+        $_ignoreSymbols = is_array($ignoreSymbols)
+            ? $ignoreSymbols
+            : ($ignoreSymbols ? [ $ignoreSymbols ] : []);
+
+        $ignoreSymbolsRegex = [];
+        foreach ( $_ignoreSymbols as $i => $symbols ) {
+            if (is_string($i)) {
+                $symbols = $i;
+            }
+
+            $_symbols = (string) $symbols;
+            $_symbols = $theMb->str_split($_symbols, 1);
+
+            foreach ( $_symbols as $symbol ) {
+                if (isset($dictionary[ $symbol ])) {
+                    throw new LogicException(
+                        [ 'Each of `ignoreSymbols` should not be in dictionary', $symbol ]
+                    );
+                }
+
+                $ignoreSymbolsRegex[ $symbol ] = true;
+            }
+        }
+        $ignoreSymbolsRegex = implode('', array_keys($ignoreSymbolsRegex));
+        $ignoreSymbolsRegex = preg_quote($ignoreSymbolsRegex, '/');
 
         $result = mb_strtolower($string);
 
-        $result = preg_replace('/[^а-яё0-9 ]+/u', ' ', $result);
+        $result = preg_replace("/[^а-яё0-9{$ignoreSymbolsRegex} ]/u", $delimiter, $result);
 
         $result = str_replace(
             array_keys($dictionary),

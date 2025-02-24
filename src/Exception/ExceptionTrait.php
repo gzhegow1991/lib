@@ -6,7 +6,7 @@ namespace Gzhegow\Lib\Exception;
 /**
  * @mixin \Throwable
  */
-trait ThrowableTrait
+trait ExceptionTrait
 {
     use HasTraceOverrideTrait;
 }

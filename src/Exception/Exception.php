@@ -10,7 +10,7 @@ class Exception extends \Exception implements
     //
     \IteratorAggregate
 {
-    use ThrowableTrait;
+    use ExceptionTrait;
 
     use AggregateExceptionTrait;
 
