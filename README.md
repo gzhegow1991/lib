@@ -21,7 +21,7 @@ ini_set('memory_limit', '32M');
 
 
 // > настраиваем обработку ошибок
-($ex = new \Gzhegow\Lib\Exception\ErrorHandler())
+(new \Gzhegow\Lib\Exception\ErrorHandler())
     ->useErrorReporting()
     ->useErrorHandler()
     ->useExceptionHandler()
@@ -81,7 +81,7 @@ function _assert_stdout(
 
 // >>> TEST
 // > тесты Exceptions
-$fn = function () use ($ex) {
+$fn = function () {
     _print('[ Exceptions ]');
     echo PHP_EOL;
 
@@ -2254,7 +2254,7 @@ $fn = function () {
     _print(\Gzhegow\Lib\Lib::str()->lcwords('ПРИВЕТ МИР'));
     _print(\Gzhegow\Lib\Lib::str()->ucwords('привет мир'));
     echo PHP_EOL;
-    
+
     _print(\Gzhegow\Lib\Lib::str()->starts('привет', 'при'));
     _print(\Gzhegow\Lib\Lib::str()->ends('привет', 'вет'));
     _print(\Gzhegow\Lib\Lib::str()->contains('привет', 'ив'));

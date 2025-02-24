@@ -8,7 +8,7 @@ ini_set('memory_limit', '32M');
 
 
 // > настраиваем обработку ошибок
-($ex = new \Gzhegow\Lib\Exception\ErrorHandler())
+(new \Gzhegow\Lib\Exception\ErrorHandler())
     ->useErrorReporting()
     ->useErrorHandler()
     ->useExceptionHandler()
@@ -68,7 +68,7 @@ function _assert_stdout(
 
 // >>> TEST
 // > тесты Exceptions
-$fn = function () use ($ex) {
+$fn = function () {
     _print('[ Exceptions ]');
     echo PHP_EOL;
 
