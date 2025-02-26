@@ -81,7 +81,9 @@ class PhpModule
         ];
 
         if (is_object($value)) {
-            return ltrim(get_class($value), '\\');
+            $result = ltrim(get_class($value), '\\');
+
+            return true;
         }
 
         if (! Lib::type()->string_not_empty($_value, $value)) {
@@ -92,7 +94,9 @@ class PhpModule
 
         foreach ( $fnExistsList as $fn ) {
             if (call_user_func($fn, $_value)) {
-                return $_value;
+                $result = $_value;
+
+                return $result;
             }
         }
 
@@ -174,20 +178,9 @@ class PhpModule
             return false;
         }
 
-        if (false !== strpos($_value, '\\')) {
-            $_value = str_replace('\\', '/', $_value);
-        }
-
-        if (false === strpos($_value, '/')) {
-            $_value = null;
-
-        } else {
-            $_value = preg_replace('~[/]+~', '/', $_value);
-
-            $namespace = dirname($_value);
-            $namespace = str_replace('/', '\\', $namespace);
-
-            $_value = $namespace;
+        $_value = $this->dirname($_value, '\\');
+        if (null === $_value) {
+            return false;
         }
 
         $result = $value;
@@ -208,14 +201,9 @@ class PhpModule
             return false;
         }
 
-        if (false !== strpos($_value, '\\')) {
-            $_value = str_replace('\\', '/', $_value);
-        }
-
-        if (false !== strpos($_value, '/')) {
-            $_value = preg_replace('~[/]+~', '/', $_value);
-
-            $_value = basename($_value);
+        $_value = $this->basename($_value, '\\');
+        if (null === $_value) {
+            return false;
         }
 
         $result = $_value;
