@@ -615,8 +615,6 @@ class CallableParser implements CallableParserInterface
     }
 
     /**
-     * todo
-     *
      * @param callable-string|null $result
      */
     public function typeCallableStringMethodStatic(&$result, $value, $newScope = 'static') : bool
