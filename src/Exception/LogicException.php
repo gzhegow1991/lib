@@ -17,12 +17,6 @@ class LogicException extends \LogicException implements
     use AggregateExceptionTrait;
 
 
-    /**
-     * @var array
-     */
-    public $trace;
-
-
     public function __construct(...$throwableArgs)
     {
         $args = Lib::php()->throwable_args(...$throwableArgs);

@@ -17,12 +17,6 @@ class Exception extends \Exception implements
     use AggregateExceptionTrait;
 
 
-    /**
-     * @var array
-     */
-    public $trace;
-
-
     public function __construct(...$throwableArgs)
     {
         $args = Lib::php()->throwable_args(...$throwableArgs);

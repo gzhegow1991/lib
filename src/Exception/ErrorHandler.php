@@ -115,17 +115,13 @@ class ErrorHandler
     {
         $exit = $exit ?? true;
 
-        $shouldConvertToUtf8 = extension_loaded('mbstring');
-        $shouldConvertFromCp1251 = (PHP_VERSION_ID < 80100);
+        $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
 
-        $theMb = null;
-        $thePhp = null;
-        if ($shouldConvertToUtf8) {
-            $theMb = Lib::mb();
-            $thePhp = Lib::php();
+        $shouldTryConvertToUtf8 = true
+            && $isWindows
+            && extension_loaded('mbstring');
 
-            $shouldConvertToUtf8 &= $thePhp->is_windows();
-        }
+        $shouldTryConvertFromCp1251 = (PHP_VERSION_ID < 80100);
 
         $it = Lib::new8(ExceptionIterator::class, [ $throwable ]);
         $iit = new \RecursiveIteratorIterator($it);
@@ -139,23 +135,25 @@ class ErrorHandler
                 $phpLine = $e->getLine() ?? 0;
                 $phpMessage = $e->getMessage() ?? '{message}';
 
-                if ($shouldConvertToUtf8) {
-                    if (! $theMb->is_utf8($phpMessage)) {
-                        if (true
-                            && $shouldConvertFromCp1251
-                            && $e instanceof \PDOException
-                        ) {
-                            $phpMessage = $theMb->convert_encoding(
-                                $phpMessage,
-                                'UTF-8',
-                                'CP1251'
-                            );
+                if ($shouldTryConvertToUtf8) {
+                    $isUtf8 = (1 === preg_match('//u', $phpMessage));
+
+                    if (! $isUtf8) {
+                        if ($shouldTryConvertFromCp1251) {
+                            // > gzhegow, 2025-02-26, case is happened only with \PDOException
+                            if ($e instanceof \PDOException) {
+                                $phpMessage = mb_convert_encoding(
+                                    $phpMessage,
+                                    'UTF-8',
+                                    'CP1251'
+                                );
+                            }
 
                         } else {
                             $mbEncodingList = mb_list_encodings();
                             array_unshift($mbEncodingList, 'CP1251');
 
-                            $phpMessage = $theMb->convert_encoding(
+                            $phpMessage = mb_convert_encoding(
                                 $phpMessage,
                                 'UTF-8',
                                 $mbEncodingList

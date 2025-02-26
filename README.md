@@ -780,12 +780,13 @@ $fn = function () {
     _print($dec);
     echo PHP_EOL;
 
+
     $src = "\x00\x00\x01\x00\xFF";
     $srcDump = '';
     $len = mb_strlen($src);
     for ( $i = 0; $i < $len; $i++ ) {
-        $chr = mb_substr($src, $i, 1);
-        $chr = ord($chr);
+        $chr = substr($src, $i, 1);
+        $chr = mb_ord($chr, '8bit');
         $chr = dechex($chr);
         $chr = str_pad($chr, 2, '0', STR_PAD_LEFT);
         $chr = '\x' . $chr;
@@ -793,14 +794,16 @@ $fn = function () {
         $srcDump .= $chr;
     }
     _print('b`' . $srcDump . '`');
+
     $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($src);
     _print($enc);
+
     $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
     $decDump = '';
     $len = mb_strlen($src);
     for ( $i = 0; $i < $len; $i++ ) {
-        $chr = mb_substr($src, $i, 1);
-        $chr = ord($chr);
+        $chr = substr($src, $i, 1);
+        $chr = mb_ord($chr, '8bit');
         $chr = dechex($chr);
         $chr = str_pad($chr, 2, '0', STR_PAD_LEFT);
         $chr = '\x' . $chr;
@@ -809,6 +812,7 @@ $fn = function () {
     }
     _print('b`' . $decDump . '`');
     echo PHP_EOL;
+
 
     $string = "你好";
     _print($string);
@@ -830,12 +834,13 @@ $fn = function () {
     _print($dec);
     echo PHP_EOL;
 
+
     $src = "\x00\x00\x01\x00\xFF";
     $srcDump = '';
     $len = mb_strlen($src);
     for ( $i = 0; $i < $len; $i++ ) {
-        $chr = mb_substr($src, $i, 1);
-        $chr = ord($chr);
+        $chr = substr($src, $i, 1);
+        $chr = mb_ord($chr, '8bit');
         $chr = dechex($chr);
         $chr = str_pad($chr, 2, '0', STR_PAD_LEFT);
         $chr = '\x' . $chr;
@@ -843,14 +848,16 @@ $fn = function () {
         $srcDump .= $chr;
     }
     _print('b`' . $srcDump . '`');
+
     $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode($src);
     _print($enc);
+
     $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
     $decDump = '';
     $len = mb_strlen($src);
     for ( $i = 0; $i < $len; $i++ ) {
-        $chr = mb_substr($src, $i, 1);
-        $chr = ord($chr);
+        $chr = substr($src, $i, 1);
+        $chr = mb_ord($chr, '8bit');
         $chr = dechex($chr);
         $chr = str_pad($chr, 2, '0', STR_PAD_LEFT);
         $chr = '\x' . $chr;
@@ -859,6 +866,7 @@ $fn = function () {
     }
     _print('b`' . $decDump . '`');
     echo PHP_EOL;
+
 
     $string = '你好';
     _print($string);
@@ -1614,7 +1622,10 @@ $fn = function () {
         [ false, true ],
         [ true, false ],
     ];
+
+    $before = error_reporting(0);
     $objectDummy->publicDynamicProperty = null;
+    error_reporting($before);
 
     $table = [];
     foreach ( $sources as $src ) {

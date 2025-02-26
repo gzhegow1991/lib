@@ -16,7 +16,7 @@ trait HasTraceOverrideTrait
     /**
      * @var array
      */
-    public $trace;
+    protected $trace;
 
 
     /**
