@@ -304,7 +304,7 @@ class Lib
 
         $_throwableArgs = $thePhp->throwable_args(...$throwableArgs);
         $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
         $_throwableArgs[ 'trace' ] = $trace;
 
         $exceptionArgs = [];
@@ -346,7 +346,7 @@ class Lib
 
         $_throwableArgs = $thePhp->throwable_args(...$throwableArgs);
         $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
         $_throwableArgs[ 'trace' ] = $trace;
 
         $exceptionArgs = [];
@@ -371,6 +371,61 @@ class Lib
         $fn();
 
         throw $e;
+    }
+
+
+    /**
+     * > gzhegow, thanks to PHP COMMUNITY!!111 we have to ensure internal types on all old classes
+     *
+     * @template-covariant T of object
+     *
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
+    public static function new7(string $class, ...$args)
+    {
+        if (PHP_VERSION_ID < 80000) {
+            return new $class(...$args);
+        }
+
+        $pi = Lib::php()->pathinfo($class, null, '\\', 1);
+        $namespace = $pi[ 'dirname' ];
+        $namespace .= '\\PHP8';
+        $classname = $pi[ 'filename' ];
+
+        $fqcn = "\\{$namespace}\\{$classname}";
+
+        $result = new $fqcn(...$args);
+
+        return $result;
+    }
+
+    /**
+     * > gzhegow, thanks to PHP COMMUNITY!!111 we have to ensure internal types on all old classes
+     *
+     * @template-covariant T of object
+     *
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
+    public static function new8(string $class, ...$args)
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            return new $class(...$args);
+        }
+
+        $pi = Lib::php()->pathinfo($class, null, '\\', 1);
+        $namespace = $pi[ 'dirname' ];
+        $namespace .= '\\PHP7';
+        $classname = $pi[ 'filename' ];
+
+        $fqcn = "\\{$namespace}\\{$classname}";
+
+        $result = new $fqcn(...$args);
+
+        return $result;
     }
 
 

@@ -4,6 +4,7 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Http\Cookie\Cookies;
 
 
@@ -229,7 +230,7 @@ class HttpModule
                 return $fallback;
             }
 
-            throw new \RuntimeException(
+            throw new RuntimeException(
                 "Missing COOKIE[ {$name} ]"
             );
         }

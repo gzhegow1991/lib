@@ -2,6 +2,9 @@
 
 namespace Gzhegow\Lib\Config;
 
+use Gzhegow\Lib\Exception\LogicException;
+
+
 abstract class AbstractConfig
 {
     /**
@@ -26,7 +29,7 @@ abstract class AbstractConfig
     public function __get($name)
     {
         if (! $this->__isset($name)) {
-            throw new \LogicException(
+            throw new LogicException(
                 'Missing property: ' . $name
             );
         }
@@ -37,7 +40,7 @@ abstract class AbstractConfig
     public function __set($name, $value)
     {
         if (! $this->__isset($name)) {
-            throw new \LogicException(
+            throw new LogicException(
                 'Missing property: ' . $name
             );
         }
@@ -48,7 +51,7 @@ abstract class AbstractConfig
     public function __unset($name)
     {
         if (! $this->__isset($name)) {
-            throw new \LogicException(
+            throw new LogicException(
                 'Missing property: ' . $name
             );
         }
@@ -77,7 +80,7 @@ abstract class AbstractConfig
                 || (! is_object($current))
                 || (! is_a($current, get_class($section)))
             ) {
-                throw new \LogicException(
+                throw new LogicException(
                     [
                         'Invalid section: ' . $key,
                         $current,

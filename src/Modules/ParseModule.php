@@ -147,6 +147,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * > Специальный тип, что свойство объекта ещё не имеет значения (если NULL - это допустимое значение)
+	 * > gzhegow, но лучше использовать пустой массив, если нулевой ключ есть - то передали, иначе - не передали
 	 *
 	 * @return mixed|null
 	 */
@@ -926,7 +927,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param callable          ...$fnExistsList
-	 *
 	 * @return class-string|null
 	 */
 	public function struct($value, bool $useRegex = null, ...$fnExistsList)
@@ -980,7 +980,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param callable          ...$fnExistsList
-	 *
 	 * @return class-string|null
 	 */
 	public function struct_fqcn($value, bool $useRegex = null, ...$fnExistsList)
@@ -995,7 +994,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param callable    ...$fnExistsList
-	 *
 	 * @return string|null
 	 */
 	public function struct_namespace($value, bool $useRegex = null, ...$fnExistsList)
@@ -1010,7 +1008,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param callable    ...$fnExistsList
-	 *
 	 * @return string|null
 	 */
 	public function struct_basename($value, bool $useRegex = null, ...$fnExistsList)
@@ -1038,7 +1035,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
 	 */
 	public function method_string($value, array $refs = [])
@@ -1053,7 +1049,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param string|object $newScope
-	 *
 	 * @return callable|null
 	 */
 	public function callable($value, $newScope = 'static')
@@ -1107,7 +1102,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param string|object                                            $newScope
-	 *
 	 * @return callable|array{
 	 */
 	public function callable_array($value, $newScope = 'static')
@@ -1122,7 +1116,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param string|object                                            $newScope
-	 *
 	 * @return callable|array{
 	 */
 	public function callable_array_method($value, $newScope = 'static')
@@ -1137,7 +1130,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param string|object                                     $newScope
-	 *
 	 * @return callable|array{
 	 */
 	public function callable_array_method_static($value, $newScope = 'static')
@@ -1152,7 +1144,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param string|object                               $newScope
-	 *
 	 * @return callable|array{
 	 */
 	public function callable_array_method_non_static($value, $newScope = 'static')
@@ -1206,7 +1197,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
 	 */
 	public function path($value, array $refs = [])
@@ -1221,7 +1211,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
 	 */
 	public function dirpath($value, array $refs = [])
@@ -1249,7 +1238,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
 	 */
 	public function path_realpath($value, array $refs = [])
@@ -1264,7 +1252,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
 	 */
 	public function dirpath_realpath($value, array $refs = [])
@@ -1279,7 +1266,6 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
 	 */
 	public function filepath_realpath($value, array $refs = [])

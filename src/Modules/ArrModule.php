@@ -591,87 +591,54 @@ class ArrModule
 
 
     /**
-     * > разбивает массив на два, где в первом все цифровые ключи (список), во втором - все буквенные (словарь)
-     *
-     * @return array{
-     *     0: array<int, mixed>,
-     *     1: array<string, mixed>
-     * }
+     * создать массив из ключей и заполнить значениями, если значение не передать заполнит цифрами по порядку
      */
-    public function kwargs(array $src = null) : array
+    public function fill_keys($keys, array $new = []) : array
     {
-        if (! isset($src)) return [];
-
-        $list = [];
-        $dict = [];
-
-        foreach ( $src as $idx => $val ) {
-            is_int($idx)
-                ? ($list[ $idx ] = $val)
-                : ($dict[ $idx ] = $val);
-        }
-
-        return [ $list, $dict ];
-    }
-
-
-    /**
-     * > выбросить указанные ключи
-     */
-    public function drop_keys(array $src, $keys) : array
-    {
-        if (null === $keys) {
-            return $src;
-        }
-
-        $_keysToRemove = (array) $keys;
-
-        foreach ( $_keysToRemove as $key ) {
-            if (! array_key_exists($key, $src)) {
-                continue;
-            }
-
-            unset($src[ $key ]);
-        }
-
-        return $src;
-    }
-
-    /**
-     * > заменить указанные ключи
-     */
-    public function drop_keys_new(array $src, $keys, $new = null) : array
-    {
-        if (null === $keys) {
-            return $src;
-        }
-
-        $_keysToRemove = (array) $keys;
-
-        foreach ( $_keysToRemove as $key ) {
-            if (! array_key_exists($key, $src)) {
-                continue;
-            }
-
-            $src[ $key ] = $new;
-        }
-
-        return $src;
-    }
-
-    /**
-     * > оставить в массиве указанные ключи, остальные выбросить
-     */
-    public function keep_keys(array $src, $keys) : array
-    {
-        if (null === $keys) {
+        $keys = (array) $keys;
+        if (! count($keys)) {
             return [];
         }
 
-        $_keysToKeep = array_flip((array) $keys);
+        $hasNew = count($new);
 
-        foreach ( $src as $key => $val ) {
-            if (! isset($_keysToKeep[ $key ])) {
+        if ($hasNew) {
+            $result = array_fill_keys($keys, $new[ 0 ]);
+
+        } else {
+            $result = [];
+
+            $i = 0;
+            foreach ( $keys as $key ) {
+                $result[ $key ] = ++$i;
+            }
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * > выбросить/заменить указанные ключи
+     */
+    public function drop_keys(array $src, $keys, array $new = []) : array
+    {
+        $keys = (array) $keys;
+        if (! count($keys)) {
+            return $src;
+        }
+
+        $hasNew = count($new);
+
+        foreach ( (array) $keys as $key ) {
+            if (! array_key_exists($key, $src)) {
+                continue;
+            }
+
+            if ($hasNew) {
+                $src[ $key ] = $new[ 0 ];
+
+            } else {
                 unset($src[ $key ]);
             }
         }
@@ -682,17 +649,25 @@ class ArrModule
     /**
      * > оставить в массиве указанные ключи, остальные заменить
      */
-    public function keep_keys_new(array $src, $keys, $new = null) : array
+    public function keep_keys(array $src, $keys, array $new = []) : array
     {
-        if (null === $keys) {
+        $keys = (array) $keys;
+        if (! count($keys)) {
             return [];
         }
 
-        $_keysToKeep = array_flip((array) $keys);
+        $hasNew = count($new);
+
+        $keysToKeep = array_flip($keys);
 
         foreach ( $src as $key => $val ) {
-            if (! isset($_keysToKeep[ $key ])) {
-                $src[ $key ] = $new;
+            if (! isset($keysToKeep[ $key ])) {
+                if ($hasNew) {
+                    $src[ $key ] = $new[ 0 ];
+
+                } else {
+                    unset($src[ $key ]);
+                }
             }
         }
 
@@ -797,7 +772,7 @@ class ArrModule
     }
 
     /**
-     * > оставить в массиве значения, что прошли фильтр, остальные заменить
+     * > оставить в массиве значения, что прошли фильтр, остальные заменить. По сути array_filter() с заменой на NULL
      *
      * @param callable|null $fn
      */
@@ -884,6 +859,30 @@ class ArrModule
         return $src;
     }
 
+
+    /**
+     * > разбивает массив на два, где в первом все цифровые ключи (список), во втором - все буквенные (словарь)
+     *
+     * @return array{
+     *     0: array<int, mixed>,
+     *     1: array<string, mixed>
+     * }
+     */
+    public function kwargs(array $src = null) : array
+    {
+        if (! isset($src)) return [];
+
+        $list = [];
+        $dict = [];
+
+        foreach ( $src as $idx => $val ) {
+            is_int($idx)
+                ? ($list[ $idx ] = $val)
+                : ($dict[ $idx ] = $val);
+        }
+
+        return [ $list, $dict ];
+    }
 
     /**
      *  > разбивает массив на два по критерию

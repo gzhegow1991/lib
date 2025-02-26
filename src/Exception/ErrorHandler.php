@@ -2,6 +2,9 @@
 
 namespace Gzhegow\Lib\Exception;
 
+use Gzhegow\Lib\Lib;
+
+
 class ErrorHandler
 {
     /**
@@ -66,7 +69,7 @@ class ErrorHandler
     /**
      * @return static
      */
-    public function useErrorReporting() // : static
+    public function useErrorReporting(&$last = null) // : static
     {
         $last = error_reporting($this->errorReporting);
 
@@ -74,9 +77,11 @@ class ErrorHandler
     }
 
     /**
+     * @param callable|null $last
+     *
      * @return static
      */
-    public function useErrorHandler() // : static
+    public function useErrorHandler(&$last = null) // : static
     {
         $last = set_error_handler($this->errorHandler);
 
@@ -84,9 +89,11 @@ class ErrorHandler
     }
 
     /**
+     * @param callable|null $last
+     *
      * @return static
      */
-    public function useExceptionHandler() // : static
+    public function useExceptionHandler(&$last = null) // : static
     {
         $last = set_exception_handler($this->exceptionHandler);
 
@@ -108,7 +115,19 @@ class ErrorHandler
     {
         $exit = $exit ?? true;
 
-        $it = new ExceptionIterator([ $throwable ]);
+        $shouldConvertToUtf8 = extension_loaded('mbstring');
+        $shouldConvertFromCp1251 = (PHP_VERSION_ID < 80100);
+
+        $theMb = null;
+        $thePhp = null;
+        if ($shouldConvertToUtf8) {
+            $theMb = Lib::mb();
+            $thePhp = Lib::php();
+
+            $shouldConvertToUtf8 &= $thePhp->is_windows();
+        }
+
+        $it = Lib::new8(ExceptionIterator::class, [ $throwable ]);
         $iit = new \RecursiveIteratorIterator($it);
 
         $messageLines = [];
@@ -117,9 +136,35 @@ class ErrorHandler
                 $phpClass = get_class($e);
                 $phpId = spl_object_id($e);
                 $phpFile = $e->getFile() ?? '{file}';
-                $phpLine = $e->getLine() ?? '{line}';
+                $phpLine = $e->getLine() ?? 0;
+                $phpMessage = $e->getMessage() ?? '{message}';
 
-                $messageLines[] = "[ {$i} ] {$e->getMessage()}";
+                if ($shouldConvertToUtf8) {
+                    if (! $theMb->is_utf8($phpMessage)) {
+                        if (true
+                            && $shouldConvertFromCp1251
+                            && $e instanceof \PDOException
+                        ) {
+                            $phpMessage = $theMb->convert_encoding(
+                                $phpMessage,
+                                'UTF-8',
+                                'CP1251'
+                            );
+
+                        } else {
+                            $mbEncodingList = mb_list_encodings();
+                            array_unshift($mbEncodingList, 'CP1251');
+
+                            $phpMessage = $theMb->convert_encoding(
+                                $phpMessage,
+                                'UTF-8',
+                                $mbEncodingList
+                            );
+                        }
+                    }
+                }
+
+                $messageLines[] = "[ {$i} ] {$phpMessage}";
                 $messageLines[] = "{ object # {$phpClass} # {$phpId} } ";
                 $messageLines[] = "{$phpFile} : {$phpLine}";
             }
@@ -128,7 +173,7 @@ class ErrorHandler
         $traceLines = [];
         foreach ( $throwable->getTrace() as $traceItem ) {
             $phpFile = $traceItem[ 'file' ] ?? '{file}';
-            $phpLine = $traceItem[ 'line' ] ?? '{line}';
+            $phpLine = $traceItem[ 'line' ] ?? 0;
 
             $traceLines[] = "{$phpFile} : {$phpLine}";
         }

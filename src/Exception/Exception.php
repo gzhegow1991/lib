@@ -3,6 +3,8 @@
 namespace Gzhegow\Lib\Exception;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\Traits\AggregateExceptionTrait;
+use Gzhegow\Lib\Exception\Interfaces\AggregateExceptionInterface;
 
 
 class Exception extends \Exception implements
@@ -14,15 +16,6 @@ class Exception extends \Exception implements
 
     use AggregateExceptionTrait;
 
-
-    /**
-     * @var string
-     */
-    public $file;
-    /**
-     * @var int
-     */
-    public $line;
 
     /**
      * @var array
@@ -47,11 +40,11 @@ class Exception extends \Exception implements
     /**
      * @return iterable<string, \Throwable[]>
      */
-    public function getIterator()
+    public function getIterator() : \Traversable
     {
         /** @var iterable<string, \Throwable[]> $iit */
 
-        $it = new ExceptionIterator([ $this ]);
+        $it = Lib::new8(ExceptionIterator::class, [ $this ]);
         $iit = new \RecursiveIteratorIterator($it);
 
         return $iit;

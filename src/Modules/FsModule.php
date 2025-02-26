@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
@@ -470,39 +471,6 @@ class FsModule
 
 
     /**
-     * > по умолчанию для двойного расширения будет возвращено только последнее
-     */
-    public function pathinfo(string $path, int $flags = null) // : string|array
-    {
-        if (! isset($flags)) {
-            $basename = basename($path);
-            [ $filename, $extension ] = explode('.', $basename, 2) + [ null, null ];
-
-            $pi = pathinfo($path);
-            $pi[ 'filename' ] = $filename;
-            $pi[ 'extension' ] = $extension;
-
-            return $pi;
-        }
-
-        if ($flags & PATHINFO_EXTENSION) {
-            $basename = basename($path);
-            [ , $extension ] = explode('.', $basename, 2) + [ null, null ];
-
-            return $extension;
-
-        } elseif ($flags & PATHINFO_FILENAME) {
-            $basename = basename($path);
-            [ $filename, ] = explode('.', $basename, 2) + [ null, null ];
-
-            return $filename;
-        }
-
-        return pathinfo($path, $flags);
-    }
-
-
-    /**
      * > разбирает последовательности /../ в пути до файла и возвращает путь через правый слеш
      */
     public function normalize(string $path) : string
@@ -543,16 +511,200 @@ class FsModule
         $_root = $this->normalize($root);
 
         if ($_path === $_root) {
-            throw new \RuntimeException('Path is equal to root: ' . $root);
+            throw new RuntimeException(
+                'Path is equal to root: ' . $root
+            );
         }
 
         if (0 !== strpos($_path, $_root)) {
-            throw new \RuntimeException('Path is not a child of root: ' . implode(' / ', [ $root, $path ]));
+            throw new RuntimeException(
+                'Path is not a child of root: '
+                . implode(' / ', [ $root, $path ])
+            );
         }
 
         $result = substr($_path, mb_strlen($_root));
         $result = ltrim($result, '/');
 
         return $result;
+    }
+
+
+    public function file_diff($file1, $file2, int $length = null, int $lengthBuffer = null)
+    {
+        $length = $length ?? 8192;
+        $lengthBuffer = $lengthBuffer ?? 1024 * 1024;
+
+        if ($length < 1) {
+            throw new LogicException(
+                [ 'The `length` should be greater than zero', $length ]
+            );
+        }
+
+        $fh1 = fopen($file1, 'rb');
+        $fh2 = fopen($file2, 'rb');
+
+        if (! $fh1) {
+            throw new RuntimeException(
+                'Unable to open file with flags: ' . $file1 . ' / rb'
+            );
+        }
+        if (! $fh2) {
+            throw new RuntimeException(
+                'Unable to open file with flags: ' . $file2 . ' / rb'
+            );
+        }
+
+        $lineNumber = 1;
+        $buffer1 = '';
+        $buffer2 = '';
+
+        $diff = [];
+
+        while ( true
+            && ! feof($fh1)
+            && ! feof($fh2)
+        ) {
+            $chunk1 = fread($fh1, $length);
+            $chunk2 = fread($fh2, $length);
+
+            $len1 = strlen($chunk1);
+            $len2 = strlen($chunk2);
+
+            $buffer1 .= $chunk1;
+            $buffer2 .= $chunk2;
+
+            if ($len1 !== $len2) {
+                $maxlen = max(
+                    strlen($buffer1),
+                    strlen($buffer2)
+                );
+
+                $line1 = substr($buffer1, 0, $maxlen);
+                $line2 = substr($buffer2, 0, $maxlen);
+
+                if ($line1 !== $line2) {
+                    $diff[] = [
+                        $lineNumber,
+                        [ strlen($line1), $line1 ],
+                        [ strlen($line2), $line2 ],
+                    ];
+                }
+
+                $buffer1 = '';
+                $buffer2 = '';
+
+            } else {
+                if ($chunk1 !== $chunk2) {
+                    $hasNPos1 = (false !== ($nPos1 = strpos($buffer1, "\n")));
+                    $hasNPos2 = (false !== ($nPos2 = strpos($buffer2, "\n")));
+
+                    if ($hasNPos1 && $hasNPos2) {
+                        while ( true
+                            && (false !== ($nPos1 = strpos($buffer1, "\n")))
+                            && (false !== ($nPos2 = strpos($buffer2, "\n")))
+                        ) {
+                            $line1 = substr($buffer1, 0, $nPos1 + 1);
+                            $line2 = substr($buffer2, 0, $nPos2 + 1);
+
+                            $buffer1 = substr($buffer1, $nPos1 + 1);
+                            $buffer2 = substr($buffer2, $nPos2 + 1);
+
+                            if ($line1 !== $line2) {
+                                $diff[] = [
+                                    $lineNumber,
+                                    [ strlen($line1), $line1 ],
+                                    [ strlen($line2), $line2 ],
+                                ];
+                            }
+
+                            $lineNumber++;
+                        }
+
+                    } else {
+                        if ($hasNPos1) {
+                            $line1 = substr($buffer1, 0, $nPos1 + 1);
+                            $line2 = substr($buffer2, 0, $nPos1 + 1);
+
+                            $buffer1 = substr($buffer1, $nPos1 + 1);
+
+                            while ( ! feof($fh2) ) {
+                                $buffer2 = fgets($fh2, $lengthBuffer);
+
+                                if ($buffer2[ strlen($buffer2) - 1 ] === "\n") {
+                                    break;
+                                }
+                            }
+
+                            $buffer2 = '';
+
+                        } elseif ($hasNPos2) {
+                            $line1 = substr($buffer1, 0, $nPos2 + 1);
+                            $line2 = substr($buffer2, 0, $nPos2 + 1);
+
+                            $buffer2 = substr($buffer2, $nPos2 + 1);
+
+                            while ( ! feof($fh1) ) {
+                                $buffer1 = fgets($fh1, $lengthBuffer);
+
+                                if ($buffer1[ strlen($buffer1) - 1 ] === "\n") {
+                                    break;
+                                }
+                            }
+
+                            $buffer1 = '';
+
+                        } else {
+                            $minlen = min(
+                                strlen($buffer1),
+                                strlen($buffer2)
+                            );
+
+                            $line1 = substr($buffer1, 0, $minlen);
+                            $line2 = substr($buffer2, 0, $minlen);
+
+                            $hasFh1 = true;
+                            $hasFh2 = true;
+                            while ( false
+                                || ($hasFh1 = $hasFh1 && (! feof($fh1)))
+                                || ($hasFh2 = $hasFh2 && (! feof($fh2)))
+                            ) {
+                                $buffer1 = fgets($fh1, $lengthBuffer);
+                                $buffer2 = fgets($fh2, $lengthBuffer);
+
+                                if ($buffer1[ strlen($buffer1) - 1 ] === "\n") {
+                                    $hasFh1 = false;
+                                }
+                                if ($buffer2[ strlen($buffer2) - 1 ] === "\n") {
+                                    $hasFh2 = false;
+                                }
+
+                                if (! $hasFh1 && ! $hasFh2) {
+                                    break;
+                                }
+                            }
+
+                            $buffer1 = '';
+                            $buffer2 = '';
+                        }
+
+                        if ($line1 !== $line2) {
+                            $diff[] = [
+                                $lineNumber,
+                                [ strlen($line1), $line1 ],
+                                [ strlen($line2), $line2 ],
+                            ];
+                        }
+
+                        $lineNumber++;
+                    }
+                }
+            }
+        }
+
+        fclose($fh1);
+        fclose($fh2);
+
+        return $diff;
     }
 }

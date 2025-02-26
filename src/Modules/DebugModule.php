@@ -297,7 +297,7 @@ class DebugModule
         }
 
         $cloner = new \Symfony\Component\VarDumper\Cloner\VarCloner();
-        $dumper = in_array(\PHP_SAPI, [ 'cli', 'phpdbg' ])
+        $dumper = Lib::php()->is_terminal()
             ? new \Symfony\Component\VarDumper\Dumper\CliDumper()
             : new \Symfony\Component\VarDumper\Dumper\HtmlDumper();
 
@@ -411,7 +411,7 @@ class DebugModule
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? 0;
         $traceWhereIs = "{$traceFile}: {$traceLine}";
 
         $options = $options ?? [];
@@ -675,7 +675,9 @@ class DebugModule
             }
 
             foreach ( $trims as $i => $v ) {
-                $trims[ $i ] .= $i;
+                if ($i === "\n") {
+                    $trims[ $i ] .= $i;
+                }
             }
             $_var = str_replace(
                 array_keys($trims),
@@ -706,8 +708,8 @@ class DebugModule
         $objectClass = $objectClassId;
         $objectId = spl_object_id($var);
 
-        if (0 === strpos($objectClass, $needle = 'class@anonymous')) {
-            $objectClass = 'class@anonymous';
+        if (false !== ($pos = strpos($objectClass, $needle = '@anonymous'))) {
+            $objectClass = substr($objectClass, 0, $pos + strlen($needle));
         }
 
         $objectSubtypeCountable = (($var instanceof \Countable) ? 'countable(' . count($var) . ')' : null);
@@ -772,17 +774,20 @@ class DebugModule
                     continue;
                 }
 
-                if (is_array($value)) {
+                if (is_string($value)) {
                     // ! recursion
                     $value = $this->var_dump(
                         $value,
                         [
-                            'with_type'       => true,
-                            'with_value'      => false,
+                            'with_type'       => false,
+                            'with_id'         => false,
+                            'with_value'      => true,
                             //
                             'array_level_max' => 0,
                         ] + $options
                     );
+
+                    $value = substr($value, 1, -1);
 
                     continue;
                 }
@@ -795,8 +800,27 @@ class DebugModule
                     $value = $this->var_dump(
                         $value,
                         [
-                            'with_type'  => true,
-                            'with_value' => false,
+                            'with_type'       => true,
+                            'with_id'         => false,
+                            'with_value'      => false,
+                            //
+                            'array_level_max' => 0,
+                        ] + $options
+                    );
+
+                    continue;
+                }
+
+                if (is_array($value)) {
+                    // ! recursion
+                    $value = $this->var_dump(
+                        $value,
+                        [
+                            'with_type'       => true,
+                            'with_id'         => false,
+                            'with_value'      => false,
+                            //
+                            'array_level_max' => 0,
                         ] + $options
                     );
 

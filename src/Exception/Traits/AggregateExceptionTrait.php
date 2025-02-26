@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Exception;
+namespace Gzhegow\Lib\Exception\Traits;
 
 trait AggregateExceptionTrait
 {

@@ -80,7 +80,7 @@ class TestModule
 
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? 0;
 
         $mt = microtime(true);
 
@@ -119,9 +119,9 @@ class TestModule
                 }
 
                 $e = new RuntimeException([ $message, $diffString ]);
-                $e->trace = $trace;
-                $e->file = $traceFile;
-                $e->line = $traceLine;
+                $e->setTrace($trace);
+                $e->setFile($traceFile);
+                $e->setLine($traceLine);
 
                 $eArray[] = $e;
             }
@@ -187,9 +187,9 @@ class TestModule
                 }
 
                 $e = new RuntimeException(implode(' | ', array_filter($message)));
-                $e->trace = $trace;
-                $e->file = $traceFile;
-                $e->line = $traceLine;
+                $e->setTrace($trace);
+                $e->setFile($traceFile);
+                $e->setLine($traceLine);
 
                 $eArray[] = $e;
             }
@@ -214,9 +214,9 @@ class TestModule
                 }
 
                 $e = new RuntimeException([ $message, $diffString ]);
-                $e->trace = $trace;
-                $e->file = $traceFile;
-                $e->line = $traceLine;
+                $e->setTrace($trace);
+                $e->setFile($traceFile);
+                $e->setLine($traceLine);
 
                 $eArray[] = $e;
             }
@@ -255,7 +255,7 @@ class TestModule
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? 0;
 
         ob_start();
         $var = call_user_func_array($fn, $fnArgs);
@@ -285,9 +285,9 @@ class TestModule
             }
 
             $e = new RuntimeException([ $message, $diffString ]);
-            $e->trace = $trace;
-            $e->file = $traceFile;
-            $e->line = $traceLine;
+            $e->setTrace($trace);
+            $e->setFile($traceFile);
+            $e->setLine($traceLine);
 
             if (null !== $resourceStdout) {
                 return false;
@@ -315,7 +315,7 @@ class TestModule
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? 0;
 
         $mt = microtime(true);
 
@@ -383,9 +383,9 @@ class TestModule
             }
 
             $e = new RuntimeException(implode(' | ', array_filter($message)));
-            $e->trace = $trace;
-            $e->file = $traceFile;
-            $e->line = $traceLine;
+            $e->setTrace($trace);
+            $e->setFile($traceFile);
+            $e->setLine($traceLine);
 
             if (null !== $resourceStdout) {
                 return false;
@@ -415,7 +415,7 @@ class TestModule
 
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? 0;
 
         $currentReturn = call_user_func_array($fn, $fnArgs);
 
@@ -439,9 +439,9 @@ class TestModule
             }
 
             $e = new RuntimeException([ $message, $diffString ]);
-            $e->trace = $trace;
-            $e->file = $traceFile;
-            $e->line = $traceLine;
+            $e->setTrace($trace);
+            $e->setFile($traceFile);
+            $e->setLine($traceLine);
 
             if (null !== $resourceStdout) {
                 return false;
@@ -469,14 +469,13 @@ class TestModule
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $traceLine = $trace[ 0 ][ 'line' ] ?? '{line}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? 0;
 
         $mem = memory_get_usage();
 
         $return = call_user_func_array($fn, $fnArgs);
 
         $currentBytes = memory_get_usage() - $mem;
-        var_dump($mem, $currentBytes);
 
         $bytes = $currentBytes;
 
@@ -499,9 +498,9 @@ class TestModule
             }
 
             $e = new RuntimeException($message);
-            $e->trace = $trace;
-            $e->file = $traceFile;
-            $e->line = $traceLine;
+            $e->setTrace($trace);
+            $e->setFile($traceFile);
+            $e->setLine($traceLine);
 
             if (null !== $resourceStdout) {
                 return false;

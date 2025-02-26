@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules\Http\Cookie;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\LogicException;
 
 
 class Cookies
@@ -149,19 +150,19 @@ class Cookies
         $theType = Lib::type();
 
         if (! $theType->string($var, $cookieName)) {
-            throw new \LogicException(
+            throw new LogicException(
                 'The `cookieName` should be non empty string'
             );
         }
 
         if (! $theType->string($var, $cookiePath)) {
-            throw new \LogicException(
+            throw new LogicException(
                 'The `cookiePath` should be non empty string'
             );
         }
 
         if (! $theType->string($var, $cookieDomain)) {
-            throw new \LogicException(
+            throw new LogicException(
                 'The `cookieDomain` should be non empty string'
             );
         }

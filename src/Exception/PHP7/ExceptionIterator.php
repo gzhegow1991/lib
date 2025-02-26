@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Exception;
+namespace Gzhegow\Lib\Exception\PHP7;
 
 use Gzhegow\Lib\Exception\Interfaces\AggregateExceptionInterface;
 
@@ -57,7 +57,7 @@ class ExceptionIterator implements \RecursiveIterator
     /**
      * @return \Throwable[]
      */
-    public function current() : mixed
+    public function current()
     {
         $track = $this->track;
 
@@ -74,7 +74,7 @@ class ExceptionIterator implements \RecursiveIterator
     /**
      * @return string
      */
-    public function key() : mixed
+    public function key()
     {
         $track = end($this->track);
 

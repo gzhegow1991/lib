@@ -176,6 +176,14 @@ class CallableParser implements CallableParserInterface
             return true;
         }
 
+        $function = $this->parse_function($value);
+        if (null !== $function) {
+            // > plain function
+            $result = $value;
+
+            return true;
+        }
+
         $methodArray = null
             ?? $this->parse_method_array_from_array($value)
             ?? $this->parse_method_array_from_string($value);
@@ -194,21 +202,21 @@ class CallableParser implements CallableParserInterface
         }
 
         if (false
-            || ($theMethod === '__invoke')
-            || ($theMethod === '__call')
-            || ($theMagic === '__invoke')
-            || ($theMagic === '__call')
-        ) {
-            return false;
-        }
-
-        if (false
             || ($theMethod === '__callStatic')
             || ($theMagic === '__callStatic')
         ) {
             $result = $value;
 
             return true;
+        }
+
+        if (false
+            || ($theMethod === '__invoke')
+            || ($theMethod === '__call')
+            || ($theMagic === '__invoke')
+            || ($theMagic === '__call')
+        ) {
+            return false;
         }
 
         try {
@@ -631,15 +639,6 @@ class CallableParser implements CallableParserInterface
             return false;
         }
 
-        if (false
-            || ($theMethod === '__invoke')
-            || ($theMethod === '__call')
-            || ($theMagic === '__invoke')
-            || ($theMagic === '__call')
-        ) {
-            return false;
-        }
-
         $callableMethodStatic = "{$theClass}::{$theMethod}";
 
         $callableMethodStaticMagic = null;
@@ -658,6 +657,15 @@ class CallableParser implements CallableParserInterface
             $result = $callableMethodStatic;
 
             return true;
+        }
+
+        if (false
+            || ($theMethod === '__invoke')
+            || ($theMethod === '__call')
+            || ($theMagic === '__invoke')
+            || ($theMagic === '__call')
+        ) {
+            return false;
         }
 
         try {

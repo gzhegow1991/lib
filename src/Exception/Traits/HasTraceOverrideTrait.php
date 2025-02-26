@@ -1,8 +1,9 @@
 <?php
 
-namespace Gzhegow\Lib\Exception;
+namespace Gzhegow\Lib\Exception\Traits;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\Interfaces\HasTraceOverrideInterface;
 
 
 /**
@@ -13,18 +14,40 @@ use Gzhegow\Lib\Lib;
 trait HasTraceOverrideTrait
 {
     /**
-     * @var string
-     */
-    public $file;
-    /**
-     * @var int|string
-     */
-    public $line;
-
-    /**
      * @var array
      */
     public $trace;
+
+
+    /**
+     * @return static
+     */
+    public function setFile(string $file)
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function setLine(int $line)
+    {
+        $this->line = $line;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function setTrace(array $trace)
+    {
+        $this->trace = $trace;
+
+        return $this;
+    }
 
 
     public function getFileOverride(string $fileRoot = null) : string

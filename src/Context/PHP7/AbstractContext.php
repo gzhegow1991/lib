@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Context;
+namespace Gzhegow\Lib\Context\PHP7;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
@@ -39,7 +39,7 @@ abstract class AbstractContext implements
         return $this->exists($offset);
     }
 
-    public function offsetGet($offset) : mixed
+    public function offsetGet($offset)
     {
         return $this->get($offset);
     }
@@ -94,7 +94,9 @@ abstract class AbstractContext implements
                 return $fallback;
             }
 
-            throw new RuntimeException('Missing property: ' . $name);
+            throw new RuntimeException(
+                'Missing property: ' . $name
+            );
         }
 
         return $this->{$name} ?? null;

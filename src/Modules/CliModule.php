@@ -10,23 +10,17 @@ class CliModule
 {
     public function __construct()
     {
-        if (in_array(\PHP_SAPI, [ 'cli', 'phpdbg' ])) {
+        if (Lib::php()->is_terminal()) {
             throw new RuntimeException('Module must be created in CLI mode');
         }
     }
 
 
-    public function isWindows() : bool
-    {
-        return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-    }
-
-
-    public function isJunction(string $junction) : bool
+    public function is_junction(string $junction) : bool
     {
         // https://github.com/composer/composer/blob/main/src/Composer/Util/Filesystem.php#L807
 
-        if (! $this->isWindows()) {
+        if (! Lib::php()->is_windows()) {
             return false;
         }
 
@@ -49,11 +43,11 @@ class CliModule
         return $result;
     }
 
-    public function isSymlink(string $symlink) : bool
+    public function is_symlink(string $symlink) : bool
     {
         return false
             || is_link($symlink)
-            || $this->isJunction($symlink);
+            || $this->is_junction($symlink);
     }
 
 

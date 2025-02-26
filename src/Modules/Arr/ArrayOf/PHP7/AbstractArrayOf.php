@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Arr\ArrayOf;
+namespace Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
@@ -153,7 +153,7 @@ abstract class AbstractArrayOf implements \ArrayAccess, \Countable, \Serializabl
         return serialize($this->__serialize());
     }
 
-    public function unserialize(string $data = '')
+    public function unserialize($data)
     {
         return unserialize($data);
     }
@@ -176,7 +176,7 @@ abstract class AbstractArrayOf implements \ArrayAccess, \Countable, \Serializabl
     /**
      * @return T|mixed
      */
-    public function offsetGet($offset) : mixed
+    public function offsetGet($offset)
     {
         if (! $this->offsetExists($offset)) {
             $debugOffset = Lib::debug()->value($offset);

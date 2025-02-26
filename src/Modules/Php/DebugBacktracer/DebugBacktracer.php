@@ -73,7 +73,7 @@ class DebugBacktracer
     {
         $options = $options ?? -1;
 
-        if ($options < 0) $options = (DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS);
+        if ($options < 0) $options = DEBUG_BACKTRACE_IGNORE_ARGS;
 
         $this->options = $options;
 
