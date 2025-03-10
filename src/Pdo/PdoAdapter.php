@@ -162,7 +162,10 @@ class PdoAdapter
             );
         }
 
-        $sql = $this->sqlEnsureCharset();
+        $sql = implode(";\n", [
+            $this->sqlEnsureCharset(),
+        ]);
+
         $pdo->exec($sql);
 
         return $pdo;
@@ -171,16 +174,35 @@ class PdoAdapter
 
     protected function sqlEnsureCharset() : string
     {
-        $pdoCharset = $this->pdoCharset;
-        $pdoCollate = $this->pdoCollate;
-
         // > until (PHP_VERSION_ID < 50306) this command was not sent on connect
         // > actually it have to be done using \PDO::MYSQL_ATTR_INIT_COMMAND but it supports only one query
-        $sql = "
-            SET CHARACTER SET {$pdoCharset};
-            SET NAMES {$pdoCharset} COLLATE {$pdoCollate};
-            SET collation_connection = \"{$pdoCollate}\";
-        ";
+
+        $pdoCharset = (string) $this->pdoCharset;
+        $pdoCollate = (string) $this->pdoCollate;
+
+        $hasCharset = ('' !== $pdoCharset);
+        $hasCollate = ('' !== $pdoCollate);
+
+        $sql = '';
+
+        if ($hasCharset && $hasCollate) {
+            $sql = "
+                SET CHARACTER SET {$pdoCharset};
+                SET NAMES {$pdoCharset} COLLATE {$pdoCollate};
+                SET collation_connection = \"{$pdoCollate}\";
+            ";
+
+        } elseif ($hasCharset) {
+            $sql = "
+                SET CHARACTER SET {$pdoCharset};
+                SET NAMES {$pdoCharset};
+            ";
+
+        } elseif ($hasCollate) {
+            $sql = "
+                SET collation_connection = \"{$pdoCollate}\";
+            ";
+        }
 
         return trim(trim($sql), ';');
     }
@@ -189,7 +211,9 @@ class PdoAdapter
     {
         $pdoDatabase = $this->pdoDatabase;
 
-        $sql = "USE {$pdoDatabase};";
+        $sql = "
+            USE {$pdoDatabase};
+        ";
 
         return trim(trim($sql), ';');
     }
