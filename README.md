@@ -13,6 +13,7 @@ composer require gzhegow/lib;
 ```php
 <?php
 
+require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 
@@ -90,9 +91,93 @@ function _assert_stdout(
 
 
 // >>> TEST
-// > тесты Exceptions
+// > тесты Config
 $fn = function () {
-    _print('[ Exceptions ]');
+    _print('[ Config ]');
+    echo PHP_EOL;
+
+    class ConfigDummy extends \Gzhegow\Lib\Config\AbstractConfig
+    {
+        protected $child;
+
+        public function __construct()
+        {
+            $this->child = new \ConfigChildDummy();
+
+            parent::__construct();
+        }
+    }
+
+    class ConfigChildDummy extends \Gzhegow\Lib\Config\AbstractConfig
+    {
+        protected $foo = 'bar';
+    }
+
+
+    $config = new \ConfigDummy();
+
+    $configChildOld = $config->child;
+
+    $configChildNewFooValue = 'baz';
+    $configChildNew = new \ConfigChildDummy();
+    $configChildNew->foo = $configChildNewFooValue;
+
+    $config->child = $configChildNew;
+
+    _print($config);
+    _print($config->child, $config->child === $configChildOld);
+    _print($config->child->foo, $config->child->foo === $configChildNew->foo);
+
+    echo PHP_EOL;
+
+
+    $config = new \ConfigDummy();
+    $configChildOld = $config->child;
+
+    $configChildNewFooValue = 'baz';
+    $config->load([
+        'hello' => 'world',
+        'foo'   => 'bar',
+        'child' => [
+            'foo' => $configChildNewFooValue,
+        ],
+    ]);
+
+    _print($config);
+    _print($config->child, $config->child === $configChildOld);
+    _print($config->child->foo, $config->child->foo === $configChildNewFooValue);
+
+    echo PHP_EOL;
+
+
+    $configArray = $config->toArray();
+    $config->load($configArray);
+
+    _print($config);
+    _print($config->child, $config->child === $configChildOld);
+    _print($config->child->foo, $config->child->foo === $configChildNewFooValue);
+};
+_assert_stdout($fn, [], '
+"[ Config ]"
+
+{ object # ConfigDummy }
+{ object # ConfigChildDummy } | TRUE
+"baz" | TRUE
+
+{ object # ConfigDummy }
+{ object # ConfigChildDummy } | TRUE
+"baz" | TRUE
+
+{ object # ConfigDummy }
+{ object # ConfigChildDummy } | TRUE
+"baz" | TRUE
+');
+
+
+// >>> TEST
+// > тесты Exception
+$fn = function () {
+    _print('[ Exception ]');
     echo PHP_EOL;
 
     $eeee1 = new \Exception('eeee1', 0);
@@ -140,7 +225,7 @@ $fn = function () {
     _print_array_multiline($eTrace, 2);
 };
 _assert_stdout($fn, [], '
-"[ Exceptions ]"
+"[ Exception ]"
 
 [ 0 ] e
 { object # Gzhegow\Lib\Exception\RuntimeException }

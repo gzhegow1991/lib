@@ -59,6 +59,7 @@ class Delegate
         })->call($this->object, $name);
     }
 
+
     public function __call($name, $arguments)
     {
         return (function ($name, $arguments) {

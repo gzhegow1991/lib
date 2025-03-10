@@ -26,13 +26,14 @@
         "ext-pcre": "*"
     },
     "suggest": {
-        "ext-filter": "*",
         "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-date": "*",
         "ext-fileinfo": "*",
+        "ext-filter": "*",
         "ext-json": "*",
-        "ext-mbstring": "*"
+        "ext-mbstring": "*",
+        "ext-pdo": "*"
     },
 
     "config": {

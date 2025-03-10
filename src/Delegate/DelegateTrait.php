@@ -32,6 +32,7 @@ trait DelegateTrait
         })->call($delegate, $name);
     }
 
+
     public function delegateCall(object $delegate, $name, $arguments)
     {
         return (function ($name, $arguments) {
