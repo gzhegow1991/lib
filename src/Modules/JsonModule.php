@@ -100,39 +100,26 @@ class JsonModule
      * @param array{ 0?: mixed } $fallback
      */
     public function json_decode(
-        string $json, bool $associative = null,
+        ?string $json, bool $associative = null,
         array $fallback = [],
         int $depth = null, int $flags = null
     ) // : mixed
     {
-        $depth = $depth ?? $this->static_json_depth();
-        $flags = $flags ?? $this->static_json_decode_flags();
+        $result = $this->_json_decode(
+            $json, $associative,
+            $depth, $flags
+        );
 
-        error_clear_last();
+        if (count($result)) {
+            [ $value ] = $result;
 
-        try {
-            $value = json_decode($json, $associative, $depth, $flags);
-        }
-        catch ( \Throwable $e ) {
-            $value = null;
-        }
+        } elseif (count($fallback)) {
+            [ $value ] = $fallback;
 
-        if (error_get_last()) {
-            $value = null;
-        }
-
-        if (null === $value) {
-            if (count($fallback)) {
-                [ $value ] = $fallback;
-
-            } else {
-                throw new RuntimeException(
-                    [
-                        'Unable to `json_decode`',
-                        $json,
-                    ]
-                );
-            }
+        } else {
+            throw new RuntimeException(
+                [ 'Unable to `json_decode`', $json ]
+            );
         }
 
         return $value;
@@ -142,26 +129,90 @@ class JsonModule
      * @param array{ 0?: mixed } $fallback
      */
     public function jsonc_decode(
-        string $json, bool $associative = null,
+        ?string $json, bool $associative = null,
         array $fallback = [],
         int $depth = null, int $flags = null
     ) // : mixed
     {
-        $regex = [];
-        $regex[] = preg_quote('#', '/') . '(.*?)$';
-        $regex[] = preg_quote('/*', '/') . '([\s\S]*?)' . preg_quote('*/', '/');
-        $regex[] = preg_quote('//', '/') . '(.*?)$';
-        $regex = '/' . implode('|', $regex) . '/mu';
+        if ('' === $json) {
+            return '';
+        }
 
-        $_json = preg_replace($regex, '$1', $json);
+        $_json = $json;
 
-        $value = $this->json_decode(
+        if (null !== $_json) {
+            $regexes = [];
+            $regexes[ '#' ] = '/' . preg_quote('#', '/') . '(.*?)$' . '/m';
+            $regexes[ '//' ] = '/' . preg_quote('//', '/') . '(.*?)$' . '/m';
+            $regexes[ '/*' ] = '/' . preg_quote('/*', '/') . '([\s\S]*?)' . preg_quote('*/', '/') . '/m';
+
+            foreach ( $regexes as $substr => $regex ) {
+                if (false === strpos($_json, $substr)) {
+                    continue;
+                }
+
+                $_json = preg_replace($regex, '$1', $_json);
+            }
+        }
+
+        $result = $this->_json_decode(
             $_json, $associative,
-            $fallback,
             $depth, $flags
         );
 
+        if (count($result)) {
+            [ $value ] = $result;
+
+        } elseif (count($fallback)) {
+            [ $value ] = $fallback;
+
+        } else {
+            throw new RuntimeException(
+                [ 'Unable to `jsonc_decode`', $json ]
+            );
+        }
+
         return $value;
+    }
+
+    /**
+     * @return array{ 0?: mixed }
+     */
+    protected function _json_decode(
+        ?string $json, bool $associative = null,
+        int $depth = null, int $flags = null
+    ) : array
+    {
+        $error = null;
+
+        if ('' === $json) {
+            return [ '' ];
+        }
+
+        $value = null;
+        if (null !== $json) {
+            $depth = $depth ?? $this->static_json_depth();
+            $flags = $flags ?? $this->static_json_decode_flags();
+
+            error_clear_last();
+
+            try {
+                $value = json_decode($json, $associative, $depth, $flags);
+            }
+            catch ( \Throwable $e ) {
+                $value = null;
+            }
+
+            if (error_get_last()) {
+                $value = null;
+            }
+        }
+
+        if (null === $value) {
+            return [];
+        }
+
+        return [ $value ];
     }
 
 
@@ -169,17 +220,19 @@ class JsonModule
      * @param array{ 0?: string } $fallback
      */
     public function json_encode(
-        $value,
-        array $fallback = [],
+        $value, array $fallback = [],
+        bool $allowNull = null,
         int $flags = null, int $depth = null
     ) : ?string
     {
+        $allowNull = $allowNull ?? false;
         $flags = $flags ?? $this->static_json_encode_flags();
         $depth = $depth ?? $this->static_json_depth();
 
         if (false
-            || is_resource($value)
-            || is_float($value) && is_nan($value)
+            || (is_resource($value))
+            || (is_float($value) && is_nan($value))
+            || (! $allowNull && is_null($value))
         ) {
             $json = null;
 
@@ -217,8 +270,8 @@ class JsonModule
 
 
     public function json_print(
-        $value,
-        array $fallback = [],
+        $value, array $fallback = [],
+        bool $allowNull = null,
         int $flags = null, int $depth = null
     ) : ?string
     {
@@ -230,7 +283,9 @@ class JsonModule
         );
 
         $json = $this->json_encode(
-            $value, $fallback,
+            $value,
+            $fallback,
+            $allowNull,
             $flags, $depth
         );
 

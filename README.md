@@ -1468,42 +1468,42 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    $result = \Gzhegow\Lib\Lib::json()->json_encode(
-        $value = [ 'hello' ]
-    );
-    _print($result);
+    $enc = \Gzhegow\Lib\Lib::format()->bytes_encode($src = 1024 * 1024);
+    _print($enc);
 
-    $result = \Gzhegow\Lib\Lib::json()->json_encode(
-        $value = NAN,
-        $fallback = [ "NAN" ]
-    );
-    _print($result);
+    $dec = \Gzhegow\Lib\Lib::format()->bytes_decode($enc);
+    _print($dec, $src === $dec);
 
-    $e = null;
-    try {
-        \Gzhegow\Lib\Lib::json()->json_encode(
-            $value = NAN
-        );
-    }
-    catch ( \Throwable $e ) {
-    }
-    _print('[ CATCH ] ' . $e->getMessage());
+    echo PHP_EOL;
 
 
-    $jsonc = "[1,/* 2 */3]";
-    $result = \Gzhegow\Lib\Lib::json()->jsonc_decode(
-        $json = $jsonc,
-        $associative = true
-    );
-    _print($result);
+    [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv_rows([ [ 'col1', 'col2' ], [ 'val1', 'val2' ] ]);
+    _print($csv);
+    _print($bytes);
+
+    echo PHP_EOL;
+
+
+    [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv_row([ 'col1', 'col2' ]);
+    _print($csv);
+    _print($bytes);
+
+    echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
 "[ FormatModule ]"
 
-"[\"hello\"]"
-"NAN"
-"[ CATCH ] Unable to `json_encode`"
-[ 1, 3 ]
+"1MB"
+1048576 | TRUE
+
+"col1;col2\n
+val1;val2\n
+"
+20
+
+"col1;col2\n
+"
+10
 ');
 
 
@@ -1544,6 +1544,166 @@ _assert_stdout($fn, [], '
 3
 3
 "123"
+');
+
+
+// >>> TEST
+// > тесты JsonModule
+$fn = function () {
+    _print('[ JsonModule ]');
+    echo PHP_EOL;
+
+
+    $json1 = '{"hello": "world"}';
+    $json2 = '
+        {
+            "hello": "world"
+        }
+    ';
+
+    $jsonWithComment1 = "[1,/* 2 */,3]";
+    $jsonWithComment2 = '
+        {
+            "hello": "world",
+            # "foo1": "bar1",
+            // "foo2": "bar2",
+            /* "foo3": "bar3" */
+        }
+    ';
+
+
+    $e = null;
+    try {
+        $result = \Gzhegow\Lib\Lib::json()->json_decode(null, true, []);
+    }
+    catch ( \Throwable $e ) {
+    }
+    _print('[ CATCH ] ' . $e->getMessage());
+
+    $e = null;
+    try {
+        $result = \Gzhegow\Lib\Lib::json()->jsonc_decode(null, true, []);
+    }
+    catch ( \Throwable $e ) {
+    }
+    _print('[ CATCH ] ' . $e->getMessage());
+
+    $result = \Gzhegow\Lib\Lib::json()->json_decode(null, true, [ null ]);
+    _print($result);
+
+    $result = \Gzhegow\Lib\Lib::json()->jsonc_decode(null, true, [ null ]);
+    _print($result);
+
+    echo PHP_EOL;
+
+
+    $result = \Gzhegow\Lib\Lib::json()->json_decode($json1, true, []);
+    _print($result);
+
+    $result = \Gzhegow\Lib\Lib::json()->jsonc_decode($json1, true, []);
+    _print($result);
+
+    $result = \Gzhegow\Lib\Lib::json()->json_decode($json2, true, []);
+    _print($result);
+
+    $result = \Gzhegow\Lib\Lib::json()->jsonc_decode($json2, true, []);
+    _print($result);
+
+    echo PHP_EOL;
+
+
+    $e = null;
+    try {
+        $result = \Gzhegow\Lib\Lib::json()->json_decode($jsonWithComment1, true, []);
+    }
+    catch ( \Throwable $e ) {
+    }
+    _print('[ CATCH ] ' . $e->getMessage());
+
+    $e = null;
+    try {
+        $result = \Gzhegow\Lib\Lib::json()->json_decode($jsonWithComment2, true, []);
+    }
+    catch ( \Throwable $e ) {
+    }
+    _print('[ CATCH ] ' . $e->getMessage());
+
+    $result = \Gzhegow\Lib\Lib::json()->jsonc_decode($jsonWithComment1, true, []);
+    _print($result);
+
+    $result = \Gzhegow\Lib\Lib::json()->jsonc_decode($jsonWithComment2, true, []);
+    _print($result);
+
+    echo PHP_EOL;
+
+
+    $e = null;
+    try {
+        $result = \Gzhegow\Lib\Lib::json()->json_encode(null, [], false);
+    }
+    catch ( \Throwable $e ) {
+    }
+    _print('[ CATCH ] ' . $e->getMessage());
+
+    $result = \Gzhegow\Lib\Lib::json()->json_encode(null, [ null ], false);
+    _print($result);
+
+    $result = \Gzhegow\Lib\Lib::json()->json_encode(null, [], true);
+    _print($result);
+
+    echo PHP_EOL;
+
+
+    $e = null;
+    try {
+        \Gzhegow\Lib\Lib::json()->json_encode($value = NAN);
+    }
+    catch ( \Throwable $e ) {
+    }
+    _print('[ CATCH ] ' . $e->getMessage());
+
+    $result = \Gzhegow\Lib\Lib::json()->json_encode(
+        $value = NAN,
+        $fallback = [ "NAN" ]
+    );
+    _print($result);
+
+    echo PHP_EOL;
+
+
+    $result = \Gzhegow\Lib\Lib::json()->json_encode("привет");
+    _print($result);
+
+    $result = \Gzhegow\Lib\Lib::json()->json_print("привет");
+    _print($result);
+};
+_assert_stdout($fn, [], '
+"[ JsonModule ]"
+
+"[ CATCH ] Unable to `json_decode`"
+"[ CATCH ] Unable to `jsonc_decode`"
+NULL
+NULL
+
+[ "hello" => "world" ]
+[ "hello" => "world" ]
+[ "hello" => "world" ]
+[ "hello" => "world" ]
+
+"[ CATCH ] Unable to `json_decode`"
+"[ CATCH ] Unable to `json_decode`"
+[ 1, 2, 3 ]
+[ "hello" => "world", "foo1" => "bar1", "foo2" => "bar2", "foo3" => "bar3" ]
+
+"[ CATCH ] Unable to `json_encode`"
+NULL
+"null"
+
+"[ CATCH ] Unable to `json_encode`"
+"NAN"
+
+"\"\u043f\u0440\u0438\u0432\u0435\u0442\""
+"\"привет\""
 ');
 
 

@@ -1530,6 +1530,9 @@ class DebugModule
                 && ($oldLines[ $iOld - 1 ] === $newLines[ $iNew - 1 ])
             ) {
                 $line = $oldLines[ $iOld - 1 ];
+                $line = ('' === $line) ? '~' : $line;
+                // $line = $line;
+
                 $lineNumber = $iOld;
 
                 $diffLines[] = [ $line, $lineNumber, null ];
@@ -1544,7 +1547,10 @@ class DebugModule
                     || ($matrix[ $iOld ][ $iNew - 1 ] < $matrix[ $iOld - 1 ][ $iNew ])
                 )
             ) {
-                $line = '--- > ' . $oldLines[ $iOld - 1 ];
+                $line = $oldLines[ $iOld - 1 ];
+                $line = ('' === $line) ? '~' : $line;
+                $line = '--- > ' . $line;
+
                 $lineNumber = $iOld;
 
                 $diffLines[] = [ $line, $lineNumber, false ];
@@ -1560,7 +1566,10 @@ class DebugModule
                     || ($matrix[ $iOld ][ $iNew - 1 ] >= $matrix[ $iOld - 1 ][ $iNew ])
                 )
             ) {
-                $line = '+++ > ' . $newLines[ $iNew - 1 ];
+                $line = $newLines[ $iNew - 1 ];
+                $line = ('' === $line) ? '~' : $line;
+                $line = '+++ > ' . $line;
+
                 $lineNumber = $iNew;
 
                 $diffLines[] = [ $line, $lineNumber, true ];

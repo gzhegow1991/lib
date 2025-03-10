@@ -117,6 +117,11 @@ class FormatModule
             }
         }
 
+        $separator = $separator ?? ';';
+        $enclosure = $enclosure ?? '"';
+        $escape = $escape ?? '\\';
+        $eol = $eol ?? PHP_EOL;
+
         $fputcsvArgs = [ $separator, $enclosure, $escape ];
 
         if (PHP_VERSION > 80100) {
@@ -155,6 +160,11 @@ class FormatModule
                 'The `row` should be not-empty array'
             );
         }
+
+        $separator = $separator ?? ';';
+        $enclosure = $enclosure ?? '"';
+        $escape = $escape ?? '\\';
+        $eol = $eol ?? PHP_EOL;
 
         $_row = array_values($row);
 
