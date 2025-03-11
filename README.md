@@ -1489,6 +1489,46 @@ $fn = function () {
     _print($bytes);
 
     echo PHP_EOL;
+
+
+    $params = [];
+    $sqlIn = \Gzhegow\Lib\Lib::format()->sql_in($params, 'AND `user_id`', [ 1, 2, 3 ]);
+    _print($sqlIn);
+    _print_array($params);
+
+    echo PHP_EOL;
+
+
+    $params = [];
+    $sqlIn = \Gzhegow\Lib\Lib::format()->sql_in($params, 'AND `user_id`', [ 1, 2, 3 ], 'user_id');
+    _print($sqlIn);
+    _print_array($params);
+
+    echo PHP_EOL;
+
+
+    $sqlLike = \Gzhegow\Lib\Lib::format()->sql_like_quote('Hello, _user_! How are you today, in percents (%)?', '\\');
+    _print($sqlLike);
+
+    $sqlLike = \Gzhegow\Lib\Lib::format()->sql_like_escape(
+        'AND `search`', 'ILIKE',
+        'Hello, _user_! How are you today, in percents (%)?'
+    );
+    _print($sqlLike);
+
+    $sqlLike = \Gzhegow\Lib\Lib::format()->sql_like_escape(
+        'AND `name`', 'LIKE',
+        [ '__' ], 'user%%__', [ '%' ]
+    );
+    _print($sqlLike);
+
+    echo PHP_EOL;
+
+
+    $regex = \Gzhegow\Lib\Lib::format()->preg_escape('/', '<html>', [ '.*' ], '</html>');
+    _print($regex);
+
+    echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
 "[ FormatModule ]"
@@ -1504,6 +1544,18 @@ val1;val2\n
 "col1;col2\n
 "
 10
+
+"AND `user_id` IN (?, ?, ?)"
+[ 1, 2, 3 ]
+
+"AND `user_id` IN (:user_id0, :user_id1, :user_id2)"
+[ ":user_id0" => 1, ":user_id1" => 2, ":user_id2" => 3 ]
+
+"Hello, \_user\_! How are you today, in percents (\%)?"
+"AND `search` ILIKE \"Hello, \_user\_! How are you today, in percents (\%)?\""
+"AND `name` LIKE \"__user\%\%\_\_%\""
+
+"/\<html\>.*\<\/html\>/"
 ');
 
 
