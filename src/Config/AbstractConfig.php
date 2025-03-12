@@ -157,25 +157,29 @@ abstract class AbstractConfig
     }
 
 
-    public function validate(array $context = []) : bool
+    /**
+     * @return static
+     */
+    public function validate(array $context = [])
     {
         foreach ( $this->__keys as $key => $bool ) {
-            if (! $this->validateKey($key, $context)) {
-                return false;
-            }
+            $this->validateKey($key, $context);
         }
 
-        return true;
+        return $this;
     }
 
-    public function validateKey(string $key, array $context = []) : bool
+    /**
+     * @return static
+     */
+    public function validateKey(string $key, array $context = [])
     {
         if (isset($this->__children[ $key ])) {
             // ! recursion
-            return $this->__children[ $key ]->validate();
+            $this->__children[ $key ]->validate($context);
         }
 
-        return true;
+        return $this;
     }
 
 
