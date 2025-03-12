@@ -178,10 +178,7 @@ class DebugModule
         return $result;
     }
 
-    /**
-     * @return callable|null
-     */
-    public function static_var_dump_options(array $varDumpOptions = null) // : ?callable
+    public function static_var_dump_options(array $varDumpOptions = null) : ?array
     {
         if (null !== $varDumpOptions) {
             $last = $this->varDumpOptions;

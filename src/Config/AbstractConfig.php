@@ -157,10 +157,10 @@ abstract class AbstractConfig
     }
 
 
-    public function validate() : bool
+    public function validate(array $context = []) : bool
     {
         foreach ( $this->__keys as $key => $bool ) {
-            if (! $this->validateKey($key)) {
+            if (! $this->validateKey($key, $context)) {
                 return false;
             }
         }
@@ -168,7 +168,7 @@ abstract class AbstractConfig
         return true;
     }
 
-    public function validateKey(string $key) : bool
+    public function validateKey(string $key, array $context = []) : bool
     {
         if (isset($this->__children[ $key ])) {
             // ! recursion
@@ -176,5 +176,20 @@ abstract class AbstractConfig
         }
 
         return true;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function configure(\Closure $fn, array $context = [])
+    {
+        $fnBound = $fn->bindTo($this, $this);
+
+        $fnBound($this);
+
+        $this->validate($context);
+
+        return $this;
     }
 }
