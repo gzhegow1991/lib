@@ -105,25 +105,35 @@ $fn = function () {
 
             parent::__construct();
         }
-
-        protected function validateKey(string $key, array $path = [], array $context = []) : array
-        {
-            return [];
-        }
     }
 
     class ConfigChildDummy extends \Gzhegow\Lib\Config\AbstractConfig
     {
-        protected $foo  = 'bar';
-        protected $foo2 = '';
+        protected $foo = 'bar';
+    }
 
-        protected function validateKey(string $key, array $path = [], array $context = []) : array
+    class ConfigValidateDummy extends \Gzhegow\Lib\Config\AbstractConfig
+    {
+        protected $child;
+
+        public function __construct()
+        {
+            $this->child = new \ConfigChildValidateDummy();
+
+            parent::__construct();
+        }
+    }
+
+    class ConfigChildValidateDummy extends \Gzhegow\Lib\Config\AbstractConfig
+    {
+        protected $foo = 1;
+        protected $foo2;
+
+        protected function validateValue($value, string $key, array $path = [], array $context = []) : array
         {
             $errors = [];
 
             if ($key === 'foo2') {
-                $value = $this->{$key};
-
                 if ($value !== $this->foo) {
                     $message = 'The `foo2` should be equal to `foo`';
                     $data = [ 'foo2' => $value, 'foo' => $this->foo ];
@@ -183,7 +193,7 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    $config = new \ConfigDummy();
+    $config = new \ConfigValidateDummy();
     try {
         $config->validate();
     }
