@@ -2,11 +2,19 @@
 
 namespace Gzhegow\Lib\Config;
 
+use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 
 
-abstract class AbstractConfig
+abstract class AbstractConfig implements
+    ToArrayInterface
 {
+    /**
+     * @var array<int, array{ 0: string[], 1: mixed }>
+     */
+    protected $__errors;
     /**
      * @var array<string, bool>
      */
@@ -19,7 +27,25 @@ abstract class AbstractConfig
 
     public function __construct()
     {
+        $publicVars = Lib::php()->get_object_vars($this, null);
+
+        if (count($publicVars)) {
+            throw new LogicException(
+                [ 'The configuration must not have any public properties', $this ]
+            );
+        }
+
+        $__keys = [
+            '__errors'   => true,
+            '__keys'     => true,
+            '__children' => true,
+        ];
+
         foreach ( get_object_vars($this) as $key => $value ) {
+            if (isset($__keys[ $key ])) {
+                continue;
+            }
+
             $this->__keys[ $key ] = true;
 
             if ($value instanceof self) {
@@ -57,6 +83,8 @@ abstract class AbstractConfig
             );
         }
 
+        $this->__errors = null;
+
         if (isset($this->__children[ $name ])) {
             $this->{$name}->fill($value);
 
@@ -73,6 +101,8 @@ abstract class AbstractConfig
             );
         }
 
+        $this->__errors = null;
+
         $valueDefault = (new static())->{$name};
 
         if (isset($this->__children[ $name ])) {
@@ -84,12 +114,33 @@ abstract class AbstractConfig
     }
 
 
+    public function toArray(array $options = []) : array
+    {
+        $result = [];
+
+        foreach ( $this->__keys as $key => $bool ) {
+            if (isset($this->__children[ $key ])) {
+                $result[ $key ] = $this->{$key}->toArray();
+
+            } else {
+                $result[ $key ] = $this->{$key};
+            }
+        }
+
+        return $result;
+    }
+
+
     /**
      * @return static
      */
-    public function reset()
+    public function configure(\Closure $fn = null, array $context = [])
     {
-        $this->fill(new static());
+        if (null !== $fn) {
+            $fn($this, $context);
+        }
+
+        $this->validate($context);
 
         return $this;
     }
@@ -97,17 +148,31 @@ abstract class AbstractConfig
     /**
      * @return static
      */
-    public function fill(self $config) // : static
+    public function validate(array $context = [])
     {
-        if (static::class !== get_class($config)) {
-            throw new LogicException(
-                [ 'The `config` should be instance of: ' . static::class, $config ]
+        if (null === $this->__errors) {
+            $this->__errors = $this->validateConfig(
+                $this,
+                [], $context
             );
         }
 
-        foreach ( $this->__keys as $key => $bool ) {
-            $this->__set($key, $config->{$key});
+        if (count($this->__errors)) {
+            throw new RuntimeException(
+                [ 'Configuration is invalid', $this->__errors ]
+            );
         }
+
+        return $this;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function reset()
+    {
+        $this->fill(new static());
 
         return $this;
     }
@@ -139,61 +204,83 @@ abstract class AbstractConfig
         return $this;
     }
 
-
-    public function toArray(array $options = []) : array
+    /**
+     * @return static
+     */
+    public function fill(self $config) // : static
     {
-        $result = [];
+        if (static::class !== get_class($config)) {
+            throw new LogicException(
+                [ 'The `config` should be instance of: ' . static::class, $config ]
+            );
+        }
 
         foreach ( $this->__keys as $key => $bool ) {
-            if (isset($this->__children[ $key ])) {
-                $result[ $key ] = $this->{$key}->toArray();
+            $this->__set($key, $config->{$key});
+        }
+
+        return $this;
+    }
+
+
+    public function getErrors() : array
+    {
+        return $this->__errors ?? [];
+    }
+
+    protected function validateValue($value, string $key, array $path = [], array $context = []) : array
+    {
+        // $errors = [];
+        //
+        // switch ($key):
+        //     case 'mykey':
+        //         if ($value === false) {
+        //            $errors[] = [ $path, 'The `mykey` is wrong' ];
+        //         }
+        //         break;
+        // endswitch;
+        //
+        // return $errors;
+
+        return [];
+    }
+
+    protected function validateConfig(self $config, array $path = [], array $context = []) : array
+    {
+        $errors = [];
+
+        foreach ( $config->__keys as $key => $bool ) {
+            $fullpath = $path;
+            $fullpath[] = $key;
+
+            if (isset($config->__children[ $key ])) {
+                $configChild = $config->__children[ $key ];
+
+                // ! recursion
+                $errorsKey = $configChild
+                    ->validateConfig(
+                        $configChild,
+                        $fullpath, $context
+                    )
+                ;
 
             } else {
-                $result[ $key ] = $this->{$key};
+                $errorsKey = $config
+                    ->validateValue(
+                        $config->{$key}, $key,
+                        $fullpath, $context
+                    )
+                ;
+            }
+
+            if (count($errorsKey)) {
+                $errors = array_merge(
+                    $errors,
+                    array_values($errorsKey)
+                );
             }
         }
 
-        return $result;
-    }
-
-
-    /**
-     * @return static
-     */
-    public function validate(array $context = [])
-    {
-        foreach ( $this->__keys as $key => $bool ) {
-            $this->validateKey($key, $context);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function validateKey(string $key, array $context = [])
-    {
-        if (isset($this->__children[ $key ])) {
-            // ! recursion
-            $this->__children[ $key ]->validate($context);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @return static
-     */
-    public function configure(\Closure $fn, array $context = [])
-    {
-        $fnBound = $fn->bindTo($this, $this);
-
-        $fnBound($this);
-
-        $this->validate($context);
-
-        return $this;
+        return $errors;
     }
 }

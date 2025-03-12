@@ -92,17 +92,39 @@ $fn = function () {
 
             parent::__construct();
         }
+
+        protected function validateValue($value, string $key, array $path = [], array $context = []) : array
+        {
+            return [];
+        }
     }
 
     class ConfigChildDummy extends \Gzhegow\Lib\Config\AbstractConfig
     {
-        protected $foo = 'bar';
+        protected $foo  = 'bar';
+        protected $foo2 = '';
+
+        protected function validateValue($value, string $key, array $path = [], array $context = []) : array
+        {
+            $errors = [];
+
+            if ($key === 'foo2') {
+                if ($value !== $this->foo) {
+                    $message = 'The `foo2` should be equal to `foo`';
+                    $data = [ 'foo2' => $value, 'foo' => $this->foo ];
+
+                    $errors[] = [ $path, [ $message, $data ] ];
+                }
+            }
+
+            return $errors;
+        }
     }
 
 
     $config = new \ConfigDummy();
 
-    $configChildOld = $config->child;
+    $configChildDefault = $config->child;
 
     $configChildNewFooValue = 'baz';
     $configChildNew = new \ConfigChildDummy();
@@ -111,14 +133,14 @@ $fn = function () {
     $config->child = $configChildNew;
 
     _print($config);
-    _print($config->child, $config->child === $configChildOld);
+    _print($config->child, $config->child === $configChildDefault);
     _print($config->child->foo, $config->child->foo === $configChildNew->foo);
 
     echo PHP_EOL;
 
 
     $config = new \ConfigDummy();
-    $configChildOld = $config->child;
+    $configChildDefault = $config->child;
 
     $configChildNewFooValue = 'baz';
     $config->load([
@@ -130,7 +152,7 @@ $fn = function () {
     ]);
 
     _print($config);
-    _print($config->child, $config->child === $configChildOld);
+    _print($config->child, $config->child === $configChildDefault);
     _print($config->child->foo, $config->child->foo === $configChildNewFooValue);
 
     echo PHP_EOL;
@@ -140,8 +162,25 @@ $fn = function () {
     $config->load($configArray);
 
     _print($config);
-    _print($config->child, $config->child === $configChildOld);
+    _print($config->child, $config->child === $configChildDefault);
     _print($config->child->foo, $config->child->foo === $configChildNewFooValue);
+
+    echo PHP_EOL;
+
+
+    $config = new \ConfigDummy();
+    try {
+        $config->validate();
+    }
+    catch ( \Throwable $e ) {
+        _print('[ CATCH ] ' . $e->getMessage());
+
+        $errors = $config->getErrors();
+
+        foreach ( $errors as [ $path, $message ] ) {
+            _print($path, $message);
+        }
+    }
 };
 _assert_stdout($fn, [], '
 "[ Config ]"
@@ -157,6 +196,9 @@ _assert_stdout($fn, [], '
 { object # ConfigDummy }
 { object # ConfigChildDummy } | TRUE
 "baz" | TRUE
+
+"[ CATCH ] Configuration is invalid"
+[ "child", "foo2" ] | [ "The `foo2` should be equal to `foo`", "{ array(2) }" ]
 ');
 
 

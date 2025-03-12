@@ -34,6 +34,12 @@ abstract class AbstractContext implements
     }
 
 
+    public function toArray(array $options = []) : array
+    {
+        return $this->vars();
+    }
+
+
     public function offsetExists($offset) : bool
     {
         return $this->exists($offset);
@@ -254,11 +260,5 @@ abstract class AbstractContext implements
         }
 
         return $instance;
-    }
-
-
-    public function toArray(array $options = []) : array
-    {
-        return $this->vars();
     }
 }
