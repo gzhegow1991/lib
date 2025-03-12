@@ -92,17 +92,29 @@ $fn = function () {
 
             parent::__construct();
         }
-
-        protected function validateValue($value, string $key, array $path = [], array $context = []) : array
-        {
-            return [];
-        }
     }
 
     class ConfigChildDummy extends \Gzhegow\Lib\Config\AbstractConfig
     {
-        protected $foo  = 'bar';
-        protected $foo2 = '';
+        protected $foo = 'bar';
+    }
+
+    class ConfigValidateDummy extends \Gzhegow\Lib\Config\AbstractConfig
+    {
+        protected $child;
+
+        public function __construct()
+        {
+            $this->child = new \ConfigChildValidateDummy();
+
+            parent::__construct();
+        }
+    }
+
+    class ConfigChildValidateDummy extends \Gzhegow\Lib\Config\AbstractConfig
+    {
+        protected $foo = 1;
+        protected $foo2;
 
         protected function validateValue($value, string $key, array $path = [], array $context = []) : array
         {
@@ -168,7 +180,7 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    $config = new \ConfigDummy();
+    $config = new \ConfigValidateDummy();
     try {
         $config->validate();
     }

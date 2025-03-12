@@ -72,6 +72,8 @@ abstract class AbstractConfig implements
             );
         }
 
+        $this->validate();
+
         return $this->{$name};
     }
 
@@ -83,7 +85,7 @@ abstract class AbstractConfig implements
             );
         }
 
-        $this->__errors = null;
+        $this->invalidate();
 
         if (isset($this->__children[ $name ])) {
             $this->{$name}->fill($value);
@@ -101,7 +103,7 @@ abstract class AbstractConfig implements
             );
         }
 
-        $this->__errors = null;
+        $this->invalidate();
 
         $valueDefault = (new static())->{$name};
 
@@ -157,11 +159,21 @@ abstract class AbstractConfig implements
             );
         }
 
-        if (count($this->__errors)) {
+        if (count($this->__errors) !== 0) {
             throw new RuntimeException(
                 [ 'Configuration is invalid', $this->__errors ]
             );
         }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function invalidate()
+    {
+        $this->__errors = null;
 
         return $this;
     }
@@ -273,7 +285,7 @@ abstract class AbstractConfig implements
                 ;
             }
 
-            if (count($errorsKey)) {
+            if (count($errorsKey) !== 0) {
                 $errors = array_merge(
                     $errors,
                     array_values($errorsKey)
