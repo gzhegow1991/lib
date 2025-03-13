@@ -12,10 +12,6 @@ abstract class AbstractConfig implements
     ToArrayInterface
 {
     /**
-     * @var array<int, array{ 0: string[], 1: mixed }>
-     */
-    protected $__errors;
-    /**
      * @var array<string, bool>
      */
     protected $__keys = [];
@@ -23,6 +19,10 @@ abstract class AbstractConfig implements
      * @var array<string, self>
      */
     protected $__children = [];
+    /**
+     * @var bool
+     */
+    protected $__valid;
 
 
     public function __construct()
@@ -36,9 +36,9 @@ abstract class AbstractConfig implements
         }
 
         $__keys = [
-            '__errors'   => true,
             '__keys'     => true,
             '__children' => true,
+            '__valid'    => true,
         ];
 
         foreach ( get_object_vars($this) as $key => $value ) {
@@ -147,23 +147,13 @@ abstract class AbstractConfig implements
         return $this;
     }
 
+
     /**
      * @return static
      */
-    public function validate(array $context = [])
+    public function invalidate()
     {
-        if (null === $this->__errors) {
-            $this->__errors = $this->validateConfig(
-                $this,
-                [], $context
-            );
-        }
-
-        if (count($this->__errors) !== 0) {
-            throw new RuntimeException(
-                [ 'Configuration is invalid', $this->__errors ]
-            );
-        }
+        $this->__valid = null;
 
         return $this;
     }
@@ -171,9 +161,17 @@ abstract class AbstractConfig implements
     /**
      * @return static
      */
-    public function invalidate()
+    public function validate(array $context = [])
     {
-        $this->__errors = null;
+        if (null === $this->__valid) {
+            $this->__valid = $this->validation($context);
+        }
+
+        if (! $this->__valid) {
+            throw new RuntimeException(
+                [ 'Configuration is invalid', $this ]
+            );
+        }
 
         return $this;
     }
@@ -235,64 +233,17 @@ abstract class AbstractConfig implements
     }
 
 
-    public function getErrors() : array
+    protected function validation(array $context = []) : bool
     {
-        return $this->__errors ?? [];
-    }
+        foreach ( $this->__children as $key => $child ) {
+            // ! recursion
+            $result = $child->validation($context);
 
-    protected function validateValue($value, string $key, array $path = [], array $context = []) : array
-    {
-        // $errors = [];
-        //
-        // switch ($key):
-        //     case 'mykey':
-        //         if ($value === false) {
-        //            $errors[] = [ $path, 'The `mykey` is wrong' ];
-        //         }
-        //         break;
-        // endswitch;
-        //
-        // return $errors;
-
-        return [];
-    }
-
-    protected function validateConfig(self $config, array $path = [], array $context = []) : array
-    {
-        $errors = [];
-
-        foreach ( $config->__keys as $key => $bool ) {
-            $fullpath = $path;
-            $fullpath[] = $key;
-
-            if (isset($config->__children[ $key ])) {
-                $configChild = $config->__children[ $key ];
-
-                // ! recursion
-                $errorsKey = $configChild
-                    ->validateConfig(
-                        $configChild,
-                        $fullpath, $context
-                    )
-                ;
-
-            } else {
-                $errorsKey = $config
-                    ->validateValue(
-                        $config->{$key}, $key,
-                        $fullpath, $context
-                    )
-                ;
-            }
-
-            if (count($errorsKey) !== 0) {
-                $errors = array_merge(
-                    $errors,
-                    array_values($errorsKey)
-                );
+            if (false === $result) {
+                return false;
             }
         }
 
-        return $errors;
+        return true;
     }
 }

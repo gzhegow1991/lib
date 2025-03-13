@@ -129,20 +129,13 @@ $fn = function () {
         protected $foo = 1;
         protected $foo2;
 
-        protected function validateValue($value, string $key, array $path = [], array $context = []) : array
+        protected function validation(array $context = []) : bool
         {
-            $errors = [];
-
-            if ($key === 'foo2') {
-                if ($value !== $this->foo) {
-                    $message = 'The `foo2` should be equal to `foo`';
-                    $data = [ 'foo2' => $value, 'foo' => $this->foo ];
-
-                    $errors[] = [ $path, [ $message, $data ] ];
-                }
+            if ($this->foo2 !== $this->foo) {
+                return false;
             }
 
-            return $errors;
+            return true;
         }
     }
 
@@ -199,12 +192,6 @@ $fn = function () {
     }
     catch ( \Throwable $e ) {
         _print('[ CATCH ] ' . $e->getMessage());
-
-        $errors = $config->getErrors();
-
-        foreach ( $errors as [ $path, $message ] ) {
-            _print($path, $message);
-        }
     }
 };
 _assert_stdout($fn, [], '
@@ -223,7 +210,6 @@ _assert_stdout($fn, [], '
 "baz" | TRUE
 
 "[ CATCH ] Configuration is invalid"
-[ "child", "foo2" ] | [ "The `foo2` should be equal to `foo`", "{ array(2) }" ]
 ');
 
 
