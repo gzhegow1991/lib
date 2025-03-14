@@ -8,7 +8,7 @@
 composer require gzhegow/lib;
 ```
 
-## Тесты
+## Примеры и тесты
 
 ```php
 <?php

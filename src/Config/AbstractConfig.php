@@ -136,7 +136,11 @@ abstract class AbstractConfig implements
     public function configure(\Closure $fn = null, array $context = []) : void
     {
         if (null !== $fn) {
-            $fn($this, $context);
+            $this->invalidate();
+
+            $fnBound = $fn->bindTo($this, $this);
+
+            $fnBound($this, $context);
         }
 
         $this->validate($context);
