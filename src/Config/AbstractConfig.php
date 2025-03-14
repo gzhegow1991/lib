@@ -133,35 +133,22 @@ abstract class AbstractConfig implements
     }
 
 
-    /**
-     * @return static
-     */
-    public function configure(\Closure $fn = null, array $context = [])
+    public function configure(\Closure $fn = null, array $context = []) : void
     {
         if (null !== $fn) {
             $fn($this, $context);
         }
 
         $this->validate($context);
-
-        return $this;
     }
 
 
-    /**
-     * @return static
-     */
-    public function invalidate()
+    public function invalidate() : void
     {
         $this->__valid = null;
-
-        return $this;
     }
 
-    /**
-     * @return static
-     */
-    public function validate(array $context = [])
+    public function validate(array $context = []) : void
     {
         if (null === $this->__valid) {
             $this->__valid = $this->validation($context);
@@ -172,8 +159,6 @@ abstract class AbstractConfig implements
                 [ 'Configuration is invalid', $this ]
             );
         }
-
-        return $this;
     }
 
 
