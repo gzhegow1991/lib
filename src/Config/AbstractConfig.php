@@ -152,10 +152,20 @@ abstract class AbstractConfig implements
         $this->__valid = null;
     }
 
-    public function validate(array $context = []) : void
+    public function validate(array &$context = []) : void
     {
         if (null === $this->__valid) {
-            $this->__valid = $this->validation($context);
+            $context[ '__path' ] = [];
+            $context[ '__key' ] = null;
+            $context[ '__parent' ] = null;
+            $context[ '__root' ] = $this;
+
+            $this->__valid = $this->validationRecursive($context);
+
+            unset($context[ '__path' ]);
+            unset($context[ '__key' ]);
+            unset($context[ '__parent' ]);
+            unset($context[ '__root' ]);
         }
 
         if (! $this->__valid) {
@@ -222,17 +232,43 @@ abstract class AbstractConfig implements
     }
 
 
-    protected function validation(array $context = []) : bool
+    protected function validationRecursive(array &$context = []) : bool
     {
-        foreach ( $this->__children as $key => $child ) {
-            // ! recursion
-            $result = $child->validation($context);
+        $result = null;
 
-            if (false === $result) {
-                return false;
+        $path = $context[ '__path' ] ?? [];
+        $key = $context[ '__key' ] ?? null;
+        $parent = $context[ '__parent' ] ?? null;
+
+        foreach ( $this->__children as $childKey => $child ) {
+            $fullpath = $path;
+            $fullpath[] = $childKey;
+
+            $context[ '__path' ] = $fullpath;
+            $context[ '__key' ] = $childKey;
+            $context[ '__parent' ] = $this;
+
+            // ! recursion
+            $result = $child->validationRecursive($context);
+
+            if (! $result) {
+                break;
             }
         }
 
+        if (null === $result) {
+            $context[ '__path' ] = $path;
+            $context[ '__key' ] = $key;
+            $context[ '__parent' ] = $parent;
+
+            $result = $this->validation($context);
+        }
+
+        return $result;
+    }
+
+    protected function validation(array &$context = []) : bool
+    {
         return true;
     }
 }

@@ -9,6 +9,7 @@ use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToObjectInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParser;
 use Gzhegow\Lib\Modules\Php\DebugBacktracer\DebugBacktracer;
@@ -528,6 +529,29 @@ class PhpModule
             }
 
             $_value = (array) $value;
+        }
+
+        return $_value;
+    }
+
+    public function to_object($value, array $options = []) : \stdClass
+    {
+        if ($value instanceof ToObjectInterface) {
+            $_value = $value->toObject($options);
+
+        } else {
+            $isObject = is_object($value);
+            $isStdclass = $value instanceof \stdClass;
+
+            if ($isObject && ! $isStdclass) {
+                throw new LogicException(
+                    [ 'The `value` being the object should be instance of: ' . \stdClass::class, $value ]
+                );
+            }
+
+            $_value = $isStdclass
+                ? $value
+                : (object) (array) $value;
         }
 
         return $_value;
