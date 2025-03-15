@@ -25,7 +25,8 @@ class FsModule
      */
     public function type_path(
         &$result,
-        $value, array $refs = []
+        $value,
+        array $refs = []
     ) : bool
     {
         $result = null;
@@ -69,7 +70,8 @@ class FsModule
      */
     public function type_dirpath(
         &$result,
-        $value, array $refs = []
+        $value,
+        array $refs = []
     ) : bool
     {
         $result = null;
@@ -109,7 +111,8 @@ class FsModule
      */
     public function type_filepath(
         &$result,
-        $value, array $refs = []
+        $value,
+        array $refs = []
     ) : bool
     {
         $status = $this->type_path(
@@ -148,7 +151,8 @@ class FsModule
      */
     public function type_path_realpath(
         &$result,
-        $value, array $refs = []
+        $value,
+        array $refs = []
     ) : bool
     {
         $result = null;
@@ -177,7 +181,8 @@ class FsModule
      */
     public function type_dirpath_realpath(
         &$result,
-        $value, array $refs = []
+        $value,
+        array $refs = []
     ) : bool
     {
         $result = null;
@@ -214,7 +219,8 @@ class FsModule
      */
     public function type_filepath_realpath(
         &$result,
-        $value, array $refs = []
+        $value,
+        array $refs = []
     ) : bool
     {
         $result = null;

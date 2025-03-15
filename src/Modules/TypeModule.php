@@ -992,6 +992,50 @@ class TypeModule extends TypeModuleBase
 
 
     /**
+     * @param string|null       $result
+     * @param string            $value
+     * @param string|array|null $query
+     * @param string|null       $fragment
+     */
+    public function url(
+        &$result,
+        $value, $query = null, $fragment = null,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::url()->type_url($result, $value, $query, $fragment, $refs);
+    }
+
+    /**
+     * @param string|null $result
+     * @param string      $value
+     */
+    public function host(
+        &$result,
+        $value,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::url()->type_host($result, $value, $refs);
+    }
+
+    /**
+     * @param string|null       $result
+     * @param string            $value
+     * @param string|array|null $query
+     * @param string|null       $fragment
+     */
+    public function link(
+        &$result,
+        $value, $query = null, $fragment = null,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::url()->type_link($result, $value, $query, $fragment, $refs);
+    }
+
+
+    /**
      * @param array|\Countable|null $result
      */
     public function countable(&$result, $value) : bool

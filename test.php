@@ -2545,3 +2545,48 @@ world"
 [ "user" ]
 [ "users" ]
 ');
+
+
+// >>> TEST
+// > тесты UrlModule
+$fn = function () {
+    _print('[ UrlModule ]');
+    echo PHP_EOL;
+
+
+    $result = \Gzhegow\Lib\Lib::url()->url($src = 'https://google.com/hello/world');
+    _print($src, (bool) $result);
+
+    $result = \Gzhegow\Lib\Lib::url()->url($src = ':hello/world');
+    _print($src, (bool) $result);
+
+    echo PHP_EOL;
+
+
+    $result = \Gzhegow\Lib\Lib::url()->host($src = 'https://google.com/hello/world');
+    _print($src, (bool) $result);
+
+    $result = \Gzhegow\Lib\Lib::url()->host($src = ':hello/world');
+    _print($src, (bool) $result);
+
+    echo PHP_EOL;
+
+
+    $result = \Gzhegow\Lib\Lib::url()->link($src = 'https://google.com/hello/world');
+    _print($src, (bool) $result);
+
+    $result = \Gzhegow\Lib\Lib::url()->link($src = ':hello/world');
+    _print($src, (bool) $result);
+};
+_assert_stdout($fn, [], '
+"[ UrlModule ]"
+
+"https://google.com/hello/world" | TRUE
+":hello/world" | FALSE
+
+"https://google.com/hello/world" | TRUE
+":hello/world" | FALSE
+
+"https://google.com/hello/world" | TRUE
+":hello/world" | FALSE
+');

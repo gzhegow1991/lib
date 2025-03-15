@@ -8,11 +8,101 @@ use Gzhegow\Lib\Exception\LogicException;
 
 class UrlModule
 {
+    /**
+     * @param string|null       $result
+     * @param string            $url
+     * @param string|array|null $query
+     * @param string|null       $fragment
+     */
+    public function type_url(
+        &$result,
+        $url, $query = null, $fragment = null,
+        array $refs = []
+    ) : bool
+    {
+        $result = null;
+
+        $_value = $this->url($url, $query, $fragment, $refs);
+
+        if (null !== $_value) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     * @param string      $url
+     */
+    public function type_host(
+        &$result,
+        $url,
+        array $refs = []
+    ) : bool
+    {
+        $result = null;
+
+        $_value = $this->host($url, $refs);
+
+        if (null !== $_value) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null       $result
+     * @param string            $url
+     * @param string|array|null $query
+     * @param string|null       $fragment
+     */
+    public function type_link(
+        &$result,
+        $url, $query = null, $fragment = null,
+        array $refs = []
+    ) : bool
+    {
+        $result = null;
+
+        $_value = $this->link($url, $query, $fragment, $refs);
+
+        if (null !== $_value) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param string            $url
+     * @param string|array|null $query
+     * @param string|null       $fragment
+     */
     public function url(
         $url = '', $query = null, $fragment = null,
-        array &$parseUrlResult = null
+        array $refs = []
     ) : ?string
     {
+        $withParseUrl = array_key_exists(0, $refs);
+
+        $refParseUrl = null;
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+            $refParseUrl = null;
+        }
+
+        $hasQuery = (null !== $query);
+        $hasFragment = (null !== $fragment);
+
         if ('' === $url) {
             $url = $this->current();
 
@@ -24,8 +114,6 @@ class UrlModule
             return null;
         }
 
-        $_parseUrlResult = $parseUrlResult ?? null;
-
         $_query = null
             ?? ((false === $query) ? false : null)
             ?? (is_array($query) ? $query : null)
@@ -35,58 +123,101 @@ class UrlModule
             ?? ((false === $fragment) ? false : null)
             ?? (is_string($fragment) ? $fragment : null);
 
-        if ((null !== $query) && (null === $_query)) {
+        if ($hasQuery && (null === $_query)) {
             throw new LogicException(
                 [ 'The `query` should be string, array or false', $query ]
             );
         }
 
-        if ((null !== $fragment) && (null === $_fragment)) {
+        if ($hasFragment && (null === $_fragment)) {
             throw new LogicException(
                 [ 'The `fragment` should be string or false', $fragment ]
             );
         }
 
-        if (! $_parseUrlResult) {
-            $_parseUrlResult = parse_url($_url);
+        if (null === $refParseUrl) {
+            $refParseUrl = parse_url($_url);
 
-            if (empty($_parseUrlResult[ 'host' ])) {
-                $_url = $this->host_current() . '/' . ltrim($_url, '/');
-
-                $_parseUrlResult = parse_url($_url);
+            if (false === $refParseUrl) {
+                return null;
             }
         }
 
+        if (empty($refParseUrl[ 'host' ])) {
+            $_url = $this->host_current() . '/' . ltrim($_url, '/');
+
+            $refParseUrl = parse_url($_url);
+
+            if (false === $refParseUrl) {
+                return null;
+            }
+        }
+
+        if (! isset($refParseUrl[ 'path' ])) {
+            return null;
+        }
+
+        $test = str_replace('/', '', $refParseUrl[ 'path' ]);
+
+        if (urlencode($test) !== $test) {
+            return null;
+        }
+
+        $wasQuery = isset($refParseUrl[ 'query' ]);
+        $wasFragment = isset($refParseUrl[ 'fragment' ]);
+
         if (false === $_query) {
-            unset($_parseUrlResult[ 'query' ]);
+            unset($refParseUrl[ 'query' ]);
 
-        } elseif ($_query || isset($_parseUrlResult[ 'query' ])) {
-            $httpQuery = Lib::http()->build_query_array($_parseUrlResult[ 'query' ] ?? null, $_query);
+        } else {
+            $httpQuery = null;
+            if ($hasQuery && $wasQuery) {
+                $httpQuery = Lib::http()->build_query_array($refParseUrl[ 'query' ], $_query);
+                $httpQuery = http_build_query($httpQuery);
 
-            $httpQuery = http_build_query($httpQuery);
+            } elseif ($hasQuery) {
+                $httpQuery = Lib::http()->build_query_array($_query);
+                $httpQuery = http_build_query($httpQuery);
+
+            } elseif ($wasQuery) {
+                $httpQuery = $refParseUrl[ 'query' ];
+            }
 
             $_parseUrlResult[ 'query' ] = $httpQuery;
         }
 
         if (false === $_fragment) {
-            unset($_parseUrlResult[ 'fragment' ]);
+            unset($refParseUrl[ 'fragment' ]);
 
         } else {
-            $_parseUrlResult[ 'fragment' ] = $_fragment;
+            if ($hasFragment) {
+                $refParseUrl[ 'fragment' ] = $_fragment;
+            }
         }
 
-        $_url = $this->build($_parseUrlResult);
+        $_url = $this->build($refParseUrl);
 
-        $parseUrlResult = $_parseUrlResult;
+        unset($refParseUrl);
 
         return $_url;
     }
 
+    /**
+     * @param string $url
+     */
     public function host(
         $url = '',
-        array &$parseUrlResult = null
+        array $refs = []
     ) : ?string
     {
+        $withParseUrl = array_key_exists(0, $refs);
+
+        $refParseUrl = null;
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+            $refParseUrl = null;
+        }
+
         if ('' === $url) {
             $url = $this->host_current();
 
@@ -98,38 +229,56 @@ class UrlModule
             return null;
         }
 
-        $_parseUrlResult = $parseUrlResult ?? null;
+        if (null === $refParseUrl) {
+            $refParseUrl = parse_url($_url);
 
-        if (! $_parseUrlResult) {
-            $_parseUrlResult = parse_url($_url);
-
-            if (empty($_parseUrlResult[ 'host' ])) {
-                $_url = $this->host_current();
-
-                $_parseUrlResult = parse_url($_url);
+            if (false === $refParseUrl) {
+                return null;
             }
         }
 
-        $_parseUrlResult = []
-            + [
-                'path'     => null,
-                'query'    => null,
-                'fragment' => null,
-            ]
-            + $_parseUrlResult;
+        if (empty($refParseUrl[ 'host' ])) {
+            $_url = $this->host_current() . '/' . ltrim($_url, '/');
 
-        $_url = $this->build($_parseUrlResult);
+            $refParseUrl = parse_url($_url);
 
-        $parseUrlResult = $_parseUrlResult;
+            if (false === $refParseUrl) {
+                return null;
+            }
+        }
+
+        $refParseUrl[ 'path' ] = null;
+        $refParseUrl[ 'query' ] = null;
+        $refParseUrl[ 'fragment' ] = null;
+
+        $_url = $this->build($refParseUrl);
+
+        unset($refParseUrl);
 
         return $_url;
     }
 
+    /**
+     * @param string            $url
+     * @param string|array|null $query
+     * @param string|null       $fragment
+     */
     public function link(
         $url = '', $query = null, $fragment = null,
-        array &$parseUrlResult = null
+        array $refs = []
     ) : ?string
     {
+        $withParseUrl = array_key_exists(0, $refs);
+
+        $refParseUrl = null;
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+            $refParseUrl = null;
+        }
+
+        $hasQuery = (null !== $query);
+        $hasFragment = (null !== $fragment);
+
         if ('' === $url) {
             $url = $this->link_current();
 
@@ -141,8 +290,6 @@ class UrlModule
             return null;
         }
 
-        $_parseUrlResult = $parseUrlResult ?? null;
-
         $_query = null
             ?? ((false === $query) ? false : null)
             ?? (is_array($query) ? $query : null)
@@ -152,51 +299,77 @@ class UrlModule
             ?? ((false === $fragment) ? false : null)
             ?? (is_string($fragment) ? $fragment : null);
 
-        if ((null !== $query) && (null === $_query)) {
+        if ($hasQuery && (null === $_query)) {
             throw new LogicException(
                 [ 'The `query` should be string, array or false', $query ]
             );
         }
 
-        if ((null !== $fragment) && (null === $_fragment)) {
+        if ($hasFragment && (null === $_fragment)) {
             throw new LogicException(
                 [ 'The `fragment` should be string or false', $fragment ]
             );
         }
 
-        $_parseUrlResult = $_parseUrlResult ?? parse_url($_link);
+        if (null === $refParseUrl) {
+            $refParseUrl = parse_url($_link);
+
+            if (false === $refParseUrl) {
+                return null;
+            }
+        }
+
+        if (! isset($refParseUrl[ 'path' ])) {
+            return null;
+        }
+
+        $test = str_replace('/', '', $refParseUrl[ 'path' ]);
+
+        if (urlencode($test) !== $test) {
+            return null;
+        }
+
+        $wasQuery = isset($refParseUrl[ 'query' ]);
+        $wasFragment = isset($refParseUrl[ 'fragment' ]);
 
         if (false === $_query) {
-            unset($_parseUrlResult[ 'query' ]);
+            unset($refParseUrl[ 'query' ]);
 
-        } elseif ($_query || isset($_parseUrlResult[ 'query' ])) {
-            $httpQuery = Lib::http()->build_query_array($_parseUrlResult[ 'query' ] ?? null, $_query);
+        } else {
+            $httpQuery = null;
+            if ($hasQuery && $wasQuery) {
+                $httpQuery = Lib::http()->build_query_array($refParseUrl[ 'query' ], $_query);
+                $httpQuery = http_build_query($httpQuery);
 
-            $httpQuery = http_build_query($httpQuery);
+            } elseif ($hasQuery) {
+                $httpQuery = Lib::http()->build_query_array($_query);
+                $httpQuery = http_build_query($httpQuery);
 
-            $_parseUrlResult[ 'query' ] = $httpQuery;
+            } elseif ($wasQuery) {
+                $httpQuery = $refParseUrl[ 'query' ];
+            }
+
+            $refParseUrl[ 'query' ] = $httpQuery;
         }
 
         if (false === $_fragment) {
-            unset($_parseUrlResult[ 'fragment' ]);
+            unset($refParseUrl[ 'fragment' ]);
 
         } else {
-            $_parseUrlResult[ 'fragment' ] = $_fragment;
+            if ($hasFragment) {
+                $refParseUrl[ 'fragment' ] = $_fragment;
+            }
         }
 
-        $_parseUrlResult = []
-            + [
-                'scheme' => null,
-                'user'   => null,
-                'pass'   => null,
-                'host'   => null,
-                'port'   => null,
-            ]
-            + $_parseUrlResult;
+        $refParseUrl[ 'scheme' ] = null;
+        $refParseUrl[ 'user' ] = null;
+        $refParseUrl[ 'pass' ] = null;
+        $refParseUrl[ 'host' ] = null;
+        $refParseUrl[ 'port' ] = null;
 
-        $_link = $this->link_build($_parseUrlResult);
+        $_link = $this->link_build($refParseUrl);
 
-        $parseUrlResult = $_parseUrlResult;
+        unset($refParseUrl);
 
         return $_link;
     }
@@ -318,7 +491,7 @@ class UrlModule
         $port = in_array($urlPort, [ 80, 443 ]) ? '' : $urlPort;
         $isPort = $port ? ':' : '';
 
-        $urlPath = $_parseUrlResult[ 'path' ];
+        $urlPath = $_parseUrlResult[ 'path' ] ?? '';
         [ $path ] = explode('?', $urlPath, 2);
 
         $urlQuery = $_parseUrlResult[ 'query' ];
@@ -401,7 +574,7 @@ class UrlModule
         $urlScheme = $_parseUrlResult[ 'scheme' ];
         $isUrlScheme = $urlScheme ? ':' : '';
 
-        $urlPath = $_parseUrlResult[ 'path' ];
+        $urlPath = $_parseUrlResult[ 'path' ] ?? '';
         [ $path ] = explode('?', $urlPath, 2);
 
         $urlQuery = $_parseUrlResult[ 'query' ];
