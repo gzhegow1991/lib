@@ -612,6 +612,65 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
+	 * @param string            $value
+	 * @param string|array|null $query
+	 * @param string|null       $fragment
+	 * @return string|null
+	 */
+	public function url($value, $query = null, $fragment = null, array $refs = [])
+	{
+		if (Lib::type()->url($result, $value, $query, $fragment, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @param string      $value
+	 * @return string|null
+	 */
+	public function host($value, array $refs = [])
+	{
+		if (Lib::type()->host($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @param string            $value
+	 * @param string|array|null $query
+	 * @param string|null       $fragment
+	 * @return string|null
+	 */
+	public function link($value, $query = null, $fragment = null, array $refs = [])
+	{
+		if (Lib::type()->link($result, $value, $query, $fragment, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function uuid($value)
+	{
+		if (Lib::type()->uuid($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
 	 * @return array|\Countable|null
 	 */
 	public function countable($value)

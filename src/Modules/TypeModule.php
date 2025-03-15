@@ -1036,6 +1036,15 @@ class TypeModule extends TypeModuleBase
 
 
     /**
+     * @param string|null $result
+     */
+    public function uuid(&$result, $value) : bool
+    {
+        return Lib::random()->type_uuid($result, $value);
+    }
+
+
+    /**
      * @param array|\Countable|null $result
      */
     public function countable(&$result, $value) : bool

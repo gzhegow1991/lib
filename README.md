@@ -2335,6 +2335,13 @@ $fn = function () {
     _print('[ RandomModule ]');
     echo PHP_EOL;
 
+    $uuid = \Gzhegow\Lib\Lib::random()->uuid();
+    $status = \Gzhegow\Lib\Lib::random()->type_uuid($result, $uuid);
+    _print(strlen($uuid), $status);
+
+    echo PHP_EOL;
+
+
     $rand = \Gzhegow\Lib\Lib::random()->random_bytes(16);
     _print($len = strlen($rand), $len === 16);
 
@@ -2394,6 +2401,8 @@ $fn = function () {
 };
 _assert_stdout($fn, [], '
 "[ RandomModule ]"
+
+36 | TRUE
 
 16 | TRUE
 32 | TRUE

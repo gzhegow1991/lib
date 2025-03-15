@@ -67,6 +67,28 @@ class RandomModule
 
 
     /**
+     * @param string|null $result
+     */
+    public function type_uuid(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
+        if (preg_match($regex, $value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
      * @noinspection PhpComposerExtensionStubsInspection
      *
      * > $bytes = $random->bytes();

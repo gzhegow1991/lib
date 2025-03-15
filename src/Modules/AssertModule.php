@@ -518,6 +518,57 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
+	 * @param string            $value
+	 * @param string|array|null $query
+	 * @param string|null       $fragment
+	 * @return static
+	 */
+	public function url($value, $query = null, $fragment = null, array $refs = [])
+	{
+		$this->status = Lib::type()->url($this->result, $value, $query, $fragment, $refs);
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string      $value
+	 * @return static
+	 */
+	public function host($value, array $refs = [])
+	{
+		$this->status = Lib::type()->host($this->result, $value, $refs);
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string            $value
+	 * @param string|array|null $query
+	 * @param string|null       $fragment
+	 * @return static
+	 */
+	public function link($value, $query = null, $fragment = null, array $refs = [])
+	{
+		$this->status = Lib::type()->link($this->result, $value, $query, $fragment, $refs);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function uuid($value)
+	{
+		$this->status = Lib::type()->uuid($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
 	 * @return static
 	 */
 	public function countable($value)
