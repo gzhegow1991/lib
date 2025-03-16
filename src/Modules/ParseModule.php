@@ -523,9 +523,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return array|null
 	 */
-	public function list_strict($value)
+	public function list_sorted($value)
 	{
-		if (Lib::type()->list_strict($result, $value)) {
+		if (Lib::type()->list_sorted($result, $value)) {
 		    return $result;
 		}
 
@@ -549,9 +549,35 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return array|null
 	 */
-	public function dict_strict($value)
+	public function dict_sorted($value)
 	{
-		if (Lib::type()->dict_strict($result, $value)) {
+		if (Lib::type()->dict_sorted($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return array|null
+	 */
+	public function index_list($value)
+	{
+		if (Lib::type()->index_list($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return array|null
+	 */
+	public function index_dict($value)
+	{
+		if (Lib::type()->index_dict($result, $value)) {
 		    return $result;
 		}
 

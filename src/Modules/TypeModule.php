@@ -909,9 +909,9 @@ class TypeModule extends TypeModuleBase
     /**
      * @param array|null $result
      */
-    public function list_strict(&$result, $value) : bool
+    public function list_sorted(&$result, $value) : bool
     {
-        return Lib::arr()->type_list_strict($result, $value);
+        return Lib::arr()->type_list_sorted($result, $value);
     }
 
 
@@ -926,9 +926,26 @@ class TypeModule extends TypeModuleBase
     /**
      * @param array|null $result
      */
-    public function dict_strict(&$result, $value) : bool
+    public function dict_sorted(&$result, $value) : bool
     {
-        return Lib::arr()->type_dict_strict($result, $value);
+        return Lib::arr()->type_dict_sorted($result, $value);
+    }
+
+
+    /**
+     * @param array|null $result
+     */
+    public function index_list(&$result, $value) : bool
+    {
+        return Lib::arr()->type_index_list($result, $value);
+    }
+
+    /**
+     * @param array|null $result
+     */
+    public function index_dict(&$result, $value) : bool
+    {
+        return Lib::arr()->type_index_dict($result, $value);
     }
 
 

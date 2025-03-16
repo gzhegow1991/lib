@@ -68,7 +68,7 @@ class ArrModule
     /**
      * @param array|null $result
      */
-    public function type_list_strict(&$result, $value) : bool
+    public function type_list_sorted(&$result, $value) : bool
     {
         $result = null;
 
@@ -109,10 +109,6 @@ class ArrModule
             if (is_int($key)) {
                 return false;
             }
-
-            if ('' === $key) {
-                return false;
-            }
         }
 
         $result = $value;
@@ -123,7 +119,7 @@ class ArrModule
     /**
      * @param array|null $result
      */
-    public function type_dict_strict(&$result, $value) : bool
+    public function type_dict_sorted(&$result, $value) : bool
     {
         $result = null;
 
@@ -137,10 +133,6 @@ class ArrModule
             if (is_int($key)) {
                 return false;
             }
-
-            if ('' === $key) {
-                return false;
-            }
         }
 
         $keysSorted = $keys;
@@ -148,6 +140,59 @@ class ArrModule
 
         if ($keys !== $keysSorted) {
             return false;
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
+    /**
+     * @param array|null $result
+     */
+    public function type_index_list(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        foreach ( array_keys($value) as $key ) {
+            if (is_string($key)) {
+                return false;
+            }
+
+            if (0 === $key) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    /**
+     * @param array|null $result
+     */
+    public function type_index_dict(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        foreach ( array_keys($value) as $key ) {
+            if (is_int($key)) {
+                return false;
+            }
+
+            if ('' === $key) {
+                return false;
+            }
         }
 
         $result = $value;
@@ -213,7 +258,7 @@ class ArrModule
         }
 
         for ( $i = 0; $i < count($value); $i++ ) {
-            if (! $this->type_list_strict($var, $value[ $i ])) {
+            if (! $this->type_list_sorted($var, $value[ $i ])) {
                 return false;
             }
         }

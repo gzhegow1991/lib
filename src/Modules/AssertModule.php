@@ -443,9 +443,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function list_strict($value)
+	public function list_sorted($value)
 	{
-		$this->status = Lib::type()->list_strict($this->result, $value);
+		$this->status = Lib::type()->list_sorted($this->result, $value);
 
 		return $this;
 	}
@@ -465,9 +465,31 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function dict_strict($value)
+	public function dict_sorted($value)
 	{
-		$this->status = Lib::type()->dict_strict($this->result, $value);
+		$this->status = Lib::type()->dict_sorted($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function index_list($value)
+	{
+		$this->status = Lib::type()->index_list($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function index_dict($value)
+	{
+		$this->status = Lib::type()->index_dict($this->result, $value);
 
 		return $this;
 	}
