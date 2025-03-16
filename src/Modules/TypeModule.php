@@ -914,12 +914,21 @@ class TypeModule extends TypeModuleBase
         return Lib::arr()->type_list_strict($result, $value);
     }
 
+
     /**
      * @param array|null $result
      */
     public function dict(&$result, $value) : bool
     {
         return Lib::arr()->type_dict($result, $value);
+    }
+
+    /**
+     * @param array|null $result
+     */
+    public function dict_strict(&$result, $value) : bool
+    {
+        return Lib::arr()->type_dict_strict($result, $value);
     }
 
 

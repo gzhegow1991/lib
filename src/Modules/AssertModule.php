@@ -465,6 +465,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
+	public function dict_strict($value)
+	{
+		$this->status = Lib::type()->dict_strict($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
 	public function table($value)
 	{
 		$this->status = Lib::type()->table($this->result, $value);

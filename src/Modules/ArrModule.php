@@ -93,6 +93,7 @@ class ArrModule
         return true;
     }
 
+
     /**
      * @param array|null $result
      */
@@ -112,6 +113,41 @@ class ArrModule
             if ('' === $key) {
                 return false;
             }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    /**
+     * @param array|null $result
+     */
+    public function type_dict_strict(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        $keys = array_keys($value);
+
+        foreach ( $keys as $key ) {
+            if (is_int($key)) {
+                return false;
+            }
+
+            if ('' === $key) {
+                return false;
+            }
+        }
+
+        $keysSorted = $keys;
+        sort($keysSorted);
+
+        if ($keys !== $keysSorted) {
+            return false;
         }
 
         $result = $value;

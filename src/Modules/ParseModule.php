@@ -549,6 +549,19 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return array|null
 	 */
+	public function dict_strict($value)
+	{
+		if (Lib::type()->dict_strict($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return array|null
+	 */
 	public function table($value)
 	{
 		if (Lib::type()->table($result, $value)) {
