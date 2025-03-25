@@ -713,23 +713,24 @@ class TypeModule extends TypeModuleBase
      */
     public function trim(&$result, $value, string $characters = null) : bool
     {
-        $result = null;
+        return Lib::str()->type_trim($result, $value, $characters);
+    }
 
-        $characters = $characters ?? " \n\r\t\v\0";
 
-        if (! $this->string($_value, $value)) {
-            return false;
-        }
+    /**
+     * @param string|null $result
+     */
+    public function letter(&$result, $value) : bool
+    {
+        return Lib::str()->type_letter($result, $value);
+    }
 
-        $_value = trim($_value, $characters);
-
-        if ('' === $_value) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return $_value;
+    /**
+     * @param Alphabet|null $result
+     */
+    public function alphabet(&$result, $value) : bool
+    {
+        return Lib::crypt()->type_alphabet($result, $value);
     }
 
 
@@ -845,15 +846,6 @@ class TypeModule extends TypeModuleBase
         $result = $_value;
 
         return true;
-    }
-
-
-    /**
-     * @param Alphabet|null $result
-     */
-    public function alphabet(&$result, $value) : bool
-    {
-        return Lib::crypt()->type_alphabet($result, $value);
     }
 
 

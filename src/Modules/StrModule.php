@@ -97,6 +97,52 @@ class StrModule
 
 
     /**
+     * @param string|null $result
+     */
+    public function type_trim(&$result, $value, string $characters = null) : bool
+    {
+        $result = null;
+
+        $characters = $characters ?? " \n\r\t\v\0";
+
+        if (! Lib::type()->string($_value, $value)) {
+            return false;
+        }
+
+        $_value = trim($_value, $characters);
+
+        if ('' === $_value) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return $_value;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function type_letter(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        if (1 !== $this->strlen($_value)) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return $_value;
+    }
+
+
+    /**
      * @param callable|callable-string|null $fn
      */
     public function mb(string $fn = null, ...$args)
@@ -145,225 +191,428 @@ class StrModule
     }
 
 
-    /**
-     * @return array
-     */
+    public function loadAsciiControls(bool $hex = null) : array
+    {
+        $hex = $hex ?? false;
+
+        if ($hex) {
+            $list = [
+                chr(0)  => '\x00', // "\0"   // NULL (ASCII 0)
+                chr(1)  => '\x01', // "\x01" // SOH (Start of Heading) (ASCII 1)
+                chr(2)  => '\x02', // "\x02" // STX (Start of Text)   (ASCII 2)
+                chr(3)  => '\x03', // "\x03" // ETX (End of Text)     (ASCII 3)
+                chr(4)  => '\x04', // "\x04" // EOT (End of Transmission) (ASCII 4)
+                chr(5)  => '\x05', // "\x05" // ENQ (Enquiry)         (ASCII 5)
+                chr(6)  => '\x06', // "\x06" // ACK (Acknowledge)     (ASCII 6)
+                chr(7)  => '\x07', // "\a" // BEL (Bell)            (ASCII 7)
+                chr(8)  => '\x08', // "\b" // BS  (Backspace)       (ASCII 8)
+                chr(9)  => '\x09', // "\t" // TAB (Horizontal Tab)  (ASCII 9)
+                chr(10) => '\x0A', // "\n" // LF  (Line Feed)       (ASCII 10)
+                chr(11) => '\x0B', // "\v" // VT  (Vertical Tab)    (ASCII 11)
+                chr(12) => '\x0C', // "\f" // FF  (Form Feed)       (ASCII 12)
+                chr(13) => '\x0D', // "\r" // CR  (Carriage Return) (ASCII 13)
+                chr(14) => '\x0E', // "\x0E" // SO  (Shift Out)       (ASCII 14)
+                chr(15) => '\x0F', // "\x0F" // SI  (Shift In)        (ASCII 15)
+                chr(16) => '\x10', // "\x10" // DLE (Data Link Escape)(ASCII 16)
+                chr(17) => '\x11', // "\x11" // DC1 (Device Control 1)(ASCII 17)
+                chr(18) => '\x12', // "\x12" // DC2 (Device Control 2)(ASCII 18)
+                chr(19) => '\x13', // "\x13" // DC3 (Device Control 3)(ASCII 19)
+                chr(20) => '\x14', // "\x14" // DC4 (Device Control 4)(ASCII 20)
+                chr(21) => '\x15', // "\x15" // NAK (Negative Acknowledge) (ASCII 21)
+                chr(22) => '\x16', // "\x16" // SYN (Synchronous Idle) (ASCII 22)
+                chr(23) => '\x17', // "\x17" // ETB (End of Block)    (ASCII 23)
+                chr(24) => '\x18', // "\x18" // CAN (Cancel)           (ASCII 24)
+                chr(25) => '\x19', // "\x19" // EM  (End of Medium)    (ASCII 25)
+                chr(26) => '\x1A', // "\x1A" // SUB (Substitute)       (ASCII 26)
+                chr(27) => '\x1B', // "\e" // ESC (Escape)           (ASCII 27)
+                chr(28) => '\x1C', // "\x1C" // FS  (File Separator)   (ASCII 28)
+                chr(29) => '\x1D', // "\x1D" // GS  (Group Separator)  (ASCII 29)
+                chr(30) => '\x1E', // "\x1E" // RS  (Record Separator) (ASCII 30)
+                chr(31) => '\x1F', // "\x1F" // US  (Unit Separator)   (ASCII 31)
+            ];
+
+        } else {
+            $list = [
+                chr(0)  => '\0',   // "\0"   // NULL (ASCII 0)
+                chr(1)  => '\x01', // "\x01" // SOH (Start of Heading) (ASCII 1)
+                chr(2)  => '\x02', // "\x02" // STX (Start of Text)   (ASCII 2)
+                chr(3)  => '\x03', // "\x03" // ETX (End of Text)     (ASCII 3)
+                chr(4)  => '\x04', // "\x04" // EOT (End of Transmission) (ASCII 4)
+                chr(5)  => '\x05', // "\x05" // ENQ (Enquiry)         (ASCII 5)
+                chr(6)  => '\x06', // "\x06" // ACK (Acknowledge)     (ASCII 6)
+                chr(7)  => '\a',   // "\x07" // BEL (Bell)            (ASCII 7)
+                chr(8)  => '\b',   // "\x08" // BS  (Backspace)       (ASCII 8)
+                chr(9)  => '\t',   // "\x09" // TAB (Horizontal Tab)  (ASCII 9)
+                chr(10) => '\n',   // "\x0A" // LF  (Line Feed)       (ASCII 10)
+                chr(11) => '\v',   // "\x0B" // VT  (Vertical Tab)    (ASCII 11)
+                chr(12) => '\f',   // "\x0C" // FF  (Form Feed)       (ASCII 12)
+                chr(13) => '\r',   // "\x0D" // CR  (Carriage Return) (ASCII 13)
+                chr(14) => '\x0E', // "\x0E" // SO  (Shift Out)       (ASCII 14)
+                chr(15) => '\x0F', // "\x0F" // SI  (Shift In)        (ASCII 15)
+                chr(16) => '\x10', // "\x10" // DLE (Data Link Escape)(ASCII 16)
+                chr(17) => '\x11', // "\x11" // DC1 (Device Control 1)(ASCII 17)
+                chr(18) => '\x12', // "\x12" // DC2 (Device Control 2)(ASCII 18)
+                chr(19) => '\x13', // "\x13" // DC3 (Device Control 3)(ASCII 19)
+                chr(20) => '\x14', // "\x14" // DC4 (Device Control 4)(ASCII 20)
+                chr(21) => '\x15', // "\x15" // NAK (Negative Acknowledge) (ASCII 21)
+                chr(22) => '\x16', // "\x16" // SYN (Synchronous Idle) (ASCII 22)
+                chr(23) => '\x17', // "\x17" // ETB (End of Block)    (ASCII 23)
+                chr(24) => '\x18', // "\x18" // CAN (Cancel)           (ASCII 24)
+                chr(25) => '\x19', // "\x19" // EM  (End of Medium)    (ASCII 25)
+                chr(26) => '\x1A', // "\x1A" // SUB (Substitute)       (ASCII 26)
+                chr(27) => '\e',   // "\x1B" // ESC (Escape)           (ASCII 27)
+                chr(28) => '\x1C', // "\x1C" // FS  (File Separator)   (ASCII 28)
+                chr(29) => '\x1D', // "\x1D" // GS  (Group Separator)  (ASCII 29)
+                chr(30) => '\x1E', // "\x1E" // RS  (Record Separator) (ASCII 30)
+                chr(31) => '\x1F', // "\x1F" // US  (Unit Separator)   (ASCII 31)
+            ];
+        }
+
+        return $list;
+    }
+
+    public function loadAsciiControlsNoTrims(bool $hex = null) : array
+    {
+        $list = $this->loadAsciiControlsOnlyTrims($hex);
+
+        unset($list[ chr(9) ]);
+        unset($list[ chr(10) ]);
+        unset($list[ chr(11) ]);
+        unset($list[ chr(13) ]);
+
+        return $list;
+    }
+
+    public function loadAsciiControlsOnlyTrims(bool $hex = null) : array
+    {
+        $hex = $hex ?? false;
+
+        if ($hex) {
+            $list = [
+                chr(9)  => '\x09', // "\t" // TAB (Horizontal Tab)  (ASCII 9)
+                chr(10) => '\x0A', // "\n" // LF  (Line Feed)       (ASCII 10)
+                chr(11) => '\x0B', // "\v" // VT  (Vertical Tab)    (ASCII 11)
+                chr(13) => '\x0D', // "\r" // CR  (Carriage Return) (ASCII 13)
+            ];
+
+        } else {
+            $list = [
+                chr(9)  => '\t',   // "\x09" // TAB (Horizontal Tab)  (ASCII 9)
+                chr(10) => '\n',   // "\x0A" // LF  (Line Feed)       (ASCII 10)
+                chr(11) => '\v',   // "\x0B" // VT  (Vertical Tab)    (ASCII 11)
+                chr(13) => '\r',   // "\x0D" // CR  (Carriage Return) (ASCII 13)
+            ];
+        }
+
+        return $list;
+    }
+
+
     public function loadAccents() : array
     {
         $list = [
-            '' => '£',
-
-            'a' => 'àáâãāăȧảǎȁąạḁẚầấẫẩằắẵẳǡǟǻậặǽǣ',
-            'A' => 'ÀÁÂÃĀĂȦẢǍȀĄẠḀAʾẦẤẪẨẰẮẴẲǠǞǺẬẶǼǢ',
-
-            'aa' => 'å',
-            'Aa' => 'Å',
-
-            'ae' => 'äæ',
-            'Ae' => 'ÄÆ',
-
-            'c' => 'çćĉċč',
-            'C' => 'ÇĆĈĊČ',
-
-            'd' => 'ďđ',
-            'D' => 'ĎĐ',
-
-            'e' => 'èéêẽēĕėëẻěȅȇẹȩęḙḛềếễểḕḗệḝёє',
-            'E' => 'ÈÉÊẼĒĔĖËẺĚȄȆẸȨĘḘḚỀẾỄỂḔḖỆḜЁЄ€',
-
-            'g' => 'ĝğġģ',
-            'G' => 'ĜĞĠĢ',
-
-            'h' => 'ĥħ',
-            'H' => 'ĤĦ',
-
-            'i' => 'ìíîĩīĭïỉǐịįȉȋḭḯї',
-            'I' => 'ÌÍÎĨĪĬÏỈǏỊĮȈȊḬḮЇ',
-
-            'ij' => 'ĳ',
-            'IJ' => 'Ĳ',
-
-            'j' => 'ĵ',
-            'J' => 'Ĵ',
-
-            'k' => 'ķĸ',
-            'K' => 'Ķ',
-
-            'l' => 'ĺļľŀł',
-            'L' => 'ĹĻĽĿŁ',
-
-            'n' => 'ñńņňŊ',
-            'N' => 'ÑŃŅŇŉŋ',
-
-            'o' => 'òóôõōŏȯỏőǒȍȏơǫọøồốỗổȱȫȭṍṏṑṓờớỡởợǭộǿ',
-            'O' => 'ÒÓÔÕŌŎȮỎŐǑȌȎƠǪỌØỒỐỖỔȰȪȬṌṎṐṒỜỚỠỞỢǬỘǾ',
-
-            'oe' => 'öœ',
-            'Oe' => 'Ö',
-            'OE' => 'Œ',
-
-            'r' => 'ŕŗř',
-            'R' => 'ŔŖŘ',
-
-            's' => 'śŝşšſ',
-            'S' => 'ŚŜŞŠ',
-
-            'ss' => 'ß',
-
-            't' => 'ţťŧ',
-            'T' => 'ŢŤŦ',
-
-            'u' => 'ùúûũūŭủůűǔȕȗưụṳųṷṵṹṻǖǜǘǖǚừứữửựў',
-            'U' => 'ÙÚÛŨŪŬỦŮŰǓȔȖƯỤṲŲṶṴṸṺǕǛǗǕǙỪỨỮỬỰЎ',
-
-            'ue' => 'ü',
-            'Ue' => 'Ü',
-
-            'w' => 'ŵ',
-            'W' => 'Ŵ',
-
-            'y' => 'ýÿŷ',
-            'Y' => 'ÝŶŸ',
-
-            'z' => 'źżž',
-            'Z' => 'ŹŻŽ',
-        ];
-
-        return $list;
-    }
-
-    /**
-     * @return array
-     */
-    public function loadVowels() : array
-    {
-        $list = [
-            'a' => 'aàáâãāăȧäảåǎȁąạḁẚầấẫẩằắẵẳǡǟǻậặæǽǣая',
-            'A' => 'AÀÁÂÃĀĂȦÄẢÅǍȀĄẠḀAʾẦẤẪẨẰẮẴẲǠǞǺẬẶÆǼǢАЯ',
-
-            'e' => 'eèéêẽēĕėëẻěȅȇẹȩęḙḛềếễểḕḗệḝеёє',
-            'E' => 'EÈÉÊẼĒĔĖËẺĚȄȆẸȨĘḘḚỀẾỄỂḔḖỆḜЕЁЄ€',
-
-            'i' => 'iìíîĩīĭïỉǐịįȉȋḭḯиыії',
-            'I' => 'IÌÍÎĨĪĬÏỈǏỊĮȈȊḬḮИЫІЇ',
-
-            'o' => 'oòóôõōŏȯöỏőǒȍȏơǫọøồốỗổȱȫȭṍṏṑṓờớỡởợǭộǿœо',
-            'O' => 'OÒÓÔÕŌŎȮÖỎŐǑȌȎƠǪỌØỒỐỖỔȰȪȬṌṎṐṒỜỚỠỞỢǬỘǾŒО',
-
-            'u' => 'uùúûũūŭüủůűǔȕȗưụṳųṷṵṹṻǖǜǘǖǚừứữửựуюў',
-            'U' => 'UÙÚÛŨŪŬÜỦŮŰǓȔȖƯỤṲŲṶṴṸṺǕǛǗǕǙỪỨỮỬỰУЮЎ',
-        ];
-
-        return $list;
-    }
-
-    /**
-     * @return array
-     */
-    public function loadTrims() : array
-    {
-        $list = [
-            chr(9)  => '\t',   // "\x09" // TAB (Horizontal Tab)  (ASCII 9)
-            chr(10) => '\n',   // "\x0A" // LF  (Line Feed)       (ASCII 10)
-            chr(11) => '\v',   // "\x0B" // VT  (Vertical Tab)    (ASCII 11)
-            chr(13) => '\r',   // "\x0D" // CR  (Carriage Return) (ASCII 13)
-        ];
-
-        return $list;
-    }
-
-    /**
-     * @return array
-     */
-    public function loadAsciiControls() : array
-    {
-        $list = [
-            chr(0)  => '\0',   // "\0"   // NULL (ASCII 0)
-            chr(1)  => '\x01', // "\x01" // SOH (Start of Heading) (ASCII 1)
-            chr(2)  => '\x02', // "\x02" // STX (Start of Text)   (ASCII 2)
-            chr(3)  => '\x03', // "\x03" // ETX (End of Text)     (ASCII 3)
-            chr(4)  => '\x04', // "\x04" // EOT (End of Transmission) (ASCII 4)
-            chr(5)  => '\x05', // "\x05" // ENQ (Enquiry)         (ASCII 5)
-            chr(6)  => '\x06', // "\x06" // ACK (Acknowledge)     (ASCII 6)
-            chr(7)  => '\a',   // "\x07" // BEL (Bell)            (ASCII 7)
-            chr(8)  => '\b',   // "\x08" // BS  (Backspace)       (ASCII 8)
-            chr(9)  => '\t',   // "\x09" // TAB (Horizontal Tab)  (ASCII 9)
-            chr(10) => '\n',   // "\x0A" // LF  (Line Feed)       (ASCII 10)
-            chr(11) => '\v',   // "\x0B" // VT  (Vertical Tab)    (ASCII 11)
-            chr(12) => '\f',   // "\x0C" // FF  (Form Feed)       (ASCII 12)
-            chr(13) => '\r',   // "\x0D" // CR  (Carriage Return) (ASCII 13)
-            chr(14) => '\x0E', // "\x0E" // SO  (Shift Out)       (ASCII 14)
-            chr(15) => '\x0F', // "\x0F" // SI  (Shift In)        (ASCII 15)
-            chr(16) => '\x10', // "\x10" // DLE (Data Link Escape)(ASCII 16)
-            chr(17) => '\x11', // "\x11" // DC1 (Device Control 1)(ASCII 17)
-            chr(18) => '\x12', // "\x12" // DC2 (Device Control 2)(ASCII 18)
-            chr(19) => '\x13', // "\x13" // DC3 (Device Control 3)(ASCII 19)
-            chr(20) => '\x14', // "\x14" // DC4 (Device Control 4)(ASCII 20)
-            chr(21) => '\x15', // "\x15" // NAK (Negative Acknowledge) (ASCII 21)
-            chr(22) => '\x16', // "\x16" // SYN (Synchronous Idle) (ASCII 22)
-            chr(23) => '\x17', // "\x17" // ETB (End of Block)    (ASCII 23)
-            chr(24) => '\x18', // "\x18" // CAN (Cancel)           (ASCII 24)
-            chr(25) => '\x19', // "\x19" // EM  (End of Medium)    (ASCII 25)
-            chr(26) => '\x1A', // "\x1A" // SUB (Substitute)       (ASCII 26)
-            chr(27) => '\e',   // "\x1B" // ESC (Escape)           (ASCII 27)
-            chr(28) => '\x1C', // "\x1C" // FS  (File Separator)   (ASCII 28)
-            chr(29) => '\x1D', // "\x1D" // GS  (Group Separator)  (ASCII 29)
-            chr(30) => '\x1E', // "\x1E" // RS  (Record Separator) (ASCII 30)
-            chr(31) => '\x1F', // "\x1F" // US  (Unit Separator)   (ASCII 31)
-        ];
-
-        return $list;
-    }
-
-    /**
-     * @return array
-     */
-    public function loadAsciiControlsNoTrims() : array
-    {
-        $list = [
-            // chr(9)  => '\t',   // "\x09" // TAB (Horizontal Tab)  (ASCII 9)
-            // chr(10) => '\n',   // "\x0A" // LF  (Line Feed)       (ASCII 10)
-            // chr(11) => '\v',   // "\x0B" // VT  (Vertical Tab)    (ASCII 11)
-            // chr(13) => '\r',   // "\x0D" // CR  (Carriage Return) (ASCII 13)
+            // "ɵ" => "-",
+            // "ꞁ" => "-",
+            // "ꞃ" => "-",
+            // "ꞅ" => "-",
             //
-            chr(0)  => '\0',   // "\0"   // NULL (ASCII 0)
-            chr(1)  => '\x01', // "\x01" // SOH (Start of Heading) (ASCII 1)
-            chr(2)  => '\x02', // "\x02" // STX (Start of Text)   (ASCII 2)
-            chr(3)  => '\x03', // "\x03" // ETX (End of Text)     (ASCII 3)
-            chr(4)  => '\x04', // "\x04" // EOT (End of Transmission) (ASCII 4)
-            chr(5)  => '\x05', // "\x05" // ENQ (Enquiry)         (ASCII 5)
-            chr(6)  => '\x06', // "\x06" // ACK (Acknowledge)     (ASCII 6)
-            chr(7)  => '\a',   // "\x07" // BEL (Bell)            (ASCII 7)
-            chr(8)  => '\b',   // "\x08" // BS  (Backspace)       (ASCII 8)
-            chr(12) => '\f',   // "\x0C" // FF  (Form Feed)       (ASCII 12)
-            chr(14) => '\x0E', // "\x0E" // SO  (Shift Out)       (ASCII 14)
-            chr(15) => '\x0F', // "\x0F" // SI  (Shift In)        (ASCII 15)
-            chr(16) => '\x10', // "\x10" // DLE (Data Link Escape)(ASCII 16)
-            chr(17) => '\x11', // "\x11" // DC1 (Device Control 1)(ASCII 17)
-            chr(18) => '\x12', // "\x12" // DC2 (Device Control 2)(ASCII 18)
-            chr(19) => '\x13', // "\x13" // DC3 (Device Control 3)(ASCII 19)
-            chr(20) => '\x14', // "\x14" // DC4 (Device Control 4)(ASCII 20)
-            chr(21) => '\x15', // "\x15" // NAK (Negative Acknowledge) (ASCII 21)
-            chr(22) => '\x16', // "\x16" // SYN (Synchronous Idle) (ASCII 22)
-            chr(23) => '\x17', // "\x17" // ETB (End of Block)    (ASCII 23)
-            chr(24) => '\x18', // "\x18" // CAN (Cancel)           (ASCII 24)
-            chr(25) => '\x19', // "\x19" // EM  (End of Medium)    (ASCII 25)
-            chr(26) => '\x1A', // "\x1A" // SUB (Substitute)       (ASCII 26)
-            chr(27) => '\e',   // "\x1B" // ESC (Escape)           (ASCII 27)
-            chr(28) => '\x1C', // "\x1C" // FS  (File Separator)   (ASCII 28)
-            chr(29) => '\x1D', // "\x1D" // GS  (Group Separator)  (ASCII 29)
-            chr(30) => '\x1E', // "\x1E" // RS  (Record Separator) (ASCII 30)
-            chr(31) => '\x1F', // "\x1F" // US  (Unit Separator)   (ASCII 31)
+            "ß" => "ss",
+            "à" => "a",
+            "á" => "a",
+            "â" => "a",
+            "ã" => "a",
+            "ä" => "a",
+            "å" => "a",
+            "æ" => "ae",
+            "ç" => "c",
+            "è" => "e",
+            "é" => "e",
+            "ê" => "e",
+            "ë" => "e",
+            "ì" => "i",
+            "í" => "i",
+            "î" => "i",
+            "ï" => "i",
+            "ð" => "d",
+            "ñ" => "n",
+            "ò" => "o",
+            "ó" => "o",
+            "ô" => "o",
+            "õ" => "o",
+            "ö" => "o",
+            "ø" => "o",
+            "ù" => "u",
+            "ú" => "u",
+            "û" => "u",
+            "ü" => "u",
+            "ý" => "y",
+            "ÿ" => "y",
+            "ā" => "a",
+            "ă" => "a",
+            "ą" => "a",
+            "ć" => "c",
+            "ĉ" => "c",
+            "ċ" => "c",
+            "č" => "c",
+            "ď" => "d",
+            "đ" => "d",
+            "ē" => "e",
+            "ĕ" => "e",
+            "ė" => "e",
+            "ę" => "e",
+            "ě" => "e",
+            "ĝ" => "g",
+            "ğ" => "g",
+            "ġ" => "g",
+            "ģ" => "g",
+            "ĥ" => "h",
+            "ħ" => "h",
+            "ĩ" => "i",
+            "ī" => "i",
+            "ĭ" => "i",
+            "į" => "i",
+            "ĳ" => "ij",
+            "ĵ" => "j",
+            "ķ" => "k",
+            "ĺ" => "l",
+            "ļ" => "l",
+            "ľ" => "l",
+            "ŀ" => "l",
+            "ł" => "l",
+            "ń" => "n",
+            "ņ" => "n",
+            "ň" => "n",
+            "ŋ" => "n",
+            "ō" => "o",
+            "ŏ" => "o",
+            "ő" => "o",
+            "œ" => "oe",
+            "ŕ" => "r",
+            "ŗ" => "r",
+            "ř" => "r",
+            "ś" => "s",
+            "ŝ" => "s",
+            "ş" => "s",
+            "š" => "s",
+            "ţ" => "t",
+            "ť" => "t",
+            "ŧ" => "t",
+            "ũ" => "u",
+            "ū" => "u",
+            "ŭ" => "u",
+            "ů" => "u",
+            "ű" => "u",
+            "ų" => "u",
+            "ŵ" => "w",
+            "ŷ" => "y",
+            "ź" => "z",
+            "ż" => "z",
+            "ž" => "z",
+            "ſ" => "s",
+            "ƀ" => "b",
+            "ƃ" => "b",
+            "ƈ" => "c",
+            "ƌ" => "d",
+            "ƙ" => "k",
+            "ƚ" => "l",
+            "ơ" => "o",
+            "ƫ" => "t",
+            "ƭ" => "t",
+            "ư" => "u",
+            "ƴ" => "y",
+            "ƶ" => "z",
+            "ǆ" => "dz",
+            "ǉ" => "lj",
+            "ǌ" => "nj",
+            "ǎ" => "a",
+            "ǐ" => "i",
+            "ǒ" => "o",
+            "ǔ" => "u",
+            "ǖ" => "u",
+            "ǘ" => "u",
+            "ǚ" => "u",
+            "ǜ" => "u",
+            "ǟ" => "a",
+            "ǡ" => "a",
+            "ǣ" => "ae",
+            "ǧ" => "g",
+            "ǩ" => "k",
+            "ǫ" => "o",
+            "ǭ" => "o",
+            "ǳ" => "dz",
+            "ǻ" => "a",
+            "ǽ" => "ae",
+            "ǿ" => "o",
+            "ȁ" => "a",
+            "ȃ" => "a",
+            "ȅ" => "e",
+            "ȇ" => "e",
+            "ȉ" => "i",
+            "ȋ" => "i",
+            "ȍ" => "o",
+            "ȏ" => "o",
+            "ȑ" => "r",
+            "ȓ" => "r",
+            "ȕ" => "u",
+            "ȗ" => "u",
+            "ș" => "s",
+            "ț" => "t",
+            "ȟ" => "h",
+            "ȧ" => "a",
+            "ȩ" => "e",
+            "ȫ" => "o",
+            "ȭ" => "o",
+            "ȯ" => "o",
+            "ȱ" => "o",
+            "ȳ" => "y",
+            "ȴ" => "l",
+            "ȵ" => "n",
+            "ȶ" => "t",
+            "ȷ" => "j",
+            "ȼ" => "c",
+            "ȿ" => "s",
+            "ɇ" => "e",
+            "ɍ" => "r",
+            "ɏ" => "y",
+            "ɓ" => "b",
+            "ɖ" => "d",
+            "ɗ" => "d",
+            "ɠ" => "g",
+            "ɨ" => "i",
+            "ʈ" => "t",
+            "ё" => "e",
+            "є" => "e",
+            "ї" => "i",
+            "ў" => "u",
+            "ӑ" => "a",
+            "ӓ" => "a",
+            "ӗ" => "e",
+            "ḁ" => "a",
+            "ḃ" => "b",
+            "ḅ" => "b",
+            "ḇ" => "b",
+            "ḋ" => "d",
+            "ḍ" => "d",
+            "ḏ" => "d",
+            "ḑ" => "d",
+            "ḓ" => "d",
+            "ḕ" => "e",
+            "ḗ" => "e",
+            "ḙ" => "e",
+            "ḛ" => "e",
+            "ḝ" => "e",
+            "ḟ" => "f",
+            "ḡ" => "g",
+            "ḥ" => "h",
+            "ḧ" => "h",
+            "ḩ" => "h",
+            "ḫ" => "h",
+            "ḭ" => "i",
+            "ḯ" => "i",
+            "ḱ" => "k",
+            "ḳ" => "k",
+            "ḵ" => "k",
+            "ḻ" => "l",
+            "ḽ" => "l",
+            "ḿ" => "m",
+            "ṁ" => "m",
+            "ṃ" => "m",
+            "ṅ" => "n",
+            "ṇ" => "n",
+            "ṉ" => "n",
+            "ṋ" => "n",
+            "ṍ" => "o",
+            "ṏ" => "o",
+            "ṑ" => "o",
+            "ṓ" => "o",
+            "ṕ" => "p",
+            "ṗ" => "p",
+            "ṙ" => "r",
+            "ṛ" => "r",
+            "ṝ" => "r",
+            "ṟ" => "r",
+            "ṡ" => "s",
+            "ṣ" => "s",
+            "ṥ" => "s",
+            "ṧ" => "s",
+            "ṩ" => "s",
+            "ṫ" => "t",
+            "ṭ" => "t",
+            "ṯ" => "t",
+            "ṱ" => "t",
+            "ṳ" => "u",
+            "ṵ" => "u",
+            "ṷ" => "u",
+            "ṹ" => "u",
+            "ṻ" => "u",
+            "ṽ" => "v",
+            "ṿ" => "v",
+            "ẁ" => "w",
+            "ẃ" => "w",
+            "ẅ" => "w",
+            "ẇ" => "w",
+            "ẉ" => "w",
+            "ẋ" => "x",
+            "ẍ" => "x",
+            "ẏ" => "y",
+            "ẑ" => "z",
+            "ẓ" => "z",
+            "ẕ" => "z",
+            "ẚ" => "a",
+            "ẛ" => "s",
+            "ạ" => "a",
+            "ả" => "a",
+            "ấ" => "a",
+            "ầ" => "a",
+            "ẩ" => "a",
+            "ẫ" => "a",
+            "ậ" => "a",
+            "ắ" => "a",
+            "ằ" => "a",
+            "ẳ" => "a",
+            "ẵ" => "a",
+            "ặ" => "a",
+            "ẹ" => "e",
+            "ẻ" => "e",
+            "ẽ" => "e",
+            "ế" => "e",
+            "ề" => "e",
+            "ể" => "e",
+            "ễ" => "e",
+            "ệ" => "e",
+            "ỉ" => "i",
+            "ị" => "i",
+            "ọ" => "o",
+            "ỏ" => "o",
+            "ố" => "o",
+            "ồ" => "o",
+            "ổ" => "o",
+            "ỗ" => "o",
+            "ộ" => "o",
+            "ớ" => "o",
+            "ờ" => "o",
+            "ở" => "o",
+            "ỡ" => "o",
+            "ợ" => "o",
+            "ụ" => "u",
+            "ủ" => "u",
+            "ứ" => "u",
+            "ừ" => "u",
+            "ử" => "u",
+            "ữ" => "u",
+            "ự" => "u",
+            "ỳ" => "y",
+            "ⱥ" => "a",
+            "ꞇ" => "t",
         ];
 
         return $list;
     }
 
-    /**
-     * @return array
-     */
     public function loadInvisibles() : array
     {
+        $theMb = Lib::mb();
+
         $list = [
             // mb_chr(0x0020, 'UTF-8') => '\u{0020}', // > \u{0020}	// Space // Обычный пробел (между словами).
             //
@@ -396,6 +645,207 @@ class StrModule
         return $list;
     }
 
+    public function loadVowels() : array
+    {
+        $list = [
+            'a' => [
+                'a' => true,
+                'à' => true,
+                'á' => true,
+                'â' => true,
+                'ã' => true,
+                'ä' => true,
+                'å' => true,
+                'æ' => true,
+                'ā' => true,
+                'ă' => true,
+                'ą' => true,
+                'ǎ' => true,
+                'ǟ' => true,
+                'ǡ' => true,
+                'ǣ' => true,
+                'ǻ' => true,
+                'ǽ' => true,
+                'ȁ' => true,
+                'ȧ' => true,
+                'ɐ' => true,
+                'α' => true,
+                'а' => true,
+                'я' => true,
+                'ӑ' => true,
+                'ӓ' => true,
+                'ḁ' => true,
+                'ẚ' => true,
+                'ạ' => true,
+                'ả' => true,
+                'ấ' => true,
+                'ầ' => true,
+                'ẩ' => true,
+                'ẫ' => true,
+                'ậ' => true,
+                'ắ' => true,
+                'ằ' => true,
+                'ẳ' => true,
+                'ẵ' => true,
+                'ặ' => true,
+            ],
+
+            'e' => [
+                'e' => true,
+                'è' => true,
+                'é' => true,
+                'ê' => true,
+                'ë' => true,
+                'ē' => true,
+                'ĕ' => true,
+                'ė' => true,
+                'ę' => true,
+                'ě' => true,
+                'ȅ' => true,
+                'ȇ' => true,
+                'ȩ' => true,
+                'ɛ' => true,
+                'ε' => true,
+                'е' => true,
+                'ё' => true,
+                'є' => true,
+                'ḕ' => true,
+                'ḗ' => true,
+                'ḙ' => true,
+                'ḛ' => true,
+                'ḝ' => true,
+                'ẹ' => true,
+                'ẻ' => true,
+                'ẽ' => true,
+                'ế' => true,
+                'ề' => true,
+                'ể' => true,
+                'ễ' => true,
+                'ệ' => true,
+            ],
+
+            'i' => [
+                'i' => true,
+                'ì' => true,
+                'í' => true,
+                'î' => true,
+                'ï' => true,
+                'ĩ' => true,
+                'ī' => true,
+                'ĭ' => true,
+                'į' => true,
+                'ǐ' => true,
+                'ȉ' => true,
+                'ȋ' => true,
+                'ɪ' => true,
+                'η' => true,
+                'и' => true,
+                'ы' => true,
+                'і' => true,
+                'ї' => true,
+                'ḭ' => true,
+                'ḯ' => true,
+                'ỉ' => true,
+                'ị' => true,
+            ],
+
+            'o' => [
+                'o' => true,
+                'ò' => true,
+                'ó' => true,
+                'ô' => true,
+                'õ' => true,
+                'ö' => true,
+                'ø' => true,
+                'ō' => true,
+                'ŏ' => true,
+                'ő' => true,
+                'œ' => true,
+                'ơ' => true,
+                'ǒ' => true,
+                'ǫ' => true,
+                'ǭ' => true,
+                'ǿ' => true,
+                'ȍ' => true,
+                'ȏ' => true,
+                'ȫ' => true,
+                'ȭ' => true,
+                'ȯ' => true,
+                'ȱ' => true,
+                'ɔ' => true,
+                'ω' => true,
+                'о' => true,
+                'ө' => true,
+                'ṍ' => true,
+                'ṏ' => true,
+                'ṑ' => true,
+                'ṓ' => true,
+                'ọ' => true,
+                'ỏ' => true,
+                'ố' => true,
+                'ồ' => true,
+                'ổ' => true,
+                'ỗ' => true,
+                'ộ' => true,
+                'ớ' => true,
+                'ờ' => true,
+                'ở' => true,
+                'ỡ' => true,
+                'ợ' => true,
+            ],
+
+            'u' => [
+                'u' => true,
+                'y' => true,
+                'ù' => true,
+                'ú' => true,
+                'û' => true,
+                'ü' => true,
+                'ý' => true,
+                'ÿ' => true,
+                'ũ' => true,
+                'ū' => true,
+                'ŭ' => true,
+                'ů' => true,
+                'ű' => true,
+                'ų' => true,
+                'ŷ' => true,
+                'ư' => true,
+                'ǔ' => true,
+                'ǖ' => true,
+                'ǘ' => true,
+                'ǚ' => true,
+                'ǜ' => true,
+                'ȕ' => true,
+                'ȗ' => true,
+                'ȳ' => true,
+                'ɏ' => true,
+                'ʊ' => true,
+                'у' => true,
+                'ю' => true,
+                'ў' => true,
+                'ү' => true,
+                'ӱ' => true,
+                'ӳ' => true,
+                'ṳ' => true,
+                'ṵ' => true,
+                'ṷ' => true,
+                'ṹ' => true,
+                'ṻ' => true,
+                'ụ' => true,
+                'ủ' => true,
+                'ứ' => true,
+                'ừ' => true,
+                'ử' => true,
+                'ữ' => true,
+                'ự' => true,
+                'ỳ' => true,
+            ],
+        ];
+
+        return $list;
+    }
+
 
     public function is_binary(string $str) : bool
     {
@@ -416,13 +866,13 @@ class StrModule
         // > gzhegow, not sure, but check below works the same
         // return preg_match(
         //     '%(?:'
-        //     . '[\xC2-\xDF][\x80-\xBF]'             # non-overlong 2-byte
-        //     . '|\xE0[\xA0-\xBF][\x80-\xBF]'        # excluding overlongs
-        //     . '|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}' # straight 3-byte
-        //     . '|\xED[\x80-\x9F][\x80-\xBF]'        # excluding surrogates
-        //     . '|\xF0[\x90-\xBF][\x80-\xBF]{2}'     # planes 1-3
-        //     . '|[\xF1-\xF3][\x80-\xBF]{3}'         # planes 4-15
-        //     . '|\xF4[\x80-\x8F][\x80-\xBF]{2}'     # plane 16
+        //     . '[\xC2-\xDF][\x80-\xBF]'             // > non-overlong 2-byte
+        //     . '|\xE0[\xA0-\xBF][\x80-\xBF]'        // > excluding overlongs
+        //     . '|[\xE1-\xEC\xEE\xEF][\x80-\xBF]{2}' // > straight 3-byte
+        //     . '|\xED[\x80-\x9F][\x80-\xBF]'        // > excluding surrogates
+        //     . '|\xF0[\x90-\xBF][\x80-\xBF]{2}'     // > planes 1-3
+        //     . '|[\xF1-\xF3][\x80-\xBF]{3}'         // > planes 4-15
+        //     . '|\xF4[\x80-\x8F][\x80-\xBF]{2}'     // > plane 16
         //     . ')+%xs',
         //     $str
         // ) === 1;
@@ -431,7 +881,10 @@ class StrModule
     }
 
 
-    public function utf8_encode(string $string) : ?string
+    /**
+     * > конвертирует непечатаемые символы терминала Windows (`кракозябры`) в последовательности, которые можно прочесть визуально
+     */
+    public function utf8_encode(string $string, string $encoding = null) : ?string
     {
         if (! \function_exists('iconv')) {
             throw new RuntimeException(
@@ -439,26 +892,96 @@ class StrModule
             );
         }
 
-        $charset = null
+        $_encoding = null
+            ?? $encoding
             ?? (\ini_get('php.output_encoding') ?: null)
             ?? (\ini_get('default_charset') ?: null)
             ?? 'UTF-8';
 
-        $stringConverted = @iconv($charset, 'UTF-8', $string);
+        $stringConverted = @iconv($_encoding, 'UTF-8', $string);
         if (false !== $stringConverted) {
             return $stringConverted;
         }
 
-        if (true
-            && ('CP1252' !== $charset)
-            && false !== $stringConverted = @iconv('CP1252', 'UTF-8', $string)
-        ) {
+        if ('CP1252' !== $_encoding) {
+            $stringConverted = @iconv('CP1252', 'UTF-8', $string);
+            if (false !== $stringConverted) {
+                return $stringConverted;
+            }
+        }
+
+        $stringConverted = @iconv('CP850', 'UTF-8', $string);
+        if (false !== $stringConverted) {
             return $stringConverted;
         }
 
-        $stringConverted = iconv('CP850', 'UTF-8', $string);
+        return null;
+    }
 
-        return $stringConverted;
+    /**
+     * > конвертирует непечатаемые символы строки в байтовые и hex последовательности, которые можно прочесть
+     */
+    public function dump_encode(string $string, string $encoding = null) : ?string
+    {
+        $_string = $string;
+
+        $asciiControlsNoTrims = $this->loadAsciiControlsNoTrims(true);
+        $asciiControlsOnlyTrims = $this->loadAsciiControlsOnlyTrims(false);
+
+        $foundBinary = false;
+        $count = 0;
+        $_string = str_replace(
+            array_keys($asciiControlsNoTrims),
+            array_values($asciiControlsNoTrims),
+            $_string,
+            $count
+        );
+        if ($count) {
+            $foundBinary = true;
+        }
+
+        if ($isUtf8 = $this->is_utf8($_string)) {
+            $invisibles = $this->loadInvisibles();
+
+            $count = 0;
+
+            $_string = str_replace(
+                array_keys($invisibles),
+                array_values($invisibles),
+                $_string,
+                $count
+            );
+
+            if ($count) {
+                $foundBinary = true;
+            }
+
+        } else {
+            $_varUtf8 = $this->utf8_encode($_string, $encoding);
+
+            if ($_varUtf8 !== $_string) {
+                $_string = $_varUtf8;
+
+                $foundBinary = true;
+            }
+        }
+
+        if ($foundBinary) {
+            $_string = "b`{$_string}`";
+        }
+
+        foreach ( $asciiControlsOnlyTrims as $i => $v ) {
+            if ($i === "\n") {
+                $asciiControlsOnlyTrims[ $i ] .= $i;
+            }
+        }
+        $_string = str_replace(
+            array_keys($asciiControlsOnlyTrims),
+            array_values($asciiControlsOnlyTrims),
+            $_string
+        );
+
+        return $_string;
     }
 
 
@@ -950,6 +1473,106 @@ class StrModule
     }
 
 
+    public function match(
+        string $pattern, $lines,
+        string $wildcardSequence = null,
+        string $wildcardSeparator = null,
+        string $wildcardLetter = null
+    ) : array
+    {
+        if ('' === $pattern) {
+            return [];
+        }
+
+        $_pattern = $pattern;
+        $_lines = Lib::php()->to_list($lines);
+
+        $anySymbolRegex = '.';
+
+        $hasWildcardSeparator = (null !== $wildcardSeparator);
+        $hasWildcardSequence = (null !== $wildcardSequence);
+        $hasWildcardLetter = (null !== $wildcardLetter);
+
+        $testUnique = [];
+
+        if ($hasWildcardSeparator) {
+            if (! $this->type_letter($_wildcardSeparator, $wildcardSeparator)) {
+                throw new LogicException(
+                    [ 'The `wildcardSeparator` should be null or exactly one letter', $wildcardSeparator ]
+                );
+            }
+
+            $testUnique[] = $_wildcardSeparator;
+        }
+
+        if ($hasWildcardSequence) {
+            if (! $this->type_letter($_wildcardSequence, $wildcardSequence)) {
+                throw new LogicException(
+                    [ 'The `wildcardSequence` should be null or exactly one letter', $wildcardSequence ]
+                );
+            }
+
+            $testUnique[] = $_wildcardSequence;
+        }
+        if ($hasWildcardLetter) {
+            if (! $this->type_letter($_wildcardLetter, $wildcardLetter)) {
+                throw new LogicException(
+                    [ 'The `wildcardLetter` should be null or exactly one letter', $wildcardLetter ]
+                );
+            }
+
+            $testUnique[] = $_wildcardLetter;
+        }
+
+        if (count(array_unique($testUnique)) !== count($testUnique)) {
+            throw new LogicException(
+                [
+                    'The wildcards should be different letters or nulls',
+                    $wildcardSeparator,
+                    $wildcardSequence,
+                    $wildcardLetter,
+                ]
+            );
+        }
+
+        $_pattern = preg_quote($_pattern, '/');
+
+        if ($hasWildcardSeparator) {
+            $_wildcardSeparatorRegex = preg_quote($_wildcardSeparator, '/');
+
+            $anySymbolRegex = '[^' . $_wildcardSeparatorRegex . ']';
+        }
+        if ($hasWildcardSequence) {
+            $_wildcardSequenceRegex = preg_quote($_wildcardSequence, '/');
+
+            $_pattern = str_replace('\\' . $_wildcardSequence, $anySymbolRegex . '+', $_pattern);
+        }
+        if ($hasWildcardLetter) {
+            $_wildcardLetterRegex = preg_quote($_wildcardLetter, '/');
+
+            $_pattern = str_replace('\\' . $_wildcardLetter, $anySymbolRegex, $_pattern);
+        }
+
+        $patternRegex = "/^{$_pattern}$/u";
+
+        if (false === preg_match($patternRegex, '')) {
+            throw new RuntimeException(
+                'Invalid regex for match: ' . $patternRegex
+            );
+        }
+
+        $result = [];
+
+        foreach ( $_lines as $i => $line ) {
+            if (preg_match($patternRegex, $line)) {
+                $result[] = $line;
+            }
+        }
+
+        return $result;
+    }
+
+
     /**
      * > 'theCamelCase'
      */
@@ -1313,7 +1936,11 @@ class StrModule
             return '';
         }
 
-        $vowels = implode('', $this->loadVowels());
+        $vowels = '';
+        $vowelsArray = $this->loadVowels();
+        foreach ( $vowelsArray as $letter => $index ) {
+            $vowels .= implode('', array_keys($index));
+        }
 
         $sourceConsonants = [];
         $sourceVowels = [];

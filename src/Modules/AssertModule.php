@@ -333,6 +333,28 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
+	public function letter($value)
+	{
+		$this->status = Lib::type()->letter($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function alphabet($value)
+	{
+		$this->status = Lib::type()->alphabet($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
 	public function ctype_digit($value)
 	{
 		$this->status = Lib::type()->ctype_digit($this->result, $value);
@@ -358,17 +380,6 @@ class AssertModule extends AssertModuleBase
 	public function ctype_alnum($value, bool $ignoreCase = null)
 	{
 		$this->status = Lib::type()->ctype_alnum($this->result, $value, $ignoreCase);
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function alphabet($value)
-	{
-		$this->status = Lib::type()->alphabet($this->result, $value);
 
 		return $this;
 	}

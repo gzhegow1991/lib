@@ -393,6 +393,32 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
+	public function letter($value)
+	{
+		if (Lib::type()->letter($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return Alphabet|null
+	 */
+	public function alphabet($value)
+	{
+		if (Lib::type()->alphabet($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
 	public function ctype_digit($value)
 	{
 		if (Lib::type()->ctype_digit($result, $value)) {
@@ -422,19 +448,6 @@ class ParseModule extends ParseModuleBase
 	public function ctype_alnum($value, bool $ignoreCase = null)
 	{
 		if (Lib::type()->ctype_alnum($result, $value, $ignoreCase)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return Alphabet|null
-	 */
-	public function alphabet($value)
-	{
-		if (Lib::type()->alphabet($result, $value)) {
 		    return $result;
 		}
 

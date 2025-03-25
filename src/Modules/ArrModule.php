@@ -271,26 +271,32 @@ class ArrModule
 
     public function has(
         $array, $key,
-        &$value = null, &$reference = null
+        array $refs = []
     ) : bool
     {
-        $value = null;
-        $reference = null;
+        $withValue = array_key_exists(0, $refs);
+
+        $refValue = null;
+
+        if ($withValue) {
+            $refValue =& $refs[ 0 ];
+            $refValue = null;
+        }
 
         if (! is_array($array)) {
             return false;
         }
 
-        if (! (is_int($key) || is_string($key))) {
+        if (! Lib::type()->string($_key, $key)) {
             return false;
         }
 
-        if (! array_key_exists($key, $array)) {
+        if (! array_key_exists($_key, $array)) {
             return false;
         }
 
-        $value = $array[ $key ];
-        $reference =& $array[ $key ];
+        $refValue = $array[ $_key ];
+        unset($refValue);
 
         return true;
     }
@@ -298,9 +304,9 @@ class ArrModule
     /**
      * @throws \RuntimeException
      */
-    public function get($array, $key, array $fallback = []) // : ?mixed
+    public function get(array $array, $key, array $fallback = []) // : ?mixed
     {
-        $status = $this->has($array, $key, $value);
+        $status = $this->has($array, $key, [ &$value ]);
 
         if (! $status) {
             if ($fallback) {
@@ -318,19 +324,19 @@ class ArrModule
     }
 
 
-    public function key_first(array $src) // : ?int|string
+    public function key_first(array $array) // : ?int|string
     {
-        reset($src);
+        reset($array);
 
-        return key($src);
+        return key($array);
     }
 
     /**
      * @throws \RuntimeException
      */
-    public function first(array $src, array $fallback = []) // : ?mixed
+    public function first(array $array, array $fallback = []) // : ?mixed
     {
-        if (! $src) {
+        if (! $array) {
             if ($fallback) {
                 [ $fallback ] = $fallback;
 
@@ -342,25 +348,25 @@ class ArrModule
             );
         }
 
-        $first = reset($src);
+        $first = reset($array);
 
         return $first;
     }
 
 
-    public function key_last(array $src) // : ?int|string
+    public function key_last(array $array) // : ?int|string
     {
-        end($src);
+        end($array);
 
-        return key($src);
+        return key($array);
     }
 
     /**
      * @throws \RuntimeException
      */
-    public function last(array $src, array $fallback = []) // : ?mixed
+    public function last(array $array, array $fallback = []) // : ?mixed
     {
-        if (! $src) {
+        if (! $array) {
             if ($fallback) {
                 [ $fallback ] = $fallback;
 
@@ -372,7 +378,7 @@ class ArrModule
             );
         }
 
-        $last = end($src);
+        $last = end($array);
 
         return $last;
     }
@@ -388,37 +394,62 @@ class ArrModule
 
 
     public function has_pos(
-        array $src, int $pos,
-        &$value = null, &$key = null, &$reference = null
+        $array, $pos,
+        array $refs = []
     ) : bool
     {
-        $value = null;
-        $key = null;
-        $reference = null;
+        $withValue = array_key_exists(0, $refs);
+        $withKey = array_key_exists(1, $refs);
 
-        if ($pos < 0) {
-            end($src);
+        $refValue = null;
+        $refKey = null;
+
+        if ($withValue) {
+            $refValue =& $refs[ 0 ];
+            $refValue = null;
+        }
+        if ($withKey) {
+            $refKey =& $refs[ 1 ];
+            $refKey = null;
+        }
+
+        if (! is_array($array)) {
+            return false;
+        }
+
+        if (! is_int($pos)) {
+            return false;
+        }
+
+        $isNegativePos = ($pos < 0);
+
+        $copyArray = $array;
+
+        if ($isNegativePos) {
+            end($copyArray);
 
             $abs = abs($pos) - 1;
 
         } else {
-            reset($src);
+            reset($copyArray);
 
             $abs = abs($pos);
         }
 
-        while ( null !== ($k = key($src)) ) {
+        while ( null !== ($k = key($copyArray)) ) {
             if (! $abs--) {
-                $value = $src[ $k ];
-                $key = $k;
-                $reference =& $src[ $k ];
+                $refValue = $array[ $k ];
+                $refKey = $k;
+
+                unset($refValue);
+                unset($refKey);
 
                 return true;
 
             } else {
-                ($pos < 0)
-                    ? prev($src)
-                    : next($src);
+                $isNegativePos
+                    ? prev($copyArray)
+                    : next($copyArray);
             }
         }
 
@@ -428,9 +459,9 @@ class ArrModule
     /**
      * @return int|string|null
      */
-    public function key_pos(array $src, int $pos) // : ?int|string
+    public function key_pos(array $array, int $pos) // : ?int|string
     {
-        $status = $this->has_pos($src, $pos, $value, $key);
+        $status = $this->has_pos($array, $pos, [ 1 => &$key ]);
 
         if ($status) {
             return $key;
@@ -442,9 +473,9 @@ class ArrModule
     /**
      * @throws \RuntimeException
      */
-    public function get_pos(array $src, int $pos, array $fallback = [])
+    public function get_pos(array $array, int $pos, array $fallback = [])
     {
-        $status = $this->has_pos($src, $pos, $value, $key);
+        $status = $this->has_pos($array, $pos, [ &$value, &$key ]);
 
         if (! $status) {
             if ($fallback) {
@@ -468,79 +499,175 @@ class ArrModule
 
         $array = [ $path, $pathes ];
 
-        array_walk_recursive($array, function ($value) use (&$result) {
-            if (Lib::type()->string($_value, $value)) {
-                $result[] = $_value;
+        array_walk_recursive($array,
+            function ($value) use (
+                &$result
+            ) {
+                if (Lib::type()->string($_value, $value)) {
+                    $result[] = $_value;
 
-            } else {
-                $result[] = null;
+                } else {
+                    $result[] = null;
+                }
             }
-        });
+        );
 
         return $result;
     }
 
+    public function path_dot(string $dot, $path, ...$pathes) : array
+    {
+        $result = [];
+
+        $array = [ $path, $pathes ];
+
+        array_walk_recursive($array,
+            function ($value) use (
+                &$result,
+                &$dot
+            ) {
+                if (Lib::type()->string($_value, $value)) {
+                    $result[] = explode($dot, $_value);
+
+                } else {
+                    $result[] = null;
+                }
+            }
+        );
+
+        return $result;
+    }
+
+
     public function has_path(
-        array $src, $path,
-        &$value = null, &$key = null, &$reference = null
+        array $array, $path,
+        array $refs = []
     ) : bool
     {
-        $value = null;
-        $key = null;
-        $reference = null;
+        $withValue = array_key_exists(0, $refs);
+        $withKey = array_key_exists(1, $refs);
 
-        $_path = $this->path($path);
+        $refValue = null;
+        $refKey = null;
 
-        $ref =& $src;
+        if ($withValue) {
+            $refValue =& $refs[ 0 ];
+            $refValue = null;
+        }
+        if ($withKey) {
+            $refKey =& $refs[ 1 ];
+            $refKey = null;
+        }
 
-        $found = true;
-        $p = null;
+        $pathArray = $this->path($path);
 
-        while ( $_path ) {
-            $p = array_shift($_path);
+        $refCurrent =& $array;
 
-            if (! array_key_exists($p, $ref)) {
-                $found = false;
-                $p = null;
+        $isFound = true;
+        $pathStep = null;
 
-                unset($ref);
-                $ref = null;
+        while ( $pathArray ) {
+            $pathStep = array_shift($pathArray);
+
+            if (! array_key_exists($pathStep, $refCurrent)) {
+                $isFound = false;
+
+                $pathStep = null;
+
+                unset($refCurrent);
+                $refCurrent = null;
 
                 break;
             }
 
-            $ref =& $ref[ $p ];
+            $refCurrent =& $refCurrent[ $pathStep ];
 
-            if ((! is_array($ref)) && $_path) {
-                $found = false;
-                $p = null;
+            if ((! is_array($refCurrent)) && $pathArray) {
+                $isFound = false;
 
-                unset($ref);
-                $ref = null;
+                $pathStep = null;
+
+                unset($refCurrent);
+                $refCurrent = null;
 
                 break;
             }
         }
 
-        if ($found) {
-            $value = $ref;
-            $key = $p;
-            $reference =& $ref;
-
-            return true;
+        if ($isFound) {
+            $refValue = $refCurrent;
+            $refKey = $pathStep;
         }
 
-        return false;
+        unset($refValue);
+        unset($refKey);
+
+        return $isFound;
+    }
+
+
+    /**
+     * @throws \LogicException|\RuntimeException
+     */
+    public function &fetch_path(array &$array, $path) // : mixed
+    {
+        $pathArray = $this->path($path);
+
+        if (! $pathArray) {
+            throw new LogicException(
+                'Unable to ' . __FUNCTION__ . ' due to empty path'
+            );
+        }
+
+        $refCurrent =& $array;
+
+        $isFound = true;
+
+        $pathStep = null;
+
+        while ( $pathArray ) {
+            $pathStep = array_shift($pathArray);
+
+            if (! array_key_exists($pathStep, $refCurrent)) {
+                unset($refCurrent);
+                $refCurrent = null;
+
+                if (! $pathArray) {
+                    throw new RuntimeException(
+                        [
+                            'Unable to ' . __FUNCTION__ . ': missing key in array',
+                            $pathStep,
+                            $path,
+                        ]
+                    );
+                }
+            }
+
+            $refCurrent =& $refCurrent[ $pathStep ];
+
+            if ((! is_array($refCurrent)) && $pathArray) {
+                unset($refCurrent);
+                $refCurrent = null;
+
+                throw new RuntimeException(
+                    [
+                        'Unable to ' . __FUNCTION__ . ': trying to traverse scalar value',
+                        $pathStep,
+                        $path,
+                    ]
+                );
+            }
+        }
+
+        return $refCurrent;
     }
 
     /**
      * @throws \RuntimeException
      */
-    public function get_path(
-        array $src, $path, array $fallback = []
-    )
+    public function get_path(array $array, $path, array $fallback = [])
     {
-        $status = $this->has_path($src, $path, $value);
+        $status = $this->has_path($array, $path, [ &$value ]);
 
         if (! $status) {
             if ($fallback) {
@@ -560,63 +687,68 @@ class ArrModule
         return $value;
     }
 
+
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function &put_path(array &$dst, $path, $value) // : &mixed
+    public function &put_path(array &$array, $path, $value) // : &mixed
     {
-        $fullpath = $this->path($path);
+        $pathArray = $this->path($path);
 
-        if (! $fullpath) {
+        if (! $pathArray) {
             throw new LogicException(
-                'Unable to ' . __FUNCTION__ . ' due to empty path'
+                [
+                    'Unable to ' . __FUNCTION__ . ': the path should be not empty string or array of',
+                    $path,
+                ]
             );
         }
 
-        $ref =& $dst;
+        $refCurrent =& $array;
 
-        while ( null !== key($fullpath) ) {
-            $p = array_shift($fullpath);
+        while ( null !== key($pathArray) ) {
+            $pathStep = array_shift($pathArray);
 
-            if (! array_key_exists($p, $ref)) {
-                $ref[ $p ] = $fullpath
+            if (! array_key_exists($pathStep, $refCurrent)) {
+                $refCurrent[ $pathStep ] = $pathArray
                     ? []
                     : null;
             }
 
-            $ref =& $ref[ $p ];
+            $refCurrent =& $refCurrent[ $pathStep ];
 
-            if ((! is_array($ref)) && $fullpath) {
-                unset($ref);
-                $ref = null;
+            if ((! is_array($refCurrent)) && $pathArray) {
+                unset($refCurrent);
+                $refCurrent = null;
 
                 throw new RuntimeException(
                     [
-                        "Trying to traverse scalar value",
-                        $p,
+                        'Unable to ' . __FUNCTION__ . ': trying to traverse scalar value',
+                        $pathStep,
                         $path,
                     ]
                 );
             }
         }
 
-        $ref = $value;
+        $refCurrent = $value;
 
-        return $ref;
+        return $refCurrent;
     }
 
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function set_path(array &$dst, $path, $value) : void
+    public function set_path(array &$array, $path, $value) : void
     {
-        $this->put_path($dst, $path, $value);
+        $this->put_path($array, $path, $value);
     }
+
 
     /**
      * @throws \LogicException
      */
-    public function unset_path(array &$src, $path) : bool
+    public function unset_path(array &$array, $path) : bool
     {
         $fullpath = $this->path($path);
 
@@ -626,48 +758,52 @@ class ArrModule
             );
         }
 
-        $ref =& $src;
+        $refCurrent =& $array;
 
-        $status = false;
+        $isDeleted = false;
 
-        $p = null;
-        $refPrev = null;
-        foreach ( $fullpath as $p ) {
-            $refPrev =& $ref;
+        $pathStep = null;
 
-            if (! is_array($ref)) {
-                unset($refPrev);
+        $refPrevious = null;
+        foreach ( $fullpath as $pathStep ) {
+            $refPrevious =& $refCurrent;
 
-                break;
-            }
-
-            if (! array_key_exists($p, $ref)) {
-                unset($refPrev);
+            if (! is_array($refCurrent)) {
+                unset($refPrevious);
 
                 break;
             }
 
-            $ref = &$ref[ $p ];
+            if (! array_key_exists($pathStep, $refCurrent)) {
+                unset($refPrevious);
+
+                break;
+            }
+
+            $refCurrent = &$refCurrent[ $pathStep ];
         }
 
         if (
-            isset($refPrev)
-            && (isset($refPrev[ $p ]) || array_key_exists($p, $refPrev))
+            isset($refPrevious)
+            && (
+                isset($refPrevious[ $pathStep ])
+                || array_key_exists($pathStep, $refPrevious)
+            )
         ) {
-            unset($refPrev[ $p ]);
+            unset($refPrevious[ $pathStep ]);
 
-            $status = true;
+            $isDeleted = true;
         }
 
-        unset($p);
+        unset($pathStep);
 
-        unset($refPrev);
-        $refPrev = null;
+        unset($refPrevious);
+        $refPrevious = null;
 
-        unset($ref);
-        $ref = null;
+        unset($refCurrent);
+        $refCurrent = null;
 
-        return $status;
+        return $isDeleted;
     }
 
 
@@ -1494,12 +1630,10 @@ class ArrModule
 
                         $values = [];
                         foreach ( $keyList as $idx => $key ) {
-                            $found = $this
-                                ->has_path(
-                                    $arrayList[ $idx ], $path,
-                                    $value
-                                )
-                            ;
+                            $found = $this->has_path(
+                                $arrayList[ $idx ], $path,
+                                [ &$value ]
+                            );
 
                             if ($found || $fallback) {
                                 if (! $found) {

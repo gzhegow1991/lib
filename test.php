@@ -1,5 +1,6 @@
 <?php
 
+require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 
@@ -332,7 +333,7 @@ _assert_stdout($fn, [], '
 
 
 // >>> TEST
-// > тесты ArrayModule
+// > тесты ArrModule
 $fn = function () {
     _print('[ ArrModule ]');
     echo PHP_EOL;
@@ -2484,6 +2485,25 @@ $fn = function () {
     _print(\Gzhegow\Lib\Lib::str()->inflector()->singularize('users'));
     _print(\Gzhegow\Lib\Lib::str()->inflector()->pluralize('user'));
     echo PHP_EOL;
+
+
+    $array = [
+        'users.name'   => false,
+        'users..name'  => false,
+        'users...name' => false,
+        //
+        'users.1.id'   => 1,
+        'users.1.name' => 'name1',
+        'users.2.id'   => 2,
+        'users.2.name' => 'name2',
+        'users.3.id'   => 3,
+        'users.3.name' => 'name3',
+    ];
+    $keys = array_keys($array);
+    _print_array_multiline(\Gzhegow\Lib\Lib::str()->match('users.*.name', $keys));
+    _print_array_multiline(\Gzhegow\Lib\Lib::str()->match('users.*.name', $keys, '*'));
+    _print_array_multiline(\Gzhegow\Lib\Lib::str()->match('users.*.name', $keys, '*', '.'));
+    echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
 "[ StrModule ]"
@@ -2553,6 +2573,27 @@ world"
 
 [ "user" ]
 [ "users" ]
+
+###
+[
+
+]
+###
+###
+[
+  "users...name",
+  "users.1.name",
+  "users.2.name",
+  "users.3.name"
+]
+###
+###
+[
+  "users.1.name",
+  "users.2.name",
+  "users.3.name"
+]
+###
 ');
 
 

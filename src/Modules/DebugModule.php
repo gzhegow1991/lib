@@ -620,69 +620,9 @@ class DebugModule
         if ($withValue) {
             $theStr = Lib::str();
 
-            $foundBinary = false;
-
-            $asciiControlsNoTrims = $theStr->loadAsciiControlsNoTrims();
-            $trims = $theStr->loadTrims();
-
-            $_var = $var;
-
-            $_var = str_replace('"', '\"', $_var);
-
-            $count = 0;
-
-            $_var = str_replace(
-                array_keys($asciiControlsNoTrims),
-                array_values($asciiControlsNoTrims),
-                $_var,
-                $count
-            );
-            if ($count) {
-                $foundBinary = true;
-            }
-
-            if ($isUtf8 = $theStr->is_utf8($_var)) {
-                $invisibles = $theStr->loadInvisibles();
-
-                $count = 0;
-
-                $_var = str_replace(
-                    array_keys($invisibles),
-                    array_values($invisibles),
-                    $_var,
-                    $count
-                );
-
-                if ($count) {
-                    $foundBinary = true;
-                }
-
-            } else {
-                $_varUtf8 = $theStr->utf8_encode($_var);
-
-                if ($_varUtf8 !== $_var) {
-                    $_var = $_varUtf8;
-
-                    $foundBinary = true;
-                }
-            }
-
-            if ($foundBinary) {
-                $_var = "b`{$_var}`";
-            }
-
-            foreach ( $trims as $i => $v ) {
-                if ($i === "\n") {
-                    $trims[ $i ] .= $i;
-                }
-            }
-            $_var = str_replace(
-                array_keys($trims),
-                array_values($trims),
-                $_var
-            );
-
-            $printableValue = '"' . $_var . '"';
+            $printableValue = str_replace('"', '\"', $var);
+            $printableValue = $theStr->dump_encode($printableValue);
+            $printableValue = '"' . $printableValue . '"';
         }
 
         $output = [];
