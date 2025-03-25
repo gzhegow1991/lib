@@ -565,6 +565,7 @@ class AssertModule extends AssertModuleBase
 	 * @param string            $value
 	 * @param string|array|null $query
 	 * @param string|null       $fragment
+	 *
 	 * @return static
 	 */
 	public function url($value, $query = null, $fragment = null, array $refs = [])
@@ -577,6 +578,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param string      $value
+	 *
 	 * @return static
 	 */
 	public function host($value, array $refs = [])
@@ -591,6 +593,7 @@ class AssertModule extends AssertModuleBase
 	 * @param string            $value
 	 * @param string|array|null $query
 	 * @param string|null       $fragment
+	 *
 	 * @return static
 	 */
 	public function link($value, $query = null, $fragment = null, array $refs = [])
@@ -607,6 +610,70 @@ class AssertModule extends AssertModuleBase
 	public function uuid($value)
 	{
 		$this->status = Lib::type()->uuid($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string|\DateTimeZone|null $timezoneIfParsed
+	 * @param string|string[]|null      $formats
+	 *
+	 * @return static
+	 */
+	public function date_interface($value, $timezoneIfParsed = null, $formats = null)
+	{
+		$this->status = Lib::type()->date_interface($this->result, $value, $timezoneIfParsed, $formats);
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string|\DateTimeZone|null $timezoneIfParsed
+	 * @param string|string[]|null      $formats
+	 *
+	 * @return static
+	 */
+	public function date($value, $timezoneIfParsed = null, $formats = null)
+	{
+		$this->status = Lib::type()->date($this->result, $value, $timezoneIfParsed, $formats);
+
+		return $this;
+	}
+
+
+	/**
+	 * @param string|\DateTimeZone|null $timezoneIfParsed
+	 * @param string|string[]|null      $formats
+	 *
+	 * @return static
+	 */
+	public function date_immutable($value, $timezoneIfParsed = null, $formats = null)
+	{
+		$this->status = Lib::type()->date_immutable($this->result, $value, $timezoneIfParsed, $formats);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function timezone($value)
+	{
+		$this->status = Lib::type()->timezone($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function interval($value)
+	{
+		$this->status = Lib::type()->interval($this->result, $value);
 
 		return $this;
 	}
@@ -658,6 +725,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param callable          ...$fnExistsList
+	 *
 	 * @return static
 	 */
 	public function struct($value, bool $useRegex = null, ...$fnExistsList)
@@ -703,6 +771,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param callable          ...$fnExistsList
+	 *
 	 * @return static
 	 */
 	public function struct_fqcn($value, bool $useRegex = null, ...$fnExistsList)
@@ -715,6 +784,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param callable    ...$fnExistsList
+	 *
 	 * @return static
 	 */
 	public function struct_namespace($value, bool $useRegex = null, ...$fnExistsList)
@@ -727,6 +797,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param callable    ...$fnExistsList
+	 *
 	 * @return static
 	 */
 	public function struct_basename($value, bool $useRegex = null, ...$fnExistsList)
@@ -750,6 +821,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return static
 	 */
 	public function method_string($value, array $refs = [])
@@ -762,6 +834,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param string|object $newScope
+	 *
 	 * @return static
 	 */
 	public function callable($value, $newScope = 'static')
@@ -807,6 +880,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param string|object                                            $newScope
+	 *
 	 * @return static
 	 */
 	public function callable_array($value, $newScope = 'static')
@@ -819,6 +893,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param string|object                                            $newScope
+	 *
 	 * @return static
 	 */
 	public function callable_array_method($value, $newScope = 'static')
@@ -831,6 +906,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param string|object                                     $newScope
+	 *
 	 * @return static
 	 */
 	public function callable_array_method_static($value, $newScope = 'static')
@@ -843,6 +919,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param string|object                               $newScope
+	 *
 	 * @return static
 	 */
 	public function callable_array_method_non_static($value, $newScope = 'static')
@@ -888,6 +965,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return static
 	 */
 	public function path($value, array $refs = [])
@@ -900,6 +978,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return static
 	 */
 	public function dirpath($value, array $refs = [])
@@ -923,6 +1002,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return static
 	 */
 	public function path_realpath($value, array $refs = [])
@@ -935,6 +1015,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return static
 	 */
 	public function dirpath_realpath($value, array $refs = [])
@@ -947,6 +1028,7 @@ class AssertModule extends AssertModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return static
 	 */
 	public function filepath_realpath($value, array $refs = [])

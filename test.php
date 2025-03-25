@@ -2281,6 +2281,80 @@ $fn = function () {
     unset($table1);
     unset($table2);
     unset($table3);
+    echo PHP_EOL;
+
+
+    $result = null;
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date($result, $from = 'now midnight');
+    $date = $result;
+    $dateAtom = $result->format(DATE_ATOM);
+    _print($status, $result);
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date($result, $from = $date, 'UTC');
+    $dateAtom2 = $result->format(DATE_ATOM);
+    _print($status, $result, $dateAtom === $dateAtom2);
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date($result, $from = $dateAtom, 'UTC');
+    $dateAtom3 = $result->format(DATE_ATOM);
+    _print($status, $result, $dateAtom === $dateAtom3);
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date_immutable($result, $from = 'now midnight');
+    $date = $result;
+    $dateAtom = $result->format(DATE_ATOM);
+    _print($status, $result);
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date_immutable($result, $from = $date, 'UTC');
+    $dateAtom2 = $result->format(DATE_ATOM);
+    _print($status, $result, $dateAtom === $dateAtom2);
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date_immutable($result, $from = $dateAtom, 'UTC');
+    $dateAtom3 = $result->format(DATE_ATOM);
+    _print($status, $result, $dateAtom === $dateAtom3);
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date($result, $from = 'now midnight');
+    $date = $result;
+    $dateAtom = $result->format(DATE_ATOM);
+    _print($status, $result);
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date_immutable($result, $from = $date, 'UTC');
+    $date2 = $result;
+    $dateAtom2 = $result->format(DATE_ATOM);
+    _print($status, $result, $dateAtom === $dateAtom2);
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date_interface($result, $from = $date, 'UTC');
+    $dateAtom3 = $result->format(DATE_ATOM);
+    _print($status, $result, $dateAtom === $dateAtom3);
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date_interface($result, $from = $date2, 'UTC');
+    $dateAtom4 = $result->format(DATE_ATOM);
+    _print($status, $result, $dateAtom === $dateAtom4);
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date($result, 'now midnight');
+    $dateAtom = $result->format(DATE_ATOM);
+    _print($status, $result);
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date($result, 'now midnight', 'UTC');
+    $dateAtom2 = $result->format(DATE_ATOM);
+    _print($status, $result, $dateAtom !== $dateAtom2);
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::php()->type_date($result, '1970-01-01 12:34:56');
+    _print($status, $result, $result->format(DATE_RFC3339_EXTENDED));
+    $status = \Gzhegow\Lib\Lib::php()->type_date($result, '1970-01-01 12:34:56.7890');
+    _print($status, $result, $result->format(DATE_RFC3339_EXTENDED));
+    $status = \Gzhegow\Lib\Lib::php()->type_date($result, '1970-01-01 12:34:56.789000');
+    _print($status, $result, $result->format(DATE_RFC3339_EXTENDED));
+    $status = \Gzhegow\Lib\Lib::php()->type_date($result, '1970-01-01 12:34:56.789000', 'UTC');
+    _print($status, $result, $result->format(DATE_RFC3339_EXTENDED));
+    echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
 "[ PhpModule ]"
@@ -2313,6 +2387,27 @@ ed828395ac5a8c5716b0181de96965cf
 d91da25286bd7e000367a9758699e0ca
 cb145079faba3ab6cf451fe9116389ba
 4c422f57f45e625aacf7753618ffd94c
+
+TRUE | { object # DateTime }
+TRUE | { object # DateTime } | TRUE
+TRUE | { object # DateTime } | TRUE
+
+TRUE | { object # DateTimeImmutable }
+TRUE | { object # DateTimeImmutable } | TRUE
+TRUE | { object # DateTimeImmutable } | TRUE
+
+TRUE | { object # DateTime }
+TRUE | { object # DateTimeImmutable } | TRUE
+TRUE | { object # DateTime } | TRUE
+TRUE | { object # DateTimeImmutable } | TRUE
+
+TRUE | { object # DateTime }
+TRUE | { object # DateTime } | TRUE
+
+TRUE | { object # DateTime } | "1970-01-01T12:34:56.000+03:00"
+TRUE | { object # DateTime } | "1970-01-01T12:34:56.789+03:00"
+TRUE | { object # DateTime } | "1970-01-01T12:34:56.789+03:00"
+TRUE | { object # DateTime } | "1970-01-01T12:34:56.789+00:00"
 ');
 
 

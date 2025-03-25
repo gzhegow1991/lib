@@ -39,6 +39,300 @@ class PhpModule
 
 
     /**
+     * @param \DateTimeInterface|null   $result
+     *
+     * @param string|\DateTimeZone|null $timezoneIfParsed
+     * @param string|string[]|null      $formats
+     */
+    public function type_date_interface(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
+    {
+        $result = null;
+
+        if ($value instanceof \DateTimeInterface) {
+            $result = $value;
+
+            return true;
+        }
+
+        if ($this->type_date($date, $value, $timezoneIfParsed, $formats)) {
+            $result = $date;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param \DateTime|null            $result
+     *
+     * @param string|\DateTimeZone|null $timezoneIfParsed
+     * @param string|string[]|null      $formats
+     */
+    public function type_date(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
+    {
+        $result = null;
+
+        $hasTimezoneIfParsed = (null !== $timezoneIfParsed);
+        $hasFormats = (null !== $formats);
+
+        $_timezoneIfParsed = null;
+        if ($hasTimezoneIfParsed) {
+            if (! $this->type_timezone($_timezoneIfParsed, $timezoneIfParsed)) {
+                throw new LogicException(
+                    [ 'The `timezoneIfParsed` should be null or valid \DateTimeZone', $timezoneIfParsed ]
+                );
+            }
+        }
+
+        if ($value instanceof \DateTime) {
+            $result = $value;
+
+            return true;
+
+        } elseif ($value instanceof \DateTimeImmutable) {
+            $date = \DateTime::createFromImmutable($value);
+
+            $result = $date;
+
+            return true;
+        }
+
+        if ($hasFormats) {
+            $_formats = $this->to_list($formats);
+
+            foreach ( $_formats as $i => $format ) {
+                if (! (is_string($format) && ('' !== $format))) {
+                    throw new LogicException(
+                        [
+                            'Each of `formats` should be non-empty string',
+                            $format,
+                            $i,
+                        ]
+                    );
+                }
+            }
+        }
+
+        $date = null;
+
+        if ($hasFormats) {
+            $formatFirst = array_shift($_formats);
+
+            foreach ( $formats as $format ) {
+                try {
+                    $date = \DateTime::createFromFormat(
+                        $formatFirst,
+                        $value,
+                        $_timezoneIfParsed
+                    );
+                }
+                catch ( \Throwable $e ) {
+                }
+
+                if ($date) {
+                    $result = $date;
+
+                    return true;
+                }
+            }
+        }
+
+        try {
+            $date = new \DateTime($value, $_timezoneIfParsed);
+
+            $result = $date;
+
+            return true;
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ($hasFormats && count($_formats)) {
+            foreach ( $_formats as $format ) {
+                try {
+                    $date = \DateTime::createFromFormat(
+                        $formatFirst,
+                        $value,
+                        $_timezoneIfParsed
+                    );
+                }
+                catch ( \Throwable $e ) {
+                }
+
+                if ($date) {
+                    $result = $date;
+
+                    break;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param \DateTimeImmutable|null   $result
+     *
+     * @param string|\DateTimeZone|null $timezoneIfParsed
+     * @param string|string[]|null      $formats
+     */
+    public function type_date_immutable(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
+    {
+        $result = null;
+
+        $hasTimezoneIfParsed = (null !== $timezoneIfParsed);
+        $hasFormats = (null !== $formats);
+
+        $_timezoneIfParsed = null;
+        if ($hasTimezoneIfParsed) {
+            if (! $this->type_timezone($_timezoneIfParsed, $timezoneIfParsed)) {
+                throw new LogicException(
+                    [ 'The `timezoneIfParsed` should be null or valid \DateTimeZone', $timezoneIfParsed ]
+                );
+            }
+        }
+
+        if ($value instanceof \DateTimeImmutable) {
+            $result = $value;
+
+            return true;
+
+        } elseif ($value instanceof \DateTime) {
+            $dateImmutable = \DateTimeImmutable::createFromMutable($value);
+
+            $result = $dateImmutable;
+
+            return true;
+        }
+
+        if ($hasFormats) {
+            $_formats = $this->to_list($formats);
+
+            foreach ( $_formats as $i => $format ) {
+                if (! (is_string($format) && ('' !== $format))) {
+                    throw new LogicException(
+                        [
+                            'Each of `formats` should be non-empty string',
+                            $format,
+                            $i,
+                        ]
+                    );
+                }
+            }
+        }
+
+        $dateImmutable = null;
+
+        if ($hasFormats) {
+            $formatFirst = array_shift($_formats);
+
+            foreach ( $formats as $format ) {
+                try {
+                    $dateImmutable = \DateTimeImmutable::createFromFormat(
+                        $formatFirst,
+                        $value,
+                        $_timezoneIfParsed
+                    );
+                }
+                catch ( \Throwable $e ) {
+                }
+
+                if ($dateImmutable) {
+                    $result = $dateImmutable;
+
+                    return true;
+                }
+            }
+        }
+
+        try {
+            $dateImmutable = new \DateTimeImmutable($value, $_timezoneIfParsed);
+
+            $result = $dateImmutable;
+
+            return true;
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ($hasFormats && count($_formats)) {
+            foreach ( $_formats as $format ) {
+                try {
+                    $dateImmutable = \DateTimeImmutable::createFromFormat(
+                        $formatFirst,
+                        $value,
+                        $_timezoneIfParsed
+                    );
+                }
+                catch ( \Throwable $e ) {
+                }
+
+                if ($dateImmutable) {
+                    $result = $dateImmutable;
+
+                    break;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param \DateTimeZone|null $result
+     */
+    public function type_timezone(&$result, $value) : bool
+    {
+        $result = null;
+
+        if ($value instanceof \DateTimeZone) {
+            $result = $value;
+
+            return true;
+        }
+
+        try {
+            $timezone = new \DateTimeZone($value);
+
+            $result = $timezone;
+
+            return true;
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        return false;
+    }
+
+    /**
+     * @param \DateInterval|null $result
+     */
+    public function type_interval(&$result, $value) : bool
+    {
+        $result = null;
+
+        if ($value instanceof \DateInterval) {
+            $result = $value;
+
+            return true;
+        }
+
+        try {
+            $interval = new \DateInterval($value);
+
+            $result = $interval;
+
+            return true;
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        return false;
+    }
+
+
+    /**
      * @param array|\Countable|null $result
      */
     public function type_countable(&$result, $value) : bool

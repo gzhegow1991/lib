@@ -667,6 +667,7 @@ class ParseModule extends ParseModuleBase
 	 * @param string            $value
 	 * @param string|array|null $query
 	 * @param string|null       $fragment
+	 *
 	 * @return string|null
 	 */
 	public function url($value, $query = null, $fragment = null, array $refs = [])
@@ -681,6 +682,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param string      $value
+	 *
 	 * @return string|null
 	 */
 	public function host($value, array $refs = [])
@@ -697,6 +699,7 @@ class ParseModule extends ParseModuleBase
 	 * @param string            $value
 	 * @param string|array|null $query
 	 * @param string|null       $fragment
+	 *
 	 * @return string|null
 	 */
 	public function link($value, $query = null, $fragment = null, array $refs = [])
@@ -715,6 +718,80 @@ class ParseModule extends ParseModuleBase
 	public function uuid($value)
 	{
 		if (Lib::type()->uuid($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @param string|\DateTimeZone|null $timezoneIfParsed
+	 * @param string|string[]|null      $formats
+	 *
+	 * @return \DateTimeInterface|null
+	 */
+	public function date_interface($value, $timezoneIfParsed = null, $formats = null)
+	{
+		if (Lib::type()->date_interface($result, $value, $timezoneIfParsed, $formats)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @param string|\DateTimeZone|null $timezoneIfParsed
+	 * @param string|string[]|null      $formats
+	 *
+	 * @return \DateTime|null
+	 */
+	public function date($value, $timezoneIfParsed = null, $formats = null)
+	{
+		if (Lib::type()->date($result, $value, $timezoneIfParsed, $formats)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @param string|\DateTimeZone|null $timezoneIfParsed
+	 * @param string|string[]|null      $formats
+	 *
+	 * @return \DateTimeImmutable|null
+	 */
+	public function date_immutable($value, $timezoneIfParsed = null, $formats = null)
+	{
+		if (Lib::type()->date_immutable($result, $value, $timezoneIfParsed, $formats)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeZone|null
+	 */
+	public function timezone($value)
+	{
+		if (Lib::type()->timezone($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateInterval|null
+	 */
+	public function interval($value)
+	{
+		if (Lib::type()->interval($result, $value)) {
 		    return $result;
 		}
 
@@ -776,6 +853,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param callable          ...$fnExistsList
+	 *
 	 * @return class-string|null
 	 */
 	public function struct($value, bool $useRegex = null, ...$fnExistsList)
@@ -829,6 +907,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param callable          ...$fnExistsList
+	 *
 	 * @return class-string|null
 	 */
 	public function struct_fqcn($value, bool $useRegex = null, ...$fnExistsList)
@@ -843,6 +922,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param callable    ...$fnExistsList
+	 *
 	 * @return string|null
 	 */
 	public function struct_namespace($value, bool $useRegex = null, ...$fnExistsList)
@@ -857,6 +937,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param callable    ...$fnExistsList
+	 *
 	 * @return string|null
 	 */
 	public function struct_basename($value, bool $useRegex = null, ...$fnExistsList)
@@ -884,6 +965,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return string|null
 	 */
 	public function method_string($value, array $refs = [])
@@ -898,6 +980,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param string|object $newScope
+	 *
 	 * @return callable|null
 	 */
 	public function callable($value, $newScope = 'static')
@@ -951,6 +1034,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param string|object                                            $newScope
+	 *
 	 * @return callable|array{
 	 */
 	public function callable_array($value, $newScope = 'static')
@@ -965,6 +1049,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param string|object                                            $newScope
+	 *
 	 * @return callable|array{
 	 */
 	public function callable_array_method($value, $newScope = 'static')
@@ -979,6 +1064,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param string|object                                     $newScope
+	 *
 	 * @return callable|array{
 	 */
 	public function callable_array_method_static($value, $newScope = 'static')
@@ -993,6 +1079,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param string|object                               $newScope
+	 *
 	 * @return callable|array{
 	 */
 	public function callable_array_method_non_static($value, $newScope = 'static')
@@ -1046,6 +1133,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return string|null
 	 */
 	public function path($value, array $refs = [])
@@ -1060,6 +1148,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return string|null
 	 */
 	public function dirpath($value, array $refs = [])
@@ -1087,6 +1176,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return string|null
 	 */
 	public function path_realpath($value, array $refs = [])
@@ -1101,6 +1191,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return string|null
 	 */
 	public function dirpath_realpath($value, array $refs = [])
@@ -1115,6 +1206,7 @@ class ParseModule extends ParseModuleBase
 
 	/**
 	 * @param array{ 0: array|null } $refs
+	 *
 	 * @return string|null
 	 */
 	public function filepath_realpath($value, array $refs = [])

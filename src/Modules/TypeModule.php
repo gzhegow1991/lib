@@ -1063,6 +1063,56 @@ class TypeModule extends TypeModuleBase
 
 
     /**
+     * @param \DateTimeInterface|null   $result
+     *
+     * @param string|\DateTimeZone|null $timezoneIfParsed
+     * @param string|string[]|null      $formats
+     */
+    public function date_interface(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
+    {
+        return Lib::php()->type_date_interface($result, $value, $timezoneIfParsed, $formats);
+    }
+
+    /**
+     * @param \DateTime|null            $result
+     *
+     * @param string|\DateTimeZone|null $timezoneIfParsed
+     * @param string|string[]|null      $formats
+     */
+    public function date(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
+    {
+        return Lib::php()->type_date($result, $value, $timezoneIfParsed, $formats);
+    }
+
+    /**
+     * @param \DateTimeImmutable|null   $result
+     *
+     * @param string|\DateTimeZone|null $timezoneIfParsed
+     * @param string|string[]|null      $formats
+     */
+    public function date_immutable(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
+    {
+        return Lib::php()->type_date_immutable($result, $value, $timezoneIfParsed, $formats);
+    }
+
+    /**
+     * @param \DateTimeZone|null $result
+     */
+    public function timezone(&$result, $value) : bool
+    {
+        return Lib::php()->type_timezone($result, $value);
+    }
+
+    /**
+     * @param \DateInterval|null $result
+     */
+    public function interval(&$result, $value) : bool
+    {
+        return Lib::php()->type_interval($result, $value);
+    }
+
+
+    /**
      * @param array|\Countable|null $result
      */
     public function countable(&$result, $value) : bool
