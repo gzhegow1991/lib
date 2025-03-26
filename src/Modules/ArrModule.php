@@ -503,12 +503,16 @@ class ArrModule
             function ($value) use (
                 &$result
             ) {
-                if (Lib::type()->string($_value, $value)) {
-                    $result[] = $_value;
-
-                } else {
-                    $result[] = null;
+                if (! Lib::type()->string($_value, $value)) {
+                    throw new LogicException(
+                        [
+                            'Each of `path` or its children should be stringable value (btw, null is not stringable)',
+                            $value,
+                        ]
+                    );
                 }
+
+                $result[] = $_value;
             }
         );
 
@@ -526,12 +530,19 @@ class ArrModule
                 &$result,
                 &$dot
             ) {
-                if (Lib::type()->string($_value, $value)) {
-                    $result[] = explode($dot, $_value);
-
-                } else {
-                    $result[] = null;
+                if (! Lib::type()->string($_value, $value)) {
+                    throw new LogicException(
+                        [
+                            'Each of `path` or its children should be stringable value (btw, null is not stringable)',
+                            $value,
+                        ]
+                    );
                 }
+
+                $result = array_merge(
+                    $result,
+                    explode($dot, $_value)
+                );
             }
         );
 
@@ -559,7 +570,12 @@ class ArrModule
             $refKey = null;
         }
 
-        $pathArray = $this->path($path);
+        try {
+            $pathArray = $this->path($path);
+        }
+        catch ( \Throwable $e ) {
+            return false;
+        }
 
         $refCurrent =& $array;
 
