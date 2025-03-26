@@ -998,16 +998,25 @@ class StrModule
         return $lines;
     }
 
-    public function eol(string $text, $eol = null, array &$lines = null) : string
+    public function eol(string $text, $eol = null, array $refs = []) : string
     {
-        $lines = null;
+        $withLines = array_key_exists(0, $refs);
+
+        $refLines = null;
+
+        if ($withLines) {
+            $refLines =& $refs[ 0 ];
+            $refLines = null;
+        }
 
         $_eol = $eol ?? "\n";
         $_eol = (string) $_eol;
 
-        $lines = $this->lines($text);
+        $refLines = $this->lines($text);
 
-        $output = implode($_eol, $lines);
+        $output = implode($_eol, $refLines);
+
+        unset($refLines);
 
         return $output;
     }
@@ -1191,16 +1200,28 @@ class StrModule
     }
 
 
-    /**
-     * > если строка начинается на искомую, отрезает ее и возвращает укороченную
-     * if (null !== ($substr = _str_starts('hello', 'h'))) {} // 'ello'
-     */
-    public function starts(string $string, string $needle, bool $ignoreCase = null) : ?string
+    public function starts(
+        string $string, string $needle, bool $ignoreCase = null,
+        array $refs = []
+    ) : bool
     {
+        $withSubstr = array_key_exists(0, $refs);
+
+        $refSubstr = null;
+
+        if ($withSubstr) {
+            $refSubstr =& $refs[ 0 ];
+            $refSubstr = null;
+        }
+
         $ignoreCase = $ignoreCase ?? true;
 
-        if ('' === $string) return null;
-        if ('' === $needle) return $string;
+        if ('' === $string) return false;
+        if ('' === $needle) {
+            $refSubstr = $string;
+
+            return true;
+        }
 
         $fnStrlen = $this->mb_func('strlen');
         $fnSubstr = $this->mb_func('substr');
@@ -1209,24 +1230,39 @@ class StrModule
             : $this->mb_func('strpos');
 
         $pos = $fnStrpos($string, $needle);
+        $status = (0 === $pos);
 
-        $result = 0 === $pos
-            ? $fnSubstr($string, $fnStrlen($needle))
-            : null;
+        if ($status && $withSubstr) {
+            $refSubstr = $fnSubstr($string, $fnStrlen($needle));
+        }
 
-        return $result;
+        unset($refSubstr);
+
+        return $status;
     }
 
-    /**
-     * > если строка заканчивается на искомую, отрезает ее и возвращает укороченную
-     * if (null !== ($substr = _str_ends('hello', 'o'))) {} // 'hell'
-     */
-    public function ends(string $string, string $needle, bool $ignoreCase = null) : ?string
+    public function ends(
+        string $string, string $needle, bool $ignoreCase = null,
+        array $refs = []
+    ) : bool
     {
+        $withSubstr = array_key_exists(0, $refs);
+
+        $refSubstr = null;
+
+        if ($withSubstr) {
+            $refSubstr =& $refs[ 0 ];
+            $refSubstr = null;
+        }
+
         $ignoreCase = $ignoreCase ?? true;
 
-        if ('' === $string) return null;
-        if ('' === $needle) return $string;
+        if ('' === $string) return false;
+        if ('' === $needle) {
+            $refSubstr = $string;
+
+            return false;
+        }
 
         $fnStrlen = $this->mb_func('strlen');
         $fnSubstr = $this->mb_func('substr');
@@ -1235,41 +1271,15 @@ class StrModule
             : $this->mb_func('strrpos');
 
         $pos = $fnStrrpos($string, $needle);
+        $status = ($pos === $fnStrlen($string) - $fnStrlen($needle));
 
-        $result = $pos === $fnStrlen($string) - $fnStrlen($needle)
-            ? $fnSubstr($string, 0, $pos)
-            : null;
-
-        return $result;
-    }
-
-    /**
-     * > ищет подстроку в строке и разбивает по ней результат
-     */
-    public function contains(string $string, string $needle, bool $ignoreCase = null, int $limit = null) : array
-    {
-        $ignoreCase = $ignoreCase ?? true;
-
-        if ('' === $string) return [];
-        if ('' === $needle) return [ $string ];
-
-        $strCase = $ignoreCase
-            ? str_ireplace($needle, $needle, $string)
-            : $string;
-
-        $result = [];
-
-        $fnStrpos = $ignoreCase
-            ? $this->mb_func('stripos')
-            : $this->mb_func('strpos');
-
-        if (false !== $fnStrpos($strCase, $needle)) {
-            $result = null
-                ?? (isset($limit) ? explode($needle, $strCase, $limit) : null)
-                ?? (explode($needle, $strCase));
+        if ($status && $withSubstr) {
+            $refSubstr = $fnSubstr($string, 0, $pos);
         }
 
-        return $result;
+        unset($refSubstr);
+
+        return $status;
     }
 
 
@@ -1430,49 +1440,92 @@ class StrModule
 
     /**
      * > str_replace с поддержкой limit замен
+     *
+     * @param string|string[] $search
+     * @param string|string[] $replace
+     * @param string|string[] $subject
+     *
+     * @return string|string[]
      */
     public function replace_limit(
-        $search, $replace, $subject, int $limit = null,
+        $search, $replace, $subject,
+        int $limit = null,
         int &$count = null
-    ) : string
+    )
     {
-        $count = null;
+        $_search = Lib::php()->to_list($search);
+        $_replace = Lib::php()->to_list($replace);
+        $_subject = Lib::php()->to_list($subject);
 
-        if ((null !== $limit) && ($limit <= 0)) {
+        if (! count($_search)) {
             return $subject;
-
-        } elseif (! isset($limit)) {
-            $result = str_replace($search, $replace, $subject, $count);
-
-            return $result;
         }
-
-        $occurrences = substr_count($subject, $search);
-
-        if ($occurrences === 0) {
+        if (! count($_replace)) {
             return $subject;
-
-        } elseif ($occurrences <= $limit) {
-            $result = str_replace($search, $replace, $subject, $count);
-
-            return $result;
+        }
+        if (! count($_subject)) {
+            return [];
         }
 
-        $position = 0;
-        for ( $i = 0; $i < $limit; $i++ ) {
-            $position = strpos($subject, $search, $position) + strlen($search);
+        $_regexes = [];
+        foreach ( $_search as $i => $s ) {
+            $regex = preg_quote($s, '/');
+            $regex = '/' . $regex . '/u';
+
+            $_regexes[ $i ] = $regex;
         }
 
-        $substring = substr($subject, 0, $position + 1);
+        $result = preg_replace($_regexes, $replace, $subject, $limit, $count);
 
-        $substring = str_replace($search, $replace, $substring, $count);
+        return $result;
+    }
 
-        $result = substr_replace($subject, $substring, 0, $position + 1);
+    /**
+     * > str_ireplace с поддержкой limit замен
+     *
+     * @param string|string[] $search
+     * @param string|string[] $replace
+     * @param string|string[] $subject
+     *
+     * @return string|string[]
+     */
+    public function ireplace_limit(
+        $search, $replace, $subject,
+        int $limit = null,
+        int &$count = null
+    )
+    {
+        $_search = Lib::php()->to_list($search);
+        $_replace = Lib::php()->to_list($replace);
+        $_subject = Lib::php()->to_list($subject);
+
+        if (! count($_search)) {
+            return $subject;
+        }
+        if (! count($_replace)) {
+            return $subject;
+        }
+        if (! count($_subject)) {
+            return [];
+        }
+
+        $_regexes = [];
+        foreach ( $_search as $i => $s ) {
+            $regex = preg_quote($s, '/');
+            $regex = '/' . $regex . '/iu';
+
+            $_regexes[ $i ] = $regex;
+        }
+
+        $result = preg_replace($_regexes, $replace, $subject, $limit, $count);
 
         return $result;
     }
 
 
+    /**
+     * @param string|string[] $lines
+     */
     public function match(
         string $pattern, $lines,
         string $wildcardSequence = null,

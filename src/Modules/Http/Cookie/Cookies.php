@@ -107,10 +107,12 @@ class Cookies
     {
         if (! $this->modeDelay) return;
 
+        $theStr = Lib::str();
+
         $cookieIndex = $this->indexCookie($cookieName, $cookiePath, $cookieDomain);
 
         foreach ( $this->cookiesIndex as $index => $cookieId ) {
-            if (null !== Lib::str()->starts($index, $cookieIndex)) {
+            if ($theStr->starts($index, $cookieIndex)) {
                 $this->delete($cookieId);
             }
         }

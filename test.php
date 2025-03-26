@@ -2524,9 +2524,10 @@ $fn = function () {
     _print(\Gzhegow\Lib\Lib::str()->ucwords('привет мир'));
     echo PHP_EOL;
 
-    _print(\Gzhegow\Lib\Lib::str()->starts('привет', 'при'));
-    _print(\Gzhegow\Lib\Lib::str()->ends('привет', 'вет'));
-    _print(\Gzhegow\Lib\Lib::str()->contains('привет', 'ив'));
+    $status = \Gzhegow\Lib\Lib::str()->starts('привет', 'ПРИ', true, [ &$substr ]);
+    _print($status, $substr);
+    $status = \Gzhegow\Lib\Lib::str()->ends('приВЕТ', 'вет', true, [ &$substr ]);
+    _print($status, $substr);
     echo PHP_EOL;
 
     _print(\Gzhegow\Lib\Lib::str()->lcrop('азаза_привет_азаза', 'аза'));
@@ -2537,21 +2538,26 @@ $fn = function () {
     _print(\Gzhegow\Lib\Lib::str()->uncrop('"привет"', '"'));
     echo PHP_EOL;
 
-    _print(\Gzhegow\Lib\Lib::str()->replace_limit('за', '_', 'азазазазазаза', 3));
+    _print(\Gzhegow\Lib\Lib::str()->replace_limit('за', '_', 'а-зазаза-зазаза', 3));
+    _print(\Gzhegow\Lib\Lib::str()->ireplace_limit('зА', '_', 'а-заЗАза-заЗАза', 3));
     echo PHP_EOL;
 
     _print(\Gzhegow\Lib\Lib::str()->camel('-hello-world-foo-bar'));
     _print(\Gzhegow\Lib\Lib::str()->camel('-helloWorldFooBar'));
     _print(\Gzhegow\Lib\Lib::str()->camel('-HelloWorldFooBar'));
+
     _print(\Gzhegow\Lib\Lib::str()->pascal('-hello-world-foo-bar'));
     _print(\Gzhegow\Lib\Lib::str()->pascal('-helloWorldFooBar'));
     _print(\Gzhegow\Lib\Lib::str()->pascal('-HelloWorldFooBar'));
+
     _print(\Gzhegow\Lib\Lib::str()->space('_Hello_WORLD_Foo_BAR'));
     _print(\Gzhegow\Lib\Lib::str()->snake('-Hello-WORLD-Foo-BAR'));
     _print(\Gzhegow\Lib\Lib::str()->kebab(' Hello WORLD Foo BAR'));
+
     _print(\Gzhegow\Lib\Lib::str()->space_lower('_Hello_WORLD_Foo_BAR'));
     _print(\Gzhegow\Lib\Lib::str()->snake_lower('-Hello-WORLD-Foo-BAR'));
     _print(\Gzhegow\Lib\Lib::str()->kebab_lower(' Hello WORLD Foo BAR'));
+
     _print(\Gzhegow\Lib\Lib::str()->space_upper('_Hello_WORLD_Foo_BAR'));
     _print(\Gzhegow\Lib\Lib::str()->snake_upper('-Hello-WORLD-Foo-BAR'));
     _print(\Gzhegow\Lib\Lib::str()->kebab_upper(' Hello WORLD Foo BAR'));
@@ -2621,9 +2627,8 @@ world"
 "пРИВЕТ мИР"
 "Привет Мир"
 
-"вет"
-"при"
-[ "пр", "ет" ]
+TRUE | "вет"
+TRUE | "при"
 
 "за_привет_азаза"
 "азаза_привет_аз"
@@ -2632,7 +2637,8 @@ world"
 "\"привет\""
 "\"привет\""
 
-"а___зазаза"
+"а-___-зазаза"
+"а-___-заЗАза"
 
 "helloWorldFooBar"
 "helloWorldFooBar"

@@ -754,7 +754,10 @@ class PhpModule
                 || (gettype($value) === 'resource (closed)')
             ) {
                 throw new LogicException(
-                    [ 'The `value` should not be array, object or resource', $value ]
+                    [
+                        'The `value` should not be array, object or resource',
+                        $value,
+                    ]
                 );
             }
 
@@ -777,7 +780,10 @@ class PhpModule
                 || (gettype($value) === 'resource (closed)')
             ) {
                 throw new LogicException(
-                    [ 'The `value` should not be array, object or resource', $value ]
+                    [
+                        'The `value` should not be array, object or resource',
+                        $value,
+                    ]
                 );
             }
 
@@ -800,7 +806,10 @@ class PhpModule
                 || (gettype($value) === 'resource (closed)')
             ) {
                 throw new LogicException(
-                    [ 'The `value` should not be array, object or resource', $value ]
+                    [
+                        'The `value` should not be array, object or resource',
+                        $value,
+                    ]
                 );
             }
 
@@ -816,9 +825,15 @@ class PhpModule
             $_value = $value->toArray($options);
 
         } else {
-            if (is_object($value) && ! ($value instanceof \stdClass)) {
+            $isObject = is_object($value);
+            $isStdclass = $value instanceof \stdClass;
+
+            if ($isObject && ! $isStdclass) {
                 throw new LogicException(
-                    [ 'The `value` being the object should be instance of: ' . \stdClass::class, $value ]
+                    [
+                        'The `value` being the object should be instance of: ' . \stdClass::class,
+                        $value,
+                    ]
                 );
             }
 
@@ -839,7 +854,10 @@ class PhpModule
 
             if ($isObject && ! $isStdclass) {
                 throw new LogicException(
-                    [ 'The `value` being the object should be instance of: ' . \stdClass::class, $value ]
+                    [
+                        'The `value` being the object should be instance of: ' . \stdClass::class,
+                        $value,
+                    ]
                 );
             }
 
@@ -851,6 +869,7 @@ class PhpModule
         return $_value;
     }
 
+
     /**
      * @param callable $fnIsForceWrap
      */
@@ -858,10 +877,6 @@ class PhpModule
     {
         if (null === $value) {
             throw new LogicException('The `value` should be not null');
-        }
-
-        if ('' === $value) {
-            throw new LogicException('The `value` should not be an empty string');
         }
 
         if (is_object($value)) {
