@@ -1508,17 +1508,21 @@ class PhpModule
             $ex = null;
             $eMsg = null;
 
+            $before = error_reporting(0);
             error_clear_last();
 
             try {
-                $result = @call_user_func($fn, ...$args);
+                $result = call_user_func($fn, ...$args);
             }
             catch ( \Throwable $ex ) {
                 $eMsg = $ex->getMessage();
             }
 
-            if ($e = error_get_last()) {
-                $eMsg = $e[ 'message' ];
+            $err = error_get_last();
+            error_reporting($before);
+
+            if (null !== $err) {
+                $eMsg = $err[ 'message' ];
             }
 
             if (null !== $eMsg) {
@@ -1577,17 +1581,21 @@ class PhpModule
             $ex = null;
             $eMsg = null;
 
+            $before = error_reporting(0);
             error_clear_last();
 
             try {
-                $result = @call_user_func_array($fn, $_args);
+                $result = call_user_func_array($fn, $_args);
             }
             catch ( \Throwable $ex ) {
                 $eMsg = $ex->getMessage();
             }
 
-            if ($e = error_get_last()) {
-                $eMsg = $e[ 'message' ];
+            $err = error_get_last();
+            error_reporting($before);
+
+            if (null !== $err) {
+                $eMsg = $err[ 'message' ];
             }
 
             if (null !== $eMsg) {
