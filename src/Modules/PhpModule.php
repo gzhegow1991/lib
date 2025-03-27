@@ -905,7 +905,7 @@ class PhpModule
 
         } elseif (is_array($value)) {
             if ($fnIsForceWrap) {
-                $status = call_user_func_array($fnIsForceWrap, $value);
+                $status = call_user_func($fnIsForceWrap, $value);
 
                 $_value = $status
                     ? [ $value ]
