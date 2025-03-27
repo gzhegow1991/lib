@@ -14,6 +14,7 @@ use Gzhegow\Lib\Modules\JsonModule;
 use Gzhegow\Lib\Modules\HttpModule;
 use Gzhegow\Lib\Modules\TestModule;
 use Gzhegow\Lib\Modules\TypeModule;
+use Gzhegow\Lib\Modules\PregModule;
 use Gzhegow\Lib\Modules\DebugModule;
 use Gzhegow\Lib\Modules\ParseModule;
 use Gzhegow\Lib\Modules\CryptModule;
@@ -217,6 +218,18 @@ class Lib
         return static::$modules[ $key ] = $instance
             ?? static::$modules[ $key ]
             ?? new PhpModule();
+    }
+
+    /**
+     * @return PregModule
+     */
+    public static function preg(PregModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new PregModule();
     }
 
     /**

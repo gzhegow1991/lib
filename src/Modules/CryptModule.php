@@ -71,8 +71,6 @@ class CryptModule
             return false;
         }
 
-        $split = $theMb->str_split($value);
-
         $seen = [];
         $regex = '/[';
         $regexNot = '/[^';
@@ -84,7 +82,8 @@ class CryptModule
             }
             $seen[ $letter ] = true;
 
-            $letterRegex = preg_quote($letter, '/');
+            $letterRegex = sprintf('\x{%X}', mb_ord($letter));
+
             $regex .= $letterRegex;
             $regexNot .= $letterRegex;
         }

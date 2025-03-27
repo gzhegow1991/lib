@@ -273,7 +273,7 @@ class StrModule
 
     public function loadAsciiControlsNoTrims(bool $hex = null) : array
     {
-        $list = $this->loadAsciiControlsOnlyTrims($hex);
+        $list = $this->loadAsciiControls($hex);
 
         unset($list[ chr(9) ]);
         unset($list[ chr(10) ]);
@@ -847,20 +847,6 @@ class StrModule
     }
 
 
-    public function is_binary(string $str) : bool
-    {
-        for ( $i = 0; $i < strlen($str); $i++ ) {
-            $chr = $str[ $i ];
-            $ord = ord($chr);
-
-            if ($ord > 127) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     public function is_utf8(string $str) : bool
     {
         // > gzhegow, not sure, but check below works the same
@@ -882,150 +868,9 @@ class StrModule
 
 
     /**
-     * > конвертирует непечатаемые символы терминала Windows (`кракозябры`) в последовательности, которые можно прочесть визуально
-     */
-    public function utf8_encode(string $string, string $encoding = null) : ?string
-    {
-        if (! \function_exists('iconv')) {
-            throw new RuntimeException(
-                'Unable to convert a non-UTF-8 string to UTF-8: required function iconv() does not exist. You should install ext-iconv or symfony/polyfill-iconv.'
-            );
-        }
-
-        $_encoding = null
-            ?? $encoding
-            ?? (\ini_get('php.output_encoding') ?: null)
-            ?? (\ini_get('default_charset') ?: null)
-            ?? 'UTF-8';
-
-        $stringConverted = @iconv($_encoding, 'UTF-8', $string);
-        if (false !== $stringConverted) {
-            return $stringConverted;
-        }
-
-        if ('CP1252' !== $_encoding) {
-            $stringConverted = @iconv('CP1252', 'UTF-8', $string);
-            if (false !== $stringConverted) {
-                return $stringConverted;
-            }
-        }
-
-        $stringConverted = @iconv('CP850', 'UTF-8', $string);
-        if (false !== $stringConverted) {
-            return $stringConverted;
-        }
-
-        return null;
-    }
-
-    /**
-     * > конвертирует непечатаемые символы строки в байтовые и hex последовательности, которые можно прочесть
-     */
-    public function dump_encode(string $string, string $encoding = null) : ?string
-    {
-        $_string = $string;
-
-        $asciiControlsNoTrims = $this->loadAsciiControlsNoTrims(true);
-        $asciiControlsOnlyTrims = $this->loadAsciiControlsOnlyTrims(false);
-
-        $foundBinary = false;
-        $count = 0;
-        $_string = str_replace(
-            array_keys($asciiControlsNoTrims),
-            array_values($asciiControlsNoTrims),
-            $_string,
-            $count
-        );
-        if ($count) {
-            $foundBinary = true;
-        }
-
-        if ($isUtf8 = $this->is_utf8($_string)) {
-            $invisibles = $this->loadInvisibles();
-
-            $count = 0;
-
-            $_string = str_replace(
-                array_keys($invisibles),
-                array_values($invisibles),
-                $_string,
-                $count
-            );
-
-            if ($count) {
-                $foundBinary = true;
-            }
-
-        } else {
-            $_varUtf8 = $this->utf8_encode($_string, $encoding);
-
-            if ($_varUtf8 !== $_string) {
-                $_string = $_varUtf8;
-
-                $foundBinary = true;
-            }
-        }
-
-        if ($foundBinary) {
-            $_string = "b`{$_string}`";
-        }
-
-        foreach ( $asciiControlsOnlyTrims as $i => $v ) {
-            if ($i === "\n") {
-                $asciiControlsOnlyTrims[ $i ] .= $i;
-            }
-        }
-        $_string = str_replace(
-            array_keys($asciiControlsOnlyTrims),
-            array_values($asciiControlsOnlyTrims),
-            $_string
-        );
-
-        return $_string;
-    }
-
-
-    public function lines(string $text) : array
-    {
-        $lines = explode("\n", $text);
-
-        foreach ( $lines as $i => $line ) {
-            $line = rtrim($line, "\r\n");
-
-            $lines[ $i ] = $line;
-        }
-
-        return $lines;
-    }
-
-    public function eol(string $text, $eol = null, array $refs = []) : string
-    {
-        $withLines = array_key_exists(0, $refs);
-
-        $refLines = null;
-
-        if ($withLines) {
-            $refLines =& $refs[ 0 ];
-            $refLines = null;
-        }
-
-        $_eol = $eol ?? "\n";
-        $_eol = (string) $_eol;
-
-        $refLines = $this->lines($text);
-
-        $output = implode($_eol, $refLines);
-
-        unset($refLines);
-
-        return $output;
-    }
-
-
-    /**
      * > возвращает число символов в строке
      */
-    public function strlen($value) : int
+    public function strlen($value, string $mb_encoding = null) : int
     {
         if (! is_string($value)) {
             return 0;
@@ -1036,7 +881,10 @@ class StrModule
         }
 
         $len = $this->static_mb_mode()
-            ? mb_strlen($value)
+            ? ((null !== $mb_encoding)
+                ? mb_strlen($value, $mb_encoding)
+                : mb_strlen($value)
+            )
             : count(preg_split('//u', $value, -1, PREG_SPLIT_NO_EMPTY));
 
         return $len;
@@ -1067,12 +915,9 @@ class StrModule
     public function lower(string $string, string $mb_encoding = null) : string
     {
         if ($this->static_mb_mode()) {
-            $mbEncodingArgs = [];
-            if (null !== $mb_encoding) {
-                $mbEncodingArgs[] = $mb_encoding;
-            }
-
-            $result = mb_strtolower($string, ...$mbEncodingArgs);
+            $result = (null !== $mb_encoding)
+                ? mb_strtolower($string, $mb_encoding)
+                : mb_strtolower($string);
 
         } else {
             if ($this->is_utf8($string)) {
@@ -1093,12 +938,9 @@ class StrModule
     public function upper(string $string, string $mb_encoding = null) : string
     {
         if ($this->static_mb_mode()) {
-            $mbEncodingArgs = [];
-            if (null !== $mb_encoding) {
-                $mbEncodingArgs[] = $mb_encoding;
-            }
-
-            $result = mb_strtoupper($string, ...$mbEncodingArgs);
+            $result = (null !== $mb_encoding)
+                ? mb_strtoupper($string, $mb_encoding)
+                : mb_strtoupper($string);
 
         } else {
             if ($this->is_utf8($string)) {
@@ -1162,7 +1004,10 @@ class StrModule
      */
     public function lcwords(string $string, string $separators = " \t\r\n\f\v", string $mb_encoding = null) : string
     {
-        $regex = '/(^|[' . preg_quote($separators, '/') . '])(\w)/u';
+        $thePreg = Lib::preg();
+
+        $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
+        $regex = '/(^|[' . $regex . '])(\w)/u';
 
         $result = preg_replace_callback(
             $regex,
@@ -1183,7 +1028,10 @@ class StrModule
      */
     public function ucwords(string $string, string $separators = " \t\r\n\f\v", string $mb_encoding = null) : string
     {
-        $regex = '/(^|[' . preg_quote($separators, '/') . '])(\w)/u';
+        $thePreg = Lib::preg();
+
+        $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
+        $regex = '/(^|[' . $regex . '])(\w)/u';
 
         $result = preg_replace_callback(
             $regex,
@@ -1528,9 +1376,9 @@ class StrModule
      */
     public function match(
         string $pattern, $lines,
-        string $wildcardSequence = null,
-        string $wildcardSeparator = null,
-        string $wildcardLetter = null
+        $wildcardSequence = null,
+        $wildcardSeparator = null,
+        $wildcardLetter = null
     ) : array
     {
         if ('' === $pattern) {
@@ -1588,20 +1436,22 @@ class StrModule
             );
         }
 
+        $thePreg = Lib::preg();
+
         $_pattern = preg_quote($_pattern, '/');
 
         if ($hasWildcardSeparator) {
-            $_wildcardSeparatorRegex = preg_quote($_wildcardSeparator, '/');
+            $_wildcardSeparatorRegex = $thePreg->preg_quote_ord($_wildcardSeparator);
 
             $anySymbolRegex = '[^' . $_wildcardSeparatorRegex . ']';
         }
         if ($hasWildcardSequence) {
-            $_wildcardSequenceRegex = preg_quote($_wildcardSequence, '/');
+            $_wildcardSequenceRegex = $thePreg->preg_quote_ord($_wildcardSequence);
 
             $_pattern = str_replace('\\' . $_wildcardSequence, $anySymbolRegex . '+', $_pattern);
         }
         if ($hasWildcardLetter) {
-            $_wildcardLetterRegex = preg_quote($_wildcardLetter, '/');
+            $_wildcardLetterRegex = $thePreg->preg_quote_ord($_wildcardLetter);
 
             $_pattern = str_replace('\\' . $_wildcardLetter, $anySymbolRegex, $_pattern);
         }
@@ -1813,6 +1663,7 @@ class StrModule
         $delimiter = $delimiter ?? '-';
 
         $theMb = Lib::mb();
+        $thePreg = Lib::preg();
 
         $dictionary = [
             'а' => 'a',
@@ -1892,8 +1743,10 @@ class StrModule
                 $ignoreSymbolsRegex[ $symbol ] = true;
             }
         }
-        $ignoreSymbolsRegex = implode('', array_keys($ignoreSymbolsRegex));
-        $ignoreSymbolsRegex = preg_quote($ignoreSymbolsRegex, '/');
+
+        $ignoreSymbolsRegex = array_keys($ignoreSymbolsRegex);
+        $ignoreSymbolsRegex = implode('', $ignoreSymbolsRegex);
+        $ignoreSymbolsRegex = $thePreg->preg_quote_ord($ignoreSymbolsRegex);
 
         $result = mb_strtolower($string);
 
@@ -2028,6 +1881,147 @@ class StrModule
         }
 
         $result = implode('', $letters);
+
+        return $result;
+    }
+
+
+    public function lines(string $text) : array
+    {
+        $lines = explode("\n", $text);
+
+        foreach ( $lines as $i => $line ) {
+            $line = rtrim($line, "\r\n");
+
+            $lines[ $i ] = $line;
+        }
+
+        return $lines;
+    }
+
+    public function eol(string $text, $eol = null, array $refs = []) : string
+    {
+        $withLines = array_key_exists(0, $refs);
+
+        $refLines = null;
+
+        if ($withLines) {
+            $refLines =& $refs[ 0 ];
+            $refLines = null;
+        }
+
+        $_eol = $eol ?? "\n";
+        $_eol = (string) $_eol;
+
+        $refLines = $this->lines($text);
+
+        $output = implode($_eol, $refLines);
+
+        unset($refLines);
+
+        return $output;
+    }
+
+
+    /**
+     * > конвертирует непечатаемые символы терминала Windows (`кракозябры`) в последовательности, которые можно прочесть визуально
+     */
+    public function utf8_encode(string $string, string $encoding = null) : ?string
+    {
+        if (! \function_exists('iconv')) {
+            throw new RuntimeException(
+                'Unable to convert a non-UTF-8 string to UTF-8: required function iconv() does not exist. You should install ext-iconv or symfony/polyfill-iconv.'
+            );
+        }
+
+        $_encoding = null
+            ?? $encoding
+            ?? (\ini_get('php.output_encoding') ?: null)
+            ?? (\ini_get('default_charset') ?: null)
+            ?? 'UTF-8';
+
+        $stringConverted = @iconv($_encoding, 'UTF-8', $string);
+        if (false !== $stringConverted) {
+            return $stringConverted;
+        }
+
+        if ('CP1252' !== $_encoding) {
+            $stringConverted = @iconv('CP1252', 'UTF-8', $string);
+            if (false !== $stringConverted) {
+                return $stringConverted;
+            }
+        }
+
+        $stringConverted = @iconv('CP850', 'UTF-8', $string);
+        if (false !== $stringConverted) {
+            return $stringConverted;
+        }
+
+        return null;
+    }
+
+    /**
+     * > конвертирует непечатаемые символы строки в байтовые и hex последовательности, которые можно прочесть
+     */
+    public function dump_encode(string $string, string $encoding = null) : ?string
+    {
+        $result = $string;
+
+        $asciiControlsNoTrims = $this->loadAsciiControlsNoTrims(true);
+        $asciiControlsOnlyTrims = $this->loadAsciiControlsOnlyTrims(false);
+
+        $foundBinary = false;
+        $count = 0;
+        $result = str_replace(
+            array_keys($asciiControlsNoTrims),
+            array_values($asciiControlsNoTrims),
+            $result,
+            $count
+        );
+        if ($count) {
+            $foundBinary = true;
+        }
+
+        if ($isUtf8 = $this->is_utf8($result)) {
+            $invisibles = $this->loadInvisibles();
+
+            $count = 0;
+
+            $result = str_replace(
+                array_keys($invisibles),
+                array_values($invisibles),
+                $result,
+                $count
+            );
+
+            if ($count) {
+                $foundBinary = true;
+            }
+
+        } else {
+            $_varUtf8 = $this->utf8_encode($result, $encoding);
+
+            if ($_varUtf8 !== $result) {
+                $result = $_varUtf8;
+
+                $foundBinary = true;
+            }
+        }
+
+        if ($foundBinary) {
+            $result = "b`{$result}`";
+        }
+
+        foreach ( $asciiControlsOnlyTrims as $i => $v ) {
+            if ($i === "\n") {
+                $asciiControlsOnlyTrims[ $i ] .= $i;
+            }
+        }
+        $result = str_replace(
+            array_keys($asciiControlsOnlyTrims),
+            array_values($asciiControlsOnlyTrims),
+            $result
+        );
 
         return $result;
     }

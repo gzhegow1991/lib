@@ -1563,12 +1563,6 @@ $fn = function () {
     _print($sqlLike);
 
     echo PHP_EOL;
-
-
-    $regex = \Gzhegow\Lib\Lib::format()->preg_escape('/', '<html>', [ '.*' ], '</html>');
-    _print($regex);
-
-    echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
 "[ FormatModule ]"
@@ -1594,8 +1588,6 @@ val1;val2\n
 "Hello, \_user\_! How are you today, in percents (\%)?"
 "AND `search` ILIKE \"Hello, \_user\_! How are you today, in percents (\%)?\""
 "AND `name` LIKE \"__user\%\%\_\_%\""
-
-"/\<html\>.*\<\/html\>/"
 ');
 
 
@@ -2425,6 +2417,34 @@ TRUE | { object # DateTime } | "1970-01-01T12:34:56.789+00:00"
 
 
 // >>> TEST
+// > тесты PregModule
+$fn = function () {
+    _print('[ PregModule ]');
+    echo PHP_EOL;
+
+
+    $regex = \Gzhegow\Lib\Lib::preg()->preg_quote_ord("Hello, \x00!");
+    _print($regex);
+    echo PHP_EOL;
+
+
+    $regex = \Gzhegow\Lib\Lib::preg()->preg_escape('/', '<html>', [ '.*' ], '</html>');
+    _print($regex);
+
+    $regex = \Gzhegow\Lib\Lib::preg()->preg_escape_ord(null, '/', '<html>', [ '.*' ], '</html>');
+    _print($regex);
+};
+_assert_stdout($fn, [], '
+"[ PregModule ]"
+
+"\x{48}\x{65}\x{6C}\x{6C}\x{6F}\x{2C}\x{20}\x{0}\x{21}"
+
+"/\<html\>.*\<\/html\>/"
+"/\x{3C}\x{68}\x{74}\x{6D}\x{6C}\x{3E}.*\x{3C}\x{2F}\x{68}\x{74}\x{6D}\x{6C}\x{3E}/"
+');
+
+
+// >>> TEST
 // > тесты RandomModule
 $fn = function () {
     _print('[ RandomModule ]');
@@ -2617,6 +2637,24 @@ $fn = function () {
     _print_array_multiline(\Gzhegow\Lib\Lib::str()->match('users.*.name', $keys, '*'));
     _print_array_multiline(\Gzhegow\Lib\Lib::str()->match('users.*.name', $keys, '*', '.'));
     echo PHP_EOL;
+
+    $array = [
+        "users\x00name"         => false,
+        "users\x00\x00name"     => false,
+        "users\x00\x00\x00name" => false,
+        //
+        "users\x001\x00id"      => 1,
+        "users\x001\x00name"    => 'name1',
+        "users\x002\x00id"      => 2,
+        "users\x002\x00name"    => 'name2',
+        "users\x003\x00id"      => 3,
+        "users\x003\x00name"    => 'name3',
+    ];
+    $keys = array_keys($array);
+    _print_array_multiline(\Gzhegow\Lib\Lib::str()->match("users\x00*\x00name", $keys));
+    _print_array_multiline($a = \Gzhegow\Lib\Lib::str()->match("users\x00*\x00name", $keys, '*'));
+    _print_array_multiline(\Gzhegow\Lib\Lib::str()->match("users\x00*\x00name", $keys, '*', "\x00"));
+    echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
 "[ StrModule ]"
@@ -2705,6 +2743,27 @@ TRUE | "при"
   "users.1.name",
   "users.2.name",
   "users.3.name"
+]
+###
+
+###
+[
+
+]
+###
+###
+[
+  "b`users\x00\x00\x00name`",
+  "b`users\x001\x00name`",
+  "b`users\x002\x00name`",
+  "b`users\x003\x00name`"
+]
+###
+###
+[
+  "b`users\x001\x00name`",
+  "b`users\x002\x00name`",
+  "b`users\x003\x00name`"
 ]
 ###
 ');

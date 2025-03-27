@@ -261,30 +261,4 @@ class FormatModule
 
         return $result;
     }
-
-
-    public function preg_escape(string $delimiter, ...$regexParts) : string
-    {
-        if (! count($regexParts)) {
-            return '';
-        }
-
-        $regex = '';
-
-        foreach ( $regexParts as $v ) {
-            $regex .= is_array($v)
-                ? $v[ 0 ]
-                : preg_quote($v, $delimiter);
-        }
-
-        $regex = "{$delimiter}{$regex}{$delimiter}";
-
-        if (false === preg_match($regex, '')) {
-            throw new LogicException(
-                [ 'Invalid regular expression: ' . $regex ]
-            );
-        }
-
-        return $regex;
-    }
 }

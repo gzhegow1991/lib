@@ -419,7 +419,8 @@ class Slugger implements SluggerInterface
 
         $result = $this->translit($string, $delimiter, $locale);
 
-        $regex = '/[' . preg_quote($_delimiter, '/') . ' ]+/iu';
+        $regex = sprintf('\x{%X}', mb_ord($_delimiter));
+        $regex = '/[' . $regex . ' ]+/iu';
         $result = preg_replace($regex, $_delimiter, $result);
 
         $result = trim($result, $_delimiter);
@@ -477,6 +478,8 @@ class Slugger implements SluggerInterface
             return '';
         }
 
+        $thePreg = Lib::preg();
+
         $_delimiter = $delimiter ?? '-';
         $_locale = $locale ?? $this->getLocaleDefault();
 
@@ -503,7 +506,8 @@ class Slugger implements SluggerInterface
 
         $knownSymbolMapRegex = array_keys($knownSymbolMap);
         $knownSymbolMapRegex = implode('', $knownSymbolMapRegex);
-        $knownSymbolMapRegex = '/[^' . preg_quote($knownSymbolMapRegex, '/') . '0-9 ]/iu';
+        $knownSymbolMapRegex = '/[^' . $thePreg->preg_quote_ord($knownSymbolMapRegex) . '0-9 ]/iu';
+
         $result = preg_replace($knownSymbolMapRegex, $_delimiter, $result);
 
         return $result;
