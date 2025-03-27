@@ -2104,6 +2104,12 @@ $fn = function () {
         $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function($result, $src, null);
         $table4[ $tableRow ][ 'callable_string_function' ] = _value($result);
 
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_internal($result, $src, null);
+        $table4[ $tableRow ][ 'callable_string_function_internal' ] = _value($result);
+
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_non_internal($result, $src, null);
+        $table4[ $tableRow ][ 'callable_string_function_non_internal' ] = _value($result);
+
         $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static($result, $src, null);
         $table4[ $tableRow ][ 'callable_string_method_static' ] = _value($result);
     }
@@ -2255,11 +2261,19 @@ $fn = function () {
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_string($result, $src, $scope);
                     $table3[ $tableRow ][ $tableCol ] = _value($result);
 
-                    $tableCol = _values(' / ', 'callable_string', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function($result, $src, $scope);
+                    $tableCol = _values(' / ', 'callable_string_function', $scopeKey);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function($result, $src);
                     $table3[ $tableRow ][ $tableCol ] = _value($result);
 
-                    $tableCol = _values(' / ', 'callable_string', $scopeKey);
+                    $tableCol = _values(' / ', 'callable_string_function_internal', $scopeKey);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_internal($result, $src);
+                    $table3[ $tableRow ][ $tableCol ] = _value($result);
+
+                    $tableCol = _values(' / ', 'callable_string_function_non_internal', $scopeKey);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_non_internal($result, $src);
+                    $table3[ $tableRow ][ $tableCol ] = _value($result);
+
+                    $tableCol = _values(' / ', 'callable_string_method_static', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static($result, $src, $scope);
                     $table3[ $tableRow ][ $tableCol ] = _value($result);
                 }
@@ -2372,13 +2386,13 @@ _assert_stdout($fn, [], '
 bcdbd4da5c1d80d67e8800a4bab352e4
 f492869c99c9d5b081a3e6b62c2b0aab
 ea13e84bea1e4178af4dfc6b33594718
-ed828395ac5a8c5716b0181de96965cf
+ee32e6bfadc76c6ffc6ca7383f2ef63e
 
 06ef24bf80b3dbe188d41dabcacb2027
 
 d91da25286bd7e000367a9758699e0ca
 cb145079faba3ab6cf451fe9116389ba
-4c422f57f45e625aacf7753618ffd94c
+3c3e6efcd8ead6feb5fde9b2d9edc105
 
 TRUE | { object # DateTime }
 TRUE | { object # DateTime } | TRUE

@@ -669,9 +669,25 @@ class PhpModule
     /**
      * @param callable-string|null $result
      */
-    public function type_callable_string_function(&$result, $value, $newScope = 'static') : bool
+    public function type_callable_string_function(&$result, $value) : bool
     {
-        return $this->callable_parser()->typeCallableStringFunction($result, $value, $newScope);
+        return $this->callable_parser()->typeCallableStringFunction($result, $value);
+    }
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function type_callable_string_function_internal(&$result, $value) : bool
+    {
+        return $this->callable_parser()->typeCallableStringFunctionInternal($result, $value);
+    }
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function type_callable_string_function_non_internal(&$result, $value) : bool
+    {
+        return $this->callable_parser()->typeCallableStringFunctionNonInternal($result, $value);
     }
 
     /**
@@ -1416,6 +1432,197 @@ class PhpModule
 
 
     /**
+     * > подготавливает аргументы функции согласно переданного массива
+     */
+    public function function_args(array $args, array $argsOriginal = null) : array
+    {
+        if (! $args) {
+            return [];
+        }
+
+        $argsOriginal = $argsOriginal ?? $args;
+
+        $_args = $args;
+
+        // > gzhegow, удаляет из массива все строковые ключи, до 8.0 версии именованные аргументы не поддерживаются
+        if (PHP_VERSION_ID < 80000) {
+            $_args = array_filter($_args, 'is_int', ARRAY_FILTER_USE_KEY);
+        }
+
+        // > gzhegow, sort keys ascending
+        ksort($_args);
+
+        // > gzhegow, добавляет цифровой ключ, чтобы понять, до какого ключа нужно заполнять nulls
+        end($_args);
+        $key = key($_args);
+        if (! is_int($key)) {
+            $_args[] = null;
+
+            end($_args);
+            $key = $extraKey = key($_args);
+        }
+
+        // > gzhegow, заполняет nulls все цифровые ключи
+        $_args += array_fill(0, $key, null);
+
+        // > gzhegow, удаляет добавленный ранее цифровой ключ
+        if (isset($extraKey)) {
+            unset($_args[ $extraKey ]);
+        }
+
+        // > gzhegow, удаляет автоматические null, которые не были явно переданы пользователем
+        foreach ( array_reverse($_args) as $k => $v ) {
+            if (null !== $_args[ $k ]) {
+                break;
+
+            } elseif (! array_key_exists($k, $argsOriginal)) {
+                unset($_args[ $k ]);
+            }
+        }
+
+        return $_args;
+    }
+
+    /**
+     * > встроенные функции в php такие как strlen() требуют строгое число аргументов
+     * > стоит передать туда больше аргументов - сразу throw/trigger_error
+     *
+     * @noinspection PhpDocMissingThrowsInspection
+     * @noinspection PhpUnhandledExceptionInspection
+     * @throws \RuntimeException
+     */
+    public function call_user_func($fn, ...$args)
+    {
+        $isMaybeInternalFunction = is_string($fn) && function_exists($fn);
+
+        if (! $isMaybeInternalFunction) {
+            $result = call_user_func($fn, ...$args);
+
+        } else {
+            $ex = null;
+            $eMsg = null;
+
+            error_clear_last();
+
+            try {
+                $result = @call_user_func($fn, ...$args);
+            }
+            catch ( \Throwable $ex ) {
+                $eMsg = $ex->getMessage();
+            }
+
+            if ($e = error_get_last()) {
+                $eMsg = $e[ 'message' ];
+            }
+
+            if (null !== $eMsg) {
+                $eMsgKnownList = [
+                    '() expects exactly '  => 19,
+                    '() expects at most '  => 19,
+                    '() expects at least ' => 20,
+                ];
+
+                $isKnown = false;
+                foreach ( $eMsgKnownList as $eSubstr => $eSubstrLen ) {
+                    if (false !== ($pos = strpos($eMsg, $eSubstr))) {
+                        $isKnown = true;
+
+                        break;
+                    }
+                }
+
+                if ($isKnown) {
+                    $max = (int) substr($eMsg, $pos + $eSubstrLen);
+
+                    array_splice($args, $max);
+
+                    $result = call_user_func($fn, ...$args);
+                }
+
+                if ($ex && ! $isKnown) {
+                    throw $ex;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * > встроенные функции в php такие как strlen() требуют строгое число аргументов
+     * > стоит передать туда больше аргументов - сразу throw/trigger_error
+     *
+     * @noinspection PhpDocMissingThrowsInspection
+     * @noinspection PhpUnhandledExceptionInspection
+     * @throws \RuntimeException
+     */
+    public function call_user_func_array($fn, array $args, array &$argsNew = null)
+    {
+        $argsNew = null;
+
+        $isMaybeInternalFunction = is_string($fn) && function_exists($fn);
+
+        $_args = $this->function_args($args, $args);
+
+        if (! $isMaybeInternalFunction) {
+            $result = call_user_func_array($fn, $_args);
+
+        } else {
+            $ex = null;
+            $eMsg = null;
+
+            error_clear_last();
+
+            try {
+                $result = @call_user_func_array($fn, $_args);
+            }
+            catch ( \Throwable $ex ) {
+                $eMsg = $ex->getMessage();
+            }
+
+            if ($e = error_get_last()) {
+                $eMsg = $e[ 'message' ];
+            }
+
+            if (null !== $eMsg) {
+                $eMsgKnownList = [
+                    '() expects exactly '  => 19,
+                    '() expects at most '  => 19,
+                    '() expects at least ' => 20,
+                ];
+
+                $isKnown = false;
+                foreach ( $eMsgKnownList as $eSubstr => $eSubstrLen ) {
+                    if (false !== ($pos = strpos($eMsg, $eSubstr))) {
+                        $isKnown = true;
+
+                        break;
+                    }
+                }
+
+                if ($isKnown) {
+                    $max = (int) substr($eMsg, $pos + $eSubstrLen);
+
+                    array_splice($args, $max);
+
+                    $_args = $this->function_args($_args, $args);
+
+                    $result = call_user_func_array($fn, $_args);
+                }
+
+                if ($ex && ! $isKnown) {
+                    throw $ex;
+                }
+            }
+        }
+
+        $argsNew = $_args;
+
+        return $result;
+    }
+
+
+    /**
      * > поддерживает предварительную замену $separator на '/'
      * > во встроенной функции pathinfo() для двойного расширения будет возвращено только последнее, `image.min.jpg` -> 'jpg`
      *
@@ -1639,99 +1846,6 @@ class PhpModule
         return $result;
     }
 
-    /**
-     * @throws \LogicException|\RuntimeException
-     */
-    public function throw(?array $trace, $throwableOrArg, ...$throwableArgs)
-    {
-        if (
-            ($throwableOrArg instanceof \LogicException)
-            || ($throwableOrArg instanceof \RuntimeException)
-        ) {
-            throw $throwableOrArg;
-        }
-
-        array_unshift($throwableArgs, $throwableOrArg);
-
-        $throwableClass = $this->static_throwable_class();
-
-        if (null === $trace) {
-            $trace = property_exists($throwableClass, 'trace')
-                ? debug_backtrace()
-                : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-        }
-
-        $_throwableArgs = $this->throwable_args(...$throwableArgs);
-        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
-        $_throwableArgs[ 'trace' ] = $trace;
-
-        $exceptionArgs = [];
-        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
-
-        $e = new $throwableClass(...$exceptionArgs);
-
-        foreach ( $_throwableArgs as $key => $value ) {
-            if (! property_exists($e, $key)) {
-                unset($_throwableArgs[ $key ]);
-            }
-        }
-
-        $fn = (function () use (&$_throwableArgs) {
-            foreach ( $_throwableArgs as $key => $value ) {
-                $this->{$key} = $value;
-            }
-        })->bindTo($e, $e);
-
-        $fn();
-
-        throw $e;
-    }
-
-    /**
-     * @throws \LogicException|\RuntimeException
-     */
-    public function throw_new(?array $trace, ...$throwableArgs)
-    {
-        $throwableClass = $this->static_throwable_class();
-
-        if (null === $trace) {
-            $trace = property_exists($throwableClass, 'trace')
-                ? debug_backtrace()
-                : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-        }
-
-        $_throwableArgs = $this->throwable_args(...$throwableArgs);
-        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
-        $_throwableArgs[ 'trace' ] = $trace;
-
-        $exceptionArgs = [];
-        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
-
-        $e = new $throwableClass(...$exceptionArgs);
-
-        foreach ( $_throwableArgs as $key => $value ) {
-            if (! property_exists($e, $key)) {
-                unset($_throwableArgs[ $key ]);
-            }
-        }
-
-        $fn = (function () use (&$_throwableArgs) {
-            foreach ( $_throwableArgs as $key => $value ) {
-                $this->{$key} = $value;
-            }
-        })->bindTo($e, $e);
-
-        $fn();
-
-        throw $e;
-    }
-
     public function throwable_args(...$throwableArgs) : array
     {
         $len = count($throwableArgs);
@@ -1834,6 +1948,99 @@ class PhpModule
         return $result;
     }
 
+    /**
+     * @throws \LogicException|\RuntimeException
+     */
+    public function throw(?array $trace, $throwableOrArg, ...$throwableArgs)
+    {
+        if (
+            ($throwableOrArg instanceof \LogicException)
+            || ($throwableOrArg instanceof \RuntimeException)
+        ) {
+            throw $throwableOrArg;
+        }
+
+        array_unshift($throwableArgs, $throwableOrArg);
+
+        $throwableClass = $this->static_throwable_class();
+
+        if (null === $trace) {
+            $trace = property_exists($throwableClass, 'trace')
+                ? debug_backtrace()
+                : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        }
+
+        $_throwableArgs = $this->throwable_args(...$throwableArgs);
+        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
+        $_throwableArgs[ 'trace' ] = $trace;
+
+        $exceptionArgs = [];
+        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
+
+        $e = new $throwableClass(...$exceptionArgs);
+
+        foreach ( $_throwableArgs as $key => $value ) {
+            if (! property_exists($e, $key)) {
+                unset($_throwableArgs[ $key ]);
+            }
+        }
+
+        $fn = (function () use (&$_throwableArgs) {
+            foreach ( $_throwableArgs as $key => $value ) {
+                $this->{$key} = $value;
+            }
+        })->bindTo($e, $e);
+
+        $fn();
+
+        throw $e;
+    }
+
+    /**
+     * @throws \LogicException|\RuntimeException
+     */
+    public function throw_new(?array $trace, ...$throwableArgs)
+    {
+        $throwableClass = $this->static_throwable_class();
+
+        if (null === $trace) {
+            $trace = property_exists($throwableClass, 'trace')
+                ? debug_backtrace()
+                : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        }
+
+        $_throwableArgs = $this->throwable_args(...$throwableArgs);
+        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
+        $_throwableArgs[ 'trace' ] = $trace;
+
+        $exceptionArgs = [];
+        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
+
+        $e = new $throwableClass(...$exceptionArgs);
+
+        foreach ( $_throwableArgs as $key => $value ) {
+            if (! property_exists($e, $key)) {
+                unset($_throwableArgs[ $key ]);
+            }
+        }
+
+        $fn = (function () use (&$_throwableArgs) {
+            foreach ( $_throwableArgs as $key => $value ) {
+                $this->{$key} = $value;
+            }
+        })->bindTo($e, $e);
+
+        $fn();
+
+        throw $e;
+    }
+
 
     /**
      * @return object{ stack: array }
@@ -1920,5 +2127,65 @@ class PhpModule
         }
 
         return $result;
+    }
+
+
+    public function benchmark(bool $noCache = null, bool $clearCache = null) : object
+    {
+        static $cache;
+
+        $noCache = $noCache ?? false;
+        $clearCache = $clearCache ?? false;
+
+        if ($noCache) {
+            return (object) [
+                'microtime' => null,
+                'totals'    => null,
+            ];
+        }
+
+        if ($clearCache) {
+            $cache = null;
+        }
+
+        if (! isset($cache)) {
+            $cache = (object) [
+                'microtime' => null,
+                'totals'    => null,
+            ];
+        }
+
+        return $cache;
+    }
+
+    public function benchmark_start(string $tag) : object
+    {
+        $benchmark = $this->benchmark();
+
+        if (isset($benchmark->microtime[ $tag ])) {
+            throw new LogicException(
+                [ 'The `tag` already exists: ' . $tag ]
+            );
+        }
+
+        $benchmark->microtime[ $tag ] = $this->microtime();
+
+        return $benchmark;
+    }
+
+    public function benchmark_end(string $tag) : object
+    {
+        $benchmark = $this->benchmark();
+
+        if (! isset($benchmark->microtime[ $tag ])) {
+            throw new LogicException(
+                [ 'Missing `tag`: ' . $tag ]
+            );
+        }
+
+        $benchmark->totals[ $tag ][] = $this->microtime() - $benchmark->microtime[ $tag ];
+        unset($benchmark->microtime[ $tag ]);
+
+        return $benchmark;
     }
 }

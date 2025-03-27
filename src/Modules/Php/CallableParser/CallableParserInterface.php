@@ -72,7 +72,17 @@ interface CallableParserInterface
     /**
      * @param callable-string|null $result
      */
-    public function typeCallableStringFunction(&$result, $value, $newScope = 'static') : bool;
+    public function typeCallableStringFunction(&$result, $value) : bool;
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function typeCallableStringFunctionInternal(&$result, $value) : bool;
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function typeCallableStringFunctionNonInternal(&$result, $value) : bool;
 
     /**
      * @param callable-string|null $result

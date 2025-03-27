@@ -592,7 +592,7 @@ class CallableParser implements CallableParserInterface
     /**
      * @param callable-string|null $result
      */
-    public function typeCallableStringFunction(&$result, $value, $newScope = 'static') : bool
+    public function typeCallableStringFunction(&$result, $value) : bool
     {
         $result = null;
 
@@ -602,10 +602,70 @@ class CallableParser implements CallableParserInterface
 
         $function = $this->parse_function($value);
         if (null !== $function) {
-            if (! $this->isCallable($function, $newScope)) {
-                return false;
-            }
+            $result = $function;
 
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function typeCallableStringFunctionInternal(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $function = $this->parse_function($value);
+        if (null === $function) {
+            return false;
+        }
+
+        try {
+            $rf = new \ReflectionFunction($function);
+        }
+        catch ( \Throwable $e ) {
+            return false;
+        }
+
+        if ($rf->isInternal()) {
+            $result = $function;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function typeCallableStringFunctionNonInternal(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $function = $this->parse_function($value);
+        if (null === $function) {
+            return false;
+        }
+
+        try {
+            $rf = new \ReflectionFunction($function);
+        }
+        catch ( \Throwable $e ) {
+            return false;
+        }
+
+        if (! $rf->isInternal()) {
             $result = $function;
 
             return true;
