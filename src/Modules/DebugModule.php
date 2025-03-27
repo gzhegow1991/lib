@@ -1422,6 +1422,9 @@ class DebugModule
         $oldCnt = count($oldLines);
         $newCnt = count($newLines);
 
+        $maxCnt = max($oldCnt, $newCnt);
+        $maxCntLen = strlen($maxCnt);
+
         $oldLinesIndex = array_flip($oldLines);
         $newLinesIndex = array_flip($newLines);
 
@@ -1519,6 +1522,11 @@ class DebugModule
 
         if ($diffLines) {
             foreach ( $diffLines as $i => [ $line, $lineNumber, $isLineDiff ] ) {
+                $lineNumber = str_pad(
+                    $lineNumber,
+                    $maxCntLen, ' ', STR_PAD_LEFT
+                );
+
                 $line = (null === $isLineDiff)
                     ? $line
                     : "[ {$lineNumber} ] {$line}";
@@ -1560,5 +1568,58 @@ class DebugModule
         );
 
         return $isDiff;
+    }
+
+
+    /**
+     * @return array|object
+     */
+    public function benchmark(string $tag = null)
+    {
+        $mt = microtime(true);
+
+        static $current;
+
+        if ($current === null) {
+            $current = new class {
+                /**
+                 * @var float[][]
+                 */
+                public $report = [];
+                /**
+                 * @var float[]
+                 */
+                public $microtime = [];
+            };
+        }
+
+        if (null === $tag) {
+            $last = $current;
+
+            $current = new class {
+                /**
+                 * @var float[][]
+                 */
+                public $report = [];
+                /**
+                 * @var float[]
+                 */
+                public $microtime = [];
+            };
+
+            return $last->report;
+
+        } else {
+            if (isset($current->microtime[ $tag ])) {
+                $current->report[ $tag ][] = $mt - $current->microtime[ $tag ];
+
+            } else {
+                $current->report[ $tag ] = [];
+            }
+
+            $current->microtime[ $tag ] = $mt;
+
+            return $current;
+        }
     }
 }

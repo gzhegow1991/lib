@@ -600,9 +600,8 @@ class CallableParser implements CallableParserInterface
             return false;
         }
 
-        $function = $this->parse_function($value);
-        if (null !== $function) {
-            $result = $function;
+        if (function_exists($value)) {
+            $result = $value;
 
             return true;
         }
@@ -621,20 +620,15 @@ class CallableParser implements CallableParserInterface
             return false;
         }
 
-        $function = $this->parse_function($value);
-        if (null === $function) {
-            return false;
-        }
-
         try {
-            $rf = new \ReflectionFunction($function);
+            $rf = new \ReflectionFunction($value);
         }
         catch ( \Throwable $e ) {
             return false;
         }
 
         if ($rf->isInternal()) {
-            $result = $function;
+            $result = $value;
 
             return true;
         }
@@ -653,20 +647,15 @@ class CallableParser implements CallableParserInterface
             return false;
         }
 
-        $function = $this->parse_function($value);
-        if (null === $function) {
-            return false;
-        }
-
         try {
-            $rf = new \ReflectionFunction($function);
+            $rf = new \ReflectionFunction($value);
         }
         catch ( \Throwable $e ) {
             return false;
         }
 
         if (! $rf->isInternal()) {
-            $result = $function;
+            $result = $value;
 
             return true;
         }

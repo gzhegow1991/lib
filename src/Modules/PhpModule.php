@@ -968,27 +968,33 @@ class PhpModule
 
     public function microtime($date = null) : string
     {
-        $mt = microtime();
-
-        [ $sec, $msec ] = explode(' ', $mt);
+        $decimalPoint = Lib::type()->the_decimal_point();
 
         if (null === $date) {
-            $result = ''
-                . $sec
-                . Lib::type()->the_decimal_point()
-                . str_pad($msec, 6, '0');
+            $mt = microtime();
+
+            [ $msec, $sec ] = explode(' ', $mt, 2);
+
+            $msec = substr($msec, 2, 6);
+            $msec = str_pad($msec, 6, '0');
 
         } elseif (is_a($date, '\DateTimeInterface')) {
-            $result = ''
-                . $date->format('s')
-                . Lib::type()->the_decimal_point()
-                . str_pad($date->format('u'), 6, '0');
+            $sec = $date->format('s');
+
+            $msec = $date->format('u');
+            $msec = substr($msec, 0, 6);
+            $msec = str_pad($date->format('u'), 6, '0');
 
         } else {
             throw new LogicException(
                 [ 'The `date` must be instance of \DateTimeInterface', $date ]
             );
         }
+
+        $result = ''
+            . $sec
+            . $decimalPoint
+            . $msec;
 
         return $result;
     }
@@ -2047,14 +2053,17 @@ class PhpModule
      */
     public function errors() : object
     {
-        static $stack;
+        static $current;
 
-        $stack = $stack
+        $current = $current
             ?? new class {
+                /**
+                 * @var object[]
+                 */
                 public $stack = [];
             };
 
-        return $stack;
+        return $current;
     }
 
     /**
@@ -2077,6 +2086,9 @@ class PhpModule
     public function errors_new() : object
     {
         $errors = new class {
+            /**
+             * @var array
+             */
             public $list = [];
         };
 
@@ -2127,65 +2139,5 @@ class PhpModule
         }
 
         return $result;
-    }
-
-
-    public function benchmark(bool $noCache = null, bool $clearCache = null) : object
-    {
-        static $cache;
-
-        $noCache = $noCache ?? false;
-        $clearCache = $clearCache ?? false;
-
-        if ($noCache) {
-            return (object) [
-                'microtime' => null,
-                'totals'    => null,
-            ];
-        }
-
-        if ($clearCache) {
-            $cache = null;
-        }
-
-        if (! isset($cache)) {
-            $cache = (object) [
-                'microtime' => null,
-                'totals'    => null,
-            ];
-        }
-
-        return $cache;
-    }
-
-    public function benchmark_start(string $tag) : object
-    {
-        $benchmark = $this->benchmark();
-
-        if (isset($benchmark->microtime[ $tag ])) {
-            throw new LogicException(
-                [ 'The `tag` already exists: ' . $tag ]
-            );
-        }
-
-        $benchmark->microtime[ $tag ] = $this->microtime();
-
-        return $benchmark;
-    }
-
-    public function benchmark_end(string $tag) : object
-    {
-        $benchmark = $this->benchmark();
-
-        if (! isset($benchmark->microtime[ $tag ])) {
-            throw new LogicException(
-                [ 'Missing `tag`: ' . $tag ]
-            );
-        }
-
-        $benchmark->totals[ $tag ][] = $this->microtime() - $benchmark->microtime[ $tag ];
-        unset($benchmark->microtime[ $tag ]);
-
-        return $benchmark;
     }
 }

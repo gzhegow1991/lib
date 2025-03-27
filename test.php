@@ -77,6 +77,82 @@ function _assert_stdout(
 
 
 // >>> TEST
+// > тесты Benchmark
+$fn = function () {
+    _print('[ Benchmark ]');
+    echo PHP_EOL;
+
+
+    $theDebug = \Gzhegow\Lib\Lib::debug();
+
+    $theDebug->benchmark('tag');
+
+    for ( $i = 0; $i < 2; $i++ ) {
+        $t = 'tag' . $i;
+
+        $theDebug->benchmark($t);
+
+        for ( $ii = 0; $ii < 2; $ii++ ) {
+            $tt = 'tag' . $i . $ii;
+
+            $theDebug->benchmark($tt);
+
+            usleep(1e4);
+
+            $theDebug->benchmark($tt);
+        }
+
+        $theDebug->benchmark($t);
+    }
+
+    $theDebug->benchmark('tag');
+
+    $report = $theDebug->benchmark();
+
+    $report[ $t = 'tag' ][ 0 ] = ($report[ $t ][ 0 ] > (4 * 1e-4));
+
+    $report[ $t = 'tag0' ][ 0 ] = ($report[ $t ][ 0 ] > (2 * 1e-4));
+    $report[ $t = 'tag00' ][ 0 ] = ($report[ $t ][ 0 ] > 1e-4);
+    $report[ $t = 'tag01' ][ 0 ] = ($report[ $t ][ 0 ] > 1e-4);
+
+    $report[ $t = 'tag1' ][ 0 ] = ($report[ $t ][ 0 ] > (2 * 1e-4));
+    $report[ $t = 'tag10' ][ 0 ] = ($report[ $t ][ 0 ] > 1e-4);
+    $report[ $t = 'tag11' ][ 0 ] = ($report[ $t ][ 0 ] > 1e-4);
+
+    _print_array_multiline($report, 2);
+};
+_assert_stdout($fn, [], '
+"[ Benchmark ]"
+
+###
+[
+  "tag" => [
+    TRUE
+  ],
+  "tag0" => [
+    TRUE
+  ],
+  "tag00" => [
+    TRUE
+  ],
+  "tag01" => [
+    TRUE
+  ],
+  "tag1" => [
+    TRUE
+  ],
+  "tag10" => [
+    TRUE
+  ],
+  "tag11" => [
+    TRUE
+  ]
+]
+###
+');
+
+
+// >>> TEST
 // > тесты Config
 $fn = function () {
     _print('[ Config ]');
@@ -197,6 +273,42 @@ _assert_stdout($fn, [], '
 "baz" | TRUE
 
 "[ CATCH ] Configuration is invalid"
+');
+
+
+// >>> TEST
+// > тесты Errors
+$fn = function () {
+    _print('[ Errors ]');
+    echo PHP_EOL;
+
+
+    \Gzhegow\Lib\Lib::php()->errors_start($b);
+
+    for ( $i = 0; $i < 3; $i++ ) {
+        \Gzhegow\Lib\Lib::php()->error([ 'This is the error message' ]);
+    }
+
+    $errors = \Gzhegow\Lib\Lib::php()->errors_end($b);
+
+    _print_array_multiline($errors, 2);
+};
+_assert_stdout($fn, [], '
+"[ Errors ]"
+
+###
+[
+  [
+    "This is the error message"
+  ],
+  [
+    "This is the error message"
+  ],
+  [
+    "This is the error message"
+  ]
+]
+###
 ');
 
 
@@ -1824,20 +1936,6 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    \Gzhegow\Lib\Lib::php()->errors_start($b);
-
-    for ( $i = 0; $i < 3; $i++ ) {
-        \Gzhegow\Lib\Lib::php()->error([ 'This is the error message' ]);
-    }
-
-    $errors = \Gzhegow\Lib\Lib::php()->errors_end($b);
-
-    _print_array_multiline($errors, 2);
-
-
-    echo PHP_EOL;
-
-
     class PhpModuleDummy
     {
         public           $publicProperty;
@@ -2364,20 +2462,6 @@ $fn = function () {
 };
 _assert_stdout($fn, [], '
 "[ PhpModule ]"
-
-###
-[
-  [
-    "This is the error message"
-  ],
-  [
-    "This is the error message"
-  ],
-  [
-    "This is the error message"
-  ]
-]
-###
 
 2f37ec97bf4a8f3de2842a958e72f8ac
 
