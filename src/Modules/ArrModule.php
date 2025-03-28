@@ -1320,11 +1320,13 @@ class ArrModule
     /**
      * > превращает вложенный массив в одноуровневый, но теряет ключи
      */
-    public function plain(...$values) : array
+    public function plain(?int $flags, ...$values) : array
     {
+        $flags = $flags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
+
         $result = [];
 
-        foreach ( $this->walk_it($values) as $value ) {
+        foreach ( $this->walk_it($values, $flags) as $value ) {
             $result[] = $value;
         }
 
@@ -1334,13 +1336,14 @@ class ArrModule
     /**
      * > превращает вложенный массив в одноуровневый, соединяя путь через точку
      */
-    public function dot(array $array, string $dot = null) : array
+    public function dot(array $array, string $dot = null, int $flags = null) : array
     {
         $dot = $dot ?? '.';
+        $flags = $flags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
 
         $result = [];
 
-        $gen = $this->walk_it($array, _ARR_WALK_WITH_EMPTY_ARRAYS);
+        $gen = $this->walk_it($array, $flags);
 
         foreach ( $gen as $path => $value ) {
             $result[ implode($dot, $path) ] = $value;
