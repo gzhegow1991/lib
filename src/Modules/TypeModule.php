@@ -741,17 +741,17 @@ class TypeModule extends TypeModuleBase
     {
         $result = null;
 
+        if (! $this->string_not_empty($_value, $value)) {
+            return false;
+        }
+
         if (extension_loaded('ctype')) {
-            if (ctype_digit($value)) {
-                $result = $value;
+            if (ctype_digit($_value)) {
+                $result = $_value;
 
                 return true;
             }
 
-            return false;
-        }
-
-        if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
         }
 
@@ -773,23 +773,23 @@ class TypeModule extends TypeModuleBase
 
         $ignoreCase = $ignoreCase ?? true;
 
+        if (! $this->string_not_empty($_value, $value)) {
+            return false;
+        }
+
         if (extension_loaded('ctype')) {
             if (! $ignoreCase) {
-                if (strtolower($value) !== $value) {
+                if (strtolower($_value) !== $_value) {
                     return false;
                 }
             }
 
-            if (ctype_alpha($value)) {
-                $result = $value;
+            if (ctype_alpha($_value)) {
+                $result = $_value;
 
                 return true;
             }
 
-            return false;
-        }
-
-        if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
         }
 
@@ -815,23 +815,23 @@ class TypeModule extends TypeModuleBase
 
         $ignoreCase = $ignoreCase ?? true;
 
+        if (! $this->string_not_empty($_value, $value)) {
+            return false;
+        }
+
         if (extension_loaded('ctype')) {
             if (! $ignoreCase) {
-                if (strtolower($value) !== $value) {
+                if (strtolower($_value) !== $_value) {
                     return false;
                 }
             }
 
-            if (ctype_alnum($value)) {
-                $result = $value;
+            if (ctype_alnum($_value)) {
+                $result = $_value;
 
                 return true;
             }
 
-            return false;
-        }
-
-        if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
         }
 
