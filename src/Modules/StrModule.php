@@ -1376,26 +1376,173 @@ class StrModule
      */
     public function match(
         string $pattern, $lines,
-        $wildcardSequence = null,
-        $wildcardSeparator = null,
-        $wildcardLetter = null
+        string $wildcardLetterSequence = null,
+        string $wildcardSeparator = null,
+        string $wildcardLetterSingle = null
     ) : array
     {
         if ('' === $pattern) {
             return [];
         }
 
-        $_pattern = $pattern;
         $_lines = Lib::php()->to_list($lines);
+        if (! count($_lines)) {
+            return [];
+        }
 
-        $anySymbolRegex = '.';
+        $regex = $this->match_regex(
+            $pattern,
+            $wildcardLetterSequence,
+            $wildcardSeparator,
+            $wildcardLetterSingle
+        );
+
+        $regex = "/^{$regex}$/u";
+
+        $result = [];
+
+        foreach ( $_lines as $i => $line ) {
+            if (preg_match($regex, $line)) {
+                $result[] = $line;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string|string[] $lines
+     */
+    public function match_starts(
+        string $pattern, $lines,
+        string $wildcardLetterSequence = null,
+        string $wildcardSeparator = null,
+        string $wildcardLetterSingle = null
+    ) : array
+    {
+        if ('' === $pattern) {
+            return [];
+        }
+
+        $_lines = Lib::php()->to_list($lines);
+        if (! count($_lines)) {
+            return [];
+        }
+
+        $regex = $this->match_regex(
+            $pattern,
+            $wildcardLetterSequence,
+            $wildcardSeparator,
+            $wildcardLetterSingle
+        );
+
+        $regex = "/^{$regex}/u";
+
+        $result = [];
+
+        foreach ( $_lines as $i => $line ) {
+            if (preg_match($regex, $line)) {
+                $result[] = $line;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string|string[] $lines
+     */
+    public function match_ends(
+        string $pattern, $lines,
+        string $wildcardLetterSequence = null,
+        string $wildcardSeparator = null,
+        string $wildcardLetterSingle = null
+    ) : array
+    {
+        if ('' === $pattern) {
+            return [];
+        }
+
+        $_lines = Lib::php()->to_list($lines);
+        if (! count($_lines)) {
+            return [];
+        }
+
+        $regex = $this->match_regex(
+            $pattern,
+            $wildcardLetterSequence,
+            $wildcardSeparator,
+            $wildcardLetterSingle
+        );
+
+        $regex = "/{$regex}$/u";
+
+        $result = [];
+
+        foreach ( $_lines as $i => $line ) {
+            if (preg_match($regex, $line)) {
+                $result[] = $line;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param string|string[] $lines
+     */
+    public function match_contains(
+        string $pattern, $lines,
+        string $wildcardLetterSequence = null,
+        string $wildcardSeparator = null,
+        string $wildcardLetterSingle = null
+    ) : array
+    {
+        if ('' === $pattern) {
+            return [];
+        }
+
+        $_lines = Lib::php()->to_list($lines);
+        if (! count($_lines)) {
+            return [];
+        }
+
+        $regex = $this->match_regex(
+            $pattern,
+            $wildcardLetterSequence,
+            $wildcardSeparator,
+            $wildcardLetterSingle
+        );
+
+        $regex = "/{$regex}/u";
+
+        $result = [];
+
+        foreach ( $_lines as $i => $line ) {
+            if (preg_match($regex, $line)) {
+                $result[] = $line;
+            }
+        }
+
+        return $result;
+    }
+
+    protected function match_regex(
+        string $pattern,
+        string $wildcardLetterSequence = null,
+        string $wildcardSeparator = null,
+        string $wildcardLetterSingle = null
+    ) : string
+    {
+        if ('' === $pattern) {
+            return '';
+        }
 
         $hasWildcardSeparator = (null !== $wildcardSeparator);
-        $hasWildcardSequence = (null !== $wildcardSequence);
-        $hasWildcardLetter = (null !== $wildcardLetter);
+        $hasWildcardLetterSequence = (null !== $wildcardLetterSequence);
+        $hasWildcardLetterSingle = (null !== $wildcardLetterSingle);
 
         $testUnique = [];
-
         if ($hasWildcardSeparator) {
             if (! $this->type_letter($_wildcardSeparator, $wildcardSeparator)) {
                 throw new LogicException(
@@ -1405,24 +1552,23 @@ class StrModule
 
             $testUnique[] = $_wildcardSeparator;
         }
-
-        if ($hasWildcardSequence) {
-            if (! $this->type_letter($_wildcardSequence, $wildcardSequence)) {
+        if ($hasWildcardLetterSequence) {
+            if (! $this->type_letter($_wildcardLetterSequence, $wildcardLetterSequence)) {
                 throw new LogicException(
-                    [ 'The `wildcardSequence` should be null or exactly one letter', $wildcardSequence ]
+                    [ 'The `wildcardSequence` should be null or exactly one letter', $wildcardLetterSequence ]
                 );
             }
 
-            $testUnique[] = $_wildcardSequence;
+            $testUnique[] = $_wildcardLetterSequence;
         }
-        if ($hasWildcardLetter) {
-            if (! $this->type_letter($_wildcardLetter, $wildcardLetter)) {
+        if ($hasWildcardLetterSingle) {
+            if (! $this->type_letter($_wildcardLetterSingle, $wildcardLetterSingle)) {
                 throw new LogicException(
-                    [ 'The `wildcardLetter` should be null or exactly one letter', $wildcardLetter ]
+                    [ 'The `wildcardLetter` should be null or exactly one letter', $wildcardLetterSingle ]
                 );
             }
 
-            $testUnique[] = $_wildcardLetter;
+            $testUnique[] = $_wildcardLetterSingle;
         }
 
         if (count(array_unique($testUnique)) !== count($testUnique)) {
@@ -1430,33 +1576,66 @@ class StrModule
                 [
                     'The wildcards should be different letters or nulls',
                     $wildcardSeparator,
-                    $wildcardSequence,
-                    $wildcardLetter,
+                    $wildcardLetterSequence,
+                    $wildcardLetterSingle,
                 ]
             );
         }
 
         $thePreg = Lib::preg();
 
-        $_pattern = preg_quote($_pattern, '/');
+        $_pattern = $pattern;
+
+        $anySymbolRegex = '.';
+
+        $replacements = [];
 
         if ($hasWildcardSeparator) {
             $_wildcardSeparatorRegex = $thePreg->preg_quote_ord($_wildcardSeparator);
 
             $anySymbolRegex = '[^' . $_wildcardSeparatorRegex . ']';
-        }
-        if ($hasWildcardSequence) {
-            $_wildcardSequenceRegex = $thePreg->preg_quote_ord($_wildcardSequence);
 
-            $_pattern = str_replace('\\' . $_wildcardSequence, $anySymbolRegex . '+', $_pattern);
-        }
-        if ($hasWildcardLetter) {
-            $_wildcardLetterRegex = $thePreg->preg_quote_ord($_wildcardLetter);
+            $replacement = '{{ 1 }}';
+            $replacements[ preg_quote($replacement, '/') ] = $_wildcardSeparatorRegex;
 
-            $_pattern = str_replace('\\' . $_wildcardLetter, $anySymbolRegex, $_pattern);
+            $_pattern = str_replace(
+                $_wildcardSeparator,
+                $replacement,
+                $_pattern
+            );
+        }
+        if ($hasWildcardLetterSequence) {
+            $_wildcardLetterSequenceRegex = $thePreg->preg_quote_ord($_wildcardLetterSequence);
+
+            $replacement = '{{ 2 }}';
+            $replacements[ preg_quote($replacement, '/') ] = $anySymbolRegex . '+';
+
+            $_pattern = str_replace(
+                $_wildcardLetterSequence,
+                $replacement,
+                $_pattern
+            );
+        }
+        if ($hasWildcardLetterSingle) {
+            $_wildcardLetterSingleRegex = $thePreg->preg_quote_ord($_wildcardLetterSingle);
+
+            $replacement = '{{ 3 }}';
+            $replacements[ preg_quote($replacement, '/') ] = $anySymbolRegex;
+
+            $_pattern = str_replace(
+                $_wildcardLetterSingle,
+                $replacement,
+                $_pattern
+            );
         }
 
-        $patternRegex = "/^{$_pattern}$/u";
+        $_pattern = preg_quote($_pattern, '/');
+
+        if (count($replacements)) {
+            $_pattern = strtr($_pattern, $replacements);
+        }
+
+        $patternRegex = "/{$_pattern}/";
 
         if (false === preg_match($patternRegex, '')) {
             throw new RuntimeException(
@@ -1464,15 +1643,7 @@ class StrModule
             );
         }
 
-        $result = [];
-
-        foreach ( $_lines as $i => $line ) {
-            if (preg_match($patternRegex, $line)) {
-                $result[] = $line;
-            }
-        }
-
-        return $result;
+        return $_pattern;
     }
 
 
