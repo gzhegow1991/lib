@@ -1333,6 +1333,7 @@ class ArrModule
         return $result;
     }
 
+
     /**
      * > превращает вложенный массив в одноуровневый, соединяя путь через точку
      */
@@ -1346,6 +1347,30 @@ class ArrModule
         $gen = $this->walk_it($array, $flags);
 
         foreach ( $gen as $path => $value ) {
+            $result[ implode($dot, $path) ] = $value;
+        }
+
+        return $result;
+    }
+
+    /**
+     * > превращает вложенный массив в одноуровневый, соединяя путь через точку
+     * > вместо значений использует $value
+     */
+    public function dot_keys(
+        array $array, string $dot = null, $value = null,
+        int $flags = null
+    ) : array
+    {
+        $dot = $dot ?? '.';
+        $value = $value ?? true;
+        $flags = $flags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
+
+        $result = [];
+
+        $gen = $this->walk_it($array, $flags);
+
+        foreach ( $gen as $path => $devnull ) {
             $result[ implode($dot, $path) ] = $value;
         }
 
