@@ -16,6 +16,17 @@ use Gzhegow\Lib\Modules\Php\DebugBacktracer\DebugBacktracer;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
 
+if (! defined('_PHP_CMP_MODE_THROW')) define('_PHP_CMP_MODE_THROW', 1 << 0);
+if (! defined('_PHP_CMP_MODE_STRICT')) define('_PHP_CMP_MODE_STRICT', 1 << 1);
+if (! defined('_PHP_CMP_MODE_STRINGS_STRCMP')) define('_PHP_CMP_MODE_STRINGS_STRCMP', 1 << 2);
+if (! defined('_PHP_CMP_MODE_STRINGS_STRCASECMP')) define('_PHP_CMP_MODE_STRINGS_STRCASECMP', 1 << 3);
+if (! defined('_PHP_CMP_MODE_STRINGS_STRNATCMP')) define('_PHP_CMP_MODE_STRINGS_STRNATCMP', 1 << 4);
+if (! defined('_PHP_CMP_MODE_STRINGS_STRNATCASECMP')) define('_PHP_CMP_MODE_STRINGS_STRNATCASECMP', 1 << 5);
+if (! defined('_PHP_CMP_MODE_STRINGS_BY_LENGTH')) define('_PHP_CMP_MODE_STRINGS_BY_LENGTH', 1 << 6);
+if (! defined('_PHP_CMP_MODE_STRINGS_BY_SIZE')) define('_PHP_CMP_MODE_STRINGS_BY_SIZE', 1 << 7);
+if (! defined('_PHP_CMP_MODE_STRINGS_BY_VALUE')) define('_PHP_CMP_MODE_STRINGS_BY_VALUE', 1 << 8);
+if (! defined('_PHP_CMP_MODE_ARRAYS_BY_VALUE')) define('_PHP_CMP_MODE_ARRAYS_BY_VALUE', 1 << 9);
+
 class PhpModule
 {
     /**
@@ -937,11 +948,184 @@ class PhpModule
     }
 
 
+    public function eq($a, $b, int $flags = null) : bool
+    {
+        $isStrict = ($flags & _PHP_CMP_MODE_STRICT);
+
+        $result = $this->cmp($a, $b, $flags);
+
+        if (is_float($result) && is_nan($result)) {
+            return $isStrict
+                ? ($a === $b)
+                : ($a == $b);
+        }
+
+        return $result === 0;
+    }
+
+    /**
+     * @return int|float
+     */
+    public function cmp($a, $b, int $flags = null) // : int|float
+    {
+        $isThrow = $flags & _PHP_CMP_MODE_THROW;
+
+        if ($isStrict = ($flags & _PHP_CMP_MODE_STRICT)) {
+            if (gettype($a) !== gettype($b)) {
+                if ($isThrow) {
+                    throw new RuntimeException(
+                        [ 'Values are incomparable', $a, $b ]
+                    );
+                }
+
+                return NAN;
+            }
+        }
+
+        $aIsNumeric = is_numeric($a);
+        $bIsNumeric = is_numeric($b);
+        if ($isAtLeastOneNumeric = ($aIsNumeric || $bIsNumeric)) {
+            $theType = $theType ?? Lib::type();
+
+            $aStatus = $theType->num($aNum, $a);
+            $bStatus = $theType->num($bNum, $b);
+
+            if ($aStatus && $bStatus) {
+                return $aNum <=> $bNum;
+            }
+        }
+
+        $aIsString = is_string($a);
+        $bIsString = is_string($b);
+        if ($isAtLeastOneString = ($aIsString || $bIsString)) {
+            $theType = $theType ?? Lib::type();
+
+            $aStatus = $theType->string($aString, $a);
+            $bStatus = $theType->string($bString, $b);
+
+            if (! ($aStatus && $bStatus)) {
+                if ($isThrow) {
+                    throw new RuntimeException(
+                        [ 'Values are incomparable', $a, $b ]
+                    );
+                }
+
+                return NAN;
+            }
+
+            $result = null;
+
+            if ($aString === $bString) {
+                return 0;
+            }
+
+            if ($isStringsByLength = ($flags & _PHP_CMP_MODE_STRINGS_BY_LENGTH)) {
+                $theStr = Lib::str();
+                $result = ($theStr->strlen($aString) <=> $theStr->strlen($bString));
+
+            } elseif ($isStringsBySize = ($flags & _PHP_CMP_MODE_STRINGS_BY_SIZE)) {
+                $result = (strlen($aString) <=> strlen($bString));
+            }
+
+            if (null !== $result) {
+                if ($result !== 0) {
+                    return $result;
+                }
+            }
+
+            if (false
+                || ($isStrcmp = ($flags & _PHP_CMP_MODE_STRINGS_STRCMP))
+                || ($isStrcasecmp = ($flags & _PHP_CMP_MODE_STRINGS_STRCASECMP))
+                || ($isStrnatcmp = ($flags & _PHP_CMP_MODE_STRINGS_STRNATCMP))
+                || ($isStrnatcasecmp = ($flags & _PHP_CMP_MODE_STRINGS_STRNATCASECMP))
+                || ($isStringsByValue = ($flags & _PHP_CMP_MODE_STRINGS_BY_VALUE))
+            ) {
+                $result = null
+                    ?? (! empty($isStrnatcasecmp) ? strnatcasecmp($aString, $bString) : null)
+                    ?? (! empty($isStrcasecmp) ? strcasecmp($aString, $bString) : null)
+                    ?? (! empty($isStrnatcmp) ? strnatcmp($aString, $bString) : null)
+                    ?? (! empty($isStrcmp) ? strcmp($aString, $bString) : null)
+                    ?? (! empty($isStringsByValue) ? ($aString <=> $bString) : null);
+            }
+
+            if (null === $result) {
+                if ($isThrow) {
+                    throw new RuntimeException(
+                        [ 'Values are incomparable', $a, $b ]
+                    );
+                }
+
+                return NAN;
+            }
+
+            return $result;
+        }
+
+        $aIsArray = is_array($a);
+        $bIsArray = is_array($b);
+        if ($isBothArrays = ($aIsArray && $bIsArray)) {
+            if ($isArraysByValue = ($flags & _PHP_CMP_MODE_ARRAYS_BY_VALUE)) {
+                return $a <=> $b;
+
+            } else {
+                $result = count($a) <=> count($b);
+
+                if (false
+                    || (0 !== $result)
+                    || ($a === $b)
+                ) {
+                    return $result;
+                }
+
+                if ($isThrow) {
+                    throw new RuntimeException(
+                        [ 'Values are incomparable', $a, $b ]
+                    );
+                }
+
+                return NAN;
+            }
+        }
+
+        $aIsObject = is_object($a);
+        $bIsObject = is_object($b);
+        if ($isBothObjects = ($aIsObject && $bIsObject)) {
+            $aIsDate = $a instanceof \DateTimeInterface;
+            $bIsDate = $b instanceof \DateTimeInterface;
+            if ($isBothDates = ($aIsDate && $bIsDate)) {
+                return $a <=> $b;
+            }
+
+            if ($isThrow) {
+                throw new RuntimeException(
+                    [ 'Values are incomparable', $a, $b ]
+                );
+            }
+
+            return NAN;
+        }
+
+        $aIsResource = is_resource($a);
+        $bIsResource = is_resource($b);
+        if ($isBothResources = ($aIsResource && $bIsResource)) {
+            if ($isThrow) {
+                throw new RuntimeException(
+                    [ 'Values are incomparable', $a, $b ]
+                );
+            }
+
+            return NAN;
+        }
+
+        return $a <=> $b;
+    }
+
+
     /**
      * @param int[]    $results
      * @param callable $fnCmp
      */
-    public function cmp($a, $b, array $results = [ 0 ], $fnCmp = null) : ?int
+    public function compare($a, $b, array $results = [ 0 ], $fnCmp = null) : ?int
     {
         $result = $fnCmp
             ? $fnCmp($a, $b)
