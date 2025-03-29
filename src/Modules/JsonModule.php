@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules;
 
+use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
@@ -229,8 +230,10 @@ class JsonModule
         $flags = $flags ?? $this->static_json_encode_flags();
         $depth = $depth ?? $this->static_json_depth();
 
+        $theType = Lib::type();
+
         if (false
-            || (is_resource($value))
+            || ($theType->resource($var, $value))
             || (is_float($value) && is_nan($value))
             || (! $allowNull && is_null($value))
         ) {

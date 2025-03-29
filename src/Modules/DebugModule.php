@@ -496,7 +496,7 @@ class DebugModule
                 $printableType .= ' # ' . $output[ 'class_id' ];
             }
             if (array_key_exists('id', $output)) {
-                $printableType .= ' &' . $output[ 'id' ];
+                $printableType .= ' @' . $output[ 'id' ];
             }
         } else {
             if (array_key_exists('class', $output)) {
@@ -616,20 +616,23 @@ class DebugModule
         $phpType = gettype($var);
         $phpStrlen = strlen($var);
 
-        $printableValue = null;
+        $printableValue = [];
         if ($withValue) {
             $theStr = Lib::str();
 
             $printableValue = str_replace('"', '\"', $var);
             $printableValue = $theStr->dump_encode($printableValue);
             $printableValue = '"' . $printableValue . '"';
+            $printableValue = [ $printableValue ];
         }
 
         $output = [];
         $output[ 'type' ] = "{$phpType}({$phpStrlen})";
 
         if ($withValue) {
-            $output[ 'value' ] = $printableValue;
+            if (count($printableValue)) {
+                $output[ 'value' ] = $printableValue[ 0 ];
+            }
         }
 
         return $output;
@@ -640,6 +643,8 @@ class DebugModule
         if (! is_object($var)) return null;
 
         $phpType = gettype($var);
+
+        $withValue = $options[ 'with_value' ] ?? false;
 
         $objectClassId = get_class($var);
         $objectClass = $objectClassId;
@@ -660,6 +665,13 @@ class DebugModule
         if ($objectSubtypeStringable) $objectSubtype[] = $objectSubtypeStringable;
         if ($objectSubtypeInvokable) $objectSubtype[] = $objectSubtypeInvokable;
 
+        $printableValue = [];
+        if ($withValue) {
+            if ($var instanceof \DateTimeInterface) {
+                $printableValue = [ '"' . $var->format(DATE_RFC3339_EXTENDED) . '"' ];
+            }
+        }
+
         $output = [];
         $output[ 'type' ] = $phpType;
         if ($objectSubtype) {
@@ -670,6 +682,12 @@ class DebugModule
         $output[ 'class' ] = $objectClass;
         $output[ 'class_id' ] = $objectClassId;
         $output[ 'id' ] = $objectId;
+
+        if ($withValue) {
+            if (count($printableValue)) {
+                $output[ 'value' ] = $printableValue[ 0 ];
+            }
+        }
 
         return $output;
     }
@@ -695,7 +713,7 @@ class DebugModule
         $arrayCopy = $var;
         $arrayCount = count($var);
 
-        $printableValue = null;
+        $printableValue = [];
         if ($withValue) {
             $gen = $theArr->walk_it(
                 $arrayCopy,
@@ -774,13 +792,17 @@ class DebugModule
                     'newline'     => $arrayNewline,
                 ]
             );
+
+            $printableValue = [ $printableValue ];
         }
 
         $output = [];
         $output[ 'type' ] = "{$phpType}({$arrayCount})";
 
         if ($withValue) {
-            $output[ 'value' ] = $printableValue;
+            if (count($printableValue)) {
+                $output[ 'value' ] = $printableValue[ 0 ];
+            }
         }
 
         return $output;
@@ -788,16 +810,21 @@ class DebugModule
 
     private function var_dump_output_resource($var, array $options = [], array &$context = []) : ?array
     {
-        if (! Lib::type()->resource($_var, $var)) {
+        $isResourceOpened = (is_resource($var));
+        $isResourceClosed = ('resource (closed)' === gettype($var));
+        if (! ($isResourceOpened || $isResourceClosed)) {
             return null;
         }
 
-        $phpType = gettype($_var);
+        $phpType = 'resource';
 
-        $resourceType = get_resource_type($_var);
+        $resourceType = $isResourceOpened
+            ? get_resource_type($var)
+            : 'closed';
+
         $resourceId = PHP_VERSION_ID > 80000
-            ? get_resource_id($_var)
-            : (int) $_var;
+            ? get_resource_id($var)
+            : (int) $var;
 
         $output = [];
         $output[ 'type' ] = $phpType;
@@ -1035,8 +1062,27 @@ class DebugModule
             $context
         );
 
+        $hasValue = array_key_exists('value', $output);
+        $isObject = array_key_exists('class', $output);
+
         $content = '';
-        if (array_key_exists('value', $output)) {
+        if ($isObject) {
+            $forceBraces = true;
+
+            if (array_key_exists('type', $output)) {
+                $content .= $output[ 'type' ];
+            }
+            if (array_key_exists('subtype', $output)) {
+                $content .= '(' . $output[ 'subtype' ] . ')';
+            }
+            if (array_key_exists('class', $output)) {
+                $content .= ' # ' . $output[ 'class' ];
+            }
+            if (array_key_exists('value', $output)) {
+                $content .= ' # ' . $output[ 'value' ];
+            }
+
+        } elseif ($hasValue) {
             $content .= $output[ 'value' ];
 
         } else {
@@ -1089,8 +1135,27 @@ class DebugModule
             $context
         );
 
+        $hasValue = array_key_exists('value', $output);
+        $isObject = array_key_exists('class', $output);
+
         $content = '';
-        if (array_key_exists('value', $output)) {
+        if ($isObject) {
+            $forceBraces = true;
+
+            if (array_key_exists('type', $output)) {
+                $content .= $output[ 'type' ];
+            }
+            if (array_key_exists('subtype', $output)) {
+                $content .= '(' . $output[ 'subtype' ] . ')';
+            }
+            if (array_key_exists('class', $output)) {
+                $content .= ' # ' . $output[ 'class' ];
+            }
+            if (array_key_exists('value', $output)) {
+                $content .= ' # ' . $output[ 'value' ];
+            }
+
+        } elseif ($hasValue) {
             $content .= $output[ 'value' ];
 
         } else {
@@ -1326,7 +1391,12 @@ class DebugModule
         $colKeys = [];
         foreach ( $rowKeys as $rowKey => $bool ) {
             if (! is_array($table[ $rowKey ])) {
-                throw new RuntimeException('The `table` should be array of arrays');
+                throw new RuntimeException(
+                    [
+                        'The `table` should be array of arrays',
+                        $table[ $rowKey ],
+                    ]
+                );
             }
 
             foreach ( array_keys($table[ $rowKey ]) as $colKey ) {

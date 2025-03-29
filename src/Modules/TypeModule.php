@@ -5,11 +5,36 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Crypt\Alphabet;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Type\Base\TypeModuleBase;
 
 
 class TypeModule extends TypeModuleBase
 {
+    /**
+     * @param bool|null $result
+     */
+    public function bool(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (is_bool($value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        if ($value === '0') {
+            $result = true;
+
+            return true;
+        }
+
+        $result = (bool) $value;
+
+        return true;
+    }
+
     /**
      * @param bool|null $result
      */
@@ -23,38 +48,40 @@ class TypeModule extends TypeModuleBase
             return true;
         }
 
-        if ($this->int($_value, $value)) {
-            $result = (bool) $_value;
+        if (is_string($value)) {
+            if ($value === '0') {
+                $result = true;
 
-            return true;
-        }
+                return true;
+            }
 
-        if (! $this->string_not_empty($_value, $value)) {
-            return false;
-        }
+            $_value = strtolower($value);
 
-        $_value = strtolower($_value);
-
-        switch ( $_value ):
-            case 'true':
-            case 'y':
-            case 'yes':
-            case 'on':
+            if (
+                ($_value === 'true')
+                || ($_value === 'y')
+                || ($_value === 'yes')
+                || ($_value === 'on')
+            ) {
                 $result = true;
 
                 return true;
 
-            case 'false':
-            case 'n':
-            case 'no':
-            case 'off':
+            } elseif (
+                ($_value === 'false')
+                || ($_value === 'n')
+                || ($_value === 'no')
+                || ($_value === 'off')
+            ) {
                 $result = false;
 
                 return true;
+            }
+        }
 
-        endswitch;
+        $result = (bool) $value;
 
-        return false;
+        return true;
     }
 
 
@@ -203,18 +230,16 @@ class TypeModule extends TypeModuleBase
             }
         }
 
-        if (is_bool($value)) {
-            $result = (int) $value;
-
-            return true;
-        }
-
         $status = $this->string_not_empty($string, $value);
         if (! $status) {
             return false;
         }
 
         if (! is_numeric($string)) {
+            return false;
+        }
+
+        if (in_array($string, [ 'NAN', 'INF', '-INF' ])) {
             return false;
         }
 
@@ -657,8 +682,10 @@ class TypeModule extends TypeModuleBase
 
         if (
             (null === $value)
+            || is_bool($value)
             || is_array($value)
             || is_resource($value)
+            || ('resource (closed)' === gettype($value))
         ) {
             return false;
         }
@@ -1070,7 +1097,21 @@ class TypeModule extends TypeModuleBase
      */
     public function date_interface(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
     {
-        return Lib::php()->type_date_interface($result, $value, $timezoneIfParsed, $formats);
+        $result = null;
+
+        if ($value instanceof \DateTimeInterface) {
+            $result = $value;
+
+            return true;
+        }
+
+        if ($this->date($date, $value, $timezoneIfParsed, $formats)) {
+            $result = $date;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -1081,7 +1122,104 @@ class TypeModule extends TypeModuleBase
      */
     public function date(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
     {
-        return Lib::php()->type_date($result, $value, $timezoneIfParsed, $formats);
+        $result = null;
+
+        $hasTimezoneIfParsed = (null !== $timezoneIfParsed);
+        $hasFormats = (null !== $formats);
+
+        $_timezoneIfParsed = null;
+        if ($hasTimezoneIfParsed) {
+            if (! $this->timezone($_timezoneIfParsed, $timezoneIfParsed)) {
+                throw new LogicException(
+                    [ 'The `timezoneIfParsed` should be null or valid \DateTimeZone', $timezoneIfParsed ]
+                );
+            }
+        }
+
+        if ($value instanceof \DateTime) {
+            $result = $value;
+
+            return true;
+
+        } elseif ($value instanceof \DateTimeImmutable) {
+            $date = \DateTime::createFromImmutable($value);
+
+            $result = $date;
+
+            return true;
+        }
+
+        if ($hasFormats) {
+            $_formats = Lib::php()->to_list($formats);
+
+            foreach ( $_formats as $i => $format ) {
+                if (! (is_string($format) && ('' !== $format))) {
+                    throw new LogicException(
+                        [
+                            'Each of `formats` should be non-empty string',
+                            $format,
+                            $i,
+                        ]
+                    );
+                }
+            }
+        }
+
+        $date = null;
+
+        if ($hasFormats) {
+            $formatFirst = array_shift($_formats);
+
+            foreach ( $formats as $format ) {
+                try {
+                    $date = \DateTime::createFromFormat(
+                        $formatFirst,
+                        $value,
+                        $_timezoneIfParsed
+                    );
+                }
+                catch ( \Throwable $e ) {
+                }
+
+                if ($date) {
+                    $result = $date;
+
+                    return true;
+                }
+            }
+        }
+
+        try {
+            $date = new \DateTime($value, $_timezoneIfParsed);
+
+            $result = $date;
+
+            return true;
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ($hasFormats && count($_formats)) {
+            foreach ( $_formats as $format ) {
+                try {
+                    $date = \DateTime::createFromFormat(
+                        $formatFirst,
+                        $value,
+                        $_timezoneIfParsed
+                    );
+                }
+                catch ( \Throwable $e ) {
+                }
+
+                if ($date) {
+                    $result = $date;
+
+                    break;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1092,7 +1230,104 @@ class TypeModule extends TypeModuleBase
      */
     public function date_immutable(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
     {
-        return Lib::php()->type_date_immutable($result, $value, $timezoneIfParsed, $formats);
+        $result = null;
+
+        $hasTimezoneIfParsed = (null !== $timezoneIfParsed);
+        $hasFormats = (null !== $formats);
+
+        $_timezoneIfParsed = null;
+        if ($hasTimezoneIfParsed) {
+            if (! $this->timezone($_timezoneIfParsed, $timezoneIfParsed)) {
+                throw new LogicException(
+                    [ 'The `timezoneIfParsed` should be null or valid \DateTimeZone', $timezoneIfParsed ]
+                );
+            }
+        }
+
+        if ($value instanceof \DateTimeImmutable) {
+            $result = $value;
+
+            return true;
+
+        } elseif ($value instanceof \DateTime) {
+            $dateImmutable = \DateTimeImmutable::createFromMutable($value);
+
+            $result = $dateImmutable;
+
+            return true;
+        }
+
+        if ($hasFormats) {
+            $_formats = Lib::php()->to_list($formats);
+
+            foreach ( $_formats as $i => $format ) {
+                if (! (is_string($format) && ('' !== $format))) {
+                    throw new LogicException(
+                        [
+                            'Each of `formats` should be non-empty string',
+                            $format,
+                            $i,
+                        ]
+                    );
+                }
+            }
+        }
+
+        $dateImmutable = null;
+
+        if ($hasFormats) {
+            $formatFirst = array_shift($_formats);
+
+            foreach ( $formats as $format ) {
+                try {
+                    $dateImmutable = \DateTimeImmutable::createFromFormat(
+                        $formatFirst,
+                        $value,
+                        $_timezoneIfParsed
+                    );
+                }
+                catch ( \Throwable $e ) {
+                }
+
+                if ($dateImmutable) {
+                    $result = $dateImmutable;
+
+                    return true;
+                }
+            }
+        }
+
+        try {
+            $dateImmutable = new \DateTimeImmutable($value, $_timezoneIfParsed);
+
+            $result = $dateImmutable;
+
+            return true;
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ($hasFormats && count($_formats)) {
+            foreach ( $_formats as $format ) {
+                try {
+                    $dateImmutable = \DateTimeImmutable::createFromFormat(
+                        $formatFirst,
+                        $value,
+                        $_timezoneIfParsed
+                    );
+                }
+                catch ( \Throwable $e ) {
+                }
+
+                if ($dateImmutable) {
+                    $result = $dateImmutable;
+
+                    break;
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1100,7 +1335,25 @@ class TypeModule extends TypeModuleBase
      */
     public function timezone(&$result, $value) : bool
     {
-        return Lib::php()->type_timezone($result, $value);
+        $result = null;
+
+        if ($value instanceof \DateTimeZone) {
+            $result = $value;
+
+            return true;
+        }
+
+        try {
+            $timezone = new \DateTimeZone($value);
+
+            $result = $timezone;
+
+            return true;
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        return false;
     }
 
     /**
@@ -1108,7 +1361,25 @@ class TypeModule extends TypeModuleBase
      */
     public function interval(&$result, $value) : bool
     {
-        return Lib::php()->type_interval($result, $value);
+        $result = null;
+
+        if ($value instanceof \DateInterval) {
+            $result = $value;
+
+            return true;
+        }
+
+        try {
+            $interval = new \DateInterval($value);
+
+            $result = $interval;
+
+            return true;
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        return false;
     }
 
 
@@ -1313,9 +1584,25 @@ class TypeModule extends TypeModuleBase
     /**
      * @param callable-string|null $result
      */
-    public function callable_string_function(&$result, $value, $newScope = 'static') : bool
+    public function callable_string_function(&$result, $value) : bool
     {
-        return Lib::php()->type_callable_string_function($result, $value, $newScope);
+        return Lib::php()->type_callable_string_function($result, $value);
+    }
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function callable_string_function_internal(&$result, $value) : bool
+    {
+        return Lib::php()->type_callable_string_function_internal($result, $value);
+    }
+
+    /**
+     * @param callable-string|null $result
+     */
+    public function callable_string_function_non_internal(&$result, $value) : bool
+    {
+        return Lib::php()->type_callable_string_function_non_internal($result, $value);
     }
 
     /**

@@ -26,7 +26,9 @@ class TestModule
             [ $h ] = $stdoutResource;
 
             if (null !== $h) {
-                if (! is_resource($stdoutResource)) {
+                $theType = Lib::type();
+
+                if (! $theType->resource_opened($var, $stdoutResource)) {
                     throw new LogicException(
                         [ 'The `resource` must be opened resource', $stdoutResource ]
                     );

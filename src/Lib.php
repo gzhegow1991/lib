@@ -10,6 +10,7 @@ use Gzhegow\Lib\Modules\PhpModule;
 use Gzhegow\Lib\Modules\StrModule;
 use Gzhegow\Lib\Modules\UrlModule;
 use Gzhegow\Lib\Modules\ArrModule;
+use Gzhegow\Lib\Modules\CmpModule;
 use Gzhegow\Lib\Modules\JsonModule;
 use Gzhegow\Lib\Modules\HttpModule;
 use Gzhegow\Lib\Modules\TestModule;
@@ -74,6 +75,18 @@ class Lib
         return static::$modules[ $key ] = $instance
             ?? static::$modules[ $key ]
             ?? new CliModule();
+    }
+
+    /**
+     * @return CmpModule
+     */
+    public static function cmp(CmpModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new CmpModule();
     }
 
     /**

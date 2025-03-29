@@ -3,54 +3,16 @@
 namespace Gzhegow\Lib\Modules\Type\Base;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Modules\Type\Nil;
 
 
 if (! defined('_TYPE_NIL')) define('_TYPE_NIL', '{N}');
-if (! defined('_TYPE_UNDEFINED')) define('_TYPE_UNDEFINED', NAN);
 
 abstract class TypeModuleBase
 {
-    const TYPE_NIL       = _TYPE_NIL;
-    const TYPE_UNDEFINED = _TYPE_UNDEFINED;
-
-
-    /**
-     * @var callable
-     */
-    protected $fnIsUndefined;
-
-
-    public function static_fn_is_undefined($fnIsUndefined = null) // : ?mixed
-    {
-        if (null !== $fnIsUndefined) {
-            $last = $this->fnIsUndefined;
-
-            if (! is_callable($fnIsUndefined)) {
-                throw new LogicException(
-                    'The `fnIsUndefined` should be callable'
-                );
-            }
-
-            $this->fnIsUndefined = $fnIsUndefined;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->fnIsUndefined;
-
-        return $result;
-    }
-
-
     public function the_nil()
     {
-        return _TYPE_NIL;
-    }
-
-    public function the_undefined()
-    {
-        return _TYPE_UNDEFINED;
+        return new Nil();
     }
 
 
@@ -107,11 +69,21 @@ abstract class TypeModuleBase
     /**
      * > Специальный тип-синоним NULL, переданный пользователем через API, например '{N}'
      * > в случаях, когда NULL интерпретируется как "не трогать", а NIL как "очистить"
+     *
+     * > NAN не равен ничему даже самому себе
+     * > NIL равен только самому себе
+     * > NULL означает пустоту и им можно заменить значения '', [], `resource (closed)`, NIL, но нельзя заменить NAN
      */
     public function is_nil($value) : bool
     {
-        if ($this->the_nil() === $value) {
+        if ($value instanceof Nil) {
             return true;
+        }
+
+        if (is_string($value)) {
+            if ($value === (string) $this->the_nil()) {
+                return true;
+            }
         }
 
         return false;
@@ -119,41 +91,7 @@ abstract class TypeModuleBase
 
     public function is_not_nil($value) : bool
     {
-        $result = null;
-
-        if ($this->the_nil() === $value) {
-            return false;
-        }
-
-        $result = $value;
-
-        return true;
-    }
-
-
-    /**
-     * > Специальный тип, который значит, что свойство объекта ещё не имеет установленного значения (если NULL - это допустимое значение)
-     * > Можно (и лучше) использовать пустой массив, если нулевой ключ есть - то передали, иначе - не передали
-     */
-    public function is_undefined($value) : bool
-    {
-        $fn = $this->static_fn_is_undefined();
-
-        if (null !== $fn) {
-            return $fn($value);
-        }
-
-        return $this->fn_is_undefined($value);
-    }
-
-    public function is_not_undefined($value) : bool
-    {
-        return ! $this->is_undefined($value);
-    }
-
-    protected function fn_is_undefined($value) : bool
-    {
-        return is_float($value) && is_nan($value);
+        return ! $this->is_nil($value);
     }
 
 
@@ -162,17 +100,18 @@ abstract class TypeModuleBase
      */
     public function is_nullable($value) : bool
     {
-        // > EMPTY STRING is not nullable
-        if ('' === $value) {
-            return false;
-        }
+        // > NAN is not nullable
+        // > EMPTY ARRAY is not nullable
 
-        if (false
+        if (
             // > NULL is nullable
-            || (null === $value)
+            (null === $value)
             //
-            // > NAN is nullable
-            || $this->is_nan($value)
+            // > EMPTY STRING is nullable
+            || ('' === $value)
+            //
+            // > CLOSED RESOURCE is nullable
+            || ('resource (closed)' === gettype($value))
             //
             // > NIL is nullable
             || $this->is_nil($value)
@@ -185,11 +124,7 @@ abstract class TypeModuleBase
 
     public function is_not_nullable($value) : bool
     {
-        if ($this->is_nullable($value)) {
-            return false;
-        }
-
-        return true;
+        return ! $this->is_nullable($value);
     }
 
 
@@ -198,15 +133,22 @@ abstract class TypeModuleBase
      */
     public function is_blank($value) : bool
     {
-        $result = null;
+        // > NAN is not blank
+        // > NIL is not blank
 
-        if ('' === $value) {
+        if (
+            // > NULL is blank
+            (null === $value)
+            //
             // > EMPTY STRING is blank
-            return true;
-        }
-
-        if ($this->is_nullable($value)) {
-            // > NULLABLE is blank
+            || ('' === $value)
+            //
+            // > EMPTY ARRAY is blank
+            || ([] === $value)
+            //
+            // > CLOSED RESOURCE is blank
+            || ('resource (closed)' === gettype($value))
+        ) {
             return true;
         }
 
@@ -214,23 +156,19 @@ abstract class TypeModuleBase
             // > BOOLEAN is not blank
             // > INTEGER is not blank
             // > FLOAT is not blank
-            // > STRING (including '0') is not blank
+            // > STRING (including '0', excluding '') is not blank
 
             return false;
         }
 
-        if (empty($value)) {
-            // > EMPTY ARRAY is blank
-
-            return true;
-        }
-
         if (is_object($value)) {
             if (null === ($cnt = Lib::php()->count($value))) {
+                // > NON-COUNTABLE is not blank
                 return false;
             }
 
             if (0 === $cnt) {
+                // > COUNTABLE w/ ZERO SIZE is blank
                 return true;
             }
         }
@@ -240,11 +178,7 @@ abstract class TypeModuleBase
 
     public function is_not_blank($value) : bool
     {
-        if ($this->is_blank($value)) {
-            return false;
-        }
-
-        return true;
+        return ! $this->is_blank($value);
     }
 
 
@@ -253,17 +187,31 @@ abstract class TypeModuleBase
      */
     public function is_passed($value) : bool
     {
-        if ($this->is_nil($value)) {
-            // > NIL is passed
-            return true;
+        // > NIL is passed
+        // > EMPTY ARRAY is passed
+        // > EMPTY COUNTABLE is passed
+
+        if (null === $value) {
+            // > NULL is not passed
+            return false;
         }
 
-        if (! $this->is_nullable($value)) {
-            // > NULLABLE is not passed (except NIL)
-            return true;
+        if ('' === $value) {
+            // > EMPTY STRING is not passed
+            return false;
         }
 
-        return false;
+        if (is_float($value) && is_nan($value)) {
+            // > NAN is not passed
+            return false;
+        }
+
+        if ('resource (closed)' === gettype($value)) {
+            // > CLOSED RESOURCE is not passed
+            return false;
+        }
+
+        return true;
     }
 
     public function is_not_passed($value) : bool

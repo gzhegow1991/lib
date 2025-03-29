@@ -740,6 +740,83 @@ _assert_stdout($fn, [], '
 
 
 // >>> TEST
+// > тесты CmpModule
+$fn = function () {
+    _print('[ CmpModule ]');
+    echo PHP_EOL;
+
+    $resource = STDOUT;
+    $resourceClosed = fopen('php://memory', 'w');
+    fclose($resourceClosed);
+
+    $values = [
+        NAN,
+        \Gzhegow\Lib\Lib::type()->the_nil(),
+        null,
+        false,
+        true,
+        0,
+        1,
+        PHP_INT_MAX,
+        0.0,
+        1.0,
+        1.1,
+        1e1,
+        PHP_FLOAT_MAX,
+        INF,
+        '',
+        'NAN',
+        (string) \Gzhegow\Lib\Lib::type()->the_nil(),
+        'a',
+        'ab',
+        '0',
+        '1',
+        '0.0',
+        '1.0',
+        '1.1',
+        '1e5',
+        'INF',
+        $resource,
+        $resourceClosed,
+        [],
+        [ '' ],
+        [ 'a' ],
+        (object) [],
+        (object) [ '' ],
+        (object) [ 'a' ],
+        new \DateTime('1970-01-01 00:00:00'),
+        new \DateTime('1970-01-01 00:00:01'),
+        (new \DateTime('1970-01-01 00:00:01'))->modify('+500ms'),
+    ];
+
+    $theCmp = \Gzhegow\Lib\Lib::cmp();
+    $theDebug = \Gzhegow\Lib\Lib::debug();
+
+    $table = [];
+    foreach ( $values as $i => $v ) {
+        $left = $theDebug->value($v);
+
+        foreach ( $values as $ii => $vv ) {
+            $right = $theDebug->value($vv);
+
+            $cmp = $theCmp->compare($v, $vv, _CMP_MODE_ERROR_NAN);
+
+            $table[ $row = $left ][ $col = $right ] = $cmp;
+        }
+    }
+
+    // \Gzhegow\Lib\Lib::debug()->print_table($table);
+    echo md5(serialize($table)) . PHP_EOL;
+    unset($table);
+};
+_assert_stdout($fn, [], '
+"[ CmpModule ]"
+
+cc6d8eac3a32d5486669f8ec30fb446b
+');
+
+
+// >>> TEST
 // > тесты CryptModule
 $fn = function () {
     _print('[ CryptModule ]');
@@ -2390,74 +2467,74 @@ $fn = function () {
 
     $result = null;
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date($result, $from = 'now midnight');
+    $status = \Gzhegow\Lib\Lib::type()->date($result, $from = 'now midnight');
     $date = $result;
     $dateAtom = $result->format(DATE_ATOM);
     _print($status, $result);
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date($result, $from = $date, 'UTC');
+    $status = \Gzhegow\Lib\Lib::type()->date($result, $from = $date, 'UTC');
     $dateAtom2 = $result->format(DATE_ATOM);
     _print($status, $result, $dateAtom === $dateAtom2);
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date($result, $from = $dateAtom, 'UTC');
+    $status = \Gzhegow\Lib\Lib::type()->date($result, $from = $dateAtom, 'UTC');
     $dateAtom3 = $result->format(DATE_ATOM);
     _print($status, $result, $dateAtom === $dateAtom3);
     echo PHP_EOL;
 
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date_immutable($result, $from = 'now midnight');
+    $status = \Gzhegow\Lib\Lib::type()->date_immutable($result, $from = 'now midnight');
     $date = $result;
     $dateAtom = $result->format(DATE_ATOM);
     _print($status, $result);
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date_immutable($result, $from = $date, 'UTC');
+    $status = \Gzhegow\Lib\Lib::type()->date_immutable($result, $from = $date, 'UTC');
     $dateAtom2 = $result->format(DATE_ATOM);
     _print($status, $result, $dateAtom === $dateAtom2);
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date_immutable($result, $from = $dateAtom, 'UTC');
+    $status = \Gzhegow\Lib\Lib::type()->date_immutable($result, $from = $dateAtom, 'UTC');
     $dateAtom3 = $result->format(DATE_ATOM);
     _print($status, $result, $dateAtom === $dateAtom3);
     echo PHP_EOL;
 
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date($result, $from = 'now midnight');
+    $status = \Gzhegow\Lib\Lib::type()->date($result, $from = 'now midnight');
     $date = $result;
     $dateAtom = $result->format(DATE_ATOM);
     _print($status, $result);
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date_immutable($result, $from = $date, 'UTC');
+    $status = \Gzhegow\Lib\Lib::type()->date_immutable($result, $from = $date, 'UTC');
     $date2 = $result;
     $dateAtom2 = $result->format(DATE_ATOM);
     _print($status, $result, $dateAtom === $dateAtom2);
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date_interface($result, $from = $date, 'UTC');
+    $status = \Gzhegow\Lib\Lib::type()->date_interface($result, $from = $date, 'UTC');
     $dateAtom3 = $result->format(DATE_ATOM);
     _print($status, $result, $dateAtom === $dateAtom3);
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date_interface($result, $from = $date2, 'UTC');
+    $status = \Gzhegow\Lib\Lib::type()->date_interface($result, $from = $date2, 'UTC');
     $dateAtom4 = $result->format(DATE_ATOM);
     _print($status, $result, $dateAtom === $dateAtom4);
     echo PHP_EOL;
 
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date($result, 'now midnight');
+    $status = \Gzhegow\Lib\Lib::type()->date($result, 'now midnight');
     $dateAtom = $result->format(DATE_ATOM);
     _print($status, $result);
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date($result, 'now midnight', 'UTC');
+    $status = \Gzhegow\Lib\Lib::type()->date($result, 'now midnight', 'UTC');
     $dateAtom2 = $result->format(DATE_ATOM);
     _print($status, $result, $dateAtom !== $dateAtom2);
     echo PHP_EOL;
 
 
-    $status = \Gzhegow\Lib\Lib::php()->type_date($result, '1970-01-01 12:34:56');
-    _print($status, $result, $result->format(DATE_RFC3339_EXTENDED));
-    $status = \Gzhegow\Lib\Lib::php()->type_date($result, '1970-01-01 12:34:56.7890');
-    _print($status, $result, $result->format(DATE_RFC3339_EXTENDED));
-    $status = \Gzhegow\Lib\Lib::php()->type_date($result, '1970-01-01 12:34:56.789000');
-    _print($status, $result, $result->format(DATE_RFC3339_EXTENDED));
-    $status = \Gzhegow\Lib\Lib::php()->type_date($result, '1970-01-01 12:34:56.789000', 'UTC');
-    _print($status, $result, $result->format(DATE_RFC3339_EXTENDED));
+    $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 12:34:56');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 12:34:56.7890');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 12:34:56.789000');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 12:34:56.789000', 'UTC');
+    _print($status, $result);
     echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
@@ -2478,26 +2555,26 @@ d91da25286bd7e000367a9758699e0ca
 cb145079faba3ab6cf451fe9116389ba
 3c3e6efcd8ead6feb5fde9b2d9edc105
 
-TRUE | { object # DateTime }
-TRUE | { object # DateTime } | TRUE
-TRUE | { object # DateTime } | TRUE
+TRUE | { object # DateTime # "2025-03-29T00:00:00.000+03:00" }
+TRUE | { object # DateTime # "2025-03-29T00:00:00.000+03:00" } | TRUE
+TRUE | { object # DateTime # "2025-03-29T00:00:00.000+03:00" } | TRUE
 
-TRUE | { object # DateTimeImmutable }
-TRUE | { object # DateTimeImmutable } | TRUE
-TRUE | { object # DateTimeImmutable } | TRUE
+TRUE | { object # DateTimeImmutable # "2025-03-29T00:00:00.000+03:00" }
+TRUE | { object # DateTimeImmutable # "2025-03-29T00:00:00.000+03:00" } | TRUE
+TRUE | { object # DateTimeImmutable # "2025-03-29T00:00:00.000+03:00" } | TRUE
 
-TRUE | { object # DateTime }
-TRUE | { object # DateTimeImmutable } | TRUE
-TRUE | { object # DateTime } | TRUE
-TRUE | { object # DateTimeImmutable } | TRUE
+TRUE | { object # DateTime # "2025-03-29T00:00:00.000+03:00" }
+TRUE | { object # DateTimeImmutable # "2025-03-29T00:00:00.000+03:00" } | TRUE
+TRUE | { object # DateTime # "2025-03-29T00:00:00.000+03:00" } | TRUE
+TRUE | { object # DateTimeImmutable # "2025-03-29T00:00:00.000+03:00" } | TRUE
 
-TRUE | { object # DateTime }
-TRUE | { object # DateTime } | TRUE
+TRUE | { object # DateTime # "2025-03-29T00:00:00.000+03:00" }
+TRUE | { object # DateTime # "2025-03-29T00:00:00.000+00:00" } | TRUE
 
-TRUE | { object # DateTime } | "1970-01-01T12:34:56.000+03:00"
-TRUE | { object # DateTime } | "1970-01-01T12:34:56.789+03:00"
-TRUE | { object # DateTime } | "1970-01-01T12:34:56.789+03:00"
-TRUE | { object # DateTime } | "1970-01-01T12:34:56.789+00:00"
+TRUE | { object # DateTime # "1970-01-01T12:34:56.000+03:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.789+03:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.789+03:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.789+00:00" }
 ');
 
 

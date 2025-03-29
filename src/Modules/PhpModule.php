@@ -16,17 +16,6 @@ use Gzhegow\Lib\Modules\Php\DebugBacktracer\DebugBacktracer;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
 
-if (! defined('_PHP_CMP_MODE_THROW')) define('_PHP_CMP_MODE_THROW', 1 << 0);
-if (! defined('_PHP_CMP_MODE_STRICT')) define('_PHP_CMP_MODE_STRICT', 1 << 1);
-if (! defined('_PHP_CMP_MODE_STRINGS_STRCMP')) define('_PHP_CMP_MODE_STRINGS_STRCMP', 1 << 2);
-if (! defined('_PHP_CMP_MODE_STRINGS_STRCASECMP')) define('_PHP_CMP_MODE_STRINGS_STRCASECMP', 1 << 3);
-if (! defined('_PHP_CMP_MODE_STRINGS_STRNATCMP')) define('_PHP_CMP_MODE_STRINGS_STRNATCMP', 1 << 4);
-if (! defined('_PHP_CMP_MODE_STRINGS_STRNATCASECMP')) define('_PHP_CMP_MODE_STRINGS_STRNATCASECMP', 1 << 5);
-if (! defined('_PHP_CMP_MODE_STRINGS_BY_LENGTH')) define('_PHP_CMP_MODE_STRINGS_BY_LENGTH', 1 << 6);
-if (! defined('_PHP_CMP_MODE_STRINGS_BY_SIZE')) define('_PHP_CMP_MODE_STRINGS_BY_SIZE', 1 << 7);
-if (! defined('_PHP_CMP_MODE_STRINGS_BY_VALUE')) define('_PHP_CMP_MODE_STRINGS_BY_VALUE', 1 << 8);
-if (! defined('_PHP_CMP_MODE_ARRAYS_BY_VALUE')) define('_PHP_CMP_MODE_ARRAYS_BY_VALUE', 1 << 9);
-
 class PhpModule
 {
     /**
@@ -46,300 +35,6 @@ class PhpModule
             ?? $callableParser
             ?? $this->callableParser
             ?? new CallableParser();
-    }
-
-
-    /**
-     * @param \DateTimeInterface|null   $result
-     *
-     * @param string|\DateTimeZone|null $timezoneIfParsed
-     * @param string|string[]|null      $formats
-     */
-    public function type_date_interface(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
-    {
-        $result = null;
-
-        if ($value instanceof \DateTimeInterface) {
-            $result = $value;
-
-            return true;
-        }
-
-        if ($this->type_date($date, $value, $timezoneIfParsed, $formats)) {
-            $result = $date;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \DateTime|null            $result
-     *
-     * @param string|\DateTimeZone|null $timezoneIfParsed
-     * @param string|string[]|null      $formats
-     */
-    public function type_date(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
-    {
-        $result = null;
-
-        $hasTimezoneIfParsed = (null !== $timezoneIfParsed);
-        $hasFormats = (null !== $formats);
-
-        $_timezoneIfParsed = null;
-        if ($hasTimezoneIfParsed) {
-            if (! $this->type_timezone($_timezoneIfParsed, $timezoneIfParsed)) {
-                throw new LogicException(
-                    [ 'The `timezoneIfParsed` should be null or valid \DateTimeZone', $timezoneIfParsed ]
-                );
-            }
-        }
-
-        if ($value instanceof \DateTime) {
-            $result = $value;
-
-            return true;
-
-        } elseif ($value instanceof \DateTimeImmutable) {
-            $date = \DateTime::createFromImmutable($value);
-
-            $result = $date;
-
-            return true;
-        }
-
-        if ($hasFormats) {
-            $_formats = $this->to_list($formats);
-
-            foreach ( $_formats as $i => $format ) {
-                if (! (is_string($format) && ('' !== $format))) {
-                    throw new LogicException(
-                        [
-                            'Each of `formats` should be non-empty string',
-                            $format,
-                            $i,
-                        ]
-                    );
-                }
-            }
-        }
-
-        $date = null;
-
-        if ($hasFormats) {
-            $formatFirst = array_shift($_formats);
-
-            foreach ( $formats as $format ) {
-                try {
-                    $date = \DateTime::createFromFormat(
-                        $formatFirst,
-                        $value,
-                        $_timezoneIfParsed
-                    );
-                }
-                catch ( \Throwable $e ) {
-                }
-
-                if ($date) {
-                    $result = $date;
-
-                    return true;
-                }
-            }
-        }
-
-        try {
-            $date = new \DateTime($value, $_timezoneIfParsed);
-
-            $result = $date;
-
-            return true;
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        if ($hasFormats && count($_formats)) {
-            foreach ( $_formats as $format ) {
-                try {
-                    $date = \DateTime::createFromFormat(
-                        $formatFirst,
-                        $value,
-                        $_timezoneIfParsed
-                    );
-                }
-                catch ( \Throwable $e ) {
-                }
-
-                if ($date) {
-                    $result = $date;
-
-                    break;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \DateTimeImmutable|null   $result
-     *
-     * @param string|\DateTimeZone|null $timezoneIfParsed
-     * @param string|string[]|null      $formats
-     */
-    public function type_date_immutable(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
-    {
-        $result = null;
-
-        $hasTimezoneIfParsed = (null !== $timezoneIfParsed);
-        $hasFormats = (null !== $formats);
-
-        $_timezoneIfParsed = null;
-        if ($hasTimezoneIfParsed) {
-            if (! $this->type_timezone($_timezoneIfParsed, $timezoneIfParsed)) {
-                throw new LogicException(
-                    [ 'The `timezoneIfParsed` should be null or valid \DateTimeZone', $timezoneIfParsed ]
-                );
-            }
-        }
-
-        if ($value instanceof \DateTimeImmutable) {
-            $result = $value;
-
-            return true;
-
-        } elseif ($value instanceof \DateTime) {
-            $dateImmutable = \DateTimeImmutable::createFromMutable($value);
-
-            $result = $dateImmutable;
-
-            return true;
-        }
-
-        if ($hasFormats) {
-            $_formats = $this->to_list($formats);
-
-            foreach ( $_formats as $i => $format ) {
-                if (! (is_string($format) && ('' !== $format))) {
-                    throw new LogicException(
-                        [
-                            'Each of `formats` should be non-empty string',
-                            $format,
-                            $i,
-                        ]
-                    );
-                }
-            }
-        }
-
-        $dateImmutable = null;
-
-        if ($hasFormats) {
-            $formatFirst = array_shift($_formats);
-
-            foreach ( $formats as $format ) {
-                try {
-                    $dateImmutable = \DateTimeImmutable::createFromFormat(
-                        $formatFirst,
-                        $value,
-                        $_timezoneIfParsed
-                    );
-                }
-                catch ( \Throwable $e ) {
-                }
-
-                if ($dateImmutable) {
-                    $result = $dateImmutable;
-
-                    return true;
-                }
-            }
-        }
-
-        try {
-            $dateImmutable = new \DateTimeImmutable($value, $_timezoneIfParsed);
-
-            $result = $dateImmutable;
-
-            return true;
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        if ($hasFormats && count($_formats)) {
-            foreach ( $_formats as $format ) {
-                try {
-                    $dateImmutable = \DateTimeImmutable::createFromFormat(
-                        $formatFirst,
-                        $value,
-                        $_timezoneIfParsed
-                    );
-                }
-                catch ( \Throwable $e ) {
-                }
-
-                if ($dateImmutable) {
-                    $result = $dateImmutable;
-
-                    break;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \DateTimeZone|null $result
-     */
-    public function type_timezone(&$result, $value) : bool
-    {
-        $result = null;
-
-        if ($value instanceof \DateTimeZone) {
-            $result = $value;
-
-            return true;
-        }
-
-        try {
-            $timezone = new \DateTimeZone($value);
-
-            $result = $timezone;
-
-            return true;
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \DateInterval|null $result
-     */
-    public function type_interval(&$result, $value) : bool
-    {
-        $result = null;
-
-        if ($value instanceof \DateInterval) {
-            $result = $value;
-
-            return true;
-        }
-
-        try {
-            $interval = new \DateInterval($value);
-
-            $result = $interval;
-
-            return true;
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        return false;
     }
 
 
@@ -525,9 +220,9 @@ class PhpModule
     {
         $result = null;
 
-        if (false
-            || is_resource($value)
-            || (gettype($value) === 'resource (closed)')
+        if (
+            is_resource($value)
+            || ('resource (closed)' === gettype($value))
         ) {
             $result = $value;
 
@@ -778,7 +473,7 @@ class PhpModule
                 || is_array($value)
                 || is_object($value)
                 || is_resource($value)
-                || (gettype($value) === 'resource (closed)')
+                || ('resource (closed)' === gettype($value))
             ) {
                 throw new LogicException(
                     [
@@ -804,7 +499,7 @@ class PhpModule
                 || is_array($value)
                 || is_object($value)
                 || is_resource($value)
-                || (gettype($value) === 'resource (closed)')
+                || ('resource (closed)' === gettype($value))
             ) {
                 throw new LogicException(
                     [
@@ -830,7 +525,7 @@ class PhpModule
                 || is_array($value)
                 || is_object($value)
                 || is_resource($value)
-                || (gettype($value) === 'resource (closed)')
+                || ('resource (closed)' === gettype($value))
             ) {
                 throw new LogicException(
                     [
@@ -948,197 +643,6 @@ class PhpModule
     }
 
 
-    public function eq($a, $b, int $flags = null) : bool
-    {
-        $isStrict = ($flags & _PHP_CMP_MODE_STRICT);
-
-        $result = $this->cmp($a, $b, $flags);
-
-        if (is_float($result) && is_nan($result)) {
-            return $isStrict
-                ? ($a === $b)
-                : ($a == $b);
-        }
-
-        return $result === 0;
-    }
-
-    /**
-     * @return int|float
-     */
-    public function cmp($a, $b, int $flags = null) // : int|float
-    {
-        $isThrow = $flags & _PHP_CMP_MODE_THROW;
-
-        if ($isStrict = ($flags & _PHP_CMP_MODE_STRICT)) {
-            if (gettype($a) !== gettype($b)) {
-                if ($isThrow) {
-                    throw new RuntimeException(
-                        [ 'Values are incomparable', $a, $b ]
-                    );
-                }
-
-                return NAN;
-            }
-        }
-
-        $aIsNumeric = is_numeric($a);
-        $bIsNumeric = is_numeric($b);
-        if ($isAtLeastOneNumeric = ($aIsNumeric || $bIsNumeric)) {
-            $theType = $theType ?? Lib::type();
-
-            $aStatus = $theType->num($aNum, $a);
-            $bStatus = $theType->num($bNum, $b);
-
-            if ($aStatus && $bStatus) {
-                return $aNum <=> $bNum;
-            }
-        }
-
-        $aIsString = is_string($a);
-        $bIsString = is_string($b);
-        if ($isAtLeastOneString = ($aIsString || $bIsString)) {
-            $theType = $theType ?? Lib::type();
-
-            $aStatus = $theType->string($aString, $a);
-            $bStatus = $theType->string($bString, $b);
-
-            if (! ($aStatus && $bStatus)) {
-                if ($isThrow) {
-                    throw new RuntimeException(
-                        [ 'Values are incomparable', $a, $b ]
-                    );
-                }
-
-                return NAN;
-            }
-
-            $result = null;
-
-            if ($aString === $bString) {
-                return 0;
-            }
-
-            if ($isStringsByLength = ($flags & _PHP_CMP_MODE_STRINGS_BY_LENGTH)) {
-                $theStr = Lib::str();
-                $result = ($theStr->strlen($aString) <=> $theStr->strlen($bString));
-
-            } elseif ($isStringsBySize = ($flags & _PHP_CMP_MODE_STRINGS_BY_SIZE)) {
-                $result = (strlen($aString) <=> strlen($bString));
-            }
-
-            if (null !== $result) {
-                if ($result !== 0) {
-                    return $result;
-                }
-            }
-
-            if (false
-                || ($isStrcmp = ($flags & _PHP_CMP_MODE_STRINGS_STRCMP))
-                || ($isStrcasecmp = ($flags & _PHP_CMP_MODE_STRINGS_STRCASECMP))
-                || ($isStrnatcmp = ($flags & _PHP_CMP_MODE_STRINGS_STRNATCMP))
-                || ($isStrnatcasecmp = ($flags & _PHP_CMP_MODE_STRINGS_STRNATCASECMP))
-                || ($isStringsByValue = ($flags & _PHP_CMP_MODE_STRINGS_BY_VALUE))
-            ) {
-                $result = null
-                    ?? (! empty($isStrnatcasecmp) ? strnatcasecmp($aString, $bString) : null)
-                    ?? (! empty($isStrcasecmp) ? strcasecmp($aString, $bString) : null)
-                    ?? (! empty($isStrnatcmp) ? strnatcmp($aString, $bString) : null)
-                    ?? (! empty($isStrcmp) ? strcmp($aString, $bString) : null)
-                    ?? (! empty($isStringsByValue) ? ($aString <=> $bString) : null);
-            }
-
-            if (null === $result) {
-                if ($isThrow) {
-                    throw new RuntimeException(
-                        [ 'Values are incomparable', $a, $b ]
-                    );
-                }
-
-                return NAN;
-            }
-
-            return $result;
-        }
-
-        $aIsArray = is_array($a);
-        $bIsArray = is_array($b);
-        if ($isBothArrays = ($aIsArray && $bIsArray)) {
-            if ($isArraysByValue = ($flags & _PHP_CMP_MODE_ARRAYS_BY_VALUE)) {
-                return $a <=> $b;
-
-            } else {
-                $result = count($a) <=> count($b);
-
-                if (false
-                    || (0 !== $result)
-                    || ($a === $b)
-                ) {
-                    return $result;
-                }
-
-                if ($isThrow) {
-                    throw new RuntimeException(
-                        [ 'Values are incomparable', $a, $b ]
-                    );
-                }
-
-                return NAN;
-            }
-        }
-
-        $aIsObject = is_object($a);
-        $bIsObject = is_object($b);
-        if ($isBothObjects = ($aIsObject && $bIsObject)) {
-            $aIsDate = $a instanceof \DateTimeInterface;
-            $bIsDate = $b instanceof \DateTimeInterface;
-            if ($isBothDates = ($aIsDate && $bIsDate)) {
-                return $a <=> $b;
-            }
-
-            if ($isThrow) {
-                throw new RuntimeException(
-                    [ 'Values are incomparable', $a, $b ]
-                );
-            }
-
-            return NAN;
-        }
-
-        $aIsResource = is_resource($a);
-        $bIsResource = is_resource($b);
-        if ($isBothResources = ($aIsResource && $bIsResource)) {
-            if ($isThrow) {
-                throw new RuntimeException(
-                    [ 'Values are incomparable', $a, $b ]
-                );
-            }
-
-            return NAN;
-        }
-
-        return $a <=> $b;
-    }
-
-
-    /**
-     * @param int[]    $results
-     * @param callable $fnCmp
-     */
-    public function compare($a, $b, array $results = [ 0 ], $fnCmp = null) : ?int
-    {
-        $result = $fnCmp
-            ? $fnCmp($a, $b)
-            : ($a <=> $b);
-
-        if (! in_array($result, $results, true)) {
-            return null;
-        }
-
-        return $result;
-    }
-
-
     public function debug_backtrace(int $options = null, int $limit = null) : DebugBacktracer
     {
         $instance = new DebugBacktracer();
@@ -1167,7 +671,7 @@ class PhpModule
 
             $msec = $date->format('u');
             $msec = substr($msec, 0, 6);
-            $msec = str_pad($date->format('u'), 6, '0');
+            $msec = str_pad($msec, 6, '0');
 
         } else {
             throw new LogicException(

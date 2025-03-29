@@ -105,6 +105,8 @@ trait HasTraceOverrideTrait
             return $traceAsString;
         }
 
+        $theType = Lib::type();
+
         $rtn = "";
         $count = 0;
         foreach ( $this->getTraceOverride($fileRoot) as $frame ) {
@@ -129,7 +131,7 @@ trait HasTraceOverrideTrait
                     } elseif (is_object($arg)) {
                         $args[] = get_class($arg);
 
-                    } elseif (is_resource($arg)) {
+                    } elseif ($theType->resource($var, $arg)) {
                         $args[] = get_resource_type($arg);
 
                     } else {
