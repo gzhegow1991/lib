@@ -112,13 +112,13 @@ $fn = function () {
 
             usleep(1e4);
 
-            $theDebug->benchmark($tt);
+            $theDebug->benchmark($tt, true);
         }
 
-        $theDebug->benchmark($t);
+        $theDebug->benchmark($t, true);
     }
 
-    $theDebug->benchmark('tag');
+    $theDebug->benchmark('tag', true);
 
     $report = $theDebug->benchmark();
 

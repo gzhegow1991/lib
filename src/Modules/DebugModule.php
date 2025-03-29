@@ -1644,7 +1644,7 @@ class DebugModule
     /**
      * @return array|object
      */
-    public function benchmark(string $tag = null)
+    public function benchmark(string $tag = null, bool $isEnd = false)
     {
         $mt = microtime(true);
 
@@ -1680,14 +1680,20 @@ class DebugModule
             return $last->report;
 
         } else {
-            if (isset($current->microtime[ $tag ])) {
-                $current->report[ $tag ][] = $mt - $current->microtime[ $tag ];
-
-            } else {
+            if (! isset($current->report[ $tag ])) {
                 $current->report[ $tag ] = [];
             }
 
-            $current->microtime[ $tag ] = $mt;
+            if (isset($current->microtime[ $tag ])) {
+                $current->report[ $tag ][] = $mt - $current->microtime[ $tag ];
+            }
+
+            if ($isEnd) {
+                unset($current->microtime[ $tag ]);
+
+            } else {
+                $current->microtime[ $tag ] = $mt;
+            }
 
             return $current;
         }
