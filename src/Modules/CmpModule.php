@@ -796,8 +796,8 @@ class CmpModule
 
             $aStatus = $isStringA;
             $bStatus = $isStringB;
-            if (! $aStatus) $aStatus = $theType->string($aString, $a);
-            if (! $bStatus) $bStatus = $theType->string($bString, $b);
+            if (! $aStatus) $aStatus = $theType->string($aString, $a, true);
+            if (! $bStatus) $bStatus = $theType->string($bString, $b, true);
 
             if ($aStatus && $bStatus) {
                 $aString = $aString ?? $a;

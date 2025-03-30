@@ -138,6 +138,14 @@ class TypeModule extends TypeModuleBase
             return true;
         }
 
+        if ('resource (closed)' === gettype($value)) {
+            // > CLOSED RESOURCE is false
+
+            $result = false;
+
+            return true;
+        }
+
         $result = (bool) $value;
 
         return true;
@@ -293,12 +301,14 @@ class TypeModule extends TypeModuleBase
             return false;
         }
 
-        if (! $this->string_not_empty($valueString, $value)) {
-            return false;
-        }
+        $valueString = (string) $value;
 
         // > IEEE 754 double-precision floating point (64-bit float)
         $valueFloat = floatval(sprintf('%.17g', $valueString));
+
+        if (! is_finite($valueFloat)) {
+            return false;
+        }
 
         if (($valueFloat < -PHP_INT_MAX) || (PHP_INT_MAX < $valueFloat)) {
             $result = $valueFloat;
@@ -306,7 +316,7 @@ class TypeModule extends TypeModuleBase
             return true;
         }
 
-        $valueInt = (int) $valueString;
+        $valueInt = (int) $valueFloat;
 
         if ($valueFloat === (float) $valueInt) {
             $result = $valueInt;
@@ -574,11 +584,16 @@ class TypeModule extends TypeModuleBase
             return false;
         }
 
-        if (! $this->string_not_empty($_value, $value)) {
+        $valueString = (string) $value;
+
+        // > IEEE 754 double-precision floating point (64-bit float)
+        $valueFloat = floatval(sprintf('%.17g', $valueString));
+
+        if (! is_finite($valueFloat)) {
             return false;
         }
 
-        $result = $_value;
+        $result = $valueString;
 
         return true;
     }
@@ -716,9 +731,11 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function string(&$result, $value) : bool
+    public function string(&$result, $value, bool $removeNanInf = null) : bool
     {
         $result = null;
+
+        $removeNanInf = $removeNanInf ?? false;
 
         $isString = is_string($value);
 
@@ -757,12 +774,14 @@ class TypeModule extends TypeModuleBase
             return false;
         }
 
-        if (is_numeric($_value)) {
-            // > IEEE 754 double-precision floating point (64-bit float)
-            $valueFloat = floatval(sprintf('%.17g', $_value));
+        if ($removeNanInf) {
+            if (is_numeric($_value)) {
+                // > IEEE 754 double-precision floating point (64-bit float)
+                $valueFloat = floatval(sprintf('%.17g', $_value));
 
-            if (! is_finite($valueFloat)) {
-                return false;
+                if (! is_finite($valueFloat)) {
+                    return false;
+                }
             }
         }
 
@@ -774,11 +793,11 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function string_not_empty(&$result, $value) : bool
+    public function string_not_empty(&$result, $value, bool $removeNanInf = null) : bool
     {
         $result = null;
 
-        if (! $this->string($_value, $value)) {
+        if (! $this->string($_value, $value, $removeNanInf)) {
             return false;
         }
 
@@ -795,9 +814,9 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function trim(&$result, $value, string $characters = null) : bool
+    public function trim(&$result, $value, string $characters = null, bool $removeNanInf = null) : bool
     {
-        return Lib::str()->type_trim($result, $value, $characters);
+        return Lib::str()->type_trim($result, $value, $characters, $removeNanInf);
     }
 
 

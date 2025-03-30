@@ -99,13 +99,13 @@ class StrModule
     /**
      * @param string|null $result
      */
-    public function type_trim(&$result, $value, string $characters = null) : bool
+    public function type_trim(&$result, $value, string $characters = null, bool $removeNanInf = null) : bool
     {
         $result = null;
 
         $characters = $characters ?? " \n\r\t\v\0";
 
-        if (! Lib::type()->string($_value, $value)) {
+        if (! Lib::type()->string($_value, $value, $removeNanInf)) {
             return false;
         }
 
