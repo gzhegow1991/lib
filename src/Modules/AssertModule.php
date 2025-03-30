@@ -14,6 +14,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
+	public function bool($value)
+	{
+		$this->status = Lib::type()->bool($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
 	public function userbool($value)
 	{
 		$this->status = Lib::type()->userbool($this->result, $value);
@@ -944,9 +955,31 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function callable_string_function($value, $newScope = 'static')
+	public function callable_string_function($value)
 	{
-		$this->status = Lib::type()->callable_string_function($this->result, $value, $newScope);
+		$this->status = Lib::type()->callable_string_function($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function callable_string_function_internal($value)
+	{
+		$this->status = Lib::type()->callable_string_function_internal($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function callable_string_function_non_internal($value)
+	{
+		$this->status = Lib::type()->callable_string_function_non_internal($this->result, $value);
 
 		return $this;
 	}

@@ -554,12 +554,9 @@ class DebugModule
     {
         if (! is_null($var)) return null;
 
-        $phpType = gettype($var);
-        $printableValue = strtoupper(var_export($var, true));
-
         $output = [];
-        $output[ 'type' ] = $phpType;
-        $output[ 'value' ] = $printableValue;
+        $output[ 'type' ] = gettype($var);
+        $output[ 'value' ] = strtoupper(var_export($var, true));
 
         return $output;
     }
@@ -568,12 +565,9 @@ class DebugModule
     {
         if (! is_bool($var)) return null;
 
-        $phpType = gettype($var);
-        $printableValue = strtoupper(var_export($var, true));
-
         $output = [];
-        $output[ 'type' ] = $phpType;
-        $output[ 'value' ] = $printableValue;
+        $output[ 'type' ] = gettype($var);
+        $output[ 'value' ] = strtoupper(var_export($var, true));
 
         return $output;
     }
@@ -584,9 +578,7 @@ class DebugModule
 
         $output = [];
         $output[ 'type' ] = gettype($var);
-        $output[ 'value' ] = is_finite($var)
-            ? $var
-            : (string) $var;
+        $output[ 'value' ] = var_export($var, true);
 
         return $output;
     }
@@ -595,14 +587,9 @@ class DebugModule
     {
         if (! is_float($var)) return null;
 
-        $phpType = gettype($var);
-        $printableValue = is_finite($var)
-            ? $var
-            : (string) $var;
-
         $output = [];
-        $output[ 'type' ] = $phpType;
-        $output[ 'value' ] = $printableValue;
+        $output[ 'type' ] = gettype($var);
+        $output[ 'value' ] = var_export($var, true);
 
         return $output;
     }

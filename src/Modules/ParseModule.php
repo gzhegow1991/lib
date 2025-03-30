@@ -6,6 +6,7 @@
 
 namespace Gzhegow\Lib\Modules;
 
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
 use Gzhegow\Lib\Modules\Crypt\Alphabet;
@@ -13,6 +14,19 @@ use Gzhegow\Lib\Modules\Type\Base\ParseModuleBase;
 
 class ParseModule extends ParseModuleBase
 {
+	/**
+	 * @return bool|null
+	 */
+	public function bool($value)
+	{
+		if (Lib::type()->bool($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
 	/**
 	 * @return bool|null
 	 */
@@ -1108,9 +1122,35 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return callable-string|null
 	 */
-	public function callable_string_function($value, $newScope = 'static')
+	public function callable_string_function($value)
 	{
-		if (Lib::type()->callable_string_function($result, $value, $newScope)) {
+		if (Lib::type()->callable_string_function($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return callable-string|null
+	 */
+	public function callable_string_function_internal($value)
+	{
+		if (Lib::type()->callable_string_function_internal($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return callable-string|null
+	 */
+	public function callable_string_function_non_internal($value)
+	{
+		if (Lib::type()->callable_string_function_non_internal($result, $value)) {
 		    return $result;
 		}
 

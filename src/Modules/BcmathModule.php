@@ -47,11 +47,6 @@ class BcmathModule
             return false;
         }
 
-        // > 0.000022 becomes 2.2E-5, so you need to pass formatted string instead of float
-        if (false !== stripos($_value, 'e')) {
-            return false;
-        }
-
         $valueMinus = '';
         $valueAbs = $_value;
 

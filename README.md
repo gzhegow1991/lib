@@ -758,11 +758,103 @@ $fn = function () {
     _print('[ CmpModule ]');
     echo PHP_EOL;
 
-    $resource = STDOUT;
+    $object = new \StdClass();
+    $objectEmptyCountable = new class implements \Countable {
+        public function count() : int
+        {
+            return 0;
+        }
+    };
+    $objectNonEmptyCountable = new class implements \Countable {
+        public function count() : int
+        {
+            return 1;
+        }
+    };
+
+    $resourceOpened = STDOUT;
     $resourceClosed = fopen('php://memory', 'w');
     fclose($resourceClosed);
 
-    $values = [
+    $valuesXX = [
+        [
+            0 => NAN,
+            1 => \Gzhegow\Lib\Lib::type()->the_nil(),
+            2 => null,
+        ],
+        [
+            3 => false,
+            4 => true,
+        ],
+        [
+            5 => 0,
+            6 => 1,
+        ],
+        [
+            9  => 0.0,
+            10 => 1.0,
+            11 => 1.1,
+            12 => 1e1,
+        ],
+        [
+            7  => PHP_INT_MAX,
+            8  => -PHP_INT_MAX,
+            13 => PHP_FLOAT_MAX,
+            14 => -PHP_FLOAT_MAX,
+            15 => INF,
+            16 => -INF,
+        ],
+        [
+            17 => 'NAN',
+            18 => (string) \Gzhegow\Lib\Lib::type()->the_nil(),
+        ],
+        [
+            19 => '',
+            20 => 'a',
+            21 => 'b',
+            22 => 'ab',
+            23 => 'ba',
+        ],
+        [
+            24 => '0',
+            25 => '1',
+        ],
+        [
+            26 => '0.0',
+            27 => '1.0',
+            28 => '1.1',
+            29 => '1e5',
+        ],
+        [
+            30 => 'INF',
+            31 => '-INF',
+        ],
+        [
+            32 => $resourceOpened,
+            33 => $resourceClosed,
+        ],
+        [
+            34 => [],
+            35 => [ '' ],
+            36 => [ 'a' ],
+        ],
+        [
+            37 => $object,
+            38 => (object) [],
+            39 => (object) [ '' ],
+            40 => (object) [ 'a' ],
+            41 => new ArrayObject([]),
+            42 => new ArrayObject([ '' ]),
+            43 => new ArrayObject([ 'a' ]),
+        ],
+        [
+            44 => new \DateTime('1970-01-01 00:00:00'),
+            45 => new \DateTime('1970-01-01 00:00:01'),
+            46 => (new \DateTime('1970-01-01 00:00:01'))->modify('+500ms'),
+        ],
+    ];
+
+    $valuesY = [
         NAN,
         \Gzhegow\Lib\Lib::type()->the_nil(),
         null,
@@ -770,18 +862,23 @@ $fn = function () {
         true,
         0,
         1,
-        PHP_INT_MAX,
         0.0,
         1.0,
         1.1,
         1e1,
+        PHP_INT_MAX,
+        -PHP_INT_MAX,
         PHP_FLOAT_MAX,
+        -PHP_FLOAT_MAX,
         INF,
-        '',
+        -INF,
         'NAN',
         (string) \Gzhegow\Lib\Lib::type()->the_nil(),
+        '',
         'a',
+        'b',
         'ab',
+        'ba',
         '0',
         '1',
         '0.0',
@@ -789,14 +886,19 @@ $fn = function () {
         '1.1',
         '1e5',
         'INF',
-        $resource,
+        '-INF',
+        $resourceOpened,
         $resourceClosed,
         [],
         [ '' ],
         [ 'a' ],
+        $object,
         (object) [],
         (object) [ '' ],
         (object) [ 'a' ],
+        new ArrayObject([]),
+        new ArrayObject([ '' ]),
+        new ArrayObject([ 'a' ]),
         new \DateTime('1970-01-01 00:00:00'),
         new \DateTime('1970-01-01 00:00:01'),
         (new \DateTime('1970-01-01 00:00:01'))->modify('+500ms'),
@@ -805,27 +907,44 @@ $fn = function () {
     $theCmp = \Gzhegow\Lib\Lib::cmp();
     $theDebug = \Gzhegow\Lib\Lib::debug();
 
-    $table = [];
-    foreach ( $values as $i => $v ) {
-        $left = $theDebug->value($v);
+    foreach ( $valuesXX as $i => $valuesX ) {
+        $table = [];
+        foreach ( $valuesY as $ii => $y ) {
+            $yKey = "@{$ii} | " . $theDebug->value($y);
 
-        foreach ( $values as $ii => $vv ) {
-            $right = $theDebug->value($vv);
+            foreach ( $valuesX as $iii => $x ) {
+                $xKey = "@{$iii} | " . $theDebug->value($x);
 
-            $cmp = $theCmp->compare($v, $vv, _CMP_MODE_ERROR_NAN);
+                $fnCmp = $theCmp->fnCompare(_CMP_MODE_ERROR_NAN | _CMP_MODE_TYPE_CONTINUE, [ &$fnCmpName ]);
 
-            $table[ $row = $left ][ $col = $right ] = $cmp;
+                $result = $fnCmp($x, $y);
+
+                $table[ $row = $yKey ][ $col = $xKey ] = "{$result} ? {$fnCmpName}";
+            }
         }
-    }
 
-    // \Gzhegow\Lib\Lib::debug()->print_table($table);
-    echo md5(serialize($table)) . PHP_EOL;
+        // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
+        echo md5(serialize($table)) . PHP_EOL;
+    }
     unset($table);
 };
 _assert_stdout($fn, [], '
 "[ CmpModule ]"
 
-cc6d8eac3a32d5486669f8ec30fb446b
+46b5e7522ef07cb22b63edc78b69984d
+2e7c5a04e1dd1291f7c1de1eedbdf841
+702b1588af4a435cbfa52223aca1c370
+f22d9ceb87e4f5d5f2783ab89a994b39
+d3b62b163d00b66815593e6b81f8aabd
+736dec21a9556c83ed0f216d1415929c
+5e77b4c6ba94061ec211462c4a7b8585
+0c8a12b7765dba203493386ab2912f5d
+fb7158fc6617eeb371bb81bc96971f8e
+a6e68e39b8d98191b02e4320b330923c
+94f61d829689cd63d2dc60fb8ac66d20
+d76528d12b3d1a44279cea1769ba73ba
+c7fe6b0b7bd0fd80110673c6435176b0
+a6e76fe84b80ffc54b408e92014aaf01
 ');
 
 
@@ -2158,7 +2277,7 @@ $fn = function () {
             }
         }
     }
-    // \Gzhegow\Lib\Lib::debug()->print_table($table);
+    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
     echo md5(serialize($table)) . PHP_EOL;
     unset($table);
 
@@ -2219,7 +2338,7 @@ $fn = function () {
             }
         }
     }
-    // \Gzhegow\Lib\Lib::debug()->print_table($table);
+    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
     echo md5(serialize($table)) . PHP_EOL;
     unset($table);
 
@@ -2301,7 +2420,7 @@ $fn = function () {
         $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static($result, $src, null);
         $table4[ $tableRow ][ 'callable_string_method_static' ] = _value($result);
     }
-    // \Gzhegow\Lib\Lib::debug()->print_table($table);
+    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
     echo md5(serialize($table1)) . PHP_EOL;
     echo md5(serialize($table2)) . PHP_EOL;
     echo md5(serialize($table3)) . PHP_EOL;
@@ -2386,7 +2505,7 @@ $fn = function () {
             }
         }
     }
-    // \Gzhegow\Lib\Lib::debug()->print_table($table);
+    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
     echo md5(serialize($table)) . PHP_EOL;
     unset($table);
 
@@ -2468,7 +2587,7 @@ $fn = function () {
             }
         }
     }
-    // \Gzhegow\Lib\Lib::debug()->print_table($table);
+    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
     echo md5(serialize($table1)) . PHP_EOL;
     echo md5(serialize($table2)) . PHP_EOL;
     echo md5(serialize($table3)) . PHP_EOL;
@@ -2480,7 +2599,7 @@ $fn = function () {
 
     $result = null;
 
-    $status = \Gzhegow\Lib\Lib::type()->date($result, $from = 'now midnight');
+    $status = \Gzhegow\Lib\Lib::type()->date($result, $from = '1970-01-01 midnight');
     $date = $result;
     $dateAtom = $result->format(DATE_ATOM);
     _print($status, $result);
@@ -2495,7 +2614,7 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    $status = \Gzhegow\Lib\Lib::type()->date_immutable($result, $from = 'now midnight');
+    $status = \Gzhegow\Lib\Lib::type()->date_immutable($result, $from = '1970-01-01 midnight');
     $date = $result;
     $dateAtom = $result->format(DATE_ATOM);
     _print($status, $result);
@@ -2510,7 +2629,7 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    $status = \Gzhegow\Lib\Lib::type()->date($result, $from = 'now midnight');
+    $status = \Gzhegow\Lib\Lib::type()->date($result, $from = '1970-01-01 midnight');
     $date = $result;
     $dateAtom = $result->format(DATE_ATOM);
     _print($status, $result);
@@ -2530,11 +2649,11 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    $status = \Gzhegow\Lib\Lib::type()->date($result, 'now midnight');
+    $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 midnight');
     $dateAtom = $result->format(DATE_ATOM);
     _print($status, $result);
 
-    $status = \Gzhegow\Lib\Lib::type()->date($result, 'now midnight', 'UTC');
+    $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 midnight', 'UTC');
     $dateAtom2 = $result->format(DATE_ATOM);
     _print($status, $result, $dateAtom !== $dateAtom2);
     echo PHP_EOL;
@@ -2568,21 +2687,21 @@ d91da25286bd7e000367a9758699e0ca
 cb145079faba3ab6cf451fe9116389ba
 3c3e6efcd8ead6feb5fde9b2d9edc105
 
-TRUE | { object # DateTime # "2025-03-29T00:00:00.000+03:00" }
-TRUE | { object # DateTime # "2025-03-29T00:00:00.000+03:00" } | TRUE
-TRUE | { object # DateTime # "2025-03-29T00:00:00.000+03:00" } | TRUE
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000+03:00" }
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000+03:00" } | TRUE
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000+03:00" } | TRUE
 
-TRUE | { object # DateTimeImmutable # "2025-03-29T00:00:00.000+03:00" }
-TRUE | { object # DateTimeImmutable # "2025-03-29T00:00:00.000+03:00" } | TRUE
-TRUE | { object # DateTimeImmutable # "2025-03-29T00:00:00.000+03:00" } | TRUE
+TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000+03:00" }
+TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000+03:00" } | TRUE
+TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000+03:00" } | TRUE
 
-TRUE | { object # DateTime # "2025-03-29T00:00:00.000+03:00" }
-TRUE | { object # DateTimeImmutable # "2025-03-29T00:00:00.000+03:00" } | TRUE
-TRUE | { object # DateTime # "2025-03-29T00:00:00.000+03:00" } | TRUE
-TRUE | { object # DateTimeImmutable # "2025-03-29T00:00:00.000+03:00" } | TRUE
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000+03:00" }
+TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000+03:00" } | TRUE
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000+03:00" } | TRUE
+TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000+03:00" } | TRUE
 
-TRUE | { object # DateTime # "2025-03-29T00:00:00.000+03:00" }
-TRUE | { object # DateTime # "2025-03-29T00:00:00.000+00:00" } | TRUE
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000+03:00" }
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000+00:00" } | TRUE
 
 TRUE | { object # DateTime # "1970-01-01T12:34:56.000+03:00" }
 TRUE | { object # DateTime # "1970-01-01T12:34:56.789+03:00" }

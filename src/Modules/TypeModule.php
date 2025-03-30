@@ -24,8 +24,41 @@ class TypeModule extends TypeModuleBase
             return true;
         }
 
-        if ($value === '0') {
+        if (null === $value) {
+            // > NULL is not bool
+
+            return false;
+        }
+
+        if ('0' === $value) {
+            // > '0' is true
             $result = true;
+
+            return true;
+        }
+
+        if (is_float($value) && is_nan($value)) {
+            // > NAN is not bool
+            return false;
+        }
+
+        if (Lib::type()->is_nil($value)) {
+            // > NIL is not bool
+            return false;
+        }
+
+        if (0 === ($cnt = Lib::php()->count($value))) {
+            // > EMPTY COUNTABLE is false
+
+            $result = false;
+
+            return true;
+        }
+
+        if ('resource (closed)' === gettype($value)) {
+            // > CLOSED RESOURCE is false
+
+            $result = false;
 
             return true;
         }
@@ -48,13 +81,26 @@ class TypeModule extends TypeModuleBase
             return true;
         }
 
+        if (null === $value) {
+            // > NULL is not bool
+
+            return false;
+        }
+
+        if ('0' === $value) {
+            // > '0' is true
+
+            $result = true;
+
+            return true;
+        }
+
+        if (is_float($value) && is_nan($value)) {
+            // > NAN is not bool
+            return false;
+        }
+
         if (is_string($value)) {
-            if ($value === '0') {
-                $result = true;
-
-                return true;
-            }
-
             $_value = strtolower($value);
 
             if (
@@ -77,6 +123,19 @@ class TypeModule extends TypeModuleBase
 
                 return true;
             }
+        }
+
+        if (Lib::type()->is_nil($value)) {
+            // > NIL is not bool
+            return false;
+        }
+
+        if (0 === ($cnt = Lib::php()->count($value))) {
+            // > EMPTY COUNTABLE is false
+
+            $result = false;
+
+            return true;
         }
 
         $result = (bool) $value;
@@ -230,20 +289,16 @@ class TypeModule extends TypeModuleBase
             }
         }
 
-        $status = $this->string_not_empty($string, $value);
-        if (! $status) {
+        if (! is_numeric($value)) {
             return false;
         }
 
-        if (! is_numeric($string)) {
+        if (! $this->string_not_empty($valueString, $value)) {
             return false;
         }
 
-        if (in_array($string, [ 'NAN', 'INF', '-INF' ])) {
-            return false;
-        }
-
-        $valueFloat = (float) $string;
+        // > IEEE 754 double-precision floating point (64-bit float)
+        $valueFloat = floatval(sprintf('%.17g', $valueString));
 
         if (($valueFloat < -PHP_INT_MAX) || (PHP_INT_MAX < $valueFloat)) {
             $result = $valueFloat;
@@ -251,7 +306,7 @@ class TypeModule extends TypeModuleBase
             return true;
         }
 
-        $valueInt = (int) $string;
+        $valueInt = (int) $valueString;
 
         if ($valueFloat === (float) $valueInt) {
             $result = $valueInt;
@@ -376,14 +431,9 @@ class TypeModule extends TypeModuleBase
             return false;
         }
 
-        $theDecimalPoint = $this->the_decimal_point();
+        $valueNoMinus = ltrim($_value, '-');
 
-        if (false !== stripos($_value, $theDecimalPoint)) {
-            return false;
-        }
-
-        // > 0.000022 becomes 2.2E-5, so you need to pass formatted string instead of float
-        if (false !== stripos($_value, 'e')) {
+        if (! $this->ctype_digit($var, $valueNoMinus)) {
             return false;
         }
 
@@ -520,15 +570,11 @@ class TypeModule extends TypeModuleBase
     {
         $result = null;
 
+        if (! is_numeric($value)) {
+            return false;
+        }
+
         if (! $this->string_not_empty($_value, $value)) {
-            return false;
-        }
-
-        if (! is_numeric($_value)) {
-            return false;
-        }
-
-        if (in_array($_value, [ 'NAN', 'INF', '-INF' ])) {
             return false;
         }
 
@@ -674,44 +720,55 @@ class TypeModule extends TypeModuleBase
     {
         $result = null;
 
-        if (is_string($value)) {
-            $result = $value;
+        $isString = is_string($value);
 
-            return true;
-        }
-
-        if (
-            (null === $value)
-            || is_bool($value)
-            || is_array($value)
-            || is_resource($value)
-            || ('resource (closed)' === gettype($value))
+        if (! $isString
+            && (
+                (null === $value)
+                || (is_bool($value))
+                || (is_array($value))
+                || (is_float($value) && ! is_finite($value))
+                || (is_resource($value))
+                || ('resource (closed)' === gettype($value))
+            )
         ) {
             return false;
         }
 
-        if (is_object($value)) {
+        $_value = null;
+
+        if (is_string($value)) {
+            $_value = $value;
+
+        } elseif (is_object($value)) {
             if (method_exists($value, '__toString')) {
                 $_value = (string) $value;
-
-                $result = $_value;
-
-                return true;
             }
 
+        } else {
+            $settype = $value;
+            $status = settype($settype, 'string');
+            if ($status) {
+                $_value = $settype;
+            }
+        }
+
+        if (null === $_value) {
             return false;
         }
 
-        $_value = $value;
+        if (is_numeric($_value)) {
+            // > IEEE 754 double-precision floating point (64-bit float)
+            $valueFloat = floatval(sprintf('%.17g', $_value));
 
-        $status = settype($_value, 'string');
-        if ($status) {
-            $result = $_value;
-
-            return true;
+            if (! is_finite($valueFloat)) {
+                return false;
+            }
         }
 
-        return false;
+        $result = $_value;
+
+        return true;
     }
 
     /**
@@ -1163,47 +1220,51 @@ class TypeModule extends TypeModuleBase
                     );
                 }
             }
+
+        } else {
+            if ('' === $value) {
+                // > strtotime(''); // OK, what?
+
+                return false;
+            }
+
+            if (is_numeric($value)) {
+                // > strtotime(0); // FALSE
+                // > strtotime(1); // FALSE
+                // > strtotime(1.0); // FALSE
+                // > strtotime('0'); // FALSE
+                // > strtotime('1'); // FALSE
+
+                // > strtotime(1.1); // OK, what?
+                // > strtotime('0.0'); // OK, what?
+                // > strtotime('1.0'); // OK, what?
+                // > strtotime('1.1'); // OK, what?
+
+                return false;
+            }
+
+            if ($this->letter($letter, $value)) {
+                // $bAscii = 'b';
+                // $bbAscii = 'bb';
+                // $bRussian = 'б';
+                // $bbRussian = 'бб';
+                // > strtotime($bbAscii); // FALSE
+                // > strtotime($bRussian); // FALSE
+                // > strtotime($bbRussian); // FALSE
+
+                // > strtotime($bAscii); // OK, what?
+
+                return false;
+            }
         }
 
         $date = null;
 
         if ($hasFormats) {
-            $formatFirst = array_shift($_formats);
-
-            foreach ( $formats as $format ) {
-                try {
-                    $date = \DateTime::createFromFormat(
-                        $formatFirst,
-                        $value,
-                        $_timezoneIfParsed
-                    );
-                }
-                catch ( \Throwable $e ) {
-                }
-
-                if ($date) {
-                    $result = $date;
-
-                    return true;
-                }
-            }
-        }
-
-        try {
-            $date = new \DateTime($value, $_timezoneIfParsed);
-
-            $result = $date;
-
-            return true;
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        if ($hasFormats && count($_formats)) {
             foreach ( $_formats as $format ) {
                 try {
                     $date = \DateTime::createFromFormat(
-                        $formatFirst,
+                        $format,
                         $value,
                         $_timezoneIfParsed
                     );
@@ -1216,6 +1277,17 @@ class TypeModule extends TypeModuleBase
 
                     break;
                 }
+            }
+
+        } else {
+            try {
+                $date = new \DateTime($value, $_timezoneIfParsed);
+
+                $result = $date;
+
+                return true;
+            }
+            catch ( \Throwable $e ) {
             }
         }
 
@@ -1271,17 +1343,51 @@ class TypeModule extends TypeModuleBase
                     );
                 }
             }
+
+        } else {
+            if ('' === $value) {
+                // > strtotime(''); // OK, what?
+
+                return false;
+            }
+
+            if (is_numeric($value)) {
+                // > strtotime(0); // FALSE
+                // > strtotime(1); // FALSE
+                // > strtotime(1.0); // FALSE
+                // > strtotime('0'); // FALSE
+                // > strtotime('1'); // FALSE
+
+                // > strtotime(1.1); // OK, what?
+                // > strtotime('0.0'); // OK, what?
+                // > strtotime('1.0'); // OK, what?
+                // > strtotime('1.1'); // OK, what?
+
+                return false;
+            }
+
+            if ($this->letter($letter, $value)) {
+                // $bAscii = 'b';
+                // $bbAscii = 'bb';
+                // $bRussian = 'б';
+                // $bbRussian = 'бб';
+                // > strtotime($bbAscii); // FALSE
+                // > strtotime($bRussian); // FALSE
+                // > strtotime($bbRussian); // FALSE
+
+                // > strtotime($bAscii); // OK, what?
+
+                return false;
+            }
         }
 
         $dateImmutable = null;
 
         if ($hasFormats) {
-            $formatFirst = array_shift($_formats);
-
-            foreach ( $formats as $format ) {
+            foreach ( $_formats as $format ) {
                 try {
                     $dateImmutable = \DateTimeImmutable::createFromFormat(
-                        $formatFirst,
+                        $format,
                         $value,
                         $_timezoneIfParsed
                     );
@@ -1295,35 +1401,16 @@ class TypeModule extends TypeModuleBase
                     return true;
                 }
             }
-        }
 
-        try {
-            $dateImmutable = new \DateTimeImmutable($value, $_timezoneIfParsed);
+        } else {
+            try {
+                $dateImmutable = new \DateTimeImmutable($value, $_timezoneIfParsed);
 
-            $result = $dateImmutable;
+                $result = $dateImmutable;
 
-            return true;
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        if ($hasFormats && count($_formats)) {
-            foreach ( $_formats as $format ) {
-                try {
-                    $dateImmutable = \DateTimeImmutable::createFromFormat(
-                        $formatFirst,
-                        $value,
-                        $_timezoneIfParsed
-                    );
-                }
-                catch ( \Throwable $e ) {
-                }
-
-                if ($dateImmutable) {
-                    $result = $dateImmutable;
-
-                    break;
-                }
+                return true;
+            }
+            catch ( \Throwable $e ) {
             }
         }
 

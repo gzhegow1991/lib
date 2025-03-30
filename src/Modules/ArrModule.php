@@ -952,11 +952,15 @@ class ArrModule
 
         $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
+        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
+        $isUseKey = ($mode & _ARR_FN_USE_KEY);
+        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
+            if ($isUseValue) $args[] = $val;
+            if ($isUseKey) $args[] = $key;
+            if ($isUseSrc) $args[] = $src;
 
             $src[ $key ] = call_user_func_array($fn, $args);
         }
@@ -988,11 +992,15 @@ class ArrModule
 
         $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
+        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
+        $isUseKey = ($mode & _ARR_FN_USE_KEY);
+        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
+            if ($isUseValue) $args[] = $val;
+            if ($isUseKey) $args[] = $key;
+            if ($isUseSrc) $args[] = $src;
 
             if (call_user_func_array($fn, $args)) {
                 continue;
@@ -1021,11 +1029,15 @@ class ArrModule
 
         $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
+        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
+        $isUseKey = ($mode & _ARR_FN_USE_KEY);
+        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
+            if ($isUseValue) $args[] = $val;
+            if ($isUseKey) $args[] = $key;
+            if ($isUseSrc) $args[] = $src;
 
             if (call_user_func_array($fn, $args)) {
                 continue;
@@ -1051,11 +1063,15 @@ class ArrModule
 
         $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
+        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
+        $isUseKey = ($mode & _ARR_FN_USE_KEY);
+        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
+            if ($isUseValue) $args[] = $val;
+            if ($isUseKey) $args[] = $key;
+            if ($isUseSrc) $args[] = $src;
 
             if (call_user_func_array($fn, $args)) {
                 unset($src[ $key ]);
@@ -1078,11 +1094,15 @@ class ArrModule
 
         $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
+        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
+        $isUseKey = ($mode & _ARR_FN_USE_KEY);
+        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
+            if ($isUseValue) $args[] = $val;
+            if ($isUseKey) $args[] = $key;
+            if ($isUseSrc) $args[] = $src;
 
             if (call_user_func_array($fn, $args)) {
                 $src[ $key ] = $new;
@@ -1131,11 +1151,15 @@ class ArrModule
 
         $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
+        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
+        $isUseKey = ($mode & _ARR_FN_USE_KEY);
+        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
+            if ($isUseValue) $args[] = $val;
+            if ($isUseValue) $args[] = $key;
+            if ($isUseSrc) $args[] = $src;
 
             call_user_func_array($fn, $args)
                 ? ($left[ $key ] = $val)
@@ -1158,11 +1182,15 @@ class ArrModule
 
         $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
 
+        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
+        $isUseKey = ($mode & _ARR_FN_USE_KEY);
+        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($mode & _ARR_FN_USE_VALUE) $args[] = $val;
-            if ($mode & _ARR_FN_USE_KEY) $args[] = $key;
-            if ($mode & _ARR_FN_USE_SRC) $args[] = $src;
+            if ($isUseValue) $args[] = $val;
+            if ($isUseKey) $args[] = $key;
+            if ($isUseSrc) $args[] = $src;
 
             $groupNames = call_user_func_array($fn, $args);
 
@@ -1421,8 +1449,8 @@ class ArrModule
 
         $isModeDepthFirst = (bool) ($flags & _ARR_WALK_MODE_DEPTH_FIRST);
         $isModeBreadthFirst = (bool) ($flags & _ARR_WALK_MODE_BREADTH_FIRST);
-        $sum = $isModeDepthFirst + $isModeBreadthFirst;
-        if (! $sum || ($sum > 1)) {
+        $sum = (int) ($isModeDepthFirst + $isModeBreadthFirst);
+        if (1 !== $sum) {
             $isModeDepthFirst = true;
             $isModeBreadthFirst = false;
         }
@@ -1430,8 +1458,8 @@ class ArrModule
         $isSortSelfFirst = (bool) ($flags & _ARR_WALK_SORT_SELF_FIRST);
         $isSortParentFirst = (bool) ($flags & _ARR_WALK_SORT_PARENT_FIRST);
         $isSortChildFirst = (bool) ($flags & _ARR_WALK_SORT_CHILD_FIRST);
-        $sum = $isSortSelfFirst + $isSortParentFirst + $isSortChildFirst;
-        if (! $sum || ($sum > 1)) {
+        $sum = (int) ($isSortSelfFirst + $isSortParentFirst + $isSortChildFirst);
+        if (1 !== $sum) {
             $isSortSelfFirst = true;
             $isSortParentFirst = false;
             $isSortChildFirst = false;
@@ -1439,8 +1467,8 @@ class ArrModule
 
         $isWithLeaves = (bool) ($flags & _ARR_WALK_WITH_LEAVES);
         $isWithoutLeaves = (bool) ($flags & _ARR_WALK_WITHOUT_LEAVES);
-        $sum = $isWithLeaves + $isWithoutLeaves;
-        if (! $sum || ($sum > 1)) {
+        $sum = (int) ($isWithLeaves + $isWithoutLeaves);
+        if (1 !== $sum) {
             $isWithLeaves = true;
             $isWithoutLeaves = false;
         }
@@ -1449,8 +1477,8 @@ class ArrModule
 
         $isWithoutEmptyArrays = (bool) ($flags & _ARR_WALK_WITHOUT_EMPTY_ARRAYS);
         $isWithEmptyArrays = (bool) ($flags & _ARR_WALK_WITH_EMPTY_ARRAYS);
-        $sum = $isWithoutEmptyArrays + $isWithEmptyArrays;
-        if (! $sum || ($sum > 1)) {
+        $sum = (int) ($isWithoutEmptyArrays + $isWithEmptyArrays);
+        if (1 !== $sum) {
             $isWithoutEmptyArrays = true;
             $isWithEmptyArrays = false;
         }
@@ -1459,8 +1487,8 @@ class ArrModule
 
         $isWithoutParents = (bool) ($flags & _ARR_WALK_WITHOUT_PARENTS);
         $isWithParents = (bool) ($flags & _ARR_WALK_WITH_PARENTS);
-        $sum = $isWithoutParents + $isWithParents;
-        if (! $sum || ($sum > 1)) {
+        $sum = (int) ($isWithoutParents + $isWithParents);
+        if (1 !== $sum) {
             $isWithoutParents = true;
             $isWithParents = false;
         }
