@@ -456,7 +456,8 @@ $fn = function () {
     };
 
 
-    $array = \Gzhegow\Lib\Lib::new8(\Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::class,
+    $array = \Gzhegow\Lib\Lib::new8(
+        \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::class,
         'object'
     );
     $array[] = $notAnObject;
@@ -470,7 +471,8 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    $array = \Gzhegow\Lib\Lib::new8(\Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::class,
+    $array = \Gzhegow\Lib\Lib::new8(
+        \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::class,
         $types = [ 'mixed' => 'object' ]
     );
     $array[] = $object;
@@ -489,7 +491,8 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    $array = \Gzhegow\Lib\Lib::new8(\Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::class,
+    $array = \Gzhegow\Lib\Lib::new8(
+        \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::class,
         $keyType = 'string',
         $objectClass = \stdClass::class
     );

@@ -22,7 +22,7 @@ class TestModule
      */
     public function static_stdout_resource(array $stdoutResource = []) // : ?resource
     {
-        if (count($stdoutResource)) {
+        if (0 !== count($stdoutResource)) {
             [ $h ] = $stdoutResource;
 
             if (null !== $h) {
@@ -197,7 +197,7 @@ class TestModule
             }
         }
 
-        if (count($expectedReturn)) {
+        if (0 !== count($expectedReturn)) {
             $expectedReturn = $expectedReturn[ 0 ] ?? null;
 
             if ($currentReturn !== $expectedReturn) {
@@ -224,7 +224,7 @@ class TestModule
             }
         }
 
-        if (count($eArray)) {
+        if (0 !== count($eArray)) {
             $message = '[ ERROR ] Test ' . __METHOD__ . '() failed.';
 
             if (null !== $resourceStdout) {

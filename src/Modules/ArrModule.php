@@ -829,11 +829,11 @@ class ArrModule
     public function fill_keys($keys, array $new = []) : array
     {
         $keys = (array) $keys;
-        if (! count($keys)) {
+        if (0 === count($keys)) {
             return [];
         }
 
-        $hasNew = count($new);
+        $hasNew = (0 !== count($new));
 
         if ($hasNew) {
             $result = array_fill_keys($keys, $new[ 0 ]);
@@ -857,11 +857,11 @@ class ArrModule
     public function drop_keys(array $src, $keys, array $new = []) : array
     {
         $keys = (array) $keys;
-        if (! count($keys)) {
+        if (0 === count($keys)) {
             return $src;
         }
 
-        $hasNew = count($new);
+        $hasNew = (0 !== count($new));
 
         foreach ( (array) $keys as $key ) {
             if (! array_key_exists($key, $src)) {
@@ -885,11 +885,11 @@ class ArrModule
     public function keep_keys(array $src, $keys, array $new = []) : array
     {
         $keys = (array) $keys;
-        if (! count($keys)) {
+        if (0 === count($keys)) {
             return [];
         }
 
-        $hasNew = count($new);
+        $hasNew = (0 !== count($new));
 
         $keysToKeep = array_flip($keys);
 
@@ -1281,7 +1281,7 @@ class ArrModule
             return [];
         }
 
-        if (count($arrays) === 1) {
+        if (1 === count($arrays)) {
             return $arrays[ 0 ];
         }
 
@@ -1299,7 +1299,7 @@ class ArrModule
             return [];
         }
 
-        if (count($arrays) === 1) {
+        if (1 === count($arrays)) {
             return $arrays[ 0 ];
         }
 
@@ -1317,7 +1317,7 @@ class ArrModule
             return [];
         }
 
-        if (count($arrays) === 1) {
+        if (1 === count($arrays)) {
             return $arrays[ 0 ];
         }
 
@@ -1335,7 +1335,7 @@ class ArrModule
             return [];
         }
 
-        if (count($arrays) === 1) {
+        if (1 === count($arrays)) {
             return $arrays[ 0 ];
         }
 

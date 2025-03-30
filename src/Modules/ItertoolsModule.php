@@ -290,7 +290,7 @@ class ItertoolsModule
 
         $size = count($pool);
 
-        if (! $size && $len) {
+        if ((0 === $size) && $len) {
             return;
         }
 

@@ -62,7 +62,7 @@ class ExceptionIterator implements \RecursiveIterator
         $track = $this->track;
 
         end($this->track);
-        $key = count($this->track)
+        $key = (0 !== count($this->track))
             ? key($this->track) . '.' . key($this->items)
             : key($this->items);
 
@@ -79,7 +79,7 @@ class ExceptionIterator implements \RecursiveIterator
         $track = end($this->track);
 
         end($this->track);
-        $key = count($this->track)
+        $key = (0 !== count($this->track))
             ? key($this->track) . '.' . key($this->items)
             : key($this->items);
 
@@ -132,11 +132,11 @@ class ExceptionIterator implements \RecursiveIterator
 
         $it = null;
 
-        if (count($list)) {
+        if (0 !== count($list)) {
             $fulltrack = $this->track;
 
             end($this->track);
-            $key = count($this->track)
+            $key = (0 !== count($this->track))
                 ? key($this->track) . '.' . key($this->items)
                 : key($this->items);
 

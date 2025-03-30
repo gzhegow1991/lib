@@ -1305,13 +1305,13 @@ class StrModule
         $_replace = Lib::php()->to_list($replace);
         $_subject = Lib::php()->to_list($subject);
 
-        if (! count($_search)) {
+        if (0 === count($_search)) {
             return $subject;
         }
-        if (! count($_replace)) {
+        if (0 === count($_replace)) {
             return $subject;
         }
-        if (! count($_subject)) {
+        if (0 === count($_subject)) {
             return [];
         }
 
@@ -1347,13 +1347,13 @@ class StrModule
         $_replace = Lib::php()->to_list($replace);
         $_subject = Lib::php()->to_list($subject);
 
-        if (! count($_search)) {
+        if (0 === count($_search)) {
             return $subject;
         }
-        if (! count($_replace)) {
+        if (0 === count($_replace)) {
             return $subject;
         }
-        if (! count($_subject)) {
+        if (0 === count($_subject)) {
             return [];
         }
 
@@ -1386,7 +1386,7 @@ class StrModule
         }
 
         $_lines = Lib::php()->to_list($lines);
-        if (! count($_lines)) {
+        if (0 === count($_lines)) {
             return [];
         }
 
@@ -1425,7 +1425,7 @@ class StrModule
         }
 
         $_lines = Lib::php()->to_list($lines);
-        if (! count($_lines)) {
+        if (0 === count($_lines)) {
             return [];
         }
 
@@ -1464,7 +1464,7 @@ class StrModule
         }
 
         $_lines = Lib::php()->to_list($lines);
-        if (! count($_lines)) {
+        if (0 === count($_lines)) {
             return [];
         }
 
@@ -1503,7 +1503,7 @@ class StrModule
         }
 
         $_lines = Lib::php()->to_list($lines);
-        if (! count($_lines)) {
+        if (0 === count($_lines)) {
             return [];
         }
 
@@ -1631,7 +1631,7 @@ class StrModule
 
         $_pattern = preg_quote($_pattern, '/');
 
-        if (count($replacements)) {
+        if (0 !== count($replacements)) {
             $_pattern = strtr($_pattern, $replacements);
         }
 

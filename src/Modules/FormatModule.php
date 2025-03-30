@@ -276,7 +276,7 @@ class FormatModule
         string $eol = null
     ) : array
     {
-        if (! count($rows)) {
+        if (0 === count($rows)) {
             throw new LogicException(
                 'The `rows` should be not-empty array'
             );
@@ -329,7 +329,7 @@ class FormatModule
         string $eol = null
     ) : array
     {
-        if (! count($row)) {
+        if (0 === count($row)) {
             throw new LogicException(
                 'The `row` should be not-empty array'
             );
@@ -367,7 +367,7 @@ class FormatModule
     {
         $params = $params ?? [];
 
-        if (! count($in)) {
+        if (0 === count($in)) {
             return '';
         }
 
@@ -419,7 +419,7 @@ class FormatModule
 
     public function sql_like_escape(string $sql, string $like = 'LIKE', ...$valueParts)
     {
-        if (! count($valueParts)) {
+        if (0 === count($valueParts)) {
             return '';
         }
 

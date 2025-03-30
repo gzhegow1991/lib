@@ -1769,7 +1769,7 @@ class PhpModule
     {
         $stack = $this->errors();
 
-        $errors = count($stack->stack)
+        $errors = (0 !== count($stack->stack))
             ? end($stack->stack)
             : null;
 

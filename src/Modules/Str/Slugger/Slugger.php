@@ -74,7 +74,7 @@ class Slugger implements SluggerInterface
      */
     public function __construct(array $presets = [])
     {
-        if (count($presets)) {
+        if (0 !== count($presets)) {
             $this->fnIgnoreSymbolMapByPreset = [];
             $this->fnSequenceMapByPreset = [];
             $this->fnSymbolMapByPreset = [];
@@ -157,7 +157,7 @@ class Slugger implements SluggerInterface
         ] = $this->getSymbolMapsCurrent();
 
         $ignoreSymbolMapSymfony = [];
-        if (count($ignoreSymbolMap)) {
+        if (0 !== count($ignoreSymbolMap)) {
             $ignoreSymbolMapSymfony = array_keys($ignoreSymbolMap);
             $ignoreSymbolMapSymfony = array_combine(
                 $ignoreSymbolMapSymfony,
@@ -190,7 +190,7 @@ class Slugger implements SluggerInterface
             ? $presets
             : ($presets ? [ $presets ] : []);
 
-        if (! count($presets)) {
+        if (0 === count($presets)) {
             return $this;
         }
 
@@ -733,7 +733,7 @@ class Slugger implements SluggerInterface
                 ?? (is_string($b) ? [ $b ] : null)
                 ?? [];
 
-            if (! count($bArray)) {
+            if (0 === count($bArray)) {
                 throw new LogicException(
                     'The `bArray` should be non-empty array'
                 );

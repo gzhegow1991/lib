@@ -111,10 +111,10 @@ class JsonModule
             $depth, $flags
         );
 
-        if (count($result)) {
+        if (0 !== count($result)) {
             [ $value ] = $result;
 
-        } elseif (count($fallback)) {
+        } elseif (0 !== count($fallback)) {
             [ $value ] = $fallback;
 
         } else {
@@ -161,10 +161,10 @@ class JsonModule
             $depth, $flags
         );
 
-        if (count($result)) {
+        if (0 !== count($result)) {
             [ $value ] = $result;
 
-        } elseif (count($fallback)) {
+        } elseif (0 !== count($fallback)) {
             [ $value ] = $fallback;
 
         } else {
@@ -255,7 +255,7 @@ class JsonModule
         }
 
         if (null === $json) {
-            if (count($fallback)) {
+            if (0 !== count($fallback)) {
                 [ $json ] = $fallback;
 
             } else {

@@ -125,23 +125,21 @@ class DebugModule
 
                 $isValid = false;
 
-                if (! $isValid) {
-                    if (count($reflectionArgs) === 1) {
-                        try {
-                            $rf = new \ReflectionFunction(...$reflectionArgs);
-                            $rfParameters = $rf->getParameters();
-                            $rfReturnType = $rf->getReturnType();
-                            if (true
-                                && (count($rfParameters) === 2)
-                                && ($rfParameters[ 0 ]->isArray())
-                                && ($rfParameters[ 1 ]->isVariadic())
-                                && (($rfReturnType === null) || ($rfReturnType->getName() === 'void'))
-                            ) {
-                                $isValid = true;
-                            }
+                if (1 === count($reflectionArgs)) {
+                    try {
+                        $rf = new \ReflectionFunction(...$reflectionArgs);
+                        $rfParameters = $rf->getParameters();
+                        $rfReturnType = $rf->getReturnType();
+                        if (true
+                            && (count($rfParameters) === 2)
+                            && ($rfParameters[ 0 ]->isArray())
+                            && ($rfParameters[ 1 ]->isVariadic())
+                            && (($rfReturnType === null) || ($rfReturnType->getName() === 'void'))
+                        ) {
+                            $isValid = true;
                         }
-                        catch ( \Throwable $erf ) {
-                        }
+                    }
+                    catch ( \Throwable $erf ) {
                     }
                 }
 
@@ -617,7 +615,7 @@ class DebugModule
         $output[ 'type' ] = "{$phpType}({$phpStrlen})";
 
         if ($withValue) {
-            if (count($printableValue)) {
+            if (0 !== count($printableValue)) {
                 $output[ 'value' ] = $printableValue[ 0 ];
             }
         }
@@ -677,7 +675,7 @@ class DebugModule
         $output[ 'id' ] = $objectId;
 
         if ($withValue) {
-            if (count($printableValue)) {
+            if (0 !== count($printableValue)) {
                 $output[ 'value' ] = $printableValue[ 0 ];
             }
         }
@@ -793,7 +791,7 @@ class DebugModule
         $output[ 'type' ] = "{$phpType}({$arrayCount})";
 
         if ($withValue) {
-            if (count($printableValue)) {
+            if (0 !== count($printableValue)) {
                 $output[ 'value' ] = $printableValue[ 0 ];
             }
         }

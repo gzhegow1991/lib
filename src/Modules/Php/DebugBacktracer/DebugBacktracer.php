@@ -422,7 +422,7 @@ class DebugBacktracer
     {
         $trace = $this->execute();
 
-        if (count($trace)) {
+        if (0 !== count($trace)) {
             return [
                 $trace[ 0 ][ 'file' ],
                 $trace[ 0 ][ 'line' ],

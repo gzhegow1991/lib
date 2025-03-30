@@ -29,7 +29,7 @@ abstract class AbstractConfig implements
     {
         $publicVars = Lib::php()->get_object_vars($this, null);
 
-        if (count($publicVars)) {
+        if (0 !== count($publicVars)) {
             throw new LogicException(
                 [ 'The configuration must not have any public properties', $this ]
             );

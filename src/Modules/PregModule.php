@@ -32,7 +32,7 @@ class PregModule extends ParseModuleBase
 
     public function preg_escape(string $delimiter, ...$regexParts) : string
     {
-        if (! count($regexParts)) {
+        if (0 === count($regexParts)) {
             return '';
         }
 
@@ -57,7 +57,7 @@ class PregModule extends ParseModuleBase
 
     public function preg_escape_ord(?string $mb_encoding, string $delimiter, ...$regexParts) : string
     {
-        if (! count($regexParts)) {
+        if (0 === count($regexParts)) {
             return '';
         }
 
