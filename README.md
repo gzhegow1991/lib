@@ -13,6 +13,7 @@ composer require gzhegow/lib;
 ```php
 <?php
 
+require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 
@@ -868,6 +869,7 @@ $fn = function () {
 
     foreach ( $valuesXX as $i => $valuesX ) {
         $table = [];
+        $tableSize = [];
         foreach ( $valuesY as $ii => $y ) {
             $yKey = "@{$ii} | " . $theDebug->value($y);
 
@@ -875,15 +877,21 @@ $fn = function () {
                 $xKey = "@{$iii} | " . $theDebug->value($x);
 
                 $fnCmp = $theCmp->fnCompare(_CMP_MODE_ERROR_NAN | _CMP_MODE_TYPE_CONTINUE, [ &$fnCmpName ]);
+                $fnCmpSize = $theCmp->fnCompareSize(_CMP_MODE_ERROR_NAN | _CMP_MODE_TYPE_CONTINUE, [ &$fnCmpSizeName ]);
 
                 $result = $fnCmp($x, $y);
+                $resultSize = $fnCmpSize($x, $y);
 
                 $table[ $row = $yKey ][ $col = $xKey ] = "{$result} ? {$fnCmpName}";
+                $tableSize[ $row = $yKey ][ $col = $xKey ] = "{$resultSize} ? {$fnCmpSizeName}";
             }
         }
 
         // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
+        // dd(\Gzhegow\Lib\Lib::debug()->print_table($tableSize, 1));
         echo md5(serialize($table)) . PHP_EOL;
+        echo md5(serialize($tableSize)) . PHP_EOL;
+        echo PHP_EOL;
     }
     unset($table);
 };
@@ -891,19 +899,46 @@ _assert_stdout($fn, [], '
 "[ CmpModule ]"
 
 d13e52ba05b3e23d03706d30fb175944
+601bf1d9cc046c84d03f979256b0ac68
+
 554c815cf495d2dfe00eab6a346defe3
-5d31c8873558ecb72ae75f8a02c6f240
-2f632a52fcf4a57919fea09dcb6305e6
-35f255c7df640a4469fd64f57c438fd1
+b638cd3469b7ba6cb7bd64cf4c703d85
+
+319e17fe896196b86440351b56864c81
+7c32f55c5abe33fe25aa02327f5dd037
+
+7c665301696c5caae30512e6d23c573d
+7fa16af56b83b935468e0b23ef8cd330
+
+8284e955854607c9e7369526bdd50a48
+810a67e771fafd6d2948568df6401736
+
 4659d8c8681cbb0b5eb50eebc817fea9
+64e90e3c92bb8185cec001a571d8acf3
+
 e92f1b5e9197af4eceef7c136032220f
-f8f824d945448880a2ebd8e964c66c72
-ae6c7384bf4e52c1ef56de764e54faef
+583e61948a840fd3fbe8cdc49c138b1d
+
+0696cb85653afd28213011dc2d739183
+211d03b3f82ca2027feb629b5fde8b61
+
+0fc51bcc83cca4f6d9a3f438c9f4d9b1
+12988bf74827ed469046b5eb5d4bbf75
+
 28e5be3ec24d4a74849aa2f81eeeb921
+7ee115574e459a773abe688592e7d818
+
 8ac0f2d3f1290e8785049f9d9f060308
-6031fe73e140da503ae7789fe9666c1b
-2225f766becc7ded366375d9cb9e50c2
-65cdac9b0b0768c55c613c3036f6bc5e
+c6e729dd5370419c51950c2d4f645ec8
+
+523be73309ad7bf62bae5a65178ad604
+50aec55a7073d86fbb7afd875cc17f4e
+
+468a3dfcfeccfda8b67d35bdf09c4fea
+7973407e3fd192fa5b03117ee1185200
+
+77b3fd6f55a95df5463cf3137be99a75
+0edc0aa1ec5c0cbffb8d618683823bc1
 ');
 
 

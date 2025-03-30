@@ -368,9 +368,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function string($value)
+	public function string($value, bool $removeNanInf = null)
 	{
-		if (Lib::type()->string($result, $value)) {
+		if (Lib::type()->string($result, $value, $removeNanInf)) {
 		    return $result;
 		}
 
@@ -381,9 +381,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function string_not_empty($value)
+	public function string_not_empty($value, bool $removeNanInf = null)
 	{
-		if (Lib::type()->string_not_empty($result, $value)) {
+		if (Lib::type()->string_not_empty($result, $value, $removeNanInf)) {
 		    return $result;
 		}
 
@@ -394,9 +394,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function trim($value, string $characters = null)
+	public function trim($value, string $characters = null, bool $removeNanInf = null)
 	{
-		if (Lib::type()->trim($result, $value, $characters)) {
+		if (Lib::type()->trim($result, $value, $characters, $removeNanInf)) {
 		    return $result;
 		}
 

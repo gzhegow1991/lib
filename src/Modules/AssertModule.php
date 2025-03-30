@@ -311,9 +311,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function string($value)
+	public function string($value, bool $removeNanInf = null)
 	{
-		$this->status = Lib::type()->string($this->result, $value);
+		$this->status = Lib::type()->string($this->result, $value, $removeNanInf);
 
 		return $this;
 	}
@@ -322,9 +322,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function string_not_empty($value)
+	public function string_not_empty($value, bool $removeNanInf = null)
 	{
-		$this->status = Lib::type()->string_not_empty($this->result, $value);
+		$this->status = Lib::type()->string_not_empty($this->result, $value, $removeNanInf);
 
 		return $this;
 	}
@@ -333,9 +333,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function trim($value, string $characters = null)
+	public function trim($value, string $characters = null, bool $removeNanInf = null)
 	{
-		$this->status = Lib::type()->trim($this->result, $value, $characters);
+		$this->status = Lib::type()->trim($this->result, $value, $characters, $removeNanInf);
 
 		return $this;
 	}
