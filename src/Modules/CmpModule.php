@@ -966,6 +966,17 @@ class CmpModule
                 return 0;
             }
 
+            $theType = Lib::type();
+
+            $isCountableA = $theType->countable($aCountable, $a);
+            $isCountableB = $theType->countable($bCountable, $b);
+
+            if ($isCountableA && $isCountableB) {
+                $fnCmpName = __FUNCTION__;
+
+                return count($a) <=> count($b);
+            }
+
             $fnCmpName = __FUNCTION__;
 
             return NAN;
