@@ -758,45 +758,32 @@ $fn = function () {
     _print('[ CmpModule ]');
     echo PHP_EOL;
 
-    $object = new \StdClass();
-    $objectEmptyCountable = new class implements \Countable {
-        public function count() : int
-        {
-            return 0;
-        }
-    };
-    $objectNonEmptyCountable = new class implements \Countable {
-        public function count() : int
-        {
-            return 1;
-        }
-    };
-
-    $resourceOpened = STDOUT;
+    $resourceOpenedStdout = STDOUT;
+    $resourceOpenedStderr = STDERR;
     $resourceClosed = fopen('php://memory', 'w');
     fclose($resourceClosed);
 
     $valuesXX = [
-        [
+        0  => [
             0 => NAN,
             1 => \Gzhegow\Lib\Lib::type()->the_nil(),
             2 => null,
         ],
-        [
+        1  => [
             3 => false,
             4 => true,
         ],
-        [
+        2  => [
             5 => 0,
             6 => 1,
         ],
-        [
+        3  => [
             9  => 0.0,
             10 => 1.0,
             11 => 1.1,
             12 => 1e1,
         ],
-        [
+        4  => [
             7  => PHP_INT_MAX,
             8  => -PHP_INT_MAX,
             13 => PHP_FLOAT_MAX,
@@ -804,105 +791,77 @@ $fn = function () {
             15 => INF,
             16 => -INF,
         ],
-        [
+        5  => [
             17 => 'NAN',
             18 => (string) \Gzhegow\Lib\Lib::type()->the_nil(),
         ],
-        [
+        6  => [
             19 => '',
             20 => 'a',
             21 => 'b',
             22 => 'ab',
             23 => 'ba',
         ],
-        [
+        7  => [
             24 => '0',
             25 => '1',
         ],
-        [
+        8  => [
             26 => '0.0',
             27 => '1.0',
             28 => '1.1',
             29 => '1e5',
         ],
-        [
+        9  => [
             30 => 'INF',
             31 => '-INF',
         ],
-        [
-            32 => $resourceOpened,
-            33 => $resourceClosed,
+        10 => [
+            32 => $resourceOpenedStdout,
+            33 => $resourceOpenedStderr,
+            34 => $resourceClosed,
         ],
-        [
-            34 => [],
-            35 => [ '' ],
-            36 => [ 'a' ],
+        11 => [
+            35 => [],
+            36 => [ '' ],
+            37 => [ 'a' ],
+            38 => [ 'a', 'b' ],
         ],
-        [
-            37 => $object,
-            38 => (object) [],
-            39 => (object) [ '' ],
-            40 => (object) [ 'a' ],
-            41 => new ArrayObject([]),
-            42 => new ArrayObject([ '' ]),
-            43 => new ArrayObject([ 'a' ]),
-        ],
-        [
-            44 => new \DateTime('1970-01-01 00:00:00'),
-            45 => new \DateTime('1970-01-01 00:00:01'),
-            46 => (new \DateTime('1970-01-01 00:00:01'))->modify('+500ms'),
+        12 => [
+            39 => (new \DateTime('1970-01-01 00:00:00')),
+            40 => (new \DateTime('1970-01-01 00:00:01')),
+            41 => (new \DateTime('1970-01-01 00:00:01'))->modify('+500ms'),
         ],
     ];
 
-    $valuesY = [
-        NAN,
-        \Gzhegow\Lib\Lib::type()->the_nil(),
-        null,
-        false,
-        true,
-        0,
-        1,
-        0.0,
-        1.0,
-        1.1,
-        1e1,
-        PHP_INT_MAX,
-        -PHP_INT_MAX,
-        PHP_FLOAT_MAX,
-        -PHP_FLOAT_MAX,
-        INF,
-        -INF,
-        'NAN',
-        (string) \Gzhegow\Lib\Lib::type()->the_nil(),
-        '',
-        'a',
-        'b',
-        'ab',
-        'ba',
-        '0',
-        '1',
-        '0.0',
-        '1.0',
-        '1.1',
-        '1e5',
-        'INF',
-        '-INF',
-        $resourceOpened,
-        $resourceClosed,
-        [],
-        [ '' ],
-        [ 'a' ],
-        $object,
-        (object) [],
-        (object) [ '' ],
-        (object) [ 'a' ],
-        new ArrayObject([]),
-        new ArrayObject([ '' ]),
-        new ArrayObject([ 'a' ]),
-        new \DateTime('1970-01-01 00:00:00'),
-        new \DateTime('1970-01-01 00:00:01'),
-        (new \DateTime('1970-01-01 00:00:01'))->modify('+500ms'),
+    $valuesY = array_merge(...$valuesXX);
+
+    $valuesXX += [
+        13 => [
+            42 => new \StdClass(),
+            43 => (object) [],
+            44 => (object) [ '' ],
+            45 => (object) [ 'a' ],
+            46 => (object) [ 'a', 'b' ],
+            47 => new ArrayObject([]),
+            48 => new ArrayObject([ '' ]),
+            49 => new ArrayObject([ 'a' ]),
+            50 => new ArrayObject([ 'a', 'b' ]),
+        ],
     ];
+
+    $valuesY += [
+        42 => new \StdClass(),
+        43 => (object) [],
+        44 => (object) [ '' ],
+        45 => (object) [ 'a' ],
+        46 => (object) [ 'a', 'b' ],
+        47 => new ArrayObject([]),
+        48 => new ArrayObject([ '' ]),
+        49 => new ArrayObject([ 'a' ]),
+        50 => new ArrayObject([ 'a', 'b' ]),
+    ];
+
 
     $theCmp = \Gzhegow\Lib\Lib::cmp();
     $theDebug = \Gzhegow\Lib\Lib::debug();
@@ -2668,6 +2627,24 @@ $fn = function () {
     $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 12:34:56.789000', 'UTC');
     _print($status, $result);
     echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::type()->timezone($result, new \DateTimeZone('UTC'));
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::type()->timezone($result, 'UTC');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::type()->timezone($result, 'Europe/Minsk');
+    _print($status, $result);
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::type()->interval($result, new \DateInterval('P1D'));
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::type()->interval($result, 'P1D');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::type()->interval($result, 'P1.5D');
+    _print($status, $result);
+    echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
 "[ PhpModule ]"
@@ -2707,6 +2684,14 @@ TRUE | { object # DateTime # "1970-01-01T12:34:56.000+03:00" }
 TRUE | { object # DateTime # "1970-01-01T12:34:56.789+03:00" }
 TRUE | { object # DateTime # "1970-01-01T12:34:56.789+03:00" }
 TRUE | { object # DateTime # "1970-01-01T12:34:56.789+00:00" }
+
+TRUE | { object # DateTimeZone # "UTC" }
+TRUE | { object # DateTimeZone # "UTC" }
+TRUE | { object # DateTimeZone # "Europe/Minsk" }
+
+TRUE | { object # DateInterval # "P1D" }
+TRUE | { object # DateInterval # "P1D" }
+TRUE | { object # DateInterval # "P1DT12H" }
 ');
 
 

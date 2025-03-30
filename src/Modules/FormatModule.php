@@ -9,10 +9,183 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 class FormatModule
 {
+    const INTERVAL_MINUTE = 60;
+    const INTERVAL_HOUR   = 3600;
+    const INTERVAL_DAY    = 86400;
+    const INTERVAL_WEEK   = 604800;
+    const INTERVAL_MONTH  = 2592000;
+    const INTERVAL_YEAR   = 31536000;
+
+
+    public function interval_encode(\DateInterval $interval) : string
+    {
+        // > ISO 8601
+
+        $search = [ 'M0S', 'H0M', 'DT0H', 'M0D', 'P0Y', 'Y0M', 'P0M' ];
+        $replace = [ 'M', 'H', 'DT', 'M', 'P', 'Y', 'P' ];
+
+        if ($interval->f) {
+            $microseconds = sprintf('%.6f', $interval->f);
+            $microseconds = substr($microseconds, 2);
+            $microseconds = rtrim($microseconds, '0.');
+            $microseconds = (int) $microseconds;
+
+            $result = $interval->format("P%yY%mM%dDT%hH%iM%s.{$microseconds}S");
+
+        } else {
+            $result = $interval->format('P%yY%mM%dDT%hH%iM%sS');
+        }
+
+        $result = str_replace($search, $replace, $result);
+        $result = rtrim($result, 'PT') ?: 'P0D';
+
+        return $result;
+    }
+
     /**
-     * @return float|int|null
+     * @template-covariant T of \DateInterval
+     *
+     * @param string               $duration
+     * @param class-string<T>|null $intervalClass
+     *
+     * @return T
      */
-    public function bytes_decode(string $size)
+    public function interval_decode(string $duration, string $intervalClass = null) : \DateInterval
+    {
+        // > ISO 8601
+
+        $theStr = Lib::str();
+
+        if ('' === $duration) {
+            throw new LogicException(
+                [ 'The `duration` should be non-empty string' ]
+            );
+        }
+
+        if (null !== $intervalClass) {
+            if (! is_a($intervalClass, \DateInterval::class, true)) {
+                throw new LogicException(
+                    [
+                        'The `intervalClass` should be class-string of: ' . \DateInterval::class,
+                        $intervalClass,
+                    ]
+                );
+            }
+        }
+
+        $intervalClass = $intervalClass ?? \DateInterval::class;
+
+        $regex = '/(\d+\.\d+)([YMWDHS])/';
+
+        $hasDecimalValue = preg_match_all($regex, $duration, $matches);
+
+        $decimalValueFrac = null;
+        $decimalLetter = null;
+        if ($hasDecimalValue) {
+            if (count($matches[ 0 ]) > 1) {
+                throw new LogicException(
+                    [
+                        'The `duration` can contain only one decimal separator in smallest period (according ISO 8601)',
+                        $duration,
+                    ]
+                );
+            }
+
+            $decimalSubstr = $matches[ 0 ][ 0 ];
+            $decimalValue = $matches[ 1 ][ 0 ];
+            $decimalLetter = $matches[ 2 ][ 0 ];
+
+            if (! $theStr->ends($duration, $decimalSubstr, false)) {
+                throw new LogicException(
+                    [
+                        'The `duration` can contain only one decimal separator in smallest period (according ISO 8601)',
+                        $duration,
+                    ]
+                );
+            }
+
+            $decimalValueFloat = (float) $decimalValue;
+            $decimalValueFloor = floor($decimalValue);
+
+            $decimalValueFrac = $decimalValueFloat - $decimalValueFloor;
+
+            $duration = str_replace($decimalValue, $decimalValueFloor, $duration);
+        }
+
+        try {
+            $instance = new \DateInterval($duration);
+
+        }
+        catch ( \Throwable $e ) {
+            throw new LogicException($e);
+        }
+
+        if ($hasDecimalValue) {
+            $now = new \DateTime('now');
+            $nowModified = clone $now;
+
+            $nowModified->add($instance);
+
+            $seconds = null;
+            switch ( $decimalLetter ):
+                case 'Y':
+                    $seconds = floor($decimalValueFrac * static::INTERVAL_YEAR);
+
+                    break;
+
+                case 'W':
+                    $seconds = floor($decimalValueFrac * static::INTERVAL_WEEK);
+
+                    break;
+
+                case 'D':
+                    $seconds = floor($decimalValueFrac * static::INTERVAL_DAY);
+
+                    break;
+
+                case 'H':
+                    $seconds = floor($decimalValueFrac * static::INTERVAL_HOUR);
+
+                    break;
+
+                case 'M':
+                    if (false === strpos($duration, 'T')) {
+                        $seconds = ceil($decimalValueFrac * static::INTERVAL_MONTH);
+
+                    } else {
+                        $seconds = ceil($decimalValueFrac * static::INTERVAL_MINUTE);
+                    }
+
+                    break;
+
+            endswitch;
+
+            if (null !== $seconds) {
+                $nowModified->modify("+{$seconds} seconds");
+            }
+
+            $interval = $nowModified->diff($now);
+
+            $instance->y = $interval->y;
+            $instance->m = $interval->m;
+            $instance->d = $interval->d;
+            $instance->h = $interval->h;
+            $instance->i = $interval->i;
+            $instance->s = $interval->s;
+
+            if ($decimalLetter === 'S') {
+                $instance->f = $decimalValueFrac;
+            }
+        }
+
+        return $instance;
+    }
+
+
+    /**
+     * @return null|int|float
+     */
+    public function bytes_decode(string $size) // : null|int|float
     {
         if (! strlen($size)) {
             return null;

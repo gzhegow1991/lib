@@ -656,6 +656,12 @@ class DebugModule
         if ($withValue) {
             if ($var instanceof \DateTimeInterface) {
                 $printableValue = [ '"' . $var->format(DATE_RFC3339_EXTENDED) . '"' ];
+
+            } elseif ($var instanceof \DateTimeZone) {
+                $printableValue = [ '"' . $var->getName() . '"' ];
+
+            } elseif ($var instanceof \DateInterval) {
+                $printableValue = [ '"' . Lib::format()->interval_encode($var) . '"' ];
             }
         }
 

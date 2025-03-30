@@ -1485,6 +1485,16 @@ class TypeModule extends TypeModuleBase
         catch ( \Throwable $e ) {
         }
 
+        try {
+            $interval = Lib::format()->interval_decode($value);
+
+            $result = $interval;
+
+            return true;
+        }
+        catch ( \Throwable $e ) {
+        }
+
         return false;
     }
 

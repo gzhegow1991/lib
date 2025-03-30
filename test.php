@@ -2614,6 +2614,24 @@ $fn = function () {
     $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 12:34:56.789000', 'UTC');
     _print($status, $result);
     echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::type()->timezone($result, new \DateTimeZone('UTC'));
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::type()->timezone($result, 'UTC');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::type()->timezone($result, 'Europe/Minsk');
+    _print($status, $result);
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::type()->interval($result, new \DateInterval('P1D'));
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::type()->interval($result, 'P1D');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::type()->interval($result, 'P1.5D');
+    _print($status, $result);
+    echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
 "[ PhpModule ]"
@@ -2653,6 +2671,14 @@ TRUE | { object # DateTime # "1970-01-01T12:34:56.000+03:00" }
 TRUE | { object # DateTime # "1970-01-01T12:34:56.789+03:00" }
 TRUE | { object # DateTime # "1970-01-01T12:34:56.789+03:00" }
 TRUE | { object # DateTime # "1970-01-01T12:34:56.789+00:00" }
+
+TRUE | { object # DateTimeZone # "UTC" }
+TRUE | { object # DateTimeZone # "UTC" }
+TRUE | { object # DateTimeZone # "Europe/Minsk" }
+
+TRUE | { object # DateInterval # "P1D" }
+TRUE | { object # DateInterval # "P1D" }
+TRUE | { object # DateInterval # "P1DT12H" }
 ');
 
 
