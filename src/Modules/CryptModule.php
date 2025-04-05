@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Crypt\Alphabet;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
@@ -48,73 +47,19 @@ class CryptModule
 
 
     /**
-     * @param Alphabet|null $result
-     */
-    public function type_alphabet(&$result, $value) : bool
-    {
-        $result = null;
-
-        $theType = Lib::type();
-        $theMb = Lib::mb();
-
-        if (! $theType->string_not_empty($_value, $value)) {
-            return false;
-        }
-
-        preg_replace('/\s+/', '', $_value, 1, $count);
-        if ($count > 0) {
-            return false;
-        }
-
-        $len = mb_strlen($_value);
-        if (mb_strlen($_value) <= 1) {
-            return false;
-        }
-
-        $seen = [];
-        $regex = '/[';
-        $regexNot = '/[^';
-        for ( $i = 0; $i < $len; $i++ ) {
-            $letter = mb_substr($_value, $i, 1);
-
-            if (isset($seen[ $letter ])) {
-                return false;
-            }
-            $seen[ $letter ] = true;
-
-            $letterRegex = sprintf('\x{%X}', mb_ord($letter));
-
-            $regex .= $letterRegex;
-            $regexNot .= $letterRegex;
-        }
-        $regex .= ']+/';
-        $regexNot .= ']/';
-
-        $alphabet = new Alphabet(
-            $_value,
-            $len,
-            $regex,
-            $regexNot
-        );
-
-        $result = $alphabet;
-
-        return true;
-    }
-
-
-    /**
      * @param string|null $result
      */
     public function type_base(&$result, $value, $alphabet) : bool
     {
         $result = null;
 
-        if (! Lib::type()->string_not_empty($_value, $value)) {
+        $theType = Lib::type();
+
+        if (! $theType->string_not_empty($_value, $value)) {
             return false;
         }
 
-        if (! $this->type_alphabet($_alphabet, $alphabet)) {
+        if (! $theType->alphabet($_alphabet, $alphabet)) {
             return false;
         }
 
@@ -281,7 +226,7 @@ class CryptModule
             );
         }
 
-        if (! $this->type_alphabet($_alphabetTo, $alphabetTo)) {
+        if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
                 [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
             );
@@ -398,7 +343,7 @@ class CryptModule
             );
         }
 
-        if (! $this->type_alphabet($_alphabetTo, $alphabetTo)) {
+        if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
                 [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
             );
@@ -528,7 +473,7 @@ class CryptModule
             );
         }
 
-        if (! $this->type_alphabet($_alphabetTo, $alphabetTo)) {
+        if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
                 [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
             );
@@ -716,7 +661,7 @@ class CryptModule
 
         $theBcmath = Lib::bcmath();
 
-        if (! $this->type_alphabet($_alphabetTo, $alphabetTo)) {
+        if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
                 [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
             );
@@ -859,7 +804,7 @@ class CryptModule
         $theBcmath = Lib::bcmath();
         $theMb = Lib::mb();
 
-        if (! $this->type_alphabet($_alphabetTo, $alphabetTo)) {
+        if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
                 [ 'The `alphabetFrom` should be valid alphabet', $alphabetTo ]
             );
@@ -970,7 +915,7 @@ class CryptModule
             ? $binaries
             : (is_string($binaries) ? [ $binaries ] : []);
 
-        if (! $this->type_alphabet($_alphabetTo, $alphabetTo)) {
+        if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
                 [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
             );

@@ -6,6 +6,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Str\Alphabet;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Str\Slugger\Slugger;
@@ -34,14 +35,28 @@ class StrModule
     /**
      * @var bool
      */
-    protected $mbMode = false;
+    protected $mbstring = false;
+
+    /**
+     * @var array<string, callable-string>
+     */
+    protected $mbstringFuncMap = [];
 
 
     public function __construct()
     {
-        $mbMode = extension_loaded('mbstring');
+        $mbstring = extension_loaded('mbstring');
 
-        $this->mbMode = $mbMode;
+        $this->mbstring = $mbstring;
+
+        $this->mbstringFuncMap[ 'lcfirst' ] = [ Lib::mb(), 'lcfirst' ];
+        $this->mbstringFuncMap[ 'ucfirst' ] = [ Lib::mb(), 'ucfirst' ];
+        $this->mbstringFuncMap[ 'lcwords' ] = [ Lib::mb(), 'lcwords' ];
+        $this->mbstringFuncMap[ 'ucwords' ] = [ Lib::mb(), 'ucwords' ];
+
+        if (PHP_VERSION_ID < 70400) {
+            $this->mbstringFuncMap[ 'str_split' ] = [ Lib::mb(), 'str_split' ];
+        }
     }
 
 
@@ -70,27 +85,65 @@ class StrModule
     }
 
 
-    public function static_mb_mode(bool $mbMode = null) : bool
+    public function static_mbstring(bool $mbstring = null) : bool
     {
-        if (null !== $mbMode) {
-            if ($mbMode) {
+        if (null !== $mbstring) {
+            if ($mbstring) {
                 if (! extension_loaded('mbstring')) {
                     throw new RuntimeException(
-                        'Unable to enable `mb_mode` due to `mbstring` extension is missing'
+                        'Missing PHP extension: mbstring'
                     );
                 }
             }
 
-            $last = $this->mbMode;
+            $last = $this->mbstring;
 
-            $current = $mbMode;
+            $current = $mbstring;
 
-            $this->mbMode = $current;
+            $this->mbstring = $current;
 
             $result = $last;
         }
 
-        $result = $result ?? $this->mbMode;
+        $result = $result ?? $this->mbstring;
+
+        return $result;
+    }
+
+
+    /**
+     * @param string   $fnName
+     * @param callable $fn
+     *
+     * @return static
+     */
+    public function mb_func_register(string $fnName, $fn)
+    {
+        if (isset($this->mbstringFuncMap[ $fnName ])) {
+            throw new LogicException(
+                [ 'The `fnName` is already registered', $fnName ]
+            );
+        }
+
+        $this->mbstringFuncMap[ $fnName ] = $fn;
+
+        return $this;
+    }
+
+    /**
+     * @param callable|callable-string $fn
+     *
+     * @return callable
+     */
+    public function mb_func(string $fn)
+    {
+        if (! $this->static_mbstring()) {
+            return $fn;
+        }
+
+        $result = null
+            ?? $this->mbstringFuncMap[ $fn ]
+            ?? 'mb_' . $fn;
 
         return $result;
     }
@@ -99,17 +152,62 @@ class StrModule
     /**
      * @param string|null $result
      */
-    public function type_trim(&$result, $value, string $characters = null, bool $removeNanInf = null) : bool
+    public function type_string(&$result, $value) : bool
     {
         $result = null;
 
-        $characters = $characters ?? " \n\r\t\v\0";
+        $isString = is_string($value);
 
-        if (! Lib::type()->string($_value, $value, $removeNanInf)) {
+        if (! $isString
+            && (
+                (null === $value)
+                || (is_bool($value))
+                || (is_array($value))
+                || (is_float($value) && ! is_finite($value))
+                || (is_resource($value))
+                || ('resource (closed)' === gettype($value))
+            )
+        ) {
             return false;
         }
 
-        $_value = trim($_value, $characters);
+        $_value = null;
+
+        if (is_string($value)) {
+            $_value = $value;
+
+        } elseif (is_object($value)) {
+            if (method_exists($value, '__toString')) {
+                $_value = (string) $value;
+            }
+
+        } else {
+            $settype = $value;
+            $status = settype($settype, 'string');
+            if ($status) {
+                $_value = $settype;
+            }
+        }
+
+        if (null === $_value) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_string_not_empty(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->type_string($_value, $value)) {
+            return false;
+        }
 
         if ('' === $_value) {
             return false;
@@ -117,7 +215,31 @@ class StrModule
 
         $result = $_value;
 
-        return $_value;
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_trim(&$result, $value, string $characters = null) : bool
+    {
+        $result = null;
+
+        $characters = $characters ?? " \n\r\t\v\0";
+
+        if (! $this->type_string($_value, $value)) {
+            return false;
+        }
+
+        $_value = trim($_value, $characters);
+
+        if ('' !== $_value) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -128,66 +250,73 @@ class StrModule
     {
         $result = null;
 
-        if (! Lib::type()->string_not_empty($_value, $value)) {
+        if (! $this->type_string_not_empty($_value, $value)) {
             return false;
         }
 
-        if (1 !== $this->strlen($_value)) {
-            return false;
+        if (1 === $this->strlen($_value)) {
+            $result = $_value;
+
+            return $_value;
         }
 
-        $result = $_value;
-
-        return $_value;
-    }
-
-
-    /**
-     * @param callable|callable-string|null $fn
-     */
-    public function mb(string $fn = null, ...$args)
-    {
-        if (null === $fn) {
-            $result = $this->static_mb_mode();
-
-        } else {
-            $_fn = $this->mb_func($fn);
-
-            $result = $_fn(...$args);
-        }
-
-        return $result;
+        return false;
     }
 
     /**
-     * @param callable|callable-string $fn
-     *
-     * @return callable
+     * @param Alphabet|null $result
      */
-    public function mb_func(string $fn)
+    public function type_alphabet(&$result, $value) : bool
     {
-        if (! $this->static_mb_mode()) {
-            return $fn;
-        }
-
         $result = null;
 
-        switch ( $fn ):
-            case 'str_split':
-                $result = (PHP_VERSION_ID >= 74000)
-                    ? 'mb_str_split'
-                    : [ Lib::mb(), 'str_split' ];
+        if (! $this->type_string_not_empty($_value, $value)) {
+            return false;
+        }
 
-                break;
+        preg_replace('/\s+/', '', $_value, 1, $count);
+        if ($count > 0) {
+            return false;
+        }
 
-            default:
-                $result = 'mb_' . $fn;
+        $fnOrd = $this->mb_func('ord');
+        $fnStrlen = $this->mb_func('strlen');
+        $fnSubstr = $this->mb_func('substr');
 
-                break;
+        $len = $fnStrlen($_value);
+        if ($len <= 1) {
+            return false;
+        }
 
-        endswitch;
+        $seen = [];
+        $regex = '/[';
+        $regexNot = '/[^';
+        for ( $i = 0; $i < $len; $i++ ) {
+            $letter = $fnSubstr($_value, $i, 1);
 
-        return $result;
+            if (isset($seen[ $letter ])) {
+                return false;
+            }
+            $seen[ $letter ] = true;
+
+            $letterRegex = sprintf('\x{%X}', $fnOrd($letter));
+
+            $regex .= $letterRegex;
+            $regexNot .= $letterRegex;
+        }
+        $regex .= ']+/';
+        $regexNot .= ']/';
+
+        $alphabet = new Alphabet(
+            $_value,
+            $len,
+            $regex,
+            $regexNot
+        );
+
+        $result = $alphabet;
+
+        return true;
     }
 
 
@@ -880,7 +1009,7 @@ class StrModule
             return 0;
         }
 
-        $len = $this->static_mb_mode()
+        $len = $this->static_mbstring()
             ? ((null !== $mb_encoding)
                 ? mb_strlen($value, $mb_encoding)
                 : mb_strlen($value)
@@ -914,7 +1043,7 @@ class StrModule
      */
     public function lower(string $string, string $mb_encoding = null) : string
     {
-        if ($this->static_mb_mode()) {
+        if ($this->static_mbstring()) {
             $result = (null !== $mb_encoding)
                 ? mb_strtolower($string, $mb_encoding)
                 : mb_strtolower($string);
@@ -937,7 +1066,7 @@ class StrModule
      */
     public function upper(string $string, string $mb_encoding = null) : string
     {
-        if ($this->static_mb_mode()) {
+        if ($this->static_mbstring()) {
             $result = (null !== $mb_encoding)
                 ? mb_strtoupper($string, $mb_encoding)
                 : mb_strtoupper($string);
@@ -961,7 +1090,7 @@ class StrModule
      */
     public function lcfirst(string $string, string $mb_encoding = null) : string
     {
-        if ($this->static_mb_mode()) {
+        if ($this->static_mbstring()) {
             $result = Lib::mb()->lcfirst($string, $mb_encoding);
 
         } else {
@@ -982,7 +1111,7 @@ class StrModule
      */
     public function ucfirst(string $string, string $mb_encoding = null) : string
     {
-        if ($this->static_mb_mode()) {
+        if ($this->static_mbstring()) {
             $result = Lib::mb()->ucfirst($string, $mb_encoding);
 
         } else {
@@ -1048,7 +1177,28 @@ class StrModule
     }
 
 
-    public function starts(
+    public function str_split(string $string, int $length = null, string $mb_encoding = null) : array
+    {
+        $length = $length ?? 1;
+
+        if ($length < 1) {
+            throw new LogicException(
+                [ 'The `length` must be greater than 0', $length ]
+            );
+        }
+
+        if ($this->static_mbstring()) {
+            $result = Lib::mb()->str_split($string, $length, $mb_encoding);
+
+        } else {
+            $result = preg_split("/(?<=.{{$length}})/u", $string, -1, PREG_SPLIT_NO_EMPTY);;
+        }
+
+        return $result;
+    }
+
+
+    public function str_starts(
         string $string, string $needle, bool $ignoreCase = null,
         array $refs = []
     ) : bool
@@ -1089,7 +1239,7 @@ class StrModule
         return $status;
     }
 
-    public function ends(
+    public function str_ends(
         string $string, string $needle, bool $ignoreCase = null,
         array $refs = []
     ) : bool
@@ -1295,7 +1445,7 @@ class StrModule
      *
      * @return string|string[]
      */
-    public function replace_limit(
+    public function str_replace_limit(
         $search, $replace, $subject,
         int $limit = null,
         int &$count = null
@@ -1337,7 +1487,7 @@ class StrModule
      *
      * @return string|string[]
      */
-    public function ireplace_limit(
+    public function str_ireplace_limit(
         $search, $replace, $subject,
         int $limit = null,
         int &$count = null
@@ -1374,7 +1524,7 @@ class StrModule
     /**
      * @param string|string[] $lines
      */
-    public function match(
+    public function str_match(
         string $pattern, $lines,
         string $wildcardLetterSequence = null,
         string $wildcardSeparator = null,
@@ -1390,7 +1540,7 @@ class StrModule
             return [];
         }
 
-        $regex = $this->match_regex(
+        $regex = $this->str_match_regex(
             $pattern,
             $wildcardLetterSequence,
             $wildcardSeparator,
@@ -1413,7 +1563,7 @@ class StrModule
     /**
      * @param string|string[] $lines
      */
-    public function match_starts(
+    public function str_match_starts(
         string $pattern, $lines,
         string $wildcardLetterSequence = null,
         string $wildcardSeparator = null,
@@ -1429,7 +1579,7 @@ class StrModule
             return [];
         }
 
-        $regex = $this->match_regex(
+        $regex = $this->str_match_regex(
             $pattern,
             $wildcardLetterSequence,
             $wildcardSeparator,
@@ -1452,7 +1602,7 @@ class StrModule
     /**
      * @param string|string[] $lines
      */
-    public function match_ends(
+    public function str_match_ends(
         string $pattern, $lines,
         string $wildcardLetterSequence = null,
         string $wildcardSeparator = null,
@@ -1468,7 +1618,7 @@ class StrModule
             return [];
         }
 
-        $regex = $this->match_regex(
+        $regex = $this->str_match_regex(
             $pattern,
             $wildcardLetterSequence,
             $wildcardSeparator,
@@ -1491,7 +1641,7 @@ class StrModule
     /**
      * @param string|string[] $lines
      */
-    public function match_contains(
+    public function str_match_contains(
         string $pattern, $lines,
         string $wildcardLetterSequence = null,
         string $wildcardSeparator = null,
@@ -1507,7 +1657,7 @@ class StrModule
             return [];
         }
 
-        $regex = $this->match_regex(
+        $regex = $this->str_match_regex(
             $pattern,
             $wildcardLetterSequence,
             $wildcardSeparator,
@@ -1527,7 +1677,7 @@ class StrModule
         return $result;
     }
 
-    protected function match_regex(
+    protected function str_match_regex(
         string $pattern,
         string $wildcardLetterSequence = null,
         string $wildcardSeparator = null,
@@ -1993,23 +2143,35 @@ class StrModule
     /**
      * gzhegow, урезает английское слово до префикса из нескольких букв - когда имя индекса в бд слишком длинное
      */
-    public function prefix(string $string, int $len = null) : string
+    public function prefix(string $string, int $length = null) : string
     {
+        require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
+
         if ('' === $string) {
             return '';
         }
 
         $theMb = Lib::mb();
 
-        $len = $len ?? 3;
-        $len = max(0, $len);
+        $length = $length ?? 3;
 
-        $source = preg_replace('/(?:[^\w]|[_])+/u', '', $string);
-        $sourceLen = mb_strlen($source);
+        if ($length < 1) {
+            throw new LogicException(
+                [ 'The `length` should be greater than zero', $length ]
+            );
+        }
 
-        $len = min($len, $sourceLen);
+        $_string = preg_replace('/(?:[^\w]|[_])+/u', '', $string);
+        if ('' === $_string) {
 
-        if (0 === $len) {
+        }
+
+        $source = $_string;
+        $sourceLen = $this->strlen($source);
+
+        $length = min($length, $sourceLen);
+
+        if (0 === $length) {
             return '';
         }
 
@@ -2032,8 +2194,8 @@ class StrModule
         $letters = [];
 
         $hasVowel = false;
-        $left = $len;
-        for ( $i = 0; $i < $len; $i++ ) {
+        $left = $length;
+        for ( $i = 0; $i < $length; $i++ ) {
             $letter = null;
             if (isset($sourceVowels[ $i ])) {
                 if (! $hasVowel) {

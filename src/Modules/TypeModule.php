@@ -3,9 +3,9 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Crypt\Alphabet;
+use Gzhegow\Lib\Modules\Type\Number;
+use Gzhegow\Lib\Modules\Str\Alphabet;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
-use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Type\Base\TypeModuleBase;
 
 
@@ -284,49 +284,126 @@ class TypeModule extends TypeModuleBase
             $result = $value;
 
             return true;
-        }
 
-        if (is_float($value)) {
+        } elseif (is_float($value)) {
             if (! is_finite($value)) {
                 return false;
+            }
 
-            } else {
-                $result = $value;
+            $result = $value;
 
-                return true;
+            return true;
+        }
+
+        if (! $this->numeric($valueNumeric, $value, true, [ &$split ])) {
+            return false;
+        }
+
+        $map = [];
+
+        if (PHP_INT_SIZE === 8) {
+            $map += [
+                ' ' . ((string) PHP_INT_MAX)  => PHP_INT_MAX,
+                ' ' . ((string) -PHP_INT_MAX) => -PHP_INT_MAX,
+                ' ' . ((string) PHP_INT_MIN)  => PHP_INT_MIN,
+                //
+                ' 9223372036854775807'        => PHP_INT_MAX,
+                ' -9223372036854775807'       => -PHP_INT_MAX,
+                ' -9223372036854775808'       => PHP_INT_MIN,
+            ];
+
+        } elseif (PHP_INT_SIZE === 4) {
+            $map += [
+                ' ' . ((string) PHP_INT_MAX)  => PHP_INT_MAX,
+                ' ' . ((string) -PHP_INT_MAX) => -PHP_INT_MAX,
+                ' ' . ((string) PHP_INT_MIN)  => PHP_INT_MIN,
+                //
+                ' 2147483647'                 => PHP_INT_MAX,
+                ' -2147483647'                => -PHP_INT_MAX,
+                ' -2147483648'                => PHP_INT_MIN,
+            ];
+        }
+
+        $map += [
+            ' ' . ((string) PHP_FLOAT_MAX)  => PHP_FLOAT_MAX,
+            ' ' . ((string) PHP_FLOAT_MIN)  => PHP_FLOAT_MIN,
+            //
+            ' ' . ((string) -PHP_FLOAT_MAX) => -PHP_FLOAT_MAX,
+            ' ' . ((string) -PHP_FLOAT_MIN) => -PHP_FLOAT_MIN,
+            //
+            ' 1.797693134862316E+308'       => PHP_FLOAT_MAX,
+            ' 1.7976931348623157E+308'      => PHP_FLOAT_MAX,
+            //
+            ' 2.225073858507201E-308'       => PHP_FLOAT_MIN,
+            ' 2.2250738585072014E-308'      => PHP_FLOAT_MIN,
+            //
+            ' -1.797693134862316E+308'      => -PHP_FLOAT_MAX,
+            ' -1.7976931348623157E+308'     => -PHP_FLOAT_MAX,
+            //
+            ' -2.225073858507201E-308'      => -PHP_FLOAT_MIN,
+            ' -2.2250738585072014E-308'     => -PHP_FLOAT_MIN,
+        ];
+
+        if (isset($map[ $key = ' ' . $valueNumeric ])) {
+            $result = $map[ $key ];
+
+            return true;
+        }
+
+        $valueFloat = null;
+        $valueFloat17g = null;
+
+        $hasExponent = ('' !== $split[ 3 ]);
+        if ($hasExponent) {
+            $valueFloat = (float) $valueNumeric;
+
+        } else {
+            // > IEEE 754 double-precision floating point (64-bit float)
+            $valueFloat17g = floatval(sprintf('%.17g', $valueNumeric));
+        }
+
+        $valueMaybeFloat = $valueFloat17g ?? $valueFloat;
+
+        if (0.0 === $valueMaybeFloat) {
+            if ($valueNumeric !== '0') {
+                return false;
             }
         }
 
-        if (! is_numeric($value)) {
+        if (! is_finite($valueMaybeFloat)) {
             return false;
         }
 
-        $valueString = (string) $value;
-
-        // > IEEE 754 double-precision floating point (64-bit float)
-        $valueFloat = floatval(sprintf('%.17g', $valueString));
-
-        if (! is_finite($valueFloat)) {
-            return false;
-        }
-
-        if (($valueFloat < -PHP_INT_MAX) || (PHP_INT_MAX < $valueFloat)) {
+        if (null !== $valueFloat) {
             $result = $valueFloat;
 
             return true;
         }
 
-        $valueInt = (int) $valueFloat;
+        if (null !== $valueFloat17g) {
+            if (
+                ($valueFloat17g < (float) PHP_INT_MIN)
+                || ($valueFloat17g > (float) PHP_INT_MAX)
+            ) {
+                $result = $valueFloat17g;
 
-        if ($valueFloat === (float) $valueInt) {
-            $result = $valueInt;
+                return true;
+            }
+
+            $valueInt = intval($valueFloat17g);
+
+            if ($valueFloat17g === floatval($valueInt)) {
+                $result = $valueInt;
+
+                return true;
+            }
+
+            $result = $valueFloat17g;
 
             return true;
         }
 
-        $result = $valueFloat;
-
-        return true;
+        return false;
     }
 
     /**
@@ -433,67 +510,137 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_int(&$result, $value) : bool
+    public function numeric(&$result, $value, bool $allowExp = null, array $refs = []) : bool
     {
         $result = null;
 
-        if (! $this->numeric($_value, $value)) {
-            return false;
+        $allowExp = $allowExp ?? true;
+
+        $withSplit = array_key_exists(0, $refs);
+
+        $refSplit = null;
+
+        if ($withSplit) {
+            $refSplit =& $refs[ 0 ];
+            $refSplit = null;
         }
 
-        $valueNoMinus = ltrim($_value, '-');
+        if ($value instanceof Number) {
+            $number = $value;
 
-        if (! $this->ctype_digit($var, $valueNoMinus)) {
-            return false;
-        }
+            $exp = $number->getExp();
 
-        $result = $_value;
+            if (! $allowExp) {
+                unset($refSplit);
 
-        return true;
-    }
+                return false;
+            }
 
-    /**
-     * @param string|null $result
-     */
-    public function numeric_int_non_zero(&$result, $value) : bool
-    {
-        $result = null;
+            $result = $number->getValue();
 
-        if (! $this->numeric_int($_value, $value)) {
-            return false;
-        }
+            if ($withSplit) {
+                $refSplit = [];
+                $refSplit[ 0 ] = $number->getSign();
+                $refSplit[ 1 ] = $number->getInt();
+                $refSplit[ 2 ] = $number->getFrac();
+                $refSplit[ 3 ] = $exp;
+            }
 
-        if ($_value == 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param string|null $result
-     */
-    public function numeric_int_non_negative(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->numeric_int($_value, $value)) {
-            return false;
-        }
-
-        if ($_value == 0) {
-            $result = '0';
+            unset($refSplit);
 
             return true;
         }
 
-        if ('-' === $_value[ 0 ]) {
+        $intOrFloat = null;
+
+        if (is_int($value)) {
+            $intOrFloat = $value;
+
+        } elseif (is_float($value)) {
+            if (! is_finite($value)) {
+                unset($refSplit);
+
+                return false;
+            }
+
+            $intOrFloat = $value;
+        }
+
+        if (null !== $intOrFloat) {
+            if (! $withSplit) {
+                $valueString = (string) $intOrFloat;
+
+                if (! $allowExp) {
+                    if (false !== strpos($valueString, 'e')) {
+                        unset($refSplit);
+
+                        return false;
+                    }
+                }
+
+                $result = $valueString;
+
+                unset($refSplit);
+
+                return true;
+            }
+        }
+
+        if (! Lib::str()->type_trim($valueTrim, $value)) {
+            unset($refSplit);
+
             return false;
         }
 
-        $result = $_value;
+        $regex = ''
+            . '/^'
+            . '([+-]?)'
+            . '((?:0|[1-9]\d*))'
+            . '(\.\d+)?'
+            . ($allowExp ? '([eE][+-]?\d+)?' : '')
+            . '$/';
+
+        if (! preg_match($regex, $valueTrim, $matches)) {
+            unset($refSplit);
+
+            return false;
+        }
+
+        [
+            1 => $sign,
+            2 => $int,
+            3 => $frac,
+            4 => $exp,
+        ] = $matches + [ '', '', '', '', '' ];
+
+        if ($sign === '+') {
+            $sign = '';
+        }
+
+        $frac = rtrim($frac, '0.');
+
+        $isNotZero = preg_match('/[1-9]/', "{$int}{$frac}");
+
+        if (! $isNotZero) {
+            $sign = '';
+            $int = '0';
+            $frac = '';
+            $exp = '';
+        }
+
+        if ($withSplit) {
+            $refSplit = [];
+            $refSplit[ 0 ] = $sign;
+            $refSplit[ 1 ] = $int;
+            $refSplit[ 2 ] = $frac;
+            $refSplit[ 3 ] = $exp;
+        }
+
+        $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
+
+        $result = $valueNumeric;
+
+        unset($refSplit);
 
         return true;
     }
@@ -501,16 +648,62 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_int_non_positive(&$result, $value) : bool
+    public function numeric_non_zero(&$result, $value, bool $allowExp = null, array $refs = []) : bool
     {
         $result = null;
 
-        if (! $this->numeric_int($_value, $value)) {
+        if (! $this->numeric($_value, $value, $allowExp, $refs)) {
             return false;
         }
 
-        if ($_value == 0) {
-            $result = '0';
+        if ('0' !== $_value) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_non_negative(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric($_value, $value, $allowExp, $refs)) {
+            return false;
+        }
+
+        if ('0' === $_value) {
+            $result = $_value;
+
+            return true;
+        }
+
+        if ('-' !== $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_non_positive(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric($_value, $value, $allowExp, $refs)) {
+            return false;
+        }
+
+        if ('0' === $_value) {
+            $result = $_value;
 
             return true;
         }
@@ -527,15 +720,15 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_int_negative(&$result, $value) : bool
+    public function numeric_negative(&$result, $value, bool $allowExp = null, array $refs = []) : bool
     {
         $result = null;
 
-        if (! $this->numeric_int($_value, $value)) {
+        if (! $this->numeric($_value, $value, $allowExp, $refs)) {
             return false;
         }
 
-        if ($_value == 0) {
+        if ('0' === $_value) {
             return false;
         }
 
@@ -551,91 +744,56 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_int_positive(&$result, $value) : bool
+    public function numeric_positive(&$result, $value, bool $allowExp = null, array $refs = []) : bool
     {
         $result = null;
 
-        if (! $this->numeric_int($_value, $value)) {
+        if (! $this->numeric($_value, $value, $allowExp, $refs)) {
             return false;
         }
 
-        if ($_value == 0) {
+        if ('0' === $_value) {
             return false;
         }
 
-        if ('-' === $_value[ 0 ]) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-
-    /**
-     * @param string|null $result
-     */
-    public function numeric(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! is_numeric($value)) {
-            return false;
-        }
-
-        $valueString = (string) $value;
-
-        // > IEEE 754 double-precision floating point (64-bit float)
-        $valueFloat = floatval(sprintf('%.17g', $valueString));
-
-        if (! is_finite($valueFloat)) {
-            return false;
-        }
-
-        $result = $valueString;
-
-        return true;
-    }
-
-    /**
-     * @param string|null $result
-     */
-    public function numeric_non_zero(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->numeric($_value, $value)) {
-            return false;
-        }
-
-        if ($_value == 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param string|null $result
-     */
-    public function numeric_non_negative(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->numeric($_value, $value)) {
-            return false;
-        }
-
-        if ($_value == 0) {
-            $result = '0';
+        if ('-' !== $_value[ 0 ]) {
+            $result = $_value;
 
             return true;
         }
 
-        if ('-' === $_value[ 0 ]) {
+        return false;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_int(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    {
+        $result = null;
+
+        $withRefSplit = array_key_exists(0, $refs);
+
+        $refSplit =& $refs[ 0 ];
+
+        if (! $this->numeric($_value, $value, $allowExp, $refs)) {
+            unset($refSplit);
+
+            return false;
+        }
+
+        [ , $int, $frac, $exp ] = $refSplit;
+
+        if ('' !== $frac) {
+            unset($refSplit);
+
+            return false;
+        }
+
+        if ('' !== $exp) {
+            unset($refSplit);
+
             return false;
         }
 
@@ -647,16 +805,64 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_non_positive(&$result, $value) : bool
+    public function numeric_int_non_zero(&$result, $value, bool $allowExp = null, array $refs = []) : bool
     {
         $result = null;
 
-        if (! $this->numeric($_value, $value)) {
+        if (! $this->numeric_int($_value, $value, $allowExp, $refs)) {
             return false;
         }
 
-        if ($_value == 0) {
-            $result = '0';
+        if ('0' !== $_value) {
+            $result = $_value;
+
+            return true;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_int_non_negative(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric_int($_value, $value, $allowExp, $refs)) {
+            return false;
+        }
+
+        if ('0' === $_value) {
+            $result = $_value;
+
+            return true;
+        }
+
+        if ('-' !== $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_int_non_positive(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric_int($_value, $value, $allowExp, $refs)) {
+            return false;
+        }
+
+        if ('0' === $_value) {
+            $result = $_value;
 
             return true;
         }
@@ -673,15 +879,15 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_negative(&$result, $value) : bool
+    public function numeric_int_negative(&$result, $value, bool $allowExp = null, array $refs = []) : bool
     {
         $result = null;
 
-        if (! $this->numeric($_value, $value)) {
+        if (! $this->numeric_int($_value, $value, $allowExp, $refs)) {
             return false;
         }
 
-        if ($_value == 0) {
+        if ('0' === $_value) {
             return false;
         }
 
@@ -697,126 +903,96 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_positive(&$result, $value) : bool
+    public function numeric_int_positive(&$result, $value, bool $allowExp = null, array $refs = []) : bool
     {
         $result = null;
 
-        if (! $this->numeric($_value, $value)) {
+        if (! $this->numeric_int($_value, $value, $allowExp, $refs)) {
             return false;
         }
 
-        if ($_value == 0) {
+        if ('0' === $_value) {
             return false;
         }
 
-        if ('-' === $_value[ 0 ]) {
-            return false;
+        if ('-' !== $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
         }
 
-        $result = $_value;
-
-        return true;
+        return false;
     }
 
+
+    /**
+     * @param Number|null $result
+     */
+    public function number(&$result, $value, bool $allowExp = null) : bool
+    {
+        $result = null;
+
+        if ($value instanceof Number) {
+            $result = $value;
+
+            return true;
+        }
+
+        $status = $this->numeric($valueNumeric, $value, $allowExp, [ &$split ]);
+
+        if ($status) {
+            $frac = $split[ 2 ];
+
+            $scale = 0;
+            if ('' !== $frac) {
+                $scale = strlen($frac) - 1;
+            }
+
+            $number = new Number(
+                $value,
+                $split[ 0 ], $split[ 1 ], $split[ 2 ], $split[ 3 ],
+                $scale
+            );
+
+            $result = $number;
+
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * @param Bcnumber|null $result
      */
-    public function bcnum(&$result, $value) : bool
+    public function bcnumber(&$result, $value) : bool
     {
-        return Lib::bcmath()->type_bcnum($result, $value);
+        return Lib::bcmath()->type_bcnumber($result, $value);
     }
 
 
     /**
      * @param string|null $result
      */
-    public function string(&$result, $value, bool $removeNanInf = null) : bool
+    public function string(&$result, $value) : bool
     {
-        $result = null;
-
-        $removeNanInf = $removeNanInf ?? false;
-
-        $isString = is_string($value);
-
-        if (! $isString
-            && (
-                (null === $value)
-                || (is_bool($value))
-                || (is_array($value))
-                || (is_float($value) && ! is_finite($value))
-                || (is_resource($value))
-                || ('resource (closed)' === gettype($value))
-            )
-        ) {
-            return false;
-        }
-
-        $_value = null;
-
-        if (is_string($value)) {
-            $_value = $value;
-
-        } elseif (is_object($value)) {
-            if (method_exists($value, '__toString')) {
-                $_value = (string) $value;
-            }
-
-        } else {
-            $settype = $value;
-            $status = settype($settype, 'string');
-            if ($status) {
-                $_value = $settype;
-            }
-        }
-
-        if (null === $_value) {
-            return false;
-        }
-
-        if ($removeNanInf) {
-            if (is_numeric($_value)) {
-                // > IEEE 754 double-precision floating point (64-bit float)
-                $valueFloat = floatval(sprintf('%.17g', $_value));
-
-                if (! is_finite($valueFloat)) {
-                    return false;
-                }
-            }
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::str()->type_string($result, $value);
     }
 
     /**
      * @param string|null $result
      */
-    public function string_not_empty(&$result, $value, bool $removeNanInf = null) : bool
+    public function string_not_empty(&$result, $value) : bool
     {
-        $result = null;
-
-        if (! $this->string($_value, $value, $removeNanInf)) {
-            return false;
-        }
-
-        if ('' === $_value) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::str()->type_string_not_empty($result, $value);
     }
-
 
     /**
      * @param string|null $result
      */
-    public function trim(&$result, $value, string $characters = null, bool $removeNanInf = null) : bool
+    public function trim(&$result, $value, string $characters = null) : bool
     {
-        return Lib::str()->type_trim($result, $value, $characters, $removeNanInf);
+        return Lib::str()->type_trim($result, $value, $characters);
     }
 
 
@@ -833,7 +1009,7 @@ class TypeModule extends TypeModuleBase
      */
     public function alphabet(&$result, $value) : bool
     {
-        return Lib::crypt()->type_alphabet($result, $value);
+        return Lib::str()->type_alphabet($result, $value);
     }
 
 
@@ -1166,345 +1342,218 @@ class TypeModule extends TypeModuleBase
 
 
     /**
-     * @param \DateTimeInterface|null   $result
-     *
-     * @param string|\DateTimeZone|null $timezoneIfParsed
-     * @param string|string[]|null      $formats
-     */
-    public function date_interface(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
-    {
-        $result = null;
-
-        if ($value instanceof \DateTimeInterface) {
-            $result = $value;
-
-            return true;
-        }
-
-        if ($this->date($date, $value, $timezoneIfParsed, $formats)) {
-            $result = $date;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \DateTime|null            $result
-     *
-     * @param string|\DateTimeZone|null $timezoneIfParsed
-     * @param string|string[]|null      $formats
-     */
-    public function date(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
-    {
-        $result = null;
-
-        $hasTimezoneIfParsed = (null !== $timezoneIfParsed);
-        $hasFormats = (null !== $formats);
-
-        $_timezoneIfParsed = null;
-        if ($hasTimezoneIfParsed) {
-            if (! $this->timezone($_timezoneIfParsed, $timezoneIfParsed)) {
-                throw new LogicException(
-                    [ 'The `timezoneIfParsed` should be null or valid \DateTimeZone', $timezoneIfParsed ]
-                );
-            }
-        }
-
-        if ($value instanceof \DateTime) {
-            $result = $value;
-
-            return true;
-
-        } elseif ($value instanceof \DateTimeImmutable) {
-            $date = \DateTime::createFromImmutable($value);
-
-            $result = $date;
-
-            return true;
-        }
-
-        if ($hasFormats) {
-            $_formats = Lib::php()->to_list($formats);
-
-            foreach ( $_formats as $i => $format ) {
-                if (! (is_string($format) && ('' !== $format))) {
-                    throw new LogicException(
-                        [
-                            'Each of `formats` should be non-empty string',
-                            $format,
-                            $i,
-                        ]
-                    );
-                }
-            }
-
-        } else {
-            if ('' === $value) {
-                // > strtotime(''); // OK, what?
-
-                return false;
-            }
-
-            if (is_numeric($value)) {
-                // > strtotime(0); // FALSE
-                // > strtotime(1); // FALSE
-                // > strtotime(1.0); // FALSE
-                // > strtotime('0'); // FALSE
-                // > strtotime('1'); // FALSE
-
-                // > strtotime(1.1); // OK, what?
-                // > strtotime('0.0'); // OK, what?
-                // > strtotime('1.0'); // OK, what?
-                // > strtotime('1.1'); // OK, what?
-
-                return false;
-            }
-
-            if ($this->letter($letter, $value)) {
-                // $bAscii = 'b';
-                // $bbAscii = 'bb';
-                // $bRussian = 'б';
-                // $bbRussian = 'бб';
-                // > strtotime($bbAscii); // FALSE
-                // > strtotime($bRussian); // FALSE
-                // > strtotime($bbRussian); // FALSE
-
-                // > strtotime($bAscii); // OK, what?
-
-                return false;
-            }
-        }
-
-        $date = null;
-
-        if ($hasFormats) {
-            foreach ( $_formats as $format ) {
-                try {
-                    $date = \DateTime::createFromFormat(
-                        $format,
-                        $value,
-                        $_timezoneIfParsed
-                    );
-                }
-                catch ( \Throwable $e ) {
-                }
-
-                if ($date) {
-                    $result = $date;
-
-                    break;
-                }
-            }
-
-        } else {
-            try {
-                $date = new \DateTime($value, $_timezoneIfParsed);
-
-                $result = $date;
-
-                return true;
-            }
-            catch ( \Throwable $e ) {
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \DateTimeImmutable|null   $result
-     *
-     * @param string|\DateTimeZone|null $timezoneIfParsed
-     * @param string|string[]|null      $formats
-     */
-    public function date_immutable(&$result, $value, $timezoneIfParsed = null, $formats = null) : bool
-    {
-        $result = null;
-
-        $hasTimezoneIfParsed = (null !== $timezoneIfParsed);
-        $hasFormats = (null !== $formats);
-
-        $_timezoneIfParsed = null;
-        if ($hasTimezoneIfParsed) {
-            if (! $this->timezone($_timezoneIfParsed, $timezoneIfParsed)) {
-                throw new LogicException(
-                    [ 'The `timezoneIfParsed` should be null or valid \DateTimeZone', $timezoneIfParsed ]
-                );
-            }
-        }
-
-        if ($value instanceof \DateTimeImmutable) {
-            $result = $value;
-
-            return true;
-
-        } elseif ($value instanceof \DateTime) {
-            $dateImmutable = \DateTimeImmutable::createFromMutable($value);
-
-            $result = $dateImmutable;
-
-            return true;
-        }
-
-        if ($hasFormats) {
-            $_formats = Lib::php()->to_list($formats);
-
-            foreach ( $_formats as $i => $format ) {
-                if (! (is_string($format) && ('' !== $format))) {
-                    throw new LogicException(
-                        [
-                            'Each of `formats` should be non-empty string',
-                            $format,
-                            $i,
-                        ]
-                    );
-                }
-            }
-
-        } else {
-            if ('' === $value) {
-                // > strtotime(''); // OK, what?
-
-                return false;
-            }
-
-            if (is_numeric($value)) {
-                // > strtotime(0); // FALSE
-                // > strtotime(1); // FALSE
-                // > strtotime(1.0); // FALSE
-                // > strtotime('0'); // FALSE
-                // > strtotime('1'); // FALSE
-
-                // > strtotime(1.1); // OK, what?
-                // > strtotime('0.0'); // OK, what?
-                // > strtotime('1.0'); // OK, what?
-                // > strtotime('1.1'); // OK, what?
-
-                return false;
-            }
-
-            if ($this->letter($letter, $value)) {
-                // $bAscii = 'b';
-                // $bbAscii = 'bb';
-                // $bRussian = 'б';
-                // $bbRussian = 'бб';
-                // > strtotime($bbAscii); // FALSE
-                // > strtotime($bRussian); // FALSE
-                // > strtotime($bbRussian); // FALSE
-
-                // > strtotime($bAscii); // OK, what?
-
-                return false;
-            }
-        }
-
-        $dateImmutable = null;
-
-        if ($hasFormats) {
-            foreach ( $_formats as $format ) {
-                try {
-                    $dateImmutable = \DateTimeImmutable::createFromFormat(
-                        $format,
-                        $value,
-                        $_timezoneIfParsed
-                    );
-                }
-                catch ( \Throwable $e ) {
-                }
-
-                if ($dateImmutable) {
-                    $result = $dateImmutable;
-
-                    return true;
-                }
-            }
-
-        } else {
-            try {
-                $dateImmutable = new \DateTimeImmutable($value, $_timezoneIfParsed);
-
-                $result = $dateImmutable;
-
-                return true;
-            }
-            catch ( \Throwable $e ) {
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \DateTimeZone|null $result
-     */
-    public function timezone(&$result, $value) : bool
-    {
-        $result = null;
-
-        if ($value instanceof \DateTimeZone) {
-            $result = $value;
-
-            return true;
-        }
-
-        try {
-            $timezone = new \DateTimeZone($value);
-
-            $result = $timezone;
-
-            return true;
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \DateInterval|null $result
-     */
-    public function interval(&$result, $value) : bool
-    {
-        $result = null;
-
-        if ($value instanceof \DateInterval) {
-            $result = $value;
-
-            return true;
-        }
-
-        try {
-            $interval = new \DateInterval($value);
-
-            $result = $interval;
-
-            return true;
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        try {
-            $interval = Lib::format()->interval_decode($value);
-
-            $result = $interval;
-
-            return true;
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        return false;
-    }
-
-
-    /**
      * @param array|\Countable|null $result
      */
     public function countable(&$result, $value) : bool
     {
         return Lib::php()->type_countable($result, $value);
+    }
+
+
+    /**
+     * @param \DateTimeZone|null $result
+     */
+    public function timezone(&$result, $value, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_timezone($result, $value, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTimeZone|null $result
+     */
+    public function timezone_offset(&$result, $timezoneOrOffset) : bool
+    {
+        return Lib::date()->type_timezone_offset($result, $timezoneOrOffset);
+    }
+
+    /**
+     * @param \DateTimeZone|null $result
+     */
+    public function timezone_abbr(&$result, $timezoneOrAbbr) : bool
+    {
+        return Lib::date()->type_timezone_abbr($result, $timezoneOrAbbr);
+    }
+
+    /**
+     * @param \DateTimeZone|null $result
+     */
+    public function timezone_name(&$result, $timezoneOrName) : bool
+    {
+        return Lib::date()->type_timezone_name($result, $timezoneOrName);
+    }
+
+    /**
+     * @param \DateTimeZone|null $result
+     */
+    public function timezone_nameabbr(&$result, $timezoneOrNameOrAbbr) : bool
+    {
+        return Lib::date()->type_timezone_nameabbr($result, $timezoneOrNameOrAbbr);
+    }
+
+
+    /**
+     * @param \DateTimeInterface|null $result
+     */
+    public function date(&$result, $datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_date($result, $datestring, $timezoneFallback, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTime|null $result
+     */
+    public function adate(&$result, $datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_adate($result, $datestring, $timezoneFallback, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTimeImmutable|null $result
+     */
+    public function idate(&$result, $datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_idate($result, $datestring, $timezoneFallback, $allowedTimezoneTypes);
+    }
+
+
+    /**
+     * @param \DateTimeInterface|null $result
+     */
+    public function date_tz(&$result, $datestring, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_date_tz($result, $datestring, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTime|null $result
+     */
+    public function adate_tz(&$result, $datestring, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_adate_tz($result, $datestring, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTimeImmutable|null $result
+     */
+    public function idate_tz(&$result, $datestring, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_idate_tz($result, $datestring, $allowedTimezoneTypes);
+    }
+
+
+    /**
+     * @param \DateTimeInterface|null $result
+     */
+    public function date_of(&$result, string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_date_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTime|null $result
+     */
+    public function adate_of(&$result, string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_adate_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTimeImmutable|null $result
+     */
+    public function idate_of(&$result, string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_idate_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
+    }
+
+
+    /**
+     * @param \DateTimeInterface|null $result
+     */
+    public function date_tz_formatted(&$result, string $format, $dateFormatted, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_date_tz_formatted($result, $format, $dateFormatted, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTime|null $result
+     */
+    public function adate_tz_formatted(&$result, string $format, $dateFormatted, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_adate_tz_formatted($result, $format, $dateFormatted, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTimeImmutable|null $result
+     */
+    public function idate_tz_formatted(&$result, string $format, $dateFormatted, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_idate_tz_formatted($result, $format, $dateFormatted, $allowedTimezoneTypes);
+    }
+
+
+    /**
+     * @param \DateTimeInterface|null $result
+     */
+    public function date_microtime(&$result, $microtime, $timezoneSet = null, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_date_microtime($result, $microtime, $timezoneSet, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTime|null $result
+     */
+    public function adate_microtime(&$result, $microtime, $timezoneSet = null, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_adate_microtime($result, $microtime, $timezoneSet, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTimeImmutable|null $result
+     */
+    public function idate_microtime(&$result, $microtime, $timezoneSet = null, array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_idate_microtime($result, $microtime, $timezoneSet, $allowedTimezoneTypes);
+    }
+
+
+    /**
+     * @param \DateInterval|null $result
+     */
+    public function interval(&$result, $interval) : bool
+    {
+        return Lib::date()->type_interval($result, $interval);
+    }
+
+    /**
+     * @param \DateInterval|null $result
+     */
+    public function interval_duration(&$result, $duration) : bool
+    {
+        return Lib::date()->type_interval_duration($result, $duration);
+    }
+
+    /**
+     * @param \DateInterval|null $result
+     */
+    public function interval_datestring(&$result, $datestring) : bool
+    {
+        return Lib::date()->type_interval_datestring($result, $datestring);
+    }
+
+    /**
+     * @param \DateInterval|null $result
+     */
+    public function interval_microtime(&$result, $microtime) : bool
+    {
+        return Lib::date()->type_interval_microtime($result, $microtime);
+    }
+
+    /**
+     * @param \DateInterval|null $result
+     */
+    public function interval_ago(&$result, $date, \DateTimeInterface $from = null, bool $reverse = null) : bool
+    {
+        return Lib::date()->type_interval_ago($result, $date, $from, $reverse);
     }
 
 
@@ -1736,7 +1785,8 @@ class TypeModule extends TypeModuleBase
      */
     public function path(
         &$result,
-        $value, array $refs = []
+        $value,
+        array $refs = []
     ) : bool
     {
         return Lib::fs()->type_path($result, $value, $refs);
@@ -1746,12 +1796,35 @@ class TypeModule extends TypeModuleBase
      * @param string|null            $result
      * @param array{ 0: array|null } $refs
      */
-    public function dirpath(
+    public function realpath(
         &$result,
-        $value, array $refs = []
+        $value, bool $allowSymlink = null,
+        array $refs = []
     ) : bool
     {
-        return Lib::fs()->type_dirpath($result, $value, $refs);
+        return Lib::fs()->type_realpath(
+            $result,
+            $value, $allowSymlink,
+            $refs
+        );
+    }
+
+
+    /**
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
+     */
+    public function dirpath(
+        &$result,
+        $value, bool $allowExists = null, bool $allowSymlink = null,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::fs()->type_dirpath(
+            $result,
+            $value, $allowExists, $allowSymlink,
+            $refs
+        );
     }
 
     /**
@@ -1759,24 +1832,17 @@ class TypeModule extends TypeModuleBase
      */
     public function filepath(
         &$result,
-        $value, array $refs = []
+        $value, bool $allowExists = null, bool $allowSymlink = null,
+        array $refs = []
     ) : bool
     {
-        return Lib::fs()->type_filepath($result, $value, $refs);
+        return Lib::fs()->type_filepath(
+            $result,
+            $value, $allowExists, $allowSymlink,
+            $refs
+        );
     }
 
-
-    /**
-     * @param string|null            $result
-     * @param array{ 0: array|null } $refs
-     */
-    public function path_realpath(
-        &$result,
-        $value, array $refs = []
-    ) : bool
-    {
-        return Lib::fs()->type_path_realpath($result, $value, $refs);
-    }
 
     /**
      * @param string|null            $result
@@ -1784,10 +1850,15 @@ class TypeModule extends TypeModuleBase
      */
     public function dirpath_realpath(
         &$result,
-        $value, array $refs = []
+        $value, bool $allowSymlink = null,
+        array $refs = []
     ) : bool
     {
-        return Lib::fs()->type_dirpath_realpath($result, $value, $refs);
+        return Lib::fs()->type_dirpath_realpath(
+            $result,
+            $value, $allowSymlink,
+            $refs
+        );
     }
 
     /**
@@ -1796,10 +1867,15 @@ class TypeModule extends TypeModuleBase
      */
     public function filepath_realpath(
         &$result,
-        $value, array $refs = []
+        $value, bool $allowSymlink = null,
+        array $refs = []
     ) : bool
     {
-        return Lib::fs()->type_filepath_realpath($result, $value, $refs);
+        return Lib::fs()->type_filepath_realpath(
+            $result,
+            $value, $allowSymlink,
+            $refs
+        );
     }
 
 

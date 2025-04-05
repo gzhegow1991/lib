@@ -1,9 +1,8 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Bcmath;
+namespace Gzhegow\Lib\Modules\Type;
 
-
-class Bcnumber
+class Number
 {
     /**
      * @var string
@@ -27,6 +26,10 @@ class Bcnumber
      * @var string
      */
     protected $frac;
+    /**
+     * @var string
+     */
+    protected $exp;
 
     /**
      * @var int
@@ -40,6 +43,7 @@ class Bcnumber
         string $sign,
         string $int,
         string $frac,
+        string $exp,
         //
         int $scale
     )
@@ -49,10 +53,11 @@ class Bcnumber
         $this->sign = $sign;
         $this->int = $int;
         $this->frac = $frac;
+        $this->exp = $exp;
 
         $this->scale = $scale;
 
-        $this->value = "{$this->sign}{$this->int}{$this->frac}";
+        $this->value = "{$this->sign}{$this->int}{$this->frac}{$this->exp}";
     }
 
 
@@ -83,6 +88,11 @@ class Bcnumber
         return $this->frac;
     }
 
+    public function getExp() : string
+    {
+        return $this->exp;
+    }
+
 
     public function getScale() : int
     {
@@ -97,7 +107,7 @@ class Bcnumber
 
     public function getValueAbsolute() : string
     {
-        return "{$this->int}{$this->frac}";
+        return "{$this->int}{$this->frac}{$this->exp}";
     }
 
     public function getValueInteger() : string

@@ -110,7 +110,7 @@ class UrlModule
             return null;
         }
 
-        if (null === ($_url = Lib::parse()->string_not_empty($url))) {
+        if (! Lib::type()->string_not_empty($_url, $url)) {
             return null;
         }
 
@@ -225,7 +225,7 @@ class UrlModule
             return null;
         }
 
-        if (null === ($_url = Lib::parse()->string_not_empty($url))) {
+        if (! Lib::type()->string_not_empty($_url, $url)) {
             return null;
         }
 
@@ -286,7 +286,7 @@ class UrlModule
             return null;
         }
 
-        if (null === ($_link = Lib::parse()->string_not_empty($url))) {
+        if (! Lib::type()->string_not_empty($_url, $url)) {
             return null;
         }
 
@@ -312,7 +312,7 @@ class UrlModule
         }
 
         if (null === $refParseUrl) {
-            $refParseUrl = parse_url($_link);
+            $refParseUrl = parse_url($_url);
 
             if (false === $refParseUrl) {
                 return null;

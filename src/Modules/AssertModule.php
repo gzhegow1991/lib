@@ -168,9 +168,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int($value)
+	public function numeric($value, bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int($this->result, $value);
+		$this->status = Lib::type()->numeric($this->result, $value, $allowExp, $refs);
 
 		return $this;
 	}
@@ -179,9 +179,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_non_zero($value)
+	public function numeric_non_zero($value, bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_non_zero($this->result, $value);
+		$this->status = Lib::type()->numeric_non_zero($this->result, $value, $allowExp, $refs);
 
 		return $this;
 	}
@@ -190,9 +190,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_non_negative($value)
+	public function numeric_non_negative($value, bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_non_negative($this->result, $value);
+		$this->status = Lib::type()->numeric_non_negative($this->result, $value, $allowExp, $refs);
 
 		return $this;
 	}
@@ -201,9 +201,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_non_positive($value)
+	public function numeric_non_positive($value, bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_non_positive($this->result, $value);
+		$this->status = Lib::type()->numeric_non_positive($this->result, $value, $allowExp, $refs);
 
 		return $this;
 	}
@@ -212,9 +212,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_negative($value)
+	public function numeric_negative($value, bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_negative($this->result, $value);
+		$this->status = Lib::type()->numeric_negative($this->result, $value, $allowExp, $refs);
 
 		return $this;
 	}
@@ -223,9 +223,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_positive($value)
+	public function numeric_positive($value, bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_positive($this->result, $value);
+		$this->status = Lib::type()->numeric_positive($this->result, $value, $allowExp, $refs);
 
 		return $this;
 	}
@@ -234,9 +234,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric($value)
+	public function numeric_int($value, bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric($this->result, $value);
+		$this->status = Lib::type()->numeric_int($this->result, $value, $allowExp, $refs);
 
 		return $this;
 	}
@@ -245,9 +245,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_non_zero($value)
+	public function numeric_int_non_zero($value, bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_non_zero($this->result, $value);
+		$this->status = Lib::type()->numeric_int_non_zero($this->result, $value, $allowExp, $refs);
 
 		return $this;
 	}
@@ -256,9 +256,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_non_negative($value)
+	public function numeric_int_non_negative($value, bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_non_negative($this->result, $value);
+		$this->status = Lib::type()->numeric_int_non_negative($this->result, $value, $allowExp, $refs);
 
 		return $this;
 	}
@@ -267,9 +267,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_non_positive($value)
+	public function numeric_int_non_positive($value, bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_non_positive($this->result, $value);
+		$this->status = Lib::type()->numeric_int_non_positive($this->result, $value, $allowExp, $refs);
 
 		return $this;
 	}
@@ -278,9 +278,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_negative($value)
+	public function numeric_int_negative($value, bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_negative($this->result, $value);
+		$this->status = Lib::type()->numeric_int_negative($this->result, $value, $allowExp, $refs);
 
 		return $this;
 	}
@@ -289,9 +289,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_positive($value)
+	public function numeric_int_positive($value, bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_positive($this->result, $value);
+		$this->status = Lib::type()->numeric_int_positive($this->result, $value, $allowExp, $refs);
 
 		return $this;
 	}
@@ -300,9 +300,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function bcnum($value)
+	public function number($value, bool $allowExp = null)
 	{
-		$this->status = Lib::type()->bcnum($this->result, $value);
+		$this->status = Lib::type()->number($this->result, $value, $allowExp);
 
 		return $this;
 	}
@@ -311,9 +311,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function string($value, bool $removeNanInf = null)
+	public function bcnumber($value)
 	{
-		$this->status = Lib::type()->string($this->result, $value, $removeNanInf);
+		$this->status = Lib::type()->bcnumber($this->result, $value);
 
 		return $this;
 	}
@@ -322,9 +322,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function string_not_empty($value, bool $removeNanInf = null)
+	public function string($value)
 	{
-		$this->status = Lib::type()->string_not_empty($this->result, $value, $removeNanInf);
+		$this->status = Lib::type()->string($this->result, $value);
 
 		return $this;
 	}
@@ -333,9 +333,20 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function trim($value, string $characters = null, bool $removeNanInf = null)
+	public function string_not_empty($value)
 	{
-		$this->status = Lib::type()->trim($this->result, $value, $characters, $removeNanInf);
+		$this->status = Lib::type()->string_not_empty($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function trim($value, string $characters = null)
+	{
+		$this->status = Lib::type()->trim($this->result, $value, $characters);
 
 		return $this;
 	}
@@ -627,75 +638,286 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
-	 * @param string|\DateTimeZone|null $timezoneIfParsed
-	 * @param string|string[]|null      $formats
-	 *
-	 * @return static
-	 */
-	public function date_interface($value, $timezoneIfParsed = null, $formats = null)
-	{
-		$this->status = Lib::type()->date_interface($this->result, $value, $timezoneIfParsed, $formats);
-
-		return $this;
-	}
-
-
-	/**
-	 * @param string|\DateTimeZone|null $timezoneIfParsed
-	 * @param string|string[]|null      $formats
-	 *
-	 * @return static
-	 */
-	public function date($value, $timezoneIfParsed = null, $formats = null)
-	{
-		$this->status = Lib::type()->date($this->result, $value, $timezoneIfParsed, $formats);
-
-		return $this;
-	}
-
-
-	/**
-	 * @param string|\DateTimeZone|null $timezoneIfParsed
-	 * @param string|string[]|null      $formats
-	 *
-	 * @return static
-	 */
-	public function date_immutable($value, $timezoneIfParsed = null, $formats = null)
-	{
-		$this->status = Lib::type()->date_immutable($this->result, $value, $timezoneIfParsed, $formats);
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function timezone($value)
-	{
-		$this->status = Lib::type()->timezone($this->result, $value);
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function interval($value)
-	{
-		$this->status = Lib::type()->interval($this->result, $value);
-
-		return $this;
-	}
-
-
-	/**
 	 * @return static
 	 */
 	public function countable($value)
 	{
 		$this->status = Lib::type()->countable($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function timezone($value, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->timezone($this->result, $value, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function timezone_offset($timezoneOrOffset)
+	{
+		$this->status = Lib::type()->timezone_offset($this->result, $timezoneOrOffset);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function timezone_abbr($timezoneOrAbbr)
+	{
+		$this->status = Lib::type()->timezone_abbr($this->result, $timezoneOrAbbr);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function timezone_name($timezoneOrName)
+	{
+		$this->status = Lib::type()->timezone_name($this->result, $timezoneOrName);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function timezone_nameabbr($timezoneOrNameOrAbbr)
+	{
+		$this->status = Lib::type()->timezone_nameabbr($this->result, $timezoneOrNameOrAbbr);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function date($datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->date($this->result, $datestring, $timezoneFallback, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function adate($datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->adate($this->result, $datestring, $timezoneFallback, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function idate($datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->idate($this->result, $datestring, $timezoneFallback, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function date_tz($datestring, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->date_tz($this->result, $datestring, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function adate_tz($datestring, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->adate_tz($this->result, $datestring, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function idate_tz($datestring, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->idate_tz($this->result, $datestring, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function date_of(string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->date_of($this->result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function adate_of(string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->adate_of($this->result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function idate_of(string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->idate_of($this->result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function date_tz_formatted(string $format, $dateFormatted, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->date_tz_formatted($this->result, $format, $dateFormatted, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function adate_tz_formatted(string $format, $dateFormatted, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->adate_tz_formatted($this->result, $format, $dateFormatted, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function idate_tz_formatted(string $format, $dateFormatted, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->idate_tz_formatted($this->result, $format, $dateFormatted, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function date_microtime($microtime, $timezoneSet = null, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->date_microtime($this->result, $microtime, $timezoneSet, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function adate_microtime($microtime, $timezoneSet = null, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->adate_microtime($this->result, $microtime, $timezoneSet, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function idate_microtime($microtime, $timezoneSet = null, array $allowedTimezoneTypes = null)
+	{
+		$this->status = Lib::type()->idate_microtime($this->result, $microtime, $timezoneSet, $allowedTimezoneTypes);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function interval($interval)
+	{
+		$this->status = Lib::type()->interval($this->result, $interval);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function interval_duration($duration)
+	{
+		$this->status = Lib::type()->interval_duration($this->result, $duration);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function interval_datestring($datestring)
+	{
+		$this->status = Lib::type()->interval_datestring($this->result, $datestring);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function interval_microtime($microtime)
+	{
+		$this->status = Lib::type()->interval_microtime($this->result, $microtime);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function interval_ago($date, \DateTimeInterface $from = null, bool $reverse = null)
+	{
+		$this->status = Lib::type()->interval_ago($this->result, $date, $from, $reverse);
 
 		return $this;
 	}
@@ -1014,20 +1236,9 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function dirpath($value, array $refs = [])
+	public function realpath($value, bool $allowSymlink = null, array $refs = [])
 	{
-		$this->status = Lib::type()->dirpath($this->result, $value, $refs);
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function filepath($value, array $refs = [])
-	{
-		$this->status = Lib::type()->filepath($this->result, $value, $refs);
+		$this->status = Lib::type()->realpath($this->result, $value, $allowSymlink, $refs);
 
 		return $this;
 	}
@@ -1038,9 +1249,20 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function path_realpath($value, array $refs = [])
+	public function dirpath($value, bool $allowExists = null, bool $allowSymlink = null, array $refs = [])
 	{
-		$this->status = Lib::type()->path_realpath($this->result, $value, $refs);
+		$this->status = Lib::type()->dirpath($this->result, $value, $allowExists, $allowSymlink, $refs);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function filepath($value, bool $allowExists = null, bool $allowSymlink = null, array $refs = [])
+	{
+		$this->status = Lib::type()->filepath($this->result, $value, $allowExists, $allowSymlink, $refs);
 
 		return $this;
 	}
@@ -1051,9 +1273,9 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function dirpath_realpath($value, array $refs = [])
+	public function dirpath_realpath($value, bool $allowSymlink = null, array $refs = [])
 	{
-		$this->status = Lib::type()->dirpath_realpath($this->result, $value, $refs);
+		$this->status = Lib::type()->dirpath_realpath($this->result, $value, $allowSymlink, $refs);
 
 		return $this;
 	}
@@ -1064,9 +1286,9 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function filepath_realpath($value, array $refs = [])
+	public function filepath_realpath($value, bool $allowSymlink = null, array $refs = [])
 	{
-		$this->status = Lib::type()->filepath_realpath($this->result, $value, $refs);
+		$this->status = Lib::type()->filepath_realpath($this->result, $value, $allowSymlink, $refs);
 
 		return $this;
 	}

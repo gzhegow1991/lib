@@ -6,11 +6,11 @@
 
 namespace Gzhegow\Lib\Modules;
 
-use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
-use Gzhegow\Lib\Modules\Crypt\Alphabet;
+use Gzhegow\Lib\Modules\Str\Alphabet;
 use Gzhegow\Lib\Modules\Type\Base\ParseModuleBase;
+use Gzhegow\Lib\Modules\Type\Number;
 
 class ParseModule extends ParseModuleBase
 {
@@ -199,9 +199,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int($value)
+	public function numeric($value, bool $allowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_int($result, $value)) {
+		if (Lib::type()->numeric($result, $value, $allowExp, $refs)) {
 		    return $result;
 		}
 
@@ -212,9 +212,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_non_zero($value)
+	public function numeric_non_zero($value, bool $allowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_non_zero($result, $value)) {
+		if (Lib::type()->numeric_non_zero($result, $value, $allowExp, $refs)) {
 		    return $result;
 		}
 
@@ -225,9 +225,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_non_negative($value)
+	public function numeric_non_negative($value, bool $allowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_non_negative($result, $value)) {
+		if (Lib::type()->numeric_non_negative($result, $value, $allowExp, $refs)) {
 		    return $result;
 		}
 
@@ -238,9 +238,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_non_positive($value)
+	public function numeric_non_positive($value, bool $allowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_non_positive($result, $value)) {
+		if (Lib::type()->numeric_non_positive($result, $value, $allowExp, $refs)) {
 		    return $result;
 		}
 
@@ -251,9 +251,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_negative($value)
+	public function numeric_negative($value, bool $allowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_negative($result, $value)) {
+		if (Lib::type()->numeric_negative($result, $value, $allowExp, $refs)) {
 		    return $result;
 		}
 
@@ -264,9 +264,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_positive($value)
+	public function numeric_positive($value, bool $allowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_positive($result, $value)) {
+		if (Lib::type()->numeric_positive($result, $value, $allowExp, $refs)) {
 		    return $result;
 		}
 
@@ -277,9 +277,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric($value)
+	public function numeric_int($value, bool $allowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric($result, $value)) {
+		if (Lib::type()->numeric_int($result, $value, $allowExp, $refs)) {
 		    return $result;
 		}
 
@@ -290,9 +290,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_non_zero($value)
+	public function numeric_int_non_zero($value, bool $allowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_non_zero($result, $value)) {
+		if (Lib::type()->numeric_int_non_zero($result, $value, $allowExp, $refs)) {
 		    return $result;
 		}
 
@@ -303,9 +303,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_non_negative($value)
+	public function numeric_int_non_negative($value, bool $allowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_non_negative($result, $value)) {
+		if (Lib::type()->numeric_int_non_negative($result, $value, $allowExp, $refs)) {
 		    return $result;
 		}
 
@@ -316,9 +316,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_non_positive($value)
+	public function numeric_int_non_positive($value, bool $allowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_non_positive($result, $value)) {
+		if (Lib::type()->numeric_int_non_positive($result, $value, $allowExp, $refs)) {
 		    return $result;
 		}
 
@@ -329,9 +329,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_negative($value)
+	public function numeric_int_negative($value, bool $allowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_negative($result, $value)) {
+		if (Lib::type()->numeric_int_negative($result, $value, $allowExp, $refs)) {
 		    return $result;
 		}
 
@@ -342,9 +342,22 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_positive($value)
+	public function numeric_int_positive($value, bool $allowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_positive($result, $value)) {
+		if (Lib::type()->numeric_int_positive($result, $value, $allowExp, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return Number|null
+	 */
+	public function number($value, bool $allowExp = null)
+	{
+		if (Lib::type()->number($result, $value, $allowExp)) {
 		    return $result;
 		}
 
@@ -355,9 +368,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return Bcnumber|null
 	 */
-	public function bcnum($value)
+	public function bcnumber($value)
 	{
-		if (Lib::type()->bcnum($result, $value)) {
+		if (Lib::type()->bcnumber($result, $value)) {
 		    return $result;
 		}
 
@@ -368,9 +381,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function string($value, bool $removeNanInf = null)
+	public function string($value)
 	{
-		if (Lib::type()->string($result, $value, $removeNanInf)) {
+		if (Lib::type()->string($result, $value)) {
 		    return $result;
 		}
 
@@ -381,9 +394,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function string_not_empty($value, bool $removeNanInf = null)
+	public function string_not_empty($value)
 	{
-		if (Lib::type()->string_not_empty($result, $value, $removeNanInf)) {
+		if (Lib::type()->string_not_empty($result, $value)) {
 		    return $result;
 		}
 
@@ -394,9 +407,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function trim($value, string $characters = null, bool $removeNanInf = null)
+	public function trim($value, string $characters = null)
 	{
-		if (Lib::type()->trim($result, $value, $characters, $removeNanInf)) {
+		if (Lib::type()->trim($result, $value, $characters)) {
 		    return $result;
 		}
 
@@ -740,46 +753,11 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @param string|\DateTimeZone|null $timezoneIfParsed
-	 * @param string|string[]|null      $formats
-	 *
-	 * @return \DateTimeInterface|null
+	 * @return array|\Countable|null
 	 */
-	public function date_interface($value, $timezoneIfParsed = null, $formats = null)
+	public function countable($value)
 	{
-		if (Lib::type()->date_interface($result, $value, $timezoneIfParsed, $formats)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @param string|\DateTimeZone|null $timezoneIfParsed
-	 * @param string|string[]|null      $formats
-	 *
-	 * @return \DateTime|null
-	 */
-	public function date($value, $timezoneIfParsed = null, $formats = null)
-	{
-		if (Lib::type()->date($result, $value, $timezoneIfParsed, $formats)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @param string|\DateTimeZone|null $timezoneIfParsed
-	 * @param string|string[]|null      $formats
-	 *
-	 * @return \DateTimeImmutable|null
-	 */
-	public function date_immutable($value, $timezoneIfParsed = null, $formats = null)
-	{
-		if (Lib::type()->date_immutable($result, $value, $timezoneIfParsed, $formats)) {
+		if (Lib::type()->countable($result, $value)) {
 		    return $result;
 		}
 
@@ -790,9 +768,256 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return \DateTimeZone|null
 	 */
-	public function timezone($value)
+	public function timezone($value, array $allowedTimezoneTypes = null)
 	{
-		if (Lib::type()->timezone($result, $value)) {
+		if (Lib::type()->timezone($result, $value, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeZone|null
+	 */
+	public function timezone_offset($timezoneOrOffset)
+	{
+		if (Lib::type()->timezone_offset($result, $timezoneOrOffset)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeZone|null
+	 */
+	public function timezone_abbr($timezoneOrAbbr)
+	{
+		if (Lib::type()->timezone_abbr($result, $timezoneOrAbbr)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeZone|null
+	 */
+	public function timezone_name($timezoneOrName)
+	{
+		if (Lib::type()->timezone_name($result, $timezoneOrName)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeZone|null
+	 */
+	public function timezone_nameabbr($timezoneOrNameOrAbbr)
+	{
+		if (Lib::type()->timezone_nameabbr($result, $timezoneOrNameOrAbbr)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeInterface|null
+	 */
+	public function date($datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->date($result, $datestring, $timezoneFallback, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTime|null
+	 */
+	public function adate($datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->adate($result, $datestring, $timezoneFallback, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeImmutable|null
+	 */
+	public function idate($datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->idate($result, $datestring, $timezoneFallback, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeInterface|null
+	 */
+	public function date_tz($datestring, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->date_tz($result, $datestring, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTime|null
+	 */
+	public function adate_tz($datestring, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->adate_tz($result, $datestring, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeImmutable|null
+	 */
+	public function idate_tz($datestring, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->idate_tz($result, $datestring, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeInterface|null
+	 */
+	public function date_of(string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->date_of($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTime|null
+	 */
+	public function adate_of(string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->adate_of($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeImmutable|null
+	 */
+	public function idate_of(string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->idate_of($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeInterface|null
+	 */
+	public function date_tz_formatted(string $format, $dateFormatted, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->date_tz_formatted($result, $format, $dateFormatted, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTime|null
+	 */
+	public function adate_tz_formatted(string $format, $dateFormatted, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->adate_tz_formatted($result, $format, $dateFormatted, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeImmutable|null
+	 */
+	public function idate_tz_formatted(string $format, $dateFormatted, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->idate_tz_formatted($result, $format, $dateFormatted, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeInterface|null
+	 */
+	public function date_microtime($microtime, $timezoneSet = null, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->date_microtime($result, $microtime, $timezoneSet, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTime|null
+	 */
+	public function adate_microtime($microtime, $timezoneSet = null, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->adate_microtime($result, $microtime, $timezoneSet, $allowedTimezoneTypes)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateTimeImmutable|null
+	 */
+	public function idate_microtime($microtime, $timezoneSet = null, array $allowedTimezoneTypes = null)
+	{
+		if (Lib::type()->idate_microtime($result, $microtime, $timezoneSet, $allowedTimezoneTypes)) {
 		    return $result;
 		}
 
@@ -803,9 +1028,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return \DateInterval|null
 	 */
-	public function interval($value)
+	public function interval($interval)
 	{
-		if (Lib::type()->interval($result, $value)) {
+		if (Lib::type()->interval($result, $interval)) {
 		    return $result;
 		}
 
@@ -814,11 +1039,50 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return array|\Countable|null
+	 * @return \DateInterval|null
 	 */
-	public function countable($value)
+	public function interval_duration($duration)
 	{
-		if (Lib::type()->countable($result, $value)) {
+		if (Lib::type()->interval_duration($result, $duration)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateInterval|null
+	 */
+	public function interval_datestring($datestring)
+	{
+		if (Lib::type()->interval_datestring($result, $datestring)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateInterval|null
+	 */
+	public function interval_microtime($microtime)
+	{
+		if (Lib::type()->interval_microtime($result, $microtime)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \DateInterval|null
+	 */
+	public function interval_ago($date, \DateTimeInterface $from = null, bool $reverse = null)
+	{
+		if (Lib::type()->interval_ago($result, $date, $from, $reverse)) {
 		    return $result;
 		}
 
@@ -1191,22 +1455,9 @@ class ParseModule extends ParseModuleBase
 	 *
 	 * @return string|null
 	 */
-	public function dirpath($value, array $refs = [])
+	public function realpath($value, bool $allowSymlink = null, array $refs = [])
 	{
-		if (Lib::type()->dirpath($result, $value, $refs)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return string|null
-	 */
-	public function filepath($value, array $refs = [])
-	{
-		if (Lib::type()->filepath($result, $value, $refs)) {
+		if (Lib::type()->realpath($result, $value, $allowSymlink, $refs)) {
 		    return $result;
 		}
 
@@ -1219,9 +1470,22 @@ class ParseModule extends ParseModuleBase
 	 *
 	 * @return string|null
 	 */
-	public function path_realpath($value, array $refs = [])
+	public function dirpath($value, bool $allowExists = null, bool $allowSymlink = null, array $refs = [])
 	{
-		if (Lib::type()->path_realpath($result, $value, $refs)) {
+		if (Lib::type()->dirpath($result, $value, $allowExists, $allowSymlink, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function filepath($value, bool $allowExists = null, bool $allowSymlink = null, array $refs = [])
+	{
+		if (Lib::type()->filepath($result, $value, $allowExists, $allowSymlink, $refs)) {
 		    return $result;
 		}
 
@@ -1234,9 +1498,9 @@ class ParseModule extends ParseModuleBase
 	 *
 	 * @return string|null
 	 */
-	public function dirpath_realpath($value, array $refs = [])
+	public function dirpath_realpath($value, bool $allowSymlink = null, array $refs = [])
 	{
-		if (Lib::type()->dirpath_realpath($result, $value, $refs)) {
+		if (Lib::type()->dirpath_realpath($result, $value, $allowSymlink, $refs)) {
 		    return $result;
 		}
 
@@ -1249,9 +1513,9 @@ class ParseModule extends ParseModuleBase
 	 *
 	 * @return string|null
 	 */
-	public function filepath_realpath($value, array $refs = [])
+	public function filepath_realpath($value, bool $allowSymlink = null, array $refs = [])
 	{
-		if (Lib::type()->filepath_realpath($result, $value, $refs)) {
+		if (Lib::type()->filepath_realpath($result, $value, $allowSymlink, $refs)) {
 		    return $result;
 		}
 

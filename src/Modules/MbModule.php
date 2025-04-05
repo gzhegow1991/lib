@@ -236,9 +236,64 @@ class MbModule
     }
 
 
+    /**
+     * > пишет каждое слово в предложении с малой буквы
+     */
+    public function lcwords(string $string, string $separators = " \t\r\n\f\v", string $mb_encoding = null) : string
+    {
+        $thePreg = Lib::preg();
+
+        $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
+        $regex = '/(^|[' . $regex . '])(\w)/u';
+
+        $result = preg_replace_callback(
+            $regex,
+            function ($m) use ($mb_encoding) {
+                $first = $m[ 1 ];
+                $last = $this->lcfirst($m[ 2 ], $mb_encoding);
+
+                return "{$first}{$last}";
+            },
+            $string
+        );
+
+        return $result;
+    }
+
+    /**
+     * > пишет каждое слово в предложении с большой буквы
+     */
+    public function ucwords(string $string, string $separators = " \t\r\n\f\v", string $mb_encoding = null) : string
+    {
+        $thePreg = Lib::preg();
+
+        $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
+        $regex = '/(^|[' . $regex . '])(\w)/u';
+
+        $result = preg_replace_callback(
+            $regex,
+            function ($m) use ($mb_encoding) {
+                $first = $m[ 1 ];
+                $last = $this->ucfirst($m[ 2 ], $mb_encoding);
+
+                return "{$first}{$last}";
+            },
+            $string
+        );
+
+        return $result;
+    }
+
+
     public function str_split(string $string, int $length = null, string $mb_encoding = null) : array
     {
         $length = $length ?? 1;
+
+        if ($length < 1) {
+            throw new LogicException(
+                [ 'The `length` must be greater than 0', $length ]
+            );
+        }
 
         $mbEncodingArgs = [];
         if (null !== $mb_encoding) {
@@ -247,12 +302,6 @@ class MbModule
 
         if (PHP_VERSION_ID >= 74000) {
             return mb_str_split($string, $length, ...$mbEncodingArgs);
-        }
-
-        if ($length < 1) {
-            throw new LogicException(
-                'The `length` must be greater than 0'
-            );
         }
 
         $len = mb_strlen($string, ...$mbEncodingArgs);

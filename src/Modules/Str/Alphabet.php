@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Crypt;
+namespace Gzhegow\Lib\Modules\Str;
 
 
 class Alphabet

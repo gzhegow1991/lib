@@ -89,6 +89,7 @@ function _assert_stdout(
 }
 
 
+
 // >>> TEST
 // > тесты Benchmark
 $fn = function () {
@@ -456,6 +457,7 @@ _assert_stdout($fn, [], '
 ');
 
 
+
 // >>> TEST
 // > тесты ArrModule
 $fn = function () {
@@ -469,7 +471,8 @@ $fn = function () {
     };
 
 
-    $array = \Gzhegow\Lib\Lib::new8(\Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::class,
+    $array = \Gzhegow\Lib\Lib::new8(
+        \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::class,
         'object'
     );
     $array[] = $notAnObject;
@@ -483,7 +486,8 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    $array = \Gzhegow\Lib\Lib::new8(\Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::class,
+    $array = \Gzhegow\Lib\Lib::new8(
+        \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::class,
         $types = [ 'mixed' => 'object' ]
     );
     $array[] = $object;
@@ -502,7 +506,8 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    $array = \Gzhegow\Lib\Lib::new8(\Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::class,
+    $array = \Gzhegow\Lib\Lib::new8(
+        \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::class,
         $keyType = 'string',
         $objectClass = \stdClass::class
     );
@@ -758,6 +763,8 @@ $fn = function () {
     _print('[ CmpModule ]');
     echo PHP_EOL;
 
+    $object = new \StdClass();
+
     $resourceOpenedStdout = STDOUT;
     $resourceOpenedStderr = STDERR;
     $resourceClosed = fopen('php://memory', 'w');
@@ -765,126 +772,178 @@ $fn = function () {
 
     $valuesXX = [
         0  => [
-            0 => NAN,
-            1 => \Gzhegow\Lib\Lib::type()->the_nil(),
-            2 => null,
+            NAN,
+            null,
+            new \Gzhegow\Lib\Modules\Type\Nil(),
         ],
         1  => [
-            3 => false,
-            4 => true,
+            strval(NAN),
+            'NULL',
+            strval(new \Gzhegow\Lib\Modules\Type\Nil()),
         ],
         2  => [
-            5 => 0,
-            6 => 1,
+            false,
+            true,
         ],
         3  => [
-            9  => 0.0,
-            10 => 1.0,
-            11 => 1.1,
-            12 => 1e1,
+            0,
+            1,
         ],
         4  => [
-            7  => PHP_INT_MAX,
-            8  => -PHP_INT_MAX,
-            13 => PHP_FLOAT_MAX,
-            14 => -PHP_FLOAT_MAX,
-            15 => INF,
-            16 => -INF,
+            0.0,
+            1.0,
+            1.1,
+            1e1,
+            1.1e1, // 11
+            1.1e-1, // 0.11
         ],
         5  => [
-            17 => 'NAN',
-            18 => (string) \Gzhegow\Lib\Lib::type()->the_nil(),
+            PHP_INT_MAX, // > int
+            PHP_INT_MIN, // > int
+            (PHP_INT_MAX + 1), // > float
+            (PHP_INT_MIN - 1), // > float
         ],
         6  => [
-            19 => '',
-            20 => 'a',
-            21 => 'b',
-            22 => 'ab',
-            23 => 'ba',
+            PHP_FLOAT_MAX,
+            PHP_FLOAT_MIN,
+            -PHP_FLOAT_MAX,
+            -PHP_FLOAT_MIN,
         ],
         7  => [
-            24 => '0',
-            25 => '1',
+            INF,
+            -INF,
         ],
         8  => [
-            26 => '0.0',
-            27 => '1.0',
-            28 => '1.1',
-            29 => '1e5',
+            '',
+            'a',
+            'b',
+            'ab',
+            'ba',
         ],
         9  => [
-            30 => 'INF',
-            31 => '-INF',
+            '0',
+            '1',
         ],
         10 => [
-            32 => $resourceOpenedStdout,
-            33 => $resourceOpenedStderr,
-            34 => $resourceClosed,
+            '0.0',
+            '1.0',
+            '1.1',
+            '1e1',
+            '1.1e1', // 11
+            '1.1e-1', // 0.11
         ],
         11 => [
-            35 => [],
-            36 => [ '' ],
-            37 => [ 'a' ],
-            38 => [ 'a', 'b' ],
+            strval(PHP_INT_MAX), // > int
+            strval(PHP_INT_MIN), // > int
+            strval(PHP_INT_MAX + 1), // > float
+            strval(PHP_INT_MIN - 1), // > float
         ],
         12 => [
-            39 => (new \DateTime('1970-01-01 00:00:00')),
-            40 => (new \DateTime('1970-01-01 00:00:01')),
-            41 => (new \DateTime('1970-01-01 00:00:01'))->modify('+500ms'),
+            strval(PHP_FLOAT_MAX),
+            strval(PHP_FLOAT_MIN),
+            strval(-PHP_FLOAT_MAX),
+            strval(-PHP_FLOAT_MIN),
         ],
-    ];
-
-    $valuesY = array_merge(...$valuesXX);
-
-    $valuesXX += [
         13 => [
-            42 => new \StdClass(),
-            43 => (object) [],
-            44 => (object) [ '' ],
-            45 => (object) [ 'a' ],
-            46 => (object) [ 'a', 'b' ],
-            47 => new ArrayObject([]),
-            48 => new ArrayObject([ '' ]),
-            49 => new ArrayObject([ 'a' ]),
-            50 => new ArrayObject([ 'a', 'b' ]),
+            strval(INF),
+            strval(-INF),
+        ],
+        14 => [
+            $resourceOpenedStdout,
+            $resourceOpenedStderr,
+            $resourceClosed,
+        ],
+        15 => [
+            [],
+            [ '' ],
+            [ 'a' ],
+            [ 'a', 'b' ],
+        ],
+        16 => [
+            (new \DateTime('1970-01-01 00:00:00')),
+            (new \DateTime('1970-01-01 00:00:01')),
+            (new \DateTime('1970-01-01 00:00:01'))->modify('+500ms'),
+        ],
+        17 => [
+            $object,
+            new \StdClass(),
+        ],
+        18 => [
+            (object) [],
+            (object) [ '' ],
+            (object) [ 'a' ],
+            (object) [ 'a', 'b' ],
+        ],
+        19 => [
+            new ArrayObject([]),
+            new ArrayObject([ '' ]),
+            new ArrayObject([ 'a' ]),
+            new ArrayObject([ 'a', 'b' ]),
         ],
     ];
 
-    $valuesY += [
-        42 => new \StdClass(),
-        43 => (object) [],
-        44 => (object) [ '' ],
-        45 => (object) [ 'a' ],
-        46 => (object) [ 'a', 'b' ],
-        47 => new ArrayObject([]),
-        48 => new ArrayObject([ '' ]),
-        49 => new ArrayObject([ 'a' ]),
-        50 => new ArrayObject([ 'a', 'b' ]),
-    ];
 
+    $valuesY = $valuesXX;
+
+    // > commented, should be same object
+    // $valuesY[ 17 ][ 0 ] = clone $valuesY[ 17 ][ 0 ];
+    $valuesY[ 17 ][ 1 ] = clone $valuesY[ 17 ][ 1 ];
+    $valuesY[ 18 ][ 0 ] = clone $valuesY[ 18 ][ 0 ];
+    $valuesY[ 18 ][ 1 ] = clone $valuesY[ 18 ][ 1 ];
+    $valuesY[ 18 ][ 2 ] = clone $valuesY[ 18 ][ 2 ];
+    $valuesY[ 18 ][ 3 ] = clone $valuesY[ 18 ][ 3 ];
+    $valuesY[ 19 ][ 0 ] = clone $valuesY[ 19 ][ 0 ];
+    $valuesY[ 19 ][ 1 ] = clone $valuesY[ 19 ][ 1 ];
+    $valuesY[ 19 ][ 2 ] = clone $valuesY[ 19 ][ 2 ];
+    $valuesY[ 19 ][ 3 ] = clone $valuesY[ 19 ][ 3 ];
+
+    $valuesY = array_merge(...$valuesY);
 
     $theCmp = \Gzhegow\Lib\Lib::cmp();
     $theDebug = \Gzhegow\Lib\Lib::debug();
 
+    // $dumpPath = __DIR__ . '/var/dump/fn_compare_tables.txt';
+    // if (is_file($dumpPath)) unlink($dumpPath);
+
+    $xi = 0;
     foreach ( $valuesXX as $i => $valuesX ) {
         $table = [];
         $tableSize = [];
-        foreach ( $valuesY as $ii => $y ) {
-            $yKey = "@{$ii} | " . $theDebug->value($y);
+        foreach ( $valuesX as $x ) {
+            $xKey = "A@{$xi} | " . $theDebug->value($x);
 
-            foreach ( $valuesX as $iii => $x ) {
-                $xKey = "@{$iii} | " . $theDebug->value($x);
+            $yi = 0;
+            foreach ( $valuesY as $y ) {
+                $yKey = "B@{$yi} | " . $theDebug->value($y);
 
-                $fnCmp = $theCmp->fnCompare(_CMP_MODE_ERROR_NAN | _CMP_MODE_TYPE_CONTINUE, [ &$fnCmpName ]);
-                $fnCmpSize = $theCmp->fnCompareSize(_CMP_MODE_ERROR_NAN | _CMP_MODE_TYPE_CONTINUE, [ &$fnCmpSizeName ]);
+                $fnCmp = $theCmp->fnCompareValues(
+                    _CMP_MODE_TYPE_CAST_OR_CONTINUE | _CMP_MODE_DATE_VS_SEC,
+                    _CMP_RESULT_NAN_RETURN,
+                    [ &$fnCmpName ]
+                );
+                $fnCmpSize = $theCmp->fnCompareSizes(
+                    _CMP_MODE_TYPE_CAST_OR_CONTINUE | _CMP_MODE_DATE_VS_SEC,
+                    _CMP_RESULT_NAN_RETURN,
+                    [ &$fnCmpSizeName ]
+                );
 
                 $result = $fnCmp($x, $y);
                 $resultSize = $fnCmpSize($x, $y);
 
-                $table[ $row = $yKey ][ $col = $xKey ] = "{$result} ? {$fnCmpName}";
-                $tableSize[ $row = $yKey ][ $col = $xKey ] = "{$resultSize} ? {$fnCmpSizeName}";
+                $row = $yKey;
+                $col = $xKey;
+
+                $table[ $row ][ $col ] = "{$result} ? {$fnCmpName}";
+                $tableSize[ $row ][ $col ] = "{$resultSize} ? {$fnCmpSizeName}";
+
+                $yi++;
             }
+
+            $xi++;
         }
+
+        // $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        // file_put_contents($dumpPath, $content . PHP_EOL . PHP_EOL, FILE_APPEND);
 
         // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
         // dd(\Gzhegow\Lib\Lib::debug()->print_table($tableSize, 1));
@@ -897,47 +956,65 @@ $fn = function () {
 _assert_stdout($fn, [], '
 "[ CmpModule ]"
 
-d13e52ba05b3e23d03706d30fb175944
-601bf1d9cc046c84d03f979256b0ac68
+bdf5cc59ed864e6160ae04d224e33fa7
+bdf5cc59ed864e6160ae04d224e33fa7
 
-554c815cf495d2dfe00eab6a346defe3
-b638cd3469b7ba6cb7bd64cf4c703d85
+5369c1754322243e0d39af9ca563a057
+1a2482d0414f29d1683971e5c8dab6e4
 
-319e17fe896196b86440351b56864c81
-7c32f55c5abe33fe25aa02327f5dd037
+8d9bae46cb2aace21295674221edfcb7
+a8d7f3fceddedc5b6c99e9cc87af036f
 
-7c665301696c5caae30512e6d23c573d
-7fa16af56b83b935468e0b23ef8cd330
+d2de73e611f4f46fb1d715065aaf8d66
+77b541afdeeaff652b8999436cf75759
 
-8284e955854607c9e7369526bdd50a48
-810a67e771fafd6d2948568df6401736
+2a606361aa2625a0fd3354cd358bb1b0
+fdeb5168c373f3b5a1be824905f96160
 
-4659d8c8681cbb0b5eb50eebc817fea9
-64e90e3c92bb8185cec001a571d8acf3
+28e16009f9953574492e4866b41b7449
+d8eabf258b3f01fc8544bd704edb0bb9
 
-e92f1b5e9197af4eceef7c136032220f
-583e61948a840fd3fbe8cdc49c138b1d
+31c1802f97ccaadea39acea0382ef677
+e9a376f16d62566fd93fc1b26ae1bd81
 
-0696cb85653afd28213011dc2d739183
-211d03b3f82ca2027feb629b5fde8b61
+2232c4d1fae52a4dc66c63fb8dfddb6c
+02a63e2497606a2dc132b37101d94b3b
 
-0fc51bcc83cca4f6d9a3f438c9f4d9b1
-12988bf74827ed469046b5eb5d4bbf75
+09dedf3c01fe5ebfcb96671acb31ca43
+767bb988c97cb93babf9e80f699a9bd6
 
-28e5be3ec24d4a74849aa2f81eeeb921
-7ee115574e459a773abe688592e7d818
+7015ffc6caa649fe14189019ac29580a
+d5127e6a0847dba84ca613b24882f603
 
-8ac0f2d3f1290e8785049f9d9f060308
-c6e729dd5370419c51950c2d4f645ec8
+56c446ad377af19cb14a25902bfdca77
+8ac08583f3dbac0847dd7b25c0bd8dff
 
-523be73309ad7bf62bae5a65178ad604
-50aec55a7073d86fbb7afd875cc17f4e
+1dbf9ffe899df6e9ddc5655f71940210
+3d10de1dd12fd826707288485fe9f7c6
 
-468a3dfcfeccfda8b67d35bdf09c4fea
-7973407e3fd192fa5b03117ee1185200
+4454bfc6a3902546c5fb4cdced945889
+9064209c0fc1996a6c87ffe7cd2d1c2b
 
-77b3fd6f55a95df5463cf3137be99a75
-0edc0aa1ec5c0cbffb8d618683823bc1
+91f4324dd6d0a448482eae00926dd357
+39358eed96f6a4030cbc478618e62144
+
+2dcbe8337a4e9ddc11a176384684ed34
+93076f4ce8d70cf7b519e10bfff52126
+
+1943a9c0529911fdf4f309a1ad39b7d2
+961de1b52b86369f95416f4ecdb5f64a
+
+7706e5fa73d93301a34aa27afb208d74
+8d9ab134e85ebf5eb30427b479ea6e04
+
+7995349e9b20ca614c6fbb1492eeca91
+2617154af36cef999b61bfc5710ff869
+
+e6eced782e89a529ae365f57b4de2a00
+ffcfeda232c9c48e5dad8570571d482f
+
+76b1ee3007109fec8adbca625357ed7a
+ee3566d740d04509720c1c5e32c48188
 ');
 
 
@@ -1453,6 +1530,301 @@ TRUE
 
 
 // >>> TEST
+// > тесты DateModule
+$fn = function () {
+    _print('[ DateModule ]');
+    echo PHP_EOL;
+
+
+    $before = date_default_timezone_get();
+    date_default_timezone_set('UTC');
+
+
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone($dateTimezone, '+0100');
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone($dateTimezone, 'EET');
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone($dateTimezone, 'Europe/Minsk');
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone($dateTimezone, new \DateTimeZone('UTC'));
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone($dateTimezone, new \DateTime('now', new \DateTimeZone('UTC')));
+    _print($status, $dateTimezone);
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset($dateTimezone, '+0100');
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset($dateTimezone, new \DateTimeZone('+0100'));
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset($dateTimezone, new \DateTime('now', new \DateTimeZone('+0100')));
+    _print($status, $dateTimezone);
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr($dateTimezone, 'EET');
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr($dateTimezone, new \DateTimeZone('EET'));
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr($dateTimezone, new \DateTime('now', new \DateTimeZone('EET')));
+    _print($status, $dateTimezone);
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name($dateTimezone, 'Europe/Minsk');
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name($dateTimezone, new \DateTimeZone('Europe/Minsk'));
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name($dateTimezone, new \DateTime('now', new \DateTimeZone('Europe/Minsk')));
+    _print($status, $dateTimezone);
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr($dateTimezone, 'EET');
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr($dateTimezone, 'Europe/Minsk');
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr($dateTimezone, new \DateTimeZone('EET'));
+    _print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr($dateTimezone, new \DateTime('now', new \DateTimeZone('Europe/Minsk')));
+    _print($status, $dateTimezone);
+    echo PHP_EOL;
+
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval($dateInterval, 'P1D');
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval($dateInterval, 'P1.5D');
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval($dateInterval, '+100 seconds');
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval($dateInterval, new \DateInterval('P1D'));
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
+    _print($status, $dateInterval);
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration($dateInterval, 'P1D');
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration($dateInterval, 'P1.5D');
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration($dateInterval, new \DateInterval('P1D'));
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
+    _print($status, $dateInterval);
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring($dateInterval, '+100 seconds');
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring($dateInterval, new \DateInterval('P1D'));
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
+    _print($status, $dateInterval);
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime($dateInterval, '123.456');
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime($dateInterval, new \DateInterval('P1D'));
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
+    _print($status, $dateInterval);
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago($dateInterval, new \DateTime('tomorrow midnight'), new \DateTime('now midnight'));
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago($dateInterval, new \DateInterval('P1D'));
+    _print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
+    _print($status, $dateInterval);
+    echo PHP_EOL;
+
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 midnight'/*, 'UTC' */);
+    $dateAtomString1 = $dateObject->format(DATE_ATOM);
+    _print($status, $dateObject);
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject2, $dateObject/*, 'UTC' */);
+    $dateAtomString2 = $dateObject2->format(DATE_ATOM);
+    _print($status, $dateObject2, $dateAtomString1 === $dateAtomString2);
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject3, $dateAtomString1/*, 'UTC' */);
+    $dateAtomString3 = $dateObject3->format(DATE_ATOM);
+    _print($status, $dateObject3, $dateAtomString1 === $dateAtomString3);
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject, '1970-01-01 midnight'/*, 'UTC' */);
+    $dateAtomString1 = $dateImmutableObject->format(DATE_ATOM);
+    _print($status, $dateImmutableObject);
+
+    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject2, $dateObject/*, 'UTC' */);
+    $dateAtomString2 = $dateImmutableObject2->format(DATE_ATOM);
+    _print($status, $dateImmutableObject2, $dateAtomString1 === $dateAtomString2);
+
+    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject3, $dateAtomString1/*, 'UTC' */);
+    $dateAtomString3 = $dateImmutableObject3->format(DATE_ATOM);
+    _print($status, $dateImmutableObject3, $dateAtomString1 === $dateAtomString3);
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::date()->type_date($dateObject, '1970-01-01 midnight'/*, 'UTC' */);
+    $dateAtomString1 = $dateObject->format(DATE_ATOM);
+    _print($status, $dateObject);
+
+    $status = \Gzhegow\Lib\Lib::date()->type_date($dateObject2, $dateObject/*, 'UTC' */);
+    $dateAtomString2 = $dateObject2->format(DATE_ATOM);
+    _print($status, $dateObject2, $dateAtomString1 === $dateAtomString2);
+
+    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject, $from = $dateObject/*, 'UTC' */);
+    $dateAtomString3 = $dateImmutableObject->format(DATE_ATOM);
+    _print($status, $dateImmutableObject, $dateAtomString1 === $dateAtomString3);
+
+    $status = \Gzhegow\Lib\Lib::date()->type_date($dateImmutableObject2, $dateImmutableObject/*, 'UTC' */);
+    $dateAtomString4 = $dateImmutableObject2->format(DATE_ATOM);
+    _print($status, $dateImmutableObject2, $dateAtomString1 === $dateAtomString4);
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject1, '1970-01-01 midnight'/*, 'UTC' */);
+    $dateAtomString = $dateObject1->format(DATE_ATOM);
+    _print($status, $dateObject1);
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject2, '1970-01-01 midnight', 'EET');
+    $dateAtomString2 = $dateObject2->format(DATE_ATOM);
+    _print($status, $dateObject2, $dateAtomString !== $dateAtomString2);
+    echo PHP_EOL;
+
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 12:34:56');
+    _print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 12:34:56.456');
+    _print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 12:34:56.456789');
+    _print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 12:34:56.456789', 'EET');
+    _print($status, $dateObject);
+    echo PHP_EOL;
+
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 +0100');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 EET');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 Europe/Minsk');
+    _print($status, $result);
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, 'Y-m-d H:i:s O', '1970-01-01 00:00:00 +0100');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, 'Y-m-d H:i:s T', '1970-01-01 00:00:00 EET');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, 'Y-m-d H:i:s e', '1970-01-01 00:00:00 Europe/Minsk');
+    _print($status, $result);
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '0');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '123');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '123.456');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '123.456', 'Europe/Minsk');
+    _print($status, $result);
+    echo PHP_EOL;
+
+
+    date_default_timezone_set($before);
+};
+_assert_stdout($fn, [], '
+"[ DateModule ]"
+
+TRUE | { object # DateTimeZone # "+01:00" }
+TRUE | { object # DateTimeZone # "EET" }
+TRUE | { object # DateTimeZone # "Europe/Minsk" }
+TRUE | { object # DateTimeZone # "UTC" }
+TRUE | { object # DateTimeZone # "UTC" }
+
+TRUE | { object # DateTimeZone # "+01:00" }
+TRUE | { object # DateTimeZone # "+01:00" }
+TRUE | { object # DateTimeZone # "+01:00" }
+
+TRUE | { object # DateTimeZone # "EET" }
+TRUE | { object # DateTimeZone # "EET" }
+TRUE | { object # DateTimeZone # "EET" }
+
+TRUE | { object # DateTimeZone # "Europe/Minsk" }
+TRUE | { object # DateTimeZone # "Europe/Minsk" }
+TRUE | { object # DateTimeZone # "Europe/Minsk" }
+
+TRUE | { object # DateTimeZone # "EET" }
+TRUE | { object # DateTimeZone # "Europe/Minsk" }
+TRUE | { object # DateTimeZone # "EET" }
+TRUE | { object # DateTimeZone # "Europe/Minsk" }
+
+
+TRUE | { object # DateInterval # "P1D" }
+TRUE | { object # DateInterval # "P1DT12H" }
+TRUE | { object # DateInterval # "PT100S" }
+TRUE | { object # DateInterval # "P1D" }
+TRUE | { object # DateInterval # "PT100S" }
+
+TRUE | { object # DateInterval # "P1D" }
+TRUE | { object # DateInterval # "P1DT12H" }
+TRUE | { object # DateInterval # "P1D" }
+TRUE | { object # DateInterval # "PT100S" }
+
+TRUE | { object # DateInterval # "PT100S" }
+TRUE | { object # DateInterval # "P1D" }
+TRUE | { object # DateInterval # "PT100S" }
+
+TRUE | { object # DateInterval # "PT2M3.456S" }
+TRUE | { object # DateInterval # "P1D" }
+TRUE | { object # DateInterval # "PT100S" }
+
+TRUE | { object # DateInterval # "P1D" }
+TRUE | { object # DateInterval # "P1D" }
+TRUE | { object # DateInterval # "PT100S" }
+
+
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+00:00" }
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+
+TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000000+00:00" }
+TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+00:00" }
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+00:00" }
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+02:00" } | TRUE
+
+
+TRUE | { object # DateTime # "1970-01-01T12:34:56.000000+00:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.456000+00:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.456789+00:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.456789+02:00" }
+
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+01:00" }
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+02:00" }
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+03:00" }
+
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+01:00" }
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+02:00" }
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+03:00" }
+
+TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+00:00" }
+TRUE | { object # DateTime # "1970-01-01T00:02:03.000000+00:00" }
+TRUE | { object # DateTime # "1970-01-01T00:02:03.000456+00:00" }
+TRUE | { object # DateTime # "1970-01-01T03:02:03.000456+03:00" }
+');
+
+
+// >>> TEST
 // > тесты DebugModule
 $fn = function () {
     _print('[ DebugModule ]');
@@ -1768,7 +2140,7 @@ FALSE
 "string"
 [  ]
 { object # stdClass }
-{ resource(stream) }
+{ resource(opened) # stream }
 
 [ "{ array(3) }", "{ array(3) }", "{ array(3) }" ]
 [ [ 1, "apple", "{ object # stdClass }" ], [ 2, "apples", "{ object # stdClass }" ], [ 1.5, "apples", "{ object # stdClass }" ] ]
@@ -2588,97 +2960,6 @@ $fn = function () {
     unset($table2);
     unset($table3);
     echo PHP_EOL;
-
-
-    $result = null;
-
-    $status = \Gzhegow\Lib\Lib::type()->date($result, $from = '1970-01-01 midnight');
-    $date = $result;
-    $dateAtom = $result->format(DATE_ATOM);
-    _print($status, $result);
-
-    $status = \Gzhegow\Lib\Lib::type()->date($result, $from = $date, 'UTC');
-    $dateAtom2 = $result->format(DATE_ATOM);
-    _print($status, $result, $dateAtom === $dateAtom2);
-
-    $status = \Gzhegow\Lib\Lib::type()->date($result, $from = $dateAtom, 'UTC');
-    $dateAtom3 = $result->format(DATE_ATOM);
-    _print($status, $result, $dateAtom === $dateAtom3);
-    echo PHP_EOL;
-
-
-    $status = \Gzhegow\Lib\Lib::type()->date_immutable($result, $from = '1970-01-01 midnight');
-    $date = $result;
-    $dateAtom = $result->format(DATE_ATOM);
-    _print($status, $result);
-
-    $status = \Gzhegow\Lib\Lib::type()->date_immutable($result, $from = $date, 'UTC');
-    $dateAtom2 = $result->format(DATE_ATOM);
-    _print($status, $result, $dateAtom === $dateAtom2);
-
-    $status = \Gzhegow\Lib\Lib::type()->date_immutable($result, $from = $dateAtom, 'UTC');
-    $dateAtom3 = $result->format(DATE_ATOM);
-    _print($status, $result, $dateAtom === $dateAtom3);
-    echo PHP_EOL;
-
-
-    $status = \Gzhegow\Lib\Lib::type()->date($result, $from = '1970-01-01 midnight');
-    $date = $result;
-    $dateAtom = $result->format(DATE_ATOM);
-    _print($status, $result);
-
-    $status = \Gzhegow\Lib\Lib::type()->date_immutable($result, $from = $date, 'UTC');
-    $date2 = $result;
-    $dateAtom2 = $result->format(DATE_ATOM);
-    _print($status, $result, $dateAtom === $dateAtom2);
-
-    $status = \Gzhegow\Lib\Lib::type()->date_interface($result, $from = $date, 'UTC');
-    $dateAtom3 = $result->format(DATE_ATOM);
-    _print($status, $result, $dateAtom === $dateAtom3);
-
-    $status = \Gzhegow\Lib\Lib::type()->date_interface($result, $from = $date2, 'UTC');
-    $dateAtom4 = $result->format(DATE_ATOM);
-    _print($status, $result, $dateAtom === $dateAtom4);
-    echo PHP_EOL;
-
-
-    $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 midnight');
-    $dateAtom = $result->format(DATE_ATOM);
-    _print($status, $result);
-
-    $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 midnight', 'UTC');
-    $dateAtom2 = $result->format(DATE_ATOM);
-    _print($status, $result, $dateAtom !== $dateAtom2);
-    echo PHP_EOL;
-
-
-    $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 12:34:56');
-    _print($status, $result);
-    $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 12:34:56.7890');
-    _print($status, $result);
-    $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 12:34:56.789000');
-    _print($status, $result);
-    $status = \Gzhegow\Lib\Lib::type()->date($result, '1970-01-01 12:34:56.789000', 'UTC');
-    _print($status, $result);
-    echo PHP_EOL;
-
-
-    $status = \Gzhegow\Lib\Lib::type()->timezone($result, new \DateTimeZone('UTC'));
-    _print($status, $result);
-    $status = \Gzhegow\Lib\Lib::type()->timezone($result, 'UTC');
-    _print($status, $result);
-    $status = \Gzhegow\Lib\Lib::type()->timezone($result, 'Europe/Minsk');
-    _print($status, $result);
-    echo PHP_EOL;
-
-
-    $status = \Gzhegow\Lib\Lib::type()->interval($result, new \DateInterval('P1D'));
-    _print($status, $result);
-    $status = \Gzhegow\Lib\Lib::type()->interval($result, 'P1D');
-    _print($status, $result);
-    $status = \Gzhegow\Lib\Lib::type()->interval($result, 'P1.5D');
-    _print($status, $result);
-    echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
 "[ PhpModule ]"
@@ -2697,35 +2978,6 @@ ee32e6bfadc76c6ffc6ca7383f2ef63e
 d91da25286bd7e000367a9758699e0ca
 cb145079faba3ab6cf451fe9116389ba
 3c3e6efcd8ead6feb5fde9b2d9edc105
-
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000+03:00" }
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000+03:00" } | TRUE
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000+03:00" } | TRUE
-
-TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000+03:00" }
-TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000+03:00" } | TRUE
-TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000+03:00" } | TRUE
-
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000+03:00" }
-TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000+03:00" } | TRUE
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000+03:00" } | TRUE
-TRUE | { object # DateTimeImmutable # "1970-01-01T00:00:00.000+03:00" } | TRUE
-
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000+03:00" }
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000+00:00" } | TRUE
-
-TRUE | { object # DateTime # "1970-01-01T12:34:56.000+03:00" }
-TRUE | { object # DateTime # "1970-01-01T12:34:56.789+03:00" }
-TRUE | { object # DateTime # "1970-01-01T12:34:56.789+03:00" }
-TRUE | { object # DateTime # "1970-01-01T12:34:56.789+00:00" }
-
-TRUE | { object # DateTimeZone # "UTC" }
-TRUE | { object # DateTimeZone # "UTC" }
-TRUE | { object # DateTimeZone # "Europe/Minsk" }
-
-TRUE | { object # DateInterval # "P1D" }
-TRUE | { object # DateInterval # "P1D" }
-TRUE | { object # DateInterval # "P1DT12H" }
 ');
 
 
@@ -2870,9 +3122,9 @@ $fn = function () {
     _print(\Gzhegow\Lib\Lib::str()->ucwords('привет мир'));
     echo PHP_EOL;
 
-    $status = \Gzhegow\Lib\Lib::str()->starts('привет', 'ПРИ', true, [ &$substr ]);
+    $status = \Gzhegow\Lib\Lib::str()->str_starts('привет', 'ПРИ', true, [ &$substr ]);
     _print($status, $substr);
-    $status = \Gzhegow\Lib\Lib::str()->ends('приВЕТ', 'вет', true, [ &$substr ]);
+    $status = \Gzhegow\Lib\Lib::str()->str_ends('приВЕТ', 'вет', true, [ &$substr ]);
     _print($status, $substr);
     echo PHP_EOL;
 
@@ -2884,8 +3136,8 @@ $fn = function () {
     _print(\Gzhegow\Lib\Lib::str()->uncrop('"привет"', '"'));
     echo PHP_EOL;
 
-    _print(\Gzhegow\Lib\Lib::str()->replace_limit('за', '_', 'а-зазаза-зазаза', 3));
-    _print(\Gzhegow\Lib\Lib::str()->ireplace_limit('зА', '_', 'а-заЗАза-заЗАза', 3));
+    _print(\Gzhegow\Lib\Lib::str()->str_replace_limit('за', '_', 'а-зазаза-зазаза', 3));
+    _print(\Gzhegow\Lib\Lib::str()->str_ireplace_limit('зА', '_', 'а-заЗАза-заЗАза', 3));
     echo PHP_EOL;
 
     _print(\Gzhegow\Lib\Lib::str()->camel('-hello-world-foo-bar'));
@@ -2946,9 +3198,9 @@ $fn = function () {
         'users.3.name' => 'name3',
     ];
     $keys = array_keys($array);
-    _print_array_multiline(\Gzhegow\Lib\Lib::str()->match('users.*.name', $keys));
-    _print_array_multiline(\Gzhegow\Lib\Lib::str()->match('users.*.name', $keys, '*'));
-    _print_array_multiline(\Gzhegow\Lib\Lib::str()->match('users.*.name', $keys, '*', '.'));
+    _print_array_multiline(\Gzhegow\Lib\Lib::str()->str_match('users.*.name', $keys));
+    _print_array_multiline(\Gzhegow\Lib\Lib::str()->str_match('users.*.name', $keys, '*'));
+    _print_array_multiline(\Gzhegow\Lib\Lib::str()->str_match('users.*.name', $keys, '*', '.'));
     echo PHP_EOL;
 
     $array = [
@@ -2964,9 +3216,9 @@ $fn = function () {
         "users\x003\x00name"    => 'name3',
     ];
     $keys = array_keys($array);
-    _print_array_multiline(\Gzhegow\Lib\Lib::str()->match("users\x00*\x00name", $keys));
-    _print_array_multiline($a = \Gzhegow\Lib\Lib::str()->match("users\x00*\x00name", $keys, '*'));
-    _print_array_multiline(\Gzhegow\Lib\Lib::str()->match("users\x00*\x00name", $keys, '*', "\x00"));
+    _print_array_multiline(\Gzhegow\Lib\Lib::str()->str_match("users\x00*\x00name", $keys));
+    _print_array_multiline($a = \Gzhegow\Lib\Lib::str()->str_match("users\x00*\x00name", $keys, '*'));
+    _print_array_multiline(\Gzhegow\Lib\Lib::str()->str_match("users\x00*\x00name", $keys, '*', "\x00"));
     echo PHP_EOL;
 };
 _assert_stdout($fn, [], '

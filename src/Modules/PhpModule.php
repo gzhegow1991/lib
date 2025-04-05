@@ -16,6 +16,13 @@ use Gzhegow\Lib\Modules\Php\DebugBacktracer\DebugBacktracer;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
 
+if (! defined('_PHP_PATHINFO_DIRNAME')) define('_PHP_PATHINFO_DIRNAME', PATHINFO_DIRNAME);
+if (! defined('_PHP_PATHINFO_BASENAME')) define('_PHP_PATHINFO_BASENAME', PATHINFO_BASENAME);
+if (! defined('_PHP_PATHINFO_EXTENSION')) define('_PHP_PATHINFO_EXTENSION', PATHINFO_EXTENSION);
+if (! defined('_PHP_PATHINFO_FILENAME')) define('_PHP_PATHINFO_FILENAME', PATHINFO_FILENAME);
+if (! defined('_PHP_PATHINFO_EXTENSIONS')) define('_PHP_PATHINFO_EXTENSIONS', 1 << 4);
+if (! defined('_PHP_PATHINFO_ALL')) define('_PHP_PATHINFO_ALL', ((1 << 5) - 1));
+
 class PhpModule
 {
     /**
@@ -1325,81 +1332,96 @@ class PhpModule
 
 
     /**
-     * > поддерживает предварительную замену $separator на '/'
-     * > во встроенной функции pathinfo() для двойного расширения будет возвращено только последнее, `image.min.jpg` -> 'jpg`
+     * > во встроенной функции pathinfo() для двойного расширения возвращается только последнее, `image.min.jpg` -> 'jpg`
+     * > + поддерживает предварительную замену $separator на '/'
+     * > + при указанных значениях возвращает все ключи, то есть отсутствие расширения при требовании его вернуть - ключ будет и будет NULL
      *
      * @return array{
      *     dirname?: string|null,
-     *     basename?: string,
-     *     filename?: string,
+     *     basename?: string|null,
+     *     filename?: string|null,
      *     extension?: string|null,
+     *     extensions?: string|null,
      * }
      */
-    public function pathinfo(string $path, int $flags = null, string $separator = null, int $levels = null, string $dot = null) : array
+    public function pathinfo(
+        string $path, int $flags = null,
+        string $separator = null, int $levels = null, string $dot = null
+    ) : array
     {
+        $flags = $flags ?? _PHP_PATHINFO_ALL;
+
         $separator = $separator ?? DIRECTORY_SEPARATOR;
         $levels = $levels ?? 1;
-        $flags = $flags ?? (PATHINFO_DIRNAME | PATHINFO_BASENAME | PATHINFO_FILENAME | PATHINFO_EXTENSION);
         $dot = $dot ?? '.';
 
         if ($levels < 1) $levels = 1;
 
-        $_separator = [ '\\', DIRECTORY_SEPARATOR ];
-        if (is_string($separator)) {
-            $_separator[] = $separator;
+        if ($dot === '/') {
+            throw new LogicException('The `dot` should not be equal to `/` sign');
         }
-        $_separator = array_unique($_separator);
 
-        $_value = str_replace($_separator, '/', $path);
+        $separators = [
+            '\\'                => true,
+            DIRECTORY_SEPARATOR => true,
+        ];
+        if ('' !== $separator) {
+            $separators[ $separator ] = true;
+        }
+        $separators = array_keys($separators);
 
-        $_value = ltrim($_value, '/');
+        $var = str_replace($separators, '/', $path);
+
+        $var = ltrim($var, '/');
 
         $pi = [];
 
         if ($flags & PATHINFO_DIRNAME) {
-            $dirname = dirname($_value, $levels);
+            $dirname = $var;
 
-            if (strlen($dirname)) {
-                $dirname = str_replace('/', $separator, $dirname);
+            if (false === strpos($dirname, '/')) {
+                $dirname = null;
 
             } else {
-                $dirname = null;
+                $dirname = dirname($dirname, $levels);
+
+                $dirname = str_replace('/', $separator, $dirname);
+
+                $dirname = ('' !== $dirname) ? $dirname : null;
             }
 
             $pi[ 'dirname' ] = $dirname;
         }
 
-        if (false
-            || $flags & PATHINFO_BASENAME
-            || $flags & PATHINFO_FILENAME
-            || $flags & PATHINFO_EXTENSION
-        ) {
-            $basename = basename($_value);
+        $withBasename = (bool) ($flags & _PHP_PATHINFO_BASENAME);
+        $withFilename = (bool) ($flags & _PHP_PATHINFO_FILENAME);
+        $withExtension = (bool) ($flags & _PHP_PATHINFO_EXTENSION);
 
-            $basenameNotEmpty = strlen($basename);
+        if ($withBasename || $withFilename || $withExtension) {
+            if ($withBasename) {
+                $basename = basename($var);
+                $pi[ 'basename' ] = ('' !== $basename) ? $basename : null;
+            }
+            if ($withFilename) {
+                $filename = pathinfo($var, PATHINFO_FILENAME);
+                $pi[ 'filename' ] = ('' !== $filename) ? $filename : null;
+            }
+            if ($withExtension) {
+                $extension = pathinfo($var, PATHINFO_EXTENSION);
+                $pi[ 'extension' ] = ('' !== $extension) ? $extension : null;
+            }
+        }
 
-            if ($flags & PATHINFO_BASENAME) {
-                $pi[ 'basename' ] = $basenameNotEmpty ? $basename : null;
+        if ($flags & _PHP_PATHINFO_EXTENSIONS) {
+            $list = explode($dot, $var);
+            array_shift($list);
+
+            $extensions = null;
+            if (0 !== count($list)) {
+                $extensions = implode($dot, $list);
             }
 
-            $filename = '';
-            $extension = '';
-            if ($basenameNotEmpty) {
-                if (false
-                    || $flags & PATHINFO_FILENAME
-                    || $flags & PATHINFO_EXTENSION
-                ) {
-                    [ $filename, $extension ] = explode($dot, $basename, 2) + [ '', '' ];
-                }
-            }
-
-            if ($flags & PATHINFO_FILENAME) {
-                $pi[ 'filename' ] = strlen($filename) ? $filename : null;
-            }
-
-            if ($flags & PATHINFO_EXTENSION) {
-                $pi[ 'extension' ] = strlen($extension) ? $extension : null;
-            }
+            $pi[ 'extensions' ] = $extensions;
         }
 
         return $pi;
@@ -1417,26 +1439,31 @@ class PhpModule
 
         if ($levels < 1) $levels = 1;
 
-        $_separator = [ '\\', DIRECTORY_SEPARATOR ];
-        if (is_string($separator)) {
-            $_separator[] = $separator;
+        $separators = [
+            '\\'                => true,
+            DIRECTORY_SEPARATOR => true,
+        ];
+        if ('' !== $separator) {
+            $separators[ $separator ] = true;
         }
-        $_separator = array_unique($_separator);
+        $separators = array_keys($separators);
 
-        $_value = str_replace($_separator, '/', $path);
+        $var = str_replace($separators, '/', $path);
 
-        $_value = ltrim($_value, '/');
+        $var = ltrim($var, '/');
 
-        if (false === strpos($_value, '/')) {
-            $_value = null;
+        $dirname = $var;
+
+        if (false === strpos($dirname, '/')) {
+            $dirname = null;
 
         } else {
-            $_value = dirname($_value, $levels);
+            $dirname = dirname($dirname, $levels);
 
-            $_value = str_replace('/', $separator, $_value);
+            $dirname = str_replace('/', $separator, $dirname);
         }
 
-        return $_value;
+        return ('' !== $dirname) ? $dirname : null;
     }
 
     /**
@@ -1446,17 +1473,22 @@ class PhpModule
     {
         if ('' === $path) return null;
 
-        $_separator = [ '\\', DIRECTORY_SEPARATOR ];
-        if (is_string($separator)) {
-            $_separator[] = $separator;
+        $separator = $separator ?? DIRECTORY_SEPARATOR;
+
+        $separators = [
+            '\\'                => true,
+            DIRECTORY_SEPARATOR => true,
+        ];
+        if ('' !== $separator) {
+            $separators[ $separator ] = true;
         }
-        $_separator = array_unique($_separator);
+        $separators = array_keys($separators);
 
-        $_value = str_replace($_separator, '/', $path);
+        $var = str_replace($separators, '/', $path);
 
-        $_value = basename($_value, $extension);
+        $basename = basename($var, $extension);
 
-        return $_value;
+        return ('' !== $basename) ? $basename : null;
     }
 
     /**
@@ -1466,23 +1498,27 @@ class PhpModule
     {
         if ('' === $path) return null;
 
+        $separator = $separator ?? DIRECTORY_SEPARATOR;
         $dot = $dot ?? '.';
 
-        $_separator = [ '\\', DIRECTORY_SEPARATOR ];
-        if (is_string($separator)) {
-            $_separator[] = $separator;
+        if ($dot === '/') {
+            throw new LogicException('The `dot` should not be equal to `/` sign');
         }
-        $_separator = array_unique($_separator);
 
-        $_value = str_replace($_separator, '/', $path);
+        $separators = [
+            '\\'                => true,
+            DIRECTORY_SEPARATOR => true,
+        ];
+        if ('' !== $separator) {
+            $separators[ $separator ] = true;
+        }
+        $separators = array_keys($separators);
 
-        $_value = basename($_value);
+        $var = str_replace($separators, '/', $path);
 
-        [ $_value ] = explode($dot, $_value, 2) + [ '', '' ];
+        $filename = pathinfo($var, PATHINFO_FILENAME);
 
-        $_value = strlen($_value) ? $_value : null;
-
-        return $_value;
+        return ('' !== $filename) ? $filename : null;
     }
 
     /**
@@ -1492,23 +1528,63 @@ class PhpModule
     {
         if ('' === $path) return null;
 
+        $separator = $separator ?? DIRECTORY_SEPARATOR;
         $dot = $dot ?? '.';
 
-        $_separator = [ '\\', DIRECTORY_SEPARATOR ];
-        if (is_string($separator)) {
-            $_separator[] = $separator;
+        if ($dot === '/') {
+            throw new LogicException('The `dot` should not be equal to `/` sign');
         }
-        $_separator = array_unique($_separator);
 
-        $_value = str_replace($_separator, '/', $path);
+        $separators = [
+            '\\'                => true,
+            DIRECTORY_SEPARATOR => true,
+        ];
+        if ('' !== $separator) {
+            $separators[ $separator ] = true;
+        }
+        $separators = array_keys($separators);
 
-        $_value = basename($_value);
+        $var = str_replace($separators, '/', $path);
 
-        [ , $_value ] = explode($dot, $_value, 2) + [ '', '' ];
+        $extension = pathinfo($var, PATHINFO_EXTENSION);
 
-        $_value = strlen($_value) ? $_value : null;
+        return ('' !== $extension) ? $extension : null;
+    }
 
-        return $_value;
+    /**
+     * > поддерживает предварительную замену $separator на '/'
+     */
+    public function extensions(string $path, string $separator = null, string $dot = null) : ?string
+    {
+        if ('' === $path) return null;
+
+        $separator = $separator ?? DIRECTORY_SEPARATOR;
+        $dot = $dot ?? '.';
+
+        if ($dot === '/') {
+            throw new LogicException('The `dot` should not be equal to `/` sign');
+        }
+
+        $separators = [
+            '\\'                => true,
+            DIRECTORY_SEPARATOR => true,
+        ];
+        if ('' !== $separator) {
+            $separators[ $separator ] = true;
+        }
+        $separators = array_keys($separators);
+
+        $var = str_replace($separators, '/', $path);
+
+        $list = explode($dot, $var);
+        array_shift($list);
+
+        $extensions = null;
+        if (0 !== count($list)) {
+            $extensions = implode($dot, $list);
+        }
+
+        return $extensions;
     }
 
 

@@ -574,9 +574,17 @@ class DebugModule
     {
         if (! is_int($var)) return null;
 
+        $map = [
+            ' ' . PHP_INT_MIN => strval(PHP_INT_MIN),
+        ];
+
+        $varString = strval($var);
+
         $output = [];
         $output[ 'type' ] = gettype($var);
-        $output[ 'value' ] = var_export($var, true);
+        $output[ 'value' ] = null
+            ?? $map[ ' ' . $varString ]
+            ?? var_export($var, true);
 
         return $output;
     }
@@ -653,7 +661,7 @@ class DebugModule
         $printableValue = [];
         if ($withValue) {
             if ($var instanceof \DateTimeInterface) {
-                $printableValue = [ '"' . $var->format(DATE_RFC3339_EXTENDED) . '"' ];
+                $printableValue = [ '"' . $var->format('Y-m-d\TH:i:s.uP') . '"' ];
 
             } elseif ($var instanceof \DateTimeZone) {
                 $printableValue = [ '"' . $var->getName() . '"' ];
@@ -807,11 +815,20 @@ class DebugModule
             return null;
         }
 
+        $withValue = $options[ 'with_value' ] ?? true;
+
         $phpType = 'resource';
 
         $resourceType = $isResourceOpened
-            ? get_resource_type($var)
+            ? 'opened'
             : 'closed';
+
+        $printableValue = [];
+        if ($withValue) {
+            $printableValue = $isResourceOpened
+                ? [ get_resource_type($var) ]
+                : [];
+        }
 
         $resourceId = PHP_VERSION_ID > 80000
             ? get_resource_id($var)
@@ -821,6 +838,12 @@ class DebugModule
         $output[ 'type' ] = $phpType;
         $output[ 'subtype' ] = $resourceType;
         $output[ 'id' ] = $resourceId;
+
+        if ($withValue) {
+            if (0 !== count($printableValue)) {
+                $output[ 'value' ] = $printableValue[ 0 ];
+            }
+        }
 
         return $output;
     }
@@ -1054,10 +1077,12 @@ class DebugModule
         );
 
         $hasValue = array_key_exists('value', $output);
-        $isObject = array_key_exists('class', $output);
+
+        $isObject = is_object($value);
+        $isResource = is_resource($value) || ('resource(closed)' === gettype($value));
 
         $content = '';
-        if ($isObject) {
+        if ($isObject || $isResource) {
             $forceBraces = true;
 
             if (array_key_exists('type', $output)) {
@@ -1127,10 +1152,12 @@ class DebugModule
         );
 
         $hasValue = array_key_exists('value', $output);
-        $isObject = array_key_exists('class', $output);
+
+        $isObject = is_object($value);
+        $isResource = is_resource($value) || ('resource(closed)' === gettype($value));
 
         $content = '';
-        if ($isObject) {
+        if ($isObject || $isResource) {
             $forceBraces = true;
 
             if (array_key_exists('type', $output)) {
@@ -1206,63 +1233,59 @@ class DebugModule
     }
 
 
-    public function types($separator = null, array $options = [], ...$values) : string
+    public function types(string $separator = null, array $options = [], ...$values) : string
     {
-        $_separator = $separator ?? ' | ';
-        $_separator = (string) $_separator;
+        $separator = $separator ?? ' | ';
 
         $list = [];
         foreach ( $values as $value ) {
             $list[] = $this->type($value, $options);
         }
 
-        $content = implode($_separator, $list);
+        $content = implode($separator, $list);
 
         return $content;
     }
 
-    public function type_ids($separator = null, array $options = [], ...$values) : string
+    public function type_ids(string $separator = null, array $options = [], ...$values) : string
     {
-        $_separator = $separator ?? ' | ';
-        $_separator = (string) $_separator;
+        $separator = $separator ?? ' | ';
 
         $list = [];
         foreach ( $values as $value ) {
             $list[] = $this->type_id($value, $options);
         }
 
-        $content = implode($_separator, $list);
+        $content = implode($separator, $list);
 
         return $content;
     }
 
-    public function type_values($separator = null, array $options = [], ...$values) : string
+    public function type_values(string $separator = null, array $options = [], ...$values) : string
     {
-        $_separator = $separator ?? ' | ';
-        $_separator = (string) $_separator;
+        $separator = $separator ?? ' | ';
 
         $list = [];
         foreach ( $values as $value ) {
             $list[] = $this->type_value($value, $options);
         }
 
-        $content = implode($_separator, $list);
+        $content = implode($separator, $list);
 
         return $content;
     }
 
 
-    public function values($separator = null, array $options = [], ...$values) : string
+    public function values(string $separator = null, array $options = [], ...$values) : string
     {
-        $_separator = $separator ?? ' | ';
-        $_separator = (string) $_separator;
+        $separator = $separator ?? ' | ';
 
         $list = [];
         foreach ( $values as $value ) {
             $list[] = $this->value($value, $options);
         }
 
-        $content = implode($_separator, $list);
+        $content = implode($separator, $list);
 
         return $content;
     }

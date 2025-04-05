@@ -39,17 +39,68 @@ class FsModule
             $refPathInfo = null;
         }
 
-        if (! Lib::type()->string_not_empty($_value, $value)) {
-            return false;
-        }
-
-        if (false !== strpos($_value, "\0")) {
+        if (! (is_string($value) && ('' !== $value))) {
             return false;
         }
 
         if ($withPathInfo) {
             try {
-                $refPathInfo = pathinfo($_value);
+                $refPathInfo = Lib::php()->pathinfo($value);
+                unset($refPathInfo);
+            }
+            catch ( \Throwable $e ) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        unset($refPathInfo);
+
+        return true;
+    }
+
+    /**
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
+     */
+    public function type_realpath(
+        &$result,
+        $value, bool $allowSymlink = null,
+        array $refs = []
+    ) : bool
+    {
+        $result = null;
+
+        $allowSymlink = $allowSymlink ?? true;
+
+        $withPathInfo = array_key_exists(0, $refs);
+
+        $refPathInfo = null;
+        if ($withPathInfo) {
+            $refPathInfo =& $refs[ 0 ];
+            $refPathInfo = null;
+        }
+
+        if (! (is_string($value) && ('' !== $value))) {
+            return false;
+        }
+
+        if (! $allowSymlink) {
+            if (is_link($value)) {
+                return false;
+            }
+        }
+
+        $_value = realpath($value);
+
+        if (false === $_value) {
+            return false;
+        }
+
+        if ($withPathInfo) {
+            try {
+                $refPathInfo = Lib::php()->pathinfo($_value);
                 unset($refPathInfo);
             }
             catch ( \Throwable $e ) {
@@ -61,8 +112,9 @@ class FsModule
 
         unset($refPathInfo);
 
-        return $_value;
+        return true;
     }
+
 
     /**
      * @param string|null            $result
@@ -70,11 +122,14 @@ class FsModule
      */
     public function type_dirpath(
         &$result,
-        $value,
+        $value, bool $allowExists = null, bool $allowSymlink = null,
         array $refs = []
     ) : bool
     {
         $result = null;
+
+        $allowExists = $allowExists ?? false;
+        $allowSymlink = $allowSymlink ?? true;
 
         $status = $this->type_path(
             $_value,
@@ -85,20 +140,32 @@ class FsModule
             return false;
         }
 
-        $status = file_exists($_value);
+        $exists = file_exists($_value);
 
-        if (! $status) {
+        if (! $allowExists) {
+            if ($exists) {
+                return false;
+            }
+
             // > dirpath is available
             $result = $_value;
 
             return true;
         }
 
-        if (! is_dir($_value)) {
-            return false;
-        }
+        if ($exists) {
+            if (! is_dir($_value)) {
+                return false;
+            }
 
-        $_value = realpath($_value);
+            if (! $allowSymlink) {
+                if (is_link($_value)) {
+                    return false;
+                }
+            }
+
+            $_value = realpath($_value);
+        }
 
         $result = $_value;
 
@@ -111,10 +178,15 @@ class FsModule
      */
     public function type_filepath(
         &$result,
-        $value,
+        $value, bool $allowExists = null, bool $allowSymlink = null,
         array $refs = []
     ) : bool
     {
+        $result = null;
+
+        $allowExists = $allowExists ?? false;
+        $allowSymlink = $allowSymlink ?? true;
+
         $status = $this->type_path(
             $_value,
             $value, $refs
@@ -124,20 +196,32 @@ class FsModule
             return false;
         }
 
-        $status = file_exists($_value);
+        $exists = file_exists($_value);
 
-        if (false === $status) {
-            // > filepath is available
+        if (! $allowExists) {
+            if ($exists) {
+                return false;
+            }
+
+            // > dirpath is available
             $result = $_value;
 
             return true;
         }
 
-        if (! is_file($_value)) {
-            return false;
-        }
+        if ($exists) {
+            if (! is_file($_value)) {
+                return false;
+            }
 
-        $_value = realpath($_value);
+            if (! $allowSymlink) {
+                if (is_link($_value)) {
+                    return false;
+                }
+            }
+
+            $_value = realpath($_value);
+        }
 
         $result = $_value;
 
@@ -149,64 +233,35 @@ class FsModule
      * @param string|null            $result
      * @param array{ 0: array|null } $refs
      */
-    public function type_path_realpath(
-        &$result,
-        $value,
-        array $refs = []
-    ) : bool
-    {
-        $result = null;
-
-        $status = $this->type_path(
-            $_value,
-            $value, $refs
-        );
-
-        if (! $status) {
-            return false;
-        }
-
-        if (false === ($_value = realpath($_value))) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param string|null            $result
-     * @param array{ 0: array|null } $refs
-     */
     public function type_dirpath_realpath(
         &$result,
-        $value,
+        $value, bool $allowSymlink = null,
         array $refs = []
     ) : bool
     {
         $result = null;
 
-        $status = $this->type_path(
+        $allowSymlink = $allowSymlink ?? true;
+
+        $status = $this->type_realpath(
             $_value,
-            $value, $refs
+            $value, $allowSymlink,
+            $refs
         );
 
         if (! $status) {
             return false;
         }
 
-        $status = file_exists($_value);
-
-        if (! $status) {
-            return false;
+        if (! $allowSymlink) {
+            if (is_link($value)) {
+                return false;
+            }
         }
 
         if (! is_dir($_value)) {
             return false;
         }
-
-        $_value = realpath($_value);
 
         $result = $_value;
 
@@ -219,36 +274,35 @@ class FsModule
      */
     public function type_filepath_realpath(
         &$result,
-        $value,
+        $value, bool $allowSymlink = null,
         array $refs = []
     ) : bool
     {
         $result = null;
 
-        $status = $this->type_path(
+        $status = $this->type_realpath(
             $_value,
-            $value, $refs
+            $value, $allowSymlink,
+            $refs
         );
 
         if (! $status) {
             return false;
         }
 
-        $status = file_exists($_value);
-
-        if (! $status) {
-            return false;
+        if (! $allowSymlink) {
+            if (is_link($value)) {
+                return false;
+            }
         }
 
         if (! is_file($_value)) {
             return false;
         }
 
-        $_value = realpath($_value);
-
         $result = $_value;
 
-        return true;
+        return $_value;
     }
 
 
@@ -259,19 +313,19 @@ class FsModule
     {
         $result = null;
 
-        if (! Lib::type()->string_not_empty($_value, $value)) {
+        if (! (is_string($value) && ('' !== $value))) {
             return false;
         }
 
-        $forbidden = [ "\0", "/", "\\", DIRECTORY_SEPARATOR ];
+        $forbidden = [ "/", "\\", DIRECTORY_SEPARATOR ];
 
         foreach ( $forbidden as $f ) {
-            if (false !== strpos($_value, $f)) {
+            if (false !== strpos($value, $f)) {
                 return false;
             }
         }
 
-        $result = $_value;
+        $result = $value;
 
         return true;
     }
@@ -284,9 +338,9 @@ class FsModule
     {
         $fileGetContentsArgs = $fileGetContentsArgs ?? [];
 
-        if (null === ($_filepath = Lib::parse()->filepath_realpath($filepath))) {
+        if (! $this->type_filepath_realpath($_filepath, $filepath)) {
             throw new RuntimeException(
-                'File not found: ' . $filepath
+                [ 'File not found', $filepath ]
             );
         }
 
@@ -297,7 +351,7 @@ class FsModule
 
         if (false === $result) {
             throw new RuntimeException(
-                'Unable to read file: ' . $filepath
+                [ 'Unable to read file', $filepath ]
             );
         }
 
@@ -313,18 +367,21 @@ class FsModule
     {
         $_filePutContentsArgs = $filePutContentsArgs ?? [];
 
+        $withMkdir = (null !== $mkdirArgs);
+        $withChmod = (null !== $chmodArgs);
+
         $_mkdirArgs = null;
         $_chmodArgs = null;
-        if (null !== $mkdirArgs) $_mkdirArgs = ($mkdirArgs ?: [ 0775, true ]);
-        if (null !== $chmodArgs) $_chmodArgs = ($chmodArgs ?: [ 0664 ]);
+        if ($withMkdir) $_mkdirArgs = ($mkdirArgs ?: [ 0775, true ]);
+        if ($withChmod) $_chmodArgs = ($chmodArgs ?: [ 0664 ]);
 
-        if (null === ($_filepath = Lib::parse()->filepath($filepath))) {
+        if (! $this->type_filepath($_filepath, $filepath, true)) {
             throw new RuntimeException(
-                'Bad filepath: ' . $filepath
+                [ 'Bad filepath', $filepath ]
             );
         }
 
-        if (null !== $_mkdirArgs) {
+        if ($withMkdir) {
             $dirpath = dirname($_filepath);
 
             if (! is_dir($dirpath)) {
@@ -335,7 +392,7 @@ class FsModule
 
                 if (false === $status) {
                     throw new RuntimeException(
-                        'Unable to mkdir: ' . $filepath
+                        [ 'Unable to mkdir', $filepath ]
                     );
                 }
             }
@@ -348,11 +405,11 @@ class FsModule
 
         if (false === $size) {
             throw new RuntimeException(
-                'Unable to write file: ' . $filepath
+                [ 'Unable to write file', $filepath ]
             );
         }
 
-        if (null !== $_chmodArgs) {
+        if ($withChmod) {
             $status = chmod(
                 $filepath,
                 ...$_chmodArgs
@@ -360,7 +417,7 @@ class FsModule
 
             if (false === $status) {
                 throw new RuntimeException(
-                    'Unable to perform chmod() on file: ' . $filepath
+                    [ 'Unable to perform chmod() on file', $filepath ]
                 );
             }
         }
@@ -385,14 +442,10 @@ class FsModule
         $recursiveDirectoryIteratorArgs = $recursiveDirectoryIteratorArgs ?? [ \FilesystemIterator::SKIP_DOTS ];
         $recursiveIteratorIteratorArgs = $recursiveIteratorIteratorArgs ?? [ \RecursiveIteratorIterator::CHILD_FIRST ];
 
-        if (null === ($_dirpath = Lib::parse()->dirpath($dirpath))) {
+        if (! $this->type_dirpath_realpath($_dirpath, $dirpath)) {
             throw new RuntimeException(
-                'Bad dirpath: ' . $_dirpath
+                [ 'Directory not exists', $dirpath ]
             );
-        }
-
-        if (! file_exists($_dirpath)) {
-            return true;
         }
 
         $it = new \RecursiveDirectoryIterator(
@@ -420,9 +473,9 @@ class FsModule
     {
         $unlinkArgs = $unlinkArgs ?? [];
 
-        if (null === ($_filepath = Lib::parse()->filepath($filepath))) {
+        if (! $this->type_filepath($_filepath, $filepath, true)) {
             throw new RuntimeException(
-                'Bad filepath: ' . $_filepath
+                [ 'Bad filepath', $filepath ]
             );
         }
 
@@ -437,7 +490,7 @@ class FsModule
 
         if (false === $status) {
             throw new RuntimeException(
-                'Unable to delete file: ' . $filepath
+                [ 'Unable to delete file', $filepath ]
             );
         }
 
@@ -451,9 +504,9 @@ class FsModule
     {
         $rmdirArgs = $rmdirArgs ?? [];
 
-        if (null === ($_dirpath = Lib::parse()->dirpath($dirpath))) {
+        if (! $this->type_dirpath($_dirpath, $dirpath, true)) {
             throw new RuntimeException(
-                'Bad dirpath: ' . $_dirpath
+                [ 'Bad dirpath', $_dirpath ]
             );
         }
 
@@ -468,7 +521,7 @@ class FsModule
 
         if (false === $status) {
             throw new RuntimeException(
-                'Unable to delete directory: ' . $dirpath
+                [ 'Unable to delete directory', $dirpath ]
             );
         }
 
@@ -479,17 +532,33 @@ class FsModule
     /**
      * > разбирает последовательности /../ в пути до файла и возвращает путь через правый слеш
      */
-    public function normalize(string $path) : string
+    public function normalize(string $path, string $separator = null) : string
     {
-        if (null !== ($_path = Lib::parse()->path_realpath($path))) {
-            $_path = str_replace(DIRECTORY_SEPARATOR, '/', $_path);
+        $separator = $separator ?? '/';
+
+        if ($this->type_realpath($realpath, $path)) {
+            $normalized = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
 
         } else {
-            $_path = $path;
+            $normalized = $path;
 
-            $root = ($_path[ 0 ] === '/') ? '/' : '';
+            $separators = [
+                '\\'                => true,
+                DIRECTORY_SEPARATOR => true,
+            ];
+            if ('' !== $separator) {
+                $separators[ $separator ] = true;
+            }
+            $separators = array_keys($separators);
 
-            $segments = explode('/', trim($_path, '/'));
+            $var = str_replace($separators, '/', $path);
+
+            $root = ($normalized[ 0 ] === '/')
+                ? $separator
+                : '';
+
+            $segments = trim($normalized, '/');
+            $segments = explode('/', $segments);
 
             $ret = [];
             foreach ( $segments as $segment ) {
@@ -502,10 +571,10 @@ class FsModule
                     : ($ret[] = $segment);
             }
 
-            $_path = $root . implode('/', $ret);
+            $normalized = $root . implode($separator, $ret);
         }
 
-        return $_path;
+        return $normalized;
     }
 
     /**
@@ -518,18 +587,23 @@ class FsModule
 
         if ($_path === $_root) {
             throw new RuntimeException(
-                'Path is equal to root: ' . $root
+                [ 'Path is equal to root', $root ]
             );
         }
 
         if (0 !== strpos($_path, $_root)) {
             throw new RuntimeException(
-                'Path is not a child of root: '
-                . implode(' / ', [ $root, $path ])
+                [
+                    'Path is not a child of root',
+                    $root,
+                    $path,
+                ]
             );
         }
 
-        $result = substr($_path, mb_strlen($_root));
+        $rootLen = Lib::str()->strlen($_root);
+
+        $result = substr($_path, $rootLen);
         $result = ltrim($result, '/');
 
         return $result;
@@ -552,12 +626,12 @@ class FsModule
 
         if (! $fh1) {
             throw new RuntimeException(
-                'Unable to open file with flags: ' . $file1 . ' / rb'
+                [ 'Unable to open file with flags: rb', $file1 ]
             );
         }
         if (! $fh2) {
             throw new RuntimeException(
-                'Unable to open file with flags: ' . $file2 . ' / rb'
+                [ 'Unable to open file with flags: rb', $file2 ]
             );
         }
 

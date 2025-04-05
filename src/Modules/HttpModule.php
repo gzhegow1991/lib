@@ -57,7 +57,7 @@ class HttpModule
         foreach ( Lib::arr()->walk_it($headersArrays) as $path => $header ) {
             /** @var string[] $path */
 
-            if (null === ($_header = Lib::parse()->string_not_empty($header))) {
+            if (! Lib::type()->string_not_empty($_header, $header)) {
                 continue;
             }
 
@@ -258,7 +258,9 @@ class HttpModule
 
         $theCookies = $this->static_cookies();
 
-        $_value = rawurlencode(Lib::parse()->string_not_empty($value) ?? ' ');
+        $_value = Lib::parse()->string_not_empty($value) ?? ' ';
+        $_value = rawurlencode($_value);
+
         $_expires = $expires ?: 0;
         $_secure = $secure ?? false;
         $_httpOnly = $httpOnly ?? false;
@@ -510,7 +512,7 @@ class HttpModule
             if (is_array($_query)) {
                 continue;
 
-            } elseif (null !== ($_queryString = Lib::parse()->string_not_empty($_query))) {
+            } elseif (Lib::type()->string_not_empty($_queryString, $_query)) {
                 parse_str($_queryString, $queryArray);
 
                 $queries[ $idx ] = $queryArray;
@@ -529,10 +531,8 @@ class HttpModule
     }
 
 
-    public function accept_match($acceptAnd = null, ...$acceptOr) : array
+    public function accept_match(string $httpAccept, $acceptAnd = null, ...$acceptOr) : array
     {
-        $httpAccept = $_SERVER[ 'HTTP_ACCEPT' ] ?? '';
-
         array_unshift($acceptOr, $acceptAnd);
 
         $acceptList = [];
@@ -564,7 +564,9 @@ class HttpModule
                 }
             }
 
-            $acceptList[ $acceptItem ] = [ Lib::parse()->numeric($qValue), $acceptVarsArray ];
+            $qValueNumeric = Lib::parse()->numeric($qValue);
+
+            $acceptList[ $acceptItem ] = [ $qValueNumeric, $acceptVarsArray ];
         }
         arsort($acceptList);
 

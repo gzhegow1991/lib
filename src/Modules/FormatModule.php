@@ -95,7 +95,7 @@ class FormatModule
             $decimalValue = $matches[ 1 ][ 0 ];
             $decimalLetter = $matches[ 2 ][ 0 ];
 
-            if (! $theStr->ends($duration, $decimalSubstr, false)) {
+            if (! $theStr->str_ends($duration, $decimalSubstr, false)) {
                 throw new LogicException(
                     [
                         'The `duration` can contain only one decimal separator in smallest period (according ISO 8601)',

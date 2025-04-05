@@ -6,38 +6,49 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-if (! defined('_CMP_MODE_ERROR_THROW')) define('_CMP_MODE_ERROR_THROW', 1 << 0);
-if (! defined('_CMP_MODE_ERROR_NAN')) define('_CMP_MODE_ERROR_NAN', 1 << 1);
-if (! defined('_CMP_MODE_TYPE_STRICT')) define('_CMP_MODE_TYPE_STRICT', 1 << 2);
-if (! defined('_CMP_MODE_TYPE_SPACESHIP')) define('_CMP_MODE_TYPE_SPACESHIP', 1 << 3);
-if (! defined('_CMP_MODE_TYPE_GT')) define('_CMP_MODE_TYPE_GT', 1 << 4);
-if (! defined('_CMP_MODE_TYPE_LT')) define('_CMP_MODE_TYPE_LT', 1 << 5);
-if (! defined('_CMP_MODE_TYPE_CONTINUE')) define('_CMP_MODE_TYPE_CONTINUE', 1 << 6);
-if (! defined('_CMP_MODE_TYPE_NAN')) define('_CMP_MODE_TYPE_NAN', 1 << 7);
-if (! defined('_CMP_MODE_STRING_VS_STRCMP')) define('_CMP_MODE_STRING_VS_STRCMP', 1 << 8);
-if (! defined('_CMP_MODE_STRING_VS_STRCASECMP')) define('_CMP_MODE_STRING_VS_STRCASECMP', 1 << 9);
-if (! defined('_CMP_MODE_STRING_VS_STRNATCMP')) define('_CMP_MODE_STRING_VS_STRNATCMP', 1 << 10);
-if (! defined('_CMP_MODE_STRING_VS_STRNATCASECMP')) define('_CMP_MODE_STRING_VS_STRNATCASECMP', 1 << 11);
-if (! defined('_CMP_MODE_STRING_VS_SPACESHIP')) define('_CMP_MODE_STRING_VS_SPACESHIP', 1 << 12);
-if (! defined('_CMP_MODE_STRING_VS_IGNORE')) define('_CMP_MODE_STRING_VS_IGNORE', 1 << 13);
-if (! defined('_CMP_MODE_STRING_SIZE_LENGTH')) define('_CMP_MODE_STRING_SIZE_LENGTH', 1 << 14);
-if (! defined('_CMP_MODE_STRING_SIZE_STRLEN')) define('_CMP_MODE_STRING_SIZE_STRLEN', 1 << 15);
-if (! defined('_CMP_MODE_STRING_SIZE_IGNORE')) define('_CMP_MODE_STRING_SIZE_IGNORE', 1 << 16);
-if (! defined('_CMP_MODE_ARRAY_SIZE_COUNT')) define('_CMP_MODE_ARRAY_SIZE_COUNT', 1 << 17);
-if (! defined('_CMP_MODE_ARRAY_SIZE_IGNORE')) define('_CMP_MODE_ARRAY_SIZE_IGNORE', 1 << 18);
-if (! defined('_CMP_MODE_ARRAY_VS_SPACESHIP')) define('_CMP_MODE_ARRAY_VS_SPACESHIP', 1 << 19);
-if (! defined('_CMP_MODE_ARRAY_VS_IGNORE')) define('_CMP_MODE_ARRAY_VS_IGNORE', 1 << 20);
-if (! defined('_CMP_MODE_OBJECT_SIZE_COUNT')) define('_CMP_MODE_OBJECT_SIZE_COUNT', 1 << 21);
-if (! defined('_CMP_MODE_OBJECT_SIZE_IGNORE')) define('_CMP_MODE_OBJECT_SIZE_IGNORE', 1 << 22);
-if (! defined('_CMP_MODE_NULL_SPACESHIP')) define('_CMP_MODE_NULL_SPACESHIP', 1 << 23);
-if (! defined('_CMP_MODE_NULL_0')) define('_CMP_MODE_NULL_0', 1 << 24);
-if (! defined('_CMP_MODE_NULL_GT')) define('_CMP_MODE_NULL_GT', 1 << 25);
-if (! defined('_CMP_MODE_NULL_LT')) define('_CMP_MODE_NULL_LT', 1 << 26);
-if (! defined('_CMP_MODE_NULL_NAN')) define('_CMP_MODE_NULL_NAN', 1 << 27);
+if (! defined('_CMP_MODE_TYPE_STRICT')) define('_CMP_MODE_TYPE_STRICT', 1 << 1);
+if (! defined('_CMP_MODE_TYPE_CAST_OR_NAN')) define('_CMP_MODE_TYPE_CAST_OR_NAN', 1 << 2);
+if (! defined('_CMP_MODE_TYPE_CAST_OR_CONTINUE')) define('_CMP_MODE_TYPE_CAST_OR_CONTINUE', 1 << 3);
+if (! defined('_CMP_MODE_TYPECAST_A')) define('_CMP_MODE_TYPECAST_A', 1 << 4);
+if (! defined('_CMP_MODE_TYPECAST_B')) define('_CMP_MODE_TYPECAST_B', 1 << 5);
+if (! defined('_CMP_MODE_STRING_VS_STRCMP')) define('_CMP_MODE_STRING_VS_STRCMP', 1 << 6);
+if (! defined('_CMP_MODE_STRING_VS_STRCASECMP')) define('_CMP_MODE_STRING_VS_STRCASECMP', 1 << 7);
+if (! defined('_CMP_MODE_STRING_VS_STRNATCMP')) define('_CMP_MODE_STRING_VS_STRNATCMP', 1 << 8);
+if (! defined('_CMP_MODE_STRING_VS_STRNATCASECMP')) define('_CMP_MODE_STRING_VS_STRNATCASECMP', 1 << 9);
+if (! defined('_CMP_MODE_STRING_VS_IGNORE')) define('_CMP_MODE_STRING_VS_IGNORE', 1 << 10);
+if (! defined('_CMP_MODE_STRING_SIZE_STRLEN')) define('_CMP_MODE_STRING_SIZE_STRLEN', 1 << 11);
+if (! defined('_CMP_MODE_STRING_SIZE_STRSIZE')) define('_CMP_MODE_STRING_SIZE_STRSIZE', 1 << 12);
+if (! defined('_CMP_MODE_STRING_SIZE_IGNORE')) define('_CMP_MODE_STRING_SIZE_IGNORE', 1 << 13);
+if (! defined('_CMP_MODE_ARRAY_SIZE_COUNT')) define('_CMP_MODE_ARRAY_SIZE_COUNT', 1 << 14);
+if (! defined('_CMP_MODE_ARRAY_SIZE_IGNORE')) define('_CMP_MODE_ARRAY_SIZE_IGNORE', 1 << 15);
+if (! defined('_CMP_MODE_ARRAY_VS_SPACESHIP')) define('_CMP_MODE_ARRAY_VS_SPACESHIP', 1 << 16);
+if (! defined('_CMP_MODE_ARRAY_VS_IGNORE')) define('_CMP_MODE_ARRAY_VS_IGNORE', 1 << 17);
+if (! defined('_CMP_MODE_DATE_VS_YEAR')) define('_CMP_MODE_DATE_VS_YEAR', 1 << 18);
+if (! defined('_CMP_MODE_DATE_VS_MONTH')) define('_CMP_MODE_DATE_VS_MONTH', 1 << 19);
+if (! defined('_CMP_MODE_DATE_VS_DAY')) define('_CMP_MODE_DATE_VS_DAY', 1 << 20);
+if (! defined('_CMP_MODE_DATE_VS_HOUR')) define('_CMP_MODE_DATE_VS_HOUR', 1 << 21);
+if (! defined('_CMP_MODE_DATE_VS_MIN')) define('_CMP_MODE_DATE_VS_MIN', 1 << 22);
+if (! defined('_CMP_MODE_DATE_VS_SEC')) define('_CMP_MODE_DATE_VS_SEC', 1 << 23);
+if (! defined('_CMP_MODE_DATE_VS_MSEC')) define('_CMP_MODE_DATE_VS_MSEC', 1 << 24);
+if (! defined('_CMP_MODE_DATE_VS_USEC')) define('_CMP_MODE_DATE_VS_USEC', 1 << 25);
+if (! defined('_CMP_MODE_OBJECT_SIZE_COUNT')) define('_CMP_MODE_OBJECT_SIZE_COUNT', 1 << 26);
+if (! defined('_CMP_MODE_OBJECT_SIZE_IGNORE')) define('_CMP_MODE_OBJECT_SIZE_IGNORE', 1 << 27);
+
+if (! defined('_CMP_RESULT_NULL_SPACESHIP')) define('_CMP_MODE_RESULT_SPACESHIP', 1 << 1);
+if (! defined('_CMP_RESULT_NULL_0')) define('_CMP_RESULT_NULL_0', 1 << 2);
+if (! defined('_CMP_RESULT_NULL_A_LT')) define('_CMP_RESULT_NULL_A_LT', 1 << 3);
+if (! defined('_CMP_RESULT_NULL_A_GT')) define('_CMP_RESULT_NULL_A_GT', 1 << 4);
+if (! defined('_CMP_RESULT_NULL_NAN')) define('_CMP_RESULT_NULL_NAN', 1 << 5);
+if (! defined('_CMP_RESULT_NAN_THROW')) define('_CMP_RESULT_NAN_THROW', 1 << 6);
+if (! defined('_CMP_RESULT_NAN_RETURN')) define('_CMP_RESULT_NAN_RETURN', 1 << 7);
+
 
 class CmpModule
 {
-    public function fnSame(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareValues(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -47,223 +58,29 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpBoolean($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpInteger($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpFloat($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNumeric($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpString($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpArray($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpDate($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpObject($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpResource($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesBoolean($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesInteger($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesFloat($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNumeric($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesString($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesArray($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesDate($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesObject($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesResource($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
-
-            return 0 === $result;
-        };
-
-        unset($fnCmpName);
-
-        return $fn;
-    }
-
-    public function fnSameSize(int $flags = null, array $refs = []) : \Closure
-    {
-        $withFnCmpName = array_key_exists(0, $refs);
-
-        $fnCmpName = null;
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
-        }
-
-        $_flags = $this->flagsDefault($flags);
-
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
-            $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpStringSize($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpArraySize($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpObjectSize($a, $b, $_flags, $fnCmpName);
-
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
-
-            return 0 === $result;
-        };
-
-        unset($fnCmpName);
-
-        return $fn;
-    }
-
-    public function fnSameDate(int $flags = null, array $refs = []) : \Closure
-    {
-        $withFnCmpName = array_key_exists(0, $refs);
-
-        $fnCmpName = null;
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
-        }
-
-        $_flags = $this->flagsDefault($flags);
-
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
-            $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpDate($a, $b, $_flags, $fnCmpName);
-
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
-
-            return 0 === $result;
-        };
-
-        unset($fnCmpName);
-
-        return $fn;
-    }
-
-
-    public function fnDifferent(int $flags = null, array $refs = []) : \Closure
-    {
-        $withFnCmpName = array_key_exists(0, $refs);
-
-        $fnCmpName = null;
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
-        }
-
-        $_flags = $this->flagsDefault($flags);
-
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
-            $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpBoolean($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpInteger($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpFloat($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNumeric($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpString($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpArray($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpDate($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpObject($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpResource($a, $b, $_flags, $fnCmpName);
-
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
-
-            return 0 !== $result;
-        };
-
-        unset($fnCmpName);
-
-        return $fn;
-    }
-
-    public function fnDifferentSize(int $flags = null, array $refs = []) : \Closure
-    {
-        $withFnCmpName = array_key_exists(0, $refs);
-
-        $fnCmpName = null;
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
-        }
-
-        $_flags = $this->flagsDefault($flags);
-
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
-            $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpStringSize($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpArraySize($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpObjectSize($a, $b, $_flags, $fnCmpName);
-
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
-
-            return 0 !== $result;
-        };
-
-        unset($fnCmpName);
-
-        return $fn;
-    }
-
-    public function fnDifferentDate(int $flags = null, array $refs = []) : \Closure
-    {
-        $withFnCmpName = array_key_exists(0, $refs);
-
-        $fnCmpName = null;
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
-        }
-
-        $_flags = $this->flagsDefault($flags);
-
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
-            $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpDate($a, $b, $_flags, $fnCmpName);
-
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
-
-            return 0 !== $result;
-        };
-
-        unset($fnCmpName);
-
-        return $fn;
-    }
-
-
-    public function fnCompare(int $flags = null, array $refs = []) : \Closure
-    {
-        $withFnCmpName = array_key_exists(0, $refs);
-
-        $fnCmpName = null;
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
-        }
-
-        $_flags = $this->flagsDefault($flags);
-
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
-            $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpBoolean($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpInteger($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpFloat($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNumeric($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpString($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpArray($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpDate($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpObject($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpResource($a, $b, $_flags, $fnCmpName);
-
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -273,7 +90,10 @@ class CmpModule
         return $fn;
     }
 
-    public function fnCompareSize(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareSizes(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -283,18 +103,23 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpStringSize($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpArraySize($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpObjectSize($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpSizesString($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpSizesArray($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpSizesObject($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -304,8 +129,10 @@ class CmpModule
         return $fn;
     }
 
-    // > todo, ask somebody, date is part of object but different type, how to solve it better?
-    public function fnCompareDate(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareDates(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -315,16 +142,67 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpDate($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesDate($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
+
+            return $result;
+        };
+
+        unset($fnCmpName);
+
+        return $fn;
+    }
+
+    public function fnComparePeriods(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
+    {
+        $withFnCmpName = array_key_exists(0, $refs);
+
+        $fnCmpName = null;
+        if ($withFnCmpName) {
+            $fnCmpName =& $refs[ 0 ];
+            $fnCmpName = null;
+        }
+
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
+
+        $fn = function ($aStart, $bStart, $aEnd = null, $bEnd = null) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
+            $result = null
+                ?? $this->cmpTypesStrict($aStart, $bStart, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($aStart, $bStart, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($aStart, $bStart, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($aStart, $bStart, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpPeriodsDate(
+                    $aStart, $bStart,
+                    $aEnd, $bEnd,
+                    $_flagsMode, $_flagsResult,
+                    $fnCmpName
+                );
+
+            $result = $this->cmpResultUnknown($result,
+                $aStart, $bStart,
+                $_flagsMode, $_flagsResult,
+                $fnCmpName
+            );
 
             return $result;
         };
@@ -335,7 +213,10 @@ class CmpModule
     }
 
 
-    public function fnCompareNil(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareValuesNil(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -345,15 +226,19 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -363,7 +248,10 @@ class CmpModule
         return $fn;
     }
 
-    public function fnCompareNull(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareValuesNull(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -373,16 +261,20 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNull($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -392,7 +284,10 @@ class CmpModule
         return $fn;
     }
 
-    public function fnCompareBoolean(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareValuesBoolean(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -402,17 +297,21 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                // ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpBoolean($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesBoolean($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -422,7 +321,10 @@ class CmpModule
         return $fn;
     }
 
-    public function fnCompareInteger(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareValuesInteger(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -432,17 +334,21 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                // ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpInteger($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesInteger($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -452,7 +358,10 @@ class CmpModule
         return $fn;
     }
 
-    public function fnCompareFloat(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareValuesFloat(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -462,17 +371,21 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                // ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpFloat($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesFloat($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -482,7 +395,10 @@ class CmpModule
         return $fn;
     }
 
-    public function fnCompareNumeric(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareValuesNumeric(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -492,17 +408,23 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                // ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNumeric($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesInteger($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesFloat($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNumeric($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -512,7 +434,10 @@ class CmpModule
         return $fn;
     }
 
-    public function fnCompareString(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareValuesString(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -522,17 +447,21 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpString($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesString($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -542,7 +471,10 @@ class CmpModule
         return $fn;
     }
 
-    public function fnCompareArray(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareValuesArray(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -552,17 +484,21 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpArray($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesArray($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -572,38 +508,10 @@ class CmpModule
         return $fn;
     }
 
-    // > todo, ask somebody, date is part of object but different type, how to solve it better?
-    // public function fnCompareDate(int $flags = null, array $refs = []) : \Closure
-    // {
-    //     $withFnCmpName = array_key_exists(0, $refs);
-    //
-    //     $fnCmpName = null;
-    //     if ($withFnCmpName) {
-    //         $fnCmpName =& $refs[ 0 ];
-    //         $fnCmpName = null;
-    //     }
-    //
-    //     $_flags = $this->flagsDefault($flags);
-    //
-    //     $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
-    //         $result = null
-    //             ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-    //             ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-    //             ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-    //             // ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-    //             ?? $this->cmpDate($a, $b, $_flags, $fnCmpName);
-    //
-    //         $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
-    //
-    //         return $result;
-    //     };
-    //
-    //     unset($fnCmpName);
-    //
-    //     return $fn;
-    // }
-
-    public function fnCompareObject(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareValuesDate(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -613,18 +521,21 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpDate($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpObject($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesDate($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -634,7 +545,10 @@ class CmpModule
         return $fn;
     }
 
-    public function fnCompareResource(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareValuesObject(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -644,17 +558,59 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpResource($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesDate($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesObject($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
+
+            return $result;
+        };
+
+        unset($fnCmpName);
+
+        return $fn;
+    }
+
+    public function fnCompareValuesResource(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
+    {
+        $withFnCmpName = array_key_exists(0, $refs);
+
+        $fnCmpName = null;
+        if ($withFnCmpName) {
+            $fnCmpName =& $refs[ 0 ];
+            $fnCmpName = null;
+        }
+
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
+
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
+            $result = null
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesResource($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
+
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -665,7 +621,10 @@ class CmpModule
     }
 
 
-    public function fnCompareStringSize(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareSizesString(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -675,17 +634,21 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpStringSize($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpSizesString($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -695,7 +658,10 @@ class CmpModule
         return $fn;
     }
 
-    public function fnCompareArraySize(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareSizesArray(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -705,17 +671,21 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpArraySize($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpSizesArray($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -725,7 +695,10 @@ class CmpModule
         return $fn;
     }
 
-    public function fnCompareObjectSize(int $flags = null, array $refs = []) : \Closure
+    public function fnCompareSizesObject(
+        int $flagsMode = null, int $flagsResult = null,
+        array $refs = []
+    ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
@@ -735,17 +708,21 @@ class CmpModule
             $fnCmpName = null;
         }
 
-        $_flags = $this->flagsDefault($flags);
+        $_flagsMode = $this->flagsModeDefault($flagsMode);
+        $_flagsResult = $this->flagsResultDefault($flagsResult);
 
-        $fn = function ($a, $b) use ($_flags, &$fnCmpName) {
+        $fn = function ($a, $b) use (
+            $_flagsMode, $_flagsResult,
+            &$fnCmpName
+        ) {
             $result = null
-                ?? $this->cmpTypeStrict($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNan($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNil($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpNull($a, $b, $_flags, $fnCmpName)
-                ?? $this->cmpObjectSize($a, $b, $_flags, $fnCmpName);
+                ?? $this->cmpTypesStrict($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNan($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNil($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpValuesNull($a, $b, $_flagsMode, $_flagsResult, $fnCmpName)
+                ?? $this->cmpSizesObject($a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
-            $result = $this->cmpUnknown($result, $a, $b, $_flags, $fnCmpName);
+            $result = $this->cmpResultUnknown($result, $a, $b, $_flagsMode, $_flagsResult, $fnCmpName);
 
             return $result;
         };
@@ -757,11 +734,17 @@ class CmpModule
 
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|float
      */
-    protected function cmpTypeStrict($a, $b, int $flags, string &$fnCmpName = null) // : null|NAN
+    protected function cmpTypesStrict(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|NAN
     {
-        if ($flags & _CMP_MODE_TYPE_STRICT) {
+        if ($flagsMode & _CMP_MODE_TYPE_STRICT) {
             if (gettype($a) !== gettype($b)) {
                 $fnCmpName = __FUNCTION__;
 
@@ -772,47 +755,17 @@ class CmpModule
         return null;
     }
 
+
     /**
-     * @return null|int|float
+     * @param callable|callable-string|null $fnCmpName
+     *
+     * @return null|float
      */
-    protected function cmpTypeCastFailed(
+    protected function cmpValuesNan(
         $a, $b,
-        bool $aStatus, bool $bStatus,
-        int $flags,
+        int $flagsMode, int $flagsResult,
         string &$fnCmpName = null
-    ) // : null|int|NAN
-    {
-        if ($flags & _CMP_MODE_TYPE_SPACESHIP) {
-            $fnCmpName = __FUNCTION__;
-
-            return $aStatus <=> $bStatus;
-
-        } elseif ($flags & _CMP_MODE_TYPE_GT) {
-            $fnCmpName = __FUNCTION__;
-
-            return 1;
-
-        } elseif ($flags & _CMP_MODE_TYPE_LT) {
-            $fnCmpName = __FUNCTION__;
-
-            return -1;
-
-        } elseif ($flags & _CMP_MODE_TYPE_NAN) {
-            $fnCmpName = __FUNCTION__;
-
-            return NAN;
-        }
-
-        // elseif ($flags & _CMP_MODE_TYPE_CONTINUE) {
-        return null;
-        // }
-    }
-
-
-    /**
-     * @return null|int|float
-     */
-    protected function cmpNan($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    ) // : null|NAN
     {
         $isNanA = is_float($a) && is_nan($a);
         $isNanB = is_float($b) && is_nan($b);
@@ -827,9 +780,15 @@ class CmpModule
     }
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpNil($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpValuesNil(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $theType = Lib::type();
 
@@ -851,9 +810,15 @@ class CmpModule
     }
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpNull($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpValuesNull(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $isNullA = ($a === null);
         $isNullB = ($b === null);
@@ -868,8 +833,8 @@ class CmpModule
 
             $aStatus = $isNullA;
             $bStatus = $isNullB;
-            if (! $aStatus) $aStatus = $theType->is_blank($a);
-            if (! $bStatus) $bStatus = $theType->is_blank($b);
+            if (! $isNullA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->is_blank($a);
+            if (! $isNullB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->is_blank($b);
 
             if ($aStatus && $bStatus) {
                 $fnCmpName = __FUNCTION__;
@@ -887,9 +852,15 @@ class CmpModule
     }
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpBoolean($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpValuesBoolean(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $isBoolA = is_bool($a);
         $isBoolB = is_bool($b);
@@ -904,8 +875,8 @@ class CmpModule
 
             $aStatus = $isBoolA;
             $bStatus = $isBoolB;
-            if (! $isBoolA) $aStatus = $theType->bool($aBool, $a);
-            if (! $isBoolB) $bStatus = $theType->bool($bBool, $b);
+            if (! $isBoolA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->bool($aBool, $a);
+            if (! $isBoolB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->bool($bBool, $b);
 
             if ($aStatus && $bStatus) {
                 $aBool = $aBool ?? $a;
@@ -916,10 +887,11 @@ class CmpModule
                 return $aBool <=> $bBool;
             }
 
-            return $this->cmpTypeCastFailed(
+            return $this->cmpTypeCastFail(
                 $a, $b,
                 $aStatus, $bStatus,
-                $flags
+                $flagsMode, $flagsResult,
+                $fnCmpName
             );
         }
 
@@ -927,9 +899,15 @@ class CmpModule
     }
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpInteger($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpValuesInteger(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $isIntA = is_int($a);
         $isIntB = is_int($b);
@@ -944,8 +922,15 @@ class CmpModule
 
             $aStatus = $isIntA;
             $bStatus = $isIntB;
-            if (! $aStatus) $aStatus = $theType->int($aInt, $a);
-            if (! $bStatus) $bStatus = $theType->int($bInt, $b);
+            if (! $isIntA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->int($aInt, $a);
+            if (! $isIntB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->int($bInt, $b);
+
+            $aInt = $aInt ?? $a;
+            $bInt = $bInt ?? $b;
+            // dump([
+            //     [ $a, $aInt, gettype($aInt), $aStatus ],
+            //     [ $b, $bInt, gettype($bInt), $bStatus ],
+            // ]);
 
             if ($aStatus && $bStatus) {
                 $aInt = $aInt ?? $a;
@@ -956,10 +941,11 @@ class CmpModule
                 return $aInt <=> $bInt;
             }
 
-            return $this->cmpTypeCastFailed(
+            return $this->cmpTypeCastFail(
                 $a, $b,
                 $aStatus, $bStatus,
-                $flags
+                $flagsMode, $flagsResult,
+                $fnCmpName
             );
         }
 
@@ -967,42 +953,65 @@ class CmpModule
     }
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpFloat($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpValuesFloat(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $isFloatA = is_float($a);
         $isFloatB = is_float($b);
 
-        if ($isFloatA && $isFloatB) {
-            $fnCmpName = __FUNCTION__;
+        if ($isFloatA || $isFloatB) {
+            $isNanA = $isFloatA && is_nan($a);
+            $isNanB = $isFloatB && is_nan($b);
 
-            return $a <=> $b;
+            if ($isNanA || $isNanB) {
+                $fnCmpName = __FUNCTION__;
 
-        } elseif ($isFloatA || $isFloatB) {
+                return NAN;
+            }
+
+            if ($isFloatA && $isFloatB) {
+                $fnCmpName = __FUNCTION__;
+
+                return $a <=> $b;
+            }
+
             $theType = Lib::type();
 
             $aStatus = $isFloatA;
             $bStatus = $isFloatB;
-            if (! $aStatus) $aStatus = $theType->num($aNum, $a);
-            if (! $bStatus) $bStatus = $theType->num($bNum, $b);
+            if (! $aStatus && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->num($aNum, $a);
+            if (! $bStatus && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->num($bNum, $b);
 
             if ($aStatus && $bStatus) {
                 $aNum = $aNum ?? $a;
                 $bNum = $bNum ?? $b;
 
-                $aFloat = floatval($aNum);
-                $bFloat = floatval($bNum);
-
                 $fnCmpName = __FUNCTION__;
 
-                return $aFloat <=> $bFloat;
+                return $aNum <=> $bNum;
             }
 
-            return $this->cmpTypeCastFailed(
+            $isInfiniteA = $isFloatA && is_infinite($a);
+            $isInfiniteB = $isFloatB && is_infinite($b);
+
+            if ($isInfiniteA || $isInfiniteB) {
+                $fnCmpName = __FUNCTION__;
+
+                return NAN;
+            }
+
+            return $this->cmpTypeCastFail(
                 $a, $b,
                 $aStatus, $bStatus,
-                $flags
+                $flagsMode, $flagsResult,
+                $fnCmpName
             );
         }
 
@@ -1010,51 +1019,79 @@ class CmpModule
     }
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpNumeric($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpValuesNumeric(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
-        $isNumericA = is_numeric($a);
-        $isNumericB = is_numeric($b);
+        $theType = Lib::type();
+
+        $isNumericA = $theType->numeric($aNumeric, $a);
+        $isNumericB = $theType->numeric($bNumeric, $b);
 
         if ($isNumericA || $isNumericB) {
-            $theType = Lib::type();
+            $isIntA = is_int($a);
+            $isIntB = is_int($b);
 
-            $aStatus = $isNumericA;
-            $bStatus = $isNumericB;
-            if (! $aStatus) $aStatus = $theType->int($aInt, $a);
-            if (! $bStatus) $bStatus = $theType->int($bInt, $b);
-
-            if ($aStatus && $bStatus) {
-                $aInt = $aInt ?? $a;
-                $bInt = $bInt ?? $b;
-
+            if ($isIntA && $isIntB) {
                 $fnCmpName = __FUNCTION__;
 
-                return $aInt <=> $bInt;
+                return $a <=> $b;
             }
 
-            $aStatus = $isNumericA;
-            $bStatus = $isNumericB;
-            if (! $aStatus) $aStatus = $theType->num($aNum, $a);
-            if (! $bStatus) $bStatus = $theType->num($bNum, $b);
+            $isFloatA = is_float($a);
+            $isFloatB = is_float($b);
+
+            $isNanA = $isFloatA && is_nan($a);
+            $isNanB = $isFloatB && is_nan($b);
+
+            if ($isNanA || $isNanB) {
+                $fnCmpName = __FUNCTION__;
+
+                return NAN;
+            }
+
+            if ($isFloatA && $isFloatB) {
+                $fnCmpName = __FUNCTION__;
+
+                return $a <=> $b;
+            }
+
+            $theType = Lib::type();
+
+            $aStatus = $isIntA || $isFloatA;
+            $bStatus = $isIntB || $isFloatB;
+            if (! $aStatus && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->num($aNum, $a);
+            if (! $bStatus && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->num($bNum, $b);
 
             if ($aStatus && $bStatus) {
                 $aNum = $aNum ?? $a;
                 $bNum = $bNum ?? $b;
 
-                $aFloat = floatval($aNum);
-                $bFloat = floatval($bNum);
-
                 $fnCmpName = __FUNCTION__;
 
-                return $aFloat <=> $bFloat;
+                return $aNum <=> $bNum;
             }
 
-            return $this->cmpTypeCastFailed(
+            $isInfiniteA = $isFloatA && is_infinite($a);
+            $isInfiniteB = $isFloatB && is_infinite($b);
+
+            if ($isInfiniteA || $isInfiniteB) {
+                $fnCmpName = __FUNCTION__;
+
+                return NAN;
+            }
+
+            return $this->cmpTypeCastFail(
                 $a, $b,
                 $aStatus, $bStatus,
-                $flags
+                $flagsMode, $flagsResult,
+                $fnCmpName
             );
         }
 
@@ -1062,9 +1099,15 @@ class CmpModule
     }
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpString($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpValuesString(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $isStringA = is_string($a);
         $isStringB = is_string($b);
@@ -1074,8 +1117,8 @@ class CmpModule
 
             $aStatus = $isStringA;
             $bStatus = $isStringB;
-            if (! $aStatus) $aStatus = $theType->string($aString, $a, true);
-            if (! $bStatus) $bStatus = $theType->string($bString, $b, true);
+            if (! $aStatus && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->string($aString, $a);
+            if (! $bStatus && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->string($bString, $b);
 
             if ($aStatus && $bStatus) {
                 $aString = $aString ?? $a;
@@ -1089,7 +1132,7 @@ class CmpModule
 
                 $resultLen = null;
 
-                if ($flags & _CMP_MODE_STRING_SIZE_LENGTH) {
+                if ($flagsMode & _CMP_MODE_STRING_SIZE_STRLEN) {
                     $theStr = Lib::str();
 
                     $aStringLen = $theStr->strlen($aString);
@@ -1103,7 +1146,7 @@ class CmpModule
                         return $resultLen;
                     }
 
-                } elseif ($flags & _CMP_MODE_STRING_SIZE_STRLEN) {
+                } elseif ($flagsMode & _CMP_MODE_STRING_SIZE_STRSIZE) {
                     $resultLen = (strlen($a) <=> strlen($b));
 
                     if (0 !== $resultLen) {
@@ -1114,11 +1157,10 @@ class CmpModule
                 }
 
                 $result = null
-                    ?? (($flags & _CMP_MODE_STRING_VS_STRNATCASECMP) ? strnatcasecmp($aString, $bString) : null)
-                    ?? (($flags & _CMP_MODE_STRING_VS_STRCASECMP) ? strcasecmp($aString, $bString) : null)
-                    ?? (($flags & _CMP_MODE_STRING_VS_STRNATCMP) ? strnatcmp($aString, $bString) : null)
-                    ?? (($flags & _CMP_MODE_STRING_VS_STRCMP) ? strcmp($aString, $bString) : null)
-                    ?? (($flags & _CMP_MODE_STRING_VS_SPACESHIP) ? ($aString <=> $bString) : null)
+                    ?? (($flagsMode & _CMP_MODE_STRING_VS_STRNATCASECMP) ? strnatcasecmp($aString, $bString) : null)
+                    ?? (($flagsMode & _CMP_MODE_STRING_VS_STRCASECMP) ? strcasecmp($aString, $bString) : null)
+                    ?? (($flagsMode & _CMP_MODE_STRING_VS_STRNATCMP) ? strnatcmp($aString, $bString) : null)
+                    ?? (($flagsMode & _CMP_MODE_STRING_VS_STRCMP) ? strcmp($aString, $bString) : null)
                     ?? $resultLen;
 
                 if (null !== $result) {
@@ -1132,10 +1174,11 @@ class CmpModule
                 return NAN;
             }
 
-            return $this->cmpTypeCastFailed(
+            return $this->cmpTypeCastFail(
                 $a, $b,
                 $aStatus, $bStatus,
-                $flags
+                $flagsMode, $flagsResult,
+                $fnCmpName
             );
         }
 
@@ -1143,9 +1186,15 @@ class CmpModule
     }
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpArray($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpValuesArray(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $isArrayA = is_array($a);
         $isArrayB = is_array($b);
@@ -1159,7 +1208,7 @@ class CmpModule
 
             $resultCnt = null;
 
-            if ($flags & _CMP_MODE_ARRAY_SIZE_COUNT) {
+            if ($flagsMode & _CMP_MODE_ARRAY_SIZE_COUNT) {
                 $resultCnt = (count($a) <=> count($b));
 
                 if (0 !== $resultCnt) {
@@ -1170,7 +1219,7 @@ class CmpModule
             }
 
             $result = null
-                ?? (($flags & _CMP_MODE_ARRAY_VS_SPACESHIP) ? ($a <=> $b) : null)
+                ?? (($flagsMode & _CMP_MODE_ARRAY_VS_SPACESHIP) ? ($a <=> $b) : null)
                 ?? $resultCnt;
 
             if (null !== $result) {
@@ -1184,62 +1233,61 @@ class CmpModule
             return NAN;
 
         } elseif ($isArrayA || $isArrayB) {
-            return $this->cmpTypeCastFailed(
-                $a, $b,
-                $isArrayA, $isArrayB,
-                $flags
-            );
+            $fnCmpName = __FUNCTION__;
+
+            return NAN;
         }
 
         return null;
     }
 
     /**
-     * > todo, ask somebody, date is part of object but different type, how to solve it better?
+     * * @param callable|callable-string|null $fnCmpName
      *
      * @return null|int|float
      */
-    protected function cmpDate($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpValuesDate(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $isDateA = $a instanceof \DateTimeInterface;
         $isDateB = $b instanceof \DateTimeInterface;
 
         if ($isDateA && $isDateB) {
-            $fnCmpName = __FUNCTION__;
-
-            return $a <=> $b;
-
-        } elseif ($isDateA || $isDateB) {
-            $theType = Lib::type();
-
-            $aStatus = $isDateA;
-            $bStatus = $isDateB;
-            if (! $aStatus) $aStatus = $theType->date_interface($aDate, $a);
-            if (! $bStatus) $bStatus = $theType->date_interface($bDate, $b);
-
-            if ($aStatus && $bStatus) {
-                $aDate = $aDate ?? $a;
-                $bDate = $bDate ?? $b;
-
+            if ($a === $b) {
                 $fnCmpName = __FUNCTION__;
 
-                return $aDate <=> $bDate;
+                return 0;
             }
 
-            return $this->cmpTypeCastFailed(
-                $a, $b,
-                $aStatus, $bStatus,
-                $flags
-            );
+            $aCut = $this->prepareDateCut($a, $flagsMode);
+            $bCut = $this->prepareDateCut($b, $flagsMode);
+
+            $fnCmpName = __FUNCTION__;
+
+            return $aCut <=> $bCut;
+
+        } elseif ($isDateA || $isDateB) {
+            $fnCmpName = __FUNCTION__;
+
+            return NAN;
         }
 
         return null;
     }
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpObject($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpValuesObject(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $isObjectA = is_object($a);
         $isObjectB = is_object($b);
@@ -1251,9 +1299,15 @@ class CmpModule
                 return 0;
             }
 
+            if (get_class($a) !== get_class($b)) {
+                $fnCmpName = __FUNCTION__;
+
+                return NAN;
+            }
+
             $resultCnt = null;
 
-            if ($flags & _CMP_MODE_OBJECT_SIZE_COUNT) {
+            if ($flagsMode & _CMP_MODE_OBJECT_SIZE_COUNT) {
                 $theType = Lib::type();
 
                 $isCountableA = $theType->countable($aCountable, $a);
@@ -1269,11 +1323,9 @@ class CmpModule
                     }
 
                 } elseif ($isCountableA || $isCountableB) {
-                    return $this->cmpTypeCastFailed(
-                        $a, $b,
-                        $isCountableA, $isCountableB,
-                        $flags
-                    );
+                    $fnCmpName = __FUNCTION__;
+
+                    return NAN;
                 }
             }
 
@@ -1288,20 +1340,24 @@ class CmpModule
             return NAN;
 
         } elseif ($isObjectA || $isObjectB) {
-            return $this->cmpTypeCastFailed(
-                $a, $b,
-                $isObjectA, $isObjectB,
-                $flags
-            );
+            $fnCmpName = __FUNCTION__;
+
+            return NAN;
         }
 
         return null;
     }
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpResource($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpValuesResource(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $theType = Lib::type();
 
@@ -1320,11 +1376,9 @@ class CmpModule
             return NAN;
 
         } elseif ($isResourceA || $isResourceB) {
-            return $this->cmpTypeCastFailed(
-                $a, $b,
-                $isResourceA, $isResourceB,
-                $flags
-            );
+            $fnCmpName = __FUNCTION__;
+
+            return NAN;
         }
 
         return null;
@@ -1332,9 +1386,15 @@ class CmpModule
 
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpStringSize($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpSizesString(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $isStringA = is_string($a);
         $isStringB = is_string($b);
@@ -1344,8 +1404,8 @@ class CmpModule
 
             $aStatus = $isStringA;
             $bStatus = $isStringB;
-            if (! $aStatus) $aStatus = $theType->string($aString, $a, true);
-            if (! $bStatus) $bStatus = $theType->string($bString, $b, true);
+            if (! $aStatus) $aStatus = $theType->string($aString, $a);
+            if (! $bStatus) $bStatus = $theType->string($bString, $b);
 
             if ($aStatus && $bStatus) {
                 $aString = $aString ?? $a;
@@ -1359,7 +1419,7 @@ class CmpModule
 
                 $resultLen = null;
 
-                if ($flags & _CMP_MODE_STRING_SIZE_LENGTH) {
+                if ($flagsMode & _CMP_MODE_STRING_SIZE_STRLEN) {
                     $theStr = Lib::str();
 
                     $aStringLen = $theStr->strlen($aString);
@@ -1373,7 +1433,7 @@ class CmpModule
                         return $resultLen;
                     }
 
-                } elseif ($flags & _CMP_MODE_STRING_SIZE_STRLEN) {
+                } elseif ($flagsMode & _CMP_MODE_STRING_SIZE_STRSIZE) {
                     $resultLen = (strlen($a) <=> strlen($b));
 
                     if (0 !== $resultLen) {
@@ -1394,10 +1454,11 @@ class CmpModule
                 return NAN;
             }
 
-            return $this->cmpTypeCastFailed(
+            return $this->cmpTypeCastFail(
                 $a, $b,
                 $aStatus, $bStatus,
-                $flags
+                $flagsMode, $flagsResult,
+                $fnCmpName
             );
         }
 
@@ -1405,9 +1466,15 @@ class CmpModule
     }
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpArraySize($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpSizesArray(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $isArrayA = is_array($a);
         $isArrayB = is_array($b);
@@ -1421,7 +1488,7 @@ class CmpModule
 
             $resultCnt = null;
 
-            if ($flags & _CMP_MODE_ARRAY_SIZE_COUNT) {
+            if ($flagsMode & _CMP_MODE_ARRAY_SIZE_COUNT) {
                 $resultCnt = (count($a) <=> count($b));
 
                 if (0 !== $resultCnt) {
@@ -1442,20 +1509,24 @@ class CmpModule
             return NAN;
 
         } elseif ($isArrayA || $isArrayB) {
-            return $this->cmpTypeCastFailed(
-                $a, $b,
-                $isArrayA, $isArrayB,
-                $flags
-            );
+            $fnCmpName = __FUNCTION__;
+
+            return NAN;
         }
 
         return null;
     }
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return null|int|float
      */
-    protected function cmpObjectSize($a, $b, int $flags, string &$fnCmpName = null) // : null|int|NAN
+    protected function cmpSizesObject(
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
     {
         $isObjectA = is_object($a);
         $isObjectB = is_object($b);
@@ -1463,7 +1534,13 @@ class CmpModule
         if ($isObjectA && $isObjectB) {
             $resultCnt = null;
 
-            if ($flags & _CMP_MODE_OBJECT_SIZE_COUNT) {
+            if (get_class($a) !== get_class($b)) {
+                $fnCmpName = __FUNCTION__;
+
+                return NAN;
+            }
+
+            if ($flagsMode & _CMP_MODE_OBJECT_SIZE_COUNT) {
                 $theType = Lib::type();
 
                 $isCountableA = $theType->countable($aCountable, $a);
@@ -1479,11 +1556,9 @@ class CmpModule
                     }
 
                 } elseif ($isCountableA || $isCountableB) {
-                    return $this->cmpTypeCastFailed(
-                        $a, $b,
-                        $isCountableA, $isCountableB,
-                        $flags
-                    );
+                    $fnCmpName = __FUNCTION__;
+
+                    return NAN;
                 }
             }
 
@@ -1498,11 +1573,9 @@ class CmpModule
             return NAN;
 
         } elseif ($isObjectA || $isObjectB) {
-            return $this->cmpTypeCastFailed(
-                $a, $b,
-                $isObjectA, $isObjectB,
-                $flags
-            );
+            $fnCmpName = __FUNCTION__;
+
+            return NAN;
         }
 
         return null;
@@ -1510,31 +1583,264 @@ class CmpModule
 
 
     /**
+     * @param callable|callable-string|null $fnCmpName
+     *
+     * @return int|float
+     */
+    protected function cmpPeriodsDate(
+        \DateTimeInterface $aStart,
+        \DateTimeInterface $bStart,
+        ?\DateTimeInterface $aEnd,
+        ?\DateTimeInterface $bEnd,
+        //
+        int $flagsMode,
+        int $flagsResult,
+        //
+        string &$fnCmpName = null
+    ) // : int|NAN
+    {
+        $_aStart = $this->prepareDateCut($aStart, $flagsMode);
+        $_bStart = $this->prepareDateCut($bStart, $flagsMode);
+
+        $_aEnd = ((null === $aEnd)
+            ? $_aStart
+            : $this->prepareDateCut($aEnd, $flagsMode)
+        );
+        $_bEnd = ((null === $bEnd)
+            ? $_bStart
+            : $this->prepareDateCut($bEnd, $flagsMode)
+        );
+
+        $result = null;
+
+        if (($_aStart > $_aEnd) || ($_bStart > $_bEnd)) {
+            // > invalid
+            $result = NAN;
+
+        } elseif (($_aStart == $_bStart) && ($_aEnd == $_bEnd)) {
+            // | AB--AB |
+            $result = 0;
+
+        } elseif (($_aStart >= $_bStart) && ($_aEnd <= $_bEnd)) {
+            // | B-A-A-B |
+            $result = -1;
+
+        } elseif (($_aStart <= $_bStart) && ($_aEnd >= $_bEnd)) {
+            // | A-B-B-A |
+            $result = 1;
+
+        } elseif ($_aEnd == $_bStart) {
+            // | A--AB--B |
+            $result = -3;
+
+        } elseif ($_aStart == $_bEnd) {
+            // | B--BA--A |
+            $result = 3;
+
+        } elseif (($_aStart < $_bStart) && ($_aEnd > $_bStart) && ($_aEnd < $_bEnd)) {
+            // | A-B-A-B |
+            $result = -2;
+
+        } elseif (($_aStart > $_bStart) && ($_aStart < $_bEnd) && ($_aEnd > $_bEnd)) {
+            // | B-A-B-A |
+            $result = 2;
+
+        } elseif ($_aEnd < $_bStart) {
+            // | A--A B--B |
+            $result = -4;
+
+        } elseif ($_aStart > $_bEnd) {
+            // | B--B A--A |
+            $result = 4;
+        }
+
+        if (null !== $result) {
+            $fnCmpName = __FUNCTION__;
+
+            return $result;
+        }
+
+        $fnCmpName = __FUNCTION__;
+
+        return NAN;
+    }
+
+
+    protected function prepareDateCut(\DateTimeInterface $date, int $flagsMode) : \DateTimeImmutable
+    {
+        $dt = null
+            ?? (($date instanceof \DateTimeImmutable) ? \DateTime::createFromImmutable($date) : null)
+            ?? (($date instanceof \DateTime) ? (clone $date) : null);
+
+        if ($flagsMode & _CMP_MODE_DATE_VS_YEAR) {
+            $dt
+                ->setDate($date->format('Y'), 1, 1)
+                ->setTime(0, 0, 0, 0)
+            ;
+
+        } elseif ($flagsMode & _CMP_MODE_DATE_VS_MONTH) {
+            $dt
+                ->setDate(
+                    (int) $date->format('Y'),
+                    (int) $date->format('m'),
+                    1
+                )
+                ->setTime(0, 0, 0, 0)
+            ;
+
+        } elseif ($flagsMode & _CMP_MODE_DATE_VS_DAY) {
+            $dt
+                ->setDate(
+                    (int) $date->format('Y'),
+                    (int) $date->format('m'),
+                    (int) $date->format('d')
+                )
+                ->setTime(0, 0, 0, 0)
+            ;
+
+        } elseif ($flagsMode & _CMP_MODE_DATE_VS_HOUR) {
+            $dt
+                ->setDate(
+                    (int) $date->format('Y'),
+                    (int) $date->format('m'),
+                    (int) $date->format('d')
+                )
+                ->setTime((int) $date->format('H'), 0, 0, 0)
+            ;
+
+        } elseif ($flagsMode & _CMP_MODE_DATE_VS_MIN) {
+            $dt
+                ->setDate(
+                    (int) $date->format('Y'),
+                    (int) $date->format('m'),
+                    (int) $date->format('d')
+                )
+                ->setTime(
+                    (int) $date->format('H'),
+                    (int) $date->format('i'),
+                    0,
+                    0
+                )
+            ;
+
+        } elseif ($flagsMode & _CMP_MODE_DATE_VS_SEC) {
+            $dt
+                ->setDate(
+                    (int) $date->format('Y'),
+                    (int) $date->format('m'),
+                    (int) $date->format('d')
+                )
+                ->setTime(
+                    (int) $date->format('H'),
+                    (int) $date->format('i'),
+                    (int) $date->format('s'),
+                    0
+                )
+            ;
+
+        } elseif ($flagsMode & _CMP_MODE_DATE_VS_MSEC) {
+            $dt
+                ->setDate(
+                    (int) $date->format('Y'),
+                    (int) $date->format('m'),
+                    (int) $date->format('d')
+                )
+                ->setTime(
+                    (int) $date->format('H'),
+                    (int) $date->format('i'),
+                    (int) $date->format('s'),
+                    (int) $date->format('v')
+                )
+            ;
+
+        } elseif ($flagsMode & _CMP_MODE_DATE_VS_USEC) {
+            $dt
+                ->setDate(
+                    (int) $date->format('Y'),
+                    (int) $date->format('m'),
+                    (int) $date->format('d')
+                )
+                ->setTime(
+                    (int) $date->format('H'),
+                    (int) $date->format('i'),
+                    (int) $date->format('s'),
+                    (int) $date->format('u')
+                )
+            ;
+
+        } else {
+            $result = $date;
+        }
+
+        $dateImmutable = \DateTimeImmutable::createFromMutable($dt);
+
+        return $dateImmutable;
+    }
+
+
+    /**
+     * @return null|float
+     */
+    protected function cmpTypeCastFail(
+        $a, $b,
+        bool $aStatus, bool $bStatus,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : null|int|NAN
+    {
+        if ($flagsMode & _CMP_MODE_TYPE_CAST_OR_CONTINUE) {
+            return null;
+
+        } elseif ($flagsMode & _CMP_MODE_TYPE_CAST_OR_NAN) {
+            $fnCmpName = __FUNCTION__;
+
+            return NAN;
+
+        } elseif ($flagsMode & _CMP_MODE_TYPE_STRICT) {
+            /** @see static::cmpTypesStrict() */
+
+            return NAN;
+        }
+
+        $fnCmpName = __FUNCTION__;
+
+        return NAN;
+    }
+
+
+    /**
+     * @param callable|callable-string|null $fnCmpName
+     *
      * @return int|float
      *
      * @throws RuntimeException
      */
-    protected function cmpUnknown($result, $a, $b, int $flags, string &$fnCmpName = null) // : int|NAN
+    protected function cmpResultUnknown(
+        $result,
+        $a, $b,
+        int $flagsMode, int $flagsResult,
+        string &$fnCmpName = null
+    ) // : int|NAN
     {
         $_result = $result;
 
         if (null === $result) {
-            if ($flags & _CMP_MODE_NULL_SPACESHIP) {
+            if ($flagsResult & _CMP_MODE_RESULT_SPACESHIP) {
                 $fnCmpName = __FUNCTION__;
 
                 $_result = $a <=> $b;
 
-            } elseif ($flags & _CMP_MODE_NULL_0) {
+            } elseif ($flagsResult & _CMP_RESULT_NULL_0) {
                 $fnCmpName = __FUNCTION__;
 
                 $_result = 0;
 
-            } elseif ($flags & _CMP_MODE_NULL_GT) {
+            } elseif ($flagsResult & _CMP_RESULT_NULL_A_LT) {
                 $fnCmpName = __FUNCTION__;
 
                 $_result = 1;
 
-            } elseif ($flags & _CMP_MODE_NULL_LT) {
+            } elseif ($flagsResult & _CMP_RESULT_NULL_A_GT) {
                 $fnCmpName = __FUNCTION__;
 
                 $_result = -1;
@@ -1548,7 +1854,7 @@ class CmpModule
         }
 
         if (is_float($_result) && is_nan($_result)) {
-            if ($flags & _CMP_MODE_ERROR_THROW) {
+            if ($flagsResult & _CMP_RESULT_NAN_THROW) {
                 throw new RuntimeException(
                     [ 'Values are incomparable', $a, $b ]
                 );
@@ -1559,140 +1865,183 @@ class CmpModule
     }
 
 
-    protected function flagsDefault(int $flags = null) : int
+    protected function flagsModeDefault(int $flagsMode = null) : int
     {
-        $flags = $flags ?? 0;
+        $flagsMode = $flagsMode ?? 0;
 
-        $_flags = $flags;
+        $flags = $flagsMode;
+
 
         $sum = (int) (
-            ((bool) ($_flags & _CMP_MODE_ERROR_THROW))
-            + ((bool) ($_flags & _CMP_MODE_ERROR_NAN))
+            ((bool) ($flags & _CMP_MODE_TYPECAST_A))
+            + ((bool) ($flags & _CMP_MODE_TYPECAST_B))
         );
-        if (1 !== $sum) {
-            $_flags &= ~(
-                _CMP_MODE_ERROR_THROW
-                | _CMP_MODE_ERROR_NAN
+        if (0 === $sum) {
+            $flags &= ~(
+                _CMP_MODE_TYPECAST_A
+                | _CMP_MODE_TYPECAST_B
             );
 
-            $_flags |= _CMP_MODE_ERROR_THROW;
+            $flags |= (_CMP_MODE_TYPECAST_A | _CMP_MODE_TYPECAST_B);
         }
 
+
         $sum = (int) (
-            ((bool) ($_flags & _CMP_MODE_TYPE_STRICT))
-            + ((bool) ($_flags & _CMP_MODE_TYPE_SPACESHIP))
-            + ((bool) ($_flags & _CMP_MODE_TYPE_GT))
-            + ((bool) ($_flags & _CMP_MODE_TYPE_LT))
-            + ((bool) ($_flags & _CMP_MODE_TYPE_CONTINUE))
-            + ((bool) ($_flags & _CMP_MODE_TYPE_NAN))
+            ((bool) ($flags & _CMP_MODE_TYPE_STRICT))
+            + ((bool) ($flags & _CMP_MODE_TYPE_CAST_OR_NAN))
+            + ((bool) ($flags & _CMP_MODE_TYPE_CAST_OR_CONTINUE))
         );
         if (1 !== $sum) {
-            $_flags &= ~(
+            $flags &= ~(
                 _CMP_MODE_TYPE_STRICT
-                | _CMP_MODE_TYPE_SPACESHIP
-                | _CMP_MODE_TYPE_GT
-                | _CMP_MODE_TYPE_LT
-                | _CMP_MODE_TYPE_CONTINUE
-                | _CMP_MODE_TYPE_NAN
+                | _CMP_MODE_TYPE_CAST_OR_NAN
+                | _CMP_MODE_TYPE_CAST_OR_CONTINUE
             );
 
-            $_flags |= _CMP_MODE_TYPE_NAN;
+            $flags |= _CMP_MODE_TYPE_CAST_OR_CONTINUE;
         }
 
+
         $sum = (int) (
-            ((bool) ($_flags & _CMP_MODE_STRING_SIZE_LENGTH))
-            + ((bool) ($_flags & _CMP_MODE_STRING_SIZE_STRLEN))
-            + ((bool) ($_flags & _CMP_MODE_STRING_SIZE_IGNORE))
+            ((bool) ($flags & _CMP_MODE_STRING_SIZE_STRLEN))
+            + ((bool) ($flags & _CMP_MODE_STRING_SIZE_STRSIZE))
+            + ((bool) ($flags & _CMP_MODE_STRING_SIZE_IGNORE))
         );
         if (1 !== $sum) {
-            $_flags &= ~(
-                _CMP_MODE_STRING_SIZE_LENGTH
-                | _CMP_MODE_STRING_SIZE_STRLEN
+            $flags &= ~(
+                _CMP_MODE_STRING_SIZE_STRLEN
+                | _CMP_MODE_STRING_SIZE_STRSIZE
                 | _CMP_MODE_STRING_SIZE_IGNORE
             );
 
-            $_flags |= _CMP_MODE_STRING_SIZE_LENGTH;
+            $flags |= _CMP_MODE_STRING_SIZE_STRLEN;
         }
 
         $sum = (int) (
-            ((bool) ($_flags & _CMP_MODE_STRING_VS_STRNATCASECMP))
-            + ((bool) ($_flags & _CMP_MODE_STRING_VS_STRCASECMP))
-            + ((bool) ($_flags & _CMP_MODE_STRING_VS_STRNATCMP))
-            + ((bool) ($_flags & _CMP_MODE_STRING_VS_STRCMP))
-            + ((bool) ($_flags & _CMP_MODE_STRING_VS_SPACESHIP))
-            + ((bool) ($_flags & _CMP_MODE_STRING_VS_IGNORE))
+            ((bool) ($flags & _CMP_MODE_STRING_VS_STRNATCASECMP))
+            + ((bool) ($flags & _CMP_MODE_STRING_VS_STRCASECMP))
+            + ((bool) ($flags & _CMP_MODE_STRING_VS_STRNATCMP))
+            + ((bool) ($flags & _CMP_MODE_STRING_VS_STRCMP))
+            + ((bool) ($flags & _CMP_MODE_STRING_VS_IGNORE))
         );
         if (1 !== $sum) {
-            $_flags &= ~(
+            $flags &= ~(
                 _CMP_MODE_STRING_VS_STRNATCASECMP
                 | _CMP_MODE_STRING_VS_STRCASECMP
                 | _CMP_MODE_STRING_VS_STRNATCMP
                 | _CMP_MODE_STRING_VS_STRCMP
-                | _CMP_MODE_STRING_VS_SPACESHIP
                 | _CMP_MODE_STRING_VS_IGNORE
             );
 
-            $_flags |= _CMP_MODE_STRING_VS_STRCMP;
+            $flags |= _CMP_MODE_STRING_VS_STRCMP;
         }
 
         $sum = (int) (
-            ((bool) ($_flags & _CMP_MODE_ARRAY_SIZE_COUNT))
-            + ((bool) ($_flags & _CMP_MODE_ARRAY_SIZE_IGNORE))
+            ((bool) ($flags & _CMP_MODE_ARRAY_SIZE_COUNT))
+            + ((bool) ($flags & _CMP_MODE_ARRAY_SIZE_IGNORE))
         );
         if (1 !== $sum) {
-            $_flags &= ~(
+            $flags &= ~(
                 _CMP_MODE_ARRAY_SIZE_COUNT
                 | _CMP_MODE_ARRAY_SIZE_IGNORE
             );
 
-            $_flags |= _CMP_MODE_ARRAY_SIZE_COUNT;
+            $flags |= _CMP_MODE_ARRAY_SIZE_COUNT;
         }
 
         $sum = (int) (
-            ((bool) ($_flags & _CMP_MODE_ARRAY_VS_SPACESHIP))
-            + ((bool) ($_flags & _CMP_MODE_ARRAY_VS_IGNORE))
+            ((bool) ($flags & _CMP_MODE_ARRAY_VS_SPACESHIP))
+            + ((bool) ($flags & _CMP_MODE_ARRAY_VS_IGNORE))
         );
         if (1 !== $sum) {
-            $_flags &= ~(
+            $flags &= ~(
                 _CMP_MODE_ARRAY_VS_SPACESHIP
                 | _CMP_MODE_ARRAY_VS_IGNORE
             );
 
-            $_flags |= _CMP_MODE_ARRAY_VS_IGNORE;
+            $flags |= _CMP_MODE_ARRAY_VS_IGNORE;
         }
 
         $sum = (int) (
-            ((bool) ($_flags & _CMP_MODE_OBJECT_SIZE_COUNT))
-            + ((bool) ($_flags & _CMP_MODE_OBJECT_SIZE_IGNORE))
+            ((bool) ($flags & _CMP_MODE_DATE_VS_YEAR))
+            + ((bool) ($flags & _CMP_MODE_DATE_VS_MONTH))
+            + ((bool) ($flags & _CMP_MODE_DATE_VS_DAY))
+            + ((bool) ($flags & _CMP_MODE_DATE_VS_HOUR))
+            + ((bool) ($flags & _CMP_MODE_DATE_VS_MIN))
+            + ((bool) ($flags & _CMP_MODE_DATE_VS_SEC))
+            + ((bool) ($flags & _CMP_MODE_DATE_VS_MSEC))
+            + ((bool) ($flags & _CMP_MODE_DATE_VS_USEC))
         );
         if (1 !== $sum) {
-            $_flags &= ~(
+            $flags &= ~(
+                _CMP_MODE_DATE_VS_YEAR
+                | _CMP_MODE_DATE_VS_MONTH
+                | _CMP_MODE_DATE_VS_DAY
+                | _CMP_MODE_DATE_VS_HOUR
+                | _CMP_MODE_DATE_VS_MIN
+                | _CMP_MODE_DATE_VS_SEC
+                | _CMP_MODE_DATE_VS_MSEC
+                | _CMP_MODE_DATE_VS_USEC
+            );
+
+            $flags |= _CMP_MODE_DATE_VS_USEC;
+        }
+
+        $sum = (int) (
+            ((bool) ($flags & _CMP_MODE_OBJECT_SIZE_COUNT))
+            + ((bool) ($flags & _CMP_MODE_OBJECT_SIZE_IGNORE))
+        );
+        if (1 !== $sum) {
+            $flags &= ~(
                 _CMP_MODE_OBJECT_SIZE_COUNT
                 | _CMP_MODE_OBJECT_SIZE_IGNORE
             );
 
-            $_flags |= _CMP_MODE_OBJECT_SIZE_COUNT;
+            $flags |= _CMP_MODE_OBJECT_SIZE_COUNT;
+        }
+
+
+        return $flags;
+    }
+
+    protected function flagsResultDefault(int $flagsResult = null) : int
+    {
+        $flagsResult = $flagsResult ?? 0;
+
+        $flags = $flagsResult;
+
+        $sum = (int) (
+            ((bool) ($flags & _CMP_MODE_RESULT_SPACESHIP))
+            + ((bool) ($flags & _CMP_RESULT_NULL_0))
+            + ((bool) ($flags & _CMP_RESULT_NULL_A_LT))
+            + ((bool) ($flags & _CMP_RESULT_NULL_A_GT))
+            + ((bool) ($flags & _CMP_RESULT_NULL_NAN))
+        );
+        if (1 !== $sum) {
+            $flags &= ~(
+                _CMP_MODE_RESULT_SPACESHIP
+                | _CMP_RESULT_NULL_0
+                | _CMP_RESULT_NULL_A_LT
+                | _CMP_RESULT_NULL_A_GT
+                | _CMP_RESULT_NULL_NAN
+            );
+
+            $flags |= _CMP_RESULT_NULL_NAN;
         }
 
         $sum = (int) (
-            ((bool) ($_flags & _CMP_MODE_NULL_SPACESHIP))
-            + ((bool) ($_flags & _CMP_MODE_NULL_0))
-            + ((bool) ($_flags & _CMP_MODE_NULL_GT))
-            + ((bool) ($_flags & _CMP_MODE_NULL_LT))
-            + ((bool) ($_flags & _CMP_MODE_NULL_NAN))
+            ((bool) ($flags & _CMP_RESULT_NAN_THROW))
+            + ((bool) ($flags & _CMP_RESULT_NAN_RETURN))
         );
         if (1 !== $sum) {
-            $_flags &= ~(
-                _CMP_MODE_NULL_SPACESHIP
-                | _CMP_MODE_NULL_0
-                | _CMP_MODE_NULL_GT
-                | _CMP_MODE_NULL_LT
-                | _CMP_MODE_NULL_NAN
+            $flags &= ~(
+                _CMP_RESULT_NAN_THROW
+                | _CMP_RESULT_NAN_RETURN
             );
 
-            $_flags |= _CMP_MODE_NULL_NAN;
+            $flags |= _CMP_RESULT_NAN_THROW;
         }
 
-        return $_flags;
+        return $flags;
     }
 }

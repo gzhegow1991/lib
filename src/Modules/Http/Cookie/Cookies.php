@@ -112,7 +112,7 @@ class Cookies
         $cookieIndex = $this->indexCookie($cookieName, $cookiePath, $cookieDomain);
 
         foreach ( $this->cookiesIndex as $index => $cookieId ) {
-            if ($theStr->starts($index, $cookieIndex)) {
+            if ($theStr->str_starts($index, $cookieIndex)) {
                 $this->delete($cookieId);
             }
         }

@@ -16,6 +16,7 @@ use Gzhegow\Lib\Modules\HttpModule;
 use Gzhegow\Lib\Modules\TestModule;
 use Gzhegow\Lib\Modules\TypeModule;
 use Gzhegow\Lib\Modules\PregModule;
+use Gzhegow\Lib\Modules\DateModule;
 use Gzhegow\Lib\Modules\DebugModule;
 use Gzhegow\Lib\Modules\ParseModule;
 use Gzhegow\Lib\Modules\CryptModule;
@@ -99,6 +100,18 @@ class Lib
         return static::$modules[ $key ] = $instance
             ?? static::$modules[ $key ]
             ?? new CryptModule();
+    }
+
+    /**
+     * @return DateModule
+     */
+    public static function date(DateModule $instance = null)
+    {
+        $key = __FUNCTION__;
+
+        return static::$modules[ $key ] = $instance
+            ?? static::$modules[ $key ]
+            ?? new DateModule();
     }
 
     /**

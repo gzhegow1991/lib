@@ -6,19 +6,34 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Nil;
 
 
-if (! defined('_TYPE_NIL')) define('_TYPE_NIL', '{N}');
-
 abstract class TypeModuleBase
 {
-    public function the_nil()
+    public function the_nil() : string
     {
         return new Nil();
+    }
+
+
+    public function the_timezone_nil() : \DateTimeZone
+    {
+        return new \DateTimeZone('+1234');
     }
 
 
     public function the_decimal_point() : string
     {
         return localeconv()[ 'decimal_point' ];
+    }
+
+
+    public function is_empty($value) : bool
+    {
+        return empty($value);
+    }
+
+    public function is_not_empty($value) : bool
+    {
+        return ! empty($value);
     }
 
 
@@ -55,14 +70,47 @@ abstract class TypeModuleBase
     }
 
 
-    public function is_empty($value) : bool
+    public function is_finite($value) : bool
     {
-        return empty($value);
+        return is_float($value) && is_finite($value);
     }
 
-    public function is_not_empty($value) : bool
+    public function is_not_finite($value) : bool
     {
-        return ! empty($value);
+        return ! (is_float($value) && is_finite($value));
+    }
+
+
+    public function is_empty_string($value) : bool
+    {
+        return '' === $value;
+    }
+
+    public function is_not_empty_string($value) : bool
+    {
+        return '' !== $value;
+    }
+
+
+    public function is_empty_array($value) : bool
+    {
+        return [] === $value;
+    }
+
+    public function is_not_empty_array($value) : bool
+    {
+        return [] !== $value;
+    }
+
+
+    public function is_closed_resource($value) : bool
+    {
+        return 'resource (closed)' === gettype($value);
+    }
+
+    public function is_not_closed_resource($value) : bool
+    {
+        return 'resource (closed)' !== gettype($value);
     }
 
 
@@ -76,22 +124,12 @@ abstract class TypeModuleBase
      */
     public function is_nil($value) : bool
     {
-        if ($value instanceof Nil) {
-            return true;
-        }
-
-        if (is_string($value)) {
-            if ($value === (string) $this->the_nil()) {
-                return true;
-            }
-        }
-
-        return false;
+        return Nil::is($value);
     }
 
     public function is_not_nil($value) : bool
     {
-        return ! $this->is_nil($value);
+        return ! Nil::is($value);
     }
 
 
