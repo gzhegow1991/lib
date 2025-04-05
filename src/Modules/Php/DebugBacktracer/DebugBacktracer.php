@@ -168,6 +168,9 @@ class DebugBacktracer
      */
     public function filter(array $filter = null)
     {
+        $theType = Lib::type();
+
+
         $_filterFile = $filter[ 'file' ] ?? $filter[ 0 ] ?? [];
         $_filterClass = $filter[ 'class' ] ?? $filter[ 1 ] ?? [];
         $_filterFunction = $filter[ 'function' ] ?? $filter[ 2 ] ?? [];
@@ -200,7 +203,7 @@ class DebugBacktracer
 
         $_filterLine = null
             ?? (is_array($_filterLine) ? $_filterLine : null)
-            ?? (is_numeric($_filterLine) ? [ $_filterLine ] : null)
+            ?? ($theType->numeric($var, $_filterLine) ? [ $var ] : null)
             ?? [];
 
         $_filterObject = null
@@ -285,6 +288,9 @@ class DebugBacktracer
      */
     public function filterNot(array $filter = null)
     {
+        $theType = Lib::type();
+
+
         $_filterFile = $filter[ 'file' ] ?? $filter[ 0 ] ?? [];
         $_filterClass = $filter[ 'class' ] ?? $filter[ 1 ] ?? [];
         $_filterFunction = $filter[ 'function' ] ?? $filter[ 2 ] ?? [];
@@ -317,7 +323,7 @@ class DebugBacktracer
 
         $_filterLine = null
             ?? (is_array($_filterLine) ? $_filterLine : null)
-            ?? (is_numeric($_filterLine) ? [ $_filterLine ] : null)
+            ?? ($theType->numeric($var, $_filterLine) ? [ $var ] : null)
             ?? [];
 
         $_filterObject = null

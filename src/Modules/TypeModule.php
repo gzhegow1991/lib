@@ -355,7 +355,7 @@ class TypeModule extends TypeModuleBase
 
         $hasExponent = ('' !== $split[ 3 ]);
         if ($hasExponent) {
-            $valueFloat = (float) $valueNumeric;
+            $valueFloat = floatval($valueNumeric);
 
         } else {
             // > IEEE 754 double-precision floating point (64-bit float)
