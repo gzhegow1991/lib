@@ -619,9 +619,9 @@ class TypeModule extends TypeModuleBase
 
         $frac = rtrim($frac, '0.');
 
-        $isNotZero = preg_match('/[1-9]/', "{$int}{$frac}");
+        $isZero = ! preg_match('/[1-9]/', "{$int}{$frac}");
 
-        if (! $isNotZero) {
+        if ($isZero) {
             $sign = '';
             $int = '0';
             $frac = '';
