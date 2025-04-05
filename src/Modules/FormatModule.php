@@ -75,46 +75,48 @@ class FormatModule
 
         $intervalClass = $intervalClass ?? \DateInterval::class;
 
+        $_duration = $duration;
+
         $regex = '/(\d+\.\d+)([YMWDHS])/';
 
-        $hasDecimalValue = preg_match_all($regex, $duration, $matches);
+        $hasDecimalValue = preg_match_all($regex, $_duration, $matches);
 
         $decimalValueFrac = null;
         $decimalLetter = null;
         if ($hasDecimalValue) {
-            if (count($matches[ 0 ]) > 1) {
+            $decimal = $matches[ 0 ];
+            $decimalSubstr = $matches[ 0 ][ 0 ];
+            $decimalValue = $matches[ 1 ][ 0 ];
+            $decimalLetter = $matches[ 2 ][ 0 ];
+
+            if (count($decimal) > 1) {
                 throw new LogicException(
                     [
-                        'The `duration` can contain only one decimal separator in smallest period (according ISO 8601)',
+                        'The `duration` can contain only one `.` in smallest period (according ISO 8601)',
                         $duration,
                     ]
                 );
             }
 
-            $decimalSubstr = $matches[ 0 ][ 0 ];
-            $decimalValue = $matches[ 1 ][ 0 ];
-            $decimalLetter = $matches[ 2 ][ 0 ];
-
             if (! $theStr->str_ends($duration, $decimalSubstr, false)) {
                 throw new LogicException(
                     [
-                        'The `duration` can contain only one decimal separator in smallest period (according ISO 8601)',
+                        'The `duration` can contain only one `.` in smallest period (according ISO 8601)',
                         $duration,
                     ]
                 );
             }
 
             $decimalValueFloat = (float) $decimalValue;
-            $decimalValueFloor = floor($decimalValue);
+            $decimalValueInt = (int) $decimalValue;
 
-            $decimalValueFrac = $decimalValueFloat - $decimalValueFloor;
+            $decimalValueFrac = $decimalValueFloat - (float) $decimalValueInt;
 
-            $duration = str_replace($decimalValue, $decimalValueFloor, $duration);
+            $_duration = str_replace($decimalValue, $decimalValueInt, $_duration);
         }
 
         try {
-            $instance = new \DateInterval($duration);
-
+            $instance = new \DateInterval($_duration);
         }
         catch ( \Throwable $e ) {
             throw new LogicException($e);
@@ -129,31 +131,31 @@ class FormatModule
             $seconds = null;
             switch ( $decimalLetter ):
                 case 'Y':
-                    $seconds = floor($decimalValueFrac * static::INTERVAL_YEAR);
+                    $seconds = intval($decimalValueFrac * static::INTERVAL_YEAR);
 
                     break;
 
                 case 'W':
-                    $seconds = floor($decimalValueFrac * static::INTERVAL_WEEK);
+                    $seconds = intval($decimalValueFrac * static::INTERVAL_WEEK);
 
                     break;
 
                 case 'D':
-                    $seconds = floor($decimalValueFrac * static::INTERVAL_DAY);
+                    $seconds = intval($decimalValueFrac * static::INTERVAL_DAY);
 
                     break;
 
                 case 'H':
-                    $seconds = floor($decimalValueFrac * static::INTERVAL_HOUR);
+                    $seconds = intval($decimalValueFrac * static::INTERVAL_HOUR);
 
                     break;
 
                 case 'M':
                     if (false === strpos($duration, 'T')) {
-                        $seconds = ceil($decimalValueFrac * static::INTERVAL_MONTH);
+                        $seconds = intval($decimalValueFrac * static::INTERVAL_MONTH);
 
                     } else {
-                        $seconds = ceil($decimalValueFrac * static::INTERVAL_MINUTE);
+                        $seconds = intval($decimalValueFrac * static::INTERVAL_MINUTE);
                     }
 
                     break;
@@ -173,8 +175,10 @@ class FormatModule
             $instance->i = $interval->i;
             $instance->s = $interval->s;
 
-            if ($decimalLetter === 'S') {
-                $instance->f = $decimalValueFrac;
+            if (null !== $decimalValueFrac) {
+                if ('S' === $decimalLetter) {
+                    $instance->f = $decimalValueFrac;
+                }
             }
         }
 
