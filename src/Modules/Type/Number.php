@@ -2,7 +2,16 @@
 
 namespace Gzhegow\Lib\Modules\Type;
 
-class Number
+use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
+
+
+class Number implements
+    ToIntegerInterface,
+    ToFloatInterface,
+    ToStringInterface
 {
     /**
      * @var string
@@ -61,9 +70,37 @@ class Number
     }
 
 
+    public function isInteger() : bool
+    {
+        return $this->value === $this->getValueInteger();
+    }
+
+
+    public function toInteger(array $options = []) : int
+    {
+        if (! $this->isInteger()) {
+            throw new RuntimeException(
+                [ 'This number cannot be converted to an integer', $this ]
+            );
+        }
+
+        return (int) $this->value;
+    }
+
+    public function toFloat(array $options = []) : float
+    {
+        return (float) $this->value;
+    }
+
+    public function toString(array $options = []) : string
+    {
+        return $this->value;
+    }
+
+
     public function __toString()
     {
-        return $this->getValue();
+        return $this->value;
     }
 
 

@@ -19,13 +19,18 @@ class CryptModule
     const ALPHABET_BASE_62 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
     const ALPHABET_BASE_64 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/';
 
+    // >>>>>>>>>>>>>>>>>>>>> '0123456789'    . 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'    . 'abcdefghijklmnopqrstuvwxyz'
+    // >>>>>>>>>>>>>>>>>>>>> '123456789'[~0] . 'ABCDEFGHJKLMNPQRSTUVWXYZ'[~IO] . 'abcdefghijkmnopqrstuvwxyz'[~l]
     const ALPHABET_BASE_58 = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 
     const ALPHABET_BASE_32_RFC4648         = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
-    const ALPHABET_BASE_32_RFC4648_HEXLIKE = self::ALPHABET_BASE_32;
+    const ALPHABET_BASE_32_RFC4648_HEXLIKE = '0123456789ABCDEFGHIJKLMNOPQRSTUV'; // > ALPHABET_BASE_32
     const ALPHABET_BASE_64_RFC4648         = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
     const ALPHABET_BASE_64_RFC4648_URLSAFE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_';
 
+    /**
+     * @noinspection PhpDuplicateArrayKeysInspection
+     */
     const LIST_ALPHABET = [
         self::ALPHABET_BASE_2                  => true,
         self::ALPHABET_BASE_4                  => true,
@@ -40,7 +45,7 @@ class CryptModule
         self::ALPHABET_BASE_58                 => true,
         //
         self::ALPHABET_BASE_32_RFC4648         => true,
-        // self::ALPHABET_BASE_32_RFC4648_HEXLIKE => true,
+        self::ALPHABET_BASE_32_RFC4648_HEXLIKE => true,
         self::ALPHABET_BASE_64_RFC4648         => true,
         self::ALPHABET_BASE_64_RFC4648_URLSAFE => true,
     ];
@@ -216,290 +221,201 @@ class CryptModule
     }
 
 
-    public function dec2numbase(string $decString, $alphabetTo, bool $oneBasedTo = null) : string
+    /**
+     * @return string[]
+     */
+    public function text2bin($strings) : array
     {
-        $theBcmath = Lib::bcmath();
+        $result = [];
 
-        if (! $this->type_base_dec($_decString, $decString)) {
-            throw new LogicException(
-                [ 'The `decString` should be valid `baseDec`', $decString ]
-            );
-        }
+        $gen = $this->text2bin_it($strings);
 
-        if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
-            throw new LogicException(
-                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
-            );
-        }
-
-        $alphabetToValue = $_alphabetTo->getValue();
-        $alphabetToLen = $_alphabetTo->getLength();
-
-        if ($alphabetToValue === '0123456789') {
-            return $_decString;
-        }
-
-        $_oneBasedTo = null
-            ?? $oneBasedTo
-            ?? ($alphabetToValue[ 0 ] !== '0');
-
-        $baseTo = $alphabetToLen;
-        $baseToString = (string) $baseTo;
-
-        $result = '';
-
-        $left = $_decString;
-        if ($_oneBasedTo) {
-            if (bccomp($left, '0', 1) === 0) {
-                throw new RuntimeException(
-                    [ 'The `decInteger` should be greater than zero due to `oneBasedTo` is set to TRUE', $alphabetTo, $oneBasedTo ]
-                );
-            }
-        }
-
-        do {
-            if ($_oneBasedTo) {
-                $left = bcsub($left, '1', 0);
-            }
-
-            $mod = bcmod($left, $baseToString, 0);
-
-            $result = mb_substr($_alphabetTo, (int) $mod, 1) . $result;
-
-            $left = bcdiv($left, $baseToString, 0);
-        } while ( bccomp($left, '0', 1) > 0 );
-
-        return $result;
-    }
-
-    public function numbase2dec(string $numbaseString, $alphabetFrom, bool $oneBasedFrom = null) : string
-    {
-        $theBcmath = Lib::bcmath();
-        $theMb = Lib::mb();
-
-        if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
-            throw new LogicException(
-                [
-                    'The `numbaseString` should be valid `base` for given alphabet',
-                    $numbaseString,
-                    $alphabetFrom,
-                ]
-            );
-        }
-
-        if ($alphabetFrom === '0123456789') {
-            return $_numbaseString;
-        }
-
-        $_oneBasedFrom = null
-            ?? $oneBasedFrom
-            ?? ($alphabetFrom[ 0 ] !== '0');
-
-        $numbaseStringLen = mb_strlen($_numbaseString);
-
-        $alphabetFromLen = mb_strlen($alphabetFrom);
-
-        $baseFrom = $alphabetFromLen;
-        $baseFromString = (string) $baseFrom;
-
-        $result = '0';
-
-        for ( $i = 1; $i <= $numbaseStringLen; $i++ ) {
-            $chr = mb_substr($_numbaseString, $i - 1, 1);
-
-            $mod = mb_strpos($alphabetFrom, $chr);
-            if (false === $mod) {
-                throw new LogicException(
-                    [ 'The `baseInteger` contains char that is outside `alphabetFrom`: ' . $chr, $chr ]
-                );
-            }
-
-            $mod = $_oneBasedFrom
-                ? bcadd($mod, '1', 0)
-                : $mod;
-
-            $pow = bcpow($baseFromString, ($numbaseStringLen - $i), 0);
-
-            $digit = bcmul($mod, $pow, 0);
-
-            $result = bcadd($result, $digit, 0);
+        foreach ( $gen as $binary ) {
+            $result[] = $binary;
         }
 
         return $result;
     }
-
 
     /**
-     * > функция переводит число из двоичной системы в другую, являющуюся степенью двойки, не переводя в десятичную систему
-     *
-     * > основное отличие `bin2numbase` от `bin2base` в считывании битов слева-направо и справа-налево соответственно
-     * > при переводе числа в систему счисления pow(2,n) (например, из bin(2^1) в hex(2^3)), данные читаются справа-налево (т.к. число имеет конец)
+     * @return string[]
      */
-    public function bin2numbase(string $binary, $alphabetTo) : string
+    public function bin2text($binaries) : array
     {
-        if (! $this->type_base_bin($_binary, $binary)) {
-            throw new LogicException(
-                [ 'The `binary` should be valid `baseBin`', $binary ]
-            );
-        }
+        $result = [];
 
-        if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
-            throw new LogicException(
-                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
-            );
-        }
+        $gen = $this->bin2text_it($binaries);
 
-        $alphabetToValue = $_alphabetTo->getValue();
-        $alphabetToLen = $_alphabetTo->getLength();
-
-        if ($alphabetToValue === '01') {
-            return $_binary;
-        }
-
-        $binaryLen = strlen($_binary);
-
-        $baseTo = $alphabetToLen;
-        if (! $this->isPowerOf2($baseTo)) {
-            throw new LogicException(
-                [
-                    'The `alphabetTo` length should be a power of 2: ' . $alphabetTo,
-                    $alphabetTo,
-                ]
-            );
-        }
-
-        $bytesCnt = (int) log($baseTo, 2);
-
-        $result = '';
-
-        $buff = '';
-        $left = $bytesCnt;
-        for ( $i = $binaryLen; $i >= 1; $i-- ) {
-            $buff = $_binary[ $i - 1 ] . $buff;
-
-            $left--;
-
-            if ($left === 0) {
-                $idx = bindec($buff);
-
-                $result .= $alphabetToValue[ $idx ];
-
-                $left = $bytesCnt;
-                $buff = '';
-            }
-        }
-
-        if ('' !== $buff) {
-            $idx = bindec($buff);
-
-            $result .= $alphabetToValue[ $idx ];
+        foreach ( $gen as $binary ) {
+            $result[] = $binary;
         }
 
         return $result;
     }
 
-    public function numbase2bin(string $numbaseString, $alphabetFrom) : string
+    /**
+     * @return \Generator<string>
+     */
+    public function text2bin_it($strings) : \Generator
     {
         $theMb = Lib::mb();
 
-        if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
-            throw new LogicException(
-                [
-                    'The `numbaseString` should be valid `base` of given `alphabetFrom`',
-                    $numbaseString,
-                    $alphabetFrom,
-                ]
-            );
+        $stringsIt = Lib::php()->to_iterable($strings);
+
+        foreach ( $stringsIt as $string ) {
+            if ('' === $string) {
+                continue;
+            }
+
+            $len = mb_strlen($string);
+
+            for ( $i = 0; $i < $len; $i++ ) {
+                $letter = mb_substr($string, $i, 1);
+
+                // > convert one UTF-8 letter to 8bit bytes
+                $bytes = unpack('C*', $letter);
+
+                $binary = '';
+                foreach ( $bytes as $byte ) {
+                    $bin = decbin($byte);
+                    $bin = str_pad($bin, 8, '0', STR_PAD_LEFT);
+
+                    $binary .= $bin;
+                }
+
+                yield $binary;
+            }
         }
+    }
 
-        $numbaseStringLen = mb_strlen($_numbaseString);
+    /**
+     * @return \Generator<string>
+     */
+    public function bin2text_it($binaries, bool $throw = null) : \Generator
+    {
+        $throw = $throw ?? true;
 
-        $alphabetFromLen = mb_strlen($alphabetFrom);
+        $theMb = Lib::mb();
 
-        $baseFrom = $alphabetFromLen;
-        if (! $this->isPowerOf2($baseFrom)) {
-            throw new LogicException(
-                [
-                    'The `alphabetFrom` length should be a power of 2: ' . $alphabetFrom,
-                    $alphabetFrom,
-                ]
-            );
-        }
+        $binariesIt = Lib::php()->to_iterable($binaries);
 
-        $bytesCnt = (int) log($baseFrom, 2);
-
-        $result = '';
+        $error = null;
 
         $buff = '';
-        $left = 8;
-        for ( $i = 0; $i < $numbaseStringLen; $i++ ) {
-            $idx = mb_strpos($alphabetFrom, $_numbaseString[ $i ]);
+        $buffLen = 0;
 
-            $bin = decbin($idx);
+        $bytes = [];
+        $followingBitsCount = null;
 
-            $bin = str_pad($bin, $bytesCnt, '0', STR_PAD_LEFT);
+        foreach ( $binaries as $binary ) {
+            $bits = str_split($binary);
 
-            for ( $ii = $bytesCnt; $ii >= 1; $ii-- ) {
-                $buff = $bin[ $ii - 1 ] . $buff;
+            foreach ( $bits as $bit ) {
+                $buff .= $bit;
+                $buffLen += 1;
 
-                $left--;
+                if ($buffLen === 8) {
+                    $bin = substr($buff, 0, 8);
+                    $byte = bindec($bin);
 
-                if ($left === 0) {
-                    $result = $buff . $result;
+                    if ($followingBitsCount === null) {
+                        if (($byte & 0b11111000) === 0b11110000) {
+                            $bytes[] = $byte;
 
-                    $left = 8;
+                            $buff = substr($buff, 8);
+                            $buffLen -= 8;
+
+                            $followingBitsCount = 24;
+
+                        } elseif (($byte & 0b11110000) === 0b11100000) {
+                            $bytes[] = $byte;
+
+                            $buff = substr($buff, 8);
+                            $buffLen -= 8;
+
+                            $followingBitsCount = 16;
+
+                        } elseif (($byte & 0b11100000) === 0b11000000) {
+                            $bytes[] = $byte;
+
+                            $buff = substr($buff, 8);
+                            $buffLen -= 8;
+
+                            $followingBitsCount = 8;
+
+                        } elseif (($byte & 0b10000000) === 0) {
+                            $bytes[] = $byte;
+
+                            $buff = substr($buff, 8);
+                            $buffLen -= 8;
+
+                            $followingBitsCount = 0;
+
+                        } else {
+                            $error = [
+                                ''
+                                . 'The first `byte` should be one of: '
+                                . implode('|',
+                                    [
+                                        '0xxxxxxx',
+                                        '110xxxxxx',
+                                        '1110xxxxx',
+                                        '11110xxxx',
+                                    ]
+                                ),
+                                //
+                                $bin,
+                            ];
+                        }
+
+                    } elseif ($followingBitsCount > 0) {
+                        if (($byte & 0b11000000) !== 0b10000000) {
+                            $error = [ 'The `nextByte` should be 10xxxxxx', $bin ];
+
+                        } else {
+                            $bytes[] = $byte;
+
+                            $buff = substr($buff, 8);
+                            $buffLen -= 8;
+
+                            $followingBitsCount -= 8;
+                        }
+                    }
+                }
+
+                if ($followingBitsCount === 0) {
+                    if ($buffLen > 0) {
+                        $error = [ 'The `buff` should be empty after parsing bytes', $buff ];
+
+                    } else {
+                        $letter = '';
+                        foreach ( $bytes as $byte ) {
+                            $letter .= chr($byte);
+                        }
+
+                        yield $letter;
+
+                        $buff = '';
+                        $buffLen = 0;
+
+                        $bytes = [];
+                        $followingBitsCount = null;
+                    }
+                }
+
+                if ($error) {
+                    if ($throw) {
+                        throw new RuntimeException($error);
+                    }
+
                     $buff = '';
+                    $buffLen = 0;
+
+                    $bytes = [];
+                    $followingBitsCount = null;
                 }
             }
         }
-
-        return $result;
-    }
-
-
-    public function numbase2numbase(
-        string $numbaseString,
-        $alphabetTo, $alphabetFrom,
-        bool $oneBasedTo = null, bool $oneBasedFrom = null
-    ) : string
-    {
-        if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
-            throw new LogicException(
-                [
-                    'The `numbaseString` should be valid `base` of given `alphabetFrom`',
-                    $numbaseString,
-                    $alphabetFrom,
-                ]
-            );
-        }
-
-        if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
-            throw new LogicException(
-                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
-            );
-        }
-
-        $result = null;
-
-        if ($oneBasedFrom === $oneBasedTo) {
-            if ($alphabetFrom === $_alphabetTo) {
-                $result = $_numbaseString;
-
-            } elseif ($alphabetFrom === '01234567890') {
-                $result = $this->dec2numbase($_numbaseString, $_alphabetTo, $oneBasedTo);
-
-            } elseif ($_alphabetTo === '01234567890') {
-                $result = $this->numbase2dec($_numbaseString, $alphabetFrom, $oneBasedFrom);
-            }
-        }
-
-        if (null === $result) {
-            $result = $_numbaseString;
-            $result = $this->numbase2dec($result, $alphabetFrom, $oneBasedFrom);
-            $result = $this->dec2numbase($result, $_alphabetTo, $oneBasedTo);
-        }
-
-        return $result;
     }
 
 
@@ -560,9 +476,9 @@ class CryptModule
         return $result;
     }
 
-    public function base64_decode(string $baseString) : string
+    public function base64_decode(string $base64String) : string
     {
-        $gen = $this->base64_decode_it($baseString);
+        $gen = $this->base64_decode_it($base64String);
 
         $result = '';
         foreach ( $gen as $chr ) {
@@ -612,9 +528,9 @@ class CryptModule
         return $result;
     }
 
-    public function base64_decode_urlsafe(string $baseString) : string
+    public function base64_decode_urlsafe(string $base64UrlSafeString) : string
     {
-        $gen = $this->base64_decode_urlsafe_it($baseString);
+        $gen = $this->base64_decode_urlsafe_it($base64UrlSafeString);
 
         $result = '';
         foreach ( $gen as $chr ) {
@@ -623,7 +539,6 @@ class CryptModule
 
         return $result;
     }
-
 
     /**
      * @return \Generator<string>
@@ -641,10 +556,10 @@ class CryptModule
     /**
      * @return \Generator<string>
      */
-    public function base64_decode_urlsafe_it($base64Strings, bool $throw = null) : \Generator
+    public function base64_decode_urlsafe_it($base64UrlSafeStrings, bool $throw = null) : \Generator
     {
         $gen = $this->baseX_decode_it(
-            $base64Strings,
+            $base64UrlSafeStrings,
             static::ALPHABET_BASE_64_RFC4648_URLSAFE,
             $throw
         );
@@ -720,20 +635,20 @@ class CryptModule
         return $result;
     }
 
-    public function baseX_decode(string $numbaseString, $alphabetFrom) : string
+    public function baseX_decode(string $baseString, $alphabetFrom) : string
     {
-        if ('' === $numbaseString) {
+        if ('' === $baseString) {
             return '';
         }
 
         $theBcmath = Lib::bcmath();
         $theMb = Lib::mb();
 
-        if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
+        if (! $this->type_base($_numbaseString, $baseString, $alphabetFrom)) {
             throw new LogicException(
                 [
                     'The `numbaseString` should be valid `base` of given `alphabetFrom`',
-                    $numbaseString,
+                    $baseString,
                     $alphabetFrom,
                 ]
             );
@@ -778,7 +693,7 @@ class CryptModule
         }
 
         for ( $i = 0; $i < $numbaseStringLen; $i++ ) {
-            $chr = mb_substr($numbaseString, $i, 1);
+            $chr = mb_substr($baseString, $i, 1);
 
             if ($chr !== $alphabetFromZero) {
                 break;
@@ -811,7 +726,7 @@ class CryptModule
         }
 
         $baseTo = $_alphabetTo->getLength();
-        if (! $this->isPowerOf2($baseTo)) {
+        if (! $this->isPowOf2($baseTo)) {
             throw new LogicException(
                 [
                     'The `alphabetTo` length should be a power of 2: ' . $alphabetTo,
@@ -849,12 +764,12 @@ class CryptModule
     /**
      * @return \Generator<string>
      */
-    public function baseX_decode_it($base64Strings, $alphabetFrom, bool $throw = null) : \Generator
+    public function baseX_decode_it($baseStrings, $alphabetFrom, bool $throw = null) : \Generator
     {
         $theParse = Lib::parse();
         $theStr = Lib::str();
 
-        $gen = $theStr->rtrim_it($base64Strings, '=');
+        $gen = $theStr->rtrim_it($baseStrings, '=');
 
         $gen = $this->base2bin_it($gen, $alphabetFrom, $throw);
 
@@ -870,10 +785,9 @@ class CryptModule
 
     /**
      * > функция кодирует двоичный поток бит по принципу base64_encode
-     * > это очень похоже на перевод в другую систему счисления, только чтение бит происходит слева-направо
-     *
-     * > основное отличие `bin2numbase` от `bin2base` в считывании битов слева-направо и справа-налево соответственно
-     * > при кодировании потока бит в base{pow(2,n)} сам поток может быть бесконечным, что применяется в сетевом уровне и работе со stream (т.к. поток не имеет окончания)
+     * > это очень похоже на перевод в другую систему счисления, только чтение бит происходит LTR (при кодировании числа же - RTL)
+     * > это быстрее и не требует окончания потока
+     * > это менее безопасно, т.к. каждый байт можно подменить и итоговая фраза раскодируется обратно без ошибок
      */
     public function bin2base($binaries, $alphabetTo) : string
     {
@@ -911,9 +825,7 @@ class CryptModule
     {
         $theBcmath = Lib::bcmath();
 
-        $_binaries = is_iterable($binaries)
-            ? $binaries
-            : (is_string($binaries) ? [ $binaries ] : []);
+        $binariesIt = Lib::php()->to_iterable($binaries);
 
         if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
@@ -925,7 +837,7 @@ class CryptModule
         $alphabetToLen = $_alphabetTo->getLength();
 
         $baseTo = $alphabetToLen;
-        if (! $this->isPowerOf2($baseTo)) {
+        if (! $this->isPowOf2($baseTo)) {
             throw new LogicException(
                 [
                     'The `alphabetTo` length should be a power of 2: ' . $alphabetTo,
@@ -940,7 +852,7 @@ class CryptModule
         $binaryBuff = '';
 
         $bitsLeft = $bitsCnt;
-        foreach ( $_binaries as $binary ) {
+        foreach ( $binariesIt as $binary ) {
             if (! $this->type_base_bin($_binary, $binary)) {
                 throw new LogicException(
                     [ 'Each of `binaries` must be valid `baseBin`', $binary ]
@@ -989,17 +901,12 @@ class CryptModule
         $theParse = Lib::parse();
         $theMb = Lib::mb();
 
-        $_baseStrings = is_iterable($baseStrings)
-            ? $baseStrings
-            : (is_string($baseStrings) ? [ $baseStrings ] : []);
+        $baseStringsIt = Lib::php()->to_iterable($baseStrings);
 
-        $_alphabetFrom = $theParse->alphabet($alphabetFrom);
-        if (null === $_alphabetFrom) {
-            if ($throw) {
-                throw new LogicException(
-                    [ 'The `alphabetTo` should be valid alphabet', $alphabetFrom ]
-                );
-            }
+        if (! Lib::type()->alphabet($_alphabetFrom, $alphabetFrom)) {
+            throw new LogicException(
+                [ 'The `alphabetTo` should be valid alphabet', $alphabetFrom ]
+            );
         }
 
         $alphabetFromLen = $_alphabetFrom->getLength();
@@ -1007,7 +914,7 @@ class CryptModule
 
         $baseFrom = $_alphabetFrom->getLength();
 
-        if (! $this->isPowerOf2($baseFrom)) {
+        if (! $this->isPowOf2($baseFrom)) {
             throw new LogicException(
                 [
                     'The `alphabetFrom` length should be a power of 2: ' . $alphabetFrom,
@@ -1020,7 +927,7 @@ class CryptModule
 
         $binaryBuff = '';
         $left = 8;
-        foreach ( $_baseStrings as $baseString ) {
+        foreach ( $baseStringsIt as $baseString ) {
             if ('' === $baseString) {
                 continue;
             }
@@ -1064,205 +971,309 @@ class CryptModule
 
 
     /**
-     * @return string[]
+     * > функция переводит число из двоичной системы в другую, являющуюся степенью двойки, не переводя в десятичную систему
+     * > например, 2 -> 8 или 2 -> 64
      */
-    public function text2bin($strings) : array
+    public function bin2binbase(string $binary, $alphabetTo) : string
     {
-        $result = [];
-
-        $gen = $this->text2bin_it($strings);
-
-        foreach ( $gen as $binary ) {
-            $result[] = $binary;
+        if (! $this->type_base_bin($_binary, $binary)) {
+            throw new LogicException(
+                [ 'The `binary` should be valid `baseBin`', $binary ]
+            );
         }
 
-        return $result;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function bin2text($binaries) : array
-    {
-        $result = [];
-
-        $gen = $this->bin2text_it($binaries);
-
-        foreach ( $gen as $binary ) {
-            $result[] = $binary;
+        if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
+            throw new LogicException(
+                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+            );
         }
 
-        return $result;
-    }
+        $alphabetToValue = $_alphabetTo->getValue();
+        $alphabetToLen = $_alphabetTo->getLength();
 
-    /**
-     * @return \Generator<string>
-     */
-    public function text2bin_it($strings) : \Generator
-    {
-        $theMb = Lib::mb();
-
-        $_strings = is_iterable($strings)
-            ? $strings
-            : (is_string($strings) ? [ $strings ] : []);
-
-        foreach ( $_strings as $string ) {
-            if ('' === $string) {
-                continue;
-            }
-
-            $len = mb_strlen($string);
-
-            for ( $i = 0; $i < $len; $i++ ) {
-                $letter = mb_substr($string, $i, 1);
-
-                $bytes = unpack('C*', $letter);
-
-                $binary = '';
-                foreach ( $bytes as $byte ) {
-                    $bin = decbin($byte);
-                    $bin = str_pad($bin, 8, '0', STR_PAD_LEFT);
-
-                    $binary .= $bin;
-                }
-
-                yield $binary;
-            }
+        if ($alphabetToValue === '01') {
+            return $_binary;
         }
-    }
 
-    /**
-     * @return \Generator<string>
-     */
-    public function bin2text_it($binaries, bool $throw = null) : \Generator
-    {
-        $throw = $throw ?? true;
+        $binaryLen = strlen($_binary);
 
-        $theMb = Lib::mb();
+        $baseTo = $alphabetToLen;
+        if (! $this->isPowOf2($baseTo)) {
+            throw new LogicException(
+                [
+                    'The `alphabetTo` length should be a power of 2: ' . $alphabetTo,
+                    $alphabetTo,
+                ]
+            );
+        }
 
-        $_binaries = is_iterable($binaries)
-            ? $binaries
-            : (is_string($binaries) ? [ $binaries ] : []);
+        $bytesCnt = (int) log($baseTo, 2);
 
-        $error = null;
+        $result = '';
 
         $buff = '';
-        $buffLen = 0;
+        $left = $bytesCnt;
+        for ( $i = $binaryLen; $i >= 1; $i-- ) {
+            $buff = $_binary[ $i - 1 ] . $buff;
 
-        $bytes = [];
-        $followingBitsCount = null;
+            $left--;
 
-        foreach ( $binaries as $binary ) {
-            $bits = str_split($binary);
+            if ($left === 0) {
+                $idx = bindec($buff);
 
-            foreach ( $bits as $bit ) {
-                $buff .= $bit;
-                $buffLen += 1;
+                $result .= $alphabetToValue[ $idx ];
 
-                if ($buffLen === 8) {
-                    $bin = substr($buff, 0, 8);
-                    $byte = bindec($bin);
+                $left = $bytesCnt;
+                $buff = '';
+            }
+        }
 
-                    if ($followingBitsCount === null) {
-                        if (($byte & 0b11111000) === 0b11110000) {
-                            $bytes[] = $byte;
+        if ('' !== $buff) {
+            $idx = bindec($buff);
 
-                            $buff = substr($buff, 8);
-                            $buffLen -= 8;
+            $result .= $alphabetToValue[ $idx ];
+        }
 
-                            $followingBitsCount = 24;
+        return $result;
+    }
 
-                        } elseif (($byte & 0b11110000) === 0b11100000) {
-                            $bytes[] = $byte;
+    /**
+     * > функция переводит число из системы счисления, являющейся степенью двойки, в двоичную
+     * > например, 8 -> 2 или 64 -> 2
+     */
+    public function binbase2bin(string $binbaseString, $alphabetFrom) : string
+    {
+        $theMb = Lib::mb();
 
-                            $buff = substr($buff, 8);
-                            $buffLen -= 8;
+        if (! $this->type_base($_numbaseString, $binbaseString, $alphabetFrom)) {
+            throw new LogicException(
+                [
+                    'The `numbaseString` should be valid `base` of given `alphabetFrom`',
+                    $binbaseString,
+                    $alphabetFrom,
+                ]
+            );
+        }
 
-                            $followingBitsCount = 16;
+        $numbaseStringLen = mb_strlen($_numbaseString);
 
-                        } elseif (($byte & 0b11100000) === 0b11000000) {
-                            $bytes[] = $byte;
+        $alphabetFromLen = mb_strlen($alphabetFrom);
 
-                            $buff = substr($buff, 8);
-                            $buffLen -= 8;
+        $baseFrom = $alphabetFromLen;
+        if (! $this->isPowOf2($baseFrom)) {
+            throw new LogicException(
+                [
+                    'The `alphabetFrom` length should be a power of 2: ' . $alphabetFrom,
+                    $alphabetFrom,
+                ]
+            );
+        }
 
-                            $followingBitsCount = 8;
+        $bytesCnt = (int) log($baseFrom, 2);
 
-                        } elseif (($byte & 0b10000000) === 0) {
-                            $bytes[] = $byte;
+        $result = '';
 
-                            $buff = substr($buff, 8);
-                            $buffLen -= 8;
+        $buff = '';
+        $left = 8;
+        for ( $i = 0; $i < $numbaseStringLen; $i++ ) {
+            $idx = mb_strpos($alphabetFrom, $_numbaseString[ $i ]);
 
-                            $followingBitsCount = 0;
+            $bin = decbin($idx);
 
-                        } else {
-                            $error = [
-                                'The first `byte` should be one of: '
-                                . implode('|',
-                                    [
-                                        '0xxxxxxx',
-                                        '110xxxxxx',
-                                        '1110xxxxx',
-                                        '11110xxxx',
-                                    ]
-                                ),
-                                $bin,
-                            ];
-                        }
+            $bin = str_pad($bin, $bytesCnt, '0', STR_PAD_LEFT);
 
-                    } elseif ($followingBitsCount > 0) {
-                        if (($byte & 0b11000000) !== 0b10000000) {
-                            $error = [ 'The `nextByte` should be 10xxxxxx', $bin ];
+            for ( $ii = $bytesCnt; $ii >= 1; $ii-- ) {
+                $buff = $bin[ $ii - 1 ] . $buff;
 
-                        } else {
-                            $bytes[] = $byte;
+                $left--;
 
-                            $buff = substr($buff, 8);
-                            $buffLen -= 8;
+                if ($left === 0) {
+                    $result = $buff . $result;
 
-                            $followingBitsCount -= 8;
-                        }
-                    }
-                }
-
-                if ($followingBitsCount === 0) {
-                    if ($buffLen > 0) {
-                        $error = [ 'The `buff` should be empty after parsing bytes', $buff ];
-
-                    } else {
-                        $letter = '';
-                        foreach ( $bytes as $byte ) {
-                            $letter .= chr($byte);
-                        }
-
-                        yield $letter;
-
-                        $buff = '';
-                        $buffLen = 0;
-
-                        $bytes = [];
-                        $followingBitsCount = null;
-                    }
-                }
-
-                if ($error) {
-                    if ($throw) {
-                        throw new RuntimeException($error);
-                    }
-
+                    $left = 8;
                     $buff = '';
-                    $buffLen = 0;
-
-                    $bytes = [];
-                    $followingBitsCount = null;
                 }
             }
         }
+
+        return $result;
     }
 
 
-    protected function isPowerOf2(int $n) : bool
+    /**
+     * > функция переводит число из десятичной системы в любую другую
+     * > например, 10 -> 58
+     */
+    public function dec2numbase(string $decString, $alphabetTo, bool $oneBasedTo = null) : string
+    {
+        $theBcmath = Lib::bcmath();
+
+        if (! $this->type_base_dec($_decString, $decString)) {
+            throw new LogicException(
+                [ 'The `decString` should be valid `baseDec`', $decString ]
+            );
+        }
+
+        if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
+            throw new LogicException(
+                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+            );
+        }
+
+        $alphabetToValue = $_alphabetTo->getValue();
+        $alphabetToLen = $_alphabetTo->getLength();
+
+        if ($alphabetToValue === '0123456789') {
+            return $_decString;
+        }
+
+        $_oneBasedTo = null
+            ?? $oneBasedTo
+            ?? ($alphabetToValue[ 0 ] !== '0');
+
+        $baseTo = $alphabetToLen;
+        $baseToString = (string) $baseTo;
+
+        $result = '';
+
+        $left = $_decString;
+        if ($_oneBasedTo) {
+            if (bccomp($left, '0', 1) === 0) {
+                throw new RuntimeException(
+                    [
+                        'The `decInteger` should be greater than zero due to `oneBasedTo` is set to TRUE',
+                        $alphabetTo,
+                        $oneBasedTo,
+                    ]
+                );
+            }
+        }
+
+        do {
+            if ($_oneBasedTo) {
+                $left = bcsub($left, '1', 0);
+            }
+
+            $mod = bcmod($left, $baseToString, 0);
+
+            $result = mb_substr($_alphabetTo, (int) $mod, 1) . $result;
+
+            $left = bcdiv($left, $baseToString, 0);
+        } while ( bccomp($left, '0', 1) > 0 );
+
+        return $result;
+    }
+
+    /**
+     * > функция переводит число из любой системы счисления в десятичную
+     * > например, 58 -> 10
+     */
+    public function numbase2dec(string $numbaseString, $alphabetFrom, bool $oneBasedFrom = null) : string
+    {
+        $theBcmath = Lib::bcmath();
+        $theMb = Lib::mb();
+
+        if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
+            throw new LogicException(
+                [
+                    'The `numbaseString` should be valid `base` for given alphabet',
+                    $numbaseString,
+                    $alphabetFrom,
+                ]
+            );
+        }
+
+        if ($alphabetFrom === '0123456789') {
+            return $_numbaseString;
+        }
+
+        $_oneBasedFrom = null
+            ?? $oneBasedFrom
+            ?? ($alphabetFrom[ 0 ] !== '0');
+
+        $numbaseStringLen = mb_strlen($_numbaseString);
+
+        $alphabetFromLen = mb_strlen($alphabetFrom);
+
+        $baseFrom = $alphabetFromLen;
+        $baseFromString = (string) $baseFrom;
+
+        $result = '0';
+
+        for ( $i = 1; $i <= $numbaseStringLen; $i++ ) {
+            $chr = mb_substr($_numbaseString, $i - 1, 1);
+
+            $mod = mb_strpos($alphabetFrom, $chr);
+            if (false === $mod) {
+                throw new LogicException(
+                    [ 'The `baseInteger` contains char that is outside `alphabetFrom`: ' . $chr, $chr ]
+                );
+            }
+
+            $mod = $_oneBasedFrom
+                ? bcadd($mod, '1', 0)
+                : $mod;
+
+            $pow = bcpow($baseFromString, ($numbaseStringLen - $i), 0);
+
+            $digit = bcmul($mod, $pow, 0);
+
+            $result = bcadd($result, $digit, 0);
+        }
+
+        return $result;
+    }
+
+    /**
+     * > функция переводит число из любой системы счисления в любую другую
+     */
+    public function numbase2numbase(
+        string $numbaseString,
+        $alphabetTo, $alphabetFrom,
+        bool $oneBasedTo = null, bool $oneBasedFrom = null
+    ) : string
+    {
+        if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
+            throw new LogicException(
+                [
+                    'The `numbaseString` should be valid `base` of given `alphabetFrom`',
+                    $numbaseString,
+                    $alphabetFrom,
+                ]
+            );
+        }
+
+        if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
+            throw new LogicException(
+                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+            );
+        }
+
+        $result = null;
+
+        if ($oneBasedFrom === $oneBasedTo) {
+            if ($alphabetFrom === $_alphabetTo) {
+                $result = $_numbaseString;
+
+            } elseif ($alphabetFrom === '01234567890') {
+                $result = $this->dec2numbase($_numbaseString, $_alphabetTo, $oneBasedTo);
+
+            } elseif ($_alphabetTo === '01234567890') {
+                $result = $this->numbase2dec($_numbaseString, $alphabetFrom, $oneBasedFrom);
+            }
+        }
+
+        if (null === $result) {
+            $result = $_numbaseString;
+            $result = $this->numbase2dec($result, $alphabetFrom, $oneBasedFrom);
+            $result = $this->dec2numbase($result, $_alphabetTo, $oneBasedTo);
+        }
+
+        return $result;
+    }
+
+
+    protected function isPowOf2(int $n) : bool
     {
         return ($n > 0) && (($n & ($n - 1)) === 0);
     }

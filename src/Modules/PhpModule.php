@@ -6,12 +6,14 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToBoolInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToObjectInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParser;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToIterableInterface;
 use Gzhegow\Lib\Modules\Php\DebugBacktracer\DebugBacktracer;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
@@ -470,27 +472,66 @@ class PhpModule
     }
 
 
+    public function to_bool($value, array $options = []) : int
+    {
+        if ($value instanceof ToBoolInterface) {
+            return $value->toBool($options);
+        }
+
+        if (
+            (null === $value)
+            || (is_float($value) && is_nan($value))
+            || (Lib::type()->is_nil($value))
+        ) {
+            throw new LogicException(
+                [
+                    'Unable to parse value while converting to boolean',
+                    $value,
+                ]
+            );
+        }
+
+        if (! Lib::type()->bool($_value, $value)) {
+            throw new LogicException(
+                [
+                    'Unable to convert value to boolean',
+                    $value,
+                ]
+            );
+        }
+
+        return $_value;
+    }
+
     public function to_int($value, array $options = []) : int
     {
         if ($value instanceof ToIntegerInterface) {
-            $_value = $value->toInteger($options);
+            return $value->toInteger($options);
+        }
 
-        } else {
-            if (false
-                || is_array($value)
-                || is_object($value)
-                || is_resource($value)
-                || ('resource (closed)' === gettype($value))
-            ) {
-                throw new LogicException(
-                    [
-                        'The `value` should not be array, object or resource',
-                        $value,
-                    ]
-                );
-            }
+        if (
+            (null === $value)
+            || (is_bool($value))
+            || (is_array($value))
+            || (is_float($value) && (! is_finite($value)))
+            || (is_resource($value))
+            || ('resource (closed)' === gettype($value))
+        ) {
+            throw new LogicException(
+                [
+                    'Unable to parse value while converting to integer',
+                    $value,
+                ]
+            );
+        }
 
-            $_value = (int) $value;
+        if (! Lib::type()->int($_value, $value)) {
+            throw new LogicException(
+                [
+                    'Unable to convert value to integer',
+                    $value,
+                ]
+            );
         }
 
         return $_value;
@@ -499,24 +540,32 @@ class PhpModule
     public function to_float($value, array $options = []) : float
     {
         if ($value instanceof ToFloatInterface) {
-            $_value = $value->toFloat($options);
+            return $value->toFloat($options);
+        }
 
-        } else {
-            if (false
-                || is_array($value)
-                || is_object($value)
-                || is_resource($value)
-                || ('resource (closed)' === gettype($value))
-            ) {
-                throw new LogicException(
-                    [
-                        'The `value` should not be array, object or resource',
-                        $value,
-                    ]
-                );
-            }
+        if (
+            (null === $value)
+            || (is_bool($value))
+            || (is_array($value))
+            || (is_float($value) && (! is_finite($value)))
+            || (is_resource($value))
+            || ('resource (closed)' === gettype($value))
+        ) {
+            throw new LogicException(
+                [
+                    'Unable to parse value while converting to float',
+                    $value,
+                ]
+            );
+        }
 
-            $_value = (float) $value;
+        if (! Lib::type()->float($_value, $value)) {
+            throw new LogicException(
+                [
+                    'Unable to convert value to float',
+                    $value,
+                ]
+            );
         }
 
         return $_value;
@@ -525,49 +574,50 @@ class PhpModule
     public function to_string($value, array $options = []) : string
     {
         if ($value instanceof ToStringInterface) {
-            $_value = $value->toString($options);
-
-        } else {
-            if (false
-                || is_array($value)
-                || is_object($value)
-                || is_resource($value)
-                || ('resource (closed)' === gettype($value))
-            ) {
-                throw new LogicException(
-                    [
-                        'The `value` should not be array, object or resource',
-                        $value,
-                    ]
-                );
-            }
-
-            $_value = (string) $value;
+            return $value->toString($options);
         }
+
+        if (
+            (is_bool($value))
+            || (is_array($value))
+            || (is_float($value) && (! is_finite($value)))
+            || (is_resource($value))
+            || ('resource (closed)' === gettype($value))
+            || (Lib::type()->is_nil($value))
+        ) {
+            throw new LogicException(
+                [
+                    'Unable to parse value while converting to string',
+                    $value,
+                ]
+            );
+        }
+
+        $_value = (string) $value;
 
         return $_value;
     }
 
+
     public function to_array($value, array $options = []) : array
     {
         if ($value instanceof ToArrayInterface) {
-            $_value = $value->toArray($options);
-
-        } else {
-            $isObject = is_object($value);
-            $isStdclass = $value instanceof \stdClass;
-
-            if ($isObject && ! $isStdclass) {
-                throw new LogicException(
-                    [
-                        'The `value` being the object should be instance of: ' . \stdClass::class,
-                        $value,
-                    ]
-                );
-            }
-
-            $_value = (array) $value;
+            return $value->toArray($options);
         }
+
+        $isObject = is_object($value);
+        $isStdClass = $isObject && (get_class($value) === \stdClass::class);
+
+        if ($isObject && ! $isStdClass) {
+            throw new LogicException(
+                [
+                    'The `value` (if object) should be instance of: ' . \stdClass::class,
+                    $value,
+                ]
+            );
+        }
+
+        $_value = (array) $value;
 
         return $_value;
     }
@@ -575,25 +625,24 @@ class PhpModule
     public function to_object($value, array $options = []) : \stdClass
     {
         if ($value instanceof ToObjectInterface) {
-            $_value = $value->toObject($options);
-
-        } else {
-            $isObject = is_object($value);
-            $isStdclass = $value instanceof \stdClass;
-
-            if ($isObject && ! $isStdclass) {
-                throw new LogicException(
-                    [
-                        'The `value` being the object should be instance of: ' . \stdClass::class,
-                        $value,
-                    ]
-                );
-            }
-
-            $_value = $isStdclass
-                ? $value
-                : (object) (array) $value;
+            return $value->toObject($options);
         }
+
+        $isObject = is_object($value);
+        $isStdClass = $isObject && (get_class($value) === \stdClass::class);
+
+        if ($isObject && ! $isStdClass) {
+            throw new LogicException(
+                [
+                    'The `value` (if object) should be instance of: ' . \stdClass::class,
+                    $value,
+                ]
+            );
+        }
+
+        $_value = $isStdClass
+            ? $value
+            : (object) $this->to_array($value);
 
         return $_value;
     }
@@ -605,20 +654,19 @@ class PhpModule
     public function to_list($value, $fnIsForceWrap = null, array $options = []) : array
     {
         if (null === $value) {
-            throw new LogicException('The `value` should be not null');
+            return [];
         }
 
-        if (is_object($value)) {
-            if ($value instanceof ToListInterface) {
-                $_value = $value->toList($options);
+        if ($value instanceof ToListInterface) {
+            return $value->toList($options);
+        }
 
-            } else {
-                $_value = [ $value ];
-            }
-
-        } elseif (is_array($value)) {
+        if (is_array($value)) {
             if ($fnIsForceWrap) {
-                $status = call_user_func($fnIsForceWrap, $value);
+                $status = call_user_func(
+                    $fnIsForceWrap,
+                    $value, $options
+                );
 
                 $_value = $status
                     ? [ $value ]
@@ -628,11 +676,56 @@ class PhpModule
                 $_value = $value;
             }
 
-        } else {
-            $_value = (array) $value;
+            return $_value;
         }
 
-        return $_value;
+        return [ $value ];
+    }
+
+    /**
+     * @param callable $fnToIterable
+     */
+    public function to_iterable($value, $fnToIterable = null, array $options = []) : iterable
+    {
+        if (null === $value) {
+            return [];
+        }
+
+        if (is_object($value)) {
+            if ($value instanceof ToIterableInterface) {
+                return $value->toIterable($options);
+            }
+
+            if ($value instanceof \Generator) {
+                return $value;
+            }
+        }
+
+        if (null !== $fnToIterable) {
+            $_value = call_user_func(
+                $fnToIterable,
+                $value, $options
+            );
+
+            if (! is_iterable($_value)) {
+                throw new RuntimeException(
+                    [
+                        'The `fnToIterable` should return iterable',
+                        $value,
+                        $options,
+                        $fnToIterable,
+                    ]
+                );
+            }
+
+            return $_value;
+        }
+
+        if (is_array($value)) {
+            return $value;
+        }
+
+        return [ $value ];
     }
 
 

@@ -1032,210 +1032,180 @@ $fn = function () {
         'sha1',
         'sha256',
     ];
+    $src = 'hello world!';
     foreach ( $algos as $algo ) {
-        $hash = \Gzhegow\Lib\Lib::crypt()->hash($algo, 'hello world!', $binary = false);
-        _print($hash);
-        $result = \Gzhegow\Lib\Lib::crypt()->hash_equals($hash, $algo, 'hello world!', $binary = false);
-        _print($result);
-        echo PHP_EOL;
+        $binary = false;
+        $enc = \Gzhegow\Lib\Lib::crypt()->hash($algo, $src, $binary);
+        $status = \Gzhegow\Lib\Lib::crypt()->hash_equals($enc, $algo, $src, $binary);
+        _print($src, $enc, $status);
 
-        $hash = \Gzhegow\Lib\Lib::crypt()->hash($algo, 'hello world!', $binary = true);
-        $hash01 = '';
-        foreach ( str_split(bin2hex($hash), 2) as $hex ) {
-            $hash01 .= str_pad(
-                base_convert($hex, 16, 2),
-                8,
-                '0',
-                STR_PAD_LEFT
-            );
-        }
-        _print($hash01);
-        $result = \Gzhegow\Lib\Lib::crypt()->hash_equals($hash, $algo, 'hello world!', $binary = true);
-        _print($result);
+        $binary = true;
+        $enc = \Gzhegow\Lib\Lib::crypt()->hash($algo, $src, $binary);
+        $status = \Gzhegow\Lib\Lib::crypt()->hash_equals($enc, $algo, $src, $binary);
+        _print($src, $enc, $status);
+
         echo PHP_EOL;
     }
 
 
-    echo PHP_EOL;
-
-
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, '01');
-    _print($enc);
+    $src = 0;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, '01');
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '01');
-    _print($dec);
-    echo PHP_EOL;
+    _print($src, $enc, $dec);
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(3, '01');
-    _print($enc);
+    $src = 3;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, '01');
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '01');
-    _print($dec);
-    echo PHP_EOL;
+    _print($src, $enc, $dec);
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, '01234567');
-    _print($enc);
+    $src = 0;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, '01234567');
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '01234567');
-    _print($dec);
-    echo PHP_EOL;
+    _print($src, $enc, $dec);
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(15, '01234567');
-    _print($enc);
+    $src = 15;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, '01234567');
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '01234567');
-    _print($dec);
-    echo PHP_EOL;
+    _print($src, $enc, $dec);
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, '0123456789ABCDEF');
-    _print($enc);
+    $src = 0;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, '0123456789ABCDEF');
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '0123456789ABCDEF');
-    _print($dec);
-    echo PHP_EOL;
+    _print($src, $enc, $dec);
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(31, '0123456789ABCDEF');
-    _print($enc);
+    $src = 31;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, '0123456789ABCDEF');
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '0123456789ABCDEF');
-    _print($dec);
-    echo PHP_EOL;
-
+    _print($src, $enc, $dec);
 
     echo PHP_EOL;
 
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _print($enc);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _print($dec);
+    $oneBased = false;
+    $src = 0;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    _print($src, $enc, $dec);
+
+    $oneBased = false;
+    $src = 10;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    _print($src, $enc, $dec);
+
+    $oneBased = false;
+    $src = 25;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    _print($src, $enc, $dec);
+
+    $oneBased = false;
+    $src = 26;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    _print($src, $enc, $dec);
+
     echo PHP_EOL;
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(10, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _print($enc);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _print($dec);
-    echo PHP_EOL;
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(25, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _print($enc);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _print($dec);
-    echo PHP_EOL;
-
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(26, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _print($enc);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = false);
-    _print($dec);
-    echo PHP_EOL;
-
+    $oneBased = true;
+    $src = 0;
     $e = null;
     try {
-        $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(0, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
+        $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
     }
     catch ( \Throwable $e ) {
     }
-    _print('[ CATCH ] ' . $e->getMessage());
-    echo PHP_EOL;
+    _print($src, '[ CATCH ] ' . $e->getMessage());
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(10, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _print($enc);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _print($dec);
-    echo PHP_EOL;
+    $oneBased = true;
+    $src = 10;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    _print($src, $enc, $dec);
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(26, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _print($enc);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _print($dec);
-    echo PHP_EOL;
+    $oneBased = true;
+    $src = 26;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    _print($src, $enc, $dec);
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase(27, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _print($enc);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased = true);
-    _print($dec);
-    echo PHP_EOL;
-
+    $oneBased = true;
+    $src = 27;
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    _print($src, $enc, $dec);
 
     echo PHP_EOL;
 
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->numbase2numbase('2147483647', '0123456789', '0123456789');
-    _print($enc);
+    $src = '2147483647';
+    $enc = \Gzhegow\Lib\Lib::crypt()->numbase2numbase($src, '0123456789', '0123456789');
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2numbase('9223372036854775807', '0123456789', '0123456789');
-    _print($dec);
-    echo PHP_EOL;
+    _print($src, $enc, $dec);
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->numbase2numbase('2147483647', '0123456789abcdefghijklmnopqrstuvwxyz', '0123456789');
-    _print($enc);
+    $src = '2147483647';
+    $enc = \Gzhegow\Lib\Lib::crypt()->numbase2numbase($src, '0123456789abcdefghijklmnopqrstuvwxyz', '0123456789');
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2numbase($enc, '0123456789', '0123456789abcdefghijklmnopqrstuvwxyz');
-    _print($dec);
-    echo PHP_EOL;
+    _print($src, $enc, $dec);
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->numbase2numbase('9223372036854775807', '0123456789abcdefghijklmnopqrstuvwxyz', '0123456789');
-    _print($enc);
+    $src = '9223372036854775807';
+    $enc = \Gzhegow\Lib\Lib::crypt()->numbase2numbase($src, '0123456789abcdefghijklmnopqrstuvwxyz', '0123456789');
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2numbase($enc, '0123456789', '0123456789abcdefghijklmnopqrstuvwxyz');
-    _print($dec);
-    echo PHP_EOL;
-
+    _print($src, $enc, $dec);
 
     echo PHP_EOL;
 
 
-    $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('1', '01');
-    _print($enc);
-    $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('11', '0123');
-    _print($enc);
-    $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('111', '01234567');
-    _print($enc);
-    $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('1111', '0123456789ABCDEF');
-    _print($enc);
-    $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('11111', '0123456789ABCDEFGHIJKLMNOPQRSTUV');
-    _print($enc);
-    $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase('111111', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/');
-    _print($enc);
+    $enc = [];
+    $enc[] = \Gzhegow\Lib\Lib::crypt()->bin2binbase('1', '01');
+    $enc[] = \Gzhegow\Lib\Lib::crypt()->bin2binbase('11', '0123');
+    $enc[] = \Gzhegow\Lib\Lib::crypt()->bin2binbase('111', '01234567');
+    $enc[] = \Gzhegow\Lib\Lib::crypt()->bin2binbase('1111', '0123456789ABCDEF');
+    $enc[] = \Gzhegow\Lib\Lib::crypt()->bin2binbase('11111', '0123456789ABCDEFGHIJKLMNOPQRSTUV');
+    $enc[] = \Gzhegow\Lib\Lib::crypt()->bin2binbase('111111', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/');
+    _print(...$enc);
     echo PHP_EOL;
 
 
-    echo PHP_EOL;
-
-
-    $strings = [ '你' ];
-    _print_array($strings);
-    $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin($strings);
-    _print_array($binaries);
-    $letters = \Gzhegow\Lib\Lib::crypt()->bin2text($binaries);
-    _print_array($letters);
-    echo PHP_EOL;
-
-    $strings = [ '你好' ];
-    _print_array($strings);
-    $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin($strings);
-    _print_array($binaries);
-    $letters = \Gzhegow\Lib\Lib::crypt()->bin2text($binaries);
-    _print_array($letters);
-    echo PHP_EOL;
-
-
-    echo PHP_EOL;
-
-
-    $number = 5678;
-    _print($number);
-    $binary = decbin(5678);
-    _print($binary);
-    $enc = \Gzhegow\Lib\Lib::crypt()->bin2numbase($binary, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    _print($enc);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2bin($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    _print($dec);
-    $number = bindec($dec);
-    _print($number);
-    echo PHP_EOL;
-
-    $strings = [ 'hello' ];
-    _print_array($strings);
-    $binaries = \Gzhegow\Lib\Lib::crypt()->text2bin($strings);
-    _print_array($binaries);
-    $enc = \Gzhegow\Lib\Lib::crypt()->bin2base($binaries, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
-    _print($enc);
-    $dec = \Gzhegow\Lib\Lib::crypt()->base2bin($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
+    $src = [ '你' ];
+    $enc = \Gzhegow\Lib\Lib::crypt()->text2bin($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->bin2text($enc);
+    _print_array($src);
+    _print_array($enc);
     _print_array($dec);
-    $text = implode('', array_map('chr', array_map('bindec', $dec)));
-    _print($text);
+    echo PHP_EOL;
+
+    $src = [ '你好' ];
+    $enc = \Gzhegow\Lib\Lib::crypt()->text2bin($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->bin2text($enc);
+    _print_array($src);
+    _print_array($enc);
+    _print_array($dec);
+    echo PHP_EOL;
+
+
+    echo PHP_EOL;
+
+
+    $src = 5678;
+    $bin = decbin($src);
+    $enc = \Gzhegow\Lib\Lib::crypt()->bin2binbase($bin, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
+    $dec = \Gzhegow\Lib\Lib::crypt()->binbase2bin($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
+    $res = bindec($dec);
+    _print($src, $bin, $enc, $dec, $res);
+    echo PHP_EOL;
+
+    $src = [ 'hello' ];
+    $bin = \Gzhegow\Lib\Lib::crypt()->text2bin($src);
+    $enc = \Gzhegow\Lib\Lib::crypt()->bin2base($bin, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
+    $dec = \Gzhegow\Lib\Lib::crypt()->base2bin($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
+    $res = implode('', array_map('chr', array_map('bindec', $dec)));
+    _print_array($src);
+    _print_array($bin);
+    _print($enc);
+    _print_array($dec);
+    _print($res);
     echo PHP_EOL;
 
 
@@ -1243,235 +1213,87 @@ $fn = function () {
 
 
     $src = 'HELLO';
-    _print('input: ' . $src);
-    $gen = (function () use ($src) { yield $src; })();
-    $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($gen);
-    $enc = '';
-    foreach ( $gen as $letter ) {
-        $enc .= $letter;
-    }
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($src);
+    $enc = implode('', iterator_to_array($gen));
     $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_it($enc);
-    $dec = '';
-    foreach ( $gen as $letter ) {
-        $dec .= $letter;
-    }
-    _print('result: ' . $dec);
-    echo PHP_EOL;
-
-    $src = 'HELLO';
-    _print('input: ' . $src);
-    $gen = (function () use ($src) { yield $src; })();
-    $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($gen);
-    $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_it($gen);
-    $dec = '';
-    foreach ( $gen as $letter ) {
-        $dec .= $letter;
-    }
-    _print('result: ' . $dec);
+    $dec = implode('', iterator_to_array($gen));
+    _print($src, $enc, $dec);
     echo PHP_EOL;
 
 
-    echo PHP_EOL;
-
-
-    $string = "hello";
-    _print($string);
-    $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($string);
-    _print($enc);
-    $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
-    _print($dec);
-    echo PHP_EOL;
-
-
-    $src = "\x00\x00\x01\x00\xFF";
-    $srcDump = '';
-    $len = mb_strlen($src);
-    for ( $i = 0; $i < $len; $i++ ) {
-        $chr = substr($src, $i, 1);
-        $chr = mb_ord($chr, '8bit');
-        $chr = dechex($chr);
-        $chr = str_pad($chr, 2, '0', STR_PAD_LEFT);
-        $chr = '\x' . $chr;
-
-        $srcDump .= $chr;
-    }
-    _print('b`' . $srcDump . '`');
-
+    $src = "hello";
     $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($src);
-    _print($enc);
-
     $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
-    $decDump = '';
-    $len = mb_strlen($src);
-    for ( $i = 0; $i < $len; $i++ ) {
-        $chr = substr($src, $i, 1);
-        $chr = mb_ord($chr, '8bit');
-        $chr = dechex($chr);
-        $chr = str_pad($chr, 2, '0', STR_PAD_LEFT);
-        $chr = '\x' . $chr;
-
-        $decDump .= $chr;
-    }
-    _print('b`' . $decDump . '`');
-    echo PHP_EOL;
-
-
-    $string = "你好";
-    _print($string);
-    $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($string);
-    _print($enc);
-    $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
-    _print($dec);
-    echo PHP_EOL;
-
-
-    echo PHP_EOL;
-
-
-    $string = "hello";
-    _print($string);
-    $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode($string);
-    _print($enc);
-    $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
-    _print($dec);
-    echo PHP_EOL;
-
+    _print($src, $enc, $dec);
 
     $src = "\x00\x00\x01\x00\xFF";
-    $srcDump = '';
-    $len = mb_strlen($src);
-    for ( $i = 0; $i < $len; $i++ ) {
-        $chr = substr($src, $i, 1);
-        $chr = mb_ord($chr, '8bit');
-        $chr = dechex($chr);
-        $chr = str_pad($chr, 2, '0', STR_PAD_LEFT);
-        $chr = '\x' . $chr;
+    $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
+    _print($src, $enc, $dec);
 
-        $srcDump .= $chr;
-    }
-    _print('b`' . $srcDump . '`');
+    $src = "你好";
+    $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
+    _print($src, $enc, $dec);
 
+    echo PHP_EOL;
+
+
+    $src = "hello";
     $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode($src);
-    _print($enc);
-
     $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
-    $decDump = '';
-    $len = mb_strlen($src);
-    for ( $i = 0; $i < $len; $i++ ) {
-        $chr = substr($src, $i, 1);
-        $chr = mb_ord($chr, '8bit');
-        $chr = dechex($chr);
-        $chr = str_pad($chr, 2, '0', STR_PAD_LEFT);
-        $chr = '\x' . $chr;
+    _print($src, $enc, $dec);
 
-        $decDump .= $chr;
-    }
-    _print('b`' . $decDump . '`');
-    echo PHP_EOL;
-
-
-    $string = '你好';
-    _print($string);
-    $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode("你好");
-    _print($enc);
+    $src = "\x00\x00\x01\x00\xFF";
+    $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode($src);
     $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
-    _print($dec);
-    echo PHP_EOL;
+    _print($src, $enc, $dec);
+
+    $src = '你好';
+    $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
+    _print($src, $enc, $dec);
 };
 _assert_stdout($fn, [], '
 "[ CryptModule ]"
 
-"b034fff2"
-TRUE
+"hello world!" | "b034fff2" | TRUE
+"hello world!" | "b`°4ÿò`" | TRUE
 
-"10110000001101001111111111110010"
-TRUE
+"hello world!" | "b79584fd" | TRUE
+"hello world!" | "b`·•„ý`" | TRUE
 
-"b79584fd"
-TRUE
+"hello world!" | "fc3ff98e8c6a0d3087d515c0473f8677" | TRUE
+"hello world!" | "b`ü?ùŽŒj\r0‡Õ\x15ÀG?†w`" | TRUE
 
-"10110111100101011000010011111101"
-TRUE
+"hello world!" | "430ce34d020724ed75a196dfc2ad67c77772d169" | TRUE
+"hello world!" | "b`C\x0CãM\x02\x07$íu¡–ßÂ­gÇwrÑi`" | TRUE
 
-"fc3ff98e8c6a0d3087d515c0473f8677"
-TRUE
+"hello world!" | "7509e5bda0c762d2bac7f90d758b5b2263fa01ccbc542ab5e3df163be08e6ca9" | TRUE
+"hello world!" | "b`u\tå½ ÇbÒºÇù\ru‹[\"cú\x01Ì¼T*µãß\x16;àŽl©`" | TRUE
 
-"11111100001111111111100110001110100011000110101000001101001100001000011111010101000101011100000001000111001111111000011001110111"
-TRUE
+0 | "0" | "0"
+3 | "11" | "3"
+0 | "0" | "0"
+15 | "17" | "15"
+0 | "0" | "0"
+31 | "1F" | "31"
 
-"430ce34d020724ed75a196dfc2ad67c77772d169"
-TRUE
+0 | "A" | "0"
+10 | "K" | "10"
+25 | "Z" | "25"
+26 | "BA" | "26"
 
-"0100001100001100111000110100110100000010000001110010010011101101011101011010000110010110110111111100001010101101011001111100011101110111011100101101000101101001"
-TRUE
+0 | "[ CATCH ] The `decInteger` should be greater than zero due to `oneBasedTo` is set to TRUE"
+10 | "J" | "10"
+26 | "Z" | "26"
+27 | "AA" | "27"
 
-"7509e5bda0c762d2bac7f90d758b5b2263fa01ccbc542ab5e3df163be08e6ca9"
-TRUE
+"2147483647" | "2147483647" | "9223372036854775807"
+"2147483647" | "zik0zj" | "2147483647"
+"9223372036854775807" | "1y2p0ij32e8e7" | "9223372036854775807"
 
-"0111010100001001111001011011110110100000110001110110001011010010101110101100011111111001000011010111010110001011010110110010001001100011111110100000000111001100101111000101010000101010101101011110001111011111000101100011101111100000100011100110110010101001"
-TRUE
-
-
-"0"
-"0"
-
-"11"
-"3"
-
-"0"
-"0"
-
-"17"
-"15"
-
-"0"
-"0"
-
-"1F"
-"31"
-
-
-"A"
-"0"
-
-"K"
-"10"
-
-"Z"
-"25"
-
-"BA"
-"26"
-
-"[ CATCH ] The `decInteger` should be greater than zero due to `oneBasedTo` is set to TRUE"
-
-"J"
-"10"
-
-"Z"
-"26"
-
-"AA"
-"27"
-
-
-"2147483647"
-"9223372036854775807"
-
-"zik0zj"
-"2147483647"
-
-"1y2p0ij32e8e7"
-"9223372036854775807"
-
-
-"1"
-"3"
-"7"
-"F"
-"V"
-"/"
-
+"1" | "3" | "7" | "F" | "V" | "/"
 
 [ "你" ]
 [ "111001001011110110100000" ]
@@ -1482,11 +1304,7 @@ TRUE
 [ "你", "好" ]
 
 
-5678
-"1011000101110"
-"uYB"
-"0001011000101110"
-5678
+5678 | "1011000101110" | "uYB" | "0001011000101110" | 5678
 
 [ "hello" ]
 [ "01101000", "01100101", "01101100", "01101100", "01101111" ]
@@ -1495,37 +1313,15 @@ TRUE
 "hello"
 
 
-"input: HELLO"
-"result: HELLO"
+"HELLO" | "SEVMTE8=" | "HELLO"
 
-"input: HELLO"
-"result: HELLO"
+"hello" | "Cn8eVZg" | "hello"
+"b`\x00\x00\x01\x00ÿ`" | "11LZL" | "b`\x00\x00\x01\x00ÿ`"
+"你好" | "2xuZUfBKa" | "你好"
 
-
-"hello"
-"Cn8eVZg"
-"hello"
-
-"b`\x00\x00\x01\x00\xff`"
-"11LZL"
-"b`\x00\x00\x01\x00\xff`"
-
-"你好"
-"2xuZUfBKa"
-"你好"
-
-
-"hello"
-"7tQLFHz"
-"hello"
-
-"b`\x00\x00\x01\x00\xff`"
-"00H79"
-"b`\x00\x00\x01\x00\xff`"
-
-"你好"
-"19PqtKE1t"
-"你好"
+"hello" | "7tQLFHz" | "hello"
+"b`\x00\x00\x01\x00ÿ`" | "00H79" | "b`\x00\x00\x01\x00ÿ`"
+"你好" | "19PqtKE1t" | "你好"
 ');
 
 

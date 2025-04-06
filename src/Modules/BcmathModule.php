@@ -43,13 +43,11 @@ class BcmathModule
         }
 
         $status = Lib::type()->number($number, $value, false);
-
         if (! $status) {
             return false;
         }
 
         $exp = $number->getExp();
-
         if ('' !== $exp) {
             return false;
         }

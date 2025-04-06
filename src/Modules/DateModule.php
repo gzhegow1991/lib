@@ -31,12 +31,12 @@ class DateModule
             }
         }
 
-        if (null !== $timezone) {
-            if (null !== $allowedTimezoneTypes) {
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+        if (null !== $allowedTimezoneTypes) {
+            if (null !== $timezone) {
+                $timezoneType = $this->timezone_type($timezone);
 
                 if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
-                    return false;
+                    $timezone = null;
                 }
             }
         }
@@ -74,7 +74,8 @@ class DateModule
         }
 
         if (null !== $timezone) {
-            $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+            $timezoneType = $this->timezone_type($timezone);
+
             if ($timezoneType !== 1) {
                 $timezone = null;
             }
@@ -113,7 +114,8 @@ class DateModule
         }
 
         if (null !== $timezone) {
-            $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+            $timezoneType = $this->timezone_type($timezone);
+
             if ($timezoneType !== 2) {
                 $timezone = null;
             }
@@ -152,7 +154,8 @@ class DateModule
         }
 
         if (null !== $timezone) {
-            $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+            $timezoneType = $this->timezone_type($timezone);
+
             if ($timezoneType !== 3) {
                 $timezone = null;
             }
@@ -191,7 +194,7 @@ class DateModule
         }
 
         if (null !== $timezone) {
-            $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+            $timezoneType = $this->timezone_type($timezone);
 
             if (! (
                 ($timezoneType === 2)
@@ -251,10 +254,10 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTime) {
-                $timezone = $dateTime->getTimezone();
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $tz = $dateTime->getTimezone();
+                $tzType = $this->timezone_type($tz);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                     $dateTime = null;
                 }
             }
@@ -309,10 +312,10 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTime) {
-                $timezone = $dateTime->getTimezone();
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $tz = $dateTime->getTimezone();
+                $tzType = $this->timezone_type($tz);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                     $dateTime = null;
                 }
             }
@@ -367,10 +370,10 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTimeImmutable) {
-                $timezone = $dateTimeImmutable->getTimezone();
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $tz = $dateTimeImmutable->getTimezone();
+                $tzType = $this->timezone_type($tz);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                     $dateTimeImmutable = null;
                 }
             }
@@ -425,7 +428,7 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTime) {
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $timezoneType = $this->timezone_type($timezone);
 
                 if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
                     $dateTime = null;
@@ -481,7 +484,7 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTime) {
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $timezoneType = $this->timezone_type($timezone);
 
                 if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
                     $dateTime = null;
@@ -537,7 +540,7 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTimeImmutable) {
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $timezoneType = $this->timezone_type($timezone);
 
                 if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
                     $dateTimeImmutable = null;
@@ -605,10 +608,10 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTime) {
-                $timezone = $dateTime->getTimezone();
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $tz = $dateTime->getTimezone();
+                $tzType = $this->timezone_type($tz);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                     $dateTime = null;
                 }
             }
@@ -673,10 +676,10 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTime) {
-                $timezone = $dateTime->getTimezone();
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $tz = $dateTime->getTimezone();
+                $tzType = $this->timezone_type($tz);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                     $dateTime = null;
                 }
             }
@@ -743,10 +746,10 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTimeImmutable) {
-                $timezone = $dateTimeImmutable->getTimezone();
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $tz = $dateTimeImmutable->getTimezone();
+                $tzType = $this->timezone_type($tz);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                     $dateTimeImmutable = null;
                 }
             }
@@ -811,7 +814,7 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTime) {
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $timezoneType = $this->timezone_type($timezone);
 
                 if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
                     $dateTime = null;
@@ -877,7 +880,7 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTime) {
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $timezoneType = $this->timezone_type($timezone);
 
                 if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
                     $dateTime = null;
@@ -943,7 +946,7 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTimeImmutable) {
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $timezoneType = $this->timezone_type($timezone);
 
                 if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
                     $dateTimeImmutable = null;
@@ -1024,10 +1027,10 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTime) {
-                $timezone = $dateTime->getTimezone();
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $tz = $dateTime->getTimezone();
+                $tzType = $this->timezone_type($tz);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                     $dateTime = null;
                 }
             }
@@ -1105,10 +1108,10 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTime) {
-                $timezone = $dateTime->getTimezone();
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $tz = $dateTime->getTimezone();
+                $tzType = $this->timezone_type($tz);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                     $dateTime = null;
                 }
             }
@@ -1188,10 +1191,10 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             if (null !== $dateTimeImmutable) {
-                $timezone = $dateTimeImmutable->getTimezone();
-                $timezoneType = get_object_vars($timezone)[ 'timezone_type' ];
+                $tz = $dateTimeImmutable->getTimezone();
+                $tzType = $this->timezone_type($tz);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                     $dateTimeImmutable = null;
                 }
             }
@@ -1452,7 +1455,7 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             $tz = $dateTime->getTimezone();
-            $tzType = get_object_vars($timezone)[ 'timezone_type' ];
+            $tzType = $this->timezone_type($tz);
 
             if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                 throw new LogicException(
@@ -1488,7 +1491,7 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             $tz = $dateTimeImmutable->getTimezone();
-            $tzType = get_object_vars($timezone)[ 'timezone_type' ];
+            $tzType = $this->timezone_type($tz);
 
             if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                 throw new LogicException(
@@ -1527,7 +1530,7 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             $tz = $dateTime->getTimezone();
-            $tzType = get_object_vars($timezone)[ 'timezone_type' ];
+            $tzType = $this->timezone_type($tz);
 
             if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                 throw new LogicException(
@@ -1565,7 +1568,7 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             $tz = $dateTimeImmutable->getTimezone();
-            $tzType = get_object_vars($timezone)[ 'timezone_type' ];
+            $tzType = $this->timezone_type($tz);
 
             if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                 throw new LogicException(
@@ -1604,7 +1607,7 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             $tz = $dateTime->getTimezone();
-            $tzType = get_object_vars($timezone)[ 'timezone_type' ];
+            $tzType = $this->timezone_type($tz);
 
             if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                 throw new LogicException(
@@ -1642,7 +1645,7 @@ class DateModule
 
         if (null !== $allowedTimezoneTypes) {
             $tz = $dateTimeImmutable->getTimezone();
-            $tzType = get_object_vars($timezone)[ 'timezone_type' ];
+            $tzType = $this->timezone_type($tz);
 
             if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                 throw new LogicException(
@@ -1755,6 +1758,24 @@ class DateModule
         ;
 
         return $clone;
+    }
+
+
+    public function timezone_type(\DateTimeZone $dateTimeZone) : int
+    {
+        return (PHP_VERSION_ID >= 70400)
+            ? json_decode(json_encode($dateTimeZone))->timezone_type
+            : get_object_vars($dateTimeZone)[ 'timezone_type' ];
+    }
+
+    /**
+     * @noinspection PhpNonStrictObjectEqualityInspection
+     */
+    public function timezone_same(\DateTimeZone $a, \DateTimeZone $b) : bool
+    {
+        return (PHP_VERSION_ID >= 70400)
+            ? ($a == $b)
+            : ($a->getName() === $b->getName());
     }
 
 

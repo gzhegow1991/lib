@@ -24,8 +24,14 @@ class TypeModule extends TypeModuleBase
             return true;
         }
 
-        if (null === $value) {
+        if (
+            (null === $value)
+            || (is_float($value) && is_nan($value))
+            || ($this->is_nil($value))
+        ) {
             // > NULL is not bool
+            // > NAN is not bool
+            // > NIL is not bool
 
             return false;
         }
@@ -35,16 +41,6 @@ class TypeModule extends TypeModuleBase
             $result = true;
 
             return true;
-        }
-
-        if (is_float($value) && is_nan($value)) {
-            // > NAN is not bool
-            return false;
-        }
-
-        if (Lib::type()->is_nil($value)) {
-            // > NIL is not bool
-            return false;
         }
 
         if (0 === ($cnt = Lib::php()->count($value))) {
@@ -81,8 +77,14 @@ class TypeModule extends TypeModuleBase
             return true;
         }
 
-        if (null === $value) {
+        if (
+            (null === $value)
+            || (is_float($value) && is_nan($value))
+            || ($this->is_nil($value))
+        ) {
             // > NULL is not bool
+            // > NAN is not bool
+            // > NIL is not bool
 
             return false;
         }
@@ -95,39 +97,27 @@ class TypeModule extends TypeModuleBase
             return true;
         }
 
-        if (is_float($value) && is_nan($value)) {
-            // > NAN is not bool
-            return false;
-        }
-
         if (is_string($value)) {
+            $map = [
+                //
+                'true'  => true,
+                'y'     => true,
+                'yes'   => true,
+                'on'    => true,
+                //
+                'false' => false,
+                'n'     => false,
+                'no'    => false,
+                'off'   => false,
+            ];
+
             $_value = strtolower($value);
 
-            if (
-                ($_value === 'true')
-                || ($_value === 'y')
-                || ($_value === 'yes')
-                || ($_value === 'on')
-            ) {
-                $result = true;
-
-                return true;
-
-            } elseif (
-                ($_value === 'false')
-                || ($_value === 'n')
-                || ($_value === 'no')
-                || ($_value === 'off')
-            ) {
-                $result = false;
+            if (isset($map[ $_value ])) {
+                $result = $map[ $_value ];
 
                 return true;
             }
-        }
-
-        if (Lib::type()->is_nil($value)) {
-            // > NIL is not bool
-            return false;
         }
 
         if (0 === ($cnt = Lib::php()->count($value))) {
@@ -158,6 +148,32 @@ class TypeModule extends TypeModuleBase
     public function int(&$result, $value) : bool
     {
         $result = null;
+
+        if (is_int($value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        if (
+            (null === $value)
+            || (is_bool($value))
+            || (is_array($value))
+            || (is_float($value) && (! is_finite($value)))
+            || (is_resource($value))
+            || ('resource (closed)' === gettype($value))
+            || ($this->is_nil($value))
+        ) {
+            // > NULL is not int
+            // > BOOLEAN is not int
+            // > ARRAY is not int
+            // > NAN, INF, -INF is not int
+            // > RESOURCE is not int
+            // > CLOSED RESOURCE is not int
+            // > NIL is not int
+
+            return false;
+        }
 
         if (! $this->num($_value, $value)) {
             return false;
@@ -274,14 +290,14 @@ class TypeModule extends TypeModuleBase
 
 
     /**
-     * @param int|float|null $result
+     * @param float|null $result
      */
-    public function num(&$result, $value) : bool
+    public function float(&$result, $value) : bool
     {
         $result = null;
 
         if (is_int($value)) {
-            $result = $value;
+            $result = (float) $value;
 
             return true;
 
@@ -293,6 +309,217 @@ class TypeModule extends TypeModuleBase
             $result = $value;
 
             return true;
+        }
+
+        if (
+            (null === $value)
+            || (is_bool($value))
+            || (is_array($value))
+            || (is_resource($value))
+            || ('resource (closed)' === gettype($value))
+            || ($this->is_nil($value))
+        ) {
+            // > NULL is not float
+            // > BOOLEAN is not float
+            // > ARRAY is not float
+            // > RESOURCE is not float
+            // > CLOSED RESOURCE is not float
+            // > NIL is not float
+
+            return false;
+        }
+
+        if (! $this->numeric($valueNumeric, $value, true, [ &$split ])) {
+            return false;
+        }
+
+        $map = [
+            ' ' . ((string) PHP_FLOAT_MAX)  => PHP_FLOAT_MAX,
+            ' ' . ((string) PHP_FLOAT_MIN)  => PHP_FLOAT_MIN,
+            //
+            ' ' . ((string) -PHP_FLOAT_MAX) => -PHP_FLOAT_MAX,
+            ' ' . ((string) -PHP_FLOAT_MIN) => -PHP_FLOAT_MIN,
+            //
+            ' 1.797693134862316E+308'       => PHP_FLOAT_MAX,
+            ' 1.7976931348623157E+308'      => PHP_FLOAT_MAX,
+            //
+            ' 2.225073858507201E-308'       => PHP_FLOAT_MIN,
+            ' 2.2250738585072014E-308'      => PHP_FLOAT_MIN,
+            //
+            ' -1.797693134862316E+308'      => -PHP_FLOAT_MAX,
+            ' -1.7976931348623157E+308'     => -PHP_FLOAT_MAX,
+            //
+            ' -2.225073858507201E-308'      => -PHP_FLOAT_MIN,
+            ' -2.2250738585072014E-308'     => -PHP_FLOAT_MIN,
+        ];
+
+        if (isset($map[ $key = ' ' . $valueNumeric ])) {
+            $result = $map[ $key ];
+
+            return true;
+        }
+
+        $valueFloat = floatval($valueNumeric);
+
+        if (0.0 === $valueFloat) {
+            if ($valueNumeric !== '0') {
+                $valueFloat = null;
+            }
+        }
+
+        if (! is_finite($valueFloat)) {
+            $valueFloat = null;
+        }
+
+        if (null !== $valueFloat) {
+            $result = $valueFloat;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function float_non_zero(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->float($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function float_non_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->float($_value, $value)) {
+            return false;
+        }
+
+        if ($_value < 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function float_non_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->float($_value, $value)) {
+            return false;
+        }
+
+        if ($_value > 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function float_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->float($_value, $value)) {
+            return false;
+        }
+
+        if ($_value >= 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function float_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->float($_value, $value)) {
+            return false;
+        }
+
+        if ($_value <= 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (is_int($value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        if (is_float($value)) {
+            if (! is_finite($value)) {
+                return false;
+            }
+
+            $result = $value;
+
+            return true;
+        }
+
+        if (
+            (null === $value)
+            || (is_bool($value))
+            || (is_array($value))
+            || (is_resource($value))
+            || ('resource (closed)' === gettype($value))
+            || ($this->is_nil($value))
+        ) {
+            // > NULL is not num
+            // > BOOLEAN is not num
+            // > ARRAY is not num
+            // > RESOURCE is not num
+            // > CLOSED RESOURCE is not num
+            // > NIL is not num
+
+            return false;
         }
 
         if (! $this->numeric($valueNumeric, $value, true, [ &$split ])) {
@@ -525,50 +752,18 @@ class TypeModule extends TypeModuleBase
             $refSplit = null;
         }
 
-        if ($value instanceof Number) {
-            $number = $value;
-
-            $exp = $number->getExp();
-
-            if (! $allowExp) {
-                unset($refSplit);
-
-                return false;
-            }
-
-            $result = $number->getValue();
-
-            if ($withSplit) {
-                $refSplit = [];
-                $refSplit[ 0 ] = $number->getSign();
-                $refSplit[ 1 ] = $number->getInt();
-                $refSplit[ 2 ] = $number->getFrac();
-                $refSplit[ 3 ] = $exp;
-            }
-
-            unset($refSplit);
-
-            return true;
-        }
-
-        $intOrFloat = null;
-
-        if (is_int($value)) {
-            $intOrFloat = $value;
-
-        } elseif (is_float($value)) {
+        $isFloat = is_float($value);
+        if ($isFloat) {
             if (! is_finite($value)) {
                 unset($refSplit);
 
                 return false;
             }
-
-            $intOrFloat = $value;
         }
 
-        if (null !== $intOrFloat) {
-            if (! $withSplit) {
-                $valueString = (string) $intOrFloat;
+        if (! $withSplit) {
+            if ($isFloat || is_int($value)) {
+                $valueString = (string) $value;
 
                 if (! $allowExp) {
                     if (false !== strpos($valueString, 'e')) {
@@ -584,6 +779,52 @@ class TypeModule extends TypeModuleBase
 
                 return true;
             }
+        }
+
+        if (
+            (null === $value)
+            || (is_bool($value))
+            || (is_array($value))
+            || (is_resource($value))
+            || ('resource (closed)' === gettype($value))
+            || ($this->is_nil($value))
+        ) {
+            // > NULL is not numeric
+            // > BOOLEAN is not numeric
+            // > ARRAY is not numeric
+            // > RESOURCE is not numeric
+            // > CLOSED RESOURCE is not numeric
+            // > NIL is not numeric
+
+            return false;
+        }
+
+        if ($value instanceof Number) {
+            $number = $value;
+
+            $exp = $number->getExp();
+
+            if (! $allowExp) {
+                if ('' !== $exp) {
+                    unset($refSplit);
+
+                    return false;
+                }
+            }
+
+            $result = $number->getValue();
+
+            if ($withSplit) {
+                $refSplit = [];
+                $refSplit[ 0 ] = $number->getSign();
+                $refSplit[ 1 ] = $number->getInt();
+                $refSplit[ 2 ] = $number->getFrac();
+                $refSplit[ 3 ] = $exp;
+            }
+
+            unset($refSplit);
+
+            return true;
         }
 
         if (! Lib::str()->type_trim($valueTrim, $value)) {
@@ -773,7 +1014,7 @@ class TypeModule extends TypeModuleBase
     {
         $result = null;
 
-        $withRefSplit = array_key_exists(0, $refs);
+        $withSplit = array_key_exists(0, $refs);
 
         $refSplit =& $refs[ 0 ];
 
@@ -783,21 +1024,31 @@ class TypeModule extends TypeModuleBase
             return false;
         }
 
-        [ , $int, $frac, $exp ] = $refSplit;
+        [ , , $frac, $exp ] = $refSplit;
 
-        if ('' !== $frac) {
+        if (
+            ('' !== $frac)
+            || ('' !== $exp)
+        ) {
+            // > btw, 1.1e1 is can be converted to integer too
+            // > there's we better dont support that numbers
+
             unset($refSplit);
 
-            return false;
-        }
-
-        if ('' !== $exp) {
-            unset($refSplit);
+            if (! $withSplit) {
+                unset($refs[ 0 ]);
+            }
 
             return false;
         }
 
         $result = $_value;
+
+        unset($refSplit);
+
+        if (! $withSplit) {
+            unset($refs[ 0 ]);
+        }
 
         return true;
     }
@@ -819,9 +1070,7 @@ class TypeModule extends TypeModuleBase
             return true;
         }
 
-        $result = $_value;
-
-        return true;
+        return false;
     }
 
     /**
