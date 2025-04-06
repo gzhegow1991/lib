@@ -83,42 +83,49 @@ $fn = function () {
     _print('[ Benchmark ]');
     echo PHP_EOL;
 
+    $tag = 'tag';
 
-    $theDebug = \Gzhegow\Lib\Lib::debug();
-
-    $theDebug->benchmark('tag');
+    \Gzhegow\Lib\Lib::benchmark(0, $tag);
 
     for ( $i = 0; $i < 2; $i++ ) {
-        $t = 'tag' . $i;
+        $ttag = 'tag' . $i;
 
-        $theDebug->benchmark($t);
+        \Gzhegow\Lib\Lib::benchmark(0, $ttag);
 
         for ( $ii = 0; $ii < 2; $ii++ ) {
-            $tt = 'tag' . $i . $ii;
+            $tttag = 'tag' . $i . $ii;
 
-            $theDebug->benchmark($tt);
+            \Gzhegow\Lib\Lib::benchmark(0, $tttag);
 
             usleep(1e4);
 
-            $theDebug->benchmark($tt, true);
+            \Gzhegow\Lib\Lib::benchmark(1, $tttag);
         }
 
-        $theDebug->benchmark($t, true);
+        \Gzhegow\Lib\Lib::benchmark(1, $ttag);
     }
 
-    $theDebug->benchmark('tag', true);
+    \Gzhegow\Lib\Lib::benchmark(1, $tag);
 
-    $report = $theDebug->benchmark();
+    $report = \Gzhegow\Lib\Lib::benchmark();
 
-    $report[ $t = 'tag' ][ 0 ] = ($report[ $t ][ 0 ] > (4 * 1e-4));
+    $expect = [
+        'tag'   => (4 * 1e-4),
+        //
+        'tag0'  => (2 * 1e-4),
+        'tag1'  => (2 * 1e-4),
+        //
+        'tag00' => (1e-4),
+        'tag01' => (1e-4),
+        'tag10' => (1e-4),
+        'tag11' => (1e-4),
+    ];
 
-    $report[ $t = 'tag0' ][ 0 ] = ($report[ $t ][ 0 ] > (2 * 1e-4));
-    $report[ $t = 'tag00' ][ 0 ] = ($report[ $t ][ 0 ] > 1e-4);
-    $report[ $t = 'tag01' ][ 0 ] = ($report[ $t ][ 0 ] > 1e-4);
+    $reportIndex = array_keys($report);
 
-    $report[ $t = 'tag1' ][ 0 ] = ($report[ $t ][ 0 ] > (2 * 1e-4));
-    $report[ $t = 'tag10' ][ 0 ] = ($report[ $t ][ 0 ] > 1e-4);
-    $report[ $t = 'tag11' ][ 0 ] = ($report[ $t ][ 0 ] > 1e-4);
+    foreach ( $report as $tag => $floats ) {
+        $report[ $tag ] = $expect[ $tag ] < array_sum($floats);
+    }
 
     _print_array_multiline($report, 2);
 };
@@ -127,27 +134,13 @@ _assert_stdout($fn, [], '
 
 ###
 [
-  "tag" => [
-    TRUE
-  ],
-  "tag0" => [
-    TRUE
-  ],
-  "tag00" => [
-    TRUE
-  ],
-  "tag01" => [
-    TRUE
-  ],
-  "tag1" => [
-    TRUE
-  ],
-  "tag10" => [
-    TRUE
-  ],
-  "tag11" => [
-    TRUE
-  ]
+  "tag" => TRUE,
+  "tag0" => TRUE,
+  "tag00" => TRUE,
+  "tag01" => TRUE,
+  "tag1" => TRUE,
+  "tag10" => TRUE,
+  "tag11" => TRUE
 ]
 ###
 ');

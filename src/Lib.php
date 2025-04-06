@@ -469,6 +469,62 @@ class Lib
 
 
     /**
+     * @return array|float
+     */
+    public static function benchmark($clear = null, string $tag = '')
+    {
+        /** @var float $mt */
+
+        $mt = microtime(true);
+
+        static $current;
+
+        if (null !== $clear) {
+            $clear = (bool) $clear;
+        }
+
+        if (null === $clear) {
+            $last = $current;
+
+            $current = null;
+
+            // ! return
+            return $last->report ?? [];
+        }
+
+        if (null === $current) {
+            $current = new class {
+                /**
+                 * @var float[][]
+                 */
+                public $report = [];
+                /**
+                 * @var float[]
+                 */
+                public $microtimes = [];
+            };
+        }
+
+        if (! isset($current->report[ $tag ])) {
+            $current->report[ $tag ] = [];
+        }
+
+        if (isset($current->microtimes[ $tag ])) {
+            $current->report[ $tag ][] = $mt - $current->microtimes[ $tag ];
+        }
+
+        if ($clear) {
+            unset($current->microtimes[ $tag ]);
+
+        } else {
+            $current->microtimes[ $tag ] = $mt;
+        }
+
+        return $mt;
+    }
+
+
+    /**
      * @var array<string, mixed>
      */
     protected static $modules = [];
