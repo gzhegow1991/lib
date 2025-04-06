@@ -3,23 +3,60 @@
 namespace Gzhegow\Lib\Modules\Arr\ArrayOf;
 
 
+use Gzhegow\Lib\Modules\Arr\ArrayOf\Base\AbstractArrayOfSubclass;
+
+
 /**
  * @template-covariant T of object
  */
-class ArrayOfSubclass extends ArrayOf
+class ArrayOfSubclass extends AbstractArrayOfSubclass implements
+    \ArrayAccess,
+    \Countable,
+    \IteratorAggregate,
+    \Serializable
 {
-    /**
-     * @param class-string<T> $objectClass
-     */
-    public function __construct(
-        string $keyType, string $objectClass,
-        array $options = []
-    )
+    public function getIterator() : \Traversable
     {
-        $options = []
-            + [ 'isSubclassOf' => true ]
-            + $options;
+        return new \ArrayIterator($this->values);
+    }
 
-        parent::__construct([ $keyType => 'object' ], $objectClass, $options);
+
+    public function offsetExists($offset) : bool
+    {
+        return $this->exists($offset);
+    }
+
+    // public function offsetGet($offset)
+    public function offsetGet($offset) : mixed
+    {
+        return $this->get($offset);
+    }
+
+    public function offsetSet($offset, $value) : void
+    {
+        $this->set($offset, $value);
+    }
+
+    public function offsetUnset($offset) : void
+    {
+        $this->unset($offset);
+    }
+
+
+    public function serialize()
+    {
+        return serialize($this->__serialize());
+    }
+
+    // public function unserialize($data)
+    public function unserialize(string $data = '')
+    {
+        return unserialize($data);
+    }
+
+
+    public function count() : int
+    {
+        return count($this->values);
     }
 }

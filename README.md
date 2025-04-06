@@ -452,63 +452,69 @@ _assert_stdout($fn, [], '
 
 
 // >>> TEST
-// > тесты ArrModule
+// > тесты ArrayOf
 $fn = function () {
     _print('[ ArrModule ]');
     echo PHP_EOL;
 
+
     $notAnObject = 1;
-    $object = new stdClass();
-    $anotherObject = new ArrayObject();
-    $anonymousObject = new class extends \stdClass {
+    $objectStdClass = new stdClass();
+    $objectArrayObject = new ArrayObject();
+    $objectAnonymousStdClass = new class extends \stdClass {
     };
 
 
-    $array = \Gzhegow\Lib\Lib::new8(
-        \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::class,
-        'object'
-    );
-    $array[] = $notAnObject;
-    _print($array);
-    _print($array->getItems());
+    // > осторожно, `ArrayOf` не проверяет типы при добавлении, для этого есть `ArrayOfType`
+    // > этот объект сделан для того, чтобы убедится, что другой разработчик создал его с правильным типом
+    // > при этом он может положить туда что захочет, это похоже на указание PHPDoc
+    /**
+     * @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf $arrayOf
+     * > это синтаксис создания объекта в 8 версии PHP отдельно от 7, на практике не потребуется, только для тестов
+     */
+    $class = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::class;
+    $args = [ 'object' ];
+    $arrayOf = \Gzhegow\Lib\Lib::new8($class, ...$args);
+    $arrayOf[] = $notAnObject;
+    _print($arrayOf);
+    _print($arrayOf->isOfType('object'), $arrayOf->getValues());
 
-    // > be aware, `ArrayOf` WILL NOT check type when adding elements, so this check returns true
-    // > if you use this feature carefully - you can avoid that check, and code becomes faster
-    // > it will work like PHPDoc idea - check should remember your colleagues who will read the sources without actually check
-    _print($array->isOfType('object'));
     echo PHP_EOL;
 
 
-    $array = \Gzhegow\Lib\Lib::new8(
-        \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::class,
-        $types = [ 'mixed' => 'object' ]
-    );
-    $array[] = $object;
-    $array[] = $anotherObject;
+    /**
+     * @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType $arrayOf
+     */
+    $class = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::class;
+    $args = [ 'object' ];
+    $arrayOf = \Gzhegow\Lib\Lib::new8($class, ...$args);
+    $arrayOf[] = $objectStdClass;
+    $arrayOf[] = $objectArrayObject;
 
     $e = null;
     try {
-        $array[] = $notAnObject;
+        $arrayOf[] = $notAnObject;
     }
     catch ( \Throwable $e ) {
     }
     _print('[ CATCH ] ' . $e->getMessage());
-    _print($array);
-    _print($array->getItems());
-    _print($array->isOfType('object'));
+    _print($arrayOf);
+    _print($arrayOf->isOfType('object'), $arrayOf->getValues());
+
     echo PHP_EOL;
 
 
-    $array = \Gzhegow\Lib\Lib::new8(
-        \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::class,
-        $keyType = 'string',
-        $objectClass = \stdClass::class
-    );
-    $array[] = $object;
+    /**
+     * @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass $arrayOf
+     */
+    $class = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::class;
+    $args = [ \stdClass::class ];
+    $arrayOf = \Gzhegow\Lib\Lib::new8($class, ...$args);
+    $arrayOf[] = $objectStdClass;;
 
     $e = null;
     try {
-        $array[] = $anotherObject;
+        $arrayOf[] = $objectArrayObject;
     }
     catch ( \Throwable $e ) {
     }
@@ -516,7 +522,7 @@ $fn = function () {
 
     $e = null;
     try {
-        $array[] = $anonymousObject;
+        $arrayOf[] = $objectAnonymousStdClass;
     }
     catch ( \Throwable $e ) {
     }
@@ -524,53 +530,73 @@ $fn = function () {
 
     $e = null;
     try {
-        $array[] = $notAnObject;
+        $arrayOf[] = $notAnObject;
     }
     catch ( \Throwable $e ) {
     }
     _print('[ CATCH ] ' . $e->getMessage());
-    _print($array);
-    _print($array->getItems());
-    _print($array->isOfType('object'));
+    _print($arrayOf);
+    _print($arrayOf->isOfType('object'), $arrayOf->getValues());
+
+    echo PHP_EOL;
+
+
+    // > для полного погружения разработана структура `Map` по аналогии с JavaScript
+    // > в качестве ключей этого объекта можно использовать вообще любые значения
+    /**
+     * @var \Gzhegow\Lib\Modules\Arr\Map\Map $map
+     */
+    $class = \Gzhegow\Lib\Modules\Arr\Map\Map::class;
+    $map = \Gzhegow\Lib\Lib::new8($class);
+    $map[ $stdClass = new \stdClass() ] = 1;
+    $map[ $array = [ 1, 2, 3 ] ] = 1;
+    _print($map);
+    _print(isset($map[ $stdClass ]), isset($map[ $array ]));
+    _print_array($map->keys(), 1);
+    _print_array($map->values(), 2);
 };
-_assert_stdout($fn, [], PHP_VERSION_ID < 80000
+_assert_stdout($fn, [], PHP_VERSION_ID >= 80000
     ? '
 "[ ArrModule ]"
 
-{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf }
-[ 1 ]
-TRUE
+{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf }
+TRUE | [ 1 ]
 
-"[ CATCH ] The `value` should be of type: object / 1"
-{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfType }
-[ "{ object # stdClass }", "{ object(countable(0) iterable) # ArrayObject }" ]
-TRUE
+"[ CATCH ] The `value` should be of type: object"
+{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType }
+TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable) # ArrayObject }" ]
 
-"[ CATCH ] The `value` should be of class: stdClass / { object(countable(0) iterable) # ArrayObject }"
-"[ CATCH ] The `value` should be of class: stdClass / { object # class@anonymous }"
-"[ CATCH ] The `value` should be of class: stdClass / 1"
-{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfClass }
-[ "{ object # stdClass }" ]
-TRUE
+"[ CATCH ] The `value` should be of class: stdClass"
+"[ CATCH ] The `value` should be of class: stdClass"
+"[ CATCH ] The `value` should be object"
+{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass }
+TRUE | [ "{ object # stdClass }" ]
+
+{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\Map\Map }
+TRUE | TRUE
+[ "{ object # stdClass }", "{ array(3) }" ]
+[ 1, 1 ]
 '
     : '
 "[ ArrModule ]"
 
-{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf }
-[ 1 ]
-TRUE
+{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf }
+TRUE | [ 1 ]
 
-"[ CATCH ] The `value` should be of type: object / 1"
-{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType }
-[ "{ object # stdClass }", "{ object(countable(0) iterable) # ArrayObject }" ]
-TRUE
+"[ CATCH ] The `value` should be of type: object"
+{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfType }
+TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable) # ArrayObject }" ]
 
-"[ CATCH ] The `value` should be of class: stdClass / { object(countable(0) iterable) # ArrayObject }"
-"[ CATCH ] The `value` should be of class: stdClass / { object # stdClass@anonymous }"
-"[ CATCH ] The `value` should be of class: stdClass / 1"
-{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass }
-[ "{ object # stdClass }" ]
-TRUE
+"[ CATCH ] The `value` should be of class: stdClass"
+"[ CATCH ] The `value` should be of class: stdClass"
+"[ CATCH ] The `value` should be object"
+{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfClass }
+TRUE | [ "{ object # stdClass }" ]
+
+{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\Map\PHP7\Map }
+TRUE | TRUE
+[ "{ object # stdClass }", "{ array(3) }" ]
+[ 1, 1 ]
 ');
 
 

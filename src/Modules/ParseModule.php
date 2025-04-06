@@ -119,6 +119,84 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
+	 * @return float|null
+	 */
+	public function float($value)
+	{
+		if (Lib::type()->float($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|float|null
+	 */
+	public function float_non_zero($value)
+	{
+		if (Lib::type()->float_non_zero($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|float|null
+	 */
+	public function float_non_negative($value)
+	{
+		if (Lib::type()->float_non_negative($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|float|null
+	 */
+	public function float_non_positive($value)
+	{
+		if (Lib::type()->float_non_positive($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|float|null
+	 */
+	public function float_negative($value)
+	{
+		if (Lib::type()->float_negative($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|float|null
+	 */
+	public function float_positive($value)
+	{
+		if (Lib::type()->float_positive($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
 	 * @return int|float|null
 	 */
 	public function num($value)

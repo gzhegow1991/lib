@@ -927,10 +927,6 @@ class CmpModule
 
             $aInt = $aInt ?? $a;
             $bInt = $bInt ?? $b;
-            // dump([
-            //     [ $a, $aInt, gettype($aInt), $aStatus ],
-            //     [ $b, $bInt, gettype($bInt), $bStatus ],
-            // ]);
 
             if ($aStatus && $bStatus) {
                 $aInt = $aInt ?? $a;

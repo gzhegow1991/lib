@@ -2,25 +2,57 @@
 
 namespace Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7;
 
+use Gzhegow\Lib\Modules\Arr\ArrayOf\Base\AbstractArrayOf;
 
-/**
- * @template-covariant T of object
- */
-class ArrayOf extends AbstractArrayOf
+
+class ArrayOf extends AbstractArrayOf implements
+    \ArrayAccess,
+    \Countable,
+    \IteratorAggregate,
+    \Serializable
 {
-    /**
-     * @param string|array<string, string> $type
-     * @param class-string<T>|null         $objectClass
-     */
-    public function __construct(
-        $type = [ 'mixed' => 'mixed' ], string $objectClass = null,
-        array $options = []
-    )
+    public function getIterator() : \Traversable
     {
-        $_type = is_array($type)
-            ? $type
-            : [ 'mixed' => (string) $type ];
+        return new \ArrayIterator($this->values);
+    }
 
-        parent::__construct($_type, $objectClass, $options);
+
+    public function offsetExists($offset) : bool
+    {
+        return $this->exists($offset);
+    }
+
+    // public function offsetGet($offset) : mixed
+    public function offsetGet($offset)
+    {
+        return $this->get($offset);
+    }
+
+    public function offsetSet($offset, $value) : void
+    {
+        $this->set($offset, $value);
+    }
+
+    public function offsetUnset($offset) : void
+    {
+        $this->unset($offset);
+    }
+
+
+    public function serialize()
+    {
+        return serialize($this->__serialize());
+    }
+
+    // public function unserialize(string $data = '')
+    public function unserialize($data)
+    {
+        return unserialize($data);
+    }
+
+
+    public function count() : int
+    {
+        return count($this->values);
     }
 }

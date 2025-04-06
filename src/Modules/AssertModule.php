@@ -102,6 +102,72 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
+	public function float($value)
+	{
+		$this->status = Lib::type()->float($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function float_non_zero($value)
+	{
+		$this->status = Lib::type()->float_non_zero($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function float_non_negative($value)
+	{
+		$this->status = Lib::type()->float_non_negative($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function float_non_positive($value)
+	{
+		$this->status = Lib::type()->float_non_positive($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function float_negative($value)
+	{
+		$this->status = Lib::type()->float_negative($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function float_positive($value)
+	{
+		$this->status = Lib::type()->float_positive($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
 	public function num($value)
 	{
 		$this->status = Lib::type()->num($this->result, $value);
