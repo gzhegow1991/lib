@@ -17,11 +17,16 @@
     "autoload": {
         "psr-4": {
             "Gzhegow\\Lib\\": "src/"
-        }
+        },
+        "files": [
+            "const/arr.php",
+            "const/cmp.php",
+            "const/php.php"
+        ]
     },
 
     "require": {
-        "php": "^7.2|^8.0",
+        "php": "^7.3|^8.0",
 
         "ext-pcre": "*"
     },

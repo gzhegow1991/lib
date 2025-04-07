@@ -716,7 +716,7 @@ class DebugModule
         if ($withValue) {
             $gen = $theArr->walk_it(
                 $arrayCopy,
-                ArrModule::WALK_WITH_EMPTY_ARRAYS | ArrModule::WALK_WITH_PARENTS
+                _ARR_WALK_WITH_EMPTY_ARRAYS | _ARR_WALK_WITH_PARENTS
             );
 
             foreach ( $gen as $path => &$value ) {

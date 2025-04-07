@@ -18,13 +18,6 @@ use Gzhegow\Lib\Modules\Php\DebugBacktracer\DebugBacktracer;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
 
-if (! defined('_PHP_PATHINFO_DIRNAME')) define('_PHP_PATHINFO_DIRNAME', PATHINFO_DIRNAME);
-if (! defined('_PHP_PATHINFO_BASENAME')) define('_PHP_PATHINFO_BASENAME', PATHINFO_BASENAME);
-if (! defined('_PHP_PATHINFO_EXTENSION')) define('_PHP_PATHINFO_EXTENSION', PATHINFO_EXTENSION);
-if (! defined('_PHP_PATHINFO_FILENAME')) define('_PHP_PATHINFO_FILENAME', PATHINFO_FILENAME);
-if (! defined('_PHP_PATHINFO_EXTENSIONS')) define('_PHP_PATHINFO_EXTENSIONS', 1 << 4);
-if (! defined('_PHP_PATHINFO_ALL')) define('_PHP_PATHINFO_ALL', ((1 << 5) - 1));
-
 class PhpModule
 {
     /**
