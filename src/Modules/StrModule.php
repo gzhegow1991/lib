@@ -1005,11 +1005,13 @@ class StrModule
 
     /**
      * > возвращает число символов в строке
+     *
+     * @return int|float
      */
-    public function strlen($value, string $mb_encoding = null) : int
+    public function strlen($value, string $mb_encoding = null) // : int|NAN
     {
         if (! is_string($value)) {
-            return 0;
+            return NAN;
         }
 
         if ('' === $value) {
@@ -1028,11 +1030,13 @@ class StrModule
 
     /**
      * > возвращает размер строки в байтах
+     *
+     * @return int|float
      */
-    public function strsize($value) : int
+    public function strsize($value) // : int|NAN
     {
         if (! is_string($value)) {
-            return 0;
+            return NAN;
         }
 
         if ('' === $value) {
@@ -2148,17 +2152,18 @@ class StrModule
 
 
     /**
-     * gzhegow, урезает английское слово до префикса из нескольких букв - когда имя индекса в бд слишком длинное
+     * > урезает английское слово до префикса из нескольких букв - когда имя индекса в бд слишком длинное
+     * > оставляет одну гласную
+     *
+     * > hello/3 -> hel
+     * > bsod/3 -> bso
+     * > manufacturer/6 -> manfct
      */
     public function prefix(string $string, int $length = null) : string
     {
-        require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
-
         if ('' === $string) {
             return '';
         }
-
-        $theMb = Lib::mb();
 
         $length = $length ?? 3;
 
@@ -2168,17 +2173,29 @@ class StrModule
             );
         }
 
-        $_string = preg_replace('/(?:[^\w]|[_])+/u', '', $string);
-        if ('' === $_string) {
+        $theStr = Lib::str();
 
+        $isUnicodeAllowed = $theStr->static_mbstring();
+
+        $_string = $isUnicodeAllowed
+            ? preg_replace('/(?:[^\w]|[_])+/u', '', $string)
+            : preg_replace('/(?:[^\w]|[_])+/', '', $string);
+
+        if ('' === $_string) {
+            throw new LogicException(
+                [ 'The `string` should contain at least one letter', $string ]
+            );
         }
 
+        $fnStrlen = $theStr->mb_func('strlen');
+        $fnSubstr = $theStr->mb_func('substr');
+
         $source = $_string;
-        $sourceLen = $this->strlen($source);
+        $sourceLen = $fnStrlen($source);
 
-        $length = min($length, $sourceLen);
+        $_length = min($length, $sourceLen);
 
-        if (0 === $length) {
+        if (0 === $_length) {
             return '';
         }
 
@@ -2191,7 +2208,7 @@ class StrModule
         $sourceConsonants = [];
         $sourceVowels = [];
         for ( $i = 0; $i < $sourceLen; $i++ ) {
-            $letter = mb_substr($source, $i, 1);
+            $letter = $fnSubstr($source, $i, 1);
 
             ('' === trim($letter, $vowels))
                 ? ($sourceVowels[ $i ] = $letter)
@@ -2201,8 +2218,8 @@ class StrModule
         $letters = [];
 
         $hasVowel = false;
-        $left = $length;
-        for ( $i = 0; $i < $length; $i++ ) {
+        $left = $_length;
+        for ( $i = 0; $i < $_length; $i++ ) {
             $letter = null;
             if (isset($sourceVowels[ $i ])) {
                 if (! $hasVowel) {

@@ -200,7 +200,9 @@ abstract class TypeModuleBase
         }
 
         if (is_object($value)) {
-            if (null === ($cnt = Lib::php()->count($value))) {
+            $cnt = Lib::php()->count($value);
+
+            if (is_float($cnt) && is_nan($cnt)) {
                 // > NON-COUNTABLE is not blank
                 return false;
             }

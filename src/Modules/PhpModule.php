@@ -722,17 +722,60 @@ class PhpModule
     }
 
 
-    public function count($value) : ?int
+    /**
+     * @return int|float
+     */
+    public function count($value) // : int|NAN
     {
         if (is_array($value)) {
             return count($value);
         }
 
-        if ($this->type_countable($_value, $value)) {
-            return count($_value);
+        if ($this->type_countable($countable, $value)) {
+            return count($countable);
         }
 
-        return null;
+        return NAN;
+    }
+
+    /**
+     * @return int|float
+     */
+    public function size($value) // : int|NAN
+    {
+        if (is_array($value)) {
+            return count($value);
+        }
+
+        if ($this->type_countable($countable, $value)) {
+            return count($countable);
+        }
+
+        if (Lib::type()->string($string, $value)) {
+            return strlen($string);
+        }
+
+        return NAN;
+    }
+
+    /**
+     * @return int|float
+     */
+    public function length($value) // : int|NAN
+    {
+        if (is_array($value)) {
+            return count($value);
+        }
+
+        if ($this->type_countable($countable, $value)) {
+            return count($countable);
+        }
+
+        if (Lib::type()->string($string, $value)) {
+            return Lib::str()->strlen($string);
+        }
+
+        return NAN;
     }
 
 
