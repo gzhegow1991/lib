@@ -49,6 +49,29 @@ abstract class AssertModuleBase
         return $this->status;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getResult()
+    {
+        return $this->result;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function triggerError($message, int $error_level = null)
+    {
+        $error_level = $error_level ?? E_USER_NOTICE;
+
+        if (! $this->status) {
+            trigger_error($message, $error_level);
+        }
+
+        return $this;
+    }
+
 
     /**
      * @return mixed|null
@@ -56,39 +79,6 @@ abstract class AssertModuleBase
     public function orNull()
     {
         if (! $this->status) {
-            return null;
-        }
-
-        return $this->result;
-    }
-
-    /**
-     * @return mixed|void
-     */
-    public function orThrow($throwableOrArg, ...$throwableArgs)
-    {
-        if (! $this->status) {
-            Lib::php()->throw(
-                debug_backtrace(),
-                $throwableOrArg, ...$throwableArgs
-            );
-
-            return null;
-        }
-
-        return $this->result;
-    }
-
-    /**
-     * @return mixed|void
-     */
-    public function orTriggerError($message, int $error_level = null)
-    {
-        $error_level = $error_level ?? E_USER_NOTICE;
-
-        if (! $this->status) {
-            trigger_error($message, $error_level);
-
             return null;
         }
 
@@ -106,7 +96,22 @@ abstract class AssertModuleBase
             }
 
             throw new LogicException(
-                'The assert failed, but no fallback provided: ' . $this->fnName
+                'The assert failed, and no fallback provided: ' . $this->fnName
+            );
+        }
+
+        return $this->result;
+    }
+
+    /**
+     * @return mixed|void
+     */
+    public function orThrow($throwableOrArg, ...$throwableArgs)
+    {
+        if (! $this->status) {
+            return Lib::php()->throw(
+                debug_backtrace(),
+                $throwableOrArg, ...$throwableArgs
             );
         }
 

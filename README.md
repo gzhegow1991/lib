@@ -606,14 +606,28 @@ $fn = function () {
     _print('[ AssertModule ]');
     echo PHP_EOL;
 
+    $var = \Gzhegow\Lib\Lib::assert()
+        ->numeric_positive('-1')
+        ->orNull()
+    ;
+    _print($var);
+
+    $var = \Gzhegow\Lib\Lib::assert()
+        ->numeric_positive('-1')
+        ->orFallback([ NAN ])
+    ;
+    _print($var);
+
     $e = null;
     try {
         $var = \Gzhegow\Lib\Lib::assert()
-            ->string_not_empty('')
-            ->orThrow('The value should be non-empty string')
+            ->numeric_positive('-1')
+            ->triggerError('The value should be positive numeric', E_USER_ERROR)
+            ->orNull()
         ;
     }
     catch ( \Throwable $e ) {
+        // > since we are using (new \Gzhegow\Lib\Exception\ErrorHandler())->useErrorHandler() it throws
     }
     _print('[ CATCH ] ' . $e->getMessage());
 
@@ -631,7 +645,9 @@ $fn = function () {
 _assert_stdout($fn, [], '
 "[ AssertModule ]"
 
-"[ CATCH ] The value should be non-empty string"
+NULL
+NAN
+"[ CATCH ] The value should be positive numeric"
 "[ CATCH ] The value should be positive numeric"
 ');
 
