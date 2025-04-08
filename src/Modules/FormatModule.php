@@ -221,7 +221,9 @@ class FormatModule
 
         [ , $iUnit, $sUnit ] = $matches;
 
-        if (! $sUnit) $sUnit = 'B';
+        if ('' === $sUnit) {
+            $sUnit = 'B';
+        }
 
         if (! isset($aUnits[ $sUnit ])) {
             throw new LogicException(
@@ -230,7 +232,7 @@ class FormatModule
         }
 
         $iUnit = (int) $iUnit;
-        if (! $iUnit) {
+        if (0 === $iUnit) {
             return 0;
         }
 
@@ -287,10 +289,15 @@ class FormatModule
         }
 
         $_rows = array_values($rows);
+
         foreach ( $_rows as $i => $row ) {
-            if (! $row) {
+            if (! (is_array($row) && (0 !== count($row)))) {
                 throw new LogicException(
-                    [ 'Each of `rows` should be not-empty array', $row, $i ]
+                    [
+                        'Each of `rows` should be not-empty array',
+                        $row,
+                        $i,
+                    ]
                 );
             }
         }

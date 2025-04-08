@@ -523,7 +523,7 @@ class CallableParser implements CallableParserInterface
             return false;
         }
 
-        if (! $theObject) {
+        if (null === $theObject) {
             return false;
         }
 

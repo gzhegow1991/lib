@@ -66,13 +66,13 @@ class FsModule
      */
     public function type_realpath(
         &$result,
-        $value, bool $allowSymlink = null,
+        $value, bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
         $result = null;
 
-        $allowSymlink = $allowSymlink ?? true;
+        $isAllowSymlink = $isAllowSymlink ?? true;
 
         $withPathInfo = array_key_exists(0, $refs);
 
@@ -86,7 +86,7 @@ class FsModule
             return false;
         }
 
-        if (! $allowSymlink) {
+        if (! $isAllowSymlink) {
             if (is_link($value)) {
                 return false;
             }
@@ -122,14 +122,14 @@ class FsModule
      */
     public function type_dirpath(
         &$result,
-        $value, bool $allowExists = null, bool $allowSymlink = null,
+        $value, bool $isAllowExists = null, bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
         $result = null;
 
-        $allowExists = $allowExists ?? false;
-        $allowSymlink = $allowSymlink ?? true;
+        $isAllowExists = $isAllowExists ?? false;
+        $isAllowSymlink = $isAllowSymlink ?? true;
 
         $status = $this->type_path(
             $_value,
@@ -142,7 +142,7 @@ class FsModule
 
         $exists = file_exists($_value);
 
-        if (! $allowExists) {
+        if (! $isAllowExists) {
             if ($exists) {
                 return false;
             }
@@ -158,7 +158,7 @@ class FsModule
                 return false;
             }
 
-            if (! $allowSymlink) {
+            if (! $isAllowSymlink) {
                 if (is_link($_value)) {
                     return false;
                 }
@@ -178,14 +178,14 @@ class FsModule
      */
     public function type_filepath(
         &$result,
-        $value, bool $allowExists = null, bool $allowSymlink = null,
+        $value, bool $isAllowExists = null, bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
         $result = null;
 
-        $allowExists = $allowExists ?? false;
-        $allowSymlink = $allowSymlink ?? true;
+        $isAllowExists = $isAllowExists ?? false;
+        $isAllowSymlink = $isAllowSymlink ?? true;
 
         $status = $this->type_path(
             $_value,
@@ -198,7 +198,7 @@ class FsModule
 
         $exists = file_exists($_value);
 
-        if (! $allowExists) {
+        if (! $isAllowExists) {
             if ($exists) {
                 return false;
             }
@@ -214,7 +214,7 @@ class FsModule
                 return false;
             }
 
-            if (! $allowSymlink) {
+            if (! $isAllowSymlink) {
                 if (is_link($_value)) {
                     return false;
                 }
@@ -235,17 +235,17 @@ class FsModule
      */
     public function type_dirpath_realpath(
         &$result,
-        $value, bool $allowSymlink = null,
+        $value, bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
         $result = null;
 
-        $allowSymlink = $allowSymlink ?? true;
+        $isAllowSymlink = $isAllowSymlink ?? true;
 
         $status = $this->type_realpath(
             $_value,
-            $value, $allowSymlink,
+            $value, $isAllowSymlink,
             $refs
         );
 
@@ -253,7 +253,7 @@ class FsModule
             return false;
         }
 
-        if (! $allowSymlink) {
+        if (! $isAllowSymlink) {
             if (is_link($value)) {
                 return false;
             }
@@ -274,7 +274,7 @@ class FsModule
      */
     public function type_filepath_realpath(
         &$result,
-        $value, bool $allowSymlink = null,
+        $value, bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
@@ -282,7 +282,7 @@ class FsModule
 
         $status = $this->type_realpath(
             $_value,
-            $value, $allowSymlink,
+            $value, $isAllowSymlink,
             $refs
         );
 
@@ -290,7 +290,7 @@ class FsModule
             return false;
         }
 
-        if (! $allowSymlink) {
+        if (! $isAllowSymlink) {
             if (is_link($value)) {
                 return false;
             }
@@ -624,12 +624,12 @@ class FsModule
         $fh1 = fopen($file1, 'rb');
         $fh2 = fopen($file2, 'rb');
 
-        if (! $fh1) {
+        if (false === $fh1) {
             throw new RuntimeException(
                 [ 'Unable to open file with flags: rb', $file1 ]
             );
         }
-        if (! $fh2) {
+        if (false === $fh2) {
             throw new RuntimeException(
                 [ 'Unable to open file with flags: rb', $file2 ]
             );

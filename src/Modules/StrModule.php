@@ -160,13 +160,15 @@ class StrModule
 
         if (! $isString) {
             if (
-                (is_bool($value))
+                (null === $value)
+                || (is_bool($value))
                 || (is_float($value) && (! is_finite($value)))
                 || (is_array($value))
                 || (is_resource($value))
                 || ('resource (closed)' === gettype($value))
                 || (Lib::type()->is_nil($value))
             ) {
+                // NULL is equal EMPTY STRING but cannot be casted to
                 // BOOLEAN is not string
                 // NAN, INF, -INF is not string
                 // ARRAY is not string
@@ -1295,12 +1297,20 @@ class StrModule
     /**
      * > обрезает у строки подстроку с начала (ltrim, только для строк а не букв)
      */
-    public function lcrop(string $string, string $lcrop, bool $ignoreCase = null, int $limit = -1) : string
+    public function lcrop(string $string, string $needle, bool $ignoreCase = null, int $limit = -1) : string
     {
         $ignoreCase = $ignoreCase ?? true;
 
         if ('' === $string) return $string;
-        if ('' === $lcrop) return $string;
+        if ('' === $needle) return $string;
+        if (0 === $limit) return $string;
+
+        if ($limit < -1) {
+            throw new LogicException(
+                'The `limit` should be GTE -1',
+                $limit
+            );
+        }
 
         $result = $string;
 
@@ -1310,18 +1320,18 @@ class StrModule
             ? $this->mb_func('stripos')
             : $this->mb_func('strpos');
 
-        $pos = $fnStrpos($result, $lcrop);
+        $pos = $fnStrpos($result, $needle);
 
         while ( $pos === 0 ) {
-            if (! $limit--) {
+            if (0 === $limit--) {
                 break;
             }
 
             $result = $fnSubstr($result,
-                $fnStrlen($lcrop)
+                $fnStrlen($needle)
             );
 
-            $pos = $fnStrpos($result, $lcrop);
+            $pos = $fnStrpos($result, $needle);
         }
 
         return $result;
@@ -1330,12 +1340,20 @@ class StrModule
     /**
      * > обрезает у строки подстроку с конца (rtrim, только для строк а не букв)
      */
-    public function rcrop(string $string, string $rcrop, bool $ignoreCase = null, int $limit = -1) : string
+    public function rcrop(string $string, string $needle, bool $ignoreCase = null, int $limit = -1) : string
     {
         $ignoreCase = $ignoreCase ?? true;
 
         if ('' === $string) return $string;
-        if ('' === $rcrop) return $string;
+        if ('' === $needle) return $string;
+        if (0 === $limit) return $string;
+
+        if ($limit < -1) {
+            throw new LogicException(
+                'The `limit` should be GTE -1',
+                $limit
+            );
+        }
 
         $result = $string;
 
@@ -1345,17 +1363,16 @@ class StrModule
             ? $this->mb_func('strripos')
             : $this->mb_func('strrpos');
 
+        $pos = $fnStrrpos($result, $needle);
 
-        $pos = $fnStrrpos($result, $rcrop);
-
-        while ( $pos === ($fnStrlen($result) - $fnStrlen($rcrop)) ) {
-            if (! $limit--) {
+        while ( $pos === ($fnStrlen($result) - $fnStrlen($needle)) ) {
+            if (0 === $limit--) {
                 break;
             }
 
             $result = $fnSubstr($result, 0, $pos);
 
-            $pos = $fnStrrpos($result, $rcrop);
+            $pos = $fnStrrpos($result, $needle);
         }
 
         return $result;
@@ -1364,23 +1381,35 @@ class StrModule
     /**
      * > обрезает у строки подстроки с обеих сторон (trim, только для строк а не букв)
      */
-    public function crop(string $string, $crops, bool $ignoreCase = null, int $limit = -1) : string
+    public function crop(string $string, $crops, bool $ignoreCase = null, $limits = null) : string
     {
-        $crops = is_array($crops)
-            ? $crops
-            : ($crops ? [ $crops ] : []);
+        $_crops = Lib::php()->to_list($crops);
+        $_limits = Lib::php()->to_list($limits ?? [ -1 ]);
 
-        if (! $crops) {
+        if (0 === count($_crops)) {
             return $string;
         }
 
-        $needleRcrop = $needleLcrop = array_shift($crops);
+        if (0 === count($_limits)) {
+            throw new LogicException(
+                'The `limits` should be array of integers or be null',
+                $limits
+            );
+        }
 
-        if ($crops) $needleRcrop = array_shift($crops);
+        $needleLcrop = array_shift($_crops);
+        $needleRcrop = (0 !== count($_crops))
+            ? array_shift($_crops)
+            : $needleLcrop;
+
+        $limitLcrop = array_shift($_limits);
+        $limitRcrop = (0 !== count($_limits))
+            ? array_shift($_limits)
+            : $limitLcrop;
 
         $result = $string;
-        $result = $this->lcrop($result, $needleLcrop, $ignoreCase, $limit);
-        $result = $this->rcrop($result, $needleRcrop, $ignoreCase, $limit);
+        $result = $this->lcrop($result, $needleLcrop, $ignoreCase, $limitLcrop);
+        $result = $this->rcrop($result, $needleRcrop, $ignoreCase, $limitRcrop);
 
         return $result;
     }
@@ -1389,17 +1418,23 @@ class StrModule
     /**
      * > добавляет подстроку в начало строки, если её уже там нет
      */
-    public function unlcrop(string $string, string $lcrop, int $times = null, bool $ignoreCase = null) : string
+    public function unlcrop(string $string, string $needle, int $times = 1, bool $ignoreCase = null) : string
     {
-        $times = $times ?? 1;
         $ignoreCase = $ignoreCase ?? true;
 
-        if ('' === $lcrop) return $string;
-        if ($times < 1) $times = 1;
+        if ('' === $needle) return $string;
+        if (0 === $times) return $string;
+
+        if ($times < 1) {
+            throw new LogicException(
+                'The `times` should be GTE 1',
+                $times
+            );
+        }
 
         $result = $string;
-        $result = $this->lcrop($result, $lcrop, $ignoreCase);
-        $result = str_repeat($lcrop, $times) . $result;
+        $result = $this->lcrop($result, $needle, $ignoreCase, -1);
+        $result = str_repeat($needle, $times) . $result;
 
         return $result;
     }
@@ -1407,17 +1442,23 @@ class StrModule
     /**
      * > добавляет подстроку в конец строки, если её уже там нет
      */
-    public function unrcrop(string $string, string $rcrop, int $times = null, bool $ignoreCase = null) : string
+    public function unrcrop(string $string, string $needle, int $times = 1, bool $ignoreCase = null) : string
     {
-        $times = $times ?? 1;
         $ignoreCase = $ignoreCase ?? true;
 
-        if ('' === $rcrop) return $string;
-        if ($times < 1) $times = 1;
+        if ('' === $needle) return $string;
+        if (0 === $times) return $string;
+
+        if ($times < 1) {
+            throw new LogicException(
+                'The `times` should be GTE 1',
+                $times
+            );
+        }
 
         $result = $string;
-        $result = $this->rcrop($result, $rcrop, $ignoreCase);
-        $result = $result . str_repeat($rcrop, $times);
+        $result = $this->rcrop($result, $needle, $ignoreCase, -1);
+        $result = $result . str_repeat($needle, $times);
 
         return $result;
     }
@@ -1430,18 +1471,33 @@ class StrModule
      */
     public function uncrop(string $string, $crops, $times = null, bool $ignoreCase = null) : string
     {
-        $times = $times ?? 1;
+        $_crops = Lib::php()->to_list($crops);
+        $_times = Lib::php()->to_list($times ?? [ 1 ]);
 
-        $_crops = (array) $crops;
-        $_times = (array) $times;
-
-        if (! $_crops) {
+        if (0 === count($_crops)) {
             return $string;
         }
 
+        if (0 === count($_times)) {
+            throw new LogicException(
+                'The `times` should be array of integers or be null',
+                $times
+            );
+        }
+
+        $needleLcrop = array_shift($_crops);
+        $needleRcrop = (0 !== count($_crops))
+            ? array_shift($_crops)
+            : $needleLcrop;
+
+        $timesLcrop = array_shift($_times);
+        $timesRcrop = (0 !== count($_times))
+            ? array_shift($_times)
+            : $timesLcrop;
+
         $result = $string;
-        $result = $this->unlcrop($result, $_crops[ 0 ], $_times[ 0 ], $ignoreCase);
-        $result = $this->unrcrop($result, $_crops[ 1 ] ?? $_crops[ 0 ], $_times[ 1 ] ?? $_times[ 0 ], $ignoreCase);
+        $result = $this->unlcrop($result, $needleLcrop, $timesLcrop, $ignoreCase);
+        $result = $this->unrcrop($result, $needleRcrop, $timesRcrop, $ignoreCase);
 
         return $result;
     }

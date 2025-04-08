@@ -98,7 +98,7 @@ class CliModule
         while ( false !== ($line = fgets($h)) ) {
             $line = trim($line);
 
-            if (! $line) {
+            if ('' === $line) {
                 echo '> Write `' . $delimiter . '` when done...' . PHP_EOL;
 
                 continue;
@@ -133,11 +133,11 @@ class CliModule
     {
         $yesQuestion = $yesQuestion ?? 'n';
 
-        $yes = ('y' === $yesQuestion) || ('yy' === $yesQuestion);
-        $all = ('nn' === $yesQuestion) || ('yy' === $yesQuestion);
+        $isYes = ('y' === $yesQuestion) || ('yy' === $yesQuestion);
+        $isAll = ('nn' === $yesQuestion) || ('yy' === $yesQuestion);
 
-        if (! $all) {
-            if (! $yes) {
+        if (! $isAll) {
+            if (! $isYes) {
                 $accepted = [ 'yy', 'y', 'n', 'nn' ];
 
                 echo $message . ' [' . implode('/', $accepted) . ']' . PHP_EOL;
@@ -148,15 +148,15 @@ class CliModule
 
                 $yesQuestion = $passed;
 
-                $yes = ('y' === $yesQuestion) || ('yy' === $yesQuestion);
-                $all = ('nn' === $yesQuestion) || ('yy' === $yesQuestion);
+                $isYes = ('y' === $yesQuestion) || ('yy' === $yesQuestion);
+                $isAll = ('nn' === $yesQuestion) || ('yy' === $yesQuestion);
             }
 
-            if (! $all) {
+            if (! $isAll) {
                 $yesQuestion = null;
             }
         }
 
-        return $yes;
+        return $isYes;
     }
 }

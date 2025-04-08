@@ -559,16 +559,16 @@ class DebugBacktracer
                         continue;
                     }
 
-                    $found = false;
+                    $isFound = false;
                     foreach ( $filter[ $key ] as $v ) {
                         if ($v === $t[ $key ]) {
-                            $found = true;
+                            $isFound = true;
 
                             break;
                         }
                     }
 
-                    if (! $found) {
+                    if (! $isFound) {
                         unset($trace[ $i ]);
 
                         continue 2;
@@ -588,16 +588,16 @@ class DebugBacktracer
                         continue;
                     }
 
-                    $found = false;
+                    $isFound = false;
                     foreach ( $filterStartsWith[ $key ] as $v ) {
                         if (0 === stripos($t[ $key ], $v)) {
-                            $found = true;
+                            $isFound = true;
 
                             break;
                         }
                     }
 
-                    if (! $found) {
+                    if (! $isFound) {
                         unset($trace[ $i ]);
 
                         continue 2;

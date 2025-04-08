@@ -9,6 +9,40 @@ use Gzhegow\Lib\Modules\Type\Base\ParseModuleBase;
 
 class PregModule extends ParseModuleBase
 {
+    /**
+     * @param string|null $result
+     */
+    public function type_regex(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! Lib::type()->string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        error_clear_last();
+
+        try {
+            $status = preg_match($_value, '');
+        }
+        catch ( \Throwable $e ) {
+            return false;
+        }
+
+        if (error_get_last()) {
+            return false;
+        }
+
+        if (false === $status) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+
     public function preg_quote_ord(string $string, string $mb_encoding = null) : string
     {
         $theMb = Lib::mb();

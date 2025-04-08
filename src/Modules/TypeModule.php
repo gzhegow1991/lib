@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Arr\ArrPath;
 use Gzhegow\Lib\Modules\Type\Number;
 use Gzhegow\Lib\Modules\Str\Alphabet;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
@@ -737,11 +738,11 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    public function numeric(&$result, $value, bool $isAllowExp = null, array $refs = []) : bool
     {
         $result = null;
 
-        $allowExp = $allowExp ?? true;
+        $isAllowExp = $isAllowExp ?? true;
 
         $withSplit = array_key_exists(0, $refs);
 
@@ -765,7 +766,7 @@ class TypeModule extends TypeModuleBase
             if ($isFloat || is_int($value)) {
                 $valueString = (string) $value;
 
-                if (! $allowExp) {
+                if (! $isAllowExp) {
                     if (false !== strpos($valueString, 'e')) {
                         unset($refSplit);
 
@@ -804,7 +805,7 @@ class TypeModule extends TypeModuleBase
 
             $exp = $number->getExp();
 
-            if (! $allowExp) {
+            if (! $isAllowExp) {
                 if ('' !== $exp) {
                     unset($refSplit);
 
@@ -838,7 +839,7 @@ class TypeModule extends TypeModuleBase
             . '([+-]?)'
             . '((?:0|[1-9]\d*))'
             . '(\.\d+)?'
-            . ($allowExp ? '([eE][+-]?\d+)?' : '')
+            . ($isAllowExp ? '([eE][+-]?\d+)?' : '')
             . '$/';
 
         if (! preg_match($regex, $valueTrim, $matches)) {
@@ -1010,7 +1011,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_int(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    public function numeric_int(&$result, $value, array $refs = []) : bool
     {
         $result = null;
 
@@ -1018,21 +1019,17 @@ class TypeModule extends TypeModuleBase
 
         $refSplit =& $refs[ 0 ];
 
-        if (! $this->numeric($_value, $value, $allowExp, $refs)) {
+        // > btw, 1.1e1 is can be converted to integer too
+        // > there's we better dont support that numbers
+        if (! $this->numeric($_value, $value, false, $refs)) {
             unset($refSplit);
 
             return false;
         }
 
-        [ , , $frac, $exp ] = $refSplit;
+        [ , , $frac ] = $refSplit;
 
-        if (
-            ('' !== $frac)
-            || ('' !== $exp)
-        ) {
-            // > btw, 1.1e1 is can be converted to integer too
-            // > there's we better dont support that numbers
-
+        if ('' !== $frac) {
             unset($refSplit);
 
             if (! $withSplit) {
@@ -1056,11 +1053,11 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_int_non_zero(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    public function numeric_int_non_zero(&$result, $value, array $refs = []) : bool
     {
         $result = null;
 
-        if (! $this->numeric_int($_value, $value, $allowExp, $refs)) {
+        if (! $this->numeric_int($_value, $value, $refs)) {
             return false;
         }
 
@@ -1076,11 +1073,11 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_int_non_negative(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    public function numeric_int_non_negative(&$result, $value, array $refs = []) : bool
     {
         $result = null;
 
-        if (! $this->numeric_int($_value, $value, $allowExp, $refs)) {
+        if (! $this->numeric_int($_value, $value, $refs)) {
             return false;
         }
 
@@ -1102,11 +1099,11 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_int_non_positive(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    public function numeric_int_non_positive(&$result, $value, array $refs = []) : bool
     {
         $result = null;
 
-        if (! $this->numeric_int($_value, $value, $allowExp, $refs)) {
+        if (! $this->numeric_int($_value, $value, $refs)) {
             return false;
         }
 
@@ -1128,11 +1125,11 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_int_negative(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    public function numeric_int_negative(&$result, $value, array $refs = []) : bool
     {
         $result = null;
 
-        if (! $this->numeric_int($_value, $value, $allowExp, $refs)) {
+        if (! $this->numeric_int($_value, $value, $refs)) {
             return false;
         }
 
@@ -1152,11 +1149,11 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_int_positive(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    public function numeric_int_positive(&$result, $value, array $refs = []) : bool
     {
         $result = null;
 
-        if (! $this->numeric_int($_value, $value, $allowExp, $refs)) {
+        if (! $this->numeric_int($_value, $value, $refs)) {
             return false;
         }
 
@@ -1295,18 +1292,18 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function ctype_alpha(&$result, $value, bool $ignoreCase = null) : bool
+    public function ctype_alpha(&$result, $value, bool $isIgnoreCase = null) : bool
     {
         $result = null;
 
-        $ignoreCase = $ignoreCase ?? true;
+        $isIgnoreCase = $isIgnoreCase ?? true;
 
         if (! $this->string_not_empty($_value, $value)) {
             return false;
         }
 
         if (extension_loaded('ctype')) {
-            if (! $ignoreCase) {
+            if (! $isIgnoreCase) {
                 if (strtolower($_value) !== $_value) {
                     return false;
                 }
@@ -1321,7 +1318,7 @@ class TypeModule extends TypeModuleBase
             return false;
         }
 
-        $regexFlags = $ignoreCase
+        $regexFlags = $isIgnoreCase
             ? 'i'
             : '';
 
@@ -1337,18 +1334,18 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function ctype_alnum(&$result, $value, bool $ignoreCase = null) : bool
+    public function ctype_alnum(&$result, $value, bool $isIgnoreCase = null) : bool
     {
         $result = null;
 
-        $ignoreCase = $ignoreCase ?? true;
+        $isIgnoreCase = $isIgnoreCase ?? true;
 
         if (! $this->string_not_empty($_value, $value)) {
             return false;
         }
 
         if (extension_loaded('ctype')) {
-            if (! $ignoreCase) {
+            if (! $isIgnoreCase) {
                 if (strtolower($_value) !== $_value) {
                     return false;
                 }
@@ -1363,7 +1360,7 @@ class TypeModule extends TypeModuleBase
             return false;
         }
 
-        $regexFlags = $ignoreCase
+        $regexFlags = $isIgnoreCase
             ? 'i'
             : '';
 
@@ -1495,36 +1492,20 @@ class TypeModule extends TypeModuleBase
 
 
     /**
+     * @param ArrPath|null $result
+     */
+    public function arrpath(&$result, $path, array $pathes = null, string $dot = null) : bool
+    {
+        return Lib::arr()->type_arrpath($result, $path, $pathes, $dot);
+    }
+
+
+    /**
      * @param string|null $result
      */
     public function regex(&$result, $value) : bool
     {
-        $result = null;
-
-        if (! $this->string_not_empty($_value, $value)) {
-            return false;
-        }
-
-        error_clear_last();
-
-        try {
-            $status = preg_match($_value, '');
-        }
-        catch ( \Throwable $e ) {
-            return false;
-        }
-
-        if (error_get_last()) {
-            return false;
-        }
-
-        if (false === $status) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::preg()->type_regex($result, $value);
     }
 
 
@@ -1533,7 +1514,7 @@ class TypeModule extends TypeModuleBase
      */
     public function ip(&$result, $value) : bool
     {
-        return Lib::net()->type_ip($result, $value);
+        return Lib::net()->type_address_ip($result, $value);
     }
 
 

@@ -165,8 +165,8 @@ class Inflector implements InflectorInterface
             );
         }
         catch ( \Throwable $e ) {
-            if (! $array) {
-                throw new RuntimeException($e->getMessage(), null, $e);
+            if (0 === count($array)) {
+                throw new RuntimeException('Unable to ' . __FUNCTION__, null, $e);
             }
         }
 
@@ -207,8 +207,8 @@ class Inflector implements InflectorInterface
             );
         }
         catch ( \Throwable $e ) {
-            if (! $array) {
-                throw new RuntimeException($e->getMessage(), null, $e);
+            if (0 === count($array)) {
+                throw new RuntimeException('Unable to ' . __FUNCTION__, null, $e);
             }
         }
 

@@ -70,7 +70,7 @@ class ItertoolsModule
             $isFloatStep = false;
         }
 
-        if (! $_step) {
+        if (0 == $_step) {
             return;
         }
 

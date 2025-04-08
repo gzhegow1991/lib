@@ -2296,6 +2296,127 @@ NULL
 
 
 // >>> TEST
+// > тесты NetModule
+$fn = function () {
+    _print('[ NetModule ]');
+    echo PHP_EOL;
+
+    $ipV4List = [
+        '192.168.1.10',
+        '192.168.2.10',
+        '10.0.0.1',
+        '10.0.1.1',
+    ];
+    $subnetV4List = [
+        '192.168.1.10/32',
+        '192.168.1.10/24',
+        '192.168.1.10/16',
+        '10.0.0.1/32',
+        '10.0.0.1/24',
+        '10.0.0.1/16',
+    ];
+
+    foreach ( $ipV4List as $i => $ip ) {
+        foreach ( $subnetV4List as $ii => $subnet ) {
+            $status1 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet($ip, $subnet);
+            $status2 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet_v4($ip, $subnet);
+
+            _print($ip, $subnet, $status1, $status1 === $status2);
+        }
+
+        echo PHP_EOL;
+    }
+
+    $ipV6List = [
+        '2001:db8::',
+        '2001:db8::1',
+        '2001:db8:0:1::1',
+        'fe80::1',
+        '::1',
+    ];
+    $subnetV6List = [
+        '2001:db8::/128',
+        '2001:db8::/64',
+        'fe80::/10',
+        '::1/128',
+        '::/0',
+    ];
+
+    foreach ( $ipV6List as $i => $ip ) {
+        foreach ( $subnetV6List as $ii => $subnet ) {
+            $status1 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet($ip, $subnet);
+            $status2 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet_v6($ip, $subnet);
+
+            _print($ip, $subnet, $status1, $status1 === $status2);
+        }
+
+        echo PHP_EOL;
+    }
+};
+_assert_stdout($fn, [], '
+"[ NetModule ]"
+
+"192.168.1.10" | "192.168.1.10/32" | TRUE | TRUE
+"192.168.1.10" | "192.168.1.10/24" | TRUE | TRUE
+"192.168.1.10" | "192.168.1.10/16" | TRUE | TRUE
+"192.168.1.10" | "10.0.0.1/32" | FALSE | TRUE
+"192.168.1.10" | "10.0.0.1/24" | FALSE | TRUE
+"192.168.1.10" | "10.0.0.1/16" | FALSE | TRUE
+
+"192.168.2.10" | "192.168.1.10/32" | FALSE | TRUE
+"192.168.2.10" | "192.168.1.10/24" | FALSE | TRUE
+"192.168.2.10" | "192.168.1.10/16" | TRUE | TRUE
+"192.168.2.10" | "10.0.0.1/32" | FALSE | TRUE
+"192.168.2.10" | "10.0.0.1/24" | FALSE | TRUE
+"192.168.2.10" | "10.0.0.1/16" | FALSE | TRUE
+
+"10.0.0.1" | "192.168.1.10/32" | FALSE | TRUE
+"10.0.0.1" | "192.168.1.10/24" | FALSE | TRUE
+"10.0.0.1" | "192.168.1.10/16" | FALSE | TRUE
+"10.0.0.1" | "10.0.0.1/32" | TRUE | TRUE
+"10.0.0.1" | "10.0.0.1/24" | TRUE | TRUE
+"10.0.0.1" | "10.0.0.1/16" | TRUE | TRUE
+
+"10.0.1.1" | "192.168.1.10/32" | FALSE | TRUE
+"10.0.1.1" | "192.168.1.10/24" | FALSE | TRUE
+"10.0.1.1" | "192.168.1.10/16" | FALSE | TRUE
+"10.0.1.1" | "10.0.0.1/32" | FALSE | TRUE
+"10.0.1.1" | "10.0.0.1/24" | FALSE | TRUE
+"10.0.1.1" | "10.0.0.1/16" | TRUE | TRUE
+
+"2001:db8::" | "2001:db8::/128" | TRUE | TRUE
+"2001:db8::" | "2001:db8::/64" | TRUE | TRUE
+"2001:db8::" | "fe80::/10" | FALSE | TRUE
+"2001:db8::" | "::1/128" | FALSE | TRUE
+"2001:db8::" | "::/0" | TRUE | TRUE
+
+"2001:db8::1" | "2001:db8::/128" | FALSE | TRUE
+"2001:db8::1" | "2001:db8::/64" | TRUE | TRUE
+"2001:db8::1" | "fe80::/10" | FALSE | TRUE
+"2001:db8::1" | "::1/128" | FALSE | TRUE
+"2001:db8::1" | "::/0" | TRUE | TRUE
+
+"2001:db8:0:1::1" | "2001:db8::/128" | FALSE | TRUE
+"2001:db8:0:1::1" | "2001:db8::/64" | FALSE | TRUE
+"2001:db8:0:1::1" | "fe80::/10" | FALSE | TRUE
+"2001:db8:0:1::1" | "::1/128" | FALSE | TRUE
+"2001:db8:0:1::1" | "::/0" | TRUE | TRUE
+
+"fe80::1" | "2001:db8::/128" | FALSE | TRUE
+"fe80::1" | "2001:db8::/64" | FALSE | TRUE
+"fe80::1" | "fe80::/10" | TRUE | TRUE
+"fe80::1" | "::1/128" | FALSE | TRUE
+"fe80::1" | "::/0" | TRUE | TRUE
+
+"::1" | "2001:db8::/128" | FALSE | TRUE
+"::1" | "2001:db8::/64" | FALSE | TRUE
+"::1" | "fe80::/10" | FALSE | TRUE
+"::1" | "::1/128" | TRUE | TRUE
+"::1" | "::/0" | TRUE | TRUE
+');
+
+
+// >>> TEST
 // > тесты ParseModule
 $fn = function () {
     _print('[ ParseModule ]');

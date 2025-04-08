@@ -234,7 +234,7 @@ abstract class AbstractConfig implements
 
     protected function validationRecursive(array &$context = []) : bool
     {
-        $result = null;
+        $status = null;
 
         $path = $context[ '__path' ] ?? [];
         $key = $context[ '__key' ] ?? null;
@@ -249,22 +249,22 @@ abstract class AbstractConfig implements
             $context[ '__parent' ] = $this;
 
             // ! recursion
-            $result = $child->validationRecursive($context);
+            $status = $child->validationRecursive($context);
 
-            if (! $result) {
+            if (! $status) {
                 break;
             }
         }
 
-        if (null === $result) {
+        if (null === $status) {
             $context[ '__path' ] = $path;
             $context[ '__key' ] = $key;
             $context[ '__parent' ] = $parent;
 
-            $result = $this->validation($context);
+            $status = $this->validation($context);
         }
 
-        return $result;
+        return $status;
     }
 
     protected function validation(array &$context = []) : bool

@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Arr\ArrPath;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
@@ -235,6 +236,41 @@ class ArrModule
     }
 
 
+    /**
+     * @param ArrPath|null $result
+     */
+    public function type_arrpath(&$result, $path, array $pathes = null, string $dot = null) : bool
+    {
+        $result = null;
+
+        $pathes = $pathes ?? [];
+
+        $hasPathes = (0 !== count($pathes));
+
+        if (! $hasPathes) {
+            if ($path instanceof ArrPath) {
+                $result = $path;
+
+                return true;
+            }
+        }
+
+        try {
+            $array = (null !== $dot)
+                ? $this->arrpath_dot($dot, $path, ...$pathes)
+                : $this->arrpath($path, ...$pathes);
+
+            $result = new ArrPath($array);
+
+            return true;
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        return false;
+    }
+
+
     public function has(
         $array, $key,
         array $refs = []
@@ -302,7 +338,7 @@ class ArrModule
      */
     public function first(array $array, array $fallback = []) // : ?mixed
     {
-        if (! $array) {
+        if (0 === count($array)) {
             if ($fallback) {
                 [ $fallback ] = $fallback;
 
@@ -332,7 +368,7 @@ class ArrModule
      */
     public function last(array $array, array $fallback = []) // : ?mixed
     {
-        if (! $array) {
+        if (0 === count($array)) {
             if ($fallback) {
                 [ $fallback ] = $fallback;
 
@@ -403,7 +439,7 @@ class ArrModule
         }
 
         while ( null !== ($k = key($copyArray)) ) {
-            if (! $abs--) {
+            if (0 === $abs) {
                 $refValue = $array[ $k ];
                 $refKey = $k;
 
@@ -411,12 +447,13 @@ class ArrModule
                 unset($refKey);
 
                 return true;
-
-            } else {
-                $isNegativePos
-                    ? prev($copyArray)
-                    : next($copyArray);
             }
+
+            $isNegativePos
+                ? prev($copyArray)
+                : next($copyArray);
+
+            $abs--;
         }
 
         return false;
@@ -459,60 +496,117 @@ class ArrModule
     }
 
 
-    public function path($path, ...$pathes) : array
+    public function arrpath($path, ...$pathes) : array
     {
-        $result = [];
+        $hasPathes = (0 !== count($pathes));
 
-        $array = [ $path, $pathes ];
+        if (! $hasPathes) {
+            if ($path instanceof ArrPath) {
+                return $path->getPath();
+            }
+        }
 
-        array_walk_recursive($array,
-            function ($value) use (
-                &$result
-            ) {
-                if (! Lib::type()->string($_value, $value)) {
+        $theType = Lib::type();
+
+        $array = [ $path ];
+        if ($hasPathes) {
+            $array[] = $pathes;
+        }
+
+        $gen = $this->walk_it($array);
+
+        $arrpath = [];
+
+        foreach ( $gen as $genPath => $p ) {
+            if ($p instanceof ArrPath) {
+                $result = array_merge($arrpath, $p->getPath());
+
+            } else {
+                if (! $theType->string($pString, $p)) {
                     throw new LogicException(
                         [
-                            'Each of `path` or its children should be stringable value (btw, null is not stringable)',
-                            $value,
+                            'Each of `path` or its children should be non-null stringable or instance of: ' . ArrPath::class,
+                            $p,
+                            $genPath,
                         ]
                     );
                 }
 
-                $result[] = $_value;
+                $arrpath[] = $pString;
             }
-        );
+        }
 
-        return $result;
+        if (! count($arrpath)) {
+            throw new LogicException(
+                [
+                    'Result path is empty',
+                    $path,
+                    $pathes,
+                ]
+            );
+        }
+
+        return $arrpath;
     }
 
-    public function path_dot(string $dot, $path, ...$pathes) : array
+    public function arrpath_dot(string $dot, $path, ...$pathes) : array
     {
-        $result = [];
+        if ('' === $dot) {
+            throw new LogicException('The `dot` should be non-empty string');
+        }
 
-        $array = [ $path, $pathes ];
+        $hasPathes = (0 !== count($pathes));
 
-        array_walk_recursive($array,
-            function ($value) use (
-                &$result,
-                &$dot
-            ) {
-                if (! Lib::type()->string($_value, $value)) {
+        if (! $hasPathes) {
+            if ($path instanceof ArrPath) {
+                return $path->getPath();
+            }
+        }
+
+        $theType = Lib::type();
+
+        $array = [ $path ];
+        if ($hasPathes) {
+            $array[] = $pathes;
+        }
+
+        $gen = $this->walk_it($array);
+
+        $arrpath = [];
+
+        foreach ( $gen as $genPath => $p ) {
+            if ($p instanceof ArrPath) {
+                $result = array_merge($arrpath, $p->getPath());
+
+            } else {
+                if (! $theType->string($pString, $p)) {
                     throw new LogicException(
                         [
-                            'Each of `path` or its children should be stringable value (btw, null is not stringable)',
-                            $value,
+                            'Each of `path` or its children should be non-null stringable or instance of: ' . ArrPath::class,
+                            $p,
+                            $genPath,
                         ]
                     );
                 }
 
-                $result = array_merge(
-                    $result,
-                    explode($dot, $_value)
+                $arrpath = array_merge(
+                    $arrpath,
+                    explode($dot, $pString)
                 );
             }
-        );
+        }
 
-        return $result;
+        if (! count($arrpath)) {
+            throw new LogicException(
+                [
+                    'Result path is empty',
+                    $path,
+                    $pathes,
+                ]
+            );
+        }
+
+        return $arrpath;
     }
 
 
@@ -536,12 +630,11 @@ class ArrModule
             $refKey = null;
         }
 
-        try {
-            $pathArray = $this->path($path);
-        }
-        catch ( \Throwable $e ) {
+        if (! $this->type_arrpath($thePath, $path)) {
             return false;
         }
+
+        $pathArray = $thePath->getPath();
 
         $refCurrent =& $array;
 
@@ -593,13 +686,13 @@ class ArrModule
      */
     public function &fetch_path(array &$array, $path) // : mixed
     {
-        $pathArray = $this->path($path);
-
-        if (! $pathArray) {
+        if (! $this->type_arrpath($thePath, $path)) {
             throw new LogicException(
-                'Unable to ' . __FUNCTION__ . ' due to empty path'
+                'Unable to ' . __FUNCTION__ . ' due to invalid path'
             );
         }
+
+        $pathArray = $thePath->getPath();
 
         $refCurrent =& $array;
 
@@ -614,7 +707,7 @@ class ArrModule
                 unset($refCurrent);
                 $refCurrent = null;
 
-                if (! $pathArray) {
+                if (0 === count($pathArray)) {
                     throw new RuntimeException(
                         [
                             'Unable to ' . __FUNCTION__ . ': missing key in array',
@@ -675,16 +768,13 @@ class ArrModule
      */
     public function &put_path(array &$array, $path, $value) // : &mixed
     {
-        $pathArray = $this->path($path);
-
-        if (! $pathArray) {
+        if (! $this->type_arrpath($thePath, $path)) {
             throw new LogicException(
-                [
-                    'Unable to ' . __FUNCTION__ . ': the path should be not empty string or array of',
-                    $path,
-                ]
+                'Unable to ' . __FUNCTION__ . ' due to invalid path'
             );
         }
+
+        $pathArray = $thePath->getPath();
 
         $refCurrent =& $array;
 
@@ -732,13 +822,13 @@ class ArrModule
      */
     public function unset_path(array &$array, $path) : bool
     {
-        $fullpath = $this->path($path);
-
-        if (! $fullpath) {
+        if (! $this->type_arrpath($thePath, $path)) {
             throw new LogicException(
-                'Unable to ' . __FUNCTION__ . ' due to empty path'
+                'Unable to ' . __FUNCTION__ . ' due to invalid path'
             );
         }
+
+        $pathArray = $thePath->getPath();
 
         $refCurrent =& $array;
 
@@ -747,7 +837,7 @@ class ArrModule
         $pathStep = null;
 
         $refPrevious = null;
-        foreach ( $fullpath as $pathStep ) {
+        foreach ( $pathArray as $pathStep ) {
             $refPrevious =& $refCurrent;
 
             if (! is_array($refCurrent)) {
@@ -912,7 +1002,7 @@ class ArrModule
      */
     public function map(array $src, $fn = null) : array
     {
-        if (! $fn) {
+        if (null === $fn) {
             return [];
         }
 
@@ -952,7 +1042,7 @@ class ArrModule
      */
     public function keep(array $src, $fn = null) : array
     {
-        if (! $fn) {
+        if (null === $fn) {
             return [];
         }
 
@@ -985,7 +1075,7 @@ class ArrModule
      */
     public function keep_new(array $src, $new = null, $fn = null) : array
     {
-        if (! $fn) {
+        if (null === $fn) {
             foreach ( $src as $key => $val ) {
                 $src[ $key ] = $new;
             }
@@ -1023,7 +1113,7 @@ class ArrModule
      */
     public function drop(array $src, $fn = null) : array
     {
-        if (! $fn) {
+        if (null === $fn) {
             return $src;
         }
 
@@ -1054,7 +1144,7 @@ class ArrModule
      */
     public function drop_new(array $src, $new = null, $fn = null) : array
     {
-        if (! $fn) {
+        if (null === $fn) {
             return $src;
         }
 
@@ -1243,7 +1333,7 @@ class ArrModule
      */
     public function diff(array ...$arrays) : array
     {
-        if (! $arrays) {
+        if (0 === count($arrays)) {
             return [];
         }
 
@@ -1261,7 +1351,7 @@ class ArrModule
      */
     public function diff_key(array ...$arrays) : array
     {
-        if (! $arrays) {
+        if (0 === count($arrays)) {
             return [];
         }
 
@@ -1279,7 +1369,7 @@ class ArrModule
      */
     public function intersect(array ...$arrays) : array
     {
-        if (! $arrays) {
+        if (0 === count($arrays)) {
             return [];
         }
 
@@ -1297,7 +1387,7 @@ class ArrModule
      */
     public function intersect_key(array ...$arrays) : array
     {
-        if (! $arrays) {
+        if (0 === count($arrays)) {
             return [];
         }
 
@@ -1409,7 +1499,7 @@ class ArrModule
      */
     public function &walk_it(array &$array, int $flags = null) : \Generator
     {
-        if (! $array) return;
+        if (0 === count($array)) return;
 
         $flags = $flags ?? 0;
 
@@ -1668,13 +1758,13 @@ class ArrModule
 
                         $values = [];
                         foreach ( $keyList as $idx => $key ) {
-                            $found = $this->has_path(
+                            $isFound = $this->has_path(
                                 $arrayList[ $idx ], $path,
                                 [ &$value ]
                             );
 
-                            if ($found || $fallback) {
-                                if (! $found) {
+                            if ($isFound || $fallback) {
+                                if (! $isFound) {
                                     [ $value ] = $fallback;
                                 }
 

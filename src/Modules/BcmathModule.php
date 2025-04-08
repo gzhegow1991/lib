@@ -190,14 +190,14 @@ class BcmathModule
             );
         }
 
-        $fractional = $bcnum->getFrac();
+        $frac = $bcnum->getFrac();
 
-        if (! $fractional) {
+        if ('' === $frac) {
             return $bcnum;
         }
 
         $value = $bcnum->getValue();
-        $minus = $bcnum->getSign();
+        $sign = $bcnum->getSign();
 
         $_scale = $this->scale_max($scale);
 
@@ -214,7 +214,7 @@ class BcmathModule
             );
         }
 
-        if (! $minus) {
+        if ('' === $sign) {
             $result = bcadd($result, '1');
         }
 
@@ -246,9 +246,9 @@ class BcmathModule
             );
         }
 
-        $fractional = $bcnum->getFrac();
+        $frac = $bcnum->getFrac();
 
-        if (! $fractional) {
+        if ('' === $frac) {
             return $bcnum;
         }
 
@@ -357,9 +357,9 @@ class BcmathModule
             );
         }
 
-        $fractional = $bcnum->getFrac();
+        $frac = $bcnum->getFrac();
 
-        if (! $fractional) {
+        if ('' === $frac) {
             return $bcnum;
         }
 
@@ -416,9 +416,9 @@ class BcmathModule
             );
         }
 
-        $fractional = $bcnum->getFrac();
+        $frac = $bcnum->getFrac();
 
-        if (! $fractional) {
+        if ('' === $frac) {
             return $bcnum;
         }
 

@@ -1393,7 +1393,7 @@ class DebugModule
 
     public function print_table(array $table, bool $return = null) : ?string
     {
-        if (! $cnt = count($table)) {
+        if (0 === count($table)) {
             return null;
         }
 

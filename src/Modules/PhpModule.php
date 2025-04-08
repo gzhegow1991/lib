@@ -465,8 +465,12 @@ class PhpModule
     }
 
 
-    public function to_bool($value, array $options = []) : int
+    public function to_bool($value, array $options = []) : bool
     {
+        if (is_bool($value)) {
+            return $value;
+        }
+
         if ($value instanceof ToBoolInterface) {
             return $value->toBool($options);
         }
@@ -498,6 +502,10 @@ class PhpModule
 
     public function to_int($value, array $options = []) : int
     {
+        if (is_int($value)) {
+            return $value;
+        }
+
         if ($value instanceof ToIntegerInterface) {
             return $value->toInteger($options);
         }
@@ -509,6 +517,7 @@ class PhpModule
             || (is_float($value) && (! is_finite($value)))
             || (is_resource($value))
             || ('resource (closed)' === gettype($value))
+            || (Lib::type()->is_nil($value))
         ) {
             throw new LogicException(
                 [
@@ -532,6 +541,19 @@ class PhpModule
 
     public function to_float($value, array $options = []) : float
     {
+        if (is_float($value)) {
+            if (! is_nan($value)) {
+                throw new LogicException(
+                    [
+                        'Unable to parse value while converting to float',
+                        $value,
+                    ]
+                );
+            }
+
+            return $value;
+        }
+
         if ($value instanceof ToFloatInterface) {
             return $value->toFloat($options);
         }
@@ -540,9 +562,9 @@ class PhpModule
             (null === $value)
             || (is_bool($value))
             || (is_array($value))
-            || (is_float($value) && (! is_finite($value)))
             || (is_resource($value))
             || ('resource (closed)' === gettype($value))
+            || (Lib::type()->is_nil($value))
         ) {
             throw new LogicException(
                 [
@@ -566,12 +588,17 @@ class PhpModule
 
     public function to_string($value, array $options = []) : string
     {
+        if (is_string($value)) {
+            return $value;
+        }
+
         if ($value instanceof ToStringInterface) {
             return $value->toString($options);
         }
 
         if (
-            (is_bool($value))
+            (null === $value)
+            || (is_bool($value))
             || (is_array($value))
             || (is_float($value) && (! is_finite($value)))
             || (is_resource($value))
@@ -594,17 +621,41 @@ class PhpModule
 
     public function to_array($value, array $options = []) : array
     {
-        if ($value instanceof ToArrayInterface) {
-            return $value->toArray($options);
+        if (is_array($value)) {
+            return $value;
         }
 
-        $isObject = is_object($value);
-        $isStdClass = $isObject && (get_class($value) === \stdClass::class);
+        if (is_object($value)) {
+            if ($value instanceof ToArrayInterface) {
+                return $value->toArray($options);
+            }
 
-        if ($isObject && ! $isStdClass) {
+            if ($value instanceof ToObjectInterface) {
+                return (array) $value->toObject($options);
+            }
+
+            $isStdClass = (get_class($value) === \stdClass::class);
+
+            if (! $isStdClass) {
+                throw new LogicException(
+                    [
+                        'The `value` (if object) should be instance of: ' . \stdClass::class,
+                        $value,
+                    ]
+                );
+            }
+        }
+
+        if (
+            (null === $value)
+            || (is_float($value) && (! is_nan($value)))
+            || (is_resource($value))
+            || ('resource (closed)' === gettype($value))
+            || (Lib::type()->is_nil($value))
+        ) {
             throw new LogicException(
                 [
-                    'The `value` (if object) should be instance of: ' . \stdClass::class,
+                    'Unable to parse value while converting to string',
                     $value,
                 ]
             );
@@ -617,25 +668,45 @@ class PhpModule
 
     public function to_object($value, array $options = []) : \stdClass
     {
-        if ($value instanceof ToObjectInterface) {
-            return $value->toObject($options);
+        if (is_object($value)) {
+            if ($value instanceof ToObjectInterface) {
+                return $value->toObject($options);
+            }
+
+            if ($value instanceof ToArrayInterface) {
+                return (object) $value->toArray($options);
+            }
+
+            $isStdClass = (get_class($value) === \stdClass::class);
+
+            if (! $isStdClass) {
+                throw new LogicException(
+                    [
+                        'The `value` (if object) should be instance of: ' . \stdClass::class,
+                        $value,
+                    ]
+                );
+            }
+
+            return $value;
         }
 
-        $isObject = is_object($value);
-        $isStdClass = $isObject && (get_class($value) === \stdClass::class);
-
-        if ($isObject && ! $isStdClass) {
+        if (
+            (null === $value)
+            || (is_float($value) && (! is_nan($value)))
+            || (is_resource($value))
+            || ('resource (closed)' === gettype($value))
+            || (Lib::type()->is_nil($value))
+        ) {
             throw new LogicException(
                 [
-                    'The `value` (if object) should be instance of: ' . \stdClass::class,
+                    'Unable to parse value while converting to string',
                     $value,
                 ]
             );
         }
 
-        $_value = $isStdClass
-            ? $value
-            : (object) $this->to_array($value);
+        $_value = (object) (array) $value;
 
         return $_value;
     }
@@ -1266,7 +1337,7 @@ class PhpModule
      */
     public function function_args(array $args, array $argsOriginal = null) : array
     {
-        if (! $args) {
+        if (0 === count($args)) {
             return [];
         }
 
