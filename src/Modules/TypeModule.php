@@ -1512,10 +1512,61 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function ip(&$result, $value) : bool
+    public function address_ip(&$result, $value) : bool
     {
         return Lib::net()->type_address_ip($result, $value);
     }
+
+    /**
+     * @param string|null $result
+     */
+    public function address_ip_v4(&$result, $value) : bool
+    {
+        return Lib::net()->type_address_ip_v4($result, $value);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function address_ip_v6(&$result, $value) : bool
+    {
+        return Lib::net()->type_address_ip_v6($result, $value);
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function address_mac(&$result, $value) : bool
+    {
+        return Lib::net()->type_address_mac($result, $value);
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function subnet(&$result, $value, string $ipFallback = null) : bool
+    {
+        return Lib::net()->type_subnet($result, $value, $ipFallback);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function subnet_v4(&$result, $value, string $ipFallback = null) : bool
+    {
+        return Lib::net()->type_subnet_v4($result, $value, $ipFallback);
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function subnet_v6(&$result, $value, string $ipFallback = null) : bool
+    {
+        return Lib::net()->type_subnet_v6($result, $value, $ipFallback);
+    }
+
 
 
     /**

@@ -109,13 +109,13 @@ class NetModule
     /**
      * @param string|null $result
      */
-    public function type_subnet(&$result, $value, string $ipDefault = null) : bool
+    public function type_subnet(&$result, $value, string $ipFallback = null) : bool
     {
         $result = null;
 
         $status = false
-            || $this->type_subnet_v4($_value, $value, $ipDefault)
-            || $this->type_subnet_v6($_value, $value, $ipDefault);
+            || $this->type_subnet_v4($_value, $value, $ipFallback)
+            || $this->type_subnet_v6($_value, $value, $ipFallback);
 
         if ($status) {
             $result = $_value;
@@ -129,7 +129,7 @@ class NetModule
     /**
      * @param string|null $result
      */
-    public function type_subnet_v4(&$result, $value, string $ipDefault = null) : bool
+    public function type_subnet_v4(&$result, $value, string $ipFallback = null) : bool
     {
         $result = null;
 
@@ -161,7 +161,7 @@ class NetModule
             }
 
             if ('' === $subnetOrIp) {
-                $addressIpString = $ipDefault;
+                $addressIpString = $ipFallback;
 
                 if (null === $addressIpString) {
                     return false;
@@ -186,7 +186,7 @@ class NetModule
                     return false;
                 }
 
-                $addressIpString = $ipDefault;
+                $addressIpString = $ipFallback;
 
                 if (null === $addressIpString) {
                     return false;
@@ -215,7 +215,7 @@ class NetModule
     /**
      * @param string|null $result
      */
-    public function type_subnet_v6(&$result, $value, string $ipDefault = null) : bool
+    public function type_subnet_v6(&$result, $value, string $ipFallback = null) : bool
     {
         $result = null;
 
@@ -247,7 +247,7 @@ class NetModule
         }
 
         if ('' === $ip) {
-            $addressIpString = $ipDefault;
+            $addressIpString = $ipFallback;
 
             if (! filter_var($addressIpString, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
                 return false;
@@ -308,7 +308,7 @@ class NetModule
     }
 
 
-    public function is_ip_in_subnet(string $ip, string $subnet, string $subnetIpDefault = null) : bool
+    public function is_ip_in_subnet(string $ip, string $subnet, string $subnetIpFallback = null) : bool
     {
         $ipV4String = null;
         $ipV6String = null;
@@ -329,15 +329,15 @@ class NetModule
         }
 
         $statusSubnet = false
-            || $this->type_subnet_v4($subnetV4String, $subnet, $subnetIpDefault)
-            || $this->type_subnet_v6($subnetV6String, $subnet, $subnetIpDefault);
+            || $this->type_subnet_v4($subnetV4String, $subnet, $subnetIpFallback)
+            || $this->type_subnet_v6($subnetV6String, $subnet, $subnetIpFallback);
 
         if (! $statusSubnet) {
             throw new LogicException(
                 [
                     'The `subnet` should be valid IPv4 or IPv6 mask',
                     $subnet,
-                    $subnetIpDefault,
+                    $subnetIpFallback,
                 ]
             );
         }
@@ -358,7 +358,7 @@ class NetModule
         return $status;
     }
 
-    public function is_ip_in_subnet_v4(string $ip, string $subnet, string $subnetIpDefault = null) : bool
+    public function is_ip_in_subnet_v4(string $ip, string $subnet, string $subnetIpFallback = null) : bool
     {
         $status = $this->type_address_ip_v4($ipString, $ip);
         if (! $status) {
@@ -370,13 +370,13 @@ class NetModule
             );
         }
 
-        $status = $this->type_subnet_v4($subnetString, $subnet, $subnetIpDefault);
+        $status = $this->type_subnet_v4($subnetString, $subnet, $subnetIpFallback);
         if (! $status) {
             throw new LogicException(
                 [
                     'The `subnet` should be valid IPv4 mask',
                     $subnet,
-                    $subnetIpDefault,
+                    $subnetIpFallback,
                 ]
             );
         }
@@ -394,7 +394,7 @@ class NetModule
         return $status;
     }
 
-    public function is_ip_in_subnet_v6(string $ip, string $subnet, string $subnetIpDefault = null) : bool
+    public function is_ip_in_subnet_v6(string $ip, string $subnet, string $subnetIpFallback = null) : bool
     {
         $status = $this->type_address_ip_v6($ipString, $ip);
         if (! $status) {
@@ -406,13 +406,13 @@ class NetModule
             );
         }
 
-        $status = $this->type_subnet_v6($subnetString, $subnet, $subnetIpDefault);
+        $status = $this->type_subnet_v6($subnetString, $subnet, $subnetIpFallback);
         if (! $status) {
             throw new LogicException(
                 [
                     'The `subnet` should be valid IPv6 mask',
                     $subnet,
-                    $subnetIpDefault,
+                    $subnetIpFallback,
                 ]
             );
         }
@@ -450,7 +450,6 @@ class NetModule
 
         return $status;
     }
-
 
 
     public function ip() : string

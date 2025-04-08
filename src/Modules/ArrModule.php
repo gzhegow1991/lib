@@ -260,7 +260,7 @@ class ArrModule
                 ? $this->arrpath_dot($dot, $path, ...$pathes)
                 : $this->arrpath($path, ...$pathes);
 
-            $result = new ArrPath($array);
+            $result = ArrPath::fromValid($array);
 
             return true;
         }
@@ -508,10 +508,7 @@ class ArrModule
 
         $theType = Lib::type();
 
-        $array = [ $path ];
-        if ($hasPathes) {
-            $array[] = $pathes;
-        }
+        $array = [ $path, $pathes ];
 
         $gen = $this->walk_it($array);
 
@@ -565,10 +562,7 @@ class ArrModule
 
         $theType = Lib::type();
 
-        $array = [ $path ];
-        if ($hasPathes) {
-            $array[] = $pathes;
-        }
+        $array = [ $path, $pathes ];
 
         $gen = $this->walk_it($array);
 
@@ -1571,7 +1565,7 @@ class ArrModule
             };
 
         } else {
-            throw new LogicException('Invalid `sort`');
+            throw new LogicException([ 'Invalid `sort`', $flags ]);
         }
 
         if ($isModeDepthFirst) {
@@ -1583,7 +1577,7 @@ class ArrModule
             $buffer =& $queue;
 
         } else {
-            throw new LogicException('Invalid `mode`');
+            throw new LogicException([ 'Invalid `mode`', $flags ]);
         }
 
         // > valueRef, fullpath, force
