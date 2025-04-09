@@ -318,7 +318,7 @@ class ArrModule
             }
 
             throw new RuntimeException(
-                'Missing key in array: ' . $key
+                [ 'Missing key in array', $key ]
             );
         }
 
@@ -522,7 +522,7 @@ class ArrModule
                 if (! $theType->string($pString, $p)) {
                     throw new LogicException(
                         [
-                            'Each of `path` or its children should be non-null stringable or instance of: ' . ArrPath::class,
+                            'Each of `pathes` should be non-null stringable or instance of: ' . ArrPath::class,
                             $p,
                             $genPath,
                         ]
@@ -549,7 +549,9 @@ class ArrModule
     public function arrpath_dot(string $dot, $path, ...$pathes) : array
     {
         if ('' === $dot) {
-            throw new LogicException('The `dot` should be non-empty string');
+            throw new LogicException(
+                'The `dot` should be non-empty string'
+            );
         }
 
         $hasPathes = (0 !== count($pathes));
@@ -576,7 +578,7 @@ class ArrModule
                 if (! $theType->string($pString, $p)) {
                     throw new LogicException(
                         [
-                            'Each of `path` or its children should be non-null stringable or instance of: ' . ArrPath::class,
+                            'Each of `pathes` should be non-null stringable or instance of: ' . ArrPath::class,
                             $p,
                             $genPath,
                         ]
