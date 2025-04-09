@@ -1261,45 +1261,6 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return resource|null
-	 */
-	public function resource($value)
-	{
-		if (Lib::type()->resource($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return resource|null
-	 */
-	public function resource_opened($value)
-	{
-		if (Lib::type()->resource_opened($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return resource|null
-	 */
-	public function resource_closed($value)
-	{
-		if (Lib::type()->resource_closed($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
 	 * @template-covariant T of object
 	 *
 	 * @param class-string<T>|T|mixed $value
@@ -1429,6 +1390,65 @@ class ParseModule extends ParseModuleBase
 	public function struct_basename($value, int $flags = null)
 	{
 		if (Lib::type()->struct_basename($result, $value, $flags)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return resource|null
+	 */
+	public function resource($value)
+	{
+		if (Lib::type()->resource($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return resource|null
+	 */
+	public function resource_opened($value)
+	{
+		if (Lib::type()->resource_opened($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return resource|null
+	 */
+	public function resource_closed($value)
+	{
+		if (Lib::type()->resource_closed($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @template-covariant T of \UnitEnum
+	 *
+	 * @param T|int|string         $value
+	 * @param class-string<T>|null $enumClass
+	 *
+	 * @return class-string|null
+	 *
+	 * @return T|null
+	 */
+	public function enum_case($value, string $enumClass = null)
+	{
+		if (Lib::type()->enum_case($result, $value, $enumClass)) {
 		    return $result;
 		}
 

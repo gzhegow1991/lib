@@ -1833,31 +1833,6 @@ class TypeModule extends TypeModuleBase
 
 
     /**
-     * @param resource|null $result
-     */
-    public function resource(&$result, $value) : bool
-    {
-        return Lib::php()->type_resource($result, $value);
-    }
-
-    /**
-     * @param resource|null $result
-     */
-    public function resource_opened(&$result, $value) : bool
-    {
-        return Lib::php()->type_resource_opened($result, $value);
-    }
-
-    /**
-     * @param resource|null $result
-     */
-    public function resource_closed(&$result, $value) : bool
-    {
-        return Lib::php()->type_resource_closed($result, $value);
-    }
-
-
-    /**
      * @template-covariant T of object
      *
      * @param class-string<T>|null    $result
@@ -1943,6 +1918,46 @@ class TypeModule extends TypeModuleBase
     public function struct_basename(&$result, $value, int $flags = null) : bool
     {
         return Lib::php()->type_struct_basename($result, $value, $flags);
+    }
+
+
+    /**
+     * @param resource|null $result
+     */
+    public function resource(&$result, $value) : bool
+    {
+        return Lib::php()->type_resource($result, $value);
+    }
+
+    /**
+     * @param resource|null $result
+     */
+    public function resource_opened(&$result, $value) : bool
+    {
+        return Lib::php()->type_resource_opened($result, $value);
+    }
+
+    /**
+     * @param resource|null $result
+     */
+    public function resource_closed(&$result, $value) : bool
+    {
+        return Lib::php()->type_resource_closed($result, $value);
+    }
+
+
+    /**
+     * @template-covariant T of \UnitEnum
+     *
+     * @param T|null               $result
+     * @param T|int|string         $value
+     * @param class-string<T>|null $enumClass
+     *
+     * @return class-string|null
+     */
+    public function enum_case(&$result, $value, string $enumClass = null) : bool
+    {
+        return Lib::php()->type_enum_case($result, $value, $enumClass);
     }
 
 

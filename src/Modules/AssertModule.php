@@ -1067,39 +1067,6 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
-	 * @return static
-	 */
-	public function resource($value)
-	{
-		$this->status = Lib::type()->resource($this->result, $value);
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function resource_opened($value)
-	{
-		$this->status = Lib::type()->resource_opened($this->result, $value);
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function resource_closed($value)
-	{
-		$this->status = Lib::type()->resource_closed($this->result, $value);
-
-		return $this;
-	}
-
-
-	/**
 	 * @template-covariant T of object
 	 *
 	 * @param class-string<T>|T|mixed $value
@@ -1213,6 +1180,57 @@ class AssertModule extends AssertModuleBase
 	public function struct_basename($value, int $flags = null)
 	{
 		$this->status = Lib::type()->struct_basename($this->result, $value, $flags);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function resource($value)
+	{
+		$this->status = Lib::type()->resource($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function resource_opened($value)
+	{
+		$this->status = Lib::type()->resource_opened($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function resource_closed($value)
+	{
+		$this->status = Lib::type()->resource_closed($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @template-covariant T of \UnitEnum
+	 *
+	 * @param T|int|string         $value
+	 * @param class-string<T>|null $enumClass
+	 *
+	 * @return class-string|null
+	 *
+	 * @return static
+	 */
+	public function enum_case($value, string $enumClass = null)
+	{
+		$this->status = Lib::type()->enum_case($this->result, $value, $enumClass);
 
 		return $this;
 	}
