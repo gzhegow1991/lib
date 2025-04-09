@@ -38,7 +38,7 @@ class TypeModule extends TypeModuleBase
         }
 
         if ('0' === $value) {
-            // > '0' is true
+            // > ANY NON-EMPTY STRING is true
             $result = true;
 
             return true;
@@ -90,14 +90,6 @@ class TypeModule extends TypeModuleBase
             return false;
         }
 
-        if ('0' === $value) {
-            // > '0' is true
-
-            $result = true;
-
-            return true;
-        }
-
         if (is_string($value)) {
             $map = [
                 //
@@ -105,11 +97,13 @@ class TypeModule extends TypeModuleBase
                 'y'     => true,
                 'yes'   => true,
                 'on'    => true,
+                '1'     => true,
                 //
                 'false' => false,
                 'n'     => false,
                 'no'    => false,
                 'off'   => false,
+                '0'     => false,
             ];
 
             $_value = strtolower($value);
@@ -1864,68 +1858,91 @@ class TypeModule extends TypeModuleBase
 
 
     /**
-     * @param class-string|null $result
+     * @template-covariant T of object
      *
-     * @param callable          ...$fnExistsList
+     * @param class-string<T>|null    $result
+     * @param class-string<T>|T|mixed $value
      */
-    public function struct(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
+    public function struct_exists(&$result, $value, int $flags = null)
     {
-        return Lib::php()->type_struct($result, $value, $useRegex, ...$fnExistsList);
+        return Lib::php()->type_struct_exists($result, $value, $flags);
     }
 
     /**
-     * @param class-string|null $result
-     */
-    public function struct_class(&$result, $value, bool $useRegex = null) : bool
-    {
-        return Lib::php()->type_struct_class($result, $value, $useRegex);
-    }
-
-    /**
-     * @param class-string|null $result
-     */
-    public function struct_interface(&$result, $value, bool $useRegex = null) : bool
-    {
-        return Lib::php()->type_struct_interface($result, $value, $useRegex);
-    }
-
-    /**
-     * @param class-string|null $result
-     */
-    public function struct_trait(&$result, $value, bool $useRegex = null) : bool
-    {
-        return Lib::php()->type_struct_trait($result, $value, $useRegex);
-    }
-
-
-    /**
-     * @param class-string|null $result
+     * @template-covariant T of object
      *
-     * @param callable          ...$fnExistsList
+     * @param class-string<T>|null    $result
+     * @param class-string<T>|T|mixed $value
      */
-    public function struct_fqcn(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
+    public function struct(&$result, $value, int $flags = null) : bool
     {
-        return Lib::php()->type_struct_fqcn($result, $value, $useRegex, ...$fnExistsList);
+        return Lib::php()->type_struct($result, $value, $flags);
+    }
+
+    /**
+     * @template-covariant T of object
+     *
+     * @param class-string<T>|null    $result
+     * @param class-string<T>|T|mixed $value
+     */
+    public function struct_class(&$result, $value, int $flags = null) : bool
+    {
+        return Lib::php()->type_struct_class($result, $value, $flags);
+    }
+
+    /**
+     * @param class-string|null $result
+     */
+    public function struct_interface(&$result, $value, int $flags = null) : bool
+    {
+        return Lib::php()->type_struct_interface($result, $value, $flags);
+    }
+
+    /**
+     * @param class-string|null $result
+     */
+    public function struct_trait(&$result, $value, int $flags = null) : bool
+    {
+        return Lib::php()->type_struct_trait($result, $value, $flags);
+    }
+
+    /**
+     * @template-covariant T of \UnitEnum
+     *
+     * @param class-string<T>|null    $result
+     * @param class-string<T>|T|mixed $value
+     */
+    public function struct_enum(&$result, $value, int $flags = null) : bool
+    {
+        return Lib::php()->type_struct_enum($result, $value, $flags);
+    }
+
+
+    /**
+     * @template-covariant T of object
+     *
+     * @param class-string<T>|null    $result
+     * @param class-string<T>|T|mixed $value
+     */
+    public function struct_fqcn(&$result, $value, int $flags = null) : bool
+    {
+        return Lib::php()->type_struct_fqcn($result, $value, $flags);
     }
 
     /**
      * @param string|null $result
-     *
-     * @param callable    ...$fnExistsList
      */
-    public function struct_namespace(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
+    public function struct_namespace(&$result, $value, int $flags = null) : bool
     {
-        return Lib::php()->type_struct_namespace($result, $value, $useRegex, ...$fnExistsList);
+        return Lib::php()->type_struct_namespace($result, $value, $flags);
     }
 
     /**
      * @param string|null $result
-     *
-     * @param callable    ...$fnExistsList
      */
-    public function struct_basename(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
+    public function struct_basename(&$result, $value, int $flags = null) : bool
     {
-        return Lib::php()->type_struct_basename($result, $value, $useRegex, ...$fnExistsList);
+        return Lib::php()->type_struct_basename($result, $value, $flags);
     }
 
 

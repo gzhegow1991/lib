@@ -68,96 +68,286 @@ class PhpModule
 
 
     /**
-     * @param class-string|null $result
+     * @template-covariant T of object
      *
-     * @param callable          ...$fnExistsList
+     * @param class-string<T>|null    $result
+     * @param class-string<T>|T|mixed $value
      */
-    public function type_struct(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
+    public function type_struct_exists(&$result, $value, int $flags = null)
     {
         $result = null;
 
-        $useRegex = $useRegex ?? false;
-        $fnExistsList = $fnExistsList ?: [
-            'class_exists',
-            'interface_exists',
-            'trait_exists',
-        ];
+        $_flags = $flags ?? _PHP_STRUCT_TYPE_ALL;
 
-        if (is_object($value)) {
-            $result = ltrim(get_class($value), '\\');
+        $isObject = is_object($value);
 
-            return true;
-        }
+        if ($isObject) {
+            $class = get_class($value);
 
-        if (! Lib::type()->string_not_empty($_value, $value)) {
+        } elseif (Lib::type()->string_not_empty($valueString, $value)) {
+            $class = ltrim($valueString, '\\');
+
+            if ('' === $class) {
+                return false;
+            }
+
+        } else {
             return false;
         }
 
-        $_value = ltrim($_value, '\\');
+        if ($class === '__PHP_Incomplete_Class') {
+            return false;
+        }
 
-        foreach ( $fnExistsList as $fn ) {
-            if (call_user_func($fn, $_value)) {
-                $result = $_value;
+        if ($flags & _PHP_STRUCT_TYPE_CLASS) {
+            if (PHP_VERSION_ID >= 80100) {
+                if (class_exists($class) && ! enum_exists($class)) {
+                    $result = $class;
 
-                return $result;
+                    return true;
+                }
+
+            } else {
+                if (class_exists($class)) {
+                    $result = $class;
+
+                    return true;
+                }
             }
         }
 
-        if ($useRegex) {
-            if (! preg_match(
-                '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*$/',
-                $_value
-            )) {
+        if ($flags & _PHP_STRUCT_TYPE_ENUM) {
+            if (PHP_VERSION_ID >= 80100) {
+                if (enum_exists($class)) {
+                    $result = $class;
+
+                    return true;
+                }
+            }
+        }
+
+        if (! $isObject) {
+            if ($flags & _PHP_STRUCT_TYPE_INTERFACE) {
+                if (interface_exists($class)) {
+                    $result = $class;
+
+                    return true;
+                }
+            }
+
+            if ($flags & _PHP_STRUCT_TYPE_TRAIT) {
+                if (trait_exists($class)) {
+                    $result = $class;
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @template-covariant T of object
+     *
+     * @param class-string<T>|null    $result
+     * @param class-string<T>|T|mixed $value
+     */
+    public function type_struct(&$result, $value, int $flags = null) : bool
+    {
+        $result = null;
+
+        $_flags = $flags ?? (
+            _PHP_STRUCT_TYPE_ALL
+            | _PHP_STRUCT_EXISTS_TRUE
+        );
+
+        $sum = 0;
+        $sum += (($_flags & _PHP_STRUCT_EXISTS_TRUE) ? 1 : 0);
+        $sum += (($_flags & _PHP_STRUCT_EXISTS_FALSE) ? 1 : 0);
+        $sum += (($_flags & _PHP_STRUCT_EXISTS_IGNORE) ? 1 : 0);
+        if (1 !== $sum) {
+            $_flags &= ~(
+                _PHP_STRUCT_EXISTS_TRUE
+                | _PHP_STRUCT_EXISTS_FALSE
+                | _PHP_STRUCT_EXISTS_IGNORE
+            );
+
+            $_flags |= _PHP_STRUCT_EXISTS_TRUE;
+        }
+        unset($sum);
+
+        $isExistsTrue = (bool) ($_flags & _PHP_STRUCT_EXISTS_TRUE);
+        $isExistsFalse = (bool) ($_flags & _PHP_STRUCT_EXISTS_FALSE);
+        $isExistsIgnore = (bool) ($_flags & _PHP_STRUCT_EXISTS_IGNORE);
+
+        $isExists = null;
+
+        $class = null;
+        if (is_object($value)) {
+            $class = get_class($value);
+
+            $isEnum = is_a($value, '\UnitEnum');
+            $isClass = ! $isEnum;
+
+            if ($isEnum && ($_flags & _PHP_STRUCT_TYPE_ENUM)) {
+                $isExists = true;
+
+            } elseif ($isClass && ($_flags & _PHP_STRUCT_TYPE_CLASS)) {
+                $isExists = true;
+            }
+
+        } else {
+            if (! Lib::type()->string_not_empty($valueString, $value)) {
+                return false;
+            }
+
+            $class = ltrim($valueString, '\\');
+
+            if ('' === $class) {
                 return false;
             }
         }
 
-        $result = $_value;
+        if ('__PHP_Incomplete_Class' === $class) {
+            return false;
+        }
 
-        return true;
+        if ($isExistsTrue || $isExistsFalse) {
+            $isExists = $isExists ?? $this->type_struct_exists($class, $class, $_flags);
+
+            if ($isExists && $isExistsFalse) {
+                return false;
+            }
+            if ((! $isExists) && $isExistsTrue) {
+                return false;
+            }
+
+            if ($isExists && $isExistsTrue) {
+                $result = $class;
+
+                return true;
+            }
+        }
+
+        if ($isExistsFalse || $isExistsIgnore) {
+            $isValid = (bool) preg_match(
+                '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*$/',
+                $class
+            );
+
+            if ($isValid) {
+                $result = $class;
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
-     * @param class-string|null $result
+     * @template-covariant T of object
      *
-     * @return class-string|null
+     * @param class-string<T>|null    $result
+     * @param class-string<T>|T|mixed $value
      */
-    public function type_struct_class(&$result, $value, bool $useRegex = null) : bool
+    public function type_struct_class(&$result, $value, int $flags = null) : bool
     {
-        return $this->type_struct($result, $value, $useRegex, 'class_exists');
+        $_flags = $flags;
+
+        if (null === $_flags) {
+            $_flags = (
+                _PHP_STRUCT_TYPE_CLASS
+                | _PHP_STRUCT_EXISTS_TRUE
+            );
+
+        } else {
+            $_flags &= ~_PHP_STRUCT_TYPE_ALL;
+            $_flags |= _PHP_STRUCT_TYPE_CLASS;
+        }
+
+        return $this->type_struct($result, $value, $_flags);
     }
 
     /**
      * @param class-string|null $result
-     *
-     * @return class-string|null
      */
-    public function type_struct_interface(&$result, $value, bool $useRegex = null) : bool
+    public function type_struct_interface(&$result, $value, int $flags = null) : bool
     {
-        return $this->type_struct($result, $value, $useRegex, 'interface_exists');
+        $_flags = $flags;
+
+        if (null === $_flags) {
+            $_flags = (
+                _PHP_STRUCT_TYPE_INTERFACE
+                | _PHP_STRUCT_EXISTS_TRUE
+            );
+
+        } else {
+            $_flags &= ~_PHP_STRUCT_TYPE_ALL;
+            $_flags |= _PHP_STRUCT_TYPE_INTERFACE;
+        }
+
+        return $this->type_struct($result, $value, $_flags);
     }
 
     /**
      * @param class-string|null $result
-     *
-     * @return class-string|null
      */
-    public function type_struct_trait(&$result, $value, bool $useRegex = null) : bool
+    public function type_struct_trait(&$result, $value, int $flags = null) : bool
     {
-        return $this->type_struct($result, $value, $useRegex, 'trait_exists');
+        $_flags = $flags;
+
+        if (null === $_flags) {
+            $_flags = (
+                _PHP_STRUCT_TYPE_TRAIT
+                | _PHP_STRUCT_EXISTS_TRUE
+            );
+
+        } else {
+            $_flags &= ~_PHP_STRUCT_TYPE_ALL;
+            $_flags |= _PHP_STRUCT_TYPE_TRAIT;
+        }
+
+        return $this->type_struct($result, $value, $_flags);
+    }
+
+    /**
+     * @template-covariant T of \UnitEnum
+     *
+     * @param class-string<T>|null    $result
+     * @param class-string<T>|T|mixed $value
+     */
+    public function type_struct_enum(&$result, $value, int $flags = null) : bool
+    {
+        $_flags = $flags;
+
+        if (null === $_flags) {
+            $_flags = (
+                _PHP_STRUCT_TYPE_ENUM
+                | _PHP_STRUCT_EXISTS_TRUE
+            );
+
+        } else {
+            $_flags &= ~_PHP_STRUCT_TYPE_ALL;
+            $_flags |= _PHP_STRUCT_TYPE_ENUM;
+        }
+
+        return $this->type_struct($result, $value, $_flags);
     }
 
 
     /**
-     * @param class-string|null $result
+     * @template-covariant T of object
      *
-     * @param callable          ...$fnExistsList
+     * @param class-string<T>|null    $result
+     * @param class-string<T>|T|mixed $value
      */
-    public function type_struct_fqcn(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
+    public function type_struct_fqcn(&$result, $value, int $flags = null) : bool
     {
         $result = null;
 
-        if (! $this->type_struct($_value, $value, $useRegex, ...$fnExistsList)) {
+        if (! $this->type_struct($_value, $value, $flags)) {
             return false;
         }
 
@@ -170,14 +360,12 @@ class PhpModule
 
     /**
      * @param string|null $result
-     *
-     * @param callable    ...$fnExistsList
      */
-    public function type_struct_namespace(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
+    public function type_struct_namespace(&$result, $value, int $flags = null) : bool
     {
         $result = null;
 
-        if (! $this->type_struct($_value, $value, $useRegex, ...$fnExistsList)) {
+        if (! $this->type_struct($_value, $value, $flags)) {
             return false;
         }
 
@@ -193,14 +381,12 @@ class PhpModule
 
     /**
      * @param string|null $result
-     *
-     * @param callable    ...$fnExistsList
      */
-    public function type_struct_basename(&$result, $value, bool $useRegex = null, ...$fnExistsList) : bool
+    public function type_struct_basename(&$result, $value, int $flags = null) : bool
     {
         $result = null;
 
-        if (! $this->type_struct($_value, $value, $useRegex, ...$fnExistsList)) {
+        if (! $this->type_struct($_value, $value, $flags)) {
             return false;
         }
 
@@ -259,6 +445,65 @@ class PhpModule
 
         if ('resource (closed)' === gettype($value)) {
             $result = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @template-covariant T of \UnitEnum
+     *
+     * @param T|null               $result
+     * @param T|int|string         $value
+     * @param class-string<T>|null $enumClass
+     *
+     * @return class-string|null
+     */
+    public function type_enum_case(&$result, $value, string $enumClass = null) : bool
+    {
+        $result = null;
+
+        $hasEnumClass = false;
+        if (null !== $enumClass) {
+            if (! is_subclass_of($enumClass, '\UnitEnum')) {
+                return false;
+            }
+
+            $hasEnumClass = true;
+        }
+
+        if (is_object($value)) {
+            $status = $hasEnumClass
+                ? is_a($value, $enumClass)
+                : is_subclass_of($value, '\UnitEnum');
+
+            if ($status) {
+                $result = $value;
+
+                return true;
+            }
+        }
+
+        if (! $hasEnumClass) {
+            return false;
+        }
+
+        if (! (is_int($value) || is_string($value))) {
+            return false;
+        }
+
+        $enumCase = null;
+        try {
+            $enumCase = $enumClass::tryFrom($value);
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if (null !== $enumCase) {
+            $result = $enumCase;
 
             return true;
         }
@@ -822,7 +1067,7 @@ class PhpModule
             return count($countable);
         }
 
-        if (Lib::type()->string($string, $value)) {
+        if (Lib::str()->type_string($string, $value)) {
             return strlen($string);
         }
 
@@ -842,7 +1087,9 @@ class PhpModule
             return count($countable);
         }
 
-        if (Lib::type()->string($string, $value)) {
+        $theStr = Lib::str();
+
+        if ($theStr->type_string($string, $value)) {
             return Lib::str()->strlen($string);
         }
 

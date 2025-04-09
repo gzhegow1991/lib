@@ -7,6 +7,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Arr\ArrPath;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
 use Gzhegow\Lib\Modules\Str\Alphabet;
 use Gzhegow\Lib\Modules\Type\Base\ParseModuleBase;
@@ -277,9 +278,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric($value, bool $allowExp = null, array $refs = [])
+	public function numeric($value, bool $isAllowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric($result, $value, $allowExp, $refs)) {
+		if (Lib::type()->numeric($result, $value, $isAllowExp, $refs)) {
 		    return $result;
 		}
 
@@ -355,9 +356,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int($value, bool $allowExp = null, array $refs = [])
+	public function numeric_int($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int($result, $value, $allowExp, $refs)) {
+		if (Lib::type()->numeric_int($result, $value, $refs)) {
 		    return $result;
 		}
 
@@ -368,9 +369,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_non_zero($value, bool $allowExp = null, array $refs = [])
+	public function numeric_int_non_zero($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_non_zero($result, $value, $allowExp, $refs)) {
+		if (Lib::type()->numeric_int_non_zero($result, $value, $refs)) {
 		    return $result;
 		}
 
@@ -381,9 +382,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_non_negative($value, bool $allowExp = null, array $refs = [])
+	public function numeric_int_non_negative($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_non_negative($result, $value, $allowExp, $refs)) {
+		if (Lib::type()->numeric_int_non_negative($result, $value, $refs)) {
 		    return $result;
 		}
 
@@ -394,9 +395,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_non_positive($value, bool $allowExp = null, array $refs = [])
+	public function numeric_int_non_positive($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_non_positive($result, $value, $allowExp, $refs)) {
+		if (Lib::type()->numeric_int_non_positive($result, $value, $refs)) {
 		    return $result;
 		}
 
@@ -407,9 +408,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_negative($value, bool $allowExp = null, array $refs = [])
+	public function numeric_int_negative($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_negative($result, $value, $allowExp, $refs)) {
+		if (Lib::type()->numeric_int_negative($result, $value, $refs)) {
 		    return $result;
 		}
 
@@ -420,9 +421,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_positive($value, bool $allowExp = null, array $refs = [])
+	public function numeric_int_positive($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_positive($result, $value, $allowExp, $refs)) {
+		if (Lib::type()->numeric_int_positive($result, $value, $refs)) {
 		    return $result;
 		}
 
@@ -537,9 +538,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function ctype_alpha($value, bool $ignoreCase = null)
+	public function ctype_alpha($value, bool $isIgnoreCase = null)
 	{
-		if (Lib::type()->ctype_alpha($result, $value, $ignoreCase)) {
+		if (Lib::type()->ctype_alpha($result, $value, $isIgnoreCase)) {
 		    return $result;
 		}
 
@@ -550,9 +551,9 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function ctype_alnum($value, bool $ignoreCase = null)
+	public function ctype_alnum($value, bool $isIgnoreCase = null)
 	{
-		if (Lib::type()->ctype_alnum($result, $value, $ignoreCase)) {
+		if (Lib::type()->ctype_alnum($result, $value, $isIgnoreCase)) {
 		    return $result;
 		}
 
@@ -743,6 +744,19 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
+	 * @return ArrPath|null
+	 */
+	public function arrpath($path, array $pathes = null, string $dot = null)
+	{
+		if (Lib::type()->arrpath($result, $path, $pathes, $dot)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
 	 * @return string|null
 	 */
 	public function regex($value)
@@ -758,9 +772,87 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
-	public function ip($value)
+	public function address_ip($value)
 	{
-		if (Lib::type()->ip($result, $value)) {
+		if (Lib::type()->address_ip($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function address_ip_v4($value)
+	{
+		if (Lib::type()->address_ip_v4($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function address_ip_v6($value)
+	{
+		if (Lib::type()->address_ip_v6($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function address_mac($value)
+	{
+		if (Lib::type()->address_mac($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function subnet($value, string $ipFallback = null)
+	{
+		if (Lib::type()->subnet($result, $value, $ipFallback)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function subnet_v4($value, string $ipFallback = null)
+	{
+		if (Lib::type()->subnet_v4($result, $value, $ipFallback)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function subnet_v6($value, string $ipFallback = null)
+	{
+		if (Lib::type()->subnet_v6($result, $value, $ipFallback)) {
 		    return $result;
 		}
 
@@ -1208,67 +1300,15 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @param callable          ...$fnExistsList
+	 * @template-covariant T of object
 	 *
-	 * @return class-string|null
-	 */
-	public function struct($value, bool $useRegex = null, ...$fnExistsList)
-	{
-		if (Lib::type()->struct($result, $value, $useRegex, ...$fnExistsList)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return class-string|null
-	 */
-	public function struct_class($value, bool $useRegex = null)
-	{
-		if (Lib::type()->struct_class($result, $value, $useRegex)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return class-string|null
-	 */
-	public function struct_interface($value, bool $useRegex = null)
-	{
-		if (Lib::type()->struct_interface($result, $value, $useRegex)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return class-string|null
-	 */
-	public function struct_trait($value, bool $useRegex = null)
-	{
-		if (Lib::type()->struct_trait($result, $value, $useRegex)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @param callable          ...$fnExistsList
+	 * @param class-string<T>|T|mixed $value
 	 *
-	 * @return class-string|null
+	 * @return class-string<T>|null
 	 */
-	public function struct_fqcn($value, bool $useRegex = null, ...$fnExistsList)
+	public function struct_exists($value, int $flags = null)
 	{
-		if (Lib::type()->struct_fqcn($result, $value, $useRegex, ...$fnExistsList)) {
+		if (Lib::type()->struct_exists($result, $value, $flags)) {
 		    return $result;
 		}
 
@@ -1277,13 +1317,105 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @param callable    ...$fnExistsList
+	 * @template-covariant T of object
 	 *
+	 * @param class-string<T>|T|mixed $value
+	 *
+	 * @return class-string<T>|null
+	 */
+	public function struct($value, int $flags = null)
+	{
+		if (Lib::type()->struct($result, $value, $flags)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @template-covariant T of object
+	 *
+	 * @param class-string<T>|T|mixed $value
+	 *
+	 * @return class-string<T>|null
+	 */
+	public function struct_class($value, int $flags = null)
+	{
+		if (Lib::type()->struct_class($result, $value, $flags)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return class-string|null
+	 */
+	public function struct_interface($value, int $flags = null)
+	{
+		if (Lib::type()->struct_interface($result, $value, $flags)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return class-string|null
+	 */
+	public function struct_trait($value, int $flags = null)
+	{
+		if (Lib::type()->struct_trait($result, $value, $flags)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @template-covariant T of \UnitEnum
+	 *
+	 * @param class-string<T>|T|mixed $value
+	 *
+	 * @return class-string<T>|null
+	 */
+	public function struct_enum($value, int $flags = null)
+	{
+		if (Lib::type()->struct_enum($result, $value, $flags)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @template-covariant T of object
+	 *
+	 * @param class-string<T>|T|mixed $value
+	 *
+	 * @return class-string<T>|null
+	 */
+	public function struct_fqcn($value, int $flags = null)
+	{
+		if (Lib::type()->struct_fqcn($result, $value, $flags)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
 	 * @return string|null
 	 */
-	public function struct_namespace($value, bool $useRegex = null, ...$fnExistsList)
+	public function struct_namespace($value, int $flags = null)
 	{
-		if (Lib::type()->struct_namespace($result, $value, $useRegex, ...$fnExistsList)) {
+		if (Lib::type()->struct_namespace($result, $value, $flags)) {
 		    return $result;
 		}
 
@@ -1292,13 +1424,11 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @param callable    ...$fnExistsList
-	 *
 	 * @return string|null
 	 */
-	public function struct_basename($value, bool $useRegex = null, ...$fnExistsList)
+	public function struct_basename($value, int $flags = null)
 	{
-		if (Lib::type()->struct_basename($result, $value, $useRegex, ...$fnExistsList)) {
+		if (Lib::type()->struct_basename($result, $value, $flags)) {
 		    return $result;
 		}
 

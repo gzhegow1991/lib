@@ -1830,11 +1830,9 @@ class CmpModule
 
         $flags = $flagsMode;
 
-
-        $sum = (int) (
-            ((bool) ($flags & _CMP_MODE_TYPECAST_A))
-            + ((bool) ($flags & _CMP_MODE_TYPECAST_B))
-        );
+        $sum = 0;
+        $sum += (($flags & _CMP_MODE_TYPECAST_A) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_TYPECAST_B) ? 1 : 0);
         if (0 === $sum) {
             $flags &= ~(
                 _CMP_MODE_TYPECAST_A
@@ -1843,13 +1841,12 @@ class CmpModule
 
             $flags |= (_CMP_MODE_TYPECAST_A | _CMP_MODE_TYPECAST_B);
         }
+        unset($sum);
 
-
-        $sum = (int) (
-            ((bool) ($flags & _CMP_MODE_TYPE_STRICT))
-            + ((bool) ($flags & _CMP_MODE_TYPE_CAST_OR_NAN))
-            + ((bool) ($flags & _CMP_MODE_TYPE_CAST_OR_CONTINUE))
-        );
+        $sum = 0;
+        $sum += (($flags & _CMP_MODE_TYPE_STRICT) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_TYPE_CAST_OR_NAN) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_TYPE_CAST_OR_CONTINUE) ? 1 : 0);
         if (1 !== $sum) {
             $flags &= ~(
                 _CMP_MODE_TYPE_STRICT
@@ -1859,13 +1856,12 @@ class CmpModule
 
             $flags |= _CMP_MODE_TYPE_CAST_OR_CONTINUE;
         }
+        unset($sum);
 
-
-        $sum = (int) (
-            ((bool) ($flags & _CMP_MODE_STRING_SIZE_STRLEN))
-            + ((bool) ($flags & _CMP_MODE_STRING_SIZE_STRSIZE))
-            + ((bool) ($flags & _CMP_MODE_STRING_SIZE_IGNORE))
-        );
+        $sum = 0;
+        $sum += (($flags & _CMP_MODE_STRING_SIZE_STRLEN) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_STRING_SIZE_STRSIZE) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_STRING_SIZE_IGNORE) ? 1 : 0);
         if (1 !== $sum) {
             $flags &= ~(
                 _CMP_MODE_STRING_SIZE_STRLEN
@@ -1875,14 +1871,14 @@ class CmpModule
 
             $flags |= _CMP_MODE_STRING_SIZE_STRLEN;
         }
+        unset($sum);
 
-        $sum = (int) (
-            ((bool) ($flags & _CMP_MODE_STRING_VS_STRNATCASECMP))
-            + ((bool) ($flags & _CMP_MODE_STRING_VS_STRCASECMP))
-            + ((bool) ($flags & _CMP_MODE_STRING_VS_STRNATCMP))
-            + ((bool) ($flags & _CMP_MODE_STRING_VS_STRCMP))
-            + ((bool) ($flags & _CMP_MODE_STRING_VS_IGNORE))
-        );
+        $sum = 0;
+        $sum += (($flags & _CMP_MODE_STRING_VS_STRNATCASECMP) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_STRING_VS_STRCASECMP) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_STRING_VS_STRNATCMP) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_STRING_VS_STRCMP) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_STRING_VS_IGNORE) ? 1 : 0);
         if (1 !== $sum) {
             $flags &= ~(
                 _CMP_MODE_STRING_VS_STRNATCASECMP
@@ -1894,11 +1890,11 @@ class CmpModule
 
             $flags |= _CMP_MODE_STRING_VS_STRCMP;
         }
+        unset($sum);
 
-        $sum = (int) (
-            ((bool) ($flags & _CMP_MODE_ARRAY_SIZE_COUNT))
-            + ((bool) ($flags & _CMP_MODE_ARRAY_SIZE_IGNORE))
-        );
+        $sum = 0;
+        $sum += (($flags & _CMP_MODE_ARRAY_SIZE_COUNT) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_ARRAY_SIZE_IGNORE) ? 1 : 0);
         if (1 !== $sum) {
             $flags &= ~(
                 _CMP_MODE_ARRAY_SIZE_COUNT
@@ -1907,11 +1903,11 @@ class CmpModule
 
             $flags |= _CMP_MODE_ARRAY_SIZE_COUNT;
         }
+        unset($sum);
 
-        $sum = (int) (
-            ((bool) ($flags & _CMP_MODE_ARRAY_VS_SPACESHIP))
-            + ((bool) ($flags & _CMP_MODE_ARRAY_VS_IGNORE))
-        );
+        $sum = 0;
+        $sum += (($flags & _CMP_MODE_ARRAY_VS_SPACESHIP) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_ARRAY_VS_IGNORE) ? 1 : 0);
         if (1 !== $sum) {
             $flags &= ~(
                 _CMP_MODE_ARRAY_VS_SPACESHIP
@@ -1920,17 +1916,17 @@ class CmpModule
 
             $flags |= _CMP_MODE_ARRAY_VS_IGNORE;
         }
+        unset($sum);
 
-        $sum = (int) (
-            ((bool) ($flags & _CMP_MODE_DATE_VS_YEAR))
-            + ((bool) ($flags & _CMP_MODE_DATE_VS_MONTH))
-            + ((bool) ($flags & _CMP_MODE_DATE_VS_DAY))
-            + ((bool) ($flags & _CMP_MODE_DATE_VS_HOUR))
-            + ((bool) ($flags & _CMP_MODE_DATE_VS_MIN))
-            + ((bool) ($flags & _CMP_MODE_DATE_VS_SEC))
-            + ((bool) ($flags & _CMP_MODE_DATE_VS_MSEC))
-            + ((bool) ($flags & _CMP_MODE_DATE_VS_USEC))
-        );
+        $sum = 0;
+        $sum += (($flags & _CMP_MODE_DATE_VS_YEAR) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_DATE_VS_MONTH) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_DATE_VS_DAY) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_DATE_VS_HOUR) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_DATE_VS_MIN) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_DATE_VS_SEC) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_DATE_VS_MSEC) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_DATE_VS_USEC) ? 1 : 0);
         if (1 !== $sum) {
             $flags &= ~(
                 _CMP_MODE_DATE_VS_YEAR
@@ -1945,11 +1941,11 @@ class CmpModule
 
             $flags |= _CMP_MODE_DATE_VS_USEC;
         }
+        unset($sum);
 
-        $sum = (int) (
-            ((bool) ($flags & _CMP_MODE_OBJECT_SIZE_COUNT))
-            + ((bool) ($flags & _CMP_MODE_OBJECT_SIZE_IGNORE))
-        );
+        $sum = 0;
+        $sum += (($flags & _CMP_MODE_OBJECT_SIZE_COUNT) ? 1 : 0);
+        $sum += (($flags & _CMP_MODE_OBJECT_SIZE_IGNORE) ? 1 : 0);
         if (1 !== $sum) {
             $flags &= ~(
                 _CMP_MODE_OBJECT_SIZE_COUNT
@@ -1958,7 +1954,7 @@ class CmpModule
 
             $flags |= _CMP_MODE_OBJECT_SIZE_COUNT;
         }
-
+        unset($sum);
 
         return $flags;
     }
@@ -1969,13 +1965,12 @@ class CmpModule
 
         $flags = $flagsResult;
 
-        $sum = (int) (
-            ((bool) ($flags & _CMP_MODE_RESULT_SPACESHIP))
-            + ((bool) ($flags & _CMP_RESULT_NULL_0))
-            + ((bool) ($flags & _CMP_RESULT_NULL_A_LT))
-            + ((bool) ($flags & _CMP_RESULT_NULL_A_GT))
-            + ((bool) ($flags & _CMP_RESULT_NULL_NAN))
-        );
+        $sum = 0;
+        $sum += (($flags & _CMP_MODE_RESULT_SPACESHIP) ? 1 : 0);
+        $sum += (($flags & _CMP_RESULT_NULL_0) ? 1 : 0);
+        $sum += (($flags & _CMP_RESULT_NULL_A_LT) ? 1 : 0);
+        $sum += (($flags & _CMP_RESULT_NULL_A_GT) ? 1 : 0);
+        $sum += (($flags & _CMP_RESULT_NULL_NAN) ? 1 : 0);
         if (1 !== $sum) {
             $flags &= ~(
                 _CMP_MODE_RESULT_SPACESHIP
@@ -1987,11 +1982,11 @@ class CmpModule
 
             $flags |= _CMP_RESULT_NULL_NAN;
         }
+        unset($sum);
 
-        $sum = (int) (
-            ((bool) ($flags & _CMP_RESULT_NAN_THROW))
-            + ((bool) ($flags & _CMP_RESULT_NAN_RETURN))
-        );
+        $sum = 0;
+        $sum += (($flags & _CMP_RESULT_NAN_THROW) ? 1 : 0);
+        $sum += (($flags & _CMP_RESULT_NAN_RETURN) ? 1 : 0);
         if (1 !== $sum) {
             $flags &= ~(
                 _CMP_RESULT_NAN_THROW
@@ -2000,6 +1995,7 @@ class CmpModule
 
             $flags |= _CMP_RESULT_NAN_THROW;
         }
+        unset($sum);
 
         return $flags;
     }

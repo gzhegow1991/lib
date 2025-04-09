@@ -151,22 +151,24 @@ class Cookies
     {
         $theType = Lib::type();
 
-        if (! $theType->string($var, $cookieName)) {
+        if (! $theType->string_not_empty($var, $cookieName)) {
             throw new LogicException(
                 'The `cookieName` should be non empty string'
             );
         }
 
-        if (! $theType->string($var, $cookiePath)) {
+        if (! $theType->string_not_empty($var, $cookiePath)) {
             throw new LogicException(
                 'The `cookiePath` should be non empty string'
             );
         }
 
-        if (! $theType->string($var, $cookieDomain)) {
-            throw new LogicException(
-                'The `cookieDomain` should be non empty string'
-            );
+        if (null !== $cookieDomain) {
+            if (! $theType->string_not_empty($var, $cookieDomain)) {
+                throw new LogicException(
+                    'The `cookieDomain` should be non empty string'
+                );
+            }
         }
 
         return "{$cookieDomain}\0{$cookiePath}\0{$cookieName}";

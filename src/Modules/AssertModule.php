@@ -234,9 +234,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric($value, bool $allowExp = null, array $refs = [])
+	public function numeric($value, bool $isAllowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric($this->result, $value, $allowExp, $refs);
+		$this->status = Lib::type()->numeric($this->result, $value, $isAllowExp, $refs);
 
 		return $this;
 	}
@@ -300,9 +300,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int($value, bool $allowExp = null, array $refs = [])
+	public function numeric_int($value, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int($this->result, $value, $allowExp, $refs);
+		$this->status = Lib::type()->numeric_int($this->result, $value, $refs);
 
 		return $this;
 	}
@@ -311,9 +311,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_non_zero($value, bool $allowExp = null, array $refs = [])
+	public function numeric_int_non_zero($value, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_non_zero($this->result, $value, $allowExp, $refs);
+		$this->status = Lib::type()->numeric_int_non_zero($this->result, $value, $refs);
 
 		return $this;
 	}
@@ -322,9 +322,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_non_negative($value, bool $allowExp = null, array $refs = [])
+	public function numeric_int_non_negative($value, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_non_negative($this->result, $value, $allowExp, $refs);
+		$this->status = Lib::type()->numeric_int_non_negative($this->result, $value, $refs);
 
 		return $this;
 	}
@@ -333,9 +333,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_non_positive($value, bool $allowExp = null, array $refs = [])
+	public function numeric_int_non_positive($value, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_non_positive($this->result, $value, $allowExp, $refs);
+		$this->status = Lib::type()->numeric_int_non_positive($this->result, $value, $refs);
 
 		return $this;
 	}
@@ -344,9 +344,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_negative($value, bool $allowExp = null, array $refs = [])
+	public function numeric_int_negative($value, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_negative($this->result, $value, $allowExp, $refs);
+		$this->status = Lib::type()->numeric_int_negative($this->result, $value, $refs);
 
 		return $this;
 	}
@@ -355,9 +355,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_positive($value, bool $allowExp = null, array $refs = [])
+	public function numeric_int_positive($value, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_positive($this->result, $value, $allowExp, $refs);
+		$this->status = Lib::type()->numeric_int_positive($this->result, $value, $refs);
 
 		return $this;
 	}
@@ -454,9 +454,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function ctype_alpha($value, bool $ignoreCase = null)
+	public function ctype_alpha($value, bool $isIgnoreCase = null)
 	{
-		$this->status = Lib::type()->ctype_alpha($this->result, $value, $ignoreCase);
+		$this->status = Lib::type()->ctype_alpha($this->result, $value, $isIgnoreCase);
 
 		return $this;
 	}
@@ -465,9 +465,9 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function ctype_alnum($value, bool $ignoreCase = null)
+	public function ctype_alnum($value, bool $isIgnoreCase = null)
 	{
-		$this->status = Lib::type()->ctype_alnum($this->result, $value, $ignoreCase);
+		$this->status = Lib::type()->ctype_alnum($this->result, $value, $isIgnoreCase);
 
 		return $this;
 	}
@@ -630,6 +630,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
+	public function arrpath($path, array $pathes = null, string $dot = null)
+	{
+		$this->status = Lib::type()->arrpath($this->result, $path, $pathes, $dot);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
 	public function regex($value)
 	{
 		$this->status = Lib::type()->regex($this->result, $value);
@@ -641,9 +652,75 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function ip($value)
+	public function address_ip($value)
 	{
-		$this->status = Lib::type()->ip($this->result, $value);
+		$this->status = Lib::type()->address_ip($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function address_ip_v4($value)
+	{
+		$this->status = Lib::type()->address_ip_v4($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function address_ip_v6($value)
+	{
+		$this->status = Lib::type()->address_ip_v6($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function address_mac($value)
+	{
+		$this->status = Lib::type()->address_mac($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function subnet($value, string $ipFallback = null)
+	{
+		$this->status = Lib::type()->subnet($this->result, $value, $ipFallback);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function subnet_v4($value, string $ipFallback = null)
+	{
+		$this->status = Lib::type()->subnet_v4($this->result, $value, $ipFallback);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function subnet_v6($value, string $ipFallback = null)
+	{
+		$this->status = Lib::type()->subnet_v6($this->result, $value, $ipFallback);
 
 		return $this;
 	}
@@ -1023,85 +1100,119 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
-	 * @param callable          ...$fnExistsList
+	 * @template-covariant T of object
+	 *
+	 * @param class-string<T>|T|mixed $value
 	 *
 	 * @return static
 	 */
-	public function struct($value, bool $useRegex = null, ...$fnExistsList)
+	public function struct_exists($value, int $flags = null)
 	{
-		$this->status = Lib::type()->struct($this->result, $value, $useRegex, ...$fnExistsList);
+		$this->status = Lib::type()->struct_exists($this->result, $value, $flags);
 
 		return $this;
 	}
 
 
 	/**
-	 * @return static
-	 */
-	public function struct_class($value, bool $useRegex = null)
-	{
-		$this->status = Lib::type()->struct_class($this->result, $value, $useRegex);
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function struct_interface($value, bool $useRegex = null)
-	{
-		$this->status = Lib::type()->struct_interface($this->result, $value, $useRegex);
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function struct_trait($value, bool $useRegex = null)
-	{
-		$this->status = Lib::type()->struct_trait($this->result, $value, $useRegex);
-
-		return $this;
-	}
-
-
-	/**
-	 * @param callable          ...$fnExistsList
+	 * @template-covariant T of object
+	 *
+	 * @param class-string<T>|T|mixed $value
 	 *
 	 * @return static
 	 */
-	public function struct_fqcn($value, bool $useRegex = null, ...$fnExistsList)
+	public function struct($value, int $flags = null)
 	{
-		$this->status = Lib::type()->struct_fqcn($this->result, $value, $useRegex, ...$fnExistsList);
+		$this->status = Lib::type()->struct($this->result, $value, $flags);
 
 		return $this;
 	}
 
 
 	/**
-	 * @param callable    ...$fnExistsList
+	 * @template-covariant T of object
+	 *
+	 * @param class-string<T>|T|mixed $value
 	 *
 	 * @return static
 	 */
-	public function struct_namespace($value, bool $useRegex = null, ...$fnExistsList)
+	public function struct_class($value, int $flags = null)
 	{
-		$this->status = Lib::type()->struct_namespace($this->result, $value, $useRegex, ...$fnExistsList);
+		$this->status = Lib::type()->struct_class($this->result, $value, $flags);
 
 		return $this;
 	}
 
 
 	/**
-	 * @param callable    ...$fnExistsList
+	 * @return static
+	 */
+	public function struct_interface($value, int $flags = null)
+	{
+		$this->status = Lib::type()->struct_interface($this->result, $value, $flags);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function struct_trait($value, int $flags = null)
+	{
+		$this->status = Lib::type()->struct_trait($this->result, $value, $flags);
+
+		return $this;
+	}
+
+
+	/**
+	 * @template-covariant T of \UnitEnum
+	 *
+	 * @param class-string<T>|T|mixed $value
 	 *
 	 * @return static
 	 */
-	public function struct_basename($value, bool $useRegex = null, ...$fnExistsList)
+	public function struct_enum($value, int $flags = null)
 	{
-		$this->status = Lib::type()->struct_basename($this->result, $value, $useRegex, ...$fnExistsList);
+		$this->status = Lib::type()->struct_enum($this->result, $value, $flags);
+
+		return $this;
+	}
+
+
+	/**
+	 * @template-covariant T of object
+	 *
+	 * @param class-string<T>|T|mixed $value
+	 *
+	 * @return static
+	 */
+	public function struct_fqcn($value, int $flags = null)
+	{
+		$this->status = Lib::type()->struct_fqcn($this->result, $value, $flags);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function struct_namespace($value, int $flags = null)
+	{
+		$this->status = Lib::type()->struct_namespace($this->result, $value, $flags);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function struct_basename($value, int $flags = null)
+	{
+		$this->status = Lib::type()->struct_basename($this->result, $value, $flags);
 
 		return $this;
 	}

@@ -1398,13 +1398,13 @@ class ArrModule
     /**
      * > превращает вложенный массив в одноуровневый, но теряет ключи
      */
-    public function plain(?int $flags, ...$values) : array
+    public function plain(?int $walkFlags, ...$values) : array
     {
-        $flags = $flags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
+        $walkFlags = $walkFlags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
 
         $result = [];
 
-        foreach ( $this->walk_it($values, $flags) as $value ) {
+        foreach ( $this->walk_it($values, $walkFlags) as $value ) {
             $result[] = $value;
         }
 
@@ -1415,14 +1415,17 @@ class ArrModule
     /**
      * > превращает вложенный массив в одноуровневый, соединяя путь через точку
      */
-    public function dot(array $array, string $dot = null, int $flags = null) : array
+    public function dot(
+        array $array, string $dot = null,
+        int $walkFlags = null
+    ) : array
     {
         $dot = $dot ?? '.';
-        $flags = $flags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
+        $walkFlags = $walkFlags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
 
         $result = [];
 
-        $gen = $this->walk_it($array, $flags);
+        $gen = $this->walk_it($array, $walkFlags);
 
         foreach ( $gen as $path => $value ) {
             $result[ implode($dot, $path) ] = $value;
@@ -1437,16 +1440,16 @@ class ArrModule
      */
     public function dot_keys(
         array $array, string $dot = null, $value = null,
-        int $flags = null
+        int $walkFlags = null
     ) : array
     {
         $dot = $dot ?? '.';
         $value = $value ?? true;
-        $flags = $flags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
+        $walkFlags = $walkFlags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
 
         $result = [];
 
-        $gen = $this->walk_it($array, $flags);
+        $gen = $this->walk_it($array, $walkFlags);
 
         foreach ( $gen as $path => $devnull ) {
             $result[ implode($dot, $path) ] = $value;
@@ -1504,6 +1507,7 @@ class ArrModule
             $isModeDepthFirst = true;
             $isModeBreadthFirst = false;
         }
+        unset($sum);
 
         $isSortSelfFirst = (bool) ($flags & _ARR_WALK_SORT_SELF_FIRST);
         $isSortParentFirst = (bool) ($flags & _ARR_WALK_SORT_PARENT_FIRST);
@@ -1514,6 +1518,7 @@ class ArrModule
             $isSortParentFirst = false;
             $isSortChildFirst = false;
         }
+        unset($sum);
 
         $isWithLeaves = (bool) ($flags & _ARR_WALK_WITH_LEAVES);
         $isWithoutLeaves = (bool) ($flags & _ARR_WALK_WITHOUT_LEAVES);
