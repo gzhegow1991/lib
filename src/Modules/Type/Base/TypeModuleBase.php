@@ -2,27 +2,25 @@
 
 namespace Gzhegow\Lib\Modules\Type\Base;
 
-use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Nil;
 
 
 abstract class TypeModuleBase
 {
-    public function the_nil() : string
+    public function the_decimal_point() : string
+    {
+        return localeconv()[ 'decimal_point' ];
+    }
+
+
+    public function the_nil() : Nil
     {
         return new Nil();
     }
 
-
     public function the_timezone_nil() : \DateTimeZone
     {
         return new \DateTimeZone('+1234');
-    }
-
-
-    public function the_decimal_point() : string
-    {
-        return localeconv()[ 'decimal_point' ];
     }
 
 
@@ -31,7 +29,7 @@ abstract class TypeModuleBase
         return empty($value);
     }
 
-    public function is_not_empty($value) : bool
+    public function is_any_not_empty($value) : bool
     {
         return ! empty($value);
     }
@@ -42,7 +40,7 @@ abstract class TypeModuleBase
         return null === $value;
     }
 
-    public function is_not_null($value) : bool
+    public function is_any_not_null($value) : bool
     {
         return null !== $value;
     }
@@ -53,9 +51,30 @@ abstract class TypeModuleBase
         return false === $value;
     }
 
-    public function is_not_false($value) : bool
+    public function is_bool_not_false($value) : bool
+    {
+        return true === $value;
+    }
+
+    public function is_any_not_false($value) : bool
     {
         return false !== $value;
+    }
+
+
+    public function is_true($value) : bool
+    {
+        return true === $value;
+    }
+
+    public function is_bool_not_true($value) : bool
+    {
+        return false === $value;
+    }
+
+    public function is_any_not_true($value) : bool
+    {
+        return true !== $value;
     }
 
 
@@ -64,7 +83,12 @@ abstract class TypeModuleBase
         return is_float($value) && is_nan($value);
     }
 
-    public function is_not_nan($value) : bool
+    public function is_float_not_nan($value) : bool
+    {
+        return is_float($value) && ! is_nan($value);
+    }
+
+    public function is_any_not_nan($value) : bool
     {
         return ! (is_float($value) && is_nan($value));
     }
@@ -75,40 +99,107 @@ abstract class TypeModuleBase
         return is_float($value) && is_finite($value);
     }
 
-    public function is_not_finite($value) : bool
+    public function is_float_not_finite($value) : bool
+    {
+        return is_float($value) && ! is_finite($value);
+    }
+
+    public function is_any_not_finite($value) : bool
     {
         return ! (is_float($value) && is_finite($value));
     }
 
 
-    public function is_empty_string($value) : bool
+    public function is_infinite($value) : bool
+    {
+        return is_float($value) && is_infinite($value);
+    }
+
+    public function is_float_not_infinite($value) : bool
+    {
+        return is_float($value) && ! is_infinite($value);
+    }
+
+    public function is_any_not_infinite($value) : bool
+    {
+        return ! (is_float($value) && is_infinite($value));
+    }
+
+
+    public function is_string_empty($value) : bool
     {
         return '' === $value;
     }
 
-    public function is_not_empty_string($value) : bool
+    public function is_string_not_empty($value) : bool
+    {
+        return is_string($value) && ('' !== $value);
+    }
+
+    public function is_any_not_string_empty($value) : bool
     {
         return '' !== $value;
     }
 
 
-    public function is_empty_array($value) : bool
+    public function is_array_empty($value) : bool
     {
         return [] === $value;
     }
 
-    public function is_not_empty_array($value) : bool
+    public function is_array_not_empty($value) : bool
+    {
+        return is_array($value) && ([] !== $value);
+    }
+
+    public function is_any_not_array_empty($value) : bool
     {
         return [] !== $value;
     }
 
 
-    public function is_closed_resource($value) : bool
+    public function is_resource($value) : bool
+    {
+        return is_resource($value)
+            || 'resource (closed)' === gettype($value);
+    }
+
+    public function is_any_not_resource($value) : bool
+    {
+        return ! (
+            is_resource($value)
+            || 'resource (closed)' === gettype($value)
+        );
+    }
+
+
+    public function is_resource_opened($value) : bool
+    {
+        return is_resource($value);
+    }
+
+    public function is_resource_not_opened($value) : bool
     {
         return 'resource (closed)' === gettype($value);
     }
 
-    public function is_not_closed_resource($value) : bool
+    public function is_any_not_resource_opened($value) : bool
+    {
+        return ! is_resource($value);
+    }
+
+
+    public function is_resource_closed($value) : bool
+    {
+        return 'resource (closed)' === gettype($value);
+    }
+
+    public function is_resource_not_closed($value) : bool
+    {
+        return is_resource($value);
+    }
+
+    public function is_any_not_resource_closed($value) : bool
     {
         return 'resource (closed)' !== gettype($value);
     }
@@ -127,42 +218,9 @@ abstract class TypeModuleBase
         return Nil::is($value);
     }
 
-    public function is_not_nil($value) : bool
+    public function is_any_not_nil($value) : bool
     {
         return ! Nil::is($value);
-    }
-
-
-    /**
-     * > Специальный тип, который значит, что значение можно безопасно заменить NULL-ом
-     */
-    public function is_nullable($value) : bool
-    {
-        // > NAN is not nullable
-        // > EMPTY ARRAY is not nullable
-
-        if (
-            // > NULL is nullable
-            (null === $value)
-            //
-            // > EMPTY STRING is nullable
-            || ('' === $value)
-            //
-            // > CLOSED RESOURCE is nullable
-            || ('resource (closed)' === gettype($value))
-            //
-            // > NIL is nullable
-            || $this->is_nil($value)
-        ) {
-            return true;
-        }
-
-        return false;
-    }
-
-    public function is_not_nullable($value) : bool
-    {
-        return ! $this->is_nullable($value);
     }
 
 
@@ -171,44 +229,32 @@ abstract class TypeModuleBase
      */
     public function is_blank($value) : bool
     {
-        // > NAN is not blank
-        // > NIL is not blank
-
         if (
-            // > NULL is blank
+            // > NULL is blank (can appear from API to omit any actions on the value)
             (null === $value)
             //
-            // > EMPTY STRING is blank
+            // > EMPTY STRING is blank (can appear from HTML forms with no input provided)
             || ('' === $value)
             //
-            // > EMPTY ARRAY is blank
+            // > EMPTY ARRAY is blank (can appear from HTML forms with no checkbox/radio/select items choosen)
             || ([] === $value)
             //
-            // > CLOSED RESOURCE is blank
-            || ('resource (closed)' === gettype($value))
+            //
+            // // > CLOSED RESOURCE is not blank (actually its still internal object)
+            // || ('resource (closed)' === gettype($value))
+            //
+            // // > NAN is not blank (NAN equals nothing even itself)
+            // || (is_float($value) && is_nan($value))
+            //
+            // // > NIL is not blank (NIL is passed manually, that literally means NOT BLANK)
+            // || $this->is_nil($value)
         ) {
             return true;
         }
 
-        if (is_scalar($value)) {
-            // > BOOLEAN is not blank
-            // > INTEGER is not blank
-            // > FLOAT is not blank
-            // > STRING (including '0', excluding '') is not blank
-
-            return false;
-        }
-
-        if (is_object($value)) {
-            $cnt = Lib::php()->count($value);
-
-            if (is_float($cnt) && is_nan($cnt)) {
-                // > NON-COUNTABLE is not blank
-                return false;
-            }
-
-            if (0 === $cnt) {
-                // > COUNTABLE w/ ZERO SIZE is blank
+        // > COUNTABLE w/ ZERO SIZE is blank
+        if ($this->countable($countable, $value)) {
+            if (0 === count($countable)) {
                 return true;
             }
         }
@@ -216,45 +262,88 @@ abstract class TypeModuleBase
         return false;
     }
 
-    public function is_not_blank($value) : bool
+    public function is_any_not_blank($value) : bool
     {
         return ! $this->is_blank($value);
     }
 
 
     /**
-     * > Специальный тип, который значит, что значение было отправлено пользователем, а не появилось из кода
+     * > Специальный тип, который значит, что значение можно заменить NULL-ом
+     */
+    public function is_clearable($value) : bool
+    {
+        if (
+            // > NULL is clearable (means nothing)
+            (null === $value)
+            //
+            // > EMPTY STRING is clearable (can appear from HTML forms with no input provided)
+            || ('' === $value)
+            //
+            // > CLOSED RESOURCE is clearable (this is the internal garbage with no possible purpose)
+            || ('resource (closed)' === gettype($value))
+            //
+            // > NIL is clearable (NIL should be replaced with NULL later)
+            || $this->is_nil($value)
+            //
+            //
+            // // > EMPTY ARRAY is not clearable (array functions is not applicable to nulls)
+            // || ([] === $value)
+            //
+            // // > NAN is not clearable (NAN means some error in the code and shouldnt be replaced)
+            // || (is_float($value) && is_nan($value))
+        ) {
+            return true;
+        }
+
+        // // > COUNTABLE w/ ZERO SIZE is not nullable (countable/iterable functions is not applicable to nulls)
+        // if ($this->countable($countable, $value)) {
+        //     if (0 === count($countable)) {
+        //         return true;
+        //     }
+        // }
+
+        return false;
+    }
+
+    public function is_any_not_clearable($value) : bool
+    {
+        return ! $this->is_clearable($value);
+    }
+
+
+    /**
+     * > Специальный тип, который значит, что значение было отправлено пользователем, а не появилось само
      */
     public function is_passed($value) : bool
     {
-        // > NIL is passed
-        // > EMPTY ARRAY is passed
-        // > EMPTY COUNTABLE is passed
-
-        if (null === $value) {
-            // > NULL is not passed
-            return false;
-        }
-
-        if ('' === $value) {
-            // > EMPTY STRING is not passed
-            return false;
-        }
-
-        if (is_float($value) && is_nan($value)) {
-            // > NAN is not passed
-            return false;
-        }
-
-        if ('resource (closed)' === gettype($value)) {
-            // > CLOSED RESOURCE is not passed
+        if (
+            // > NULL is not passed (can appear from API to omit any actions on the value)
+            (null === $value)
+            //
+            // > EMPTY STRING is not passed (can appear from HTML form with no input provided)
+            || ('' === $value)
+            //
+            // > EMPTY ARRAY is not passed (can appear from HTML forms with no checkbox/radio/select items choosen)
+            || ([] === $value)
+            //
+            // > RESOURCE not passed (user cannot send resource)
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
+            //
+            // > NAN, -INF, INF is not passed (user cannot send NAN, -INF, +INF)
+            || (is_float($value) && ! is_finite($value))
+            //
+            //
+            // // > NIL is passed (NIL is passed manually, that literally means PASSED)
+            // || $this->is_nil($value)
+        ) {
             return false;
         }
 
         return true;
     }
 
-    public function is_not_passed($value) : bool
+    public function is_any_not_passed($value) : bool
     {
         return ! $this->is_passed($value);
     }

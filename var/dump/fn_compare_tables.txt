@@ -52,7 +52,7 @@
 | B@48 | "-INF"                                                     | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                          |
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                          |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                          |
-| B@51 | { resource(closed) }                                       | NAN ? cmpValuesNan | 0 ? cmpValuesNull  | NAN ? cmpValuesNil                                          |
+| B@51 | { resource(closed) }                                       | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                          |
 | B@52 | [  ]                                                       | NAN ? cmpValuesNan | 0 ? cmpValuesNull  | NAN ? cmpValuesNil                                          |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                          |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                          |
@@ -1052,7 +1052,7 @@
 |                                                                   | A@49 | { resource(opened) # stream } | A@50 | { resource(opened) # stream } | A@51 | { resource(closed) } |
 +-------------------------------------------------------------------+--------------------------------------+--------------------------------------+-----------------------------+
 | B@0 | NAN                                                         | NAN ? cmpValuesNan                   | NAN ? cmpValuesNan                   | NAN ? cmpValuesNan          |
-| B@1 | NULL                                                        | 1 ? cmpValuesNull                    | 1 ? cmpValuesNull                    | 0 ? cmpValuesNull           |
+| B@1 | NULL                                                        | 1 ? cmpValuesNull                    | 1 ? cmpValuesNull                    | 1 ? cmpValuesNull           |
 | B@2 | { object(stringable) # Gzhegow\Lib\Modules\Type\Nil }       | NAN ? cmpValuesNil                   | NAN ? cmpValuesNil                   | NAN ? cmpValuesNil          |
 | B@3 | "NAN"                                                       | NAN ? cmpValuesResource              | NAN ? cmpValuesResource              | NAN ? cmpValuesResource     |
 | B@4 | "NULL"                                                      | NAN ? cmpValuesResource              | NAN ? cmpValuesResource              | NAN ? cmpValuesResource     |

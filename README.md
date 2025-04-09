@@ -937,6 +937,20 @@ $fn = function () {
     $theCmp = \Gzhegow\Lib\Lib::cmp();
     $theDebug = \Gzhegow\Lib\Lib::debug();
 
+    $fnCmpName = null;
+    $fnCmpSizeName = null;
+
+    $fnCmp = $theCmp->fnCompareValues(
+        _CMP_MODE_TYPE_CAST_OR_CONTINUE | _CMP_MODE_DATE_VS_SEC,
+        _CMP_RESULT_NAN_RETURN,
+        [ &$fnCmpName ]
+    );
+    $fnCmpSize = $theCmp->fnCompareSizes(
+        _CMP_MODE_TYPE_CAST_OR_CONTINUE | _CMP_MODE_DATE_VS_SEC,
+        _CMP_RESULT_NAN_RETURN,
+        [ &$fnCmpSizeName ]
+    );
+
     // $dumpPath = __DIR__ . '/var/dump/fn_compare_tables.txt';
     // if (is_file($dumpPath)) unlink($dumpPath);
 
@@ -950,17 +964,6 @@ $fn = function () {
             $yi = 0;
             foreach ( $valuesY as $y ) {
                 $yKey = "B@{$yi} | " . $theDebug->value($y);
-
-                $fnCmp = $theCmp->fnCompareValues(
-                    _CMP_MODE_TYPE_CAST_OR_CONTINUE | _CMP_MODE_DATE_VS_SEC,
-                    _CMP_RESULT_NAN_RETURN,
-                    [ &$fnCmpName ]
-                );
-                $fnCmpSize = $theCmp->fnCompareSizes(
-                    _CMP_MODE_TYPE_CAST_OR_CONTINUE | _CMP_MODE_DATE_VS_SEC,
-                    _CMP_RESULT_NAN_RETURN,
-                    [ &$fnCmpSizeName ]
-                );
 
                 $result = $fnCmp($x, $y);
                 $resultSize = $fnCmpSize($x, $y);
@@ -991,8 +994,8 @@ $fn = function () {
 _assert_stdout($fn, [], '
 "[ CmpModule ]"
 
-bdf5cc59ed864e6160ae04d224e33fa7
-bdf5cc59ed864e6160ae04d224e33fa7
+a75fe2dc510d4d1559dc93fb294f34aa
+a75fe2dc510d4d1559dc93fb294f34aa
 
 5369c1754322243e0d39af9ca563a057
 1a2482d0414f29d1683971e5c8dab6e4
@@ -1033,8 +1036,8 @@ d5127e6a0847dba84ca613b24882f603
 91f4324dd6d0a448482eae00926dd357
 39358eed96f6a4030cbc478618e62144
 
-2dcbe8337a4e9ddc11a176384684ed34
-93076f4ce8d70cf7b519e10bfff52126
+8caf8b71107f20440ebc4a67965537e3
+2cfbe39b15c3e9f9206028460234061f
 
 1943a9c0529911fdf4f309a1ad39b7d2
 961de1b52b86369f95416f4ecdb5f64a

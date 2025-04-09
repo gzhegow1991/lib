@@ -161,20 +161,20 @@ class StrModule
         if (! $isString) {
             if (
                 (null === $value)
+                // || ('' === $value)
                 || (is_bool($value))
-                || (is_float($value) && (! is_finite($value)))
                 || (is_array($value))
-                || (is_resource($value))
-                || ('resource (closed)' === gettype($value))
+                || (is_float($value) && (! is_finite($value)))
+                || (is_resource($value) || ('resource (closed)' === gettype($value)))
                 || (Lib::type()->is_nil($value))
             ) {
-                // NULL is equal EMPTY STRING but cannot be casted to
-                // BOOLEAN is not string
-                // NAN, INF, -INF is not string
-                // ARRAY is not string
-                // RESOURCE is not string
-                // CLOSED RESOURCE is not string
-                // NIL is not string
+                // > NULL is equal EMPTY STRING but cannot be casted to
+                // > BOOLEAN is not string
+                // > NAN, INF, -INF is not string
+                // > ARRAY is not string
+                // > RESOURCE is not string
+                // > CLOSED RESOURCE is not string
+                // > NIL is not string
 
                 return false;
             }

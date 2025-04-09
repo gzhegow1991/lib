@@ -271,10 +271,7 @@ class ArrModule
     }
 
 
-    public function has(
-        $array, $key,
-        array $refs = []
-    ) : bool
+    public function has_key($array, $key, array $refs = []) : bool
     {
         $withValue = array_key_exists(0, $refs);
 
@@ -306,9 +303,9 @@ class ArrModule
     /**
      * @throws \RuntimeException
      */
-    public function get(array $array, $key, array $fallback = []) // : ?mixed
+    public function get_key(array $array, $key, array $fallback = []) // : ?mixed
     {
-        $status = $this->has($array, $key, [ &$value ]);
+        $status = $this->has_key($array, $key, [ &$value ]);
 
         if (! $status) {
             if ($fallback) {
@@ -328,9 +325,14 @@ class ArrModule
 
     public function key_first(array $array) // : ?int|string
     {
-        reset($array);
+        if (PHP_VERSION_ID >= 70300) {
+            return array_key_first($array);
 
-        return key($array);
+        } else {
+            reset($array);
+
+            return key($array);
+        }
     }
 
     /**
@@ -350,6 +352,10 @@ class ArrModule
             );
         }
 
+        if (PHP_VERSION_ID >= 70300) {
+            return $array[ array_key_first($array) ];
+        }
+
         $first = reset($array);
 
         return $first;
@@ -358,9 +364,14 @@ class ArrModule
 
     public function key_last(array $array) // : ?int|string
     {
-        end($array);
+        if (PHP_VERSION_ID >= 70300) {
+            return array_key_last($array);
 
-        return key($array);
+        } else {
+            end($array);
+
+            return key($array);
+        }
     }
 
     /**
@@ -380,6 +391,10 @@ class ArrModule
             );
         }
 
+        if (PHP_VERSION_ID >= 70300) {
+            return $array[ array_key_last($array) ];
+        }
+
         $last = end($array);
 
         return $last;
@@ -388,10 +403,23 @@ class ArrModule
 
     public function key_next(array $src) : int
     {
-        $arr = $src;
+        $arr = array_fill_keys(
+            array_keys($src),
+            true
+        );
+
         $arr[] = true;
 
-        return $this->key_last($arr);
+        if (PHP_VERSION_ID >= 70300) {
+            $lastKey = array_key_last($arr);
+
+        } else {
+            end($src);
+
+            $lastKey = key($arr);
+        }
+
+        return $lastKey;
     }
 
 
@@ -876,7 +904,7 @@ class ArrModule
 
 
     /**
-     * создать массив из ключей и заполнить значениями, если значение не передать заполнит цифрами по порядку
+     * > создать массив из ключей и заполнить значениями, если значение не передать заполнит цифрами по порядку
      */
     public function fill_keys($keys, array $new = []) : array
     {
@@ -1190,7 +1218,7 @@ class ArrModule
     }
 
     /**
-     *  > разбивает массив на два по критерию
+     * > разбивает массив на два по критерию
      *
      * @param callable $fn
      *

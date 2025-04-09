@@ -47,23 +47,78 @@ class PhpModule
     {
         $result = null;
 
+        if (PHP_VERSION_ID >= 70300) {
+            if (is_countable($value)) {
+                $result = $value;
+
+                return true;
+            }
+
+            return false;
+        }
+
+        if (is_array($value)) {
+            $result = $value;
+
+            return true;
+        }
+
         if ($value instanceof \Countable) {
             $result = $value;
 
             return true;
         }
 
-        if (PHP_VERSION_ID < 70300) {
+        return false;
+    }
+
+    /**
+     * @param \Countable|null $result
+     */
+    public function type_countable_object(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (PHP_VERSION_ID >= 70300) {
+            if (is_object($value) && is_countable($value)) {
+                $result = $value;
+
+                return true;
+            }
+
             return false;
         }
 
-        if (! is_countable($value)) {
-            return false;
+        if ($value instanceof \Countable) {
+            $result = $value;
+
+            return true;
         }
 
-        $result = $value;
+        return false;
+    }
 
-        return true;
+
+    /**
+     * @param array|\Countable|null $result
+     */
+    public function type_sizeable(&$result, $value) : bool
+    {
+        $result = null;
+
+        if ($this->type_countable($countable, $value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        if (Lib::str()->type_string($string, $value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -757,11 +812,11 @@ class PhpModule
 
         if (
             (null === $value)
+            || ('' === $value)
             || (is_bool($value))
             || (is_array($value))
             || (is_float($value) && (! is_finite($value)))
-            || (is_resource($value))
-            || ('resource (closed)' === gettype($value))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || (Lib::type()->is_nil($value))
         ) {
             throw new LogicException(
@@ -787,7 +842,7 @@ class PhpModule
     public function to_float($value, array $options = []) : float
     {
         if (is_float($value)) {
-            if (! is_nan($value)) {
+            if (! is_finite($value)) {
                 throw new LogicException(
                     [
                         'Unable to parse value while converting to float',
@@ -805,10 +860,11 @@ class PhpModule
 
         if (
             (null === $value)
+            || ('' === $value)
             || (is_bool($value))
             || (is_array($value))
-            || (is_resource($value))
-            || ('resource (closed)' === gettype($value))
+            // || (is_float($value) && (! is_finite($value)))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || (Lib::type()->is_nil($value))
         ) {
             throw new LogicException(
@@ -843,11 +899,11 @@ class PhpModule
 
         if (
             (null === $value)
+            // || ('' === $value)
             || (is_bool($value))
             || (is_array($value))
             || (is_float($value) && (! is_finite($value)))
-            || (is_resource($value))
-            || ('resource (closed)' === gettype($value))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || (Lib::type()->is_nil($value))
         ) {
             throw new LogicException(
@@ -858,7 +914,14 @@ class PhpModule
             );
         }
 
-        $_value = (string) $value;
+        if (! Lib::type()->string($_value, $value)) {
+            throw new LogicException(
+                [
+                    'Unable to convert value to string',
+                    $value,
+                ]
+            );
+        }
 
         return $_value;
     }
@@ -893,14 +956,16 @@ class PhpModule
 
         if (
             (null === $value)
+            // || ('' === $value)
+            // || (is_bool($value))
+            // || (is_array($value))
             || (is_float($value) && (! is_nan($value)))
-            || (is_resource($value))
-            || ('resource (closed)' === gettype($value))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || (Lib::type()->is_nil($value))
         ) {
             throw new LogicException(
                 [
-                    'Unable to parse value while converting to string',
+                    'Unable to parse value while converting to array',
                     $value,
                 ]
             );
@@ -938,9 +1003,11 @@ class PhpModule
 
         if (
             (null === $value)
+            // || ('' === $value)
+            // || (is_bool($value))
+            // || (is_array($value))
             || (is_float($value) && (! is_nan($value)))
-            || (is_resource($value))
-            || ('resource (closed)' === gettype($value))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || (Lib::type()->is_nil($value))
         ) {
             throw new LogicException(
@@ -1043,10 +1110,6 @@ class PhpModule
      */
     public function count($value) // : int|NAN
     {
-        if (is_array($value)) {
-            return count($value);
-        }
-
         if ($this->type_countable($countable, $value)) {
             return count($countable);
         }
@@ -1059,10 +1122,6 @@ class PhpModule
      */
     public function size($value) // : int|NAN
     {
-        if (is_array($value)) {
-            return count($value);
-        }
-
         if ($this->type_countable($countable, $value)) {
             return count($countable);
         }
@@ -1079,10 +1138,6 @@ class PhpModule
      */
     public function length($value) // : int|NAN
     {
-        if (is_array($value)) {
-            return count($value);
-        }
-
         if ($this->type_countable($countable, $value)) {
             return count($countable);
         }
@@ -1090,7 +1145,7 @@ class PhpModule
         $theStr = Lib::str();
 
         if ($theStr->type_string($string, $value)) {
-            return Lib::str()->strlen($string);
+            return $theStr->strlen($string);
         }
 
         return NAN;

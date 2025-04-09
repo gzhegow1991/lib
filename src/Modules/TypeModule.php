@@ -19,50 +19,88 @@ class TypeModule extends TypeModuleBase
     {
         $result = null;
 
+        if (null === $value) {
+            return false;
+        }
+
         if (is_bool($value)) {
             $result = $value;
 
             return true;
         }
 
-        if (
-            (null === $value)
-            || (is_float($value) && is_nan($value))
-            || ($this->is_nil($value))
-        ) {
-            // > NULL is not bool
-            // > NAN is not bool
-            // > NIL is not bool
+        if (is_int($value)) {
+            $result = (0 !== $value);
 
+            return true;
+        }
+
+        if (is_float($value)) {
+            if (is_nan($value)) {
+                return false;
+            }
+
+            $result = (0.0 !== $value);
+
+            return true;
+        }
+
+        if (Lib::type()->is_nil($value)) {
             return false;
         }
 
-        if ('0' === $value) {
-            // > ANY NON-EMPTY STRING is true
+        if (is_string($value)) {
+            if ('' === $value) {
+                $result = false;
+
+                return true;
+            }
+
             $result = true;
 
             return true;
         }
 
-        if (0 === ($cnt = Lib::php()->count($value))) {
-            // > EMPTY COUNTABLE is false
+        if (is_array($value)) {
+            if ([] === $value) {
+                $result = false;
 
+                return true;
+            }
+
+            $result = true;
+
+            return true;
+        }
+
+        if (is_resource($value)) {
+            $result = true;
+
+            return true;
+
+        } elseif ('resource (closed)' === gettype($value)) {
             $result = false;
 
             return true;
         }
 
-        if ('resource (closed)' === gettype($value)) {
-            // > CLOSED RESOURCE is false
+        if (is_object($value)) {
+            if ($this->countable($countable, $value)) {
+                if (0 === count($countable)) {
+                    // > EMPTY COUNTABLE is false
 
-            $result = false;
+                    $result = false;
+
+                    return true;
+                }
+            }
+
+            $result = true;
 
             return true;
         }
 
-        $result = (bool) $value;
-
-        return true;
+        return false;
     }
 
     /**
@@ -72,22 +110,30 @@ class TypeModule extends TypeModuleBase
     {
         $result = null;
 
+        if (null === $value) {
+            return false;
+        }
+
         if (is_bool($value)) {
             $result = $value;
 
             return true;
         }
 
-        if (
-            (null === $value)
-            || (is_float($value) && is_nan($value))
-            || ($this->is_nil($value))
-        ) {
-            // > NULL is not bool
-            // > NAN is not bool
-            // > NIL is not bool
+        if (is_int($value)) {
+            $result = (0 !== $value);
 
-            return false;
+            return true;
+        }
+
+        if (is_float($value)) {
+            if (is_nan($value)) {
+                return false;
+            }
+
+            $result = (0.0 !== $value);
+
+            return true;
         }
 
         if (is_string($value)) {
@@ -115,25 +161,7 @@ class TypeModule extends TypeModuleBase
             }
         }
 
-        if (0 === ($cnt = Lib::php()->count($value))) {
-            // > EMPTY COUNTABLE is false
-
-            $result = false;
-
-            return true;
-        }
-
-        if ('resource (closed)' === gettype($value)) {
-            // > CLOSED RESOURCE is false
-
-            $result = false;
-
-            return true;
-        }
-
-        $result = (bool) $value;
-
-        return true;
+        return false;
     }
 
 
@@ -152,19 +180,19 @@ class TypeModule extends TypeModuleBase
 
         if (
             (null === $value)
+            || ('' === $value)
             || (is_bool($value))
             || (is_array($value))
-            || (is_float($value) && (! is_finite($value)))
-            || (is_resource($value))
-            || ('resource (closed)' === gettype($value))
+            || (is_float($value) && ! is_finite($value))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || ($this->is_nil($value))
         ) {
             // > NULL is not int
+            // > EMPTY STRING is not int
             // > BOOLEAN is not int
             // > ARRAY is not int
             // > NAN, INF, -INF is not int
             // > RESOURCE is not int
-            // > CLOSED RESOURCE is not int
             // > NIL is not int
 
             return false;
@@ -298,6 +326,7 @@ class TypeModule extends TypeModuleBase
 
         } elseif (is_float($value)) {
             if (! is_finite($value)) {
+                // > NAN, INF, -INF is float, but should not be parsed
                 return false;
             }
 
@@ -308,17 +337,18 @@ class TypeModule extends TypeModuleBase
 
         if (
             (null === $value)
+            || ('' === $value)
             || (is_bool($value))
             || (is_array($value))
-            || (is_resource($value))
-            || ('resource (closed)' === gettype($value))
+            // || (is_float($value) && (! is_finite($value)))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || ($this->is_nil($value))
         ) {
             // > NULL is not float
+            // > EMPTY STRING is not float
             // > BOOLEAN is not float
             // > ARRAY is not float
             // > RESOURCE is not float
-            // > CLOSED RESOURCE is not float
             // > NIL is not float
 
             return false;
@@ -491,6 +521,7 @@ class TypeModule extends TypeModuleBase
 
         if (is_float($value)) {
             if (! is_finite($value)) {
+                // > NAN, INF, -INF is float, but should not be parsed
                 return false;
             }
 
@@ -501,17 +532,18 @@ class TypeModule extends TypeModuleBase
 
         if (
             (null === $value)
+            || ('' === $value)
             || (is_bool($value))
             || (is_array($value))
-            || (is_resource($value))
-            || ('resource (closed)' === gettype($value))
+            // || (is_float($value) && (! is_finite($value)))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || ($this->is_nil($value))
         ) {
             // > NULL is not num
+            // > EMPTY STRING is not num
             // > BOOLEAN is not num
             // > ARRAY is not num
             // > RESOURCE is not num
-            // > CLOSED RESOURCE is not num
             // > NIL is not num
 
             return false;
@@ -750,6 +782,8 @@ class TypeModule extends TypeModuleBase
         $isFloat = is_float($value);
         if ($isFloat) {
             if (! is_finite($value)) {
+                // > NAN, INF, -INF is float, but should not be parsed
+
                 unset($refSplit);
 
                 return false;
@@ -778,17 +812,18 @@ class TypeModule extends TypeModuleBase
 
         if (
             (null === $value)
+            || ('' === $value)
             || (is_bool($value))
             || (is_array($value))
-            || (is_resource($value))
-            || ('resource (closed)' === gettype($value))
+            // || (is_float($value) && (! is_finite($value)))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || ($this->is_nil($value))
         ) {
             // > NULL is not numeric
+            // > EMPTY STRING is not numeric
             // > BOOLEAN is not numeric
             // > ARRAY is not numeric
             // > RESOURCE is not numeric
-            // > CLOSED RESOURCE is not numeric
             // > NIL is not numeric
 
             return false;
@@ -1622,6 +1657,22 @@ class TypeModule extends TypeModuleBase
     public function countable(&$result, $value) : bool
     {
         return Lib::php()->type_countable($result, $value);
+    }
+
+    /**
+     * @param \Countable|null $result
+     */
+    public function countable_object(&$result, $value) : bool
+    {
+        return Lib::php()->type_countable_object($result, $value);
+    }
+
+    /**
+     * @param string|array|\Countable|null $result
+     */
+    public function sizeable(&$result, $value) : bool
+    {
+        return Lib::php()->type_sizeable($result, $value);
     }
 
 
