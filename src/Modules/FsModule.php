@@ -571,13 +571,13 @@ class FsModule
      * > возвращает абсолютный нормализованный путь, если путь не начинается с $separator
      */
     public function absolute(
-        string $relative, string $current,
+        string $path, string $current,
         string $separator = null
     ) : string
     {
         $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
 
-        return Lib::php()->absolute($relative, $current, $separator, '.');
+        return Lib::php()->absolute($path, $current, $separator, '.');
     }
 
 

@@ -2204,11 +2204,11 @@ class PhpModule
      * > возвращает абсолютный нормализованный путь, если путь не начинается с $separator
      */
     public function absolute(
-        string $relative, string $current,
+        string $path, string $current,
         string $separator = null, string $dot = null
     ) : string
     {
-        if ('' === $relative) {
+        if ('' === $path) {
             throw new LogicException(
                 [ 'The `relative` should be non-empty string' ]
             );
@@ -2223,15 +2223,26 @@ class PhpModule
         $separator = Lib::parse()->char($separator) ?? '/';
         $dot = Lib::parse()->char($dot) ?? '.';
 
-        $absolute = $this->normalize($relative, $separator);
+        $normalized = $this->normalize($path, $separator);
 
-        if ($dot === $absolute[ 0 ]) {
-            $_current = $this->normalize($current, $separator);
+        $isRoot = ($separator === $normalized[ 0 ]);
+        $isDot = ($dot === $normalized[ 0 ]);
 
-            $absolute = $_current . $separator . $absolute;
+        if ($isRoot || $isDot) {
+            if ($isDot) {
+                $_current = $this->normalize($current, $separator);
+
+                $absolute = $_current . $separator . $normalized;
+
+            } else {
+                $absolute = $normalized;
+            }
+
+            $resolved = $this->resolve($absolute, $separator, $dot);
+
+        } else {
+            $resolved = $normalized;
         }
-
-        $resolved = $this->resolve($absolute, $separator, $dot);
 
         return $resolved;
     }
