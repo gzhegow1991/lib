@@ -345,7 +345,7 @@ class ItertoolsModule
      *
      * @return \Generator
      */
-    public function permutations_it(iterable $it, int $len = null) : \Generator
+    public function permutations_it(iterable $it, ?int $len = null) : \Generator
     {
         $pool = [];
         foreach ( $it as $v ) {

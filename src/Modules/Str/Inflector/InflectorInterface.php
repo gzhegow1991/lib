@@ -12,7 +12,7 @@ interface InflectorInterface
      *
      * @return null|array
      */
-    public function pluralize(string $singular, int $limit = null, int $offset = null) : array;
+    public function pluralize(string $singular, ?int $limit = null, ?int $offset = null) : array;
 
     /**
      * @param string   $plural
@@ -21,5 +21,5 @@ interface InflectorInterface
      *
      * @return null|array
      */
-    public function singularize(string $plural, int $limit = null, int $offset = null) : array;
+    public function singularize(string $plural, ?int $limit = null, ?int $offset = null) : array;
 }

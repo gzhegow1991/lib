@@ -11,7 +11,7 @@ class DateModule
     /**
      * @param \DateTimeZone|null $result
      */
-    public function type_timezone(&$result, $value, array $allowedTimezoneTypes = null) : bool
+    public function type_timezone(&$result, $value, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -217,7 +217,7 @@ class DateModule
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function type_date(&$result, $datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    public function type_date(&$result, $datestring, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -275,7 +275,7 @@ class DateModule
     /**
      * @param \DateTime|null $result
      */
-    public function type_adate(&$result, $datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    public function type_adate(&$result, $datestring, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -333,7 +333,7 @@ class DateModule
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function type_idate(&$result, $datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    public function type_idate(&$result, $datestring, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -392,7 +392,7 @@ class DateModule
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function type_date_tz(&$result, $datestring, array $allowedTimezoneTypes = null) : bool
+    public function type_date_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -448,7 +448,7 @@ class DateModule
     /**
      * @param \DateTime|null $result
      */
-    public function type_adate_tz(&$result, $datestring, array $allowedTimezoneTypes = null) : bool
+    public function type_adate_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -504,7 +504,7 @@ class DateModule
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function type_idate_tz(&$result, $datestring, array $allowedTimezoneTypes = null) : bool
+    public function type_idate_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -561,7 +561,7 @@ class DateModule
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function type_date_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    public function type_date_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -629,7 +629,7 @@ class DateModule
     /**
      * @param \DateTime|null $result
      */
-    public function type_adate_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    public function type_adate_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -697,7 +697,7 @@ class DateModule
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function type_idate_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    public function type_idate_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -768,7 +768,7 @@ class DateModule
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function type_date_tz_formatted(&$result, string $format, $dateFormatted, array $allowedTimezoneTypes = null) : bool
+    public function type_date_tz_formatted(&$result, string $format, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -834,7 +834,7 @@ class DateModule
     /**
      * @param \DateTime|null $result
      */
-    public function type_adate_tz_formatted(&$result, string $format, $dateFormatted, array $allowedTimezoneTypes = null) : bool
+    public function type_adate_tz_formatted(&$result, string $format, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -900,7 +900,7 @@ class DateModule
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function type_idate_tz_formatted(&$result, string $format, $dateFormatted, array $allowedTimezoneTypes = null) : bool
+    public function type_idate_tz_formatted(&$result, string $format, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -967,7 +967,7 @@ class DateModule
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function type_date_microtime(&$result, $microtime, $timezoneSet = null, array $allowedTimezoneTypes = null) : bool
+    public function type_date_microtime(&$result, $microtime, $timezoneSet = null, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -1048,7 +1048,7 @@ class DateModule
     /**
      * @param \DateTime|null $result
      */
-    public function type_adate_microtime(&$result, $microtime, $timezoneSet = null, array $allowedTimezoneTypes = null) : bool
+    public function type_adate_microtime(&$result, $microtime, $timezoneSet = null, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -1129,7 +1129,7 @@ class DateModule
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function type_idate_microtime(&$result, $microtime, $timezoneSet = null, array $allowedTimezoneTypes = null) : bool
+    public function type_idate_microtime(&$result, $microtime, $timezoneSet = null, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -1337,7 +1337,7 @@ class DateModule
     /**
      * @param \DateInterval|null $result
      */
-    public function type_interval_ago(&$result, $date, \DateTimeInterface $from = null, bool $reverse = null) : bool
+    public function type_interval_ago(&$result, $date, ?\DateTimeInterface $from = null, ?bool $reverse = null) : bool
     {
         $result = null;
 
@@ -1370,7 +1370,7 @@ class DateModule
     }
 
 
-    public function date_remote(\DateTimeInterface $date, $timezoneSet, array $allowedTimezoneTypes = null) : \DateTimeInterface
+    public function date_remote(\DateTimeInterface $date, $timezoneSet, ?array $allowedTimezoneTypes = null) : \DateTimeInterface
     {
         $status = $this->type_timezone(
             $_timezoneRemote,
@@ -1390,7 +1390,7 @@ class DateModule
         return $clone;
     }
 
-    public function adate_remote(\DateTimeInterface $date, $timezoneSet, array $allowedTimezoneTypes = null) : \DateTime
+    public function adate_remote(\DateTimeInterface $date, $timezoneSet, ?array $allowedTimezoneTypes = null) : \DateTime
     {
         $status = $this->type_timezone(
             $_timezoneRemote,
@@ -1410,7 +1410,7 @@ class DateModule
         return $clone;
     }
 
-    public function idate_remote(\DateTimeInterface $date, $timezoneSet, array $allowedTimezoneTypes = null) : \DateTimeInterface
+    public function idate_remote(\DateTimeInterface $date, $timezoneSet, ?array $allowedTimezoneTypes = null) : \DateTimeInterface
     {
         $status = $this->type_timezone(
             $_timezoneRemote,
@@ -1431,7 +1431,7 @@ class DateModule
     }
 
 
-    public function adate_now($timezone = null, array $allowedTimezoneTypes = null) : \DateTime
+    public function adate_now($timezone = null, ?array $allowedTimezoneTypes = null) : \DateTime
     {
         $_timezone = null;
         if (null !== $timezone) {
@@ -1467,7 +1467,7 @@ class DateModule
         return $dateTime;
     }
 
-    public function idate_now($timezone = null, array $allowedTimezoneTypes = null) : \DateTimeInterface
+    public function idate_now($timezone = null, ?array $allowedTimezoneTypes = null) : \DateTimeInterface
     {
         $_timezone = null;
         if (null !== $timezone) {
@@ -1504,7 +1504,7 @@ class DateModule
     }
 
 
-    public function adate_epoch($timezone = null, array $allowedTimezoneTypes = null) : \DateTime
+    public function adate_epoch($timezone = null, ?array $allowedTimezoneTypes = null) : \DateTime
     {
         $allowOffset = $allowOffset ?? true;
 
@@ -1542,7 +1542,7 @@ class DateModule
         return $dateTime;
     }
 
-    public function idate_epoch($timezone = null, array $allowedTimezoneTypes = null) : \DateTimeInterface
+    public function idate_epoch($timezone = null, ?array $allowedTimezoneTypes = null) : \DateTimeInterface
     {
         $allowOffset = $allowOffset ?? true;
 
@@ -1581,7 +1581,7 @@ class DateModule
     }
 
 
-    public function adate_zero($timezone = null, array $allowedTimezoneTypes = null) : \DateTime
+    public function adate_zero($timezone = null, ?array $allowedTimezoneTypes = null) : \DateTime
     {
         $allowOffset = $allowOffset ?? true;
 
@@ -1619,7 +1619,7 @@ class DateModule
         return $dateTime;
     }
 
-    public function idate_zero($timezone = null, array $allowedTimezoneTypes = null) : \DateTimeInterface
+    public function idate_zero($timezone = null, ?array $allowedTimezoneTypes = null) : \DateTimeInterface
     {
         $allowOffset = $allowOffset ?? true;
 

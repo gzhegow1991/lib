@@ -93,15 +93,15 @@ class HttpModule
 
 
     public function header_throw(
-        string $header, bool $replace = null, int $response_code = null
+        string $header, ?bool $replace = null, ?int $response_code = null
     ) : void
     {
         $this->header($header, $replace, $response_code, true);
     }
 
     public function header(
-        string $header, bool $replace = null, int $response_code = null,
-        bool $throwIfHeadersSent = null
+        string $header, ?bool $replace = null, ?int $response_code = null,
+        ?bool $throwIfHeadersSent = null
     ) : void
     {
         $replace = $replace ?? true;
@@ -130,7 +130,7 @@ class HttpModule
 
     public function header_remove(
         ?string $name,
-        bool $throwIfHeadersSent = null
+        ?bool $throwIfHeadersSent = null
     ) : void
     {
         $throwIfHeadersSent = $throwIfHeadersSent ?? false;
@@ -179,7 +179,7 @@ class HttpModule
     }
 
 
-    public function static_cookies(Cookies $cookies = null) : Cookies
+    public function static_cookies(?Cookies $cookies = null) : Cookies
     {
         if (null !== $cookies) {
             $last = $this->cookies;
@@ -239,9 +239,9 @@ class HttpModule
     }
 
     public function cookie_set(
-        string $name, string $value, int $expires = null,
-        string $path = null, string $domain = null,
-        bool $secure = null, bool $httpOnly = null
+        string $name, string $value, ?int $expires = null,
+        ?string $path = null, ?string $domain = null,
+        ?bool $secure = null, ?bool $httpOnly = null
     ) : void
     {
         if ('' === $name) {
@@ -287,8 +287,8 @@ class HttpModule
 
     public function cookie_unset(
         string $name,
-        string $path = null, string $domain = null,
-        bool $secure = null, bool $httpOnly = null
+        ?string $path = null, ?string $domain = null,
+        ?bool $secure = null, ?bool $httpOnly = null
     ) : void
     {
         // > смещение временной зоны в самых отвратительных кейсах может быть до 26 часов
@@ -302,7 +302,7 @@ class HttpModule
     }
 
 
-    public function static_session(object $session = null) : ?object
+    public function static_session(?object $session = null) : ?object
     {
         /**
          * @noinspection PhpUndefinedNamespaceInspection

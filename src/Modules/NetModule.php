@@ -109,7 +109,7 @@ class NetModule
     /**
      * @param string|null $result
      */
-    public function type_subnet(&$result, $value, string $ipFallback = null) : bool
+    public function type_subnet(&$result, $value, ?string $ipFallback = null) : bool
     {
         $result = null;
 
@@ -129,7 +129,7 @@ class NetModule
     /**
      * @param string|null $result
      */
-    public function type_subnet_v4(&$result, $value, string $ipFallback = null) : bool
+    public function type_subnet_v4(&$result, $value, ?string $ipFallback = null) : bool
     {
         $result = null;
 
@@ -215,7 +215,7 @@ class NetModule
     /**
      * @param string|null $result
      */
-    public function type_subnet_v6(&$result, $value, string $ipFallback = null) : bool
+    public function type_subnet_v6(&$result, $value, ?string $ipFallback = null) : bool
     {
         $result = null;
 
@@ -308,7 +308,7 @@ class NetModule
     }
 
 
-    public function is_ip_in_subnet(string $ip, string $subnet, string $subnetIpFallback = null) : bool
+    public function is_ip_in_subnet(string $ip, string $subnet, ?string $subnetIpFallback = null) : bool
     {
         $ipV4String = null;
         $ipV6String = null;
@@ -358,7 +358,7 @@ class NetModule
         return $status;
     }
 
-    public function is_ip_in_subnet_v4(string $ip, string $subnet, string $subnetIpFallback = null) : bool
+    public function is_ip_in_subnet_v4(string $ip, string $subnet, ?string $subnetIpFallback = null) : bool
     {
         $status = $this->type_address_ip_v4($ipString, $ip);
         if (! $status) {
@@ -394,7 +394,7 @@ class NetModule
         return $status;
     }
 
-    public function is_ip_in_subnet_v6(string $ip, string $subnet, string $subnetIpFallback = null) : bool
+    public function is_ip_in_subnet_v6(string $ip, string $subnet, ?string $subnetIpFallback = null) : bool
     {
         $status = $this->type_address_ip_v6($ipString, $ip);
         if (! $status) {

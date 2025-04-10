@@ -176,7 +176,7 @@ class DebugModule
         return $result;
     }
 
-    public function static_var_dump_options(array $varDumpOptions = null) : ?array
+    public function static_var_dump_options(?array $varDumpOptions = null) : ?array
     {
         if (null !== $varDumpOptions) {
             $last = $this->varDumpOptions;
@@ -1208,7 +1208,7 @@ class DebugModule
     }
 
 
-    public function value_array($value, int $levelMax = null, array $options = [], array &$context = []) : string
+    public function value_array($value, ?int $levelMax = null, array $options = [], array &$context = []) : string
     {
         $levelMax = $levelMax ?? 1;
         if ($levelMax < 0) $levelMax = 0;
@@ -1220,7 +1220,7 @@ class DebugModule
         return $content;
     }
 
-    public function value_array_multiline($value, int $levelMax = null, array $options = [], array &$context = []) : string
+    public function value_array_multiline($value, ?int $levelMax = null, array $options = [], array &$context = []) : string
     {
         $levelMax = $levelMax ?? 1;
         if ($levelMax < 0) $levelMax = 0;
@@ -1233,7 +1233,7 @@ class DebugModule
     }
 
 
-    public function types(string $separator = null, array $options = [], ...$values) : string
+    public function types(?string $separator = null, array $options = [], ...$values) : string
     {
         $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
 
@@ -1247,7 +1247,7 @@ class DebugModule
         return $content;
     }
 
-    public function type_ids(string $separator = null, array $options = [], ...$values) : string
+    public function type_ids(?string $separator = null, array $options = [], ...$values) : string
     {
         $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
 
@@ -1261,7 +1261,7 @@ class DebugModule
         return $content;
     }
 
-    public function type_values(string $separator = null, array $options = [], ...$values) : string
+    public function type_values(?string $separator = null, array $options = [], ...$values) : string
     {
         $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
 
@@ -1276,7 +1276,7 @@ class DebugModule
     }
 
 
-    public function values(string $separator = null, array $options = [], ...$values) : string
+    public function values(?string $separator = null, array $options = [], ...$values) : string
     {
         $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
 
@@ -1391,7 +1391,7 @@ class DebugModule
     }
 
 
-    public function print_table(array $table, bool $return = null) : ?string
+    public function print_table(array $table, ?bool $return = null) : ?string
     {
         if (0 === count($table)) {
             return null;

@@ -14,7 +14,7 @@ abstract class ParseModuleBase
     protected $theType;
 
 
-    public function __construct(TypeModule $theType = null)
+    public function __construct(?TypeModule $theType = null)
     {
         $this->theType = $theType ?? Lib::type();
     }

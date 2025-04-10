@@ -9,7 +9,7 @@ use Gzhegow\Lib\Exception\RuntimeException;
 class CmpModule
 {
     public function fnCompareValues(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -54,7 +54,7 @@ class CmpModule
     }
 
     public function fnCompareSizes(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -93,7 +93,7 @@ class CmpModule
     }
 
     public function fnCompareDates(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -130,7 +130,7 @@ class CmpModule
     }
 
     public function fnComparePeriods(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -177,7 +177,7 @@ class CmpModule
 
 
     public function fnCompareValuesNil(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -212,7 +212,7 @@ class CmpModule
     }
 
     public function fnCompareValuesNull(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -248,7 +248,7 @@ class CmpModule
     }
 
     public function fnCompareValuesBoolean(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -285,7 +285,7 @@ class CmpModule
     }
 
     public function fnCompareValuesInteger(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -322,7 +322,7 @@ class CmpModule
     }
 
     public function fnCompareValuesFloat(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -359,7 +359,7 @@ class CmpModule
     }
 
     public function fnCompareValuesNumeric(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -398,7 +398,7 @@ class CmpModule
     }
 
     public function fnCompareValuesString(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -435,7 +435,7 @@ class CmpModule
     }
 
     public function fnCompareValuesArray(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -472,7 +472,7 @@ class CmpModule
     }
 
     public function fnCompareValuesDate(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -509,7 +509,7 @@ class CmpModule
     }
 
     public function fnCompareValuesObject(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -547,7 +547,7 @@ class CmpModule
     }
 
     public function fnCompareValuesResource(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -585,7 +585,7 @@ class CmpModule
 
 
     public function fnCompareSizesString(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -622,7 +622,7 @@ class CmpModule
     }
 
     public function fnCompareSizesArray(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -659,7 +659,7 @@ class CmpModule
     }
 
     public function fnCompareSizesObject(
-        int $flagsMode = null, int $flagsResult = null,
+        ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []
     ) : \Closure
     {
@@ -1824,7 +1824,7 @@ class CmpModule
     }
 
 
-    protected function flagsModeDefault(int $flagsMode = null) : int
+    protected function flagsModeDefault(?int $flagsMode = null) : int
     {
         $flagsMode = $flagsMode ?? 0;
 
@@ -1959,7 +1959,7 @@ class CmpModule
         return $flags;
     }
 
-    protected function flagsResultDefault(int $flagsResult = null) : int
+    protected function flagsResultDefault(?int $flagsResult = null) : int
     {
         $flagsResult = $flagsResult ?? 0;
 

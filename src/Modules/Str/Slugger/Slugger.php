@@ -384,7 +384,7 @@ class Slugger implements SluggerInterface
     }
 
 
-    public function translit(string $string, string $delimiter = null, string $locale = null) : ?string
+    public function translit(string $string, ?string $delimiter = null, ?string $locale = null) : ?string
     {
         $_delimiter = $delimiter ?? '-';
 
@@ -407,7 +407,7 @@ class Slugger implements SluggerInterface
         return $result;
     }
 
-    public function slug(string $string, string $delimiter = null, string $locale = null) : ?string
+    public function slug(string $string, ?string $delimiter = null, ?string $locale = null) : ?string
     {
         $_delimiter = $delimiter ?? '-';
 
@@ -429,7 +429,7 @@ class Slugger implements SluggerInterface
     }
 
 
-    protected function translitSymfonySlugger(string $string, string $delimiter = null, string $locale = null) : ?string
+    protected function translitSymfonySlugger(string $string, ?string $delimiter = null, ?string $locale = null) : ?string
     {
         if (! interface_exists($interface = static::SYMFONY_SLUGGER_SLUGGER_INTERFACE)) {
             return null;
@@ -468,7 +468,7 @@ class Slugger implements SluggerInterface
         return $result;
     }
 
-    protected function translitPresets(string $string, string $delimiter = null, string $locale = null) : ?string
+    protected function translitPresets(string $string, ?string $delimiter = null, ?string $locale = null) : ?string
     {
         if (! $this->presets) {
             return null;
@@ -513,7 +513,7 @@ class Slugger implements SluggerInterface
         return $result;
     }
 
-    protected function translitTransliterator(string $string, string $delimiter = null, string $locale = null) : ?string
+    protected function translitTransliterator(string $string, ?string $delimiter = null, ?string $locale = null) : ?string
     {
         if (! (true
             && extension_loaded('intl')
@@ -560,7 +560,7 @@ class Slugger implements SluggerInterface
         return $result;
     }
 
-    protected function translitPhpNative(string $string, string $delimiter = null, string $locale = null) : string
+    protected function translitPhpNative(string $string, ?string $delimiter = null, ?string $locale = null) : string
     {
         if ('' === $string) {
             return '';

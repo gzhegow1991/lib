@@ -25,7 +25,7 @@ class MbModule
     }
 
 
-    public function list_encodings(array $order = null, array $groups = null) : array
+    public function list_encodings(?array $order = null, ?array $groups = null) : array
     {
         static $cache;
 
@@ -152,11 +152,10 @@ class MbModule
 
     /**
      * @param array|string|null $encondings
-     * @param bool|null         $strict
      *
      * @return array<string, bool>
      */
-    public function detect_encoding(string $string, $encondings = '', bool $strict = null, array $detect_order = null) : array
+    public function detect_encoding(string $string, $encondings = '', ?bool $strict = null, ?array $detect_order = null) : array
     {
         $strict = $strict ?? true;
 
@@ -285,7 +284,7 @@ class MbModule
     }
 
 
-    public function str_split(string $string, int $length = null, string $mb_encoding = null) : array
+    public function str_split(string $string, ?int $length = null, ?string $mb_encoding = null) : array
     {
         $length = $length ?? 1;
 

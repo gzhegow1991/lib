@@ -66,7 +66,7 @@ class BcmathModule
     }
 
 
-    public function static_scale_limit(int $scaleLimit = null) : int
+    public function static_scale_limit(?int $scaleLimit = null) : int
     {
         if (null !== $scaleLimit) {
             if ($scaleLimit < 0) {
@@ -113,7 +113,7 @@ class BcmathModule
     }
 
 
-    public function scale_min(int $scale = null, ...$numbers) : int
+    public function scale_min(?int $scale = null, ...$numbers) : int
     {
         $scales = [];
 
@@ -147,7 +147,7 @@ class BcmathModule
         return $scaleMin;
     }
 
-    public function scale_max(int $scale = null, ...$numbers) : int
+    public function scale_max(?int $scale = null, ...$numbers) : int
     {
         $scales = [];
 
@@ -438,7 +438,7 @@ class BcmathModule
     }
 
 
-    public function bccomp($num1, $num2, int $scale = null) : int
+    public function bccomp($num1, $num2, ?int $scale = null) : int
     {
         if (! $this->type_bcnumber($bcnum1, $num1)) {
             throw new LogicException(
@@ -466,7 +466,7 @@ class BcmathModule
     }
 
 
-    public function bcadd($num1, $num2, int $scale = null) : Bcnumber
+    public function bcadd($num1, $num2, ?int $scale = null) : Bcnumber
     {
         if (! $this->type_bcnumber($bcnum1, $num1)) {
             throw new LogicException(
@@ -495,7 +495,7 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcsub($num1, $num2, int $scale = null) : Bcnumber
+    public function bcsub($num1, $num2, ?int $scale = null) : Bcnumber
     {
         if (! $this->type_bcnumber($bcnum1, $num1)) {
             throw new LogicException(
@@ -524,7 +524,7 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcmul($num1, $num2, int $scale = null) : Bcnumber
+    public function bcmul($num1, $num2, ?int $scale = null) : Bcnumber
     {
         if (! $this->type_bcnumber($bcnum1, $num1)) {
             throw new LogicException(
@@ -622,7 +622,7 @@ class BcmathModule
     }
 
 
-    public function bcpow($num, int $exponent, int $scale = null) : Bcnumber
+    public function bcpow($num, int $exponent, ?int $scale = null) : Bcnumber
     {
         if (! $this->type_bcnumber($bcnum, $num)) {
             throw new LogicException(

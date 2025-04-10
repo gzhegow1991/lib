@@ -33,7 +33,7 @@ class JsonModule
     }
 
 
-    public function static_json_depth(int $jsonDepth = null) : int
+    public function static_json_depth(?int $jsonDepth = null) : int
     {
         if (null !== $jsonDepth) {
             if ($jsonDepth < 0) {
@@ -54,7 +54,7 @@ class JsonModule
         return $result;
     }
 
-    public function static_json_encode_flags(int $jsonEncodeFlags = null) : int
+    public function static_json_encode_flags(?int $jsonEncodeFlags = null) : int
     {
         if (null !== $jsonEncodeFlags) {
             if ($jsonEncodeFlags < 0) {
@@ -75,7 +75,7 @@ class JsonModule
         return $result;
     }
 
-    public function static_json_decode_flags(int $jsonDecodeFlags = null) : int
+    public function static_json_decode_flags(?int $jsonDecodeFlags = null) : int
     {
         if (null !== $jsonDecodeFlags) {
             if ($jsonDecodeFlags < 0) {
@@ -101,9 +101,9 @@ class JsonModule
      * @param array{ 0?: mixed } $fallback
      */
     public function json_decode(
-        ?string $json, bool $associative = null,
+        ?string $json, ?bool $associative = null,
         array $fallback = [],
-        int $depth = null, int $flags = null
+        ?int $depth = null, ?int $flags = null
     ) // : mixed
     {
         $result = $this->_json_decode(
@@ -130,9 +130,9 @@ class JsonModule
      * @param array{ 0?: mixed } $fallback
      */
     public function jsonc_decode(
-        ?string $json, bool $associative = null,
+        ?string $json, ?bool $associative = null,
         array $fallback = [],
-        int $depth = null, int $flags = null
+        ?int $depth = null, ?int $flags = null
     ) // : mixed
     {
         if ('' === $json) {
@@ -180,8 +180,8 @@ class JsonModule
      * @return array{ 0?: mixed }
      */
     protected function _json_decode(
-        ?string $json, bool $associative = null,
-        int $depth = null, int $flags = null
+        ?string $json, ?bool $associative = null,
+        ?int $depth = null, ?int $flags = null
     ) : array
     {
         $error = null;
@@ -222,8 +222,8 @@ class JsonModule
      */
     public function json_encode(
         $value, array $fallback = [],
-        bool $allowNull = null,
-        int $flags = null, int $depth = null
+        ?bool $allowNull = null,
+        ?int $flags = null, ?int $depth = null
     ) : ?string
     {
         $allowNull = $allowNull ?? false;
@@ -274,8 +274,8 @@ class JsonModule
 
     public function json_print(
         $value, array $fallback = [],
-        bool $allowNull = null,
-        int $flags = null, int $depth = null
+        ?bool $allowNull = null,
+        ?int $flags = null, ?int $depth = null
     ) : ?string
     {
         $flags = $flags ?? (

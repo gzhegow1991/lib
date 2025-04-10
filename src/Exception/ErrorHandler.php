@@ -111,9 +111,9 @@ class ErrorHandler
         }
     }
 
-    public static function exception_handler(\Throwable $throwable, bool $exit = null) : void
+    public static function exception_handler(\Throwable $throwable, ?bool $isExit = null) : void
     {
-        $exit = $exit ?? true;
+        $isExit = $isExit ?? true;
 
         $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
 

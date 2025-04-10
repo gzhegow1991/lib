@@ -66,7 +66,7 @@ class FsModule
      */
     public function type_realpath(
         &$result, $value,
-        bool $isAllowSymlink = null,
+        ?bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
@@ -123,7 +123,7 @@ class FsModule
      */
     public function type_dirpath(
         &$result, $value,
-        bool $isAllowExists = null, bool $isAllowSymlink = null,
+        ?bool $isAllowExists = null, ?bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
@@ -143,7 +143,6 @@ class FsModule
                 return false;
             }
 
-            // > dirpath is available
             $result = $_value;
 
             return true;
@@ -174,7 +173,7 @@ class FsModule
      */
     public function type_filepath(
         &$result, $value,
-        bool $isAllowExists = null, bool $isAllowSymlink = null,
+        ?bool $isAllowExists = null, ?bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
@@ -194,7 +193,6 @@ class FsModule
                 return false;
             }
 
-            // > dirpath is available
             $result = $_value;
 
             return true;
@@ -225,8 +223,8 @@ class FsModule
      * @param array{ 0: array|null } $refs
      */
     public function type_dirpath_realpath(
-        &$result,
-        $value, bool $isAllowSymlink = null,
+        &$result, $value,
+        ?bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
@@ -264,8 +262,8 @@ class FsModule
      * @param array{ 0: array|null } $refs
      */
     public function type_filepath_realpath(
-        &$result,
-        $value, bool $isAllowSymlink = null,
+        &$result, $value,
+        ?bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
@@ -324,10 +322,10 @@ class FsModule
 
     public function file_get_contents(
         string $filepath,
-        array $fileGetContentsArgs = null
+        ?array $fileGetContentsArgs = null
     ) : ?string
     {
-        $fileGetContentsArgs = $fileGetContentsArgs ?? [];
+        $fileGetContentsArgs = $fileGetContentsArgs ?: [];
 
         if (! $this->type_filepath_realpath($_filepath, $filepath)) {
             throw new RuntimeException(
@@ -351,9 +349,9 @@ class FsModule
 
     public function file_put_contents(
         string $filepath, $data,
-        array $mkdirArgs = null,
-        array $filePutContentsArgs = null,
-        array $chmodArgs = null
+        ?array $filePutContentsArgs = null,
+        ?array $mkdirArgs = null,
+        ?array $chmodArgs = null
     ) : ?int
     {
         $_filePutContentsArgs = $filePutContentsArgs ?? [];
@@ -426,12 +424,12 @@ class FsModule
      */
     public function dir_walk_it(
         string $dirpath,
-        array $recursiveDirectoryIteratorArgs = null,
-        array $recursiveIteratorIteratorArgs = null
+        ?array $recursiveDirectoryIteratorArgs = null,
+        ?array $recursiveIteratorIteratorArgs = null
     ) : \Generator
     {
-        $recursiveDirectoryIteratorArgs = $recursiveDirectoryIteratorArgs ?? [ \FilesystemIterator::SKIP_DOTS ];
-        $recursiveIteratorIteratorArgs = $recursiveIteratorIteratorArgs ?? [ \RecursiveIteratorIterator::CHILD_FIRST ];
+        $recursiveDirectoryIteratorArgs = $recursiveDirectoryIteratorArgs ?: [ \FilesystemIterator::SKIP_DOTS ];
+        $recursiveIteratorIteratorArgs = $recursiveIteratorIteratorArgs ?: [ \RecursiveIteratorIterator::CHILD_FIRST ];
 
         if (! $this->type_dirpath_realpath($_dirpath, $dirpath)) {
             throw new RuntimeException(
@@ -459,10 +457,10 @@ class FsModule
 
     public function rm(
         string $filepath,
-        array $unlinkArgs = null
+        ?array $unlinkArgs = null
     ) : bool
     {
-        $unlinkArgs = $unlinkArgs ?? [];
+        $unlinkArgs = $unlinkArgs ?: [];
 
         if (! $this->type_filepath($_filepath, $filepath, true)) {
             throw new RuntimeException(
@@ -490,10 +488,10 @@ class FsModule
 
     public function rmdir(
         string $dirpath,
-        array $rmdirArgs = null
+        ?array $rmdirArgs = null
     ) : bool
     {
-        $rmdirArgs = $rmdirArgs ?? [];
+        $rmdirArgs = $rmdirArgs ?: [];
 
         if (! $this->type_dirpath($_dirpath, $dirpath, true)) {
             throw new RuntimeException(
@@ -523,7 +521,7 @@ class FsModule
     /**
      * > заменяет слеши в пути на указанные
      */
-    public function normalize(string $path, string $separator = null) : string
+    public function normalize(string $path, ?string $separator = null) : string
     {
         $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
 
@@ -540,7 +538,7 @@ class FsModule
     /**
      * > разбирает последовательности `./path` и `../path` и возвращает нормализованный путь
      */
-    public function resolve(string $path, string $separator = null) : string
+    public function resolve(string $path, ?string $separator = null) : string
     {
         $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
 
@@ -559,7 +557,7 @@ class FsModule
      */
     public function relative(
         string $path, string $root,
-        string $separator = null
+        ?string $separator = null
     ) : string
     {
         $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
@@ -572,7 +570,7 @@ class FsModule
      */
     public function resolved(
         string $path, string $current,
-        string $separator = null
+        ?string $separator = null
     ) : string
     {
         $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
@@ -581,7 +579,7 @@ class FsModule
     }
 
 
-    public function file_diff($file1, $file2, int $length = null, int $lengthBuffer = null)
+    public function file_diff($file1, $file2, ?int $length = null, ?int $lengthBuffer = null)
     {
         $length = $length ?? 8192;
         $lengthBuffer = $lengthBuffer ?? 1024 * 1024;

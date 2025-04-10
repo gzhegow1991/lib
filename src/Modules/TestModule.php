@@ -54,8 +54,8 @@ class TestModule
     public function assert(
         ?array $trace,
         $fn, array $fnArgs = [],
-        string $expectedStdout = null,
-        float $expectedSecondsMax = null, float $expectedSecondsMin = null,
+        ?string $expectedStdout = null,
+        ?float $expectedSecondsMax = null, ?float $expectedSecondsMin = null,
         array $expectedReturn = [],
         array $refs = []
     ) : bool
@@ -251,7 +251,7 @@ class TestModule
     public function assertStdout(
         ?array $trace,
         $fn, array $fnArgs = [],
-        string $expectedStdout = null,
+        ?string $expectedStdout = null,
         string &$stdout = null
     ) : bool
     {
@@ -311,8 +311,8 @@ class TestModule
     public function assertMicrotime(
         ?array $trace,
         $fn, array $fnArgs = [],
-        float $expectedSecondsMax = null, float $expectedSecondsMin = null,
-        float &$seconds = null
+        ?float $expectedSecondsMax = null, ?float $expectedSecondsMin = null,
+        ?float &$seconds = null
     ) : bool
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -465,8 +465,8 @@ class TestModule
     public function assertMemory(
         ?array $trace,
         $fn, array $fnArgs = [],
-        float $expectedBytesMax = null,
-        float &$bytes = null
+        ?float $expectedBytesMax = null,
+        ?float &$bytes = null
     ) : bool
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);

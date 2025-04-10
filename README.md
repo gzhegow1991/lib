@@ -49,12 +49,12 @@ function _values($separator = null, ...$values) : string
     return \Gzhegow\Lib\Lib::debug()->values($separator, [], ...$values);
 }
 
-function _array($value, int $maxLevel = null, array $options = []) : string
+function _array($value, ?int $maxLevel = null, array $options = []) : string
 {
     return \Gzhegow\Lib\Lib::debug()->value_array($value, $maxLevel, $options);
 }
 
-function _array_multiline($value, int $maxLevel = null, array $options = []) : string
+function _array_multiline($value, ?int $maxLevel = null, array $options = []) : string
 {
     return \Gzhegow\Lib\Lib::debug()->value_array_multiline($value, $maxLevel, $options);
 }
@@ -64,19 +64,19 @@ function _print(...$values) : void
     echo _values(' | ', ...$values) . PHP_EOL;
 }
 
-function _print_array($value, int $maxLevel = null, array $options = [])
+function _print_array($value, ?int $maxLevel = null, array $options = [])
 {
     echo _array($value, $maxLevel, $options) . PHP_EOL;
 }
 
-function _print_array_multiline($value, int $maxLevel = null, array $options = [])
+function _print_array_multiline($value, ?int $maxLevel = null, array $options = [])
 {
     echo _array_multiline($value, $maxLevel, $options) . PHP_EOL;
 }
 
 function _assert_stdout(
     \Closure $fn, array $fnArgs = [],
-    string $expectedStdout = null
+    ?string $expectedStdout = null
 ) : void
 {
     $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
@@ -2104,22 +2104,40 @@ $fn = function () {
     _print('[ FsModule ]');
     echo PHP_EOL;
 
-    $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(__DIR__ . '/var/1/1/1/1.txt', '123', [ 0775, true ]);
+
+    $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
+        __DIR__ . '/var/1/1/1/1.txt', '123',
+        [ FILE_APPEND ], [ 0775, true ]
+    );
     _print($result);
 
-    $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(__DIR__ . '/var/1/1/1.txt', '123');
+    $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
+        __DIR__ . '/var/1/1/1.txt', '123',
+        [ FILE_APPEND ], [ 0775, true ]
+    );
     _print($result);
 
-    $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(__DIR__ . '/var/1/1.txt', '123');
+    $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
+        __DIR__ . '/var/1/1.txt', '123',
+        [ FILE_APPEND ], [ 0775, true ]
+    );
     _print($result);
 
+    echo PHP_EOL;
 
-    $result = \Gzhegow\Lib\Lib::fs()->file_get_contents(__DIR__ . '/var/1/1/1/1.txt');
+
+    $result = \Gzhegow\Lib\Lib::fs()->file_get_contents(
+        __DIR__ . '/var/1/1/1/1.txt',
+        []
+    );
     _print($result);
 
 
     foreach (
-        \Gzhegow\Lib\Lib::fs()->dir_walk_it(__DIR__ . '/var/1')
+        \Gzhegow\Lib\Lib::fs()->dir_walk_it(
+            __DIR__ . '/var/1',
+            [], []
+        )
         as $spl
     ) {
         $spl->isDir()
@@ -2134,6 +2152,7 @@ _assert_stdout($fn, [], '
 3
 3
 3
+
 "123"
 ');
 

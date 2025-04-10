@@ -239,7 +239,7 @@ class ArrModule
     /**
      * @param ArrPath|null $result
      */
-    public function type_arrpath(&$result, $value, string $dot = null) : bool
+    public function type_arrpath(&$result, $value, ?string $dot = null) : bool
     {
         $result = null;
 
@@ -1192,9 +1192,9 @@ class ArrModule
      *     1: array<string, mixed>
      * }
      */
-    public function kwargs(array $src = null) : array
+    public function kwargs(array $src) : array
     {
-        if (! isset($src)) return [];
+        if (! count($src)) return [];
 
         $list = [];
         $dict = [];
@@ -1437,8 +1437,8 @@ class ArrModule
      * > превращает вложенный массив в одноуровневый, соединяя путь через точку
      */
     public function dot(
-        array $array, string $dot = null,
-        int $walkFlags = null
+        array $array, ?string $dot = null,
+        ?int $walkFlags = null
     ) : array
     {
         $walkFlags = $walkFlags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
@@ -1469,8 +1469,8 @@ class ArrModule
      * > вместо значений использует $value
      */
     public function dot_keys(
-        array $array, string $dot = null, $value = null,
-        int $walkFlags = null
+        array $array, ?string $dot = null, $value = null,
+        ?int $walkFlags = null
     ) : array
     {
         $value = $value ?? true;
@@ -1500,7 +1500,7 @@ class ArrModule
     /**
      * > превращает одноуровневый массив с ключами-точками во вложенный
      */
-    public function undot(array $arrayDot, string $dot = null) : array
+    public function undot(array $arrayDot, ?string $dot = null) : array
     {
         if (null === $dot) {
             $dot = '.';
@@ -1541,7 +1541,7 @@ class ArrModule
      *
      * @return \Iterator<array<TKey>, TValue>|\Generator<array<TKey>, TValue>
      */
-    public function &walk_it(array &$array, int $flags = null) : \Generator
+    public function &walk_it(array &$array, ?int $flags = null) : \Generator
     {
         if (0 === count($array)) return;
 
@@ -1711,7 +1711,7 @@ class ArrModule
      *
      * @return \Iterator<array<TKey>, TValue>|\Generator<array<TKey>, TValue>
      */
-    public function walk_tree_it(array $tree, array $list = null, $start = null) : \Generator
+    public function walk_tree_it(array $tree, ?array $list = null, $start = null) : \Generator
     {
         if (null === $start) {
             $start = null
@@ -1764,7 +1764,7 @@ class ArrModule
      * @return \Iterator<array<TKey>, array<TValue>>|\Generator<array<TKey>, array<TValue>>
      * @throws \LogicException
      */
-    public function walk_collect_it(array $arrayList, int $arrayWalkFlags = null, array $fallback = []) : \Generator
+    public function walk_collect_it(array $arrayList, ?int $arrayWalkFlags = null, array $fallback = []) : \Generator
     {
         $keyList = array_keys($arrayList);
 

@@ -31,7 +31,7 @@ class PhpModule
     protected $throwableClass = LogicException::class;
 
 
-    public function callable_parser(CallableParserInterface $callableParser = null) : CallableParserInterface
+    public function callable_parser(?CallableParserInterface $callableParser = null) : CallableParserInterface
     {
         return $this->callableParser = null
             ?? $callableParser
@@ -128,7 +128,7 @@ class PhpModule
      * @param class-string<T>|null    $result
      * @param class-string<T>|T|mixed $value
      */
-    public function type_struct_exists(&$result, $value, int $flags = null)
+    public function type_struct_exists(&$result, $value, ?int $flags = null)
     {
         $result = null;
 
@@ -208,7 +208,7 @@ class PhpModule
      * @param class-string<T>|null    $result
      * @param class-string<T>|T|mixed $value
      */
-    public function type_struct(&$result, $value, int $flags = null) : bool
+    public function type_struct(&$result, $value, ?int $flags = null) : bool
     {
         $result = null;
 
@@ -307,7 +307,7 @@ class PhpModule
      * @param class-string<T>|null    $result
      * @param class-string<T>|T|mixed $value
      */
-    public function type_struct_class(&$result, $value, int $flags = null) : bool
+    public function type_struct_class(&$result, $value, ?int $flags = null) : bool
     {
         $_flags = $flags;
 
@@ -328,7 +328,7 @@ class PhpModule
     /**
      * @param class-string|null $result
      */
-    public function type_struct_interface(&$result, $value, int $flags = null) : bool
+    public function type_struct_interface(&$result, $value, ?int $flags = null) : bool
     {
         $_flags = $flags;
 
@@ -349,7 +349,7 @@ class PhpModule
     /**
      * @param class-string|null $result
      */
-    public function type_struct_trait(&$result, $value, int $flags = null) : bool
+    public function type_struct_trait(&$result, $value, ?int $flags = null) : bool
     {
         $_flags = $flags;
 
@@ -373,7 +373,7 @@ class PhpModule
      * @param class-string<T>|null    $result
      * @param class-string<T>|T|mixed $value
      */
-    public function type_struct_enum(&$result, $value, int $flags = null) : bool
+    public function type_struct_enum(&$result, $value, ?int $flags = null) : bool
     {
         $_flags = $flags;
 
@@ -398,7 +398,7 @@ class PhpModule
      * @param class-string<T>|null    $result
      * @param class-string<T>|T|mixed $value
      */
-    public function type_struct_fqcn(&$result, $value, int $flags = null) : bool
+    public function type_struct_fqcn(&$result, $value, ?int $flags = null) : bool
     {
         $result = null;
 
@@ -416,7 +416,7 @@ class PhpModule
     /**
      * @param string|null $result
      */
-    public function type_struct_namespace(&$result, $value, int $flags = null) : bool
+    public function type_struct_namespace(&$result, $value, ?int $flags = null) : bool
     {
         $result = null;
 
@@ -437,7 +437,7 @@ class PhpModule
     /**
      * @param string|null $result
      */
-    public function type_struct_basename(&$result, $value, int $flags = null) : bool
+    public function type_struct_basename(&$result, $value, ?int $flags = null) : bool
     {
         $result = null;
 
@@ -517,7 +517,7 @@ class PhpModule
      *
      * @return class-string|null
      */
-    public function type_enum_case(&$result, $value, string $enumClass = null) : bool
+    public function type_enum_case(&$result, $value, ?string $enumClass = null) : bool
     {
         $result = null;
 
@@ -1152,7 +1152,7 @@ class PhpModule
     }
 
 
-    public function debug_backtrace(int $options = null, int $limit = null) : DebugBacktracer
+    public function debug_backtrace(?int $options = null, ?int $limit = null) : DebugBacktracer
     {
         $instance = new DebugBacktracer();
 
@@ -1202,7 +1202,7 @@ class PhpModule
      *
      * @return class-string[]
      */
-    public function class_uses_with_parents($objectOrClass, bool $recursive = null)
+    public function class_uses_with_parents($objectOrClass, ?bool $recursive = null)
     {
         $recursive = $recursive ?? false;
 
@@ -1231,9 +1231,9 @@ class PhpModule
      *
      * @return class-string[]
      */
-    public function class_uses($objectOrClass, bool $recursive = null)
+    public function class_uses($objectOrClass, ?bool $isRecursive = null)
     {
-        $recursive = $recursive ?? false;
+        $isRecursive = $isRecursive ?? false;
 
         $className = $objectOrClass;
         if (is_object($objectOrClass)) {
@@ -1242,7 +1242,7 @@ class PhpModule
 
         $uses = class_uses($className) ?: [];
 
-        if ($recursive) {
+        if ($isRecursive) {
             foreach ( $uses as $usesItem ) {
                 // ! recursion
                 $uses += $this->class_uses($usesItem);
@@ -1392,7 +1392,7 @@ class PhpModule
      */
     public function property_exists(
         $object_or_class, string $property,
-        bool $public = null, bool $static = null
+        ?bool $public = null, ?bool $static = null
     ) : bool
     {
         $isObject = false;
@@ -1494,7 +1494,7 @@ class PhpModule
      */
     public function method_exists(
         $object_or_class, string $method,
-        bool $public = null, bool $static = null
+        ?bool $public = null, ?bool $static = null
     ) : bool
     {
         $isObject = false;
@@ -1637,7 +1637,7 @@ class PhpModule
     /**
      * > подготавливает аргументы функции согласно переданного массива
      */
-    public function function_args(array $args, array $argsOriginal = null) : array
+    public function function_args(array $args, ?array $argsOriginal = null) : array
     {
         if (0 === count($args)) {
             return [];
@@ -1847,8 +1847,8 @@ class PhpModule
      * }
      */
     public function pathinfo(
-        string $path, int $flags = null,
-        string $separator = null, int $levels = null, string $dot = null
+        string $path, ?int $flags = null,
+        ?string $separator = null, ?int $levels = null, ?string $dot = null
     ) : array
     {
         if ('' === $path) {
@@ -1936,7 +1936,7 @@ class PhpModule
     /**
      * > поддерживает предварительную замену $separator на '/'
      */
-    public function dirname(string $path, string $separator = null, int $levels = null) : ?string
+    public function dirname(string $path, ?string $separator = null, ?int $levels = null) : ?string
     {
         if ('' === $path) {
             throw new LogicException(
@@ -1973,7 +1973,7 @@ class PhpModule
     /**
      * > поддерживает предварительную замену $separator на '/'
      */
-    public function basename(string $path, string $separator = null, string $extension = null) : ?string
+    public function basename(string $path, ?string $extension = null) : ?string
     {
         if ('' === $path) {
             throw new LogicException(
@@ -1991,7 +1991,7 @@ class PhpModule
     /**
      * > поддерживает предварительную замену $separator на '/'
      */
-    public function filename(string $path, string $separator = null, string $dot = null) : ?string
+    public function filename(string $path, ?string $dot = null) : ?string
     {
         if ('' === $path) {
             throw new LogicException(
@@ -2013,7 +2013,7 @@ class PhpModule
     /**
      * > поддерживает предварительную замену $separator на '/'
      */
-    public function extension(string $path, string $separator = null, string $dot = null) : ?string
+    public function extension(string $path, ?string $dot = null) : ?string
     {
         if ('' === $path) {
             throw new LogicException(
@@ -2023,7 +2023,7 @@ class PhpModule
 
         $dot = Lib::parse()->char($dot) ?? '.';
 
-        $normalized = $this->normalize($path, $separator);
+        $normalized = $this->normalize($path, '/');
 
         $basename = basename($normalized);
 
@@ -2037,7 +2037,7 @@ class PhpModule
     /**
      * > поддерживает предварительную замену $separator на '/'
      */
-    public function extensions(string $path, string $separator = null, string $dot = null) : ?string
+    public function extensions(string $path, ?string $separator = null, ?string $dot = null) : ?string
     {
         if ('' === $path) {
             throw new LogicException(
@@ -2074,7 +2074,7 @@ class PhpModule
     /**
      * > заменяет слеши в пути на указанные
      */
-    public function normalize(string $path, string $separator = null) : string
+    public function normalize(string $path, ?string $separator = null) : string
     {
         if ('' === $path) {
             throw new LogicException(
@@ -2101,7 +2101,7 @@ class PhpModule
     /**
      * > разбирает последовательности `./path` и `../path` и возвращает нормализованный путь
      */
-    public function resolve(string $path, string $separator = null, string $dot = null) : string
+    public function resolve(string $path, ?string $separator = null, ?string $dot = null) : string
     {
         if ('' === $path) {
             throw new LogicException(
@@ -2159,7 +2159,7 @@ class PhpModule
      */
     public function relative(
         string $path, string $root,
-        string $separator = null, string $dot = null
+        ?string $separator = null, ?string $dot = null
     ) : string
     {
         if ('' === $path) {
@@ -2206,7 +2206,7 @@ class PhpModule
      */
     public function resolved(
         string $path, string $current,
-        string $separator = null, string $dot = null
+        ?string $separator = null, ?string $dot = null
     ) : string
     {
         if ('' === $path) {
@@ -2252,7 +2252,7 @@ class PhpModule
      *
      * @return class-string<\LogicException|\RuntimeException>
      */
-    public function static_throwable_class(string $throwableClass = null) : string
+    public function static_throwable_class(?string $throwableClass = null) : string
     {
         if (null !== $throwableClass) {
             if (! (false

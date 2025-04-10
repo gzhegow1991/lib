@@ -133,7 +133,7 @@ abstract class AbstractConfig implements
     }
 
 
-    public function configure(\Closure $fn = null, array $context = []) : void
+    public function configure(?\Closure $fn = null, array $context = []) : void
     {
         if (null !== $fn) {
             $this->invalidate();

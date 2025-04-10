@@ -47,16 +47,16 @@ class PdoAdapter
 
 
     public function __construct(
-        string $pdoDsn = null,
-        string $pdoDatabase = null,
+        ?string $pdoDsn = null,
+        ?string $pdoDatabase = null,
         //
-        string $pdoUsername = null,
-        string $pdoPassword = null,
+        ?string $pdoUsername = null,
+        ?string $pdoPassword = null,
         //
-        string $pdoCharset = null,
-        string $pdoCollate = null,
+        ?string $pdoCharset = null,
+        ?string $pdoCollate = null,
         //
-        array $pdoOptions = null
+        ?array $pdoOptions = null
     )
     {
         $pdoCharset = $pdoCharset ?? 'utf8';

@@ -50,7 +50,7 @@ class FormatModule
      *
      * @return T
      */
-    public function interval_decode(string $duration, string $intervalClass = null) : \DateInterval
+    public function interval_decode(string $duration, ?string $intervalClass = null) : \DateInterval
     {
         // > ISO 8601
 
@@ -244,7 +244,7 @@ class FormatModule
     /**
      * @param float|int $bytes
      */
-    public function bytes_encode($bytes, int $precision = null, int $lenUnit = null) : string
+    public function bytes_encode($bytes, ?int $precision = null, ?int $lenUnit = null) : string
     {
         $precision = $precision ?? 3;
         $lenUnit = $lenUnit ?? 2;
@@ -276,10 +276,10 @@ class FormatModule
      */
     public function csv_rows(
         array $rows,
-        string $separator = null,
-        string $enclosure = null,
-        string $escape = null,
-        string $eol = null
+        ?string $separator = null,
+        ?string $enclosure = null,
+        ?string $escape = null,
+        ?string $eol = null
     ) : array
     {
         if (0 === count($rows)) {
@@ -334,10 +334,10 @@ class FormatModule
      */
     public function csv_row(
         array $row,
-        string $separator = null,
-        string $enclosure = null,
-        string $escape = null,
-        string $eol = null
+        ?string $separator = null,
+        ?string $enclosure = null,
+        ?string $escape = null,
+        ?string $eol = null
     ) : array
     {
         if (0 === count($row)) {
@@ -373,7 +373,7 @@ class FormatModule
 
     public function sql_in(
         ?array &$params,
-        string $sql, array $in, string $paramNamePrefix = null
+        string $sql, array $in, ?string $paramNamePrefix = null
     ) : string
     {
         $params = $params ?? [];
@@ -416,7 +416,7 @@ class FormatModule
         return $sqlIn;
     }
 
-    public function sql_like_quote(string $string, string $escaper = null) : string
+    public function sql_like_quote(string $string, ?string $escaper = null) : string
     {
         $escaper = $escaper ?? '\\';
 

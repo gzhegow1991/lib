@@ -764,7 +764,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric(&$result, $value, bool $isAllowExp = null, array $refs = []) : bool
+    public function numeric(&$result, $value, ?bool $isAllowExp = null, array $refs = []) : bool
     {
         $result = null;
 
@@ -919,7 +919,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_non_zero(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    public function numeric_non_zero(&$result, $value, ?bool $allowExp = null, array $refs = []) : bool
     {
         $result = null;
 
@@ -939,7 +939,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_non_negative(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    public function numeric_non_negative(&$result, $value, ?bool $allowExp = null, array $refs = []) : bool
     {
         $result = null;
 
@@ -965,7 +965,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_non_positive(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    public function numeric_non_positive(&$result, $value, ?bool $allowExp = null, array $refs = []) : bool
     {
         $result = null;
 
@@ -991,7 +991,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_negative(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    public function numeric_negative(&$result, $value, ?bool $allowExp = null, array $refs = []) : bool
     {
         $result = null;
 
@@ -1015,7 +1015,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function numeric_positive(&$result, $value, bool $allowExp = null, array $refs = []) : bool
+    public function numeric_positive(&$result, $value, ?bool $allowExp = null, array $refs = []) : bool
     {
         $result = null;
 
@@ -1203,7 +1203,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param Number|null $result
      */
-    public function number(&$result, $value, bool $allowExp = null) : bool
+    public function number(&$result, $value, ?bool $allowExp = null) : bool
     {
         $result = null;
 
@@ -1265,7 +1265,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function trim(&$result, $value, string $characters = null) : bool
+    public function trim(&$result, $value, ?string $characters = null) : bool
     {
         return Lib::str()->type_trim($result, $value, $characters);
     }
@@ -1329,7 +1329,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function ctype_alpha(&$result, $value, bool $isIgnoreCase = null) : bool
+    public function ctype_alpha(&$result, $value, ?bool $isIgnoreCase = null) : bool
     {
         $result = null;
 
@@ -1371,7 +1371,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function ctype_alnum(&$result, $value, bool $isIgnoreCase = null) : bool
+    public function ctype_alnum(&$result, $value, ?bool $isIgnoreCase = null) : bool
     {
         $result = null;
 
@@ -1531,9 +1531,9 @@ class TypeModule extends TypeModuleBase
     /**
      * @param ArrPath|null $result
      */
-    public function arrpath(&$result, $path, array $pathes = null, string $dot = null) : bool
+    public function arrpath(&$result, $path, ?string $dot = null) : bool
     {
-        return Lib::arr()->type_arrpath($result, $path, $pathes, $dot);
+        return Lib::arr()->type_arrpath($result, $path, $dot);
     }
 
 
@@ -1583,7 +1583,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function subnet(&$result, $value, string $ipFallback = null) : bool
+    public function subnet(&$result, $value, ?string $ipFallback = null) : bool
     {
         return Lib::net()->type_subnet($result, $value, $ipFallback);
     }
@@ -1591,7 +1591,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function subnet_v4(&$result, $value, string $ipFallback = null) : bool
+    public function subnet_v4(&$result, $value, ?string $ipFallback = null) : bool
     {
         return Lib::net()->type_subnet_v4($result, $value, $ipFallback);
     }
@@ -1599,7 +1599,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function subnet_v6(&$result, $value, string $ipFallback = null) : bool
+    public function subnet_v6(&$result, $value, ?string $ipFallback = null) : bool
     {
         return Lib::net()->type_subnet_v6($result, $value, $ipFallback);
     }
@@ -1687,7 +1687,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeZone|null $result
      */
-    public function timezone(&$result, $value, array $allowedTimezoneTypes = null) : bool
+    public function timezone(&$result, $value, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_timezone($result, $value, $allowedTimezoneTypes);
     }
@@ -1728,7 +1728,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function date(&$result, $datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    public function date(&$result, $datestring, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_date($result, $datestring, $timezoneFallback, $allowedTimezoneTypes);
     }
@@ -1736,7 +1736,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTime|null $result
      */
-    public function adate(&$result, $datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    public function adate(&$result, $datestring, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_adate($result, $datestring, $timezoneFallback, $allowedTimezoneTypes);
     }
@@ -1744,7 +1744,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function idate(&$result, $datestring, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    public function idate(&$result, $datestring, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_idate($result, $datestring, $timezoneFallback, $allowedTimezoneTypes);
     }
@@ -1753,7 +1753,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function date_tz(&$result, $datestring, array $allowedTimezoneTypes = null) : bool
+    public function date_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_date_tz($result, $datestring, $allowedTimezoneTypes);
     }
@@ -1761,7 +1761,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTime|null $result
      */
-    public function adate_tz(&$result, $datestring, array $allowedTimezoneTypes = null) : bool
+    public function adate_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_adate_tz($result, $datestring, $allowedTimezoneTypes);
     }
@@ -1769,7 +1769,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function idate_tz(&$result, $datestring, array $allowedTimezoneTypes = null) : bool
+    public function idate_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_idate_tz($result, $datestring, $allowedTimezoneTypes);
     }
@@ -1778,7 +1778,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function date_of(&$result, string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    public function date_of(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_date_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
     }
@@ -1786,7 +1786,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTime|null $result
      */
-    public function adate_of(&$result, string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    public function adate_of(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_adate_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
     }
@@ -1794,7 +1794,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function idate_of(&$result, string $format, $dateFormatted, $timezoneFallback = null, array $allowedTimezoneTypes = null) : bool
+    public function idate_of(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_idate_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
     }
@@ -1803,7 +1803,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function date_tz_formatted(&$result, string $format, $dateFormatted, array $allowedTimezoneTypes = null) : bool
+    public function date_tz_formatted(&$result, string $format, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_date_tz_formatted($result, $format, $dateFormatted, $allowedTimezoneTypes);
     }
@@ -1811,7 +1811,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTime|null $result
      */
-    public function adate_tz_formatted(&$result, string $format, $dateFormatted, array $allowedTimezoneTypes = null) : bool
+    public function adate_tz_formatted(&$result, string $format, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_adate_tz_formatted($result, $format, $dateFormatted, $allowedTimezoneTypes);
     }
@@ -1819,7 +1819,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function idate_tz_formatted(&$result, string $format, $dateFormatted, array $allowedTimezoneTypes = null) : bool
+    public function idate_tz_formatted(&$result, string $format, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_idate_tz_formatted($result, $format, $dateFormatted, $allowedTimezoneTypes);
     }
@@ -1828,7 +1828,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function date_microtime(&$result, $microtime, $timezoneSet = null, array $allowedTimezoneTypes = null) : bool
+    public function date_microtime(&$result, $microtime, $timezoneSet = null, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_date_microtime($result, $microtime, $timezoneSet, $allowedTimezoneTypes);
     }
@@ -1836,7 +1836,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTime|null $result
      */
-    public function adate_microtime(&$result, $microtime, $timezoneSet = null, array $allowedTimezoneTypes = null) : bool
+    public function adate_microtime(&$result, $microtime, $timezoneSet = null, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_adate_microtime($result, $microtime, $timezoneSet, $allowedTimezoneTypes);
     }
@@ -1844,7 +1844,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function idate_microtime(&$result, $microtime, $timezoneSet = null, array $allowedTimezoneTypes = null) : bool
+    public function idate_microtime(&$result, $microtime, $timezoneSet = null, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_idate_microtime($result, $microtime, $timezoneSet, $allowedTimezoneTypes);
     }
@@ -1885,7 +1885,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateInterval|null $result
      */
-    public function interval_ago(&$result, $date, \DateTimeInterface $from = null, bool $reverse = null) : bool
+    public function interval_ago(&$result, $date, ?\DateTimeInterface $from = null, ?bool $reverse = null) : bool
     {
         return Lib::date()->type_interval_ago($result, $date, $from, $reverse);
     }
@@ -1897,7 +1897,7 @@ class TypeModule extends TypeModuleBase
      * @param class-string<T>|null    $result
      * @param class-string<T>|T|mixed $value
      */
-    public function struct_exists(&$result, $value, int $flags = null)
+    public function struct_exists(&$result, $value, ?int $flags = null)
     {
         return Lib::php()->type_struct_exists($result, $value, $flags);
     }
@@ -1908,7 +1908,7 @@ class TypeModule extends TypeModuleBase
      * @param class-string<T>|null    $result
      * @param class-string<T>|T|mixed $value
      */
-    public function struct(&$result, $value, int $flags = null) : bool
+    public function struct(&$result, $value, ?int $flags = null) : bool
     {
         return Lib::php()->type_struct($result, $value, $flags);
     }
@@ -1919,7 +1919,7 @@ class TypeModule extends TypeModuleBase
      * @param class-string<T>|null    $result
      * @param class-string<T>|T|mixed $value
      */
-    public function struct_class(&$result, $value, int $flags = null) : bool
+    public function struct_class(&$result, $value, ?int $flags = null) : bool
     {
         return Lib::php()->type_struct_class($result, $value, $flags);
     }
@@ -1927,7 +1927,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param class-string|null $result
      */
-    public function struct_interface(&$result, $value, int $flags = null) : bool
+    public function struct_interface(&$result, $value, ?int $flags = null) : bool
     {
         return Lib::php()->type_struct_interface($result, $value, $flags);
     }
@@ -1935,7 +1935,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param class-string|null $result
      */
-    public function struct_trait(&$result, $value, int $flags = null) : bool
+    public function struct_trait(&$result, $value, ?int $flags = null) : bool
     {
         return Lib::php()->type_struct_trait($result, $value, $flags);
     }
@@ -1946,7 +1946,7 @@ class TypeModule extends TypeModuleBase
      * @param class-string<T>|null    $result
      * @param class-string<T>|T|mixed $value
      */
-    public function struct_enum(&$result, $value, int $flags = null) : bool
+    public function struct_enum(&$result, $value, ?int $flags = null) : bool
     {
         return Lib::php()->type_struct_enum($result, $value, $flags);
     }
@@ -1958,7 +1958,7 @@ class TypeModule extends TypeModuleBase
      * @param class-string<T>|null    $result
      * @param class-string<T>|T|mixed $value
      */
-    public function struct_fqcn(&$result, $value, int $flags = null) : bool
+    public function struct_fqcn(&$result, $value, ?int $flags = null) : bool
     {
         return Lib::php()->type_struct_fqcn($result, $value, $flags);
     }
@@ -1966,7 +1966,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function struct_namespace(&$result, $value, int $flags = null) : bool
+    public function struct_namespace(&$result, $value, ?int $flags = null) : bool
     {
         return Lib::php()->type_struct_namespace($result, $value, $flags);
     }
@@ -1974,7 +1974,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
-    public function struct_basename(&$result, $value, int $flags = null) : bool
+    public function struct_basename(&$result, $value, ?int $flags = null) : bool
     {
         return Lib::php()->type_struct_basename($result, $value, $flags);
     }
@@ -2014,7 +2014,7 @@ class TypeModule extends TypeModuleBase
      *
      * @return class-string|null
      */
-    public function enum_case(&$result, $value, string $enumClass = null) : bool
+    public function enum_case(&$result, $value, ?string $enumClass = null) : bool
     {
         return Lib::php()->type_enum_case($result, $value, $enumClass);
     }
@@ -2156,8 +2156,7 @@ class TypeModule extends TypeModuleBase
      * @param array{ 0: array|null } $refs
      */
     public function path(
-        &$result,
-        $value,
+        &$result, $value,
         array $refs = []
     ) : bool
     {
@@ -2169,14 +2168,14 @@ class TypeModule extends TypeModuleBase
      * @param array{ 0: array|null } $refs
      */
     public function realpath(
-        &$result,
-        $value, bool $allowSymlink = null,
+        &$result, $value,
+        ?bool $allowSymlink = null,
         array $refs = []
     ) : bool
     {
         return Lib::fs()->type_realpath(
-            $result,
-            $value, $allowSymlink,
+            $result, $value,
+            $allowSymlink,
             $refs
         );
     }
@@ -2187,14 +2186,14 @@ class TypeModule extends TypeModuleBase
      * @param array{ 0: array|null } $refs
      */
     public function dirpath(
-        &$result,
-        $value, bool $allowExists = null, bool $allowSymlink = null,
+        &$result, $value,
+        ?bool $allowExists = null, ?bool $allowSymlink = null,
         array $refs = []
     ) : bool
     {
         return Lib::fs()->type_dirpath(
-            $result,
-            $value, $allowExists, $allowSymlink,
+            $result, $value,
+            $allowExists, $allowSymlink,
             $refs
         );
     }
@@ -2203,14 +2202,14 @@ class TypeModule extends TypeModuleBase
      * @param string|null $result
      */
     public function filepath(
-        &$result,
-        $value, bool $allowExists = null, bool $allowSymlink = null,
+        &$result, $value,
+        ?bool $allowExists = null, ?bool $allowSymlink = null,
         array $refs = []
     ) : bool
     {
         return Lib::fs()->type_filepath(
-            $result,
-            $value, $allowExists, $allowSymlink,
+            $result, $value,
+            $allowExists, $allowSymlink,
             $refs
         );
     }
@@ -2221,14 +2220,14 @@ class TypeModule extends TypeModuleBase
      * @param array{ 0: array|null } $refs
      */
     public function dirpath_realpath(
-        &$result,
-        $value, bool $allowSymlink = null,
+        &$result, $value,
+        ?bool $allowSymlink = null,
         array $refs = []
     ) : bool
     {
         return Lib::fs()->type_dirpath_realpath(
-            $result,
-            $value, $allowSymlink,
+            $result, $value,
+            $allowSymlink,
             $refs
         );
     }
@@ -2238,8 +2237,8 @@ class TypeModule extends TypeModuleBase
      * @param array{ 0: array|null } $refs
      */
     public function filepath_realpath(
-        &$result,
-        $value, bool $allowSymlink = null,
+        &$result, $value,
+        ?bool $allowSymlink = null,
         array $refs = []
     ) : bool
     {

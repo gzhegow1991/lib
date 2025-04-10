@@ -50,7 +50,7 @@ class ArrPath implements
     /**
      * @return static|null
      */
-    public static function tryFrom($from, \Throwable &$last = null) // : ?static
+    public static function tryFrom($from, ?\Throwable &$last = null) // : ?static
     {
         $last = null;
 

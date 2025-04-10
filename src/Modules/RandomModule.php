@@ -94,7 +94,7 @@ class RandomModule
      * > $bytes = $random->bytes();
      * > var_dump(bin2hex($bytes)) // string(32) "00f6c04b144b41fad6a59111c126e1ee"
      */
-    public function random_bytes(int $len = null) : string
+    public function random_bytes(?int $len = null) : string
     {
         $len = $len ?? 16;
 
@@ -139,7 +139,7 @@ class RandomModule
         return $result;
     }
 
-    public function random_hex(int $len = null) : string
+    public function random_hex(?int $len = null) : string
     {
         $array = unpack('H*', $this->random_bytes($len));
 
@@ -160,7 +160,7 @@ class RandomModule
         return $rand;
     }
 
-    public function random_string(int $len, string $alphabet = null) : string
+    public function random_string(int $len, ?string $alphabet = null) : string
     {
         $theType = Lib::type();
 
@@ -196,27 +196,27 @@ class RandomModule
     }
 
 
-    public function random_base64_urlsafe(int $len = null) : string
+    public function random_base64_urlsafe(?int $len = null) : string
     {
         return Lib::crypt()->base64_encode_urlsafe($this->random_bytes($len));
     }
 
-    public function random_base64(int $len = null) : string
+    public function random_base64(?int $len = null) : string
     {
         return Lib::crypt()->base64_encode($this->random_bytes($len));
     }
 
-    public function random_base62(int $len = null) : string
+    public function random_base62(?int $len = null) : string
     {
         return Lib::crypt()->base62_encode($this->random_bytes($len));
     }
 
-    public function random_base58(int $len = null) : string
+    public function random_base58(?int $len = null) : string
     {
         return Lib::crypt()->base58_encode($this->random_bytes($len));
     }
 
-    public function random_base36(int $len = null) : string
+    public function random_base36(?int $len = null) : string
     {
         return Lib::crypt()->base36_encode($this->random_bytes($len));
     }

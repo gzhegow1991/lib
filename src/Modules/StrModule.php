@@ -60,7 +60,7 @@ class StrModule
     }
 
 
-    public function inflector(InflectorInterface $inflector = null) : InflectorInterface
+    public function inflector(?InflectorInterface $inflector = null) : InflectorInterface
     {
         return $this->inflector = null
             ?? $inflector
@@ -68,7 +68,7 @@ class StrModule
             ?? new Inflector();
     }
 
-    public function interpolator(InterpolatorInterface $interpolator = null) : InterpolatorInterface
+    public function interpolator(?InterpolatorInterface $interpolator = null) : InterpolatorInterface
     {
         return $this->interpolator = null
             ?? $interpolator
@@ -76,7 +76,7 @@ class StrModule
             ?? new Interpolator();
     }
 
-    public function slugger(SluggerInterface $slugger = null) : SluggerInterface
+    public function slugger(?SluggerInterface $slugger = null) : SluggerInterface
     {
         return $this->slugger = null
             ?? $slugger
@@ -85,7 +85,7 @@ class StrModule
     }
 
 
-    public function static_mbstring(bool $mbstring = null) : bool
+    public function static_mbstring(?bool $mbstring = null) : bool
     {
         if (null !== $mbstring) {
             if ($mbstring) {
@@ -216,7 +216,7 @@ class StrModule
     /**
      * @param string|null $result
      */
-    public function type_trim(&$result, $value, string $characters = null) : bool
+    public function type_trim(&$result, $value, ?string $characters = null) : bool
     {
         $result = null;
 
@@ -335,7 +335,7 @@ class StrModule
     }
 
 
-    public function loadAsciiControls(bool $hex = null) : array
+    public function loadAsciiControls(?bool $hex = null) : array
     {
         $hex = $hex ?? false;
 
@@ -415,7 +415,7 @@ class StrModule
         return $list;
     }
 
-    public function loadAsciiControlsNoTrims(bool $hex = null) : array
+    public function loadAsciiControlsNoTrims(?bool $hex = null) : array
     {
         $list = $this->loadAsciiControls($hex);
 
@@ -427,7 +427,7 @@ class StrModule
         return $list;
     }
 
-    public function loadAsciiControlsOnlyTrims(bool $hex = null) : array
+    public function loadAsciiControlsOnlyTrims(?bool $hex = null) : array
     {
         $hex = $hex ?? false;
 
@@ -1016,7 +1016,7 @@ class StrModule
      *
      * @return int|float
      */
-    public function strlen($value, string $mb_encoding = null) // : int|NAN
+    public function strlen($value, ?string $mb_encoding = null) // : int|NAN
     {
         if (! is_string($value)) {
             return NAN;
@@ -1060,7 +1060,7 @@ class StrModule
     /**
      * > заменяет все буквы на малые
      */
-    public function lower(string $string, string $mb_encoding = null) : string
+    public function lower(string $string, ?string $mb_encoding = null) : string
     {
         if ($this->static_mbstring()) {
             $result = (null !== $mb_encoding)
@@ -1083,7 +1083,7 @@ class StrModule
     /**
      * > заменяет все буквы на большие
      */
-    public function upper(string $string, string $mb_encoding = null) : string
+    public function upper(string $string, ?string $mb_encoding = null) : string
     {
         if ($this->static_mbstring()) {
             $result = (null !== $mb_encoding)
@@ -1107,7 +1107,7 @@ class StrModule
     /**
      * > пишет слово с малой буквы
      */
-    public function lcfirst(string $string, string $mb_encoding = null) : string
+    public function lcfirst(string $string, ?string $mb_encoding = null) : string
     {
         if ($this->static_mbstring()) {
             $result = Lib::mb()->lcfirst($string, $mb_encoding);
@@ -1128,7 +1128,7 @@ class StrModule
     /**
      * > пишет слово с большой буквы
      */
-    public function ucfirst(string $string, string $mb_encoding = null) : string
+    public function ucfirst(string $string, ?string $mb_encoding = null) : string
     {
         if ($this->static_mbstring()) {
             $result = Lib::mb()->ucfirst($string, $mb_encoding);
@@ -1150,8 +1150,10 @@ class StrModule
     /**
      * > пишет каждое слово в предложении с малой буквы
      */
-    public function lcwords(string $string, string $separators = " \t\r\n\f\v", string $mb_encoding = null) : string
+    public function lcwords(string $string, ?string $separators = null, string $mb_encoding = null) : string
     {
+        $separators = $separators ?? " \t\r\n\f\v";
+
         $thePreg = Lib::preg();
 
         $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
@@ -1174,8 +1176,10 @@ class StrModule
     /**
      * > пишет каждое слово в предложении с большой буквы
      */
-    public function ucwords(string $string, string $separators = " \t\r\n\f\v", string $mb_encoding = null) : string
+    public function ucwords(string $string, ?string $separators = null, string $mb_encoding = null) : string
     {
+        $separators = $separators ?? " \t\r\n\f\v";
+
         $thePreg = Lib::preg();
 
         $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
@@ -1196,7 +1200,7 @@ class StrModule
     }
 
 
-    public function str_split(string $string, int $length = null, string $mb_encoding = null) : array
+    public function str_split(string $string, ?int $length = null, ?string $mb_encoding = null) : array
     {
         $length = $length ?? 1;
 
@@ -1218,7 +1222,7 @@ class StrModule
 
 
     public function str_starts(
-        string $string, string $needle, bool $ignoreCase = null,
+        string $string, string $needle, ?bool $ignoreCase = null,
         array $refs = []
     ) : bool
     {
@@ -1259,7 +1263,7 @@ class StrModule
     }
 
     public function str_ends(
-        string $string, string $needle, bool $ignoreCase = null,
+        string $string, string $needle, ?bool $ignoreCase = null,
         array $refs = []
     ) : bool
     {
@@ -1303,7 +1307,7 @@ class StrModule
     /**
      * > обрезает у строки подстроку с начала (ltrim, только для строк а не букв)
      */
-    public function lcrop(string $string, string $needle, bool $ignoreCase = null, int $limit = -1) : string
+    public function lcrop(string $string, string $needle, ?bool $ignoreCase = null, int $limit = -1) : string
     {
         $ignoreCase = $ignoreCase ?? true;
 
@@ -1346,7 +1350,7 @@ class StrModule
     /**
      * > обрезает у строки подстроку с конца (rtrim, только для строк а не букв)
      */
-    public function rcrop(string $string, string $needle, bool $ignoreCase = null, int $limit = -1) : string
+    public function rcrop(string $string, string $needle, ?bool $ignoreCase = null, int $limit = -1) : string
     {
         $ignoreCase = $ignoreCase ?? true;
 
@@ -1387,7 +1391,7 @@ class StrModule
     /**
      * > обрезает у строки подстроки с обеих сторон (trim, только для строк а не букв)
      */
-    public function crop(string $string, $crops, bool $ignoreCase = null, $limits = null) : string
+    public function crop(string $string, $crops, ?bool $ignoreCase = null, $limits = null) : string
     {
         $_crops = Lib::php()->to_list($crops);
         $_limits = Lib::php()->to_list($limits ?? [ -1 ]);
@@ -1424,9 +1428,10 @@ class StrModule
     /**
      * > добавляет подстроку в начало строки, если её уже там нет
      */
-    public function unlcrop(string $string, string $needle, int $times = 1, bool $ignoreCase = null) : string
+    public function unlcrop(string $string, string $needle, ?int $times = null, ?bool $isIgnoreCase = null) : string
     {
-        $ignoreCase = $ignoreCase ?? true;
+        $times = $times ?? 1;
+        $isIgnoreCase = $isIgnoreCase ?? true;
 
         if ('' === $needle) return $string;
         if (0 === $times) return $string;
@@ -1439,7 +1444,7 @@ class StrModule
         }
 
         $result = $string;
-        $result = $this->lcrop($result, $needle, $ignoreCase, -1);
+        $result = $this->lcrop($result, $needle, $isIgnoreCase, -1);
         $result = str_repeat($needle, $times) . $result;
 
         return $result;
@@ -1448,9 +1453,10 @@ class StrModule
     /**
      * > добавляет подстроку в конец строки, если её уже там нет
      */
-    public function unrcrop(string $string, string $needle, int $times = 1, bool $ignoreCase = null) : string
+    public function unrcrop(string $string, string $needle, ?int $times = null, ?bool $isIgnoreCase = null) : string
     {
-        $ignoreCase = $ignoreCase ?? true;
+        $times = $times ?? 1;
+        $isIgnoreCase = $isIgnoreCase ?? true;
 
         if ('' === $needle) return $string;
         if (0 === $times) return $string;
@@ -1463,7 +1469,7 @@ class StrModule
         }
 
         $result = $string;
-        $result = $this->rcrop($result, $needle, $ignoreCase, -1);
+        $result = $this->rcrop($result, $needle, $isIgnoreCase, -1);
         $result = $result . str_repeat($needle, $times);
 
         return $result;
@@ -1475,7 +1481,7 @@ class StrModule
      * @param string|string[] $crops
      * @param int|int[]       $times
      */
-    public function uncrop(string $string, $crops, $times = null, bool $ignoreCase = null) : string
+    public function uncrop(string $string, $crops, $times = null, ?bool $ignoreCase = null) : string
     {
         $_crops = Lib::php()->to_list($crops);
         $_times = Lib::php()->to_list($times ?? [ 1 ]);
@@ -1520,8 +1526,8 @@ class StrModule
      */
     public function str_replace_limit(
         $search, $replace, $subject,
-        int $limit = null,
-        int &$count = null
+        ?int $limit = null,
+        ?int &$count = null
     )
     {
         $_search = Lib::php()->to_list($search);
@@ -1562,8 +1568,8 @@ class StrModule
      */
     public function str_ireplace_limit(
         $search, $replace, $subject,
-        int $limit = null,
-        int &$count = null
+        ?int $limit = null,
+        ?int &$count = null
     )
     {
         $_search = Lib::php()->to_list($search);
@@ -1599,9 +1605,9 @@ class StrModule
      */
     public function str_match(
         string $pattern, $lines,
-        string $wildcardLetterSequence = null,
-        string $wildcardSeparator = null,
-        string $wildcardLetterSingle = null
+        ?string $wildcardLetterSequence = null,
+        ?string $wildcardSeparator = null,
+        ?string $wildcardLetterSingle = null
     ) : array
     {
         if ('' === $pattern) {
@@ -1638,9 +1644,9 @@ class StrModule
      */
     public function str_match_starts(
         string $pattern, $lines,
-        string $wildcardLetterSequence = null,
-        string $wildcardSeparator = null,
-        string $wildcardLetterSingle = null
+        ?string $wildcardLetterSequence = null,
+        ?string $wildcardSeparator = null,
+        ?string $wildcardLetterSingle = null
     ) : array
     {
         if ('' === $pattern) {
@@ -1677,9 +1683,9 @@ class StrModule
      */
     public function str_match_ends(
         string $pattern, $lines,
-        string $wildcardLetterSequence = null,
-        string $wildcardSeparator = null,
-        string $wildcardLetterSingle = null
+        ?string $wildcardLetterSequence = null,
+        ?string $wildcardSeparator = null,
+        ?string $wildcardLetterSingle = null
     ) : array
     {
         if ('' === $pattern) {
@@ -1716,9 +1722,9 @@ class StrModule
      */
     public function str_match_contains(
         string $pattern, $lines,
-        string $wildcardLetterSequence = null,
-        string $wildcardSeparator = null,
-        string $wildcardLetterSingle = null
+        ?string $wildcardLetterSequence = null,
+        ?string $wildcardSeparator = null,
+        ?string $wildcardLetterSingle = null
     ) : array
     {
         if ('' === $pattern) {
@@ -1752,9 +1758,9 @@ class StrModule
 
     protected function str_match_regex(
         string $pattern,
-        string $wildcardSequenceSymbol = null,
-        string $wildcardSeparatorSymbol = null,
-        string $wildcardSingleSymbol = null
+        ?string $wildcardSequenceSymbol = null,
+        ?string $wildcardSeparatorSymbol = null,
+        ?string $wildcardSingleSymbol = null
     ) : string
     {
         if ('' === $pattern) {
@@ -2052,7 +2058,7 @@ class StrModule
      *
      * @param array|string $ignoreSymbols
      */
-    public function translit_ru2ascii(string $string, string $delimiter = null, $ignoreSymbols = null) : string
+    public function translit_ru2ascii(string $string, ?string $delimiter = null, $ignoreSymbols = null) : string
     {
         $delimiter = $delimiter ?? '-';
 
@@ -2163,7 +2169,7 @@ class StrModule
      *
      * @return \Generator<string>
      */
-    public function trim_it($strings, string $characters = null) : \Generator
+    public function trim_it($strings, ?string $characters = null) : \Generator
     {
         $_characters = $characters ?? " \n\r\t\v\0";
 
@@ -2181,7 +2187,7 @@ class StrModule
      *
      * @return \Generator<string>
      */
-    public function ltrim_it($strings, string $characters = null) : \Generator
+    public function ltrim_it($strings, ?string $characters = null) : \Generator
     {
         $_characters = $characters ?? " \n\r\t\v\0";
 
@@ -2199,7 +2205,7 @@ class StrModule
      *
      * @return \Generator<string>
      */
-    public function rtrim_it($strings, string $characters = null) : \Generator
+    public function rtrim_it($strings, ?string $characters = null) : \Generator
     {
         $_characters = $characters ?? " \n\r\t\v\0";
 
@@ -2221,7 +2227,7 @@ class StrModule
      * > bsod/3 -> bso
      * > manufacturer/6 -> manfct
      */
-    public function prefix(string $string, int $length = null) : string
+    public function prefix(string $string, ?int $length = null) : string
     {
         if ('' === $string) {
             return '';
@@ -2345,7 +2351,7 @@ class StrModule
     /**
      * > конвертирует непечатаемые символы терминала Windows (`кракозябры`) в последовательности, которые можно прочесть визуально
      */
-    public function utf8_encode(string $string, string $encoding = null) : ?string
+    public function utf8_encode(string $string, ?string $encoding = null) : ?string
     {
         if (! \function_exists('iconv')) {
             throw new RuntimeException(
@@ -2382,7 +2388,7 @@ class StrModule
     /**
      * > конвертирует непечатаемые символы строки в байтовые и hex последовательности, которые можно прочесть
      */
-    public function dump_encode(string $string, string $encoding = null) : ?string
+    public function dump_encode(string $string, ?string $encoding = null) : ?string
     {
         $result = $string;
 

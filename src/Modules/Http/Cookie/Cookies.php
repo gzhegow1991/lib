@@ -58,7 +58,7 @@ class Cookies
 
     public function add(
         array $setrawcookieArgs,
-        string $cookieName, string $cookiePath, string $cookieDomain = null
+        string $cookieName, string $cookiePath, ?string $cookieDomain = null
     ) : void
     {
         $this->modeDelay
@@ -68,7 +68,7 @@ class Cookies
 
     public function addCookie(
         array $setrawcookieArgs,
-        string $cookieName, string $cookiePath, string $cookieDomain = null
+        string $cookieName, string $cookiePath, ?string $cookieDomain = null
     ) : void
     {
         $id = $this->id++;
@@ -103,7 +103,7 @@ class Cookies
         unset($this->cookiesList[ $cookieId ]);
     }
 
-    public function remove(string $cookieName, string $cookiePath, string $cookieDomain = null) : void
+    public function remove(string $cookieName, string $cookiePath, ?string $cookieDomain = null) : void
     {
         if (! $this->modeDelay) return;
 
@@ -147,7 +147,7 @@ class Cookies
     }
 
 
-    protected function indexCookie(string $cookieName, string $cookiePath, string $cookieDomain = null) : string
+    protected function indexCookie(string $cookieName, string $cookiePath, ?string $cookieDomain = null) : string
     {
         $theType = Lib::type();
 

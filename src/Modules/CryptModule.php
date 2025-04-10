@@ -161,7 +161,7 @@ class CryptModule
     public function hash(
         string $algo,
         string $datastring,
-        bool $binary = null, array $options = []
+        ?bool $binary = null, array $options = []
     ) : string
     {
         $binary = $binary ?? false;
@@ -179,7 +179,7 @@ class CryptModule
         string $user_hash,
         string $algo,
         string $user_datastring,
-        bool $binary = null, array $options = []
+        ?bool $binary = null, array $options = []
     )
     {
         $known_hash = $this->hash(
@@ -194,7 +194,7 @@ class CryptModule
     public function hash_hmac(
         string $algo, string $secret_key,
         string $datastring,
-        bool $binary = null, array $options = []
+        ?bool $binary = null, array $options = []
     )
     {
         $binary = $binary ?? false;
@@ -208,7 +208,7 @@ class CryptModule
         string $user_hmac,
         string $algo, string $secret_key,
         string $user_datastring,
-        bool $binary = null, array $options = []
+        ?bool $binary = null, array $options = []
     )
     {
         $known_hmac = $this->hash_hmac(
@@ -291,9 +291,9 @@ class CryptModule
     /**
      * @return \Generator<string>
      */
-    public function bin2text_it($binaries, bool $throw = null) : \Generator
+    public function bin2text_it($binaries, ?bool $isThrow = null) : \Generator
     {
-        $throw = $throw ?? true;
+        $isThrow = $isThrow ?? true;
 
         $theMb = Lib::mb();
 
@@ -404,7 +404,7 @@ class CryptModule
                 }
 
                 if ($error) {
-                    if ($throw) {
+                    if ($isThrow) {
                         throw new RuntimeException($error);
                     }
 
@@ -504,12 +504,12 @@ class CryptModule
     /**
      * @return \Generator<string>
      */
-    public function base64_decode_it($base64Strings, bool $throw = null) : \Generator
+    public function base64_decode_it($base64Strings, ?bool $isThrow = null) : \Generator
     {
         $gen = $this->baseX_decode_it(
             $base64Strings,
             static::ALPHABET_BASE_64_RFC4648,
-            $throw
+            $isThrow
         );
 
         return $gen;
@@ -556,12 +556,12 @@ class CryptModule
     /**
      * @return \Generator<string>
      */
-    public function base64_decode_urlsafe_it($base64UrlSafeStrings, bool $throw = null) : \Generator
+    public function base64_decode_urlsafe_it($base64UrlSafeStrings, ?bool $isThrow = null) : \Generator
     {
         $gen = $this->baseX_decode_it(
             $base64UrlSafeStrings,
             static::ALPHABET_BASE_64_RFC4648_URLSAFE,
-            $throw
+            $isThrow
         );
 
         return $gen;
@@ -764,14 +764,14 @@ class CryptModule
     /**
      * @return \Generator<string>
      */
-    public function baseX_decode_it($baseStrings, $alphabetFrom, bool $throw = null) : \Generator
+    public function baseX_decode_it($baseStrings, $alphabetFrom, ?bool $isThrow = null) : \Generator
     {
         $theParse = Lib::parse();
         $theStr = Lib::str();
 
         $gen = $theStr->rtrim_it($baseStrings, '=');
 
-        $gen = $this->base2bin_it($gen, $alphabetFrom, $throw);
+        $gen = $this->base2bin_it($gen, $alphabetFrom, $isThrow);
 
         foreach ( $gen as $bin ) {
             $ord = bindec($bin);
@@ -894,9 +894,9 @@ class CryptModule
     /**
      * @return \Generator<string>
      */
-    public function base2bin_it($baseStrings, $alphabetFrom, bool $throw = null) : \Generator
+    public function base2bin_it($baseStrings, $alphabetFrom, ?bool $isThrow = null) : \Generator
     {
-        $throw = $throw ?? true;
+        $isThrow = $isThrow ?? true;
 
         $theParse = Lib::parse();
         $theMb = Lib::mb();
@@ -933,7 +933,7 @@ class CryptModule
             }
 
             if (preg_match($alphabetFromRegexNot, $baseString)) {
-                if ($throw) {
+                if ($isThrow) {
                     throw new LogicException(
                         [ 'Each of `baseStrings` should be valid baseString of given alphabet', $baseString, $alphabetFrom ]
                     );
@@ -1104,7 +1104,7 @@ class CryptModule
      * > функция переводит число из десятичной системы в любую другую
      * > например, 10 -> 58
      */
-    public function dec2numbase(string $decString, $alphabetTo, bool $oneBasedTo = null) : string
+    public function dec2numbase(string $decString, $alphabetTo, ?bool $isOneBasedTo = null) : string
     {
         $theBcmath = Lib::bcmath();
 
@@ -1128,7 +1128,7 @@ class CryptModule
         }
 
         $_oneBasedTo = null
-            ?? $oneBasedTo
+            ?? $isOneBasedTo
             ?? ($alphabetToValue[ 0 ] !== '0');
 
         $baseTo = $alphabetToLen;
@@ -1143,7 +1143,7 @@ class CryptModule
                     [
                         'The `decInteger` should be greater than zero due to `oneBasedTo` is set to TRUE',
                         $alphabetTo,
-                        $oneBasedTo,
+                        $isOneBasedTo,
                     ]
                 );
             }
@@ -1168,7 +1168,7 @@ class CryptModule
      * > функция переводит число из любой системы счисления в десятичную
      * > например, 58 -> 10
      */
-    public function numbase2dec(string $numbaseString, $alphabetFrom, bool $oneBasedFrom = null) : string
+    public function numbase2dec(string $numbaseString, $alphabetFrom, ?bool $isOneBasedFrom = null) : string
     {
         $theBcmath = Lib::bcmath();
         $theMb = Lib::mb();
@@ -1188,7 +1188,7 @@ class CryptModule
         }
 
         $_oneBasedFrom = null
-            ?? $oneBasedFrom
+            ?? $isOneBasedFrom
             ?? ($alphabetFrom[ 0 ] !== '0');
 
         $numbaseStringLen = mb_strlen($_numbaseString);
@@ -1230,7 +1230,7 @@ class CryptModule
     public function numbase2numbase(
         string $numbaseString,
         $alphabetTo, $alphabetFrom,
-        bool $oneBasedTo = null, bool $oneBasedFrom = null
+        ?bool $oneBasedTo = null, ?bool $oneBasedFrom = null
     ) : string
     {
         if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {

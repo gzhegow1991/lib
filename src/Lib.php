@@ -35,7 +35,7 @@ class Lib
      */
     public static $arr;
 
-    public static function arr(ArrModule $instance = null)
+    public static function arr(?ArrModule $instance = null)
     {
         return static::$arr = $instance
             ?? static::$arr
@@ -47,7 +47,7 @@ class Lib
      */
     public static $assert;
 
-    public static function assert(AssertModule $instance = null)
+    public static function assert(?AssertModule $instance = null)
     {
         return static::$assert = $instance
             ?? static::$assert
@@ -59,7 +59,7 @@ class Lib
      */
     public static $bcmath;
 
-    public static function bcmath(BcmathModule $instance = null)
+    public static function bcmath(?BcmathModule $instance = null)
     {
         return static::$bcmath = $instance
             ?? static::$bcmath
@@ -71,7 +71,7 @@ class Lib
      */
     public static $cli;
 
-    public static function cli(CliModule $instance = null)
+    public static function cli(?CliModule $instance = null)
     {
         return static::$cli = $instance
             ?? static::$cli
@@ -83,7 +83,7 @@ class Lib
      */
     public static $cmp;
 
-    public static function cmp(CmpModule $instance = null)
+    public static function cmp(?CmpModule $instance = null)
     {
         return static::$cmp = $instance
             ?? static::$cmp
@@ -95,7 +95,7 @@ class Lib
      */
     public static $crypt;
 
-    public static function crypt(CryptModule $instance = null)
+    public static function crypt(?CryptModule $instance = null)
     {
         return static::$crypt = $instance
             ?? static::$crypt
@@ -107,7 +107,7 @@ class Lib
      */
     public static $date;
 
-    public static function date(DateModule $instance = null)
+    public static function date(?DateModule $instance = null)
     {
         return static::$date = $instance
             ?? static::$date
@@ -119,7 +119,7 @@ class Lib
      */
     public static $debug;
 
-    public static function debug(DebugModule $instance = null)
+    public static function debug(?DebugModule $instance = null)
     {
         return static::$debug = $instance
             ?? static::$debug
@@ -131,7 +131,7 @@ class Lib
      */
     public static $escape;
 
-    public static function escape(EscapeModule $instance = null)
+    public static function escape(?EscapeModule $instance = null)
     {
         return static::$escape = $instance
             ?? static::$escape
@@ -143,7 +143,7 @@ class Lib
      */
     public static $format;
 
-    public static function format(FormatModule $instance = null)
+    public static function format(?FormatModule $instance = null)
     {
         return static::$format = $instance
             ?? static::$format
@@ -155,7 +155,7 @@ class Lib
      */
     public static $fs;
 
-    public static function fs(FsModule $instance = null)
+    public static function fs(?FsModule $instance = null)
     {
         return static::$fs = $instance
             ?? static::$fs
@@ -167,7 +167,7 @@ class Lib
      */
     public static $http;
 
-    public static function http(HttpModule $instance = null)
+    public static function http(?HttpModule $instance = null)
     {
         return static::$http = $instance
             ?? static::$http
@@ -179,7 +179,7 @@ class Lib
      */
     public static $itertools;
 
-    public static function itertools(ItertoolsModule $instance = null)
+    public static function itertools(?ItertoolsModule $instance = null)
     {
         return static::$itertools = $instance
             ?? static::$itertools
@@ -191,7 +191,7 @@ class Lib
      */
     public static $json;
 
-    public static function json(JsonModule $instance = null)
+    public static function json(?JsonModule $instance = null)
     {
         return static::$json = $instance
             ?? static::$json
@@ -203,7 +203,7 @@ class Lib
      */
     public static $mb;
 
-    public static function mb(MbModule $instance = null)
+    public static function mb(?MbModule $instance = null)
     {
         return static::$mb = $instance
             ?? static::$mb
@@ -215,7 +215,7 @@ class Lib
      */
     public static $net;
 
-    public static function net(NetModule $instance = null)
+    public static function net(?NetModule $instance = null)
     {
         return static::$net = $instance
             ?? static::$net
@@ -227,7 +227,7 @@ class Lib
      */
     public static $parse;
 
-    public static function parse(ParseModule $instance = null)
+    public static function parse(?ParseModule $instance = null)
     {
         return static::$parse = $instance
             ?? static::$parse
@@ -239,7 +239,7 @@ class Lib
      */
     public static $php;
 
-    public static function php(PhpModule $instance = null)
+    public static function php(?PhpModule $instance = null)
     {
         return static::$php = $instance
             ?? static::$php
@@ -251,7 +251,7 @@ class Lib
      */
     public static $preg;
 
-    public static function preg(PregModule $instance = null)
+    public static function preg(?PregModule $instance = null)
     {
         return static::$preg = $instance
             ?? static::$preg
@@ -263,7 +263,7 @@ class Lib
      */
     public static $random;
 
-    public static function random(RandomModule $instance = null)
+    public static function random(?RandomModule $instance = null)
     {
         return static::$random = $instance
             ?? static::$random
@@ -275,7 +275,7 @@ class Lib
      */
     public static $str;
 
-    public static function str(StrModule $instance = null)
+    public static function str(?StrModule $instance = null)
     {
         return static::$str = $instance
             ?? static::$str
@@ -287,7 +287,7 @@ class Lib
      */
     public static $test;
 
-    public static function test(TestModule $instance = null)
+    public static function test(?TestModule $instance = null)
     {
         return static::$test = $instance
             ?? static::$test
@@ -299,7 +299,7 @@ class Lib
      */
     public static $type;
 
-    public static function type(TypeModule $instance = null)
+    public static function type(?TypeModule $instance = null)
     {
         return static::$type = $instance
             ?? static::$type
@@ -311,7 +311,7 @@ class Lib
      */
     public static $url;
 
-    public static function url(UrlModule $instance = null)
+    public static function url(?UrlModule $instance = null)
     {
         return static::$url = $instance
             ?? static::$url
