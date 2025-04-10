@@ -2221,16 +2221,14 @@ class PhpModule
         }
 
         $separator = Lib::parse()->char($separator) ?? '/';
+        $dot = Lib::parse()->char($dot) ?? '.';
 
-        $_relative = $this->normalize($relative, $separator);
+        $absolute = $this->normalize($relative, $separator);
 
-        if ($separator === $_relative[ 0 ]) {
-            $absolute = $_relative;
-
-        } else {
+        if ($dot === $absolute[ 0 ]) {
             $_current = $this->normalize($current, $separator);
 
-            $absolute = $_current . $separator . $_relative;
+            $absolute = $_current . $separator . $absolute;
         }
 
         $resolved = $this->resolve($absolute, $separator, $dot);
