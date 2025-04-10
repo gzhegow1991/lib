@@ -151,10 +151,19 @@ class HttpModule
 
 
     public function setcookie(
-        string $name, $value = "",
-        $expires_or_options = 0, $path = "", $domain = "", $secure = false, $httponly = false
+        string $name, ?string $value = null,
+        $expires_or_options = null,
+        ?string $path = null, ?string $domain = null,
+        ?bool $secure = null, ?bool $httponly = null
     ) : void
     {
+        $value = $value ?? '';
+        $expires_or_options = $expires_or_options ?? 0;
+        $path = $path ?? '';
+        $domain = $domain ?? '';
+        $secure = $secure ?? false;
+        $httponly = $httponly ?? false;
+
         if (headers_sent($file, $line)) {
             throw new LogicException(
                 "Headers already sent at {$file} : {$line}"
@@ -165,10 +174,19 @@ class HttpModule
     }
 
     public function setrawcookie(
-        string $name, $value = '',
-        $expires_or_options = 0, $path = "", $domain = "", $secure = false, $httponly = false
+        string $name, ?string $value = null,
+        $expires_or_options = null,
+        ?string $path = null, ?string $domain = null,
+        ?bool $secure = null, ?bool $httponly = null
     ) : void
     {
+        $value = $value ?? '';
+        $expires_or_options = $expires_or_options ?? 0;
+        $path = $path ?? '';
+        $domain = $domain ?? '';
+        $secure = $secure ?? false;
+        $httponly = $httponly ?? false;
+
         if (headers_sent($file, $line)) {
             throw new LogicException(
                 "Headers already sent at {$file} : {$line}"

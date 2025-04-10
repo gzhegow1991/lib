@@ -155,7 +155,10 @@ class MbModule
      *
      * @return array<string, bool>
      */
-    public function detect_encoding(string $string, $encondings = '', ?bool $strict = null, ?array $detect_order = null) : array
+    public function detect_encoding(
+        string $string, $encondings = '',
+        ?bool $strict = null, ?array $detect_order = null
+    ) : array
     {
         $strict = $strict ?? true;
 
@@ -238,8 +241,10 @@ class MbModule
     /**
      * > пишет каждое слово в предложении с малой буквы
      */
-    public function lcwords(string $string, string $separators = " \t\r\n\f\v", string $mb_encoding = null) : string
+    public function lcwords(string $string, ?string $separators = null, ?string $mb_encoding = null) : string
     {
+        $separators = $separators ?? " \t\r\n\f\v";
+
         $thePreg = Lib::preg();
 
         $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
@@ -262,8 +267,10 @@ class MbModule
     /**
      * > пишет каждое слово в предложении с большой буквы
      */
-    public function ucwords(string $string, string $separators = " \t\r\n\f\v", string $mb_encoding = null) : string
+    public function ucwords(string $string, ?string $separators = null, ?string $mb_encoding = null) : string
     {
+        $separators = $separators ?? " \t\r\n\f\v";
+
         $thePreg = Lib::preg();
 
         $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);

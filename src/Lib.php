@@ -471,13 +471,15 @@ class Lib
     /**
      * @return array|float
      */
-    public static function benchmark($clear = null, string $tag = '')
+    public static function benchmark($clear = null, ?string $tag = null)
     {
         /** @var float $mt */
 
         $mt = microtime(true);
 
         static $current;
+
+        $tag = $tag ?? '';
 
         if (null !== $clear) {
             $clear = (bool) $clear;

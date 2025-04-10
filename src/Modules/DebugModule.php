@@ -1294,8 +1294,10 @@ class DebugModule
     /**
      * @return string|float|int|null
      */
-    public function var_export($var, array $options = [], int $level = 0) // : string|float|int|null
+    public function var_export($var, array $options = [], ?int $level = null) // : string|float|int|null
     {
+        $level = $level ?? 0;
+
         $addcslashes = $options[ 'addcslashes' ] ?? true;
         $indent = $options[ 'indent' ] ?? "  ";
         $newline = $options[ 'newline' ] ?? "\n";

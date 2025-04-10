@@ -11,6 +11,42 @@ use Gzhegow\Lib\Exception\RuntimeException;
 class ArrModule
 {
     /**
+     * @var bool
+     */
+    protected $fn_mode;
+
+
+    public function static_fn_mode(?int $fn_mode = null) : ?int
+    {
+        if (null !== $fn_mode) {
+            if ($fn_mode) {
+                if (0 === ($fn_mode & ~_ARR_FN_USE_ALL)) {
+                    throw new LogicException(
+                        [
+                            'The `fn_mode` should be valid flags',
+                            $fn_mode,
+                            _ARR_FN_USE_ALL,
+                        ]
+                    );
+                }
+            }
+
+            $last = $this->fn_mode;
+
+            $current = $fn_mode;
+
+            $this->fn_mode = $current;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->fn_mode;
+
+        return $result;
+    }
+
+
+    /**
      * @param array|null $result
      */
     public function type_list(&$result, $value) : bool
@@ -979,37 +1015,6 @@ class ArrModule
     }
 
 
-    public function fn_mode($mode = '') : ?int
-    {
-        static $modeCurrent;
-
-        if ('' !== $mode) {
-            if (null !== $mode) {
-                if (! is_int($mode)) {
-                    throw new LogicException(
-                        [
-                            'The `mode` should be int',
-                            $mode,
-                        ]
-                    );
-                }
-
-                if ($mode > 0b111) {
-                    throw new LogicException(
-                        [
-                            'The `mode` should be less than: ' . decbin(0b111),
-                            $mode,
-                        ]
-                    );
-                }
-            }
-
-            $modeCurrent = $mode;
-        }
-
-        return $modeCurrent;
-    }
-
     /**
      * > выполнить array_map с учетом _array_fn_mode()
      *
@@ -1021,7 +1026,7 @@ class ArrModule
             return [];
         }
 
-        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -1061,7 +1066,7 @@ class ArrModule
             return [];
         }
 
-        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -1098,7 +1103,7 @@ class ArrModule
             return $src;
         }
 
-        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -1132,7 +1137,7 @@ class ArrModule
             return $src;
         }
 
-        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -1163,7 +1168,7 @@ class ArrModule
             return $src;
         }
 
-        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -1222,7 +1227,7 @@ class ArrModule
         $left = [];
         $right = [];
 
-        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -1253,7 +1258,7 @@ class ArrModule
     {
         $result = [];
 
-        $mode = $this->fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);

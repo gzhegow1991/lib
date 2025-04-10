@@ -109,7 +109,7 @@ class DebugBacktracer
     /**
      * @return static
      */
-    public function of(?array $of = null)
+    public function of(?array $of)
     {
         $_ofFunction = $of[ 'function' ] ?? $of[ 0 ] ?? null;
         $_ofClass = $of[ 'class' ] ?? $of[ 1 ] ?? null;
@@ -142,7 +142,7 @@ class DebugBacktracer
     /**
      * @return static
      */
-    public function ofStartsWith(?array $of = null)
+    public function ofStartsWith(?array $of)
     {
         $_ofFunction = $of[ 'function' ] ?? $of[ 0 ] ?? null;
         $_ofClass = $of[ 'class' ] ?? $of[ 1 ] ?? null;
@@ -166,7 +166,7 @@ class DebugBacktracer
     /**
      * @return static
      */
-    public function filter(?array $filter = null)
+    public function filter(?array $filter)
     {
         $theType = Lib::type();
 
@@ -231,7 +231,7 @@ class DebugBacktracer
     /**
      * @return static
      */
-    public function filterStartsWith(?array $filter = null)
+    public function filterStartsWith(?array $filter)
     {
         $_filterFile = $filter[ 'file' ] ?? $filter[ 0 ] ?? [];
         $_filterClass = $filter[ 'class' ] ?? $filter[ 1 ] ?? [];
@@ -286,7 +286,7 @@ class DebugBacktracer
     /**
      * @return static
      */
-    public function filterNot(?array $filter = null)
+    public function filterNot(?array $filter)
     {
         $theType = Lib::type();
 
@@ -351,7 +351,7 @@ class DebugBacktracer
     /**
      * @return static
      */
-    public function filterNotStartsWith(?array $filter = null)
+    public function filterNotStartsWith(?array $filter)
     {
         $_filterFile = $filter[ 'file' ] ?? $filter[ 0 ] ?? [];
         $_filterClass = $filter[ 'class' ] ?? $filter[ 1 ] ?? [];

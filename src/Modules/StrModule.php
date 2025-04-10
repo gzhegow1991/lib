@@ -1307,8 +1307,9 @@ class StrModule
     /**
      * > обрезает у строки подстроку с начала (ltrim, только для строк а не букв)
      */
-    public function lcrop(string $string, string $needle, ?bool $ignoreCase = null, int $limit = -1) : string
+    public function lcrop(string $string, string $needle, ?bool $ignoreCase = null, ?int $limit = null) : string
     {
+        $limit = $limit ?? -1;
         $ignoreCase = $ignoreCase ?? true;
 
         if ('' === $string) return $string;
@@ -1350,8 +1351,9 @@ class StrModule
     /**
      * > обрезает у строки подстроку с конца (rtrim, только для строк а не букв)
      */
-    public function rcrop(string $string, string $needle, ?bool $ignoreCase = null, int $limit = -1) : string
+    public function rcrop(string $string, string $needle, ?bool $ignoreCase = null, ?int $limit = null) : string
     {
+        $limit = $limit ?? -1;
         $ignoreCase = $ignoreCase ?? true;
 
         if ('' === $string) return $string;

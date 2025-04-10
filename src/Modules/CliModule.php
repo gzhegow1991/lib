@@ -82,8 +82,10 @@ class CliModule
         return $line;
     }
 
-    public function cin(string $delimiter = '```') : string
+    public function cin(?string $delimiter = null) : string
     {
+        $delimiter = $delimiter ?? '```';
+
         $theStr = Lib::str();
 
         echo '> Enter text separating lines by pressing ENTER' . PHP_EOL;

@@ -3,6 +3,7 @@
 if (! defined('_ARR_FN_USE_KEY')) define('_ARR_FN_USE_KEY', 1 << 0);
 if (! defined('_ARR_FN_USE_SRC')) define('_ARR_FN_USE_SRC', 1 << 1);
 if (! defined('_ARR_FN_USE_VALUE')) define('_ARR_FN_USE_VALUE', 1 << 2);
+if (! defined('_ARR_FN_USE_ALL')) define('_ARR_FN_USE_ALL', (1 << 3) - 1);
 
 if (! defined('_ARR_WALK_MODE_BREADTH_FIRST')) define('_ARR_WALK_MODE_BREADTH_FIRST', 1 << 0);
 if (! defined('_ARR_WALK_MODE_DEPTH_FIRST')) define('_ARR_WALK_MODE_DEPTH_FIRST', 1 << 1);

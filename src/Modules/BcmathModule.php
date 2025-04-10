@@ -182,8 +182,10 @@ class BcmathModule
     }
 
 
-    public function bcceil($num, int $scale = 0) : Bcnumber
+    public function bcceil($num, ?int $scale = null) : Bcnumber
     {
+        $scale = $scale ?? 0;
+
         if (! $this->type_bcnumber($bcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
@@ -238,8 +240,10 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcfloor($num, int $scale = 0) : Bcnumber
+    public function bcfloor($num, ?int $scale = null) : Bcnumber
     {
+        $scale = $scale ?? 0;
+
         if (! $this->type_bcnumber($bcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
@@ -294,8 +298,10 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcround($num, int $scale = 0) : Bcnumber
+    public function bcround($num, ?int $scale = null) : Bcnumber
     {
+        $scale = $scale ?? 0;
+
         if (! $this->type_bcnumber($bcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
@@ -349,8 +355,10 @@ class BcmathModule
     }
 
 
-    public function bcmoneyceil($num, int $scale = 0) : Bcnumber
+    public function bcmoneyceil($num, ?int $scale = null) : Bcnumber
     {
+        $scale = $scale ?? 0;
+
         if (! $this->type_bcnumber($bcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
@@ -408,8 +416,10 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcmoneyfloor($num, int $scale = 0) : Bcnumber
+    public function bcmoneyfloor($num, ?int $scale = null) : Bcnumber
     {
+        $scale = $scale ?? 0;
+
         if (! $this->type_bcnumber($bcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
