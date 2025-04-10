@@ -2099,7 +2099,7 @@ class PhpModule
     }
 
     /**
-     * > разбирает последовательности /../ в пути и возвращает нормализованный путь
+     * > разбирает последовательности `./path` и `../path` и возвращает нормализованный путь
      */
     public function resolve(string $path, string $separator = null, string $dot = null) : string
     {
@@ -2153,15 +2153,16 @@ class PhpModule
         return $normalized;
     }
 
+
     /**
      * > возвращает относительный нормализованный путь, если в пути содержится root
      */
     public function relative(
-        string $absolute, string $root,
+        string $path, string $root,
         string $separator = null, string $dot = null
     ) : string
     {
-        if ('' === $absolute) {
+        if ('' === $path) {
             throw new LogicException(
                 [ 'The `absolute` should be non-empty string' ]
             );
@@ -2175,13 +2176,13 @@ class PhpModule
 
         $separator = Lib::parse()->char($separator) ?? '/';
 
-        $_absolute = $this->resolve($absolute, $separator, $dot);
+        $resolved = $this->resolve($path, $separator, $dot);
 
-        $_root = $this->normalize($root, $separator);
-        $_root = rtrim($_root, $separator) . $separator;
+        $rootNormalized = $this->normalize($root, $separator);
+        $rootNormalized = rtrim($rootNormalized, $separator) . $separator;
 
         $status = Lib::str()->str_starts(
-            $_absolute, $_root, false,
+            $resolved, $rootNormalized, false,
             [ &$relative ]
         );
 
@@ -2201,9 +2202,9 @@ class PhpModule
     }
 
     /**
-     * > возвращает абсолютный нормализованный путь, если путь не начинается с $separator
+     * > возвращает абсолютный нормализованный путь, с поддержкой ./path и ../path
      */
-    public function absolute(
+    public function resolved(
         string $path, string $current,
         string $separator = null, string $dot = null
     ) : string
@@ -2228,20 +2229,18 @@ class PhpModule
         $isRoot = ($separator === $normalized[ 0 ]);
         $isDot = ($dot === $normalized[ 0 ]);
 
+        $resolved = $normalized;
+
         if ($isRoot || $isDot) {
+            $absolute = $normalized;
+
             if ($isDot) {
-                $_current = $this->normalize($current, $separator);
+                $currentNormalized = $this->normalize($current, $separator);
 
-                $absolute = $_current . $separator . $normalized;
-
-            } else {
-                $absolute = $normalized;
+                $absolute = $currentNormalized . $separator . $normalized;
             }
 
             $resolved = $this->resolve($absolute, $separator, $dot);
-
-        } else {
-            $resolved = $normalized;
         }
 
         return $resolved;
