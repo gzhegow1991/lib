@@ -1851,36 +1851,38 @@ class PhpModule
         string $separator = null, int $levels = null, string $dot = null
     ) : array
     {
+        if ('' === $path) {
+            throw new LogicException(
+                [ 'The `path` should be non-empty string' ]
+            );
+        }
+
         $flags = $flags ?? _PHP_PATHINFO_ALL;
-
-        $separator = $separator ?? DIRECTORY_SEPARATOR;
         $levels = $levels ?? 1;
-        $dot = $dot ?? '.';
 
-        if ($levels < 1) $levels = 1;
+        $separator = Lib::parse()->char($separator) ?? '/';
+        $dot = Lib::parse()->char($dot) ?? '.';
 
-        if ($dot === '/') {
-            throw new LogicException('The `dot` should not be equal to `/` sign');
+        if ($levels < 1) {
+            throw new LogicException(
+                [ 'The `levels` should be GTE 1', $levels ]
+            );
         }
 
-        $separators = [
-            '\\'                => true,
-            DIRECTORY_SEPARATOR => true,
-        ];
-        if ('' !== $separator) {
-            $separators[ $separator ] = true;
+        if ('/' === $dot) {
+            throw new LogicException(
+                [ 'The `dot` should not be `/` sign' ]
+            );
         }
-        $separators = array_keys($separators);
 
-        $var = str_replace($separators, '/', $path);
+        $normalized = $this->normalize($path, '/');
 
-        $var = ltrim($var, '/');
+        $dirname = ltrim($normalized, '/');
+        $basename = basename($normalized);
 
         $pi = [];
 
         if ($flags & PATHINFO_DIRNAME) {
-            $dirname = $var;
-
             if (false === strpos($dirname, '/')) {
                 $dirname = null;
 
@@ -1895,35 +1897,37 @@ class PhpModule
             $pi[ 'dirname' ] = $dirname;
         }
 
-        $withBasename = (bool) ($flags & _PHP_PATHINFO_BASENAME);
-        $withFilename = (bool) ($flags & _PHP_PATHINFO_FILENAME);
-        $withExtension = (bool) ($flags & _PHP_PATHINFO_EXTENSION);
-
-        if ($withBasename || $withFilename || $withExtension) {
-            if ($withBasename) {
-                $basename = basename($var);
-                $pi[ 'basename' ] = ('' !== $basename) ? $basename : null;
-            }
-            if ($withFilename) {
-                $filename = pathinfo($var, PATHINFO_FILENAME);
-                $pi[ 'filename' ] = ('' !== $filename) ? $filename : null;
-            }
-            if ($withExtension) {
-                $extension = pathinfo($var, PATHINFO_EXTENSION);
-                $pi[ 'extension' ] = ('' !== $extension) ? $extension : null;
-            }
+        if ($flags & _PHP_PATHINFO_BASENAME) {
+            $pi[ 'basename' ] = ('' !== $basename) ? $basename : null;
         }
 
-        if ($flags & _PHP_PATHINFO_EXTENSIONS) {
-            $list = explode($dot, $var);
-            array_shift($list);
+        if (
+            ($flags & _PHP_PATHINFO_FILENAME)
+            || ($flags & _PHP_PATHINFO_EXTENSION)
+            || ($flags & _PHP_PATHINFO_EXTENSIONS)
+        ) {
+            $split = explode($dot, $basename) + [ 1 => '' ];
 
-            $extensions = null;
-            if (0 !== count($list)) {
-                $extensions = implode($dot, $list);
+            $filename = array_shift($split);
+
+            if ($flags & _PHP_PATHINFO_EXTENSION) {
+                $pi[ 'filename' ] = ('' !== $filename) ? $filename : null;
             }
 
-            $pi[ 'extensions' ] = $extensions;
+            if ($flags & _PHP_PATHINFO_EXTENSION) {
+                $extension = end($split);
+
+                $pi[ 'extension' ] = ('' !== $extension) ? $extension : null;
+            }
+
+            if ($flags & _PHP_PATHINFO_EXTENSIONS) {
+                $extensions = null;
+                if (0 !== count($split)) {
+                    $extensions = implode($dot, $split);
+                }
+
+                $pi[ 'extensions' ] = $extensions;
+            }
         }
 
         return $pi;
@@ -1934,27 +1938,25 @@ class PhpModule
      */
     public function dirname(string $path, string $separator = null, int $levels = null) : ?string
     {
-        if ('' === $path) return null;
+        if ('' === $path) {
+            throw new LogicException(
+                [ 'The `path` should be non-empty string' ]
+            );
+        }
 
-        $separator = $separator ?? DIRECTORY_SEPARATOR;
         $levels = $levels ?? 1;
 
-        if ($levels < 1) $levels = 1;
+        $separator = Lib::parse()->char($separator) ?? '/';
 
-        $separators = [
-            '\\'                => true,
-            DIRECTORY_SEPARATOR => true,
-        ];
-        if ('' !== $separator) {
-            $separators[ $separator ] = true;
+        if ($levels < 1) {
+            throw new LogicException(
+                [ 'The `levels` should be GTE 1', $levels ]
+            );
         }
-        $separators = array_keys($separators);
 
-        $var = str_replace($separators, '/', $path);
+        $normalized = $this->normalize($path, '/');
 
-        $var = ltrim($var, '/');
-
-        $dirname = $var;
+        $dirname = ltrim($normalized, '/');
 
         if (false === strpos($dirname, '/')) {
             $dirname = null;
@@ -1973,22 +1975,15 @@ class PhpModule
      */
     public function basename(string $path, string $separator = null, string $extension = null) : ?string
     {
-        if ('' === $path) return null;
-
-        $separator = $separator ?? DIRECTORY_SEPARATOR;
-
-        $separators = [
-            '\\'                => true,
-            DIRECTORY_SEPARATOR => true,
-        ];
-        if ('' !== $separator) {
-            $separators[ $separator ] = true;
+        if ('' === $path) {
+            throw new LogicException(
+                [ 'The `path` should be non-empty string' ]
+            );
         }
-        $separators = array_keys($separators);
 
-        $var = str_replace($separators, '/', $path);
+        $normalized = $this->normalize($path, '/');
 
-        $basename = basename($var, $extension);
+        $basename = basename($normalized, $extension);
 
         return ('' !== $basename) ? $basename : null;
     }
@@ -1998,27 +1993,19 @@ class PhpModule
      */
     public function filename(string $path, string $separator = null, string $dot = null) : ?string
     {
-        if ('' === $path) return null;
-
-        $separator = $separator ?? DIRECTORY_SEPARATOR;
-        $dot = $dot ?? '.';
-
-        if ($dot === '/') {
-            throw new LogicException('The `dot` should not be equal to `/` sign');
+        if ('' === $path) {
+            throw new LogicException(
+                [ 'The `path` should be non-empty string' ]
+            );
         }
 
-        $separators = [
-            '\\'                => true,
-            DIRECTORY_SEPARATOR => true,
-        ];
-        if ('' !== $separator) {
-            $separators[ $separator ] = true;
-        }
-        $separators = array_keys($separators);
+        $dot = Lib::parse()->char($dot) ?? '.';
 
-        $var = str_replace($separators, '/', $path);
+        $normalized = $this->normalize($path, '/');
 
-        $filename = pathinfo($var, PATHINFO_FILENAME);
+        $basename = basename($normalized);
+
+        [ $filename ] = explode($dot, $basename, 2);
 
         return ('' !== $filename) ? $filename : null;
     }
@@ -2028,27 +2015,21 @@ class PhpModule
      */
     public function extension(string $path, string $separator = null, string $dot = null) : ?string
     {
-        if ('' === $path) return null;
-
-        $separator = $separator ?? DIRECTORY_SEPARATOR;
-        $dot = $dot ?? '.';
-
-        if ($dot === '/') {
-            throw new LogicException('The `dot` should not be equal to `/` sign');
+        if ('' === $path) {
+            throw new LogicException(
+                [ 'The `path` should be non-empty string' ]
+            );
         }
 
-        $separators = [
-            '\\'                => true,
-            DIRECTORY_SEPARATOR => true,
-        ];
-        if ('' !== $separator) {
-            $separators[ $separator ] = true;
-        }
-        $separators = array_keys($separators);
+        $dot = Lib::parse()->char($dot) ?? '.';
 
-        $var = str_replace($separators, '/', $path);
+        $normalized = $this->normalize($path, $separator);
 
-        $extension = pathinfo($var, PATHINFO_EXTENSION);
+        $basename = basename($normalized);
+
+        $split = explode($dot, $basename) + [ 1 => '' ];
+
+        $extension = end($split);
 
         return ('' !== $extension) ? $extension : null;
     }
@@ -2058,35 +2039,203 @@ class PhpModule
      */
     public function extensions(string $path, string $separator = null, string $dot = null) : ?string
     {
-        if ('' === $path) return null;
-
-        $separator = $separator ?? DIRECTORY_SEPARATOR;
-        $dot = $dot ?? '.';
-
-        if ($dot === '/') {
-            throw new LogicException('The `dot` should not be equal to `/` sign');
+        if ('' === $path) {
+            throw new LogicException(
+                [ 'The `path` should be non-empty string' ]
+            );
         }
+
+        $separator = Lib::parse()->char($separator) ?? '/';
+        $dot = Lib::parse()->char($dot) ?? '.';
+
+        if ('/' === $dot) {
+            throw new LogicException(
+                [ 'The `dot` should not be `/` sign' ]
+            );
+        }
+
+        $normalized = $this->normalize($path, $separator);
+
+        $basename = basename($normalized);
+
+        $split = explode($dot, $basename) + [ 1 => '' ];
+
+        array_shift($split);
+
+        $extensions = null;
+        if (0 !== count($split)) {
+            $extensions = implode($dot, $split);
+        }
+
+        return $extensions;
+    }
+
+
+    /**
+     * > заменяет слеши в пути на указанные
+     */
+    public function normalize(string $path, string $separator = null) : string
+    {
+        if ('' === $path) {
+            throw new LogicException(
+                [ 'The `path` should be non-empty string' ]
+            );
+        }
+
+        $separator = Lib::parse()->char($separator) ?? '/';
+
+        $normalized = $path;
 
         $separators = [
             '\\'                => true,
             DIRECTORY_SEPARATOR => true,
+            $separator          => true,
         ];
-        if ('' !== $separator) {
-            $separators[ $separator ] = true;
-        }
         $separators = array_keys($separators);
 
-        $var = str_replace($separators, '/', $path);
+        $normalized = str_replace($separators, $separator, $path);
 
-        $list = explode($dot, $var);
-        array_shift($list);
+        return $normalized;
+    }
 
-        $extensions = null;
-        if (0 !== count($list)) {
-            $extensions = implode($dot, $list);
+    /**
+     * > разбирает последовательности /../ в пути и возвращает нормализованный путь
+     */
+    public function resolve(string $path, string $separator = null, string $dot = null) : string
+    {
+        if ('' === $path) {
+            throw new LogicException(
+                [ 'The `path` should be non-empty string' ]
+            );
         }
 
-        return $extensions;
+        $separator = Lib::parse()->char($separator) ?? '/';
+        $dot = Lib::parse()->char($dot) ?? '.';
+
+        $normalized = $this->normalize($path, '/');
+
+        $root = ($normalized[ 0 ] === '/')
+            ? $separator
+            : '';
+
+        $segments = trim($normalized, '/');
+        $segments = explode('/', $segments);
+
+        $segmentsNew = [];
+        foreach ( $segments as $segment ) {
+            if (
+                ('' === $segment)
+                || ($dot === $segment)
+            ) {
+                continue;
+            }
+
+            if ($segment === "{$dot}{$dot}") {
+                if (0 === count($segmentsNew)) {
+                    throw new RuntimeException(
+                        [
+                            'The `path` is invalid to parse `..` segments',
+                            $path,
+                        ]
+                    );
+                }
+
+                array_pop($segmentsNew);
+
+                continue;
+            }
+
+            $segmentsNew[] = $segment;
+        }
+
+        $normalized = $root . implode($separator, $segmentsNew);
+
+        return $normalized;
+    }
+
+    /**
+     * > возвращает относительный нормализованный путь, если в пути содержится root
+     */
+    public function relative(
+        string $absolute, string $root,
+        string $separator = null, string $dot = null
+    ) : string
+    {
+        if ('' === $absolute) {
+            throw new LogicException(
+                [ 'The `absolute` should be non-empty string' ]
+            );
+        }
+
+        if ('' === $root) {
+            throw new LogicException(
+                [ 'The `root` should be non-empty string' ]
+            );
+        }
+
+        $separator = Lib::parse()->char($separator) ?? '/';
+
+        $_absolute = $this->resolve($absolute, $separator, $dot);
+
+        $_root = $this->normalize($root, $separator);
+        $_root = rtrim($_root, $separator) . $separator;
+
+        $status = Lib::str()->str_starts(
+            $_absolute, $_root, false,
+            [ &$relative ]
+        );
+
+        if (! $status) {
+            throw new RuntimeException(
+                [ 'The `absolute` is not a part of the `root`', $root ]
+            );
+        }
+
+        if ('' === $relative) {
+            throw new RuntimeException(
+                [ 'The `absolute` should not be equal to `root`', $root ]
+            );
+        }
+
+        return $relative;
+    }
+
+    /**
+     * > возвращает абсолютный нормализованный путь, если путь не начинается с $separator
+     */
+    public function absolute(
+        string $relative, string $current,
+        string $separator = null, string $dot = null
+    ) : string
+    {
+        if ('' === $relative) {
+            throw new LogicException(
+                [ 'The `relative` should be non-empty string' ]
+            );
+        }
+
+        if ('' === $current) {
+            throw new LogicException(
+                [ 'The `current` should be non-empty string' ]
+            );
+        }
+
+        $separator = Lib::parse()->char($separator) ?? '/';
+
+        $_relative = $this->normalize($relative, $separator);
+
+        if ($separator === $_relative[ 0 ]) {
+            $absolute = $_relative;
+
+        } else {
+            $_current = $this->normalize($current, $separator);
+
+            $absolute = $_current . $separator . $_relative;
+        }
+
+        $resolved = $this->resolve($absolute, $separator, $dot);
+
+        return $resolved;
     }
 
 

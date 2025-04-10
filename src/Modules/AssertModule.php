@@ -421,6 +421,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
+	public function char($value)
+	{
+		$this->status = Lib::type()->char($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
 	public function letter($value)
 	{
 		$this->status = Lib::type()->letter($this->result, $value);
@@ -786,6 +797,28 @@ class AssertModule extends AssertModuleBase
 	public function countable($value)
 	{
 		$this->status = Lib::type()->countable($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function countable_object($value)
+	{
+		$this->status = Lib::type()->countable_object($this->result, $value);
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function sizeable($value)
+	{
+		$this->status = Lib::type()->sizeable($this->result, $value);
 
 		return $this;
 	}

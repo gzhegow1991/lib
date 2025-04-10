@@ -24,8 +24,7 @@ class FsModule
      * @param array{ 0: array|null } $refs
      */
     public function type_path(
-        &$result,
-        $value,
+        &$result, $value,
         array $refs = []
     ) : bool
     {
@@ -39,21 +38,22 @@ class FsModule
             $refPathInfo = null;
         }
 
-        if (! (is_string($value) && ('' !== $value))) {
+        if (! Lib::type()->string_not_empty($valueString, $value)) {
             return false;
         }
 
         if ($withPathInfo) {
             try {
-                $refPathInfo = Lib::php()->pathinfo($value);
-                unset($refPathInfo);
+                $refPathInfo = Lib::php()->pathinfo($valueString);
             }
             catch ( \Throwable $e ) {
+                unset($refPathInfo);
+
                 return false;
             }
         }
 
-        $result = $value;
+        $result = $valueString;
 
         unset($refPathInfo);
 
@@ -65,8 +65,8 @@ class FsModule
      * @param array{ 0: array|null } $refs
      */
     public function type_realpath(
-        &$result,
-        $value, bool $isAllowSymlink = null,
+        &$result, $value,
+        bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
@@ -82,17 +82,17 @@ class FsModule
             $refPathInfo = null;
         }
 
-        if (! (is_string($value) && ('' !== $value))) {
+        if (! Lib::type()->string_not_empty($valueString, $value)) {
             return false;
         }
 
         if (! $isAllowSymlink) {
-            if (is_link($value)) {
+            if (is_link($valueString)) {
                 return false;
             }
         }
 
-        $_value = realpath($value);
+        $_value = realpath($valueString);
 
         if (false === $_value) {
             return false;
@@ -101,9 +101,10 @@ class FsModule
         if ($withPathInfo) {
             try {
                 $refPathInfo = Lib::php()->pathinfo($_value);
-                unset($refPathInfo);
             }
             catch ( \Throwable $e ) {
+                unset($refPathInfo);
+
                 return false;
             }
         }
@@ -121,8 +122,8 @@ class FsModule
      * @param array{ 0: array|null } $refs
      */
     public function type_dirpath(
-        &$result,
-        $value, bool $isAllowExists = null, bool $isAllowSymlink = null,
+        &$result, $value,
+        bool $isAllowExists = null, bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
@@ -131,12 +132,7 @@ class FsModule
         $isAllowExists = $isAllowExists ?? false;
         $isAllowSymlink = $isAllowSymlink ?? true;
 
-        $status = $this->type_path(
-            $_value,
-            $value, $refs
-        );
-
-        if (! $status) {
+        if (! $this->type_path($_value, $value, $refs)) {
             return false;
         }
 
@@ -177,8 +173,8 @@ class FsModule
      * @param array{ 0: array|null } $refs
      */
     public function type_filepath(
-        &$result,
-        $value, bool $isAllowExists = null, bool $isAllowSymlink = null,
+        &$result, $value,
+        bool $isAllowExists = null, bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
@@ -187,12 +183,7 @@ class FsModule
         $isAllowExists = $isAllowExists ?? false;
         $isAllowSymlink = $isAllowSymlink ?? true;
 
-        $status = $this->type_path(
-            $_value,
-            $value, $refs
-        );
-
-        if (! $status) {
+        if (! $this->type_path($_value, $value, $refs)) {
             return false;
         }
 
@@ -244,8 +235,8 @@ class FsModule
         $isAllowSymlink = $isAllowSymlink ?? true;
 
         $status = $this->type_realpath(
-            $_value,
-            $value, $isAllowSymlink,
+            $_value, $value,
+            $isAllowSymlink,
             $refs
         );
 
@@ -281,8 +272,8 @@ class FsModule
         $result = null;
 
         $status = $this->type_realpath(
-            $_value,
-            $value, $isAllowSymlink,
+            $_value, $value,
+            $isAllowSymlink,
             $refs
         );
 
@@ -313,19 +304,19 @@ class FsModule
     {
         $result = null;
 
-        if (! (is_string($value) && ('' !== $value))) {
+        if (! Lib::type()->string_not_empty($valueString, $value)) {
             return false;
         }
 
         $forbidden = [ "/", "\\", DIRECTORY_SEPARATOR ];
 
         foreach ( $forbidden as $f ) {
-            if (false !== strpos($value, $f)) {
+            if (false !== strpos($valueString, $f)) {
                 return false;
             }
         }
 
-        $result = $value;
+        $result = $valueString;
 
         return true;
     }
@@ -530,83 +521,63 @@ class FsModule
 
 
     /**
-     * > разбирает последовательности /../ в пути до файла и возвращает путь через правый слеш
+     * > заменяет слеши в пути на указанные
      */
     public function normalize(string $path, string $separator = null) : string
     {
-        $separator = $separator ?? '/';
+        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
 
         if ($this->type_realpath($realpath, $path)) {
             $normalized = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
 
         } else {
-            $normalized = $path;
-
-            $separators = [
-                '\\'                => true,
-                DIRECTORY_SEPARATOR => true,
-            ];
-            if ('' !== $separator) {
-                $separators[ $separator ] = true;
-            }
-            $separators = array_keys($separators);
-
-            $var = str_replace($separators, '/', $path);
-
-            $root = ($normalized[ 0 ] === '/')
-                ? $separator
-                : '';
-
-            $segments = trim($normalized, '/');
-            $segments = explode('/', $segments);
-
-            $ret = [];
-            foreach ( $segments as $segment ) {
-                if ((! $segment) || ($segment == '.')) {
-                    continue;
-                }
-
-                ($segment == '..')
-                    ? array_pop($ret)
-                    : ($ret[] = $segment);
-            }
-
-            $normalized = $root . implode($separator, $ret);
+            $normalized = Lib::php()->normalize($path, $separator);
         }
 
         return $normalized;
     }
 
     /**
-     * > возвращает относительный путь до файла
+     * > разбирает последовательности /../ в пути и возвращает нормализованный путь
      */
-    public function relative(string $path, string $root) : string
+    public function resolve(string $path, string $separator = null) : string
     {
-        $_path = $this->normalize($path);
-        $_root = $this->normalize($root);
+        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
 
-        if ($_path === $_root) {
-            throw new RuntimeException(
-                [ 'Path is equal to root', $root ]
-            );
+        if ($this->type_realpath($realpath, $path)) {
+            $resolved = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+
+        } else {
+            $resolved = Lib::php()->resolve($path, $separator, '.');
         }
 
-        if (0 !== strpos($_path, $_root)) {
-            throw new RuntimeException(
-                [
-                    'Path is not a child of root',
-                    $root,
-                    $path,
-                ]
-            );
-        }
+        return $resolved;
+    }
 
-        $rootLen = Lib::str()->strlen($_root);
+    /**
+     * > возвращает относительный нормализованный путь, если в пути содержится root
+     */
+    public function relative(
+        string $absolute, string $root,
+        string $separator = null
+    ) : string
+    {
+        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
 
-        $result = substr($_path, $rootLen);
-        $result = ltrim($result, '/');
+        return Lib::php()->relative($absolute, $root, $separator, '.');
+    }
 
-        return $result;
+    /**
+     * > возвращает абсолютный нормализованный путь, если путь не начинается с $separator
+     */
+    public function absolute(
+        string $relative, string $current,
+        string $separator = null
+    ) : string
+    {
+        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+
+        return Lib::php()->absolute($relative, $current, $separator, '.');
     }
 
 

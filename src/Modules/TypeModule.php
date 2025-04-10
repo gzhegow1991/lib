@@ -1274,6 +1274,14 @@ class TypeModule extends TypeModuleBase
     /**
      * @param string|null $result
      */
+    public function char(&$result, $value) : bool
+    {
+        return Lib::str()->type_char($result, $value);
+    }
+
+    /**
+     * @param string|null $result
+     */
     public function letter(&$result, $value) : bool
     {
         return Lib::str()->type_letter($result, $value);

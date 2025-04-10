@@ -1235,42 +1235,42 @@ class DebugModule
 
     public function types(string $separator = null, array $options = [], ...$values) : string
     {
-        $separator = $separator ?? ' | ';
+        $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
 
         $list = [];
         foreach ( $values as $value ) {
             $list[] = $this->type($value, $options);
         }
 
-        $content = implode($separator, $list);
+        $content = implode($_separator, $list);
 
         return $content;
     }
 
     public function type_ids(string $separator = null, array $options = [], ...$values) : string
     {
-        $separator = $separator ?? ' | ';
+        $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
 
         $list = [];
         foreach ( $values as $value ) {
             $list[] = $this->type_id($value, $options);
         }
 
-        $content = implode($separator, $list);
+        $content = implode($_separator, $list);
 
         return $content;
     }
 
     public function type_values(string $separator = null, array $options = [], ...$values) : string
     {
-        $separator = $separator ?? ' | ';
+        $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
 
         $list = [];
         foreach ( $values as $value ) {
             $list[] = $this->type_value($value, $options);
         }
 
-        $content = implode($separator, $list);
+        $content = implode($_separator, $list);
 
         return $content;
     }
@@ -1278,14 +1278,14 @@ class DebugModule
 
     public function values(string $separator = null, array $options = [], ...$values) : string
     {
-        $separator = $separator ?? ' | ';
+        $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
 
         $list = [];
         foreach ( $values as $value ) {
             $list[] = $this->value($value, $options);
         }
 
-        $content = implode($separator, $list);
+        $content = implode($_separator, $list);
 
         return $content;
     }

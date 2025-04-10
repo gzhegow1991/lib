@@ -302,10 +302,10 @@ class FormatModule
             }
         }
 
-        $separator = $separator ?? ';';
-        $enclosure = $enclosure ?? '"';
-        $escape = $escape ?? '\\';
-        $eol = $eol ?? PHP_EOL;
+        $separator = Lib::parse()->char($separator) ?? ';';
+        $enclosure = Lib::parse()->char($enclosure) ?? '"';
+        $escape = Lib::parse()->char($escape) ?? '\\';
+        $eol = Lib::parse()->string_not_empty($eol) ?? PHP_EOL;
 
         $fputcsvArgs = [ $separator, $enclosure, $escape ];
 

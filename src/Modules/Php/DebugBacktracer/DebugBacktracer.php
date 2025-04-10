@@ -445,7 +445,7 @@ class DebugBacktracer
         $hasFileRoot = (null !== ($fileRoot = $this->fileRoot));
 
         if ($hasFileRoot) {
-            $theFs = Lib::fs();
+            $thePhp = Lib::php();
         }
 
         $trace = $this->trace;

@@ -499,6 +499,19 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return string|null
 	 */
+	public function char($value)
+	{
+		if (Lib::type()->char($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
 	public function letter($value)
 	{
 		if (Lib::type()->letter($result, $value)) {
@@ -928,6 +941,32 @@ class ParseModule extends ParseModuleBase
 	public function countable($value)
 	{
 		if (Lib::type()->countable($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \Countable|null
+	 */
+	public function countable_object($value)
+	{
+		if (Lib::type()->countable_object($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|array|\Countable|null
+	 */
+	public function sizeable($value)
+	{
+		if (Lib::type()->sizeable($result, $value)) {
 		    return $result;
 		}
 

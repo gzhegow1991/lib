@@ -33,288 +33,288 @@ class Lib
     /**
      * @return ArrModule
      */
+    public static $arr;
+
     public static function arr(ArrModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$arr = $instance
+            ?? static::$arr
             ?? new ArrModule();
     }
 
     /**
      * @return AssertModule
      */
+    public static $assert;
+
     public static function assert(AssertModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$assert = $instance
+            ?? static::$assert
             ?? new AssertModule();
     }
 
     /**
      * @return BcmathModule
      */
+    public static $bcmath;
+
     public static function bcmath(BcmathModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$bcmath = $instance
+            ?? static::$bcmath
             ?? new BcmathModule();
     }
 
     /**
      * @return CliModule
      */
+    public static $cli;
+
     public static function cli(CliModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$cli = $instance
+            ?? static::$cli
             ?? new CliModule();
     }
 
     /**
      * @return CmpModule
      */
+    public static $cmp;
+
     public static function cmp(CmpModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$cmp = $instance
+            ?? static::$cmp
             ?? new CmpModule();
     }
 
     /**
      * @return CryptModule
      */
+    public static $crypt;
+
     public static function crypt(CryptModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$crypt = $instance
+            ?? static::$crypt
             ?? new CryptModule();
     }
 
     /**
      * @return DateModule
      */
+    public static $date;
+
     public static function date(DateModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$date = $instance
+            ?? static::$date
             ?? new DateModule();
     }
 
     /**
      * @return DebugModule
      */
+    public static $debug;
+
     public static function debug(DebugModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$debug = $instance
+            ?? static::$debug
             ?? new DebugModule();
     }
 
     /**
      * @return EscapeModule
      */
+    public static $escape;
+
     public static function escape(EscapeModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$escape = $instance
+            ?? static::$escape
             ?? new EscapeModule();
     }
 
     /**
      * @return FormatModule
      */
+    public static $format;
+
     public static function format(FormatModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$format = $instance
+            ?? static::$format
             ?? new FormatModule();
     }
 
     /**
      * @return FsModule
      */
+    public static $fs;
+
     public static function fs(FsModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$fs = $instance
+            ?? static::$fs
             ?? new FsModule();
     }
 
     /**
      * @return HttpModule
      */
+    public static $http;
+
     public static function http(HttpModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$http = $instance
+            ?? static::$http
             ?? new HttpModule();
     }
 
     /**
      * @return ItertoolsModule
      */
+    public static $itertools;
+
     public static function itertools(ItertoolsModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$itertools = $instance
+            ?? static::$itertools
             ?? new ItertoolsModule();
     }
 
     /**
      * @return ItertoolsModule
      */
+    public static $json;
+
     public static function json(JsonModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$json = $instance
+            ?? static::$json
             ?? new JsonModule();
     }
 
     /**
      * @return MbModule
      */
+    public static $mb;
+
     public static function mb(MbModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$mb = $instance
+            ?? static::$mb
             ?? new MbModule();
     }
 
     /**
      * @return NetModule
      */
+    public static $net;
+
     public static function net(NetModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$net = $instance
+            ?? static::$net
             ?? new NetModule();
     }
 
     /**
      * @return ParseModule
      */
+    public static $parse;
+
     public static function parse(ParseModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$parse = $instance
+            ?? static::$parse
             ?? new ParseModule();
     }
 
     /**
      * @return PhpModule
      */
+    public static $php;
+
     public static function php(PhpModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$php = $instance
+            ?? static::$php
             ?? new PhpModule();
     }
 
     /**
      * @return PregModule
      */
+    public static $preg;
+
     public static function preg(PregModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$preg = $instance
+            ?? static::$preg
             ?? new PregModule();
     }
 
     /**
      * @return RandomModule
      */
+    public static $random;
+
     public static function random(RandomModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$random = $instance
+            ?? static::$random
             ?? new RandomModule();
     }
 
     /**
      * @return StrModule
      */
+    public static $str;
+
     public static function str(StrModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$str = $instance
+            ?? static::$str
             ?? new StrModule();
     }
 
     /**
      * @return TestModule
      */
+    public static $test;
+
     public static function test(TestModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$test = $instance
+            ?? static::$test
             ?? new TestModule();
     }
 
     /**
      * @return TypeModule
      */
+    public static $type;
+
     public static function type(TypeModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$type = $instance
+            ?? static::$type
             ?? new TypeModule();
     }
 
     /**
      * @return UrlModule
      */
+    public static $url;
+
     public static function url(UrlModule $instance = null)
     {
-        $key = __FUNCTION__;
-
-        return static::$modules[ $key ] = $instance
-            ?? static::$modules[ $key ]
+        return static::$url = $instance
+            ?? static::$url
             ?? new UrlModule();
     }
 

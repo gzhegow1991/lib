@@ -239,26 +239,20 @@ class ArrModule
     /**
      * @param ArrPath|null $result
      */
-    public function type_arrpath(&$result, $path, array $pathes = null, string $dot = null) : bool
+    public function type_arrpath(&$result, $value, string $dot = null) : bool
     {
         $result = null;
 
-        $pathes = $pathes ?? [];
+        if ($value instanceof ArrPath) {
+            $result = $value;
 
-        $hasPathes = (0 !== count($pathes));
-
-        if (! $hasPathes) {
-            if ($path instanceof ArrPath) {
-                $result = $path;
-
-                return true;
-            }
+            return true;
         }
 
         try {
             $array = (null !== $dot)
-                ? $this->arrpath_dot($dot, $path, ...$pathes)
-                : $this->arrpath($path, ...$pathes);
+                ? $this->arrpath_dot($dot, $value)
+                : $this->arrpath($value);
 
             $result = ArrPath::fromValid($array);
 
@@ -526,19 +520,17 @@ class ArrModule
 
     public function arrpath($path, ...$pathes) : array
     {
-        $hasPathes = (0 !== count($pathes));
+        array_unshift($pathes, $path);
 
-        if (! $hasPathes) {
+        if (1 === count($pathes)) {
             if ($path instanceof ArrPath) {
                 return $path->getPath();
             }
         }
 
+        $gen = $this->walk_it($pathes);
+
         $theType = Lib::type();
-
-        $array = [ $path, $pathes ];
-
-        $gen = $this->walk_it($array);
 
         $arrpath = [];
 
@@ -576,25 +568,24 @@ class ArrModule
 
     public function arrpath_dot(string $dot, $path, ...$pathes) : array
     {
-        if ('' === $dot) {
+        if (! Lib::str()->type_char($symbol, $dot)) {
             throw new LogicException(
-                'The `dot` should be non-empty string'
+                'The `dot` should be one symbol',
+                $dot
             );
         }
 
-        $hasPathes = (0 !== count($pathes));
+        array_unshift($pathes, $path);
 
-        if (! $hasPathes) {
+        if (1 === count($pathes)) {
             if ($path instanceof ArrPath) {
                 return $path->getPath();
             }
         }
 
+        $gen = $this->walk_it($pathes);
+
         $theType = Lib::type();
-
-        $array = [ $path, $pathes ];
-
-        $gen = $this->walk_it($array);
 
         $arrpath = [];
 
@@ -639,6 +630,10 @@ class ArrModule
         array $refs = []
     ) : bool
     {
+        if (! $this->type_arrpath($thePath, $path)) {
+            return false;
+        }
+
         $withValue = array_key_exists(0, $refs);
         $withKey = array_key_exists(1, $refs);
 
@@ -652,10 +647,6 @@ class ArrModule
         if ($withKey) {
             $refKey =& $refs[ 1 ];
             $refKey = null;
-        }
-
-        if (! $this->type_arrpath($thePath, $path)) {
-            return false;
         }
 
         $pathArray = $thePath->getPath();
@@ -1450,8 +1441,17 @@ class ArrModule
         int $walkFlags = null
     ) : array
     {
-        $dot = $dot ?? '.';
         $walkFlags = $walkFlags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
+
+        if (null === $dot) {
+            $dot = '.';
+
+        } elseif (! Lib::str()->type_char($symbol, $dot)) {
+            throw new LogicException(
+                'The `dot` should be one symbol',
+                $dot
+            );
+        }
 
         $result = [];
 
@@ -1473,9 +1473,18 @@ class ArrModule
         int $walkFlags = null
     ) : array
     {
-        $dot = $dot ?? '.';
         $value = $value ?? true;
         $walkFlags = $walkFlags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
+
+        if (null === $dot) {
+            $dot = '.';
+
+        } elseif (! Lib::str()->type_char($symbol, $dot)) {
+            throw new LogicException(
+                'The `dot` should be one symbol',
+                $dot
+            );
+        }
 
         $result = [];
 
@@ -1493,7 +1502,15 @@ class ArrModule
      */
     public function undot(array $arrayDot, string $dot = null) : array
     {
-        $dot = $dot ?? '.';
+        if (null === $dot) {
+            $dot = '.';
+
+        } elseif (! Lib::str()->type_char($symbol, $dot)) {
+            throw new LogicException(
+                'The `dot` should be one symbol',
+                $dot
+            );
+        }
 
         $result = [];
 

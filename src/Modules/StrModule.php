@@ -156,9 +156,10 @@ class StrModule
     {
         $result = null;
 
-        $isString = is_string($value);
+        if (is_string($value)) {
+            $_value = $value;
 
-        if (! $isString) {
+        } else {
             if (
                 (null === $value)
                 // || ('' === $value)
@@ -178,28 +179,13 @@ class StrModule
 
                 return false;
             }
-        }
 
-        $_value = null;
-
-        if ($isString) {
-            $_value = $value;
-
-        } elseif (is_object($value)) {
-            if (method_exists($value, '__toString')) {
+            try {
                 $_value = (string) $value;
             }
-
-        } else {
-            $settype = $value;
-            $status = settype($settype, 'string');
-            if ($status) {
-                $_value = $settype;
+            catch ( \Throwable $e ) {
+                return false;
             }
-        }
-
-        if (null === $_value) {
-            return false;
         }
 
         $result = $_value;
@@ -251,6 +237,26 @@ class StrModule
         return false;
     }
 
+
+    /**
+     * @param string|null $result
+     */
+    public function type_char(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->type_string_not_empty($_value, $value)) {
+            return false;
+        }
+
+        if (1 === strlen($_value)) {
+            $result = $_value;
+
+            return $_value;
+        }
+
+        return false;
+    }
 
     /**
      * @param string|null $result
@@ -1746,55 +1752,55 @@ class StrModule
 
     protected function str_match_regex(
         string $pattern,
-        string $wildcardLetterSequence = null,
-        string $wildcardSeparator = null,
-        string $wildcardLetterSingle = null
+        string $wildcardSequenceSymbol = null,
+        string $wildcardSeparatorSymbol = null,
+        string $wildcardSingleSymbol = null
     ) : string
     {
         if ('' === $pattern) {
             return '';
         }
 
-        $hasWildcardSeparator = (null !== $wildcardSeparator);
-        $hasWildcardLetterSequence = (null !== $wildcardLetterSequence);
-        $hasWildcardLetterSingle = (null !== $wildcardLetterSingle);
+        $hasWildcardSeparatorSymbol = (null !== $wildcardSeparatorSymbol);
+        $hasWildcardSequenceSymbol = (null !== $wildcardSequenceSymbol);
+        $hasWildcardSingleSymbol = (null !== $wildcardSingleSymbol);
 
         $testUnique = [];
-        if ($hasWildcardSeparator) {
-            if (! $this->type_letter($_wildcardSeparator, $wildcardSeparator)) {
+        if ($hasWildcardSeparatorSymbol) {
+            if (! $this->type_char($_wildcardSeparatorSymbol, $wildcardSeparatorSymbol)) {
                 throw new LogicException(
-                    [ 'The `wildcardSeparator` should be null or exactly one letter', $wildcardSeparator ]
+                    [ 'The `wildcardSeparator` should be null or exactly one letter', $wildcardSeparatorSymbol ]
                 );
             }
 
-            $testUnique[] = $_wildcardSeparator;
+            $testUnique[] = $_wildcardSeparatorSymbol;
         }
-        if ($hasWildcardLetterSequence) {
-            if (! $this->type_letter($_wildcardLetterSequence, $wildcardLetterSequence)) {
+        if ($hasWildcardSequenceSymbol) {
+            if (! $this->type_char($_wildcardSequenceSymbol, $wildcardSequenceSymbol)) {
                 throw new LogicException(
-                    [ 'The `wildcardSequence` should be null or exactly one letter', $wildcardLetterSequence ]
+                    [ 'The `wildcardSequence` should be null or exactly one letter', $wildcardSequenceSymbol ]
                 );
             }
 
-            $testUnique[] = $_wildcardLetterSequence;
+            $testUnique[] = $_wildcardSequenceSymbol;
         }
-        if ($hasWildcardLetterSingle) {
-            if (! $this->type_letter($_wildcardLetterSingle, $wildcardLetterSingle)) {
+        if ($hasWildcardSingleSymbol) {
+            if (! $this->type_char($_wildcardSingleSymbol, $wildcardSingleSymbol)) {
                 throw new LogicException(
-                    [ 'The `wildcardLetter` should be null or exactly one letter', $wildcardLetterSingle ]
+                    [ 'The `wildcardLetter` should be null or exactly one letter', $wildcardSingleSymbol ]
                 );
             }
 
-            $testUnique[] = $_wildcardLetterSingle;
+            $testUnique[] = $_wildcardSingleSymbol;
         }
 
         if (count(array_unique($testUnique)) !== count($testUnique)) {
             throw new LogicException(
                 [
                     'The wildcards should be different letters or nulls',
-                    $wildcardSeparator,
-                    $wildcardLetterSequence,
-                    $wildcardLetterSingle,
+                    $wildcardSeparatorSymbol,
+                    $wildcardSequenceSymbol,
+                    $wildcardSingleSymbol,
                 ]
             );
         }
@@ -1807,8 +1813,8 @@ class StrModule
 
         $replacements = [];
 
-        if ($hasWildcardSeparator) {
-            $_wildcardSeparatorRegex = $thePreg->preg_quote_ord($_wildcardSeparator);
+        if ($hasWildcardSeparatorSymbol) {
+            $_wildcardSeparatorRegex = $thePreg->preg_quote_ord($_wildcardSeparatorSymbol);
 
             $anySymbolRegex = '[^' . $_wildcardSeparatorRegex . ']';
 
@@ -1816,31 +1822,31 @@ class StrModule
             $replacements[ preg_quote($replacement, '/') ] = $_wildcardSeparatorRegex;
 
             $_pattern = str_replace(
-                $_wildcardSeparator,
+                $_wildcardSeparatorSymbol,
                 $replacement,
                 $_pattern
             );
         }
-        if ($hasWildcardLetterSequence) {
-            $_wildcardLetterSequenceRegex = $thePreg->preg_quote_ord($_wildcardLetterSequence);
+        if ($hasWildcardSequenceSymbol) {
+            $_wildcardLetterSequenceRegex = $thePreg->preg_quote_ord($_wildcardSequenceSymbol);
 
             $replacement = '{{ 2 }}';
             $replacements[ preg_quote($replacement, '/') ] = $anySymbolRegex . '+';
 
             $_pattern = str_replace(
-                $_wildcardLetterSequence,
+                $_wildcardSequenceSymbol,
                 $replacement,
                 $_pattern
             );
         }
-        if ($hasWildcardLetterSingle) {
-            $_wildcardLetterSingleRegex = $thePreg->preg_quote_ord($_wildcardLetterSingle);
+        if ($hasWildcardSingleSymbol) {
+            $_wildcardLetterSingleRegex = $thePreg->preg_quote_ord($_wildcardSingleSymbol);
 
             $replacement = '{{ 3 }}';
             $replacements[ preg_quote($replacement, '/') ] = $anySymbolRegex;
 
             $_pattern = str_replace(
-                $_wildcardLetterSingle,
+                $_wildcardSingleSymbol,
                 $replacement,
                 $_pattern
             );
