@@ -1194,7 +1194,9 @@ class ArrModule
      */
     public function kwargs(array $src) : array
     {
-        if (! count($src)) return [];
+        if (! count($src)) {
+            return [ [], [] ];
+        }
 
         $list = [];
         $dict = [];
