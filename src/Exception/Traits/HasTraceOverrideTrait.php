@@ -55,7 +55,7 @@ trait HasTraceOverrideTrait
         $file = $this->file ?? $this->getFile();
 
         if (null !== $fileRoot) {
-            $file = Lib::php()->relative($file, $fileRoot);
+            $file = Lib::php()->path_relative($file, $fileRoot);
         }
 
         return $file;
@@ -86,7 +86,7 @@ trait HasTraceOverrideTrait
                     continue;
                 }
 
-                $trace[ $i ][ 'file' ] = $thePhp->relative($frame[ 'file' ], $fileRoot);
+                $trace[ $i ][ 'file' ] = $thePhp->path_relative($frame[ 'file' ], $fileRoot);
             }
         }
 

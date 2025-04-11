@@ -521,7 +521,7 @@ class FsModule
     /**
      * > заменяет слеши в пути на указанные
      */
-    public function normalize(string $path, ?string $separator = null) : string
+    public function path_normalize(string $path, ?string $separator = null) : string
     {
         $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
 
@@ -529,7 +529,7 @@ class FsModule
             $normalized = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
 
         } else {
-            $normalized = Lib::php()->normalize($path, $separator);
+            $normalized = Lib::php()->path_normalize($path, $separator);
         }
 
         return $normalized;
@@ -538,7 +538,7 @@ class FsModule
     /**
      * > разбирает последовательности `./path` и `../path` и возвращает нормализованный путь
      */
-    public function resolve(string $path, ?string $separator = null) : string
+    public function path_resolve(string $path, ?string $separator = null) : string
     {
         $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
 
@@ -546,43 +546,64 @@ class FsModule
             $resolved = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
 
         } else {
-            $resolved = Lib::php()->resolve($path, $separator, '.');
+            $resolved = Lib::php()->path_resolve($path, $separator, '.');
         }
 
         return $resolved;
     }
 
+
     /**
-     * > возвращает относительный нормализованный путь, если в пути содержится root
+     * > возвращает относительный нормализованный путь, отрезая у него $root
      */
-    public function relative(
+    public function path_relative(
         string $path, string $root,
         ?string $separator = null
     ) : string
     {
         $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
 
-        return Lib::php()->relative($path, $root, $separator, '.');
+        return Lib::php()->path_relative($path, $root, $separator, '.');
     }
 
     /**
-     * > возвращает абсолютный нормализованный путь, с поддержкой ./path и ../path
+     * > возвращает абсолютный нормализованный путь, с поддержкой `./path` и `../path`
      */
-    public function resolved(
+    public function path_absolute(
         string $path, string $current,
         ?string $separator = null
     ) : string
     {
         $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
 
-        return Lib::php()->resolved($path, $current, $separator, '.');
+        return Lib::php()->path_absolute($path, $current, $separator, '.');
+    }
+
+    /**
+     * > возвращает абсолютный нормализованный путь, с поддержкой `./path` и `../path`, но только если путь начинается с `.`
+     */
+    public function path_or_absolute(
+        string $path, string $current,
+        ?string $separator = null
+    ) : string
+    {
+        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+
+        return Lib::php()->path_or_absolute($path, $current, $separator, '.');
     }
 
 
-    public function file_diff($file1, $file2, ?int $length = null, ?int $lengthBuffer = null)
+    /**
+     * @return array<int, array{
+     *     0: int,
+     *     1: array{ 0: int, 1: string },
+     *     2: array{ 0: int, 1: string }
+     * }>
+     */
+    public function file_diff($file1, $file2, ?int $length = null, ?int $lengthBuffer = null) : array
     {
-        $length = $length ?? 8192;
-        $lengthBuffer = $lengthBuffer ?? 1024 * 1024;
+        $length = $length ?? 8192;                      // > 8kb
+        $lengthBuffer = $lengthBuffer ?? (1024 * 1024); // > 1mb
 
         if ($length < 1) {
             throw new LogicException(

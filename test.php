@@ -1459,53 +1459,53 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 midnight'/*, 'UTC' */);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 midnight');
     $dateAtomString1 = $dateObject->format(DATE_ATOM);
     _print($status, $dateObject);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject2, $dateObject/*, 'UTC' */);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject2, $dateObject);
     $dateAtomString2 = $dateObject2->format(DATE_ATOM);
     _print($status, $dateObject2, $dateAtomString1 === $dateAtomString2);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject3, $dateAtomString1/*, 'UTC' */);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject3, $dateAtomString1);
     $dateAtomString3 = $dateObject3->format(DATE_ATOM);
     _print($status, $dateObject3, $dateAtomString1 === $dateAtomString3);
     echo PHP_EOL;
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject, '1970-01-01 midnight'/*, 'UTC' */);
+    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject, '1970-01-01 midnight');
     $dateAtomString1 = $dateImmutableObject->format(DATE_ATOM);
     _print($status, $dateImmutableObject);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject2, $dateObject/*, 'UTC' */);
+    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject2, $dateObject);
     $dateAtomString2 = $dateImmutableObject2->format(DATE_ATOM);
     _print($status, $dateImmutableObject2, $dateAtomString1 === $dateAtomString2);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject3, $dateAtomString1/*, 'UTC' */);
+    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject3, $dateAtomString1);
     $dateAtomString3 = $dateImmutableObject3->format(DATE_ATOM);
     _print($status, $dateImmutableObject3, $dateAtomString1 === $dateAtomString3);
     echo PHP_EOL;
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_date($dateObject, '1970-01-01 midnight'/*, 'UTC' */);
+    $status = \Gzhegow\Lib\Lib::date()->type_date($dateObject, '1970-01-01 midnight');
     $dateAtomString1 = $dateObject->format(DATE_ATOM);
     _print($status, $dateObject);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_date($dateObject2, $dateObject/*, 'UTC' */);
+    $status = \Gzhegow\Lib\Lib::date()->type_date($dateObject2, $dateObject);
     $dateAtomString2 = $dateObject2->format(DATE_ATOM);
     _print($status, $dateObject2, $dateAtomString1 === $dateAtomString2);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject, $from = $dateObject/*, 'UTC' */);
+    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject, $from = $dateObject);
     $dateAtomString3 = $dateImmutableObject->format(DATE_ATOM);
     _print($status, $dateImmutableObject, $dateAtomString1 === $dateAtomString3);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_date($dateImmutableObject2, $dateImmutableObject/*, 'UTC' */);
+    $status = \Gzhegow\Lib\Lib::date()->type_date($dateImmutableObject2, $dateImmutableObject);
     $dateAtomString4 = $dateImmutableObject2->format(DATE_ATOM);
     _print($status, $dateImmutableObject2, $dateAtomString1 === $dateAtomString4);
     echo PHP_EOL;
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject1, '1970-01-01 midnight'/*, 'UTC' */);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject1, '1970-01-01 midnight');
     $dateAtomString = $dateObject1->format(DATE_ATOM);
     _print($status, $dateObject1);
 

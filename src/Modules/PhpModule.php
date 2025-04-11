@@ -1763,7 +1763,7 @@ class PhpModule
      * @noinspection PhpUnhandledExceptionInspection
      * @throws \RuntimeException
      */
-    public function call_user_func_array($fn, array $args, array &$argsNew = null)
+    public function call_user_func_array($fn, array $args, ?array &$argsNew = null)
     {
         $argsNew = null;
 
@@ -1875,7 +1875,7 @@ class PhpModule
             );
         }
 
-        $normalized = $this->normalize($path, '/');
+        $normalized = $this->path_normalize($path, '/');
 
         $dirname = ltrim($normalized, '/');
         $basename = basename($normalized);
@@ -1954,7 +1954,7 @@ class PhpModule
             );
         }
 
-        $normalized = $this->normalize($path, '/');
+        $normalized = $this->path_normalize($path, '/');
 
         $dirname = ltrim($normalized, '/');
 
@@ -1981,7 +1981,7 @@ class PhpModule
             );
         }
 
-        $normalized = $this->normalize($path, '/');
+        $normalized = $this->path_normalize($path, '/');
 
         $basename = basename($normalized, $extension);
 
@@ -2001,7 +2001,7 @@ class PhpModule
 
         $dot = Lib::parse()->char($dot) ?? '.';
 
-        $normalized = $this->normalize($path, '/');
+        $normalized = $this->path_normalize($path, '/');
 
         $basename = basename($normalized);
 
@@ -2023,7 +2023,7 @@ class PhpModule
 
         $dot = Lib::parse()->char($dot) ?? '.';
 
-        $normalized = $this->normalize($path, '/');
+        $normalized = $this->path_normalize($path, '/');
 
         $basename = basename($normalized);
 
@@ -2054,7 +2054,7 @@ class PhpModule
             );
         }
 
-        $normalized = $this->normalize($path, $separator);
+        $normalized = $this->path_normalize($path, $separator);
 
         $basename = basename($normalized);
 
@@ -2074,7 +2074,7 @@ class PhpModule
     /**
      * > заменяет слеши в пути на указанные
      */
-    public function normalize(string $path, ?string $separator = null) : string
+    public function path_normalize(string $path, ?string $separator = null) : string
     {
         if ('' === $path) {
             throw new LogicException(
@@ -2101,7 +2101,7 @@ class PhpModule
     /**
      * > разбирает последовательности `./path` и `../path` и возвращает нормализованный путь
      */
-    public function resolve(string $path, ?string $separator = null, ?string $dot = null) : string
+    public function path_resolve(string $path, ?string $separator = null, ?string $dot = null) : string
     {
         if ('' === $path) {
             throw new LogicException(
@@ -2112,13 +2112,13 @@ class PhpModule
         $separator = Lib::parse()->char($separator) ?? '/';
         $dot = Lib::parse()->char($dot) ?? '.';
 
-        $normalized = $this->normalize($path, '/');
+        $pathNormalized = $this->path_normalize($path, '/');
 
-        $root = ($normalized[ 0 ] === '/')
+        $root = ($pathNormalized[ 0 ] === '/')
             ? $separator
             : '';
 
-        $segments = trim($normalized, '/');
+        $segments = trim($pathNormalized, '/');
         $segments = explode('/', $segments);
 
         $segmentsNew = [];
@@ -2148,16 +2148,27 @@ class PhpModule
             $segmentsNew[] = $segment;
         }
 
-        $normalized = $root . implode($separator, $segmentsNew);
+        $pathResolved = $root . implode($separator, $segmentsNew);
 
-        return $normalized;
+        if ('' === $pathResolved) {
+            throw new RuntimeException(
+                [
+                    'Result path should be non-empty string',
+                    $path,
+                    $separator,
+                    $dot,
+                ]
+            );
+        }
+
+        return $pathResolved;
     }
 
 
     /**
-     * > возвращает относительный нормализованный путь, если в пути содержится root
+     * > возвращает относительный нормализованный путь, отрезая у него $root
      */
-    public function relative(
+    public function path_relative(
         string $path, string $root,
         ?string $separator = null, ?string $dot = null
     ) : string
@@ -2176,14 +2187,15 @@ class PhpModule
 
         $separator = Lib::parse()->char($separator) ?? '/';
 
-        $resolved = $this->resolve($path, $separator, $dot);
+        $pathResolved = $this->path_resolve($path, $separator, $dot);
 
-        $rootNormalized = $this->normalize($root, $separator);
-        $rootNormalized = rtrim($rootNormalized, $separator) . $separator;
+        $rootNormalized = $this->path_normalize($root, $separator);
+        $rootNormalized = rtrim($rootNormalized, $separator);
 
         $status = Lib::str()->str_starts(
-            $resolved, $rootNormalized, false,
-            [ &$relative ]
+            $pathResolved, ($rootNormalized . $separator),
+            false,
+            [ &$pathRelative ]
         );
 
         if (! $status) {
@@ -2192,19 +2204,64 @@ class PhpModule
             );
         }
 
-        if ('' === $relative) {
+        if ('' === $pathRelative) {
             throw new RuntimeException(
-                [ 'The `absolute` should not be equal to `root`', $root ]
+                [
+                    'Result path should be non-empty string',
+                    $path,
+                    $separator,
+                    $dot,
+                ]
             );
         }
 
-        return $relative;
+        return $pathRelative;
     }
 
     /**
-     * > возвращает абсолютный нормализованный путь, с поддержкой ./path и ../path
+     * > возвращает абсолютный нормализованный путь, с поддержкой `./path` и `../path`
      */
-    public function resolved(
+    public function path_absolute(
+        string $relative, string $current,
+        ?string $separator = null, ?string $dot = null
+    ) : string
+    {
+        if ('' === $relative) {
+            throw new LogicException(
+                [ 'The `relative` should be non-empty string' ]
+            );
+        }
+
+        if ('' === $current) {
+            throw new LogicException(
+                [ 'The `current` should be non-empty string' ]
+            );
+        }
+
+        $separator = Lib::parse()->char($separator) ?? '/';
+
+        $relativeNormalized = $this->path_normalize($relative, $separator);
+
+        $isRoot = ($separator === $relativeNormalized[ 0 ]);
+
+        if ($isRoot) {
+            $absoluteNormalized = $relativeNormalized;
+
+        } else {
+            $currentNormalized = $this->path_normalize($current, $separator);
+
+            $absoluteNormalized = $currentNormalized . $separator . $relativeNormalized;
+        }
+
+        $absoluteResolved = $this->path_resolve($absoluteNormalized, $separator, $dot);
+
+        return $absoluteResolved;
+    }
+
+    /**
+     * > возвращает абсолютный нормализованный путь, с поддержкой `./path` и `../path`, но только если путь начинается с `.`
+     */
+    public function path_or_absolute(
         string $path, string $current,
         ?string $separator = null, ?string $dot = null
     ) : string
@@ -2221,29 +2278,18 @@ class PhpModule
             );
         }
 
-        $separator = Lib::parse()->char($separator) ?? '/';
         $dot = Lib::parse()->char($dot) ?? '.';
 
-        $normalized = $this->normalize($path, $separator);
+        $isDot = ($dot === $path[ 0 ]);
 
-        $isRoot = ($separator === $normalized[ 0 ]);
-        $isDot = ($dot === $normalized[ 0 ]);
+        if ($isDot) {
+            $pathResolved = $this->path_absolute($path, $separator, $dot);
 
-        $resolved = $normalized;
-
-        if ($isRoot || $isDot) {
-            $absolute = $normalized;
-
-            if ($isDot) {
-                $currentNormalized = $this->normalize($current, $separator);
-
-                $absolute = $currentNormalized . $separator . $normalized;
-            }
-
-            $resolved = $this->resolve($absolute, $separator, $dot);
+        } else {
+            $pathResolved = $this->path_normalize($path, $separator);
         }
 
-        return $resolved;
+        return $pathResolved;
     }
 
 
@@ -2529,7 +2575,7 @@ class PhpModule
     /**
      * @return object{ list: array }
      */
-    public function errors_start(object &$errors = null) : object
+    public function errors_start(?object &$errors = null) : object
     {
         $stack = $this->errors();
 

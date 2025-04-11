@@ -704,7 +704,7 @@ class CmpModule
     protected function cmpTypesStrict(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|NAN
     {
         if ($flagsMode & _CMP_MODE_TYPE_STRICT) {
@@ -727,7 +727,7 @@ class CmpModule
     protected function cmpValuesNan(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|NAN
     {
         $isNanA = is_float($a) && is_nan($a);
@@ -750,7 +750,7 @@ class CmpModule
     protected function cmpValuesNil(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $theType = Lib::type();
@@ -780,7 +780,7 @@ class CmpModule
     protected function cmpValuesNull(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $isNullA = ($a === null);
@@ -822,7 +822,7 @@ class CmpModule
     protected function cmpValuesBoolean(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $isBoolA = is_bool($a);
@@ -869,7 +869,7 @@ class CmpModule
     protected function cmpValuesInteger(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $isIntA = is_int($a);
@@ -919,7 +919,7 @@ class CmpModule
     protected function cmpValuesFloat(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $isFloatA = is_float($a);
@@ -985,7 +985,7 @@ class CmpModule
     protected function cmpValuesNumeric(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $theType = Lib::type();
@@ -1065,7 +1065,7 @@ class CmpModule
     protected function cmpValuesString(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $isStringA = is_string($a);
@@ -1152,7 +1152,7 @@ class CmpModule
     protected function cmpValuesArray(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $isArrayA = is_array($a);
@@ -1208,7 +1208,7 @@ class CmpModule
     protected function cmpValuesDate(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $isDateA = $a instanceof \DateTimeInterface;
@@ -1245,7 +1245,7 @@ class CmpModule
     protected function cmpValuesObject(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $isObjectA = is_object($a);
@@ -1315,7 +1315,7 @@ class CmpModule
     protected function cmpValuesResource(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $theType = Lib::type();
@@ -1352,7 +1352,7 @@ class CmpModule
     protected function cmpSizesString(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $isStringA = is_string($a);
@@ -1432,7 +1432,7 @@ class CmpModule
     protected function cmpSizesArray(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $isArrayA = is_array($a);
@@ -1484,7 +1484,7 @@ class CmpModule
     protected function cmpSizesObject(
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         $isObjectA = is_object($a);
@@ -1555,7 +1555,7 @@ class CmpModule
         int $flagsMode,
         int $flagsResult,
         //
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : int|NAN
     {
         $_aStart = $this->prepareDateCut($aStart, $flagsMode);
@@ -1744,7 +1744,7 @@ class CmpModule
         $a, $b,
         bool $aStatus, bool $bStatus,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : null|int|NAN
     {
         if ($flagsMode & _CMP_MODE_TYPE_CAST_OR_CONTINUE) {
@@ -1778,7 +1778,7 @@ class CmpModule
         $result,
         $a, $b,
         int $flagsMode, int $flagsResult,
-        string &$fnCmpName = null
+        ?string &$fnCmpName = null
     ) // : int|NAN
     {
         $_result = $result;

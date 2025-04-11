@@ -252,7 +252,7 @@ class TestModule
         ?array $trace,
         $fn, array $fnArgs = [],
         ?string $expectedStdout = null,
-        string &$stdout = null
+        ?string &$stdout = null
     ) : bool
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
@@ -410,7 +410,7 @@ class TestModule
         ?array $trace,
         $fn, array $fnArgs = [],
         array $expectedReturn = [],
-        string &$result = null
+        ?string &$result = null
     ) : bool
     {
         $expectedReturn = $expectedReturn[ 0 ] ?? null;

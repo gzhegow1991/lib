@@ -606,7 +606,7 @@ class Slugger implements SluggerInterface
      */
     protected function prepareSequenceMap(
         array $sequenceMap, array $ignoreSymbolMap,
-        array &$knownSymbolMap = null
+        ?array &$knownSymbolMap = null
     ) : array
     {
         $knownSymbolMap = [];
@@ -701,7 +701,7 @@ class Slugger implements SluggerInterface
      */
     protected function prepareSymbolMap(
         array $symbolMap, array $ignoreSymbolMap,
-        array &$knownSymbolMap = null
+        ?array &$knownSymbolMap = null
     ) : array
     {
         $knownSymbolMap = [];
@@ -812,7 +812,7 @@ class Slugger implements SluggerInterface
      *
      * @return array<string, bool>
      */
-    protected function prepareIgnoreSymbolMap(array $ignoreSymbols, array &$knownSymbolMap = null) : array
+    protected function prepareIgnoreSymbolMap(array $ignoreSymbols, ?array &$knownSymbolMap = null) : array
     {
         $knownSymbolMap = [];
 

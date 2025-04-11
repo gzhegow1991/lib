@@ -131,7 +131,7 @@ class CliModule
     }
 
 
-    public function yes(string $message, string &$yesQuestion = null) : bool
+    public function yes(string $message, ?string &$yesQuestion = null) : bool
     {
         $yesQuestion = $yesQuestion ?? 'n';
 
