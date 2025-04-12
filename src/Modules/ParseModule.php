@@ -1120,9 +1120,13 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return \DateTimeInterface|null
 	 */
-	public function date_of(string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
-	{
-		if (Lib::type()->date_of($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes)) {
+	public function date_formatted(
+		string $format,
+		$dateFormatted,
+		$timezoneFallback = null,
+		?array $allowedTimezoneTypes = null
+	) {
+		if (Lib::type()->date_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes)) {
 		    return $result;
 		}
 
@@ -1133,9 +1137,13 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return \DateTime|null
 	 */
-	public function adate_of(string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
-	{
-		if (Lib::type()->adate_of($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes)) {
+	public function adate_formatted(
+		string $format,
+		$dateFormatted,
+		$timezoneFallback = null,
+		?array $allowedTimezoneTypes = null
+	) {
+		if (Lib::type()->adate_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes)) {
 		    return $result;
 		}
 
@@ -1146,9 +1154,13 @@ class ParseModule extends ParseModuleBase
 	/**
 	 * @return \DateTimeImmutable|null
 	 */
-	public function idate_of(string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
-	{
-		if (Lib::type()->idate_of($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes)) {
+	public function idate_formatted(
+		string $format,
+		$dateFormatted,
+		$timezoneFallback = null,
+		?array $allowedTimezoneTypes = null
+	) {
+		if (Lib::type()->idate_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes)) {
 		    return $result;
 		}
 
@@ -1480,8 +1492,6 @@ class ParseModule extends ParseModuleBase
 	 *
 	 * @param T|int|string         $value
 	 * @param class-string<T>|null $enumClass
-	 *
-	 * @return class-string|null
 	 *
 	 * @return T|null
 	 */

@@ -17,17 +17,7 @@ abstract class AssertModuleBase
     /**
      * @var mixed
      */
-    protected $value = [];
-
-    /**
-     * @var callable
-     */
-    protected $fnName;
-    /**
-     * @var array
-     */
-    protected $fnArguments;
-
+    protected $value;
     /**
      * @var bool
      */
@@ -37,10 +27,17 @@ abstract class AssertModuleBase
      */
     protected $result;
 
+    /**
+     * @var array<array{0: callable, 1: array}>
+     */
+    protected $fnList = [];
 
-    public function __construct(?TypeModule $theType = null)
+
+    public function __construct($value, ?TypeModule $theType = null)
     {
         $this->theType = $theType ?? Lib::type();
+
+        $this->value = $value;
     }
 
 
@@ -88,15 +85,12 @@ abstract class AssertModuleBase
     /**
      * @return mixed|void
      */
-    public function orFallback(array $fallback = [])
+    public function orThrow($throwableOrArg, ...$throwableArgs)
     {
         if (! $this->status) {
-            if (array_key_exists(0, $fallback)) {
-                return $fallback[ 0 ];
-            }
-
-            throw new LogicException(
-                'The assert failed, and no fallback provided: ' . $this->fnName
+            return Lib::php()->throw(
+                debug_backtrace(),
+                $throwableOrArg, ...$throwableArgs
             );
         }
 
@@ -106,13 +100,33 @@ abstract class AssertModuleBase
     /**
      * @return mixed|void
      */
-    public function orThrow($throwableOrArg, ...$throwableArgs)
+    public function orFallback(array $fallback = [])
     {
         if (! $this->status) {
-            return Lib::php()->throw(
-                debug_backtrace(),
-                $throwableOrArg, ...$throwableArgs
+            if (array_key_exists(0, $fallback)) {
+                return $fallback[ 0 ];
+            }
+
+            throw new LogicException(
+                [ 'The assert failed, and no fallback provided', $this->fnList ]
             );
+        }
+
+        return $this->result;
+    }
+
+    /**
+     * @return mixed|void
+     */
+    public function orCallback(\Closure $fn)
+    {
+        if (! $this->status) {
+            $result = call_user_func_array(
+                $fn,
+                [ $this->value, $this->fnList ]
+            );
+
+            return $result;
         }
 
         return $this->result;

@@ -593,22 +593,23 @@ $fn = function () {
     _print('[ AssertModule ]');
     echo PHP_EOL;
 
-    $var = \Gzhegow\Lib\Lib::assert()
-        ->numeric_positive('-1')
+    $var = \Gzhegow\Lib\Lib::assert(-1)
+        ->int_positive()
         ->orNull()
     ;
-    _print($var);
+    _print($var); // NULL
 
-    $var = \Gzhegow\Lib\Lib::assert()
-        ->numeric_positive('-1')
+    $var = \Gzhegow\Lib\Lib::assert('-1')
+        ->string_not_empty()
+        ->numeric_positive()
         ->orFallback([ NAN ])
     ;
-    _print($var);
+    _print($var); // NAN
 
     $e = null;
     try {
-        $var = \Gzhegow\Lib\Lib::assert()
-            ->numeric_positive('-1')
+        $var = \Gzhegow\Lib\Lib::assert('-1')
+            ->numeric_positive()
             ->triggerError('The value should be positive numeric', E_USER_ERROR)
             ->orNull()
         ;
@@ -620,8 +621,8 @@ $fn = function () {
 
     $e = null;
     try {
-        $var = \Gzhegow\Lib\Lib::assert()
-            ->numeric_positive('-1')
+        $var = \Gzhegow\Lib\Lib::assert('-1')
+            ->numeric_positive()
             ->orThrow('The value should be positive numeric')
         ;
     }
@@ -1527,12 +1528,19 @@ $fn = function () {
     _print($status, $dateObject);
     echo PHP_EOL;
 
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 12:34:56 +0100');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 12:34:56.456 EET');
+    _print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 12:34:56.456789 Europe/Minsk');
+    _print($status, $result);
+    echo PHP_EOL;
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 +0100');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, 'Y-m-d H:i:s O', '1970-01-01 00:00:00 +0100');
     _print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 EET');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, 'Y-m-d H:i:s T', '1970-01-01 00:00:00 EET');
     _print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 Europe/Minsk');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, 'Y-m-d H:i:s e', '1970-01-01 00:00:00 Europe/Minsk');
     _print($status, $result);
     echo PHP_EOL;
 
@@ -1550,7 +1558,7 @@ $fn = function () {
     _print($status, $result);
     $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '123.456');
     _print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '123.456', 'Europe/Minsk');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '123.456', 'EET');
     _print($status, $result);
     echo PHP_EOL;
 
@@ -1630,6 +1638,10 @@ TRUE | { object # DateTime # "1970-01-01T12:34:56.456000+00:00" }
 TRUE | { object # DateTime # "1970-01-01T12:34:56.456789+00:00" }
 TRUE | { object # DateTime # "1970-01-01T12:34:56.456789+02:00" }
 
+TRUE | { object # DateTime # "1970-01-01T12:34:56.000000+01:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.456000+02:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.456789+03:00" }
+
 TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+01:00" }
 TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+02:00" }
 TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+03:00" }
@@ -1641,7 +1653,7 @@ TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+03:00" }
 TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+00:00" }
 TRUE | { object # DateTime # "1970-01-01T00:02:03.000000+00:00" }
 TRUE | { object # DateTime # "1970-01-01T00:02:03.000456+00:00" }
-TRUE | { object # DateTime # "1970-01-01T03:02:03.000456+03:00" }
+TRUE | { object # DateTime # "1970-01-01T02:02:03.000456+02:00" }
 ');
 
 

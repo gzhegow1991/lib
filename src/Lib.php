@@ -31,6 +31,43 @@ use Gzhegow\Lib\Modules\ItertoolsModule;
 class Lib
 {
     /**
+     * @return AssertModule
+     */
+    public static $assert;
+
+    public static function assert($value, ?AssertModule $instance = null)
+    {
+        return static::$assert = $instance
+            ?? static::$assert
+            ?? new AssertModule($value);
+    }
+
+    /**
+     * @return ParseModule
+     */
+    public static $parse;
+
+    public static function parse(?ParseModule $instance = null)
+    {
+        return static::$parse = $instance
+            ?? static::$parse
+            ?? new ParseModule();
+    }
+
+    /**
+     * @return TypeModule
+     */
+    public static $type;
+
+    public static function type(?TypeModule $instance = null)
+    {
+        return static::$type = $instance
+            ?? static::$type
+            ?? new TypeModule();
+    }
+
+
+    /**
      * @return ArrModule
      */
     public static $arr;
@@ -40,18 +77,6 @@ class Lib
         return static::$arr = $instance
             ?? static::$arr
             ?? new ArrModule();
-    }
-
-    /**
-     * @return AssertModule
-     */
-    public static $assert;
-
-    public static function assert(?AssertModule $instance = null)
-    {
-        return static::$assert = $instance
-            ?? static::$assert
-            ?? new AssertModule();
     }
 
     /**
@@ -223,18 +248,6 @@ class Lib
     }
 
     /**
-     * @return ParseModule
-     */
-    public static $parse;
-
-    public static function parse(?ParseModule $instance = null)
-    {
-        return static::$parse = $instance
-            ?? static::$parse
-            ?? new ParseModule();
-    }
-
-    /**
      * @return PhpModule
      */
     public static $php;
@@ -292,18 +305,6 @@ class Lib
         return static::$test = $instance
             ?? static::$test
             ?? new TestModule();
-    }
-
-    /**
-     * @return TypeModule
-     */
-    public static $type;
-
-    public static function type(?TypeModule $instance = null)
-    {
-        return static::$type = $instance
-            ?? static::$type
-            ?? new TypeModule();
     }
 
     /**

@@ -229,6 +229,10 @@ abstract class TypeModuleBase
      */
     public function is_blank($value) : bool
     {
+        // > NAN is not blank (NAN equals nothing even itself)
+        // > NIL is not blank (NIL is passed manually, that literally means NOT BLANK)
+        // > CLOSED RESOURCE is not blank (actually its still internal object)
+
         if (
             // > NULL is blank (can appear from API to omit any actions on the value)
             (null === $value)
@@ -238,16 +242,6 @@ abstract class TypeModuleBase
             //
             // > EMPTY ARRAY is blank (can appear from HTML forms with no checkbox/radio/select items choosen)
             || ([] === $value)
-            //
-            //
-            // // > CLOSED RESOURCE is not blank (actually its still internal object)
-            // || ('resource (closed)' === gettype($value))
-            //
-            // // > NAN is not blank (NAN equals nothing even itself)
-            // || (is_float($value) && is_nan($value))
-            //
-            // // > NIL is not blank (NIL is passed manually, that literally means NOT BLANK)
-            // || $this->is_nil($value)
         ) {
             return true;
         }
@@ -273,6 +267,10 @@ abstract class TypeModuleBase
      */
     public function is_clearable($value) : bool
     {
+        // > NAN is not clearable (NAN means some error in the code and shouldnt be replaced)
+        // > EMPTY ARRAY is not clearable (array functions is not applicable to nulls)
+        // > COUNTABLE w/ ZERO SIZE is not clearable (countable/iterable functions is not applicable to nulls)
+
         if (
             // > NULL is clearable (means nothing)
             (null === $value)
@@ -283,25 +281,11 @@ abstract class TypeModuleBase
             // > CLOSED RESOURCE is clearable (this is the internal garbage with no possible purpose)
             || ('resource (closed)' === gettype($value))
             //
-            // > NIL is clearable (NIL should be replaced with NULL later)
+            // > NIL is clearable (NIL should be replaced with NULL later or perform deleting actions)
             || $this->is_nil($value)
-            //
-            //
-            // // > EMPTY ARRAY is not clearable (array functions is not applicable to nulls)
-            // || ([] === $value)
-            //
-            // // > NAN is not clearable (NAN means some error in the code and shouldnt be replaced)
-            // || (is_float($value) && is_nan($value))
         ) {
             return true;
         }
-
-        // // > COUNTABLE w/ ZERO SIZE is not nullable (countable/iterable functions is not applicable to nulls)
-        // if ($this->countable($countable, $value)) {
-        //     if (0 === count($countable)) {
-        //         return true;
-        //     }
-        // }
 
         return false;
     }
@@ -318,6 +302,12 @@ abstract class TypeModuleBase
     public function is_passed($value) : bool
     {
         if (
+            $this->is_nil($value)
+        ) {
+            return true;
+        }
+
+        if (
             // > NULL is not passed (can appear from API to omit any actions on the value)
             (null === $value)
             //
@@ -327,15 +317,14 @@ abstract class TypeModuleBase
             // > EMPTY ARRAY is not passed (can appear from HTML forms with no checkbox/radio/select items choosen)
             || ([] === $value)
             //
-            // > RESOURCE not passed (user cannot send resource)
-            || (is_resource($value) || ('resource (closed)' === gettype($value)))
+            // > OBJECTS is not passed (they're only created from source code)
+            || is_object($value)
             //
             // > NAN, -INF, INF is not passed (user cannot send NAN, -INF, +INF)
             || (is_float($value) && ! is_finite($value))
             //
-            //
-            // // > NIL is passed (NIL is passed manually, that literally means PASSED)
-            // || $this->is_nil($value)
+            // > RESOURCE not passed (user cannot send resource)
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
         ) {
             return false;
         }

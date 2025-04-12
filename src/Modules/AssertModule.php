@@ -14,10 +14,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function bool($value)
+	public function bool()
 	{
-		$this->status = Lib::type()->bool($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->bool(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -25,10 +33,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function userbool($value)
+	public function userbool()
 	{
-		$this->status = Lib::type()->userbool($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->userbool(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -36,9 +52,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function int($value)
+	public function int()
 	{
-		$this->status = Lib::type()->int($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->int(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -47,10 +71,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function int_non_zero($value)
+	public function int_non_zero()
 	{
-		$this->status = Lib::type()->int_non_zero($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->int_non_zero(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -58,10 +90,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function int_non_negative($value)
+	public function int_non_negative()
 	{
-		$this->status = Lib::type()->int_non_negative($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->int_non_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -69,10 +109,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function int_non_positive($value)
+	public function int_non_positive()
 	{
-		$this->status = Lib::type()->int_non_positive($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->int_non_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -80,10 +128,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function int_negative($value)
+	public function int_negative()
 	{
-		$this->status = Lib::type()->int_negative($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->int_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -91,9 +147,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function int_positive($value)
+	public function int_positive()
 	{
-		$this->status = Lib::type()->int_positive($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->int_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -102,10 +166,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function float($value)
+	public function float()
 	{
-		$this->status = Lib::type()->float($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->float(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -113,9 +185,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function float_non_zero($value)
+	public function float_non_zero()
 	{
-		$this->status = Lib::type()->float_non_zero($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->float_non_zero(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -124,10 +204,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function float_non_negative($value)
+	public function float_non_negative()
 	{
-		$this->status = Lib::type()->float_non_negative($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->float_non_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -135,10 +223,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function float_non_positive($value)
+	public function float_non_positive()
 	{
-		$this->status = Lib::type()->float_non_positive($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->float_non_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -146,10 +242,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function float_negative($value)
+	public function float_negative()
 	{
-		$this->status = Lib::type()->float_negative($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->float_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -157,10 +261,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function float_positive($value)
+	public function float_positive()
 	{
-		$this->status = Lib::type()->float_positive($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->float_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -168,9 +280,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function num($value)
+	public function num()
 	{
-		$this->status = Lib::type()->num($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->num(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -179,10 +299,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function num_non_zero($value)
+	public function num_non_zero()
 	{
-		$this->status = Lib::type()->num_non_zero($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->num_non_zero(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -190,9 +318,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function num_non_negative($value)
+	public function num_non_negative()
 	{
-		$this->status = Lib::type()->num_non_negative($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->num_non_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -201,10 +337,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function num_non_positive($value)
+	public function num_non_positive()
 	{
-		$this->status = Lib::type()->num_non_positive($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->num_non_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -212,10 +356,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function num_negative($value)
+	public function num_negative()
 	{
-		$this->status = Lib::type()->num_negative($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->num_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -223,10 +375,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function num_positive($value)
+	public function num_positive()
 	{
-		$this->status = Lib::type()->num_positive($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->num_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -234,9 +394,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric($value, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric(?bool $isAllowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric($this->result, $value, $isAllowExp, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $isAllowExp, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $isAllowExp, $refs
+		    );
+		}
 
 		return $this;
 	}
@@ -245,10 +413,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_non_zero($value, ?bool $allowExp = null, array $refs = [])
+	public function numeric_non_zero(?bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_non_zero($this->result, $value, $allowExp, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $allowExp, $refs ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_non_zero(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowExp, $refs
+		    );
+		}
+
 		return $this;
 	}
 
@@ -256,10 +432,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_non_negative($value, ?bool $allowExp = null, array $refs = [])
+	public function numeric_non_negative(?bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_non_negative($this->result, $value, $allowExp, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $allowExp, $refs ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_non_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowExp, $refs
+		    );
+		}
+
 		return $this;
 	}
 
@@ -267,9 +451,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_non_positive($value, ?bool $allowExp = null, array $refs = [])
+	public function numeric_non_positive(?bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_non_positive($this->result, $value, $allowExp, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $allowExp, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_non_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowExp, $refs
+		    );
+		}
 
 		return $this;
 	}
@@ -278,10 +470,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_negative($value, ?bool $allowExp = null, array $refs = [])
+	public function numeric_negative(?bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_negative($this->result, $value, $allowExp, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $allowExp, $refs ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowExp, $refs
+		    );
+		}
+
 		return $this;
 	}
 
@@ -289,9 +489,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_positive($value, ?bool $allowExp = null, array $refs = [])
+	public function numeric_positive(?bool $allowExp = null, array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_positive($this->result, $value, $allowExp, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $allowExp, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowExp, $refs
+		    );
+		}
 
 		return $this;
 	}
@@ -300,10 +508,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int($value, array $refs = [])
+	public function numeric_int(array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int($this->result, $value, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_int(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
 		return $this;
 	}
 
@@ -311,9 +527,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_non_zero($value, array $refs = [])
+	public function numeric_int_non_zero(array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_non_zero($this->result, $value, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_int_non_zero(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
 
 		return $this;
 	}
@@ -322,10 +546,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_non_negative($value, array $refs = [])
+	public function numeric_int_non_negative(array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_non_negative($this->result, $value, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_int_non_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
 		return $this;
 	}
 
@@ -333,10 +565,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_non_positive($value, array $refs = [])
+	public function numeric_int_non_positive(array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_non_positive($this->result, $value, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_int_non_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
 		return $this;
 	}
 
@@ -344,9 +584,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_negative($value, array $refs = [])
+	public function numeric_int_negative(array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_negative($this->result, $value, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_int_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
 
 		return $this;
 	}
@@ -355,10 +603,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function numeric_int_positive($value, array $refs = [])
+	public function numeric_int_positive(array $refs = [])
 	{
-		$this->status = Lib::type()->numeric_int_positive($this->result, $value, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_int_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
 		return $this;
 	}
 
@@ -366,9 +622,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function number($value, ?bool $allowExp = null)
+	public function number(?bool $allowExp = null)
 	{
-		$this->status = Lib::type()->number($this->result, $value, $allowExp);
+		$this->fnList[] = [ __FUNCTION__, [ $allowExp ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->number(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowExp
+		    );
+		}
 
 		return $this;
 	}
@@ -377,9 +641,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function bcnumber($value)
+	public function bcnumber()
 	{
-		$this->status = Lib::type()->bcnumber($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->bcnumber(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -388,10 +660,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function string($value)
+	public function string()
 	{
-		$this->status = Lib::type()->string($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->string(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -399,10 +679,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function string_not_empty($value)
+	public function string_not_empty()
 	{
-		$this->status = Lib::type()->string_not_empty($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->string_not_empty(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -410,9 +698,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function trim($value, ?string $characters = null)
+	public function trim(?string $characters = null)
 	{
-		$this->status = Lib::type()->trim($this->result, $value, $characters);
+		$this->fnList[] = [ __FUNCTION__, [ $characters ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->trim(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $characters
+		    );
+		}
 
 		return $this;
 	}
@@ -421,9 +717,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function char($value)
+	public function char()
 	{
-		$this->status = Lib::type()->char($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->char(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -432,10 +736,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function letter($value)
+	public function letter()
 	{
-		$this->status = Lib::type()->letter($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->letter(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -443,10 +755,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function alphabet($value)
+	public function alphabet()
 	{
-		$this->status = Lib::type()->alphabet($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->alphabet(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -454,10 +774,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function ctype_digit($value)
+	public function ctype_digit()
 	{
-		$this->status = Lib::type()->ctype_digit($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->ctype_digit(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -465,9 +793,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function ctype_alpha($value, ?bool $isIgnoreCase = null)
+	public function ctype_alpha(?bool $isIgnoreCase = null)
 	{
-		$this->status = Lib::type()->ctype_alpha($this->result, $value, $isIgnoreCase);
+		$this->fnList[] = [ __FUNCTION__, [ $isIgnoreCase ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->ctype_alpha(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $isIgnoreCase
+		    );
+		}
 
 		return $this;
 	}
@@ -476,10 +812,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function ctype_alnum($value, ?bool $isIgnoreCase = null)
+	public function ctype_alnum(?bool $isIgnoreCase = null)
 	{
-		$this->status = Lib::type()->ctype_alnum($this->result, $value, $isIgnoreCase);
+		$this->fnList[] = [ __FUNCTION__, [ $isIgnoreCase ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->ctype_alnum(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $isIgnoreCase
+		    );
+		}
+
 		return $this;
 	}
 
@@ -487,10 +831,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function base($value, $alphabet)
+	public function base($alphabet)
 	{
-		$this->status = Lib::type()->base($this->result, $value, $alphabet);
+		$this->fnList[] = [ __FUNCTION__, [ $alphabet ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->base(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $alphabet
+		    );
+		}
+
 		return $this;
 	}
 
@@ -498,10 +850,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function base_bin($value)
+	public function base_bin()
 	{
-		$this->status = Lib::type()->base_bin($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->base_bin(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -509,10 +869,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function base_oct($value)
+	public function base_oct()
 	{
-		$this->status = Lib::type()->base_oct($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->base_oct(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -520,10 +888,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function base_dec($value)
+	public function base_dec()
 	{
-		$this->status = Lib::type()->base_dec($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->base_dec(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -531,9 +907,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function base_hex($value)
+	public function base_hex()
 	{
-		$this->status = Lib::type()->base_hex($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->base_hex(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -542,10 +926,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function list($value)
+	public function list()
 	{
-		$this->status = Lib::type()->list($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->list(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -553,9 +945,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function list_sorted($value)
+	public function list_sorted()
 	{
-		$this->status = Lib::type()->list_sorted($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->list_sorted(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -564,10 +964,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function dict($value)
+	public function dict()
 	{
-		$this->status = Lib::type()->dict($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->dict(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -575,10 +983,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function dict_sorted($value)
+	public function dict_sorted()
 	{
-		$this->status = Lib::type()->dict_sorted($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->dict_sorted(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -586,10 +1002,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function index_list($value)
+	public function index_list()
 	{
-		$this->status = Lib::type()->index_list($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->index_list(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -597,10 +1021,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function index_dict($value)
+	public function index_dict()
 	{
-		$this->status = Lib::type()->index_dict($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->index_dict(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -608,9 +1040,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function table($value)
+	public function table()
 	{
-		$this->status = Lib::type()->table($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->table(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -619,10 +1059,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function matrix($value)
+	public function matrix()
 	{
-		$this->status = Lib::type()->matrix($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->matrix(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -630,9 +1078,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function matrix_strict($value)
+	public function matrix_strict()
 	{
-		$this->status = Lib::type()->matrix_strict($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->matrix_strict(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -641,10 +1097,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function arrpath($path, ?string $dot = null)
+	public function arrpath(?string $dot = null)
 	{
-		$this->status = Lib::type()->arrpath($this->result, $path, $dot);
+		$this->fnList[] = [ __FUNCTION__, [ $dot ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->arrpath(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $dot
+		    );
+		}
+
 		return $this;
 	}
 
@@ -652,9 +1116,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function regex($value)
+	public function regex()
 	{
-		$this->status = Lib::type()->regex($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->regex(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -663,10 +1135,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function address_ip($value)
+	public function address_ip()
 	{
-		$this->status = Lib::type()->address_ip($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->address_ip(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -674,9 +1154,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function address_ip_v4($value)
+	public function address_ip_v4()
 	{
-		$this->status = Lib::type()->address_ip_v4($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->address_ip_v4(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -685,10 +1173,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function address_ip_v6($value)
+	public function address_ip_v6()
 	{
-		$this->status = Lib::type()->address_ip_v6($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->address_ip_v6(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
 		return $this;
 	}
 
@@ -696,10 +1192,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function address_mac($value)
+	public function address_mac()
 	{
-		$this->status = Lib::type()->address_mac($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->address_mac(
+		        $this->result,
+		        $this->result ?? $this->value,
 
+		    );
+		}
+
 		return $this;
 	}
 
@@ -707,9 +1211,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function subnet($value, ?string $ipFallback = null)
+	public function subnet(?string $ipFallback = null)
 	{
-		$this->status = Lib::type()->subnet($this->result, $value, $ipFallback);
+		$this->fnList[] = [ __FUNCTION__, [ $ipFallback ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->subnet(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $ipFallback
+		    );
+		}
 
 		return $this;
 	}
@@ -718,10 +1230,18 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function subnet_v4($value, ?string $ipFallback = null)
+	public function subnet_v4(?string $ipFallback = null)
 	{
-		$this->status = Lib::type()->subnet_v4($this->result, $value, $ipFallback);
+		$this->fnList[] = [ __FUNCTION__, [ $ipFallback ] ];
 
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->subnet_v4(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $ipFallback
+		    );
+		}
+
 		return $this;
 	}
 
@@ -729,9 +1249,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function subnet_v6($value, ?string $ipFallback = null)
+	public function subnet_v6(?string $ipFallback = null)
 	{
-		$this->status = Lib::type()->subnet_v6($this->result, $value, $ipFallback);
+		$this->fnList[] = [ __FUNCTION__, [ $ipFallback ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->subnet_v6(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $ipFallback
+		    );
+		}
 
 		return $this;
 	}
@@ -744,9 +1272,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function url($value, $query = null, $fragment = null, array $refs = [])
+	public function url($query = null, $fragment = null, array $refs = [])
 	{
-		$this->status = Lib::type()->url($this->result, $value, $query, $fragment, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $query, $fragment, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->url(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $query, $fragment, $refs
+		    );
+		}
 
 		return $this;
 	}
@@ -757,9 +1293,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function host($value, array $refs = [])
+	public function host(array $refs = [])
 	{
-		$this->status = Lib::type()->host($this->result, $value, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->host(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
 
 		return $this;
 	}
@@ -772,9 +1316,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function link($value, $query = null, $fragment = null, array $refs = [])
+	public function link($query = null, $fragment = null, array $refs = [])
 	{
-		$this->status = Lib::type()->link($this->result, $value, $query, $fragment, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $query, $fragment, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->link(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $query, $fragment, $refs
+		    );
+		}
 
 		return $this;
 	}
@@ -783,9 +1335,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function uuid($value)
+	public function uuid()
 	{
-		$this->status = Lib::type()->uuid($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->uuid(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -794,9 +1354,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function countable($value)
+	public function countable()
 	{
-		$this->status = Lib::type()->countable($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->countable(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -805,9 +1373,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function countable_object($value)
+	public function countable_object()
 	{
-		$this->status = Lib::type()->countable_object($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->countable_object(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -816,9 +1392,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function sizeable($value)
+	public function sizeable()
 	{
-		$this->status = Lib::type()->sizeable($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->sizeable(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -827,9 +1411,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function timezone($value, ?array $allowedTimezoneTypes = null)
+	public function timezone(?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->timezone($this->result, $value, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->timezone(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -838,9 +1430,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function timezone_offset($timezoneOrOffset)
+	public function timezone_offset()
 	{
-		$this->status = Lib::type()->timezone_offset($this->result, $timezoneOrOffset);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->timezone_offset(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -849,9 +1449,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function timezone_abbr($timezoneOrAbbr)
+	public function timezone_abbr()
 	{
-		$this->status = Lib::type()->timezone_abbr($this->result, $timezoneOrAbbr);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->timezone_abbr(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -860,9 +1468,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function timezone_name($timezoneOrName)
+	public function timezone_name()
 	{
-		$this->status = Lib::type()->timezone_name($this->result, $timezoneOrName);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->timezone_name(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -871,9 +1487,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function timezone_nameabbr($timezoneOrNameOrAbbr)
+	public function timezone_nameabbr()
 	{
-		$this->status = Lib::type()->timezone_nameabbr($this->result, $timezoneOrNameOrAbbr);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->timezone_nameabbr(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -882,9 +1506,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function date($datestring, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
+	public function date($timezoneFallback = null, ?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->date($this->result, $datestring, $timezoneFallback, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $timezoneFallback, $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->date(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $timezoneFallback, $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -893,9 +1525,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function adate($datestring, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
+	public function adate($timezoneFallback = null, ?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->adate($this->result, $datestring, $timezoneFallback, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $timezoneFallback, $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->adate(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $timezoneFallback, $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -904,9 +1544,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function idate($datestring, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
+	public function idate($timezoneFallback = null, ?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->idate($this->result, $datestring, $timezoneFallback, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $timezoneFallback, $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->idate(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $timezoneFallback, $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -915,9 +1563,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function date_tz($datestring, ?array $allowedTimezoneTypes = null)
+	public function date_tz(?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->date_tz($this->result, $datestring, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->date_tz(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -926,9 +1582,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function adate_tz($datestring, ?array $allowedTimezoneTypes = null)
+	public function adate_tz(?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->adate_tz($this->result, $datestring, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->adate_tz(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -937,9 +1601,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function idate_tz($datestring, ?array $allowedTimezoneTypes = null)
+	public function idate_tz(?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->idate_tz($this->result, $datestring, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->idate_tz(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -948,9 +1620,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function date_of(string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
+	public function date_formatted($dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->date_of($this->result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $timezoneFallback, $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->date_formatted(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $dateFormatted, $timezoneFallback, $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -959,9 +1639,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function adate_of(string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
+	public function adate_formatted($dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->adate_of($this->result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $timezoneFallback, $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->adate_formatted(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $dateFormatted, $timezoneFallback, $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -970,9 +1658,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function idate_of(string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
+	public function idate_formatted($dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->idate_of($this->result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $timezoneFallback, $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->idate_formatted(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $dateFormatted, $timezoneFallback, $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -981,9 +1677,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function date_tz_formatted(string $format, $dateFormatted, ?array $allowedTimezoneTypes = null)
+	public function date_tz_formatted($dateFormatted, ?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->date_tz_formatted($this->result, $format, $dateFormatted, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->date_tz_formatted(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $dateFormatted, $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -992,9 +1696,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function adate_tz_formatted(string $format, $dateFormatted, ?array $allowedTimezoneTypes = null)
+	public function adate_tz_formatted($dateFormatted, ?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->adate_tz_formatted($this->result, $format, $dateFormatted, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->adate_tz_formatted(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $dateFormatted, $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -1003,9 +1715,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function idate_tz_formatted(string $format, $dateFormatted, ?array $allowedTimezoneTypes = null)
+	public function idate_tz_formatted($dateFormatted, ?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->idate_tz_formatted($this->result, $format, $dateFormatted, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->idate_tz_formatted(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $dateFormatted, $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -1014,9 +1734,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function date_microtime($microtime, $timezoneSet = null, ?array $allowedTimezoneTypes = null)
+	public function date_microtime($timezoneSet = null, ?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->date_microtime($this->result, $microtime, $timezoneSet, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $timezoneSet, $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->date_microtime(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $timezoneSet, $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -1025,9 +1753,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function adate_microtime($microtime, $timezoneSet = null, ?array $allowedTimezoneTypes = null)
+	public function adate_microtime($timezoneSet = null, ?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->adate_microtime($this->result, $microtime, $timezoneSet, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $timezoneSet, $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->adate_microtime(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $timezoneSet, $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -1036,9 +1772,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function idate_microtime($microtime, $timezoneSet = null, ?array $allowedTimezoneTypes = null)
+	public function idate_microtime($timezoneSet = null, ?array $allowedTimezoneTypes = null)
 	{
-		$this->status = Lib::type()->idate_microtime($this->result, $microtime, $timezoneSet, $allowedTimezoneTypes);
+		$this->fnList[] = [ __FUNCTION__, [ $timezoneSet, $allowedTimezoneTypes ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->idate_microtime(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $timezoneSet, $allowedTimezoneTypes
+		    );
+		}
 
 		return $this;
 	}
@@ -1047,9 +1791,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function interval($interval)
+	public function interval()
 	{
-		$this->status = Lib::type()->interval($this->result, $interval);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->interval(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -1058,9 +1810,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function interval_duration($duration)
+	public function interval_duration()
 	{
-		$this->status = Lib::type()->interval_duration($this->result, $duration);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->interval_duration(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -1069,9 +1829,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function interval_datestring($datestring)
+	public function interval_datestring()
 	{
-		$this->status = Lib::type()->interval_datestring($this->result, $datestring);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->interval_datestring(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -1080,9 +1848,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function interval_microtime($microtime)
+	public function interval_microtime()
 	{
-		$this->status = Lib::type()->interval_microtime($this->result, $microtime);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->interval_microtime(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -1091,9 +1867,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function interval_ago($date, ?\DateTimeInterface $from = null, ?bool $reverse = null)
+	public function interval_ago(?\DateTimeInterface $from = null, ?bool $reverse = null)
 	{
-		$this->status = Lib::type()->interval_ago($this->result, $date, $from, $reverse);
+		$this->fnList[] = [ __FUNCTION__, [ $from, $reverse ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->interval_ago(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $from, $reverse
+		    );
+		}
 
 		return $this;
 	}
@@ -1106,9 +1890,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function struct_exists($value, ?int $flags = null)
+	public function struct_exists(?int $flags = null)
 	{
-		$this->status = Lib::type()->struct_exists($this->result, $value, $flags);
+		$this->fnList[] = [ __FUNCTION__, [ $flags ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->struct_exists(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $flags
+		    );
+		}
 
 		return $this;
 	}
@@ -1121,9 +1913,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function struct($value, ?int $flags = null)
+	public function struct(?int $flags = null)
 	{
-		$this->status = Lib::type()->struct($this->result, $value, $flags);
+		$this->fnList[] = [ __FUNCTION__, [ $flags ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->struct(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $flags
+		    );
+		}
 
 		return $this;
 	}
@@ -1136,9 +1936,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function struct_class($value, ?int $flags = null)
+	public function struct_class(?int $flags = null)
 	{
-		$this->status = Lib::type()->struct_class($this->result, $value, $flags);
+		$this->fnList[] = [ __FUNCTION__, [ $flags ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->struct_class(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $flags
+		    );
+		}
 
 		return $this;
 	}
@@ -1147,9 +1955,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function struct_interface($value, ?int $flags = null)
+	public function struct_interface(?int $flags = null)
 	{
-		$this->status = Lib::type()->struct_interface($this->result, $value, $flags);
+		$this->fnList[] = [ __FUNCTION__, [ $flags ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->struct_interface(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $flags
+		    );
+		}
 
 		return $this;
 	}
@@ -1158,9 +1974,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function struct_trait($value, ?int $flags = null)
+	public function struct_trait(?int $flags = null)
 	{
-		$this->status = Lib::type()->struct_trait($this->result, $value, $flags);
+		$this->fnList[] = [ __FUNCTION__, [ $flags ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->struct_trait(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $flags
+		    );
+		}
 
 		return $this;
 	}
@@ -1173,9 +1997,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function struct_enum($value, ?int $flags = null)
+	public function struct_enum(?int $flags = null)
 	{
-		$this->status = Lib::type()->struct_enum($this->result, $value, $flags);
+		$this->fnList[] = [ __FUNCTION__, [ $flags ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->struct_enum(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $flags
+		    );
+		}
 
 		return $this;
 	}
@@ -1188,9 +2020,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function struct_fqcn($value, ?int $flags = null)
+	public function struct_fqcn(?int $flags = null)
 	{
-		$this->status = Lib::type()->struct_fqcn($this->result, $value, $flags);
+		$this->fnList[] = [ __FUNCTION__, [ $flags ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->struct_fqcn(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $flags
+		    );
+		}
 
 		return $this;
 	}
@@ -1199,9 +2039,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function struct_namespace($value, ?int $flags = null)
+	public function struct_namespace(?int $flags = null)
 	{
-		$this->status = Lib::type()->struct_namespace($this->result, $value, $flags);
+		$this->fnList[] = [ __FUNCTION__, [ $flags ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->struct_namespace(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $flags
+		    );
+		}
 
 		return $this;
 	}
@@ -1210,9 +2058,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function struct_basename($value, ?int $flags = null)
+	public function struct_basename(?int $flags = null)
 	{
-		$this->status = Lib::type()->struct_basename($this->result, $value, $flags);
+		$this->fnList[] = [ __FUNCTION__, [ $flags ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->struct_basename(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $flags
+		    );
+		}
 
 		return $this;
 	}
@@ -1221,9 +2077,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function resource($value)
+	public function resource()
 	{
-		$this->status = Lib::type()->resource($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->resource(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -1232,9 +2096,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function resource_opened($value)
+	public function resource_opened()
 	{
-		$this->status = Lib::type()->resource_opened($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->resource_opened(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -1243,9 +2115,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function resource_closed($value)
+	public function resource_closed()
 	{
-		$this->status = Lib::type()->resource_closed($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->resource_closed(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -1257,13 +2137,19 @@ class AssertModule extends AssertModuleBase
 	 * @param T|int|string         $value
 	 * @param class-string<T>|null $enumClass
 	 *
-	 * @return class-string|null
-	 *
 	 * @return static
 	 */
-	public function enum_case($value, ?string $enumClass = null)
+	public function enum_case(?string $enumClass = null)
 	{
-		$this->status = Lib::type()->enum_case($this->result, $value, $enumClass);
+		$this->fnList[] = [ __FUNCTION__, [ $enumClass ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->enum_case(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $enumClass
+		    );
+		}
 
 		return $this;
 	}
@@ -1272,9 +2158,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function method_array($value)
+	public function method_array()
 	{
-		$this->status = Lib::type()->method_array($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->method_array(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -1285,9 +2179,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function method_string($value, array $refs = [])
+	public function method_string(array $refs = [])
 	{
-		$this->status = Lib::type()->method_string($this->result, $value, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->method_string(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
 
 		return $this;
 	}
@@ -1298,9 +2200,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function callable($value, $newScope = 'static')
+	public function callable($newScope = 'static')
 	{
-		$this->status = Lib::type()->callable($this->result, $value, $newScope);
+		$this->fnList[] = [ __FUNCTION__, [ $newScope ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $newScope
+		    );
+		}
 
 		return $this;
 	}
@@ -1309,9 +2219,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function callable_object($value, $newScope = 'static')
+	public function callable_object($newScope = 'static')
 	{
-		$this->status = Lib::type()->callable_object($this->result, $value, $newScope);
+		$this->fnList[] = [ __FUNCTION__, [ $newScope ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable_object(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $newScope
+		    );
+		}
 
 		return $this;
 	}
@@ -1320,9 +2238,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function callable_object_closure($value, $newScope = 'static')
+	public function callable_object_closure($newScope = 'static')
 	{
-		$this->status = Lib::type()->callable_object_closure($this->result, $value, $newScope);
+		$this->fnList[] = [ __FUNCTION__, [ $newScope ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable_object_closure(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $newScope
+		    );
+		}
 
 		return $this;
 	}
@@ -1331,9 +2257,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function callable_object_invokable($value, $newScope = 'static')
+	public function callable_object_invokable($newScope = 'static')
 	{
-		$this->status = Lib::type()->callable_object_invokable($this->result, $value, $newScope);
+		$this->fnList[] = [ __FUNCTION__, [ $newScope ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable_object_invokable(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $newScope
+		    );
+		}
 
 		return $this;
 	}
@@ -1344,9 +2278,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function callable_array($value, $newScope = 'static')
+	public function callable_array($newScope = 'static')
 	{
-		$this->status = Lib::type()->callable_array($this->result, $value, $newScope);
+		$this->fnList[] = [ __FUNCTION__, [ $newScope ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable_array(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $newScope
+		    );
+		}
 
 		return $this;
 	}
@@ -1357,9 +2299,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function callable_array_method($value, $newScope = 'static')
+	public function callable_array_method($newScope = 'static')
 	{
-		$this->status = Lib::type()->callable_array_method($this->result, $value, $newScope);
+		$this->fnList[] = [ __FUNCTION__, [ $newScope ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable_array_method(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $newScope
+		    );
+		}
 
 		return $this;
 	}
@@ -1370,9 +2320,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function callable_array_method_static($value, $newScope = 'static')
+	public function callable_array_method_static($newScope = 'static')
 	{
-		$this->status = Lib::type()->callable_array_method_static($this->result, $value, $newScope);
+		$this->fnList[] = [ __FUNCTION__, [ $newScope ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable_array_method_static(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $newScope
+		    );
+		}
 
 		return $this;
 	}
@@ -1383,9 +2341,17 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function callable_array_method_non_static($value, $newScope = 'static')
+	public function callable_array_method_non_static($newScope = 'static')
 	{
-		$this->status = Lib::type()->callable_array_method_non_static($this->result, $value, $newScope);
+		$this->fnList[] = [ __FUNCTION__, [ $newScope ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable_array_method_non_static(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $newScope
+		    );
+		}
 
 		return $this;
 	}
@@ -1394,9 +2360,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function callable_string($value, $newScope = 'static')
+	public function callable_string($newScope = 'static')
 	{
-		$this->status = Lib::type()->callable_string($this->result, $value, $newScope);
+		$this->fnList[] = [ __FUNCTION__, [ $newScope ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable_string(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $newScope
+		    );
+		}
 
 		return $this;
 	}
@@ -1405,9 +2379,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function callable_string_function($value)
+	public function callable_string_function()
 	{
-		$this->status = Lib::type()->callable_string_function($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable_string_function(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -1416,9 +2398,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function callable_string_function_internal($value)
+	public function callable_string_function_internal()
 	{
-		$this->status = Lib::type()->callable_string_function_internal($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable_string_function_internal(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -1427,9 +2417,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function callable_string_function_non_internal($value)
+	public function callable_string_function_non_internal()
 	{
-		$this->status = Lib::type()->callable_string_function_non_internal($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable_string_function_non_internal(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}
@@ -1438,72 +2436,17 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function callable_string_method_static($value, $newScope = 'static')
+	public function callable_string_method_static($newScope = 'static')
 	{
-		$this->status = Lib::type()->callable_string_method_static($this->result, $value, $newScope);
+		$this->fnList[] = [ __FUNCTION__, [ $newScope ] ];
 
-		return $this;
-	}
-
-
-	/**
-	 * @param array{ 0: array|null } $refs
-	 *
-	 * @return static
-	 */
-	public function path($value, array $refs = [])
-	{
-		$this->status = Lib::type()->path($this->result, $value, $refs);
-
-		return $this;
-	}
-
-
-	/**
-	 * @param array{ 0: array|null } $refs
-	 *
-	 * @return static
-	 */
-	public function realpath($value, ?bool $allowSymlink = null, array $refs = [])
-	{
-		$this->status = Lib::type()->realpath($this->result, $value, $allowSymlink, $refs);
-
-		return $this;
-	}
-
-
-	/**
-	 * @param array{ 0: array|null } $refs
-	 *
-	 * @return static
-	 */
-	public function dirpath($value, ?bool $allowExists = null, ?bool $allowSymlink = null, array $refs = [])
-	{
-		$this->status = Lib::type()->dirpath($this->result, $value, $allowExists, $allowSymlink, $refs);
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function filepath($value, ?bool $allowExists = null, ?bool $allowSymlink = null, array $refs = [])
-	{
-		$this->status = Lib::type()->filepath($this->result, $value, $allowExists, $allowSymlink, $refs);
-
-		return $this;
-	}
-
-
-	/**
-	 * @param array{ 0: array|null } $refs
-	 *
-	 * @return static
-	 */
-	public function dirpath_realpath($value, ?bool $allowSymlink = null, array $refs = [])
-	{
-		$this->status = Lib::type()->dirpath_realpath($this->result, $value, $allowSymlink, $refs);
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->callable_string_method_static(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $newScope
+		    );
+		}
 
 		return $this;
 	}
@@ -1514,9 +2457,59 @@ class AssertModule extends AssertModuleBase
 	 *
 	 * @return static
 	 */
-	public function filepath_realpath($value, ?bool $allowSymlink = null, array $refs = [])
+	public function path(array $refs = [])
 	{
-		$this->status = Lib::type()->filepath_realpath($this->result, $value, $allowSymlink, $refs);
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->path(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @param array{ 0: array|null } $refs
+	 *
+	 * @return static
+	 */
+	public function realpath(?bool $allowSymlink = null, array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $allowSymlink, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->realpath(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowSymlink, $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @param array{ 0: array|null } $refs
+	 *
+	 * @return static
+	 */
+	public function dirpath(?bool $allowExists = null, ?bool $allowSymlink = null, array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $allowExists, $allowSymlink, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->dirpath(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowExists, $allowSymlink, $refs
+		    );
+		}
 
 		return $this;
 	}
@@ -1525,9 +2518,78 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function filename($value)
+	public function filepath(?bool $allowExists = null, ?bool $allowSymlink = null, array $refs = [])
 	{
-		$this->status = Lib::type()->filename($this->result, $value);
+		$this->fnList[] = [ __FUNCTION__, [ $allowExists, $allowSymlink, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->filepath(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowExists, $allowSymlink, $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @param array{ 0: array|null } $refs
+	 *
+	 * @return static
+	 */
+	public function dirpath_realpath(?bool $allowSymlink = null, array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $allowSymlink, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->dirpath_realpath(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowSymlink, $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @param array{ 0: array|null } $refs
+	 *
+	 * @return static
+	 */
+	public function filepath_realpath(?bool $allowSymlink = null, array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $allowSymlink, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->filepath_realpath(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $allowSymlink, $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function filename()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->filename(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
 
 		return $this;
 	}

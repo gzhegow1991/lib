@@ -1778,7 +1778,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function date_of(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
+    public function date_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_date_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
     }
@@ -1786,7 +1786,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTime|null $result
      */
-    public function adate_of(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
+    public function adate_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_adate_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
     }
@@ -1794,7 +1794,7 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function idate_of(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
+    public function idate_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         return Lib::date()->type_idate_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
     }
@@ -2011,8 +2011,6 @@ class TypeModule extends TypeModuleBase
      * @param T|null               $result
      * @param T|int|string         $value
      * @param class-string<T>|null $enumClass
-     *
-     * @return class-string|null
      */
     public function enum_case(&$result, $value, ?string $enumClass = null) : bool
     {
