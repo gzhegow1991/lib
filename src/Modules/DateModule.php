@@ -561,7 +561,7 @@ class DateModule
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function type_date_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
+    public function type_date_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -571,8 +571,19 @@ class DateModule
             $dateTime = $dateFormatted;
 
         } else {
-            if ('' === $format) {
+            $formatsList = Lib::php()->to_list($formats);
+
+            if (0 === count($formatsList)) {
                 return false;
+            }
+
+            $theType = Lib::type();
+            foreach ( $formatsList as $i => $format ) {
+                if (! $theType->string_not_empty($formatString, $format)) {
+                    return false;
+                }
+
+                $formatsList[ $i ] = $formatString;
             }
 
             if (! (is_string($dateFormatted) && ('' !== $dateFormatted))) {
@@ -590,15 +601,17 @@ class DateModule
                 }
             }
 
-            try {
-                $dateTime = \DateTime::createFromFormat(
-                    $format,
-                    $dateFormatted,
-                    $_timezoneFallback
-                );
-            }
-            catch ( \Throwable $e ) {
-                $dateTime = false;
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTime = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormatted,
+                        $_timezoneFallback
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTime = false;
+                }
             }
 
             if (false === $dateTime) {
@@ -629,7 +642,7 @@ class DateModule
     /**
      * @param \DateTime|null $result
      */
-    public function type_adate_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
+    public function type_adate_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -639,8 +652,19 @@ class DateModule
             $dateTime = $dateFormatted;
 
         } else {
-            if ('' === $format) {
+            $formatsList = Lib::php()->to_list($formats);
+
+            if (0 === count($formatsList)) {
                 return false;
+            }
+
+            $theType = Lib::type();
+            foreach ( $formatsList as $i => $format ) {
+                if (! $theType->string_not_empty($formatString, $format)) {
+                    return false;
+                }
+
+                $formatsList[ $i ] = $formatString;
             }
 
             if (! (is_string($dateFormatted) && ('' !== $dateFormatted))) {
@@ -658,15 +682,17 @@ class DateModule
                 }
             }
 
-            try {
-                $dateTime = \DateTime::createFromFormat(
-                    $format,
-                    $dateFormatted,
-                    $_timezoneFallback
-                );
-            }
-            catch ( \Throwable $e ) {
-                $dateTime = false;
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTime = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormatted,
+                        $_timezoneFallback
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTime = false;
+                }
             }
 
             if (false === $dateTime) {
@@ -697,7 +723,7 @@ class DateModule
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function type_idate_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
+    public function type_idate_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -709,8 +735,19 @@ class DateModule
             $dateTimeImmutable = $dateFormatted;
 
         } else {
-            if ('' === $format) {
+            $formatsList = Lib::php()->to_list($formats);
+
+            if (0 === count($formatsList)) {
                 return false;
+            }
+
+            $theType = Lib::type();
+            foreach ( $formatsList as $i => $format ) {
+                if (! $theType->string_not_empty($formatString, $format)) {
+                    return false;
+                }
+
+                $formatsList[ $i ] = $formatString;
             }
 
             if (! (is_string($dateFormatted) && ('' !== $dateFormatted))) {
@@ -728,15 +765,17 @@ class DateModule
                 }
             }
 
-            try {
-                $dateTimeImmutable = \DateTime::createFromFormat(
-                    $format,
-                    $dateFormatted,
-                    $_timezoneFallback
-                );
-            }
-            catch ( \Throwable $e ) {
-                $dateTimeImmutable = false;
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTimeImmutable = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormatted,
+                        $_timezoneFallback
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTimeImmutable = false;
+                }
             }
 
             if (false === $dateTimeImmutable) {
@@ -768,7 +807,7 @@ class DateModule
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function type_date_tz_formatted(&$result, string $format, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
+    public function type_date_tz_formatted(&$result, $formats, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -780,23 +819,36 @@ class DateModule
             $dateTime = $dateFormatted;
 
         } else {
-            if ('' === $format) {
+            $formatsList = Lib::php()->to_list($formats);
+
+            if (0 === count($formatsList)) {
                 return false;
+            }
+
+            $theType = Lib::type();
+            foreach ( $formatsList as $i => $format ) {
+                if (! $theType->string_not_empty($formatString, $format)) {
+                    return false;
+                }
+
+                $formatsList[ $i ] = $formatString;
             }
 
             if (! (is_string($dateFormatted) && ('' !== $dateFormatted))) {
                 return false;
             }
 
-            try {
-                $dateTime = \DateTime::createFromFormat(
-                    $format,
-                    $dateFormatted,
-                    $timezoneNil
-                );
-            }
-            catch ( \Throwable $e ) {
-                $dateTime = false;
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTime = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormatted,
+                        $timezoneNil
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTime = false;
+                }
             }
 
             if (false === $dateTime) {
@@ -834,7 +886,7 @@ class DateModule
     /**
      * @param \DateTime|null $result
      */
-    public function type_adate_tz_formatted(&$result, string $format, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
+    public function type_adate_tz_formatted(&$result, $formats, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -846,23 +898,36 @@ class DateModule
             $dateTime = $dateFormatted;
 
         } else {
-            if ('' === $format) {
+            $formatsList = Lib::php()->to_list($formats);
+
+            if (0 === count($formatsList)) {
                 return false;
+            }
+
+            $theType = Lib::type();
+            foreach ( $formatsList as $i => $format ) {
+                if (! $theType->string_not_empty($formatString, $format)) {
+                    return false;
+                }
+
+                $formatsList[ $i ] = $formatString;
             }
 
             if (! (is_string($dateFormatted) && ('' !== $dateFormatted))) {
                 return false;
             }
 
-            try {
-                $dateTime = \DateTime::createFromFormat(
-                    $format,
-                    $dateFormatted,
-                    $timezoneNil
-                );
-            }
-            catch ( \Throwable $e ) {
-                $dateTime = false;
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTime = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormatted,
+                        $timezoneNil
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTime = false;
+                }
             }
 
             if (false === $dateTime) {
@@ -900,7 +965,7 @@ class DateModule
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function type_idate_tz_formatted(&$result, string $format, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
+    public function type_idate_tz_formatted(&$result, $formats, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -912,23 +977,36 @@ class DateModule
             $dateTimeImmutable = $dateFormatted;
 
         } else {
-            if ('' === $format) {
+            $formatsList = Lib::php()->to_list($formats);
+
+            if (0 === count($formatsList)) {
                 return false;
+            }
+
+            $theType = Lib::type();
+            foreach ( $formatsList as $i => $format ) {
+                if (! $theType->string_not_empty($formatString, $format)) {
+                    return false;
+                }
+
+                $formatsList[ $i ] = $formatString;
             }
 
             if (! (is_string($dateFormatted) && ('' !== $dateFormatted))) {
                 return false;
             }
 
-            try {
-                $dateTimeImmutable = \DateTime::createFromFormat(
-                    $format,
-                    $dateFormatted,
-                    $timezoneNil
-                );
-            }
-            catch ( \Throwable $e ) {
-                $dateTimeImmutable = false;
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTimeImmutable = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormatted,
+                        $timezoneNil
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTimeImmutable = false;
+                }
             }
 
             if (false === $dateTimeImmutable) {

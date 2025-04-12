@@ -1778,50 +1778,50 @@ class TypeModule extends TypeModuleBase
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function date_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
+    public function date_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
-        return Lib::date()->type_date_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
+        return Lib::date()->type_date_formatted($result, $formats, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
     }
 
     /**
      * @param \DateTime|null $result
      */
-    public function adate_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
+    public function adate_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
-        return Lib::date()->type_adate_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
+        return Lib::date()->type_adate_formatted($result, $formats, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
     }
 
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function idate_formatted(&$result, string $format, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
+    public function idate_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
     {
-        return Lib::date()->type_idate_formatted($result, $format, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
+        return Lib::date()->type_idate_formatted($result, $formats, $dateFormatted, $timezoneFallback, $allowedTimezoneTypes);
     }
 
 
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function date_tz_formatted(&$result, string $format, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
+    public function date_tz_formatted(&$result, $formats, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
     {
-        return Lib::date()->type_date_tz_formatted($result, $format, $dateFormatted, $allowedTimezoneTypes);
+        return Lib::date()->type_date_tz_formatted($result, $formats, $dateFormatted, $allowedTimezoneTypes);
     }
 
     /**
      * @param \DateTime|null $result
      */
-    public function adate_tz_formatted(&$result, string $format, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
+    public function adate_tz_formatted(&$result, $formats, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
     {
-        return Lib::date()->type_adate_tz_formatted($result, $format, $dateFormatted, $allowedTimezoneTypes);
+        return Lib::date()->type_adate_tz_formatted($result, $formats, $dateFormatted, $allowedTimezoneTypes);
     }
 
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function idate_tz_formatted(&$result, string $format, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
+    public function idate_tz_formatted(&$result, $formats, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
     {
-        return Lib::date()->type_idate_tz_formatted($result, $format, $dateFormatted, $allowedTimezoneTypes);
+        return Lib::date()->type_idate_tz_formatted($result, $formats, $dateFormatted, $allowedTimezoneTypes);
     }
 
 
