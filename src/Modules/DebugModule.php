@@ -667,7 +667,7 @@ class DebugModule
                 $printableValue = [ '"' . $var->getName() . '"' ];
 
             } elseif ($var instanceof \DateInterval) {
-                $printableValue = [ '"' . Lib::format()->interval_encode($var) . '"' ];
+                $printableValue = [ '"' . Lib::date()->interval_encode($var) . '"' ];
             }
         }
 

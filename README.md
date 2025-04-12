@@ -2036,14 +2036,14 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv_rows([ [ 'col1', 'col2' ], [ 'val1', 'val2' ] ]);
+    [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv_encode_rows([ [ 'col1', 'col2' ], [ 'val1', 'val2' ] ]);
     _print($csv);
     _print($bytes);
 
     echo PHP_EOL;
 
 
-    [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv_row([ 'col1', 'col2' ]);
+    [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv_encode_row([ 'col1', 'col2' ]);
     _print($csv);
     _print($bytes);
 
