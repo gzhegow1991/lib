@@ -217,7 +217,7 @@ class DateModule
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function type_date(&$result, $datestring, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
+    public function type_date(&$result, $datestring, $timezoneFallback = null) : bool
     {
         $result = null;
 
@@ -249,17 +249,6 @@ class DateModule
                 );
             }
             catch ( \Throwable $e ) {
-            }
-        }
-
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTime) {
-                $tz = $dateTime->getTimezone();
-                $tzType = $this->timezone_type($tz);
-
-                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                    $dateTime = null;
-                }
             }
         }
 
@@ -275,7 +264,7 @@ class DateModule
     /**
      * @param \DateTime|null $result
      */
-    public function type_adate(&$result, $datestring, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
+    public function type_adate(&$result, $datestring, $timezoneFallback = null) : bool
     {
         $result = null;
 
@@ -310,17 +299,6 @@ class DateModule
             }
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTime) {
-                $tz = $dateTime->getTimezone();
-                $tzType = $this->timezone_type($tz);
-
-                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                    $dateTime = null;
-                }
-            }
-        }
-
         if (null !== $dateTime) {
             $result = $this->cloneToADate($dateTime);
 
@@ -333,7 +311,7 @@ class DateModule
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function type_idate(&$result, $datestring, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
+    public function type_idate(&$result, $datestring, $timezoneFallback = null) : bool
     {
         $result = null;
 
@@ -368,14 +346,216 @@ class DateModule
             }
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTimeImmutable) {
-                $tz = $dateTimeImmutable->getTimezone();
-                $tzType = $this->timezone_type($tz);
+        if (null !== $dateTimeImmutable) {
+            $result = $this->cloneToIDate($dateTimeImmutable);
 
-                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                    $dateTimeImmutable = null;
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param \DateTimeInterface|null $result
+     */
+    public function type_date_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null) : bool
+    {
+        $result = null;
+
+        $dateTime = null;
+
+        if ($dateFormatted instanceof \DateTimeInterface) {
+            $dateTime = $dateFormatted;
+
+        } else {
+            $formatsList = Lib::php()->to_list($formats);
+
+            if (0 === count($formatsList)) {
+                return false;
+            }
+
+            $theType = Lib::type();
+            foreach ( $formatsList as $i => $format ) {
+                if (! $theType->string_not_empty($formatString, $format)) {
+                    return false;
                 }
+
+                $formatsList[ $i ] = $formatString;
+            }
+
+            if (! (is_string($dateFormatted) && ('' !== $dateFormatted))) {
+                return false;
+            }
+
+            $_timezoneFallback = null;
+            if (null !== $timezoneFallback) {
+                $status = $this->type_timezone(
+                    $_timezoneFallback, $timezoneFallback
+                );
+
+                if (! $status) {
+                    return false;
+                }
+            }
+
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTime = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormatted,
+                        $_timezoneFallback
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTime = false;
+                }
+            }
+
+            if (false === $dateTime) {
+                $dateTime = null;
+            }
+        }
+
+        if (null !== $dateTime) {
+            $result = $this->cloneToDate($dateTime);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param \DateTime|null $result
+     */
+    public function type_adate_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null) : bool
+    {
+        $result = null;
+
+        $dateTime = null;
+
+        if ($dateFormatted instanceof \DateTimeInterface) {
+            $dateTime = $dateFormatted;
+
+        } else {
+            $formatsList = Lib::php()->to_list($formats);
+
+            if (0 === count($formatsList)) {
+                return false;
+            }
+
+            $theType = Lib::type();
+            foreach ( $formatsList as $i => $format ) {
+                if (! $theType->string_not_empty($formatString, $format)) {
+                    return false;
+                }
+
+                $formatsList[ $i ] = $formatString;
+            }
+
+            if (! (is_string($dateFormatted) && ('' !== $dateFormatted))) {
+                return false;
+            }
+
+            $_timezoneFallback = null;
+            if (null !== $timezoneFallback) {
+                $status = $this->type_timezone(
+                    $_timezoneFallback, $timezoneFallback
+                );
+
+                if (! $status) {
+                    return false;
+                }
+            }
+
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTime = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormatted,
+                        $_timezoneFallback
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTime = false;
+                }
+            }
+
+            if (false === $dateTime) {
+                $dateTime = null;
+            }
+        }
+
+        if (null !== $dateTime) {
+            $result = $this->cloneToADate($dateTime);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param \DateTimeImmutable|null $result
+     */
+    public function type_idate_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null) : bool
+    {
+        $result = null;
+
+        $allowedTimezoneTypes = $allowedTimezoneTypes ?? true;
+
+        $dateTimeImmutable = null;
+
+        if ($dateFormatted instanceof \DateTimeInterface) {
+            $dateTimeImmutable = $dateFormatted;
+
+        } else {
+            $formatsList = Lib::php()->to_list($formats);
+
+            if (0 === count($formatsList)) {
+                return false;
+            }
+
+            $theType = Lib::type();
+            foreach ( $formatsList as $i => $format ) {
+                if (! $theType->string_not_empty($formatString, $format)) {
+                    return false;
+                }
+
+                $formatsList[ $i ] = $formatString;
+            }
+
+            if (! (is_string($dateFormatted) && ('' !== $dateFormatted))) {
+                return false;
+            }
+
+            $_timezoneFallback = null;
+            if (null !== $timezoneFallback) {
+                $status = $this->type_timezone(
+                    $_timezoneFallback, $timezoneFallback
+                );
+
+                if (! $status) {
+                    return false;
+                }
+            }
+
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTimeImmutable = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormatted,
+                        $_timezoneFallback
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTimeImmutable = false;
+                }
+            }
+
+            if (false === $dateTimeImmutable) {
+                $dateTimeImmutable = null;
             }
         }
 
@@ -543,252 +723,6 @@ class DateModule
                 $timezoneType = $this->timezone_type($timezone);
 
                 if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
-                    $dateTimeImmutable = null;
-                }
-            }
-        }
-
-        if (null !== $dateTimeImmutable) {
-            $result = $this->cloneToIDate($dateTimeImmutable);
-
-            return true;
-        }
-
-        return false;
-    }
-
-
-    /**
-     * @param \DateTimeInterface|null $result
-     */
-    public function type_date_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
-    {
-        $result = null;
-
-        $dateTime = null;
-
-        if ($dateFormatted instanceof \DateTimeInterface) {
-            $dateTime = $dateFormatted;
-
-        } else {
-            $formatsList = Lib::php()->to_list($formats);
-
-            if (0 === count($formatsList)) {
-                return false;
-            }
-
-            $theType = Lib::type();
-            foreach ( $formatsList as $i => $format ) {
-                if (! $theType->string_not_empty($formatString, $format)) {
-                    return false;
-                }
-
-                $formatsList[ $i ] = $formatString;
-            }
-
-            if (! (is_string($dateFormatted) && ('' !== $dateFormatted))) {
-                return false;
-            }
-
-            $_timezoneFallback = null;
-            if (null !== $timezoneFallback) {
-                $status = $this->type_timezone(
-                    $_timezoneFallback, $timezoneFallback
-                );
-
-                if (! $status) {
-                    return false;
-                }
-            }
-
-            foreach ( $formatsList as $format ) {
-                try {
-                    $dateTime = \DateTime::createFromFormat(
-                        $format,
-                        $dateFormatted,
-                        $_timezoneFallback
-                    );
-                }
-                catch ( \Throwable $e ) {
-                    $dateTime = false;
-                }
-            }
-
-            if (false === $dateTime) {
-                $dateTime = null;
-            }
-        }
-
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTime) {
-                $tz = $dateTime->getTimezone();
-                $tzType = $this->timezone_type($tz);
-
-                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                    $dateTime = null;
-                }
-            }
-        }
-
-        if (null !== $dateTime) {
-            $result = $this->cloneToDate($dateTime);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \DateTime|null $result
-     */
-    public function type_adate_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
-    {
-        $result = null;
-
-        $dateTime = null;
-
-        if ($dateFormatted instanceof \DateTimeInterface) {
-            $dateTime = $dateFormatted;
-
-        } else {
-            $formatsList = Lib::php()->to_list($formats);
-
-            if (0 === count($formatsList)) {
-                return false;
-            }
-
-            $theType = Lib::type();
-            foreach ( $formatsList as $i => $format ) {
-                if (! $theType->string_not_empty($formatString, $format)) {
-                    return false;
-                }
-
-                $formatsList[ $i ] = $formatString;
-            }
-
-            if (! (is_string($dateFormatted) && ('' !== $dateFormatted))) {
-                return false;
-            }
-
-            $_timezoneFallback = null;
-            if (null !== $timezoneFallback) {
-                $status = $this->type_timezone(
-                    $_timezoneFallback, $timezoneFallback
-                );
-
-                if (! $status) {
-                    return false;
-                }
-            }
-
-            foreach ( $formatsList as $format ) {
-                try {
-                    $dateTime = \DateTime::createFromFormat(
-                        $format,
-                        $dateFormatted,
-                        $_timezoneFallback
-                    );
-                }
-                catch ( \Throwable $e ) {
-                    $dateTime = false;
-                }
-            }
-
-            if (false === $dateTime) {
-                $dateTime = null;
-            }
-        }
-
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTime) {
-                $tz = $dateTime->getTimezone();
-                $tzType = $this->timezone_type($tz);
-
-                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                    $dateTime = null;
-                }
-            }
-        }
-
-        if (null !== $dateTime) {
-            $result = $this->cloneToADate($dateTime);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \DateTimeImmutable|null $result
-     */
-    public function type_idate_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null) : bool
-    {
-        $result = null;
-
-        $allowedTimezoneTypes = $allowedTimezoneTypes ?? true;
-
-        $dateTimeImmutable = null;
-
-        if ($dateFormatted instanceof \DateTimeInterface) {
-            $dateTimeImmutable = $dateFormatted;
-
-        } else {
-            $formatsList = Lib::php()->to_list($formats);
-
-            if (0 === count($formatsList)) {
-                return false;
-            }
-
-            $theType = Lib::type();
-            foreach ( $formatsList as $i => $format ) {
-                if (! $theType->string_not_empty($formatString, $format)) {
-                    return false;
-                }
-
-                $formatsList[ $i ] = $formatString;
-            }
-
-            if (! (is_string($dateFormatted) && ('' !== $dateFormatted))) {
-                return false;
-            }
-
-            $_timezoneFallback = null;
-            if (null !== $timezoneFallback) {
-                $status = $this->type_timezone(
-                    $_timezoneFallback, $timezoneFallback
-                );
-
-                if (! $status) {
-                    return false;
-                }
-            }
-
-            foreach ( $formatsList as $format ) {
-                try {
-                    $dateTimeImmutable = \DateTime::createFromFormat(
-                        $format,
-                        $dateFormatted,
-                        $_timezoneFallback
-                    );
-                }
-                catch ( \Throwable $e ) {
-                    $dateTimeImmutable = false;
-                }
-            }
-
-            if (false === $dateTimeImmutable) {
-                $dateTimeImmutable = null;
-            }
-        }
-
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTimeImmutable) {
-                $tz = $dateTimeImmutable->getTimezone();
-                $tzType = $this->timezone_type($tz);
-
-                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
                     $dateTimeImmutable = null;
                 }
             }
@@ -1045,7 +979,7 @@ class DateModule
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function type_date_microtime(&$result, $microtime, $timezoneSet = null, ?array $allowedTimezoneTypes = null) : bool
+    public function type_date_microtime(&$result, $microtime, $timezoneSet = null) : bool
     {
         $result = null;
 
@@ -1101,17 +1035,6 @@ class DateModule
             /** @var \DateTimeZone $_timezoneSet */
 
             $dateTime = $dateTime->setTimezone($_timezoneSet);
-        }
-
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTime) {
-                $tz = $dateTime->getTimezone();
-                $tzType = $this->timezone_type($tz);
-
-                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                    $dateTime = null;
-                }
-            }
         }
 
         if (null !== $dateTime) {
@@ -1126,7 +1049,7 @@ class DateModule
     /**
      * @param \DateTime|null $result
      */
-    public function type_adate_microtime(&$result, $microtime, $timezoneSet = null, ?array $allowedTimezoneTypes = null) : bool
+    public function type_adate_microtime(&$result, $microtime, $timezoneSet = null) : bool
     {
         $result = null;
 
@@ -1184,17 +1107,6 @@ class DateModule
             $dateTime = $dateTime->setTimezone($_timezoneSet);
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTime) {
-                $tz = $dateTime->getTimezone();
-                $tzType = $this->timezone_type($tz);
-
-                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                    $dateTime = null;
-                }
-            }
-        }
-
         if (null !== $dateTime) {
             $result = $this->cloneToDate($dateTime);
 
@@ -1207,7 +1119,7 @@ class DateModule
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function type_idate_microtime(&$result, $microtime, $timezoneSet = null, ?array $allowedTimezoneTypes = null) : bool
+    public function type_idate_microtime(&$result, $microtime, $timezoneSet = null) : bool
     {
         $result = null;
 
@@ -1265,17 +1177,6 @@ class DateModule
             /** @var \DateTimeZone $_timezoneSet */
 
             $dateTimeImmutable = $dateTimeImmutable->setTimezone($_timezoneSet);
-        }
-
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTimeImmutable) {
-                $tz = $dateTimeImmutable->getTimezone();
-                $tzType = $this->timezone_type($tz);
-
-                if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                    $dateTimeImmutable = null;
-                }
-            }
         }
 
         if (null !== $dateTimeImmutable) {
@@ -1448,12 +1349,11 @@ class DateModule
     }
 
 
-    public function date_remote(\DateTimeInterface $date, $timezoneSet, ?array $allowedTimezoneTypes = null) : \DateTimeInterface
+    public function date_remote(\DateTimeInterface $date, $timezoneSet) : \DateTimeInterface
     {
         $status = $this->type_timezone(
             $_timezoneRemote,
-            $timezoneSet,
-            $allowedTimezoneTypes
+            $timezoneSet
         );
         if (! $status) {
             throw new LogicException(
@@ -1468,12 +1368,11 @@ class DateModule
         return $clone;
     }
 
-    public function adate_remote(\DateTimeInterface $date, $timezoneSet, ?array $allowedTimezoneTypes = null) : \DateTime
+    public function adate_remote(\DateTimeInterface $date, $timezoneSet) : \DateTime
     {
         $status = $this->type_timezone(
             $_timezoneRemote,
-            $timezoneSet,
-            $allowedTimezoneTypes
+            $timezoneSet
         );
         if (! $status) {
             throw new LogicException(
@@ -1488,12 +1387,11 @@ class DateModule
         return $clone;
     }
 
-    public function idate_remote(\DateTimeInterface $date, $timezoneSet, ?array $allowedTimezoneTypes = null) : \DateTimeInterface
+    public function idate_remote(\DateTimeInterface $date, $timezoneSet) : \DateTimeImmutable
     {
         $status = $this->type_timezone(
             $_timezoneRemote,
-            $timezoneSet,
-            $allowedTimezoneTypes
+            $timezoneSet
         );
         if (! $status) {
             throw new LogicException(
@@ -1509,17 +1407,17 @@ class DateModule
     }
 
 
-    public function adate_now($timezone = null, ?array $allowedTimezoneTypes = null) : \DateTime
+    public function adate_now($timezoneFallback = null) : \DateTime
     {
         $_timezone = null;
-        if (null !== $timezone) {
+        if (null !== $timezoneFallback) {
             $status = $this->type_timezone(
-                $_timezone, $timezone
+                $_timezone, $timezoneFallback
             );
 
             if (! $status) {
                 throw new LogicException(
-                    [ 'The `timezone` is invalid', $timezone ]
+                    [ 'The `timezone` is invalid', $timezoneFallback ]
                 );
             }
         }
@@ -1531,31 +1429,20 @@ class DateModule
             throw new LogicException('Unable to create datetime', $e);
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            $tz = $dateTime->getTimezone();
-            $tzType = $this->timezone_type($tz);
-
-            if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                throw new LogicException(
-                    [ 'This `timezone` is not allowed', $tz ]
-                );
-            }
-        }
-
         return $dateTime;
     }
 
-    public function idate_now($timezone = null, ?array $allowedTimezoneTypes = null) : \DateTimeInterface
+    public function idate_now($timezoneFallback = null) : \DateTimeImmutable
     {
         $_timezone = null;
-        if (null !== $timezone) {
+        if (null !== $timezoneFallback) {
             $status = $this->type_timezone(
-                $_timezone, $timezone
+                $_timezone, $timezoneFallback
             );
 
             if (! $status) {
                 throw new LogicException(
-                    [ 'The `timezone` is invalid', $timezone ]
+                    [ 'The `timezone` is invalid', $timezoneFallback ]
                 );
             }
         }
@@ -1567,34 +1454,23 @@ class DateModule
             throw new LogicException('Unable to create datetime', $e);
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            $tz = $dateTimeImmutable->getTimezone();
-            $tzType = $this->timezone_type($tz);
-
-            if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                throw new LogicException(
-                    [ 'This `timezone` is not allowed', $tz ]
-                );
-            }
-        }
-
         return $dateTimeImmutable;
     }
 
 
-    public function adate_epoch($timezone = null, ?array $allowedTimezoneTypes = null) : \DateTime
+    public function adate_epoch($timezoneFallback = null) : \DateTime
     {
         $allowOffset = $allowOffset ?? true;
 
         $_timezone = null;
-        if (null !== $timezone) {
+        if (null !== $timezoneFallback) {
             $status = $this->type_timezone(
-                $_timezone, $timezone
+                $_timezone, $timezoneFallback
             );
 
             if (! $status) {
                 throw new LogicException(
-                    [ 'The `timezone` is invalid', $timezone ]
+                    [ 'The `timezone` is invalid', $timezoneFallback ]
                 );
             }
         }
@@ -1606,33 +1482,22 @@ class DateModule
             throw new LogicException('Unable to create datetime', $e);
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            $tz = $dateTime->getTimezone();
-            $tzType = $this->timezone_type($tz);
-
-            if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                throw new LogicException(
-                    [ 'This `timezone` is not allowed', $tz ]
-                );
-            }
-        }
-
         return $dateTime;
     }
 
-    public function idate_epoch($timezone = null, ?array $allowedTimezoneTypes = null) : \DateTimeInterface
+    public function idate_epoch($timezoneFallback = null) : \DateTimeImmutable
     {
         $allowOffset = $allowOffset ?? true;
 
         $_timezone = null;
-        if (null !== $timezone) {
+        if (null !== $timezoneFallback) {
             $status = $this->type_timezone(
-                $_timezone, $timezone
+                $_timezone, $timezoneFallback
             );
 
             if (! $status) {
                 throw new LogicException(
-                    [ 'The `timezone` is invalid', $timezone ]
+                    [ 'The `timezone` is invalid', $timezoneFallback ]
                 );
             }
         }
@@ -1644,34 +1509,23 @@ class DateModule
             throw new LogicException('Unable to create datetime', $e);
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            $tz = $dateTimeImmutable->getTimezone();
-            $tzType = $this->timezone_type($tz);
-
-            if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                throw new LogicException(
-                    [ 'This `timezone` is not allowed', $tz ]
-                );
-            }
-        }
-
         return $dateTimeImmutable;
     }
 
 
-    public function adate_zero($timezone = null, ?array $allowedTimezoneTypes = null) : \DateTime
+    public function adate_zero($timezoneFallback = null) : \DateTime
     {
         $allowOffset = $allowOffset ?? true;
 
         $_timezone = null;
-        if (null !== $timezone) {
+        if (null !== $timezoneFallback) {
             $status = $this->type_timezone(
-                $_timezone, $timezone
+                $_timezone, $timezoneFallback
             );
 
             if (! $status) {
                 throw new LogicException(
-                    [ 'The `timezone` is invalid', $timezone ]
+                    [ 'The `timezone` is invalid', $timezoneFallback ]
                 );
             }
         }
@@ -1683,33 +1537,22 @@ class DateModule
             throw new LogicException('Unable to create datetime', $e);
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            $tz = $dateTime->getTimezone();
-            $tzType = $this->timezone_type($tz);
-
-            if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                throw new LogicException(
-                    [ 'This `timezone` is not allowed', $tz ]
-                );
-            }
-        }
-
         return $dateTime;
     }
 
-    public function idate_zero($timezone = null, ?array $allowedTimezoneTypes = null) : \DateTimeInterface
+    public function idate_zero($timezoneFallback = null) : \DateTimeImmutable
     {
         $allowOffset = $allowOffset ?? true;
 
         $_timezone = null;
-        if (null !== $timezone) {
+        if (null !== $timezoneFallback) {
             $status = $this->type_timezone(
-                $_timezone, $timezone
+                $_timezone, $timezoneFallback
             );
 
             if (! $status) {
                 throw new LogicException(
-                    [ 'The `timezone` is invalid', $timezone ]
+                    [ 'The `timezone` is invalid', $timezoneFallback ]
                 );
             }
         }
@@ -1719,17 +1562,6 @@ class DateModule
         }
         catch ( \Exception $e ) {
             throw new LogicException('Unable to create datetime', $e);
-        }
-
-        if (null !== $allowedTimezoneTypes) {
-            $tz = $dateTimeImmutable->getTimezone();
-            $tzType = $this->timezone_type($tz);
-
-            if (! in_array($tzType, $allowedTimezoneTypes, true)) {
-                throw new LogicException(
-                    [ 'This `timezone` is not allowed', $tz ]
-                );
-            }
         }
 
         return $dateTimeImmutable;
@@ -1839,21 +1671,47 @@ class DateModule
     }
 
 
-    public function timezone_type(\DateTimeZone $dateTimeZone) : int
+    /**
+     * @param string|\DateTimeInterface|\DateTimeZone $timezone
+     *
+     * @return int
+     */
+    public function timezone_type($timezone) : int
     {
+        if (! $this->type_timezone($dateTimeZone, $timezone)) {
+            throw new LogicException(
+                [ 'The `timezone` should be string or instance of \DateTimeZone', $timezone ]
+            );
+        }
+
         return (PHP_VERSION_ID >= 70400)
             ? json_decode(json_encode($dateTimeZone))->timezone_type
             : get_object_vars($dateTimeZone)[ 'timezone_type' ];
     }
 
     /**
+     * @param string|\DateTimeInterface|\DateTimeZone $a
+     * @param string|\DateTimeInterface|\DateTimeZone $b
+     *
      * @noinspection PhpNonStrictObjectEqualityInspection
      */
-    public function timezone_same(\DateTimeZone $a, \DateTimeZone $b) : bool
+    public function timezone_same($a, $b) : bool
     {
+        if (! $this->type_timezone($aTz, $a)) {
+            throw new LogicException(
+                [ 'The `a` should be string or instance of \DateTimeZone', $a ]
+            );
+        }
+
+        if (! $this->type_timezone($bTz, $b)) {
+            throw new LogicException(
+                [ 'The `a` should be string or instance of \DateTimeZone', $b ]
+            );
+        }
+
         return (PHP_VERSION_ID >= 70400)
-            ? ($a == $b)
-            : ($a->getName() === $b->getName());
+            ? ($aTz == $bTz)
+            : ($aTz->getName() === $bTz->getName());
     }
 
 

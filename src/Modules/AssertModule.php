@@ -1506,15 +1506,15 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function date($timezoneFallback = null, ?array $allowedTimezoneTypes = null)
+	public function date($timezoneFallback = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $timezoneFallback, $allowedTimezoneTypes ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $timezoneFallback ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->date(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $timezoneFallback, $allowedTimezoneTypes
+		        $timezoneFallback
 		    );
 		}
 
@@ -1525,15 +1525,15 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function adate($timezoneFallback = null, ?array $allowedTimezoneTypes = null)
+	public function adate($timezoneFallback = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $timezoneFallback, $allowedTimezoneTypes ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $timezoneFallback ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->adate(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $timezoneFallback, $allowedTimezoneTypes
+		        $timezoneFallback
 		    );
 		}
 
@@ -1544,15 +1544,72 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function idate($timezoneFallback = null, ?array $allowedTimezoneTypes = null)
+	public function idate($timezoneFallback = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $timezoneFallback, $allowedTimezoneTypes ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $timezoneFallback ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->idate(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $timezoneFallback, $allowedTimezoneTypes
+		        $timezoneFallback
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function date_formatted($dateFormatted, $timezoneFallback = null)
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $timezoneFallback ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->date_formatted(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $dateFormatted, $timezoneFallback
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function adate_formatted($dateFormatted, $timezoneFallback = null)
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $timezoneFallback ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->adate_formatted(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $dateFormatted, $timezoneFallback
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function idate_formatted($dateFormatted, $timezoneFallback = null)
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $timezoneFallback ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->idate_formatted(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $dateFormatted, $timezoneFallback
 		    );
 		}
 
@@ -1620,63 +1677,6 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function date_formatted($dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
-	{
-		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $timezoneFallback, $allowedTimezoneTypes ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->date_formatted(
-		        $this->result,
-		        $this->result ?? $this->value,
-		        $dateFormatted, $timezoneFallback, $allowedTimezoneTypes
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function adate_formatted($dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
-	{
-		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $timezoneFallback, $allowedTimezoneTypes ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->adate_formatted(
-		        $this->result,
-		        $this->result ?? $this->value,
-		        $dateFormatted, $timezoneFallback, $allowedTimezoneTypes
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function idate_formatted($dateFormatted, $timezoneFallback = null, ?array $allowedTimezoneTypes = null)
-	{
-		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $timezoneFallback, $allowedTimezoneTypes ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->idate_formatted(
-		        $this->result,
-		        $this->result ?? $this->value,
-		        $dateFormatted, $timezoneFallback, $allowedTimezoneTypes
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
 	public function date_tz_formatted($dateFormatted, ?array $allowedTimezoneTypes = null)
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $allowedTimezoneTypes ] ];
@@ -1734,15 +1734,15 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function date_microtime($timezoneSet = null, ?array $allowedTimezoneTypes = null)
+	public function date_microtime($timezoneSet = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $timezoneSet, $allowedTimezoneTypes ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $timezoneSet ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->date_microtime(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $timezoneSet, $allowedTimezoneTypes
+		        $timezoneSet
 		    );
 		}
 
@@ -1753,15 +1753,15 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function adate_microtime($timezoneSet = null, ?array $allowedTimezoneTypes = null)
+	public function adate_microtime($timezoneSet = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $timezoneSet, $allowedTimezoneTypes ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $timezoneSet ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->adate_microtime(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $timezoneSet, $allowedTimezoneTypes
+		        $timezoneSet
 		    );
 		}
 
@@ -1772,15 +1772,15 @@ class AssertModule extends AssertModuleBase
 	/**
 	 * @return static
 	 */
-	public function idate_microtime($timezoneSet = null, ?array $allowedTimezoneTypes = null)
+	public function idate_microtime($timezoneSet = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $timezoneSet, $allowedTimezoneTypes ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $timezoneSet ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->idate_microtime(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $timezoneSet, $allowedTimezoneTypes
+		        $timezoneSet
 		    );
 		}
 
