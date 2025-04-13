@@ -106,10 +106,18 @@ class JsonModule
         ?int $depth = null, ?int $flags = null
     ) // : mixed
     {
-        $result = $this->_json_decode(
-            $json, $associative,
-            $depth, $flags
-        );
+        if ('' === $json) {
+            return '';
+        }
+
+        $result = [];
+
+        if (null !== $json) {
+            $result = $this->_json_decode(
+                $json, $associative,
+                $depth, $flags
+            );
+        }
 
         if (0 !== count($result)) {
             [ $value ] = $result;
@@ -139,9 +147,11 @@ class JsonModule
             return '';
         }
 
-        $_json = $json;
+        $result = [];
 
-        if (null !== $_json) {
+        if (null !== $json) {
+            $_json = $json;
+
             $regexes = [];
             $regexes[ '#' ] = '/' . preg_quote('#', '/') . '(.*?)$' . '/m';
             $regexes[ '//' ] = '/' . preg_quote('//', '/') . '(.*?)$' . '/m';
@@ -154,12 +164,12 @@ class JsonModule
 
                 $_json = preg_replace($regex, '$1', $_json);
             }
-        }
 
-        $result = $this->_json_decode(
-            $_json, $associative,
-            $depth, $flags
-        );
+            $result = $this->_json_decode(
+                $_json, $associative,
+                $depth, $flags
+            );
+        }
 
         if (0 !== count($result)) {
             [ $value ] = $result;
@@ -186,27 +196,29 @@ class JsonModule
     {
         $error = null;
 
+        if (null === $json) {
+            return [];
+        }
+
         if ('' === $json) {
             return [ '' ];
         }
 
         $value = null;
-        if (null !== $json) {
-            $depth = $depth ?? $this->static_json_depth();
-            $flags = $flags ?? $this->static_json_decode_flags();
 
-            error_clear_last();
+        $depth = $depth ?? $this->static_json_depth();
+        $flags = $flags ?? $this->static_json_decode_flags();
 
-            try {
-                $value = json_decode($json, $associative, $depth, $flags);
-            }
-            catch ( \Throwable $e ) {
-                $value = null;
-            }
+        error_clear_last();
 
-            if (error_get_last()) {
-                $value = null;
-            }
+        try {
+            $value = json_decode($json, $associative, $depth, $flags);
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if (error_get_last()) {
+            $value = null;
         }
 
         if (null === $value) {

@@ -9,6 +9,10 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Arr\ArrPath;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
+use Gzhegow\Lib\Modules\Net\AddressIpV4;
+use Gzhegow\Lib\Modules\Net\AddressIpV6;
+use Gzhegow\Lib\Modules\Net\SubnetV4;
+use Gzhegow\Lib\Modules\Net\SubnetV6;
 use Gzhegow\Lib\Modules\Str\Alphabet;
 use Gzhegow\Lib\Modules\Type\Base\ParseModuleBase;
 use Gzhegow\Lib\Modules\Type\Number;
@@ -783,7 +787,7 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return string|null
+	 * @return AddressIpV4|AddressIpV6|null
 	 */
 	public function address_ip($value)
 	{
@@ -796,7 +800,7 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return string|null
+	 * @return AddressIpV4|null
 	 */
 	public function address_ip_v4($value)
 	{
@@ -809,7 +813,7 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return string|null
+	 * @return AddressIpV6|null
 	 */
 	public function address_ip_v6($value)
 	{
@@ -835,7 +839,7 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return string|null
+	 * @return SubnetV4|SubnetV6|null
 	 */
 	public function subnet($value, ?string $ipFallback = null)
 	{
@@ -848,7 +852,7 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return string|null
+	 * @return SubnetV4|null
 	 */
 	public function subnet_v4($value, ?string $ipFallback = null)
 	{
@@ -861,7 +865,7 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return string|null
+	 * @return SubnetV6|null
 	 */
 	public function subnet_v6($value, ?string $ipFallback = null)
 	{
@@ -1794,6 +1798,32 @@ class ParseModule extends ParseModuleBase
 	public function filename($value)
 	{
 		if (Lib::type()->filename($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \SplFileInfo|null
+	 */
+	public function file($value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null)
+	{
+		if (Lib::type()->file($result, $value, $extensions, $mimeTypes, $filters)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return \SplFileInfo|null
+	 */
+	public function image($value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null)
+	{
+		if (Lib::type()->image($result, $value, $extensions, $mimeTypes, $filters)) {
 		    return $result;
 		}
 

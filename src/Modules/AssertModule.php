@@ -2593,4 +2593,42 @@ class AssertModule extends AssertModuleBase
 
 		return $this;
 	}
+
+
+	/**
+	 * @return static
+	 */
+	public function file(?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null)
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $extensions, $mimeTypes, $filters ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->file(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $extensions, $mimeTypes, $filters
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function image(?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null)
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $extensions, $mimeTypes, $filters ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->image(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $extensions, $mimeTypes, $filters
+		    );
+		}
+
+		return $this;
+	}
 }

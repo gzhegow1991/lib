@@ -6,7 +6,11 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Arr\ArrPath;
 use Gzhegow\Lib\Modules\Type\Number;
 use Gzhegow\Lib\Modules\Str\Alphabet;
+use Gzhegow\Lib\Modules\Net\SubnetV4;
+use Gzhegow\Lib\Modules\Net\SubnetV6;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
+use Gzhegow\Lib\Modules\Net\AddressIpV6;
+use Gzhegow\Lib\Modules\Net\AddressIpV4;
 use Gzhegow\Lib\Modules\Type\Base\TypeModuleBase;
 
 
@@ -1223,11 +1227,14 @@ class TypeModule extends TypeModuleBase
                 $scale = strlen($frac) - 1;
             }
 
-            $number = new Number(
-                $value,
-                $split[ 0 ], $split[ 1 ], $split[ 2 ], $split[ 3 ],
-                $scale
-            );
+            $number = Number::fromValid([
+                'original' => $value,
+                'sign'     => $split[ 0 ],
+                'int'      => $split[ 1 ],
+                'frac'     => $split[ 2 ],
+                'exp'      => $split[ 3 ],
+                'scale'    => $scale,
+            ]);
 
             $result = $number;
 
@@ -1547,7 +1554,7 @@ class TypeModule extends TypeModuleBase
 
 
     /**
-     * @param string|null $result
+     * @param AddressIpV4|AddressIpV6|null $result
      */
     public function address_ip(&$result, $value) : bool
     {
@@ -1555,7 +1562,7 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param string|null $result
+     * @param AddressIpV4|null $result
      */
     public function address_ip_v4(&$result, $value) : bool
     {
@@ -1563,7 +1570,7 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param string|null $result
+     * @param AddressIpV6|null $result
      */
     public function address_ip_v6(&$result, $value) : bool
     {
@@ -1581,7 +1588,7 @@ class TypeModule extends TypeModuleBase
 
 
     /**
-     * @param string|null $result
+     * @param SubnetV4|SubnetV6|null $result
      */
     public function subnet(&$result, $value, ?string $ipFallback = null) : bool
     {
@@ -1589,7 +1596,7 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param string|null $result
+     * @param SubnetV4|null $result
      */
     public function subnet_v4(&$result, $value, ?string $ipFallback = null) : bool
     {
@@ -1597,7 +1604,7 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param string|null $result
+     * @param SubnetV6|null $result
      */
     public function subnet_v6(&$result, $value, ?string $ipFallback = null) : bool
     {
@@ -2254,5 +2261,38 @@ class TypeModule extends TypeModuleBase
     public function filename(&$result, $value) : bool
     {
         return Lib::fs()->type_filename($result, $value);
+    }
+
+
+    /**
+     * @param \SplFileInfo|null $result
+     */
+    public function file(
+        &$result, $value,
+        ?array $extensions = null, ?array $mimeTypes = null,
+        ?array $filters = null
+    ) : bool
+    {
+        return Lib::fs()->type_file(
+            $result, $value,
+            $extensions, $mimeTypes,
+            $filters
+        );
+    }
+
+    /**
+     * @param \SplFileInfo|null $result
+     */
+    public function image(
+        &$result, $value,
+        ?array $extensions = null, ?array $mimeTypes = null,
+        ?array $filters = null
+    ) : bool
+    {
+        return Lib::fs()->type_image(
+            $result, $value,
+            $extensions, $mimeTypes,
+            $filters
+        );
     }
 }

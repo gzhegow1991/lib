@@ -252,7 +252,7 @@ class StrModule
         if (1 === strlen($_value)) {
             $result = $_value;
 
-            return $_value;
+            return true;
         }
 
         return false;
@@ -272,7 +272,7 @@ class StrModule
         if (1 === $this->strlen($_value)) {
             $result = $_value;
 
-            return $_value;
+            return true;
         }
 
         return false;

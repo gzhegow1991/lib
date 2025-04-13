@@ -1,5 +1,6 @@
 <?php
 
+require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 
@@ -74,7 +75,6 @@ function _assert_stdout(
         $expectedStdout
     );
 }
-
 
 
 // >>> TEST
@@ -2338,9 +2338,13 @@ $fn = function () {
     ];
 
     foreach ( $ipV4List as $i => $ip ) {
+        \Gzhegow\Lib\Lib::net()->type_address_ip_v4($addressIpV4, $ip);
+
         foreach ( $subnetV4List as $ii => $subnet ) {
-            $status1 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet($ip, $subnet);
-            $status2 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet_v4($ip, $subnet);
+            \Gzhegow\Lib\Lib::net()->type_subnet_v4($subnetV4, $subnet);
+
+            $status1 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet($addressIpV4, $subnetV4);
+            $status2 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet_v4($addressIpV4, $subnetV4);
 
             _print($ip, $subnet, $status1, $status1 === $status2);
         }
@@ -2364,9 +2368,13 @@ $fn = function () {
     ];
 
     foreach ( $ipV6List as $i => $ip ) {
+        \Gzhegow\Lib\Lib::net()->type_address_ip_v6($addressIpV6, $ip);
+
         foreach ( $subnetV6List as $ii => $subnet ) {
-            $status1 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet($ip, $subnet);
-            $status2 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet_v6($ip, $subnet);
+            \Gzhegow\Lib\Lib::net()->type_subnet_v6($subnetV6, $subnet);
+
+            $status1 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet($addressIpV6, $subnetV6);
+            $status2 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet_v6($addressIpV6, $subnetV6);
 
             _print($ip, $subnet, $status1, $status1 === $status2);
         }

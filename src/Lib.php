@@ -429,7 +429,7 @@ class Lib
             return new $class(...$args);
         }
 
-        $pi = Lib::php()->pathinfo($class, null, '\\', 1);
+        $pi = Lib::php()->pathinfo($class, '\\');
         $namespace = $pi[ 'dirname' ];
         $namespace .= '\\PHP8';
         $classname = $pi[ 'filename' ];
@@ -456,7 +456,7 @@ class Lib
             return new $class(...$args);
         }
 
-        $pi = Lib::php()->pathinfo($class, null, '\\', 1);
+        $pi = Lib::php()->pathinfo($class, '\\');
         $namespace = $pi[ 'dirname' ];
         $namespace .= '\\PHP7';
         $classname = $pi[ 'filename' ];

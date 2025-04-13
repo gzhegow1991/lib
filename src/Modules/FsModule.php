@@ -164,7 +164,7 @@ class FsModule
 
         $result = $_value;
 
-        return $_value;
+        return true;
     }
 
     /**
@@ -214,7 +214,7 @@ class FsModule
 
         $result = $_value;
 
-        return $_value;
+        return true;
     }
 
 
@@ -248,13 +248,13 @@ class FsModule
             }
         }
 
-        if (! is_dir($_value)) {
-            return false;
+        if (is_dir($_value)) {
+            $result = $_value;
+
+            return true;
         }
 
-        $result = $_value;
-
-        return $_value;
+        return false;
     }
 
     /**
@@ -285,13 +285,13 @@ class FsModule
             }
         }
 
-        if (! is_file($_value)) {
-            return false;
+        if (is_file($_value)) {
+            $result = $_value;
+
+            return true;
         }
 
-        $result = $_value;
-
-        return $_value;
+        return false;
     }
 
 
@@ -308,15 +308,450 @@ class FsModule
 
         $forbidden = [ "/", "\\", DIRECTORY_SEPARATOR ];
 
+        $isForbidden = false;
         foreach ( $forbidden as $f ) {
             if (false !== strpos($valueString, $f)) {
-                return false;
+                $isForbidden = true;
+
+                break;
             }
         }
 
-        $result = $valueString;
+        if (! $isForbidden) {
+            $result = $valueString;
 
-        return true;
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param \SplFileInfo|null $result
+     */
+    public function type_file(
+        &$result, $value,
+        ?array $extensions = null, ?array $mimeTypes = null,
+        ?array $filters = null
+    ) : bool
+    {
+        $result = null;
+
+        $splFileInfo = null;
+        if ($value instanceof \SplFileInfo) {
+            $splFileInfo = $value;
+
+        } else {
+            if (! $this->type_filepath_realpath($realpath, $value)) {
+                return false;
+            }
+
+            try {
+                $splFileInfo = new \SplFileInfo($realpath);
+            }
+            catch ( \Throwable $e ) {
+            }
+        }
+
+        $withExtensions = (null !== $extensions);
+        $withMimeTypes = (null !== $mimeTypes);
+
+        $fileRealpath = null;
+        if ($withExtensions || $withMimeTypes) {
+            $fileRealpath = $splFileInfo->getRealPath();
+        }
+
+        if (null !== $extensions) {
+            if (null !== $splFileInfo) {
+                $splFileInfo = $this->type_file_extensions($splFileInfo, $extensions);
+            }
+        }
+
+        if (null !== $mimeTypes) {
+            if (null !== $splFileInfo) {
+                $splFileInfo = $this->type_file_mime_types($splFileInfo, $mimeTypes);
+            }
+        }
+
+        if (null !== $filters) {
+            if (null !== $splFileInfo) {
+                $splFileInfo = $this->type_file_filters($splFileInfo, $filters);
+            }
+        }
+
+        if (null !== $splFileInfo) {
+            $result = $splFileInfo;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function type_file_extensions(\SplFileInfo $splFileInfo, array $extensions) : ?\SplFileInfo
+    {
+        if (0 === count($extensions)) {
+            return null;
+        }
+
+        $fileRealpath = $splFileInfo->getRealPath();
+
+        $fileExtensions = $this->extensions($fileRealpath);
+
+        if (null === $fileExtensions) {
+            return null;
+        }
+
+        if (in_array($fileExtensions, $extensions, true)) {
+            return $splFileInfo;
+        }
+
+        $fileExtensionLast = explode('.', $fileExtensions);
+        $fileExtensionLast = end($fileExtensionLast);
+
+        if (in_array($fileExtensionLast, $extensions, true)) {
+            return $splFileInfo;
+        }
+
+        return null;
+    }
+
+    protected function type_file_mime_types(\SplFileInfo $splFileInfo, array $mimeTypes) : ?\SplFileInfo
+    {
+        if (0 === count($mimeTypes)) {
+            return null;
+        }
+
+        $fileRealpath = $splFileInfo->getRealPath();
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+
+        $mimeType = finfo_file($finfo, $fileRealpath);
+
+        finfo_close($finfo);
+
+        if (false === $mimeType) {
+            return null;
+        }
+
+        if (in_array($mimeType, $mimeTypes, true)) {
+            return $splFileInfo;
+        }
+
+        foreach ( $mimeTypes as $strStarts ) {
+            if (0 === strpos($mimeType, $strStarts)) {
+                return $splFileInfo;
+            }
+        }
+
+        return null;
+    }
+
+    protected function type_file_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
+    {
+        if (0 === count($filters)) {
+            return $splFileInfo;
+        }
+
+        $filtersList = [
+            'max_size' => true,
+            'min_size' => true,
+        ];
+
+        $filtersIntersect = array_intersect_key($filters, $filtersList);
+
+        if (0 !== count($filtersIntersect)) {
+            $fileRealpath = $splFileInfo->getRealPath();
+
+            $hasMaxSize = array_key_exists('max_size', $filters);
+            $hasMinSize = array_key_exists('min_size', $filters);
+
+            $theFormat = null;
+            $fileSize = null;
+            if ($hasMaxSize || $hasMinSize) {
+                $theFormat = Lib::format();
+
+                $fileSize = $splFileInfo->getSize();
+            }
+
+            foreach ( $filters as $filter => $value ) {
+                if ('max_size' === $filter) {
+                    $maxSize = $theFormat->bytes_decode($value, [ NAN ]);
+
+                    if (! ($fileSize <= $maxSize)) {
+                        return null;
+                    }
+
+                } elseif ('min_size' === $filter) {
+                    $minSize = $theFormat->bytes_decode($value, [ NAN ]);
+
+                    if (! ($fileSize >= $minSize)) {
+                        return null;
+                    }
+                }
+            }
+        }
+
+        return $splFileInfo;
+    }
+
+
+    /**
+     * @param \SplFileInfo|null $result
+     */
+    public function type_image(
+        &$result, $value,
+        ?array $extensions = null, ?array $mimeTypes = null,
+        ?array $filters = null
+    ) : bool
+    {
+        $result = null;
+
+        $status = $this->type_file(
+            $splFileInfo, $value,
+            $extensions, $mimeTypes,
+            $filters
+        );
+
+        if (! $status) {
+            return false;
+        }
+
+        if (null !== $filters) {
+            if (null !== $splFileInfo) {
+                $splFileInfo = $this->type_image_filters($splFileInfo, $filters);
+            }
+        }
+
+        if (null !== $splFileInfo) {
+            $result = $splFileInfo;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function type_image_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
+    {
+        if (0 === count($filters)) {
+            return $splFileInfo;
+        }
+
+        $filtersList = [
+            'max_width'  => true,
+            'max_height' => true,
+            'min_width'  => true,
+            'min_height' => true,
+            'width'      => true,
+            'height'     => true,
+            'ratio'      => true,
+        ];
+
+        $filtersIntersect = array_intersect_key($filters, $filtersList);
+
+        if (0 !== count($filtersIntersect)) {
+            $fileRealpath = $splFileInfo->getRealPath();
+
+            try {
+                $array = getimagesize($fileRealpath);
+            }
+            catch ( \Throwable $e ) {
+                $array = false;
+            }
+
+            if (false === $array) {
+                return null;
+            }
+
+            [ $imageWidth, $imageHeight ] = $array;
+
+            $theType = Lib::type();
+
+            foreach ( $filters as $filter => $value ) {
+                if ('max_width' === $filter) {
+                    if (! $theType->numeric_int_positive($maxWidth, $value)) {
+                        return null;
+                    }
+
+                    if (! ($imageWidth <= $maxWidth)) {
+                        return null;
+                    }
+
+                } elseif ('max_height' === $filter) {
+                    if (! $theType->numeric_int_positive($maxHeight, $value)) {
+                        return null;
+                    }
+
+                    if (! ($imageHeight <= $maxHeight)) {
+                        return null;
+                    }
+
+                } elseif ('min_width' === $filter) {
+                    if (! $theType->numeric_int_positive($minWidth, $value)) {
+                        return null;
+                    }
+
+                    if (! ($imageWidth >= $minWidth)) {
+                        return null;
+                    }
+
+                } elseif ('min_height' === $filter) {
+                    if (! $theType->numeric_int_positive($minHeight, $value)) {
+                        return null;
+                    }
+
+                    if (! ($imageHeight >= $minHeight)) {
+                        return null;
+                    }
+
+                } elseif ('width' === $filter) {
+                    if (! $theType->numeric_int_positive($exactWidth, $value)) {
+                        return null;
+                    }
+
+                    if (! ($imageWidth == $exactWidth)) {
+                        return null;
+                    }
+
+                } elseif ('height' === $filter) {
+                    if (! $theType->numeric_int_positive($exactHeight, $value)) {
+                        return null;
+                    }
+
+                    if (! ($imageHeight == $exactHeight)) {
+                        return null;
+                    }
+
+                } elseif ('ratio' === $filter) {
+                    if ($theType->numeric($number, $value)) {
+                        $ratio = $number;
+                        $ratio = round($ratio, 3);
+
+                    } elseif ($theType->string_not_empty($string, $value)) {
+                        [ $ratioW, $ratioH ] = explode('/', $string) + [ 0, 0 ];
+
+                        if (! $theType->numeric_int_positive($ratioWInt, $ratioW)) {
+                            return null;
+                        }
+                        if (! $theType->numeric_int_positive($ratioHInt, $ratioH)) {
+                            return null;
+                        }
+
+                        $ratio = $ratioW / $ratioH;
+                        $ratio = round($ratio, 3);
+
+                    } else {
+                        return null;
+                    }
+
+                    $imageRatio = $imageWidth / $imageHeight;
+                    $imageRatio = round($imageRatio, 3);
+
+                    if ($ratio !== $imageRatio) {
+                        return null;
+                    }
+                }
+            }
+        }
+
+        return $splFileInfo;
+    }
+
+
+    public function pathinfo(string $path, ?int $flags = null, ?string $separator = null) : array
+    {
+        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+
+        return Lib::php()->pathinfo($path, $flags, $separator, '.');
+    }
+
+    public function dirname(string $path, ?int $levels = null, ?string $separator = null) : ?string
+    {
+        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+
+        return Lib::php()->dirname($path, $separator, $levels);
+    }
+
+    public function basename(string $path, ?string $extension = null) : ?string
+    {
+        return Lib::php()->basename($path, $extension);
+    }
+
+    public function filename(string $path) : ?string
+    {
+        return Lib::php()->filename($path, '.');
+    }
+
+    public function extension(string $path) : ?string
+    {
+        return Lib::php()->extension($path, '.');
+    }
+
+    public function extensions(string $path) : ?string
+    {
+        return Lib::php()->extensions($path, '.');
+    }
+
+
+    public function path_normalize(string $path, ?string $separator = null) : string
+    {
+        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+
+        if ($this->type_realpath($realpath, $path)) {
+            $normalized = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+
+        } else {
+            $normalized = Lib::php()->path_normalize($path, $separator);
+        }
+
+        return $normalized;
+    }
+
+    public function path_resolve(string $path, ?string $separator = null) : string
+    {
+        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+
+        if ($this->type_realpath($realpath, $path)) {
+            $resolved = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+
+        } else {
+            $resolved = Lib::php()->path_resolve($path, $separator, '.');
+        }
+
+        return $resolved;
+    }
+
+
+    public function path_relative(
+        string $path, string $root,
+        ?string $separator = null
+    ) : string
+    {
+        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+
+        return Lib::php()->path_relative($path, $root, $separator, '.');
+    }
+
+    public function path_absolute(
+        string $path, string $current,
+        ?string $separator = null
+    ) : string
+    {
+        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+
+        return Lib::php()->path_absolute($path, $current, $separator, '.');
+    }
+
+    public function path_or_absolute(
+        string $path, string $current,
+        ?string $separator = null
+    ) : string
+    {
+        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+
+        return Lib::php()->path_or_absolute($path, $current, $separator, '.');
     }
 
 
@@ -416,10 +851,6 @@ class FsModule
 
 
     /**
-     * @param string     $dirpath
-     * @param array|null $recursiveDirectoryIteratorArgs
-     * @param array|null $recursiveIteratorIteratorArgs
-     *
      * @return \Generator<\SplFileInfo>
      */
     public function dir_walk_it(
@@ -515,81 +946,6 @@ class FsModule
         }
 
         return true;
-    }
-
-
-    /**
-     * > заменяет слеши в пути на указанные
-     */
-    public function path_normalize(string $path, ?string $separator = null) : string
-    {
-        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
-
-        if ($this->type_realpath($realpath, $path)) {
-            $normalized = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
-
-        } else {
-            $normalized = Lib::php()->path_normalize($path, $separator);
-        }
-
-        return $normalized;
-    }
-
-    /**
-     * > разбирает последовательности `./path` и `../path` и возвращает нормализованный путь
-     */
-    public function path_resolve(string $path, ?string $separator = null) : string
-    {
-        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
-
-        if ($this->type_realpath($realpath, $path)) {
-            $resolved = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
-
-        } else {
-            $resolved = Lib::php()->path_resolve($path, $separator, '.');
-        }
-
-        return $resolved;
-    }
-
-
-    /**
-     * > возвращает относительный нормализованный путь, отрезая у него $root
-     */
-    public function path_relative(
-        string $path, string $root,
-        ?string $separator = null
-    ) : string
-    {
-        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
-
-        return Lib::php()->path_relative($path, $root, $separator, '.');
-    }
-
-    /**
-     * > возвращает абсолютный нормализованный путь, с поддержкой `./path` и `../path`
-     */
-    public function path_absolute(
-        string $path, string $current,
-        ?string $separator = null
-    ) : string
-    {
-        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
-
-        return Lib::php()->path_absolute($path, $current, $separator, '.');
-    }
-
-    /**
-     * > возвращает абсолютный нормализованный путь, с поддержкой `./path` и `../path`, но только если путь начинается с `.`
-     */
-    public function path_or_absolute(
-        string $path, string $current,
-        ?string $separator = null
-    ) : string
-    {
-        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
-
-        return Lib::php()->path_or_absolute($path, $current, $separator, '.');
     }
 
 

@@ -14,11 +14,6 @@ class Number implements
     ToStringInterface
 {
     /**
-     * @var string
-     */
-    protected $value;
-
-    /**
      * @var mixed
      */
     protected $original;
@@ -45,28 +40,33 @@ class Number implements
      */
     protected $scale;
 
+    /**
+     * @var string
+     */
+    protected $value;
 
-    public function __construct(
-        $original,
-        //
-        string $sign,
-        string $int,
-        string $frac,
-        string $exp,
-        //
-        int $scale
-    )
+
+    private function __construct()
     {
-        $this->original = $original;
+    }
 
-        $this->sign = $sign;
-        $this->int = $int;
-        $this->frac = $frac;
-        $this->exp = $exp;
 
-        $this->scale = $scale;
+    public static function fromValid(array $valid)
+    {
+        $instance = new static();
 
-        $this->value = "{$this->sign}{$this->int}{$this->frac}{$this->exp}";
+        $instance->original = $valid[ 'original' ];
+
+        $instance->sign = $valid[ 'sign' ];
+        $instance->int = $valid[ 'int' ];
+        $instance->frac = $valid[ 'frac' ];
+        $instance->exp = $valid[ 'exp' ];
+
+        $instance->scale = $valid[ 'scale' ];
+
+        $instance->value = "{$instance->sign}{$instance->int}{$instance->frac}{$instance->exp}";
+
+        return $instance;
     }
 
 
@@ -154,6 +154,6 @@ class Number implements
 
     public function getValueAbsoluteInteger() : string
     {
-        return "{$this->int}";
+        return $this->int;
     }
 }

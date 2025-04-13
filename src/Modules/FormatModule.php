@@ -10,87 +10,174 @@ use Gzhegow\Lib\Exception\RuntimeException;
 class FormatModule
 {
     /**
-     * @return null|int|float
+     * @return int|float
      */
-    public function bytes_decode(string $size) // : null|int|float
+    public function bytes_decode(
+        string $bytesSize, array $fallback = []
+    ) // : int|float
     {
-        if (! strlen($size)) {
-            return null;
+        $decoded = null;
+
+        $e = null;
+        try {
+            $decoded = $this->_bytes_decode($bytesSize);
+        }
+        catch ( \Throwable $e ) {
         }
 
-        $aUnits = [
-            'B'  => 0,
-            'K'  => 1,
-            'KB' => 1,
-            'M'  => 2,
-            'MB' => 2,
-            'G'  => 3,
-            'GB' => 3,
-            'T'  => 4,
-            'TB' => 4,
-            'P'  => 5,
-            'PB' => 5,
-            'E'  => 6,
-            'EB' => 6,
-            'Z'  => 7,
-            'ZB' => 7,
-            'Y'  => 8,
-            'YB' => 8,
-        ];
+        if (null !== $decoded) {
+            $bytesNum = $decoded;
 
-        if (! preg_match('~^([0-9]+)([A-Z]{0,2})$~', $size, $matches)) {
-            return null;
-        }
+        } elseif (0 !== count($fallback)) {
+            [ $bytesNum ] = $fallback;
 
-        [ , $iUnit, $sUnit ] = $matches;
-
-        if ('' === $sUnit) {
-            $sUnit = 'B';
-        }
-
-        if (! isset($aUnits[ $sUnit ])) {
-            throw new LogicException(
-                [ "Unknown `sUnit`", $sUnit ]
+        } else {
+            throw new RuntimeException(
+                [ 'Unable to ' . __FUNCTION__, $bytesSize, $e ]
             );
         }
 
-        $iUnit = (int) $iUnit;
-        if (0 === $iUnit) {
-            return 0;
-        }
-
-        $result = $iUnit * pow(1024, $aUnits[ $sUnit ]);
-
-        return $result;
+        return $bytesNum;
     }
 
     /**
-     * @param float|int $bytes
+     * @return int|float
      */
-    public function bytes_encode($bytes, ?int $precision = null, ?int $lenUnit = null) : string
+    protected function _bytes_decode(string $size, ?int $precision = null) // : int|float
     {
         $precision = $precision ?? 3;
-        $lenUnit = $lenUnit ?? 2;
 
-        if (! Lib::type()->num_non_negative($var, $bytes)) {
+        if ('' === $size) {
+            throw new LogicException(
+                [ 'The `size` should be non-empty string', $size ]
+            );
+        }
+
+        $strUnitList = [
+            [ 'B' => 0 ],
+            [ 'K' => 1, 'KB' => 1 ],
+            [ 'M' => 2, 'MB' => 2 ],
+            [ 'G' => 3, 'GB' => 3 ],
+            [ 'T' => 4, 'TB' => 4 ],
+            [ 'P' => 5, 'PB' => 5 ],
+            [ 'E' => 6, 'EB' => 6 ],
+            [ 'Z' => 7, 'ZB' => 7 ],
+            [ 'Y' => 8, 'YB' => 8 ],
+        ];
+        $strUnitList = array_merge(...$strUnitList);
+
+        if (! preg_match($regex = '~^(.*[0-9])([A-Z]{0,2})$~', $size, $matches)) {
+            throw new LogicException(
+                [ 'The `size` should match regex: ' . $regex, $size ]
+            );
+        }
+
+        [ , $numUnit, $strUnit ] = $matches;
+
+        if ('' === $strUnit) {
+            $strUnit = 'B';
+        }
+
+        if (! isset($strUnitList[ $strUnit ])) {
+            throw new LogicException(
+                [ 'Unknown `strUnit`', $strUnit ]
+            );
+        }
+
+        if (! Lib::type()->num_positive($number, $numUnit)) {
+            throw new LogicException(
+                [ 'Invalid `numUnit`', $numUnit ]
+            );
+        }
+
+        if (0 == $numUnit) {
+            return 0;
+        }
+
+        $bytesNum = $numUnit * pow(1024, $strUnitList[ $strUnit ]);
+
+        $bytesCeil = ceil($bytesNum);
+
+        if ($bytesCeil === false) {
+            throw new LogicException(
+                [ 'Unable to ceil', $bytesNum ]
+            );
+        }
+
+        $bytesInt = (int) $bytesCeil;
+
+        return $bytesInt;
+    }
+
+
+    /**
+     * @param int|float $bytes
+     */
+    public function bytes_encode(
+        $bytes, array $fallback = [],
+        ?int $precision = null, ?int $unitLen = null
+    ) : string
+    {
+        $encoded = null;
+
+        $e = null;
+        try {
+            $encoded = $this->_bytes_encode(
+                $bytes,
+                $precision, $unitLen
+            );
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if (null !== $encoded) {
+            $bytesSize = $encoded;
+
+        } elseif (0 !== count($fallback)) {
+            [ $bytesSize ] = $fallback;
+
+        } else {
+            throw new RuntimeException(
+                [ 'Unable to ' . __FUNCTION__, $bytes, $e ]
+            );
+        }
+
+        return $bytesSize;
+    }
+
+    /**
+     * @param int|float $bytes
+     */
+    protected function _bytes_encode($bytes, ?int $precision = null, ?int $unitLen = null) : string
+    {
+        if (! Lib::type()->num_non_negative($number, $bytes)) {
             throw new LogicException(
                 [ 'The `bytes` should be non-negative num', $bytes ]
             );
         }
 
-        $units = [ 'B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ];
+        $precision = $precision ?? 3;
+        $unitLen = $unitLen ?? 2;
 
-        $_bytes = max($bytes, 0);
+        if (0 == $number) {
+            return '0B';
+        }
 
-        $pow = floor(($_bytes ? log($_bytes) : 0) / log(1024));
-        $pow = min($pow, count($units) - 1);
+        $strUnitList = [ 'B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ];
 
-        $_bytes /= pow(1024, $pow);
+        $left = $number;
 
-        $unit = $units[ $pow ];
-        $unit = substr($unit, 0, $lenUnit);
+        $pow = floor(log($number) / log(1024));
+        $pow = min($pow, count($strUnitList) - 1);
 
-        return round($_bytes, $precision) . $unit;
+        $left /= pow(1024, $pow);
+
+        $unit = $strUnitList[ $pow ];
+        $unit = substr($unit, 0, $unitLen);
+
+        $size = round($left, $precision) . $unit;
+
+        return $size;
     }
 
 

@@ -446,13 +446,14 @@ class PhpModule
         }
 
         $_value = $this->basename($_value, '\\');
-        if (null === $_value) {
-            return false;
+
+        if (null !== $_value) {
+            $result = $_value;
+
+            return true;
         }
 
-        $result = $_value;
-
-        return $_value;
+        return false;
     }
 
 
@@ -1847,8 +1848,8 @@ class PhpModule
      * }
      */
     public function pathinfo(
-        string $path, ?int $flags = null,
-        ?string $separator = null, ?int $levels = null, ?string $dot = null
+        string $path, ?string $separator = null, ?string $dot = null,
+        ?int $flags = null
     ) : array
     {
         if ('' === $path) {
@@ -1858,16 +1859,9 @@ class PhpModule
         }
 
         $flags = $flags ?? _PHP_PATHINFO_ALL;
-        $levels = $levels ?? 1;
 
         $separator = Lib::parse()->char($separator) ?? '/';
         $dot = Lib::parse()->char($dot) ?? '.';
-
-        if ($levels < 1) {
-            throw new LogicException(
-                [ 'The `levels` should be GTE 1', $levels ]
-            );
-        }
 
         if ('/' === $dot) {
             throw new LogicException(
@@ -1887,7 +1881,7 @@ class PhpModule
                 $dirname = null;
 
             } else {
-                $dirname = dirname($dirname, $levels);
+                $dirname = dirname($dirname);
 
                 $dirname = str_replace('/', $separator, $dirname);
 
@@ -1933,10 +1927,10 @@ class PhpModule
         return $pi;
     }
 
-    /**
-     * > поддерживает предварительную замену $separator на '/'
-     */
-    public function dirname(string $path, ?string $separator = null, ?int $levels = null) : ?string
+    public function dirname(
+        string $path, ?string $separator = null,
+        ?int $levels = null
+    ) : ?string
     {
         if ('' === $path) {
             throw new LogicException(
@@ -1970,9 +1964,6 @@ class PhpModule
         return ('' !== $dirname) ? $dirname : null;
     }
 
-    /**
-     * > поддерживает предварительную замену $separator на '/'
-     */
     public function basename(string $path, ?string $extension = null) : ?string
     {
         if ('' === $path) {
@@ -1988,9 +1979,6 @@ class PhpModule
         return ('' !== $basename) ? $basename : null;
     }
 
-    /**
-     * > поддерживает предварительную замену $separator на '/'
-     */
     public function filename(string $path, ?string $dot = null) : ?string
     {
         if ('' === $path) {
@@ -2010,9 +1998,6 @@ class PhpModule
         return ('' !== $filename) ? $filename : null;
     }
 
-    /**
-     * > поддерживает предварительную замену $separator на '/'
-     */
     public function extension(string $path, ?string $dot = null) : ?string
     {
         if ('' === $path) {
@@ -2034,10 +2019,7 @@ class PhpModule
         return ('' !== $extension) ? $extension : null;
     }
 
-    /**
-     * > поддерживает предварительную замену $separator на '/'
-     */
-    public function extensions(string $path, ?string $separator = null, ?string $dot = null) : ?string
+    public function extensions(string $path, ?string $dot = null) : ?string
     {
         if ('' === $path) {
             throw new LogicException(
@@ -2045,7 +2027,6 @@ class PhpModule
             );
         }
 
-        $separator = Lib::parse()->char($separator) ?? '/';
         $dot = Lib::parse()->char($dot) ?? '.';
 
         if ('/' === $dot) {
@@ -2054,7 +2035,7 @@ class PhpModule
             );
         }
 
-        $normalized = $this->path_normalize($path, $separator);
+        $normalized = $this->path_normalize($path, '/');
 
         $basename = basename($normalized);
 

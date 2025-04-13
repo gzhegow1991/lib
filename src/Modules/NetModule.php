@@ -3,6 +3,10 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Net\SubnetV4;
+use Gzhegow\Lib\Modules\Net\SubnetV6;
+use Gzhegow\Lib\Modules\Net\AddressIpV4;
+use Gzhegow\Lib\Modules\Net\AddressIpV6;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
@@ -20,7 +24,7 @@ class NetModule
 
 
     /**
-     * @param string|null $result
+     * @param AddressIpV4|AddressIpV6|null $result
      */
     public function type_address_ip(&$result, $value) : bool
     {
@@ -40,41 +44,53 @@ class NetModule
     }
 
     /**
-     * @param string|null $result
+     * @param AddressIpV4|null $result
      */
     public function type_address_ip_v4(&$result, $value) : bool
     {
         $result = null;
 
+        if ($value instanceof AddressIpV4) {
+            $result = $value;
+
+            return true;
+        }
+
         if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
         }
 
-        if (false === ($_value = filter_var($_value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))) {
+        if (false === ($addressIpV4 = filter_var($_value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4))) {
             return false;
         }
 
-        $result = $_value;
+        $result = AddressIpV4::fromValid($addressIpV4);
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param AddressIpV6|null $result
      */
     public function type_address_ip_v6(&$result, $value) : bool
     {
         $result = null;
 
+        if ($value instanceof AddressIpV6) {
+            $result = $value;
+
+            return true;
+        }
+
         if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
         }
 
-        if (false === ($_value = filter_var($_value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))) {
+        if (false === ($addressIpV6 = filter_var($_value, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))) {
             return false;
         }
 
-        $result = $_value;
+        $result = AddressIpV6::fromValid($addressIpV6);
 
         return true;
     }
@@ -107,7 +123,7 @@ class NetModule
 
 
     /**
-     * @param string|null $result
+     * @param SubnetV4|SubnetV6|null $result
      */
     public function type_subnet(&$result, $value, ?string $ipFallback = null) : bool
     {
@@ -127,11 +143,17 @@ class NetModule
     }
 
     /**
-     * @param string|null $result
+     * @param SubnetV4|null $result
      */
     public function type_subnet_v4(&$result, $value, ?string $ipFallback = null) : bool
     {
         $result = null;
+
+        if ($value instanceof SubnetV4) {
+            $result = $value;
+
+            return true;
+        }
 
         $theType = Lib::type();
 
@@ -204,7 +226,9 @@ class NetModule
         $hasSubnetInt = (null !== $subnetInt);
 
         if ($hasIpString && $hasSubnetInt) {
-            $result = "{$addressIpString}/{$subnetInt}";
+            $subnetV4 = "{$addressIpString}/{$subnetInt}";
+
+            $result = SubnetV4::fromValid($subnetV4);
 
             return true;
         }
@@ -213,11 +237,17 @@ class NetModule
     }
 
     /**
-     * @param string|null $result
+     * @param SubnetV6|null $result
      */
     public function type_subnet_v6(&$result, $value, ?string $ipFallback = null) : bool
     {
         $result = null;
+
+        if ($value instanceof SubnetV6) {
+            $result = $value;
+
+            return true;
+        }
 
         $theType = Lib::type();
 
@@ -263,7 +293,9 @@ class NetModule
         $hasSubnetInt = (null !== $subnetInt);
 
         if ($hasIpString && $hasSubnetInt) {
-            $result = "{$addressIpString}/{$subnetInt}";
+            $subnetV6 = "{$addressIpString}/{$subnetInt}";
+
+            $result = SubnetV6::fromValid($subnetV6);
 
             return true;
         }
@@ -272,7 +304,7 @@ class NetModule
     }
 
     /**
-     * @param string|null $result
+     * @param int|null $result
      */
     protected function type_subnet_v4_iplike(&$result, $subnet) : bool
     {
@@ -308,82 +340,189 @@ class NetModule
     }
 
 
-    public function is_ip_in_subnet(string $ip, string $subnet, ?string $subnetIpFallback = null) : bool
+    /**
+     * @param AddressIpV4|AddressIpV6  $addressIp
+     * @param array<SubnetV4|SubnetV6> $subnets
+     */
+    public function is_ip_in_subnets($addressIp, array $subnets) : bool
     {
-        $ipV4String = null;
-        $ipV6String = null;
-        $subnetV4String = null;
-        $subnetV6String = null;
+        /**
+         * @var AddressIpV4 $addressIpV4
+         * @var AddressIpV6 $addressIpV6
+         * @var SubnetV4    $subnetV4
+         * @var SubnetV6    $subnetV6
+         */
+
+        $addressIpV4 = null;
+        $addressIpV6 = null;
 
         $statusIp = false
-            || $this->type_address_ip_v4($ipV4String, $ip)
-            || $this->type_address_ip_v6($ipV6String, $ip);
+            || $this->type_address_ip_v4($addressIpV4, $addressIp)
+            || $this->type_address_ip_v6($addressIpV6, $addressIp);
 
         if (! $statusIp) {
             throw new LogicException(
                 [
                     'The `ip` should be valid IPv4 or IPv6 address',
-                    $ip,
+                    $addressIp,
                 ]
             );
         }
 
-        $statusSubnet = false
-            || $this->type_subnet_v4($subnetV4String, $subnet, $subnetIpFallback)
-            || $this->type_subnet_v6($subnetV6String, $subnet, $subnetIpFallback);
+        $isV4 = (null !== $addressIpV4);
+        $isV6 = (null !== $addressIpV6);
 
-        if (! $statusSubnet) {
-            throw new LogicException(
-                [
-                    'The `subnet` should be valid IPv4 or IPv6 mask',
-                    $subnet,
-                    $subnetIpFallback,
-                ]
-            );
+        $subnetsV4 = [];
+        $subnetsV6 = [];
+        foreach ( $subnets as $i => $subnet ) {
+            if ($isV4) {
+                $statusSubnet = $this->type_subnet_v4($subnetV4, $subnet);
+
+                if (! $statusSubnet) {
+                    throw new LogicException(
+                        [
+                            'The `subnet` should be valid IPv4 mask',
+                            $subnet,
+                            $i,
+                        ]
+                    );
+                }
+
+                $subnetsV4[ $i ] = $subnetV4;
+
+            } elseif ($isV6) {
+                $statusSubnet = $this->type_subnet_v6($subnetV6, $subnet);
+
+                if (! $statusSubnet) {
+                    throw new LogicException(
+                        [
+                            'The `subnet` should be valid IPv6 mask',
+                            $subnet,
+                            $i,
+                        ]
+                    );
+                }
+
+                $subnetsV6[ $i ] = $subnetV6;
+            }
         }
 
-        $isIpV4 = (null !== $ipV4String) && (null !== $subnetV4String);
-        $isIpV6 = (null !== $ipV6String) && (null !== $subnetV6String);
+        $status = false;
 
-        if ($isIpV4) {
-            $status = $this->is_ip_in_subnet_v4($ipV4String, $subnetV4String);
+        if ($isV4 && (0 !== count($subnetsV4))) {
+            $status = $this->is_ip_in_subnets_v4($addressIpV4, $subnetsV4);
 
-        } elseif ($isIpV6) {
-            $status = $this->is_ip_in_subnet_v6($ipV6String, $subnetV6String);
-
-        } else {
-            $status = false;
+        } elseif ($isV6 && (0 !== count($subnetsV6))) {
+            $status = $this->is_ip_in_subnets_v6($addressIpV6, $subnetsV6);
         }
 
         return $status;
     }
 
-    public function is_ip_in_subnet_v4(string $ip, string $subnet, ?string $subnetIpFallback = null) : bool
+    /**
+     * @param SubnetV4[] $subnetsV4
+     */
+    public function is_ip_in_subnets_v4(AddressIpV4 $addressIpV4, array $subnetsV4) : bool
     {
-        $status = $this->type_address_ip_v4($ipString, $ip);
-        if (! $status) {
+        foreach ( $subnetsV4 as $subnetV4 ) {
+            if ($this->is_ip_in_subnet_v4($addressIpV4, $subnetV4)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param SubnetV6[] $subnetsV6
+     */
+    public function is_ip_in_subnets_v6(AddressIpV6 $addressIpV6, array $subnetsV6) : bool
+    {
+        foreach ( $subnetsV6 as $subnetV6 ) {
+            if ($this->is_ip_in_subnet_v6($addressIpV6, $subnetV6)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param AddressIpV4|AddressIpV6 $addressIp
+     * @param SubnetV4|SubnetV6       $subnet
+     *
+     * @return bool
+     */
+    public function is_ip_in_subnet($addressIp, $subnet) : bool
+    {
+        /**
+         * @var AddressIpV4 $addressIpV4
+         * @var AddressIpV6 $addressIpV6
+         * @var SubnetV4    $subnetV4
+         * @var SubnetV6    $subnetV6
+         */
+
+        $addressIpV4 = null;
+        $addressIpV6 = null;
+        $subnetV4 = null;
+        $subnetV6 = null;
+
+        $statusIp = false
+            || $this->type_address_ip_v4($addressIpV4, $addressIp)
+            || $this->type_address_ip_v6($addressIpV6, $addressIp);
+
+        if (! $statusIp) {
             throw new LogicException(
                 [
-                    'The `ip` should be valid IPv4 address',
-                    $ip,
+                    'The `ip` should be valid IPv4 or IPv6 address',
+                    $addressIp,
                 ]
             );
         }
 
-        $status = $this->type_subnet_v4($subnetString, $subnet, $subnetIpFallback);
-        if (! $status) {
-            throw new LogicException(
-                [
-                    'The `subnet` should be valid IPv4 mask',
-                    $subnet,
-                    $subnetIpFallback,
-                ]
-            );
+        $isV4 = (null !== $addressIpV4);
+        $isV6 = (null !== $addressIpV6);
+
+        $status = false;
+
+        if ($isV4) {
+            $statusSubnet = $this->type_subnet_v4($subnetV4, $subnet);
+
+            if (! $statusSubnet) {
+                throw new LogicException(
+                    [
+                        'The `subnet` should be valid IPv4 mask',
+                        $subnet,
+                    ]
+                );
+            }
+
+            $status = $this->is_ip_in_subnet_v4($addressIpV4, $subnetV4);
+
+        } elseif ($isV6) {
+            $statusSubnet = $this->type_subnet_v6($subnetV6, $subnet);
+
+            if (! $statusSubnet) {
+                throw new LogicException(
+                    [
+                        'The `subnet` should be valid IPv6 mask',
+                        $subnet,
+                    ]
+                );
+            }
+
+            $status = $this->is_ip_in_subnet_v6($addressIpV6, $subnetV6);
         }
 
-        [ $subnetIpString, $subnetBitsInt ] = explode('/', $subnetString, 2);
+        return $status;
+    }
 
-        $ipLong = ip2long($ipString);
+    public function is_ip_in_subnet_v4(AddressIpV4 $addressIpV4, SubnetV4 $subnetV4) : bool
+    {
+        [ $subnetIpString, $subnetBitsInt ] = explode('/', $subnetV4->getValue(), 2);
+
+        $ipLong = ip2long($addressIpV4->getValue());
         $subnetIpLong = ip2long($subnetIpString);
         $subnetBitsInt = (int) $subnetBitsInt;
 
@@ -394,32 +533,11 @@ class NetModule
         return $status;
     }
 
-    public function is_ip_in_subnet_v6(string $ip, string $subnet, ?string $subnetIpFallback = null) : bool
+    public function is_ip_in_subnet_v6(AddressIpV6 $addressIpV6, SubnetV6 $subnetV6) : bool
     {
-        $status = $this->type_address_ip_v6($ipString, $ip);
-        if (! $status) {
-            throw new LogicException(
-                [
-                    'The `ip` should be valid IPv6 address',
-                    $ip,
-                ]
-            );
-        }
+        [ $subnetIpString, $subnetBitsInt ] = explode('/', $subnetV6->getValue(), 2);
 
-        $status = $this->type_subnet_v6($subnetString, $subnet, $subnetIpFallback);
-        if (! $status) {
-            throw new LogicException(
-                [
-                    'The `subnet` should be valid IPv6 mask',
-                    $subnet,
-                    $subnetIpFallback,
-                ]
-            );
-        }
-
-        [ $subnetIpString, $subnetBitsInt ] = explode('/', $subnetString, 2);
-
-        $ipBin = inet_pton($ipString);
+        $ipBin = inet_pton($addressIpV6->getValue());
         $subnetIpBin = inet_pton($subnetIpString);
         $subnetBitsInt = (int) $subnetBitsInt;
 
@@ -452,69 +570,51 @@ class NetModule
     }
 
 
-    public function ip() : string
-    {
-        $_ip = $this->ip_localhost();
-
-        return $_ip;
-    }
-
     public function ip_client() : ?string
     {
-        $_ip = Lib::parse()->ip($_SERVER[ 'REMOTE_ADDR' ] ?? null);
+        $status = $this->type_address_ip($ip, $_SERVER[ 'REMOTE_ADDR' ] ?? null);
 
-        return $_ip;
+        if ($status) {
+            return $ip;
+        }
+
+        return null;
     }
 
-    public function ip_localhost() : ?string
+    public function ip_client_proxy() : ?string
     {
-        $_ip = null
-            ?? Lib::parse()->ip($_SERVER[ 'REMOTE_ADDR' ] ?? null)
-            ?? '127.0.0.1';
+        $status = false
+            || $this->type_address_ip($ip, $_SERVER[ 'REMOTE_ADDR' ] ?? null)
+            || $this->type_address_ip($ip, $_SERVER[ 'HTTP_CLIENT_IP' ] ?? null)
+            || $this->type_address_ip($ip, $_SERVER[ 'HTTP_X_FORWARDED_FOR' ] ?? null);
 
-        return $_ip;
+        if ($status) {
+            return $ip;
+        }
+
+        return null;
     }
 
-    public function ip_client_proxy()
+    public function ip_localhost() : string
     {
-        $_ip = null
-            ?? Lib::parse()->ip($_SERVER[ 'REMOTE_ADDR' ] ?? null)
-            ?? Lib::parse()->ip($_SERVER[ 'HTTP_CLIENT_IP' ] ?? null)
-            ?? Lib::parse()->ip($_SERVER[ 'HTTP_X_FORWARDED_FOR' ] ?? null);
-
-        return $_ip;
+        return '127.0.0.1';
     }
 
 
-    public function user_agent() : string
-    {
-        $_ip = $this->user_agent_php();
-
-        return $_ip;
-    }
-
-    public function user_agent_client() : string
+    public function user_agent_client() : ?string
     {
         $_userAgent = Lib::parse()->string_not_empty($_SERVER[ 'HTTP_USER_AGENT' ] ?? null);
 
         return $_userAgent;
     }
 
-    public function user_agent_php() : string
-    {
-        $_userAgent = null
-            ?? $this->user_agent_client()
-            ?? 'PHP ' . phpversion();
-
-        return $_userAgent;
-    }
-
     public function user_agent_browser() : string
     {
-        $_userAgent = null
-            ?? $this->user_agent_client()
-            ?? 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36';
+        return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36';
+    }
 
-        return $_userAgent;
+    public function user_agent_php() : string
+    {
+        return 'PHP ' . phpversion();
     }
 }
