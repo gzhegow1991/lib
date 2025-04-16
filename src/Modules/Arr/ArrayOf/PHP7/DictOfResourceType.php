@@ -2,10 +2,10 @@
 
 namespace Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7;
 
-use Gzhegow\Lib\Modules\Arr\ArrayOf\Base\AbstractArrayOfResources;
+use Gzhegow\Lib\Modules\Arr\ArrayOf\Base\AbstractDictOfResourceType;
 
 
-class ArrayOfResources extends AbstractArrayOfResources implements
+class DictOfResourceType extends AbstractDictOfResourceType implements
     \ArrayAccess,
     \Countable,
     \IteratorAggregate,

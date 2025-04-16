@@ -2295,4 +2295,132 @@ class TypeModule extends TypeModuleBase
             $filters
         );
     }
+
+
+    public function email(
+        &$result, $value,
+        ?array $filters = null,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::social()->type_email(
+            $result, $value,
+            $filters,
+            $refs
+        );
+    }
+
+    public function email_fake(
+        &$result, $value,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::social()->type_email_fake(
+            $result, $value,
+            $refs
+        );
+    }
+
+    public function email_non_fake(
+        &$result, $value,
+        ?array $filters = null,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::social()->type_email_non_fake(
+            $result, $value,
+            $filters,
+            $refs
+        );
+    }
+
+
+    public function phone(
+        &$result, $value,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::social()->type_phone(
+            $result, $value,
+            $refs,
+        );
+    }
+
+    public function phone_fake(
+        &$result, $value,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::social()->type_phone_fake(
+            $result, $value,
+            $refs,
+        );
+    }
+
+    public function phone_non_fake(
+        &$result, $value,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::social()->type_phone_non_fake(
+            $result, $value,
+            $refs,
+        );
+    }
+
+    public function phone_real(
+        &$result, $value,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::social()->type_phone_real(
+            $result, $value,
+            $refs,
+        );
+    }
+
+
+    public function tel(
+        &$result, $value,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::social()->type_tel(
+            $result, $value,
+            $refs,
+        );
+    }
+
+    public function tel_fake(
+        &$result, $value,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::social()->type_tel_fake(
+            $result, $value,
+            $refs,
+        );
+    }
+
+    public function tel_non_fake(
+        &$result, $value,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::social()->type_tel_non_fake(
+            $result, $value,
+            $refs,
+        );
+    }
+
+    public function tel_real(
+        &$result, $value,
+        array $refs = []
+    ) : bool
+    {
+        return Lib::social()->type_tel_real(
+            $result, $value,
+            $refs,
+        );
+    }
 }

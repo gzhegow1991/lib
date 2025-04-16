@@ -2631,4 +2631,180 @@ class AssertModule extends AssertModuleBase
 
 		return $this;
 	}
+
+
+	public function email(?array $filters = null, array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $filters, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->email(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $filters, $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	public function email_fake(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->email_fake(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	public function email_non_fake(?array $filters = null, array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $filters, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->email_non_fake(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $filters, $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	public function phone(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->phone(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	public function phone_fake(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->phone_fake(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	public function phone_non_fake(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->phone_non_fake(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	public function phone_real(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->phone_real(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	public function tel(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->tel(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	public function tel_fake(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->tel_fake(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	public function tel_non_fake(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->tel_non_fake(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	public function tel_real(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->tel_real(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
 }

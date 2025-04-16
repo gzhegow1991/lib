@@ -3,7 +3,7 @@
 namespace Gzhegow\Lib\Modules\Str\Interpolator;
 
 
-class Interpolator implements InterpolatorInterface
+class DefaultInterpolator implements InterpolatorInterface
 {
     public function interpolate(string $string, array $placeholders = []) : string
     {

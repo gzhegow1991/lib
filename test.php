@@ -1,6 +1,5 @@
 <?php
 
-require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
 require_once __DIR__ . '/vendor/autoload.php';
 
 
@@ -24,6 +23,7 @@ ini_set('memory_limit', '32M');
     ->useErrorHandler()
     ->useExceptionHandler()
 ;
+
 
 
 // > добавляем несколько функция для тестирования
@@ -2008,6 +2008,61 @@ FALSE
 
 
 // >>> TEST
+// > тесты EscapeModule
+$fn = function () {
+    _print('[ EscapeModule ]');
+    echo PHP_EOL;
+
+
+    $params = [];
+    $sqlIn = \Gzhegow\Lib\Lib::escape()->sql_in($params, 'AND `user_id`', [ 1, 2, 3 ]);
+    _print($sqlIn);
+    _print_array($params);
+
+    echo PHP_EOL;
+
+
+    $params = [];
+    $sqlIn = \Gzhegow\Lib\Lib::escape()->sql_in($params, 'AND `user_id`', [ 1, 2, 3 ], 'user_id');
+    _print($sqlIn);
+    _print_array($params);
+
+    echo PHP_EOL;
+
+
+    $sqlLike = \Gzhegow\Lib\Lib::escape()->sql_like_quote('Hello, _user_! How are you today, in percents (%)?', '\\');
+    _print($sqlLike);
+
+    $sqlLike = \Gzhegow\Lib\Lib::escape()->sql_like_escape(
+        'AND `search`', 'ILIKE',
+        'Hello, _user_! How are you today, in percents (%)?'
+    );
+    _print($sqlLike);
+
+    $sqlLike = \Gzhegow\Lib\Lib::escape()->sql_like_escape(
+        'AND `name`', 'LIKE',
+        [ '__' ], 'user%%__', [ '%' ]
+    );
+    _print($sqlLike);
+
+    echo PHP_EOL;
+};
+_assert_stdout($fn, [], '
+"[ EscapeModule ]"
+
+"AND `user_id` IN (?, ?, ?)"
+[ 1, 2, 3 ]
+
+"AND `user_id` IN (:user_id0, :user_id1, :user_id2)"
+[ ":user_id0" => 1, ":user_id1" => 2, ":user_id2" => 3 ]
+
+"Hello, \_user\_! How are you today, in percents (\%)?"
+"AND `search` ILIKE \"Hello, \_user\_! How are you today, in percents (\%)?\""
+"AND `name` LIKE \"__user\%\%\_\_%\""
+');
+
+
+// >>> TEST
 // > тесты FormatModule
 $fn = function () {
     _print('[ FormatModule ]');
@@ -2033,42 +2088,6 @@ $fn = function () {
     [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv_encode_row([ 'col1', 'col2' ]);
     _print($csv);
     _print($bytes);
-
-    echo PHP_EOL;
-
-
-    $params = [];
-    $sqlIn = \Gzhegow\Lib\Lib::format()->sql_in($params, 'AND `user_id`', [ 1, 2, 3 ]);
-    _print($sqlIn);
-    _print_array($params);
-
-    echo PHP_EOL;
-
-
-    $params = [];
-    $sqlIn = \Gzhegow\Lib\Lib::format()->sql_in($params, 'AND `user_id`', [ 1, 2, 3 ], 'user_id');
-    _print($sqlIn);
-    _print_array($params);
-
-    echo PHP_EOL;
-
-
-    $sqlLike = \Gzhegow\Lib\Lib::format()->sql_like_quote('Hello, _user_! How are you today, in percents (%)?', '\\');
-    _print($sqlLike);
-
-    $sqlLike = \Gzhegow\Lib\Lib::format()->sql_like_escape(
-        'AND `search`', 'ILIKE',
-        'Hello, _user_! How are you today, in percents (%)?'
-    );
-    _print($sqlLike);
-
-    $sqlLike = \Gzhegow\Lib\Lib::format()->sql_like_escape(
-        'AND `name`', 'LIKE',
-        [ '__' ], 'user%%__', [ '%' ]
-    );
-    _print($sqlLike);
-
-    echo PHP_EOL;
 };
 _assert_stdout($fn, [], '
 "[ FormatModule ]"
@@ -2084,16 +2103,6 @@ val1;val2\n
 "col1;col2\n
 "
 10
-
-"AND `user_id` IN (?, ?, ?)"
-[ 1, 2, 3 ]
-
-"AND `user_id` IN (:user_id0, :user_id1, :user_id2)"
-[ ":user_id0" => 1, ":user_id1" => 2, ":user_id2" => 3 ]
-
-"Hello, \_user\_! How are you today, in percents (\%)?"
-"AND `search` ILIKE \"Hello, \_user\_! How are you today, in percents (\%)?\""
-"AND `name` LIKE \"__user\%\%\_\_%\""
 ');
 
 
@@ -3078,6 +3087,275 @@ TRUE
 
 
 // >>> TEST
+// > тесты SocialModule
+$fn = function () {
+    _print('[ SocialModule ]');
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@gmail.com');
+    _print($status, $email);
+    $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф');
+    _print($status, $email);
+    $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', [ 'filter_unicode' ]);
+    _print($status, $email);
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@gmail.com');
+    _print($status, $email);
+    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф');
+    _print($status, $email);
+    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', [ 'filter_unicode' ]);
+    _print($status, $email);
+    echo PHP_EOL;
+
+    $status = \Gzhegow\Lib\Lib::social()->type_email_fake($email, 'no-reply@gmail.com');
+    _print($status, $email);
+    $status = \Gzhegow\Lib\Lib::social()->type_email_fake($email, 'email@example.com');
+    _print($status, $email);
+    echo PHP_EOL;
+
+
+    $phones = [
+        // > номера BY
+        '+375 (29) 676-48-68',
+        '+375296764868',
+        '375296764868',
+
+        // > номера RU
+        '+7 (862) 220-40-16',
+        '+78622204016',
+        '78622204016',
+
+        // > номера, начинающиеся на 89
+        '89123456789',
+        '89234567890',
+        '89345678901',
+        '89456789012',
+        '89567890123',
+
+        // > номера, начинающиеся на 9 и имеющие 10 цифр:
+        '9123456789',
+        '9234567890',
+        '9345678901',
+        '9456789012',
+        '9567890123',
+
+        // > номера мобильных операторов:
+        '9012345678', // (МегаФон)
+        '9023456789', // (Билайн)
+        '9034567890', // (МТС)
+        '9045678901', // (Теле2)
+        '9056789012', // (МегаФон)
+    ];
+
+    $fakePhones = [
+        // Фейковые номера для тестирования при разработке
+        '+375990000000',
+        '+79990000000',
+        '+19700101000000',
+    ];
+
+    foreach ( $phones as $phone ) {
+        $status = \Gzhegow\Lib\Lib::social()->type_phone($result, $phone);
+        _print($phone, $status, $result);
+
+        $status = \Gzhegow\Lib\Lib::social()->type_phone_non_fake($result, $phone);
+        _print($phone, $status, $result);
+
+        $status = \Gzhegow\Lib\Lib::social()->type_tel($result, $phone);
+        _print($phone, $status, $result);
+
+        $status = \Gzhegow\Lib\Lib::social()->type_tel_non_fake($result, $phone);
+        _print($phone, $status, $result);
+
+        echo PHP_EOL;
+    }
+
+    $phoneManager = \Gzhegow\Lib\Lib::social()->clonePhoneManager();
+    $phoneManager->usePhoneFakeDatelike(true);
+
+    foreach ( $fakePhones as $phone ) {
+        $result = $phoneManager->parsePhone($phone);
+        _print($phone, $result);
+
+        $result = $phoneManager->parsePhoneFake($phone);
+        _print($phone, $result);
+
+        $result = $phoneManager->parseTel($phone);
+        _print($phone, $result);
+
+        $result = $phoneManager->parseTelFake($phone);
+        _print($phone, $result);
+
+        echo PHP_EOL;
+    }
+
+    // $phone = $phones[0];
+    //
+    // $phoneManager = \Gzhegow\Lib\Lib::social()->phoneManager();
+    //
+    // $phoneNumberWithoutDetection = $phoneManager->parsePhoneNumber($phone);
+    // $phoneNumberWithDetection = $phoneManager->parsePhoneNumber($phone, '');
+    //
+    // $formatE164 = $phoneManager->formatE164($phone);
+    // $formatNational = $phoneManager->formatNational($phone);
+    // $formatInternational = $phoneManager->formatInternational($phone);
+    // $formatRFC3966 = $phoneManager->formatRFC3966($phone);
+    // $formatShort = $phoneManager->formatShort($phone);
+    // $formatLong = $phoneManager->formatLong($phone);
+    // $getLocationNameForPhone = $phoneManager->getLocationNameForPhone($phone);
+    // $getOperatorNameForPhone = $phoneManager->getOperatorNameForPhone($phone);
+    // $getTimezonesForPhone = $phoneManager->getTimezonesForPhone($phone);
+    //
+    // var_dump([
+    //     $formatE164,
+    //     $formatNational,
+    //     $formatInternational,
+    //     $formatRFC3966,
+    //     $formatShort,
+    //     $formatLong,
+    //     $getLocationNameForPhone,
+    //     $getOperatorNameForPhone,
+    //     $getTimezonesForPhone,
+    // ]);
+};
+_assert_stdout($fn, [], '
+"[ SocialModule ]"
+
+TRUE | "example@gmail.com"
+FALSE | NULL
+TRUE | "example@привет.рф"
+
+TRUE | "example@gmail.com"
+FALSE | NULL
+TRUE | "example@привет.рф"
+
+TRUE | "no-reply@gmail.com"
+TRUE | "email@example.com"
+
+"+375 (29) 676-48-68" | TRUE | "+375 (29) 676-48-68"
+"+375 (29) 676-48-68" | TRUE | "+375 (29) 676-48-68"
+"+375 (29) 676-48-68" | TRUE | "+375296764868"
+"+375 (29) 676-48-68" | TRUE | "+375296764868"
+
+"+375296764868" | TRUE | "+375296764868"
+"+375296764868" | TRUE | "+375296764868"
+"+375296764868" | TRUE | "+375296764868"
+"+375296764868" | TRUE | "+375296764868"
+
+"375296764868" | TRUE | "375296764868"
+"375296764868" | TRUE | "375296764868"
+"375296764868" | TRUE | "375296764868"
+"375296764868" | TRUE | "375296764868"
+
+"+7 (862) 220-40-16" | TRUE | "+7 (862) 220-40-16"
+"+7 (862) 220-40-16" | TRUE | "+7 (862) 220-40-16"
+"+7 (862) 220-40-16" | TRUE | "+78622204016"
+"+7 (862) 220-40-16" | TRUE | "+78622204016"
+
+"+78622204016" | TRUE | "+78622204016"
+"+78622204016" | TRUE | "+78622204016"
+"+78622204016" | TRUE | "+78622204016"
+"+78622204016" | TRUE | "+78622204016"
+
+"78622204016" | TRUE | "78622204016"
+"78622204016" | TRUE | "78622204016"
+"78622204016" | TRUE | "78622204016"
+"78622204016" | TRUE | "78622204016"
+
+"89123456789" | TRUE | "89123456789"
+"89123456789" | TRUE | "89123456789"
+"89123456789" | TRUE | "89123456789"
+"89123456789" | TRUE | "89123456789"
+
+"89234567890" | TRUE | "89234567890"
+"89234567890" | TRUE | "89234567890"
+"89234567890" | TRUE | "89234567890"
+"89234567890" | TRUE | "89234567890"
+
+"89345678901" | TRUE | "89345678901"
+"89345678901" | TRUE | "89345678901"
+"89345678901" | TRUE | "89345678901"
+"89345678901" | TRUE | "89345678901"
+
+"89456789012" | TRUE | "89456789012"
+"89456789012" | TRUE | "89456789012"
+"89456789012" | TRUE | "89456789012"
+"89456789012" | TRUE | "89456789012"
+
+"89567890123" | TRUE | "89567890123"
+"89567890123" | TRUE | "89567890123"
+"89567890123" | TRUE | "89567890123"
+"89567890123" | TRUE | "89567890123"
+
+"9123456789" | TRUE | "9123456789"
+"9123456789" | TRUE | "9123456789"
+"9123456789" | TRUE | "9123456789"
+"9123456789" | TRUE | "9123456789"
+
+"9234567890" | TRUE | "9234567890"
+"9234567890" | TRUE | "9234567890"
+"9234567890" | TRUE | "9234567890"
+"9234567890" | TRUE | "9234567890"
+
+"9345678901" | TRUE | "9345678901"
+"9345678901" | TRUE | "9345678901"
+"9345678901" | TRUE | "9345678901"
+"9345678901" | TRUE | "9345678901"
+
+"9456789012" | TRUE | "9456789012"
+"9456789012" | TRUE | "9456789012"
+"9456789012" | TRUE | "9456789012"
+"9456789012" | TRUE | "9456789012"
+
+"9567890123" | TRUE | "9567890123"
+"9567890123" | TRUE | "9567890123"
+"9567890123" | TRUE | "9567890123"
+"9567890123" | TRUE | "9567890123"
+
+"9012345678" | TRUE | "9012345678"
+"9012345678" | TRUE | "9012345678"
+"9012345678" | TRUE | "9012345678"
+"9012345678" | TRUE | "9012345678"
+
+"9023456789" | TRUE | "9023456789"
+"9023456789" | TRUE | "9023456789"
+"9023456789" | TRUE | "9023456789"
+"9023456789" | TRUE | "9023456789"
+
+"9034567890" | TRUE | "9034567890"
+"9034567890" | TRUE | "9034567890"
+"9034567890" | TRUE | "9034567890"
+"9034567890" | TRUE | "9034567890"
+
+"9045678901" | TRUE | "9045678901"
+"9045678901" | TRUE | "9045678901"
+"9045678901" | TRUE | "9045678901"
+"9045678901" | TRUE | "9045678901"
+
+"9056789012" | TRUE | "9056789012"
+"9056789012" | TRUE | "9056789012"
+"9056789012" | TRUE | "9056789012"
+"9056789012" | TRUE | "9056789012"
+
+"+375990000000" | "+375990000000"
+"+375990000000" | "+375990000000"
+"+375990000000" | "+375990000000"
+"+375990000000" | "+375990000000"
+
+"+79990000000" | "+79990000000"
+"+79990000000" | "+79990000000"
+"+79990000000" | "+79990000000"
+"+79990000000" | "+79990000000"
+
+"+19700101000000" | "+19700101000000"
+"+19700101000000" | "+19700101000000"
+"+19700101000000" | "+19700101000000"
+"+19700101000000" | "+19700101000000"
+');
+
+
+// >>> TEST
 // > тесты StrModule
 $fn = function () {
     _print('[ StrModule ]');
@@ -3158,7 +3436,9 @@ $fn = function () {
     echo PHP_EOL;
 
     _print(\Gzhegow\Lib\Lib::str()->slugger()->translit(' привет мир '));
+    _print(\Gzhegow\Lib\Lib::str()->slugger()->translit(' привет мир ', null, [ 'и' ]));
     _print(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир'));
+    _print(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир', ':', [ 'и' ]));
     echo PHP_EOL;
 
     _print(\Gzhegow\Lib\Lib::str()->inflector()->singularize('users'));
@@ -3266,7 +3546,9 @@ TRUE | "при"
 "привет мир"
 
 " privet mir "
+" prиvet mиr "
 "privet-mir"
+"prиvet:mиr"
 
 [ "user" ]
 [ "users" ]

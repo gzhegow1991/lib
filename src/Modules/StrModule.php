@@ -9,10 +9,10 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Str\Alphabet;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Modules\Str\Slugger\Slugger;
-use Gzhegow\Lib\Modules\Str\Inflector\Inflector;
+use Gzhegow\Lib\Modules\Str\Slugger\DefaultSlugger;
+use Gzhegow\Lib\Modules\Str\Inflector\DefaultInflector;
 use Gzhegow\Lib\Modules\Str\Slugger\SluggerInterface;
-use Gzhegow\Lib\Modules\Str\Interpolator\Interpolator;
+use Gzhegow\Lib\Modules\Str\Interpolator\DefaultInterpolator;
 use Gzhegow\Lib\Modules\Str\Inflector\InflectorInterface;
 use Gzhegow\Lib\Modules\Str\Interpolator\InterpolatorInterface;
 
@@ -60,12 +60,33 @@ class StrModule
     }
 
 
+    public function newInflector() : InflectorInterface
+    {
+        return new DefaultInflector();
+    }
+
+    public function cloneInflector() : InflectorInterface
+    {
+        return clone $this->inflector();
+    }
+
     public function inflector(?InflectorInterface $inflector = null) : InflectorInterface
     {
         return $this->inflector = null
             ?? $inflector
             ?? $this->inflector
-            ?? new Inflector();
+            ?? new DefaultInflector();
+    }
+
+
+    public function newInterpolator() : InterpolatorInterface
+    {
+        return new DefaultInterpolator();
+    }
+
+    public function cloneInterpolator() : InterpolatorInterface
+    {
+        return clone $this->interpolator();
     }
 
     public function interpolator(?InterpolatorInterface $interpolator = null) : InterpolatorInterface
@@ -73,7 +94,18 @@ class StrModule
         return $this->interpolator = null
             ?? $interpolator
             ?? $this->interpolator
-            ?? new Interpolator();
+            ?? new DefaultInterpolator();
+    }
+
+
+    public function newSlugger() : SluggerInterface
+    {
+        return new DefaultSlugger(null);
+    }
+
+    public function cloneSlugger() : SluggerInterface
+    {
+        return clone $this->slugger();
     }
 
     public function slugger(?SluggerInterface $slugger = null) : SluggerInterface
@@ -81,7 +113,7 @@ class StrModule
         return $this->slugger = null
             ?? $slugger
             ?? $this->slugger
-            ?? new Slugger();
+            ?? new DefaultSlugger(null);
     }
 
 

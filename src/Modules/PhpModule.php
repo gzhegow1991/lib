@@ -16,6 +16,7 @@ use Gzhegow\Lib\Modules\Php\CallableParser\CallableParser;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIterableInterface;
 use Gzhegow\Lib\Modules\Php\DebugBacktracer\DebugBacktracer;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
+use Gzhegow\Lib\Modules\Php\DebugBacktracer\DebugBacktracerInterface;
 
 
 class PhpModule
@@ -24,19 +25,52 @@ class PhpModule
      * @var CallableParserInterface
      */
     protected $callableParser;
+    /**
+     * @var DebugBacktracerInterface
+     */
+    protected $debugBacktracer;
 
     /**
      * @var class-string<\LogicException|\RuntimeException>
      */
-    protected $throwableClass = LogicException::class;
+    protected $throwableClass = RuntimeException::class;
 
 
-    public function callable_parser(?CallableParserInterface $callableParser = null) : CallableParserInterface
+    public function newCallableParser() : CallableParserInterface
+    {
+        return new CallableParser();
+    }
+
+    public function cloneCallableParser() : CallableParserInterface
+    {
+        return clone $this->callableParser();
+    }
+
+    public function callableParser(?CallableParserInterface $callableParser = null) : CallableParserInterface
     {
         return $this->callableParser = null
             ?? $callableParser
             ?? $this->callableParser
             ?? new CallableParser();
+    }
+
+
+    public function newDebugBacktracer() : DebugBacktracerInterface
+    {
+        return new DebugBacktracer();
+    }
+
+    public function cloneDebugBacktracer() : DebugBacktracerInterface
+    {
+        return clone $this->debugBacktracer();
+    }
+
+    public function debugBacktracer(?DebugBacktracerInterface $debugBacktracer = null) : DebugBacktracerInterface
+    {
+        return $this->debugBacktracer = null
+            ?? $debugBacktracer
+            ?? $this->debugBacktracer
+            ?? new DebugBacktracer();
     }
 
 
@@ -576,7 +610,7 @@ class PhpModule
      */
     public function type_method_array(&$result, $value) : bool
     {
-        return $this->callable_parser()->typeMethodArray($result, $value);
+        return $this->callableParser()->typeMethodArray($result, $value);
     }
 
     /**
@@ -588,7 +622,7 @@ class PhpModule
      */
     public function type_method_string(&$result, $value, array $refs = []) : bool
     {
-        return $this->callable_parser()->typeMethodString($result, $value, $refs);
+        return $this->callableParser()->typeMethodString($result, $value, $refs);
     }
 
 
@@ -601,7 +635,7 @@ class PhpModule
      */
     public function type_callable(&$result, $value, $newScope = 'static') : bool
     {
-        return $this->callable_parser()->typeCallable($result, $value, $newScope);
+        return $this->callableParser()->typeCallable($result, $value, $newScope);
     }
 
 
@@ -610,7 +644,7 @@ class PhpModule
      */
     public function type_callable_object(&$result, $value, $newScope = 'static') : bool
     {
-        return $this->callable_parser()->typeCallableObject($result, $value, $newScope);
+        return $this->callableParser()->typeCallableObject($result, $value, $newScope);
     }
 
     /**
@@ -618,7 +652,7 @@ class PhpModule
      */
     public function type_callable_object_closure(&$result, $value, $newScope = 'static') : bool
     {
-        return $this->callable_parser()->typeCallableObjectClosure($result, $value, $newScope);
+        return $this->callableParser()->typeCallableObjectClosure($result, $value, $newScope);
     }
 
     /**
@@ -626,7 +660,7 @@ class PhpModule
      */
     public function type_callable_object_invokable(&$result, $value, $newScope = 'static') : bool
     {
-        return $this->callable_parser()->typeCallableObjectInvokable($result, $value, $newScope);
+        return $this->callableParser()->typeCallableObjectInvokable($result, $value, $newScope);
     }
 
 
@@ -636,7 +670,7 @@ class PhpModule
      */
     public function type_callable_array(&$result, $value, $newScope = 'static') : bool
     {
-        return $this->callable_parser()->typeCallableArray($result, $value, $newScope);
+        return $this->callableParser()->typeCallableArray($result, $value, $newScope);
     }
 
     /**
@@ -645,7 +679,7 @@ class PhpModule
      */
     public function type_callable_array_method(&$result, $value, $newScope = 'static') : bool
     {
-        return $this->callable_parser()->typeCallableArrayMethod($result, $value, $newScope);
+        return $this->callableParser()->typeCallableArrayMethod($result, $value, $newScope);
     }
 
     /**
@@ -654,7 +688,7 @@ class PhpModule
      */
     public function type_callable_array_method_static(&$result, $value, $newScope = 'static') : bool
     {
-        return $this->callable_parser()->typeCallableArrayMethodStatic($result, $value, $newScope);
+        return $this->callableParser()->typeCallableArrayMethodStatic($result, $value, $newScope);
     }
 
     /**
@@ -663,7 +697,7 @@ class PhpModule
      */
     public function type_callable_array_method_non_static(&$result, $value, $newScope = 'static') : bool
     {
-        return $this->callable_parser()->typeCallableArrayMethodNonStatic($result, $value, $newScope);
+        return $this->callableParser()->typeCallableArrayMethodNonStatic($result, $value, $newScope);
     }
 
 
@@ -672,7 +706,7 @@ class PhpModule
      */
     public function type_callable_string(&$result, $value, $newScope = 'static') : bool
     {
-        return $this->callable_parser()->typeCallableString($result, $value, $newScope);
+        return $this->callableParser()->typeCallableString($result, $value, $newScope);
     }
 
     /**
@@ -680,7 +714,7 @@ class PhpModule
      */
     public function type_callable_string_function(&$result, $value) : bool
     {
-        return $this->callable_parser()->typeCallableStringFunction($result, $value);
+        return $this->callableParser()->typeCallableStringFunction($result, $value);
     }
 
     /**
@@ -688,7 +722,7 @@ class PhpModule
      */
     public function type_callable_string_function_internal(&$result, $value) : bool
     {
-        return $this->callable_parser()->typeCallableStringFunctionInternal($result, $value);
+        return $this->callableParser()->typeCallableStringFunctionInternal($result, $value);
     }
 
     /**
@@ -696,7 +730,7 @@ class PhpModule
      */
     public function type_callable_string_function_non_internal(&$result, $value) : bool
     {
-        return $this->callable_parser()->typeCallableStringFunctionNonInternal($result, $value);
+        return $this->callableParser()->typeCallableStringFunctionNonInternal($result, $value);
     }
 
     /**
@@ -704,7 +738,7 @@ class PhpModule
      */
     public function type_callable_string_method_static(&$result, $value, $newScope = 'static') : bool
     {
-        return $this->callable_parser()->typeCallableStringMethodStatic($result, $value, $newScope);
+        return $this->callableParser()->typeCallableStringMethodStatic($result, $value, $newScope);
     }
 
 
@@ -1105,6 +1139,39 @@ class PhpModule
         return [ $value ];
     }
 
+    /**
+     * @param callable $fnReduce
+     * @param callable $fnListIsForceWrap
+     */
+    public function to_index($value, $fnReduce = null, $fnListIsForceWrap = null, array $options = []) : array
+    {
+        if (null === $value) {
+            return [];
+        }
+
+        $list = $this->to_list($value, $fnListIsForceWrap, $options);
+
+        $index = [];
+
+        if (null === $fnReduce) {
+            foreach ( $list as $i => $l ) {
+                if (is_string($i)) {
+                    $l = $i;
+                }
+
+                $index[ $l ] = true;
+            }
+
+        } else {
+            $index = Lib::arr()->reduce(
+                $list, $fnReduce, [],
+                _ARR_FN_USE_VALUE | _ARR_FN_USE_KEY
+            );
+        }
+
+        return $index;
+    }
+
 
     /**
      * @return int|float
@@ -1153,14 +1220,18 @@ class PhpModule
     }
 
 
-    public function debug_backtrace(?int $options = null, ?int $limit = null) : DebugBacktracer
+    public function debug_backtrace(
+        ?int $options = null, ?int $limit = null,
+        ?string $fileRoot = null
+    ) : DebugBacktracerInterface
     {
-        $instance = new DebugBacktracer();
+        $theDebugBacktracer = $this->cloneDebugBacktracer();
 
-        if (null !== $options) $instance->options($options);
-        if (null !== $limit) $instance->limit($limit);
+        if (null !== $options) $theDebugBacktracer->options($options);
+        if (null !== $limit) $theDebugBacktracer->limit($limit);
+        if (null !== $fileRoot) $theDebugBacktracer->rootDirectory($fileRoot);
 
-        return $instance;
+        return $theDebugBacktracer;
     }
 
 

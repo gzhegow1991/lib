@@ -3,10 +3,11 @@
 namespace Gzhegow\Lib\Modules\Php\DebugBacktracer;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-class DebugBacktracer
+class DebugBacktracer implements DebugBacktracerInterface
 {
     /**
      * @var array
@@ -25,7 +26,7 @@ class DebugBacktracer
     /**
      * @var string
      */
-    protected $fileRoot;
+    protected $rootDirectory;
 
     /**
      * @var array
@@ -98,9 +99,15 @@ class DebugBacktracer
     /**
      * @return static
      */
-    public function fileRoot(string $fileRoot)
+    public function rootDirectory(string $rootDirectory)
     {
-        $this->fileRoot = $fileRoot;
+        if (! Lib::fs()->type_dirpath_realpath($realpath, $rootDirectory)) {
+            throw new LogicException(
+                [ 'The `rootDirectory` should be existing directory path', $rootDirectory ]
+            );
+        }
+
+        $this->rootDirectory = $realpath;
 
         return $this;
     }
@@ -424,7 +431,7 @@ class DebugBacktracer
     /**
      * @return array{ 0: string, 1: int }|null
      */
-    public function getFile() : ?array
+    public function getFileLine() : ?array
     {
         $trace = $this->execute();
 
@@ -441,12 +448,9 @@ class DebugBacktracer
 
     protected function execute() : array
     {
-        $theFs = null;
-        $hasFileRoot = (null !== ($fileRoot = $this->fileRoot));
+        $theFs = Lib::fs();
 
-        if ($hasFileRoot) {
-            $thePhp = Lib::php();
-        }
+        $hasRootDirectory = (null !== ($rootDirectory = $this->rootDirectory));
 
         $trace = $this->trace;
 
@@ -663,8 +667,8 @@ class DebugBacktracer
                 }
             }
 
-            if ($hasFileRoot) {
-                $t[ 'file' ] = $theFs->relative($t[ 'file' ], $fileRoot);
+            if ($hasRootDirectory) {
+                $t[ 'file' ] = $theFs->path_relative($t[ 'file' ], $rootDirectory);
             }
 
             $t += [

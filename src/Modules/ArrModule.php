@@ -589,7 +589,7 @@ class ArrModule
             }
         }
 
-        if (! count($arrpath)) {
+        if (0 === count($arrpath)) {
             throw new LogicException(
                 [
                     'Result path is empty',
@@ -647,7 +647,7 @@ class ArrModule
             }
         }
 
-        if (! count($arrpath)) {
+        if (0 === count($arrpath)) {
             throw new LogicException(
                 [
                     'Result path is empty',
@@ -1020,13 +1020,16 @@ class ArrModule
      *
      * @param callable|null $fn
      */
-    public function map(array $src, $fn = null) : array
+    public function map(array $src, $fn = null, ?int $flags = null) : array
     {
         if (null === $fn) {
-            return [];
+            return $src;
         }
 
-        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = null
+            ?? $flags
+            ?? $this->static_fn_mode()
+            ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -1049,9 +1052,51 @@ class ArrModule
      *
      * @param callable|null $fn
      */
-    public function filter(array $src, $fn = null) : array
+    public function filter(array $src, $fn = null, ?int $flags = null) : array
     {
-        return $this->keep($src, $fn);
+        $filtered = $this->keep($src, $fn, $flags);
+
+        return $filtered;
+    }
+
+    /**
+     * > выполнить array_reduce с учетом _array_fn_mode()
+     *
+     * @template-covariant T of mixed
+     *
+     * @param callable|null $fn
+     *
+     * @param T             $initial
+     *
+     * @return T|mixed
+     */
+    public function reduce(array $src, $fn = null, $initial = null, ?int $flags = null)
+    {
+        if (null === $fn) {
+            return $initial;
+        }
+
+        $mode = null
+            ?? $flags
+            ?? $this->static_fn_mode()
+            ?? _ARR_FN_USE_VALUE;
+
+        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
+        $isUseKey = ($mode & _ARR_FN_USE_KEY);
+        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
+        $current = $initial;
+        foreach ( $src as $key => $val ) {
+            $args = [];
+            $args[] = $current;
+            if ($isUseValue) $args[] = $val;
+            if ($isUseKey) $args[] = $key;
+            if ($isUseSrc) $args[] = $src;
+
+            $current = call_user_func_array($fn, $args);
+        }
+
+        return $current;
     }
 
 
@@ -1060,13 +1105,16 @@ class ArrModule
      *
      * @param callable|null $fn
      */
-    public function keep(array $src, $fn = null) : array
+    public function keep(array $src, $fn = null, ?int $flags = null) : array
     {
         if (null === $fn) {
             return [];
         }
 
-        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = null
+            ?? $flags
+            ?? $this->static_fn_mode()
+            ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -1093,7 +1141,7 @@ class ArrModule
      *
      * @param callable|null $fn
      */
-    public function keep_new(array $src, $new = null, $fn = null) : array
+    public function keep_new(array $src, $new = null, $fn = null, ?int $flags = null) : array
     {
         if (null === $fn) {
             foreach ( $src as $key => $val ) {
@@ -1103,7 +1151,10 @@ class ArrModule
             return $src;
         }
 
-        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = null
+            ?? $flags
+            ?? $this->static_fn_mode()
+            ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -1131,13 +1182,16 @@ class ArrModule
      *
      * @param callable|null $fn
      */
-    public function drop(array $src, $fn = null) : array
+    public function drop(array $src, $fn = null, ?int $flags = null) : array
     {
         if (null === $fn) {
             return $src;
         }
 
-        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = null
+            ?? $flags
+            ?? $this->static_fn_mode()
+            ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -1162,13 +1216,16 @@ class ArrModule
      *
      * @param callable|null $fn
      */
-    public function drop_new(array $src, $new = null, $fn = null) : array
+    public function drop_new(array $src, $new = null, $fn = null, ?int $flags = null) : array
     {
         if (null === $fn) {
             return $src;
         }
 
-        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = null
+            ?? $flags
+            ?? $this->static_fn_mode()
+            ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -1199,7 +1256,7 @@ class ArrModule
      */
     public function kwargs(array $src) : array
     {
-        if (! count($src)) {
+        if (0 === count($src)) {
             return [ [], [] ];
         }
 
@@ -1222,12 +1279,19 @@ class ArrModule
      *
      * @return array{0: array, 1: array}
      */
-    public function both(array $src, $fn) : array
+    public function both(array $src, $fn = null, ?int $flags = null) : array
     {
+        if (null === $fn) {
+            return [ $src, [] ];
+        }
+
         $left = [];
         $right = [];
 
-        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = null
+            ?? $flags
+            ?? $this->static_fn_mode()
+            ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -1254,15 +1318,22 @@ class ArrModule
      *
      * @return array<string, array>
      */
-    public function group(array $src, $fn) : array
+    public function group(array $src, $fn = null, ?int $flags = null) : array
     {
-        $result = [];
+        if (null === $fn) {
+            return [ '' => $src ];
+        }
 
-        $mode = $this->static_fn_mode() ?? _ARR_FN_USE_VALUE;
+        $mode = null
+            ?? $flags
+            ?? $this->static_fn_mode()
+            ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
         $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
+        $result = [];
 
         foreach ( $src as $key => $val ) {
             $args = [];

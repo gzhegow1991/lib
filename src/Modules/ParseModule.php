@@ -1829,4 +1829,114 @@ class ParseModule extends ParseModuleBase
 
 		return null;
 	}
+
+
+	public function email($value, ?array $filters = null, array $refs = [])
+	{
+		if (Lib::type()->email($result, $value, $filters, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function email_fake($value, array $refs = [])
+	{
+		if (Lib::type()->email_fake($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function email_non_fake($value, ?array $filters = null, array $refs = [])
+	{
+		if (Lib::type()->email_non_fake($result, $value, $filters, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function phone($value, array $refs = [])
+	{
+		if (Lib::type()->phone($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function phone_fake($value, array $refs = [])
+	{
+		if (Lib::type()->phone_fake($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function phone_non_fake($value, array $refs = [])
+	{
+		if (Lib::type()->phone_non_fake($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function phone_real($value, array $refs = [])
+	{
+		if (Lib::type()->phone_real($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function tel($value, array $refs = [])
+	{
+		if (Lib::type()->tel($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function tel_fake($value, array $refs = [])
+	{
+		if (Lib::type()->tel_fake($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function tel_non_fake($value, array $refs = [])
+	{
+		if (Lib::type()->tel_non_fake($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function tel_real($value, array $refs = [])
+	{
+		if (Lib::type()->tel_real($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
 }

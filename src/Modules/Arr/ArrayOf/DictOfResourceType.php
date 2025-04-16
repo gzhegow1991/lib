@@ -1,11 +1,11 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7;
+namespace Gzhegow\Lib\Modules\Arr\ArrayOf;
 
-use Gzhegow\Lib\Modules\Arr\ArrayOf\Base\AbstractDictOfResources;
+use Gzhegow\Lib\Modules\Arr\ArrayOf\Base\AbstractDictOfResourceType;
 
 
-class DictOfResources extends AbstractDictOfResources implements
+class DictOfResourceType extends AbstractDictOfResourceType implements
     \ArrayAccess,
     \Countable,
     \IteratorAggregate,
@@ -22,8 +22,8 @@ class DictOfResources extends AbstractDictOfResources implements
         return $this->exists($offset);
     }
 
-    // public function offsetGet($offset) : mixed
-    public function offsetGet($offset)
+    // public function offsetGet($offset)
+    public function offsetGet($offset) : mixed
     {
         return $this->get($offset);
     }
@@ -44,8 +44,8 @@ class DictOfResources extends AbstractDictOfResources implements
         return serialize($this->__serialize());
     }
 
-    // public function unserialize(string $data = '')
-    public function unserialize($data)
+    // public function unserialize($data)
+    public function unserialize(string $data = '')
     {
         return unserialize($data);
     }

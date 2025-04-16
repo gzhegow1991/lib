@@ -39,7 +39,16 @@
         "ext-filter": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
-        "ext-pdo": "*"
+        "ext-pdo": "*",
+
+        "doctrine/inflector": "^2.0",
+
+        "symfony/string": "^5.0",
+        "symfony/translation-contracts": "^2.0",
+
+        "egulias/email-validator": "^3.0",
+
+        "giggsey/libphonenumber-for-php": "^8.0"
     },
 
     "config": {

@@ -3,10 +3,10 @@
 namespace Gzhegow\Lib\Modules\Arr\ArrayOf;
 
 
-use Gzhegow\Lib\Modules\Arr\ArrayOf\Base\AbstractArrayOfResources;
+use Gzhegow\Lib\Modules\Arr\ArrayOf\Base\AbstractArrayOfResourceType;
 
 
-class ArrayOfResources extends AbstractArrayOfResources implements
+class ArrayOfResourceType extends AbstractArrayOfResourceType implements
     \ArrayAccess,
     \Countable,
     \IteratorAggregate,

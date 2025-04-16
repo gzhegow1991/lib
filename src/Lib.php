@@ -25,6 +25,7 @@ use Gzhegow\Lib\Modules\AssertModule;
 use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
+use Gzhegow\Lib\Modules\SocialModule;
 use Gzhegow\Lib\Modules\ItertoolsModule;
 
 
@@ -281,6 +282,18 @@ class Lib
         return static::$random = $instance
             ?? static::$random
             ?? new RandomModule();
+    }
+
+    /**
+     * @return StrModule
+     */
+    public static $social;
+
+    public static function social(?SocialModule $instance = null)
+    {
+        return static::$social = $instance
+            ?? static::$social
+            ?? new SocialModule();
     }
 
     /**

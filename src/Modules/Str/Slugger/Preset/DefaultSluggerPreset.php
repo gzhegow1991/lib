@@ -1,0 +1,323 @@
+<?php
+
+namespace Gzhegow\Lib\Modules\Str\Slugger\Preset;
+
+
+class DefaultSluggerPreset implements SluggerPresetInterface
+{
+    /**
+     * @return array<string, bool>
+     */
+    public function getIgnoreSymbolMap() : array
+    {
+        return [
+            // 'a' => true,
+        ];
+    }
+
+    /**
+     * @return array<string, array<string, string>>
+     */
+    public function getSequenceMap() : array
+    {
+        return [
+            'ый' => [ 'ы' => 'i', 'й' => 'y' ],
+            'ех' => [ 'е' => 'c', 'х' => 'kh' ],
+            'сх' => [ 'с' => 'c', 'х' => 'kh' ],
+            'цх' => [ 'ц' => 'c', 'х' => 'kh' ],
+            //
+            'ẚ'  => [ 'ẚ' => 'a' ], // > ẚ -> [lower]: ẚ -> [upper]: Aʾ
+            //
+            'ß'  => [ 'ß' => 'ss' ], // > ß -> [lower]: ß -> [upper]: SS
+            'ſ'  => [ 'ſ' => 's' ], // > ſ -> [lower]: ſ -> [upper]: S
+        ];
+    }
+
+    /**
+     * @return array<string, array<string, bool>>
+     */
+    public function getSymbolMap() : array
+    {
+        return [
+            '' => [
+                'ъ' => true,
+                'ь' => true,
+            ],
+
+            'a' => [
+                'a' => true,
+                'à' => true,
+                'á' => true,
+                'â' => true,
+                'ã' => true,
+                'ä' => true,
+                'å' => true,
+                'æ' => true,
+                'ā' => true,
+                'ă' => true,
+                'ą' => true,
+                'ǎ' => true,
+                'ǟ' => true,
+                'ǡ' => true,
+                'ǣ' => true,
+                'ǻ' => true,
+                'ǽ' => true,
+                'ȁ' => true,
+                'ȧ' => true,
+                'а' => true,
+                'ḁ' => true,
+                'ạ' => true,
+                'ả' => true,
+                'ấ' => true,
+                'ầ' => true,
+                'ẩ' => true,
+                'ẫ' => true,
+                'ậ' => true,
+                'ắ' => true,
+                'ằ' => true,
+                'ẳ' => true,
+                'ẵ' => true,
+                'ặ' => true,
+            ],
+            'b' => [
+                'þ' => true,
+                'б' => true,
+            ],
+            'c' => [
+                'ç' => true,
+                'ć' => true,
+                'ĉ' => true,
+                'ċ' => true,
+                'č' => true,
+                'ц' => true,
+            ],
+            'd' => [
+                'ð' => true,
+                'ď' => true,
+                'д' => true,
+            ],
+            'e' => [
+                'e' => true,
+                'è' => true,
+                'é' => true,
+                'ê' => true,
+                'ë' => true,
+                'ē' => true,
+                'ĕ' => true,
+                'ė' => true,
+                'ę' => true,
+                'ě' => true,
+                'ȅ' => true,
+                'ȇ' => true,
+                'ȩ' => true,
+                'е' => true,
+                'є' => true,
+                'ḕ' => true,
+                'ḗ' => true,
+                'ḙ' => true,
+                'ḛ' => true,
+                'ḝ' => true,
+                'ẹ' => true,
+                'ẻ' => true,
+                'ẽ' => true,
+                'ế' => true,
+                'ề' => true,
+                'ể' => true,
+                'ễ' => true,
+                'ệ' => true,
+            ],
+            'f' => [
+                'ƒ' => true,
+                'ф' => true,
+            ],
+            'g' => [
+                'ĝ' => true,
+                'ğ' => true,
+                'ġ' => true,
+                'ģ' => true,
+                'г' => true,
+            ],
+            'h' => [
+                'ĥ' => true,
+                'ħ' => true,
+                'х' => true,
+            ],
+            'i' => [
+                'i' => true,
+                'ì' => true,
+                'í' => true,
+                'î' => true,
+                'ï' => true,
+                'ĩ' => true,
+                'ī' => true,
+                'ĭ' => true,
+                'į' => true,
+                'ǐ' => true,
+                'ȉ' => true,
+                'ȋ' => true,
+                'и' => true,
+                'ы' => true,
+                'і' => true,
+                'ї' => true,
+                'ḭ' => true,
+                'ḯ' => true,
+                'ỉ' => true,
+                'ị' => true,
+            ],
+            'j' => [
+                'ĵ' => true,
+                'й' => true,
+            ],
+            'k' => [
+                'ķ' => true,
+                'ĸ' => true,
+                'Ǩ' => true,
+                'κ' => true,
+            ],
+            'l' => [
+                'ĺ' => true,
+                'ļ' => true,
+                'ľ' => true,
+                'ŀ' => true,
+                'ł' => true,
+                'л' => true,
+            ],
+            'm' => [ 'м' => true ],
+            'n' => [
+                'ñ' => true,
+                'ń' => true,
+                'ņ' => true,
+                'ň' => true,
+                'ʼ' => true,
+                'n' => true,
+                'ŋ' => true,
+                'н' => true,
+            ],
+            'o' => [
+                'o' => true,
+                'ò' => true,
+                'ó' => true,
+                'ô' => true,
+                'õ' => true,
+                'ö' => true,
+                'ø' => true,
+                'ō' => true,
+                'ŏ' => true,
+                'ő' => true,
+                'ơ' => true,
+                'ǒ' => true,
+                'ǫ' => true,
+                'ǭ' => true,
+                'ǿ' => true,
+                'ȍ' => true,
+                'ȏ' => true,
+                'ȫ' => true,
+                'ȭ' => true,
+                'ȯ' => true,
+                'ȱ' => true,
+                'о' => true,
+                'ṍ' => true,
+                'ṏ' => true,
+                'ṑ' => true,
+                'ṓ' => true,
+                'ọ' => true,
+                'ỏ' => true,
+                'ố' => true,
+                'ồ' => true,
+                'ổ' => true,
+                'ỗ' => true,
+                'ộ' => true,
+                'ớ' => true,
+                'ờ' => true,
+                'ở' => true,
+                'ỡ' => true,
+                'ợ' => true,
+            ],
+            'p' => [
+                'ƥ' => true,
+                'п' => true,
+            ],
+            'r' => [
+                'ŕ' => true,
+                'ŗ' => true,
+                'ř' => true,
+                'р' => true,
+            ],
+            's' => [
+                'ś' => true,
+                'ŝ' => true,
+                'ş' => true,
+                'š' => true,
+                'ș' => true,
+                'с' => true,
+            ],
+            't' => [
+                'ţ' => true,
+                'ť' => true,
+                'ŧ' => true,
+                'ț' => true,
+                'т' => true,
+            ],
+            'u' => [
+                'u' => true,
+                'ù' => true,
+                'ú' => true,
+                'û' => true,
+                'ũ' => true,
+                'ū' => true,
+                'ŭ' => true,
+                'ů' => true,
+                'ű' => true,
+                'ų' => true,
+                'ư' => true,
+                'ǔ' => true,
+                'ǖ' => true,
+                'ǘ' => true,
+                'ǚ' => true,
+                'ǜ' => true,
+                'ȕ' => true,
+                'ȗ' => true,
+                'у' => true,
+                'ў' => true,
+                'ṳ' => true,
+                'ṵ' => true,
+                'ṷ' => true,
+                'ṹ' => true,
+                'ṻ' => true,
+                'ụ' => true,
+                'ủ' => true,
+                'ứ' => true,
+                'ừ' => true,
+                'ử' => true,
+                'ữ' => true,
+                'ự' => true,
+            ],
+            'v' => [ 'в' => true ],
+            'w' => [ 'ŵ' => true ],
+            'y' => [
+                'ý' => true,
+                'ÿ' => true,
+                'ŷ' => true,
+            ],
+            'z' => [
+                'ź' => true,
+                'ż' => true,
+                'ž' => true,
+                'з' => true,
+            ],
+
+            'ch'   => [ 'ч' => true ],
+            'dj'   => [ 'đ' => true ],
+            'eh'   => [ 'э' => true ],
+            'ij'   => [ 'ĳ' => true ],
+            'oe'   => [ 'œ' => true ],
+            'sh'   => [ 'ш' => true ],
+            'shch' => [ 'щ' => true ],
+            'ue'   => [ 'ü' => true ],
+            'ya'   => [ 'я' => true ],
+            'yo'   => [ 'ё' => true ],
+            'yu'   => [ 'ю' => true ],
+            'zh'   => [ 'ж' => true ],
+        ];
+    }
+}

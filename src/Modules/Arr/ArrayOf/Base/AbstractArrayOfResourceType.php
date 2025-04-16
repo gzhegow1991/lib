@@ -9,7 +9,7 @@ use Gzhegow\Lib\Modules\Arr\ArrayOf\Base\AbstractArrayOf;
 /**
  * @template-covariant T of resource
  */
-abstract class AbstractArrayOfResources extends AbstractArrayOf
+abstract class AbstractArrayOfResourceType extends AbstractArrayOf
 {
     /**
      * @var T[]

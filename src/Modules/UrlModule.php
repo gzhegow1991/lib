@@ -104,7 +104,7 @@ class UrlModule
         $hasFragment = (null !== $fragment);
 
         if ('' === $url) {
-            $url = $this->current();
+            $url = $this->url_current();
 
         } elseif (null === $url) {
             return null;
@@ -195,7 +195,7 @@ class UrlModule
             }
         }
 
-        $_url = $this->build($refParseUrl);
+        $_url = $this->url_build($refParseUrl);
 
         unset($refParseUrl);
 
@@ -251,7 +251,7 @@ class UrlModule
         $refParseUrl[ 'query' ] = null;
         $refParseUrl[ 'fragment' ] = null;
 
-        $_url = $this->build($refParseUrl);
+        $_url = $this->url_build($refParseUrl);
 
         unset($refParseUrl);
 
@@ -375,7 +375,7 @@ class UrlModule
     }
 
 
-    public function current() : string
+    public function url_current() : string
     {
         $urlHostCurrent = $this->host_current();
         $urlLinkCurrent = $this->link_current();
@@ -440,7 +440,7 @@ class UrlModule
     }
 
 
-    public function referrer($url = '') : ?string
+    public function url_referrer($url = '') : ?string
     {
         $result = $this->url($_SERVER[ 'HTTP_REFERER' ] ?? $url);
 
@@ -462,7 +462,7 @@ class UrlModule
     }
 
 
-    public function build(array $parseUrlResult) : string
+    public function url_build(array $parseUrlResult) : string
     {
         $_parseUrlResult = []
             + $parseUrlResult

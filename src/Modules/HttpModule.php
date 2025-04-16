@@ -5,7 +5,7 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Modules\Http\Cookie\Cookies;
+use Gzhegow\Lib\Modules\Http\Cookies\Cookies;
 
 
 class HttpModule
@@ -92,58 +92,26 @@ class HttpModule
     }
 
 
-    public function header_throw(
-        string $header, ?bool $replace = null, ?int $response_code = null
-    ) : void
-    {
-        $this->header($header, $replace, $response_code, true);
-    }
-
-    public function header(
-        string $header, ?bool $replace = null, ?int $response_code = null,
-        ?bool $throwIfHeadersSent = null
-    ) : void
+    public function header(string $header, ?bool $replace = null, ?int $response_code = null) : void
     {
         $replace = $replace ?? true;
         $response_code = $response_code ?? 0;
-        $throwIfHeadersSent = $throwIfHeadersSent ?? false;
 
         if (headers_sent($file, $line)) {
-            if ($throwIfHeadersSent) {
-                throw new LogicException(
-                    [ "Headers already sent at {$file} : {$line}" ]
-                );
-
-            } else {
-                return;
-            }
+            throw new LogicException(
+                "Headers already sent at {$file} : {$line}"
+            );
         }
 
         header($header, $replace, $response_code);
     }
 
-
-    public function header_remove_throw(?string $name) : void
+    public function header_remove(?string $name) : void
     {
-        $this->header_remove($name, true);
-    }
-
-    public function header_remove(
-        ?string $name,
-        ?bool $throwIfHeadersSent = null
-    ) : void
-    {
-        $throwIfHeadersSent = $throwIfHeadersSent ?? false;
-
         if (headers_sent($file, $line)) {
-            if ($throwIfHeadersSent) {
-                throw new LogicException(
-                    "Headers already sent at {$file} : {$line}"
-                );
-
-            } else {
-                return;
-            }
+            throw new LogicException(
+                "Headers already sent at {$file} : {$line}"
+            );
         }
 
         header_remove($name);

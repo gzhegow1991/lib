@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Http\Cookie;
+namespace Gzhegow\Lib\Modules\Http\Cookies;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;

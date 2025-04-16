@@ -8,7 +8,7 @@ use Gzhegow\Lib\Exception\LogicException;
 /**
  * @template-covariant T of resource
  */
-abstract class AbstractListOfResources extends AbstractListOf
+abstract class AbstractDictOfResourceType extends AbstractDictOf
 {
     /**
      * @var T[]
