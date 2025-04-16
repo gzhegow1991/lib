@@ -878,10 +878,6 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @param string            $value
-	 * @param string|array|null $query
-	 * @param string|null       $fragment
-	 *
 	 * @return string|null
 	 */
 	public function url($value, $query = null, $fragment = null, array $refs = [])
@@ -895,8 +891,6 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @param string      $value
-	 *
 	 * @return string|null
 	 */
 	public function host($value, array $refs = [])
@@ -910,10 +904,6 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @param string            $value
-	 * @param string|array|null $query
-	 * @param string|null       $fragment
-	 *
 	 * @return string|null
 	 */
 	public function link($value, $query = null, $fragment = null, array $refs = [])

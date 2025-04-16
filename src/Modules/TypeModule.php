@@ -1614,10 +1614,7 @@ class TypeModule extends TypeModuleBase
 
 
     /**
-     * @param string|null       $result
-     * @param string            $value
-     * @param string|array|null $query
-     * @param string|null       $fragment
+     * @param string|null $result
      */
     public function url(
         &$result,
@@ -1630,7 +1627,6 @@ class TypeModule extends TypeModuleBase
 
     /**
      * @param string|null $result
-     * @param string      $value
      */
     public function host(
         &$result,
@@ -1642,10 +1638,7 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param string|null       $result
-     * @param string            $value
-     * @param string|array|null $query
-     * @param string|null       $fragment
+     * @param string|null $result
      */
     public function link(
         &$result,

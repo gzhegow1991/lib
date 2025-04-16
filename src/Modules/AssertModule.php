@@ -1266,10 +1266,6 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
-	 * @param string            $value
-	 * @param string|array|null $query
-	 * @param string|null       $fragment
-	 *
 	 * @return static
 	 */
 	public function url($query = null, $fragment = null, array $refs = [])
@@ -1289,8 +1285,6 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
-	 * @param string      $value
-	 *
 	 * @return static
 	 */
 	public function host(array $refs = [])
@@ -1310,10 +1304,6 @@ class AssertModule extends AssertModuleBase
 
 
 	/**
-	 * @param string            $value
-	 * @param string|array|null $query
-	 * @param string|null       $fragment
-	 *
 	 * @return static
 	 */
 	public function link($query = null, $fragment = null, array $refs = [])
