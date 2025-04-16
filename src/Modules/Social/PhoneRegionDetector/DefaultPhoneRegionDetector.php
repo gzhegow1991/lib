@@ -18,12 +18,10 @@ class DefaultPhoneRegionDetector implements PhoneRegionDetectorInterface
 
     protected function detectRegionBy(string $telDigits) : ?string
     {
-        if (strlen($telDigits) !== 12) {
-            return null;
-        }
-
-        if (0 === strpos($telDigits, '375')) {
-            return 'BY';
+        if (strlen($telDigits) === 12) {
+            if (0 === strpos($telDigits, '375')) {
+                return 'BY';
+            }
         }
 
         return null;
@@ -32,13 +30,11 @@ class DefaultPhoneRegionDetector implements PhoneRegionDetectorInterface
 
     protected function detectRegionKz(string $telDigits) : ?string
     {
-        if (strlen($telDigits) !== 11) {
-            return null;
-        }
-
-        if ($telDigits[ 0 ] === '7') {
-            if (in_array($telDigits[ 1 ], [ 6, 7 ])) {
-                return 'KZ';
+        if (strlen($telDigits) === 11) {
+            if ($telDigits[ 0 ] === '7') {
+                if (in_array($telDigits[ 1 ], [ 6, 7 ])) {
+                    return 'KZ';
+                }
             }
         }
 

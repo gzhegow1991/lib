@@ -14,10 +14,10 @@ use Gzhegow\Lib\Modules\Net\AddressIpV6;
 use Gzhegow\Lib\Modules\Net\SubnetV4;
 use Gzhegow\Lib\Modules\Net\SubnetV6;
 use Gzhegow\Lib\Modules\Str\Alphabet;
-use Gzhegow\Lib\Modules\Type\Base\ParseModuleBase;
+use Gzhegow\Lib\Modules\Type\Base\AbstractParseModule;
 use Gzhegow\Lib\Modules\Type\Number;
 
-class ParseModule extends ParseModuleBase
+class ParseModule extends AbstractParseModule
 {
 	/**
 	 * @return bool|null
@@ -137,7 +137,7 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return int|float|null
+	 * @return float|null
 	 */
 	public function float_non_zero($value)
 	{
@@ -150,7 +150,7 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return int|float|null
+	 * @return float|null
 	 */
 	public function float_non_negative($value)
 	{
@@ -163,7 +163,7 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return int|float|null
+	 * @return float|null
 	 */
 	public function float_non_positive($value)
 	{
@@ -176,7 +176,7 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return int|float|null
+	 * @return float|null
 	 */
 	public function float_negative($value)
 	{
@@ -189,7 +189,7 @@ class ParseModule extends ParseModuleBase
 
 
 	/**
-	 * @return int|float|null
+	 * @return float|null
 	 */
 	public function float_positive($value)
 	{

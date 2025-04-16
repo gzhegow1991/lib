@@ -38,7 +38,6 @@ ini_set('memory_limit', '32M');
 ;
 
 
-
 // > добавляем несколько функция для тестирования
 function _value($value) : string
 {

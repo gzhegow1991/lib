@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @noinspection PhpUndefinedClassInspection
+ * @noinspection PhpUndefinedNamespaceInspection
+ */
+
 namespace Gzhegow\Lib\Modules\Social\PhoneManager;
 
 interface PhoneManagerInterface

@@ -689,6 +689,11 @@ class FsModule
         return Lib::php()->extension($path, '.');
     }
 
+    public function file(string $path) : ?string
+    {
+        return Lib::php()->file($path, '.');
+    }
+
     public function extensions(string $path) : ?string
     {
         return Lib::php()->extensions($path, '.');

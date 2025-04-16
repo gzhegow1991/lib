@@ -8,5 +8,5 @@ interface EmailParserInterface
 
     public function parseEmailFake($value, string &$emailDomain = null, string &$emailName = null) : string;
 
-    public function parseEmailNonFake($value, ?array $filters = null, string &$emailDomain = null, string &$emailName = null) : ?string;
+    public function parseEmailNonFake($value, ?array $filters = null, string &$emailDomain = null, string &$emailName = null) : string;
 }

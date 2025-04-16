@@ -4,10 +4,10 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Modules\Type\Base\ParseModuleBase;
+use Gzhegow\Lib\Modules\Type\Base\AbstractParseModule;
 
 
-class PregModule extends ParseModuleBase
+class PregModule extends AbstractParseModule
 {
     /**
      * @param string|null $result

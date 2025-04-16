@@ -6,7 +6,7 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\TypeModule;
 
 
-abstract class ParseModuleBase
+abstract class AbstractParseModule
 {
     /**
      * @var TypeModule

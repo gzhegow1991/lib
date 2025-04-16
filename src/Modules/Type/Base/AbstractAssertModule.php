@@ -7,7 +7,7 @@ use Gzhegow\Lib\Modules\TypeModule;
 use Gzhegow\Lib\Exception\LogicException;
 
 
-abstract class AssertModuleBase
+abstract class AbstractAssertModule
 {
     /**
      * @var TypeModule

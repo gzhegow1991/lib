@@ -164,7 +164,7 @@ class DefaultEmailParser implements EmailParserInterface
     public function parseEmailNonFake(
         $value, ?array $filters = null,
         string &$emailDomain = null, string &$emailName = null
-    ) : ?string
+    ) : string
     {
         $filters = $filters ?? [ 'filter' => true ];
 

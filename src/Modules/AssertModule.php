@@ -7,9 +7,9 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Type\Base\AssertModuleBase;
+use Gzhegow\Lib\Modules\Type\Base\AbstractAssertModule;
 
-class AssertModule extends AssertModuleBase
+class AssertModule extends AbstractAssertModule
 {
 	/**
 	 * @return static

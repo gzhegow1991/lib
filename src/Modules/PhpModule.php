@@ -1915,6 +1915,7 @@ class PhpModule
      *     basename?: string|null,
      *     filename?: string|null,
      *     extension?: string|null,
+     *     file?: string|null,
      *     extensions?: string|null,
      * }
      */
@@ -1969,20 +1970,34 @@ class PhpModule
         if (
             ($flags & _PHP_PATHINFO_FILENAME)
             || ($flags & _PHP_PATHINFO_EXTENSION)
+            || ($flags & _PHP_PATHINFO_FILE)
             || ($flags & _PHP_PATHINFO_EXTENSIONS)
         ) {
-            $split = explode($dot, $basename) + [ 1 => '' ];
+            $filename = $basename;
 
-            $filename = array_shift($split);
+            $split = explode($dot, $basename) + [ '', '' ];
 
-            if ($flags & _PHP_PATHINFO_EXTENSION) {
-                $pi[ 'filename' ] = ('' !== $filename) ? $filename : null;
-            }
+            $file = array_shift($split);
 
             if ($flags & _PHP_PATHINFO_EXTENSION) {
                 $extension = end($split);
 
-                $pi[ 'extension' ] = ('' !== $extension) ? $extension : null;
+                if ('' === $extension) {
+                    $pi[ 'extension' ] = null;
+
+                } else {
+                    $pi[ 'extension' ] = $extension;
+
+                    $filename = basename($basename, "{$dot}{$extension}");
+                }
+            }
+
+            if ($flags & _PHP_PATHINFO_FILENAME) {
+                $pi[ 'filename' ] = ('' !== $filename) ? $filename : null;
+            }
+
+            if ($flags & _PHP_PATHINFO_FILE) {
+                $pi[ 'file' ] = ('' !== $file) ? $file : null;
             }
 
             if ($flags & _PHP_PATHINFO_EXTENSIONS) {
@@ -2064,7 +2079,11 @@ class PhpModule
 
         $basename = basename($normalized);
 
-        [ $filename ] = explode($dot, $basename, 2);
+        $split = explode($dot, $basename) + [ '', '' ];
+
+        $extension = end($split);
+
+        $filename = basename($basename, "{$dot}{$extension}");
 
         return ('' !== $filename) ? $filename : null;
     }
@@ -2083,11 +2102,30 @@ class PhpModule
 
         $basename = basename($normalized);
 
-        $split = explode($dot, $basename) + [ 1 => '' ];
+        $split = explode($dot, $basename) + [ '', '' ];
 
         $extension = end($split);
 
         return ('' !== $extension) ? $extension : null;
+    }
+
+    public function file(string $path, ?string $dot = null) : ?string
+    {
+        if ('' === $path) {
+            throw new LogicException(
+                [ 'The `path` should be non-empty string' ]
+            );
+        }
+
+        $dot = Lib::parse()->char($dot) ?? '.';
+
+        $normalized = $this->path_normalize($path, '/');
+
+        $basename = basename($normalized);
+
+        [ $file ] = explode($dot, $basename, 2);
+
+        return ('' !== $file) ? $file : null;
     }
 
     public function extensions(string $path, ?string $dot = null) : ?string

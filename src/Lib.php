@@ -445,7 +445,7 @@ class Lib
         $pi = Lib::php()->pathinfo($class, '\\');
         $namespace = $pi[ 'dirname' ];
         $namespace .= '\\PHP8';
-        $classname = $pi[ 'filename' ];
+        $classname = $pi[ 'basename' ];
 
         $fqcn = "\\{$namespace}\\{$classname}";
 
@@ -472,7 +472,7 @@ class Lib
         $pi = Lib::php()->pathinfo($class, '\\');
         $namespace = $pi[ 'dirname' ];
         $namespace .= '\\PHP7';
-        $classname = $pi[ 'filename' ];
+        $classname = $pi[ 'basename' ];
 
         $fqcn = "\\{$namespace}\\{$classname}";
 

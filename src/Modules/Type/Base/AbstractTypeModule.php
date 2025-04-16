@@ -5,7 +5,7 @@ namespace Gzhegow\Lib\Modules\Type\Base;
 use Gzhegow\Lib\Modules\Type\Nil;
 
 
-abstract class TypeModuleBase
+abstract class AbstractTypeModule
 {
     public function the_decimal_point() : string
     {

@@ -11,10 +11,10 @@ use Gzhegow\Lib\Modules\Net\SubnetV6;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
 use Gzhegow\Lib\Modules\Net\AddressIpV6;
 use Gzhegow\Lib\Modules\Net\AddressIpV4;
-use Gzhegow\Lib\Modules\Type\Base\TypeModuleBase;
+use Gzhegow\Lib\Modules\Type\Base\AbstractTypeModule;
 
 
-class TypeModule extends TypeModuleBase
+class TypeModule extends AbstractTypeModule
 {
     /**
      * @param bool|null $result
@@ -410,7 +410,7 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param int|float|null $result
+     * @param float|null $result
      */
     public function float_non_zero(&$result, $value) : bool
     {
@@ -430,7 +430,7 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param int|float|null $result
+     * @param float|null $result
      */
     public function float_non_negative(&$result, $value) : bool
     {
@@ -450,7 +450,7 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param int|float|null $result
+     * @param float|null $result
      */
     public function float_non_positive(&$result, $value) : bool
     {
@@ -470,7 +470,7 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param int|float|null $result
+     * @param float|null $result
      */
     public function float_negative(&$result, $value) : bool
     {
@@ -490,7 +490,7 @@ class TypeModule extends TypeModuleBase
     }
 
     /**
-     * @param int|float|null $result
+     * @param float|null $result
      */
     public function float_positive(&$result, $value) : bool
     {
