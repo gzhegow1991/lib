@@ -81,6 +81,11 @@ interface PhoneManagerInterface
      */
     public function formatLong($phoneNumber, ?string $region = '', array $fallback = []) : string;
 
+    /**
+     * @param string|\libphonenumber\PhoneNumber $phoneNumber
+     */
+    public function formatHref($phoneNumber, ?string $region = '', array $fallback = []) : string;
+
 
     /**
      * @param string|\libphonenumber\PhoneNumber $phoneNumber
@@ -90,7 +95,7 @@ interface PhoneManagerInterface
     /**
      * @param string|\libphonenumber\PhoneNumber $phoneNumber
      */
-    public function formatNational($phoneNumber, ?string $region = '') : ?string;
+    public function formatRFC3966($phoneNumber, ?string $region = '') : ?string;
 
     /**
      * @param string|\libphonenumber\PhoneNumber $phoneNumber
@@ -100,7 +105,7 @@ interface PhoneManagerInterface
     /**
      * @param string|\libphonenumber\PhoneNumber $phoneNumber
      */
-    public function formatRFC3966($phoneNumber, ?string $region = '') : ?string;
+    public function formatNational($phoneNumber, ?string $region = '') : ?string;
 
 
     public function detectRegion($phone) : string;

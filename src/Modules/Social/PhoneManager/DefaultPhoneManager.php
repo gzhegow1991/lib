@@ -643,6 +643,31 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $formatted;
     }
 
+    /**
+     * @param string|\libphonenumber\PhoneNumber $phoneNumber
+     */
+    public function formatHref($phoneNumber, ?string $region = '', array $fallback = []) : string
+    {
+        try {
+            $formatted = $this->formatRFC3966($phoneNumber, $region);
+        }
+        catch ( \Throwable $e ) {
+            if (0 === count($fallback)) {
+                throw new RuntimeException(
+                    'Unable to ' . __FUNCTION__, $e
+                );
+            }
+
+            [ $formatted ] = $fallback;
+        }
+
+        [ , $phone ] = explode(':', $formatted, 2) + [ '', '' ];
+
+        $formatted = 'tel:' . urlencode($phone);
+
+        return $formatted;
+    }
+
 
     /**
      * @param string|\libphonenumber\PhoneNumber $phoneNumber
@@ -660,60 +685,12 @@ class DefaultPhoneManager implements PhoneManagerInterface
             );
         }
 
-        $format = $this->giggseyPhoneNumberUtil->format(
+        $formatted = $this->giggseyPhoneNumberUtil->format(
             $phoneNumberObject,
             \libphonenumber\PhoneNumberFormat::E164
         );
 
-        return $format;
-    }
-
-    /**
-     * @param string|\libphonenumber\PhoneNumber $phoneNumber
-     */
-    public function formatNational($phoneNumber, ?string $region = '') : ?string
-    {
-        if ($phoneNumber instanceof \libphonenumber\PhoneNumber) {
-            $phoneNumberObject = $phoneNumber;
-
-        } else {
-            $tel = $this->parseTelNonFake($phoneNumber);
-
-            $phoneNumberObject = $this->parsePhoneNumber(
-                $tel, $region
-            );
-        }
-
-        $format = $this->giggseyPhoneNumberUtil->format(
-            $phoneNumberObject,
-            \libphonenumber\PhoneNumberFormat::NATIONAL
-        );
-
-        return $format;
-    }
-
-    /**
-     * @param string|\libphonenumber\PhoneNumber $phoneNumber
-     */
-    public function formatInternational($phoneNumber, ?string $region = '') : ?string
-    {
-        if ($phoneNumber instanceof \libphonenumber\PhoneNumber) {
-            $phoneNumberObject = $phoneNumber;
-
-        } else {
-            $tel = $this->parseTelNonFake($phoneNumber);
-
-            $phoneNumberObject = $this->parsePhoneNumber(
-                $tel, $region
-            );
-        }
-
-        $format = $this->giggseyPhoneNumberUtil->format(
-            $phoneNumberObject,
-            \libphonenumber\PhoneNumberFormat::INTERNATIONAL
-        );
-
-        return $format;
+        return $formatted;
     }
 
     /**
@@ -732,16 +709,60 @@ class DefaultPhoneManager implements PhoneManagerInterface
             );
         }
 
-        $format = $this->giggseyPhoneNumberUtil->format(
+        $formatted = $this->giggseyPhoneNumberUtil->format(
             $phoneNumberObject,
             \libphonenumber\PhoneNumberFormat::RFC3966
         );
 
-        [ , $number ] = explode(':', $format, 2) + [ '', '' ];
+        return $formatted;
+    }
 
-        $format = 'tel:' . urlencode($number);
+    /**
+     * @param string|\libphonenumber\PhoneNumber $phoneNumber
+     */
+    public function formatInternational($phoneNumber, ?string $region = '') : ?string
+    {
+        if ($phoneNumber instanceof \libphonenumber\PhoneNumber) {
+            $phoneNumberObject = $phoneNumber;
 
-        return $format;
+        } else {
+            $tel = $this->parseTelNonFake($phoneNumber);
+
+            $phoneNumberObject = $this->parsePhoneNumber(
+                $tel, $region
+            );
+        }
+
+        $formatted = $this->giggseyPhoneNumberUtil->format(
+            $phoneNumberObject,
+            \libphonenumber\PhoneNumberFormat::INTERNATIONAL
+        );
+
+        return $formatted;
+    }
+
+    /**
+     * @param string|\libphonenumber\PhoneNumber $phoneNumber
+     */
+    public function formatNational($phoneNumber, ?string $region = '') : ?string
+    {
+        if ($phoneNumber instanceof \libphonenumber\PhoneNumber) {
+            $phoneNumberObject = $phoneNumber;
+
+        } else {
+            $tel = $this->parseTelNonFake($phoneNumber);
+
+            $phoneNumberObject = $this->parsePhoneNumber(
+                $tel, $region
+            );
+        }
+
+        $formatted = $this->giggseyPhoneNumberUtil->format(
+            $phoneNumberObject,
+            \libphonenumber\PhoneNumberFormat::NATIONAL
+        );
+
+        return $formatted;
     }
 
 
