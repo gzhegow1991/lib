@@ -3110,6 +3110,12 @@ $fn = function () {
     _print($status, $email);
     $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', [ 'filter_unicode' ]);
     _print($status, $email);
+    try {
+        $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', [ 'rfc' ]);
+    }
+    catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
+        _print('[ CATCH ] ' . $e->getMessage());
+    }
     echo PHP_EOL;
 
     $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@gmail.com');
@@ -3118,6 +3124,12 @@ $fn = function () {
     _print($status, $email);
     $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', [ 'filter_unicode' ]);
     _print($status, $email);
+    try {
+        $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', [ 'rfc' ]);
+    }
+    catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
+        _print('[ CATCH ] ' . $e->getMessage());
+    }
     echo PHP_EOL;
 
     $status = \Gzhegow\Lib\Lib::social()->type_email_fake($email, 'no-reply@gmail.com');
@@ -3174,11 +3186,24 @@ $fn = function () {
         $status = \Gzhegow\Lib\Lib::social()->type_phone_non_fake($result, $phone);
         _print($phone, $status, $result);
 
+        try {
+            $status = \Gzhegow\Lib\Lib::social()->type_phone_real($result, $phone);
+        } catch (\Gzhegow\Lib\Exception\Runtime\ComposerException $e) {
+            _print('[ CATCH ] ' . $e->getMessage());
+        }
+
         $status = \Gzhegow\Lib\Lib::social()->type_tel($result, $phone);
         _print($phone, $status, $result);
 
         $status = \Gzhegow\Lib\Lib::social()->type_tel_non_fake($result, $phone);
         _print($phone, $status, $result);
+
+        try {
+            $status = \Gzhegow\Lib\Lib::social()->type_tel_real($result, $phone);
+        }
+        catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
+            _print('[ CATCH ] ' . $e->getMessage());
+        }
 
         echo PHP_EOL;
     }
@@ -3237,118 +3262,162 @@ _assert_stdout($fn, [], '
 TRUE | "example@gmail.com"
 FALSE | NULL
 TRUE | "example@привет.рф"
+"[ CATCH ] Please, run following commands: [ composer require egulias/email-validator ]"
 
 TRUE | "example@gmail.com"
 FALSE | NULL
 TRUE | "example@привет.рф"
+"[ CATCH ] Please, run following commands: [ composer require egulias/email-validator ]"
 
 TRUE | "no-reply@gmail.com"
 TRUE | "email@example.com"
 
 "+375 (29) 676-48-68" | TRUE | "+375 (29) 676-48-68"
 "+375 (29) 676-48-68" | TRUE | "+375 (29) 676-48-68"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "+375 (29) 676-48-68" | TRUE | "+375296764868"
 "+375 (29) 676-48-68" | TRUE | "+375296764868"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "+375296764868" | TRUE | "+375296764868"
 "+375296764868" | TRUE | "+375296764868"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "+375296764868" | TRUE | "+375296764868"
 "+375296764868" | TRUE | "+375296764868"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "375296764868" | TRUE | "375296764868"
 "375296764868" | TRUE | "375296764868"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "375296764868" | TRUE | "375296764868"
 "375296764868" | TRUE | "375296764868"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "+7 (862) 220-40-16" | TRUE | "+7 (862) 220-40-16"
 "+7 (862) 220-40-16" | TRUE | "+7 (862) 220-40-16"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "+7 (862) 220-40-16" | TRUE | "+78622204016"
 "+7 (862) 220-40-16" | TRUE | "+78622204016"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "+78622204016" | TRUE | "+78622204016"
 "+78622204016" | TRUE | "+78622204016"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "+78622204016" | TRUE | "+78622204016"
 "+78622204016" | TRUE | "+78622204016"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "78622204016" | TRUE | "78622204016"
 "78622204016" | TRUE | "78622204016"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "78622204016" | TRUE | "78622204016"
 "78622204016" | TRUE | "78622204016"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "89123456789" | TRUE | "89123456789"
 "89123456789" | TRUE | "89123456789"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "89123456789" | TRUE | "89123456789"
 "89123456789" | TRUE | "89123456789"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "89234567890" | TRUE | "89234567890"
 "89234567890" | TRUE | "89234567890"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "89234567890" | TRUE | "89234567890"
 "89234567890" | TRUE | "89234567890"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "89345678901" | TRUE | "89345678901"
 "89345678901" | TRUE | "89345678901"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "89345678901" | TRUE | "89345678901"
 "89345678901" | TRUE | "89345678901"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "89456789012" | TRUE | "89456789012"
 "89456789012" | TRUE | "89456789012"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "89456789012" | TRUE | "89456789012"
 "89456789012" | TRUE | "89456789012"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "89567890123" | TRUE | "89567890123"
 "89567890123" | TRUE | "89567890123"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "89567890123" | TRUE | "89567890123"
 "89567890123" | TRUE | "89567890123"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "9123456789" | TRUE | "9123456789"
 "9123456789" | TRUE | "9123456789"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "9123456789" | TRUE | "9123456789"
 "9123456789" | TRUE | "9123456789"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "9234567890" | TRUE | "9234567890"
 "9234567890" | TRUE | "9234567890"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "9234567890" | TRUE | "9234567890"
 "9234567890" | TRUE | "9234567890"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "9345678901" | TRUE | "9345678901"
 "9345678901" | TRUE | "9345678901"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "9345678901" | TRUE | "9345678901"
 "9345678901" | TRUE | "9345678901"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "9456789012" | TRUE | "9456789012"
 "9456789012" | TRUE | "9456789012"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "9456789012" | TRUE | "9456789012"
 "9456789012" | TRUE | "9456789012"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "9567890123" | TRUE | "9567890123"
 "9567890123" | TRUE | "9567890123"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "9567890123" | TRUE | "9567890123"
 "9567890123" | TRUE | "9567890123"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "9012345678" | TRUE | "9012345678"
 "9012345678" | TRUE | "9012345678"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "9012345678" | TRUE | "9012345678"
 "9012345678" | TRUE | "9012345678"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "9023456789" | TRUE | "9023456789"
 "9023456789" | TRUE | "9023456789"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "9023456789" | TRUE | "9023456789"
 "9023456789" | TRUE | "9023456789"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "9034567890" | TRUE | "9034567890"
 "9034567890" | TRUE | "9034567890"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "9034567890" | TRUE | "9034567890"
 "9034567890" | TRUE | "9034567890"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "9045678901" | TRUE | "9045678901"
 "9045678901" | TRUE | "9045678901"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "9045678901" | TRUE | "9045678901"
 "9045678901" | TRUE | "9045678901"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "9056789012" | TRUE | "9056789012"
 "9056789012" | TRUE | "9056789012"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 "9056789012" | TRUE | "9056789012"
 "9056789012" | TRUE | "9056789012"
+"[ CATCH ] Please, run following commands: [ composer require giggsey/libphonenumber-for-php ]"
 
 "+375990000000" | "+375990000000"
 "+375990000000" | "+375990000000"

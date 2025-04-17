@@ -10,6 +10,7 @@ namespace Gzhegow\Lib\Modules\Str\Slugger;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ComposerException;
 use Gzhegow\Lib\Modules\Str\Slugger\Preset\DefaultSluggerPreset;
 use Gzhegow\Lib\Modules\Str\Slugger\Preset\SluggerPresetInterface;
 use Gzhegow\Lib\Modules\Str\Slugger\PresetRegistry\SluggerPresetRegistry;
@@ -86,12 +87,10 @@ class DefaultSlugger implements SluggerInterface
         $symfonyAsciiSluggerClass = '\Symfony\Component\String\Slugger\AsciiSlugger';
 
         if (! class_exists($symfonyAsciiSluggerClass)) {
-            throw new RuntimeException([
+            throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
                 . '[ ' . implode(' ][ ', $commands) . ' ]',
-                //
-                $commands,
             ]);
         }
 
@@ -147,12 +146,10 @@ class DefaultSlugger implements SluggerInterface
                     'composer require symfony/translation-contracts',
                 ];
 
-                throw new RuntimeException([
+                throw new ComposerException([
                     ''
                     . 'Please, run following commands: '
                     . '[ ' . implode(' ][ ', $commands) . ' ]',
-                    //
-                    $commands,
                 ]);
             }
         }
@@ -175,7 +172,7 @@ class DefaultSlugger implements SluggerInterface
 
         if ($useIntlTransliterator) {
             if (! $extensionAndFunctionExists) {
-                throw new RuntimeException(
+                throw new ComposerException(
                     [
                         ''
                         . 'Missing php extension of function does not exist: '

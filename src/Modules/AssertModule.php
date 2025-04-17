@@ -2623,6 +2623,9 @@ class AssertModule extends AbstractAssertModule
 	}
 
 
+	/**
+	 * @return static
+	 */
 	public function email(?array $filters = null, array $refs = [])
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $filters, $refs ] ];
@@ -2639,6 +2642,9 @@ class AssertModule extends AbstractAssertModule
 	}
 
 
+	/**
+	 * @return static
+	 */
 	public function email_fake(array $refs = [])
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
@@ -2655,6 +2661,9 @@ class AssertModule extends AbstractAssertModule
 	}
 
 
+	/**
+	 * @return static
+	 */
 	public function email_non_fake(?array $filters = null, array $refs = [])
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $filters, $refs ] ];
@@ -2671,6 +2680,9 @@ class AssertModule extends AbstractAssertModule
 	}
 
 
+	/**
+	 * @return static
+	 */
 	public function phone(array $refs = [])
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
@@ -2687,6 +2699,9 @@ class AssertModule extends AbstractAssertModule
 	}
 
 
+	/**
+	 * @return static
+	 */
 	public function phone_fake(array $refs = [])
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
@@ -2703,6 +2718,9 @@ class AssertModule extends AbstractAssertModule
 	}
 
 
+	/**
+	 * @return static
+	 */
 	public function phone_non_fake(array $refs = [])
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
@@ -2719,6 +2737,9 @@ class AssertModule extends AbstractAssertModule
 	}
 
 
+	/**
+	 * @return static
+	 */
 	public function phone_real(array $refs = [])
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
@@ -2735,6 +2756,9 @@ class AssertModule extends AbstractAssertModule
 	}
 
 
+	/**
+	 * @return static
+	 */
 	public function tel(array $refs = [])
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
@@ -2751,6 +2775,9 @@ class AssertModule extends AbstractAssertModule
 	}
 
 
+	/**
+	 * @return static
+	 */
 	public function tel_fake(array $refs = [])
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
@@ -2767,6 +2794,9 @@ class AssertModule extends AbstractAssertModule
 	}
 
 
+	/**
+	 * @return static
+	 */
 	public function tel_non_fake(array $refs = [])
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
@@ -2783,6 +2813,9 @@ class AssertModule extends AbstractAssertModule
 	}
 
 
+	/**
+	 * @return static
+	 */
 	public function tel_real(array $refs = [])
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];

@@ -55,6 +55,15 @@ interface PhoneManagerInterface
 
 
     /**
+     * @return object|\libphonenumber\PhoneNumber
+     */
+    public function parsePhoneNumber(
+        $value, ?string $region = '',
+        string &$regionDetected = null
+    ) : object;
+
+
+    /**
      * @param string|\libphonenumber\PhoneNumber $phoneNumber
      */
     public function formatShort($phoneNumber, ?string $region = '', array $fallback = []) : string;
@@ -94,13 +103,4 @@ interface PhoneManagerInterface
     public function getLocationNameForPhone($phoneNumber, ?string $region = '') : string;
 
     public function getOperatorNameForPhone($phoneNumber, ?string $parseRegion = '') : string;
-
-
-    /**
-     * @return object|\libphonenumber\PhoneNumber
-     */
-    public function parsePhoneNumber(
-        $value, ?string $region = '',
-        string &$regionParsed = null
-    ) : object;
 }

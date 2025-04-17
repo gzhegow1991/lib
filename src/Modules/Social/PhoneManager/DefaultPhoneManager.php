@@ -10,6 +10,7 @@ namespace Gzhegow\Lib\Modules\Social\PhoneManager;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ComposerException;
 use Gzhegow\Lib\Modules\Social\PhoneRegionDetector\DefaultPhoneRegionDetector;
 use Gzhegow\Lib\Modules\Social\PhoneRegionDetector\PhoneRegionDetectorInterface;
 
@@ -85,12 +86,10 @@ class DefaultPhoneManager implements PhoneManagerInterface
         $libphonenumberPhoneNumberUtilClass = '\libphonenumber\PhoneNumberUtil';
 
         if (! class_exists($libphonenumberPhoneNumberUtilClass)) {
-            throw new RuntimeException([
+            throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
                 . '[ ' . implode(' ][ ', $commands) . ' ]',
-                //
-                $commands,
             ]);
         }
 
@@ -120,12 +119,10 @@ class DefaultPhoneManager implements PhoneManagerInterface
         $libphonenumberPhoneNumberOfflineGeocoderClass = '\libphonenumber\geocoding\PhoneNumberOfflineGeocoder';
 
         if (! class_exists($libphonenumberPhoneNumberOfflineGeocoderClass)) {
-            throw new RuntimeException([
+            throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
                 . '[ ' . implode(' ][ ', $commands) . ' ]',
-                //
-                $commands,
             ]);
         }
 
@@ -155,12 +152,10 @@ class DefaultPhoneManager implements PhoneManagerInterface
         $libphonenumberPhoneNumberToCarrierMapperClass = '\libphonenumber\PhoneNumberToCarrierMapper';
 
         if (! class_exists($libphonenumberPhoneNumberToCarrierMapperClass)) {
-            throw new RuntimeException([
+            throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
                 . '[ ' . implode(' ][ ', $commands) . ' ]',
-                //
-                $commands,
             ]);
         }
 
@@ -190,12 +185,10 @@ class DefaultPhoneManager implements PhoneManagerInterface
         $libphonenumberPhoneNumberToTimeZonesMapperClass = '\libphonenumber\PhoneNumberToTimeZonesMapper';
 
         if (! class_exists($libphonenumberPhoneNumberToTimeZonesMapperClass)) {
-            throw new RuntimeException([
+            throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
                 . '[ ' . implode(' ][ ', $commands) . ' ]',
-                //
-                $commands,
             ]);
         }
 
@@ -520,6 +513,71 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
 
     /**
+     * @return object|\libphonenumber\PhoneNumber
+     */
+    public function parsePhoneNumber(
+        $value, ?string $region = '',
+        string &$regionDetected = null
+    ) : object
+    {
+        $regionDetected = null;
+
+        if ($value instanceof \libphonenumber\PhoneNumber) {
+            $phoneNumber = $value;
+
+            $regionString = $value->getCountryCode();
+
+        } else {
+            $phone = $this->parsePhone($value, $tel, $telDigits);
+
+            if ('' === $region) {
+                $regionString = null;
+
+                if ($this->useRegionDetector) {
+                    if (null === $regionString) {
+                        $regionString = $this->regionDetector->detectRegion($telDigits);
+                    }
+                }
+                if ($this->useRegionAutoDetection) {
+                    if (null === $regionString) {
+                        $regionString = \libphonenumber\PhoneNumberUtil::UNKNOWN_REGION;
+                    }
+                }
+
+                if (null === $regionString) {
+                    throw new RuntimeException(
+                        [
+                            'Unable to detect region',
+                            $value,
+                        ]
+                    );
+                }
+
+            } else {
+                $regionString = $region;
+            }
+
+            try {
+                $phoneNumberUtil = $this->getGiggseyPhoneNumberUtil();
+
+                $phoneNumber = $phoneNumberUtil
+                    ->parse($phone, $regionString)
+                ;
+            }
+            catch ( \libphonenumber\NumberParseException $e ) {
+                throw new RuntimeException(
+                    [ 'Unable to ' . __FUNCTION__, $e ]
+                );
+            }
+        }
+
+        $regionDetected = $regionString;
+
+        return $phoneNumber;
+    }
+
+
+    /**
      * @param string|\libphonenumber\PhoneNumber $phoneNumber
      */
     public function formatShort($phoneNumber, ?string $region = '', array $fallback = []) : string
@@ -758,70 +816,5 @@ class DefaultPhoneManager implements PhoneManagerInterface
         $operatorName = $operatorName ?: "{{ Unknown }}";
 
         return $operatorName;
-    }
-
-
-    /**
-     * @return object|\libphonenumber\PhoneNumber
-     */
-    public function parsePhoneNumber(
-        $value, ?string $region = '',
-        string &$regionParsed = null
-    ) : object
-    {
-        $regionParsed = null;
-
-        if ($value instanceof \libphonenumber\PhoneNumber) {
-            $phoneNumber = $value;
-
-            $regionString = $value->getCountryCode();
-
-        } else {
-            $phone = $this->parsePhone($value, $tel, $telDigits);
-
-            if ('' === $region) {
-                $regionString = null;
-
-                if ($this->useRegionDetector) {
-                    if (null === $regionString) {
-                        $regionString = $this->regionDetector->detectRegion($telDigits);
-                    }
-                }
-                if ($this->useRegionAutoDetection) {
-                    if (null === $regionString) {
-                        $regionString = \libphonenumber\PhoneNumberUtil::UNKNOWN_REGION;
-                    }
-                }
-
-                if (null === $regionString) {
-                    throw new RuntimeException(
-                        [
-                            'Unable to detect region',
-                            $value,
-                        ]
-                    );
-                }
-
-            } else {
-                $regionString = $region;
-            }
-
-            try {
-                $phoneNumberUtil = $this->getGiggseyPhoneNumberUtil();
-
-                $phoneNumber = $phoneNumberUtil
-                    ->parse($phone, $regionString)
-                ;
-            }
-            catch ( \libphonenumber\NumberParseException $e ) {
-                throw new RuntimeException(
-                    [ 'Unable to ' . __FUNCTION__, $e ]
-                );
-            }
-        }
-
-        $regionParsed = $regionString;
-
-        return $phoneNumber;
     }
 }

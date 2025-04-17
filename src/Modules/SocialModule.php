@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules;
 
+use Gzhegow\Lib\Exception\Runtime\ComposerException;
 use Gzhegow\Lib\Modules\Social\EmailParser\DefaultEmailParser;
 use Gzhegow\Lib\Modules\Social\EmailParser\EmailParserInterface;
 use Gzhegow\Lib\Modules\Social\PhoneManager\DefaultPhoneManager;
@@ -58,6 +59,9 @@ class SocialModule
     }
 
 
+    /**
+     * @param string|null $result
+     */
     public function type_email(
         &$result, $value,
         ?array $filters = null,
@@ -94,6 +98,9 @@ class SocialModule
                 $refEmailName = $emailName;
             }
         }
+        catch ( ComposerException $e ) {
+            throw $e;
+        }
         catch ( \Throwable $e ) {
             return false;
         }
@@ -106,6 +113,9 @@ class SocialModule
         return true;
     }
 
+    /**
+     * @param string|null $result
+     */
     public function type_email_fake(
         &$result, $value,
         array $refs = []
@@ -141,6 +151,9 @@ class SocialModule
                 $refEmailName = $emailName;
             }
         }
+        catch ( ComposerException $e ) {
+            throw $e;
+        }
         catch ( \Throwable $e ) {
             return false;
         }
@@ -153,6 +166,9 @@ class SocialModule
         return true;
     }
 
+    /**
+     * @param string|null $result
+     */
     public function type_email_non_fake(
         &$result, $value,
         ?array $filters = null,
@@ -189,6 +205,9 @@ class SocialModule
                 $refEmailName = $emailName;
             }
         }
+        catch ( ComposerException $e ) {
+            throw $e;
+        }
         catch ( \Throwable $e ) {
             return false;
         }
@@ -202,6 +221,9 @@ class SocialModule
     }
 
 
+    /**
+     * @param string|null $result
+     */
     public function type_phone(
         &$result, $value,
         array $refs = []
@@ -235,6 +257,9 @@ class SocialModule
                 $refTel, $refTelDigits, $refTelPlus
             );
         }
+        catch ( ComposerException $e ) {
+            throw $e;
+        }
         catch ( \Throwable $e ) {
             return false;
         }
@@ -248,6 +273,9 @@ class SocialModule
         return true;
     }
 
+    /**
+     * @param string|null $result
+     */
     public function type_phone_fake(
         &$result, $value,
         array $refs = []
@@ -294,6 +322,9 @@ class SocialModule
         return true;
     }
 
+    /**
+     * @param string|null $result
+     */
     public function type_phone_non_fake(
         &$result, $value,
         array $refs = []
@@ -327,6 +358,9 @@ class SocialModule
                 $refTel, $refTelDigits, $refTelPlus
             );
         }
+        catch ( ComposerException $e ) {
+            throw $e;
+        }
         catch ( \Throwable $e ) {
             return false;
         }
@@ -340,6 +374,9 @@ class SocialModule
         return true;
     }
 
+    /**
+     * @param string|null $result
+     */
     public function type_phone_real(
         &$result, $value,
         array $refs = []
@@ -373,6 +410,9 @@ class SocialModule
                 $refTel, $refTelDigits, $refTelPlus
             );
         }
+        catch ( ComposerException $e ) {
+            throw $e;
+        }
         catch ( \Throwable $e ) {
             return false;
         }
@@ -387,6 +427,9 @@ class SocialModule
     }
 
 
+    /**
+     * @param string|null $result
+     */
     public function type_tel(
         &$result, $value,
         array $refs = []
@@ -415,6 +458,9 @@ class SocialModule
                 $refTelDigits, $refTelPlus
             );
         }
+        catch ( ComposerException $e ) {
+            throw $e;
+        }
         catch ( \Throwable $e ) {
             return false;
         }
@@ -427,6 +473,9 @@ class SocialModule
         return true;
     }
 
+    /**
+     * @param string|null $result
+     */
     public function type_tel_fake(
         &$result, $value,
         array $refs = []
@@ -455,6 +504,9 @@ class SocialModule
                 $refTelDigits, $refTelPlus
             );
         }
+        catch ( ComposerException $e ) {
+            throw $e;
+        }
         catch ( \Throwable $e ) {
             return false;
         }
@@ -467,6 +519,9 @@ class SocialModule
         return true;
     }
 
+    /**
+     * @param string|null $result
+     */
     public function type_tel_non_fake(
         &$result, $value,
         array $refs = []
@@ -495,6 +550,9 @@ class SocialModule
                 $refTelDigits, $refTelPlus
             );
         }
+        catch ( ComposerException $e ) {
+            throw $e;
+        }
         catch ( \Throwable $e ) {
             return false;
         }
@@ -507,6 +565,9 @@ class SocialModule
         return true;
     }
 
+    /**
+     * @param string|null $result
+     */
     public function type_tel_real(
         &$result, $value,
         array $refs = []
@@ -534,6 +595,9 @@ class SocialModule
                 $value,
                 $refTelDigits, $refTelPlus
             );
+        }
+        catch ( ComposerException $e ) {
+            throw $e;
         }
         catch ( \Throwable $e ) {
             return false;

@@ -2290,6 +2290,9 @@ class TypeModule extends AbstractTypeModule
     }
 
 
+    /**
+     * @param string|null $result
+     */
     public function email(
         &$result, $value,
         ?array $filters = null,
@@ -2303,6 +2306,9 @@ class TypeModule extends AbstractTypeModule
         );
     }
 
+    /**
+     * @param string|null $result
+     */
     public function email_fake(
         &$result, $value,
         array $refs = []
@@ -2314,6 +2320,9 @@ class TypeModule extends AbstractTypeModule
         );
     }
 
+    /**
+     * @param string|null $result
+     */
     public function email_non_fake(
         &$result, $value,
         ?array $filters = null,
@@ -2328,6 +2337,9 @@ class TypeModule extends AbstractTypeModule
     }
 
 
+    /**
+     * @param string|null $result
+     */
     public function phone(
         &$result, $value,
         array $refs = []
@@ -2339,6 +2351,9 @@ class TypeModule extends AbstractTypeModule
         );
     }
 
+    /**
+     * @param string|null $result
+     */
     public function phone_fake(
         &$result, $value,
         array $refs = []
@@ -2350,6 +2365,9 @@ class TypeModule extends AbstractTypeModule
         );
     }
 
+    /**
+     * @param string|null $result
+     */
     public function phone_non_fake(
         &$result, $value,
         array $refs = []
@@ -2361,6 +2379,9 @@ class TypeModule extends AbstractTypeModule
         );
     }
 
+    /**
+     * @param string|null $result
+     */
     public function phone_real(
         &$result, $value,
         array $refs = []
@@ -2373,6 +2394,9 @@ class TypeModule extends AbstractTypeModule
     }
 
 
+    /**
+     * @param string|null $result
+     */
     public function tel(
         &$result, $value,
         array $refs = []
@@ -2384,6 +2408,9 @@ class TypeModule extends AbstractTypeModule
         );
     }
 
+    /**
+     * @param string|null $result
+     */
     public function tel_fake(
         &$result, $value,
         array $refs = []
@@ -2395,6 +2422,9 @@ class TypeModule extends AbstractTypeModule
         );
     }
 
+    /**
+     * @param string|null $result
+     */
     public function tel_non_fake(
         &$result, $value,
         array $refs = []
@@ -2406,6 +2436,9 @@ class TypeModule extends AbstractTypeModule
         );
     }
 
+    /**
+     * @param string|null $result
+     */
     public function tel_real(
         &$result, $value,
         array $refs = []

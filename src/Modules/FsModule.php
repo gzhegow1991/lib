@@ -5,6 +5,7 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\FilesystemException;
 
 
 class FsModule
@@ -768,7 +769,7 @@ class FsModule
         $fileGetContentsArgs = $fileGetContentsArgs ?: [];
 
         if (! $this->type_filepath_realpath($_filepath, $filepath)) {
-            throw new RuntimeException(
+            throw new FilesystemException(
                 [ 'File not found', $filepath ]
             );
         }
@@ -779,7 +780,7 @@ class FsModule
         );
 
         if (false === $result) {
-            throw new RuntimeException(
+            throw new FilesystemException(
                 [ 'Unable to read file', $filepath ]
             );
         }
@@ -820,7 +821,7 @@ class FsModule
                 );
 
                 if (false === $status) {
-                    throw new RuntimeException(
+                    throw new FilesystemException(
                         [ 'Unable to mkdir', $filepath ]
                     );
                 }
@@ -833,7 +834,7 @@ class FsModule
         );
 
         if (false === $size) {
-            throw new RuntimeException(
+            throw new FilesystemException(
                 [ 'Unable to write file', $filepath ]
             );
         }
@@ -845,7 +846,7 @@ class FsModule
             );
 
             if (false === $status) {
-                throw new RuntimeException(
+                throw new FilesystemException(
                     [ 'Unable to perform chmod() on file', $filepath ]
                 );
             }
@@ -868,7 +869,7 @@ class FsModule
         $recursiveIteratorIteratorArgs = $recursiveIteratorIteratorArgs ?: [ \RecursiveIteratorIterator::CHILD_FIRST ];
 
         if (! $this->type_dirpath_realpath($_dirpath, $dirpath)) {
-            throw new RuntimeException(
+            throw new FilesystemException(
                 [ 'Directory not exists', $dirpath ]
             );
         }
@@ -914,7 +915,7 @@ class FsModule
         );
 
         if (false === $status) {
-            throw new RuntimeException(
+            throw new FilesystemException(
                 [ 'Unable to delete file', $filepath ]
             );
         }
@@ -945,7 +946,7 @@ class FsModule
         );
 
         if (false === $status) {
-            throw new RuntimeException(
+            throw new FilesystemException(
                 [ 'Unable to delete directory', $dirpath ]
             );
         }
@@ -976,12 +977,12 @@ class FsModule
         $fh2 = fopen($file2, 'rb');
 
         if (false === $fh1) {
-            throw new RuntimeException(
+            throw new FilesystemException(
                 [ 'Unable to open file with flags: rb', $file1 ]
             );
         }
         if (false === $fh2) {
-            throw new RuntimeException(
+            throw new FilesystemException(
                 [ 'Unable to open file with flags: rb', $file2 ]
             );
         }

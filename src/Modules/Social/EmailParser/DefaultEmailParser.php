@@ -10,6 +10,7 @@ namespace Gzhegow\Lib\Modules\Social\EmailParser;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ComposerException;
 
 
 class DefaultEmailParser implements EmailParserInterface
@@ -35,12 +36,10 @@ class DefaultEmailParser implements EmailParserInterface
         $eguliasEmailValidatorClass = '\Egulias\EmailValidator\EmailValidator';
 
         if (! class_exists($eguliasEmailValidatorClass)) {
-            throw new RuntimeException([
+            throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
                 . '[ ' . implode(' ][ ', $commands) . ' ]',
-                //
-                $commands,
             ]);
         }
 

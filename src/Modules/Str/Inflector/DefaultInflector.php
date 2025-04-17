@@ -8,6 +8,7 @@
 namespace Gzhegow\Lib\Modules\Str\Inflector;
 
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ComposerException;
 
 
 class DefaultInflector implements InflectorInterface
@@ -76,12 +77,10 @@ class DefaultInflector implements InflectorInterface
         ];
 
         if (! class_exists($doctrineInflector = static::DOCTRINE_INFLECTOR)) {
-            throw new RuntimeException([
+            throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
                 . '[ ' . implode(' ][ ', $commands) . ' ]',
-                //
-                $commands,
             ]);
         }
 
@@ -148,12 +147,10 @@ class DefaultInflector implements InflectorInterface
         ];
 
         if (! class_exists($class = static::SYMFONY_INFLECTOR_ENGLISH_INFLECTOR)) {
-            throw new RuntimeException([
+            throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
                 . '[ ' . implode(' ][ ', $commands) . ' ]',
-                //
-                $commands,
             ]);
         }
 
