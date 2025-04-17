@@ -449,11 +449,9 @@ class DefaultSlugger implements SluggerInterface
                 && function_exists('transliterator_transliterate')
             ))
         ) {
-            throw new RuntimeException(
+            throw new ComposerException(
                 [
-                    ''
-                    . 'Symfony Transliterator works incorectly if string contains UTF-8 symbols'
-                    . ' but `ext-intl` is missing',
+                    'Symfony Transliterator works incorectly without `ext-intl` if used on UTF-8 strings',
                     //
                     $string,
                 ]
