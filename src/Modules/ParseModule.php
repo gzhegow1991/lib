@@ -1902,9 +1902,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return string|null
 	 */
-	public function phone_real($value, array $refs = [])
+	public function phone_real($value, ?string $region = '', array $refs = [])
 	{
-		if (Lib::type()->phone_real($result, $value, $refs)) {
+		if (Lib::type()->phone_real($result, $value, $region, $refs)) {
 		    return $result;
 		}
 
@@ -1954,9 +1954,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return string|null
 	 */
-	public function tel_real($value, array $refs = [])
+	public function tel_real($value, ?string $region = '', array $refs = [])
 	{
-		if (Lib::type()->tel_real($result, $value, $refs)) {
+		if (Lib::type()->tel_real($result, $value, $region, $refs)) {
 		    return $result;
 		}
 

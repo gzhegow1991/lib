@@ -294,7 +294,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
     }
 
 
-    public function parsePhone($value, string &$tel = null, string &$telDigits = null, string &$telPlus = null) : string
+    public function parsePhone($value, ?string &$tel = null, ?string &$telDigits = null, ?string &$telPlus = null) : string
     {
         $tel = null;
 
@@ -317,7 +317,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $phone;
     }
 
-    public function parsePhoneFake($value, string &$tel = null, string &$telDigits = null, string &$telPlus = null) : string
+    public function parsePhoneFake($value, ?string &$tel = null, ?string &$telDigits = null, ?string &$telPlus = null) : string
     {
         $tel = null;
 
@@ -340,7 +340,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $phoneFake;
     }
 
-    public function parsePhoneNonFake($value, string &$tel = null, string &$telDigits = null, string &$telPlus = null) : string
+    public function parsePhoneNonFake($value, ?string &$tel = null, ?string &$telDigits = null, ?string &$telPlus = null) : string
     {
         $tel = null;
 
@@ -363,13 +363,25 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $phoneNonFake;
     }
 
-    public function parsePhoneReal($value, string &$tel = null, string &$telDigits = null, string &$telPlus = null) : string
+    public function parsePhoneReal(
+        $value, ?string $region = '',
+        ?string &$regionDetected = null,
+        ?string &$tel = null, ?string &$telDigits = null, ?string &$telPlus = null
+    ) : string
     {
         $tel = null;
 
-        $telNonFake = $this->parseTelNonFake($value, $telDigits, $telPlus);
+        $telNonFake = $this->parseTelNonFake(
+            $value,
+            $telDigits, $telPlus
+        );
 
-        $formatted = $this->formatInternational($telNonFake, '');
+        $phoneNumberObject = $this->parsePhoneNumber(
+            $telNonFake, $region,
+            $regionDetected
+        );
+
+        $formatted = $this->formatInternational($phoneNumberObject);
 
         $tel = $telNonFake;
 
@@ -377,7 +389,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
     }
 
 
-    public function parseTel($value, string &$telDigits = null, string &$telPlus = null) : string
+    public function parseTel($value, ?string &$telDigits = null, ?string &$telPlus = null) : string
     {
         $telDigits = null;
         $telPlus = null;
@@ -427,7 +439,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $tel;
     }
 
-    public function parseTelFake($value, string &$telDigits = null, string &$telPlus = null) : string
+    public function parseTelFake($value, ?string &$telDigits = null, ?string &$telPlus = null) : string
     {
         $telString = $this->parseTel($value, $telDigits, $telPlus);
 
@@ -467,7 +479,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $telString;
     }
 
-    public function parseTelNonFake($value, string &$telDigits = null, string &$telPlus = null) : string
+    public function parseTelNonFake($value, ?string &$telDigits = null, ?string &$telPlus = null) : string
     {
         $telString = $this->parseTel($value, $telDigits, $telPlus);
 
@@ -502,11 +514,23 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $telString;
     }
 
-    public function parseTelReal($value, string &$telDigits = null, string &$telPlus = null) : string
+    public function parseTelReal(
+        $value, ?string $region = '',
+        ?string &$regionDetected = null,
+        ?string &$telDigits = null, ?string &$telPlus = null
+    ) : string
     {
-        $telNonFake = $this->parseTelNonFake($value, $telDigits, $telPlus);
+        $telNonFake = $this->parseTelNonFake(
+            $value,
+            $telDigits, $telPlus
+        );
 
-        $formatted = $this->formatE164($telNonFake, '');
+        $phoneNumberObject = $this->parsePhoneNumber(
+            $telNonFake, $region,
+            $regionDetected
+        );
+
+        $formatted = $this->formatE164($phoneNumberObject);
 
         return $formatted;
     }
@@ -517,7 +541,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
      */
     public function parsePhoneNumber(
         $value, ?string $region = '',
-        string &$regionDetected = null
+        ?string &$regionDetected = null
     ) : object
     {
         $regionDetected = null;
@@ -631,7 +655,9 @@ class DefaultPhoneManager implements PhoneManagerInterface
         } else {
             $tel = $this->parseTelNonFake($phoneNumber);
 
-            $phoneNumberObject = $this->parsePhoneNumber($tel, $region);
+            $phoneNumberObject = $this->parsePhoneNumber(
+                $tel, $region
+            );
         }
 
         $format = $this->giggseyPhoneNumberUtil->format(
@@ -653,7 +679,9 @@ class DefaultPhoneManager implements PhoneManagerInterface
         } else {
             $tel = $this->parseTelNonFake($phoneNumber);
 
-            $phoneNumberObject = $this->parsePhoneNumber($tel, $region);
+            $phoneNumberObject = $this->parsePhoneNumber(
+                $tel, $region
+            );
         }
 
         $format = $this->giggseyPhoneNumberUtil->format(
@@ -675,7 +703,9 @@ class DefaultPhoneManager implements PhoneManagerInterface
         } else {
             $tel = $this->parseTelNonFake($phoneNumber);
 
-            $phoneNumberObject = $this->parsePhoneNumber($tel, $region);
+            $phoneNumberObject = $this->parsePhoneNumber(
+                $tel, $region
+            );
         }
 
         $format = $this->giggseyPhoneNumberUtil->format(
@@ -697,7 +727,9 @@ class DefaultPhoneManager implements PhoneManagerInterface
         } else {
             $tel = $this->parseTelNonFake($phoneNumber);
 
-            $phoneNumberObject = $this->parsePhoneNumber($tel, $region);
+            $phoneNumberObject = $this->parsePhoneNumber(
+                $tel, $region
+            );
         }
 
         $format = $this->giggseyPhoneNumberUtil->format(
@@ -801,10 +833,10 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $location;
     }
 
-    public function getOperatorNameForPhone($phoneNumber, ?string $parseRegion = '') : string
+    public function getOperatorNameForPhone($phoneNumber, ?string $region = '') : string
     {
         $_phoneNumber = $this->parsePhoneNumber(
-            $phoneNumber, $parseRegion
+            $phoneNumber, $region
         );
 
         $phoneNumberToCarrierMapper = $this->getGiggseyPhoneNumberToCarrierMapper();

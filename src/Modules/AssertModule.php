@@ -2740,15 +2740,15 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function phone_real(array $refs = [])
+	public function phone_real(?string $region = '', array $refs = [])
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $region, $refs ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->phone_real(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $refs
+		        $region, $refs
 		    );
 		}
 
@@ -2816,15 +2816,15 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function tel_real(array $refs = [])
+	public function tel_real(?string $region = '', array $refs = [])
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $region, $refs ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->tel_real(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $refs
+		        $region, $refs
 		    );
 		}
 

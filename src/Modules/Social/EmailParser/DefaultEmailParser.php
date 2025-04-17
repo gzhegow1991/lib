@@ -100,7 +100,7 @@ class DefaultEmailParser implements EmailParserInterface
 
     public function parseEmail(
         $value, ?array $filters = null,
-        string &$emailDomain = null, string &$emailName = null
+        ?string &$emailDomain = null, ?string &$emailName = null
     ) : string
     {
         $filters = $filters ?? [ 'filter' => true ];
@@ -121,7 +121,7 @@ class DefaultEmailParser implements EmailParserInterface
 
     public function parseEmailFake(
         $value,
-        string &$emailDomain = null, string &$emailName = null
+        ?string &$emailDomain = null, ?string &$emailName = null
     ) : string
     {
         [
@@ -162,7 +162,7 @@ class DefaultEmailParser implements EmailParserInterface
 
     public function parseEmailNonFake(
         $value, ?array $filters = null,
-        string &$emailDomain = null, string &$emailName = null
+        ?string &$emailDomain = null, ?string &$emailName = null
     ) : string
     {
         $filters = $filters ?? [ 'filter' => true ];

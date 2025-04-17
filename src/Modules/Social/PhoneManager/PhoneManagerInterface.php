@@ -36,22 +36,30 @@ interface PhoneManagerInterface
     public function useRegionAutoDetection(?bool $useRegionAutoDetection = null);
 
 
-    public function parsePhone($value, string &$tel = null, string &$telDigits = null, string &$telPlus = null) : string;
+    public function parsePhone($value, ?string &$tel = null, ?string &$telDigits = null, ?string &$telPlus = null) : string;
 
-    public function parsePhoneFake($value, string &$tel = null, string &$telDigits = null, string &$telPlus = null) : string;
+    public function parsePhoneFake($value, ?string &$tel = null, ?string &$telDigits = null, ?string &$telPlus = null) : string;
 
-    public function parsePhoneNonFake($value, string &$tel = null, string &$telDigits = null, string &$telPlus = null) : string;
+    public function parsePhoneNonFake($value, ?string &$tel = null, ?string &$telDigits = null, ?string &$telPlus = null) : string;
 
-    public function parsePhoneReal($value, string &$tel = null, string &$telDigits = null, string &$telPlus = null) : string;
+    public function parsePhoneReal(
+        $value, ?string $region = '',
+        ?string &$regionDetected = null,
+        ?string &$tel = null, ?string &$telDigits = null, ?string &$telPlus = null
+    ) : string;
 
 
-    public function parseTel($value, string &$telDigits = null, string &$telPlus = null) : string;
+    public function parseTel($value, ?string &$telDigits = null, ?string &$telPlus = null) : string;
 
-    public function parseTelFake($value, string &$telDigits = null, string &$telPlus = null) : string;
+    public function parseTelFake($value, ?string &$telDigits = null, ?string &$telPlus = null) : string;
 
-    public function parseTelNonFake($value, string &$telDigits = null, string &$telPlus = null) : string;
+    public function parseTelNonFake($value, ?string &$telDigits = null, ?string &$telPlus = null) : string;
 
-    public function parseTelReal($value, string &$telDigits = null, string &$telPlus = null) : string;
+    public function parseTelReal(
+        $value, ?string $region = '',
+        ?string &$regionDetected = null,
+        ?string &$telDigits = null, ?string &$telPlus = null
+    ) : string;
 
 
     /**
@@ -59,7 +67,7 @@ interface PhoneManagerInterface
      */
     public function parsePhoneNumber(
         $value, ?string $region = '',
-        string &$regionDetected = null
+        ?string &$regionDetected = null
     ) : object;
 
 
@@ -102,5 +110,5 @@ interface PhoneManagerInterface
 
     public function getLocationNameForPhone($phoneNumber, ?string $region = '') : string;
 
-    public function getOperatorNameForPhone($phoneNumber, ?string $parseRegion = '') : string;
+    public function getOperatorNameForPhone($phoneNumber, ?string $region = '') : string;
 }

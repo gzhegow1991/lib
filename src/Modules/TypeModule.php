@@ -2294,8 +2294,7 @@ class TypeModule extends AbstractTypeModule
      * @param string|null $result
      */
     public function email(
-        &$result, $value,
-        ?array $filters = null,
+        &$result, $value, ?array $filters = null,
         array $refs = []
     ) : bool
     {
@@ -2324,8 +2323,7 @@ class TypeModule extends AbstractTypeModule
      * @param string|null $result
      */
     public function email_non_fake(
-        &$result, $value,
-        ?array $filters = null,
+        &$result, $value, ?array $filters = null,
         array $refs = []
     ) : bool
     {
@@ -2383,12 +2381,12 @@ class TypeModule extends AbstractTypeModule
      * @param string|null $result
      */
     public function phone_real(
-        &$result, $value,
+        &$result, $value, ?string $region = '',
         array $refs = []
     ) : bool
     {
         return Lib::social()->type_phone_real(
-            $result, $value,
+            $result, $value, $region,
             $refs,
         );
     }
@@ -2440,12 +2438,12 @@ class TypeModule extends AbstractTypeModule
      * @param string|null $result
      */
     public function tel_real(
-        &$result, $value,
+        &$result, $value, ?string $region = '',
         array $refs = []
     ) : bool
     {
         return Lib::social()->type_tel_real(
-            $result, $value,
+            $result, $value, $region,
             $refs,
         );
     }

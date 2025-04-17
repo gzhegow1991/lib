@@ -3095,10 +3095,10 @@ $fn = function () {
     _print($status, $email);
     $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф');
     _print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', [ 'filter_unicode' ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', $filters = [ 'filter_unicode' ]);
     _print($status, $email);
     try {
-        $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', [ 'rfc' ]);
+        $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', $filters = [ 'rfc' ]);
     }
     catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
         _print('[ CATCH ] ' . $e->getMessage());
@@ -3109,10 +3109,10 @@ $fn = function () {
     _print($status, $email);
     $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф');
     _print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', [ 'filter_unicode' ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', $filters = [ 'filter_unicode' ]);
     _print($status, $email);
     try {
-        $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', [ 'rfc' ]);
+        $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', $filters = [ 'rfc' ]);
     }
     catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
         _print('[ CATCH ] ' . $e->getMessage());
@@ -3174,7 +3174,7 @@ $fn = function () {
         _print($phone, $status, $result);
 
         try {
-            $status = \Gzhegow\Lib\Lib::social()->type_phone_real($result, $phone);
+            $status = \Gzhegow\Lib\Lib::social()->type_phone_real($result, $phone, '');
         } catch (\Gzhegow\Lib\Exception\Runtime\ComposerException $e) {
             _print('[ CATCH ] ' . $e->getMessage());
         }
@@ -3186,7 +3186,7 @@ $fn = function () {
         _print($phone, $status, $result);
 
         try {
-            $status = \Gzhegow\Lib\Lib::social()->type_tel_real($result, $phone);
+            $status = \Gzhegow\Lib\Lib::social()->type_tel_real($result, $phone, '');
         }
         catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
             _print('[ CATCH ] ' . $e->getMessage());

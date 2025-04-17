@@ -63,8 +63,7 @@ class SocialModule
      * @param string|null $result
      */
     public function type_email(
-        &$result, $value,
-        ?array $filters = null,
+        &$result, $value, ?array $filters = null,
         array $refs = []
     ) : bool
     {
@@ -170,8 +169,7 @@ class SocialModule
      * @param string|null $result
      */
     public function type_email_non_fake(
-        &$result, $value,
-        ?array $filters = null,
+        &$result, $value, ?array $filters = null,
         array $refs = []
     ) : bool
     {
@@ -378,26 +376,31 @@ class SocialModule
      * @param string|null $result
      */
     public function type_phone_real(
-        &$result, $value,
+        &$result, $value, ?string $region = '',
         array $refs = []
     ) : bool
     {
         $result = null;
 
-        $withTel = array_key_exists(0, $refs);
-        $withTelDigits = array_key_exists(1, $refs);
-        $withTelPlus = array_key_exists(2, $refs);
+        $withRegionDetected = array_key_exists(0, $refs);
+        $withTel = array_key_exists(1, $refs);
+        $withTelDigits = array_key_exists(2, $refs);
+        $withTelPlus = array_key_exists(3, $refs);
 
+        if ($withRegionDetected) {
+            $refRegionDetected =& $refs[ 0 ];
+        }
         if ($withTel) {
-            $refTel =& $refs[ 0 ];
+            $refTel =& $refs[ 1 ];
         }
         if ($withTelDigits) {
-            $refTelDigits =& $refs[ 1 ];
+            $refTelDigits =& $refs[ 2 ];
         }
         if ($withTelPlus) {
-            $refTelPlus =& $refs[ 2 ];
+            $refTelPlus =& $refs[ 3 ];
         }
 
+        $refRegionDetected = null;
         $refTel = null;
         $refTelDigits = null;
         $refTelPlus = null;
@@ -406,7 +409,8 @@ class SocialModule
             $phoneManager = $this->phoneManager();
 
             $phone = $phoneManager->parsePhoneReal(
-                $value,
+                $value, $region,
+                $refRegionDetected,
                 $refTel, $refTelDigits, $refTelPlus
             );
         }
@@ -417,6 +421,7 @@ class SocialModule
             return false;
         }
 
+        unset($refRegionDetected);
         unset($refTel);
         unset($refTelDigits);
         unset($refTelPlus);
@@ -569,22 +574,27 @@ class SocialModule
      * @param string|null $result
      */
     public function type_tel_real(
-        &$result, $value,
+        &$result, $value, ?string $region = '',
         array $refs = []
     ) : bool
     {
         $result = null;
 
-        $withTelDigits = array_key_exists(0, $refs);
-        $withTelPlus = array_key_exists(1, $refs);
+        $withRegionDetected = array_key_exists(0, $refs);
+        $withTelDigits = array_key_exists(1, $refs);
+        $withTelPlus = array_key_exists(2, $refs);
 
+        if ($withRegionDetected) {
+            $refRegionDetected =& $refs[ 0 ];
+        }
         if ($withTelDigits) {
-            $refTelDigits =& $refs[ 0 ];
+            $refTelDigits =& $refs[ 1 ];
         }
         if ($withTelPlus) {
-            $refTelPlus =& $refs[ 1 ];
+            $refTelPlus =& $refs[ 2 ];
         }
 
+        $refRegionDetected = null;
         $refTelDigits = null;
         $refTelPlus = null;
 
@@ -592,7 +602,8 @@ class SocialModule
             $phoneManager = $this->phoneManager();
 
             $tel = $phoneManager->parseTelReal(
-                $value,
+                $value, $region,
+                $refRegionDetected,
                 $refTelDigits, $refTelPlus
             );
         }
@@ -603,6 +614,7 @@ class SocialModule
             return false;
         }
 
+        unset($refRegionDetected);
         unset($refTelDigits);
         unset($refTelPlus);
 
