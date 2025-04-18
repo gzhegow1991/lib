@@ -395,7 +395,7 @@ class NetModule
 
         if ($isV4 && (0 !== count($subnetsV4))) {
             foreach ( $subnetsV4 as $subnetV4 ) {
-                if ($this->is_ip_in_subnet_v6($addressIpV4, $subnetV4)) {
+                if ($this->is_ip_in_subnet_v4($addressIpV4, $subnetV4)) {
                     return true;
                 }
             }
@@ -474,8 +474,6 @@ class NetModule
     {
         $addressIpV4 = null;
         $addressIpV6 = null;
-        $subnetV4 = null;
-        $subnetV6 = null;
 
         $statusIp = false
             || $this->type_address_ip_v4($addressIpV4, $addressIp)
@@ -489,6 +487,9 @@ class NetModule
                 ]
             );
         }
+
+        $subnetV4 = null;
+        $subnetV6 = null;
 
         $statusSubnet = false
             || $this->type_subnet_v4($subnetV4, $subnet)
