@@ -2373,7 +2373,7 @@ class PhpModule
         $isDot = ($dot === $path[ 0 ]);
 
         if ($isDot) {
-            $pathResolved = $this->path_absolute($path, $separator, $dot);
+            $pathResolved = $this->path_absolute($path, $current, $separator, $dot);
 
         } else {
             $pathResolved = $this->path_normalize($path, $separator);
