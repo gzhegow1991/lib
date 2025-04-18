@@ -698,6 +698,19 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return array|null
 	 */
+	public function index($value)
+	{
+		if (Lib::type()->index($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return array|null
+	 */
 	public function index_list($value)
 	{
 		if (Lib::type()->index_list($result, $value)) {

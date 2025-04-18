@@ -1496,6 +1496,14 @@ class TypeModule extends AbstractTypeModule
     /**
      * @param array|null $result
      */
+    public function index(&$result, $value) : bool
+    {
+        return Lib::arr()->type_index($result, $value);
+    }
+
+    /**
+     * @param array|null $result
+     */
     public function index_list(&$result, $value) : bool
     {
         return Lib::arr()->type_index_list($result, $value);

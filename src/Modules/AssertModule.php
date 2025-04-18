@@ -1002,6 +1002,25 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
+	public function index()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->index(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
 	public function index_list()
 	{
 		$this->fnList[] = [ __FUNCTION__, [  ] ];
