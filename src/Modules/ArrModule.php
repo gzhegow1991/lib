@@ -154,6 +154,26 @@ class ArrModule
     /**
      * @param array|null $result
      */
+    public function type_index(&$result, $value) : bool
+    {
+        $result = null;
+
+        $status = false
+            || $this->type_index_dict($result, $value)
+            || $this->type_index_list($result, $value);
+
+        if ($status) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array|null $result
+     */
     public function type_index_list(&$result, $value) : bool
     {
         $result = null;
