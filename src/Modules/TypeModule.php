@@ -456,8 +456,8 @@ class TypeModule extends AbstractTypeModule
 
         $refSplit =& $refs[ 0 ];
 
-        // > btw, 1.1e1 is can be converted to integer too
-        // > there's we better dont support that numbers
+        // > btw, 1.1e1 is can be converted to integer 11 too
+        // > we better dont support that numbers here
         if (! $this->numeric($_value, $value, false, $refs)) {
             unset($refSplit);
 
@@ -619,12 +619,24 @@ class TypeModule extends AbstractTypeModule
 
         $refSplit =& $refs[ 0 ];
 
-        // > btw, 1.1e1 is can be converted to integer too
-        // > there's we better dont support that numbers
+        // > btw, 1.1e-1 is can be converted to float 0.11 too
+        // > we better dont support that numbers here
         if (! $this->numeric($_value, $value, false, $refs)) {
             unset($refSplit);
 
             return false;
+        }
+
+        [ $sign, $int, $frac ] = $refSplit;
+
+        if ('' === $frac) {
+            $frac = '.0';
+
+            $_value = "{$sign}{$int}{$frac}";
+
+            if ($withSplit) {
+                $refSplit[ 3 ] = $frac;
+            }
         }
 
         if ('0' === $_value) {
@@ -637,18 +649,6 @@ class TypeModule extends AbstractTypeModule
             }
 
             return true;
-        }
-
-        [ , , $frac ] = $refSplit;
-
-        if ('' === $frac) {
-            unset($refSplit);
-
-            if (! $withSplit) {
-                unset($refs[ 0 ]);
-            }
-
-            return false;
         }
 
         $result = $_value;
@@ -796,8 +796,6 @@ class TypeModule extends AbstractTypeModule
 
         $refSplit =& $refs[ 0 ];
 
-        // > btw, 1.1e1 is can be converted to integer too
-        // > there's we better dont support that numbers
         if (! $this->numeric($_value, $value, false, $refs)) {
             unset($refSplit);
 
