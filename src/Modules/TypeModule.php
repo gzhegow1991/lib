@@ -170,602 +170,6 @@ class TypeModule extends AbstractTypeModule
 
 
     /**
-     * @param int|null $result
-     */
-    public function int(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (is_int($value)) {
-            $result = $value;
-
-            return true;
-        }
-
-        if (
-            (null === $value)
-            || ('' === $value)
-            || (is_bool($value))
-            || (is_array($value))
-            || (is_float($value) && ! is_finite($value))
-            || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || ($this->is_nil($value))
-        ) {
-            // > NULL is not int
-            // > EMPTY STRING is not int
-            // > BOOLEAN is not int
-            // > ARRAY is not int
-            // > NAN, INF, -INF is not int
-            // > RESOURCE is not int
-            // > NIL is not int
-
-            return false;
-        }
-
-        if (! $this->num($_value, $value)) {
-            return false;
-        }
-
-        if (! is_int($_value)) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param int|null $result
-     */
-    public function int_non_zero(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->int($_value, $value)) {
-            return false;
-        }
-
-        if ($_value === 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param int|null $result
-     */
-    public function int_non_negative(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->int($_value, $value)) {
-            return false;
-        }
-
-        if ($_value < 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param int|null $result
-     */
-    public function int_non_positive(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->int($_value, $value)) {
-            return false;
-        }
-
-        if ($_value > 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param int|null $result
-     */
-    public function int_negative(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->int($_value, $value)) {
-            return false;
-        }
-
-        if ($_value >= 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param int|null $result
-     */
-    public function int_positive(&$result, $value) : bool
-    {
-        $result = false;
-
-        if (! $this->int($_value, $value)) {
-            return false;
-        }
-
-        if ($_value <= 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-
-    /**
-     * @param float|null $result
-     */
-    public function float(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (is_int($value)) {
-            $result = (float) $value;
-
-            return true;
-
-        } elseif (is_float($value)) {
-            if (! is_finite($value)) {
-                // > NAN, INF, -INF is float, but should not be parsed
-                return false;
-            }
-
-            $result = $value;
-
-            return true;
-        }
-
-        if (
-            (null === $value)
-            || ('' === $value)
-            || (is_bool($value))
-            || (is_array($value))
-            // || (is_float($value) && (! is_finite($value)))
-            || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || ($this->is_nil($value))
-        ) {
-            // > NULL is not float
-            // > EMPTY STRING is not float
-            // > BOOLEAN is not float
-            // > ARRAY is not float
-            // > RESOURCE is not float
-            // > NIL is not float
-
-            return false;
-        }
-
-        if (! $this->numeric($valueNumeric, $value, true, [ &$split ])) {
-            return false;
-        }
-
-        $map = [
-            ' ' . ((string) PHP_FLOAT_MAX)  => PHP_FLOAT_MAX,
-            ' ' . ((string) PHP_FLOAT_MIN)  => PHP_FLOAT_MIN,
-            //
-            ' ' . ((string) -PHP_FLOAT_MAX) => -PHP_FLOAT_MAX,
-            ' ' . ((string) -PHP_FLOAT_MIN) => -PHP_FLOAT_MIN,
-            //
-            ' 1.797693134862316E+308'       => PHP_FLOAT_MAX,
-            ' 1.7976931348623157E+308'      => PHP_FLOAT_MAX,
-            //
-            ' 2.225073858507201E-308'       => PHP_FLOAT_MIN,
-            ' 2.2250738585072014E-308'      => PHP_FLOAT_MIN,
-            //
-            ' -1.797693134862316E+308'      => -PHP_FLOAT_MAX,
-            ' -1.7976931348623157E+308'     => -PHP_FLOAT_MAX,
-            //
-            ' -2.225073858507201E-308'      => -PHP_FLOAT_MIN,
-            ' -2.2250738585072014E-308'     => -PHP_FLOAT_MIN,
-        ];
-
-        if (isset($map[ $key = ' ' . $valueNumeric ])) {
-            $result = $map[ $key ];
-
-            return true;
-        }
-
-        $valueFloat = floatval($valueNumeric);
-
-        if (0.0 === $valueFloat) {
-            if ($valueNumeric !== '0') {
-                $valueFloat = null;
-            }
-        }
-
-        if (! is_finite($valueFloat)) {
-            $valueFloat = null;
-        }
-
-        if (null !== $valueFloat) {
-            $result = $valueFloat;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param float|null $result
-     */
-    public function float_non_zero(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->float($_value, $value)) {
-            return false;
-        }
-
-        if ($_value == 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param float|null $result
-     */
-    public function float_non_negative(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->float($_value, $value)) {
-            return false;
-        }
-
-        if ($_value < 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param float|null $result
-     */
-    public function float_non_positive(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->float($_value, $value)) {
-            return false;
-        }
-
-        if ($_value > 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param float|null $result
-     */
-    public function float_negative(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->float($_value, $value)) {
-            return false;
-        }
-
-        if ($_value >= 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param float|null $result
-     */
-    public function float_positive(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->float($_value, $value)) {
-            return false;
-        }
-
-        if ($_value <= 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-
-    /**
-     * @param int|float|null $result
-     */
-    public function num(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (is_int($value)) {
-            $result = $value;
-
-            return true;
-        }
-
-        if (is_float($value)) {
-            if (! is_finite($value)) {
-                // > NAN, INF, -INF is float, but should not be parsed
-                return false;
-            }
-
-            $result = $value;
-
-            return true;
-        }
-
-        if (
-            (null === $value)
-            || ('' === $value)
-            || (is_bool($value))
-            || (is_array($value))
-            // || (is_float($value) && (! is_finite($value)))
-            || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || ($this->is_nil($value))
-        ) {
-            // > NULL is not num
-            // > EMPTY STRING is not num
-            // > BOOLEAN is not num
-            // > ARRAY is not num
-            // > RESOURCE is not num
-            // > NIL is not num
-
-            return false;
-        }
-
-        if (! $this->numeric($valueNumeric, $value, true, [ &$split ])) {
-            return false;
-        }
-
-        $map = [];
-
-        if (PHP_INT_SIZE === 8) {
-            $map += [
-                ' ' . ((string) PHP_INT_MAX)  => PHP_INT_MAX,
-                ' ' . ((string) -PHP_INT_MAX) => -PHP_INT_MAX,
-                ' ' . ((string) PHP_INT_MIN)  => PHP_INT_MIN,
-                //
-                ' 9223372036854775807'        => PHP_INT_MAX,
-                ' -9223372036854775807'       => -PHP_INT_MAX,
-                ' -9223372036854775808'       => PHP_INT_MIN,
-            ];
-
-        } elseif (PHP_INT_SIZE === 4) {
-            $map += [
-                ' ' . ((string) PHP_INT_MAX)  => PHP_INT_MAX,
-                ' ' . ((string) -PHP_INT_MAX) => -PHP_INT_MAX,
-                ' ' . ((string) PHP_INT_MIN)  => PHP_INT_MIN,
-                //
-                ' 2147483647'                 => PHP_INT_MAX,
-                ' -2147483647'                => -PHP_INT_MAX,
-                ' -2147483648'                => PHP_INT_MIN,
-            ];
-        }
-
-        $map += [
-            ' ' . ((string) PHP_FLOAT_MAX)  => PHP_FLOAT_MAX,
-            ' ' . ((string) PHP_FLOAT_MIN)  => PHP_FLOAT_MIN,
-            //
-            ' ' . ((string) -PHP_FLOAT_MAX) => -PHP_FLOAT_MAX,
-            ' ' . ((string) -PHP_FLOAT_MIN) => -PHP_FLOAT_MIN,
-            //
-            ' 1.797693134862316E+308'       => PHP_FLOAT_MAX,
-            ' 1.7976931348623157E+308'      => PHP_FLOAT_MAX,
-            //
-            ' 2.225073858507201E-308'       => PHP_FLOAT_MIN,
-            ' 2.2250738585072014E-308'      => PHP_FLOAT_MIN,
-            //
-            ' -1.797693134862316E+308'      => -PHP_FLOAT_MAX,
-            ' -1.7976931348623157E+308'     => -PHP_FLOAT_MAX,
-            //
-            ' -2.225073858507201E-308'      => -PHP_FLOAT_MIN,
-            ' -2.2250738585072014E-308'     => -PHP_FLOAT_MIN,
-        ];
-
-        if (isset($map[ $key = ' ' . $valueNumeric ])) {
-            $result = $map[ $key ];
-
-            return true;
-        }
-
-        $valueFloat = null;
-        $valueFloat17g = null;
-
-        $hasExponent = ('' !== $split[ 3 ]);
-        if ($hasExponent) {
-            $valueFloat = floatval($valueNumeric);
-
-        } else {
-            // > IEEE 754 double-precision floating point (64-bit float)
-            $valueFloat17g = floatval(sprintf('%.17g', $valueNumeric));
-        }
-
-        $valueMaybeFloat = $valueFloat17g ?? $valueFloat;
-
-        if (0.0 === $valueMaybeFloat) {
-            if ($valueNumeric !== '0') {
-                return false;
-            }
-        }
-
-        if (! is_finite($valueMaybeFloat)) {
-            return false;
-        }
-
-        if (null !== $valueFloat) {
-            $result = $valueFloat;
-
-            return true;
-        }
-
-        if (null !== $valueFloat17g) {
-            if (
-                ($valueFloat17g < (float) PHP_INT_MIN)
-                || ($valueFloat17g > (float) PHP_INT_MAX)
-            ) {
-                $result = $valueFloat17g;
-
-                return true;
-            }
-
-            $valueInt = intval($valueFloat17g);
-
-            if ($valueFloat17g === floatval($valueInt)) {
-                $result = $valueInt;
-
-                return true;
-            }
-
-            $result = $valueFloat17g;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param int|float|null $result
-     */
-    public function num_non_zero(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->num($_value, $value)) {
-            return false;
-        }
-
-        if ($_value == 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param int|float|null $result
-     */
-    public function num_non_negative(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->num($_value, $value)) {
-            return false;
-        }
-
-        if ($_value < 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param int|float|null $result
-     */
-    public function num_non_positive(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->num($_value, $value)) {
-            return false;
-        }
-
-        if ($_value > 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param int|float|null $result
-     */
-    public function num_negative(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->num($_value, $value)) {
-            return false;
-        }
-
-        if ($_value >= 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-    /**
-     * @param int|float|null $result
-     */
-    public function num_positive(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! $this->num($_value, $value)) {
-            return false;
-        }
-
-        if ($_value <= 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-
-    /**
      * @param string|null $result
      */
     public function numeric(&$result, $value, ?bool $isAllowExp = null, array $refs = []) : bool
@@ -1201,6 +605,961 @@ class TypeModule extends AbstractTypeModule
         }
 
         return false;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_float(&$result, $value, array $refs = []) : bool
+    {
+        $result = null;
+
+        $withSplit = array_key_exists(0, $refs);
+
+        $refSplit =& $refs[ 0 ];
+
+        // > btw, 1.1e1 is can be converted to integer too
+        // > there's we better dont support that numbers
+        if (! $this->numeric($_value, $value, false, $refs)) {
+            unset($refSplit);
+
+            return false;
+        }
+
+        if ('0' === $_value) {
+            $result = '0.0';
+
+            unset($refSplit);
+
+            if (! $withSplit) {
+                unset($refs[ 0 ]);
+            }
+
+            return true;
+        }
+
+        [ , , $frac ] = $refSplit;
+
+        if ('' === $frac) {
+            unset($refSplit);
+
+            if (! $withSplit) {
+                unset($refs[ 0 ]);
+            }
+
+            return false;
+        }
+
+        $result = $_value;
+
+        unset($refSplit);
+
+        if (! $withSplit) {
+            unset($refs[ 0 ]);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_float_non_zero(&$result, $value, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric_float($_value, $value, $refs)) {
+            return false;
+        }
+
+        if ('0.0' !== $_value) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_float_non_negative(&$result, $value, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric_float($_value, $value, $refs)) {
+            return false;
+        }
+
+        if ('0.0' === $_value) {
+            $result = $_value;
+
+            return true;
+        }
+
+        if ('-' !== $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_float_non_positive(&$result, $value, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric_float($_value, $value, $refs)) {
+            return false;
+        }
+
+        if ('0.0' === $_value) {
+            $result = $_value;
+
+            return true;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_float_negative(&$result, $value, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric_float($_value, $value, $refs)) {
+            return false;
+        }
+
+        if ('0.0' === $_value) {
+            return false;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function numeric_float_positive(&$result, $value, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->numeric_float($_value, $value, $refs)) {
+            return false;
+        }
+
+        if ('0.0' === $_value) {
+            return false;
+        }
+
+        if ('-' !== $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
+    public function decimal(&$result, $value, int $scale = 0, array $refs = []) : bool
+    {
+        $result = null;
+
+        if ($scale < 0) return false;
+
+        $withSplit = array_key_exists(0, $refs);
+
+        $refSplit =& $refs[ 0 ];
+
+        // > btw, 1.1e1 is can be converted to integer too
+        // > there's we better dont support that numbers
+        if (! $this->numeric($_value, $value, false, $refs)) {
+            unset($refSplit);
+
+            return false;
+        }
+
+        [ $sign, $int, $frac ] = $refSplit;
+
+        $numericScale = 0;
+        if ('' !== $frac) {
+            $numericScale = strlen($frac) - 1;
+        }
+
+        if ($numericScale > $scale) {
+            unset($refSplit);
+
+            if (! $withSplit) {
+                unset($refs[ 0 ]);
+            }
+
+            return false;
+        }
+
+        if ($numericScale < $scale) {
+            if ('' === $frac) {
+                $frac = '.';
+            }
+
+            $frac = str_pad($frac, $scale + 1, '0', STR_PAD_RIGHT);
+
+            $_value = "{$sign}{$int}{$frac}";
+
+            if ($withSplit) {
+                $refSplit[ 3 ] = $frac;
+            }
+        }
+
+        $result = $_value;
+
+        unset($refSplit);
+
+        if (! $withSplit) {
+            unset($refs[ 0 ]);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function decimal_non_zero(&$result, $value, int $scale = 0, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->decimal($_value, $value, $scale, $refs)) {
+            return false;
+        }
+
+        if ('0' === rtrim($_value, '0.')) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function decimal_non_negative(&$result, $value, int $scale = 0, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->decimal($_value, $value, $scale, $refs)) {
+            return false;
+        }
+
+        if ('0' === rtrim($_value, '0.')) {
+            $result = $_value;
+
+            return true;
+        }
+
+        if ('-' !== $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function decimal_non_positive(&$result, $value, int $scale = 0, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->decimal($_value, $value, $scale, $refs)) {
+            return false;
+        }
+
+        if ('0' === rtrim($_value, '0.')) {
+            $result = $_value;
+
+            return true;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function decimal_negative(&$result, $value, int $scale = 0, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->decimal($_value, $value, $scale, $refs)) {
+            return false;
+        }
+
+        if ('0' === rtrim($_value, '0.')) {
+            return false;
+        }
+
+        if ('-' === $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function decimal_positive(&$result, $value, int $scale = 0, array $refs = []) : bool
+    {
+        $result = null;
+
+        if (! $this->decimal($_value, $value, $scale, $refs)) {
+            return false;
+        }
+
+        if ('0' === rtrim($_value, '0.')) {
+            return false;
+        }
+
+        if ('-' !== $_value[ 0 ]) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (is_int($value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        if (is_float($value)) {
+            if (! is_finite($value)) {
+                // > NAN, INF, -INF is float, but should not be parsed
+                return false;
+            }
+
+            $result = $value;
+
+            return true;
+        }
+
+        if (
+            (null === $value)
+            || ('' === $value)
+            || (is_bool($value))
+            || (is_array($value))
+            // || (is_float($value) && (! is_finite($value)))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
+            || ($this->is_nil($value))
+        ) {
+            // > NULL is not num
+            // > EMPTY STRING is not num
+            // > BOOLEAN is not num
+            // > ARRAY is not num
+            // > RESOURCE is not num
+            // > NIL is not num
+
+            return false;
+        }
+
+        if (! $this->numeric($valueNumeric, $value, true, [ &$split ])) {
+            return false;
+        }
+
+        $map = [];
+
+        if (PHP_INT_SIZE === 8) {
+            $map += [
+                ' ' . ((string) PHP_INT_MAX)  => PHP_INT_MAX,
+                ' ' . ((string) -PHP_INT_MAX) => -PHP_INT_MAX,
+                ' ' . ((string) PHP_INT_MIN)  => PHP_INT_MIN,
+                //
+                ' 9223372036854775807'        => PHP_INT_MAX,
+                ' -9223372036854775807'       => -PHP_INT_MAX,
+                ' -9223372036854775808'       => PHP_INT_MIN,
+            ];
+
+        } elseif (PHP_INT_SIZE === 4) {
+            $map += [
+                ' ' . ((string) PHP_INT_MAX)  => PHP_INT_MAX,
+                ' ' . ((string) -PHP_INT_MAX) => -PHP_INT_MAX,
+                ' ' . ((string) PHP_INT_MIN)  => PHP_INT_MIN,
+                //
+                ' 2147483647'                 => PHP_INT_MAX,
+                ' -2147483647'                => -PHP_INT_MAX,
+                ' -2147483648'                => PHP_INT_MIN,
+            ];
+        }
+
+        $map += [
+            ' ' . ((string) PHP_FLOAT_MAX)  => PHP_FLOAT_MAX,
+            ' ' . ((string) PHP_FLOAT_MIN)  => PHP_FLOAT_MIN,
+            //
+            ' ' . ((string) -PHP_FLOAT_MAX) => -PHP_FLOAT_MAX,
+            ' ' . ((string) -PHP_FLOAT_MIN) => -PHP_FLOAT_MIN,
+            //
+            ' 1.797693134862316E+308'       => PHP_FLOAT_MAX,
+            ' 1.7976931348623157E+308'      => PHP_FLOAT_MAX,
+            //
+            ' 2.225073858507201E-308'       => PHP_FLOAT_MIN,
+            ' 2.2250738585072014E-308'      => PHP_FLOAT_MIN,
+            //
+            ' -1.797693134862316E+308'      => -PHP_FLOAT_MAX,
+            ' -1.7976931348623157E+308'     => -PHP_FLOAT_MAX,
+            //
+            ' -2.225073858507201E-308'      => -PHP_FLOAT_MIN,
+            ' -2.2250738585072014E-308'     => -PHP_FLOAT_MIN,
+        ];
+
+        if (isset($map[ $key = ' ' . $valueNumeric ])) {
+            $result = $map[ $key ];
+
+            return true;
+        }
+
+        $valueFloat = null;
+        $valueFloat17g = null;
+
+        $hasExponent = ('' !== $split[ 3 ]);
+        if ($hasExponent) {
+            $valueFloat = floatval($valueNumeric);
+
+        } else {
+            // > IEEE 754 double-precision floating point (64-bit float)
+            $valueFloat17g = floatval(sprintf('%.17g', $valueNumeric));
+        }
+
+        $valueMaybeFloat = $valueFloat17g ?? $valueFloat;
+
+        if (0.0 === $valueMaybeFloat) {
+            if ($valueNumeric !== '0') {
+                return false;
+            }
+        }
+
+        if (! is_finite($valueMaybeFloat)) {
+            return false;
+        }
+
+        if (null !== $valueFloat) {
+            $result = $valueFloat;
+
+            return true;
+        }
+
+        if (null !== $valueFloat17g) {
+            if (
+                ($valueFloat17g < (float) PHP_INT_MIN)
+                || ($valueFloat17g > (float) PHP_INT_MAX)
+            ) {
+                $result = $valueFloat17g;
+
+                return true;
+            }
+
+            $valueInt = intval($valueFloat17g);
+
+            if ($valueFloat17g === floatval($valueInt)) {
+                $result = $valueInt;
+
+                return true;
+            }
+
+            $result = $valueFloat17g;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num_non_zero(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->num($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num_non_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->num($_value, $value)) {
+            return false;
+        }
+
+        if ($_value < 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num_non_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->num($_value, $value)) {
+            return false;
+        }
+
+        if ($_value > 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->num($_value, $value)) {
+            return false;
+        }
+
+        if ($_value >= 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|float|null $result
+     */
+    public function num_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->num($_value, $value)) {
+            return false;
+        }
+
+        if ($_value <= 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+
+    /**
+     * @param int|null $result
+     */
+    public function int(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (is_int($value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        if (
+            (null === $value)
+            || ('' === $value)
+            || (is_bool($value))
+            || (is_array($value))
+            || (is_float($value) && ! is_finite($value))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
+            || ($this->is_nil($value))
+        ) {
+            // > NULL is not int
+            // > EMPTY STRING is not int
+            // > BOOLEAN is not int
+            // > ARRAY is not int
+            // > NAN, INF, -INF is not int
+            // > RESOURCE is not int
+            // > NIL is not int
+
+            return false;
+        }
+
+        if (! $this->num($_value, $value)) {
+            return false;
+        }
+
+        if (! is_int($_value)) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|null $result
+     */
+    public function int_non_zero(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value === 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|null $result
+     */
+    public function int_non_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value < 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|null $result
+     */
+    public function int_non_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value > 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|null $result
+     */
+    public function int_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value >= 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param int|null $result
+     */
+    public function int_positive(&$result, $value) : bool
+    {
+        $result = false;
+
+        if (! $this->int($_value, $value)) {
+            return false;
+        }
+
+        if ($_value <= 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+
+    /**
+     * @param float|null $result
+     */
+    public function float(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (is_int($value)) {
+            $result = (float) $value;
+
+            return true;
+
+        } elseif (is_float($value)) {
+            if (! is_finite($value)) {
+                // > NAN, INF, -INF is float, but should not be parsed
+                return false;
+            }
+
+            $result = $value;
+
+            return true;
+        }
+
+        if (
+            (null === $value)
+            || ('' === $value)
+            || (is_bool($value))
+            || (is_array($value))
+            // || (is_float($value) && (! is_finite($value)))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
+            || ($this->is_nil($value))
+        ) {
+            // > NULL is not float
+            // > EMPTY STRING is not float
+            // > BOOLEAN is not float
+            // > ARRAY is not float
+            // > RESOURCE is not float
+            // > NIL is not float
+
+            return false;
+        }
+
+        if (! $this->numeric($valueNumeric, $value, true, [ &$split ])) {
+            return false;
+        }
+
+        $map = [
+            ' ' . ((string) PHP_FLOAT_MAX)  => PHP_FLOAT_MAX,
+            ' ' . ((string) PHP_FLOAT_MIN)  => PHP_FLOAT_MIN,
+            //
+            ' ' . ((string) -PHP_FLOAT_MAX) => -PHP_FLOAT_MAX,
+            ' ' . ((string) -PHP_FLOAT_MIN) => -PHP_FLOAT_MIN,
+            //
+            ' 1.797693134862316E+308'       => PHP_FLOAT_MAX,
+            ' 1.7976931348623157E+308'      => PHP_FLOAT_MAX,
+            //
+            ' 2.225073858507201E-308'       => PHP_FLOAT_MIN,
+            ' 2.2250738585072014E-308'      => PHP_FLOAT_MIN,
+            //
+            ' -1.797693134862316E+308'      => -PHP_FLOAT_MAX,
+            ' -1.7976931348623157E+308'     => -PHP_FLOAT_MAX,
+            //
+            ' -2.225073858507201E-308'      => -PHP_FLOAT_MIN,
+            ' -2.2250738585072014E-308'     => -PHP_FLOAT_MIN,
+        ];
+
+        if (isset($map[ $key = ' ' . $valueNumeric ])) {
+            $result = $map[ $key ];
+
+            return true;
+        }
+
+        $valueFloat = floatval($valueNumeric);
+
+        if (0.0 === $valueFloat) {
+            if ($valueNumeric !== '0') {
+                $valueFloat = null;
+            }
+        }
+
+        if (! is_finite($valueFloat)) {
+            $valueFloat = null;
+        }
+
+        if (null !== $valueFloat) {
+            $result = $valueFloat;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param float|null $result
+     */
+    public function float_non_zero(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->float($_value, $value)) {
+            return false;
+        }
+
+        if ($_value == 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param float|null $result
+     */
+    public function float_non_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->float($_value, $value)) {
+            return false;
+        }
+
+        if ($_value < 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param float|null $result
+     */
+    public function float_non_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->float($_value, $value)) {
+            return false;
+        }
+
+        if ($_value > 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param float|null $result
+     */
+    public function float_negative(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->float($_value, $value)) {
+            return false;
+        }
+
+        if ($_value >= 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
+    /**
+     * @param float|null $result
+     */
+    public function float_positive(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->float($_value, $value)) {
+            return false;
+        }
+
+        if ($_value <= 0) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
     }
 
 

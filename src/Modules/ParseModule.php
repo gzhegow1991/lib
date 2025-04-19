@@ -46,240 +46,6 @@ class ParseModule extends AbstractParseModule
 
 
 	/**
-	 * @return int|null
-	 */
-	public function int($value)
-	{
-		if (Lib::type()->int($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return int|null
-	 */
-	public function int_non_zero($value)
-	{
-		if (Lib::type()->int_non_zero($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return int|null
-	 */
-	public function int_non_negative($value)
-	{
-		if (Lib::type()->int_non_negative($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return int|null
-	 */
-	public function int_non_positive($value)
-	{
-		if (Lib::type()->int_non_positive($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return int|null
-	 */
-	public function int_negative($value)
-	{
-		if (Lib::type()->int_negative($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return int|null
-	 */
-	public function int_positive($value)
-	{
-		if (Lib::type()->int_positive($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return float|null
-	 */
-	public function float($value)
-	{
-		if (Lib::type()->float($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return float|null
-	 */
-	public function float_non_zero($value)
-	{
-		if (Lib::type()->float_non_zero($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return float|null
-	 */
-	public function float_non_negative($value)
-	{
-		if (Lib::type()->float_non_negative($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return float|null
-	 */
-	public function float_non_positive($value)
-	{
-		if (Lib::type()->float_non_positive($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return float|null
-	 */
-	public function float_negative($value)
-	{
-		if (Lib::type()->float_negative($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return float|null
-	 */
-	public function float_positive($value)
-	{
-		if (Lib::type()->float_positive($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return int|float|null
-	 */
-	public function num($value)
-	{
-		if (Lib::type()->num($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return int|float|null
-	 */
-	public function num_non_zero($value)
-	{
-		if (Lib::type()->num_non_zero($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return int|float|null
-	 */
-	public function num_non_negative($value)
-	{
-		if (Lib::type()->num_non_negative($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return int|float|null
-	 */
-	public function num_non_positive($value)
-	{
-		if (Lib::type()->num_non_positive($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return int|float|null
-	 */
-	public function num_negative($value)
-	{
-		if (Lib::type()->num_negative($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return int|float|null
-	 */
-	public function num_positive($value)
-	{
-		if (Lib::type()->num_positive($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
 	 * @return string|null
 	 */
 	public function numeric($value, ?bool $isAllowExp = null, array $refs = [])
@@ -428,6 +194,396 @@ class ParseModule extends AbstractParseModule
 	public function numeric_int_positive($value, array $refs = [])
 	{
 		if (Lib::type()->numeric_int_positive($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function numeric_float($value, array $refs = [])
+	{
+		if (Lib::type()->numeric_float($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function numeric_float_non_zero($value, array $refs = [])
+	{
+		if (Lib::type()->numeric_float_non_zero($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function numeric_float_non_negative($value, array $refs = [])
+	{
+		if (Lib::type()->numeric_float_non_negative($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function numeric_float_non_positive($value, array $refs = [])
+	{
+		if (Lib::type()->numeric_float_non_positive($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function numeric_float_negative($value, array $refs = [])
+	{
+		if (Lib::type()->numeric_float_negative($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function numeric_float_positive($value, array $refs = [])
+	{
+		if (Lib::type()->numeric_float_positive($result, $value, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function decimal($value, int $scale = 0, array $refs = [])
+	{
+		if (Lib::type()->decimal($result, $value, $scale, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function decimal_non_zero($value, int $scale = 0, array $refs = [])
+	{
+		if (Lib::type()->decimal_non_zero($result, $value, $scale, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function decimal_non_negative($value, int $scale = 0, array $refs = [])
+	{
+		if (Lib::type()->decimal_non_negative($result, $value, $scale, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function decimal_non_positive($value, int $scale = 0, array $refs = [])
+	{
+		if (Lib::type()->decimal_non_positive($result, $value, $scale, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function decimal_negative($value, int $scale = 0, array $refs = [])
+	{
+		if (Lib::type()->decimal_negative($result, $value, $scale, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function decimal_positive($value, int $scale = 0, array $refs = [])
+	{
+		if (Lib::type()->decimal_positive($result, $value, $scale, $refs)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|float|null
+	 */
+	public function num($value)
+	{
+		if (Lib::type()->num($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|float|null
+	 */
+	public function num_non_zero($value)
+	{
+		if (Lib::type()->num_non_zero($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|float|null
+	 */
+	public function num_non_negative($value)
+	{
+		if (Lib::type()->num_non_negative($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|float|null
+	 */
+	public function num_non_positive($value)
+	{
+		if (Lib::type()->num_non_positive($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|float|null
+	 */
+	public function num_negative($value)
+	{
+		if (Lib::type()->num_negative($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|float|null
+	 */
+	public function num_positive($value)
+	{
+		if (Lib::type()->num_positive($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|null
+	 */
+	public function int($value)
+	{
+		if (Lib::type()->int($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|null
+	 */
+	public function int_non_zero($value)
+	{
+		if (Lib::type()->int_non_zero($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|null
+	 */
+	public function int_non_negative($value)
+	{
+		if (Lib::type()->int_non_negative($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|null
+	 */
+	public function int_non_positive($value)
+	{
+		if (Lib::type()->int_non_positive($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|null
+	 */
+	public function int_negative($value)
+	{
+		if (Lib::type()->int_negative($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|null
+	 */
+	public function int_positive($value)
+	{
+		if (Lib::type()->int_positive($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return float|null
+	 */
+	public function float($value)
+	{
+		if (Lib::type()->float($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return float|null
+	 */
+	public function float_non_zero($value)
+	{
+		if (Lib::type()->float_non_zero($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return float|null
+	 */
+	public function float_non_negative($value)
+	{
+		if (Lib::type()->float_non_negative($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return float|null
+	 */
+	public function float_non_positive($value)
+	{
+		if (Lib::type()->float_non_positive($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return float|null
+	 */
+	public function float_negative($value)
+	{
+		if (Lib::type()->float_negative($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return float|null
+	 */
+	public function float_positive($value)
+	{
+		if (Lib::type()->float_positive($result, $value)) {
 		    return $result;
 		}
 

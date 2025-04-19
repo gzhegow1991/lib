@@ -52,348 +52,6 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function int()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->int(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function int_non_zero()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->int_non_zero(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function int_non_negative()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->int_non_negative(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function int_non_positive()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->int_non_positive(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function int_negative()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->int_negative(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function int_positive()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->int_positive(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function float()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->float(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function float_non_zero()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->float_non_zero(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function float_non_negative()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->float_non_negative(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function float_non_positive()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->float_non_positive(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function float_negative()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->float_negative(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function float_positive()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->float_positive(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function num()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->num(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function num_non_zero()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->num_non_zero(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function num_non_negative()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->num_non_negative(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function num_non_positive()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->num_non_positive(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function num_negative()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->num_negative(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function num_positive()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->num_positive(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
 	public function numeric(?bool $isAllowExp = null, array $refs = [])
 	{
 		$this->fnList[] = [ __FUNCTION__, [ $isAllowExp, $refs ] ];
@@ -612,6 +270,576 @@ class AssertModule extends AbstractAssertModule
 		        $this->result,
 		        $this->result ?? $this->value,
 		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function numeric_float(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_float(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function numeric_float_non_zero(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_float_non_zero(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function numeric_float_non_negative(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_float_non_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function numeric_float_non_positive(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_float_non_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function numeric_float_negative(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_float_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function numeric_float_positive(array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->numeric_float_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function decimal(int $scale = 0, array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $scale, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->decimal(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $scale, $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function decimal_non_zero(int $scale = 0, array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $scale, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->decimal_non_zero(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $scale, $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function decimal_non_negative(int $scale = 0, array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $scale, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->decimal_non_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $scale, $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function decimal_non_positive(int $scale = 0, array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $scale, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->decimal_non_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $scale, $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function decimal_negative(int $scale = 0, array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $scale, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->decimal_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $scale, $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function decimal_positive(int $scale = 0, array $refs = [])
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $scale, $refs ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->decimal_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $scale, $refs
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function num()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->num(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function num_non_zero()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->num_non_zero(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function num_non_negative()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->num_non_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function num_non_positive()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->num_non_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function num_negative()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->num_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function num_positive()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->num_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function int()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->int(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function int_non_zero()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->int_non_zero(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function int_non_negative()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->int_non_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function int_non_positive()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->int_non_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function int_negative()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->int_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function int_positive()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->int_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function float()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->float(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function float_non_zero()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->float_non_zero(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function float_non_negative()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->float_non_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function float_non_positive()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->float_non_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function float_negative()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->float_negative(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function float_positive()
+	{
+		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->float_positive(
+		        $this->result,
+		        $this->result ?? $this->value,
+
 		    );
 		}
 
