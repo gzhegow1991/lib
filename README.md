@@ -112,17 +112,17 @@ $fn = function () {
             throw new \Gzhegow\Lib\Exception\RuntimeException('This is the exception');
         })
         //
-        // > this step will never started cause of exception in previous step
+        // > this step will never be started cause of exception in previous step
         ->map('intval')
         //
-        // > this step may catch the exception and replace it by result
-        // ->catchTo($e) // > exception will be stored in $e by reference
-        // ->catchTo($e, [ 'catchTo' ]) // > same, and value will be replaced to 'catchTo'
-        // ->catchTo($e, [ 'catchTo' ], LogicException::class) > same, but only if \Throwable is subclass of arguments[2]
-        ->catchTo($e, [ 'catchTo' ], LogicException::class)
+        // > this step can catch the exception and replace it by result
+        // ->catchTo($e) // > exception will be stored in $e by reference, value will be replaced to NULL
+        // ->catchTo($e, 'catchTo') // > same, but value will be replaced to 'catchTo'
+        // ->catchTo($e, 'catchTo', LogicException::class) > same, but only if \Throwable is subclass
+        ->catchTo($e, 'catchTo', LogicException::class)
         //
         // > or you can handle exception common way using callback
-        ->catch(function (\Throwable $e, $any, $result) {
+        ->catch(function (\Throwable $e, $null, $result) {
             if ($e instanceof \RuntimeException) {
                 return $result;
             }

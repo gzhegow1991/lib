@@ -195,10 +195,8 @@ class Pipe
      *
      * @return static
      */
-    public function catchTo(?\Throwable &$e, array $result = [], ?string $throwableClass = null)
+    public function catchTo(?\Throwable &$e, $result = null, ?string $throwableClass = null)
     {
-        $_result = static::sanitizeResult($result);
-
         if (null !== $throwableClass) {
             if (! is_subclass_of($throwableClass, \Throwable::class)) {
                 throw new LogicException(
@@ -209,7 +207,7 @@ class Pipe
 
         $this->queueId++;
 
-        $this->catchToQueue[ $this->queueId ] = [ &$e, $_result, $throwableClass ];
+        $this->catchToQueue[ $this->queueId ] = [ &$e, $result, $throwableClass ];
 
         return $this;
     }
@@ -268,6 +266,12 @@ class Pipe
         }
 
         error_reporting($before);
+
+        if ($this->throwableCurrent) {
+            throw new PipeException(
+                [ 'Unhandled exception in pipe' ], $this->throwableCurrent
+            );
+        }
 
         if ($this->hasValueInitial) {
             return $this->valueCurrent[ $this->keyValueInitial ] ?? null;
@@ -386,22 +390,17 @@ class Pipe
 
         $isIgnore = false;
 
-        if (null !== $throwableClass) {
-            if (! is_a($this->throwableCurrent, $throwableClass)) {
-                $isIgnore = true;
-            }
-        }
-
-        if (! $isIgnore) {
+        if (false
+            || (null === $throwableClass)
+            || is_a($this->throwableCurrent, $throwableClass)
+        ) {
             $ref = $this->throwableCurrent;
 
-            if ([] !== $result) {
-                if ($this->hasValueInitial) {
-                    $this->valueCurrent[ $this->keyValueInitial ] = $result[ 0 ];
-                }
-
-                $this->throwableCurrent = null;
+            if ($this->hasValueInitial) {
+                $this->valueCurrent[ $this->keyValueInitial ] = $result;
             }
+
+            $this->throwableCurrent = null;
         }
 
         unset($ref);
