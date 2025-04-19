@@ -99,29 +99,29 @@ $fn = function () {
     $fn = \Gzhegow\Lib\Lib::pipe();
 
     $fn
-        // > this step can replace the value
+        // > этот шаг может заменить значение, в данном случае приведя его к строке
         ->map('strval')
         //
-        // > this step can replace value with NULL if boolean result is FALSE
+        // > этот шаг может очистить значение (в последующих шаг будет использоваться NULL) 
         ->filter('strlen')
         //
-        // > this step can do some side effects and can return nothing, value will be untouched
+        // > этот шаг может выполнить сторонние действия, а возврат метода игнорируется
         ->tap(function ($value) {
             echo 'Hello World! Your value is: [ ' . _value($value) . ' ]' . PHP_EOL;
 
             throw new \Gzhegow\Lib\Exception\RuntimeException('This is the exception');
         })
         //
-        // > this step will never be started cause of exception in previous step
+        // > этот шаг никогда не начнется, поскольку в прошлом шаге было выброшено исключение
         ->map('intval')
         //
-        // > this step can catch the exception and replace it by result
-        // ->catchTo($e) // > exception will be stored in $e by reference, value will be replaced to NULL
-        // ->catchTo($e, 'catchTo') // > same, but value will be replaced to 'catchTo'
-        // ->catchTo($e, 'catchTo', LogicException::class) > same, but only if \Throwable is subclass
-        ->catchTo($e, 'catchTo', LogicException::class)
+        // > этот шаг может поймать исключение
+        // ->catchTo($e) // > исключение будет сохранено в $e по ссылке, а значение удалено
+        // ->catchTo($e, [ 'catchTo' ]) // > тоже, но значение будет заменено на 'catchTo'
+        // ->catchTo($e, [ 'catchTo' ], LogicException::class) > тоже, но только если \Throwable это субкласс
+        ->catchTo($e, [ 'catchTo' ], LogicException::class)
         //
-        // > or you can handle exception common way using callback
+        // > или можно обрабатывать исключения обычным способом через callable
         ->catch(function (\Throwable $e, $null, $result) {
             if ($e instanceof \RuntimeException) {
                 return $result;

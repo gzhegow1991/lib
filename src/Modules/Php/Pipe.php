@@ -128,7 +128,7 @@ class Pipe
      */
     public function tap(callable $fn, array $args = [])
     {
-        $_args = static::sanitizeArgs($args);
+        $_args = $this->sanitizeArgs($args);
 
         $this->queueId++;
 
@@ -142,7 +142,7 @@ class Pipe
      */
     public function map(callable $fn, array $args = [])
     {
-        $_args = static::sanitizeArgs($args);
+        $_args = $this->sanitizeArgs($args);
 
         $this->queueId++;
 
@@ -156,7 +156,7 @@ class Pipe
      */
     public function filter(callable $fn, array $args = [])
     {
-        $_args = static::sanitizeArgs($args);
+        $_args = $this->sanitizeArgs($args);
 
         $this->queueId++;
 
@@ -170,7 +170,7 @@ class Pipe
      */
     public function catch(callable $fn, array $args = [])
     {
-        $_args = static::sanitizeArgs($args);
+        $_args = $this->sanitizeArgs($args);
 
         if ([] !== $_args) {
             if (Lib::arr()->type_list_sorted($list, $_args)) {
@@ -195,8 +195,10 @@ class Pipe
      *
      * @return static
      */
-    public function catchTo(?\Throwable &$e, $result = null, ?string $throwableClass = null)
+    public function catchTo(?\Throwable &$e, array $result = [], ?string $throwableClass = null)
     {
+        $_result = $this->sanitizeResult($result);
+
         if (null !== $throwableClass) {
             if (! is_subclass_of($throwableClass, \Throwable::class)) {
                 throw new LogicException(
@@ -392,12 +394,17 @@ class Pipe
 
         if (false
             || (null === $throwableClass)
-            || is_a($this->throwableCurrent, $throwableClass)
+            || (is_a($this->throwableCurrent, $throwableClass))
         ) {
             $ref = $this->throwableCurrent;
 
             if ($this->hasValueInitial) {
-                $this->valueCurrent[ $this->keyValueInitial ] = $result;
+                if ([] === $result) {
+                    $this->valueCurrent = [];
+
+                } else {
+                    $this->valueCurrent[ $this->keyValueInitial ] = $result;
+                }
             }
 
             $this->throwableCurrent = null;
