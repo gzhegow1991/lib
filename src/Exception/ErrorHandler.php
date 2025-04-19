@@ -182,7 +182,7 @@ class ErrorHandler
 
         echo PHP_EOL;
 
-        if (0 !== count($traceLines)) {
+        if ([] !== $traceLines) {
             echo 'Trace: ' . PHP_EOL;
 
             foreach ( $traceLines as $line ) {

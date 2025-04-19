@@ -22,7 +22,7 @@ class TestModule
      */
     public function static_stdout_resource(array $stdoutResource = []) // : ?resource
     {
-        if (0 !== count($stdoutResource)) {
+        if ([] !== $stdoutResource) {
             [ $h ] = $stdoutResource;
 
             if (null !== $h) {
@@ -57,32 +57,38 @@ class TestModule
         ?string $expectedStdout = null,
         ?float $expectedSecondsMax = null, ?float $expectedSecondsMin = null,
         array $expectedReturn = [],
+        ?int $expectedBytesMax = null,
         array $refs = []
     ) : bool
     {
         $withStdout = array_key_exists(0, $refs);
         $withSeconds = array_key_exists(1, $refs);
         $withReturn = array_key_exists(2, $refs);
+        $withBytes = array_key_exists(3, $refs);
+
+        if ($withStdout) {
+            $refStdout =& $refs[ 0 ];
+        }
+        if ($withSeconds) {
+            $refSeconds =& $refs[ 1 ];
+        }
+        if ($withReturn) {
+            $refReturn =& $refs[ 2 ];
+        }
+        if ($withReturn) {
+            $refBytes =& $refs[ 3 ];
+        }
 
         $refStdout = null;
         $refSeconds = null;
         $refReturn = null;
-        if ($withStdout) {
-            $refStdout =& $refs[ 0 ];
-            $refStdout = null;
-        }
-        if ($withSeconds) {
-            $refSeconds =& $refs[ 1 ];
-            $refSeconds = null;
-        }
-        if ($withReturn) {
-            $refReturn =& $refs[ 2 ];
-            $refReturn = null;
-        }
+        $refBytes = null;
 
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
         $traceLine = $trace[ 0 ][ 'line' ] ?? 0;
+
+        $mem = memory_get_usage();
 
         $mt = microtime(true);
 
@@ -92,9 +98,12 @@ class TestModule
 
         $currentSeconds = round(microtime(true) - $mt, 6);
 
+        $currentBytes = memory_get_usage() - $mem;
+
         $refStdout = $currentStdout;
         $refSeconds = $currentSeconds;
         $refReturn = $currentReturn;
+        $refBytes = $currentBytes;
 
         $resourceStdout = $this->static_stdout_resource();
 
@@ -197,7 +206,7 @@ class TestModule
             }
         }
 
-        if (0 !== count($expectedReturn)) {
+        if ([] !== $expectedReturn) {
             $expectedReturn = $expectedReturn[ 0 ] ?? null;
 
             if ($currentReturn !== $expectedReturn) {
@@ -224,7 +233,33 @@ class TestModule
             }
         }
 
-        if (0 !== count($eArray)) {
+        if (null !== $expectedBytesMax) {
+            if ($currentBytes > $expectedBytesMax) {
+                $message = '[ ERROR ] Test ' . __METHOD__ . '() `expectedBytesMax` failed.';
+                $messageCase = ''
+                    . 'Case: '
+                    . sprintf('%f', $currentBytes)
+                    . ' > '
+                    . sprintf('%f', $expectedBytesMax);
+
+                if (null !== $resourceStdout) {
+                    fwrite($resourceStdout, '------' . PHP_EOL);
+                    fwrite($resourceStdout, $message . PHP_EOL);
+                    fwrite($resourceStdout, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                    fwrite($resourceStdout, $messageCase . PHP_EOL);
+                    fwrite($resourceStdout, '------' . PHP_EOL);
+                }
+
+                $e = new RuntimeException([ $message, $messageCase ]);
+                $e->setTrace($trace);
+                $e->setFile($traceFile);
+                $e->setLine($traceLine);
+
+                $eArray[] = $e;
+            }
+        }
+
+        if ([] !== $eArray) {
             $message = '[ ERROR ] Test ' . __METHOD__ . '() failed.';
 
             if (null !== $resourceStdout) {
@@ -239,8 +274,9 @@ class TestModule
         }
 
         unset($refStdout);
-        unset($refReturn);
         unset($refSeconds);
+        unset($refReturn);
+        unset($refBytes);
 
         return true;
     }
@@ -465,8 +501,8 @@ class TestModule
     public function assertMemory(
         ?array $trace,
         $fn, array $fnArgs = [],
-        ?float $expectedBytesMax = null,
-        ?float &$bytes = null
+        ?int $expectedBytesMax = null,
+        ?int &$bytes = null
     ) : bool
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);

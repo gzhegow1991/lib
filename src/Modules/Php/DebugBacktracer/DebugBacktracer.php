@@ -435,7 +435,7 @@ class DebugBacktracer implements DebugBacktracerInterface
     {
         $trace = $this->execute();
 
-        if (0 !== count($trace)) {
+        if ([] !== $trace) {
             return [
                 $trace[ 0 ][ 'file' ],
                 $trace[ 0 ][ 'line' ],

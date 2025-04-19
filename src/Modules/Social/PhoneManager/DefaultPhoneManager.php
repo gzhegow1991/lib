@@ -231,7 +231,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
      */
     public function addPhoneFakeRegexes(array $regexList) // : static
     {
-        if (0 === count($regexList)) {
+        if ([] === $regexList) {
             return $this;
         }
 
@@ -610,7 +610,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             $formatted = $this->formatE164($phoneNumber, $region);
         }
         catch ( \Throwable $e ) {
-            if (0 === count($fallback)) {
+            if ([] === $fallback) {
                 throw new RuntimeException(
                     'Unable to ' . __FUNCTION__, $e
                 );
@@ -631,7 +631,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             $formatted = $this->formatInternational($phoneNumber, $region);
         }
         catch ( \Throwable $e ) {
-            if (0 === count($fallback)) {
+            if ([] === $fallback) {
                 throw new RuntimeException(
                     'Unable to ' . __FUNCTION__, $e
                 );
@@ -652,7 +652,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             $formatted = $this->formatRFC3966($phoneNumber, $region);
         }
         catch ( \Throwable $e ) {
-            if (0 === count($fallback)) {
+            if ([] === $fallback) {
                 throw new RuntimeException(
                     'Unable to ' . __FUNCTION__, $e
                 );
@@ -802,7 +802,8 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
     public function getTimezonesForPhone($phoneNumber, $timezoneWildcards = null, ?string $region = '') : array
     {
-        $timezoneWildcardsIndex = Lib::php()->to_index($timezoneWildcards);
+        $timezoneWildcardsList = Lib::php()->to_list($timezoneWildcards);
+        dd();
 
         $phoneNumberObject = $this->parsePhoneNumber(
             $phoneNumber, $region
@@ -814,10 +815,10 @@ class DefaultPhoneManager implements PhoneManagerInterface
             ->getTimeZonesForNumber($phoneNumberObject)
         ;
 
-        if (0 !== count($timezoneWildcardsIndex)) {
+        if ([] !== $timezoneWildcardsIndex) {
             foreach ( $timezones as $i => $timezoneName ) {
                 $isMatch = false;
-                foreach ( $timezoneWildcardsIndex as $wildcard ) {
+                foreach ( $timezoneWildcardsIndex as $wildcard => $bool ) {
                     if (false !== strpos($timezoneName, $wildcard)) {
                         $isMatch = true;
 

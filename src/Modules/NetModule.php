@@ -393,14 +393,14 @@ class NetModule
             }
         }
 
-        if ($isV4 && (0 !== count($subnetsV4))) {
+        if ($isV4 && ([] !== $subnetsV4)) {
             foreach ( $subnetsV4 as $subnetV4 ) {
                 if ($this->is_ip_in_subnet_v4($addressIpV4, $subnetV4)) {
                     return true;
                 }
             }
 
-        } elseif ($isV6 && (0 !== count($subnetsV6))) {
+        } elseif ($isV6 && ([] !== $subnetsV6)) {
             foreach ( $subnetsV6 as $subnetV6 ) {
                 if ($this->is_ip_in_subnet_v6($addressIpV6, $subnetV6)) {
                     return true;

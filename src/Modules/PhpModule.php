@@ -9,6 +9,7 @@ use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToBoolInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToIndexInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToObjectInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
@@ -1058,45 +1059,7 @@ class PhpModule
         return $_value;
     }
 
-
-    /**
-     * @param callable $fnIsForceWrap
-     */
-    public function to_list($value, $fnIsForceWrap = null, array $options = []) : array
-    {
-        if (null === $value) {
-            return [];
-        }
-
-        if ($value instanceof ToListInterface) {
-            return $value->toList($options);
-        }
-
-        if (is_array($value)) {
-            if ($fnIsForceWrap) {
-                $status = call_user_func(
-                    $fnIsForceWrap,
-                    $value, $options
-                );
-
-                $_value = $status
-                    ? [ $value ]
-                    : $value;
-
-            } else {
-                $_value = $value;
-            }
-
-            return $_value;
-        }
-
-        return [ $value ];
-    }
-
-    /**
-     * @param callable $fnToIterable
-     */
-    public function to_iterable($value, $fnToIterable = null, array $options = []) : iterable
+    public function to_iterable($value, array $options = []) : iterable
     {
         if (null === $value) {
             return [];
@@ -1107,29 +1070,9 @@ class PhpModule
                 return $value->toIterable($options);
             }
 
-            if ($value instanceof \Generator) {
+            if ($value instanceof \Traversable) {
                 return $value;
             }
-        }
-
-        if (null !== $fnToIterable) {
-            $_value = call_user_func(
-                $fnToIterable,
-                $value, $options
-            );
-
-            if (! is_iterable($_value)) {
-                throw new RuntimeException(
-                    [
-                        'The `fnToIterable` should return iterable',
-                        $value,
-                        $options,
-                        $fnToIterable,
-                    ]
-                );
-            }
-
-            return $_value;
         }
 
         if (is_array($value)) {
@@ -1139,37 +1082,108 @@ class PhpModule
         return [ $value ];
     }
 
+
     /**
-     * @param callable $fnReduce
-     * @param callable $fnListIsForceWrap
+     * @param callable $fnAssert
      */
-    public function to_index($value, $fnReduce = null, $fnListIsForceWrap = null, array $options = []) : array
+    public function to_list(
+        $value, array $options = [],
+        $fnAssert = null, array $fnAssertArgs = [], $fnAssertValueKey = 0
+    ) : array
     {
         if (null === $value) {
             return [];
         }
 
-        $list = $this->to_list($value, $fnListIsForceWrap, $options);
+        $hasAssert = (null !== $fnAssert);
 
-        $index = [];
+        $fnArgs = $hasAssert
+            ? $this->function_args([ $fnAssertValueKey => null ], $fnAssertArgs)
+            : [];
 
-        if (null === $fnReduce) {
-            foreach ( $list as $i => $l ) {
-                if (is_string($i)) {
-                    $l = $i;
+        $listValid = null;
+
+        if ($value instanceof ToListInterface) {
+            $list = $value->toList($options);
+
+        } elseif (is_array($value)) {
+            if ($hasAssert) {
+                $fnArgs[ $fnAssertValueKey ] = $value;
+
+                $status = (bool) call_user_func_array($fnAssert, $fnArgs);
+
+                if ($status) {
+                    $listValid = [ $value ];
                 }
+            }
 
-                $index[ $l ] = true;
+            if (null === $listValid) {
+                if (Lib::arr()->type_list($var, $value)) {
+                    $list = $var;
+
+                } else {
+                    $list = [ $value ];
+                }
             }
 
         } else {
-            $index = Lib::arr()->reduce(
-                $list, $fnReduce, [],
-                _ARR_FN_USE_VALUE | _ARR_FN_USE_KEY
-            );
+            $list = [ $value ];
         }
 
-        return $index;
+        if (null !== $listValid) {
+            return $listValid;
+        }
+
+        if ([] !== $list) {
+            if ($hasAssert) {
+                foreach ( $list as $i => $v ) {
+                    $fnArgs[ $fnAssertValueKey ] = $v;
+
+                    $status = (bool) call_user_func_array($fnAssert, $fnArgs);
+
+                    if (! $status) {
+                        throw new LogicException(
+                            [
+                                'Each of `value` (if array) should pass `fnAssert` check',
+                                $v,
+                                $i,
+                            ]
+                        );
+                    }
+                }
+            }
+        }
+
+        return $list;
+    }
+
+    public function to_list_it($value, array $options = []) : \Generator
+    {
+        if (null === $value) {
+            return true;
+        }
+
+        if ($value instanceof ToListInterface) {
+            $list = $value->toList($options);
+
+            foreach ( $list as $v ) {
+                yield $v;
+            }
+
+        } elseif (is_array($value)) {
+            yield $value;
+
+            if (Lib::arr()->type_list($list, $value)) {
+                foreach ( $list as $v ) {
+                    yield $v;
+                }
+            }
+
+        } else {
+            yield $value;
+        }
+
+        return true;
     }
 
 
@@ -1706,56 +1720,78 @@ class PhpModule
     }
 
 
-    /**
-     * > подготавливает аргументы функции согласно переданного массива
-     */
-    public function function_args(array $args, ?array $argsOriginal = null) : array
+    public function function_args(array ...$arrays) : array
     {
-        if (0 === count($args)) {
-            return [];
+        $args = [];
+
+        $hasInt = false;
+        $hasString = false;
+        $argsSeenIndex = [];
+        for ( $i = 0; $i < count($arrays); $i++ ) {
+            if ([] === $arrays[ $i ]) {
+                continue;
+            }
+
+            foreach ( array_keys($arrays[ $i ]) as $ii ) {
+                if (isset($argsSeenIndex[ $ii ])) {
+                    throw new LogicException(
+                        [
+                            'Arguments intersection detected',
+                            $ii,
+                            $arrays[ $i ],
+                            $arrays,
+                        ]
+                    );
+                }
+
+                if ((! $hasString) && (is_string($ii))) {
+                    $hasString = true;
+
+                } elseif ((! $hasInt) && is_int($ii)) {
+                    $hasInt = true;
+                }
+
+                if ($hasString && $hasInt) {
+                    throw new LogicException(
+                        [
+                            'The `args` should contain arguments of single type: string or int',
+                            $args,
+                        ]
+                    );
+                }
+
+                $argsSeenIndex[ $ii ] = true;
+            }
+
+            $args += $arrays[ $i ];
         }
 
-        $argsOriginal = $argsOriginal ?? $args;
+        if ([] !== $args) {
+            if ($hasInt) {
+                $args[] = null;
 
-        $_args = $args;
+                $max = array_key_last($args);
 
-        // > gzhegow, удаляет из массива все строковые ключи, до 8.0 версии именованные аргументы не поддерживаются
-        if (PHP_VERSION_ID < 80000) {
-            $_args = array_filter($_args, 'is_int', ARRAY_FILTER_USE_KEY);
-        }
+                unset($args[ $max ]);
 
-        // > gzhegow, sort keys ascending
-        ksort($_args);
+                for ( $i = 0; $i < $max; $i++ ) {
+                    if (! array_key_exists($i, $args)) {
+                        $args[ $i ] = null;
+                    }
+                }
 
-        // > gzhegow, добавляет цифровой ключ, чтобы понять, до какого ключа нужно заполнять nulls
-        end($_args);
-        $key = key($_args);
-        if (! is_int($key)) {
-            $_args[] = null;
+                ksort($args);
 
-            end($_args);
-            $key = $extraKey = key($_args);
-        }
-
-        // > gzhegow, заполняет nulls все цифровые ключи
-        $_args += array_fill(0, $key, null);
-
-        // > gzhegow, удаляет добавленный ранее цифровой ключ
-        if (isset($extraKey)) {
-            unset($_args[ $extraKey ]);
-        }
-
-        // > gzhegow, удаляет автоматические null, которые не были явно переданы пользователем
-        foreach ( array_reverse($_args) as $k => $v ) {
-            if (null !== $_args[ $k ]) {
-                break;
-
-            } elseif (! array_key_exists($k, $argsOriginal)) {
-                unset($_args[ $k ]);
+            } elseif ($hasString) {
+                if (PHP_VERSION_ID < 80000) {
+                    throw new RuntimeException(
+                        [ 'PHP does not support arguments with string keys', $args ]
+                    );
+                }
             }
         }
 
-        return $_args;
+        return $args;
     }
 
     /**
@@ -1841,9 +1877,12 @@ class PhpModule
 
         $isMaybeInternalFunction = is_string($fn) && function_exists($fn);
 
-        $_args = $this->function_args($args, $args);
+        $_args = $this->function_args($args);
 
         if (! $isMaybeInternalFunction) {
+            $result = call_user_func_array($fn, $_args);
+
+        } elseif (! ($isIntKeys = array_key_exists(0, $_args))) {
             $result = call_user_func_array($fn, $_args);
 
         } else {
@@ -1883,18 +1922,16 @@ class PhpModule
                     }
                 }
 
+                if ($ex && ! $isKnown) {
+                    throw $ex;
+                }
+
                 if ($isKnown) {
                     $max = (int) substr($eMsg, $pos + $eSubstrLen);
 
-                    array_splice($args, $max);
-
-                    $_args = $this->function_args($_args, $args);
+                    array_splice($_args, $max);
 
                     $result = call_user_func_array($fn, $_args);
-                }
-
-                if ($ex && ! $isKnown) {
-                    throw $ex;
                 }
             }
         }
@@ -2002,7 +2039,7 @@ class PhpModule
 
             if ($flags & _PHP_PATHINFO_EXTENSIONS) {
                 $extensions = null;
-                if (0 !== count($split)) {
+                if ([] !== $split) {
                     $extensions = implode($dot, $split);
                 }
 
@@ -2153,7 +2190,7 @@ class PhpModule
         array_shift($split);
 
         $extensions = null;
-        if (0 !== count($split)) {
+        if ([] !== $split) {
             $extensions = implode($dot, $split);
         }
 
@@ -2221,7 +2258,7 @@ class PhpModule
             }
 
             if ($segment === "{$dot}{$dot}") {
-                if (0 === count($segmentsNew)) {
+                if ([] === $segmentsNew) {
                     throw new RuntimeException(
                         [
                             'The `path` is invalid to parse `..` segments',
@@ -2640,7 +2677,7 @@ class PhpModule
     {
         $stack = $this->errors();
 
-        $errors = (0 !== count($stack->stack))
+        $errors = ([] !== $stack->stack)
             ? end($stack->stack)
             : null;
 

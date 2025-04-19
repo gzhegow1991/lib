@@ -119,10 +119,10 @@ class JsonModule
             );
         }
 
-        if (0 !== count($result)) {
+        if ([] !== $result) {
             [ $value ] = $result;
 
-        } elseif (0 !== count($fallback)) {
+        } elseif ([] !== $fallback) {
             [ $value ] = $fallback;
 
         } else {
@@ -171,10 +171,10 @@ class JsonModule
             );
         }
 
-        if (0 !== count($result)) {
+        if ([] !== $result) {
             [ $value ] = $result;
 
-        } elseif (0 !== count($fallback)) {
+        } elseif ([] !== $fallback) {
             [ $value ] = $fallback;
 
         } else {
@@ -267,7 +267,7 @@ class JsonModule
         }
 
         if (null === $json) {
-            if (0 !== count($fallback)) {
+            if ([] !== $fallback) {
                 [ $json ] = $fallback;
 
             } else {

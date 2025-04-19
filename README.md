@@ -38,6 +38,7 @@ ini_set('memory_limit', '32M');
 ;
 
 
+
 // > добавляем несколько функция для тестирования
 function _value($value) : string
 {
@@ -87,6 +88,68 @@ function _assert_stdout(
         $expectedStdout
     );
 }
+
+
+// >>> TEST
+// > тесты Pipe
+$fn = function () {
+    _print('[ Pipe ]');
+    echo PHP_EOL;
+
+    $fn = \Gzhegow\Lib\Lib::pipe();
+
+    $fn
+        // > this step can replace the value
+        ->map('strval')
+        //
+        // > this step can replace value with NULL if boolean result is FALSE
+        ->filter('strlen')
+        //
+        // > this step can do some side effects and can return nothing, value will be untouched
+        ->tap(function ($value) {
+            echo 'Hello World! Your value is: [ ' . _value($value) . ' ]' . PHP_EOL;
+
+            throw new \Gzhegow\Lib\Exception\RuntimeException('This is the exception');
+        })
+        //
+        // > this step will never started cause of exception in previous step
+        ->map('intval')
+        //
+        // > this step may catch the exception and replace it by result
+        // ->catchTo($e) // > exception will be stored in $e by reference
+        // ->catchTo($e, [ 'catchTo' ]) // > same, and value will be replaced to 'catchTo'
+        // ->catchTo($e, [ 'catchTo' ], LogicException::class) > same, but only if \Throwable is subclass of arguments[2]
+        ->catchTo($e, [ 'catchTo' ], LogicException::class)
+        //
+        // > or you can handle exception common way using callback
+        ->catch(function (\Throwable $e, $any, $result) {
+            if ($e instanceof \RuntimeException) {
+                return $result;
+            }
+
+            return $e;
+        }, $arguments = [ 2 => 'catch' ])
+    ;
+
+    $result = $fn('');
+    _print($result);
+
+    $result = $fn(1);
+    _print($result);
+
+    $result = $fn('0');
+    _print($result);
+};
+_assert_stdout($fn, [], '
+"[ Pipe ]"
+
+Hello World! Your value is: [ NULL ]
+"catch"
+Hello World! Your value is: [ "1" ]
+"catch"
+Hello World! Your value is: [ "0" ]
+"catch"
+');
 
 
 // >>> TEST
@@ -453,7 +516,7 @@ _assert_stdout($fn, [], '
 // >>> TEST
 // > тесты ArrayOf
 $fn = function () {
-    _print('[ ArrModule ]');
+    _print('[ ArrayOf ]');
     echo PHP_EOL;
 
 
@@ -464,9 +527,6 @@ $fn = function () {
     };
 
 
-    // > осторожно, `ArrayOf` не проверяет типы при добавлении, для этого есть `ArrayOfType`
-    // > этот объект сделан для того, чтобы убедится, что другой разработчик создал его с правильным типом
-    // > при этом он может положить туда что захочет, это похоже на указание PHPDoc
     /**
      * @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf $arrayOf
      * > это синтаксис создания объекта в 8 версии PHP отдельно от 7, на практике не потребуется, только для тестов
@@ -474,6 +534,10 @@ $fn = function () {
     $class = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::class;
     $args = [ 'object' ];
     $arrayOf = \Gzhegow\Lib\Lib::new8($class, ...$args);
+
+    // > осторожно, `ArrayOf` не проверяет типы при добавлении, для этого есть `ArrayOfType`
+    // > этот объект сделан для того, чтобы убедится, что другой разработчик создал его с правильным типом
+    // > при этом он может положить туда что захочет, это похоже на указание PHPDoc
     $arrayOf[] = $notAnObject;
     _print($arrayOf);
     _print($arrayOf->isOfType('object'), $arrayOf->getValues());
@@ -540,7 +604,7 @@ $fn = function () {
     echo PHP_EOL;
 
 
-    // > для полного погружения разработана структура `Map` по аналогии с JavaScript
+    // > для полного посвящения разработана структура `Map` по аналогии с JavaScript
     // > в качестве ключей этого объекта можно использовать вообще любые значения
     /**
      * @var \Gzhegow\Lib\Modules\Arr\Map\Map $map
@@ -556,7 +620,7 @@ $fn = function () {
 };
 _assert_stdout($fn, [], PHP_VERSION_ID >= 80000
     ? '
-"[ ArrModule ]"
+"[ ArrayOf ]"
 
 { object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf }
 TRUE | [ 1 ]
@@ -577,7 +641,7 @@ TRUE | TRUE
 [ 1, 1 ]
 '
     : '
-"[ ArrModule ]"
+"[ ArrayOf ]"
 
 { object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf }
 TRUE | [ 1 ]
@@ -596,6 +660,47 @@ TRUE | [ "{ object # stdClass }" ]
 TRUE | TRUE
 [ "{ object # stdClass }", "{ array(3) }" ]
 [ 1, 1 ]
+');
+
+
+
+// >>> TEST
+// > тесты ArrModule
+$fn = function () {
+    _print('[ ArrModule ]');
+    echo PHP_EOL;
+
+    $cases = [
+        [ [ 1, 2, 3 ], [ 2, 3, 4 ] ],
+        [ [ 1, '2', 3 ], [ 2, 3 ] ],
+        [ [ '1', '2', '3' ], [ 1, 2 ] ],
+        [ [ 1, 2, 2, 3 ], [ 2 ] ],
+        [ [ 'x' => 100, 'y' => 200, 'z' => 300 ], [ 200, 300, 400 ] ],
+    ];
+
+    foreach ( $cases as [ $a, $b ] ) {
+        $resStrict = \Gzhegow\Lib\Lib::arr()->intersect($a, $b);
+        $resNonStrict = \Gzhegow\Lib\Lib::arr()->intersect_non_strict($a, $b);
+        _print($resStrict, $resNonStrict, $resNonStrict === array_intersect($a, $b));
+
+        $resStrict = \Gzhegow\Lib\Lib::arr()->diff($a, $b);
+        $resNonStrict = \Gzhegow\Lib\Lib::arr()->diff_non_strict($a, $b);
+        _print($resStrict, $resNonStrict, $resNonStrict === array_diff($a, $b));
+    }
+};
+_assert_stdout($fn, [], '
+"[ ArrModule ]"
+
+[ 1 => 2, 2 => 3 ] | [ 1 => 2, 2 => 3 ] | TRUE
+[ 1 ] | [ 1 ] | TRUE
+[ 2 => 3 ] | [ 1 => "2", 2 => 3 ] | TRUE
+[ 1, "2" ] | [ 1 ] | TRUE
+[  ] | [ "1", "2" ] | TRUE
+[ "1", "2", "3" ] | [ 2 => "3" ] | TRUE
+[ 1 => 2, 2 => 2 ] | [ 1 => 2, 2 => 2 ] | TRUE
+[ 0 => 1, 3 => 3 ] | [ 0 => 1, 3 => 3 ] | TRUE
+[ "y" => 200, "z" => 300 ] | [ "y" => 200, "z" => 300 ] | TRUE
+[ "x" => 100 ] | [ "x" => 100 ] | TRUE
 ');
 
 
@@ -2613,7 +2718,11 @@ $fn = function () {
     ];
 
     $before = error_reporting(0);
-    $objectDummy->publicDynamicProperty = null;
+    try {
+        $objectDummy->publicDynamicProperty = null;
+    }
+    catch ( \Throwable $e ) {
+    }
     error_reporting($before);
 
     $table = [];
@@ -3108,10 +3217,10 @@ $fn = function () {
     _print($status, $email);
     $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф');
     _print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', [ 'filter_unicode' ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', $filters = [ 'filter_unicode' ]);
     _print($status, $email);
     try {
-        $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', [ 'rfc' ]);
+        $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', $filters = [ 'rfc' ]);
     }
     catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
         _print('[ CATCH ] ' . $e->getMessage());
@@ -3122,10 +3231,10 @@ $fn = function () {
     _print($status, $email);
     $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф');
     _print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', [ 'filter_unicode' ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', $filters = [ 'filter_unicode' ]);
     _print($status, $email);
     try {
-        $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', [ 'rfc' ]);
+        $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', $filters = [ 'rfc' ]);
     }
     catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
         _print('[ CATCH ] ' . $e->getMessage());
@@ -3187,8 +3296,9 @@ $fn = function () {
         _print($phone, $status, $result);
 
         try {
-            $status = \Gzhegow\Lib\Lib::social()->type_phone_real($result, $phone);
-        } catch (\Gzhegow\Lib\Exception\Runtime\ComposerException $e) {
+            $status = \Gzhegow\Lib\Lib::social()->type_phone_real($result, $phone, '');
+        }
+        catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
             _print('[ CATCH ] ' . $e->getMessage());
         }
 
@@ -3199,7 +3309,7 @@ $fn = function () {
         _print($phone, $status, $result);
 
         try {
-            $status = \Gzhegow\Lib\Lib::social()->type_tel_real($result, $phone);
+            $status = \Gzhegow\Lib\Lib::social()->type_tel_real($result, $phone, '');
         }
         catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
             _print('[ CATCH ] ' . $e->getMessage());

@@ -14,7 +14,7 @@ class EscapeModule
     {
         $params = $params ?? [];
 
-        if (0 === count($in)) {
+        if ([] === $in) {
             return '';
         }
 
@@ -55,7 +55,7 @@ class EscapeModule
 
     public function sql_like_escape(string $sql, string $like = 'LIKE', ...$valueParts)
     {
-        if (0 === count($valueParts)) {
+        if ([] === $valueParts) {
             return '';
         }
 

@@ -72,7 +72,7 @@ class DefaultEmailParser implements EmailParserInterface
      */
     public function addEmailFakeRegexes(array $regexList) // : static
     {
-        if (0 === count($regexList)) {
+        if ([] === $regexList) {
             return $this;
         }
 
@@ -259,7 +259,7 @@ class DefaultEmailParser implements EmailParserInterface
 
         $status = true;
 
-        if (0 !== count($filtersIntersectIndex)) {
+        if ([] !== $filtersIntersectIndex) {
             $eguliasFilters = [];
 
             foreach ( $filtersIntersectIndex as $filter => $bool ) {
@@ -332,7 +332,7 @@ class DefaultEmailParser implements EmailParserInterface
                 }
             }
 
-            if (0 !== count($eguliasFilters)) {
+            if ([] !== $eguliasFilters) {
                 $emailValidation = new \Egulias\EmailValidator\Validation\MultipleValidationWithAnd(
                     $eguliasFilters
                 );

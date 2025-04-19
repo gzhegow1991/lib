@@ -57,6 +57,10 @@ class ArrModule
             return false;
         }
 
+        if ([] === $value) {
+            return true;
+        }
+
         foreach ( array_keys($value) as $key ) {
             if (is_string($key)) {
                 return false;
@@ -79,16 +83,21 @@ class ArrModule
             return false;
         }
 
-        $keys = array_keys($value);
+        if ([] === $value) {
+            return true;
+        }
 
-        foreach ( $keys as $key ) {
+        $prev = -1;
+        foreach ( array_keys($value) as $key ) {
             if (is_string($key)) {
                 return false;
             }
-        }
 
-        if ($keys !== range(0, count($value))) {
-            return false;
+            if (($key - $prev) !== 1) {
+                return false;
+            }
+
+            $prev = $key;
         }
 
         $result = $value;
@@ -106,6 +115,10 @@ class ArrModule
 
         if (! is_array($value)) {
             return false;
+        }
+
+        if ([] === $value) {
+            return true;
         }
 
         foreach ( array_keys($value) as $key ) {
@@ -128,6 +141,10 @@ class ArrModule
 
         if (! is_array($value)) {
             return false;
+        }
+
+        if ([] === $value) {
+            return true;
         }
 
         $keys = array_keys($value);
@@ -390,7 +407,7 @@ class ArrModule
      */
     public function first(array $array, array $fallback = []) // : ?mixed
     {
-        if (0 === count($array)) {
+        if ([] === $array) {
             if ($fallback) {
                 [ $fallback ] = $fallback;
 
@@ -429,7 +446,7 @@ class ArrModule
      */
     public function last(array $array, array $fallback = []) // : ?mixed
     {
-        if (0 === count($array)) {
+        if ([] === $array) {
             if ($fallback) {
                 [ $fallback ] = $fallback;
 
@@ -609,7 +626,7 @@ class ArrModule
             }
         }
 
-        if (0 === count($arrpath)) {
+        if ([] === $arrpath) {
             throw new LogicException(
                 [
                     'Result path is empty',
@@ -667,7 +684,7 @@ class ArrModule
             }
         }
 
-        if (0 === count($arrpath)) {
+        if ([] === $arrpath) {
             throw new LogicException(
                 [
                     'Result path is empty',
@@ -778,7 +795,7 @@ class ArrModule
                 unset($refCurrent);
                 $refCurrent = null;
 
-                if (0 === count($pathArray)) {
+                if ([] === $pathArray) {
                     throw new RuntimeException(
                         [
                             'Unable to ' . __FUNCTION__ . ': missing key in array',
@@ -956,11 +973,12 @@ class ArrModule
     public function fill_keys($keys, array $new = []) : array
     {
         $keys = (array) $keys;
-        if (0 === count($keys)) {
+
+        if ([] === $keys) {
             return [];
         }
 
-        $hasNew = (0 !== count($new));
+        $hasNew = ([] !== $new);
 
         if ($hasNew) {
             $result = array_fill_keys($keys, $new[ 0 ]);
@@ -984,11 +1002,12 @@ class ArrModule
     public function drop_keys(array $src, $keys, array $new = []) : array
     {
         $keys = (array) $keys;
-        if (0 === count($keys)) {
+
+        if ([] === $keys) {
             return $src;
         }
 
-        $hasNew = (0 !== count($new));
+        $hasNew = ([] !== $new);
 
         foreach ( (array) $keys as $key ) {
             if (! array_key_exists($key, $src)) {
@@ -1012,11 +1031,12 @@ class ArrModule
     public function keep_keys(array $src, $keys, array $new = []) : array
     {
         $keys = (array) $keys;
-        if (0 === count($keys)) {
+
+        if ([] === $keys) {
             return [];
         }
 
-        $hasNew = (0 !== count($new));
+        $hasNew = ([] !== $new);
 
         $keysToKeep = array_flip($keys);
 
@@ -1036,6 +1056,60 @@ class ArrModule
 
 
     /**
+     * > выполнить array_filter с учетом _array_fn_mode()
+     *
+     * @param callable|null $fn
+     */
+    public function filter(array $src, $fn = null, ?int $flags = null) : array
+    {
+        if (null === $fn) {
+            return $src;
+        }
+
+        if ([] === $src) {
+            return [];
+        }
+
+        $filtered = $this->keep($src, $fn, $flags);
+
+        return $filtered;
+    }
+
+    /**
+     * > выполнить array_map с учетом _array_fn_mode()
+     *
+     * @param callable|null $fn
+     */
+    public function tap(array $src, $fn = null, ?int $flags = null) : void
+    {
+        if (null === $fn) {
+            return;
+        }
+
+        if ([] === $src) {
+            return;
+        }
+
+        $mode = null
+            ?? $flags
+            ?? $this->static_fn_mode()
+            ?? _ARR_FN_USE_VALUE;
+
+        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
+        $isUseKey = ($mode & _ARR_FN_USE_KEY);
+        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
+        foreach ( $src as $key => $val ) {
+            $args = [];
+            if ($isUseValue) $args[] = $val;
+            if ($isUseKey) $args[] = $key;
+            if ($isUseSrc) $args[] = $src;
+
+            call_user_func_array($fn, $args);
+        }
+    }
+
+    /**
      * > выполнить array_map с учетом _array_fn_mode()
      *
      * @param callable|null $fn
@@ -1044,6 +1118,10 @@ class ArrModule
     {
         if (null === $fn) {
             return $src;
+        }
+
+        if ([] === $src) {
+            return [];
         }
 
         $mode = null
@@ -1068,18 +1146,6 @@ class ArrModule
     }
 
     /**
-     * > выполнить array_filter с учетом _array_fn_mode()
-     *
-     * @param callable|null $fn
-     */
-    public function filter(array $src, $fn = null, ?int $flags = null) : array
-    {
-        $filtered = $this->keep($src, $fn, $flags);
-
-        return $filtered;
-    }
-
-    /**
      * > выполнить array_reduce с учетом _array_fn_mode()
      *
      * @template-covariant T of mixed
@@ -1093,6 +1159,10 @@ class ArrModule
     public function reduce(array $src, $fn = null, $initial = null, ?int $flags = null)
     {
         if (null === $fn) {
+            return $initial;
+        }
+
+        if ([] === $src) {
             return $initial;
         }
 
@@ -1131,6 +1201,10 @@ class ArrModule
             return [];
         }
 
+        if ([] === $src) {
+            return [];
+        }
+
         $mode = null
             ?? $flags
             ?? $this->static_fn_mode()
@@ -1163,6 +1237,10 @@ class ArrModule
      */
     public function keep_new(array $src, $new = null, $fn = null, ?int $flags = null) : array
     {
+        if ([] === $src) {
+            return [];
+        }
+
         if (null === $fn) {
             foreach ( $src as $key => $val ) {
                 $src[ $key ] = $new;
@@ -1208,6 +1286,10 @@ class ArrModule
             return $src;
         }
 
+        if ([] === $src) {
+            return [];
+        }
+
         $mode = null
             ?? $flags
             ?? $this->static_fn_mode()
@@ -1240,6 +1322,10 @@ class ArrModule
     {
         if (null === $fn) {
             return $src;
+        }
+
+        if ([] === $src) {
+            return [];
         }
 
         $mode = null
@@ -1276,7 +1362,7 @@ class ArrModule
      */
     public function kwargs(array $src) : array
     {
-        if (0 === count($src)) {
+        if ([] === $src) {
             return [ [], [] ];
         }
 
@@ -1303,6 +1389,10 @@ class ArrModule
     {
         if (null === $fn) {
             return [ $src, [] ];
+        }
+
+        if ([] === $src) {
+            return [ [], [] ];
         }
 
         $left = [];
@@ -1342,6 +1432,10 @@ class ArrModule
     {
         if (null === $fn) {
             return [ '' => $src ];
+        }
+
+        if ([] === $src) {
+            return [ '' => [] ];
         }
 
         $mode = null
@@ -1441,30 +1535,180 @@ class ArrModule
     }
 
 
-    /**
-     * > встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
-     */
-    public function diff(array ...$arrays) : array
+    public function is_unique_keys(array ...$arrays) : bool
     {
-        if (0 === count($arrays)) {
-            return [];
+        $seen = [];
+
+        foreach ( $arrays as $arr ) {
+            if ([] === $arr) {
+                continue;
+            }
+
+            foreach ( array_keys($arr) as $k ) {
+                if (isset($seen[ $k ])) {
+                    return false;
+                }
+
+                $seen[ $k ] = true;
+            }
+        }
+
+        return true;
+    }
+
+
+    public function is_diff_keys(array ...$arrays) : bool
+    {
+        if ([] === $arrays) {
+            return false;
         }
 
         if (1 === count($arrays)) {
-            return $arrays[ 0 ];
+            return false;
         }
 
-        $result = array_diff(...$arrays);
+        $src = array_shift($arrays);
+        sort($src);
 
-        return $result;
+        foreach ( $arrays as $i => $array ) {
+            foreach ( array_keys($array) as $ii ) {
+                if (! array_key_exists($ii, $src)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
-    /**
-     * > встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
-     */
-    public function diff_key(array ...$arrays) : array
+    public function is_diff(array ...$arrays) : bool
     {
-        if (0 === count($arrays)) {
+        if ([] === $arrays) {
+            return false;
+        }
+
+        if (1 === count($arrays)) {
+            return false;
+        }
+
+        $src = array_shift($arrays);
+        sort($src);
+
+        foreach ( $arrays as $i => $array ) {
+            foreach ( $array as $ii => $v ) {
+                if (! in_array($v, $src, true)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function is_diff_non_strict(array ...$arrays) : bool
+    {
+        if ([] === $arrays) {
+            return false;
+        }
+
+        if (1 === count($arrays)) {
+            return false;
+        }
+
+        $src = array_shift($arrays);
+        sort($src);
+
+        foreach ( $arrays as $i => $array ) {
+            foreach ( $array as $ii => $v ) {
+                if (! in_array($v, $src)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    public function is_intersect_keys(array ...$arrays) : bool
+    {
+        if ([] === $arrays) {
+            return false;
+        }
+
+        if (1 === count($arrays)) {
+            return false;
+        }
+
+        $src = array_shift($arrays);
+        sort($src);
+
+        foreach ( $arrays as $i => $array ) {
+            foreach ( array_keys($array) as $ii ) {
+                if (array_key_exists($ii, $src)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function is_intersect(array ...$arrays) : bool
+    {
+        if ([] === $arrays) {
+            return false;
+        }
+
+        if (1 === count($arrays)) {
+            return false;
+        }
+
+        $src = array_shift($arrays);
+        sort($src);
+
+        foreach ( $arrays as $i => $array ) {
+            foreach ( $array as $ii => $v ) {
+                if (in_array($v, $src, true)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function is_intersect_non_strict(array ...$arrays) : bool
+    {
+        if ([] === $arrays) {
+            return false;
+        }
+
+        if (1 === count($arrays)) {
+            return false;
+        }
+
+        $src = array_shift($arrays);
+        sort($src);
+
+        foreach ( $arrays as $i => $array ) {
+            foreach ( $array as $ii => $v ) {
+                if (in_array($v, $src)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * > встроенная функция всегда требует именно два массива на вход, вынуждая разруливать ифами то, что не нужно
+     */
+    public function diff_keys(array ...$arrays) : array
+    {
+        if ([] === $arrays) {
             return [];
         }
 
@@ -1478,11 +1722,12 @@ class ArrModule
     }
 
     /**
-     * > встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
+     * > встроенная функция всегда требует именно два массива на вход, вынуждая разруливать ифами то, что не нужно
+     * > встроенная функция делает non-strict сравнение
      */
-    public function intersect(array ...$arrays) : array
+    public function diff(array ...$arrays) : array
     {
-        if (0 === count($arrays)) {
+        if ([] === $arrays) {
             return [];
         }
 
@@ -1490,17 +1735,50 @@ class ArrModule
             return $arrays[ 0 ];
         }
 
-        $result = array_intersect(...$arrays);
+        $src = array_shift($arrays);
+
+        foreach ( array_keys($arrays) as $i ) {
+            sort($arrays[ $i ]);
+        }
+
+        foreach ( $src as $i => $v ) {
+            foreach ( array_keys($arrays) as $ii ) {
+                if (in_array($v, $arrays[ $ii ], true)) {
+                    unset($src[ $i ]);
+
+                    break;
+                }
+            }
+        }
+
+        return $src;
+    }
+
+    /**
+     * > встроенная функция всегда требует именно два массива на вход, вынуждая разруливать ифами то, что не нужно
+     */
+    public function diff_non_strict(array ...$arrays) : array
+    {
+        if ([] === $arrays) {
+            return [];
+        }
+
+        if (1 === count($arrays)) {
+            return $arrays[ 0 ];
+        }
+
+        $result = array_diff(...$arrays);
 
         return $result;
     }
 
+
     /**
      * > встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
      */
-    public function intersect_key(array ...$arrays) : array
+    public function intersect_keys(array ...$arrays) : array
     {
-        if (0 === count($arrays)) {
+        if ([] === $arrays) {
             return [];
         }
 
@@ -1509,6 +1787,57 @@ class ArrModule
         }
 
         $result = array_intersect_key(...$arrays);
+
+        return $result;
+    }
+
+    /**
+     * > встроенная функция всегда требует именно два массива на вход, вынуждая разруливать ифами то, что не нужно
+     * > встроенная функция делает non-strict сравнение
+     */
+    public function intersect(array ...$arrays) : array
+    {
+        if ([] === $arrays) {
+            return [];
+        }
+
+        if (1 === count($arrays)) {
+            return $arrays[ 0 ];
+        }
+
+        $src = array_shift($arrays);
+
+        foreach ( array_keys($arrays) as $i ) {
+            sort($arrays[ $i ]);
+        }
+
+        foreach ( $src as $i => $v ) {
+            foreach ( array_keys($arrays) as $ii ) {
+                if (in_array($v, $arrays[ $ii ], true)) {
+                    continue 2;
+                }
+            }
+
+            unset($src[ $i ]);
+        }
+
+        return $src;
+    }
+
+    /**
+     * > встроенная функция всегда требует именно два массива на вход, вынуждая разруливать ифами то, что не нужно
+     */
+    public function intersect_non_strict(array ...$arrays) : array
+    {
+        if ([] === $arrays) {
+            return [];
+        }
+
+        if (1 === count($arrays)) {
+            return $arrays[ 0 ];
+        }
+
+        $result = array_intersect(...$arrays);
 
         return $result;
     }
@@ -1641,7 +1970,9 @@ class ArrModule
      */
     public function &walk_it(array &$array, ?int $flags = null) : \Generator
     {
-        if (0 === count($array)) return;
+        if ([] === $array) {
+            return;
+        }
 
         $flags = $flags ?? 0;
 

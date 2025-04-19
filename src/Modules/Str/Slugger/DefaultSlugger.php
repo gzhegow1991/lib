@@ -383,7 +383,7 @@ class DefaultSlugger implements SluggerInterface
 
         $presets = $this->registry->getPresetsSelected();
 
-        if (0 === count($presets)) {
+        if ([] === $presets) {
             throw new RuntimeException(
                 [ 'Unable to ' . __FUNCTION__ . ' | No presets was selected' ]
             );
@@ -396,7 +396,7 @@ class DefaultSlugger implements SluggerInterface
             $knownSymbolMap,
         ] = $this->registry->getSymbolMapsForPresetsSelected();
 
-        if (0 !== count($ignoreSymbolUserMap)) {
+        if ([] !== $ignoreSymbolUserMap) {
             $ignoreSymbolMap += $ignoreSymbolUserMap;
             $knownSymbolMap += $ignoreSymbolUserMap;
         }
@@ -524,7 +524,7 @@ class DefaultSlugger implements SluggerInterface
             $knownSymbolMap,
         ] = $this->registryDefault->getSymbolMapsForPresetsSelected();
 
-        if (0 !== count($ignoreSymbolUserMap)) {
+        if ([] !== $ignoreSymbolUserMap) {
             $ignoreSymbolMap += $ignoreSymbolUserMap;
             $knownSymbolMap += $ignoreSymbolUserMap;
         }
@@ -560,7 +560,7 @@ class DefaultSlugger implements SluggerInterface
 
     protected function translit_it(string $string, array $ignoreSymbolMap) : \Generator
     {
-        if (0 === count($ignoreSymbolMap)) {
+        if ([] === $ignoreSymbolMap) {
             yield [ $string, '' ];
 
         } else {

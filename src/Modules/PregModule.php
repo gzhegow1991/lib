@@ -66,7 +66,7 @@ class PregModule extends AbstractParseModule
 
     public function preg_escape(string $delimiter, ...$regexParts) : string
     {
-        if (0 === count($regexParts)) {
+        if ([] === $regexParts) {
             return '';
         }
 
@@ -91,7 +91,7 @@ class PregModule extends AbstractParseModule
 
     public function preg_escape_ord(?string $mb_encoding, string $delimiter, ...$regexParts) : string
     {
-        if (0 === count($regexParts)) {
+        if ([] === $regexParts) {
             return '';
         }
 

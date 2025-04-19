@@ -1430,11 +1430,11 @@ class StrModule
         $_crops = Lib::php()->to_list($crops);
         $_limits = Lib::php()->to_list($limits ?? [ -1 ]);
 
-        if (0 === count($_crops)) {
+        if ([] === $_crops) {
             return $string;
         }
 
-        if (0 === count($_limits)) {
+        if ([] === $_limits) {
             throw new LogicException(
                 'The `limits` should be array of integers or be null',
                 $limits
@@ -1442,12 +1442,12 @@ class StrModule
         }
 
         $needleLcrop = array_shift($_crops);
-        $needleRcrop = (0 !== count($_crops))
+        $needleRcrop = ([] !== $_crops)
             ? array_shift($_crops)
             : $needleLcrop;
 
         $limitLcrop = array_shift($_limits);
-        $limitRcrop = (0 !== count($_limits))
+        $limitRcrop = ([] !== $_limits)
             ? array_shift($_limits)
             : $limitLcrop;
 
@@ -1520,11 +1520,11 @@ class StrModule
         $_crops = Lib::php()->to_list($crops);
         $_times = Lib::php()->to_list($times ?? [ 1 ]);
 
-        if (0 === count($_crops)) {
+        if ([] === $_crops) {
             return $string;
         }
 
-        if (0 === count($_times)) {
+        if ([] === $_times) {
             throw new LogicException(
                 'The `times` should be array of integers or be null',
                 $times
@@ -1532,12 +1532,12 @@ class StrModule
         }
 
         $needleLcrop = array_shift($_crops);
-        $needleRcrop = (0 !== count($_crops))
+        $needleRcrop = ([] !== $_crops)
             ? array_shift($_crops)
             : $needleLcrop;
 
         $timesLcrop = array_shift($_times);
-        $timesRcrop = (0 !== count($_times))
+        $timesRcrop = ([] !== $_times)
             ? array_shift($_times)
             : $timesLcrop;
 
@@ -1568,13 +1568,13 @@ class StrModule
         $_replace = Lib::php()->to_list($replace);
         $_subject = Lib::php()->to_list($subject);
 
-        if (0 === count($_search)) {
+        if ([] === $_search) {
             return $subject;
         }
-        if (0 === count($_replace)) {
+        if ([] === $_replace) {
             return $subject;
         }
-        if (0 === count($_subject)) {
+        if ([] === $_subject) {
             return [];
         }
 
@@ -1610,13 +1610,13 @@ class StrModule
         $_replace = Lib::php()->to_list($replace);
         $_subject = Lib::php()->to_list($subject);
 
-        if (0 === count($_search)) {
+        if ([] === $_search) {
             return $subject;
         }
-        if (0 === count($_replace)) {
+        if ([] === $_replace) {
             return $subject;
         }
-        if (0 === count($_subject)) {
+        if ([] === $_subject) {
             return [];
         }
 
@@ -1649,7 +1649,8 @@ class StrModule
         }
 
         $_lines = Lib::php()->to_list($lines);
-        if (0 === count($_lines)) {
+
+        if ([] === $_lines) {
             return [];
         }
 
@@ -1688,7 +1689,8 @@ class StrModule
         }
 
         $_lines = Lib::php()->to_list($lines);
-        if (0 === count($_lines)) {
+
+        if ([] === $_lines) {
             return [];
         }
 
@@ -1727,7 +1729,8 @@ class StrModule
         }
 
         $_lines = Lib::php()->to_list($lines);
-        if (0 === count($_lines)) {
+
+        if ([] === $_lines) {
             return [];
         }
 
@@ -1766,7 +1769,8 @@ class StrModule
         }
 
         $_lines = Lib::php()->to_list($lines);
-        if (0 === count($_lines)) {
+
+        if ([] === $_lines) {
             return [];
         }
 
@@ -1894,7 +1898,7 @@ class StrModule
 
         $_pattern = preg_quote($_pattern, '/');
 
-        if (0 !== count($replacements)) {
+        if ([] !== $replacements) {
             $_pattern = strtr($_pattern, $replacements);
         }
 

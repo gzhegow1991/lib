@@ -623,7 +623,7 @@ class DebugModule
         $output[ 'type' ] = "{$phpType}({$phpStrlen})";
 
         if ($withValue) {
-            if (0 !== count($printableValue)) {
+            if ([] !== $printableValue) {
                 $output[ 'value' ] = $printableValue[ 0 ];
             }
         }
@@ -683,7 +683,7 @@ class DebugModule
         $output[ 'id' ] = $objectId;
 
         if ($withValue) {
-            if (0 !== count($printableValue)) {
+            if ([] !== $printableValue) {
                 $output[ 'value' ] = $printableValue[ 0 ];
             }
         }
@@ -799,7 +799,7 @@ class DebugModule
         $output[ 'type' ] = "{$phpType}({$arrayCount})";
 
         if ($withValue) {
-            if (0 !== count($printableValue)) {
+            if ([] !== $printableValue) {
                 $output[ 'value' ] = $printableValue[ 0 ];
             }
         }
@@ -840,7 +840,7 @@ class DebugModule
         $output[ 'id' ] = $resourceId;
 
         if ($withValue) {
-            if (0 !== count($printableValue)) {
+            if ([] !== $printableValue) {
                 $output[ 'value' ] = $printableValue[ 0 ];
             }
         }
@@ -1395,7 +1395,7 @@ class DebugModule
 
     public function print_table(array $table, ?bool $return = null) : ?string
     {
-        if (0 === count($table)) {
+        if ([] === $table) {
             return null;
         }
 

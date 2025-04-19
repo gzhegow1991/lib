@@ -59,7 +59,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
 
     public function getSymbolMapsForPresetsSelected() : array
     {
-        if (0 === count($this->presetsSelected)) {
+        if ([] === $this->presetsSelected) {
             return [ [], [], [], [] ];
         }
 
@@ -115,7 +115,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
         foreach ( $presets as $preset ) {
             $ignoreSymbolMapPreset = $preset->getIgnoreSymbolMap();
 
-            if (0 !== count($ignoreSymbolMapPreset)) {
+            if ([] !== $ignoreSymbolMapPreset) {
                 $knownSymbolMapPreset = [];
 
                 $ignoreSymbolMapPreparedPreset = $this->prepareIgnoreSymbolMap(
@@ -132,7 +132,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
         foreach ( $presets as $preset ) {
             $sequenceMapPreset = $preset->getSequenceMap();
 
-            if (0 !== count($sequenceMapPreset)) {
+            if ([] !== $sequenceMapPreset) {
                 $knownSymbolMapPreset = [];
 
                 $ignoreSymbolMapPreparedPreset = $this->prepareSequenceMap(
@@ -146,7 +146,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
 
             $symbolMapPreset = $preset->getSymbolMap();
 
-            if (0 !== count($symbolMapPreset)) {
+            if ([] !== $symbolMapPreset) {
                 $knownSymbolMapPreset = [];
 
                 $ignoreSymbolMapPreparedPreset = $this->prepareSymbolMap(
@@ -346,7 +346,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
                 ?? (is_string($b) ? [ $b ] : null)
                 ?? [];
 
-            if (0 === count($bArray)) {
+            if ([] === $bArray) {
                 throw new LogicException(
                     'The `bArray` should be non-empty array'
                 );

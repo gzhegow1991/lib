@@ -392,7 +392,7 @@ class FsModule
 
     protected function type_file_extensions(\SplFileInfo $splFileInfo, array $extensions) : ?\SplFileInfo
     {
-        if (0 === count($extensions)) {
+        if ([] === $extensions) {
             return null;
         }
 
@@ -420,7 +420,7 @@ class FsModule
 
     protected function type_file_mime_types(\SplFileInfo $splFileInfo, array $mimeTypes) : ?\SplFileInfo
     {
-        if (0 === count($mimeTypes)) {
+        if ([] === $mimeTypes) {
             return null;
         }
 
@@ -451,7 +451,7 @@ class FsModule
 
     protected function type_file_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
     {
-        if (0 === count($filters)) {
+        if ([] === $filters) {
             return $splFileInfo;
         }
 
@@ -462,7 +462,7 @@ class FsModule
 
         $filtersIntersect = array_intersect_key($filters, $filtersList);
 
-        if (0 !== count($filtersIntersect)) {
+        if ([] !== $filtersIntersect) {
             $fileRealpath = $splFileInfo->getRealPath();
 
             $hasMaxSize = array_key_exists('max_size', $filters);
@@ -536,7 +536,7 @@ class FsModule
 
     protected function type_image_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
     {
-        if (0 === count($filters)) {
+        if ([] === $filters) {
             return $splFileInfo;
         }
 
@@ -552,7 +552,7 @@ class FsModule
 
         $filtersIntersect = array_intersect_key($filters, $filtersList);
 
-        if (0 !== count($filtersIntersect)) {
+        if ([] !== $filtersIntersect) {
             $fileRealpath = $splFileInfo->getRealPath();
 
             try {

@@ -15,6 +15,102 @@ class DateModule
     const INTERVAL_MONTH  = 2592000;
     const INTERVAL_YEAR   = 31536000;
 
+    const FORMAT_FILENAME_DATE       = self::FORMAT_FILENAME_DATE_DAY;
+    const FORMAT_FILENAME_DATE_YEAR  = 'y0000';
+    const FORMAT_FILENAME_DATE_MONTH = 'ym00';
+    const FORMAT_FILENAME_DATE_DAY   = 'ymd';
+
+    const FORMAT_FILENAME       = self::FORMAT_FILENAME_SEC;
+    const FORMAT_FILENAME_YEAR  = 'y0000_000000';
+    const FORMAT_FILENAME_MONTH = 'ym00_000000';
+    const FORMAT_FILENAME_DAY   = 'ymd_000000';
+    const FORMAT_FILENAME_HOUR  = 'ymd_H0000';
+    const FORMAT_FILENAME_MIN   = 'ymd_Hi00';
+    const FORMAT_FILENAME_SEC   = 'ymd_His';
+    const FORMAT_FILENAME_MSEC  = 'ymd_His_v';
+    const FORMAT_FILENAME_USEC  = 'ymd_His_u';
+
+    const FORMAT_SQL_DATE       = self::FORMAT_SQL_DATE_DAY;
+    const FORMAT_SQL_DATE_YEAR  = 'Y-00-00';
+    const FORMAT_SQL_DATE_MONTH = 'Y-m-00';
+    const FORMAT_SQL_DATE_DAY   = 'Y-m-d';
+
+    const FORMAT_SQL       = self::FORMAT_SQL_SEC;
+    const FORMAT_SQL_YEAR  = 'Y-00-00 00:00:00';
+    const FORMAT_SQL_MONTH = 'Y-m-00 00:00:00';
+    const FORMAT_SQL_DAY   = 'Y-m-d 00:00:00';
+    const FORMAT_SQL_HOUR  = 'Y-m-d H:00:00';
+    const FORMAT_SQL_MIN   = 'Y-m-d H:i:00';
+    const FORMAT_SQL_SEC   = 'Y-m-d H:i:s';
+    const FORMAT_SQL_USEC  = 'Y-m-d H:i:s.u';
+    const FORMAT_SQL_MSEC  = 'Y-m-d H:i:s.v';
+
+    const FORMAT_SQL_TIME      = self::FORMAT_SQL_TIME_SEC;
+    const FORMAT_SQL_TIME_HOUR = 'H:00:00';
+    const FORMAT_SQL_TIME_MIN  = 'H:i:00';
+    const FORMAT_SQL_TIME_SEC  = 'H:i:s';
+    const FORMAT_SQL_TIME_MSEC = 'H:i:s.v';
+    const FORMAT_SQL_TIME_USEC = 'H:i:s.u';
+
+    const FORMAT_JAVASCRIPT      = self::FORMAT_JAVASCRIPT_SEC;
+    const FORMAT_JAVASCRIPT_SEC  = "Y-m-d\TH:i:sP";
+    const FORMAT_JAVASCRIPT_USEC = "Y-m-d\TH:i:s.uP";
+    const FORMAT_JAVASCRIPT_MSEC = "Y-m-d\TH:i:s.vP";
+
+    const FORMAT_HUMAN_DATE = "D, d M Y O";
+    const FORMAT_HUMAN      = "D, d M Y H:i:s O";
+
+
+    const LIST_INTERVAL = [
+        self::INTERVAL_MINUTE => true,
+        self::INTERVAL_HOUR   => true,
+        self::INTERVAL_DAY    => true,
+        self::INTERVAL_WEEK   => true,
+        self::INTERVAL_MONTH  => true,
+        self::INTERVAL_YEAR   => true,
+    ];
+
+    const LIST_FORMAT = [
+        self::FORMAT_FILENAME_DATE_YEAR  => true,
+        self::FORMAT_FILENAME_DATE_MONTH => true,
+        self::FORMAT_FILENAME_DATE_DAY   => true,
+
+        self::FORMAT_FILENAME_YEAR  => true,
+        self::FORMAT_FILENAME_MONTH => true,
+        self::FORMAT_FILENAME_DAY   => true,
+        self::FORMAT_FILENAME_HOUR  => true,
+        self::FORMAT_FILENAME_MIN   => true,
+        self::FORMAT_FILENAME_SEC   => true,
+        self::FORMAT_FILENAME_MSEC  => true,
+        self::FORMAT_FILENAME_USEC  => true,
+
+        self::FORMAT_SQL_DATE_YEAR  => true,
+        self::FORMAT_SQL_DATE_MONTH => true,
+        self::FORMAT_SQL_DATE_DAY   => true,
+
+        self::FORMAT_SQL_YEAR  => true,
+        self::FORMAT_SQL_MONTH => true,
+        self::FORMAT_SQL_DAY   => true,
+        self::FORMAT_SQL_HOUR  => true,
+        self::FORMAT_SQL_MIN   => true,
+        self::FORMAT_SQL_SEC   => true,
+        self::FORMAT_SQL_USEC  => true,
+        self::FORMAT_SQL_MSEC  => true,
+
+        self::FORMAT_SQL_TIME_HOUR => true,
+        self::FORMAT_SQL_TIME_MIN  => true,
+        self::FORMAT_SQL_TIME_SEC  => true,
+        self::FORMAT_SQL_TIME_MSEC => true,
+        self::FORMAT_SQL_TIME_USEC => true,
+
+        self::FORMAT_JAVASCRIPT_SEC  => true,
+        self::FORMAT_JAVASCRIPT_USEC => true,
+        self::FORMAT_JAVASCRIPT_MSEC => true,
+
+        self::FORMAT_HUMAN_DATE => true,
+        self::FORMAT_HUMAN      => true,
+    ];
+
 
     /**
      * @param \DateTimeZone|null $result
@@ -379,7 +475,7 @@ class DateModule
         } else {
             $formatsList = Lib::php()->to_list($formats);
 
-            if (0 === count($formatsList)) {
+            if ([] === $formatsList) {
                 return false;
             }
 
@@ -449,7 +545,7 @@ class DateModule
         } else {
             $formatsList = Lib::php()->to_list($formats);
 
-            if (0 === count($formatsList)) {
+            if ([] === $formatsList) {
                 return false;
             }
 
@@ -521,7 +617,7 @@ class DateModule
         } else {
             $formatsList = Lib::php()->to_list($formats);
 
-            if (0 === count($formatsList)) {
+            if ([] === $formatsList) {
                 return false;
             }
 
@@ -763,7 +859,7 @@ class DateModule
         } else {
             $formatsList = Lib::php()->to_list($formats);
 
-            if (0 === count($formatsList)) {
+            if ([] === $formatsList) {
                 return false;
             }
 
@@ -842,7 +938,7 @@ class DateModule
         } else {
             $formatsList = Lib::php()->to_list($formats);
 
-            if (0 === count($formatsList)) {
+            if ([] === $formatsList) {
                 return false;
             }
 
@@ -921,7 +1017,7 @@ class DateModule
         } else {
             $formatsList = Lib::php()->to_list($formats);
 
-            if (0 === count($formatsList)) {
+            if ([] === $formatsList) {
                 return false;
             }
 
@@ -1889,6 +1985,149 @@ class DateModule
         }
 
         return $instance;
+    }
+
+
+    public function format_timestamp(\DateTimeInterface $dateTime) : string
+    {
+        return (string) $dateTime->getTimestamp();
+    }
+
+    public function format_timestamp_non_utc(\DateTimeInterface $dateTime) : string
+    {
+        return (string) ($dateTime->getTimestamp() + $dateTime->getOffset());
+    }
+
+
+    public function format_sec(\DateTimeInterface $dateTime) : string
+    {
+        return (string) $dateTime->getTimestamp();
+    }
+
+    public function format_msec(\DateTimeInterface $dateTime) : string
+    {
+        $seconds = (string) $dateTime->getTimestamp();
+
+        $milliseconds = $dateTime->format('v');
+        $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
+
+        return "{$seconds}.{$milliseconds}";
+    }
+
+    public function format_usec(\DateTimeInterface $dateTime) : string
+    {
+        $seconds = (string) $dateTime->getTimestamp();
+
+        $microseconds = $dateTime->format('u');
+        $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
+
+        return "{$seconds}.{$microseconds}";
+    }
+
+
+    public function format_sec_non_utc(\DateTimeInterface $dateTime) : string
+    {
+        return (string) ($dateTime->getTimestamp() + $dateTime->getOffset());
+    }
+
+    public function format_msec_non_utc(\DateTimeInterface $dateTime) : string
+    {
+        $seconds = (string) ($dateTime->getTimestamp() + $dateTime->getOffset());
+
+        $milliseconds = $dateTime->format('v');
+        $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
+
+        return "{$seconds}.{$milliseconds}";
+    }
+
+    public function format_usec_non_utc(\DateTimeInterface $dateTime) : string
+    {
+        $seconds = (string) ($dateTime->getTimestamp() + $dateTime->getOffset());
+
+        $microseconds = $dateTime->format('u');
+        $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
+
+        return "{$seconds}.{$microseconds}";
+    }
+
+
+
+    public function format_sql(\DateTimeInterface $dateTime) : string
+    {
+        $formattedSql = $dateTime->format(static::FORMAT_SQL);
+
+        return $formattedSql;
+    }
+
+    public function format_sql_msec(\DateTimeInterface $dateTime) : string
+    {
+        $formattedSql = $dateTime->format(static::FORMAT_SQL);
+
+        $milliseconds = $dateTime->format('v');
+        $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
+
+        return "{$formattedSql}.{$milliseconds}";
+    }
+
+    public function format_sql_usec(\DateTimeInterface $dateTime) : string
+    {
+        $formattedSql = $dateTime->format(static::FORMAT_SQL);
+
+        $microseconds = $dateTime->format('v');
+        $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
+
+        return "{$formattedSql}.{$microseconds}";
+    }
+
+
+    public function format_sql_utc(\DateTimeInterface $dateTime) : string
+    {
+        $clone = (clone $dateTime)->setTimezone(new \DateTimeZone('UTC'));
+
+        return $this->format_sql($clone);
+    }
+
+    public function format_sql_msec_utc(\DateTimeInterface $dateTime) : string
+    {
+        $clone = (clone $dateTime)->setTimezone(new \DateTimeZone('UTC'));
+
+        return $this->format_sql_msec($clone);
+    }
+
+    public function format_sql_usec_utc(\DateTimeInterface $dateTime) : string
+    {
+        $clone = (clone $dateTime)->setTimezone(new \DateTimeZone('UTC'));
+
+        return $this->format_sql_usec($clone);
+    }
+
+
+
+    public function format_javascript(\DateTimeInterface $dateTime) : string
+    {
+        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT);
+
+        return $formatted;
+    }
+
+    public function format_javascript_msec(\DateTimeInterface $dateTime) : string
+    {
+        $formattedJavascript = $dateTime->format(static::FORMAT_JAVASCRIPT);
+
+        $milliseconds = $dateTime->format('v');
+        $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
+
+        return "{$formattedJavascript}.{$milliseconds}";
+    }
+
+    public function format_javascript_usec(\DateTimeInterface $dateTime) : string
+    {
+        $formattedJavascript = $dateTime->format(static::FORMAT_JAVASCRIPT);
+
+        $microseconds = $dateTime->format('u');
+        $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
+
+        return "{$formattedJavascript}.{$microseconds}";
     }
 
 

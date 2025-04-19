@@ -4,6 +4,7 @@ namespace Gzhegow\Lib;
 
 use Gzhegow\Lib\Modules\FsModule;
 use Gzhegow\Lib\Modules\MbModule;
+use Gzhegow\Lib\Modules\Php\Pipe;
 use Gzhegow\Lib\Modules\CliModule;
 use Gzhegow\Lib\Modules\NetModule;
 use Gzhegow\Lib\Modules\PhpModule;
@@ -427,58 +428,9 @@ class Lib
     }
 
 
-    /**
-     * > gzhegow, thanks to PHP COMMUNITY!!111 we have to ensure internal types on all old classes
-     *
-     * @template-covariant T of object
-     *
-     * @param class-string<T> $class
-     *
-     * @return T
-     */
-    public static function new7(string $class, ...$args)
+    public static function pipe() : Pipe
     {
-        if (PHP_VERSION_ID < 80000) {
-            return new $class(...$args);
-        }
-
-        $pi = Lib::php()->pathinfo($class, '\\');
-        $namespace = $pi[ 'dirname' ];
-        $namespace .= '\\PHP8';
-        $classname = $pi[ 'basename' ];
-
-        $fqcn = "\\{$namespace}\\{$classname}";
-
-        $result = new $fqcn(...$args);
-
-        return $result;
-    }
-
-    /**
-     * > gzhegow, thanks to PHP COMMUNITY!!111 we have to ensure internal types on all old classes
-     *
-     * @template-covariant T of object
-     *
-     * @param class-string<T> $class
-     *
-     * @return T
-     */
-    public static function new8(string $class, ...$args)
-    {
-        if (PHP_VERSION_ID >= 80000) {
-            return new $class(...$args);
-        }
-
-        $pi = Lib::php()->pathinfo($class, '\\');
-        $namespace = $pi[ 'dirname' ];
-        $namespace .= '\\PHP7';
-        $classname = $pi[ 'basename' ];
-
-        $fqcn = "\\{$namespace}\\{$classname}";
-
-        $result = new $fqcn(...$args);
-
-        return $result;
+        return new Pipe();
     }
 
 
@@ -537,6 +489,61 @@ class Lib
         }
 
         return $mt;
+    }
+
+
+    /**
+     * > gzhegow, thanks to PHP COMMUNITY!!111 we have to ensure internal types on all old classes
+     *
+     * @template-covariant T of object
+     *
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
+    public static function new7(string $class, ...$args)
+    {
+        if (PHP_VERSION_ID < 80000) {
+            return new $class(...$args);
+        }
+
+        $pi = Lib::php()->pathinfo($class, '\\');
+        $namespace = $pi[ 'dirname' ];
+        $namespace .= '\\PHP8';
+        $classname = $pi[ 'basename' ];
+
+        $fqcn = "\\{$namespace}\\{$classname}";
+
+        $result = new $fqcn(...$args);
+
+        return $result;
+    }
+
+    /**
+     * > gzhegow, thanks to PHP COMMUNITY!!111 we have to ensure internal types on all old classes
+     *
+     * @template-covariant T of object
+     *
+     * @param class-string<T> $class
+     *
+     * @return T
+     */
+    public static function new8(string $class, ...$args)
+    {
+        if (PHP_VERSION_ID >= 80000) {
+            return new $class(...$args);
+        }
+
+        $pi = Lib::php()->pathinfo($class, '\\');
+        $namespace = $pi[ 'dirname' ];
+        $namespace .= '\\PHP7';
+        $classname = $pi[ 'basename' ];
+
+        $fqcn = "\\{$namespace}\\{$classname}";
+
+        $result = new $fqcn(...$args);
+
+        return $result;
     }
 
 

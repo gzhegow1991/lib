@@ -127,7 +127,7 @@ class BcmathModule
             $scales[] = $_scale;
         }
 
-        if (0 !== count($numbers)) {
+        if ([] !== $numbers) {
             $scales = array_merge(
                 $scales,
                 $this->scales(...$numbers)
@@ -161,7 +161,7 @@ class BcmathModule
             $scales[] = $_scale;
         }
 
-        if (0 !== count($numbers)) {
+        if ([] !== $numbers) {
             $scales = array_merge(
                 $scales,
                 $this->scales(...$numbers)

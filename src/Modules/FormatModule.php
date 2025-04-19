@@ -28,7 +28,7 @@ class FormatModule
         if (null !== $decoded) {
             $bytesNum = $decoded;
 
-        } elseif (0 !== count($fallback)) {
+        } elseif ([] !== $fallback) {
             [ $bytesNum ] = $fallback;
 
         } else {
@@ -133,7 +133,7 @@ class FormatModule
         if (null !== $encoded) {
             $bytesSize = $encoded;
 
-        } elseif (0 !== count($fallback)) {
+        } elseif ([] !== $fallback) {
             [ $bytesSize ] = $fallback;
 
         } else {
@@ -192,7 +192,7 @@ class FormatModule
         ?string $eol = null
     ) : array
     {
-        if (0 === count($rows)) {
+        if ([] === $rows) {
             throw new LogicException(
                 'The `rows` should be not-empty array'
             );
@@ -201,7 +201,9 @@ class FormatModule
         $_rows = array_values($rows);
 
         foreach ( $_rows as $i => $row ) {
-            if (! (is_array($row) && (0 !== count($row)))) {
+            $isNonEmptyArray = is_array($row) && ([] !== $row);
+
+            if (! $isNonEmptyArray) {
                 throw new LogicException(
                     [
                         'Each of `rows` should be not-empty array',
@@ -250,7 +252,7 @@ class FormatModule
         ?string $eol = null
     ) : array
     {
-        if (0 === count($row)) {
+        if ([] === $row) {
             throw new LogicException(
                 'The `row` should be not-empty array'
             );
