@@ -1986,22 +1986,40 @@ class ArrModule
 
             foreach ( $currentArray as $key => $value ) {
                 if (! is_array($value)) {
+                    $e = null;
+                    $ee = null;
                     try {
                         $fnSet($currentObject, $key, $value);
                     }
                     catch ( \Throwable $e ) {
-                        $fnSet->call($currentObject, null, $key, $value);
+                        try {
+                            $fnSet->call($currentObject, null, $key, $value);
+                        }
+                        catch ( \Throwable $ee ) {
+                            throw new RuntimeException(
+                                [ 'Unable to ' . __FUNCTION__ ], $ee, $e
+                            );
+                        }
                     }
 
                 } else {
                     $childObject = null;
 
                     if (property_exists($currentObject, $key)) {
+                        $e = null;
+                        $ee = null;
                         try {
                             $var = $fnGet($currentObject, $key);
                         }
                         catch ( \Throwable $e ) {
-                            $var = $fnGet->call($currentObject, null, $key);
+                            try {
+                                $var = $fnGet->call($currentObject, null, $key);
+                            }
+                            catch ( \Throwable $ee ) {
+                                throw new RuntimeException(
+                                    [ 'Unable to ' . __FUNCTION__ ], $ee, $e
+                                );
+                            }
                         }
 
                         if (is_object($var)) {
@@ -2012,11 +2030,20 @@ class ArrModule
                     if (null === $childObject) {
                         $childObject = new \stdClass();
 
+                        $e = null;
+                        $ee = null;
                         try {
                             $fnSet($currentObject, $key, $childObject);
                         }
                         catch ( \Throwable $e ) {
-                            $fnSet->call($currentObject, null, $key, $childObject);
+                            try {
+                                $fnSet->call($currentObject, null, $key, $childObject);
+                            }
+                            catch ( \Throwable $ee ) {
+                                throw new RuntimeException(
+                                    [ 'Unable to ' . __FUNCTION__ ], $ee, $e
+                                );
+                            }
                         }
                     }
 
