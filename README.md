@@ -90,6 +90,7 @@ function _assert_stdout(
 }
 
 
+
 // >>> TEST
 // > тесты Pipe
 $fn = function () {
@@ -102,7 +103,7 @@ $fn = function () {
         // > этот шаг может заменить значение, в данном случае приведя его к строке
         ->map('strval')
         //
-        // > этот шаг может очистить значение (в последующих шаг будет использоваться NULL) 
+        // > этот шаг может очистить значение (в последующих шаг будет использоваться NULL)
         ->filter('strlen')
         //
         // > этот шаг может выполнить сторонние действия, а возврат метода игнорируется
@@ -687,6 +688,38 @@ $fn = function () {
         $resNonStrict = \Gzhegow\Lib\Lib::arr()->diff_non_strict($a, $b);
         _print($resStrict, $resNonStrict, $resNonStrict === array_diff($a, $b));
     }
+
+    echo PHP_EOL;
+
+
+    $arr = [
+        'prop' => 1,
+
+        0 => [
+            'prop' => 1,
+
+            0 => [
+                'prop' => 1,
+
+                0 => [
+                    'prop' => 1,
+                ],
+            ],
+        ],
+    ];
+
+    $objStdClass = \Gzhegow\Lib\Lib::arr()->map_to_object($arr);
+    _print($objStdClass, (array) $objStdClass);
+
+    $target = new \stdClass();
+    $objStdClass = \Gzhegow\Lib\Lib::arr()->map_to_object($arr, $target);
+    _print($objStdClass, (array) $objStdClass);
+
+    $target = new class {
+        protected $prop;
+    };
+    $objAnonymous = \Gzhegow\Lib\Lib::arr()->map_to_object($arr, $target);
+    _print($objAnonymous, (array) $objAnonymous);
 };
 _assert_stdout($fn, [], '
 "[ ArrModule ]"
@@ -701,7 +734,11 @@ _assert_stdout($fn, [], '
 [ 0 => 1, 3 => 3 ] | [ 0 => 1, 3 => 3 ] | TRUE
 [ "y" => 200, "z" => 300 ] | [ "y" => 200, "z" => 300 ] | TRUE
 [ "x" => 100 ] | [ "x" => 100 ] | TRUE
-');
+' . "
+{ object # stdClass } | [ \"prop\" => 1, 0 => \"{ object # stdClass }\" ]
+{ object # stdClass } | [ \"prop\" => 1, 0 => \"{ object # stdClass }\" ]
+{ object # class@anonymous } | [ \"\x00*\x00prop\" => 1, 0 => \"{ object # stdClass }\" ]
+");
 
 
 // >>> TEST

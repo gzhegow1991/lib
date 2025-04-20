@@ -1954,6 +1954,85 @@ class ArrModule
 
 
     /**
+     * > превращает вложенный массив во вложенный объект - отсутствующие ключи в объекте всегда бросают исключения
+     */
+    public function map_to_object(array $array, object $target = null) : object
+    {
+        $target = $target ?? new \stdClass();
+
+        $stack = [
+            [
+                'array'  => $array,
+                'object' => $target,
+            ],
+        ];
+
+        $fnGet = function ($object, $key) {
+            $object = $object ?? $this;
+
+            return $object->{$key};
+        };
+        $fnSet = function ($object, $key, $value) {
+            $object = $object ?? $this;
+
+            $object->{$key} = $value;
+        };
+
+        while ( [] !== $stack ) {
+            $current = array_pop($stack);
+
+            $currentArray = $current[ 'array' ];
+            $currentObject = $current[ 'object' ];
+
+            foreach ( $currentArray as $key => $value ) {
+                if (! is_array($value)) {
+                    try {
+                        $fnSet($currentObject, $key, $value);
+                    }
+                    catch ( \Throwable $e ) {
+                        $fnSet->call($currentObject, null, $key, $value);
+                    }
+
+                } else {
+                    $childObject = null;
+
+                    if (property_exists($currentObject, $key)) {
+                        try {
+                            $var = $fnGet($currentObject, $key);
+                        }
+                        catch ( \Throwable $e ) {
+                            $var = $fnGet->call($currentObject, null, $key);
+                        }
+
+                        if (is_object($var)) {
+                            $childObject = $var;
+                        }
+                    }
+
+                    if (null === $childObject) {
+                        $childObject = new \stdClass();
+
+                        try {
+                            $fnSet($currentObject, $key, $childObject);
+                        }
+                        catch ( \Throwable $e ) {
+                            $fnSet->call($currentObject, null, $key, $childObject);
+                        }
+                    }
+
+                    $stack[] = [
+                        'array'  => $value,
+                        'object' => $childObject,
+                    ];
+                }
+            }
+        }
+
+        return $target;
+    }
+
+
+    /**
      * > Реализация array_walk_recursive, позволяющая:
      * > - получить путь до элемента
      * > - подменить значение по ссылке
