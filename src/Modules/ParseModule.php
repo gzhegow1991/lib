@@ -802,9 +802,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return array|null
 	 */
-	public function list($value)
+	public function array_plain($value)
 	{
-		if (Lib::type()->list($result, $value)) {
+		if (Lib::type()->array_plain($result, $value)) {
 		    return $result;
 		}
 
@@ -815,9 +815,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return array|null
 	 */
-	public function list_sorted($value)
+	public function list($value, ?bool $isPlain = null)
 	{
-		if (Lib::type()->list_sorted($result, $value)) {
+		if (Lib::type()->list($result, $value, $isPlain)) {
 		    return $result;
 		}
 
@@ -828,9 +828,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return array|null
 	 */
-	public function dict($value)
+	public function list_sorted($value, ?bool $isPlain = null)
 	{
-		if (Lib::type()->dict($result, $value)) {
+		if (Lib::type()->list_sorted($result, $value, $isPlain)) {
 		    return $result;
 		}
 
@@ -841,9 +841,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return array|null
 	 */
-	public function dict_sorted($value)
+	public function dict($value, ?bool $isPlain = null)
 	{
-		if (Lib::type()->dict_sorted($result, $value)) {
+		if (Lib::type()->dict($result, $value, $isPlain)) {
 		    return $result;
 		}
 
@@ -854,35 +854,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return array|null
 	 */
-	public function index($value)
+	public function dict_sorted($value, ?bool $isPlain = null)
 	{
-		if (Lib::type()->index($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return array|null
-	 */
-	public function index_list($value)
-	{
-		if (Lib::type()->index_list($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return array|null
-	 */
-	public function index_dict($value)
-	{
-		if (Lib::type()->index_dict($result, $value)) {
+		if (Lib::type()->dict_sorted($result, $value, $isPlain)) {
 		    return $result;
 		}
 

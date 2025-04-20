@@ -803,7 +803,6 @@ class DefaultPhoneManager implements PhoneManagerInterface
     public function getTimezonesForPhone($phoneNumber, $timezoneWildcards = null, ?string $region = '') : array
     {
         $timezoneWildcardsList = Lib::php()->to_list($timezoneWildcards);
-        dd();
 
         $phoneNumberObject = $this->parsePhoneNumber(
             $phoneNumber, $region
@@ -815,10 +814,20 @@ class DefaultPhoneManager implements PhoneManagerInterface
             ->getTimeZonesForNumber($phoneNumberObject)
         ;
 
-        if ([] !== $timezoneWildcardsIndex) {
+        if ([] !== $timezoneWildcardsList) {
+            $wildcards = [];
+            foreach ( $timezoneWildcardsList as $i => $wildcard ) {
+                if (is_string($i)) {
+                    $wildcard = $i;
+                }
+
+                $wildcards[ $wildcard ] = true;
+            }
+            $wildcards = array_keys($wildcards);
+
             foreach ( $timezones as $i => $timezoneName ) {
                 $isMatch = false;
-                foreach ( $timezoneWildcardsIndex as $wildcard => $bool ) {
+                foreach ( $wildcards as $wildcard ) {
                     if (false !== strpos($timezoneName, $wildcard)) {
                         $isMatch = true;
 

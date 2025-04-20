@@ -1330,7 +1330,7 @@ class PhpModule
 
         if ($isRecursive) {
             foreach ( $uses as $usesItem ) {
-                // ! recursion
+                // > ! recursion
                 $uses += $this->class_uses($usesItem);
             }
         }

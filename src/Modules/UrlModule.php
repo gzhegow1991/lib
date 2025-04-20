@@ -94,11 +94,11 @@ class UrlModule
     {
         $withParseUrl = array_key_exists(0, $refs);
 
-        $refParseUrl = null;
         if ($withParseUrl) {
             $refParseUrl =& $refs[ 0 ];
-            $refParseUrl = null;
         }
+
+        $refParseUrl = null;
 
         $hasQuery = (null !== $query);
         $hasFragment = (null !== $fragment);
@@ -212,11 +212,11 @@ class UrlModule
     {
         $withParseUrl = array_key_exists(0, $refs);
 
-        $refParseUrl = null;
         if ($withParseUrl) {
             $refParseUrl =& $refs[ 0 ];
-            $refParseUrl = null;
         }
+
+        $refParseUrl = null;
 
         if ('' === $url) {
             $url = $this->host_current();
@@ -270,11 +270,11 @@ class UrlModule
     {
         $withParseUrl = array_key_exists(0, $refs);
 
-        $refParseUrl = null;
         if ($withParseUrl) {
             $refParseUrl =& $refs[ 0 ];
-            $refParseUrl = null;
         }
+
+        $refParseUrl = null;
 
         $hasQuery = (null !== $query);
         $hasFragment = (null !== $fragment);

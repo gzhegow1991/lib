@@ -63,11 +63,11 @@ class CallableParser implements CallableParserInterface
 
         $withMethodArray = array_key_exists(0, $refs);
 
-        $refResultArray = null;
         if ($withMethodArray) {
             $refResultArray =& $refs[ 0 ];
-            $refResultArray = null;
         }
+
+        $refResultArray = null;
 
         $methodArray = null
             ?? $this->parse_method_array_from_object($value)

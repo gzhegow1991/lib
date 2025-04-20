@@ -15,11 +15,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -60,11 +60,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -99,11 +99,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -136,11 +136,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -183,11 +183,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -218,11 +218,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -254,11 +254,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -291,11 +291,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -328,11 +328,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -365,11 +365,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -404,11 +404,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -441,11 +441,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -478,11 +478,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -515,11 +515,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -553,11 +553,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -591,11 +591,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -628,11 +628,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);
@@ -665,11 +665,11 @@ class CmpModule
     {
         $withFnCmpName = array_key_exists(0, $refs);
 
-        $fnCmpName = null;
         if ($withFnCmpName) {
             $fnCmpName =& $refs[ 0 ];
-            $fnCmpName = null;
         }
+
+        $fnCmpName = null;
 
         $_flagsMode = $this->flagsModeDefault($flagsMode);
         $_flagsResult = $this->flagsResultDefault($flagsResult);

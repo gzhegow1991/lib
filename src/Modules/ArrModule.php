@@ -49,7 +49,7 @@ class ArrModule
     /**
      * @param array|null $result
      */
-    public function type_list(&$result, $value) : bool
+    public function type_array_plain(&$result, $value) : bool
     {
         $result = null;
 
@@ -61,9 +61,51 @@ class ArrModule
             return true;
         }
 
-        foreach ( array_keys($value) as $key ) {
-            if (is_string($key)) {
+        foreach ( $value as $v ) {
+            if (is_array($v) && ([] !== $v)) {
                 return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+
+    /**
+     * @param array|null $result
+     */
+    public function type_list(&$result, $value, ?bool $isPlain = null) : bool
+    {
+        $result = null;
+
+        $isPlain = $isPlain ?? false;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        if ([] === $value) {
+            return true;
+        }
+
+        if ($isPlain) {
+            foreach ( $value as $key => $v ) {
+                if (is_string($key)) {
+                    return false;
+                }
+
+                if (is_array($v) && ([] !== $v)) {
+                    return false;
+                }
+            }
+
+        } else {
+            foreach ( array_keys($value) as $key ) {
+                if (is_string($key)) {
+                    return false;
+                }
             }
         }
 
@@ -75,9 +117,11 @@ class ArrModule
     /**
      * @param array|null $result
      */
-    public function type_list_sorted(&$result, $value) : bool
+    public function type_list_sorted(&$result, $value, ?bool $isPlain = null) : bool
     {
         $result = null;
+
+        $isPlain = $isPlain ?? false;
 
         if (! is_array($value)) {
             return false;
@@ -88,16 +132,36 @@ class ArrModule
         }
 
         $prev = -1;
-        foreach ( array_keys($value) as $key ) {
-            if (is_string($key)) {
-                return false;
+
+        if ($isPlain) {
+            foreach ( $value as $key => $v ) {
+                if (is_string($key)) {
+                    return false;
+                }
+
+                if (($key - $prev) !== 1) {
+                    return false;
+                }
+
+                if (is_array($v) && ([] !== $v)) {
+                    return false;
+                }
+
+                $prev = $key;
             }
 
-            if (($key - $prev) !== 1) {
-                return false;
-            }
+        } else {
+            foreach ( array_keys($value) as $key ) {
+                if (is_string($key)) {
+                    return false;
+                }
 
-            $prev = $key;
+                if (($key - $prev) !== 1) {
+                    return false;
+                }
+
+                $prev = $key;
+            }
         }
 
         $result = $value;
@@ -109,9 +173,11 @@ class ArrModule
     /**
      * @param array|null $result
      */
-    public function type_dict(&$result, $value) : bool
+    public function type_dict(&$result, $value, ?bool $isPlain = null) : bool
     {
         $result = null;
+
+        $isPlain = $isPlain ?? false;
 
         if (! is_array($value)) {
             return false;
@@ -121,9 +187,22 @@ class ArrModule
             return true;
         }
 
-        foreach ( array_keys($value) as $key ) {
-            if (is_int($key)) {
-                return false;
+        if ($isPlain) {
+            foreach ( $value as $key => $v ) {
+                if (is_int($key)) {
+                    return false;
+                }
+
+                if (is_array($v) && ([] !== $v)) {
+                    return false;
+                }
+            }
+
+        } else {
+            foreach ( array_keys($value) as $key ) {
+                if (is_int($key)) {
+                    return false;
+                }
             }
         }
 
@@ -134,10 +213,14 @@ class ArrModule
 
     /**
      * @param array|null $result
+     * @param callable   $fnCmp
      */
-    public function type_dict_sorted(&$result, $value) : bool
+    public function type_dict_sorted(&$result, $value, ?bool $isPlain = null, $fnCmp = null) : bool
     {
         $result = null;
+
+        $isPlain = $isPlain ?? false;
+        $fnCmp = $fnCmp ?? 'strcmp';
 
         if (! is_array($value)) {
             return false;
@@ -147,91 +230,48 @@ class ArrModule
             return true;
         }
 
-        $keys = array_keys($value);
+        $prev = '';
 
-        foreach ( $keys as $key ) {
-            if (is_int($key)) {
-                return false;
-            }
-        }
+        if ($isPlain) {
+            foreach ( $value as $key => $v ) {
+                if (is_int($key)) {
+                    return false;
+                }
 
-        $keysSorted = $keys;
-        sort($keysSorted);
+                if (is_array($v) && ([] !== $v)) {
+                    return false;
+                }
 
-        if ($keys !== $keysSorted) {
-            return false;
-        }
+                $cmp = call_user_func($fnCmp, $prev, $key);
 
-        $result = $value;
+                if (! is_int($cmp)) {
+                    return false;
+                }
 
-        return true;
-    }
+                if ($cmp < 0) {
+                    return false;
+                }
 
-
-    /**
-     * @param array|null $result
-     */
-    public function type_index(&$result, $value) : bool
-    {
-        $result = null;
-
-        $status = false
-            || $this->type_index_dict($result, $value)
-            || $this->type_index_list($result, $value);
-
-        if ($status) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param array|null $result
-     */
-    public function type_index_list(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! is_array($value)) {
-            return false;
-        }
-
-        foreach ( array_keys($value) as $key ) {
-            if (is_string($key)) {
-                return false;
+                $prev = $key;
             }
 
-            if (0 === $key) {
-                return false;
-            }
-        }
+        } else {
+            foreach ( array_keys($value) as $key ) {
+                if (is_int($key)) {
+                    return false;
+                }
 
-        $result = $value;
+                $cmp = call_user_func($fnCmp, $prev, $key);
 
-        return true;
-    }
+                if (! is_int($cmp)) {
+                    return false;
+                }
 
-    /**
-     * @param array|null $result
-     */
-    public function type_index_dict(&$result, $value) : bool
-    {
-        $result = null;
+                if ($cmp < 0) {
+                    return false;
+                }
 
-        if (! is_array($value)) {
-            return false;
-        }
-
-        foreach ( array_keys($value) as $key ) {
-            if (is_int($key)) {
-                return false;
-            }
-
-            if ('' === $key) {
-                return false;
+                $prev = $key;
             }
         }
 
@@ -342,12 +382,11 @@ class ArrModule
     {
         $withValue = array_key_exists(0, $refs);
 
-        $refValue = null;
-
         if ($withValue) {
             $refValue =& $refs[ 0 ];
-            $refValue = null;
         }
+
+        $refValue = null;
 
         if (! is_array($array)) {
             return false;
@@ -498,17 +537,15 @@ class ArrModule
         $withValue = array_key_exists(0, $refs);
         $withKey = array_key_exists(1, $refs);
 
-        $refValue = null;
-        $refKey = null;
-
         if ($withValue) {
             $refValue =& $refs[ 0 ];
-            $refValue = null;
         }
         if ($withKey) {
             $refKey =& $refs[ 1 ];
-            $refKey = null;
         }
+
+        $refValue = null;
+        $refKey = null;
 
         if (! is_array($array)) {
             return false;
@@ -710,17 +747,15 @@ class ArrModule
         $withValue = array_key_exists(0, $refs);
         $withKey = array_key_exists(1, $refs);
 
-        $refValue = null;
-        $refKey = null;
-
         if ($withValue) {
             $refValue =& $refs[ 0 ];
-            $refValue = null;
         }
         if ($withKey) {
             $refKey =& $refs[ 1 ];
-            $refKey = null;
         }
+
+        $refValue = null;
+        $refKey = null;
 
         $pathArray = $thePath->getPath();
 
@@ -1875,8 +1910,10 @@ class ArrModule
 
         } elseif (! Lib::str()->type_char($symbol, $dot)) {
             throw new LogicException(
-                'The `dot` should be one symbol',
-                $dot
+                [
+                    'The `dot` should be one symbol',
+                    $dot,
+                ]
             );
         }
 
@@ -1954,7 +1991,8 @@ class ArrModule
 
 
     /**
-     * > превращает вложенный массив во вложенный объект - отсутствующие ключи в объекте всегда бросают исключения
+     * > превращает вложенный массив во вложенный объект
+     * > отсутствующие ключи в объекте всегда бросают исключения, не нужно писать `isset()` или оператор `?? null`
      */
     public function map_to_object(array $array, object $target = null) : object
     {
@@ -2132,6 +2170,26 @@ class ArrModule
         $withParents = $isWithParents && ! $isWithoutParents;
         unset($sum);
 
+        $isWithoutLists = (bool) ($flags & _ARR_WALK_WITHOUT_LISTS);
+        $isWithLists = (bool) ($flags & _ARR_WALK_WITH_LISTS);
+        $sum = (int) ($isWithoutLists + $isWithLists);
+        if (1 !== $sum) {
+            $isWithoutLists = true;
+            $isWithLists = false;
+        }
+        $withLists = $isWithLists && ! $isWithoutLists;
+        unset($sum);
+
+        $isWithoutDicts = (bool) ($flags & _ARR_WALK_WITHOUT_DICTS);
+        $isWithDicts = (bool) ($flags & _ARR_WALK_WITH_DICTS);
+        $sum = (int) ($isWithoutDicts + $isWithDicts);
+        if (1 !== $sum) {
+            $isWithoutDicts = true;
+            $isWithDicts = false;
+        }
+        $withDicts = $isWithDicts && ! $isWithoutDicts;
+        unset($sum);
+
         if ($isSortSelfFirst) {
             $fnUsort = null;
 
@@ -2167,12 +2225,15 @@ class ArrModule
             throw new LogicException([ 'Invalid `mode`', $flags ]);
         }
 
-        // > valueRef, fullpath, force
-        $buffer[] = [ &$array, [], false ];
+        $theArr = Lib::arr();
+
+        // > ref, path
+        $buffer[] = [ &$array, [] ];
 
         $isRoot = true;
         while ( ! empty($buffer) ) {
             $cur = [];
+
             if ($isModeDepthFirst) {
                 $cur = array_pop($buffer);
 
@@ -2180,31 +2241,50 @@ class ArrModule
                 $cur = array_shift($buffer);
             }
 
-            $isYieldLeaf = ! is_array($cur[ 0 ]);
-            $isYieldParent = ! $isRoot && ! $isYieldLeaf && ! empty($cur[ 0 ]);
-            $isYieldEmptyArray = ! $isRoot && ! $isYieldLeaf && empty($cur[ 0 ]);
+            $cur0 = $cur[ 0 ];
+
+            $isArray = is_array($cur0);
+
+            $isLeaf = $isEmptyArray = $isParent = $isList = $isDict = false;
+
+            if (! $isArray) {
+                $isLeaf = true;
+
+            } elseif ((! $isRoot) && ([] === $cur0)) {
+                $isEmptyArray = true;
+
+            } elseif ((! $isRoot) && ([] !== $cur0)) {
+                if ($withLists) {
+                    $isList = $theArr->type_list($var, $cur0, true);
+                }
+                if ($withDicts) {
+                    $isDict = $theArr->type_dict($var, $cur0, true);
+                }
+
+                $isParent = ! ($isList || $isDict);
+            }
 
             if (
-                ($withLeaves && $isYieldLeaf)
-                || ($withParents && $isYieldParent)
-                || ($withEmptyArrays && $isYieldEmptyArray)
+                ($withLeaves && $isLeaf)
+                || ($withEmptyArrays && $isEmptyArray)
+                || ($withParents && $isParent)
+                || ($withLists && $isList)
+                || ($withDicts && $isDict)
             ) {
-                $valueBefore = $cur[ 0 ];
-                $valueReference =& $cur[ 0 ];
+                $refCur0 =& $cur[ 0 ];
 
-                yield $cur[ 1 ] => $valueReference;
+                yield $cur[ 1 ] => $refCur0;
 
-                if ($valueReference !== $valueBefore) {
-                    $isYieldParent = is_array($valueReference) && ! empty($valueReference);
+                if ($refCur0 !== $cur0) {
+                    $isParent = is_array($refCur0) && ([] !== $refCur0);
                 }
 
                 unset($valueBefore);
-                unset($valueReference);
-                $valueReference = null;
+                unset($refValueBefore);
             }
 
-            if ($isRoot || $isYieldParent) {
-                $children = $cur[ 0 ];
+            if ($isRoot || $isParent) {
+                $children = $cur0;
 
                 if ($fnUsort) {
                     uasort($children, $fnUsort);

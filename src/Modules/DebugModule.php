@@ -729,7 +729,7 @@ class DebugModule
                 }
 
                 if (is_string($value)) {
-                    // ! recursion
+                    // > ! recursion
                     $value = $this->var_dump(
                         $value,
                         [
@@ -750,7 +750,7 @@ class DebugModule
                     || is_object($value)
                     || $theType->resource($_value, $value)
                 ) {
-                    // ! recursion
+                    // > ! recursion
                     $value = $this->var_dump(
                         $value,
                         [
@@ -766,17 +766,19 @@ class DebugModule
                 }
 
                 if (is_array($value)) {
-                    // ! recursion
-                    $value = $this->var_dump(
-                        $value,
-                        [
-                            'with_type'       => true,
-                            'with_id'         => false,
-                            'with_value'      => false,
-                            //
-                            'array_level_max' => 0,
-                        ] + $options
-                    );
+                    if ([] !== $value) {
+                        // > ! recursion
+                        $value = $this->var_dump(
+                            $value,
+                            [
+                                'with_type'       => true,
+                                'with_id'         => false,
+                                'with_value'      => false,
+                                //
+                                'array_level_max' => 0,
+                            ] + $options
+                        );
+                    }
 
                     continue;
                 }
@@ -1329,35 +1331,36 @@ class DebugModule
                 break;
 
             case "array":
-                $keys = array_keys($var);
-
-                foreach ( $keys as $key ) {
-                    if (is_string($key)) {
-                        $isList = false;
-
-                        break;
-                    }
-                }
-                $isList = $isList ?? true;
-
-                $isListIndexed = $isList
-                    && ($keys === range(0, count($var) - 1));
+                $isListSorted = Lib::arr()->type_list_sorted($ref, $var);
 
                 $lines = [];
                 foreach ( $var as $key => $value ) {
                     $rowIndent = str_repeat($indent, $level + 1);
 
                     $keyString = '';
-                    if (! $isListIndexed) {
+                    if (! $isListSorted) {
                         $keyString = is_string($key)
-                            ? "\"{$key}\""
-                            : $key;
-
-                        $keyString .= " => ";
+                            ? "\"{$key}\" => "
+                            : "{$key} => ";
                     }
 
-                    // ! recursion
-                    $valueString = $this->var_export($value, $options, $level + 1);
+                    if ([] === $value) {
+                        $valueString = '[]';
+
+                    } else {
+                        // > ! recursion
+                        $valueString = $this->var_export(
+                            $value,
+                            $options,
+                            $level + 1
+                        );
+                    }
+
+                    // dump([
+                    //     $value,
+                    //     $rowIndent,
+                    //     $keyString,
+                    // ]);
 
                     $line = ''
                         . $rowIndent
@@ -1367,15 +1370,15 @@ class DebugModule
                     $lines[] = $line;
                 }
 
-                $arrayStartIndent = '';
+                // $arrayStartIndent = '';
                 $arrayEndIndent = '';
                 if ($level > 0) {
-                    $arrayStartIndent = str_repeat($indent, $level - 1);
+                    // $arrayStartIndent = str_repeat($indent, $level - 1);
                     $arrayEndIndent = str_repeat($indent, $level);
                 }
 
                 $result = ""
-                    . $arrayStartIndent
+                    // . $arrayStartIndent
                     . "[" . $newline
                     . implode("," . $newline, $lines) . $newline
                     . $arrayEndIndent
@@ -1494,13 +1497,13 @@ class DebugModule
     {
         $theStr = Lib::str();
 
-        $withResultLines = array_key_exists(0, $refs);
+        $withDiffLines = array_key_exists(0, $refs);
 
-        $refResultLines = null;
-        if ($withResultLines) {
-            $refResultLines =& $refs[ 0 ];
-            $refResultLines = null;
+        if ($withDiffLines) {
+            $refDiffLines =& $refs[ 0 ];
         }
+
+        $refDiffLines = null;
 
         $oldLines = $theStr->lines($old);
         $newLines = $theStr->lines($new);
@@ -1623,11 +1626,11 @@ class DebugModule
             $diffLines = array_reverse($diffLines);
         }
 
-        if ($withResultLines) {
-            $refResultLines = $diffLines;
+        if ($withDiffLines) {
+            $refDiffLines = $diffLines;
         }
 
-        unset($refResultLines);
+        unset($refDiffLines);
 
         return $isDiff;
     }

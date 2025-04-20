@@ -248,7 +248,7 @@ abstract class AbstractConfig implements
             $context[ '__key' ] = $childKey;
             $context[ '__parent' ] = $this;
 
-            // ! recursion
+            // > ! recursion
             $status = $child->validationRecursive($context);
 
             if (! $status) {

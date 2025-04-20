@@ -1260,12 +1260,11 @@ class StrModule
     {
         $withSubstr = array_key_exists(0, $refs);
 
-        $refSubstr = null;
-
         if ($withSubstr) {
             $refSubstr =& $refs[ 0 ];
-            $refSubstr = null;
         }
+
+        $refSubstr = null;
 
         $ignoreCase = $ignoreCase ?? true;
 
@@ -1301,12 +1300,11 @@ class StrModule
     {
         $withSubstr = array_key_exists(0, $refs);
 
-        $refSubstr = null;
-
         if ($withSubstr) {
             $refSubstr =& $refs[ 0 ];
-            $refSubstr = null;
         }
+
+        $refSubstr = null;
 
         $ignoreCase = $ignoreCase ?? true;
 
@@ -2366,12 +2364,11 @@ class StrModule
     {
         $withLines = array_key_exists(0, $refs);
 
-        $refLines = null;
-
         if ($withLines) {
             $refLines =& $refs[ 0 ];
-            $refLines = null;
         }
+
+        $refLines = null;
 
         $_eol = $eol ?? "\n";
         $_eol = (string) $_eol;

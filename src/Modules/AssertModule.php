@@ -1154,15 +1154,34 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function list()
+	public function array_plain()
 	{
 		$this->fnList[] = [ __FUNCTION__, [  ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->array_plain(
+		        $this->result,
+		        $this->result ?? $this->value,
+
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
+	public function list(?bool $isPlain = null)
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $isPlain ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->list(
 		        $this->result,
 		        $this->result ?? $this->value,
-
+		        $isPlain
 		    );
 		}
 
@@ -1173,15 +1192,15 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function list_sorted()
+	public function list_sorted(?bool $isPlain = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $isPlain ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->list_sorted(
 		        $this->result,
 		        $this->result ?? $this->value,
-
+		        $isPlain
 		    );
 		}
 
@@ -1192,15 +1211,15 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function dict()
+	public function dict(?bool $isPlain = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $isPlain ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->dict(
 		        $this->result,
 		        $this->result ?? $this->value,
-
+		        $isPlain
 		    );
 		}
 
@@ -1211,72 +1230,15 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function dict_sorted()
+	public function dict_sorted(?bool $isPlain = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $isPlain ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->dict_sorted(
 		        $this->result,
 		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function index()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->index(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function index_list()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->index_list(
-		        $this->result,
-		        $this->result ?? $this->value,
-
-		    );
-		}
-
-		return $this;
-	}
-
-
-	/**
-	 * @return static
-	 */
-	public function index_dict()
-	{
-		$this->fnList[] = [ __FUNCTION__, [  ] ];
-
-		if (false !== $this->status) {
-		    $this->status = Lib::type()->index_dict(
-		        $this->result,
-		        $this->result ?? $this->value,
-
+		        $isPlain
 		    );
 		}
 

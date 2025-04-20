@@ -33,11 +33,11 @@ class FsModule
 
         $withPathInfo = array_key_exists(0, $refs);
 
-        $refPathInfo = null;
         if ($withPathInfo) {
             $refPathInfo =& $refs[ 0 ];
-            $refPathInfo = null;
         }
+
+        $refPathInfo = null;
 
         if (! Lib::type()->string_not_empty($valueString, $value)) {
             return false;
@@ -77,11 +77,11 @@ class FsModule
 
         $withPathInfo = array_key_exists(0, $refs);
 
-        $refPathInfo = null;
         if ($withPathInfo) {
             $refPathInfo =& $refs[ 0 ];
-            $refPathInfo = null;
         }
+
+        $refPathInfo = null;
 
         if (! Lib::type()->string_not_empty($valueString, $value)) {
             return false;

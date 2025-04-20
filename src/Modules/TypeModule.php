@@ -180,12 +180,11 @@ class TypeModule extends AbstractTypeModule
 
         $withSplit = array_key_exists(0, $refs);
 
-        $refSplit = null;
-
         if ($withSplit) {
             $refSplit =& $refs[ 0 ];
-            $refSplit = null;
         }
+
+        $refSplit = null;
 
         $isFloat = is_float($value);
         if ($isFloat) {
@@ -1819,59 +1818,43 @@ class TypeModule extends AbstractTypeModule
     /**
      * @param array|null $result
      */
-    public function list(&$result, $value) : bool
+    public function array_plain(&$result, $value) : bool
     {
-        return Lib::arr()->type_list($result, $value);
-    }
-
-    /**
-     * @param array|null $result
-     */
-    public function list_sorted(&$result, $value) : bool
-    {
-        return Lib::arr()->type_list_sorted($result, $value);
+        return Lib::arr()->type_array_plain($result, $value);
     }
 
 
     /**
      * @param array|null $result
      */
-    public function dict(&$result, $value) : bool
+    public function list(&$result, $value, ?bool $isPlain = null) : bool
     {
-        return Lib::arr()->type_dict($result, $value);
+        return Lib::arr()->type_list($result, $value, $isPlain);
     }
 
     /**
      * @param array|null $result
      */
-    public function dict_sorted(&$result, $value) : bool
+    public function list_sorted(&$result, $value, ?bool $isPlain = null) : bool
     {
-        return Lib::arr()->type_dict_sorted($result, $value);
+        return Lib::arr()->type_list_sorted($result, $value, $isPlain);
     }
 
 
     /**
      * @param array|null $result
      */
-    public function index(&$result, $value) : bool
+    public function dict(&$result, $value, ?bool $isPlain = null) : bool
     {
-        return Lib::arr()->type_index($result, $value);
+        return Lib::arr()->type_dict($result, $value, $isPlain);
     }
 
     /**
      * @param array|null $result
      */
-    public function index_list(&$result, $value) : bool
+    public function dict_sorted(&$result, $value, ?bool $isPlain = null) : bool
     {
-        return Lib::arr()->type_index_list($result, $value);
-    }
-
-    /**
-     * @param array|null $result
-     */
-    public function index_dict(&$result, $value) : bool
-    {
-        return Lib::arr()->type_index_dict($result, $value);
+        return Lib::arr()->type_dict_sorted($result, $value, $isPlain);
     }
 
 
