@@ -788,7 +788,7 @@ class FsModule
     public function file_get_contents(
         string $filepath,
         ?array $fileGetContentsArgs = null
-    ) : ?string
+    ) : string
     {
         $fileGetContentsArgs = $fileGetContentsArgs ?: [];
 
@@ -817,7 +817,7 @@ class FsModule
         ?array $filePutContentsArgs = null,
         ?array $mkdirArgs = null,
         ?array $chmodArgs = null
-    ) : ?int
+    ) : int
     {
         $_filePutContentsArgs = $filePutContentsArgs ?? [];
 
@@ -877,6 +877,126 @@ class FsModule
         }
 
         return $size;
+    }
+
+    public function file_replace_blocks(
+        string $filepath,
+        string $start, $lines, string $end
+    ) : string
+    {
+        $theParse = Lib::parse();
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        if (! $theType->filepath_realpath($filepathRealpath, $filepath, true)) {
+            $this->file_put_contents(
+                $filepath, '',
+                [], [], []
+            );
+
+            $filepathRealpath = realpath($filepath);
+        }
+
+        if (! $theType->trim($startTrim, $start, true)) {
+            throw new LogicException(
+                [ 'The `start` should be non-empty trim', $start ]
+            );
+        }
+
+        $endTrim = $theParse->trim($end) ?? '';
+
+        if ($startTrim === $endTrim) {
+            throw new LogicException(
+                [ 'The `start` should not be equal to `end`', $startTrim, $endTrim ]
+            );
+        }
+
+        $input = fopen($filepathRealpath, 'r');
+        if (false === $input) {
+            throw new FilesystemException(
+                [ 'Unable to perform fopen() on file', $filepathRealpath ]
+            );
+        }
+
+        $filepathRealpathTmp = $filepathRealpath . '.tmp';
+
+        $output = fopen($filepathRealpathTmp, 'w');
+        if (false === $output) {
+            throw new FilesystemException(
+                [ 'Unable to perform fopen() on file', $filepathRealpathTmp ]
+            );
+        }
+
+        $insideBlock = null;
+
+        while ( ! feof($input) ) {
+            $fgets = fgets($input);
+            $fgets = trim($fgets);
+
+            if ('' !== $startTrim) {
+                if ($fgets === $startTrim) {
+                    $insideBlock = 1;
+                }
+            }
+
+            if ('' !== $endTrim) {
+                if ($fgets === $endTrim) {
+                    $insideBlock = 0;
+                }
+            }
+
+            if (! $insideBlock) {
+                fwrite($output, $fgets . PHP_EOL);
+
+            } elseif (1 === $insideBlock) {
+                fwrite($output, $startTrim . PHP_EOL);
+
+                foreach ( $thePhp->to_list_it($lines) as $line ) {
+                    if (is_array($line)) {
+                        continue;
+                    }
+
+                    $line = trim($line);
+
+                    fwrite($output, $line . PHP_EOL);
+                }
+
+                fwrite($output, $endTrim . PHP_EOL);
+
+                $insideBlock = 2;
+            }
+        }
+
+        if (null === $insideBlock) {
+            fwrite($output, PHP_EOL);
+
+            fwrite($output, $startTrim . PHP_EOL);
+
+            foreach ( $thePhp->to_list_it($lines) as $line ) {
+                if (is_array($line)) {
+                    continue;
+                }
+
+                $line = trim($line);
+
+                fwrite($output, $line . PHP_EOL);
+            }
+
+            fwrite($output, $endTrim . PHP_EOL);
+        }
+
+        fclose($input);
+        fclose($output);
+
+        $status = rename($filepathRealpathTmp, $filepathRealpath);
+
+        if (false === $status) {
+            throw new FilesystemException(
+                [ 'Unable to perform rename() on file', $filepathRealpathTmp ]
+            );
+        }
+
+        return $filepathRealpath;
     }
 
 
