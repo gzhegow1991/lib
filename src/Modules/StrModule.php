@@ -2169,10 +2169,18 @@ class StrModule
 
         $ignoreSymbolsIndex = [];
         foreach ( $gen as $str ) {
-            if ($theType->letter($letter, $str)) {
+            if (is_array($str)) {
+                continue;
+
+            } elseif ($theType->letter($letter, $str)) {
                 $letterLower = mb_strtolower($letter);
 
                 $ignoreSymbolsIndex[ $letterLower ] = true;
+
+            } else {
+                throw new LogicException(
+                    [ 'Each of `ignoreSymbols` should be letter', $str ]
+                );
             }
         }
 
