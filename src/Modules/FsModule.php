@@ -881,7 +881,7 @@ class FsModule
 
     public function file_replace_blocks(
         string $filepath,
-        string $start, $lines, string $end
+        string $start, $lines, string $end = ''
     ) : string
     {
         $theParse = Lib::parse();
