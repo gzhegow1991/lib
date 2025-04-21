@@ -1,49 +1,12 @@
-# Lib
-
-Библиотека вспомогательных функций для использования в проектах и остальных пакетах
-
-## Установить в проект
-
-```
-composer require gzhegow/lib
-```
-
-## Запустить тесты
-
-```
-php test.php
-```
-
 ## Примеры и тесты
-
-```php
-D:\OpenServer\.org\@gzhegow\_1_\_1_lib\tests\test.php
-```
-
-```php
-D:\OpenServer\.org\@gzhegow\_1_\_1_lib\tests\test.php
-```
-
-```php
-D:\OpenServer\.org\@gzhegow\_1_\_1_lib\tests\test.php
-```
-
-```php
-D:\OpenServer\.org\@gzhegow\_1_\_1_lib\tests\test.php
-```
-
-```php
-D:\OpenServer\.org\@gzhegow\_1_\_1_lib\tests\test.php
-```
-
-```php
-D:\OpenServer\.org\@gzhegow\_1_\_1_lib\tests\test.php
-```
 
 ```php
 <?php
 
-require_once __DIR__ . '/vendor/autoload.php';
+
+define('__ROOT__', __DIR__ . '/..');
+
+require_once __ROOT__ . '/vendor/autoload.php';
 
 
 // > настраиваем PHP
@@ -449,13 +412,13 @@ $fn = function () {
 
 
     $e = new \Gzhegow\Lib\Exception\RuntimeException();
-    $eTrace = $e->getTraceOverride(__DIR__);
+    $eTrace = $e->getTraceOverride(__ROOT__);
     foreach ( $eTrace as $i => $frame ) {
         unset($eTrace[ $i ][ 'line' ]);
         unset($eTrace[ $i ][ 'args' ]);
     }
 
-    _print($e->getFileOverride(__DIR__));
+    _print($e->getFileOverride(__ROOT__));
 
     echo PHP_EOL;
 
@@ -516,7 +479,7 @@ _assert_stdout($fn, [], '
 { object # Exception }
 
 
-"test.php"
+"tests/test.php"
 
 ###
 [
@@ -528,14 +491,18 @@ _assert_stdout($fn, [], '
     "function" => "call_user_func_array"
   ],
   [
-    "file" => "test.php",
+    "file" => "tests/test.php",
     "function" => "assertStdout",
     "class" => "Gzhegow\Lib\Modules\TestModule",
     "type" => "->"
   ],
   [
-    "file" => "test.php",
+    "file" => "tests/test.php",
     "function" => "_assert_stdout"
+  ],
+  [
+    "file" => "test.php",
+    "function" => "require_once"
   ]
 ]
 ###
@@ -1052,13 +1019,17 @@ $fn = function () {
     _print('[ AssertModule ]');
     echo PHP_EOL;
 
-    $var = \Gzhegow\Lib\Lib::assert(-1)
+
+    $var = \Gzhegow\Lib\Lib::assert()
+        ->of(-1)
         ->int_positive()
         ->orNull()
     ;
     _print($var); // NULL
+    echo PHP_EOL;
 
-    $var = \Gzhegow\Lib\Lib::assert('-1')
+
+    $var = \Gzhegow\Lib\Lib::assertOf('-1')
         ->string_not_empty()
         ->numeric_positive()
         ->orFallback([ NAN ])
@@ -1067,9 +1038,9 @@ $fn = function () {
 
     $e = null;
     try {
-        $var = \Gzhegow\Lib\Lib::assert('-1')
+        $var = \Gzhegow\Lib\Lib::assertOf('-1')
             ->numeric_positive()
-            ->triggerError('The value should be positive numeric', E_USER_ERROR)
+            ->withTriggerError('The value should be positive numeric', E_USER_ERROR)
             ->orNull()
         ;
     }
@@ -1080,7 +1051,7 @@ $fn = function () {
 
     $e = null;
     try {
-        $var = \Gzhegow\Lib\Lib::assert('-1')
+        $var = \Gzhegow\Lib\Lib::assertOf('-1')
             ->numeric_positive()
             ->orThrow('The value should be positive numeric')
         ;
@@ -1093,6 +1064,7 @@ _assert_stdout($fn, [], '
 "[ AssertModule ]"
 
 NULL
+
 NAN
 "[ CATCH ] The value should be positive numeric"
 "[ CATCH ] The value should be positive numeric"
@@ -1398,8 +1370,8 @@ $fn = function () {
         [ &$fnCmpSizeName ]
     );
 
-    $dumpPath = __DIR__ . '/var/dump/fn_compare_tables.txt';
-    if (is_file($dumpPath)) unlink($dumpPath);
+    // $dumpPath = __ROOT__ . '/var/dump/fn_compare_tables.txt';
+    // if (is_file($dumpPath)) unlink($dumpPath);
 
     $xi = 0;
     foreach ( $valuesXX as $i => $valuesX ) {
@@ -1427,8 +1399,8 @@ $fn = function () {
             $xi++;
         }
 
-        $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
-        file_put_contents($dumpPath, $content . PHP_EOL . PHP_EOL, FILE_APPEND);
+        // $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        // file_put_contents($dumpPath, $content . PHP_EOL . PHP_EOL, FILE_APPEND);
 
         // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
         // dd(\Gzhegow\Lib\Lib::debug()->print_table($tableSize, 1));
@@ -2573,19 +2545,19 @@ $fn = function () {
 
 
     $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
-        __DIR__ . '/var/1/1/1/1.txt', '123',
+        __ROOT__ . '/var/1/1/1/1.txt', '123',
         [ FILE_APPEND ], [ 0775, true ]
     );
     _print($result);
 
     $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
-        __DIR__ . '/var/1/1/1.txt', '123',
+        __ROOT__ . '/var/1/1/1.txt', '123',
         [ FILE_APPEND ], [ 0775, true ]
     );
     _print($result);
 
     $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
-        __DIR__ . '/var/1/1.txt', '123',
+        __ROOT__ . '/var/1/1.txt', '123',
         [ FILE_APPEND ], [ 0775, true ]
     );
     _print($result);
@@ -2594,7 +2566,7 @@ $fn = function () {
 
 
     $result = \Gzhegow\Lib\Lib::fs()->file_get_contents(
-        __DIR__ . '/var/1/1/1/1.txt',
+        __ROOT__ . '/var/1/1/1/1.txt',
         []
     );
     _print($result);
@@ -2602,7 +2574,7 @@ $fn = function () {
 
     foreach (
         \Gzhegow\Lib\Lib::fs()->dir_walk_it(
-            __DIR__ . '/var/1',
+            __ROOT__ . '/var/1',
             [], []
         )
         as $spl
@@ -2611,7 +2583,7 @@ $fn = function () {
             ? \Gzhegow\Lib\Lib::fs()->rmdir($spl->getRealPath())
             : \Gzhegow\Lib\Lib::fs()->rm($spl->getRealPath());
     }
-    \Gzhegow\Lib\Lib::fs()->rmdir(__DIR__ . '/var/1');
+    \Gzhegow\Lib\Lib::fs()->rmdir(__ROOT__ . '/var/1');
 };
 _assert_stdout($fn, [], '
 "[ FsModule ]"
@@ -4170,3 +4142,4 @@ _assert_stdout($fn, [], '
 ":hello/world" | FALSE
 ');
 ```
+
