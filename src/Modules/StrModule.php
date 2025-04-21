@@ -2096,10 +2096,13 @@ class StrModule
      */
     public function translit_ru2ascii(string $string, ?string $delimiter = null, $ignoreSymbols = null) : string
     {
-        $delimiter = $delimiter ?? '-';
+        if ('' === $string) {
+            return '';
+        }
 
         $theMb = Lib::mb();
         $thePreg = Lib::preg();
+        $theType = Lib::type();
 
         $dictionary = [
             'а' => 'a',
@@ -2108,12 +2111,12 @@ class StrModule
             'г' => 'r',
             'д' => 'g',
             'е' => 'e',
-            'ж' => '}|{',
+            'ж' => ']![',
             'з' => '3',
             'и' => 'u',
             'й' => 'u',
             'к' => 'K',
-            'л' => 'JI',
+            'л' => '/l',
             'м' => 'M',
             'н' => 'H',
             'о' => 'o',
@@ -2122,18 +2125,18 @@ class StrModule
             'с' => 'c',
             'т' => 'T',
             'у' => 'y',
-            'ф' => '(|)',
+            'ф' => 'qp',
             'х' => 'x',
             'ц' => 'll,',
             'ч' => '4',
             'ш' => 'lll',
             'щ' => 'lll,',
-            'ъ' => '\'b',
-            'ы' => 'bI',
+            'ъ' => "`b",
+            'ы' => 'bl',
             'ь' => 'b',
-            'э' => 'e',
-            'ю' => 'I0',
-            'я' => '9I',
+            'э' => '3}',
+            'ю' => '!0',
+            'я' => '9l',
             'ё' => 'e',
             //
             '0' => '0',
@@ -2148,45 +2151,47 @@ class StrModule
             '9' => '9',
         ];
 
-        if (isset($dictionary[ $delimiter ])) {
-            throw new LogicException(
-                [ 'The `delimiter` should not be in dictionary', $delimiter ]
-            );
-        }
-
-        $_ignoreSymbols = is_array($ignoreSymbols)
-            ? $ignoreSymbols
-            : ($ignoreSymbols ? [ $ignoreSymbols ] : []);
-
-        $ignoreSymbolsRegex = [];
-        foreach ( $_ignoreSymbols as $i => $symbols ) {
-            if (is_string($i)) {
-                $symbols = $i;
+        if (null !== $delimiter) {
+            if (! $theType->char($char, $delimiter)) {
+                throw new LogicException(
+                    [ 'The `delimiter` should be exactly one char', $delimiter ]
+                );
             }
 
-            $_symbols = (string) $symbols;
-            $_symbols = $theMb->str_split($_symbols, 1);
-
-            foreach ( $_symbols as $symbol ) {
-                if (isset($dictionary[ $symbol ])) {
-                    throw new LogicException(
-                        [ 'Each of `ignoreSymbols` should not be in dictionary', $symbol ]
-                    );
-                }
-
-                $symbol = mb_strtolower($symbol);
-
-                $ignoreSymbolsRegex[ $symbol ] = true;
+            if (isset($dictionary[ $delimiter ])) {
+                throw new LogicException(
+                    [ 'The `delimiter` should not be in dictionary', $delimiter ]
+                );
             }
         }
 
-        $ignoreSymbolsRegex = array_keys($ignoreSymbolsRegex);
+        $gen = Lib::php()->to_list_it($ignoreSymbols);
+
+        $ignoreSymbolsIndex = [];
+        foreach ( $gen as $str ) {
+            if ($theType->letter($letter, $str)) {
+                $letterLower = mb_strtolower($letter);
+
+                $ignoreSymbolsIndex[ $letterLower ] = true;
+            }
+        }
+
+        $ignoreSymbolsRegex = array_keys($ignoreSymbolsIndex);
         $ignoreSymbolsRegex = implode('', $ignoreSymbolsRegex);
         $ignoreSymbolsRegex = $thePreg->preg_quote_ord($ignoreSymbolsRegex);
 
-        $result = mb_strtolower($string);
+        $stringLower = mb_strtolower($string);
 
-        $result = preg_replace("/[^а-яё0-9{$ignoreSymbolsRegex} ]/iu", $delimiter, $result);
+        $stringLower = preg_replace('/\s/u', ' ', $stringLower);
+
+        $result = preg_replace_callback(
+            "/[^а-яё0-9{$ignoreSymbolsRegex} ]/u",
+            static function ($m) use ($delimiter) {
+                return $delimiter
+                    ?? ('{' . $m[ 0 ] . '}');
+            },
+            $stringLower
+        );
 
         $result = str_replace(
             array_keys($dictionary),
@@ -2209,11 +2214,13 @@ class StrModule
     {
         $_characters = $characters ?? " \n\r\t\v\0";
 
-        $_strings = is_iterable($strings)
-            ? $strings
-            : (is_string($strings) ? [ $strings ] : []);
+        foreach ( Lib::php()->to_iterable($strings) as $string ) {
+            if (! is_string($string)) {
+                throw new LogicException(
+                    [ 'Each of `strings` should be string', $string ]
+                );
+            }
 
-        foreach ( $_strings as $string ) {
             yield trim($string, $_characters);
         }
     }
@@ -2227,11 +2234,13 @@ class StrModule
     {
         $_characters = $characters ?? " \n\r\t\v\0";
 
-        $_strings = is_iterable($strings)
-            ? $strings
-            : (is_string($strings) ? [ $strings ] : []);
+        foreach ( Lib::php()->to_iterable($strings) as $string ) {
+            if (! is_string($string)) {
+                throw new LogicException(
+                    [ 'Each of `strings` should be string', $string ]
+                );
+            }
 
-        foreach ( $_strings as $string ) {
             yield ltrim($string, $_characters);
         }
     }
@@ -2245,11 +2254,13 @@ class StrModule
     {
         $_characters = $characters ?? " \n\r\t\v\0";
 
-        $_strings = is_iterable($strings)
-            ? $strings
-            : (is_string($strings) ? [ $strings ] : []);
+        foreach ( Lib::php()->to_iterable($strings) as $string ) {
+            if (! is_string($string)) {
+                throw new LogicException(
+                    [ 'Each of `strings` should be string', $string ]
+                );
+            }
 
-        foreach ( $_strings as $string ) {
             yield rtrim($string, $_characters);
         }
     }
