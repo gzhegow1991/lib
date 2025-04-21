@@ -2,13 +2,43 @@
 
 Библиотека вспомогательных функций для использования в проектах и остальных пакетах
 
-## Установка
+## Установить в проект
 
 ```
-composer require gzhegow/lib;
+composer require gzhegow/lib
+```
+
+## Запустить тесты
+
+```
+php test.php
 ```
 
 ## Примеры и тесты
+
+```php
+D:\OpenServer\.org\@gzhegow\_1_\_1_lib\tests\test.php
+```
+
+```php
+D:\OpenServer\.org\@gzhegow\_1_\_1_lib\tests\test.php
+```
+
+```php
+D:\OpenServer\.org\@gzhegow\_1_\_1_lib\tests\test.php
+```
+
+```php
+D:\OpenServer\.org\@gzhegow\_1_\_1_lib\tests\test.php
+```
+
+```php
+D:\OpenServer\.org\@gzhegow\_1_\_1_lib\tests\test.php
+```
+
+```php
+D:\OpenServer\.org\@gzhegow\_1_\_1_lib\tests\test.php
+```
 
 ```php
 <?php
