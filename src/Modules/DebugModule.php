@@ -1331,58 +1331,70 @@ class DebugModule
                 break;
 
             case "array":
-                $isListSorted = Lib::arr()->type_list_sorted($ref, $var);
+                if ([] === $var) {
+                    $result = "[]";
 
-                $lines = [];
-                foreach ( $var as $key => $value ) {
-                    $rowIndent = str_repeat($indent, $level + 1);
+                } else {
+                    $isListSorted = Lib::arr()->type_list_sorted($ref, $var);
 
-                    $keyString = '';
-                    if (! $isListSorted) {
-                        $keyString = is_string($key)
-                            ? "\"{$key}\" => "
-                            : "{$key} => ";
+                    $lines = [];
+                    foreach ( $var as $key => $value ) {
+                        $rowIndent = str_repeat($indent, $level + 1);
+
+                        $keyString = '';
+                        if (! $isListSorted) {
+                            $keyString = is_string($key)
+                                ? "\"{$key}\" => "
+                                : "{$key} => ";
+                        }
+
+                        if ([] === $value) {
+                            $valueString = '[]';
+
+                        } else {
+                            // > ! recursion
+                            $valueString = $this->var_export(
+                                $value,
+                                $options,
+                                $level + 1
+                            );
+                        }
+
+                        $line = ''
+                            . $rowIndent
+                            . $keyString
+                            . $valueString;
+
+                        $lines[] = $line;
                     }
 
-                    if ([] === $value) {
-                        $valueString = '[]';
+                    $arrayEndIndent = '';
+                    if ($level > 0) {
+                        $arrayEndIndent = str_repeat($indent, $level);
+                    }
 
-                    } else {
-                        // > ! recursion
-                        $valueString = $this->var_export(
-                            $value,
+                    $result = ""
+                        . "[" . $newline
+                        . implode("," . $newline, $lines) . $newline
+                        . $arrayEndIndent
+                        . "]";
+                }
+
+                break;
+
+            case "object":
+                if ($var instanceof \stdClass) {
+                    $result = ''
+                        . '(object) '
+                        . $this->var_export(
+                            get_object_vars($var),
                             $options,
-                            $level + 1
+                            $level,
                         );
-                    }
 
-                    // dump([
-                    //     $value,
-                    //     $rowIndent,
-                    //     $keyString,
-                    // ]);
-
-                    $line = ''
-                        . $rowIndent
-                        . $keyString
-                        . $valueString;
-
-                    $lines[] = $line;
+                } else {
+                    $result = var_export($var, true);
                 }
-
-                // $arrayStartIndent = '';
-                $arrayEndIndent = '';
-                if ($level > 0) {
-                    // $arrayStartIndent = str_repeat($indent, $level - 1);
-                    $arrayEndIndent = str_repeat($indent, $level);
-                }
-
-                $result = ""
-                    // . $arrayStartIndent
-                    . "[" . $newline
-                    . implode("," . $newline, $lines) . $newline
-                    . $arrayEndIndent
-                    . "]";
 
                 break;
 

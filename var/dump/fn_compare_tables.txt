@@ -53,7 +53,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                          |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                          |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                          |
-| B@52 | [  ]                                                       | NAN ? cmpValuesNan | 0 ? cmpValuesNull  | NAN ? cmpValuesNil                                          |
+| B@52 | []                                                         | NAN ? cmpValuesNan | 0 ? cmpValuesNull  | NAN ? cmpValuesNil                                          |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                          |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                          |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                          |
@@ -128,7 +128,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesNil |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesNil |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesNil |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesNil |
+| B@52 | []                                                         | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesNil |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesNil |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesNil |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesNil |
@@ -203,7 +203,7 @@
 | B@49 | { resource(opened) # stream }                              | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
 | B@50 | { resource(opened) # stream }                              | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
 | B@51 | { resource(closed) }                                       | 0 ? cmpValuesBoolean  | 1 ? cmpValuesBoolean |
-| B@52 | [  ]                                                       | 0 ? cmpValuesBoolean  | 1 ? cmpValuesBoolean |
+| B@52 | []                                                         | 0 ? cmpValuesBoolean  | 1 ? cmpValuesBoolean |
 | B@53 | [ "" ]                                                     | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
 | B@54 | [ "a" ]                                                    | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
 | B@55 | [ "a", "b" ]                                               | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
@@ -278,7 +278,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
+| B@52 | []                                                         | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
@@ -353,7 +353,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
+| B@52 | []                                                         | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
@@ -428,7 +428,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesResource    | NAN ? cmpValuesResource     | NAN ? cmpValuesResource      | NAN ? cmpValuesResource       |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesResource    | NAN ? cmpValuesResource     | NAN ? cmpValuesResource      | NAN ? cmpValuesResource       |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesResource    | NAN ? cmpValuesResource     | NAN ? cmpValuesResource      | NAN ? cmpValuesResource       |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray       | NAN ? cmpValuesArray        | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          |
+| B@52 | []                                                         | NAN ? cmpValuesArray       | NAN ? cmpValuesArray        | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray       | NAN ? cmpValuesArray        | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray       | NAN ? cmpValuesArray        | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray       | NAN ? cmpValuesArray        | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          |
@@ -503,7 +503,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesResource        | NAN ? cmpValuesResource        | NAN ? cmpValuesResource         | NAN ? cmpValuesResource         |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesResource        | NAN ? cmpValuesResource        | NAN ? cmpValuesResource         | NAN ? cmpValuesResource         |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesResource        | NAN ? cmpValuesResource        | NAN ? cmpValuesResource         | NAN ? cmpValuesResource         |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray           | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            | NAN ? cmpValuesArray            |
+| B@52 | []                                                         | NAN ? cmpValuesArray           | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            | NAN ? cmpValuesArray            |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray           | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            | NAN ? cmpValuesArray            |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray           | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            | NAN ? cmpValuesArray            |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray           | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            | NAN ? cmpValuesArray            |
@@ -578,7 +578,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
-| B@52 | [  ]                                                       | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
+| B@52 | []                                                         | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
@@ -653,7 +653,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
+| B@52 | []                                                         | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
@@ -728,7 +728,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
+| B@52 | []                                                         | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
@@ -803,7 +803,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
+| B@52 | []                                                         | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
@@ -878,7 +878,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesResource      | NAN ? cmpValuesResource       | NAN ? cmpValuesResource        | NAN ? cmpValuesResource         |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesResource      | NAN ? cmpValuesResource       | NAN ? cmpValuesResource        | NAN ? cmpValuesResource         |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesResource      | NAN ? cmpValuesResource       | NAN ? cmpValuesResource        | NAN ? cmpValuesResource         |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            |
+| B@52 | []                                                         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            |
@@ -953,7 +953,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesResource         | NAN ? cmpValuesResource         | NAN ? cmpValuesResource          | NAN ? cmpValuesResource          |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesResource         | NAN ? cmpValuesResource         | NAN ? cmpValuesResource          | NAN ? cmpValuesResource          |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesResource         | NAN ? cmpValuesResource         | NAN ? cmpValuesResource          | NAN ? cmpValuesResource          |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray            | NAN ? cmpValuesArray            | NAN ? cmpValuesArray             | NAN ? cmpValuesArray             |
+| B@52 | []                                                         | NAN ? cmpValuesArray            | NAN ? cmpValuesArray            | NAN ? cmpValuesArray             | NAN ? cmpValuesArray             |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray            | NAN ? cmpValuesArray            | NAN ? cmpValuesArray             | NAN ? cmpValuesArray             |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray            | NAN ? cmpValuesArray            | NAN ? cmpValuesArray             | NAN ? cmpValuesArray             |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray            | NAN ? cmpValuesArray            | NAN ? cmpValuesArray             | NAN ? cmpValuesArray             |
@@ -1028,7 +1028,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesResource | NAN ? cmpValuesResource |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
+| B@52 | []                                                         | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
@@ -1103,7 +1103,7 @@
 | B@49 | { resource(opened) # stream }                              | 0 ? cmpValuesResource                | NAN ? cmpValuesResource              | NAN ? cmpValuesResource     |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesResource              | 0 ? cmpValuesResource                | NAN ? cmpValuesResource     |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesResource              | NAN ? cmpValuesResource              | 0 ? cmpValuesResource       |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray        |
+| B@52 | []                                                         | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray        |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray        |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray        |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray        |
@@ -1124,7 +1124,7 @@
 
 
 +-------------------------------------------------------------------+-----------------------+----------------------+----------------------+----------------------+
-|                                                                   | A@52 | [  ]           | A@53 | [ "" ]        | A@54 | [ "a" ]       | A@55 | [ "a", "b" ]  |
+|                                                                   | A@52 | []             | A@53 | [ "" ]        | A@54 | [ "a" ]       | A@55 | [ "a", "b" ]  |
 +-------------------------------------------------------------------+-----------------------+----------------------+----------------------+----------------------+
 | B@0 | NAN                                                         | NAN ? cmpValuesNan    | NAN ? cmpValuesNan   | NAN ? cmpValuesNan   | NAN ? cmpValuesNan   |
 | B@1 | NULL                                                        | 0 ? cmpValuesNull     | 1 ? cmpValuesNull    | 1 ? cmpValuesNull    | 1 ? cmpValuesNull    |
@@ -1178,7 +1178,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesArray  | NAN ? cmpValuesArray | NAN ? cmpValuesArray | NAN ? cmpValuesArray |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesArray  | NAN ? cmpValuesArray | NAN ? cmpValuesArray | NAN ? cmpValuesArray |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesArray  | NAN ? cmpValuesArray | NAN ? cmpValuesArray | NAN ? cmpValuesArray |
-| B@52 | [  ]                                                       | 0 ? cmpValuesArray    | 1 ? cmpValuesArray   | 1 ? cmpValuesArray   | 1 ? cmpValuesArray   |
+| B@52 | []                                                         | 0 ? cmpValuesArray    | 1 ? cmpValuesArray   | 1 ? cmpValuesArray   | 1 ? cmpValuesArray   |
 | B@53 | [ "" ]                                                     | -1 ? cmpValuesArray   | 0 ? cmpValuesArray   | 0 ? cmpValuesArray   | 1 ? cmpValuesArray   |
 | B@54 | [ "a" ]                                                    | -1 ? cmpValuesArray   | 0 ? cmpValuesArray   | 0 ? cmpValuesArray   | 1 ? cmpValuesArray   |
 | B@55 | [ "a", "b" ]                                               | -1 ? cmpValuesArray   | -1 ? cmpValuesArray  | -1 ? cmpValuesArray  | 0 ? cmpValuesArray   |
@@ -1253,7 +1253,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesDate                                               | NAN ? cmpValuesDate                                               | NAN ? cmpValuesDate                                               |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesDate                                               | NAN ? cmpValuesDate                                               | NAN ? cmpValuesDate                                               |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesDate                                               | NAN ? cmpValuesDate                                               | NAN ? cmpValuesDate                                               |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray                                              | NAN ? cmpValuesArray                                              | NAN ? cmpValuesArray                                              |
+| B@52 | []                                                         | NAN ? cmpValuesArray                                              | NAN ? cmpValuesArray                                              | NAN ? cmpValuesArray                                              |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray                                              | NAN ? cmpValuesArray                                              | NAN ? cmpValuesArray                                              |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray                                              | NAN ? cmpValuesArray                                              | NAN ? cmpValuesArray                                              |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray                                              | NAN ? cmpValuesArray                                              | NAN ? cmpValuesArray                                              |
@@ -1328,7 +1328,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
+| B@52 | []                                                         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
@@ -1403,7 +1403,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
+| B@52 | []                                                         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
@@ -1478,7 +1478,7 @@
 | B@49 | { resource(opened) # stream }                              | NAN ? cmpValuesObject                                  | NAN ? cmpValuesObject                                  | NAN ? cmpValuesObject                                  | NAN ? cmpValuesObject                                  |
 | B@50 | { resource(opened) # stream }                              | NAN ? cmpValuesObject                                  | NAN ? cmpValuesObject                                  | NAN ? cmpValuesObject                                  | NAN ? cmpValuesObject                                  |
 | B@51 | { resource(closed) }                                       | NAN ? cmpValuesObject                                  | NAN ? cmpValuesObject                                  | NAN ? cmpValuesObject                                  | NAN ? cmpValuesObject                                  |
-| B@52 | [  ]                                                       | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   |
+| B@52 | []                                                         | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   |
 | B@53 | [ "" ]                                                     | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   |
 | B@54 | [ "a" ]                                                    | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   |
 | B@55 | [ "a", "b" ]                                               | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   | NAN ? cmpValuesArray                                   |

@@ -1246,7 +1246,7 @@ class StrModule
             $result = Lib::mb()->str_split($string, $length, $mb_encoding);
 
         } else {
-            $result = preg_split("/(?<=.{{$length}})/u", $string, -1, PREG_SPLIT_NO_EMPTY);;
+            $result = preg_split("/(?<=.{{$length}})/u", $string, -1, PREG_SPLIT_NO_EMPTY);
         }
 
         return $result;

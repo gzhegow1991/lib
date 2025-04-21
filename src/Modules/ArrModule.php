@@ -1404,10 +1404,10 @@ class ArrModule
         $list = [];
         $dict = [];
 
-        foreach ( $src as $idx => $val ) {
-            is_int($idx)
-                ? ($list[ $idx ] = $val)
-                : ($dict[ $idx ] = $val);
+        foreach ( $src as $key => $val ) {
+            is_int($key)
+                ? ($list[ $key ] = $val)
+                : ($dict[ $key ] = $val);
         }
 
         return [ $list, $dict ];

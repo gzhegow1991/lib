@@ -38,6 +38,7 @@ ini_set('memory_limit', '32M');
 ;
 
 
+
 // > добавляем несколько функция для тестирования
 function _value($value) : string
 {
@@ -119,7 +120,7 @@ $fn = function () {
         // ->catchTo($e) // > исключение будет сохранено в $e по ссылке, а значение удалено
         // ->catchTo($e, [ 'catchTo' ]) // > тоже, но значение будет заменено на 'catchTo'
         // ->catchTo($e, [ 'catchTo' ], LogicException::class) > тоже, но только если \Throwable это субкласс
-        ->catchTo($e, [ 'catchTo' ], LogicException::class)
+        ->catchTo($e, [ 'catchTo' ], \LogicException::class)
         //
         // > или можно обрабатывать исключения обычным способом через callable
         ->catch(function (\Throwable $e, $null, $result) {
@@ -351,7 +352,6 @@ $fn = function () {
     _print('[ Errors ]');
     echo PHP_EOL;
 
-
     \Gzhegow\Lib\Lib::php()->errors_start($b);
 
     for ( $i = 0; $i < 3; $i++ ) {
@@ -573,7 +573,7 @@ $fn = function () {
     $class = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::class;
     $args = [ \stdClass::class ];
     $arrayOf = \Gzhegow\Lib\Lib::new8($class, ...$args);
-    $arrayOf[] = $objectStdClass;;
+    $arrayOf[] = $objectStdClass;
 
     $e = null;
     try {
@@ -848,7 +848,7 @@ _assert_stdout($fn, [], '
 [ 1 ] | [ 1 ] | TRUE
 [ 2 => 3 ] | [ 1 => "2", 2 => 3 ] | TRUE
 [ 1, "2" ] | [ 1 ] | TRUE
-[  ] | [ "1", "2" ] | TRUE
+[] | [ "1", "2" ] | TRUE
 [ "1", "2", "3" ] | [ 2 => "3" ] | TRUE
 [ 1 => 2, 2 => 2 ] | [ 1 => 2, 2 => 2 ] | TRUE
 [ 0 => 1, 3 => 3 ] | [ 0 => 1, 3 => 3 ] | TRUE
@@ -1368,8 +1368,8 @@ $fn = function () {
         [ &$fnCmpSizeName ]
     );
 
-    // $dumpPath = __DIR__ . '/var/dump/fn_compare_tables.txt';
-    // if (is_file($dumpPath)) unlink($dumpPath);
+    $dumpPath = __DIR__ . '/var/dump/fn_compare_tables.txt';
+    if (is_file($dumpPath)) unlink($dumpPath);
 
     $xi = 0;
     foreach ( $valuesXX as $i => $valuesX ) {
@@ -1397,8 +1397,8 @@ $fn = function () {
             $xi++;
         }
 
-        // $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
-        // file_put_contents($dumpPath, $content . PHP_EOL . PHP_EOL, FILE_APPEND);
+        $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        file_put_contents($dumpPath, $content . PHP_EOL . PHP_EOL, FILE_APPEND);
 
         // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
         // dd(\Gzhegow\Lib\Lib::debug()->print_table($tableSize, 1));
@@ -1411,65 +1411,65 @@ $fn = function () {
 _assert_stdout($fn, [], '
 "[ CmpModule ]"
 
-a75fe2dc510d4d1559dc93fb294f34aa
-a75fe2dc510d4d1559dc93fb294f34aa
+5385429d302ea2d3026e9f33bfa4d853
+5385429d302ea2d3026e9f33bfa4d853
 
-5369c1754322243e0d39af9ca563a057
-1a2482d0414f29d1683971e5c8dab6e4
+008634489c1dba011cc77b0ba59d1519
+1f236611f946b35cc5668ec0c5af8836
 
-8d9bae46cb2aace21295674221edfcb7
-a8d7f3fceddedc5b6c99e9cc87af036f
+9b4a464db2d63e7e7b9381136e297f75
+a86a9f9ff2574657414ba3b0b7466c8a
 
-d2de73e611f4f46fb1d715065aaf8d66
-77b541afdeeaff652b8999436cf75759
+da2eb61ea489ab2e7511a6ae91c083ea
+6e8dfdd6ff651c0cac54a74be9a90d6b
 
-2a606361aa2625a0fd3354cd358bb1b0
-fdeb5168c373f3b5a1be824905f96160
+21300ddcdd5ce216cba60ba941dfd5ff
+c4ef1801482a159507e9cbec2a61d4aa
 
-28e16009f9953574492e4866b41b7449
-d8eabf258b3f01fc8544bd704edb0bb9
+285b44fac9dcd0bea9f2ae2c112213ff
+253013cddd9231a0aade38c436937885
 
-31c1802f97ccaadea39acea0382ef677
-e9a376f16d62566fd93fc1b26ae1bd81
+e8af850847fb4a8dfdb63c703f6051e5
+852e73f55bdf62de7b100fb55f631a08
 
-2232c4d1fae52a4dc66c63fb8dfddb6c
-02a63e2497606a2dc132b37101d94b3b
+70b2fcdd42bc385cd1554dcdeb0898d9
+6bfeed4db1fa55f3e1c6d9dfca8280c4
 
-09dedf3c01fe5ebfcb96671acb31ca43
-767bb988c97cb93babf9e80f699a9bd6
+aa4bcf585316aaa18a39caa5592f5427
+fbfd78e38327ff7f43597b6a1eafeace
 
-7015ffc6caa649fe14189019ac29580a
-d5127e6a0847dba84ca613b24882f603
+10f0c72412634ed3c9c41d7037ef596b
+9c148674ced20aa9c240c7428f170273
 
-56c446ad377af19cb14a25902bfdca77
-8ac08583f3dbac0847dd7b25c0bd8dff
+88544b31a956d1b7318b97d30636fade
+4ca33b02d2a76dcbc0cd860cfa5f15bd
 
-1dbf9ffe899df6e9ddc5655f71940210
-3d10de1dd12fd826707288485fe9f7c6
+d9b4d680e5dd306dc52ff7cde7711cdd
+aec411b9c20ba127e90b463a6af21b09
 
-4454bfc6a3902546c5fb4cdced945889
-9064209c0fc1996a6c87ffe7cd2d1c2b
+67961666f18ca9d7394a0bc409687999
+8d8d7b3eeb4a95f92076f447b99378ac
 
-91f4324dd6d0a448482eae00926dd357
-39358eed96f6a4030cbc478618e62144
+6ae4f3935f9c271868106121d5227b62
+b593abbfe8a2fe9815eca18e668589da
 
-8caf8b71107f20440ebc4a67965537e3
-2cfbe39b15c3e9f9206028460234061f
+9683ab0962f7a9c6d332a8d2379636cf
+1074f0f24cccc91a97e71edbcbed3fcd
 
-1943a9c0529911fdf4f309a1ad39b7d2
-961de1b52b86369f95416f4ecdb5f64a
+7eb399935172f8dc5eba431e6658aa5c
+e61b8e43f7695621aef5aaef11ac8f66
 
-7706e5fa73d93301a34aa27afb208d74
-8d9ab134e85ebf5eb30427b479ea6e04
+097844512ec3b3353db58f00dbb4d4ad
+4c8539adf5ea64667856ef9f6f895cc1
 
-7995349e9b20ca614c6fbb1492eeca91
-2617154af36cef999b61bfc5710ff869
+85db5244c266af1ad75074c0133533d8
+32069eb7eb15be848bb42e23d9830db9
 
-e6eced782e89a529ae365f57b4de2a00
-ffcfeda232c9c48e5dad8570571d482f
+671c529cad4c282902750608f0d54e43
+65da62978a68e60d8fd3ba00894ec125
 
-76b1ee3007109fec8adbca625357ed7a
-ee3566d740d04509720c1c5e32c48188
+15b4d75da3a3cca2ab797a480a27332b
+507c286748b7733a832a91ba9d984f52
 ');
 
 
@@ -2400,7 +2400,7 @@ FALSE
 1
 1.1
 "string"
-[  ]
+[]
 { object # stdClass }
 { resource(opened) # stream }
 
@@ -4057,9 +4057,7 @@ TRUE | "при"
 [ "users" ]
 
 ###
-[
-
-]
+[]
 ###
 ###
 [
@@ -4078,9 +4076,7 @@ TRUE | "при"
 ###
 
 ###
-[
-
-]
+[]
 ###
 ###
 [
