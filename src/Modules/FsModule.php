@@ -737,6 +737,14 @@ class FsModule
     {
         $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
 
+        if ($this->type_realpath($realpath, $path)) {
+            $path = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+        }
+
+        if ($this->type_realpath($realpath, $root)) {
+            $root = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+        }
+
         return Lib::php()->path_relative($path, $root, $separator, '.');
     }
 
@@ -747,6 +755,14 @@ class FsModule
     {
         $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
 
+        if ($this->type_realpath($realpath, $path)) {
+            $path = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+        }
+
+        if ($this->type_realpath($realpath, $current)) {
+            $current = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+        }
+
         return Lib::php()->path_absolute($path, $current, $separator, '.');
     }
 
@@ -756,6 +772,14 @@ class FsModule
     ) : string
     {
         $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+
+        if ($this->type_realpath($realpath, $path)) {
+            $path = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+        }
+
+        if ($this->type_realpath($realpath, $current)) {
+            $current = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+        }
 
         return Lib::php()->path_or_absolute($path, $current, $separator, '.');
     }

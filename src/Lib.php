@@ -37,11 +37,11 @@ class Lib
      */
     public static $assert;
 
-    public static function assert($value, ?AssertModule $instance = null)
+    public static function assert(?AssertModule $instance = null)
     {
         return static::$assert = $instance
             ?? static::$assert
-            ?? new AssertModule($value);
+            ?? new AssertModule();
     }
 
     /**
@@ -431,6 +431,12 @@ class Lib
     public static function pipe() : Pipe
     {
         return new Pipe();
+    }
+
+
+    public static function assertOf($value) : AssertModule
+    {
+        return static::assert()->of($value);
     }
 
 

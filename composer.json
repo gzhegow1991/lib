@@ -23,7 +23,15 @@
             "const/cmp.php",
             "const/php.php",
             "const/type.php"
+        ],
+        "exclude-from-classmap": [
+            "tests/"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Gzhegow\\Lib\\Tests\\": "tests/src/"
+        }
     },
 
     "require": {

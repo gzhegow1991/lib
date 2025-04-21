@@ -33,32 +33,44 @@ abstract class AbstractAssertModule
     protected $fnList = [];
 
 
-    public function __construct($value, ?TypeModule $theType = null)
+    public function __construct(?TypeModule $theType = null)
     {
         $this->theType = $theType ?? Lib::type();
-
-        $this->value = $value;
-    }
-
-
-    public function getStatus() : bool
-    {
-        return $this->status;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getResult()
-    {
-        return $this->result;
     }
 
 
     /**
      * @return static
      */
-    public function triggerError($message, int $error_level = null)
+    public function of($value)
+    {
+        $instance = clone $this;
+        $instance->value = $value;
+
+        return $instance;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function get(&$result = null)
+    {
+        $result = $this->result;
+
+        return $result;
+    }
+
+    public function getStatus() : bool
+    {
+        return $this->status;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function withTriggerError($message, int $error_level = null)
     {
         $error_level = $error_level ?? E_USER_NOTICE;
 
@@ -69,23 +81,10 @@ abstract class AbstractAssertModule
         return $this;
     }
 
-
     /**
-     * @return mixed|null
+     * @return static
      */
-    public function orNull()
-    {
-        if (! $this->status) {
-            return null;
-        }
-
-        return $this->result;
-    }
-
-    /**
-     * @return mixed|void
-     */
-    public function orThrow($throwableOrArg, ...$throwableArgs)
+    public function withThrow($throwableOrArg, ...$throwableArgs)
     {
         if (! $this->status) {
             return Lib::php()->throw(
@@ -94,31 +93,31 @@ abstract class AbstractAssertModule
             );
         }
 
-        return $this->result;
+        return $this;
     }
 
     /**
-     * @return mixed|void
+     * @return static
      */
-    public function orFallback(array $fallback = [])
+    public function withFallback(array $fallback = [])
     {
         if (! $this->status) {
-            if (array_key_exists(0, $fallback)) {
-                return $fallback[ 0 ];
+            if ([] === $fallback) {
+                throw new LogicException(
+                    [ 'The assert failed, and no fallback provided', $this->fnList ]
+                );
             }
 
-            throw new LogicException(
-                [ 'The assert failed, and no fallback provided', $this->fnList ]
-            );
+            $this->result = $fallback[ 0 ];
         }
 
-        return $this->result;
+        return $this;
     }
 
     /**
-     * @return mixed|void
+     * @return static
      */
-    public function orCallback(\Closure $fn)
+    public function withCallback(\Closure $fn)
     {
         if (! $this->status) {
             $result = call_user_func_array(
@@ -126,8 +125,61 @@ abstract class AbstractAssertModule
                 [ $this->value, $this->fnList ]
             );
 
-            return $result;
+            $this->result = $result;
         }
+
+        return $this;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function orNull()
+    {
+        if (! $this->status) {
+            $this->result = null;
+        }
+
+        return $this->result;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function orTriggerError($message, int $error_level = null)
+    {
+        $this->withTriggerError($message, $error_level);
+
+        return $this->result;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function orThrow($throwableOrArg, ...$throwableArgs)
+    {
+        $this->withThrow($throwableOrArg, ...$throwableArgs);
+
+        return $this->result;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function orFallback(array $fallback = [])
+    {
+        $this->withFallback($fallback);
+
+        return $this->result;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function orCallback(\Closure $fn)
+    {
+        $this->withCallback($fn);
 
         return $this->result;
     }

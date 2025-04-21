@@ -50,12 +50,14 @@ trait HasTraceOverrideTrait
     }
 
 
-    public function getFileOverride(?string $fileRoot = null) : string
+    public function getFileOverride(?string $dirRoot = null) : string
     {
         $file = $this->file ?? $this->getFile();
 
-        if (null !== $fileRoot) {
-            $file = Lib::php()->path_relative($file, $fileRoot);
+        if (null !== $dirRoot) {
+            $file = Lib::fs()->path_relative(
+                $file, $dirRoot, '/'
+            );
         }
 
         return $file;
@@ -74,19 +76,21 @@ trait HasTraceOverrideTrait
     }
 
 
-    public function getTraceOverride(?string $fileRoot = null) : array
+    public function getTraceOverride(?string $dirRoot = null) : array
     {
         $trace = $this->trace ?? $this->getTrace();
 
-        if (null !== $fileRoot) {
-            $thePhp = Lib::php();
+        if (null !== $dirRoot) {
+            $theFs = Lib::fs();
 
             foreach ( $trace as $i => $frame ) {
                 if (! isset($frame[ 'file' ])) {
                     continue;
                 }
 
-                $trace[ $i ][ 'file' ] = $thePhp->path_relative($frame[ 'file' ], $fileRoot);
+                $trace[ $i ][ 'file' ] = $theFs->path_relative(
+                    $frame[ 'file' ], $dirRoot, '/'
+                );
             }
         }
 
