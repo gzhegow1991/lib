@@ -508,7 +508,7 @@ $fn = function () {
 
 
     $notAnObject = 1;
-    $objectStdClass = new stdClass();
+    $objectStdClass = new \stdClass();
     $objectArrayObject = new ArrayObject();
     $objectAnonymousStdClass = new class extends \stdClass {
     };
