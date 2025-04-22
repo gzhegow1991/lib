@@ -931,6 +931,7 @@ class FsModule
 
         while ( ! feof($input) ) {
             $fgets = fgets($input);
+
             $fgets = rtrim($fgets);
 
             if ('' !== $startTrim) {
