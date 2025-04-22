@@ -931,16 +931,16 @@ class FsModule
 
         while ( ! feof($input) ) {
             $fgets = fgets($input);
-            $fgets = trim($fgets);
+            $fgets = rtrim($fgets);
 
             if ('' !== $startTrim) {
-                if ($fgets === $startTrim) {
+                if (ltrim($fgets) === $startTrim) {
                     $insideBlock = 1;
                 }
             }
 
             if ('' !== $endTrim) {
-                if ($fgets === $endTrim) {
+                if (ltrim($fgets) === $endTrim) {
                     $insideBlock = 0;
                 }
             }
@@ -956,7 +956,7 @@ class FsModule
                         continue;
                     }
 
-                    $line = trim($line);
+                    $line = rtrim($line);
 
                     fwrite($output, $line . PHP_EOL);
                 }
