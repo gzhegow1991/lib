@@ -2118,10 +2118,10 @@ class ArrModule
             return;
         }
 
-        $flags = $flags ?? 0;
+        $_flags = $flags ?? 0;
 
-        $isModeDepthFirst = (bool) ($flags & _ARR_WALK_MODE_DEPTH_FIRST);
-        $isModeBreadthFirst = (bool) ($flags & _ARR_WALK_MODE_BREADTH_FIRST);
+        $isModeDepthFirst = (bool) ($_flags & _ARR_WALK_MODE_DEPTH_FIRST);
+        $isModeBreadthFirst = (bool) ($_flags & _ARR_WALK_MODE_BREADTH_FIRST);
         $sum = (int) ($isModeDepthFirst + $isModeBreadthFirst);
         if (1 !== $sum) {
             $isModeDepthFirst = true;
@@ -2129,9 +2129,9 @@ class ArrModule
         }
         unset($sum);
 
-        $isSortSelfFirst = (bool) ($flags & _ARR_WALK_SORT_SELF_FIRST);
-        $isSortParentFirst = (bool) ($flags & _ARR_WALK_SORT_PARENT_FIRST);
-        $isSortChildFirst = (bool) ($flags & _ARR_WALK_SORT_CHILD_FIRST);
+        $isSortSelfFirst = (bool) ($_flags & _ARR_WALK_SORT_SELF_FIRST);
+        $isSortParentFirst = (bool) ($_flags & _ARR_WALK_SORT_PARENT_FIRST);
+        $isSortChildFirst = (bool) ($_flags & _ARR_WALK_SORT_CHILD_FIRST);
         $sum = (int) ($isSortSelfFirst + $isSortParentFirst + $isSortChildFirst);
         if (1 !== $sum) {
             $isSortSelfFirst = true;
@@ -2140,8 +2140,8 @@ class ArrModule
         }
         unset($sum);
 
-        $isWithLeaves = (bool) ($flags & _ARR_WALK_WITH_LEAVES);
-        $isWithoutLeaves = (bool) ($flags & _ARR_WALK_WITHOUT_LEAVES);
+        $isWithLeaves = (bool) ($_flags & _ARR_WALK_WITH_LEAVES);
+        $isWithoutLeaves = (bool) ($_flags & _ARR_WALK_WITHOUT_LEAVES);
         $sum = (int) ($isWithLeaves + $isWithoutLeaves);
         if (1 !== $sum) {
             $isWithLeaves = true;
@@ -2150,8 +2150,8 @@ class ArrModule
         $withLeaves = $isWithLeaves && ! $isWithoutLeaves;
         unset($sum);
 
-        $isWithoutEmptyArrays = (bool) ($flags & _ARR_WALK_WITHOUT_EMPTY_ARRAYS);
-        $isWithEmptyArrays = (bool) ($flags & _ARR_WALK_WITH_EMPTY_ARRAYS);
+        $isWithoutEmptyArrays = (bool) ($_flags & _ARR_WALK_WITHOUT_EMPTY_ARRAYS);
+        $isWithEmptyArrays = (bool) ($_flags & _ARR_WALK_WITH_EMPTY_ARRAYS);
         $sum = (int) ($isWithoutEmptyArrays + $isWithEmptyArrays);
         if (1 !== $sum) {
             $isWithoutEmptyArrays = true;
@@ -2160,8 +2160,8 @@ class ArrModule
         $withEmptyArrays = $isWithEmptyArrays && ! $isWithoutEmptyArrays;
         unset($sum);
 
-        $isWithoutParents = (bool) ($flags & _ARR_WALK_WITHOUT_PARENTS);
-        $isWithParents = (bool) ($flags & _ARR_WALK_WITH_PARENTS);
+        $isWithoutParents = (bool) ($_flags & _ARR_WALK_WITHOUT_PARENTS);
+        $isWithParents = (bool) ($_flags & _ARR_WALK_WITH_PARENTS);
         $sum = (int) ($isWithoutParents + $isWithParents);
         if (1 !== $sum) {
             $isWithoutParents = true;
@@ -2170,8 +2170,8 @@ class ArrModule
         $withParents = $isWithParents && ! $isWithoutParents;
         unset($sum);
 
-        $isWithoutLists = (bool) ($flags & _ARR_WALK_WITHOUT_LISTS);
-        $isWithLists = (bool) ($flags & _ARR_WALK_WITH_LISTS);
+        $isWithoutLists = (bool) ($_flags & _ARR_WALK_WITHOUT_LISTS);
+        $isWithLists = (bool) ($_flags & _ARR_WALK_WITH_LISTS);
         $sum = (int) ($isWithoutLists + $isWithLists);
         if (1 !== $sum) {
             $isWithoutLists = true;
@@ -2180,8 +2180,8 @@ class ArrModule
         $withLists = $isWithLists && ! $isWithoutLists;
         unset($sum);
 
-        $isWithoutDicts = (bool) ($flags & _ARR_WALK_WITHOUT_DICTS);
-        $isWithDicts = (bool) ($flags & _ARR_WALK_WITH_DICTS);
+        $isWithoutDicts = (bool) ($_flags & _ARR_WALK_WITHOUT_DICTS);
+        $isWithDicts = (bool) ($_flags & _ARR_WALK_WITH_DICTS);
         $sum = (int) ($isWithoutDicts + $isWithDicts);
         if (1 !== $sum) {
             $isWithoutDicts = true;
@@ -2210,7 +2210,7 @@ class ArrModule
             };
 
         } else {
-            throw new LogicException([ 'Invalid `sort`', $flags ]);
+            throw new LogicException([ 'Invalid `sort`', $_flags ]);
         }
 
         if ($isModeDepthFirst) {
@@ -2222,7 +2222,7 @@ class ArrModule
             $buffer =& $queue;
 
         } else {
-            throw new LogicException([ 'Invalid `mode`', $flags ]);
+            throw new LogicException([ 'Invalid `mode`', $_flags ]);
         }
 
         $theArr = Lib::arr();

@@ -189,7 +189,7 @@ class PhpModule
             return false;
         }
 
-        if ($flags & _PHP_STRUCT_TYPE_CLASS) {
+        if ($_flags & _PHP_STRUCT_TYPE_CLASS) {
             if (PHP_VERSION_ID >= 80100) {
                 if (class_exists($class) && ! enum_exists($class)) {
                     $result = $class;
@@ -206,7 +206,7 @@ class PhpModule
             }
         }
 
-        if ($flags & _PHP_STRUCT_TYPE_ENUM) {
+        if ($_flags & _PHP_STRUCT_TYPE_ENUM) {
             if (PHP_VERSION_ID >= 80100) {
                 if (enum_exists($class)) {
                     $result = $class;
@@ -217,7 +217,7 @@ class PhpModule
         }
 
         if (! $isObject) {
-            if ($flags & _PHP_STRUCT_TYPE_INTERFACE) {
+            if ($_flags & _PHP_STRUCT_TYPE_INTERFACE) {
                 if (interface_exists($class)) {
                     $result = $class;
 
@@ -225,7 +225,7 @@ class PhpModule
                 }
             }
 
-            if ($flags & _PHP_STRUCT_TYPE_TRAIT) {
+            if ($_flags & _PHP_STRUCT_TYPE_TRAIT) {
                 if (trait_exists($class)) {
                     $result = $class;
 
@@ -1967,7 +1967,7 @@ class PhpModule
             );
         }
 
-        $flags = $flags ?? _PHP_PATHINFO_ALL;
+        $_flags = $flags ?? _PHP_PATHINFO_ALL;
 
         $separator = Lib::parse()->char($separator) ?? '/';
         $dot = Lib::parse()->char($dot) ?? '.';
@@ -1985,7 +1985,7 @@ class PhpModule
 
         $pi = [];
 
-        if ($flags & PATHINFO_DIRNAME) {
+        if ($_flags & PATHINFO_DIRNAME) {
             if (false === strpos($dirname, '/')) {
                 $dirname = null;
 
@@ -2000,15 +2000,15 @@ class PhpModule
             $pi[ 'dirname' ] = $dirname;
         }
 
-        if ($flags & _PHP_PATHINFO_BASENAME) {
+        if ($_flags & _PHP_PATHINFO_BASENAME) {
             $pi[ 'basename' ] = ('' !== $basename) ? $basename : null;
         }
 
         if (
-            ($flags & _PHP_PATHINFO_FILENAME)
-            || ($flags & _PHP_PATHINFO_EXTENSION)
-            || ($flags & _PHP_PATHINFO_FILE)
-            || ($flags & _PHP_PATHINFO_EXTENSIONS)
+            ($_flags & _PHP_PATHINFO_FILENAME)
+            || ($_flags & _PHP_PATHINFO_EXTENSION)
+            || ($_flags & _PHP_PATHINFO_FILE)
+            || ($_flags & _PHP_PATHINFO_EXTENSIONS)
         ) {
             $filename = $basename;
 
@@ -2016,7 +2016,7 @@ class PhpModule
 
             $file = array_shift($split);
 
-            if ($flags & _PHP_PATHINFO_EXTENSION) {
+            if ($_flags & _PHP_PATHINFO_EXTENSION) {
                 $extension = end($split);
 
                 if ('' === $extension) {
@@ -2029,15 +2029,15 @@ class PhpModule
                 }
             }
 
-            if ($flags & _PHP_PATHINFO_FILENAME) {
+            if ($_flags & _PHP_PATHINFO_FILENAME) {
                 $pi[ 'filename' ] = ('' !== $filename) ? $filename : null;
             }
 
-            if ($flags & _PHP_PATHINFO_FILE) {
+            if ($_flags & _PHP_PATHINFO_FILE) {
                 $pi[ 'file' ] = ('' !== $file) ? $file : null;
             }
 
-            if ($flags & _PHP_PATHINFO_EXTENSIONS) {
+            if ($_flags & _PHP_PATHINFO_EXTENSIONS) {
                 $extensions = null;
                 if ([] !== $split) {
                     $extensions = implode($dot, $split);
