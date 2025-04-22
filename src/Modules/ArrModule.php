@@ -1592,7 +1592,7 @@ class ArrModule
     }
 
 
-    public function is_diff_keys(array ...$arrays) : bool
+    public function is_diff_key(array ...$arrays) : bool
     {
         if ([] === $arrays) {
             return false;
@@ -1665,7 +1665,7 @@ class ArrModule
     }
 
 
-    public function is_intersect_keys(array ...$arrays) : bool
+    public function is_intersect_key(array ...$arrays) : bool
     {
         if ([] === $arrays) {
             return false;
@@ -1741,7 +1741,7 @@ class ArrModule
     /**
      * > встроенная функция всегда требует именно два массива на вход, вынуждая разруливать ифами то, что не нужно
      */
-    public function diff_keys(array ...$arrays) : array
+    public function diff_key(array ...$arrays) : array
     {
         if ([] === $arrays) {
             return [];
@@ -1811,7 +1811,7 @@ class ArrModule
     /**
      * > встроенная функция всегда требует два массива на вход, вынуждая разруливать ифами то, что не нужно
      */
-    public function intersect_keys(array ...$arrays) : array
+    public function intersect_key(array ...$arrays) : array
     {
         if ([] === $arrays) {
             return [];
