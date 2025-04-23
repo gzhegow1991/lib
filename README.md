@@ -63,15 +63,18 @@ $ffn = new class {
         return \Gzhegow\Lib\Lib::debug()->value_array_multiline($value, $maxLevel, $options);
     }
 
+
     function values($separator = null, ...$values) : string
     {
         return \Gzhegow\Lib\Lib::debug()->values([], $separator, ...$values);
     }
 
+
     function print(...$values)
     {
         echo $this->values(' | ', ...$values) . PHP_EOL;
     }
+
 
     function print_array($value, ?int $maxLevel = null, array $options = [])
     {
@@ -82,6 +85,7 @@ $ffn = new class {
     {
         echo $this->value_array_multiline($value, $maxLevel, $options) . PHP_EOL;
     }
+
 
     function assert_stdout(\Closure $fn, array $fnArgs = [], ?string $expectedStdout = null)
     {
