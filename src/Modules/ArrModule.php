@@ -628,15 +628,20 @@ class ArrModule
     }
 
 
+    /**
+     * @return string[]
+     */
     public function arrpath($path, ...$pathes) : array
     {
+        $theType = Lib::type();
+
         $arrpath = [];
 
         $gen = $this->arrpath_it($path, ...$pathes);
 
         foreach ( $gen as $p ) {
-            if (is_string($p)) {
-                $arrpath[] = $p;
+            if ($theType->string($pString, $p)) {
+                $arrpath[] = $pString;
             }
         }
 
@@ -653,6 +658,9 @@ class ArrModule
         return $arrpath;
     }
 
+    /**
+     * @return string[]
+     */
     public function arrpath_dot(string $dot, $path, ...$pathes) : array
     {
         if (! Lib::str()->type_char($symbol, $dot)) {
@@ -662,19 +670,21 @@ class ArrModule
             );
         }
 
+        $theType = Lib::type();
+
         $arrpath = [];
 
         $gen = $this->arrpath_it($path, ...$pathes);
 
         foreach ( $gen as $p ) {
-            if (is_string($p)) {
-                if ('' === $p) {
-                    $arrpath[] = $p;
+            if ($theType->string($pString, $p)) {
+                if ('' === $pString) {
+                    $arrpath[] = $pString;
 
                 } else {
                     $arrpath = array_merge(
                         $arrpath,
-                        explode($dot, $p)
+                        explode($dot, $pString)
                     );
                 }
             }
@@ -693,6 +703,9 @@ class ArrModule
         return $arrpath;
     }
 
+    /**
+     * @return \Generator<mixed>
+     */
     public function arrpath_it($path, ...$pathes) : \Generator
     {
         if ([] === $pathes) {
