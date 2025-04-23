@@ -773,7 +773,7 @@ $fn = function () use ($ffn) {
         ],
     ];
     $res = \Gzhegow\Lib\Lib::arr()->dot(
-        $arr, '.',
+        $arr, '.', [],
         _ARR_WALK_WITH_EMPTY_ARRAYS | _ARR_WALK_WITH_LISTS | _ARR_WALK_WITH_DICTS
     );
     $ffn->print_array_multiline($res, 2);

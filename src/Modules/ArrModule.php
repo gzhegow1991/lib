@@ -1888,7 +1888,7 @@ class ArrModule
      * > превращает вложенный массив в одноуровневый, соединяя путь через точку
      */
     public function dot(
-        array $array, ?string $dot = null,
+        array $array, ?string $dot = null, array $fillKeys = [],
         ?int $walkFlags = null
     ) : array
     {
@@ -1906,45 +1906,16 @@ class ArrModule
             );
         }
 
+        $hasFillKeys = ([] !== $fillKeys);
+
         $result = [];
 
         $gen = $this->walk_it($array, $walkFlags);
 
         foreach ( $gen as $path => $value ) {
-            $result[ implode($dot, $path) ] = $value;
-        }
-
-        return $result;
-    }
-
-    /**
-     * > превращает вложенный массив в одноуровневый, соединяя путь через точку
-     * > вместо значений использует $value
-     */
-    public function dot_keys(
-        array $array, ?string $dot = null, $value = null,
-        ?int $walkFlags = null
-    ) : array
-    {
-        $value = $value ?? true;
-        $walkFlags = $walkFlags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
-
-        if (null === $dot) {
-            $dot = '.';
-
-        } elseif (! Lib::str()->type_char($symbol, $dot)) {
-            throw new LogicException(
-                'The `dot` should be one symbol',
-                $dot
-            );
-        }
-
-        $result = [];
-
-        $gen = $this->walk_it($array, $walkFlags);
-
-        foreach ( $gen as $path => $devnull ) {
-            $result[ implode($dot, $path) ] = $value;
+            $result[ implode($dot, $path) ] = $hasFillKeys
+                ? $fillKeys[ 0 ]
+                : $value;
         }
 
         return $result;
