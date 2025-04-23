@@ -640,8 +640,8 @@ class ArrModule
         $gen = $this->arrpath_it($path, ...$pathes);
 
         foreach ( $gen as $p ) {
-            if ($theType->string($pString, $p)) {
-                $arrpath[] = $pString;
+            if ($theType->string($var, $p)) {
+                $arrpath[] = $p;
             }
         }
 
