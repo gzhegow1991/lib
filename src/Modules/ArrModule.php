@@ -630,36 +630,11 @@ class ArrModule
 
     public function arrpath($path, ...$pathes) : array
     {
-        array_unshift($pathes, $path);
-
-        if (1 === count($pathes)) {
-            if ($path instanceof ArrPath) {
-                return $path->getPath();
-            }
-        }
-
-        $gen = $this->walk_it($pathes);
-
-        $theType = Lib::type();
-
         $arrpath = [];
 
-        foreach ( $gen as $genPath => $p ) {
-            if ($p instanceof ArrPath) {
-                $result = array_merge($arrpath, $p->getPath());
-
-            } else {
-                if (! $theType->string($pString, $p)) {
-                    throw new LogicException(
-                        [
-                            'Each of `pathes` should be non-null stringable or instance of: ' . ArrPath::class,
-                            $p,
-                            $genPath,
-                        ]
-                    );
-                }
-
-                $arrpath[] = $pString;
+        foreach ( $this->arrpath_it($path, ...$pathes) as $p ) {
+            if (is_string($p)) {
+                $arrpath[] = $p;
             }
         }
 
@@ -685,39 +660,19 @@ class ArrModule
             );
         }
 
-        array_unshift($pathes, $path);
-
-        if (1 === count($pathes)) {
-            if ($path instanceof ArrPath) {
-                return $path->getPath();
-            }
-        }
-
-        $gen = $this->walk_it($pathes);
-
-        $theType = Lib::type();
-
         $arrpath = [];
 
-        foreach ( $gen as $genPath => $p ) {
-            if ($p instanceof ArrPath) {
-                $result = array_merge($arrpath, $p->getPath());
+        foreach ( $this->arrpath_it($path, ...$pathes) as $p ) {
+            if (is_string($p)) {
+                if ('' === $p) {
+                    $arrpath[] = $p;
 
-            } else {
-                if (! $theType->string($pString, $p)) {
-                    throw new LogicException(
-                        [
-                            'Each of `pathes` should be non-null stringable or instance of: ' . ArrPath::class,
-                            $p,
-                            $genPath,
-                        ]
+                } else {
+                    $arrpath = array_merge(
+                        $arrpath,
+                        explode($dot, $p)
                     );
                 }
-
-                $arrpath = array_merge(
-                    $arrpath,
-                    explode($dot, $pString)
-                );
             }
         }
 
@@ -732,6 +687,36 @@ class ArrModule
         }
 
         return $arrpath;
+    }
+
+    public function arrpath_it($path, ...$pathes) : \Generator
+    {
+        if ([] === $pathes) {
+            if ($path instanceof ArrPath) {
+                foreach ( $path->getPath() as $p ) {
+                    yield $p;
+                }
+            }
+
+            return;
+        }
+
+        array_unshift($pathes, $path);
+
+        $gen = $this->walk_it($pathes);
+
+        $list = [];
+
+        foreach ( $gen as $genPath => $p ) {
+            if ($p instanceof ArrPath) {
+                foreach ( $p->getPath() as $pp ) {
+                    yield $pp;
+                }
+
+            } else {
+                yield $p;
+            }
+        }
     }
 
 
