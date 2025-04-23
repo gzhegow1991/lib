@@ -632,7 +632,9 @@ class ArrModule
     {
         $arrpath = [];
 
-        foreach ( $this->arrpath_it($path, ...$pathes) as $p ) {
+        $gen = $this->arrpath_it($path, ...$pathes);
+
+        foreach ( $gen as $p ) {
             if (is_string($p)) {
                 $arrpath[] = $p;
             }
@@ -662,7 +664,9 @@ class ArrModule
 
         $arrpath = [];
 
-        foreach ( $this->arrpath_it($path, ...$pathes) as $p ) {
+        $gen = $this->arrpath_it($path, ...$pathes);
+
+        foreach ( $gen as $p ) {
             if (is_string($p)) {
                 if ('' === $p) {
                     $arrpath[] = $p;
@@ -696,9 +700,9 @@ class ArrModule
                 foreach ( $path->getPath() as $p ) {
                     yield $p;
                 }
-            }
 
-            return;
+                return;
+            }
         }
 
         array_unshift($pathes, $path);
