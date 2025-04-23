@@ -1,8 +1,6 @@
 <?php
 
-define('__ROOT__', __DIR__ . '/..');
-
-require_once __ROOT__ . '/vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 
 // > настраиваем PHP
@@ -29,6 +27,12 @@ ini_set('memory_limit', '32M');
 
 // > добавляем несколько функция для тестирования
 $ffn = new class {
+    function root() : string
+    {
+        return realpath(__DIR__ . '/..');
+    }
+
+
     function value($value) : string
     {
         return \Gzhegow\Lib\Lib::debug()->value($value, []);
@@ -409,13 +413,13 @@ $fn = function () use ($ffn) {
 
 
     // $e = new \Gzhegow\Lib\Exception\RuntimeException();
-    // $eTrace = $e->getTraceOverride(__ROOT__);
+    // $eTrace = $e->getTraceOverride($ffn->root());
     // foreach ( $eTrace as $i => $frame ) {
     //     unset($eTrace[ $i ][ 'line' ]);
     //     unset($eTrace[ $i ][ 'args' ]);
     // }
     //
-    // $ffn->print($e->getFileOverride(__ROOT__));
+    // $ffn->print($e->getFileOverride($ffn->root()));
     //
     // echo PHP_EOL;
     //
@@ -1338,7 +1342,7 @@ $fn = function () use ($ffn) {
         [ &$fnCmpSizeName ]
     );
 
-    // $dumpPath = __ROOT__ . '/var/dump/fn_compare_tables.txt';
+    // $dumpPath = $ffn->root() . '/var/dump/fn_compare_tables.txt';
     // if (is_file($dumpPath)) unlink($dumpPath);
 
     $xi = 0;
@@ -2548,19 +2552,19 @@ $fn = function () use ($ffn) {
 
 
     $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
-        __ROOT__ . '/var/1/1/1/1.txt', '123',
+        $ffn->root() . '/var/1/1/1/1.txt', '123',
         [ FILE_APPEND ], [ 0775, true ]
     );
     $ffn->print($result);
 
     $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
-        __ROOT__ . '/var/1/1/1.txt', '123',
+        $ffn->root() . '/var/1/1/1.txt', '123',
         [ FILE_APPEND ], [ 0775, true ]
     );
     $ffn->print($result);
 
     $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
-        __ROOT__ . '/var/1/1.txt', '123',
+        $ffn->root() . '/var/1/1.txt', '123',
         [ FILE_APPEND ], [ 0775, true ]
     );
     $ffn->print($result);
@@ -2569,7 +2573,7 @@ $fn = function () use ($ffn) {
 
 
     $result = \Gzhegow\Lib\Lib::fs()->file_get_contents(
-        __ROOT__ . '/var/1/1/1/1.txt',
+        $ffn->root() . '/var/1/1/1/1.txt',
         []
     );
     $ffn->print($result);
@@ -2577,7 +2581,7 @@ $fn = function () use ($ffn) {
 
     foreach (
         \Gzhegow\Lib\Lib::fs()->dir_walk_it(
-            __ROOT__ . '/var/1',
+            $ffn->root() . '/var/1',
             [], []
         )
         as $spl
@@ -2586,7 +2590,7 @@ $fn = function () use ($ffn) {
             ? \Gzhegow\Lib\Lib::fs()->rmdir($spl->getRealPath())
             : \Gzhegow\Lib\Lib::fs()->rm($spl->getRealPath());
     }
-    \Gzhegow\Lib\Lib::fs()->rmdir(__ROOT__ . '/var/1');
+    \Gzhegow\Lib\Lib::fs()->rmdir($ffn->root() . '/var/1');
 };
 $ffn->assert_stdout($fn, [], '
 "[ FsModule ]"
