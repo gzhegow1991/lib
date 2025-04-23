@@ -37,7 +37,8 @@
     "require": {
         "php": "^7.3|^8.0",
 
-        "ext-pcre": "*"
+        "ext-pcre": "*",
+        "symfony/var-dumper": "^5.4"
     },
     "suggest": {
         "ext-bcmath": "*",
@@ -53,6 +54,7 @@
 
         "symfony/string": "^5.0",
         "symfony/translation-contracts": "^2.0",
+        "symfony/var-dumper": "^5.0",
 
         "egulias/email-validator": "^3.0",
 

@@ -3,178 +3,42 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper;
+use Gzhegow\Lib\Modules\Debug\Dumper\DumperInterface;
 
 
 class DebugModule
 {
     /**
-     * @var callable
+     * @var DumperInterface
      */
-    protected $dumperFn;
-    /**
-     * @var callable
-     */
-    protected $dumpFn;
+    protected $dumper;
+
     /**
      * @var array
      */
     protected $varDumpOptions = [];
 
 
-    public function __construct()
+    public function newDumper() : DumperInterface
     {
-        $this->dumperFn = [ $this, 'dumper_var_dump' ];
-        $this->dumpFn = [ $this, 'dump_stdout' ];
+        return new DefaultDumper();
     }
 
-
-    /**
-     * @param callable $fnDumper
-     *
-     * @return callable|null
-     */
-    public function static_dumper_fn($fnDumper = null) // : ?callable
+    public function cloneDumper() : DumperInterface
     {
-        if (null !== $fnDumper) {
-            $last = $this->dumperFn;
-
-            if ($last !== $fnDumper) {
-                $isValid = false;
-
-                $erf = null;
-                $erm = null;
-
-                $reflectionArgs = is_array($fnDumper)
-                    ? $fnDumper
-                    : [ $fnDumper ];
-
-                if (! $isValid) {
-                    try {
-                        $rf = new \ReflectionFunction(...$reflectionArgs);
-                        $rfParameters = $rf->getParameters();
-                        $rfReturnType = $rf->getReturnType();
-                        if (true
-                            && (count($rfParameters) === 1)
-                            && ($rfParameters[ 0 ]->isVariadic())
-                            && ($rfReturnType !== null)
-                            && ($rfReturnType->isBuiltin())
-                            && (! $rfReturnType->allowsNull())
-                            && ($rfReturnType->getName() === 'string')
-                        ) {
-                            $isValid = true;
-                        }
-                    }
-                    catch ( \Throwable $erf ) {
-                    }
-                }
-
-                if (! $isValid) {
-                    try {
-                        $rm = new \ReflectionMethod(...$reflectionArgs);
-                        $rmParameters = $rm->getParameters();
-                        $rmReturnType = $rm->getReturnType();
-                        if (true
-                            && (count($rmParameters) === 1)
-                            && ($rmParameters[ 0 ]->isVariadic())
-                            && ($rmReturnType !== null)
-                            && ($rmReturnType->isBuiltin())
-                            && (! $rmReturnType->allowsNull())
-                            && ($rmReturnType->getName() === 'string')
-                        ) {
-                            $isValid = true;
-                        }
-                    }
-                    catch ( \Throwable $erm ) {
-                    }
-                }
-
-                if (! $isValid) {
-                    throw new LogicException('Invalid `dumperFn`', $erf, $erm);
-                }
-
-                $this->dumperFn = $fnDumper;
-            }
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->dumperFn;
-
-        return $result;
+        return clone $this->dumper();
     }
 
-    /**
-     * @param callable $fnDump
-     *
-     * @return callable|null
-     */
-    public function static_dump_fn($fnDump = null) // : ?callable
+    public function dumper(?DumperInterface $dumper = null) : DumperInterface
     {
-        if (null !== $fnDump) {
-            $last = $this->dumpFn;
-
-            if ($last !== $fnDump) {
-                $erf = null;
-                $erm = null;
-
-                $reflectionArgs = is_array($fnDump)
-                    ? $fnDump
-                    : [ $fnDump ];
-
-                $isValid = false;
-
-                if (1 === count($reflectionArgs)) {
-                    try {
-                        $rf = new \ReflectionFunction(...$reflectionArgs);
-                        $rfParameters = $rf->getParameters();
-                        $rfReturnType = $rf->getReturnType();
-                        if (true
-                            && (count($rfParameters) === 2)
-                            && ($rfParameters[ 0 ]->isArray())
-                            && ($rfParameters[ 1 ]->isVariadic())
-                            && (($rfReturnType === null) || ($rfReturnType->getName() === 'void'))
-                        ) {
-                            $isValid = true;
-                        }
-                    }
-                    catch ( \Throwable $erf ) {
-                    }
-                }
-
-                if (! $isValid) {
-                    try {
-                        $rm = new \ReflectionMethod(...$reflectionArgs);
-                        $rmParameters = $rm->getParameters();
-                        $rmReturnType = $rm->getReturnType();
-                        if (true
-                            && (count($rmParameters) === 2)
-                            && ($rmParameters[ 0 ]->isArray())
-                            && ($rmParameters[ 1 ]->isVariadic())
-                            && (($rmReturnType === null) || ($rmReturnType->getName() === 'void'))
-                        ) {
-                            $isValid = true;
-                        }
-                    }
-                    catch ( \Throwable $erm ) {
-                    }
-                }
-
-                if (! $isValid) {
-                    throw new LogicException('Invalid `dumpFn`', $erf, $erm);
-                }
-
-                $this->dumpFn = $fnDump;
-            }
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->dumpFn;
-
-        return $result;
+        return $this->dumper = null
+            ?? $dumper
+            ?? $this->dumper
+            ?? new DefaultDumper();
     }
+
 
     public function static_var_dump_options(?array $varDumpOptions = null) : ?array
     {
@@ -192,267 +56,77 @@ class DebugModule
     }
 
 
-    public function dumper_var_dump(...$vars) : string
+    public function print(...$vars) : string
     {
-        $content = '';
-
-        foreach ( $vars as $arg ) {
-            if ($content) {
-                $content .= PHP_EOL;
-            }
-
-            $content .= $this->var_dump($arg);
-        }
-
-        return $content;
+        return $this->dumper()->print(...$vars);
     }
 
-    public function dumper_var_export(...$vars) : string
+
+    /**
+     * @return mixed
+     */
+    public function dump($var, ...$vars) // : mixed
     {
-        $content = '';
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        foreach ( $vars as $arg ) {
-            if ($content) {
-                $content .= PHP_EOL;
-            }
-
-            $content .= $this->var_export($arg);
-        }
-
-        return $content;
-    }
-
-    public function dumper_print_r(...$vars) : string
-    {
-        $content = '';
-
-        foreach ( $vars as $arg ) {
-            if ($content) {
-                $content .= PHP_EOL;
-            }
-
-            $content .= print_r($arg, true);
-        }
-
-        return $content;
-    }
-
-    public function dumper_var_dump_native(...$vars) : string
-    {
-        ob_start();
-        var_dump(...$vars);
-        $content = ob_get_clean();
-
-        return $content;
-    }
-
-    public function dumper_var_export_native(...$vars) : string
-    {
-        $content = '';
-
-        foreach ( $vars as $arg ) {
-            if ($content) {
-                $content .= PHP_EOL;
-            }
-
-            $content .= var_export($arg, true);
-        }
-
-        return $content;
-    }
-
-    public function dumper_json_encode(...$vars) : string
-    {
-        $content = '';
-
-        foreach ( $vars as $arg ) {
-            if ($content) {
-                $content .= PHP_EOL;
-            }
-
-            $content .= json_encode($arg,
-                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS
-            );
-        }
-
-        return $content;
+        return $this->dumper()->dumpTrace($trace, $var, ...$vars);
     }
 
     /**
-     * @noinspection PhpFullyQualifiedNameUsageInspection
-     * @noinspection PhpUndefinedClassInspection
-     * @noinspection PhpUndefinedNamespaceInspection
+     * @return mixed
      */
-    public function dumper_symfony(...$vars) : string
+    public function d($var, ...$vars) // : mixed
     {
-        if (! class_exists('\Symfony\Component\VarDumper\VarDumper')) {
-            throw new RuntimeException(
-                'Please run: `composer require symfony/var-dumper`'
-            );
-        }
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $cloner = new \Symfony\Component\VarDumper\Cloner\VarCloner();
-        $dumper = Lib::php()->is_terminal()
-            ? new \Symfony\Component\VarDumper\Dumper\CliDumper()
-            : new \Symfony\Component\VarDumper\Dumper\HtmlDumper();
+        return $this->dumper()->dTrace($trace, $var, ...$vars);
+    }
 
-        $content = '';
+    public function dd(...$vars) : void
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        foreach ( $vars as $arg ) {
-            $clonedVar = $cloner->cloneVar($arg);
+        $this->dumper()->ddTrace($trace, ...$vars);
+    }
 
-            $content .= $dumper->dump($clonedVar);
-        }
+    /**
+     * @return mixed|void
+     */
+    public function ddd(?int $limit, $var, ...$vars) // : mixed|void
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $content;
+        return $this->dumper()->dddTrace($trace, $limit, $var, ...$vars);
     }
 
 
-    public function dump_echo(array $options, ...$vars)
+    /**
+     * @return mixed
+     */
+    public function dumpTrace(?array $trace, $var, ...$vars) // : mixed
     {
-        $fn = $this->static_dumper_fn();
-
-        $content = $fn(...$vars);
-        $content .= PHP_EOL;
-
-        echo $content;
+        return $this->dumper()->dumpTrace($trace, $var, ...$vars);
     }
 
-    public function dump_stdout(array $options, ...$vars)
+    /**
+     * @return mixed
+     */
+    public function dTrace(?array $trace, $var, ...$vars) // : mixed
     {
-        $resource = $options[ 'stdout' ] ?? $options[ 0 ] ?? STDOUT;
-
-        $fn = $this->static_dumper_fn();
-
-        $content = $fn(...$vars);
-        $content .= PHP_EOL;
-
-        fwrite($resource, $content);
+        return $this->dumper()->dTrace($trace, $var, ...$vars);
     }
 
-    public function dump_stdout_html(array $options, ...$vars)
+    public function ddTrace(?array $trace, ...$vars) : void
     {
-        $resource = $options[ 'stdout' ] ?? $options[ 0 ] ?? STDOUT;
-
-        $fn = $this->static_dumper_fn();
-
-        $content = $fn(...$vars);
-        $content .= PHP_EOL;
-
-        $htmlContent = nl2br($content);
-
-        if (! headers_sent()) {
-            header('Content-Type: text/html');
-        }
-
-        fwrite($resource, $htmlContent);
+        $this->dumper()->ddTrace($trace, ...$vars);
     }
 
-    public function dump_browser_console(array $options, ...$vars)
+    /**
+     * @return mixed|void
+     */
+    public function dddTrace(?array $trace, ?int $limit, $var, ...$vars) // : mixed|void
     {
-        $fn = $this->static_dumper_fn();
-
-        $content = $fn(...$vars);
-
-        $b64content = base64_encode($content);
-
-        $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . PHP_EOL;
-
-        if (! headers_sent()) {
-            header('Content-Type: text/html');
-        }
-
-        fwrite(STDOUT, $htmlContent);
-    }
-
-    public function dump_pdo(array $options, ...$vars)
-    {
-        $pdo = $options[ 'pdo' ] ?? $options[ 0 ];
-        $table = $options[ 'table' ] ?? $options[ 1 ];
-        $column = $options[ 'column' ] ?? $options[ 2 ];
-
-        if (! ($pdo instanceof \PDO)) {
-            throw new LogicException(
-                'The `options.pdo` should be instance of: ' . \PDO::class
-            );
-        }
-
-        $_table = (string) $table;
-        if ('' === $_table) {
-            throw new LogicException(
-                'The `options.table` should be non-empty string'
-            );
-        }
-
-        $_column = (string) $column;
-        if ('' === $_column) {
-            throw new LogicException(
-                'The `options.column` should be non-empty string'
-            );
-        }
-
-        $fn = $this->static_dumper_fn();
-
-        $content = $fn(...$vars);
-
-        $sql = "INSERT INTO {$_table} ({$_column}) VALUES (?);";
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([ $content ]);
-    }
-
-
-    public function dump(?array $trace, ?array $options, $var, ...$vars) // : mixed
-    {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-        $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $traceLine = $trace[ 0 ][ 'line' ] ?? 0;
-        $traceWhereIs = "{$traceFile}: {$traceLine}";
-
-        $options = $options ?? [];
-
-        $fn = $this->static_dump_fn();
-
-        $fn($options, $traceWhereIs, $var, ...$vars);
-
-        return $var;
-    }
-
-    public function d(?array $trace, ?array $options, $var, ...$vars) // : mixed
-    {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->dump($trace, $options, $var, ...$vars);
-
-        return $var;
-    }
-
-    public function dd(?array $trace, ?array $options, $var, ...$vars) : void
-    {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->dump($trace, $options, $var, ...$vars);
-
-        die();
-    }
-
-    public function ddd(?array $trace, ?array $options, ?int $limit, $var, ...$vars) // : mixed|void
-    {
-        static $current;
-
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-        $limit = $limit ?? 1;
-        if ($limit < 1) $limit = 1;
-
-        $current = $current ?? $limit;
-
-        $this->dump($trace, $options, $var, ...$vars);
-
-        if (0 === --$current) {
-            die();
-        }
-
-        return $var;
+        return $this->dumper()->dddTrace($trace, $limit, $var, ...$vars);
     }
 
 
@@ -548,7 +222,7 @@ class DebugModule
         return $output;
     }
 
-    private function var_dump_output_null($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_null($var, array $options = [], array &$context = []) : ?array
     {
         if (! is_null($var)) return null;
 
@@ -559,7 +233,7 @@ class DebugModule
         return $output;
     }
 
-    private function var_dump_output_bool($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_bool($var, array $options = [], array &$context = []) : ?array
     {
         if (! is_bool($var)) return null;
 
@@ -570,7 +244,7 @@ class DebugModule
         return $output;
     }
 
-    private function var_dump_output_int($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_int($var, array $options = [], array &$context = []) : ?array
     {
         if (! is_int($var)) return null;
 
@@ -589,7 +263,7 @@ class DebugModule
         return $output;
     }
 
-    private function var_dump_output_float($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_float($var, array $options = [], array &$context = []) : ?array
     {
         if (! is_float($var)) return null;
 
@@ -600,7 +274,7 @@ class DebugModule
         return $output;
     }
 
-    private function var_dump_output_string($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_string($var, array $options = [], array &$context = []) : ?array
     {
         if (! is_string($var)) return null;
 
@@ -631,7 +305,7 @@ class DebugModule
         return $output;
     }
 
-    private function var_dump_output_object($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_object($var, array $options = [], array &$context = []) : ?array
     {
         if (! is_object($var)) return null;
 
@@ -691,7 +365,7 @@ class DebugModule
         return $output;
     }
 
-    private function var_dump_output_array($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_array($var, array $options = [], array &$context = []) : ?array
     {
         if (! is_array($var)) return null;
 
@@ -809,7 +483,7 @@ class DebugModule
         return $output;
     }
 
-    private function var_dump_output_resource($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_resource($var, array $options = [], array &$context = []) : ?array
     {
         $isResourceOpened = (is_resource($var));
         $isResourceClosed = ('resource (closed)' === gettype($var));
@@ -1235,7 +909,7 @@ class DebugModule
     }
 
 
-    public function types(?string $separator = null, array $options = [], ...$values) : string
+    public function types(array $options = [], ?string $separator = null, ...$values) : string
     {
         $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
 
@@ -1249,7 +923,7 @@ class DebugModule
         return $content;
     }
 
-    public function type_ids(?string $separator = null, array $options = [], ...$values) : string
+    public function type_ids(array $options = [], ?string $separator = null, ...$values) : string
     {
         $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
 
@@ -1263,7 +937,7 @@ class DebugModule
         return $content;
     }
 
-    public function type_values(?string $separator = null, array $options = [], ...$values) : string
+    public function type_values(array $options = [], ?string $separator = null, ...$values) : string
     {
         $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
 
@@ -1277,8 +951,7 @@ class DebugModule
         return $content;
     }
 
-
-    public function values(?string $separator = null, array $options = [], ...$values) : string
+    public function values(array $options = [], ?string $separator = null, ...$values) : string
     {
         $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
 
@@ -1405,97 +1078,6 @@ class DebugModule
         }
 
         return $result;
-    }
-
-
-    public function print_table(array $table, ?bool $return = null) : ?string
-    {
-        if ([] === $table) {
-            return null;
-        }
-
-        $rowKeys = array_fill_keys(
-            array_keys($table),
-            true
-        );
-
-        $colKeys = [];
-        foreach ( $rowKeys as $rowKey => $bool ) {
-            if (! is_array($table[ $rowKey ])) {
-                throw new RuntimeException(
-                    [
-                        'The `table` should be array of arrays',
-                        $table[ $rowKey ],
-                    ]
-                );
-            }
-
-            foreach ( array_keys($table[ $rowKey ]) as $colKey ) {
-                if (! isset($colKeys[ $colKey ])) {
-                    $colKeys[ $colKey ] = true;
-                }
-            }
-        }
-
-        $thWidth = max(
-            array_map('strlen', array_keys($rowKeys))
-        );
-        $tdWidths = array_combine(
-            $list = array_keys($colKeys),
-            array_map('strlen', $list)
-        );
-
-        foreach ( $table as $rowKey => $row ) {
-            foreach ( $row as $colKey => $colValue ) {
-                $tdWidths[ $colKey ] = max(
-                    $tdWidths[ $colKey ] ?? 0,
-                    strlen((string) $colValue)
-                );
-            }
-        }
-
-        if ($return) {
-            ob_start();
-        }
-
-        $fnDrawLine = function () use ($thWidth, $tdWidths) {
-            echo '+';
-            echo str_repeat('-', $thWidth + 2) . '+';
-            foreach ( $tdWidths as $tdWidth ) {
-                echo str_repeat('-', $tdWidth + 2) . '+';
-            }
-            echo "\n";
-        };
-
-        $fnDrawLine();
-
-        echo '|';
-        echo ' ' . str_pad('', $thWidth) . ' |';
-        foreach ( $colKeys as $colKey => $bool ) {
-            echo ' ' . str_pad($colKey, $tdWidths[ $colKey ]) . ' |';
-        }
-        echo "\n";
-
-        $fnDrawLine();
-
-        foreach ( $table as $rowKey => $row ) {
-            echo '|';
-            echo ' ' . str_pad($rowKey, $thWidth) . ' |';
-            foreach ( $colKeys as $colKey => $bool ) {
-                echo ' ' . str_pad($row[ $colKey ] ?? 'NULL', $tdWidths[ $colKey ]) . ' |';
-            }
-            echo "\n";
-        }
-
-        $fnDrawLine();
-
-        if ($return) {
-            $content = ob_get_clean();
-
-            return $content;
-        }
-
-        return null;
     }
 
 
@@ -1669,5 +1251,96 @@ class DebugModule
         );
 
         return $isDiff;
+    }
+
+
+    public function print_table(array $table, ?bool $return = null) : ?string
+    {
+        if ([] === $table) {
+            return null;
+        }
+
+        $rowKeys = array_fill_keys(
+            array_keys($table),
+            true
+        );
+
+        $colKeys = [];
+        foreach ( $rowKeys as $rowKey => $bool ) {
+            if (! is_array($table[ $rowKey ])) {
+                throw new RuntimeException(
+                    [
+                        'The `table` should be array of arrays',
+                        $table[ $rowKey ],
+                    ]
+                );
+            }
+
+            foreach ( array_keys($table[ $rowKey ]) as $colKey ) {
+                if (! isset($colKeys[ $colKey ])) {
+                    $colKeys[ $colKey ] = true;
+                }
+            }
+        }
+
+        $thWidth = max(
+            array_map('strlen', array_keys($rowKeys))
+        );
+        $tdWidths = array_combine(
+            $list = array_keys($colKeys),
+            array_map('strlen', $list)
+        );
+
+        foreach ( $table as $rowKey => $row ) {
+            foreach ( $row as $colKey => $colValue ) {
+                $tdWidths[ $colKey ] = max(
+                    $tdWidths[ $colKey ] ?? 0,
+                    strlen((string) $colValue)
+                );
+            }
+        }
+
+        if ($return) {
+            ob_start();
+        }
+
+        $fnDrawLine = function () use ($thWidth, $tdWidths) {
+            echo '+';
+            echo str_repeat('-', $thWidth + 2) . '+';
+            foreach ( $tdWidths as $tdWidth ) {
+                echo str_repeat('-', $tdWidth + 2) . '+';
+            }
+            echo "\n";
+        };
+
+        $fnDrawLine();
+
+        echo '|';
+        echo ' ' . str_pad('', $thWidth) . ' |';
+        foreach ( $colKeys as $colKey => $bool ) {
+            echo ' ' . str_pad($colKey, $tdWidths[ $colKey ]) . ' |';
+        }
+        echo "\n";
+
+        $fnDrawLine();
+
+        foreach ( $table as $rowKey => $row ) {
+            echo '|';
+            echo ' ' . str_pad($rowKey, $thWidth) . ' |';
+            foreach ( $colKeys as $colKey => $bool ) {
+                echo ' ' . str_pad($row[ $colKey ] ?? 'NULL', $tdWidths[ $colKey ]) . ' |';
+            }
+            echo "\n";
+        }
+
+        $fnDrawLine();
+
+        if ($return) {
+            $content = ob_get_clean();
+
+            return $content;
+        }
+
+        return null;
     }
 }
