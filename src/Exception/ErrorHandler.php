@@ -105,7 +105,7 @@ class ErrorHandler
     /**
      * @return static
      */
-    public function useErrorReporting(&$last = null) // : static
+    public function useErrorReporting(&$last = null)
     {
         $last = error_reporting($this->errorReporting);
 
@@ -117,7 +117,7 @@ class ErrorHandler
      *
      * @return static
      */
-    public function useErrorHandler(&$last = null) // : static
+    public function useErrorHandler(&$last = null)
     {
         $fn = $this->errorHandler ?? $this->fnErrorHandler();
 
@@ -131,7 +131,7 @@ class ErrorHandler
      *
      * @return static
      */
-    public function useExceptionHandler(&$last = null) // : static
+    public function useExceptionHandler(&$last = null)
     {
         $fn = $this->exceptionHandler ?? $this->fnExceptionHandler();
 

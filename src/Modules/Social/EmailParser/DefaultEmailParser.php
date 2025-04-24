@@ -50,7 +50,7 @@ class DefaultEmailParser implements EmailParserInterface
     /**
      * @return static
      */
-    public function setEmailFakeRegexes(?array $regexList = null) // : static
+    public function setEmailFakeRegexes(?array $regexList)
     {
         if (null === $regexList) {
             $this->emailFakeRegexIndex = [
@@ -70,7 +70,7 @@ class DefaultEmailParser implements EmailParserInterface
     /**
      * @return static
      */
-    public function addEmailFakeRegexes(array $regexList) // : static
+    public function addEmailFakeRegexes(array $regexList)
     {
         if ([] === $regexList) {
             return $this;

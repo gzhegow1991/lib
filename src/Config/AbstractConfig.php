@@ -189,7 +189,7 @@ abstract class AbstractConfig implements
     /**
      * @return static
      */
-    public function load(array $config) // : static
+    public function load(array $config)
     {
         foreach ( $this->__keys as $key => $bool ) {
             if (! array_key_exists($key, $config)) {
@@ -216,7 +216,7 @@ abstract class AbstractConfig implements
     /**
      * @return static
      */
-    public function fill(self $config) // : static
+    public function fill(self $config)
     {
         if (static::class !== get_class($config)) {
             throw new LogicException(

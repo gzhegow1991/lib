@@ -12,12 +12,13 @@ interface PhoneManagerInterface
     /**
      * @return static
      */
-    public function setPhoneFakeRegexes(?array $regexList = null);
+    public function setPhoneFakeRegexes(?array $regexList);
 
     /**
      * @return static
      */
     public function addPhoneFakeRegexes(array $regexList);
+
 
     /**
      * @return static

@@ -24,6 +24,28 @@ class ArrStrict implements
 
 
     /**
+     * @return static|bool|null
+     */
+    public static function fromValid($from, array $refs = [])
+    {
+        $withErrors = array_key_exists(0, $refs);
+
+        $refs[ 0 ] = $refs[ 0 ] ?? null;
+
+        $instance = null
+            ?? static::fromStatic($from, $refs)
+            ?? static::fromValidArray($from, $refs);
+
+        if (! $withErrors) {
+            if (null === $instance) {
+                throw $refs[ 0 ];
+            }
+        }
+
+        return $instance;
+    }
+
+    /**
      * @return static|null|bool
      */
     public static function fromStatic($from, array $refs = [])

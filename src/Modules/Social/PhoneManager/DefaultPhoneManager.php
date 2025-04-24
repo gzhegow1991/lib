@@ -209,7 +209,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
     /**
      * @return static
      */
-    public function setPhoneFakeRegexes(?array $regexList = null) // : static
+    public function setPhoneFakeRegexes(?array $regexList)
     {
         if (null === $regexList) {
             $this->phoneFakeRegexIndex = [
@@ -229,7 +229,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
     /**
      * @return static
      */
-    public function addPhoneFakeRegexes(array $regexList) // : static
+    public function addPhoneFakeRegexes(array $regexList)
     {
         if ([] === $regexList) {
             return $this;
@@ -255,6 +255,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         return $this;
     }
+
 
     /**
      * @return static

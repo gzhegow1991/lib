@@ -25,7 +25,32 @@ class SubnetV4
     }
 
 
-    public static function fromInstance($from, array $refs = [])
+    /**
+     * @return static|bool|null
+     */
+    public static function fromValid($from, array $refs = [])
+    {
+        $withErrors = array_key_exists(0, $refs);
+
+        $refs[ 0 ] = $refs[ 0 ] ?? null;
+
+        $instance = null
+            ?? static::fromStatic($from, $refs)
+            ?? static::fromValidString($from, $refs);
+
+        if (! $withErrors) {
+            if (null === $instance) {
+                throw $refs[ 0 ];
+            }
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @return static|bool|null
+     */
+    public static function fromStatic($from, array $refs = [])
     {
         if ($from instanceof static) {
             return Lib::refsResult($refs, $from);
@@ -39,6 +64,9 @@ class SubnetV4
         );
     }
 
+    /**
+     * @return static|bool|null
+     */
     public static function fromValidString($from, array $refs = [])
     {
         if (is_string($from)) {

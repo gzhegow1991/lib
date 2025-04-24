@@ -112,7 +112,7 @@ abstract class AbstractContext implements
     /**
      * @return static
      */
-    public function set(string $name, $value) // : static
+    public function set(string $name, $value)
     {
         if ('' === $name) {
             throw new LogicException(
@@ -128,7 +128,7 @@ abstract class AbstractContext implements
     /**
      * @return static
      */
-    public function clear(string $name) // : static
+    public function clear(string $name)
     {
         if ($this->exists($name)) {
             $this->{$name} = null;
@@ -141,7 +141,7 @@ abstract class AbstractContext implements
     /**
      * @return static
      */
-    public function reset(string $name) // : static
+    public function reset(string $name)
     {
         $instance = new static();
 
@@ -155,7 +155,7 @@ abstract class AbstractContext implements
     /**
      * @return static
      */
-    public function unset(string $name) // : static
+    public function unset(string $name)
     {
         unset($this->{$name});
 
@@ -229,7 +229,7 @@ abstract class AbstractContext implements
     /**
      * @return static
      */
-    public function toCamelCase() // : static
+    public function toCamelCase()
     {
         $instance = new static();
 
@@ -247,7 +247,7 @@ abstract class AbstractContext implements
     /**
      * @return static
      */
-    public function toSnakeCase() // : static
+    public function toSnakeCase()
     {
         $instance = new static();
 
