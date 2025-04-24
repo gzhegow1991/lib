@@ -339,6 +339,8 @@ class Lib
 
 
     /**
+     * > в старых PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
+     *
      * @throws \LogicException|\RuntimeException
      */
     public static function throw($throwableOrArg, ...$throwableArgs)
@@ -390,6 +392,8 @@ class Lib
     }
 
     /**
+     * > в старых PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
+     *
      * @throws \LogicException|\RuntimeException
      */
     public static function throw_new(...$throwableArgs)
@@ -432,12 +436,17 @@ class Lib
     }
 
 
+    /**
+     * > фабрика для Pipeline
+     */
     public static function pipe() : Pipe
     {
         return new Pipe();
     }
 
-
+    /**
+     * > удобный вызов AssertModule для цепочечной проверки типа
+     */
     public static function assertOf($value) : AssertModule
     {
         return static::assert()->of($value);
@@ -445,6 +454,8 @@ class Lib
 
 
     /**
+     * > простой замерщик времени между вызовами
+     *
      * @return array|float
      */
     public static function benchmark($clear = null, ?string $tag = null)
@@ -503,6 +514,8 @@ class Lib
 
 
     /**
+     * > используется в from{type}() методах, что внутри ValueObject-ов
+     *
      * @param array{ 0?: AggregateExceptionInterface, 1?: mixed } $refs
      *
      * @return true|mixed
@@ -522,6 +535,8 @@ class Lib
     }
 
     /**
+     * > используется в from{type}() методах, что внутри ValueObject-ов
+     *
      * @param array{ 0?: AggregateExceptionInterface, 1?: mixed } $refs
      *
      * @return false|null
@@ -530,8 +545,6 @@ class Lib
     {
         $withErrors = array_key_exists(0, $refs);
         $withValue = array_key_exists(1, $refs);
-
-        $ex = null;
 
         if (! $withErrors) {
             if ($error instanceof ExceptionInterface) {
@@ -554,7 +567,7 @@ class Lib
         if ($refErrors instanceof AggregateExceptionInterface) {
             $refErrors->addPrevious($error);
 
-        } else {
+        } elseif (null === $refErrors) {
             $refErrors = new LogicException('Aggregate exception', $error);
         }
 
@@ -567,7 +580,8 @@ class Lib
 
 
     /**
-     * > gzhegow, thanks to PHP COMMUNITY!!111 we have to ensure internal types on all old classes
+     * > благодаря PHP COMMUNITY!!111 мы теперь обязаны строго повторят return-type даже для Internal классов
+     * > для старой ПХП теперь отдельная фабрика, где на это наплевать
      *
      * @template-covariant T of object
      *
@@ -594,7 +608,8 @@ class Lib
     }
 
     /**
-     * > gzhegow, thanks to PHP COMMUNITY!!111 we have to ensure internal types on all old classes
+     * > благодаря PHP COMMUNITY!!111 мы теперь обязаны строго повторят return-type даже для Internal классов
+     * > для восьмой ПХП теперь отдельная фабрика, где все типы на месте
      *
      * @template-covariant T of object
      *
