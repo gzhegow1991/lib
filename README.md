@@ -413,7 +413,7 @@ $fn = function () use ($ffn) {
     $previousList = [ $ee1, $ee2 ];
     $e0 = new \Gzhegow\Lib\Exception\RuntimeException('e', 0, ...$previousList);
 
-    $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e0, false);
+    $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e0, [ 'with_file' => false ]);
     echo implode(PHP_EOL, $messages);
 };
 $ffn->assert_stdout($fn, [], '
@@ -756,7 +756,7 @@ $fn = function () use ($ffn) {
             ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromValidArray(1);
     }
     catch ( \Throwable $e ) {
-        $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e, false);
+        $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e, [ 'with_file' => false ]);
 
         echo implode(PHP_EOL, $messages) . PHP_EOL;
         echo PHP_EOL;
@@ -767,7 +767,7 @@ $fn = function () use ($ffn) {
         ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromStatic(1, [ &$e ])
         ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromValidArray(1, [ &$e ]);
 
-    $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e, false);
+    $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e, [ 'with_file' => false ]);
 
     echo implode(PHP_EOL, $messages) . PHP_EOL;
     echo PHP_EOL;
@@ -777,7 +777,7 @@ $fn = function () use ($ffn) {
         ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromStatic(1, [ &$e, &$val ])
         ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromValidArray(1, [ &$e, &$val ]);
 
-    $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e, false);
+    $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e, [ 'with_file' => false ]);
 
     echo implode(PHP_EOL, $messages) . PHP_EOL;
     echo PHP_EOL;

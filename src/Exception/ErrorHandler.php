@@ -158,13 +158,15 @@ class ErrorHandler
         return static function (\Throwable $throwable) use ($dirRoot, $forceExit) {
             $messageLines = static::getThrowableMessageListLines(
                 $throwable,
-                true, true,
-                $dirRoot
+                [
+                    'with_file' => true,
+                    'dir_root'  => $dirRoot,
+                ]
             );
 
             $traceLines = static::getThrowableTraceLines(
                 $throwable,
-                $dirRoot
+                [ 'dir_root' => $dirRoot ]
             );
 
             if ([] !== $messageLines) {
@@ -231,12 +233,7 @@ class ErrorHandler
      * @return string[]
      */
     public static function getThrowableMessageListLines(
-        \Throwable $throwable,
-        //
-        ?bool $withFile = null,
-        ?bool $withId = null,
-        //
-        ?string $dirRoot = null
+        \Throwable $throwable, array $options = []
     ) : array
     {
         $arrayDot = static::getThrowableArrayDot($throwable);
@@ -247,11 +244,7 @@ class ErrorHandler
         foreach ( $arrayDot as $dotpath => $e ) {
             $level = substr_count($dotpath, '.');
 
-            $lines = static::getThrowableMessageLines(
-                $e,
-                $withFile, $withId,
-                $dirRoot
-            );
+            $lines = static::getThrowableMessageLines($e, $options);
             $linesCnt = count($lines);
 
             $lines[ 0 ] = "[ {$dotpath} ] " . $lines[ 0 ];
@@ -330,35 +323,22 @@ class ErrorHandler
      * @return string[]
      */
     public static function getThrowableMessageLines(
-        \Throwable $throwable,
-        //
-        ?bool $withFile = null,
-        ?bool $withId = null,
-        //
-        ?string $dirRoot = null
+        \Throwable $throwable, array $options = []
     ) : array
     {
-        $withFile = $withFile ?? true;
-        $withId = $withId ?? false;
-
-        $phpClass = get_class($throwable);
-        $phpFile = $throwable->getFile() ?? '{file}';
-        $phpLine = $throwable->getLine() ?? 0;
+        $withFile = $options[ 'with_file' ] ?? true;
+        $dirRoot = $options[ 'dir_root' ] ?? null;
 
         $phpMessage = static::getThrowableMessage($throwable);
+        $phpClass = get_class($throwable);
 
         $messageLines[] = $phpMessage;
-
-        if ($withId) {
-            $phpId = spl_object_id($throwable);
-
-            $messageLines[] = "{ object # {$phpClass} # {$phpId} }";
-
-        } else {
-            $messageLines[] = "{ object # {$phpClass} }";
-        }
+        $messageLines[] = "{ object # {$phpClass} }";
 
         if ($withFile) {
+            $phpFile = $throwable->getFile() ?? '{file}';
+            $phpLine = $throwable->getLine() ?? 0;
+
             if (null !== $dirRoot) {
                 $theFs = Lib::fs();
 
@@ -375,11 +355,11 @@ class ErrorHandler
 
 
     public static function getThrowableTrace(
-        \Throwable $e,
-        //
-        ?string $dirRoot = null
+        \Throwable $e, array $options = []
     ) : array
     {
+        $dirRoot = $options[ 'dir_root' ] ?? null;
+
         $trace = $e->getTrace();
 
         if (null !== $dirRoot) {
@@ -405,14 +385,11 @@ class ErrorHandler
      * @return string[]
      */
     public static function getThrowableTraceLines(
-        \Throwable $throwable,
-        //
-        ?string $dirRoot = null
+        \Throwable $throwable, array $options = []
     ) : array
     {
         $trace = static::getThrowableTrace(
-            $throwable,
-            $dirRoot
+            $throwable, $options
         );
 
         $traceLines = [];
