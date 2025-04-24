@@ -149,7 +149,7 @@ class ArrStrict implements
     /**
      * @return mixed
      */
-    public function get($key, array $fallback = []) // : mixed
+    public function get($key, array $fallback = [])
     {
         if (array_key_exists($key, $this->array)) {
             return $this->array[ $key ];

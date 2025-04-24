@@ -781,7 +781,7 @@ class PhpModule
     /**
      * @return callable|null
      */
-    public function get_error_handler() // : ?callable
+    public function get_error_handler()
     {
         $handler = set_error_handler(static function () { });
         restore_error_handler();
@@ -792,7 +792,7 @@ class PhpModule
     /**
      * @return callable|null
      */
-    public function get_exception_handler() // : ?callable
+    public function get_exception_handler()
     {
         $handler = set_exception_handler(static function () { });
         restore_exception_handler();
@@ -1672,7 +1672,7 @@ class PhpModule
     /**
      * @return mixed|null
      */
-    public function unserialize(string $data) // : mixed|null
+    public function unserialize(string $data)
     {
         error_clear_last();
 
@@ -2737,7 +2737,7 @@ class PhpModule
         return $errors->list;
     }
 
-    public function error($error, $result = null) // : mixed
+    public function error($error, $result = null)
     {
         $current = $this->errors_current();
 

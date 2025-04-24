@@ -51,7 +51,7 @@ class CliModule
     }
 
 
-    public function pause($var = null, ...$vars) // : mixed
+    public function pause($var = null, ...$vars)
     {
         if (null !== $var) {
             var_dump($var, ...$vars);

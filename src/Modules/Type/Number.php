@@ -2,6 +2,8 @@
 
 namespace Gzhegow\Lib\Modules\Type;
 
+use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
@@ -51,22 +53,76 @@ class Number implements
     }
 
 
-    public static function fromValid(array $valid)
+    public function __toString()
     {
+        return $this->value;
+    }
+
+
+    /**
+     * @return static|bool|null
+     */
+    public static function fromValid($from, array $refs = [])
+    {
+        $withErrors = array_key_exists(0, $refs);
+
+        $refs[ 0 ] = $refs[ 0 ] ?? null;
+
+        $instance = null
+            ?? static::fromStatic($from, $refs)
+            ?? static::fromValidArray($from, $refs);
+
+        if (! $withErrors) {
+            if (null === $instance) {
+                throw $refs[ 0 ];
+            }
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @return static|bool|null
+     */
+    public static function fromStatic($from, array $refs = [])
+    {
+        if ($from instanceof static) {
+            return Lib::refsResult($refs, $from);
+        }
+
+        return Lib::refsError(
+            $refs,
+            new LogicException(
+                [ 'The `from` should be instance of: ' . static::class, $from ]
+            )
+        );
+    }
+
+    public static function fromValidArray($from, array $refs = [])
+    {
+        if (! is_array($from)) {
+            return Lib::refsError(
+                $refs,
+                new LogicException(
+                    [ 'The `from` should be array', $from ]
+                )
+            );
+        }
+
         $instance = new static();
 
-        $instance->original = $valid[ 'original' ];
-
-        $instance->sign = $valid[ 'sign' ];
-        $instance->int = $valid[ 'int' ];
-        $instance->frac = $valid[ 'frac' ];
-        $instance->exp = $valid[ 'exp' ];
-
-        $instance->scale = $valid[ 'scale' ];
+        [
+            'original' => $instance->original,
+            'sign'     => $instance->sign,
+            'int'      => $instance->int,
+            'frac'     => $instance->frac,
+            'exp'      => $instance->exp,
+            'scale'    => $instance->scale,
+        ] = $from;
 
         $instance->value = "{$instance->sign}{$instance->int}{$instance->frac}{$instance->exp}";
 
-        return $instance;
+        return Lib::refsResult($refs, $instance);
     }
 
 
@@ -98,13 +154,7 @@ class Number implements
     }
 
 
-    public function __toString()
-    {
-        return $this->value;
-    }
-
-
-    public function getOriginal() // : mixed
+    public function getOriginal()
     {
         return $this->original;
     }

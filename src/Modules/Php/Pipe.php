@@ -217,7 +217,7 @@ class Pipe
     /**
      * @return mixed
      */
-    public function run(?array $value = null, ?array $args = null) // : mixed
+    public function run(?array $value = null, ?array $args = null)
     {
         $this->initialize($value, $args);
 

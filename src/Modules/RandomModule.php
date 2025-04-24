@@ -26,7 +26,7 @@ class RandomModule
      *
      * @return callable|null
      */
-    public function static_uuid_fn($fnUuid = null) // : ?callable
+    public function static_uuid_fn($fnUuid = null)
     {
         if (null !== $fnUuid) {
             $last = $this->uuidFn;

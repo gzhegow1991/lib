@@ -50,13 +50,13 @@ class BcmathModule
             return false;
         }
 
-        $bcnum = new Bcnumber(
-            $number->getOriginal(),
-            $number->getSign(),
-            $number->getInt(),
-            $number->getFrac(),
-            $number->getScale()
-        );
+        $bcnum = Bcnumber::fromValidArray([
+            'original' => $number->getOriginal(),
+            'sign'     => $number->getSign(),
+            'int'      => $number->getInt(),
+            'frac'     => $number->getFrac(),
+            'scale'    => $number->getScale(),
+        ]);
 
         $result = $bcnum;
 

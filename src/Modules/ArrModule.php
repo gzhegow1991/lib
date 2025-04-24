@@ -409,7 +409,7 @@ class ArrModule
     /**
      * @throws \RuntimeException
      */
-    public function get_key(array $array, $key, array $fallback = []) // : ?mixed
+    public function get_key(array $array, $key, array $fallback = [])
     {
         $status = $this->has_key($array, $key, [ &$value ]);
 
@@ -429,7 +429,10 @@ class ArrModule
     }
 
 
-    public function key_first(array $array) // : ?int|string
+    /**
+     * @return int|string|null
+     */
+    public function key_first(array $array)
     {
         if (PHP_VERSION_ID >= 70300) {
             return array_key_first($array);
@@ -444,7 +447,7 @@ class ArrModule
     /**
      * @throws \RuntimeException
      */
-    public function first(array $array, array $fallback = []) // : ?mixed
+    public function first(array $array, array $fallback = [])
     {
         if ([] === $array) {
             if ($fallback) {
@@ -468,7 +471,10 @@ class ArrModule
     }
 
 
-    public function key_last(array $array) // : ?int|string
+    /**
+     * @return int|string|null
+     */
+    public function key_last(array $array)
     {
         if (PHP_VERSION_ID >= 70300) {
             return array_key_last($array);
@@ -483,7 +489,7 @@ class ArrModule
     /**
      * @throws \RuntimeException
      */
-    public function last(array $array, array $fallback = []) // : ?mixed
+    public function last(array $array, array $fallback = [])
     {
         if ([] === $array) {
             if ($fallback) {
@@ -594,7 +600,7 @@ class ArrModule
     /**
      * @return int|string|null
      */
-    public function key_pos(array $array, int $pos) // : ?int|string
+    public function key_pos(array $array, int $pos)
     {
         $status = $this->has_pos($array, $pos, [ 1 => &$key ]);
 
@@ -809,7 +815,7 @@ class ArrModule
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function &fetch_path(array &$array, $path) // : mixed
+    public function &fetch_path(array &$array, $path)
     {
         if (! $this->type_arrpath($thePath, $path)) {
             throw new LogicException(
@@ -891,7 +897,7 @@ class ArrModule
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function &put_path(array &$array, $path, $value) // : &mixed
+    public function &put_path(array &$array, $path, $value)
     {
         if (! $this->type_arrpath($thePath, $path)) {
             throw new LogicException(

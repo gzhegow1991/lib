@@ -371,7 +371,7 @@ class HttpModule
         $theSession->set($name, $value);
     }
 
-    public function session_unset(string $name) // : ?mixed
+    public function session_unset(string $name)
     {
         if (! strlen($name)) {
             throw new LogicException(

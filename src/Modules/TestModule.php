@@ -20,7 +20,7 @@ class TestModule
      *
      * @return resource|null
      */
-    public function static_stdout_resource(array $stdoutResource = []) // : ?resource
+    public function static_stdout_resource(array $stdoutResource = [])
     {
         if ([] !== $stdoutResource) {
             [ $h ] = $stdoutResource;

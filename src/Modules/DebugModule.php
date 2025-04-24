@@ -65,7 +65,7 @@ class DebugModule
     /**
      * @return mixed
      */
-    public function dump($var, ...$vars) // : mixed
+    public function dump($var, ...$vars)
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
@@ -75,7 +75,7 @@ class DebugModule
     /**
      * @return mixed
      */
-    public function d($var, ...$vars) // : mixed
+    public function d($var, ...$vars)
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
@@ -92,7 +92,7 @@ class DebugModule
     /**
      * @return mixed|void
      */
-    public function ddd(?int $limit, $var, ...$vars) // : mixed|void
+    public function ddd(?int $limit, $var, ...$vars)
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
@@ -103,7 +103,7 @@ class DebugModule
     /**
      * @return mixed
      */
-    public function dumpTrace(?array $trace, $var, ...$vars) // : mixed
+    public function dumpTrace(?array $trace, $var, ...$vars)
     {
         return $this->dumper()->dumpTrace($trace, $var, ...$vars);
     }
@@ -111,7 +111,7 @@ class DebugModule
     /**
      * @return mixed
      */
-    public function dTrace(?array $trace, $var, ...$vars) // : mixed
+    public function dTrace(?array $trace, $var, ...$vars)
     {
         return $this->dumper()->dTrace($trace, $var, ...$vars);
     }
@@ -124,7 +124,7 @@ class DebugModule
     /**
      * @return mixed|void
      */
-    public function dddTrace(?array $trace, ?int $limit, $var, ...$vars) // : mixed|void
+    public function dddTrace(?array $trace, ?int $limit, $var, ...$vars)
     {
         return $this->dumper()->dddTrace($trace, $limit, $var, ...$vars);
     }
@@ -969,7 +969,7 @@ class DebugModule
     /**
      * @return string|float|int|null
      */
-    public function var_export($var, array $options = [], ?int $level = null) // : string|float|int|null
+    public function var_export($var, array $options = [], ?int $level = null)
     {
         $level = $level ?? 0;
 

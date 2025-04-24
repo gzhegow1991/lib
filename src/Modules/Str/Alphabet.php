@@ -59,7 +59,7 @@ class Alphabet
     }
 
 
-    public function getOriginal() // : mixed
+    public function getOriginal()
     {
         return $this->original;
     }

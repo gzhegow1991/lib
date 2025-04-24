@@ -655,14 +655,14 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    public function dump($var, ...$vars) // : mixed
+    public function dump($var, ...$vars)
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
         return $this->dumpTrace($trace, $var, ...$vars);
     }
 
-    public function d($var, ...$vars) // : mixed
+    public function d($var, ...$vars)
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
@@ -676,7 +676,7 @@ class DefaultDumper implements DumperInterface
         $this->ddTrace($trace, ...$vars);
     }
 
-    public function ddd(?int $limit, $var, ...$vars) // : mixed|void
+    public function ddd(?int $limit, $var, ...$vars)
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
@@ -684,12 +684,12 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    public function dumpTrace(?array $trace, $var, ...$vars) // : mixed
+    public function dumpTrace(?array $trace, $var, ...$vars)
     {
         return $this->doDumpTrace($trace, $var, ...$vars);
     }
 
-    public function dTrace(?array $trace, $var, ...$vars) // : mixed
+    public function dTrace(?array $trace, $var, ...$vars)
     {
         return $this->doDumpTrace($trace, $var, ...$vars);
     }
@@ -701,7 +701,7 @@ class DefaultDumper implements DumperInterface
         die();
     }
 
-    public function dddTrace(?array $trace, ?int $limit, $var, ...$vars) // : mixed|void
+    public function dddTrace(?array $trace, ?int $limit, $var, ...$vars)
     {
         static $current;
 
@@ -720,7 +720,7 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    protected function doDumpTrace(?array $trace, $var, ...$vars) // : mixed
+    protected function doDumpTrace(?array $trace, $var, ...$vars)
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 

@@ -104,7 +104,7 @@ class JsonModule
         ?string $json, ?bool $associative = null,
         array $fallback = [],
         ?int $depth = null, ?int $flags = null
-    ) // : mixed
+    )
     {
         if ('' === $json) {
             return '';
@@ -141,7 +141,7 @@ class JsonModule
         ?string $json, ?bool $associative = null,
         array $fallback = [],
         ?int $depth = null, ?int $flags = null
-    ) // : mixed
+    )
     {
         if ('' === $json) {
             return '';

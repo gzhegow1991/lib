@@ -14,7 +14,7 @@ class FormatModule
      */
     public function bytes_decode(
         string $bytesSize, array $fallback = []
-    ) // : int|float
+    )
     {
         $decoded = null;
 
@@ -43,7 +43,7 @@ class FormatModule
     /**
      * @return int|float
      */
-    protected function _bytes_decode(string $size, ?int $precision = null) // : int|float
+    protected function _bytes_decode(string $size, ?int $precision = null)
     {
         $precision = $precision ?? 3;
 

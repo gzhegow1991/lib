@@ -1583,7 +1583,7 @@ class TypeModule extends AbstractTypeModule
                 $scale = strlen($frac) - 1;
             }
 
-            $number = Number::fromValid([
+            $number = Number::fromValidArray([
                 'original' => $value,
                 'sign'     => $split[ 0 ],
                 'int'      => $split[ 1 ],

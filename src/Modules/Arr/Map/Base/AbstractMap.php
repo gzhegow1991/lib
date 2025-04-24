@@ -114,7 +114,10 @@ abstract class AbstractMap
     }
 
 
-    public function put($value) // : int|string
+    /**
+     * @return int|string
+     */
+    public function put($value)
     {
         $this->values[] = $value;
 

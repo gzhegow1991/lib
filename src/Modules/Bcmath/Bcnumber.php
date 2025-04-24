@@ -2,8 +2,18 @@
 
 namespace Gzhegow\Lib\Modules\Bcmath;
 
+use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
 
-class Bcnumber
+
+class Bcnumber implements
+    ToIntegerInterface,
+    ToFloatInterface,
+    ToStringInterface
 {
     /**
      * @var string
@@ -34,25 +44,8 @@ class Bcnumber
     protected $scale;
 
 
-    public function __construct(
-        $original,
-        //
-        string $sign,
-        string $int,
-        string $frac,
-        //
-        int $scale
-    )
+    private function __construct()
     {
-        $this->original = $original;
-
-        $this->sign = $sign;
-        $this->int = $int;
-        $this->frac = $frac;
-
-        $this->scale = $scale;
-
-        $this->value = "{$this->sign}{$this->int}{$this->frac}";
     }
 
 
@@ -62,7 +55,101 @@ class Bcnumber
     }
 
 
-    public function getOriginal() // : mixed
+    /**
+     * @return static|bool|null
+     */
+    public static function fromValid($from, array $refs = [])
+    {
+        $withErrors = array_key_exists(0, $refs);
+
+        $refs[ 0 ] = $refs[ 0 ] ?? null;
+
+        $instance = null
+            ?? static::fromStatic($from, $refs)
+            ?? static::fromValidArray($from, $refs);
+
+        if (! $withErrors) {
+            if (null === $instance) {
+                throw $refs[ 0 ];
+            }
+        }
+
+        return $instance;
+    }
+
+    /**
+     * @return static|bool|null
+     */
+    public static function fromStatic($from, array $refs = [])
+    {
+        if ($from instanceof static) {
+            return Lib::refsResult($refs, $from);
+        }
+
+        return Lib::refsError(
+            $refs,
+            new LogicException(
+                [ 'The `from` should be instance of: ' . static::class, $from ]
+            )
+        );
+    }
+
+    public static function fromValidArray($from, array $refs = [])
+    {
+        if (! is_array($from)) {
+            return Lib::refsError(
+                $refs,
+                new LogicException(
+                    [ 'The `from` should be array', $from ]
+                )
+            );
+        }
+
+        $instance = new static();
+
+        [
+            'original' => $instance->original,
+            'sign'     => $instance->sign,
+            'int'      => $instance->int,
+            'frac'     => $instance->frac,
+            'scale'    => $instance->scale,
+        ] = $from;
+
+        $instance->value = "{$instance->sign}{$instance->int}{$instance->frac}";
+
+        return Lib::refsResult($refs, $instance);
+    }
+
+
+    public function isInteger() : bool
+    {
+        return $this->value === $this->getValueInteger();
+    }
+
+
+    public function toInteger(array $options = []) : int
+    {
+        if (! $this->isInteger()) {
+            throw new RuntimeException(
+                [ 'This number cannot be converted to an integer', $this ]
+            );
+        }
+
+        return (int) $this->value;
+    }
+
+    public function toFloat(array $options = []) : float
+    {
+        return (float) $this->value;
+    }
+
+    public function toString(array $options = []) : string
+    {
+        return $this->value;
+    }
+
+
+    public function getOriginal()
     {
         return $this->original;
     }
