@@ -2,13 +2,16 @@
 
 namespace Gzhegow\Lib\Exception\Interfaces;
 
-use Gzhegow\Lib\Exception\ExceptionInterface;
 
-
-interface AggregateExceptionInterface extends ExceptionInterface
+interface HasPreviousListInterface
 {
     /**
      * @return \Throwable[]
      */
     public function getPreviousList() : array;
+
+    /**
+     * @return static
+     */
+    public function addPrevious(\Throwable $e);
 }

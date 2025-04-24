@@ -1,8 +1,8 @@
 <?php
 
-namespace Gzhegow\Lib\Exception\PHP7;
+namespace Gzhegow\Lib\Exception\Iterator\PHP7;
 
-use Gzhegow\Lib\Exception\Interfaces\AggregateExceptionInterface;
+use Gzhegow\Lib\Exception\AggregateExceptionInterface;
 
 
 class ExceptionIterator implements \RecursiveIterator
@@ -23,7 +23,8 @@ class ExceptionIterator implements \RecursiveIterator
      */
     public function __construct(array $items, array $track = [])
     {
-        foreach ( $items as $e ) {
+        $_items = $items;
+        foreach ( $_items as $i => $e ) {
             if (! ($e instanceof \Throwable)) {
                 throw new \LogicException(
                     'Each of `items` should be instance of: ' . \Throwable::class
@@ -31,7 +32,7 @@ class ExceptionIterator implements \RecursiveIterator
             }
         }
 
-        $_path = [];
+        $_track = [];
         foreach ( $track as $i => $e ) {
             $_i = (string) $i;
 
@@ -40,17 +41,18 @@ class ExceptionIterator implements \RecursiveIterator
                     'Each of keys of `track` should be non-empty string'
                 );
             }
+
             if (! ($e instanceof \Throwable)) {
                 throw new \LogicException(
                     'Each of `track` should be instance of: ' . \Throwable::class
                 );
             }
 
-            $_path[ $i ] = $e;
+            $_track[ $i ] = $e;
         }
 
-        $this->items = $items;
-        $this->track = $_path;
+        $this->items = $_items;
+        $this->track = $_track;
     }
 
 
@@ -61,9 +63,8 @@ class ExceptionIterator implements \RecursiveIterator
     {
         $track = $this->track;
 
-        end($this->track);
         $key = ([] !== $this->track)
-            ? key($this->track) . '.' . key($this->items)
+            ? array_key_last($this->track) . '.' . key($this->items)
             : key($this->items);
 
         $track[ $key ] = current($this->items);
@@ -76,11 +77,8 @@ class ExceptionIterator implements \RecursiveIterator
      */
     public function key()
     {
-        $track = end($this->track);
-
-        end($this->track);
         $key = ([] !== $this->track)
-            ? key($this->track) . '.' . key($this->items)
+            ? array_key_last($this->track) . '.' . key($this->items)
             : key($this->items);
 
         return $key;
@@ -135,9 +133,8 @@ class ExceptionIterator implements \RecursiveIterator
         if ([] !== $list) {
             $fulltrack = $this->track;
 
-            end($this->track);
             $key = ([] !== $this->track)
-                ? key($this->track) . '.' . key($this->items)
+                ? array_key_last($this->track) . '.' . key($this->items)
                 : key($this->items);
 
             $fulltrack[ $key ] = $current;

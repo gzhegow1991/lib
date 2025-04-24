@@ -21,88 +21,35 @@ class ArrPath implements
     }
 
 
-    /**
-     * @return static
-     */
-    public static function from($from) // : static
+    public static function fromInstance($from, array $refs = [])
     {
-        $instance = static::tryFrom($from, $error);
-
-        if (null === $instance) {
-            throw $error;
+        if ($from instanceof static) {
+            return Lib::refsResult($refs, $from);
         }
 
-        return $instance;
+        return Lib::refsError(
+            $refs,
+            new LogicException(
+                [ 'The `from` must be instance of: ' . static::class, $from ]
+            )
+        );
     }
 
-    /**
-     * @return static
-     */
-    public static function fromValid(array $path)
+    public static function fromValidArray($from, array $refs = [])
     {
-        $instance = new static();
-        $instance->path = $path;
+        if (is_array($from)) {
+            $instance = new static();
+            $instance->path = $from;
 
-        return $instance;
-    }
-
-
-    /**
-     * @return static|null
-     */
-    public static function tryFrom($from, ?\Throwable &$last = null) // : ?static
-    {
-        $last = null;
-
-        Lib::php()->errors_start($b);
-
-        $instance = null
-            ?? static::tryFromInstance($from)
-            ?? static::tryFromArray($from);
-
-        $errors = Lib::php()->errors_end($b);
-
-        if (null === $instance) {
-            foreach ( $errors as $error ) {
-                $last = new LogicException($error, $last);
-            }
+            return Lib::refsResult($refs, $instance);
         }
 
-        return $instance;
-    }
-
-
-    /**
-     * @return static|null
-     */
-    public static function tryFromInstance($instance) // : ?static
-    {
-        if (! ($instance instanceof static)) {
-            return Lib::php()->error(
-                [ 'The `from` should be instance of: ' . static::class, $instance ]
-            );
-        }
-
-        return $instance;
-    }
-
-    /**
-     * @return static|null
-     */
-    public static function tryFromArray($array) // : ?static
-    {
-        if (! is_array($array)) {
-            return Lib::php()->error(
-                [ 'The `from` should be array', $array ]
-            );
-        }
-
-        $path = Lib::arr()->arrpath($array);
-
-        $instance = new static();
-        $instance->path = $path;
-
-        return $instance;
+        return Lib::refsError(
+            $refs,
+            new LogicException(
+                [ 'The `from` must be array', $from ]
+            )
+        );
     }
 
 

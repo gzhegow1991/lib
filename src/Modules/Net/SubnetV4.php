@@ -2,6 +2,10 @@
 
 namespace Gzhegow\Lib\Modules\Net;
 
+use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\LogicException;
+
+
 class SubnetV4
 {
     /**
@@ -21,12 +25,35 @@ class SubnetV4
     }
 
 
-    public static function fromValid(string $subnetV4)
+    public static function fromInstance($from, array $refs = [])
     {
-        $instance = new static();
-        $instance->value = $subnetV4;
+        if ($from instanceof static) {
+            return Lib::refsResult($refs, $from);
+        }
 
-        return $instance;
+        return Lib::refsError(
+            $refs,
+            new LogicException(
+                [ 'The `from` must be instance of: ' . static::class, $from ]
+            )
+        );
+    }
+
+    public static function fromValidString($from, array $refs = [])
+    {
+        if (is_string($from)) {
+            $instance = new static();
+            $instance->value = $from;
+
+            return Lib::refsResult($refs, $instance);
+        }
+
+        return Lib::refsError(
+            $refs,
+            new LogicException(
+                [ 'The `from` must be string', $from ]
+            )
+        );
     }
 
 

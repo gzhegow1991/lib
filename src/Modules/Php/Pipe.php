@@ -82,10 +82,9 @@ class Pipe
         if (null !== $value) {
             $_value = self::sanitizeValue($value);
 
-            $this->valueInitial = $_value;
-
             $this->hasValueInitial = true;
             $this->keyValueInitial = key($_value);
+            $this->valueInitial = $_value;
         }
 
         if (null !== $args) {

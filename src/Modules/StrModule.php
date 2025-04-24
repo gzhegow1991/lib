@@ -2371,7 +2371,7 @@ class StrModule
         $lines = explode("\n", $text);
 
         foreach ( $lines as $i => $line ) {
-            $line = rtrim($line, "\r\n");
+            $line = rtrim($line);
 
             $lines[ $i ] = $line;
         }

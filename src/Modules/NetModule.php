@@ -64,7 +64,7 @@ class NetModule
             return false;
         }
 
-        $result = AddressIpV4::fromValid($addressIpV4);
+        $result = AddressIpV4::fromValidString($addressIpV4);
 
         return true;
     }
@@ -90,7 +90,7 @@ class NetModule
             return false;
         }
 
-        $result = AddressIpV6::fromValid($addressIpV6);
+        $result = AddressIpV6::fromValidString($addressIpV6);
 
         return true;
     }
@@ -228,7 +228,7 @@ class NetModule
         if ($hasIpString && $hasSubnetInt) {
             $subnetV4 = "{$addressIpString}/{$subnetInt}";
 
-            $result = SubnetV4::fromValid($subnetV4);
+            $result = SubnetV4::fromValidString($subnetV4);
 
             return true;
         }
@@ -295,7 +295,7 @@ class NetModule
         if ($hasIpString && $hasSubnetInt) {
             $subnetV6 = "{$addressIpString}/{$subnetInt}";
 
-            $result = SubnetV6::fromValid($subnetV6);
+            $result = SubnetV6::fromValidString($subnetV6);
 
             return true;
         }

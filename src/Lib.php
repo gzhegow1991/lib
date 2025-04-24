@@ -28,6 +28,10 @@ use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
 use Gzhegow\Lib\Modules\SocialModule;
 use Gzhegow\Lib\Modules\ItertoolsModule;
+use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\ExceptionInterface;
+use Gzhegow\Lib\Exception\AggregateExceptionInterface;
 
 
 class Lib
@@ -495,6 +499,70 @@ class Lib
         }
 
         return $mt;
+    }
+
+
+    /**
+     * @param array{ 0?: AggregateExceptionInterface, 1?: mixed } $refs
+     *
+     * @return true|mixed
+     */
+    public static function refsResult(array $refs, $value)
+    {
+        $withValue = array_key_exists(1, $refs);
+
+        if ($withValue) {
+            $refValue =& $refs[ 1 ];
+            $refValue = $value;
+
+            return true;
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param array{ 0?: AggregateExceptionInterface, 1?: mixed } $refs
+     *
+     * @return false|null
+     */
+    public static function refsError(array $refs, $error) : ?bool
+    {
+        $withErrors = array_key_exists(0, $refs);
+        $withValue = array_key_exists(1, $refs);
+
+        $ex = null;
+
+        if (! $withErrors) {
+            if ($error instanceof ExceptionInterface) {
+                throw $error;
+
+            } elseif ($error instanceof \RuntimeException) {
+                throw new RuntimeException($error);
+
+            } else {
+                throw new LogicException($error);
+            }
+        }
+
+        if (! ($error instanceof \Throwable)) {
+            $error = new LogicException($error);
+        }
+
+        $refErrors =& $refs[ 0 ];
+
+        if ($refErrors instanceof AggregateExceptionInterface) {
+            $refErrors->addPrevious($error);
+
+        } else {
+            $refErrors = new LogicException('Aggregate exception', $error);
+        }
+
+        if ($withValue) {
+            return false;
+        }
+
+        return null;
     }
 
 

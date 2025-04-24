@@ -2507,6 +2507,9 @@ class PhpModule
             if ($arg instanceof \Throwable) {
                 $previousList[ $i ] = $arg;
 
+                $messageList[ $i ] = $arg->getMessage();
+                $codeIntegerList[ $i ] = $arg->getCode();
+
                 continue;
             }
 
@@ -2533,10 +2536,10 @@ class PhpModule
 
         $messageDataList = $messageDataList ?? [];
 
-        $message = $messageList ? end($messageList) : null;
-        $code = $codeIntegerList ? end($codeIntegerList) : null;
-        $codeString = $codeStringList ? end($codeStringList) : null;
-        $previous = $previousList ? end($previousList) : null;
+        $message = $messageList ? reset($messageList) : null;
+        $code = $codeIntegerList ? reset($codeIntegerList) : null;
+        $codeString = $codeStringList ? reset($codeStringList) : null;
+        $previous = $previousList ? reset($previousList) : null;
 
         $messageData = $messageDataList
             ? array_replace(...$messageDataList)

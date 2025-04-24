@@ -367,7 +367,7 @@ class ArrModule
                 ? $this->arrpath_dot($dot, $value)
                 : $this->arrpath($value);
 
-            $result = ArrPath::fromValid($array);
+            $result = ArrPath::fromValidArray($array);
 
             return true;
         }

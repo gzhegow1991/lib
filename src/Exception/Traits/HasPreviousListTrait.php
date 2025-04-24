@@ -2,7 +2,7 @@
 
 namespace Gzhegow\Lib\Exception\Traits;
 
-trait AggregateExceptionTrait
+trait HasPreviousListTrait
 {
     /**
      * @var \Throwable[]
@@ -16,5 +16,15 @@ trait AggregateExceptionTrait
     public function getPreviousList() : array
     {
         return $this->previousList;
+    }
+
+    /**
+     * @return static
+     */
+    public function addPrevious(\Throwable $e)
+    {
+        $this->previousList[] = $e;
+
+        return $this;
     }
 }

@@ -384,8 +384,9 @@ $fn = function () use ($ffn) {
     $eeee1 = new \Exception('eeee1', 0);
     $eeee2 = new \Exception('eeee2', 0);
 
-    $previousList = [ $eeee1, $eeee2 ];
-    $eee0 = new \Gzhegow\Lib\Exception\LogicException('eee', 0, ...$previousList);
+    $eee0 = new \Gzhegow\Lib\Exception\LogicException('eee');
+    $eee0->addPrevious($eeee1);
+    $eee0->addPrevious($eeee2);
 
     $ee1 = new \Exception('ee1', 0, $previous = $eee0);
     $ee2 = new \Exception('ee2', 0, $previous = $eee0);
@@ -393,91 +394,38 @@ $fn = function () use ($ffn) {
     $previousList = [ $ee1, $ee2 ];
     $e0 = new \Gzhegow\Lib\Exception\RuntimeException('e', 0, ...$previousList);
 
-    $iit = $e0->getIterator();
-
-    // > or:
-    // $it = new \Gzhegow\Lib\Exception\ExceptionIterator([ $e0 ]);
-    // $iit = new \RecursiveIteratorIterator($it);
-
-    foreach ( $iit as $i => $track ) {
-        foreach ( $track as $ii => $e ) {
-            $phpClass = get_class($e);
-
-            echo "[ {$ii} ] {$e->getMessage()}" . PHP_EOL;
-            echo "{ object # {$phpClass} }" . PHP_EOL;
-            echo PHP_EOL;
-        }
-
-        echo PHP_EOL;
-    }
-
-
-    // $e = new \Gzhegow\Lib\Exception\RuntimeException();
-    // $eTrace = $e->getTraceOverride($ffn->root());
-    // foreach ( $eTrace as $i => $frame ) {
-    //     unset($eTrace[ $i ][ 'line' ]);
-    //     unset($eTrace[ $i ][ 'args' ]);
-    // }
-    //
-    // $ffn->print($e->getFileOverride($ffn->root()));
-    //
-    // echo PHP_EOL;
-    //
-    // $ffn->print_array_multiline($eTrace, 2);
+    $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e0, false);
+    echo implode(PHP_EOL, $messages);
 };
 $ffn->assert_stdout($fn, [], '
 "[ Exception ]"
 
 [ 0 ] e
 { object # Gzhegow\Lib\Exception\RuntimeException }
-
-[ 0.0 ] ee1
-{ object # Exception }
-
-[ 0.0.0 ] eee
-{ object # Gzhegow\Lib\Exception\LogicException }
-
-[ 0.0.0.0 ] eeee1
-{ object # Exception }
-
-
-[ 0 ] e
-{ object # Gzhegow\Lib\Exception\RuntimeException }
-
-[ 0.0 ] ee1
-{ object # Exception }
-
-[ 0.0.0 ] eee
-{ object # Gzhegow\Lib\Exception\LogicException }
-
-[ 0.0.0.1 ] eeee2
-{ object # Exception }
-
-
-[ 0 ] e
-{ object # Gzhegow\Lib\Exception\RuntimeException }
-
-[ 0.1 ] ee2
-{ object # Exception }
-
-[ 0.1.0 ] eee
-{ object # Gzhegow\Lib\Exception\LogicException }
-
-[ 0.1.0.0 ] eeee1
-{ object # Exception }
-
-
-[ 0 ] e
-{ object # Gzhegow\Lib\Exception\RuntimeException }
-
-[ 0.1 ] ee2
-{ object # Exception }
-
-[ 0.1.0 ] eee
-{ object # Gzhegow\Lib\Exception\LogicException }
-
-[ 0.1.0.1 ] eeee2
-{ object # Exception }
+--
+-- [ 0.0 ] ee1
+-- { object # Exception }
+----
+---- [ 0.0.0 ] eee
+---- { object # Gzhegow\Lib\Exception\LogicException }
+------
+------ [ 0.0.0.0 ] eeee1
+------ { object # Exception }
+------
+------ [ 0.0.0.1 ] eeee2
+------ { object # Exception }
+--
+-- [ 0.1 ] ee2
+-- { object # Exception }
+----
+---- [ 0.1.0 ] eee
+---- { object # Gzhegow\Lib\Exception\LogicException }
+------
+------ [ 0.1.0.0 ] eeee1
+------ { object # Exception }
+------
+------ [ 0.1.0.1 ] eeee2
+------ { object # Exception }
 ');
 
 
@@ -639,6 +587,7 @@ $fn = function () use ($ffn) {
     $ffn->print('[ ArrModule ]');
     echo PHP_EOL;
 
+
     $cases = [
         [ [ 1, 2, 3 ], [ 2, 3, 4 ] ],
         [ [ 1, '2', 3 ], [ 2, 3 ] ],
@@ -778,6 +727,41 @@ $fn = function () use ($ffn) {
     );
     $ffn->print_array_multiline($res, 2);
 
+    echo PHP_EOL;
+    echo PHP_EOL;
+
+
+    try {
+        $value = null
+            ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromStatic(1)
+            ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromValidArray(1);
+    }
+    catch ( \Throwable $e ) {
+        $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e, false);
+
+        echo implode(PHP_EOL, $messages) . PHP_EOL;
+        echo PHP_EOL;
+    }
+
+    $e = null;
+    $value = null
+        ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromStatic(1, [ &$e ])
+        ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromValidArray(1, [ &$e ]);
+
+    $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e, false);
+
+    echo implode(PHP_EOL, $messages) . PHP_EOL;
+    echo PHP_EOL;
+
+    $e = null;
+    $status = null
+        ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromStatic(1, [ &$e, &$val ])
+        ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromValidArray(1, [ &$e, &$val ]);
+
+    $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e, false);
+
+    echo implode(PHP_EOL, $messages) . PHP_EOL;
+    echo PHP_EOL;
     echo PHP_EOL;
 
 
@@ -978,6 +962,26 @@ $ffn->assert_stdout($fn, [], '
   ]
 ]
 ###
+
+
+[ 0 ] The `from` must be instance of: Gzhegow\Lib\Modules\Arr\ArrStrict
+{ object # Gzhegow\Lib\Exception\LogicException }
+
+[ 0 ] Aggregate exception
+{ object # Gzhegow\Lib\Exception\LogicException }
+--
+-- [ 0.0 ] The `from` must be instance of: Gzhegow\Lib\Modules\Arr\ArrStrict
+-- { object # Gzhegow\Lib\Exception\LogicException }
+--
+-- [ 0.1 ] The `from` must be array
+-- { object # Gzhegow\Lib\Exception\LogicException }
+
+[ 0 ] Aggregate exception
+{ object # Gzhegow\Lib\Exception\LogicException }
+--
+-- [ 0.0 ] The `from` must be instance of: Gzhegow\Lib\Modules\Arr\ArrStrict
+-- { object # Gzhegow\Lib\Exception\LogicException }
+
 ' . "
 { object # stdClass } | [ \"prop\" => 1, 0 => \"{ object # stdClass }\" ]
 { object # stdClass } | [ \"prop\" => 1, 0 => \"{ object # stdClass }\" ]
