@@ -207,6 +207,7 @@ $ffn->assert_stdout($fn, [], '
 ');
 
 
+
 // >>> TEST
 // > тесты Pipe
 $fn = function () use ($ffn) {
@@ -1166,6 +1167,7 @@ NAN
 ');
 
 
+
 // >>> TEST
 // > тесты BcmathModule
 $fn = function () use ($ffn) {
@@ -1304,6 +1306,7 @@ $ffn->assert_stdout($fn, [], '
 { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "40"
 { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "40"
 ');
+
 
 
 // >>> TEST
@@ -1568,6 +1571,7 @@ e61b8e43f7695621aef5aaef11ac8f66
 15b4d75da3a3cca2ab797a480a27332b
 507c286748b7733a832a91ba9d984f52
 ');
+
 
 
 // >>> TEST
@@ -1877,6 +1881,7 @@ $ffn->assert_stdout($fn, [], '
 ');
 
 
+
 // >>> TEST
 // > тесты DateModule
 $fn = function () use ($ffn) {
@@ -2181,6 +2186,7 @@ TRUE | { object # DateTime # "1970-01-01T00:02:03.000000+00:00" }
 TRUE | { object # DateTime # "1970-01-01T00:02:03.000456+00:00" }
 TRUE | { object # DateTime # "1970-01-01T02:02:03.000456+02:00" }
 ');
+
 
 
 // >>> TEST
@@ -2568,6 +2574,7 @@ FALSE
 ');
 
 
+
 // >>> TEST
 // > тесты EscapeModule
 $fn = function () use ($ffn) {
@@ -2623,6 +2630,7 @@ $ffn->assert_stdout($fn, [], '
 ');
 
 
+
 // >>> TEST
 // > тесты FormatModule
 $fn = function () use ($ffn) {
@@ -2665,6 +2673,7 @@ val1;val2\n
 "
 10
 ');
+
 
 
 // >>> TEST
@@ -2724,6 +2733,7 @@ $ffn->assert_stdout($fn, [], '
 
 "123"
 ');
+
 
 
 // >>> TEST
@@ -2886,6 +2896,7 @@ NULL
 ');
 
 
+
 // >>> TEST
 // > тесты NetModule
 $fn = function () use ($ffn) {
@@ -3015,6 +3026,7 @@ $ffn->assert_stdout($fn, [], '
 ');
 
 
+
 // >>> TEST
 // > тесты ParseModule
 $fn = function () use ($ffn) {
@@ -3052,6 +3064,7 @@ NULL
 "123abcABC"
 NULL
 ');
+
 
 
 // >>> TEST
@@ -3536,6 +3549,7 @@ cb145079faba3ab6cf451fe9116389ba
 ');
 
 
+
 // >>> TEST
 // > тесты PregModule
 $fn = function () use ($ffn) {
@@ -3562,6 +3576,7 @@ $ffn->assert_stdout($fn, [], '
 "/\<html\>.*\<\/html\>/"
 "/\x{3C}\x{68}\x{74}\x{6D}\x{6C}\x{3E}.*\x{3C}\x{2F}\x{68}\x{74}\x{6D}\x{6C}\x{3E}/"
 ');
+
 
 
 // >>> TEST
@@ -3649,6 +3664,7 @@ TRUE
 TRUE
 TRUE
 ');
+
 
 
 // >>> TEST
@@ -3990,6 +4006,7 @@ TRUE | "email@example.com"
 ');
 
 
+
 // >>> TEST
 // > тесты StrModule
 $fn = function () use ($ffn) {
@@ -4226,6 +4243,7 @@ TRUE | "при"
 ]
 ###
 ');
+
 
 
 // >>> TEST
