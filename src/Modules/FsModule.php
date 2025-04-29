@@ -130,7 +130,7 @@ class FsModule
     {
         $result = null;
 
-        $isAllowExists = $isAllowExists ?? false;
+        $isAllowExists = $isAllowExists ?? true;
         $isAllowSymlink = $isAllowSymlink ?? true;
 
         if (! $this->type_path($_value, $value, $refs)) {
@@ -180,7 +180,7 @@ class FsModule
     {
         $result = null;
 
-        $isAllowExists = $isAllowExists ?? false;
+        $isAllowExists = $isAllowExists ?? true;
         $isAllowSymlink = $isAllowSymlink ?? true;
 
         if (! $this->type_path($_value, $value, $refs)) {
