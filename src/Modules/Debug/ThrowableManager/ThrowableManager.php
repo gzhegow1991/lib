@@ -283,9 +283,24 @@ class ThrowableManager implements ThrowableManagerInterface
      */
     public function getThrowableMessageLines(\Throwable $throwable, array $options = []) : array
     {
+        $withCode = $options[ 'with_code' ] ?? false;
+
         $eMessage = $this->getThrowableMessage($throwable, $options);
 
-        $lines = [ $eMessage ];
+        $lines = [];
+
+        if ($withCode) {
+            $eMessage = 'CODE[' . $throwable->getCode() . '] ' . $eMessage;
+        }
+
+        foreach ( explode("\n", $eMessage) as $line ) {
+            $line = trim($line);
+            if ('' === $line) {
+                continue;
+            }
+
+            $lines[] = $line;
+        }
 
         $lines = array_merge(
             $lines,
@@ -319,14 +334,26 @@ class ThrowableManager implements ThrowableManagerInterface
      */
     public function getThrowableMessagesLines(\Throwable $throwable, array $options = []) : array
     {
+        $withCode = $options[ 'with_code' ] ?? false;
+
         $eMessages = $this->getThrowableMessages($throwable, $options);
 
         $lines = [];
 
-        $lines = array_merge(
-            $lines,
-            $eMessages
-        );
+        foreach ( $eMessages as $eMessage ) {
+            if ($withCode) {
+                $eMessage = 'CODE[' . $throwable->getCode() . '] ' . $eMessage;
+            }
+
+            foreach ( explode("\n", $eMessage) as $line ) {
+                $line = trim($line);
+                if ('' === $line) {
+                    continue;
+                }
+
+                $lines[] = $line;
+            }
+        }
 
         $lines = array_merge(
             $lines,

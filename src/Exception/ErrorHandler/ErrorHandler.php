@@ -247,6 +247,8 @@ class ErrorHandler implements ErrorHandlerInterface
             [
                 'dir_root'       => $this->dirRoot,
                 //
+                'with_code'      => true,
+                //
                 'with_file'      => true,
                 'with_file_line' => true,
                 //
