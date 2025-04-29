@@ -3,21 +3,22 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Php\Pipe\Pipe;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
+use Gzhegow\Lib\Modules\Php\Result\ResultManager;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToBoolInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
-use Gzhegow\Lib\Modules\Php\Interfaces\ToIndexInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToObjectInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParser;
+use Gzhegow\Lib\Modules\Php\Result\ResultManagerInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIterableInterface;
-use Gzhegow\Lib\Modules\Php\DebugBacktracer\DebugBacktracer;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
-use Gzhegow\Lib\Modules\Php\DebugBacktracer\DebugBacktracerInterface;
 
 
 class PhpModule
@@ -27,9 +28,10 @@ class PhpModule
      */
     protected $callableParser;
     /**
-     * @var DebugBacktracerInterface
+     * @var ResultManagerInterface
      */
-    protected $debugBacktracer;
+    protected $resultManager;
+
 
     /**
      * @var class-string<\LogicException|\RuntimeException>
@@ -56,22 +58,33 @@ class PhpModule
     }
 
 
-    public function newDebugBacktracer() : DebugBacktracerInterface
+    public function newResultManager() : ResultManagerInterface
     {
-        return new DebugBacktracer();
+        return new ResultManager();
     }
 
-    public function cloneDebugBacktracer() : DebugBacktracerInterface
+    public function cloneResultManager() : ResultManagerInterface
     {
-        return clone $this->debugBacktracer();
+        return clone $this->resultManager();
     }
 
-    public function debugBacktracer(?DebugBacktracerInterface $debugBacktracer = null) : DebugBacktracerInterface
+    public function resultManager(?ResultManagerInterface $resultManager = null) : ResultManagerInterface
     {
-        return $this->debugBacktracer = null
-            ?? $debugBacktracer
-            ?? $this->debugBacktracer
-            ?? new DebugBacktracer();
+        return $this->resultManager = null
+            ?? $resultManager
+            ?? $this->resultManager
+            ?? new ResultManager();
+    }
+
+
+    public function pipe(?Pipe &$p = null) : Pipe
+    {
+        return $p = new Pipe();
+    }
+
+    public function errorBag(?ErrorBag &$b = null) : ErrorBag
+    {
+        return $b = new ErrorBag();
     }
 
 
@@ -754,53 +767,6 @@ class PhpModule
     }
 
 
-    /**
-     * @return array{
-     *     internal: array<string, bool>,
-     *     user: array<string, bool>,
-     * }
-     */
-    public function get_defined_functions() : array
-    {
-        $getDefinedFunctions = get_defined_functions();
-
-        $flipInternal = array_fill_keys($getDefinedFunctions[ 'internal' ] ?? [], true);
-        $flipUser = array_fill_keys($getDefinedFunctions[ 'user' ] ?? [], true);
-
-        ksort($flipInternal);
-        ksort($flipUser);
-
-        $result = [];
-        $result[ 'internal' ] += $flipInternal;
-        $result[ 'user' ] += $flipUser;
-
-        return $result;
-    }
-
-
-    /**
-     * @return callable|null
-     */
-    public function get_error_handler()
-    {
-        $handler = set_error_handler(static function () { });
-        restore_error_handler();
-
-        return $handler;
-    }
-
-    /**
-     * @return callable|null
-     */
-    public function get_exception_handler()
-    {
-        $handler = set_exception_handler(static function () { });
-        restore_exception_handler();
-
-        return $handler;
-    }
-
-
     public function to_bool($value, array $options = []) : bool
     {
         if (is_bool($value)) {
@@ -1234,82 +1200,27 @@ class PhpModule
     }
 
 
-    public function debug_backtrace(
-        ?int $options = null, ?int $limit = null,
-        ?string $fileRoot = null
-    ) : DebugBacktracerInterface
+    /**
+     * @return array{
+     *     internal: array<string, bool>,
+     *     user: array<string, bool>,
+     * }
+     */
+    public function get_defined_functions() : array
     {
-        $theDebugBacktracer = $this->cloneDebugBacktracer();
+        $getDefinedFunctions = get_defined_functions();
 
-        if (null !== $options) $theDebugBacktracer->options($options);
-        if (null !== $limit) $theDebugBacktracer->limit($limit);
-        if (null !== $fileRoot) $theDebugBacktracer->rootDirectory($fileRoot);
+        $flipInternal = array_fill_keys($getDefinedFunctions[ 'internal' ] ?? [], true);
+        $flipUser = array_fill_keys($getDefinedFunctions[ 'user' ] ?? [], true);
 
-        return $theDebugBacktracer;
-    }
+        ksort($flipInternal);
+        ksort($flipUser);
 
-
-    public function microtime($date = null) : string
-    {
-        $decimalPoint = Lib::type()->the_decimal_point();
-
-        if (null === $date) {
-            $mt = microtime();
-
-            [ $msec, $sec ] = explode(' ', $mt, 2);
-
-            $msec = substr($msec, 2, 6);
-            $msec = str_pad($msec, 6, '0');
-
-        } elseif (is_a($date, '\DateTimeInterface')) {
-            $sec = $date->format('s');
-
-            $msec = $date->format('u');
-            $msec = substr($msec, 0, 6);
-            $msec = str_pad($msec, 6, '0');
-
-        } else {
-            throw new LogicException(
-                [ 'The `date` must be instance of \DateTimeInterface', $date ]
-            );
-        }
-
-        $result = ''
-            . $sec
-            . $decimalPoint
-            . $msec;
+        $result = [];
+        $result[ 'internal' ] += $flipInternal;
+        $result[ 'user' ] += $flipUser;
 
         return $result;
-    }
-
-
-    /**
-     * @param object|class-string $objectOrClass
-     *
-     * @return class-string[]
-     */
-    public function class_uses_with_parents($objectOrClass, ?bool $recursive = null)
-    {
-        $recursive = $recursive ?? false;
-
-        $className = $objectOrClass;
-        if (is_object($objectOrClass)) {
-            $className = get_class($objectOrClass);
-        }
-
-        $uses = [];
-
-        $sources = []
-            + array_reverse(class_parents($className))
-            + [ $className => $className ];
-
-        foreach ( $sources as $sourceClassName ) {
-            $uses += $this->class_uses($sourceClassName, $recursive);
-        }
-
-        $uses = array_unique($uses);
-
-        return $uses;
     }
 
     /**
@@ -1338,135 +1249,33 @@ class PhpModule
         return $uses;
     }
 
-
     /**
-     * > is_callable является контекстно-зависимой функцией
-     * > будучи вызванной снаружи класса она не покажет методы protected/private
-     * > если её вызвать в обертке с указанием $newScope - это сработает
+     * @param object|class-string $objectOrClass
      *
-     * @param string|object $newScope
+     * @return class-string[]
      */
-    public function is_callable($value, $newScope = 'static') : bool
+    public function class_uses_with_parents($objectOrClass, ?bool $recursive = null)
     {
-        $result = null;
+        $recursive = $recursive ?? false;
 
-        if ('static' === $newScope) {
-            // > if you need `static` scope you may call the existing php function
-            throw new RuntimeException(
-                'You should pass constant __CLASS__ to second argument to keep scope `static`'
-            );
+        $className = $objectOrClass;
+        if (is_object($objectOrClass)) {
+            $className = get_class($objectOrClass);
         }
 
-        $fnIsCallable = null;
-        if (null !== $newScope) {
-            $fnIsCallable = (static function ($callable) {
-                return is_callable($callable);
-            })->bindTo(null, $newScope);
+        $uses = [];
+
+        $sources = []
+            + array_reverse(class_parents($className))
+            + [ $className => $className ];
+
+        foreach ( $sources as $sourceClassName ) {
+            $uses += $this->class_uses($sourceClassName, $recursive);
         }
 
-        $status = $fnIsCallable
-            ? $fnIsCallable($value)
-            : is_callable($value);
+        $uses = array_unique($uses);
 
-        if ($status) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
-    }
-
-
-    /**
-     * > функция get_class_vars() возвращает только публичные (и статические публичные) свойства для $object_or_class
-     * > чтобы получить доступ ко всем свойствам, её нужно вызвать в обертке
-     *
-     * @param string|object $newScope
-     */
-    public function get_class_vars($object_or_class, $newScope = 'static') : array
-    {
-        if ('static' === $newScope) {
-            // > if you need `static` scope you may call the existing php function
-            throw new RuntimeException(
-                'You should pass constant __CLASS__ to second argument to keep scope `static`'
-            );
-        }
-
-        $fnGetClassVars = null;
-        if (null !== $newScope) {
-            $fnGetClassVars = (static function ($class) {
-                return get_class_vars($class);
-            })->bindTo(null, $newScope);
-        }
-
-        $class = is_object($object_or_class)
-            ? get_class($object_or_class)
-            : $object_or_class;
-
-        $vars = $fnGetClassVars
-            ? $fnGetClassVars($class)
-            : get_class_vars($class);
-
-        return $vars;
-    }
-
-    /**
-     * > функция get_class_methods() возвращает только публичные (и статические публичные) методы для $object_or_class
-     * > чтобы получить доступ ко всем методам, её нужно вызвать в обертке
-     *
-     * @param string|object $newScope
-     */
-    public function get_class_methods($object_or_class, $newScope = 'static') : array
-    {
-        if ('static' === $newScope) {
-            // > if you need `static` scope you may call the existing php function
-            throw new RuntimeException(
-                'You should pass constant __CLASS__ to second argument to keep scope `static`'
-            );
-        }
-
-        $fnGetClassMethods = null;
-        if (null !== $newScope) {
-            $fnGetClassMethods = (static function ($object_or_class) {
-                return get_class_methods($object_or_class);
-            })->bindTo(null, $newScope);
-        }
-
-        $vars = $fnGetClassMethods
-            ? $fnGetClassMethods($object_or_class)
-            : get_class_vars($object_or_class);
-
-        return $vars;
-    }
-
-    /**
-     * > функция get_object_vars() возвращает только публичные свойства для $this
-     * > чтобы получить доступ ко всем свойствам, её нужно вызвать в обертке
-     *
-     * @param string|object $newScope
-     */
-    public function get_object_vars(object $object, $newScope = 'static') : array
-    {
-        if ('static' === $newScope) {
-            // > if you need `static` scope you may call the existing php function
-            throw new RuntimeException(
-                'You should pass constant __CLASS__ to second argument to keep scope `static`'
-            );
-        }
-
-        $fnGetObjectVars = null;
-        if (null !== $newScope) {
-            $fnGetObjectVars = (static function ($object) {
-                return get_object_vars($object);
-            })->bindTo(null, $newScope);
-        }
-
-        $vars = $fnGetObjectVars
-            ? $fnGetObjectVars($object)
-            : get_object_vars($object);
-
-        return $vars;
+        return $uses;
     }
 
 
@@ -1649,296 +1458,133 @@ class PhpModule
 
 
     /**
-     * @param mixed $data
-     */
-    public function serialize($data) : ?string
-    {
-        error_clear_last();
-
-        try {
-            $result = serialize($data);
-        }
-        catch ( \Throwable $e ) {
-            $result = null;
-        }
-
-        if (error_get_last()) {
-            $result = null;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function unserialize(string $data)
-    {
-        error_clear_last();
-
-        try {
-            $result = unserialize($data);
-        }
-        catch ( \Throwable $e ) {
-            $result = null;
-        }
-
-        if (error_get_last()) {
-            $result = null;
-        }
-
-        if (is_object($result) && (get_class($result) === '__PHP_Incomplete_Class')) {
-            $result = null;
-        }
-
-        return $result;
-    }
-
-
-    /**
-     * @param callable $fn
-     */
-    public function fn($fn, array $args = []) : \Closure
-    {
-        return function (...$arguments) use ($fn, $args) {
-            $_args = array_merge($arguments, $args);
-
-            return call_user_func_array($fn, $_args);
-        };
-    }
-
-    /**
-     * @param callable $fn
-     */
-    public function fn_not($fn, array $args = []) : \Closure
-    {
-        return function (...$arguments) use ($fn, $args) {
-            $_args = array_merge($arguments, $args);
-
-            return ! call_user_func_array($fn, $_args);
-        };
-    }
-
-
-    public function function_args(array ...$arrays) : array
-    {
-        $args = [];
-
-        $hasInt = false;
-        $hasString = false;
-        $argsSeenIndex = [];
-        for ( $i = 0; $i < count($arrays); $i++ ) {
-            if ([] === $arrays[ $i ]) {
-                continue;
-            }
-
-            foreach ( array_keys($arrays[ $i ]) as $ii ) {
-                if (isset($argsSeenIndex[ $ii ])) {
-                    throw new LogicException(
-                        [
-                            'Arguments intersection detected',
-                            $ii,
-                            $arrays[ $i ],
-                            $arrays,
-                        ]
-                    );
-                }
-
-                if ((! $hasString) && (is_string($ii))) {
-                    $hasString = true;
-
-                } elseif ((! $hasInt) && is_int($ii)) {
-                    $hasInt = true;
-                }
-
-                if ($hasString && $hasInt) {
-                    throw new LogicException(
-                        [
-                            'The `args` should contain arguments of single type: string or int',
-                            $args,
-                        ]
-                    );
-                }
-
-                $argsSeenIndex[ $ii ] = true;
-            }
-
-            $args += $arrays[ $i ];
-        }
-
-        if ([] !== $args) {
-            if ($hasInt) {
-                $args[] = null;
-
-                $max = array_key_last($args);
-
-                unset($args[ $max ]);
-
-                for ( $i = 0; $i < $max; $i++ ) {
-                    if (! array_key_exists($i, $args)) {
-                        $args[ $i ] = null;
-                    }
-                }
-
-                ksort($args);
-
-            } elseif ($hasString) {
-                if (PHP_VERSION_ID < 80000) {
-                    throw new RuntimeException(
-                        [ 'PHP does not support arguments with string keys', $args ]
-                    );
-                }
-            }
-        }
-
-        return $args;
-    }
-
-    /**
-     * > встроенные функции в php такие как strlen() требуют строгое число аргументов
-     * > стоит передать туда больше аргументов - сразу throw/trigger_error
+     * > функция get_object_vars() возвращает только публичные свойства для $this
+     * > чтобы получить доступ ко всем свойствам, её нужно вызвать в обертке
      *
-     * @noinspection PhpDocMissingThrowsInspection
-     * @noinspection PhpUnhandledExceptionInspection
-     * @throws \RuntimeException
+     * @param string|object $newScope
      */
-    public function call_user_func($fn, ...$args)
+    public function get_object_vars(object $object, $newScope = 'static') : array
     {
-        $isMaybeInternalFunction = is_string($fn) && function_exists($fn);
-
-        if (! $isMaybeInternalFunction) {
-            $result = call_user_func($fn, ...$args);
-
-        } else {
-            $ex = null;
-            $eMsg = null;
-
-            $before = error_reporting(0);
-            error_clear_last();
-
-            try {
-                $result = call_user_func($fn, ...$args);
-            }
-            catch ( \Throwable $ex ) {
-                $eMsg = $ex->getMessage();
-            }
-
-            $err = error_get_last();
-            error_reporting($before);
-
-            if (null !== $err) {
-                $eMsg = $err[ 'message' ];
-            }
-
-            if (null !== $eMsg) {
-                $eMsgKnownList = [
-                    '() expects exactly '  => 19,
-                    '() expects at most '  => 19,
-                    '() expects at least ' => 20,
-                ];
-
-                $isKnown = false;
-                foreach ( $eMsgKnownList as $eSubstr => $eSubstrLen ) {
-                    if (false !== ($pos = strpos($eMsg, $eSubstr))) {
-                        $isKnown = true;
-
-                        break;
-                    }
-                }
-
-                if ($isKnown) {
-                    $max = (int) substr($eMsg, $pos + $eSubstrLen);
-
-                    array_splice($args, $max);
-
-                    $result = call_user_func($fn, ...$args);
-                }
-
-                if ($ex && ! $isKnown) {
-                    throw $ex;
-                }
-            }
+        if ('static' === $newScope) {
+            // > if you need `static` scope you may call the existing php function
+            throw new RuntimeException(
+                'You should pass constant __CLASS__ to second argument to keep scope `static`'
+            );
         }
 
-        return $result;
+        $fnGetObjectVars = null;
+        if (null !== $newScope) {
+            $fnGetObjectVars = (static function ($object) {
+                return get_object_vars($object);
+            })->bindTo(null, $newScope);
+        }
+
+        $vars = $fnGetObjectVars
+            ? $fnGetObjectVars($object)
+            : get_object_vars($object);
+
+        return $vars;
     }
 
     /**
-     * > встроенные функции в php такие как strlen() требуют строгое число аргументов
-     * > стоит передать туда больше аргументов - сразу throw/trigger_error
+     * > функция get_class_vars() возвращает только публичные (и статические публичные) свойства для $object_or_class
+     * > чтобы получить доступ ко всем свойствам, её нужно вызвать в обертке
      *
-     * @noinspection PhpDocMissingThrowsInspection
-     * @noinspection PhpUnhandledExceptionInspection
-     * @throws \RuntimeException
+     * @param string|object $newScope
      */
-    public function call_user_func_array($fn, array $args, ?array &$argsNew = null)
+    public function get_class_vars($object_or_class, $newScope = 'static') : array
     {
-        $argsNew = null;
-
-        $isMaybeInternalFunction = is_string($fn) && function_exists($fn);
-
-        $_args = $this->function_args($args);
-
-        if (! $isMaybeInternalFunction) {
-            $result = call_user_func_array($fn, $_args);
-
-        } elseif (! ($isIntKeys = array_key_exists(0, $_args))) {
-            $result = call_user_func_array($fn, $_args);
-
-        } else {
-            $ex = null;
-            $eMsg = null;
-
-            $before = error_reporting(0);
-            error_clear_last();
-
-            try {
-                $result = call_user_func_array($fn, $_args);
-            }
-            catch ( \Throwable $ex ) {
-                $eMsg = $ex->getMessage();
-            }
-
-            $err = error_get_last();
-            error_reporting($before);
-
-            if (null !== $err) {
-                $eMsg = $err[ 'message' ];
-            }
-
-            if (null !== $eMsg) {
-                $eMsgKnownList = [
-                    '() expects exactly '  => 19,
-                    '() expects at most '  => 19,
-                    '() expects at least ' => 20,
-                ];
-
-                $isKnown = false;
-                foreach ( $eMsgKnownList as $eSubstr => $eSubstrLen ) {
-                    if (false !== ($pos = strpos($eMsg, $eSubstr))) {
-                        $isKnown = true;
-
-                        break;
-                    }
-                }
-
-                if ($ex && ! $isKnown) {
-                    throw $ex;
-                }
-
-                if ($isKnown) {
-                    $max = (int) substr($eMsg, $pos + $eSubstrLen);
-
-                    array_splice($_args, $max);
-
-                    $result = call_user_func_array($fn, $_args);
-                }
-            }
+        if ('static' === $newScope) {
+            // > if you need `static` scope you may call the existing php function
+            throw new RuntimeException(
+                'You should pass constant __CLASS__ to second argument to keep scope `static`'
+            );
         }
 
-        $argsNew = $_args;
+        $fnGetClassVars = null;
+        if (null !== $newScope) {
+            $fnGetClassVars = (static function ($class) {
+                return get_class_vars($class);
+            })->bindTo(null, $newScope);
+        }
 
-        return $result;
+        $class = is_object($object_or_class)
+            ? get_class($object_or_class)
+            : $object_or_class;
+
+        $vars = $fnGetClassVars
+            ? $fnGetClassVars($class)
+            : get_class_vars($class);
+
+        return $vars;
+    }
+
+    /**
+     * > функция get_class_methods() возвращает только публичные (и статические публичные) методы для $object_or_class
+     * > чтобы получить доступ ко всем методам, её нужно вызвать в обертке
+     *
+     * @param string|object $newScope
+     */
+    public function get_class_methods($object_or_class, $newScope = 'static') : array
+    {
+        if ('static' === $newScope) {
+            // > if you need `static` scope you may call the existing php function
+            throw new RuntimeException(
+                'You should pass constant __CLASS__ to second argument to keep scope `static`'
+            );
+        }
+
+        $fnGetClassMethods = null;
+        if (null !== $newScope) {
+            $fnGetClassMethods = (static function ($object_or_class) {
+                return get_class_methods($object_or_class);
+            })->bindTo(null, $newScope);
+        }
+
+        $vars = $fnGetClassMethods
+            ? $fnGetClassMethods($object_or_class)
+            : get_class_vars($object_or_class);
+
+        return $vars;
+    }
+
+
+    /**
+     * > is_callable является контекстно-зависимой функцией
+     * > будучи вызванной снаружи класса она не покажет методы protected/private
+     * > если её вызвать в обертке с указанием $newScope - это сработает
+     *
+     * @param string|object $newScope
+     */
+    public function is_callable($value, $newScope = 'static') : bool
+    {
+        $result = null;
+
+        if ('static' === $newScope) {
+            // > if you need `static` scope you may call the existing php function
+            throw new RuntimeException(
+                'You should pass constant __CLASS__ to second argument to keep scope `static`'
+            );
+        }
+
+        $fnIsCallable = null;
+        if (null !== $newScope) {
+            $fnIsCallable = (static function ($callable) {
+                return is_callable($callable);
+            })->bindTo(null, $newScope);
+        }
+
+        $status = $fnIsCallable
+            ? $fnIsCallable($value)
+            : is_callable($value);
+
+        if ($status) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -2420,6 +2066,335 @@ class PhpModule
     }
 
 
+    /** > подготавливает аргументы для вызова callable, заполняет пустоты в list с помощью NULL */
+    public function function_args(array ...$arrays) : array
+    {
+        $args = [];
+
+        $hasInt = false;
+        $hasString = false;
+        $argsSeenIndex = [];
+        for ( $i = 0; $i < count($arrays); $i++ ) {
+            if ([] === $arrays[ $i ]) {
+                continue;
+            }
+
+            foreach ( array_keys($arrays[ $i ]) as $ii ) {
+                if (isset($argsSeenIndex[ $ii ])) {
+                    throw new LogicException(
+                        [
+                            'Arguments intersection detected',
+                            $ii,
+                            $arrays[ $i ],
+                            $arrays,
+                        ]
+                    );
+                }
+
+                if ((! $hasString) && (is_string($ii))) {
+                    $hasString = true;
+
+                } elseif ((! $hasInt) && is_int($ii)) {
+                    $hasInt = true;
+                }
+
+                if ($hasString && $hasInt) {
+                    throw new LogicException(
+                        [
+                            'The `args` should contain arguments of single type: string or int',
+                            $args,
+                        ]
+                    );
+                }
+
+                $argsSeenIndex[ $ii ] = true;
+            }
+
+            $args += $arrays[ $i ];
+        }
+
+        if ([] !== $args) {
+            if ($hasInt) {
+                $args[] = null;
+
+                $max = array_key_last($args);
+
+                unset($args[ $max ]);
+
+                for ( $i = 0; $i < $max; $i++ ) {
+                    if (! array_key_exists($i, $args)) {
+                        $args[ $i ] = null;
+                    }
+                }
+
+                ksort($args);
+
+            } elseif ($hasString) {
+                if (PHP_VERSION_ID < 80000) {
+                    throw new RuntimeException(
+                        [ 'PHP does not support arguments with string keys', $args ]
+                    );
+                }
+            }
+        }
+
+        return $args;
+    }
+
+    /**
+     * > встроенные функции в php такие как strlen() требуют строгое число аргументов
+     * > стоит передать туда больше аргументов - сразу throw/trigger_error
+     *
+     * @noinspection PhpDocMissingThrowsInspection
+     * @noinspection PhpUnhandledExceptionInspection
+     * @throws \RuntimeException
+     */
+    public function call_user_func($fn, ...$args)
+    {
+        $isMaybeInternalFunction = is_string($fn) && function_exists($fn);
+
+        if (! $isMaybeInternalFunction) {
+            $result = call_user_func($fn, ...$args);
+
+        } else {
+            $ex = null;
+            $eMsg = null;
+
+            $before = error_reporting(0);
+            error_clear_last();
+
+            try {
+                $result = call_user_func($fn, ...$args);
+            }
+            catch ( \Throwable $ex ) {
+                $eMsg = $ex->getMessage();
+            }
+
+            $err = error_get_last();
+            error_reporting($before);
+
+            if (null !== $err) {
+                $eMsg = $err[ 'message' ];
+            }
+
+            if (null !== $eMsg) {
+                $eMsgKnownList = [
+                    '() expects exactly '  => 19,
+                    '() expects at most '  => 19,
+                    '() expects at least ' => 20,
+                ];
+
+                $isKnown = false;
+                foreach ( $eMsgKnownList as $eSubstr => $eSubstrLen ) {
+                    if (false !== ($pos = strpos($eMsg, $eSubstr))) {
+                        $isKnown = true;
+
+                        break;
+                    }
+                }
+
+                if ($isKnown) {
+                    $max = (int) substr($eMsg, $pos + $eSubstrLen);
+
+                    array_splice($args, $max);
+
+                    $result = call_user_func($fn, ...$args);
+                }
+
+                if ($ex && ! $isKnown) {
+                    throw $ex;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * > встроенные функции в php такие как strlen() требуют строгое число аргументов
+     * > стоит передать туда больше аргументов - сразу throw/trigger_error
+     *
+     * @noinspection PhpDocMissingThrowsInspection
+     * @noinspection PhpUnhandledExceptionInspection
+     * @throws \RuntimeException
+     */
+    public function call_user_func_array($fn, array $args, ?array &$argsNew = null)
+    {
+        $argsNew = null;
+
+        $isMaybeInternalFunction = is_string($fn) && function_exists($fn);
+
+        $_args = $this->function_args($args);
+
+        if (! $isMaybeInternalFunction) {
+            $result = call_user_func_array($fn, $_args);
+
+        } elseif (! ($isIntKeys = array_key_exists(0, $_args))) {
+            $result = call_user_func_array($fn, $_args);
+
+        } else {
+            $ex = null;
+            $eMsg = null;
+
+            $before = error_reporting(0);
+            error_clear_last();
+
+            try {
+                $result = call_user_func_array($fn, $_args);
+            }
+            catch ( \Throwable $ex ) {
+                $eMsg = $ex->getMessage();
+            }
+
+            $err = error_get_last();
+            error_reporting($before);
+
+            if (null !== $err) {
+                $eMsg = $err[ 'message' ];
+            }
+
+            if (null !== $eMsg) {
+                $eMsgKnownList = [
+                    '() expects exactly '  => 19,
+                    '() expects at most '  => 19,
+                    '() expects at least ' => 20,
+                ];
+
+                $isKnown = false;
+                foreach ( $eMsgKnownList as $eSubstr => $eSubstrLen ) {
+                    if (false !== ($pos = strpos($eMsg, $eSubstr))) {
+                        $isKnown = true;
+
+                        break;
+                    }
+                }
+
+                if ($ex && ! $isKnown) {
+                    throw $ex;
+                }
+
+                if ($isKnown) {
+                    $max = (int) substr($eMsg, $pos + $eSubstrLen);
+
+                    array_splice($_args, $max);
+
+                    $result = call_user_func_array($fn, $_args);
+                }
+            }
+        }
+
+        $argsNew = $_args;
+
+        return $result;
+    }
+
+
+    /**
+     * @param callable $fn
+     */
+    public function fn($fn, array $args = []) : \Closure
+    {
+        return function (...$arguments) use ($fn, $args) {
+            $_args = array_merge($arguments, $args);
+
+            return call_user_func_array($fn, $_args);
+        };
+    }
+
+    /**
+     * @param callable $fn
+     */
+    public function fn_not($fn, array $args = []) : \Closure
+    {
+        return function (...$arguments) use ($fn, $args) {
+            $_args = array_merge($arguments, $args);
+
+            return ! call_user_func_array($fn, $_args);
+        };
+    }
+
+
+    /**
+     * @param mixed $data
+     */
+    public function serialize($data) : ?string
+    {
+        error_clear_last();
+
+        try {
+            $result = serialize($data);
+        }
+        catch ( \Throwable $e ) {
+            $result = null;
+        }
+
+        if (error_get_last()) {
+            $result = null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function unserialize(string $data)
+    {
+        error_clear_last();
+
+        try {
+            $result = unserialize($data);
+        }
+        catch ( \Throwable $e ) {
+            $result = null;
+        }
+
+        if (error_get_last()) {
+            $result = null;
+        }
+
+        if (is_object($result) && (get_class($result) === '__PHP_Incomplete_Class')) {
+            $result = null;
+        }
+
+        return $result;
+    }
+
+
+    public function microtime($date = null) : string
+    {
+        if (null === $date) {
+            $mt = microtime();
+
+            [ $msec, $sec ] = explode(' ', $mt, 2);
+
+            $msec = substr($msec, 2, 6);
+            $msec = str_pad($msec, 6, '0');
+
+        } elseif ($date instanceof \DateTimeInterface) {
+            $sec = $date->format('s');
+
+            $msec = $date->format('u');
+            $msec = substr($msec, 0, 6);
+            $msec = str_pad($msec, 6, '0');
+
+        } else {
+            throw new LogicException(
+                [ 'The `date` must be instance of \DateTimeInterface', $date ]
+            );
+        }
+
+        $decimalPoint = Lib::type()->the_decimal_point();
+
+        $result = ''
+            . $sec
+            . $decimalPoint
+            . $msec;
+
+        return $result;
+    }
+
+
     /**
      * @param class-string<\LogicException|\RuntimeException>|null $throwableClass
      *
@@ -2434,11 +2409,13 @@ class PhpModule
             )) {
                 throw new LogicException(
                     [
-                        'The `throwableClass` should be class-string that is subclass one of: '
+                        ''
+                        . 'The `throwableClass` should be class-string that is subclass one of: '
                         . implode('|', [
                             \LogicException::class,
                             \RuntimeException::class,
                         ]),
+                        //
                         $throwableClass,
                     ]
                 );
@@ -2462,6 +2439,7 @@ class PhpModule
 
         $messageList = [];
         $messageDataList = [];
+        $messageObjectList = [];
         $codeIntegerList = [];
         $codeStringList = [];
         $previousList = [];
@@ -2489,9 +2467,7 @@ class PhpModule
             ) {
                 $messageData = (array) $arg;
 
-                $messageString = isset($messageData[ 0 ])
-                    ? (string) $messageData[ 0 ]
-                    : '';
+                $messageString = (string) ($messageData[ 0 ] ?? null);
 
                 if ('' !== $messageString) {
                     unset($messageData[ 0 ]);
@@ -2507,54 +2483,49 @@ class PhpModule
             if ($arg instanceof \Throwable) {
                 $previousList[ $i ] = $arg;
 
-                $messageList[ $i ] = $arg->getMessage();
-                $codeIntegerList[ $i ] = $arg->getCode();
-
                 continue;
             }
 
             $__unresolved[ $i ] = $arg;
         }
 
+        if (([] === $messageList) && ([] !== $previousList)) {
+            foreach ( $previousList as $i => $previous ) {
+                $messageList[ $i ] = $previous->getMessage();
+            }
+        }
+
         for ( $i = 0; $i < $len; $i++ ) {
             if (isset($messageList[ $i ])) {
-                if (preg_match('/^[a-z](?!.*\s)/i', $messageList[ $i ])) {
+                if (! preg_match('/[^a-z0-9_]/i', $messageList[ $i ])) {
                     $codeStringList[ $i ] = strtoupper($messageList[ $i ]);
                 }
             }
+        }
+
+        foreach ( $messageList as $i => $messageString ) {
+            $messageData = $messageDataList[ $i ] ?? [];
+
+            $messageObjectList[ $i ] = (object) ([ $messageString ] + $messageData);
         }
 
         $result = [];
 
         $result[ 'messageList' ] = $messageList;
         $result[ 'messageDataList' ] = $messageDataList;
-
+        $result[ 'messageObjectList' ] = $messageObjectList;
         $result[ 'codeIntegerList' ] = $codeIntegerList;
         $result[ 'codeStringList' ] = $codeStringList;
-
         $result[ 'previousList' ] = $previousList;
 
-        $messageDataList = $messageDataList ?? [];
-
-        $message = $messageList ? reset($messageList) : null;
-        $code = $codeIntegerList ? reset($codeIntegerList) : null;
-        $codeString = $codeStringList ? reset($codeStringList) : null;
-        $previous = $previousList ? reset($previousList) : null;
-
-        $messageData = $messageDataList
-            ? array_replace(...$messageDataList)
-            : [];
-
-        $messageObject = (object) ([ $message ] + $messageData);
-
-        $result[ 'message' ] = $message ?? '';
-        $result[ 'messageData' ] = $messageData;
-        $result[ 'messageObject' ] = $messageObject;
-
-        $result[ 'code' ] = $code ?? -1;
-        $result[ 'codeString' ] = $codeString;
-
-        $result[ 'previous' ] = $previous;
+        $result += [
+            'message'       => (([] !== $messageList) ? reset($messageList) : ''),
+            'messageData'   => (([] !== $messageDataList) ? reset($messageDataList) : []),
+            'messageObject' => (([] !== $messageObjectList) ? reset($messageObjectList) : null),
+            'code'          => (([] !== $codeIntegerList) ? reset($codeIntegerList) : -1),
+            'codeString'    => (([] !== $codeStringList) ? reset($codeStringList) : ''),
+            'previous'      => (([] !== $previousList) ? reset($previousList) : null),
+        ];
 
         $result[ '__unresolved' ] = $__unresolved;
 
@@ -2564,7 +2535,35 @@ class PhpModule
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function throw(?array $trace, $throwableOrArg, ...$throwableArgs)
+    public function throw($throwableOrArg, ...$throwableArgs) : void
+    {
+        $throwableClass = $this->static_throwable_class();
+
+        $trace = property_exists($throwableClass, 'trace')
+            ? debug_backtrace()
+            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $this->throw_trace($trace, $throwableOrArg, ...$throwableArgs);
+    }
+
+    /**
+     * @throws \LogicException|\RuntimeException
+     */
+    public function throw_new(...$throwableArgs) : void
+    {
+        $throwableClass = $this->static_throwable_class();
+
+        $trace = property_exists($throwableClass, 'trace')
+            ? debug_backtrace()
+            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $this->throw_new_trace($trace, ...$throwableArgs);
+    }
+
+    /**
+     * @throws \LogicException|\RuntimeException
+     */
+    public function throw_trace(array $trace, $throwableOrArg, ...$throwableArgs) : void
     {
         if (
             ($throwableOrArg instanceof \LogicException)
@@ -2575,55 +2574,15 @@ class PhpModule
 
         array_unshift($throwableArgs, $throwableOrArg);
 
-        $throwableClass = $this->static_throwable_class();
-
-        if (null === $trace) {
-            $trace = property_exists($throwableClass, 'trace')
-                ? debug_backtrace()
-                : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-        }
-
-        $_throwableArgs = $this->throwable_args(...$throwableArgs);
-        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
-        $_throwableArgs[ 'trace' ] = $trace;
-
-        $exceptionArgs = [];
-        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
-
-        $e = new $throwableClass(...$exceptionArgs);
-
-        foreach ( $_throwableArgs as $key => $value ) {
-            if (! property_exists($e, $key)) {
-                unset($_throwableArgs[ $key ]);
-            }
-        }
-
-        $fn = (function () use (&$_throwableArgs) {
-            foreach ( $_throwableArgs as $key => $value ) {
-                $this->{$key} = $value;
-            }
-        })->bindTo($e, $e);
-
-        $fn();
-
-        throw $e;
+        $this->throw_new_trace($trace, ...$throwableArgs);
     }
 
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function throw_new(?array $trace, ...$throwableArgs)
+    public function throw_new_trace(array $trace, ...$throwableArgs) : void
     {
         $throwableClass = $this->static_throwable_class();
-
-        if (null === $trace) {
-            $trace = property_exists($throwableClass, 'trace')
-                ? debug_backtrace()
-                : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-        }
 
         $_throwableArgs = $this->throwable_args(...$throwableArgs);
         $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
@@ -2652,99 +2611,5 @@ class PhpModule
         $fn();
 
         throw $e;
-    }
-
-
-    /**
-     * @return object{ stack: array }
-     */
-    public function errors() : object
-    {
-        static $current;
-
-        $current = $current
-            ?? new class {
-                /**
-                 * @var object[]
-                 */
-                public $stack = [];
-            };
-
-        return $current;
-    }
-
-    /**
-     * @return object{ list: array }
-     */
-    public function errors_current() : ?object
-    {
-        $stack = $this->errors();
-
-        $errors = ([] !== $stack->stack)
-            ? end($stack->stack)
-            : null;
-
-        return $errors;
-    }
-
-    /**
-     * @return object{ list: array }
-     */
-    public function errors_new() : object
-    {
-        $errors = new class {
-            /**
-             * @var array
-             */
-            public $list = [];
-        };
-
-        return $errors;
-    }
-
-    /**
-     * @return object{ list: array }
-     */
-    public function errors_start(?object &$errors = null) : object
-    {
-        $stack = $this->errors();
-
-        $errors = $this->errors_new();
-
-        $stack->stack[] = $errors;
-
-        return $errors;
-    }
-
-    public function errors_end(?object $until) : array
-    {
-        $stack = $this->errors();
-
-        $errors = $this->errors_new();
-
-        while ( count($stack->stack) ) {
-            $current = array_pop($stack->stack);
-
-            foreach ( $current->list as $error ) {
-                $errors->list[] = $error;
-            }
-
-            if ($current === $until) {
-                break;
-            }
-        }
-
-        return $errors->list;
-    }
-
-    public function error($error, $result = null)
-    {
-        $current = $this->errors_current();
-
-        if (null !== $current) {
-            $current->list[] = $error;
-        }
-
-        return $result;
     }
 }

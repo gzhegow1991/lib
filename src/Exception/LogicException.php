@@ -17,7 +17,15 @@ class LogicException extends \LogicException implements
     {
         $args = Lib::php()->throwable_args(...$throwableArgs);
 
+        $this->messageList = array_values($args[ 'messageList' ]);
+        $this->messageObjectList = array_values($args[ 'messageObjectList' ]);
         $this->previousList = array_values($args[ 'previousList' ]);
+
+        $cnt = count($args[ 'messageList' ]);
+
+        if ($cnt > 1) {
+            $args[ 'message' ] = 'Multiple errors occured: ' . $cnt;
+        }
 
         parent::__construct(
             $args[ 'message' ],
@@ -32,6 +40,6 @@ class LogicException extends \LogicException implements
      */
     public function getIterator() : \Traversable
     {
-        return ErrorHandler::getThrowableIterator($this);
+        return Lib::php()->get_throwable_previous_iterator($this);
     }
 }

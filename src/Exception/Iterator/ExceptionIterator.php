@@ -34,9 +34,9 @@ class ExceptionIterator implements \RecursiveIterator
 
         $_track = [];
         foreach ( $track as $i => $e ) {
-            $_i = (string) $i;
+            $iString = (string) $i;
 
-            if ('' === $_i) {
+            if ('' === $iString) {
                 throw new \LogicException(
                     'Each of keys of `track` should be non-empty string'
                 );

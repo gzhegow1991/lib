@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Php\DebugBacktracer;
+namespace Gzhegow\Lib\Modules\Debug\DebugBacktracer;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
@@ -15,6 +15,11 @@ class DebugBacktracer implements DebugBacktracerInterface
     protected $trace;
 
     /**
+     * @var string
+     */
+    protected $dirRoot;
+
+    /**
      * @var int
      */
     protected $options = DEBUG_BACKTRACE_IGNORE_ARGS;
@@ -22,11 +27,6 @@ class DebugBacktracer implements DebugBacktracerInterface
      * @var int
      */
     protected $limit = 0;
-
-    /**
-     * @var string
-     */
-    protected $rootDirectory;
 
     /**
      * @var array
@@ -59,7 +59,7 @@ class DebugBacktracer implements DebugBacktracerInterface
     /**
      * @return static
      */
-    public function trace(array $trace)
+    public function trace(?array $trace)
     {
         $this->trace = $trace;
 
@@ -70,44 +70,50 @@ class DebugBacktracer implements DebugBacktracerInterface
     /**
      * @return static
      */
-    public function options(?int $options = null)
+    public function dirRoot(?string $dirRoot)
     {
-        $options = $options ?? -1;
-
-        if ($options < 0) $options = DEBUG_BACKTRACE_IGNORE_ARGS;
-
-        $this->options = $options;
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function limit(?int $limit = null)
-    {
-        $limit = $limit ?? 0;
-
-        if ($limit < 0) $limit = 1;
-
-        $this->limit = $limit;
-
-        return $this;
-    }
-
-
-    /**
-     * @return static
-     */
-    public function rootDirectory(string $rootDirectory)
-    {
-        if (! Lib::fs()->type_dirpath_realpath($realpath, $rootDirectory)) {
-            throw new LogicException(
-                [ 'The `rootDirectory` should be existing directory path', $rootDirectory ]
-            );
+        if (null !== $dirRoot) {
+            if (! Lib::fs()->type_dirpath_realpath($realpath, $dirRoot)) {
+                throw new LogicException(
+                    [ 'The `rootDirectory` should be existing directory path', $dirRoot ]
+                );
+            }
         }
 
-        $this->rootDirectory = $realpath;
+        $this->dirRoot = $realpath ?? null;
+
+        return $this;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function options(?int $options)
+    {
+        if (null !== $options) {
+            if ($options < 0) {
+                $options = null;
+            }
+        }
+
+        $this->options = $options ?? DEBUG_BACKTRACE_IGNORE_ARGS;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function limit(?int $limit)
+    {
+        if (null !== $limit) {
+            if ($limit < 0) {
+                $limit = null;
+            }
+        }
+
+        $this->limit = $limit ?? 0;
 
         return $this;
     }
@@ -450,7 +456,7 @@ class DebugBacktracer implements DebugBacktracerInterface
     {
         $theFs = Lib::fs();
 
-        $hasRootDirectory = (null !== ($rootDirectory = $this->rootDirectory));
+        $hasDirRoot = (null !== ($dirRoot = $this->dirRoot));
 
         $trace = $this->trace;
 
@@ -667,8 +673,8 @@ class DebugBacktracer implements DebugBacktracerInterface
                 }
             }
 
-            if ($hasRootDirectory) {
-                $t[ 'file' ] = $theFs->path_relative($t[ 'file' ], $rootDirectory);
+            if ($hasDirRoot) {
+                $t[ 'file' ] = $theFs->path_relative($t[ 'file' ], $dirRoot);
             }
 
             $t += [

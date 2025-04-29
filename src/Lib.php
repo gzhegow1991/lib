@@ -4,7 +4,6 @@ namespace Gzhegow\Lib;
 
 use Gzhegow\Lib\Modules\FsModule;
 use Gzhegow\Lib\Modules\MbModule;
-use Gzhegow\Lib\Modules\Php\Pipe;
 use Gzhegow\Lib\Modules\CliModule;
 use Gzhegow\Lib\Modules\NetModule;
 use Gzhegow\Lib\Modules\PhpModule;
@@ -27,15 +26,28 @@ use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
 use Gzhegow\Lib\Modules\SocialModule;
+use Gzhegow\Lib\Modules\Php\Pipe\Pipe;
 use Gzhegow\Lib\Modules\ItertoolsModule;
-use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Exception\ExceptionInterface;
-use Gzhegow\Lib\Exception\AggregateExceptionInterface;
+use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
+use Gzhegow\Lib\Exception\ErrorHandler\ErrorHandler;
+use Gzhegow\Lib\Exception\ErrorHandler\ErrorHandlerInterface;
 
 
 class Lib
 {
+    /**
+     * @return ErrorHandlerInterface
+     */
+    public static $errorHandler;
+
+    public static function errorHandler(?ErrorHandlerInterface $instance = null) : ErrorHandlerInterface
+    {
+        return static::$errorHandler = $instance
+            ?? static::$errorHandler
+            ?? new ErrorHandler();
+    }
+
+
     /**
      * @return AssertModule
      */
@@ -362,33 +374,7 @@ class Lib
             ? debug_backtrace()
             : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $_throwableArgs = $thePhp->throwable_args(...$throwableArgs);
-        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
-        $_throwableArgs[ 'trace' ] = $trace;
-
-        $exceptionArgs = [];
-        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
-
-        $e = new $throwableClass(...$exceptionArgs);
-
-        foreach ( $_throwableArgs as $key => $value ) {
-            if (! property_exists($e, $key)) {
-                unset($_throwableArgs[ $key ]);
-            }
-        }
-
-        $fn = (function () use (&$_throwableArgs) {
-            foreach ( $_throwableArgs as $key => $value ) {
-                $this->{$key} = $value;
-            }
-        })->bindTo($e, $e);
-
-        $fn();
-
-        throw $e;
+        $thePhp->throw_new_trace($trace, ...$throwableArgs);
     }
 
     /**
@@ -406,50 +392,18 @@ class Lib
             ? debug_backtrace()
             : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $_throwableArgs = $thePhp->throwable_args(...$throwableArgs);
-        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
-        $_throwableArgs[ 'trace' ] = $trace;
-
-        $exceptionArgs = [];
-        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
-
-        $e = new $throwableClass(...$exceptionArgs);
-
-        foreach ( $_throwableArgs as $key => $value ) {
-            if (! property_exists($e, $key)) {
-                unset($_throwableArgs[ $key ]);
-            }
-        }
-
-        $fn = (function () use (&$_throwableArgs) {
-            foreach ( $_throwableArgs as $key => $value ) {
-                $this->{$key} = $value;
-            }
-        })->bindTo($e, $e);
-
-        $fn();
-
-        throw $e;
+        $thePhp->throw_new_trace($trace, ...$throwableArgs);
     }
 
 
-    /**
-     * > фабрика для Pipeline
-     */
-    public static function pipe() : Pipe
+    public static function errorBag(?ErrorBag &$b = null) : ErrorBag
     {
-        return new Pipe();
+        return Lib::php()->errorBag($b);
     }
 
-    /**
-     * > удобный вызов AssertModule для цепочечной проверки типа
-     */
-    public static function assertOf($value) : AssertModule
+    public static function pipe(?Pipe &$p = null) : Pipe
     {
-        return static::assert()->of($value);
+        return Lib::php()->pipe($p);
     }
 
 
@@ -511,133 +465,4 @@ class Lib
 
         return $mt;
     }
-
-
-    /**
-     * > используется в from{type}() методах, что внутри ValueObject-ов
-     *
-     * @param array{ 0?: AggregateExceptionInterface, 1?: mixed } $refs
-     *
-     * @return true|mixed
-     */
-    public static function refsResult(array $refs, $value)
-    {
-        $withValue = array_key_exists(1, $refs);
-
-        if ($withValue) {
-            $refValue =& $refs[ 1 ];
-            $refValue = $value;
-
-            return true;
-        }
-
-        return $value;
-    }
-
-    /**
-     * > используется в from{type}() методах, что внутри ValueObject-ов
-     *
-     * @param array{ 0?: AggregateExceptionInterface, 1?: mixed } $refs
-     *
-     * @return false|null
-     */
-    public static function refsError(array $refs, $error) : ?bool
-    {
-        $withErrors = array_key_exists(0, $refs);
-        $withValue = array_key_exists(1, $refs);
-
-        if (! $withErrors) {
-            if ($error instanceof ExceptionInterface) {
-                throw $error;
-
-            } elseif ($error instanceof \RuntimeException) {
-                throw new RuntimeException($error);
-
-            } else {
-                throw new LogicException($error);
-            }
-        }
-
-        if (! ($error instanceof \Throwable)) {
-            $error = new LogicException($error);
-        }
-
-        $refErrors =& $refs[ 0 ];
-
-        if ($refErrors instanceof AggregateExceptionInterface) {
-            $refErrors->addPrevious($error);
-
-        } elseif (null === $refErrors) {
-            $refErrors = new LogicException('Aggregate exception', $error);
-        }
-
-        if ($withValue) {
-            return false;
-        }
-
-        return null;
-    }
-
-
-    /**
-     * > благодаря PHP COMMUNITY!!111 мы теперь обязаны строго повторят return-type даже для Internal классов
-     * > для старой ПХП теперь отдельная фабрика, где на это наплевать
-     *
-     * @template-covariant T of object
-     *
-     * @param class-string<T> $class
-     *
-     * @return T
-     */
-    public static function new7(string $class, ...$args)
-    {
-        if (PHP_VERSION_ID < 80000) {
-            return new $class(...$args);
-        }
-
-        $pi = Lib::php()->pathinfo($class, '\\');
-        $namespace = $pi[ 'dirname' ];
-        $namespace .= '\\PHP8';
-        $classname = $pi[ 'basename' ];
-
-        $fqcn = "\\{$namespace}\\{$classname}";
-
-        $result = new $fqcn(...$args);
-
-        return $result;
-    }
-
-    /**
-     * > благодаря PHP COMMUNITY!!111 мы теперь обязаны строго повторят return-type даже для Internal классов
-     * > для восьмой ПХП теперь отдельная фабрика, где все типы на месте
-     *
-     * @template-covariant T of object
-     *
-     * @param class-string<T> $class
-     *
-     * @return T
-     */
-    public static function new8(string $class, ...$args)
-    {
-        if (PHP_VERSION_ID >= 80000) {
-            return new $class(...$args);
-        }
-
-        $pi = Lib::php()->pathinfo($class, '\\');
-        $namespace = $pi[ 'dirname' ];
-        $namespace .= '\\PHP7';
-        $classname = $pi[ 'basename' ];
-
-        $fqcn = "\\{$namespace}\\{$classname}";
-
-        $result = new $fqcn(...$args);
-
-        return $result;
-    }
-
-
-    /**
-     * @var array<string, mixed>
-     */
-    protected static $modules = [];
 }

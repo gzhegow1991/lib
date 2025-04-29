@@ -2,8 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Net;
 
-use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Modules\Php\Result\Result;
 
 
 class AddressIpV4
@@ -28,59 +27,53 @@ class AddressIpV4
     /**
      * @return static|bool|null
      */
-    public static function fromValid($from, array $refs = [])
+    public static function fromValid($from, $ctx = null)
     {
-        $withErrors = array_key_exists(0, $refs);
-
-        $refs[ 0 ] = $refs[ 0 ] ?? null;
+        $ctxCur = Result::nullchain();
 
         $instance = null
-            ?? static::fromStatic($from, $refs)
-            ?? static::fromValidString($from, $refs);
+            ?? static::fromStatic($from, $ctxCur)
+            ?? static::fromValidString($from, $ctxCur);
 
-        if (! $withErrors) {
-            if (null === $instance) {
-                throw $refs[ 0 ];
-            }
+        if ($ctxCur->isErr()) {
+            return Result::err($ctx, $ctxCur);
         }
 
-        return $instance;
+        return Result::ok($ctx, $instance);
     }
 
     /**
      * @return static|bool|null
      */
-    public static function fromStatic($from, array $refs = [])
+    public static function fromStatic($from, $ctx = null)
     {
         if ($from instanceof static) {
-            return Lib::refsResult($refs, $from);
+            return Result::ok($ctx, $from);
         }
 
-        return Lib::refsError(
-            $refs,
-            new LogicException(
-                [ 'The `from` must be instance of: ' . static::class, $from ]
-            )
+        return Result::err(
+            $ctx,
+            [ 'The `from` must be instance of: ' . static::class, $from ],
+            [ __FILE__, __LINE__ ]
         );
     }
 
     /**
      * @return static|bool|null
      */
-    public static function fromValidString($from, array $refs = [])
+    public static function fromValidString($from, $ctx = null)
     {
         if (is_string($from)) {
             $instance = new static();
             $instance->value = $from;
 
-            return Lib::refsResult($refs, $instance);
+            return Result::ok($ctx, $instance);
         }
 
-        return Lib::refsError(
-            $refs,
-            new LogicException(
-                [ 'The `from` must be string', $from ]
-            )
+        return Result::err(
+            $ctx,
+            [ 'The `from` must be string', $from ],
+            [ __FILE__, __LINE__ ]
         );
     }
 

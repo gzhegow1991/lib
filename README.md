@@ -29,11 +29,14 @@ ini_set('memory_limit', '32M');
 // > настраиваем обработку ошибок
 // > некоторые CMS сами по себе применяют error_reporting/set_error_handler/set_exception_handler глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
-(new \Gzhegow\Lib\Exception\ErrorHandler())
+($ex = \Gzhegow\Lib\Lib::errorHandler())
+    // > частично удаляет путь файла из каждой строки `trace` (`trace[i][file]`)
+    ->setDirRoot(__DIR__ . '/..')
+    //
     // > index.php
     // ->setErrorReporting(E_ALL)
-    // ->setErrorHandler([ \Gzhegow\Lib\Exception\ErrorHandler::class, 'error_handler' ])
-    // ->setExceptionHandler([ \Gzhegow\Lib\Exception\ErrorHandler::class, 'exception_handler' ])
+    // ->setErrorHandler([ $ex, 'fnErrorHandler' ])
+    // ->setExceptionHandler([ $ex, 'fnExceptionHandler' ])
     //
     // > ... какой-то код самой CMS
     //
@@ -104,6 +107,125 @@ $ffn = new class {
 };
 
 
+
+// >>> TEST
+// > тесты Exception
+$fn = function () use ($ffn) {
+    $ffn->print('[ Exception ]');
+    echo PHP_EOL;
+
+    $eeee1 = new \Exception('eeee1', 0);
+    $eeee2 = new \Exception('eeee2', 0);
+
+    $eee0 = new \Gzhegow\Lib\Exception\LogicException('eee');
+    $eee0->addPrevious($eeee1);
+    $eee0->addPrevious($eeee2);
+
+    $ee1 = new \Exception('ee1', 0, $previous = $eee0);
+    $ee2 = new \Exception('ee2', 0, $previous = $eee0);
+
+    $previousList = [ $ee1, $ee2 ];
+    $e0 = new \Gzhegow\Lib\Exception\RuntimeException('e', 0, ...$previousList);
+
+    $messages = \Gzhegow\Lib\Lib::debug()
+        ->throwableManager()
+        ->getPreviousMessagesLines(
+            $e0,
+            [ 'with_file' => false ]
+        )
+    ;
+    echo implode(PHP_EOL, $messages);
+};
+$ffn->assert_stdout($fn, [], '
+"[ Exception ]"
+
+[ 0 ] e
+{ object # Gzhegow\Lib\Exception\RuntimeException }
+--
+-- [ 0.0 ] ee1
+-- { object # Exception }
+----
+---- [ 0.0.0 ] eee
+---- { object # Gzhegow\Lib\Exception\LogicException }
+------
+------ [ 0.0.0.0 ] eeee1
+------ { object # Exception }
+------
+------ [ 0.0.0.1 ] eeee2
+------ { object # Exception }
+--
+-- [ 0.1 ] ee2
+-- { object # Exception }
+----
+---- [ 0.1.0 ] eee
+---- { object # Gzhegow\Lib\Exception\LogicException }
+------
+------ [ 0.1.0.0 ] eeee1
+------ { object # Exception }
+------
+------ [ 0.1.0.1 ] eeee2
+------ { object # Exception }
+');
+
+
+
+// >>> TEST
+// > тесты ErrorBag
+$fn = function () use ($ffn) {
+    $ffn->print('[ ErrorBag ]');
+    echo PHP_EOL;
+
+    \Gzhegow\Lib\Lib::errorBag($b);
+
+    for ( $i = 0; $i < 2; $i++ ) {
+        $tag = 'tag' . $i;
+
+        for ( $ii = 0; $ii < 2; $ii++ ) {
+            $ttag = 'ttag' . $ii;
+
+            for ( $iii = 0; $iii < 2; $iii++ ) {
+                $tttag = 'tttag' . $iii;
+
+                $b->error("[ Error ] {$i}.{$ii}.{$iii}", [ $tag, $ttag, $tttag ], [ __FILE__, __LINE__ ]);
+            }
+        }
+    }
+
+    $list = $b->getErrorsByTags([ 'tttag0' ]); // 4
+
+    $print = [];
+    foreach ( $list as $l ) {
+        $print[] = [ $l->error, $l ];
+    }
+
+    $ffn->print_array_multiline($print, 2);
+};
+$ffn->assert_stdout($fn, [], '
+"[ ErrorBag ]"
+
+###
+[
+  [
+    "[ Error ] 0.0.0",
+    "{ object # Gzhegow\Lib\Modules\Php\ErrorBag\Error }"
+  ],
+  [
+    "[ Error ] 0.1.0",
+    "{ object # Gzhegow\Lib\Modules\Php\ErrorBag\Error }"
+  ],
+  [
+    "[ Error ] 1.0.0",
+    "{ object # Gzhegow\Lib\Modules\Php\ErrorBag\Error }"
+  ],
+  [
+    "[ Error ] 1.1.0",
+    "{ object # Gzhegow\Lib\Modules\Php\ErrorBag\Error }"
+  ]
+]
+###
+');
+
+
 // >>> TEST
 // > тесты Pipe
 $fn = function () use ($ffn) {
@@ -164,6 +286,151 @@ Hello World! Your value is: [ "1" ]
 Hello World! Your value is: [ "0" ]
 "catch"
 ');
+
+
+
+// >>> TEST
+// > тесты ArrayOf
+$fn = function () use ($ffn) {
+    $ffn->print('[ ArrayOf ]');
+    echo PHP_EOL;
+
+
+    $notAnObject = 1;
+    $objectStdClass = new \stdClass();
+    $objectArrayObject = new ArrayObject();
+    $objectAnonymousStdClass = new class extends \stdClass {
+    };
+
+
+    // > осторожно, `ArrayOf` не проверяет типы при добавлении, для этого есть `ArrayOfType` или `ArrayOfClass`
+    // > этот объект сделан для того, чтобы убедится, что другой разработчик создал его с правильным типом
+    // > при этом он может положить туда что захочет, это похоже на указание PHPDoc
+    $arrayOf = (PHP_VERSION_ID >= 80000)
+        ? \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::class
+        : \Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf::class;
+
+    /** @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf $theArrayOf */
+    $theArrayOf = new $arrayOf('object');
+    $theArrayOf[] = $notAnObject;
+    $ffn->print($theArrayOf);
+    $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
+
+    echo PHP_EOL;
+
+
+    $arrayOf = (PHP_VERSION_ID >= 80000)
+        ? \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::class
+        : \Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfType::class;
+
+    /** @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType $theArrayOf */
+    $theArrayOf = new $arrayOf('object');
+    $theArrayOf[] = $objectStdClass;
+    $theArrayOf[] = $objectArrayObject;
+
+    try {
+        $theArrayOf[] = $notAnObject;
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+    $ffn->print($theArrayOf);
+    $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
+
+    echo PHP_EOL;
+
+
+    $arrayOf = (PHP_VERSION_ID >= 80000)
+        ? \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::class
+        : \Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfClass::class;
+
+    /** @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass $theArrayOf */
+    $theArrayOf = new $arrayOf(\stdClass::class);
+    $theArrayOf[] = $objectStdClass;
+
+    try {
+        $theArrayOf[] = $objectArrayObject;
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+
+    try {
+        $theArrayOf[] = $objectAnonymousStdClass;
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+
+    try {
+        $theArrayOf[] = $notAnObject;
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+    $ffn->print($theArrayOf);
+    $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
+
+    echo PHP_EOL;
+
+
+    $map = (PHP_VERSION_ID >= 80000)
+        ? \Gzhegow\Lib\Modules\Arr\Map\Map::class
+        : \Gzhegow\Lib\Modules\Arr\Map\PHP7\Map::class;
+
+    /** @var \Gzhegow\Lib\Modules\Arr\Map\Map $theMap */
+    $theMap = new $map();
+    $theMap[ $stdClass = new \stdClass() ] = 1;
+    $theMap[ $array = [ 1, 2, 3 ] ] = 1;
+    $ffn->print($theMap);
+    $ffn->print(isset($theMap[ $stdClass ]), isset($theMap[ $array ]));
+    $ffn->print_array($theMap->keys(), 1);
+    $ffn->print_array($theMap->values(), 2);
+};
+$ffn->assert_stdout($fn, [], PHP_VERSION_ID >= 80000
+    ? '
+"[ ArrayOf ]"
+
+{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf }
+TRUE | [ 1 ]
+
+"[ CATCH ] The `value` should be of type: object"
+{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType }
+TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable) # ArrayObject }" ]
+
+"[ CATCH ] The `value` should be of class: stdClass"
+"[ CATCH ] The `value` should be of class: stdClass"
+"[ CATCH ] The `value` should be object"
+{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass }
+TRUE | [ "{ object # stdClass }" ]
+
+{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\Map\Map }
+TRUE | TRUE
+[ "{ object # stdClass }", "{ array(3) }" ]
+[ 1, 1 ]
+'
+    : '
+"[ ArrayOf ]"
+
+{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf }
+TRUE | [ 1 ]
+
+"[ CATCH ] The `value` should be of type: object"
+{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfType }
+TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable) # ArrayObject }" ]
+
+"[ CATCH ] The `value` should be of class: stdClass"
+"[ CATCH ] The `value` should be of class: stdClass"
+"[ CATCH ] The `value` should be object"
+{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfClass }
+TRUE | [ "{ object # stdClass }" ]
+
+{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\Map\PHP7\Map }
+TRUE | TRUE
+[ "{ object # stdClass }", "{ array(3) }" ]
+[ 1, 1 ]
+');
+
 
 
 // >>> TEST
@@ -233,6 +500,7 @@ $ffn->assert_stdout($fn, [], '
 ]
 ###
 ');
+
 
 
 // >>> TEST
@@ -359,243 +627,148 @@ $ffn->assert_stdout($fn, [], '
 ');
 
 
+
 // >>> TEST
-// > тесты Errors
+// > тесты Result
 $fn = function () use ($ffn) {
-    $ffn->print('[ Errors ]');
+    $ffn->print('[ Result ]');
     echo PHP_EOL;
 
-    \Gzhegow\Lib\Lib::php()->errors_start($b);
+    $invalidValue = NAN;
 
-    for ( $i = 0; $i < 3; $i++ ) {
-        \Gzhegow\Lib\Lib::php()->error([ 'This is the error message' ]);
+
+    class ResultHelper
+    {
+        public static function string($value, $ctx = null)
+        {
+            if (! is_string($value)) {
+                return \Gzhegow\Lib\Modules\Php\Result\Result::err(
+                    $ctx,
+                    [ 'The `value` should be string', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            return \Gzhegow\Lib\Modules\Php\Result\Result::ok($ctx, $value);
+        }
+
+        public static function string_not_empty($value, $ctx = null)
+        {
+            if (! (is_string($value) && ('' !== $value))) {
+                return \Gzhegow\Lib\Modules\Php\Result\Result::err(
+                    $ctx,
+                    [ 'The `value` should be non-empty string', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            return \Gzhegow\Lib\Modules\Php\Result\Result::ok($ctx, $value);
+        }
     }
 
-    $errors = \Gzhegow\Lib\Lib::php()->errors_end($b);
 
+    $strInterpolator = \Gzhegow\Lib\Lib::str()->interpolator();
+
+
+    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::type();
+    $status = false
+        || \Gzhegow\Lib\Modules\Type\Number::fromStatic($invalidValue, $ctx)
+        || \Gzhegow\Lib\Modules\Type\Number::fromValidArray($invalidValue, $ctx);
+
+    $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $ctx->errors());
     $ffn->print_array_multiline($errors, 2);
+    echo PHP_EOL;
+
+    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::parse();
+    $value = null
+        ?? \Gzhegow\Lib\Modules\Type\Number::fromStatic($invalidValue, $ctx)
+        ?? \Gzhegow\Lib\Modules\Type\Number::fromValidArray($invalidValue, $ctx);
+
+    $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $ctx->errors());
+    $ffn->print_array_multiline($errors, 2);
+    echo PHP_EOL;
+
+
+    try {
+        $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::assertType();
+        $status = true
+            && ResultHelper::string($invalidValue, $ctx)
+            && ResultHelper::string_not_empty($ctx->get(), $ctx);
+    }
+    catch ( \Throwable $e ) {
+        $messages = \Gzhegow\Lib\Lib::debug()
+            ->throwableManager()
+            ->getPreviousMessagesLines(
+                $e,
+                [ 'with_file' => false ]
+            )
+        ;
+
+        echo implode(PHP_EOL, $messages) . PHP_EOL;
+        echo PHP_EOL;
+    }
+
+    try {
+        $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::assertParse();
+        $devnull = null
+            ?? ResultHelper::string($invalidValue, $ctx)
+            ?? ResultHelper::string_not_empty($ctx->get(), $ctx);
+    }
+    catch ( \Throwable $e ) {
+        $messages = \Gzhegow\Lib\Lib::debug()
+            ->throwableManager()
+            ->getPreviousMessagesLines(
+                $e,
+                [ 'with_file' => false ]
+            )
+        ;
+
+        echo implode(PHP_EOL, $messages) . PHP_EOL;
+        echo PHP_EOL;
+    }
+
+
+    $validValue = '123';
+
+    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::assertType();
+    $status = true
+        && ResultHelper::string($validValue, $ctx)
+        && ResultHelper::string_not_empty($ctx->get(), $ctx);
+    $ffn->print($ctx->get());
+    echo PHP_EOL;
+
+    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::assertParse();
+    $devnull = null
+        ?? ResultHelper::string($validValue, $ctx)
+        ?? ResultHelper::string_not_empty($ctx->get(), $ctx);
+    $ffn->print($ctx->get());
 };
 $ffn->assert_stdout($fn, [], '
-"[ Errors ]"
+"[ Result ]"
 
 ###
 [
-  [
-    "This is the error message"
-  ],
-  [
-    "This is the error message"
-  ],
-  [
-    "This is the error message"
-  ]
+  "The `from` must be instance of: Gzhegow\Lib\Modules\Type\Number",
+  "The `from` should be array"
 ]
 ###
-');
 
+###
+[
+  "The `from` must be instance of: Gzhegow\Lib\Modules\Type\Number",
+  "The `from` should be array"
+]
+###
 
-// >>> TEST
-// > тесты Exception
-$fn = function () use ($ffn) {
-    $ffn->print('[ Exception ]');
-    echo PHP_EOL;
+[ 0 ] The `value` should be string
+{ object # Gzhegow\Lib\Exception\LogicException }
 
-    $eeee1 = new \Exception('eeee1', 0);
-    $eeee2 = new \Exception('eeee2', 0);
+[ 0 ] The `value` should be string
+{ object # Gzhegow\Lib\Exception\LogicException }
 
-    $eee0 = new \Gzhegow\Lib\Exception\LogicException('eee');
-    $eee0->addPrevious($eeee1);
-    $eee0->addPrevious($eeee2);
+"123"
 
-    $ee1 = new \Exception('ee1', 0, $previous = $eee0);
-    $ee2 = new \Exception('ee2', 0, $previous = $eee0);
-
-    $previousList = [ $ee1, $ee2 ];
-    $e0 = new \Gzhegow\Lib\Exception\RuntimeException('e', 0, ...$previousList);
-
-    $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e0, [ 'with_file' => false ]);
-    echo implode(PHP_EOL, $messages);
-};
-$ffn->assert_stdout($fn, [], '
-"[ Exception ]"
-
-[ 0 ] e
-{ object # Gzhegow\Lib\Exception\RuntimeException }
---
--- [ 0.0 ] ee1
--- { object # Exception }
-----
----- [ 0.0.0 ] eee
----- { object # Gzhegow\Lib\Exception\LogicException }
-------
------- [ 0.0.0.0 ] eeee1
------- { object # Exception }
-------
------- [ 0.0.0.1 ] eeee2
------- { object # Exception }
---
--- [ 0.1 ] ee2
--- { object # Exception }
-----
----- [ 0.1.0 ] eee
----- { object # Gzhegow\Lib\Exception\LogicException }
-------
------- [ 0.1.0.0 ] eeee1
------- { object # Exception }
-------
------- [ 0.1.0.1 ] eeee2
------- { object # Exception }
-');
-
-
-
-// >>> TEST
-// > тесты ArrayOf
-$fn = function () use ($ffn) {
-    $ffn->print('[ ArrayOf ]');
-    echo PHP_EOL;
-
-
-    $notAnObject = 1;
-    $objectStdClass = new \stdClass();
-    $objectArrayObject = new ArrayObject();
-    $objectAnonymousStdClass = new class extends \stdClass {
-    };
-
-
-    /**
-     * @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf $arrayOf
-     * > это синтаксис создания объекта в 8 версии PHP отдельно от 7, на практике не потребуется, только для тестов
-     */
-    $class = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::class;
-    $args = [ 'object' ];
-    $arrayOf = \Gzhegow\Lib\Lib::new8($class, ...$args);
-
-    // > осторожно, `ArrayOf` не проверяет типы при добавлении, для этого есть `ArrayOfType`
-    // > этот объект сделан для того, чтобы убедится, что другой разработчик создал его с правильным типом
-    // > при этом он может положить туда что захочет, это похоже на указание PHPDoc
-    $arrayOf[] = $notAnObject;
-    $ffn->print($arrayOf);
-    $ffn->print($arrayOf->isOfType('object'), $arrayOf->getValues());
-
-    echo PHP_EOL;
-
-
-    /**
-     * @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType $arrayOf
-     */
-    $class = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::class;
-    $args = [ 'object' ];
-    $arrayOf = \Gzhegow\Lib\Lib::new8($class, ...$args);
-    $arrayOf[] = $objectStdClass;
-    $arrayOf[] = $objectArrayObject;
-
-    $e = null;
-    try {
-        $arrayOf[] = $notAnObject;
-    }
-    catch ( \Throwable $e ) {
-    }
-    $ffn->print('[ CATCH ] ' . $e->getMessage());
-    $ffn->print($arrayOf);
-    $ffn->print($arrayOf->isOfType('object'), $arrayOf->getValues());
-
-    echo PHP_EOL;
-
-
-    /**
-     * @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass $arrayOf
-     */
-    $class = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::class;
-    $args = [ \stdClass::class ];
-    $arrayOf = \Gzhegow\Lib\Lib::new8($class, ...$args);
-    $arrayOf[] = $objectStdClass;
-
-    $e = null;
-    try {
-        $arrayOf[] = $objectArrayObject;
-    }
-    catch ( \Throwable $e ) {
-    }
-    $ffn->print('[ CATCH ] ' . $e->getMessage());
-
-    $e = null;
-    try {
-        $arrayOf[] = $objectAnonymousStdClass;
-    }
-    catch ( \Throwable $e ) {
-    }
-    $ffn->print('[ CATCH ] ' . $e->getMessage());
-
-    $e = null;
-    try {
-        $arrayOf[] = $notAnObject;
-    }
-    catch ( \Throwable $e ) {
-    }
-    $ffn->print('[ CATCH ] ' . $e->getMessage());
-    $ffn->print($arrayOf);
-    $ffn->print($arrayOf->isOfType('object'), $arrayOf->getValues());
-
-    echo PHP_EOL;
-
-
-    // > для полного посвящения разработана структура `Map` по аналогии с JavaScript
-    // > в качестве ключей этого объекта можно использовать вообще любые значения
-    /**
-     * @var \Gzhegow\Lib\Modules\Arr\Map\Map $map
-     */
-    $class = \Gzhegow\Lib\Modules\Arr\Map\Map::class;
-    $map = \Gzhegow\Lib\Lib::new8($class);
-    $map[ $stdClass = new \stdClass() ] = 1;
-    $map[ $array = [ 1, 2, 3 ] ] = 1;
-    $ffn->print($map);
-    $ffn->print(isset($map[ $stdClass ]), isset($map[ $array ]));
-    $ffn->print_array($map->keys(), 1);
-    $ffn->print_array($map->values(), 2);
-};
-$ffn->assert_stdout($fn, [], PHP_VERSION_ID >= 80000
-    ? '
-"[ ArrayOf ]"
-
-{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf }
-TRUE | [ 1 ]
-
-"[ CATCH ] The `value` should be of type: object"
-{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType }
-TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable) # ArrayObject }" ]
-
-"[ CATCH ] The `value` should be of class: stdClass"
-"[ CATCH ] The `value` should be of class: stdClass"
-"[ CATCH ] The `value` should be object"
-{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass }
-TRUE | [ "{ object # stdClass }" ]
-
-{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\Map\Map }
-TRUE | TRUE
-[ "{ object # stdClass }", "{ array(3) }" ]
-[ 1, 1 ]
-'
-    : '
-"[ ArrayOf ]"
-
-{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf }
-TRUE | [ 1 ]
-
-"[ CATCH ] The `value` should be of type: object"
-{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfType }
-TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable) # ArrayObject }" ]
-
-"[ CATCH ] The `value` should be of class: stdClass"
-"[ CATCH ] The `value` should be of class: stdClass"
-"[ CATCH ] The `value` should be object"
-{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfClass }
-TRUE | [ "{ object # stdClass }" ]
-
-{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\Map\PHP7\Map }
-TRUE | TRUE
-[ "{ object # stdClass }", "{ array(3) }" ]
-[ 1, 1 ]
+"123"
 ');
 
 
@@ -745,42 +918,6 @@ $fn = function () use ($ffn) {
         _ARR_WALK_WITH_EMPTY_ARRAYS | _ARR_WALK_WITH_LISTS | _ARR_WALK_WITH_DICTS
     );
     $ffn->print_array_multiline($res, 2);
-
-    echo PHP_EOL;
-    echo PHP_EOL;
-
-
-    try {
-        $value = null
-            ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromStatic(1)
-            ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromValidArray(1);
-    }
-    catch ( \Throwable $e ) {
-        $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e, [ 'with_file' => false ]);
-
-        echo implode(PHP_EOL, $messages) . PHP_EOL;
-        echo PHP_EOL;
-    }
-
-    $e = null;
-    $value = null
-        ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromStatic(1, [ &$e ])
-        ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromValidArray(1, [ &$e ]);
-
-    $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e, [ 'with_file' => false ]);
-
-    echo implode(PHP_EOL, $messages) . PHP_EOL;
-    echo PHP_EOL;
-
-    $e = null;
-    $status = null
-        ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromStatic(1, [ &$e, &$val ])
-        ?? \Gzhegow\Lib\Modules\Arr\ArrStrict::fromValidArray(1, [ &$e, &$val ]);
-
-    $messages = \Gzhegow\Lib\Exception\ErrorHandler::getThrowableMessageListLines($e, [ 'with_file' => false ]);
-
-    echo implode(PHP_EOL, $messages) . PHP_EOL;
-    echo PHP_EOL;
     echo PHP_EOL;
 
 
@@ -981,31 +1118,12 @@ $ffn->assert_stdout($fn, [], '
   ]
 ]
 ###
-
-
-[ 0 ] The `from` must be instance of: Gzhegow\Lib\Modules\Arr\ArrStrict
-{ object # Gzhegow\Lib\Exception\LogicException }
-
-[ 0 ] Aggregate exception
-{ object # Gzhegow\Lib\Exception\LogicException }
---
--- [ 0.0 ] The `from` must be instance of: Gzhegow\Lib\Modules\Arr\ArrStrict
--- { object # Gzhegow\Lib\Exception\LogicException }
---
--- [ 0.1 ] The `from` must be array
--- { object # Gzhegow\Lib\Exception\LogicException }
-
-[ 0 ] Aggregate exception
-{ object # Gzhegow\Lib\Exception\LogicException }
---
--- [ 0.0 ] The `from` must be instance of: Gzhegow\Lib\Modules\Arr\ArrStrict
--- { object # Gzhegow\Lib\Exception\LogicException }
-
 ' . "
 { object # stdClass } | [ \"prop\" => 1, 0 => \"{ object # stdClass }\" ]
 { object # stdClass } | [ \"prop\" => 1, 0 => \"{ object # stdClass }\" ]
 { object # class@anonymous } | [ \"\x00*\x00prop\" => 1, 0 => \"{ object # stdClass }\" ]
 ");
+
 
 
 // >>> TEST
@@ -1024,7 +1142,8 @@ $fn = function () use ($ffn) {
     echo PHP_EOL;
 
 
-    $var = \Gzhegow\Lib\Lib::assertOf('-1')
+    $var = \Gzhegow\Lib\Lib::assert()
+        ->of('-1')
         ->string_not_empty()
         ->numeric_positive()
         ->orFallback([ NAN ])
@@ -1033,27 +1152,27 @@ $fn = function () use ($ffn) {
 
     $e = null;
     try {
-        $var = \Gzhegow\Lib\Lib::assertOf('-1')
+        $var = \Gzhegow\Lib\Lib::assert()
+            ->of('-1')
             ->numeric_positive()
             ->withTriggerError('The value should be positive numeric', E_USER_ERROR)
             ->orNull()
         ;
     }
     catch ( \Throwable $e ) {
-        // > since we are using (new \Gzhegow\Lib\Exception\ErrorHandler())->useErrorHandler() it throws
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
-    $ffn->print('[ CATCH ] ' . $e->getMessage());
 
-    $e = null;
     try {
-        $var = \Gzhegow\Lib\Lib::assertOf('-1')
+        $var = \Gzhegow\Lib\Lib::assert()
+            ->of('-1')
             ->numeric_positive()
             ->orThrow('The value should be positive numeric')
         ;
     }
     catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
-    $ffn->print('[ CATCH ] ' . $e->getMessage());
 };
 $ffn->assert_stdout($fn, [], '
 "[ AssertModule ]"

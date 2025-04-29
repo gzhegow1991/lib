@@ -87,10 +87,14 @@ abstract class AbstractAssertModule
     public function withThrow($throwableOrArg, ...$throwableArgs)
     {
         if (! $this->status) {
-            return Lib::php()->throw(
-                debug_backtrace(),
-                $throwableOrArg, ...$throwableArgs
-            );
+            if (
+                ($throwableOrArg instanceof \LogicException)
+                || ($throwableOrArg instanceof \RuntimeException)
+            ) {
+                throw $throwableOrArg;
+            }
+
+            throw new LogicException($throwableOrArg, ...$throwableArgs);
         }
 
         return $this;

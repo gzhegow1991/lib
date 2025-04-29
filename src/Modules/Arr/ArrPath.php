@@ -2,8 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Arr;
 
-use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 
 
@@ -24,59 +23,53 @@ class ArrPath implements
     /**
      * @return static|bool|null
      */
-    public static function fromValid($from, array $refs = [])
+    public static function fromValid($from, $ctx = null)
     {
-        $withErrors = array_key_exists(0, $refs);
-
-        $refs[ 0 ] = $refs[ 0 ] ?? null;
+        $ctxCur = Result::nullchain();
 
         $instance = null
-            ?? static::fromStatic($from, $refs)
-            ?? static::fromValidArray($from, $refs);
+            ?? static::fromStatic($from, $ctxCur)
+            ?? static::fromValidArray($from, $ctxCur);
 
-        if (! $withErrors) {
-            if (null === $instance) {
-                throw $refs[ 0 ];
-            }
+        if ($ctxCur->isErr()) {
+            return Result::err($ctx, $ctxCur);
         }
 
-        return $instance;
+        return Result::ok($ctx, $instance);
     }
 
     /**
      * @return static|bool|null
      */
-    public static function fromStatic($from, array $refs = [])
+    public static function fromStatic($from, $ctx = null)
     {
         if ($from instanceof static) {
-            return Lib::refsResult($refs, $from);
+            return Result::ok($ctx, $from);
         }
 
-        return Lib::refsError(
-            $refs,
-            new LogicException(
-                [ 'The `from` must be instance of: ' . static::class, $from ]
-            )
+        return Result::err(
+            $ctx,
+            [ 'The `from` must be instance of: ' . static::class, $from ],
+            [ __FILE__, __LINE__ ]
         );
     }
 
     /**
      * @return static|bool|null
      */
-    public static function fromValidArray($from, array $refs = [])
+    public static function fromValidArray($from, $ctx = null)
     {
         if (is_array($from)) {
             $instance = new static();
             $instance->path = $from;
 
-            return Lib::refsResult($refs, $instance);
+            return Result::ok($ctx, $instance);
         }
 
-        return Lib::refsError(
-            $refs,
-            new LogicException(
-                [ 'The `from` must be array', $from ]
-            )
+        return Result::err(
+            $ctx,
+            [ 'The `from` must be array', $from ],
+            [ __FILE__, __LINE__ ]
         );
     }
 

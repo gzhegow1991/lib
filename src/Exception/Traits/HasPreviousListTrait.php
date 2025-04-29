@@ -2,6 +2,14 @@
 
 namespace Gzhegow\Lib\Exception\Traits;
 
+use Gzhegow\Lib\Exception\Interfaces\HasPreviousListInterface;
+
+
+/**
+ * @mixin \Throwable
+ *
+ * @mixin HasPreviousListInterface
+ */
 trait HasPreviousListTrait
 {
     /**

@@ -66,7 +66,7 @@ trait HasTraceOverrideTrait
     /**
      * @return int|string
      */
-    public function getLineOverride()
+    public function getLineOverride() : int
     {
         /** @var int|string $line */
 

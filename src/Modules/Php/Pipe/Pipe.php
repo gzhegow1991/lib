@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Php;
+namespace Gzhegow\Lib\Modules\Php\Pipe;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;

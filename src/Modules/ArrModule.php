@@ -2097,10 +2097,10 @@ class ArrModule
             return;
         }
 
-        $_flags = $flags ?? 0;
+        $flags = $flags ?? _ARR_WALK_WITH_LEAVES;
 
-        $isModeDepthFirst = (bool) ($_flags & _ARR_WALK_MODE_DEPTH_FIRST);
-        $isModeBreadthFirst = (bool) ($_flags & _ARR_WALK_MODE_BREADTH_FIRST);
+        $isModeDepthFirst = (bool) ($flags & _ARR_WALK_MODE_DEPTH_FIRST);
+        $isModeBreadthFirst = (bool) ($flags & _ARR_WALK_MODE_BREADTH_FIRST);
         $sum = (int) ($isModeDepthFirst + $isModeBreadthFirst);
         if (1 !== $sum) {
             $isModeDepthFirst = true;
@@ -2108,9 +2108,9 @@ class ArrModule
         }
         unset($sum);
 
-        $isSortSelfFirst = (bool) ($_flags & _ARR_WALK_SORT_SELF_FIRST);
-        $isSortParentFirst = (bool) ($_flags & _ARR_WALK_SORT_PARENT_FIRST);
-        $isSortChildFirst = (bool) ($_flags & _ARR_WALK_SORT_CHILD_FIRST);
+        $isSortSelfFirst = (bool) ($flags & _ARR_WALK_SORT_SELF_FIRST);
+        $isSortParentFirst = (bool) ($flags & _ARR_WALK_SORT_PARENT_FIRST);
+        $isSortChildFirst = (bool) ($flags & _ARR_WALK_SORT_CHILD_FIRST);
         $sum = (int) ($isSortSelfFirst + $isSortParentFirst + $isSortChildFirst);
         if (1 !== $sum) {
             $isSortSelfFirst = true;
@@ -2119,54 +2119,49 @@ class ArrModule
         }
         unset($sum);
 
-        $isWithLeaves = (bool) ($_flags & _ARR_WALK_WITH_LEAVES);
-        $isWithoutLeaves = (bool) ($_flags & _ARR_WALK_WITHOUT_LEAVES);
+        $isWithLeaves = (bool) ($flags & _ARR_WALK_WITH_LEAVES);
+        $isWithoutLeaves = (bool) ($flags & _ARR_WALK_WITHOUT_LEAVES);
         $sum = (int) ($isWithLeaves + $isWithoutLeaves);
         if (1 !== $sum) {
             $isWithLeaves = true;
             $isWithoutLeaves = false;
         }
-        $withLeaves = $isWithLeaves && ! $isWithoutLeaves;
         unset($sum);
 
-        $isWithoutEmptyArrays = (bool) ($_flags & _ARR_WALK_WITHOUT_EMPTY_ARRAYS);
-        $isWithEmptyArrays = (bool) ($_flags & _ARR_WALK_WITH_EMPTY_ARRAYS);
-        $sum = (int) ($isWithoutEmptyArrays + $isWithEmptyArrays);
+        $isWithDicts = (bool) ($flags & _ARR_WALK_WITH_DICTS);
+        $isWithoutDicts = (bool) ($flags & _ARR_WALK_WITHOUT_DICTS);
+        $sum = (int) ($isWithDicts + $isWithoutDicts);
         if (1 !== $sum) {
-            $isWithoutEmptyArrays = true;
-            $isWithEmptyArrays = false;
-        }
-        $withEmptyArrays = $isWithEmptyArrays && ! $isWithoutEmptyArrays;
-        unset($sum);
-
-        $isWithoutParents = (bool) ($_flags & _ARR_WALK_WITHOUT_PARENTS);
-        $isWithParents = (bool) ($_flags & _ARR_WALK_WITH_PARENTS);
-        $sum = (int) ($isWithoutParents + $isWithParents);
-        if (1 !== $sum) {
-            $isWithoutParents = true;
-            $isWithParents = false;
-        }
-        $withParents = $isWithParents && ! $isWithoutParents;
-        unset($sum);
-
-        $isWithoutLists = (bool) ($_flags & _ARR_WALK_WITHOUT_LISTS);
-        $isWithLists = (bool) ($_flags & _ARR_WALK_WITH_LISTS);
-        $sum = (int) ($isWithoutLists + $isWithLists);
-        if (1 !== $sum) {
-            $isWithoutLists = true;
-            $isWithLists = false;
-        }
-        $withLists = $isWithLists && ! $isWithoutLists;
-        unset($sum);
-
-        $isWithoutDicts = (bool) ($_flags & _ARR_WALK_WITHOUT_DICTS);
-        $isWithDicts = (bool) ($_flags & _ARR_WALK_WITH_DICTS);
-        $sum = (int) ($isWithoutDicts + $isWithDicts);
-        if (1 !== $sum) {
-            $isWithoutDicts = true;
             $isWithDicts = false;
+            $isWithoutDicts = false;
         }
-        $withDicts = $isWithDicts && ! $isWithoutDicts;
+        unset($sum);
+
+        $isWithEmptyArrays = (bool) ($flags & _ARR_WALK_WITH_EMPTY_ARRAYS);
+        $isWithoutEmptyArrays = (bool) ($flags & _ARR_WALK_WITHOUT_EMPTY_ARRAYS);
+        $sum = (int) ($isWithEmptyArrays + $isWithoutEmptyArrays);
+        if (1 !== $sum) {
+            $isWithEmptyArrays = false;
+            $isWithoutEmptyArrays = false;
+        }
+        unset($sum);
+
+        $isWithLists = (bool) ($flags & _ARR_WALK_WITH_LISTS);
+        $isWithoutLists = (bool) ($flags & _ARR_WALK_WITHOUT_LISTS);
+        $sum = (int) ($isWithLists + $isWithoutLists);
+        if (1 !== $sum) {
+            $isWithLists = false;
+            $isWithoutLists = false;
+        }
+        unset($sum);
+
+        $isWithParents = (bool) ($flags & _ARR_WALK_WITH_PARENTS);
+        $isWithoutParents = (bool) ($flags & _ARR_WALK_WITHOUT_PARENTS);
+        $sum = (int) ($isWithParents + $isWithoutParents);
+        if (1 !== $sum) {
+            $isWithParents = false;
+            $isWithoutParents = false;
+        }
         unset($sum);
 
         if ($isSortSelfFirst) {
@@ -2189,7 +2184,7 @@ class ArrModule
             };
 
         } else {
-            throw new LogicException([ 'Invalid `sort`', $_flags ]);
+            throw new LogicException([ 'Invalid `sort`', $flags ]);
         }
 
         if ($isModeDepthFirst) {
@@ -2201,7 +2196,7 @@ class ArrModule
             $buffer =& $queue;
 
         } else {
-            throw new LogicException([ 'Invalid `mode`', $_flags ]);
+            throw new LogicException([ 'Invalid `mode`', $flags ]);
         }
 
         $theArr = Lib::arr();
@@ -2233,10 +2228,10 @@ class ArrModule
                 $isEmptyArray = true;
 
             } elseif ((! $isRoot) && ([] !== $cur0)) {
-                if ($withLists) {
+                if ($isWithLists) {
                     $isList = $theArr->type_list($var, $cur0, true);
                 }
-                if ($withDicts) {
+                if ($isWithDicts) {
                     $isDict = $theArr->type_dict($var, $cur0, true);
                 }
 
@@ -2244,11 +2239,11 @@ class ArrModule
             }
 
             if (
-                ($withLeaves && $isLeaf)
-                || ($withEmptyArrays && $isEmptyArray)
-                || ($withParents && $isParent)
-                || ($withLists && $isList)
-                || ($withDicts && $isDict)
+                ($isWithLeaves && $isLeaf)
+                || ($isWithDicts && $isDict)
+                || ($isWithEmptyArrays && $isEmptyArray)
+                || ($isWithLists && $isList)
+                || ($isWithParents && $isParent)
             ) {
                 $refCur0 =& $cur[ 0 ];
 

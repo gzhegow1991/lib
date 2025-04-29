@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Php\DebugBacktracer;
+namespace Gzhegow\Lib\Modules\Debug\DebugBacktracer;
 
 interface DebugBacktracerInterface
 {
@@ -13,17 +13,18 @@ interface DebugBacktracerInterface
     /**
      * @return static
      */
-    public function options(?int $options = null);
+    public function dirRoot(?string $dirRoot);
+
 
     /**
      * @return static
      */
-    public function limit(?int $limit = null);
+    public function options(?int $options);
 
     /**
      * @return static
      */
-    public function rootDirectory(string $rootDirectory);
+    public function limit(?int $limit);
 
 
     /**
