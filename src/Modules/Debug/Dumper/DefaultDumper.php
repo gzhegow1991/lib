@@ -659,14 +659,18 @@ class DefaultDumper implements DumperInterface
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->dumpTrace($trace, $var, ...$vars);
+        $this->dumpTrace($trace, $var, ...$vars);
+
+        return $var;
     }
 
     public function d($var, ...$vars)
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->dTrace($trace, $var, ...$vars);
+        $this->dTrace($trace, $var, ...$vars);
+
+        return $var;
     }
 
     public function dd(...$vars) : void
@@ -680,7 +684,9 @@ class DefaultDumper implements DumperInterface
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->dddTrace($trace, $limit, $var, ...$vars);
+        $this->dddTrace($trace, $limit, $var, ...$vars);
+
+        return $var;
     }
 
 
@@ -688,14 +694,18 @@ class DefaultDumper implements DumperInterface
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->doDumpTrace($trace, $var, ...$vars);
+        $this->doDumpTrace($trace, $var, ...$vars);
+
+        return $var;
     }
 
     public function dTrace(?array $trace, $var, ...$vars)
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->doDumpTrace($trace, $var, ...$vars);
+        $this->doDumpTrace($trace, $var, ...$vars);
+
+        return $var;
     }
 
     public function ddTrace(?array $trace, ...$vars) : void
@@ -728,14 +738,12 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    protected function doDumpTrace(array $trace, $var, ...$vars)
+    protected function doDumpTrace(array $trace, ...$vars)
     {
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
         $traceLine = $trace[ 0 ][ 'line' ] ?? -1;
         $traceWhereIs = "{$traceFile}: {$traceLine}";
 
-        $this->dumpDumper($traceWhereIs, $var, ...$vars);
-
-        return $var;
+        $this->dumpDumper($traceWhereIs, ...$vars);
     }
 }

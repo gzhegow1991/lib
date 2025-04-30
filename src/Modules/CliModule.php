@@ -10,7 +10,7 @@ class CliModule
 {
     public function __construct()
     {
-        if (Lib::php()->is_terminal()) {
+        if (! Lib::php()->is_terminal()) {
             throw new RuntimeException('Module must be created in CLI mode');
         }
     }
@@ -54,7 +54,7 @@ class CliModule
     public function pause($var = null, ...$vars)
     {
         if (null !== $var) {
-            var_dump($var, ...$vars);
+            Lib::debug()->dump($var, ...$vars);
         }
 
         echo '> Press ENTER to continue...' . PHP_EOL;

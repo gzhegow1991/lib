@@ -281,6 +281,7 @@ class TestModule
         return true;
     }
 
+
     /**
      * @param callable $fn
      */
@@ -344,7 +345,7 @@ class TestModule
     /**
      * @param callable $fn
      */
-    public function assertMicrotime(
+    public function assertTime(
         ?array $trace,
         $fn, array $fnArgs = [],
         ?float $expectedSecondsMax = null, ?float $expectedSecondsMin = null,

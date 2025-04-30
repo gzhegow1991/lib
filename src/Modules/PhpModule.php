@@ -8,6 +8,7 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 use Gzhegow\Lib\Modules\Php\Result\ResultManager;
+use Gzhegow\Lib\Modules\Php\Promise\PromiseManager;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToBoolInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
@@ -18,6 +19,7 @@ use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParser;
 use Gzhegow\Lib\Modules\Php\Result\ResultManagerInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIterableInterface;
+use Gzhegow\Lib\Modules\Php\Promise\PromiseManagerInterface;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
 
@@ -27,6 +29,10 @@ class PhpModule
      * @var CallableParserInterface
      */
     protected $callableParser;
+    /**
+     * @var PromiseManagerInterface
+     */
+    protected $promiseManager;
     /**
      * @var ResultManagerInterface
      */
@@ -58,6 +64,25 @@ class PhpModule
     }
 
 
+    public function newPromiseManager() : PromiseManagerInterface
+    {
+        return new PromiseManager();
+    }
+
+    public function clonePromiseManager() : PromiseManagerInterface
+    {
+        return clone $this->promiseManager();
+    }
+
+    public function promiseManager(?PromiseManagerInterface $promiseManager = null) : PromiseManagerInterface
+    {
+        return $this->promiseManager = null
+            ?? $promiseManager
+            ?? $this->promiseManager
+            ?? new PromiseManager();
+    }
+
+
     public function newResultManager() : ResultManagerInterface
     {
         return new ResultManager();
@@ -77,14 +102,14 @@ class PhpModule
     }
 
 
-    public function pipe(?Pipe &$p = null) : Pipe
-    {
-        return $p = new Pipe();
-    }
-
     public function errorBag(?ErrorBag &$b = null) : ErrorBag
     {
         return $b = new ErrorBag();
+    }
+
+    public function pipe(?Pipe &$p = null) : Pipe
+    {
+        return $p = new Pipe();
     }
 
 

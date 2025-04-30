@@ -29,7 +29,7 @@ ini_set('memory_limit', '32M');
 // > настраиваем обработку ошибок
 // > некоторые CMS сами по себе применяют error_reporting/set_error_handler/set_exception_handler глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
-($ex = \Gzhegow\Lib\Lib::errorHandler())
+\Gzhegow\Lib\Lib::errorHandler()
     // > частично удаляет путь файла из каждой строки `trace` (`trace[i][file]`)
     ->setDirRoot(__DIR__ . '/..')
     //
@@ -47,7 +47,7 @@ ini_set('memory_limit', '32M');
 ;
 
 
-// > добавляем несколько функция для тестирования
+// > добавляем несколько функций для тестирования
 $ffn = new class {
     function root() : string
     {
@@ -77,22 +77,44 @@ $ffn = new class {
     }
 
 
-    function print(...$values)
+    function print($value, ...$values)
     {
-        echo $this->values(' | ', ...$values) . PHP_EOL;
+        echo $this->values(' | ', $value, ...$values) . PHP_EOL;
+
+        return $value;
     }
 
 
     function print_array($value, ?int $maxLevel = null, array $options = [])
     {
         echo $this->value_array($value, $maxLevel, $options) . PHP_EOL;
+
+        return $value;
     }
 
     function print_array_multiline($value, ?int $maxLevel = null, array $options = [])
     {
         echo $this->value_array_multiline($value, $maxLevel, $options) . PHP_EOL;
+
+        return $value;
     }
 
+
+    function assert(
+        \Closure $fn, array $fnArgs = [],
+        ?string $expectedStdout = null,
+        ?float $expectedSecondsMax = null, ?float $expectedSecondsMin = null
+    )
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        \Gzhegow\Lib\Lib::test()->assert(
+            $trace,
+            $fn, $fnArgs,
+            $expectedStdout,
+            $expectedSecondsMax, $expectedSecondsMin
+        );
+    }
 
     function assert_stdout(\Closure $fn, array $fnArgs = [], ?string $expectedStdout = null)
     {
@@ -105,6 +127,178 @@ $ffn = new class {
         );
     }
 };
+
+
+
+// >>> TEST
+// > тесты Promise
+$fn = function () use ($ffn) {
+    $ffn->print('[ Promise ]');
+    echo PHP_EOL;
+
+
+    \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(800)
+        ->finally(function () {
+            echo PHP_EOL;
+        })
+        ->then(function ($value) use ($ffn) {
+            $ffn->print("[ THEN 1.1 ]", $value);
+
+            throw new \Gzhegow\Lib\Exception\RuntimeException('123');
+        })
+        ->catch(function ($error) use ($ffn) {
+            $ffn->print("[ CATCH 1.1 ]", $error);
+
+            return $error;
+        })
+        ->catch(function ($error) use ($ffn) {
+            $ffn->print("[ CATCH 1.2 ]", $error);
+
+            return [ $error ];
+        })
+        ->then(function ($value) use ($ffn) {
+            $ffn->print("[ THEN 1.2 ]", $value);
+
+            return $value;
+        })
+        ->finally(function () {
+            echo PHP_EOL;
+        })
+    ;
+
+
+    \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(500)
+        ->finally(function () {
+            echo PHP_EOL;
+        })
+        ->then(function ($value) use ($ffn) {
+            $ffn->print("[ THEN 2.1 ]", $value);
+
+            return $value;
+        })
+        ->then(function ($value) use ($ffn) {
+            $ffn->print("[ THEN 2.2 ]", $value);
+
+            return $value;
+        })
+        ->finally(function () {
+            echo PHP_EOL;
+        })
+    ;
+
+
+    \Gzhegow\Lib\Modules\Php\Promise\Promise::timeout(
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(700),
+        600
+    )
+        ->finally(function () {
+            echo PHP_EOL;
+        })
+        ->catch(function ($value) use ($ffn) {
+            $ffn->print("[ TIMEOUT ]", $value);
+        })
+        ->finally(function () {
+            echo PHP_EOL;
+        })
+    ;
+
+
+    $ps = [
+        '[ ALL ] 1',
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ ALL ] 2'),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ ALL ] 3'),
+    ];
+    \Gzhegow\Lib\Modules\Php\Promise\Promise::all($ps)
+        ->then([ $ffn, 'print' ])
+    ;
+
+
+    $ps = [
+        '[ ALL SETTLED ] 1',
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ ALL SETTLED ] 2'),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::reject('[ ALL SETTLED ] 3'),
+    ];
+    \Gzhegow\Lib\Modules\Php\Promise\Promise::allSettled($ps)
+        ->then(function ($results) use ($ffn) {
+            return $ffn->print_array_multiline($results, 2);
+        })
+    ;
+
+
+    $ps = [
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(200)->then(function () { return '[ RACE ] slow'; }),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(100)->then(function () { return '[ RACE ] fast'; }),
+    ];
+    \Gzhegow\Lib\Modules\Php\Promise\Promise::race($ps)
+        ->finally(function () {
+            echo PHP_EOL;
+        })
+        ->then([ $ffn, 'print' ])
+        ->finally(function () {
+            echo PHP_EOL;
+        })
+    ;
+
+
+    $ps = [
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::reject('[ ANY ] 1'),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::reject('[ ANY ] 2'),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(300)->then(function () { return '[ ANY ] 3'; }),
+    ];
+    \Gzhegow\Lib\Modules\Php\Promise\Promise::any($ps)
+        ->finally(function () {
+            echo PHP_EOL;
+        })
+        ->then([ $ffn, 'print' ])
+        ->finally(function () {
+            echo PHP_EOL;
+        })
+    ;
+
+
+    \Gzhegow\Lib\Modules\Php\Promise\Promise::loop();
+};
+$ffn->assert($fn, [], '
+"[ Promise ]"
+
+[ "[ ALL ] 1", "[ ALL ] 2", "[ ALL ] 3" ]
+###
+[
+  [
+    "status" => "fulfilled",
+    "value" => "[ ALL SETTLED ] 1"
+  ],
+  [
+    "status" => "fulfilled",
+    "value" => "[ ALL SETTLED ] 2"
+  ],
+  [
+    "status" => "rejected",
+    "reason" => "[ ALL SETTLED ] 3"
+  ]
+]
+###
+
+"[ RACE ] fast"
+
+
+"[ ANY ] 3"
+
+
+"[ THEN 2.1 ]" | NULL
+"[ THEN 2.2 ]" | NULL
+
+
+"[ TIMEOUT ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
+
+
+"[ THEN 1.1 ]" | NULL
+"[ CATCH 1.1 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
+"[ CATCH 1.2 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
+"[ THEN 1.2 ]" | [ "{ object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }" ]
+',
+    1, 0.8
+);
 
 
 
