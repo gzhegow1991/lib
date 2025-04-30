@@ -137,11 +137,9 @@ $fn = function () use ($ffn) {
     echo PHP_EOL;
 
 
-    \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(800)
-        ->finally(function () {
-            echo PHP_EOL;
-        })
+    \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(1000)
         ->then(function ($value) use ($ffn) {
+            echo PHP_EOL;
             $ffn->print("[ THEN 1.1 ]", $value);
 
             throw new \Gzhegow\Lib\Exception\RuntimeException('123');
@@ -158,47 +156,39 @@ $fn = function () use ($ffn) {
         })
         ->then(function ($value) use ($ffn) {
             $ffn->print("[ THEN 1.2 ]", $value);
+            echo PHP_EOL;
 
             return $value;
-        })
-        ->finally(function () {
-            echo PHP_EOL;
         })
     ;
 
 
-    \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(500)
-        ->finally(function () {
-            echo PHP_EOL;
-        })
+    \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(700)
         ->then(function ($value) use ($ffn) {
+            echo PHP_EOL;
             $ffn->print("[ THEN 2.1 ]", $value);
 
             return $value;
         })
         ->then(function ($value) use ($ffn) {
             $ffn->print("[ THEN 2.2 ]", $value);
+            echo PHP_EOL;
 
             return $value;
-        })
-        ->finally(function () {
-            echo PHP_EOL;
         })
     ;
 
 
     \Gzhegow\Lib\Modules\Php\Promise\Promise::timeout(
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(700),
-        600
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(900),
+        800
     )
-        ->finally(function () {
-            echo PHP_EOL;
-        })
         ->catch(function ($value) use ($ffn) {
-            $ffn->print("[ TIMEOUT ]", $value);
-        })
-        ->finally(function () {
             echo PHP_EOL;
+            $ffn->print("[ TIMEOUT ]", $value);
+            echo PHP_EOL;
+
+            return true;
         })
     ;
 
@@ -209,7 +199,12 @@ $fn = function () use ($ffn) {
         \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ ALL ] 3'),
     ];
     \Gzhegow\Lib\Modules\Php\Promise\Promise::all($ps)
-        ->then([ $ffn, 'print' ])
+        ->then(function ($res) use ($ffn) {
+            $ffn->print($res);
+            echo PHP_EOL;
+
+            return $res;
+        })
     ;
 
 
@@ -217,25 +212,30 @@ $fn = function () use ($ffn) {
         '[ ALL SETTLED ] 1',
         \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ ALL SETTLED ] 2'),
         \Gzhegow\Lib\Modules\Php\Promise\Promise::reject('[ ALL SETTLED ] 3'),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(100)->then(function () { return '[ ALL SETTLED ] 4'; }),
     ];
     \Gzhegow\Lib\Modules\Php\Promise\Promise::allSettled($ps)
-        ->then(function ($results) use ($ffn) {
-            return $ffn->print_array_multiline($results, 2);
+        ->then(function ($res) use ($ffn) {
+            echo PHP_EOL;
+            $ffn->print_array_multiline($res, 2);
+            echo PHP_EOL;
+
+            return $res;
         })
     ;
 
 
     $ps = [
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(200)->then(function () { return '[ RACE ] slow'; }),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(100)->then(function () { return '[ RACE ] fast'; }),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(400)->then(function () { return '[ RACE ] 1'; }),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(300)->then(function () { return '[ RACE ] 2'; }),
     ];
     \Gzhegow\Lib\Modules\Php\Promise\Promise::race($ps)
-        ->finally(function () {
+        ->then(function ($res) use ($ffn) {
             echo PHP_EOL;
-        })
-        ->then([ $ffn, 'print' ])
-        ->finally(function () {
+            $ffn->print($res);
             echo PHP_EOL;
+
+            return $res;
         })
     ;
 
@@ -243,15 +243,15 @@ $fn = function () use ($ffn) {
     $ps = [
         \Gzhegow\Lib\Modules\Php\Promise\Promise::reject('[ ANY ] 1'),
         \Gzhegow\Lib\Modules\Php\Promise\Promise::reject('[ ANY ] 2'),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(300)->then(function () { return '[ ANY ] 3'; }),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(600)->then(function () { return '[ ANY ] 3'; }),
     ];
     \Gzhegow\Lib\Modules\Php\Promise\Promise::any($ps)
-        ->finally(function () {
+        ->then(function ($res) use ($ffn) {
             echo PHP_EOL;
-        })
-        ->then([ $ffn, 'print' ])
-        ->finally(function () {
+            $ffn->print($res);
             echo PHP_EOL;
+
+            return $res;
         })
     ;
 
@@ -262,6 +262,8 @@ $ffn->assert($fn, [], '
 "[ Promise ]"
 
 [ "[ ALL ] 1", "[ ALL ] 2", "[ ALL ] 3" ]
+
+
 ###
 [
   [
@@ -275,11 +277,16 @@ $ffn->assert($fn, [], '
   [
     "status" => "rejected",
     "reason" => "[ ALL SETTLED ] 3"
+  ],
+  [
+    "status" => "fulfilled",
+    "value" => "[ ALL SETTLED ] 4"
   ]
 ]
 ###
 
-"[ RACE ] fast"
+
+"[ RACE ] 2"
 
 
 "[ ANY ] 3"
@@ -297,7 +304,7 @@ $ffn->assert($fn, [], '
 "[ CATCH 1.2 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
 "[ THEN 1.2 ]" | [ "{ object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }" ]
 ',
-    1, 0.8
+    null, 0.9
 );
 
 
