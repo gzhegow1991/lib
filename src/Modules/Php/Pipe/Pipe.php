@@ -393,7 +393,7 @@ class Pipe
 
         if (false
             || (null === $throwableClass)
-            || (is_a($this->throwableCurrent, $throwableClass))
+            || ($this->throwableCurrent instanceof $throwableClass)
         ) {
             $ref = $this->throwableCurrent;
 
