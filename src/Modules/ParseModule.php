@@ -1114,9 +1114,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return \DateTimeZone|null
 	 */
-	public function timezone($value, ?array $allowedTimezoneTypes = null)
+	public function timezone($timezone, ?array $allowedTimezoneTypes = null)
 	{
-		if (Lib::type()->timezone($result, $value, $allowedTimezoneTypes)) {
+		if (Lib::type()->timezone($result, $timezone, $allowedTimezoneTypes)) {
 		    return $result;
 		}
 
@@ -1218,9 +1218,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return \DateTimeInterface|null
 	 */
-	public function date_formatted($formats, $dateFormatted, $timezoneFallback = null)
+	public function date_formatted($dateFormatted, $formats, $timezoneFallback = null)
 	{
-		if (Lib::type()->date_formatted($result, $formats, $dateFormatted, $timezoneFallback)) {
+		if (Lib::type()->date_formatted($result, $dateFormatted, $formats, $timezoneFallback)) {
 		    return $result;
 		}
 
@@ -1231,9 +1231,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return \DateTime|null
 	 */
-	public function adate_formatted($formats, $dateFormatted, $timezoneFallback = null)
+	public function adate_formatted($dateFormatted, $formats, $timezoneFallback = null)
 	{
-		if (Lib::type()->adate_formatted($result, $formats, $dateFormatted, $timezoneFallback)) {
+		if (Lib::type()->adate_formatted($result, $dateFormatted, $formats, $timezoneFallback)) {
 		    return $result;
 		}
 
@@ -1244,9 +1244,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return \DateTimeImmutable|null
 	 */
-	public function idate_formatted($formats, $dateFormatted, $timezoneFallback = null)
+	public function idate_formatted($dateFormatted, $formats, $timezoneFallback = null)
 	{
-		if (Lib::type()->idate_formatted($result, $formats, $dateFormatted, $timezoneFallback)) {
+		if (Lib::type()->idate_formatted($result, $dateFormatted, $formats, $timezoneFallback)) {
 		    return $result;
 		}
 
@@ -1296,9 +1296,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return \DateTimeInterface|null
 	 */
-	public function date_tz_formatted($formats, $dateFormatted, ?array $allowedTimezoneTypes = null)
+	public function date_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
 	{
-		if (Lib::type()->date_tz_formatted($result, $formats, $dateFormatted, $allowedTimezoneTypes)) {
+		if (Lib::type()->date_tz_formatted($result, $dateFormatted, $formats, $allowedTimezoneTypes)) {
 		    return $result;
 		}
 
@@ -1309,9 +1309,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return \DateTime|null
 	 */
-	public function adate_tz_formatted($formats, $dateFormatted, ?array $allowedTimezoneTypes = null)
+	public function adate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
 	{
-		if (Lib::type()->adate_tz_formatted($result, $formats, $dateFormatted, $allowedTimezoneTypes)) {
+		if (Lib::type()->adate_tz_formatted($result, $dateFormatted, $formats, $allowedTimezoneTypes)) {
 		    return $result;
 		}
 
@@ -1322,9 +1322,9 @@ class ParseModule extends AbstractParseModule
 	/**
 	 * @return \DateTimeImmutable|null
 	 */
-	public function idate_tz_formatted($formats, $dateFormatted, ?array $allowedTimezoneTypes = null)
+	public function idate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
 	{
-		if (Lib::type()->idate_tz_formatted($result, $formats, $dateFormatted, $allowedTimezoneTypes)) {
+		if (Lib::type()->idate_tz_formatted($result, $dateFormatted, $formats, $allowedTimezoneTypes)) {
 		    return $result;
 		}
 

@@ -1762,15 +1762,15 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function date_formatted($dateFormatted, $timezoneFallback = null)
+	public function date_formatted($formats, $timezoneFallback = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $timezoneFallback ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $formats, $timezoneFallback ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->date_formatted(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $dateFormatted, $timezoneFallback
+		        $formats, $timezoneFallback
 		    );
 		}
 
@@ -1781,15 +1781,15 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function adate_formatted($dateFormatted, $timezoneFallback = null)
+	public function adate_formatted($formats, $timezoneFallback = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $timezoneFallback ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $formats, $timezoneFallback ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->adate_formatted(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $dateFormatted, $timezoneFallback
+		        $formats, $timezoneFallback
 		    );
 		}
 
@@ -1800,15 +1800,15 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function idate_formatted($dateFormatted, $timezoneFallback = null)
+	public function idate_formatted($formats, $timezoneFallback = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $timezoneFallback ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $formats, $timezoneFallback ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->idate_formatted(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $dateFormatted, $timezoneFallback
+		        $formats, $timezoneFallback
 		    );
 		}
 
@@ -1876,15 +1876,15 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function date_tz_formatted($dateFormatted, ?array $allowedTimezoneTypes = null)
+	public function date_tz_formatted($formats, ?array $allowedTimezoneTypes = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $allowedTimezoneTypes ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $formats, $allowedTimezoneTypes ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->date_tz_formatted(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $dateFormatted, $allowedTimezoneTypes
+		        $formats, $allowedTimezoneTypes
 		    );
 		}
 
@@ -1895,15 +1895,15 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function adate_tz_formatted($dateFormatted, ?array $allowedTimezoneTypes = null)
+	public function adate_tz_formatted($formats, ?array $allowedTimezoneTypes = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $allowedTimezoneTypes ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $formats, $allowedTimezoneTypes ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->adate_tz_formatted(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $dateFormatted, $allowedTimezoneTypes
+		        $formats, $allowedTimezoneTypes
 		    );
 		}
 
@@ -1914,15 +1914,15 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
-	public function idate_tz_formatted($dateFormatted, ?array $allowedTimezoneTypes = null)
+	public function idate_tz_formatted($formats, ?array $allowedTimezoneTypes = null)
 	{
-		$this->fnList[] = [ __FUNCTION__, [ $dateFormatted, $allowedTimezoneTypes ] ];
+		$this->fnList[] = [ __FUNCTION__, [ $formats, $allowedTimezoneTypes ] ];
 
 		if (false !== $this->status) {
 		    $this->status = Lib::type()->idate_tz_formatted(
 		        $this->result,
 		        $this->result ?? $this->value,
-		        $dateFormatted, $allowedTimezoneTypes
+		        $formats, $allowedTimezoneTypes
 		    );
 		}
 

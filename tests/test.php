@@ -2310,19 +2310,19 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $result);
     echo PHP_EOL;
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, 'Y-m-d H:i:s O', '1970-01-01 00:00:00 +0100');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, '1970-01-01 00:00:00 +0100', 'Y-m-d H:i:s O',);
     $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, 'Y-m-d H:i:s T', '1970-01-01 00:00:00 EET');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, '1970-01-01 00:00:00 EET', 'Y-m-d H:i:s T',);
     $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, 'Y-m-d H:i:s e', '1970-01-01 00:00:00 Europe/Minsk');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, '1970-01-01 00:00:00 Europe/Minsk', 'Y-m-d H:i:s e',);
     $ffn->print($status, $result);
     echo PHP_EOL;
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, 'Y-m-d H:i:s O', '1970-01-01 00:00:00 +0100');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, '1970-01-01 00:00:00 +0100', 'Y-m-d H:i:s O',);
     $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, 'Y-m-d H:i:s T', '1970-01-01 00:00:00 EET');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, '1970-01-01 00:00:00 EET', 'Y-m-d H:i:s T',);
     $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, 'Y-m-d H:i:s e', '1970-01-01 00:00:00 Europe/Minsk');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, '1970-01-01 00:00:00 Europe/Minsk', 'Y-m-d H:i:s e',);
     $ffn->print($status, $result);
     echo PHP_EOL;
 

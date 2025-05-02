@@ -42,8 +42,8 @@ class DateModule
     const FORMAT_SQL_HOUR  = 'Y-m-d H:00:00';
     const FORMAT_SQL_MIN   = 'Y-m-d H:i:00';
     const FORMAT_SQL_SEC   = 'Y-m-d H:i:s';
-    const FORMAT_SQL_USEC  = 'Y-m-d H:i:s.u';
     const FORMAT_SQL_MSEC  = 'Y-m-d H:i:s.v';
+    const FORMAT_SQL_USEC  = 'Y-m-d H:i:s.u';
 
     const FORMAT_SQL_TIME      = self::FORMAT_SQL_TIME_SEC;
     const FORMAT_SQL_TIME_HOUR = 'H:00:00';
@@ -54,8 +54,8 @@ class DateModule
 
     const FORMAT_JAVASCRIPT      = self::FORMAT_JAVASCRIPT_SEC;
     const FORMAT_JAVASCRIPT_SEC  = "Y-m-d\TH:i:sP";
-    const FORMAT_JAVASCRIPT_USEC = "Y-m-d\TH:i:s.uP";
     const FORMAT_JAVASCRIPT_MSEC = "Y-m-d\TH:i:s.vP";
+    const FORMAT_JAVASCRIPT_USEC = "Y-m-d\TH:i:s.uP";
 
     const FORMAT_HUMAN_DATE = "D, d M Y O";
     const FORMAT_HUMAN      = "D, d M Y H:i:s O";
@@ -94,8 +94,8 @@ class DateModule
         self::FORMAT_SQL_HOUR  => true,
         self::FORMAT_SQL_MIN   => true,
         self::FORMAT_SQL_SEC   => true,
-        self::FORMAT_SQL_USEC  => true,
         self::FORMAT_SQL_MSEC  => true,
+        self::FORMAT_SQL_USEC  => true,
 
         self::FORMAT_SQL_TIME_HOUR => true,
         self::FORMAT_SQL_TIME_MIN  => true,
@@ -104,8 +104,8 @@ class DateModule
         self::FORMAT_SQL_TIME_USEC => true,
 
         self::FORMAT_JAVASCRIPT_SEC  => true,
-        self::FORMAT_JAVASCRIPT_USEC => true,
         self::FORMAT_JAVASCRIPT_MSEC => true,
+        self::FORMAT_JAVASCRIPT_USEC => true,
 
         self::FORMAT_HUMAN_DATE => true,
         self::FORMAT_HUMAN      => true,
@@ -115,38 +115,38 @@ class DateModule
     /**
      * @param \DateTimeZone|null $result
      */
-    public function type_timezone(&$result, $value, ?array $allowedTimezoneTypes = null) : bool
+    public function type_timezone(&$result, $timezone, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
-        $timezone = null;
+        $dateTimeZone = null;
 
-        if ($value instanceof \DateTimeZone) {
-            $timezone = $value;
+        if ($timezone instanceof \DateTimeZone) {
+            $dateTimeZone = $timezone;
 
-        } elseif ($value instanceof \DateTimeInterface) {
-            $timezone = $value->getTimezone();
+        } elseif ($timezone instanceof \DateTimeInterface) {
+            $dateTimeZone = $timezone->getTimezone();
 
         } else {
             try {
-                $timezone = new \DateTimeZone($value);
+                $dateTimeZone = new \DateTimeZone($timezone);
             }
             catch ( \Throwable $e ) {
             }
         }
 
         if (null !== $allowedTimezoneTypes) {
-            if (null !== $timezone) {
-                $timezoneType = $this->timezone_type($timezone);
+            if (null !== $dateTimeZone) {
+                $timezoneType = $this->timezone_type($dateTimeZone);
 
                 if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
-                    $timezone = null;
+                    $dateTimeZone = null;
                 }
             }
         }
 
-        if (null !== $timezone) {
-            $result = $timezone;
+        if (null !== $dateTimeZone) {
+            $result = $dateTimeZone;
 
             return true;
         }
@@ -161,32 +161,32 @@ class DateModule
     {
         $result = null;
 
-        $timezone = null;
+        $dateTimeZone = null;
 
         if ($timezoneOrOffset instanceof \DateTimeZone) {
-            $timezone = $timezoneOrOffset;
+            $dateTimeZone = $timezoneOrOffset;
 
         } elseif ($timezoneOrOffset instanceof \DateTimeInterface) {
-            $timezone = $timezoneOrOffset->getTimezone();
+            $dateTimeZone = $timezoneOrOffset->getTimezone();
 
         } else {
             try {
-                $timezone = new \DateTimeZone($timezoneOrOffset);
+                $dateTimeZone = new \DateTimeZone($timezoneOrOffset);
             }
             catch ( \Throwable $e ) {
             }
         }
 
-        if (null !== $timezone) {
-            $timezoneType = $this->timezone_type($timezone);
+        if (null !== $dateTimeZone) {
+            $timezoneType = $this->timezone_type($dateTimeZone);
 
             if ($timezoneType !== 1) {
-                $timezone = null;
+                $dateTimeZone = null;
             }
         }
 
-        if (null !== $timezone) {
-            $result = $timezone;
+        if (null !== $dateTimeZone) {
+            $result = $dateTimeZone;
 
             return true;
         }
@@ -201,32 +201,32 @@ class DateModule
     {
         $result = null;
 
-        $timezone = null;
+        $dateTimeZone = null;
 
         if ($timezoneOrAbbr instanceof \DateTimeZone) {
-            $timezone = $timezoneOrAbbr;
+            $dateTimeZone = $timezoneOrAbbr;
 
         } elseif ($timezoneOrAbbr instanceof \DateTimeInterface) {
-            $timezone = $timezoneOrAbbr->getTimezone();
+            $dateTimeZone = $timezoneOrAbbr->getTimezone();
 
         } else {
             try {
-                $timezone = new \DateTimeZone($timezoneOrAbbr);
+                $dateTimeZone = new \DateTimeZone($timezoneOrAbbr);
             }
             catch ( \Throwable $e ) {
             }
         }
 
-        if (null !== $timezone) {
-            $timezoneType = $this->timezone_type($timezone);
+        if (null !== $dateTimeZone) {
+            $timezoneType = $this->timezone_type($dateTimeZone);
 
             if ($timezoneType !== 2) {
-                $timezone = null;
+                $dateTimeZone = null;
             }
         }
 
-        if (null !== $timezone) {
-            $result = $timezone;
+        if (null !== $dateTimeZone) {
+            $result = $dateTimeZone;
 
             return true;
         }
@@ -241,32 +241,32 @@ class DateModule
     {
         $result = null;
 
-        $timezone = null;
+        $dateTimeZone = null;
 
         if ($timezoneOrName instanceof \DateTimeZone) {
-            $timezone = $timezoneOrName;
+            $dateTimeZone = $timezoneOrName;
 
         } elseif ($timezoneOrName instanceof \DateTimeInterface) {
-            $timezone = $timezoneOrName->getTimezone();
+            $dateTimeZone = $timezoneOrName->getTimezone();
 
         } else {
             try {
-                $timezone = new \DateTimeZone($timezoneOrName);
+                $dateTimeZone = new \DateTimeZone($timezoneOrName);
             }
             catch ( \Throwable $e ) {
             }
         }
 
-        if (null !== $timezone) {
-            $timezoneType = $this->timezone_type($timezone);
+        if (null !== $dateTimeZone) {
+            $timezoneType = $this->timezone_type($dateTimeZone);
 
             if ($timezoneType !== 3) {
-                $timezone = null;
+                $dateTimeZone = null;
             }
         }
 
-        if (null !== $timezone) {
-            $result = $timezone;
+        if (null !== $dateTimeZone) {
+            $result = $dateTimeZone;
 
             return true;
         }
@@ -281,35 +281,35 @@ class DateModule
     {
         $result = null;
 
-        $timezone = null;
+        $dateTimeZone = null;
 
         if ($timezoneOrNameOrAbbr instanceof \DateTimeZone) {
-            $timezone = $timezoneOrNameOrAbbr;
+            $dateTimeZone = $timezoneOrNameOrAbbr;
 
         } elseif ($timezoneOrNameOrAbbr instanceof \DateTimeInterface) {
-            $timezone = $timezoneOrNameOrAbbr->getTimezone();
+            $dateTimeZone = $timezoneOrNameOrAbbr->getTimezone();
 
         } else {
             try {
-                $timezone = new \DateTimeZone($timezoneOrNameOrAbbr);
+                $dateTimeZone = new \DateTimeZone($timezoneOrNameOrAbbr);
             }
             catch ( \Throwable $e ) {
             }
         }
 
-        if (null !== $timezone) {
-            $timezoneType = $this->timezone_type($timezone);
+        if (null !== $dateTimeZone) {
+            $timezoneType = $this->timezone_type($dateTimeZone);
 
             if (! (
                 ($timezoneType === 2)
                 || ($timezoneType === 3)
             )) {
-                $timezone = null;
+                $dateTimeZone = null;
             }
         }
 
-        if (null !== $timezone) {
-            $result = $timezone;
+        if (null !== $dateTimeZone) {
+            $result = $dateTimeZone;
 
             return true;
         }
@@ -463,7 +463,7 @@ class DateModule
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function type_date_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null) : bool
+    public function type_date_formatted(&$result, $dateFormatted, $formats, $timezoneFallback = null) : bool
     {
         $result = null;
 
@@ -533,7 +533,7 @@ class DateModule
     /**
      * @param \DateTime|null $result
      */
-    public function type_adate_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null) : bool
+    public function type_adate_formatted(&$result, $dateFormatted, $formats, $timezoneFallback = null) : bool
     {
         $result = null;
 
@@ -603,7 +603,7 @@ class DateModule
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function type_idate_formatted(&$result, $formats, $dateFormatted, $timezoneFallback = null) : bool
+    public function type_idate_formatted(&$result, $dateFormatted, $formats, $timezoneFallback = null) : bool
     {
         $result = null;
 
@@ -845,7 +845,7 @@ class DateModule
     /**
      * @param \DateTimeInterface|null $result
      */
-    public function type_date_tz_formatted(&$result, $formats, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
+    public function type_date_tz_formatted(&$result, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -924,7 +924,7 @@ class DateModule
     /**
      * @param \DateTime|null $result
      */
-    public function type_adate_tz_formatted(&$result, $formats, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
+    public function type_adate_tz_formatted(&$result, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -1003,7 +1003,7 @@ class DateModule
     /**
      * @param \DateTimeImmutable|null $result
      */
-    public function type_idate_tz_formatted(&$result, $formats, $dateFormatted, ?array $allowedTimezoneTypes = null) : bool
+    public function type_idate_tz_formatted(&$result, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
     {
         $result = null;
 
@@ -1306,18 +1306,18 @@ class DateModule
             return true;
         }
 
-        $var = null;
+        $dateInterval = null;
 
         $status = null
-            || $this->type_interval_duration($var, $interval)
-            || $this->type_interval_datestring($var, $interval)
+            || $this->type_interval_duration($dateInterval, $interval)
+            || $this->type_interval_datestring($dateInterval, $interval)
             //
             // > commented, autoparsing integers is bad practice
             // || $this->type_interval_microtime($var, $interval)
         ;
 
         if ($status) {
-            $result = $var;
+            $result = $dateInterval;
 
             return true;
         }
@@ -1436,14 +1436,14 @@ class DateModule
         }
 
         if ($date instanceof \DateTimeInterface) {
-            $_from = $from ?? new \DateTime('now');
+            $fromDate = $from ?? new \DateTime('now');
 
             if ($isFrom) {
-                $result = $_from->diff($date);
+                $result = $fromDate->diff($date);
 
             } else {
                 // } elseif ($isUntil) {
-                $result = $date->diff($_from);
+                $result = $date->diff($fromDate);
             }
 
             return true;
