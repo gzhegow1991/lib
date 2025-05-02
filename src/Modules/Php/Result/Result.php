@@ -17,20 +17,21 @@ class Result
         return static::getInstance()->parse($ref);
     }
 
-    public static function map(?ResultContext &$ref = null) : ?ResultContext
+
+    public static function assert(?ResultContext &$ref = null) : ?ResultContext
     {
-        return static::getInstance()->map($ref);
+        return static::getInstance()->assert($ref);
     }
 
 
-    public static function assertType(?ResultContext &$ref = null) : ?ResultContext
+    public static function chainType(?ResultContext &$ref = null) : ?ResultContext
     {
-        return static::getInstance()->assertType($ref);
+        return static::getInstance()->chainType($ref);
     }
 
-    public static function assertParse(?ResultContext &$ref = null) : ?ResultContext
+    public static function chainParse(?ResultContext &$ref = null) : ?ResultContext
     {
-        return static::getInstance()->assertParse($ref);
+        return static::getInstance()->chainParse($ref);
     }
 
 

@@ -25,15 +25,15 @@ class PromiseItem
     /**
      * @var callable
      */
-    protected $fnExecute;
+    protected $fnExecutor;
     /**
      * @var callable
      */
-    protected $fnTick;
+    protected $fnTicker;
     /**
      * @var callable
      */
-    protected $fnSettle;
+    protected $fnSettler;
 
     /**
      * @var string
@@ -191,13 +191,13 @@ class PromiseItem
     }
 
     /**
-     * @param callable $fnTick
+     * @param callable $fnTicker
      *
      * @return static
      */
-    public static function pooling($fnTick) : PromiseItem
+    public static function pooling($fnTicker) : PromiseItem
     {
-        $instance = static::fromCallableTick($fnTick);
+        $instance = static::fromCallableTick($fnTicker);
 
         $id = Promise::add($instance);
 
@@ -208,13 +208,13 @@ class PromiseItem
     {
         $msTarget = microtime(true) + ($ms / 1000);
 
-        $fnTick = static function ($fnOk) use ($msTarget) {
+        $fnTicker = static function ($fnOk) use ($msTarget) {
             if (microtime(true) >= $msTarget) {
                 $fnOk();
             }
         };
 
-        $instance = static::fromCallableTick($fnTick);
+        $instance = static::fromCallableTick($fnTicker);
 
         $id = Promise::add($instance);
 
@@ -276,7 +276,7 @@ class PromiseItem
         }
 
         $instance = new static();
-        $instance->fnExecute = static::fnExecute($instance, $from);
+        $instance->fnExecutor = static::fnExecutor($instance, $from);
 
         return Result::ok($ctx, $instance);
     }
@@ -295,7 +295,7 @@ class PromiseItem
         }
 
         $instance = new static();
-        $instance->fnTick = static::fnTick($instance, $from);
+        $instance->fnTicker = static::fnTicker($instance, $from);
 
         return Result::ok($ctx, $instance);
     }
@@ -305,9 +305,10 @@ class PromiseItem
     {
         $fn = null;
 
-        $status = $this->hasFnSettle($fn)
-            || $this->hasFnTick($fn)
-            || $this->hasFnExecute($fn);
+        $status =
+            $this->hasFnSettler($fn)
+            || $this->hasFnTicker($fn)
+            || $this->hasFnExecutor($fn);
 
         return $status;
     }
@@ -320,12 +321,12 @@ class PromiseItem
     }
 
 
-    protected function hasFnExecute(\Closure &$fn = null) : bool
+    protected function hasFnExecutor(\Closure &$fn = null) : bool
     {
         $fn = null;
 
-        if (null !== $this->fnExecute) {
-            $fn = $this->fnExecute;
+        if (null !== $this->fnExecutor) {
+            $fn = $this->fnExecutor;
 
             return true;
         }
@@ -333,12 +334,12 @@ class PromiseItem
         return false;
     }
 
-    protected function hasFnTick(\Closure &$fn = null) : bool
+    protected function hasFnTicker(\Closure &$fn = null) : bool
     {
         $fn = null;
 
-        if (null !== $this->fnTick) {
-            $fn = $this->fnTick;
+        if (null !== $this->fnTicker) {
+            $fn = $this->fnTicker;
 
             return true;
         }
@@ -346,12 +347,12 @@ class PromiseItem
         return false;
     }
 
-    protected function hasFnSettle(\Closure &$fn = null) : bool
+    protected function hasFnSettler(\Closure &$fn = null) : bool
     {
         $fn = null;
 
-        if (null !== $this->fnSettle) {
-            $fn = $this->fnSettle;
+        if (null !== $this->fnSettler) {
+            $fn = $this->fnSettler;
 
             return true;
         }
@@ -528,8 +529,8 @@ class PromiseItem
             );
         }
 
-        $this->fnExecute = null;
-        $this->fnSettle = null;
+        $this->fnExecutor = null;
+        $this->fnSettler = null;
 
         if ([] !== $this->settles) {
             $promiseSettles = $this->settles;
@@ -544,7 +545,7 @@ class PromiseItem
                         $fnOnRejected = $promiseSettle->fnOnRejected;
 
                         if ($fnOnRejected) {
-                            $promise->fnSettle = static::fnSettleCatch($promiseSettle, $reason);
+                            $promise->fnSettler = static::fnSettlerCatch($promiseSettle, $reason);
 
                         } else {
                             static::reject($promise, $reason);
@@ -554,7 +555,7 @@ class PromiseItem
                         $fnOnResolved = $promiseSettle->fnOnResolved;
 
                         if ($fnOnResolved) {
-                            $promise->fnSettle = static::fnSettleThen($promiseSettle, $value);
+                            $promise->fnSettler = static::fnSettlerThen($promiseSettle, $value);
 
                         } else {
                             static::resolve($promise, $value);
@@ -566,7 +567,7 @@ class PromiseItem
                         $fnOnRejected = $promiseSettle->fnOnRejected;
 
                         if ($fnOnRejected) {
-                            $promise->fnSettle = static::fnSettleCatch($promiseSettle, $reason);
+                            $promise->fnSettler = static::fnSettlerCatch($promiseSettle, $reason);
 
                         } else {
                             static::reject($promise, $reason);
@@ -584,7 +585,7 @@ class PromiseItem
 
                     if ($isResolved || $isRejected) {
                         if ($fnOnFinally) {
-                            $promise->fnSettle = static::fnSettleFinally($promiseSettle, $value);
+                            $promise->fnSettler = static::fnSettlerFinally($promiseSettle, $value);
 
                         } else {
                             if ($isResolved) {
@@ -665,7 +666,7 @@ class PromiseItem
      *
      * @return \Closure
      */
-    protected static function fnExecute($promise, $fn)
+    protected static function fnExecutor($promise, $fn)
     {
         return static function () use ($promise, $fn) {
             try {
@@ -686,7 +687,7 @@ class PromiseItem
      *
      * @return \Closure
      */
-    protected static function fnTick($promise, $fn)
+    protected static function fnTicker($promise, $fn)
     {
         return static function () use ($promise, $fn) {
             $promise->state = static::STATE_POOLING;
@@ -709,7 +710,7 @@ class PromiseItem
      *
      * @return \Closure
      */
-    protected static function fnSettleThen($promiseSettle, $value)
+    protected static function fnSettlerThen($promiseSettle, $value)
     {
         return static function () use ($promiseSettle, $value) {
             $promise = $promiseSettle->promise;
@@ -770,7 +771,7 @@ class PromiseItem
      *
      * @return \Closure
      */
-    protected static function fnSettleCatch($promiseSettle, $reason)
+    protected static function fnSettlerCatch($promiseSettle, $reason)
     {
         return static function () use ($promiseSettle, $reason) {
             $promise = $promiseSettle->promise;
@@ -821,7 +822,7 @@ class PromiseItem
      *
      * @return \Closure
      */
-    protected static function fnSettleFinally($promiseSettle, $value)
+    protected static function fnSettlerFinally($promiseSettle, $value)
     {
         return static function () use ($promiseSettle, $value) {
             $promiseParent = $promiseSettle->promiseParent;

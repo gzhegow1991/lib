@@ -11,6 +11,7 @@ use Gzhegow\Lib\Modules\StrModule;
 use Gzhegow\Lib\Modules\UrlModule;
 use Gzhegow\Lib\Modules\ArrModule;
 use Gzhegow\Lib\Modules\CmpModule;
+use Composer\Autoload\ClassLoader;
 use Gzhegow\Lib\Modules\JsonModule;
 use Gzhegow\Lib\Modules\HttpModule;
 use Gzhegow\Lib\Modules\TestModule;
@@ -464,5 +465,16 @@ class Lib
         }
 
         return $mt;
+    }
+
+
+    public static function requireComposerGlobal() : ClassLoader
+    {
+        return require getenv('COMPOSER_HOME') . '/vendor/autoload.php';
+    }
+
+    public static function requireOnceComposerGlobal() : ClassLoader
+    {
+        return require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
     }
 }

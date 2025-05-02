@@ -110,7 +110,6 @@ $ffn = new class {
 };
 
 
-
 // >>> TEST
 // > тесты Promise
 $fn = function () use ($ffn) {
@@ -692,6 +691,9 @@ $fn = function () use ($ffn) {
     $ffn->print('[ Config ]');
     echo PHP_EOL;
 
+    /**
+     * @property $child
+     */
     class ConfigDummy extends \Gzhegow\Lib\Config\AbstractConfig
     {
         protected $child;
@@ -704,11 +706,17 @@ $fn = function () use ($ffn) {
         }
     }
 
+    /**
+     * @property $foo
+     */
     class ConfigChildDummy extends \Gzhegow\Lib\Config\AbstractConfig
     {
         protected $foo = 'bar';
     }
 
+    /**
+     * @property $child
+     */
     class ConfigValidateDummy extends \Gzhegow\Lib\Config\AbstractConfig
     {
         protected $child;
@@ -721,6 +729,10 @@ $fn = function () use ($ffn) {
         }
     }
 
+    /**
+     * @property $foo
+     * @property $foo2
+     */
     class ConfigChildValidateDummy extends \Gzhegow\Lib\Config\AbstractConfig
     {
         protected $foo = 1;
@@ -820,7 +832,7 @@ $fn = function () use ($ffn) {
     $invalidValue = NAN;
 
 
-    class ResultHelper
+    class ResultTest
     {
         public static function string($value, $ctx = null)
         {
@@ -858,7 +870,8 @@ $fn = function () use ($ffn) {
         || \Gzhegow\Lib\Modules\Type\Number::fromStatic($invalidValue, $ctx)
         || \Gzhegow\Lib\Modules\Type\Number::fromValidArray($invalidValue, $ctx);
 
-    $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $ctx->errors());
+    $errors = $ctx->errors();
+    $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $errors);
     $ffn->print_array_multiline($errors, 2);
     echo PHP_EOL;
 
@@ -867,16 +880,35 @@ $fn = function () use ($ffn) {
         ?? \Gzhegow\Lib\Modules\Type\Number::fromStatic($invalidValue, $ctx)
         ?? \Gzhegow\Lib\Modules\Type\Number::fromValidArray($invalidValue, $ctx);
 
-    $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $ctx->errors());
+    $errors = $ctx->errors();
+    $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $errors);
     $ffn->print_array_multiline($errors, 2);
     echo PHP_EOL;
 
 
+    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::assert();
     try {
-        $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::assertType();
+        $value = \Gzhegow\Lib\Modules\Type\Number::fromStatic($invalidValue, $ctx);
+    }
+    catch ( \Throwable $e ) {
+        $messages = \Gzhegow\Lib\Lib::debug()
+            ->throwableManager()
+            ->getPreviousMessagesLines(
+                $e,
+                [ 'with_file' => false ]
+            )
+        ;
+
+        echo implode(PHP_EOL, $messages) . PHP_EOL;
+        echo PHP_EOL;
+    }
+
+
+    try {
+        $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::chainType();
         $status = true
-            && ResultHelper::string($invalidValue, $ctx)
-            && ResultHelper::string_not_empty($ctx->get(), $ctx);
+            && ResultTest::string($invalidValue, $ctx)
+            && ResultTest::string_not_empty($ctx->get(), $ctx);
     }
     catch ( \Throwable $e ) {
         $messages = \Gzhegow\Lib\Lib::debug()
@@ -892,10 +924,10 @@ $fn = function () use ($ffn) {
     }
 
     try {
-        $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::assertParse();
+        $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::chainParse();
         $devnull = null
-            ?? ResultHelper::string($invalidValue, $ctx)
-            ?? ResultHelper::string_not_empty($ctx->get(), $ctx);
+            ?? ResultTest::string($invalidValue, $ctx)
+            ?? ResultTest::string_not_empty($ctx->get(), $ctx);
     }
     catch ( \Throwable $e ) {
         $messages = \Gzhegow\Lib\Lib::debug()
@@ -913,18 +945,23 @@ $fn = function () use ($ffn) {
 
     $validValue = '123';
 
-    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::assertType();
-    $status = true
-        && ResultHelper::string($validValue, $ctx)
-        && ResultHelper::string_not_empty($ctx->get(), $ctx);
-    $ffn->print($ctx->get());
+    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::assert();
+    $value = ResultTest::string($validValue, $ctx);
+    $ffn->print($value, $ctx->get());
     echo PHP_EOL;
 
-    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::assertParse();
+    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::chainType();
+    $status = true
+        && ResultTest::string($validValue, $ctx)
+        && ResultTest::string_not_empty($ctx->get(), $ctx);
+    $ffn->print($status, $ctx->get());
+    echo PHP_EOL;
+
+    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::chainParse();
     $devnull = null
-        ?? ResultHelper::string($validValue, $ctx)
-        ?? ResultHelper::string_not_empty($ctx->get(), $ctx);
-    $ffn->print($ctx->get());
+        ?? ResultTest::string($validValue, $ctx)
+        ?? ResultTest::string_not_empty($ctx->get(), $ctx);
+    $ffn->print($devnull, $ctx->get());
 };
 $ffn->assert_stdout($fn, [], '
 "[ Result ]"
@@ -943,15 +980,20 @@ $ffn->assert_stdout($fn, [], '
 ]
 ###
 
-[ 0 ] The `value` should be string
+[ 0 ] The `from` must be instance of: Gzhegow\Lib\Modules\Type\Number
 { object # Gzhegow\Lib\Exception\LogicException }
 
 [ 0 ] The `value` should be string
 { object # Gzhegow\Lib\Exception\LogicException }
 
-"123"
+[ 0 ] The `value` should be string
+{ object # Gzhegow\Lib\Exception\LogicException }
 
-"123"
+"123" | "123"
+
+TRUE | "123"
+
+NULL | "123"
 ');
 
 
@@ -1791,14 +1833,14 @@ $fn = function () use ($ffn) {
     ];
     $src = 'hello world!';
     foreach ( $algos as $algo ) {
-        $binary = false;
-        $enc = \Gzhegow\Lib\Lib::crypt()->hash($algo, $src, $binary);
-        $status = \Gzhegow\Lib\Lib::crypt()->hash_equals($enc, $algo, $src, $binary);
+        $isModeBinary = false;
+        $enc = \Gzhegow\Lib\Lib::crypt()->hash($algo, $src, $isModeBinary);
+        $status = \Gzhegow\Lib\Lib::crypt()->hash_equals($enc, $algo, $src, $isModeBinary);
         $ffn->print($src, $enc, $status);
 
-        $binary = true;
-        $enc = \Gzhegow\Lib\Lib::crypt()->hash($algo, $src, $binary);
-        $status = \Gzhegow\Lib\Lib::crypt()->hash_equals($enc, $algo, $src, $binary);
+        $isModeBinary = true;
+        $enc = \Gzhegow\Lib\Lib::crypt()->hash($algo, $src, $isModeBinary);
+        $status = \Gzhegow\Lib\Lib::crypt()->hash_equals($enc, $algo, $src, $isModeBinary);
         $ffn->print($src, $enc, $status);
 
         echo PHP_EOL;
@@ -1838,59 +1880,59 @@ $fn = function () use ($ffn) {
     echo PHP_EOL;
 
 
-    $oneBased = false;
+    $isOneBased = false;
     $src = 0;
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
     $ffn->print($src, $enc, $dec);
 
-    $oneBased = false;
+    $isOneBased = false;
     $src = 10;
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
     $ffn->print($src, $enc, $dec);
 
-    $oneBased = false;
+    $isOneBased = false;
     $src = 25;
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
     $ffn->print($src, $enc, $dec);
 
-    $oneBased = false;
+    $isOneBased = false;
     $src = 26;
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
     $ffn->print($src, $enc, $dec);
 
     echo PHP_EOL;
 
 
-    $oneBased = true;
+    $isOneBased = true;
     $src = 0;
     $e = null;
     try {
-        $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+        $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
     }
     catch ( \Throwable $e ) {
     }
     $ffn->print($src, '[ CATCH ] ' . $e->getMessage());
 
-    $oneBased = true;
+    $isOneBased = true;
     $src = 10;
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
     $ffn->print($src, $enc, $dec);
 
-    $oneBased = true;
+    $isOneBased = true;
     $src = 26;
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
     $ffn->print($src, $enc, $dec);
 
-    $oneBased = true;
+    $isOneBased = true;
     $src = 27;
-    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
-    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $oneBased);
+    $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
+    $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
     $ffn->print($src, $enc, $dec);
 
     echo PHP_EOL;

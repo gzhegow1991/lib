@@ -24,14 +24,6 @@ class ResultManager implements ResultManagerInterface
         );
     }
 
-    public function map(?ResultContext &$ref = null) : ?ResultContext
-    {
-        return $ref = ResultContext::fromMode(
-            ResultContext::MODE_RETURN_CONTEXT,
-            ResultContext::MODE_THROW_OFF,
-        );
-    }
-
 
     public function assert(?ResultContext &$ref = null) : ?ResultContext
     {
@@ -41,7 +33,8 @@ class ResultManager implements ResultManagerInterface
         );
     }
 
-    public function assertType(?ResultContext &$ref = null) : ?ResultContext
+
+    public function chainType(?ResultContext &$ref = null) : ?ResultContext
     {
         return $ref = ResultContext::fromMode(
             ResultContext::MODE_RETURN_BOOLEAN,
@@ -49,7 +42,7 @@ class ResultManager implements ResultManagerInterface
         );
     }
 
-    public function assertParse(?ResultContext &$ref = null) : ?ResultContext
+    public function chainParse(?ResultContext &$ref = null) : ?ResultContext
     {
         return $ref = ResultContext::fromMode(
             ResultContext::MODE_RETURN_NULL,

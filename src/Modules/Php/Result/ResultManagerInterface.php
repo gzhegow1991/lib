@@ -9,14 +9,13 @@ interface ResultManagerInterface
 
     public function parse(?ResultContext &$ref = null) : ?ResultContext;
 
-    public function map(?ResultContext &$ref = null) : ?ResultContext;
-
 
     public function assert(?ResultContext &$ref = null) : ?ResultContext;
 
-    public function assertType(?ResultContext &$ref = null) : ?ResultContext;
 
-    public function assertParse(?ResultContext &$ref = null) : ?ResultContext;
+    public function chainType(?ResultContext &$ref = null) : ?ResultContext;
+
+    public function chainParse(?ResultContext &$ref = null) : ?ResultContext;
 
 
     /**

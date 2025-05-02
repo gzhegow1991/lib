@@ -161,16 +161,17 @@ class CryptModule
     public function hash(
         string $algo,
         string $datastring,
-        ?bool $binary = null, array $options = []
+        ?bool $isModeBinary = null,
+        array $options = []
     ) : string
     {
-        $binary = $binary ?? false;
+        $isModeBinary = $isModeBinary ?? false;
 
         $result = null;
 
         $result = (PHP_VERSION_ID >= 80100)
-            ? hash($algo, $datastring, $binary, $options)
-            : hash($algo, $datastring, $binary);
+            ? hash($algo, $datastring, $isModeBinary, $options)
+            : hash($algo, $datastring, $isModeBinary);
 
         return $result;
     }
@@ -179,13 +180,14 @@ class CryptModule
         string $user_hash,
         string $algo,
         string $user_datastring,
-        ?bool $binary = null, array $options = []
+        ?bool $isModeBinary = null,
+        array $options = []
     )
     {
         $known_hash = $this->hash(
             $algo,
             $user_datastring,
-            $binary, $options
+            $isModeBinary, $options
         );
 
         return hash_equals($known_hash, $user_hash);
@@ -194,12 +196,13 @@ class CryptModule
     public function hash_hmac(
         string $algo, string $secret_key,
         string $datastring,
-        ?bool $binary = null, array $options = []
+        ?bool $isModeBinary = null,
+        array $options = []
     )
     {
-        $binary = $binary ?? false;
+        $isModeBinary = $isModeBinary ?? false;
 
-        $hmac = hash_hmac($algo, $datastring, $secret_key, $binary);
+        $hmac = hash_hmac($algo, $datastring, $secret_key, $isModeBinary);
 
         return $hmac;
     }
@@ -208,13 +211,14 @@ class CryptModule
         string $user_hmac,
         string $algo, string $secret_key,
         string $user_datastring,
-        ?bool $binary = null, array $options = []
+        ?bool $isModeBinary = null,
+        array $options = []
     )
     {
         $known_hmac = $this->hash_hmac(
             $algo, $secret_key,
             $user_datastring,
-            $binary, $options
+            $isModeBinary, $options
         );
 
         return hash_equals($known_hmac, $user_hmac);

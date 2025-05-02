@@ -246,11 +246,11 @@ class PromiseManager implements PromiseManagerInterface
 
     public function timeout(PromiseItem $promise, float $ms, $reason = null) : PromiseItem
     {
-        $fnOnResolvedTimeout = static function () use ($reason, $ms) {
+        $fnOnResolvedTimeout = static function () use ($ms, $reason) {
             if ($reason instanceof \Throwable) {
                 throw $reason;
 
-            } elseif (is_array($reason)) {
+            } elseif (is_array($reason) && ([] !== $reason)) {
                 $reason[] = $ms;
 
                 throw new RuntimeException($reason);
