@@ -800,6 +800,19 @@ class ParseModule extends AbstractParseModule
 
 
 	/**
+	 * @return mixed|null
+	 */
+	public function key_exists($value, $key)
+	{
+		if (Lib::type()->key_exists($result, $value, $key)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
 	 * @return array|null
 	 */
 	public function array_plain($value)

@@ -47,6 +47,31 @@ class ArrModule
 
 
     /**
+     * @param mixed|null $result
+     */
+    public function type_key_exists(&$result, $value, $key) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        if ([] === $value) {
+            return false;
+        }
+
+        if (! array_key_exists($key, $value)) {
+            return false;
+        }
+
+        $result = $value[ $key ];
+
+        return true;
+    }
+
+
+    /**
      * @param array|null $result
      */
     public function type_array_plain(&$result, $value) : bool
@@ -1032,34 +1057,6 @@ class ArrModule
                 $result[ $key ] = ++$i;
             }
         }
-
-        return $result;
-    }
-
-    /**
-     * > заполнить ключи в массиве значениями из указанного ключа, если они не были уже заполнены до этого
-     */
-    public function fill_defaults(array $src, array $keys, $keyDefault, bool $shouldRemoveKeyDefault = null) : array
-    {
-        $shouldRemoveKeyDefault = $shouldRemoveKeyDefault ?? false;
-
-        $keyDefault = (string) $keyDefault;
-
-        if ([] === $keys) {
-            if ($shouldRemoveKeyDefault) {
-                unset($src[ $keyDefault ]);
-            }
-
-            return $src;
-        }
-
-        $valueDefault = $src[ $keyDefault ] ?? null;
-
-        if ($shouldRemoveKeyDefault) {
-            unset($src[ $keyDefault ]);
-        }
-
-        $result = $src + array_fill_keys($keys, $valueDefault);
 
         return $result;
     }

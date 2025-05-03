@@ -1154,6 +1154,25 @@ class AssertModule extends AbstractAssertModule
 	/**
 	 * @return static
 	 */
+	public function key_exists($key)
+	{
+		$this->fnList[] = [ __FUNCTION__, [ $key ] ];
+
+		if (false !== $this->status) {
+		    $this->status = Lib::type()->key_exists(
+		        $this->result,
+		        $this->result ?? $this->value,
+		        $key
+		    );
+		}
+
+		return $this;
+	}
+
+
+	/**
+	 * @return static
+	 */
 	public function array_plain()
 	{
 		$this->fnList[] = [ __FUNCTION__, [  ] ];

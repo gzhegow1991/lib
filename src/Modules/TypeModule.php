@@ -1816,6 +1816,15 @@ class TypeModule extends AbstractTypeModule
 
 
     /**
+     * @param mixed|null $result
+     */
+    public function key_exists(&$result, $value, $key) : bool
+    {
+        return Lib::arr()->type_key_exists($result, $value, $key);
+    }
+
+
+    /**
      * @param array|null $result
      */
     public function array_plain(&$result, $value) : bool
