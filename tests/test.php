@@ -1005,6 +1005,16 @@ $fn = function () use ($ffn) {
     echo PHP_EOL;
 
 
+    $res = \Gzhegow\Lib\Lib::arr()->fill_defaults(
+        [ '' => 'test', 'hello' => 'world' ],
+        [ 'hello', 'foo' ],
+        '',
+        true
+    );
+    $ffn->print_array_multiline($res);
+    echo PHP_EOL;
+
+
     $cases = [
         [ [ 1, 2, 3 ], [ 2, 3, 4 ] ],
         [ [ 1, '2', 3 ], [ 2, 3 ] ],
@@ -1177,6 +1187,13 @@ $fn = function () use ($ffn) {
 };
 $ffn->assert_stdout($fn, [], '
 "[ ArrModule ]"
+
+###
+[
+  "hello" => "world",
+  "foo" => "test"
+]
+###
 
 [ 1 => 2, 2 => 3 ] | [ 1 => 2, 2 => 3 ] | TRUE
 [ 1 ] | [ 1 ] | TRUE

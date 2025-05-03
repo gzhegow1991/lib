@@ -1013,10 +1013,8 @@ class ArrModule
     /**
      * > создать массив из ключей и заполнить значениями, если значение не передать заполнит цифрами по порядку
      */
-    public function fill_keys($keys, array $new = []) : array
+    public function fill_keys(array $keys, array $new = []) : array
     {
-        $keys = (array) $keys;
-
         if ([] === $keys) {
             return [];
         }
@@ -1034,6 +1032,34 @@ class ArrModule
                 $result[ $key ] = ++$i;
             }
         }
+
+        return $result;
+    }
+
+    /**
+     * > заполнить ключи в массиве значениями из указанного ключа, если они не были уже заполнены до этого
+     */
+    public function fill_defaults(array $src, array $keys, $keyDefault, bool $shouldRemoveKeyDefault = null) : array
+    {
+        $shouldRemoveKeyDefault = $shouldRemoveKeyDefault ?? false;
+
+        $keyDefault = (string) $keyDefault;
+
+        if ([] === $keys) {
+            if ($shouldRemoveKeyDefault) {
+                unset($src[ $keyDefault ]);
+            }
+
+            return $src;
+        }
+
+        $valueDefault = $src[ $keyDefault ] ?? null;
+
+        if ($shouldRemoveKeyDefault) {
+            unset($src[ $keyDefault ]);
+        }
+
+        $result = $src + array_fill_keys($keys, $valueDefault);
 
         return $result;
     }
