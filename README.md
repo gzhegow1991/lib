@@ -197,7 +197,6 @@ $fn = function () use ($ffn) {
         '[ 100 | ALL ] 1',
         \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(100)->then(function () { return '[ 100 | ALL ] 2'; }),
         \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ 100 | ALL ] 3'),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ 100 | ALL ] 4'),
     ];
     \Gzhegow\Lib\Modules\Php\Promise\Promise::all($ps)
         ->then(function ($res) use ($ffn) {
@@ -267,8 +266,7 @@ $ffn->assert($fn, [], '
 [
   "[ 100 | ALL ] 1",
   "[ 100 | ALL ] 2",
-  "[ 100 | ALL ] 3",
-  "[ 100 | ALL ] 4"
+  "[ 100 | ALL ] 3"
 ]
 ###
 
