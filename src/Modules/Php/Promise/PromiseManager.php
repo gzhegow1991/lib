@@ -4,49 +4,78 @@ namespace Gzhegow\Lib\Modules\Php\Promise;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Php\Loop\LoopManagerInterface;
+use Gzhegow\Lib\Modules\Php\Timer\TimerManagerInterface;
 
 
 class PromiseManager implements PromiseManagerInterface
 {
     /**
-     * @var bool
+     * @var LoopManagerInterface
      */
-    protected $signalBreak = false;
-
+    protected $loop;
     /**
-     * @var int
+     * @var TimerManagerInterface
      */
-    protected $queueId = 0;
-    /**
-     * @var PromiseItem[]
-     */
-    protected $queue = [];
+    protected $timer;
 
 
-    public function new($fnExecute) : PromiseItem
+    public function __construct(
+        LoopManagerInterface $loop,
+        TimerManagerInterface $timer
+    )
     {
-        return PromiseItem::fromCallable($fnExecute);
+        $this->loop = $loop;
+        $this->timer = $timer;
+    }
+
+
+    public function isPromise($value) : bool
+    {
+        return $value instanceof PromiseItem;
+    }
+
+
+    public function new($fnExecutor) : PromiseItem
+    {
+        $promise = PromiseItem::new($fnExecutor);
+
+        $this->loop->addPromise($promise);
+
+        return $promise;
     }
 
 
     public function resolve($value = null) : PromiseItem
     {
-        return PromiseItem::fromResolved($value);
+        $promise = PromiseItem::fromResolved($value);
+
+        $this->loop->addPromise($promise);
+
+        return $promise;
     }
 
     public function reject($reason = null) : PromiseItem
     {
-        return PromiseItem::fromRejected($reason);
+        $promise = PromiseItem::fromRejected($reason);
+
+        $this->loop->addPromise($promise);
+
+        return $promise;
     }
 
 
     public function all(array $ps) : PromiseItem
     {
         if ([] === $ps) {
-            return $this->resolve([]);
+            return $this
+                ->resolve([])
+            ;
         }
 
-        $fnExecute = static function ($fnOk, $fnFail) use ($ps) {
+        $loop = $this->loop;
+
+        $fnExecutor = static function ($fnOk, $fnFail) use ($loop, $ps) {
             $psLeft = count($ps);
 
             $results = [];
@@ -69,13 +98,15 @@ class PromiseManager implements PromiseManagerInterface
                     return $value;
                 };
 
-                PromiseItem::fromValue($v)
-                    ->then($fnThenChild, $fnFail)
-                ;
+                $p = PromiseItem::fromValue($v);
+
+                $p->then($fnThenChild, $fnFail);
+
+                $loop->addPromise($p);
             }
         };
 
-        $promise = $this->new($fnExecute);
+        $promise = $this->new($fnExecutor);
 
         return $promise;
     }
@@ -83,10 +114,14 @@ class PromiseManager implements PromiseManagerInterface
     public function allSettled(array $ps) : PromiseItem
     {
         if ([] === $ps) {
-            return $this->resolve([]);
+            return $this
+                ->resolve([])
+            ;
         }
 
-        $fnExecute = static function ($fnOk) use ($ps) {
+        $loop = $this->loop;
+
+        $fnExecutor = static function ($fnOk) use ($loop, $ps) {
             $psLeft = count($ps);
 
             $results = [];
@@ -124,13 +159,15 @@ class PromiseManager implements PromiseManagerInterface
                     }
                 };
 
-                PromiseItem::fromValue($v)
-                    ->then($fnOnResolvedChild, $fnOnRejectedChild)
-                ;
+                $p = PromiseItem::fromValue($v);
+
+                $p->then($fnOnResolvedChild, $fnOnRejectedChild);
+
+                $loop->addPromise($p);
             }
         };
 
-        $promise = $this->new($fnExecute);
+        $promise = $this->new($fnExecutor);
 
         return $promise;
     }
@@ -138,10 +175,14 @@ class PromiseManager implements PromiseManagerInterface
     public function race(array $ps) : PromiseItem
     {
         if ([] === $ps) {
-            return $this->never();
+            return $this
+                ->never()
+            ;
         }
 
-        $fnExecute = static function ($fnOk, $fnFail) use ($ps) {
+        $loop = $this->loop;
+
+        $fnExecutor = static function ($fnOk, $fnFail) use ($loop, $ps) {
             $isSettled = false;
 
             $fnOnResolvedChild = static function ($value) use (
@@ -169,13 +210,15 @@ class PromiseManager implements PromiseManagerInterface
             };
 
             foreach ( $ps as $v ) {
-                PromiseItem::fromValue($v)
-                    ->then($fnOnResolvedChild, $fnOnRejectedChild)
-                ;
+                $p = PromiseItem::fromValue($v);
+
+                $p->then($fnOnResolvedChild, $fnOnRejectedChild);
+
+                $loop->addPromise($p);
             }
         };
 
-        $promise = $this->new($fnExecute);
+        $promise = $this->new($fnExecutor);
 
         return $promise;
     }
@@ -183,12 +226,16 @@ class PromiseManager implements PromiseManagerInterface
     public function any(array $ps) : PromiseItem
     {
         if ([] === $ps) {
-            return $this->reject(
-                new RuntimeException('The `ps` should be non-empty array')
-            );
+            return $this
+                ->reject(
+                    new RuntimeException('The `ps` should be non-empty array')
+                )
+            ;
         }
 
-        $fnExecute = static function ($fnOk, $fnFail) use ($ps) {
+        $loop = $this->loop;
+
+        $fnExecutor = static function ($fnOk, $fnFail) use ($loop, $ps) {
             $psLeft = count($ps);
 
             $errors = [];
@@ -211,13 +258,15 @@ class PromiseManager implements PromiseManagerInterface
                     }
                 };
 
-                PromiseItem::fromValue($v)
-                    ->then($fnOnResolvedChild, $fnOnRejectedChild)
-                ;
+                $p = PromiseItem::fromValue($v);
+
+                $p->then($fnOnResolvedChild, $fnOnRejectedChild);
+
+                $loop->addPromise($p);
             }
         };
 
-        $promise = $this->new($fnExecute);
+        $promise = $this->new($fnExecutor);
 
         return $promise;
     }
@@ -225,24 +274,56 @@ class PromiseManager implements PromiseManagerInterface
 
     public function never() : PromiseItem
     {
-        return PromiseItem::never();
+        $promise = PromiseItem::never();
+
+        $this->loop->addPromise($promise);
+
+        return $promise;
     }
 
     public function defer(\Closure &$fnResolve = null, \Closure &$fnReject = null) : PromiseItem
     {
-        return PromiseItem::defer($fnResolve, $fnReject);
+        $promise = PromiseItem::defer($fnResolve, $fnReject);
+
+        $this->loop->addPromise($promise);
+
+        return $promise;
     }
 
-
-    public function pooling($fnTick) : PromiseItem
-    {
-        return PromiseItem::pooling($fnTick);
-    }
 
     public function delay(float $ms) : PromiseItem
     {
-        return PromiseItem::delay($ms);
+        $promise = PromiseItem::defer($fnResolve);
+
+        $this->timer->timer($ms, $fnResolve);
+
+        $this->loop->addPromise($promise);
+
+        return $promise;
     }
+
+    public function pooling(float $ms, $fnExecutor) : PromiseItem
+    {
+        $promise = PromiseItem::defer($fnResolve, $fnReject);
+
+        $interval = $this->timer->interval(
+            $ms,
+            static function () use ($fnExecutor, $fnResolve, $fnReject) {
+                call_user_func($fnExecutor, $fnResolve, $fnReject);
+            }
+        );
+
+        $promise
+            ->finally(static function () use ($interval) {
+                $interval->cancel();
+            })
+        ;
+
+        $this->loop->addPromise($promise);
+
+        return $promise;
+    }
+
 
     public function timeout(PromiseItem $promise, float $ms, $reason = null) : PromiseItem
     {
@@ -263,151 +344,13 @@ class PromiseManager implements PromiseManagerInterface
             }
         };
 
-        $timeoutPromise = $this->delay($ms)
+        $promiseTimeout = $this
+            ->delay($ms)
             ->then($fnOnResolvedTimeout)
         ;
 
-        $promiseRace = $this->race([ $promise, $timeoutPromise ]);
+        $promiseRace = $this->race([ $promise, $promiseTimeout ]);
 
         return $promiseRace;
-    }
-
-
-    public function isPromise($value) : bool
-    {
-        return $value instanceof PromiseItem;
-    }
-
-
-    protected function reset() : void
-    {
-        $this->queue = [];
-
-        $this->signalBreak = false;
-    }
-
-
-    public function add(PromiseItem $promise) : int
-    {
-        $id = ++$this->queueId;
-
-        $this->queue[ $id ] = $promise;
-
-        return $id;
-    }
-
-
-    public function loop() : void
-    {
-        while ( true ) {
-            if ($this->signalBreak) {
-                $this->reset();
-
-                break;
-            }
-
-            $this->loopStep($this->signalBreak);
-        }
-    }
-
-    /**
-     * @param bool|null $signalBreak
-     *
-     * @return static
-     */
-    protected function loopStep(bool &$signalBreak = null)
-    {
-        /**
-         * @var PromiseItem[] $settledList
-         */
-
-        $signalBreak = true;
-
-        if ([] === $this->queue) {
-            return $this;
-        }
-
-        $settledList = [];
-
-        reset($this->queue);
-
-        while ( null !== ($id = key($this->queue)) ) {
-            $promise = $this->queue[ $id ];
-
-            if ($this->loopStepTickSettled($promise)) {
-                $settledList[ $id ] = $promise;
-
-                if ($signalBreak) {
-                    $signalBreak = false;
-                }
-
-            } elseif ($this->loopStepTickAwaiting($promise)) {
-                if ($signalBreak) {
-                    $signalBreak = false;
-                }
-            }
-
-            next($this->queue);
-
-            usleep(1000);
-        }
-
-        if ([] !== $settledList) {
-            foreach ( array_keys($settledList) as $id ) {
-                unset($this->queue[ $id ]);
-            }
-
-            if ([] === $this->queue) {
-                if ($settledList[ $id ]->isRejected($reason)) {
-                    throw new RuntimeException(
-                        [ 'Unhandled rejection in Promise', $reason ]
-                    );
-                }
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @param PromiseItem $promise
-     *
-     * @return bool
-     */
-    protected function loopStepTickSettled($promise) : bool
-    {
-        if (! $promise->isSettled()) {
-            return false;
-        }
-
-        $promise->onSettled();
-
-        return true;
-    }
-
-    /**
-     * @param PromiseItem $promise
-     *
-     * @return bool
-     */
-    protected function loopStepTickAwaiting($promise) : bool
-    {
-        if (! $promise->isAwaiting()) {
-            return false;
-        }
-
-        $isKeepWaiting = false;
-
-        if ($promise->hasFn($fn)) {
-            $state = $promise->getState();
-
-            call_user_func($fn);
-
-            $isKeepWaiting = false
-                || ($isPooling = ($promise->isPooling()))
-                || ($isStateChanged = ($state !== $promise->getState()));
-        }
-
-        return $isKeepWaiting;
     }
 }

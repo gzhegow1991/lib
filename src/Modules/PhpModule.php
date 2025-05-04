@@ -6,13 +6,17 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Php\Pipe\Pipe;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Php\Loop\LoopManager;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
+use Gzhegow\Lib\Modules\Php\Timer\TimerManager;
 use Gzhegow\Lib\Modules\Php\Result\ResultManager;
 use Gzhegow\Lib\Modules\Php\Promise\PromiseManager;
+use Gzhegow\Lib\Modules\Php\Loop\LoopManagerInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToBoolInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
+use Gzhegow\Lib\Modules\Php\Timer\TimerManagerInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToObjectInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
@@ -30,9 +34,17 @@ class PhpModule
      */
     protected $callableParser;
     /**
+     * @var LoopManagerInterface
+     */
+    protected $loopManager;
+    /**
      * @var PromiseManagerInterface
      */
     protected $promiseManager;
+    /**
+     * @var TimerManagerInterface
+     */
+    protected $timerManager;
     /**
      * @var ResultManagerInterface
      */
@@ -64,9 +76,31 @@ class PhpModule
     }
 
 
+    public function newLoopManager() : LoopManagerInterface
+    {
+        return new LoopManager();
+    }
+
+    public function cloneLoopManager() : LoopManagerInterface
+    {
+        return clone $this->loopManager();
+    }
+
+    public function loopManager(?LoopManagerInterface $loopManager = null) : LoopManagerInterface
+    {
+        return $this->loopManager = null
+            ?? $loopManager
+            ?? $this->loopManager
+            ?? new LoopManager();
+    }
+
+
     public function newPromiseManager() : PromiseManagerInterface
     {
-        return new PromiseManager();
+        $loopManager = static::loopManager();
+        $timerManager = static::timerManager();
+
+        return new PromiseManager($loopManager, $timerManager);
     }
 
     public function clonePromiseManager() : PromiseManagerInterface
@@ -79,7 +113,31 @@ class PhpModule
         return $this->promiseManager = null
             ?? $promiseManager
             ?? $this->promiseManager
-            ?? new PromiseManager();
+            ?? new PromiseManager(
+                static::loopManager(),
+                static::timerManager()
+            );
+    }
+
+
+    public function newTimerManager() : TimerManagerInterface
+    {
+        $loopManager = static::loopManager();
+
+        return new TimerManager($loopManager);
+    }
+
+    public function cloneTimerManager() : TimerManagerInterface
+    {
+        return clone $this->timerManager();
+    }
+
+    public function timerManager(?TimerManagerInterface $timerManager = null) : TimerManagerInterface
+    {
+        return $this->timerManager = null
+            ?? $timerManager
+            ?? $this->timerManager
+            ?? new TimerManager(static::loopManager());
     }
 
 
@@ -1317,8 +1375,8 @@ class PhpModule
     {
         $isObject = false;
         $isClass = false;
-        if (! (false
-            || ($isObject = (is_object($object_or_class)))
+        if (! (
+            ($isObject = (is_object($object_or_class)))
             || ($isClass = (is_string($object_or_class) && class_exists($object_or_class)))
         )) {
             return false;
@@ -1419,8 +1477,8 @@ class PhpModule
     {
         $isObject = false;
         $isClass = false;
-        if (! (false
-            || ($isObject = (is_object($object_or_class)))
+        if (! (
+            ($isObject = (is_object($object_or_class)))
             || ($isClass = (is_string($object_or_class) && class_exists($object_or_class)))
         )) {
             return false;
@@ -2091,7 +2149,334 @@ class PhpModule
     }
 
 
-    /** > подготавливает аргументы для вызова callable, заполняет пустоты в list с помощью NULL */
+    /**
+     * @param mixed $data
+     */
+    public function serialize($data) : ?string
+    {
+        error_clear_last();
+
+        try {
+            $result = serialize($data);
+        }
+        catch ( \Throwable $e ) {
+            $result = null;
+        }
+
+        if (error_get_last()) {
+            $result = null;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function unserialize(string $data)
+    {
+        error_clear_last();
+
+        try {
+            $result = unserialize($data);
+        }
+        catch ( \Throwable $e ) {
+            $result = null;
+        }
+
+        if (error_get_last()) {
+            $result = null;
+        }
+
+        if (is_object($result) && (get_class($result) === '__PHP_Incomplete_Class')) {
+            $result = null;
+        }
+
+        return $result;
+    }
+
+
+    public function microtime($date = null) : string
+    {
+        if (null === $date) {
+            $mt = microtime();
+
+            [ $msec, $sec ] = explode(' ', $mt, 2);
+
+            $msec = substr($msec, 2, 6);
+            $msec = str_pad($msec, 6, '0');
+
+        } elseif ($date instanceof \DateTimeInterface) {
+            $sec = $date->format('s');
+
+            $msec = $date->format('u');
+            $msec = substr($msec, 0, 6);
+            $msec = str_pad($msec, 6, '0');
+
+        } else {
+            throw new LogicException(
+                [ 'The `date` must be instance of \DateTimeInterface', $date ]
+            );
+        }
+
+        $decimalPoint = Lib::type()->the_decimal_point();
+
+        $result = ''
+            . $sec
+            . $decimalPoint
+            . $msec;
+
+        return $result;
+    }
+
+
+    /**
+     * @param class-string<\LogicException|\RuntimeException>|null $throwableClass
+     *
+     * @return class-string<\LogicException|\RuntimeException>
+     */
+    public function static_throwable_class(?string $throwableClass = null) : string
+    {
+        if (null !== $throwableClass) {
+            if (! (
+                is_subclass_of($throwableClass, \LogicException::class)
+                || is_subclass_of($throwableClass, \RuntimeException::class)
+            )) {
+                throw new LogicException(
+                    [
+                        ''
+                        . 'The `throwableClass` should be class-string that is subclass one of: '
+                        . implode('|', [
+                            \LogicException::class,
+                            \RuntimeException::class,
+                        ]),
+                        //
+                        $throwableClass,
+                    ]
+                );
+            }
+
+            $last = $this->throwableClass;
+
+            $current = $throwableClass;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->throwableClass;
+
+        return $result;
+    }
+
+    public function throwable_args(...$throwableArgs) : array
+    {
+        $len = count($throwableArgs);
+
+        $messageList = [];
+        $messageDataList = [];
+        $messageObjectList = [];
+        $codeIntegerList = [];
+        $codeStringList = [];
+        $previousList = [];
+
+        $__unresolved = [];
+
+        for ( $i = 0; $i < $len; $i++ ) {
+            $arg = $throwableArgs[ $i ];
+
+            if (is_int($arg)) {
+                $codeIntegerList[ $i ] = $arg;
+
+                continue;
+            }
+
+            if (is_string($arg) && ('' !== $arg)) {
+                $messageList[ $i ] = $arg;
+
+                continue;
+            }
+
+            if (
+                is_array($arg)
+                || $arg instanceof \stdClass
+            ) {
+                $messageData = (array) $arg;
+
+                $messageString = (string) ($messageData[ 0 ] ?? null);
+
+                if ('' !== $messageString) {
+                    unset($messageData[ 0 ]);
+
+                    $messageList[ $i ] = $messageString;
+                }
+
+                $messageDataList[ $i ] = $messageData;
+
+                continue;
+            }
+
+            if ($arg instanceof \Throwable) {
+                $previousList[ $i ] = $arg;
+
+                continue;
+            }
+
+            $__unresolved[ $i ] = $arg;
+        }
+
+        if (([] === $messageList) && ([] !== $previousList)) {
+            foreach ( $previousList as $i => $previous ) {
+                $messageList[ $i ] = $previous->getMessage();
+            }
+        }
+
+        for ( $i = 0; $i < $len; $i++ ) {
+            if (isset($messageList[ $i ])) {
+                if (! preg_match('/[^a-z0-9_]/i', $messageList[ $i ])) {
+                    $codeStringList[ $i ] = strtoupper($messageList[ $i ]);
+                }
+            }
+        }
+
+        foreach ( $messageList as $i => $messageString ) {
+            $messageData = $messageDataList[ $i ] ?? [];
+
+            $messageObjectList[ $i ] = (object) ([ $messageString ] + $messageData);
+        }
+
+        $result = [];
+
+        $result[ 'messageList' ] = $messageList;
+        $result[ 'messageDataList' ] = $messageDataList;
+        $result[ 'messageObjectList' ] = $messageObjectList;
+        $result[ 'codeIntegerList' ] = $codeIntegerList;
+        $result[ 'codeStringList' ] = $codeStringList;
+        $result[ 'previousList' ] = $previousList;
+
+        $result += [
+            'message'       => (([] !== $messageList) ? reset($messageList) : ''),
+            'messageData'   => (([] !== $messageDataList) ? reset($messageDataList) : []),
+            'messageObject' => (([] !== $messageObjectList) ? reset($messageObjectList) : null),
+            'code'          => (([] !== $codeIntegerList) ? reset($codeIntegerList) : -1),
+            'codeString'    => (([] !== $codeStringList) ? reset($codeStringList) : ''),
+            'previous'      => (([] !== $previousList) ? reset($previousList) : null),
+        ];
+
+        $result[ '__unresolved' ] = $__unresolved;
+
+        return $result;
+    }
+
+    /**
+     * @throws \LogicException|\RuntimeException
+     */
+    public function throw($throwableOrArg, ...$throwableArgs) : void
+    {
+        $throwableClass = $this->static_throwable_class();
+
+        $trace = property_exists($throwableClass, 'trace')
+            ? debug_backtrace()
+            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $this->throw_trace($trace, $throwableOrArg, ...$throwableArgs);
+    }
+
+    /**
+     * @throws \LogicException|\RuntimeException
+     */
+    public function throw_new(...$throwableArgs) : void
+    {
+        $throwableClass = $this->static_throwable_class();
+
+        $trace = property_exists($throwableClass, 'trace')
+            ? debug_backtrace()
+            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $this->throw_new_trace($trace, ...$throwableArgs);
+    }
+
+    /**
+     * @throws \LogicException|\RuntimeException
+     */
+    public function throw_trace(array $trace, $throwableOrArg, ...$throwableArgs) : void
+    {
+        if (
+            ($throwableOrArg instanceof \LogicException)
+            || ($throwableOrArg instanceof \RuntimeException)
+        ) {
+            throw $throwableOrArg;
+        }
+
+        array_unshift($throwableArgs, $throwableOrArg);
+
+        $this->throw_new_trace($trace, ...$throwableArgs);
+    }
+
+    /**
+     * @throws \LogicException|\RuntimeException
+     */
+    public function throw_new_trace(array $trace, ...$throwableArgs) : void
+    {
+        $throwableClass = $this->static_throwable_class();
+
+        $_throwableArgs = $this->throwable_args(...$throwableArgs);
+        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
+        $_throwableArgs[ 'trace' ] = $trace;
+
+        $exceptionArgs = [];
+        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
+        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
+
+        $e = new $throwableClass(...$exceptionArgs);
+
+        foreach ( $_throwableArgs as $key => $value ) {
+            if (! property_exists($e, $key)) {
+                unset($_throwableArgs[ $key ]);
+            }
+        }
+
+        $fn = (function () use (&$_throwableArgs) {
+            foreach ( $_throwableArgs as $key => $value ) {
+                $this->{$key} = $value;
+            }
+        })->bindTo($e, $e);
+
+        call_user_func($fn);
+
+        throw $e;
+    }
+
+
+    /**
+     * @param callable $fn
+     */
+    public function fn($fn, array $args = []) : \Closure
+    {
+        return function (...$arguments) use ($fn, $args) {
+            $_args = array_merge($arguments, $args);
+
+            return call_user_func_array($fn, $_args);
+        };
+    }
+
+    /**
+     * @param callable $fn
+     */
+    public function fn_not($fn, array $args = []) : \Closure
+    {
+        return function (...$arguments) use ($fn, $args) {
+            $_args = array_merge($arguments, $args);
+
+            return ! call_user_func_array($fn, $_args);
+        };
+    }
+
+
+    /**
+     * > подготавливает аргументы для вызова callable, заполняет пустоты в list с помощью NULL
+     */
     public function function_args(array ...$arrays) : array
     {
         $args = [];
@@ -2165,6 +2550,7 @@ class PhpModule
 
         return $args;
     }
+
 
     /**
      * > встроенные функции в php такие как strlen() требуют строгое число аргументов
@@ -2311,330 +2697,5 @@ class PhpModule
         $argsNew = $_args;
 
         return $result;
-    }
-
-
-    /**
-     * @param callable $fn
-     */
-    public function fn($fn, array $args = []) : \Closure
-    {
-        return function (...$arguments) use ($fn, $args) {
-            $_args = array_merge($arguments, $args);
-
-            return call_user_func_array($fn, $_args);
-        };
-    }
-
-    /**
-     * @param callable $fn
-     */
-    public function fn_not($fn, array $args = []) : \Closure
-    {
-        return function (...$arguments) use ($fn, $args) {
-            $_args = array_merge($arguments, $args);
-
-            return ! call_user_func_array($fn, $_args);
-        };
-    }
-
-
-    /**
-     * @param mixed $data
-     */
-    public function serialize($data) : ?string
-    {
-        error_clear_last();
-
-        try {
-            $result = serialize($data);
-        }
-        catch ( \Throwable $e ) {
-            $result = null;
-        }
-
-        if (error_get_last()) {
-            $result = null;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function unserialize(string $data)
-    {
-        error_clear_last();
-
-        try {
-            $result = unserialize($data);
-        }
-        catch ( \Throwable $e ) {
-            $result = null;
-        }
-
-        if (error_get_last()) {
-            $result = null;
-        }
-
-        if (is_object($result) && (get_class($result) === '__PHP_Incomplete_Class')) {
-            $result = null;
-        }
-
-        return $result;
-    }
-
-
-    public function microtime($date = null) : string
-    {
-        if (null === $date) {
-            $mt = microtime();
-
-            [ $msec, $sec ] = explode(' ', $mt, 2);
-
-            $msec = substr($msec, 2, 6);
-            $msec = str_pad($msec, 6, '0');
-
-        } elseif ($date instanceof \DateTimeInterface) {
-            $sec = $date->format('s');
-
-            $msec = $date->format('u');
-            $msec = substr($msec, 0, 6);
-            $msec = str_pad($msec, 6, '0');
-
-        } else {
-            throw new LogicException(
-                [ 'The `date` must be instance of \DateTimeInterface', $date ]
-            );
-        }
-
-        $decimalPoint = Lib::type()->the_decimal_point();
-
-        $result = ''
-            . $sec
-            . $decimalPoint
-            . $msec;
-
-        return $result;
-    }
-
-
-    /**
-     * @param class-string<\LogicException|\RuntimeException>|null $throwableClass
-     *
-     * @return class-string<\LogicException|\RuntimeException>
-     */
-    public function static_throwable_class(?string $throwableClass = null) : string
-    {
-        if (null !== $throwableClass) {
-            if (! (false
-                || is_subclass_of($throwableClass, \LogicException::class)
-                || is_subclass_of($throwableClass, \RuntimeException::class)
-            )) {
-                throw new LogicException(
-                    [
-                        ''
-                        . 'The `throwableClass` should be class-string that is subclass one of: '
-                        . implode('|', [
-                            \LogicException::class,
-                            \RuntimeException::class,
-                        ]),
-                        //
-                        $throwableClass,
-                    ]
-                );
-            }
-
-            $last = $this->throwableClass;
-
-            $current = $throwableClass;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->throwableClass;
-
-        return $result;
-    }
-
-    public function throwable_args(...$throwableArgs) : array
-    {
-        $len = count($throwableArgs);
-
-        $messageList = [];
-        $messageDataList = [];
-        $messageObjectList = [];
-        $codeIntegerList = [];
-        $codeStringList = [];
-        $previousList = [];
-
-        $__unresolved = [];
-
-        for ( $i = 0; $i < $len; $i++ ) {
-            $arg = $throwableArgs[ $i ];
-
-            if (is_int($arg)) {
-                $codeIntegerList[ $i ] = $arg;
-
-                continue;
-            }
-
-            if (is_string($arg) && ('' !== $arg)) {
-                $messageList[ $i ] = $arg;
-
-                continue;
-            }
-
-            if (false
-                || is_array($arg)
-                || $arg instanceof \stdClass
-            ) {
-                $messageData = (array) $arg;
-
-                $messageString = (string) ($messageData[ 0 ] ?? null);
-
-                if ('' !== $messageString) {
-                    unset($messageData[ 0 ]);
-
-                    $messageList[ $i ] = $messageString;
-                }
-
-                $messageDataList[ $i ] = $messageData;
-
-                continue;
-            }
-
-            if ($arg instanceof \Throwable) {
-                $previousList[ $i ] = $arg;
-
-                continue;
-            }
-
-            $__unresolved[ $i ] = $arg;
-        }
-
-        if (([] === $messageList) && ([] !== $previousList)) {
-            foreach ( $previousList as $i => $previous ) {
-                $messageList[ $i ] = $previous->getMessage();
-            }
-        }
-
-        for ( $i = 0; $i < $len; $i++ ) {
-            if (isset($messageList[ $i ])) {
-                if (! preg_match('/[^a-z0-9_]/i', $messageList[ $i ])) {
-                    $codeStringList[ $i ] = strtoupper($messageList[ $i ]);
-                }
-            }
-        }
-
-        foreach ( $messageList as $i => $messageString ) {
-            $messageData = $messageDataList[ $i ] ?? [];
-
-            $messageObjectList[ $i ] = (object) ([ $messageString ] + $messageData);
-        }
-
-        $result = [];
-
-        $result[ 'messageList' ] = $messageList;
-        $result[ 'messageDataList' ] = $messageDataList;
-        $result[ 'messageObjectList' ] = $messageObjectList;
-        $result[ 'codeIntegerList' ] = $codeIntegerList;
-        $result[ 'codeStringList' ] = $codeStringList;
-        $result[ 'previousList' ] = $previousList;
-
-        $result += [
-            'message'       => (([] !== $messageList) ? reset($messageList) : ''),
-            'messageData'   => (([] !== $messageDataList) ? reset($messageDataList) : []),
-            'messageObject' => (([] !== $messageObjectList) ? reset($messageObjectList) : null),
-            'code'          => (([] !== $codeIntegerList) ? reset($codeIntegerList) : -1),
-            'codeString'    => (([] !== $codeStringList) ? reset($codeStringList) : ''),
-            'previous'      => (([] !== $previousList) ? reset($previousList) : null),
-        ];
-
-        $result[ '__unresolved' ] = $__unresolved;
-
-        return $result;
-    }
-
-    /**
-     * @throws \LogicException|\RuntimeException
-     */
-    public function throw($throwableOrArg, ...$throwableArgs) : void
-    {
-        $throwableClass = $this->static_throwable_class();
-
-        $trace = property_exists($throwableClass, 'trace')
-            ? debug_backtrace()
-            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->throw_trace($trace, $throwableOrArg, ...$throwableArgs);
-    }
-
-    /**
-     * @throws \LogicException|\RuntimeException
-     */
-    public function throw_new(...$throwableArgs) : void
-    {
-        $throwableClass = $this->static_throwable_class();
-
-        $trace = property_exists($throwableClass, 'trace')
-            ? debug_backtrace()
-            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->throw_new_trace($trace, ...$throwableArgs);
-    }
-
-    /**
-     * @throws \LogicException|\RuntimeException
-     */
-    public function throw_trace(array $trace, $throwableOrArg, ...$throwableArgs) : void
-    {
-        if (
-            ($throwableOrArg instanceof \LogicException)
-            || ($throwableOrArg instanceof \RuntimeException)
-        ) {
-            throw $throwableOrArg;
-        }
-
-        array_unshift($throwableArgs, $throwableOrArg);
-
-        $this->throw_new_trace($trace, ...$throwableArgs);
-    }
-
-    /**
-     * @throws \LogicException|\RuntimeException
-     */
-    public function throw_new_trace(array $trace, ...$throwableArgs) : void
-    {
-        $throwableClass = $this->static_throwable_class();
-
-        $_throwableArgs = $this->throwable_args(...$throwableArgs);
-        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
-        $_throwableArgs[ 'trace' ] = $trace;
-
-        $exceptionArgs = [];
-        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
-
-        $e = new $throwableClass(...$exceptionArgs);
-
-        foreach ( $_throwableArgs as $key => $value ) {
-            if (! property_exists($e, $key)) {
-                unset($_throwableArgs[ $key ]);
-            }
-        }
-
-        $fn = (function () use (&$_throwableArgs) {
-            foreach ( $_throwableArgs as $key => $value ) {
-                $this->{$key} = $value;
-            }
-        })->bindTo($e, $e);
-
-        $fn();
-
-        throw $e;
     }
 }

@@ -129,8 +129,8 @@ class NetModule
     {
         $result = null;
 
-        $status = false
-            || $this->type_subnet_v4($_value, $value, $ipFallback)
+        $status =
+            $this->type_subnet_v4($_value, $value, $ipFallback)
             || $this->type_subnet_v6($_value, $value, $ipFallback);
 
         if ($status) {
@@ -170,8 +170,8 @@ class NetModule
                 return false;
             }
 
-            $status = false
-                || $this->type_subnet_v4_iplike($subnetInt, $subnet)
+            $status =
+                $this->type_subnet_v4_iplike($subnetInt, $subnet)
                 || $theType->numeric_int($subnetInt, $subnet);
 
             if (! $status) {
@@ -349,8 +349,8 @@ class NetModule
         $addressIpV4 = null;
         $addressIpV6 = null;
 
-        $statusIp = false
-            || $this->type_address_ip_v4($addressIpV4, $addressIp)
+        $statusIp =
+            $this->type_address_ip_v4($addressIpV4, $addressIp)
             || $this->type_address_ip_v6($addressIpV6, $addressIp);
 
         if (! $statusIp) {
@@ -371,8 +371,8 @@ class NetModule
             $subnetV4 = null;
             $subnetV6 = null;
 
-            $statusSubnet = false
-                || ($isV4 && $this->type_subnet_v4($subnetV4, $subnet))
+            $statusSubnet =
+                ($isV4 && $this->type_subnet_v4($subnetV4, $subnet))
                 || ($isV6 && $this->type_subnet_v4($subnetV6, $subnet));
 
             if (! $statusSubnet) {
@@ -475,8 +475,8 @@ class NetModule
         $addressIpV4 = null;
         $addressIpV6 = null;
 
-        $statusIp = false
-            || $this->type_address_ip_v4($addressIpV4, $addressIp)
+        $statusIp =
+            $this->type_address_ip_v4($addressIpV4, $addressIp)
             || $this->type_address_ip_v6($addressIpV6, $addressIp);
 
         if (! $statusIp) {
@@ -491,8 +491,8 @@ class NetModule
         $subnetV4 = null;
         $subnetV6 = null;
 
-        $statusSubnet = false
-            || $this->type_subnet_v4($subnetV4, $subnet)
+        $statusSubnet =
+            $this->type_subnet_v4($subnetV4, $subnet)
             || $this->type_subnet_v6($subnetV6, $subnet);
 
         if (! $statusSubnet) {
@@ -617,8 +617,8 @@ class NetModule
 
     public function ip_client_proxy() : ?string
     {
-        $status = false
-            || $this->type_address_ip($ip, $_SERVER[ 'REMOTE_ADDR' ] ?? null)
+        $status =
+            $this->type_address_ip($ip, $_SERVER[ 'REMOTE_ADDR' ] ?? null)
             || $this->type_address_ip($ip, $_SERVER[ 'HTTP_CLIENT_IP' ] ?? null)
             || $this->type_address_ip($ip, $_SERVER[ 'HTTP_X_FORWARDED_FOR' ] ?? null);
 

@@ -4,7 +4,10 @@ namespace Gzhegow\Lib\Modules\Php\Promise;
 
 interface PromiseManagerInterface
 {
-    public function new($fnExecute) : PromiseItem;
+    public function isPromise($value) : bool;
+
+
+    public function new($fnExecutor) : PromiseItem;
 
 
     public function resolve($value = null) : PromiseItem;
@@ -26,18 +29,10 @@ interface PromiseManagerInterface
     public function defer(\Closure &$fnResolve = null, \Closure &$fnReject = null) : PromiseItem;
 
 
-    public function pooling($fnTick) : PromiseItem;
-
     public function delay(float $ms) : PromiseItem;
 
+    public function pooling(float $ms, $fnExecutor) : PromiseItem;
+
+
     public function timeout(PromiseItem $promise, float $ms, $reason = null) : PromiseItem;
-
-
-    public function isPromise($value) : bool;
-
-
-    public function add(PromiseItem $promise) : int;
-
-
-    public function loop();
 }

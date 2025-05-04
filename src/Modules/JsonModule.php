@@ -244,8 +244,8 @@ class JsonModule
 
         $theType = Lib::type();
 
-        if (false
-            || ($theType->resource($var, $value))
+        if (
+            ($theType->resource($var, $value))
             || (is_float($value) && is_nan($value))
             || (! $allowNull && is_null($value))
         ) {

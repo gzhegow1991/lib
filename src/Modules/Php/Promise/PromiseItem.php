@@ -5,6 +5,7 @@ namespace Gzhegow\Lib\Modules\Php\Promise;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Php\Loop\LoopManagerInterface;
 
 
 class PromiseItem
@@ -26,10 +27,6 @@ class PromiseItem
      * @var callable
      */
     protected $fnExecutor;
-    /**
-     * @var callable
-     */
-    protected $fnTicker;
     /**
      * @var callable
      */
@@ -62,20 +59,18 @@ class PromiseItem
     /**
      * @return static|bool|null
      */
-    public static function from($from = null, $ctx = null)
+    public static function from($from, $ctx = null)
     {
         Result::parse($cur);
 
         $instance = null
             ?? static::fromObjectStatic($from, $cur)
-            ?? static::fromCallableExecute($from, $cur)
-            ?? static::fromValueResolved($from, $cur);
+            ?? static::fromCallableExecutor($from, $cur)
+            ?? static::fromResolved($from, $cur);
 
         if ($cur->isErr()) {
             return Result::err($ctx, $cur);
         }
-
-        $id = Promise::add($instance);
 
         return Result::ok($ctx, $instance);
     }
@@ -83,56 +78,17 @@ class PromiseItem
     /**
      * @return static|bool|null
      */
-    public static function fromValue($from = null, $ctx = null)
+    public static function fromValue($from, $ctx = null)
     {
         Result::parse($cur);
 
         $instance = null
             ?? static::fromObjectStatic($from, $cur)
-            ?? static::fromValueResolved($from, $cur);
+            ?? static::fromResolved($from, $cur);
 
         if ($cur->isErr()) {
             return Result::err($ctx, $cur);
         }
-
-        $id = Promise::add($instance);
-
-        return Result::ok($ctx, $instance);
-    }
-
-
-    /**
-     * @return static|bool|null
-     */
-    public static function fromResolved($from = null, $ctx = null)
-    {
-        Result::parse($cur);
-
-        $instance = static::fromValueResolved($from, $cur);
-
-        if ($cur->isErr()) {
-            return Result::err($ctx, $cur);
-        }
-
-        $id = Promise::add($instance);
-
-        return Result::ok($ctx, $instance);
-    }
-
-    /**
-     * @return static|bool|null
-     */
-    public static function fromRejected($from = null, $ctx = null)
-    {
-        Result::parse($cur);
-
-        $instance = static::fromValueRejected($from, $cur);
-
-        if ($cur->isErr()) {
-            return Result::err($ctx, $cur);
-        }
-
-        $id = Promise::add($instance);
 
         return Result::ok($ctx, $instance);
     }
@@ -146,34 +102,57 @@ class PromiseItem
     {
         Result::parse($cur);
 
-        $instance = static::fromCallableExecute($from, $cur);
+        $instance = null
+            ?? static::fromObjectStatic($from, $cur)
+            ?? static::fromCallableExecutor($from, $cur);
 
         if ($cur->isErr()) {
             return Result::err($ctx, $cur);
         }
-
-        $id = Promise::add($instance);
 
         return Result::ok($ctx, $instance);
     }
 
 
     /**
-     * @return static
+     * @return static|bool|null
      */
+    public static function fromResolved($from, $ctx = null)
+    {
+        $instance = new static();
+        $instance->state = static::STATE_RESOLVED;
+        $instance->resolvedValue = $from;
+
+        return Result::ok($ctx, $instance);
+    }
+
+    /**
+     * @return static|bool|null
+     */
+    public static function fromRejected($from, $ctx = null)
+    {
+        $instance = new static();
+        $instance->state = static::STATE_REJECTED;
+        $instance->rejectedReason = $from;
+
+        return Result::ok($ctx, $instance);
+    }
+
+
+    public static function new($fnExecutor) : PromiseItem
+    {
+        return PromiseItem::fromCallableExecutor($fnExecutor);
+    }
+
+
     public static function never() : PromiseItem
     {
         $instance = new static();
         $instance->state = static::STATE_PENDING;
 
-        $id = Promise::add($instance);
-
         return $instance;
     }
 
-    /**
-     * @return static
-     */
     public static function defer(\Closure &$fnResolve = null, \Closure &$fnReject = null) : PromiseItem
     {
         $fnResolve = null;
@@ -184,39 +163,6 @@ class PromiseItem
 
         $fnResolve = static::fnResolve($instance);
         $fnReject = static::fnReject($instance);
-
-        $id = Promise::add($instance);
-
-        return $instance;
-    }
-
-    /**
-     * @param callable $fnTicker
-     *
-     * @return static
-     */
-    public static function pooling($fnTicker) : PromiseItem
-    {
-        $instance = static::fromCallableTick($fnTicker);
-
-        $id = Promise::add($instance);
-
-        return $instance;
-    }
-
-    public static function delay(float $ms) : PromiseItem
-    {
-        $msTarget = microtime(true) + ($ms / 1000);
-
-        $fnTicker = static function ($fnOk) use ($msTarget) {
-            if (microtime(true) >= $msTarget) {
-                $fnOk();
-            }
-        };
-
-        $instance = static::fromCallableTick($fnTicker);
-
-        $id = Promise::add($instance);
 
         return $instance;
     }
@@ -241,31 +187,7 @@ class PromiseItem
     /**
      * @return static|bool|null
      */
-    protected static function fromValueResolved($from = null, $ctx = null)
-    {
-        $instance = new static();
-        $instance->state = static::STATE_RESOLVED;
-        $instance->resolvedValue = $from;
-
-        return Result::ok($ctx, $instance);
-    }
-
-    /**
-     * @return static|bool|null
-     */
-    protected static function fromValueRejected($from = null, $ctx = null)
-    {
-        $instance = new static();
-        $instance->state = static::STATE_REJECTED;
-        $instance->rejectedReason = $from;
-
-        return Result::ok($ctx, $instance);
-    }
-
-    /**
-     * @return static|bool|null
-     */
-    protected static function fromCallableExecute($from, $ctx = null)
+    protected static function fromCallableExecutor($from, $ctx = null)
     {
         if (! is_callable($from)) {
             return Result::err(
@@ -276,26 +198,8 @@ class PromiseItem
         }
 
         $instance = new static();
+        $instance->state = static::STATE_PENDING;
         $instance->fnExecutor = static::fnExecutor($instance, $from);
-
-        return Result::ok($ctx, $instance);
-    }
-
-    /**
-     * @return static|bool|null
-     */
-    protected static function fromCallableTick($from, $ctx = null)
-    {
-        if (! is_callable($from)) {
-            return Result::err(
-                $ctx,
-                [ 'The `from` should be callable', $from ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        $instance = new static();
-        $instance->fnTicker = static::fnTicker($instance, $from);
 
         return Result::ok($ctx, $instance);
     }
@@ -307,7 +211,6 @@ class PromiseItem
 
         $status =
             $this->hasFnSettler($fn)
-            || $this->hasFnTicker($fn)
             || $this->hasFnExecutor($fn);
 
         return $status;
@@ -321,7 +224,7 @@ class PromiseItem
     }
 
 
-    protected function hasFnExecutor(\Closure &$fn = null) : bool
+    public function hasFnExecutor(\Closure &$fn = null) : bool
     {
         $fn = null;
 
@@ -334,20 +237,13 @@ class PromiseItem
         return false;
     }
 
-    protected function hasFnTicker(\Closure &$fn = null) : bool
+    public function getFnExecutor() : \Closure
     {
-        $fn = null;
-
-        if (null !== $this->fnTicker) {
-            $fn = $this->fnTicker;
-
-            return true;
-        }
-
-        return false;
+        return $this->fnExecutor;
     }
 
-    protected function hasFnSettler(\Closure &$fn = null) : bool
+
+    public function hasFnSettler(\Closure &$fn = null) : bool
     {
         $fn = null;
 
@@ -360,6 +256,11 @@ class PromiseItem
         return false;
     }
 
+    public function getFnSettler() : \Closure
+    {
+        return $this->fnSettler;
+    }
+
 
     public function getState() : string
     {
@@ -369,9 +270,9 @@ class PromiseItem
 
     public function isAwaiting() : bool
     {
-        return false
-            || (static::STATE_PENDING === $this->state)
-            || (static::STATE_POOLING === $this->state);
+        return
+            (static::STATE_POOLING === $this->state)
+            || (static::STATE_PENDING === $this->state);
     }
 
     public function isSettled() : bool
@@ -423,8 +324,6 @@ class PromiseItem
     /**
      * @param callable|null $fnOnResolved
      * @param callable|null $fnOnRejected
-     *
-     * @return static
      */
     public function then($fnOnResolved = null, $fnOnRejected = null) : PromiseItem
     {
@@ -462,8 +361,6 @@ class PromiseItem
 
     /**
      * @param callable|null $fnOnRejected
-     *
-     * @return static
      */
     public function catch($fnOnRejected = null) : PromiseItem
     {
@@ -492,8 +389,6 @@ class PromiseItem
 
     /**
      * @param callable|null $fnOnFinally
-     *
-     * @return static
      */
     public function finally($fnOnFinally = null) : PromiseItem
     {
@@ -506,6 +401,7 @@ class PromiseItem
         }
 
         $promise = new static();
+        $promise->state = static::STATE_PENDING;
 
         $settle = new PromiseSettle();
         $settle->type = PromiseSettle::TYPE_FINALLY;
@@ -521,9 +417,12 @@ class PromiseItem
     }
 
 
-    public function onSettled() : void
+    public function onSettled(LoopManagerInterface $loop) : void
     {
-        if (! $this->isSettled()) {
+        if (! (true
+            && (static::STATE_PENDING !== $this->state)
+            && (static::STATE_POOLING !== $this->state)
+        )) {
             throw new RuntimeException(
                 [ 'The promise must be `settled` to call `onSettled`', $this ]
             );
@@ -537,68 +436,98 @@ class PromiseItem
 
             $this->settles = [];
 
-            foreach ( $promiseSettles as $i => $promiseSettle ) {
+            foreach ( $promiseSettles as $promiseSettle ) {
                 $promise = $promiseSettle->promise;
 
                 if (PromiseSettle::TYPE_THEN === $promiseSettle->type) {
-                    if ($this->isRejected($reason)) {
+                    if (PromiseItem::STATE_REJECTED === $this->state) {
                         $fnOnRejected = $promiseSettle->fnOnRejected;
 
-                        if ($fnOnRejected) {
-                            $promise->fnSettler = static::fnSettlerCatch($promiseSettle, $reason);
+                        if (null === $fnOnRejected) {
+                            $promise->state = PromiseItem::STATE_REJECTED;
+                            $promise->rejectedReason = $this->rejectedReason;
 
                         } else {
-                            static::reject($promise, $reason);
+                            $promise->fnSettler = static::fnSettlerCatch(
+                                $promiseSettle,
+                                $this->rejectedReason
+                            );
                         }
 
-                    } elseif ($this->isResolved($value)) {
+                    } elseif (PromiseItem::STATE_RESOLVED === $this->state) {
                         $fnOnResolved = $promiseSettle->fnOnResolved;
 
-                        if ($fnOnResolved) {
-                            $promise->fnSettler = static::fnSettlerThen($promiseSettle, $value);
+                        if (null === $fnOnResolved) {
+                            $promise->state = PromiseItem::STATE_RESOLVED;
+                            $promise->resolvedValue = $this->resolvedValue;
 
                         } else {
-                            static::resolve($promise, $value);
+                            $promise->fnSettler = static::fnSettlerThen(
+                                $promiseSettle,
+                                $this->resolvedValue
+                            );
                         }
                     }
 
-                } elseif (PromiseSettle::TYPE_CATCH === $promiseSettle->type) {
-                    if ($this->isRejected($reason)) {
-                        $fnOnRejected = $promiseSettle->fnOnRejected;
+                    $loop->addPromise($promise);
 
-                        if ($fnOnRejected) {
-                            $promise->fnSettler = static::fnSettlerCatch($promiseSettle, $reason);
-
-                        } else {
-                            static::reject($promise, $reason);
-                        }
-
-                    } elseif ($this->isResolved($value)) {
-                        static::resolve($promise, $value);
-                    }
-
-                } elseif (PromiseSettle::TYPE_FINALLY === $promiseSettle->type) {
-                    $fnOnFinally = $promiseSettle->fnOnFinally;
-
-                    $isResolved = $this->isResolved($value);
-                    $isRejected = $this->isRejected($reason);
-
-                    if ($isResolved || $isRejected) {
-                        if ($fnOnFinally) {
-                            $promise->fnSettler = static::fnSettlerFinally($promiseSettle, $value);
-
-                        } else {
-                            if ($isResolved) {
-                                static::resolve($promise, $value);
-
-                            } elseif ($isRejected) {
-                                static::reject($promise, $reason);
-                            }
-                        }
-                    }
+                    continue;
                 }
 
-                Promise::add($promise);
+                if (PromiseSettle::TYPE_CATCH === $promiseSettle->type) {
+                    if (PromiseItem::STATE_REJECTED === $this->state) {
+                        $fnOnRejected = $promiseSettle->fnOnRejected;
+
+                        if (null === $fnOnRejected) {
+                            $promise->state = PromiseItem::STATE_REJECTED;
+                            $promise->rejectedReason = $this->rejectedReason;
+
+                        } else {
+                            $promise->fnSettler = static::fnSettlerCatch(
+                                $promiseSettle,
+                                $this->rejectedReason
+                            );
+                        }
+
+                    } elseif (PromiseItem::STATE_RESOLVED === $this->state) {
+                        $promise->state = PromiseItem::STATE_RESOLVED;
+                        $promise->resolvedValue = $this->resolvedValue;
+                    }
+
+                    $loop->addPromise($promise);
+
+                    continue;
+                }
+
+                if (PromiseSettle::TYPE_FINALLY === $promiseSettle->type) {
+                    $fnOnFinally = $promiseSettle->fnOnFinally;
+
+                    $isResolved = (PromiseItem::STATE_RESOLVED === $this->state);
+                    $isRejected = (PromiseItem::STATE_REJECTED === $this->state);
+
+                    if ($isResolved || $isRejected) {
+                        if (null === $fnOnFinally) {
+                            if ($isResolved) {
+                                $promise->state = PromiseItem::STATE_RESOLVED;
+                                $promise->resolvedValue = $this->resolvedValue;
+
+                            } elseif ($isRejected) {
+                                $promise->state = PromiseItem::STATE_REJECTED;
+                                $promise->rejectedReason = $this->rejectedReason;
+                            }
+
+                        } else {
+                            $promise->fnSettler = static::fnSettlerFinally(
+                                $promiseSettle,
+                                $this->resolvedValue
+                            );
+                        }
+                    }
+
+                    $loop->addPromise($promise);
+
+                    continue;
+                }
             }
         }
     }
@@ -609,9 +538,12 @@ class PromiseItem
      */
     protected static function resolve($promise, $value) : void
     {
-        if ($promise->isSettled()) {
+        if (true
+            && (static::STATE_PENDING !== $promise->state)
+            && (static::STATE_POOLING !== $promise->state)
+        ) {
             throw new RuntimeException(
-                [ 'Promise is already settled', $promise ]
+                [ 'Promise is already `settled`', $promise ]
             );
         }
 
@@ -624,9 +556,12 @@ class PromiseItem
      */
     protected static function reject($promise, $reason) : void
     {
-        if ($promise->isSettled()) {
+        if (true
+            && (static::STATE_PENDING !== $promise->state)
+            && (static::STATE_POOLING !== $promise->state)
+        ) {
             throw new RuntimeException(
-                [ 'Promise is already settled', $promise ]
+                [ 'Promise is already `settled`', $promise ]
             );
         }
 
@@ -643,7 +578,8 @@ class PromiseItem
     protected static function fnResolve($promise)
     {
         return static function ($value = null) use ($promise) {
-            static::resolve($promise, $value);
+            $promise->state = PromiseItem::STATE_RESOLVED;
+            $promise->resolvedValue = $value;
         };
     }
 
@@ -655,7 +591,8 @@ class PromiseItem
     protected static function fnReject($promise)
     {
         return static function ($reason = null) use ($promise) {
-            static::reject($promise, $reason);
+            $promise->state = PromiseItem::STATE_REJECTED;
+            $promise->rejectedReason = $reason;
         };
     }
 
@@ -676,30 +613,8 @@ class PromiseItem
                 call_user_func($fn, $fnResolve, $fnReject);
             }
             catch ( \Throwable $throwable ) {
-                static::reject($promise, $throwable);
-            }
-        };
-    }
-
-    /**
-     * @param PromiseItem $promise
-     * @param \Closure    $fn
-     *
-     * @return \Closure
-     */
-    protected static function fnTicker($promise, $fn)
-    {
-        return static function () use ($promise, $fn) {
-            $promise->state = static::STATE_POOLING;
-
-            try {
-                $fnResolve = static::fnResolve($promise);
-                $fnReject = static::fnReject($promise);
-
-                call_user_func($fn, $fnResolve, $fnReject);
-            }
-            catch ( \Throwable $throwable ) {
-                static::reject($promise, $throwable);
+                $promise->state = PromiseItem::STATE_REJECTED;
+                $promise->rejectedReason = $throwable;
             }
         };
     }
@@ -737,18 +652,24 @@ class PromiseItem
             }
 
             if (null !== $throwable) {
-                static::reject($promise, $throwable);
+                $promise->state = PromiseItem::STATE_REJECTED;
+                $promise->rejectedReason = $throwable;
 
                 return;
             }
 
             if ($result instanceof \Throwable) {
-                static::reject($promise, $result);
+                $promise->state = PromiseItem::STATE_REJECTED;
+                $promise->rejectedReason = $result;
 
             } elseif ($result instanceof static) {
                 if ($promise === $result) {
                     throw new RuntimeException(
-                        [ 'The `result` of `fnOnResolved` should not be promise itself', $result, $promise ]
+                        [
+                            'The `result` of `fnOnResolved` should not be promise itself',
+                            $result,
+                            $promise,
+                        ]
                     );
                 }
 
@@ -761,7 +682,8 @@ class PromiseItem
                 ;
 
             } else {
-                static::resolve($promise, $result);
+                $promise->state = PromiseItem::STATE_RESOLVED;
+                $promise->resolvedValue = $result;
             }
         };
     }
@@ -776,25 +698,26 @@ class PromiseItem
         return static function () use ($promiseSettle, $reason) {
             $promise = $promiseSettle->promise;
 
-            $result = null;
-
             try {
                 $result = call_user_func($promiseSettle->fnOnRejected, $reason);
             }
             catch ( \Throwable $throwable ) {
-                static::reject($promise, $result);
+                $promise->state = PromiseItem::STATE_REJECTED;
+                $promise->rejectedReason = $throwable;
 
                 return;
             }
 
             if (null === $result) {
-                static::reject($promise, $reason);
+                $promise->state = PromiseItem::STATE_REJECTED;
+                $promise->rejectedReason = $reason;
 
                 return;
             }
 
             if ($result instanceof \Throwable) {
-                static::reject($promise, $result);
+                $promise->state = PromiseItem::STATE_REJECTED;
+                $promise->rejectedReason = $result;
 
             } elseif ($result instanceof static) {
                 if ($promise === $result) {
@@ -812,7 +735,8 @@ class PromiseItem
                 ;
 
             } else {
-                static::resolve($promise, $result);
+                $promise->state = PromiseItem::STATE_RESOLVED;
+                $promise->resolvedValue = $result;
             }
         };
     }
@@ -832,14 +756,19 @@ class PromiseItem
                 call_user_func($promiseSettle->fnOnFinally);
             }
             catch ( \Throwable $throwable ) {
-                static::reject($promise, $throwable);
+                $promise->state = PromiseItem::STATE_REJECTED;
+                $promise->rejectedReason = $throwable;
+
+                return;
             }
 
-            if ($promiseParent->isResolved($value)) {
-                static::resolve($promise, $value);
+            if (PromiseItem::STATE_RESOLVED === $promiseParent->state) {
+                $promise->state = PromiseItem::STATE_RESOLVED;
+                $promise->resolvedValue = $promiseParent->resolvedValue;
 
-            } elseif ($promiseParent->isRejected($reason)) {
-                static::reject($promise, $reason);
+            } elseif (PromiseItem::STATE_REJECTED === $promiseParent->state) {
+                $promise->state = PromiseItem::STATE_REJECTED;
+                $promise->rejectedReason = $promiseParent->rejectedReason;
             }
         };
     }

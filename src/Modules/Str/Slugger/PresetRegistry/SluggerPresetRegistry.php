@@ -251,8 +251,8 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
                 $aLower = mb_strtolower($a);
                 $aUpper = mb_strtoupper($a);
 
-                if (false
-                    || isset($ignoreSymbolMap[ $aLower ])
+                if (
+                    isset($ignoreSymbolMap[ $aLower ])
                     || isset($ignoreSymbolMap[ $aUpper ])
                 ) {
                     throw new RuntimeException(
@@ -327,8 +327,8 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
             $aLower = mb_strtolower($a);
             $aUpper = mb_strtoupper($a);
 
-            if (false
-                || isset($ignoreSymbolMap[ $aLower ])
+            if (
+                isset($ignoreSymbolMap[ $aLower ])
                 || isset($ignoreSymbolMap[ $aUpper ])
             ) {
                 throw new RuntimeException(
@@ -376,8 +376,8 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
                 $bbUpperLen = mb_strlen($bbLower);
 
                 // > example size/length difference when change case: `ß` -> `SS`
-                if (false
-                    || ($bbSize !== $bbLowerSize)
+                if (
+                    ($bbSize !== $bbLowerSize)
                     || ($bbSize !== $bbUpperSize)
                     || ($bbLen !== $bbLowerLen)
                     || ($bbLen !== $bbUpperLen)
@@ -391,8 +391,8 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
                     );
                 }
 
-                if (false
-                    || isset($result[ $bbLower ])
+                if (
+                    isset($result[ $bbLower ])
                     || isset($result[ $bbUpper ])
                 ) {
                     throw new LogicException(

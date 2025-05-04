@@ -1242,8 +1242,8 @@ class FsModule
 
                             $hasFh1 = true;
                             $hasFh2 = true;
-                            while ( false
-                                || ($hasFh1 = $hasFh1 && (! feof($fh1)))
+                            while (
+                                ($hasFh1 = $hasFh1 && (! feof($fh1)))
                                 || ($hasFh2 = $hasFh2 && (! feof($fh2)))
                             ) {
                                 $buffer1 = fgets($fh1, $lengthBuffer);

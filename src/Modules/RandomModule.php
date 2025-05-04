@@ -12,12 +12,12 @@ class RandomModule
     /**
      * @var callable
      */
-    protected $uuidFn;
+    protected $fnUuid;
 
 
     public function __construct()
     {
-        $this->uuidFn = [ $this, '_uuid' ];
+        $this->fnUuid = [ $this, 'fnUuid' ];
     }
 
 
@@ -29,17 +29,54 @@ class RandomModule
     public function static_uuid_fn($fnUuid = null)
     {
         if (null !== $fnUuid) {
-            $last = $this->uuidFn;
+            $last = $this->fnUuid;
 
-            $this->uuidFn = $fnUuid;
+            $this->fnUuid = $fnUuid;
 
             $result = $last;
         }
 
-        $result = $result ?? $this->uuidFn;
+        $result = $result ?? $this->fnUuid;
 
         return $result;
     }
+
+
+    public function idIncrement(&$value) : string
+    {
+        $val = $value;
+
+        if (is_int($val)) {
+            if ($val >= PHP_INT_MAX) {
+                $val = bcadd($val, 1);
+
+            } else {
+                $val++;
+            }
+
+        } else {
+            if (! ctype_digit($val)) {
+                throw new LogicException(
+                    [ 'The `value` should contain big integer value', $value ]
+                );
+            }
+
+            if (
+                (strlen($val) > strlen(PHP_INT_MAX))
+                || (floatval($val) >= PHP_INT_MAX)
+            ) {
+                $val = bcadd($val, 1);
+
+            } else {
+                $val = intval($val) + 1;
+            }
+        }
+
+        $value = $val;
+
+        return $val;
+    }
+
 
     public function uuid() : string
     {
@@ -50,7 +87,7 @@ class RandomModule
         return $uuid;
     }
 
-    private function _uuid() : string
+    protected function fnUuid() : string
     {
         $bytes = $this->random_bytes(16);
 

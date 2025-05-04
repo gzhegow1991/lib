@@ -138,8 +138,8 @@ class TestModule
             }
         }
 
-        if (false
-            || (null !== $expectedSecondsMax)
+        if (
+            (null !== $expectedSecondsMax)
             || (null !== $expectedSecondsMin)
         ) {
             $isError = false;

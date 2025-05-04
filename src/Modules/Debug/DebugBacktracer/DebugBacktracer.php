@@ -512,8 +512,8 @@ class DebugBacktracer implements DebugBacktracerInterface
                         );
                     }
 
-                    if (false
-                        || ((null !== $of[ 'function' ]) && ($of[ 'function' ] !== $tFunction))
+                    if (
+                        ((null !== $of[ 'function' ]) && ($of[ 'function' ] !== $tFunction))
                         || ((null !== $of[ 'class' ]) && ($of[ 'class' ] !== $tClass))
                         || ((null !== $of[ 'file' ]) && ($of[ 'file' ] !== $tFile))
                         || ((null !== $of[ 'type' ]) && ($of[ 'type' ] !== $tType))
@@ -527,9 +527,8 @@ class DebugBacktracer implements DebugBacktracerInterface
                 }
 
                 if ($hasOfStartsWith) {
-                    $drop = false;
-                    if (false
-                        || (0 !== stripos($tFunction, $ofStartsWith[ 'function' ]))
+                    if (
+                        (0 !== stripos($tFunction, $ofStartsWith[ 'function' ]))
                         || (0 !== stripos($tClass, $ofStartsWith[ 'class' ]))
                         || (0 !== stripos($tFile, $ofStartsWith[ 'file' ]))
                     ) {

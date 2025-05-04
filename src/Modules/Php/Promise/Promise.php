@@ -7,9 +7,15 @@ use Gzhegow\Lib\Lib;
 
 class Promise
 {
-    public static function new($fnExecute) : PromiseItem
+    public static function isPromise($value) : bool
     {
-        return static::getInstance()->new($fnExecute);
+        return static::getInstance()->isPromise($value);
+    }
+
+
+    public static function new($fnExecutor) : PromiseItem
+    {
+        return static::getInstance()->new($fnExecutor);
     }
 
 
@@ -56,37 +62,20 @@ class Promise
     }
 
 
-    public static function pooling($fnTick) : PromiseItem
-    {
-        return static::getInstance()->pooling($fnTick);
-    }
-
     public static function delay(float $ms) : PromiseItem
     {
         return static::getInstance()->delay($ms);
     }
 
+    public static function pooling(float $ms, $fnExecutor) : PromiseItem
+    {
+        return static::getInstance()->pooling($ms, $fnExecutor);
+    }
+
+
     public static function timeout(PromiseItem $promise, float $ms, $reason = null) : PromiseItem
     {
         return static::getInstance()->timeout($promise, $ms, $reason);
-    }
-
-
-    public static function isPromise($value) : bool
-    {
-        return static::getInstance()->isPromise($value);
-    }
-
-
-    public static function loop() : void
-    {
-        static::getInstance()->loop();
-    }
-
-
-    public static function add(PromiseItem $promise) : int
-    {
-        return static::getInstance()->add($promise);
     }
 
 

@@ -87,8 +87,8 @@ class CallableParser implements CallableParserInterface
 
         } elseif ($theMagic) {
             // > method not provided, but but class or object has magic method __invoke()
-            if (false
-                || ($theMagic === '__invoke')
+            if (
+                ($theMagic === '__invoke')
             ) {
                 $result = "{$theClass}->__invoke";
 
@@ -103,8 +103,8 @@ class CallableParser implements CallableParserInterface
         } elseif ($theMethod) {
             // > method provided and exists
 
-            if (false
-                || ($theMethod === '__invoke')
+            if (
+                ($theMethod === '__invoke')
                 || ($theMethod === '__call')
             ) {
                 $result = "{$theClass}->{$theMethod}";
@@ -115,8 +115,8 @@ class CallableParser implements CallableParserInterface
                 return true;
             }
 
-            if (false
-                || ($theMethod === '__callStatic')
+            if (
+                ($theMethod === '__callStatic')
             ) {
                 $result = "{$theClass}::{$theMethod}";
 
@@ -201,8 +201,8 @@ class CallableParser implements CallableParserInterface
             return true;
         }
 
-        if (false
-            || ($theMethod === '__callStatic')
+        if (
+            ($theMethod === '__callStatic')
             || ($theMagic === '__callStatic')
         ) {
             $result = $value;
@@ -210,8 +210,8 @@ class CallableParser implements CallableParserInterface
             return true;
         }
 
-        if (false
-            || ($theMethod === '__invoke')
+        if (
+            ($theMethod === '__invoke')
             || ($theMethod === '__call')
             || ($theMagic === '__invoke')
             || ($theMagic === '__call')
@@ -370,8 +370,8 @@ class CallableParser implements CallableParserInterface
             return true;
         }
 
-        if (false
-            || ($theMethod === '__invoke')
+        if (
+            ($theMethod === '__invoke')
             || ($theMethod === '__call')
             || ($theMagic === '__invoke')
             || ($theMagic === '__call')
@@ -386,8 +386,8 @@ class CallableParser implements CallableParserInterface
             $callableMethodStaticMagic = [ $theClass, $theMagic ];
         }
 
-        if (false
-            || ($theMethod === '__callStatic')
+        if (
+            ($theMethod === '__callStatic')
             || ($theMagic === '__callStatic')
         ) {
             if (! $this->isCallable($callableMethodStaticMagic ?? $callableMethodStatic, $newScope)) {
@@ -443,8 +443,8 @@ class CallableParser implements CallableParserInterface
             return false;
         }
 
-        if (false
-            || ($theMethod === '__invoke')
+        if (
+            ($theMethod === '__invoke')
             || ($theMethod === '__call')
             || ($theMagic === '__invoke')
             || ($theMagic === '__call')
@@ -459,8 +459,8 @@ class CallableParser implements CallableParserInterface
             $callableMethodStaticMagic = [ $theClass, $theMagic ];
         }
 
-        if (false
-            || ($theMethod === '__callStatic')
+        if (
+            ($theMethod === '__callStatic')
             || ($theMagic === '__callStatic')
         ) {
             if (! $this->isCallable($callableMethodStaticMagic ?? $callableMethodStatic, $newScope)) {
@@ -516,8 +516,8 @@ class CallableParser implements CallableParserInterface
             return false;
         }
 
-        if (false
-            || ($theMethod === '__callStatic')
+        if (
+            ($theMethod === '__callStatic')
             || ($theMagic === '__callStatic')
         ) {
             return false;
@@ -529,8 +529,8 @@ class CallableParser implements CallableParserInterface
 
         $callableMethodPublic = [ $theObject, $theMethod ];
 
-        if (false
-            || ($theMethod === '__invoke')
+        if (
+            ($theMethod === '__invoke')
             || ($theMethod === '__call')
             || ($theMagic === '__invoke')
             || ($theMagic === '__call')
@@ -693,8 +693,8 @@ class CallableParser implements CallableParserInterface
             $callableMethodStaticMagic = "{$theClass}::{$theMagic}";
         }
 
-        if (false
-            || ($theMethod === '__callStatic')
+        if (
+            ($theMethod === '__callStatic')
             || ($theMagic === '__callStatic')
         ) {
             if (! $this->isCallable($callableMethodStaticMagic ?? $callableMethodStatic, $newScope)) {
@@ -706,8 +706,8 @@ class CallableParser implements CallableParserInterface
             return true;
         }
 
-        if (false
-            || ($theMethod === '__invoke')
+        if (
+            ($theMethod === '__invoke')
             || ($theMethod === '__call')
             || ($theMagic === '__invoke')
             || ($theMagic === '__call')
@@ -804,8 +804,8 @@ class CallableParser implements CallableParserInterface
 
         $isObject = null;
         $isClass = null;
-        if (! (false
-            || ($isObject = is_object($classOrObject))
+        if (! (
+            ($isObject = is_object($classOrObject))
             || ($isClass = is_string($classOrObject) && class_exists($classOrObject))
         )) {
             return null;

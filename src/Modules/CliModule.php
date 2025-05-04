@@ -45,8 +45,7 @@ class CliModule
 
     public function is_symlink(string $symlink) : bool
     {
-        return false
-            || is_link($symlink)
+        return is_link($symlink)
             || $this->is_junction($symlink);
     }
 

@@ -257,7 +257,7 @@ class ThrowableManager implements ThrowableManagerInterface
 
         $gen = $this->getPreviousIterator($throwable);
 
-        foreach ( $gen as $i => $e ) {
+        foreach ( $gen as $e ) {
             if ($e instanceof $throwableClass) {
                 return $e;
             }
@@ -316,7 +316,6 @@ class ThrowableManager implements ThrowableManagerInterface
      */
     public function getThrowableMessages(\Throwable $throwable, array $options = []) : array
     {
-        $throwableMap = [];
         if ($throwable instanceof HasMessageListInterface) {
             $throwableMap = array_fill_keys($throwable->getMessageList(), $throwable);
 

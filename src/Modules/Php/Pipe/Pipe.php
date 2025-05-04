@@ -391,8 +391,8 @@ class Pipe
 
         $isIgnore = false;
 
-        if (false
-            || (null === $throwableClass)
+        if (
+            (null === $throwableClass)
             || ($this->throwableCurrent instanceof $throwableClass)
         ) {
             $ref = $this->throwableCurrent;

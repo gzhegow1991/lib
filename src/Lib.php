@@ -4,6 +4,7 @@ namespace Gzhegow\Lib;
 
 use Gzhegow\Lib\Modules\FsModule;
 use Gzhegow\Lib\Modules\MbModule;
+use Gzhegow\Lib\Modules\FnModule;
 use Gzhegow\Lib\Modules\CliModule;
 use Gzhegow\Lib\Modules\NetModule;
 use Gzhegow\Lib\Modules\PhpModule;

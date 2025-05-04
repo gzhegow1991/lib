@@ -1308,8 +1308,8 @@ class DateModule
 
         $dateInterval = null;
 
-        $status = null
-            || $this->type_interval_duration($dateInterval, $interval)
+        $status =
+            $this->type_interval_duration($dateInterval, $interval)
             || $this->type_interval_datestring($dateInterval, $interval)
             //
             // > commented, autoparsing integers is bad practice

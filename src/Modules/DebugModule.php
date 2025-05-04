@@ -915,8 +915,8 @@ class DebugModule
             );
 
             foreach ( $gen as $path => &$value ) {
-                if (false
-                    || is_object($value)
+                if (
+                    is_object($value)
                     || $theType->resource($_value, $value)
                 ) {
                     // > ! recursion
@@ -1237,8 +1237,8 @@ class DebugModule
 
             } elseif (true
                 && $iOldGt0
-                && (false
-                    || $iNewEq0
+                && (
+                    $iNewEq0
                     || ($matrix[ $iOld ][ $iNew - 1 ] < $matrix[ $iOld - 1 ][ $iNew ])
                 )
             ) {
@@ -1256,8 +1256,8 @@ class DebugModule
 
             } elseif (true
                 && $iNewGt0
-                && (false
-                    || $iOldEq0
+                && (
+                    $iOldEq0
                     || ($matrix[ $iOld ][ $iNew - 1 ] >= $matrix[ $iOld - 1 ][ $iNew ])
                 )
             ) {

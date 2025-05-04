@@ -120,15 +120,15 @@ class ItertoolsModule
 
         $i = $_start;
 
-        while ( false
-            || ($isReverse && ($i >= $_end))
+        while (
+            ($isReverse && ($i >= $_end))
             || ($i <= $_end)
         ) {
             yield $i;
 
             if ($isModeString) {
-                if (false
-                    || ($isReverse && ($i === $_start))
+                if (
+                    ($isReverse && ($i === $_start))
                     || ($i === $_end)
                 ) {
                     break;
