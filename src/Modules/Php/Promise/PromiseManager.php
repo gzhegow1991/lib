@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules\Php\Promise;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Loop\LoopManagerInterface;
 use Gzhegow\Lib\Modules\Php\Timer\TimerManagerInterface;
@@ -36,30 +37,190 @@ class PromiseManager implements PromiseManagerInterface
     }
 
 
+    /**
+     * @return PromiseItem|bool|null
+     */
+    public function from($from, $ctx = null)
+    {
+        Result::parse($cur);
+
+        $instance = null
+            ?? static::fromStatic($from, $cur)
+            ?? static::fromExecutor($from, $cur)
+            ?? static::fromResolved($from, $cur);
+
+        if ($cur->isErr()) {
+            return Result::err($ctx, $cur);
+        }
+
+        return Result::ok($ctx, $instance);
+    }
+
+    /**
+     * @return PromiseItem|bool|null
+     */
+    public function fromValue($from, $ctx = null)
+    {
+        Result::parse($cur);
+
+        $instance = null
+            ?? static::fromStatic($from, $cur)
+            ?? static::fromResolved($from, $cur);
+
+        if ($cur->isErr()) {
+            return Result::err($ctx, $cur);
+        }
+
+        return Result::ok($ctx, $instance);
+    }
+
+    /**
+     * @param callable $from
+     *
+     * @return PromiseItem|bool|null
+     */
+    public function fromCallable($from, $ctx = null)
+    {
+        Result::parse($cur);
+
+        $instance = null
+            ?? static::fromStatic($from, $cur)
+            ?? static::fromExecutor($from, $cur);
+
+        if ($cur->isErr()) {
+            return Result::err($ctx, $cur);
+        }
+
+        return Result::ok($ctx, $instance);
+    }
+
+
+    /**
+     * @return PromiseItem|bool|null
+     */
+    public function fromStatic($from, $ctx = null)
+    {
+        if ($from instanceof static) {
+            return Result::ok($ctx, $from);
+        }
+
+        return Result::err(
+            $ctx,
+            [ 'The `from` should be instance of: ' . static::class, $from ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return PromiseItem|bool|null
+     */
+    public function fromResolved($from, $ctx = null)
+    {
+        $instance = PromiseItem::newResolved($this, $this->loop, $from);
+
+        return Result::ok($ctx, $instance);
+    }
+
+    /**
+     * @return PromiseItem|bool|null
+     */
+    public function fromRejected($from, $ctx = null)
+    {
+        $instance = PromiseItem::newRejected($this, $this->loop, $from);
+
+        return Result::ok($ctx, $instance);
+    }
+
+    /**
+     * @return PromiseItem|bool|null
+     */
+    public function fromExecutor($from, $ctx = null)
+    {
+        if (! is_callable($from)) {
+            return Result::err(
+                $ctx,
+                [ 'The `from` should be callable', $from ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $instance = PromiseItem::newPromise($this, $this->loop, $from);
+
+        return Result::ok($ctx, $instance);
+    }
+
+
     public function new($fnExecutor) : PromiseItem
     {
-        $promise = PromiseItem::new($fnExecutor);
-
-        $this->loop->addPromise($promise);
+        $promise = PromiseItem::newPromise($this, $this->loop, $fnExecutor);
 
         return $promise;
     }
 
-
     public function resolve($value = null) : PromiseItem
     {
-        $promise = PromiseItem::fromResolved($value);
-
-        $this->loop->addPromise($promise);
+        $promise = PromiseItem::newResolved($this, $this->loop, $value);
 
         return $promise;
     }
 
     public function reject($reason = null) : PromiseItem
     {
-        $promise = PromiseItem::fromRejected($reason);
+        $promise = PromiseItem::newRejected($this, $this->loop, $reason);
 
-        $this->loop->addPromise($promise);
+        return $promise;
+    }
+
+
+    public function never() : PromiseItem
+    {
+        $promise = PromiseItem::new($this, $this->loop);
+
+        return $promise;
+    }
+
+    public function defer(\Closure &$fnResolve = null, \Closure &$fnReject = null) : PromiseItem
+    {
+        $promise = PromiseItem::newDefer(
+            $this, $this->loop,
+            $fnResolve, $fnReject
+        );
+
+        return $promise;
+    }
+
+
+    public function delay(float $ms) : PromiseItem
+    {
+        $promise = PromiseItem::newDefer(
+            $this, $this->loop,
+            $fnResolve
+        );
+
+        $this->timer->timer($ms, $fnResolve);
+
+        return $promise;
+    }
+
+    public function pooling(float $ms, $fnExecutor) : PromiseItem
+    {
+        $promise = PromiseItem::newDefer(
+            $this, $this->loop,
+            $fnResolve, $fnReject
+        );
+
+        $interval = $this->timer->interval(
+            $ms,
+            static function () use ($fnExecutor, $fnResolve, $fnReject) {
+                call_user_func($fnExecutor, $fnResolve, $fnReject);
+            }
+        );
+
+        $promise
+            ->finally(static function () use ($interval) {
+                $interval->cancel();
+            })
+        ;
 
         return $promise;
     }
@@ -73,9 +234,7 @@ class PromiseManager implements PromiseManagerInterface
             ;
         }
 
-        $loop = $this->loop;
-
-        $fnExecutor = static function ($fnOk, $fnFail) use ($loop, $ps) {
+        $fnExecutor = function ($fnOk, $fnFail) use ($ps) {
             $psLeft = count($ps);
 
             $results = [];
@@ -98,11 +257,9 @@ class PromiseManager implements PromiseManagerInterface
                     return $value;
                 };
 
-                $p = PromiseItem::fromValue($v);
+                $p = $this->isPromise($v) ? $v : $this->resolve($v);
 
                 $p->then($fnThenChild, $fnFail);
-
-                $loop->addPromise($p);
             }
         };
 
@@ -119,9 +276,7 @@ class PromiseManager implements PromiseManagerInterface
             ;
         }
 
-        $loop = $this->loop;
-
-        $fnExecutor = static function ($fnOk) use ($loop, $ps) {
+        $fnExecutor = function ($fnOk) use ($ps) {
             $psLeft = count($ps);
 
             $results = [];
@@ -159,11 +314,9 @@ class PromiseManager implements PromiseManagerInterface
                     }
                 };
 
-                $p = PromiseItem::fromValue($v);
+                $p = $this->isPromise($v) ? $v : $this->resolve($v);
 
                 $p->then($fnOnResolvedChild, $fnOnRejectedChild);
-
-                $loop->addPromise($p);
             }
         };
 
@@ -180,9 +333,7 @@ class PromiseManager implements PromiseManagerInterface
             ;
         }
 
-        $loop = $this->loop;
-
-        $fnExecutor = static function ($fnOk, $fnFail) use ($loop, $ps) {
+        $fnExecutor = function ($fnOk, $fnFail) use ($ps) {
             $isSettled = false;
 
             $fnOnResolvedChild = static function ($value) use (
@@ -210,11 +361,9 @@ class PromiseManager implements PromiseManagerInterface
             };
 
             foreach ( $ps as $v ) {
-                $p = PromiseItem::fromValue($v);
+                $p = $this->isPromise($v) ? $v : $this->resolve($v);
 
                 $p->then($fnOnResolvedChild, $fnOnRejectedChild);
-
-                $loop->addPromise($p);
             }
         };
 
@@ -233,9 +382,7 @@ class PromiseManager implements PromiseManagerInterface
             ;
         }
 
-        $loop = $this->loop;
-
-        $fnExecutor = static function ($fnOk, $fnFail) use ($loop, $ps) {
+        $fnExecutor = function ($fnOk, $fnFail) use ($ps) {
             $psLeft = count($ps);
 
             $errors = [];
@@ -258,68 +405,13 @@ class PromiseManager implements PromiseManagerInterface
                     }
                 };
 
-                $p = PromiseItem::fromValue($v);
+                $p = $this->isPromise($v) ? $v : $this->resolve($v);
 
                 $p->then($fnOnResolvedChild, $fnOnRejectedChild);
-
-                $loop->addPromise($p);
             }
         };
 
         $promise = $this->new($fnExecutor);
-
-        return $promise;
-    }
-
-
-    public function never() : PromiseItem
-    {
-        $promise = PromiseItem::never();
-
-        $this->loop->addPromise($promise);
-
-        return $promise;
-    }
-
-    public function defer(\Closure &$fnResolve = null, \Closure &$fnReject = null) : PromiseItem
-    {
-        $promise = PromiseItem::defer($fnResolve, $fnReject);
-
-        $this->loop->addPromise($promise);
-
-        return $promise;
-    }
-
-
-    public function delay(float $ms) : PromiseItem
-    {
-        $promise = PromiseItem::defer($fnResolve);
-
-        $this->timer->timer($ms, $fnResolve);
-
-        $this->loop->addPromise($promise);
-
-        return $promise;
-    }
-
-    public function pooling(float $ms, $fnExecutor) : PromiseItem
-    {
-        $promise = PromiseItem::defer($fnResolve, $fnReject);
-
-        $interval = $this->timer->interval(
-            $ms,
-            static function () use ($fnExecutor, $fnResolve, $fnReject) {
-                call_user_func($fnExecutor, $fnResolve, $fnReject);
-            }
-        );
-
-        $promise
-            ->finally(static function () use ($interval) {
-                $interval->cancel();
-            })
-        ;
-
-        $this->loop->addPromise($promise);
 
         return $promise;
     }
@@ -344,10 +436,14 @@ class PromiseManager implements PromiseManagerInterface
             }
         };
 
-        $promiseTimeout = $this
-            ->delay($ms)
-            ->then($fnOnResolvedTimeout)
-        ;
+        $promiseTimeout = PromiseItem::newDefer(
+            $this, $this->loop,
+            $fnResolve
+        );
+
+        $this->timer->timer($ms, $fnResolve);
+
+        $promiseTimeout->then($fnOnResolvedTimeout);
 
         $promiseRace = $this->race([ $promise, $promiseTimeout ]);
 

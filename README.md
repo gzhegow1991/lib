@@ -130,10 +130,6 @@ $ffn = new class {
 
 
 
-\Gzhegow\Lib\Lib::requireOnceComposerGlobal();
-
-
-
 // >>> TEST
 // > тесты Promise
 $fn = function () use ($ffn) {
@@ -198,15 +194,15 @@ $fn = function () use ($ffn) {
 
 
     $ps = [
-        '[ 0 | ALL ] 1',
+        '[ 100 | ALL ] 1',
         \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(100)->then(function () { return '[ 100 | ALL ] 2'; }),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ 0 | ALL ] 3'),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ 0 | ALL ] 4'),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ 100 | ALL ] 3'),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ 100 | ALL ] 4'),
     ];
     \Gzhegow\Lib\Modules\Php\Promise\Promise::all($ps)
         ->then(function ($res) use ($ffn) {
             echo PHP_EOL;
-            $ffn->print($res);
+            $ffn->print_array_multiline($res);
             echo PHP_EOL;
 
             return $res;
@@ -215,10 +211,10 @@ $fn = function () use ($ffn) {
 
 
     $ps = [
-        '[ 200 | ALL SETTLED ] 1',
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ 200 | ALL SETTLED ] 1'),
         \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(200)->then(function () { return '[ 200 | ALL SETTLED ] 2'; }),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ 200 | ALL SETTLED ] 3'),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::reject('[ 200 | ALL SETTLED ] 4'),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::reject('[ 200 | ALL SETTLED ] 3'),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(100)->then(function () { return '[ 200 | ALL SETTLED ] 4'; }),
     ];
     \Gzhegow\Lib\Modules\Php\Promise\Promise::allSettled($ps)
         ->then(function ($res) use ($ffn) {
@@ -248,7 +244,7 @@ $fn = function () use ($ffn) {
 
     $ps = [
         \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(500)->then(function () { return '[ 500 | ANY ] 1'; }),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::reject('[ 0 | ANY ] 2'),
+        \Gzhegow\Lib\Modules\Php\Promise\Promise::reject('[ 500 | ANY ] 2'),
     ];
     \Gzhegow\Lib\Modules\Php\Promise\Promise::any($ps)
         ->then(function ($res) use ($ffn) {
@@ -267,26 +263,33 @@ $ffn->assert($fn, [], '
 "[ Promise ]"
 
 
-[ "[ 0 | ALL ] 1", "[ 100 | ALL ] 2", "[ 0 | ALL ] 3", "[ 0 | ALL ] 4" ]
+###
+[
+  "[ 100 | ALL ] 1",
+  "[ 100 | ALL ] 2",
+  "[ 100 | ALL ] 3",
+  "[ 100 | ALL ] 4"
+]
+###
 
 
 ###
 [
-  2 => [
+  0 => [
     "status" => "fulfilled",
-    "value" => "[ 200 | ALL SETTLED ] 3"
+    "value" => "[ 200 | ALL SETTLED ] 1"
+  ],
+  2 => [
+    "status" => "rejected",
+    "reason" => "[ 200 | ALL SETTLED ] 3"
   ],
   3 => [
-    "status" => "rejected",
-    "reason" => "[ 200 | ALL SETTLED ] 4"
+    "status" => "fulfilled",
+    "value" => "[ 200 | ALL SETTLED ] 4"
   ],
   1 => [
     "status" => "fulfilled",
     "value" => "[ 200 | ALL SETTLED ] 2"
-  ],
-  0 => [
-    "status" => "fulfilled",
-    "value" => "[ 200 | ALL SETTLED ] 1"
   ]
 ]
 ###
@@ -296,9 +299,6 @@ $ffn->assert($fn, [], '
 
 
 "[ 500 | ANY ] 1"
-
-
-"[ 600 | TIMEOUT ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
 
 
 "[ 800 | THEN 2.1 ]" | NULL

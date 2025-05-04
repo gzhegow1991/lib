@@ -5,40 +5,50 @@ namespace Gzhegow\Lib\Modules\Php\Loop;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Php\Timer\TimerItem;
 use Gzhegow\Lib\Modules\Php\Timer\IntervalItem;
-use Gzhegow\Lib\Modules\Php\Promise\PromiseItem;
 
 
 class Loop
 {
-    public static function isPromise($value) : bool
+    public static function addInterval(IntervalItem $interval) : void
     {
-        return static::getInstance()->isPromise($value);
+        static::getInstance()->addInterval($interval);
     }
 
-    public static function isTimer($value) : bool
+    public static function clearInterval(IntervalItem $interval) : void
     {
-        return static::getInstance()->isTimer($value);
-    }
-
-    public static function isInterval($value) : bool
-    {
-        return static::getInstance()->isInterval($value);
+        static::getInstance()->clearInterval($interval);
     }
 
 
-    public static function addPromise(PromiseItem $promise) : string
+    public static function addTimer(TimerItem $timer) : void
     {
-        return static::getInstance()->addPromise($promise);
+        static::getInstance()->addTimer($timer);
     }
 
-    public static function addTimer(TimerItem $timer) : string
+    public static function clearTimer(TimerItem $timer) : void
     {
-        return static::getInstance()->addTimer($timer);
+        static::getInstance()->clearTimer($timer);
     }
 
-    public static function addInterval(IntervalItem $interval) : string
+
+    /**
+     * @param callable $microtask
+     *
+     * @return void
+     */
+    public static function addMicrotask($microtask) : void
     {
-        return static::getInstance()->addInterval($interval);
+        static::getInstance()->addMicrotask($microtask);
+    }
+
+    /**
+     * @param callable $macrotask
+     *
+     * @return void
+     */
+    public static function addMacrotask($macrotask) : void
+    {
+        static::getInstance()->addMacrotask($macrotask);
     }
 
 

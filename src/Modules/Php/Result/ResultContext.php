@@ -57,9 +57,33 @@ class ResultContext
 
     public static function fromMode(int $modeReturn, int $modeThrow)
     {
+        if (! isset(static::LIST_MODE_RETURN[ $modeReturn ])) {
+            throw new LogicException(
+                [
+                    ''
+                    . 'The `modeReturn` should be one of: '
+                    . '[ ' . implode(' ][ ', array_keys(static::LIST_MODE_RETURN)) . ' ]',
+                    //
+                    $modeReturn,
+                ]
+            );
+        }
+
+        if (! isset(static::LIST_MODE_THROW[ $modeThrow ])) {
+            throw new LogicException(
+                [
+                    ''
+                    . 'The `modeThrow` should be one of: '
+                    . '[ ' . implode(' ][ ', array_keys(static::LIST_MODE_THROW)) . ' ]',
+                    //
+                    $modeThrow,
+                ]
+            );
+        }
+
         $instance = new static();
-        $instance->setModeReturn($modeReturn);
-        $instance->setModeThrow($modeThrow);
+        $instance->modeReturn = $modeReturn;
+        $instance->modeThrow = $modeThrow;
 
         return $instance;
     }
@@ -86,48 +110,6 @@ class ResultContext
     public function isModeThrow(int $modeThrow) : bool
     {
         return $this->modeThrow === $modeThrow;
-    }
-
-    protected function setModeReturn(int $modeReturn) : int
-    {
-        if (! isset(static::LIST_MODE_RETURN[ $modeReturn ])) {
-            throw new LogicException(
-                [
-                    ''
-                    . 'The `modeReturn` should be one of: '
-                    . '[ ' . implode(' ][ ', array_keys(static::LIST_MODE_RETURN)) . ' ]',
-                    //
-                    $modeReturn,
-                ]
-            );
-        }
-
-        $last = $this->modeReturn;
-
-        $this->modeReturn = $modeReturn;
-
-        return $last;
-    }
-
-    protected function setModeThrow(int $modeThrow) : int
-    {
-        if (! isset(static::LIST_MODE_THROW[ $modeThrow ])) {
-            throw new LogicException(
-                [
-                    ''
-                    . 'The `modeThrow` should be one of: '
-                    . '[ ' . implode(' ][ ', array_keys(static::LIST_MODE_THROW)) . ' ]',
-                    //
-                    $modeThrow,
-                ]
-            );
-        }
-
-        $last = $this->modeThrow;
-
-        $this->modeThrow = $modeThrow;
-
-        return $last;
     }
 
 

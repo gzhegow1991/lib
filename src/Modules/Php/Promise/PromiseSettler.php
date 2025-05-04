@@ -2,7 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Php\Promise;
 
-class PromiseSettle
+class PromiseSettler
 {
     const TYPE_THEN    = 'then';
     const TYPE_CATCH   = 'catch';

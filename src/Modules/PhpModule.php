@@ -97,10 +97,10 @@ class PhpModule
 
     public function newPromiseManager() : PromiseManagerInterface
     {
-        $loopManager = static::loopManager();
-        $timerManager = static::timerManager();
-
-        return new PromiseManager($loopManager, $timerManager);
+        return new PromiseManager(
+            $this->loopManager(),
+            $this->timerManager()
+        );
     }
 
     public function clonePromiseManager() : PromiseManagerInterface
@@ -108,23 +108,23 @@ class PhpModule
         return clone $this->promiseManager();
     }
 
-    public function promiseManager(?PromiseManagerInterface $promiseManager = null) : PromiseManagerInterface
+    public function promiseManager(?PromiseManagerInterface $promiseFactory = null) : PromiseManagerInterface
     {
         return $this->promiseManager = null
-            ?? $promiseManager
+            ?? $promiseFactory
             ?? $this->promiseManager
             ?? new PromiseManager(
-                static::loopManager(),
-                static::timerManager()
+                $this->loopManager(),
+                $this->timerManager()
             );
     }
 
 
     public function newTimerManager() : TimerManagerInterface
     {
-        $loopManager = static::loopManager();
-
-        return new TimerManager($loopManager);
+        return new TimerManager(
+            $this->loopManager()
+        );
     }
 
     public function cloneTimerManager() : TimerManagerInterface
@@ -137,7 +137,9 @@ class PhpModule
         return $this->timerManager = null
             ?? $timerManager
             ?? $this->timerManager
-            ?? new TimerManager(static::loopManager());
+            ?? new TimerManager(
+                $this->loopManager()
+            );
     }
 
 

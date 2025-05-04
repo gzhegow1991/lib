@@ -6,22 +6,14 @@ interface TimerManagerInterface
 {
     public function isTimer($value) : bool;
 
+    public function timer(float $ms, callable $fn) : TimerItem;
+
+    public function clearTimer(TimerItem $timer) : void;
+
+
     public function isInterval($value) : bool;
 
+    public function interval(float $ms, callable $fn) : IntervalItem;
 
-    public function timer(float $ms, $fn) : TimerItem;
-
-    public function interval(float $ms, $fn) : IntervalItem;
-
-
-    public function startTimer(TimerItem $timer) : void;
-
-    public function cancelTimer(TimerItem $timer) : void;
-
-
-    public function startInterval(IntervalItem $interval) : void;
-
-    public function cancelInterval(IntervalItem $interval) : void;
-
-    public function restartInterval(IntervalItem $interval) : void;
+    public function clearInterval(IntervalItem $interval) : void;
 }

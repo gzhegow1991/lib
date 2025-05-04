@@ -13,11 +13,70 @@ class Promise
     }
 
 
+    /**
+     * @return PromiseItem|bool|null
+     */
+    public static function from($from, $ctx = null)
+    {
+        return static::getInstance()->from($from, $ctx);
+    }
+
+    /**
+     * @return PromiseItem|bool|null
+     */
+    public static function fromValue($from, $ctx = null)
+    {
+        return static::getInstance()->fromValue($from, $ctx);
+    }
+
+    /**
+     * @param callable $from
+     *
+     * @return PromiseItem|bool|null
+     */
+    public static function fromCallable($from, $ctx = null)
+    {
+        return static::getInstance()->fromCallable($from, $ctx);
+    }
+
+
+    /**
+     * @return PromiseItem|bool|null
+     */
+    public static function fromStatic($from, $ctx = null)
+    {
+        return static::getInstance()->fromStatic($from, $ctx);
+    }
+
+    /**
+     * @return PromiseItem|bool|null
+     */
+    public static function fromResolved($from, $ctx = null)
+    {
+        return static::getInstance()->fromResolved($from, $ctx);
+    }
+
+    /**
+     * @return PromiseItem|bool|null
+     */
+    public static function fromRejected($from, $ctx = null)
+    {
+        return static::getInstance()->fromRejected($from, $ctx);
+    }
+
+    /**
+     * @return PromiseItem|bool|null
+     */
+    public static function fromExecutor($from, $ctx = null)
+    {
+        return static::getInstance()->fromExecutor($from, $ctx);
+    }
+
+
     public static function new($fnExecutor) : PromiseItem
     {
         return static::getInstance()->new($fnExecutor);
     }
-
 
     public static function resolve($value = null) : PromiseItem
     {
@@ -30,50 +89,76 @@ class Promise
     }
 
 
-    public static function all(array $ps) : PromiseItem
-    {
-        return static::getInstance()->all($ps);
-    }
-
-    public static function allSettled(array $ps) : PromiseItem
-    {
-        return static::getInstance()->allSettled($ps);
-    }
-
-    public static function race(array $ps) : PromiseItem
-    {
-        return static::getInstance()->race($ps);
-    }
-
-    public static function any(array $ps) : PromiseItem
-    {
-        return static::getInstance()->any($ps);
-    }
-
-
     public static function never() : PromiseItem
     {
         return static::getInstance()->never();
     }
 
-    public static function defer(\Closure &$fnResolve = null, \Closure &$fnReject = null) : PromiseItem
+    /**
+     * @param \Closure $fnResolve
+     * @param \Closure $fnReject
+     */
+    public static function defer(&$fnResolve = null, &$fnReject = null) : PromiseItem
     {
         return static::getInstance()->defer($fnResolve, $fnReject);
     }
 
 
-    public static function delay(float $ms) : PromiseItem
+    /**
+     * @param float $ms
+     */
+    public static function delay($ms) : PromiseItem
     {
         return static::getInstance()->delay($ms);
     }
 
-    public static function pooling(float $ms, $fnExecutor) : PromiseItem
+    /**
+     * @param float $ms
+     */
+    public static function pooling($ms, $fnExecutor) : PromiseItem
     {
         return static::getInstance()->pooling($ms, $fnExecutor);
     }
 
 
-    public static function timeout(PromiseItem $promise, float $ms, $reason = null) : PromiseItem
+    /**
+     * @param array $ps
+     */
+    public static function all($ps) : PromiseItem
+    {
+        return static::getInstance()->all($ps);
+    }
+
+    /**
+     * @param array $ps
+     */
+    public static function allSettled($ps) : PromiseItem
+    {
+        return static::getInstance()->allSettled($ps);
+    }
+
+    /**
+     * @param array $ps
+     */
+    public static function race($ps) : PromiseItem
+    {
+        return static::getInstance()->race($ps);
+    }
+
+    /**
+     * @param array $ps
+     */
+    public static function any($ps) : PromiseItem
+    {
+        return static::getInstance()->any($ps);
+    }
+
+
+    /**
+     * @param PromiseItem $promise
+     * @param float       $ms
+     */
+    public static function timeout($promise, $ms, $reason = null) : PromiseItem
     {
         return static::getInstance()->timeout($promise, $ms, $reason);
     }
