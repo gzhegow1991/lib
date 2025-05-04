@@ -61,7 +61,7 @@ class LoopManager implements LoopManagerInterface
         $this->queueMacrotask = new \SplQueue();
         $this->queueMacrotask->setIteratorMode(\SplDoublyLinkedList::IT_MODE_FIFO);
 
-        $queue = $this->queueMicrotask;
+        $queue = $this->queueMacrotask;
     }
 
 
