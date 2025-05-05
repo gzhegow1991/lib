@@ -25,27 +25,6 @@ interface PromiseManagerInterface
     public function fromCallable($from, $ctx = null);
 
 
-    /**
-     * @return PromiseItem|bool|null
-     */
-    public function fromStatic($from, $ctx = null);
-
-    /**
-     * @return PromiseItem|bool|null
-     */
-    public function fromResolved($from, $ctx = null);
-
-    /**
-     * @return PromiseItem|bool|null
-     */
-    public function fromRejected($from, $ctx = null);
-
-    /**
-     * @return PromiseItem|bool|null
-     */
-    public function fromExecutor($from, $ctx = null);
-
-
     public function new($fnExecutor) : PromiseItem;
 
     public function resolve($value = null) : PromiseItem;

@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Php\Pipe\Pipe;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Loop\LoopManager;
@@ -165,11 +164,6 @@ class PhpModule
     public function errorBag(?ErrorBag &$b = null) : ErrorBag
     {
         return $b = new ErrorBag();
-    }
-
-    public function pipe(?Pipe &$p = null) : Pipe
-    {
-        return $p = new Pipe();
     }
 
 
@@ -1148,9 +1142,10 @@ class PhpModule
 
         $hasAssert = (null !== $fnAssert);
 
-        $fnArgs = $hasAssert
-            ? $this->function_args([ $fnAssertValueKey => null ], $fnAssertArgs)
-            : [];
+        $fnArgs = [];
+        if ($hasAssert) {
+            [ $fnArgs ] = Lib::func()->func_args_unique([ $fnAssertValueKey => null ], $fnAssertArgs);
+        }
 
         $listValid = null;
 
@@ -2448,256 +2443,5 @@ class PhpModule
         call_user_func($fn);
 
         throw $e;
-    }
-
-
-    /**
-     * @param callable $fn
-     */
-    public function fn($fn, array $args = []) : \Closure
-    {
-        return function (...$arguments) use ($fn, $args) {
-            $_args = array_merge($arguments, $args);
-
-            return call_user_func_array($fn, $_args);
-        };
-    }
-
-    /**
-     * @param callable $fn
-     */
-    public function fn_not($fn, array $args = []) : \Closure
-    {
-        return function (...$arguments) use ($fn, $args) {
-            $_args = array_merge($arguments, $args);
-
-            return ! call_user_func_array($fn, $_args);
-        };
-    }
-
-
-    /**
-     * > подготавливает аргументы для вызова callable, заполняет пустоты в list с помощью NULL
-     */
-    public function function_args(array ...$arrays) : array
-    {
-        $args = [];
-
-        $hasInt = false;
-        $hasString = false;
-        $argsSeenIndex = [];
-        for ( $i = 0; $i < count($arrays); $i++ ) {
-            if ([] === $arrays[ $i ]) {
-                continue;
-            }
-
-            foreach ( array_keys($arrays[ $i ]) as $ii ) {
-                if (isset($argsSeenIndex[ $ii ])) {
-                    throw new LogicException(
-                        [
-                            'Arguments intersection detected',
-                            $ii,
-                            $arrays[ $i ],
-                            $arrays,
-                        ]
-                    );
-                }
-
-                if ((! $hasString) && (is_string($ii))) {
-                    $hasString = true;
-
-                } elseif ((! $hasInt) && is_int($ii)) {
-                    $hasInt = true;
-                }
-
-                if ($hasString && $hasInt) {
-                    throw new LogicException(
-                        [
-                            'The `args` should contain arguments of single type: string or int',
-                            $args,
-                        ]
-                    );
-                }
-
-                $argsSeenIndex[ $ii ] = true;
-            }
-
-            $args += $arrays[ $i ];
-        }
-
-        if ([] !== $args) {
-            if ($hasInt) {
-                $args[] = null;
-
-                $max = array_key_last($args);
-
-                unset($args[ $max ]);
-
-                for ( $i = 0; $i < $max; $i++ ) {
-                    if (! array_key_exists($i, $args)) {
-                        $args[ $i ] = null;
-                    }
-                }
-
-                ksort($args);
-
-            } elseif ($hasString) {
-                if (PHP_VERSION_ID < 80000) {
-                    throw new RuntimeException(
-                        [ 'PHP does not support arguments with string keys', $args ]
-                    );
-                }
-            }
-        }
-
-        return $args;
-    }
-
-
-    /**
-     * > встроенные функции в php такие как strlen() требуют строгое число аргументов
-     * > стоит передать туда больше аргументов - сразу throw/trigger_error
-     *
-     * @noinspection PhpDocMissingThrowsInspection
-     * @noinspection PhpUnhandledExceptionInspection
-     * @throws \RuntimeException
-     */
-    public function call_user_func($fn, ...$args)
-    {
-        $isMaybeInternalFunction = is_string($fn) && function_exists($fn);
-
-        if (! $isMaybeInternalFunction) {
-            $result = call_user_func($fn, ...$args);
-
-        } else {
-            $ex = null;
-            $eMsg = null;
-
-            $before = error_reporting(0);
-            error_clear_last();
-
-            try {
-                $result = call_user_func($fn, ...$args);
-            }
-            catch ( \Throwable $ex ) {
-                $eMsg = $ex->getMessage();
-            }
-
-            $err = error_get_last();
-            error_reporting($before);
-
-            if (null !== $err) {
-                $eMsg = $err[ 'message' ];
-            }
-
-            if (null !== $eMsg) {
-                $eMsgKnownList = [
-                    '() expects exactly '  => 19,
-                    '() expects at most '  => 19,
-                    '() expects at least ' => 20,
-                ];
-
-                $isKnown = false;
-                foreach ( $eMsgKnownList as $eSubstr => $eSubstrLen ) {
-                    if (false !== ($pos = strpos($eMsg, $eSubstr))) {
-                        $isKnown = true;
-
-                        break;
-                    }
-                }
-
-                if ($isKnown) {
-                    $max = (int) substr($eMsg, $pos + $eSubstrLen);
-
-                    array_splice($args, $max);
-
-                    $result = call_user_func($fn, ...$args);
-                }
-
-                if ($ex && ! $isKnown) {
-                    throw $ex;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * > встроенные функции в php такие как strlen() требуют строгое число аргументов
-     * > стоит передать туда больше аргументов - сразу throw/trigger_error
-     *
-     * @noinspection PhpDocMissingThrowsInspection
-     * @noinspection PhpUnhandledExceptionInspection
-     * @throws \RuntimeException
-     */
-    public function call_user_func_array($fn, array $args, ?array &$argsNew = null)
-    {
-        $argsNew = null;
-
-        $isMaybeInternalFunction = is_string($fn) && function_exists($fn);
-
-        $_args = $this->function_args($args);
-
-        if (! $isMaybeInternalFunction) {
-            $result = call_user_func_array($fn, $_args);
-
-        } elseif (! ($isIntKeys = array_key_exists(0, $_args))) {
-            $result = call_user_func_array($fn, $_args);
-
-        } else {
-            $ex = null;
-            $eMsg = null;
-
-            $before = error_reporting(0);
-            error_clear_last();
-
-            try {
-                $result = call_user_func_array($fn, $_args);
-            }
-            catch ( \Throwable $ex ) {
-                $eMsg = $ex->getMessage();
-            }
-
-            $err = error_get_last();
-            error_reporting($before);
-
-            if (null !== $err) {
-                $eMsg = $err[ 'message' ];
-            }
-
-            if (null !== $eMsg) {
-                $eMsgKnownList = [
-                    '() expects exactly '  => 19,
-                    '() expects at most '  => 19,
-                    '() expects at least ' => 20,
-                ];
-
-                $isKnown = false;
-                foreach ( $eMsgKnownList as $eSubstr => $eSubstrLen ) {
-                    if (false !== ($pos = strpos($eMsg, $eSubstr))) {
-                        $isKnown = true;
-
-                        break;
-                    }
-                }
-
-                if ($ex && ! $isKnown) {
-                    throw $ex;
-                }
-
-                if ($isKnown) {
-                    $max = (int) substr($eMsg, $pos + $eSubstrLen);
-
-                    array_splice($_args, $max);
-
-                    $result = call_user_func_array($fn, $_args);
-                }
-            }
-        }
-
-        $argsNew = $_args;
-
-        return $result;
     }
 }

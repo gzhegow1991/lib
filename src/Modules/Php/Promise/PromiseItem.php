@@ -60,18 +60,6 @@ class PromiseItem
     }
 
 
-    public static function new(
-        PromiseManagerInterface $factory,
-        //
-        LoopManagerInterface $loop
-    )
-    {
-        $instance = new PromiseItem($factory, $loop);
-        $instance->state = static::STATE_PENDING;
-
-        return $instance;
-    }
-
     public static function newPromise(
         PromiseManagerInterface $factory,
         //
@@ -120,6 +108,19 @@ class PromiseItem
         return $instance;
     }
 
+
+    public static function newNever(
+        PromiseManagerInterface $factory,
+        //
+        LoopManagerInterface $loop
+    )
+    {
+        $instance = new PromiseItem($factory, $loop);
+        $instance->state = static::STATE_PENDING;
+
+        return $instance;
+    }
+
     public static function newDefer(
         PromiseManagerInterface $factory,
         //
@@ -161,7 +162,6 @@ class PromiseItem
     {
         return static::STATE_PENDING === $this->state;
     }
-
 
     public function isResolved(&$value = null) : bool
     {

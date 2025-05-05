@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Php\Pipe;
+namespace Gzhegow\Lib\Modules\Func\Pipe;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
@@ -196,7 +196,7 @@ class Pipe
      */
     public function catchTo(?\Throwable &$e, array $result = [], ?string $throwableClass = null)
     {
-        $_result = $this->sanitizeResult($result);
+        $resultSanitized = $this->sanitizeResult($result);
 
         if (null !== $throwableClass) {
             if (! is_subclass_of($throwableClass, \Throwable::class)) {
@@ -208,7 +208,7 @@ class Pipe
 
         $this->queueId++;
 
-        $this->catchToQueue[ $this->queueId ] = [ &$e, $result, $throwableClass ];
+        $this->catchToQueue[ $this->queueId ] = [ &$e, $resultSanitized, $throwableClass ];
 
         return $this;
     }
@@ -293,9 +293,9 @@ class Pipe
             ? $this->valueCurrent
             : [ $this->keyValueInitial => null ];
 
-        $fnArgs = Lib::php()->function_args($argsFn, $argsValue, $this->argsInitial);
+        [ $argsNew ] = Lib::func()->func_args_unique($argsFn, $argsValue, $this->argsInitial);
 
-        call_user_func_array($fn, $fnArgs);
+        call_user_func_array($fn, $argsNew);
 
         return true;
     }
@@ -318,9 +318,9 @@ class Pipe
             ? $this->valueCurrent
             : [ $this->keyValueInitial => null ];
 
-        $fnArgs = Lib::php()->function_args($argsFn, $argsValue, $this->argsInitial);
+        [ $argsNew ] = Lib::func()->func_args_unique($argsFn, $argsValue, $this->argsInitial);
 
-        $result = call_user_func_array($fn, $fnArgs);
+        $result = call_user_func_array($fn, $argsNew);
 
         $this->valueCurrent[ $this->keyValueInitial ] = $result;
 
@@ -345,9 +345,9 @@ class Pipe
             ? $this->valueCurrent
             : [ $this->keyValueInitial => null ];
 
-        $fnArgs = Lib::php()->function_args($argsFn, $argsValue, $this->argsInitial);
+        [ $argsNew ] = Lib::func()->func_args_unique($argsFn, $argsValue, $this->argsInitial);
 
-        $status = (bool) call_user_func_array($fn, $fnArgs);
+        $status = (bool) call_user_func_array($fn, $argsNew);
 
         if (! $status) {
             $this->valueCurrent = [];
@@ -366,9 +366,9 @@ class Pipe
 
         $argsThrowable = [ 0 => $this->throwableCurrent ];
 
-        $fnArgs = Lib::php()->function_args($argsFn, $argsThrowable);
+        [ $argsNew ] = Lib::func()->func_args_unique($argsFn, $argsThrowable);
 
-        $result = call_user_func_array($fn, $fnArgs);
+        $result = call_user_func_array($fn, $argsNew);
 
         if (! is_a($result, \Throwable::class)) {
             if ($this->hasValueInitial) {
@@ -388,8 +388,6 @@ class Pipe
         }
 
         [ &$ref, $result, $throwableClass ] = $this->catchToQueue[ $i ];
-
-        $isIgnore = false;
 
         if (
             (null === $throwableClass)

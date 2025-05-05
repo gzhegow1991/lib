@@ -40,39 +40,6 @@ class Promise
     }
 
 
-    /**
-     * @return PromiseItem|bool|null
-     */
-    public static function fromStatic($from, $ctx = null)
-    {
-        return static::getInstance()->fromStatic($from, $ctx);
-    }
-
-    /**
-     * @return PromiseItem|bool|null
-     */
-    public static function fromResolved($from, $ctx = null)
-    {
-        return static::getInstance()->fromResolved($from, $ctx);
-    }
-
-    /**
-     * @return PromiseItem|bool|null
-     */
-    public static function fromRejected($from, $ctx = null)
-    {
-        return static::getInstance()->fromRejected($from, $ctx);
-    }
-
-    /**
-     * @return PromiseItem|bool|null
-     */
-    public static function fromExecutor($from, $ctx = null)
-    {
-        return static::getInstance()->fromExecutor($from, $ctx);
-    }
-
-
     public static function new($fnExecutor) : PromiseItem
     {
         return static::getInstance()->new($fnExecutor);

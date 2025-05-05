@@ -45,9 +45,9 @@ class PromiseManager implements PromiseManagerInterface
         Result::parse($cur);
 
         $instance = null
-            ?? static::fromStatic($from, $cur)
-            ?? static::fromExecutor($from, $cur)
-            ?? static::fromResolved($from, $cur);
+            ?? $this->fromInstance($from, $cur)
+            ?? $this->fromCallable($from, $cur)
+            ?? $this->fromResolved($from, $cur);
 
         if ($cur->isErr()) {
             return Result::err($ctx, $cur);
@@ -64,8 +64,8 @@ class PromiseManager implements PromiseManagerInterface
         Result::parse($cur);
 
         $instance = null
-            ?? static::fromStatic($from, $cur)
-            ?? static::fromResolved($from, $cur);
+            ?? $this->fromInstance($from, $cur)
+            ?? $this->fromResolved($from, $cur);
 
         if ($cur->isErr()) {
             return Result::err($ctx, $cur);
@@ -75,8 +75,6 @@ class PromiseManager implements PromiseManagerInterface
     }
 
     /**
-     * @param callable $from
-     *
      * @return PromiseItem|bool|null
      */
     public function fromCallable($from, $ctx = null)
@@ -84,8 +82,8 @@ class PromiseManager implements PromiseManagerInterface
         Result::parse($cur);
 
         $instance = null
-            ?? static::fromStatic($from, $cur)
-            ?? static::fromExecutor($from, $cur);
+            ?? $this->fromInstance($from, $cur)
+            ?? $this->fromCallable($from, $cur);
 
         if ($cur->isErr()) {
             return Result::err($ctx, $cur);
@@ -98,15 +96,15 @@ class PromiseManager implements PromiseManagerInterface
     /**
      * @return PromiseItem|bool|null
      */
-    public function fromStatic($from, $ctx = null)
+    protected function fromInstance($from, $ctx = null)
     {
-        if ($from instanceof static) {
+        if ($from instanceof PromiseItem) {
             return Result::ok($ctx, $from);
         }
 
         return Result::err(
             $ctx,
-            [ 'The `from` should be instance of: ' . static::class, $from ],
+            [ 'The `from` should be instance of: ' . PromiseItem::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -114,37 +112,56 @@ class PromiseManager implements PromiseManagerInterface
     /**
      * @return PromiseItem|bool|null
      */
-    public function fromResolved($from, $ctx = null)
+    protected function fromResolved($from, $ctx = null)
     {
-        $instance = PromiseItem::newResolved($this, $this->loop, $from);
-
-        return Result::ok($ctx, $instance);
-    }
-
-    /**
-     * @return PromiseItem|bool|null
-     */
-    public function fromRejected($from, $ctx = null)
-    {
-        $instance = PromiseItem::newRejected($this, $this->loop, $from);
-
-        return Result::ok($ctx, $instance);
-    }
-
-    /**
-     * @return PromiseItem|bool|null
-     */
-    public function fromExecutor($from, $ctx = null)
-    {
-        if (! is_callable($from)) {
+        try {
+            $instance = PromiseItem::newResolved($this, $this->loop, $from);
+        }
+        catch ( \Throwable $e ) {
             return Result::err(
                 $ctx,
-                [ 'The `from` should be callable', $from ],
+                $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $instance = PromiseItem::newPromise($this, $this->loop, $from);
+        return Result::ok($ctx, $instance);
+    }
+
+    /**
+     * @return PromiseItem|bool|null
+     */
+    protected function fromRejected($from, $ctx = null)
+    {
+        try {
+            $instance = PromiseItem::newRejected($this, $this->loop, $from);
+        }
+        catch ( \Throwable $e ) {
+            return Result::err(
+                $ctx,
+                $e,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Result::ok($ctx, $instance);
+    }
+
+    /**
+     * @return PromiseItem|bool|null
+     */
+    protected function fromExecutor($from, $ctx = null)
+    {
+        try {
+            $instance = PromiseItem::newPromise($this, $this->loop, $from);
+        }
+        catch ( \Throwable $e ) {
+            return Result::err(
+                $ctx,
+                $e,
+                [ __FILE__, __LINE__ ]
+            );
+        }
 
         return Result::ok($ctx, $instance);
     }
@@ -174,7 +191,7 @@ class PromiseManager implements PromiseManagerInterface
 
     public function never() : PromiseItem
     {
-        $promise = PromiseItem::new($this, $this->loop);
+        $promise = PromiseItem::newNever($this, $this->loop);
 
         return $promise;
     }
@@ -234,36 +251,34 @@ class PromiseManager implements PromiseManagerInterface
             ;
         }
 
-        $fnExecutor = function ($fnOk, $fnFail) use ($ps) {
-            $psLeft = count($ps);
+        $promise = $this->defer($fnResolveParent, $fnRejectParent);
 
-            $results = [];
+        $psLeft = count($ps);
 
-            foreach ( $ps as $i => $v ) {
-                $results[ $i ] = null;
+        $results = [];
 
-                $fnThenChild = static function ($value) use (
-                    &$psLeft,
-                    &$results,
-                    //
-                    $fnOk, $i
-                ) {
-                    $results[ $i ] = $value;
+        foreach ( $ps as $i => $v ) {
+            $results[ $i ] = null;
 
-                    if (--$psLeft === 0) {
-                        call_user_func($fnOk, $results);
-                    }
+            $fnOnResolvedChild = static function ($value) use (
+                &$psLeft,
+                &$results,
+                //
+                $fnResolveParent, $i
+            ) {
+                $results[ $i ] = $value;
 
-                    return $value;
-                };
+                if (--$psLeft === 0) {
+                    call_user_func($fnResolveParent, $results);
+                }
 
-                $p = $this->isPromise($v) ? $v : $this->resolve($v);
+                return $value;
+            };
 
-                $p->then($fnThenChild, $fnFail);
-            }
-        };
+            $p = $this->isPromise($v) ? $v : $this->resolve($v);
 
-        $promise = $this->new($fnExecutor);
+            $p->then($fnOnResolvedChild, $fnRejectParent);
+        }
 
         return $promise;
     }
@@ -276,51 +291,49 @@ class PromiseManager implements PromiseManagerInterface
             ;
         }
 
-        $fnExecutor = function ($fnOk) use ($ps) {
-            $psLeft = count($ps);
+        $promise = $this->defer($fnResolveParent, $fnRejectParent);
 
-            $results = [];
+        $psLeft = count($ps);
 
-            foreach ( $ps as $i => $v ) {
-                $fnOnResolvedChild = static function ($val) use (
-                    &$psLeft,
-                    &$results,
-                    //
-                    $fnOk, $i
-                ) {
-                    $results[ $i ] = [
-                        'status' => 'fulfilled',
-                        'value'  => $val,
-                    ];
+        $results = [];
 
-                    if (--$psLeft === 0) {
-                        call_user_func($fnOk, $results);
-                    }
-                };
+        foreach ( $ps as $i => $v ) {
+            $fnOnResolvedChild = static function ($val) use (
+                &$psLeft,
+                &$results,
+                //
+                $fnResolveParent, $i
+            ) {
+                $results[ $i ] = [
+                    'status' => 'fulfilled',
+                    'value'  => $val,
+                ];
 
-                $fnOnRejectedChild = static function ($err) use (
-                    &$psLeft,
-                    &$results,
-                    //
-                    $fnOk, $i
-                ) {
-                    $results[ $i ] = [
-                        'status' => 'rejected',
-                        'reason' => $err,
-                    ];
+                if (--$psLeft === 0) {
+                    call_user_func($fnResolveParent, $results);
+                }
+            };
 
-                    if (--$psLeft === 0) {
-                        call_user_func($fnOk, $results);
-                    }
-                };
+            $fnOnRejectedChild = static function ($err) use (
+                &$psLeft,
+                &$results,
+                //
+                $fnResolveParent, $i
+            ) {
+                $results[ $i ] = [
+                    'status' => 'rejected',
+                    'reason' => $err,
+                ];
 
-                $p = $this->isPromise($v) ? $v : $this->resolve($v);
+                if (--$psLeft === 0) {
+                    call_user_func($fnResolveParent, $results);
+                }
+            };
 
-                $p->then($fnOnResolvedChild, $fnOnRejectedChild);
-            }
-        };
+            $p = $this->isPromise($v) ? $v : $this->resolve($v);
 
-        $promise = $this->new($fnExecutor);
+            $p->then($fnOnResolvedChild, $fnOnRejectedChild);
+        }
 
         return $promise;
     }
@@ -333,41 +346,39 @@ class PromiseManager implements PromiseManagerInterface
             ;
         }
 
-        $fnExecutor = function ($fnOk, $fnFail) use ($ps) {
-            $isSettled = false;
+        $promise = $this->defer($fnResolveParent, $fnRejectParent);
 
-            $fnOnResolvedChild = static function ($value) use (
-                &$isSettled,
-                //
-                $fnOk
-            ) {
-                if (! $isSettled) {
-                    $isSettled = true;
+        $isSettled = false;
 
-                    call_user_func($fnOk, $value);
-                }
-            };
+        $fnOnResolvedChild = static function ($value) use (
+            &$isSettled,
+            //
+            $fnResolveParent
+        ) {
+            if (! $isSettled) {
+                $isSettled = true;
 
-            $fnOnRejectedChild = static function ($reason) use (
-                &$isSettled,
-                //
-                $fnFail
-            ) {
-                if (! $isSettled) {
-                    $isSettled = true;
-
-                    call_user_func($fnFail, $reason);
-                }
-            };
-
-            foreach ( $ps as $v ) {
-                $p = $this->isPromise($v) ? $v : $this->resolve($v);
-
-                $p->then($fnOnResolvedChild, $fnOnRejectedChild);
+                call_user_func($fnResolveParent, $value);
             }
         };
 
-        $promise = $this->new($fnExecutor);
+        $fnOnRejectedChild = static function ($reason) use (
+            &$isSettled,
+            //
+            $fnRejectParent
+        ) {
+            if (! $isSettled) {
+                $isSettled = true;
+
+                call_user_func($fnRejectParent, $reason);
+            }
+        };
+
+        foreach ( $ps as $v ) {
+            $p = $this->isPromise($v) ? $v : $this->resolve($v);
+
+            $p->then($fnOnResolvedChild, $fnOnRejectedChild);
+        }
 
         return $promise;
     }
@@ -382,36 +393,34 @@ class PromiseManager implements PromiseManagerInterface
             ;
         }
 
-        $fnExecutor = function ($fnOk, $fnFail) use ($ps) {
-            $psLeft = count($ps);
+        $promise = $this->defer($fnResolveParent, $fnRejectParent);
 
-            $errors = [];
+        $psLeft = count($ps);
 
-            $fnOnResolvedChild = static function ($value) use ($fnOk) {
-                call_user_func($fnOk, $value);
-            };
+        $errors = [];
 
-            foreach ( $ps as $i => $v ) {
-                $fnOnRejectedChild = static function ($reason) use (
-                    &$psLeft,
-                    &$errors,
-                    //
-                    $fnFail, $i
-                ) {
-                    $errors[ $i ] = $reason;
-
-                    if (--$psLeft === 0) {
-                        call_user_func($fnFail, $errors);
-                    }
-                };
-
-                $p = $this->isPromise($v) ? $v : $this->resolve($v);
-
-                $p->then($fnOnResolvedChild, $fnOnRejectedChild);
-            }
+        $fnOnResolvedChild = static function ($value) use ($fnResolveParent) {
+            call_user_func($fnResolveParent, $value);
         };
 
-        $promise = $this->new($fnExecutor);
+        foreach ( $ps as $i => $v ) {
+            $fnOnRejectedChild = static function ($reason) use (
+                &$psLeft,
+                &$errors,
+                //
+                $fnRejectParent, $i
+            ) {
+                $errors[ $i ] = $reason;
+
+                if (--$psLeft === 0) {
+                    call_user_func($fnRejectParent, $errors);
+                }
+            };
+
+            $p = $this->isPromise($v) ? $v : $this->resolve($v);
+
+            $p->then($fnOnResolvedChild, $fnOnRejectedChild);
+        }
 
         return $promise;
     }

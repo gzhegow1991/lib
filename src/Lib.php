@@ -4,7 +4,6 @@ namespace Gzhegow\Lib;
 
 use Gzhegow\Lib\Modules\FsModule;
 use Gzhegow\Lib\Modules\MbModule;
-use Gzhegow\Lib\Modules\FnModule;
 use Gzhegow\Lib\Modules\CliModule;
 use Gzhegow\Lib\Modules\NetModule;
 use Gzhegow\Lib\Modules\PhpModule;
@@ -13,6 +12,7 @@ use Gzhegow\Lib\Modules\UrlModule;
 use Gzhegow\Lib\Modules\ArrModule;
 use Gzhegow\Lib\Modules\CmpModule;
 use Composer\Autoload\ClassLoader;
+use Gzhegow\Lib\Modules\FuncModule;
 use Gzhegow\Lib\Modules\JsonModule;
 use Gzhegow\Lib\Modules\HttpModule;
 use Gzhegow\Lib\Modules\TestModule;
@@ -28,7 +28,7 @@ use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
 use Gzhegow\Lib\Modules\SocialModule;
-use Gzhegow\Lib\Modules\Php\Pipe\Pipe;
+use Gzhegow\Lib\Modules\Func\Pipe\Pipe;
 use Gzhegow\Lib\Modules\ItertoolsModule;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 use Gzhegow\Lib\Exception\ErrorHandler\ErrorHandler;
@@ -205,6 +205,18 @@ class Lib
         return static::$fs = $instance
             ?? static::$fs
             ?? new FsModule();
+    }
+
+    /**
+     * @return FuncModule
+     */
+    public static $func;
+
+    public static function func(?FuncModule $instance = null)
+    {
+        return static::$func = $instance
+            ?? static::$func
+            ?? new FuncModule();
     }
 
     /**
@@ -405,7 +417,7 @@ class Lib
 
     public static function pipe(?Pipe &$p = null) : Pipe
     {
-        return Lib::php()->pipe($p);
+        return Lib::func()->pipe($p);
     }
 
 
