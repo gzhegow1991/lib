@@ -142,20 +142,25 @@ $fn = function () use ($ffn) {
             echo PHP_EOL;
             $ffn->print("[ 900 | THEN 1.1 ]", $value);
 
-            throw new \Gzhegow\Lib\Exception\RuntimeException('123');
-        })
-        ->catch(function ($error) use ($ffn) {
-            $ffn->print("[ 900 | CATCH 1.1 ]", $error);
-
-            return $error;
-        })
-        ->catch(function ($error) use ($ffn) {
-            $ffn->print("[ 900 | CATCH 1.2 ]", $error);
-
-            return [ $error ];
+            return 123;
         })
         ->then(function ($value) use ($ffn) {
             $ffn->print("[ 900 | THEN 1.2 ]", $value);
+
+            throw new \Gzhegow\Lib\Exception\RuntimeException('123');
+        })
+        ->catch(function ($reason) use ($ffn) {
+            $ffn->print("[ 900 | CATCH 1.3 ]", $reason);
+
+            return \Gzhegow\Lib\Modules\Php\Promise\Promise::reject($reason);
+        })
+        ->catch(function ($reason) use ($ffn) {
+            $ffn->print("[ 900 | CATCH 1.4 ]", $reason);
+
+            return $reason;
+        })
+        ->then(function ($value) use ($ffn) {
+            $ffn->print("[ 900 | THEN 1.5 ]", $value);
             echo PHP_EOL;
 
             return $value;
@@ -168,10 +173,19 @@ $fn = function () use ($ffn) {
             echo PHP_EOL;
             $ffn->print("[ 800 | THEN 2.1 ]", $value);
 
-            return $value;
+            return 123;
         })
         ->then(function ($value) use ($ffn) {
             $ffn->print("[ 800 | THEN 2.2 ]", $value);
+
+            $var = yield \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(400)
+                ->then(function () { return 456; })
+            ;
+
+            return $var;
+        })
+        ->then(function ($value) use ($ffn) {
+            $ffn->print("[ 800+400 | THEN 2.3 ]", $value);
             echo PHP_EOL;
 
             return $value;
@@ -300,16 +314,18 @@ $ffn->assert($fn, [], '
 
 
 "[ 800 | THEN 2.1 ]" | NULL
-"[ 800 | THEN 2.2 ]" | NULL
-
+"[ 800 | THEN 2.2 ]" | 123
 
 "[ 900 | THEN 1.1 ]" | NULL
-"[ 900 | CATCH 1.1 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
-"[ 900 | CATCH 1.2 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
-"[ 900 | THEN 1.2 ]" | [ "{ object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }" ]
+"[ 900 | THEN 1.2 ]" | 123
+"[ 900 | CATCH 1.3 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
+"[ 900 | CATCH 1.4 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
+"[ 900 | THEN 1.5 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
+
+"[ 800+400 | THEN 2.3 ]" | 456
 ',
-    $maxSeconds = 1.0,
-    $minSeconds = 0.9
+    $maxSeconds = 1.3,
+    $minSeconds = 1.2
 );
 
 

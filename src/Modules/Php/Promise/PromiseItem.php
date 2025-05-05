@@ -332,36 +332,6 @@ class PromiseItem
     }
 
 
-    /**
-     * @param callable $fn
-     */
-    protected function executor($fn) : void
-    {
-        try {
-            $fnResolve = static::fnResolve($this);
-            $fnReject = static::fnReject($this);
-
-            call_user_func($fn, $fnResolve, $fnReject);
-        }
-        catch ( \Throwable $throwable ) {
-            $this->reject($throwable);
-        }
-    }
-
-    /**
-     * @param PromiseItem $promise
-     * @param \Closure    $fn
-     *
-     * @return \Closure
-     */
-    protected static function fnExecutor($promise, $fn)
-    {
-        return static function () use ($promise, $fn) {
-            $promise->executor($fn);
-        };
-    }
-
-
     protected function resolve($value = null) : void
     {
         if (static::STATE_PENDING !== $this->state) {
@@ -501,6 +471,48 @@ class PromiseItem
 
 
     /**
+     * @param callable $fn
+     */
+    protected function executor($fn) : void
+    {
+        $result = null;
+        $throwable = null;
+
+        try {
+            $fnResolve = static::fnResolve($this);
+            $fnReject = static::fnReject($this);
+
+            $result = $fn($fnResolve, $fnReject);
+        }
+        catch ( \Throwable $throwable ) {
+        }
+
+        if (null !== $throwable) {
+            $this->reject($throwable);
+
+            return;
+        }
+
+        if ($result instanceof \Generator) {
+            static::awaitGenerator($result);
+        }
+    }
+
+    /**
+     * @param PromiseItem $promise
+     * @param \Closure    $fn
+     *
+     * @return \Closure
+     */
+    protected static function fnExecutor($promise, $fn)
+    {
+        return static function () use ($promise, $fn) {
+            $promise->executor($fn);
+        };
+    }
+
+
+    /**
      * @param callable    $fnOnResolved
      * @param PromiseItem $promise
      * @param mixed       $value
@@ -517,8 +529,7 @@ class PromiseItem
                 try {
                     $result = $fnOnResolved($value);
                 }
-                catch ( \Throwable $e ) {
-                    $throwable = $e;
+                catch ( \Throwable $throwable ) {
                 }
 
             } else {
@@ -533,6 +544,12 @@ class PromiseItem
 
             if ($result instanceof \Throwable) {
                 $promise->reject($result);
+
+                return;
+            }
+
+            if ($result instanceof \Generator) {
+                static::awaitGenerator($result, $promise, $promise);
 
                 return;
             }
@@ -581,8 +598,7 @@ class PromiseItem
                 try {
                     $result = $fnOnRejected($reason);
                 }
-                catch ( \Throwable $e ) {
-                    $throwable = $e;
+                catch ( \Throwable $throwable ) {
                 }
 
             } else {
@@ -597,6 +613,12 @@ class PromiseItem
 
             if ($result instanceof \Throwable) {
                 $promise->reject($result);
+
+                return;
+            }
+
+            if ($result instanceof \Generator) {
+                static::awaitGenerator($result, $promise, $promise);
 
                 return;
             }
@@ -638,13 +660,23 @@ class PromiseItem
     protected static function fnSettlerFinally($fnOnFinally, $promise, $promiseParent)
     {
         return static function () use ($fnOnFinally, $promise, $promiseParent) {
+            $result = null;
+            $throwable = null;
+
             try {
-                call_user_func($fnOnFinally);
+                $result = $fnOnFinally();
             }
             catch ( \Throwable $throwable ) {
+            }
+
+            if (null !== $throwable) {
                 $promise->reject($throwable);
 
                 return;
+            }
+
+            if ($result instanceof \Generator) {
+                static::awaitGenerator($result);
             }
 
             if (static::STATE_RESOLVED === $promiseParent->state) {
@@ -652,6 +684,144 @@ class PromiseItem
 
             } elseif (static::STATE_REJECTED === $promiseParent->state) {
                 $promise->reject($promiseParent->rejectedReason);
+            }
+        };
+    }
+
+
+    /**
+     * @param \Generator $gen
+     * @param static     $promiseToResolve
+     * @param static     $promiseToReject
+     */
+    protected static function awaitGenerator($gen, $promiseToResolve = null, $promiseToReject = null) : void
+    {
+        $isValid = $gen->valid();
+
+        $result = null;
+        $throwable = null;
+
+        if (! $isValid) {
+            try {
+                $result = $gen->getReturn();
+            }
+            catch ( \Throwable $throwable ) {
+            }
+
+            if ((null !== $throwable) && (null !== $promiseToReject)) {
+                $promiseToReject->reject($throwable);
+
+                return;
+            }
+
+            if (null !== $promiseToResolve) {
+                $promiseToResolve->resolve($result);
+            }
+
+            return;
+        }
+
+        try {
+            $current = $gen->current();
+        }
+        catch ( \Throwable $throwable ) {
+        }
+
+        if ((null !== $throwable) && (null !== $promiseToReject)) {
+            $promiseToReject->reject($throwable);
+
+            return;
+        }
+
+        if ($current instanceof PromiseItem) {
+            $fnGenSend = static::fnGenSend($gen, $promiseToResolve, $promiseToReject);
+            $fnGenThrow = static::fnGenThrow($gen, $promiseToResolve, $promiseToReject);
+
+            $current
+                ->then(
+                    $fnGenSend,
+                    $fnGenThrow
+                )
+            ;
+
+            return;
+        }
+
+        try {
+            $gen->send($current);
+        }
+        catch ( \Throwable $throwable ) {
+        }
+
+        if ((null !== $throwable) && (null !== $promiseToReject)) {
+            $promiseToReject->reject($throwable);
+
+            return;
+        }
+
+        // ! recursion
+        static::awaitGenerator($gen, $promiseToResolve, $promiseToReject);
+    }
+
+    /**
+     * @param \Generator $gen
+     * @param static     $promiseToResolve
+     * @param static     $promiseToReject
+     *
+     * @return \Closure
+     */
+    protected static function fnGenSend($gen, $promiseToResolve, $promiseToReject)
+    {
+        return static function ($value = null) use (
+            $gen,
+            //
+            $promiseToResolve,
+            $promiseToReject
+        ) {
+            $throwable = null;
+
+            try {
+                $gen->send($value);
+            }
+            catch ( \Throwable $throwable ) {
+            }
+
+            if ((null !== $throwable) && (null !== $promiseToReject)) {
+                $promiseToReject->reject($throwable);
+
+                return;
+            }
+
+            // ! recursion
+            static::awaitGenerator($gen, $promiseToResolve, $promiseToReject);
+        };
+    }
+
+    /**
+     * @param \Generator $gen
+     * @param static     $promiseToResolve
+     * @param static     $promiseToReject
+     *
+     * @return \Closure
+     */
+    protected static function fnGenThrow($gen, $promiseToResolve, $promiseToReject)
+    {
+        return static function ($reason) use (
+            $gen,
+            //
+            $promiseToResolve,
+            $promiseToReject
+        ) {
+            $throwable = null;
+
+            try {
+                $gen->throw($reason);
+            }
+            catch ( \Throwable $throwable ) {
+            }
+
+            if ((null !== $throwable) && (null !== $promiseToReject)) {
+                $promiseToReject->reject($throwable);
             }
         };
     }
