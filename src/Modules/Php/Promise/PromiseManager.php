@@ -428,31 +428,31 @@ class PromiseManager implements PromiseManagerInterface
 
     public function timeout(PromiseItem $promise, float $ms, $reason = null) : PromiseItem
     {
-        $fnOnResolvedTimeout = static function () use ($ms, $reason) {
+        $promiseTimeout = PromiseItem::newDefer(
+            $this, $this->loop,
+            $fnResolve, $fnReject
+        );
+
+        $fnTimer = static function () use ($ms, $reason, $fnReject) {
             if ($reason instanceof \Throwable) {
-                throw $reason;
+                $reasonThrowable = $reason;
 
             } elseif (is_array($reason) && ([] !== $reason)) {
                 $reason[] = $ms;
 
-                throw new RuntimeException($reason);
+                $reasonThrowable = new RuntimeException($reason);
 
             } elseif (Lib::type()->string_not_empty($reasonString, $reason)) {
-                throw new RuntimeException([ $reasonString, $ms ]);
+                $reasonThrowable = new RuntimeException([ $reasonString, $ms ]);
 
             } else {
-                throw new RuntimeException("Timeout: {$ms}ms");
+                $reasonThrowable = new RuntimeException("Timeout: {$ms}ms");
             }
+
+            $fnReject($reasonThrowable);
         };
 
-        $promiseTimeout = PromiseItem::newDefer(
-            $this, $this->loop,
-            $fnResolve
-        );
-
-        $this->timer->timer($ms, $fnResolve);
-
-        $promiseTimeout->then($fnOnResolvedTimeout);
+        $this->timer->timer($ms, $fnTimer);
 
         $promiseRace = $this->race([ $promise, $promiseTimeout ]);
 

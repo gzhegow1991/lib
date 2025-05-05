@@ -110,6 +110,9 @@ $ffn = new class {
 };
 
 
+\Gzhegow\Lib\Lib::requireOnceComposerGlobal();
+
+
 
 // >>> TEST
 // > тесты Promise

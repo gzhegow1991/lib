@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules\Php\Promise;
 
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\PromiseException;
 use Gzhegow\Lib\Modules\Php\Loop\LoopManagerInterface;
 
 
@@ -408,6 +409,8 @@ class PromiseItem
         $this->state = static::STATE_REJECTED;
         $this->rejectedReason = $reason;
 
+        $hasCatch = null;
+
         foreach ( $this->settlers as $settler ) {
             $promise = $settler->promise;
 
@@ -418,6 +421,10 @@ class PromiseItem
                     $promise->reject($this->rejectedReason);
 
                 } else {
+                    if (null === $hasCatch) {
+                        $hasCatch = true;
+                    }
+
                     $fn = static::fnSettlerCatch(
                         $fnOnRejected,
                         $promise,
@@ -428,6 +435,10 @@ class PromiseItem
                 }
 
             } elseif (PromiseSettler::TYPE_CATCH === $settler->type) {
+                if (null === $hasCatch) {
+                    $hasCatch = true;
+                }
+
                 $fnOnRejected = $settler->fnOnRejected;
 
                 $fn = static::fnSettlerCatch(
@@ -455,6 +466,16 @@ class PromiseItem
                 }
             }
         }
+
+        $hasCatch = $hasCatch ?? false;
+
+        if (! $hasCatch) {
+            $fn = static::fnHasCatch($this);
+
+            $this->loop->addMicrotask($fn);
+        }
+
+        $this->settlers = [];
     }
 
     /**
@@ -494,7 +515,7 @@ class PromiseItem
         }
 
         if ($result instanceof \Generator) {
-            static::awaitGenerator($result);
+            static::awaitGenerator($result, null, null);
         }
     }
 
@@ -664,7 +685,7 @@ class PromiseItem
             }
 
             if ($result instanceof \Generator) {
-                static::awaitGenerator($result);
+                static::awaitGenerator($result, null, null);
             }
 
             if (static::STATE_RESOLVED === $promiseParent->state) {
@@ -676,13 +697,45 @@ class PromiseItem
         };
     }
 
+    /**
+     * @param static $promise
+     *
+     * @return \Closure
+     */
+    protected static function fnHasCatch($promise)
+    {
+        return static function () use ($promise) {
+            $hasCatch = false;
+
+            foreach ( $promise->settlers as $settler ) {
+                if (PromiseSettler::TYPE_THEN === $settler->type) {
+                    if (null !== $settler->fnOnRejected) {
+                        $hasCatch = true;
+                    }
+
+                } elseif (PromiseSettler::TYPE_CATCH === $settler->type) {
+                    $hasCatch = true;
+                }
+            }
+
+            if (! $hasCatch) {
+                $reason = $promise->rejectedReason;
+                $reasonThrowable = ($reason instanceof \Throwable) ? $reason : null;
+
+                throw new PromiseException(
+                    [ 'Unhandled rejection in Promise', $reason ], $reasonThrowable
+                );
+            }
+        };
+    }
+
 
     /**
-     * @param \Generator $gen
-     * @param static     $promiseToResolve
-     * @param static     $promiseToReject
+     * @param \Generator  $gen
+     * @param static|null $promiseToResolve
+     * @param static|null $promiseToReject
      */
-    protected static function awaitGenerator($gen, $promiseToResolve = null, $promiseToReject = null) : void
+    protected static function awaitGenerator($gen, $promiseToResolve, $promiseToReject) : void
     {
         $isValid = $gen->valid();
 
@@ -752,9 +805,9 @@ class PromiseItem
     }
 
     /**
-     * @param \Generator $gen
-     * @param static     $promiseToResolve
-     * @param static     $promiseToReject
+     * @param \Generator  $gen
+     * @param static|null $promiseToResolve
+     * @param static|null $promiseToReject
      *
      * @return \Closure
      */
@@ -786,9 +839,9 @@ class PromiseItem
     }
 
     /**
-     * @param \Generator $gen
-     * @param static     $promiseToResolve
-     * @param static     $promiseToReject
+     * @param \Generator  $gen
+     * @param static|null $promiseToResolve
+     * @param static|null $promiseToReject
      *
      * @return \Closure
      */
