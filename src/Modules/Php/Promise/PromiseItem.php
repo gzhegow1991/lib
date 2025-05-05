@@ -542,12 +542,6 @@ class PromiseItem
                 return;
             }
 
-            if ($result instanceof \Throwable) {
-                $promise->reject($result);
-
-                return;
-            }
-
             if ($result instanceof \Generator) {
                 static::awaitGenerator($result, $promise, $promise);
 
@@ -607,12 +601,6 @@ class PromiseItem
 
             if (null !== $throwable) {
                 $promise->reject($throwable);
-
-                return;
-            }
-
-            if ($result instanceof \Throwable) {
-                $promise->reject($result);
 
                 return;
             }
