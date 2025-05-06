@@ -42,6 +42,10 @@ class PromiseItem
      * @var mixed
      */
     protected $rejectedReason;
+    /**
+     * @var bool
+     */
+    protected $rejectionDelegated = false;
 
     /**
      * @var PromiseSettler[]
@@ -105,6 +109,10 @@ class PromiseItem
         $instance = new PromiseItem($factory, $loop);
         $instance->state = static::STATE_REJECTED;
         $instance->rejectedReason = $rejectedReason;
+
+        $fn = static::fnThrowIfUnhandledRejectionInNextStep($loop, $instance);
+
+        $loop->addMacrotask($fn);
 
         return $instance;
     }
@@ -197,6 +205,8 @@ class PromiseItem
      */
     public function then($fnOnResolved = null, $fnOnRejected = null) : PromiseItem
     {
+        $this->rejectionDelegated = true;
+
         $promise = $this->factory->never();
 
         if (PromiseItem::STATE_RESOLVED === $this->state) {
@@ -232,7 +242,7 @@ class PromiseItem
             $settler->type = PromiseSettler::TYPE_THEN;
 
             $settler->fnOnResolved = $fnOnResolved;
-            $settler->fnOnRejected = $fnOnResolved;
+            $settler->fnOnRejected = $fnOnRejected;
 
             $settler->promise = $promise;
             $settler->promiseParent = $this;
@@ -248,6 +258,8 @@ class PromiseItem
      */
     public function catch($fnOnRejected = null) : PromiseItem
     {
+        $this->rejectionDelegated = true;
+
         $promise = $this->factory->never();
 
         if (PromiseItem::STATE_RESOLVED === $this->state) {
@@ -287,6 +299,8 @@ class PromiseItem
      */
     public function finally($fnOnFinally = null) : PromiseItem
     {
+        $this->rejectionDelegated = true;
+
         $promise = $this->factory->never();
 
         if (PromiseItem::STATE_RESOLVED === $this->state) {
@@ -311,7 +325,7 @@ class PromiseItem
                 $fn = static::fnSettlerFinally(
                     $fnOnFinally,
                     $promise,
-                    $this->rejectedReason
+                    $this
                 );
 
                 $this->loop->addMicrotask($fn);
@@ -409,8 +423,6 @@ class PromiseItem
         $this->state = static::STATE_REJECTED;
         $this->rejectedReason = $reason;
 
-        $hasCatch = null;
-
         foreach ( $this->settlers as $settler ) {
             $promise = $settler->promise;
 
@@ -421,10 +433,6 @@ class PromiseItem
                     $promise->reject($this->rejectedReason);
 
                 } else {
-                    if (null === $hasCatch) {
-                        $hasCatch = true;
-                    }
-
                     $fn = static::fnSettlerCatch(
                         $fnOnRejected,
                         $promise,
@@ -435,10 +443,6 @@ class PromiseItem
                 }
 
             } elseif (PromiseSettler::TYPE_CATCH === $settler->type) {
-                if (null === $hasCatch) {
-                    $hasCatch = true;
-                }
-
                 $fnOnRejected = $settler->fnOnRejected;
 
                 $fn = static::fnSettlerCatch(
@@ -467,10 +471,8 @@ class PromiseItem
             }
         }
 
-        $hasCatch = $hasCatch ?? false;
-
-        if (! $hasCatch) {
-            $fn = static::fnHasCatch($this);
+        if (! $this->rejectionDelegated) {
+            $fn = static::fnThrowIfUnhandledRejection($this);
 
             $this->loop->addMicrotask($fn);
         }
@@ -574,7 +576,7 @@ class PromiseItem
                     $promise->reject(
                         new RuntimeException(
                             [
-                                'The `result` of `fnOnResolved`/`fnOnRejected` should not be promise itself',
+                                'The `result` of `fnOnResolved` / `fnOnRejected` should not be promise itself',
                                 $result,
                                 $promise,
                             ]
@@ -609,15 +611,15 @@ class PromiseItem
             $result = null;
             $throwable = null;
 
-            if (null !== $fnOnRejected) {
+            if (null === $fnOnRejected) {
+                $result = $reason;
+
+            } else {
                 try {
                     $result = $fnOnRejected($reason);
                 }
                 catch ( \Throwable $throwable ) {
                 }
-
-            } else {
-                $result = $reason;
             }
 
             if (null !== $throwable) {
@@ -637,7 +639,7 @@ class PromiseItem
                     $promise->reject(
                         new RuntimeException(
                             [
-                                'The `result` of `fnOnResolved`/`fnOnRejected` should not be promise itself',
+                                'The `result` of `fnOnResolved` / `fnOnRejected` should not be promise itself',
                                 $result,
                                 $promise,
                             ]
@@ -697,35 +699,41 @@ class PromiseItem
         };
     }
 
+
     /**
      * @param static $promise
      *
      * @return \Closure
      */
-    protected static function fnHasCatch($promise)
+    protected static function fnThrowIfUnhandledRejectionInNextStep($loop, $promise)
+    {
+        return static function () use ($loop, $promise) {
+            if (! $promise->rejectionDelegated) {
+                $fn = static::fnThrowIfUnhandledRejection($promise);
+
+                $loop->addMicrotask($fn);
+            }
+        };
+    }
+
+    /**
+     * @param static $promise
+     *
+     * @return \Closure
+     */
+    protected static function fnThrowIfUnhandledRejection($promise)
     {
         return static function () use ($promise) {
-            $hasCatch = false;
-
-            foreach ( $promise->settlers as $settler ) {
-                if (PromiseSettler::TYPE_THEN === $settler->type) {
-                    if (null !== $settler->fnOnRejected) {
-                        $hasCatch = true;
-                    }
-
-                } elseif (PromiseSettler::TYPE_CATCH === $settler->type) {
-                    $hasCatch = true;
-                }
+            if ($promise->rejectionDelegated) {
+                return;
             }
 
-            if (! $hasCatch) {
-                $reason = $promise->rejectedReason;
-                $reasonThrowable = ($reason instanceof \Throwable) ? $reason : null;
+            $reason = $promise->rejectedReason;
+            $reasonThrowable = ($reason instanceof \Throwable) ? $reason : null;
 
-                throw new PromiseException(
-                    [ 'Unhandled rejection in Promise', $reason ], $reasonThrowable
-                );
-            }
+            throw new PromiseException(
+                [ 'Unhandled rejection in Promise', $reason ], $reasonThrowable
+            );
         };
     }
 

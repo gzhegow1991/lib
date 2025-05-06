@@ -47,6 +47,7 @@ ini_set('memory_limit', '32M');
 ;
 
 
+
 // > добавляем несколько функций для тестирования
 $ffn = new class {
     function root() : string
@@ -311,6 +312,9 @@ $ffn->assert($fn, [], '
 
 
 "[ 500 | ANY ] 1"
+
+
+"[ 600 | TIMEOUT ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
 
 
 "[ 800 | THEN 2.1 ]" | NULL

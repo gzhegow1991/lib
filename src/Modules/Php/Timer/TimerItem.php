@@ -7,6 +7,6 @@ class TimerItem extends AbstractTimerItem
 {
     public function cancel() : void
     {
-        $this->timer->clearTimer($this);
+        $this->timer->clearTimeout($this);
     }
 }

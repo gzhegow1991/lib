@@ -16,17 +16,17 @@ class Timer
      * @param float    $ms
      * @param callable $fn
      */
-    public static function timer($ms, $fn) : TimerItem
+    public static function setTimeout($ms, $fn) : TimerItem
     {
-        return static::getInstance()->timer($ms, $fn);
+        return static::getInstance()->setTimeout($ms, $fn);
     }
 
     /**
      * @param TimerItem $timer
      */
-    public static function clearTimer($timer) : void
+    public static function clearTimeout($timer) : void
     {
-        static::getInstance()->clearTimer($timer);
+        static::getInstance()->clearTimeout($timer);
     }
 
 
@@ -40,9 +40,9 @@ class Timer
      * @param float    $ms
      * @param callable $fn
      */
-    public static function interval($ms, $fn) : IntervalItem
+    public static function setInterval($ms, $fn) : IntervalItem
     {
-        return static::getInstance()->interval($ms, $fn);
+        return static::getInstance()->setInterval($ms, $fn);
     }
 
     /**

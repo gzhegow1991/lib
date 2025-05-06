@@ -82,7 +82,7 @@ class LoopManager implements LoopManagerInterface
     }
 
 
-    public function addTimer(TimerItem $timer) : void
+    public function addTimeout(TimerItem $timer) : void
     {
         $this->timers->attach($timer);
 
@@ -93,7 +93,7 @@ class LoopManager implements LoopManagerInterface
         }
     }
 
-    public function clearTimer(TimerItem $timer) : void
+    public function clearTimeout(TimerItem $timer) : void
     {
         $this->timers->detach($timer);
     }

@@ -25,7 +25,7 @@ class TimerManager implements TimerManagerInterface
         return $value instanceof TimerItem;
     }
 
-    public function timer(float $ms, callable $fn) : TimerItem
+    public function setTimeout(float $ms, callable $fn) : TimerItem
     {
         if ($ms < 0) {
             throw new RuntimeException(
@@ -38,14 +38,14 @@ class TimerManager implements TimerManagerInterface
         $timer->fnHandler = $fn;
         $timer->timeoutMicrotime = microtime(true) + ($ms / 1000);
 
-        $this->loop->addTimer($timer);
+        $this->loop->addTimeout($timer);
 
         return $timer;
     }
 
-    public function clearTimer(TimerItem $timer) : void
+    public function clearTimeout(TimerItem $timer) : void
     {
-        $this->loop->clearTimer($timer);
+        $this->loop->clearTimeout($timer);
     }
 
 
@@ -54,7 +54,7 @@ class TimerManager implements TimerManagerInterface
         return $value instanceof IntervalItem;
     }
 
-    public function interval(float $ms, callable $fn) : IntervalItem
+    public function setInterval(float $ms, callable $fn) : IntervalItem
     {
         if ($ms < 0) {
             throw new RuntimeException(

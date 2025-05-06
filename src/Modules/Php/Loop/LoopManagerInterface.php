@@ -13,9 +13,9 @@ interface LoopManagerInterface
     public function clearInterval(IntervalItem $interval) : void;
 
 
-    public function addTimer(TimerItem $timer) : void;
+    public function addTimeout(TimerItem $timer) : void;
 
-    public function clearTimer(TimerItem $timer) : void;
+    public function clearTimeout(TimerItem $timer) : void;
 
 
     /**

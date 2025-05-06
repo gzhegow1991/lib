@@ -20,14 +20,14 @@ class Loop
     }
 
 
-    public static function addTimer(TimerItem $timer) : void
+    public static function addTimeout(TimerItem $timer) : void
     {
-        static::getInstance()->addTimer($timer);
+        static::getInstance()->addTimeout($timer);
     }
 
-    public static function clearTimer(TimerItem $timer) : void
+    public static function clearTimeout(TimerItem $timer) : void
     {
-        static::getInstance()->clearTimer($timer);
+        static::getInstance()->clearTimeout($timer);
     }
 
 

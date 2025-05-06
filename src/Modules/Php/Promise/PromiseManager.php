@@ -214,7 +214,7 @@ class PromiseManager implements PromiseManagerInterface
             $fnResolve
         );
 
-        $this->timer->timer($ms, $fnResolve);
+        $this->timer->setTimeout($ms, $fnResolve);
 
         return $promise;
     }
@@ -226,7 +226,7 @@ class PromiseManager implements PromiseManagerInterface
             $fnResolve, $fnReject
         );
 
-        $interval = $this->timer->interval(
+        $interval = $this->timer->setInterval(
             $ms,
             static function () use ($fnExecutor, $fnResolve, $fnReject) {
                 call_user_func($fnExecutor, $fnResolve, $fnReject);
@@ -452,7 +452,7 @@ class PromiseManager implements PromiseManagerInterface
             $fnReject($reasonThrowable);
         };
 
-        $this->timer->timer($ms, $fnTimer);
+        $this->timer->setTimeout($ms, $fnTimer);
 
         $promiseRace = $this->race([ $promise, $promiseTimeout ]);
 
