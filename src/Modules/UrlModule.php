@@ -83,9 +83,9 @@ class UrlModule
 
 
     /**
-     * @param string            $url
-     * @param string|array|null $query
-     * @param string|null       $fragment
+     * @param string                  $url
+     * @param false|string|array|null $query
+     * @param false|string|null       $fragment
      */
     public function url(
         $url = '', $query = null, $fragment = null,
@@ -110,7 +110,7 @@ class UrlModule
             return null;
         }
 
-        if (! Lib::type()->string_not_empty($_url, $url)) {
+        if (! Lib::type()->string_not_empty($urlString, $url)) {
             return null;
         }
 
@@ -136,7 +136,7 @@ class UrlModule
         }
 
         if (null === $refParseUrl) {
-            $refParseUrl = parse_url($_url);
+            $refParseUrl = parse_url($urlString);
 
             if (false === $refParseUrl) {
                 return null;
@@ -144,27 +144,24 @@ class UrlModule
         }
 
         if (empty($refParseUrl[ 'host' ])) {
-            $_url = $this->host_current() . '/' . ltrim($_url, '/');
+            $urlString = $this->host_current() . '/' . ltrim($urlString, '/');
 
-            $refParseUrl = parse_url($_url);
+            $refParseUrl = parse_url($urlString);
 
             if (false === $refParseUrl) {
                 return null;
             }
         }
 
-        if (! isset($refParseUrl[ 'path' ])) {
-            return null;
-        }
+        if (isset($refParseUrl[ 'path' ])) {
+            $test = str_replace('/', '', $refParseUrl[ 'path' ]);
 
-        $test = str_replace('/', '', $refParseUrl[ 'path' ]);
-
-        if (urlencode($test) !== $test) {
-            return null;
+            if (urlencode($test) !== $test) {
+                return null;
+            }
         }
 
         $wasQuery = isset($refParseUrl[ 'query' ]);
-        $wasFragment = isset($refParseUrl[ 'fragment' ]);
 
         if (false === $_query) {
             unset($refParseUrl[ 'query' ]);
@@ -183,7 +180,7 @@ class UrlModule
                 $httpQuery = $refParseUrl[ 'query' ];
             }
 
-            $_parseUrlResult[ 'query' ] = $httpQuery;
+            $refParseUrl[ 'query' ] = $httpQuery;
         }
 
         if (false === $_fragment) {
@@ -195,11 +192,11 @@ class UrlModule
             }
         }
 
-        $_url = $this->url_build($refParseUrl);
+        $urlString = $this->url_build($refParseUrl);
 
         unset($refParseUrl);
 
-        return $_url;
+        return $urlString;
     }
 
     /**
@@ -321,16 +318,16 @@ class UrlModule
 
         if (! isset($refParseUrl[ 'path' ])) {
             return null;
-        }
 
-        $test = str_replace('/', '', $refParseUrl[ 'path' ]);
+        } else {
+            $test = str_replace('/', '', $refParseUrl[ 'path' ]);
 
-        if (urlencode($test) !== $test) {
-            return null;
+            if (urlencode($test) !== $test) {
+                return null;
+            }
         }
 
         $wasQuery = isset($refParseUrl[ 'query' ]);
-        $wasFragment = isset($refParseUrl[ 'fragment' ]);
 
         if (false === $_query) {
             unset($refParseUrl[ 'query' ]);

@@ -112,6 +112,8 @@ class ArrModule
         }
 
         if ([] === $value) {
+            $result = $value;
+
             return true;
         }
 
@@ -153,6 +155,8 @@ class ArrModule
         }
 
         if ([] === $value) {
+            $result = $value;
+
             return true;
         }
 
@@ -209,6 +213,8 @@ class ArrModule
         }
 
         if ([] === $value) {
+            $result = $value;
+
             return true;
         }
 
@@ -252,6 +258,8 @@ class ArrModule
         }
 
         if ([] === $value) {
+            $result = $value;
+
             return true;
         }
 

@@ -10,23 +10,24 @@ ini_set('memory_limit', '32M');
 // > настраиваем обработку ошибок
 // > некоторые CMS сами по себе применяют error_reporting/set_error_handler/set_exception_handler глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
-\Gzhegow\Lib\Lib::errorHandler()
-    // > частично удаляет путь файла из каждой строки `trace` (`trace[i][file]`)
+\Gzhegow\Lib\Lib::entrypoint()
+    // > частично удаляет путь файла из каждой строки `trace` (`trace[i][file]`) при обработке исключений
     ->setDirRoot(__DIR__ . '/..')
     //
-    // > index.php
+    // > file: index.php
     // ->setErrorReporting(E_ALL)
+    // ->setMemoryLimit('32M')
+    // ->setTimeLimit(30)
     // ->setErrorHandler([ $ex, 'fnErrorHandler' ])
     // ->setExceptionHandler([ $ex, 'fnExceptionHandler' ])
     //
-    // > ... какой-то код самой CMS
-    //
-    // > yourscript.php
+    // > file: yourscript.php
     ->useErrorReporting()
+    ->useMemoryLimit()
+    ->useTimeLimit()
     ->useErrorHandler()
     ->useExceptionHandler()
 ;
-
 
 
 // > добавляем несколько функций для тестирования
@@ -119,7 +120,7 @@ $fn = function () use ($ffn) {
     echo PHP_EOL;
 
 
-    \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(900)
+    \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(900)
         ->then(function ($value) use ($ffn) {
             echo PHP_EOL;
             $ffn->print("[ 900 | THEN 1.1 ]", $value);
@@ -134,7 +135,7 @@ $fn = function () use ($ffn) {
         ->catch(function ($reason) use ($ffn) {
             $ffn->print("[ 900 | CATCH 1.3 ]", $reason);
 
-            return \Gzhegow\Lib\Modules\Php\Promise\Promise::reject($reason);
+            return \Gzhegow\Lib\Modules\Async\Promise\Promise::reject($reason);
         })
         ->catch(function ($reason) use ($ffn) {
             $ffn->print("[ 900 | CATCH 1.4 ]", $reason);
@@ -150,7 +151,7 @@ $fn = function () use ($ffn) {
     ;
 
 
-    \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(800)
+    \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(800)
         ->then(function ($value) use ($ffn) {
             echo PHP_EOL;
             $ffn->print("[ 800 | THEN 2.1 ]", $value);
@@ -160,7 +161,7 @@ $fn = function () use ($ffn) {
         ->then(function ($value) use ($ffn) {
             $ffn->print("[ 800 | THEN 2.2 ]", $value);
 
-            $var = yield \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(400)
+            $var = yield \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(400)
                 ->then(function () { return 456; })
             ;
 
@@ -175,8 +176,8 @@ $fn = function () use ($ffn) {
     ;
 
 
-    \Gzhegow\Lib\Modules\Php\Promise\Promise::timeout(
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(700),
+    \Gzhegow\Lib\Modules\Async\Promise\Promise::timeout(
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(700),
         600
     )
         ->catch(function ($value) use ($ffn) {
@@ -191,10 +192,10 @@ $fn = function () use ($ffn) {
 
     $ps = [
         '[ 100 | ALL ] 1',
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(100)->then(function () { return '[ 100 | ALL ] 2'; }),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ 100 | ALL ] 3'),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(100)->then(function () { return '[ 100 | ALL ] 2'; }),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::resolve('[ 100 | ALL ] 3'),
     ];
-    \Gzhegow\Lib\Modules\Php\Promise\Promise::all($ps)
+    \Gzhegow\Lib\Modules\Async\Promise\Promise::allResolvedOf($ps)
         ->then(function ($res) use ($ffn) {
             echo PHP_EOL;
             $ffn->print_array_multiline($res);
@@ -206,12 +207,12 @@ $fn = function () use ($ffn) {
 
 
     $ps = [
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::resolve('[ 200 | ALL SETTLED ] 1'),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(200)->then(function () { return '[ 200 | ALL SETTLED ] 2'; }),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::reject('[ 200 | ALL SETTLED ] 3'),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(100)->then(function () { return '[ 200 | ALL SETTLED ] 4'; }),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::resolve('[ 200 | ALL SETTLED ] 1'),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(200)->then(function () { return '[ 200 | ALL SETTLED ] 2'; }),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::reject('[ 200 | ALL SETTLED ] 3'),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(100)->then(function () { return '[ 200 | ALL SETTLED ] 4'; }),
     ];
-    \Gzhegow\Lib\Modules\Php\Promise\Promise::allSettled($ps)
+    \Gzhegow\Lib\Modules\Async\Promise\Promise::allSettled($ps)
         ->then(function ($res) use ($ffn) {
             echo PHP_EOL;
             $ffn->print_array_multiline($res, 2);
@@ -223,10 +224,10 @@ $fn = function () use ($ffn) {
 
 
     $ps = [
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(400)->then(function () { return '[ 400 | RACE ] 1'; }),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(300)->then(function () { return '[ 300 | RACE ] 2'; }),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(400)->then(function () { return '[ 400 | RACE ] 1'; }),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(300)->then(function () { return '[ 300 | RACE ] 2'; }),
     ];
-    \Gzhegow\Lib\Modules\Php\Promise\Promise::race($ps)
+    \Gzhegow\Lib\Modules\Async\Promise\Promise::firstOf($ps)
         ->then(function ($res) use ($ffn) {
             echo PHP_EOL;
             $ffn->print($res);
@@ -238,10 +239,10 @@ $fn = function () use ($ffn) {
 
 
     $ps = [
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::delay(500)->then(function () { return '[ 500 | ANY ] 1'; }),
-        \Gzhegow\Lib\Modules\Php\Promise\Promise::reject('[ 500 | ANY ] 2'),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(500)->then(function () { return '[ 500 | ANY ] 1'; }),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::reject('[ 500 | ANY ] 2'),
     ];
-    \Gzhegow\Lib\Modules\Php\Promise\Promise::any($ps)
+    \Gzhegow\Lib\Modules\Async\Promise\Promise::firstResolvedOf($ps)
         ->then(function ($res) use ($ffn) {
             echo PHP_EOL;
             $ffn->print($res);
@@ -252,7 +253,25 @@ $fn = function () use ($ffn) {
     ;
 
 
-    \Gzhegow\Lib\Modules\Php\Loop\Loop::runLoop();
+    // \Gzhegow\Lib\Lib::async()
+    //     ->promiseManager()
+    //     ->useFetchApiWakeup(true)
+    // ;
+    //
+    // \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl('https://google.com')
+    //     ->then(function ($result) {
+    //         echo "{$result['http_code']} - Google\n";
+    //     })
+    // ;
+    //
+    // \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl('https://yandex.ru')
+    //     ->then(function ($result) {
+    //         echo "{$result['http_code']} - Yandex\n";
+    //     })
+    // ;
+
+
+    \Gzhegow\Lib\Modules\Async\Loop\Loop::runLoop();
 };
 $ffn->assert($fn, [], '
 "[ Promise ]"
@@ -270,7 +289,7 @@ $ffn->assert($fn, [], '
 ###
 [
   0 => [
-    "status" => "fulfilled",
+    "status" => "resolved",
     "value" => "[ 200 | ALL SETTLED ] 1"
   ],
   2 => [
@@ -278,11 +297,11 @@ $ffn->assert($fn, [], '
     "reason" => "[ 200 | ALL SETTLED ] 3"
   ],
   3 => [
-    "status" => "fulfilled",
+    "status" => "resolved",
     "value" => "[ 200 | ALL SETTLED ] 4"
   ],
   1 => [
-    "status" => "fulfilled",
+    "status" => "resolved",
     "value" => "[ 200 | ALL SETTLED ] 2"
   ]
 ]
@@ -514,12 +533,7 @@ $fn = function () use ($ffn) {
     // > осторожно, `ArrayOf` не проверяет типы при добавлении, для этого есть `ArrayOfType` или `ArrayOfClass`
     // > этот объект сделан для того, чтобы убедится, что другой разработчик создал его с правильным типом
     // > при этом он может положить туда что захочет, это похоже на указание PHPDoc
-    $arrayOf = (PHP_VERSION_ID >= 80000)
-        ? \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::class
-        : \Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf::class;
-
-    /** @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf $theArrayOf */
-    $theArrayOf = new $arrayOf('object');
+    $theArrayOf = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::new('object');
     $theArrayOf[] = $notAnObject;
     $ffn->print($theArrayOf);
     $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
@@ -527,12 +541,7 @@ $fn = function () use ($ffn) {
     echo PHP_EOL;
 
 
-    $arrayOf = (PHP_VERSION_ID >= 80000)
-        ? \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::class
-        : \Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfType::class;
-
-    /** @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType $theArrayOf */
-    $theArrayOf = new $arrayOf('object');
+    $theArrayOf = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::new('object');
     $theArrayOf[] = $objectStdClass;
     $theArrayOf[] = $objectArrayObject;
 
@@ -548,12 +557,7 @@ $fn = function () use ($ffn) {
     echo PHP_EOL;
 
 
-    $arrayOf = (PHP_VERSION_ID >= 80000)
-        ? \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::class
-        : \Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfClass::class;
-
-    /** @var \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass $theArrayOf */
-    $theArrayOf = new $arrayOf(\stdClass::class);
+    $theArrayOf = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::new(\stdClass::class);
     $theArrayOf[] = $objectStdClass;
 
     try {
@@ -582,12 +586,10 @@ $fn = function () use ($ffn) {
     echo PHP_EOL;
 
 
-    $map = (PHP_VERSION_ID >= 80000)
-        ? \Gzhegow\Lib\Modules\Arr\Map\Map::class
-        : \Gzhegow\Lib\Modules\Arr\Map\PHP7\Map::class;
-
-    /** @var \Gzhegow\Lib\Modules\Arr\Map\Map $theMap */
-    $theMap = new $map();
+    /**
+     * @var \Gzhegow\Lib\Modules\Arr\Map\PHP8\Map $theMap
+     */
+    $theMap = \Gzhegow\Lib\Modules\Arr\Map\Map::new();
     $theMap[ $stdClass = new \stdClass() ] = 1;
     $theMap[ $array = [ 1, 2, 3 ] ] = 1;
     $ffn->print($theMap);
@@ -912,7 +914,7 @@ $fn = function () use ($ffn) {
     echo PHP_EOL;
 
 
-    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::assert();
+    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::parseThrow();
     try {
         $value = \Gzhegow\Lib\Modules\Type\Number::fromStatic($invalidValue, $ctx);
     }
@@ -931,7 +933,7 @@ $fn = function () use ($ffn) {
 
 
     try {
-        $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::chainType();
+        $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::typeThrow();
         $status = true
             && ResultTest::string($invalidValue, $ctx)
             && ResultTest::string_not_empty($ctx->get(), $ctx);
@@ -950,7 +952,7 @@ $fn = function () use ($ffn) {
     }
 
     try {
-        $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::chainParse();
+        $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::ignoreThrow();
         $devnull = null
             ?? ResultTest::string($invalidValue, $ctx)
             ?? ResultTest::string_not_empty($ctx->get(), $ctx);
@@ -971,19 +973,19 @@ $fn = function () use ($ffn) {
 
     $validValue = '123';
 
-    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::assert();
+    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::parseThrow();
     $value = ResultTest::string($validValue, $ctx);
     $ffn->print($value, $ctx->get());
     echo PHP_EOL;
 
-    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::chainType();
+    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::typeThrow();
     $status = true
         && ResultTest::string($validValue, $ctx)
         && ResultTest::string_not_empty($ctx->get(), $ctx);
     $ffn->print($status, $ctx->get());
     echo PHP_EOL;
 
-    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::chainParse();
+    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::ignoreThrow();
     $devnull = null
         ?? ResultTest::string($validValue, $ctx)
         ?? ResultTest::string_not_empty($ctx->get(), $ctx);
@@ -1378,66 +1380,6 @@ $ffn->assert_stdout($fn, [], '
 
 
 // >>> TEST
-// > тесты AssertModule
-$fn = function () use ($ffn) {
-    $ffn->print('[ AssertModule ]');
-    echo PHP_EOL;
-
-
-    $var = \Gzhegow\Lib\Lib::assert()
-        ->of(-1)
-        ->int_positive()
-        ->orNull()
-    ;
-    $ffn->print($var); // NULL
-    echo PHP_EOL;
-
-
-    $var = \Gzhegow\Lib\Lib::assert()
-        ->of('-1')
-        ->string_not_empty()
-        ->numeric_positive()
-        ->orFallback([ NAN ])
-    ;
-    $ffn->print($var); // NAN
-
-    $e = null;
-    try {
-        $var = \Gzhegow\Lib\Lib::assert()
-            ->of('-1')
-            ->numeric_positive()
-            ->withTriggerError('The value should be positive numeric', E_USER_ERROR)
-            ->orNull()
-        ;
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-
-    try {
-        $var = \Gzhegow\Lib\Lib::assert()
-            ->of('-1')
-            ->numeric_positive()
-            ->orThrow('The value should be positive numeric')
-        ;
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-};
-$ffn->assert_stdout($fn, [], '
-"[ AssertModule ]"
-
-NULL
-
-NAN
-"[ CATCH ] The value should be positive numeric"
-"[ CATCH ] The value should be positive numeric"
-');
-
-
-
-// >>> TEST
 // > тесты BcmathModule
 $fn = function () use ($ffn) {
     $ffn->print('[ BcmathModule ]');
@@ -1595,12 +1537,12 @@ $fn = function () use ($ffn) {
         0  => [
             NAN,
             null,
-            new \Gzhegow\Lib\Modules\Type\Nil(),
+            new \Gzhegow\Lib\Modules\Php\Nil(),
         ],
         1  => [
             strval(NAN),
             'NULL',
-            strval(new \Gzhegow\Lib\Modules\Type\Nil()),
+            strval(new \Gzhegow\Lib\Modules\Php\Nil()),
         ],
         2  => [
             false,
@@ -1737,7 +1679,7 @@ $fn = function () use ($ffn) {
         [ &$fnCmpSizeName ]
     );
 
-    // $dumpPath = $ffn->root() . '/var/dump/fn_compare_tables.txt';
+    // $dumpPath = $ffn->root() . '/var/dump/fn_compare_tables2.txt';
     // if (is_file($dumpPath)) unlink($dumpPath);
 
     $xi = 0;
@@ -1780,65 +1722,65 @@ $fn = function () use ($ffn) {
 $ffn->assert_stdout($fn, [], '
 "[ CmpModule ]"
 
-5385429d302ea2d3026e9f33bfa4d853
-5385429d302ea2d3026e9f33bfa4d853
+5e2492ca236e97203b30e4dfc7321bcc
+5e2492ca236e97203b30e4dfc7321bcc
 
-008634489c1dba011cc77b0ba59d1519
-1f236611f946b35cc5668ec0c5af8836
+d13ec776e6a6b863f2edffffa794b734
+8ff1ed40e121c56d578cf31a6aa972bb
 
-9b4a464db2d63e7e7b9381136e297f75
-a86a9f9ff2574657414ba3b0b7466c8a
+db5398cec8005b52a8986db4d64733b7
+983a7c61102c65988ad2eeed6b44cfed
 
-da2eb61ea489ab2e7511a6ae91c083ea
-6e8dfdd6ff651c0cac54a74be9a90d6b
+549d53d52036df86295f6a63433f2e7e
+b5b20175a7a97657a4e5415d31fe1347
 
-21300ddcdd5ce216cba60ba941dfd5ff
-c4ef1801482a159507e9cbec2a61d4aa
+4178f43b03e070e68419b6045b04c5f4
+646027584c89b7c1853904528b9a2b4b
 
-285b44fac9dcd0bea9f2ae2c112213ff
-253013cddd9231a0aade38c436937885
+e835886a0293f2ff912f3f4c2259d9e3
+97fb729da901ad97be5806afb04ed23b
 
-e8af850847fb4a8dfdb63c703f6051e5
-852e73f55bdf62de7b100fb55f631a08
+9cd8bf3696245cab04b08b7e87ebe775
+2b06afbc0a12ae4ff91ea11346ffc899
 
-70b2fcdd42bc385cd1554dcdeb0898d9
-6bfeed4db1fa55f3e1c6d9dfca8280c4
+3cca7c073be55cd60ab5c4667eb954d5
+10de3fb31a99d0fa7e84999847d716f5
 
-aa4bcf585316aaa18a39caa5592f5427
-fbfd78e38327ff7f43597b6a1eafeace
+5db6144bb2ca6c22f84fe63206903400
+916a33f760215343aee0d75ecc9a047c
 
-10f0c72412634ed3c9c41d7037ef596b
-9c148674ced20aa9c240c7428f170273
+83816ded4bbd3762f1f6bb883a081227
+82192e5a44bd7fca825b444aaa86feeb
 
-88544b31a956d1b7318b97d30636fade
-4ca33b02d2a76dcbc0cd860cfa5f15bd
+8ebafe33ddf18250e0272b5e676d6808
+ae0d4df86b3c1d687cece08201db9f06
 
-d9b4d680e5dd306dc52ff7cde7711cdd
-aec411b9c20ba127e90b463a6af21b09
+571b5a39250dbef4380cebdb500b7827
+78fc285033f5689e17bf44129da96a5b
 
-67961666f18ca9d7394a0bc409687999
-8d8d7b3eeb4a95f92076f447b99378ac
+d379ce729a3b631f67d1abf83410543d
+82db724055307d2bd0403666e6ac8ec4
 
-6ae4f3935f9c271868106121d5227b62
-b593abbfe8a2fe9815eca18e668589da
+0b9e5fbd4fcd91b27c342b3804107939
+ce62a89be0880f6448bb1c641d2549fa
 
-9683ab0962f7a9c6d332a8d2379636cf
-1074f0f24cccc91a97e71edbcbed3fcd
+d34cf15ca5d59fef2170a0db381308af
+61ed82f5d29fefc7f672ebf6abb9f860
 
-7eb399935172f8dc5eba431e6658aa5c
-e61b8e43f7695621aef5aaef11ac8f66
+b95bb58e53bc33954c873055a734e0c9
+767b20e9b0b64a9c559e85d1ce145d6b
 
-097844512ec3b3353db58f00dbb4d4ad
-4c8539adf5ea64667856ef9f6f895cc1
+d70f8ec00e99ec2809bba5b85ce6ff45
+5b4e614c42777ea8a7a64abe466b8606
 
-85db5244c266af1ad75074c0133533d8
-32069eb7eb15be848bb42e23d9830db9
+763b3382a7c267c5cb3771ba52614a26
+385cf1836661c3c71163d33260807d64
 
-671c529cad4c282902750608f0d54e43
-65da62978a68e60d8fd3ba00894ec125
+d62c658cc94b8f6f2733458cbb8b3444
+09c673560c9807c654ab12ba7c32f18b
 
-15b4d75da3a3cca2ab797a480a27332b
-507c286748b7733a832a91ba9d984f52
+3a5c4ba2b20240e510cb31b5608dc10e
+659cef0fc8e4274bd5dc0c75fd3bad08
 ');
 
 
@@ -3644,7 +3586,7 @@ $fn = function () use ($ffn) {
         \PhpModuleDummy4::class,
     ];
 
-    foreach ( $sourceClasses as $i => $sourceClass ) {
+    foreach ( $sourceClasses as $sourceClass ) {
         $sourceObject = new $sourceClass();
 
         $sources[ 0 ][ $sourceClass ] = [
@@ -3694,8 +3636,8 @@ $fn = function () use ($ffn) {
 
 
     $table = [];
-    foreach ( $sources as $type => $a ) {
-        foreach ( $a as $sourceClass => $aa ) {
+    foreach ( $sources as $a ) {
+        foreach ( $a as $aa ) {
             foreach ( $aa as $src ) {
                 $tableRow = $ffn->value($src);
 
@@ -3718,7 +3660,7 @@ $fn = function () use ($ffn) {
     $table1 = [];
     $table2 = [];
     $table3 = [];
-    foreach ( $sources as $type => $a ) {
+    foreach ( $sources as $a ) {
         foreach ( $a as $sourceClass => $aa ) {
             foreach ( $aa as $src ) {
                 $tableRow = $ffn->value($src);

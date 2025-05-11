@@ -1,3 +1,4 @@
 *
-!fn_compare_tables.txt
 !.gitignore
+
+!/fn_compare_tables.txt

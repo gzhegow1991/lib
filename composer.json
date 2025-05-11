@@ -37,21 +37,24 @@
     "require": {
         "php": "^7.3|^8.0",
 
-        "ext-pcre": "*",
-        "symfony/var-dumper": "^5.4"
+        "ext-pcre": "*"
     },
     "suggest": {
         "ext-bcmath": "*",
         "ext-ctype": "*",
+        "ext-curl": "*",
         "ext-date": "*",
         "ext-fileinfo": "*",
         "ext-filter": "*",
+        "ext-intl": "*",
         "ext-json": "*",
         "ext-mbstring": "*",
         "ext-pdo": "*",
+        "ext-sockets": "*",
 
         "doctrine/inflector": "^2.0",
 
+        "symfony/process": "^5.0",
         "symfony/string": "^5.0",
         "symfony/translation-contracts": "^2.0",
         "symfony/var-dumper": "^5.0",

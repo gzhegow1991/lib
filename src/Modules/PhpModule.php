@@ -3,26 +3,21 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Php\Nil;
+use Gzhegow\Lib\Modules\Arr\Map\Map;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Modules\Php\Loop\LoopManager;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
-use Gzhegow\Lib\Modules\Php\Timer\TimerManager;
-use Gzhegow\Lib\Modules\Php\Result\ResultManager;
-use Gzhegow\Lib\Modules\Php\Promise\PromiseManager;
-use Gzhegow\Lib\Modules\Php\Loop\LoopManagerInterface;
+use Gzhegow\Lib\Modules\Arr\Map\Base\AbstractMap;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToBoolInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
-use Gzhegow\Lib\Modules\Php\Timer\TimerManagerInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToObjectInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParser;
-use Gzhegow\Lib\Modules\Php\Result\ResultManagerInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIterableInterface;
-use Gzhegow\Lib\Modules\Php\Promise\PromiseManagerInterface;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
 
@@ -32,28 +27,26 @@ class PhpModule
      * @var CallableParserInterface
      */
     protected $callableParser;
-    /**
-     * @var LoopManagerInterface
-     */
-    protected $loopManager;
-    /**
-     * @var PromiseManagerInterface
-     */
-    protected $promiseManager;
-    /**
-     * @var TimerManagerInterface
-     */
-    protected $timerManager;
-    /**
-     * @var ResultManagerInterface
-     */
-    protected $resultManager;
-
 
     /**
      * @var class-string<\LogicException|\RuntimeException>
      */
     protected $throwableClass = RuntimeException::class;
+
+    /**
+     * @var bool
+     */
+    protected $signalIgnoreShutdownFunction = false;
+    /**
+     * @var AbstractMap
+     */
+    protected $registerShutdownFunctionMap;
+
+
+    public function __construct()
+    {
+        $this->registerShutdownFunctionMap = Map::new();
+    }
 
 
     public function newCallableParser() : CallableParserInterface
@@ -75,95 +68,20 @@ class PhpModule
     }
 
 
-    public function newLoopManager() : LoopManagerInterface
-    {
-        return new LoopManager();
-    }
-
-    public function cloneLoopManager() : LoopManagerInterface
-    {
-        return clone $this->loopManager();
-    }
-
-    public function loopManager(?LoopManagerInterface $loopManager = null) : LoopManagerInterface
-    {
-        return $this->loopManager = null
-            ?? $loopManager
-            ?? $this->loopManager
-            ?? new LoopManager();
-    }
-
-
-    public function newPromiseManager() : PromiseManagerInterface
-    {
-        return new PromiseManager(
-            $this->loopManager(),
-            $this->timerManager()
-        );
-    }
-
-    public function clonePromiseManager() : PromiseManagerInterface
-    {
-        return clone $this->promiseManager();
-    }
-
-    public function promiseManager(?PromiseManagerInterface $promiseFactory = null) : PromiseManagerInterface
-    {
-        return $this->promiseManager = null
-            ?? $promiseFactory
-            ?? $this->promiseManager
-            ?? new PromiseManager(
-                $this->loopManager(),
-                $this->timerManager()
-            );
-    }
-
-
-    public function newTimerManager() : TimerManagerInterface
-    {
-        return new TimerManager(
-            $this->loopManager()
-        );
-    }
-
-    public function cloneTimerManager() : TimerManagerInterface
-    {
-        return clone $this->timerManager();
-    }
-
-    public function timerManager(?TimerManagerInterface $timerManager = null) : TimerManagerInterface
-    {
-        return $this->timerManager = null
-            ?? $timerManager
-            ?? $this->timerManager
-            ?? new TimerManager(
-                $this->loopManager()
-            );
-    }
-
-
-    public function newResultManager() : ResultManagerInterface
-    {
-        return new ResultManager();
-    }
-
-    public function cloneResultManager() : ResultManagerInterface
-    {
-        return clone $this->resultManager();
-    }
-
-    public function resultManager(?ResultManagerInterface $resultManager = null) : ResultManagerInterface
-    {
-        return $this->resultManager = null
-            ?? $resultManager
-            ?? $this->resultManager
-            ?? new ResultManager();
-    }
-
-
     public function errorBag(?ErrorBag &$b = null) : ErrorBag
     {
         return $b = new ErrorBag();
+    }
+
+
+    public function the_nil() : Nil
+    {
+        return new Nil();
+    }
+
+    public function the_timezone_nil() : \DateTimeZone
+    {
+        return new \DateTimeZone('+1234');
     }
 
 
@@ -606,6 +524,26 @@ class PhpModule
     /**
      * @param resource|null $result
      */
+    public function type_any_not_resource(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! (
+            is_resource($value)
+            || ('resource (closed)' === gettype($value))
+        )) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param resource|null $result
+     */
     public function type_resource_opened(&$result, $value) : bool
     {
         $result = null;
@@ -835,14 +773,46 @@ class PhpModule
     }
 
 
+    /**
+     * > получает ссылку из массива ссылок или создает новую переменную - если в функцию передали ссылки и нужно убедится, что значение по ссылке требовалось снаружи
+     *
+     * @template T
+     *
+     * @param mixed|T        $result
+     * @param int|string     $key
+     * @param array{ 0?: T } $set
+     */
+    public function type_ref(&$result, $key, array $refs = [], array $set = []) : bool
+    {
+        $status = array_key_exists($key, $refs);
+
+        if ($status) {
+            $result =& $refs[ $key ];
+
+        } else {
+            $result = null;
+        }
+
+        if ([] !== $set) {
+            $result = $set[ 0 ];
+        }
+
+        return $status;
+    }
+
+
     public function is_windows() : bool
     {
-        return strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
+        static $current;
+
+        return $current = $current ?? ('WIN' === strtoupper(substr(PHP_OS, 0, 3)));
     }
 
     public function is_terminal() : bool
     {
-        return in_array(\PHP_SAPI, [ 'cli', 'phpdbg' ]);
+        static $current;
+
+        return $current = $current ?? in_array(\PHP_SAPI, [ 'cli', 'phpdbg' ]);
     }
 
 
@@ -859,7 +829,7 @@ class PhpModule
         if (
             (null === $value)
             || (is_float($value) && is_nan($value))
-            || (Lib::type()->is_nil($value))
+            || (Lib::type()->a_nil($var, $value))
         ) {
             throw new LogicException(
                 [
@@ -898,7 +868,7 @@ class PhpModule
             || (is_array($value))
             || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->is_nil($value))
+            || (Lib::type()->a_nil($var, $value))
         ) {
             throw new LogicException(
                 [
@@ -946,7 +916,7 @@ class PhpModule
             || (is_array($value))
             // || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->is_nil($value))
+            || (Lib::type()->a_nil($var, $value))
         ) {
             throw new LogicException(
                 [
@@ -985,7 +955,7 @@ class PhpModule
             || (is_array($value))
             || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->is_nil($value))
+            || (Lib::type()->a_nil($var, $value))
         ) {
             throw new LogicException(
                 [
@@ -1042,7 +1012,7 @@ class PhpModule
             // || (is_array($value))
             || (is_float($value) && (! is_nan($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->is_nil($value))
+            || (Lib::type()->a_nil($var, $value))
         ) {
             throw new LogicException(
                 [
@@ -1089,7 +1059,7 @@ class PhpModule
             // || (is_array($value))
             || (is_float($value) && (! is_nan($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->is_nil($value))
+            || (Lib::type()->a_nil($var, $value))
         ) {
             throw new LogicException(
                 [
@@ -2193,40 +2163,6 @@ class PhpModule
     }
 
 
-    public function microtime($date = null) : string
-    {
-        if (null === $date) {
-            $mt = microtime();
-
-            [ $msec, $sec ] = explode(' ', $mt, 2);
-
-            $msec = substr($msec, 2, 6);
-            $msec = str_pad($msec, 6, '0');
-
-        } elseif ($date instanceof \DateTimeInterface) {
-            $sec = $date->format('s');
-
-            $msec = $date->format('u');
-            $msec = substr($msec, 0, 6);
-            $msec = str_pad($msec, 6, '0');
-
-        } else {
-            throw new LogicException(
-                [ 'The `date` must be instance of \DateTimeInterface', $date ]
-            );
-        }
-
-        $decimalPoint = Lib::type()->the_decimal_point();
-
-        $result = ''
-            . $sec
-            . $decimalPoint
-            . $msec;
-
-        return $result;
-    }
-
-
     /**
      * @param class-string<\LogicException|\RuntimeException>|null $throwableClass
      *
@@ -2365,9 +2301,13 @@ class PhpModule
     }
 
     /**
+     * @return null
+     *
      * @throws \LogicException|\RuntimeException
+     *
+     * @noinspection PhpUnnecessaryStopStatementInspection
      */
-    public function throw($throwableOrArg, ...$throwableArgs) : void
+    public function throw($throwableOrArg, ...$throwableArgs)
     {
         $throwableClass = $this->static_throwable_class();
 
@@ -2376,12 +2316,18 @@ class PhpModule
             : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
         $this->throw_trace($trace, $throwableOrArg, ...$throwableArgs);
+
+        return;
     }
 
     /**
+     * @return null
+     *
      * @throws \LogicException|\RuntimeException
+     *
+     * @noinspection PhpUnnecessaryStopStatementInspection
      */
-    public function throw_new(...$throwableArgs) : void
+    public function throw_new(...$throwableArgs)
     {
         $throwableClass = $this->static_throwable_class();
 
@@ -2390,12 +2336,18 @@ class PhpModule
             : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
         $this->throw_new_trace($trace, ...$throwableArgs);
+
+        return;
     }
 
     /**
+     * @return null
+     *
      * @throws \LogicException|\RuntimeException
+     *
+     * @noinspection PhpUnnecessaryStopStatementInspection
      */
-    public function throw_trace(array $trace, $throwableOrArg, ...$throwableArgs) : void
+    public function throw_trace(array $trace, $throwableOrArg, ...$throwableArgs)
     {
         if (
             ($throwableOrArg instanceof \LogicException)
@@ -2407,12 +2359,18 @@ class PhpModule
         array_unshift($throwableArgs, $throwableOrArg);
 
         $this->throw_new_trace($trace, ...$throwableArgs);
+
+        return;
     }
 
     /**
+     * @return null
+     *
      * @throws \LogicException|\RuntimeException
+     *
+     * @noinspection PhpUnnecessaryStopStatementInspection
      */
-    public function throw_new_trace(array $trace, ...$throwableArgs) : void
+    public function throw_new_trace(array $trace, ...$throwableArgs)
     {
         $throwableClass = $this->static_throwable_class();
 
@@ -2434,14 +2392,68 @@ class PhpModule
             }
         }
 
-        $fn = (function () use (&$_throwableArgs) {
-            foreach ( $_throwableArgs as $key => $value ) {
-                $this->{$key} = $value;
-            }
-        })->bindTo($e, $e);
+        if ([] !== $_throwableArgs) {
+            $fn = (function () use (&$_throwableArgs) {
+                foreach ( $_throwableArgs as $key => $value ) {
+                    $this->{$key} = $value;
+                }
+            })->bindTo($e, $e);
 
-        call_user_func($fn);
+            call_user_func($fn);
+        }
 
-        throw $e;
+        if ($e) {
+            // > phpstorm `void` supression for chaining
+            throw $e;
+        }
+
+        return;
+    }
+
+
+    /**
+     * @param int|string $status
+     */
+    public function die($status, ?bool $ignoreShutdownFunction = null)
+    {
+        $status = $status ?? '';
+        $ignoreShutdownFunction = $ignoreShutdownFunction ?? true;
+
+        $this->signalIgnoreShutdownFunction = $ignoreShutdownFunction;
+
+        die($status);
+    }
+
+    /**
+     * @param int|string $status
+     */
+    public function exit($status, ?bool $ignoreShutdownFunction = null)
+    {
+        $status = $status ?? '';
+        $ignoreShutdownFunction = $ignoreShutdownFunction ?? true;
+
+        $this->signalIgnoreShutdownFunction = $ignoreShutdownFunction;
+
+        exit($status);
+    }
+
+    /**
+     * > проверяет наличие функции в списке перед тем, как ее регистрировать, если регистрация функций происходит в цикле
+     *
+     * @param callable $fn
+     */
+    public function register_shutdown_function_unique($fn) : void
+    {
+        if (! $this->registerShutdownFunctionMap->exists($fn)) {
+            $this->registerShutdownFunctionMap->add($fn, true);
+
+            $fnWithSignal = function () use ($fn) {
+                if ($this->signalIgnoreShutdownFunction) return;
+
+                call_user_func($fn);
+            };
+
+            register_shutdown_function($fnWithSignal);
+        }
     }
 }

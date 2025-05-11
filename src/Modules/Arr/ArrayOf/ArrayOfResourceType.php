@@ -3,57 +3,12 @@
 namespace Gzhegow\Lib\Modules\Arr\ArrayOf;
 
 
-use Gzhegow\Lib\Modules\Arr\ArrayOf\Base\AbstractArrayOfResourceType;
-
-
-class ArrayOfResourceType extends AbstractArrayOfResourceType implements
-    \ArrayAccess,
-    \Countable,
-    \IteratorAggregate,
-    \Serializable
+class ArrayOfResourceType
 {
-    public function getIterator() : \Traversable
+    public static function new(string $type)
     {
-        return new \ArrayIterator($this->values);
-    }
-
-
-    public function offsetExists($offset) : bool
-    {
-        return $this->exists($offset);
-    }
-
-    // public function offsetGet($offset)
-    public function offsetGet($offset) : mixed
-    {
-        return $this->get($offset);
-    }
-
-    public function offsetSet($offset, $value) : void
-    {
-        $this->set($offset, $value);
-    }
-
-    public function offsetUnset($offset) : void
-    {
-        $this->unset($offset);
-    }
-
-
-    public function serialize()
-    {
-        return serialize($this->__serialize());
-    }
-
-    // public function unserialize($data)
-    public function unserialize(string $data = '')
-    {
-        return unserialize($data);
-    }
-
-
-    public function count() : int
-    {
-        return count($this->values);
+        return (PHP_VERSION_ID >= 80000)
+            ? new \Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOfResourceType($type)
+            : new \Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfResourceType($type);
     }
 }

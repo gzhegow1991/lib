@@ -22,17 +22,17 @@ abstract class AbstractDictOfA extends AbstractDictOf
 
 
     /**
-     * @param class-string<T> $class
+     * @param class-string<T> $className
      */
-    public function __construct(string $class)
+    public function __construct(string $className)
     {
-        if (! class_exists($class)) {
+        if (! class_exists($className)) {
             throw new LogicException(
-                [ 'Class not exists: ' . $class ]
+                [ 'Class not exists: ' . $className ]
             );
         }
 
-        $this->valueClass = $class;
+        $this->valueClass = $className;
 
         parent::__construct('object');
     }

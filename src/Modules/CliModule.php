@@ -4,15 +4,34 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Cli\Process\DefaultProcessManager;
+use Gzhegow\Lib\Modules\Cli\Process\ProcessManagerInterface;
 
 
 class CliModule
 {
-    public function __construct()
+    /**
+     * @var ProcessManagerInterface
+     */
+    protected $processManager;
+
+
+    public function newProcessManager() : ProcessManagerInterface
     {
-        if (! Lib::php()->is_terminal()) {
-            throw new RuntimeException('Module must be created in CLI mode');
-        }
+        return new DefaultProcessManager();
+    }
+
+    public function cloneProcessManager() : ProcessManagerInterface
+    {
+        return clone $this->processManager();
+    }
+
+    public function processManager(?ProcessManagerInterface $processManager = null) : ProcessManagerInterface
+    {
+        return $this->processManager = null
+            ?? $processManager
+            ?? $this->processManager
+            ?? new DefaultProcessManager();
     }
 
 
@@ -52,8 +71,12 @@ class CliModule
 
     public function pause($var = null, ...$vars)
     {
+        if (! Lib::php()->is_terminal()) {
+            throw new RuntimeException('Function must be called only in CLI mode');
+        }
+
         if (null !== $var) {
-            Lib::debug()->dump($var, ...$vars);
+            Lib::debug()->d($var, ...$vars);
         }
 
         echo '> Press ENTER to continue...' . PHP_EOL;
@@ -66,6 +89,10 @@ class CliModule
 
     public function stop(...$vars) : void
     {
+        if (! Lib::php()->is_terminal()) {
+            throw new RuntimeException('Function must be called only in CLI mode');
+        }
+
         $this->pause(...$vars);
 
         exit(1);
@@ -74,6 +101,10 @@ class CliModule
 
     public function readln() : string
     {
+        if (! Lib::php()->is_terminal()) {
+            throw new RuntimeException('Function must be called only in CLI mode');
+        }
+
         $h = fopen('php://stdin', 'r');
         $line = trim(fgets($h));
         fclose($h);
@@ -83,6 +114,10 @@ class CliModule
 
     public function cin(?string $delimiter = null) : string
     {
+        if (! Lib::php()->is_terminal()) {
+            throw new RuntimeException('Function must be called only in CLI mode');
+        }
+
         $delimiter = $delimiter ?? '```';
 
         $theStr = Lib::str();
@@ -132,6 +167,10 @@ class CliModule
 
     public function yes(string $message, ?string &$yesQuestion = null) : bool
     {
+        if (! Lib::php()->is_terminal()) {
+            throw new RuntimeException('Function must be called only in CLI mode');
+        }
+
         $yesQuestion = $yesQuestion ?? 'n';
 
         $isYes = ('y' === $yesQuestion) || ('yy' === $yesQuestion);

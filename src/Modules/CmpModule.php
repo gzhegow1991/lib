@@ -755,8 +755,8 @@ class CmpModule
     {
         $theType = Lib::type();
 
-        $isNilA = $theType->is_nil($a);
-        $isNilB = $theType->is_nil($b);
+        $isNilA = $theType->a_nil($var, $a);
+        $isNilB = $theType->a_nil($var, $b);
 
         if ($isNilA && $isNilB) {
             $fnCmpName = __FUNCTION__;
@@ -796,8 +796,8 @@ class CmpModule
 
             $aStatus = $isNullA;
             $bStatus = $isNullB;
-            if (! $isNullA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->is_blank($a);
-            if (! $isNullB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->is_blank($b);
+            if (! $isNullA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->a_blank($var, $a);
+            if (! $isNullB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->a_blank($var, $b);
 
             if ($aStatus && $bStatus) {
                 $fnCmpName = __FUNCTION__;

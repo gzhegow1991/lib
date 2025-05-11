@@ -128,85 +128,61 @@ class DebugModule
     }
 
 
+    /**
+     * @return array{ 0: string, 1: string }
+     */
+    public function file_line(?array $trace = null) : array
+    {
+        if (null !== $trace) {
+            $t = [
+                $trace[ 0 ][ 'file' ] ?? '{file}',
+                $trace[ 0 ][ 'line' ] ?? '{line}',
+            ];
+
+        } else {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+
+            $t = [
+                $trace[ 1 ][ 'file' ] ?? '{file}',
+                $trace[ 1 ][ 'line' ] ?? '{line}',
+            ];
+        }
+
+        return $t;
+    }
+
+
     public function print(...$vars) : string
     {
         return $this->dumper()->print(...$vars);
     }
 
 
-    /**
-     * @return mixed
-     */
-    public function dump($var, ...$vars)
+    public function dd(?array $trace, ...$vars) : void
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->dumper()->dumpTrace($trace, $var, ...$vars);
+        $this->dumper()->dd($trace, ...$vars);
     }
 
     /**
      * @return mixed
      */
-    public function d($var, ...$vars)
+    public function d(?array $trace, $var, ...$vars)
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->dumper()->dTrace($trace, $var, ...$vars);
-    }
-
-    public function dd(...$vars) : void
-    {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->dumper()->ddTrace($trace, ...$vars);
+        return $this->dumper()->d($trace, $var, ...$vars);
     }
 
     /**
      * @return mixed|void
      */
-    public function ddd(?int $limit, $var, ...$vars)
-    {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        return $this->dumper()->dddTrace($trace, $limit, $var, ...$vars);
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function dumpTrace(?array $trace, $var, ...$vars)
+    public function ddd(?array $trace, ?int $limit, $var, ...$vars)
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->dumper()->dumpTrace($trace, $var, ...$vars);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function dTrace(?array $trace, $var, ...$vars)
-    {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        return $this->dumper()->dTrace($trace, $var, ...$vars);
-    }
-
-    public function ddTrace(?array $trace, ...$vars) : void
-    {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->dumper()->ddTrace($trace, ...$vars);
-    }
-
-    /**
-     * @return mixed|void
-     */
-    public function dddTrace(?array $trace, ?int $limit, $var, ...$vars)
-    {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        return $this->dumper()->dddTrace($trace, $limit, $var, ...$vars);
+        return $this->dumper()->ddd($trace, $limit, $var, ...$vars);
     }
 
 
@@ -966,7 +942,7 @@ class DebugModule
                             );
                         }
 
-                        continue;
+                        // continue;
                     }
                 }
             }
@@ -1376,7 +1352,7 @@ class DebugModule
             ob_start();
         }
 
-        $fnDrawLine = function () use ($thWidth, $tdWidths) {
+        $fnDrawLine = static function () use ($thWidth, $tdWidths) {
             echo '+';
             echo str_repeat('-', $thWidth + 2) . '+';
             foreach ( $tdWidths as $tdWidth ) {
@@ -1385,7 +1361,7 @@ class DebugModule
             echo "\n";
         };
 
-        $fnDrawLine();
+        call_user_func($fnDrawLine);
 
         echo '|';
         echo ' ' . str_pad('', $thWidth) . ' |';
@@ -1394,7 +1370,7 @@ class DebugModule
         }
         echo "\n";
 
-        $fnDrawLine();
+        call_user_func($fnDrawLine);
 
         foreach ( $table as $rowKey => $row ) {
             echo '|';
@@ -1405,7 +1381,7 @@ class DebugModule
             echo "\n";
         }
 
-        $fnDrawLine();
+        call_user_func($fnDrawLine);
 
         if ($return) {
             $content = ob_get_clean();

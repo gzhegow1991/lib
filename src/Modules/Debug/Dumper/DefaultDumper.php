@@ -133,13 +133,13 @@ class DefaultDumper implements DumperInterface
     /**
      * @return \Symfony\Component\VarDumper\Cloner\ClonerInterface
      */
-    protected function newSymfonyCloner() : object
+    protected function newSymfonyCloner(array $casters = []) : object
     {
         $commands = [
             'composer require symfony/var-dumper',
         ];
 
-        if (! class_exists($symfonyCloner = static::SYMFONY_CLONER)) {
+        if (! class_exists($symfonyClonerClass = static::SYMFONY_CLONER)) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -147,14 +147,18 @@ class DefaultDumper implements DumperInterface
             ]);
         }
 
-        return new $symfonyCloner();
+        return new $symfonyClonerClass($casters);
     }
 
     /**
      * @return \Symfony\Component\VarDumper\Cloner\ClonerInterface
      */
-    protected function getSymfonyCloner() : object
+    protected function getSymfonyCloner(?array $casters = null) : object
     {
+        if (null !== $casters) {
+            return $this->newSymfonyCloner($casters);
+        }
+
         return $this->symfonyCloner = null
             ?? $this->symfonyCloner
             ?? $this->newSymfonyCloner();
@@ -193,7 +197,7 @@ class DefaultDumper implements DumperInterface
             'composer require symfony/var-dumper',
         ];
 
-        if (! class_exists($symfonyCliDumper = static::SYMFONY_CLI_DUMPER)) {
+        if (! class_exists($symfonyCliDumperClass = static::SYMFONY_CLI_DUMPER)) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -201,7 +205,7 @@ class DefaultDumper implements DumperInterface
             ]);
         }
 
-        return new $symfonyCliDumper();
+        return new $symfonyCliDumperClass();
     }
 
     /**
@@ -247,7 +251,7 @@ class DefaultDumper implements DumperInterface
             'composer require symfony/var-dumper',
         ];
 
-        if (! class_exists($symfonyHtmlDumper = static::SYMFONY_HTML_DUMPER)) {
+        if (! class_exists($symfonyHtmlDumperClass = static::SYMFONY_HTML_DUMPER)) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -255,7 +259,7 @@ class DefaultDumper implements DumperInterface
             ]);
         }
 
-        return new $symfonyHtmlDumper();
+        return new $symfonyHtmlDumperClass();
     }
 
     /**
@@ -288,10 +292,12 @@ class DefaultDumper implements DumperInterface
             }
         }
 
-        $this->printer = $printer ?? $this->printerDefault;
+        $printer = $printer ?? $this->printerDefault;
+
+        $this->printer = $printer;
 
         if (null !== $printerOptions) {
-            $this->printerOptions = $printerOptions;
+            $this->printerOptions[ $printer ] = $printerOptions;
         }
 
         return $this;
@@ -342,7 +348,11 @@ class DefaultDumper implements DumperInterface
 
     public function printPrinter_symfony(...$vars) : string
     {
-        $cloner = $this->getSymfonyCloner();
+        $printerOptions = $this->printerOptions[ $this->printer ] ?? [];
+
+        $casters = $printerOptions[ 'casters' ] ?? null;
+
+        $cloner = $this->getSymfonyCloner($casters);
 
         $dumper = Lib::php()->is_terminal()
             ? $this->getSymfonyCliDumper()
@@ -475,31 +485,31 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    protected function dumpDumper(...$vars) : void
+    protected function echoDumper(...$vars) : void
     {
         switch ( $this->dumper ):
             case static::DUMPER_ECHO:
-                $this->dumpDumper_echo(...$vars);
+                $this->echoDumper_echo(...$vars);
                 break;
 
             case static::DUMPER_ECHO_HTML:
-                $this->dumpDumper_echo_html(...$vars);
+                $this->echoDumper_echo_html(...$vars);
                 break;
 
             case static::DUMPER_STDOUT:
-                $this->dumpDumper_stdout(...$vars);
+                $this->echoDumper_stdout(...$vars);
                 break;
 
             case static::DUMPER_STDOUT_HTML:
-                $this->dumpDumper_stdout_html(...$vars);
+                $this->echoDumper_stdout_html(...$vars);
                 break;
 
             case static::DUMPER_DEVTOOLS:
-                $this->dumpDumper_devtools(...$vars);
+                $this->echoDumper_devtools(...$vars);
                 break;
 
             case static::DUMPER_PDO:
-                $this->dumpDumper_pdo(...$vars);
+                $this->echoDumper_pdo(...$vars);
                 break;
 
             default:
@@ -510,7 +520,7 @@ class DefaultDumper implements DumperInterface
         endswitch;
     }
 
-    public function dumpDumper_echo(...$vars)
+    public function echoDumper_echo(...$vars)
     {
         $content = $this->printPrinter(...$vars);
 
@@ -519,7 +529,7 @@ class DefaultDumper implements DumperInterface
         echo $content;
     }
 
-    public function dumpDumper_echo_html(...$vars)
+    public function echoDumper_echo_html(...$vars)
     {
         $options = $this->dumperOptions;
 
@@ -545,7 +555,7 @@ class DefaultDumper implements DumperInterface
         }
     }
 
-    public function dumpDumper_stdout(...$vars)
+    public function echoDumper_stdout(...$vars)
     {
         $options = $this->dumperOptions;
 
@@ -557,7 +567,7 @@ class DefaultDumper implements DumperInterface
         fwrite($resource, $content);
     }
 
-    public function dumpDumper_stdout_html(...$vars)
+    public function echoDumper_stdout_html(...$vars)
     {
         $options = $this->dumperOptions;
 
@@ -585,7 +595,7 @@ class DefaultDumper implements DumperInterface
         }
     }
 
-    public function dumpDumper_devtools(...$vars)
+    public function echoDumper_devtools(...$vars)
     {
         $options = $this->dumperOptions;
 
@@ -612,7 +622,7 @@ class DefaultDumper implements DumperInterface
         }
     }
 
-    public function dumpDumper_pdo(...$vars)
+    public function echoDumper_pdo(...$vars)
     {
         $options = $this->dumperOptions;
 
@@ -655,42 +665,7 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    public function dump($var, ...$vars)
-    {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->dumpTrace($trace, $var, ...$vars);
-
-        return $var;
-    }
-
-    public function d($var, ...$vars)
-    {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->dTrace($trace, $var, ...$vars);
-
-        return $var;
-    }
-
-    public function dd(...$vars) : void
-    {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->ddTrace($trace, ...$vars);
-    }
-
-    public function ddd(?int $limit, $var, ...$vars)
-    {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->dddTrace($trace, $limit, $var, ...$vars);
-
-        return $var;
-    }
-
-
-    public function dumpTrace(?array $trace, $var, ...$vars)
+    public function d(?array $trace, $var, ...$vars)
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
@@ -699,16 +674,7 @@ class DefaultDumper implements DumperInterface
         return $var;
     }
 
-    public function dTrace(?array $trace, $var, ...$vars)
-    {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->doDumpTrace($trace, $var, ...$vars);
-
-        return $var;
-    }
-
-    public function ddTrace(?array $trace, ...$vars) : void
+    public function dd(?array $trace, ...$vars) : void
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
@@ -717,7 +683,7 @@ class DefaultDumper implements DumperInterface
         die();
     }
 
-    public function dddTrace(?array $trace, ?int $limit, $var, ...$vars)
+    public function ddd(?array $trace, ?int $limit, $var, ...$vars)
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
@@ -740,10 +706,11 @@ class DefaultDumper implements DumperInterface
 
     protected function doDumpTrace(array $trace, ...$vars)
     {
-        $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $traceLine = $trace[ 0 ][ 'line' ] ?? -1;
+        $traceFile = $trace[ 0 ][ 'file' ] ?? $trace[ 0 ][ 0 ] ?? '{file}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? $trace[ 0 ][ 1 ] ?? -1;
+
         $traceWhereIs = "{$traceFile}: {$traceLine}";
 
-        $this->dumpDumper($traceWhereIs, ...$vars);
+        $this->echoDumper($traceWhereIs, ...$vars);
     }
 }

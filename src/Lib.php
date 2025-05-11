@@ -11,410 +11,349 @@ use Gzhegow\Lib\Modules\StrModule;
 use Gzhegow\Lib\Modules\UrlModule;
 use Gzhegow\Lib\Modules\ArrModule;
 use Gzhegow\Lib\Modules\CmpModule;
-use Composer\Autoload\ClassLoader;
 use Gzhegow\Lib\Modules\FuncModule;
 use Gzhegow\Lib\Modules\JsonModule;
 use Gzhegow\Lib\Modules\HttpModule;
 use Gzhegow\Lib\Modules\TestModule;
-use Gzhegow\Lib\Modules\TypeModule;
 use Gzhegow\Lib\Modules\PregModule;
 use Gzhegow\Lib\Modules\DateModule;
 use Gzhegow\Lib\Modules\DebugModule;
-use Gzhegow\Lib\Modules\ParseModule;
 use Gzhegow\Lib\Modules\CryptModule;
+use Gzhegow\Lib\Modules\AsyncModule;
 use Gzhegow\Lib\Modules\BcmathModule;
-use Gzhegow\Lib\Modules\AssertModule;
 use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
 use Gzhegow\Lib\Modules\SocialModule;
 use Gzhegow\Lib\Modules\Func\Pipe\Pipe;
+use Gzhegow\Lib\Modules\TypeBoolModule;
 use Gzhegow\Lib\Modules\ItertoolsModule;
+use Gzhegow\Lib\Modules\TypeThrowModule;
+use Gzhegow\Lib\Modules\ParseNullModule;
+use Gzhegow\Lib\Modules\EntrypointModule;
+use Gzhegow\Lib\Modules\ParseThrowModule;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
-use Gzhegow\Lib\Exception\ErrorHandler\ErrorHandler;
-use Gzhegow\Lib\Exception\ErrorHandler\ErrorHandlerInterface;
 
 
 class Lib
 {
     /**
-     * @return ErrorHandlerInterface
+     * @var ParseNullModule
      */
-    public static $errorHandler;
+    public static $parseNull;
+    /**
+     * @var ParseThrowModule
+     */
+    public static $parseThrow;
 
-    public static function errorHandler(?ErrorHandlerInterface $instance = null) : ErrorHandlerInterface
+    /**
+     * > Lib::parse([ &$theParseThrow, &$theParseNull ])
+     * > $theParseNull = Lib::parse()
+     *
+     * @param ParseThrowModule|null $pt
+     * @param ParseNullModule|null  $pn
+     *
+     * @return ParseNullModule
+     */
+    public static function parse(&$pt = null, &$pn = null)
     {
-        return static::$errorHandler = $instance
-            ?? static::$errorHandler
-            ?? new ErrorHandler();
+        $pt = static::$parseNull = static::$parseNull ?? new ParseNullModule();
+        $pn = static::$parseThrow = static::$parseThrow ?? new ParseThrowModule();
+
+        return static::$parseNull;
     }
 
 
     /**
-     * @return AssertModule
+     * @var TypeBoolModule
      */
-    public static $assert;
-
-    public static function assert(?AssertModule $instance = null)
-    {
-        return static::$assert = $instance
-            ?? static::$assert
-            ?? new AssertModule();
-    }
+    public static $typeBool;
+    /**
+     * @var TypeThrowModule
+     */
+    public static $typeThrow;
 
     /**
-     * @return ParseModule
+     * > Lib::type([ &$theTypeThrow, &$theTypeBool ])
+     * > $theTypeBool = Lib::type()
+     *
+     * @param TypeThrowModule|null $tt
+     * @param TypeBoolModule|null  $tb
+     *
+     * @return TypeBoolModule
      */
-    public static $parse;
-
-    public static function parse(?ParseModule $instance = null)
+    public static function type(&$tt = null, &$tb = null)
     {
-        return static::$parse = $instance
-            ?? static::$parse
-            ?? new ParseModule();
-    }
+        $tt = static::$typeThrow = static::$typeThrow ?? new TypeThrowModule();
+        $tb = static::$typeBool = static::$typeBool ?? new TypeBoolModule();
 
-    /**
-     * @return TypeModule
-     */
-    public static $type;
-
-    public static function type(?TypeModule $instance = null)
-    {
-        return static::$type = $instance
-            ?? static::$type
-            ?? new TypeModule();
+        return static::$typeBool;
     }
 
 
     /**
-     * @return ArrModule
+     * @var ArrModule
      */
     public static $arr;
 
-    public static function arr(?ArrModule $instance = null)
+    public static function arr()
     {
-        return static::$arr = $instance
-            ?? static::$arr
-            ?? new ArrModule();
+        return static::$arr = static::$arr ?? new ArrModule();
     }
 
     /**
-     * @return BcmathModule
+     * @var AsyncModule
+     */
+    public static $async;
+
+    public static function async()
+    {
+        return static::$async = static::$async ?? new AsyncModule();
+    }
+
+    /**
+     * @var BcmathModule
      */
     public static $bcmath;
 
-    public static function bcmath(?BcmathModule $instance = null)
+    public static function bcmath()
     {
-        return static::$bcmath = $instance
-            ?? static::$bcmath
-            ?? new BcmathModule();
+        return static::$bcmath = static::$bcmath ?? new BcmathModule();
     }
 
     /**
-     * @return CliModule
+     * @var CliModule
      */
     public static $cli;
 
-    public static function cli(?CliModule $instance = null)
+    public static function cli()
     {
-        return static::$cli = $instance
-            ?? static::$cli
-            ?? new CliModule();
+        return static::$cli = static::$cli ?? new CliModule();
     }
 
     /**
-     * @return CmpModule
+     * @var CmpModule
      */
     public static $cmp;
 
-    public static function cmp(?CmpModule $instance = null)
+    public static function cmp()
     {
-        return static::$cmp = $instance
-            ?? static::$cmp
-            ?? new CmpModule();
+        return static::$cmp = static::$cmp ?? new CmpModule();
     }
 
     /**
-     * @return CryptModule
+     * @var CryptModule
      */
     public static $crypt;
 
-    public static function crypt(?CryptModule $instance = null)
+    public static function crypt()
     {
-        return static::$crypt = $instance
-            ?? static::$crypt
-            ?? new CryptModule();
+        return static::$crypt = static::$crypt ?? new CryptModule();
     }
 
     /**
-     * @return DateModule
+     * @var DateModule
      */
     public static $date;
 
-    public static function date(?DateModule $instance = null)
+    public static function date()
     {
-        return static::$date = $instance
-            ?? static::$date
-            ?? new DateModule();
+        return static::$date = static::$date ?? new DateModule();
     }
 
     /**
-     * @return DebugModule
+     * @var DebugModule
      */
     public static $debug;
 
-    public static function debug(?DebugModule $instance = null)
+    public static function debug()
     {
-        return static::$debug = $instance
-            ?? static::$debug
-            ?? new DebugModule();
+        return static::$debug = static::$debug ?? new DebugModule();
     }
 
     /**
-     * @return EscapeModule
+     * @var EntrypointModule
+     */
+    public static $entrypoint;
+
+    public static function entrypoint() : EntrypointModule
+    {
+        return static::$entrypoint = static::$entrypoint ?? new EntrypointModule();
+    }
+
+    /**
+     * @var EscapeModule
      */
     public static $escape;
 
-    public static function escape(?EscapeModule $instance = null)
+    public static function escape()
     {
-        return static::$escape = $instance
-            ?? static::$escape
-            ?? new EscapeModule();
+        return static::$escape = static::$escape ?? new EscapeModule();
     }
 
     /**
-     * @return FormatModule
+     * @var FormatModule
      */
     public static $format;
 
-    public static function format(?FormatModule $instance = null)
+    public static function format()
     {
-        return static::$format = $instance
-            ?? static::$format
-            ?? new FormatModule();
+        return static::$format = static::$format ?? new FormatModule();
     }
 
     /**
-     * @return FsModule
+     * @var FsModule
      */
     public static $fs;
 
-    public static function fs(?FsModule $instance = null)
+    public static function fs()
     {
-        return static::$fs = $instance
-            ?? static::$fs
-            ?? new FsModule();
+        return static::$fs = static::$fs ?? new FsModule();
     }
 
     /**
-     * @return FuncModule
+     * @var FuncModule
      */
     public static $func;
 
-    public static function func(?FuncModule $instance = null)
+    public static function func()
     {
-        return static::$func = $instance
-            ?? static::$func
-            ?? new FuncModule();
+        return static::$func = static::$func ?? new FuncModule();
     }
 
     /**
-     * @return HttpModule
+     * @var HttpModule
      */
     public static $http;
 
-    public static function http(?HttpModule $instance = null)
+    public static function http()
     {
-        return static::$http = $instance
-            ?? static::$http
-            ?? new HttpModule();
+        return static::$http = static::$http ?? new HttpModule();
     }
 
     /**
-     * @return ItertoolsModule
+     * @var ItertoolsModule
      */
     public static $itertools;
 
-    public static function itertools(?ItertoolsModule $instance = null)
+    public static function itertools()
     {
-        return static::$itertools = $instance
-            ?? static::$itertools
-            ?? new ItertoolsModule();
+        return static::$itertools = static::$itertools ?? new ItertoolsModule();
     }
 
     /**
-     * @return ItertoolsModule
+     * @var ItertoolsModule
      */
     public static $json;
 
-    public static function json(?JsonModule $instance = null)
+    public static function json()
     {
-        return static::$json = $instance
-            ?? static::$json
-            ?? new JsonModule();
+        return static::$json = static::$json ?? new JsonModule();
     }
 
     /**
-     * @return MbModule
+     * @var MbModule
      */
     public static $mb;
 
-    public static function mb(?MbModule $instance = null)
+    public static function mb()
     {
-        return static::$mb = $instance
-            ?? static::$mb
-            ?? new MbModule();
+        return static::$mb = static::$mb ?? new MbModule();
     }
 
     /**
-     * @return NetModule
+     * @var NetModule
      */
     public static $net;
 
-    public static function net(?NetModule $instance = null)
+    public static function net()
     {
-        return static::$net = $instance
-            ?? static::$net
-            ?? new NetModule();
+        return static::$net = static::$net ?? new NetModule();
     }
 
     /**
-     * @return PhpModule
+     * @var PhpModule
      */
     public static $php;
 
-    public static function php(?PhpModule $instance = null)
+    public static function php()
     {
-        return static::$php = $instance
-            ?? static::$php
-            ?? new PhpModule();
+        return static::$php = static::$php ?? new PhpModule();
     }
 
     /**
-     * @return PregModule
+     * @var PregModule
      */
     public static $preg;
 
-    public static function preg(?PregModule $instance = null)
+    public static function preg()
     {
-        return static::$preg = $instance
-            ?? static::$preg
-            ?? new PregModule();
+        return static::$preg = static::$preg ?? new PregModule();
     }
 
     /**
-     * @return RandomModule
+     * @var RandomModule
      */
     public static $random;
 
-    public static function random(?RandomModule $instance = null)
+    public static function random()
     {
-        return static::$random = $instance
-            ?? static::$random
-            ?? new RandomModule();
+        return static::$random = static::$random ?? new RandomModule();
     }
 
     /**
-     * @return StrModule
+     * @var StrModule
      */
     public static $social;
 
-    public static function social(?SocialModule $instance = null)
+    public static function social()
     {
-        return static::$social = $instance
-            ?? static::$social
-            ?? new SocialModule();
+        return static::$social = static::$social ?? new SocialModule();
     }
 
     /**
-     * @return StrModule
+     * @var StrModule
      */
     public static $str;
 
-    public static function str(?StrModule $instance = null)
+    public static function str()
     {
-        return static::$str = $instance
-            ?? static::$str
-            ?? new StrModule();
+        return static::$str = static::$str ?? new StrModule();
     }
 
     /**
-     * @return TestModule
+     * @var TestModule
      */
     public static $test;
 
-    public static function test(?TestModule $instance = null)
+    public static function test()
     {
-        return static::$test = $instance
-            ?? static::$test
-            ?? new TestModule();
+        return static::$test = static::$test ?? new TestModule();
     }
 
     /**
-     * @return UrlModule
+     * @var UrlModule
      */
     public static $url;
 
-    public static function url(?UrlModule $instance = null)
+    public static function url()
     {
-        return static::$url = $instance
-            ?? static::$url
-            ?? new UrlModule();
+        return static::$url = static::$url ?? new UrlModule();
     }
 
 
     /**
-     * > в старых PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
-     *
-     * @throws \LogicException|\RuntimeException
+     * > фабрика для ErrorBag - добавить теги ошибкам, чтобы потом сохранить в несколько отчетов
      */
-    public static function throw($throwableOrArg, ...$throwableArgs)
-    {
-        if (
-            ($throwableOrArg instanceof \LogicException)
-            || ($throwableOrArg instanceof \RuntimeException)
-        ) {
-            throw $throwableOrArg;
-        }
-
-        array_unshift($throwableArgs, $throwableOrArg);
-
-        $thePhp = Lib::php();
-
-        $throwableClass = $thePhp->static_throwable_class();
-
-        $trace = property_exists($throwableClass, 'trace')
-            ? debug_backtrace()
-            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $thePhp->throw_new_trace($trace, ...$throwableArgs);
-    }
-
-    /**
-     * > в старых PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
-     *
-     * @throws \LogicException|\RuntimeException
-     */
-    public static function throw_new(...$throwableArgs)
-    {
-        $thePhp = Lib::php();
-
-        $throwableClass = $thePhp->static_throwable_class();
-
-        $trace = property_exists($throwableClass, 'trace')
-            ? debug_backtrace()
-            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $thePhp->throw_new_trace($trace, ...$throwableArgs);
-    }
-
-
     public static function errorBag(?ErrorBag &$b = null) : ErrorBag
     {
         return Lib::php()->errorBag($b);
     }
 
+
+    /**
+     * > фабрика для Pipeline - выполнить команды контроллера цепочкой, не углубляясь в детали
+     */
     public static function pipe(?Pipe &$p = null) : Pipe
     {
         return Lib::func()->pipe($p);
@@ -422,7 +361,103 @@ class Lib
 
 
     /**
-     * > простой замерщик времени между вызовами
+     * > время в секундах
+     */
+    public static function time(?\DateTimeInterface $date = null) : string
+    {
+        if (null === $date) {
+            $sec = time();
+
+        } else {
+            $sec = $date->format('U');
+        }
+
+        return $sec;
+    }
+
+    /**
+     * > время в миллисекундах
+     */
+    public static function mtime(?\DateTimeInterface $date = null) : string
+    {
+        if (null === $date) {
+            $now = microtime();
+
+            [ $msec, $sec ] = explode(' ', $now, 2);
+
+            $msec = substr($msec, 2, 3);
+
+        } else {
+            $sec = $date->format('U');
+            $msec = $date->format('v');
+
+            $msec = substr($msec, 0, 3);
+        }
+
+        $msec = str_pad($msec, 3, '0');
+
+        $result = "{$sec}.{$msec}";
+
+        return $result;
+    }
+
+    /**
+     * > время в микросекундах
+     */
+    public static function utime(?\DateTimeInterface $date = null) : string
+    {
+        if (null === $date) {
+            $now = microtime();
+
+            [ $usec, $sec ] = explode(' ', $now, 2);
+
+            $usec = substr($usec, 2, 6);
+
+        } else {
+            $sec = $date->format('U');
+            $usec = $date->format('u');
+        }
+
+        $usec = str_pad($usec, 6, '0');
+
+        $result = "{$sec}.{$usec}";
+
+        return $result;
+    }
+
+    /**
+     * > время в наносекундах
+     */
+    public static function ntime(?\DateTimeInterface $date = null) : string
+    {
+        if (null === $date) {
+            $now = microtime();
+
+            [ $usec, $sec ] = explode(' ', $now, 2);
+
+            $usec = substr($usec, 2, 6);
+
+        } else {
+            $sec = $date->format('U');
+            $usec = $date->format('u');
+        }
+
+        $hr = hrtime();
+        $nsec = substr($hr[ 1 ], 0, 9);
+
+        $nanosec = '';
+        for ( $i = 0; $i < 9; $i++ ) {
+            $nanosec[ $i ] = $usec[ $i ] ?? $nsec[ $i ] ?? '0';
+        }
+
+        $result = "{$sec}.{$nanosec}";
+
+        return $result;
+    }
+
+
+    /**
+     * > простой замерщик времени между вызовами - сразу несколько таймеров для замера
      *
      * @return array|float
      */
@@ -481,13 +516,145 @@ class Lib
     }
 
 
-    public static function requireComposerGlobal() : ClassLoader
-    {
-        return require getenv('COMPOSER_HOME') . '/vendor/autoload.php';
-    }
-
-    public static function requireOnceComposerGlobal() : ClassLoader
+    /**
+     * > подключить правильно настроенный композер, установленный глобально - чтобы дебаг пакеты не добавлять в библиотеки, но пользоваться ими (временно)
+     *
+     * @return \Composer\Autoload\ClassLoader
+     */
+    public static function require_composer_global()
     {
         return require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
+    }
+
+    /**
+     * > зарегистрировать функции d/dd/ddd/td, чтобы пользоваться ими но PHPStorm не подсказывал, что они есть в проекте (временно)
+     */
+    public static function register_functions_global() : void
+    {
+        global $td, $d, $dd, $ddd;
+
+        $td = function ($ms, $var, ...$vars) {
+            static $last;
+
+            $last = $last ?? [];
+
+            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+
+            $key = implode(':', $t);
+            $last[ $key ] = $last[ $key ] ?? 0;
+
+            $now = microtime(true);
+
+            if (($now - $last[ $key ]) > ($ms / 1000)) {
+                $last[ $key ] = $now;
+
+                \Gzhegow\Lib\Lib::debug()->d([ $t ], $var, ...$vars);
+            }
+
+            return $var;
+        };
+
+        $d = function ($var, ...$vars) {
+            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+
+            \Gzhegow\Lib\Lib::debug()->d([ $t ], $var, ...$vars);
+        };
+
+        $dd = function (...$vars) {
+            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+
+            \Gzhegow\Lib\Lib::debug()->dd([ $t ], ...$vars);
+        };
+
+        $ddd = function (?int $limit, $var, ...$vars) {
+            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+
+            \Gzhegow\Lib\Lib::debug()->ddd([ $t ], $limit, $var, ...$vars);
+        };
+    }
+
+
+    /**
+     * > в старых PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
+     *
+     * @return null
+     *
+     * @noinspection PhpUnnecessaryStopStatementInspection
+     *
+     * @throws \LogicException|\RuntimeException
+     */
+    public static function throw($throwableOrArg, ...$throwableArgs)
+    {
+        if (
+            ($throwableOrArg instanceof \LogicException)
+            || ($throwableOrArg instanceof \RuntimeException)
+        ) {
+            throw $throwableOrArg;
+        }
+
+        array_unshift($throwableArgs, $throwableOrArg);
+
+        $thePhp = Lib::php();
+
+        $throwableClass = $thePhp->static_throwable_class();
+
+        $trace = property_exists($throwableClass, 'trace')
+            ? debug_backtrace()
+            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $thePhp->throw_new_trace($trace, ...$throwableArgs);
+
+        return;
+    }
+
+    /**
+     * > в старых PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
+     *
+     * @return null
+     *
+     * @throws \LogicException|\RuntimeException
+     *
+     * @noinspection PhpUnnecessaryStopStatementInspection
+     */
+    public static function throw_new(...$throwableArgs)
+    {
+        $thePhp = Lib::php();
+
+        $throwableClass = $thePhp->static_throwable_class();
+
+        $trace = property_exists($throwableClass, 'trace')
+            ? debug_backtrace()
+            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $thePhp->throw_new_trace($trace, ...$throwableArgs);
+
+        return;
+    }
+
+
+    /**
+     * > регистрация функции на завершение процесса, позволяющей пропустить запуск, если завершить через одну из функций, указанных ниже
+     *
+     * @param callable $fn
+     */
+    public static function register_shutdown_function($fn) : void
+    {
+        Lib::php()->register_shutdown_function_unique($fn);
+    }
+
+    /**
+     * @param int|string $status
+     */
+    public static function die($status, ?bool $ignoreShutdownFunction = null)
+    {
+        Lib::php()->die($status, $ignoreShutdownFunction);
+    }
+
+    /**
+     * @param int|string $status
+     */
+    public static function exit($status, ?bool $ignoreShutdownFunction = null)
+    {
+        Lib::php()->exit($status, $ignoreShutdownFunction);
     }
 }

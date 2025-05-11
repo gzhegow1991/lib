@@ -10,6 +10,25 @@ use Gzhegow\Lib\Exception\Runtime\FilesystemException;
 
 class FsModule
 {
+    /**
+     * @var bool
+     */
+    protected $isShutdownFunctionRegisteredFopen = false;
+    /**
+     * @var array<int, resource>
+     */
+    protected $fopenFhh = [];
+
+    /**
+     * @var bool
+     */
+    protected $isShutdownFunctionRegisteredFlock = false;
+    /**
+     * @var array<int, array{ 0: resource, 1: string }>
+     */
+    protected $flockFhh = [];
+
+
     public function __construct()
     {
         if (! extension_loaded('fileinfo')) {
@@ -117,6 +136,30 @@ class FsModule
         return true;
     }
 
+    /**
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
+     */
+    public function type_freepath(
+        &$result, $value,
+        array $refs = []
+    ) : bool
+    {
+        $result = null;
+
+        if (! $this->type_path($_value, $value, $refs)) {
+            return false;
+        }
+
+        if (file_exists($_value)) {
+            return false;
+        }
+
+        $result = $_value;
+
+        return true;
+    }
+
 
     /**
      * @param string|null            $result
@@ -172,57 +215,6 @@ class FsModule
      * @param string|null            $result
      * @param array{ 0: array|null } $refs
      */
-    public function type_filepath(
-        &$result, $value,
-        ?bool $isAllowExists = null, ?bool $isAllowSymlink = null,
-        array $refs = []
-    ) : bool
-    {
-        $result = null;
-
-        $isAllowExists = $isAllowExists ?? true;
-        $isAllowSymlink = $isAllowSymlink ?? true;
-
-        if (! $this->type_path($_value, $value, $refs)) {
-            return false;
-        }
-
-        $exists = file_exists($_value);
-
-        if (! $isAllowExists) {
-            if ($exists) {
-                return false;
-            }
-
-            $result = $_value;
-
-            return true;
-        }
-
-        if ($exists) {
-            if (! is_file($_value)) {
-                return false;
-            }
-
-            if (! $isAllowSymlink) {
-                if (is_link($_value)) {
-                    return false;
-                }
-            }
-
-            $_value = realpath($_value);
-        }
-
-        $result = $_value;
-
-        return true;
-    }
-
-
-    /**
-     * @param string|null            $result
-     * @param array{ 0: array|null } $refs
-     */
     public function type_dirpath_realpath(
         &$result, $value,
         ?bool $isAllowSymlink = null,
@@ -256,6 +248,57 @@ class FsModule
         }
 
         return false;
+    }
+
+
+    /**
+     * @param string|null            $result
+     * @param array{ 0: array|null } $refs
+     */
+    public function type_filepath(
+        &$result, $value,
+        ?bool $isAllowExists = null, ?bool $isAllowSymlink = null,
+        array $refs = []
+    ) : bool
+    {
+        $result = null;
+
+        $isAllowExists = $isAllowExists ?? true;
+        $isAllowSymlink = $isAllowSymlink ?? true;
+
+        if (! $this->type_path($_value, $value, $refs)) {
+            return false;
+        }
+
+        $exists = file_exists($_value);
+
+        if (! $isAllowExists) {
+            if ($exists) {
+                return false;
+            }
+
+            $result = $_value;
+
+            return true;
+        }
+
+        if ($exists) {
+            if (! $isAllowSymlink) {
+                if (is_link($_value)) {
+                    return false;
+                }
+            }
+
+            if (! is_file($_value)) {
+                return false;
+            }
+
+            $_value = realpath($_value);
+        }
+
+        $result = $_value;
+
+        return true;
     }
 
     /**
@@ -782,6 +825,500 @@ class FsModule
         }
 
         return Lib::php()->path_or_absolute($path, $current, $separator, '.');
+    }
+
+
+    /**
+     * @return false|resource
+     */
+    public function fopen(
+        string $file, string $mode, ?int $waitTimeoutMs = 0,
+        ?bool $use_include_path = null, $context = null
+    )
+    {
+        $use_include_path = $use_include_path ?? false;
+
+        Lib::type($tt);
+
+        $tt->filepath($fileString, $file);
+
+        is_null($waitTimeoutMsInt = $waitTimeoutMs)
+        || $tt->numeric_int_non_negative($waitTimeoutMsInt, $waitTimeoutMs);
+
+        $waitTimeoutMt = null;
+        if (null === $waitTimeoutMsInt) {
+            $waitTimeoutMt = microtime(true) + ($waitTimeoutMsInt / 1000);
+        }
+
+        do {
+            $fh = (func_get_args() > 3)
+                ? @fopen($file, $mode, $use_include_path, $context)
+                : @fopen($file, $mode, $use_include_path);
+
+            $statusOpen = (false !== $fh);
+
+            if ($statusOpen) {
+                $this->fopenFhh[ (int) $fh ] = $fh;
+
+                $this->register_shutdown_function_fopen();
+
+                break;
+
+            } elseif (null !== $waitTimeoutMt) {
+                if (microtime(true) > $waitTimeoutMt) {
+                    break;
+                }
+            }
+
+            usleep(1000);
+        } while ( true );
+
+        return $fh;
+    }
+
+    /**
+     * @param resource $stream
+     *
+     * @return void
+     */
+    public function fclose($stream) : bool
+    {
+        unset($this->fopenFhh[ (int) $stream ]);
+
+        $status = fclose($stream);
+
+        return $status;
+    }
+
+    public function shutdown_function_fopen() : void
+    {
+        foreach ( $this->fopenFhh as $fh ) {
+            fclose($fh);
+        }
+
+        $this->fopenFhh = [];
+    }
+
+    protected function register_shutdown_function_fopen() : void
+    {
+        if (! $this->isShutdownFunctionRegisteredFopen) {
+            register_shutdown_function([ $this, 'shutdown_function_fopen' ]);
+
+            $this->isShutdownFunctionRegisteredFopen = true;
+        }
+    }
+
+
+    /**
+     * @return resource|bool
+     */
+    public function fopen_lock(
+        string $file,
+        ?string $modeOpen = null, ?int $modeLock = null,
+        ?int $waitTimeoutMs = 0,
+        array $fopenArgs = [],
+        array $flockArgs = []
+    )
+    {
+        Lib::type($tt, $tb);
+
+        $withWouldBlock = $tb->ref($refWouldBlock, 0, $flockArgs);
+
+        $tt->filepath($fileString, $file);
+
+        is_null($waitTimeoutMsInt = $waitTimeoutMs)
+        || $tt->numeric_int_non_negative($waitTimeoutMsInt, $waitTimeoutMs);
+
+        $waitTimeoutMt = null;
+        if (null === $waitTimeoutMsInt) {
+            $waitTimeoutMt = microtime(true) + ($waitTimeoutMsInt / 1000);
+        }
+
+        do {
+            $fh = @fopen($fileString, $modeOpen, ...$fopenArgs);
+            $statusOpen = (false !== $fh);
+
+            if ($statusOpen) {
+                $statusLock = $withWouldBlock
+                    ? @flock($fh, $modeLock, $refWouldBlock)
+                    : @flock($fh, $modeLock);
+            }
+
+            if ($statusOpen && $statusLock) {
+                $this->flockFhh[ (int) $fh ] = [ $fh, null ];
+
+                $this->register_shutdown_function_fopen_lock();
+
+                break;
+
+            } elseif (null !== $waitTimeoutMt) {
+                if (microtime(true) > $waitTimeoutMt) {
+                    if ($statusOpen) {
+                        fclose($fh);
+                    }
+
+                    break;
+                }
+            }
+
+            usleep(1000);
+        } while ( true );
+
+        return $fh;
+    }
+
+    /**
+     * @param resource $stream
+     *
+     * @return void
+     */
+    public function fclose_unlock($stream) : bool
+    {
+        unset($this->flockFhh[ (int) $stream ]);
+
+        $statusUnlock = flock($stream, LOCK_UN);
+
+        $statusClose = fclose($stream);
+
+        return $statusUnlock && $statusClose;
+    }
+
+    /**
+     * @return resource|bool
+     */
+    public function fopen_lock_tmpfile(
+        string $file,
+        ?string $modeOpen = null, ?int $modeLock = null,
+        ?int $waitTimeoutMs = 0,
+        array $fopenArgs = [],
+        array $flockArgs = []
+    )
+    {
+        Lib::type($tt, $tb);
+
+        $withWouldBlock = $tb->ref($refWouldBlock, 0, $flockArgs);
+
+        $tt->filepath($fileString, $file);
+
+        $waitTimeoutMt = null;
+        if (null !== $modeLock) {
+            is_null($waitTimeoutMsInt = $waitTimeoutMs)
+            || $tt->numeric_int_non_negative($waitTimeoutMsInt, $waitTimeoutMs);
+
+            if (null === $waitTimeoutMsInt) {
+                $waitTimeoutMt = microtime(true) + ($waitTimeoutMsInt / 1000);
+            }
+        }
+
+        do {
+            $fh = @fopen($fileString, $modeOpen, ...$fopenArgs);
+            $statusOpen = (false !== $fh);
+
+            if ($statusOpen) {
+                $statusLock = $withWouldBlock
+                    ? @flock($fh, $modeLock, $refWouldBlock)
+                    : @flock($fh, $modeLock);
+            }
+
+            if ($statusOpen && $statusLock) {
+                $this->flockFhh[ (int) $fh ] = [ $fh, $fileString ];
+
+                $this->register_shutdown_function_fopen_lock();
+
+                break;
+
+            } elseif (null !== $waitTimeoutMt) {
+                if (microtime(true) > $waitTimeoutMt) {
+                    if ($statusOpen) {
+                        fclose($fh);
+                    }
+
+                    break;
+                }
+            }
+
+            usleep(100000);
+        } while ( true );
+
+        return $fh;
+    }
+
+    /**
+     * @param resource $stream
+     *
+     * @return void
+     */
+    public function fclose_unlock_tmpfile($stream, string $filename) : bool
+    {
+        $isWindows = Lib::php()->is_windows();
+
+        unset($this->flockFhh[ (int) $stream ]);
+
+        if ($isWindows) {
+            $statusUnlock = flock($stream, LOCK_UN);
+            $statusClose = fclose($stream);
+            $statusUnlink = @unlink($filename);
+
+        } else {
+            $statusUnlink = @unlink($filename);
+            $statusUnlock = flock($stream, LOCK_UN);
+            $statusClose = fclose($stream);
+        }
+
+        return $statusUnlock && $statusClose && $statusUnlink;
+    }
+
+    public function shutdown_function_fopen_lock() : void
+    {
+        foreach ( $this->flockFhh as [ $fh, $file ] ) {
+            flock($fh, LOCK_UN);
+            fclose($fh);
+
+            if (null !== $file) {
+                @unlink($file);
+            }
+        }
+
+        $this->flockFhh = [];
+    }
+
+    protected function register_shutdown_function_fopen_lock() : void
+    {
+        if (! $this->isShutdownFunctionRegisteredFopen) {
+            register_shutdown_function([ $this, 'shutdown_function_fopen_lock' ]);
+
+            $this->isShutdownFunctionRegisteredFopen = true;
+        }
+    }
+
+
+    public function lpush(string $file, string $data, ?int $lockWaitTimeoutMs = 0, bool $throw = true) : bool
+    {
+        Lib::type($tt);
+
+        $tt->freepath($fileString, $file);
+        $tt->dirpath_realpath($var, dirname($fileString));
+
+        $fileIn = "{$file}.in";
+        $fileInLock = "{$file}.in.lock";
+
+        $fhInLock = $this->fopen_lock_tmpfile($fileInLock, 'w', LOCK_EX, $lockWaitTimeoutMs);
+        if (false === $fhInLock) {
+            if ($throw) {
+                throw new FilesystemException(
+                    [ 'Unable to ' . __METHOD__ . ' due to locking file with LOCK_EX is failed', $fileInLock ]
+                );
+            }
+
+            return false;
+        }
+
+        @fwrite($fhInLock, getmypid());
+
+        $line = base64_encode($data);
+
+        file_put_contents($fileIn, $line . PHP_EOL . file_get_contents($fileIn));
+
+        $this->fclose_unlock_tmpfile($fhInLock, $fileInLock);
+
+        return true;
+    }
+
+    public function rpush(string $file, string $data, ?int $lockWaitTimeoutMs = 0, bool $throw = true) : bool
+    {
+        Lib::type($tt);
+
+        $tt->freepath($fileString, $file);
+        $tt->dirpath_realpath($var, dirname($fileString));
+
+        $fileIn = "{$file}.in";
+        $fileInLock = "{$file}.in.lock";
+
+        $fhInLock = $this->fopen_lock_tmpfile($fileInLock, 'w', LOCK_EX, $lockWaitTimeoutMs);
+        if (false === $fhInLock) {
+            if ($throw) {
+                throw new FilesystemException(
+                    [ 'Unable to ' . __METHOD__ . ' due to locking file with LOCK_EX is failed', $fileInLock ]
+                );
+            }
+
+            return false;
+        }
+
+        @fwrite($fhInLock, getmypid());
+
+        $line = base64_encode($data);
+
+        file_put_contents($fileIn, $line . PHP_EOL, FILE_APPEND);
+
+        $this->fclose_unlock_tmpfile($fhInLock, $fileInLock);
+
+        return true;
+    }
+
+
+    public function lpop(string $file, ?int $blockTimeoutMs = 0, bool $throw = true) : ?string
+    {
+        Lib::type($tt);
+
+        $tt->freepath($fileString, $file);
+        $tt->dirpath_realpath($var, dirname($fileString));
+
+        is_null($blockTimeoutMsInt = $blockTimeoutMs)
+        || $tt->numeric_int_non_negative($blockTimeoutMsInt, $blockTimeoutMs);
+
+        $blockTimeoutMt = null;
+        if (null !== $blockTimeoutMsInt) {
+            $blockTimeoutMt = microtime(true) + ($blockTimeoutMsInt / 1000);
+        }
+
+        $fileIn = "{$file}.in";
+        $fileOut = "{$file}.lpop";
+        $fileOutLock = "{$file}.lpop.lock";
+
+        $fhOutLock = $this->fopen_lock_tmpfile($fileOutLock, 'w', LOCK_EX, $blockTimeoutMs);
+        if (false === $fhOutLock) {
+            if ($throw) {
+                throw new FilesystemException(
+                    [ 'Unable to ' . __METHOD__ . ' due to locking file with LOCK_EX is failed', $fileOutLock ]
+                );
+            }
+
+            return null;
+        }
+
+        @fwrite($fhOutLock, getmypid());
+
+        $data = null;
+
+        do {
+            if (microtime(true) > $blockTimeoutMt) {
+                break;
+            }
+
+            if (is_file($fileOut) && (filesize($fileOut) > 0)) {
+                $hOut = fopen($fileOut, 'c+');
+                if (false === $hOut) {
+                    continue;
+                }
+
+                $line = fgets($hOut);
+                $line = rtrim($line);
+                if ('' === $line) {
+                    continue;
+                }
+
+                $contentOut = stream_get_contents($hOut);
+
+                rewind($hOut);
+                ftruncate($hOut, 0);
+
+                fwrite($hOut, $contentOut);
+                fclose($hOut);
+
+                $data = base64_decode($line);
+
+                break;
+            }
+
+            if (is_file($fileIn) && (filesize($fileIn) > 0)) {
+                $lines = file($fileIn);
+
+                if (false !== $lines) {
+                    file_put_contents($fileOut, implode('', $lines), FILE_APPEND);
+                    file_put_contents($fileIn, '');
+                }
+            }
+
+            usleep(100000);
+        } while ( true );
+
+        $this->fclose_unlock_tmpfile($fhOutLock, $fileOutLock);
+
+        return $data;
+    }
+
+    public function rpop(string $file, ?int $blockTimeoutMs = 0, bool $throw = true) : ?string
+    {
+        Lib::type($tt);
+
+        $tt->freepath($fileString, $file);
+        $tt->dirpath_realpath($var, dirname($fileString));
+
+        $fileIn = "{$file}.in";
+        $fileOut = "{$file}.rpop";
+        $fileOutLock = "{$file}.rpop.lock";
+
+        is_null($blockTimeoutMsInt = $blockTimeoutMs)
+        || $tt->numeric_int_non_negative($blockTimeoutMsInt, $blockTimeoutMs);
+
+        $blockTimeoutMt = null;
+        if (null !== $blockTimeoutMsInt) {
+            $blockTimeoutMt = microtime(true) + ($blockTimeoutMsInt / 1000);
+        }
+
+        $fhOutLock = $this->fopen_lock_tmpfile($fileOutLock, 'w', LOCK_EX, $blockTimeoutMs);
+        if (false === $fhOutLock) {
+            if ($throw) {
+                throw new FilesystemException(
+                    [ 'Unable to ' . __METHOD__ . ' due to locking file with LOCK_EX is failed', $fileOutLock ]
+                );
+            }
+
+            return null;
+        }
+
+        @fwrite($fhOutLock, getmypid());
+
+        $data = null;
+
+        do {
+            if (microtime(true) > $blockTimeoutMt) {
+                break;
+            }
+
+            if (is_file($fileOut) && (filesize($fileOut) > 0)) {
+                $hOut = fopen($fileOut, 'c+');
+                if (false === $hOut) {
+                    continue;
+                }
+
+                $line = fgets($hOut);
+                $line = rtrim($line);
+                if ('' === $line) {
+                    continue;
+                }
+
+                $contentOut = stream_get_contents($hOut);
+
+                rewind($hOut);
+                ftruncate($hOut, 0);
+
+                fwrite($hOut, $contentOut);
+                fclose($hOut);
+
+                $data = base64_decode($line);
+
+                break;
+            }
+
+            if (is_file($fileIn) && (filesize($fileIn) > 0)) {
+                $lines = file($fileIn);
+
+                if (false !== $lines) {
+                    $lines = array_reverse($lines);
+
+                    file_put_contents($fileOut, implode('', $lines), FILE_APPEND);
+                    file_put_contents($fileIn, '');
+                }
+            }
+
+            usleep(100000);
+        } while ( true );
+
+        $this->fclose_unlock_tmpfile($fhOutLock, $fileOutLock);
+
+        return $data;
     }
 
 

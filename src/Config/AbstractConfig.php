@@ -140,7 +140,7 @@ abstract class AbstractConfig implements
 
             $fnBound = $fn->bindTo($this, $this);
 
-            $fnBound($this, $context);
+            call_user_func($fnBound, $this, $context);
         }
 
         $this->validate($context);
@@ -199,9 +199,9 @@ abstract class AbstractConfig implements
             $value = $config[ $key ];
 
             if (isset($this->__children[ $key ])) {
-                $theClass = get_class($this->__children[ $key ]);
+                $configClass = get_class($this->__children[ $key ]);
 
-                $instance = new $theClass();
+                $instance = new $configClass();
                 $instance->load($value);
 
                 $value = $instance;

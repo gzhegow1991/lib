@@ -572,7 +572,7 @@ class CallableParser implements CallableParserInterface
             return false;
         }
 
-        $status = $this->typeCallableStringFunction($function, $value, $newScope);
+        $status = $this->typeCallableStringFunction($function, $value);
         if ($status) {
             $result = $function;
 

@@ -219,6 +219,9 @@ class DefaultEmailParser implements EmailParserInterface
         return [ $emailString, $emailDomain, $emailName ];
     }
 
+    /**
+     * @noinspection PhpDeprecationInspection
+     */
     protected function parseEmailFilters(
         string $email, string $emailDomain, string $emailName,
         array $filters

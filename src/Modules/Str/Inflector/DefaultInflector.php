@@ -76,7 +76,7 @@ class DefaultInflector implements InflectorInterface
             'composer require doctrine/inflector',
         ];
 
-        if (! class_exists($doctrineInflector = static::DOCTRINE_INFLECTOR)) {
+        if (! class_exists($doctrineInflectorClass = static::DOCTRINE_INFLECTOR)) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -84,18 +84,18 @@ class DefaultInflector implements InflectorInterface
             ]);
         }
 
-        $cachedWordInflector = '\Doctrine\Inflector\CachedWordInflector';
-        $rulesetInflector = '\Doctrine\Inflector\RulesetInflector';
+        $cachedWordInflectorClass = '\Doctrine\Inflector\CachedWordInflector';
+        $rulesetInflectorClass = '\Doctrine\Inflector\RulesetInflector';
         $englishRules = '\Doctrine\Inflector\Rules\English\Rules';
 
-        return new $doctrineInflector(
-            new $cachedWordInflector(
-                new $rulesetInflector(
+        return new $doctrineInflectorClass(
+            new $cachedWordInflectorClass(
+                new $rulesetInflectorClass(
                     $englishRules::{'getSingularRuleset'}()
                 )
             ),
-            new $cachedWordInflector(
-                new $rulesetInflector(
+            new $cachedWordInflectorClass(
+                new $rulesetInflectorClass(
                     $englishRules::{'getPluralRuleset'}()
                 )
             )
@@ -146,7 +146,7 @@ class DefaultInflector implements InflectorInterface
             'composer require symfony/translation-contracts',
         ];
 
-        if (! class_exists($class = static::SYMFONY_INFLECTOR_ENGLISH_INFLECTOR)) {
+        if (! class_exists($symfonyInflectorClass = static::SYMFONY_INFLECTOR_ENGLISH_INFLECTOR)) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -154,7 +154,7 @@ class DefaultInflector implements InflectorInterface
             ]);
         }
 
-        return new $class();
+        return new $symfonyInflectorClass();
     }
 
     /**

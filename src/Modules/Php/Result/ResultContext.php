@@ -34,11 +34,11 @@ class ResultContext
     /**
      * @var int
      */
-    protected $modeReturn = self::MODE_RETURN_VALUE;
+    public $modeReturn = self::MODE_RETURN_VALUE;
     /**
      * @var int
      */
-    protected $modeThrow = self::MODE_THROW_ON;
+    public $modeThrow = self::MODE_THROW_ON;
 
     /**
      * @var array{ 0?: mixed }
@@ -99,17 +99,6 @@ class ResultContext
         }
 
         return $this;
-    }
-
-
-    public function isModeReturn(int $modeReturn) : bool
-    {
-        return $this->modeReturn === $modeReturn;
-    }
-
-    public function isModeThrow(int $modeThrow) : bool
-    {
-        return $this->modeThrow === $modeThrow;
     }
 
 

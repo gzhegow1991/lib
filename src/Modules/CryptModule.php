@@ -158,6 +158,9 @@ class CryptModule
     }
 
 
+    /**
+     * @noinspection PhpMethodParametersCountMismatchInspection
+     */
     public function hash(
         string $algo,
         string $datastring,
@@ -166,8 +169,6 @@ class CryptModule
     ) : string
     {
         $isModeBinary = $isModeBinary ?? false;
-
-        $result = null;
 
         $result = (PHP_VERSION_ID >= 80100)
             ? hash($algo, $datastring, $isModeBinary, $options)
@@ -468,6 +469,9 @@ class CryptModule
     }
 
 
+    /**
+     * @noinspection PhpLoopCanBeReplacedWithImplodeInspection
+     */
     public function base64_encode(string $string) : string
     {
         $gen = $this->base64_encode_it($string);
@@ -480,6 +484,9 @@ class CryptModule
         return $result;
     }
 
+    /**
+     * @noinspection PhpLoopCanBeReplacedWithImplodeInspection
+     */
     public function base64_decode(string $base64String) : string
     {
         $gen = $this->base64_decode_it($base64String);
@@ -520,6 +527,9 @@ class CryptModule
     }
 
 
+    /**
+     * @noinspection PhpLoopCanBeReplacedWithImplodeInspection
+     */
     public function base64_encode_urlsafe(string $string) : string
     {
         $gen = $this->base64_encode_urlsafe_it($string);
@@ -532,6 +542,9 @@ class CryptModule
         return $result;
     }
 
+    /**
+     * @noinspection PhpLoopCanBeReplacedWithImplodeInspection
+     */
     public function base64_decode_urlsafe(string $base64UrlSafeString) : string
     {
         $gen = $this->base64_decode_urlsafe_it($base64UrlSafeString);
@@ -792,6 +805,8 @@ class CryptModule
      * > это очень похоже на перевод в другую систему счисления, только чтение бит происходит LTR (при кодировании числа же - RTL)
      * > это быстрее и не требует окончания потока
      * > это менее безопасно, т.к. каждый байт можно подменить и итоговая фраза раскодируется обратно без ошибок
+     *
+     * @noinspection PhpLoopCanBeReplacedWithImplodeInspection
      */
     public function bin2base($binaries, $alphabetTo) : string
     {

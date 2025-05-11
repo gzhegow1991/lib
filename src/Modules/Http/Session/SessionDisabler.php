@@ -2,45 +2,12 @@
 
 namespace Gzhegow\Lib\Modules\Http\Session;
 
-use Gzhegow\Lib\Modules\HttpModule;
-use Gzhegow\Lib\Exception\RuntimeException;
-
-
-class SessionDisabler implements \ArrayAccess, \Countable
+class SessionDisabler
 {
-    public function offsetExists($offset) : bool
+    public static function new()
     {
-        /** @see HttpModule::static_session() */
-
-        throw new RuntimeException('Native $_SESSION is disabled');
-    }
-
-    public function offsetGet($offset) : mixed
-    {
-        /** @see HttpModule::static_session() */
-
-        throw new RuntimeException('Native $_SESSION is disabled');
-    }
-
-    public function offsetSet($offset, $value) : void
-    {
-        /** @see HttpModule::static_session() */
-
-        throw new RuntimeException('Native $_SESSION is disabled');
-    }
-
-    public function offsetUnset($offset) : void
-    {
-        /** @see HttpModule::static_session() */
-
-        throw new RuntimeException('Native $_SESSION is disabled');
-    }
-
-
-    public function count() : int
-    {
-        /** @see HttpModule::static_session() */
-
-        throw new RuntimeException('Native $_SESSION is disabled');
+        return (PHP_VERSION_ID >= 80000)
+            ? new \Gzhegow\Lib\Modules\Http\Session\PHP8\SessionDisabler()
+            : new \Gzhegow\Lib\Modules\Http\Session\PHP7\SessionDisabler();
     }
 }

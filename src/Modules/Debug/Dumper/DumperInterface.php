@@ -18,38 +18,15 @@ interface DumperInterface
     public function print(...$vars) : string;
 
 
-    /**
-     * @return mixed
-     */
-    public function dump($var, ...$vars);
+    public function dd(?array $trace, ...$vars) : void;
 
     /**
      * @return mixed
      */
-    public function d($var, ...$vars);
-
-    public function dd(...$vars) : void;
+    public function d(?array $trace, $var, ...$vars);
 
     /**
      * @return mixed|void
      */
-    public function ddd(?int $limit, $var, ...$vars);
-
-
-    /**
-     * @return mixed
-     */
-    public function dumpTrace(?array $trace, $var, ...$vars);
-
-    /**
-     * @return mixed
-     */
-    public function dTrace(?array $trace, $var, ...$vars);
-
-    public function ddTrace(?array $trace, ...$vars) : void;
-
-    /**
-     * @return mixed|void
-     */
-    public function dddTrace(?array $trace, ?int $limit, $var, ...$vars);
+    public function ddd(?array $trace, ?int $limit, $var, ...$vars);
 }

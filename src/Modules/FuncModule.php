@@ -392,4 +392,38 @@ class FuncModule
 
         return $result;
     }
+
+
+    /**
+     * @param callable $fn
+     */
+    public function throttle(int $throttleMs, $fn) : \Closure
+    {
+        if ($throttleMs <= 0) {
+            throw new LogicException(
+                [ 'The `delayMs` should be positive integer', $throttleMs ]
+            );
+        }
+
+        $lastCall = 0;
+
+        $throttleSeconds = ($throttleMs / 1000);
+
+        return static function (...$args) use (
+            &$lastCall,
+            $throttleSeconds, $fn
+        ) : array {
+            $now = microtime(true);
+
+            if (($now - $lastCall) >= $throttleSeconds) {
+                $lastCall = $now;
+
+                $result = call_user_func_array($fn, $args);
+
+                return [ $result ];
+            }
+
+            return [];
+        };
+    }
 }

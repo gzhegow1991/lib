@@ -29,7 +29,7 @@ class SubnetV6
      */
     public static function fromValid($from, $ctx = null)
     {
-        $ctxCur = Result::nullchain();
+        $ctxCur = Result::parse();
 
         $instance = null
             ?? static::fromStatic($from, $ctxCur)

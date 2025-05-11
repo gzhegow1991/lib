@@ -682,7 +682,7 @@ class DateModule
 
         $dateTime = null;
 
-        $timezoneNil = Lib::type()->the_timezone_nil();
+        $timezoneNil = Lib::php()->the_timezone_nil();
 
         if ($datestring instanceof \DateTimeInterface) {
             $dateTime = $datestring;
@@ -738,7 +738,7 @@ class DateModule
 
         $dateTime = null;
 
-        $timezoneNil = Lib::type()->the_timezone_nil();
+        $timezoneNil = Lib::php()->the_timezone_nil();
 
         if ($datestring instanceof \DateTimeInterface) {
             $dateTime = $datestring;
@@ -794,7 +794,7 @@ class DateModule
 
         $dateTimeImmutable = null;
 
-        $timezoneNil = Lib::type()->the_timezone_nil();
+        $timezoneNil = Lib::php()->the_timezone_nil();
 
         if ($datestring instanceof \DateTimeInterface) {
             $dateTimeImmutable = $datestring;
@@ -851,7 +851,7 @@ class DateModule
 
         $dateTime = null;
 
-        $timezoneNil = Lib::type()->the_timezone_nil();
+        $timezoneNil = Lib::php()->the_timezone_nil();
 
         if ($dateFormatted instanceof \DateTimeInterface) {
             $dateTime = $dateFormatted;
@@ -930,7 +930,7 @@ class DateModule
 
         $dateTime = null;
 
-        $timezoneNil = Lib::type()->the_timezone_nil();
+        $timezoneNil = Lib::php()->the_timezone_nil();
 
         if ($dateFormatted instanceof \DateTimeInterface) {
             $dateTime = $dateFormatted;
@@ -1009,7 +1009,7 @@ class DateModule
 
         $dateTimeImmutable = null;
 
-        $timezoneNil = Lib::type()->the_timezone_nil();
+        $timezoneNil = Lib::php()->the_timezone_nil();
 
         if ($dateFormatted instanceof \DateTimeInterface) {
             $dateTimeImmutable = $dateFormatted;

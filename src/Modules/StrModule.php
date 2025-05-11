@@ -184,45 +184,139 @@ class StrModule
     /**
      * @param string|null $result
      */
+    public function type_a_string(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (is_string($value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_a_string_empty(&$result, $value) : bool
+    {
+        $result = null;
+
+        if ('' === $value) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_a_string_not_empty(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (is_string($value) && ('' !== $value)) {
+            $result = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_a_trim(&$result, $value, ?string $characters = null) : bool
+    {
+        $result = null;
+
+        $characters = $characters ?? " \n\r\t\v\0";
+
+        if (! is_string($value)) {
+            return false;
+        }
+
+        $_value = trim($value, $characters);
+
+        if ('' !== $_value) {
+            $result = $_value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param string|null $result
+     */
     public function type_string(&$result, $value) : bool
     {
         $result = null;
 
         if (is_string($value)) {
-            $_value = $value;
+            $result = $value;
 
-        } else {
-            if (
-                (null === $value)
-                // || ('' === $value)
-                || (is_bool($value))
-                || (is_array($value))
-                || (is_float($value) && (! is_finite($value)))
-                || (is_resource($value) || ('resource (closed)' === gettype($value)))
-                || (Lib::type()->is_nil($value))
-            ) {
-                // > NULL is equal EMPTY STRING but cannot be casted to
-                // > BOOLEAN is not string
-                // > NAN, INF, -INF is not string
-                // > ARRAY is not string
-                // > RESOURCE is not string
-                // > CLOSED RESOURCE is not string
-                // > NIL is not string
+            return true;
+        }
 
-                return false;
-            }
+        if (
+            (null === $value)
+            // || ('' === $value)
+            || (is_bool($value))
+            || (is_array($value))
+            || (is_float($value) && (! is_finite($value)))
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
+            || (Lib::type()->a_nil($var, $value))
+        ) {
+            // > NULL is equal EMPTY STRING but cannot be casted to
+            // > BOOLEAN is not string
+            // > NAN, INF, -INF is not string
+            // > ARRAY is not string
+            // > RESOURCE is not string
+            // > CLOSED RESOURCE is not string
+            // > NIL is not string
 
-            try {
-                $_value = (string) $value;
-            }
-            catch ( \Throwable $e ) {
-                return false;
-            }
+            return false;
+        }
+
+        try {
+            $_value = (string) $value;
+        }
+        catch ( \Throwable $e ) {
+            return false;
         }
 
         $result = $_value;
 
         return true;
+    }
+
+    /**
+     * @param string|null $result
+     */
+    public function type_string_empty(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (! $this->type_string($_value, $value)) {
+            return false;
+        }
+
+        if ('' === $_value) {
+            $result = '';
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -236,13 +330,13 @@ class StrModule
             return false;
         }
 
-        if ('' === $_value) {
-            return false;
+        if ('' !== $_value) {
+            $result = $_value;
+
+            return true;
         }
 
-        $result = $_value;
-
-        return true;
+        return false;
     }
 
     /**

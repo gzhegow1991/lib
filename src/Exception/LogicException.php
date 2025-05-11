@@ -40,6 +40,9 @@ class LogicException extends \LogicException implements
      */
     public function getIterator() : \Traversable
     {
-        return Lib::php()->get_throwable_previous_iterator($this);
+        return Lib::debug()
+            ->throwableManager()
+            ->getPreviousTrackIterator($this)
+        ;
     }
 }
