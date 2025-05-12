@@ -4,13 +4,40 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Modules\Func\Pipe\Pipe;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Modules\Func\Invoker\DefaultInvoker;
+use Gzhegow\Lib\Modules\Func\Invoker\InvokerInterface;
 
 
 class FuncModule
 {
-    public function pipe(?Pipe &$p = null) : Pipe
+    /**
+     * @var InvokerInterface
+     */
+    protected $invoker;
+
+
+    public function newInvoker() : InvokerInterface
     {
-        return $p = new Pipe();
+        return new DefaultInvoker();
+    }
+
+    public function cloneInvoker() : InvokerInterface
+    {
+        return clone $this->invoker();
+    }
+
+    public function invoker(?InvokerInterface $invoker = null) : InvokerInterface
+    {
+        return $this->invoker = null
+            ?? $invoker
+            ?? $this->invoker
+            ?? new DefaultInvoker();
+    }
+
+
+    public function pipe() : Pipe
+    {
+        return new Pipe();
     }
 
 
@@ -175,29 +202,6 @@ class FuncModule
     }
 
     /**
-     * > совмещает аргументы по числовым индексам, заполняет недостающие NULL
-     *
-     * @param callable $fn
-     */
-    public function func_not($fn, array $args = [], $newThis = null, $newScope = null) : \Closure
-    {
-        $hasNewThis = (null !== $newThis);
-        $hasNewScope = (null !== $newScope);
-
-        if ($hasNewThis || $hasNewScope) {
-            $fn = \Closure::bind($fn, $newThis, $newScope);
-        }
-
-        [ $fnArgs ] = $this->func_args_unique($args);
-
-        return function (...$arguments) use ($fn, $fnArgs) {
-            $total = $arguments + $fnArgs;
-
-            return ! call_user_func_array($fn, $total);
-        };
-    }
-
-    /**
      * > добавляет аргументы в начало, заполняет недостающие NULL
      *
      * @param callable $fn
@@ -217,29 +221,6 @@ class FuncModule
             $total = array_merge($fnIArgs, $arguments) + $fnArgs;
 
             return call_user_func_array($fn, $total);
-        };
-    }
-
-    /**
-     * > добавляет аргументы в начало, заполняет недостающие NULL
-     *
-     * @param callable $fn
-     */
-    public function bind_not($fn, array $args = [], $newThis = null, $newScope = null) : \Closure
-    {
-        $hasNewThis = (null !== $newThis);
-        $hasNewScope = (null !== $newScope);
-
-        if ($hasNewThis || $hasNewScope) {
-            $fn = \Closure::bind($fn, $newThis, $newScope);
-        }
-
-        [ $fnArgs, $fnIArgs ] = $this->func_args_unique($args);
-
-        return function (...$arguments) use ($fn, $fnArgs, $fnIArgs) {
-            $total = array_merge($fnIArgs, $arguments) + $fnArgs;
-
-            return ! call_user_func_array($fn, $total);
         };
     }
 

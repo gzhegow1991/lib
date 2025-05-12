@@ -43,10 +43,8 @@ class FormatModule
     /**
      * @return int|float
      */
-    protected function _bytes_decode(string $size, ?int $precision = null)
+    protected function _bytes_decode(string $size)
     {
-        $precision = $precision ?? 3;
-
         if ('' === $size) {
             throw new LogicException(
                 [ 'The `size` should be non-empty string', $size ]
@@ -104,9 +102,7 @@ class FormatModule
             );
         }
 
-        $bytesInt = (int) $bytesCeil;
-
-        return $bytesInt;
+        return $bytesCeil;
     }
 
 

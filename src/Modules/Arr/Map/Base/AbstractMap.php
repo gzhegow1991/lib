@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules\Arr\Map\Base;
 
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Php\Interfaces\CanIsSameInterface;
 
 
 abstract class AbstractMap
@@ -39,7 +40,10 @@ abstract class AbstractMap
      * @var array
      */
     protected $keysComplex = [];
-
+    /**
+     * @var CanIsSameInterface[]
+     */
+    protected $keysComplexSame = [];
 
 
     public function __serialize() : array
@@ -60,13 +64,14 @@ abstract class AbstractMap
         $keys = [];
 
         $refs = [
-            '' => &$this->keysNative,
-            0  => &$this->keysObject,
-            1  => &$this->keysComplex,
+            1 => &$this->keysNative,
+            2 => &$this->keysObject,
+            3 => &$this->keysComplex,
+            4 => &$this->keysComplexSame,
         ];
 
         foreach ( $this->keysQueue as $keyPos => $keyPosType ) {
-            $keys[] = $refs[ $keyPosType ?? '' ][ $keyPos ];
+            $keys[] = $refs[ $keyPosType ][ $keyPos ];
         }
 
         return $keys;
@@ -113,21 +118,6 @@ abstract class AbstractMap
         return $this->values[ $keyPos ];
     }
 
-
-    /**
-     * @return int|string
-     */
-    public function put($value)
-    {
-        $this->values[] = $value;
-
-        end($this->values);
-        $keyValue = key($this->values);
-
-        $this->set($keyValue, $value);
-
-        return $keyValue;
-    }
 
     /**
      * @return static
@@ -183,6 +173,22 @@ abstract class AbstractMap
         return $this;
     }
 
+    /**
+     * @param int|string $keyValue
+     *
+     * @return static
+     */
+    public function push($value, &$keyValue = null)
+    {
+        $this->values[] = $value;
+
+        $keyValue = array_key_last($this->values);
+
+        $this->set($keyValue, $value);
+
+        return $this;
+    }
+
     protected function setKey(array $key, $keyValue) : int
     {
         [ $keyPos, $keyPosType, $keyPosIndex ] = $key;
@@ -196,16 +202,19 @@ abstract class AbstractMap
 
         $this->keysQueue[ $keyPos ] = $keyPosType;
 
-        if (null === $keyPosType) {
+        if (1 === $keyPosType) {
             $this->keysNative[ $keyPos ] = $keyValue;
             $this->keysNativeIndex[ $keyPosIndex ] = $keyPos;
 
-        } elseif (0 === $keyPosType) {
+        } elseif (2 === $keyPosType) {
             $this->keysObject[ $keyPos ] = $keyValue;
             $this->keysObjectIndex[ $keyPosIndex ] = $keyPos;
 
-        } elseif (1 === $keyPosType) {
+        } elseif (3 === $keyPosType) {
             $this->keysComplex[ $keyPos ] = $keyValue;
+
+        } elseif (4 === $keyPosType) {
+            $this->keysComplexSame[ $keyPos ] = $keyValue;
         }
 
         return $keyPos;
@@ -252,16 +261,19 @@ abstract class AbstractMap
 
         unset($this->keysQueue[ $keyPos ]);
 
-        if (null === $keyPosType) {
+        if (1 === $keyPosType) {
             unset($this->keysNative[ $keyPos ]);
             unset($this->keysNativeIndex[ $keyPosIndex ]);
 
-        } elseif (0 === $keyPosType) {
+        } elseif (2 === $keyPosType) {
             unset($this->keysObject[ $keyPos ]);
             unset($this->keysObjectIndex[ $keyPosIndex ]);
 
-        } elseif (1 === $keyPosType) {
+        } elseif (3 === $keyPosType) {
             unset($this->keysComplex[ $keyPos ]);
+
+        } elseif (4 === $keyPosType) {
+            unset($this->keysComplexSame[ $keyPos ]);
         }
 
         return $this;
@@ -273,24 +285,32 @@ abstract class AbstractMap
      */
     protected function newKey($keyValue) : ?array
     {
+        $keyPos = null;
+
         if (null === $keyValue) {
-            $keyPosType = null;
+            $keyPosType = 1;
             $keyPosIndex = '';
 
-        } elseif (is_object($keyValue)) {
-            $keyPosType = 0;
-            $keyPosIndex = spl_object_id($keyValue);
-
         } elseif (is_scalar($keyValue)) {
-            $keyPosType = null;
+            $keyPosType = 1;
             $keyPosIndex = (string) $keyValue;
 
+        } elseif (is_object($keyValue)) {
+            if ($keyValue instanceof CanIsSameInterface) {
+                $keyPosType = 4;
+                $keyPosIndex = null;
+
+            } else {
+                $keyPosType = 2;
+                $keyPosIndex = spl_object_id($keyValue);
+            }
+
         } else {
-            $keyPosType = 1;
+            $keyPosType = 3;
             $keyPosIndex = null;
         }
 
-        return [ null, $keyPosType, $keyPosIndex ];
+        return [ $keyPos, $keyPosType, $keyPosIndex ];
     }
 
     /**
@@ -299,23 +319,37 @@ abstract class AbstractMap
     protected function existsKey($keyValue) : ?array
     {
         if (null === $keyValue) {
-            $keyPosType = null;
             $keyPosIndex = '';
+            $keyPosType = 1;
             $keyPos = $this->keysNativeIndex[ $keyPosIndex ] ?? false;
-
-        } elseif (is_object($keyValue)) {
-            $keyPosIndex = spl_object_id($keyValue);
-            $keyPosType = 0;
-            $keyPos = $this->keysObjectIndex[ $keyPosIndex ] ?? false;
 
         } elseif (is_scalar($keyValue)) {
             $keyPosIndex = (string) $keyValue;
-            $keyPosType = null;
+            $keyPosType = 1;
             $keyPos = $this->keysNativeIndex[ $keyPosIndex ] ?? false;
+
+        } elseif (is_object($keyValue)) {
+            if ($keyValue instanceof CanIsSameInterface) {
+                $keyPosIndex = null;
+                $keyPosType = 4;
+                $keyPos = null;
+                foreach ( $this->keysComplexSame as $i => $key ) {
+                    if ($key->isSame($keyValue)) {
+                        $keyPos = $i;
+
+                        break;
+                    }
+                }
+
+            } else {
+                $keyPosIndex = spl_object_id($keyValue);
+                $keyPosType = 2;
+                $keyPos = $this->keysObjectIndex[ $keyPosIndex ] ?? false;
+            }
 
         } else {
             $keyPosIndex = null;
-            $keyPosType = 1;
+            $keyPosType = 3;
             $keyPos = array_search($keyValue, $this->keysComplex, true);
         }
 

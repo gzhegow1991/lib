@@ -427,7 +427,7 @@ class DebugBacktracer implements DebugBacktracerInterface
      *     args: array|null,
      * }>
      */
-    public function get() : array
+    public function fetchTrace() : array
     {
         $trace = $this->execute();
 
@@ -437,7 +437,7 @@ class DebugBacktracer implements DebugBacktracerInterface
     /**
      * @return array{ 0: string, 1: int }|null
      */
-    public function getFileLine() : ?array
+    public function fetchFileLine() : ?array
     {
         $trace = $this->execute();
 
@@ -542,7 +542,7 @@ class DebugBacktracer implements DebugBacktracerInterface
                 $hasOfStartsWith = false;
             }
 
-            if ($filter) {
+            if ($hasFilter) {
                 $hasObject = ([] !== $filter[ 'object' ]);
 
                 if ($hasObject
@@ -585,7 +585,7 @@ class DebugBacktracer implements DebugBacktracerInterface
                 }
             }
 
-            if ($filterStartsWith) {
+            if ($hasFilterStartsWith) {
                 $keys = [
                     'file',
                     'class',
@@ -614,7 +614,7 @@ class DebugBacktracer implements DebugBacktracerInterface
                 }
             }
 
-            if ($filterNot) {
+            if ($hasFilterNot) {
                 $hasObject = ([] !== $filterNot[ 'object' ]);
 
                 if ($hasObject
@@ -650,7 +650,7 @@ class DebugBacktracer implements DebugBacktracerInterface
                 }
             }
 
-            if ($filterNotStartsWith) {
+            if ($hasFilterNotStartsWith) {
                 $keys = [
                     'file',
                     'class',

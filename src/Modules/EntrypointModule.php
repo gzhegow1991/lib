@@ -3,7 +3,9 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Arr\Map\Map;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Modules\Arr\Map\Base\AbstractMap;
 
 
 class EntrypointModule
@@ -14,10 +16,6 @@ class EntrypointModule
     protected $dirRoot;
 
     /**
-     * @var int
-     */
-    protected $errorReporting;
-    /**
      * @var string
      */
     protected $memoryLimit = '32M';
@@ -25,6 +23,12 @@ class EntrypointModule
      * @var int
      */
     protected $timeLimit = 30;
+
+    /**
+     * @var int
+     */
+    protected $errorReporting;
+
     /**
      * @var callable|null
      */
@@ -34,6 +38,15 @@ class EntrypointModule
      */
     protected $fnExceptionHandler;
 
+    /**
+     * @var bool
+     */
+    protected $signalIgnoreShutdownFunction = false;
+    /**
+     * @var AbstractMap
+     */
+    protected $registerShutdownFunctionMap;
+
 
     public function __construct()
     {
@@ -41,6 +54,8 @@ class EntrypointModule
 
         $this->fnErrorHandler = [ $this, 'fnErrorHandler' ];
         $this->fnExceptionHandler = [ $this, 'fnExceptionHandler' ];
+
+        $this->registerShutdownFunctionMap = Map::new();
     }
 
 
@@ -63,52 +78,6 @@ class EntrypointModule
         }
 
         $this->dirRoot = $realpath ?? null;
-
-        return $this;
-    }
-
-
-    /**
-     * @return int|null
-     */
-    public function getPhpErrorReporting()
-    {
-        $errorReporting = error_reporting();
-
-        return $errorReporting;
-    }
-
-    /**
-     * @return static
-     */
-    public function setErrorReporting(?int $errorReporting = -1)
-    {
-        if (null !== $errorReporting) {
-            if (-1 === $errorReporting) {
-                $errorReporting = (E_ALL | E_STRICT | E_DEPRECATED | E_USER_DEPRECATED);
-
-            } elseif (($errorReporting & ~(E_ALL | E_STRICT | E_DEPRECATED | E_USER_DEPRECATED)) !== 0) {
-                throw new LogicException(
-                    [ 'The `errorReporting` should be valid error_reporting flag', $errorReporting ]
-                );
-            }
-        }
-
-        $this->errorReporting = $errorReporting;
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useErrorReporting(&$last = null)
-    {
-        if (null === $this->errorReporting) {
-            return $this;
-        }
-
-        $last = error_reporting($this->errorReporting);
 
         return $this;
     }
@@ -178,6 +147,52 @@ class EntrypointModule
 
         $last = ini_set('max_execution_time', $this->timeLimit);
         set_time_limit($this->timeLimit);
+
+        return $this;
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getPhpErrorReporting()
+    {
+        $errorReporting = error_reporting();
+
+        return $errorReporting;
+    }
+
+    /**
+     * @return static
+     */
+    public function setErrorReporting(?int $errorReporting = -1)
+    {
+        if (null !== $errorReporting) {
+            if (-1 === $errorReporting) {
+                $errorReporting = (E_ALL | E_STRICT | E_DEPRECATED | E_USER_DEPRECATED);
+
+            } elseif (($errorReporting & ~(E_ALL | E_STRICT | E_DEPRECATED | E_USER_DEPRECATED)) !== 0) {
+                throw new LogicException(
+                    [ 'The `errorReporting` should be valid error_reporting flag', $errorReporting ]
+                );
+            }
+        }
+
+        $this->errorReporting = $errorReporting;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useErrorReporting(&$last = null)
+    {
+        if (null === $this->errorReporting) {
+            return $this;
+        }
+
+        $last = error_reporting($this->errorReporting);
 
         return $this;
     }
@@ -359,5 +374,52 @@ class EntrypointModule
         }
 
         exit(1);
+    }
+
+
+    /**
+     * @param int|string $status
+     */
+    public function die($status, ?bool $ignoreShutdownFunction = null)
+    {
+        $status = $status ?? '';
+        $ignoreShutdownFunction = $ignoreShutdownFunction ?? true;
+
+        $this->signalIgnoreShutdownFunction = $ignoreShutdownFunction;
+
+        die($status);
+    }
+
+    /**
+     * @param int|string $status
+     */
+    public function exit($status, ?bool $ignoreShutdownFunction = null)
+    {
+        $status = $status ?? '';
+        $ignoreShutdownFunction = $ignoreShutdownFunction ?? true;
+
+        $this->signalIgnoreShutdownFunction = $ignoreShutdownFunction;
+
+        exit($status);
+    }
+
+    /**
+     * > проверяет наличие функции в списке перед тем, как ее регистрировать, если регистрация функций происходит в цикле
+     *
+     * @param callable $fn
+     */
+    public function registerShutdownFunction($fn) : void
+    {
+        if (! $this->registerShutdownFunctionMap->exists($fn)) {
+            $this->registerShutdownFunctionMap->add($fn, true);
+
+            $fnWithSignal = function () use ($fn) {
+                if ($this->signalIgnoreShutdownFunction) return;
+
+                call_user_func($fn);
+            };
+
+            register_shutdown_function($fnWithSignal);
+        }
     }
 }

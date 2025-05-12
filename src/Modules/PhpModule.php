@@ -4,11 +4,9 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Php\Nil;
-use Gzhegow\Lib\Modules\Arr\Map\Map;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
-use Gzhegow\Lib\Modules\Arr\Map\Base\AbstractMap;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToBoolInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
@@ -16,8 +14,8 @@ use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToObjectInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
-use Gzhegow\Lib\Modules\Php\CallableParser\CallableParser;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIterableInterface;
+use Gzhegow\Lib\Modules\Php\CallableParser\DefaultCallableParser;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
 
@@ -33,25 +31,10 @@ class PhpModule
      */
     protected $throwableClass = RuntimeException::class;
 
-    /**
-     * @var bool
-     */
-    protected $signalIgnoreShutdownFunction = false;
-    /**
-     * @var AbstractMap
-     */
-    protected $registerShutdownFunctionMap;
-
-
-    public function __construct()
-    {
-        $this->registerShutdownFunctionMap = Map::new();
-    }
-
 
     public function newCallableParser() : CallableParserInterface
     {
-        return new CallableParser();
+        return new DefaultCallableParser();
     }
 
     public function cloneCallableParser() : CallableParserInterface
@@ -64,7 +47,7 @@ class PhpModule
         return $this->callableParser = null
             ?? $callableParser
             ?? $this->callableParser
-            ?? new CallableParser();
+            ?? new DefaultCallableParser();
     }
 
 
@@ -2408,52 +2391,5 @@ class PhpModule
         }
 
         return;
-    }
-
-
-    /**
-     * @param int|string $status
-     */
-    public function die($status, ?bool $ignoreShutdownFunction = null)
-    {
-        $status = $status ?? '';
-        $ignoreShutdownFunction = $ignoreShutdownFunction ?? true;
-
-        $this->signalIgnoreShutdownFunction = $ignoreShutdownFunction;
-
-        die($status);
-    }
-
-    /**
-     * @param int|string $status
-     */
-    public function exit($status, ?bool $ignoreShutdownFunction = null)
-    {
-        $status = $status ?? '';
-        $ignoreShutdownFunction = $ignoreShutdownFunction ?? true;
-
-        $this->signalIgnoreShutdownFunction = $ignoreShutdownFunction;
-
-        exit($status);
-    }
-
-    /**
-     * > проверяет наличие функции в списке перед тем, как ее регистрировать, если регистрация функций происходит в цикле
-     *
-     * @param callable $fn
-     */
-    public function register_shutdown_function_unique($fn) : void
-    {
-        if (! $this->registerShutdownFunctionMap->exists($fn)) {
-            $this->registerShutdownFunctionMap->add($fn, true);
-
-            $fnWithSignal = function () use ($fn) {
-                if ($this->signalIgnoreShutdownFunction) return;
-
-                call_user_func($fn);
-            };
-
-            register_shutdown_function($fnWithSignal);
-        }
     }
 }

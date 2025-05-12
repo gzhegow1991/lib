@@ -83,31 +83,14 @@ $ffn = new class {
     }
 
 
-    function assert(
-        \Closure $fn, array $fnArgs = [],
-        ?string $expectedStdout = null,
-        ?float $expectedSecondsMax = null, ?float $expectedSecondsMin = null
-    )
+    function test(\Closure $fn, array $args = []) : \Gzhegow\Lib\Modules\Test\TestRunner\TestRunner
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        \Gzhegow\Lib\Lib::test()->assert(
-            $trace,
-            $fn, $fnArgs,
-            $expectedStdout,
-            $expectedSecondsMax, $expectedSecondsMin
-        );
-    }
-
-    function assert_stdout(\Closure $fn, array $fnArgs = [], ?string $expectedStdout = null)
-    {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        \Gzhegow\Lib\Lib::test()->assertStdout(
-            $trace,
-            $fn, $fnArgs,
-            $expectedStdout
-        );
+        return \Gzhegow\Lib\Lib::test()->test()
+            ->fn($fn, $args)
+            ->trace($trace)
+        ;
     }
 };
 
@@ -273,7 +256,8 @@ $fn = function () use ($ffn) {
 
     \Gzhegow\Lib\Modules\Async\Loop\Loop::runLoop();
 };
-$ffn->assert($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ Promise ]"
 
 
@@ -327,10 +311,10 @@ $ffn->assert($fn, [], '
 "[ 900 | THEN 1.5 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
 
 "[ 800+400 | THEN 2.3 ]" | 456
-',
-    $maxSeconds = 1.3,
-    $minSeconds = 1.2
-);
+');
+$test->expectSecondsMin(1.2);
+$test->expectSecondsMax(1.3);
+$test->run();
 
 
 
@@ -362,7 +346,8 @@ $fn = function () use ($ffn) {
     ;
     echo implode(PHP_EOL, $messages);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ Exception ]"
 
 [ 0 ] e
@@ -392,6 +377,7 @@ $ffn->assert_stdout($fn, [], '
 ------ [ 0.1.0.1 ] eeee2
 ------ { object # Exception }
 ');
+$test->run();
 
 
 
@@ -426,7 +412,8 @@ $fn = function () use ($ffn) {
 
     $ffn->print_array_multiline($print, 2);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ ErrorBag ]"
 
 ###
@@ -450,6 +437,7 @@ $ffn->assert_stdout($fn, [], '
 ]
 ###
 ');
+$test->run();
 
 
 
@@ -503,7 +491,8 @@ $fn = function () use ($ffn) {
     $result = $fn('0');
     $ffn->print($result);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ Pipe ]"
 
 Hello World! Your value is: [ NULL ]
@@ -513,6 +502,7 @@ Hello World! Your value is: [ "1" ]
 Hello World! Your value is: [ "0" ]
 "catch"
 ');
+$test->run();
 
 
 
@@ -597,8 +587,8 @@ $fn = function () use ($ffn) {
     $ffn->print_array($theMap->keys(), 1);
     $ffn->print_array($theMap->values(), 2);
 };
-$ffn->assert_stdout($fn, [], PHP_VERSION_ID >= 80000
-    ? '
+$test = $ffn->test($fn);
+$test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
 "[ ArrayOf ]"
 
 { object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf }
@@ -618,8 +608,8 @@ TRUE | [ "{ object # stdClass }" ]
 TRUE | TRUE
 [ "{ object # stdClass }", "{ array(3) }" ]
 [ 1, 1 ]
-'
-    : '
+');
+$test->expectStdoutIf(PHP_VERSION_ID < 80000, '
 "[ ArrayOf ]"
 
 { object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf }
@@ -640,6 +630,7 @@ TRUE | TRUE
 [ "{ object # stdClass }", "{ array(3) }" ]
 [ 1, 1 ]
 ');
+$test->run();
 
 
 
@@ -695,7 +686,8 @@ $fn = function () use ($ffn) {
 
     $ffn->print_array_multiline($report, 2);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ Benchmark ]"
 
 ###
@@ -710,6 +702,7 @@ $ffn->assert_stdout($fn, [], '
 ]
 ###
 ');
+$test->run();
 
 
 
@@ -831,7 +824,8 @@ $fn = function () use ($ffn) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ Config ]"
 
 { object # ConfigDummy }
@@ -848,6 +842,7 @@ $ffn->assert_stdout($fn, [], '
 
 "[ CATCH ] Configuration is invalid"
 ');
+$test->run();
 
 
 
@@ -991,7 +986,8 @@ $fn = function () use ($ffn) {
         ?? ResultTest::string_not_empty($ctx->get(), $ctx);
     $ffn->print($devnull, $ctx->get());
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ Result ]"
 
 ###
@@ -1023,6 +1019,7 @@ TRUE | "123"
 
 NULL | "123"
 ');
+$test->run();
 
 
 
@@ -1203,7 +1200,8 @@ $fn = function () use ($ffn) {
     $objAnonymous = \Gzhegow\Lib\Lib::arr()->map_to_object($arr, $target);
     $ffn->print($objAnonymous, (array) $objAnonymous);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ ArrModule ]"
 
 [ 1 => 2, 2 => 3 ] | [ 1 => 2, 2 => 3 ] | TRUE
@@ -1376,6 +1374,7 @@ $ffn->assert_stdout($fn, [], '
 { object # stdClass } | [ \"prop\" => 1, 0 => \"{ object # stdClass }\" ]
 { object # class@anonymous } | [ \"\x00*\x00prop\" => 1, 0 => \"{ object # stdClass }\" ]
 ");
+$test->run();
 
 
 
@@ -1471,7 +1470,8 @@ $fn = function () use ($ffn) {
     $ffn->print($result, (string) $result);
     echo PHP_EOL;
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ BcmathModule ]"
 
 { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
@@ -1517,6 +1517,7 @@ $ffn->assert_stdout($fn, [], '
 { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "40"
 { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "40"
 ');
+$test->run();
 
 
 
@@ -1719,7 +1720,8 @@ $fn = function () use ($ffn) {
     }
     unset($table);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ CmpModule ]"
 
 5e2492ca236e97203b30e4dfc7321bcc
@@ -1782,6 +1784,7 @@ d62c658cc94b8f6f2733458cbb8b3444
 3a5c4ba2b20240e510cb31b5608dc10e
 659cef0fc8e4274bd5dc0c75fd3bad08
 ');
+$test->run();
 
 
 
@@ -2021,7 +2024,8 @@ $fn = function () use ($ffn) {
     $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
     $ffn->print($src, $enc, $dec);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ CryptModule ]"
 
 "hello world!" | "b034fff2" | TRUE
@@ -2090,6 +2094,7 @@ $ffn->assert_stdout($fn, [], '
 "b`\x00\x00\x01\x00ÿ`" | "00H79" | "b`\x00\x00\x01\x00ÿ`"
 "你好" | "19PqtKE1t" | "你好"
 ');
+$test->run();
 
 
 
@@ -2307,7 +2312,8 @@ $fn = function () use ($ffn) {
 
     date_default_timezone_set($before);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ DateModule ]"
 
 TRUE | { object # DateTimeZone # "+01:00" }
@@ -2397,6 +2403,7 @@ TRUE | { object # DateTime # "1970-01-01T00:02:03.000000+00:00" }
 TRUE | { object # DateTime # "1970-01-01T00:02:03.000456+00:00" }
 TRUE | { object # DateTime # "1970-01-01T02:02:03.000456+02:00" }
 ');
+$test->run();
 
 
 
@@ -2617,7 +2624,8 @@ $fn = function () use ($ffn) {
     //     ->dump($varToDump)
     // ;
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ DebugModule ]"
 
 FALSE
@@ -2783,6 +2791,7 @@ FALSE
 "<div class=\"block\"></div>"
 "\"<div class=\\\\"block\\\\"></div>\""
 ');
+$test->run();
 
 
 
@@ -2826,7 +2835,8 @@ $fn = function () use ($ffn) {
 
     echo PHP_EOL;
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ EscapeModule ]"
 
 "AND `user_id` IN (?, ?, ?)"
@@ -2839,6 +2849,7 @@ $ffn->assert_stdout($fn, [], '
 "AND `search` ILIKE \"Hello, \_user\_! How are you today, in percents (\%)?\""
 "AND `name` LIKE \"__user\%\%\_\_%\""
 ');
+$test->run();
 
 
 
@@ -2869,7 +2880,8 @@ $fn = function () use ($ffn) {
     $ffn->print($csv);
     $ffn->print($bytes);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ FormatModule ]"
 
 "1MB"
@@ -2884,6 +2896,7 @@ val1;val2\n
 "
 10
 ');
+$test->run();
 
 
 
@@ -2935,7 +2948,8 @@ $fn = function () use ($ffn) {
     }
     \Gzhegow\Lib\Lib::fs()->rmdir($ffn->root() . '/var/1');
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ FsModule ]"
 
 3
@@ -2944,6 +2958,7 @@ $ffn->assert_stdout($fn, [], '
 
 "123"
 ');
+$test->run();
 
 
 
@@ -3077,7 +3092,8 @@ $fn = function () use ($ffn) {
     $result = \Gzhegow\Lib\Lib::json()->json_print("привет");
     $ffn->print($result);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ JsonModule ]"
 
 "[ CATCH ] Unable to `json_decode`"
@@ -3105,6 +3121,7 @@ NULL
 "\"\u043f\u0440\u0438\u0432\u0435\u0442\""
 "\"привет\""
 ');
+$test->run();
 
 
 
@@ -3174,7 +3191,8 @@ $fn = function () use ($ffn) {
         echo PHP_EOL;
     }
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ NetModule ]"
 
 "192.168.1.10" | "192.168.1.10/32" | TRUE | TRUE
@@ -3235,6 +3253,7 @@ $ffn->assert_stdout($fn, [], '
 "::1" | "::1/128" | TRUE | TRUE
 "::1" | "::/0" | TRUE | TRUE
 ');
+$test->run();
 
 
 
@@ -3264,7 +3283,8 @@ $fn = function () use ($ffn) {
     $result = \Gzhegow\Lib\Lib::parse()->ctype_alnum('123abcABC', false);
     $ffn->print($result);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ ParseModule ]"
 
 "123"
@@ -3275,6 +3295,7 @@ NULL
 "123abcABC"
 NULL
 ');
+$test->run();
 
 
 
@@ -3740,7 +3761,8 @@ $fn = function () use ($ffn) {
     unset($table3);
     echo PHP_EOL;
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ PhpModule ]"
 
 2f37ec97bf4a8f3de2842a958e72f8ac
@@ -3758,6 +3780,7 @@ d91da25286bd7e000367a9758699e0ca
 cb145079faba3ab6cf451fe9116389ba
 3c3e6efcd8ead6feb5fde9b2d9edc105
 ');
+$test->run();
 
 
 
@@ -3779,7 +3802,8 @@ $fn = function () use ($ffn) {
     $regex = \Gzhegow\Lib\Lib::preg()->preg_escape_ord(null, '/', '<html>', [ '.*' ], '</html>');
     $ffn->print($regex);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ PregModule ]"
 
 "\x{48}\x{65}\x{6C}\x{6C}\x{6F}\x{2C}\x{20}\x{0}\x{21}"
@@ -3787,6 +3811,7 @@ $ffn->assert_stdout($fn, [], '
 "/\<html\>.*\<\/html\>/"
 "/\x{3C}\x{68}\x{74}\x{6D}\x{6C}\x{3E}.*\x{3C}\x{2F}\x{68}\x{74}\x{6D}\x{6C}\x{3E}/"
 ');
+$test->run();
 
 
 
@@ -3860,7 +3885,8 @@ $fn = function () use ($ffn) {
     ;
     $ffn->print(null !== $test);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ RandomModule ]"
 
 36 | TRUE
@@ -3875,6 +3901,7 @@ TRUE
 TRUE
 TRUE
 ');
+$test->run();
 
 
 
@@ -4037,7 +4064,8 @@ $fn = function () use ($ffn) {
     //     $getTimezonesForPhone,
     // ]);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ SocialModule ]"
 
 TRUE | "example@gmail.com"
@@ -4215,6 +4243,7 @@ TRUE | "email@example.com"
 "+19700101000000" | "+19700101000000"
 "+19700101000000" | "+19700101000000"
 ');
+$test->run();
 
 
 
@@ -4345,7 +4374,8 @@ $fn = function () use ($ffn) {
     $ffn->print_array_multiline(\Gzhegow\Lib\Lib::str()->str_match("users\x00*\x00name", $keys, '*', "\x00"));
     echo PHP_EOL;
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ StrModule ]"
 
 [ "hello", "world" ]
@@ -4454,6 +4484,7 @@ TRUE | "при"
 ]
 ###
 ');
+$test->run();
 
 
 
@@ -4488,7 +4519,8 @@ $fn = function () use ($ffn) {
     $result = \Gzhegow\Lib\Lib::url()->link($src = ':hello/world');
     $ffn->print($src, (bool) $result);
 };
-$ffn->assert_stdout($fn, [], '
+$test = $ffn->test($fn);
+$test->expectStdout('
 "[ UrlModule ]"
 
 "https://google.com/hello/world" | TRUE
@@ -4500,3 +4532,4 @@ $ffn->assert_stdout($fn, [], '
 "https://google.com/hello/world" | TRUE
 ":hello/world" | FALSE
 ');
+$test->run();

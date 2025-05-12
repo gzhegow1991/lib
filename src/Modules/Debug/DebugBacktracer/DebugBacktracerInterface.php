@@ -71,10 +71,10 @@ interface DebugBacktracerInterface
      *     args: array|null,
      * }>
      */
-    public function get() : array;
+    public function fetchTrace() : array;
 
     /**
      * @return array{ 0: string, 1: int }|null
      */
-    public function getFileLine() : ?array;
+    public function fetchFileLine() : ?array;
 }

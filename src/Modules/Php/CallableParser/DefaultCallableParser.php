@@ -5,7 +5,7 @@ namespace Gzhegow\Lib\Modules\Php\CallableParser;
 use Gzhegow\Lib\Lib;
 
 
-class CallableParser implements CallableParserInterface
+class DefaultCallableParser implements CallableParserInterface
 {
     /**
      * @param array{ 0: class-string, 1: string }|null $result

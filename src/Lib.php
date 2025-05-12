@@ -33,6 +33,7 @@ use Gzhegow\Lib\Modules\ParseNullModule;
 use Gzhegow\Lib\Modules\EntrypointModule;
 use Gzhegow\Lib\Modules\ParseThrowModule;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
+use Gzhegow\Lib\Modules\Test\TestRunner\TestRunner;
 
 
 class Lib
@@ -354,9 +355,18 @@ class Lib
     /**
      * > фабрика для Pipeline - выполнить команды контроллера цепочкой, не углубляясь в детали
      */
-    public static function pipe(?Pipe &$p = null) : Pipe
+    public static function pipe() : Pipe
     {
-        return Lib::func()->pipe($p);
+        return Lib::func()->pipe();
+    }
+
+
+    /**
+     * > фабрика для AssertProcessor - удобный способ писать тесты
+     */
+    public static function assert() : TestRunner
+    {
+        return Lib::test()->test();
     }
 
 
@@ -629,32 +639,5 @@ class Lib
         $thePhp->throw_new_trace($trace, ...$throwableArgs);
 
         return;
-    }
-
-
-    /**
-     * > регистрация функции на завершение процесса, позволяющей пропустить запуск, если завершить через одну из функций, указанных ниже
-     *
-     * @param callable $fn
-     */
-    public static function register_shutdown_function($fn) : void
-    {
-        Lib::php()->register_shutdown_function_unique($fn);
-    }
-
-    /**
-     * @param int|string $status
-     */
-    public static function die($status, ?bool $ignoreShutdownFunction = null)
-    {
-        Lib::php()->die($status, $ignoreShutdownFunction);
-    }
-
-    /**
-     * @param int|string $status
-     */
-    public static function exit($status, ?bool $ignoreShutdownFunction = null)
-    {
-        Lib::php()->exit($status, $ignoreShutdownFunction);
     }
 }

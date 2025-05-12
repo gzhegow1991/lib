@@ -818,16 +818,18 @@ class DebugModule
             $objectClass = substr($objectClass, 0, $pos + strlen($needle));
         }
 
-        $objectSubtypeCountable = (($var instanceof \Countable) ? 'countable(' . count($var) . ')' : null);
-        $objectSubtypeIterable = (is_iterable($var) ? 'iterable' : null);
         $objectSubtypeStringable = (method_exists($var, '__toString') ? 'stringable' : null);
+        $objectSubtypeSerializable = ((($var instanceof \Serializable) || method_exists($var, '__serialize')) ? 'serializable' : null);
         $objectSubtypeInvokable = (method_exists($var, '__invoke') ? 'invokable' : null);
+        $objectSubtypeIterable = (is_iterable($var) ? 'iterable' : null);
+        $objectSubtypeCountable = (($var instanceof \Countable) ? 'countable(' . count($var) . ')' : null);
 
         $objectSubtype = [];
-        if ($objectSubtypeCountable) $objectSubtype[] = $objectSubtypeCountable;
-        if ($objectSubtypeIterable) $objectSubtype[] = $objectSubtypeIterable;
         if ($objectSubtypeStringable) $objectSubtype[] = $objectSubtypeStringable;
+        if ($objectSubtypeSerializable) $objectSubtype[] = $objectSubtypeSerializable;
         if ($objectSubtypeInvokable) $objectSubtype[] = $objectSubtypeInvokable;
+        if ($objectSubtypeIterable) $objectSubtype[] = $objectSubtypeIterable;
+        if ($objectSubtypeCountable) $objectSubtype[] = $objectSubtypeCountable;
 
         $printableValue = [];
         if ($withValue) {

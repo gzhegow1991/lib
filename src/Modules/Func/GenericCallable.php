@@ -1,13 +1,24 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Php\CallableParser;
+namespace Gzhegow\Lib\Modules\Func;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Php\Result\Result;
+use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Func\Invoker\InvokerInterface;
+use Gzhegow\Lib\Modules\Php\Interfaces\CanIsSameInterface;
 
 
-class GenericCallable implements \Serializable
+class GenericCallable implements
+    \Serializable,
+    //
+    CanIsSameInterface
 {
+    /**
+     * @var InvokerInterface
+     */
+    protected $invoker;
+
     /**
      * @var string
      */
@@ -73,6 +84,89 @@ class GenericCallable implements \Serializable
 
     private function __construct()
     {
+        $this->invoker = Lib::func()->invoker();
+    }
+
+    public function __invoke(...$values)
+    {
+        if (null !== $this->invoker) {
+            $result = $this->invoker->callUserFuncArray($this, $values);
+
+        } else {
+            if ($this->isClosure) {
+                $fn = $this->closureObject;
+
+            } elseif ($this->isMethod) {
+                if (null !== $this->methodObject) {
+                    $fn = [ $this->methodObject, $this->methodName ];
+
+                } else {
+                    // > ! static
+                    $fn = [ $this->methodClass, $this->methodName ];
+                }
+
+            } elseif ($this->isInvokable) {
+                if (null !== $this->invokableObject) {
+                    $fn = $this->invokableObject;
+
+                } else {
+                    $className = $this->invokableClass;
+
+                    // > ! factory
+                    $fn = new $className();
+                }
+
+            } elseif ($this->isFunction) {
+                if (null !== $this->functionStringNonInternal) {
+                    $fn = $this->functionStringNonInternal;
+
+                } else {
+                    $fnString = $this->functionStringInternal;
+
+                    $fn = static function (...$args) use ($fnString) {
+                        return Lib::func()->call_user_func_array($fnString, $args);
+                    };
+                }
+
+            } else {
+                throw new RuntimeException(
+                    [ 'Unable to extract callable from: ' . GenericCallable::class, $this ]
+                );
+            }
+
+            $result = call_user_func_array($fn, $values);
+        }
+
+        return $result;
+    }
+
+
+    public function __serialize() : array
+    {
+        $vars = get_object_vars($this);
+
+        return array_filter($vars);
+    }
+
+    public function __unserialize(array $data) : void
+    {
+        foreach ( $data as $key => $val ) {
+            $this->{$key} = $val;
+        }
+    }
+
+    public function serialize()
+    {
+        $array = $this->__serialize();
+
+        return serialize($array);
+    }
+
+    public function unserialize($data)
+    {
+        $array = unserialize($data);
+
+        $this->__unserialize($array);
     }
 
 
@@ -315,32 +409,22 @@ class GenericCallable implements \Serializable
     }
 
 
-    public function __serialize() : array
+    public function setInvoker(?InvokerInterface $invoker) : ?InvokerInterface
     {
-        $vars = get_object_vars($this);
+        $last = $this->invoker;
 
-        return array_filter($vars);
+        $this->invoker = $invoker;
+
+        return $last;
     }
 
-    public function __unserialize(array $data) : void
+
+    /**
+     * @param static $object
+     */
+    public function isSame($object, array $options = []) : bool
     {
-        foreach ( $data as $key => $val ) {
-            $this->{$key} = $val;
-        }
-    }
-
-    public function serialize()
-    {
-        $array = $this->__serialize();
-
-        return serialize($array);
-    }
-
-    public function unserialize($data)
-    {
-        $array = unserialize($data);
-
-        $this->__unserialize($array);
+        return $this->key === $object->key;
     }
 
 
@@ -361,9 +445,20 @@ class GenericCallable implements \Serializable
         return $this->isClosure;
     }
 
-    public function hasClosureObject() : ?\Closure
+    /**
+     * @param \Closure|null $fn
+     */
+    public function hasClosureObject(&$fn = null) : bool
     {
-        return $this->closureObject;
+        $fn = null;
+
+        if (null !== $this->closureObject) {
+            $fn = $this->closureObject;
+
+            return true;
+        }
+
+        return false;
     }
 
     public function getClosureObject() : \Closure
@@ -372,32 +467,49 @@ class GenericCallable implements \Serializable
     }
 
 
-
     public function isMethod() : bool
     {
         return $this->isMethod;
     }
 
     /**
-     * @return \class-string|null
+     * @param class-string|null $methodClassName
      */
-    public function hasMethodClass() : ?string
+    public function hasMethodClass(&$methodClassName = null) : ?string
     {
-        return $this->methodClass;
+        $methodClassName = null;
+
+        if (null !== $this->methodClass) {
+            $methodClassName = $this->methodClass;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * @return \class-string
+     * @return class-string
      */
     public function getMethodClass() : string
     {
         return $this->methodClass;
     }
 
-
-    public function hasMethodObject() : ?object
+    /**
+     * @param string|null $methodObject
+     */
+    public function hasMethodObject(&$methodObject = null) : bool
     {
-        return $this->methodObject;
+        $methodObject = null;
+
+        if (null !== $this->methodObject) {
+            $methodObject = $this->methodObject;
+
+            return true;
+        }
+
+        return false;
     }
 
     public function getMethodObject() : object
@@ -405,10 +517,20 @@ class GenericCallable implements \Serializable
         return $this->methodObject;
     }
 
-
-    public function hasMethodName() : ?string
+    /**
+     * @param string|null $methodName
+     */
+    public function hasMethodName(&$methodName = null) : bool
     {
-        return $this->methodName;
+        $methodName = null;
+
+        if (null !== $this->methodName) {
+            $methodName = $this->methodName;
+
+            return true;
+        }
+
+        return false;
     }
 
     public function getMethodName() : string
@@ -423,11 +545,19 @@ class GenericCallable implements \Serializable
     }
 
     /**
-     * @return callable|object|null
+     * @param callable|object|null $object
      */
-    public function hasInvokableObject() : ?object
+    public function hasInvokableObject(&$object = null) : bool
     {
-        return $this->invokableObject;
+        $object = null;
+
+        if (null !== $this->invokableObject) {
+            $object = $this->invokableObject;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -439,15 +569,23 @@ class GenericCallable implements \Serializable
     }
 
     /**
-     * @return callable|object|null
+     * @param class-string|null $className
      */
-    public function hasInvokableClass() : ?string
+    public function hasInvokableClass(&$className = null) : bool
     {
-        return $this->invokableObject;
+        $className = null;
+
+        if (null !== $this->invokableClass) {
+            $className = $this->invokableClass;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * @return \class-string
+     * @return class-string
      */
     public function getInvokableClass() : string
     {
@@ -460,13 +598,20 @@ class GenericCallable implements \Serializable
         return $this->isFunction;
     }
 
-
     /**
-     * @return callable|string|null
+     * @param callable|string|null $fn
      */
-    public function hasFunctionStringInternal() : ?string
+    public function hasFunctionStringInternal(&$fn = null) : bool
     {
-        return $this->functionStringInternal;
+        $fn = null;
+
+        if (null !== $this->functionStringInternal) {
+            $fn = $this->functionStringInternal;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -477,13 +622,20 @@ class GenericCallable implements \Serializable
         return $this->functionStringInternal;
     }
 
-
     /**
-     * @return callable|string|null
+     * @param callable|string|null $fn
      */
-    public function hasFunctionStringNonInternal() : ?string
+    public function hasFunctionStringNonInternal(&$fn = null) : bool
     {
-        return $this->functionStringNonInternal;
+        $fn = null;
+
+        if (null !== $this->functionStringNonInternal) {
+            $fn = $this->functionStringNonInternal;
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

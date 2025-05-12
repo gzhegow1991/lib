@@ -71,7 +71,7 @@ class LoopManager implements LoopManagerInterface
         $this->intervals->attach($interval);
 
         if (! $this->isLoopRegistered) {
-            Lib::php()->register_shutdown_function_unique([ $this, 'runLoop' ]);
+            Lib::entrypoint()->registerShutdownFunction([ $this, 'runLoop' ]);
 
             $this->isLoopRegistered = true;
         }
@@ -88,7 +88,7 @@ class LoopManager implements LoopManagerInterface
         $this->timers->attach($timer);
 
         if (! $this->isLoopRegistered) {
-            Lib::php()->register_shutdown_function_unique([ $this, 'runLoop' ]);
+            Lib::entrypoint()->registerShutdownFunction([ $this, 'runLoop' ]);
 
             $this->isLoopRegistered = true;
         }
@@ -110,7 +110,7 @@ class LoopManager implements LoopManagerInterface
         $this->queueMicrotask->enqueue($microtask);
 
         if (! $this->isLoopRegistered) {
-            Lib::php()->register_shutdown_function_unique([ $this, 'runLoop' ]);
+            Lib::entrypoint()->registerShutdownFunction([ $this, 'runLoop' ]);
 
             $this->isLoopRegistered = true;
         }
@@ -126,7 +126,7 @@ class LoopManager implements LoopManagerInterface
         $this->queueMacrotask->enqueue($macrotask);
 
         if (! $this->isLoopRegistered) {
-            Lib::php()->register_shutdown_function_unique([ $this, 'runLoop' ]);
+            Lib::entrypoint()->registerShutdownFunction([ $this, 'runLoop' ]);
 
             $this->isLoopRegistered = true;
         }
@@ -199,7 +199,7 @@ class LoopManager implements LoopManagerInterface
     public function registerLoop() : void
     {
         if (! $this->isLoopRegistered) {
-            Lib::php()->register_shutdown_function_unique([ $this, 'runLoop' ]);
+            Lib::entrypoint()->registerShutdownFunction([ $this, 'runLoop' ]);
 
             $this->isLoopRegistered = true;
         }
