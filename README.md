@@ -23,10 +23,6 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 
 // > настраиваем PHP
-ini_set('memory_limit', '32M');
-
-
-// > настраиваем обработку ошибок
 // > некоторые CMS сами по себе применяют error_reporting/set_error_handler/set_exception_handler глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
 \Gzhegow\Lib\Lib::entrypoint()
