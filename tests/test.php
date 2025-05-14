@@ -232,24 +232,6 @@ $fn = function () use ($ffn) {
     ;
 
 
-    // \Gzhegow\Lib\Lib::async()
-    //     ->promiseManager()
-    //     ->useFetchApiWakeup(true)
-    // ;
-    //
-    // \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl('https://google.com')
-    //     ->then(function ($result) {
-    //         echo "{$result['http_code']} - Google\n";
-    //     })
-    // ;
-    //
-    // \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl('https://yandex.ru')
-    //     ->then(function ($result) {
-    //         echo "{$result['http_code']} - Yandex\n";
-    //     })
-    // ;
-
-
     \Gzhegow\Lib\Modules\Async\Loop\Loop::runLoop();
 };
 $test = $ffn->test($fn);
@@ -311,6 +293,50 @@ $test->expectStdout('
 $test->expectSecondsMin(1.2);
 $test->expectSecondsMax(1.3);
 $test->run();
+
+
+
+// > Тест закомментирован, поскольку приводит к поднятию дополнительных процессов
+// > Их потом не завершить, если неверные права пользователя, раскоментируйте, чтобы проверить
+// // >>> TEST
+// // > тесты Fetch
+// $fn = function () use ($ffn) {
+//     $ffn->print('[ Fetch ]');
+//     echo "\n";
+//
+//
+//     \Gzhegow\Lib\Lib::async()
+//         ->promiseManager()
+//         ->useFetchApiWakeup(true)
+//     ;
+//
+//     \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl($url = 'https://google.com')
+//         ->then(function ($result) use ($ffn, $url) {
+//             $httpCode = $result[ 'http_code' ];
+//
+//             $ffn->print("{$url} - HTTP: {$httpCode}");
+//         })
+//     ;
+//
+//     \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl($url = 'https://yandex.ru')
+//         ->then(function ($result) use ($ffn, $url) {
+//             $httpCode = $result[ 'http_code' ];
+//
+//             $ffn->print("{$url} - HTTP: {$httpCode}");
+//         })
+//     ;
+//
+//
+//     \Gzhegow\Lib\Modules\Async\Loop\Loop::runLoop();
+// };
+// $test = $ffn->test($fn);
+// $test->expectStdout('
+// "[ Fetch ]"
+//
+// "https://google.com - HTTP: 200"
+// "https://yandex.ru - HTTP: 200"
+// ');
+// $test->run();
 
 
 
