@@ -32,6 +32,7 @@ use Gzhegow\Lib\Modules\TypeThrowModule;
 use Gzhegow\Lib\Modules\ParseNullModule;
 use Gzhegow\Lib\Modules\EntrypointModule;
 use Gzhegow\Lib\Modules\ParseThrowModule;
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 use Gzhegow\Lib\Modules\Test\TestRunner\TestRunner;
 
@@ -527,64 +528,6 @@ class Lib
 
 
     /**
-     * > подключить правильно настроенный композер, установленный глобально - чтобы дебаг пакеты не добавлять в библиотеки, но пользоваться ими (временно)
-     *
-     * @return \Composer\Autoload\ClassLoader
-     */
-    public static function require_composer_global()
-    {
-        return require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
-    }
-
-    /**
-     * > зарегистрировать функции d/dd/ddd/td, чтобы пользоваться ими но PHPStorm не подсказывал, что они есть в проекте (временно)
-     */
-    public static function register_functions_global() : void
-    {
-        global $td, $d, $dd, $ddd;
-
-        $td = function ($ms, $var, ...$vars) {
-            static $last;
-
-            $last = $last ?? [];
-
-            $t = \Gzhegow\Lib\Lib::debug()->file_line();
-
-            $key = implode(':', $t);
-            $last[ $key ] = $last[ $key ] ?? 0;
-
-            $now = microtime(true);
-
-            if (($now - $last[ $key ]) > ($ms / 1000)) {
-                $last[ $key ] = $now;
-
-                \Gzhegow\Lib\Lib::debug()->d([ $t ], $var, ...$vars);
-            }
-
-            return $var;
-        };
-
-        $d = function ($var, ...$vars) {
-            $t = \Gzhegow\Lib\Lib::debug()->file_line();
-
-            \Gzhegow\Lib\Lib::debug()->d([ $t ], $var, ...$vars);
-        };
-
-        $dd = function (...$vars) {
-            $t = \Gzhegow\Lib\Lib::debug()->file_line();
-
-            \Gzhegow\Lib\Lib::debug()->dd([ $t ], ...$vars);
-        };
-
-        $ddd = function (?int $limit, $var, ...$vars) {
-            $t = \Gzhegow\Lib\Lib::debug()->file_line();
-
-            \Gzhegow\Lib\Lib::debug()->ddd([ $t ], $limit, $var, ...$vars);
-        };
-    }
-
-
-    /**
      * > в старых PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
      *
      * @return null
@@ -639,5 +582,85 @@ class Lib
         $thePhp->throw_new_trace($trace, ...$throwableArgs);
 
         return;
+    }
+
+
+    /**
+     * > подключить композер, установленный глобально - чтобы дебаг пакеты не добавлять в библиотеки, но пользоваться ими (временно)
+     *
+     * @return \Composer\Autoload\ClassLoader
+     */
+    public static function require_composer_global()
+    {
+        return require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
+    }
+
+    /**
+     * @param \Closure|null $ref
+     */
+    public static function d(&$ref = null) : \Closure
+    {
+        return $ref = function ($var, ...$vars) {
+            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+
+            \Gzhegow\Lib\Lib::debug()->d([ $t ], $var, ...$vars);
+        };
+    }
+
+    /**
+     * @param \Closure|null $ref
+     */
+    public static function dd(&$ref = null) : \Closure
+    {
+        return $ref = function (...$vars) {
+            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+
+            \Gzhegow\Lib\Lib::debug()->dd([ $t ], ...$vars);
+        };
+    }
+
+    /**
+     * @param \Closure|null $ref
+     */
+    public static function ddd(&$ref = null) : \Closure
+    {
+        return $ref = function (?int $limit, $var, ...$vars) {
+            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+
+            \Gzhegow\Lib\Lib::debug()->ddd([ $t ], $limit, $var, ...$vars);
+        };
+    }
+
+    /**
+     * @param \Closure|null $ref
+     */
+    public static function td(int $throttleMs, &$ref = null) : \Closure
+    {
+        if ($throttleMs < 0) {
+            throw new LogicException(
+                [ 'The `throttleMs` should be non-negative integer', $throttleMs ]
+            );
+        }
+
+        return $ref = function ($var, ...$vars) use ($throttleMs) {
+            static $last;
+
+            $last = $last ?? [];
+
+            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+
+            $key = implode(':', $t);
+            $last[ $key ] = $last[ $key ] ?? 0;
+
+            $now = microtime(true);
+
+            if (($now - $last[ $key ]) > ($throttleMs / 1000)) {
+                $last[ $key ] = $now;
+
+                \Gzhegow\Lib\Lib::debug()->d([ $t ], $var, ...$vars);
+            }
+
+            return $var;
+        };
     }
 }
