@@ -881,7 +881,7 @@ class StrModule
 
     public function loadInvisibles() : array
     {
-        $theMb = Lib::mb();
+        Lib::mb();
 
         $list = [
             // mb_chr(0x0020, 'UTF-8') => '\u{0020}', // > \u{0020}	// Space // Обычный пробел (между словами).
@@ -2209,7 +2209,8 @@ class StrModule
             return '';
         }
 
-        $theMb = Lib::mb();
+        Lib::mb();
+
         $thePreg = Lib::preg();
         $theType = Lib::type();
 

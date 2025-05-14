@@ -20,6 +20,116 @@ use Gzhegow\Lib\Modules\Str\Alphabet;
 class ParseNullModule
 {
 	/**
+	 * @return mixed|null
+	 */
+	public function empty($value)
+	{
+		if (Lib::type()->empty($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return mixed|null
+	 */
+	public function any_not_empty($value)
+	{
+		if (Lib::type()->any_not_empty($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * > Специальный тип, который значит, что значение можно отбросить или не учитывать, т.к. оно не несёт информации
+	 *
+	 * @return string|array|\Countable|null
+	 */
+	public function blank($value)
+	{
+		if (Lib::type()->blank($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return mixed|null
+	 */
+	public function any_not_blank($value)
+	{
+		if (Lib::type()->any_not_blank($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * > Специальный тип, который значит, что значение можно заменить NULL-ом
+	 *
+	 * @return mixed|null
+	 */
+	public function nullable($value)
+	{
+		if (Lib::type()->nullable($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return mixed|null
+	 */
+	public function any_not_nullable($value)
+	{
+		if (Lib::type()->any_not_nullable($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * > Специальный тип, который значит, что значение было отправлено пользователем, а не появилось из PHP
+	 *
+	 * @return mixed|null
+	 */
+	public function passed($value)
+	{
+		if (Lib::type()->passed($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return mixed|null
+	 */
+	public function any_not_passed($value)
+	{
+		if (Lib::type()->any_not_passed($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
 	 * > Специальный тип-синоним NULL, переданный пользователем через API, например '{N}'
 	 * > в случаях, когда NULL интерпретируется как "не трогать", а NIL как "очистить"
 	 *
@@ -29,7 +139,7 @@ class ParseNullModule
 	 *
 	 * @return string|Nil|null
 	 */
-	public function a_nil($value)
+	public function nil($value)
 	{
 		if (Lib::type()->nil($result, $value)) {
 		    return $result;
@@ -71,116 +181,6 @@ class ParseNullModule
 	public function any_not_null($value)
 	{
 		if (Lib::type()->any_not_null($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * > Специальный тип, который значит, что значение можно заменить NULL-ом
-	 *
-	 * @return mixed|null
-	 */
-	public function a_nullable($value)
-	{
-		if (Lib::type()->nullable($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return mixed|null
-	 */
-	public function any_not_nullable($value)
-	{
-		if (Lib::type()->any_not_nullable($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return mixed|null
-	 */
-	public function a_empty($value)
-	{
-		if (Lib::type()->empty($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return mixed|null
-	 */
-	public function any_not_empty($value)
-	{
-		if (Lib::type()->any_not_empty($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * > Специальный тип, который значит, что значение можно отбросить или не учитывать, т.к. оно не несёт информации
-	 *
-	 * @return string|array|\Countable|null
-	 */
-	public function a_blank($value)
-	{
-		if (Lib::type()->blank($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return mixed|null
-	 */
-	public function any_not_blank($value)
-	{
-		if (Lib::type()->any_not_blank($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * > Специальный тип, который значит, что значение было отправлено пользователем, а не появилось из PHP
-	 *
-	 * @return mixed|null
-	 */
-	public function a_passed($value)
-	{
-		if (Lib::type()->passed($result, $value)) {
-		    return $result;
-		}
-
-		return null;
-	}
-
-
-	/**
-	 * @return mixed|null
-	 */
-	public function any_not_passed($value)
-	{
-		if (Lib::type()->any_not_passed($result, $value)) {
 		    return $result;
 		}
 
@@ -347,7 +347,7 @@ class ParseNullModule
 	/**
 	 * @return float|null
 	 */
-	public function a_nan($value)
+	public function nan($value)
 	{
 		if (Lib::type()->nan($result, $value)) {
 		    return $result;
@@ -360,7 +360,7 @@ class ParseNullModule
 	/**
 	 * @return float|null
 	 */
-	public function a_float_not_nan($value)
+	public function float_not_nan($value)
 	{
 		if (Lib::type()->float_not_nan($result, $value)) {
 		    return $result;
@@ -386,7 +386,7 @@ class ParseNullModule
 	/**
 	 * @return float|null
 	 */
-	public function a_finite($value)
+	public function finite($value)
 	{
 		if (Lib::type()->finite($result, $value)) {
 		    return $result;
@@ -399,7 +399,7 @@ class ParseNullModule
 	/**
 	 * @return float|null
 	 */
-	public function a_float_not_finite($value)
+	public function float_not_finite($value)
 	{
 		if (Lib::type()->float_not_finite($result, $value)) {
 		    return $result;
@@ -425,7 +425,7 @@ class ParseNullModule
 	/**
 	 * @return float|null
 	 */
-	public function a_infinite($value)
+	public function infinite($value)
 	{
 		if (Lib::type()->infinite($result, $value)) {
 		    return $result;
@@ -438,7 +438,7 @@ class ParseNullModule
 	/**
 	 * @return float|null
 	 */
-	public function a_float_not_infinite($value)
+	public function float_not_infinite($value)
 	{
 		if (Lib::type()->float_not_infinite($result, $value)) {
 		    return $result;
@@ -1501,6 +1501,9 @@ class ParseNullModule
 	}
 
 
+	/**
+	 * @return array|null
+	 */
 	public function array_of_type($value, string $type)
 	{
 		if (Lib::type()->array_of_type($result, $value, $type)) {
@@ -1511,6 +1514,9 @@ class ParseNullModule
 	}
 
 
+	/**
+	 * @return resource[]|null
+	 */
 	public function array_of_resource_type($value, string $resourceType)
 	{
 		if (Lib::type()->array_of_resource_type($result, $value, $resourceType)) {
@@ -1572,6 +1578,9 @@ class ParseNullModule
 	}
 
 
+	/**
+	 * @return array|null
+	 */
 	public function array_of_callback($value, callable $fn, array $args = [])
 	{
 		if (Lib::type()->array_of_callback($result, $value, $fn, $args)) {

@@ -44,7 +44,7 @@ class PregModule
 
     public function preg_quote_ord(string $string, string $mb_encoding = null) : string
     {
-        $theMb = Lib::mb();
+        Lib::mb();
 
         $len = mb_strlen($string);
 

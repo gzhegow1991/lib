@@ -2727,11 +2727,17 @@ class TypeBoolModule
     }
 
 
+    /**
+     * @param array|null $result
+     */
     public function array_of_type(&$result, $value, string $type) : bool
     {
         return Lib::arr()->type_array_of_type($result, $value, $type);
     }
 
+    /**
+     * @param resource[]|null $result
+     */
     public function array_of_resource_type(&$result, $value, string $resourceType) : bool
     {
         return Lib::arr()->type_array_of_resource_type($result, $value, $resourceType);
@@ -2770,6 +2776,9 @@ class TypeBoolModule
         return Lib::arr()->type_array_of_subclass($result, $value, $className);
     }
 
+    /**
+     * @param array|null $result
+     */
     public function array_of_callback(&$result, $value, callable $fn, array $args = []) : bool
     {
         return Lib::arr()->type_array_of_callback($result, $value, $fn, $args);
@@ -3076,7 +3085,6 @@ class TypeBoolModule
         return Lib::date()->type_interval($result, $interval);
     }
 
-
     /**
      * @param \DateInterval|null $result
      */
@@ -3084,7 +3092,6 @@ class TypeBoolModule
     {
         return Lib::date()->type_interval_duration($result, $duration);
     }
-
 
     /**
      * @param \DateInterval|null $result
@@ -3094,7 +3101,6 @@ class TypeBoolModule
         return Lib::date()->type_interval_datestring($result, $datestring);
     }
 
-
     /**
      * @param \DateInterval|null $result
      */
@@ -3102,7 +3108,6 @@ class TypeBoolModule
     {
         return Lib::date()->type_interval_microtime($result, $microtime);
     }
-
 
     /**
      * @param \DateInterval|null $result
@@ -3136,7 +3141,6 @@ class TypeBoolModule
         return Lib::php()->type_struct($result, $value, $flags);
     }
 
-
     /**
      * @template-covariant T of object
      *
@@ -3148,7 +3152,6 @@ class TypeBoolModule
         return Lib::php()->type_struct_class($result, $value, $flags);
     }
 
-
     /**
      * @param class-string|null $result
      */
@@ -3157,7 +3160,6 @@ class TypeBoolModule
         return Lib::php()->type_struct_interface($result, $value, $flags);
     }
 
-
     /**
      * @param class-string|null $result
      */
@@ -3165,7 +3167,6 @@ class TypeBoolModule
     {
         return Lib::php()->type_struct_trait($result, $value, $flags);
     }
-
 
     /**
      * @template-covariant T of \UnitEnum
@@ -3190,7 +3191,6 @@ class TypeBoolModule
         return Lib::php()->type_struct_fqcn($result, $value, $flags);
     }
 
-
     /**
      * @param string|null $result
      */
@@ -3198,7 +3198,6 @@ class TypeBoolModule
     {
         return Lib::php()->type_struct_namespace($result, $value, $flags);
     }
-
 
     /**
      * @param string|null $result
@@ -3217,7 +3216,6 @@ class TypeBoolModule
         return Lib::php()->type_resource($result, $value);
     }
 
-
     /**
      * @param resource|null $result
      */
@@ -3234,7 +3232,6 @@ class TypeBoolModule
     {
         return Lib::php()->type_resource_opened($result, $value);
     }
-
 
     /**
      * @param resource|null $result
@@ -3266,7 +3263,6 @@ class TypeBoolModule
         return Lib::php()->type_method_array($result, $value);
     }
 
-
     /**
      * @param string|null            $result
      * @param array{ 0: array|null } $refs
@@ -3286,7 +3282,6 @@ class TypeBoolModule
         return Lib::php()->type_callable_object($result, $value, $newScope);
     }
 
-
     /**
      * @param callable|\Closure|object|null $result
      */
@@ -3294,7 +3289,6 @@ class TypeBoolModule
     {
         return Lib::php()->type_callable_object($result, $value, $newScope);
     }
-
 
     /**
      * @param callable|object|null $result
@@ -3304,7 +3298,6 @@ class TypeBoolModule
         return Lib::php()->type_callable_object_closure($result, $value, $newScope);
     }
 
-
     /**
      * @param callable|object|null $result
      */
@@ -3312,7 +3305,6 @@ class TypeBoolModule
     {
         return Lib::php()->type_callable_object_invokable($result, $value, $newScope);
     }
-
 
     /**
      * @param callable|array{ 0: object|class-string, 1: string }|null $result
@@ -3323,7 +3315,6 @@ class TypeBoolModule
         return Lib::php()->type_callable_array($result, $value, $newScope);
     }
 
-
     /**
      * @param callable|array{ 0: object|class-string, 1: string }|null $result
      * @param string|object                                            $newScope
@@ -3332,7 +3323,6 @@ class TypeBoolModule
     {
         return Lib::php()->type_callable_array_method($result, $value, $newScope);
     }
-
 
     /**
      * @param callable|array{ 0: class-string, 1: string }|null $result
@@ -3343,7 +3333,6 @@ class TypeBoolModule
         return Lib::php()->type_callable_array_method_static($result, $value, $newScope);
     }
 
-
     /**
      * @param callable|array{ 0: object, 1: string }|null $result
      * @param string|object                               $newScope
@@ -3353,7 +3342,6 @@ class TypeBoolModule
         return Lib::php()->type_callable_array_method_non_static($result, $value, $newScope);
     }
 
-
     /**
      * @param callable-string|null $result
      */
@@ -3361,7 +3349,6 @@ class TypeBoolModule
     {
         return Lib::php()->type_callable_string($result, $value, $newScope);
     }
-
 
     /**
      * @param callable-string|null $result
@@ -3371,7 +3358,6 @@ class TypeBoolModule
         return Lib::php()->type_callable_string_function($result, $value);
     }
 
-
     /**
      * @param callable-string|null $result
      */
@@ -3380,7 +3366,6 @@ class TypeBoolModule
         return Lib::php()->type_callable_string_function_internal($result, $value);
     }
 
-
     /**
      * @param callable-string|null $result
      */
@@ -3388,7 +3373,6 @@ class TypeBoolModule
     {
         return Lib::php()->type_callable_string_function_non_internal($result, $value);
     }
-
 
     /**
      * @param callable-string|null $result
@@ -3421,7 +3405,6 @@ class TypeBoolModule
         return Lib::fs()->type_path($result, $value, $refs);
     }
 
-
     /**
      * @param string|null            $result
      * @param array{ 0: array|null } $refs
@@ -3430,7 +3413,6 @@ class TypeBoolModule
     {
         return Lib::fs()->type_realpath($result, $value, $allowSymlink, $refs);
     }
-
 
     /**
      * @param string|null            $result
@@ -3457,7 +3439,6 @@ class TypeBoolModule
         return Lib::fs()->type_dirpath($result, $value, $allowExists, $allowSymlink, $refs);
     }
 
-
     /**
      * @param string|null $result
      */
@@ -3481,7 +3462,6 @@ class TypeBoolModule
     {
         return Lib::fs()->type_dirpath_realpath($result, $value, $allowSymlink, $refs);
     }
-
 
     /**
      * @param string|null            $result
@@ -3516,7 +3496,6 @@ class TypeBoolModule
         return Lib::fs()->type_file($result, $value, $extensions, $mimeTypes, $filters);
     }
 
-
     /**
      * @param \SplFileInfo|null $result
      */
@@ -3540,7 +3519,6 @@ class TypeBoolModule
         return Lib::social()->type_email($result, $value, $filters, $refs);
     }
 
-
     /**
      * @param string|null $result
      */
@@ -3548,7 +3526,6 @@ class TypeBoolModule
     {
         return Lib::social()->type_email_fake($result, $value, $refs);
     }
-
 
     /**
      * @param string|null $result
@@ -3567,7 +3544,6 @@ class TypeBoolModule
         return Lib::social()->type_phone($result, $value, $refs);
     }
 
-
     /**
      * @param string|null $result
      */
@@ -3576,7 +3552,6 @@ class TypeBoolModule
         return Lib::social()->type_phone_fake($result, $value, $refs);
     }
 
-
     /**
      * @param string|null $result
      */
@@ -3584,7 +3559,6 @@ class TypeBoolModule
     {
         return Lib::social()->type_phone_non_fake($result, $value, $refs);
     }
-
 
     /**
      * @param string|null $result
@@ -3603,7 +3577,6 @@ class TypeBoolModule
         return Lib::social()->type_tel($result, $value, $refs);
     }
 
-
     /**
      * @param string|null $result
      */
@@ -3612,7 +3585,6 @@ class TypeBoolModule
         return Lib::social()->type_tel_fake($result, $value, $refs);
     }
 
-
     /**
      * @param string|null $result
      */
@@ -3620,7 +3592,6 @@ class TypeBoolModule
     {
         return Lib::social()->type_tel_non_fake($result, $value, $refs);
     }
-
 
     /**
      * @param string|null $result

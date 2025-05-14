@@ -21,6 +21,116 @@ use Gzhegow\Lib\Modules\Str\Alphabet;
 class TypeThrowModule
 {
 	/**
+	 * @param mixed|null $result
+	 */
+	public function empty(&$result, $value): bool
+	{
+		if (Lib::type()->empty($result, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `empty` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param mixed|null $result
+	 */
+	public function any_not_empty(&$result, $value): bool
+	{
+		if (Lib::type()->any_not_empty($result, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `any_not_empty` is failed", $value ]);
+	}
+
+
+	/**
+	 * > Специальный тип, который значит, что значение можно отбросить или не учитывать, т.к. оно не несёт информации
+	 *
+	 * @param string|array|\Countable|null $result
+	 */
+	public function blank(&$result, $value): bool
+	{
+		if (Lib::type()->blank($result, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `blank` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param mixed|null $result
+	 */
+	public function any_not_blank(&$result, $value): bool
+	{
+		if (Lib::type()->any_not_blank($result, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `any_not_blank` is failed", $value ]);
+	}
+
+
+	/**
+	 * > Специальный тип, который значит, что значение можно заменить NULL-ом
+	 *
+	 * @param mixed|null $result
+	 */
+	public function nullable(&$result, $value): bool
+	{
+		if (Lib::type()->nullable($result, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `nullable` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param mixed|null $result
+	 */
+	public function any_not_nullable(&$result, $value): bool
+	{
+		if (Lib::type()->any_not_nullable($result, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `any_not_nullable` is failed", $value ]);
+	}
+
+
+	/**
+	 * > Специальный тип, который значит, что значение было отправлено пользователем, а не появилось из PHP
+	 *
+	 * @param mixed|null $result
+	 */
+	public function passed(&$result, $value): bool
+	{
+		if (Lib::type()->passed($result, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `passed` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param mixed|null $result
+	 */
+	public function any_not_passed(&$result, $value): bool
+	{
+		if (Lib::type()->any_not_passed($result, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `any_not_passed` is failed", $value ]);
+	}
+
+
+	/**
 	 * > Специальный тип-синоним NULL, переданный пользователем через API, например '{N}'
 	 * > в случаях, когда NULL интерпретируется как "не трогать", а NIL как "очистить"
 	 *
@@ -30,13 +140,13 @@ class TypeThrowModule
 	 *
 	 * @param string|Nil|null $result
 	 */
-	public function a_nil(&$result, $value): bool
+	public function nil(&$result, $value): bool
 	{
 		if (Lib::type()->nil($result, $value)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_nil` is failed", $value ]);
+		throw new LogicException([ "Filter `nil` is failed", $value ]);
 	}
 
 
@@ -76,116 +186,6 @@ class TypeThrowModule
 		}
 
 		throw new LogicException([ "Filter `any_not_null` is failed", $value ]);
-	}
-
-
-	/**
-	 * > Специальный тип, который значит, что значение можно заменить NULL-ом
-	 *
-	 * @param mixed|null $result
-	 */
-	public function a_nullable(&$result, $value): bool
-	{
-		if (Lib::type()->nullable($result, $value)) {
-		    return true;
-		}
-
-		throw new LogicException([ "Filter `a_nullable` is failed", $value ]);
-	}
-
-
-	/**
-	 * @param mixed|null $result
-	 */
-	public function any_not_nullable(&$result, $value): bool
-	{
-		if (Lib::type()->any_not_nullable($result, $value)) {
-		    return true;
-		}
-
-		throw new LogicException([ "Filter `any_not_nullable` is failed", $value ]);
-	}
-
-
-	/**
-	 * @param mixed|null $result
-	 */
-	public function a_empty(&$result, $value): bool
-	{
-		if (Lib::type()->empty($result, $value)) {
-		    return true;
-		}
-
-		throw new LogicException([ "Filter `a_empty` is failed", $value ]);
-	}
-
-
-	/**
-	 * @param mixed|null $result
-	 */
-	public function any_not_empty(&$result, $value): bool
-	{
-		if (Lib::type()->any_not_empty($result, $value)) {
-		    return true;
-		}
-
-		throw new LogicException([ "Filter `any_not_empty` is failed", $value ]);
-	}
-
-
-	/**
-	 * > Специальный тип, который значит, что значение можно отбросить или не учитывать, т.к. оно не несёт информации
-	 *
-	 * @param string|array|\Countable|null $result
-	 */
-	public function a_blank(&$result, $value): bool
-	{
-		if (Lib::type()->blank($result, $value)) {
-		    return true;
-		}
-
-		throw new LogicException([ "Filter `a_blank` is failed", $value ]);
-	}
-
-
-	/**
-	 * @param mixed|null $result
-	 */
-	public function any_not_blank(&$result, $value): bool
-	{
-		if (Lib::type()->any_not_blank($result, $value)) {
-		    return true;
-		}
-
-		throw new LogicException([ "Filter `any_not_blank` is failed", $value ]);
-	}
-
-
-	/**
-	 * > Специальный тип, который значит, что значение было отправлено пользователем, а не появилось из PHP
-	 *
-	 * @param mixed|null $result
-	 */
-	public function a_passed(&$result, $value): bool
-	{
-		if (Lib::type()->passed($result, $value)) {
-		    return true;
-		}
-
-		throw new LogicException([ "Filter `a_passed` is failed", $value ]);
-	}
-
-
-	/**
-	 * @param mixed|null $result
-	 */
-	public function any_not_passed(&$result, $value): bool
-	{
-		if (Lib::type()->any_not_passed($result, $value)) {
-		    return true;
-		}
-
-		throw new LogicException([ "Filter `any_not_passed` is failed", $value ]);
 	}
 
 
@@ -348,26 +348,26 @@ class TypeThrowModule
 	/**
 	 * @param float|null $result
 	 */
-	public function a_nan(&$result, $value): bool
+	public function nan(&$result, $value): bool
 	{
 		if (Lib::type()->nan($result, $value)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_nan` is failed", $value ]);
+		throw new LogicException([ "Filter `nan` is failed", $value ]);
 	}
 
 
 	/**
 	 * @param float|null $result
 	 */
-	public function a_float_not_nan(&$result, $value): bool
+	public function float_not_nan(&$result, $value): bool
 	{
 		if (Lib::type()->float_not_nan($result, $value)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_float_not_nan` is failed", $value ]);
+		throw new LogicException([ "Filter `float_not_nan` is failed", $value ]);
 	}
 
 
@@ -387,26 +387,26 @@ class TypeThrowModule
 	/**
 	 * @param float|null $result
 	 */
-	public function a_finite(&$result, $value): bool
+	public function finite(&$result, $value): bool
 	{
 		if (Lib::type()->finite($result, $value)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_finite` is failed", $value ]);
+		throw new LogicException([ "Filter `finite` is failed", $value ]);
 	}
 
 
 	/**
 	 * @param float|null $result
 	 */
-	public function a_float_not_finite(&$result, $value): bool
+	public function float_not_finite(&$result, $value): bool
 	{
 		if (Lib::type()->float_not_finite($result, $value)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_float_not_finite` is failed", $value ]);
+		throw new LogicException([ "Filter `float_not_finite` is failed", $value ]);
 	}
 
 
@@ -426,26 +426,26 @@ class TypeThrowModule
 	/**
 	 * @param float|null $result
 	 */
-	public function a_infinite(&$result, $value): bool
+	public function infinite(&$result, $value): bool
 	{
 		if (Lib::type()->infinite($result, $value)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_infinite` is failed", $value ]);
+		throw new LogicException([ "Filter `infinite` is failed", $value ]);
 	}
 
 
 	/**
 	 * @param float|null $result
 	 */
-	public function a_float_not_infinite(&$result, $value): bool
+	public function float_not_infinite(&$result, $value): bool
 	{
 		if (Lib::type()->float_not_infinite($result, $value)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_float_not_infinite` is failed", $value ]);
+		throw new LogicException([ "Filter `float_not_infinite` is failed", $value ]);
 	}
 
 
@@ -1502,6 +1502,9 @@ class TypeThrowModule
 	}
 
 
+	/**
+	 * @param array|null $result
+	 */
 	public function array_of_type(&$result, $value, string $type): bool
 	{
 		if (Lib::type()->array_of_type($result, $value, $type)) {
@@ -1512,6 +1515,9 @@ class TypeThrowModule
 	}
 
 
+	/**
+	 * @param resource[]|null $result
+	 */
 	public function array_of_resource_type(&$result, $value, string $resourceType): bool
 	{
 		if (Lib::type()->array_of_resource_type($result, $value, $resourceType)) {
@@ -1570,6 +1576,9 @@ class TypeThrowModule
 	}
 
 
+	/**
+	 * @param array|null $result
+	 */
 	public function array_of_callback(&$result, $value, callable $fn, array $args = []): bool
 	{
 		if (Lib::type()->array_of_callback($result, $value, $fn, $args)) {
