@@ -191,7 +191,7 @@ $fn = function () use ($ffn) {
         \Gzhegow\Lib\Modules\Async\Promise\Promise::reject('[ 200 | ALL SETTLED ] 3'),
         \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(100)->then(function () { return '[ 200 | ALL SETTLED ] 4'; }),
     ];
-    \Gzhegow\Lib\Modules\Async\Promise\Promise::allSettled($ps)
+    \Gzhegow\Lib\Modules\Async\Promise\Promise::allOf($ps)
         ->then(function ($res) use ($ffn) {
             echo "\n";
             $ffn->print_array_multiline($res, 2);
