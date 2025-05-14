@@ -27,7 +27,6 @@ abstract class AbstractPromise
     //  */
     // public $debug;
 
-
     /**
      * @var PromiseManagerInterface
      */
@@ -35,7 +34,7 @@ abstract class AbstractPromise
     /**
      * @var LoopManagerInterface
      */
-    protected $loopManager;
+    protected $loop;
 
     /**
      * @var string
@@ -68,7 +67,7 @@ abstract class AbstractPromise
     {
         $this->manager = $manager;
 
-        $this->loopManager = $loop;
+        $this->loop = $loop;
     }
 
 
@@ -148,7 +147,8 @@ abstract class AbstractPromise
                     $this->resolvedValue
                 );
 
-                $this->loopManager->addMicrotask($fn);
+                $this->loop->addMicrotask($fn);
+                $this->loop->registerLoop();
             }
 
         } elseif (AbstractPromise::STATE_REJECTED === $this->state) {
@@ -164,7 +164,8 @@ abstract class AbstractPromise
                     $this->rejectedReason
                 );
 
-                $this->loopManager->addMicrotask($fn);
+                $this->loop->addMicrotask($fn);
+                $this->loop->registerLoop();
             }
 
         } else {
@@ -214,7 +215,8 @@ abstract class AbstractPromise
                     $this->rejectedReason
                 );
 
-                $this->loopManager->addMicrotask($fn);
+                $this->loop->addMicrotask($fn);
+                $this->loop->registerLoop();
             }
 
         } else {
@@ -258,7 +260,8 @@ abstract class AbstractPromise
                     $this
                 );
 
-                $this->loopManager->addMicrotask($fn);
+                $this->loop->addMicrotask($fn);
+                $this->loop->registerLoop();
             }
 
         } elseif (AbstractPromise::STATE_REJECTED === $this->state) {
@@ -274,7 +277,8 @@ abstract class AbstractPromise
                     $this
                 );
 
-                $this->loopManager->addMicrotask($fn);
+                $this->loop->addMicrotask($fn);
+                $this->loop->registerLoop();
             }
 
         } else {
@@ -322,7 +326,8 @@ abstract class AbstractPromise
                         $this->resolvedValue
                     );
 
-                    $this->loopManager->addMicrotask($fn);
+                    $this->loop->addMicrotask($fn);
+                    $this->loop->registerLoop();
                 }
 
             } elseif (PromiseSettler::TYPE_CATCH === $settler->type) {
@@ -345,7 +350,8 @@ abstract class AbstractPromise
                         $this
                     );
 
-                    $this->loopManager->addMicrotask($fn);
+                    $this->loop->addMicrotask($fn);
+                    $this->loop->registerLoop();
                 }
             }
         }
@@ -395,7 +401,8 @@ abstract class AbstractPromise
                         $this->rejectedReason
                     );
 
-                    $this->loopManager->addMicrotask($fn);
+                    $this->loop->addMicrotask($fn);
+                    $this->loop->registerLoop();
                 }
 
             } elseif (PromiseSettler::TYPE_CATCH === $settler->type) {
@@ -407,7 +414,8 @@ abstract class AbstractPromise
                     $this->rejectedReason
                 );
 
-                $this->loopManager->addMicrotask($fn);
+                $this->loop->addMicrotask($fn);
+                $this->loop->registerLoop();
 
             } elseif (PromiseSettler::TYPE_FINALLY === $settler->type) {
                 $fnOnFinally = $settler->fnOnFinally;
@@ -424,7 +432,8 @@ abstract class AbstractPromise
                         $this
                     );
 
-                    $this->loopManager->addMicrotask($fn);
+                    $this->loop->addMicrotask($fn);
+                    $this->loop->registerLoop();
                 }
             }
         }
@@ -432,7 +441,8 @@ abstract class AbstractPromise
         if (! $this->isRejectionDelegated) {
             $fn = static::fnThrowIfUnhandledRejection($this);
 
-            $this->loopManager->addMicrotask($fn);
+            $this->loop->addMicrotask($fn);
+            $this->loop->registerLoop();
         }
 
         $this->settlers = [];
@@ -706,22 +716,6 @@ abstract class AbstractPromise
      *
      * @return \Closure
      */
-    protected static function fnThrowIfUnhandledRejectionInSecondStep($loop, $promise)
-    {
-        return static function () use ($loop, $promise) {
-            if (! $promise->isRejectionDelegated) {
-                $fn = static::fnThrowIfUnhandledRejection($promise);
-
-                $loop->addMicrotask($fn);
-            }
-        };
-    }
-
-    /**
-     * @param static $promise
-     *
-     * @return \Closure
-     */
     protected static function fnThrowIfUnhandledRejection($promise)
     {
         return static function () use ($promise) {
@@ -735,6 +729,22 @@ abstract class AbstractPromise
             throw new PromiseException(
                 [ 'Unhandled rejection in Promise', $reason, $promise ], $reasonThrowable
             );
+        };
+    }
+
+    /**
+     * @param static $promise
+     *
+     * @return \Closure
+     */
+    protected static function fnThrowIfUnhandledRejectionInSecondStep($loop, $promise)
+    {
+        return static function () use ($loop, $promise) {
+            if (! $promise->isRejectionDelegated) {
+                $fn = static::fnThrowIfUnhandledRejection($promise);
+
+                $loop->addMicrotask($fn);
+            }
         };
     }
 

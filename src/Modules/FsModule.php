@@ -256,8 +256,8 @@ class FsModule
      * @param array{ 0: array|null } $refs
      */
     public function type_filepath(
-        &$result, $value,
-        ?bool $isAllowExists = null, ?bool $isAllowSymlink = null,
+        &$result, $value, ?bool $isAllowExists,
+        ?bool $isAllowSymlink = null,
         array $refs = []
     ) : bool
     {
@@ -398,14 +398,6 @@ class FsModule
             }
         }
 
-        $withExtensions = (null !== $extensions);
-        $withMimeTypes = (null !== $mimeTypes);
-
-        $fileRealpath = null;
-        if ($withExtensions || $withMimeTypes) {
-            $fileRealpath = $splFileInfo->getRealPath();
-        }
-
         if (null !== $extensions) {
             if (null !== $splFileInfo) {
                 $splFileInfo = $this->type_file_extensions($splFileInfo, $extensions);
@@ -506,8 +498,6 @@ class FsModule
         $filtersIntersect = array_intersect_key($filters, $filtersList);
 
         if ([] !== $filtersIntersect) {
-            $fileRealpath = $splFileInfo->getRealPath();
-
             $hasMaxSize = array_key_exists('max_size', $filters);
             $hasMinSize = array_key_exists('min_size', $filters);
 
@@ -706,16 +696,24 @@ class FsModule
 
     public function pathinfo(string $path, ?int $flags = null, ?string $separator = null) : array
     {
-        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
+            throw new LogicException(
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
 
-        return Lib::php()->pathinfo($path, $flags, $separator, '.');
+        return Lib::php()->pathinfo($path, $flags, $separatorString, '.');
     }
 
     public function dirname(string $path, ?int $levels = null, ?string $separator = null) : ?string
     {
-        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
+            throw new LogicException(
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
 
-        return Lib::php()->dirname($path, $separator, $levels);
+        return Lib::php()->dirname($path, $separatorString, $levels);
     }
 
     public function basename(string $path, ?string $extension = null) : ?string
@@ -746,10 +744,14 @@ class FsModule
 
     public function path_normalize(string $path, ?string $separator = null) : string
     {
-        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
+            throw new LogicException(
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
 
         if ($this->type_realpath($realpath, $path)) {
-            $normalized = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+            $normalized = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
 
         } else {
             $normalized = Lib::php()->path_normalize($path, $separator);
@@ -760,13 +762,17 @@ class FsModule
 
     public function path_resolve(string $path, ?string $separator = null) : string
     {
-        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
+            throw new LogicException(
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
 
         if ($this->type_realpath($realpath, $path)) {
-            $resolved = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+            $resolved = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
 
         } else {
-            $resolved = Lib::php()->path_resolve($path, $separator, '.');
+            $resolved = Lib::php()->path_resolve($path, $separatorString, '.');
         }
 
         return $resolved;
@@ -778,17 +784,21 @@ class FsModule
         ?string $separator = null
     ) : string
     {
-        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
+            throw new LogicException(
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
 
         if ($this->type_realpath($realpath, $path)) {
-            $path = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+            $path = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
         }
 
         if ($this->type_realpath($realpath, $root)) {
-            $root = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+            $root = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
         }
 
-        return Lib::php()->path_relative($path, $root, $separator, '.');
+        return Lib::php()->path_relative($path, $root, $separatorString, '.');
     }
 
     public function path_absolute(
@@ -796,17 +806,21 @@ class FsModule
         ?string $separator = null
     ) : string
     {
-        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
+            throw new LogicException(
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
 
         if ($this->type_realpath($realpath, $path)) {
-            $path = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+            $path = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
         }
 
         if ($this->type_realpath($realpath, $current)) {
-            $current = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+            $current = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
         }
 
-        return Lib::php()->path_absolute($path, $current, $separator, '.');
+        return Lib::php()->path_absolute($path, $current, $separatorString, '.');
     }
 
     public function path_or_absolute(
@@ -814,17 +828,21 @@ class FsModule
         ?string $separator = null
     ) : string
     {
-        $separator = Lib::parse()->char($separator) ?? DIRECTORY_SEPARATOR;
+        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
+            throw new LogicException(
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
 
         if ($this->type_realpath($realpath, $path)) {
-            $path = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+            $path = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
         }
 
         if ($this->type_realpath($realpath, $current)) {
-            $current = str_replace(DIRECTORY_SEPARATOR, $separator, $realpath);
+            $current = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
         }
 
-        return Lib::php()->path_or_absolute($path, $current, $separator, '.');
+        return Lib::php()->path_or_absolute($path, $current, $separatorString, '.');
     }
 
 
@@ -836,18 +854,27 @@ class FsModule
         ?bool $use_include_path = null, $context = null
     )
     {
+        $theType = Lib::type();
+
         $use_include_path = $use_include_path ?? false;
 
-        Lib::type($tt);
+        if (! $theType->filepath($fileString, $file, true)) {
+            throw new LogicException(
+                [ 'The `file` should be valid filepath', $file ]
+            );
+        }
 
-        $tt->filepath($fileString, $file);
+        if (! is_null($waitTimeoutMsInt = $waitTimeoutMs)) {
+            if (! $theType->int_non_negative($waitTimeoutMsInt, $waitTimeoutMs)) {
+                throw new LogicException(
+                    [ 'The `waitTimeoutMs` should be integer non-negative', $waitTimeoutMs ]
+                );
+            }
+        }
 
-        is_null($waitTimeoutMsInt = $waitTimeoutMs)
-        || $tt->numeric_int_non_negative($waitTimeoutMsInt, $waitTimeoutMs);
-
-        $waitTimeoutMt = null;
+        $waitTimeoutMicrotime = null;
         if (null === $waitTimeoutMsInt) {
-            $waitTimeoutMt = microtime(true) + ($waitTimeoutMsInt / 1000);
+            $waitTimeoutMicrotime = microtime(true) + ($waitTimeoutMsInt / 1000);
         }
 
         do {
@@ -864,8 +891,8 @@ class FsModule
 
                 break;
 
-            } elseif (null !== $waitTimeoutMt) {
-                if (microtime(true) > $waitTimeoutMt) {
+            } elseif (null !== $waitTimeoutMicrotime) {
+                if (microtime(true) > $waitTimeoutMicrotime) {
                     break;
                 }
             }
@@ -913,25 +940,33 @@ class FsModule
      * @return resource|bool
      */
     public function fopen_lock(
-        string $file,
-        ?string $modeOpen = null, ?int $modeLock = null,
+        string $file, string $modeOpen, int $modeLock,
         ?int $waitTimeoutMs = 0,
         array $fopenArgs = [],
         array $flockArgs = []
     )
     {
-        Lib::type($tt, $tb);
+        $theType = Lib::type();
 
-        $withWouldBlock = $tb->ref($refWouldBlock, 0, $flockArgs);
+        $withWouldBlock = $theType->ref($refWouldBlock, 0, $flockArgs);
 
-        $tt->filepath($fileString, $file);
+        if (! $theType->filepath($fileString, $file, true)) {
+            throw new LogicException(
+                [ 'The `file` should be valid filepath', $file ]
+            );
+        }
 
-        is_null($waitTimeoutMsInt = $waitTimeoutMs)
-        || $tt->numeric_int_non_negative($waitTimeoutMsInt, $waitTimeoutMs);
+        if (! is_null($waitTimeoutMsInt = $waitTimeoutMs)) {
+            if (! $theType->int_non_negative($waitTimeoutMsInt, $waitTimeoutMs)) {
+                throw new LogicException(
+                    [ 'The `waitTimeoutMs` should be non-negative integer', $waitTimeoutMs ]
+                );
+            }
+        }
 
-        $waitTimeoutMt = null;
+        $waitTimeoutMicrotime = null;
         if (null === $waitTimeoutMsInt) {
-            $waitTimeoutMt = microtime(true) + ($waitTimeoutMsInt / 1000);
+            $waitTimeoutMicrotime = microtime(true) + ($waitTimeoutMsInt / 1000);
         }
 
         do {
@@ -951,8 +986,8 @@ class FsModule
 
                 break;
 
-            } elseif (null !== $waitTimeoutMt) {
-                if (microtime(true) > $waitTimeoutMt) {
+            } elseif (null !== $waitTimeoutMicrotime) {
+                if (microtime(true) > $waitTimeoutMicrotime) {
                     if ($statusOpen) {
                         fclose($fh);
                     }
@@ -987,27 +1022,33 @@ class FsModule
      * @return resource|bool
      */
     public function fopen_lock_tmpfile(
-        string $file,
-        ?string $modeOpen = null, ?int $modeLock = null,
+        string $file, string $modeOpen, int $modeLock,
         ?int $waitTimeoutMs = 0,
         array $fopenArgs = [],
         array $flockArgs = []
     )
     {
-        Lib::type($tt, $tb);
+        $theType = Lib::type();
 
-        $withWouldBlock = $tb->ref($refWouldBlock, 0, $flockArgs);
+        $withWouldBlock = $theType->ref($refWouldBlock, 0, $flockArgs);
 
-        $tt->filepath($fileString, $file);
+        if (! $theType->filepath($fileString, $file, true)) {
+            throw new LogicException(
+                [ 'The `file` should be valid filepath', $file ]
+            );
+        }
 
-        $waitTimeoutMt = null;
-        if (null !== $modeLock) {
-            is_null($waitTimeoutMsInt = $waitTimeoutMs)
-            || $tt->numeric_int_non_negative($waitTimeoutMsInt, $waitTimeoutMs);
-
-            if (null === $waitTimeoutMsInt) {
-                $waitTimeoutMt = microtime(true) + ($waitTimeoutMsInt / 1000);
+        if (! is_null($waitTimeoutMsInt = $waitTimeoutMs)) {
+            if (! $theType->int_non_negative($waitTimeoutMsInt, $waitTimeoutMs)) {
+                throw new LogicException(
+                    [ 'The `waitTimeoutMs` should be non-negative integer', $waitTimeoutMs ]
+                );
             }
+        }
+
+        $waitTimeoutMicrotime = null;
+        if (null === $waitTimeoutMsInt) {
+            $waitTimeoutMicrotime = microtime(true) + ($waitTimeoutMsInt / 1000);
         }
 
         do {
@@ -1027,8 +1068,8 @@ class FsModule
 
                 break;
 
-            } elseif (null !== $waitTimeoutMt) {
-                if (microtime(true) > $waitTimeoutMt) {
+            } elseif (null !== $waitTimeoutMicrotime) {
+                if (microtime(true) > $waitTimeoutMicrotime) {
                     if ($statusOpen) {
                         fclose($fh);
                     }
@@ -1094,10 +1135,19 @@ class FsModule
 
     public function lpush(string $file, string $data, ?int $lockWaitTimeoutMs = 0, bool $throw = true) : bool
     {
-        Lib::type($tt);
+        $theType = Lib::type();
 
-        $tt->freepath($fileString, $file);
-        $tt->dirpath_realpath($var, dirname($fileString));
+        if (! $theType->freepath($fileString, $file)) {
+            throw new LogicException(
+                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+            );
+        }
+
+        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
+            throw new LogicException(
+                [ 'The `fileDir` should be existing directory', $fileDir ]
+            );
+        }
 
         $fileIn = "{$file}.in";
         $fileInLock = "{$file}.in.lock";
@@ -1117,7 +1167,7 @@ class FsModule
 
         $line = base64_encode($data);
 
-        file_put_contents($fileIn, $line . PHP_EOL . file_get_contents($fileIn));
+        file_put_contents($fileIn, $line . "\n" . file_get_contents($fileIn));
 
         $this->fclose_unlock_tmpfile($fhInLock, $fileInLock);
 
@@ -1126,10 +1176,19 @@ class FsModule
 
     public function rpush(string $file, string $data, ?int $lockWaitTimeoutMs = 0, bool $throw = true) : bool
     {
-        Lib::type($tt);
+        $theType = Lib::type();
 
-        $tt->freepath($fileString, $file);
-        $tt->dirpath_realpath($var, dirname($fileString));
+        if (! $theType->freepath($fileString, $file)) {
+            throw new LogicException(
+                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+            );
+        }
+
+        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
+            throw new LogicException(
+                [ 'The `fileDir` should be existing directory', $fileDir ]
+            );
+        }
 
         $fileIn = "{$file}.in";
         $fileInLock = "{$file}.in.lock";
@@ -1149,7 +1208,7 @@ class FsModule
 
         $line = base64_encode($data);
 
-        file_put_contents($fileIn, $line . PHP_EOL, FILE_APPEND);
+        file_put_contents($fileIn, $line . "\n", FILE_APPEND);
 
         $this->fclose_unlock_tmpfile($fhInLock, $fileInLock);
 
@@ -1159,17 +1218,31 @@ class FsModule
 
     public function lpop(string $file, ?int $blockTimeoutMs = 0, bool $throw = true) : ?string
     {
-        Lib::type($tt);
+        $theType = Lib::type();
 
-        $tt->freepath($fileString, $file);
-        $tt->dirpath_realpath($var, dirname($fileString));
+        if (! $theType->freepath($fileString, $file)) {
+            throw new LogicException(
+                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+            );
+        }
 
-        is_null($blockTimeoutMsInt = $blockTimeoutMs)
-        || $tt->numeric_int_non_negative($blockTimeoutMsInt, $blockTimeoutMs);
+        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
+            throw new LogicException(
+                [ 'The `fileDir` should be existing directory', $fileDir ]
+            );
+        }
 
-        $blockTimeoutMt = null;
+        if (! is_null($blockTimeoutMsInt = $blockTimeoutMs)) {
+            if (! $theType->int_non_negative($blockTimeoutMsInt, $blockTimeoutMs)) {
+                throw new LogicException(
+                    [ 'The `blockTimeoutMs` should be non-negative integer', $blockTimeoutMs ]
+                );
+            }
+        }
+
+        $blockTimeoutMicrotime = null;
         if (null !== $blockTimeoutMsInt) {
-            $blockTimeoutMt = microtime(true) + ($blockTimeoutMsInt / 1000);
+            $blockTimeoutMicrotime = microtime(true) + ($blockTimeoutMsInt / 1000);
         }
 
         $fileIn = "{$file}.in";
@@ -1192,7 +1265,7 @@ class FsModule
         $data = null;
 
         do {
-            if (microtime(true) > $blockTimeoutMt) {
+            if (microtime(true) > $blockTimeoutMicrotime) {
                 break;
             }
 
@@ -1240,22 +1313,36 @@ class FsModule
 
     public function rpop(string $file, ?int $blockTimeoutMs = 0, bool $throw = true) : ?string
     {
-        Lib::type($tt);
+        $theType = Lib::type();
 
-        $tt->freepath($fileString, $file);
-        $tt->dirpath_realpath($var, dirname($fileString));
+        if (! $theType->freepath($fileString, $file)) {
+            throw new LogicException(
+                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+            );
+        }
+
+        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
+            throw new LogicException(
+                [ 'The `fileDir` should be existing directory', $fileDir ]
+            );
+        }
+
+        if (! is_null($blockTimeoutMsInt = $blockTimeoutMs)) {
+            if (! $theType->int_non_negative($blockTimeoutMsInt, $blockTimeoutMs)) {
+                throw new LogicException(
+                    [ 'The `blockTimeoutMs` should be non-negative integer', $blockTimeoutMs ]
+                );
+            }
+        }
+
+        $blockTimeoutMicrotime = null;
+        if (null !== $blockTimeoutMsInt) {
+            $blockTimeoutMicrotime = microtime(true) + ($blockTimeoutMsInt / 1000);
+        }
 
         $fileIn = "{$file}.in";
         $fileOut = "{$file}.rpop";
         $fileOutLock = "{$file}.rpop.lock";
-
-        is_null($blockTimeoutMsInt = $blockTimeoutMs)
-        || $tt->numeric_int_non_negative($blockTimeoutMsInt, $blockTimeoutMs);
-
-        $blockTimeoutMt = null;
-        if (null !== $blockTimeoutMsInt) {
-            $blockTimeoutMt = microtime(true) + ($blockTimeoutMsInt / 1000);
-        }
 
         $fhOutLock = $this->fopen_lock_tmpfile($fileOutLock, 'w', LOCK_EX, $blockTimeoutMs);
         if (false === $fhOutLock) {
@@ -1273,7 +1360,7 @@ class FsModule
         $data = null;
 
         do {
-            if (microtime(true) > $blockTimeoutMt) {
+            if (microtime(true) > $blockTimeoutMicrotime) {
                 break;
             }
 
@@ -1418,10 +1505,9 @@ class FsModule
 
     public function file_replace_blocks(
         string $filepath,
-        string $start, $lines, string $end = ''
+        string $start, $lines, ?string $end = null
     ) : string
     {
-        $theParse = Lib::parse();
         $thePhp = Lib::php();
         $theType = Lib::type();
 
@@ -1440,7 +1526,13 @@ class FsModule
             );
         }
 
-        $endTrim = $theParse->trim($end) ?? '';
+        if (! is_null($endTrim = $end)) {
+            if (! $theType->trim($endTrim, $end)) {
+                throw new LogicException(
+                    [ 'The `end` should be non-empty trim', $end ]
+                );
+            }
+        }
 
         if ($startTrim === $endTrim) {
             throw new LogicException(
@@ -1484,10 +1576,10 @@ class FsModule
             }
 
             if (! $insideBlock) {
-                fwrite($output, $fgets . PHP_EOL);
+                fwrite($output, $fgets . "\n");
 
             } elseif (1 === $insideBlock) {
-                fwrite($output, $startTrim . PHP_EOL);
+                fwrite($output, $startTrim . "\n");
 
                 foreach ( $thePhp->to_list_it($lines) as $line ) {
                     if (is_array($line)) {
@@ -1496,19 +1588,19 @@ class FsModule
 
                     $line = rtrim($line);
 
-                    fwrite($output, $line . PHP_EOL);
+                    fwrite($output, $line . "\n");
                 }
 
-                fwrite($output, $endTrim . PHP_EOL);
+                fwrite($output, $endTrim . "\n");
 
                 $insideBlock = 2;
             }
         }
 
         if (null === $insideBlock) {
-            fwrite($output, PHP_EOL);
+            fwrite($output, "\n");
 
-            fwrite($output, $startTrim . PHP_EOL);
+            fwrite($output, $startTrim . "\n");
 
             foreach ( $thePhp->to_list_it($lines) as $line ) {
                 if (is_array($line)) {
@@ -1517,10 +1609,10 @@ class FsModule
 
                 $line = trim($line);
 
-                fwrite($output, $line . PHP_EOL);
+                fwrite($output, $line . "\n");
             }
 
-            fwrite($output, $endTrim . PHP_EOL);
+            fwrite($output, $endTrim . "\n");
         }
 
         fclose($input);

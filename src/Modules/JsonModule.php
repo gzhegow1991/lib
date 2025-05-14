@@ -44,7 +44,7 @@ class JsonModule
 
             $last = $this->jsonDepth;
 
-            $current = $jsonDepth;
+            $this->jsonDepth = $jsonDepth;
 
             $result = $last;
         }
@@ -65,7 +65,7 @@ class JsonModule
 
             $last = $this->jsonEncodeFlags;
 
-            $current = $jsonEncodeFlags;
+            $this->jsonEncodeFlags = $jsonEncodeFlags;
 
             $result = $last;
         }
@@ -86,7 +86,7 @@ class JsonModule
 
             $last = $this->jsonDecodeFlags;
 
-            $current = $jsonDecodeFlags;
+            $this->jsonDecodeFlags = $jsonDecodeFlags;
 
             $result = $last;
         }
@@ -99,21 +99,23 @@ class JsonModule
 
     /**
      * @param array{ 0?: mixed } $fallback
+     *
+     * @return mixed
      */
     public function json_decode(
-        ?string $json, ?bool $associative = null,
-        array $fallback = [],
+        ?string $json, ?bool $associative = null, array $fallback = [],
         ?int $depth = null, ?int $flags = null
     )
     {
-        if ('' === $json) {
-            return '';
-        }
+        if (null === $json) {
+            $result = [];
 
-        $result = [];
+        } elseif ('' === $json) {
+            $result = [ '' ];
 
-        if (null !== $json) {
+        } else {
             $result = $this->_json_decode(
+                $error,
                 $json, $associative,
                 $depth, $flags
             );
@@ -136,21 +138,22 @@ class JsonModule
 
     /**
      * @param array{ 0?: mixed } $fallback
+     *
+     * @return mixed
      */
     public function jsonc_decode(
-        ?string $json, ?bool $associative = null,
-        array $fallback = [],
+        ?string $json, ?bool $associative = null, array $fallback = [],
         ?int $depth = null, ?int $flags = null
     )
     {
-        if ('' === $json) {
-            return '';
-        }
+        if (null === $json) {
+            $result = [];
 
-        $result = [];
+        } elseif ('' === $json) {
+            $result = [ '' ];
 
-        if (null !== $json) {
-            $_json = $json;
+        } else {
+            $jsonString = $json;
 
             $regexes = [];
             $regexes[ '#' ] = '/' . preg_quote('#', '/') . '(.*?)$' . '/m';
@@ -158,15 +161,16 @@ class JsonModule
             $regexes[ '/*' ] = '/' . preg_quote('/*', '/') . '([\s\S]*?)' . preg_quote('*/', '/') . '/m';
 
             foreach ( $regexes as $substr => $regex ) {
-                if (false === strpos($_json, $substr)) {
+                if (false === strpos($jsonString, $substr)) {
                     continue;
                 }
 
-                $_json = preg_replace($regex, '$1', $_json);
+                $jsonString = preg_replace($regex, '$1', $jsonString);
             }
 
             $result = $this->_json_decode(
-                $_json, $associative,
+                $error,
+                $jsonString, $associative,
                 $depth, $flags
             );
         }
@@ -190,44 +194,101 @@ class JsonModule
      * @return array{ 0?: mixed }
      */
     protected function _json_decode(
+        &$error,
         ?string $json, ?bool $associative = null,
         ?int $depth = null, ?int $flags = null
     ) : array
     {
-        $error = null;
-
         if (null === $json) {
-            return [];
+            $error = new RuntimeException(
+                [ 'The `json` should be not null', $json ]
+            );
+
+            $result = [];
+
+        } elseif ('' === $json) {
+            $error = null;
+
+            $result = [ '' ];
+
+        } else {
+            $error = null;
+
+            $depth = $depth ?? $this->static_json_depth();
+            $flags = $flags ?? $this->static_json_decode_flags();
+
+            error_clear_last();
+
+            try {
+                $result = json_decode(
+                    $json, $associative,
+                    $depth, $flags
+                );
+
+                if (null === $result) {
+                    $error = new RuntimeException(
+                        [ 'The `json` should be valid JSON string', $json ]
+                    );
+
+                    $result = [];
+
+                } else {
+                    $result = [ $result ];
+                }
+            }
+            catch ( \Throwable $e ) {
+                $error = $e;
+
+                $result = [];
+            }
+
+            if (null === $error) {
+                if ($error = error_get_last()) {
+                    $result = [];
+                }
+            }
         }
 
-        if ('' === $json) {
-            return [ '' ];
-        }
-
-        $value = null;
-
-        $depth = $depth ?? $this->static_json_depth();
-        $flags = $flags ?? $this->static_json_decode_flags();
-
-        error_clear_last();
-
-        try {
-            $value = json_decode($json, $associative, $depth, $flags);
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        if (error_get_last()) {
-            $value = null;
-        }
-
-        if (null === $value) {
-            return [];
-        }
-
-        return [ $value ];
+        return $result;
     }
 
+
+    /**
+     * @param array{ 0?: string } $fallback
+     */
+    public function json_print(
+        $value, array $fallback = [],
+        ?bool $allowNull = null,
+        ?int $flags = null, ?int $depth = null
+    ) : ?string
+    {
+        $flags = $flags ?? $this->static_json_encode_flags();
+
+        $flags = $flags
+            | JSON_UNESCAPED_LINE_TERMINATORS
+            | JSON_UNESCAPED_UNICODE
+            | JSON_UNESCAPED_SLASHES;
+
+        $result = $this->_json_encode(
+            $error,
+            $value, $allowNull,
+            $flags, $depth
+        );
+
+        if ([] !== $result) {
+            [ $json ] = $result;
+
+        } elseif ([] !== $fallback) {
+            [ $json ] = $fallback;
+
+        } else {
+            throw new RuntimeException(
+                [ 'Unable to `json_print`', $value ]
+            );
+        }
+
+        return $json;
+    }
 
     /**
      * @param array{ 0?: string } $fallback
@@ -238,71 +299,88 @@ class JsonModule
         ?int $flags = null, ?int $depth = null
     ) : ?string
     {
-        $allowNull = $allowNull ?? false;
-        $flags = $flags ?? $this->static_json_encode_flags();
-        $depth = $depth ?? $this->static_json_depth();
+        $result = $this->_json_encode(
+            $error,
+            $value, $allowNull,
+            $flags, $depth
+        );
 
-        $theType = Lib::type();
+        if ([] !== $result) {
+            [ $json ] = $result;
 
-        if (
-            ($theType->resource($var, $value))
-            || (is_float($value) && is_nan($value))
-            || (! $allowNull && is_null($value))
-        ) {
-            $json = null;
+        } elseif ([] !== $fallback) {
+            [ $json ] = $fallback;
 
         } else {
-            error_clear_last();
-
-            try {
-                $json = json_encode($value, $flags, $depth);
-            }
-            catch ( \Throwable $e ) {
-                $json = null;
-            }
-
-            if (error_get_last()) {
-                $json = null;
-            }
-        }
-
-        if (null === $json) {
-            if ([] !== $fallback) {
-                [ $json ] = $fallback;
-
-            } else {
-                throw new RuntimeException(
-                    [
-                        'Unable to `json_encode`',
-                        $value,
-                    ]
-                );
-            }
+            throw new RuntimeException(
+                [ 'Unable to `json_encode`', $value ]
+            );
         }
 
         return $json;
     }
 
-
-    public function json_print(
-        $value, array $fallback = [],
+    /**
+     * @return array{ 0?: mixed }
+     */
+    protected function _json_encode(
+        &$error,
+        $value,
         ?bool $allowNull = null,
         ?int $flags = null, ?int $depth = null
-    ) : ?string
+    ) : array
     {
-        $flags = $flags ?? (
-            $this->static_json_encode_flags()
-            | JSON_UNESCAPED_LINE_TERMINATORS
-            | JSON_UNESCAPED_UNICODE
-            | JSON_UNESCAPED_SLASHES
-        );
+        $allowNull = $allowNull ?? false;
 
-        $json = $this->json_encode(
-            $value,
-            $fallback,
-            $allowNull,
-            $flags, $depth
-        );
+        if (
+            (is_float($value) && is_nan($value))
+            || (Lib::type()->resource($var, $value))
+        ) {
+            $error = new RuntimeException(
+                [ 'Unable to `json_encode`', $value ]
+            );
+
+            $json = [];
+
+        } elseif (! $allowNull && is_null($value)) {
+            $error = new RuntimeException(
+                [ 'Unable to `json_encode`', $value ]
+            );
+
+            $json = [];
+
+        } else {
+            $flags = $flags ?? $this->static_json_encode_flags();
+            $depth = $depth ?? $this->static_json_depth();
+
+            error_clear_last();
+
+            try {
+                $json = json_encode($value, $flags, $depth);
+
+                if (false === $json) {
+                    $error = new RuntimeException(
+                        [ 'Unable to `json_encode` given value', $value ]
+                    );
+
+                    $json = [];
+
+                } else {
+                    $json = [ $json ];
+                }
+            }
+            catch ( \Throwable $e ) {
+                $error = $e;
+
+                $json = [];
+            }
+
+            if (null === $error) {
+                if ($error = error_get_last()) {
+                    $json = [];
+                }
+            }
+        }
 
         return $json;
     }

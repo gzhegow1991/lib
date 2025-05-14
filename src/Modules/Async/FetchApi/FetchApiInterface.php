@@ -13,8 +13,10 @@ interface FetchApiInterface
 
     public function taskFlushResult(string $taskId, ?array &$taskResult = null) : bool;
 
+    public function clearTaskResults() : void;
 
-    public function daemonAddToPool(int $timeoutMs, ?float $nowUtime = null) : bool;
+
+    public function daemonAddToPool(int $timeoutMs, ?float $nowMicrotime = null) : bool;
 
     public function daemonRemoveFromPool() : bool;
 
@@ -22,6 +24,8 @@ interface FetchApiInterface
     public function daemonIsAwake(?int &$pidFirst = null) : bool;
 
     public function daemonWakeup(?int $timeoutMs = null, ?int $lockWaitTimeoutMs = null) : void;
+
+    public function daemonSpawn(?int $timeoutMs = null, ?int $lockWaitTimeoutMs = null) : void;
 
 
     public function daemonMain(int $timeoutMs, int $lockWaitTimeoutMs) : void;

@@ -63,18 +63,20 @@ class Promise
         return static::getInstance()->isPromise($value);
     }
 
-    public static function isTheDeferred($value) : bool
-    {
-        return static::getInstance()->isTheDeferred($value);
-    }
-
     public static function isThePromise($value) : bool
     {
         return static::getInstance()->isThePromise($value);
     }
 
+    public static function isTheDeferred($value) : bool
+    {
+        return static::getInstance()->isTheDeferred($value);
+    }
+
 
     /**
+     * @param callable $fnExecutor
+     *
      * @return APromise
      */
     public static function new($fnExecutor)
@@ -166,8 +168,9 @@ class Promise
     }
 
     /**
-     * @param int $tickMs
-     * @param int $timeoutMs
+     * @param int      $tickMs
+     * @param int      $timeoutMs
+     * @param callable $fnExecutor
      *
      * @return ADeferred
      */

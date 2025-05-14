@@ -8,6 +8,7 @@ use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 
 
 abstract class AbstractDictOf implements
+    DictOfInterface,
     ToArrayInterface
 {
     /**
@@ -142,21 +143,21 @@ abstract class AbstractDictOf implements
 
 
     /**
-     * @return int|string
-     */
-    public function put($value)
-    {
-        $this->values[] = $value;
-
-        end($this->values);
-
-        return key($this->values);
-    }
-
-    /**
      * @return static
      */
     public function set($key, $value)
+    {
+        $this->setValue($key ?? '', $value);
+
+        return $this;
+    }
+
+    /**
+     * @param int|string $key
+     *
+     * @return static
+     */
+    protected function setValue($key, $value)
     {
         if (! is_string($key)) {
             throw new LogicException(
@@ -169,6 +170,7 @@ abstract class AbstractDictOf implements
         return $this;
     }
 
+
     /**
      * @return static
      */
@@ -176,7 +178,7 @@ abstract class AbstractDictOf implements
     {
         if (isset($this->values[ $key ])) {
             throw new RuntimeException(
-                [ 'The array key is already exists: ' . ($key ?? '{ NULL }') ]
+                [ 'The array key is already exists: ' . var_export($key, true) ]
             );
         }
 
@@ -192,7 +194,7 @@ abstract class AbstractDictOf implements
     {
         if (! isset($this->values[ $key ])) {
             throw new RuntimeException(
-                [ 'Missing array key: ' . ($key ?? '{ NULL }') ]
+                [ 'Missing array key: ' . var_export($key, true) ]
             );
         }
 
@@ -207,7 +209,7 @@ abstract class AbstractDictOf implements
      */
     public function unset($key)
     {
-        unset($this->values[ $key ]);
+        $this->unsetValue($key);
 
         return $this;
     }
@@ -219,11 +221,23 @@ abstract class AbstractDictOf implements
     {
         if (! isset($this->values[ $key ])) {
             throw new RuntimeException(
-                [ 'Missing array key: ' . ($key ?? '{ NULL }') ]
+                [ 'Missing array key: ' . var_export($key, true) ]
             );
         }
 
-        $this->unset($key);
+        $this->unsetValue($key);
+
+        return $this;
+    }
+
+    /**
+     * @param int|string $key
+     *
+     * @return static
+     */
+    protected function unsetValue($key)
+    {
+        unset($this->values[ $key ]);
 
         return $this;
     }

@@ -375,7 +375,7 @@ class DefaultDumper implements DumperInterface
 
         foreach ( $vars as $arg ) {
             if ($content) {
-                $content .= PHP_EOL;
+                $content .= "\n";
             }
 
             $content .= Lib::debug()->var_dump($arg);
@@ -399,7 +399,7 @@ class DefaultDumper implements DumperInterface
 
         foreach ( $vars as $arg ) {
             if ($content) {
-                $content .= PHP_EOL;
+                $content .= "\n";
             }
 
             $content .= Lib::debug()->var_export($arg);
@@ -414,7 +414,7 @@ class DefaultDumper implements DumperInterface
 
         foreach ( $vars as $arg ) {
             if ($content) {
-                $content .= PHP_EOL;
+                $content .= "\n";
             }
 
             $content .= var_export($arg, true);
@@ -429,7 +429,7 @@ class DefaultDumper implements DumperInterface
 
         foreach ( $vars as $arg ) {
             if ($content) {
-                $content .= PHP_EOL;
+                $content .= "\n";
             }
 
             $content .= print_r($arg, true);
@@ -444,7 +444,7 @@ class DefaultDumper implements DumperInterface
 
         foreach ( $vars as $arg ) {
             if ($content) {
-                $content .= PHP_EOL;
+                $content .= "\n";
             }
 
             $content .= json_encode($arg,
@@ -524,7 +524,7 @@ class DefaultDumper implements DumperInterface
     {
         $content = $this->printPrinter(...$vars);
 
-        $content .= PHP_EOL;
+        $content .= "\n";
 
         echo $content;
     }
@@ -536,7 +536,7 @@ class DefaultDumper implements DumperInterface
         $throwIfHeadersSent = (bool) ($options[ 'throw_if_headers_sent' ] ?? true);
 
         $content = $this->printPrinter(...$vars);
-        $content .= PHP_EOL;
+        $content .= "\n";
 
         $htmlContent = nl2br($content);
 
@@ -562,7 +562,7 @@ class DefaultDumper implements DumperInterface
         $resource = $options[ 'stdout' ] ?? STDOUT;
 
         $content = $this->printPrinter(...$vars);
-        $content .= PHP_EOL;
+        $content .= "\n";
 
         fwrite($resource, $content);
     }
@@ -575,7 +575,7 @@ class DefaultDumper implements DumperInterface
         $throwIfHeadersSent = (bool) ($options[ 'throw_if_headers_sent' ] ?? true);
 
         $content = $this->printPrinter(...$vars);
-        $content .= PHP_EOL;
+        $content .= "\n";
 
         $htmlContent = nl2br($content);
 
@@ -605,7 +605,7 @@ class DefaultDumper implements DumperInterface
 
         $b64content = base64_encode($content);
 
-        $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . PHP_EOL;
+        $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . "\n";
 
         $isHeadersSent = headers_sent($file, $line);
 

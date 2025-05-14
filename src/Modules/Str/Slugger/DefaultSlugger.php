@@ -404,7 +404,7 @@ class DefaultSlugger implements SluggerInterface
         $gen = $this->translit_it($string, $ignoreSymbolMap);
 
         $translit = '';
-        foreach ( $gen as $i => [ $chunk, $chunkDelimiter ] ) {
+        foreach ( $gen as [ $chunk, $chunkDelimiter ] ) {
             $chunk = str_replace(
                 array_keys($sequnceMap),
                 array_values($sequnceMap),
@@ -438,24 +438,22 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
-        $canUseIntl = extension_loaded('intl') && function_exists('transliterator_transliterate');
-
         $stringObject = new \Symfony\Component\String\BinaryString($string);
 
-        if (
-            $stringObject->isUtf8()
-            && (! (
+        if ($stringObject->isUtf8()) {
+            $canUseIntl =
                 extension_loaded('intl')
-                && function_exists('transliterator_transliterate')
-            ))
-        ) {
-            throw new ComposerException(
-                [
-                    'Symfony Transliterator works incorectly without `ext-intl` if used on UTF-8 strings',
-                    //
-                    $string,
-                ]
-            );
+                && function_exists('transliterator_transliterate');
+
+            if (! $canUseIntl) {
+                throw new ComposerException(
+                    [
+                        'Symfony Transliterator works incorectly without `ext-intl` if used on UTF-8 strings',
+                        //
+                        $string,
+                    ]
+                );
+            }
         }
 
         $symfonySlugger = $this->newSymfonySlugger($ignoreSymbolUserMap, $locale);
@@ -488,7 +486,7 @@ class DefaultSlugger implements SluggerInterface
         $gen = $this->translit_it($string, $ignoreSymbolUserMap);
 
         $translit = '';
-        foreach ( $gen as $i => [ $chunk, $chunkDelimiter ] ) {
+        foreach ( $gen as [ $chunk, $chunkDelimiter ] ) {
             $chunk = transliterator_transliterate(
                 $rules,
                 $chunk
@@ -532,7 +530,7 @@ class DefaultSlugger implements SluggerInterface
         $gen = $this->translit_it($string, $ignoreSymbolMap);
 
         $translit = '';
-        foreach ( $gen as $i => [ $chunk, $chunkDelimiter ] ) {
+        foreach ( $gen as [ $chunk, $chunkDelimiter ] ) {
             $chunk = str_replace(
                 array_keys($sequnceMap),
                 array_values($sequnceMap),

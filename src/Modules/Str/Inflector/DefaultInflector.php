@@ -214,8 +214,6 @@ class DefaultInflector implements InflectorInterface
      */
     public function pluralize(string $singular, ?int $limit = null, ?int $offset = null) : array
     {
-        $array = [];
-
         $limit = $limit ?? 0;
         $offset = $offset ?? 0;
 
@@ -272,8 +270,6 @@ class DefaultInflector implements InflectorInterface
      */
     public function singularize(string $plural, ?int $limit = null, ?int $offset = null) : array
     {
-        $array = [];
-
         $limit = $limit ?? 0;
         $offset = $offset ?? 0;
 

@@ -788,7 +788,10 @@ class PhpModule
     {
         static $current;
 
-        return $current = $current ?? ('WIN' === strtoupper(substr(PHP_OS, 0, 3)));
+        // > немного быстрее будет так, как сделано ниже
+        // return $current = $current ?? ('WIN' === strtoupper(substr(PHP_OS, 0, 3)));
+
+        return $current = $current ?? (PHP_EOL !== "\n");
     }
 
     public function is_terminal() : bool
@@ -812,7 +815,7 @@ class PhpModule
         if (
             (null === $value)
             || (is_float($value) && is_nan($value))
-            || (Lib::type()->a_nil($var, $value))
+            || (Lib::type()->nil($var, $value))
         ) {
             throw new LogicException(
                 [
@@ -851,7 +854,7 @@ class PhpModule
             || (is_array($value))
             || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->a_nil($var, $value))
+            || (Lib::type()->nil($var, $value))
         ) {
             throw new LogicException(
                 [
@@ -899,7 +902,7 @@ class PhpModule
             || (is_array($value))
             // || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->a_nil($var, $value))
+            || (Lib::type()->nil($var, $value))
         ) {
             throw new LogicException(
                 [
@@ -938,7 +941,7 @@ class PhpModule
             || (is_array($value))
             || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->a_nil($var, $value))
+            || (Lib::type()->nil($var, $value))
         ) {
             throw new LogicException(
                 [
@@ -995,7 +998,7 @@ class PhpModule
             // || (is_array($value))
             || (is_float($value) && (! is_nan($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->a_nil($var, $value))
+            || (Lib::type()->nil($var, $value))
         ) {
             throw new LogicException(
                 [
@@ -1042,7 +1045,7 @@ class PhpModule
             // || (is_array($value))
             || (is_float($value) && (! is_nan($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->a_nil($var, $value))
+            || (Lib::type()->nil($var, $value))
         ) {
             throw new LogicException(
                 [
@@ -1648,10 +1651,21 @@ class PhpModule
 
         $_flags = $flags ?? _PHP_PATHINFO_ALL;
 
-        $separator = Lib::parse()->char($separator) ?? '/';
-        $dot = Lib::parse()->char($dot) ?? '.';
+        $theType = Lib::type();
 
-        if ('/' === $dot) {
+        if (! $theType->char($separatorString, $separator ?? '/')) {
+            throw new LogicException(
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
+
+        if (! $theType->char($dotString, $dot ?? '.')) {
+            throw new LogicException(
+                [ 'The `dot` should be char', $dot ]
+            );
+        }
+
+        if ('/' === $dotString) {
             throw new LogicException(
                 [ 'The `dot` should not be `/` sign' ]
             );
@@ -1671,7 +1685,7 @@ class PhpModule
             } else {
                 $dirname = dirname($dirname);
 
-                $dirname = str_replace('/', $separator, $dirname);
+                $dirname = str_replace('/', $separatorString, $dirname);
 
                 $dirname = ('' !== $dirname) ? $dirname : null;
             }
@@ -1691,7 +1705,7 @@ class PhpModule
         ) {
             $filename = $basename;
 
-            $split = explode($dot, $basename) + [ '', '' ];
+            $split = explode($dotString, $basename) + [ '', '' ];
 
             $file = array_shift($split);
 
@@ -1704,7 +1718,7 @@ class PhpModule
                 } else {
                     $pi[ 'extension' ] = $extension;
 
-                    $filename = basename($basename, "{$dot}{$extension}");
+                    $filename = basename($basename, "{$dotString}{$extension}");
                 }
             }
 
@@ -1719,7 +1733,7 @@ class PhpModule
             if ($_flags & _PHP_PATHINFO_EXTENSIONS) {
                 $extensions = null;
                 if ([] !== $split) {
-                    $extensions = implode($dot, $split);
+                    $extensions = implode($dotString, $split);
                 }
 
                 $pi[ 'extensions' ] = $extensions;
@@ -1740,13 +1754,17 @@ class PhpModule
             );
         }
 
-        $levels = $levels ?? 1;
+        $theType = Lib::type();
 
-        $separator = Lib::parse()->char($separator) ?? '/';
-
-        if ($levels < 1) {
+        if (! $theType->char($separatorString, $separator ?? '/')) {
             throw new LogicException(
-                [ 'The `levels` should be GTE 1', $levels ]
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
+
+        if (! $theType->int_positive($levelsInt, $levels ?? 1)) {
+            throw new LogicException(
+                [ 'The `levels` should be positive integer', $levels ]
             );
         }
 
@@ -1758,9 +1776,9 @@ class PhpModule
             $dirname = null;
 
         } else {
-            $dirname = dirname($dirname, $levels);
+            $dirname = dirname($dirname, $levelsInt);
 
-            $dirname = str_replace('/', $separator, $dirname);
+            $dirname = str_replace('/', $separatorString, $dirname);
         }
 
         return ('' !== $dirname) ? $dirname : null;
@@ -1789,17 +1807,21 @@ class PhpModule
             );
         }
 
-        $dot = Lib::parse()->char($dot) ?? '.';
+        if (! Lib::type()->char($dotString, $dot ?? '.')) {
+            throw new LogicException(
+                [ 'The `dot` should be char', $dot ]
+            );
+        }
 
         $normalized = $this->path_normalize($path, '/');
 
         $basename = basename($normalized);
 
-        $split = explode($dot, $basename) + [ '', '' ];
+        $split = explode($dotString, $basename) + [ '', '' ];
 
         $extension = end($split);
 
-        $filename = basename($basename, "{$dot}{$extension}");
+        $filename = basename($basename, "{$dotString}{$extension}");
 
         return ('' !== $filename) ? $filename : null;
     }
@@ -1812,13 +1834,17 @@ class PhpModule
             );
         }
 
-        $dot = Lib::parse()->char($dot) ?? '.';
+        if (! Lib::type()->char($dotString, $dot ?? '.')) {
+            throw new LogicException(
+                [ 'The `dot` should be char', $dot ]
+            );
+        }
 
         $normalized = $this->path_normalize($path, '/');
 
         $basename = basename($normalized);
 
-        $split = explode($dot, $basename) + [ '', '' ];
+        $split = explode($dotString, $basename) + [ '', '' ];
 
         $extension = end($split);
 
@@ -1833,13 +1859,17 @@ class PhpModule
             );
         }
 
-        $dot = Lib::parse()->char($dot) ?? '.';
+        if (! Lib::type()->char($dotString, $dot ?? '.')) {
+            throw new LogicException(
+                [ 'The `dot` should be char', $dot ]
+            );
+        }
 
         $normalized = $this->path_normalize($path, '/');
 
         $basename = basename($normalized);
 
-        [ $file ] = explode($dot, $basename, 2);
+        [ $file ] = explode($dotString, $basename, 2);
 
         return ('' !== $file) ? $file : null;
     }
@@ -1852,9 +1882,13 @@ class PhpModule
             );
         }
 
-        $dot = Lib::parse()->char($dot) ?? '.';
+        if (! Lib::type()->char($dotString, $dot ?? '.')) {
+            throw new LogicException(
+                [ 'The `dot` should be char', $dot ]
+            );
+        }
 
-        if ('/' === $dot) {
+        if ('/' === $dotString) {
             throw new LogicException(
                 [ 'The `dot` should not be `/` sign' ]
             );
@@ -1864,13 +1898,13 @@ class PhpModule
 
         $basename = basename($normalized);
 
-        $split = explode($dot, $basename) + [ 1 => '' ];
+        $split = explode($dotString, $basename) + [ 1 => '' ];
 
         array_shift($split);
 
         $extensions = null;
         if ([] !== $split) {
-            $extensions = implode($dot, $split);
+            $extensions = implode($dotString, $split);
         }
 
         return $extensions;
@@ -1888,18 +1922,20 @@ class PhpModule
             );
         }
 
-        $separator = Lib::parse()->char($separator) ?? '/';
-
-        $normalized = $path;
+        if (! Lib::type()->char($separatorString, $separator ?? '/')) {
+            throw new LogicException(
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
 
         $separators = [
             '\\'                => true,
             DIRECTORY_SEPARATOR => true,
-            $separator          => true,
+            $separatorString    => true,
         ];
         $separators = array_keys($separators);
 
-        $normalized = str_replace($separators, $separator, $path);
+        $normalized = str_replace($separators, $separatorString, $path);
 
         return $normalized;
     }
@@ -1915,13 +1951,24 @@ class PhpModule
             );
         }
 
-        $separator = Lib::parse()->char($separator) ?? '/';
-        $dot = Lib::parse()->char($dot) ?? '.';
+        $theType = Lib::type();
+
+        if (! $theType->char($separatorString, $separator ?? '/')) {
+            throw new LogicException(
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
+
+        if (! $theType->char($dotString, $dot ?? '.')) {
+            throw new LogicException(
+                [ 'The `dot` should be char', $dot ]
+            );
+        }
 
         $pathNormalized = $this->path_normalize($path, '/');
 
         $root = ($pathNormalized[ 0 ] === '/')
-            ? $separator
+            ? $separatorString
             : '';
 
         $segments = trim($pathNormalized, '/');
@@ -1931,12 +1978,12 @@ class PhpModule
         foreach ( $segments as $segment ) {
             if (
                 ('' === $segment)
-                || ($dot === $segment)
+                || ($dotString === $segment)
             ) {
                 continue;
             }
 
-            if ($segment === "{$dot}{$dot}") {
+            if ($segment === "{$dotString}{$dotString}") {
                 if ([] === $segmentsNew) {
                     throw new RuntimeException(
                         [
@@ -1954,15 +2001,15 @@ class PhpModule
             $segmentsNew[] = $segment;
         }
 
-        $pathResolved = $root . implode($separator, $segmentsNew);
+        $pathResolved = $root . implode($separatorString, $segmentsNew);
 
         if ('' === $pathResolved) {
             throw new RuntimeException(
                 [
                     'Result path should be non-empty string',
                     $path,
-                    $separator,
-                    $dot,
+                    $separatorString,
+                    $dotString,
                 ]
             );
         }
@@ -1991,15 +2038,19 @@ class PhpModule
             );
         }
 
-        $separator = Lib::parse()->char($separator) ?? '/';
+        if (! Lib::type()->char($separatorString, $separator ?? '/')) {
+            throw new LogicException(
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
 
-        $pathResolved = $this->path_resolve($path, $separator, $dot);
+        $pathResolved = $this->path_resolve($path, $separatorString, $dot);
 
-        $rootNormalized = $this->path_normalize($root, $separator);
-        $rootNormalized = rtrim($rootNormalized, $separator);
+        $rootNormalized = $this->path_normalize($root, $separatorString);
+        $rootNormalized = rtrim($rootNormalized, $separatorString);
 
         $status = Lib::str()->str_starts(
-            $pathResolved, ($rootNormalized . $separator),
+            $pathResolved, ($rootNormalized . $separatorString),
             false,
             [ &$pathRelative ]
         );
@@ -2015,7 +2066,7 @@ class PhpModule
                 [
                     'Result path should be non-empty string',
                     $path,
-                    $separator,
+                    $separatorString,
                     $dot,
                 ]
             );
@@ -2044,22 +2095,26 @@ class PhpModule
             );
         }
 
-        $separator = Lib::parse()->char($separator) ?? '/';
+        if (! Lib::type()->char($separatorString, $separator ?? '/')) {
+            throw new LogicException(
+                [ 'The `separator` should be char', $separator ]
+            );
+        }
 
-        $relativeNormalized = $this->path_normalize($relative, $separator);
+        $relativeNormalized = $this->path_normalize($relative, $separatorString);
 
-        $isRoot = ($separator === $relativeNormalized[ 0 ]);
+        $isRoot = ($separatorString === $relativeNormalized[ 0 ]);
 
         if ($isRoot) {
             $absoluteNormalized = $relativeNormalized;
 
         } else {
-            $currentNormalized = $this->path_normalize($current, $separator);
+            $currentNormalized = $this->path_normalize($current, $separatorString);
 
-            $absoluteNormalized = $currentNormalized . $separator . $relativeNormalized;
+            $absoluteNormalized = $currentNormalized . $separatorString . $relativeNormalized;
         }
 
-        $absoluteResolved = $this->path_resolve($absoluteNormalized, $separator, $dot);
+        $absoluteResolved = $this->path_resolve($absoluteNormalized, $separatorString, $dot);
 
         return $absoluteResolved;
     }
@@ -2084,12 +2139,16 @@ class PhpModule
             );
         }
 
-        $dot = Lib::parse()->char($dot) ?? '.';
+        if (! Lib::type()->char($dotString, $dot ?? '.')) {
+            throw new LogicException(
+                [ 'The `dot` should be char', $separator ]
+            );
+        }
 
-        $isDot = ($dot === $path[ 0 ]);
+        $isDot = ($dotString === $path[ 0 ]);
 
         if ($isDot) {
-            $pathResolved = $this->path_absolute($path, $current, $separator, $dot);
+            $pathResolved = $this->path_absolute($path, $current, $separator, $dotString);
 
         } else {
             $pathResolved = $this->path_normalize($path, $separator);

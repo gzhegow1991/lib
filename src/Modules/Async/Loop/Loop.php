@@ -57,11 +57,6 @@ class Loop
         static::getInstance()->runLoop();
     }
 
-    public static function registerLoop() : void
-    {
-        static::getInstance()->registerLoop();
-    }
-
 
     public static function getInstance() : LoopManagerInterface
     {

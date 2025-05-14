@@ -312,10 +312,9 @@ class FuncModule
 
         [ $fnArgs ] = $this->func_args_unique($args);
 
-        if (! $isMaybeInternalFunction) {
-            $result = call_user_func_array($fn, $fnArgs);
+        $isIntKeys = array_key_exists(0, $fnArgs);
 
-        } elseif (! ($isIntKeys = array_key_exists(0, $fnArgs))) {
+        if (! ($isMaybeInternalFunction || ! $isIntKeys)) {
             $result = call_user_func_array($fn, $fnArgs);
 
         } else {

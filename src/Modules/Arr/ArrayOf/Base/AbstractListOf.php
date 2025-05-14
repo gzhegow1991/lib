@@ -8,6 +8,7 @@ use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 
 
 abstract class AbstractListOf implements
+    ListOfInterface,
     ToArrayInterface
 {
     /**
@@ -142,21 +143,45 @@ abstract class AbstractListOf implements
 
 
     /**
-     * @return int|string
+     * @return static
      */
-    public function put($value)
+    public function set($key, $value)
     {
-        $this->values[] = $value;
+        if (null === $key) {
+            $this->push($value);
 
-        end($this->values);
+        } else {
+            $this->setValue($key, $value);
+        }
 
-        return key($this->values);
+        return $this;
     }
 
     /**
      * @return static
      */
-    public function set($key, $value)
+    public function push($value, &$key = null)
+    {
+        $key = null;
+
+        $this->values[] = null;
+
+        $key = array_key_last($this->values);
+
+        unset($this->values[ $key ]);
+
+        $this->setValue($key, $value);
+
+        return $this;
+    }
+
+    /**
+     * @param int|string $key
+     * @param            $value
+     *
+     * @return static
+     */
+    protected function setValue($key, $value)
     {
         if (! is_int($key)) {
             throw new LogicException(
@@ -169,6 +194,7 @@ abstract class AbstractListOf implements
         return $this;
     }
 
+
     /**
      * @return static
      */
@@ -176,7 +202,7 @@ abstract class AbstractListOf implements
     {
         if (isset($this->values[ $key ])) {
             throw new RuntimeException(
-                [ 'The array key is already exists: ' . ($key ?? '{ NULL }') ]
+                [ 'The array key is already exists: ' . var_export($key, true) ]
             );
         }
 
@@ -192,7 +218,7 @@ abstract class AbstractListOf implements
     {
         if (! isset($this->values[ $key ])) {
             throw new RuntimeException(
-                [ 'Missing array key: ' . ($key ?? '{ NULL }') ]
+                [ 'Missing array key: ' . var_export($key, true) ]
             );
         }
 
@@ -207,7 +233,7 @@ abstract class AbstractListOf implements
      */
     public function unset($key)
     {
-        unset($this->values[ $key ]);
+        $this->unsetValue($key);
 
         return $this;
     }
@@ -219,11 +245,23 @@ abstract class AbstractListOf implements
     {
         if (! isset($this->values[ $key ])) {
             throw new RuntimeException(
-                [ 'Missing array key: ' . ($key ?? '{ NULL }') ]
+                [ 'Missing array key: ' . var_export($key, true) ]
             );
         }
 
-        $this->unset($key);
+        $this->unsetValue($key);
+
+        return $this;
+    }
+
+    /**
+     * @param int|string $key
+     *
+     * @return static
+     */
+    protected function unsetValue($key)
+    {
+        unset($this->values[ $key ]);
 
         return $this;
     }

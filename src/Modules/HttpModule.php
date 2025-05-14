@@ -170,7 +170,7 @@ class HttpModule
         if (null !== $cookies) {
             $last = $this->cookies;
 
-            $current = $cookies;
+            $this->cookies = $cookies;
 
             $result = $last;
         }
@@ -192,9 +192,10 @@ class HttpModule
             return false;
         }
 
-        $_value = Lib::parse()->string_not_empty($_COOKIE[ $name ]);
+        // > convert empty string to null
+        Lib::type()->string_not_empty($cookieString, $_COOKIE[ $name ]);
 
-        $result = $_value;
+        $result = $cookieString;
 
         return true;
     }
@@ -244,7 +245,10 @@ class HttpModule
 
         $theCookies = $this->static_cookies();
 
-        $_value = Lib::parse()->string_not_empty($value) ?? ' ';
+        // > convert empty string to null
+        Lib::type()->string_not_empty($valueString, $value);
+
+        $_value = $valueString ?? ' ';
         $_value = rawurlencode($_value);
 
         $_expires = $expires ?: 0;
@@ -300,7 +304,7 @@ class HttpModule
         if (null !== $session) {
             $last = $this->session;
 
-            $current = $session;
+            $this->session = $session;
 
             $result = $last;
         }
@@ -536,7 +540,7 @@ class HttpModule
 
                 $acceptItem = array_shift($acceptVars);
 
-                foreach ( $acceptVars as $i => $acceptVar ) {
+                foreach ( $acceptVars as $acceptVar ) {
                     [
                         $acceptVarName,
                         $acceptVarValue,
@@ -550,7 +554,8 @@ class HttpModule
                 }
             }
 
-            $qValueNumeric = Lib::parse()->numeric($qValue);
+            // > convert non-numeric value to NULL
+            Lib::type()->numeric($qValueNumeric, $qValue);
 
             $acceptList[ $acceptItem ] = [ $qValueNumeric, $acceptVarsArray ];
         }

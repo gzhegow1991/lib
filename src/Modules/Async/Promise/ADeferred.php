@@ -11,12 +11,12 @@ class ADeferred extends AbstractPromise
      * @return static
      */
     public static function newNever(
-        PromiseManagerInterface $factory,
+        PromiseManagerInterface $manager,
         //
         LoopManagerInterface $loop
     )
     {
-        $instance = new static($factory, $loop);
+        $instance = new static($manager, $loop);
         $instance->state = static::STATE_PENDING;
 
         return $instance;
@@ -26,7 +26,7 @@ class ADeferred extends AbstractPromise
      * @return static
      */
     public static function newDefer(
-        PromiseManagerInterface $factory,
+        PromiseManagerInterface $manager,
         //
         LoopManagerInterface $loop,
         //
@@ -36,7 +36,7 @@ class ADeferred extends AbstractPromise
         $fnResolve = null;
         $fnReject = null;
 
-        $instance = new static($factory, $loop);
+        $instance = new static($manager, $loop);
 
         $fnResolve = static::fnResolve($instance);
         $fnReject = static::fnReject($instance);

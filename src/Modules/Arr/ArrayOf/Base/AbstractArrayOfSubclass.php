@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Modules\Arr\ArrayOf\Base;
 
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Modules\Arr\ArrayOf\Base\AbstractArrayOf;
 
 
 /**
@@ -58,7 +57,7 @@ abstract class AbstractArrayOfSubclass extends AbstractArrayOf
     }
 
 
-    public function set($key, $value)
+    protected function setValue($key, $value)
     {
         if (! is_object($value)) {
             throw new LogicException(
@@ -78,7 +77,7 @@ abstract class AbstractArrayOfSubclass extends AbstractArrayOf
             );
         }
 
-        return parent::set($key, $value);
+        return parent::setValue($key, $value);
     }
 
 

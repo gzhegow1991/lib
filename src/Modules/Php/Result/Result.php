@@ -11,145 +11,145 @@ class Result
     /**
      * @see static::typeBool()
      */
-    public static function type(?ResultContext &$ref = null) : ResultContext
+    public static function type(?Res &$ref = null) : Res
     {
-        return $ref = ResultContext::fromMode(
-            ResultContext::MODE_RETURN_BOOLEAN,
-            ResultContext::MODE_THROW_OFF,
+        return $ref = Res::fromMode(
+            Res::MODE_RETURN_BOOLEAN,
+            Res::MODE_THROW_OFF,
         );
     }
 
     /**
      * @see static::parseNull()
      */
-    public static function parse(?ResultContext &$ref = null) : ResultContext
+    public static function parse(?Res &$ref = null) : Res
     {
-        return $ref = ResultContext::fromMode(
-            ResultContext::MODE_RETURN_VALUE,
-            ResultContext::MODE_THROW_OFF,
+        return $ref = Res::fromMode(
+            Res::MODE_RETURN_VALUE,
+            Res::MODE_THROW_OFF,
         );
     }
 
     /**
      * @see static::ignoreNull()
      */
-    public static function ignore(?ResultContext &$ref = null) : ResultContext
+    public static function ignore(?Res &$ref = null) : Res
     {
-        return $ref = ResultContext::fromMode(
-            ResultContext::MODE_RETURN_NULL,
-            ResultContext::MODE_THROW_OFF,
+        return $ref = Res::fromMode(
+            Res::MODE_RETURN_NULL,
+            Res::MODE_THROW_OFF,
         );
     }
 
 
-    public static function typeBool(?ResultContext &$ref = null) : ResultContext
+    public static function typeBool(?Res &$ref = null) : Res
     {
-        return $ref = ResultContext::fromMode(
-            ResultContext::MODE_RETURN_BOOLEAN,
-            ResultContext::MODE_THROW_OFF,
+        return $ref = Res::fromMode(
+            Res::MODE_RETURN_BOOLEAN,
+            Res::MODE_THROW_OFF,
         );
     }
 
-    public static function typeThrow(?ResultContext &$ref = null) : ResultContext
+    public static function typeThrow(?Res &$ref = null) : Res
     {
-        return $ref = ResultContext::fromMode(
-            ResultContext::MODE_RETURN_BOOLEAN,
-            ResultContext::MODE_THROW_ON,
-        );
-    }
-
-
-    public static function parseNull(?ResultContext &$ref = null) : ResultContext
-    {
-        return $ref = ResultContext::fromMode(
-            ResultContext::MODE_RETURN_VALUE,
-            ResultContext::MODE_THROW_OFF,
-        );
-    }
-
-    public static function parseThrow(?ResultContext &$ref = null) : ResultContext
-    {
-        return $ref = ResultContext::fromMode(
-            ResultContext::MODE_RETURN_VALUE,
-            ResultContext::MODE_THROW_ON,
+        return $ref = Res::fromMode(
+            Res::MODE_RETURN_BOOLEAN,
+            Res::MODE_THROW_ON,
         );
     }
 
 
-    public static function ignoreNull(?ResultContext &$ref = null) : ResultContext
+    public static function parseNull(?Res &$ref = null) : Res
     {
-        return $ref = ResultContext::fromMode(
-            ResultContext::MODE_RETURN_NULL,
-            ResultContext::MODE_THROW_OFF,
+        return $ref = Res::fromMode(
+            Res::MODE_RETURN_VALUE,
+            Res::MODE_THROW_OFF,
         );
     }
 
-    public static function ignoreThrow(?ResultContext &$ref = null) : ResultContext
+    public static function parseThrow(?Res &$ref = null) : Res
     {
-        return $ref = ResultContext::fromMode(
-            ResultContext::MODE_RETURN_NULL,
-            ResultContext::MODE_THROW_ON,
+        return $ref = Res::fromMode(
+            Res::MODE_RETURN_VALUE,
+            Res::MODE_THROW_ON,
+        );
+    }
+
+
+    public static function ignoreNull(?Res &$ref = null) : Res
+    {
+        return $ref = Res::fromMode(
+            Res::MODE_RETURN_NULL,
+            Res::MODE_THROW_OFF,
+        );
+    }
+
+    public static function ignoreThrow(?Res &$ref = null) : Res
+    {
+        return $ref = Res::fromMode(
+            Res::MODE_RETURN_NULL,
+            Res::MODE_THROW_ON,
         );
     }
 
 
     /**
-     * @param ResultContext $ctx
-     * @param mixed         $value
+     * @param Res   $res
+     * @param mixed $value
      *
-     * @return ResultContext|mixed|true
+     * @return Res|mixed|true
      */
-    public static function ok($ctx, $value)
+    public static function ok($res, $value)
     {
-        $ctx = $ctx ?? static::parseThrow();
+        $res = $res ?? static::parseThrow();
 
-        $ctx->ok($value);
+        $res->ok($value);
 
-        if (ResultContext::MODE_RETURN_VALUE === $ctx->modeReturn) {
+        if (Res::MODE_RETURN_VALUE === $res->modeReturn) {
             return $value;
 
-        } elseif (ResultContext::MODE_RETURN_BOOLEAN === $ctx->modeReturn) {
+        } elseif (Res::MODE_RETURN_BOOLEAN === $res->modeReturn) {
             return true;
 
-        } elseif (ResultContext::MODE_RETURN_NULL === $ctx->modeReturn) {
+        } elseif (Res::MODE_RETURN_NULL === $res->modeReturn) {
             return null;
 
-        } elseif (ResultContext::MODE_RETURN_CONTEXT === $ctx->modeReturn) {
-            return $ctx;
+        } elseif (Res::MODE_RETURN_CONTEXT === $res->modeReturn) {
+            return $res;
         }
 
-        throw new RuntimeException([ 'Mode is unknown', $ctx ]);
+        throw new RuntimeException([ 'Mode is unknown', $res ]);
     }
 
     /**
-     * @param ResultContext $ctx
-     * @param mixed         $error
+     * @param Res   $res
+     * @param mixed $error
      *
-     * @return ResultContext|null|false
+     * @return Res|null|false
      */
-    public static function err($ctx, $error, array $trace = [], array $tags = [])
+    public static function err($res, $error, array $trace = [], array $tags = [])
     {
-        $ctx = $ctx ?? static::parseThrow();
+        $res = $res ?? static::parseThrow();
 
-        $ctx->err($error, $tags, $trace);
+        $res->err($error, $tags, $trace);
 
-        if (ResultContext::MODE_THROW_ON === $ctx->modeThrow) {
-            throw new LogicException(...$ctx->errors());
+        if (Res::MODE_THROW_ON === $res->modeThrow) {
+            throw new LogicException(...$res->errors());
         }
 
-        if (ResultContext::MODE_RETURN_VALUE === $ctx->modeReturn) {
+        if (Res::MODE_RETURN_VALUE === $res->modeReturn) {
             return null;
 
-        } elseif (ResultContext::MODE_RETURN_BOOLEAN === $ctx->modeReturn) {
+        } elseif (Res::MODE_RETURN_BOOLEAN === $res->modeReturn) {
             return false;
 
-        } elseif (ResultContext::MODE_RETURN_NULL === $ctx->modeReturn) {
+        } elseif (Res::MODE_RETURN_NULL === $res->modeReturn) {
             return null;
 
-        } elseif (ResultContext::MODE_RETURN_CONTEXT === $ctx->modeReturn) {
-            return $ctx;
+        } elseif (Res::MODE_RETURN_CONTEXT === $res->modeReturn) {
+            return $res;
         }
 
-        throw new RuntimeException([ 'Mode is unknown', $ctx ]);
+        throw new RuntimeException([ 'Mode is unknown', $res ]);
     }
 }

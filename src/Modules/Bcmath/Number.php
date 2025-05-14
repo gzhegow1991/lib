@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Type;
+namespace Gzhegow\Lib\Modules\Bcmath;
 
 use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;

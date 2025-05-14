@@ -83,8 +83,6 @@ abstract class AbstractContext implements
 
     public function get(string $name, array $fallback = [])
     {
-        $status = true;
-
         $status = $this->exists($name);
 
         if (! $status) {
@@ -184,7 +182,7 @@ abstract class AbstractContext implements
     {
         $entries = [];
 
-        foreach ( $vars = $this->vars() as $key => $value ) {
+        foreach ( $this->vars() as $key => $value ) {
             $entries[] = [ $key, $value ];
         }
 

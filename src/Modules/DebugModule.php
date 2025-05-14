@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper;
 use Gzhegow\Lib\Modules\Debug\Dumper\DumperInterface;
@@ -532,13 +533,14 @@ class DebugModule
             ?? $forceBraces
             ?? false;
 
+        $printableType = $content;
         if ($withBraces) {
             $printableType = '{ ' . $content . ' }';
         }
 
         $content = ''
             . $options[ 'multiline_escape' ] . "\n"
-            . $content . "\n"
+            . $printableType . "\n"
             . $options[ 'multiline_escape' ];
 
         return $content;
@@ -570,58 +572,74 @@ class DebugModule
     }
 
 
-    public function types(array $options = [], ?string $separator = null, ...$values) : string
+    public function types(array $options = [], ?string $delimiter = null, ...$values) : string
     {
-        $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
+        if (! Lib::type()->string_not_empty($delimiterString, $delimiter ?? ' | ')) {
+            throw new LogicException(
+                [ 'The `delimiter` should be non-empty string', $delimiter ]
+            );
+        }
 
         $list = [];
         foreach ( $values as $value ) {
             $list[] = $this->type($value, $options);
         }
 
-        $content = implode($_separator, $list);
+        $content = implode($delimiterString, $list);
 
         return $content;
     }
 
-    public function type_ids(array $options = [], ?string $separator = null, ...$values) : string
+    public function type_ids(array $options = [], ?string $delimiter = null, ...$values) : string
     {
-        $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
+        if (! Lib::type()->string_not_empty($delimiterString, $delimiter ?? ' | ')) {
+            throw new LogicException(
+                [ 'The `delimiter` should be non-empty string', $delimiter ]
+            );
+        }
 
         $list = [];
         foreach ( $values as $value ) {
             $list[] = $this->type_id($value, $options);
         }
 
-        $content = implode($_separator, $list);
+        $content = implode($delimiterString, $list);
 
         return $content;
     }
 
-    public function type_values(array $options = [], ?string $separator = null, ...$values) : string
+    public function type_values(array $options = [], ?string $delimiter = null, ...$values) : string
     {
-        $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
+        if (! Lib::type()->string_not_empty($delimiterString, $delimiter ?? ' | ')) {
+            throw new LogicException(
+                [ 'The `delimiter` should be non-empty string', $delimiter ]
+            );
+        }
 
         $list = [];
         foreach ( $values as $value ) {
             $list[] = $this->type_value($value, $options);
         }
 
-        $content = implode($_separator, $list);
+        $content = implode($delimiterString, $list);
 
         return $content;
     }
 
-    public function values(array $options = [], ?string $separator = null, ...$values) : string
+    public function values(array $options = [], ?string $delimiter = null, ...$values) : string
     {
-        $_separator = Lib::parse()->string_not_empty($separator) ?? ' | ';
+        if (! Lib::type()->string_not_empty($delimiterString, $delimiter ?? ' | ')) {
+            throw new LogicException(
+                [ 'The `delimiter` should be non-empty string', $delimiter ]
+            );
+        }
 
         $list = [];
         foreach ( $values as $value ) {
             $list[] = $this->value($value, $options);
         }
 
-        $content = implode($_separator, $list);
+        $content = implode($delimiterString, $list);
 
         return $content;
     }
@@ -818,18 +836,18 @@ class DebugModule
             $objectClass = substr($objectClass, 0, $pos + strlen($needle));
         }
 
-        $objectSubtypeStringable = (method_exists($var, '__toString') ? 'stringable' : null);
-        $objectSubtypeSerializable = ((($var instanceof \Serializable) || method_exists($var, '__serialize')) ? 'serializable' : null);
+        $objectSubtypeCountable = (($var instanceof \Countable) ? 'countable(' . count($var) . ')' : null);
         $objectSubtypeInvokable = (method_exists($var, '__invoke') ? 'invokable' : null);
         $objectSubtypeIterable = (is_iterable($var) ? 'iterable' : null);
-        $objectSubtypeCountable = (($var instanceof \Countable) ? 'countable(' . count($var) . ')' : null);
+        $objectSubtypeSerializable = ((($var instanceof \Serializable) || method_exists($var, '__serialize')) ? 'serializable' : null);
+        $objectSubtypeStringable = (method_exists($var, '__toString') ? 'stringable' : null);
 
         $objectSubtype = [];
-        if ($objectSubtypeStringable) $objectSubtype[] = $objectSubtypeStringable;
-        if ($objectSubtypeSerializable) $objectSubtype[] = $objectSubtypeSerializable;
+        if ($objectSubtypeCountable) $objectSubtype[] = $objectSubtypeCountable;
         if ($objectSubtypeInvokable) $objectSubtype[] = $objectSubtypeInvokable;
         if ($objectSubtypeIterable) $objectSubtype[] = $objectSubtypeIterable;
-        if ($objectSubtypeCountable) $objectSubtype[] = $objectSubtypeCountable;
+        if ($objectSubtypeSerializable) $objectSubtype[] = $objectSubtypeSerializable;
+        if ($objectSubtypeStringable) $objectSubtype[] = $objectSubtypeStringable;
 
         $printableValue = [];
         if ($withValue) {
@@ -1158,9 +1176,6 @@ class DebugModule
         $maxCnt = max($oldCnt, $newCnt);
         $maxCntLen = strlen($maxCnt);
 
-        $oldLinesIndex = array_flip($oldLines);
-        $newLinesIndex = array_flip($newLines);
-
         $matrix = [];
         for ( $iOld = 0; $iOld <= $oldCnt; $iOld++ ) {
             for ( $iNew = 0; $iNew <= $newCnt; $iNew++ ) {
@@ -1341,7 +1356,7 @@ class DebugModule
             array_map('strlen', $list)
         );
 
-        foreach ( $table as $rowKey => $row ) {
+        foreach ( $table as $row ) {
             foreach ( $row as $colKey => $colValue ) {
                 $tdWidths[ $colKey ] = max(
                     $tdWidths[ $colKey ] ?? 0,

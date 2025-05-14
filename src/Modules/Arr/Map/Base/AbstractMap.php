@@ -130,10 +130,54 @@ abstract class AbstractMap
 
         $keyPos = $this->setKey($key, $keyValue);
 
+        $this->setValue($keyPos, $value);
+
+        return $this;
+    }
+
+    protected function setKey(array $key, $keyValue) : int
+    {
+        [ $keyPos, $keyPosType, $keyPosIndex ] = $key;
+
+        if (null === $keyPos) {
+            $this->keysQueue[] = null;
+
+            end($this->keysQueue);
+            $keyPos = key($this->keysQueue);
+        }
+
+        $this->keysQueue[ $keyPos ] = $keyPosType;
+
+        if (1 === $keyPosType) {
+            $this->keysNative[ $keyPos ] = $keyValue;
+            $this->keysNativeIndex[ $keyPosIndex ] = $keyPos;
+
+        } elseif (2 === $keyPosType) {
+            $this->keysObject[ $keyPos ] = $keyValue;
+            $this->keysObjectIndex[ $keyPosIndex ] = $keyPos;
+
+        } elseif (3 === $keyPosType) {
+            $this->keysComplex[ $keyPos ] = $keyValue;
+
+        } elseif (4 === $keyPosType) {
+            $this->keysComplexSame[ $keyPos ] = $keyValue;
+        }
+
+        return $keyPos;
+    }
+
+    /**
+     * @param int|string $keyPos
+     *
+     * @return static
+     */
+    protected function setValue($keyPos, $value)
+    {
         $this->values[ $keyPos ] = $value;
 
         return $this;
     }
+
 
     /**
      * @return static
@@ -180,44 +224,15 @@ abstract class AbstractMap
      */
     public function push($value, &$keyValue = null)
     {
-        $this->values[] = $value;
+        $this->values[] = null;
 
         $keyValue = array_key_last($this->values);
+
+        unset($this->values[ $keyValue ]);
 
         $this->set($keyValue, $value);
 
         return $this;
-    }
-
-    protected function setKey(array $key, $keyValue) : int
-    {
-        [ $keyPos, $keyPosType, $keyPosIndex ] = $key;
-
-        if (null === $keyPos) {
-            $this->keysQueue[] = null;
-
-            end($this->keysQueue);
-            $keyPos = key($this->keysQueue);
-        }
-
-        $this->keysQueue[ $keyPos ] = $keyPosType;
-
-        if (1 === $keyPosType) {
-            $this->keysNative[ $keyPos ] = $keyValue;
-            $this->keysNativeIndex[ $keyPosIndex ] = $keyPos;
-
-        } elseif (2 === $keyPosType) {
-            $this->keysObject[ $keyPos ] = $keyValue;
-            $this->keysObjectIndex[ $keyPosIndex ] = $keyPos;
-
-        } elseif (3 === $keyPosType) {
-            $this->keysComplex[ $keyPos ] = $keyValue;
-
-        } elseif (4 === $keyPosType) {
-            $this->keysComplexSame[ $keyPos ] = $keyValue;
-        }
-
-        return $keyPos;
     }
 
 
@@ -229,7 +244,10 @@ abstract class AbstractMap
         $key = $this->existsKey($keyValue);
 
         if (null !== $key) {
+            [ $keyPos ] = $key;
+
             $this->unsetKey($key);
+            $this->unsetValue($keyPos);
         }
 
         return $this;
@@ -240,15 +258,18 @@ abstract class AbstractMap
      */
     public function remove($keyValue)
     {
-        $keyType = $this->existsKey($keyValue);
+        $key = $this->existsKey($keyValue);
 
-        if (null === $keyType) {
+        if (null === $key) {
             throw new RuntimeException(
                 [ 'Missing array key: ' . ($keyValue ?? '{ NULL }') ]
             );
         }
 
-        $this->unsetKey($keyType);
+        [ $keyPos ] = $key;
+
+        $this->unsetKey($key);
+        $this->unsetValue($keyPos);
 
         return $this;
     }
@@ -256,8 +277,6 @@ abstract class AbstractMap
     protected function unsetKey(array $key)
     {
         [ $keyPos, $keyPosType, $keyPosIndex ] = $key;
-
-        unset($this->values[ $keyPos ]);
 
         unset($this->keysQueue[ $keyPos ]);
 
@@ -275,6 +294,18 @@ abstract class AbstractMap
         } elseif (4 === $keyPosType) {
             unset($this->keysComplexSame[ $keyPos ]);
         }
+
+        return $this;
+    }
+
+    /**
+     * @param int|string $keyPos
+     *
+     * @return static
+     */
+    protected function unsetValue($keyPos)
+    {
+        unset($this->values[ $keyPos ]);
 
         return $this;
     }

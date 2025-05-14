@@ -260,8 +260,6 @@ class DefaultEmailParser implements EmailParserInterface
             $eguliasEmailValidator = $this->newEguliasEmailValidator();
         }
 
-        $status = true;
-
         if ([] !== $filtersIntersectIndex) {
             $eguliasFilters = [];
 

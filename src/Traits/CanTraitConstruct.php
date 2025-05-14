@@ -9,13 +9,16 @@ trait CanTraitConstruct
 {
     protected function __traitConstruct(array $args = [])
     {
-        $theParse = Lib::parse();
-        $thePhp = Lib::php();
+        $theType = Lib::type();
 
-        $traits = $thePhp->class_uses_with_parents($this, true);
+        $traits = Lib::php()->class_uses_with_parents($this, true);
 
         foreach ( $traits as $trait ) {
-            $fn = '__construct' . $theParse->struct_basename($trait);
+            if (! $theType->struct_basename($traitBasename, $trait)) {
+                continue;
+            }
+
+            $fn = "__construct{$traitBasename}";
 
             if (method_exists($this, $fn)) {
                 call_user_func_array([ $this, $fn ], $args);

@@ -13,33 +13,35 @@ class APromise extends AbstractPromise
     public static function newPromise(
         PromiseManagerInterface $manager,
         //
-        LoopManagerInterface $loopManager,
+        LoopManagerInterface $loop,
         //
         callable $fnExecutor
     )
     {
-        $instance = new APromise($manager, $loopManager);
+        $instance = new APromise($manager, $loop);
         $instance->state = static::STATE_PENDING;
 
         $fn = static::fnExecutor($instance, $fnExecutor);
 
-        $loopManager->addMicrotask($fn);
+        $loop->addMicrotask($fn);
+        $loop->registerLoop();
 
         return $instance;
     }
+
 
     /**
      * @return static
      */
     public static function newResolved(
-        PromiseManagerInterface $factory,
+        PromiseManagerInterface $manager,
         //
         LoopManagerInterface $loop,
         //
         $resolvedValue = null
     )
     {
-        $instance = new static($factory, $loop);
+        $instance = new static($manager, $loop);
         $instance->state = static::STATE_RESOLVED;
         $instance->resolvedValue = $resolvedValue;
 
@@ -50,20 +52,21 @@ class APromise extends AbstractPromise
      * @return static
      */
     public static function newRejected(
-        PromiseManagerInterface $factory,
+        PromiseManagerInterface $manager,
         //
         LoopManagerInterface $loop,
         //
         $rejectedReason = null
     )
     {
-        $instance = new static($factory, $loop);
+        $instance = new static($manager, $loop);
         $instance->state = static::STATE_REJECTED;
         $instance->rejectedReason = $rejectedReason;
 
         $fn = static::fnThrowIfUnhandledRejectionInSecondStep($loop, $instance);
 
         $loop->addMacrotask($fn);
+        $loop->registerLoop();
 
         return $instance;
     }

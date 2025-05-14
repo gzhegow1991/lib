@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules\Async\Clock;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
 
 
@@ -33,17 +34,20 @@ class ClockManager implements ClockManagerInterface
 
     public function setTimeout(int $waitMs, callable $fn) : Timeout
     {
-        Lib::type($tt);
-
-        $tt->int_non_negative($waitMsFloat, $waitMs);
+        if (! Lib::type()->int_non_negative($waitMsInt, $waitMs)) {
+            throw new LogicException(
+                [ 'The `waitMs` should be int non-negative', $waitMs ]
+            );
+        }
 
         $timer = new Timeout();
         $timer->fnHandler = $fn;
-        $timer->waitMs = $waitMsFloat;
+        $timer->waitMs = $waitMsInt;
 
-        $timer->timeoutMicrotime = microtime(true) + ($waitMsFloat / 1000);
+        $timer->timeoutMicrotime = microtime(true) + ($waitMsInt / 1000);
 
         $this->loop->addTimeout($timer);
+        $this->loop->registerLoop();
 
         return $timer;
     }
@@ -61,17 +65,20 @@ class ClockManager implements ClockManagerInterface
 
     public function setInterval(int $waitMs, callable $fn) : Interval
     {
-        Lib::type($tt);
-
-        $tt->int_non_negative($waitMsFloat, $waitMs);
+        if (! Lib::type()->int_non_negative($waitMsInt, $waitMs)) {
+            throw new LogicException(
+                [ 'The `waitMs` should be int non-negative', $waitMs ]
+            );
+        }
 
         $interval = new Interval();
         $interval->fnHandler = $fn;
-        $interval->waitMs = $waitMsFloat;
+        $interval->waitMs = $waitMsInt;
 
-        $interval->timeoutMicrotime = microtime(true) + ($waitMsFloat / 1000);
+        $interval->timeoutMicrotime = microtime(true) + ($waitMsInt / 1000);
 
         $this->loop->addInterval($interval);
+        $this->loop->registerLoop();
 
         return $interval;
     }

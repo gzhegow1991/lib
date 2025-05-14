@@ -77,7 +77,7 @@ $ffn = new class {
 
     function print($value, ...$values)
     {
-        echo $this->values(' | ', $value, ...$values) . PHP_EOL;
+        echo $this->values(' | ', $value, ...$values) . "\n";
 
         return $value;
     }
@@ -85,14 +85,14 @@ $ffn = new class {
 
     function print_array($value, ?int $maxLevel = null, array $options = [])
     {
-        echo $this->value_array($value, $maxLevel, $options) . PHP_EOL;
+        echo $this->value_array($value, $maxLevel, $options) . "\n";
 
         return $value;
     }
 
     function print_array_multiline($value, ?int $maxLevel = null, array $options = [])
     {
-        echo $this->value_array_multiline($value, $maxLevel, $options) . PHP_EOL;
+        echo $this->value_array_multiline($value, $maxLevel, $options) . "\n";
 
         return $value;
     }
@@ -115,12 +115,12 @@ $ffn = new class {
 // > тесты Promise
 $fn = function () use ($ffn) {
     $ffn->print('[ Promise ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(900)
         ->then(function ($value) use ($ffn) {
-            echo PHP_EOL;
+            echo "\n";
             $ffn->print("[ 900 | THEN 1.1 ]", $value);
 
             return 123;
@@ -142,7 +142,7 @@ $fn = function () use ($ffn) {
         })
         ->then(function ($value) use ($ffn) {
             $ffn->print("[ 900 | THEN 1.5 ]", $value);
-            echo PHP_EOL;
+            echo "\n";
 
             return $value;
         })
@@ -151,7 +151,7 @@ $fn = function () use ($ffn) {
 
     \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(800)
         ->then(function ($value) use ($ffn) {
-            echo PHP_EOL;
+            echo "\n";
             $ffn->print("[ 800 | THEN 2.1 ]", $value);
 
             return 123;
@@ -167,7 +167,7 @@ $fn = function () use ($ffn) {
         })
         ->then(function ($value) use ($ffn) {
             $ffn->print("[ 800+400 | THEN 2.3 ]", $value);
-            echo PHP_EOL;
+            echo "\n";
 
             return $value;
         })
@@ -179,9 +179,9 @@ $fn = function () use ($ffn) {
         600
     )
         ->catch(function ($value) use ($ffn) {
-            echo PHP_EOL;
+            echo "\n";
             $ffn->print("[ 600 | TIMEOUT ]", $value);
-            echo PHP_EOL;
+            echo "\n";
 
             return true;
         })
@@ -195,9 +195,9 @@ $fn = function () use ($ffn) {
     ];
     \Gzhegow\Lib\Modules\Async\Promise\Promise::allResolvedOf($ps)
         ->then(function ($res) use ($ffn) {
-            echo PHP_EOL;
+            echo "\n";
             $ffn->print_array_multiline($res);
-            echo PHP_EOL;
+            echo "\n";
 
             return $res;
         })
@@ -212,9 +212,9 @@ $fn = function () use ($ffn) {
     ];
     \Gzhegow\Lib\Modules\Async\Promise\Promise::allSettled($ps)
         ->then(function ($res) use ($ffn) {
-            echo PHP_EOL;
+            echo "\n";
             $ffn->print_array_multiline($res, 2);
-            echo PHP_EOL;
+            echo "\n";
 
             return $res;
         })
@@ -227,9 +227,9 @@ $fn = function () use ($ffn) {
     ];
     \Gzhegow\Lib\Modules\Async\Promise\Promise::firstOf($ps)
         ->then(function ($res) use ($ffn) {
-            echo PHP_EOL;
+            echo "\n";
             $ffn->print($res);
-            echo PHP_EOL;
+            echo "\n";
 
             return $res;
         })
@@ -242,9 +242,9 @@ $fn = function () use ($ffn) {
     ];
     \Gzhegow\Lib\Modules\Async\Promise\Promise::firstResolvedOf($ps)
         ->then(function ($res) use ($ffn) {
-            echo PHP_EOL;
+            echo "\n";
             $ffn->print($res);
-            echo PHP_EOL;
+            echo "\n";
 
             return $res;
         })
@@ -337,7 +337,7 @@ $test->run();
 // > тесты Exception
 $fn = function () use ($ffn) {
     $ffn->print('[ Exception ]');
-    echo PHP_EOL;
+    echo "\n";
 
     $eeee1 = new \Exception('eeee1', 0);
     $eeee2 = new \Exception('eeee2', 0);
@@ -359,7 +359,7 @@ $fn = function () use ($ffn) {
             [ 'with_file' => false ]
         )
     ;
-    echo implode(PHP_EOL, $messages);
+    echo implode("\n", $messages);
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
@@ -400,7 +400,7 @@ $test->run();
 // > тесты ErrorBag
 $fn = function () use ($ffn) {
     $ffn->print('[ ErrorBag ]');
-    echo PHP_EOL;
+    echo "\n";
 
     \Gzhegow\Lib\Lib::errorBag($b);
 
@@ -460,7 +460,7 @@ $test->run();
 // > тесты Pipe
 $fn = function () use ($ffn) {
     $ffn->print('[ Pipe ]');
-    echo PHP_EOL;
+    echo "\n";
 
     $fn = \Gzhegow\Lib\Lib::pipe();
 
@@ -473,7 +473,7 @@ $fn = function () use ($ffn) {
         //
         // > этот шаг может выполнить сторонние действия, а возврат метода игнорируется
         ->tap(function ($value) use ($ffn) {
-            echo 'Hello World! Your value is: [ ' . $ffn->value($value) . ' ]' . PHP_EOL;
+            echo 'Hello World! Your value is: [ ' . $ffn->value($value) . ' ]' . "\n";
 
             throw new \Gzhegow\Lib\Exception\RuntimeException('This is the exception');
         })
@@ -525,7 +525,7 @@ $test->run();
 // > тесты ArrayOf
 $fn = function () use ($ffn) {
     $ffn->print('[ ArrayOf ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     $notAnObject = 1;
@@ -543,7 +543,7 @@ $fn = function () use ($ffn) {
     $ffn->print($theArrayOf);
     $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $theArrayOf = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::new('object');
@@ -559,7 +559,7 @@ $fn = function () use ($ffn) {
     $ffn->print($theArrayOf);
     $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $theArrayOf = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::new(\stdClass::class);
@@ -588,7 +588,7 @@ $fn = function () use ($ffn) {
     $ffn->print($theArrayOf);
     $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     /**
@@ -606,20 +606,20 @@ $test = $ffn->test($fn);
 $test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
 "[ ArrayOf ]"
 
-{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf }
+{ object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOf }
 TRUE | [ 1 ]
 
 "[ CATCH ] The `value` should be of type: object"
-{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType }
-TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable) # ArrayObject }" ]
+{ object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOfType }
+TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable serializable) # ArrayObject }" ]
 
 "[ CATCH ] The `value` should be of class: stdClass"
 "[ CATCH ] The `value` should be of class: stdClass"
 "[ CATCH ] The `value` should be object"
-{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass }
+{ object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOfClass }
 TRUE | [ "{ object # stdClass }" ]
 
-{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\Map\Map }
+{ object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\Map\PHP8\Map }
 TRUE | TRUE
 [ "{ object # stdClass }", "{ array(3) }" ]
 [ 1, 1 ]
@@ -627,20 +627,20 @@ TRUE | TRUE
 $test->expectStdoutIf(PHP_VERSION_ID < 80000, '
 "[ ArrayOf ]"
 
-{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf }
+{ object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf }
 TRUE | [ 1 ]
 
 "[ CATCH ] The `value` should be of type: object"
-{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfType }
-TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable) # ArrayObject }" ]
+{ object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfType }
+TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable serializable) # ArrayObject }" ]
 
 "[ CATCH ] The `value` should be of class: stdClass"
 "[ CATCH ] The `value` should be of class: stdClass"
 "[ CATCH ] The `value` should be object"
-{ object(countable(1) iterable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfClass }
+{ object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfClass }
 TRUE | [ "{ object # stdClass }" ]
 
-{ object(countable(2) iterable) # Gzhegow\Lib\Modules\Arr\Map\PHP7\Map }
+{ object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\Map\PHP7\Map }
 TRUE | TRUE
 [ "{ object # stdClass }", "{ array(3) }" ]
 [ 1, 1 ]
@@ -653,7 +653,7 @@ $test->run();
 // > тесты Benchmark
 $fn = function () use ($ffn) {
     $ffn->print('[ Benchmark ]');
-    echo PHP_EOL;
+    echo "\n";
 
     $tag = 'tag';
 
@@ -725,7 +725,7 @@ $test->run();
 // > тесты Config
 $fn = function () use ($ffn) {
     $ffn->print('[ Config ]');
-    echo PHP_EOL;
+    echo "\n";
 
     /**
      * @property $child
@@ -799,7 +799,7 @@ $fn = function () use ($ffn) {
     $ffn->print($config->child, $config->child === $configChildDefault);
     $ffn->print($config->child->foo, $config->child->foo === $configChildNew->foo);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $config = new \ConfigDummy();
@@ -818,7 +818,7 @@ $fn = function () use ($ffn) {
     $ffn->print($config->child, $config->child === $configChildDefault);
     $ffn->print($config->child->foo, $config->child->foo === $configChildNewFooValue);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $configArray = $config->toArray();
@@ -828,7 +828,7 @@ $fn = function () use ($ffn) {
     $ffn->print($config->child, $config->child === $configChildDefault);
     $ffn->print($config->child->foo, $config->child->foo === $configChildNewFooValue);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $config = new \ConfigValidateDummy();
@@ -865,7 +865,7 @@ $test->run();
 // > тесты Result
 $fn = function () use ($ffn) {
     $ffn->print('[ Result ]');
-    echo PHP_EOL;
+    echo "\n";
 
     $invalidValue = NAN;
 
@@ -905,28 +905,28 @@ $fn = function () use ($ffn) {
 
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::type();
     $status =
-        \Gzhegow\Lib\Modules\Type\Number::fromStatic($invalidValue, $ctx)
-        || \Gzhegow\Lib\Modules\Type\Number::fromValidArray($invalidValue, $ctx);
+        \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx)
+        || \Gzhegow\Lib\Modules\Bcmath\Number::fromValidArray($invalidValue, $ctx);
 
     $errors = $ctx->errors();
     $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $errors);
     $ffn->print_array_multiline($errors, 2);
-    echo PHP_EOL;
+    echo "\n";
 
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::parse();
     $value = null
-        ?? \Gzhegow\Lib\Modules\Type\Number::fromStatic($invalidValue, $ctx)
-        ?? \Gzhegow\Lib\Modules\Type\Number::fromValidArray($invalidValue, $ctx);
+        ?? \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx)
+        ?? \Gzhegow\Lib\Modules\Bcmath\Number::fromValidArray($invalidValue, $ctx);
 
     $errors = $ctx->errors();
     $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $errors);
     $ffn->print_array_multiline($errors, 2);
-    echo PHP_EOL;
+    echo "\n";
 
 
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::parseThrow();
     try {
-        $value = \Gzhegow\Lib\Modules\Type\Number::fromStatic($invalidValue, $ctx);
+        \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx);
     }
     catch ( \Throwable $e ) {
         $messages = \Gzhegow\Lib\Lib::debug()
@@ -937,8 +937,8 @@ $fn = function () use ($ffn) {
             )
         ;
 
-        echo implode(PHP_EOL, $messages) . PHP_EOL;
-        echo PHP_EOL;
+        echo implode("\n", $messages) . "\n";
+        echo "\n";
     }
 
 
@@ -957,8 +957,8 @@ $fn = function () use ($ffn) {
             )
         ;
 
-        echo implode(PHP_EOL, $messages) . PHP_EOL;
-        echo PHP_EOL;
+        echo implode("\n", $messages) . "\n";
+        echo "\n";
     }
 
     try {
@@ -976,8 +976,8 @@ $fn = function () use ($ffn) {
             )
         ;
 
-        echo implode(PHP_EOL, $messages) . PHP_EOL;
-        echo PHP_EOL;
+        echo implode("\n", $messages) . "\n";
+        echo "\n";
     }
 
 
@@ -986,14 +986,14 @@ $fn = function () use ($ffn) {
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::parseThrow();
     $value = ResultTest::string($validValue, $ctx);
     $ffn->print($value, $ctx->get());
-    echo PHP_EOL;
+    echo "\n";
 
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::typeThrow();
     $status = true
         && ResultTest::string($validValue, $ctx)
         && ResultTest::string_not_empty($ctx->get(), $ctx);
     $ffn->print($status, $ctx->get());
-    echo PHP_EOL;
+    echo "\n";
 
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::ignoreThrow();
     $devnull = null
@@ -1007,19 +1007,19 @@ $test->expectStdout('
 
 ###
 [
-  "The `from` must be instance of: Gzhegow\Lib\Modules\Type\Number",
+  "The `from` must be instance of: Gzhegow\Lib\Modules\Bcmath\Number",
   "The `from` should be array"
 ]
 ###
 
 ###
 [
-  "The `from` must be instance of: Gzhegow\Lib\Modules\Type\Number",
+  "The `from` must be instance of: Gzhegow\Lib\Modules\Bcmath\Number",
   "The `from` should be array"
 ]
 ###
 
-[ 0 ] The `from` must be instance of: Gzhegow\Lib\Modules\Type\Number
+[ 0 ] The `from` must be instance of: Gzhegow\Lib\Modules\Bcmath\Number
 { object # Gzhegow\Lib\Exception\LogicException }
 
 [ 0 ] The `value` should be string
@@ -1042,7 +1042,7 @@ $test->run();
 // > тесты ArrModule
 $fn = function () use ($ffn) {
     $ffn->print('[ ArrModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     $cases = [
@@ -1063,7 +1063,7 @@ $fn = function () use ($ffn) {
         $ffn->print($resStrict, $resNonStrict, $resNonStrict === array_diff($a, $b));
     }
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $arr = [
@@ -1183,7 +1183,7 @@ $fn = function () use ($ffn) {
         _ARR_WALK_WITH_EMPTY_ARRAYS | _ARR_WALK_WITH_LISTS | _ARR_WALK_WITH_DICTS
     );
     $ffn->print_array_multiline($res, 2);
-    echo PHP_EOL;
+    echo "\n";
 
 
     $arr = [
@@ -1397,7 +1397,7 @@ $test->run();
 // > тесты BcmathModule
 $fn = function () use ($ffn) {
     $ffn->print('[ BcmathModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 0);
     $ffn->print($result, (string) $result);
@@ -1407,7 +1407,7 @@ $fn = function () use ($ffn) {
     $ffn->print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 2);
     $ffn->print($result, (string) $result);
-    echo PHP_EOL;
+    echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 0);
     $ffn->print($result, (string) $result);
@@ -1417,7 +1417,7 @@ $fn = function () use ($ffn) {
     $ffn->print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 2);
     $ffn->print($result, (string) $result);
-    echo PHP_EOL;
+    echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005', 0);
     $ffn->print($result, (string) $result);
@@ -1427,7 +1427,7 @@ $fn = function () use ($ffn) {
     $ffn->print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005', 2);
     $ffn->print($result, (string) $result);
-    echo PHP_EOL;
+    echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 0);
     $ffn->print($result, (string) $result);
@@ -1437,7 +1437,7 @@ $fn = function () use ($ffn) {
     $ffn->print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 2);
     $ffn->print($result, (string) $result);
-    echo PHP_EOL;
+    echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 0);
     $ffn->print($result, (string) $result);
@@ -1445,7 +1445,7 @@ $fn = function () use ($ffn) {
     $ffn->print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 0);
     $ffn->print($result, (string) $result);
-    echo PHP_EOL;
+    echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 2);
     $ffn->print($result, (string) $result);
@@ -1453,7 +1453,7 @@ $fn = function () use ($ffn) {
     $ffn->print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 2);
     $ffn->print($result, (string) $result);
-    echo PHP_EOL;
+    echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.5', 0);
     $ffn->print($result, (string) $result);
@@ -1461,7 +1461,7 @@ $fn = function () use ($ffn) {
     $ffn->print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.005', 0);
     $ffn->print($result, (string) $result);
-    echo PHP_EOL;
+    echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.5', 2);
     $ffn->print($result, (string) $result);
@@ -1469,13 +1469,13 @@ $fn = function () use ($ffn) {
     $ffn->print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.005', 2);
     $ffn->print($result, (string) $result);
-    echo PHP_EOL;
+    echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcgcd(8, 12);
     $ffn->print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcgcd(7, 13);
     $ffn->print($result, (string) $result);
-    echo PHP_EOL;
+    echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 6);
     $ffn->print($result, (string) $result);
@@ -1483,7 +1483,7 @@ $fn = function () use ($ffn) {
     $ffn->print($result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 10);
     $ffn->print($result, (string) $result);
-    echo PHP_EOL;
+    echo "\n";
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
@@ -1540,7 +1540,7 @@ $test->run();
 // > тесты CmpModule
 $fn = function () use ($ffn) {
     $ffn->print('[ CmpModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
     $object = new \StdClass();
 
@@ -1699,7 +1699,7 @@ $fn = function () use ($ffn) {
     // if (is_file($dumpPath)) unlink($dumpPath);
 
     $xi = 0;
-    foreach ( $valuesXX as $i => $valuesX ) {
+    foreach ( $valuesXX as $valuesX ) {
         $table = [];
         $tableSize = [];
         foreach ( $valuesX as $x ) {
@@ -1725,13 +1725,13 @@ $fn = function () use ($ffn) {
         }
 
         // $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
-        // file_put_contents($dumpPath, $content . PHP_EOL . PHP_EOL, FILE_APPEND);
+        // file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
 
         // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
         // dd(\Gzhegow\Lib\Lib::debug()->print_table($tableSize, 1));
-        echo md5(serialize($table)) . PHP_EOL;
-        echo md5(serialize($tableSize)) . PHP_EOL;
-        echo PHP_EOL;
+        echo md5(serialize($table)) . "\n";
+        echo md5(serialize($tableSize)) . "\n";
+        echo "\n";
     }
     unset($table);
 };
@@ -1739,65 +1739,65 @@ $test = $ffn->test($fn);
 $test->expectStdout('
 "[ CmpModule ]"
 
-5e2492ca236e97203b30e4dfc7321bcc
-5e2492ca236e97203b30e4dfc7321bcc
+82f719e1e01d77d54712e33ee73c9eef
+82f719e1e01d77d54712e33ee73c9eef
 
-d13ec776e6a6b863f2edffffa794b734
-8ff1ed40e121c56d578cf31a6aa972bb
+57712c0155ecc96bf7958eef2eb2c15c
+4cdeb656c29a9d3c3bb3beeb4c935660
 
-db5398cec8005b52a8986db4d64733b7
-983a7c61102c65988ad2eeed6b44cfed
+77aba0613789762ea2c3c479920904d5
+05741b56dfff778ea656957062597693
 
-549d53d52036df86295f6a63433f2e7e
-b5b20175a7a97657a4e5415d31fe1347
+a465d524f95253f9e78db5b8bd967b5c
+3f3e59d3fb40b9d1254b2b15833caf6d
 
-4178f43b03e070e68419b6045b04c5f4
-646027584c89b7c1853904528b9a2b4b
+9840a56176ef81b518e0d819da2d9c3c
+cfc83599a289f0f9f95ba4b7fe626c9e
 
-e835886a0293f2ff912f3f4c2259d9e3
-97fb729da901ad97be5806afb04ed23b
+3a8df645ac662bcb16cb4d1a5e9805be
+e6029467cb9b33033e53ace6ca234328
 
-9cd8bf3696245cab04b08b7e87ebe775
-2b06afbc0a12ae4ff91ea11346ffc899
+b95287e75683be04860e5f2103b30c73
+150271d2c69a7da3024abc760060a698
 
-3cca7c073be55cd60ab5c4667eb954d5
-10de3fb31a99d0fa7e84999847d716f5
+f0716acbde15cf9381d1add49c213e15
+86888e38a0e818282dd161b537ffc679
 
-5db6144bb2ca6c22f84fe63206903400
-916a33f760215343aee0d75ecc9a047c
+1e65fa8f932a9535ff7c2aa1f60f82e5
+7c37f83c6b382d48087f9ca329e79d18
 
-83816ded4bbd3762f1f6bb883a081227
-82192e5a44bd7fca825b444aaa86feeb
+a86e213893dae7509e4926b3be82f35e
+86d9ace1ba936d47fd0a16971309c56a
 
-8ebafe33ddf18250e0272b5e676d6808
-ae0d4df86b3c1d687cece08201db9f06
+665fb866f689f5440588a1dcb1593bf4
+3ad7a0cb801fc6b8127d04182bb8e47f
 
-571b5a39250dbef4380cebdb500b7827
-78fc285033f5689e17bf44129da96a5b
+d19a897e0b57bf63e8fbf9398358e6d8
+b28f71f02f17cfe93cee65c64623400b
 
-d379ce729a3b631f67d1abf83410543d
-82db724055307d2bd0403666e6ac8ec4
+aa02005c30e79e8772d3df310716c8d7
+fd1ac42f24cda6df6dbfefd12fc70317
 
-0b9e5fbd4fcd91b27c342b3804107939
-ce62a89be0880f6448bb1c641d2549fa
+6233d14a2cb943730a4513d69b5de514
+898449a50d8741568159521163de7457
 
-d34cf15ca5d59fef2170a0db381308af
-61ed82f5d29fefc7f672ebf6abb9f860
+7f40a0427b5e1e2d646019d89a5a2f7f
+68db9812f428826443e271cabf880fbb
 
-b95bb58e53bc33954c873055a734e0c9
-767b20e9b0b64a9c559e85d1ce145d6b
+10e9523c26b0f8c27d21b68a3acca316
+aff0519a0870d57e0a0bf845d6209f63
 
-d70f8ec00e99ec2809bba5b85ce6ff45
-5b4e614c42777ea8a7a64abe466b8606
+9e31c04f69697190e88b16b1c576255b
+2238672a27a185cd2e0c65e6ccb9ae16
 
-763b3382a7c267c5cb3771ba52614a26
-385cf1836661c3c71163d33260807d64
+9e793be458e49a3faf18be572d8edfec
+1dd2cba5b0a201f8a24e72b6588ea2fb
 
-d62c658cc94b8f6f2733458cbb8b3444
-09c673560c9807c654ab12ba7c32f18b
+b0ac0103412cfb09117c2a8ec71c0ad0
+af0b49ea305eadac52ceccbeff73fa1d
 
-3a5c4ba2b20240e510cb31b5608dc10e
-659cef0fc8e4274bd5dc0c75fd3bad08
+a3fb74b5b7f1ce2b438df41a43581719
+7f269763bf236100e2ed7c5a5f305dff
 ');
 $test->run();
 
@@ -1807,7 +1807,7 @@ $test->run();
 // > тесты CryptModule
 $fn = function () use ($ffn) {
     $ffn->print('[ CryptModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     $algos = [
@@ -1829,7 +1829,7 @@ $fn = function () use ($ffn) {
         $status = \Gzhegow\Lib\Lib::crypt()->hash_equals($enc, $algo, $src, $isModeBinary);
         $ffn->print($src, $enc, $status);
 
-        echo PHP_EOL;
+        echo "\n";
     }
 
 
@@ -1863,7 +1863,7 @@ $fn = function () use ($ffn) {
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, '0123456789ABCDEF');
     $ffn->print($src, $enc, $dec);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $isOneBased = false;
@@ -1890,18 +1890,17 @@ $fn = function () use ($ffn) {
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
     $ffn->print($src, $enc, $dec);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $isOneBased = true;
     $src = 0;
-    $e = null;
     try {
-        $enc = \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
+        \Gzhegow\Lib\Lib::crypt()->dec2numbase($src, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
     }
     catch ( \Throwable $e ) {
+        $ffn->print($src, '[ CATCH ] ' . $e->getMessage());
     }
-    $ffn->print($src, '[ CATCH ] ' . $e->getMessage());
 
     $isOneBased = true;
     $src = 10;
@@ -1921,7 +1920,7 @@ $fn = function () use ($ffn) {
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2dec($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', $isOneBased);
     $ffn->print($src, $enc, $dec);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $src = '2147483647';
@@ -1939,7 +1938,7 @@ $fn = function () use ($ffn) {
     $dec = \Gzhegow\Lib\Lib::crypt()->numbase2numbase($enc, '0123456789', '0123456789abcdefghijklmnopqrstuvwxyz');
     $ffn->print($src, $enc, $dec);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $enc = [];
@@ -1950,7 +1949,7 @@ $fn = function () use ($ffn) {
     $enc[] = \Gzhegow\Lib\Lib::crypt()->bin2binbase('11111', '0123456789ABCDEFGHIJKLMNOPQRSTUV');
     $enc[] = \Gzhegow\Lib\Lib::crypt()->bin2binbase('111111', '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz+/');
     $ffn->print(...$enc);
-    echo PHP_EOL;
+    echo "\n";
 
 
     $src = [ '你' ];
@@ -1959,7 +1958,7 @@ $fn = function () use ($ffn) {
     $ffn->print_array($src);
     $ffn->print_array($enc);
     $ffn->print_array($dec);
-    echo PHP_EOL;
+    echo "\n";
 
     $src = [ '你好' ];
     $enc = \Gzhegow\Lib\Lib::crypt()->text2bin($src);
@@ -1967,10 +1966,10 @@ $fn = function () use ($ffn) {
     $ffn->print_array($src);
     $ffn->print_array($enc);
     $ffn->print_array($dec);
-    echo PHP_EOL;
+    echo "\n";
 
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $src = 5678;
@@ -1979,7 +1978,7 @@ $fn = function () use ($ffn) {
     $dec = \Gzhegow\Lib\Lib::crypt()->binbase2bin($enc, 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/');
     $res = bindec($dec);
     $ffn->print($src, $bin, $enc, $dec, $res);
-    echo PHP_EOL;
+    echo "\n";
 
     $src = [ 'hello' ];
     $bin = \Gzhegow\Lib\Lib::crypt()->text2bin($src);
@@ -1991,10 +1990,10 @@ $fn = function () use ($ffn) {
     $ffn->print($enc);
     $ffn->print_array($dec);
     $ffn->print($res);
-    echo PHP_EOL;
+    echo "\n";
 
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $src = 'HELLO';
@@ -2003,7 +2002,7 @@ $fn = function () use ($ffn) {
     $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_it($enc);
     $dec = implode('', iterator_to_array($gen));
     $ffn->print($src, $enc, $dec);
-    echo PHP_EOL;
+    echo "\n";
 
 
     $src = "hello";
@@ -2021,7 +2020,7 @@ $fn = function () use ($ffn) {
     $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
     $ffn->print($src, $enc, $dec);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $src = "hello";
@@ -2117,7 +2116,7 @@ $test->run();
 // > тесты DateModule
 $fn = function () use ($ffn) {
     $ffn->print('[ DateModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     $before = date_default_timezone_get();
@@ -2134,7 +2133,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $dateTimezone);
     $status = \Gzhegow\Lib\Lib::date()->type_timezone($dateTimezone, new \DateTime('now', new \DateTimeZone('UTC')));
     $ffn->print($status, $dateTimezone);
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset($dateTimezone, '+0100');
     $ffn->print($status, $dateTimezone);
@@ -2142,7 +2141,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $dateTimezone);
     $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset($dateTimezone, new \DateTime('now', new \DateTimeZone('+0100')));
     $ffn->print($status, $dateTimezone);
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr($dateTimezone, 'EET');
     $ffn->print($status, $dateTimezone);
@@ -2150,7 +2149,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $dateTimezone);
     $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr($dateTimezone, new \DateTime('now', new \DateTimeZone('EET')));
     $ffn->print($status, $dateTimezone);
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::date()->type_timezone_name($dateTimezone, 'Europe/Minsk');
     $ffn->print($status, $dateTimezone);
@@ -2158,7 +2157,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $dateTimezone);
     $status = \Gzhegow\Lib\Lib::date()->type_timezone_name($dateTimezone, new \DateTime('now', new \DateTimeZone('Europe/Minsk')));
     $ffn->print($status, $dateTimezone);
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr($dateTimezone, 'EET');
     $ffn->print($status, $dateTimezone);
@@ -2168,9 +2167,9 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $dateTimezone);
     $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr($dateTimezone, new \DateTime('now', new \DateTimeZone('Europe/Minsk')));
     $ffn->print($status, $dateTimezone);
-    echo PHP_EOL;
+    echo "\n";
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $status = \Gzhegow\Lib\Lib::date()->type_interval($dateInterval, 'P1D');
@@ -2183,7 +2182,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $dateInterval);
     $status = \Gzhegow\Lib\Lib::date()->type_interval($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
     $ffn->print($status, $dateInterval);
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::date()->type_interval_duration($dateInterval, 'P1D');
     $ffn->print($status, $dateInterval);
@@ -2193,7 +2192,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $dateInterval);
     $status = \Gzhegow\Lib\Lib::date()->type_interval_duration($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
     $ffn->print($status, $dateInterval);
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring($dateInterval, '+100 seconds');
     $ffn->print($status, $dateInterval);
@@ -2201,7 +2200,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $dateInterval);
     $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
     $ffn->print($status, $dateInterval);
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime($dateInterval, '123.456');
     $ffn->print($status, $dateInterval);
@@ -2209,7 +2208,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $dateInterval);
     $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
     $ffn->print($status, $dateInterval);
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::date()->type_interval_ago($dateInterval, new \DateTime('tomorrow midnight'), new \DateTime('now midnight'));
     $ffn->print($status, $dateInterval);
@@ -2217,9 +2216,9 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $dateInterval);
     $status = \Gzhegow\Lib\Lib::date()->type_interval_ago($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
     $ffn->print($status, $dateInterval);
-    echo PHP_EOL;
+    echo "\n";
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 midnight');
@@ -2233,7 +2232,7 @@ $fn = function () use ($ffn) {
     $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject3, $dateAtomString1);
     $dateAtomString3 = $dateObject3->format(DATE_ATOM);
     $ffn->print($status, $dateObject3, $dateAtomString1 === $dateAtomString3);
-    echo PHP_EOL;
+    echo "\n";
 
 
     $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject, '1970-01-01 midnight');
@@ -2247,7 +2246,7 @@ $fn = function () use ($ffn) {
     $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject3, $dateAtomString1);
     $dateAtomString3 = $dateImmutableObject3->format(DATE_ATOM);
     $ffn->print($status, $dateImmutableObject3, $dateAtomString1 === $dateAtomString3);
-    echo PHP_EOL;
+    echo "\n";
 
 
     $status = \Gzhegow\Lib\Lib::date()->type_date($dateObject, '1970-01-01 midnight');
@@ -2265,7 +2264,7 @@ $fn = function () use ($ffn) {
     $status = \Gzhegow\Lib\Lib::date()->type_date($dateImmutableObject2, $dateImmutableObject);
     $dateAtomString4 = $dateImmutableObject2->format(DATE_ATOM);
     $ffn->print($status, $dateImmutableObject2, $dateAtomString1 === $dateAtomString4);
-    echo PHP_EOL;
+    echo "\n";
 
 
     $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject1, '1970-01-01 midnight');
@@ -2275,9 +2274,9 @@ $fn = function () use ($ffn) {
     $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject2, '1970-01-01 midnight', 'EET');
     $dateAtomString2 = $dateObject2->format(DATE_ATOM);
     $ffn->print($status, $dateObject2, $dateAtomString !== $dateAtomString2);
-    echo PHP_EOL;
+    echo "\n";
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 12:34:56');
@@ -2288,7 +2287,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $dateObject);
     $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 12:34:56.456789', 'EET');
     $ffn->print($status, $dateObject);
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 12:34:56 +0100');
     $ffn->print($status, $result);
@@ -2296,7 +2295,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $result);
     $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 12:34:56.456789 Europe/Minsk');
     $ffn->print($status, $result);
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, '1970-01-01 00:00:00 +0100', 'Y-m-d H:i:s O',);
     $ffn->print($status, $result);
@@ -2304,7 +2303,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $result);
     $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, '1970-01-01 00:00:00 Europe/Minsk', 'Y-m-d H:i:s e',);
     $ffn->print($status, $result);
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, '1970-01-01 00:00:00 +0100', 'Y-m-d H:i:s O',);
     $ffn->print($status, $result);
@@ -2312,7 +2311,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $result);
     $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, '1970-01-01 00:00:00 Europe/Minsk', 'Y-m-d H:i:s e',);
     $ffn->print($status, $result);
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '0');
     $ffn->print($status, $result);
@@ -2322,7 +2321,7 @@ $fn = function () use ($ffn) {
     $ffn->print($status, $result);
     $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '123.456', 'EET');
     $ffn->print($status, $result);
-    echo PHP_EOL;
+    echo "\n";
 
 
     date_default_timezone_set($before);
@@ -2426,7 +2425,7 @@ $test->run();
 // > тесты DebugModule
 $fn = function () use ($ffn) {
     $ffn->print('[ DebugModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
@@ -2434,10 +2433,10 @@ $fn = function () use ($ffn) {
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     $ffn->print($isDiff);
     $ffn->print_array_multiline($diffLines);
-    echo PHP_EOL;
+    echo "\n";
 
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
@@ -2445,24 +2444,24 @@ $fn = function () use ($ffn) {
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     $ffn->print($isDiff);
     $ffn->print_array_multiline($diffLines);
-    echo PHP_EOL;
+    echo "\n";
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry2\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     $ffn->print($isDiff);
     $ffn->print_array_multiline($diffLines);
-    echo PHP_EOL;
+    echo "\n";
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\ndamson\nelderberry2";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     $ffn->print($isDiff);
     $ffn->print_array_multiline($diffLines);
-    echo PHP_EOL;
+    echo "\n";
 
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
@@ -2470,24 +2469,24 @@ $fn = function () use ($ffn) {
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     $ffn->print($isDiff);
     $ffn->print_array_multiline($diffLines);
-    echo PHP_EOL;
+    echo "\n";
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\nfig\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     $ffn->print($isDiff);
     $ffn->print_array_multiline($diffLines);
-    echo PHP_EOL;
+    echo "\n";
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\ndamson\nelderberry\nfig";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     $ffn->print($isDiff);
     $ffn->print_array_multiline($diffLines);
-    echo PHP_EOL;
+    echo "\n";
 
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
@@ -2495,36 +2494,36 @@ $fn = function () use ($ffn) {
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     $ffn->print($isDiff);
     $ffn->print_array_multiline($diffLines);
-    echo PHP_EOL;
+    echo "\n";
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ndamson\nelderberry";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     $ffn->print($isDiff);
     $ffn->print_array_multiline($diffLines);
-    echo PHP_EOL;
+    echo "\n";
 
     $oldText = "apple\nbanana\ncherry\ndamson\nelderberry";
     $newText = "apple\nbanana\ncherry\ndamson";
     $isDiff = \Gzhegow\Lib\Lib::debug()->diff($oldText, $newText, [ &$diffLines ]);
     $ffn->print($isDiff);
     $ffn->print_array_multiline($diffLines);
-    echo PHP_EOL;
+    echo "\n";
 
 
-    echo PHP_EOL;
+    echo "\n";
 
 
-    echo \Gzhegow\Lib\Lib::debug()->value(null) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug()->value(false) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug()->value(1) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug()->value(1.1) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug()->value('string') . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug()->value([]) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug()->value((object) []) . PHP_EOL;
-    echo \Gzhegow\Lib\Lib::debug()->value(STDOUT) . PHP_EOL;
+    echo \Gzhegow\Lib\Lib::debug()->value(null) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->value(false) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->value(1) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->value(1.1) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->value('string') . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->value([]) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->value((object) []) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->value(STDOUT) . "\n";
 
-    echo PHP_EOL;
+    echo "\n";
 
     $stdClass = (object) [];
     echo \Gzhegow\Lib\Lib::debug()->value(
@@ -2534,7 +2533,7 @@ $fn = function () use ($ffn) {
             [ 1.5, 'apples', $stdClass ],
         ]
     );
-    echo PHP_EOL;
+    echo "\n";
     echo \Gzhegow\Lib\Lib::debug()->value_array(
         [
             [ 1, 'apple', $stdClass ],
@@ -2542,10 +2541,10 @@ $fn = function () use ($ffn) {
             [ 1.5, 'apples', $stdClass ],
         ], 2
     );
-    echo PHP_EOL;
+    echo "\n";
 
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     echo \Gzhegow\Lib\Lib::debug()->value_multiline(
@@ -2555,7 +2554,7 @@ $fn = function () use ($ffn) {
             [ 1.5, 'apples', $stdClass ],
         ]
     );
-    echo PHP_EOL;
+    echo "\n";
 
     echo \Gzhegow\Lib\Lib::debug()->value_array_multiline(
         [
@@ -2565,9 +2564,9 @@ $fn = function () use ($ffn) {
         ], 2
     );
 
-    echo PHP_EOL;
+    echo "\n";
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $varToPrint = '<div class="block"></div>';
@@ -2593,7 +2592,7 @@ $fn = function () use ($ffn) {
     ;
     $ffn->print($string);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     // $varToDump = '<div class="block"></div>';
@@ -2814,7 +2813,7 @@ $test->run();
 // > тесты EscapeModule
 $fn = function () use ($ffn) {
     $ffn->print('[ EscapeModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     $params = [];
@@ -2822,7 +2821,7 @@ $fn = function () use ($ffn) {
     $ffn->print($sqlIn);
     $ffn->print_array($params);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $params = [];
@@ -2830,7 +2829,7 @@ $fn = function () use ($ffn) {
     $ffn->print($sqlIn);
     $ffn->print_array($params);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $sqlLike = \Gzhegow\Lib\Lib::escape()->sql_like_quote('Hello, _user_! How are you today, in percents (%)?', '\\');
@@ -2848,7 +2847,7 @@ $fn = function () use ($ffn) {
     );
     $ffn->print($sqlLike);
 
-    echo PHP_EOL;
+    echo "\n";
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
@@ -2872,7 +2871,7 @@ $test->run();
 // > тесты FormatModule
 $fn = function () use ($ffn) {
     $ffn->print('[ FormatModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     $enc = \Gzhegow\Lib\Lib::format()->bytes_encode($src = 1024 * 1024);
@@ -2881,14 +2880,14 @@ $fn = function () use ($ffn) {
     $dec = \Gzhegow\Lib\Lib::format()->bytes_decode($enc);
     $ffn->print($dec, $src === $dec);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv_encode_rows([ [ 'col1', 'col2' ], [ 'val1', 'val2' ] ]);
     $ffn->print($csv);
     $ffn->print($bytes);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv_encode_row([ 'col1', 'col2' ]);
@@ -2919,7 +2918,7 @@ $test->run();
 // > тесты FsModule
 $fn = function () use ($ffn) {
     $ffn->print('[ FsModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
@@ -2940,7 +2939,7 @@ $fn = function () use ($ffn) {
     );
     $ffn->print($result);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $result = \Gzhegow\Lib\Lib::fs()->file_get_contents(
@@ -2978,10 +2977,102 @@ $test->run();
 
 
 // >>> TEST
+// > тесты ItertoolsModule
+$fn = function () use ($ffn) {
+    $ffn->print('[ ItertoolsModule ]');
+    echo "\n";
+
+    $it = \Gzhegow\Lib\Lib::itertools()->range_it(0, 10);
+    $result = iterator_to_array($it);
+    $ffn->print($result);
+
+    echo PHP_EOL;
+
+
+    $it = \Gzhegow\Lib\Lib::itertools()->range_it(0, 10);
+    $it = \Gzhegow\Lib\Lib::itertools()->reversed_it($it);
+    $result = iterator_to_array($it);
+    $ffn->print($result);
+
+    echo PHP_EOL;
+
+
+    $it = \Gzhegow\Lib\Lib::itertools()->product_it([ 'A', 'B', 'C', 'D' ], [ 'x', 'y' ]);
+    $result = iterator_to_array($it);
+    $result = array_map('implode', $result);
+    $ffn->print_array($result);
+
+    echo PHP_EOL;
+
+
+    $it = \Gzhegow\Lib\Lib::itertools()->product_repeat_it(3, [ '0', '1' ]);
+    $result = iterator_to_array($it);
+    $result = array_map('implode', $result);
+    $ffn->print_array($result);
+
+    echo PHP_EOL;
+
+
+    $it = \Gzhegow\Lib\Lib::itertools()->combinations_unique_it([ 'A', 'B', 'C', 'D' ], 2);
+    $result = iterator_to_array($it);
+    $result = array_map('implode', $result);
+    $ffn->print_array($result);
+
+    $it = \Gzhegow\Lib\Lib::itertools()->combinations_unique_it([ '0', '1', '2', '3' ], 3);
+    $result = iterator_to_array($it);
+    $result = array_map('implode', $result);
+    $ffn->print_array($result);
+
+    echo PHP_EOL;
+
+
+    $it = \Gzhegow\Lib\Lib::itertools()->combinations_all_it([ 'A', 'B', 'C' ], 2);
+    $result = iterator_to_array($it);
+    $result = array_map('implode', $result);
+    $ffn->print_array($result);
+
+    echo PHP_EOL;
+
+
+    $it = \Gzhegow\Lib\Lib::itertools()->permutations_it([ 'A', 'B', 'C', 'D' ], 2);
+    $result = iterator_to_array($it);
+    $result = array_map('implode', $result);
+    $ffn->print_array($result);
+
+    $it = \Gzhegow\Lib\Lib::itertools()->permutations_it([ '0', '1', '2' ]);
+    $result = iterator_to_array($it);
+    $result = array_map('implode', $result);
+    $ffn->print_array($result);
+};
+$test = $ffn->test($fn);
+$test->expectStdout('
+"[ ItertoolsModule ]"
+
+[ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+
+[ 10 => 10, 9 => 9, 8 => 8, 7 => 7, 6 => 6, 5 => 5, 4 => 4, 3 => 3, 2 => 2, 1 => 1, 0 => 0 ]
+
+[ "Ax", "Ay", "Bx", "By", "Cx", "Cy", "Dx", "Dy" ]
+
+[ "000", "001", "010", "011", "100", "101", "110", "111" ]
+
+[ "AB", "AC", "AD", "BC", "BD", "CD" ]
+[ "012", "013", "023", "123" ]
+
+[ "AA", "AB", "AC", "BB", "BC", "CC" ]
+
+[ "AB", "AC", "AD", "BA", "BC", "BD", "CA", "CB", "CD", "DA", "DB", "DC" ]
+[ "012", "021", "102", "120", "201", "210" ]
+');
+$test->run();
+
+
+
+// >>> TEST
 // > тесты JsonModule
 $fn = function () use ($ffn) {
     $ffn->print('[ JsonModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     $json1 = '{"hello": "world"}';
@@ -3002,21 +3093,19 @@ $fn = function () use ($ffn) {
     ';
 
 
-    $e = null;
     try {
-        $result = \Gzhegow\Lib\Lib::json()->json_decode(null, true, []);
+        \Gzhegow\Lib\Lib::json()->json_decode(null, true, []);
     }
     catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
-    $ffn->print('[ CATCH ] ' . $e->getMessage());
 
-    $e = null;
     try {
-        $result = \Gzhegow\Lib\Lib::json()->jsonc_decode(null, true, []);
+        \Gzhegow\Lib\Lib::json()->jsonc_decode(null, true, []);
     }
     catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
-    $ffn->print('[ CATCH ] ' . $e->getMessage());
 
     $result = \Gzhegow\Lib\Lib::json()->json_decode(null, true, [ null ]);
     $ffn->print($result);
@@ -3024,7 +3113,7 @@ $fn = function () use ($ffn) {
     $result = \Gzhegow\Lib\Lib::json()->jsonc_decode(null, true, [ null ]);
     $ffn->print($result);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $result = \Gzhegow\Lib\Lib::json()->json_decode($json1, true, []);
@@ -3039,24 +3128,22 @@ $fn = function () use ($ffn) {
     $result = \Gzhegow\Lib\Lib::json()->jsonc_decode($json2, true, []);
     $ffn->print($result);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
-    $e = null;
     try {
-        $result = \Gzhegow\Lib\Lib::json()->json_decode($jsonWithComment1, true, []);
+        \Gzhegow\Lib\Lib::json()->json_decode($jsonWithComment1, true, []);
     }
     catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
-    $ffn->print('[ CATCH ] ' . $e->getMessage());
 
-    $e = null;
     try {
-        $result = \Gzhegow\Lib\Lib::json()->json_decode($jsonWithComment2, true, []);
+        \Gzhegow\Lib\Lib::json()->json_decode($jsonWithComment2, true, []);
     }
     catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
-    $ffn->print('[ CATCH ] ' . $e->getMessage());
 
     $result = \Gzhegow\Lib\Lib::json()->jsonc_decode($jsonWithComment1, true, []);
     $ffn->print($result);
@@ -3064,16 +3151,15 @@ $fn = function () use ($ffn) {
     $result = \Gzhegow\Lib\Lib::json()->jsonc_decode($jsonWithComment2, true, []);
     $ffn->print($result);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
-    $e = null;
     try {
-        $result = \Gzhegow\Lib\Lib::json()->json_encode(null, [], false);
+        \Gzhegow\Lib\Lib::json()->json_encode(null, [], false);
     }
     catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
-    $ffn->print('[ CATCH ] ' . $e->getMessage());
 
     $result = \Gzhegow\Lib\Lib::json()->json_encode(null, [ null ], false);
     $ffn->print($result);
@@ -3081,16 +3167,15 @@ $fn = function () use ($ffn) {
     $result = \Gzhegow\Lib\Lib::json()->json_encode(null, [], true);
     $ffn->print($result);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
-    $e = null;
     try {
         \Gzhegow\Lib\Lib::json()->json_encode($value = NAN);
     }
     catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
-    $ffn->print('[ CATCH ] ' . $e->getMessage());
 
     $result = \Gzhegow\Lib\Lib::json()->json_encode(
         $value = NAN,
@@ -3098,7 +3183,7 @@ $fn = function () use ($ffn) {
     );
     $ffn->print($result);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $result = \Gzhegow\Lib\Lib::json()->json_encode("привет");
@@ -3144,7 +3229,7 @@ $test->run();
 // > тесты NetModule
 $fn = function () use ($ffn) {
     $ffn->print('[ NetModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
     $ipV4List = [
         '192.168.1.10',
@@ -3173,7 +3258,7 @@ $fn = function () use ($ffn) {
             $ffn->print($ip, $subnet, $status1, $status1 === $status2);
         }
 
-        echo PHP_EOL;
+        echo "\n";
     }
 
     $ipV6List = [
@@ -3203,7 +3288,7 @@ $fn = function () use ($ffn) {
             $ffn->print($ip, $subnet, $status1, $status1 === $status2);
         }
 
-        echo PHP_EOL;
+        echo "\n";
     }
 };
 $test = $ffn->test($fn);
@@ -3276,12 +3361,12 @@ $test->run();
 // > тесты ParseModule
 $fn = function () use ($ffn) {
     $ffn->print('[ ParseModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     $result = \Gzhegow\Lib\Lib::parse()->ctype_digit('123');
     $ffn->print($result);
-    echo PHP_EOL;
+    echo "\n";
 
 
     $result = \Gzhegow\Lib\Lib::parse()->ctype_alpha('abcABC');
@@ -3289,7 +3374,7 @@ $fn = function () use ($ffn) {
 
     $result = \Gzhegow\Lib\Lib::parse()->ctype_alpha('abcABC', false);
     $ffn->print($result);
-    echo PHP_EOL;
+    echo "\n";
 
 
     $result = \Gzhegow\Lib\Lib::parse()->ctype_alnum('123abcABC');
@@ -3318,7 +3403,7 @@ $test->run();
 // > тесты PhpModule
 $fn = function () use ($ffn) {
     $ffn->print('[ PhpModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     class PhpModuleDummy
@@ -3335,33 +3420,33 @@ $fn = function () use ($ffn) {
     {
         public function publicMethod()
         {
-            echo __METHOD__ . PHP_EOL;
+            echo __METHOD__ . "\n";
         }
 
         protected function protectedMethod()
         {
-            echo __METHOD__ . PHP_EOL;
+            echo __METHOD__ . "\n";
         }
 
         private function privateMethod()
         {
-            echo __METHOD__ . PHP_EOL;
+            echo __METHOD__ . "\n";
         }
 
 
         public static function publicStaticMethod()
         {
-            echo __METHOD__ . PHP_EOL;
+            echo __METHOD__ . "\n";
         }
 
         protected static function protectedStaticMethod()
         {
-            echo __METHOD__ . PHP_EOL;
+            echo __METHOD__ . "\n";
         }
 
         private static function privateStaticMethod()
         {
-            echo __METHOD__ . PHP_EOL;
+            echo __METHOD__ . "\n";
         }
     }
 
@@ -3369,7 +3454,7 @@ $fn = function () use ($ffn) {
     {
         public function __call($name, $args)
         {
-            echo __METHOD__ . PHP_EOL;
+            echo __METHOD__ . "\n";
         }
     }
 
@@ -3377,7 +3462,7 @@ $fn = function () use ($ffn) {
     {
         public static function __callStatic($name, $args)
         {
-            echo __METHOD__ . PHP_EOL;
+            echo __METHOD__ . "\n";
         }
     }
 
@@ -3385,13 +3470,13 @@ $fn = function () use ($ffn) {
     {
         public function __invoke()
         {
-            echo __METHOD__ . PHP_EOL;
+            echo __METHOD__ . "\n";
         }
     }
 
     function PhpModule_dummy_function()
     {
-        echo __FUNCTION__ . PHP_EOL;
+        echo __FUNCTION__ . "\n";
     }
 
 
@@ -3458,11 +3543,11 @@ $fn = function () use ($ffn) {
         }
     }
     // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
-    echo md5(serialize($table)) . PHP_EOL;
+    echo md5(serialize($table)) . "\n";
     unset($table);
 
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $sources = [
@@ -3519,11 +3604,11 @@ $fn = function () use ($ffn) {
         }
     }
     // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
-    echo md5(serialize($table)) . PHP_EOL;
+    echo md5(serialize($table)) . "\n";
     unset($table);
 
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $sources = [
@@ -3601,17 +3686,17 @@ $fn = function () use ($ffn) {
         $table4[ $tableRow ][ 'callable_string_method_static' ] = $ffn->value($result);
     }
     // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
-    echo md5(serialize($table1)) . PHP_EOL;
-    echo md5(serialize($table2)) . PHP_EOL;
-    echo md5(serialize($table3)) . PHP_EOL;
-    echo md5(serialize($table4)) . PHP_EOL;
+    echo md5(serialize($table1)) . "\n";
+    echo md5(serialize($table2)) . "\n";
+    echo md5(serialize($table3)) . "\n";
+    echo md5(serialize($table4)) . "\n";
     unset($table1);
     unset($table2);
     unset($table3);
     unset($table4);
 
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $sources = [];
@@ -3686,11 +3771,11 @@ $fn = function () use ($ffn) {
         }
     }
     // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
-    echo md5(serialize($table)) . PHP_EOL;
+    echo md5(serialize($table)) . "\n";
     unset($table);
 
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $table1 = [];
@@ -3768,13 +3853,13 @@ $fn = function () use ($ffn) {
         }
     }
     // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
-    echo md5(serialize($table1)) . PHP_EOL;
-    echo md5(serialize($table2)) . PHP_EOL;
-    echo md5(serialize($table3)) . PHP_EOL;
+    echo md5(serialize($table1)) . "\n";
+    echo md5(serialize($table2)) . "\n";
+    echo md5(serialize($table3)) . "\n";
     unset($table1);
     unset($table2);
     unset($table3);
-    echo PHP_EOL;
+    echo "\n";
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
@@ -3803,12 +3888,12 @@ $test->run();
 // > тесты PregModule
 $fn = function () use ($ffn) {
     $ffn->print('[ PregModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     $regex = \Gzhegow\Lib\Lib::preg()->preg_quote_ord("Hello, \x00!");
     $ffn->print($regex);
-    echo PHP_EOL;
+    echo "\n";
 
 
     $regex = \Gzhegow\Lib\Lib::preg()->preg_escape('/', '<html>', [ '.*' ], '</html>');
@@ -3834,13 +3919,13 @@ $test->run();
 // > тесты RandomModule
 $fn = function () use ($ffn) {
     $ffn->print('[ RandomModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
     $uuid = \Gzhegow\Lib\Lib::random()->uuid();
     $status = \Gzhegow\Lib\Lib::random()->type_uuid($result, $uuid);
     $ffn->print(strlen($uuid), $status);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $rand = \Gzhegow\Lib\Lib::random()->random_bytes(16);
@@ -3924,7 +4009,7 @@ $test->run();
 // > тесты SocialModule
 $fn = function () use ($ffn) {
     $ffn->print('[ SocialModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@gmail.com');
     $ffn->print($status, $email);
@@ -3938,7 +4023,7 @@ $fn = function () use ($ffn) {
     catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@gmail.com');
     $ffn->print($status, $email);
@@ -3952,13 +4037,13 @@ $fn = function () use ($ffn) {
     catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::social()->type_email_fake($email, 'no-reply@gmail.com');
     $ffn->print($status, $email);
     $status = \Gzhegow\Lib\Lib::social()->type_email_fake($email, 'email@example.com');
     $ffn->print($status, $email);
-    echo PHP_EOL;
+    echo "\n";
 
 
     $phones = [
@@ -4028,7 +4113,7 @@ $fn = function () use ($ffn) {
             $ffn->print('[ CATCH ] ' . $e->getMessage());
         }
 
-        echo PHP_EOL;
+        echo "\n";
     }
 
     $phoneManager = \Gzhegow\Lib\Lib::social()->clonePhoneManager();
@@ -4047,7 +4132,7 @@ $fn = function () use ($ffn) {
         $result = $phoneManager->parseTelFake($phone);
         $ffn->print($phone, $result);
 
-        echo PHP_EOL;
+        echo "\n";
     }
 
     // $phone = $phones[0];
@@ -4266,19 +4351,19 @@ $test->run();
 // > тесты StrModule
 $fn = function () use ($ffn) {
     $ffn->print('[ StrModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
     $ffn->print(\Gzhegow\Lib\Lib::str()->lines("hello\nworld"));
     $ffn->print(\Gzhegow\Lib\Lib::str()->eol("hello\nworld"));
-    $ffn->print(\Gzhegow\Lib\Lib::str()->lines('hello' . PHP_EOL . 'world'));
-    $ffn->print(\Gzhegow\Lib\Lib::str()->eol('hello' . PHP_EOL . 'world'));
-    echo PHP_EOL;
+    $ffn->print(\Gzhegow\Lib\Lib::str()->lines('hello' . "\n" . 'world'));
+    $ffn->print(\Gzhegow\Lib\Lib::str()->eol('hello' . "\n" . 'world'));
+    echo "\n";
 
     $ffn->print(\Gzhegow\Lib\Lib::str()->strlen('Привет'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->strlen('Hello'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->strsize('Привет'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->strsize('Hello'));
-    echo PHP_EOL;
+    echo "\n";
 
     $ffn->print(\Gzhegow\Lib\Lib::str()->lower('ПРИВЕТ'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->upper('привет'));
@@ -4286,13 +4371,13 @@ $fn = function () use ($ffn) {
     $ffn->print(\Gzhegow\Lib\Lib::str()->ucfirst('привет'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->lcwords('ПРИВЕТ МИР'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->ucwords('привет мир'));
-    echo PHP_EOL;
+    echo "\n";
 
     $status = \Gzhegow\Lib\Lib::str()->str_starts('привет', 'ПРИ', true, [ &$substr ]);
     $ffn->print($status, $substr);
     $status = \Gzhegow\Lib\Lib::str()->str_ends('приВЕТ', 'вет', true, [ &$substr ]);
     $ffn->print($status, $substr);
-    echo PHP_EOL;
+    echo "\n";
 
     $ffn->print(\Gzhegow\Lib\Lib::str()->lcrop('азаза_привет_азаза', 'аза'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->rcrop('азаза_привет_азаза', 'аза'));
@@ -4300,11 +4385,11 @@ $fn = function () use ($ffn) {
     $ffn->print(\Gzhegow\Lib\Lib::str()->unlcrop('"привет"', '"'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->unrcrop('"привет"', '"'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->uncrop('"привет"', '"'));
-    echo PHP_EOL;
+    echo "\n";
 
     $ffn->print(\Gzhegow\Lib\Lib::str()->str_replace_limit('за', '_', 'а-зазаза-зазаза', 3));
     $ffn->print(\Gzhegow\Lib\Lib::str()->str_ireplace_limit('зА', '_', 'а-заЗАза-заЗАза', 3));
-    echo PHP_EOL;
+    echo "\n";
 
     $ffn->print(\Gzhegow\Lib\Lib::str()->camel('-hello-world-foo-bar'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->camel('-helloWorldFooBar'));
@@ -4325,7 +4410,7 @@ $fn = function () use ($ffn) {
     $ffn->print(\Gzhegow\Lib\Lib::str()->space_upper('_Hello_WORLD_Foo_BAR'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->snake_upper('-Hello-WORLD-Foo-BAR'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->kebab_upper(' Hello WORLD Foo BAR'));
-    echo PHP_EOL;
+    echo "\n";
 
     $ffn->print(\Gzhegow\Lib\Lib::str()->prefix('primary'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->prefix('unique'));
@@ -4333,24 +4418,24 @@ $fn = function () use ($ffn) {
     $ffn->print(\Gzhegow\Lib\Lib::str()->prefix('fulltext'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->prefix('fullText'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->prefix('spatialIndex'));
-    echo PHP_EOL;
+    echo "\n";
 
     $ffn->print(\Gzhegow\Lib\Lib::str()->translit_ru2ascii('привет мир'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->translit_ru2ascii('+привет +мир +100 abc', '-', '+'));
-    echo PHP_EOL;
+    echo "\n";
 
     $ffn->print(\Gzhegow\Lib\Lib::str()->interpolator()->interpolate('привет {{username}}', [ 'username' => 'мир' ]));
-    echo PHP_EOL;
+    echo "\n";
 
     $ffn->print(\Gzhegow\Lib\Lib::str()->slugger()->translit(' привет мир '));
     $ffn->print(\Gzhegow\Lib\Lib::str()->slugger()->translit(' привет мир ', null, [ 'и' ]));
     $ffn->print(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->slugger()->slug('привет мир', ':', [ 'и' ]));
-    echo PHP_EOL;
+    echo "\n";
 
     $ffn->print(\Gzhegow\Lib\Lib::str()->inflector()->singularize('users'));
     $ffn->print(\Gzhegow\Lib\Lib::str()->inflector()->pluralize('user'));
-    echo PHP_EOL;
+    echo "\n";
 
 
     $array = [
@@ -4369,7 +4454,7 @@ $fn = function () use ($ffn) {
     $ffn->print_array_multiline(\Gzhegow\Lib\Lib::str()->str_match('users.*.name', $keys));
     $ffn->print_array_multiline(\Gzhegow\Lib\Lib::str()->str_match('users.*.name', $keys, '*'));
     $ffn->print_array_multiline(\Gzhegow\Lib\Lib::str()->str_match('users.*.name', $keys, '*', '.'));
-    echo PHP_EOL;
+    echo "\n";
 
     $array = [
         "users\x00name"         => false,
@@ -4387,7 +4472,7 @@ $fn = function () use ($ffn) {
     $ffn->print_array_multiline(\Gzhegow\Lib\Lib::str()->str_match("users\x00*\x00name", $keys));
     $ffn->print_array_multiline($a = \Gzhegow\Lib\Lib::str()->str_match("users\x00*\x00name", $keys, '*'));
     $ffn->print_array_multiline(\Gzhegow\Lib\Lib::str()->str_match("users\x00*\x00name", $keys, '*', "\x00"));
-    echo PHP_EOL;
+    echo "\n";
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
@@ -4507,7 +4592,7 @@ $test->run();
 // > тесты UrlModule
 $fn = function () use ($ffn) {
     $ffn->print('[ UrlModule ]');
-    echo PHP_EOL;
+    echo "\n";
 
 
     $result = \Gzhegow\Lib\Lib::url()->url($src = 'https://google.com/hello/world');
@@ -4516,7 +4601,7 @@ $fn = function () use ($ffn) {
     $result = \Gzhegow\Lib\Lib::url()->url($src = ':hello/world');
     $ffn->print($src, (bool) $result);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $result = \Gzhegow\Lib\Lib::url()->host($src = 'https://google.com/hello/world');
@@ -4525,7 +4610,7 @@ $fn = function () use ($ffn) {
     $result = \Gzhegow\Lib\Lib::url()->host($src = ':hello/world');
     $ffn->print($src, (bool) $result);
 
-    echo PHP_EOL;
+    echo "\n";
 
 
     $result = \Gzhegow\Lib\Lib::url()->link($src = 'https://google.com/hello/world');

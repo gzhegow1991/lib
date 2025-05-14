@@ -13,13 +13,16 @@ trait CanTraitBoot
             return;
         }
 
-        $theParse = Lib::parse();
-        $thePhp = Lib::php();
+        $theType = Lib::type();
 
-        $traits = $thePhp->class_uses_with_parents(static::class, true);
+        $traits = Lib::php()->class_uses_with_parents(static::class, true);
 
         foreach ( $traits as $trait ) {
-            $fn = '__boot' . $theParse->struct_basename($trait);
+            if (! $theType->struct_basename($traitBasename, $trait)) {
+                continue;
+            }
+
+            $fn = "__boot{$traitBasename}";
 
             if (method_exists(static::class, $fn)) {
                 call_user_func_array(static::class . "::{$fn}", $args);

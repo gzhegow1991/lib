@@ -359,17 +359,17 @@ class EntrypointModule
 
         if ([] !== $messageLines) {
             foreach ( $messageLines as $line ) {
-                echo $line . PHP_EOL;
+                echo $line . "\n";
             }
         }
 
         if ([] !== $traceLines) {
-            echo PHP_EOL;
+            echo "\n";
 
-            echo 'Trace: ' . PHP_EOL;
+            echo 'Trace: ' . "\n";
 
             foreach ( $traceLines as $line ) {
-                echo $line . PHP_EOL;
+                echo $line . "\n";
             }
         }
 

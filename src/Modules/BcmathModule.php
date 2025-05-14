@@ -3,7 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Type\Number;
+use Gzhegow\Lib\Modules\Bcmath\Number;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
@@ -28,6 +28,46 @@ class BcmathModule
 
 
     /**
+     * @param Number|null $result
+     */
+    public function type_number(&$result, $value, ?bool $allowExp = null) : bool
+    {
+        $result = null;
+
+        if ($value instanceof Number) {
+            $result = $value;
+
+            return true;
+        }
+
+        $status = Lib::type()->numeric($valueNumeric, $value, $allowExp, [ &$split ]);
+
+        if ($status) {
+            $frac = $split[ 2 ];
+
+            $scale = 0;
+            if ('' !== $frac) {
+                $scale = strlen($frac) - 1;
+            }
+
+            $number = Number::fromValidArray([
+                'original' => $value,
+                'sign'     => $split[ 0 ],
+                'int'      => $split[ 1 ],
+                'frac'     => $split[ 2 ],
+                'exp'      => $split[ 3 ],
+                'scale'    => $scale,
+            ]);
+
+            $result = $number;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * @param Bcnumber|null $result
      */
     public function type_bcnumber(&$result, $value) : bool
@@ -40,7 +80,7 @@ class BcmathModule
             return true;
         }
 
-        $status = Lib::type()->number($number, $value, false);
+        $status = $this->type_number($number, $value, false);
         if (! $status) {
             return false;
         }
@@ -75,7 +115,7 @@ class BcmathModule
 
             $last = $this->scaleLimit;
 
-            $current = $scaleLimit;
+            $this->scaleLimit = $scaleLimit;
 
             $result = $last;
         }
@@ -710,7 +750,7 @@ class BcmathModule
             $num2Abs = $mod;
         }
 
-        $result = $gcd = $num1Abs;
+        $result = $num1Abs;
 
         $this->type_bcnumber($bcresult, $result);
 
@@ -743,9 +783,9 @@ class BcmathModule
 
         $gcdAbs = $bcGcd->getValueAbsolute();
 
-        $result = $lcm = bcdiv($mul, $gcdAbs, 0);
+        $result = bcdiv($mul, $gcdAbs, 0);
 
-        $status = $this->type_bcnumber($bcresult, $result);
+        $this->type_bcnumber($bcresult, $result);
 
         return $bcresult;
     }

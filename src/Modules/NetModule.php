@@ -637,9 +637,9 @@ class NetModule
 
     public function user_agent_client() : ?string
     {
-        $_userAgent = Lib::parse()->string_not_empty($_SERVER[ 'HTTP_USER_AGENT' ] ?? null);
+        Lib::type()->string_not_empty($userAgentString, $_SERVER[ 'HTTP_USER_AGENT' ] ?? null);
 
-        return $_userAgent;
+        return $userAgentString;
     }
 
     public function user_agent_browser() : string

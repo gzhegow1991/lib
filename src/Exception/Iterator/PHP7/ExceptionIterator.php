@@ -24,7 +24,7 @@ class ExceptionIterator implements \RecursiveIterator
     public function __construct(array $items, array $track = [])
     {
         $_items = $items;
-        foreach ( $_items as $i => $e ) {
+        foreach ( $_items as $e ) {
             if (! ($e instanceof \Throwable)) {
                 throw new \LogicException(
                     'Each of `items` should be instance of: ' . \Throwable::class

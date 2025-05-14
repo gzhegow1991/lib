@@ -9,13 +9,13 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Arr\ArrPath;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
+use Gzhegow\Lib\Modules\Bcmath\Number;
 use Gzhegow\Lib\Modules\Net\AddressIpV4;
 use Gzhegow\Lib\Modules\Net\AddressIpV6;
 use Gzhegow\Lib\Modules\Net\SubnetV4;
 use Gzhegow\Lib\Modules\Net\SubnetV6;
 use Gzhegow\Lib\Modules\Php\Nil;
 use Gzhegow\Lib\Modules\Str\Alphabet;
-use Gzhegow\Lib\Modules\Type\Number;
 
 class ParseNullModule
 {
@@ -31,7 +31,7 @@ class ParseNullModule
 	 */
 	public function a_nil($value)
 	{
-		if (Lib::type()->a_nil($result, $value)) {
+		if (Lib::type()->nil($result, $value)) {
 		    return $result;
 		}
 
@@ -85,7 +85,7 @@ class ParseNullModule
 	 */
 	public function a_nullable($value)
 	{
-		if (Lib::type()->a_nullable($result, $value)) {
+		if (Lib::type()->nullable($result, $value)) {
 		    return $result;
 		}
 
@@ -111,7 +111,7 @@ class ParseNullModule
 	 */
 	public function a_empty($value)
 	{
-		if (Lib::type()->a_empty($result, $value)) {
+		if (Lib::type()->empty($result, $value)) {
 		    return $result;
 		}
 
@@ -139,7 +139,7 @@ class ParseNullModule
 	 */
 	public function a_blank($value)
 	{
-		if (Lib::type()->a_blank($result, $value)) {
+		if (Lib::type()->blank($result, $value)) {
 		    return $result;
 		}
 
@@ -167,7 +167,7 @@ class ParseNullModule
 	 */
 	public function a_passed($value)
 	{
-		if (Lib::type()->a_passed($result, $value)) {
+		if (Lib::type()->passed($result, $value)) {
 		    return $result;
 		}
 
@@ -349,7 +349,7 @@ class ParseNullModule
 	 */
 	public function a_nan($value)
 	{
-		if (Lib::type()->a_nan($result, $value)) {
+		if (Lib::type()->nan($result, $value)) {
 		    return $result;
 		}
 
@@ -362,7 +362,7 @@ class ParseNullModule
 	 */
 	public function a_float_not_nan($value)
 	{
-		if (Lib::type()->a_float_not_nan($result, $value)) {
+		if (Lib::type()->float_not_nan($result, $value)) {
 		    return $result;
 		}
 
@@ -388,7 +388,7 @@ class ParseNullModule
 	 */
 	public function a_finite($value)
 	{
-		if (Lib::type()->a_finite($result, $value)) {
+		if (Lib::type()->finite($result, $value)) {
 		    return $result;
 		}
 
@@ -401,7 +401,7 @@ class ParseNullModule
 	 */
 	public function a_float_not_finite($value)
 	{
-		if (Lib::type()->a_float_not_finite($result, $value)) {
+		if (Lib::type()->float_not_finite($result, $value)) {
 		    return $result;
 		}
 
@@ -427,7 +427,7 @@ class ParseNullModule
 	 */
 	public function a_infinite($value)
 	{
-		if (Lib::type()->a_infinite($result, $value)) {
+		if (Lib::type()->infinite($result, $value)) {
 		    return $result;
 		}
 
@@ -440,7 +440,7 @@ class ParseNullModule
 	 */
 	public function a_float_not_infinite($value)
 	{
-		if (Lib::type()->a_float_not_infinite($result, $value)) {
+		if (Lib::type()->float_not_infinite($result, $value)) {
 		    return $result;
 		}
 
@@ -620,9 +620,9 @@ class ParseNullModule
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_positive_fallback($value, array $refs = [])
+	public function numeric_int_positive_or_minus_one($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_positive_fallback($result, $value, $refs)) {
+		if (Lib::type()->numeric_int_positive_or_minus_one($result, $value, $refs)) {
 		    return $result;
 		}
 
@@ -633,9 +633,9 @@ class ParseNullModule
 	/**
 	 * @return string|null
 	 */
-	public function numeric_int_non_negative_fallback($value, array $refs = [])
+	public function numeric_int_non_negative_or_minus_one($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_non_negative_fallback($result, $value, $refs)) {
+		if (Lib::type()->numeric_int_non_negative_or_minus_one($result, $value, $refs)) {
 		    return $result;
 		}
 
@@ -958,9 +958,9 @@ class ParseNullModule
 	/**
 	 * @return string|null
 	 */
-	public function int_positive_fallback($value, array $refs = [])
+	public function int_positive_or_minus_one($value)
 	{
-		if (Lib::type()->int_positive_fallback($result, $value, $refs)) {
+		if (Lib::type()->int_positive_or_minus_one($result, $value)) {
 		    return $result;
 		}
 
@@ -971,9 +971,9 @@ class ParseNullModule
 	/**
 	 * @return string|null
 	 */
-	public function int_non_negative_fallback($value, array $refs = [])
+	public function int_non_negative_or_minus_one($value)
 	{
-		if (Lib::type()->int_non_negative_fallback($result, $value, $refs)) {
+		if (Lib::type()->int_non_negative_or_minus_one($result, $value)) {
 		    return $result;
 		}
 
@@ -1494,6 +1494,87 @@ class ParseNullModule
 	public function arrpath($path, ?string $dot = null)
 	{
 		if (Lib::type()->arrpath($result, $path, $dot)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function array_of_type($value, string $type)
+	{
+		if (Lib::type()->array_of_type($result, $value, $type)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function array_of_resource_type($value, string $resourceType)
+	{
+		if (Lib::type()->array_of_resource_type($result, $value, $resourceType)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @template T
+	 *
+	 * @param class-string<T> $className
+	 *
+	 * @return T[]
+	 */
+	public function array_of_a($value, string $className)
+	{
+		if (Lib::type()->array_of_a($result, $value, $className)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @template T
+	 *
+	 * @param class-string<T> $className
+	 *
+	 * @return T[]
+	 */
+	public function array_of_class($value, string $className)
+	{
+		if (Lib::type()->array_of_class($result, $value, $className)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @template T
+	 *
+	 * @param class-string<T> $className
+	 *
+	 * @return T[]
+	 */
+	public function array_of_subclass($value, string $className)
+	{
+		if (Lib::type()->array_of_subclass($result, $value, $className)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	public function array_of_callback($value, callable $fn, array $args = [])
+	{
+		if (Lib::type()->array_of_callback($result, $value, $fn, $args)) {
 		    return $result;
 		}
 
@@ -2516,7 +2597,7 @@ class ParseNullModule
 	/**
 	 * @return string|null
 	 */
-	public function filepath($value, ?bool $allowExists = null, ?bool $allowSymlink = null, array $refs = [])
+	public function filepath($value, ?bool $allowExists, ?bool $allowSymlink = null, array $refs = [])
 	{
 		if (Lib::type()->filepath($result, $value, $allowExists, $allowSymlink, $refs)) {
 		    return $result;

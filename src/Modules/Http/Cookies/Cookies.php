@@ -123,7 +123,7 @@ class Cookies
     {
         $result = [];
 
-        foreach ( $this->cookiesIndex as $cookieIndex => $cookieId ) {
+        foreach ( $this->cookiesIndex as $cookieId ) {
             $result[] = $this->cookiesList[ $cookieId ][ 1 ];
         }
 

@@ -79,7 +79,7 @@ class CliModule
             Lib::debug()->d($var, ...$vars);
         }
 
-        echo '> Press ENTER to continue...' . PHP_EOL;
+        echo '> Press ENTER to continue...' . "\n";
         $h = fopen('php://stdin', 'r');
         fgets($h);
         fclose($h);
@@ -122,8 +122,8 @@ class CliModule
 
         $theStr = Lib::str();
 
-        echo '> Enter text separating lines by pressing ENTER' . PHP_EOL;
-        echo '> Write when you\'re done: ' . $delimiter . PHP_EOL;
+        echo '> Enter text separating lines by pressing ENTER' . "\n";
+        echo '> Write when you\'re done: ' . $delimiter . "\n";
 
         $fnStrlen = $theStr->mb_func('strlen');
         $fnStrrpos = $theStr->mb_func('strrpos');
@@ -135,7 +135,7 @@ class CliModule
             $line = trim($line);
 
             if ('' === $line) {
-                echo '> Write `' . $delimiter . '` when done...' . PHP_EOL;
+                echo '> Write `' . $delimiter . '` when done...' . "\n";
 
                 continue;
             }
@@ -161,7 +161,7 @@ class CliModule
         fclose($h);
 
         // results
-        return implode(PHP_EOL, $lines);
+        return implode("\n", $lines);
     }
 
 
@@ -180,7 +180,7 @@ class CliModule
             if (! $isYes) {
                 $accepted = [ 'yy', 'y', 'n', 'nn' ];
 
-                echo $message . ' [' . implode('/', $accepted) . ']' . PHP_EOL;
+                echo $message . ' [' . implode('/', $accepted) . ']' . "\n";
 
                 while ( ! in_array($passed = $this->readln(), $accepted) ) {
                     echo 'Please enter one of: [' . implode('/', $accepted) . ']';

@@ -7,7 +7,7 @@ use Gzhegow\Lib\Exception\LogicException;
 
 abstract class AbstractListOfType extends AbstractListOf
 {
-    public function set($key, $value)
+    protected function setValue($key, $value)
     {
         if (null !== $this->valueType) {
             if ($this->valueType !== gettype($value)) {
@@ -20,6 +20,6 @@ abstract class AbstractListOfType extends AbstractListOf
             }
         }
 
-        return parent::set($key, $value);
+        return parent::setValue($key, $value);
     }
 }

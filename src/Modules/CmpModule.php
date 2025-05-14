@@ -755,8 +755,8 @@ class CmpModule
     {
         $theType = Lib::type();
 
-        $isNilA = $theType->a_nil($var, $a);
-        $isNilB = $theType->a_nil($var, $b);
+        $isNilA = $theType->nil($var, $a);
+        $isNilB = $theType->nil($var, $b);
 
         if ($isNilA && $isNilB) {
             $fnCmpName = __FUNCTION__;
@@ -796,8 +796,8 @@ class CmpModule
 
             $aStatus = $isNullA;
             $bStatus = $isNullB;
-            if (! $isNullA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->a_blank($var, $a);
-            if (! $isNullB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->a_blank($var, $b);
+            if (! $isNullA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->blank($var, $a);
+            if (! $isNullB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->blank($var, $b);
 
             if ($aStatus && $bStatus) {
                 $fnCmpName = __FUNCTION__;
@@ -948,6 +948,29 @@ class CmpModule
             if (! $aStatus && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->num($aNum, $a);
             if (! $bStatus && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->num($bNum, $b);
 
+            $isInfiniteA = $isFloatA && is_infinite($a);
+            $isInfiniteB = $isFloatB && is_infinite($b);
+            if ($isInfiniteA || $isInfiniteB) {
+                $aNum = $aNum ?? $a;
+                $bNum = $bNum ?? $b;
+
+                if ($isInfiniteA && $bStatus) {
+                    $fnCmpName = __FUNCTION__;
+
+                    return $a <=> $bNum;
+                }
+
+                if ($isInfiniteB && $aStatus) {
+                    $fnCmpName = __FUNCTION__;
+
+                    return $aNum <=> $b;
+                }
+
+                $fnCmpName = __FUNCTION__;
+
+                return NAN;
+            }
+
             if ($aStatus && $bStatus) {
                 $aNum = $aNum ?? $a;
                 $bNum = $bNum ?? $b;
@@ -955,15 +978,6 @@ class CmpModule
                 $fnCmpName = __FUNCTION__;
 
                 return $aNum <=> $bNum;
-            }
-
-            $isInfiniteA = $isFloatA && is_infinite($a);
-            $isInfiniteB = $isFloatB && is_infinite($b);
-
-            if ($isInfiniteA || $isInfiniteB) {
-                $fnCmpName = __FUNCTION__;
-
-                return NAN;
             }
 
             return $this->cmpTypeCastFail(
@@ -1028,6 +1042,30 @@ class CmpModule
             if (! $aStatus && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->num($aNum, $a);
             if (! $bStatus && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->num($bNum, $b);
 
+            $isInfiniteA = $isFloatA && is_infinite($a);
+            $isInfiniteB = $isFloatB && is_infinite($b);
+            if ($isInfiniteA || $isInfiniteB) {
+                $aNum = $aNum ?? $a;
+                $bNum = $bNum ?? $b;
+
+
+                if ($isInfiniteA && $bStatus) {
+                    $fnCmpName = __FUNCTION__;
+
+                    return $a <=> $bNum;
+                }
+
+                if ($isInfiniteB && $aStatus) {
+                    $fnCmpName = __FUNCTION__;
+
+                    return $aNum <=> $b;
+                }
+
+                $fnCmpName = __FUNCTION__;
+
+                return NAN;
+            }
+
             if ($aStatus && $bStatus) {
                 $aNum = $aNum ?? $a;
                 $bNum = $bNum ?? $b;
@@ -1035,15 +1073,6 @@ class CmpModule
                 $fnCmpName = __FUNCTION__;
 
                 return $aNum <=> $bNum;
-            }
-
-            $isInfiniteA = $isFloatA && is_infinite($a);
-            $isInfiniteB = $isFloatB && is_infinite($b);
-
-            if ($isInfiniteA || $isInfiniteB) {
-                $fnCmpName = __FUNCTION__;
-
-                return NAN;
             }
 
             return $this->cmpTypeCastFail(
@@ -1726,9 +1755,6 @@ class CmpModule
                     (int) $date->format('u')
                 )
             ;
-
-        } else {
-            $result = $date;
         }
 
         $dateImmutable = \DateTimeImmutable::createFromMutable($dt);

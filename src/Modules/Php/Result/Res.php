@@ -8,7 +8,7 @@ use Gzhegow\Lib\Modules\Php\ErrorBag\Error;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 
 
-class ResultContext
+class Res
 {
     const MODE_RETURN_BOOLEAN = 2;
     const MODE_RETURN_CONTEXT = 4;
@@ -92,7 +92,7 @@ class ResultContext
     /**
      * @return static
      */
-    public function merge(ResultContext $item)
+    public function merge(Res $item)
     {
         if (null !== $item->errors) {
             $this->getErrors()->merge($item->errors);
@@ -156,7 +156,7 @@ class ResultContext
      */
     public function err($error, array $tags = [], array $trace = [])
     {
-        if ($error instanceof ResultContext) {
+        if ($error instanceof Res) {
             $this->merge($error);
 
         } else {

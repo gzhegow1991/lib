@@ -167,13 +167,21 @@ class DefaultProcessManager implements ProcessManagerInterface
         $input = null
     ) : bool
     {
-        Lib::type($tt);
+        $theType = Lib::type();
 
-        $tt->dirpath_realpath($cwdRealpath, $cwd);
+        if (! $theType->dirpath_realpath($cwdRealpath, $cwd)) {
+            throw new LogicException(
+                [ 'The `cwd` should be existing directory', $cwd ]
+            );
+        }
 
         $cmdExeFile = getenv('SystemRoot') . "\\System32\\cmd.exe";
 
-        $tt->filepath_realpath($cmdExeFileRealpath, $cmdExeFile);
+        if (! $theType->filepath_realpath($cmdExeFileRealpath, $cmdExeFile)) {
+            throw new LogicException(
+                [ 'The `cmdExeFile` should be existing file', $cmdExeFile ]
+            );
+        }
 
         $cmd = '(' . implode(' ', $cmd) . ')';
 
@@ -196,13 +204,6 @@ class DefaultProcessManager implements ProcessManagerInterface
             'bypass_shell'       => true,
             'create_new_console' => true,
         ];
-
-        // dump([
-        //     $oscmd,
-        //     $spec,
-        //     $cwdRealpath,
-        //     $options,
-        // ]);
 
         $ph = @proc_open($oscmd, $spec, $pipes, $cwdRealpath, $env, $options);
 

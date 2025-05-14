@@ -68,7 +68,7 @@ class CryptModule
             return false;
         }
 
-        if (preg_match($_alphabet->getRegexNot(), $_value, $m)) {
+        if (preg_match($_alphabet->getRegexNot(), $_value)) {
             return false;
         }
 
@@ -263,7 +263,7 @@ class CryptModule
      */
     public function text2bin_it($strings) : \Generator
     {
-        $theMb = Lib::mb();
+        Lib::mb();
 
         $stringsIt = Lib::php()->to_iterable($strings);
 
@@ -298,9 +298,9 @@ class CryptModule
      */
     public function bin2text_it($binaries, ?bool $isThrow = null) : \Generator
     {
-        $isThrow = $isThrow ?? true;
+        Lib::mb();
 
-        $theMb = Lib::mb();
+        $isThrow = $isThrow ?? true;
 
         $binariesIt = Lib::php()->to_iterable($binaries);
 
@@ -312,7 +312,7 @@ class CryptModule
         $bytes = [];
         $followingBitsCount = null;
 
-        foreach ( $binaries as $binary ) {
+        foreach ( $binariesIt as $binary ) {
             $bits = str_split($binary);
 
             foreach ( $bits as $bit ) {
@@ -591,7 +591,7 @@ class CryptModule
             return '';
         }
 
-        $theBcmath = Lib::bcmath();
+        Lib::bcmath();
 
         if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
@@ -658,8 +658,8 @@ class CryptModule
             return '';
         }
 
-        $theBcmath = Lib::bcmath();
-        $theMb = Lib::mb();
+        Lib::bcmath();
+        Lib::mb();
 
         if (! $this->type_base($_numbaseString, $baseString, $alphabetFrom)) {
             throw new LogicException(
@@ -733,8 +733,7 @@ class CryptModule
      */
     public function baseX_encode_it($strings, $alphabetTo) : \Generator
     {
-        $theBcmath = Lib::bcmath();
-        $theMb = Lib::mb();
+        Lib::mb();
 
         if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
@@ -763,6 +762,8 @@ class CryptModule
             yield $baseLetter;
         }
 
+        $theBcmath = Lib::bcmath();
+
         $bytesPerBlock = $theBcmath->bclcm('8', $bytesCnt);
         $bytesPerBlock = bcdiv($bytesPerBlock, '8');
 
@@ -783,7 +784,6 @@ class CryptModule
      */
     public function baseX_decode_it($baseStrings, $alphabetFrom, ?bool $isThrow = null) : \Generator
     {
-        $theParse = Lib::parse();
         $theStr = Lib::str();
 
         $gen = $theStr->rtrim_it($baseStrings, '=');
@@ -842,7 +842,7 @@ class CryptModule
      */
     public function bin2base_it($binaries, $alphabetTo) : \Generator
     {
-        $theBcmath = Lib::bcmath();
+        Lib::bcmath();
 
         $binariesIt = Lib::php()->to_iterable($binaries);
 
@@ -917,8 +917,7 @@ class CryptModule
     {
         $isThrow = $isThrow ?? true;
 
-        $theParse = Lib::parse();
-        $theMb = Lib::mb();
+        Lib::mb();
 
         $baseStringsIt = Lib::php()->to_iterable($baseStrings);
 
@@ -931,7 +930,7 @@ class CryptModule
         $alphabetFromLen = $_alphabetFrom->getLength();
         $alphabetFromRegexNot = $_alphabetFrom->getRegexNot();
 
-        $baseFrom = $_alphabetFrom->getLength();
+        $baseFrom = $alphabetFromLen;
 
         if (! $this->isPowOf2($baseFrom)) {
             throw new LogicException(
@@ -1062,7 +1061,7 @@ class CryptModule
      */
     public function binbase2bin(string $binbaseString, $alphabetFrom) : string
     {
-        $theMb = Lib::mb();
+        Lib::mb();
 
         if (! $this->type_base($_numbaseString, $binbaseString, $alphabetFrom)) {
             throw new LogicException(
@@ -1125,7 +1124,7 @@ class CryptModule
      */
     public function dec2numbase(string $decString, $alphabetTo, ?bool $isOneBasedTo = null) : string
     {
-        $theBcmath = Lib::bcmath();
+        Lib::bcmath();
 
         if (! $this->type_base_dec($_decString, $decString)) {
             throw new LogicException(
@@ -1189,8 +1188,8 @@ class CryptModule
      */
     public function numbase2dec(string $numbaseString, $alphabetFrom, ?bool $isOneBasedFrom = null) : string
     {
-        $theBcmath = Lib::bcmath();
-        $theMb = Lib::mb();
+        Lib::bcmath();
+        Lib::mb();
 
         if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
             throw new LogicException(

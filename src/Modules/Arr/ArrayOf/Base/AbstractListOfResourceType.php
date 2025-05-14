@@ -51,7 +51,7 @@ abstract class AbstractListOfResourceType extends AbstractListOf
     }
 
 
-    public function set($key, $value)
+    protected function setValue($key, $value)
     {
         if (! is_resource($value)) {
             throw new LogicException(
@@ -71,7 +71,7 @@ abstract class AbstractListOfResourceType extends AbstractListOf
             );
         }
 
-        return parent::set($key, $value);
+        return parent::setValue($key, $value);
     }
 
 

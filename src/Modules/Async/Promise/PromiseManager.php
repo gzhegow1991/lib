@@ -30,7 +30,7 @@ class PromiseManager implements PromiseManagerInterface
     /**
      * @var bool
      */
-    protected $useFetchApiWakeup = true;
+    protected $useFetchApiWakeup = false;
     /**
      * @var ADeferred
      */
@@ -191,17 +191,20 @@ class PromiseManager implements PromiseManagerInterface
         return $value instanceof AbstractPromise;
     }
 
-    public function isTheDeferred($value) : bool
-    {
-        return $value instanceof ADeferred;
-    }
-
     public function isThePromise($value) : bool
     {
         return $value instanceof APromise;
     }
 
+    public function isTheDeferred($value) : bool
+    {
+        return $value instanceof ADeferred;
+    }
 
+
+    /**
+     * @param callable $fnExecutor
+     */
     public function new($fnExecutor) : APromise
     {
         $promise = APromise::newPromise($this, $this->loop, $fnExecutor);
@@ -253,24 +256,36 @@ class PromiseManager implements PromiseManagerInterface
         return $defer;
     }
 
+    /**
+     * @param callable $fnPooling
+     */
     public function pooling(int $tickMs, int $timeoutMs, $fnPooling) : ADeferred
     {
-        Lib::type($tt);
+        $theType = Lib::type();
+
+        if (! $theType->int_positive($tickMsInt, $tickMs)) {
+            throw new LogicException(
+                [ 'The `tickMs` should be positive integer', $tickMs ]
+            );
+        }
+
+        if (! $theType->int_positive($timeoutMsInt, $timeoutMs)) {
+            throw new LogicException(
+                [ 'The `timeoutMs` should be positive integer', $timeoutMs ]
+            );
+        }
 
         $clock = $this->getClock();
 
-        $tt->int_positive($tickMsInt, $tickMs);
-        $tt->int_positive($timeoutMsInt, $timeoutMs);
-
         $defer = $this->defer($fnResolve, $fnReject);
 
-        $timeoutMt = microtime(true) + ($timeoutMsInt / 1000);
+        $timeoutMicrotime = microtime(true) + ($timeoutMsInt / 1000);
 
         $fnTick = static function () use (
-            $timeoutMt, $timeoutMs,
+            $timeoutMicrotime, $timeoutMs,
             $fnPooling, $fnResolve, $fnReject
         ) {
-            if (microtime(true) > $timeoutMt) {
+            if (microtime(true) > $timeoutMicrotime) {
                 $fnReject("Timeout: {$timeoutMs}");
 
                 return;
@@ -602,7 +617,16 @@ class PromiseManager implements PromiseManagerInterface
                 $psLeft--;
 
                 if (! $isSettled) {
-                    call_user_func($fnRejectParent, $report);
+                    $isLast = ($psLeft === 0);
+
+                    if ($isLast) {
+                        call_user_func($fnRejectParent, $report);
+
+                    } else {
+                        call_user_func($fnRejectParent, $reason);
+
+                        $report = false;
+                    }
 
                     $results = false;
 
@@ -647,14 +671,14 @@ class PromiseManager implements PromiseManagerInterface
             }
         );
 
-        $promiseRace = $this
+        $promiseFirstOf = $this
             ->firstOf([ $promise, $promiseTimeout ])
             ->finally(static function () use ($clock, $timer) {
                 $clock->clearTimeout($timer);
             })
         ;
 
-        return $promiseRace;
+        return $promiseFirstOf;
     }
 
 
@@ -663,13 +687,27 @@ class PromiseManager implements PromiseManagerInterface
      */
     public function fetchCurl(string $url, array $curlOptions = [], ?int $timeoutMs = null) : ADeferred
     {
-        Lib::type($tt);
+        $theType = Lib::type();
 
-        $tt->url($urlString, $url);
-        $tt->list($curlOptionsList, $curlOptions);
+        if (! $theType->url($urlString, $url)) {
+            throw new LogicException(
+                [ 'The `url` should be valid url', $url ]
+            );
+        }
 
-        is_null($timeoutMsInt = $timeoutMs)
-        || $tt->int_positive($timeoutMsInt, $timeoutMs);
+        if (! $theType->list($curlOptionsList, $curlOptions)) {
+            throw new LogicException(
+                [ 'The `curlOptions` should be list of CURL options', $curlOptions ]
+            );
+        }
+
+        if (! is_null($timeoutMsInt = $timeoutMs)) {
+            if (! $theType->int_positive($timeoutMsInt, $timeoutMs)) {
+                throw new LogicException(
+                    [ 'The `timeoutMs` should be positive integer', $timeoutMs ]
+                );
+            }
+        }
 
         $urlString = $urlString ?? '';
         $curlOptionsList = $curlOptionsList ?? [];

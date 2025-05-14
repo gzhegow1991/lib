@@ -8,7 +8,7 @@ use Gzhegow\Lib\Exception\LogicException;
 class ItertoolsModule
 {
     /**
-     * reversed([ 'A', 'B', 'C' ]) --> C B A
+     * > reversed([ 'A', 'B', 'C' ]) --> C B A
      *
      * @param iterable $it
      *
@@ -28,12 +28,12 @@ class ItertoolsModule
 
 
     /**
-     * range(0,2) -> 0 1 2
-     * range(2,0,-1) -> 2 1 0
+     * > range(0,2) -> 0 1 2
+     * > range(2,0,-1) -> 2 1 0
      *
-     * @param int      $start
-     * @param int|null $end
-     * @param int|null $step
+     * @param int|float|string $start
+     * @param int|float|string $end
+     * @param int|float|null   $step
      *
      * @return \Generator
      */
@@ -41,19 +41,30 @@ class ItertoolsModule
     {
         $step = $step ?? 1;
 
-        if (! (($isStringStart = is_string($start)) || is_int($start) || is_float($start))) {
+        if (! (
+            ($isStringStart = is_string($start))
+            || is_int($start)
+            || is_float($start)
+        )) {
             throw new LogicException(
                 [ 'The `start` should be int|float|string', $start ]
             );
         }
 
-        if (! (($isStringEnd = is_string($end)) || is_int($end) || is_float($end))) {
+        if (! (
+            ($isStringEnd = is_string($end))
+            || is_int($end)
+            || is_float($end)
+        )) {
             throw new LogicException(
                 [ 'The `end` should be int|float|string', $end ]
             );
         }
 
-        if (! (($isFloatStep = is_float($step)) || is_int($step))) {
+        if (! (
+            ($isFloatStep = is_float($step))
+            || is_int($step)
+        )) {
             throw new LogicException(
                 [ 'The `step` should be int|float', $step ]
             );
@@ -120,35 +131,47 @@ class ItertoolsModule
 
         $i = $_start;
 
-        while (
-            ($isReverse && ($i >= $_end))
-            || ($i <= $_end)
-        ) {
-            yield $i;
+        if ($isReverse) {
+            while ( $i >= $_end ) {
+                yield $i;
 
-            if ($isModeString) {
-                if (
-                    ($isReverse && ($i === $_start))
-                    || ($i === $_end)
-                ) {
-                    break;
+                if ($isModeString) {
+                    if ($i === $_start) {
+                        break;
+                    }
+
+                    for ( $ii = 0; $ii < $_step; $ii++ ) {
+                        $i--;
+                    }
+
+                } else {
+                    $i += $_step;
                 }
+            }
 
-                for ( $ii = 0; $ii < $_step; $ii++ ) {
-                    $isReverse
-                        ? $i--
-                        : $i++;
+        } else {
+            while ( $i <= $_end ) {
+                yield $i;
+
+                if ($isModeString) {
+                    if ($i === $_end) {
+                        break;
+                    }
+
+                    for ( $ii = 0; $ii < $_step; $ii++ ) {
+                        $i++;
+                    }
+
+                } else {
+                    $i += $_step;
                 }
-
-            } else {
-                $i += $_step;
             }
         }
     }
 
 
     /**
-     * product([ 'A', 'B', 'C', 'D' ], [ 'x', 'y' ]) --> Ax Ay Bx By Cx Cy Dx Dy
+     * > product([ 'A', 'B', 'C', 'D' ], [ 'x', 'y' ]) --> Ax Ay Bx By Cx Cy Dx Dy
      *
      * @param iterable ...$iterables
      *
@@ -182,7 +205,7 @@ class ItertoolsModule
     }
 
     /**
-     * product_repeat(3, range(2)) --> 000 001 010 011 100 101 110 111
+     * > product_repeat(3, range(2)) --> 000 001 010 011 100 101 110 111
      *
      * @param null|int $repeat
      * @param iterable ...$iterables
@@ -212,8 +235,8 @@ class ItertoolsModule
 
 
     /**
-     * combinations_unique([ 'A', 'B', 'C', 'D' ], 2) --> AB AC AD BC BD CD
-     * combinations_unique(range(4), 3) --> 012 013 023 123
+     * > combinations_unique([ 'A', 'B', 'C', 'D' ], 2) --> AB AC AD BC BD CD
+     * > combinations_unique(range(4), 3) --> 012 013 023 123
      *
      * @param iterable $it
      * @param int      $len
@@ -233,9 +256,10 @@ class ItertoolsModule
             return;
         }
 
+        $iMax = ($len - 1);
         $row = [];
         $indexes = [];
-        foreach ( $this->range_it(0, $len - 1) as $i ) {
+        for ( $i = 0; $i <= $iMax; $i++ ) {
             $row[] = $pool[ $i ];
             $indexes[] = $i;
         }
@@ -245,7 +269,9 @@ class ItertoolsModule
         while ( true ) {
             $found = null;
 
-            foreach ( $this->range_it($len - 1, 0, -1) as $i ) {
+            $iMax = ($len - 1);
+            // foreach ( $this->range_it(($len - 1), 0, -1) as $i ) {
+            for ( $i = $iMax; $i >= 0; $i-- ) {
                 if ($indexes[ $i ] !== $i + $size - $len) {
                     $found = $i;
                     break;
@@ -260,7 +286,10 @@ class ItertoolsModule
 
             $indexes[ $i ] += 1;
 
-            foreach ( $this->range_it($i + 1, $len - 1) as $j ) {
+            $iMin = ($i + 1);
+            $iMax = ($len - 1);
+            // foreach ( $this->range_it(($i + 1), ($len - 1)) as $j ) {
+            for ( $j = $iMin; $j <= $iMax; $j++ ) {
                 $indexes[ $j ] = $indexes[ $j - 1 ] + 1;
             }
 
@@ -274,7 +303,7 @@ class ItertoolsModule
     }
 
     /**
-     * combinations_all([ 'A', 'B', 'C' ], 2) --> AA AB AC BB BC CC
+     * > combinations_all([ 'A', 'B', 'C' ], 2) --> AA AB AC BB BC CC
      *
      * @param iterable $it
      * @param int      $len
@@ -294,9 +323,10 @@ class ItertoolsModule
             return;
         }
 
+        $iMax = ($len - 1);
         $row = [];
         $indices = [];
-        foreach ( $this->range_it(0, $len - 1) as $i ) {
+        for ( $i = 0; $i <= $iMax; $i++ ) {
             $row[] = $pool[ 0 ];
             $indices[] = 0;
         }
@@ -306,9 +336,12 @@ class ItertoolsModule
         while ( true ) {
             $found = null;
 
-            foreach ( $this->range_it($len - 1, 0, -1) as $i ) {
+            $iMax = ($len - 1);
+            // foreach ( $this->range_it(($len - 1), 0, -1) as $i ) {
+            for ( $i = $iMax; $i >= 0; $i-- ) {
                 if ($indices[ $i ] !== ($size - 1)) {
                     $found = $i;
+
                     break;
                 }
             }
@@ -319,8 +352,10 @@ class ItertoolsModule
 
             $i = $found;
 
+            $iMax = ($len - $i - 1);
             $replace = [];
-            foreach ( $this->range_it(0, $len - $i - 1) as $ii ) {
+            // foreach ( $this->range_it(0, ($len - $i - 1), 1) as $i ) {
+            for ( $ii = 0; $ii <= $iMax; $ii++ ) {
                 $replace[] = $indices[ $i ] + 1;
             }
 
@@ -337,8 +372,8 @@ class ItertoolsModule
 
 
     /**
-     * permutations([ 'A', 'B', 'C', 'D' ], 2) --> AB AC AD BA BC BD CA CB CD DA DB DC
-     * permutations(range(3)) --> 012 021 102 120 201 210
+     * > permutations([ 'A', 'B', 'C', 'D' ], 2) --> AB AC AD BA BC BD CA CB CD DA DB DC
+     * > permutations(range(3)) --> 012 021 102 120 201 210
      *
      * @param iterable $it
      * @param null|int $len
@@ -360,8 +395,9 @@ class ItertoolsModule
             return;
         }
 
+        $iMax = $size - 1;
         $indices = [];
-        foreach ( $this->range_it(0, $size - 1) as $i ) {
+        for ( $i = 0; $i <= $iMax; $i++ ) {
             $indices[] = $i;
         }
 
@@ -372,13 +408,18 @@ class ItertoolsModule
 
         yield $row;
 
-        $cycles = iterator_to_array(
-            $this->range_it($size, $size - $len - 1, -1)
-        );
+        $iMax = $size;
+        $iMin = ($size - $len - 1);
+        $cycles = [];
+        for ( $i = $iMax; $i >= $iMin; $i-- ) {
+            $cycles[] = $i;
+        }
 
         while ( $size ) {
             $found = null;
-            foreach ( $this->range_it($len - 1, 0, -1) as $i ) {
+            $iMax = ($len - 1);
+            $iMin = 0;
+            for ( $i = $iMax; $i >= $iMin; $i-- ) {
                 $cycles[ $i ] -= 1;
 
                 if ($cycles[ $i ] === 0) {

@@ -57,7 +57,7 @@ abstract class AbstractListOfSubclass extends AbstractListOf
     }
 
 
-    public function set($key, $value)
+    protected function setValue($key, $value)
     {
         if (! is_object($value)) {
             throw new LogicException(
@@ -77,7 +77,7 @@ abstract class AbstractListOfSubclass extends AbstractListOf
             );
         }
 
-        return parent::set($key, $value);
+        return parent::setValue($key, $value);
     }
 
 

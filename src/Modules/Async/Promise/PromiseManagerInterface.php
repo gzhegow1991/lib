@@ -30,11 +30,14 @@ interface PromiseManagerInterface
 
     public function isPromise($value) : bool;
 
-    public function isTheDeferred($value) : bool;
-
     public function isThePromise($value) : bool;
 
+    public function isTheDeferred($value) : bool;
 
+
+    /**
+     * @param callable $fnExecutor
+     */
     public function new($fnExecutor) : APromise;
 
     public function resolve($value = null) : APromise;
@@ -49,6 +52,9 @@ interface PromiseManagerInterface
 
     public function delay(int $waitMs) : ADeferred;
 
+    /**
+     * @param callable $fnPooling
+     */
     public function pooling(int $tickMs, int $timeoutMs, $fnPooling) : ADeferred;
 
 

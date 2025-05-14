@@ -325,7 +325,6 @@ class ArrModule
             return false;
         }
 
-        $columns = [];
         for ( $i = 0; $i < count($value); $i++ ) {
             if (! is_array($value[ $i ])) {
                 return false;
@@ -408,6 +407,184 @@ class ArrModule
         }
 
         return false;
+    }
+
+
+    public function type_array_of_type(&$result, $value, string $type) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        $mapTypes = [
+            "mixed"             => "mixed",
+            //
+            "null"              => "NULL",
+            "boolean"           => "boolean",
+            "integer"           => "integer",
+            "double"            => "double",
+            "string"            => "string",
+            "array"             => "array",
+            "object"            => "object",
+            "resource"          => "resource",
+            "resource (closed)" => "resource (closed)",
+            "unknown type"      => "unknown type",
+            //
+            ""                  => 'mixed',
+            "int"               => "integer",
+            "float"             => "double",
+        ];
+
+        if (! isset($mapTypes[ $type ])) {
+            return false;
+        }
+
+        foreach ( $value as $v ) {
+            if ($type !== gettype($v)) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    public function type_array_of_resource_type(&$result, $value, string $resourceType) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        foreach ( $value as $v ) {
+            if (! is_resource($v)) {
+                return false;
+            }
+
+            if ($resourceType !== get_resource_type($v)) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    /**
+     * @template T
+     *
+     * @param T[]             $result
+     * @param class-string<T> $className
+     */
+    public function type_array_of_a(&$result, $value, string $className) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        if (! class_exists($className)) {
+            return false;
+        }
+
+        foreach ( $value as $v ) {
+            if (! is_a($v, $className)) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    /**
+     * @template T
+     *
+     * @param T[]             $result
+     * @param class-string<T> $className
+     */
+    public function type_array_of_class(&$result, $value, string $className) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        if (! class_exists($className)) {
+            return false;
+        }
+
+        foreach ( $value as $v ) {
+            if (! is_object($v)) {
+                return false;
+            }
+
+            if (get_class($v) !== $className) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    /**
+     * @template T
+     *
+     * @param T[]             $result
+     * @param class-string<T> $className
+     */
+    public function type_array_of_subclass(&$result, $value, string $className) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        if (! class_exists($className)) {
+            return false;
+        }
+
+        foreach ( $value as $v ) {
+            if (! is_subclass_of($v, $className)) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
+    }
+
+    public function type_array_of_callback(&$result, $value, callable $fn, array $args = []) : bool
+    {
+        $result = null;
+
+        if (! is_array($value)) {
+            return false;
+        }
+
+        foreach ( $value as $v ) {
+            $vArgs = array_merge([ $v ], $args);
+
+            if (! call_user_func_array($fn, $vArgs)) {
+                return false;
+            }
+        }
+
+        $result = $value;
+
+        return true;
     }
 
 
@@ -761,9 +938,7 @@ class ArrModule
 
         $gen = $this->walk_it($pathes);
 
-        $list = [];
-
-        foreach ( $gen as $genPath => $p ) {
+        foreach ( $gen as $p ) {
             if ($p instanceof ArrPath) {
                 foreach ( $p->getPath() as $pp ) {
                     yield $pp;
@@ -859,10 +1034,6 @@ class ArrModule
         $pathArray = $thePath->getPath();
 
         $refCurrent =& $array;
-
-        $isFound = true;
-
-        $pathStep = null;
 
         while ( $pathArray ) {
             $pathStep = array_shift($pathArray);
@@ -1484,7 +1655,7 @@ class ArrModule
         foreach ( $src as $key => $val ) {
             $args = [];
             if ($isUseValue) $args[] = $val;
-            if ($isUseValue) $args[] = $key;
+            if ($isUseKey) $args[] = $key;
             if ($isUseSrc) $args[] = $src;
 
             call_user_func_array($fn, $args)
@@ -1644,7 +1815,7 @@ class ArrModule
         $src = array_shift($arrays);
         sort($src);
 
-        foreach ( $arrays as $i => $array ) {
+        foreach ( $arrays as $array ) {
             foreach ( array_keys($array) as $ii ) {
                 if (! array_key_exists($ii, $src)) {
                     return true;
@@ -1668,8 +1839,8 @@ class ArrModule
         $src = array_shift($arrays);
         sort($src);
 
-        foreach ( $arrays as $i => $array ) {
-            foreach ( $array as $ii => $v ) {
+        foreach ( $arrays as $array ) {
+            foreach ( $array as $v ) {
                 if (! in_array($v, $src, true)) {
                     return true;
                 }
@@ -1692,8 +1863,8 @@ class ArrModule
         $src = array_shift($arrays);
         sort($src);
 
-        foreach ( $arrays as $i => $array ) {
-            foreach ( $array as $ii => $v ) {
+        foreach ( $arrays as $array ) {
+            foreach ( $array as $v ) {
                 if (! in_array($v, $src)) {
                     return true;
                 }
@@ -1717,7 +1888,7 @@ class ArrModule
         $src = array_shift($arrays);
         sort($src);
 
-        foreach ( $arrays as $i => $array ) {
+        foreach ( $arrays as $array ) {
             foreach ( array_keys($array) as $ii ) {
                 if (array_key_exists($ii, $src)) {
                     return true;
@@ -1741,8 +1912,8 @@ class ArrModule
         $src = array_shift($arrays);
         sort($src);
 
-        foreach ( $arrays as $i => $array ) {
-            foreach ( $array as $ii => $v ) {
+        foreach ( $arrays as $array ) {
+            foreach ( $array as $v ) {
                 if (in_array($v, $src, true)) {
                     return true;
                 }
@@ -1765,8 +1936,8 @@ class ArrModule
         $src = array_shift($arrays);
         sort($src);
 
-        foreach ( $arrays as $i => $array ) {
-            foreach ( $array as $ii => $v ) {
+        foreach ( $arrays as $array ) {
+            foreach ( $array as $v ) {
                 if (in_array($v, $src)) {
                     return true;
                 }
@@ -2003,6 +2174,8 @@ class ArrModule
     /**
      * > превращает вложенный массив во вложенный объект
      * > отсутствующие ключи в объекте всегда бросают исключения, не нужно писать `isset()` или оператор `?? null`
+     *
+     * @noinspection PhpUnusedLocalVariableInspection
      */
     public function map_to_object(array $array, object $target = null) : object
     {
@@ -2155,7 +2328,7 @@ class ArrModule
         $sum = (int) ($isWithLeaves + $isWithoutLeaves);
         if (1 !== $sum) {
             $isWithLeaves = true;
-            $isWithoutLeaves = false;
+            // $isWithoutLeaves = false;
         }
         unset($sum);
 
@@ -2164,7 +2337,7 @@ class ArrModule
         $sum = (int) ($isWithDicts + $isWithoutDicts);
         if (1 !== $sum) {
             $isWithDicts = false;
-            $isWithoutDicts = false;
+            // $isWithoutDicts = false;
         }
         unset($sum);
 
@@ -2173,7 +2346,7 @@ class ArrModule
         $sum = (int) ($isWithEmptyArrays + $isWithoutEmptyArrays);
         if (1 !== $sum) {
             $isWithEmptyArrays = false;
-            $isWithoutEmptyArrays = false;
+            // $isWithoutEmptyArrays = false;
         }
         unset($sum);
 
@@ -2182,7 +2355,7 @@ class ArrModule
         $sum = (int) ($isWithLists + $isWithoutLists);
         if (1 !== $sum) {
             $isWithLists = false;
-            $isWithoutLists = false;
+            // $isWithoutLists = false;
         }
         unset($sum);
 
@@ -2191,7 +2364,7 @@ class ArrModule
         $sum = (int) ($isWithParents + $isWithoutParents);
         if (1 !== $sum) {
             $isWithParents = false;
-            $isWithoutParents = false;
+            // $isWithoutParents = false;
         }
         unset($sum);
 

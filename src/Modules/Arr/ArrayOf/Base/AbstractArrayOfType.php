@@ -3,12 +3,11 @@
 namespace Gzhegow\Lib\Modules\Arr\ArrayOf\Base;
 
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Modules\Arr\ArrayOf\Base\AbstractArrayOf;
 
 
 abstract class AbstractArrayOfType extends AbstractArrayOf
 {
-    public function set($key, $value)
+    protected function setValue($key, $value)
     {
         if (null !== $this->valueType) {
             if ($this->valueType !== gettype($value)) {
@@ -21,6 +20,6 @@ abstract class AbstractArrayOfType extends AbstractArrayOf
             }
         }
 
-        return parent::set($key, $value);
+        return parent::setValue($key, $value);
     }
 }

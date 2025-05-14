@@ -264,7 +264,7 @@ class TestRunner
     {
         $trace = null;
 
-        if (null !== $trace) {
+        if (null !== $this->trace) {
             $trace = $this->trace;
 
             return true;
@@ -281,7 +281,7 @@ class TestRunner
     {
         $stdout = null;
 
-        if (null !== $stdout) {
+        if (null !== $this->stdout) {
             $stdout = $this->stdout;
 
             return true;
@@ -297,7 +297,7 @@ class TestRunner
     {
         $secondsMin = null;
 
-        if (null !== $secondsMin) {
+        if (null !== $this->secondsMin) {
             $secondsMin = $this->secondsMin;
 
             return true;
@@ -313,7 +313,7 @@ class TestRunner
     {
         $secondsMax = null;
 
-        if (null !== $secondsMax) {
+        if (null !== $this->secondsMax) {
             $secondsMax = $this->secondsMax;
 
             return true;
@@ -329,7 +329,7 @@ class TestRunner
     {
         $return = null;
 
-        if (null !== $return) {
+        if (null !== $this->return) {
             $return = $this->return[ 0 ];
 
             return true;
@@ -345,7 +345,7 @@ class TestRunner
     {
         $memoryMaxBytes = null;
 
-        if (null !== $memoryMaxBytes) {
+        if (null !== $this->memoryMaxBytes) {
             $memoryMaxBytes = $this->memoryMaxBytes;
 
             return true;
@@ -390,14 +390,14 @@ class TestRunner
             if ($isStdoutDiff) {
                 $message = '[ ERROR ] Test ' . __METHOD__ . '() `expectedStdout` failed.';
 
-                $diffString = implode(PHP_EOL, $diffLines);
+                $diffString = implode("\n", $diffLines);
 
                 if ($hasResource) {
-                    fwrite($h, '------' . PHP_EOL);
-                    fwrite($h, $message . PHP_EOL);
-                    fwrite($h, "{$traceFile} : {$traceLine}" . PHP_EOL);
-                    fwrite($h, $diffString . PHP_EOL);
-                    fwrite($h, '------' . PHP_EOL);
+                    fwrite($h, '------' . "\n");
+                    fwrite($h, $message . "\n");
+                    fwrite($h, "{$traceFile} : {$traceLine}" . "\n");
+                    fwrite($h, $diffString . "\n");
+                    fwrite($h, '------' . "\n");
                 }
 
                 $e = new RuntimeException([ $message, $diffString ]);
@@ -453,21 +453,21 @@ class TestRunner
                 ];
 
                 if ($hasResource) {
-                    fwrite($h, '------' . PHP_EOL);
+                    fwrite($h, '------' . "\n");
                     if (null !== $messageMax) {
-                        fwrite($h, $messageMax . PHP_EOL);
+                        fwrite($h, $messageMax . "\n");
                     }
                     if (null !== $messageMin) {
-                        fwrite($h, $messageMin . PHP_EOL);
+                        fwrite($h, $messageMin . "\n");
                     }
-                    fwrite($h, "{$traceFile} : {$traceLine}" . PHP_EOL);
+                    fwrite($h, "{$traceFile} : {$traceLine}" . "\n");
                     if (null !== $messageCaseMax) {
-                        fwrite($h, $messageCaseMax . PHP_EOL);
+                        fwrite($h, $messageCaseMax . "\n");
                     }
                     if (null !== $messageCaseMin) {
-                        fwrite($h, $messageCaseMin . PHP_EOL);
+                        fwrite($h, $messageCaseMin . "\n");
                     }
-                    fwrite($h, '------' . PHP_EOL);
+                    fwrite($h, '------' . "\n");
                 }
 
                 $e = new RuntimeException(implode(' | ', array_filter($message)));
@@ -489,14 +489,14 @@ class TestRunner
 
                 Lib::debug()->diff_vars($this->refReturn, $expectedReturn, [ &$diffLines ]);
 
-                $diffString = implode(PHP_EOL, $diffLines);
+                $diffString = implode("\n", $diffLines);
 
                 if ($hasResource) {
-                    fwrite($h, '------' . PHP_EOL);
-                    fwrite($h, $message . PHP_EOL);
-                    fwrite($h, "{$traceFile} : {$traceLine}" . PHP_EOL);
-                    fwrite($h, $diffString . PHP_EOL);
-                    fwrite($h, '------' . PHP_EOL);
+                    fwrite($h, '------' . "\n");
+                    fwrite($h, $message . "\n");
+                    fwrite($h, "{$traceFile} : {$traceLine}" . "\n");
+                    fwrite($h, $diffString . "\n");
+                    fwrite($h, '------' . "\n");
                 }
 
                 $e = new RuntimeException([ $message, $diffString ]);
@@ -518,11 +518,11 @@ class TestRunner
                     . sprintf('%f', $this->refMemoryBytes);
 
                 if ($hasResource) {
-                    fwrite($h, '------' . PHP_EOL);
-                    fwrite($h, $message . PHP_EOL);
-                    fwrite($h, "{$traceFile} : {$traceLine}" . PHP_EOL);
-                    fwrite($h, $messageCase . PHP_EOL);
-                    fwrite($h, '------' . PHP_EOL);
+                    fwrite($h, '------' . "\n");
+                    fwrite($h, $message . "\n");
+                    fwrite($h, "{$traceFile} : {$traceLine}" . "\n");
+                    fwrite($h, $messageCase . "\n");
+                    fwrite($h, '------' . "\n");
                 }
 
                 $e = new RuntimeException([ $message, $messageCase ]);
@@ -545,7 +545,7 @@ class TestRunner
         }
 
         if ($hasResource) {
-            fwrite($h, '[ OK ] Test ' . __METHOD__ . '() passed.' . PHP_EOL);
+            fwrite($h, '[ OK ] Test ' . __METHOD__ . '() passed.' . "\n");
         }
 
         unset($refStdout);

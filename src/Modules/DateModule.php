@@ -607,8 +607,6 @@ class DateModule
     {
         $result = null;
 
-        $allowedTimezoneTypes = $allowedTimezoneTypes ?? true;
-
         $dateTimeImmutable = null;
 
         if ($dateFormatted instanceof \DateTimeInterface) {
@@ -1427,7 +1425,7 @@ class DateModule
         $reverse = $reverse ?? false;
 
         $isFrom = (false === $reverse);
-        $isUntil = (true === $reverse);
+        // $isUntil = (true === $reverse);
 
         if ($date instanceof \DateInterval) {
             $result = $date;
@@ -1564,8 +1562,6 @@ class DateModule
 
     public function adate_epoch($timezoneFallback = null) : \DateTime
     {
-        $allowOffset = $allowOffset ?? true;
-
         $_timezone = null;
         if (null !== $timezoneFallback) {
             $status = $this->type_timezone(
@@ -1591,8 +1587,6 @@ class DateModule
 
     public function idate_epoch($timezoneFallback = null) : \DateTimeImmutable
     {
-        $allowOffset = $allowOffset ?? true;
-
         $_timezone = null;
         if (null !== $timezoneFallback) {
             $status = $this->type_timezone(
@@ -1619,8 +1613,6 @@ class DateModule
 
     public function adate_zero($timezoneFallback = null) : \DateTime
     {
-        $allowOffset = $allowOffset ?? true;
-
         $_timezone = null;
         if (null !== $timezoneFallback) {
             $status = $this->type_timezone(
@@ -1646,8 +1638,6 @@ class DateModule
 
     public function idate_zero($timezoneFallback = null) : \DateTimeImmutable
     {
-        $allowOffset = $allowOffset ?? true;
-
         $_timezone = null;
         if (null !== $timezoneFallback) {
             $status = $this->type_timezone(
@@ -1918,7 +1908,7 @@ class DateModule
         }
 
         try {
-            $instance = new \DateInterval($_duration);
+            $instance = new $intervalClass($_duration);
         }
         catch ( \Throwable $e ) {
             throw new LogicException($e);

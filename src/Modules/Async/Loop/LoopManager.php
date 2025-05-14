@@ -69,12 +69,6 @@ class LoopManager implements LoopManagerInterface
     public function addInterval(Interval $interval) : void
     {
         $this->intervals->attach($interval);
-
-        if (! $this->isLoopRegistered) {
-            Lib::entrypoint()->registerShutdownFunction([ $this, 'runLoop' ]);
-
-            $this->isLoopRegistered = true;
-        }
     }
 
     public function clearInterval(Interval $interval) : void
@@ -86,12 +80,6 @@ class LoopManager implements LoopManagerInterface
     public function addTimeout(Timeout $timer) : void
     {
         $this->timers->attach($timer);
-
-        if (! $this->isLoopRegistered) {
-            Lib::entrypoint()->registerShutdownFunction([ $this, 'runLoop' ]);
-
-            $this->isLoopRegistered = true;
-        }
     }
 
     public function clearTimeout(Timeout $timer) : void
@@ -108,12 +96,6 @@ class LoopManager implements LoopManagerInterface
     public function addMicrotask($microtask) : void
     {
         $this->queueMicrotask->enqueue($microtask);
-
-        if (! $this->isLoopRegistered) {
-            Lib::entrypoint()->registerShutdownFunction([ $this, 'runLoop' ]);
-
-            $this->isLoopRegistered = true;
-        }
     }
 
     /**
@@ -124,12 +106,6 @@ class LoopManager implements LoopManagerInterface
     public function addMacrotask($macrotask) : void
     {
         $this->queueMacrotask->enqueue($macrotask);
-
-        if (! $this->isLoopRegistered) {
-            Lib::entrypoint()->registerShutdownFunction([ $this, 'runLoop' ]);
-
-            $this->isLoopRegistered = true;
-        }
     }
 
 
@@ -145,6 +121,7 @@ class LoopManager implements LoopManagerInterface
             foreach ( $intervals as $interval ) {
                 if ($now >= $interval->timeoutMicrotime) {
                     $this->addMacrotask($interval->fnHandler);
+                    $this->registerLoop();
 
                     $interval->timeoutMicrotime = $now + ($interval->waitMs / 1000);
                 }
@@ -155,6 +132,7 @@ class LoopManager implements LoopManagerInterface
             foreach ( $timers as $timer ) {
                 if ($now >= $timer->timeoutMicrotime) {
                     $this->addMacrotask($timer->fnHandler);
+                    $this->registerLoop();
 
                     $timers->detach($timer);
                 }

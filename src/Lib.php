@@ -473,9 +473,9 @@ class Lib
      */
     public static function benchmark($clear = null, ?string $tag = null)
     {
-        /** @var float $mt */
+        /** @var float $microtime */
 
-        $mt = microtime(true);
+        $microtime = microtime(true);
 
         static $current;
 
@@ -512,17 +512,17 @@ class Lib
         }
 
         if (isset($current->microtimes[ $tag ])) {
-            $current->report[ $tag ][] = $mt - $current->microtimes[ $tag ];
+            $current->report[ $tag ][] = $microtime - $current->microtimes[ $tag ];
         }
 
         if ($clear) {
             unset($current->microtimes[ $tag ]);
 
         } else {
-            $current->microtimes[ $tag ] = $mt;
+            $current->microtimes[ $tag ] = $microtime;
         }
 
-        return $mt;
+        return $microtime;
     }
 
 

@@ -461,7 +461,6 @@ class DebugBacktracer implements DebugBacktracerInterface
         $trace = $this->trace;
 
         $options = null;
-        $limit = null;
         if (null === $trace) {
             $skip = 2;
 

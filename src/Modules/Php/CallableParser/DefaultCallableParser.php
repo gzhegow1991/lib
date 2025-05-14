@@ -437,7 +437,7 @@ class DefaultCallableParser implements CallableParserInterface
             return false;
         }
 
-        [ $theObject, $theClass, $theMethod, $theMagic ] = $methodArray;
+        [ /* $theObject */, $theClass, $theMethod, $theMagic ] = $methodArray;
 
         if (null === $theMethod) {
             return false;
@@ -802,8 +802,6 @@ class DefaultCallableParser implements CallableParserInterface
             return null;
         }
 
-        $isObject = null;
-        $isClass = null;
         if (! (
             ($isObject = is_object($classOrObject))
             || ($isClass = is_string($classOrObject) && class_exists($classOrObject))

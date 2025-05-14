@@ -10,13 +10,13 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Arr\ArrPath;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
+use Gzhegow\Lib\Modules\Bcmath\Number;
 use Gzhegow\Lib\Modules\Net\AddressIpV4;
 use Gzhegow\Lib\Modules\Net\AddressIpV6;
 use Gzhegow\Lib\Modules\Net\SubnetV4;
 use Gzhegow\Lib\Modules\Net\SubnetV6;
 use Gzhegow\Lib\Modules\Php\Nil;
 use Gzhegow\Lib\Modules\Str\Alphabet;
-use Gzhegow\Lib\Modules\Type\Number;
 
 class TypeThrowModule
 {
@@ -32,7 +32,7 @@ class TypeThrowModule
 	 */
 	public function a_nil(&$result, $value): bool
 	{
-		if (Lib::type()->a_nil($result, $value)) {
+		if (Lib::type()->nil($result, $value)) {
 		    return true;
 		}
 
@@ -86,7 +86,7 @@ class TypeThrowModule
 	 */
 	public function a_nullable(&$result, $value): bool
 	{
-		if (Lib::type()->a_nullable($result, $value)) {
+		if (Lib::type()->nullable($result, $value)) {
 		    return true;
 		}
 
@@ -112,7 +112,7 @@ class TypeThrowModule
 	 */
 	public function a_empty(&$result, $value): bool
 	{
-		if (Lib::type()->a_empty($result, $value)) {
+		if (Lib::type()->empty($result, $value)) {
 		    return true;
 		}
 
@@ -140,7 +140,7 @@ class TypeThrowModule
 	 */
 	public function a_blank(&$result, $value): bool
 	{
-		if (Lib::type()->a_blank($result, $value)) {
+		if (Lib::type()->blank($result, $value)) {
 		    return true;
 		}
 
@@ -168,7 +168,7 @@ class TypeThrowModule
 	 */
 	public function a_passed(&$result, $value): bool
 	{
-		if (Lib::type()->a_passed($result, $value)) {
+		if (Lib::type()->passed($result, $value)) {
 		    return true;
 		}
 
@@ -350,7 +350,7 @@ class TypeThrowModule
 	 */
 	public function a_nan(&$result, $value): bool
 	{
-		if (Lib::type()->a_nan($result, $value)) {
+		if (Lib::type()->nan($result, $value)) {
 		    return true;
 		}
 
@@ -363,7 +363,7 @@ class TypeThrowModule
 	 */
 	public function a_float_not_nan(&$result, $value): bool
 	{
-		if (Lib::type()->a_float_not_nan($result, $value)) {
+		if (Lib::type()->float_not_nan($result, $value)) {
 		    return true;
 		}
 
@@ -389,7 +389,7 @@ class TypeThrowModule
 	 */
 	public function a_finite(&$result, $value): bool
 	{
-		if (Lib::type()->a_finite($result, $value)) {
+		if (Lib::type()->finite($result, $value)) {
 		    return true;
 		}
 
@@ -402,7 +402,7 @@ class TypeThrowModule
 	 */
 	public function a_float_not_finite(&$result, $value): bool
 	{
-		if (Lib::type()->a_float_not_finite($result, $value)) {
+		if (Lib::type()->float_not_finite($result, $value)) {
 		    return true;
 		}
 
@@ -428,7 +428,7 @@ class TypeThrowModule
 	 */
 	public function a_infinite(&$result, $value): bool
 	{
-		if (Lib::type()->a_infinite($result, $value)) {
+		if (Lib::type()->infinite($result, $value)) {
 		    return true;
 		}
 
@@ -441,7 +441,7 @@ class TypeThrowModule
 	 */
 	public function a_float_not_infinite(&$result, $value): bool
 	{
-		if (Lib::type()->a_float_not_infinite($result, $value)) {
+		if (Lib::type()->float_not_infinite($result, $value)) {
 		    return true;
 		}
 
@@ -621,26 +621,26 @@ class TypeThrowModule
 	/**
 	 * @param string|null $result
 	 */
-	public function numeric_int_positive_fallback(&$result, $value, array $refs = []): bool
+	public function numeric_int_positive_or_minus_one(&$result, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_int_positive_fallback($result, $value, $refs)) {
+		if (Lib::type()->numeric_int_positive_or_minus_one($result, $value, $refs)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_positive_fallback` is failed", $value, $refs ]);
+		throw new LogicException([ "Filter `numeric_int_positive_or_minus_one` is failed", $value, $refs ]);
 	}
 
 
 	/**
 	 * @param string|null $result
 	 */
-	public function numeric_int_non_negative_fallback(&$result, $value, array $refs = []): bool
+	public function numeric_int_non_negative_or_minus_one(&$result, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_int_non_negative_fallback($result, $value, $refs)) {
+		if (Lib::type()->numeric_int_non_negative_or_minus_one($result, $value, $refs)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_non_negative_fallback` is failed", $value, $refs ]);
+		throw new LogicException([ "Filter `numeric_int_non_negative_or_minus_one` is failed", $value, $refs ]);
 	}
 
 
@@ -959,26 +959,26 @@ class TypeThrowModule
 	/**
 	 * @param string|null $result
 	 */
-	public function int_positive_fallback(&$result, $value, array $refs = []): bool
+	public function int_positive_or_minus_one(&$result, $value): bool
 	{
-		if (Lib::type()->int_positive_fallback($result, $value, $refs)) {
+		if (Lib::type()->int_positive_or_minus_one($result, $value)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `int_positive_fallback` is failed", $value, $refs ]);
+		throw new LogicException([ "Filter `int_positive_or_minus_one` is failed", $value ]);
 	}
 
 
 	/**
 	 * @param string|null $result
 	 */
-	public function int_non_negative_fallback(&$result, $value, array $refs = []): bool
+	public function int_non_negative_or_minus_one(&$result, $value): bool
 	{
-		if (Lib::type()->int_non_negative_fallback($result, $value, $refs)) {
+		if (Lib::type()->int_non_negative_or_minus_one($result, $value)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `int_non_negative_fallback` is failed", $value, $refs ]);
+		throw new LogicException([ "Filter `int_non_negative_or_minus_one` is failed", $value ]);
 	}
 
 
@@ -1499,6 +1499,84 @@ class TypeThrowModule
 		}
 
 		throw new LogicException([ "Filter `arrpath` is failed", $path, $dot ]);
+	}
+
+
+	public function array_of_type(&$result, $value, string $type): bool
+	{
+		if (Lib::type()->array_of_type($result, $value, $type)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `array_of_type` is failed", $value, $type ]);
+	}
+
+
+	public function array_of_resource_type(&$result, $value, string $resourceType): bool
+	{
+		if (Lib::type()->array_of_resource_type($result, $value, $resourceType)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `array_of_resource_type` is failed", $value, $resourceType ]);
+	}
+
+
+	/**
+	 * @template T
+	 *
+	 * @param T[]             $result
+	 * @param class-string<T> $className
+	 */
+	public function array_of_a(&$result, $value, string $className): bool
+	{
+		if (Lib::type()->array_of_a($result, $value, $className)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `array_of_a` is failed", $value, $className ]);
+	}
+
+
+	/**
+	 * @template T
+	 *
+	 * @param T[]             $result
+	 * @param class-string<T> $className
+	 */
+	public function array_of_class(&$result, $value, string $className): bool
+	{
+		if (Lib::type()->array_of_class($result, $value, $className)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `array_of_class` is failed", $value, $className ]);
+	}
+
+
+	/**
+	 * @template T
+	 *
+	 * @param T[]             $result
+	 * @param class-string<T> $className
+	 */
+	public function array_of_subclass(&$result, $value, string $className): bool
+	{
+		if (Lib::type()->array_of_subclass($result, $value, $className)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `array_of_subclass` is failed", $value, $className ]);
+	}
+
+
+	public function array_of_callback(&$result, $value, callable $fn, array $args = []): bool
+	{
+		if (Lib::type()->array_of_callback($result, $value, $fn, $args)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Filter `array_of_callback` is failed", $value, $fn, $args ]);
 	}
 
 
@@ -2505,13 +2583,8 @@ class TypeThrowModule
 	/**
 	 * @param string|null $result
 	 */
-	public function filepath(
-		&$result,
-		$value,
-		?bool $allowExists = null,
-		?bool $allowSymlink = null,
-		array $refs = []
-	): bool {
+	public function filepath(&$result, $value, ?bool $allowExists, ?bool $allowSymlink = null, array $refs = []): bool
+	{
 		if (Lib::type()->filepath($result, $value, $allowExists, $allowSymlink, $refs)) {
 		    return true;
 		}

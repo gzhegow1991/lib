@@ -16,10 +16,6 @@ use Gzhegow\Lib\Modules\Async\Promise\PromiseManagerInterface;
 class AsyncModule
 {
     /**
-     * @var FetchApiInterface
-     */
-    protected $fetchApi;
-    /**
      * @var LoopManagerInterface
      */
     protected $loopManager;
@@ -32,24 +28,10 @@ class AsyncModule
      */
     protected $clockManager;
 
-
-    public function newFetchApi() : FetchApiInterface
-    {
-        return new FilesystemFetchApi();
-    }
-
-    public function cloneFetchApi() : FetchApiInterface
-    {
-        return clone $this->fetchApi();
-    }
-
-    public function fetchApi(?FetchApiInterface $fetchApi = null) : FetchApiInterface
-    {
-        return $this->fetchApi = null
-            ?? $fetchApi
-            ?? $this->fetchApi
-            ?? new FilesystemFetchApi();
-    }
+    /**
+     * @var FetchApiInterface
+     */
+    protected $fetchApi;
 
 
     public function newLoopManager() : LoopManagerInterface
@@ -113,6 +95,25 @@ class AsyncModule
     }
 
 
+    public function newFetchApi() : FetchApiInterface
+    {
+        return new FilesystemFetchApi();
+    }
+
+    public function cloneFetchApi() : FetchApiInterface
+    {
+        return clone $this->fetchApi();
+    }
+
+    public function fetchApi(?FetchApiInterface $fetchApi = null) : FetchApiInterface
+    {
+        return $this->fetchApi = null
+            ?? $fetchApi
+            ?? $this->fetchApi
+            ?? new FilesystemFetchApi();
+    }
+
+
     /**
      * @param \Socket $socket
      *
@@ -146,6 +147,22 @@ class AsyncModule
     }
 
     /**
+     * @param \Socket $socket
+     * @param string  $payload
+     *
+     * @return void
+     */
+    public function write_packet_socket($socket, string $payload) : void
+    {
+        $len = strlen($payload);
+
+        $header = pack("N", $len);
+
+        socket_write($socket, $header . $payload);
+    }
+
+
+    /**
      * @param resource $stream
      *
      * @return string|null
@@ -175,22 +192,6 @@ class AsyncModule
         }
 
         return $buff;
-    }
-
-
-    /**
-     * @param \Socket $socket
-     * @param string  $payload
-     *
-     * @return void
-     */
-    public function write_packet_socket($socket, string $payload) : void
-    {
-        $len = strlen($payload);
-
-        $header = pack("N", $len);
-
-        socket_write($socket, $header . $payload);
     }
 
     /**
