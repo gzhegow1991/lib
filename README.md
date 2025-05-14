@@ -25,7 +25,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 // > настраиваем PHP
 // > некоторые CMS сами по себе применяют error_reporting/set_error_handler/set_exception_handler глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
-\Gzhegow\Lib\Lib::entrypoint()
+($ex = \Gzhegow\Lib\Lib::entrypoint())
     // > частично удаляет путь файла из каждой строки `trace` (`trace[i][file]`) при обработке исключений
     ->setDirRoot(__DIR__ . '/..')
     //
