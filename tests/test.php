@@ -610,6 +610,7 @@ $fn = function () use ($ffn) {
     $ffn->print_array($theMap->values(), 2);
 };
 $test = $ffn->test($fn);
+
 $test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
 "[ ArrayOf ]"
 
@@ -631,6 +632,7 @@ TRUE | TRUE
 [ "{ object # stdClass }", "{ array(3) }" ]
 [ 1, 1 ]
 ');
+
 $test->expectStdoutIf(PHP_VERSION_ID < 80000, '
 "[ ArrayOf ]"
 
@@ -652,6 +654,7 @@ TRUE | TRUE
 [ "{ object # stdClass }", "{ array(3) }" ]
 [ 1, 1 ]
 ');
+
 $test->run();
 
 
