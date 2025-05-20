@@ -94,10 +94,6 @@ $ffn = new class {
 
 
 
-\Gzhegow\Lib\Lib::require_composer_global();
-
-
-
 // >>> TEST
 // > тесты Promise
 $fn = function () use ($ffn) {
