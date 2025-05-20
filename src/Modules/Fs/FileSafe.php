@@ -2172,14 +2172,27 @@ class FileSafe
 
 
     /**
+     * > в случае отсутствия файла вернет NULL, а не FALSE
+     *
      * @param string   $file
      * @param int|null $offset
      * @param int|null $length
      *
-     * @return string|false
+     * @return string|null|false
      */
     protected function file_get_contents($file, $offset = null, $length = null, $context = null)
     {
+        if (! file_exists($file)) {
+            return null;
+
+        } elseif (! is_file($file)) {
+            return false;
+        }
+
+        if (! filesize($file)) {
+            return null;
+        }
+
         $args = [];
         if (null !== $length) array_unshift($args, $length);
         if (null !== $offset) array_unshift($args, $offset);
@@ -2198,6 +2211,7 @@ class FileSafe
     /**
      * > выполняет file_put_contents(), затем clearstatcache(true, file)
      * > из коробки в PHP это единственная функция блочной записи, которая не обновляет после себя кэш stat файла
+     * > добавлена возможность автоматически создавать директорию, менять права на созданный файл
      *
      * @param string                   $file
      * @param string|string[]|resource $data
@@ -2209,11 +2223,11 @@ class FileSafe
         $file, $data, $flags = null,
         array $filePutContentsArgs = [],
         ?array $mkdirpArgs = [],
-        ?array $chmodArgs = null
+        ?array $chmodIfNewArgs = null
     )
     {
         $hasMkdirp = (null !== $mkdirpArgs);
-        $hasChmod = (null !== $chmodArgs);
+        $hasChmodIfNew = (null !== $chmodIfNewArgs) && (! file_exists($file));
 
         $flags = $flags ?? 0;
         $flags &= ~FILE_USE_INCLUDE_PATH;
@@ -2246,10 +2260,10 @@ class FileSafe
             return false;
         }
 
-        if ($hasChmod) {
-            array_unshift($chmodArgs, $realpath);
+        if ($hasChmodIfNew) {
+            array_unshift($chmodIfNewArgs, $realpath);
 
-            $status = call_user_func_array('chmod', $chmodArgs);
+            $status = call_user_func_array('chmod', $chmodIfNewArgs);
 
             if (false === $status) {
                 return false;
