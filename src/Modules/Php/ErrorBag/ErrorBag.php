@@ -118,6 +118,7 @@ class ErrorBag
         return $list;
     }
 
+
     /**
      * @return static
      */

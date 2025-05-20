@@ -282,16 +282,21 @@ class PromiseManager implements PromiseManagerInterface
         $timeoutMicrotime = microtime(true) + ($timeoutMsInt / 1000);
 
         $fnTick = static function () use (
-            $timeoutMicrotime, $timeoutMs,
+            $timeoutMs,
+            &$timeoutMicrotime,
+            //
             $fnPooling, $fnResolve, $fnReject
         ) {
+            call_user_func_array($fnPooling, [
+                $fnResolve,
+                $fnReject,
+                //
+                &$timeoutMicrotime,
+            ]);
+
             if (microtime(true) > $timeoutMicrotime) {
                 $fnReject("Timeout: {$timeoutMs}");
-
-                return;
             }
-
-            call_user_func($fnPooling, $fnResolve, $fnReject);
         };
 
         $interval = $clock->setInterval($tickMsInt, $fnTick);

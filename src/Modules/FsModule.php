@@ -3,7 +3,10 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Fs\FileSafe;
+use Gzhegow\Lib\Modules\Fs\StreamSafe;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Modules\Fs\FileSafeContext;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Exception\Runtime\FilesystemException;
 
@@ -13,20 +16,15 @@ class FsModule
     /**
      * @var bool
      */
-    protected $isShutdownFunctionRegisteredFopen = false;
+    protected $realpathReturnTargetPath = true;
     /**
-     * @var array<int, resource>
+     * @var int
      */
-    protected $fopenFhh = [];
-
+    protected $dirChmod = 0775;
     /**
-     * @var bool
+     * @var int
      */
-    protected $isShutdownFunctionRegisteredFlock = false;
-    /**
-     * @var array<int, array{ 0: resource, 1: string }>
-     */
-    protected $flockFhh = [];
+    protected $fileChmod = 0664;
 
 
     public function __construct()
@@ -36,6 +34,136 @@ class FsModule
                 'Missing PHP extension: fileinfo'
             );
         }
+    }
+
+
+    public function fileSafe(&$f = null) : FileSafe
+    {
+        return $f = new FileSafe();
+    }
+
+    public function streamSafe(&$s = null) : StreamSafe
+    {
+        return $s = new StreamSafe();
+    }
+
+
+    public function static_realpath_return_target_path(?bool $realpath_return_target_path = null) : bool
+    {
+        if (null !== $realpath_return_target_path) {
+            $last = $this->realpathReturnTargetPath;
+
+            $this->realpathReturnTargetPath = $realpath_return_target_path;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->realpathReturnTargetPath ?? true;
+
+        return $result;
+    }
+
+
+    /**
+     * @param int|string|null $dir_chmod
+     */
+    public function static_dir_chmod($dir_chmod = null) : int
+    {
+        if (null !== $dir_chmod) {
+            if (! $this->type_chmod($dirChmodString, $dir_chmod)) {
+                throw new LogicException(
+                    [ 'The `dir_chmod` should be valid chmod', $dir_chmod ]
+                );
+            }
+
+            $last = $this->dirChmod;
+
+            $this->dirChmod = $dir_chmod;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->dirChmod ?? 0775;
+
+        return $result;
+    }
+
+    /**
+     * @param int|string|null $file_chmod
+     */
+    public function static_file_chmod($file_chmod = null) : int
+    {
+        if (null !== $file_chmod) {
+            if (! $this->type_chmod($fileChmodString, $file_chmod)) {
+                throw new LogicException(
+                    [ 'The `file_chmod` should be valid chmod', $file_chmod ]
+                );
+            }
+
+            $last = $this->fileChmod;
+
+            $this->fileChmod = $file_chmod;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->fileChmod ?? 0664;
+
+        return $result;
+    }
+
+
+    /**
+     * @param int|null $result
+     * @param string   $value
+     *
+     * @return bool
+     */
+    public function type_chmod(&$result, $value) : bool
+    {
+        $result = null;
+
+        if (is_int($value)) {
+            $int = $value;
+
+        } elseif (is_string($value)) {
+            if ('0' === $value) {
+                $result = 0;
+
+                return true;
+            }
+
+            $valueString = ltrim($value, '0');
+            if ('' === $valueString) {
+                return false;
+            }
+
+            if (! preg_match('/^[0124]?[0-7]{3}$/', $valueString)) {
+                return false;
+            }
+
+            $int = octdec($valueString);
+            if (0 === $int) {
+                return false;
+            }
+
+        } else {
+            return false;
+        }
+
+        if (($int < 0) || ($int > 04777)) {
+            return false;
+        }
+
+        $octString = decoct($int);
+
+        if (! in_array($octString[ 0 ], [ '0', '1', '2', '4' ], true)) {
+            return false;
+        }
+
+        $result = $int;
+
+        return true;
     }
 
 
@@ -51,11 +179,9 @@ class FsModule
         $result = null;
 
         $withPathInfo = array_key_exists(0, $refs);
-
         if ($withPathInfo) {
             $refPathInfo =& $refs[ 0 ];
         }
-
         $refPathInfo = null;
 
         if (! Lib::type()->string_not_empty($valueString, $value)) {
@@ -95,11 +221,9 @@ class FsModule
         $isAllowSymlink = $isAllowSymlink ?? true;
 
         $withPathInfo = array_key_exists(0, $refs);
-
         if ($withPathInfo) {
             $refPathInfo =& $refs[ 0 ];
         }
-
         $refPathInfo = null;
 
         if (! Lib::type()->string_not_empty($valueString, $value)) {
@@ -112,15 +236,15 @@ class FsModule
             }
         }
 
-        $_value = realpath($valueString);
+        $realpath = realpath($valueString);
 
-        if (false === $_value) {
+        if (false === $realpath) {
             return false;
         }
 
         if ($withPathInfo) {
             try {
-                $refPathInfo = Lib::php()->pathinfo($_value);
+                $refPathInfo = Lib::php()->pathinfo($realpath);
             }
             catch ( \Throwable $e ) {
                 unset($refPathInfo);
@@ -129,7 +253,7 @@ class FsModule
             }
         }
 
-        $result = $_value;
+        $result = $realpath;
 
         unset($refPathInfo);
 
@@ -203,7 +327,13 @@ class FsModule
                 }
             }
 
-            $_value = realpath($_value);
+            $realpath = realpath($_value);
+
+            if (false === $realpath) {
+                return false;
+            }
+
+            $_value = $realpath;
         }
 
         $result = $_value;
@@ -293,7 +423,13 @@ class FsModule
                 return false;
             }
 
-            $_value = realpath($_value);
+            $realpath = realpath($_value);
+
+            if (false === $realpath) {
+                return false;
+            }
+
+            $_value = $realpath;
         }
 
         $result = $_value;
@@ -694,6 +830,34 @@ class FsModule
     }
 
 
+    public function get_umask_chmod(int $fileMode, int $dirMode) : int
+    {
+        $fileMode &= 0777;
+        $dirMode &= 0777;
+
+        $defaultFileMask = 0664;
+        $defaultDirMask = 0775;
+
+        $fileUmask = $defaultFileMask & (~$fileMode);
+        $dirUmask = $defaultDirMask & (~$dirMode);
+
+        if ($fileUmask !== $dirUmask) {
+            throw new RuntimeException(
+                [
+                    'Unable to create one umask for both given `fileMode` and `dirMode`',
+                    //
+                    $fileMode,
+                    $dirMode,
+                    $fileUmask,
+                    $dirUmask,
+                ]
+            );
+        }
+
+        return $fileUmask;
+    }
+
+
     public function pathinfo(string $path, ?int $flags = null, ?string $separator = null) : array
     {
         if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
@@ -726,14 +890,14 @@ class FsModule
         return Lib::php()->filename($path, '.');
     }
 
+    public function fname(string $path) : ?string
+    {
+        return Lib::php()->fname($path, '.');
+    }
+
     public function extension(string $path) : ?string
     {
         return Lib::php()->extension($path, '.');
-    }
-
-    public function file(string $path) : ?string
-    {
-        return Lib::php()->file($path, '.');
     }
 
     public function extensions(string $path) : ?string
@@ -846,294 +1010,9 @@ class FsModule
     }
 
 
-    /**
-     * @return false|resource
-     */
-    public function fopen(
-        string $file, string $mode, ?int $waitTimeoutMs = 0,
-        ?bool $use_include_path = null, $context = null
-    )
-    {
-        $theType = Lib::type();
-
-        $use_include_path = $use_include_path ?? false;
-
-        if (! $theType->filepath($fileString, $file, true)) {
-            throw new LogicException(
-                [ 'The `file` should be valid filepath', $file ]
-            );
-        }
-
-        if (! is_null($waitTimeoutMsInt = $waitTimeoutMs)) {
-            if (! $theType->int_non_negative($waitTimeoutMsInt, $waitTimeoutMs)) {
-                throw new LogicException(
-                    [ 'The `waitTimeoutMs` should be integer non-negative', $waitTimeoutMs ]
-                );
-            }
-        }
-
-        $waitTimeoutMicrotime = null;
-        if (null === $waitTimeoutMsInt) {
-            $waitTimeoutMicrotime = microtime(true) + ($waitTimeoutMsInt / 1000);
-        }
-
-        do {
-            $fh = (func_get_args() > 3)
-                ? @fopen($file, $mode, $use_include_path, $context)
-                : @fopen($file, $mode, $use_include_path);
-
-            $statusOpen = (false !== $fh);
-
-            if ($statusOpen) {
-                $this->fopenFhh[ (int) $fh ] = $fh;
-
-                $this->register_shutdown_function_fopen();
-
-                break;
-
-            } elseif (null !== $waitTimeoutMicrotime) {
-                if (microtime(true) > $waitTimeoutMicrotime) {
-                    break;
-                }
-            }
-
-            usleep(1000);
-        } while ( true );
-
-        return $fh;
-    }
-
-    /**
-     * @param resource $stream
-     *
-     * @return void
-     */
-    public function fclose($stream) : bool
-    {
-        unset($this->fopenFhh[ (int) $stream ]);
-
-        $status = fclose($stream);
-
-        return $status;
-    }
-
-    public function shutdown_function_fopen() : void
-    {
-        foreach ( $this->fopenFhh as $fh ) {
-            fclose($fh);
-        }
-
-        $this->fopenFhh = [];
-    }
-
-    protected function register_shutdown_function_fopen() : void
-    {
-        if (! $this->isShutdownFunctionRegisteredFopen) {
-            register_shutdown_function([ $this, 'shutdown_function_fopen' ]);
-
-            $this->isShutdownFunctionRegisteredFopen = true;
-        }
-    }
-
-
-    /**
-     * @return resource|bool
-     */
-    public function fopen_lock(
-        string $file, string $modeOpen, int $modeLock,
-        ?int $waitTimeoutMs = 0,
-        array $fopenArgs = [],
-        array $flockArgs = []
-    )
-    {
-        $theType = Lib::type();
-
-        $withWouldBlock = $theType->ref($refWouldBlock, 0, $flockArgs);
-
-        if (! $theType->filepath($fileString, $file, true)) {
-            throw new LogicException(
-                [ 'The `file` should be valid filepath', $file ]
-            );
-        }
-
-        if (! is_null($waitTimeoutMsInt = $waitTimeoutMs)) {
-            if (! $theType->int_non_negative($waitTimeoutMsInt, $waitTimeoutMs)) {
-                throw new LogicException(
-                    [ 'The `waitTimeoutMs` should be non-negative integer', $waitTimeoutMs ]
-                );
-            }
-        }
-
-        $waitTimeoutMicrotime = null;
-        if (null === $waitTimeoutMsInt) {
-            $waitTimeoutMicrotime = microtime(true) + ($waitTimeoutMsInt / 1000);
-        }
-
-        do {
-            $fh = @fopen($fileString, $modeOpen, ...$fopenArgs);
-            $statusOpen = (false !== $fh);
-
-            if ($statusOpen) {
-                $statusLock = $withWouldBlock
-                    ? @flock($fh, $modeLock, $refWouldBlock)
-                    : @flock($fh, $modeLock);
-            }
-
-            if ($statusOpen && $statusLock) {
-                $this->flockFhh[ (int) $fh ] = [ $fh, null ];
-
-                $this->register_shutdown_function_fopen_lock();
-
-                break;
-
-            } elseif (null !== $waitTimeoutMicrotime) {
-                if (microtime(true) > $waitTimeoutMicrotime) {
-                    if ($statusOpen) {
-                        fclose($fh);
-                    }
-
-                    break;
-                }
-            }
-
-            usleep(1000);
-        } while ( true );
-
-        return $fh;
-    }
-
-    /**
-     * @param resource $stream
-     *
-     * @return void
-     */
-    public function fclose_unlock($stream) : bool
-    {
-        unset($this->flockFhh[ (int) $stream ]);
-
-        $statusUnlock = flock($stream, LOCK_UN);
-
-        $statusClose = fclose($stream);
-
-        return $statusUnlock && $statusClose;
-    }
-
-    /**
-     * @return resource|bool
-     */
-    public function fopen_lock_tmpfile(
-        string $file, string $modeOpen, int $modeLock,
-        ?int $waitTimeoutMs = 0,
-        array $fopenArgs = [],
-        array $flockArgs = []
-    )
-    {
-        $theType = Lib::type();
-
-        $withWouldBlock = $theType->ref($refWouldBlock, 0, $flockArgs);
-
-        if (! $theType->filepath($fileString, $file, true)) {
-            throw new LogicException(
-                [ 'The `file` should be valid filepath', $file ]
-            );
-        }
-
-        if (! is_null($waitTimeoutMsInt = $waitTimeoutMs)) {
-            if (! $theType->int_non_negative($waitTimeoutMsInt, $waitTimeoutMs)) {
-                throw new LogicException(
-                    [ 'The `waitTimeoutMs` should be non-negative integer', $waitTimeoutMs ]
-                );
-            }
-        }
-
-        $waitTimeoutMicrotime = null;
-        if (null === $waitTimeoutMsInt) {
-            $waitTimeoutMicrotime = microtime(true) + ($waitTimeoutMsInt / 1000);
-        }
-
-        do {
-            $fh = @fopen($fileString, $modeOpen, ...$fopenArgs);
-            $statusOpen = (false !== $fh);
-
-            if ($statusOpen) {
-                $statusLock = $withWouldBlock
-                    ? @flock($fh, $modeLock, $refWouldBlock)
-                    : @flock($fh, $modeLock);
-            }
-
-            if ($statusOpen && $statusLock) {
-                $this->flockFhh[ (int) $fh ] = [ $fh, $fileString ];
-
-                $this->register_shutdown_function_fopen_lock();
-
-                break;
-
-            } elseif (null !== $waitTimeoutMicrotime) {
-                if (microtime(true) > $waitTimeoutMicrotime) {
-                    if ($statusOpen) {
-                        fclose($fh);
-                    }
-
-                    break;
-                }
-            }
-
-            usleep(100000);
-        } while ( true );
-
-        return $fh;
-    }
-
-    /**
-     * @param resource $stream
-     *
-     * @return void
-     */
-    public function fclose_unlock_tmpfile($stream, string $filename) : bool
-    {
-        $isWindows = Lib::php()->is_windows();
-
-        unset($this->flockFhh[ (int) $stream ]);
-
-        if ($isWindows) {
-            $statusUnlock = flock($stream, LOCK_UN);
-            $statusClose = fclose($stream);
-            $statusUnlink = @unlink($filename);
-
-        } else {
-            $statusUnlink = @unlink($filename);
-            $statusUnlock = flock($stream, LOCK_UN);
-            $statusClose = fclose($stream);
-        }
-
-        return $statusUnlock && $statusClose && $statusUnlink;
-    }
-
-    public function shutdown_function_fopen_lock() : void
-    {
-        foreach ( $this->flockFhh as [ $fh, $file ] ) {
-            flock($fh, LOCK_UN);
-            fclose($fh);
-
-            if (null !== $file) {
-                @unlink($file);
-            }
-        }
-
-        $this->flockFhh = [];
-    }
-
-    protected function register_shutdown_function_fopen_lock() : void
-    {
-        if (! $this->isShutdownFunctionRegisteredFopen) {
-            register_shutdown_function([ $this, 'shutdown_function_fopen_lock' ]);
-
-            $this->isShutdownFunctionRegisteredFopen = true;
-        }
-    }
-
-
-    public function lpush(string $file, string $data, ?int $lockWaitTimeoutMs = 0, bool $throw = true) : bool
+    public function lpush(
+        string $file, string $data
+    ) : bool
     {
         $theType = Lib::type();
 
@@ -1149,32 +1028,38 @@ class FsModule
             );
         }
 
-        $fileIn = "{$file}.in";
-        $fileInLock = "{$file}.in.lock";
+        $f = $this->fileSafe();
+        $f->call(
+            static function (FileSafeContext $ctx) use (
+                $f,
+                $file, $data
+            ) {
+                $fileIn = "{$file}.in";
+                $fileInLock = "{$file}.in.lock";
 
-        $fhInLock = $this->fopen_lock_tmpfile($fileInLock, 'w', LOCK_EX, $lockWaitTimeoutMs);
-        if (false === $fhInLock) {
-            if ($throw) {
-                throw new FilesystemException(
-                    [ 'Unable to ' . __METHOD__ . ' due to locking file with LOCK_EX is failed', $fileInLock ]
-                );
+                if ($fhInLock = $f->fopen_flock(
+                    $fileInLock, 'w', LOCK_EX | LOCK_NB,
+                )) {
+                    $ctx->finallyFrelease($fhInLock);
+                    $ctx->finallyFclose($fhInLock);
+                    $ctx->finallyUnlink($fileInLock);
+
+                    fwrite($fhInLock, getmypid());
+
+                    $line = base64_encode($data);
+
+                    file_put_contents($fileIn, $line . "\n" . file_get_contents($fileIn));
+                }
             }
-
-            return false;
-        }
-
-        @fwrite($fhInLock, getmypid());
-
-        $line = base64_encode($data);
-
-        file_put_contents($fileIn, $line . "\n" . file_get_contents($fileIn));
-
-        $this->fclose_unlock_tmpfile($fhInLock, $fileInLock);
+        );
 
         return true;
     }
 
-    public function rpush(string $file, string $data, ?int $lockWaitTimeoutMs = 0, bool $throw = true) : bool
+    public function blpush(
+        $tickUsleep, $timeoutMs,
+        string $file, string $data
+    ) : bool
     {
         $theType = Lib::type();
 
@@ -1190,33 +1075,38 @@ class FsModule
             );
         }
 
-        $fileIn = "{$file}.in";
-        $fileInLock = "{$file}.in.lock";
+        $f = $this->fileSafe();
+        $f->call(
+            static function (FileSafeContext $ctx) use (
+                $f,
+                $tickUsleep, $timeoutMs,
+                $file, $data
+            ) {
+                $fileIn = "{$file}.in";
+                $fileInLock = "{$file}.in.lock";
 
-        $fhInLock = $this->fopen_lock_tmpfile($fileInLock, 'w', LOCK_EX, $lockWaitTimeoutMs);
-        if (false === $fhInLock) {
-            if ($throw) {
-                throw new FilesystemException(
-                    [ 'Unable to ' . __METHOD__ . ' due to locking file with LOCK_EX is failed', $fileInLock ]
-                );
+                if ($fhInLock = $f->fopen_flock_pooling(
+                    $tickUsleep, $timeoutMs,
+                    $fileInLock, 'w', LOCK_EX | LOCK_NB
+                )) {
+                    $ctx->finallyFrelease($fhInLock);
+                    $ctx->finallyFclose($fhInLock);
+                    $ctx->finallyUnlink($fileInLock);
+
+                    fwrite($fhInLock, getmypid());
+
+                    $line = base64_encode($data);
+
+                    file_put_contents($fileIn, $line . "\n" . file_get_contents($fileIn));
+                }
             }
-
-            return false;
-        }
-
-        @fwrite($fhInLock, getmypid());
-
-        $line = base64_encode($data);
-
-        file_put_contents($fileIn, $line . "\n", FILE_APPEND);
-
-        $this->fclose_unlock_tmpfile($fhInLock, $fileInLock);
+        );
 
         return true;
     }
 
 
-    public function lpop(string $file, ?int $blockTimeoutMs = 0, bool $throw = true) : ?string
+    public function rpush(string $file, string $data) : bool
     {
         $theType = Lib::type();
 
@@ -1232,86 +1122,38 @@ class FsModule
             );
         }
 
-        if (! is_null($blockTimeoutMsInt = $blockTimeoutMs)) {
-            if (! $theType->int_non_negative($blockTimeoutMsInt, $blockTimeoutMs)) {
-                throw new LogicException(
-                    [ 'The `blockTimeoutMs` should be non-negative integer', $blockTimeoutMs ]
-                );
-            }
-        }
+        $f = $this->fileSafe();
+        $f->call(
+            static function (FileSafeContext $ctx) use (
+                $f,
+                $file, $data
+            ) {
+                $fileIn = "{$file}.in";
+                $fileInLock = "{$file}.in.lock";
 
-        $blockTimeoutMicrotime = null;
-        if (null !== $blockTimeoutMsInt) {
-            $blockTimeoutMicrotime = microtime(true) + ($blockTimeoutMsInt / 1000);
-        }
+                if ($fhInLock = $f->fopen_flock(
+                    $fileInLock, 'w', LOCK_EX | LOCK_NB
+                )) {
+                    $ctx->finallyFrelease($fhInLock);
+                    $ctx->finallyFclose($fhInLock);
+                    $ctx->finallyUnlink($fileInLock);
 
-        $fileIn = "{$file}.in";
-        $fileOut = "{$file}.lpop";
-        $fileOutLock = "{$file}.lpop.lock";
+                    fwrite($fhInLock, getmypid());
 
-        $fhOutLock = $this->fopen_lock_tmpfile($fileOutLock, 'w', LOCK_EX, $blockTimeoutMs);
-        if (false === $fhOutLock) {
-            if ($throw) {
-                throw new FilesystemException(
-                    [ 'Unable to ' . __METHOD__ . ' due to locking file with LOCK_EX is failed', $fileOutLock ]
-                );
-            }
+                    $line = base64_encode($data);
 
-            return null;
-        }
-
-        @fwrite($fhOutLock, getmypid());
-
-        $data = null;
-
-        do {
-            if (microtime(true) > $blockTimeoutMicrotime) {
-                break;
-            }
-
-            if (is_file($fileOut) && (filesize($fileOut) > 0)) {
-                $hOut = fopen($fileOut, 'c+');
-                if (false === $hOut) {
-                    continue;
-                }
-
-                $line = fgets($hOut);
-                $line = rtrim($line);
-                if ('' === $line) {
-                    continue;
-                }
-
-                $contentOut = stream_get_contents($hOut);
-
-                rewind($hOut);
-                ftruncate($hOut, 0);
-
-                fwrite($hOut, $contentOut);
-                fclose($hOut);
-
-                $data = base64_decode($line);
-
-                break;
-            }
-
-            if (is_file($fileIn) && (filesize($fileIn) > 0)) {
-                $lines = file($fileIn);
-
-                if (false !== $lines) {
-                    file_put_contents($fileOut, implode('', $lines), FILE_APPEND);
-                    file_put_contents($fileIn, '');
+                    file_put_contents($fileIn, $line . "\n", FILE_APPEND);
                 }
             }
+        );
 
-            usleep(100000);
-        } while ( true );
-
-        $this->fclose_unlock_tmpfile($fhOutLock, $fileOutLock);
-
-        return $data;
+        return true;
     }
 
-    public function rpop(string $file, ?int $blockTimeoutMs = 0, bool $throw = true) : ?string
+    public function brpush(
+        $tickUsleep, $timeoutMs,
+        string $file, string $data
+    ) : bool
     {
         $theType = Lib::type();
 
@@ -1327,306 +1169,438 @@ class FsModule
             );
         }
 
-        if (! is_null($blockTimeoutMsInt = $blockTimeoutMs)) {
-            if (! $theType->int_non_negative($blockTimeoutMsInt, $blockTimeoutMs)) {
-                throw new LogicException(
-                    [ 'The `blockTimeoutMs` should be non-negative integer', $blockTimeoutMs ]
-                );
-            }
-        }
+        $f = $this->fileSafe();
+        $f->call(
+            static function (FileSafeContext $ctx) use (
+                $f,
+                $tickUsleep, $timeoutMs,
+                $file, $data
+            ) {
+                $fileIn = "{$file}.in";
+                $fileInLock = "{$file}.in.lock";
 
-        $blockTimeoutMicrotime = null;
-        if (null !== $blockTimeoutMsInt) {
-            $blockTimeoutMicrotime = microtime(true) + ($blockTimeoutMsInt / 1000);
-        }
+                if ($fhInLock = $f->fopen_flock_pooling(
+                    $tickUsleep, $timeoutMs,
+                    $fileInLock, 'w', LOCK_EX | LOCK_NB
+                )) {
+                    $ctx->finallyFrelease($fhInLock);
+                    $ctx->finallyFclose($fhInLock);
+                    $ctx->finallyUnlink($fileInLock);
 
-        $fileIn = "{$file}.in";
-        $fileOut = "{$file}.rpop";
-        $fileOutLock = "{$file}.rpop.lock";
+                    fwrite($fhInLock, getmypid());
 
-        $fhOutLock = $this->fopen_lock_tmpfile($fileOutLock, 'w', LOCK_EX, $blockTimeoutMs);
-        if (false === $fhOutLock) {
-            if ($throw) {
-                throw new FilesystemException(
-                    [ 'Unable to ' . __METHOD__ . ' due to locking file with LOCK_EX is failed', $fileOutLock ]
-                );
-            }
+                    $line = base64_encode($data);
 
-            return null;
-        }
-
-        @fwrite($fhOutLock, getmypid());
-
-        $data = null;
-
-        do {
-            if (microtime(true) > $blockTimeoutMicrotime) {
-                break;
-            }
-
-            if (is_file($fileOut) && (filesize($fileOut) > 0)) {
-                $hOut = fopen($fileOut, 'c+');
-                if (false === $hOut) {
-                    continue;
-                }
-
-                $line = fgets($hOut);
-                $line = rtrim($line);
-                if ('' === $line) {
-                    continue;
-                }
-
-                $contentOut = stream_get_contents($hOut);
-
-                rewind($hOut);
-                ftruncate($hOut, 0);
-
-                fwrite($hOut, $contentOut);
-                fclose($hOut);
-
-                $data = base64_decode($line);
-
-                break;
-            }
-
-            if (is_file($fileIn) && (filesize($fileIn) > 0)) {
-                $lines = file($fileIn);
-
-                if (false !== $lines) {
-                    $lines = array_reverse($lines);
-
-                    file_put_contents($fileOut, implode('', $lines), FILE_APPEND);
-                    file_put_contents($fileIn, '');
+                    file_put_contents($fileIn, $line . "\n", FILE_APPEND);
                 }
             }
-
-            usleep(100000);
-        } while ( true );
-
-        $this->fclose_unlock_tmpfile($fhOutLock, $fileOutLock);
-
-        return $data;
-    }
-
-
-    public function file_get_contents(
-        string $filepath,
-        ?array $fileGetContentsArgs = null
-    ) : string
-    {
-        $fileGetContentsArgs = $fileGetContentsArgs ?: [];
-
-        if (! $this->type_filepath_realpath($_filepath, $filepath)) {
-            throw new FilesystemException(
-                [ 'File not found', $filepath ]
-            );
-        }
-
-        $result = file_get_contents(
-            $_filepath,
-            ...$fileGetContentsArgs
         );
 
-        if (false === $result) {
-            throw new FilesystemException(
-                [ 'Unable to read file', $filepath ]
-            );
-        }
-
-        return $result;
+        return true;
     }
 
-    public function file_put_contents(
-        string $filepath, $data,
-        ?array $filePutContentsArgs = null,
-        ?array $mkdirArgs = null,
-        ?array $chmodArgs = null
-    ) : int
+
+    public function lpop(string $file) : ?string
     {
-        $_filePutContentsArgs = $filePutContentsArgs ?? [];
-
-        $withMkdir = (null !== $mkdirArgs);
-        $withChmod = (null !== $chmodArgs);
-
-        $_mkdirArgs = null;
-        $_chmodArgs = null;
-        if ($withMkdir) $_mkdirArgs = ($mkdirArgs ?: [ 0775, true ]);
-        if ($withChmod) $_chmodArgs = ($chmodArgs ?: [ 0664 ]);
-
-        if (! $this->type_filepath($_filepath, $filepath, true)) {
-            throw new RuntimeException(
-                [ 'Bad filepath', $filepath ]
-            );
-        }
-
-        if ($withMkdir) {
-            $dirpath = dirname($_filepath);
-
-            if (! is_dir($dirpath)) {
-                $status = mkdir(
-                    $dirpath,
-                    ...$_mkdirArgs
-                );
-
-                if (false === $status) {
-                    throw new FilesystemException(
-                        [ 'Unable to mkdir', $filepath ]
-                    );
-                }
-            }
-        }
-
-        $size = file_put_contents(
-            $filepath, $data,
-            ...$_filePutContentsArgs
-        );
-
-        if (false === $size) {
-            throw new FilesystemException(
-                [ 'Unable to write file', $filepath ]
-            );
-        }
-
-        if ($withChmod) {
-            $status = chmod(
-                $filepath,
-                ...$_chmodArgs
-            );
-
-            if (false === $status) {
-                throw new FilesystemException(
-                    [ 'Unable to perform chmod() on file', $filepath ]
-                );
-            }
-        }
-
-        return $size;
-    }
-
-    public function file_replace_blocks(
-        string $filepath,
-        string $start, $lines, ?string $end = null
-    ) : string
-    {
-        $thePhp = Lib::php();
         $theType = Lib::type();
 
-        if (! $theType->filepath_realpath($filepathRealpath, $filepath, true)) {
-            $this->file_put_contents(
-                $filepath, '',
-                [], [], []
-            );
-
-            $filepathRealpath = realpath($filepath);
-        }
-
-        if (! $theType->trim($startTrim, $start, true)) {
+        if (! $theType->freepath($fileString, $file)) {
             throw new LogicException(
-                [ 'The `start` should be non-empty trim', $start ]
+                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
             );
         }
 
-        if (! is_null($endTrim = $end)) {
-            if (! $theType->trim($endTrim, $end)) {
-                throw new LogicException(
-                    [ 'The `end` should be non-empty trim', $end ]
-                );
-            }
-        }
-
-        if ($startTrim === $endTrim) {
+        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
             throw new LogicException(
-                [ 'The `start` should not be equal to `end`', $startTrim, $endTrim ]
+                [ 'The `fileDir` should be existing directory', $fileDir ]
             );
         }
 
-        $input = fopen($filepathRealpath, 'r');
-        if (false === $input) {
-            throw new FilesystemException(
-                [ 'Unable to perform fopen() on file', $filepathRealpath ]
-            );
-        }
+        $f = $this->fileSafe();
 
-        $filepathRealpathTmp = $filepathRealpath . '.tmp';
+        $data = $f->call(
+            static function (FileSafeContext $ctx) use (
+                $f,
+                $file
+            ) {
+                $fileIn = "{$file}.in";
+                $fileOut = "{$file}.lpop";
+                $fileOutLock = "{$file}.lpop.lock";
 
-        $output = fopen($filepathRealpathTmp, 'w');
-        if (false === $output) {
-            throw new FilesystemException(
-                [ 'Unable to perform fopen() on file', $filepathRealpathTmp ]
-            );
-        }
+                $data = null;
 
-        $insideBlock = null;
+                if ($fhOutLock = $f->fopen_flock(
+                    $fileOutLock, 'w', LOCK_EX | LOCK_NB
+                )) {
+                    $ctx->finallyFrelease($fhOutLock);
+                    $ctx->finallyFclose($fhOutLock);
+                    $ctx->finallyUnlink($fileOutLock);
 
-        while ( ! feof($input) ) {
-            $fgets = fgets($input);
+                    fwrite($fhOutLock, getmypid());
 
-            $fgets = rtrim($fgets);
+                    $isFileOut = is_file($fileOut) && filesize($fileOut);
 
-            if ('' !== $startTrim) {
-                if (ltrim($fgets) === $startTrim) {
-                    $insideBlock = 1;
-                }
-            }
+                    if (! $isFileOut) {
+                        $isFileIn = is_file($fileIn) && filesize($fileIn);
 
-            if ('' !== $endTrim) {
-                if (ltrim($fgets) === $endTrim) {
-                    $insideBlock = 0;
-                }
-            }
+                        if ($isFileIn) {
+                            $content = file_get_contents($fileIn);
 
-            if (! $insideBlock) {
-                fwrite($output, $fgets . "\n");
+                            if (! ((false === $content) || ('' === $content))) {
+                                file_put_contents($fileOut, $content, FILE_APPEND);
+                                file_put_contents($fileIn, '');
 
-            } elseif (1 === $insideBlock) {
-                fwrite($output, $startTrim . "\n");
+                                clearstatcache(true, $fileOut);
+                                clearstatcache(true, $fileIn);
 
-                foreach ( $thePhp->to_list_it($lines) as $line ) {
-                    if (is_array($line)) {
-                        continue;
+                                $isFileOut = true;
+                            }
+                        }
                     }
 
-                    $line = rtrim($line);
+                    if ($isFileOut) {
+                        if ($fhOut = fopen($fileOut, 'r+')) {
+                            $ctx->finallyFclose($fhOut);
 
-                    fwrite($output, $line . "\n");
+                            $line = fgets($fhOut);
+
+                            $line = rtrim($line);
+
+                            if ('' !== $line) {
+                                $contentOut = stream_get_contents($fhOut);
+
+                                rewind($fhOut);
+                                ftruncate($fhOut, 0);
+
+                                fwrite($fhOut, $contentOut);
+
+                                $data = base64_decode($line);
+                            }
+                        }
+                    }
                 }
 
-                fwrite($output, $endTrim . "\n");
-
-                $insideBlock = 2;
+                return $data;
             }
-        }
+        );
 
-        if (null === $insideBlock) {
-            fwrite($output, "\n");
+        return $data;
+    }
 
-            fwrite($output, $startTrim . "\n");
+    public function blpop(
+        $tickUsleep, $timeoutMs,
+        string $file
+    ) : ?string
+    {
+        $theType = Lib::type();
 
-            foreach ( $thePhp->to_list_it($lines) as $line ) {
-                if (is_array($line)) {
-                    continue;
-                }
-
-                $line = trim($line);
-
-                fwrite($output, $line . "\n");
-            }
-
-            fwrite($output, $endTrim . "\n");
-        }
-
-        fclose($input);
-        fclose($output);
-
-        $status = rename($filepathRealpathTmp, $filepathRealpath);
-
-        if (false === $status) {
-            throw new FilesystemException(
-                [ 'Unable to perform rename() on file', $filepathRealpathTmp ]
+        if (! $theType->freepath($fileString, $file)) {
+            throw new LogicException(
+                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
             );
         }
 
-        return $filepathRealpath;
+        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
+            throw new LogicException(
+                [ 'The `fileDir` should be existing directory', $fileDir ]
+            );
+        }
+
+        $f = $this->fileSafe();
+
+        $data = $f->call(
+            static function (FileSafeContext $ctx) use (
+                $f,
+                $tickUsleep, $timeoutMs,
+                $file
+            ) {
+                $fileIn = "{$file}.in";
+                $fileOut = "{$file}.lpop";
+                $fileOutLock = "{$file}.lpop.lock";
+
+                $data = null;
+
+                if ($fhOutLock = $f->fopen_flock_pooling(
+                    $tickUsleep, $timeoutMs,
+                    $fileOutLock, 'w', LOCK_EX
+                )) {
+                    $ctx->finallyFrelease($fhOutLock);
+                    $ctx->finallyFclose($fhOutLock);
+                    $ctx->finallyUnlink($fileOutLock);
+
+                    fwrite($fhOutLock, getmypid());
+
+                    $fnTick = static function (&$result) use (
+                        &$fhOut, $fileIn, $fileOut,
+                        //
+                        $ctx
+                    ) {
+                        $isFileOut = is_file($fileOut) && filesize($fileOut);
+
+                        if (! $isFileOut) {
+                            $isFileIn = is_file($fileIn) && filesize($fileIn);
+
+                            if ($isFileIn) {
+                                $content = file_get_contents($fileIn);
+
+                                if (! ((false === $content) || ('' === $content))) {
+                                    file_put_contents($fileOut, $content, FILE_APPEND);
+                                    file_put_contents($fileIn, '');
+
+                                    clearstatcache(true, $fileOut);
+                                    clearstatcache(true, $fileIn);
+
+                                    $isFileOut = true;
+                                }
+                            }
+                        }
+
+                        if ($isFileOut) {
+                            if (! $fhOut) {
+                                if ($fhOut = fopen($fileOut, 'r+')) {
+                                    $ctx->finallyFclose($fhOut);
+                                }
+                            }
+
+                            if ($fhOut) {
+                                $line = fgets($fhOut);
+
+                                $line = rtrim($line);
+
+                                if ('' !== $line) {
+                                    $contentOut = stream_get_contents($fhOut);
+
+                                    rewind($fhOut);
+                                    ftruncate($fhOut, 0);
+
+                                    fwrite($fhOut, $contentOut);
+
+                                    $data = base64_decode($line);
+
+                                    $result = [ $data ];
+                                }
+                            }
+                        }
+                    };
+
+                    $data = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+
+                    if (false === $data) {
+                        $data = null;
+                    }
+                }
+
+                return $data;
+            }
+        );
+
+        return $data;
+    }
+
+
+    public function rpop(string $file) : ?string
+    {
+        $theType = Lib::type();
+
+        if (! $theType->freepath($fileString, $file)) {
+            throw new LogicException(
+                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+            );
+        }
+
+        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
+            throw new LogicException(
+                [ 'The `fileDir` should be existing directory', $fileDir ]
+            );
+        }
+
+        $f = $this->fileSafe();
+
+        $data = $f->call(
+            static function (FileSafeContext $ctx) use (
+                $f,
+                $file
+            ) {
+                $fileIn = "{$file}.in";
+                $fileOut = "{$file}.rpop";
+                $fileOutLock = "{$file}.rpop.lock";
+
+                $data = null;
+
+                if ($fhOutLock = $f->fopen_flock(
+                    $fileOutLock, 'w', LOCK_EX | LOCK_NB
+                )) {
+                    $ctx->finallyFrelease($fhOutLock);
+                    $ctx->finallyFclose($fhOutLock);
+                    $ctx->finallyUnlink($fileOutLock);
+
+                    $isFileOut = is_file($fileOut) && filesize($fileOut);
+
+                    if (! $isFileOut) {
+                        $isFileIn = is_file($fileIn) && filesize($fileIn);
+
+                        if ($isFileIn) {
+                            $lines = file($fileIn);
+
+                            if (! ((false === $lines) || ([] === $lines))) {
+                                $lines = array_map('trim', $lines);
+                                $lines = array_reverse($lines);
+
+                                $content = implode("\n", $lines);
+
+                                file_put_contents($fileOut, $content, FILE_APPEND);
+                                file_put_contents($fileIn, '');
+
+                                clearstatcache(true, $fileOut);
+                                clearstatcache(true, $fileIn);
+
+                                $isFileOut = true;
+                            }
+                        }
+                    }
+
+                    if ($isFileOut) {
+                        if ($fhOut = fopen($fileOut, 'r+')) {
+                            $ctx->finallyFclose($fhOut);
+
+                            $line = fgets($fhOut);
+
+                            $line = rtrim($line);
+
+                            if ('' !== $line) {
+                                $contentOut = stream_get_contents($fhOut);
+
+                                rewind($fhOut);
+                                ftruncate($fhOut, 0);
+
+                                fwrite($fhOut, $contentOut);
+
+                                $data = base64_decode($line);
+                            }
+                        }
+                    }
+                }
+
+                return $data;
+            }
+        );
+
+        return $data;
+    }
+
+    public function brpop(
+        $tickUsleep, $timeoutMs,
+        string $file
+    ) : ?string
+    {
+        $theType = Lib::type();
+
+        if (! $theType->freepath($fileString, $file)) {
+            throw new LogicException(
+                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+            );
+        }
+
+        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
+            throw new LogicException(
+                [ 'The `fileDir` should be existing directory', $fileDir ]
+            );
+        }
+
+        $f = $this->fileSafe();
+
+        $data = $f->call(
+            static function (FileSafeContext $ctx) use (
+                $f,
+                $tickUsleep, $timeoutMs,
+                $file
+            ) {
+                $fileIn = "{$file}.in";
+                $fileOut = "{$file}.rpop";
+                $fileOutLock = "{$file}.rpop.lock";
+
+                $data = null;
+
+                if ($fhOutLock = $f->fopen_flock_pooling(
+                    $tickUsleep, $timeoutMs,
+                    $fileOutLock, 'w', LOCK_EX | LOCK_NB
+                )) {
+                    $ctx->finallyFrelease($fhOutLock);
+                    $ctx->finallyFclose($fhOutLock);
+                    $ctx->finallyUnlink($fileOutLock);
+
+                    fwrite($fhOutLock, getmypid());
+
+                    $fnTick = static function (&$result) use (
+                        &$fhOut, $fileIn, $fileOut,
+                        //
+                        $ctx
+                    ) {
+                        $isFileOut = is_file($fileOut) && filesize($fileOut);
+
+                        if (! $isFileOut) {
+                            $isFileIn = is_file($fileIn) && filesize($fileIn);
+
+                            if ($isFileIn) {
+                                $lines = file($fileIn);
+
+                                if (! ((false === $lines) || ([] === $lines))) {
+                                    $lines = array_map('trim', $lines);
+                                    $lines = array_reverse($lines);
+
+                                    $content = implode("\n", $lines);
+
+                                    file_put_contents($fileOut, $content, FILE_APPEND);
+                                    file_put_contents($fileIn, '');
+
+                                    clearstatcache(true, $fileOut);
+                                    clearstatcache(true, $fileIn);
+
+                                    $isFileOut = true;
+                                }
+                            }
+                        }
+
+                        if ($isFileOut) {
+                            if (! $fhOut) {
+                                if ($fhOut = fopen($fileOut, 'r+')) {
+                                    $ctx->finallyFclose($fhOut);
+                                }
+                            }
+
+                            if ($fhOut) {
+                                $line = fgets($fhOut);
+
+                                $line = rtrim($line);
+
+                                if ('' !== $line) {
+                                    $contentOut = stream_get_contents($fhOut);
+
+                                    rewind($fhOut);
+                                    ftruncate($fhOut, 0);
+
+                                    fwrite($fhOut, $contentOut);
+
+                                    $data = base64_decode($line);
+
+                                    $result = [ $data ];
+                                }
+                            }
+                        }
+                    };
+
+                    $data = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+
+                    if (false === $data) {
+                        $data = null;
+                    }
+                }
+
+                return $data;
+            }
+        );
+
+        return $data;
     }
 
 
@@ -1663,69 +1637,6 @@ class FsModule
 
             yield $i => $spl;
         }
-    }
-
-
-    public function rm(
-        string $filepath,
-        ?array $unlinkArgs = null
-    ) : bool
-    {
-        $unlinkArgs = $unlinkArgs ?: [];
-
-        if (! $this->type_filepath($_filepath, $filepath, true)) {
-            throw new RuntimeException(
-                [ 'Bad filepath', $filepath ]
-            );
-        }
-
-        if (! file_exists($_filepath)) {
-            return true;
-        }
-
-        $status = unlink(
-            $_filepath,
-            ...$unlinkArgs
-        );
-
-        if (false === $status) {
-            throw new FilesystemException(
-                [ 'Unable to delete file', $filepath ]
-            );
-        }
-
-        return true;
-    }
-
-    public function rmdir(
-        string $dirpath,
-        ?array $rmdirArgs = null
-    ) : bool
-    {
-        $rmdirArgs = $rmdirArgs ?: [];
-
-        if (! $this->type_dirpath($_dirpath, $dirpath, true)) {
-            throw new RuntimeException(
-                [ 'Bad dirpath', $_dirpath ]
-            );
-        }
-
-        if (! file_exists($_dirpath)) {
-            return true;
-        }
-
-        $status = rmdir(
-            $_dirpath,
-            ...$rmdirArgs
-        );
-
-        if (false === $status) {
-            throw new FilesystemException(
-                [ 'Unable to delete directory', $dirpath ]
-            );
-        }
-
-        return true;
     }
 
 
@@ -1912,5 +1823,129 @@ class FsModule
         fclose($fh2);
 
         return $diff;
+    }
+
+
+    public function file_replace_blocks(
+        string $filepath,
+        string $start, $lines, ?string $end = null
+    ) : string
+    {
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        if (! file_exists($filepath)) {
+            file_put_contents($filepath, '');
+
+            $filepathRealpath = realpath($filepath);
+        }
+
+        if (! $theType->trim($startTrim, $start, true)) {
+            throw new LogicException(
+                [ 'The `start` should be non-empty trim', $start ]
+            );
+        }
+
+        if (! is_null($endTrim = $end)) {
+            if (! $theType->trim($endTrim, $end)) {
+                throw new LogicException(
+                    [ 'The `end` should be non-empty trim', $end ]
+                );
+            }
+        }
+
+        if ($startTrim === $endTrim) {
+            throw new LogicException(
+                [ 'The `start` should not be equal to `end`', $startTrim, $endTrim ]
+            );
+        }
+
+        $input = fopen($filepathRealpath, 'r');
+        if (false === $input) {
+            throw new FilesystemException(
+                [ 'Unable to perform fopen() on file', $filepathRealpath ]
+            );
+        }
+
+        $filepathRealpathTmp = $filepathRealpath . '.tmp';
+
+        $output = fopen($filepathRealpathTmp, 'w');
+        if (false === $output) {
+            throw new FilesystemException(
+                [ 'Unable to perform fopen() on file', $filepathRealpathTmp ]
+            );
+        }
+
+        $insideBlock = null;
+
+        while ( ! feof($input) ) {
+            $fgets = fgets($input);
+
+            $fgets = rtrim($fgets);
+
+            if ('' !== $startTrim) {
+                if (ltrim($fgets) === $startTrim) {
+                    $insideBlock = 1;
+                }
+            }
+
+            if ('' !== $endTrim) {
+                if (ltrim($fgets) === $endTrim) {
+                    $insideBlock = 0;
+                }
+            }
+
+            if (! $insideBlock) {
+                fwrite($output, $fgets . "\n");
+
+            } elseif (1 === $insideBlock) {
+                fwrite($output, $startTrim . "\n");
+
+                foreach ( $thePhp->to_list_it($lines) as $line ) {
+                    if (is_array($line)) {
+                        continue;
+                    }
+
+                    $line = rtrim($line);
+
+                    fwrite($output, $line . "\n");
+                }
+
+                fwrite($output, $endTrim . "\n");
+
+                $insideBlock = 2;
+            }
+        }
+
+        if (null === $insideBlock) {
+            fwrite($output, "\n");
+
+            fwrite($output, $startTrim . "\n");
+
+            foreach ( $thePhp->to_list_it($lines) as $line ) {
+                if (is_array($line)) {
+                    continue;
+                }
+
+                $line = trim($line);
+
+                fwrite($output, $line . "\n");
+            }
+
+            fwrite($output, $endTrim . "\n");
+        }
+
+        fclose($input);
+        fclose($output);
+
+        $status = rename($filepathRealpathTmp, $filepathRealpath);
+
+        if (false === $status) {
+            throw new FilesystemException(
+                [ 'Unable to perform rename() on file', $filepathRealpathTmp ]
+            );
+        }
+
+        return $filepathRealpath;
     }
 }

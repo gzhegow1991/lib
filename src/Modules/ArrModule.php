@@ -11,9 +11,9 @@ use Gzhegow\Lib\Exception\RuntimeException;
 class ArrModule
 {
     /**
-     * @var bool
+     * @var int
      */
-    protected $fn_mode;
+    protected $fnMode;
 
 
     public function static_fn_mode(?int $fn_mode = null) : ?int
@@ -31,16 +31,14 @@ class ArrModule
                 }
             }
 
-            $last = $this->fn_mode;
+            $last = $this->fnMode;
 
-            $current = $fn_mode;
-
-            $this->fn_mode = $current;
+            $this->fnMode = $fn_mode;
 
             $result = $last;
         }
 
-        $result = $result ?? $this->fn_mode;
+        $result = $result ?? $this->fnMode;
 
         return $result;
     }
@@ -591,11 +589,9 @@ class ArrModule
     public function has_key($array, $key, array $refs = []) : bool
     {
         $withValue = array_key_exists(0, $refs);
-
         if ($withValue) {
             $refValue =& $refs[ 0 ];
         }
-
         $refValue = null;
 
         if (! is_array($array)) {
@@ -751,16 +747,15 @@ class ArrModule
     ) : bool
     {
         $withValue = array_key_exists(0, $refs);
-        $withKey = array_key_exists(1, $refs);
-
         if ($withValue) {
             $refValue =& $refs[ 0 ];
         }
+        $refValue = null;
+
+        $withKey = array_key_exists(1, $refs);
         if ($withKey) {
             $refKey =& $refs[ 1 ];
         }
-
-        $refValue = null;
         $refKey = null;
 
         if (! is_array($array)) {
@@ -961,16 +956,15 @@ class ArrModule
         }
 
         $withValue = array_key_exists(0, $refs);
-        $withKey = array_key_exists(1, $refs);
-
         if ($withValue) {
             $refValue =& $refs[ 0 ];
         }
+        $refValue = null;
+
+        $withKey = array_key_exists(1, $refs);
         if ($withKey) {
             $refKey =& $refs[ 1 ];
         }
-
-        $refValue = null;
         $refKey = null;
 
         $pathArray = $thePath->getPath();

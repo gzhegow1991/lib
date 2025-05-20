@@ -29,23 +29,23 @@ interface ThrowableManagerInterface
     /**
      * @return string[]
      */
-    public function getPreviousMessageList(\Throwable $throwable, array $options = []) : array;
+    public function getPreviousMessageList(\Throwable $throwable, ?int $flags = null) : array;
 
     /**
      * @return string[]
      */
-    public function getPreviousMessageLines(\Throwable $throwable, array $options = []) : array;
+    public function getPreviousMessageLines(\Throwable $throwable, ?int $flags = null) : array;
 
 
     /**
      * @return string[]
      */
-    public function getPreviousMessagesList(\Throwable $throwable, array $options = []) : array;
+    public function getPreviousMessagesList(\Throwable $throwable, ?int $flags = null) : array;
 
     /**
      * @return string[]
      */
-    public function getPreviousMessagesLines(\Throwable $throwable, array $options = []) : array;
+    public function getPreviousMessagesLines(\Throwable $throwable, ?int $flags = null) : array;
 
 
     /**
@@ -59,37 +59,37 @@ interface ThrowableManagerInterface
     public function catchPrevious(\Throwable $throwable, string $throwableClass = '') : ?\Throwable;
 
 
-    public function getThrowableMessage(\Throwable $throwable, array $options = []) : string;
+    public function getThrowableMessage(\Throwable $throwable, ?int $flags = null) : string;
 
     /**
      * @return string[]
      */
-    public function getThrowableMessageLines(\Throwable $throwable, array $options = []) : array;
+    public function getThrowableMessageLines(\Throwable $throwable, ?int $flags = null) : array;
 
 
     /**
      * @return string[]
      */
-    public function getThrowableMessages(\Throwable $throwable, array $options = []) : array;
+    public function getThrowableMessages(\Throwable $throwable, ?int $flags = null) : array;
 
     /**
      * @return string[]
      */
-    public function getThrowableMessagesLines(\Throwable $throwable, array $options = []) : array;
+    public function getThrowableMessagesLines(\Throwable $throwable, ?int $flags = null) : array;
 
 
-    public function getThrowableInfo(\Throwable $throwable, array $options = []) : array;
-
-    /**
-     * @return string[]
-     */
-    public function getThrowableInfoLines(\Throwable $throwable, array $options = []) : array;
-
-
-    public function getThrowableTrace(\Throwable $e, array $options = []) : array;
+    public function getThrowableInfo(\Throwable $throwable, ?int $flags = null) : array;
 
     /**
      * @return string[]
      */
-    public function getThrowableTraceLines(\Throwable $throwable, array $options = []) : array;
+    public function getThrowableInfoLines(\Throwable $throwable, ?int $flags = null) : array;
+
+
+    public function getThrowableTrace(\Throwable $e, ?int $flags = null) : array;
+
+    /**
+     * @return string[]
+     */
+    public function getThrowableTraceLines(\Throwable $throwable, ?int $flags = null) : array;
 }

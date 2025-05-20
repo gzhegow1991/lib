@@ -103,7 +103,7 @@ trait HasTraceOverrideTrait
             $traceAsString = $this->getTraceAsString();
 
             if (null !== $fileRoot) {
-                $fileRootRealpath = realpath($fileRoot) ?: null;
+                Lib::file()->realpath($fileRootRealpath, $fileRoot);
 
                 $traceAsString = str_replace($fileRootRealpath . DIRECTORY_SEPARATOR, '', $traceAsString);
             }

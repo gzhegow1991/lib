@@ -59,8 +59,11 @@ class Lib
      */
     public static function parse(&$pt = null, &$pn = null)
     {
-        $pt = static::$parseNull = static::$parseNull ?? new ParseNullModule();
-        $pn = static::$parseThrow = static::$parseThrow ?? new ParseThrowModule();
+        static::$parseNull = static::$parseNull ?? new ParseNullModule();
+
+        $n = func_num_args();
+        if ($n > 1) $pn = static::$parseNull;
+        if ($n > 0) $pt = static::$parseThrow = static::$parseThrow ?? new ParseThrowModule();
 
         return static::$parseNull;
     }
@@ -86,8 +89,11 @@ class Lib
      */
     public static function type(&$tt = null, &$tb = null)
     {
-        $tt = static::$typeThrow = static::$typeThrow ?? new TypeThrowModule();
-        $tb = static::$typeBool = static::$typeBool ?? new TypeBoolModule();
+        static::$typeBool = static::$typeBool ?? new TypeBoolModule();
+
+        $n = func_num_args();
+        if ($n > 1) $tb = static::$typeBool;
+        if ($n > 0) $tt = static::$typeThrow = static::$typeThrow ?? new TypeThrowModule();
 
         return static::$typeBool;
     }

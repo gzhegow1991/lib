@@ -29,6 +29,10 @@ class DebugModule
     protected $throwableManager;
 
     /**
+     * @var string
+     */
+    protected $dirRoot;
+    /**
      * @var array
      */
     protected $varDumpOptions = [];
@@ -91,7 +95,28 @@ class DebugModule
     }
 
 
-    public function static_var_dump_options(?array $varDumpOptions = null) : ?array
+    public function static_dir_root(?string $dirRoot = null) : ?string
+    {
+        if (null !== $dirRoot) {
+            if (! Lib::fs()->type_dirpath_realpath($realpath, $dirRoot)) {
+                throw new LogicException(
+                    [ 'The `dirRoot` should be existing directory path', $dirRoot ]
+                );
+            }
+
+            $last = $this->dirRoot;
+
+            $this->dirRoot = $realpath;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->dirRoot;
+
+        return $result;
+    }
+
+    public function static_var_dump_options(?array $varDumpOptions = null) : array
     {
         if (null !== $varDumpOptions) {
             $last = $this->varDumpOptions;
@@ -101,7 +126,7 @@ class DebugModule
             $result = $last;
         }
 
-        $result = $result ?? $this->varDumpOptions;
+        $result = $result ?? $this->varDumpOptions ?? [];
 
         return $result;
     }
@@ -1160,11 +1185,9 @@ class DebugModule
         $theStr = Lib::str();
 
         $withDiffLines = array_key_exists(0, $refs);
-
         if ($withDiffLines) {
             $refDiffLines =& $refs[ 0 ];
         }
-
         $refDiffLines = null;
 
         $oldLines = $theStr->lines($old);

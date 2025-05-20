@@ -779,11 +779,9 @@ class TypeBoolModule
         $isAllowExp = $isAllowExp ?? true;
 
         $withSplit = array_key_exists(0, $refs);
-
         if ($withSplit) {
             $refSplit =& $refs[ 0 ];
         }
-
         $refSplit = null;
 
         $isFloat = is_float($value);
@@ -1052,7 +1050,6 @@ class TypeBoolModule
         $result = null;
 
         $withSplit = array_key_exists(0, $refs);
-
         $refSplit =& $refs[ 0 ];
 
         // > btw, 1.1e1 is can be converted to integer 11 too
@@ -3393,6 +3390,16 @@ class TypeBoolModule
     public function ref(&$result, $key, array $refs = [], array $set = []) : bool
     {
         return Lib::php()->type_ref($result, $key, $refs, $set);
+    }
+
+
+    /**
+     * @param int|null $result
+     * @param string   $value
+     */
+    public function chmod(&$result, $value) : bool
+    {
+        return Lib::fs()->type_chmod($result, $value);
     }
 
 

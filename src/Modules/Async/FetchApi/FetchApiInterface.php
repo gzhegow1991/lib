@@ -18,7 +18,7 @@ interface FetchApiInterface
 
     public function daemonAddToPool(int $timeoutMs, ?float $nowMicrotime = null) : bool;
 
-    public function daemonRemoveFromPool() : bool;
+    public function daemonRemoveFromPool(?float $nowMicrotime = null) : bool;
 
 
     public function daemonIsAwake(?int &$pidFirst = null) : bool;

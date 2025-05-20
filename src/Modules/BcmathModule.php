@@ -120,7 +120,7 @@ class BcmathModule
             $result = $last;
         }
 
-        $result = $result ?? $this->scaleLimit;
+        $result = $result ?? $this->scaleLimit ?? 10;
 
         return $result;
     }

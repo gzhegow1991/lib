@@ -29,7 +29,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `empty` is failed", $value ]);
+		throw new LogicException([ "Typecheck `empty` is failed", $value ]);
 	}
 
 
@@ -42,7 +42,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_empty` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_empty` is failed", $value ]);
 	}
 
 
@@ -57,7 +57,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `blank` is failed", $value ]);
+		throw new LogicException([ "Typecheck `blank` is failed", $value ]);
 	}
 
 
@@ -70,7 +70,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_blank` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_blank` is failed", $value ]);
 	}
 
 
@@ -85,7 +85,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `nullable` is failed", $value ]);
+		throw new LogicException([ "Typecheck `nullable` is failed", $value ]);
 	}
 
 
@@ -98,7 +98,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_nullable` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_nullable` is failed", $value ]);
 	}
 
 
@@ -113,7 +113,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `passed` is failed", $value ]);
+		throw new LogicException([ "Typecheck `passed` is failed", $value ]);
 	}
 
 
@@ -126,7 +126,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_passed` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_passed` is failed", $value ]);
 	}
 
 
@@ -146,7 +146,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `nil` is failed", $value ]);
+		throw new LogicException([ "Typecheck `nil` is failed", $value ]);
 	}
 
 
@@ -159,7 +159,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_nil` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_nil` is failed", $value ]);
 	}
 
 
@@ -172,7 +172,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_null` is failed", $value ]);
+		throw new LogicException([ "Typecheck `a_null` is failed", $value ]);
 	}
 
 
@@ -185,7 +185,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_null` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_null` is failed", $value ]);
 	}
 
 
@@ -198,7 +198,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_bool` is failed", $value ]);
+		throw new LogicException([ "Typecheck `a_bool` is failed", $value ]);
 	}
 
 
@@ -211,7 +211,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `an_any_not_bool` is failed", $value ]);
+		throw new LogicException([ "Typecheck `an_any_not_bool` is failed", $value ]);
 	}
 
 
@@ -224,7 +224,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_false` is failed", $value ]);
+		throw new LogicException([ "Typecheck `a_false` is failed", $value ]);
 	}
 
 
@@ -237,7 +237,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_false` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_false` is failed", $value ]);
 	}
 
 
@@ -250,7 +250,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_true` is failed", $value ]);
+		throw new LogicException([ "Typecheck `a_true` is failed", $value ]);
 	}
 
 
@@ -263,7 +263,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_true` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_true` is failed", $value ]);
 	}
 
 
@@ -276,7 +276,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `bool` is failed", $value ]);
+		throw new LogicException([ "Typecheck `bool` is failed", $value ]);
 	}
 
 
@@ -289,7 +289,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `false` is failed", $value ]);
+		throw new LogicException([ "Typecheck `false` is failed", $value ]);
 	}
 
 
@@ -302,7 +302,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `true` is failed", $value ]);
+		throw new LogicException([ "Typecheck `true` is failed", $value ]);
 	}
 
 
@@ -315,7 +315,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `userbool` is failed", $value ]);
+		throw new LogicException([ "Typecheck `userbool` is failed", $value ]);
 	}
 
 
@@ -328,7 +328,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `userfalse` is failed", $value ]);
+		throw new LogicException([ "Typecheck `userfalse` is failed", $value ]);
 	}
 
 
@@ -341,7 +341,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `usertrue` is failed", $value ]);
+		throw new LogicException([ "Typecheck `usertrue` is failed", $value ]);
 	}
 
 
@@ -354,7 +354,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `nan` is failed", $value ]);
+		throw new LogicException([ "Typecheck `nan` is failed", $value ]);
 	}
 
 
@@ -367,7 +367,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `float_not_nan` is failed", $value ]);
+		throw new LogicException([ "Typecheck `float_not_nan` is failed", $value ]);
 	}
 
 
@@ -380,7 +380,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_nan` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_nan` is failed", $value ]);
 	}
 
 
@@ -393,7 +393,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `finite` is failed", $value ]);
+		throw new LogicException([ "Typecheck `finite` is failed", $value ]);
 	}
 
 
@@ -406,7 +406,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `float_not_finite` is failed", $value ]);
+		throw new LogicException([ "Typecheck `float_not_finite` is failed", $value ]);
 	}
 
 
@@ -419,7 +419,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_finite` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_finite` is failed", $value ]);
 	}
 
 
@@ -432,7 +432,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `infinite` is failed", $value ]);
+		throw new LogicException([ "Typecheck `infinite` is failed", $value ]);
 	}
 
 
@@ -445,7 +445,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `float_not_infinite` is failed", $value ]);
+		throw new LogicException([ "Typecheck `float_not_infinite` is failed", $value ]);
 	}
 
 
@@ -458,7 +458,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_infinite` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_infinite` is failed", $value ]);
 	}
 
 
@@ -471,7 +471,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric` is failed", $value, $isAllowExp, $refs ]);
+		throw new LogicException([ "Typecheck `numeric` is failed", $value, $isAllowExp, $refs ]);
 	}
 
 
@@ -484,7 +484,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_non_zero` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_non_zero` is failed", $value, $allowExp, $refs ]);
 	}
 
 
@@ -497,7 +497,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_non_negative` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_non_negative` is failed", $value, $allowExp, $refs ]);
 	}
 
 
@@ -510,7 +510,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_non_positive` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_non_positive` is failed", $value, $allowExp, $refs ]);
 	}
 
 
@@ -523,7 +523,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_negative` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_negative` is failed", $value, $allowExp, $refs ]);
 	}
 
 
@@ -536,7 +536,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_positive` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_positive` is failed", $value, $allowExp, $refs ]);
 	}
 
 
@@ -549,7 +549,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_int` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_int` is failed", $value, $refs ]);
 	}
 
 
@@ -562,7 +562,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_non_zero` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_int_non_zero` is failed", $value, $refs ]);
 	}
 
 
@@ -575,7 +575,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_non_negative` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_int_non_negative` is failed", $value, $refs ]);
 	}
 
 
@@ -588,7 +588,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_non_positive` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_int_non_positive` is failed", $value, $refs ]);
 	}
 
 
@@ -601,7 +601,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_negative` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_int_negative` is failed", $value, $refs ]);
 	}
 
 
@@ -614,7 +614,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_positive` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_int_positive` is failed", $value, $refs ]);
 	}
 
 
@@ -627,7 +627,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_positive_or_minus_one` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_int_positive_or_minus_one` is failed", $value, $refs ]);
 	}
 
 
@@ -640,7 +640,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_non_negative_or_minus_one` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_int_non_negative_or_minus_one` is failed", $value, $refs ]);
 	}
 
 
@@ -653,7 +653,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_float` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_float` is failed", $value, $refs ]);
 	}
 
 
@@ -666,7 +666,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_float_non_zero` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_float_non_zero` is failed", $value, $refs ]);
 	}
 
 
@@ -679,7 +679,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_float_non_negative` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_float_non_negative` is failed", $value, $refs ]);
 	}
 
 
@@ -692,7 +692,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_float_non_positive` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_float_non_positive` is failed", $value, $refs ]);
 	}
 
 
@@ -705,7 +705,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_float_negative` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_float_negative` is failed", $value, $refs ]);
 	}
 
 
@@ -718,7 +718,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `numeric_float_positive` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_float_positive` is failed", $value, $refs ]);
 	}
 
 
@@ -731,7 +731,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `decimal` is failed", $value, $scale, $refs ]);
+		throw new LogicException([ "Typecheck `decimal` is failed", $value, $scale, $refs ]);
 	}
 
 
@@ -744,7 +744,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `decimal_non_zero` is failed", $value, $scale, $refs ]);
+		throw new LogicException([ "Typecheck `decimal_non_zero` is failed", $value, $scale, $refs ]);
 	}
 
 
@@ -757,7 +757,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `decimal_non_negative` is failed", $value, $scale, $refs ]);
+		throw new LogicException([ "Typecheck `decimal_non_negative` is failed", $value, $scale, $refs ]);
 	}
 
 
@@ -770,7 +770,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `decimal_non_positive` is failed", $value, $scale, $refs ]);
+		throw new LogicException([ "Typecheck `decimal_non_positive` is failed", $value, $scale, $refs ]);
 	}
 
 
@@ -783,7 +783,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `decimal_negative` is failed", $value, $scale, $refs ]);
+		throw new LogicException([ "Typecheck `decimal_negative` is failed", $value, $scale, $refs ]);
 	}
 
 
@@ -796,7 +796,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `decimal_positive` is failed", $value, $scale, $refs ]);
+		throw new LogicException([ "Typecheck `decimal_positive` is failed", $value, $scale, $refs ]);
 	}
 
 
@@ -809,7 +809,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `num` is failed", $value ]);
+		throw new LogicException([ "Typecheck `num` is failed", $value ]);
 	}
 
 
@@ -822,7 +822,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `num_non_zero` is failed", $value ]);
+		throw new LogicException([ "Typecheck `num_non_zero` is failed", $value ]);
 	}
 
 
@@ -835,7 +835,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `num_non_negative` is failed", $value ]);
+		throw new LogicException([ "Typecheck `num_non_negative` is failed", $value ]);
 	}
 
 
@@ -848,7 +848,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `num_non_positive` is failed", $value ]);
+		throw new LogicException([ "Typecheck `num_non_positive` is failed", $value ]);
 	}
 
 
@@ -861,7 +861,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `num_negative` is failed", $value ]);
+		throw new LogicException([ "Typecheck `num_negative` is failed", $value ]);
 	}
 
 
@@ -874,7 +874,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `num_positive` is failed", $value ]);
+		throw new LogicException([ "Typecheck `num_positive` is failed", $value ]);
 	}
 
 
@@ -887,7 +887,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `int` is failed", $value ]);
+		throw new LogicException([ "Typecheck `int` is failed", $value ]);
 	}
 
 
@@ -900,7 +900,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `int_non_zero` is failed", $value ]);
+		throw new LogicException([ "Typecheck `int_non_zero` is failed", $value ]);
 	}
 
 
@@ -913,7 +913,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `int_non_negative` is failed", $value ]);
+		throw new LogicException([ "Typecheck `int_non_negative` is failed", $value ]);
 	}
 
 
@@ -926,7 +926,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `int_non_positive` is failed", $value ]);
+		throw new LogicException([ "Typecheck `int_non_positive` is failed", $value ]);
 	}
 
 
@@ -939,7 +939,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `int_negative` is failed", $value ]);
+		throw new LogicException([ "Typecheck `int_negative` is failed", $value ]);
 	}
 
 
@@ -952,7 +952,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `int_positive` is failed", $value ]);
+		throw new LogicException([ "Typecheck `int_positive` is failed", $value ]);
 	}
 
 
@@ -965,7 +965,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `int_positive_or_minus_one` is failed", $value ]);
+		throw new LogicException([ "Typecheck `int_positive_or_minus_one` is failed", $value ]);
 	}
 
 
@@ -978,7 +978,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `int_non_negative_or_minus_one` is failed", $value ]);
+		throw new LogicException([ "Typecheck `int_non_negative_or_minus_one` is failed", $value ]);
 	}
 
 
@@ -991,7 +991,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `float` is failed", $value ]);
+		throw new LogicException([ "Typecheck `float` is failed", $value ]);
 	}
 
 
@@ -1004,7 +1004,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `float_non_zero` is failed", $value ]);
+		throw new LogicException([ "Typecheck `float_non_zero` is failed", $value ]);
 	}
 
 
@@ -1017,7 +1017,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `float_non_negative` is failed", $value ]);
+		throw new LogicException([ "Typecheck `float_non_negative` is failed", $value ]);
 	}
 
 
@@ -1030,7 +1030,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `float_non_positive` is failed", $value ]);
+		throw new LogicException([ "Typecheck `float_non_positive` is failed", $value ]);
 	}
 
 
@@ -1043,7 +1043,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `float_negative` is failed", $value ]);
+		throw new LogicException([ "Typecheck `float_negative` is failed", $value ]);
 	}
 
 
@@ -1056,7 +1056,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `float_positive` is failed", $value ]);
+		throw new LogicException([ "Typecheck `float_positive` is failed", $value ]);
 	}
 
 
@@ -1069,7 +1069,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `number` is failed", $value, $allowExp ]);
+		throw new LogicException([ "Typecheck `number` is failed", $value, $allowExp ]);
 	}
 
 
@@ -1082,7 +1082,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `bcnumber` is failed", $value ]);
+		throw new LogicException([ "Typecheck `bcnumber` is failed", $value ]);
 	}
 
 
@@ -1095,7 +1095,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_string` is failed", $value ]);
+		throw new LogicException([ "Typecheck `a_string` is failed", $value ]);
 	}
 
 
@@ -1108,7 +1108,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_string_empty` is failed", $value ]);
+		throw new LogicException([ "Typecheck `a_string_empty` is failed", $value ]);
 	}
 
 
@@ -1121,7 +1121,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_string_not_empty` is failed", $value ]);
+		throw new LogicException([ "Typecheck `a_string_not_empty` is failed", $value ]);
 	}
 
 
@@ -1134,7 +1134,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `a_trim` is failed", $value ]);
+		throw new LogicException([ "Typecheck `a_trim` is failed", $value ]);
 	}
 
 
@@ -1147,7 +1147,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `string` is failed", $value ]);
+		throw new LogicException([ "Typecheck `string` is failed", $value ]);
 	}
 
 
@@ -1160,7 +1160,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `string_empty` is failed", $value ]);
+		throw new LogicException([ "Typecheck `string_empty` is failed", $value ]);
 	}
 
 
@@ -1173,7 +1173,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `string_not_empty` is failed", $value ]);
+		throw new LogicException([ "Typecheck `string_not_empty` is failed", $value ]);
 	}
 
 
@@ -1186,7 +1186,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `trim` is failed", $value, $characters ]);
+		throw new LogicException([ "Typecheck `trim` is failed", $value, $characters ]);
 	}
 
 
@@ -1199,7 +1199,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `char` is failed", $value ]);
+		throw new LogicException([ "Typecheck `char` is failed", $value ]);
 	}
 
 
@@ -1212,7 +1212,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `letter` is failed", $value ]);
+		throw new LogicException([ "Typecheck `letter` is failed", $value ]);
 	}
 
 
@@ -1225,7 +1225,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `alphabet` is failed", $value ]);
+		throw new LogicException([ "Typecheck `alphabet` is failed", $value ]);
 	}
 
 
@@ -1238,7 +1238,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `ctype_digit` is failed", $value ]);
+		throw new LogicException([ "Typecheck `ctype_digit` is failed", $value ]);
 	}
 
 
@@ -1251,7 +1251,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `ctype_alpha` is failed", $value, $isIgnoreCase ]);
+		throw new LogicException([ "Typecheck `ctype_alpha` is failed", $value, $isIgnoreCase ]);
 	}
 
 
@@ -1264,7 +1264,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `ctype_alnum` is failed", $value, $isIgnoreCase ]);
+		throw new LogicException([ "Typecheck `ctype_alnum` is failed", $value, $isIgnoreCase ]);
 	}
 
 
@@ -1277,7 +1277,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `base` is failed", $value, $alphabet ]);
+		throw new LogicException([ "Typecheck `base` is failed", $value, $alphabet ]);
 	}
 
 
@@ -1290,7 +1290,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `base_bin` is failed", $value ]);
+		throw new LogicException([ "Typecheck `base_bin` is failed", $value ]);
 	}
 
 
@@ -1303,7 +1303,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `base_oct` is failed", $value ]);
+		throw new LogicException([ "Typecheck `base_oct` is failed", $value ]);
 	}
 
 
@@ -1316,7 +1316,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `base_dec` is failed", $value ]);
+		throw new LogicException([ "Typecheck `base_dec` is failed", $value ]);
 	}
 
 
@@ -1329,7 +1329,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `base_hex` is failed", $value ]);
+		throw new LogicException([ "Typecheck `base_hex` is failed", $value ]);
 	}
 
 
@@ -1342,7 +1342,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `array_empty` is failed", $value ]);
+		throw new LogicException([ "Typecheck `array_empty` is failed", $value ]);
 	}
 
 
@@ -1355,7 +1355,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `array_not_empty` is failed", $value ]);
+		throw new LogicException([ "Typecheck `array_not_empty` is failed", $value ]);
 	}
 
 
@@ -1368,7 +1368,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_array_empty` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_array_empty` is failed", $value ]);
 	}
 
 
@@ -1381,7 +1381,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `key_exists` is failed", $value, $key ]);
+		throw new LogicException([ "Typecheck `key_exists` is failed", $value, $key ]);
 	}
 
 
@@ -1394,7 +1394,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `array_plain` is failed", $value ]);
+		throw new LogicException([ "Typecheck `array_plain` is failed", $value ]);
 	}
 
 
@@ -1407,7 +1407,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `list` is failed", $value, $isPlain ]);
+		throw new LogicException([ "Typecheck `list` is failed", $value, $isPlain ]);
 	}
 
 
@@ -1420,7 +1420,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `list_sorted` is failed", $value, $isPlain ]);
+		throw new LogicException([ "Typecheck `list_sorted` is failed", $value, $isPlain ]);
 	}
 
 
@@ -1433,7 +1433,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `dict` is failed", $value, $isPlain ]);
+		throw new LogicException([ "Typecheck `dict` is failed", $value, $isPlain ]);
 	}
 
 
@@ -1446,7 +1446,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `dict_sorted` is failed", $value, $isPlain ]);
+		throw new LogicException([ "Typecheck `dict_sorted` is failed", $value, $isPlain ]);
 	}
 
 
@@ -1459,7 +1459,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `table` is failed", $value ]);
+		throw new LogicException([ "Typecheck `table` is failed", $value ]);
 	}
 
 
@@ -1472,7 +1472,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `matrix` is failed", $value ]);
+		throw new LogicException([ "Typecheck `matrix` is failed", $value ]);
 	}
 
 
@@ -1485,7 +1485,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `matrix_strict` is failed", $value ]);
+		throw new LogicException([ "Typecheck `matrix_strict` is failed", $value ]);
 	}
 
 
@@ -1498,7 +1498,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `arrpath` is failed", $path, $dot ]);
+		throw new LogicException([ "Typecheck `arrpath` is failed", $path, $dot ]);
 	}
 
 
@@ -1511,7 +1511,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `array_of_type` is failed", $value, $type ]);
+		throw new LogicException([ "Typecheck `array_of_type` is failed", $value, $type ]);
 	}
 
 
@@ -1524,7 +1524,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `array_of_resource_type` is failed", $value, $resourceType ]);
+		throw new LogicException([ "Typecheck `array_of_resource_type` is failed", $value, $resourceType ]);
 	}
 
 
@@ -1540,7 +1540,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `array_of_a` is failed", $value, $className ]);
+		throw new LogicException([ "Typecheck `array_of_a` is failed", $value, $className ]);
 	}
 
 
@@ -1556,7 +1556,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `array_of_class` is failed", $value, $className ]);
+		throw new LogicException([ "Typecheck `array_of_class` is failed", $value, $className ]);
 	}
 
 
@@ -1572,7 +1572,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `array_of_subclass` is failed", $value, $className ]);
+		throw new LogicException([ "Typecheck `array_of_subclass` is failed", $value, $className ]);
 	}
 
 
@@ -1585,7 +1585,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `array_of_callback` is failed", $value, $fn, $args ]);
+		throw new LogicException([ "Typecheck `array_of_callback` is failed", $value, $fn, $args ]);
 	}
 
 
@@ -1598,7 +1598,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `regex` is failed", $value ]);
+		throw new LogicException([ "Typecheck `regex` is failed", $value ]);
 	}
 
 
@@ -1611,7 +1611,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `address_ip` is failed", $value ]);
+		throw new LogicException([ "Typecheck `address_ip` is failed", $value ]);
 	}
 
 
@@ -1624,7 +1624,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `address_ip_v4` is failed", $value ]);
+		throw new LogicException([ "Typecheck `address_ip_v4` is failed", $value ]);
 	}
 
 
@@ -1637,7 +1637,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `address_ip_v6` is failed", $value ]);
+		throw new LogicException([ "Typecheck `address_ip_v6` is failed", $value ]);
 	}
 
 
@@ -1650,7 +1650,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `address_mac` is failed", $value ]);
+		throw new LogicException([ "Typecheck `address_mac` is failed", $value ]);
 	}
 
 
@@ -1663,7 +1663,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `subnet` is failed", $value, $ipFallback ]);
+		throw new LogicException([ "Typecheck `subnet` is failed", $value, $ipFallback ]);
 	}
 
 
@@ -1676,7 +1676,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `subnet_v4` is failed", $value, $ipFallback ]);
+		throw new LogicException([ "Typecheck `subnet_v4` is failed", $value, $ipFallback ]);
 	}
 
 
@@ -1689,7 +1689,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `subnet_v6` is failed", $value, $ipFallback ]);
+		throw new LogicException([ "Typecheck `subnet_v6` is failed", $value, $ipFallback ]);
 	}
 
 
@@ -1702,7 +1702,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `url` is failed", $value, $query, $fragment, $refs ]);
+		throw new LogicException([ "Typecheck `url` is failed", $value, $query, $fragment, $refs ]);
 	}
 
 
@@ -1715,7 +1715,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `host` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `host` is failed", $value, $refs ]);
 	}
 
 
@@ -1728,7 +1728,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `link` is failed", $value, $query, $fragment, $refs ]);
+		throw new LogicException([ "Typecheck `link` is failed", $value, $query, $fragment, $refs ]);
 	}
 
 
@@ -1741,7 +1741,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `uuid` is failed", $value ]);
+		throw new LogicException([ "Typecheck `uuid` is failed", $value ]);
 	}
 
 
@@ -1754,7 +1754,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `countable` is failed", $value ]);
+		throw new LogicException([ "Typecheck `countable` is failed", $value ]);
 	}
 
 
@@ -1767,7 +1767,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `countable_object` is failed", $value ]);
+		throw new LogicException([ "Typecheck `countable_object` is failed", $value ]);
 	}
 
 
@@ -1780,7 +1780,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `sizeable` is failed", $value ]);
+		throw new LogicException([ "Typecheck `sizeable` is failed", $value ]);
 	}
 
 
@@ -1793,7 +1793,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `timezone` is failed", $timezone, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Typecheck `timezone` is failed", $timezone, $allowedTimezoneTypes ]);
 	}
 
 
@@ -1806,7 +1806,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `timezone_offset` is failed", $timezoneOrOffset ]);
+		throw new LogicException([ "Typecheck `timezone_offset` is failed", $timezoneOrOffset ]);
 	}
 
 
@@ -1819,7 +1819,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `timezone_abbr` is failed", $timezoneOrAbbr ]);
+		throw new LogicException([ "Typecheck `timezone_abbr` is failed", $timezoneOrAbbr ]);
 	}
 
 
@@ -1832,7 +1832,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `timezone_name` is failed", $timezoneOrName ]);
+		throw new LogicException([ "Typecheck `timezone_name` is failed", $timezoneOrName ]);
 	}
 
 
@@ -1845,7 +1845,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `timezone_nameabbr` is failed", $timezoneOrNameOrAbbr ]);
+		throw new LogicException([ "Typecheck `timezone_nameabbr` is failed", $timezoneOrNameOrAbbr ]);
 	}
 
 
@@ -1858,7 +1858,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `date` is failed", $datestring, $timezoneFallback ]);
+		throw new LogicException([ "Typecheck `date` is failed", $datestring, $timezoneFallback ]);
 	}
 
 
@@ -1871,7 +1871,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `adate` is failed", $datestring, $timezoneFallback ]);
+		throw new LogicException([ "Typecheck `adate` is failed", $datestring, $timezoneFallback ]);
 	}
 
 
@@ -1884,7 +1884,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `idate` is failed", $datestring, $timezoneFallback ]);
+		throw new LogicException([ "Typecheck `idate` is failed", $datestring, $timezoneFallback ]);
 	}
 
 
@@ -1897,7 +1897,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `date_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
+		throw new LogicException([ "Typecheck `date_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
 	}
 
 
@@ -1910,7 +1910,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `adate_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
+		throw new LogicException([ "Typecheck `adate_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
 	}
 
 
@@ -1923,7 +1923,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `idate_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
+		throw new LogicException([ "Typecheck `idate_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
 	}
 
 
@@ -1936,7 +1936,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `date_tz` is failed", $datestring, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Typecheck `date_tz` is failed", $datestring, $allowedTimezoneTypes ]);
 	}
 
 
@@ -1949,7 +1949,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `adate_tz` is failed", $datestring, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Typecheck `adate_tz` is failed", $datestring, $allowedTimezoneTypes ]);
 	}
 
 
@@ -1962,7 +1962,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `idate_tz` is failed", $datestring, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Typecheck `idate_tz` is failed", $datestring, $allowedTimezoneTypes ]);
 	}
 
 
@@ -1975,7 +1975,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `date_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Typecheck `date_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
 	}
 
 
@@ -1988,7 +1988,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `adate_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Typecheck `adate_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
 	}
 
 
@@ -2001,7 +2001,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `idate_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Typecheck `idate_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
 	}
 
 
@@ -2014,7 +2014,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `date_microtime` is failed", $microtime, $timezoneSet ]);
+		throw new LogicException([ "Typecheck `date_microtime` is failed", $microtime, $timezoneSet ]);
 	}
 
 
@@ -2027,7 +2027,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `adate_microtime` is failed", $microtime, $timezoneSet ]);
+		throw new LogicException([ "Typecheck `adate_microtime` is failed", $microtime, $timezoneSet ]);
 	}
 
 
@@ -2040,7 +2040,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `idate_microtime` is failed", $microtime, $timezoneSet ]);
+		throw new LogicException([ "Typecheck `idate_microtime` is failed", $microtime, $timezoneSet ]);
 	}
 
 
@@ -2053,7 +2053,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `interval` is failed", $interval ]);
+		throw new LogicException([ "Typecheck `interval` is failed", $interval ]);
 	}
 
 
@@ -2066,7 +2066,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `interval_duration` is failed", $duration ]);
+		throw new LogicException([ "Typecheck `interval_duration` is failed", $duration ]);
 	}
 
 
@@ -2079,7 +2079,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `interval_datestring` is failed", $datestring ]);
+		throw new LogicException([ "Typecheck `interval_datestring` is failed", $datestring ]);
 	}
 
 
@@ -2092,7 +2092,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `interval_microtime` is failed", $microtime ]);
+		throw new LogicException([ "Typecheck `interval_microtime` is failed", $microtime ]);
 	}
 
 
@@ -2105,7 +2105,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `interval_ago` is failed", $date, $from, $reverse ]);
+		throw new LogicException([ "Typecheck `interval_ago` is failed", $date, $from, $reverse ]);
 	}
 
 
@@ -2121,7 +2121,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `struct_exists` is failed", $value, $flags ]);
+		throw new LogicException([ "Typecheck `struct_exists` is failed", $value, $flags ]);
 	}
 
 
@@ -2137,7 +2137,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `struct` is failed", $value, $flags ]);
+		throw new LogicException([ "Typecheck `struct` is failed", $value, $flags ]);
 	}
 
 
@@ -2153,7 +2153,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `struct_class` is failed", $value, $flags ]);
+		throw new LogicException([ "Typecheck `struct_class` is failed", $value, $flags ]);
 	}
 
 
@@ -2166,7 +2166,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `struct_interface` is failed", $value, $flags ]);
+		throw new LogicException([ "Typecheck `struct_interface` is failed", $value, $flags ]);
 	}
 
 
@@ -2179,7 +2179,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `struct_trait` is failed", $value, $flags ]);
+		throw new LogicException([ "Typecheck `struct_trait` is failed", $value, $flags ]);
 	}
 
 
@@ -2195,7 +2195,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `struct_enum` is failed", $value, $flags ]);
+		throw new LogicException([ "Typecheck `struct_enum` is failed", $value, $flags ]);
 	}
 
 
@@ -2211,7 +2211,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `struct_fqcn` is failed", $value, $flags ]);
+		throw new LogicException([ "Typecheck `struct_fqcn` is failed", $value, $flags ]);
 	}
 
 
@@ -2224,7 +2224,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `struct_namespace` is failed", $value, $flags ]);
+		throw new LogicException([ "Typecheck `struct_namespace` is failed", $value, $flags ]);
 	}
 
 
@@ -2237,7 +2237,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `struct_basename` is failed", $value, $flags ]);
+		throw new LogicException([ "Typecheck `struct_basename` is failed", $value, $flags ]);
 	}
 
 
@@ -2250,7 +2250,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `resource` is failed", $value ]);
+		throw new LogicException([ "Typecheck `resource` is failed", $value ]);
 	}
 
 
@@ -2263,7 +2263,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `any_not_resource` is failed", $value ]);
+		throw new LogicException([ "Typecheck `any_not_resource` is failed", $value ]);
 	}
 
 
@@ -2276,7 +2276,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `resource_opened` is failed", $value ]);
+		throw new LogicException([ "Typecheck `resource_opened` is failed", $value ]);
 	}
 
 
@@ -2289,7 +2289,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `resource_closed` is failed", $value ]);
+		throw new LogicException([ "Typecheck `resource_closed` is failed", $value ]);
 	}
 
 
@@ -2306,7 +2306,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `enum_case` is failed", $value, $enumClass ]);
+		throw new LogicException([ "Typecheck `enum_case` is failed", $value, $enumClass ]);
 	}
 
 
@@ -2319,7 +2319,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `method_array` is failed", $value ]);
+		throw new LogicException([ "Typecheck `method_array` is failed", $value ]);
 	}
 
 
@@ -2333,7 +2333,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `method_string` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `method_string` is failed", $value, $refs ]);
 	}
 
 
@@ -2347,7 +2347,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable` is failed", $value, $newScope ]);
+		throw new LogicException([ "Typecheck `callable` is failed", $value, $newScope ]);
 	}
 
 
@@ -2360,7 +2360,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable_object` is failed", $value, $newScope ]);
+		throw new LogicException([ "Typecheck `callable_object` is failed", $value, $newScope ]);
 	}
 
 
@@ -2373,7 +2373,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable_object_closure` is failed", $value, $newScope ]);
+		throw new LogicException([ "Typecheck `callable_object_closure` is failed", $value, $newScope ]);
 	}
 
 
@@ -2386,7 +2386,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable_object_invokable` is failed", $value, $newScope ]);
+		throw new LogicException([ "Typecheck `callable_object_invokable` is failed", $value, $newScope ]);
 	}
 
 
@@ -2400,7 +2400,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable_array` is failed", $value, $newScope ]);
+		throw new LogicException([ "Typecheck `callable_array` is failed", $value, $newScope ]);
 	}
 
 
@@ -2414,7 +2414,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable_array_method` is failed", $value, $newScope ]);
+		throw new LogicException([ "Typecheck `callable_array_method` is failed", $value, $newScope ]);
 	}
 
 
@@ -2428,7 +2428,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable_array_method_static` is failed", $value, $newScope ]);
+		throw new LogicException([ "Typecheck `callable_array_method_static` is failed", $value, $newScope ]);
 	}
 
 
@@ -2442,7 +2442,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable_array_method_non_static` is failed", $value, $newScope ]);
+		throw new LogicException([ "Typecheck `callable_array_method_non_static` is failed", $value, $newScope ]);
 	}
 
 
@@ -2455,7 +2455,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable_string` is failed", $value, $newScope ]);
+		throw new LogicException([ "Typecheck `callable_string` is failed", $value, $newScope ]);
 	}
 
 
@@ -2468,7 +2468,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable_string_function` is failed", $value ]);
+		throw new LogicException([ "Typecheck `callable_string_function` is failed", $value ]);
 	}
 
 
@@ -2481,7 +2481,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable_string_function_internal` is failed", $value ]);
+		throw new LogicException([ "Typecheck `callable_string_function_internal` is failed", $value ]);
 	}
 
 
@@ -2494,7 +2494,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable_string_function_non_internal` is failed", $value ]);
+		throw new LogicException([ "Typecheck `callable_string_function_non_internal` is failed", $value ]);
 	}
 
 
@@ -2507,7 +2507,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `callable_string_method_static` is failed", $value, $newScope ]);
+		throw new LogicException([ "Typecheck `callable_string_method_static` is failed", $value, $newScope ]);
 	}
 
 
@@ -2524,7 +2524,21 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `ref` is failed", $key, $refs, $set ]);
+		throw new LogicException([ "Typecheck `ref` is failed", $key, $refs, $set ]);
+	}
+
+
+	/**
+	 * @param int|null $result
+	 * @param string   $value
+	 */
+	public function chmod(&$result, $value): bool
+	{
+		if (Lib::type()->chmod($result, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `chmod` is failed", $value ]);
 	}
 
 
@@ -2538,7 +2552,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `path` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `path` is failed", $value, $refs ]);
 	}
 
 
@@ -2552,7 +2566,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `realpath` is failed", $value, $allowSymlink, $refs ]);
+		throw new LogicException([ "Typecheck `realpath` is failed", $value, $allowSymlink, $refs ]);
 	}
 
 
@@ -2566,7 +2580,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `freepath` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `freepath` is failed", $value, $refs ]);
 	}
 
 
@@ -2585,7 +2599,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `dirpath` is failed", $value, $allowExists, $allowSymlink, $refs ]);
+		throw new LogicException([ "Typecheck `dirpath` is failed", $value, $allowExists, $allowSymlink, $refs ]);
 	}
 
 
@@ -2598,7 +2612,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `filepath` is failed", $value, $allowExists, $allowSymlink, $refs ]);
+		throw new LogicException([ "Typecheck `filepath` is failed", $value, $allowExists, $allowSymlink, $refs ]);
 	}
 
 
@@ -2612,7 +2626,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `dirpath_realpath` is failed", $value, $allowSymlink, $refs ]);
+		throw new LogicException([ "Typecheck `dirpath_realpath` is failed", $value, $allowSymlink, $refs ]);
 	}
 
 
@@ -2626,7 +2640,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `filepath_realpath` is failed", $value, $allowSymlink, $refs ]);
+		throw new LogicException([ "Typecheck `filepath_realpath` is failed", $value, $allowSymlink, $refs ]);
 	}
 
 
@@ -2639,7 +2653,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `filename` is failed", $value ]);
+		throw new LogicException([ "Typecheck `filename` is failed", $value ]);
 	}
 
 
@@ -2657,7 +2671,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `file` is failed", $value, $extensions, $mimeTypes, $filters ]);
+		throw new LogicException([ "Typecheck `file` is failed", $value, $extensions, $mimeTypes, $filters ]);
 	}
 
 
@@ -2675,7 +2689,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `image` is failed", $value, $extensions, $mimeTypes, $filters ]);
+		throw new LogicException([ "Typecheck `image` is failed", $value, $extensions, $mimeTypes, $filters ]);
 	}
 
 
@@ -2688,7 +2702,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `email` is failed", $value, $filters, $refs ]);
+		throw new LogicException([ "Typecheck `email` is failed", $value, $filters, $refs ]);
 	}
 
 
@@ -2701,7 +2715,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `email_fake` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `email_fake` is failed", $value, $refs ]);
 	}
 
 
@@ -2714,7 +2728,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `email_non_fake` is failed", $value, $filters, $refs ]);
+		throw new LogicException([ "Typecheck `email_non_fake` is failed", $value, $filters, $refs ]);
 	}
 
 
@@ -2727,7 +2741,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `phone` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `phone` is failed", $value, $refs ]);
 	}
 
 
@@ -2740,7 +2754,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `phone_fake` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `phone_fake` is failed", $value, $refs ]);
 	}
 
 
@@ -2753,7 +2767,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `phone_non_fake` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `phone_non_fake` is failed", $value, $refs ]);
 	}
 
 
@@ -2766,7 +2780,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `phone_real` is failed", $value, $region, $refs ]);
+		throw new LogicException([ "Typecheck `phone_real` is failed", $value, $region, $refs ]);
 	}
 
 
@@ -2779,7 +2793,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `tel` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `tel` is failed", $value, $refs ]);
 	}
 
 
@@ -2792,7 +2806,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `tel_fake` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `tel_fake` is failed", $value, $refs ]);
 	}
 
 
@@ -2805,7 +2819,7 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `tel_non_fake` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `tel_non_fake` is failed", $value, $refs ]);
 	}
 
 
@@ -2818,6 +2832,6 @@ class TypeThrowModule
 		    return true;
 		}
 
-		throw new LogicException([ "Filter `tel_real` is failed", $value, $region, $refs ]);
+		throw new LogicException([ "Typecheck `tel_real` is failed", $value, $region, $refs ]);
 	}
 }

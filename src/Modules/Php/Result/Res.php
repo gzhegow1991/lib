@@ -8,40 +8,47 @@ use Gzhegow\Lib\Modules\Php\ErrorBag\Error;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 
 
+/**
+ * @template T
+ */
 class Res
 {
-    const MODE_RETURN_BOOLEAN = 2;
-    const MODE_RETURN_CONTEXT = 4;
-    const MODE_RETURN_NULL    = 3;
-    const MODE_RETURN_VALUE   = 1;
+    const MODE_RESULT_NULL  = 1;
+    const MODE_RESULT_SELF  = 2;
+    const MODE_RESULT_TRUE  = 3;
+    const MODE_RESULT_VALUE = 4;
 
-    const MODE_THROW_ON  = 1;
-    const MODE_THROW_OFF = 2;
+    const MODE_ERROR_FALSE = 1;
+    const MODE_ERROR_NULL  = 2;
+    const MODE_ERROR_SELF  = 3;
+    const MODE_ERROR_THROW = 4;
 
-    const LIST_MODE_RETURN = [
-        self::MODE_RETURN_BOOLEAN => true,
-        self::MODE_RETURN_CONTEXT => true,
-        self::MODE_RETURN_NULL    => true,
-        self::MODE_RETURN_VALUE   => true,
+    const LIST_MODE_RESULT = [
+        self::MODE_RESULT_TRUE  => true,
+        self::MODE_RESULT_NULL  => true,
+        self::MODE_RESULT_SELF  => true,
+        self::MODE_RESULT_VALUE => true,
     ];
 
-    const LIST_MODE_THROW = [
-        self::MODE_THROW_ON  => true,
-        self::MODE_THROW_OFF => true,
+    const LIST_MODE_ERROR = [
+        self::MODE_ERROR_FALSE => true,
+        self::MODE_ERROR_NULL  => true,
+        self::MODE_ERROR_SELF  => true,
+        self::MODE_ERROR_THROW => true,
     ];
 
 
     /**
      * @var int
      */
-    public $modeReturn = self::MODE_RETURN_VALUE;
+    public $modeResult = self::MODE_RESULT_VALUE;
     /**
      * @var int
      */
-    public $modeThrow = self::MODE_THROW_ON;
+    public $modeError = self::MODE_ERROR_THROW;
 
     /**
-     * @var array{ 0?: mixed }
+     * @var array{ 0?: T }
      */
     protected $result = [];
     /**
@@ -55,35 +62,35 @@ class Res
     }
 
 
-    public static function fromMode(int $modeReturn, int $modeThrow)
+    public static function fromMode(int $modeResult, int $modeError)
     {
-        if (! isset(static::LIST_MODE_RETURN[ $modeReturn ])) {
+        if (! isset(static::LIST_MODE_RESULT[ $modeResult ])) {
             throw new LogicException(
                 [
                     ''
                     . 'The `modeReturn` should be one of: '
-                    . '[ ' . implode(' ][ ', array_keys(static::LIST_MODE_RETURN)) . ' ]',
+                    . '[ ' . implode(' ][ ', array_keys(static::LIST_MODE_RESULT)) . ' ]',
                     //
-                    $modeReturn,
+                    $modeResult,
                 ]
             );
         }
 
-        if (! isset(static::LIST_MODE_THROW[ $modeThrow ])) {
+        if (! isset(static::LIST_MODE_ERROR[ $modeError ])) {
             throw new LogicException(
                 [
                     ''
                     . 'The `modeThrow` should be one of: '
-                    . '[ ' . implode(' ][ ', array_keys(static::LIST_MODE_THROW)) . ' ]',
+                    . '[ ' . implode(' ][ ', array_keys(static::LIST_MODE_ERROR)) . ' ]',
                     //
-                    $modeThrow,
+                    $modeError,
                 ]
             );
         }
 
         $instance = new static();
-        $instance->modeReturn = $modeReturn;
-        $instance->modeThrow = $modeThrow;
+        $instance->modeResult = $modeResult;
+        $instance->modeError = $modeError;
 
         return $instance;
     }
@@ -103,7 +110,7 @@ class Res
 
 
     /**
-     * @param mixed &$result
+     * @param T &$result
      *
      * @return bool
      */
@@ -121,62 +128,28 @@ class Res
     }
 
     /**
-     * @param Error[]|null &$errors
+     * @param T $result
      *
-     * @return bool
-     */
-    public function isErr(array &$errors = null) : bool
-    {
-        $errors = null;
-
-        if ([] !== $this->result) {
-            return false;
-        }
-
-        if (null !== $this->errors) {
-            $errors = $this->errors();
-        }
-
-        return true;
-    }
-
-
-    /**
      * @return static
      */
-    public function ok($result)
+    public function setResult($result)
     {
-        $this->result = [ $result ];
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function err($error, array $tags = [], array $trace = [])
-    {
-        if ($error instanceof Res) {
-            $this->merge($error);
+        if ($result instanceof Res) {
+            $this->result = [ $result->getResult() ];
 
         } else {
-            if (null === $this->errors) {
-                $this->errors = new ErrorBag();
-            }
-
-            $this->errors->error($error, $tags, $trace);
+            $this->result = [ $result ];
         }
 
         return $this;
     }
 
-
     /**
-     * @param array{ 0?: mixed } $fallback
+     * @param array{ 0?: T } $fallback
      *
-     * @return mixed
+     * @return T
      */
-    public function get(array $fallback = [])
+    public function getResult(array $fallback = [])
     {
         if ([] === $this->result) {
             if ([] === $fallback) {
@@ -192,34 +165,43 @@ class Res
     }
 
 
-    public function errors() : array
+    /**
+     * @param Error[]|null &$errors
+     *
+     * @return bool
+     */
+    public function isErr(array &$errors = null) : bool
     {
-        $list = [];
+        $errors = null;
 
-        if (null !== $this->errors) {
-            $errors = $this->errors->getErrors();
-
-            foreach ( $errors as $i => $errorObject ) {
-                $list[] = $errorObject->error;
-            }
+        if ([] !== $this->result) {
+            return false;
         }
 
-        return $list;
+        if (null !== $this->errors) {
+            $errors = $this->getErrors();
+        }
+
+        return true;
     }
 
-    public function errorsByTags(array $andTags, array ...$orAndTags) : array
+    /**
+     * @return static
+     */
+    public function addError($error, array $tags = [], array $trace = [])
     {
-        $list = [];
+        if ($error instanceof Res) {
+            $this->merge($error);
 
-        if (null !== $this->errors) {
-            $errors = $this->errors->getErrorsByTags($andTags, ...$orAndTags);
-
-            foreach ( $errors as $i => $errorObject ) {
-                $list[] = $errorObject->error;
+        } else {
+            if (null === $this->errors) {
+                $this->errors = new ErrorBag();
             }
+
+            $this->errors->error($error, $tags, $trace);
         }
 
-        return $list;
+        return $this;
     }
 
 
@@ -243,5 +225,36 @@ class Res
         }
 
         return $errorBag;
+    }
+
+
+    public function errors() : array
+    {
+        $list = [];
+
+        if (null !== $this->errors) {
+            $errorBag = $this->errors->getErrors();
+
+            foreach ( $errorBag as $errorObject ) {
+                $list[] = $errorObject->error;
+            }
+        }
+
+        return $list;
+    }
+
+    public function errorsByTags(array $andTags, array ...$orAndTags) : array
+    {
+        $list = [];
+
+        if (null !== $this->errors) {
+            $errorBag = $this->errors->getErrorsByTags($andTags, ...$orAndTags);
+
+            foreach ( $errorBag as $errorObject ) {
+                $list[] = $errorObject->error;
+            }
+        }
+
+        return $list;
     }
 }

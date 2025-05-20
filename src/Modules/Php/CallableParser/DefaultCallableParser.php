@@ -62,11 +62,9 @@ class DefaultCallableParser implements CallableParserInterface
         $result = null;
 
         $withMethodArray = array_key_exists(0, $refs);
-
         if ($withMethodArray) {
             $refResultArray =& $refs[ 0 ];
         }
-
         $refResultArray = null;
 
         $methodArray = null

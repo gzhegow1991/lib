@@ -456,7 +456,8 @@ class DebugBacktracer implements DebugBacktracerInterface
     {
         $theFs = Lib::fs();
 
-        $hasDirRoot = (null !== ($dirRoot = $this->dirRoot));
+        $dirRoot = $this->dirRoot ?? Lib::debug()->static_dir_root();
+        $hasDirRoot = (null !== $dirRoot);
 
         $trace = $this->trace;
 

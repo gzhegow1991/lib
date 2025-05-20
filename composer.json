@@ -21,6 +21,7 @@
         "files": [
             "const/arr.php",
             "const/cmp.php",
+            "const/debug.php",
             "const/php.php",
             "const/type.php"
         ],

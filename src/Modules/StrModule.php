@@ -10,10 +10,10 @@ use Gzhegow\Lib\Modules\Str\Alphabet;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Str\Slugger\DefaultSlugger;
-use Gzhegow\Lib\Modules\Str\Inflector\DefaultInflector;
 use Gzhegow\Lib\Modules\Str\Slugger\SluggerInterface;
-use Gzhegow\Lib\Modules\Str\Interpolator\DefaultInterpolator;
+use Gzhegow\Lib\Modules\Str\Inflector\DefaultInflector;
 use Gzhegow\Lib\Modules\Str\Inflector\InflectorInterface;
+use Gzhegow\Lib\Modules\Str\Interpolator\DefaultInterpolator;
 use Gzhegow\Lib\Modules\Str\Interpolator\InterpolatorInterface;
 
 
@@ -130,14 +130,12 @@ class StrModule
 
             $last = $this->mbstring;
 
-            $current = $mbstring;
-
-            $this->mbstring = $current;
+            $this->mbstring = $mbstring;
 
             $result = $last;
         }
 
-        $result = $result ?? $this->mbstring;
+        $result = $result ?? $this->mbstring ?? false;
 
         return $result;
     }
@@ -1353,11 +1351,9 @@ class StrModule
     ) : bool
     {
         $withSubstr = array_key_exists(0, $refs);
-
         if ($withSubstr) {
             $refSubstr =& $refs[ 0 ];
         }
-
         $refSubstr = null;
 
         $ignoreCase = $ignoreCase ?? true;
@@ -1393,11 +1389,9 @@ class StrModule
     ) : bool
     {
         $withSubstr = array_key_exists(0, $refs);
-
         if ($withSubstr) {
             $refSubstr =& $refs[ 0 ];
         }
-
         $refSubstr = null;
 
         $ignoreCase = $ignoreCase ?? true;
@@ -2492,11 +2486,9 @@ class StrModule
     public function eol(string $text, $eol = null, array $refs = []) : string
     {
         $withLines = array_key_exists(0, $refs);
-
         if ($withLines) {
             $refLines =& $refs[ 0 ];
         }
-
         $refLines = null;
 
         $_eol = $eol ?? "\n";

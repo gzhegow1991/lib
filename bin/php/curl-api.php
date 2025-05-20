@@ -11,19 +11,21 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 
 \Gzhegow\Lib\Lib::entrypoint()
     ->setErrorReporting(E_ALL | E_STRICT | E_DEPRECATED | E_USER_DEPRECATED)
-    ->setTimeLimit(0)
     ->setMemoryLimit('32M')
+    ->setTimeLimit(0)
+    ->setUmask(0002)
     //
     ->useErrorReporting()
-    ->useTimeLimit()
     ->useMemoryLimit()
+    ->useTimeLimit()
+    ->useUmask()
     ->useErrorHandler()
     ->useExceptionHandler()
 ;
 
 
-$timeoutMs = $argv[ 1 ] ?? 10000;
-$lockWaitTimeoutMs = $argv[ 2 ] ?? 1000;
+$timeoutMs = $argv[ 1 ] ?? 10000;        // 10 sec
+$lockWaitTimeoutMs = $argv[ 2 ] ?? 1000; // 1 sec
 
 
 $fetchApi = \Gzhegow\Lib\Lib::async()->fetchApi();

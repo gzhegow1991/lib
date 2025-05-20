@@ -29,7 +29,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `empty` is failed", $value ]);
+		throw new LogicException([ "Parsing `empty` is failed", $value ]);
 	}
 
 
@@ -42,7 +42,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_empty` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_empty` is failed", $value ]);
 	}
 
 
@@ -57,7 +57,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `blank` is failed", $value ]);
+		throw new LogicException([ "Parsing `blank` is failed", $value ]);
 	}
 
 
@@ -70,7 +70,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_blank` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_blank` is failed", $value ]);
 	}
 
 
@@ -85,7 +85,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `nullable` is failed", $value ]);
+		throw new LogicException([ "Parsing `nullable` is failed", $value ]);
 	}
 
 
@@ -98,7 +98,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_nullable` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_nullable` is failed", $value ]);
 	}
 
 
@@ -113,7 +113,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `passed` is failed", $value ]);
+		throw new LogicException([ "Parsing `passed` is failed", $value ]);
 	}
 
 
@@ -126,7 +126,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_passed` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_passed` is failed", $value ]);
 	}
 
 
@@ -146,7 +146,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `nil` is failed", $value ]);
+		throw new LogicException([ "Parsing `nil` is failed", $value ]);
 	}
 
 
@@ -159,7 +159,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_nil` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_nil` is failed", $value ]);
 	}
 
 
@@ -172,7 +172,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `a_null` is failed", $value ]);
+		throw new LogicException([ "Parsing `a_null` is failed", $value ]);
 	}
 
 
@@ -185,7 +185,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_null` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_null` is failed", $value ]);
 	}
 
 
@@ -198,7 +198,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `a_bool` is failed", $value ]);
+		throw new LogicException([ "Parsing `a_bool` is failed", $value ]);
 	}
 
 
@@ -211,7 +211,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `an_any_not_bool` is failed", $value ]);
+		throw new LogicException([ "Parsing `an_any_not_bool` is failed", $value ]);
 	}
 
 
@@ -224,7 +224,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `a_false` is failed", $value ]);
+		throw new LogicException([ "Parsing `a_false` is failed", $value ]);
 	}
 
 
@@ -237,7 +237,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_false` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_false` is failed", $value ]);
 	}
 
 
@@ -250,7 +250,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `a_true` is failed", $value ]);
+		throw new LogicException([ "Parsing `a_true` is failed", $value ]);
 	}
 
 
@@ -263,7 +263,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_true` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_true` is failed", $value ]);
 	}
 
 
@@ -276,7 +276,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `bool` is failed", $value ]);
+		throw new LogicException([ "Parsing `bool` is failed", $value ]);
 	}
 
 
@@ -289,7 +289,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `false` is failed", $value ]);
+		throw new LogicException([ "Parsing `false` is failed", $value ]);
 	}
 
 
@@ -302,7 +302,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `true` is failed", $value ]);
+		throw new LogicException([ "Parsing `true` is failed", $value ]);
 	}
 
 
@@ -315,7 +315,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `userbool` is failed", $value ]);
+		throw new LogicException([ "Parsing `userbool` is failed", $value ]);
 	}
 
 
@@ -328,7 +328,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `userfalse` is failed", $value ]);
+		throw new LogicException([ "Parsing `userfalse` is failed", $value ]);
 	}
 
 
@@ -341,7 +341,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `usertrue` is failed", $value ]);
+		throw new LogicException([ "Parsing `usertrue` is failed", $value ]);
 	}
 
 
@@ -354,7 +354,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `nan` is failed", $value ]);
+		throw new LogicException([ "Parsing `nan` is failed", $value ]);
 	}
 
 
@@ -367,7 +367,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `float_not_nan` is failed", $value ]);
+		throw new LogicException([ "Parsing `float_not_nan` is failed", $value ]);
 	}
 
 
@@ -380,7 +380,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_nan` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_nan` is failed", $value ]);
 	}
 
 
@@ -393,7 +393,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `finite` is failed", $value ]);
+		throw new LogicException([ "Parsing `finite` is failed", $value ]);
 	}
 
 
@@ -406,7 +406,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `float_not_finite` is failed", $value ]);
+		throw new LogicException([ "Parsing `float_not_finite` is failed", $value ]);
 	}
 
 
@@ -419,7 +419,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_finite` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_finite` is failed", $value ]);
 	}
 
 
@@ -432,7 +432,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `infinite` is failed", $value ]);
+		throw new LogicException([ "Parsing `infinite` is failed", $value ]);
 	}
 
 
@@ -445,7 +445,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `float_not_infinite` is failed", $value ]);
+		throw new LogicException([ "Parsing `float_not_infinite` is failed", $value ]);
 	}
 
 
@@ -458,7 +458,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_infinite` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_infinite` is failed", $value ]);
 	}
 
 
@@ -471,7 +471,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric` is failed", $value, $isAllowExp, $refs ]);
+		throw new LogicException([ "Parsing `numeric` is failed", $value, $isAllowExp, $refs ]);
 	}
 
 
@@ -484,7 +484,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_non_zero` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Parsing `numeric_non_zero` is failed", $value, $allowExp, $refs ]);
 	}
 
 
@@ -497,7 +497,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_non_negative` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Parsing `numeric_non_negative` is failed", $value, $allowExp, $refs ]);
 	}
 
 
@@ -510,7 +510,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_non_positive` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Parsing `numeric_non_positive` is failed", $value, $allowExp, $refs ]);
 	}
 
 
@@ -523,7 +523,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_negative` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Parsing `numeric_negative` is failed", $value, $allowExp, $refs ]);
 	}
 
 
@@ -536,7 +536,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_positive` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Parsing `numeric_positive` is failed", $value, $allowExp, $refs ]);
 	}
 
 
@@ -549,7 +549,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_int` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_int` is failed", $value, $refs ]);
 	}
 
 
@@ -562,7 +562,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_non_zero` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_int_non_zero` is failed", $value, $refs ]);
 	}
 
 
@@ -575,7 +575,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_non_negative` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_int_non_negative` is failed", $value, $refs ]);
 	}
 
 
@@ -588,7 +588,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_non_positive` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_int_non_positive` is failed", $value, $refs ]);
 	}
 
 
@@ -601,7 +601,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_negative` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_int_negative` is failed", $value, $refs ]);
 	}
 
 
@@ -614,7 +614,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_positive` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_int_positive` is failed", $value, $refs ]);
 	}
 
 
@@ -627,7 +627,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_positive_or_minus_one` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_int_positive_or_minus_one` is failed", $value, $refs ]);
 	}
 
 
@@ -640,7 +640,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_int_non_negative_or_minus_one` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_int_non_negative_or_minus_one` is failed", $value, $refs ]);
 	}
 
 
@@ -653,7 +653,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_float` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_float` is failed", $value, $refs ]);
 	}
 
 
@@ -666,7 +666,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_float_non_zero` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_float_non_zero` is failed", $value, $refs ]);
 	}
 
 
@@ -679,7 +679,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_float_non_negative` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_float_non_negative` is failed", $value, $refs ]);
 	}
 
 
@@ -692,7 +692,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_float_non_positive` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_float_non_positive` is failed", $value, $refs ]);
 	}
 
 
@@ -705,7 +705,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_float_negative` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_float_negative` is failed", $value, $refs ]);
 	}
 
 
@@ -718,7 +718,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `numeric_float_positive` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `numeric_float_positive` is failed", $value, $refs ]);
 	}
 
 
@@ -731,7 +731,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `decimal` is failed", $value, $scale, $refs ]);
+		throw new LogicException([ "Parsing `decimal` is failed", $value, $scale, $refs ]);
 	}
 
 
@@ -744,7 +744,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `decimal_non_zero` is failed", $value, $scale, $refs ]);
+		throw new LogicException([ "Parsing `decimal_non_zero` is failed", $value, $scale, $refs ]);
 	}
 
 
@@ -757,7 +757,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `decimal_non_negative` is failed", $value, $scale, $refs ]);
+		throw new LogicException([ "Parsing `decimal_non_negative` is failed", $value, $scale, $refs ]);
 	}
 
 
@@ -770,7 +770,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `decimal_non_positive` is failed", $value, $scale, $refs ]);
+		throw new LogicException([ "Parsing `decimal_non_positive` is failed", $value, $scale, $refs ]);
 	}
 
 
@@ -783,7 +783,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `decimal_negative` is failed", $value, $scale, $refs ]);
+		throw new LogicException([ "Parsing `decimal_negative` is failed", $value, $scale, $refs ]);
 	}
 
 
@@ -796,7 +796,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `decimal_positive` is failed", $value, $scale, $refs ]);
+		throw new LogicException([ "Parsing `decimal_positive` is failed", $value, $scale, $refs ]);
 	}
 
 
@@ -809,7 +809,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `num` is failed", $value ]);
+		throw new LogicException([ "Parsing `num` is failed", $value ]);
 	}
 
 
@@ -822,7 +822,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `num_non_zero` is failed", $value ]);
+		throw new LogicException([ "Parsing `num_non_zero` is failed", $value ]);
 	}
 
 
@@ -835,7 +835,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `num_non_negative` is failed", $value ]);
+		throw new LogicException([ "Parsing `num_non_negative` is failed", $value ]);
 	}
 
 
@@ -848,7 +848,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `num_non_positive` is failed", $value ]);
+		throw new LogicException([ "Parsing `num_non_positive` is failed", $value ]);
 	}
 
 
@@ -861,7 +861,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `num_negative` is failed", $value ]);
+		throw new LogicException([ "Parsing `num_negative` is failed", $value ]);
 	}
 
 
@@ -874,7 +874,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `num_positive` is failed", $value ]);
+		throw new LogicException([ "Parsing `num_positive` is failed", $value ]);
 	}
 
 
@@ -887,7 +887,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `int` is failed", $value ]);
+		throw new LogicException([ "Parsing `int` is failed", $value ]);
 	}
 
 
@@ -900,7 +900,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `int_non_zero` is failed", $value ]);
+		throw new LogicException([ "Parsing `int_non_zero` is failed", $value ]);
 	}
 
 
@@ -913,7 +913,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `int_non_negative` is failed", $value ]);
+		throw new LogicException([ "Parsing `int_non_negative` is failed", $value ]);
 	}
 
 
@@ -926,7 +926,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `int_non_positive` is failed", $value ]);
+		throw new LogicException([ "Parsing `int_non_positive` is failed", $value ]);
 	}
 
 
@@ -939,7 +939,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `int_negative` is failed", $value ]);
+		throw new LogicException([ "Parsing `int_negative` is failed", $value ]);
 	}
 
 
@@ -952,7 +952,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `int_positive` is failed", $value ]);
+		throw new LogicException([ "Parsing `int_positive` is failed", $value ]);
 	}
 
 
@@ -965,7 +965,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `int_positive_or_minus_one` is failed", $value ]);
+		throw new LogicException([ "Parsing `int_positive_or_minus_one` is failed", $value ]);
 	}
 
 
@@ -978,7 +978,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `int_non_negative_or_minus_one` is failed", $value ]);
+		throw new LogicException([ "Parsing `int_non_negative_or_minus_one` is failed", $value ]);
 	}
 
 
@@ -991,7 +991,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `float` is failed", $value ]);
+		throw new LogicException([ "Parsing `float` is failed", $value ]);
 	}
 
 
@@ -1004,7 +1004,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `float_non_zero` is failed", $value ]);
+		throw new LogicException([ "Parsing `float_non_zero` is failed", $value ]);
 	}
 
 
@@ -1017,7 +1017,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `float_non_negative` is failed", $value ]);
+		throw new LogicException([ "Parsing `float_non_negative` is failed", $value ]);
 	}
 
 
@@ -1030,7 +1030,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `float_non_positive` is failed", $value ]);
+		throw new LogicException([ "Parsing `float_non_positive` is failed", $value ]);
 	}
 
 
@@ -1043,7 +1043,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `float_negative` is failed", $value ]);
+		throw new LogicException([ "Parsing `float_negative` is failed", $value ]);
 	}
 
 
@@ -1056,7 +1056,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `float_positive` is failed", $value ]);
+		throw new LogicException([ "Parsing `float_positive` is failed", $value ]);
 	}
 
 
@@ -1069,7 +1069,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `number` is failed", $value, $allowExp ]);
+		throw new LogicException([ "Parsing `number` is failed", $value, $allowExp ]);
 	}
 
 
@@ -1082,7 +1082,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `bcnumber` is failed", $value ]);
+		throw new LogicException([ "Parsing `bcnumber` is failed", $value ]);
 	}
 
 
@@ -1095,7 +1095,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `a_string` is failed", $value ]);
+		throw new LogicException([ "Parsing `a_string` is failed", $value ]);
 	}
 
 
@@ -1108,7 +1108,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `a_string_empty` is failed", $value ]);
+		throw new LogicException([ "Parsing `a_string_empty` is failed", $value ]);
 	}
 
 
@@ -1121,7 +1121,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `a_string_not_empty` is failed", $value ]);
+		throw new LogicException([ "Parsing `a_string_not_empty` is failed", $value ]);
 	}
 
 
@@ -1134,7 +1134,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `a_trim` is failed", $value ]);
+		throw new LogicException([ "Parsing `a_trim` is failed", $value ]);
 	}
 
 
@@ -1147,7 +1147,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `string` is failed", $value ]);
+		throw new LogicException([ "Parsing `string` is failed", $value ]);
 	}
 
 
@@ -1160,7 +1160,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `string_empty` is failed", $value ]);
+		throw new LogicException([ "Parsing `string_empty` is failed", $value ]);
 	}
 
 
@@ -1173,7 +1173,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `string_not_empty` is failed", $value ]);
+		throw new LogicException([ "Parsing `string_not_empty` is failed", $value ]);
 	}
 
 
@@ -1186,7 +1186,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `trim` is failed", $value, $characters ]);
+		throw new LogicException([ "Parsing `trim` is failed", $value, $characters ]);
 	}
 
 
@@ -1199,7 +1199,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `char` is failed", $value ]);
+		throw new LogicException([ "Parsing `char` is failed", $value ]);
 	}
 
 
@@ -1212,7 +1212,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `letter` is failed", $value ]);
+		throw new LogicException([ "Parsing `letter` is failed", $value ]);
 	}
 
 
@@ -1225,7 +1225,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `alphabet` is failed", $value ]);
+		throw new LogicException([ "Parsing `alphabet` is failed", $value ]);
 	}
 
 
@@ -1238,7 +1238,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `ctype_digit` is failed", $value ]);
+		throw new LogicException([ "Parsing `ctype_digit` is failed", $value ]);
 	}
 
 
@@ -1251,7 +1251,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `ctype_alpha` is failed", $value, $isIgnoreCase ]);
+		throw new LogicException([ "Parsing `ctype_alpha` is failed", $value, $isIgnoreCase ]);
 	}
 
 
@@ -1264,7 +1264,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `ctype_alnum` is failed", $value, $isIgnoreCase ]);
+		throw new LogicException([ "Parsing `ctype_alnum` is failed", $value, $isIgnoreCase ]);
 	}
 
 
@@ -1277,7 +1277,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `base` is failed", $value, $alphabet ]);
+		throw new LogicException([ "Parsing `base` is failed", $value, $alphabet ]);
 	}
 
 
@@ -1290,7 +1290,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `base_bin` is failed", $value ]);
+		throw new LogicException([ "Parsing `base_bin` is failed", $value ]);
 	}
 
 
@@ -1303,7 +1303,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `base_oct` is failed", $value ]);
+		throw new LogicException([ "Parsing `base_oct` is failed", $value ]);
 	}
 
 
@@ -1316,7 +1316,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `base_dec` is failed", $value ]);
+		throw new LogicException([ "Parsing `base_dec` is failed", $value ]);
 	}
 
 
@@ -1329,7 +1329,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `base_hex` is failed", $value ]);
+		throw new LogicException([ "Parsing `base_hex` is failed", $value ]);
 	}
 
 
@@ -1342,7 +1342,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `array_empty` is failed", $value ]);
+		throw new LogicException([ "Parsing `array_empty` is failed", $value ]);
 	}
 
 
@@ -1355,7 +1355,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `array_not_empty` is failed", $value ]);
+		throw new LogicException([ "Parsing `array_not_empty` is failed", $value ]);
 	}
 
 
@@ -1368,7 +1368,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_array_empty` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_array_empty` is failed", $value ]);
 	}
 
 
@@ -1381,7 +1381,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `key_exists` is failed", $value, $key ]);
+		throw new LogicException([ "Parsing `key_exists` is failed", $value, $key ]);
 	}
 
 
@@ -1394,7 +1394,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `array_plain` is failed", $value ]);
+		throw new LogicException([ "Parsing `array_plain` is failed", $value ]);
 	}
 
 
@@ -1407,7 +1407,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `list` is failed", $value, $isPlain ]);
+		throw new LogicException([ "Parsing `list` is failed", $value, $isPlain ]);
 	}
 
 
@@ -1420,7 +1420,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `list_sorted` is failed", $value, $isPlain ]);
+		throw new LogicException([ "Parsing `list_sorted` is failed", $value, $isPlain ]);
 	}
 
 
@@ -1433,7 +1433,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `dict` is failed", $value, $isPlain ]);
+		throw new LogicException([ "Parsing `dict` is failed", $value, $isPlain ]);
 	}
 
 
@@ -1446,7 +1446,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `dict_sorted` is failed", $value, $isPlain ]);
+		throw new LogicException([ "Parsing `dict_sorted` is failed", $value, $isPlain ]);
 	}
 
 
@@ -1459,7 +1459,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `table` is failed", $value ]);
+		throw new LogicException([ "Parsing `table` is failed", $value ]);
 	}
 
 
@@ -1472,7 +1472,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `matrix` is failed", $value ]);
+		throw new LogicException([ "Parsing `matrix` is failed", $value ]);
 	}
 
 
@@ -1485,7 +1485,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `matrix_strict` is failed", $value ]);
+		throw new LogicException([ "Parsing `matrix_strict` is failed", $value ]);
 	}
 
 
@@ -1498,7 +1498,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `arrpath` is failed", $path, $dot ]);
+		throw new LogicException([ "Parsing `arrpath` is failed", $path, $dot ]);
 	}
 
 
@@ -1511,7 +1511,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `array_of_type` is failed", $value, $type ]);
+		throw new LogicException([ "Parsing `array_of_type` is failed", $value, $type ]);
 	}
 
 
@@ -1524,7 +1524,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `array_of_resource_type` is failed", $value, $resourceType ]);
+		throw new LogicException([ "Parsing `array_of_resource_type` is failed", $value, $resourceType ]);
 	}
 
 
@@ -1541,7 +1541,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `array_of_a` is failed", $value, $className ]);
+		throw new LogicException([ "Parsing `array_of_a` is failed", $value, $className ]);
 	}
 
 
@@ -1558,7 +1558,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `array_of_class` is failed", $value, $className ]);
+		throw new LogicException([ "Parsing `array_of_class` is failed", $value, $className ]);
 	}
 
 
@@ -1575,7 +1575,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `array_of_subclass` is failed", $value, $className ]);
+		throw new LogicException([ "Parsing `array_of_subclass` is failed", $value, $className ]);
 	}
 
 
@@ -1588,7 +1588,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `array_of_callback` is failed", $value, $fn, $args ]);
+		throw new LogicException([ "Parsing `array_of_callback` is failed", $value, $fn, $args ]);
 	}
 
 
@@ -1601,7 +1601,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `regex` is failed", $value ]);
+		throw new LogicException([ "Parsing `regex` is failed", $value ]);
 	}
 
 
@@ -1614,7 +1614,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `address_ip` is failed", $value ]);
+		throw new LogicException([ "Parsing `address_ip` is failed", $value ]);
 	}
 
 
@@ -1627,7 +1627,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `address_ip_v4` is failed", $value ]);
+		throw new LogicException([ "Parsing `address_ip_v4` is failed", $value ]);
 	}
 
 
@@ -1640,7 +1640,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `address_ip_v6` is failed", $value ]);
+		throw new LogicException([ "Parsing `address_ip_v6` is failed", $value ]);
 	}
 
 
@@ -1653,7 +1653,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `address_mac` is failed", $value ]);
+		throw new LogicException([ "Parsing `address_mac` is failed", $value ]);
 	}
 
 
@@ -1666,7 +1666,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `subnet` is failed", $value, $ipFallback ]);
+		throw new LogicException([ "Parsing `subnet` is failed", $value, $ipFallback ]);
 	}
 
 
@@ -1679,7 +1679,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `subnet_v4` is failed", $value, $ipFallback ]);
+		throw new LogicException([ "Parsing `subnet_v4` is failed", $value, $ipFallback ]);
 	}
 
 
@@ -1692,7 +1692,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `subnet_v6` is failed", $value, $ipFallback ]);
+		throw new LogicException([ "Parsing `subnet_v6` is failed", $value, $ipFallback ]);
 	}
 
 
@@ -1705,7 +1705,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `url` is failed", $value, $query, $fragment, $refs ]);
+		throw new LogicException([ "Parsing `url` is failed", $value, $query, $fragment, $refs ]);
 	}
 
 
@@ -1718,7 +1718,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `host` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `host` is failed", $value, $refs ]);
 	}
 
 
@@ -1731,7 +1731,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `link` is failed", $value, $query, $fragment, $refs ]);
+		throw new LogicException([ "Parsing `link` is failed", $value, $query, $fragment, $refs ]);
 	}
 
 
@@ -1744,7 +1744,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `uuid` is failed", $value ]);
+		throw new LogicException([ "Parsing `uuid` is failed", $value ]);
 	}
 
 
@@ -1757,7 +1757,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `countable` is failed", $value ]);
+		throw new LogicException([ "Parsing `countable` is failed", $value ]);
 	}
 
 
@@ -1770,7 +1770,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `countable_object` is failed", $value ]);
+		throw new LogicException([ "Parsing `countable_object` is failed", $value ]);
 	}
 
 
@@ -1783,7 +1783,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `sizeable` is failed", $value ]);
+		throw new LogicException([ "Parsing `sizeable` is failed", $value ]);
 	}
 
 
@@ -1796,7 +1796,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `timezone` is failed", $timezone, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Parsing `timezone` is failed", $timezone, $allowedTimezoneTypes ]);
 	}
 
 
@@ -1809,7 +1809,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `timezone_offset` is failed", $timezoneOrOffset ]);
+		throw new LogicException([ "Parsing `timezone_offset` is failed", $timezoneOrOffset ]);
 	}
 
 
@@ -1822,7 +1822,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `timezone_abbr` is failed", $timezoneOrAbbr ]);
+		throw new LogicException([ "Parsing `timezone_abbr` is failed", $timezoneOrAbbr ]);
 	}
 
 
@@ -1835,7 +1835,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `timezone_name` is failed", $timezoneOrName ]);
+		throw new LogicException([ "Parsing `timezone_name` is failed", $timezoneOrName ]);
 	}
 
 
@@ -1848,7 +1848,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `timezone_nameabbr` is failed", $timezoneOrNameOrAbbr ]);
+		throw new LogicException([ "Parsing `timezone_nameabbr` is failed", $timezoneOrNameOrAbbr ]);
 	}
 
 
@@ -1861,7 +1861,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `date` is failed", $datestring, $timezoneFallback ]);
+		throw new LogicException([ "Parsing `date` is failed", $datestring, $timezoneFallback ]);
 	}
 
 
@@ -1874,7 +1874,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `adate` is failed", $datestring, $timezoneFallback ]);
+		throw new LogicException([ "Parsing `adate` is failed", $datestring, $timezoneFallback ]);
 	}
 
 
@@ -1887,7 +1887,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `idate` is failed", $datestring, $timezoneFallback ]);
+		throw new LogicException([ "Parsing `idate` is failed", $datestring, $timezoneFallback ]);
 	}
 
 
@@ -1900,7 +1900,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `date_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
+		throw new LogicException([ "Parsing `date_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
 	}
 
 
@@ -1913,7 +1913,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `adate_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
+		throw new LogicException([ "Parsing `adate_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
 	}
 
 
@@ -1926,7 +1926,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `idate_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
+		throw new LogicException([ "Parsing `idate_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
 	}
 
 
@@ -1939,7 +1939,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `date_tz` is failed", $datestring, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Parsing `date_tz` is failed", $datestring, $allowedTimezoneTypes ]);
 	}
 
 
@@ -1952,7 +1952,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `adate_tz` is failed", $datestring, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Parsing `adate_tz` is failed", $datestring, $allowedTimezoneTypes ]);
 	}
 
 
@@ -1965,7 +1965,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `idate_tz` is failed", $datestring, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Parsing `idate_tz` is failed", $datestring, $allowedTimezoneTypes ]);
 	}
 
 
@@ -1978,7 +1978,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `date_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Parsing `date_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
 	}
 
 
@@ -1991,7 +1991,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `adate_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Parsing `adate_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
 	}
 
 
@@ -2004,7 +2004,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `idate_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
+		throw new LogicException([ "Parsing `idate_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
 	}
 
 
@@ -2017,7 +2017,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `date_microtime` is failed", $microtime, $timezoneSet ]);
+		throw new LogicException([ "Parsing `date_microtime` is failed", $microtime, $timezoneSet ]);
 	}
 
 
@@ -2030,7 +2030,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `adate_microtime` is failed", $microtime, $timezoneSet ]);
+		throw new LogicException([ "Parsing `adate_microtime` is failed", $microtime, $timezoneSet ]);
 	}
 
 
@@ -2043,7 +2043,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `idate_microtime` is failed", $microtime, $timezoneSet ]);
+		throw new LogicException([ "Parsing `idate_microtime` is failed", $microtime, $timezoneSet ]);
 	}
 
 
@@ -2056,7 +2056,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `interval` is failed", $interval ]);
+		throw new LogicException([ "Parsing `interval` is failed", $interval ]);
 	}
 
 
@@ -2069,7 +2069,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `interval_duration` is failed", $duration ]);
+		throw new LogicException([ "Parsing `interval_duration` is failed", $duration ]);
 	}
 
 
@@ -2082,7 +2082,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `interval_datestring` is failed", $datestring ]);
+		throw new LogicException([ "Parsing `interval_datestring` is failed", $datestring ]);
 	}
 
 
@@ -2095,7 +2095,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `interval_microtime` is failed", $microtime ]);
+		throw new LogicException([ "Parsing `interval_microtime` is failed", $microtime ]);
 	}
 
 
@@ -2108,7 +2108,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `interval_ago` is failed", $date, $from, $reverse ]);
+		throw new LogicException([ "Parsing `interval_ago` is failed", $date, $from, $reverse ]);
 	}
 
 
@@ -2125,7 +2125,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `struct_exists` is failed", $value, $flags ]);
+		throw new LogicException([ "Parsing `struct_exists` is failed", $value, $flags ]);
 	}
 
 
@@ -2142,7 +2142,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `struct` is failed", $value, $flags ]);
+		throw new LogicException([ "Parsing `struct` is failed", $value, $flags ]);
 	}
 
 
@@ -2159,7 +2159,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `struct_class` is failed", $value, $flags ]);
+		throw new LogicException([ "Parsing `struct_class` is failed", $value, $flags ]);
 	}
 
 
@@ -2172,7 +2172,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `struct_interface` is failed", $value, $flags ]);
+		throw new LogicException([ "Parsing `struct_interface` is failed", $value, $flags ]);
 	}
 
 
@@ -2185,7 +2185,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `struct_trait` is failed", $value, $flags ]);
+		throw new LogicException([ "Parsing `struct_trait` is failed", $value, $flags ]);
 	}
 
 
@@ -2202,7 +2202,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `struct_enum` is failed", $value, $flags ]);
+		throw new LogicException([ "Parsing `struct_enum` is failed", $value, $flags ]);
 	}
 
 
@@ -2219,7 +2219,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `struct_fqcn` is failed", $value, $flags ]);
+		throw new LogicException([ "Parsing `struct_fqcn` is failed", $value, $flags ]);
 	}
 
 
@@ -2232,7 +2232,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `struct_namespace` is failed", $value, $flags ]);
+		throw new LogicException([ "Parsing `struct_namespace` is failed", $value, $flags ]);
 	}
 
 
@@ -2245,7 +2245,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `struct_basename` is failed", $value, $flags ]);
+		throw new LogicException([ "Parsing `struct_basename` is failed", $value, $flags ]);
 	}
 
 
@@ -2258,7 +2258,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `resource` is failed", $value ]);
+		throw new LogicException([ "Parsing `resource` is failed", $value ]);
 	}
 
 
@@ -2271,7 +2271,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `any_not_resource` is failed", $value ]);
+		throw new LogicException([ "Parsing `any_not_resource` is failed", $value ]);
 	}
 
 
@@ -2284,7 +2284,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `resource_opened` is failed", $value ]);
+		throw new LogicException([ "Parsing `resource_opened` is failed", $value ]);
 	}
 
 
@@ -2297,7 +2297,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `resource_closed` is failed", $value ]);
+		throw new LogicException([ "Parsing `resource_closed` is failed", $value ]);
 	}
 
 
@@ -2315,7 +2315,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `enum_case` is failed", $value, $enumClass ]);
+		throw new LogicException([ "Parsing `enum_case` is failed", $value, $enumClass ]);
 	}
 
 
@@ -2328,7 +2328,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `method_array` is failed", $value ]);
+		throw new LogicException([ "Parsing `method_array` is failed", $value ]);
 	}
 
 
@@ -2343,7 +2343,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `method_string` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `method_string` is failed", $value, $refs ]);
 	}
 
 
@@ -2358,7 +2358,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable` is failed", $value, $newScope ]);
+		throw new LogicException([ "Parsing `callable` is failed", $value, $newScope ]);
 	}
 
 
@@ -2371,7 +2371,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable_object` is failed", $value, $newScope ]);
+		throw new LogicException([ "Parsing `callable_object` is failed", $value, $newScope ]);
 	}
 
 
@@ -2384,7 +2384,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable_object_closure` is failed", $value, $newScope ]);
+		throw new LogicException([ "Parsing `callable_object_closure` is failed", $value, $newScope ]);
 	}
 
 
@@ -2397,7 +2397,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable_object_invokable` is failed", $value, $newScope ]);
+		throw new LogicException([ "Parsing `callable_object_invokable` is failed", $value, $newScope ]);
 	}
 
 
@@ -2412,7 +2412,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable_array` is failed", $value, $newScope ]);
+		throw new LogicException([ "Parsing `callable_array` is failed", $value, $newScope ]);
 	}
 
 
@@ -2427,7 +2427,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable_array_method` is failed", $value, $newScope ]);
+		throw new LogicException([ "Parsing `callable_array_method` is failed", $value, $newScope ]);
 	}
 
 
@@ -2442,7 +2442,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable_array_method_static` is failed", $value, $newScope ]);
+		throw new LogicException([ "Parsing `callable_array_method_static` is failed", $value, $newScope ]);
 	}
 
 
@@ -2457,7 +2457,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable_array_method_non_static` is failed", $value, $newScope ]);
+		throw new LogicException([ "Parsing `callable_array_method_non_static` is failed", $value, $newScope ]);
 	}
 
 
@@ -2470,7 +2470,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable_string` is failed", $value, $newScope ]);
+		throw new LogicException([ "Parsing `callable_string` is failed", $value, $newScope ]);
 	}
 
 
@@ -2483,7 +2483,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable_string_function` is failed", $value ]);
+		throw new LogicException([ "Parsing `callable_string_function` is failed", $value ]);
 	}
 
 
@@ -2496,7 +2496,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable_string_function_internal` is failed", $value ]);
+		throw new LogicException([ "Parsing `callable_string_function_internal` is failed", $value ]);
 	}
 
 
@@ -2509,7 +2509,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable_string_function_non_internal` is failed", $value ]);
+		throw new LogicException([ "Parsing `callable_string_function_non_internal` is failed", $value ]);
 	}
 
 
@@ -2522,7 +2522,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `callable_string_method_static` is failed", $value, $newScope ]);
+		throw new LogicException([ "Parsing `callable_string_method_static` is failed", $value, $newScope ]);
 	}
 
 
@@ -2540,7 +2540,22 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `ref` is failed", $key, $refs, $set ]);
+		throw new LogicException([ "Parsing `ref` is failed", $key, $refs, $set ]);
+	}
+
+
+	/**
+	 * @param string   $value
+	 *
+	 * @return int|null
+	 */
+	public function chmod($value)
+	{
+		if (Lib::type()->chmod($result, $value)) {
+		    return $result;
+		}
+
+		throw new LogicException([ "Parsing `chmod` is failed", $value ]);
 	}
 
 
@@ -2555,7 +2570,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `path` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `path` is failed", $value, $refs ]);
 	}
 
 
@@ -2570,7 +2585,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `realpath` is failed", $value, $allowSymlink, $refs ]);
+		throw new LogicException([ "Parsing `realpath` is failed", $value, $allowSymlink, $refs ]);
 	}
 
 
@@ -2585,7 +2600,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `freepath` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `freepath` is failed", $value, $refs ]);
 	}
 
 
@@ -2600,7 +2615,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `dirpath` is failed", $value, $allowExists, $allowSymlink, $refs ]);
+		throw new LogicException([ "Parsing `dirpath` is failed", $value, $allowExists, $allowSymlink, $refs ]);
 	}
 
 
@@ -2613,7 +2628,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `filepath` is failed", $value, $allowExists, $allowSymlink, $refs ]);
+		throw new LogicException([ "Parsing `filepath` is failed", $value, $allowExists, $allowSymlink, $refs ]);
 	}
 
 
@@ -2628,7 +2643,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `dirpath_realpath` is failed", $value, $allowSymlink, $refs ]);
+		throw new LogicException([ "Parsing `dirpath_realpath` is failed", $value, $allowSymlink, $refs ]);
 	}
 
 
@@ -2643,7 +2658,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `filepath_realpath` is failed", $value, $allowSymlink, $refs ]);
+		throw new LogicException([ "Parsing `filepath_realpath` is failed", $value, $allowSymlink, $refs ]);
 	}
 
 
@@ -2656,7 +2671,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `filename` is failed", $value ]);
+		throw new LogicException([ "Parsing `filename` is failed", $value ]);
 	}
 
 
@@ -2669,7 +2684,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `file` is failed", $value, $extensions, $mimeTypes, $filters ]);
+		throw new LogicException([ "Parsing `file` is failed", $value, $extensions, $mimeTypes, $filters ]);
 	}
 
 
@@ -2682,7 +2697,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `image` is failed", $value, $extensions, $mimeTypes, $filters ]);
+		throw new LogicException([ "Parsing `image` is failed", $value, $extensions, $mimeTypes, $filters ]);
 	}
 
 
@@ -2695,7 +2710,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `email` is failed", $value, $filters, $refs ]);
+		throw new LogicException([ "Parsing `email` is failed", $value, $filters, $refs ]);
 	}
 
 
@@ -2708,7 +2723,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `email_fake` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `email_fake` is failed", $value, $refs ]);
 	}
 
 
@@ -2721,7 +2736,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `email_non_fake` is failed", $value, $filters, $refs ]);
+		throw new LogicException([ "Parsing `email_non_fake` is failed", $value, $filters, $refs ]);
 	}
 
 
@@ -2734,7 +2749,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `phone` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `phone` is failed", $value, $refs ]);
 	}
 
 
@@ -2747,7 +2762,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `phone_fake` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `phone_fake` is failed", $value, $refs ]);
 	}
 
 
@@ -2760,7 +2775,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `phone_non_fake` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `phone_non_fake` is failed", $value, $refs ]);
 	}
 
 
@@ -2773,7 +2788,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `phone_real` is failed", $value, $region, $refs ]);
+		throw new LogicException([ "Parsing `phone_real` is failed", $value, $region, $refs ]);
 	}
 
 
@@ -2786,7 +2801,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `tel` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `tel` is failed", $value, $refs ]);
 	}
 
 
@@ -2799,7 +2814,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `tel_fake` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `tel_fake` is failed", $value, $refs ]);
 	}
 
 
@@ -2812,7 +2827,7 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `tel_non_fake` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `tel_non_fake` is failed", $value, $refs ]);
 	}
 
 
@@ -2825,6 +2840,6 @@ class ParseThrowModule
 		    return $result;
 		}
 
-		throw new LogicException([ "Filter `tel_real` is failed", $value, $region, $refs ]);
+		throw new LogicException([ "Parsing `tel_real` is failed", $value, $region, $refs ]);
 	}
 }

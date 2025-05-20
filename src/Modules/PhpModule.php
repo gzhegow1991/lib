@@ -30,6 +30,10 @@ class PhpModule
      * @var class-string<\LogicException|\RuntimeException>
      */
     protected $throwableClass = RuntimeException::class;
+    /**
+     * @var int
+     */
+    protected $poolingTickUsleep = 1000;
 
 
     public function newCallableParser() : CallableParserInterface
@@ -65,6 +69,66 @@ class PhpModule
     public function the_timezone_nil() : \DateTimeZone
     {
         return new \DateTimeZone('+1234');
+    }
+
+
+    /**
+     * @param class-string<\LogicException|\RuntimeException>|null $throwable_class
+     *
+     * @return class-string<\LogicException|\RuntimeException>
+     */
+    public function static_throwable_class(?string $throwable_class = null) : string
+    {
+        if (null !== $throwable_class) {
+            if (! (
+                is_subclass_of($throwable_class, \LogicException::class)
+                || is_subclass_of($throwable_class, \RuntimeException::class)
+            )) {
+                throw new LogicException(
+                    [
+                        ''
+                        . 'The `throwableClass` should be class-string that is subclass one of: '
+                        . implode('|', [
+                            \LogicException::class,
+                            \RuntimeException::class,
+                        ]),
+                        //
+                        $throwable_class,
+                    ]
+                );
+            }
+
+            $last = $this->throwableClass;
+
+            $this->throwableClass = $throwable_class;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->throwableClass ?? RuntimeException::class;
+
+        return $result;
+    }
+
+    public function static_pooling_tick_usleep(?int $pooling_tick_usleep = null) : int
+    {
+        if (null !== $pooling_tick_usleep) {
+            if ($pooling_tick_usleep < 1) {
+                throw new LogicException(
+                    [ 'The `pooling_tick_usleep` should be positive integer', $pooling_tick_usleep ]
+                );
+            }
+
+            $last = $this->poolingTickUsleep;
+
+            $this->poolingTickUsleep = $pooling_tick_usleep;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->poolingTickUsleep ?? 1000;
+
+        return $result;
     }
 
 
@@ -266,7 +330,6 @@ class PhpModule
 
         $isExists = null;
 
-        $class = null;
         if (is_object($value)) {
             $class = get_class($value);
 
@@ -1687,7 +1750,7 @@ class PhpModule
 
                 $dirname = str_replace('/', $separatorString, $dirname);
 
-                $dirname = ('' !== $dirname) ? $dirname : null;
+                $dirname = ('.' !== $dirname) ? $dirname : null;
             }
 
             $pi[ 'dirname' ] = $dirname;
@@ -1781,7 +1844,7 @@ class PhpModule
             $dirname = str_replace('/', $separatorString, $dirname);
         }
 
-        return ('' !== $dirname) ? $dirname : null;
+        return ('.' !== $dirname) ? $dirname : null;
     }
 
     public function basename(string $path, ?string $extension = null) : ?string
@@ -1826,6 +1889,29 @@ class PhpModule
         return ('' !== $filename) ? $filename : null;
     }
 
+    public function fname(string $path, ?string $dot = null) : ?string
+    {
+        if ('' === $path) {
+            throw new LogicException(
+                [ 'The `path` should be non-empty string' ]
+            );
+        }
+
+        if (! Lib::type()->char($dotString, $dot ?? '.')) {
+            throw new LogicException(
+                [ 'The `dot` should be char', $dot ]
+            );
+        }
+
+        $normalized = $this->path_normalize($path, '/');
+
+        $basename = basename($normalized);
+
+        [ $file ] = explode($dotString, $basename, 2);
+
+        return ('' !== $file) ? $file : null;
+    }
+
     public function extension(string $path, ?string $dot = null) : ?string
     {
         if ('' === $path) {
@@ -1849,29 +1935,6 @@ class PhpModule
         $extension = end($split);
 
         return ('' !== $extension) ? $extension : null;
-    }
-
-    public function file(string $path, ?string $dot = null) : ?string
-    {
-        if ('' === $path) {
-            throw new LogicException(
-                [ 'The `path` should be non-empty string' ]
-            );
-        }
-
-        if (! Lib::type()->char($dotString, $dot ?? '.')) {
-            throw new LogicException(
-                [ 'The `dot` should be char', $dot ]
-            );
-        }
-
-        $normalized = $this->path_normalize($path, '/');
-
-        $basename = basename($normalized);
-
-        [ $file ] = explode($dotString, $basename, 2);
-
-        return ('' !== $file) ? $file : null;
     }
 
     public function extensions(string $path, ?string $dot = null) : ?string
@@ -2205,44 +2268,6 @@ class PhpModule
     }
 
 
-    /**
-     * @param class-string<\LogicException|\RuntimeException>|null $throwableClass
-     *
-     * @return class-string<\LogicException|\RuntimeException>
-     */
-    public function static_throwable_class(?string $throwableClass = null) : string
-    {
-        if (null !== $throwableClass) {
-            if (! (
-                is_subclass_of($throwableClass, \LogicException::class)
-                || is_subclass_of($throwableClass, \RuntimeException::class)
-            )) {
-                throw new LogicException(
-                    [
-                        ''
-                        . 'The `throwableClass` should be class-string that is subclass one of: '
-                        . implode('|', [
-                            \LogicException::class,
-                            \RuntimeException::class,
-                        ]),
-                        //
-                        $throwableClass,
-                    ]
-                );
-            }
-
-            $last = $this->throwableClass;
-
-            $current = $throwableClass;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->throwableClass;
-
-        return $result;
-    }
-
     public function throwable_args(...$throwableArgs) : array
     {
         $len = count($throwableArgs);
@@ -2450,5 +2475,58 @@ class PhpModule
         }
 
         return;
+    }
+
+
+    /**
+     * @return mixed|false
+     */
+    public function poolingSync(?int $tickUsleep, ?int $timeoutMs, \Closure $fn)
+    {
+        $tickUsleep = $tickUsleep ?? $this->static_pooling_tick_usleep();
+
+        if ($tickUsleep <= 0) {
+            throw new LogicException(
+                [ 'The `tickUsleep` should be integer positive', $tickUsleep ]
+            );
+        }
+
+        if (! ((null === $timeoutMs) || ($timeoutMs >= 0))) {
+            throw new LogicException(
+                [ 'The `timeoutMs` should be integer non-negative or be null', $timeoutMs ]
+            );
+        }
+
+        $timeoutMicrotime = null;
+        if (null !== $timeoutMs) {
+            $timeoutMicrotime = microtime(true) + ($timeoutMs / 1000);
+        }
+
+        $errors = [];
+
+        do {
+            $result = [];
+
+            try {
+                call_user_func_array($fn, [ &$result, &$errors, &$timeoutMicrotime ]);
+            }
+            catch ( \Throwable $e ) {
+                $errors[] = $e;
+            }
+
+            if (is_array($result) && array_key_exists(0, $result)) {
+                return $result[ 0 ];
+            }
+
+            if (null !== $timeoutMicrotime) {
+                if (microtime(true) > $timeoutMicrotime) {
+                    break;
+                }
+            }
+
+            usleep($tickUsleep);
+        } while ( true );
+
+        return false;
     }
 }

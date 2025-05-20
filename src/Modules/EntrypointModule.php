@@ -23,6 +23,10 @@ class EntrypointModule
      * @var int
      */
     protected $timeLimit = 30;
+    /**
+     * @var int
+     */
+    protected $umask = 0002;
 
     /**
      * @var int
@@ -97,6 +101,10 @@ class EntrypointModule
      */
     public function setMemoryLimit(?string $memoryLimit = null)
     {
+        if (null !== $memoryLimit) {
+            Lib::format()->bytes_decode($memoryLimit, []);
+        }
+
         $this->memoryLimit = $memoryLimit;
 
         return $this;
@@ -131,6 +139,10 @@ class EntrypointModule
      */
     public function setTimeLimit(?int $timeLimit = null)
     {
+        if (null !== $timeLimit) {
+            Lib::parse($pt) && $pt->int_non_negative($timeLimit);
+        }
+
         $this->timeLimit = $timeLimit;
 
         return $this;
@@ -146,7 +158,50 @@ class EntrypointModule
         }
 
         $last = ini_set('max_execution_time', $this->timeLimit);
+
         set_time_limit($this->timeLimit);
+
+        return $this;
+    }
+
+
+    public function getPhpUmask(int $umaskTmp = 0002) : string
+    {
+        $before = umask($umaskTmp);
+
+        umask($before);
+
+        return $before;
+    }
+
+    /**
+     * @return static
+     */
+    public function setUmask(?int $umask = null)
+    {
+        if (null !== $umask) {
+            if (! (($umask >= 0) && ($umask <= 0777))) {
+                throw new LogicException(
+                    [ 'The `umask` should be valid umask', $umask ]
+                );
+            }
+        }
+
+        $this->umask = $umask;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useUmask(&$last = null)
+    {
+        if (null === $this->umask) {
+            return $this;
+        }
+
+        $last = umask($this->umask);
 
         return $this;
     }
@@ -335,27 +390,14 @@ class EntrypointModule
 
         $messageLines = $tManager->getPreviousMessagesLines(
             $throwable,
-            [
-                'dir_root'       => $this->dirRoot,
-                //
-                'with_code'      => true,
-                //
-                'with_file'      => true,
-                'with_file_line' => true,
-                //
-                'with_object'    => true,
-                'with_object_id' => false,
-                //
-                'with_parents'   => true,
-            ]
+            0
+            | _DEBUG_THROWABLE_WITH_CODE
+            | _DEBUG_THROWABLE_WITH_FILE
+            | _DEBUG_THROWABLE_WITH_OBJECT_CLASS
+            | _DEBUG_THROWABLE_WITH_PARENTS
         );
 
-        $traceLines = $tManager->getThrowableTraceLines(
-            $throwable,
-            [
-                'dir_root' => $this->dirRoot,
-            ]
-        );
+        $traceLines = $tManager->getThrowableTraceLines($throwable);
 
         if ([] !== $messageLines) {
             foreach ( $messageLines as $line ) {

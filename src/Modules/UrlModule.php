@@ -93,11 +93,9 @@ class UrlModule
     ) : ?string
     {
         $withParseUrl = array_key_exists(0, $refs);
-
         if ($withParseUrl) {
             $refParseUrl =& $refs[ 0 ];
         }
-
         $refParseUrl = null;
 
         $hasQuery = (null !== $query);
@@ -208,11 +206,9 @@ class UrlModule
     ) : ?string
     {
         $withParseUrl = array_key_exists(0, $refs);
-
         if ($withParseUrl) {
             $refParseUrl =& $refs[ 0 ];
         }
-
         $refParseUrl = null;
 
         if ('' === $url) {
@@ -266,11 +262,9 @@ class UrlModule
     ) : ?string
     {
         $withParseUrl = array_key_exists(0, $refs);
-
         if ($withParseUrl) {
             $refParseUrl =& $refs[ 0 ];
         }
-
         $refParseUrl = null;
 
         $hasQuery = (null !== $query);

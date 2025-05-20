@@ -33,10 +33,10 @@ class JsonModule
     }
 
 
-    public function static_json_depth(?int $jsonDepth = null) : int
+    public function static_json_depth(?int $json_depth = null) : int
     {
-        if (null !== $jsonDepth) {
-            if ($jsonDepth < 0) {
+        if (null !== $json_depth) {
+            if ($json_depth < 0) {
                 throw new LogicException(
                     'The `jsonDepth` must be non-negative integer'
                 );
@@ -44,20 +44,20 @@ class JsonModule
 
             $last = $this->jsonDepth;
 
-            $this->jsonDepth = $jsonDepth;
+            $this->jsonDepth = $json_depth;
 
             $result = $last;
         }
 
-        $result = $result ?? $this->jsonDepth;
+        $result = $result ?? $this->jsonDepth ?? 512;
 
         return $result;
     }
 
-    public function static_json_encode_flags(?int $jsonEncodeFlags = null) : int
+    public function static_json_encode_flags(?int $json_encode_flags = null) : int
     {
-        if (null !== $jsonEncodeFlags) {
-            if ($jsonEncodeFlags < 0) {
+        if (null !== $json_encode_flags) {
+            if ($json_encode_flags < 0) {
                 throw new LogicException(
                     'The `jsonEncodeFlags` must be non-negative integer'
                 );
@@ -65,20 +65,20 @@ class JsonModule
 
             $last = $this->jsonEncodeFlags;
 
-            $this->jsonEncodeFlags = $jsonEncodeFlags;
+            $this->jsonEncodeFlags = $json_encode_flags;
 
             $result = $last;
         }
 
-        $result = $result ?? $this->jsonEncodeFlags;
+        $result = $result ?? $this->jsonEncodeFlags ?? 0;
 
         return $result;
     }
 
-    public function static_json_decode_flags(?int $jsonDecodeFlags = null) : int
+    public function static_json_decode_flags(?int $json_decode_flags = null) : int
     {
-        if (null !== $jsonDecodeFlags) {
-            if ($jsonDecodeFlags < 0) {
+        if (null !== $json_decode_flags) {
+            if ($json_decode_flags < 0) {
                 throw new LogicException(
                     'The `jsonDecodeFlags` must be non-negative integer'
                 );
@@ -86,12 +86,12 @@ class JsonModule
 
             $last = $this->jsonDecodeFlags;
 
-            $this->jsonDecodeFlags = $jsonDecodeFlags;
+            $this->jsonDecodeFlags = $json_decode_flags;
 
             $result = $last;
         }
 
-        $result = $result ?? $this->jsonDecodeFlags;
+        $result = $result ?? $this->jsonDecodeFlags ?? 0;
 
         return $result;
     }

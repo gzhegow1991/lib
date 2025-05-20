@@ -92,16 +92,14 @@ class ThrowableManager implements ThrowableManagerInterface
     /**
      * @return string[]
      */
-    public function getPreviousMessageList(
-        \Throwable $throwable, array $options = []
-    ) : array
+    public function getPreviousMessageList(\Throwable $throwable, ?int $flags = null) : array
     {
         $lines = [];
 
         $array = $this->getPreviousArray($throwable);
 
         foreach ( $array as $dotpath => $e ) {
-            $message = $this->getThrowableMessage($e, $options);
+            $message = $this->getThrowableMessage($e, $flags);
             $message = "[ {$dotpath} ] {$message}";
 
             $level = substr_count($dotpath, '.');
@@ -122,9 +120,7 @@ class ThrowableManager implements ThrowableManagerInterface
     /**
      * @return string[]
      */
-    public function getPreviousMessageLines(
-        \Throwable $throwable, array $options = []
-    ) : array
+    public function getPreviousMessageLines(\Throwable $throwable, ?int $flags = null) : array
     {
         $lines = [];
 
@@ -132,7 +128,7 @@ class ThrowableManager implements ThrowableManagerInterface
 
         $first = true;
         foreach ( $array as $dotpath => $e ) {
-            $messageLines = $this->getThrowableMessageLines($e, $options);
+            $messageLines = $this->getThrowableMessageLines($e, $flags);
             $messageLinesCnt = count($messageLines);
 
             $messageLines[ 0 ] = "[ {$dotpath} ] {$messageLines[ 0 ]}";
@@ -164,9 +160,7 @@ class ThrowableManager implements ThrowableManagerInterface
     /**
      * @return string[]
      */
-    public function getPreviousMessagesList(
-        \Throwable $throwable, array $options = []
-    ) : array
+    public function getPreviousMessagesList(\Throwable $throwable, ?int $flags = null) : array
     {
         $lines = [];
 
@@ -174,7 +168,7 @@ class ThrowableManager implements ThrowableManagerInterface
 
         $first = true;
         foreach ( $array as $dotpath => $e ) {
-            $messagesLines = $this->getThrowableMessages($e, $options);
+            $messagesLines = $this->getThrowableMessages($e, $flags);
 
             if (! $first) {
                 array_unshift($messagesLines, '');
@@ -202,9 +196,7 @@ class ThrowableManager implements ThrowableManagerInterface
     /**
      * @return string[]
      */
-    public function getPreviousMessagesLines(
-        \Throwable $throwable, array $options = []
-    ) : array
+    public function getPreviousMessagesLines(\Throwable $throwable, ?int $flags = null) : array
     {
         $lines = [];
 
@@ -212,7 +204,7 @@ class ThrowableManager implements ThrowableManagerInterface
 
         $first = true;
         foreach ( $array as $dotpath => $e ) {
-            $messagesLines = $this->getThrowableMessagesLines($e, $options);
+            $messagesLines = $this->getThrowableMessagesLines($e, $flags);
             $messagesLinesCnt = count($messagesLines);
 
             $messagesLines[ 0 ] = "[ {$dotpath} ] {$messagesLines[ 0 ]}";
@@ -267,13 +259,13 @@ class ThrowableManager implements ThrowableManagerInterface
     }
 
 
-    public function getThrowableMessage(\Throwable $throwable, array $options = []) : string
+    public function getThrowableMessage(\Throwable $throwable, ?int $flags = null) : string
     {
         $eMessage = $throwable->getMessage();
 
         $throwableMap = [ $eMessage => $throwable ];
 
-        $eMessages = $this->convertMessagesToUtf8($throwableMap, $options);
+        $eMessages = $this->convertMessagesToUtf8($throwableMap, $flags);
 
         return reset($eMessages);
     }
@@ -281,11 +273,13 @@ class ThrowableManager implements ThrowableManagerInterface
     /**
      * @return string[]
      */
-    public function getThrowableMessageLines(\Throwable $throwable, array $options = []) : array
+    public function getThrowableMessageLines(\Throwable $throwable, ?int $flags = null) : array
     {
-        $withCode = $options[ 'with_code' ] ?? false;
+        $flags = $this->flagsDefault($flags);
 
-        $eMessage = $this->getThrowableMessage($throwable, $options);
+        $withCode = $flags & _DEBUG_THROWABLE_WITH_CODE;
+
+        $eMessage = $this->getThrowableMessage($throwable, $flags);
 
         $lines = [];
 
@@ -304,7 +298,7 @@ class ThrowableManager implements ThrowableManagerInterface
 
         $lines = array_merge(
             $lines,
-            $this->getThrowableInfoLines($throwable, $options)
+            $this->getThrowableInfoLines($throwable, $flags)
         );
 
         return $lines;
@@ -314,7 +308,7 @@ class ThrowableManager implements ThrowableManagerInterface
     /**
      * @return string[]
      */
-    public function getThrowableMessages(\Throwable $throwable, array $options = []) : array
+    public function getThrowableMessages(\Throwable $throwable, ?int $flags = null) : array
     {
         if ($throwable instanceof HasMessageListInterface) {
             $throwableMap = array_fill_keys($throwable->getMessageList(), $throwable);
@@ -323,7 +317,7 @@ class ThrowableManager implements ThrowableManagerInterface
             $throwableMap = [ $throwable->getMessage() => $throwable ];
         }
 
-        $eMessages = $this->convertMessagesToUtf8($throwableMap, $options);
+        $eMessages = $this->convertMessagesToUtf8($throwableMap, $flags);
 
         return $eMessages;
     }
@@ -331,11 +325,13 @@ class ThrowableManager implements ThrowableManagerInterface
     /**
      * @return string[]
      */
-    public function getThrowableMessagesLines(\Throwable $throwable, array $options = []) : array
+    public function getThrowableMessagesLines(\Throwable $throwable, ?int $flags = null) : array
     {
-        $withCode = $options[ 'with_code' ] ?? false;
+        $flags = $this->flagsDefault($flags);
 
-        $eMessages = $this->getThrowableMessages($throwable, $options);
+        $withCode = $flags & _DEBUG_THROWABLE_WITH_CODE;
+
+        $eMessages = $this->getThrowableMessages($throwable, $flags);
 
         $lines = [];
 
@@ -356,14 +352,14 @@ class ThrowableManager implements ThrowableManagerInterface
 
         $lines = array_merge(
             $lines,
-            $this->getThrowableInfoLines($throwable, $options)
+            $this->getThrowableInfoLines($throwable, $flags)
         );
 
         return $lines;
     }
 
 
-    public function getThrowableInfo(\Throwable $throwable, array $options = []) : array
+    public function getThrowableInfo(\Throwable $throwable, ?int $flags = null) : array
     {
         $eFile = $throwable->getFile();
         $eLine = $throwable->getLine();
@@ -374,22 +370,16 @@ class ThrowableManager implements ThrowableManagerInterface
             $eFile = '{file}';
 
         } else {
-            $dirRoot = $options[ 'dir_root' ] ?? $this->dirRoot;
+            $dirRoot = $this->dirRoot ?? Lib::debug()->static_dir_root();
 
             if (null !== $dirRoot) {
-                $theFs = Lib::fs();
-
-                if (! $theFs->type_dirpath_realpath($dirRootRealpath, $dirRoot)) {
-                    throw new LogicException(
-                        [ 'The `options[dir_root]` should be existing directory', $dirRoot ]
-                    );
-                }
-
-                $eFile = $theFs->path_relative(
+                $eFileRelative = Lib::fs()->path_relative(
                     $eFile,
                     $dirRoot,
                     '/'
                 );
+
+                $eFile = $eFileRelative;
             }
         }
 
@@ -410,47 +400,39 @@ class ThrowableManager implements ThrowableManagerInterface
     /**
      * @return string[]
      */
-    public function getThrowableInfoLines(\Throwable $throwable, array $options = []) : array
+    public function getThrowableInfoLines(\Throwable $throwable, ?int $flags = null) : array
     {
         $lines = [];
 
-        $withFile = boolval($options[ 'with_file' ] ?? true);
-        $withFileLine = boolval($options[ 'with_file_line' ] ?? true);
-        $withObjectClass = boolval($options[ 'with_object_class' ] ?? true);
-        $withObjectId = boolval($options[ 'with_object_id' ] ?? false);
+        $flags = $this->flagsDefault($flags);
+
+        $withFile = $flags & _DEBUG_THROWABLE_WITH_FILE;
+        $withObjectClass = $flags & _DEBUG_THROWABLE_WITH_OBJECT_CLASS;
+        $withObjectId = $flags & _DEBUG_THROWABLE_WITH_OBJECT_ID;
 
         if ($withFile) {
             $eFile = $throwable->getFile();
+            $eLine = $throwable->getLine();
 
             if ('' === $eFile) {
                 $eFile = '{file}';
 
             } else {
-                $dirRoot = $options[ 'dir_root' ] ?? $this->dirRoot;
+                $dirRoot = $this->dirRoot ?? Lib::debug()->static_dir_root();
 
                 if (null !== $dirRoot) {
-                    $theFs = Lib::fs();
-
-                    if (! $theFs->type_dirpath_realpath($dirRootRealpath, $dirRoot)) {
-                        throw new LogicException(
-                            [ 'The `options[dir_root]` should be existing directory', $dirRoot ]
-                        );
-                    }
-
-                    $eFile = $theFs->path_relative(
+                    $eFileRelative = Lib::fs()->path_relative(
                         $eFile,
                         $dirRoot,
                         '/'
                     );
+
+                    $eFile = $eFileRelative;
                 }
             }
 
-            if ($withFileLine) {
-                $eLine = $throwable->getLine();
-
-                if (0 >= $eLine) {
-                    $eLine = -1;
-                }
+            if ($eLine <= 0) {
+                $eLine = -1;
             }
         }
 
@@ -471,11 +453,7 @@ class ThrowableManager implements ThrowableManagerInterface
         }
 
         if ($withFile) {
-            $line = $eFile;
-
-            if ($withFileLine) {
-                $line .= " : {$eLine}";
-            }
+            $line = "{$eFile} : {$eLine}";
 
             $lines[] = $line;
         }
@@ -484,24 +462,24 @@ class ThrowableManager implements ThrowableManagerInterface
     }
 
 
-    public function getThrowableTrace(
-        \Throwable $e, array $options = []
-    ) : array
+    public function getThrowableTrace(\Throwable $e, ?int $flags = null) : array
     {
-        $dirRoot = $options[ 'dir_root' ] ?? $this->dirRoot;
+        $dirRoot = $this->dirRoot ?? Lib::debug()->static_dir_root();
 
         $eTrace = $e->getTrace();
 
         if (null !== $dirRoot) {
             $theFs = Lib::fs();
 
-            foreach ( $eTrace as $i => $frame ) {
-                if (! isset($frame[ 'file' ])) {
+            foreach ( $eTrace as $i => $t ) {
+                if (! isset($t[ 'file' ])) {
                     continue;
                 }
 
                 $fileRelative = $theFs->path_relative(
-                    $frame[ 'file' ], $dirRoot, '/'
+                    $t[ 'file' ],
+                    $dirRoot,
+                    '/'
                 );
 
                 $eTrace[ $i ][ 'file' ] = $fileRelative;
@@ -514,14 +492,12 @@ class ThrowableManager implements ThrowableManagerInterface
     /**
      * @return string[]
      */
-    public function getThrowableTraceLines(
-        \Throwable $throwable, array $options = []
-    ) : array
+    public function getThrowableTraceLines(\Throwable $throwable, ?int $flags = null) : array
     {
         $lines = [];
 
         $trace = $this->getThrowableTrace(
-            $throwable, $options
+            $throwable, $flags
         );
 
         foreach ( $trace as $traceItem ) {
@@ -540,7 +516,7 @@ class ThrowableManager implements ThrowableManagerInterface
      *
      * @return string[]
      */
-    protected function convertMessagesToUtf8(array $throwableMap, array $options = []) : array
+    protected function convertMessagesToUtf8(array $throwableMap, ?int $flags = null) : array
     {
         // > mbstring is required to convert to UTF-8
         $isMbstring = extension_loaded('mbstring');
@@ -610,5 +586,32 @@ class ThrowableManager implements ThrowableManagerInterface
         }
 
         return $lines;
+    }
+
+
+    protected function flagsDefault(?int $flags) : int
+    {
+        $flagPairs = [
+            [ _DEBUG_THROWABLE_WITH_FILE, _DEBUG_THROWABLE_WITHOUT_FILE ],
+            [ _DEBUG_THROWABLE_WITH_OBJECT_CLASS, _DEBUG_THROWABLE_WITHOUT_OBJECT_CLASS ],
+            //
+            [ _DEBUG_THROWABLE_WITHOUT_CODE, _DEBUG_THROWABLE_WITH_CODE ],
+            [ _DEBUG_THROWABLE_WITHOUT_OBJECT_ID, _DEBUG_THROWABLE_WITH_OBJECT_ID ],
+            [ _DEBUG_THROWABLE_WITHOUT_PARENTS, _DEBUG_THROWABLE_WITH_PARENTS ],
+        ];
+
+        $_flags = $flags ?? 0;
+
+        foreach ( $flagPairs as [ $with, $without ] ) {
+            $hasWith = (bool) ($_flags & $with);
+            $hasWithout = (bool) ($_flags & $without);
+
+            if ((int) $hasWith + (int) $hasWithout !== 1) {
+                $_flags &= ~$without;
+                $_flags |= $with;
+            }
+        }
+
+        return $_flags;
     }
 }

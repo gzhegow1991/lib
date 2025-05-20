@@ -22,21 +22,21 @@ class RandomModule
 
 
     /**
-     * @param callable $fnUuid
+     * @param callable $fn_uuid
      *
-     * @return callable|null
+     * @return callable
      */
-    public function static_uuid_fn($fnUuid = null)
+    public function static_uuid_fn($fn_uuid = null) : callable
     {
-        if (null !== $fnUuid) {
+        if (null !== $fn_uuid) {
             $last = $this->fnUuid;
 
-            $this->fnUuid = $fnUuid;
+            $this->fnUuid = $fn_uuid;
 
             $result = $last;
         }
 
-        $result = $result ?? $this->fnUuid;
+        $result = $result ?? $this->fnUuid ?? [ $this, 'fnUuid' ];
 
         return $result;
     }

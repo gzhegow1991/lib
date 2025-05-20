@@ -4,7 +4,7 @@ namespace Gzhegow\Lib\Modules\Async\FetchApi;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\Runtime\FilesystemException;
+use Gzhegow\Lib\Modules\Fs\FileSafeContext;
 
 
 class FilesystemFetchApi implements FetchApiInterface
@@ -61,22 +61,22 @@ class FilesystemFetchApi implements FetchApiInterface
 
     public function __construct(array $config = [])
     {
-        $theType = Lib::type();
+        $theType = Lib::type($tt);
 
-        $binDirDefault = realpath(__DIR__ . '/../../../../bin/php/');
+        $theType->realpath($binDirDefault, __DIR__ . '/../../../../bin/php/');
         $binDirRealpath = '';
         $binFilename = '';
         $binFileRealpath = '';
 
-        $poolDirDefault = realpath(__DIR__ . '/../../../../var/run/bin/php/curl-api/');
+        $theType->realpath($poolDirDefault, __DIR__ . '/../../../../var/run/bin/php/curl-api/');
         $poolDirRealpath = '';
         $poolFilename = '';
 
-        $queueDirDefault = realpath(__DIR__ . '/../../../../var/queue/bin/php/curl-api/task/');
+        $theType->realpath($queueDirDefault, __DIR__ . '/../../../../var/queue/bin/php/curl-api/task/');
         $queueDirRealpath = '';
         $queueFilename = '';
 
-        $taskResultDirDefault = realpath(__DIR__ . '/../../../../var/tmp/bin/php/curl-api/task-result/');
+        $theType->realpath($taskResultDirDefault, __DIR__ . '/../../../../var/tmp/bin/php/curl-api/task-result/');
         $taskResultDirRealpath = '';
 
         if (! $theType->dirpath_realpath($binDirRealpath, $binDir = $config[ 'bin_dir' ] ?? $binDirDefault)) {
@@ -186,7 +186,10 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $serialized = serialize($task);
 
-        $statusPush = Lib::fs()->rpush($this->queueFile, $serialized, $lockWaitTimeoutMs);
+        $statusPush = Lib::fs()->brpush(
+            1e5, $lockWaitTimeoutMs,
+            $this->queueFile, $serialized
+        );
 
         return $statusPush;
     }
@@ -196,7 +199,10 @@ class FilesystemFetchApi implements FetchApiInterface
         ?array &$task = null
     ) : bool
     {
-        $serialized = Lib::fs()->lpop($this->queueFile, $blockTimeoutMs, false);
+        $serialized = Lib::fs()->blpop(
+            1e5, $blockTimeoutMs,
+            $this->queueFile
+        );
 
         if (null !== $serialized) {
             $task = unserialize($serialized);
@@ -221,7 +227,7 @@ class FilesystemFetchApi implements FetchApiInterface
                 continue;
             }
 
-            @unlink($spl->getRealPath());
+            @unlink($spl->getPathname());
         }
     }
 
@@ -353,7 +359,7 @@ class FilesystemFetchApi implements FetchApiInterface
             );
         }
 
-        if (! is_null($nowMicrotimeFloat = $nowMicrotime)) {
+        if ((null !== ($nowMicrotimeFloat = $nowMicrotime))) {
             if (! $theType->float_non_negative($nowMicrotimeFloat, $nowMicrotime)) {
                 throw new LogicException(
                     [ 'The `nowMicrotime` should be non-negative float', $nowMicrotime ]
@@ -363,131 +369,214 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $pid = getmypid();
 
-        $status = $this->workerAddToPool($pid, $timeoutMsInt, $nowMicrotimeFloat);
+        $statusAdd = $this->workerAddToPool(
+            $pid,
+            $timeoutMsInt, $nowMicrotimeFloat
+        );
 
-        return $status;
+        return $statusAdd;
     }
 
-    public function daemonRemoveFromPool() : bool
+    public function daemonRemoveFromPool(?float $nowMicrotime = null) : bool
     {
+        $theType = Lib::type();
+
+        if ((null !== ($nowMicrotimeFloat = $nowMicrotime))) {
+            if (! $theType->float_non_negative($nowMicrotimeFloat, $nowMicrotime)) {
+                throw new LogicException(
+                    [ 'The `nowMicrotime` should be non-negative float', $nowMicrotime ]
+                );
+            }
+        }
+
         $pid = getmypid();
 
-        $statusRemove = $this->workerRemoveFromPool($pid);
+        $statusRemove = $this->workerRemoveFromPool(
+            $pid,
+            $nowMicrotimeFloat
+        );
 
         return $statusRemove;
     }
 
 
+    /**
+     * @param int        $pid
+     * @param int        $timeoutMs
+     * @param float|null $nowMicrotime
+     */
     protected function workerAddToPool(
-        int $pid, int $timeoutMs,
-        ?float $nowMicrotime = null
+        $pid,
+        $timeoutMs, $nowMicrotime = null
+    ) : bool
+    {
+        $fs = Lib::fs();
+
+        $f = $fs->fileSafe();
+
+        $poolFile = $this->poolFile;
+
+        $status = $f->call(
+            static function (FileSafeContext $ctx) use (
+                $f,
+                $pid, $poolFile,
+                $timeoutMs, $nowMicrotime
+            ) {
+                $status = false;
+
+                if ($fhPool = $f->fopen_flock_pooling(
+                    1e5, 1000,
+                    $poolFile, 'c+', LOCK_EX | LOCK_NB
+                )) {
+                    $ctx->finallyFrelease($fhPool);
+                    $ctx->finallyFclose($fhPool);
+
+                    $pidString = ltrim($pid, '0');
+                    $nowMicrotimeFloat = $nowMicrotime ?? microtime(true);
+
+                    $lines = [];
+                    while ( ! feof($fhPool) ) {
+                        $line = fgets($fhPool);
+
+                        $lineTrim = rtrim($line);
+                        if ('' === $lineTrim) {
+                            continue;
+                        }
+
+                        [ $pidLineString, $timeoutMicrotimeLineString ] = explode('|', $lineTrim);
+
+                        $timeoutMicrotimeLineFloat = (float) $timeoutMicrotimeLineString;
+                        if ($nowMicrotimeFloat > $timeoutMicrotimeLineFloat) {
+                            continue;
+                        }
+
+                        $pidLineString = ltrim($pidLineString, '0');
+                        if ($pidLineString === $pidString) {
+                            continue;
+                        }
+
+                        $lines[] = $lineTrim;
+                    }
+
+                    $timeoutMicrotimeFloat = $nowMicrotimeFloat + ($timeoutMs / 1000);
+
+                    $pidNewString = str_pad($pid, 10, '0', STR_PAD_LEFT);
+                    $timeoutMicrotimeNewString = sprintf('%.6f', $timeoutMicrotimeFloat);
+
+                    $lines[] = "{$pidNewString}|{$timeoutMicrotimeNewString}";
+
+                    $content = implode("\n", $lines);
+
+                    rewind($fhPool);
+                    ftruncate($fhPool, 0);
+
+                    fwrite($fhPool, $content);
+
+                    $status = true;
+                }
+
+                return $status;
+            }
+        );
+
+        return $status;
+    }
+
+    /**
+     * @param int        $pid
+     * @param float|null $nowMicrotime
+     */
+    protected function workerRemoveFromPool(
+        $pid,
+        $nowMicrotime = null
     ) : bool
     {
         $theFs = Lib::fs();
 
-        $fhPool = $theFs->fopen_lock($this->poolFile, 'c+', LOCK_EX, 1000);
-        if (false === $fhPool) {
-            throw new FilesystemException(
-                [ 'Unable to ' . __METHOD__ . ' due to locking file with LOCK_EX is failed', $this->poolFile ]
-            );
-        }
+        $f = $theFs->fileSafe();
 
-        $pidString = ltrim($pid, '0');
-        $nowMicrotimeFloat = $nowMicrotime ?? microtime(true);
+        $poolFile = $this->poolFile;
 
-        $lines = [];
-        while ( ! feof($fhPool) ) {
-            $line = fgets($fhPool);
-            $lineTrim = rtrim($line);
-            if ('' === $lineTrim) {
-                continue;
+        $status = $f->call(
+            static function (FileSafeContext $ctx) use (
+                $f,
+                $pid, $poolFile,
+                $nowMicrotime
+            ) {
+                $status = false;
+
+                if ($fhPool = $f->fopen_flock_pooling(
+                    1e5, 1000,
+                    $poolFile, 'c+', LOCK_EX | LOCK_NB
+                )) {
+                    $ctx->finallyFrelease($fhPool);
+                    $ctx->finallyFclose($fhPool);
+
+                    $pidString = ltrim($pid, '0');
+                    $nowMicrotimeFloat = $nowMicrotime ?? microtime(true);
+
+                    $lines = [];
+                    while ( ! feof($fhPool) ) {
+                        $line = fgets($fhPool);
+
+                        $lineTrim = rtrim($line);
+                        if ('' === $lineTrim) {
+                            continue;
+                        }
+
+                        [ $pidLineString, $timeoutMicrotimeLineString ] = explode('|', $lineTrim);
+
+                        $timeoutMicrotimeLineFloat = (float) $timeoutMicrotimeLineString;
+                        if ($nowMicrotimeFloat > $timeoutMicrotimeLineFloat) {
+                            continue;
+                        }
+
+                        $pidLineString = ltrim($pidLineString, '0');
+                        if ($pidLineString === $pidString) {
+                            continue;
+                        }
+
+                        $lines[] = $lineTrim;
+                    }
+
+                    $content = implode("\n", $lines);
+
+                    rewind($fhPool);
+                    ftruncate($fhPool, 0);
+
+                    fwrite($fhPool, $content);
+
+                    $status = true;
+                }
+
+                return $status;
             }
+        );
 
-            [ $pidLineString, $timeoutMicrotimeLineString ] = explode('|', $lineTrim);
-
-            $timeoutMicrotimeLineFloat = (float) $timeoutMicrotimeLineString;
-            if ($nowMicrotimeFloat > $timeoutMicrotimeLineFloat) {
-                continue;
-            }
-
-            $pidLineString = ltrim($pidLineString, '0');
-            if ($pidLineString === $pidString) {
-                continue;
-            }
-
-            $lines[] = $lineTrim;
-        }
-
-        $timeoutMicrotimeFloat = $nowMicrotimeFloat + ($timeoutMs / 1000);
-
-        $pidNewString = str_pad($pid, 10, '0', STR_PAD_LEFT);
-        $timeoutMicrotimeNewString = sprintf('%.6f', $timeoutMicrotimeFloat);
-
-        $lines[] = "{$pidNewString}|{$timeoutMicrotimeNewString}";
-
-        rewind($fhPool);
-        ftruncate($fhPool, 0);
-
-        fwrite($fhPool, implode("\n", $lines));
-
-        $theFs->fclose_unlock($fhPool);
-
-        return true;
-    }
-
-    protected function workerRemoveFromPool(int $pid) : bool
-    {
-        $theFs = Lib::fs();
-
-        $fhPool = $theFs->fopen_lock_tmpfile($this->poolFile, 'c+', LOCK_EX, 1000);
-        if (false === $fhPool) {
-            throw new FilesystemException(
-                [ 'Unable to ' . __METHOD__ . ' due to locking file with LOCK_EX is failed', $this->poolFile ]
-            );
-        }
-
-        $pidString = ltrim($pid, '0');
-        $nowMicrotimeFloat = microtime(true);
-
-        $lines = [];
-        while ( ! feof($fhPool) ) {
-            $line = fgets($fhPool);
-            $lineTrim = rtrim($line);
-            if ('' === $lineTrim) {
-                continue;
-            }
-
-            [ $pidLineString, $timeoutMicrotimeLineString ] = explode('|', $lineTrim);
-
-            $timeoutMicrotimeLineFloat = (float) $timeoutMicrotimeLineString;
-            if ($nowMicrotimeFloat > $timeoutMicrotimeLineFloat) {
-                continue;
-            }
-
-            $pidLineString = ltrim($pidLineString, '0');
-            if ($pidLineString === $pidString) {
-                continue;
-            }
-
-            $lines[] = $lineTrim;
-        }
-
-        rewind($fhPool);
-        ftruncate($fhPool, 0);
-
-        fwrite($fhPool, implode("\n", $lines));
-
-        $theFs->fclose_unlock($fhPool);
-
-        return true;
+        return $status;
     }
 
 
-    public function daemonIsAwake(?int &$pidFirst = null) : bool
+    public function daemonIsAwake(
+        ?int &$pidFirst = null,
+        ?float $nowMicrotime = null
+    ) : bool
     {
         $pidFirst = null;
 
+        $theType = Lib::type();
+
+        if ((null !== ($nowMicrotimeFloat = $nowMicrotime))) {
+            if (! $theType->float_non_negative($nowMicrotimeFloat, $nowMicrotime)) {
+                throw new LogicException(
+                    [ 'The `nowMicrotime` should be non-negative float', $nowMicrotime ]
+                );
+            }
+        }
+
         $theFs = Lib::fs();
+
+        $f = $theFs->fileSafe();
 
         $poolFile = $this->poolFile;
 
@@ -495,45 +584,59 @@ class FilesystemFetchApi implements FetchApiInterface
             return false;
         }
 
-        $fhPool = $theFs->fopen_lock($poolFile, 'r', LOCK_SH, 100);
-        if (false === $fhPool) {
-            throw new FilesystemException(
-                [ 'Unable to ' . __METHOD__ . ' due to locking file with LOCK_SH is failed', $poolFile ]
-            );
-        }
+        $status = $f->call(
+            static function (FileSafeContext $ctx) use (
+                &$pidFirst,
+                //
+                $f,
+                $poolFile,
+                $nowMicrotimeFloat
+            ) {
+                $status = false;
 
-        $nowMicrotimeFloat = microtime(true);
+                if ($fhPool = $f->fopen_flock_pooling(
+                    1e5, 1000,
+                    $poolFile, 'r', LOCK_SH | LOCK_NB
+                )) {
+                    $ctx->finallyFrelease($fhPool);
+                    $ctx->finallyFclose($fhPool);
 
-        $pidFirstLine = null;
-        while ( ! feof($fhPool) ) {
-            $line = fgets($fhPool);
-            $lineTrim = rtrim($line);
-            if ('' === $lineTrim) {
-                continue;
+                    $nowMicrotimeFloat = microtime(true);
+
+                    $pidFirstLine = null;
+
+                    while ( ! feof($fhPool) ) {
+                        $line = fgets($fhPool);
+
+                        $lineTrim = rtrim($line);
+                        if ('' === $lineTrim) {
+                            continue;
+                        }
+
+                        [ $pidLineString, $timeoutMicrotimeLineString ] = explode('|', $lineTrim);
+
+                        $timeoutMicrotimeFloat = (float) $timeoutMicrotimeLineString;
+                        if ($nowMicrotimeFloat > $timeoutMicrotimeFloat) {
+                            continue;
+                        }
+
+                        $pidFirstLine = $pidLineString;
+
+                        break;
+                    }
+
+                    if (null !== $pidFirstLine) {
+                        $pidFirst = (int) ltrim($pidFirstLine, '0');
+
+                        $status = true;
+                    }
+                }
+
+                return $status;
             }
+        );
 
-            [ $pidLineString, $timeoutMicrotimeLineString ] = explode('|', $lineTrim);
-
-            $timeoutMicrotimeFloat = (float) $timeoutMicrotimeLineString;
-
-            if ($nowMicrotimeFloat > $timeoutMicrotimeFloat) {
-                continue;
-            }
-
-            $pidFirstLine = $pidLineString;
-
-            break;
-        }
-
-        $theFs->fclose_unlock($fhPool);
-
-        if (null !== $pidFirstLine) {
-            $pidFirst = (int) ltrim($pidFirstLine, '0');
-
-            return true;
-        }
-
-        return false;
+        return $status;
     }
 
     public function daemonWakeup(

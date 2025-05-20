@@ -2544,6 +2544,21 @@ class ParseNullModule
 
 
 	/**
+	 * @param string   $value
+	 *
+	 * @return int|null
+	 */
+	public function chmod($value)
+	{
+		if (Lib::type()->chmod($result, $value)) {
+		    return $result;
+		}
+
+		return null;
+	}
+
+
+	/**
 	 * @param array{ 0: array|null } $refs
 	 *
 	 * @return string|null

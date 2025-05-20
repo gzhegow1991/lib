@@ -33,6 +33,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
     // ->setErrorReporting(E_ALL)
     // ->setMemoryLimit('32M')
     // ->setTimeLimit(30)
+    // ->setUmask(0002)
     // ->setErrorHandler([ $ex, 'fnErrorHandler' ])
     // ->setExceptionHandler([ $ex, 'fnExceptionHandler' ])
     //
@@ -40,6 +41,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
     ->useErrorReporting()
     ->useMemoryLimit()
     ->useTimeLimit()
+    ->useUmask()
     ->useErrorHandler()
     ->useExceptionHandler()
 ;
@@ -108,6 +110,10 @@ $ffn = new class {
         ;
     }
 };
+
+
+
+\Gzhegow\Lib\Lib::require_composer_global();
 
 
 
@@ -380,10 +386,7 @@ $fn = function () use ($ffn) {
 
     $messages = \Gzhegow\Lib\Lib::debug()
         ->throwableManager()
-        ->getPreviousMessagesLines(
-            $e0,
-            [ 'with_file' => false ]
-        )
+        ->getPreviousMessagesLines($e0, _DEBUG_THROWABLE_WITHOUT_FILE)
     ;
     echo implode("\n", $messages);
 };
@@ -896,35 +899,33 @@ $fn = function () use ($ffn) {
     $ffn->print('[ Result ]');
     echo "\n";
 
-    $invalidValue = NAN;
-
 
     class ResultTest
     {
-        public static function string($value, $ctx = null)
+        public static function string($value, $res = null)
         {
             if (! is_string($value)) {
                 return \Gzhegow\Lib\Modules\Php\Result\Result::err(
-                    $ctx,
+                    $res,
                     [ 'The `value` should be string', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return \Gzhegow\Lib\Modules\Php\Result\Result::ok($ctx, $value);
+            return \Gzhegow\Lib\Modules\Php\Result\Result::ok($res, $value);
         }
 
-        public static function string_not_empty($value, $ctx = null)
+        public static function string_not_empty($value, $res = null)
         {
             if (! (is_string($value) && ('' !== $value))) {
                 return \Gzhegow\Lib\Modules\Php\Result\Result::err(
-                    $ctx,
+                    $res,
                     [ 'The `value` should be non-empty string', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return \Gzhegow\Lib\Modules\Php\Result\Result::ok($ctx, $value);
+            return \Gzhegow\Lib\Modules\Php\Result\Result::ok($res, $value);
         }
     }
 
@@ -932,6 +933,7 @@ $fn = function () use ($ffn) {
     $strInterpolator = \Gzhegow\Lib\Lib::str()->interpolator();
 
 
+    $invalidValue = NAN;
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::type();
     $status =
         \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx)
@@ -940,8 +942,11 @@ $fn = function () use ($ffn) {
     $errors = $ctx->errors();
     $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $errors);
     $ffn->print_array_multiline($errors, 2);
+
     echo "\n";
 
+
+    $invalidValue = NAN;
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::parse();
     $value = null
         ?? \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx)
@@ -950,9 +955,11 @@ $fn = function () use ($ffn) {
     $errors = $ctx->errors();
     $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $errors);
     $ffn->print_array_multiline($errors, 2);
+
     echo "\n";
 
 
+    $invalidValue = NAN;
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::parseThrow();
     try {
         \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx);
@@ -960,10 +967,7 @@ $fn = function () use ($ffn) {
     catch ( \Throwable $e ) {
         $messages = \Gzhegow\Lib\Lib::debug()
             ->throwableManager()
-            ->getPreviousMessagesLines(
-                $e,
-                [ 'with_file' => false ]
-            )
+            ->getPreviousMessagesLines($e, _DEBUG_THROWABLE_WITHOUT_FILE)
         ;
 
         echo implode("\n", $messages) . "\n";
@@ -975,34 +979,29 @@ $fn = function () use ($ffn) {
         $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::typeThrow();
         $status = true
             && ResultTest::string($invalidValue, $ctx)
-            && ResultTest::string_not_empty($ctx->get(), $ctx);
+            && ResultTest::string_not_empty($ctx->getResult(), $ctx);
     }
     catch ( \Throwable $e ) {
         $messages = \Gzhegow\Lib\Lib::debug()
             ->throwableManager()
-            ->getPreviousMessagesLines(
-                $e,
-                [ 'with_file' => false ]
-            )
+            ->getPreviousMessagesLines($e, _DEBUG_THROWABLE_WITHOUT_FILE)
         ;
 
         echo implode("\n", $messages) . "\n";
         echo "\n";
     }
 
+
     try {
         $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::ignoreThrow();
         $devnull = null
             ?? ResultTest::string($invalidValue, $ctx)
-            ?? ResultTest::string_not_empty($ctx->get(), $ctx);
+            ?? ResultTest::string_not_empty($ctx->getResult(), $ctx);
     }
     catch ( \Throwable $e ) {
         $messages = \Gzhegow\Lib\Lib::debug()
             ->throwableManager()
-            ->getPreviousMessagesLines(
-                $e,
-                [ 'with_file' => false ]
-            )
+            ->getPreviousMessagesLines($e, _DEBUG_THROWABLE_WITHOUT_FILE)
         ;
 
         echo implode("\n", $messages) . "\n";
@@ -1014,21 +1013,21 @@ $fn = function () use ($ffn) {
 
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::parseThrow();
     $value = ResultTest::string($validValue, $ctx);
-    $ffn->print($value, $ctx->get());
+    $ffn->print($value, $ctx->getResult());
     echo "\n";
 
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::typeThrow();
     $status = true
         && ResultTest::string($validValue, $ctx)
-        && ResultTest::string_not_empty($ctx->get(), $ctx);
-    $ffn->print($status, $ctx->get());
+        && ResultTest::string_not_empty($ctx->getResult(), $ctx);
+    $ffn->print($status, $ctx->getResult());
     echo "\n";
 
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::ignoreThrow();
     $devnull = null
         ?? ResultTest::string($validValue, $ctx)
-        ?? ResultTest::string_not_empty($ctx->get(), $ctx);
-    $ffn->print($devnull, $ctx->get());
+        ?? ResultTest::string_not_empty($ctx->getResult(), $ctx);
+    $ffn->print($devnull, $ctx->getResult());
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
@@ -1765,7 +1764,70 @@ $fn = function () use ($ffn) {
     unset($table);
 };
 $test = $ffn->test($fn);
-$test->expectStdout('
+$test->expectStdoutIf(PHP_VERSION_ID >= 80200, '
+"[ CmpModule ]"
+
+cf4099ce4a62a1d06cf8b3aafc0da38d
+cf4099ce4a62a1d06cf8b3aafc0da38d
+
+490ec98f69fe96c14637416f066852c2
+1fd5d4c6fc6cf6abde19e1c75ca55710
+
+e606eca98951c845a7640edb02b3ab62
+6fcc4ef34f6c7bcd1daa4855b8b196f2
+
+48fe998035bdd10d06e73f0f8a08194a
+da5a6500e2ad849c8772f1c713541973
+
+6f0fd785225ac3eab7fa00b2c46cc298
+a8fe44514f23a3182da5459418346eed
+
+35101a67c8b16659d83418f721c93668
+6dca25535d3e9ad90f35c0419acb37b5
+
+87ff003090a1314209918f3ac7f8beba
+ec8c98ae4dd41a94732bbdb499c3d845
+
+55a35deb406692fd486098d19c923798
+0b07fae03da41bff2d2c698d78bbd6c1
+
+edf2f80951aa9ba3f6ae9289b3cea8b9
+7d159d9422854dc5f443113d1710828e
+
+6877e6ce3586a6d065eede6e05698977
+dadf7999aaf18c657bdae55f4aefd521
+
+e3ee774a87d3c5397efea14d9e1d1f6b
+6c642f9464a155fc8b3478f7c73480cf
+
+2558d66c489c580b403ae36be9a1f42f
+0fb2ff53c46b572d09ed995fe5d320fa
+
+ea7065cc26c32ddd0f949ea8dbef5f31
+b159e16b3ebf3aa4c3743b5714656022
+
+6e7182a443054f2608c1582473a69420
+4fca1526ef9a3769fe3279b15543fc57
+
+cd3ca8a442d8b5aef4173ae928978e96
+6e3e6ed1c9a6e1ae2d634b9656c976f8
+
+098c84f888f7c6049199cfa933e119d0
+753b54ab1969bce113f3b5b413f66b08
+
+c2991d79be720822b54584c3dc7d723c
+e4f103e1717b536a5fec3fa45065c28c
+
+8029eafbf5407e2a188bb7737154af51
+6a2f24abb7ad00dce3e0caa451614c3f
+
+94f9d7b5c4184b5a4c1bd9e9ae7fe219
+4af4327c1bbf913323ee2f4b01ee77ea
+
+1d836ee366bf12ffb91ba7cf0e569464
+ed615e45c29e72aeb4c1404a47e59747
+');
+$test->expectStdoutIf(PHP_VERSION_ID < 80200, '
 "[ CmpModule ]"
 
 82f719e1e01d77d54712e33ee73c9eef
@@ -2356,7 +2418,97 @@ $fn = function () use ($ffn) {
     date_default_timezone_set($before);
 };
 $test = $ffn->test($fn);
-$test->expectStdout('
+$test->expectStdoutIf(PHP_VERSION_ID >= 80200, '
+"[ DateModule ]"
+
+TRUE | { object(serializable) # DateTimeZone # "+01:00" }
+TRUE | { object(serializable) # DateTimeZone # "EET" }
+TRUE | { object(serializable) # DateTimeZone # "Europe/Minsk" }
+TRUE | { object(serializable) # DateTimeZone # "UTC" }
+TRUE | { object(serializable) # DateTimeZone # "UTC" }
+
+TRUE | { object(serializable) # DateTimeZone # "+01:00" }
+TRUE | { object(serializable) # DateTimeZone # "+01:00" }
+TRUE | { object(serializable) # DateTimeZone # "+01:00" }
+
+TRUE | { object(serializable) # DateTimeZone # "EET" }
+TRUE | { object(serializable) # DateTimeZone # "EET" }
+TRUE | { object(serializable) # DateTimeZone # "EET" }
+
+TRUE | { object(serializable) # DateTimeZone # "Europe/Minsk" }
+TRUE | { object(serializable) # DateTimeZone # "Europe/Minsk" }
+TRUE | { object(serializable) # DateTimeZone # "Europe/Minsk" }
+
+TRUE | { object(serializable) # DateTimeZone # "EET" }
+TRUE | { object(serializable) # DateTimeZone # "Europe/Minsk" }
+TRUE | { object(serializable) # DateTimeZone # "EET" }
+TRUE | { object(serializable) # DateTimeZone # "Europe/Minsk" }
+
+
+TRUE | { object(serializable) # DateInterval # "P1D" }
+TRUE | { object(serializable) # DateInterval # "P1DT12H" }
+TRUE | { object(serializable) # DateInterval # "PT100S" }
+TRUE | { object(serializable) # DateInterval # "P1D" }
+TRUE | { object(serializable) # DateInterval # "PT100S" }
+
+TRUE | { object(serializable) # DateInterval # "P1D" }
+TRUE | { object(serializable) # DateInterval # "P1DT12H" }
+TRUE | { object(serializable) # DateInterval # "P1D" }
+TRUE | { object(serializable) # DateInterval # "PT100S" }
+
+TRUE | { object(serializable) # DateInterval # "PT100S" }
+TRUE | { object(serializable) # DateInterval # "P1D" }
+TRUE | { object(serializable) # DateInterval # "PT100S" }
+
+TRUE | { object(serializable) # DateInterval # "PT2M3.456S" }
+TRUE | { object(serializable) # DateInterval # "P1D" }
+TRUE | { object(serializable) # DateInterval # "PT100S" }
+
+TRUE | { object(serializable) # DateInterval # "P1D" }
+TRUE | { object(serializable) # DateInterval # "P1D" }
+TRUE | { object(serializable) # DateInterval # "PT100S" }
+
+
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+
+TRUE | { object(serializable) # DateTimeImmutable # "1970-01-01T00:00:00.000000+00:00" }
+TRUE | { object(serializable) # DateTimeImmutable # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+TRUE | { object(serializable) # DateTimeImmutable # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+TRUE | { object(serializable) # DateTimeImmutable # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+TRUE | { object(serializable) # DateTimeImmutable # "1970-01-01T00:00:00.000000+00:00" } | TRUE
+
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+02:00" } | TRUE
+
+
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.000000+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.456000+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.456789+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.456789+02:00" }
+
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.000000+01:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.456000+02:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.456789+03:00" }
+
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+01:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+02:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" }
+
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+01:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+02:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" }
+
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:02:03.000000+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:02:03.000456+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T02:02:03.000456+02:00" }
+');
+$test->expectStdoutIf(PHP_VERSION_ID < 80200, '
 "[ DateModule ]"
 
 TRUE | { object # DateTimeZone # "+01:00" }
@@ -2949,55 +3101,49 @@ $fn = function () use ($ffn) {
     $ffn->print('[ FsModule ]');
     echo "\n";
 
+    $theFs = \Gzhegow\Lib\Lib::fs();
+    $f = $theFs->fileSafe();
 
-    $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
-        $ffn->root() . '/var/1/1/1/1.txt', '123',
-        [ FILE_APPEND ], [ 0775, true ]
-    );
-    $ffn->print($result);
+    $file = $ffn->root() . '/var/1/1/1/1.txt';
+    $realpath = $f->file_put_contents($file, '123', FILE_APPEND, [], [ 0775, true ]);
+    $relpath = $theFs->path_relative($realpath, $ffn->root());
+    $ffn->print($relpath);
 
-    $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
-        $ffn->root() . '/var/1/1/1.txt', '123',
-        [ FILE_APPEND ], [ 0775, true ]
-    );
-    $ffn->print($result);
+    $file = $ffn->root() . '/var/1/1/1.txt';
+    $realpath = $f->file_put_contents($file, '123', FILE_APPEND, [], [ 0775, true ]);
+    $relpath = $theFs->path_relative($realpath, $ffn->root());
+    $ffn->print($relpath);
 
-    $result = \Gzhegow\Lib\Lib::fs()->file_put_contents(
-        $ffn->root() . '/var/1/1.txt', '123',
-        [ FILE_APPEND ], [ 0775, true ]
-    );
-    $ffn->print($result);
+    $file = $ffn->root() . '/var/1/1.txt';
+    $realpath = $f->file_put_contents($file, '123', FILE_APPEND, [], [ 0775, true ]);
+    $relpath = $theFs->path_relative($realpath, $ffn->root());
+    $ffn->print($relpath);
 
     echo "\n";
 
 
-    $result = \Gzhegow\Lib\Lib::fs()->file_get_contents(
-        $ffn->root() . '/var/1/1/1/1.txt',
-        []
-    );
-    $ffn->print($result);
+    $file = $ffn->root() . '/var/1/1/1/1.txt';
+    $content = $f->file_get_contents($file);
+    $ffn->print($content);
+
+    echo "\n";
 
 
-    foreach (
-        \Gzhegow\Lib\Lib::fs()->dir_walk_it(
-            $ffn->root() . '/var/1',
-            [], []
-        )
-        as $spl
-    ) {
+    $dir = $ffn->root() . '/var/1';
+    foreach ( \Gzhegow\Lib\Lib::fs()->dir_walk_it($dir) as $spl ) {
         $spl->isDir()
-            ? \Gzhegow\Lib\Lib::fs()->rmdir($spl->getRealPath())
-            : \Gzhegow\Lib\Lib::fs()->rm($spl->getRealPath());
+            ? $f->rmdir($spl->getRealPath())
+            : $f->unlink($spl->getRealPath());
     }
-    \Gzhegow\Lib\Lib::fs()->rmdir($ffn->root() . '/var/1');
+    $f->rmdir($ffn->root() . '/var/1');
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
 "[ FsModule ]"
 
-3
-3
-3
+"var\1\1\1\1.txt"
+"var\1\1\1.txt"
+"var\1\1.txt"
 
 "123"
 ');
