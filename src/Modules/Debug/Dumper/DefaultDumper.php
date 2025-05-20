@@ -565,6 +565,7 @@ class DefaultDumper implements DumperInterface
         $content .= "\n";
 
         fwrite($resource, $content);
+        fflush($resource);
     }
 
     public function echoDumper_stdout_html(...$vars)
@@ -587,6 +588,7 @@ class DefaultDumper implements DumperInterface
         }
 
         fwrite($resource, $htmlContent);
+        fflush($resource);
 
         if ($isStdout && $isHeadersSent && $throwIfHeadersSent) {
             throw new RuntimeException(

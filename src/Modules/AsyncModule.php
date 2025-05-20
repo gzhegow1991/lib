@@ -163,13 +163,13 @@ class AsyncModule
 
 
     /**
-     * @param resource $stream
+     * @param resource $resource
      *
      * @return string|null
      */
-    public function read_packet_resource($stream) : ?string
+    public function read_packet_resource($resource) : ?string
     {
-        $header = fread($stream, 4);
+        $header = fread($resource, 4);
 
         if (strlen($header) !== 4) {
             throw new RuntimeException(
@@ -182,7 +182,7 @@ class AsyncModule
         $buff = '';
 
         while ( strlen($buff) < $len ) {
-            $chunk = fread($stream, $len - strlen($buff));
+            $chunk = fread($resource, $len - strlen($buff));
 
             if ($chunk === false || $chunk === '') {
                 return null;
@@ -195,17 +195,18 @@ class AsyncModule
     }
 
     /**
-     * @param resource $socket
+     * @param resource $resource
      * @param string   $payload
      *
      * @return void
      */
-    public function write_packet_resource($socket, string $payload) : void
+    public function write_packet_resource($resource, string $payload) : void
     {
         $len = strlen($payload);
 
         $header = pack("N", $len);
 
-        fwrite($socket, $header . $payload);
+        fwrite($resource, $header . $payload);
+        fflush($resource);
     }
 }

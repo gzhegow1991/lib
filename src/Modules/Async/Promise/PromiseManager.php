@@ -762,8 +762,7 @@ class PromiseManager implements PromiseManagerInterface
             $fetchApi->daemonWakeup(10000, 1000);
 
             $fnPooling = static function ($fnResolve) use ($fetchApi) {
-                $statusGet = $fetchApi->daemonIsAwake();
-                if (! $statusGet) {
+                if (! $fetchApi->daemonIsAwake()) {
                     return;
                 }
 
@@ -786,8 +785,8 @@ class PromiseManager implements PromiseManagerInterface
         $fetchApi = $this->getFetchApi();
 
         $statusPush = $fetchApi->pushTask(
-            $url, $curlOptions, 1000,
-            $taskId
+            $taskId,
+            $url, $curlOptions, 1000
         );
 
         if (! $statusPush) {
@@ -809,8 +808,15 @@ class PromiseManager implements PromiseManagerInterface
     {
         $fetchApi = $this->getFetchApi();
 
-        $fnPooling = static function ($fnResolve) use ($fetchApi, $taskId) {
-            $status = $fetchApi->taskFlushResult($taskId, $taskResult);
+        $fnPooling = static function ($fnResolve) use (
+            $fetchApi,
+            //
+            $taskId
+        ) {
+            $status = $fetchApi->taskFlushResult(
+                $taskResult,
+                $taskId
+            );
 
             if ($status) {
                 $fnResolve($taskResult);

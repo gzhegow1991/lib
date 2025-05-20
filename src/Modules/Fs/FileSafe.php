@@ -371,42 +371,7 @@ class FileSafe
             $result = call_user_func_array($closure, [ $ctx ]);
         }
         finally {
-            $isWindows = Lib::php()->is_windows();
-
-            if ($isWindows) {
-                foreach ( $ctx->getFhhToFrelease() as $fh ) {
-                    if (is_resource($fh)) {
-                        flock($fh, LOCK_UN);
-                    }
-                }
-                foreach ( $ctx->getFhhToFclose() as $fh ) {
-                    if (is_resource($fh)) {
-                        fclose($fh);
-                    }
-                }
-                foreach ( $ctx->getFilesToUnlink() as $file => $bool ) {
-                    if (is_file($file)) {
-                        unlink($file);
-                    }
-                }
-
-            } else {
-                foreach ( $ctx->getFilesToUnlink() as $file => $bool ) {
-                    if (is_file($file)) {
-                        unlink($file);
-                    }
-                }
-                foreach ( $ctx->getFhhToFrelease() as $fh ) {
-                    if (is_resource($fh)) {
-                        flock($fh, LOCK_UN);
-                    }
-                }
-                foreach ( $ctx->getFhhToFclose() as $fh ) {
-                    if (is_resource($fh)) {
-                        fclose($fh);
-                    }
-                }
-            }
+            $ctx->onFinally();
         }
 
         set_error_handler($beforeErrorHandler);
@@ -1691,22 +1656,22 @@ class FileSafe
 
         array_unshift($fopenArgs, $file, $modeOpen);
 
-        $fh = call_user_func_array([ $this, 'fopen' ], $fopenArgs);
+        $resource = call_user_func_array([ $this, 'fopen' ], $fopenArgs);
 
-        if (false === $fh) {
+        if (false === $resource) {
             return false;
         }
 
         if ($isAppend) {
-            fseek($fh, 0, SEEK_END);
+            fseek($resource, 0, SEEK_END);
 
         } else {
-            rewind($fh);
-            ftruncate($fh, 0);
+            rewind($resource);
+            ftruncate($resource, 0);
         }
 
         if (is_resource($data)) {
-            $len = stream_copy_to_stream($data, $fh);
+            $len = stream_copy_to_stream($data, $resource);
 
             if (false === $len) {
                 return false;
@@ -1723,7 +1688,7 @@ class FileSafe
                     );
                 }
 
-                $lenLine = fwrite($fh, $line);
+                $lenLine = fwrite($resource, $line);
 
                 if (false === $lenLine) {
                     return false;
@@ -1733,7 +1698,7 @@ class FileSafe
             }
 
         } elseif (is_string($data)) {
-            $len = fwrite($fh, $data);
+            $len = fwrite($resource, $data);
 
             if (false === $len) {
                 return false;
@@ -1745,7 +1710,7 @@ class FileSafe
             );
         }
 
-        fclose($fh);
+        fclose($resource);
 
         clearstatcache(true, $file);
 

@@ -1040,9 +1040,9 @@ class FsModule
                 if ($fhInLock = $f->fopen_flock(
                     $fileInLock, 'w', LOCK_EX | LOCK_NB,
                 )) {
-                    $ctx->finallyFrelease($fhInLock);
-                    $ctx->finallyFclose($fhInLock);
-                    $ctx->finallyUnlink($fileInLock);
+                    $ctx->onFinallyFrelease($fhInLock);
+                    $ctx->onFinallyFclose($fhInLock);
+                    $ctx->onFinallyUnlink($fileInLock);
 
                     fwrite($fhInLock, getmypid());
 
@@ -1057,7 +1057,7 @@ class FsModule
     }
 
     public function blpush(
-        $tickUsleep, $timeoutMs,
+        $flockWaitTickUsleep, $flockWaitTimeoutMs,
         string $file, string $data
     ) : bool
     {
@@ -1079,19 +1079,19 @@ class FsModule
         $f->call(
             static function (FileSafeContext $ctx) use (
                 $f,
-                $tickUsleep, $timeoutMs,
+                $flockWaitTickUsleep, $flockWaitTimeoutMs,
                 $file, $data
             ) {
                 $fileIn = "{$file}.in";
                 $fileInLock = "{$file}.in.lock";
 
                 if ($fhInLock = $f->fopen_flock_pooling(
-                    $tickUsleep, $timeoutMs,
+                    $flockWaitTickUsleep, $flockWaitTimeoutMs,
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
                 )) {
-                    $ctx->finallyFrelease($fhInLock);
-                    $ctx->finallyFclose($fhInLock);
-                    $ctx->finallyUnlink($fileInLock);
+                    $ctx->onFinallyFrelease($fhInLock);
+                    $ctx->onFinallyFclose($fhInLock);
+                    $ctx->onFinallyUnlink($fileInLock);
 
                     fwrite($fhInLock, getmypid());
 
@@ -1134,9 +1134,9 @@ class FsModule
                 if ($fhInLock = $f->fopen_flock(
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
                 )) {
-                    $ctx->finallyFrelease($fhInLock);
-                    $ctx->finallyFclose($fhInLock);
-                    $ctx->finallyUnlink($fileInLock);
+                    $ctx->onFinallyFrelease($fhInLock);
+                    $ctx->onFinallyFclose($fhInLock);
+                    $ctx->onFinallyUnlink($fileInLock);
 
                     fwrite($fhInLock, getmypid());
 
@@ -1151,7 +1151,7 @@ class FsModule
     }
 
     public function brpush(
-        $tickUsleep, $timeoutMs,
+        $flockWaitTickUsleep, $flockWaitTimeoutMs,
         string $file, string $data
     ) : bool
     {
@@ -1173,19 +1173,19 @@ class FsModule
         $f->call(
             static function (FileSafeContext $ctx) use (
                 $f,
-                $tickUsleep, $timeoutMs,
+                $flockWaitTickUsleep, $flockWaitTimeoutMs,
                 $file, $data
             ) {
                 $fileIn = "{$file}.in";
                 $fileInLock = "{$file}.in.lock";
 
                 if ($fhInLock = $f->fopen_flock_pooling(
-                    $tickUsleep, $timeoutMs,
+                    $flockWaitTickUsleep, $flockWaitTimeoutMs,
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
                 )) {
-                    $ctx->finallyFrelease($fhInLock);
-                    $ctx->finallyFclose($fhInLock);
-                    $ctx->finallyUnlink($fileInLock);
+                    $ctx->onFinallyFrelease($fhInLock);
+                    $ctx->onFinallyFclose($fhInLock);
+                    $ctx->onFinallyUnlink($fileInLock);
 
                     fwrite($fhInLock, getmypid());
 
@@ -1200,8 +1200,10 @@ class FsModule
     }
 
 
-    public function lpop(string $file) : ?string
+    public function lpop(string $file, ?bool $deleteIfEmpty = null) : ?string
     {
+        $deleteIfEmpty = $deleteIfEmpty ?? false;
+
         $theType = Lib::type();
 
         if (! $theType->freepath($fileString, $file)) {
@@ -1221,10 +1223,16 @@ class FsModule
         $data = $f->call(
             static function (FileSafeContext $ctx) use (
                 $f,
-                $file
+                $file, $deleteIfEmpty
             ) {
                 $fileIn = "{$file}.in";
                 $fileOut = "{$file}.lpop";
+
+                if ($deleteIfEmpty) {
+                    $ctx->onFinallyUnlinkIfEmpty($fileIn);
+                    $ctx->onFinallyUnlinkIfEmpty($fileOut);
+                }
+
                 $fileOutLock = "{$file}.lpop.lock";
 
                 $data = null;
@@ -1232,9 +1240,9 @@ class FsModule
                 if ($fhOutLock = $f->fopen_flock(
                     $fileOutLock, 'w', LOCK_EX | LOCK_NB
                 )) {
-                    $ctx->finallyFrelease($fhOutLock);
-                    $ctx->finallyFclose($fhOutLock);
-                    $ctx->finallyUnlink($fileOutLock);
+                    $ctx->onFinallyFrelease($fhOutLock);
+                    $ctx->onFinallyFclose($fhOutLock);
+                    $ctx->onFinallyUnlink($fileOutLock);
 
                     fwrite($fhOutLock, getmypid());
 
@@ -1250,9 +1258,6 @@ class FsModule
                                 file_put_contents($fileOut, $content, FILE_APPEND);
                                 file_put_contents($fileIn, '');
 
-                                clearstatcache(true, $fileOut);
-                                clearstatcache(true, $fileIn);
-
                                 $isFileOut = true;
                             }
                         }
@@ -1260,20 +1265,20 @@ class FsModule
 
                     if ($isFileOut) {
                         if ($fhOut = fopen($fileOut, 'r+')) {
-                            $ctx->finallyFclose($fhOut);
+                            $ctx->onFinallyFclose($fhOut);
 
                             $line = fgets($fhOut);
+                            $contentOut = stream_get_contents($fhOut);
+
+                            rewind($fhOut);
+                            ftruncate($fhOut, 0);
+
+                            if ('' !== $contentOut) {
+                                fwrite($fhOut, $contentOut);
+                            }
 
                             $line = rtrim($line);
-
                             if ('' !== $line) {
-                                $contentOut = stream_get_contents($fhOut);
-
-                                rewind($fhOut);
-                                ftruncate($fhOut, 0);
-
-                                fwrite($fhOut, $contentOut);
-
                                 $data = base64_decode($line);
                             }
                         }
@@ -1288,10 +1293,12 @@ class FsModule
     }
 
     public function blpop(
-        $tickUsleep, $timeoutMs,
-        string $file
+        $blockTickUsleep, $blockTimeoutMs,
+        string $file, ?bool $deleteIfEmpty = null
     ) : ?string
     {
+        $deleteIfEmpty = $deleteIfEmpty ?? false;
+
         $theType = Lib::type();
 
         if (! $theType->freepath($fileString, $file)) {
@@ -1311,29 +1318,35 @@ class FsModule
         $data = $f->call(
             static function (FileSafeContext $ctx) use (
                 $f,
-                $tickUsleep, $timeoutMs,
-                $file
+                $blockTickUsleep, $blockTimeoutMs,
+                $file, $deleteIfEmpty
             ) {
                 $fileIn = "{$file}.in";
                 $fileOut = "{$file}.lpop";
-                $fileOutLock = "{$file}.lpop.lock";
+
+                if ($deleteIfEmpty) {
+                    $ctx->onFinallyUnlinkIfEmpty($fileIn);
+                    $ctx->onFinallyUnlinkIfEmpty($fileOut);
+                }
 
                 $data = null;
 
+                $fileOutLock = "{$file}.lpop.lock";
+
                 if ($fhOutLock = $f->fopen_flock_pooling(
-                    $tickUsleep, $timeoutMs,
-                    $fileOutLock, 'w', LOCK_EX
+                    $blockTickUsleep, $blockTimeoutMs,
+                    $fileOutLock, 'w', LOCK_EX | LOCK_NB
                 )) {
-                    $ctx->finallyFrelease($fhOutLock);
-                    $ctx->finallyFclose($fhOutLock);
-                    $ctx->finallyUnlink($fileOutLock);
+                    $ctx->onFinallyFrelease($fhOutLock);
+                    $ctx->onFinallyFclose($fhOutLock);
+                    $ctx->onFinallyUnlink($fileOutLock);
 
                     fwrite($fhOutLock, getmypid());
 
                     $fnTick = static function (&$result) use (
-                        &$fhOut, $fileIn, $fileOut,
-                        //
-                        $ctx
+                        $ctx,
+                        $fileIn, $fileOut,
+                        &$fhOut
                     ) {
                         $isFileOut = is_file($fileOut) && filesize($fileOut);
 
@@ -1347,9 +1360,6 @@ class FsModule
                                     file_put_contents($fileOut, $content, FILE_APPEND);
                                     file_put_contents($fileIn, '');
 
-                                    clearstatcache(true, $fileOut);
-                                    clearstatcache(true, $fileIn);
-
                                     $isFileOut = true;
                                 }
                             }
@@ -1358,23 +1368,23 @@ class FsModule
                         if ($isFileOut) {
                             if (! $fhOut) {
                                 if ($fhOut = fopen($fileOut, 'r+')) {
-                                    $ctx->finallyFclose($fhOut);
+                                    $ctx->onFinallyFclose($fhOut);
                                 }
                             }
 
                             if ($fhOut) {
                                 $line = fgets($fhOut);
+                                $contentOut = stream_get_contents($fhOut);
+
+                                rewind($fhOut);
+                                ftruncate($fhOut, 0);
+
+                                if ('' !== $contentOut) {
+                                    fwrite($fhOut, $contentOut);
+                                }
 
                                 $line = rtrim($line);
-
                                 if ('' !== $line) {
-                                    $contentOut = stream_get_contents($fhOut);
-
-                                    rewind($fhOut);
-                                    ftruncate($fhOut, 0);
-
-                                    fwrite($fhOut, $contentOut);
-
                                     $data = base64_decode($line);
 
                                     $result = [ $data ];
@@ -1383,7 +1393,7 @@ class FsModule
                         }
                     };
 
-                    $data = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+                    $data = Lib::php()->poolingSync($blockTickUsleep, $blockTimeoutMs, $fnTick);
 
                     if (false === $data) {
                         $data = null;
@@ -1398,8 +1408,10 @@ class FsModule
     }
 
 
-    public function rpop(string $file) : ?string
+    public function rpop(string $file, ?bool $deleteIfEmpty = null) : ?string
     {
+        $deleteIfEmpty = $deleteIfEmpty ?? false;
+
         $theType = Lib::type();
 
         if (! $theType->freepath($fileString, $file)) {
@@ -1419,10 +1431,16 @@ class FsModule
         $data = $f->call(
             static function (FileSafeContext $ctx) use (
                 $f,
-                $file
+                $file, $deleteIfEmpty
             ) {
                 $fileIn = "{$file}.in";
                 $fileOut = "{$file}.rpop";
+
+                if ($deleteIfEmpty) {
+                    $ctx->onFinallyUnlinkIfEmpty($fileIn);
+                    $ctx->onFinallyUnlinkIfEmpty($fileOut);
+                }
+
                 $fileOutLock = "{$file}.rpop.lock";
 
                 $data = null;
@@ -1430,9 +1448,9 @@ class FsModule
                 if ($fhOutLock = $f->fopen_flock(
                     $fileOutLock, 'w', LOCK_EX | LOCK_NB
                 )) {
-                    $ctx->finallyFrelease($fhOutLock);
-                    $ctx->finallyFclose($fhOutLock);
-                    $ctx->finallyUnlink($fileOutLock);
+                    $ctx->onFinallyFrelease($fhOutLock);
+                    $ctx->onFinallyFclose($fhOutLock);
+                    $ctx->onFinallyUnlink($fileOutLock);
 
                     $isFileOut = is_file($fileOut) && filesize($fileOut);
 
@@ -1451,9 +1469,6 @@ class FsModule
                                 file_put_contents($fileOut, $content, FILE_APPEND);
                                 file_put_contents($fileIn, '');
 
-                                clearstatcache(true, $fileOut);
-                                clearstatcache(true, $fileIn);
-
                                 $isFileOut = true;
                             }
                         }
@@ -1461,20 +1476,20 @@ class FsModule
 
                     if ($isFileOut) {
                         if ($fhOut = fopen($fileOut, 'r+')) {
-                            $ctx->finallyFclose($fhOut);
+                            $ctx->onFinallyFclose($fhOut);
 
                             $line = fgets($fhOut);
+                            $contentOut = stream_get_contents($fhOut);
+
+                            rewind($fhOut);
+                            ftruncate($fhOut, 0);
+
+                            if ('' !== $contentOut) {
+                                fwrite($fhOut, $contentOut);
+                            }
 
                             $line = rtrim($line);
-
                             if ('' !== $line) {
-                                $contentOut = stream_get_contents($fhOut);
-
-                                rewind($fhOut);
-                                ftruncate($fhOut, 0);
-
-                                fwrite($fhOut, $contentOut);
-
                                 $data = base64_decode($line);
                             }
                         }
@@ -1489,10 +1504,12 @@ class FsModule
     }
 
     public function brpop(
-        $tickUsleep, $timeoutMs,
-        string $file
+        $blockTickUsleep, $blockTimeoutMs,
+        string $file, ?bool $deleteIfEmpty = null
     ) : ?string
     {
+        $deleteIfEmpty = $deleteIfEmpty ?? false;
+
         $theType = Lib::type();
 
         if (! $theType->freepath($fileString, $file)) {
@@ -1512,22 +1529,28 @@ class FsModule
         $data = $f->call(
             static function (FileSafeContext $ctx) use (
                 $f,
-                $tickUsleep, $timeoutMs,
-                $file
+                $blockTickUsleep, $blockTimeoutMs,
+                $file, $deleteIfEmpty
             ) {
                 $fileIn = "{$file}.in";
                 $fileOut = "{$file}.rpop";
+
+                if ($deleteIfEmpty) {
+                    $ctx->onFinallyUnlinkIfEmpty($fileIn);
+                    $ctx->onFinallyUnlinkIfEmpty($fileOut);
+                }
+
                 $fileOutLock = "{$file}.rpop.lock";
 
                 $data = null;
 
                 if ($fhOutLock = $f->fopen_flock_pooling(
-                    $tickUsleep, $timeoutMs,
+                    $blockTickUsleep, $blockTimeoutMs,
                     $fileOutLock, 'w', LOCK_EX | LOCK_NB
                 )) {
-                    $ctx->finallyFrelease($fhOutLock);
-                    $ctx->finallyFclose($fhOutLock);
-                    $ctx->finallyUnlink($fileOutLock);
+                    $ctx->onFinallyFrelease($fhOutLock);
+                    $ctx->onFinallyFclose($fhOutLock);
+                    $ctx->onFinallyUnlink($fileOutLock);
 
                     fwrite($fhOutLock, getmypid());
 
@@ -1553,9 +1576,6 @@ class FsModule
                                     file_put_contents($fileOut, $content, FILE_APPEND);
                                     file_put_contents($fileIn, '');
 
-                                    clearstatcache(true, $fileOut);
-                                    clearstatcache(true, $fileIn);
-
                                     $isFileOut = true;
                                 }
                             }
@@ -1564,23 +1584,23 @@ class FsModule
                         if ($isFileOut) {
                             if (! $fhOut) {
                                 if ($fhOut = fopen($fileOut, 'r+')) {
-                                    $ctx->finallyFclose($fhOut);
+                                    $ctx->onFinallyFclose($fhOut);
                                 }
                             }
 
                             if ($fhOut) {
                                 $line = fgets($fhOut);
+                                $contentOut = stream_get_contents($fhOut);
+
+                                rewind($fhOut);
+                                ftruncate($fhOut, 0);
+
+                                if ('' === $contentOut) {
+                                    fwrite($fhOut, $contentOut);
+                                }
 
                                 $line = rtrim($line);
-
                                 if ('' !== $line) {
-                                    $contentOut = stream_get_contents($fhOut);
-
-                                    rewind($fhOut);
-                                    ftruncate($fhOut, 0);
-
-                                    fwrite($fhOut, $contentOut);
-
                                     $data = base64_decode($line);
 
                                     $result = [ $data ];
@@ -1589,7 +1609,7 @@ class FsModule
                         }
                     };
 
-                    $data = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+                    $data = Lib::php()->poolingSync($blockTickUsleep, $blockTimeoutMs, $fnTick);
 
                     if (false === $data) {
                         $data = null;

@@ -851,10 +851,7 @@ class PhpModule
     {
         static $current;
 
-        // > немного быстрее будет так, как сделано ниже
-        // return $current = $current ?? ('WIN' === strtoupper(substr(PHP_OS, 0, 3)));
-
-        return $current = $current ?? (PHP_EOL !== "\n");
+        return $current = $current ?? ('WIN' === strtoupper(substr(PHP_OS, 0, 3)));
     }
 
     public function is_terminal() : bool

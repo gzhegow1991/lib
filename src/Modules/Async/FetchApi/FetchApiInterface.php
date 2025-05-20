@@ -4,19 +4,19 @@ namespace Gzhegow\Lib\Modules\Async\FetchApi;
 
 interface FetchApiInterface
 {
-    public function pushTask(string $url, array $curlOptions = [], ?int $lockWaitTimeoutMs = null, ?string &$taskId = null) : bool;
+    public function pushTask(&$taskId, string $url, array $curlOptions = [], ?int $lockWaitTimeoutMs = null) : bool;
 
-    public function popTask(?int $blockTimeoutMs = null, ?array &$task = null) : bool;
+    public function popTask(&$task, ?int $blockTimeoutMs = null) : bool;
 
 
-    public function taskGetResult(string $taskId, ?array &$taskResult = null) : bool;
+    public function taskGetResult(&$taskResult, string $taskId) : bool;
 
-    public function taskFlushResult(string $taskId, ?array &$taskResult = null) : bool;
+    public function taskFlushResult(&$taskResult, string $taskId) : bool;
 
     public function clearTaskResults() : void;
 
 
-    public function daemonAddToPool(int $timeoutMs, ?float $nowMicrotime = null) : bool;
+    public function daemonAddToPool(int $daemonTimeoutMs, ?float $nowMicrotime = null) : bool;
 
     public function daemonRemoveFromPool(?float $nowMicrotime = null) : bool;
 
