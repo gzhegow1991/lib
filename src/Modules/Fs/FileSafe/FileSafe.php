@@ -1865,7 +1865,7 @@ class FileSafe
 
 
     // > функция переименована в file_lines()
-    // abstract public function file(string $file, int|null $flags = null, $context = null) : array;
+    // abstract public function file(string $file, ?int $flags = null, $context = null) : array;
 
     /**
      * @param string   $file
