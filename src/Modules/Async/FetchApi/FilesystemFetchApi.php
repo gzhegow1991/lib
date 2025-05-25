@@ -4,6 +4,7 @@ namespace Gzhegow\Lib\Modules\Async\FetchApi;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
 
 
 class FilesystemFetchApi implements FetchApiInterface
@@ -60,6 +61,12 @@ class FilesystemFetchApi implements FetchApiInterface
 
     public function __construct(array $config = [])
     {
+        if (! extension_loaded('curl')) {
+            throw new RuntimeException(
+                'Missing PHP extension: curl'
+            );
+        }
+
         $theType = Lib::type($tt);
 
         $theType->realpath($binDirDefault, __DIR__ . '/../../../../bin/php/');
