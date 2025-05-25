@@ -64,7 +64,8 @@ class CliModule
 
     public function is_symlink(string $symlink) : bool
     {
-        return is_link($symlink)
+        return false
+            || is_link($symlink)
             || $this->is_junction($symlink);
     }
 
@@ -165,16 +166,16 @@ class CliModule
     }
 
 
-    public function yes(string $message, ?string &$yesQuestion = null) : bool
+    public function yes(string $message, ?string &$refAnswer = null) : bool
     {
         if (! Lib::php()->is_terminal()) {
             throw new RuntimeException('Function must be called only in CLI mode');
         }
 
-        $yesQuestion = $yesQuestion ?? 'n';
+        $refAnswer = $refAnswer ?? 'n';
 
-        $isYes = ('y' === $yesQuestion) || ('yy' === $yesQuestion);
-        $isAll = ('nn' === $yesQuestion) || ('yy' === $yesQuestion);
+        $isYes = ('y' === $refAnswer) || ('yy' === $refAnswer);
+        $isAll = ('nn' === $refAnswer) || ('yy' === $refAnswer);
 
         if (! $isAll) {
             if (! $isYes) {
@@ -186,14 +187,14 @@ class CliModule
                     echo 'Please enter one of: [' . implode('/', $accepted) . ']';
                 }
 
-                $yesQuestion = $passed;
+                $refAnswer = $passed;
 
-                $isYes = ('y' === $yesQuestion) || ('yy' === $yesQuestion);
-                $isAll = ('nn' === $yesQuestion) || ('yy' === $yesQuestion);
+                $isYes = ('y' === $refAnswer) || ('yy' === $refAnswer);
+                $isAll = ('nn' === $refAnswer) || ('yy' === $refAnswer);
             }
 
             if (! $isAll) {
-                $yesQuestion = null;
+                $refAnswer = null;
             }
         }
 

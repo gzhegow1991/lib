@@ -90,8 +90,7 @@ class Pipe
         if (null !== $args) {
             $_args = self::sanitizeArgs($args);
 
-            if (
-                $this->hasValueInitial
+            if ($this->hasValueInitial
                 && (array_key_exists($this->keyValueInitial, $args))
             ) {
                 $isResolved = false;
@@ -189,12 +188,12 @@ class Pipe
     /**
      * @template-covariant T of \Throwable
      *
-     * @param T|null               $e
+     * @param T|null               $refE
      * @param class-string<T>|null $throwableClass
      *
      * @return static
      */
-    public function catchTo(?\Throwable &$e, array $result = [], ?string $throwableClass = null)
+    public function catchTo(?\Throwable &$refE, array $result = [], ?string $throwableClass = null)
     {
         $resultSanitized = $this->sanitizeResult($result);
 
@@ -208,7 +207,7 @@ class Pipe
 
         $this->queueId++;
 
-        $this->catchToQueue[ $this->queueId ] = [ &$e, $resultSanitized, $throwableClass ];
+        $this->catchToQueue[ $this->queueId ] = [ &$refE, $resultSanitized, $throwableClass ];
 
         return $this;
     }
@@ -243,9 +242,7 @@ class Pipe
                     );
                 }
 
-                $e = error_get_last();
-
-                if (null !== $e) {
+                if ($e = error_get_last()) {
                     $this->valueCurrent = [];
 
                     $this->throwableCurrent = new \ErrorException(
@@ -389,8 +386,8 @@ class Pipe
 
         [ &$ref, $result, $throwableClass ] = $this->catchToQueue[ $i ];
 
-        if (
-            (null === $throwableClass)
+        if (false
+            || (null === $throwableClass)
             || ($this->throwableCurrent instanceof $throwableClass)
         ) {
             $ref = $this->throwableCurrent;

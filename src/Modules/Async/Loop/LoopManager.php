@@ -44,25 +44,25 @@ class LoopManager implements LoopManagerInterface
 
 
     /**
-     * @param \SplQueue $queue
+     * @param \SplQueue $refQueue
      */
-    protected function resetQueueMicrotask(&$queue = null) : void
+    protected function resetQueueMicrotask(&$refQueue = null) : void
     {
         $this->queueMicrotask = new \SplQueue();
         $this->queueMicrotask->setIteratorMode(\SplDoublyLinkedList::IT_MODE_FIFO);
 
-        $queue = $this->queueMicrotask;
+        $refQueue = $this->queueMicrotask;
     }
 
     /**
-     * @param \SplQueue $queue
+     * @param \SplQueue $refQueue
      */
-    protected function resetQueueMacrotask(&$queue = null) : void
+    protected function resetQueueMacrotask(&$refQueue = null) : void
     {
         $this->queueMacrotask = new \SplQueue();
         $this->queueMacrotask->setIteratorMode(\SplDoublyLinkedList::IT_MODE_FIFO);
 
-        $queue = $this->queueMacrotask;
+        $refQueue = $this->queueMacrotask;
     }
 
 
@@ -166,8 +166,8 @@ class LoopManager implements LoopManagerInterface
 
             usleep(1000);
 
-        } while ( ! (
-            (0 === count($intervals))
+        } while ( ! ( true
+            && (0 === count($intervals))
             && (0 === count($timers))
             && $bufferMicrotask->isEmpty()
             && $bufferMacrotask->isEmpty()

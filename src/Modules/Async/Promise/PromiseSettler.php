@@ -34,11 +34,11 @@ class PromiseSettler
     public $fnOnFinally;
 
     /**
-     * @var AbstractPromise
+     * @var Promise
      */
     public $promiseParent;
     /**
-     * @var AbstractPromise
+     * @var Promise
      */
     public $promise;
 }

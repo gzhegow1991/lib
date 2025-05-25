@@ -132,11 +132,11 @@ class DebugBacktracer implements DebugBacktracerInterface
         $_ofLine = $of[ 'line' ] ?? null;
         $_ofObject = $of[ 'object' ] ?? null;
 
-        if (null !== $_ofFunction) $_ofFunction = strval($_ofFunction);
-        if (null !== $_ofClass) $_ofClass = strval($_ofClass);
-        if (null !== $_ofFile) $_ofFile = strval($_ofFile);
-        if (null !== $_ofType) $_ofType = strval($_ofType);
-        if (null !== $_ofLine) $_ofLine = intval($_ofLine);
+        if (null !== $_ofFunction) $_ofFunction = (string) $_ofFunction;
+        if (null !== $_ofClass) $_ofClass = (string) $_ofClass;
+        if (null !== $_ofFile) $_ofFile = (string) $_ofFile;
+        if (null !== $_ofType) $_ofType = (string) $_ofType;
+        if (null !== $_ofLine) $_ofLine = (int) $_ofLine;
         // if (null !== $_ofObject) $_ofObject = $_ofObject;
 
         $_of = [];
@@ -161,9 +161,9 @@ class DebugBacktracer implements DebugBacktracerInterface
         $_ofClass = $of[ 'class' ] ?? $of[ 1 ] ?? null;
         $_ofFile = $of[ 'file' ] ?? $of[ 2 ] ?? null;
 
-        if (null !== $_ofFunction) $_ofFunction = strval($_ofFunction);
-        if (null !== $_ofClass) $_ofClass = strval($_ofClass);
-        if (null !== $_ofFile) $_ofFile = strval($_ofFile);
+        if (null !== $_ofFunction) $_ofFunction = (string) $_ofFunction;
+        if (null !== $_ofClass) $_ofClass = (string) $_ofClass;
+        if (null !== $_ofFile) $_ofFile = (string) $_ofFile;
 
         $_of = [];
         $_of[ 'function' ] = $_ofFunction ?? "\0";
@@ -512,8 +512,8 @@ class DebugBacktracer implements DebugBacktracerInterface
                         );
                     }
 
-                    if (
-                        ((null !== $of[ 'function' ]) && ($of[ 'function' ] !== $tFunction))
+                    if (false
+                        || ((null !== $of[ 'function' ]) && ($of[ 'function' ] !== $tFunction))
                         || ((null !== $of[ 'class' ]) && ($of[ 'class' ] !== $tClass))
                         || ((null !== $of[ 'file' ]) && ($of[ 'file' ] !== $tFile))
                         || ((null !== $of[ 'type' ]) && ($of[ 'type' ] !== $tType))
@@ -527,8 +527,8 @@ class DebugBacktracer implements DebugBacktracerInterface
                 }
 
                 if ($hasOfStartsWith) {
-                    if (
-                        (0 !== stripos($tFunction, $ofStartsWith[ 'function' ]))
+                    if (false
+                        || (0 !== stripos($tFunction, $ofStartsWith[ 'function' ]))
                         || (0 !== stripos($tClass, $ofStartsWith[ 'class' ]))
                         || (0 !== stripos($tFile, $ofStartsWith[ 'file' ]))
                     ) {

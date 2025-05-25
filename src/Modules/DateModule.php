@@ -113,11 +113,11 @@ class DateModule
 
 
     /**
-     * @param \DateTimeZone|null $result
+     * @param \DateTimeZone|null $r
      */
-    public function type_timezone(&$result, $timezone, ?array $allowedTimezoneTypes = null) : bool
+    public function type_timezone(&$r, $timezone, ?array $allowedTimezoneTypes = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTimeZone = null;
 
@@ -146,7 +146,7 @@ class DateModule
         }
 
         if (null !== $dateTimeZone) {
-            $result = $dateTimeZone;
+            $r = $dateTimeZone;
 
             return true;
         }
@@ -155,11 +155,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTimeZone|null $result
+     * @param \DateTimeZone|null $r
      */
-    public function type_timezone_offset(&$result, $timezoneOrOffset) : bool
+    public function type_timezone_offset(&$r, $timezoneOrOffset) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTimeZone = null;
 
@@ -186,7 +186,7 @@ class DateModule
         }
 
         if (null !== $dateTimeZone) {
-            $result = $dateTimeZone;
+            $r = $dateTimeZone;
 
             return true;
         }
@@ -195,11 +195,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTimeZone|null $result
+     * @param \DateTimeZone|null $r
      */
-    public function type_timezone_abbr(&$result, $timezoneOrAbbr) : bool
+    public function type_timezone_abbr(&$r, $timezoneOrAbbr) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTimeZone = null;
 
@@ -226,7 +226,7 @@ class DateModule
         }
 
         if (null !== $dateTimeZone) {
-            $result = $dateTimeZone;
+            $r = $dateTimeZone;
 
             return true;
         }
@@ -235,11 +235,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTimeZone|null $result
+     * @param \DateTimeZone|null $r
      */
-    public function type_timezone_name(&$result, $timezoneOrName) : bool
+    public function type_timezone_name(&$r, $timezoneOrName) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTimeZone = null;
 
@@ -266,7 +266,7 @@ class DateModule
         }
 
         if (null !== $dateTimeZone) {
-            $result = $dateTimeZone;
+            $r = $dateTimeZone;
 
             return true;
         }
@@ -275,11 +275,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTimeZone|null $result
+     * @param \DateTimeZone|null $r
      */
-    public function type_timezone_nameabbr(&$result, $timezoneOrNameOrAbbr) : bool
+    public function type_timezone_nameabbr(&$r, $timezoneOrNameOrAbbr) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTimeZone = null;
 
@@ -309,7 +309,7 @@ class DateModule
         }
 
         if (null !== $dateTimeZone) {
-            $result = $dateTimeZone;
+            $r = $dateTimeZone;
 
             return true;
         }
@@ -319,11 +319,11 @@ class DateModule
 
 
     /**
-     * @param \DateTimeInterface|null $result
+     * @param \DateTimeInterface|null $r
      */
-    public function type_date(&$result, $datestring, $timezoneFallback = null) : bool
+    public function type_date(&$r, $datestring, $timezoneFallback = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTime = null;
 
@@ -357,7 +357,7 @@ class DateModule
         }
 
         if (null !== $dateTime) {
-            $result = $this->cloneToDate($dateTime);
+            $r = $this->cloneToDate($dateTime);
 
             return true;
         }
@@ -366,11 +366,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTime|null $result
+     * @param \DateTime|null $r
      */
-    public function type_adate(&$result, $datestring, $timezoneFallback = null) : bool
+    public function type_adate(&$r, $datestring, $timezoneFallback = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTime = null;
 
@@ -404,7 +404,7 @@ class DateModule
         }
 
         if (null !== $dateTime) {
-            $result = $this->cloneToADate($dateTime);
+            $r = $this->cloneToADate($dateTime);
 
             return true;
         }
@@ -413,11 +413,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTimeImmutable|null $result
+     * @param \DateTimeImmutable|null $r
      */
-    public function type_idate(&$result, $datestring, $timezoneFallback = null) : bool
+    public function type_idate(&$r, $datestring, $timezoneFallback = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTimeImmutable = null;
 
@@ -451,7 +451,7 @@ class DateModule
         }
 
         if (null !== $dateTimeImmutable) {
-            $result = $this->cloneToIDate($dateTimeImmutable);
+            $r = $this->cloneToIDate($dateTimeImmutable);
 
             return true;
         }
@@ -461,11 +461,11 @@ class DateModule
 
 
     /**
-     * @param \DateTimeInterface|null $result
+     * @param \DateTimeInterface|null $r
      */
-    public function type_date_formatted(&$result, $dateFormatted, $formats, $timezoneFallback = null) : bool
+    public function type_date_formatted(&$r, $dateFormatted, $formats, $timezoneFallback = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTime = null;
 
@@ -522,7 +522,7 @@ class DateModule
         }
 
         if (null !== $dateTime) {
-            $result = $this->cloneToDate($dateTime);
+            $r = $this->cloneToDate($dateTime);
 
             return true;
         }
@@ -531,11 +531,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTime|null $result
+     * @param \DateTime|null $r
      */
-    public function type_adate_formatted(&$result, $dateFormatted, $formats, $timezoneFallback = null) : bool
+    public function type_adate_formatted(&$r, $dateFormatted, $formats, $timezoneFallback = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTime = null;
 
@@ -592,7 +592,7 @@ class DateModule
         }
 
         if (null !== $dateTime) {
-            $result = $this->cloneToADate($dateTime);
+            $r = $this->cloneToADate($dateTime);
 
             return true;
         }
@@ -601,11 +601,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTimeImmutable|null $result
+     * @param \DateTimeImmutable|null $r
      */
-    public function type_idate_formatted(&$result, $dateFormatted, $formats, $timezoneFallback = null) : bool
+    public function type_idate_formatted(&$r, $dateFormatted, $formats, $timezoneFallback = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTimeImmutable = null;
 
@@ -662,7 +662,7 @@ class DateModule
         }
 
         if (null !== $dateTimeImmutable) {
-            $result = $this->cloneToIDate($dateTimeImmutable);
+            $r = $this->cloneToIDate($dateTimeImmutable);
 
             return true;
         }
@@ -672,11 +672,11 @@ class DateModule
 
 
     /**
-     * @param \DateTimeInterface|null $result
+     * @param \DateTimeInterface|null $r
      */
-    public function type_date_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null) : bool
+    public function type_date_tz(&$r, $datestring, ?array $allowedTimezoneTypes = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTime = null;
 
@@ -719,7 +719,7 @@ class DateModule
         }
 
         if (null !== $dateTime) {
-            $result = $this->cloneToDate($dateTime);
+            $r = $this->cloneToDate($dateTime);
 
             return true;
         }
@@ -728,11 +728,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTime|null $result
+     * @param \DateTime|null $r
      */
-    public function type_adate_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null) : bool
+    public function type_adate_tz(&$r, $datestring, ?array $allowedTimezoneTypes = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTime = null;
 
@@ -775,7 +775,7 @@ class DateModule
         }
 
         if (null !== $dateTime) {
-            $result = $this->cloneToADate($dateTime);
+            $r = $this->cloneToADate($dateTime);
 
             return true;
         }
@@ -784,11 +784,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTimeImmutable|null $result
+     * @param \DateTimeImmutable|null $r
      */
-    public function type_idate_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null) : bool
+    public function type_idate_tz(&$r, $datestring, ?array $allowedTimezoneTypes = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTimeImmutable = null;
 
@@ -831,7 +831,7 @@ class DateModule
         }
 
         if (null !== $dateTimeImmutable) {
-            $result = $this->cloneToIDate($dateTimeImmutable);
+            $r = $this->cloneToIDate($dateTimeImmutable);
 
             return true;
         }
@@ -841,11 +841,11 @@ class DateModule
 
 
     /**
-     * @param \DateTimeInterface|null $result
+     * @param \DateTimeInterface|null $r
      */
-    public function type_date_tz_formatted(&$result, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
+    public function type_date_tz_formatted(&$r, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTime = null;
 
@@ -911,7 +911,7 @@ class DateModule
         }
 
         if (null !== $dateTime) {
-            $result = $this->cloneToADate($dateTime);
+            $r = $this->cloneToADate($dateTime);
 
             return true;
         }
@@ -920,11 +920,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTime|null $result
+     * @param \DateTime|null $r
      */
-    public function type_adate_tz_formatted(&$result, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
+    public function type_adate_tz_formatted(&$r, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTime = null;
 
@@ -990,7 +990,7 @@ class DateModule
         }
 
         if (null !== $dateTime) {
-            $result = $this->cloneToADate($dateTime);
+            $r = $this->cloneToADate($dateTime);
 
             return true;
         }
@@ -999,11 +999,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTimeImmutable|null $result
+     * @param \DateTimeImmutable|null $r
      */
-    public function type_idate_tz_formatted(&$result, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
+    public function type_idate_tz_formatted(&$r, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTimeImmutable = null;
 
@@ -1069,7 +1069,7 @@ class DateModule
         }
 
         if (null !== $dateTimeImmutable) {
-            $result = $this->cloneToIDate($dateTimeImmutable);
+            $r = $this->cloneToIDate($dateTimeImmutable);
 
             return true;
         }
@@ -1079,11 +1079,11 @@ class DateModule
 
 
     /**
-     * @param \DateTimeInterface|null $result
+     * @param \DateTimeInterface|null $r
      */
-    public function type_date_microtime(&$result, $microtime, $timezoneSet = null) : bool
+    public function type_date_microtime(&$r, $microtime, $timezoneSet = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTime = null;
 
@@ -1140,7 +1140,7 @@ class DateModule
         }
 
         if (null !== $dateTime) {
-            $result = $this->cloneToDate($dateTime);
+            $r = $this->cloneToDate($dateTime);
 
             return true;
         }
@@ -1149,11 +1149,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTime|null $result
+     * @param \DateTime|null $r
      */
-    public function type_adate_microtime(&$result, $microtime, $timezoneSet = null) : bool
+    public function type_adate_microtime(&$r, $microtime, $timezoneSet = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTime = null;
 
@@ -1210,7 +1210,7 @@ class DateModule
         }
 
         if (null !== $dateTime) {
-            $result = $this->cloneToDate($dateTime);
+            $r = $this->cloneToDate($dateTime);
 
             return true;
         }
@@ -1219,11 +1219,11 @@ class DateModule
     }
 
     /**
-     * @param \DateTimeImmutable|null $result
+     * @param \DateTimeImmutable|null $r
      */
-    public function type_idate_microtime(&$result, $microtime, $timezoneSet = null) : bool
+    public function type_idate_microtime(&$r, $microtime, $timezoneSet = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $dateTimeImmutable = null;
 
@@ -1282,7 +1282,7 @@ class DateModule
         }
 
         if (null !== $dateTimeImmutable) {
-            $result = $this->cloneToDate($dateTimeImmutable);
+            $r = $this->cloneToDate($dateTimeImmutable);
 
             return true;
         }
@@ -1292,22 +1292,22 @@ class DateModule
 
 
     /**
-     * @param \DateInterval|null $result
+     * @param \DateInterval|null $r
      */
-    public function type_interval(&$result, $interval) : bool
+    public function type_interval(&$r, $interval) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($interval instanceof \DateInterval) {
-            $result = $interval;
+            $r = $interval;
 
             return true;
         }
 
         $dateInterval = null;
 
-        $status =
-            $this->type_interval_duration($dateInterval, $interval)
+        $status = false
+            || $this->type_interval_duration($dateInterval, $interval)
             || $this->type_interval_datestring($dateInterval, $interval)
             //
             // > commented, autoparsing integers is bad practice
@@ -1315,7 +1315,7 @@ class DateModule
         ;
 
         if ($status) {
-            $result = $dateInterval;
+            $r = $dateInterval;
 
             return true;
         }
@@ -1324,14 +1324,14 @@ class DateModule
     }
 
     /**
-     * @param \DateInterval|null $result
+     * @param \DateInterval|null $r
      */
-    public function type_interval_duration(&$result, $duration) : bool
+    public function type_interval_duration(&$r, $duration) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($duration instanceof \DateInterval) {
-            $result = $duration;
+            $r = $duration;
 
             return true;
         }
@@ -1343,7 +1343,7 @@ class DateModule
         try {
             $dateInterval = $this->interval_decode($duration);
 
-            $result = $dateInterval;
+            $r = $dateInterval;
 
             return true;
         }
@@ -1354,14 +1354,14 @@ class DateModule
     }
 
     /**
-     * @param \DateInterval|null $result
+     * @param \DateInterval|null $r
      */
-    public function type_interval_datestring(&$result, $datestring) : bool
+    public function type_interval_datestring(&$r, $datestring) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($datestring instanceof \DateInterval) {
-            $result = $datestring;
+            $r = $datestring;
 
             return true;
         }
@@ -1374,7 +1374,7 @@ class DateModule
             $dateInterval = \DateInterval::createFromDateString($datestring);
 
             if (false !== $dateInterval) {
-                $result = $dateInterval;
+                $r = $dateInterval;
 
                 return true;
             }
@@ -1386,14 +1386,14 @@ class DateModule
     }
 
     /**
-     * @param \DateInterval|null $result
+     * @param \DateInterval|null $r
      */
-    public function type_interval_microtime(&$result, $microtime) : bool
+    public function type_interval_microtime(&$r, $microtime) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($microtime instanceof \DateInterval) {
-            $result = $microtime;
+            $r = $microtime;
 
             return true;
         }
@@ -1405,7 +1405,7 @@ class DateModule
         try {
             $dateInterval = $this->interval_decode('PT' . $numeric . 'S');
 
-            $result = $dateInterval;
+            $r = $dateInterval;
 
             return true;
         }
@@ -1416,11 +1416,11 @@ class DateModule
     }
 
     /**
-     * @param \DateInterval|null $result
+     * @param \DateInterval|null $r
      */
-    public function type_interval_ago(&$result, $date, ?\DateTimeInterface $from = null, ?bool $reverse = null) : bool
+    public function type_interval_ago(&$r, $date, ?\DateTimeInterface $from = null, ?bool $reverse = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $reverse = $reverse ?? false;
 
@@ -1428,7 +1428,7 @@ class DateModule
         // $isUntil = (true === $reverse);
 
         if ($date instanceof \DateInterval) {
-            $result = $date;
+            $r = $date;
 
             return true;
         }
@@ -1437,11 +1437,11 @@ class DateModule
             $fromDate = $from ?? new \DateTime('now');
 
             if ($isFrom) {
-                $result = $fromDate->diff($date);
+                $r = $fromDate->diff($date);
 
             } else {
                 // } elseif ($isUntil) {
-                $result = $date->diff($fromDate);
+                $r = $date->diff($fromDate);
             }
 
             return true;
@@ -1923,31 +1923,31 @@ class DateModule
             $seconds = null;
             switch ( $decimalLetter ):
                 case 'Y':
-                    $seconds = intval($decimalValueFrac * static::INTERVAL_YEAR);
+                    $seconds = (int) ($decimalValueFrac * static::INTERVAL_YEAR);
 
                     break;
 
                 case 'W':
-                    $seconds = intval($decimalValueFrac * static::INTERVAL_WEEK);
+                    $seconds = (int) ($decimalValueFrac * static::INTERVAL_WEEK);
 
                     break;
 
                 case 'D':
-                    $seconds = intval($decimalValueFrac * static::INTERVAL_DAY);
+                    $seconds = (int) ($decimalValueFrac * static::INTERVAL_DAY);
 
                     break;
 
                 case 'H':
-                    $seconds = intval($decimalValueFrac * static::INTERVAL_HOUR);
+                    $seconds = (int) ($decimalValueFrac * static::INTERVAL_HOUR);
 
                     break;
 
                 case 'M':
                     if (false === strpos($duration, 'T')) {
-                        $seconds = intval($decimalValueFrac * static::INTERVAL_MONTH);
+                        $seconds = (int) ($decimalValueFrac * static::INTERVAL_MONTH);
 
                     } else {
-                        $seconds = intval($decimalValueFrac * static::INTERVAL_MINUTE);
+                        $seconds = (int) ($decimalValueFrac * static::INTERVAL_MINUTE);
                     }
 
                     break;

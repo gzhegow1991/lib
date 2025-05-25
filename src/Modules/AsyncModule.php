@@ -2,12 +2,11 @@
 
 namespace Gzhegow\Lib\Modules;
 
-use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Async\Loop\LoopManager;
 use Gzhegow\Lib\Modules\Async\Clock\ClockManager;
 use Gzhegow\Lib\Modules\Async\Promise\PromiseManager;
-use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
 use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
+use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
 use Gzhegow\Lib\Modules\Async\FetchApi\FilesystemFetchApi;
 use Gzhegow\Lib\Modules\Async\Clock\ClockManagerInterface;
 use Gzhegow\Lib\Modules\Async\Promise\PromiseManagerInterface;
@@ -111,102 +110,5 @@ class AsyncModule
             ?? $fetchApi
             ?? $this->fetchApi
             ?? new FilesystemFetchApi();
-    }
-
-
-    /**
-     * @param \Socket $socket
-     *
-     * @return string|null
-     */
-    public function read_packet_socket($socket) : ?string
-    {
-        $header = socket_read($socket, 4);
-
-        if (strlen($header) !== 4) {
-            throw new RuntimeException(
-                [ 'First 4 bytes should be length', $header ]
-            );
-        }
-
-        $len = unpack("N", $header)[ 1 ];
-
-        $buff = '';
-
-        while ( strlen($buff) < $len ) {
-            $chunk = socket_read($socket, $len - strlen($buff));
-
-            if ($chunk === false || $chunk === '') {
-                return null;
-            }
-
-            $buff .= $chunk;
-        }
-
-        return $buff;
-    }
-
-    /**
-     * @param \Socket $socket
-     * @param string  $payload
-     *
-     * @return void
-     */
-    public function write_packet_socket($socket, string $payload) : void
-    {
-        $len = strlen($payload);
-
-        $header = pack("N", $len);
-
-        socket_write($socket, $header . $payload);
-    }
-
-
-    /**
-     * @param resource $resource
-     *
-     * @return string|null
-     */
-    public function read_packet_resource($resource) : ?string
-    {
-        $header = fread($resource, 4);
-
-        if (strlen($header) !== 4) {
-            throw new RuntimeException(
-                [ 'First 4 bytes should be length', $header ]
-            );
-        }
-
-        $len = unpack("N", $header)[ 1 ];
-
-        $buff = '';
-
-        while ( strlen($buff) < $len ) {
-            $chunk = fread($resource, $len - strlen($buff));
-
-            if ($chunk === false || $chunk === '') {
-                return null;
-            }
-
-            $buff .= $chunk;
-        }
-
-        return $buff;
-    }
-
-    /**
-     * @param resource $resource
-     * @param string   $payload
-     *
-     * @return void
-     */
-    public function write_packet_resource($resource, string $payload) : void
-    {
-        $len = strlen($payload);
-
-        $header = pack("N", $len);
-
-        fwrite($resource, $header . $payload);
-        fflush($resource);
     }
 }

@@ -3,52 +3,127 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Php\Result\Ret;
+use Gzhegow\Lib\Modules\Format\FormatCsv;
+use Gzhegow\Lib\Modules\Format\FormatXml;
+use Gzhegow\Lib\Modules\Php\Result\Result;
+use Gzhegow\Lib\Modules\Format\FormatJson;
 
 
 class FormatModule
 {
     /**
-     * @return int|float
+     * @param FormatCsv $ref
+     *
+     * @return FormatCsv
      */
-    public function bytes_decode(
-        string $bytesSize, array $fallback = []
-    )
+    public function csv(&$ref = null)
     {
-        $result = [];
-
-        $e = null;
-        try {
-            $result = $this->_bytes_decode($bytesSize);
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        if ([] !== $result) {
-            [ $bytesNum ] = $result;
-
-        } elseif ([] !== $fallback) {
-            [ $bytesNum ] = $fallback;
-
-        } else {
-            throw new RuntimeException(
-                [ 'Unable to ' . __FUNCTION__, $bytesSize, $e ]
-            );
-        }
-
-        return $bytesNum;
+        return $ref = new FormatCsv();
     }
 
     /**
-     * @return array{ 0?: int|float }
+     * @param FormatJson $ref
+     *
+     * @return FormatJson
      */
-    protected function _bytes_decode(string $size) : array
+    public function json(&$ref = null)
+    {
+        return $ref = new FormatJson();
+    }
+
+    /**
+     * @param FormatXml $ref
+     *
+     * @return FormatXml
+     */
+    public function xml(&$ref = null)
+    {
+        return $ref = new FormatXml();
+    }
+
+
+    /**
+     * @param string|null $r
+     */
+    public function type_html_tag(&$r, $value) : bool
+    {
+        $r = null;
+
+        if (! Lib::type()->string_not_empty($valueString, $value)) {
+            return false;
+        }
+
+        if (preg_match('/^[a-z][a-z0-9-]*$/', $valueString)) {
+            $r = $valueString;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $r
+     */
+    public function type_xml_tag(&$r, $value) : bool
+    {
+        $r = null;
+
+        if (! Lib::type()->string_not_empty($valueString, $value)) {
+            return false;
+        }
+
+        if (preg_match('/^[A-Za-z_][A-Za-z0-9_\-\.]*$/', $valueString)) {
+            $r = $valueString;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string|null $r
+     */
+    public function type_xml_nstag(&$r, $value) : bool
+    {
+        $r = null;
+
+        if (! Lib::type()->string_not_empty($valueString, $value)) {
+            return false;
+        }
+
+        if (preg_match('/^(?:[A-Za-z_][A-Za-z0-9_\-\.]*)?:?[A-Za-z_][A-Za-z0-9_\-\.]*$/', $valueString)) {
+            $r = $valueString;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param Ret $ret
+     *
+     * @return int|mixed
+     */
+    public function bytes_decode(
+        string $size,
+        $ret = null
+    )
     {
         if ('' === $size) {
-            throw new LogicException(
-                [ 'The `size` should be non-empty string', $size ]
+            return Result::err(
+                $ret,
+                [ 'The `size` should be non-empty string', $size ],
+                [ __FILE__, __LINE__ ]
             );
+        }
+
+        if ('0' === $size) {
+            return Result::ok($ret, 0);
         }
 
         $strUnitList = [
@@ -64,9 +139,11 @@ class FormatModule
         ];
         $strUnitList = array_merge(...$strUnitList);
 
-        if (! preg_match($regex = '~^(.*[0-9])([A-Z]{0,2})$~', $size, $matches)) {
-            throw new LogicException(
-                [ 'The `size` should match regex: ' . $regex, $size ]
+        if (! preg_match($regex = '/^(\d+(?:\.\d+)?)([A-Z]{0,2})$/', $size, $matches)) {
+            return Result::err(
+                $ret,
+                [ 'The `size` should match regex: ' . $regex, $size ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
@@ -77,258 +154,84 @@ class FormatModule
         }
 
         if (! isset($strUnitList[ $strUnit ])) {
-            throw new LogicException(
-                [ 'Unknown `strUnit`', $strUnit ]
+            return Result::err(
+                $ret,
+                [ 'Unknown `strUnit`', $strUnit ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
         $theType = Lib::type();
 
         if (! $theType->num_positive($number, $numUnit)) {
-            throw new LogicException(
-                [ 'Invalid `numUnit`', $numUnit ]
+            return Result::err(
+                $ret,
+                [ 'Unknown `numUnit`', $numUnit ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
-        if (0 == $numUnit) {
-            $result = [ 0 ];
-
-        } else {
-            $bytesNum = $numUnit * pow(1024, $strUnitList[ $strUnit ]);
-
-            $bytesCeil = ceil($bytesNum);
-
-            if ($bytesCeil === false) {
-                throw new LogicException(
-                    [ 'Unable to ceil', $bytesNum ]
-                );
-            }
-
-            $theType->int($bytesCeilInt, $bytesCeil);
-
-            $result = [ $bytesCeilInt ?? $bytesCeil ];
+        if (0 === $number) {
+            return Result::ok($ret, 0);
         }
 
-        return $result;
-    }
+        $bytesNum = $numUnit * pow(1024, $strUnitList[ $strUnit ]);
 
+        $bytesCeil = ceil($bytesNum);
+
+        if (false === $bytesCeil) {
+            return Result::err(
+                $ret,
+                [ 'Unable to `ceil`', $bytesNum ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Result::ok($ret, (int) $bytesCeil);
+    }
 
     /**
      * @param int|float $bytes
+     * @param Ret       $ret
+     *
+     * @return array{ 0?: string }|mixed
      */
     public function bytes_encode(
-        $bytes, array $fallback = [],
-        ?int $precision = null, ?int $unitLen = null
-    ) : string
+        $bytes,
+        ?int $roundPrecision = null,
+        ?int $unitLen = null,
+        $ret = null
+    )
     {
-        $result = [];
-
-        $e = null;
-        try {
-            $result = $this->_bytes_encode(
-                $bytes,
-                $precision, $unitLen
-            );
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        if ([] !== $result) {
-            [ $bytesSize ] = $result;
-
-        } elseif ([] !== $fallback) {
-            [ $bytesSize ] = $fallback;
-
-        } else {
-            throw new RuntimeException(
-                [ 'Unable to ' . __FUNCTION__, $bytes, $e ]
+        if (! Lib::type()->num_non_negative($bytesNumber, $bytes)) {
+            return Result::err(
+                $ret,
+                [ 'The `bytes` should be non-negative num', $bytes ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
-        return $bytesSize;
-    }
-
-    /**
-     * @param int|float $bytes
-     *
-     * @return array{ 0?: string }
-     */
-    protected function _bytes_encode($bytes, ?int $precision = null, ?int $unitLen = null) : array
-    {
-        if (! Lib::type()->num_non_negative($number, $bytes)) {
-            throw new LogicException(
-                [ 'The `bytes` should be non-negative num', $bytes ]
-            );
-        }
-
-        $precision = $precision ?? 3;
+        $roundPrecision = $roundPrecision ?? 3;
         $unitLen = $unitLen ?? 2;
 
-        if (0 == $number) {
-            $result = [ '0B' ];
-
-        } else {
-            $strUnitList = [ 'B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ];
-
-            $left = $number;
-
-            $pow = floor(log($number) / log(1024));
-            $pow = min($pow, count($strUnitList) - 1);
-
-            $left /= pow(1024, $pow);
-
-            $unit = $strUnitList[ $pow ];
-            $unit = substr($unit, 0, $unitLen);
-
-            $size = round($left, $precision) . $unit;
-
-            $result = [ $size ];
+        if (0 === $bytesNumber) {
+            return Result::ok($ret, '0B');
         }
 
-        return $result;
-    }
+        $strUnitList = [ 'B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ];
 
+        $left = $bytesNumber;
 
-    /**
-     * @return array{0: string, 1: int}
-     */
-    public function csv_encode_rows(
-        array $rows,
-        ?string $separator = null,
-        ?string $enclosure = null,
-        ?string $escape = null,
-        ?string $eol = null
-    ) : array
-    {
-        if ([] === $rows) {
-            throw new LogicException(
-                'The `rows` should be not-empty array'
-            );
-        }
+        $pow = floor(log($bytesNumber) / log(1024));
+        $pow = min($pow, count($strUnitList) - 1);
 
-        $_rows = array_values($rows);
+        $left /= pow(1024, $pow);
 
-        foreach ( $_rows as $i => $row ) {
-            $isNonEmptyArray = is_array($row) && ([] !== $row);
+        $unit = $strUnitList[ $pow ];
+        $unit = substr($unit, 0, $unitLen);
 
-            if (! $isNonEmptyArray) {
-                throw new LogicException(
-                    [
-                        'Each of `rows` should be not-empty array',
-                        $row,
-                        $i,
-                    ]
-                );
-            }
-        }
+        $size = round($left, $roundPrecision) . $unit;
 
-        $theType = Lib::type();
-
-        if (! $theType->char($separatorString, $separator ?? ';')) {
-            throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
-            );
-        }
-
-        if (! $theType->char($enclosureString, $enclosure ?? '"')) {
-            throw new LogicException(
-                [ 'The `enclosure` should be char', $enclosure ]
-            );
-        }
-
-        if (! $theType->char($escapeString, $escape ?? '\\')) {
-            throw new LogicException(
-                [ 'The `escape` should be char', $escape ]
-            );
-        }
-
-        if (! $theType->string_not_empty($eolString, $eol ?? "\n")) {
-            throw new LogicException(
-                [ 'The `eol` should be non-empty string', $eol ]
-            );
-        }
-
-        $fputcsvArgs = [ $separatorString, $enclosureString, $escapeString ];
-
-        if (PHP_VERSION > 80100) {
-            $fputcsvArgs[] = $eolString;
-        }
-
-        $h = fopen('php://temp', 'w');
-        $len = 0;
-
-        foreach ( $_rows as $row ) {
-            $_row = array_values($row);
-
-            $len += fputcsv($h, $_row, ...$fputcsvArgs);
-        }
-
-        rewind($h);
-        $content = stream_get_contents($h);
-        fclose($h);
-
-        return [ $content, $len ];
-    }
-
-    /**
-     * @return array{0: string, 1: int}
-     */
-    public function csv_encode_row(
-        array $row,
-        ?string $separator = null,
-        ?string $enclosure = null,
-        ?string $escape = null,
-        ?string $eol = null
-    ) : array
-    {
-        if ([] === $row) {
-            throw new LogicException(
-                'The `row` should be not-empty array'
-            );
-        }
-
-        $theType = Lib::type();
-
-        if (! $theType->char($separatorString, $separator ?? ';')) {
-            throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
-            );
-        }
-
-        if (! $theType->char($enclosureString, $enclosure ?? '"')) {
-            throw new LogicException(
-                [ 'The `enclosure` should be char', $enclosure ]
-            );
-        }
-
-        if (! $theType->char($escapeString, $escape ?? '\\')) {
-            throw new LogicException(
-                [ 'The `escape` should be char', $escape ]
-            );
-        }
-
-        if (! $theType->string_not_empty($eolString, $eol ?? "\n")) {
-            throw new LogicException(
-                [ 'The `eol` should be non-empty string', $eol ]
-            );
-        }
-
-        $_row = array_values($row);
-
-        $fputcsvArgs = [ $separatorString, $enclosureString, $escapeString ];
-
-        if (PHP_VERSION > 80100) {
-            $fputcsvArgs[] = $eolString;
-        }
-
-        $h = fopen('php://temp', 'w');
-
-        $len = fputcsv($h, $_row, ...$fputcsvArgs);
-
-        rewind($h);
-        $content = stream_get_contents($h);
-        fclose($h);
-
-        return [ $content, $len ];
+        return Result::ok($ret, $size);
     }
 }

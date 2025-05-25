@@ -15,6 +15,9 @@ use Gzhegow\Lib\Exception\Runtime\ComposerException;
 
 class DefaultEmailParser implements EmailParserInterface
 {
+    const EGULIAS_EMAIL_VALIDATOR = '\Egulias\EmailValidator\EmailValidator';
+
+
     /**
      * @var string[]
      */
@@ -33,9 +36,7 @@ class DefaultEmailParser implements EmailParserInterface
             'composer require egulias/email-validator',
         ];
 
-        $eguliasEmailValidatorClass = '\Egulias\EmailValidator\EmailValidator';
-
-        if (! class_exists($eguliasEmailValidatorClass)) {
+        if (! class_exists($eguliasEmailValidatorClass = static::EGULIAS_EMAIL_VALIDATOR)) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -100,19 +101,19 @@ class DefaultEmailParser implements EmailParserInterface
 
     public function parseEmail(
         $value, ?array $filters = null,
-        ?string &$emailDomain = null, ?string &$emailName = null
+        ?string &$refEmailDomain = null, ?string &$refEmailName = null
     ) : string
     {
         $filters = $filters ?? [ 'filter' => true ];
 
         [
             $emailString,
-            $emailDomain,
-            $emailName,
+            $refEmailDomain,
+            $refEmailName,
         ] = $this->parseEmailDomain($value);
 
         $this->parseEmailFilters(
-            $emailString, $emailDomain, $emailName,
+            $emailString, $refEmailDomain, $refEmailName,
             $filters
         );
 
@@ -121,13 +122,13 @@ class DefaultEmailParser implements EmailParserInterface
 
     public function parseEmailFake(
         $value,
-        ?string &$emailDomain = null, ?string &$emailName = null
+        ?string &$refEmailDomain = null, ?string &$refEmailName = null
     ) : string
     {
         [
             $emailString,
-            $emailDomain,
-            $emailName,
+            $refEmailDomain,
+            $refEmailName,
         ] = $this->parseEmailDomain($value);
 
         if (false === filter_var($emailString, FILTER_VALIDATE_EMAIL)) {
@@ -162,15 +163,15 @@ class DefaultEmailParser implements EmailParserInterface
 
     public function parseEmailNonFake(
         $value, ?array $filters = null,
-        ?string &$emailDomain = null, ?string &$emailName = null
+        ?string &$refEmailDomain = null, ?string &$refEmailName = null
     ) : string
     {
         $filters = $filters ?? [ 'filter' => true ];
 
         [
             $emailString,
-            $emailDomain,
-            $emailName,
+            $refEmailDomain,
+            $refEmailName,
         ] = $this->parseEmailDomain($value);
 
         foreach ( $this->emailFakeRegexIndex as $regexp => $bool ) {
@@ -185,7 +186,7 @@ class DefaultEmailParser implements EmailParserInterface
         }
 
         $this->parseEmailFilters(
-            $emailString, $emailDomain, $emailName,
+            $emailString, $refEmailDomain, $refEmailName,
             $filters
         );
 
@@ -251,8 +252,8 @@ class DefaultEmailParser implements EmailParserInterface
         $filtersIntersectIndex = array_intersect_key($filtersIndex, $filtersKnownIndex);
 
         $eguliasEmailValidator = null;
-        if (
-            isset($filtersIntersectIndex[ 'rfc' ])
+        if (false
+            || isset($filtersIntersectIndex[ 'rfc' ])
             || isset($filtersIntersectIndex[ 'rfc_non_strict' ])
             || isset($filtersIntersectIndex[ 'spoof' ])
             || isset($filtersIntersectIndex[ 'dns' ])

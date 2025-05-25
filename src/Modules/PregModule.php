@@ -9,40 +9,37 @@ use Gzhegow\Lib\Exception\LogicException;
 class PregModule
 {
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_regex(&$result, $value) : bool
+    public function type_regex(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
         }
 
-        error_clear_last();
-
         try {
-            $status = preg_match($_value, '');
+            $isMatch = Lib::func()->safe_call(
+                'preg_match',
+                [ $_value, '' ]
+            );
         }
         catch ( \Throwable $e ) {
             return false;
         }
 
-        if (error_get_last()) {
+        if (false === $isMatch) {
             return false;
         }
 
-        if (false === $status) {
-            return false;
-        }
-
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }
 
 
-    public function preg_quote_ord(string $string, string $mb_encoding = null) : string
+    public function preg_quote_ord(string $string, ?string $mb_encoding = null) : string
     {
         Lib::mb();
 

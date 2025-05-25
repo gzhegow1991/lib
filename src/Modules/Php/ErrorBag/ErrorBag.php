@@ -19,6 +19,10 @@ class ErrorBag
      */
     public function merge(ErrorBag $bag)
     {
+        if ($bag === $this) {
+            return $this;
+        }
+
         $this->errors = array_merge(
             $this->errors,
             $bag->getErrors()

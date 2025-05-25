@@ -19,18 +19,17 @@ class MbModule
     }
 
 
-    public function is_utf8(string $str) : bool
-    {
-        return Lib::str()->is_utf8($str);
-    }
-
-
-    public function list_encodings(?array $order = null, ?array $groups = null) : array
+    /**
+     * @param array|null $detect_order
+     *
+     * @return array{ 0: string[], 1: array<string, string[]> }
+     */
+    public function list_encodings(?array $detect_order = []) : array
     {
         static $cache;
 
-        if (null === $order) {
-            $order = [
+        if (null === $detect_order) {
+            $detect_order = [
                 'utf32',
                 'utf16',
                 'utf8',
@@ -47,35 +46,30 @@ class MbModule
                 'ucs',
             ];
 
-        } elseif ([] === $order) {
-            $string = mb_detect_order();
-
-            foreach ( explode(',', $string) as $enc ) {
-                $order[] = $enc;
+        } elseif ([] === $detect_order) {
+            foreach ( explode(',', mb_detect_order()) as $encGroup ) {
+                $detect_order[] = $encGroup;
             }
         }
 
-        $_order = [];
-        foreach ( $order as $i => $encGroup ) {
-            $_encGroup = trim($encGroup);
-            $_encGroup = strtolower($_encGroup);
-            $_encGroup = str_replace([ ' ', '-' ], '', $_encGroup);
+        $currentEncGroupPriority = 0;
+        $groupsIndexPrioritized = [];
+        foreach ( $detect_order as $encGroup ) {
+            $encGroupString = trim($encGroup);
+            $encGroupString = strtolower($encGroupString);
+            $encGroupString = str_replace([ ' ', '-' ], '', $encGroupString);
 
-            $_order[ $_encGroup ] = true;
+            $groupsIndexPrioritized[ $encGroupString ] = ++$currentEncGroupPriority;
         }
 
-        if (null === $groups) {
-            $groups = $_order;
-        }
-
-        $cacheKey = crc32(serialize($_order));
+        $cacheKey = crc32(serialize($groupsIndexPrioritized));
 
         if (! isset($cache[ $cacheKey ])) {
-            $list = mb_list_encodings();
+            $encsList = mb_list_encodings();
 
             if (Lib::php()->is_windows()) {
-                $list[] = 'CP1251';
-                $list[] = 'Windows-1251';
+                $encsList[] = 'CP1251';
+                $encsList[] = 'Windows-1251';
             }
 
             $remove = [];
@@ -91,44 +85,40 @@ class MbModule
                 ];
             }
 
-            $_list = [];
-            foreach ( $list as $i => $enc ) {
-                $encKey = trim($enc);
-                $encKey = strtolower($encKey);
-                $encKey = str_replace([ ' ', '-' ], '', $encKey);
+            $encsIndexed = [];
+            foreach ( $encsList as $enc ) {
+                $encString = trim($enc);
+                $encString = strtolower($encString);
+                $encString = str_replace([ ' ', '-' ], '', $encString);
 
-                if (! isset($remove[ $encKey ])) {
-                    $_list[ $encKey ] = $enc;
+                if (! isset($remove[ $encString ])) {
+                    $encsIndexed[ $encString ] = $enc;
                 }
             }
 
-            $priority = 0;
-            $orderIndex = [];
-            foreach ( $_order as $encGroup => $bool ) {
-                $orderIndex[ $encGroup ] = ++$priority;
-            }
+            $encsOrder = [];
+            foreach ( $encsIndexed as $encString => $enc ) {
+                $currentEncGroup = null;
+                $currentEncGroupPriority = null;
 
-            $_listOrder = [];
-            foreach ( $_list as $encKey => $enc ) {
-                $group = null;
-                $priority = null;
-                foreach ( $orderIndex as $encGroup => $i ) {
-                    if (0 === stripos($encKey, $encGroup)) {
-                        $group = $encGroup;
-                        $priority = $i;
+                foreach ( $groupsIndexPrioritized as $encGroup => $encGroupPriority ) {
+                    if (0 === stripos($encString, $encGroup)) {
+                        $currentEncGroup = $encGroup;
+                        $currentEncGroupPriority = $encGroupPriority;
 
                         break;
                     }
                 }
-                $priority = $priority ?? INF;
 
-                $_listOrder[ $enc ] = [ $group, $priority ];
+                $currentEncGroupPriority = $currentEncGroupPriority ?? INF;
+
+                $encsOrder[ $enc ] = [ $currentEncGroup, $currentEncGroupPriority ];
             }
 
-            usort($_list,
-                static function ($encA, $encB) use (&$_listOrder) {
-                    $aPriority = $_listOrder[ $encA ][ 1 ];
-                    $bPriority = $_listOrder[ $encB ][ 1 ];
+            usort($encsIndexed,
+                static function ($encA, $encB) use (&$encsOrder) {
+                    $aPriority = $encsOrder[ $encA ][ 1 ];
+                    $bPriority = $encsOrder[ $encB ][ 1 ];
 
                     return 0
                         ?: ($aPriority <=> $bPriority)
@@ -137,42 +127,43 @@ class MbModule
                 }
             );
 
-            $listGroups = [];
-            foreach ( $_list as $enc ) {
-                $encGroup = $_listOrder[ $enc ][ 0 ];
+            $encsByGroup = [];
+            foreach ( $encsIndexed as $enc ) {
+                $encGroup = $encsOrder[ $enc ][ 0 ];
 
-                $listGroups[ $encGroup ][] = $enc;
+                $encsByGroup[ $encGroup ][] = $enc;
             }
 
-            $cache[ $cacheKey ] = [ $list, $listGroups ];
+            $cache[ $cacheKey ] = [ $encsList, $encsByGroup ];
         }
 
         return $cache[ $cacheKey ];
     }
 
     /**
-     * @param array|string|null $encondings
+     * @param string|string[]|null $encondings
      *
-     * @return array<string, bool>
+     * @return array<string, string|false>
      */
     public function detect_encoding(
-        string $string, $encondings = '',
-        ?bool $strict = null, ?array $detect_order = null
+        string $string, $encondings = '', ?bool $strict = null,
+        ?array $detect_order = null
     ) : array
     {
         $strict = $strict ?? true;
 
-        $encGroups = null;
         if ($encondings === '') {
-            [ , $encGroups ] = $this->list_encodings($detect_order);
+            [ , $encsByGroup ] = $this->list_encodings($detect_order);
 
         } else {
-            $encGroups = [];
-            $encGroups[ '' ] = $encondings;
+            $encsByGroup = [];
+            $encsByGroup[ '' ] = is_array($encondings)
+                ? $encondings
+                : array_map('trim', explode(',', $encondings));
         }
 
         $result = [];
-        foreach ( $encGroups as $encGroup => $encList ) {
+        foreach ( $encsByGroup as $encGroup => $encList ) {
             $result[ $encGroup ] = mb_detect_encoding($string, $encList, $strict);
         }
 
@@ -180,34 +171,42 @@ class MbModule
     }
 
     /**
-     * @param array|string|null $from_encoding
+     * @param string|string[]|null $from_encoding
      *
-     * @return array|string|null
+     * @return string|false
      */
-    public function convert_encoding($string, string $to_encoding, $from_encoding = '', array $detect_order = null)
+    public function convert_encoding($string, string $to_encoding, $from_encoding = '', ?array $detect_order = null)
     {
         if ($from_encoding === '') {
-            $array = $this->detect_encoding($string);
+            $detectEncoding = $this->detect_encoding($string);
 
             $list = [];
-            foreach ( $array as $encGroup => $encodingOrFalse ) {
-                if (false !== $encodingOrFalse) {
-                    $list[] = $encodingOrFalse;
+            foreach ( $detectEncoding as $encodingOrFalse ) {
+                if (false === $encodingOrFalse) {
+                    continue;
                 }
+
+                $list[] = $encodingOrFalse;
             }
 
             $from_encoding = $list;
+
+        } else {
+            $from_encoding = is_array($from_encoding)
+                ? $from_encoding
+                : array_map('trim', explode(',', $from_encoding));
         }
 
         $result = mb_convert_encoding($string, $to_encoding, $from_encoding);
 
-        return (false === $result)
-            ? null
-            : $result;
+        return $result;
     }
 
 
-    public function lcfirst(string $string, string $mb_encoding = null) : string
+    /**
+     * > делает регистр первой буквы малым
+     */
+    public function lcfirst(string $string, ?string $mb_encoding = null) : string
     {
         $mbEncodingArgs = [];
         if (null !== $mb_encoding) {
@@ -222,7 +221,10 @@ class MbModule
         return $result;
     }
 
-    public function ucfirst(string $string, string $mb_encoding = null) : string
+    /**
+     * > делает регистр первой буквы большим
+     */
+    public function ucfirst(string $string, ?string $mb_encoding = null) : string
     {
         $mbEncodingArgs = [];
         if (null !== $mb_encoding) {
@@ -291,6 +293,9 @@ class MbModule
     }
 
 
+    /**
+     * > разбивает слово на группы букв с учетом того, что буква может занимать больше одного байта
+     */
     public function str_split(string $string, ?int $length = null, ?string $mb_encoding = null) : array
     {
         $length = $length ?? 1;

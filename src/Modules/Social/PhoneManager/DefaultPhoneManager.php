@@ -17,6 +17,12 @@ use Gzhegow\Lib\Modules\Social\PhoneRegionDetector\PhoneRegionDetectorInterface;
 
 class DefaultPhoneManager implements PhoneManagerInterface
 {
+    const GIGGSEY_PHONE_NUMBER_UTIL_CLASS                 = '\libphonenumber\PhoneNumberUtil';
+    const GIGGSEY_PHONE_NUMBER_OFFLINE_GEOCODER_CLASS     = '\libphonenumber\geocoding\PhoneNumberOfflineGeocoder';
+    const GIGGSEY_PHONE_NUMBER_TO_CARRIER_MAPPER_CLASS    = '\libphonenumber\PhoneNumberToCarrierMapper';
+    const GIGGSEY_PHONE_NUMBER_TO_TIME_ZONES_MAPPER_CLASS = '\libphonenumber\PhoneNumberToTimeZonesMapper';
+
+
     /**
      * @var PhoneRegionDetectorInterface
      */
@@ -83,9 +89,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             'composer require giggsey/libphonenumber-for-php',
         ];
 
-        $libphonenumberPhoneNumberUtilClass = '\libphonenumber\PhoneNumberUtil';
-
-        if (! class_exists($libphonenumberPhoneNumberUtilClass)) {
+        if (! class_exists($giggseyPhoneNumberUtilClass = static::GIGGSEY_PHONE_NUMBER_UTIL_CLASS)) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -93,7 +97,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             ]);
         }
 
-        return $libphonenumberPhoneNumberUtilClass::getInstance();
+        return $giggseyPhoneNumberUtilClass::{'getInstance'}();
     }
 
     /**
@@ -116,9 +120,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             'composer require giggsey/libphonenumber-for-php',
         ];
 
-        $libphonenumberPhoneNumberOfflineGeocoderClass = '\libphonenumber\geocoding\PhoneNumberOfflineGeocoder';
-
-        if (! class_exists($libphonenumberPhoneNumberOfflineGeocoderClass)) {
+        if (! class_exists($giggseyPhoneNumberOfflineGeocoderClass = static::GIGGSEY_PHONE_NUMBER_OFFLINE_GEOCODER_CLASS)) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -126,7 +128,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             ]);
         }
 
-        return $libphonenumberPhoneNumberOfflineGeocoderClass::getInstance();
+        return $giggseyPhoneNumberOfflineGeocoderClass::{'getInstance'}();
     }
 
     /**
@@ -149,9 +151,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             'composer require giggsey/libphonenumber-for-php',
         ];
 
-        $libphonenumberPhoneNumberToCarrierMapperClass = '\libphonenumber\PhoneNumberToCarrierMapper';
-
-        if (! class_exists($libphonenumberPhoneNumberToCarrierMapperClass)) {
+        if (! class_exists($giggseyPhoneNumberToCarrierMapperClass = static::GIGGSEY_PHONE_NUMBER_TO_CARRIER_MAPPER_CLASS)) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -159,7 +159,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             ]);
         }
 
-        return $libphonenumberPhoneNumberToCarrierMapperClass::getInstance();
+        return $giggseyPhoneNumberToCarrierMapperClass::{'getInstance'}();
     }
 
     /**
@@ -182,9 +182,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             'composer require giggsey/libphonenumber-for-php',
         ];
 
-        $libphonenumberPhoneNumberToTimeZonesMapperClass = '\libphonenumber\PhoneNumberToTimeZonesMapper';
-
-        if (! class_exists($libphonenumberPhoneNumberToTimeZonesMapperClass)) {
+        if (! class_exists($giggseyPhoneNumberToTimeZonesMapperClass = static::GIGGSEY_PHONE_NUMBER_TO_TIME_ZONES_MAPPER_CLASS)) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -192,7 +190,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             ]);
         }
 
-        return $libphonenumberPhoneNumberToTimeZonesMapperClass::getInstance();
+        return $giggseyPhoneNumberToTimeZonesMapperClass::{'getInstance'}();
     }
 
     /**
@@ -295,11 +293,11 @@ class DefaultPhoneManager implements PhoneManagerInterface
     }
 
 
-    public function parsePhone($value, ?string &$tel = null, ?string &$telDigits = null, ?string &$telPlus = null) : string
+    public function parsePhone($value, ?string &$refTel = null, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
     {
-        $tel = null;
+        $refTel = null;
 
-        $telParsed = $this->parseTel($value, $telDigits, $telPlus);
+        $telParsed = $this->parseTel($value, $refTelDigits, $refTelPlus);
 
         $allowedSymbolsRegex = ''
             . '[^'
@@ -309,20 +307,20 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         $phone = preg_replace("/{$allowedSymbolsRegex}/", '', $value);
 
-        if ($telPlus) {
+        if ($refTelPlus) {
             $phone = '+' . $phone;
         }
 
-        $tel = $telParsed;
+        $refTel = $telParsed;
 
         return $phone;
     }
 
-    public function parsePhoneFake($value, ?string &$tel = null, ?string &$telDigits = null, ?string &$telPlus = null) : string
+    public function parsePhoneFake($value, ?string &$refTel = null, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
     {
-        $tel = null;
+        $refTel = null;
 
-        $telFake = $this->parseTelFake($value, $telDigits, $telPlus);
+        $telFake = $this->parseTelFake($value, $refTelDigits, $refTelPlus);
 
         $allowedSymbolsRegex = ''
             . '[^'
@@ -332,20 +330,20 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         $phoneFake = preg_replace("/{$allowedSymbolsRegex}/", '', $value);
 
-        if ($telPlus) {
+        if ($refTelPlus) {
             $phoneFake = '+' . $phoneFake;
         }
 
-        $tel = $telFake;
+        $refTel = $telFake;
 
         return $phoneFake;
     }
 
-    public function parsePhoneNonFake($value, ?string &$tel = null, ?string &$telDigits = null, ?string &$telPlus = null) : string
+    public function parsePhoneNonFake($value, ?string &$refTel = null, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
     {
-        $tel = null;
+        $refTel = null;
 
-        $telNonFake = $this->parseTelNonFake($value, $telDigits, $telPlus);
+        $telNonFake = $this->parseTelNonFake($value, $refTelDigits, $refTelPlus);
 
         $allowedSymbolsRegex = ''
             . '[^'
@@ -355,45 +353,45 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         $phoneNonFake = preg_replace("/{$allowedSymbolsRegex}/", '', $value);
 
-        if ($telPlus) {
+        if ($refTelPlus) {
             $phoneNonFake = '+' . $phoneNonFake;
         }
 
-        $tel = $telNonFake;
+        $refTel = $telNonFake;
 
         return $phoneNonFake;
     }
 
     public function parsePhoneReal(
         $value, ?string $region = '',
-        ?string &$regionDetected = null,
-        ?string &$tel = null, ?string &$telDigits = null, ?string &$telPlus = null
+        ?string &$refRegionDetected = null,
+        ?string &$refTel = null, ?string &$refTelDigits = null, ?string &$refTelPlus = null
     ) : string
     {
-        $tel = null;
+        $refTel = null;
 
         $telNonFake = $this->parseTelNonFake(
             $value,
-            $telDigits, $telPlus
+            $refTelDigits, $refTelPlus
         );
 
         $phoneNumberObject = $this->parsePhoneNumber(
             $telNonFake, $region,
-            $regionDetected
+            $refRegionDetected
         );
 
         $formatted = $this->formatInternational($phoneNumberObject);
 
-        $tel = $telNonFake;
+        $refTel = $telNonFake;
 
         return $formatted;
     }
 
 
-    public function parseTel($value, ?string &$telDigits = null, ?string &$telPlus = null) : string
+    public function parseTel($value, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
     {
-        $telDigits = null;
-        $telPlus = null;
+        $refTelDigits = null;
+        $refTelPlus = null;
 
         if (is_a($value, '\libphonenumber\PhoneNumber')) {
             $tel = $this->formatE164($value);
@@ -430,8 +428,8 @@ class DefaultPhoneManager implements PhoneManagerInterface
             $telDigitsString = $tel;
         }
 
-        $telDigits = $telDigitsString;
-        $telPlus = $telPlusString;
+        $refTelDigits = $telDigitsString;
+        $refTelPlus = $telPlusString;
 
         $tel = $isPlus
             ? '+' . $telDigitsString
@@ -440,9 +438,9 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $tel;
     }
 
-    public function parseTelFake($value, ?string &$telDigits = null, ?string &$telPlus = null) : string
+    public function parseTelFake($value, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
     {
-        $telString = $this->parseTel($value, $telDigits, $telPlus);
+        $telString = $this->parseTel($value, $refTelDigits, $refTelPlus);
 
         $isFake = null;
 
@@ -457,7 +455,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
         if (null === $isFake) {
             if ($this->usePhoneFakeDatelike) {
                 try {
-                    $dt = \DateTime::createFromFormat('YmdHis', $telDigits);
+                    $dt = \DateTime::createFromFormat('YmdHis', $refTelDigits);
 
                     if (false !== $dt) {
                         $isFake = true;
@@ -480,9 +478,9 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $telString;
     }
 
-    public function parseTelNonFake($value, ?string &$telDigits = null, ?string &$telPlus = null) : string
+    public function parseTelNonFake($value, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
     {
-        $telString = $this->parseTel($value, $telDigits, $telPlus);
+        $telString = $this->parseTel($value, $refTelDigits, $refTelPlus);
 
         foreach ( $this->phoneFakeRegexIndex as $regexp => $bool ) {
             if (preg_match($regexp, $telString)) {
@@ -517,18 +515,18 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
     public function parseTelReal(
         $value, ?string $region = '',
-        ?string &$regionDetected = null,
-        ?string &$telDigits = null, ?string &$telPlus = null
+        ?string &$refRegionDetected = null,
+        ?string &$refTelDigits = null, ?string &$refTelPlus = null
     ) : string
     {
         $telNonFake = $this->parseTelNonFake(
             $value,
-            $telDigits, $telPlus
+            $refTelDigits, $refTelPlus
         );
 
         $phoneNumberObject = $this->parsePhoneNumber(
             $telNonFake, $region,
-            $regionDetected
+            $refRegionDetected
         );
 
         $formatted = $this->formatE164($phoneNumberObject);
@@ -542,10 +540,10 @@ class DefaultPhoneManager implements PhoneManagerInterface
      */
     public function parsePhoneNumber(
         $value, ?string $region = '',
-        ?string &$regionDetected = null
+        ?string &$refRegionDetected = null
     ) : object
     {
-        $regionDetected = null;
+        $refRegionDetected = null;
 
         if ($value instanceof \libphonenumber\PhoneNumber) {
             $phoneNumber = $value;
@@ -596,7 +594,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             }
         }
 
-        $regionDetected = $regionString;
+        $refRegionDetected = $regionString;
 
         return $phoneNumber;
     }

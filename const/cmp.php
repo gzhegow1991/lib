@@ -1,8 +1,8 @@
 <?php
 
 if (! defined('_CMP_MODE_TYPE_STRICT')) define('_CMP_MODE_TYPE_STRICT', 1 << 1);
-if (! defined('_CMP_MODE_TYPE_CAST_OR_NAN')) define('_CMP_MODE_TYPE_CAST_OR_NAN', 1 << 2);
-if (! defined('_CMP_MODE_TYPE_CAST_OR_CONTINUE')) define('_CMP_MODE_TYPE_CAST_OR_CONTINUE', 1 << 3);
+if (! defined('_CMP_MODE_TYPE_TYPECAST_OR_NAN')) define('_CMP_MODE_TYPE_TYPECAST_OR_NAN', 1 << 2);
+if (! defined('_CMP_MODE_TYPE_TYPECAST_OR_CONTINUE')) define('_CMP_MODE_TYPE_TYPECAST_OR_CONTINUE', 1 << 3);
 if (! defined('_CMP_MODE_TYPECAST_A')) define('_CMP_MODE_TYPECAST_A', 1 << 4);
 if (! defined('_CMP_MODE_TYPECAST_B')) define('_CMP_MODE_TYPECAST_B', 1 << 5);
 if (! defined('_CMP_MODE_STRING_VS_STRCMP')) define('_CMP_MODE_STRING_VS_STRCMP', 1 << 6);

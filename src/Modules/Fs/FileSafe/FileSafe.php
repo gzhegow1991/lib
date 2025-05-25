@@ -1,383 +1,39 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Fs;
+namespace Gzhegow\Lib\Modules\Fs\FileSafe;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-/**
- * @method int umask(int $umask)
- *
- * @ method fopen()
- * @ method fclose()
- *
- * @ method flock()
- * @ method flock_pooling()
- * @ method frelease()
- *
- * @method bool feof(resource $resource)
- * @method int|false ftell(resource $resource)
- * @ method fseek()
- * @ method rewind()
- *
- * @method string|false fread(resource $resource, int $length)
- * @method int|false fwrite(resource $resource, string $data, int|null $length)
- * @ method fwrite_fflush()
- *
- * @method bool ftruncate(resource $resource, int $pos)
- *
- * @method string|false fgetc(resource $resource)
- * @method string|false fgets(resource $resource, int|null $length)
- *
- * @method int|false fputs(resource $resource, string $data, int $length)
- * @ method int|false fputs_fflush()
- *
- * @method int|false fpassthru(resource $stream)
- * @ method int|false fpassthru_fflush(resource $stream)
- *
- * @method bool fflush(resource $stream)
- * @method bool fsync(resource $stream)
- * @method bool fdatasync(resource $stream)
- *
- * @method string|false filetype(string $filename)
- *
- * @ method file_exists()
- * @ method is_exists()
- * @ method is_file()
- * @ method is_realfile()
- * @ method is_dir()
- * @ method is_realdir()
- *
- * @ method is_link()
- * @ method is_link_dir()
- * @ method is_link_file()
- * @ method is_link_target()
- *
- * @ method is_readable()
- * @ method is_writeable()
- * @ method is_executable()
- *
- * @ method clearstatcache()
- * @method array|false fstat(string $file)
- * @method array|false lstat(string $file)
- * @method array|false stat(resource $resource)
- *
- * @method string|false readlink(string $file)
- * @ method realpath()
- * @ method realpath_link()
- * @ method realpath_target()
- *
- * @method int|false fileatime(string $file)
- * @method int|false filectime(string $file)
- * @method int|false filegroup(string $file)
- * @method int|false fileinode(string $file)
- * @method int|false filemtime(string $file)
- * @method int|false fileowner(string $file)
- * @method int|false fileperms(string $file)
- *
- * @method int|false filesize(string $file)
- *
- * @ method chmod()
- * @ method chown()
- * @ method lchown()
- * @ method chgrp()
- * @ method lchgrp()
- *
- * @ method touch()
- * @ method copy()
- * @ method rename()
- *
- * @ method unlink()
- *
- * @ method rm()
- * @ method rmf()
- *
- * @ method mkdir()
- * @ method mkdirp()
- * @ method rmdir()
- * @ method rmdirf()
- *
- * @ method link()
- * @ method symlink()
- *
- * @ method file_read()
- * @ method file_read_flock()
- * @ method file_read_flock_pooling()
- *
- * @ method file_write()
- * @ method file_write_flock()
- * @ method file_write_flock_pooling()
- *
- * // @ method file()
- * @ method file_lines()
- * @ method file_lines_flock()
- * @ method file_lines_flock_pooling()
- *
- * // @ method readfile()
- * @ method file_echo()
- * @ method file_echo_flock()
- * @ method file_echo_flock_pooling()
- *
- * @ method file_get_contents()
- * @ method file_put_contents()
- *
- *
- * // @ method fgetss()
- *
- * // @ method fgetcsv()
- * // @ method fputcsv()
- *
- * // @ method basename()
- * // @ method dirname()
- *
- * // @ method linkinfo()
- * // @ method pathinfo()
- *
- * // @ method pclose()
- * // @ method popen()
- *
- * // @ method glob()
- *
- * // @ method parse_ini_file()
- * // @ method parse_ini_string()
- *
- * // @ method realpath_cache_get()
- * // @ method realpath_cache_size()
- *
- * // @ method set_file_buffer()
- *
- * // @ method tempnam()
- * // @ method tmpfile()
- *
- * // @ method is_uploaded_file()
- * // @ method move_uploaded_file()
- *
- * // @ method disk_free_space()
- * // @ method disk_total_space()
- * // @ method diskfreespace()
- */
 class FileSafe
 {
     /**
-     * @return mixed
+     * @var FileSafeContext
      */
-    public function __call($name, $args)
+    protected $context;
+
+
+    public function __construct()
     {
-        $beforeErrorReporting = error_reporting(E_ALL | E_STRICT | E_DEPRECATED | E_USER_DEPRECATED);
-        $beforeErrorHandler = set_error_handler($this->fnErrorHandler());
-
-        $fn = $this->__callGetCallable($name);
-
-        $result = call_user_func_array($fn, $args);
-
-        set_error_handler($beforeErrorHandler);
-        error_reporting($beforeErrorReporting);
-
-        return $result;
-    }
-
-    /**
-     * @param string $name
-     *
-     * @return callable
-     */
-    protected function __callGetCallable(string $name)
-    {
-        /**
-         * @var array<string, callable> $map
-         */
-        static $map;
-
-        $map = $map ?? [
-            'umask'                    => 'umask',
-            //
-            'fopen'                    => [ $this, 'fopen' ],
-            'fclose'                   => [ $this, 'fclose' ],
-            //
-            'flock'                    => [ $this, 'flock' ],
-            'flock_pooling'            => [ $this, 'flock_pooling' ],
-            'frelease'                 => [ $this, 'frelease' ],
-            //
-            'fopen_flock'              => [ $this, 'fopen_flock' ],
-            'fopen_flock_pooling'      => [ $this, 'fopen_flock_pooling' ],
-            'frelease_fclose'          => [ $this, 'frelease_fclose' ],
-            //
-            'feof'                     => 'feof',
-            'ftell'                    => 'ftell',
-            'fseek'                    => [ $this, 'fseek' ],
-            'rewind'                   => [ $this, 'rewind' ],
-            //
-            'fread'                    => [ $this, 'fread' ],
-            'fwrite'                   => [ $this, 'fwrite' ],
-            'fwrite_fflush'            => [ $this, 'fwrite_fflush' ],
-            //
-            'ftruncate'                => 'ftruncate',
-            //
-            'fgetc'                    => 'fgetc',
-            'fgets'                    => 'fgets',
-            //
-            'fputs'                    => 'fputs',
-            'fputs_fflush'             => [ $this, 'fputs_fflush' ],
-            //
-            'fpassthru'                => 'fpassthru',
-            'fpassthru_fflush'         => [ $this, 'fpassthru_fflush' ],
-            //
-            'fflush'                   => 'fflush',
-            'fsync'                    => 'fsync',
-            'fdatasync'                => 'fdatasync',
-            //
-            'filetype'                 => 'filetype',
-            //
-            'file_exists'              => [ $this, 'file_exists' ],
-            'is_exists'                => [ $this, 'is_exists' ],
-            'is_file'                  => [ $this, 'is_file' ],
-            'is_realfile'              => [ $this, 'is_realfile' ],
-            'is_dir'                   => [ $this, 'is_dir' ],
-            'is_realdir'               => [ $this, 'is_realdir' ],
-            //
-            'is_link'                  => [ $this, 'is_link' ],
-            'is_link_dir'              => [ $this, 'is_link_dir' ],
-            'is_link_file'             => [ $this, 'is_link_file' ],
-            'is_link_target'           => [ $this, 'is_link_target' ],
-            //
-            'is_readable'              => [ $this, 'is_readable' ],
-            'is_writable'              => [ $this, 'is_writable' ],
-            'is_writeable'             => [ $this, 'is_writeable' ],
-            'is_executable'            => [ $this, 'is_executable' ],
-            //
-            'clearstatcache'           => [ $this, 'clearstatcache' ],
-            'fstat'                    => 'fstat',
-            'lstat'                    => 'lstat',
-            'stat'                     => 'stat',
-            //
-            'readlink'                 => 'readlink',
-            'realpath'                 => [ $this, 'realpath' ],
-            'realpath_link'            => [ $this, 'realpath_link' ],
-            'realpath_target'          => [ $this, 'realpath_target' ],
-            //
-            'fileatime'                => 'fileatime',
-            'filectime'                => 'filectime',
-            'filegroup'                => 'filegroup',
-            'fileinode'                => 'fileinode',
-            'filemtime'                => 'filemtime',
-            'fileowner'                => 'fileowner',
-            'fileperms'                => 'fileperms',
-            'filesize'                 => 'filesize',
-            //
-            'chmod'                    => [ $this, 'chmod' ],
-            'chown'                    => [ $this, 'chown' ],
-            'lchown'                   => [ $this, 'lchown' ],
-            'chgrp'                    => [ $this, 'chgrp' ],
-            'lchgrp'                   => [ $this, 'lchgrp' ],
-            //
-            'touch'                    => [ $this, 'touch' ],
-            'copy'                     => [ $this, 'copy' ],
-            'rename'                   => [ $this, 'rename' ],
-            //
-            'unlink'                   => [ $this, 'unlink' ],
-            //
-            'rm'                       => [ $this, 'rm' ],
-            'rmf'                      => [ $this, 'rmf' ],
-            //
-            'mkdir'                    => [ $this, 'mkdir' ],
-            'mkdirp'                   => [ $this, 'mkdirp' ],
-            //
-            'rmdir'                    => [ $this, 'rmdir' ],
-            'rmdirf'                   => [ $this, 'rmdirf' ],
-            //
-            'link'                     => [ $this, 'link' ],
-            'symlink'                  => [ $this, 'symlink' ],
-            //
-            'file_read'                => [ $this, 'file_read' ],
-            'file_read_flock'          => [ $this, 'file_read_flock' ],
-            'file_read_flock_pooling'  => [ $this, 'file_read_flock_pooling' ],
-            //
-            'file_write'               => [ $this, 'file_write' ],
-            'file_write_flock'         => [ $this, 'file_write_flock' ],
-            'file_write_flock_pooling' => [ $this, 'file_write_flock_pooling' ],
-            //
-            'file'                     => false,
-            'file_lines'               => [ $this, 'file_lines' ],
-            'file_lines_lock'          => [ $this, 'file_lines_flock' ],
-            'file_lines_flock_pooling' => [ $this, 'file_lines_flock_pooling' ],
-            //
-            'readfile'                 => false,
-            'file_echo'                => [ $this, 'file_echo' ],
-            'file_echo_flock'          => [ $this, 'file_echo_flock' ],
-            'file_echo_flock_pooling'  => [ $this, 'file_echo_flock_pooling' ],
-            //
-            'file_get_contents'        => [ $this, 'file_get_contents' ],
-            'file_put_contents'        => [ $this, 'file_put_contents' ],
-            //
-            //
-            'fgetss'                   => false,
-            //
-            'fgetcsv'                  => false,
-            'fputcsv'                  => false,
-            //
-            'basename'                 => false,
-            'dirname'                  => false,
-            //
-            'linkinfo'                 => false,
-            'pathinfo'                 => false,
-            //
-            'pclose'                   => false,
-            'popen'                    => false,
-            //
-            'glob'                     => false,
-            //
-            'parse_ini_file'           => false,
-            'parse_ini_string'         => false,
-            //
-            'realpath_cache_get'       => false,
-            'realpath_cache_size'      => false,
-            //
-            'set_file_buffer'          => false,
-            //
-            'tempnam'                  => false,
-            'tmpfile'                  => false,
-            //
-            'is_uploaded_file'         => false,
-            'move_uploaded_file'       => false,
-            //
-            'disk_free_space'          => false,
-            'disk_total_space'         => false,
-            'diskfreespace'            => false,
-        ];
-
-        $fn = $map[ $name ] ?: null;
-
-        if (null === $fn) {
-            throw new RuntimeException('Method is not exists: ' . $name);
+        if (! extension_loaded('fileinfo')) {
+            throw new RuntimeException(
+                'Missing PHP extension: fileinfo'
+            );
         }
 
-        return $fn;
+        $this->context = new FileSafeContext();
     }
 
 
-    /**
-     * @return mixed
-     */
-    public function call(\Closure $closure)
+    public function setContext(?FileSafeContext $context) : ?FileSafeContext
     {
-        $beforeErrorReporting = error_reporting(E_ALL | E_STRICT | E_DEPRECATED | E_USER_DEPRECATED);
-        $beforeErrorHandler = set_error_handler($this->fnErrorHandler());
+        $last = $this->context;
 
-        $ctx = new FileSafeContext();
+        $this->context = $context;
 
-        try {
-            $result = call_user_func_array($closure, [ $ctx ]);
-        }
-        finally {
-            $ctx->onFinally();
-        }
-
-        set_error_handler($beforeErrorHandler);
-        error_reporting($beforeErrorReporting);
-
-        return $result;
+        return $last;
     }
 
 
@@ -387,7 +43,7 @@ class FileSafe
      *
      * @return resource|false
      */
-    protected function fopen(
+    public function fopen(
         $file, $modeOpen,
         array $fopenArgs = []
     )
@@ -400,6 +56,8 @@ class FileSafe
             return false;
         }
 
+        $this->context->onFinallyFclose($resource);
+
         return $resource;
     }
 
@@ -408,13 +66,41 @@ class FileSafe
      *
      * @return closed-resource|bool
      */
-    protected function fclose($resource)
+    public function fclose($resource)
     {
         $status = fclose($resource);
 
         if (false === $status) {
             return false;
         }
+
+        $this->context->offFinallyFclose($resource);
+
+        return $resource;
+    }
+
+    /**
+     * @param resource $resource
+     *
+     * @return closed-resource|bool
+     */
+    public function fclosef($resource)
+    {
+        if (! Lib::type()->resource($var, $resource)) {
+            throw new LogicException(
+                [ 'The `resource` should be resource', $resource ]
+            );
+        }
+
+        if (is_resource($resource)) {
+            $status = fclose($resource);
+
+            if (false === $status) {
+                return false;
+            }
+        }
+
+        $this->context->offFinallyFclose($resource);
 
         return $resource;
     }
@@ -426,7 +112,7 @@ class FileSafe
      *
      * @return resource|false
      */
-    protected function flock(
+    public function flock(
         $resource, $modeLock,
         array $flockArgs = []
     )
@@ -439,6 +125,8 @@ class FileSafe
             return false;
         }
 
+        $this->context->onFinallyFrelease($resource);
+
         return $resource;
     }
 
@@ -450,24 +138,29 @@ class FileSafe
      *
      * @return resource|false
      */
-    protected function flock_pooling(
+    public function flock_pooling(
         $tickUsleep, $timeoutMs,
         $resource, $modeLock,
         array $flockArgs = []
     )
     {
-        $fnTick = function (&$result) use (
+        $modeLock |= LOCK_NB;
+
+        $fnTick = function (&$refResult) use (
             $resource, $modeLock,
             $flockArgs
         ) {
-            if (! $this->flock(
-                $resource, $modeLock | LOCK_NB,
-                $flockArgs
-            )) {
+            array_unshift($flockArgs, $resource, $modeLock);
+
+            $status = call_user_func_array('flock', $flockArgs);
+
+            if (false === $status) {
                 return;
             }
 
-            $result = [ $resource ];
+            $this->context->onFinallyFrelease($resource);
+
+            $refResult = [ $resource ];
         };
 
         $status = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
@@ -484,13 +177,41 @@ class FileSafe
      *
      * @return resource|false
      */
-    protected function frelease($resource)
+    public function frelease($resource)
     {
         $status = flock($resource, LOCK_UN);
 
         if (false === $status) {
             return false;
         }
+
+        $this->context->offFinallyFrelease($resource);
+
+        return $resource;
+    }
+
+    /**
+     * @param resource $resource
+     *
+     * @return resource|false
+     */
+    public function freleasef($resource)
+    {
+        if (! Lib::type()->resource($var, $resource)) {
+            throw new LogicException(
+                [ 'The `resource` should be resource', $resource ]
+            );
+        }
+
+        if (is_resource($resource)) {
+            $status = flock($resource, LOCK_UN);
+
+            if (false === $status) {
+                return false;
+            }
+        }
+
+        $this->context->offFinallyFrelease($resource);
 
         return $resource;
     }
@@ -503,7 +224,7 @@ class FileSafe
      *
      * @return resource|false
      */
-    protected function fopen_flock(
+    public function fopen_flock(
         $file, $modeOpen, $modeLock,
         array $fopenArgs = [],
         array $flockArgs = []
@@ -517,6 +238,8 @@ class FileSafe
             return false;
         }
 
+        $this->context->onFinallyFclose($resource);
+
         array_unshift($flockArgs, $resource, $modeLock);
 
         $status = call_user_func_array('flock', $flockArgs);
@@ -524,6 +247,8 @@ class FileSafe
         if (false === $status) {
             return false;
         }
+
+        $this->context->onFinallyFrelease($resource);
 
         return $resource;
     }
@@ -537,13 +262,15 @@ class FileSafe
      *
      * @return resource|false
      */
-    protected function fopen_flock_pooling(
+    public function fopen_flock_pooling(
         $tickUsleep, $timeoutMs,
         $file, $modeOpen, $modeLock,
         array $fopenArgs = [],
         array $flockArgs = []
     )
     {
+        $modeLock |= LOCK_NB;
+
         array_unshift($fopenArgs, $file, $modeOpen, false);
 
         $resource = call_user_func_array('fopen', $fopenArgs);
@@ -552,18 +279,23 @@ class FileSafe
             return false;
         }
 
-        $fnTick = function (&$result) use (
+        $this->context->onFinallyFclose($resource);
+
+        $fnTick = function (&$refResult) use (
             $resource, $modeLock,
             $flockArgs
         ) {
-            if (! $this->flock(
-                $resource, $modeLock | LOCK_NB,
-                $flockArgs
-            )) {
+            array_unshift($flockArgs, $resource, $modeLock);
+
+            $status = call_user_func_array('flock', $flockArgs);
+
+            if (false === $status) {
                 return;
             }
 
-            $result = [ $resource ];
+            $this->context->onFinallyFrelease($resource);
+
+            $refResult = [ $resource ];
         };
 
         $resource = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
@@ -580,7 +312,7 @@ class FileSafe
      *
      * @return closed-resource|false
      */
-    protected function frelease_fclose($resource)
+    public function frelease_fclose($resource)
     {
         $status = flock($resource, LOCK_UN);
 
@@ -588,10 +320,261 @@ class FileSafe
             return false;
         }
 
+        $this->context->offFinallyFrelease($resource);
+
         $status = fclose($resource);
 
         if (false === $status) {
             return false;
+        }
+
+        $this->context->offFinallyFclose($resource);
+
+        return $resource;
+    }
+
+    /**
+     * @param resource $resource
+     *
+     * @return closed-resource|false
+     */
+    public function freleasef_fclosef($resource)
+    {
+        if (! Lib::type()->resource($var, $resource)) {
+            throw new LogicException(
+                [ 'The `resource` should be resource', $resource ]
+            );
+        }
+
+        $isResource = is_resource($resource);
+
+        if ($isResource) {
+            $status = flock($resource, LOCK_UN);
+
+            if (false === $status) {
+                return false;
+            }
+        }
+
+        $this->context->offFinallyFrelease($resource);
+
+        if ($isResource) {
+            $status = fclose($resource);
+
+            if (false === $status) {
+                return false;
+            }
+        }
+
+        $this->context->offFinallyFclose($resource);
+
+        return $resource;
+    }
+
+
+    /**
+     * @param string $file
+     * @param string $modeOpen
+     * @param int    $modeLock
+     *
+     * @return resource|false
+     */
+    public function fopen_flock_tmpfile(
+        $file, $modeOpen, $modeLock,
+        array $fopenArgs = [],
+        array $flockArgs = []
+    )
+    {
+        array_unshift($fopenArgs, $file, $modeOpen, false);
+
+        $resource = call_user_func_array('fopen', $fopenArgs);
+
+        if (false === $resource) {
+            return false;
+        }
+
+        $this->context->onFinallyFclose($resource);
+        $this->context->onFinallyUnlink($file);
+
+        array_unshift($flockArgs, $resource, $modeLock);
+
+        $status = call_user_func_array('flock', $flockArgs);
+
+        if (false === $status) {
+            return false;
+        }
+
+        $this->context->onFinallyFrelease($resource);
+
+        return $resource;
+    }
+
+    /**
+     * @param int|null $tickUsleep
+     * @param int|null $timeoutMs
+     * @param string   $file
+     * @param string   $modeOpen
+     * @param int      $modeLock
+     *
+     * @return resource|false
+     */
+    public function fopen_flock_tmpfile_pooling(
+        $tickUsleep, $timeoutMs,
+        $file, $modeOpen, $modeLock,
+        array $fopenArgs = [],
+        array $flockArgs = []
+    )
+    {
+        $modeLock |= LOCK_NB;
+
+        array_unshift($fopenArgs, $file, $modeOpen, false);
+
+        $resource = call_user_func_array('fopen', $fopenArgs);
+
+        if (false === $resource) {
+            return false;
+        }
+
+        $this->context->onFinallyUnlink($file);
+        $this->context->onFinallyFclose($resource);
+
+        $fnTick = function (&$refResult) use (
+            $resource, $modeLock,
+            $flockArgs
+        ) {
+            array_unshift($flockArgs, $resource, $modeLock);
+
+            $status = call_user_func_array('flock', $flockArgs);
+
+            if (false === $status) {
+                return;
+            }
+
+            $this->context->onFinallyFrelease($resource);
+
+            $refResult = [ $resource ];
+        };
+
+        $resource = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+
+        if (false === $resource) {
+            return false;
+        }
+
+        return $resource;
+    }
+
+    /**
+     * @param resource $resource
+     * @param string   $file
+     *
+     * @return closed-resource|false
+     */
+    public function frelease_fclose_unlink($resource, $file)
+    {
+        $isWindows = Lib::php()->is_windows();
+
+        if (! $isWindows) {
+            $status = unlink($file);
+
+            if (false === $status) {
+                return false;
+            }
+
+            $this->context->offFinallyUnlink($file);
+        }
+
+        $status = flock($resource, LOCK_UN);
+
+        if (false === $status) {
+            return false;
+        }
+
+        $this->context->offFinallyFrelease($resource);
+
+        $status = fclose($resource);
+
+        if (false === $status) {
+            return false;
+        }
+
+        $this->context->offFinallyFclose($resource);
+
+        if ($isWindows) {
+            $status = unlink($file);
+
+            if (false === $status) {
+                return false;
+            }
+
+            $this->context->offFinallyUnlink($file);
+        }
+
+        return $resource;
+    }
+
+    /**
+     * @param resource $resource
+     * @param string   $file
+     *
+     * @return closed-resource|false
+     */
+    public function freleasef_fclosef_unlinkf($resource, $file)
+    {
+        if (! Lib::type()->resource($var, $resource)) {
+            throw new LogicException(
+                [ 'The `resource` should be resource', $resource ]
+            );
+        }
+
+        $isWindows = Lib::php()->is_windows();
+
+        $isFile = is_file($file);
+
+        if (! $isWindows) {
+            if ($isFile) {
+                $status = unlink($file);
+
+                if (false === $status) {
+                    return false;
+                }
+            }
+
+            $this->context->offFinallyUnlink($file);
+        }
+
+        $isResource = is_resource($resource);
+
+        if ($isResource) {
+            $status = flock($resource, LOCK_UN);
+
+            if (false === $status) {
+                return false;
+            }
+        }
+
+        $this->context->offFinallyFrelease($resource);
+
+        if ($isResource) {
+            $status = fclose($resource);
+
+            if (false === $status) {
+                return false;
+            }
+        }
+
+        $this->context->offFinallyFclose($resource);
+
+        if ($isWindows) {
+            if ($isFile) {
+                $status = unlink($file);
+
+                if (false === $status) {
+                    return false;
+                }
+            }
+
+            $this->context->offFinallyUnlink($file);
         }
 
         return $resource;
@@ -603,13 +586,23 @@ class FileSafe
      * @param int      $offset
      * @param int|null $whence
      *
-     * @return int
+     * @return int|false
      */
-    protected function fseek($resource, int $offset, $whence = null)
+    public function fseek($resource, int $offset, $whence = null)
     {
         $whence = $whence ?? SEEK_SET;
 
-        $pos = fseek($resource, $offset, $whence);
+        $statusInt = fseek($resource, $offset, $whence);
+
+        if (-1 === $statusInt) {
+            return false;
+        }
+
+        $pos = ftell($resource);
+
+        if (false === $pos) {
+            return false;
+        }
 
         return $pos;
     }
@@ -619,7 +612,7 @@ class FileSafe
      *
      * @return resource|false
      */
-    protected function rewind($resource)
+    public function rewind($resource)
     {
         $status = rewind($resource);
 
@@ -638,7 +631,7 @@ class FileSafe
      *
      * @return int|false
      */
-    protected function fwrite_fflush($resource, string $data, ?int $length = null)
+    public function fwrite_fflush($resource, string $data, ?int $length = null)
     {
         $len = (null !== $length)
             ? fwrite($resource, $data, $length)
@@ -661,7 +654,7 @@ class FileSafe
      *
      * @return int|false
      */
-    protected function fputs_fflush($resource, string $data, ?int $length = null)
+    public function fputs_fflush($resource, string $data, ?int $length = null)
     {
         $len = (null !== $length)
             ? fputs($resource, $data, $length)
@@ -682,7 +675,7 @@ class FileSafe
      *
      * @return int|false
      */
-    protected function fpassthru_fflush($resource)
+    public function fpassthru_fflush($resource)
     {
         $size = fpassthru($resource);
 
@@ -701,7 +694,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function file_exists($file)
+    public function file_exists($file)
     {
         $status = file_exists($file);
 
@@ -727,7 +720,7 @@ class FileSafe
      *
      * @see static::file_exists()
      */
-    protected function is_exists($file)
+    public function is_exists($file)
     {
         $status = file_exists($file);
 
@@ -750,7 +743,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function is_file($file)
+    public function is_file($file)
     {
         $status = is_file($file);
 
@@ -772,7 +765,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function is_realfile($file)
+    public function is_realfile($file)
     {
         $status = is_file($file) && ! is_link($file);
 
@@ -795,7 +788,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function is_dir($directory)
+    public function is_dir($directory)
     {
         $status = is_dir($directory);
 
@@ -817,7 +810,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function is_realdir($directory)
+    public function is_realdir($directory)
     {
         $status = is_dir($directory) && ! is_link($directory);
 
@@ -840,7 +833,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function is_link($file)
+    public function is_link($file)
     {
         $status = is_link($file);
 
@@ -862,7 +855,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function is_link_target($file)
+    public function is_link_target($file)
     {
         $status = is_link($file);
 
@@ -884,7 +877,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function is_link_file($file)
+    public function is_link_file($file)
     {
         $status = is_link($file);
 
@@ -906,7 +899,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function is_link_dir($directory)
+    public function is_link_dir($directory)
     {
         $status = is_link($directory);
 
@@ -929,7 +922,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function is_readable($file)
+    public function is_readable($file)
     {
         $status = is_readable($file);
 
@@ -951,7 +944,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function is_writable($file)
+    public function is_writable($file)
     {
         $status = is_writable($file);
 
@@ -973,7 +966,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function is_writeable($file)
+    public function is_writeable($file)
     {
         $status = is_writeable($file);
 
@@ -995,7 +988,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function is_executable($file)
+    public function is_executable($file)
     {
         $status = is_executable($file);
 
@@ -1017,9 +1010,9 @@ class FileSafe
      * @param bool|null   $clear_realpath_cache
      * @param string|null $file
      *
-     * @return true
+     * @return bool
      */
-    protected function clearstatcache($clear_realpath_cache = null, $file = null) : bool
+    public function clearstatcache($clear_realpath_cache = null, $file = null)
     {
         $clear_realpath_cache = $clear_realpath_cache ?? false;
         $file = $file ?? '';
@@ -1038,7 +1031,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function realpath($file, $returnTargetPath = null)
+    public function realpath($file, $returnTargetPath = null)
     {
         $returnTargetPath = $returnTargetPath ?? Lib::fs()->static_realpath_return_target_path();
         $returnTargetPath = (bool) $returnTargetPath;
@@ -1066,7 +1059,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function realpath_target($file)
+    public function realpath_target($file)
     {
         return realpath($file);
     }
@@ -1076,7 +1069,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function realpath_link($file)
+    public function realpath_link($file)
     {
         $realpath = realpath(dirname($file));
 
@@ -1096,7 +1089,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function chmod($file, $permissions)
+    public function chmod($file, $permissions)
     {
         $status = chmod($file, $permissions);
 
@@ -1119,7 +1112,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function chown($file, $user)
+    public function chown($file, $user)
     {
         $status = chown($file, $user);
 
@@ -1142,7 +1135,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function lchown($file, $user)
+    public function lchown($file, $user)
     {
         $status = lchown($file, $user);
 
@@ -1165,7 +1158,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function chgrp($file, $group)
+    public function chgrp($file, $group)
     {
         $status = chgrp($file, $group);
 
@@ -1188,7 +1181,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function lchgrp($file, $group)
+    public function lchgrp($file, $group)
     {
         $status = lchgrp($file, $group);
 
@@ -1213,7 +1206,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function touch($file, $mtime = null, $atime = null)
+    public function touch($file, $mtime = null, $atime = null)
     {
         $args = [];
         if (null !== $mtime) $args[] = $mtime;
@@ -1240,7 +1233,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function copy($from, $to, $context = null)
+    public function copy($from, $to, $context = null)
     {
         $status = (null !== $context)
             ? copy($from, $to, $context)
@@ -1265,7 +1258,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function rename($from, $to, $context = null)
+    public function rename($from, $to, $context = null)
     {
         $status = (null !== $context)
             ? rename($from, $to, $context)
@@ -1293,8 +1286,34 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function unlink($file, $context = null)
+    public function unlink($file, $context = null)
     {
+        $status = (null !== $context)
+            ? unlink($file, $context)
+            : unlink($file);
+
+        if (false === $status) {
+            return false;
+        }
+
+        clearstatcache(true, $file);
+
+        return $file;
+    }
+
+    /**
+     * > если файла нет, то не выдаст ошибку
+     *
+     * @param string $file
+     *
+     * @return string|false
+     */
+    public function unlinkf($file, $context = null)
+    {
+        if (! is_file($file)) {
+            return $file;
+        }
+
         $status = (null !== $context)
             ? unlink($file, $context)
             : unlink($file);
@@ -1314,7 +1333,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function rm($file, $context = null)
+    public function rm($file, $context = null)
     {
         $status = is_file($file) && ! is_link($file);
 
@@ -1322,7 +1341,9 @@ class FileSafe
             return false;
         }
 
-        $status = unlink($file, $context);
+        $status = (null !== $context)
+            ? unlink($file, $context)
+            : unlink($file);
 
         if (false === $status) {
             return false;
@@ -1335,18 +1356,21 @@ class FileSafe
 
     /**
      * > удаляет в том числе символическую ссылку на файл
+     * > если файла нет, то не выдаст ошибку
      *
      * @param string $file
      *
      * @return string|false
      */
-    protected function rmf($file, $context = null)
+    public function rmf($file, $context = null)
     {
         if (! is_file($file)) {
             return $file;
         }
 
-        $status = unlink($file, $context);
+        $status = (null !== $context)
+            ? unlink($file, $context)
+            : unlink($file);
 
         if (false === $status) {
             return false;
@@ -1365,7 +1389,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function mkdir($directory, $permissions = null, $recursive = null, $context = null)
+    public function mkdir($directory, $permissions = null, $recursive = null, $context = null)
     {
         $permissions = $permissions ?? Lib::fs()->static_dir_chmod();
         $recursive = $recursive ?? false;
@@ -1388,13 +1412,15 @@ class FileSafe
     }
 
     /**
+     * > если папка есть, то не выдаст ошибку
+     *
      * @param string    $directory
      * @param int|null  $permissions
      * @param bool|null $recursive
      *
      * @return string|false
      */
-    protected function mkdirp($directory, $permissions = null, $recursive = null, $context = null)
+    public function mkdirp($directory, $permissions = null, $recursive = null, $context = null)
     {
         if (! is_dir($directory)) {
             $permissions = $permissions ?? Lib::fs()->static_dir_chmod();
@@ -1424,7 +1450,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function rmdir($directory, $context = null)
+    public function rmdir($directory, $context = null)
     {
         $status = is_dir($directory) && ! is_link($directory);
 
@@ -1447,22 +1473,27 @@ class FileSafe
 
     /**
      * > удаляет в том числе символическую ссылку на папку
+     * > если папки нет, то не выдаст ошибку
      *
      * @param string $directory
      *
      * @return string|false
      */
-    protected function rmdirf($directory, $context = null)
+    public function rmdirf($directory, $context = null)
     {
         if (! is_dir($directory)) {
             return $directory;
         }
 
         if (is_link($directory)) {
-            $status = unlink($directory, $context);
+            $status = (null !== $context)
+                ? unlink($directory, $context)
+                : unlink($directory);
 
         } else {
-            $status = rmdir($directory, $context);
+            $status = (null !== $context)
+                ? rmdir($directory, $context)
+                : rmdir($directory);
         }
 
         if (false === $status) {
@@ -1481,7 +1512,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function link($target, $link)
+    public function link($target, $link)
     {
         $status = link($target, $link);
 
@@ -1504,7 +1535,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function symlink($target, $link)
+    public function symlink($target, $link)
     {
         $status = symlink($target, $link);
 
@@ -1528,7 +1559,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function file_read(
+    public function file_read(
         $file, $modeOpen,
         array $fopenArgs = [],
         array $streamGetContentsArgs = []
@@ -1560,7 +1591,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function file_read_flock(
+    public function file_read_flock(
         $file, $modeOpen, $modeLock,
         array $fopenArgs = [],
         array $flockArgs = [],
@@ -1604,7 +1635,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function file_read_flock_pooling(
+    public function file_read_flock_pooling(
         $tickUsleep, $timeoutMs,
         $file, $modeOpen, $modeLock,
         array $fopenArgs = [],
@@ -1612,14 +1643,16 @@ class FileSafe
         array $streamGetContentsArgs = []
     )
     {
-        $fnTick = function (&$result) use (
+        $modeLock |= LOCK_NB;
+
+        $fnTick = function (&$refResult) use (
             $file, $modeOpen, $modeLock,
             $fopenArgs,
             $flockArgs,
             $streamGetContentsArgs
         ) {
             $content = $this->file_read_flock(
-                $file, $modeOpen, $modeLock | LOCK_NB,
+                $file, $modeOpen, $modeLock,
                 $fopenArgs,
                 $flockArgs,
                 $streamGetContentsArgs,
@@ -1629,7 +1662,7 @@ class FileSafe
                 return;
             }
 
-            $result = [ $content ];
+            $refResult = [ $content ];
         };
 
         $result = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
@@ -1642,32 +1675,21 @@ class FileSafe
      * @param string                   $file
      * @param string                   $modeOpen
      * @param string|string[]|resource $data
-     * @param bool|null                $isAppend
      *
      * @return int|false
      */
-    protected function file_write(
+    public function file_write(
         $file, $modeOpen,
-        $data, $isAppend = null,
+        $data,
         array $fopenArgs = []
     )
     {
-        $isAppend = $isAppend ?? false;
-
         array_unshift($fopenArgs, $file, $modeOpen);
 
         $resource = call_user_func_array([ $this, 'fopen' ], $fopenArgs);
 
         if (false === $resource) {
             return false;
-        }
-
-        if ($isAppend) {
-            fseek($resource, 0, SEEK_END);
-
-        } else {
-            rewind($resource);
-            ftruncate($resource, 0);
         }
 
         if (is_resource($data)) {
@@ -1725,7 +1747,7 @@ class FileSafe
      *
      * @return int|false
      */
-    protected function file_write_flock(
+    public function file_write_flock(
         $file, $modeOpen, $modeLock,
         $data,
         array $fopenArgs = [],
@@ -1806,7 +1828,7 @@ class FileSafe
      *
      * @return int|false
      */
-    protected function file_write_flock_pooling(
+    public function file_write_flock_pooling(
         $tickUsleep, $timeoutMs,
         $file, $modeOpen, $modeLock,
         $data,
@@ -1814,14 +1836,16 @@ class FileSafe
         array $flockArgs = []
     )
     {
-        $fnTick = function (&$result) use (
+        $modeLock |= LOCK_NB;
+
+        $fnTick = function (&$refResult) use (
             $file, $modeOpen, $modeLock,
             $data,
             $fopenArgs,
             $flockArgs
         ) {
             $len = $this->file_write_flock(
-                $file, $modeOpen, $modeLock | LOCK_NB,
+                $file, $modeOpen, $modeLock,
                 $data,
                 $fopenArgs,
                 $flockArgs
@@ -1831,7 +1855,7 @@ class FileSafe
                 return;
             }
 
-            $result = [ $len ];
+            $refResult = [ $len ];
         };
 
         $result = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
@@ -1841,23 +1865,7 @@ class FileSafe
 
 
     // > функция переименована в file_lines()
-    // /**
-    //  * @param string   $file
-    //  * @param int|null $flags
-    //  *
-    //  * @return string[]|false
-    //  */
-    // protected function file($file, $flags = null, $context = null)
-    // {
-    //     $flags = $flags ?? 0;
-    //     $flags &= ~FILE_USE_INCLUDE_PATH;
-    //
-    //     $lines = (null !== $context)
-    //         ? file($file, $flags, $context)
-    //         : file($file, $flags);
-    //
-    //     return $lines;
-    // }
+    // abstract public function file(string $file, int|null $flags = null, $context = null) : array;
 
     /**
      * @param string   $file
@@ -1865,7 +1873,7 @@ class FileSafe
      *
      * @return string[]|false
      */
-    protected function file_lines(
+    public function file_lines(
         $file, $flags = null,
         array $fopenArgs = []
     )
@@ -1940,7 +1948,7 @@ class FileSafe
      *
      * @return string[]|false
      */
-    protected function file_lines_flock(
+    public function file_lines_flock(
         $file, $modeLock, $flags = null,
         array $fopenArgs = [],
         array $flockArgs = []
@@ -2018,20 +2026,22 @@ class FileSafe
      *
      * @return string[]|false
      */
-    protected function file_lines_flock_pooling(
+    public function file_lines_flock_pooling(
         $tickUsleep, $timeoutMs,
         $file, $modeLock, $flags = null,
         array $fopenArgs = [],
         array $flockArgs = []
     )
     {
-        $fnTick = function (&$result) use (
+        $modeLock |= LOCK_NB;
+
+        $fnTick = function (&$refResult) use (
             $file, $modeLock, $flags,
             $fopenArgs,
             $flockArgs
         ) {
             $content = $this->file_lines_flock(
-                $file, $modeLock | LOCK_NB, $flags,
+                $file, $modeLock, $flags,
                 $fopenArgs,
                 $flockArgs,
             );
@@ -2040,7 +2050,7 @@ class FileSafe
                 return;
             }
 
-            $result = [ $content ];
+            $refResult = [ $content ];
         };
 
         $result = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
@@ -2050,26 +2060,14 @@ class FileSafe
 
 
     // > функция переименована в file_echo()
-    // /**
-    //  * @param string $file
-    //  *
-    //  * @return int|false
-    //  */
-    // protected function readfile($file, $context = null)
-    // {
-    //     $size = (null !== $context)
-    //         ? readfile($file, false, $context)
-    //         : readfile($file);
-    //
-    //     return $size;
-    // }
+    // abstract public function readfile(string $file, $context = null);
 
     /**
      * @param string $file
      *
      * @return int|false
      */
-    protected function file_echo(
+    public function file_echo(
         $file,
         array $fopenArgs = []
     )
@@ -2099,7 +2097,7 @@ class FileSafe
      *
      * @return int|false
      */
-    protected function file_echo_flock(
+    public function file_echo_flock(
         $file, $modeLock,
         array $fopenArgs = [],
         array $flockArgs = []
@@ -2140,20 +2138,22 @@ class FileSafe
      *
      * @return int|false
      */
-    protected function file_echo_flock_pooling(
+    public function file_echo_flock_pooling(
         $tickUsleep, $timeoutMs,
         $file, $modeLock,
         array $fopenArgs = [],
         array $flockArgs = []
     )
     {
-        $fnTick = function (&$result) use (
+        $modeLock |= LOCK_NB;
+
+        $fnTick = function (&$refResult) use (
             $file, $modeLock,
             $fopenArgs,
             $flockArgs
         ) {
             $size = $this->file_echo_flock(
-                $file, $modeLock | LOCK_NB,
+                $file, $modeLock,
                 $fopenArgs,
                 $flockArgs,
             );
@@ -2162,7 +2162,7 @@ class FileSafe
                 return;
             }
 
-            $result = [ $size ];
+            $refResult = [ $size ];
         };
 
         $result = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
@@ -2180,7 +2180,7 @@ class FileSafe
      *
      * @return string|null|false
      */
-    protected function file_get_contents($file, $offset = null, $length = null, $context = null)
+    public function file_get_contents($file, $offset = null, $length = null, $context = null)
     {
         if (! file_exists($file)) {
             return null;
@@ -2219,7 +2219,7 @@ class FileSafe
      *
      * @return string|false
      */
-    protected function file_put_contents(
+    public function file_put_contents(
         $file, $data, $flags = null,
         array $filePutContentsArgs = [],
         ?array $mkdirpArgs = [],
@@ -2273,16 +2273,5 @@ class FileSafe
         clearstatcache(true, $realpath);
 
         return $realpath;
-    }
-
-
-    protected function fnErrorHandler() : \Closure
-    {
-        /** @var \Closure $fn */
-        static $fn;
-
-        return $fn = $fn ?? function ($errno, $errstr, $errfile, $errline) {
-            throw new \ErrorException($errstr, -1, $errno, $errfile, $errline);
-        };
     }
 }

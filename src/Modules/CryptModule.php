@@ -52,11 +52,11 @@ class CryptModule
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_base(&$result, $value, $alphabet) : bool
+    public function type_base(&$r, $value, $alphabet) : bool
     {
-        $result = null;
+        $r = null;
 
         $theType = Lib::type();
 
@@ -72,17 +72,17 @@ class CryptModule
             return false;
         }
 
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_base_bin(&$result, $value) : bool
+    public function type_base_bin(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
@@ -92,17 +92,17 @@ class CryptModule
             return false;
         }
 
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_base_oct(&$result, $value) : bool
+    public function type_base_oct(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
@@ -112,17 +112,17 @@ class CryptModule
             return false;
         }
 
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_base_dec(&$result, $value) : bool
+    public function type_base_dec(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
@@ -132,17 +132,17 @@ class CryptModule
             return false;
         }
 
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_base_hex(&$result, $value) : bool
+    public function type_base_hex(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
@@ -152,7 +152,7 @@ class CryptModule
             return false;
         }
 
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }

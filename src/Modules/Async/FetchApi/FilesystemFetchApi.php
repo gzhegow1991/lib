@@ -4,7 +4,6 @@ namespace Gzhegow\Lib\Modules\Async\FetchApi;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Modules\Fs\FileSafeContext;
 
 
 class FilesystemFetchApi implements FetchApiInterface
@@ -157,7 +156,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
 
     public function pushTask(
-        &$taskId,
+        &$refTaskId,
         string $url, array $curlOptions = [],
         ?int $lockWaitTimeoutMs = 0
     ) : bool
@@ -178,10 +177,10 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $queueFile = $this->queueFile;
 
-        $taskId = Lib::random()->uuid();
+        $refTaskId = Lib::random()->uuid();
 
         $task = [
-            'id'           => $taskId,
+            'id'           => $refTaskId,
             'url'          => $url,
             'curl_options' => $curlOptions,
         ];
@@ -197,7 +196,7 @@ class FilesystemFetchApi implements FetchApiInterface
     }
 
     public function popTask(
-        &$task,
+        &$refTask,
         ?int $blockTimeoutMs = 0
     ) : bool
     {
@@ -209,7 +208,7 @@ class FilesystemFetchApi implements FetchApiInterface
         );
 
         if (null !== $serialized) {
-            $task = unserialize($serialized);
+            $refTask = unserialize($serialized);
 
             return true;
         }
@@ -235,7 +234,7 @@ class FilesystemFetchApi implements FetchApiInterface
         }
     }
 
-    public function taskGetResult(&$taskResult, string $taskId) : bool
+    public function taskGetResult(&$refTaskResult, string $taskId) : bool
     {
         if (! Lib::type()->string_not_empty($taskIdString, $taskId)) {
             throw new LogicException(
@@ -244,12 +243,12 @@ class FilesystemFetchApi implements FetchApiInterface
         }
 
         return $this->taskFetchResult(
-            $taskResult,
+            $refTaskResult,
             $taskIdString, false
         );
     }
 
-    public function taskFlushResult(&$taskResult, string $taskId) : bool
+    public function taskFlushResult(&$refTaskResult, string $taskId) : bool
     {
         if (! Lib::type()->string_not_empty($taskIdString, $taskId)) {
             throw new LogicException(
@@ -258,17 +257,17 @@ class FilesystemFetchApi implements FetchApiInterface
         }
 
         return $this->taskFetchResult(
-            $taskResult,
+            $refTaskResult,
             $taskIdString, true
         );
     }
 
     protected function taskFetchResult(
-        &$taskResult,
+        &$refTaskResult,
         string $taskId, bool $delete
     ) : bool
     {
-        $taskResult = null;
+        $refTaskResult = null;
 
         $taskResultFile = "{$this->taskResultDirRealpath}/{$taskId}.result";
 
@@ -283,7 +282,7 @@ class FilesystemFetchApi implements FetchApiInterface
                     unlink($taskResultFile);
                 }
 
-                $taskResult = unserialize($serialized);
+                $refTaskResult = unserialize($serialized);
             }
         }
 
@@ -306,14 +305,14 @@ class FilesystemFetchApi implements FetchApiInterface
     }
 
 
-    protected function processTask(&$taskResult, array $task) : bool
+    protected function processTask(&$refTaskResult, array $task) : bool
     {
-        return $this->processTaskUsingCurl($taskResult, $task);
+        return $this->processTaskUsingCurl($refTaskResult, $task);
     }
 
-    protected function processTaskUsingCurl(&$result, array $task) : bool
+    protected function processTaskUsingCurl(&$refTaskResult, array $task) : bool
     {
-        $result = null;
+        $refTaskResult = null;
 
         $taskUrl = $task[ 'url' ];
         $taskCurlOptions = $task[ 'curl_options' ];
@@ -347,7 +346,7 @@ class FilesystemFetchApi implements FetchApiInterface
         $headers = substr($response, 0, $headersSize);
         $content = substr($response, $headersSize);
 
-        $result = [
+        $refTaskResult = [
             'headers_sent' => $headersSent,
             //
             'http_code'    => $httpCode,
@@ -420,14 +419,12 @@ class FilesystemFetchApi implements FetchApiInterface
         $nowMicrotime = null
     ) : bool
     {
-        $theFs = Lib::fs();
-
-        $f = $theFs->fileSafe();
-
         $poolFile = $this->poolFile;
 
-        $status = $f->call(
-            static function (FileSafeContext $ctx) use (
+        $f = Lib::fs()->fileSafe();
+
+        $status = $f->callSafe(
+            static function () use (
                 $f,
                 $workerPid, $poolFile,
                 $workerTimeoutMs, $nowMicrotime
@@ -438,9 +435,6 @@ class FilesystemFetchApi implements FetchApiInterface
                     100000, $workerTimeoutMs,
                     $poolFile, 'c+', LOCK_EX | LOCK_NB
                 )) {
-                    $ctx->onFinallyFrelease($fhPool);
-                    $ctx->onFinallyFclose($fhPool);
-
                     $nowMicrotimeFloat = $nowMicrotime ?? microtime(true);
 
                     $workerPidString = ltrim($workerPid, '0');
@@ -502,18 +496,16 @@ class FilesystemFetchApi implements FetchApiInterface
         $nowMicrotime = null
     ) : bool
     {
-        $theFs = Lib::fs();
-
-        $f = $theFs->fileSafe();
-
         $poolFile = $this->poolFile;
 
         if (! is_file($poolFile)) {
-            return false;
+            return true;
         }
 
-        $status = $f->call(
-            static function (FileSafeContext $ctx) use (
+        $f = Lib::fs()->fileSafe();
+
+        $status = $f->callSafe(
+            static function () use (
                 $f,
                 $workerPid, $poolFile,
                 $nowMicrotime
@@ -524,9 +516,6 @@ class FilesystemFetchApi implements FetchApiInterface
                     100000, 1000,
                     $poolFile, 'r+', LOCK_EX | LOCK_NB
                 )) {
-                    $ctx->onFinallyFrelease($fhPool);
-                    $ctx->onFinallyFclose($fhPool);
-
                     $pidString = ltrim($workerPid, '0');
                     $nowMicrotimeFloat = $nowMicrotime ?? microtime(true);
 
@@ -579,11 +568,11 @@ class FilesystemFetchApi implements FetchApiInterface
 
 
     public function daemonIsAwake(
-        ?int &$pidFirst = null,
+        ?int &$refPidFirst = null,
         ?float $nowMicrotime = null
     ) : bool
     {
-        $pidFirst = null;
+        $refPidFirst = null;
 
         $theType = Lib::type();
 
@@ -595,19 +584,17 @@ class FilesystemFetchApi implements FetchApiInterface
             }
         }
 
-        $theFs = Lib::fs();
-
-        $f = $theFs->fileSafe();
-
         $poolFile = $this->poolFile;
 
         if (! is_file($poolFile)) {
             return false;
         }
 
-        $status = $f->call(
-            static function (FileSafeContext $ctx) use (
-                &$pidFirst,
+        $f = Lib::fs()->fileSafe();
+
+        $status = $f->callSafe(
+            static function () use (
+                &$refPidFirst,
                 //
                 $f,
                 $poolFile,
@@ -619,9 +606,6 @@ class FilesystemFetchApi implements FetchApiInterface
                     100000, 1000,
                     $poolFile, 'r', LOCK_SH | LOCK_NB
                 )) {
-                    $ctx->onFinallyFrelease($fhPool);
-                    $ctx->onFinallyFclose($fhPool);
-
                     $nowMicrotimeFloat = microtime(true);
 
                     $pidFirstLine = null;
@@ -647,7 +631,7 @@ class FilesystemFetchApi implements FetchApiInterface
                     }
 
                     if (null !== $pidFirstLine) {
-                        $pidFirst = (int) ltrim($pidFirstLine, '0');
+                        $refPidFirst = (int) ltrim($pidFirstLine, '0');
 
                         $status = true;
                     }
@@ -656,6 +640,10 @@ class FilesystemFetchApi implements FetchApiInterface
                 return $status;
             }
         );
+
+        if (is_file($poolFile) && ! filesize($poolFile)) {
+            unlink($poolFile);
+        }
 
         return $status;
     }
@@ -701,10 +689,13 @@ class FilesystemFetchApi implements FetchApiInterface
         $cmd[] = $timeoutMs;
         $cmd[] = $lockWaitTimeoutMs;
 
-        $pm->spawn(
-            $result,
-            $cmd, $this->binDirRealpath
-        );
+        $proc = $pm->newProc()
+            ->setIsBackground(true)
+            ->setCmd($cmd)
+            ->setCwd($this->binDirRealpath)
+        ;
+
+        $pm->spawn($proc);
     }
 
 
@@ -791,7 +782,9 @@ class FilesystemFetchApi implements FetchApiInterface
 
             $status = true
                 && $this->popTask($task, $lockWaitTimeoutMs)
+                && print_r('[ NEW ] Task: ' . $task[ 'id' ] . "\n")
                 && $this->processTask($taskResult, $task)
+                && print_r('[ END ] Task: ' . $task[ 'id' ] . "\n")
                 && $this->taskSaveResult($task, $taskResult);
 
             if (! $isNullTimeout) {

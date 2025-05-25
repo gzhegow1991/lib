@@ -218,19 +218,19 @@ abstract class AbstractMap
     }
 
     /**
-     * @param int|string $keyValue
+     * @param int|string $refKeyValue
      *
      * @return static
      */
-    public function push($value, &$keyValue = null)
+    public function push($value, &$refKeyValue = null)
     {
         $this->values[] = null;
 
-        $keyValue = array_key_last($this->values);
+        $refKeyValue = array_key_last($this->values);
 
-        unset($this->values[ $keyValue ]);
+        unset($this->values[ $refKeyValue ]);
 
-        $this->set($keyValue, $value);
+        $this->set($refKeyValue, $value);
 
         return $this;
     }

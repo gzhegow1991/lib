@@ -42,9 +42,9 @@ class RandomModule
     }
 
 
-    public function idIncrement(&$value) : string
+    public function idIncrement(&$refValue) : string
     {
-        $val = $value;
+        $val = $refValue;
 
         if (is_int($val)) {
             if ($val >= PHP_INT_MAX) {
@@ -57,22 +57,22 @@ class RandomModule
         } else {
             if (! ctype_digit($val)) {
                 throw new LogicException(
-                    [ 'The `value` should contain big integer value', $value ]
+                    [ 'The `value` should contain big integer value', $refValue ]
                 );
             }
 
-            if (
-                (strlen($val) > strlen(PHP_INT_MAX))
-                || (floatval($val) >= PHP_INT_MAX)
+            if (false
+                || (strlen($val) > strlen(PHP_INT_MAX))
+                || (((float) $val) >= PHP_INT_MAX)
             ) {
                 $val = bcadd($val, 1);
 
             } else {
-                $val = intval($val) + 1;
+                $val = ((int) $val) + 1;
             }
         }
 
-        $value = $val;
+        $refValue = $val;
 
         return $val;
     }
@@ -104,11 +104,11 @@ class RandomModule
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_uuid(&$result, $value) : bool
+    public function type_uuid(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_string($value)) {
             return false;
@@ -116,7 +116,7 @@ class RandomModule
 
         $regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
         if (preg_match($regex, $value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }

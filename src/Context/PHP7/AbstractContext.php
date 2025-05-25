@@ -72,14 +72,14 @@ abstract class AbstractContext implements
     }
 
 
-    public function has(string $name, &$result = null) : bool
+    public function has(string $name, &$refResult = null) : bool
     {
-        $result = null;
+        $refResult = null;
 
         $status = $this->exists($name);
 
         if ($status) {
-            $result = $this->{$name} ?? null;
+            $refResult = $this->{$name} ?? null;
 
             return true;
         }

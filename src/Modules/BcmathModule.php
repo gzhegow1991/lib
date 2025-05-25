@@ -14,7 +14,7 @@ class BcmathModule
     /**
      * @var int
      */
-    protected $scaleLimit = 10;
+    protected $scaleLimit = 16;
 
 
     public function __construct()
@@ -28,14 +28,14 @@ class BcmathModule
 
 
     /**
-     * @param Number|null $result
+     * @param Number|null $r
      */
-    public function type_number(&$result, $value, ?bool $allowExp = null) : bool
+    public function type_number(&$r, $value, ?bool $allowExp = null) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($value instanceof Number) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -59,7 +59,7 @@ class BcmathModule
                 'scale'    => $scale,
             ]);
 
-            $result = $number;
+            $r = $number;
 
             return true;
         }
@@ -68,14 +68,14 @@ class BcmathModule
     }
 
     /**
-     * @param Bcnumber|null $result
+     * @param Bcnumber|null $r
      */
-    public function type_bcnumber(&$result, $value) : bool
+    public function type_bcnumber(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($value instanceof Bcnumber) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -98,7 +98,7 @@ class BcmathModule
             'scale'    => $number->getScale(),
         ]);
 
-        $result = $bcnum;
+        $r = $bcnum;
 
         return true;
     }
@@ -120,7 +120,7 @@ class BcmathModule
             $result = $last;
         }
 
-        $result = $result ?? $this->scaleLimit ?? 10;
+        $result = $result ?? $this->scaleLimit ?? 14;
 
         return $result;
     }

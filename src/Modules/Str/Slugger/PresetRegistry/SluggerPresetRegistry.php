@@ -173,16 +173,16 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
 
 
     /**
-     * @param array<string, bool> $knownSymbolMap
+     * @param array<string, bool> $refKnownSymbolMap
      *
      * @return array<string, bool>
      */
     protected function prepareIgnoreSymbolMap(
         array $ignoreSymbols,
-        ?array &$knownSymbolMap = null
+        ?array &$refKnownSymbolMap = null
     ) : array
     {
-        $knownSymbolMap = [];
+        $refKnownSymbolMap = [];
 
         $theMb = Lib::mb();
 
@@ -204,7 +204,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
                 if (! isset($result[ $l ])) {
                     $result[ $l ] = true;
 
-                    $knownSymbolMap[ $l ] = true;
+                    $refKnownSymbolMap[ $l ] = true;
                 }
             }
         }
@@ -213,19 +213,20 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
     }
 
     /**
-     * @param array<string, bool> $knownSymbolMap
+     * @param array<string, bool> $refKnownSymbolMap
      *
      * @return array<string, string>
      */
     protected function prepareSequenceMap(
         array $sequenceMap, array $ignoreSymbolMap,
-        ?array &$knownSymbolMap = null
+        ?array &$refKnownSymbolMap = null
     ) : array
     {
-        $knownSymbolMap = [];
+        $refKnownSymbolMap = [];
 
         $theItertools = Lib::itertools();
         $theMb = Lib::mb();
+        $theType = Lib::type();
 
         $result = [];
 
@@ -242,17 +243,17 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
 
             $aCase = [];
             foreach ( $aList as $i => $a ) {
-                if (! is_string($a) || (mb_strlen($a) !== 1)) {
+                if (! $theType->letter($aString, $a)) {
                     throw new LogicException(
-                        'Each of `lettersIn` must be letter'
+                        [ 'Each of `lettersIn` must be letter', $a, $i ]
                     );
                 }
 
-                $aLower = mb_strtolower($a);
-                $aUpper = mb_strtoupper($a);
+                $aLower = mb_strtolower($aString);
+                $aUpper = mb_strtoupper($aString);
 
-                if (
-                    isset($ignoreSymbolMap[ $aLower ])
+                if (false
+                    || isset($ignoreSymbolMap[ $aLower ])
                     || isset($ignoreSymbolMap[ $aUpper ])
                 ) {
                     throw new RuntimeException(
@@ -299,7 +300,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
 
                 $array = $theMb->str_split($replacement, 1);
                 foreach ( $array as $l ) {
-                    $knownSymbolMap[ $l ] = true;
+                    $refKnownSymbolMap[ $l ] = true;
                 }
             }
         }
@@ -308,16 +309,16 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
     }
 
     /**
-     * @param array<string, bool> $knownSymbolMap
+     * @param array<string, bool> $refKnownSymbolMap
      *
      * @return array<string, string>
      */
     protected function prepareSymbolMap(
         array $symbolMap, array $ignoreSymbolMap,
-        ?array &$knownSymbolMap = null
+        ?array &$refKnownSymbolMap = null
     ) : array
     {
-        $knownSymbolMap = [];
+        $refKnownSymbolMap = [];
 
         $theMb = Lib::mb();
 
@@ -376,8 +377,8 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
                 $bbUpperLen = mb_strlen($bbLower);
 
                 // > example size/length difference when change case: `ß` -> `SS`
-                if (
-                    ($bbSize !== $bbLowerSize)
+                if (false
+                    || ($bbSize !== $bbLowerSize)
                     || ($bbSize !== $bbUpperSize)
                     || ($bbLen !== $bbLowerLen)
                     || ($bbLen !== $bbUpperLen)
@@ -391,8 +392,8 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
                     );
                 }
 
-                if (
-                    isset($result[ $bbLower ])
+                if (false
+                    || isset($result[ $bbLower ])
                     || isset($result[ $bbUpper ])
                 ) {
                     throw new LogicException(
@@ -407,12 +408,12 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
 
                 $array = $theMb->str_split($aLower, 1);
                 foreach ( $array as $l ) {
-                    $knownSymbolMap[ $l ] = true;
+                    $refKnownSymbolMap[ $l ] = true;
                 }
 
                 $array = $theMb->str_split($aUpper, 1);
                 foreach ( $array as $l ) {
-                    $knownSymbolMap[ $l ] = true;
+                    $refKnownSymbolMap[ $l ] = true;
                 }
             }
         }

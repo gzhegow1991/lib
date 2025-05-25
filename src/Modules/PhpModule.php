@@ -54,10 +54,14 @@ class PhpModule
             ?? new DefaultCallableParser();
     }
 
-
-    public function errorBag(?ErrorBag &$b = null) : ErrorBag
+    /**
+     * @param ErrorBag $ref
+     *
+     * @return ErrorBag
+     */
+    public function newErrorBag(&$ref = null)
     {
-        return $b = new ErrorBag();
+        return $ref = new ErrorBag();
     }
 
 
@@ -80,8 +84,8 @@ class PhpModule
     public function static_throwable_class(?string $throwable_class = null) : string
     {
         if (null !== $throwable_class) {
-            if (! (
-                is_subclass_of($throwable_class, \LogicException::class)
+            if (! (false
+                || is_subclass_of($throwable_class, \LogicException::class)
                 || is_subclass_of($throwable_class, \RuntimeException::class)
             )) {
                 throw new LogicException(
@@ -133,15 +137,15 @@ class PhpModule
 
 
     /**
-     * @param array|\Countable|null $result
+     * @param array|\Countable|null $r
      */
-    public function type_countable(&$result, $value) : bool
+    public function type_countable(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (PHP_VERSION_ID >= 70300) {
             if (is_countable($value)) {
-                $result = $value;
+                $r = $value;
 
                 return true;
             }
@@ -150,13 +154,13 @@ class PhpModule
         }
 
         if (is_array($value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
 
         if ($value instanceof \Countable) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -165,15 +169,15 @@ class PhpModule
     }
 
     /**
-     * @param \Countable|null $result
+     * @param \Countable|null $r
      */
-    public function type_countable_object(&$result, $value) : bool
+    public function type_countable_object(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (PHP_VERSION_ID >= 70300) {
             if (is_object($value) && is_countable($value)) {
-                $result = $value;
+                $r = $value;
 
                 return true;
             }
@@ -182,7 +186,7 @@ class PhpModule
         }
 
         if ($value instanceof \Countable) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -192,20 +196,20 @@ class PhpModule
 
 
     /**
-     * @param array|\Countable|null $result
+     * @param array|\Countable|null $r
      */
-    public function type_sizeable(&$result, $value) : bool
+    public function type_sizeable(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($this->type_countable($countable, $value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
 
         if (Lib::str()->type_string($string, $value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -217,12 +221,12 @@ class PhpModule
     /**
      * @template-covariant T of object
      *
-     * @param class-string<T>|null    $result
+     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
      */
-    public function type_struct_exists(&$result, $value, ?int $flags = null)
+    public function type_struct_exists(&$r, $value, ?int $flags = null)
     {
-        $result = null;
+        $r = null;
 
         $_flags = $flags ?? _PHP_STRUCT_TYPE_ALL;
 
@@ -249,14 +253,14 @@ class PhpModule
         if ($_flags & _PHP_STRUCT_TYPE_CLASS) {
             if (PHP_VERSION_ID >= 80100) {
                 if (class_exists($class) && ! enum_exists($class)) {
-                    $result = $class;
+                    $r = $class;
 
                     return true;
                 }
 
             } else {
                 if (class_exists($class)) {
-                    $result = $class;
+                    $r = $class;
 
                     return true;
                 }
@@ -266,7 +270,7 @@ class PhpModule
         if ($_flags & _PHP_STRUCT_TYPE_ENUM) {
             if (PHP_VERSION_ID >= 80100) {
                 if (enum_exists($class)) {
-                    $result = $class;
+                    $r = $class;
 
                     return true;
                 }
@@ -276,7 +280,7 @@ class PhpModule
         if (! $isObject) {
             if ($_flags & _PHP_STRUCT_TYPE_INTERFACE) {
                 if (interface_exists($class)) {
-                    $result = $class;
+                    $r = $class;
 
                     return true;
                 }
@@ -284,7 +288,7 @@ class PhpModule
 
             if ($_flags & _PHP_STRUCT_TYPE_TRAIT) {
                 if (trait_exists($class)) {
-                    $result = $class;
+                    $r = $class;
 
                     return true;
                 }
@@ -297,12 +301,12 @@ class PhpModule
     /**
      * @template-covariant T of object
      *
-     * @param class-string<T>|null    $result
+     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
      */
-    public function type_struct(&$result, $value, ?int $flags = null) : bool
+    public function type_struct(&$r, $value, ?int $flags = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $_flags = $flags ?? (
             _PHP_STRUCT_TYPE_ALL
@@ -370,7 +374,7 @@ class PhpModule
             }
 
             if ($isExists && $isExistsTrue) {
-                $result = $class;
+                $r = $class;
 
                 return true;
             }
@@ -383,7 +387,7 @@ class PhpModule
             );
 
             if ($isValid) {
-                $result = $class;
+                $r = $class;
 
                 return true;
             }
@@ -395,10 +399,10 @@ class PhpModule
     /**
      * @template-covariant T of object
      *
-     * @param class-string<T>|null    $result
+     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
      */
-    public function type_struct_class(&$result, $value, ?int $flags = null) : bool
+    public function type_struct_class(&$r, $value, ?int $flags = null) : bool
     {
         $_flags = $flags;
 
@@ -413,13 +417,13 @@ class PhpModule
             $_flags |= _PHP_STRUCT_TYPE_CLASS;
         }
 
-        return $this->type_struct($result, $value, $_flags);
+        return $this->type_struct($r, $value, $_flags);
     }
 
     /**
-     * @param class-string|null $result
+     * @param class-string|null $r
      */
-    public function type_struct_interface(&$result, $value, ?int $flags = null) : bool
+    public function type_struct_interface(&$r, $value, ?int $flags = null) : bool
     {
         $_flags = $flags;
 
@@ -434,13 +438,13 @@ class PhpModule
             $_flags |= _PHP_STRUCT_TYPE_INTERFACE;
         }
 
-        return $this->type_struct($result, $value, $_flags);
+        return $this->type_struct($r, $value, $_flags);
     }
 
     /**
-     * @param class-string|null $result
+     * @param class-string|null $r
      */
-    public function type_struct_trait(&$result, $value, ?int $flags = null) : bool
+    public function type_struct_trait(&$r, $value, ?int $flags = null) : bool
     {
         $_flags = $flags;
 
@@ -455,16 +459,16 @@ class PhpModule
             $_flags |= _PHP_STRUCT_TYPE_TRAIT;
         }
 
-        return $this->type_struct($result, $value, $_flags);
+        return $this->type_struct($r, $value, $_flags);
     }
 
     /**
      * @template-covariant T of \UnitEnum
      *
-     * @param class-string<T>|null    $result
+     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
      */
-    public function type_struct_enum(&$result, $value, ?int $flags = null) : bool
+    public function type_struct_enum(&$r, $value, ?int $flags = null) : bool
     {
         $_flags = $flags;
 
@@ -479,19 +483,19 @@ class PhpModule
             $_flags |= _PHP_STRUCT_TYPE_ENUM;
         }
 
-        return $this->type_struct($result, $value, $_flags);
+        return $this->type_struct($r, $value, $_flags);
     }
 
 
     /**
      * @template-covariant T of object
      *
-     * @param class-string<T>|null    $result
+     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
      */
-    public function type_struct_fqcn(&$result, $value, ?int $flags = null) : bool
+    public function type_struct_fqcn(&$r, $value, ?int $flags = null) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->type_struct($_value, $value, $flags)) {
             return false;
@@ -499,17 +503,17 @@ class PhpModule
 
         $_value = '\\' . $_value;
 
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_struct_namespace(&$result, $value, ?int $flags = null) : bool
+    public function type_struct_namespace(&$r, $value, ?int $flags = null) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->type_struct($_value, $value, $flags)) {
             return false;
@@ -520,17 +524,17 @@ class PhpModule
             return false;
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_struct_basename(&$result, $value, ?int $flags = null) : bool
+    public function type_struct_basename(&$r, $value, ?int $flags = null) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->type_struct($_value, $value, $flags)) {
             return false;
@@ -539,7 +543,7 @@ class PhpModule
         $_value = $this->basename($_value, '\\');
 
         if (null !== $_value) {
-            $result = $_value;
+            $r = $_value;
 
             return true;
         }
@@ -549,53 +553,29 @@ class PhpModule
 
 
     /**
-     * @param resource|null $result
+     * @param resource|null $r
      */
-    public function type_resource(&$result, $value) : bool
+    public function type_resource(&$r, $value, ?string $resourceType = null) : bool
     {
-        $result = null;
-
-        if (
-            is_resource($value)
-            || ('resource (closed)' === gettype($value))
-        ) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param resource|null $result
-     */
-    public function type_any_not_resource(&$result, $value) : bool
-    {
-        $result = null;
-
-        if (! (
-            is_resource($value)
-            || ('resource (closed)' === gettype($value))
-        )) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
-    }
-
-
-    /**
-     * @param resource|null $result
-     */
-    public function type_resource_opened(&$result, $value) : bool
-    {
-        $result = null;
+        $r = null;
 
         if (is_resource($value)) {
-            $result = $value;
+            if (null === $resourceType) {
+                $r = $value;
+
+                return true;
+
+            } else {
+                if ($resourceType === get_resource_type($value)) {
+                    $r = $value;
+
+                    return true;
+                }
+            }
+        }
+
+        if ('resource (closed)' === gettype($value)) {
+            $r = $value;
 
             return true;
         }
@@ -604,14 +584,97 @@ class PhpModule
     }
 
     /**
-     * @param resource|null $result
+     * @param resource|null $r
      */
-    public function type_resource_closed(&$result, $value) : bool
+    public function type_resource_opened(&$r, $value, ?string $resourceType = null) : bool
     {
-        $result = null;
+        $r = null;
+
+        if (is_resource($value)) {
+            if (null === $resourceType) {
+                $r = $value;
+
+                return true;
+
+            } else {
+                if ($resourceType === get_resource_type($value)) {
+                    $r = $value;
+
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param resource|null $r
+     */
+    public function type_resource_closed(&$r, $value) : bool
+    {
+        $r = null;
 
         if ('resource (closed)' === gettype($value)) {
-            $result = $value;
+            $r = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param resource|null $r
+     */
+    public function type_any_not_resource(&$r, $value) : bool
+    {
+        $r = null;
+
+        if (! (false
+            || is_resource($value)
+            || ('resource (closed)' === gettype($value))
+        )) {
+            $r = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param resource|\CurlHandle|null $r
+     */
+    public function type_curl(&$r, $value) : bool
+    {
+        $r = null;
+
+        if (false
+            || is_a($value, '\CurlHandle')
+            || $this->type_resource_opened($var, $value, 'curl')
+        ) {
+            $r = $value;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param resource|\Socket|null $r
+     */
+    public function type_socket(&$r, $value) : bool
+    {
+        $r = null;
+
+        if (false
+            || is_a($value, '\Socket')
+            || $this->type_resource_opened($var, $value, 'socket')
+        ) {
+            $r = $value;
 
             return true;
         }
@@ -623,15 +686,15 @@ class PhpModule
     /**
      * @template-covariant T of \UnitEnum
      *
-     * @param T|null               $result
+     * @param T|null               $r
      * @param T|int|string         $value
      * @param class-string<T>|null $enumClass
      *
      * @return class-string|null
      */
-    public function type_enum_case(&$result, $value, ?string $enumClass = null) : bool
+    public function type_enum_case(&$r, $value, ?string $enumClass = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $hasEnumClass = false;
         if (null !== $enumClass) {
@@ -648,7 +711,7 @@ class PhpModule
                 : is_subclass_of($value, '\UnitEnum');
 
             if ($status) {
-                $result = $value;
+                $r = $value;
 
                 return true;
             }
@@ -658,7 +721,10 @@ class PhpModule
             return false;
         }
 
-        if (! (is_int($value) || is_string($value))) {
+        if (! (false
+            || is_int($value)
+            || is_string($value)
+        )) {
             return false;
         }
 
@@ -670,7 +736,7 @@ class PhpModule
         }
 
         if (null !== $enumCase) {
-            $result = $enumCase;
+            $r = $enumCase;
 
             return true;
         }
@@ -683,23 +749,22 @@ class PhpModule
      * > метод не всегда возвращает callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
      * > используйте type_callable_array, если собираетесь вызывать метод
      *
-     * @param array{ 0: class-string, 1: string }|null $result
+     * @param array{ 0: class-string, 1: string }|null $r
      */
-    public function type_method_array(&$result, $value) : bool
+    public function type_method_array(&$r, $value) : bool
     {
-        return $this->callableParser()->typeMethodArray($result, $value);
+        return $this->callableParser()->typeMethodArray($r, $value);
     }
 
     /**
      * > метод не всегда возвращает callable, поскольку строка 'class->method' не является callable
      * > используйте type_callable_string, если собираетесь вызывать метод
      *
-     * @param string|null            $result
-     * @param array{ 0: array|null } $refs
+     * @param string|null $r
      */
-    public function type_method_string(&$result, $value, array $refs = []) : bool
+    public function type_method_string(&$r, $value, array $refs = []) : bool
     {
-        return $this->callableParser()->typeMethodString($result, $value, $refs);
+        return $this->callableParser()->typeMethodString($r, $value, $refs);
     }
 
 
@@ -707,115 +772,115 @@ class PhpModule
      * > в версиях PHP до 8.0.0 публичный метод считался callable, если его проверить даже на имени класса
      * > при этом вызвать MyClass::publicMethod было нельзя, т.к. вызываемым является только MyClass::publicStaticMethod
      *
-     * @param callable|null $result
+     * @param callable|null $r
      * @param string|object $newScope
      */
-    public function type_callable(&$result, $value, $newScope = 'static') : bool
+    public function type_callable(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallable($result, $value, $newScope);
+        return $this->callableParser()->typeCallable($r, $value, $newScope);
     }
 
 
     /**
-     * @param callable|\Closure|object|null $result
+     * @param callable|\Closure|object|null $r
      */
-    public function type_callable_object(&$result, $value, $newScope = 'static') : bool
+    public function type_callable_object(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableObject($result, $value, $newScope);
+        return $this->callableParser()->typeCallableObject($r, $value, $newScope);
     }
 
     /**
-     * @param callable|object|null $result
+     * @param callable|object|null $r
      */
-    public function type_callable_object_closure(&$result, $value, $newScope = 'static') : bool
+    public function type_callable_object_closure(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableObjectClosure($result, $value, $newScope);
+        return $this->callableParser()->typeCallableObjectClosure($r, $value, $newScope);
     }
 
     /**
-     * @param callable|object|null $result
+     * @param callable|object|null $r
      */
-    public function type_callable_object_invokable(&$result, $value, $newScope = 'static') : bool
+    public function type_callable_object_invokable(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableObjectInvokable($result, $value, $newScope);
+        return $this->callableParser()->typeCallableObjectInvokable($r, $value, $newScope);
     }
 
 
     /**
-     * @param callable|array{ 0: object|class-string, 1: string }|null $result
+     * @param callable|array{ 0: object|class-string, 1: string }|null $r
      * @param string|object                                            $newScope
      */
-    public function type_callable_array(&$result, $value, $newScope = 'static') : bool
+    public function type_callable_array(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableArray($result, $value, $newScope);
+        return $this->callableParser()->typeCallableArray($r, $value, $newScope);
     }
 
     /**
-     * @param callable|array{ 0: object|class-string, 1: string }|null $result
+     * @param callable|array{ 0: object|class-string, 1: string }|null $r
      * @param string|object                                            $newScope
      */
-    public function type_callable_array_method(&$result, $value, $newScope = 'static') : bool
+    public function type_callable_array_method(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableArrayMethod($result, $value, $newScope);
+        return $this->callableParser()->typeCallableArrayMethod($r, $value, $newScope);
     }
 
     /**
-     * @param callable|array{ 0: class-string, 1: string }|null $result
+     * @param callable|array{ 0: class-string, 1: string }|null $r
      * @param string|object                                     $newScope
      */
-    public function type_callable_array_method_static(&$result, $value, $newScope = 'static') : bool
+    public function type_callable_array_method_static(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableArrayMethodStatic($result, $value, $newScope);
+        return $this->callableParser()->typeCallableArrayMethodStatic($r, $value, $newScope);
     }
 
     /**
-     * @param callable|array{ 0: object, 1: string }|null $result
+     * @param callable|array{ 0: object, 1: string }|null $r
      * @param string|object                               $newScope
      */
-    public function type_callable_array_method_non_static(&$result, $value, $newScope = 'static') : bool
+    public function type_callable_array_method_non_static(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableArrayMethodNonStatic($result, $value, $newScope);
+        return $this->callableParser()->typeCallableArrayMethodNonStatic($r, $value, $newScope);
     }
 
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function type_callable_string(&$result, $value, $newScope = 'static') : bool
+    public function type_callable_string(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableString($result, $value, $newScope);
+        return $this->callableParser()->typeCallableString($r, $value, $newScope);
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function type_callable_string_function(&$result, $value) : bool
+    public function type_callable_string_function(&$r, $value) : bool
     {
-        return $this->callableParser()->typeCallableStringFunction($result, $value);
+        return $this->callableParser()->typeCallableStringFunction($r, $value);
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function type_callable_string_function_internal(&$result, $value) : bool
+    public function type_callable_string_function_internal(&$r, $value) : bool
     {
-        return $this->callableParser()->typeCallableStringFunctionInternal($result, $value);
+        return $this->callableParser()->typeCallableStringFunctionInternal($r, $value);
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function type_callable_string_function_non_internal(&$result, $value) : bool
+    public function type_callable_string_function_non_internal(&$r, $value) : bool
     {
-        return $this->callableParser()->typeCallableStringFunctionNonInternal($result, $value);
+        return $this->callableParser()->typeCallableStringFunctionNonInternal($r, $value);
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function type_callable_string_method_static(&$result, $value, $newScope = 'static') : bool
+    public function type_callable_string_method_static(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableStringMethodStatic($result, $value, $newScope);
+        return $this->callableParser()->typeCallableStringMethodStatic($r, $value, $newScope);
     }
 
 
@@ -824,23 +889,23 @@ class PhpModule
      *
      * @template T
      *
-     * @param mixed|T        $result
+     * @param mixed|T        $r
      * @param int|string     $key
      * @param array{ 0?: T } $set
      */
-    public function type_ref(&$result, $key, array $refs = [], array $set = []) : bool
+    public function type_ref(&$r, $key, array $refs = [], array $set = []) : bool
     {
         $status = array_key_exists($key, $refs);
 
         if ($status) {
-            $result =& $refs[ $key ];
+            $r =& $refs[ $key ];
 
         } else {
-            $result = null;
+            $r = null;
         }
 
         if ([] !== $set) {
-            $result = $set[ 0 ];
+            $r = $set[ 0 ];
         }
 
         return $status;
@@ -872,8 +937,8 @@ class PhpModule
             return $value->toBool($options);
         }
 
-        if (
-            (null === $value)
+        if (false
+            || (null === $value)
             || (is_float($value) && is_nan($value))
             || (Lib::type()->nil($var, $value))
         ) {
@@ -907,8 +972,8 @@ class PhpModule
             return $value->toInteger($options);
         }
 
-        if (
-            (null === $value)
+        if (false
+            || (null === $value)
             || ('' === $value)
             || (is_bool($value))
             || (is_array($value))
@@ -955,8 +1020,8 @@ class PhpModule
             return $value->toFloat($options);
         }
 
-        if (
-            (null === $value)
+        if (false
+            || (null === $value)
             || ('' === $value)
             || (is_bool($value))
             || (is_array($value))
@@ -994,8 +1059,8 @@ class PhpModule
             return $value->toString($options);
         }
 
-        if (
-            (null === $value)
+        if (false
+            || (null === $value)
             // || ('' === $value)
             || (is_bool($value))
             || (is_array($value))
@@ -1051,8 +1116,8 @@ class PhpModule
             }
         }
 
-        if (
-            (null === $value)
+        if (false
+            || (null === $value)
             // || ('' === $value)
             // || (is_bool($value))
             // || (is_array($value))
@@ -1098,8 +1163,8 @@ class PhpModule
             return $value;
         }
 
-        if (
-            (null === $value)
+        if (false
+            || (null === $value)
             // || ('' === $value)
             // || (is_bool($value))
             // || (is_array($value))
@@ -1388,8 +1453,8 @@ class PhpModule
     {
         $isObject = false;
         $isClass = false;
-        if (! (
-            ($isObject = (is_object($object_or_class)))
+        if (! (false
+            || ($isObject = (is_object($object_or_class)))
             || ($isClass = (is_string($object_or_class) && class_exists($object_or_class)))
         )) {
             return false;
@@ -1490,8 +1555,8 @@ class PhpModule
     {
         $isObject = false;
         $isClass = false;
-        if (! (
-            ($isObject = (is_object($object_or_class)))
+        if (! (false
+            || ($isObject = (is_object($object_or_class)))
             || ($isClass = (is_string($object_or_class) && class_exists($object_or_class)))
         )) {
             return false;
@@ -1757,8 +1822,8 @@ class PhpModule
             $pi[ 'basename' ] = ('' !== $basename) ? $basename : null;
         }
 
-        if (
-            ($_flags & _PHP_PATHINFO_FILENAME)
+        if (false
+            || ($_flags & _PHP_PATHINFO_FILENAME)
             || ($_flags & _PHP_PATHINFO_EXTENSION)
             || ($_flags & _PHP_PATHINFO_FILE)
             || ($_flags & _PHP_PATHINFO_EXTENSIONS)
@@ -2036,8 +2101,8 @@ class PhpModule
 
         $segmentsNew = [];
         foreach ( $segments as $segment ) {
-            if (
-                ('' === $segment)
+            if (false
+                || ('' === $segment)
                 || ($dotString === $segment)
             ) {
                 continue;
@@ -2223,16 +2288,13 @@ class PhpModule
      */
     public function serialize($data) : ?string
     {
-        error_clear_last();
-
         try {
-            $result = serialize($data);
+            $result = Lib::func()->safe_call(
+                'serialize',
+                [ $data ]
+            );
         }
         catch ( \Throwable $e ) {
-            $result = null;
-        }
-
-        if (error_get_last()) {
             $result = null;
         }
 
@@ -2244,16 +2306,13 @@ class PhpModule
      */
     public function unserialize(string $data)
     {
-        error_clear_last();
-
         try {
-            $result = unserialize($data);
+            $result = Lib::func()->safe_call(
+                'unserialize',
+                [ $data ]
+            );
         }
         catch ( \Throwable $e ) {
-            $result = null;
-        }
-
-        if (error_get_last()) {
             $result = null;
         }
 
@@ -2293,8 +2352,8 @@ class PhpModule
                 continue;
             }
 
-            if (
-                is_array($arg)
+            if (false
+                || is_array($arg)
                 || $arg instanceof \stdClass
             ) {
                 $messageData = (array) $arg;
@@ -2413,8 +2472,8 @@ class PhpModule
      */
     public function throw_trace(array $trace, $throwableOrArg, ...$throwableArgs)
     {
-        if (
-            ($throwableOrArg instanceof \LogicException)
+        if (false
+            || ($throwableOrArg instanceof \LogicException)
             || ($throwableOrArg instanceof \RuntimeException)
         ) {
             throw $throwableOrArg;
@@ -2438,27 +2497,27 @@ class PhpModule
     {
         $throwableClass = $this->static_throwable_class();
 
-        $_throwableArgs = $this->throwable_args(...$throwableArgs);
-        $_throwableArgs[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $_throwableArgs[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
-        $_throwableArgs[ 'trace' ] = $trace;
+        $throwableArgsNew = $this->throwable_args(...$throwableArgs);
+        $throwableArgsNew[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';
+        $throwableArgsNew[ 'line' ] = $trace[ 0 ][ 'line' ] ?? 0;
+        $throwableArgsNew[ 'trace' ] = $trace;
 
         $exceptionArgs = [];
-        $exceptionArgs[] = $_throwableArgs[ 'message' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'code' ] ?? null;
-        $exceptionArgs[] = $_throwableArgs[ 'previous' ] ?? null;
+        $exceptionArgs[] = $throwableArgsNew[ 'message' ] ?? null;
+        $exceptionArgs[] = $throwableArgsNew[ 'code' ] ?? null;
+        $exceptionArgs[] = $throwableArgsNew[ 'previous' ] ?? null;
 
         $e = new $throwableClass(...$exceptionArgs);
 
-        foreach ( $_throwableArgs as $key => $value ) {
+        foreach ( $throwableArgsNew as $key => $value ) {
             if (! property_exists($e, $key)) {
-                unset($_throwableArgs[ $key ]);
+                unset($throwableArgsNew[ $key ]);
             }
         }
 
-        if ([] !== $_throwableArgs) {
-            $fn = (function () use (&$_throwableArgs) {
-                foreach ( $_throwableArgs as $key => $value ) {
+        if ([] !== $throwableArgsNew) {
+            $fn = (function () use (&$throwableArgsNew) {
+                foreach ( $throwableArgsNew as $key => $value ) {
                     $this->{$key} = $value;
                 }
             })->bindTo($e, $e);
@@ -2488,7 +2547,10 @@ class PhpModule
             );
         }
 
-        if (! ((null === $timeoutMs) || ($timeoutMs >= 0))) {
+        if (! (false
+            || (null === $timeoutMs)
+            || ($timeoutMs >= 0)
+        )) {
             throw new LogicException(
                 [ 'The `timeoutMs` should be integer non-negative or be null', $timeoutMs ]
             );

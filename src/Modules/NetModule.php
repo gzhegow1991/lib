@@ -24,11 +24,11 @@ class NetModule
 
 
     /**
-     * @param AddressIpV4|AddressIpV6|null $result
+     * @param AddressIpV4|AddressIpV6|null $r
      */
-    public function type_address_ip(&$result, $value) : bool
+    public function type_address_ip(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
@@ -38,20 +38,20 @@ class NetModule
             return false;
         }
 
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }
 
     /**
-     * @param AddressIpV4|null $result
+     * @param AddressIpV4|null $r
      */
-    public function type_address_ip_v4(&$result, $value) : bool
+    public function type_address_ip_v4(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($value instanceof AddressIpV4) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -64,20 +64,20 @@ class NetModule
             return false;
         }
 
-        $result = AddressIpV4::fromValidString($addressIpV4);
+        $r = AddressIpV4::fromValidString($addressIpV4);
 
         return true;
     }
 
     /**
-     * @param AddressIpV6|null $result
+     * @param AddressIpV6|null $r
      */
-    public function type_address_ip_v6(&$result, $value) : bool
+    public function type_address_ip_v6(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($value instanceof AddressIpV6) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -90,18 +90,18 @@ class NetModule
             return false;
         }
 
-        $result = AddressIpV6::fromValidString($addressIpV6);
+        $r = AddressIpV6::fromValidString($addressIpV6);
 
         return true;
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_address_mac(&$result, $value) : bool
+    public function type_address_mac(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! Lib::type()->string_not_empty($_value, $value)) {
             return false;
@@ -116,25 +116,25 @@ class NetModule
             return false;
         }
 
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }
 
 
     /**
-     * @param SubnetV4|SubnetV6|null $result
+     * @param SubnetV4|SubnetV6|null $r
      */
-    public function type_subnet(&$result, $value, ?string $ipFallback = null) : bool
+    public function type_subnet(&$r, $value, ?string $ipFallback = null) : bool
     {
-        $result = null;
+        $r = null;
 
-        $status =
-            $this->type_subnet_v4($_value, $value, $ipFallback)
+        $status = false
+            || $this->type_subnet_v4($_value, $value, $ipFallback)
             || $this->type_subnet_v6($_value, $value, $ipFallback);
 
         if ($status) {
-            $result = $_value;
+            $r = $_value;
 
             return true;
         }
@@ -143,14 +143,14 @@ class NetModule
     }
 
     /**
-     * @param SubnetV4|null $result
+     * @param SubnetV4|null $r
      */
-    public function type_subnet_v4(&$result, $value, ?string $ipFallback = null) : bool
+    public function type_subnet_v4(&$r, $value, ?string $ipFallback = null) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($value instanceof SubnetV4) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -170,8 +170,8 @@ class NetModule
                 return false;
             }
 
-            $status =
-                $this->type_subnet_v4_iplike($subnetInt, $subnet)
+            $status = false
+                || $this->type_subnet_v4_iplike($subnetInt, $subnet)
                 || $theType->numeric_int($subnetInt, $subnet);
 
             if (! $status) {
@@ -228,7 +228,7 @@ class NetModule
         if ($hasIpString && $hasSubnetInt) {
             $subnetV4 = "{$addressIpString}/{$subnetInt}";
 
-            $result = SubnetV4::fromValidString($subnetV4);
+            $r = SubnetV4::fromValidString($subnetV4);
 
             return true;
         }
@@ -237,14 +237,14 @@ class NetModule
     }
 
     /**
-     * @param SubnetV6|null $result
+     * @param SubnetV6|null $r
      */
-    public function type_subnet_v6(&$result, $value, ?string $ipFallback = null) : bool
+    public function type_subnet_v6(&$r, $value, ?string $ipFallback = null) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($value instanceof SubnetV6) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -295,7 +295,7 @@ class NetModule
         if ($hasIpString && $hasSubnetInt) {
             $subnetV6 = "{$addressIpString}/{$subnetInt}";
 
-            $result = SubnetV6::fromValidString($subnetV6);
+            $r = SubnetV6::fromValidString($subnetV6);
 
             return true;
         }
@@ -304,11 +304,11 @@ class NetModule
     }
 
     /**
-     * @param int|null $result
+     * @param int|null $r
      */
-    protected function type_subnet_v4_iplike(&$result, $subnet) : bool
+    protected function type_subnet_v4_iplike(&$r, $subnet) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! Lib::type()->string_not_empty($_subnet, $subnet)) {
             return false;
@@ -331,7 +331,7 @@ class NetModule
             $subnetInt = rtrim($subnetInt, '0');
             $subnetInt = strlen($subnetInt);
 
-            $result = $subnetInt;
+            $r = $subnetInt;
 
             return true;
         }
@@ -349,8 +349,8 @@ class NetModule
         $addressIpV4 = null;
         $addressIpV6 = null;
 
-        $statusIp =
-            $this->type_address_ip_v4($addressIpV4, $addressIp)
+        $statusIp = false
+            || $this->type_address_ip_v4($addressIpV4, $addressIp)
             || $this->type_address_ip_v6($addressIpV6, $addressIp);
 
         if (! $statusIp) {
@@ -371,8 +371,8 @@ class NetModule
             $subnetV4 = null;
             $subnetV6 = null;
 
-            $statusSubnet =
-                ($isV4 && $this->type_subnet_v4($subnetV4, $subnet))
+            $statusSubnet = false
+                || ($isV4 && $this->type_subnet_v4($subnetV4, $subnet))
                 || ($isV6 && $this->type_subnet_v4($subnetV6, $subnet));
 
             if (! $statusSubnet) {
@@ -475,8 +475,8 @@ class NetModule
         $addressIpV4 = null;
         $addressIpV6 = null;
 
-        $statusIp =
-            $this->type_address_ip_v4($addressIpV4, $addressIp)
+        $statusIp = false
+            || $this->type_address_ip_v4($addressIpV4, $addressIp)
             || $this->type_address_ip_v6($addressIpV6, $addressIp);
 
         if (! $statusIp) {
@@ -491,8 +491,8 @@ class NetModule
         $subnetV4 = null;
         $subnetV6 = null;
 
-        $statusSubnet =
-            $this->type_subnet_v4($subnetV4, $subnet)
+        $statusSubnet = false
+            || $this->type_subnet_v4($subnetV4, $subnet)
             || $this->type_subnet_v6($subnetV6, $subnet);
 
         if (! $statusSubnet) {
@@ -617,8 +617,8 @@ class NetModule
 
     public function ip_client_proxy() : ?string
     {
-        $status =
-            $this->type_address_ip($ip, $_SERVER[ 'REMOTE_ADDR' ] ?? null)
+        $status = false
+            || $this->type_address_ip($ip, $_SERVER[ 'REMOTE_ADDR' ] ?? null)
             || $this->type_address_ip($ip, $_SERVER[ 'HTTP_CLIENT_IP' ] ?? null)
             || $this->type_address_ip($ip, $_SERVER[ 'HTTP_X_FORWARDED_FOR' ] ?? null);
 

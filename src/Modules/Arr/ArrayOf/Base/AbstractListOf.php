@@ -160,17 +160,17 @@ abstract class AbstractListOf implements
     /**
      * @return static
      */
-    public function push($value, &$key = null)
+    public function push($value, &$refKey = null)
     {
-        $key = null;
+        $refKey = null;
 
         $this->values[] = null;
 
-        $key = array_key_last($this->values);
+        $refKey = array_key_last($this->values);
 
-        unset($this->values[ $key ]);
+        unset($this->values[ $refKey ]);
 
-        $this->setValue($key, $value);
+        $this->setValue($refKey, $value);
 
         return $this;
     }

@@ -4,6 +4,7 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Modules\Func\Pipe\Pipe;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Func\Invoker\DefaultInvoker;
 use Gzhegow\Lib\Modules\Func\Invoker\InvokerInterface;
 
@@ -35,9 +36,14 @@ class FuncModule
     }
 
 
-    public function pipe() : Pipe
+    /**
+     * @param Pipe $ref
+     *
+     * @return Pipe
+     */
+    public function newPipe(&$ref = null)
     {
-        return new Pipe();
+        return $ref = new Pipe();
     }
 
 
@@ -230,9 +236,7 @@ class FuncModule
      * > стоит передать туда больше аргументов - сразу throw/trigger_error и это хорошо
      * > но как только array_filter/array_map, то это плохо
      *
-     * @noinspection PhpDocMissingThrowsInspection
      * @noinspection PhpUnhandledExceptionInspection
-     * @throws \RuntimeException
      */
     public function call_user_func($fn, ...$args)
     {
@@ -300,13 +304,11 @@ class FuncModule
      * > стоит передать туда больше аргументов - сразу throw/trigger_error и это хорошо
      * > но как только array_filter/array_map, то это плохо
      *
-     * @noinspection PhpDocMissingThrowsInspection
      * @noinspection PhpUnhandledExceptionInspection
-     * @throws \RuntimeException
      */
-    public function call_user_func_array($fn, array $args, ?array &$argsNew = null)
+    public function call_user_func_array($fn, array $args, ?array &$refArgsNew = null)
     {
-        $argsNew = null;
+        $refArgsNew = null;
 
         $isMaybeInternalFunction = is_string($fn) && function_exists($fn);
 
@@ -368,9 +370,41 @@ class FuncModule
             }
         }
 
-        $argsNew = $fnArgs;
+        $refArgsNew = $fnArgs;
 
         return $result;
+    }
+
+
+    /**
+     * @param callable $fn
+     *
+     * @return mixed
+     */
+    public function safe_call($fn, array $args = [])
+    {
+        $beforeErrorReporting = error_reporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
+        $beforeErrorHandler = set_error_handler([ $this, 'safe_call_error_handler' ]);
+
+        try {
+            $result = call_user_func_array($fn, $args);
+        }
+        catch ( \Throwable $e ) {
+            throw new RuntimeException($e);
+        }
+
+        set_error_handler($beforeErrorHandler);
+        error_reporting($beforeErrorReporting);
+
+        return $result;
+    }
+
+    /**
+     * @throws \ErrorException
+     */
+    public function safe_call_error_handler($errno, $errstr, $errfile, $errline)
+    {
+        throw new \ErrorException($errstr, -1, $errno, $errfile, $errline);
     }
 
 

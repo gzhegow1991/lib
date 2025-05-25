@@ -9,23 +9,23 @@ use Gzhegow\Lib\Exception\LogicException;
 class UrlModule
 {
     /**
-     * @param string|null       $result
+     * @param string|null       $r
      * @param string            $url
      * @param string|array|null $query
      * @param string|null       $fragment
      */
     public function type_url(
-        &$result,
+        &$r,
         $url, $query = null, $fragment = null,
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $_value = $this->url($url, $query, $fragment, $refs);
 
         if (null !== $_value) {
-            $result = $_value;
+            $r = $_value;
 
             return true;
         }
@@ -34,21 +34,21 @@ class UrlModule
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      * @param string      $url
      */
     public function type_host(
-        &$result,
+        &$r,
         $url,
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $_value = $this->host($url, $refs);
 
         if (null !== $_value) {
-            $result = $_value;
+            $r = $_value;
 
             return true;
         }
@@ -57,23 +57,23 @@ class UrlModule
     }
 
     /**
-     * @param string|null       $result
+     * @param string|null       $r
      * @param string            $url
      * @param string|array|null $query
      * @param string|null       $fragment
      */
     public function type_link(
-        &$result,
+        &$r,
         $url, $query = null, $fragment = null,
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $_value = $this->link($url, $query, $fragment, $refs);
 
         if (null !== $_value) {
-            $result = $_value;
+            $r = $_value;
 
             return true;
         }

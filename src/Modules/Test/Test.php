@@ -1,13 +1,13 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Test\TestRunner;
+namespace Gzhegow\Lib\Modules\Test;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-class TestRunner
+class Test
 {
     /**
      * @var \Closure
@@ -258,14 +258,14 @@ class TestRunner
 
 
     /**
-     * @param array $trace
+     * @param array $refTrace
      */
-    public function hasTrace(&$trace = null) : bool
+    public function hasTrace(&$refTrace = null) : bool
     {
-        $trace = null;
+        $refTrace = null;
 
         if (null !== $this->trace) {
-            $trace = $this->trace;
+            $refTrace = $this->trace;
 
             return true;
         }
@@ -275,14 +275,14 @@ class TestRunner
 
 
     /**
-     * @param string $stdout
+     * @param string $refStdout
      */
-    public function hasStdout(&$stdout = null) : bool
+    public function hasStdout(&$refStdout = null) : bool
     {
-        $stdout = null;
+        $refStdout = null;
 
         if (null !== $this->stdout) {
-            $stdout = $this->stdout;
+            $refStdout = $this->stdout;
 
             return true;
         }
@@ -291,14 +291,14 @@ class TestRunner
     }
 
     /**
-     * @param float $secondsMin
+     * @param float $refSecondsMin
      */
-    public function hasSecondsMin(&$secondsMin = null) : bool
+    public function hasSecondsMin(&$refSecondsMin = null) : bool
     {
-        $secondsMin = null;
+        $refSecondsMin = null;
 
         if (null !== $this->secondsMin) {
-            $secondsMin = $this->secondsMin;
+            $refSecondsMin = $this->secondsMin;
 
             return true;
         }
@@ -307,14 +307,14 @@ class TestRunner
     }
 
     /**
-     * @param float $secondsMax
+     * @param float $refSecondsMax
      */
-    public function hasSecondsMax(&$secondsMax = null) : bool
+    public function hasSecondsMax(&$refSecondsMax = null) : bool
     {
-        $secondsMax = null;
+        $refSecondsMax = null;
 
         if (null !== $this->secondsMax) {
-            $secondsMax = $this->secondsMax;
+            $refSecondsMax = $this->secondsMax;
 
             return true;
         }
@@ -323,14 +323,14 @@ class TestRunner
     }
 
     /**
-     * @param array $return
+     * @param array $refReturn
      */
-    public function hasReturn(&$return = null) : bool
+    public function hasReturn(&$refReturn = null) : bool
     {
-        $return = null;
+        $refReturn = null;
 
         if (null !== $this->return) {
-            $return = $this->return[ 0 ];
+            $refReturn = $this->return[ 0 ];
 
             return true;
         }
@@ -339,14 +339,14 @@ class TestRunner
     }
 
     /**
-     * @param int $memoryMaxBytes
+     * @param int $refMemoryMaxBytes
      */
-    public function hasMemoryMax(&$memoryMaxBytes = null) : bool
+    public function hasMemoryMax(&$refMemoryMaxBytes = null) : bool
     {
-        $memoryMaxBytes = null;
+        $refMemoryMaxBytes = null;
 
         if (null !== $this->memoryMaxBytes) {
-            $memoryMaxBytes = $this->memoryMaxBytes;
+            $refMemoryMaxBytes = $this->memoryMaxBytes;
 
             return true;
         }
@@ -362,7 +362,8 @@ class TestRunner
         $h = $this->getResource();
         $hasResource = (null !== $h);
 
-        $this->hasTrace($trace) || ($trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+        $this->hasTrace($trace)
+        || ($trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
         $traceLine = $trace[ 0 ][ 'line' ] ?? -1;
@@ -411,8 +412,8 @@ class TestRunner
 
         $expectedSecondsMin = null;
         $expectedSecondsMax = null;
-        if (
-            $this->hasSecondsMin($expectedSecondsMin)
+        if (false
+            || $this->hasSecondsMin($expectedSecondsMin)
             || $this->hasSecondsMax($expectedSecondsMax)
         ) {
             $isError = false;

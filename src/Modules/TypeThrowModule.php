@@ -21,11 +21,11 @@ use Gzhegow\Lib\Modules\Str\Alphabet;
 class TypeThrowModule
 {
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function empty(&$result, $value): bool
+	public function empty(&$r, $value): bool
 	{
-		if (Lib::type()->empty($result, $value)) {
+		if (Lib::type()->empty($r, $value)) {
 		    return true;
 		}
 
@@ -34,11 +34,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function any_not_empty(&$result, $value): bool
+	public function any_not_empty(&$r, $value): bool
 	{
-		if (Lib::type()->any_not_empty($result, $value)) {
+		if (Lib::type()->any_not_empty($r, $value)) {
 		    return true;
 		}
 
@@ -49,11 +49,11 @@ class TypeThrowModule
 	/**
 	 * > Специальный тип, который значит, что значение можно отбросить или не учитывать, т.к. оно не несёт информации
 	 *
-	 * @param string|array|\Countable|null $result
+	 * @param string|array|\Countable|null $r
 	 */
-	public function blank(&$result, $value): bool
+	public function blank(&$r, $value): bool
 	{
-		if (Lib::type()->blank($result, $value)) {
+		if (Lib::type()->blank($r, $value)) {
 		    return true;
 		}
 
@@ -62,11 +62,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function any_not_blank(&$result, $value): bool
+	public function any_not_blank(&$r, $value): bool
 	{
-		if (Lib::type()->any_not_blank($result, $value)) {
+		if (Lib::type()->any_not_blank($r, $value)) {
 		    return true;
 		}
 
@@ -77,11 +77,11 @@ class TypeThrowModule
 	/**
 	 * > Специальный тип, который значит, что значение можно заменить NULL-ом
 	 *
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function nullable(&$result, $value): bool
+	public function nullable(&$r, $value): bool
 	{
-		if (Lib::type()->nullable($result, $value)) {
+		if (Lib::type()->nullable($r, $value)) {
 		    return true;
 		}
 
@@ -90,11 +90,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function any_not_nullable(&$result, $value): bool
+	public function any_not_nullable(&$r, $value): bool
 	{
-		if (Lib::type()->any_not_nullable($result, $value)) {
+		if (Lib::type()->any_not_nullable($r, $value)) {
 		    return true;
 		}
 
@@ -105,11 +105,11 @@ class TypeThrowModule
 	/**
 	 * > Специальный тип, который значит, что значение было отправлено пользователем, а не появилось из PHP
 	 *
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function passed(&$result, $value): bool
+	public function passed(&$r, $value): bool
 	{
-		if (Lib::type()->passed($result, $value)) {
+		if (Lib::type()->passed($r, $value)) {
 		    return true;
 		}
 
@@ -118,11 +118,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function any_not_passed(&$result, $value): bool
+	public function any_not_passed(&$r, $value): bool
 	{
-		if (Lib::type()->any_not_passed($result, $value)) {
+		if (Lib::type()->any_not_passed($r, $value)) {
 		    return true;
 		}
 
@@ -138,11 +138,11 @@ class TypeThrowModule
 	 * > NIL равен только самому себе
 	 * > NULL означает пустоту и им можно заменить значения '', [], `resource (closed)`, NIL, но нельзя заменить NAN
 	 *
-	 * @param string|Nil|null $result
+	 * @param string|Nil|null $r
 	 */
-	public function nil(&$result, $value): bool
+	public function nil(&$r, $value): bool
 	{
-		if (Lib::type()->nil($result, $value)) {
+		if (Lib::type()->nil($r, $value)) {
 		    return true;
 		}
 
@@ -151,11 +151,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function any_not_nil(&$result, $value): bool
+	public function any_not_nil(&$r, $value): bool
 	{
-		if (Lib::type()->any_not_nil($result, $value)) {
+		if (Lib::type()->any_not_nil($r, $value)) {
 		    return true;
 		}
 
@@ -164,11 +164,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param null $result
+	 * @param null $r
 	 */
-	public function a_null(&$result, $value): bool
+	public function a_null(&$r, $value): bool
 	{
-		if (Lib::type()->a_null($result, $value)) {
+		if (Lib::type()->a_null($r, $value)) {
 		    return true;
 		}
 
@@ -177,11 +177,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function any_not_null(&$result, $value): bool
+	public function any_not_null(&$r, $value): bool
 	{
-		if (Lib::type()->any_not_null($result, $value)) {
+		if (Lib::type()->any_not_null($r, $value)) {
 		    return true;
 		}
 
@@ -190,11 +190,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param bool|null $result
+	 * @param bool|null $r
 	 */
-	public function a_bool(&$result, $value): bool
+	public function a_bool(&$r, $value): bool
 	{
-		if (Lib::type()->a_bool($result, $value)) {
+		if (Lib::type()->a_bool($r, $value)) {
 		    return true;
 		}
 
@@ -203,11 +203,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function an_any_not_bool(&$result, $value): bool
+	public function an_any_not_bool(&$r, $value): bool
 	{
-		if (Lib::type()->an_any_not_bool($result, $value)) {
+		if (Lib::type()->an_any_not_bool($r, $value)) {
 		    return true;
 		}
 
@@ -216,11 +216,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param false|null $result
+	 * @param false|null $r
 	 */
-	public function a_false(&$result, $value): bool
+	public function a_false(&$r, $value): bool
 	{
-		if (Lib::type()->a_false($result, $value)) {
+		if (Lib::type()->a_false($r, $value)) {
 		    return true;
 		}
 
@@ -229,11 +229,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function any_not_false(&$result, $value): bool
+	public function any_not_false(&$r, $value): bool
 	{
-		if (Lib::type()->any_not_false($result, $value)) {
+		if (Lib::type()->any_not_false($r, $value)) {
 		    return true;
 		}
 
@@ -242,11 +242,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param true|null $result
+	 * @param true|null $r
 	 */
-	public function a_true(&$result, $value): bool
+	public function a_true(&$r, $value): bool
 	{
-		if (Lib::type()->a_true($result, $value)) {
+		if (Lib::type()->a_true($r, $value)) {
 		    return true;
 		}
 
@@ -255,11 +255,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function any_not_true(&$result, $value): bool
+	public function any_not_true(&$r, $value): bool
 	{
-		if (Lib::type()->any_not_true($result, $value)) {
+		if (Lib::type()->any_not_true($r, $value)) {
 		    return true;
 		}
 
@@ -268,11 +268,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param bool|null $result
+	 * @param bool|null $r
 	 */
-	public function bool(&$result, $value): bool
+	public function bool(&$r, $value): bool
 	{
-		if (Lib::type()->bool($result, $value)) {
+		if (Lib::type()->bool($r, $value)) {
 		    return true;
 		}
 
@@ -281,11 +281,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param false|null $result
+	 * @param false|null $r
 	 */
-	public function false(&$result, $value): bool
+	public function false(&$r, $value): bool
 	{
-		if (Lib::type()->false($result, $value)) {
+		if (Lib::type()->false($r, $value)) {
 		    return true;
 		}
 
@@ -294,11 +294,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param false|null $result
+	 * @param false|null $r
 	 */
-	public function true(&$result, $value): bool
+	public function true(&$r, $value): bool
 	{
-		if (Lib::type()->true($result, $value)) {
+		if (Lib::type()->true($r, $value)) {
 		    return true;
 		}
 
@@ -307,11 +307,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param bool|null $result
+	 * @param bool|null $r
 	 */
-	public function userbool(&$result, $value): bool
+	public function userbool(&$r, $value): bool
 	{
-		if (Lib::type()->userbool($result, $value)) {
+		if (Lib::type()->userbool($r, $value)) {
 		    return true;
 		}
 
@@ -320,11 +320,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param false|null $result
+	 * @param false|null $r
 	 */
-	public function userfalse(&$result, $value): bool
+	public function userfalse(&$r, $value): bool
 	{
-		if (Lib::type()->userfalse($result, $value)) {
+		if (Lib::type()->userfalse($r, $value)) {
 		    return true;
 		}
 
@@ -333,11 +333,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param false|null $result
+	 * @param false|null $r
 	 */
-	public function usertrue(&$result, $value): bool
+	public function usertrue(&$r, $value): bool
 	{
-		if (Lib::type()->usertrue($result, $value)) {
+		if (Lib::type()->usertrue($r, $value)) {
 		    return true;
 		}
 
@@ -346,11 +346,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param float|null $result
+	 * @param float|null $r
 	 */
-	public function nan(&$result, $value): bool
+	public function nan(&$r, $value): bool
 	{
-		if (Lib::type()->nan($result, $value)) {
+		if (Lib::type()->nan($r, $value)) {
 		    return true;
 		}
 
@@ -359,11 +359,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param float|null $result
+	 * @param float|null $r
 	 */
-	public function float_not_nan(&$result, $value): bool
+	public function float_not_nan(&$r, $value): bool
 	{
-		if (Lib::type()->float_not_nan($result, $value)) {
+		if (Lib::type()->float_not_nan($r, $value)) {
 		    return true;
 		}
 
@@ -372,11 +372,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function any_not_nan(&$result, $value): bool
+	public function any_not_nan(&$r, $value): bool
 	{
-		if (Lib::type()->any_not_nan($result, $value)) {
+		if (Lib::type()->any_not_nan($r, $value)) {
 		    return true;
 		}
 
@@ -385,11 +385,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param float|null $result
+	 * @param float|null $r
 	 */
-	public function finite(&$result, $value): bool
+	public function finite(&$r, $value): bool
 	{
-		if (Lib::type()->finite($result, $value)) {
+		if (Lib::type()->finite($r, $value)) {
 		    return true;
 		}
 
@@ -398,11 +398,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param float|null $result
+	 * @param float|null $r
 	 */
-	public function float_not_finite(&$result, $value): bool
+	public function float_not_finite(&$r, $value): bool
 	{
-		if (Lib::type()->float_not_finite($result, $value)) {
+		if (Lib::type()->float_not_finite($r, $value)) {
 		    return true;
 		}
 
@@ -411,11 +411,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function any_not_finite(&$result, $value): bool
+	public function any_not_finite(&$r, $value): bool
 	{
-		if (Lib::type()->any_not_finite($result, $value)) {
+		if (Lib::type()->any_not_finite($r, $value)) {
 		    return true;
 		}
 
@@ -424,11 +424,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param float|null $result
+	 * @param float|null $r
 	 */
-	public function infinite(&$result, $value): bool
+	public function infinite(&$r, $value): bool
 	{
-		if (Lib::type()->infinite($result, $value)) {
+		if (Lib::type()->infinite($r, $value)) {
 		    return true;
 		}
 
@@ -437,11 +437,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param float|null $result
+	 * @param float|null $r
 	 */
-	public function float_not_infinite(&$result, $value): bool
+	public function float_not_infinite(&$r, $value): bool
 	{
-		if (Lib::type()->float_not_infinite($result, $value)) {
+		if (Lib::type()->float_not_infinite($r, $value)) {
 		    return true;
 		}
 
@@ -450,11 +450,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function any_not_infinite(&$result, $value): bool
+	public function any_not_infinite(&$r, $value): bool
 	{
-		if (Lib::type()->any_not_infinite($result, $value)) {
+		if (Lib::type()->any_not_infinite($r, $value)) {
 		    return true;
 		}
 
@@ -463,11 +463,50 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param float|null $r
 	 */
-	public function numeric(&$result, $value, ?bool $isAllowExp = null, array $refs = []): bool
+	public function float_min(&$r, $value): bool
 	{
-		if (Lib::type()->numeric($result, $value, $isAllowExp, $refs)) {
+		if (Lib::type()->float_min($r, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `float_min` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param float|null $r
+	 */
+	public function float_not_float_min(&$r, $value): bool
+	{
+		if (Lib::type()->float_not_float_min($r, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `float_not_float_min` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param mixed|null $r
+	 */
+	public function any_not_float_min(&$r, $value): bool
+	{
+		if (Lib::type()->any_not_float_min($r, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `any_not_float_min` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param string|null $r
+	 */
+	public function numeric(&$r, $value, ?bool $isAllowExp = null, array $refs = []): bool
+	{
+		if (Lib::type()->numeric($r, $value, $isAllowExp, $refs)) {
 		    return true;
 		}
 
@@ -476,76 +515,76 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_non_zero(&$result, $value, ?bool $allowExp = null, array $refs = []): bool
+	public function numeric_non_zero(&$r, $value, ?bool $isAllowExp = null, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_non_zero($result, $value, $allowExp, $refs)) {
+		if (Lib::type()->numeric_non_zero($r, $value, $isAllowExp, $refs)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `numeric_non_zero` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_non_zero` is failed", $value, $isAllowExp, $refs ]);
 	}
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_non_negative(&$result, $value, ?bool $allowExp = null, array $refs = []): bool
+	public function numeric_non_negative(&$r, $value, ?bool $isAllowExp = null, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_non_negative($result, $value, $allowExp, $refs)) {
+		if (Lib::type()->numeric_non_negative($r, $value, $isAllowExp, $refs)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `numeric_non_negative` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_non_negative` is failed", $value, $isAllowExp, $refs ]);
 	}
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_non_positive(&$result, $value, ?bool $allowExp = null, array $refs = []): bool
+	public function numeric_non_positive(&$r, $value, ?bool $isAllowExp = null, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_non_positive($result, $value, $allowExp, $refs)) {
+		if (Lib::type()->numeric_non_positive($r, $value, $isAllowExp, $refs)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `numeric_non_positive` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_non_positive` is failed", $value, $isAllowExp, $refs ]);
 	}
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_negative(&$result, $value, ?bool $allowExp = null, array $refs = []): bool
+	public function numeric_negative(&$r, $value, ?bool $isAllowExp = null, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_negative($result, $value, $allowExp, $refs)) {
+		if (Lib::type()->numeric_negative($r, $value, $isAllowExp, $refs)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `numeric_negative` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_negative` is failed", $value, $isAllowExp, $refs ]);
 	}
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_positive(&$result, $value, ?bool $allowExp = null, array $refs = []): bool
+	public function numeric_positive(&$r, $value, ?bool $isAllowExp = null, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_positive($result, $value, $allowExp, $refs)) {
+		if (Lib::type()->numeric_positive($r, $value, $isAllowExp, $refs)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `numeric_positive` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Typecheck `numeric_positive` is failed", $value, $isAllowExp, $refs ]);
 	}
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_int(&$result, $value, array $refs = []): bool
+	public function numeric_int(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_int($result, $value, $refs)) {
+		if (Lib::type()->numeric_int($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -554,11 +593,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_int_non_zero(&$result, $value, array $refs = []): bool
+	public function numeric_int_non_zero(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_int_non_zero($result, $value, $refs)) {
+		if (Lib::type()->numeric_int_non_zero($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -567,11 +606,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_int_non_negative(&$result, $value, array $refs = []): bool
+	public function numeric_int_non_negative(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_int_non_negative($result, $value, $refs)) {
+		if (Lib::type()->numeric_int_non_negative($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -580,11 +619,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_int_non_positive(&$result, $value, array $refs = []): bool
+	public function numeric_int_non_positive(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_int_non_positive($result, $value, $refs)) {
+		if (Lib::type()->numeric_int_non_positive($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -593,11 +632,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_int_negative(&$result, $value, array $refs = []): bool
+	public function numeric_int_negative(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_int_negative($result, $value, $refs)) {
+		if (Lib::type()->numeric_int_negative($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -606,11 +645,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_int_positive(&$result, $value, array $refs = []): bool
+	public function numeric_int_positive(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_int_positive($result, $value, $refs)) {
+		if (Lib::type()->numeric_int_positive($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -619,11 +658,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_int_positive_or_minus_one(&$result, $value, array $refs = []): bool
+	public function numeric_int_positive_or_minus_one(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_int_positive_or_minus_one($result, $value, $refs)) {
+		if (Lib::type()->numeric_int_positive_or_minus_one($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -632,11 +671,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_int_non_negative_or_minus_one(&$result, $value, array $refs = []): bool
+	public function numeric_int_non_negative_or_minus_one(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_int_non_negative_or_minus_one($result, $value, $refs)) {
+		if (Lib::type()->numeric_int_non_negative_or_minus_one($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -645,11 +684,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_float(&$result, $value, array $refs = []): bool
+	public function numeric_float(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_float($result, $value, $refs)) {
+		if (Lib::type()->numeric_float($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -658,11 +697,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_float_non_zero(&$result, $value, array $refs = []): bool
+	public function numeric_float_non_zero(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_float_non_zero($result, $value, $refs)) {
+		if (Lib::type()->numeric_float_non_zero($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -671,11 +710,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_float_non_negative(&$result, $value, array $refs = []): bool
+	public function numeric_float_non_negative(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_float_non_negative($result, $value, $refs)) {
+		if (Lib::type()->numeric_float_non_negative($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -684,11 +723,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_float_non_positive(&$result, $value, array $refs = []): bool
+	public function numeric_float_non_positive(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_float_non_positive($result, $value, $refs)) {
+		if (Lib::type()->numeric_float_non_positive($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -697,11 +736,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_float_negative(&$result, $value, array $refs = []): bool
+	public function numeric_float_negative(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_float_negative($result, $value, $refs)) {
+		if (Lib::type()->numeric_float_negative($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -710,11 +749,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function numeric_float_positive(&$result, $value, array $refs = []): bool
+	public function numeric_float_positive(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->numeric_float_positive($result, $value, $refs)) {
+		if (Lib::type()->numeric_float_positive($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -723,11 +762,125 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function decimal(&$result, $value, int $scale = 0, array $refs = []): bool
+	public function numeric_trimpad(
+		&$r,
+		$value,
+		?int $lenTrim = null,
+		?int $lenPad = null,
+		string $stringPad = '0',
+		array $refs = []
+	): bool {
+		if (Lib::type()->numeric_trimpad($r, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `numeric_trimpad` is failed", $value, $lenTrim, $lenPad, $stringPad, $refs ]);
+	}
+
+
+	/**
+	 * @param string|null $r
+	 */
+	public function numeric_trimpad_non_zero(
+		&$r,
+		$value,
+		?int $lenTrim = null,
+		?int $lenPad = null,
+		string $stringPad = '0',
+		array $refs = []
+	): bool {
+		if (Lib::type()->numeric_trimpad_non_zero($r, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `numeric_trimpad_non_zero` is failed", $value, $lenTrim, $lenPad, $stringPad, $refs ]);
+	}
+
+
+	/**
+	 * @param string|null $r
+	 */
+	public function numeric_trimpad_non_negative(
+		&$r,
+		$value,
+		?int $lenTrim = null,
+		?int $lenPad = null,
+		string $stringPad = '0',
+		array $refs = []
+	): bool {
+		if (Lib::type()->numeric_trimpad_non_negative($r, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `numeric_trimpad_non_negative` is failed", $value, $lenTrim, $lenPad, $stringPad, $refs ]);
+	}
+
+
+	/**
+	 * @param string|null $r
+	 */
+	public function numeric_trimpad_non_positive(
+		&$r,
+		$value,
+		?int $lenTrim = null,
+		?int $lenPad = null,
+		string $stringPad = '0',
+		array $refs = []
+	): bool {
+		if (Lib::type()->numeric_trimpad_non_positive($r, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `numeric_trimpad_non_positive` is failed", $value, $lenTrim, $lenPad, $stringPad, $refs ]);
+	}
+
+
+	/**
+	 * @param string|null $r
+	 */
+	public function numeric_trimpad_negative(
+		&$r,
+		$value,
+		?int $lenTrim = null,
+		?int $lenPad = null,
+		string $stringPad = '0',
+		array $refs = []
+	): bool {
+		if (Lib::type()->numeric_trimpad_negative($r, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `numeric_trimpad_negative` is failed", $value, $lenTrim, $lenPad, $stringPad, $refs ]);
+	}
+
+
+	/**
+	 * @param string|null $r
+	 */
+	public function numeric_trimpad_positive(
+		&$r,
+		$value,
+		?int $lenTrim = null,
+		?int $lenPad = null,
+		string $stringPad = '0',
+		array $refs = []
+	): bool {
+		if (Lib::type()->numeric_trimpad_positive($r, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `numeric_trimpad_positive` is failed", $value, $lenTrim, $lenPad, $stringPad, $refs ]);
+	}
+
+
+	/**
+	 * @param string|null $r
+	 */
+	public function decimal(&$r, $value, int $scale = 0, array $refs = []): bool
 	{
-		if (Lib::type()->decimal($result, $value, $scale, $refs)) {
+		if (Lib::type()->decimal($r, $value, $scale, $refs)) {
 		    return true;
 		}
 
@@ -736,11 +889,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function decimal_non_zero(&$result, $value, int $scale = 0, array $refs = []): bool
+	public function decimal_non_zero(&$r, $value, int $scale = 0, array $refs = []): bool
 	{
-		if (Lib::type()->decimal_non_zero($result, $value, $scale, $refs)) {
+		if (Lib::type()->decimal_non_zero($r, $value, $scale, $refs)) {
 		    return true;
 		}
 
@@ -749,11 +902,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function decimal_non_negative(&$result, $value, int $scale = 0, array $refs = []): bool
+	public function decimal_non_negative(&$r, $value, int $scale = 0, array $refs = []): bool
 	{
-		if (Lib::type()->decimal_non_negative($result, $value, $scale, $refs)) {
+		if (Lib::type()->decimal_non_negative($r, $value, $scale, $refs)) {
 		    return true;
 		}
 
@@ -762,11 +915,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function decimal_non_positive(&$result, $value, int $scale = 0, array $refs = []): bool
+	public function decimal_non_positive(&$r, $value, int $scale = 0, array $refs = []): bool
 	{
-		if (Lib::type()->decimal_non_positive($result, $value, $scale, $refs)) {
+		if (Lib::type()->decimal_non_positive($r, $value, $scale, $refs)) {
 		    return true;
 		}
 
@@ -775,11 +928,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function decimal_negative(&$result, $value, int $scale = 0, array $refs = []): bool
+	public function decimal_negative(&$r, $value, int $scale = 0, array $refs = []): bool
 	{
-		if (Lib::type()->decimal_negative($result, $value, $scale, $refs)) {
+		if (Lib::type()->decimal_negative($r, $value, $scale, $refs)) {
 		    return true;
 		}
 
@@ -788,11 +941,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function decimal_positive(&$result, $value, int $scale = 0, array $refs = []): bool
+	public function decimal_positive(&$r, $value, int $scale = 0, array $refs = []): bool
 	{
-		if (Lib::type()->decimal_positive($result, $value, $scale, $refs)) {
+		if (Lib::type()->decimal_positive($r, $value, $scale, $refs)) {
 		    return true;
 		}
 
@@ -801,11 +954,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|float|null $result
+	 * @param int|float|null $r
 	 */
-	public function num(&$result, $value): bool
+	public function num(&$r, $value): bool
 	{
-		if (Lib::type()->num($result, $value)) {
+		if (Lib::type()->num($r, $value)) {
 		    return true;
 		}
 
@@ -814,11 +967,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|float|null $result
+	 * @param int|float|null $r
 	 */
-	public function num_non_zero(&$result, $value): bool
+	public function num_non_zero(&$r, $value): bool
 	{
-		if (Lib::type()->num_non_zero($result, $value)) {
+		if (Lib::type()->num_non_zero($r, $value)) {
 		    return true;
 		}
 
@@ -827,11 +980,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|float|null $result
+	 * @param int|float|null $r
 	 */
-	public function num_non_negative(&$result, $value): bool
+	public function num_non_negative(&$r, $value): bool
 	{
-		if (Lib::type()->num_non_negative($result, $value)) {
+		if (Lib::type()->num_non_negative($r, $value)) {
 		    return true;
 		}
 
@@ -840,11 +993,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|float|null $result
+	 * @param int|float|null $r
 	 */
-	public function num_non_positive(&$result, $value): bool
+	public function num_non_positive(&$r, $value): bool
 	{
-		if (Lib::type()->num_non_positive($result, $value)) {
+		if (Lib::type()->num_non_positive($r, $value)) {
 		    return true;
 		}
 
@@ -853,11 +1006,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|float|null $result
+	 * @param int|float|null $r
 	 */
-	public function num_negative(&$result, $value): bool
+	public function num_negative(&$r, $value): bool
 	{
-		if (Lib::type()->num_negative($result, $value)) {
+		if (Lib::type()->num_negative($r, $value)) {
 		    return true;
 		}
 
@@ -866,11 +1019,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|float|null $result
+	 * @param int|float|null $r
 	 */
-	public function num_positive(&$result, $value): bool
+	public function num_positive(&$r, $value): bool
 	{
-		if (Lib::type()->num_positive($result, $value)) {
+		if (Lib::type()->num_positive($r, $value)) {
 		    return true;
 		}
 
@@ -879,11 +1032,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|null $result
+	 * @param int|null $r
 	 */
-	public function int(&$result, $value): bool
+	public function int(&$r, $value): bool
 	{
-		if (Lib::type()->int($result, $value)) {
+		if (Lib::type()->int($r, $value)) {
 		    return true;
 		}
 
@@ -892,11 +1045,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|null $result
+	 * @param int|null $r
 	 */
-	public function int_non_zero(&$result, $value): bool
+	public function int_non_zero(&$r, $value): bool
 	{
-		if (Lib::type()->int_non_zero($result, $value)) {
+		if (Lib::type()->int_non_zero($r, $value)) {
 		    return true;
 		}
 
@@ -905,11 +1058,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|null $result
+	 * @param int|null $r
 	 */
-	public function int_non_negative(&$result, $value): bool
+	public function int_non_negative(&$r, $value): bool
 	{
-		if (Lib::type()->int_non_negative($result, $value)) {
+		if (Lib::type()->int_non_negative($r, $value)) {
 		    return true;
 		}
 
@@ -918,11 +1071,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|null $result
+	 * @param int|null $r
 	 */
-	public function int_non_positive(&$result, $value): bool
+	public function int_non_positive(&$r, $value): bool
 	{
-		if (Lib::type()->int_non_positive($result, $value)) {
+		if (Lib::type()->int_non_positive($r, $value)) {
 		    return true;
 		}
 
@@ -931,11 +1084,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|null $result
+	 * @param int|null $r
 	 */
-	public function int_negative(&$result, $value): bool
+	public function int_negative(&$r, $value): bool
 	{
-		if (Lib::type()->int_negative($result, $value)) {
+		if (Lib::type()->int_negative($r, $value)) {
 		    return true;
 		}
 
@@ -944,11 +1097,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|null $result
+	 * @param int|null $r
 	 */
-	public function int_positive(&$result, $value): bool
+	public function int_positive(&$r, $value): bool
 	{
-		if (Lib::type()->int_positive($result, $value)) {
+		if (Lib::type()->int_positive($r, $value)) {
 		    return true;
 		}
 
@@ -957,11 +1110,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function int_positive_or_minus_one(&$result, $value): bool
+	public function int_positive_or_minus_one(&$r, $value): bool
 	{
-		if (Lib::type()->int_positive_or_minus_one($result, $value)) {
+		if (Lib::type()->int_positive_or_minus_one($r, $value)) {
 		    return true;
 		}
 
@@ -970,11 +1123,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function int_non_negative_or_minus_one(&$result, $value): bool
+	public function int_non_negative_or_minus_one(&$r, $value): bool
 	{
-		if (Lib::type()->int_non_negative_or_minus_one($result, $value)) {
+		if (Lib::type()->int_non_negative_or_minus_one($r, $value)) {
 		    return true;
 		}
 
@@ -983,11 +1136,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param float|null $result
+	 * @param float|null $r
 	 */
-	public function float(&$result, $value): bool
+	public function float(&$r, $value): bool
 	{
-		if (Lib::type()->float($result, $value)) {
+		if (Lib::type()->float($r, $value)) {
 		    return true;
 		}
 
@@ -996,11 +1149,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param float|null $result
+	 * @param float|null $r
 	 */
-	public function float_non_zero(&$result, $value): bool
+	public function float_non_zero(&$r, $value): bool
 	{
-		if (Lib::type()->float_non_zero($result, $value)) {
+		if (Lib::type()->float_non_zero($r, $value)) {
 		    return true;
 		}
 
@@ -1009,11 +1162,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param float|null $result
+	 * @param float|null $r
 	 */
-	public function float_non_negative(&$result, $value): bool
+	public function float_non_negative(&$r, $value): bool
 	{
-		if (Lib::type()->float_non_negative($result, $value)) {
+		if (Lib::type()->float_non_negative($r, $value)) {
 		    return true;
 		}
 
@@ -1022,11 +1175,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param float|null $result
+	 * @param float|null $r
 	 */
-	public function float_non_positive(&$result, $value): bool
+	public function float_non_positive(&$r, $value): bool
 	{
-		if (Lib::type()->float_non_positive($result, $value)) {
+		if (Lib::type()->float_non_positive($r, $value)) {
 		    return true;
 		}
 
@@ -1035,11 +1188,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param float|null $result
+	 * @param float|null $r
 	 */
-	public function float_negative(&$result, $value): bool
+	public function float_negative(&$r, $value): bool
 	{
-		if (Lib::type()->float_negative($result, $value)) {
+		if (Lib::type()->float_negative($r, $value)) {
 		    return true;
 		}
 
@@ -1048,11 +1201,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param float|null $result
+	 * @param float|null $r
 	 */
-	public function float_positive(&$result, $value): bool
+	public function float_positive(&$r, $value): bool
 	{
-		if (Lib::type()->float_positive($result, $value)) {
+		if (Lib::type()->float_positive($r, $value)) {
 		    return true;
 		}
 
@@ -1061,11 +1214,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param Number|null $result
+	 * @param Number|null $r
 	 */
-	public function number(&$result, $value, ?bool $allowExp = null): bool
+	public function number(&$r, $value, ?bool $allowExp = null): bool
 	{
-		if (Lib::type()->number($result, $value, $allowExp)) {
+		if (Lib::type()->number($r, $value, $allowExp)) {
 		    return true;
 		}
 
@@ -1074,11 +1227,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param Bcnumber|null $result
+	 * @param Bcnumber|null $r
 	 */
-	public function bcnumber(&$result, $value): bool
+	public function bcnumber(&$r, $value): bool
 	{
-		if (Lib::type()->bcnumber($result, $value)) {
+		if (Lib::type()->bcnumber($r, $value)) {
 		    return true;
 		}
 
@@ -1087,11 +1240,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function a_string(&$result, $value): bool
+	public function a_string(&$r, $value): bool
 	{
-		if (Lib::type()->a_string($result, $value)) {
+		if (Lib::type()->a_string($r, $value)) {
 		    return true;
 		}
 
@@ -1100,11 +1253,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function a_string_empty(&$result, $value): bool
+	public function a_string_empty(&$r, $value): bool
 	{
-		if (Lib::type()->a_string_empty($result, $value)) {
+		if (Lib::type()->a_string_empty($r, $value)) {
 		    return true;
 		}
 
@@ -1113,11 +1266,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function a_string_not_empty(&$result, $value): bool
+	public function a_string_not_empty(&$r, $value): bool
 	{
-		if (Lib::type()->a_string_not_empty($result, $value)) {
+		if (Lib::type()->a_string_not_empty($r, $value)) {
 		    return true;
 		}
 
@@ -1126,11 +1279,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function a_trim(&$result, $value): bool
+	public function a_trim(&$r, $value): bool
 	{
-		if (Lib::type()->a_trim($result, $value)) {
+		if (Lib::type()->a_trim($r, $value)) {
 		    return true;
 		}
 
@@ -1139,11 +1292,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function string(&$result, $value): bool
+	public function string(&$r, $value): bool
 	{
-		if (Lib::type()->string($result, $value)) {
+		if (Lib::type()->string($r, $value)) {
 		    return true;
 		}
 
@@ -1152,11 +1305,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function string_empty(&$result, $value): bool
+	public function string_empty(&$r, $value): bool
 	{
-		if (Lib::type()->string_empty($result, $value)) {
+		if (Lib::type()->string_empty($r, $value)) {
 		    return true;
 		}
 
@@ -1165,11 +1318,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function string_not_empty(&$result, $value): bool
+	public function string_not_empty(&$r, $value): bool
 	{
-		if (Lib::type()->string_not_empty($result, $value)) {
+		if (Lib::type()->string_not_empty($r, $value)) {
 		    return true;
 		}
 
@@ -1178,11 +1331,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function trim(&$result, $value, ?string $characters = null): bool
+	public function trim(&$r, $value, ?string $characters = null): bool
 	{
-		if (Lib::type()->trim($result, $value, $characters)) {
+		if (Lib::type()->trim($r, $value, $characters)) {
 		    return true;
 		}
 
@@ -1191,11 +1344,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function char(&$result, $value): bool
+	public function char(&$r, $value): bool
 	{
-		if (Lib::type()->char($result, $value)) {
+		if (Lib::type()->char($r, $value)) {
 		    return true;
 		}
 
@@ -1204,11 +1357,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function letter(&$result, $value): bool
+	public function letter(&$r, $value): bool
 	{
-		if (Lib::type()->letter($result, $value)) {
+		if (Lib::type()->letter($r, $value)) {
 		    return true;
 		}
 
@@ -1217,11 +1370,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param Alphabet|null $result
+	 * @param Alphabet|null $r
 	 */
-	public function alphabet(&$result, $value): bool
+	public function alphabet(&$r, $value): bool
 	{
-		if (Lib::type()->alphabet($result, $value)) {
+		if (Lib::type()->alphabet($r, $value)) {
 		    return true;
 		}
 
@@ -1230,11 +1383,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function ctype_digit(&$result, $value): bool
+	public function ctype_digit(&$r, $value): bool
 	{
-		if (Lib::type()->ctype_digit($result, $value)) {
+		if (Lib::type()->ctype_digit($r, $value)) {
 		    return true;
 		}
 
@@ -1243,11 +1396,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function ctype_alpha(&$result, $value, ?bool $isIgnoreCase = null): bool
+	public function ctype_alpha(&$r, $value, ?bool $isIgnoreCase = null): bool
 	{
-		if (Lib::type()->ctype_alpha($result, $value, $isIgnoreCase)) {
+		if (Lib::type()->ctype_alpha($r, $value, $isIgnoreCase)) {
 		    return true;
 		}
 
@@ -1256,11 +1409,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function ctype_alnum(&$result, $value, ?bool $isIgnoreCase = null): bool
+	public function ctype_alnum(&$r, $value, ?bool $isIgnoreCase = null): bool
 	{
-		if (Lib::type()->ctype_alnum($result, $value, $isIgnoreCase)) {
+		if (Lib::type()->ctype_alnum($r, $value, $isIgnoreCase)) {
 		    return true;
 		}
 
@@ -1269,11 +1422,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function base(&$result, $value, $alphabet): bool
+	public function base(&$r, $value, $alphabet): bool
 	{
-		if (Lib::type()->base($result, $value, $alphabet)) {
+		if (Lib::type()->base($r, $value, $alphabet)) {
 		    return true;
 		}
 
@@ -1282,11 +1435,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function base_bin(&$result, $value): bool
+	public function base_bin(&$r, $value): bool
 	{
-		if (Lib::type()->base_bin($result, $value)) {
+		if (Lib::type()->base_bin($r, $value)) {
 		    return true;
 		}
 
@@ -1295,11 +1448,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function base_oct(&$result, $value): bool
+	public function base_oct(&$r, $value): bool
 	{
-		if (Lib::type()->base_oct($result, $value)) {
+		if (Lib::type()->base_oct($r, $value)) {
 		    return true;
 		}
 
@@ -1308,11 +1461,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function base_dec(&$result, $value): bool
+	public function base_dec(&$r, $value): bool
 	{
-		if (Lib::type()->base_dec($result, $value)) {
+		if (Lib::type()->base_dec($r, $value)) {
 		    return true;
 		}
 
@@ -1321,11 +1474,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function base_hex(&$result, $value): bool
+	public function base_hex(&$r, $value): bool
 	{
-		if (Lib::type()->base_hex($result, $value)) {
+		if (Lib::type()->base_hex($r, $value)) {
 		    return true;
 		}
 
@@ -1334,11 +1487,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|null $result
+	 * @param array|null $r
 	 */
-	public function array_empty(&$result, $value): bool
+	public function array_empty(&$r, $value): bool
 	{
-		if (Lib::type()->array_empty($result, $value)) {
+		if (Lib::type()->array_empty($r, $value)) {
 		    return true;
 		}
 
@@ -1347,11 +1500,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|null $result
+	 * @param array|null $r
 	 */
-	public function array_not_empty(&$result, $value): bool
+	public function array_not_empty(&$r, $value): bool
 	{
-		if (Lib::type()->array_not_empty($result, $value)) {
+		if (Lib::type()->array_not_empty($r, $value)) {
 		    return true;
 		}
 
@@ -1360,11 +1513,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function any_not_array_empty(&$result, $value): bool
+	public function any_not_array_empty(&$r, $value): bool
 	{
-		if (Lib::type()->any_not_array_empty($result, $value)) {
+		if (Lib::type()->any_not_array_empty($r, $value)) {
 		    return true;
 		}
 
@@ -1373,11 +1526,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param mixed|null $result
+	 * @param mixed|null $r
 	 */
-	public function key_exists(&$result, $value, $key): bool
+	public function key_exists(&$r, $value, $key): bool
 	{
-		if (Lib::type()->key_exists($result, $value, $key)) {
+		if (Lib::type()->key_exists($r, $value, $key)) {
 		    return true;
 		}
 
@@ -1386,11 +1539,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|null $result
+	 * @param array|null $r
 	 */
-	public function array_plain(&$result, $value): bool
+	public function array_plain(&$r, $value): bool
 	{
-		if (Lib::type()->array_plain($result, $value)) {
+		if (Lib::type()->array_plain($r, $value)) {
 		    return true;
 		}
 
@@ -1399,11 +1552,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|null $result
+	 * @param array|null $r
 	 */
-	public function list(&$result, $value, ?bool $isPlain = null): bool
+	public function list(&$r, $value, ?bool $isPlain = null): bool
 	{
-		if (Lib::type()->list($result, $value, $isPlain)) {
+		if (Lib::type()->list($r, $value, $isPlain)) {
 		    return true;
 		}
 
@@ -1412,11 +1565,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|null $result
+	 * @param array|null $r
 	 */
-	public function list_sorted(&$result, $value, ?bool $isPlain = null): bool
+	public function list_sorted(&$r, $value, ?bool $isPlain = null): bool
 	{
-		if (Lib::type()->list_sorted($result, $value, $isPlain)) {
+		if (Lib::type()->list_sorted($r, $value, $isPlain)) {
 		    return true;
 		}
 
@@ -1425,11 +1578,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|null $result
+	 * @param array|null $r
 	 */
-	public function dict(&$result, $value, ?bool $isPlain = null): bool
+	public function dict(&$r, $value, ?bool $isPlain = null): bool
 	{
-		if (Lib::type()->dict($result, $value, $isPlain)) {
+		if (Lib::type()->dict($r, $value, $isPlain)) {
 		    return true;
 		}
 
@@ -1438,11 +1591,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|null $result
+	 * @param array|null $r
 	 */
-	public function dict_sorted(&$result, $value, ?bool $isPlain = null): bool
+	public function dict_sorted(&$r, $value, ?bool $isPlain = null): bool
 	{
-		if (Lib::type()->dict_sorted($result, $value, $isPlain)) {
+		if (Lib::type()->dict_sorted($r, $value, $isPlain)) {
 		    return true;
 		}
 
@@ -1451,11 +1604,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|null $result
+	 * @param array|null $r
 	 */
-	public function table(&$result, $value): bool
+	public function table(&$r, $value): bool
 	{
-		if (Lib::type()->table($result, $value)) {
+		if (Lib::type()->table($r, $value)) {
 		    return true;
 		}
 
@@ -1464,11 +1617,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|null $result
+	 * @param array|null $r
 	 */
-	public function matrix(&$result, $value): bool
+	public function matrix(&$r, $value): bool
 	{
-		if (Lib::type()->matrix($result, $value)) {
+		if (Lib::type()->matrix($r, $value)) {
 		    return true;
 		}
 
@@ -1477,11 +1630,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|null $result
+	 * @param array|null $r
 	 */
-	public function matrix_strict(&$result, $value): bool
+	public function matrix_strict(&$r, $value): bool
 	{
-		if (Lib::type()->matrix_strict($result, $value)) {
+		if (Lib::type()->matrix_strict($r, $value)) {
 		    return true;
 		}
 
@@ -1490,11 +1643,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param ArrPath|null $result
+	 * @param ArrPath|null $r
 	 */
-	public function arrpath(&$result, $path, ?string $dot = null): bool
+	public function arrpath(&$r, $path, ?string $dot = null): bool
 	{
-		if (Lib::type()->arrpath($result, $path, $dot)) {
+		if (Lib::type()->arrpath($r, $path, $dot)) {
 		    return true;
 		}
 
@@ -1503,11 +1656,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|null $result
+	 * @param array|null $r
 	 */
-	public function array_of_type(&$result, $value, string $type): bool
+	public function array_of_type(&$r, $value, string $type): bool
 	{
-		if (Lib::type()->array_of_type($result, $value, $type)) {
+		if (Lib::type()->array_of_type($r, $value, $type)) {
 		    return true;
 		}
 
@@ -1516,11 +1669,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param resource[]|null $result
+	 * @param resource[]|null $r
 	 */
-	public function array_of_resource_type(&$result, $value, string $resourceType): bool
+	public function array_of_resource_type(&$r, $value, string $resourceType): bool
 	{
-		if (Lib::type()->array_of_resource_type($result, $value, $resourceType)) {
+		if (Lib::type()->array_of_resource_type($r, $value, $resourceType)) {
 		    return true;
 		}
 
@@ -1531,12 +1684,12 @@ class TypeThrowModule
 	/**
 	 * @template T
 	 *
-	 * @param T[]             $result
+	 * @param T[]             $r
 	 * @param class-string<T> $className
 	 */
-	public function array_of_a(&$result, $value, string $className): bool
+	public function array_of_a(&$r, $value, string $className): bool
 	{
-		if (Lib::type()->array_of_a($result, $value, $className)) {
+		if (Lib::type()->array_of_a($r, $value, $className)) {
 		    return true;
 		}
 
@@ -1547,12 +1700,12 @@ class TypeThrowModule
 	/**
 	 * @template T
 	 *
-	 * @param T[]             $result
+	 * @param T[]             $r
 	 * @param class-string<T> $className
 	 */
-	public function array_of_class(&$result, $value, string $className): bool
+	public function array_of_class(&$r, $value, string $className): bool
 	{
-		if (Lib::type()->array_of_class($result, $value, $className)) {
+		if (Lib::type()->array_of_class($r, $value, $className)) {
 		    return true;
 		}
 
@@ -1563,12 +1716,12 @@ class TypeThrowModule
 	/**
 	 * @template T
 	 *
-	 * @param T[]             $result
+	 * @param T[]             $r
 	 * @param class-string<T> $className
 	 */
-	public function array_of_subclass(&$result, $value, string $className): bool
+	public function array_of_subclass(&$r, $value, string $className): bool
 	{
-		if (Lib::type()->array_of_subclass($result, $value, $className)) {
+		if (Lib::type()->array_of_subclass($r, $value, $className)) {
 		    return true;
 		}
 
@@ -1577,11 +1730,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|null $result
+	 * @param array|null $r
 	 */
-	public function array_of_callback(&$result, $value, callable $fn, array $args = []): bool
+	public function array_of_callback(&$r, $value, callable $fn, array $args = []): bool
 	{
-		if (Lib::type()->array_of_callback($result, $value, $fn, $args)) {
+		if (Lib::type()->array_of_callback($r, $value, $fn, $args)) {
 		    return true;
 		}
 
@@ -1590,11 +1743,50 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function regex(&$result, $value): bool
+	public function html_tag(&$r, $value): bool
 	{
-		if (Lib::type()->regex($result, $value)) {
+		if (Lib::type()->html_tag($r, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `html_tag` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param string|null $r
+	 */
+	public function xml_tag(&$r, $value): bool
+	{
+		if (Lib::type()->xml_tag($r, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `xml_tag` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param string|null $r
+	 */
+	public function xml_nstag(&$r, $value): bool
+	{
+		if (Lib::type()->xml_nstag($r, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `xml_nstag` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param string|null $r
+	 */
+	public function regex(&$r, $value): bool
+	{
+		if (Lib::type()->regex($r, $value)) {
 		    return true;
 		}
 
@@ -1603,11 +1795,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param AddressIpV4|AddressIpV6|null $result
+	 * @param AddressIpV4|AddressIpV6|null $r
 	 */
-	public function address_ip(&$result, $value): bool
+	public function address_ip(&$r, $value): bool
 	{
-		if (Lib::type()->address_ip($result, $value)) {
+		if (Lib::type()->address_ip($r, $value)) {
 		    return true;
 		}
 
@@ -1616,11 +1808,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param AddressIpV4|null $result
+	 * @param AddressIpV4|null $r
 	 */
-	public function address_ip_v4(&$result, $value): bool
+	public function address_ip_v4(&$r, $value): bool
 	{
-		if (Lib::type()->address_ip_v4($result, $value)) {
+		if (Lib::type()->address_ip_v4($r, $value)) {
 		    return true;
 		}
 
@@ -1629,11 +1821,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param AddressIpV6|null $result
+	 * @param AddressIpV6|null $r
 	 */
-	public function address_ip_v6(&$result, $value): bool
+	public function address_ip_v6(&$r, $value): bool
 	{
-		if (Lib::type()->address_ip_v6($result, $value)) {
+		if (Lib::type()->address_ip_v6($r, $value)) {
 		    return true;
 		}
 
@@ -1642,11 +1834,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function address_mac(&$result, $value): bool
+	public function address_mac(&$r, $value): bool
 	{
-		if (Lib::type()->address_mac($result, $value)) {
+		if (Lib::type()->address_mac($r, $value)) {
 		    return true;
 		}
 
@@ -1655,11 +1847,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param SubnetV4|SubnetV6|null $result
+	 * @param SubnetV4|SubnetV6|null $r
 	 */
-	public function subnet(&$result, $value, ?string $ipFallback = null): bool
+	public function subnet(&$r, $value, ?string $ipFallback = null): bool
 	{
-		if (Lib::type()->subnet($result, $value, $ipFallback)) {
+		if (Lib::type()->subnet($r, $value, $ipFallback)) {
 		    return true;
 		}
 
@@ -1668,11 +1860,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param SubnetV4|null $result
+	 * @param SubnetV4|null $r
 	 */
-	public function subnet_v4(&$result, $value, ?string $ipFallback = null): bool
+	public function subnet_v4(&$r, $value, ?string $ipFallback = null): bool
 	{
-		if (Lib::type()->subnet_v4($result, $value, $ipFallback)) {
+		if (Lib::type()->subnet_v4($r, $value, $ipFallback)) {
 		    return true;
 		}
 
@@ -1681,11 +1873,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param SubnetV6|null $result
+	 * @param SubnetV6|null $r
 	 */
-	public function subnet_v6(&$result, $value, ?string $ipFallback = null): bool
+	public function subnet_v6(&$r, $value, ?string $ipFallback = null): bool
 	{
-		if (Lib::type()->subnet_v6($result, $value, $ipFallback)) {
+		if (Lib::type()->subnet_v6($r, $value, $ipFallback)) {
 		    return true;
 		}
 
@@ -1694,11 +1886,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function url(&$result, $value, $query = null, $fragment = null, array $refs = []): bool
+	public function url(&$r, $value, $query = null, $fragment = null, array $refs = []): bool
 	{
-		if (Lib::type()->url($result, $value, $query, $fragment, $refs)) {
+		if (Lib::type()->url($r, $value, $query, $fragment, $refs)) {
 		    return true;
 		}
 
@@ -1707,11 +1899,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function host(&$result, $value, array $refs = []): bool
+	public function host(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->host($result, $value, $refs)) {
+		if (Lib::type()->host($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -1720,11 +1912,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function link(&$result, $value, $query = null, $fragment = null, array $refs = []): bool
+	public function link(&$r, $value, $query = null, $fragment = null, array $refs = []): bool
 	{
-		if (Lib::type()->link($result, $value, $query, $fragment, $refs)) {
+		if (Lib::type()->link($r, $value, $query, $fragment, $refs)) {
 		    return true;
 		}
 
@@ -1733,11 +1925,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function uuid(&$result, $value): bool
+	public function uuid(&$r, $value): bool
 	{
-		if (Lib::type()->uuid($result, $value)) {
+		if (Lib::type()->uuid($r, $value)) {
 		    return true;
 		}
 
@@ -1746,11 +1938,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array|\Countable|null $result
+	 * @param array|\Countable|null $r
 	 */
-	public function countable(&$result, $value): bool
+	public function countable(&$r, $value): bool
 	{
-		if (Lib::type()->countable($result, $value)) {
+		if (Lib::type()->countable($r, $value)) {
 		    return true;
 		}
 
@@ -1759,11 +1951,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \Countable|null $result
+	 * @param \Countable|null $r
 	 */
-	public function countable_object(&$result, $value): bool
+	public function countable_object(&$r, $value): bool
 	{
-		if (Lib::type()->countable_object($result, $value)) {
+		if (Lib::type()->countable_object($r, $value)) {
 		    return true;
 		}
 
@@ -1772,11 +1964,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|array|\Countable|null $result
+	 * @param string|array|\Countable|null $r
 	 */
-	public function sizeable(&$result, $value): bool
+	public function sizeable(&$r, $value): bool
 	{
-		if (Lib::type()->sizeable($result, $value)) {
+		if (Lib::type()->sizeable($r, $value)) {
 		    return true;
 		}
 
@@ -1785,11 +1977,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeZone|null $result
+	 * @param \DateTimeZone|null $r
 	 */
-	public function timezone(&$result, $timezone, ?array $allowedTimezoneTypes = null): bool
+	public function timezone(&$r, $timezone, ?array $allowedTimezoneTypes = null): bool
 	{
-		if (Lib::type()->timezone($result, $timezone, $allowedTimezoneTypes)) {
+		if (Lib::type()->timezone($r, $timezone, $allowedTimezoneTypes)) {
 		    return true;
 		}
 
@@ -1798,11 +1990,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeZone|null $result
+	 * @param \DateTimeZone|null $r
 	 */
-	public function timezone_offset(&$result, $timezoneOrOffset): bool
+	public function timezone_offset(&$r, $timezoneOrOffset): bool
 	{
-		if (Lib::type()->timezone_offset($result, $timezoneOrOffset)) {
+		if (Lib::type()->timezone_offset($r, $timezoneOrOffset)) {
 		    return true;
 		}
 
@@ -1811,11 +2003,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeZone|null $result
+	 * @param \DateTimeZone|null $r
 	 */
-	public function timezone_abbr(&$result, $timezoneOrAbbr): bool
+	public function timezone_abbr(&$r, $timezoneOrAbbr): bool
 	{
-		if (Lib::type()->timezone_abbr($result, $timezoneOrAbbr)) {
+		if (Lib::type()->timezone_abbr($r, $timezoneOrAbbr)) {
 		    return true;
 		}
 
@@ -1824,11 +2016,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeZone|null $result
+	 * @param \DateTimeZone|null $r
 	 */
-	public function timezone_name(&$result, $timezoneOrName): bool
+	public function timezone_name(&$r, $timezoneOrName): bool
 	{
-		if (Lib::type()->timezone_name($result, $timezoneOrName)) {
+		if (Lib::type()->timezone_name($r, $timezoneOrName)) {
 		    return true;
 		}
 
@@ -1837,11 +2029,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeZone|null $result
+	 * @param \DateTimeZone|null $r
 	 */
-	public function timezone_nameabbr(&$result, $timezoneOrNameOrAbbr): bool
+	public function timezone_nameabbr(&$r, $timezoneOrNameOrAbbr): bool
 	{
-		if (Lib::type()->timezone_nameabbr($result, $timezoneOrNameOrAbbr)) {
+		if (Lib::type()->timezone_nameabbr($r, $timezoneOrNameOrAbbr)) {
 		    return true;
 		}
 
@@ -1850,11 +2042,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeInterface|null $result
+	 * @param \DateTimeInterface|null $r
 	 */
-	public function date(&$result, $datestring, $timezoneFallback = null): bool
+	public function date(&$r, $datestring, $timezoneFallback = null): bool
 	{
-		if (Lib::type()->date($result, $datestring, $timezoneFallback)) {
+		if (Lib::type()->date($r, $datestring, $timezoneFallback)) {
 		    return true;
 		}
 
@@ -1863,11 +2055,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTime|null $result
+	 * @param \DateTime|null $r
 	 */
-	public function adate(&$result, $datestring, $timezoneFallback = null): bool
+	public function adate(&$r, $datestring, $timezoneFallback = null): bool
 	{
-		if (Lib::type()->adate($result, $datestring, $timezoneFallback)) {
+		if (Lib::type()->adate($r, $datestring, $timezoneFallback)) {
 		    return true;
 		}
 
@@ -1876,11 +2068,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeImmutable|null $result
+	 * @param \DateTimeImmutable|null $r
 	 */
-	public function idate(&$result, $datestring, $timezoneFallback = null): bool
+	public function idate(&$r, $datestring, $timezoneFallback = null): bool
 	{
-		if (Lib::type()->idate($result, $datestring, $timezoneFallback)) {
+		if (Lib::type()->idate($r, $datestring, $timezoneFallback)) {
 		    return true;
 		}
 
@@ -1889,11 +2081,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeInterface|null $result
+	 * @param \DateTimeInterface|null $r
 	 */
-	public function date_formatted(&$result, $dateFormatted, $formats, $timezoneFallback = null): bool
+	public function date_formatted(&$r, $dateFormatted, $formats, $timezoneFallback = null): bool
 	{
-		if (Lib::type()->date_formatted($result, $dateFormatted, $formats, $timezoneFallback)) {
+		if (Lib::type()->date_formatted($r, $dateFormatted, $formats, $timezoneFallback)) {
 		    return true;
 		}
 
@@ -1902,11 +2094,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTime|null $result
+	 * @param \DateTime|null $r
 	 */
-	public function adate_formatted(&$result, $dateFormatted, $formats, $timezoneFallback = null): bool
+	public function adate_formatted(&$r, $dateFormatted, $formats, $timezoneFallback = null): bool
 	{
-		if (Lib::type()->adate_formatted($result, $dateFormatted, $formats, $timezoneFallback)) {
+		if (Lib::type()->adate_formatted($r, $dateFormatted, $formats, $timezoneFallback)) {
 		    return true;
 		}
 
@@ -1915,11 +2107,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeImmutable|null $result
+	 * @param \DateTimeImmutable|null $r
 	 */
-	public function idate_formatted(&$result, $dateFormatted, $formats, $timezoneFallback = null): bool
+	public function idate_formatted(&$r, $dateFormatted, $formats, $timezoneFallback = null): bool
 	{
-		if (Lib::type()->idate_formatted($result, $dateFormatted, $formats, $timezoneFallback)) {
+		if (Lib::type()->idate_formatted($r, $dateFormatted, $formats, $timezoneFallback)) {
 		    return true;
 		}
 
@@ -1928,11 +2120,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeInterface|null $result
+	 * @param \DateTimeInterface|null $r
 	 */
-	public function date_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null): bool
+	public function date_tz(&$r, $datestring, ?array $allowedTimezoneTypes = null): bool
 	{
-		if (Lib::type()->date_tz($result, $datestring, $allowedTimezoneTypes)) {
+		if (Lib::type()->date_tz($r, $datestring, $allowedTimezoneTypes)) {
 		    return true;
 		}
 
@@ -1941,11 +2133,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTime|null $result
+	 * @param \DateTime|null $r
 	 */
-	public function adate_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null): bool
+	public function adate_tz(&$r, $datestring, ?array $allowedTimezoneTypes = null): bool
 	{
-		if (Lib::type()->adate_tz($result, $datestring, $allowedTimezoneTypes)) {
+		if (Lib::type()->adate_tz($r, $datestring, $allowedTimezoneTypes)) {
 		    return true;
 		}
 
@@ -1954,11 +2146,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeImmutable|null $result
+	 * @param \DateTimeImmutable|null $r
 	 */
-	public function idate_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null): bool
+	public function idate_tz(&$r, $datestring, ?array $allowedTimezoneTypes = null): bool
 	{
-		if (Lib::type()->idate_tz($result, $datestring, $allowedTimezoneTypes)) {
+		if (Lib::type()->idate_tz($r, $datestring, $allowedTimezoneTypes)) {
 		    return true;
 		}
 
@@ -1967,11 +2159,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeInterface|null $result
+	 * @param \DateTimeInterface|null $r
 	 */
-	public function date_tz_formatted(&$result, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null): bool
+	public function date_tz_formatted(&$r, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null): bool
 	{
-		if (Lib::type()->date_tz_formatted($result, $dateFormatted, $formats, $allowedTimezoneTypes)) {
+		if (Lib::type()->date_tz_formatted($r, $dateFormatted, $formats, $allowedTimezoneTypes)) {
 		    return true;
 		}
 
@@ -1980,11 +2172,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTime|null $result
+	 * @param \DateTime|null $r
 	 */
-	public function adate_tz_formatted(&$result, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null): bool
+	public function adate_tz_formatted(&$r, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null): bool
 	{
-		if (Lib::type()->adate_tz_formatted($result, $dateFormatted, $formats, $allowedTimezoneTypes)) {
+		if (Lib::type()->adate_tz_formatted($r, $dateFormatted, $formats, $allowedTimezoneTypes)) {
 		    return true;
 		}
 
@@ -1993,11 +2185,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeImmutable|null $result
+	 * @param \DateTimeImmutable|null $r
 	 */
-	public function idate_tz_formatted(&$result, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null): bool
+	public function idate_tz_formatted(&$r, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null): bool
 	{
-		if (Lib::type()->idate_tz_formatted($result, $dateFormatted, $formats, $allowedTimezoneTypes)) {
+		if (Lib::type()->idate_tz_formatted($r, $dateFormatted, $formats, $allowedTimezoneTypes)) {
 		    return true;
 		}
 
@@ -2006,11 +2198,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeInterface|null $result
+	 * @param \DateTimeInterface|null $r
 	 */
-	public function date_microtime(&$result, $microtime, $timezoneSet = null): bool
+	public function date_microtime(&$r, $microtime, $timezoneSet = null): bool
 	{
-		if (Lib::type()->date_microtime($result, $microtime, $timezoneSet)) {
+		if (Lib::type()->date_microtime($r, $microtime, $timezoneSet)) {
 		    return true;
 		}
 
@@ -2019,11 +2211,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTime|null $result
+	 * @param \DateTime|null $r
 	 */
-	public function adate_microtime(&$result, $microtime, $timezoneSet = null): bool
+	public function adate_microtime(&$r, $microtime, $timezoneSet = null): bool
 	{
-		if (Lib::type()->adate_microtime($result, $microtime, $timezoneSet)) {
+		if (Lib::type()->adate_microtime($r, $microtime, $timezoneSet)) {
 		    return true;
 		}
 
@@ -2032,11 +2224,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateTimeImmutable|null $result
+	 * @param \DateTimeImmutable|null $r
 	 */
-	public function idate_microtime(&$result, $microtime, $timezoneSet = null): bool
+	public function idate_microtime(&$r, $microtime, $timezoneSet = null): bool
 	{
-		if (Lib::type()->idate_microtime($result, $microtime, $timezoneSet)) {
+		if (Lib::type()->idate_microtime($r, $microtime, $timezoneSet)) {
 		    return true;
 		}
 
@@ -2045,11 +2237,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateInterval|null $result
+	 * @param \DateInterval|null $r
 	 */
-	public function interval(&$result, $interval): bool
+	public function interval(&$r, $interval): bool
 	{
-		if (Lib::type()->interval($result, $interval)) {
+		if (Lib::type()->interval($r, $interval)) {
 		    return true;
 		}
 
@@ -2058,11 +2250,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateInterval|null $result
+	 * @param \DateInterval|null $r
 	 */
-	public function interval_duration(&$result, $duration): bool
+	public function interval_duration(&$r, $duration): bool
 	{
-		if (Lib::type()->interval_duration($result, $duration)) {
+		if (Lib::type()->interval_duration($r, $duration)) {
 		    return true;
 		}
 
@@ -2071,11 +2263,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateInterval|null $result
+	 * @param \DateInterval|null $r
 	 */
-	public function interval_datestring(&$result, $datestring): bool
+	public function interval_datestring(&$r, $datestring): bool
 	{
-		if (Lib::type()->interval_datestring($result, $datestring)) {
+		if (Lib::type()->interval_datestring($r, $datestring)) {
 		    return true;
 		}
 
@@ -2084,11 +2276,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateInterval|null $result
+	 * @param \DateInterval|null $r
 	 */
-	public function interval_microtime(&$result, $microtime): bool
+	public function interval_microtime(&$r, $microtime): bool
 	{
-		if (Lib::type()->interval_microtime($result, $microtime)) {
+		if (Lib::type()->interval_microtime($r, $microtime)) {
 		    return true;
 		}
 
@@ -2097,11 +2289,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \DateInterval|null $result
+	 * @param \DateInterval|null $r
 	 */
-	public function interval_ago(&$result, $date, ?\DateTimeInterface $from = null, ?bool $reverse = null): bool
+	public function interval_ago(&$r, $date, ?\DateTimeInterface $from = null, ?bool $reverse = null): bool
 	{
-		if (Lib::type()->interval_ago($result, $date, $from, $reverse)) {
+		if (Lib::type()->interval_ago($r, $date, $from, $reverse)) {
 		    return true;
 		}
 
@@ -2112,12 +2304,12 @@ class TypeThrowModule
 	/**
 	 * @template-covariant T of object
 	 *
-	 * @param class-string<T>|null    $result
+	 * @param class-string<T>|null    $r
 	 * @param class-string<T>|T|mixed $value
 	 */
-	public function struct_exists(&$result, $value, ?int $flags = null)
+	public function struct_exists(&$r, $value, ?int $flags = null)
 	{
-		if (Lib::type()->struct_exists($result, $value, $flags)) {
+		if (Lib::type()->struct_exists($r, $value, $flags)) {
 		    return true;
 		}
 
@@ -2128,12 +2320,12 @@ class TypeThrowModule
 	/**
 	 * @template-covariant T of object
 	 *
-	 * @param class-string<T>|null    $result
+	 * @param class-string<T>|null    $r
 	 * @param class-string<T>|T|mixed $value
 	 */
-	public function struct(&$result, $value, ?int $flags = null): bool
+	public function struct(&$r, $value, ?int $flags = null): bool
 	{
-		if (Lib::type()->struct($result, $value, $flags)) {
+		if (Lib::type()->struct($r, $value, $flags)) {
 		    return true;
 		}
 
@@ -2144,12 +2336,12 @@ class TypeThrowModule
 	/**
 	 * @template-covariant T of object
 	 *
-	 * @param class-string<T>|null    $result
+	 * @param class-string<T>|null    $r
 	 * @param class-string<T>|T|mixed $value
 	 */
-	public function struct_class(&$result, $value, ?int $flags = null): bool
+	public function struct_class(&$r, $value, ?int $flags = null): bool
 	{
-		if (Lib::type()->struct_class($result, $value, $flags)) {
+		if (Lib::type()->struct_class($r, $value, $flags)) {
 		    return true;
 		}
 
@@ -2158,11 +2350,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param class-string|null $result
+	 * @param class-string|null $r
 	 */
-	public function struct_interface(&$result, $value, ?int $flags = null): bool
+	public function struct_interface(&$r, $value, ?int $flags = null): bool
 	{
-		if (Lib::type()->struct_interface($result, $value, $flags)) {
+		if (Lib::type()->struct_interface($r, $value, $flags)) {
 		    return true;
 		}
 
@@ -2171,11 +2363,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param class-string|null $result
+	 * @param class-string|null $r
 	 */
-	public function struct_trait(&$result, $value, ?int $flags = null): bool
+	public function struct_trait(&$r, $value, ?int $flags = null): bool
 	{
-		if (Lib::type()->struct_trait($result, $value, $flags)) {
+		if (Lib::type()->struct_trait($r, $value, $flags)) {
 		    return true;
 		}
 
@@ -2186,12 +2378,12 @@ class TypeThrowModule
 	/**
 	 * @template-covariant T of \UnitEnum
 	 *
-	 * @param class-string<T>|null    $result
+	 * @param class-string<T>|null    $r
 	 * @param class-string<T>|T|mixed $value
 	 */
-	public function struct_enum(&$result, $value, ?int $flags = null): bool
+	public function struct_enum(&$r, $value, ?int $flags = null): bool
 	{
-		if (Lib::type()->struct_enum($result, $value, $flags)) {
+		if (Lib::type()->struct_enum($r, $value, $flags)) {
 		    return true;
 		}
 
@@ -2202,12 +2394,12 @@ class TypeThrowModule
 	/**
 	 * @template-covariant T of object
 	 *
-	 * @param class-string<T>|null    $result
+	 * @param class-string<T>|null    $r
 	 * @param class-string<T>|T|mixed $value
 	 */
-	public function struct_fqcn(&$result, $value, ?int $flags = null): bool
+	public function struct_fqcn(&$r, $value, ?int $flags = null): bool
 	{
-		if (Lib::type()->struct_fqcn($result, $value, $flags)) {
+		if (Lib::type()->struct_fqcn($r, $value, $flags)) {
 		    return true;
 		}
 
@@ -2216,11 +2408,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function struct_namespace(&$result, $value, ?int $flags = null): bool
+	public function struct_namespace(&$r, $value, ?int $flags = null): bool
 	{
-		if (Lib::type()->struct_namespace($result, $value, $flags)) {
+		if (Lib::type()->struct_namespace($r, $value, $flags)) {
 		    return true;
 		}
 
@@ -2229,11 +2421,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function struct_basename(&$result, $value, ?int $flags = null): bool
+	public function struct_basename(&$r, $value, ?int $flags = null): bool
 	{
-		if (Lib::type()->struct_basename($result, $value, $flags)) {
+		if (Lib::type()->struct_basename($r, $value, $flags)) {
 		    return true;
 		}
 
@@ -2242,50 +2434,37 @@ class TypeThrowModule
 
 
 	/**
-	 * @param resource|null $result
+	 * @param resource|null $r
 	 */
-	public function resource(&$result, $value): bool
+	public function resource(&$r, $value, ?string $resourceType = null): bool
 	{
-		if (Lib::type()->resource($result, $value)) {
+		if (Lib::type()->resource($r, $value, $resourceType)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `resource` is failed", $value ]);
+		throw new LogicException([ "Typecheck `resource` is failed", $value, $resourceType ]);
 	}
 
 
 	/**
-	 * @param resource|null $result
+	 * @param resource|null $r
 	 */
-	public function any_not_resource(&$result, $value): bool
+	public function resource_opened(&$r, $value, ?string $resourceType = null): bool
 	{
-		if (Lib::type()->any_not_resource($result, $value)) {
+		if (Lib::type()->resource_opened($r, $value, $resourceType)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `any_not_resource` is failed", $value ]);
+		throw new LogicException([ "Typecheck `resource_opened` is failed", $value, $resourceType ]);
 	}
 
 
 	/**
-	 * @param resource|null $result
+	 * @param resource|null $r
 	 */
-	public function resource_opened(&$result, $value): bool
+	public function resource_closed(&$r, $value): bool
 	{
-		if (Lib::type()->resource_opened($result, $value)) {
-		    return true;
-		}
-
-		throw new LogicException([ "Typecheck `resource_opened` is failed", $value ]);
-	}
-
-
-	/**
-	 * @param resource|null $result
-	 */
-	public function resource_closed(&$result, $value): bool
-	{
-		if (Lib::type()->resource_closed($result, $value)) {
+		if (Lib::type()->resource_closed($r, $value)) {
 		    return true;
 		}
 
@@ -2294,15 +2473,54 @@ class TypeThrowModule
 
 
 	/**
+	 * @param resource|null $r
+	 */
+	public function any_not_resource(&$r, $value): bool
+	{
+		if (Lib::type()->any_not_resource($r, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `any_not_resource` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param resource|\CurlHandle|null $r
+	 */
+	public function curl(&$r, $value): bool
+	{
+		if (Lib::type()->curl($r, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `curl` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param resource|\Socket|null $r
+	 */
+	public function socket(&$r, $value): bool
+	{
+		if (Lib::type()->socket($r, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `socket` is failed", $value ]);
+	}
+
+
+	/**
 	 * @template-covariant T of \UnitEnum
 	 *
-	 * @param T|null               $result
+	 * @param T|null               $r
 	 * @param T|int|string         $value
 	 * @param class-string<T>|null $enumClass
 	 */
-	public function enum_case(&$result, $value, ?string $enumClass = null): bool
+	public function enum_case(&$r, $value, ?string $enumClass = null): bool
 	{
-		if (Lib::type()->enum_case($result, $value, $enumClass)) {
+		if (Lib::type()->enum_case($r, $value, $enumClass)) {
 		    return true;
 		}
 
@@ -2311,11 +2529,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param array{ 0: class-string, 1: string }|null $result
+	 * @param array{ 0: class-string, 1: string }|null $r
 	 */
-	public function method_array(&$result, $value): bool
+	public function method_array(&$r, $value): bool
 	{
-		if (Lib::type()->method_array($result, $value)) {
+		if (Lib::type()->method_array($r, $value)) {
 		    return true;
 		}
 
@@ -2324,12 +2542,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null            $result
-	 * @param array{ 0: array|null } $refs
+	 * @param string|null $r
 	 */
-	public function method_string(&$result, $value, array $refs = []): bool
+	public function method_string(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->method_string($result, $value, $refs)) {
+		if (Lib::type()->method_string($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -2338,12 +2555,12 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable|null $result
+	 * @param callable|null $r
 	 * @param string|object $newScope
 	 */
-	public function callable(&$result, $value, $newScope = 'static'): bool
+	public function callable(&$r, $value, $newScope = 'static'): bool
 	{
-		if (Lib::type()->callable($result, $value, $newScope)) {
+		if (Lib::type()->callable($r, $value, $newScope)) {
 		    return true;
 		}
 
@@ -2352,11 +2569,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable|\Closure|object|null $result
+	 * @param callable|\Closure|object|null $r
 	 */
-	public function callable_object(&$result, $value, $newScope = 'static'): bool
+	public function callable_object(&$r, $value, $newScope = 'static'): bool
 	{
-		if (Lib::type()->callable_object($result, $value, $newScope)) {
+		if (Lib::type()->callable_object($r, $value, $newScope)) {
 		    return true;
 		}
 
@@ -2365,11 +2582,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable|object|null $result
+	 * @param callable|object|null $r
 	 */
-	public function callable_object_closure(&$result, $value, $newScope = 'static'): bool
+	public function callable_object_closure(&$r, $value, $newScope = 'static'): bool
 	{
-		if (Lib::type()->callable_object_closure($result, $value, $newScope)) {
+		if (Lib::type()->callable_object_closure($r, $value, $newScope)) {
 		    return true;
 		}
 
@@ -2378,11 +2595,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable|object|null $result
+	 * @param callable|object|null $r
 	 */
-	public function callable_object_invokable(&$result, $value, $newScope = 'static'): bool
+	public function callable_object_invokable(&$r, $value, $newScope = 'static'): bool
 	{
-		if (Lib::type()->callable_object_invokable($result, $value, $newScope)) {
+		if (Lib::type()->callable_object_invokable($r, $value, $newScope)) {
 		    return true;
 		}
 
@@ -2391,12 +2608,12 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable|array{ 0: object|class-string, 1: string }|null $result
+	 * @param callable|array{ 0: object|class-string, 1: string }|null $r
 	 * @param string|object                                            $newScope
 	 */
-	public function callable_array(&$result, $value, $newScope = 'static'): bool
+	public function callable_array(&$r, $value, $newScope = 'static'): bool
 	{
-		if (Lib::type()->callable_array($result, $value, $newScope)) {
+		if (Lib::type()->callable_array($r, $value, $newScope)) {
 		    return true;
 		}
 
@@ -2405,12 +2622,12 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable|array{ 0: object|class-string, 1: string }|null $result
+	 * @param callable|array{ 0: object|class-string, 1: string }|null $r
 	 * @param string|object                                            $newScope
 	 */
-	public function callable_array_method(&$result, $value, $newScope = 'static'): bool
+	public function callable_array_method(&$r, $value, $newScope = 'static'): bool
 	{
-		if (Lib::type()->callable_array_method($result, $value, $newScope)) {
+		if (Lib::type()->callable_array_method($r, $value, $newScope)) {
 		    return true;
 		}
 
@@ -2419,12 +2636,12 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable|array{ 0: class-string, 1: string }|null $result
+	 * @param callable|array{ 0: class-string, 1: string }|null $r
 	 * @param string|object                                     $newScope
 	 */
-	public function callable_array_method_static(&$result, $value, $newScope = 'static'): bool
+	public function callable_array_method_static(&$r, $value, $newScope = 'static'): bool
 	{
-		if (Lib::type()->callable_array_method_static($result, $value, $newScope)) {
+		if (Lib::type()->callable_array_method_static($r, $value, $newScope)) {
 		    return true;
 		}
 
@@ -2433,12 +2650,12 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable|array{ 0: object, 1: string }|null $result
+	 * @param callable|array{ 0: object, 1: string }|null $r
 	 * @param string|object                               $newScope
 	 */
-	public function callable_array_method_non_static(&$result, $value, $newScope = 'static'): bool
+	public function callable_array_method_non_static(&$r, $value, $newScope = 'static'): bool
 	{
-		if (Lib::type()->callable_array_method_non_static($result, $value, $newScope)) {
+		if (Lib::type()->callable_array_method_non_static($r, $value, $newScope)) {
 		    return true;
 		}
 
@@ -2447,11 +2664,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable-string|null $result
+	 * @param callable-string|null $r
 	 */
-	public function callable_string(&$result, $value, $newScope = 'static'): bool
+	public function callable_string(&$r, $value, $newScope = 'static'): bool
 	{
-		if (Lib::type()->callable_string($result, $value, $newScope)) {
+		if (Lib::type()->callable_string($r, $value, $newScope)) {
 		    return true;
 		}
 
@@ -2460,11 +2677,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable-string|null $result
+	 * @param callable-string|null $r
 	 */
-	public function callable_string_function(&$result, $value): bool
+	public function callable_string_function(&$r, $value): bool
 	{
-		if (Lib::type()->callable_string_function($result, $value)) {
+		if (Lib::type()->callable_string_function($r, $value)) {
 		    return true;
 		}
 
@@ -2473,11 +2690,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable-string|null $result
+	 * @param callable-string|null $r
 	 */
-	public function callable_string_function_internal(&$result, $value): bool
+	public function callable_string_function_internal(&$r, $value): bool
 	{
-		if (Lib::type()->callable_string_function_internal($result, $value)) {
+		if (Lib::type()->callable_string_function_internal($r, $value)) {
 		    return true;
 		}
 
@@ -2486,11 +2703,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable-string|null $result
+	 * @param callable-string|null $r
 	 */
-	public function callable_string_function_non_internal(&$result, $value): bool
+	public function callable_string_function_non_internal(&$r, $value): bool
 	{
-		if (Lib::type()->callable_string_function_non_internal($result, $value)) {
+		if (Lib::type()->callable_string_function_non_internal($r, $value)) {
 		    return true;
 		}
 
@@ -2499,11 +2716,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param callable-string|null $result
+	 * @param callable-string|null $r
 	 */
-	public function callable_string_method_static(&$result, $value, $newScope = 'static'): bool
+	public function callable_string_method_static(&$r, $value, $newScope = 'static'): bool
 	{
-		if (Lib::type()->callable_string_method_static($result, $value, $newScope)) {
+		if (Lib::type()->callable_string_method_static($r, $value, $newScope)) {
 		    return true;
 		}
 
@@ -2514,13 +2731,13 @@ class TypeThrowModule
 	/**
 	 * @template T
 	 *
-	 * @param mixed|T        $result
+	 * @param mixed|T        $r
 	 * @param int|string     $key
 	 * @param array{ 0?: T } $set
 	 */
-	public function ref(&$result, $key, array $refs = [], array $set = []): bool
+	public function ref(&$r, $key, array $refs = [], array $set = []): bool
 	{
-		if (Lib::type()->ref($result, $key, $refs, $set)) {
+		if (Lib::type()->ref($r, $key, $refs, $set)) {
 		    return true;
 		}
 
@@ -2529,12 +2746,12 @@ class TypeThrowModule
 
 
 	/**
-	 * @param int|null $result
+	 * @param int|null $r
 	 * @param string   $value
 	 */
-	public function chmod(&$result, $value): bool
+	public function chmod(&$r, $value): bool
 	{
-		if (Lib::type()->chmod($result, $value)) {
+		if (Lib::type()->chmod($r, $value)) {
 		    return true;
 		}
 
@@ -2543,12 +2760,12 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null            $result
+	 * @param string|null            $r
 	 * @param array{ 0: array|null } $refs
 	 */
-	public function path(&$result, $value, array $refs = []): bool
+	public function path(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->path($result, $value, $refs)) {
+		if (Lib::type()->path($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -2557,12 +2774,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null            $result
-	 * @param array{ 0: array|null } $refs
+	 * @param string|null $r
 	 */
-	public function realpath(&$result, $value, ?bool $allowSymlink = null, array $refs = []): bool
+	public function realpath(&$r, $value, ?bool $allowSymlink = null, array $refs = []): bool
 	{
-		if (Lib::type()->realpath($result, $value, $allowSymlink, $refs)) {
+		if (Lib::type()->realpath($r, $value, $allowSymlink, $refs)) {
 		    return true;
 		}
 
@@ -2571,12 +2787,12 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null            $result
+	 * @param string|null            $r
 	 * @param array{ 0: array|null } $refs
 	 */
-	public function freepath(&$result, $value, array $refs = []): bool
+	public function freepath(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->freepath($result, $value, $refs)) {
+		if (Lib::type()->freepath($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -2585,17 +2801,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null            $result
-	 * @param array{ 0: array|null } $refs
+	 * @param string|null $r
 	 */
-	public function dirpath(
-		&$result,
-		$value,
-		?bool $allowExists = null,
-		?bool $allowSymlink = null,
-		array $refs = []
-	): bool {
-		if (Lib::type()->dirpath($result, $value, $allowExists, $allowSymlink, $refs)) {
+	public function dirpath(&$r, $value, ?bool $allowExists = null, ?bool $allowSymlink = null, array $refs = []): bool
+	{
+		if (Lib::type()->dirpath($r, $value, $allowExists, $allowSymlink, $refs)) {
 		    return true;
 		}
 
@@ -2604,11 +2814,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function filepath(&$result, $value, ?bool $allowExists, ?bool $allowSymlink = null, array $refs = []): bool
+	public function filepath(&$r, $value, ?bool $allowExists, ?bool $allowSymlink = null, array $refs = []): bool
 	{
-		if (Lib::type()->filepath($result, $value, $allowExists, $allowSymlink, $refs)) {
+		if (Lib::type()->filepath($r, $value, $allowExists, $allowSymlink, $refs)) {
 		    return true;
 		}
 
@@ -2617,12 +2827,12 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null            $result
+	 * @param string|null            $r
 	 * @param array{ 0: array|null } $refs
 	 */
-	public function dirpath_realpath(&$result, $value, ?bool $allowSymlink = null, array $refs = []): bool
+	public function dirpath_realpath(&$r, $value, ?bool $allowSymlink = null, array $refs = []): bool
 	{
-		if (Lib::type()->dirpath_realpath($result, $value, $allowSymlink, $refs)) {
+		if (Lib::type()->dirpath_realpath($r, $value, $allowSymlink, $refs)) {
 		    return true;
 		}
 
@@ -2631,12 +2841,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null            $result
-	 * @param array{ 0: array|null } $refs
+	 * @param string|null $r
 	 */
-	public function filepath_realpath(&$result, $value, ?bool $allowSymlink = null, array $refs = []): bool
+	public function filepath_realpath(&$r, $value, ?bool $allowSymlink = null, array $refs = []): bool
 	{
-		if (Lib::type()->filepath_realpath($result, $value, $allowSymlink, $refs)) {
+		if (Lib::type()->filepath_realpath($r, $value, $allowSymlink, $refs)) {
 		    return true;
 		}
 
@@ -2645,11 +2854,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function filename(&$result, $value): bool
+	public function filename(&$r, $value): bool
 	{
-		if (Lib::type()->filename($result, $value)) {
+		if (Lib::type()->filename($r, $value)) {
 		    return true;
 		}
 
@@ -2658,16 +2867,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \SplFileInfo|null $result
+	 * @param \SplFileInfo|null $r
 	 */
-	public function file(
-		&$result,
-		$value,
-		?array $extensions = null,
-		?array $mimeTypes = null,
-		?array $filters = null
-	): bool {
-		if (Lib::type()->file($result, $value, $extensions, $mimeTypes, $filters)) {
+	public function file(&$r, $value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null): bool
+	{
+		if (Lib::type()->file($r, $value, $extensions, $mimeTypes, $filters)) {
 		    return true;
 		}
 
@@ -2676,16 +2880,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param \SplFileInfo|null $result
+	 * @param \SplFileInfo|null $r
 	 */
-	public function image(
-		&$result,
-		$value,
-		?array $extensions = null,
-		?array $mimeTypes = null,
-		?array $filters = null
-	): bool {
-		if (Lib::type()->image($result, $value, $extensions, $mimeTypes, $filters)) {
+	public function image(&$r, $value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null): bool
+	{
+		if (Lib::type()->image($r, $value, $extensions, $mimeTypes, $filters)) {
 		    return true;
 		}
 
@@ -2694,11 +2893,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function email(&$result, $value, ?array $filters = null, array $refs = []): bool
+	public function email(&$r, $value, ?array $filters = null, array $refs = []): bool
 	{
-		if (Lib::type()->email($result, $value, $filters, $refs)) {
+		if (Lib::type()->email($r, $value, $filters, $refs)) {
 		    return true;
 		}
 
@@ -2707,11 +2906,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function email_fake(&$result, $value, array $refs = []): bool
+	public function email_fake(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->email_fake($result, $value, $refs)) {
+		if (Lib::type()->email_fake($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -2720,11 +2919,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function email_non_fake(&$result, $value, ?array $filters = null, array $refs = []): bool
+	public function email_non_fake(&$r, $value, ?array $filters = null, array $refs = []): bool
 	{
-		if (Lib::type()->email_non_fake($result, $value, $filters, $refs)) {
+		if (Lib::type()->email_non_fake($r, $value, $filters, $refs)) {
 		    return true;
 		}
 
@@ -2733,11 +2932,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function phone(&$result, $value, array $refs = []): bool
+	public function phone(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->phone($result, $value, $refs)) {
+		if (Lib::type()->phone($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -2746,11 +2945,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function phone_fake(&$result, $value, array $refs = []): bool
+	public function phone_fake(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->phone_fake($result, $value, $refs)) {
+		if (Lib::type()->phone_fake($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -2759,11 +2958,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function phone_non_fake(&$result, $value, array $refs = []): bool
+	public function phone_non_fake(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->phone_non_fake($result, $value, $refs)) {
+		if (Lib::type()->phone_non_fake($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -2772,11 +2971,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function phone_real(&$result, $value, ?string $region = '', array $refs = []): bool
+	public function phone_real(&$r, $value, ?string $region = '', array $refs = []): bool
 	{
-		if (Lib::type()->phone_real($result, $value, $region, $refs)) {
+		if (Lib::type()->phone_real($r, $value, $region, $refs)) {
 		    return true;
 		}
 
@@ -2785,11 +2984,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function tel(&$result, $value, array $refs = []): bool
+	public function tel(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->tel($result, $value, $refs)) {
+		if (Lib::type()->tel($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -2798,11 +2997,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function tel_fake(&$result, $value, array $refs = []): bool
+	public function tel_fake(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->tel_fake($result, $value, $refs)) {
+		if (Lib::type()->tel_fake($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -2811,11 +3010,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function tel_non_fake(&$result, $value, array $refs = []): bool
+	public function tel_non_fake(&$r, $value, array $refs = []): bool
 	{
-		if (Lib::type()->tel_non_fake($result, $value, $refs)) {
+		if (Lib::type()->tel_non_fake($r, $value, $refs)) {
 		    return true;
 		}
 
@@ -2824,11 +3023,11 @@ class TypeThrowModule
 
 
 	/**
-	 * @param string|null $result
+	 * @param string|null $r
 	 */
-	public function tel_real(&$result, $value, ?string $region = '', array $refs = []): bool
+	public function tel_real(&$r, $value, ?string $region = '', array $refs = []): bool
 	{
-		if (Lib::type()->tel_real($result, $value, $region, $refs)) {
+		if (Lib::type()->tel_real($r, $value, $region, $refs)) {
 		    return true;
 		}
 

@@ -133,17 +133,17 @@ abstract class AbstractConfig implements
     }
 
 
-    public function configure(?\Closure $fn = null, array $context = []) : void
+    public function configure(?\Closure $fn = null, array &$refContext = []) : void
     {
         if (null !== $fn) {
             $this->invalidate();
 
             $fnBound = $fn->bindTo($this, $this);
 
-            call_user_func($fnBound, $this, $context);
+            call_user_func_array($fnBound, [ $this, $refContext ]);
         }
 
-        $this->validate($context);
+        $this->validate($refContext);
     }
 
 
@@ -152,20 +152,20 @@ abstract class AbstractConfig implements
         $this->__valid = null;
     }
 
-    public function validate(array &$context = []) : void
+    public function validate(array &$refContext = []) : void
     {
         if (null === $this->__valid) {
-            $context[ '__path' ] = [];
-            $context[ '__key' ] = null;
-            $context[ '__parent' ] = null;
-            $context[ '__root' ] = $this;
+            $refContext[ '__path' ] = [];
+            $refContext[ '__key' ] = null;
+            $refContext[ '__parent' ] = null;
+            $refContext[ '__root' ] = $this;
 
-            $this->__valid = $this->validationRecursive($context);
+            $this->__valid = $this->validationRecursive($refContext);
 
-            unset($context[ '__path' ]);
-            unset($context[ '__key' ]);
-            unset($context[ '__parent' ]);
-            unset($context[ '__root' ]);
+            unset($refContext[ '__path' ]);
+            unset($refContext[ '__key' ]);
+            unset($refContext[ '__parent' ]);
+            unset($refContext[ '__root' ]);
         }
 
         if (! $this->__valid) {
@@ -232,24 +232,24 @@ abstract class AbstractConfig implements
     }
 
 
-    protected function validationRecursive(array &$context = []) : bool
+    protected function validationRecursive(array &$refContext = []) : bool
     {
         $status = null;
 
-        $path = $context[ '__path' ] ?? [];
-        $key = $context[ '__key' ] ?? null;
-        $parent = $context[ '__parent' ] ?? null;
+        $path = $refContext[ '__path' ] ?? [];
+        $key = $refContext[ '__key' ] ?? null;
+        $parent = $refContext[ '__parent' ] ?? null;
 
         foreach ( $this->__children as $childKey => $child ) {
             $fullpath = $path;
             $fullpath[] = $childKey;
 
-            $context[ '__path' ] = $fullpath;
-            $context[ '__key' ] = $childKey;
-            $context[ '__parent' ] = $this;
+            $refContext[ '__path' ] = $fullpath;
+            $refContext[ '__key' ] = $childKey;
+            $refContext[ '__parent' ] = $this;
 
             // > ! recursion
-            $status = $child->validationRecursive($context);
+            $status = $child->validationRecursive($refContext);
 
             if (! $status) {
                 break;
@@ -257,17 +257,17 @@ abstract class AbstractConfig implements
         }
 
         if (null === $status) {
-            $context[ '__path' ] = $path;
-            $context[ '__key' ] = $key;
-            $context[ '__parent' ] = $parent;
+            $refContext[ '__path' ] = $path;
+            $refContext[ '__key' ] = $key;
+            $refContext[ '__parent' ] = $parent;
 
-            $status = $this->validation($context);
+            $status = $this->validation($refContext);
         }
 
         return $status;
     }
 
-    protected function validation(array &$context = []) : bool
+    protected function validation(array &$refContext = []) : bool
     {
         return true;
     }

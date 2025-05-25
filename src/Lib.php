@@ -11,6 +11,7 @@ use Gzhegow\Lib\Modules\StrModule;
 use Gzhegow\Lib\Modules\UrlModule;
 use Gzhegow\Lib\Modules\ArrModule;
 use Gzhegow\Lib\Modules\CmpModule;
+use Gzhegow\Lib\Modules\NumModule;
 use Gzhegow\Lib\Modules\FuncModule;
 use Gzhegow\Lib\Modules\JsonModule;
 use Gzhegow\Lib\Modules\HttpModule;
@@ -25,7 +26,6 @@ use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
 use Gzhegow\Lib\Modules\SocialModule;
-use Gzhegow\Lib\Modules\Func\Pipe\Pipe;
 use Gzhegow\Lib\Modules\TypeBoolModule;
 use Gzhegow\Lib\Modules\ItertoolsModule;
 use Gzhegow\Lib\Modules\TypeThrowModule;
@@ -34,7 +34,6 @@ use Gzhegow\Lib\Modules\EntrypointModule;
 use Gzhegow\Lib\Modules\ParseThrowModule;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
-use Gzhegow\Lib\Modules\Test\TestRunner\TestRunner;
 
 
 class Lib
@@ -250,16 +249,6 @@ class Lib
     }
 
     /**
-     * @var ItertoolsModule
-     */
-    public static $json;
-
-    public static function json()
-    {
-        return static::$json = static::$json ?? new JsonModule();
-    }
-
-    /**
      * @var MbModule
      */
     public static $mb;
@@ -277,6 +266,16 @@ class Lib
     public static function net()
     {
         return static::$net = static::$net ?? new NetModule();
+    }
+
+    /**
+     * @var NumModule
+     */
+    public static $num;
+
+    public static function num()
+    {
+        return static::$num = static::$num ?? new NumModule();
     }
 
     /**
@@ -355,25 +354,40 @@ class Lib
      */
     public static function errorBag(?ErrorBag &$b = null) : ErrorBag
     {
-        return Lib::php()->errorBag($b);
+        return Lib::php()->newErrorBag($b);
     }
 
-
     /**
-     * > фабрика для Pipeline - выполнить команды контроллера цепочкой, не углубляясь в детали
+     * > в старых PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
+     *
+     * @return null
+     *
+     * @noinspection PhpUnnecessaryStopStatementInspection
+     *
+     * @throws \LogicException|\RuntimeException
      */
-    public static function pipe() : Pipe
+    public static function throw($throwableOrArg, ...$throwableArgs)
     {
-        return Lib::func()->pipe();
-    }
+        if (false
+            || ($throwableOrArg instanceof \LogicException)
+            || ($throwableOrArg instanceof \RuntimeException)
+        ) {
+            throw $throwableOrArg;
+        }
 
+        array_unshift($throwableArgs, $throwableOrArg);
 
-    /**
-     * > фабрика для AssertProcessor - удобный способ писать тесты
-     */
-    public static function assert() : TestRunner
-    {
-        return Lib::test()->test();
+        $thePhp = Lib::php();
+
+        $throwableClass = $thePhp->static_throwable_class();
+
+        $trace = property_exists($throwableClass, 'trace')
+            ? debug_backtrace()
+            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $thePhp->throw_new_trace($trace, ...$throwableArgs);
+
+        return;
     }
 
 
@@ -534,64 +548,6 @@ class Lib
 
 
     /**
-     * > в старых PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
-     *
-     * @return null
-     *
-     * @noinspection PhpUnnecessaryStopStatementInspection
-     *
-     * @throws \LogicException|\RuntimeException
-     */
-    public static function throw($throwableOrArg, ...$throwableArgs)
-    {
-        if (
-            ($throwableOrArg instanceof \LogicException)
-            || ($throwableOrArg instanceof \RuntimeException)
-        ) {
-            throw $throwableOrArg;
-        }
-
-        array_unshift($throwableArgs, $throwableOrArg);
-
-        $thePhp = Lib::php();
-
-        $throwableClass = $thePhp->static_throwable_class();
-
-        $trace = property_exists($throwableClass, 'trace')
-            ? debug_backtrace()
-            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $thePhp->throw_new_trace($trace, ...$throwableArgs);
-
-        return;
-    }
-
-    /**
-     * > в старых PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
-     *
-     * @return null
-     *
-     * @throws \LogicException|\RuntimeException
-     *
-     * @noinspection PhpUnnecessaryStopStatementInspection
-     */
-    public static function throw_new(...$throwableArgs)
-    {
-        $thePhp = Lib::php();
-
-        $throwableClass = $thePhp->static_throwable_class();
-
-        $trace = property_exists($throwableClass, 'trace')
-            ? debug_backtrace()
-            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $thePhp->throw_new_trace($trace, ...$throwableArgs);
-
-        return;
-    }
-
-
-    /**
      * > подключить композер, установленный глобально - чтобы дебаг пакеты не добавлять в библиотеки, но пользоваться ими (временно)
      *
      * @return \Composer\Autoload\ClassLoader
@@ -602,11 +558,11 @@ class Lib
     }
 
     /**
-     * @param \Closure|null $ref
+     * @param \Closure|null $refFn
      */
-    public static function d(&$ref = null) : \Closure
+    public static function d(&$refFn = null) : \Closure
     {
-        return $ref = function ($var, ...$vars) {
+        return $refFn = function ($var, ...$vars) {
             $t = \Gzhegow\Lib\Lib::debug()->file_line();
 
             \Gzhegow\Lib\Lib::debug()->d([ $t ], $var, ...$vars);
@@ -614,11 +570,11 @@ class Lib
     }
 
     /**
-     * @param \Closure|null $ref
+     * @param \Closure|null $refFn
      */
-    public static function dd(&$ref = null) : \Closure
+    public static function dd(&$refFn = null) : \Closure
     {
-        return $ref = function (...$vars) {
+        return $refFn = function (...$vars) {
             $t = \Gzhegow\Lib\Lib::debug()->file_line();
 
             \Gzhegow\Lib\Lib::debug()->dd([ $t ], ...$vars);
@@ -626,11 +582,11 @@ class Lib
     }
 
     /**
-     * @param \Closure|null $ref
+     * @param \Closure|null $refFn
      */
-    public static function ddd(&$ref = null) : \Closure
+    public static function ddd(&$refFn = null) : \Closure
     {
-        return $ref = function (?int $limit, $var, ...$vars) {
+        return $refFn = function (?int $limit, $var, ...$vars) {
             $t = \Gzhegow\Lib\Lib::debug()->file_line();
 
             \Gzhegow\Lib\Lib::debug()->ddd([ $t ], $limit, $var, ...$vars);
@@ -638,9 +594,9 @@ class Lib
     }
 
     /**
-     * @param \Closure|null $ref
+     * @param \Closure|null $refFn
      */
-    public static function td(int $throttleMs, &$ref = null) : \Closure
+    public static function td(int $throttleMs, &$refFn = null) : \Closure
     {
         if ($throttleMs < 0) {
             throw new LogicException(
@@ -648,7 +604,7 @@ class Lib
             );
         }
 
-        return $ref = function ($var, ...$vars) use ($throttleMs) {
+        return $refFn = function ($var, ...$vars) use ($throttleMs) {
             static $last;
 
             $last = $last ?? [];

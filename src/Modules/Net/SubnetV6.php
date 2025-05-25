@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Net;
 
+use Gzhegow\Lib\Modules\Php\Result\Ret;
 use Gzhegow\Lib\Modules\Php\Result\Result;
 
 
@@ -25,53 +26,59 @@ class SubnetV6
 
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromValid($from, $ctx = null)
+    public static function fromValid($from, $ret = null)
     {
-        $ctxCur = Result::parse();
+        $retCur = Result::asValue();
 
         $instance = null
-            ?? static::fromStatic($from, $ctxCur)
-            ?? static::fromValidString($from, $ctxCur);
+            ?? static::fromStatic($from, $retCur)
+            ?? static::fromValidString($from, $retCur);
 
-        if ($ctxCur->isErr()) {
-            return Result::err($ctx, $ctxCur);
+        if ($retCur->isErr()) {
+            return Result::err($ret, $retCur);
         }
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromStatic($from, $ctx = null)
+    public static function fromStatic($from, $ret = null)
     {
         if ($from instanceof static) {
-            return Result::ok($ctx, $from);
+            return Result::ok($ret, $from);
         }
 
         return Result::err(
-            $ctx,
+            $ret,
             [ 'The `from` must be instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromValidString($from, $ctx = null)
+    public static function fromValidString($from, $ret = null)
     {
         if (is_string($from)) {
             $instance = new static();
             $instance->value = $from;
 
-            return Result::ok($ctx, $instance);
+            return Result::ok($ret, $instance);
         }
 
         return Result::err(
-            $ctx,
+            $ret,
             [ 'The `from` must be string', $from ],
             [ __FILE__, __LINE__ ]
         );

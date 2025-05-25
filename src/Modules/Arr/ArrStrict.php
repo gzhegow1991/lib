@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Arr;
 
+use Gzhegow\Lib\Modules\Php\Result\Ret;
 use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
@@ -22,53 +23,59 @@ class ArrStrict implements
 
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromValid($from, $ctx = null)
+    public static function fromValid($from, $ret = null)
     {
-        $ctxCur = Result::parse();
+        $retCur = Result::asValue();
 
         $instance = null
-            ?? static::fromStatic($from, $ctxCur)
-            ?? static::fromValidArray($from, $ctxCur);
+            ?? static::fromStatic($from, $retCur)
+            ?? static::fromValidArray($from, $retCur);
 
-        if ($ctxCur->isErr()) {
-            return Result::err($ctx, $ctxCur);
+        if ($retCur->isErr()) {
+            return Result::err($ret, $retCur);
         }
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromStatic($from, $ctx = null)
+    public static function fromStatic($from, $ret = null)
     {
         if ($from instanceof static) {
-            return Result::ok($ctx, $from);
+            return Result::ok($ret, $from);
         }
 
         return Result::err(
-            $ctx,
+            $ret,
             [ 'The `from` must be instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromValidArray($from, $ctx = null)
+    public static function fromValidArray($from, $ret = null)
     {
         if (is_array($from)) {
             $instance = new static();
             $instance->array = $from;
 
-            return Result::ok($ctx, $instance);
+            return Result::ok($ret, $instance);
         }
 
         return Result::err(
-            $ctx,
+            $ret,
             [ 'The `from` must be array', $from ],
             [ __FILE__, __LINE__ ]
         );
@@ -102,16 +109,16 @@ class ArrStrict implements
     }
 
 
-    public function exists($key, &$value = null) : bool
+    public function exists($key, &$refValue = null) : bool
     {
-        $value = null;
+        $refValue = null;
 
         if (array_key_exists($key, $this->array)) {
             if (is_array($this->array[ $key ])) {
-                $value = static::fromValidArray($this->array[ $key ]);
+                $refValue = static::fromValidArray($this->array[ $key ]);
 
             } else {
-                $value = $this->array[ $key ];
+                $refValue = $this->array[ $key ];
             }
 
             return true;
@@ -120,16 +127,16 @@ class ArrStrict implements
         return false;
     }
 
-    public function isset($key, &$value = null) : bool
+    public function isset($key, &$refValue = null) : bool
     {
-        $value = null;
+        $refValue = null;
 
         if (isset($this->array[ $key ])) {
             if (is_array($this->array[ $key ])) {
-                $value = static::fromValidArray($this->array[ $key ]);
+                $refValue = static::fromValidArray($this->array[ $key ]);
 
             } else {
-                $value = $this->array[ $key ];
+                $refValue = $this->array[ $key ];
             }
 
             return true;

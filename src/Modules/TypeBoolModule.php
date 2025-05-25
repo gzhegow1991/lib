@@ -17,14 +17,14 @@ use Gzhegow\Lib\Modules\Net\AddressIpV6;
 class TypeBoolModule
 {
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function empty(&$result, $value) : bool
+    public function empty(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (empty($value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -33,14 +33,14 @@ class TypeBoolModule
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function any_not_empty(&$result, $value) : bool
+    public function any_not_empty(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! empty($value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -52,19 +52,19 @@ class TypeBoolModule
     /**
      * > Специальный тип, который значит, что значение можно отбросить или не учитывать, т.к. оно не несёт информации
      *
-     * @param string|array|\Countable|null $result
+     * @param string|array|\Countable|null $r
      */
-    public function blank(&$result, $value) : bool
+    public function blank(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         // > NAN is not blank (NAN equals nothing even itself)
         // > NIL is not blank (NIL is passed manually, that literally means NOT BLANK)
         // > CLOSED RESOURCE is not blank (actually its still internal object)
 
-        if (
+        if (false
             // > NULL is blank (can appear from API to omit any actions on the value)
-            (null === $value)
+            || (null === $value)
             //
             // > EMPTY STRING is blank (can appear from HTML forms with no input provided)
             || ('' === $value)
@@ -72,7 +72,7 @@ class TypeBoolModule
             // > EMPTY ARRAY is blank (can appear from HTML forms with no checkbox/radio/select items choosen)
             || ([] === $value)
         ) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -80,7 +80,7 @@ class TypeBoolModule
         // > COUNTABLE w/ ZERO SIZE is blank
         if ($this->countable($countable, $value)) {
             if (0 === count($countable)) {
-                $result = $value;
+                $r = $value;
 
                 return true;
             }
@@ -90,14 +90,14 @@ class TypeBoolModule
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function any_not_blank(&$result, $value) : bool
+    public function any_not_blank(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->blank($var, $value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -109,19 +109,19 @@ class TypeBoolModule
     /**
      * > Специальный тип, который значит, что значение можно заменить NULL-ом
      *
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function nullable(&$result, $value) : bool
+    public function nullable(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         // > NAN is not clearable (NAN means some error in the code and shouldnt be replaced)
         // > EMPTY ARRAY is not clearable (array functions is not applicable to nulls)
         // > COUNTABLE w/ ZERO SIZE is not clearable (countable/iterable functions is not applicable to nulls)
 
-        if (
+        if (false
             // > NULL is clearable (means nothing)
-            (null === $value)
+            || (null === $value)
             //
             // > EMPTY STRING is clearable (can appear from HTML forms with no input provided)
             || ('' === $value)
@@ -132,7 +132,7 @@ class TypeBoolModule
             // > NIL is clearable (NIL should be replaced with NULL later or perform deleting actions)
             || $this->nil($var, $value)
         ) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -141,14 +141,14 @@ class TypeBoolModule
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function any_not_nullable(&$result, $value) : bool
+    public function any_not_nullable(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->nullable($var, $value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -160,21 +160,21 @@ class TypeBoolModule
     /**
      * > Специальный тип, который значит, что значение было отправлено пользователем, а не появилось из PHP
      *
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function passed(&$result, $value) : bool
+    public function passed(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($this->nil($var, $value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
 
-        if (
+        if (false
             // > NULL is not passed (can appear from API to omit any actions on the value)
-            (null === $value)
+            || (null === $value)
             //
             // > EMPTY STRING is not passed (can appear from HTML form with no input provided)
             || ('' === $value)
@@ -194,20 +194,20 @@ class TypeBoolModule
             return false;
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function any_not_passed(&$result, $value) : bool
+    public function any_not_passed(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->passed($var, $value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -224,14 +224,14 @@ class TypeBoolModule
      * > NIL равен только самому себе
      * > NULL означает пустоту и им можно заменить значения '', [], `resource (closed)`, NIL, но нельзя заменить NAN
      *
-     * @param string|Nil|null $result
+     * @param string|Nil|null $r
      */
-    public function nil(&$result, $value) : bool
+    public function nil(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (Nil::is($value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -240,14 +240,14 @@ class TypeBoolModule
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function any_not_nil(&$result, $value) : bool
+    public function any_not_nil(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! Nil::is($value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -257,14 +257,14 @@ class TypeBoolModule
 
 
     /**
-     * @param null $result
+     * @param null $r
      */
-    public function a_null(&$result, $value) : bool
+    public function a_null(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (null === $value) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -273,14 +273,14 @@ class TypeBoolModule
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function any_not_null(&$result, $value) : bool
+    public function any_not_null(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (null !== $value) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -290,14 +290,14 @@ class TypeBoolModule
 
 
     /**
-     * @param bool|null $result
+     * @param bool|null $r
      */
-    public function a_bool(&$result, $value) : bool
+    public function a_bool(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (is_bool($value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -306,14 +306,14 @@ class TypeBoolModule
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function an_any_not_bool(&$result, $value) : bool
+    public function an_any_not_bool(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_bool($value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -323,14 +323,14 @@ class TypeBoolModule
 
 
     /**
-     * @param false|null $result
+     * @param false|null $r
      */
-    public function a_false(&$result, $value) : bool
+    public function a_false(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (false === $value) {
-            $result = false;
+            $r = false;
 
             return true;
         }
@@ -339,14 +339,14 @@ class TypeBoolModule
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function any_not_false(&$result, $value) : bool
+    public function any_not_false(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (false !== $value) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -356,14 +356,14 @@ class TypeBoolModule
 
 
     /**
-     * @param true|null $result
+     * @param true|null $r
      */
-    public function a_true(&$result, $value) : bool
+    public function a_true(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (true === $value) {
-            $result = true;
+            $r = true;
 
             return true;
         }
@@ -372,14 +372,14 @@ class TypeBoolModule
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function any_not_true(&$result, $value) : bool
+    public function any_not_true(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (true !== $value) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -389,24 +389,24 @@ class TypeBoolModule
 
 
     /**
-     * @param bool|null $result
+     * @param bool|null $r
      */
-    public function bool(&$result, $value) : bool
+    public function bool(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (null === $value) {
             return false;
         }
 
         if (is_bool($value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
 
         if (is_int($value)) {
-            $result = (0 !== $value);
+            $r = (0 !== $value);
 
             return true;
         }
@@ -416,7 +416,7 @@ class TypeBoolModule
                 return false;
             }
 
-            $result = (0.0 !== $value);
+            $r = (0.0 !== $value);
 
             return true;
         }
@@ -427,35 +427,35 @@ class TypeBoolModule
 
         if (is_string($value)) {
             if ('' === $value) {
-                $result = false;
+                $r = false;
 
                 return true;
             }
 
-            $result = true;
+            $r = true;
 
             return true;
         }
 
         if (is_array($value)) {
             if ([] === $value) {
-                $result = false;
+                $r = false;
 
                 return true;
             }
 
-            $result = true;
+            $r = true;
 
             return true;
         }
 
         if (is_resource($value)) {
-            $result = true;
+            $r = true;
 
             return true;
 
         } elseif ('resource (closed)' === gettype($value)) {
-            $result = false;
+            $r = false;
 
             return true;
         }
@@ -465,13 +465,13 @@ class TypeBoolModule
                 if (0 === count($countable)) {
                     // > EMPTY COUNTABLE is false
 
-                    $result = false;
+                    $r = false;
 
                     return true;
                 }
             }
 
-            $result = true;
+            $r = true;
 
             return true;
         }
@@ -480,18 +480,18 @@ class TypeBoolModule
     }
 
     /**
-     * @param false|null $result
+     * @param false|null $r
      */
-    public function false(&$result, $value) : bool
+    public function false(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->bool($bool, $value)) {
             return false;
         }
 
         if (false === $bool) {
-            $result = false;
+            $r = false;
 
             return true;
         }
@@ -500,18 +500,18 @@ class TypeBoolModule
     }
 
     /**
-     * @param false|null $result
+     * @param false|null $r
      */
-    public function true(&$result, $value) : bool
+    public function true(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->bool($bool, $value)) {
             return false;
         }
 
         if (true === $bool) {
-            $result = true;
+            $r = true;
 
             return true;
         }
@@ -521,24 +521,24 @@ class TypeBoolModule
 
 
     /**
-     * @param bool|null $result
+     * @param bool|null $r
      */
-    public function userbool(&$result, $value) : bool
+    public function userbool(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (null === $value) {
             return false;
         }
 
         if (is_bool($value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
 
         if (is_int($value)) {
-            $result = (0 !== $value);
+            $r = (0 !== $value);
 
             return true;
         }
@@ -548,7 +548,7 @@ class TypeBoolModule
                 return false;
             }
 
-            $result = (0.0 !== $value);
+            $r = (0.0 !== $value);
 
             return true;
         }
@@ -572,7 +572,7 @@ class TypeBoolModule
             $_value = strtolower($value);
 
             if (isset($map[ $_value ])) {
-                $result = $map[ $_value ];
+                $r = $map[ $_value ];
 
                 return true;
             }
@@ -582,18 +582,18 @@ class TypeBoolModule
     }
 
     /**
-     * @param false|null $result
+     * @param false|null $r
      */
-    public function userfalse(&$result, $value) : bool
+    public function userfalse(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->userbool($bool, $value)) {
             return false;
         }
 
         if (false === $bool) {
-            $result = false;
+            $r = false;
 
             return true;
         }
@@ -602,18 +602,18 @@ class TypeBoolModule
     }
 
     /**
-     * @param false|null $result
+     * @param false|null $r
      */
-    public function usertrue(&$result, $value) : bool
+    public function usertrue(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->userbool($bool, $value)) {
             return false;
         }
 
         if (true === $bool) {
-            $result = true;
+            $r = true;
 
             return true;
         }
@@ -623,1822 +623,643 @@ class TypeBoolModule
 
 
     /**
-     * @param float|null $result
+     * @param float|null $r
      */
-    public function nan(&$result, $value) : bool
+    public function nan(&$r, $value) : bool
     {
-        $result = null;
-
-        if (is_float($value) && is_nan($value)) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_nan($r, $value);
     }
 
     /**
-     * @param float|null $result
+     * @param float|null $r
      */
-    public function float_not_nan(&$result, $value) : bool
+    public function float_not_nan(&$r, $value) : bool
     {
-        $result = null;
-
-        if (is_float($value) && ! is_nan($value)) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_float_not_nan($r, $value);
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function any_not_nan(&$result, $value) : bool
+    public function any_not_nan(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! (is_float($value) && is_nan($value))) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_any_not_nan($r, $value);
     }
 
 
     /**
-     * @param float|null $result
+     * @param float|null $r
      */
-    public function finite(&$result, $value) : bool
+    public function finite(&$r, $value) : bool
     {
-        $result = null;
-
-        if (is_float($value) && is_finite($value)) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_finite($r, $value);
     }
 
     /**
-     * @param float|null $result
+     * @param float|null $r
      */
-    public function float_not_finite(&$result, $value) : bool
+    public function float_not_finite(&$r, $value) : bool
     {
-        $result = null;
-
-        if (is_float($value) && ! is_finite($value)) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_float_not_finite($r, $value);
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function any_not_finite(&$result, $value) : bool
+    public function any_not_finite(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! (is_float($value) && is_finite($value))) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_any_not_finite($r, $value);
     }
 
 
     /**
-     * @param float|null $result
+     * @param float|null $r
      */
-    public function infinite(&$result, $value) : bool
+    public function infinite(&$r, $value) : bool
     {
-        $result = null;
-
-        if (is_float($value) && is_infinite($value)) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_infinite($r, $value);
     }
 
     /**
-     * @param float|null $result
+     * @param float|null $r
      */
-    public function float_not_infinite(&$result, $value) : bool
+    public function float_not_infinite(&$r, $value) : bool
     {
-        $result = null;
-
-        if (is_float($value) && ! is_infinite($value)) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_float_not_infinite($r, $value);
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function any_not_infinite(&$result, $value) : bool
+    public function any_not_infinite(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! (is_float($value) && is_infinite($value))) {
-            $result = $value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_any_not_infinite($r, $value);
     }
 
 
     /**
-     * @param string|null $result
+     * @param float|null $r
      */
-    public function numeric(&$result, $value, ?bool $isAllowExp = null, array $refs = []) : bool
+    public function float_min(&$r, $value) : bool
     {
-        $result = null;
-
-        $isAllowExp = $isAllowExp ?? true;
-
-        $withSplit = array_key_exists(0, $refs);
-        if ($withSplit) {
-            $refSplit =& $refs[ 0 ];
-        }
-        $refSplit = null;
-
-        $isFloat = is_float($value);
-        if ($isFloat) {
-            if (! is_finite($value)) {
-                // > NAN, INF, -INF is float, but should not be parsed
-
-                unset($refSplit);
-
-                return false;
-            }
-        }
-
-        if (! $withSplit) {
-            if ($isFloat || is_int($value)) {
-                $valueString = (string) $value;
-
-                if (! $isAllowExp) {
-                    if (false !== strpos($valueString, 'e')) {
-                        unset($refSplit);
-
-                        return false;
-                    }
-                }
-
-                $result = $valueString;
-
-                unset($refSplit);
-
-                return true;
-            }
-        }
-
-        if (
-            (null === $value)
-            || ('' === $value)
-            || (is_bool($value))
-            || (is_array($value))
-            // || (is_float($value) && (! is_finite($value)))
-            || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || ($this->nil($var, $value))
-        ) {
-            // > NULL is not numeric
-            // > EMPTY STRING is not numeric
-            // > BOOLEAN is not numeric
-            // > ARRAY is not numeric
-            // > RESOURCE is not numeric
-            // > NIL is not numeric
-
-            return false;
-        }
-
-        if ($value instanceof Number) {
-            $number = $value;
-
-            $exp = $number->getExp();
-
-            if (! $isAllowExp) {
-                if ('' !== $exp) {
-                    unset($refSplit);
-
-                    return false;
-                }
-            }
-
-            $result = $number->getValue();
-
-            if ($withSplit) {
-                $refSplit = [];
-                $refSplit[ 0 ] = $number->getSign();
-                $refSplit[ 1 ] = $number->getInt();
-                $refSplit[ 2 ] = $number->getFrac();
-                $refSplit[ 3 ] = $exp;
-            }
-
-            unset($refSplit);
-
-            return true;
-        }
-
-        if (! $this->trim($valueTrim, $value)) {
-            unset($refSplit);
-
-            return false;
-        }
-
-        $regex = ''
-            . '/^'
-            . '([+-]?)'
-            . '((?:0|[1-9]\d*))'
-            . '(\.\d+)?'
-            . ($isAllowExp ? '([eE][+-]?\d+)?' : '')
-            . '$/';
-
-        if (! preg_match($regex, $valueTrim, $matches)) {
-            unset($refSplit);
-
-            return false;
-        }
-
-        [
-            1 => $sign,
-            2 => $int,
-            3 => $frac,
-            4 => $exp,
-        ] = $matches + [ '', '', '', '', '' ];
-
-        if ($sign === '+') {
-            $sign = '';
-        }
-
-        $frac = rtrim($frac, '0.');
-
-        $isZero = ! preg_match('/[1-9]/', "{$int}{$frac}");
-
-        if ($isZero) {
-            $sign = '';
-            $int = '0';
-            $frac = '';
-            $exp = '';
-        }
-
-        if ($withSplit) {
-            $refSplit = [];
-            $refSplit[ 0 ] = $sign;
-            $refSplit[ 1 ] = $int;
-            $refSplit[ 2 ] = $frac;
-            $refSplit[ 3 ] = $exp;
-        }
-
-        $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
-
-        $result = $valueNumeric;
-
-        unset($refSplit);
-
-        return true;
+        return Lib::num()->type_float_min($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param float|null $r
      */
-    public function numeric_non_zero(&$result, $value, ?bool $allowExp = null, array $refs = []) : bool
+    public function float_not_float_min(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! $this->numeric($_value, $value, $allowExp, $refs)) {
-            return false;
-        }
-
-        if ('0' !== $_value) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_float_not_float_min($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param mixed|null $r
      */
-    public function numeric_non_negative(&$result, $value, ?bool $allowExp = null, array $refs = []) : bool
+    public function any_not_float_min(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! $this->numeric($_value, $value, $allowExp, $refs)) {
-            return false;
-        }
-
-        if ('0' === $_value) {
-            $result = $_value;
-
-            return true;
-        }
-
-        if ('-' !== $_value[ 0 ]) {
-            $result = $_value;
+        return Lib::num()->type_any_not_float_min($r, $value);
+    }
 
-            return true;
-        }
 
-        return false;
+    /**
+     * @param string|null $r
+     */
+    public function numeric(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
+    {
+        return Lib::num()->type_numeric($r, $value, $isAllowExp, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_non_positive(&$result, $value, ?bool $allowExp = null, array $refs = []) : bool
+    public function numeric_non_zero(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric($_value, $value, $allowExp, $refs)) {
-            return false;
-        }
-
-        if ('0' === $_value) {
-            $result = $_value;
-
-            return true;
-        }
-
-        if ('-' === $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_non_zero($r, $value, $isAllowExp, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_negative(&$result, $value, ?bool $allowExp = null, array $refs = []) : bool
+    public function numeric_non_negative(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric($_value, $value, $allowExp, $refs)) {
-            return false;
-        }
-
-        if ('0' === $_value) {
-            return false;
-        }
-
-        if ('-' === $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_non_negative($r, $value, $isAllowExp, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_positive(&$result, $value, ?bool $allowExp = null, array $refs = []) : bool
+    public function numeric_non_positive(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric($_value, $value, $allowExp, $refs)) {
-            return false;
-        }
-
-        if ('0' === $_value) {
-            return false;
-        }
-
-        if ('-' !== $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_non_positive($r, $value, $isAllowExp, $refs);
     }
 
-
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_int(&$result, $value, array $refs = []) : bool
+    public function numeric_negative(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
     {
-        $result = null;
-
-        $withSplit = array_key_exists(0, $refs);
-        $refSplit =& $refs[ 0 ];
-
-        // > btw, 1.1e1 is can be converted to integer 11 too
-        // > we better dont support that numbers here
-        if (! $this->numeric($_value, $value, false, $refs)) {
-            unset($refSplit);
-
-            return false;
-        }
-
-        [ , , $frac ] = $refSplit;
-
-        if ('' !== $frac) {
-            unset($refSplit);
-
-            if (! $withSplit) {
-                unset($refs[ 0 ]);
-            }
-
-            return false;
-        }
-
-        $result = $_value;
-
-        unset($refSplit);
-
-        if (! $withSplit) {
-            unset($refs[ 0 ]);
-        }
-
-        return true;
+        return Lib::num()->type_numeric_negative($r, $value, $isAllowExp, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_int_non_zero(&$result, $value, array $refs = []) : bool
+    public function numeric_positive(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric_int($_value, $value, $refs)) {
-            return false;
-        }
-
-        if ('0' !== $_value) {
-            $result = $_value;
+        return Lib::num()->type_numeric_positive($r, $value, $isAllowExp, $refs);
+    }
 
-            return true;
-        }
 
-        return false;
+    /**
+     * @param string|null $r
+     */
+    public function numeric_int(&$r, $value, array $refs = []) : bool
+    {
+        return Lib::num()->type_numeric_int($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_int_non_negative(&$result, $value, array $refs = []) : bool
+    public function numeric_int_non_zero(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric_int($_value, $value, $refs)) {
-            return false;
-        }
-
-        if ('0' === $_value) {
-            $result = $_value;
-
-            return true;
-        }
-
-        if ('-' !== $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_int_non_zero($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_int_non_positive(&$result, $value, array $refs = []) : bool
+    public function numeric_int_non_negative(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric_int($_value, $value, $refs)) {
-            return false;
-        }
-
-        if ('0' === $_value) {
-            $result = $_value;
-
-            return true;
-        }
-
-        if ('-' === $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_int_non_negative($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_int_negative(&$result, $value, array $refs = []) : bool
+    public function numeric_int_non_positive(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric_int($_value, $value, $refs)) {
-            return false;
-        }
-
-        if ('0' === $_value) {
-            return false;
-        }
-
-        if ('-' === $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_int_non_positive($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_int_positive(&$result, $value, array $refs = []) : bool
+    public function numeric_int_negative(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric_int($_value, $value, $refs)) {
-            return false;
-        }
-
-        if ('0' === $_value) {
-            return false;
-        }
-
-        if ('-' !== $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_int_negative($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_int_positive_or_minus_one(&$result, $value, array $refs = []) : bool
+    public function numeric_int_positive(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric_int($_value, $value, $refs)) {
-            return false;
-        }
-
-        if ('0' === $_value) {
-            $result = $_value;
-
-            return false;
-        }
-
-        if ('-1' === $_value) {
-            $result = $_value;
-
-            return true;
-        }
-
-        if ('-' !== $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_int_positive($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_int_non_negative_or_minus_one(&$result, $value, array $refs = []) : bool
+    public function numeric_int_positive_or_minus_one(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric_int($_value, $value, $refs)) {
-            return false;
-        }
-
-        if ('-1' === $_value) {
-            $result = $_value;
-
-            return true;
-        }
-
-        if ('0' === $_value) {
-            $result = $_value;
-
-            return true;
-        }
-
-        if ('-' !== $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_int_positive_or_minus_one($r, $value, $refs);
     }
-
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_float(&$result, $value, array $refs = []) : bool
+    public function numeric_int_non_negative_or_minus_one(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
-
-        $withSplit = array_key_exists(0, $refs);
-
-        $refSplit =& $refs[ 0 ];
-
-        // > btw, 1.1e-1 is can be converted to float 0.11 too
-        // > we better dont support that numbers here
-        if (! $this->numeric($_value, $value, false, $refs)) {
-            unset($refSplit);
-
-            return false;
-        }
-
-        [ $sign, $int, $frac ] = $refSplit;
-
-        if ('' === $frac) {
-            $frac = '.0';
-
-            $_value = "{$sign}{$int}{$frac}";
-
-            if ($withSplit) {
-                $refSplit[ 3 ] = $frac;
-            }
-        }
-
-        if ('0' === $_value) {
-            $result = '0.0';
-
-            unset($refSplit);
-
-            if (! $withSplit) {
-                unset($refs[ 0 ]);
-            }
-
-            return true;
-        }
-
-        $result = $_value;
-
-        unset($refSplit);
+        return Lib::num()->type_numeric_int_non_negative_or_minus_one($r, $value, $refs);
+    }
 
-        if (! $withSplit) {
-            unset($refs[ 0 ]);
-        }
 
-        return true;
+    /**
+     * @param string|null $r
+     */
+    public function numeric_float(&$r, $value, array $refs = []) : bool
+    {
+        return Lib::num()->type_numeric_float($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_float_non_zero(&$result, $value, array $refs = []) : bool
+    public function numeric_float_non_zero(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric_float($_value, $value, $refs)) {
-            return false;
-        }
-
-        if ('0.0' !== $_value) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_float_non_zero($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_float_non_negative(&$result, $value, array $refs = []) : bool
+    public function numeric_float_non_negative(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric_float($_value, $value, $refs)) {
-            return false;
-        }
-
-        if ('0.0' === $_value) {
-            $result = $_value;
-
-            return true;
-        }
-
-        if ('-' !== $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_float_non_negative($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_float_non_positive(&$result, $value, array $refs = []) : bool
+    public function numeric_float_non_positive(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric_float($_value, $value, $refs)) {
-            return false;
-        }
-
-        if ('0.0' === $_value) {
-            $result = $_value;
-
-            return true;
-        }
-
-        if ('-' === $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_float_non_positive($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_float_negative(&$result, $value, array $refs = []) : bool
+    public function numeric_float_negative(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric_float($_value, $value, $refs)) {
-            return false;
-        }
-
-        if ('0.0' === $_value) {
-            return false;
-        }
-
-        if ('-' === $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_float_negative($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function numeric_float_positive(&$result, $value, array $refs = []) : bool
+    public function numeric_float_positive(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->numeric_float($_value, $value, $refs)) {
-            return false;
-        }
-
-        if ('0.0' === $_value) {
-            return false;
-        }
-
-        if ('-' !== $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_float_positive($r, $value, $refs);
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function decimal(&$result, $value, int $scale = 0, array $refs = []) : bool
+    public function numeric_trimpad(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
     {
-        $result = null;
-
-        if ($scale < 0) return false;
-
-        $withSplit = array_key_exists(0, $refs);
-
-        $refSplit =& $refs[ 0 ];
-
-        if (! $this->numeric($_value, $value, false, $refs)) {
-            unset($refSplit);
-
-            return false;
-        }
-
-        [ $sign, $int, $frac ] = $refSplit;
-
-        $numericScale = 0;
-        if ('' !== $frac) {
-            $numericScale = strlen($frac) - 1;
-        }
-
-        if ($numericScale > $scale) {
-            unset($refSplit);
-
-            if (! $withSplit) {
-                unset($refs[ 0 ]);
-            }
-
-            return false;
-        }
-
-        if ($numericScale < $scale) {
-            if ('' === $frac) {
-                $frac = '.';
-            }
-
-            $frac = str_pad($frac, $scale + 1, '0', STR_PAD_RIGHT);
-
-            $_value = "{$sign}{$int}{$frac}";
-
-            if ($withSplit) {
-                $refSplit[ 3 ] = $frac;
-            }
-        }
-
-        $result = $_value;
-
-        unset($refSplit);
-
-        if (! $withSplit) {
-            unset($refs[ 0 ]);
-        }
-
-        return true;
+        return Lib::num()->type_numeric_trimpad($r, $value, $lenTrim, $lenPad, $stringPad, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function decimal_non_zero(&$result, $value, int $scale = 0, array $refs = []) : bool
+    public function numeric_trimpad_non_zero(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->decimal($_value, $value, $scale, $refs)) {
-            return false;
-        }
-
-        if ('0' === rtrim($_value, '0.')) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_trimpad_non_zero($r, $value, $lenTrim, $lenPad, $stringPad, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function decimal_non_negative(&$result, $value, int $scale = 0, array $refs = []) : bool
+    public function numeric_trimpad_non_negative(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->decimal($_value, $value, $scale, $refs)) {
-            return false;
-        }
-
-        if ('0' === rtrim($_value, '0.')) {
-            $result = $_value;
-
-            return true;
-        }
-
-        if ('-' !== $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_trimpad_non_negative($r, $value, $lenTrim, $lenPad, $stringPad, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function decimal_non_positive(&$result, $value, int $scale = 0, array $refs = []) : bool
+    public function numeric_trimpad_non_positive(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->decimal($_value, $value, $scale, $refs)) {
-            return false;
-        }
-
-        if ('0' === rtrim($_value, '0.')) {
-            $result = $_value;
-
-            return true;
-        }
-
-        if ('-' === $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_trimpad_non_positive($r, $value, $lenTrim, $lenPad, $stringPad, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function decimal_negative(&$result, $value, int $scale = 0, array $refs = []) : bool
+    public function numeric_trimpad_negative(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->decimal($_value, $value, $scale, $refs)) {
-            return false;
-        }
-
-        if ('0' === rtrim($_value, '0.')) {
-            return false;
-        }
-
-        if ('-' === $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_trimpad_negative($r, $value, $lenTrim, $lenPad, $stringPad, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function decimal_positive(&$result, $value, int $scale = 0, array $refs = []) : bool
+    public function numeric_trimpad_positive(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->decimal($_value, $value, $scale, $refs)) {
-            return false;
-        }
-
-        if ('0' === rtrim($_value, '0.')) {
-            return false;
-        }
-
-        if ('-' !== $_value[ 0 ]) {
-            $result = $_value;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_numeric_trimpad_positive($r, $value, $lenTrim, $lenPad, $stringPad, $refs);
     }
 
 
     /**
-     * @param int|float|null $result
+     * @param string|null $r
      */
-    public function num(&$result, $value) : bool
+    public function decimal(&$r, $value, int $scale = 0, array $refs = []) : bool
     {
-        $result = null;
-
-        if (is_int($value)) {
-            $result = $value;
-
-            return true;
-        }
-
-        if (is_float($value)) {
-            if (! is_finite($value)) {
-                // > NAN, INF, -INF is float, but should not be parsed
-                return false;
-            }
-
-            $result = $value;
-
-            return true;
-        }
-
-        if (
-            (null === $value)
-            || ('' === $value)
-            || (is_bool($value))
-            || (is_array($value))
-            // || (is_float($value) && (! is_finite($value)))
-            || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || ($this->nil($var, $value))
-        ) {
-            // > NULL is not num
-            // > EMPTY STRING is not num
-            // > BOOLEAN is not num
-            // > ARRAY is not num
-            // > RESOURCE is not num
-            // > NIL is not num
-
-            return false;
-        }
-
-        if (! $this->numeric($valueNumeric, $value, true, [ &$split ])) {
-            return false;
-        }
-
-        $map = [];
-
-        if (PHP_INT_SIZE === 8) {
-            $map += [
-                ' ' . ((string) PHP_INT_MAX)  => PHP_INT_MAX,
-                ' ' . ((string) -PHP_INT_MAX) => -PHP_INT_MAX,
-                ' ' . ((string) PHP_INT_MIN)  => PHP_INT_MIN,
-                //
-                " 9223372036854775807"        => PHP_INT_MAX,
-                ' -9223372036854775807'       => -PHP_INT_MAX,
-                ' -9223372036854775808'       => PHP_INT_MIN,
-            ];
-
-        } elseif (PHP_INT_SIZE === 4) {
-            $map += [
-                ' ' . ((string) PHP_INT_MAX)  => PHP_INT_MAX,
-                ' ' . ((string) -PHP_INT_MAX) => -PHP_INT_MAX,
-                ' ' . ((string) PHP_INT_MIN)  => PHP_INT_MIN,
-                //
-                " 2147483647"                 => PHP_INT_MAX,
-                ' -2147483647'                => -PHP_INT_MAX,
-                ' -2147483648'                => PHP_INT_MIN,
-            ];
-        }
-
-        $map += [
-            ' ' . ((string) PHP_FLOAT_MAX)  => PHP_FLOAT_MAX,
-            ' ' . ((string) PHP_FLOAT_MIN)  => PHP_FLOAT_MIN,
-            //
-            " " . ((string) -PHP_FLOAT_MAX) => -PHP_FLOAT_MAX,
-            ' ' . ((string) -PHP_FLOAT_MIN) => -PHP_FLOAT_MIN,
-            //
-            " 1.797693134862316E+308"       => PHP_FLOAT_MAX,
-            ' 1.7976931348623157E+308'      => PHP_FLOAT_MAX,
-            //
-            " 2.225073858507201E-308"       => PHP_FLOAT_MIN,
-            ' 2.2250738585072014E-308'      => PHP_FLOAT_MIN,
-            //
-            " -1.797693134862316E+308"      => -PHP_FLOAT_MAX,
-            ' -1.7976931348623157E+308'     => -PHP_FLOAT_MAX,
-            //
-            " -2.225073858507201E-308"      => -PHP_FLOAT_MIN,
-            ' -2.2250738585072014E-308'     => -PHP_FLOAT_MIN,
-        ];
-
-        if (isset($map[ $key = ' ' . $valueNumeric ])) {
-            $result = $map[ $key ];
-
-            return true;
-        }
-
-        $valueFloat = null;
-        $valueFloat17g = null;
-
-        $hasExponent = ('' !== $split[ 3 ]);
-        if ($hasExponent) {
-            $valueFloat = floatval($valueNumeric);
-
-        } else {
-            // > IEEE 754 double-precision floating point (64-bit float)
-            $valueFloat17g = floatval(sprintf('%.17g', $valueNumeric));
-        }
-
-        $valueMaybeFloat = $valueFloat17g ?? $valueFloat;
-
-        if (0.0 === $valueMaybeFloat) {
-            if ($valueNumeric !== '0') {
-                return false;
-            }
-        }
-
-        if (! is_finite($valueMaybeFloat)) {
-            return false;
-        }
-
-        if (null !== $valueFloat) {
-            $result = $valueFloat;
-
-            return true;
-        }
-
-        if (null !== $valueFloat17g) {
-            if (
-                ($valueFloat17g < (float) PHP_INT_MIN)
-                || ($valueFloat17g > (float) PHP_INT_MAX)
-            ) {
-                $result = $valueFloat17g;
-
-                return true;
-            }
-
-            $valueInt = intval($valueFloat17g);
-
-            if ($valueFloat17g === floatval($valueInt)) {
-                $result = $valueInt;
-
-                return true;
-            }
-
-            $result = $valueFloat17g;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_decimal($r, $value, $scale, $refs);
     }
 
     /**
-     * @param int|float|null $result
+     * @param string|null $r
      */
-    public function num_non_zero(&$result, $value) : bool
+    public function decimal_non_zero(&$r, $value, int $scale = 0, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->num($_value, $value)) {
-            return false;
-        }
-
-        if ($_value == 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_decimal_non_zero($r, $value, $scale, $refs);
     }
 
     /**
-     * @param int|float|null $result
+     * @param string|null $r
      */
-    public function num_non_negative(&$result, $value) : bool
+    public function decimal_non_negative(&$r, $value, int $scale = 0, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->num($_value, $value)) {
-            return false;
-        }
-
-        if ($_value < 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_decimal_non_negative($r, $value, $scale, $refs);
     }
 
     /**
-     * @param int|float|null $result
+     * @param string|null $r
      */
-    public function num_non_positive(&$result, $value) : bool
+    public function decimal_non_positive(&$r, $value, int $scale = 0, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->num($_value, $value)) {
-            return false;
-        }
-
-        if ($_value > 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_decimal_non_positive($r, $value, $scale, $refs);
     }
 
     /**
-     * @param int|float|null $result
+     * @param string|null $r
      */
-    public function num_negative(&$result, $value) : bool
+    public function decimal_negative(&$r, $value, int $scale = 0, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->num($_value, $value)) {
-            return false;
-        }
-
-        if ($_value >= 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_decimal_negative($r, $value, $scale, $refs);
     }
 
     /**
-     * @param int|float|null $result
+     * @param string|null $r
      */
-    public function num_positive(&$result, $value) : bool
+    public function decimal_positive(&$r, $value, int $scale = 0, array $refs = []) : bool
     {
-        $result = null;
-
-        if (! $this->num($_value, $value)) {
-            return false;
-        }
-
-        if ($_value <= 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_decimal_positive($r, $value, $scale, $refs);
     }
 
 
     /**
-     * @param int|null $result
+     * @param int|float|null $r
      */
-    public function int(&$result, $value) : bool
+    public function num(&$r, $value) : bool
     {
-        $result = null;
-
-        if (is_int($value)) {
-            $result = $value;
-
-            return true;
-        }
-
-        if (
-            (null === $value)
-            || ('' === $value)
-            || (is_bool($value))
-            || (is_array($value))
-            || (is_float($value) && ! is_finite($value))
-            || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || ($this->nil($var, $value))
-        ) {
-            // > NULL is not int
-            // > EMPTY STRING is not int
-            // > BOOLEAN is not int
-            // > ARRAY is not int
-            // > NAN, INF, -INF is not int
-            // > RESOURCE is not int
-            // > NIL is not int
-
-            return false;
-        }
-
-        if (! $this->numeric($valueNumeric, $value, true, [ &$split ])) {
-            return false;
-        }
-
-        $map = [];
-
-        if (PHP_INT_SIZE === 8) {
-            $map += [
-                ' ' . ((string) PHP_INT_MAX)  => PHP_INT_MAX,
-                ' ' . ((string) -PHP_INT_MAX) => -PHP_INT_MAX,
-                ' ' . ((string) PHP_INT_MIN)  => PHP_INT_MIN,
-                //
-                " 9223372036854775807"        => PHP_INT_MAX,
-                ' -9223372036854775807'       => -PHP_INT_MAX,
-                ' -9223372036854775808'       => PHP_INT_MIN,
-            ];
-
-        } elseif (PHP_INT_SIZE === 4) {
-            $map += [
-                ' ' . ((string) PHP_INT_MAX)  => PHP_INT_MAX,
-                ' ' . ((string) -PHP_INT_MAX) => -PHP_INT_MAX,
-                ' ' . ((string) PHP_INT_MIN)  => PHP_INT_MIN,
-                //
-                " 2147483647"                 => PHP_INT_MAX,
-                ' -2147483647'                => -PHP_INT_MAX,
-                ' -2147483648'                => PHP_INT_MIN,
-            ];
-        }
-
-        if (isset($map[ $key = ' ' . $valueNumeric ])) {
-            $result = $map[ $key ];
-
-            return true;
-        }
-
-        $hasExponent = ('' !== $split[ 3 ]);
-        if ($hasExponent) {
-            return false;
-        }
-
-        // > IEEE 754 double-precision floating point (64-bit float)
-        $valueFloat17g = floatval(sprintf('%.17g', $valueNumeric));
-
-        if (0.0 === $valueFloat17g) {
-            if ($valueNumeric !== '0') {
-                return false;
-            }
-        }
-
-        if (! is_finite($valueFloat17g)) {
-            return false;
-        }
-
-        if (
-            ($valueFloat17g < (float) PHP_INT_MIN)
-            || ($valueFloat17g > (float) PHP_INT_MAX)
-        ) {
-            return false;
-        }
-
-        $valueInt = intval($valueFloat17g);
-
-        if ($valueFloat17g === floatval($valueInt)) {
-            $result = $valueInt;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_num($r, $value);
     }
 
     /**
-     * @param int|null $result
+     * @param int|float|null $r
      */
-    public function int_non_zero(&$result, $value) : bool
+    public function num_non_zero(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! $this->int($_value, $value)) {
-            return false;
-        }
-
-        if ($_value === 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_num_non_zero($r, $value);
     }
 
     /**
-     * @param int|null $result
+     * @param int|float|null $r
      */
-    public function int_non_negative(&$result, $value) : bool
+    public function num_non_negative(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! $this->int($_value, $value)) {
-            return false;
-        }
-
-        if ($_value < 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_num_non_negative($r, $value);
     }
 
     /**
-     * @param int|null $result
+     * @param int|float|null $r
      */
-    public function int_non_positive(&$result, $value) : bool
+    public function num_non_positive(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! $this->int($_value, $value)) {
-            return false;
-        }
-
-        if ($_value > 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_num_non_positive($r, $value);
     }
 
     /**
-     * @param int|null $result
+     * @param int|float|null $r
      */
-    public function int_negative(&$result, $value) : bool
+    public function num_negative(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! $this->int($_value, $value)) {
-            return false;
-        }
-
-        if ($_value >= 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_num_negative($r, $value);
     }
 
     /**
-     * @param int|null $result
+     * @param int|float|null $r
      */
-    public function int_positive(&$result, $value) : bool
+    public function num_positive(&$r, $value) : bool
     {
-        $result = false;
-
-        if (! $this->int($_value, $value)) {
-            return false;
-        }
-
-        if ($_value <= 0) {
-            return false;
-        }
+        return Lib::num()->type_num_positive($r, $value);
+    }
 
-        $result = $_value;
 
-        return true;
+    /**
+     * @param int|null $r
+     */
+    public function int(&$r, $value) : bool
+    {
+        return Lib::num()->type_int($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param int|null $r
      */
-    public function int_positive_or_minus_one(&$result, $value) : bool
+    public function int_non_zero(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! $this->int($_value, $value)) {
-            return false;
-        }
-
-        if (-1 === $_value) {
-            $result = $_value;
-
-            return true;
-        }
-
-        if ($_value <= 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_int_non_zero($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param int|null $r
      */
-    public function int_non_negative_or_minus_one(&$result, $value) : bool
+    public function int_non_negative(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! $this->int($_value, $value)) {
-            return false;
-        }
-
-        if ($_value < -1) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_int_non_negative($r, $value);
     }
-
 
     /**
-     * @param float|null $result
+     * @param int|null $r
      */
-    public function float(&$result, $value) : bool
+    public function int_non_positive(&$r, $value) : bool
     {
-        $result = null;
-
-        if (is_int($value)) {
-            $result = (float) $value;
-
-            return true;
-
-        } elseif (is_float($value)) {
-            if (! is_finite($value)) {
-                // > NAN, INF, -INF is float, but should not be parsed
-                return false;
-            }
-
-            $result = $value;
-
-            return true;
-        }
-
-        if (
-            (null === $value)
-            || ('' === $value)
-            || (is_bool($value))
-            || (is_array($value))
-            // || (is_float($value) && (! is_finite($value)))
-            || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || ($this->nil($var, $value))
-        ) {
-            // > NULL is not float
-            // > EMPTY STRING is not float
-            // > BOOLEAN is not float
-            // > ARRAY is not float
-            // > RESOURCE is not float
-            // > NIL is not float
-
-            return false;
-        }
-
-        if (! $this->numeric($valueNumeric, $value, true, [ &$split ])) {
-            return false;
-        }
-
-        $map = [
-            ' ' . ((string) PHP_FLOAT_MAX)  => PHP_FLOAT_MAX,
-            ' ' . ((string) PHP_FLOAT_MIN)  => PHP_FLOAT_MIN,
-            //
-            " " . ((string) -PHP_FLOAT_MAX) => -PHP_FLOAT_MAX,
-            ' ' . ((string) -PHP_FLOAT_MIN) => -PHP_FLOAT_MIN,
-            //
-            " 1.797693134862316E+308"       => PHP_FLOAT_MAX,
-            ' 1.7976931348623157E+308'      => PHP_FLOAT_MAX,
-            //
-            " 2.225073858507201E-308"       => PHP_FLOAT_MIN,
-            ' 2.2250738585072014E-308'      => PHP_FLOAT_MIN,
-            //
-            " -1.797693134862316E+308"      => -PHP_FLOAT_MAX,
-            ' -1.7976931348623157E+308'     => -PHP_FLOAT_MAX,
-            //
-            " -2.225073858507201E-308"      => -PHP_FLOAT_MIN,
-            ' -2.2250738585072014E-308'     => -PHP_FLOAT_MIN,
-        ];
-
-        if (isset($map[ $key = ' ' . $valueNumeric ])) {
-            $result = $map[ $key ];
-
-            return true;
-        }
-
-        $valueFloat = floatval($valueNumeric);
-
-        if (0.0 === $valueFloat) {
-            if ($valueNumeric !== '0') {
-                $valueFloat = null;
-            }
-        }
-
-        if (! is_finite($valueFloat)) {
-            $valueFloat = null;
-        }
-
-        if (null !== $valueFloat) {
-            $result = $valueFloat;
-
-            return true;
-        }
-
-        return false;
+        return Lib::num()->type_int_non_positive($r, $value);
     }
 
     /**
-     * @param float|null $result
+     * @param int|null $r
      */
-    public function float_non_zero(&$result, $value) : bool
+    public function int_negative(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! $this->float($_value, $value)) {
-            return false;
-        }
-
-        if ($_value == 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_int_negative($r, $value);
     }
 
     /**
-     * @param float|null $result
+     * @param int|null $r
      */
-    public function float_non_negative(&$result, $value) : bool
+    public function int_positive(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! $this->float($_value, $value)) {
-            return false;
-        }
-
-        if ($_value < 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_int_positive($r, $value);
     }
 
     /**
-     * @param float|null $result
+     * @param string|null $r
      */
-    public function float_non_positive(&$result, $value) : bool
+    public function int_positive_or_minus_one(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! $this->float($_value, $value)) {
-            return false;
-        }
-
-        if ($_value > 0) {
-            return false;
-        }
-
-        $result = $_value;
-
-        return true;
+        return Lib::num()->type_int_positive_or_minus_one($r, $value);
     }
 
     /**
-     * @param float|null $result
+     * @param string|null $r
      */
-    public function float_negative(&$result, $value) : bool
+    public function int_non_negative_or_minus_one(&$r, $value) : bool
     {
-        $result = null;
-
-        if (! $this->float($_value, $value)) {
-            return false;
-        }
-
-        if ($_value >= 0) {
-            return false;
-        }
+        return Lib::num()->type_int_non_negative_or_minus_one($r, $value);
+    }
 
-        $result = $_value;
 
-        return true;
+    /**
+     * @param float|null $r
+     */
+    public function float(&$r, $value) : bool
+    {
+        return Lib::num()->type_float($r, $value);
     }
 
     /**
-     * @param float|null $result
+     * @param float|null $r
      */
-    public function float_positive(&$result, $value) : bool
+    public function float_non_zero(&$r, $value) : bool
     {
-        $result = null;
+        return Lib::num()->type_float_non_zero($r, $value);
+    }
 
-        if (! $this->float($_value, $value)) {
-            return false;
-        }
+    /**
+     * @param float|null $r
+     */
+    public function float_non_negative(&$r, $value) : bool
+    {
+        return Lib::num()->type_float_non_negative($r, $value);
+    }
 
-        if ($_value <= 0) {
-            return false;
-        }
+    /**
+     * @param float|null $r
+     */
+    public function float_non_positive(&$r, $value) : bool
+    {
+        return Lib::num()->type_float_non_positive($r, $value);
+    }
 
-        $result = $_value;
+    /**
+     * @param float|null $r
+     */
+    public function float_negative(&$r, $value) : bool
+    {
+        return Lib::num()->type_float_negative($r, $value);
+    }
 
-        return true;
+    /**
+     * @param float|null $r
+     */
+    public function float_positive(&$r, $value) : bool
+    {
+        return Lib::num()->type_float_positive($r, $value);
     }
 
 
     /**
-     * @param Number|null $result
+     * @param Number|null $r
      */
-    public function number(&$result, $value, ?bool $allowExp = null) : bool
+    public function number(&$r, $value, ?bool $allowExp = null) : bool
     {
-        return Lib::bcmath()->type_number($result, $value, $allowExp);
+        return Lib::bcmath()->type_number($r, $value, $allowExp);
     }
 
     /**
-     * @param Bcnumber|null $result
+     * @param Bcnumber|null $r
      */
-    public function bcnumber(&$result, $value) : bool
+    public function bcnumber(&$r, $value) : bool
     {
-        return Lib::bcmath()->type_bcnumber($result, $value);
+        return Lib::bcmath()->type_bcnumber($r, $value);
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function a_string(&$result, $value) : bool
+    public function a_string(&$r, $value) : bool
     {
-        return Lib::str()->type_a_string($result, $value);
+        return Lib::str()->type_a_string($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function a_string_empty(&$result, $value) : bool
+    public function a_string_empty(&$r, $value) : bool
     {
-        return Lib::str()->type_a_string_empty($result, $value);
+        return Lib::str()->type_a_string_empty($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function a_string_not_empty(&$result, $value) : bool
+    public function a_string_not_empty(&$r, $value) : bool
     {
-        return Lib::str()->type_a_string_not_empty($result, $value);
+        return Lib::str()->type_a_string_not_empty($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function a_trim(&$result, $value) : bool
+    public function a_trim(&$r, $value) : bool
     {
-        return Lib::str()->type_a_trim($result, $value);
+        return Lib::str()->type_a_trim($r, $value);
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function string(&$result, $value) : bool
+    public function string(&$r, $value) : bool
     {
-        return Lib::str()->type_string($result, $value);
+        return Lib::str()->type_string($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function string_empty(&$result, $value) : bool
+    public function string_empty(&$r, $value) : bool
     {
-        return Lib::str()->type_string_empty($result, $value);
+        return Lib::str()->type_string_empty($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function string_not_empty(&$result, $value) : bool
+    public function string_not_empty(&$r, $value) : bool
     {
-        return Lib::str()->type_string_not_empty($result, $value);
+        return Lib::str()->type_string_not_empty($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function trim(&$result, $value, ?string $characters = null) : bool
+    public function trim(&$r, $value, ?string $characters = null) : bool
     {
-        return Lib::str()->type_trim($result, $value, $characters);
+        return Lib::str()->type_trim($r, $value, $characters);
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function char(&$result, $value) : bool
+    public function char(&$r, $value) : bool
     {
-        return Lib::str()->type_char($result, $value);
+        return Lib::str()->type_char($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function letter(&$result, $value) : bool
+    public function letter(&$r, $value) : bool
     {
-        return Lib::str()->type_letter($result, $value);
+        return Lib::str()->type_letter($r, $value);
     }
 
     /**
-     * @param Alphabet|null $result
+     * @param Alphabet|null $r
      */
-    public function alphabet(&$result, $value) : bool
+    public function alphabet(&$r, $value) : bool
     {
-        return Lib::str()->type_alphabet($result, $value);
+        return Lib::str()->type_alphabet($r, $value);
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function ctype_digit(&$result, $value) : bool
+    public function ctype_digit(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->string_not_empty($_value, $value)) {
             return false;
@@ -2446,7 +1267,7 @@ class TypeBoolModule
 
         if (extension_loaded('ctype')) {
             if (ctype_digit($_value)) {
-                $result = $_value;
+                $r = $_value;
 
                 return true;
             }
@@ -2458,17 +1279,17 @@ class TypeBoolModule
             return false;
         }
 
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function ctype_alpha(&$result, $value, ?bool $isIgnoreCase = null) : bool
+    public function ctype_alpha(&$r, $value, ?bool $isIgnoreCase = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $isIgnoreCase = $isIgnoreCase ?? true;
 
@@ -2484,7 +1305,7 @@ class TypeBoolModule
             }
 
             if (ctype_alpha($_value)) {
-                $result = $_value;
+                $r = $_value;
 
                 return true;
             }
@@ -2500,17 +1321,17 @@ class TypeBoolModule
             return false;
         }
 
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function ctype_alnum(&$result, $value, ?bool $isIgnoreCase = null) : bool
+    public function ctype_alnum(&$r, $value, ?bool $isIgnoreCase = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $isIgnoreCase = $isIgnoreCase ?? true;
 
@@ -2526,7 +1347,7 @@ class TypeBoolModule
             }
 
             if (ctype_alnum($_value)) {
-                $result = $_value;
+                $r = $_value;
 
                 return true;
             }
@@ -2542,62 +1363,62 @@ class TypeBoolModule
             return false;
         }
 
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function base(&$result, $value, $alphabet) : bool
+    public function base(&$r, $value, $alphabet) : bool
     {
-        return Lib::crypt()->type_base($result, $value, $alphabet);
+        return Lib::crypt()->type_base($r, $value, $alphabet);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function base_bin(&$result, $value) : bool
+    public function base_bin(&$r, $value) : bool
     {
-        return Lib::crypt()->type_base_bin($result, $value);
+        return Lib::crypt()->type_base_bin($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function base_oct(&$result, $value) : bool
+    public function base_oct(&$r, $value) : bool
     {
-        return Lib::crypt()->type_base_oct($result, $value);
+        return Lib::crypt()->type_base_oct($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function base_dec(&$result, $value) : bool
+    public function base_dec(&$r, $value) : bool
     {
-        return Lib::crypt()->type_base_dec($result, $value);
+        return Lib::crypt()->type_base_dec($r, $value);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function base_hex(&$result, $value) : bool
+    public function base_hex(&$r, $value) : bool
     {
-        return Lib::crypt()->type_base_hex($result, $value);
+        return Lib::crypt()->type_base_hex($r, $value);
     }
 
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function array_empty(&$result, $value) : bool
+    public function array_empty(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if ([] === $value) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -2606,14 +1427,14 @@ class TypeBoolModule
     }
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function array_not_empty(&$result, $value) : bool
+    public function array_not_empty(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (is_array($value) && ([] !== $value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -2622,14 +1443,14 @@ class TypeBoolModule
     }
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function any_not_array_empty(&$result, $value) : bool
+    public function any_not_array_empty(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if ([] !== $value) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -2639,972 +1460,1009 @@ class TypeBoolModule
 
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function key_exists(&$result, $value, $key) : bool
+    public function key_exists(&$r, $value, $key) : bool
     {
-        return Lib::arr()->type_key_exists($result, $value, $key);
+        return Lib::arr()->type_key_exists($r, $value, $key);
     }
 
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function array_plain(&$result, $value) : bool
+    public function array_plain(&$r, $value) : bool
     {
-        return Lib::arr()->type_array_plain($result, $value);
+        return Lib::arr()->type_array_plain($r, $value);
     }
 
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function list(&$result, $value, ?bool $isPlain = null) : bool
+    public function list(&$r, $value, ?bool $isPlain = null) : bool
     {
-        return Lib::arr()->type_list($result, $value, $isPlain);
+        return Lib::arr()->type_list($r, $value, $isPlain);
     }
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function list_sorted(&$result, $value, ?bool $isPlain = null) : bool
+    public function list_sorted(&$r, $value, ?bool $isPlain = null) : bool
     {
-        return Lib::arr()->type_list_sorted($result, $value, $isPlain);
-    }
-
-
-    /**
-     * @param array|null $result
-     */
-    public function dict(&$result, $value, ?bool $isPlain = null) : bool
-    {
-        return Lib::arr()->type_dict($result, $value, $isPlain);
-    }
-
-    /**
-     * @param array|null $result
-     */
-    public function dict_sorted(&$result, $value, ?bool $isPlain = null) : bool
-    {
-        return Lib::arr()->type_dict_sorted($result, $value, $isPlain);
+        return Lib::arr()->type_list_sorted($r, $value, $isPlain);
     }
 
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function table(&$result, $value) : bool
+    public function dict(&$r, $value, ?bool $isPlain = null) : bool
     {
-        return Lib::arr()->type_table($result, $value);
+        return Lib::arr()->type_dict($r, $value, $isPlain);
     }
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function matrix(&$result, $value) : bool
+    public function dict_sorted(&$r, $value, ?bool $isPlain = null) : bool
     {
-        return Lib::arr()->type_matrix($result, $value);
-    }
-
-    /**
-     * @param array|null $result
-     */
-    public function matrix_strict(&$result, $value) : bool
-    {
-        return Lib::arr()->type_matrix_strict($result, $value);
+        return Lib::arr()->type_dict_sorted($r, $value, $isPlain);
     }
 
 
     /**
-     * @param ArrPath|null $result
+     * @param array|null $r
      */
-    public function arrpath(&$result, $path, ?string $dot = null) : bool
+    public function table(&$r, $value) : bool
     {
-        return Lib::arr()->type_arrpath($result, $path, $dot);
+        return Lib::arr()->type_table($r, $value);
+    }
+
+    /**
+     * @param array|null $r
+     */
+    public function matrix(&$r, $value) : bool
+    {
+        return Lib::arr()->type_matrix($r, $value);
+    }
+
+    /**
+     * @param array|null $r
+     */
+    public function matrix_strict(&$r, $value) : bool
+    {
+        return Lib::arr()->type_matrix_strict($r, $value);
     }
 
 
     /**
-     * @param array|null $result
+     * @param ArrPath|null $r
      */
-    public function array_of_type(&$result, $value, string $type) : bool
+    public function arrpath(&$r, $path, ?string $dot = null) : bool
     {
-        return Lib::arr()->type_array_of_type($result, $value, $type);
+        return Lib::arr()->type_arrpath($r, $path, $dot);
+    }
+
+
+    /**
+     * @param array|null $r
+     */
+    public function array_of_type(&$r, $value, string $type) : bool
+    {
+        return Lib::arr()->type_array_of_type($r, $value, $type);
     }
 
     /**
-     * @param resource[]|null $result
+     * @param resource[]|null $r
      */
-    public function array_of_resource_type(&$result, $value, string $resourceType) : bool
+    public function array_of_resource_type(&$r, $value, string $resourceType) : bool
     {
-        return Lib::arr()->type_array_of_resource_type($result, $value, $resourceType);
-    }
-
-    /**
-     * @template T
-     *
-     * @param T[]             $result
-     * @param class-string<T> $className
-     */
-    public function array_of_a(&$result, $value, string $className) : bool
-    {
-        return Lib::arr()->type_array_of_a($result, $value, $className);
+        return Lib::arr()->type_array_of_resource_type($r, $value, $resourceType);
     }
 
     /**
      * @template T
      *
-     * @param T[]             $result
+     * @param T[]             $r
      * @param class-string<T> $className
      */
-    public function array_of_class(&$result, $value, string $className) : bool
+    public function array_of_a(&$r, $value, string $className) : bool
     {
-        return Lib::arr()->type_array_of_class($result, $value, $className);
+        return Lib::arr()->type_array_of_a($r, $value, $className);
     }
 
     /**
      * @template T
      *
-     * @param T[]             $result
+     * @param T[]             $r
      * @param class-string<T> $className
      */
-    public function array_of_subclass(&$result, $value, string $className) : bool
+    public function array_of_class(&$r, $value, string $className) : bool
     {
-        return Lib::arr()->type_array_of_subclass($result, $value, $className);
+        return Lib::arr()->type_array_of_class($r, $value, $className);
     }
 
     /**
-     * @param array|null $result
+     * @template T
+     *
+     * @param T[]             $r
+     * @param class-string<T> $className
      */
-    public function array_of_callback(&$result, $value, callable $fn, array $args = []) : bool
+    public function array_of_subclass(&$r, $value, string $className) : bool
     {
-        return Lib::arr()->type_array_of_callback($result, $value, $fn, $args);
-    }
-
-
-    /**
-     * @param string|null $result
-     */
-    public function regex(&$result, $value) : bool
-    {
-        return Lib::preg()->type_regex($result, $value);
-    }
-
-
-    /**
-     * @param AddressIpV4|AddressIpV6|null $result
-     */
-    public function address_ip(&$result, $value) : bool
-    {
-        return Lib::net()->type_address_ip($result, $value);
+        return Lib::arr()->type_array_of_subclass($r, $value, $className);
     }
 
     /**
-     * @param AddressIpV4|null $result
+     * @param array|null $r
      */
-    public function address_ip_v4(&$result, $value) : bool
+    public function array_of_callback(&$r, $value, callable $fn, array $args = []) : bool
     {
-        return Lib::net()->type_address_ip_v4($result, $value);
-    }
-
-    /**
-     * @param AddressIpV6|null $result
-     */
-    public function address_ip_v6(&$result, $value) : bool
-    {
-        return Lib::net()->type_address_ip_v6($result, $value);
-    }
-
-    /**
-     * @param string|null $result
-     */
-    public function address_mac(&$result, $value) : bool
-    {
-        return Lib::net()->type_address_mac($result, $value);
+        return Lib::arr()->type_array_of_callback($r, $value, $fn, $args);
     }
 
 
     /**
-     * @param SubnetV4|SubnetV6|null $result
+     * @param string|null $r
      */
-    public function subnet(&$result, $value, ?string $ipFallback = null) : bool
+    public function html_tag(&$r, $value) : bool
     {
-        return Lib::net()->type_subnet($result, $value, $ipFallback);
+        return Lib::format()->type_html_tag($r, $value);
     }
 
     /**
-     * @param SubnetV4|null $result
+     * @param string|null $r
      */
-    public function subnet_v4(&$result, $value, ?string $ipFallback = null) : bool
+    public function xml_tag(&$r, $value) : bool
     {
-        return Lib::net()->type_subnet_v4($result, $value, $ipFallback);
+        return Lib::format()->type_xml_tag($r, $value);
     }
 
     /**
-     * @param SubnetV6|null $result
+     * @param string|null $r
      */
-    public function subnet_v6(&$result, $value, ?string $ipFallback = null) : bool
+    public function xml_nstag(&$r, $value) : bool
     {
-        return Lib::net()->type_subnet_v6($result, $value, $ipFallback);
-    }
-
-
-    /**
-     * @param string|null $result
-     */
-    public function url(&$result, $value, $query = null, $fragment = null, array $refs = []) : bool
-    {
-        return Lib::url()->type_url($result, $value, $query, $fragment, $refs);
-    }
-
-    /**
-     * @param string|null $result
-     */
-    public function host(&$result, $value, array $refs = []) : bool
-    {
-        return Lib::url()->type_host($result, $value, $refs);
-    }
-
-    /**
-     * @param string|null $result
-     */
-    public function link(&$result, $value, $query = null, $fragment = null, array $refs = []) : bool
-    {
-        return Lib::url()->type_link($result, $value, $query, $fragment, $refs);
+        return Lib::format()->type_xml_nstag($r, $value);
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function uuid(&$result, $value) : bool
+    public function regex(&$r, $value) : bool
     {
-        return Lib::random()->type_uuid($result, $value);
+        return Lib::preg()->type_regex($r, $value);
     }
 
 
     /**
-     * @param array|\Countable|null $result
+     * @param AddressIpV4|AddressIpV6|null $r
      */
-    public function countable(&$result, $value) : bool
+    public function address_ip(&$r, $value) : bool
     {
-        return Lib::php()->type_countable($result, $value);
+        return Lib::net()->type_address_ip($r, $value);
     }
 
     /**
-     * @param \Countable|null $result
+     * @param AddressIpV4|null $r
      */
-    public function countable_object(&$result, $value) : bool
+    public function address_ip_v4(&$r, $value) : bool
     {
-        return Lib::php()->type_countable_object($result, $value);
+        return Lib::net()->type_address_ip_v4($r, $value);
     }
 
     /**
-     * @param string|array|\Countable|null $result
+     * @param AddressIpV6|null $r
      */
-    public function sizeable(&$result, $value) : bool
+    public function address_ip_v6(&$r, $value) : bool
     {
-        return Lib::php()->type_sizeable($result, $value);
-    }
-
-
-    /**
-     * @param \DateTimeZone|null $result
-     */
-    public function timezone(&$result, $timezone, ?array $allowedTimezoneTypes = null) : bool
-    {
-        return Lib::date()->type_timezone($result, $timezone, $allowedTimezoneTypes);
+        return Lib::net()->type_address_ip_v6($r, $value);
     }
 
     /**
-     * @param \DateTimeZone|null $result
+     * @param string|null $r
      */
-    public function timezone_offset(&$result, $timezoneOrOffset) : bool
+    public function address_mac(&$r, $value) : bool
     {
-        return Lib::date()->type_timezone_offset($result, $timezoneOrOffset);
-    }
-
-    /**
-     * @param \DateTimeZone|null $result
-     */
-    public function timezone_abbr(&$result, $timezoneOrAbbr) : bool
-    {
-        return Lib::date()->type_timezone_abbr($result, $timezoneOrAbbr);
-    }
-
-    /**
-     * @param \DateTimeZone|null $result
-     */
-    public function timezone_name(&$result, $timezoneOrName) : bool
-    {
-        return Lib::date()->type_timezone_name($result, $timezoneOrName);
-    }
-
-    /**
-     * @param \DateTimeZone|null $result
-     */
-    public function timezone_nameabbr(&$result, $timezoneOrNameOrAbbr) : bool
-    {
-        return Lib::date()->type_timezone_nameabbr($result, $timezoneOrNameOrAbbr);
+        return Lib::net()->type_address_mac($r, $value);
     }
 
 
     /**
-     * @param \DateTimeInterface|null $result
+     * @param SubnetV4|SubnetV6|null $r
      */
-    public function date(&$result, $datestring, $timezoneFallback = null) : bool
+    public function subnet(&$r, $value, ?string $ipFallback = null) : bool
     {
-        return Lib::date()->type_date($result, $datestring, $timezoneFallback);
+        return Lib::net()->type_subnet($r, $value, $ipFallback);
     }
 
     /**
-     * @param \DateTime|null $result
+     * @param SubnetV4|null $r
      */
-    public function adate(&$result, $datestring, $timezoneFallback = null) : bool
+    public function subnet_v4(&$r, $value, ?string $ipFallback = null) : bool
     {
-        return Lib::date()->type_adate($result, $datestring, $timezoneFallback);
+        return Lib::net()->type_subnet_v4($r, $value, $ipFallback);
     }
 
     /**
-     * @param \DateTimeImmutable|null $result
+     * @param SubnetV6|null $r
      */
-    public function idate(&$result, $datestring, $timezoneFallback = null) : bool
+    public function subnet_v6(&$r, $value, ?string $ipFallback = null) : bool
     {
-        return Lib::date()->type_idate($result, $datestring, $timezoneFallback);
-    }
-
-
-    /**
-     * @param \DateTimeInterface|null $result
-     */
-    public function date_formatted(&$result, $dateFormatted, $formats, $timezoneFallback = null) : bool
-    {
-        return Lib::date()->type_date_formatted($result, $dateFormatted, $formats, $timezoneFallback);
-    }
-
-    /**
-     * @param \DateTime|null $result
-     */
-    public function adate_formatted(&$result, $dateFormatted, $formats, $timezoneFallback = null) : bool
-    {
-        return Lib::date()->type_adate_formatted($result, $dateFormatted, $formats, $timezoneFallback);
-    }
-
-    /**
-     * @param \DateTimeImmutable|null $result
-     */
-    public function idate_formatted(&$result, $dateFormatted, $formats, $timezoneFallback = null) : bool
-    {
-        return Lib::date()->type_idate_formatted($result, $dateFormatted, $formats, $timezoneFallback);
+        return Lib::net()->type_subnet_v6($r, $value, $ipFallback);
     }
 
 
     /**
-     * @param \DateTimeInterface|null $result
+     * @param string|null $r
      */
-    public function date_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null) : bool
+    public function url(&$r, $value, $query = null, $fragment = null, array $refs = []) : bool
     {
-        return Lib::date()->type_date_tz($result, $datestring, $allowedTimezoneTypes);
+        return Lib::url()->type_url($r, $value, $query, $fragment, $refs);
     }
 
     /**
-     * @param \DateTime|null $result
+     * @param string|null $r
      */
-    public function adate_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null) : bool
+    public function host(&$r, $value, array $refs = []) : bool
     {
-        return Lib::date()->type_adate_tz($result, $datestring, $allowedTimezoneTypes);
+        return Lib::url()->type_host($r, $value, $refs);
     }
 
     /**
-     * @param \DateTimeImmutable|null $result
+     * @param string|null $r
      */
-    public function idate_tz(&$result, $datestring, ?array $allowedTimezoneTypes = null) : bool
+    public function link(&$r, $value, $query = null, $fragment = null, array $refs = []) : bool
     {
-        return Lib::date()->type_idate_tz($result, $datestring, $allowedTimezoneTypes);
-    }
-
-
-    /**
-     * @param \DateTimeInterface|null $result
-     */
-    public function date_tz_formatted(&$result, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
-    {
-        return Lib::date()->type_date_tz_formatted($result, $dateFormatted, $formats, $allowedTimezoneTypes);
-    }
-
-    /**
-     * @param \DateTime|null $result
-     */
-    public function adate_tz_formatted(&$result, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
-    {
-        return Lib::date()->type_adate_tz_formatted($result, $dateFormatted, $formats, $allowedTimezoneTypes);
-    }
-
-    /**
-     * @param \DateTimeImmutable|null $result
-     */
-    public function idate_tz_formatted(&$result, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
-    {
-        return Lib::date()->type_idate_tz_formatted($result, $dateFormatted, $formats, $allowedTimezoneTypes);
+        return Lib::url()->type_link($r, $value, $query, $fragment, $refs);
     }
 
 
     /**
-     * @param \DateTimeInterface|null $result
+     * @param string|null $r
      */
-    public function date_microtime(&$result, $microtime, $timezoneSet = null) : bool
+    public function uuid(&$r, $value) : bool
     {
-        return Lib::date()->type_date_microtime($result, $microtime, $timezoneSet);
-    }
-
-    /**
-     * @param \DateTime|null $result
-     */
-    public function adate_microtime(&$result, $microtime, $timezoneSet = null) : bool
-    {
-        return Lib::date()->type_adate_microtime($result, $microtime, $timezoneSet);
-    }
-
-    /**
-     * @param \DateTimeImmutable|null $result
-     */
-    public function idate_microtime(&$result, $microtime, $timezoneSet = null) : bool
-    {
-        return Lib::date()->type_idate_microtime($result, $microtime, $timezoneSet);
+        return Lib::random()->type_uuid($r, $value);
     }
 
 
     /**
-     * @param \DateInterval|null $result
+     * @param array|\Countable|null $r
      */
-    public function interval(&$result, $interval) : bool
+    public function countable(&$r, $value) : bool
     {
-        return Lib::date()->type_interval($result, $interval);
+        return Lib::php()->type_countable($r, $value);
     }
 
     /**
-     * @param \DateInterval|null $result
+     * @param \Countable|null $r
      */
-    public function interval_duration(&$result, $duration) : bool
+    public function countable_object(&$r, $value) : bool
     {
-        return Lib::date()->type_interval_duration($result, $duration);
+        return Lib::php()->type_countable_object($r, $value);
     }
 
     /**
-     * @param \DateInterval|null $result
+     * @param string|array|\Countable|null $r
      */
-    public function interval_datestring(&$result, $datestring) : bool
+    public function sizeable(&$r, $value) : bool
     {
-        return Lib::date()->type_interval_datestring($result, $datestring);
+        return Lib::php()->type_sizeable($r, $value);
+    }
+
+
+    /**
+     * @param \DateTimeZone|null $r
+     */
+    public function timezone(&$r, $timezone, ?array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_timezone($r, $timezone, $allowedTimezoneTypes);
     }
 
     /**
-     * @param \DateInterval|null $result
+     * @param \DateTimeZone|null $r
      */
-    public function interval_microtime(&$result, $microtime) : bool
+    public function timezone_offset(&$r, $timezoneOrOffset) : bool
     {
-        return Lib::date()->type_interval_microtime($result, $microtime);
+        return Lib::date()->type_timezone_offset($r, $timezoneOrOffset);
     }
 
     /**
-     * @param \DateInterval|null $result
+     * @param \DateTimeZone|null $r
      */
-    public function interval_ago(&$result, $date, ?\DateTimeInterface $from = null, ?bool $reverse = null) : bool
+    public function timezone_abbr(&$r, $timezoneOrAbbr) : bool
     {
-        return Lib::date()->type_interval_ago($result, $date, $from, $reverse);
+        return Lib::date()->type_timezone_abbr($r, $timezoneOrAbbr);
+    }
+
+    /**
+     * @param \DateTimeZone|null $r
+     */
+    public function timezone_name(&$r, $timezoneOrName) : bool
+    {
+        return Lib::date()->type_timezone_name($r, $timezoneOrName);
+    }
+
+    /**
+     * @param \DateTimeZone|null $r
+     */
+    public function timezone_nameabbr(&$r, $timezoneOrNameOrAbbr) : bool
+    {
+        return Lib::date()->type_timezone_nameabbr($r, $timezoneOrNameOrAbbr);
+    }
+
+
+    /**
+     * @param \DateTimeInterface|null $r
+     */
+    public function date(&$r, $datestring, $timezoneFallback = null) : bool
+    {
+        return Lib::date()->type_date($r, $datestring, $timezoneFallback);
+    }
+
+    /**
+     * @param \DateTime|null $r
+     */
+    public function adate(&$r, $datestring, $timezoneFallback = null) : bool
+    {
+        return Lib::date()->type_adate($r, $datestring, $timezoneFallback);
+    }
+
+    /**
+     * @param \DateTimeImmutable|null $r
+     */
+    public function idate(&$r, $datestring, $timezoneFallback = null) : bool
+    {
+        return Lib::date()->type_idate($r, $datestring, $timezoneFallback);
+    }
+
+
+    /**
+     * @param \DateTimeInterface|null $r
+     */
+    public function date_formatted(&$r, $dateFormatted, $formats, $timezoneFallback = null) : bool
+    {
+        return Lib::date()->type_date_formatted($r, $dateFormatted, $formats, $timezoneFallback);
+    }
+
+    /**
+     * @param \DateTime|null $r
+     */
+    public function adate_formatted(&$r, $dateFormatted, $formats, $timezoneFallback = null) : bool
+    {
+        return Lib::date()->type_adate_formatted($r, $dateFormatted, $formats, $timezoneFallback);
+    }
+
+    /**
+     * @param \DateTimeImmutable|null $r
+     */
+    public function idate_formatted(&$r, $dateFormatted, $formats, $timezoneFallback = null) : bool
+    {
+        return Lib::date()->type_idate_formatted($r, $dateFormatted, $formats, $timezoneFallback);
+    }
+
+
+    /**
+     * @param \DateTimeInterface|null $r
+     */
+    public function date_tz(&$r, $datestring, ?array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_date_tz($r, $datestring, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTime|null $r
+     */
+    public function adate_tz(&$r, $datestring, ?array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_adate_tz($r, $datestring, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTimeImmutable|null $r
+     */
+    public function idate_tz(&$r, $datestring, ?array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_idate_tz($r, $datestring, $allowedTimezoneTypes);
+    }
+
+
+    /**
+     * @param \DateTimeInterface|null $r
+     */
+    public function date_tz_formatted(&$r, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_date_tz_formatted($r, $dateFormatted, $formats, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTime|null $r
+     */
+    public function adate_tz_formatted(&$r, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_adate_tz_formatted($r, $dateFormatted, $formats, $allowedTimezoneTypes);
+    }
+
+    /**
+     * @param \DateTimeImmutable|null $r
+     */
+    public function idate_tz_formatted(&$r, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null) : bool
+    {
+        return Lib::date()->type_idate_tz_formatted($r, $dateFormatted, $formats, $allowedTimezoneTypes);
+    }
+
+
+    /**
+     * @param \DateTimeInterface|null $r
+     */
+    public function date_microtime(&$r, $microtime, $timezoneSet = null) : bool
+    {
+        return Lib::date()->type_date_microtime($r, $microtime, $timezoneSet);
+    }
+
+    /**
+     * @param \DateTime|null $r
+     */
+    public function adate_microtime(&$r, $microtime, $timezoneSet = null) : bool
+    {
+        return Lib::date()->type_adate_microtime($r, $microtime, $timezoneSet);
+    }
+
+    /**
+     * @param \DateTimeImmutable|null $r
+     */
+    public function idate_microtime(&$r, $microtime, $timezoneSet = null) : bool
+    {
+        return Lib::date()->type_idate_microtime($r, $microtime, $timezoneSet);
+    }
+
+
+    /**
+     * @param \DateInterval|null $r
+     */
+    public function interval(&$r, $interval) : bool
+    {
+        return Lib::date()->type_interval($r, $interval);
+    }
+
+    /**
+     * @param \DateInterval|null $r
+     */
+    public function interval_duration(&$r, $duration) : bool
+    {
+        return Lib::date()->type_interval_duration($r, $duration);
+    }
+
+    /**
+     * @param \DateInterval|null $r
+     */
+    public function interval_datestring(&$r, $datestring) : bool
+    {
+        return Lib::date()->type_interval_datestring($r, $datestring);
+    }
+
+    /**
+     * @param \DateInterval|null $r
+     */
+    public function interval_microtime(&$r, $microtime) : bool
+    {
+        return Lib::date()->type_interval_microtime($r, $microtime);
+    }
+
+    /**
+     * @param \DateInterval|null $r
+     */
+    public function interval_ago(&$r, $date, ?\DateTimeInterface $from = null, ?bool $reverse = null) : bool
+    {
+        return Lib::date()->type_interval_ago($r, $date, $from, $reverse);
     }
 
 
     /**
      * @template-covariant T of object
      *
-     * @param class-string<T>|null    $result
+     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
      */
-    public function struct_exists(&$result, $value, ?int $flags = null)
+    public function struct_exists(&$r, $value, ?int $flags = null)
     {
-        return Lib::php()->type_struct_exists($result, $value, $flags);
+        return Lib::php()->type_struct_exists($r, $value, $flags);
     }
 
 
     /**
      * @template-covariant T of object
      *
-     * @param class-string<T>|null    $result
+     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
      */
-    public function struct(&$result, $value, ?int $flags = null) : bool
+    public function struct(&$r, $value, ?int $flags = null) : bool
     {
-        return Lib::php()->type_struct($result, $value, $flags);
+        return Lib::php()->type_struct($r, $value, $flags);
     }
 
     /**
      * @template-covariant T of object
      *
-     * @param class-string<T>|null    $result
+     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
      */
-    public function struct_class(&$result, $value, ?int $flags = null) : bool
+    public function struct_class(&$r, $value, ?int $flags = null) : bool
     {
-        return Lib::php()->type_struct_class($result, $value, $flags);
+        return Lib::php()->type_struct_class($r, $value, $flags);
     }
 
     /**
-     * @param class-string|null $result
+     * @param class-string|null $r
      */
-    public function struct_interface(&$result, $value, ?int $flags = null) : bool
+    public function struct_interface(&$r, $value, ?int $flags = null) : bool
     {
-        return Lib::php()->type_struct_interface($result, $value, $flags);
+        return Lib::php()->type_struct_interface($r, $value, $flags);
     }
 
     /**
-     * @param class-string|null $result
+     * @param class-string|null $r
      */
-    public function struct_trait(&$result, $value, ?int $flags = null) : bool
+    public function struct_trait(&$r, $value, ?int $flags = null) : bool
     {
-        return Lib::php()->type_struct_trait($result, $value, $flags);
+        return Lib::php()->type_struct_trait($r, $value, $flags);
     }
 
     /**
      * @template-covariant T of \UnitEnum
      *
-     * @param class-string<T>|null    $result
+     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
      */
-    public function struct_enum(&$result, $value, ?int $flags = null) : bool
+    public function struct_enum(&$r, $value, ?int $flags = null) : bool
     {
-        return Lib::php()->type_struct_enum($result, $value, $flags);
+        return Lib::php()->type_struct_enum($r, $value, $flags);
     }
 
 
     /**
      * @template-covariant T of object
      *
-     * @param class-string<T>|null    $result
+     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
      */
-    public function struct_fqcn(&$result, $value, ?int $flags = null) : bool
+    public function struct_fqcn(&$r, $value, ?int $flags = null) : bool
     {
-        return Lib::php()->type_struct_fqcn($result, $value, $flags);
+        return Lib::php()->type_struct_fqcn($r, $value, $flags);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function struct_namespace(&$result, $value, ?int $flags = null) : bool
+    public function struct_namespace(&$r, $value, ?int $flags = null) : bool
     {
-        return Lib::php()->type_struct_namespace($result, $value, $flags);
+        return Lib::php()->type_struct_namespace($r, $value, $flags);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function struct_basename(&$result, $value, ?int $flags = null) : bool
+    public function struct_basename(&$r, $value, ?int $flags = null) : bool
     {
-        return Lib::php()->type_struct_basename($result, $value, $flags);
-    }
-
-
-    /**
-     * @param resource|null $result
-     */
-    public function resource(&$result, $value) : bool
-    {
-        return Lib::php()->type_resource($result, $value);
-    }
-
-    /**
-     * @param resource|null $result
-     */
-    public function any_not_resource(&$result, $value) : bool
-    {
-        return Lib::php()->type_any_not_resource($result, $value);
+        return Lib::php()->type_struct_basename($r, $value, $flags);
     }
 
 
     /**
-     * @param resource|null $result
+     * @param resource|null $r
      */
-    public function resource_opened(&$result, $value) : bool
+    public function resource(&$r, $value, ?string $resourceType = null) : bool
     {
-        return Lib::php()->type_resource_opened($result, $value);
+        return Lib::php()->type_resource($r, $value, $resourceType);
     }
 
     /**
-     * @param resource|null $result
+     * @param resource|null $r
      */
-    public function resource_closed(&$result, $value) : bool
+    public function resource_opened(&$r, $value, ?string $resourceType = null) : bool
     {
-        return Lib::php()->type_resource_closed($result, $value);
+        return Lib::php()->type_resource_opened($r, $value, $resourceType);
+    }
+
+    /**
+     * @param resource|null $r
+     */
+    public function resource_closed(&$r, $value) : bool
+    {
+        return Lib::php()->type_resource_closed($r, $value);
+    }
+
+    /**
+     * @param resource|null $r
+     */
+    public function any_not_resource(&$r, $value) : bool
+    {
+        return Lib::php()->type_any_not_resource($r, $value);
+    }
+
+
+    /**
+     * @param resource|\CurlHandle|null $r
+     */
+    public function curl(&$r, $value) : bool
+    {
+        return Lib::php()->type_curl($r, $value);
+    }
+
+    /**
+     * @param resource|\Socket|null $r
+     */
+    public function socket(&$r, $value) : bool
+    {
+        return Lib::php()->type_socket($r, $value);
     }
 
 
     /**
      * @template-covariant T of \UnitEnum
      *
-     * @param T|null               $result
+     * @param T|null               $r
      * @param T|int|string         $value
      * @param class-string<T>|null $enumClass
      */
-    public function enum_case(&$result, $value, ?string $enumClass = null) : bool
+    public function enum_case(&$r, $value, ?string $enumClass = null) : bool
     {
-        return Lib::php()->type_enum_case($result, $value, $enumClass);
+        return Lib::php()->type_enum_case($r, $value, $enumClass);
     }
 
 
     /**
-     * @param array{ 0: class-string, 1: string }|null $result
+     * @param array{ 0: class-string, 1: string }|null $r
      */
-    public function method_array(&$result, $value) : bool
+    public function method_array(&$r, $value) : bool
     {
-        return Lib::php()->type_method_array($result, $value);
+        return Lib::php()->type_method_array($r, $value);
     }
 
     /**
-     * @param string|null            $result
-     * @param array{ 0: array|null } $refs
+     * @param string|null $r
      */
-    public function method_string(&$result, $value, array $refs = []) : bool
+    public function method_string(&$r, $value, array $refs = []) : bool
     {
-        return Lib::php()->type_method_string($result, $value, $refs);
+        return Lib::php()->type_method_string($r, $value, $refs);
     }
 
 
     /**
-     * @param callable|null $result
+     * @param callable|null $r
      * @param string|object $newScope
      */
-    public function callable(&$result, $value, $newScope = 'static') : bool
+    public function callable(&$r, $value, $newScope = 'static') : bool
     {
-        return Lib::php()->type_callable_object($result, $value, $newScope);
+        return Lib::php()->type_callable_object($r, $value, $newScope);
     }
 
     /**
-     * @param callable|\Closure|object|null $result
+     * @param callable|\Closure|object|null $r
      */
-    public function callable_object(&$result, $value, $newScope = 'static') : bool
+    public function callable_object(&$r, $value, $newScope = 'static') : bool
     {
-        return Lib::php()->type_callable_object($result, $value, $newScope);
+        return Lib::php()->type_callable_object($r, $value, $newScope);
     }
 
     /**
-     * @param callable|object|null $result
+     * @param callable|object|null $r
      */
-    public function callable_object_closure(&$result, $value, $newScope = 'static') : bool
+    public function callable_object_closure(&$r, $value, $newScope = 'static') : bool
     {
-        return Lib::php()->type_callable_object_closure($result, $value, $newScope);
+        return Lib::php()->type_callable_object_closure($r, $value, $newScope);
     }
 
     /**
-     * @param callable|object|null $result
+     * @param callable|object|null $r
      */
-    public function callable_object_invokable(&$result, $value, $newScope = 'static') : bool
+    public function callable_object_invokable(&$r, $value, $newScope = 'static') : bool
     {
-        return Lib::php()->type_callable_object_invokable($result, $value, $newScope);
+        return Lib::php()->type_callable_object_invokable($r, $value, $newScope);
     }
 
     /**
-     * @param callable|array{ 0: object|class-string, 1: string }|null $result
+     * @param callable|array{ 0: object|class-string, 1: string }|null $r
      * @param string|object                                            $newScope
      */
-    public function callable_array(&$result, $value, $newScope = 'static') : bool
+    public function callable_array(&$r, $value, $newScope = 'static') : bool
     {
-        return Lib::php()->type_callable_array($result, $value, $newScope);
+        return Lib::php()->type_callable_array($r, $value, $newScope);
     }
 
     /**
-     * @param callable|array{ 0: object|class-string, 1: string }|null $result
+     * @param callable|array{ 0: object|class-string, 1: string }|null $r
      * @param string|object                                            $newScope
      */
-    public function callable_array_method(&$result, $value, $newScope = 'static') : bool
+    public function callable_array_method(&$r, $value, $newScope = 'static') : bool
     {
-        return Lib::php()->type_callable_array_method($result, $value, $newScope);
+        return Lib::php()->type_callable_array_method($r, $value, $newScope);
     }
 
     /**
-     * @param callable|array{ 0: class-string, 1: string }|null $result
+     * @param callable|array{ 0: class-string, 1: string }|null $r
      * @param string|object                                     $newScope
      */
-    public function callable_array_method_static(&$result, $value, $newScope = 'static') : bool
+    public function callable_array_method_static(&$r, $value, $newScope = 'static') : bool
     {
-        return Lib::php()->type_callable_array_method_static($result, $value, $newScope);
+        return Lib::php()->type_callable_array_method_static($r, $value, $newScope);
     }
 
     /**
-     * @param callable|array{ 0: object, 1: string }|null $result
+     * @param callable|array{ 0: object, 1: string }|null $r
      * @param string|object                               $newScope
      */
-    public function callable_array_method_non_static(&$result, $value, $newScope = 'static') : bool
+    public function callable_array_method_non_static(&$r, $value, $newScope = 'static') : bool
     {
-        return Lib::php()->type_callable_array_method_non_static($result, $value, $newScope);
+        return Lib::php()->type_callable_array_method_non_static($r, $value, $newScope);
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function callable_string(&$result, $value, $newScope = 'static') : bool
+    public function callable_string(&$r, $value, $newScope = 'static') : bool
     {
-        return Lib::php()->type_callable_string($result, $value, $newScope);
+        return Lib::php()->type_callable_string($r, $value, $newScope);
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function callable_string_function(&$result, $value) : bool
+    public function callable_string_function(&$r, $value) : bool
     {
-        return Lib::php()->type_callable_string_function($result, $value);
+        return Lib::php()->type_callable_string_function($r, $value);
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function callable_string_function_internal(&$result, $value) : bool
+    public function callable_string_function_internal(&$r, $value) : bool
     {
-        return Lib::php()->type_callable_string_function_internal($result, $value);
+        return Lib::php()->type_callable_string_function_internal($r, $value);
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function callable_string_function_non_internal(&$result, $value) : bool
+    public function callable_string_function_non_internal(&$r, $value) : bool
     {
-        return Lib::php()->type_callable_string_function_non_internal($result, $value);
+        return Lib::php()->type_callable_string_function_non_internal($r, $value);
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function callable_string_method_static(&$result, $value, $newScope = 'static') : bool
+    public function callable_string_method_static(&$r, $value, $newScope = 'static') : bool
     {
-        return Lib::php()->type_callable_string_method_static($result, $value, $newScope);
+        return Lib::php()->type_callable_string_method_static($r, $value, $newScope);
     }
 
 
     /**
      * @template T
      *
-     * @param mixed|T        $result
+     * @param mixed|T        $r
      * @param int|string     $key
      * @param array{ 0?: T } $set
      */
-    public function ref(&$result, $key, array $refs = [], array $set = []) : bool
+    public function ref(&$r, $key, array $refs = [], array $set = []) : bool
     {
-        return Lib::php()->type_ref($result, $key, $refs, $set);
+        return Lib::php()->type_ref($r, $key, $refs, $set);
     }
 
 
     /**
-     * @param int|null $result
+     * @param int|null $r
      * @param string   $value
      */
-    public function chmod(&$result, $value) : bool
+    public function chmod(&$r, $value) : bool
     {
-        return Lib::fs()->type_chmod($result, $value);
+        return Lib::fs()->type_chmod($r, $value);
     }
 
 
     /**
-     * @param string|null            $result
+     * @param string|null            $r
      * @param array{ 0: array|null } $refs
      */
-    public function path(&$result, $value, array $refs = []) : bool
+    public function path(&$r, $value, array $refs = []) : bool
     {
-        return Lib::fs()->type_path($result, $value, $refs);
+        return Lib::fs()->type_path($r, $value, $refs);
     }
 
     /**
-     * @param string|null            $result
+     * @param string|null $r
+     */
+    public function realpath(&$r, $value, ?bool $allowSymlink = null, array $refs = []) : bool
+    {
+        return Lib::fs()->type_realpath($r, $value, $allowSymlink, $refs);
+    }
+
+    /**
+     * @param string|null            $r
      * @param array{ 0: array|null } $refs
      */
-    public function realpath(&$result, $value, ?bool $allowSymlink = null, array $refs = []) : bool
+    public function freepath(&$r, $value, array $refs = []) : bool
     {
-        return Lib::fs()->type_realpath($result, $value, $allowSymlink, $refs);
-    }
-
-    /**
-     * @param string|null            $result
-     * @param array{ 0: array|null } $refs
-     */
-    public function freepath(&$result, $value, array $refs = []) : bool
-    {
-        return Lib::fs()->type_freepath($result, $value, $refs);
+        return Lib::fs()->type_freepath($r, $value, $refs);
     }
 
 
     /**
-     * @param string|null            $result
-     * @param array{ 0: array|null } $refs
+     * @param string|null $r
      */
     public function dirpath(
-        &$result,
+        &$r,
         $value,
         ?bool $allowExists = null,
         ?bool $allowSymlink = null,
         array $refs = []
     ) : bool
     {
-        return Lib::fs()->type_dirpath($result, $value, $allowExists, $allowSymlink, $refs);
+        return Lib::fs()->type_dirpath($r, $value, $allowExists, $allowSymlink, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
     public function filepath(
-        &$result,
+        &$r,
         $value,
         ?bool $allowExists,
         ?bool $allowSymlink = null,
         array $refs = []
     ) : bool
     {
-        return Lib::fs()->type_filepath($result, $value, $allowExists, $allowSymlink, $refs);
+        return Lib::fs()->type_filepath($r, $value, $allowExists, $allowSymlink, $refs);
     }
 
 
     /**
-     * @param string|null            $result
+     * @param string|null            $r
      * @param array{ 0: array|null } $refs
      */
-    public function dirpath_realpath(&$result, $value, ?bool $allowSymlink = null, array $refs = []) : bool
+    public function dirpath_realpath(&$r, $value, ?bool $allowSymlink = null, array $refs = []) : bool
     {
-        return Lib::fs()->type_dirpath_realpath($result, $value, $allowSymlink, $refs);
+        return Lib::fs()->type_dirpath_realpath($r, $value, $allowSymlink, $refs);
     }
 
     /**
-     * @param string|null            $result
-     * @param array{ 0: array|null } $refs
+     * @param string|null $r
      */
-    public function filepath_realpath(&$result, $value, ?bool $allowSymlink = null, array $refs = []) : bool
+    public function filepath_realpath(&$r, $value, ?bool $allowSymlink = null, array $refs = []) : bool
     {
-        return Lib::fs()->type_filepath_realpath($result, $value, $allowSymlink, $refs);
+        return Lib::fs()->type_filepath_realpath($r, $value, $allowSymlink, $refs);
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function filename(&$result, $value) : bool
+    public function filename(&$r, $value) : bool
     {
-        return Lib::fs()->type_filename($result, $value);
+        return Lib::fs()->type_filename($r, $value);
     }
 
 
     /**
-     * @param \SplFileInfo|null $result
+     * @param \SplFileInfo|null $r
      */
     public function file(
-        &$result,
+        &$r,
         $value,
         ?array $extensions = null,
         ?array $mimeTypes = null,
         ?array $filters = null
     ) : bool
     {
-        return Lib::fs()->type_file($result, $value, $extensions, $mimeTypes, $filters);
+        return Lib::fs()->type_file($r, $value, $extensions, $mimeTypes, $filters);
     }
 
     /**
-     * @param \SplFileInfo|null $result
+     * @param \SplFileInfo|null $r
      */
     public function image(
-        &$result,
+        &$r,
         $value,
         ?array $extensions = null,
         ?array $mimeTypes = null,
         ?array $filters = null
     ) : bool
     {
-        return Lib::fs()->type_image($result, $value, $extensions, $mimeTypes, $filters);
+        return Lib::fs()->type_image($r, $value, $extensions, $mimeTypes, $filters);
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function email(&$result, $value, ?array $filters = null, array $refs = []) : bool
+    public function email(&$r, $value, ?array $filters = null, array $refs = []) : bool
     {
-        return Lib::social()->type_email($result, $value, $filters, $refs);
+        return Lib::social()->type_email($r, $value, $filters, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function email_fake(&$result, $value, array $refs = []) : bool
+    public function email_fake(&$r, $value, array $refs = []) : bool
     {
-        return Lib::social()->type_email_fake($result, $value, $refs);
+        return Lib::social()->type_email_fake($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function email_non_fake(&$result, $value, ?array $filters = null, array $refs = []) : bool
+    public function email_non_fake(&$r, $value, ?array $filters = null, array $refs = []) : bool
     {
-        return Lib::social()->type_email_non_fake($result, $value, $filters, $refs);
-    }
-
-
-    /**
-     * @param string|null $result
-     */
-    public function phone(&$result, $value, array $refs = []) : bool
-    {
-        return Lib::social()->type_phone($result, $value, $refs);
-    }
-
-    /**
-     * @param string|null $result
-     */
-    public function phone_fake(&$result, $value, array $refs = []) : bool
-    {
-        return Lib::social()->type_phone_fake($result, $value, $refs);
-    }
-
-    /**
-     * @param string|null $result
-     */
-    public function phone_non_fake(&$result, $value, array $refs = []) : bool
-    {
-        return Lib::social()->type_phone_non_fake($result, $value, $refs);
-    }
-
-    /**
-     * @param string|null $result
-     */
-    public function phone_real(&$result, $value, ?string $region = '', array $refs = []) : bool
-    {
-        return Lib::social()->type_phone_real($result, $value, $region, $refs);
+        return Lib::social()->type_email_non_fake($r, $value, $filters, $refs);
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function tel(&$result, $value, array $refs = []) : bool
+    public function phone(&$r, $value, array $refs = []) : bool
     {
-        return Lib::social()->type_tel($result, $value, $refs);
+        return Lib::social()->type_phone($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function tel_fake(&$result, $value, array $refs = []) : bool
+    public function phone_fake(&$r, $value, array $refs = []) : bool
     {
-        return Lib::social()->type_tel_fake($result, $value, $refs);
+        return Lib::social()->type_phone_fake($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function tel_non_fake(&$result, $value, array $refs = []) : bool
+    public function phone_non_fake(&$r, $value, array $refs = []) : bool
     {
-        return Lib::social()->type_tel_non_fake($result, $value, $refs);
+        return Lib::social()->type_phone_non_fake($r, $value, $refs);
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function tel_real(&$result, $value, ?string $region = '', array $refs = []) : bool
+    public function phone_real(&$r, $value, ?string $region = '', array $refs = []) : bool
     {
-        return Lib::social()->type_tel_real($result, $value, $region, $refs);
+        return Lib::social()->type_phone_real($r, $value, $region, $refs);
+    }
+
+
+    /**
+     * @param string|null $r
+     */
+    public function tel(&$r, $value, array $refs = []) : bool
+    {
+        return Lib::social()->type_tel($r, $value, $refs);
+    }
+
+    /**
+     * @param string|null $r
+     */
+    public function tel_fake(&$r, $value, array $refs = []) : bool
+    {
+        return Lib::social()->type_tel_fake($r, $value, $refs);
+    }
+
+    /**
+     * @param string|null $r
+     */
+    public function tel_non_fake(&$r, $value, array $refs = []) : bool
+    {
+        return Lib::social()->type_tel_non_fake($r, $value, $refs);
+    }
+
+    /**
+     * @param string|null $r
+     */
+    public function tel_real(&$r, $value, ?string $region = '', array $refs = []) : bool
+    {
+        return Lib::social()->type_tel_real($r, $value, $region, $refs);
     }
 }

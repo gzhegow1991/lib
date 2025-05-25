@@ -8,16 +8,16 @@ use Gzhegow\Lib\Lib;
 class DefaultCallableParser implements CallableParserInterface
 {
     /**
-     * @param array{ 0: class-string, 1: string }|null $result
+     * @param array{ 0: class-string, 1: string }|null $r
      */
-    public function typeMethodArray(&$result, $value) : bool
+    public function typeMethodArray(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         $methodArray = null
-            ?? $this->parse_method_array_from_object($value)
-            ?? $this->parse_method_array_from_array($value)
-            ?? $this->parse_method_array_from_string($value);
+            ?? $this->parseMethodArrayFromObject($value)
+            ?? $this->parseMethodArrayFromArray($value)
+            ?? $this->parseMethodArrayFromString($value);
 
         if (null === $methodArray) {
             // > passed value is not a method or a \Closure
@@ -36,7 +36,7 @@ class DefaultCallableParser implements CallableParserInterface
             if (false
                 || ($theMagic === '__invoke')
             ) {
-                $result = [ $theClass, $theMagic ];
+                $r = [ $theClass, $theMagic ];
 
                 return true;
             }
@@ -46,7 +46,7 @@ class DefaultCallableParser implements CallableParserInterface
         } elseif ($theMethod) {
             // > method provided and exists
 
-            $result = [ $theClass, $theMethod ];
+            $r = [ $theClass, $theMethod ];
 
             return true;
         }
@@ -55,11 +55,11 @@ class DefaultCallableParser implements CallableParserInterface
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function typeMethodString(&$result, $value, array $refs = []) : bool
+    public function typeMethodString(&$r, $value, array $refs = []) : bool
     {
-        $result = null;
+        $r = null;
 
         $withMethodArray = array_key_exists(0, $refs);
         if ($withMethodArray) {
@@ -68,9 +68,9 @@ class DefaultCallableParser implements CallableParserInterface
         $refResultArray = null;
 
         $methodArray = null
-            ?? $this->parse_method_array_from_object($value)
-            ?? $this->parse_method_array_from_array($value)
-            ?? $this->parse_method_array_from_string($value);
+            ?? $this->parseMethodArrayFromObject($value)
+            ?? $this->parseMethodArrayFromArray($value)
+            ?? $this->parseMethodArrayFromString($value);
 
         if (null === $methodArray) {
             // > passed value is not a method or a \Closure
@@ -85,10 +85,10 @@ class DefaultCallableParser implements CallableParserInterface
 
         } elseif ($theMagic) {
             // > method not provided, but but class or object has magic method __invoke()
-            if (
-                ($theMagic === '__invoke')
+            if (false
+                || ($theMagic === '__invoke')
             ) {
-                $result = "{$theClass}->__invoke";
+                $r = "{$theClass}->__invoke";
 
                 $refResultArray = [ $theClass, '__invoke' ];
                 unset($refResultArray);
@@ -101,11 +101,11 @@ class DefaultCallableParser implements CallableParserInterface
         } elseif ($theMethod) {
             // > method provided and exists
 
-            if (
-                ($theMethod === '__invoke')
+            if (false
+                || ($theMethod === '__invoke')
                 || ($theMethod === '__call')
             ) {
-                $result = "{$theClass}->{$theMethod}";
+                $r = "{$theClass}->{$theMethod}";
 
                 $refResultArray = [ $theClass, $theMethod ];
                 unset($refResultArray);
@@ -113,10 +113,10 @@ class DefaultCallableParser implements CallableParserInterface
                 return true;
             }
 
-            if (
-                ($theMethod === '__callStatic')
+            if (false
+                || ($theMethod === '__callStatic')
             ) {
-                $result = "{$theClass}::{$theMethod}";
+                $r = "{$theClass}::{$theMethod}";
 
                 $refResultArray = [ $theClass, $theMethod ];
                 unset($refResultArray);
@@ -136,7 +136,7 @@ class DefaultCallableParser implements CallableParserInterface
                 return false;
             }
 
-            $result = $isStatic
+            $r = $isStatic
                 ? "{$theClass}::{$theMethod}"
                 : "{$theClass}->{$theMethod}";
 
@@ -150,41 +150,41 @@ class DefaultCallableParser implements CallableParserInterface
 
 
     /**
-     * @param callable|null $result
+     * @param callable|null $r
      * @param string|object $newScope
      */
-    public function typeCallable(&$result, $value, $newScope = 'static') : bool
+    public function typeCallable(&$r, $value, $newScope = 'static') : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->isCallable($value, $newScope)) {
             return false;
         }
 
         if (PHP_VERSION_ID >= 80000) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
 
         if (is_object($value)) {
             // > \Closure or invokable
-            $result = $value;
+            $r = $value;
 
             return true;
         }
 
-        $function = $this->parse_function($value);
+        $function = $this->parseFunction($value);
         if (null !== $function) {
             // > plain function
-            $result = $value;
+            $r = $value;
 
             return true;
         }
 
         $methodArray = null
-            ?? $this->parse_method_array_from_array($value)
-            ?? $this->parse_method_array_from_string($value);
+            ?? $this->parseMethodArrayFromArray($value)
+            ?? $this->parseMethodArrayFromString($value);
 
         if (null === $methodArray) {
             return false;
@@ -194,22 +194,22 @@ class DefaultCallableParser implements CallableParserInterface
 
         if ($theObject) {
             // > array with object
-            $result = $value;
+            $r = $value;
 
             return true;
         }
 
-        if (
-            ($theMethod === '__callStatic')
+        if (false
+            || ($theMethod === '__callStatic')
             || ($theMagic === '__callStatic')
         ) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
 
-        if (
-            ($theMethod === '__invoke')
+        if (false
+            || ($theMethod === '__invoke')
             || ($theMethod === '__call')
             || ($theMagic === '__invoke')
             || ($theMagic === '__call')
@@ -228,18 +228,18 @@ class DefaultCallableParser implements CallableParserInterface
             return false;
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
 
     /**
-     * @param callable|\Closure|object|null $result
+     * @param callable|\Closure|object|null $r
      */
-    public function typeCallableObject(&$result, $value, $newScope = 'static') : bool
+    public function typeCallableObject(&$r, $value, $newScope = 'static') : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_object($value)) {
             return false;
@@ -247,14 +247,14 @@ class DefaultCallableParser implements CallableParserInterface
 
         $status = $this->typeCallableObjectClosure($closure, $value, $newScope);
         if ($status) {
-            $result = $closure;
+            $r = $closure;
 
             return true;
         }
 
         $status = $this->typeCallableObjectInvokable($invokable, $value, $newScope);
         if ($status) {
-            $result = $invokable;
+            $r = $invokable;
 
             return true;
         }
@@ -263,11 +263,11 @@ class DefaultCallableParser implements CallableParserInterface
     }
 
     /**
-     * @param callable|object|null $result
+     * @param callable|object|null $r
      */
-    public function typeCallableObjectClosure(&$result, $value, $newScope = 'static') : bool
+    public function typeCallableObjectClosure(&$r, $value, $newScope = 'static') : bool
     {
-        $result = null;
+        $r = null;
 
         if (! ($value instanceof \Closure)) {
             return false;
@@ -277,19 +277,19 @@ class DefaultCallableParser implements CallableParserInterface
             return false;
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
     /**
-     * @param callable|object|null $result
+     * @param callable|object|null $r
      */
-    public function typeCallableObjectInvokable(&$result, $value, $newScope = 'static') : bool
+    public function typeCallableObjectInvokable(&$r, $value, $newScope = 'static') : bool
     {
-        $result = null;
+        $r = null;
 
-        $invokable = $this->parse_invokable($value);
+        $invokable = $this->parseInvokable($value);
 
         if (null === $invokable) {
             return false;
@@ -299,19 +299,19 @@ class DefaultCallableParser implements CallableParserInterface
             return false;
         }
 
-        $result = $invokable;
+        $r = $invokable;
 
         return true;
     }
 
 
     /**
-     * @param callable|array{ 0: object|class-string, 1: string }|null $result
+     * @param callable|array{ 0: object|class-string, 1: string }|null $r
      * @param string|object                                            $newScope
      */
-    public function typeCallableArray(&$result, $value, $newScope = 'static') : bool
+    public function typeCallableArray(&$r, $value, $newScope = 'static') : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
@@ -319,7 +319,7 @@ class DefaultCallableParser implements CallableParserInterface
 
         $status = $this->typeCallableArrayMethod($method, $value, $newScope);
         if ($status) {
-            $result = $method;
+            $r = $method;
 
             return true;
         }
@@ -328,18 +328,18 @@ class DefaultCallableParser implements CallableParserInterface
     }
 
     /**
-     * @param callable|array{ 0: object|class-string, 1: string }|null $result
+     * @param callable|array{ 0: object|class-string, 1: string }|null $r
      * @param string|object                                            $newScope
      */
-    public function typeCallableArrayMethod(&$result, $value, $newScope = 'static') : bool
+    public function typeCallableArrayMethod(&$r, $value, $newScope = 'static') : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
         }
 
-        $methodArray = $this->parse_method_array_from_array($value);
+        $methodArray = $this->parseMethodArrayFromArray($value);
 
         if (null === $methodArray) {
             return false;
@@ -363,13 +363,13 @@ class DefaultCallableParser implements CallableParserInterface
                 return false;
             }
 
-            $result = $callableMethodPublic;
+            $r = $callableMethodPublic;
 
             return true;
         }
 
-        if (
-            ($theMethod === '__invoke')
+        if (false
+            || ($theMethod === '__invoke')
             || ($theMethod === '__call')
             || ($theMagic === '__invoke')
             || ($theMagic === '__call')
@@ -384,15 +384,15 @@ class DefaultCallableParser implements CallableParserInterface
             $callableMethodStaticMagic = [ $theClass, $theMagic ];
         }
 
-        if (
-            ($theMethod === '__callStatic')
+        if (false
+            || ($theMethod === '__callStatic')
             || ($theMagic === '__callStatic')
         ) {
             if (! $this->isCallable($callableMethodStaticMagic ?? $callableMethodStatic, $newScope)) {
                 return false;
             }
 
-            $result = $callableMethodStatic;
+            $r = $callableMethodStatic;
 
             return true;
         }
@@ -412,24 +412,24 @@ class DefaultCallableParser implements CallableParserInterface
             return false;
         }
 
-        $result = $callableMethodStatic;
+        $r = $callableMethodStatic;
 
         return true;
     }
 
     /**
-     * @param callable|array{ 0: class-string, 1: string }|null $result
+     * @param callable|array{ 0: class-string, 1: string }|null $r
      * @param string|object                                     $newScope
      */
-    public function typeCallableArrayMethodStatic(&$result, $value, $newScope = 'static') : bool
+    public function typeCallableArrayMethodStatic(&$r, $value, $newScope = 'static') : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
         }
 
-        $methodArray = $this->parse_method_array_from_array($value);
+        $methodArray = $this->parseMethodArrayFromArray($value);
 
         if (null === $methodArray) {
             return false;
@@ -441,8 +441,8 @@ class DefaultCallableParser implements CallableParserInterface
             return false;
         }
 
-        if (
-            ($theMethod === '__invoke')
+        if (false
+            || ($theMethod === '__invoke')
             || ($theMethod === '__call')
             || ($theMagic === '__invoke')
             || ($theMagic === '__call')
@@ -457,15 +457,15 @@ class DefaultCallableParser implements CallableParserInterface
             $callableMethodStaticMagic = [ $theClass, $theMagic ];
         }
 
-        if (
-            ($theMethod === '__callStatic')
+        if (false
+            || ($theMethod === '__callStatic')
             || ($theMagic === '__callStatic')
         ) {
             if (! $this->isCallable($callableMethodStaticMagic ?? $callableMethodStatic, $newScope)) {
                 return false;
             }
 
-            $result = $callableMethodStatic;
+            $r = $callableMethodStatic;
 
             return true;
         }
@@ -485,24 +485,24 @@ class DefaultCallableParser implements CallableParserInterface
             return false;
         }
 
-        $result = $callableMethodStatic;
+        $r = $callableMethodStatic;
 
         return true;
     }
 
     /**
-     * @param callable|array{ 0: object, 1: string }|null $result
+     * @param callable|array{ 0: object, 1: string }|null $r
      * @param string|object                               $newScope
      */
-    public function typeCallableArrayMethodNonStatic(&$result, $value, $newScope = 'static') : bool
+    public function typeCallableArrayMethodNonStatic(&$r, $value, $newScope = 'static') : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
         }
 
-        $methodArray = $this->parse_method_array_from_array($value);
+        $methodArray = $this->parseMethodArrayFromArray($value);
 
         if (null === $methodArray) {
             return false;
@@ -514,8 +514,8 @@ class DefaultCallableParser implements CallableParserInterface
             return false;
         }
 
-        if (
-            ($theMethod === '__callStatic')
+        if (false
+            || ($theMethod === '__callStatic')
             || ($theMagic === '__callStatic')
         ) {
             return false;
@@ -527,13 +527,13 @@ class DefaultCallableParser implements CallableParserInterface
 
         $callableMethodPublic = [ $theObject, $theMethod ];
 
-        if (
-            ($theMethod === '__invoke')
+        if (false
+            || ($theMethod === '__invoke')
             || ($theMethod === '__call')
             || ($theMagic === '__invoke')
             || ($theMagic === '__call')
         ) {
-            $result = $callableMethodPublic;
+            $r = $callableMethodPublic;
 
             return true;
         }
@@ -553,18 +553,18 @@ class DefaultCallableParser implements CallableParserInterface
             return false;
         }
 
-        $result = $callableMethodPublic;
+        $r = $callableMethodPublic;
 
         return true;
     }
 
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function typeCallableString(&$result, $value, $newScope = 'static') : bool
+    public function typeCallableString(&$r, $value, $newScope = 'static') : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_string($value)) {
             return false;
@@ -572,14 +572,14 @@ class DefaultCallableParser implements CallableParserInterface
 
         $status = $this->typeCallableStringFunction($function, $value);
         if ($status) {
-            $result = $function;
+            $r = $function;
 
             return true;
         }
 
         $status = $this->typeCallableStringMethodStatic($methodStatic, $value, $newScope);
         if ($status) {
-            $result = $methodStatic;
+            $r = $methodStatic;
 
             return true;
         }
@@ -588,18 +588,18 @@ class DefaultCallableParser implements CallableParserInterface
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function typeCallableStringFunction(&$result, $value) : bool
+    public function typeCallableStringFunction(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_string($value)) {
             return false;
         }
 
         if (function_exists($value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -608,11 +608,11 @@ class DefaultCallableParser implements CallableParserInterface
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function typeCallableStringFunctionInternal(&$result, $value) : bool
+    public function typeCallableStringFunctionInternal(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_string($value)) {
             return false;
@@ -626,7 +626,7 @@ class DefaultCallableParser implements CallableParserInterface
         }
 
         if ($rf->isInternal()) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -635,11 +635,11 @@ class DefaultCallableParser implements CallableParserInterface
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function typeCallableStringFunctionNonInternal(&$result, $value) : bool
+    public function typeCallableStringFunctionNonInternal(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_string($value)) {
             return false;
@@ -653,7 +653,7 @@ class DefaultCallableParser implements CallableParserInterface
         }
 
         if (! $rf->isInternal()) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -662,17 +662,17 @@ class DefaultCallableParser implements CallableParserInterface
     }
 
     /**
-     * @param callable-string|null $result
+     * @param callable-string|null $r
      */
-    public function typeCallableStringMethodStatic(&$result, $value, $newScope = 'static') : bool
+    public function typeCallableStringMethodStatic(&$r, $value, $newScope = 'static') : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_string($value)) {
             return false;
         }
 
-        $methodArray = $this->parse_method_array_from_string($value);
+        $methodArray = $this->parseMethodArrayFromString($value);
 
         if (null === $methodArray) {
             return false;
@@ -691,21 +691,21 @@ class DefaultCallableParser implements CallableParserInterface
             $callableMethodStaticMagic = "{$theClass}::{$theMagic}";
         }
 
-        if (
-            ($theMethod === '__callStatic')
+        if (false
+            || ($theMethod === '__callStatic')
             || ($theMagic === '__callStatic')
         ) {
             if (! $this->isCallable($callableMethodStaticMagic ?? $callableMethodStatic, $newScope)) {
                 return false;
             }
 
-            $result = $callableMethodStatic;
+            $r = $callableMethodStatic;
 
             return true;
         }
 
-        if (
-            ($theMethod === '__invoke')
+        if (false
+            || ($theMethod === '__invoke')
             || ($theMethod === '__call')
             || ($theMagic === '__invoke')
             || ($theMagic === '__call')
@@ -728,7 +728,7 @@ class DefaultCallableParser implements CallableParserInterface
             return false;
         }
 
-        $result = $callableMethodStatic;
+        $r = $callableMethodStatic;
 
         return true;
     }
@@ -746,7 +746,7 @@ class DefaultCallableParser implements CallableParserInterface
     /**
      * @return callable-string
      */
-    private function parse_function($value) : ?string
+    private function parseFunction($value) : ?string
     {
         if (! is_string($value)) {
             return null;
@@ -763,7 +763,7 @@ class DefaultCallableParser implements CallableParserInterface
     /**
      * @return array{ 0: object, 1: class-string, 2: null, 3: string }
      */
-    private function parse_method_array_from_object($value) : ?array
+    private function parseMethodArrayFromObject($value) : ?array
     {
         if (! is_object($value)) {
             return null;
@@ -786,7 +786,7 @@ class DefaultCallableParser implements CallableParserInterface
     /**
      * @return array{ 0: object|null, 1: class-string, 2: string, 3: string|null }
      */
-    private function parse_method_array_from_array($value) : ?array
+    private function parseMethodArrayFromArray($value) : ?array
     {
         if (! is_array($value)) {
             return null;
@@ -796,12 +796,12 @@ class DefaultCallableParser implements CallableParserInterface
 
         [ $classOrObject, $theMethod ] = $list + [ '', '' ];
 
-        if ((! is_string($theMethod)) || ('' === $theMethod)) {
+        if (! ((is_string($theMethod)) && ('' !== $theMethod))) {
             return null;
         }
 
-        if (! (
-            ($isObject = is_object($classOrObject))
+        if (! (false
+            || ($isObject = is_object($classOrObject))
             || ($isClass = is_string($classOrObject) && class_exists($classOrObject))
         )) {
             return null;
@@ -836,7 +836,7 @@ class DefaultCallableParser implements CallableParserInterface
     /**
      * @return array{ 0: null, 1: class-string, 2: string|null, 3: string|null }
      */
-    private function parse_method_array_from_string($value) : ?array
+    private function parseMethodArrayFromString($value) : ?array
     {
         if (! is_string($value)) {
             return null;
@@ -874,7 +874,7 @@ class DefaultCallableParser implements CallableParserInterface
     /**
      * @return object|callable
      */
-    private function parse_invokable($value) : ?object
+    private function parseInvokable($value) : ?object
     {
         if (! is_object($value)) {
             return null;

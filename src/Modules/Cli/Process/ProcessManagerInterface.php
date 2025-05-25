@@ -10,11 +10,18 @@ interface ProcessManagerInterface
     public function useSymfonyProcess(?bool $useSymfonyProcess = null);
 
 
+    public function newProc() : Proc;
+
+    public function newProcBackground() : Proc;
+
+
     /**
-     * @param GenericProcess|null $result
+     * @return static
      */
-    public function spawn(
-        &$result,
-        array $cmd, ?string $cwd = null, ?array $env = null, $input = null
-    ) : bool;
+    public function spawn(Proc $proc);
+
+    /**
+     * @return static
+     */
+    public function spawnBackground(Proc $proc);
 }

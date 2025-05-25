@@ -180,14 +180,14 @@ class StrModule
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_a_string(&$result, $value) : bool
+    public function type_a_string(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (is_string($value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -196,14 +196,14 @@ class StrModule
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_a_string_empty(&$result, $value) : bool
+    public function type_a_string_empty(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if ('' === $value) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -212,14 +212,14 @@ class StrModule
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_a_string_not_empty(&$result, $value) : bool
+    public function type_a_string_not_empty(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (is_string($value) && ('' !== $value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -228,11 +228,11 @@ class StrModule
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_a_trim(&$result, $value, ?string $characters = null) : bool
+    public function type_a_trim(&$r, $value, ?string $characters = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $characters = $characters ?? " \n\r\t\v\0";
 
@@ -243,7 +243,7 @@ class StrModule
         $_value = trim($value, $characters);
 
         if ('' !== $_value) {
-            $result = $_value;
+            $r = $_value;
 
             return true;
         }
@@ -253,20 +253,20 @@ class StrModule
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_string(&$result, $value) : bool
+    public function type_string(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (is_string($value)) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
 
-        if (
-            (null === $value)
+        if (false
+            || (null === $value)
             // || ('' === $value)
             || (is_bool($value))
             || (is_array($value))
@@ -292,24 +292,24 @@ class StrModule
             return false;
         }
 
-        $result = $_value;
+        $r = $_value;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_string_empty(&$result, $value) : bool
+    public function type_string_empty(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->type_string($_value, $value)) {
             return false;
         }
 
         if ('' === $_value) {
-            $result = '';
+            $r = '';
 
             return true;
         }
@@ -318,18 +318,18 @@ class StrModule
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_string_not_empty(&$result, $value) : bool
+    public function type_string_not_empty(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->type_string($_value, $value)) {
             return false;
         }
 
         if ('' !== $_value) {
-            $result = $_value;
+            $r = $_value;
 
             return true;
         }
@@ -338,11 +338,11 @@ class StrModule
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_trim(&$result, $value, ?string $characters = null) : bool
+    public function type_trim(&$r, $value, ?string $characters = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $characters = $characters ?? " \n\r\t\v\0";
 
@@ -353,7 +353,7 @@ class StrModule
         $_value = trim($_value, $characters);
 
         if ('' !== $_value) {
-            $result = $_value;
+            $r = $_value;
 
             return true;
         }
@@ -363,18 +363,18 @@ class StrModule
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_char(&$result, $value) : bool
+    public function type_char(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->type_string_not_empty($_value, $value)) {
             return false;
         }
 
         if (1 === strlen($_value)) {
-            $result = $_value;
+            $r = $_value;
 
             return true;
         }
@@ -383,18 +383,18 @@ class StrModule
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
-    public function type_letter(&$result, $value) : bool
+    public function type_letter(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->type_string_not_empty($_value, $value)) {
             return false;
         }
 
         if (1 === $this->strlen($_value)) {
-            $result = $_value;
+            $r = $_value;
 
             return true;
         }
@@ -403,11 +403,11 @@ class StrModule
     }
 
     /**
-     * @param Alphabet|null $result
+     * @param Alphabet|null $r
      */
-    public function type_alphabet(&$result, $value) : bool
+    public function type_alphabet(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! $this->type_string_not_empty($_value, $value)) {
             return false;
@@ -453,7 +453,7 @@ class StrModule
             $regexNot
         );
 
-        $result = $alphabet;
+        $r = $alphabet;
 
         return true;
     }
@@ -1274,7 +1274,7 @@ class StrModule
     /**
      * > пишет каждое слово в предложении с малой буквы
      */
-    public function lcwords(string $string, ?string $separators = null, string $mb_encoding = null) : string
+    public function lcwords(string $string, ?string $separators = null, ?string $mb_encoding = null) : string
     {
         $separators = $separators ?? " \t\r\n\f\v";
 
@@ -1300,7 +1300,7 @@ class StrModule
     /**
      * > пишет каждое слово в предложении с большой буквы
      */
-    public function ucwords(string $string, ?string $separators = null, string $mb_encoding = null) : string
+    public function ucwords(string $string, ?string $separators = null, ?string $mb_encoding = null) : string
     {
         $separators = $separators ?? " \t\r\n\f\v";
 
@@ -1647,7 +1647,7 @@ class StrModule
     public function str_replace_limit(
         $search, $replace, $subject,
         ?int $limit = null,
-        ?int &$count = null
+        ?int &$refCount = null
     )
     {
         $_search = Lib::php()->to_list($search);
@@ -1672,7 +1672,7 @@ class StrModule
             $_regexes[ $i ] = $regex;
         }
 
-        $result = preg_replace($_regexes, $replace, $subject, $limit, $count);
+        $result = preg_replace($_regexes, $replace, $subject, $limit, $refCount);
 
         return $result;
     }
@@ -1689,7 +1689,7 @@ class StrModule
     public function str_ireplace_limit(
         $search, $replace, $subject,
         ?int $limit = null,
-        ?int &$count = null
+        ?int &$refCount = null
     )
     {
         $_search = Lib::php()->to_list($search);
@@ -1714,7 +1714,7 @@ class StrModule
             $_regexes[ $i ] = $regex;
         }
 
-        $result = preg_replace($_regexes, $replace, $subject, $limit, $count);
+        $result = preg_replace($_regexes, $replace, $subject, $limit, $refCount);
 
         return $result;
     }

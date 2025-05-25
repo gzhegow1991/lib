@@ -180,9 +180,9 @@ class HttpModule
         return $result;
     }
 
-    public function cookie_has(string $name, &$result = null) : bool
+    public function cookie_has(string $name, &$refValue = null) : bool
     {
-        $result = null;
+        $refValue = null;
 
         if ('' === $name) {
             return false;
@@ -195,7 +195,7 @@ class HttpModule
         // > convert empty string to null
         Lib::type()->string_not_empty($cookieString, $_COOKIE[ $name ]);
 
-        $result = $cookieString;
+        $refValue = $cookieString;
 
         return true;
     }
@@ -314,9 +314,9 @@ class HttpModule
         return $result;
     }
 
-    public function session_has(string $name, &$result = null) : bool
+    public function session_has(string $name, &$refValue = null) : bool
     {
-        $result = null;
+        $refValue = null;
 
         if (! strlen($name)) {
             throw new LogicException(
@@ -330,7 +330,7 @@ class HttpModule
             return false;
         }
 
-        $result = $theSession->get($name);
+        $refValue = $theSession->get($name);
 
         return true;
     }

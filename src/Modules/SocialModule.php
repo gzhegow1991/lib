@@ -60,14 +60,14 @@ class SocialModule
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
     public function type_email(
-        &$result, $value, ?array $filters = null,
+        &$r, $value, ?array $filters = null,
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $withEmailDomain = array_key_exists(0, $refs);
         if ($withEmailDomain) {
@@ -106,20 +106,20 @@ class SocialModule
         unset($refEmailDomain);
         unset($refEmailName);
 
-        $result = $email;
+        $r = $email;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
     public function type_email_fake(
-        &$result, $value,
+        &$r, $value,
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $withEmailDomain = array_key_exists(0, $refs);
         if ($withEmailDomain) {
@@ -158,20 +158,20 @@ class SocialModule
         unset($refEmailDomain);
         unset($refEmailName);
 
-        $result = $email;
+        $r = $email;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
     public function type_email_non_fake(
-        &$result, $value, ?array $filters = null,
+        &$r, $value, ?array $filters = null,
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $withEmailDomain = array_key_exists(0, $refs);
         if ($withEmailDomain) {
@@ -210,21 +210,21 @@ class SocialModule
         unset($refEmailDomain);
         unset($refEmailName);
 
-        $result = $email;
+        $r = $email;
 
         return true;
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
     public function type_phone(
-        &$result, $value,
+        &$r, $value,
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $withTel = array_key_exists(0, $refs);
         if ($withTel) {
@@ -263,20 +263,20 @@ class SocialModule
         unset($refTelDigits);
         unset($refTelPlus);
 
-        $result = $phone;
+        $r = $phone;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
     public function type_phone_fake(
-        &$result, $value,
+        &$r, $value,
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $withTel = array_key_exists(0, $refs);
         if ($withTel) {
@@ -312,20 +312,20 @@ class SocialModule
         unset($refTelDigits);
         unset($refTelPlus);
 
-        $result = $phone;
+        $r = $phone;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
     public function type_phone_non_fake(
-        &$result, $value,
+        &$r, $value,
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $withTel = array_key_exists(0, $refs);
         if ($withTel) {
@@ -364,20 +364,20 @@ class SocialModule
         unset($refTelDigits);
         unset($refTelPlus);
 
-        $result = $phone;
+        $r = $phone;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
     public function type_phone_real(
-        &$result, $value, ?string $region = '',
+        &$r, $value, ?string $region = '',
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $withRegionDetected = array_key_exists(0, $refs);
         if ($withRegionDetected) {
@@ -424,21 +424,21 @@ class SocialModule
         unset($refTelDigits);
         unset($refTelPlus);
 
-        $result = $phone;
+        $r = $phone;
 
         return true;
     }
 
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
     public function type_tel(
-        &$result, $value,
+        &$r, $value,
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $withTelDigits = array_key_exists(0, $refs);
         if ($withTelDigits) {
@@ -470,20 +470,20 @@ class SocialModule
         unset($refTelDigits);
         unset($refTelPlus);
 
-        $result = $tel;
+        $r = $tel;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
     public function type_tel_fake(
-        &$result, $value,
+        &$r, $value,
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $withTelDigits = array_key_exists(0, $refs);
         if ($withTelDigits) {
@@ -515,20 +515,20 @@ class SocialModule
         unset($refTelDigits);
         unset($refTelPlus);
 
-        $result = $tel;
+        $r = $tel;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
     public function type_tel_non_fake(
-        &$result, $value,
+        &$r, $value,
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $withTelDigits = array_key_exists(0, $refs);
         if ($withTelDigits) {
@@ -560,20 +560,20 @@ class SocialModule
         unset($refTelDigits);
         unset($refTelPlus);
 
-        $result = $tel;
+        $r = $tel;
 
         return true;
     }
 
     /**
-     * @param string|null $result
+     * @param string|null $r
      */
     public function type_tel_real(
-        &$result, $value, ?string $region = '',
+        &$r, $value, ?string $region = '',
         array $refs = []
     ) : bool
     {
-        $result = null;
+        $r = null;
 
         $withRegionDetected = array_key_exists(0, $refs);
         if ($withRegionDetected) {
@@ -613,7 +613,7 @@ class SocialModule
         unset($refTelDigits);
         unset($refTelPlus);
 
-        $result = $tel;
+        $r = $tel;
 
         return true;
     }

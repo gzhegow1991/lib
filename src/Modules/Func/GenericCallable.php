@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules\Func;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Php\Result\Ret;
 use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Func\Invoker\InvokerInterface;
@@ -84,7 +85,6 @@ class GenericCallable implements
 
     private function __construct()
     {
-        $this->invoker = Lib::func()->invoker();
     }
 
     public function __invoke(...$values)
@@ -171,51 +171,57 @@ class GenericCallable implements
 
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function from($from, array $context = [], $ctx = null)
+    public static function from($from, array $context = [], $ret = null)
     {
-        Result::parse($cur);
+        $retCur = Result::asValue();
 
         $instance = null
-            ?? static::fromInstance($from, $cur)
-            ?? static::fromFunction($from, $context, $cur)
-            ?? static::fromMethod($from, $context, $cur)
-            ?? static::fromClosure($from, $context, $cur)
-            ?? static::fromInvokableObject($from, $context, $cur)
-            ?? static::fromInvokableClass($from, $context, $cur);
+            ?? static::fromInstance($from, $retCur)
+            ?? static::fromFunction($from, $context, $retCur)
+            ?? static::fromMethod($from, $context, $retCur)
+            ?? static::fromClosure($from, $context, $retCur)
+            ?? static::fromInvokableObject($from, $context, $retCur)
+            ?? static::fromInvokableClass($from, $context, $retCur);
 
-        if ($cur->isErr()) {
-            return Result::err($ctx, $cur);
+        if ($retCur->isErr()) {
+            return Result::err($ret, $retCur);
         }
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromInstance($from, $ctx = null)
+    public static function fromInstance($from, $ret = null)
     {
         if ($from instanceof static) {
-            return Result::ok($ctx, $from);
+            return Result::ok($ret, $from);
         }
 
         return Result::err(
-            $ctx,
+            $ret,
             [ 'The `from` should be instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromClosure($from, array $context = [], $ctx = null)
+    public static function fromClosure($from, array $context = [], $ret = null)
     {
         if (! ($from instanceof \Closure)) {
             return Result::err(
-                $ctx,
+                $ret,
                 [ 'The `from` should be instance of \Closure', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -233,17 +239,19 @@ class GenericCallable implements
 
         $instance->key = "{ object # \Closure # {$phpId} }";
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromMethod($from, array $context = [], $ctx = null)
+    public static function fromMethod($from, array $context = [], $ret = null)
     {
         if (! Lib::php()->type_method_string($methodString, $from, [ &$methodArray ])) {
             return Result::err(
-                $ctx,
+                $ret,
                 [ 'The `from` should be existing method', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -282,17 +290,19 @@ class GenericCallable implements
 
         $instance->key = "[ {$key0}, {$key1} ]";
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromInvokableObject($from, array $context = [], $ctx = null)
+    public static function fromInvokableObject($from, array $context = [], $ret = null)
     {
         if (! is_object($from)) {
             return Result::err(
-                $ctx,
+                $ret,
                 [ 'The `from` should be object', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -300,7 +310,7 @@ class GenericCallable implements
 
         if (! method_exists($from, '__invoke')) {
             return Result::err(
-                $ctx,
+                $ret,
                 [ 'The `from` should be invokable object', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -319,33 +329,35 @@ class GenericCallable implements
 
         $instance->key = "\"{ object # {$phpClass} # {$phpId} }\"";
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromInvokableClass($from, array $context = [], $ctx = null)
+    public static function fromInvokableClass($from, array $context = [], $ret = null)
     {
-        if (! Lib::type()->string_not_empty($_invokableClass, $from)) {
+        if (! Lib::type()->string_not_empty($invokableClass, $from)) {
             return Result::err(
-                $ctx,
+                $ret,
                 [ 'The `from` should be non-empty string', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! class_exists($_invokableClass)) {
+        if (! class_exists($invokableClass)) {
             return Result::err(
-                $ctx,
+                $ret,
                 [ 'The `from` should be existing class', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! method_exists($_invokableClass, '__invoke')) {
+        if (! method_exists($invokableClass, '__invoke')) {
             return Result::err(
-                $ctx,
+                $ret,
                 [ 'The `from` should be invokable class', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -357,23 +369,25 @@ class GenericCallable implements
         $instance->args = $arguments;
 
         $instance->isInvokable = true;
-        $instance->invokableClass = $_invokableClass;
+        $instance->invokableClass = $invokableClass;
 
-        $instance->key = "\"{$_invokableClass}\"";
+        $instance->key = "\"{$invokableClass}\"";
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromFunction($function, array $context = [], $ctx = null)
+    public static function fromFunction($function, array $context = [], $ret = null)
     {
         $thePhp = Lib::php();
 
         if (! Lib::type()->string_not_empty($_function, $function)) {
             return Result::err(
-                $ctx,
+                $ret,
                 [ 'The `from` should be existing function name', $function ],
                 [ __FILE__, __LINE__ ]
             );
@@ -381,7 +395,7 @@ class GenericCallable implements
 
         if (! function_exists($_function)) {
             return Result::err(
-                $ctx,
+                $ret,
                 [ 'The `from` should be existing function name', $_function ],
                 [ __FILE__, __LINE__ ]
             );
@@ -405,7 +419,7 @@ class GenericCallable implements
 
         $instance->key = "\"{$_function}\"";
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
 
@@ -446,14 +460,14 @@ class GenericCallable implements
     }
 
     /**
-     * @param \Closure|null $fn
+     * @param \Closure|null $refFn
      */
-    public function hasClosureObject(&$fn = null) : bool
+    public function hasClosureObject(&$refFn = null) : bool
     {
-        $fn = null;
+        $refFn = null;
 
         if (null !== $this->closureObject) {
-            $fn = $this->closureObject;
+            $refFn = $this->closureObject;
 
             return true;
         }
@@ -473,14 +487,14 @@ class GenericCallable implements
     }
 
     /**
-     * @param class-string|null $methodClassName
+     * @param class-string|null $refMethodClass
      */
-    public function hasMethodClass(&$methodClassName = null) : ?string
+    public function hasMethodClass(&$refMethodClass = null) : ?string
     {
-        $methodClassName = null;
+        $refMethodClass = null;
 
         if (null !== $this->methodClass) {
-            $methodClassName = $this->methodClass;
+            $refMethodClass = $this->methodClass;
 
             return true;
         }
@@ -497,14 +511,14 @@ class GenericCallable implements
     }
 
     /**
-     * @param string|null $methodObject
+     * @param string|null $refMethodObject
      */
-    public function hasMethodObject(&$methodObject = null) : bool
+    public function hasMethodObject(&$refMethodObject = null) : bool
     {
-        $methodObject = null;
+        $refMethodObject = null;
 
         if (null !== $this->methodObject) {
-            $methodObject = $this->methodObject;
+            $refMethodObject = $this->methodObject;
 
             return true;
         }
@@ -518,14 +532,14 @@ class GenericCallable implements
     }
 
     /**
-     * @param string|null $methodName
+     * @param string|null $refMethodName
      */
-    public function hasMethodName(&$methodName = null) : bool
+    public function hasMethodName(&$refMethodName = null) : bool
     {
-        $methodName = null;
+        $refMethodName = null;
 
         if (null !== $this->methodName) {
-            $methodName = $this->methodName;
+            $refMethodName = $this->methodName;
 
             return true;
         }
@@ -545,14 +559,14 @@ class GenericCallable implements
     }
 
     /**
-     * @param callable|object|null $object
+     * @param callable|object|null $refInvokableObject
      */
-    public function hasInvokableObject(&$object = null) : bool
+    public function hasInvokableObject(&$refInvokableObject = null) : bool
     {
-        $object = null;
+        $refInvokableObject = null;
 
         if (null !== $this->invokableObject) {
-            $object = $this->invokableObject;
+            $refInvokableObject = $this->invokableObject;
 
             return true;
         }
@@ -569,14 +583,14 @@ class GenericCallable implements
     }
 
     /**
-     * @param class-string|null $className
+     * @param class-string|null $refInvokableClass
      */
-    public function hasInvokableClass(&$className = null) : bool
+    public function hasInvokableClass(&$refInvokableClass = null) : bool
     {
-        $className = null;
+        $refInvokableClass = null;
 
         if (null !== $this->invokableClass) {
-            $className = $this->invokableClass;
+            $refInvokableClass = $this->invokableClass;
 
             return true;
         }
@@ -599,14 +613,14 @@ class GenericCallable implements
     }
 
     /**
-     * @param callable|string|null $fn
+     * @param callable|string|null $refFunctionStringInternal
      */
-    public function hasFunctionStringInternal(&$fn = null) : bool
+    public function hasFunctionStringInternal(&$refFunctionStringInternal = null) : bool
     {
-        $fn = null;
+        $refFunctionStringInternal = null;
 
         if (null !== $this->functionStringInternal) {
-            $fn = $this->functionStringInternal;
+            $refFunctionStringInternal = $this->functionStringInternal;
 
             return true;
         }
@@ -623,14 +637,14 @@ class GenericCallable implements
     }
 
     /**
-     * @param callable|string|null $fn
+     * @param callable|string|null $refFunctionStringNonInternal
      */
-    public function hasFunctionStringNonInternal(&$fn = null) : bool
+    public function hasFunctionStringNonInternal(&$refFunctionStringNonInternal = null) : bool
     {
-        $fn = null;
+        $refFunctionStringNonInternal = null;
 
         if (null !== $this->functionStringNonInternal) {
-            $fn = $this->functionStringNonInternal;
+            $refFunctionStringNonInternal = $this->functionStringNonInternal;
 
             return true;
         }

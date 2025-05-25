@@ -5,15 +5,26 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Arr\Map\Map;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Arr\Map\Base\AbstractMap;
 
 
 class EntrypointModule
 {
     /**
+     * @var bool
+     */
+    protected $isLocked = false;
+
+    /**
      * @var string
      */
     protected $dirRoot;
+
+    /**
+     * @var int
+     */
+    protected $errorReporting;
 
     /**
      * @var string
@@ -23,15 +34,30 @@ class EntrypointModule
      * @var int
      */
     protected $timeLimit = 30;
+
     /**
-     * @var int
+     * @var string
      */
-    protected $umask = 0002;
+    protected $postMaxSize = '5M';
+
+    /**
+     * @var string
+     */
+    protected $uploadMaxFilesize = '2M';
+    /**
+     * @var string
+     */
+    protected $uploadTmpDir;
 
     /**
      * @var int
      */
-    protected $errorReporting;
+    protected $precision = 16;
+
+    /**
+     * @var int
+     */
+    protected $umask = 0002;
 
     /**
      * @var callable|null
@@ -54,12 +80,27 @@ class EntrypointModule
 
     public function __construct()
     {
-        $this->errorReporting = (E_ALL | E_STRICT | E_DEPRECATED | E_USER_DEPRECATED);
+        $this->errorReporting = (E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
+
+        $this->uploadTmpDir = sys_get_temp_dir();
 
         $this->fnErrorHandler = [ $this, 'fnErrorHandler' ];
         $this->fnExceptionHandler = [ $this, 'fnExceptionHandler' ];
 
         $this->registerShutdownFunctionMap = Map::new();
+    }
+
+
+    /**
+     * @param bool $isLocked
+     *
+     * @return static
+     */
+    public function lock(bool $isLocked)
+    {
+        $this->isLocked = $isLocked;
+
+        return $this;
     }
 
 
@@ -73,6 +114,8 @@ class EntrypointModule
      */
     public function setDirRoot(?string $dirRoot)
     {
+        $this->assertNotLocked();
+
         if (null !== $dirRoot) {
             if (! Lib::fs()->type_dirpath_realpath($realpath, $dirRoot)) {
                 throw new LogicException(
@@ -82,126 +125,6 @@ class EntrypointModule
         }
 
         $this->dirRoot = $realpath ?? null;
-
-        return $this;
-    }
-
-
-    public function getPhpMemoryLimit(string $memoryLimitTmp = '32M') : string
-    {
-        $before = ini_set('memory_limit', $memoryLimitTmp);
-
-        ini_set('memory_limit', $before);
-
-        return $before;
-    }
-
-    /**
-     * @return static
-     */
-    public function setMemoryLimit(?string $memoryLimit = null)
-    {
-        if (null !== $memoryLimit) {
-            Lib::format()->bytes_decode($memoryLimit, []);
-        }
-
-        $this->memoryLimit = $memoryLimit;
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useMemoryLimit(&$last = null)
-    {
-        if (null === $this->memoryLimit) {
-            return $this;
-        }
-
-        $last = ini_set('memory_limit', $this->memoryLimit);
-
-        return $this;
-    }
-
-
-    public function getPhpTimeLimit(int $timeLimitTmp = 30) : string
-    {
-        $before = ini_set('max_execution_time', $timeLimitTmp);
-
-        ini_set('max_execution_time', $before);
-
-        return $before;
-    }
-
-    /**
-     * @return static
-     */
-    public function setTimeLimit(?int $timeLimit = null)
-    {
-        if (null !== $timeLimit) {
-            Lib::parse($pt) && $pt->int_non_negative($timeLimit);
-        }
-
-        $this->timeLimit = $timeLimit;
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useTimeLimit(&$last = null)
-    {
-        if (null === $this->timeLimit) {
-            return $this;
-        }
-
-        $last = ini_set('max_execution_time', $this->timeLimit);
-
-        set_time_limit($this->timeLimit);
-
-        return $this;
-    }
-
-
-    public function getPhpUmask(int $umaskTmp = 0002) : string
-    {
-        $before = umask($umaskTmp);
-
-        umask($before);
-
-        return $before;
-    }
-
-    /**
-     * @return static
-     */
-    public function setUmask(?int $umask = null)
-    {
-        if (null !== $umask) {
-            if (! (($umask >= 0) && ($umask <= 0777))) {
-                throw new LogicException(
-                    [ 'The `umask` should be valid umask', $umask ]
-                );
-            }
-        }
-
-        $this->umask = $umask;
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useUmask(&$last = null)
-    {
-        if (null === $this->umask) {
-            return $this;
-        }
-
-        $last = umask($this->umask);
 
         return $this;
     }
@@ -222,11 +145,13 @@ class EntrypointModule
      */
     public function setErrorReporting(?int $errorReporting = -1)
     {
+        $this->assertNotLocked();
+
         if (null !== $errorReporting) {
             if (-1 === $errorReporting) {
-                $errorReporting = (E_ALL | E_STRICT | E_DEPRECATED | E_USER_DEPRECATED);
+                $errorReporting = (E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
 
-            } elseif (($errorReporting & ~(E_ALL | E_STRICT | E_DEPRECATED | E_USER_DEPRECATED)) !== 0) {
+            } elseif (($errorReporting & ~(E_ALL | E_DEPRECATED | E_USER_DEPRECATED)) !== 0) {
                 throw new LogicException(
                     [ 'The `errorReporting` should be valid error_reporting flag', $errorReporting ]
                 );
@@ -241,13 +166,326 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useErrorReporting(&$last = null)
+    public function useErrorReporting(&$refLast = null)
     {
         if (null === $this->errorReporting) {
             return $this;
         }
 
-        $last = error_reporting($this->errorReporting);
+        $refLast = error_reporting($this->errorReporting);
+
+        return $this;
+    }
+
+
+    public function getPhpMemoryLimit(string $memoryLimitTmp = '32M') : string
+    {
+        $before = ini_set('memory_limit', $memoryLimitTmp);
+
+        ini_set('memory_limit', $before);
+
+        return $before;
+    }
+
+    /**
+     * @return static
+     */
+    public function setMemoryLimit(?string $memoryLimit = null)
+    {
+        $this->assertNotLocked();
+
+        if (null !== $memoryLimit) {
+            $theFormat = Lib::format();
+
+            $bytes = $theFormat->bytes_decode($memoryLimit);
+            $bytesString = $theFormat->bytes_encode($bytes, 0, 1);
+
+            $memoryLimit = $bytesString;
+        }
+
+        $this->memoryLimit = $memoryLimit;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useMemoryLimit(&$refLast = null)
+    {
+        if (null === $this->memoryLimit) {
+            return $this;
+        }
+
+        $refLast = ini_set('memory_limit', $this->memoryLimit);
+
+        return $this;
+    }
+
+
+    public function getPhpTimeLimit(int $timeLimitTmp = 30) : string
+    {
+        $before = ini_set('max_execution_time', $timeLimitTmp);
+
+        ini_set('max_execution_time', $before);
+
+        return $before;
+    }
+
+    /**
+     * @return static
+     */
+    public function setTimeLimit(?int $timeLimit = null)
+    {
+        $this->assertNotLocked();
+
+        if (null !== ($timeLimitInt = $timeLimit)) {
+            if (! Lib::type()->int_non_negative($timeLimitInt, $timeLimit)) {
+                throw new LogicException(
+                    [ 'The `timeLimit` should be non-negative integer', $timeLimit ]
+                );
+            }
+        }
+
+        $this->timeLimit = $timeLimitInt;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useTimeLimit(&$refLast = null)
+    {
+        if (null === $this->timeLimit) {
+            return $this;
+        }
+
+        $refLast = ini_set('max_execution_time', $this->timeLimit);
+
+        set_time_limit($this->timeLimit);
+
+        return $this;
+    }
+
+
+    public function getPhpPostMaxSize(string $postMaxSizeTmp = '5M') : string
+    {
+        $before = ini_set('post_max_size', $postMaxSizeTmp);
+
+        ini_set('post_max_size', $before);
+
+        return $before;
+    }
+
+    /**
+     * @return static
+     */
+    public function setPostMaxSize(?string $postMaxSize = null)
+    {
+        $this->assertNotLocked();
+
+        if (null !== $postMaxSize) {
+            $theFormat = Lib::format();
+
+            $bytes = $theFormat->bytes_decode($postMaxSize);
+            $bytesString = $theFormat->bytes_encode($bytes, 0, 1);
+
+            $postMaxSize = $bytesString;
+        }
+
+        $this->postMaxSize = $postMaxSize;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function usePostMaxSize(&$refLast = null)
+    {
+        if (null === $this->postMaxSize) {
+            return $this;
+        }
+
+        $refLast = ini_set('post_max_size', $this->postMaxSize);
+
+        return $this;
+    }
+
+
+    public function getPhpUploadMaxFilesize(string $uploadMaxFilesizeTmp = '2M') : string
+    {
+        $before = ini_set('upload_max_filesize', $uploadMaxFilesizeTmp);
+
+        ini_set('upload_max_filesize', $before);
+
+        return $before;
+    }
+
+    /**
+     * @return static
+     */
+    public function setUploadMaxFilesize(?string $uploadMaxFilesize = null)
+    {
+        $this->assertNotLocked();
+
+        if (null !== $uploadMaxFilesize) {
+            $theFormat = Lib::format();
+
+            $bytes = $theFormat->bytes_decode($uploadMaxFilesize);
+            $bytesString = $theFormat->bytes_encode($bytes, 0, 1);
+
+            $uploadMaxFilesize = $bytesString;
+        }
+
+        $this->uploadMaxFilesize = $uploadMaxFilesize;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useUploadMaxFilesize(&$refLast = null)
+    {
+        if (null === $this->uploadMaxFilesize) {
+            return $this;
+        }
+
+        $refLast = ini_set('upload_max_filesize', $this->uploadMaxFilesize);
+
+        return $this;
+    }
+
+
+    public function getPhpUploadTmpDir() : string
+    {
+        $before = ini_set('upload_tmp_dir', sys_get_temp_dir());
+
+        ini_set('upload_tmp_dir', $before);
+
+        return $before;
+    }
+
+    /**
+     * @return static
+     */
+    public function setUploadTmpDir(?string $uploadTmpDir = null)
+    {
+        $this->assertNotLocked();
+
+        if (null !== $uploadTmpDir) {
+            if (! Lib::fs()->type_dirpath_realpath($realpath, $uploadTmpDir)) {
+                throw new LogicException(
+                    [ 'The `uploadTmpDir` should be existing directory path', $uploadTmpDir ]
+                );
+            }
+        }
+
+        $this->uploadTmpDir = $realpath ?? null;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useUploadTmpDir(&$refLast = null)
+    {
+        if (null === $this->uploadTmpDir) {
+            return $this;
+        }
+
+        $refLast = ini_set('upload_tmp_dir', $this->uploadTmpDir);
+
+        return $this;
+    }
+
+
+    public function getPhpPrecision(int $precisionTmp = 16) : string
+    {
+        $before = ini_set('precision', $precisionTmp);
+
+        ini_set('precision', $before);
+
+        return $before;
+    }
+
+    /**
+     * @return static
+     */
+    public function setPrecision(?int $precision = null)
+    {
+        $this->assertNotLocked();
+
+        if (null !== ($precisionInt = $precision)) {
+            if (! Lib::type()->int_non_negative($precisionInt, $precision)) {
+                throw new LogicException(
+                    [ 'The `precision` should be non-negative integer', $precision ]
+                );
+            }
+        }
+
+        $this->precision = $precisionInt;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function usePrecision(&$refLast = null)
+    {
+        if (null === $this->precision) {
+            return $this;
+        }
+
+        $refLast = ini_set('precision', $this->precision);
+
+        return $this;
+    }
+
+
+    public function getPhpUmask(int $umaskTmp = 0002) : string
+    {
+        $before = umask($umaskTmp);
+
+        umask($before);
+
+        return $before;
+    }
+
+    /**
+     * @return static
+     */
+    public function setUmask(?int $umask = null)
+    {
+        $this->assertNotLocked();
+
+        if (null !== $umask) {
+            if (! (($umask >= 0) && ($umask <= 0777))) {
+                throw new LogicException(
+                    [ 'The `umask` should be valid umask', $umask ]
+                );
+            }
+        }
+
+        $this->umask = $umask;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useUmask(&$refLast = null)
+    {
+        if (null === $this->umask) {
+            return $this;
+        }
+
+        $refLast = umask($this->umask);
 
         return $this;
     }
@@ -279,6 +517,8 @@ class EntrypointModule
      */
     public function setErrorHandler($fnErrorHandler = '')
     {
+        $this->assertNotLocked();
+
         if (null !== $fnErrorHandler) {
             if ('' === $fnErrorHandler) {
                 $fnErrorHandler = [ $this, 'fnErrorHandler' ];
@@ -296,17 +536,17 @@ class EntrypointModule
     }
 
     /**
-     * @param callable|null $last
+     * @param callable|null $refLast
      *
      * @return static
      */
-    public function useErrorHandler(&$last = null)
+    public function useErrorHandler(&$refLast = null)
     {
         if (null === $this->fnErrorHandler) {
             return $this;
         }
 
-        $last = set_error_handler($this->fnErrorHandler);
+        $refLast = set_error_handler($this->fnErrorHandler);
 
         return $this;
     }
@@ -338,6 +578,8 @@ class EntrypointModule
      */
     public function setExceptionHandler($fnExceptionHandler = '')
     {
+        $this->assertNotLocked();
+
         if (null !== $fnExceptionHandler) {
             if ('' === $fnExceptionHandler) {
                 $fnExceptionHandler = [ $this, 'fnErrorHandler' ];
@@ -355,17 +597,17 @@ class EntrypointModule
     }
 
     /**
-     * @param callable|null $last
+     * @param callable|null $refLast
      *
      * @return static
      */
-    public function useExceptionHandler(&$last = null)
+    public function useExceptionHandler(&$refLast = null)
     {
         if (null === $this->fnExceptionHandler) {
             return $this;
         }
 
-        $last = set_exception_handler($this->fnExceptionHandler);
+        $refLast = set_exception_handler($this->fnExceptionHandler);
 
         return $this;
     }
@@ -416,6 +658,14 @@ class EntrypointModule
         }
 
         exit(1);
+    }
+
+
+    protected function assertNotLocked() : void
+    {
+        if ($this->isLocked) {
+            throw new RuntimeException('Unable to change `entrypoint` due to it was locked before');
+        }
     }
 
 

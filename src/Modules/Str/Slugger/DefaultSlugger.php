@@ -19,6 +19,7 @@ use Gzhegow\Lib\Modules\Str\Slugger\PresetRegistry\SluggerPresetRegistryInterfac
 
 class DefaultSlugger implements SluggerInterface
 {
+    const SYMFONY_ASCII_SLUGGER     = '\Symfony\Component\String\Slugger\AsciiSlugger';
     const SYMFONY_SLUGGER_INTERFACE = '\Symfony\Component\String\Slugger\SluggerInterface';
 
 
@@ -84,9 +85,7 @@ class DefaultSlugger implements SluggerInterface
             'composer require symfony/translation-contracts',
         ];
 
-        $symfonyAsciiSluggerClass = '\Symfony\Component\String\Slugger\AsciiSlugger';
-
-        if (! class_exists($symfonyAsciiSluggerClass)) {
+        if (! class_exists($symfonyAsciiSluggerClass = static::SYMFONY_ASCII_SLUGGER)) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -234,8 +233,7 @@ class DefaultSlugger implements SluggerInterface
     {
         $localeDefaultPhp = null;
 
-        if (
-            extension_loaded('intl')
+        if (extension_loaded('intl')
             && function_exists('locale_get_default')
         ) {
             $localeDefaultPhp = locale_get_default();
@@ -255,8 +253,8 @@ class DefaultSlugger implements SluggerInterface
     public function localeDefault($localeDefault)
     {
         if (null !== $localeDefault) {
-            if (! (
-                is_string($localeDefault)
+            if (! (false
+                || is_string($localeDefault)
                 || is_callable($localeDefault)
             )) {
                 throw new LogicException(
@@ -441,8 +439,8 @@ class DefaultSlugger implements SluggerInterface
         $stringObject = new \Symfony\Component\String\BinaryString($string);
 
         if ($stringObject->isUtf8()) {
-            $canUseIntl =
-                extension_loaded('intl')
+            $canUseIntl = true
+                && extension_loaded('intl')
                 && function_exists('transliterator_transliterate');
 
             if (! $canUseIntl) {

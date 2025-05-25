@@ -3,367 +3,1061 @@
 namespace Gzhegow\Lib\Modules\Async\Promise;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\PromiseException;
+use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
 
 
 class Promise
 {
+    use PromiseTrait;
+
+
+    const STATE_PENDING  = 'pending';
+    const STATE_RESOLVED = 'resolved';
+    const STATE_REJECTED = 'rejected';
+
+    const LIST_STATE = [
+        self::STATE_PENDING  => true,
+        self::STATE_RESOLVED => true,
+        self::STATE_REJECTED => true,
+    ];
+
+
+    // // > uncomment if you set Promise::$debug = true
+    // /**
+    //  * @var array
+    //  */
+    // public $debug;
+
+    /**
+     * @var PromiseManagerInterface
+     */
+    protected $manager;
+    /**
+     * @var LoopManagerInterface
+     */
+    protected $loop;
+
+    /**
+     * @var string
+     */
+    protected $state = self::STATE_PENDING;
+    /**
+     * @var mixed
+     */
+    protected $resolvedValue;
+    /**
+     * @var mixed
+     */
+    protected $rejectedReason;
     /**
      * @var bool
      */
-    public static $debug = false;
+    protected $isRejectionDelegated = false;
+
+    /**
+     * @var PromiseSettler[]
+     */
+    protected $settlers = [];
+
+
+    public function __construct(
+        PromiseManagerInterface $manager,
+        //
+        LoopManagerInterface $loop
+    )
+    {
+        $this->manager = $manager;
+
+        $this->loop = $loop;
+    }
 
 
     /**
-     * @return APromise|bool|null
+     * @return static
      */
-    public static function from($from, $ctx = null)
+    public static function newPromise(
+        PromiseManagerInterface $manager,
+        //
+        LoopManagerInterface $loop,
+        //
+        callable $fnExecutor
+    )
     {
-        $p = static::getInstance()->from($from, $ctx);
+        $instance = new static($manager, $loop);
+        $instance->state = static::STATE_PENDING;
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
+        $fn = static::fnExecutor($instance, $fnExecutor);
 
-        return $p;
+        $loop->addMicrotask($fn);
+        $loop->registerLoop();
+
+        return $instance;
     }
 
     /**
-     * @return APromise|bool|null
+     * @return static
      */
-    public static function fromValue($from, $ctx = null)
+    public static function newResolved(
+        PromiseManagerInterface $manager,
+        //
+        LoopManagerInterface $loop,
+        //
+        $resolvedValue = null
+    )
     {
-        $p = static::getInstance()->fromValue($from, $ctx);
+        $instance = new static($manager, $loop);
+        $instance->state = static::STATE_RESOLVED;
+        $instance->resolvedValue = $resolvedValue;
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
-
-        return $p;
+        return $instance;
     }
 
     /**
-     * @param callable $from
+     * @return static
+     */
+    public static function newRejected(
+        PromiseManagerInterface $manager,
+        //
+        LoopManagerInterface $loop,
+        //
+        $rejectedReason = null
+    )
+    {
+        $instance = new static($manager, $loop);
+        $instance->state = static::STATE_REJECTED;
+        $instance->rejectedReason = $rejectedReason;
+
+        $fn = static::fnThrowIfUnhandledRejectionInSecondStep($loop, $instance);
+
+        $loop->addMacrotask($fn);
+        $loop->registerLoop();
+
+        return $instance;
+    }
+
+
+    /**
+     * @return static
+     */
+    public static function newNever(
+        PromiseManagerInterface $manager,
+        //
+        LoopManagerInterface $loop
+    )
+    {
+        $instance = new static($manager, $loop);
+        $instance->state = static::STATE_PENDING;
+
+        return $instance;
+    }
+
+    /**
+     * @return static
+     */
+    public static function newDefer(
+        PromiseManagerInterface $manager,
+        //
+        LoopManagerInterface $loop,
+        //
+        ?\Closure &$refFnResolve = null, ?\Closure &$refFnReject = null
+    )
+    {
+        $refFnResolve = null;
+        $refFnReject = null;
+
+        $instance = new static($manager, $loop);
+
+        $refFnResolve = static::fnResolve($instance);
+        $refFnReject = static::fnReject($instance);
+
+        return $instance;
+    }
+
+
+    public function getState() : string
+    {
+        return $this->state;
+    }
+
+
+    public function isAwaiting() : bool
+    {
+        return static::STATE_PENDING === $this->state;
+    }
+
+    public function isSettled() : bool
+    {
+        return static::STATE_PENDING !== $this->state;
+    }
+
+
+    public function isPending() : bool
+    {
+        return static::STATE_PENDING === $this->state;
+    }
+
+    public function isResolved(&$refValue = null) : bool
+    {
+        $refValue = null;
+
+        if (static::STATE_RESOLVED === $this->state) {
+            $refValue = $this->resolvedValue;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function isRejected(&$refReason = null) : bool
+    {
+        $refReason = null;
+
+        if (static::STATE_REJECTED === $this->state) {
+            $refReason = $this->rejectedReason;
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param callable|null $fnOnResolved
+     * @param callable|null $fnOnRejected
+     */
+    public function then($fnOnResolved = null, $fnOnRejected = null) : Promise
+    {
+        $this->isRejectionDelegated = true;
+
+        $promise = $this->manager->never();
+
+        if (Promise::$debug) {
+            $promise->{'debug'} = Lib::debug()->file_line();
+        }
+
+        if (Promise::STATE_RESOLVED === $this->state) {
+            if (null === $fnOnResolved) {
+                $promise->resolve(
+                    $this->resolvedValue
+                );
+
+            } else {
+                $fn = static::fnSettlerThen(
+                    $fnOnResolved,
+                    $promise,
+                    $this->resolvedValue
+                );
+
+                $this->loop->addMicrotask($fn);
+                $this->loop->registerLoop();
+            }
+
+        } elseif (Promise::STATE_REJECTED === $this->state) {
+            if (null === $fnOnRejected) {
+                $promise->reject(
+                    $this->rejectedReason
+                );
+
+            } else {
+                $fn = static::fnSettlerCatch(
+                    $fnOnRejected,
+                    $promise,
+                    $this->rejectedReason
+                );
+
+                $this->loop->addMicrotask($fn);
+                $this->loop->registerLoop();
+            }
+
+        } else {
+            $settler = new PromiseSettler();
+            $settler->type = PromiseSettler::TYPE_THEN;
+
+            $settler->fnOnResolved = $fnOnResolved;
+            $settler->fnOnRejected = $fnOnRejected;
+
+            $settler->promise = $promise;
+            $settler->promiseParent = $this;
+
+            $this->settlers[] = $settler;
+        }
+
+        return $promise;
+    }
+
+    /**
+     * @param callable|null $fnOnRejected
+     */
+    public function catch($fnOnRejected = null) : Promise
+    {
+        $this->isRejectionDelegated = true;
+
+        $promise = $this->manager->never();
+
+        if (Promise::$debug) {
+            $promise->{'debug'} = Lib::debug()->file_line();
+        }
+
+        if (Promise::STATE_RESOLVED === $this->state) {
+            $promise->resolve(
+                $this->resolvedValue
+            );
+
+        } elseif (Promise::STATE_REJECTED === $this->state) {
+            if (null === $fnOnRejected) {
+                $promise->reject(
+                    $this->rejectedReason
+                );
+
+            } else {
+                $fn = static::fnSettlerCatch(
+                    $fnOnRejected,
+                    $promise,
+                    $this->rejectedReason
+                );
+
+                $this->loop->addMicrotask($fn);
+                $this->loop->registerLoop();
+            }
+
+        } else {
+            $settler = new PromiseSettler();
+            $settler->type = PromiseSettler::TYPE_CATCH;
+
+            $settler->fnOnRejected = $fnOnRejected;
+
+            $settler->promiseParent = $this;
+            $settler->promise = $promise;
+
+            $this->settlers[] = $settler;
+        }
+
+        return $promise;
+    }
+
+    /**
+     * @param callable|null $fnOnFinally
+     */
+    public function finally($fnOnFinally = null) : Promise
+    {
+        $this->isRejectionDelegated = true;
+
+        $promise = $this->manager->never();
+
+        if (Promise::$debug) {
+            $promise->{'debug'} = Lib::debug()->file_line();
+        }
+
+        if (Promise::STATE_RESOLVED === $this->state) {
+            if (null === $fnOnFinally) {
+                $promise->resolve(
+                    $this->resolvedValue
+                );
+
+            } else {
+                $fn = static::fnSettlerFinally(
+                    $fnOnFinally,
+                    $promise,
+                    $this
+                );
+
+                $this->loop->addMicrotask($fn);
+                $this->loop->registerLoop();
+            }
+
+        } elseif (Promise::STATE_REJECTED === $this->state) {
+            if (null === $fnOnFinally) {
+                $promise->reject(
+                    $this->rejectedReason
+                );
+
+            } else {
+                $fn = static::fnSettlerFinally(
+                    $fnOnFinally,
+                    $promise,
+                    $this
+                );
+
+                $this->loop->addMicrotask($fn);
+                $this->loop->registerLoop();
+            }
+
+        } else {
+            $settler = new PromiseSettler();
+            $settler->type = PromiseSettler::TYPE_FINALLY;
+
+            $settler->fnOnFinally = $fnOnFinally;
+
+            $settler->promiseParent = $this;
+            $settler->promise = $promise;
+
+            $this->settlers[] = $settler;
+        }
+
+        return $promise;
+    }
+
+
+    protected function resolve($value = null) : void
+    {
+        if (static::STATE_PENDING !== $this->state) {
+            throw new RuntimeException(
+                [ 'Promise is already `settled`', $this ]
+            );
+        }
+
+        $this->state = static::STATE_RESOLVED;
+        $this->resolvedValue = $value;
+
+        foreach ( $this->settlers as $settler ) {
+            $promise = $settler->promise;
+
+            if (PromiseSettler::TYPE_THEN === $settler->type) {
+                $fnOnResolved = $settler->fnOnResolved;
+
+                if (null === $fnOnResolved) {
+                    $promise->resolve(
+                        $this->resolvedValue
+                    );
+
+                } else {
+                    $fn = static::fnSettlerThen(
+                        $fnOnResolved,
+                        $promise,
+                        $this->resolvedValue
+                    );
+
+                    $this->loop->addMicrotask($fn);
+                    $this->loop->registerLoop();
+                }
+
+            } elseif (PromiseSettler::TYPE_CATCH === $settler->type) {
+                $promise->resolve(
+                    $this->resolvedValue
+                );
+
+            } elseif (PromiseSettler::TYPE_FINALLY === $settler->type) {
+                $fnOnFinally = $settler->fnOnFinally;
+
+                if (null === $fnOnFinally) {
+                    $promise->resolve(
+                        $this->resolvedValue
+                    );
+
+                } else {
+                    $fn = static::fnSettlerFinally(
+                        $fnOnFinally,
+                        $promise,
+                        $this
+                    );
+
+                    $this->loop->addMicrotask($fn);
+                    $this->loop->registerLoop();
+                }
+            }
+        }
+    }
+
+    /**
+     * @param Promise $promise
      *
-     * @return APromise|bool|null
+     * @return \Closure
      */
-    public static function fromCallable($from, $ctx = null)
+    protected static function fnResolve($promise)
     {
-        $p = static::getInstance()->fromCallable($from, $ctx);
+        return static function ($value = null) use ($promise) {
+            $promise->resolve(
+                $value
+            );
+        };
+    }
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+
+    protected function reject($reason = null) : void
+    {
+        if (static::STATE_PENDING !== $this->state) {
+            throw new RuntimeException(
+                [ 'Promise is already `settled`', $this ]
+            );
         }
 
-        return $p;
+        $this->state = static::STATE_REJECTED;
+        $this->rejectedReason = $reason;
+
+        foreach ( $this->settlers as $settler ) {
+            $promise = $settler->promise;
+
+            if (PromiseSettler::TYPE_THEN === $settler->type) {
+                $fnOnRejected = $settler->fnOnRejected;
+
+                if (null === $fnOnRejected) {
+                    $promise->reject(
+                        $this->rejectedReason
+                    );
+
+                } else {
+                    $fn = static::fnSettlerCatch(
+                        $fnOnRejected,
+                        $promise,
+                        $this->rejectedReason
+                    );
+
+                    $this->loop->addMicrotask($fn);
+                    $this->loop->registerLoop();
+                }
+
+            } elseif (PromiseSettler::TYPE_CATCH === $settler->type) {
+                $fnOnRejected = $settler->fnOnRejected;
+
+                $fn = static::fnSettlerCatch(
+                    $fnOnRejected,
+                    $promise,
+                    $this->rejectedReason
+                );
+
+                $this->loop->addMicrotask($fn);
+                $this->loop->registerLoop();
+
+            } elseif (PromiseSettler::TYPE_FINALLY === $settler->type) {
+                $fnOnFinally = $settler->fnOnFinally;
+
+                if (null === $fnOnFinally) {
+                    $promise->reject(
+                        $this->rejectedReason
+                    );
+
+                } else {
+                    $fn = static::fnSettlerFinally(
+                        $fnOnFinally,
+                        $promise,
+                        $this
+                    );
+
+                    $this->loop->addMicrotask($fn);
+                    $this->loop->registerLoop();
+                }
+            }
+        }
+
+        if (! $this->isRejectionDelegated) {
+            $fn = static::fnThrowIfUnhandledRejection($this);
+
+            $this->loop->addMicrotask($fn);
+            $this->loop->registerLoop();
+        }
+
+        $this->settlers = [];
     }
-
-
-    public static function isPromise($value) : bool
-    {
-        return static::getInstance()->isPromise($value);
-    }
-
-    public static function isThePromise($value) : bool
-    {
-        return static::getInstance()->isThePromise($value);
-    }
-
-    public static function isTheDeferred($value) : bool
-    {
-        return static::getInstance()->isTheDeferred($value);
-    }
-
 
     /**
-     * @param callable $fnExecutor
+     * @param Promise $promise
      *
-     * @return APromise
+     * @return \Closure
      */
-    public static function new($fnExecutor)
+    protected static function fnReject($promise)
     {
-        $p = static::getInstance()->new($fnExecutor);
-
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
-
-        return $p;
-    }
-
-    /**
-     * @return APromise
-     */
-    public static function resolve($value = null)
-    {
-        $p = static::getInstance()->resolve($value);
-
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
-
-        return $p;
-    }
-
-    /**
-     * @return APromise
-     */
-    public static function reject($reason = null)
-    {
-        $p = static::getInstance()->reject($reason);
-
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
-
-        return $p;
+        return static function ($reason = null) use ($promise) {
+            $promise->reject(
+                $reason
+            );
+        };
     }
 
 
     /**
-     * @return ADeferred
+     * @param callable $fn
      */
-    public static function never()
+    protected function executor($fn) : void
     {
-        $p = static::getInstance()->never();
+        $result = null;
+        $throwable = null;
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        try {
+            $fnResolve = static::fnResolve($this);
+            $fnReject = static::fnReject($this);
+
+            $result = call_user_func($fn, $fnResolve, $fnReject);
+        }
+        catch ( \Throwable $throwable ) {
         }
 
-        return $p;
+        if (null !== $throwable) {
+            $this->reject(
+                $throwable
+            );
+
+            return;
+        }
+
+        if ($result instanceof \Generator) {
+            static::awaitGen($result, $this, null);
+        }
     }
 
     /**
-     * @param \Closure $fnResolve
-     * @param \Closure $fnReject
+     * @param Promise  $promise
+     * @param \Closure $fn
      *
-     * @return ADeferred
+     * @return \Closure
      */
-    public static function defer(&$fnResolve = null, &$fnReject = null)
+    protected static function fnExecutor($promise, $fn)
     {
-        $p = static::getInstance()->defer($fnResolve, $fnReject);
-
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
-
-        return $p;
+        return static function () use ($promise, $fn) {
+            $promise->executor($fn);
+        };
     }
 
 
     /**
-     * @param int $waitMs
+     * @param callable|null $fnOnResolved
+     * @param Promise       $promise
+     * @param mixed         $value
      *
-     * @return ADeferred
+     * @return \Closure
      */
-    public static function delay($waitMs)
+    protected static function fnSettlerThen($fnOnResolved, $promise, $value)
     {
-        $p = static::getInstance()->delay($waitMs);
+        return static function () use ($fnOnResolved, $promise, $value) {
+            if (null === $fnOnResolved) {
+                $promise->resolve($value);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
+                return;
+            }
 
-        return $p;
+            $result = null;
+            $throwable = null;
+
+            try {
+                $result = call_user_func($fnOnResolved, $value);
+            }
+            catch ( \Throwable $throwable ) {
+            }
+
+            if (null !== $throwable) {
+                $promise->reject(
+                    $throwable
+                );
+
+                return;
+            }
+
+            if ($result instanceof \Generator) {
+                static::awaitGen($result, $promise, $promise);
+
+                return;
+            }
+
+            if ($result instanceof self) {
+                if ($result === $promise) {
+                    $promise->reject(
+                        new RuntimeException(
+                            [
+                                'Returning parent promise as a result of the promise forces infinite recursion',
+                                $result,
+                            ]
+                        )
+                    );
+
+                    return;
+                }
+
+                $result->then(
+                    [ $promise, 'resolve' ],
+                    [ $promise, 'reject' ]
+                );
+
+                return;
+            }
+
+            $promise->resolve(
+                $result
+            );
+        };
     }
 
     /**
-     * @param int      $tickMs
-     * @param int      $timeoutMs
-     * @param callable $fnExecutor
+     * @param callable|null $fnOnRejected
+     * @param Promise       $promise
+     * @param mixed         $reason
      *
-     * @return ADeferred
+     * @return \Closure
      */
-    public static function pooling($tickMs, $timeoutMs, $fnExecutor)
+    protected static function fnSettlerCatch($fnOnRejected, $promise, $reason)
     {
-        $p = static::getInstance()->pooling($tickMs, $timeoutMs, $fnExecutor);
+        return static function () use ($fnOnRejected, $promise, $reason) {
+            if (null === $fnOnRejected) {
+                $promise->reject($reason);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
+                return;
+            }
 
-        return $p;
+            $result = null;
+            $throwable = null;
+
+            try {
+                $result = call_user_func($fnOnRejected, $reason);
+            }
+            catch ( \Throwable $throwable ) {
+            }
+
+            if (null !== $throwable) {
+                $promise->reject(
+                    $throwable
+                );
+
+                return;
+            }
+
+            if ($result instanceof \Generator) {
+                static::awaitGen($result, $promise, $promise);
+
+                return;
+            }
+
+            if ($result instanceof self) {
+                if ($result === $promise) {
+                    $promise->reject(
+                        new RuntimeException(
+                            [
+                                'Returning parent promise as a result of the promise forces infinite recursion',
+                                $result,
+                            ]
+                        )
+                    );
+
+                    return;
+                }
+
+                $result->then(
+                    [ $promise, 'resolve' ],
+                    [ $promise, 'reject' ]
+                );
+
+                return;
+            }
+
+            $promise->resolve(
+                $result
+            );
+        };
+    }
+
+    /**
+     * @param callable|null $fnOnFinally
+     * @param Promise       $promise
+     * @param Promise       $promiseParent
+     *
+     * @return \Closure
+     */
+    protected static function fnSettlerFinally($fnOnFinally, $promise, $promiseParent)
+    {
+        return static function () use ($fnOnFinally, $promise, $promiseParent) {
+            if (null !== $fnOnFinally) {
+                $result = null;
+                $throwable = null;
+
+                try {
+                    $result = call_user_func($fnOnFinally);
+                }
+                catch ( \Throwable $throwable ) {
+                }
+
+                if (null !== $throwable) {
+                    $promise->reject(
+                        $throwable
+                    );
+
+                    return;
+                }
+
+                if ($result instanceof \Generator) {
+                    static::awaitGen($result, $promise, null);
+
+                    return;
+                }
+
+                if ($result instanceof self) {
+                    if ($result === $promise) {
+                        $promise->reject(
+                            new RuntimeException(
+                                [
+                                    'Returning parent promise as a result of the promise forces infinite recursion',
+                                    $result,
+                                ]
+                            )
+                        );
+
+                        return;
+                    }
+
+                    $result->catch(
+                        [ $promise, 'reject' ]
+                    );
+
+                    return;
+                }
+            }
+
+            if (static::STATE_RESOLVED === $promiseParent->state) {
+                $promise->resolve(
+                    $promiseParent->resolvedValue
+                );
+
+            } elseif (static::STATE_REJECTED === $promiseParent->state) {
+                $promise->reject(
+                    $promiseParent->rejectedReason
+                );
+            }
+        };
     }
 
 
     /**
-     * @param AbstractPromise[] $ps
-     * @param bool|null         $rejectIfEmpty
+     * @param static $promise
      *
-     * @return AbstractPromise
+     * @return \Closure
      */
-    public static function race($ps, $rejectIfEmpty = null)
+    protected static function fnThrowIfUnhandledRejection($promise)
     {
-        $p = static::getInstance()->firstOf($ps, $rejectIfEmpty);
+        return static function () use ($promise) {
+            if ($promise->isRejectionDelegated) {
+                return;
+            }
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
+            $reason = $promise->rejectedReason;
+            $reasonThrowable = ($reason instanceof \Throwable) ? $reason : null;
 
-        return $p;
+            throw new PromiseException(
+                [ 'Unhandled rejection in Promise', $reason, $promise ], $reasonThrowable
+            );
+        };
     }
 
     /**
-     * @param AbstractPromise[] $ps
-     * @param bool|null         $rejectIfEmpty
+     * @param static $promise
      *
-     * @return AbstractPromise
+     * @return \Closure
      */
-    public static function firstOf($ps, $rejectIfEmpty = null)
+    protected static function fnThrowIfUnhandledRejectionInSecondStep($loop, $promise)
     {
-        $p = static::getInstance()->firstOf($ps, $rejectIfEmpty);
+        return static function () use ($loop, $promise) {
+            if (! $promise->isRejectionDelegated) {
+                $fn = static::fnThrowIfUnhandledRejection($promise);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
-
-        return $p;
-    }
-
-
-    /**
-     * @param AbstractPromise[] $ps
-     * @param bool|null         $rejectIfEmpty
-     *
-     * @return AbstractPromise
-     */
-    public static function any($ps, $rejectIfEmpty = null)
-    {
-        $p = static::getInstance()->firstResolvedOf($ps, $rejectIfEmpty);
-
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
-
-        return $p;
-    }
-
-    /**
-     * @param AbstractPromise[] $ps
-     * @param bool|null         $rejectIfEmpty
-     *
-     * @return AbstractPromise
-     */
-    public static function firstResolvedOf($ps, $rejectIfEmpty = null)
-    {
-        $p = static::getInstance()->firstResolvedOf($ps, $rejectIfEmpty);
-
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
-
-        return $p;
+                $loop->addMicrotask($fn);
+            }
+        };
     }
 
 
     /**
-     * @param AbstractPromise[] $ps
-     * @param bool|null         $rejectIfEmpty
-     *
-     * @return AbstractPromise
+     * @param \Generator  $gen
+     * @param static      $promiseToReject
+     * @param static|null $promiseToResolve
      */
-    public static function allSettled($ps, $rejectIfEmpty = null)
+    protected static function awaitGen($gen, $promiseToReject, $promiseToResolve) : void
     {
-        $p = static::getInstance()->allOf($ps, $rejectIfEmpty);
+        $hasPromiseToResolve = (null !== $promiseToResolve);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        $isValid = $gen->valid();
+
+        $result = null;
+        $throwable = null;
+
+        if (! $isValid) {
+            try {
+                $result = $gen->getReturn();
+            }
+            catch ( \Throwable $throwable ) {
+            }
+
+            if (null !== $throwable) {
+                $promiseToReject->reject(
+                    $throwable
+                );
+
+                return;
+            }
+
+            if ($result instanceof \Generator) {
+                $promiseToReject->reject(
+                    new RuntimeException(
+                        [
+                            'Returning another \Generator from generator function is not supported, you should use `yield from` operator',
+                            $result,
+                            $gen,
+                        ]
+                    )
+                );
+
+                return;
+            }
+
+            if ($result instanceof self) {
+                if (false
+                    || ($result === $promiseToReject)
+                    || ($result === $promiseToResolve)
+                ) {
+                    $promiseToReject->reject(
+                        new RuntimeException(
+                            [
+                                'Returning parent promise as a result of the promise forces infinite recursion',
+                                $result,
+                            ]
+                        )
+                    );
+
+                    return;
+                }
+
+                $fnOnResolved = $hasPromiseToResolve
+                    ? [ $promiseToResolve, 'resolve' ]
+                    : null;
+
+                $fnOnRejected = [ $promiseToReject, 'reject' ];
+
+                $result->then(
+                    $fnOnResolved,
+                    $fnOnRejected
+                );
+
+                return;
+            }
+
+            if ($hasPromiseToResolve) {
+                $promiseToResolve->resolve(
+                    $result
+                );
+            }
+
+            return;
         }
 
-        return $p;
+        try {
+            $current = $gen->current();
+        }
+        catch ( \Throwable $throwable ) {
+        }
+
+        if (null !== $throwable) {
+            $promiseToReject->reject(
+                $throwable
+            );
+
+            return;
+        }
+
+        if ($current instanceof \Generator) {
+            $promiseToReject->reject(
+                new RuntimeException(
+                    [
+                        'Yielding another \Generator from generator function is not supported, you should use `yield from operator`',
+                        $current,
+                        $gen,
+                    ]
+                )
+            );
+
+            return;
+        }
+
+        if ($current instanceof Promise) {
+            $fnGenSend = static::fnGenSend($gen, $promiseToReject, $promiseToResolve);
+            $fnGenThrow = static::fnGenThrow($gen, $promiseToReject, $promiseToResolve);
+
+            $current->then(
+                $fnGenSend,
+                $fnGenThrow
+            );
+
+            return;
+        }
+
+        try {
+            $gen->send($current);
+        }
+        catch ( \Throwable $throwable ) {
+        }
+
+        if (null !== $throwable) {
+            $promiseToReject->reject(
+                $throwable
+            );
+
+            return;
+        }
+
+        // ! recursion
+        static::awaitGen($gen, $promiseToReject, $promiseToResolve);
     }
 
     /**
-     * @param AbstractPromise[] $ps
-     * @param bool|null         $rejectIfEmpty
+     * @param \Generator  $gen
+     * @param static      $promiseToReject
+     * @param static|null $promiseToResolve
      *
-     * @return AbstractPromise
+     * @return \Closure
      */
-    public static function allOf($ps, $rejectIfEmpty = null)
+    protected static function fnGenSend($gen, $promiseToReject, $promiseToResolve)
     {
-        $p = static::getInstance()->allOf($ps, $rejectIfEmpty);
+        return static function ($value = null) use (
+            $gen,
+            //
+            $promiseToReject,
+            $promiseToResolve
+        ) {
+            $throwable = null;
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
+            try {
+                $gen->send($value);
+            }
+            catch ( \Throwable $throwable ) {
+            }
 
-        return $p;
+            if (null !== $throwable) {
+                $promiseToReject->reject(
+                    $throwable
+                );
+
+                return;
+            }
+
+            // ! recursion
+            static::awaitGen($gen, $promiseToReject, $promiseToResolve);
+        };
     }
-
 
     /**
-     * @param AbstractPromise[] $ps
-     * @param bool|null         $rejectIfEmpty
+     * @param \Generator  $gen
+     * @param static      $promiseToReject
+     * @param static|null $promiseToResolve
      *
-     * @return AbstractPromise
+     * @return \Closure
      */
-    public static function all($ps, $rejectIfEmpty = null)
+    protected static function fnGenThrow($gen, $promiseToReject, $promiseToResolve)
     {
-        $p = static::getInstance()->allResolvedOf($ps, $rejectIfEmpty);
+        return static function ($reason) use (
+            $gen,
+            //
+            $promiseToReject
+        ) {
+            $throwable = null;
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
+            try {
+                $gen->throw($reason);
+            }
+            catch ( \Throwable $throwable ) {
+            }
 
-        return $p;
-    }
-
-    /**
-     * @param AbstractPromise[] $ps
-     * @param bool|null         $rejectIfEmpty
-     *
-     * @return AbstractPromise
-     */
-    public static function allResolvedOf($ps, $rejectIfEmpty = null)
-    {
-        $p = static::getInstance()->allResolvedOf($ps, $rejectIfEmpty);
-
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
-
-        return $p;
-    }
-
-
-    /**
-     * @param AbstractPromise $promise
-     * @param int             $timeoutMs
-     *
-     * @return AbstractPromise
-     */
-    public static function timeout($promise, $timeoutMs, $reason = null)
-    {
-        $p = static::getInstance()->timeout($promise, $timeoutMs, $reason);
-
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
-
-        return $p;
-    }
-
-
-    /**
-     * @param string            $url
-     * @param array<int, mixed> $curlOptions
-     *
-     * @return ADeferred
-     */
-    public static function fetchCurl($url, $curlOptions = [])
-    {
-        $p = static::getInstance()->fetchCurl($url, $curlOptions);
-
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
-        }
-
-        return $p;
-    }
-
-
-    public static function getInstance() : PromiseManagerInterface
-    {
-        return Lib::async()->promiseManager();
+            if (null !== $throwable) {
+                $promiseToReject->reject(
+                    $throwable
+                );
+            }
+        };
     }
 }

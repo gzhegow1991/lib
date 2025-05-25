@@ -8,11 +8,11 @@ use Gzhegow\Lib\Exception\RuntimeException;
 class EscapeModule
 {
     public function sql_in(
-        ?array &$params,
+        ?array &$refPdoParams,
         string $sql, array $in, ?string $paramNamePrefix = null
     ) : string
     {
-        $params = $params ?? [];
+        $refPdoParams = $refPdoParams ?? [];
 
         if ([] === $in) {
             return '';
@@ -26,20 +26,20 @@ class EscapeModule
         $sqlIn = '';
         foreach ( $in as $value ) {
             if ($hasParamNamePrefix) {
-                $paramName = ":{$paramNamePrefix}{$i}";
+                $pdoParamName = ":{$paramNamePrefix}{$i}";
 
-                if (isset($params[ $paramName ])) {
+                if (isset($refPdoParams[ $pdoParamName ])) {
                     throw new RuntimeException(
-                        [ 'The `params` already has parameter named: ' . $paramName, $params ]
+                        [ 'The `params` already has parameter named: ' . $pdoParamName, $refPdoParams ]
                     );
                 }
 
-                $params[ $paramName ] = $value;
+                $refPdoParams[ $pdoParamName ] = $value;
 
-                $sqlIn .= "{$paramName}, ";
+                $sqlIn .= "{$pdoParamName}, ";
 
             } else {
-                $params[] = $value;
+                $refPdoParams[] = $value;
 
                 $sqlIn .= "?, ";
             }

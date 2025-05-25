@@ -143,9 +143,11 @@ class DebugModule
         if ((null === $options) || ($options >= 0)) {
             $theDebugBacktracer->options($options);
         }
-        if ((null === $options) || ($limit >= 0)) {
+
+        if ((null === $limit) || ($limit >= 0)) {
             $theDebugBacktracer->limit($limit);
         }
+
         if ('' !== $dirRoot) {
             $theDebugBacktracer->dirRoot($dirRoot);
         }
@@ -212,7 +214,7 @@ class DebugModule
     }
 
 
-    public function type($value, array $options = [], array &$context = []) : string
+    public function type($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + [
@@ -233,7 +235,7 @@ class DebugModule
         $output = $this->var_dump_output(
             $value,
             $options,
-            $context
+            $refContext
         );
 
         $content = '';
@@ -258,7 +260,7 @@ class DebugModule
         return $content;
     }
 
-    public function type_id($value, array $options = [], array &$context = []) : string
+    public function type_id($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + [
@@ -279,7 +281,7 @@ class DebugModule
         $output = $this->var_dump_output(
             $value,
             $options,
-            $context
+            $refContext
         );
 
         $content = '';
@@ -308,7 +310,7 @@ class DebugModule
     }
 
 
-    public function type_value($value, array $options = [], array &$context = []) : string
+    public function type_value($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + [
@@ -329,7 +331,7 @@ class DebugModule
         $output = $this->var_dump_output(
             $value,
             $options,
-            $context
+            $refContext
         );
 
         $content = '';
@@ -357,7 +359,7 @@ class DebugModule
         return $content;
     }
 
-    public function type_value_multiline($value, array $options = [], array &$context = []) : string
+    public function type_value_multiline($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + [
@@ -378,7 +380,7 @@ class DebugModule
         $output = $this->var_dump_output(
             $value,
             $options,
-            $context
+            $refContext
         );
 
         $printableType = '';
@@ -415,7 +417,7 @@ class DebugModule
     }
 
 
-    public function value($value, array $options = [], array &$context = []) : string
+    public function value($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + [
@@ -436,7 +438,7 @@ class DebugModule
         $output = $this->var_dump_output(
             $value,
             $options,
-            $context
+            $refContext
         );
 
         $hasValue = array_key_exists('value', $output);
@@ -490,7 +492,7 @@ class DebugModule
         return $content;
     }
 
-    public function value_multiline($value, array $options = [], array &$context = []) : string
+    public function value_multiline($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + [
@@ -511,7 +513,7 @@ class DebugModule
         $output = $this->var_dump_output(
             $value,
             $options,
-            $context
+            $refContext
         );
 
         $hasValue = array_key_exists('value', $output);
@@ -572,26 +574,26 @@ class DebugModule
     }
 
 
-    public function value_array($value, ?int $levelMax = null, array $options = [], array &$context = []) : string
+    public function value_array($value, ?int $levelMax = null, array $options = [], array &$refContext = []) : string
     {
         $levelMax = $levelMax ?? 1;
         if ($levelMax < 0) $levelMax = 0;
 
         $options[ 'array_level_max' ] = $levelMax;
 
-        $content = $this->value($value, $options, $context);
+        $content = $this->value($value, $options, $refContext);
 
         return $content;
     }
 
-    public function value_array_multiline($value, ?int $levelMax = null, array $options = [], array &$context = []) : string
+    public function value_array_multiline($value, ?int $levelMax = null, array $options = [], array &$refContext = []) : string
     {
         $levelMax = $levelMax ?? 1;
         if ($levelMax < 0) $levelMax = 0;
 
         $options[ 'array_level_max' ] = $levelMax;
 
-        $content = $this->value_multiline($value, $options, $context);
+        $content = $this->value_multiline($value, $options, $refContext);
 
         return $content;
     }
@@ -670,7 +672,7 @@ class DebugModule
     }
 
 
-    public function var_dump($var, array $options = [], array &$context = []) : string
+    public function var_dump($var, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + $options
@@ -689,7 +691,7 @@ class DebugModule
         $output = $this->var_dump_output(
             $var,
             $options,
-            $context
+            $refContext
         );
 
         $withType = $options[ 'with_type' ];
@@ -747,22 +749,22 @@ class DebugModule
         return $content;
     }
 
-    protected function var_dump_output($var, array $options = [], array &$context = []) : array
+    protected function var_dump_output($var, array $options = [], array &$refContext = []) : array
     {
         $output = null
-            ?? $this->var_dump_output_null($var, $options, $context)
-            ?? $this->var_dump_output_bool($var, $options, $context)
-            ?? $this->var_dump_output_int($var, $options, $context)
-            ?? $this->var_dump_output_float($var, $options, $context)
-            ?? $this->var_dump_output_string($var, $options, $context)
-            ?? $this->var_dump_output_object($var, $options, $context)
-            ?? $this->var_dump_output_array($var, $options, $context)
-            ?? $this->var_dump_output_resource($var, $options, $context);
+            ?? $this->var_dump_output_null($var, $options, $refContext)
+            ?? $this->var_dump_output_bool($var, $options, $refContext)
+            ?? $this->var_dump_output_int($var, $options, $refContext)
+            ?? $this->var_dump_output_float($var, $options, $refContext)
+            ?? $this->var_dump_output_string($var, $options, $refContext)
+            ?? $this->var_dump_output_object($var, $options, $refContext)
+            ?? $this->var_dump_output_array($var, $options, $refContext)
+            ?? $this->var_dump_output_resource($var, $options, $refContext);
 
         return $output;
     }
 
-    protected function var_dump_output_null($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_null($var, array $options = [], array &$refContext = []) : ?array
     {
         if (! is_null($var)) return null;
 
@@ -773,7 +775,7 @@ class DebugModule
         return $output;
     }
 
-    protected function var_dump_output_bool($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_bool($var, array $options = [], array &$refContext = []) : ?array
     {
         if (! is_bool($var)) return null;
 
@@ -784,15 +786,15 @@ class DebugModule
         return $output;
     }
 
-    protected function var_dump_output_int($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_int($var, array $options = [], array &$refContext = []) : ?array
     {
         if (! is_int($var)) return null;
 
         $map = [
-            ' ' . PHP_INT_MIN => strval(PHP_INT_MIN),
+            ' ' . PHP_INT_MIN => ((string) PHP_INT_MIN),
         ];
 
-        $varString = strval($var);
+        $varString = (string) $var;
 
         $output = [];
         $output[ 'type' ] = gettype($var);
@@ -803,7 +805,7 @@ class DebugModule
         return $output;
     }
 
-    protected function var_dump_output_float($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_float($var, array $options = [], array &$refContext = []) : ?array
     {
         if (! is_float($var)) return null;
 
@@ -814,7 +816,7 @@ class DebugModule
         return $output;
     }
 
-    protected function var_dump_output_string($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_string($var, array $options = [], array &$refContext = []) : ?array
     {
         if (! is_string($var)) return null;
 
@@ -845,7 +847,7 @@ class DebugModule
         return $output;
     }
 
-    protected function var_dump_output_object($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_object($var, array $options = [], array &$refContext = []) : ?array
     {
         if (! is_object($var)) return null;
 
@@ -884,6 +886,9 @@ class DebugModule
 
             } elseif ($var instanceof \DateInterval) {
                 $printableValue = [ '"' . Lib::date()->interval_encode($var) . '"' ];
+
+            } elseif ($var instanceof \Throwable) {
+                $printableValue = [ '"' . $var->getMessage() . '"' ];
             }
         }
 
@@ -907,7 +912,7 @@ class DebugModule
         return $output;
     }
 
-    protected function var_dump_output_array($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_array($var, array $options = [], array &$refContext = []) : ?array
     {
         if (! is_array($var)) return null;
 
@@ -936,8 +941,8 @@ class DebugModule
             );
 
             foreach ( $gen as $path => &$value ) {
-                if (
-                    is_object($value)
+                if (false
+                    || is_object($value)
                     || $theType->resource($_value, $value)
                 ) {
                     // > ! recursion
@@ -1017,7 +1022,7 @@ class DebugModule
         return $output;
     }
 
-    protected function var_dump_output_resource($var, array $options = [], array &$context = []) : ?array
+    protected function var_dump_output_resource($var, array $options = [], array &$refContext = []) : ?array
     {
         $isResourceOpened = (is_resource($var));
         $isResourceClosed = ('resource (closed)' === gettype($var));
@@ -1174,9 +1179,6 @@ class DebugModule
     }
 
 
-    /**
-     * @param array{ 0: string[]|null } $refs
-     */
     public function diff(
         string $new, string $old,
         array $refs = []
@@ -1253,8 +1255,8 @@ class DebugModule
 
             } elseif (true
                 && $iOldGt0
-                && (
-                    $iNewEq0
+                && (false
+                    || $iNewEq0
                     || ($matrix[ $iOld ][ $iNew - 1 ] < $matrix[ $iOld - 1 ][ $iNew ])
                 )
             ) {
@@ -1272,8 +1274,8 @@ class DebugModule
 
             } elseif (true
                 && $iNewGt0
-                && (
-                    $iOldEq0
+                && (false
+                    || $iOldEq0
                     || ($matrix[ $iOld ][ $iNew - 1 ] >= $matrix[ $iOld - 1 ][ $iNew ])
                 )
             ) {
@@ -1317,9 +1319,6 @@ class DebugModule
         return $isDiff;
     }
 
-    /**
-     * @param array{ 0: string[]|null } $refs
-     */
     public function diff_vars(
         $new = null, $old = null,
         array $refs = []

@@ -45,11 +45,11 @@ class ArrModule
 
 
     /**
-     * @param mixed|null $result
+     * @param mixed|null $r
      */
-    public function type_key_exists(&$result, $value, $key) : bool
+    public function type_key_exists(&$r, $value, $key) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
@@ -63,18 +63,18 @@ class ArrModule
             return false;
         }
 
-        $result = $value[ $key ];
+        $r = $value[ $key ];
 
         return true;
     }
 
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function type_array_plain(&$result, $value) : bool
+    public function type_array_plain(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
@@ -90,18 +90,18 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function type_list(&$result, $value, ?bool $isPlain = null) : bool
+    public function type_list(&$r, $value, ?bool $isPlain = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $isPlain = $isPlain ?? false;
 
@@ -110,7 +110,7 @@ class ArrModule
         }
 
         if ([] === $value) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -134,17 +134,17 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function type_list_sorted(&$result, $value, ?bool $isPlain = null) : bool
+    public function type_list_sorted(&$r, $value, ?bool $isPlain = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $isPlain = $isPlain ?? false;
 
@@ -153,7 +153,7 @@ class ArrModule
         }
 
         if ([] === $value) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -191,18 +191,18 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function type_dict(&$result, $value, ?bool $isPlain = null) : bool
+    public function type_dict(&$r, $value, ?bool $isPlain = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $isPlain = $isPlain ?? false;
 
@@ -211,7 +211,7 @@ class ArrModule
         }
 
         if ([] === $value) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -235,18 +235,18 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      * @param callable   $fnCmp
      */
-    public function type_dict_sorted(&$result, $value, ?bool $isPlain = null, $fnCmp = null) : bool
+    public function type_dict_sorted(&$r, $value, ?bool $isPlain = null, $fnCmp = null) : bool
     {
-        $result = null;
+        $r = null;
 
         $isPlain = $isPlain ?? false;
         $fnCmp = $fnCmp ?? 'strcmp';
@@ -256,7 +256,7 @@ class ArrModule
         }
 
         if ([] === $value) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -306,18 +306,18 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function type_table(&$result, $value) : bool
+    public function type_table(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
@@ -329,17 +329,17 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function type_matrix(&$result, $value) : bool
+    public function type_matrix(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
@@ -351,17 +351,17 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
     /**
-     * @param array|null $result
+     * @param array|null $r
      */
-    public function type_matrix_strict(&$result, $value) : bool
+    public function type_matrix_strict(&$r, $value) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
@@ -373,21 +373,21 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
 
     /**
-     * @param ArrPath|null $result
+     * @param ArrPath|null $r
      */
-    public function type_arrpath(&$result, $value, ?string $dot = null) : bool
+    public function type_arrpath(&$r, $value, ?string $dot = null) : bool
     {
-        $result = null;
+        $r = null;
 
         if ($value instanceof ArrPath) {
-            $result = $value;
+            $r = $value;
 
             return true;
         }
@@ -397,7 +397,7 @@ class ArrModule
                 ? $this->arrpath_dot($dot, $value)
                 : $this->arrpath($value);
 
-            $result = ArrPath::fromValidArray($array);
+            $r = ArrPath::fromValidArray($array);
 
             return true;
         }
@@ -408,9 +408,9 @@ class ArrModule
     }
 
 
-    public function type_array_of_type(&$result, $value, string $type) : bool
+    public function type_array_of_type(&$r, $value, string $type) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
@@ -445,14 +445,14 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
-    public function type_array_of_resource_type(&$result, $value, string $resourceType) : bool
+    public function type_array_of_resource_type(&$r, $value, string $resourceType) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
@@ -468,7 +468,7 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
@@ -476,12 +476,12 @@ class ArrModule
     /**
      * @template T
      *
-     * @param T[]             $result
+     * @param T[]             $r
      * @param class-string<T> $className
      */
-    public function type_array_of_a(&$result, $value, string $className) : bool
+    public function type_array_of_a(&$r, $value, string $className) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
@@ -497,7 +497,7 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
@@ -505,12 +505,12 @@ class ArrModule
     /**
      * @template T
      *
-     * @param T[]             $result
+     * @param T[]             $r
      * @param class-string<T> $className
      */
-    public function type_array_of_class(&$result, $value, string $className) : bool
+    public function type_array_of_class(&$r, $value, string $className) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
@@ -530,7 +530,7 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
@@ -538,12 +538,12 @@ class ArrModule
     /**
      * @template T
      *
-     * @param T[]             $result
+     * @param T[]             $r
      * @param class-string<T> $className
      */
-    public function type_array_of_subclass(&$result, $value, string $className) : bool
+    public function type_array_of_subclass(&$r, $value, string $className) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
@@ -559,14 +559,14 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
 
-    public function type_array_of_callback(&$result, $value, callable $fn, array $args = []) : bool
+    public function type_array_of_callback(&$r, $value, callable $fn, array $args = []) : bool
     {
-        $result = null;
+        $r = null;
 
         if (! is_array($value)) {
             return false;
@@ -580,7 +580,7 @@ class ArrModule
             }
         }
 
-        $result = $value;
+        $r = $value;
 
         return true;
     }
@@ -1017,7 +1017,7 @@ class ArrModule
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function &fetch_path(array &$array, $path)
+    public function &fetch_path(array &$refArray, $path)
     {
         if (! $this->type_arrpath($thePath, $path)) {
             throw new LogicException(
@@ -1027,7 +1027,7 @@ class ArrModule
 
         $pathArray = $thePath->getPath();
 
-        $refCurrent =& $array;
+        $refCurrent =& $refArray;
 
         while ( $pathArray ) {
             $pathStep = array_shift($pathArray);
@@ -1095,7 +1095,7 @@ class ArrModule
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function &put_path(array &$array, $path, $value)
+    public function &put_path(array &$refArray, $path, $value)
     {
         if (! $this->type_arrpath($thePath, $path)) {
             throw new LogicException(
@@ -1105,7 +1105,7 @@ class ArrModule
 
         $pathArray = $thePath->getPath();
 
-        $refCurrent =& $array;
+        $refCurrent =& $refArray;
 
         while ( null !== key($pathArray) ) {
             $pathStep = array_shift($pathArray);
@@ -1140,16 +1140,16 @@ class ArrModule
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function set_path(array &$array, $path, $value) : void
+    public function set_path(array &$refArray, $path, $value) : void
     {
-        $this->put_path($array, $path, $value);
+        $this->put_path($refArray, $path, $value);
     }
 
 
     /**
      * @throws \LogicException
      */
-    public function unset_path(array &$array, $path) : bool
+    public function unset_path(array &$refArray, $path) : bool
     {
         if (! $this->type_arrpath($thePath, $path)) {
             throw new LogicException(
@@ -1159,7 +1159,7 @@ class ArrModule
 
         $pathArray = $thePath->getPath();
 
-        $refCurrent =& $array;
+        $refCurrent =& $refArray;
 
         $isDeleted = false;
 
@@ -1184,10 +1184,9 @@ class ArrModule
             $refCurrent = &$refCurrent[ $pathStep ];
         }
 
-        if (
-            isset($refPrevious)
-            && (
-                isset($refPrevious[ $pathStep ])
+        if (isset($refPrevious)
+            && (false
+                || isset($refPrevious[ $pathStep ])
                 || array_key_exists($pathStep, $refPrevious)
             )
         ) {
@@ -2171,7 +2170,7 @@ class ArrModule
      *
      * @noinspection PhpUnusedLocalVariableInspection
      */
-    public function map_to_object(array $array, object $target = null) : object
+    public function map_to_object(array $array, ?object $target = null) : object
     {
         $target = $target ?? new \stdClass();
 
@@ -2284,14 +2283,14 @@ class ArrModule
      * @template TKey of int|string
      * @template TValue
      *
-     * @param array    $array
+     * @param array    $refArray
      * @param int|null $flags
      *
      * @return \Iterator<array<TKey>, TValue>|\Generator<array<TKey>, TValue>
      */
-    public function &walk_it(array &$array, ?int $flags = null) : \Generator
+    public function &walk_it(array &$refArray, ?int $flags = null) : \Generator
     {
-        if ([] === $array) {
+        if ([] === $refArray) {
             return;
         }
 
@@ -2400,7 +2399,7 @@ class ArrModule
         $theArr = Lib::arr();
 
         // > ref, path
-        $buffer[] = [ &$array, [] ];
+        $buffer[] = [ &$refArray, [] ];
 
         $isRoot = true;
         while ( ! empty($buffer) ) {
@@ -2436,8 +2435,8 @@ class ArrModule
                 $isParent = ! ($isList || $isDict);
             }
 
-            if (
-                ($isWithLeaves && $isLeaf)
+            if (false
+                || ($isWithLeaves && $isLeaf)
                 || ($isWithDicts && $isDict)
                 || ($isWithEmptyArrays && $isEmptyArray)
                 || ($isWithLists && $isList)
@@ -2506,7 +2505,10 @@ class ArrModule
                 ?? (isset($tree[ '' ]) ? '' : null);
         }
 
-        if ((null === $start) || ! isset($tree[ $start ])) {
+        if (false
+            || (null === $start)
+            || ! isset($tree[ $start ])
+        ) {
             return;
         }
 

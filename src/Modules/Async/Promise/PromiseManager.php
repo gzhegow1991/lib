@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules\Async\Promise;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Php\Result\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
@@ -32,7 +33,7 @@ class PromiseManager implements PromiseManagerInterface
      */
     protected $useFetchApiWakeup = false;
     /**
-     * @var ADeferred
+     * @var Promise
      */
     protected $fetchApiWakeupDeferred;
 
@@ -63,113 +64,125 @@ class PromiseManager implements PromiseManagerInterface
 
 
     /**
-     * @return APromise|bool|null
+     * @param Ret $ret
+     *
+     * @return Promise|bool|null
      */
-    public function from($from, $ctx = null)
+    public function from($from, $ret = null)
     {
-        Result::parse($cur);
+        $retCur = Result::asValue();
 
         $instance = null
-            ?? $this->fromInstance($from, $cur)
-            ?? $this->fromCallable($from, $cur)
-            ?? $this->fromValueResolved($from, $cur);
+            ?? $this->fromInstance($from, $retCur)
+            ?? $this->fromCallable($from, $retCur)
+            ?? $this->fromValueResolved($from, $retCur);
 
-        if ($cur->isErr()) {
-            return Result::err($ctx, $cur);
+        if ($retCur->isErr()) {
+            return Result::err($ret, $retCur);
         }
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
     /**
-     * @return APromise|bool|null
+     * @param Ret $ret
+     *
+     * @return Promise|bool|null
      */
-    public function fromValue($from, $ctx = null)
+    public function fromValue($from, $ret = null)
     {
-        Result::parse($cur);
+        $retCur = Result::asValue();
 
         $instance = null
-            ?? $this->fromInstance($from, $cur)
-            ?? $this->fromValueResolved($from, $cur);
+            ?? $this->fromInstance($from, $retCur)
+            ?? $this->fromValueResolved($from, $retCur);
 
-        if ($cur->isErr()) {
-            return Result::err($ctx, $cur);
+        if ($retCur->isErr()) {
+            return Result::err($ret, $retCur);
         }
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
     /**
-     * @return APromise|bool|null
+     * @param Ret $ret
+     *
+     * @return Promise|bool|null
      */
-    public function fromCallable($from, $ctx = null)
+    public function fromCallable($from, $ret = null)
     {
-        Result::parse($cur);
+        $retCur = Result::asValue();
 
         $instance = null
-            ?? $this->fromInstance($from, $cur)
-            ?? $this->fromCallableExecutor($from, $cur);
+            ?? $this->fromInstance($from, $retCur)
+            ?? $this->fromCallableExecutor($from, $retCur);
 
-        if ($cur->isErr()) {
-            return Result::err($ctx, $cur);
+        if ($retCur->isErr()) {
+            return Result::err($ret, $retCur);
         }
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
 
     /**
-     * @return APromise|bool|null
+     * @param Ret $ret
+     *
+     * @return Promise|bool|null
      */
-    protected function fromInstance($from, $ctx = null)
+    protected function fromInstance($from, $ret = null)
     {
-        if ($from instanceof AbstractPromise) {
-            return Result::ok($ctx, $from);
+        if ($from instanceof Promise) {
+            return Result::ok($ret, $from);
         }
 
         return Result::err(
-            $ctx,
-            [ 'The `from` should be instance of: ' . AbstractPromise::class, $from ],
+            $ret,
+            [ 'The `from` should be instance of: ' . Promise::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return APromise|bool|null
+     * @param Ret $ret
+     *
+     * @return Promise|bool|null
      */
-    protected function fromValueResolved($from, $ctx = null)
+    protected function fromValueResolved($from, $ret = null)
     {
         try {
-            $instance = APromise::newResolved($this, $this->loop, $from);
+            $instance = Promise::newResolved($this, $this->loop, $from);
         }
         catch ( \Throwable $e ) {
             return Result::err(
-                $ctx,
+                $ret,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
     /**
-     * @return APromise|bool|null
+     * @param Ret $ret
+     *
+     * @return Promise|bool|null
      */
-    protected function fromCallableExecutor($from, $ctx = null)
+    protected function fromCallableExecutor($from, $ret = null)
     {
         try {
-            $instance = APromise::newPromise($this, $this->loop, $from);
+            $instance = Promise::newPromise($this, $this->loop, $from);
         }
         catch ( \Throwable $e ) {
             return Result::err(
-                $ctx,
+                $ret,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
 
@@ -188,64 +201,56 @@ class PromiseManager implements PromiseManagerInterface
 
     public function isPromise($value) : bool
     {
-        return $value instanceof AbstractPromise;
-    }
-
-    public function isThePromise($value) : bool
-    {
-        return $value instanceof APromise;
-    }
-
-    public function isTheDeferred($value) : bool
-    {
-        return $value instanceof ADeferred;
+        return $value instanceof Promise;
     }
 
 
     /**
      * @param callable $fnExecutor
      */
-    public function new($fnExecutor) : APromise
+    public function new($fnExecutor) : Promise
     {
-        $promise = APromise::newPromise($this, $this->loop, $fnExecutor);
+        $promise = Promise::newPromise($this, $this->loop, $fnExecutor);
 
         return $promise;
     }
 
-    public function resolve($value = null) : APromise
+    public function resolved($value = null) : Promise
     {
-        $promise = APromise::newResolved($this, $this->loop, $value);
+        $promise = Promise::newResolved($this, $this->loop, $value);
 
         return $promise;
     }
 
-    public function reject($reason = null) : APromise
+    public function rejected($reason = null) : Promise
     {
-        $promise = APromise::newRejected($this, $this->loop, $reason);
+        $promise = Promise::newRejected($this, $this->loop, $reason);
 
         return $promise;
     }
 
 
-    public function never() : ADeferred
+    public function never() : Promise
     {
-        $promise = ADeferred::newNever($this, $this->loop);
+        $promise = Promise::newNever(
+            $this, $this->loop
+        );
 
         return $promise;
     }
 
-    public function defer(\Closure &$fnResolve = null, \Closure &$fnReject = null) : ADeferred
+    public function defer(?\Closure &$refFnResolve = null, ?\Closure &$refFnReject = null) : Promise
     {
-        $promise = ADeferred::newDefer(
+        $promise = Promise::newDefer(
             $this, $this->loop,
-            $fnResolve, $fnReject
+            $refFnResolve, $refFnReject
         );
 
         return $promise;
     }
 
 
-    public function delay(int $waitMs) : ADeferred
+    public function delay(int $waitMs) : Promise
     {
         $clock = $this->getClock();
 
@@ -259,7 +264,7 @@ class PromiseManager implements PromiseManagerInterface
     /**
      * @param callable $fnPooling
      */
-    public function pooling(int $tickMs, int $timeoutMs, $fnPooling) : ADeferred
+    public function pooling(int $tickMs, ?int $timeoutMs, $fnPooling) : Promise
     {
         $theType = Lib::type();
 
@@ -269,17 +274,22 @@ class PromiseManager implements PromiseManagerInterface
             );
         }
 
-        if (! $theType->int_positive($timeoutMsInt, $timeoutMs)) {
-            throw new LogicException(
-                [ 'The `timeoutMs` should be positive integer', $timeoutMs ]
-            );
+        if (null !== ($timeoutMsInt = $timeoutMs)) {
+            if (! $theType->int_positive($timeoutMsInt, $timeoutMs)) {
+                throw new LogicException(
+                    [ 'The `timeoutMs` should be positive integer', $timeoutMs ]
+                );
+            }
         }
 
         $clock = $this->getClock();
 
         $defer = $this->defer($fnResolve, $fnReject);
 
-        $timeoutMicrotime = microtime(true) + ($timeoutMsInt / 1000);
+        $timeoutMicrotime = null;
+        if (null !== $timeoutMsInt) {
+            $timeoutMicrotime = microtime(true) + ($timeoutMsInt / 1000);
+        }
 
         $fnTick = static function () use (
             $timeoutMs,
@@ -294,8 +304,10 @@ class PromiseManager implements PromiseManagerInterface
                 &$timeoutMicrotime,
             ]);
 
-            if (microtime(true) > $timeoutMicrotime) {
-                $fnReject("Timeout: {$timeoutMs}");
+            if (null !== $timeoutMicrotime) {
+                if (microtime(true) > $timeoutMicrotime) {
+                    $fnReject("Timeout: {$timeoutMs}");
+                }
             }
         };
 
@@ -312,15 +324,15 @@ class PromiseManager implements PromiseManagerInterface
 
 
     /**
-     * @param AbstractPromise[] $ps
+     * @param Promise[] $ps
      */
-    public function firstOf(array $ps, ?bool $rejectIfEmpty = null) : AbstractPromise
+    public function firstOf(array $ps, ?bool $rejectIfEmpty = null) : Promise
     {
         $rejectIfEmpty = $rejectIfEmpty ?? true;
 
         if ([] === $ps) {
             if ($rejectIfEmpty) {
-                return $this->reject(
+                return $this->rejected(
                     new LogicException('The `ps` should be non-empty array')
                 );
             }
@@ -357,7 +369,7 @@ class PromiseManager implements PromiseManagerInterface
         };
 
         foreach ( $ps as $v ) {
-            $p = $this->isPromise($v) ? $v : $this->resolve($v);
+            $p = $this->isPromise($v) ? $v : $this->resolved($v);
 
             $p->then($fnOnResolvedChild, $fnOnRejectedChild);
         }
@@ -366,15 +378,15 @@ class PromiseManager implements PromiseManagerInterface
     }
 
     /**
-     * @param AbstractPromise[] $ps
+     * @param Promise[] $ps
      */
-    public function firstResolvedOf(array $ps, ?bool $rejectIfEmpty = null) : AbstractPromise
+    public function firstResolvedOf(array $ps, ?bool $rejectIfEmpty = null) : Promise
     {
         $rejectIfEmpty = $rejectIfEmpty ?? true;
 
         if ([] === $ps) {
             if ($rejectIfEmpty) {
-                return $this->reject(
+                return $this->rejected(
                     new LogicException('The `ps` should be non-empty array')
                 );
             }
@@ -400,7 +412,7 @@ class PromiseManager implements PromiseManagerInterface
             ) {
                 if (false !== $report) {
                     $report[ $i ] = [
-                        'status' => AbstractPromise::STATE_RESOLVED,
+                        'status' => Promise::STATE_RESOLVED,
                         'value'  => $value,
                     ];
                 }
@@ -428,7 +440,7 @@ class PromiseManager implements PromiseManagerInterface
             ) {
                 if (false !== $report) {
                     $report[ $i ] = [
-                        'status' => AbstractPromise::STATE_REJECTED,
+                        'status' => Promise::STATE_REJECTED,
                         'reason' => $reason,
                     ];
                 }
@@ -446,7 +458,7 @@ class PromiseManager implements PromiseManagerInterface
                 }
             };
 
-            $p = $this->isPromise($v) ? $v : $this->resolve($v);
+            $p = $this->isPromise($v) ? $v : $this->resolved($v);
 
             $p->then($fnOnResolvedChild, $fnOnRejectedChild);
         }
@@ -456,20 +468,20 @@ class PromiseManager implements PromiseManagerInterface
 
 
     /**
-     * @param AbstractPromise[] $ps
+     * @param Promise[] $ps
      */
-    public function allOf(array $ps, ?bool $rejectIfEmpty = null) : AbstractPromise
+    public function allOf(array $ps, ?bool $rejectIfEmpty = null) : Promise
     {
         $rejectIfEmpty = $rejectIfEmpty ?? true;
 
         if ([] === $ps) {
             if ($rejectIfEmpty) {
-                return $this->reject(
+                return $this->rejected(
                     new LogicException('The `ps` should be non-empty array')
                 );
             }
 
-            return $this->resolve(
+            return $this->resolved(
                 []
             );
         }
@@ -491,7 +503,7 @@ class PromiseManager implements PromiseManagerInterface
                 $fnResolveParent, $i
             ) {
                 $report[ $i ] = [
-                    'status' => AbstractPromise::STATE_RESOLVED,
+                    'status' => Promise::STATE_RESOLVED,
                     'value'  => $value,
                 ];
 
@@ -514,7 +526,7 @@ class PromiseManager implements PromiseManagerInterface
                 $fnResolveParent, $i
             ) {
                 $report[ $i ] = [
-                    'status' => AbstractPromise::STATE_REJECTED,
+                    'status' => Promise::STATE_REJECTED,
                     'reason' => $reason,
                 ];
 
@@ -528,7 +540,7 @@ class PromiseManager implements PromiseManagerInterface
                 }
             };
 
-            $p = $this->isPromise($v) ? $v : $this->resolve($v);
+            $p = $this->isPromise($v) ? $v : $this->resolved($v);
 
             $p->then($fnOnResolvedChild, $fnOnRejectedChild);
         }
@@ -537,20 +549,20 @@ class PromiseManager implements PromiseManagerInterface
     }
 
     /**
-     * @param AbstractPromise[] $ps
+     * @param Promise[] $ps
      */
-    public function allResolvedOf(array $ps, ?bool $rejectIfEmpty = null) : AbstractPromise
+    public function allResolvedOf(array $ps, ?bool $rejectIfEmpty = null) : Promise
     {
         $rejectIfEmpty = $rejectIfEmpty ?? true;
 
         if ([] === $ps) {
             if ($rejectIfEmpty) {
-                return $this->reject(
+                return $this->rejected(
                     new LogicException('The `ps` should be non-empty array')
                 );
             }
 
-            return $this->resolve(
+            return $this->resolved(
                 []
             );
         }
@@ -581,7 +593,7 @@ class PromiseManager implements PromiseManagerInterface
 
                 if (false !== $report) {
                     $report[ $i ] = [
-                        'status' => AbstractPromise::STATE_RESOLVED,
+                        'status' => Promise::STATE_RESOLVED,
                         'value'  => $value,
                     ];
                 }
@@ -614,7 +626,7 @@ class PromiseManager implements PromiseManagerInterface
             ) {
                 if (false !== $report) {
                     $report[ $i ] = [
-                        'status' => AbstractPromise::STATE_REJECTED,
+                        'status' => Promise::STATE_REJECTED,
                         'reason' => $reason,
                     ];
                 }
@@ -639,7 +651,7 @@ class PromiseManager implements PromiseManagerInterface
                 }
             };
 
-            $p = $this->isPromise($v) ? $v : $this->resolve($v);
+            $p = $this->isPromise($v) ? $v : $this->resolved($v);
 
             $p->then($fnOnResolvedChild, $fnOnRejectedChild);
         }
@@ -648,7 +660,7 @@ class PromiseManager implements PromiseManagerInterface
     }
 
 
-    public function timeout(AbstractPromise $promise, int $timeoutMs, $reason = null) : AbstractPromise
+    public function timeout(Promise $promise, int $timeoutMs, $reason = null) : Promise
     {
         $clock = $this->getClock();
 
@@ -690,7 +702,7 @@ class PromiseManager implements PromiseManagerInterface
     /**
      * @param array<int, mixed> $curlOptions
      */
-    public function fetchCurl(string $url, array $curlOptions = [], ?int $timeoutMs = null) : ADeferred
+    public function fetchCurl(string $url, array $curlOptions = [], ?int $timeoutMs = null) : Promise
     {
         $theType = Lib::type();
 
@@ -718,63 +730,15 @@ class PromiseManager implements PromiseManagerInterface
         $curlOptionsList = $curlOptionsList ?? [];
         $timeoutMsInt = $timeoutMsInt ?? 10000;
 
-        $promise = $this
-            ->fetchApiAwait()
-            ->then(function () use ($urlString, $curlOptionsList) {
-                return $this->fetchApiPushTask($urlString, $curlOptionsList);
-            })
-            ->then(function ($taskId) use ($timeoutMsInt) {
+        $taskId = $this->fetchApiPushTask($urlString, $curlOptionsList);
+
+        $promise = $this->fetchApiAwait()
+            ->then(function () use ($taskId, $timeoutMsInt) {
                 return $this->fetchApiTaskGetResult($taskId, $timeoutMsInt);
             })
         ;
 
         return $promise;
-    }
-
-    /**
-     * @return AbstractPromise
-     */
-    protected function fetchApiAwait()
-    {
-        $fetchApi = $this->getFetchApi();
-
-        if ($fetchApi->daemonIsAwake()) {
-            return Promise::resolve();
-
-        } elseif ($this->useFetchApiWakeup) {
-            return $this->fetchApiWakeup();
-
-        } else {
-            return Promise::reject('Daemon is sleeping');
-        }
-    }
-
-    /**
-     * @return ADeferred
-     */
-    protected function fetchApiWakeup()
-    {
-        $promise = $this->fetchApiWakeupDeferred;
-
-        if ((null === $promise) || $promise->isSettled()) {
-            $fetchApi = $this->getFetchApi();
-
-            $fetchApi->daemonWakeup(10000, 1000);
-
-            $fnPooling = static function ($fnResolve) use ($fetchApi) {
-                if (! $fetchApi->daemonIsAwake()) {
-                    return;
-                }
-
-                $fnResolve();
-            };
-
-            $promise = $this->pooling(100, 10000, $fnPooling);
-
-            $this->fetchApiWakeupDeferred = $promise;
-        }
-
-        return $this->fetchApiWakeupDeferred;
     }
 
     /**
@@ -799,7 +763,56 @@ class PromiseManager implements PromiseManagerInterface
     }
 
     /**
-     * @return ADeferred
+     * @return Promise
+     */
+    protected function fetchApiAwait()
+    {
+        $fetchApi = $this->getFetchApi();
+
+        if ($fetchApi->daemonIsAwake()) {
+            return Promise::resolved();
+
+        } elseif ($this->useFetchApiWakeup) {
+            return $this->fetchApiWakeup();
+
+        } else {
+            return Promise::rejected('Daemon is sleeping');
+        }
+    }
+
+    /**
+     * @return Promise
+     */
+    protected function fetchApiWakeup()
+    {
+        $promise = $this->fetchApiWakeupDeferred;
+
+        if (false
+            || (null === $promise)
+            || $promise->isSettled()
+        ) {
+            $fetchApi = $this->getFetchApi();
+
+            $fetchApi->daemonWakeup(10000, 1000);
+
+            $fnPooling = static function ($fnResolve) use ($fetchApi) {
+                if (! $fetchApi->daemonIsAwake()) {
+                    return;
+                }
+
+                $fnResolve();
+            };
+
+            $promise = $this->pooling(100, 10000, $fnPooling);
+
+            $this->fetchApiWakeupDeferred = $promise;
+        }
+
+        return $this->fetchApiWakeupDeferred;
+    }
+
+    /**
+     * @return Promise
      */
     protected function fetchApiTaskGetResult(
         string $taskId,

@@ -25,8 +25,8 @@ class ParseThrowModule
 	 */
 	public function empty($value)
 	{
-		if (Lib::type()->empty($result, $value)) {
-		    return $result;
+		if (Lib::type()->empty($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `empty` is failed", $value ]);
@@ -38,8 +38,8 @@ class ParseThrowModule
 	 */
 	public function any_not_empty($value)
 	{
-		if (Lib::type()->any_not_empty($result, $value)) {
-		    return $result;
+		if (Lib::type()->any_not_empty($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `any_not_empty` is failed", $value ]);
@@ -53,8 +53,8 @@ class ParseThrowModule
 	 */
 	public function blank($value)
 	{
-		if (Lib::type()->blank($result, $value)) {
-		    return $result;
+		if (Lib::type()->blank($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `blank` is failed", $value ]);
@@ -66,8 +66,8 @@ class ParseThrowModule
 	 */
 	public function any_not_blank($value)
 	{
-		if (Lib::type()->any_not_blank($result, $value)) {
-		    return $result;
+		if (Lib::type()->any_not_blank($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `any_not_blank` is failed", $value ]);
@@ -81,8 +81,8 @@ class ParseThrowModule
 	 */
 	public function nullable($value)
 	{
-		if (Lib::type()->nullable($result, $value)) {
-		    return $result;
+		if (Lib::type()->nullable($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `nullable` is failed", $value ]);
@@ -94,8 +94,8 @@ class ParseThrowModule
 	 */
 	public function any_not_nullable($value)
 	{
-		if (Lib::type()->any_not_nullable($result, $value)) {
-		    return $result;
+		if (Lib::type()->any_not_nullable($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `any_not_nullable` is failed", $value ]);
@@ -109,8 +109,8 @@ class ParseThrowModule
 	 */
 	public function passed($value)
 	{
-		if (Lib::type()->passed($result, $value)) {
-		    return $result;
+		if (Lib::type()->passed($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `passed` is failed", $value ]);
@@ -122,8 +122,8 @@ class ParseThrowModule
 	 */
 	public function any_not_passed($value)
 	{
-		if (Lib::type()->any_not_passed($result, $value)) {
-		    return $result;
+		if (Lib::type()->any_not_passed($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `any_not_passed` is failed", $value ]);
@@ -142,8 +142,8 @@ class ParseThrowModule
 	 */
 	public function nil($value)
 	{
-		if (Lib::type()->nil($result, $value)) {
-		    return $result;
+		if (Lib::type()->nil($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `nil` is failed", $value ]);
@@ -155,8 +155,8 @@ class ParseThrowModule
 	 */
 	public function any_not_nil($value)
 	{
-		if (Lib::type()->any_not_nil($result, $value)) {
-		    return $result;
+		if (Lib::type()->any_not_nil($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `any_not_nil` is failed", $value ]);
@@ -168,8 +168,8 @@ class ParseThrowModule
 	 */
 	public function a_null($value)
 	{
-		if (Lib::type()->a_null($result, $value)) {
-		    return $result;
+		if (Lib::type()->a_null($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `a_null` is failed", $value ]);
@@ -181,8 +181,8 @@ class ParseThrowModule
 	 */
 	public function any_not_null($value)
 	{
-		if (Lib::type()->any_not_null($result, $value)) {
-		    return $result;
+		if (Lib::type()->any_not_null($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `any_not_null` is failed", $value ]);
@@ -194,8 +194,8 @@ class ParseThrowModule
 	 */
 	public function a_bool($value)
 	{
-		if (Lib::type()->a_bool($result, $value)) {
-		    return $result;
+		if (Lib::type()->a_bool($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `a_bool` is failed", $value ]);
@@ -207,8 +207,8 @@ class ParseThrowModule
 	 */
 	public function an_any_not_bool($value)
 	{
-		if (Lib::type()->an_any_not_bool($result, $value)) {
-		    return $result;
+		if (Lib::type()->an_any_not_bool($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `an_any_not_bool` is failed", $value ]);
@@ -220,8 +220,8 @@ class ParseThrowModule
 	 */
 	public function a_false($value)
 	{
-		if (Lib::type()->a_false($result, $value)) {
-		    return $result;
+		if (Lib::type()->a_false($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `a_false` is failed", $value ]);
@@ -233,8 +233,8 @@ class ParseThrowModule
 	 */
 	public function any_not_false($value)
 	{
-		if (Lib::type()->any_not_false($result, $value)) {
-		    return $result;
+		if (Lib::type()->any_not_false($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `any_not_false` is failed", $value ]);
@@ -246,8 +246,8 @@ class ParseThrowModule
 	 */
 	public function a_true($value)
 	{
-		if (Lib::type()->a_true($result, $value)) {
-		    return $result;
+		if (Lib::type()->a_true($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `a_true` is failed", $value ]);
@@ -259,8 +259,8 @@ class ParseThrowModule
 	 */
 	public function any_not_true($value)
 	{
-		if (Lib::type()->any_not_true($result, $value)) {
-		    return $result;
+		if (Lib::type()->any_not_true($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `any_not_true` is failed", $value ]);
@@ -272,8 +272,8 @@ class ParseThrowModule
 	 */
 	public function bool($value)
 	{
-		if (Lib::type()->bool($result, $value)) {
-		    return $result;
+		if (Lib::type()->bool($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `bool` is failed", $value ]);
@@ -285,8 +285,8 @@ class ParseThrowModule
 	 */
 	public function false($value)
 	{
-		if (Lib::type()->false($result, $value)) {
-		    return $result;
+		if (Lib::type()->false($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `false` is failed", $value ]);
@@ -298,8 +298,8 @@ class ParseThrowModule
 	 */
 	public function true($value)
 	{
-		if (Lib::type()->true($result, $value)) {
-		    return $result;
+		if (Lib::type()->true($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `true` is failed", $value ]);
@@ -311,8 +311,8 @@ class ParseThrowModule
 	 */
 	public function userbool($value)
 	{
-		if (Lib::type()->userbool($result, $value)) {
-		    return $result;
+		if (Lib::type()->userbool($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `userbool` is failed", $value ]);
@@ -324,8 +324,8 @@ class ParseThrowModule
 	 */
 	public function userfalse($value)
 	{
-		if (Lib::type()->userfalse($result, $value)) {
-		    return $result;
+		if (Lib::type()->userfalse($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `userfalse` is failed", $value ]);
@@ -337,8 +337,8 @@ class ParseThrowModule
 	 */
 	public function usertrue($value)
 	{
-		if (Lib::type()->usertrue($result, $value)) {
-		    return $result;
+		if (Lib::type()->usertrue($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `usertrue` is failed", $value ]);
@@ -350,8 +350,8 @@ class ParseThrowModule
 	 */
 	public function nan($value)
 	{
-		if (Lib::type()->nan($result, $value)) {
-		    return $result;
+		if (Lib::type()->nan($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `nan` is failed", $value ]);
@@ -363,8 +363,8 @@ class ParseThrowModule
 	 */
 	public function float_not_nan($value)
 	{
-		if (Lib::type()->float_not_nan($result, $value)) {
-		    return $result;
+		if (Lib::type()->float_not_nan($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `float_not_nan` is failed", $value ]);
@@ -376,8 +376,8 @@ class ParseThrowModule
 	 */
 	public function any_not_nan($value)
 	{
-		if (Lib::type()->any_not_nan($result, $value)) {
-		    return $result;
+		if (Lib::type()->any_not_nan($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `any_not_nan` is failed", $value ]);
@@ -389,8 +389,8 @@ class ParseThrowModule
 	 */
 	public function finite($value)
 	{
-		if (Lib::type()->finite($result, $value)) {
-		    return $result;
+		if (Lib::type()->finite($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `finite` is failed", $value ]);
@@ -402,8 +402,8 @@ class ParseThrowModule
 	 */
 	public function float_not_finite($value)
 	{
-		if (Lib::type()->float_not_finite($result, $value)) {
-		    return $result;
+		if (Lib::type()->float_not_finite($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `float_not_finite` is failed", $value ]);
@@ -415,8 +415,8 @@ class ParseThrowModule
 	 */
 	public function any_not_finite($value)
 	{
-		if (Lib::type()->any_not_finite($result, $value)) {
-		    return $result;
+		if (Lib::type()->any_not_finite($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `any_not_finite` is failed", $value ]);
@@ -428,8 +428,8 @@ class ParseThrowModule
 	 */
 	public function infinite($value)
 	{
-		if (Lib::type()->infinite($result, $value)) {
-		    return $result;
+		if (Lib::type()->infinite($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `infinite` is failed", $value ]);
@@ -441,8 +441,8 @@ class ParseThrowModule
 	 */
 	public function float_not_infinite($value)
 	{
-		if (Lib::type()->float_not_infinite($result, $value)) {
-		    return $result;
+		if (Lib::type()->float_not_infinite($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `float_not_infinite` is failed", $value ]);
@@ -454,11 +454,50 @@ class ParseThrowModule
 	 */
 	public function any_not_infinite($value)
 	{
-		if (Lib::type()->any_not_infinite($result, $value)) {
-		    return $result;
+		if (Lib::type()->any_not_infinite($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `any_not_infinite` is failed", $value ]);
+	}
+
+
+	/**
+	 * @return float|null
+	 */
+	public function float_min($value)
+	{
+		if (Lib::type()->float_min($r, $value)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `float_min` is failed", $value ]);
+	}
+
+
+	/**
+	 * @return float|null
+	 */
+	public function float_not_float_min($value)
+	{
+		if (Lib::type()->float_not_float_min($r, $value)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `float_not_float_min` is failed", $value ]);
+	}
+
+
+	/**
+	 * @return mixed|null
+	 */
+	public function any_not_float_min($value)
+	{
+		if (Lib::type()->any_not_float_min($r, $value)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `any_not_float_min` is failed", $value ]);
 	}
 
 
@@ -467,8 +506,8 @@ class ParseThrowModule
 	 */
 	public function numeric($value, ?bool $isAllowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric($result, $value, $isAllowExp, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric($r, $value, $isAllowExp, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric` is failed", $value, $isAllowExp, $refs ]);
@@ -478,65 +517,65 @@ class ParseThrowModule
 	/**
 	 * @return string|null
 	 */
-	public function numeric_non_zero($value, ?bool $allowExp = null, array $refs = [])
+	public function numeric_non_zero($value, ?bool $isAllowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_non_zero($result, $value, $allowExp, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_non_zero($r, $value, $isAllowExp, $refs)) {
+		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `numeric_non_zero` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Parsing `numeric_non_zero` is failed", $value, $isAllowExp, $refs ]);
 	}
 
 
 	/**
 	 * @return string|null
 	 */
-	public function numeric_non_negative($value, ?bool $allowExp = null, array $refs = [])
+	public function numeric_non_negative($value, ?bool $isAllowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_non_negative($result, $value, $allowExp, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_non_negative($r, $value, $isAllowExp, $refs)) {
+		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `numeric_non_negative` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Parsing `numeric_non_negative` is failed", $value, $isAllowExp, $refs ]);
 	}
 
 
 	/**
 	 * @return string|null
 	 */
-	public function numeric_non_positive($value, ?bool $allowExp = null, array $refs = [])
+	public function numeric_non_positive($value, ?bool $isAllowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_non_positive($result, $value, $allowExp, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_non_positive($r, $value, $isAllowExp, $refs)) {
+		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `numeric_non_positive` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Parsing `numeric_non_positive` is failed", $value, $isAllowExp, $refs ]);
 	}
 
 
 	/**
 	 * @return string|null
 	 */
-	public function numeric_negative($value, ?bool $allowExp = null, array $refs = [])
+	public function numeric_negative($value, ?bool $isAllowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_negative($result, $value, $allowExp, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_negative($r, $value, $isAllowExp, $refs)) {
+		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `numeric_negative` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Parsing `numeric_negative` is failed", $value, $isAllowExp, $refs ]);
 	}
 
 
 	/**
 	 * @return string|null
 	 */
-	public function numeric_positive($value, ?bool $allowExp = null, array $refs = [])
+	public function numeric_positive($value, ?bool $isAllowExp = null, array $refs = [])
 	{
-		if (Lib::type()->numeric_positive($result, $value, $allowExp, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_positive($r, $value, $isAllowExp, $refs)) {
+		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `numeric_positive` is failed", $value, $allowExp, $refs ]);
+		throw new LogicException([ "Parsing `numeric_positive` is failed", $value, $isAllowExp, $refs ]);
 	}
 
 
@@ -545,8 +584,8 @@ class ParseThrowModule
 	 */
 	public function numeric_int($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_int($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_int` is failed", $value, $refs ]);
@@ -558,8 +597,8 @@ class ParseThrowModule
 	 */
 	public function numeric_int_non_zero($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_non_zero($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_int_non_zero($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_int_non_zero` is failed", $value, $refs ]);
@@ -571,8 +610,8 @@ class ParseThrowModule
 	 */
 	public function numeric_int_non_negative($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_non_negative($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_int_non_negative($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_int_non_negative` is failed", $value, $refs ]);
@@ -584,8 +623,8 @@ class ParseThrowModule
 	 */
 	public function numeric_int_non_positive($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_non_positive($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_int_non_positive($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_int_non_positive` is failed", $value, $refs ]);
@@ -597,8 +636,8 @@ class ParseThrowModule
 	 */
 	public function numeric_int_negative($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_negative($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_int_negative($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_int_negative` is failed", $value, $refs ]);
@@ -610,8 +649,8 @@ class ParseThrowModule
 	 */
 	public function numeric_int_positive($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_positive($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_int_positive($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_int_positive` is failed", $value, $refs ]);
@@ -623,8 +662,8 @@ class ParseThrowModule
 	 */
 	public function numeric_int_positive_or_minus_one($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_positive_or_minus_one($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_int_positive_or_minus_one($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_int_positive_or_minus_one` is failed", $value, $refs ]);
@@ -636,8 +675,8 @@ class ParseThrowModule
 	 */
 	public function numeric_int_non_negative_or_minus_one($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_int_non_negative_or_minus_one($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_int_non_negative_or_minus_one($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_int_non_negative_or_minus_one` is failed", $value, $refs ]);
@@ -649,8 +688,8 @@ class ParseThrowModule
 	 */
 	public function numeric_float($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_float($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_float($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_float` is failed", $value, $refs ]);
@@ -662,8 +701,8 @@ class ParseThrowModule
 	 */
 	public function numeric_float_non_zero($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_float_non_zero($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_float_non_zero($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_float_non_zero` is failed", $value, $refs ]);
@@ -675,8 +714,8 @@ class ParseThrowModule
 	 */
 	public function numeric_float_non_negative($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_float_non_negative($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_float_non_negative($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_float_non_negative` is failed", $value, $refs ]);
@@ -688,8 +727,8 @@ class ParseThrowModule
 	 */
 	public function numeric_float_non_positive($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_float_non_positive($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_float_non_positive($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_float_non_positive` is failed", $value, $refs ]);
@@ -701,8 +740,8 @@ class ParseThrowModule
 	 */
 	public function numeric_float_negative($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_float_negative($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_float_negative($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_float_negative` is failed", $value, $refs ]);
@@ -714,8 +753,8 @@ class ParseThrowModule
 	 */
 	public function numeric_float_positive($value, array $refs = [])
 	{
-		if (Lib::type()->numeric_float_positive($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->numeric_float_positive($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `numeric_float_positive` is failed", $value, $refs ]);
@@ -725,10 +764,118 @@ class ParseThrowModule
 	/**
 	 * @return string|null
 	 */
+	public function numeric_trimpad(
+		$value,
+		?int $lenTrim = null,
+		?int $lenPad = null,
+		string $stringPad = '0',
+		array $refs = []
+	) {
+		if (Lib::type()->numeric_trimpad($r, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `numeric_trimpad` is failed", $value, $lenTrim, $lenPad, $stringPad, $refs ]);
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function numeric_trimpad_non_zero(
+		$value,
+		?int $lenTrim = null,
+		?int $lenPad = null,
+		string $stringPad = '0',
+		array $refs = []
+	) {
+		if (Lib::type()->numeric_trimpad_non_zero($r, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `numeric_trimpad_non_zero` is failed", $value, $lenTrim, $lenPad, $stringPad, $refs ]);
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function numeric_trimpad_non_negative(
+		$value,
+		?int $lenTrim = null,
+		?int $lenPad = null,
+		string $stringPad = '0',
+		array $refs = []
+	) {
+		if (Lib::type()->numeric_trimpad_non_negative($r, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `numeric_trimpad_non_negative` is failed", $value, $lenTrim, $lenPad, $stringPad, $refs ]);
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function numeric_trimpad_non_positive(
+		$value,
+		?int $lenTrim = null,
+		?int $lenPad = null,
+		string $stringPad = '0',
+		array $refs = []
+	) {
+		if (Lib::type()->numeric_trimpad_non_positive($r, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `numeric_trimpad_non_positive` is failed", $value, $lenTrim, $lenPad, $stringPad, $refs ]);
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function numeric_trimpad_negative(
+		$value,
+		?int $lenTrim = null,
+		?int $lenPad = null,
+		string $stringPad = '0',
+		array $refs = []
+	) {
+		if (Lib::type()->numeric_trimpad_negative($r, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `numeric_trimpad_negative` is failed", $value, $lenTrim, $lenPad, $stringPad, $refs ]);
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function numeric_trimpad_positive(
+		$value,
+		?int $lenTrim = null,
+		?int $lenPad = null,
+		string $stringPad = '0',
+		array $refs = []
+	) {
+		if (Lib::type()->numeric_trimpad_positive($r, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `numeric_trimpad_positive` is failed", $value, $lenTrim, $lenPad, $stringPad, $refs ]);
+	}
+
+
+	/**
+	 * @return string|null
+	 */
 	public function decimal($value, int $scale = 0, array $refs = [])
 	{
-		if (Lib::type()->decimal($result, $value, $scale, $refs)) {
-		    return $result;
+		if (Lib::type()->decimal($r, $value, $scale, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `decimal` is failed", $value, $scale, $refs ]);
@@ -740,8 +887,8 @@ class ParseThrowModule
 	 */
 	public function decimal_non_zero($value, int $scale = 0, array $refs = [])
 	{
-		if (Lib::type()->decimal_non_zero($result, $value, $scale, $refs)) {
-		    return $result;
+		if (Lib::type()->decimal_non_zero($r, $value, $scale, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `decimal_non_zero` is failed", $value, $scale, $refs ]);
@@ -753,8 +900,8 @@ class ParseThrowModule
 	 */
 	public function decimal_non_negative($value, int $scale = 0, array $refs = [])
 	{
-		if (Lib::type()->decimal_non_negative($result, $value, $scale, $refs)) {
-		    return $result;
+		if (Lib::type()->decimal_non_negative($r, $value, $scale, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `decimal_non_negative` is failed", $value, $scale, $refs ]);
@@ -766,8 +913,8 @@ class ParseThrowModule
 	 */
 	public function decimal_non_positive($value, int $scale = 0, array $refs = [])
 	{
-		if (Lib::type()->decimal_non_positive($result, $value, $scale, $refs)) {
-		    return $result;
+		if (Lib::type()->decimal_non_positive($r, $value, $scale, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `decimal_non_positive` is failed", $value, $scale, $refs ]);
@@ -779,8 +926,8 @@ class ParseThrowModule
 	 */
 	public function decimal_negative($value, int $scale = 0, array $refs = [])
 	{
-		if (Lib::type()->decimal_negative($result, $value, $scale, $refs)) {
-		    return $result;
+		if (Lib::type()->decimal_negative($r, $value, $scale, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `decimal_negative` is failed", $value, $scale, $refs ]);
@@ -792,8 +939,8 @@ class ParseThrowModule
 	 */
 	public function decimal_positive($value, int $scale = 0, array $refs = [])
 	{
-		if (Lib::type()->decimal_positive($result, $value, $scale, $refs)) {
-		    return $result;
+		if (Lib::type()->decimal_positive($r, $value, $scale, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `decimal_positive` is failed", $value, $scale, $refs ]);
@@ -805,8 +952,8 @@ class ParseThrowModule
 	 */
 	public function num($value)
 	{
-		if (Lib::type()->num($result, $value)) {
-		    return $result;
+		if (Lib::type()->num($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `num` is failed", $value ]);
@@ -818,8 +965,8 @@ class ParseThrowModule
 	 */
 	public function num_non_zero($value)
 	{
-		if (Lib::type()->num_non_zero($result, $value)) {
-		    return $result;
+		if (Lib::type()->num_non_zero($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `num_non_zero` is failed", $value ]);
@@ -831,8 +978,8 @@ class ParseThrowModule
 	 */
 	public function num_non_negative($value)
 	{
-		if (Lib::type()->num_non_negative($result, $value)) {
-		    return $result;
+		if (Lib::type()->num_non_negative($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `num_non_negative` is failed", $value ]);
@@ -844,8 +991,8 @@ class ParseThrowModule
 	 */
 	public function num_non_positive($value)
 	{
-		if (Lib::type()->num_non_positive($result, $value)) {
-		    return $result;
+		if (Lib::type()->num_non_positive($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `num_non_positive` is failed", $value ]);
@@ -857,8 +1004,8 @@ class ParseThrowModule
 	 */
 	public function num_negative($value)
 	{
-		if (Lib::type()->num_negative($result, $value)) {
-		    return $result;
+		if (Lib::type()->num_negative($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `num_negative` is failed", $value ]);
@@ -870,8 +1017,8 @@ class ParseThrowModule
 	 */
 	public function num_positive($value)
 	{
-		if (Lib::type()->num_positive($result, $value)) {
-		    return $result;
+		if (Lib::type()->num_positive($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `num_positive` is failed", $value ]);
@@ -883,8 +1030,8 @@ class ParseThrowModule
 	 */
 	public function int($value)
 	{
-		if (Lib::type()->int($result, $value)) {
-		    return $result;
+		if (Lib::type()->int($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `int` is failed", $value ]);
@@ -896,8 +1043,8 @@ class ParseThrowModule
 	 */
 	public function int_non_zero($value)
 	{
-		if (Lib::type()->int_non_zero($result, $value)) {
-		    return $result;
+		if (Lib::type()->int_non_zero($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `int_non_zero` is failed", $value ]);
@@ -909,8 +1056,8 @@ class ParseThrowModule
 	 */
 	public function int_non_negative($value)
 	{
-		if (Lib::type()->int_non_negative($result, $value)) {
-		    return $result;
+		if (Lib::type()->int_non_negative($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `int_non_negative` is failed", $value ]);
@@ -922,8 +1069,8 @@ class ParseThrowModule
 	 */
 	public function int_non_positive($value)
 	{
-		if (Lib::type()->int_non_positive($result, $value)) {
-		    return $result;
+		if (Lib::type()->int_non_positive($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `int_non_positive` is failed", $value ]);
@@ -935,8 +1082,8 @@ class ParseThrowModule
 	 */
 	public function int_negative($value)
 	{
-		if (Lib::type()->int_negative($result, $value)) {
-		    return $result;
+		if (Lib::type()->int_negative($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `int_negative` is failed", $value ]);
@@ -948,8 +1095,8 @@ class ParseThrowModule
 	 */
 	public function int_positive($value)
 	{
-		if (Lib::type()->int_positive($result, $value)) {
-		    return $result;
+		if (Lib::type()->int_positive($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `int_positive` is failed", $value ]);
@@ -961,8 +1108,8 @@ class ParseThrowModule
 	 */
 	public function int_positive_or_minus_one($value)
 	{
-		if (Lib::type()->int_positive_or_minus_one($result, $value)) {
-		    return $result;
+		if (Lib::type()->int_positive_or_minus_one($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `int_positive_or_minus_one` is failed", $value ]);
@@ -974,8 +1121,8 @@ class ParseThrowModule
 	 */
 	public function int_non_negative_or_minus_one($value)
 	{
-		if (Lib::type()->int_non_negative_or_minus_one($result, $value)) {
-		    return $result;
+		if (Lib::type()->int_non_negative_or_minus_one($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `int_non_negative_or_minus_one` is failed", $value ]);
@@ -987,8 +1134,8 @@ class ParseThrowModule
 	 */
 	public function float($value)
 	{
-		if (Lib::type()->float($result, $value)) {
-		    return $result;
+		if (Lib::type()->float($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `float` is failed", $value ]);
@@ -1000,8 +1147,8 @@ class ParseThrowModule
 	 */
 	public function float_non_zero($value)
 	{
-		if (Lib::type()->float_non_zero($result, $value)) {
-		    return $result;
+		if (Lib::type()->float_non_zero($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `float_non_zero` is failed", $value ]);
@@ -1013,8 +1160,8 @@ class ParseThrowModule
 	 */
 	public function float_non_negative($value)
 	{
-		if (Lib::type()->float_non_negative($result, $value)) {
-		    return $result;
+		if (Lib::type()->float_non_negative($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `float_non_negative` is failed", $value ]);
@@ -1026,8 +1173,8 @@ class ParseThrowModule
 	 */
 	public function float_non_positive($value)
 	{
-		if (Lib::type()->float_non_positive($result, $value)) {
-		    return $result;
+		if (Lib::type()->float_non_positive($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `float_non_positive` is failed", $value ]);
@@ -1039,8 +1186,8 @@ class ParseThrowModule
 	 */
 	public function float_negative($value)
 	{
-		if (Lib::type()->float_negative($result, $value)) {
-		    return $result;
+		if (Lib::type()->float_negative($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `float_negative` is failed", $value ]);
@@ -1052,8 +1199,8 @@ class ParseThrowModule
 	 */
 	public function float_positive($value)
 	{
-		if (Lib::type()->float_positive($result, $value)) {
-		    return $result;
+		if (Lib::type()->float_positive($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `float_positive` is failed", $value ]);
@@ -1065,8 +1212,8 @@ class ParseThrowModule
 	 */
 	public function number($value, ?bool $allowExp = null)
 	{
-		if (Lib::type()->number($result, $value, $allowExp)) {
-		    return $result;
+		if (Lib::type()->number($r, $value, $allowExp)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `number` is failed", $value, $allowExp ]);
@@ -1078,8 +1225,8 @@ class ParseThrowModule
 	 */
 	public function bcnumber($value)
 	{
-		if (Lib::type()->bcnumber($result, $value)) {
-		    return $result;
+		if (Lib::type()->bcnumber($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `bcnumber` is failed", $value ]);
@@ -1091,8 +1238,8 @@ class ParseThrowModule
 	 */
 	public function a_string($value)
 	{
-		if (Lib::type()->a_string($result, $value)) {
-		    return $result;
+		if (Lib::type()->a_string($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `a_string` is failed", $value ]);
@@ -1104,8 +1251,8 @@ class ParseThrowModule
 	 */
 	public function a_string_empty($value)
 	{
-		if (Lib::type()->a_string_empty($result, $value)) {
-		    return $result;
+		if (Lib::type()->a_string_empty($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `a_string_empty` is failed", $value ]);
@@ -1117,8 +1264,8 @@ class ParseThrowModule
 	 */
 	public function a_string_not_empty($value)
 	{
-		if (Lib::type()->a_string_not_empty($result, $value)) {
-		    return $result;
+		if (Lib::type()->a_string_not_empty($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `a_string_not_empty` is failed", $value ]);
@@ -1130,8 +1277,8 @@ class ParseThrowModule
 	 */
 	public function a_trim($value)
 	{
-		if (Lib::type()->a_trim($result, $value)) {
-		    return $result;
+		if (Lib::type()->a_trim($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `a_trim` is failed", $value ]);
@@ -1143,8 +1290,8 @@ class ParseThrowModule
 	 */
 	public function string($value)
 	{
-		if (Lib::type()->string($result, $value)) {
-		    return $result;
+		if (Lib::type()->string($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `string` is failed", $value ]);
@@ -1156,8 +1303,8 @@ class ParseThrowModule
 	 */
 	public function string_empty($value)
 	{
-		if (Lib::type()->string_empty($result, $value)) {
-		    return $result;
+		if (Lib::type()->string_empty($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `string_empty` is failed", $value ]);
@@ -1169,8 +1316,8 @@ class ParseThrowModule
 	 */
 	public function string_not_empty($value)
 	{
-		if (Lib::type()->string_not_empty($result, $value)) {
-		    return $result;
+		if (Lib::type()->string_not_empty($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `string_not_empty` is failed", $value ]);
@@ -1182,8 +1329,8 @@ class ParseThrowModule
 	 */
 	public function trim($value, ?string $characters = null)
 	{
-		if (Lib::type()->trim($result, $value, $characters)) {
-		    return $result;
+		if (Lib::type()->trim($r, $value, $characters)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `trim` is failed", $value, $characters ]);
@@ -1195,8 +1342,8 @@ class ParseThrowModule
 	 */
 	public function char($value)
 	{
-		if (Lib::type()->char($result, $value)) {
-		    return $result;
+		if (Lib::type()->char($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `char` is failed", $value ]);
@@ -1208,8 +1355,8 @@ class ParseThrowModule
 	 */
 	public function letter($value)
 	{
-		if (Lib::type()->letter($result, $value)) {
-		    return $result;
+		if (Lib::type()->letter($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `letter` is failed", $value ]);
@@ -1221,8 +1368,8 @@ class ParseThrowModule
 	 */
 	public function alphabet($value)
 	{
-		if (Lib::type()->alphabet($result, $value)) {
-		    return $result;
+		if (Lib::type()->alphabet($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `alphabet` is failed", $value ]);
@@ -1234,8 +1381,8 @@ class ParseThrowModule
 	 */
 	public function ctype_digit($value)
 	{
-		if (Lib::type()->ctype_digit($result, $value)) {
-		    return $result;
+		if (Lib::type()->ctype_digit($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `ctype_digit` is failed", $value ]);
@@ -1247,8 +1394,8 @@ class ParseThrowModule
 	 */
 	public function ctype_alpha($value, ?bool $isIgnoreCase = null)
 	{
-		if (Lib::type()->ctype_alpha($result, $value, $isIgnoreCase)) {
-		    return $result;
+		if (Lib::type()->ctype_alpha($r, $value, $isIgnoreCase)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `ctype_alpha` is failed", $value, $isIgnoreCase ]);
@@ -1260,8 +1407,8 @@ class ParseThrowModule
 	 */
 	public function ctype_alnum($value, ?bool $isIgnoreCase = null)
 	{
-		if (Lib::type()->ctype_alnum($result, $value, $isIgnoreCase)) {
-		    return $result;
+		if (Lib::type()->ctype_alnum($r, $value, $isIgnoreCase)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `ctype_alnum` is failed", $value, $isIgnoreCase ]);
@@ -1273,8 +1420,8 @@ class ParseThrowModule
 	 */
 	public function base($value, $alphabet)
 	{
-		if (Lib::type()->base($result, $value, $alphabet)) {
-		    return $result;
+		if (Lib::type()->base($r, $value, $alphabet)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `base` is failed", $value, $alphabet ]);
@@ -1286,8 +1433,8 @@ class ParseThrowModule
 	 */
 	public function base_bin($value)
 	{
-		if (Lib::type()->base_bin($result, $value)) {
-		    return $result;
+		if (Lib::type()->base_bin($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `base_bin` is failed", $value ]);
@@ -1299,8 +1446,8 @@ class ParseThrowModule
 	 */
 	public function base_oct($value)
 	{
-		if (Lib::type()->base_oct($result, $value)) {
-		    return $result;
+		if (Lib::type()->base_oct($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `base_oct` is failed", $value ]);
@@ -1312,8 +1459,8 @@ class ParseThrowModule
 	 */
 	public function base_dec($value)
 	{
-		if (Lib::type()->base_dec($result, $value)) {
-		    return $result;
+		if (Lib::type()->base_dec($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `base_dec` is failed", $value ]);
@@ -1325,8 +1472,8 @@ class ParseThrowModule
 	 */
 	public function base_hex($value)
 	{
-		if (Lib::type()->base_hex($result, $value)) {
-		    return $result;
+		if (Lib::type()->base_hex($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `base_hex` is failed", $value ]);
@@ -1338,8 +1485,8 @@ class ParseThrowModule
 	 */
 	public function array_empty($value)
 	{
-		if (Lib::type()->array_empty($result, $value)) {
-		    return $result;
+		if (Lib::type()->array_empty($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `array_empty` is failed", $value ]);
@@ -1351,8 +1498,8 @@ class ParseThrowModule
 	 */
 	public function array_not_empty($value)
 	{
-		if (Lib::type()->array_not_empty($result, $value)) {
-		    return $result;
+		if (Lib::type()->array_not_empty($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `array_not_empty` is failed", $value ]);
@@ -1364,8 +1511,8 @@ class ParseThrowModule
 	 */
 	public function any_not_array_empty($value)
 	{
-		if (Lib::type()->any_not_array_empty($result, $value)) {
-		    return $result;
+		if (Lib::type()->any_not_array_empty($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `any_not_array_empty` is failed", $value ]);
@@ -1377,8 +1524,8 @@ class ParseThrowModule
 	 */
 	public function key_exists($value, $key)
 	{
-		if (Lib::type()->key_exists($result, $value, $key)) {
-		    return $result;
+		if (Lib::type()->key_exists($r, $value, $key)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `key_exists` is failed", $value, $key ]);
@@ -1390,8 +1537,8 @@ class ParseThrowModule
 	 */
 	public function array_plain($value)
 	{
-		if (Lib::type()->array_plain($result, $value)) {
-		    return $result;
+		if (Lib::type()->array_plain($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `array_plain` is failed", $value ]);
@@ -1403,8 +1550,8 @@ class ParseThrowModule
 	 */
 	public function list($value, ?bool $isPlain = null)
 	{
-		if (Lib::type()->list($result, $value, $isPlain)) {
-		    return $result;
+		if (Lib::type()->list($r, $value, $isPlain)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `list` is failed", $value, $isPlain ]);
@@ -1416,8 +1563,8 @@ class ParseThrowModule
 	 */
 	public function list_sorted($value, ?bool $isPlain = null)
 	{
-		if (Lib::type()->list_sorted($result, $value, $isPlain)) {
-		    return $result;
+		if (Lib::type()->list_sorted($r, $value, $isPlain)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `list_sorted` is failed", $value, $isPlain ]);
@@ -1429,8 +1576,8 @@ class ParseThrowModule
 	 */
 	public function dict($value, ?bool $isPlain = null)
 	{
-		if (Lib::type()->dict($result, $value, $isPlain)) {
-		    return $result;
+		if (Lib::type()->dict($r, $value, $isPlain)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `dict` is failed", $value, $isPlain ]);
@@ -1442,8 +1589,8 @@ class ParseThrowModule
 	 */
 	public function dict_sorted($value, ?bool $isPlain = null)
 	{
-		if (Lib::type()->dict_sorted($result, $value, $isPlain)) {
-		    return $result;
+		if (Lib::type()->dict_sorted($r, $value, $isPlain)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `dict_sorted` is failed", $value, $isPlain ]);
@@ -1455,8 +1602,8 @@ class ParseThrowModule
 	 */
 	public function table($value)
 	{
-		if (Lib::type()->table($result, $value)) {
-		    return $result;
+		if (Lib::type()->table($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `table` is failed", $value ]);
@@ -1468,8 +1615,8 @@ class ParseThrowModule
 	 */
 	public function matrix($value)
 	{
-		if (Lib::type()->matrix($result, $value)) {
-		    return $result;
+		if (Lib::type()->matrix($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `matrix` is failed", $value ]);
@@ -1481,8 +1628,8 @@ class ParseThrowModule
 	 */
 	public function matrix_strict($value)
 	{
-		if (Lib::type()->matrix_strict($result, $value)) {
-		    return $result;
+		if (Lib::type()->matrix_strict($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `matrix_strict` is failed", $value ]);
@@ -1494,8 +1641,8 @@ class ParseThrowModule
 	 */
 	public function arrpath($path, ?string $dot = null)
 	{
-		if (Lib::type()->arrpath($result, $path, $dot)) {
-		    return $result;
+		if (Lib::type()->arrpath($r, $path, $dot)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `arrpath` is failed", $path, $dot ]);
@@ -1507,8 +1654,8 @@ class ParseThrowModule
 	 */
 	public function array_of_type($value, string $type)
 	{
-		if (Lib::type()->array_of_type($result, $value, $type)) {
-		    return $result;
+		if (Lib::type()->array_of_type($r, $value, $type)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `array_of_type` is failed", $value, $type ]);
@@ -1520,8 +1667,8 @@ class ParseThrowModule
 	 */
 	public function array_of_resource_type($value, string $resourceType)
 	{
-		if (Lib::type()->array_of_resource_type($result, $value, $resourceType)) {
-		    return $result;
+		if (Lib::type()->array_of_resource_type($r, $value, $resourceType)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `array_of_resource_type` is failed", $value, $resourceType ]);
@@ -1537,8 +1684,8 @@ class ParseThrowModule
 	 */
 	public function array_of_a($value, string $className)
 	{
-		if (Lib::type()->array_of_a($result, $value, $className)) {
-		    return $result;
+		if (Lib::type()->array_of_a($r, $value, $className)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `array_of_a` is failed", $value, $className ]);
@@ -1554,8 +1701,8 @@ class ParseThrowModule
 	 */
 	public function array_of_class($value, string $className)
 	{
-		if (Lib::type()->array_of_class($result, $value, $className)) {
-		    return $result;
+		if (Lib::type()->array_of_class($r, $value, $className)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `array_of_class` is failed", $value, $className ]);
@@ -1571,8 +1718,8 @@ class ParseThrowModule
 	 */
 	public function array_of_subclass($value, string $className)
 	{
-		if (Lib::type()->array_of_subclass($result, $value, $className)) {
-		    return $result;
+		if (Lib::type()->array_of_subclass($r, $value, $className)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `array_of_subclass` is failed", $value, $className ]);
@@ -1584,8 +1731,8 @@ class ParseThrowModule
 	 */
 	public function array_of_callback($value, callable $fn, array $args = [])
 	{
-		if (Lib::type()->array_of_callback($result, $value, $fn, $args)) {
-		    return $result;
+		if (Lib::type()->array_of_callback($r, $value, $fn, $args)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `array_of_callback` is failed", $value, $fn, $args ]);
@@ -1595,10 +1742,49 @@ class ParseThrowModule
 	/**
 	 * @return string|null
 	 */
+	public function html_tag($value)
+	{
+		if (Lib::type()->html_tag($r, $value)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `html_tag` is failed", $value ]);
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function xml_tag($value)
+	{
+		if (Lib::type()->xml_tag($r, $value)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `xml_tag` is failed", $value ]);
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function xml_nstag($value)
+	{
+		if (Lib::type()->xml_nstag($r, $value)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `xml_nstag` is failed", $value ]);
+	}
+
+
+	/**
+	 * @return string|null
+	 */
 	public function regex($value)
 	{
-		if (Lib::type()->regex($result, $value)) {
-		    return $result;
+		if (Lib::type()->regex($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `regex` is failed", $value ]);
@@ -1610,8 +1796,8 @@ class ParseThrowModule
 	 */
 	public function address_ip($value)
 	{
-		if (Lib::type()->address_ip($result, $value)) {
-		    return $result;
+		if (Lib::type()->address_ip($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `address_ip` is failed", $value ]);
@@ -1623,8 +1809,8 @@ class ParseThrowModule
 	 */
 	public function address_ip_v4($value)
 	{
-		if (Lib::type()->address_ip_v4($result, $value)) {
-		    return $result;
+		if (Lib::type()->address_ip_v4($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `address_ip_v4` is failed", $value ]);
@@ -1636,8 +1822,8 @@ class ParseThrowModule
 	 */
 	public function address_ip_v6($value)
 	{
-		if (Lib::type()->address_ip_v6($result, $value)) {
-		    return $result;
+		if (Lib::type()->address_ip_v6($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `address_ip_v6` is failed", $value ]);
@@ -1649,8 +1835,8 @@ class ParseThrowModule
 	 */
 	public function address_mac($value)
 	{
-		if (Lib::type()->address_mac($result, $value)) {
-		    return $result;
+		if (Lib::type()->address_mac($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `address_mac` is failed", $value ]);
@@ -1662,8 +1848,8 @@ class ParseThrowModule
 	 */
 	public function subnet($value, ?string $ipFallback = null)
 	{
-		if (Lib::type()->subnet($result, $value, $ipFallback)) {
-		    return $result;
+		if (Lib::type()->subnet($r, $value, $ipFallback)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `subnet` is failed", $value, $ipFallback ]);
@@ -1675,8 +1861,8 @@ class ParseThrowModule
 	 */
 	public function subnet_v4($value, ?string $ipFallback = null)
 	{
-		if (Lib::type()->subnet_v4($result, $value, $ipFallback)) {
-		    return $result;
+		if (Lib::type()->subnet_v4($r, $value, $ipFallback)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `subnet_v4` is failed", $value, $ipFallback ]);
@@ -1688,8 +1874,8 @@ class ParseThrowModule
 	 */
 	public function subnet_v6($value, ?string $ipFallback = null)
 	{
-		if (Lib::type()->subnet_v6($result, $value, $ipFallback)) {
-		    return $result;
+		if (Lib::type()->subnet_v6($r, $value, $ipFallback)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `subnet_v6` is failed", $value, $ipFallback ]);
@@ -1701,8 +1887,8 @@ class ParseThrowModule
 	 */
 	public function url($value, $query = null, $fragment = null, array $refs = [])
 	{
-		if (Lib::type()->url($result, $value, $query, $fragment, $refs)) {
-		    return $result;
+		if (Lib::type()->url($r, $value, $query, $fragment, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `url` is failed", $value, $query, $fragment, $refs ]);
@@ -1714,8 +1900,8 @@ class ParseThrowModule
 	 */
 	public function host($value, array $refs = [])
 	{
-		if (Lib::type()->host($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->host($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `host` is failed", $value, $refs ]);
@@ -1727,8 +1913,8 @@ class ParseThrowModule
 	 */
 	public function link($value, $query = null, $fragment = null, array $refs = [])
 	{
-		if (Lib::type()->link($result, $value, $query, $fragment, $refs)) {
-		    return $result;
+		if (Lib::type()->link($r, $value, $query, $fragment, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `link` is failed", $value, $query, $fragment, $refs ]);
@@ -1740,8 +1926,8 @@ class ParseThrowModule
 	 */
 	public function uuid($value)
 	{
-		if (Lib::type()->uuid($result, $value)) {
-		    return $result;
+		if (Lib::type()->uuid($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `uuid` is failed", $value ]);
@@ -1753,8 +1939,8 @@ class ParseThrowModule
 	 */
 	public function countable($value)
 	{
-		if (Lib::type()->countable($result, $value)) {
-		    return $result;
+		if (Lib::type()->countable($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `countable` is failed", $value ]);
@@ -1766,8 +1952,8 @@ class ParseThrowModule
 	 */
 	public function countable_object($value)
 	{
-		if (Lib::type()->countable_object($result, $value)) {
-		    return $result;
+		if (Lib::type()->countable_object($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `countable_object` is failed", $value ]);
@@ -1779,8 +1965,8 @@ class ParseThrowModule
 	 */
 	public function sizeable($value)
 	{
-		if (Lib::type()->sizeable($result, $value)) {
-		    return $result;
+		if (Lib::type()->sizeable($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `sizeable` is failed", $value ]);
@@ -1792,8 +1978,8 @@ class ParseThrowModule
 	 */
 	public function timezone($timezone, ?array $allowedTimezoneTypes = null)
 	{
-		if (Lib::type()->timezone($result, $timezone, $allowedTimezoneTypes)) {
-		    return $result;
+		if (Lib::type()->timezone($r, $timezone, $allowedTimezoneTypes)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `timezone` is failed", $timezone, $allowedTimezoneTypes ]);
@@ -1805,8 +1991,8 @@ class ParseThrowModule
 	 */
 	public function timezone_offset($timezoneOrOffset)
 	{
-		if (Lib::type()->timezone_offset($result, $timezoneOrOffset)) {
-		    return $result;
+		if (Lib::type()->timezone_offset($r, $timezoneOrOffset)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `timezone_offset` is failed", $timezoneOrOffset ]);
@@ -1818,8 +2004,8 @@ class ParseThrowModule
 	 */
 	public function timezone_abbr($timezoneOrAbbr)
 	{
-		if (Lib::type()->timezone_abbr($result, $timezoneOrAbbr)) {
-		    return $result;
+		if (Lib::type()->timezone_abbr($r, $timezoneOrAbbr)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `timezone_abbr` is failed", $timezoneOrAbbr ]);
@@ -1831,8 +2017,8 @@ class ParseThrowModule
 	 */
 	public function timezone_name($timezoneOrName)
 	{
-		if (Lib::type()->timezone_name($result, $timezoneOrName)) {
-		    return $result;
+		if (Lib::type()->timezone_name($r, $timezoneOrName)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `timezone_name` is failed", $timezoneOrName ]);
@@ -1844,8 +2030,8 @@ class ParseThrowModule
 	 */
 	public function timezone_nameabbr($timezoneOrNameOrAbbr)
 	{
-		if (Lib::type()->timezone_nameabbr($result, $timezoneOrNameOrAbbr)) {
-		    return $result;
+		if (Lib::type()->timezone_nameabbr($r, $timezoneOrNameOrAbbr)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `timezone_nameabbr` is failed", $timezoneOrNameOrAbbr ]);
@@ -1857,8 +2043,8 @@ class ParseThrowModule
 	 */
 	public function date($datestring, $timezoneFallback = null)
 	{
-		if (Lib::type()->date($result, $datestring, $timezoneFallback)) {
-		    return $result;
+		if (Lib::type()->date($r, $datestring, $timezoneFallback)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `date` is failed", $datestring, $timezoneFallback ]);
@@ -1870,8 +2056,8 @@ class ParseThrowModule
 	 */
 	public function adate($datestring, $timezoneFallback = null)
 	{
-		if (Lib::type()->adate($result, $datestring, $timezoneFallback)) {
-		    return $result;
+		if (Lib::type()->adate($r, $datestring, $timezoneFallback)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `adate` is failed", $datestring, $timezoneFallback ]);
@@ -1883,8 +2069,8 @@ class ParseThrowModule
 	 */
 	public function idate($datestring, $timezoneFallback = null)
 	{
-		if (Lib::type()->idate($result, $datestring, $timezoneFallback)) {
-		    return $result;
+		if (Lib::type()->idate($r, $datestring, $timezoneFallback)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `idate` is failed", $datestring, $timezoneFallback ]);
@@ -1896,8 +2082,8 @@ class ParseThrowModule
 	 */
 	public function date_formatted($dateFormatted, $formats, $timezoneFallback = null)
 	{
-		if (Lib::type()->date_formatted($result, $dateFormatted, $formats, $timezoneFallback)) {
-		    return $result;
+		if (Lib::type()->date_formatted($r, $dateFormatted, $formats, $timezoneFallback)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `date_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
@@ -1909,8 +2095,8 @@ class ParseThrowModule
 	 */
 	public function adate_formatted($dateFormatted, $formats, $timezoneFallback = null)
 	{
-		if (Lib::type()->adate_formatted($result, $dateFormatted, $formats, $timezoneFallback)) {
-		    return $result;
+		if (Lib::type()->adate_formatted($r, $dateFormatted, $formats, $timezoneFallback)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `adate_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
@@ -1922,8 +2108,8 @@ class ParseThrowModule
 	 */
 	public function idate_formatted($dateFormatted, $formats, $timezoneFallback = null)
 	{
-		if (Lib::type()->idate_formatted($result, $dateFormatted, $formats, $timezoneFallback)) {
-		    return $result;
+		if (Lib::type()->idate_formatted($r, $dateFormatted, $formats, $timezoneFallback)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `idate_formatted` is failed", $dateFormatted, $formats, $timezoneFallback ]);
@@ -1935,8 +2121,8 @@ class ParseThrowModule
 	 */
 	public function date_tz($datestring, ?array $allowedTimezoneTypes = null)
 	{
-		if (Lib::type()->date_tz($result, $datestring, $allowedTimezoneTypes)) {
-		    return $result;
+		if (Lib::type()->date_tz($r, $datestring, $allowedTimezoneTypes)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `date_tz` is failed", $datestring, $allowedTimezoneTypes ]);
@@ -1948,8 +2134,8 @@ class ParseThrowModule
 	 */
 	public function adate_tz($datestring, ?array $allowedTimezoneTypes = null)
 	{
-		if (Lib::type()->adate_tz($result, $datestring, $allowedTimezoneTypes)) {
-		    return $result;
+		if (Lib::type()->adate_tz($r, $datestring, $allowedTimezoneTypes)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `adate_tz` is failed", $datestring, $allowedTimezoneTypes ]);
@@ -1961,8 +2147,8 @@ class ParseThrowModule
 	 */
 	public function idate_tz($datestring, ?array $allowedTimezoneTypes = null)
 	{
-		if (Lib::type()->idate_tz($result, $datestring, $allowedTimezoneTypes)) {
-		    return $result;
+		if (Lib::type()->idate_tz($r, $datestring, $allowedTimezoneTypes)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `idate_tz` is failed", $datestring, $allowedTimezoneTypes ]);
@@ -1974,8 +2160,8 @@ class ParseThrowModule
 	 */
 	public function date_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
 	{
-		if (Lib::type()->date_tz_formatted($result, $dateFormatted, $formats, $allowedTimezoneTypes)) {
-		    return $result;
+		if (Lib::type()->date_tz_formatted($r, $dateFormatted, $formats, $allowedTimezoneTypes)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `date_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
@@ -1987,8 +2173,8 @@ class ParseThrowModule
 	 */
 	public function adate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
 	{
-		if (Lib::type()->adate_tz_formatted($result, $dateFormatted, $formats, $allowedTimezoneTypes)) {
-		    return $result;
+		if (Lib::type()->adate_tz_formatted($r, $dateFormatted, $formats, $allowedTimezoneTypes)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `adate_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
@@ -2000,8 +2186,8 @@ class ParseThrowModule
 	 */
 	public function idate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
 	{
-		if (Lib::type()->idate_tz_formatted($result, $dateFormatted, $formats, $allowedTimezoneTypes)) {
-		    return $result;
+		if (Lib::type()->idate_tz_formatted($r, $dateFormatted, $formats, $allowedTimezoneTypes)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `idate_tz_formatted` is failed", $dateFormatted, $formats, $allowedTimezoneTypes ]);
@@ -2013,8 +2199,8 @@ class ParseThrowModule
 	 */
 	public function date_microtime($microtime, $timezoneSet = null)
 	{
-		if (Lib::type()->date_microtime($result, $microtime, $timezoneSet)) {
-		    return $result;
+		if (Lib::type()->date_microtime($r, $microtime, $timezoneSet)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `date_microtime` is failed", $microtime, $timezoneSet ]);
@@ -2026,8 +2212,8 @@ class ParseThrowModule
 	 */
 	public function adate_microtime($microtime, $timezoneSet = null)
 	{
-		if (Lib::type()->adate_microtime($result, $microtime, $timezoneSet)) {
-		    return $result;
+		if (Lib::type()->adate_microtime($r, $microtime, $timezoneSet)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `adate_microtime` is failed", $microtime, $timezoneSet ]);
@@ -2039,8 +2225,8 @@ class ParseThrowModule
 	 */
 	public function idate_microtime($microtime, $timezoneSet = null)
 	{
-		if (Lib::type()->idate_microtime($result, $microtime, $timezoneSet)) {
-		    return $result;
+		if (Lib::type()->idate_microtime($r, $microtime, $timezoneSet)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `idate_microtime` is failed", $microtime, $timezoneSet ]);
@@ -2052,8 +2238,8 @@ class ParseThrowModule
 	 */
 	public function interval($interval)
 	{
-		if (Lib::type()->interval($result, $interval)) {
-		    return $result;
+		if (Lib::type()->interval($r, $interval)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `interval` is failed", $interval ]);
@@ -2065,8 +2251,8 @@ class ParseThrowModule
 	 */
 	public function interval_duration($duration)
 	{
-		if (Lib::type()->interval_duration($result, $duration)) {
-		    return $result;
+		if (Lib::type()->interval_duration($r, $duration)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `interval_duration` is failed", $duration ]);
@@ -2078,8 +2264,8 @@ class ParseThrowModule
 	 */
 	public function interval_datestring($datestring)
 	{
-		if (Lib::type()->interval_datestring($result, $datestring)) {
-		    return $result;
+		if (Lib::type()->interval_datestring($r, $datestring)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `interval_datestring` is failed", $datestring ]);
@@ -2091,8 +2277,8 @@ class ParseThrowModule
 	 */
 	public function interval_microtime($microtime)
 	{
-		if (Lib::type()->interval_microtime($result, $microtime)) {
-		    return $result;
+		if (Lib::type()->interval_microtime($r, $microtime)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `interval_microtime` is failed", $microtime ]);
@@ -2104,8 +2290,8 @@ class ParseThrowModule
 	 */
 	public function interval_ago($date, ?\DateTimeInterface $from = null, ?bool $reverse = null)
 	{
-		if (Lib::type()->interval_ago($result, $date, $from, $reverse)) {
-		    return $result;
+		if (Lib::type()->interval_ago($r, $date, $from, $reverse)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `interval_ago` is failed", $date, $from, $reverse ]);
@@ -2121,8 +2307,8 @@ class ParseThrowModule
 	 */
 	public function struct_exists($value, ?int $flags = null)
 	{
-		if (Lib::type()->struct_exists($result, $value, $flags)) {
-		    return $result;
+		if (Lib::type()->struct_exists($r, $value, $flags)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `struct_exists` is failed", $value, $flags ]);
@@ -2138,8 +2324,8 @@ class ParseThrowModule
 	 */
 	public function struct($value, ?int $flags = null)
 	{
-		if (Lib::type()->struct($result, $value, $flags)) {
-		    return $result;
+		if (Lib::type()->struct($r, $value, $flags)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `struct` is failed", $value, $flags ]);
@@ -2155,8 +2341,8 @@ class ParseThrowModule
 	 */
 	public function struct_class($value, ?int $flags = null)
 	{
-		if (Lib::type()->struct_class($result, $value, $flags)) {
-		    return $result;
+		if (Lib::type()->struct_class($r, $value, $flags)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `struct_class` is failed", $value, $flags ]);
@@ -2168,8 +2354,8 @@ class ParseThrowModule
 	 */
 	public function struct_interface($value, ?int $flags = null)
 	{
-		if (Lib::type()->struct_interface($result, $value, $flags)) {
-		    return $result;
+		if (Lib::type()->struct_interface($r, $value, $flags)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `struct_interface` is failed", $value, $flags ]);
@@ -2181,8 +2367,8 @@ class ParseThrowModule
 	 */
 	public function struct_trait($value, ?int $flags = null)
 	{
-		if (Lib::type()->struct_trait($result, $value, $flags)) {
-		    return $result;
+		if (Lib::type()->struct_trait($r, $value, $flags)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `struct_trait` is failed", $value, $flags ]);
@@ -2198,8 +2384,8 @@ class ParseThrowModule
 	 */
 	public function struct_enum($value, ?int $flags = null)
 	{
-		if (Lib::type()->struct_enum($result, $value, $flags)) {
-		    return $result;
+		if (Lib::type()->struct_enum($r, $value, $flags)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `struct_enum` is failed", $value, $flags ]);
@@ -2215,8 +2401,8 @@ class ParseThrowModule
 	 */
 	public function struct_fqcn($value, ?int $flags = null)
 	{
-		if (Lib::type()->struct_fqcn($result, $value, $flags)) {
-		    return $result;
+		if (Lib::type()->struct_fqcn($r, $value, $flags)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `struct_fqcn` is failed", $value, $flags ]);
@@ -2228,8 +2414,8 @@ class ParseThrowModule
 	 */
 	public function struct_namespace($value, ?int $flags = null)
 	{
-		if (Lib::type()->struct_namespace($result, $value, $flags)) {
-		    return $result;
+		if (Lib::type()->struct_namespace($r, $value, $flags)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `struct_namespace` is failed", $value, $flags ]);
@@ -2241,8 +2427,8 @@ class ParseThrowModule
 	 */
 	public function struct_basename($value, ?int $flags = null)
 	{
-		if (Lib::type()->struct_basename($result, $value, $flags)) {
-		    return $result;
+		if (Lib::type()->struct_basename($r, $value, $flags)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `struct_basename` is failed", $value, $flags ]);
@@ -2252,39 +2438,26 @@ class ParseThrowModule
 	/**
 	 * @return resource|null
 	 */
-	public function resource($value)
+	public function resource($value, ?string $resourceType = null)
 	{
-		if (Lib::type()->resource($result, $value)) {
-		    return $result;
+		if (Lib::type()->resource($r, $value, $resourceType)) {
+		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `resource` is failed", $value ]);
+		throw new LogicException([ "Parsing `resource` is failed", $value, $resourceType ]);
 	}
 
 
 	/**
 	 * @return resource|null
 	 */
-	public function any_not_resource($value)
+	public function resource_opened($value, ?string $resourceType = null)
 	{
-		if (Lib::type()->any_not_resource($result, $value)) {
-		    return $result;
+		if (Lib::type()->resource_opened($r, $value, $resourceType)) {
+		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `any_not_resource` is failed", $value ]);
-	}
-
-
-	/**
-	 * @return resource|null
-	 */
-	public function resource_opened($value)
-	{
-		if (Lib::type()->resource_opened($result, $value)) {
-		    return $result;
-		}
-
-		throw new LogicException([ "Parsing `resource_opened` is failed", $value ]);
+		throw new LogicException([ "Parsing `resource_opened` is failed", $value, $resourceType ]);
 	}
 
 
@@ -2293,11 +2466,50 @@ class ParseThrowModule
 	 */
 	public function resource_closed($value)
 	{
-		if (Lib::type()->resource_closed($result, $value)) {
-		    return $result;
+		if (Lib::type()->resource_closed($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `resource_closed` is failed", $value ]);
+	}
+
+
+	/**
+	 * @return resource|null
+	 */
+	public function any_not_resource($value)
+	{
+		if (Lib::type()->any_not_resource($r, $value)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `any_not_resource` is failed", $value ]);
+	}
+
+
+	/**
+	 * @return resource|\CurlHandle|null
+	 */
+	public function curl($value)
+	{
+		if (Lib::type()->curl($r, $value)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `curl` is failed", $value ]);
+	}
+
+
+	/**
+	 * @return resource|\Socket|null
+	 */
+	public function socket($value)
+	{
+		if (Lib::type()->socket($r, $value)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `socket` is failed", $value ]);
 	}
 
 
@@ -2311,8 +2523,8 @@ class ParseThrowModule
 	 */
 	public function enum_case($value, ?string $enumClass = null)
 	{
-		if (Lib::type()->enum_case($result, $value, $enumClass)) {
-		    return $result;
+		if (Lib::type()->enum_case($r, $value, $enumClass)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `enum_case` is failed", $value, $enumClass ]);
@@ -2324,8 +2536,8 @@ class ParseThrowModule
 	 */
 	public function method_array($value)
 	{
-		if (Lib::type()->method_array($result, $value)) {
-		    return $result;
+		if (Lib::type()->method_array($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `method_array` is failed", $value ]);
@@ -2333,14 +2545,12 @@ class ParseThrowModule
 
 
 	/**
-	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
 	 */
 	public function method_string($value, array $refs = [])
 	{
-		if (Lib::type()->method_string($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->method_string($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `method_string` is failed", $value, $refs ]);
@@ -2354,8 +2564,8 @@ class ParseThrowModule
 	 */
 	public function callable($value, $newScope = 'static')
 	{
-		if (Lib::type()->callable($result, $value, $newScope)) {
-		    return $result;
+		if (Lib::type()->callable($r, $value, $newScope)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable` is failed", $value, $newScope ]);
@@ -2367,8 +2577,8 @@ class ParseThrowModule
 	 */
 	public function callable_object($value, $newScope = 'static')
 	{
-		if (Lib::type()->callable_object($result, $value, $newScope)) {
-		    return $result;
+		if (Lib::type()->callable_object($r, $value, $newScope)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable_object` is failed", $value, $newScope ]);
@@ -2380,8 +2590,8 @@ class ParseThrowModule
 	 */
 	public function callable_object_closure($value, $newScope = 'static')
 	{
-		if (Lib::type()->callable_object_closure($result, $value, $newScope)) {
-		    return $result;
+		if (Lib::type()->callable_object_closure($r, $value, $newScope)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable_object_closure` is failed", $value, $newScope ]);
@@ -2393,8 +2603,8 @@ class ParseThrowModule
 	 */
 	public function callable_object_invokable($value, $newScope = 'static')
 	{
-		if (Lib::type()->callable_object_invokable($result, $value, $newScope)) {
-		    return $result;
+		if (Lib::type()->callable_object_invokable($r, $value, $newScope)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable_object_invokable` is failed", $value, $newScope ]);
@@ -2408,8 +2618,8 @@ class ParseThrowModule
 	 */
 	public function callable_array($value, $newScope = 'static')
 	{
-		if (Lib::type()->callable_array($result, $value, $newScope)) {
-		    return $result;
+		if (Lib::type()->callable_array($r, $value, $newScope)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable_array` is failed", $value, $newScope ]);
@@ -2423,8 +2633,8 @@ class ParseThrowModule
 	 */
 	public function callable_array_method($value, $newScope = 'static')
 	{
-		if (Lib::type()->callable_array_method($result, $value, $newScope)) {
-		    return $result;
+		if (Lib::type()->callable_array_method($r, $value, $newScope)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable_array_method` is failed", $value, $newScope ]);
@@ -2438,8 +2648,8 @@ class ParseThrowModule
 	 */
 	public function callable_array_method_static($value, $newScope = 'static')
 	{
-		if (Lib::type()->callable_array_method_static($result, $value, $newScope)) {
-		    return $result;
+		if (Lib::type()->callable_array_method_static($r, $value, $newScope)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable_array_method_static` is failed", $value, $newScope ]);
@@ -2453,8 +2663,8 @@ class ParseThrowModule
 	 */
 	public function callable_array_method_non_static($value, $newScope = 'static')
 	{
-		if (Lib::type()->callable_array_method_non_static($result, $value, $newScope)) {
-		    return $result;
+		if (Lib::type()->callable_array_method_non_static($r, $value, $newScope)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable_array_method_non_static` is failed", $value, $newScope ]);
@@ -2466,8 +2676,8 @@ class ParseThrowModule
 	 */
 	public function callable_string($value, $newScope = 'static')
 	{
-		if (Lib::type()->callable_string($result, $value, $newScope)) {
-		    return $result;
+		if (Lib::type()->callable_string($r, $value, $newScope)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable_string` is failed", $value, $newScope ]);
@@ -2479,8 +2689,8 @@ class ParseThrowModule
 	 */
 	public function callable_string_function($value)
 	{
-		if (Lib::type()->callable_string_function($result, $value)) {
-		    return $result;
+		if (Lib::type()->callable_string_function($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable_string_function` is failed", $value ]);
@@ -2492,8 +2702,8 @@ class ParseThrowModule
 	 */
 	public function callable_string_function_internal($value)
 	{
-		if (Lib::type()->callable_string_function_internal($result, $value)) {
-		    return $result;
+		if (Lib::type()->callable_string_function_internal($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable_string_function_internal` is failed", $value ]);
@@ -2505,8 +2715,8 @@ class ParseThrowModule
 	 */
 	public function callable_string_function_non_internal($value)
 	{
-		if (Lib::type()->callable_string_function_non_internal($result, $value)) {
-		    return $result;
+		if (Lib::type()->callable_string_function_non_internal($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable_string_function_non_internal` is failed", $value ]);
@@ -2518,8 +2728,8 @@ class ParseThrowModule
 	 */
 	public function callable_string_method_static($value, $newScope = 'static')
 	{
-		if (Lib::type()->callable_string_method_static($result, $value, $newScope)) {
-		    return $result;
+		if (Lib::type()->callable_string_method_static($r, $value, $newScope)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `callable_string_method_static` is failed", $value, $newScope ]);
@@ -2536,8 +2746,8 @@ class ParseThrowModule
 	 */
 	public function ref($key, array $refs = [], array $set = [])
 	{
-		if (Lib::type()->ref($result, $key, $refs, $set)) {
-		    return $result;
+		if (Lib::type()->ref($r, $key, $refs, $set)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `ref` is failed", $key, $refs, $set ]);
@@ -2551,8 +2761,8 @@ class ParseThrowModule
 	 */
 	public function chmod($value)
 	{
-		if (Lib::type()->chmod($result, $value)) {
-		    return $result;
+		if (Lib::type()->chmod($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `chmod` is failed", $value ]);
@@ -2560,14 +2770,14 @@ class ParseThrowModule
 
 
 	/**
-	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
+	 *
+	 * @return array{
 	 */
 	public function path($value, array $refs = [])
 	{
-		if (Lib::type()->path($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->path($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `path` is failed", $value, $refs ]);
@@ -2575,14 +2785,12 @@ class ParseThrowModule
 
 
 	/**
-	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
 	 */
 	public function realpath($value, ?bool $allowSymlink = null, array $refs = [])
 	{
-		if (Lib::type()->realpath($result, $value, $allowSymlink, $refs)) {
-		    return $result;
+		if (Lib::type()->realpath($r, $value, $allowSymlink, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `realpath` is failed", $value, $allowSymlink, $refs ]);
@@ -2590,14 +2798,14 @@ class ParseThrowModule
 
 
 	/**
-	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
+	 *
+	 * @return array{
 	 */
 	public function freepath($value, array $refs = [])
 	{
-		if (Lib::type()->freepath($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->freepath($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `freepath` is failed", $value, $refs ]);
@@ -2605,14 +2813,12 @@ class ParseThrowModule
 
 
 	/**
-	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
 	 */
 	public function dirpath($value, ?bool $allowExists = null, ?bool $allowSymlink = null, array $refs = [])
 	{
-		if (Lib::type()->dirpath($result, $value, $allowExists, $allowSymlink, $refs)) {
-		    return $result;
+		if (Lib::type()->dirpath($r, $value, $allowExists, $allowSymlink, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `dirpath` is failed", $value, $allowExists, $allowSymlink, $refs ]);
@@ -2624,8 +2830,8 @@ class ParseThrowModule
 	 */
 	public function filepath($value, ?bool $allowExists, ?bool $allowSymlink = null, array $refs = [])
 	{
-		if (Lib::type()->filepath($result, $value, $allowExists, $allowSymlink, $refs)) {
-		    return $result;
+		if (Lib::type()->filepath($r, $value, $allowExists, $allowSymlink, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `filepath` is failed", $value, $allowExists, $allowSymlink, $refs ]);
@@ -2633,14 +2839,14 @@ class ParseThrowModule
 
 
 	/**
-	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
+	 *
+	 * @return array{
 	 */
 	public function dirpath_realpath($value, ?bool $allowSymlink = null, array $refs = [])
 	{
-		if (Lib::type()->dirpath_realpath($result, $value, $allowSymlink, $refs)) {
-		    return $result;
+		if (Lib::type()->dirpath_realpath($r, $value, $allowSymlink, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `dirpath_realpath` is failed", $value, $allowSymlink, $refs ]);
@@ -2648,14 +2854,12 @@ class ParseThrowModule
 
 
 	/**
-	 * @param array{ 0: array|null } $refs
-	 *
 	 * @return string|null
 	 */
 	public function filepath_realpath($value, ?bool $allowSymlink = null, array $refs = [])
 	{
-		if (Lib::type()->filepath_realpath($result, $value, $allowSymlink, $refs)) {
-		    return $result;
+		if (Lib::type()->filepath_realpath($r, $value, $allowSymlink, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `filepath_realpath` is failed", $value, $allowSymlink, $refs ]);
@@ -2667,8 +2871,8 @@ class ParseThrowModule
 	 */
 	public function filename($value)
 	{
-		if (Lib::type()->filename($result, $value)) {
-		    return $result;
+		if (Lib::type()->filename($r, $value)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `filename` is failed", $value ]);
@@ -2680,8 +2884,8 @@ class ParseThrowModule
 	 */
 	public function file($value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null)
 	{
-		if (Lib::type()->file($result, $value, $extensions, $mimeTypes, $filters)) {
-		    return $result;
+		if (Lib::type()->file($r, $value, $extensions, $mimeTypes, $filters)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `file` is failed", $value, $extensions, $mimeTypes, $filters ]);
@@ -2693,8 +2897,8 @@ class ParseThrowModule
 	 */
 	public function image($value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null)
 	{
-		if (Lib::type()->image($result, $value, $extensions, $mimeTypes, $filters)) {
-		    return $result;
+		if (Lib::type()->image($r, $value, $extensions, $mimeTypes, $filters)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `image` is failed", $value, $extensions, $mimeTypes, $filters ]);
@@ -2706,8 +2910,8 @@ class ParseThrowModule
 	 */
 	public function email($value, ?array $filters = null, array $refs = [])
 	{
-		if (Lib::type()->email($result, $value, $filters, $refs)) {
-		    return $result;
+		if (Lib::type()->email($r, $value, $filters, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `email` is failed", $value, $filters, $refs ]);
@@ -2719,8 +2923,8 @@ class ParseThrowModule
 	 */
 	public function email_fake($value, array $refs = [])
 	{
-		if (Lib::type()->email_fake($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->email_fake($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `email_fake` is failed", $value, $refs ]);
@@ -2732,8 +2936,8 @@ class ParseThrowModule
 	 */
 	public function email_non_fake($value, ?array $filters = null, array $refs = [])
 	{
-		if (Lib::type()->email_non_fake($result, $value, $filters, $refs)) {
-		    return $result;
+		if (Lib::type()->email_non_fake($r, $value, $filters, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `email_non_fake` is failed", $value, $filters, $refs ]);
@@ -2745,8 +2949,8 @@ class ParseThrowModule
 	 */
 	public function phone($value, array $refs = [])
 	{
-		if (Lib::type()->phone($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->phone($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `phone` is failed", $value, $refs ]);
@@ -2758,8 +2962,8 @@ class ParseThrowModule
 	 */
 	public function phone_fake($value, array $refs = [])
 	{
-		if (Lib::type()->phone_fake($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->phone_fake($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `phone_fake` is failed", $value, $refs ]);
@@ -2771,8 +2975,8 @@ class ParseThrowModule
 	 */
 	public function phone_non_fake($value, array $refs = [])
 	{
-		if (Lib::type()->phone_non_fake($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->phone_non_fake($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `phone_non_fake` is failed", $value, $refs ]);
@@ -2784,8 +2988,8 @@ class ParseThrowModule
 	 */
 	public function phone_real($value, ?string $region = '', array $refs = [])
 	{
-		if (Lib::type()->phone_real($result, $value, $region, $refs)) {
-		    return $result;
+		if (Lib::type()->phone_real($r, $value, $region, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `phone_real` is failed", $value, $region, $refs ]);
@@ -2797,8 +3001,8 @@ class ParseThrowModule
 	 */
 	public function tel($value, array $refs = [])
 	{
-		if (Lib::type()->tel($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->tel($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `tel` is failed", $value, $refs ]);
@@ -2810,8 +3014,8 @@ class ParseThrowModule
 	 */
 	public function tel_fake($value, array $refs = [])
 	{
-		if (Lib::type()->tel_fake($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->tel_fake($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `tel_fake` is failed", $value, $refs ]);
@@ -2823,8 +3027,8 @@ class ParseThrowModule
 	 */
 	public function tel_non_fake($value, array $refs = [])
 	{
-		if (Lib::type()->tel_non_fake($result, $value, $refs)) {
-		    return $result;
+		if (Lib::type()->tel_non_fake($r, $value, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `tel_non_fake` is failed", $value, $refs ]);
@@ -2836,8 +3040,8 @@ class ParseThrowModule
 	 */
 	public function tel_real($value, ?string $region = '', array $refs = [])
 	{
-		if (Lib::type()->tel_real($result, $value, $region, $refs)) {
-		    return $result;
+		if (Lib::type()->tel_real($r, $value, $region, $refs)) {
+		    return $r;
 		}
 
 		throw new LogicException([ "Parsing `tel_real` is failed", $value, $region, $refs ]);

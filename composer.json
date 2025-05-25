@@ -22,6 +22,7 @@
             "const/arr.php",
             "const/cmp.php",
             "const/debug.php",
+            "const/num.php",
             "const/php.php",
             "const/type.php"
         ],
@@ -38,19 +39,24 @@
     "require": {
         "php": "^7.3|^8.0",
 
-        "ext-pcre": "*"
+        "ext-pcre": "*",
+        "symfony/process": "^5.4"
     },
     "suggest": {
         "ext-bcmath": "*",
         "ext-ctype": "*",
         "ext-curl": "*",
         "ext-date": "*",
+        "ext-dom": "*",
         "ext-fileinfo": "*",
         "ext-filter": "*",
         "ext-intl": "*",
         "ext-json": "*",
+        "ext-libxml": "*",
         "ext-mbstring": "*",
         "ext-pdo": "*",
+        "ext-redis": "*",
+        "ext-simplexml": "*",
         "ext-sockets": "*",
 
         "doctrine/inflector": "^2.0",

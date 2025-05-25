@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Bcmath;
 
+use Gzhegow\Lib\Modules\Php\Result\Ret;
 use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
@@ -55,47 +56,53 @@ class Bcnumber implements
 
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromValid($from, $ctx = null)
+    public static function fromValid($from, $ret = null)
     {
-        $ctxCur = Result::parse();
+        $retCur = Result::asValue();
 
         $instance = null
-            ?? static::fromStatic($from, $ctxCur)
-            ?? static::fromValidArray($from, $ctxCur);
+            ?? static::fromStatic($from, $retCur)
+            ?? static::fromValidArray($from, $retCur);
 
-        if ($ctxCur->isErr()) {
-            return Result::err($ctx, $ctxCur);
+        if ($retCur->isErr()) {
+            return Result::err($ret, $retCur);
         }
 
-        return Result::ok($ctx, $instance);
+        return Result::ok($ret, $instance);
     }
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromStatic($from, $ctx = null)
+    public static function fromStatic($from, $ret = null)
     {
         if ($from instanceof static) {
-            return Result::ok($ctx, $from);
+            return Result::ok($ret, $from);
         }
 
         return Result::err(
-            $ctx,
+            $ret,
             [ 'The `from` must be instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
+     * @param Ret $ret
+     *
      * @return static|bool|null
      */
-    public static function fromValidArray($from, $ctx = null)
+    public static function fromValidArray($from, $ret = null)
     {
         if (! is_array($from)) {
             return Result::err(
-                $ctx,
+                $ret,
                 [ 'The `from` should be array', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -114,7 +121,7 @@ class Bcnumber implements
         $instance->value = "{$instance->sign}{$instance->int}{$instance->frac}";
 
         return Result::ok(
-            $ctx,
+            $ret,
             $instance
         );
     }

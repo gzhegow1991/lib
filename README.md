@@ -23,7 +23,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 
 // > настраиваем PHP
-// > некоторые CMS сами по себе применяют error_reporting/set_error_handler/set_exception_handler глубоко в ядре
+// > некоторые CMS сами по себе применяют настройки глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
 ($ex = \Gzhegow\Lib\Lib::entrypoint())
     // > частично удаляет путь файла из каждой строки `trace` (`trace[i][file]`) при обработке исключений
@@ -33,14 +33,23 @@ require_once __DIR__ . '/../vendor/autoload.php';
     // ->setErrorReporting(E_ALL)
     // ->setMemoryLimit('32M')
     // ->setTimeLimit(30)
+    // ->setPostMaxSize('5M')
+    // ->setUploadMaxFilesize('2M')
+    // ->setUploadTmpDir(sys_get_temp_dir())
+    // ->setPrecision(16)
     // ->setUmask(0002)
     // ->setErrorHandler([ $ex, 'fnErrorHandler' ])
     // ->setExceptionHandler([ $ex, 'fnExceptionHandler' ])
+    // ->lock(true)
     //
     // > file: yourscript.php
     ->useErrorReporting()
     ->useMemoryLimit()
     ->useTimeLimit()
+    ->usePostMaxSize()
+    ->useUploadMaxFilesize()
+    ->useUploadTmpDir()
+    ->usePrecision()
     ->useUmask()
     ->useErrorHandler()
     ->useExceptionHandler()
@@ -100,11 +109,11 @@ $ffn = new class {
     }
 
 
-    function test(\Closure $fn, array $args = []) : \Gzhegow\Lib\Modules\Test\TestRunner\TestRunner
+    function test(\Closure $fn, array $args = []) : \Gzhegow\Lib\Modules\Test\Test
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return \Gzhegow\Lib\Lib::test()->test()
+        return \Gzhegow\Lib\Lib::test()->newTest()
             ->fn($fn, $args)
             ->trace($trace)
         ;
@@ -135,7 +144,7 @@ $fn = function () use ($ffn) {
         ->catch(function ($reason) use ($ffn) {
             $ffn->print("[ 900 | CATCH 1.3 ]", $reason);
 
-            return \Gzhegow\Lib\Modules\Async\Promise\Promise::reject($reason);
+            return \Gzhegow\Lib\Modules\Async\Promise\Promise::rejected($reason);
         })
         ->catch(function ($reason) use ($ffn) {
             $ffn->print("[ 900 | CATCH 1.4 ]", $reason);
@@ -193,7 +202,7 @@ $fn = function () use ($ffn) {
     $ps = [
         '[ 100 | ALL ] 1',
         \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(100)->then(function () { return '[ 100 | ALL ] 2'; }),
-        \Gzhegow\Lib\Modules\Async\Promise\Promise::resolve('[ 100 | ALL ] 3'),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::resolved('[ 100 | ALL ] 3'),
     ];
     \Gzhegow\Lib\Modules\Async\Promise\Promise::allResolvedOf($ps)
         ->then(function ($res) use ($ffn) {
@@ -207,9 +216,9 @@ $fn = function () use ($ffn) {
 
 
     $ps = [
-        \Gzhegow\Lib\Modules\Async\Promise\Promise::resolve('[ 200 | ALL SETTLED ] 1'),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::resolved('[ 200 | ALL SETTLED ] 1'),
         \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(200)->then(function () { return '[ 200 | ALL SETTLED ] 2'; }),
-        \Gzhegow\Lib\Modules\Async\Promise\Promise::reject('[ 200 | ALL SETTLED ] 3'),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::rejected('[ 200 | ALL SETTLED ] 3'),
         \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(100)->then(function () { return '[ 200 | ALL SETTLED ] 4'; }),
     ];
     \Gzhegow\Lib\Modules\Async\Promise\Promise::allOf($ps)
@@ -240,7 +249,7 @@ $fn = function () use ($ffn) {
 
     $ps = [
         \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(500)->then(function () { return '[ 500 | ANY ] 1'; }),
-        \Gzhegow\Lib\Modules\Async\Promise\Promise::reject('[ 500 | ANY ] 2'),
+        \Gzhegow\Lib\Modules\Async\Promise\Promise::rejected('[ 500 | ANY ] 2'),
     ];
     \Gzhegow\Lib\Modules\Async\Promise\Promise::firstResolvedOf($ps)
         ->then(function ($res) use ($ffn) {
@@ -297,7 +306,7 @@ $test->expectStdout('
 "[ 500 | ANY ] 1"
 
 
-"[ 600 | TIMEOUT ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
+"[ 600 | TIMEOUT ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException # "Timeout: 600ms" }
 
 
 "[ 800 | THEN 2.1 ]" | NULL
@@ -305,9 +314,9 @@ $test->expectStdout('
 
 "[ 900 | THEN 1.1 ]" | NULL
 "[ 900 | THEN 1.2 ]" | 123
-"[ 900 | CATCH 1.3 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
-"[ 900 | CATCH 1.4 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
-"[ 900 | THEN 1.5 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException }
+"[ 900 | CATCH 1.3 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException # "123" }
+"[ 900 | CATCH 1.4 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException # "123" }
+"[ 900 | THEN 1.5 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException # "123" }
 
 "[ 800+400 | THEN 2.3 ]" | 456
 ');
@@ -317,10 +326,9 @@ $test->run();
 
 
 
-// > Тест закомментирован, поскольку приводит к поднятию дополнительных процессов
-// > Если неверные права пользователя в Unix, с этим будут проблемы, раскоментируйте, чтобы протестировать
+// // > Тест закомментирован, поскольку приводит к поднятию дополнительных процессов
+// // > Если неверные права пользователя в Unix, с этим будут проблемы, раскоментируйте, чтобы протестировать
 // // >>> TEST
-// // > тесты Fetch
 // $fn = function () use ($ffn) {
 //     $ffn->print('[ Fetch ]');
 //     echo "\n";
@@ -347,7 +355,6 @@ $test->run();
 //         })
 //     ;
 //
-//
 //     \Gzhegow\Lib\Modules\Async\Loop\Loop::runLoop();
 // };
 // $test = $ffn->test($fn);
@@ -358,6 +365,7 @@ $test->run();
 // "https://yandex.ru - HTTP: 200"
 // ');
 // $test->run();
+// die();
 
 
 
@@ -487,7 +495,7 @@ $fn = function () use ($ffn) {
     $ffn->print('[ Pipe ]');
     echo "\n";
 
-    $fn = \Gzhegow\Lib\Lib::pipe();
+    $fn = \Gzhegow\Lib\Lib::func()->newPipe();
 
     $fn
         // > этот шаг может заменить значение, в данном случае приведя его к строке
@@ -802,7 +810,7 @@ $fn = function () use ($ffn) {
         protected $foo = 1;
         protected $foo2;
 
-        protected function validation(array &$context = []) : bool
+        protected function validation(array &$refContext = []) : bool
         {
             if ($this->foo2 !== $this->foo) {
                 return false;
@@ -935,7 +943,7 @@ $fn = function () use ($ffn) {
         \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx)
         || \Gzhegow\Lib\Modules\Bcmath\Number::fromValidArray($invalidValue, $ctx);
 
-    $errors = $ctx->errors();
+    $errors = $ctx->getErrors();
     $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $errors);
     $ffn->print_array_multiline($errors, 2);
 
@@ -948,7 +956,7 @@ $fn = function () use ($ffn) {
         ?? \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx)
         ?? \Gzhegow\Lib\Modules\Bcmath\Number::fromValidArray($invalidValue, $ctx);
 
-    $errors = $ctx->errors();
+    $errors = $ctx->getErrors();
     $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $errors);
     $ffn->print_array_multiline($errors, 2);
 
@@ -1580,9 +1588,9 @@ $fn = function () use ($ffn) {
             new \Gzhegow\Lib\Modules\Php\Nil(),
         ],
         1  => [
-            strval(NAN),
+            ((string) NAN),
             'NULL',
-            strval(new \Gzhegow\Lib\Modules\Php\Nil()),
+            ((string) (new \Gzhegow\Lib\Modules\Php\Nil())),
         ],
         2  => [
             false,
@@ -1608,9 +1616,11 @@ $fn = function () use ($ffn) {
         ],
         6  => [
             PHP_FLOAT_MAX,
-            PHP_FLOAT_MIN,
             -PHP_FLOAT_MAX,
-            -PHP_FLOAT_MIN,
+            //
+            // > практическая польза нулевая, но для проверки дополнительный вызов и куча работы со строками
+            // PHP_FLOAT_MIN,
+            // -PHP_FLOAT_MIN,
         ],
         7  => [
             INF,
@@ -1636,20 +1646,22 @@ $fn = function () use ($ffn) {
             '1.1e-1', // 0.11
         ],
         11 => [
-            strval(PHP_INT_MAX), // > int
-            strval(PHP_INT_MIN), // > int
-            strval(PHP_INT_MAX + 1), // > float
-            strval(PHP_INT_MIN - 1), // > float
+            ((string) PHP_INT_MAX), // > int
+            ((string) PHP_INT_MIN), // > int
+            ((string) (PHP_INT_MAX + 1)), // > float
+            ((string) (PHP_INT_MIN - 1)), // > float
         ],
         12 => [
-            strval(PHP_FLOAT_MAX),
-            strval(PHP_FLOAT_MIN),
-            strval(-PHP_FLOAT_MAX),
-            strval(-PHP_FLOAT_MIN),
+            ((string) PHP_FLOAT_MAX),
+            ((string) (-PHP_FLOAT_MAX)),
+            //
+            // > практическая польза нулевая, но для проверки дополнительный вызов и куча работы со строками
+            // ((string) PHP_FLOAT_MIN),
+            // ((string) (-PHP_FLOAT_MIN)),
         ],
         13 => [
-            strval(INF),
-            strval(-INF),
+            ((string) INF),
+            ((string) -INF),
         ],
         14 => [
             $resourceOpenedStdout,
@@ -1709,12 +1721,12 @@ $fn = function () use ($ffn) {
     $fnCmpSizeName = null;
 
     $fnCmp = $theCmp->fnCompareValues(
-        _CMP_MODE_TYPE_CAST_OR_CONTINUE | _CMP_MODE_DATE_VS_SEC,
+        _CMP_MODE_TYPE_TYPECAST_OR_CONTINUE | _CMP_MODE_DATE_VS_SEC,
         _CMP_RESULT_NAN_RETURN,
         [ &$fnCmpName ]
     );
     $fnCmpSize = $theCmp->fnCompareSizes(
-        _CMP_MODE_TYPE_CAST_OR_CONTINUE | _CMP_MODE_DATE_VS_SEC,
+        _CMP_MODE_TYPE_TYPECAST_OR_CONTINUE | _CMP_MODE_DATE_VS_SEC,
         _CMP_RESULT_NAN_RETURN,
         [ &$fnCmpSizeName ]
     );
@@ -1763,128 +1775,128 @@ $test = $ffn->test($fn);
 $test->expectStdoutIf(PHP_VERSION_ID >= 80200, '
 "[ CmpModule ]"
 
-cf4099ce4a62a1d06cf8b3aafc0da38d
-cf4099ce4a62a1d06cf8b3aafc0da38d
+6059906a31fa5125d24ba54dd3b964e3
+6059906a31fa5125d24ba54dd3b964e3
 
-490ec98f69fe96c14637416f066852c2
-1fd5d4c6fc6cf6abde19e1c75ca55710
+946b93bc140fde11af7fc037f6b1dc24
+010cd4ccdcf75798a323015cc74baabb
 
-e606eca98951c845a7640edb02b3ab62
-6fcc4ef34f6c7bcd1daa4855b8b196f2
+e5e70c7ea54c5df833ac0a9cf44cb0eb
+7f70eca80051635d5e1c03f50abda6fa
 
-48fe998035bdd10d06e73f0f8a08194a
-da5a6500e2ad849c8772f1c713541973
+ced146152b2c97555b813b15b16ae1c8
+b70c6693c28ccb82362470daba595e23
 
-6f0fd785225ac3eab7fa00b2c46cc298
-a8fe44514f23a3182da5459418346eed
+ea0e1bba308de574e4c50a43814e81a8
+f23d3000ccdb2f1553c52f6bf2d34aba
 
-35101a67c8b16659d83418f721c93668
-6dca25535d3e9ad90f35c0419acb37b5
+17354afc4bf33a1718d921455ab85174
+67192b5dbba558d753853a60805c9777
 
-87ff003090a1314209918f3ac7f8beba
-ec8c98ae4dd41a94732bbdb499c3d845
+b6bd2e21911ed651bb8127b056504385
+6307de5fdc129ebd154d4acb7432c6f8
 
-55a35deb406692fd486098d19c923798
-0b07fae03da41bff2d2c698d78bbd6c1
+20eaebc512de63b445b9fe1f0a5fd8cd
+4ecd7f38cbcc8b5baa8629c0b9842f77
 
-edf2f80951aa9ba3f6ae9289b3cea8b9
-7d159d9422854dc5f443113d1710828e
+0c040ef28f8b5b7715e9769156c8e302
+c98a0d7147c11759375c6eb2ea871898
 
-6877e6ce3586a6d065eede6e05698977
-dadf7999aaf18c657bdae55f4aefd521
+3f7d4ae0b4e5a17452bbdc6b124b9e07
+3809ad20a1a941348d6fad8815232778
 
-e3ee774a87d3c5397efea14d9e1d1f6b
-6c642f9464a155fc8b3478f7c73480cf
+b3278bdd4f1408db5306fe5266500334
+a4426a67ecce8870f500067f31309fc7
 
-2558d66c489c580b403ae36be9a1f42f
-0fb2ff53c46b572d09ed995fe5d320fa
+fbef265c137bc1c782e48cff53275af4
+94aa32637507a30178d00e17c6bb6110
 
-ea7065cc26c32ddd0f949ea8dbef5f31
-b159e16b3ebf3aa4c3743b5714656022
+94e63395607395d4afe94e2590a39239
+ca47468825e5827a615550db101ca766
 
-6e7182a443054f2608c1582473a69420
-4fca1526ef9a3769fe3279b15543fc57
+2bfe19a5f2b0a8f28fc351fde86a1026
+b2fa59d21450ffdf7d134108675fbcf8
 
-cd3ca8a442d8b5aef4173ae928978e96
-6e3e6ed1c9a6e1ae2d634b9656c976f8
+456d83eefc1188cf3c6a12af1a466bfa
+a61c2637ef644e655455df4271f2b5d4
 
-098c84f888f7c6049199cfa933e119d0
-753b54ab1969bce113f3b5b413f66b08
+bc250e5150d5d579ab65cc94768c0f2e
+9d2909611f86c8c269307b25fb4baa47
 
-c2991d79be720822b54584c3dc7d723c
-e4f103e1717b536a5fec3fa45065c28c
+33c8d02cb62067afc2b4dc6b8c7fe8a7
+65264d02c72cd2625df4e1c509471341
 
-8029eafbf5407e2a188bb7737154af51
-6a2f24abb7ad00dce3e0caa451614c3f
+010f12e98155e1c686ac224cfcc3429f
+c4b464b05fe0cc943a8a04885731f0bd
 
-94f9d7b5c4184b5a4c1bd9e9ae7fe219
-4af4327c1bbf913323ee2f4b01ee77ea
+6c52ef19cdb689e0347d7f736f8ea72b
+5fa15f0fda2c03c6dfc7829f5458436e
 
-1d836ee366bf12ffb91ba7cf0e569464
-ed615e45c29e72aeb4c1404a47e59747
+4e1eb235990845c9c305c4b6e81c4a41
+d15aaa88fc0599cabcd9ca84eb0ba1ca
 ');
 $test->expectStdoutIf(PHP_VERSION_ID < 80200, '
 "[ CmpModule ]"
 
-82f719e1e01d77d54712e33ee73c9eef
-82f719e1e01d77d54712e33ee73c9eef
+908fbbc10d0524b32e07b18caa682524
+908fbbc10d0524b32e07b18caa682524
 
-57712c0155ecc96bf7958eef2eb2c15c
-4cdeb656c29a9d3c3bb3beeb4c935660
+165b8d3e81c246955d4533498d6f48fe
+fff1b18ed73d6e21a826e47ea9f4f056
 
-77aba0613789762ea2c3c479920904d5
-05741b56dfff778ea656957062597693
+d30eff66d945cecdd0c96516a6558e3a
+e561399aa4d2187899cdcd3ab6ad000d
 
-a465d524f95253f9e78db5b8bd967b5c
-3f3e59d3fb40b9d1254b2b15833caf6d
+97b271c2d613076723b9705cb9c71556
+be6d0776834317ec5fadaff1303f4ff0
 
-9840a56176ef81b518e0d819da2d9c3c
-cfc83599a289f0f9f95ba4b7fe626c9e
+1efefd957627898b2acbba867d75cbc5
+fb0750945139eb06b47a600255676c47
 
-3a8df645ac662bcb16cb4d1a5e9805be
-e6029467cb9b33033e53ace6ca234328
+c6f8a5b70de94e6eaa2d5fb57ccc3e3e
+96c4d024600d61a61804c7209e34c63c
 
-b95287e75683be04860e5f2103b30c73
-150271d2c69a7da3024abc760060a698
+5826b941dd5d395ee103f9da83fc253a
+c58716f5ae674065028a104ebb0bd146
 
-f0716acbde15cf9381d1add49c213e15
-86888e38a0e818282dd161b537ffc679
+621dba2174ffd2e60446436f1886f62c
+2449e86fde91446dba306c34b99602a1
 
-1e65fa8f932a9535ff7c2aa1f60f82e5
-7c37f83c6b382d48087f9ca329e79d18
+355a59fbca8bd69553c5d8690869d3e2
+c38266d7dd9d1bc9cf32f845fcd04b38
 
-a86e213893dae7509e4926b3be82f35e
-86d9ace1ba936d47fd0a16971309c56a
+828629b8067b4860e63bfaf38ba72964
+08d0229be9035ea4428e80a04a4a8372
 
-665fb866f689f5440588a1dcb1593bf4
-3ad7a0cb801fc6b8127d04182bb8e47f
+4869d80916766a53ac11476293c01ab2
+04c6c960e535386f1ac60fc2f3a6e8e6
 
-d19a897e0b57bf63e8fbf9398358e6d8
-b28f71f02f17cfe93cee65c64623400b
+2dad24df60dd8b8e1536ed33ee103e84
+7d331f7bdf0ef0ae6a810688292200a3
 
-aa02005c30e79e8772d3df310716c8d7
-fd1ac42f24cda6df6dbfefd12fc70317
+1df0475ec18db2c156c95ea58734e091
+226676c999ac47f898e08cd16cb34681
 
-6233d14a2cb943730a4513d69b5de514
-898449a50d8741568159521163de7457
+7a0b364aa70b3c753f57fa934dfea198
+2d023d1a64cab349bfa9c92001510ce5
 
-7f40a0427b5e1e2d646019d89a5a2f7f
-68db9812f428826443e271cabf880fbb
+4ae9f95cbf71415931dcbecc7747611b
+d0bbd2e6c1b903d51e2a58f05b53fd7f
 
-10e9523c26b0f8c27d21b68a3acca316
-aff0519a0870d57e0a0bf845d6209f63
+f1a5b2e3072b88181a4e5e1de7eafa84
+dd8ef9262960ab6cff45009c4b2db54e
 
-9e31c04f69697190e88b16b1c576255b
-2238672a27a185cd2e0c65e6ccb9ae16
+3782ec73f791f0498abacac1c137226c
+f6890b0e173dd8aafdbc618d4c4767a6
 
-9e793be458e49a3faf18be572d8edfec
-1dd2cba5b0a201f8a24e72b6588ea2fb
+2a1a8aa3afbd086df0eb3a712a491db0
+6554c02b004cd4ac2baa4c49dbb71e2b
 
-b0ac0103412cfb09117c2a8ec71c0ad0
-af0b49ea305eadac52ceccbeff73fa1d
+a25b56af54b8de44fe31f2c9a364dc0f
+636b2a406fcb7b7733eca5710f0c3aa0
 
-a3fb74b5b7f1ce2b438df41a43581719
-7f269763bf236100e2ed7c5a5f305dff
+33d5dd34a8557216808c11dd17050c8c
+2e66f6507e33f5da1614086aabc66fcf
 ');
 $test->run();
 
@@ -3058,25 +3070,218 @@ $fn = function () use ($ffn) {
     $ffn->print($dec, $src === $dec);
 
     echo "\n";
+    echo "\n";
 
 
-    [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv_encode_rows([ [ 'col1', 'col2' ], [ 'val1', 'val2' ] ]);
+    [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv()->csv_encode_rows([ [ 'col1', 'col2' ], [ 'val1', 'val2' ] ]);
     $ffn->print($csv);
     $ffn->print($bytes);
 
     echo "\n";
 
-
-    [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv_encode_row([ 'col1', 'col2' ]);
+    [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv()->csv_encode_row([ 'col1', 'col2' ]);
     $ffn->print($csv);
     $ffn->print($bytes);
+
+    echo "\n";
+    echo "\n";
+
+
+
+    $json1 = '{"hello": "world"}';
+    $json2 = '
+        {
+            "hello": "world"
+        }
+    ';
+
+    $jsonWithComment1 = "[1,/* 2 */,3]";
+    $jsonWithComment2 = '
+        {
+            "hello": "world",
+            # "foo1": "bar1",
+            // "foo2": "bar2",
+            /* "foo3": "bar3" */
+        }
+    ';
+
+
+    try {
+        \Gzhegow\Lib\Lib::format()->json()->json_decode(null, true);
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode(
+        null, true,
+        null, null,
+        \Gzhegow\Lib\Modules\Php\Result\Result::asValue([ null ])
+    );
+    $ffn->print($result);
+
+    echo "\n";
+
+
+    try {
+        \Gzhegow\Lib\Lib::format()->json()->jsonc_decode(null, true);
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode(
+        null, true,
+        null, null,
+        \Gzhegow\Lib\Modules\Php\Result\Result::asValue([ null ])
+    );
+    $ffn->print($result);
+
+    echo "\n";
+
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode($json1, true);
+    $ffn->print($result);
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode($json2, true);
+    $ffn->print($result);
+
+    echo "\n";
+
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($json1, true);
+    $ffn->print($result);
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($json2, true);
+    $ffn->print($result);
+
+    echo "\n";
+
+
+    try {
+        \Gzhegow\Lib\Lib::format()->json()->json_decode($jsonWithComment1, true);
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+
+    try {
+        \Gzhegow\Lib\Lib::format()->json()->json_decode($jsonWithComment2, true);
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($jsonWithComment1, true);
+    $ffn->print($result);
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($jsonWithComment2, true);
+    $ffn->print($result);
+
+    echo "\n";
+
+
+    try {
+        \Gzhegow\Lib\Lib::format()->json()->json_encode(null, false);
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode(null, false, null, null, \Gzhegow\Lib\Modules\Php\Result\Result::asValue([ null ]));
+    $ffn->print($result);
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode(null, true);
+    $ffn->print($result);
+
+    echo "\n";
+
+
+    try {
+        \Gzhegow\Lib\Lib::format()->json()->json_encode($value = NAN);
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode(
+        $value = NAN, null,
+        null, null,
+        \Gzhegow\Lib\Modules\Php\Result\Result::asValue([ "NAN" ])
+    );
+    $ffn->print($result);
+
+    echo "\n";
+
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode("привет");
+    $ffn->print($result);
+
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_print("привет");
+    $ffn->print($result);
+
+    echo "\n";
+    echo "\n";
+
+
+
+    $xml = <<<XML
+<example>
+  <a>Apple</a>
+  <b>Banana</b>
+  <c>Cherry</c>
+</example>
+XML;
+
+    $sxe = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_sxe($xml);
+    $ffn->print($sxe);
+
+
+    $xml = <<<XML
+<?xml version="1.0" encoding="UTF-8"?>
+<example>
+  <a>Apple</a>
+  <b>Banana</b>
+  <c>Cherry</c>
+</example>
+XML;
+
+    $ddoc = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_dom_document($xml);
+    $ffn->print($ddoc);
+
+
+    $xml = <<<XML
+<example xmlns:foo="my.foo.urn">
+  <foo:a>Apple</foo:a>
+  <foo:b>Banana</foo:b>
+  <c>Cherry</c>
+</example>
+XML;
+
+    $ddoc = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_dom_document($xml);
+    $ffn->print($ddoc);
+
+
+    $xmlInvalid = <<<XML
+<note>
+  <to>Tove</to>
+  <from>Jani</from
+  <heading>Reminder</heading>
+  <body>Don't forget me this weekend!</body>
+</note>
+XML;
+
+    $sxe = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_sxe($xmlInvalid, $ret = \Gzhegow\Lib\Modules\Php\Result\Result::asValue());
+    $ffn->print($sxe);
+    $ffn->print_array_multiline($ret->getErrors(), 2);
 };
 $test = $ffn->test($fn);
-$test->expectStdout('
+$test->expectStdoutIf(PHP_VERSION_ID >= 70400, '
 "[ FormatModule ]"
 
 "1MB"
 1048576 | TRUE
+
 
 "col1;col2\n
 val1;val2\n
@@ -3086,6 +3291,108 @@ val1;val2\n
 "col1;col2\n
 "
 10
+
+
+"[ CATCH ] The `json` should be non-empty string"
+NULL
+
+"[ CATCH ] The `jsonc` should be non-empty string"
+NULL
+
+[ "hello" => "world" ]
+[ "hello" => "world" ]
+
+[ "hello" => "world" ]
+[ "hello" => "world" ]
+
+"[ CATCH ] Unable to `json_decode` due to invalid JSON"
+"[ CATCH ] Unable to `json_decode` due to invalid JSON"
+[ 1, 2, 3 ]
+[ "hello" => "world", "foo1" => "bar1", "foo2" => "bar2", "foo3" => "bar3" ]
+
+"[ CATCH ] The NULL values cannot be encoded to JSON when `allowsNull` is set to FALSE"
+NULL
+"NULL"
+
+"[ CATCH ] The values of types [ NAN ][ resource ] cannot be encoded to JSON"
+"NAN"
+
+"\"\u043f\u0440\u0438\u0432\u0435\u0442\""
+"\"привет\""
+
+
+{ object(countable(3) iterable stringable) # SimpleXMLElement }
+{ object # DOMDocument }
+{ object # DOMDocument }
+NULL
+###
+[
+  [
+    "[ ERROR ] expected \'>\' at line 4",
+    "  <heading>Reminder</heading>",
+    "{ object # LibXMLError }"
+  ]
+]
+###
+');
+$test->expectStdoutIf(PHP_VERSION_ID < 70400, '
+"[ FormatModule ]"
+
+"1MB"
+1048576 | TRUE
+
+
+"col1;col2\n
+val1;val2\n
+"
+20
+
+"col1;col2\n
+"
+10
+
+
+"[ CATCH ] The `json` should be non-empty string"
+NULL
+
+"[ CATCH ] The `jsonc` should be non-empty string"
+NULL
+
+[ "hello" => "world" ]
+[ "hello" => "world" ]
+
+[ "hello" => "world" ]
+[ "hello" => "world" ]
+
+"[ CATCH ] Unable to `json_decode` due to invalid JSON"
+"[ CATCH ] Unable to `json_decode` due to invalid JSON"
+[ 1, 2, 3 ]
+[ "hello" => "world", "foo1" => "bar1", "foo2" => "bar2", "foo3" => "bar3" ]
+
+"[ CATCH ] The NULL values cannot be encoded to JSON when `allowsNull` is set to FALSE"
+NULL
+"NULL"
+
+"[ CATCH ] The values of types [ NAN ][ resource ] cannot be encoded to JSON"
+"NAN"
+
+"\"\u043f\u0440\u0438\u0432\u0435\u0442\""
+"\"привет\""
+
+
+{ object(iterable stringable) # SimpleXMLElement }
+{ object # DOMDocument }
+{ object # DOMDocument }
+NULL
+###
+[
+  [
+    "[ ERROR ] expected \'>\' at line 4",
+    "  <heading>Reminder</heading>",
+    "{ object # LibXMLError }"
+  ]
+]
+###
 ');
 $test->run();
 
@@ -3234,163 +3541,6 @@ $test->expectStdout('
 
 [ "AB", "AC", "AD", "BA", "BC", "BD", "CA", "CB", "CD", "DA", "DB", "DC" ]
 [ "012", "021", "102", "120", "201", "210" ]
-');
-$test->run();
-
-
-
-// >>> TEST
-// > тесты JsonModule
-$fn = function () use ($ffn) {
-    $ffn->print('[ JsonModule ]');
-    echo "\n";
-
-
-    $json1 = '{"hello": "world"}';
-    $json2 = '
-        {
-            "hello": "world"
-        }
-    ';
-
-    $jsonWithComment1 = "[1,/* 2 */,3]";
-    $jsonWithComment2 = '
-        {
-            "hello": "world",
-            # "foo1": "bar1",
-            // "foo2": "bar2",
-            /* "foo3": "bar3" */
-        }
-    ';
-
-
-    try {
-        \Gzhegow\Lib\Lib::json()->json_decode(null, true, []);
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-
-    try {
-        \Gzhegow\Lib\Lib::json()->jsonc_decode(null, true, []);
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-
-    $result = \Gzhegow\Lib\Lib::json()->json_decode(null, true, [ null ]);
-    $ffn->print($result);
-
-    $result = \Gzhegow\Lib\Lib::json()->jsonc_decode(null, true, [ null ]);
-    $ffn->print($result);
-
-    echo "\n";
-
-
-    $result = \Gzhegow\Lib\Lib::json()->json_decode($json1, true, []);
-    $ffn->print($result);
-
-    $result = \Gzhegow\Lib\Lib::json()->jsonc_decode($json1, true, []);
-    $ffn->print($result);
-
-    $result = \Gzhegow\Lib\Lib::json()->json_decode($json2, true, []);
-    $ffn->print($result);
-
-    $result = \Gzhegow\Lib\Lib::json()->jsonc_decode($json2, true, []);
-    $ffn->print($result);
-
-    echo "\n";
-
-
-    try {
-        \Gzhegow\Lib\Lib::json()->json_decode($jsonWithComment1, true, []);
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-
-    try {
-        \Gzhegow\Lib\Lib::json()->json_decode($jsonWithComment2, true, []);
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-
-    $result = \Gzhegow\Lib\Lib::json()->jsonc_decode($jsonWithComment1, true, []);
-    $ffn->print($result);
-
-    $result = \Gzhegow\Lib\Lib::json()->jsonc_decode($jsonWithComment2, true, []);
-    $ffn->print($result);
-
-    echo "\n";
-
-
-    try {
-        \Gzhegow\Lib\Lib::json()->json_encode(null, [], false);
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-
-    $result = \Gzhegow\Lib\Lib::json()->json_encode(null, [ null ], false);
-    $ffn->print($result);
-
-    $result = \Gzhegow\Lib\Lib::json()->json_encode(null, [], true);
-    $ffn->print($result);
-
-    echo "\n";
-
-
-    try {
-        \Gzhegow\Lib\Lib::json()->json_encode($value = NAN);
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-
-    $result = \Gzhegow\Lib\Lib::json()->json_encode(
-        $value = NAN,
-        $fallback = [ "NAN" ]
-    );
-    $ffn->print($result);
-
-    echo "\n";
-
-
-    $result = \Gzhegow\Lib\Lib::json()->json_encode("привет");
-    $ffn->print($result);
-
-    $result = \Gzhegow\Lib\Lib::json()->json_print("привет");
-    $ffn->print($result);
-};
-$test = $ffn->test($fn);
-$test->expectStdout('
-"[ JsonModule ]"
-
-"[ CATCH ] Unable to `json_decode`"
-"[ CATCH ] Unable to `jsonc_decode`"
-NULL
-NULL
-
-[ "hello" => "world" ]
-[ "hello" => "world" ]
-[ "hello" => "world" ]
-[ "hello" => "world" ]
-
-"[ CATCH ] Unable to `json_decode`"
-"[ CATCH ] Unable to `json_decode`"
-[ 1, 2, 3 ]
-[ "hello" => "world", "foo1" => "bar1", "foo2" => "bar2", "foo3" => "bar3" ]
-
-"[ CATCH ] Unable to `json_encode`"
-NULL
-"null"
-
-"[ CATCH ] Unable to `json_encode`"
-"NAN"
-
-"\"\u043f\u0440\u0438\u0432\u0435\u0442\""
-"\"привет\""
 ');
 $test->run();
 

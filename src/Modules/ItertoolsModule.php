@@ -41,8 +41,8 @@ class ItertoolsModule
     {
         $step = $step ?? 1;
 
-        if (! (
-            ($isStringStart = is_string($start))
+        if (! (false
+            || ($isStringStart = is_string($start))
             || is_int($start)
             || is_float($start)
         )) {
@@ -51,8 +51,8 @@ class ItertoolsModule
             );
         }
 
-        if (! (
-            ($isStringEnd = is_string($end))
+        if (! (false
+            || ($isStringEnd = is_string($end))
             || is_int($end)
             || is_float($end)
         )) {
@@ -61,8 +61,8 @@ class ItertoolsModule
             );
         }
 
-        if (! (
-            ($isFloatStep = is_float($step))
+        if (! (false
+            || ($isFloatStep = is_float($step))
             || is_int($step)
         )) {
             throw new LogicException(

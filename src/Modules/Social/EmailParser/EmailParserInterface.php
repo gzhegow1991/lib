@@ -18,16 +18,16 @@ interface EmailParserInterface
 
     public function parseEmail(
         $value, ?array $filters = null,
-        ?string &$emailDomain = null, ?string &$emailName = null
+        ?string &$refEmailDomain = null, ?string &$refEmailName = null
     ) : string;
 
     public function parseEmailFake(
         $value,
-        ?string &$emailDomain = null, ?string &$emailName = null
+        ?string &$refEmailDomain = null, ?string &$refEmailName = null
     ) : string;
 
     public function parseEmailNonFake(
         $value, ?array $filters = null,
-        ?string &$emailDomain = null, ?string &$emailName = null
+        ?string &$refEmailDomain = null, ?string &$refEmailName = null
     ) : string;
 }

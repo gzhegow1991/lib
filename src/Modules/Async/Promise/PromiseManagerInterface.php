@@ -2,24 +2,32 @@
 
 namespace Gzhegow\Lib\Modules\Async\Promise;
 
+use Gzhegow\Lib\Modules\Php\Result\Ret;
+
+
 interface PromiseManagerInterface
 {
     /**
-     * @return APromise|bool|null
+     * @param Ret $ret
+     *
+     * @return Promise|bool|null
      */
-    public function from($from, $ctx = null);
+    public function from($from, $ret = null);
 
     /**
-     * @return APromise|bool|null
+     * @param Ret $ret
+     *
+     * @return Promise|bool|null
      */
-    public function fromValue($from, $ctx = null);
+    public function fromValue($from, $ret = null);
 
     /**
      * @param callable $from
+     * @param Ret      $ret
      *
-     * @return APromise|bool|null
+     * @return Promise|bool|null
      */
-    public function fromCallable($from, $ctx = null);
+    public function fromCallable($from, $ret = null);
 
 
     /**
@@ -30,61 +38,57 @@ interface PromiseManagerInterface
 
     public function isPromise($value) : bool;
 
-    public function isThePromise($value) : bool;
-
-    public function isTheDeferred($value) : bool;
-
 
     /**
      * @param callable $fnExecutor
      */
-    public function new($fnExecutor) : APromise;
+    public function new($fnExecutor) : Promise;
 
-    public function resolve($value = null) : APromise;
+    public function resolved($value = null) : Promise;
 
-    public function reject($reason = null) : APromise;
-
-
-    public function never() : ADeferred;
-
-    public function defer(\Closure &$fnResolve = null, \Closure &$fnReject = null) : ADeferred;
+    public function rejected($reason = null) : Promise;
 
 
-    public function delay(int $waitMs) : ADeferred;
+    public function never() : Promise;
+
+    public function defer(?\Closure &$refFnResolve = null, ?\Closure &$refFnReject = null) : Promise;
+
+
+    public function delay(int $waitMs) : Promise;
 
     /**
      * @param callable $fnPooling
      */
-    public function pooling(int $tickMs, int $timeoutMs, $fnPooling) : ADeferred;
+    public function pooling(int $tickMs, ?int $timeoutMs, $fnPooling) : Promise;
 
 
     /**
-     * @param AbstractPromise[] $ps
+     * @param Promise[] $ps
      */
-    public function firstOf(array $ps, ?bool $rejectIfEmpty = null) : AbstractPromise;
+    public function firstOf(array $ps, ?bool $rejectIfEmpty = null) : Promise;
 
     /**
-     * @param AbstractPromise[] $ps
+     * @param Promise[] $ps
      */
-    public function firstResolvedOf(array $ps, ?bool $rejectIfEmpty = null) : AbstractPromise;
+    public function firstResolvedOf(array $ps, ?bool $rejectIfEmpty = null) : Promise;
 
 
     /**
-     * @param AbstractPromise[] $ps
+     * @param Promise[] $ps
      */
-    public function allOf(array $ps, ?bool $rejectIfEmpty = null) : AbstractPromise;
+    public function allOf(array $ps, ?bool $rejectIfEmpty = null) : Promise;
 
     /**
-     * @param AbstractPromise[] $ps
+     * @param Promise[] $ps
      */
-    public function allResolvedOf(array $ps, ?bool $rejectIfEmpty = null) : AbstractPromise;
+    public function allResolvedOf(array $ps, ?bool $rejectIfEmpty = null) : Promise;
 
 
-    public function timeout(AbstractPromise $promise, int $timeoutMs, $reason = null) : AbstractPromise;
+    public function timeout(Promise $promise, int $timeoutMs, $reason = null) : Promise;
 
 
     /**
      * @param array<int, mixed> $curlOptions
      */
-    public function fetchCurl(string $url, array $curlOptions = []) : ADeferred;
+    public function fetchCurl(string $url, array $curlOptions = []) : Promise;
 }
