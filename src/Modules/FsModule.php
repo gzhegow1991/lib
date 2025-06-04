@@ -1047,7 +1047,7 @@ class FsModule
         }
 
         $f = $this->fileSafe();
-        $f->callSafe(
+        $f->call_safe(
             static function () use (
                 $f,
                 $file, $data
@@ -1071,7 +1071,7 @@ class FsModule
     }
 
     public function blpush(
-        $flockWaitTickUsleep, $flockWaitTimeoutMs,
+        $tickUsleep, $timeoutMs,
         string $file, string $data
     ) : bool
     {
@@ -1090,17 +1090,17 @@ class FsModule
         }
 
         $f = $this->fileSafe();
-        $f->callSafe(
+        $f->call_safe(
             static function () use (
                 $f,
-                $flockWaitTickUsleep, $flockWaitTimeoutMs,
+                $tickUsleep, $timeoutMs,
                 $file, $data
             ) {
                 $fileIn = "{$file}.in";
                 $fileInLock = "{$file}.in.lock";
 
                 if ($fhInLock = $f->fopen_flock_tmpfile_pooling(
-                    $flockWaitTickUsleep, $flockWaitTimeoutMs,
+                    $tickUsleep, $timeoutMs,
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
                 )) {
                     fwrite($fhInLock, getmypid());
@@ -1133,7 +1133,7 @@ class FsModule
         }
 
         $f = $this->fileSafe();
-        $f->callSafe(
+        $f->call_safe(
             static function () use (
                 $f,
                 $file, $data
@@ -1157,7 +1157,7 @@ class FsModule
     }
 
     public function brpush(
-        $flockWaitTickUsleep, $flockWaitTimeoutMs,
+        $tickUsleep, $timeoutMs,
         string $file, string $data
     ) : bool
     {
@@ -1176,17 +1176,17 @@ class FsModule
         }
 
         $f = $this->fileSafe();
-        $f->callSafe(
+        $f->call_safe(
             static function () use (
                 $f,
-                $flockWaitTickUsleep, $flockWaitTimeoutMs,
+                $tickUsleep, $timeoutMs,
                 $file, $data
             ) {
                 $fileIn = "{$file}.in";
                 $fileInLock = "{$file}.in.lock";
 
                 if ($fhInLock = $f->fopen_flock_tmpfile_pooling(
-                    $flockWaitTickUsleep, $flockWaitTimeoutMs,
+                    $tickUsleep, $timeoutMs,
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
                 )) {
                     fwrite($fhInLock, getmypid());
@@ -1226,7 +1226,7 @@ class FsModule
 
         $f = $this->fileSafe();
 
-        $data = $f->callSafe(
+        $data = $f->call_safe(
             static function () use (
                 $f,
                 $fileIn, $fileOut, $fileOutLock
@@ -1318,7 +1318,7 @@ class FsModule
 
         $f = $this->fileSafe();
 
-        $data = $f->callSafe(
+        $data = $f->call_safe(
             static function () use (
                 $f,
                 $blockTickUsleep, $blockTimeoutMs,
@@ -1332,55 +1332,58 @@ class FsModule
                 )) {
                     fwrite($fhOutLock, getmypid());
 
-                    $fnTick = static function (&$refResult) use (
-                        $f,
-                        $fileIn, $fileOut,
-                        &$fhOut
-                    ) {
-                        $isFileOut = is_file($fileOut) && filesize($fileOut);
+                    $data = Lib::php()->poolingSync(
+                        $blockTickUsleep, $blockTimeoutMs,
+                        //
+                        static function (&$refResult) use (
+                            $f,
+                            $fileIn, $fileOut,
+                            //
+                            &$fhOut
+                        ) {
+                            $isFileOut = is_file($fileOut) && filesize($fileOut);
 
-                        if (! $isFileOut) {
-                            $isFileIn = is_file($fileIn) && filesize($fileIn);
+                            if (! $isFileOut) {
+                                $isFileIn = is_file($fileIn) && filesize($fileIn);
 
-                            if ($isFileIn) {
-                                $content = file_get_contents($fileIn);
+                                if ($isFileIn) {
+                                    $content = file_get_contents($fileIn);
 
-                                if (! ((false === $content) || ('' === $content))) {
-                                    file_put_contents($fileOut, $content, FILE_APPEND);
-                                    file_put_contents($fileIn, '');
+                                    if (! ((false === $content) || ('' === $content))) {
+                                        file_put_contents($fileOut, $content, FILE_APPEND);
+                                        file_put_contents($fileIn, '');
 
-                                    $isFileOut = true;
+                                        $isFileOut = true;
+                                    }
+                                }
+                            }
+
+                            if ($isFileOut) {
+                                if (! $fhOut) {
+                                    $fhOut = $f->fopen($fileOut, 'r+');
+                                }
+
+                                if ($fhOut) {
+                                    $line = fgets($fhOut);
+                                    $rest = stream_get_contents($fhOut);
+
+                                    rewind($fhOut);
+                                    ftruncate($fhOut, 0);
+
+                                    if ('' !== $rest) {
+                                        fwrite($fhOut, $rest);
+                                    }
+
+                                    $line = rtrim($line);
+                                    if ('' !== $line) {
+                                        $data = base64_decode($line);
+
+                                        $refResult = [ $data ];
+                                    }
                                 }
                             }
                         }
-
-                        if ($isFileOut) {
-                            if (! $fhOut) {
-                                $fhOut = $f->fopen($fileOut, 'r+');
-                            }
-
-                            if ($fhOut) {
-                                $line = fgets($fhOut);
-                                $rest = stream_get_contents($fhOut);
-
-                                rewind($fhOut);
-                                ftruncate($fhOut, 0);
-
-                                if ('' !== $rest) {
-                                    fwrite($fhOut, $rest);
-                                }
-
-                                $line = rtrim($line);
-                                if ('' !== $line) {
-                                    $data = base64_decode($line);
-
-                                    $refResult = [ $data ];
-                                }
-                            }
-                        }
-                    };
-
-                    $data = Lib::php()->poolingSync($blockTickUsleep, $blockTimeoutMs, $fnTick);
+                    );
 
                     if (false === $data) {
                         $data = null;
@@ -1428,7 +1431,7 @@ class FsModule
 
         $f = $this->fileSafe();
 
-        $data = $f->callSafe(
+        $data = $f->call_safe(
             static function () use (
                 $f,
                 $fileIn, $fileOut, $fileOutLock
@@ -1525,7 +1528,7 @@ class FsModule
 
         $f = $this->fileSafe();
 
-        $data = $f->callSafe(
+        $data = $f->call_safe(
             static function () use (
                 $f,
                 $blockTickUsleep, $blockTimeoutMs,
@@ -1539,60 +1542,63 @@ class FsModule
                 )) {
                     fwrite($fhOutLock, getmypid());
 
-                    $fnTick = static function (&$refResult) use (
-                        $f,
-                        $fileIn, $fileOut,
-                        &$fhOut
-                    ) {
-                        $isFileOut = is_file($fileOut) && filesize($fileOut);
+                    $data = Lib::php()->poolingSync(
+                        $blockTickUsleep, $blockTimeoutMs,
+                        //
+                        static function (&$refResult) use (
+                            $f,
+                            $fileIn, $fileOut,
+                            //
+                            &$fhOut
+                        ) {
+                            $isFileOut = is_file($fileOut) && filesize($fileOut);
 
-                        if (! $isFileOut) {
-                            $isFileIn = is_file($fileIn) && filesize($fileIn);
+                            if (! $isFileOut) {
+                                $isFileIn = is_file($fileIn) && filesize($fileIn);
 
-                            if ($isFileIn) {
-                                $lines = file($fileIn);
+                                if ($isFileIn) {
+                                    $lines = file($fileIn);
 
-                                if (! ((false === $lines) || ([] === $lines))) {
-                                    $lines = array_map('trim', $lines);
-                                    $lines = array_reverse($lines);
+                                    if (! ((false === $lines) || ([] === $lines))) {
+                                        $lines = array_map('trim', $lines);
+                                        $lines = array_reverse($lines);
 
-                                    $content = implode("\n", $lines);
+                                        $content = implode("\n", $lines);
 
-                                    file_put_contents($fileOut, $content, FILE_APPEND);
-                                    file_put_contents($fileIn, '');
+                                        file_put_contents($fileOut, $content, FILE_APPEND);
+                                        file_put_contents($fileIn, '');
 
-                                    $isFileOut = true;
+                                        $isFileOut = true;
+                                    }
+                                }
+                            }
+
+                            if ($isFileOut) {
+                                if (! $fhOut) {
+                                    $fhOut = $f->fopen($fileOut, 'r+');
+                                }
+
+                                if ($fhOut) {
+                                    $line = fgets($fhOut);
+                                    $contentOut = stream_get_contents($fhOut);
+
+                                    rewind($fhOut);
+                                    ftruncate($fhOut, 0);
+
+                                    if ('' === $contentOut) {
+                                        fwrite($fhOut, $contentOut);
+                                    }
+
+                                    $line = rtrim($line);
+                                    if ('' !== $line) {
+                                        $data = base64_decode($line);
+
+                                        $refResult = [ $data ];
+                                    }
                                 }
                             }
                         }
-
-                        if ($isFileOut) {
-                            if (! $fhOut) {
-                                $fhOut = $f->fopen($fileOut, 'r+');
-                            }
-
-                            if ($fhOut) {
-                                $line = fgets($fhOut);
-                                $contentOut = stream_get_contents($fhOut);
-
-                                rewind($fhOut);
-                                ftruncate($fhOut, 0);
-
-                                if ('' === $contentOut) {
-                                    fwrite($fhOut, $contentOut);
-                                }
-
-                                $line = rtrim($line);
-                                if ('' !== $line) {
-                                    $data = base64_decode($line);
-
-                                    $refResult = [ $data ];
-                                }
-                            }
-                        }
-                    };
-
-                    $data = Lib::php()->poolingSync($blockTickUsleep, $blockTimeoutMs, $fnTick);
+                    );
 
                     if (false === $data) {
                         $data = null;

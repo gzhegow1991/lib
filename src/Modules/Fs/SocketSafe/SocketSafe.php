@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Fs\SocketSafe;
 
+use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
@@ -81,5 +82,33 @@ class SocketSafe
         $header = pack("N", $len);
 
         socket_write($socket, $header . $payload);
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function call_safe(\Closure $fn, array $args = [])
+    {
+        $beforeErrorReporting = error_reporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
+        $beforeErrorHandler = set_error_handler([ Lib::func(), 'safe_call_error_handler' ]);
+
+        $previousCtx = $this->setContext($currentCtx = new SocketSafeContext());
+
+        try {
+            array_unshift($args, $currentCtx);
+
+            $result = call_user_func_array($fn, $args);
+        }
+        finally {
+            $currentCtx->handleOnFinally();
+
+            $this->setContext($previousCtx);
+        }
+
+        set_error_handler($beforeErrorHandler);
+        error_reporting($beforeErrorReporting);
+
+        return $result;
     }
 }

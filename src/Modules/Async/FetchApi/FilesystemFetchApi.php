@@ -430,7 +430,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $f = Lib::fs()->fileSafe();
 
-        $status = $f->callSafe(
+        $status = $f->call_safe(
             static function () use (
                 $f,
                 $workerPid, $poolFile,
@@ -511,7 +511,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $f = Lib::fs()->fileSafe();
 
-        $status = $f->callSafe(
+        $status = $f->call_safe(
             static function () use (
                 $f,
                 $workerPid, $poolFile,
@@ -599,7 +599,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $f = Lib::fs()->fileSafe();
 
-        $status = $f->callSafe(
+        $status = $f->call_safe(
             static function () use (
                 &$refPidFirst,
                 //

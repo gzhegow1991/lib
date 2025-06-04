@@ -13,6 +13,8 @@ use Gzhegow\Lib\Exception\RuntimeException;
 /**
  * @method string|null read_packet_socket(\Socket|resource $socket)
  * @method void write_packet_socket(\Socket|resource $socket, string $payload)
+ *
+ * @method mixed call_safe(\Closure $fn, array $args = [])
  */
 class SocketSafeProxy
 {
@@ -45,6 +47,8 @@ class SocketSafeProxy
                 //
                 'read_packet_socket'  => [ '@inner', 'read_packet_socket' ],
                 'write_packet_socket' => [ '@inner', 'write_packet_socket' ],
+                //
+                'call_safe'           => [ '@inner', 'call_safe' ],
             ];
         }
 
@@ -61,34 +65,6 @@ class SocketSafeProxy
         }
 
         $result = Lib::func()->safe_call($fn, $args);
-
-        return $result;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function callSafe(\Closure $fn, array $args = [])
-    {
-        $beforeErrorReporting = error_reporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
-        $beforeErrorHandler = set_error_handler([ Lib::func(), 'safe_call_error_handler' ]);
-
-        $previousCtx = $this->inner->setContext($currentCtx = new SocketSafeContext());
-
-        try {
-            array_unshift($args, $currentCtx);
-
-            $result = call_user_func_array($fn, $args);
-        }
-        finally {
-            $currentCtx->handleOnFinally();
-
-            $this->inner->setContext($previousCtx);
-        }
-
-        set_error_handler($beforeErrorHandler);
-        error_reporting($beforeErrorReporting);
 
         return $result;
     }

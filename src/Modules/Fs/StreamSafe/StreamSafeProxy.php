@@ -11,6 +11,8 @@ use Gzhegow\Lib\Exception\RuntimeException;
  *
  * @method string|false read_packet_resource(resource $resource)
  * @method string|false write_packet_resource(resource $resource, string $payload)
+ *
+ * @method mixed call_safe(\Closure $fn, array $args = [])
  */
 class StreamSafeProxy
 {
@@ -42,6 +44,8 @@ class StreamSafeProxy
                 //
                 'read_packet_resource'  => [ '@inner', 'read_packet_resource' ],
                 'write_packet_resource' => [ '@inner', 'write_packet_resource' ],
+                //
+                'call_safe'             => [ '@inner', 'call_safe' ],
             ];
         }
 
@@ -58,34 +62,6 @@ class StreamSafeProxy
         }
 
         $result = Lib::func()->safe_call($fn, $args);
-
-        return $result;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function callSafe(\Closure $fn, array $args = [])
-    {
-        $beforeErrorReporting = error_reporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
-        $beforeErrorHandler = set_error_handler([ Lib::func(), 'safe_call_error_handler' ]);
-
-        $previousCtx = $this->inner->setContext($currentCtx = new StreamSafeContext());
-
-        try {
-            array_unshift($args, $currentCtx);
-
-            $result = call_user_func_array($fn, $args);
-        }
-        finally {
-            $currentCtx->handleOnFinally();
-
-            $this->inner->setContext($previousCtx);
-        }
-
-        set_error_handler($beforeErrorHandler);
-        error_reporting($beforeErrorReporting);
 
         return $result;
     }

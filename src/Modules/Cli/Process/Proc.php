@@ -934,7 +934,11 @@ class Proc
             };
         }
 
-        $exitCode = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+        $exitCode = Lib::php()->poolingSync(
+            $tickUsleep, $timeoutMs,
+            //
+            $fnTick
+        );
 
         return $exitCode;
     }

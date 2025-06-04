@@ -86,13 +86,17 @@ class FileSafe
      */
     public function fclosef($resource)
     {
-        if (! Lib::type()->resource($var, $resource)) {
+        $isResource = Lib::type()->resource($var, $resource);
+
+        if (! $isResource) {
             throw new LogicException(
                 [ 'The `resource` should be resource', $resource ]
             );
         }
 
-        if (is_resource($resource)) {
+        $isResourceOpened = is_resource($resource);
+
+        if ($isResourceOpened) {
             $status = fclose($resource);
 
             if (false === $status) {
@@ -146,24 +150,26 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $fnTick = function (&$refResult) use (
-            $resource, $modeLock,
-            $flockArgs
-        ) {
-            array_unshift($flockArgs, $resource, $modeLock);
+        $status = Lib::php()->poolingSync(
+            $tickUsleep, $timeoutMs,
+            //
+            function (&$refResult) use (
+                $resource, $modeLock,
+                $flockArgs
+            ) {
+                array_unshift($flockArgs, $resource, $modeLock);
 
-            $status = call_user_func_array('flock', $flockArgs);
+                $status = call_user_func_array('flock', $flockArgs);
 
-            if (false === $status) {
-                return;
+                if (false === $status) {
+                    return;
+                }
+
+                $this->context->onFinallyFrelease($resource);
+
+                $refResult = [ $resource ];
             }
-
-            $this->context->onFinallyFrelease($resource);
-
-            $refResult = [ $resource ];
-        };
-
-        $status = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+        );
 
         if (false === $status) {
             return false;
@@ -197,13 +203,17 @@ class FileSafe
      */
     public function freleasef($resource)
     {
-        if (! Lib::type()->resource($var, $resource)) {
+        $isResource = Lib::type()->resource($var, $resource);
+
+        if (! $isResource) {
             throw new LogicException(
                 [ 'The `resource` should be resource', $resource ]
             );
         }
 
-        if (is_resource($resource)) {
+        $isResourceOpened = is_resource($resource);
+
+        if ($isResourceOpened) {
             $status = flock($resource, LOCK_UN);
 
             if (false === $status) {
@@ -281,24 +291,24 @@ class FileSafe
 
         $this->context->onFinallyFclose($resource);
 
-        $fnTick = function (&$refResult) use (
-            $resource, $modeLock,
-            $flockArgs
-        ) {
-            array_unshift($flockArgs, $resource, $modeLock);
+        $resource = Lib::php()->poolingSync(
+            $tickUsleep, $timeoutMs,
+            //
+            function (&$refResult) use (
+                $resource, $modeLock,
+                $flockArgs
+            ) {
+                array_unshift($flockArgs, $resource, $modeLock);
 
-            $status = call_user_func_array('flock', $flockArgs);
+                $status = call_user_func_array('flock', $flockArgs);
 
-            if (false === $status) {
-                return;
+                if (false !== $status) {
+                    $refResult = [ $resource ];
+
+                    $this->context->onFinallyFrelease($resource);
+                }
             }
-
-            $this->context->onFinallyFrelease($resource);
-
-            $refResult = [ $resource ];
-        };
-
-        $resource = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+        );
 
         if (false === $resource) {
             return false;
@@ -314,17 +324,17 @@ class FileSafe
      */
     public function frelease_fclose($resource)
     {
-        $status = flock($resource, LOCK_UN);
+        $statusFlock = flock($resource, LOCK_UN);
 
-        if (false === $status) {
+        if (false === $statusFlock) {
             return false;
         }
 
         $this->context->offFinallyFrelease($resource);
 
-        $status = fclose($resource);
+        $statusFclose = fclose($resource);
 
-        if (false === $status) {
+        if (false === $statusFclose) {
             return false;
         }
 
@@ -340,28 +350,30 @@ class FileSafe
      */
     public function freleasef_fclosef($resource)
     {
-        if (! Lib::type()->resource($var, $resource)) {
+        $isResource = Lib::type()->resource($var, $resource);
+
+        if (! $isResource) {
             throw new LogicException(
                 [ 'The `resource` should be resource', $resource ]
             );
         }
 
-        $isResource = is_resource($resource);
+        $isResourceOpened = is_resource($resource);
 
-        if ($isResource) {
-            $status = flock($resource, LOCK_UN);
+        if ($isResourceOpened) {
+            $statusFlock = flock($resource, LOCK_UN);
 
-            if (false === $status) {
+            if (false === $statusFlock) {
                 return false;
             }
         }
 
         $this->context->offFinallyFrelease($resource);
 
-        if ($isResource) {
-            $status = fclose($resource);
+        if ($isResourceOpened) {
+            $statusFclose = fclose($resource);
 
-            if (false === $status) {
+            if (false === $statusFclose) {
                 return false;
             }
         }
@@ -438,24 +450,26 @@ class FileSafe
         $this->context->onFinallyUnlink($file);
         $this->context->onFinallyFclose($resource);
 
-        $fnTick = function (&$refResult) use (
-            $resource, $modeLock,
-            $flockArgs
-        ) {
-            array_unshift($flockArgs, $resource, $modeLock);
+        $resource = Lib::php()->poolingSync(
+            $tickUsleep, $timeoutMs,
+            //
+            function (&$refResult) use (
+                $resource, $modeLock,
+                $flockArgs
+            ) {
+                array_unshift($flockArgs, $resource, $modeLock);
 
-            $status = call_user_func_array('flock', $flockArgs);
+                $status = call_user_func_array('flock', $flockArgs);
 
-            if (false === $status) {
-                return;
+                if (false === $status) {
+                    return;
+                }
+
+                $this->context->onFinallyFrelease($resource);
+
+                $refResult = [ $resource ];
             }
-
-            $this->context->onFinallyFrelease($resource);
-
-            $refResult = [ $resource ];
-        };
-
-        $resource = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+        );
 
         if (false === $resource) {
             return false;
@@ -484,17 +498,17 @@ class FileSafe
             $this->context->offFinallyUnlink($file);
         }
 
-        $status = flock($resource, LOCK_UN);
+        $statusFlock = flock($resource, LOCK_UN);
 
-        if (false === $status) {
+        if (false === $statusFlock) {
             return false;
         }
 
         $this->context->offFinallyFrelease($resource);
 
-        $status = fclose($resource);
+        $statusFclose = fclose($resource);
 
-        if (false === $status) {
+        if (false === $statusFclose) {
             return false;
         }
 
@@ -521,7 +535,9 @@ class FileSafe
      */
     public function freleasef_fclosef_unlinkf($resource, $file)
     {
-        if (! Lib::type()->resource($var, $resource)) {
+        $isResource = Lib::type()->resource($var, $resource);
+
+        if (! $isResource) {
             throw new LogicException(
                 [ 'The `resource` should be resource', $resource ]
             );
@@ -543,9 +559,9 @@ class FileSafe
             $this->context->offFinallyUnlink($file);
         }
 
-        $isResource = is_resource($resource);
+        $isResourceOpened = is_resource($resource);
 
-        if ($isResource) {
+        if ($isResourceOpened) {
             $status = flock($resource, LOCK_UN);
 
             if (false === $status) {
@@ -555,7 +571,7 @@ class FileSafe
 
         $this->context->offFinallyFrelease($resource);
 
-        if ($isResource) {
+        if ($isResourceOpened) {
             $status = fclose($resource);
 
             if (false === $status) {
@@ -1007,19 +1023,19 @@ class FileSafe
 
 
     /**
-     * @param bool|null   $clear_realpath_cache
+     * @param bool|null   $clearRealpathCache
      * @param string|null $file
      *
      * @return bool
      */
-    public function clearstatcache($clear_realpath_cache = null, $file = null)
+    public function clearstatcache($clearRealpathCache = null, $file = null)
     {
-        $clear_realpath_cache = $clear_realpath_cache ?? false;
+        $clearRealpathCache = $clearRealpathCache ?? false;
         $file = $file ?? '';
 
         ('' !== $file)
-            ? clearstatcache($clear_realpath_cache, $file)
-            : clearstatcache($clear_realpath_cache);
+            ? clearstatcache($clearRealpathCache, $file)
+            : clearstatcache($clearRealpathCache);
 
         return true;
     }
@@ -1645,27 +1661,29 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $fnTick = function (&$refResult) use (
-            $file, $modeOpen, $modeLock,
-            $fopenArgs,
-            $flockArgs,
-            $streamGetContentsArgs
-        ) {
-            $content = $this->file_read_flock(
+        $result = Lib::php()->poolingSync(
+            $tickUsleep, $timeoutMs,
+            //
+            function (&$refResult) use (
                 $file, $modeOpen, $modeLock,
                 $fopenArgs,
                 $flockArgs,
-                $streamGetContentsArgs,
-            );
+                $streamGetContentsArgs
+            ) {
+                $content = $this->file_read_flock(
+                    $file, $modeOpen, $modeLock,
+                    $fopenArgs,
+                    $flockArgs,
+                    $streamGetContentsArgs,
+                );
 
-            if (false === $content) {
-                return;
+                if (false === $content) {
+                    return;
+                }
+
+                $refResult = [ $content ];
             }
-
-            $refResult = [ $content ];
-        };
-
-        $result = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+        );
 
         return $result;
     }
@@ -1838,27 +1856,29 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $fnTick = function (&$refResult) use (
-            $file, $modeOpen, $modeLock,
-            $data,
-            $fopenArgs,
-            $flockArgs
-        ) {
-            $len = $this->file_write_flock(
+        $result = Lib::php()->poolingSync(
+            $tickUsleep, $timeoutMs,
+            //
+            function (&$refResult) use (
                 $file, $modeOpen, $modeLock,
                 $data,
                 $fopenArgs,
                 $flockArgs
-            );
+            ) {
+                $len = $this->file_write_flock(
+                    $file, $modeOpen, $modeLock,
+                    $data,
+                    $fopenArgs,
+                    $flockArgs
+                );
 
-            if (false === $len) {
-                return;
+                if (false === $len) {
+                    return;
+                }
+
+                $refResult = [ $len ];
             }
-
-            $refResult = [ $len ];
-        };
-
-        $result = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+        );
 
         return $result;
     }
@@ -2035,25 +2055,27 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $fnTick = function (&$refResult) use (
-            $file, $modeLock, $flags,
-            $fopenArgs,
-            $flockArgs
-        ) {
-            $content = $this->file_lines_flock(
+        $result = Lib::php()->poolingSync(
+            $tickUsleep, $timeoutMs,
+            //
+            function (&$refResult) use (
                 $file, $modeLock, $flags,
                 $fopenArgs,
-                $flockArgs,
-            );
+                $flockArgs
+            ) {
+                $content = $this->file_lines_flock(
+                    $file, $modeLock, $flags,
+                    $fopenArgs,
+                    $flockArgs,
+                );
 
-            if (false === $content) {
-                return;
+                if (false === $content) {
+                    return;
+                }
+
+                $refResult = [ $content ];
             }
-
-            $refResult = [ $content ];
-        };
-
-        $result = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+        );
 
         return $result;
     }
@@ -2147,25 +2169,27 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $fnTick = function (&$refResult) use (
-            $file, $modeLock,
-            $fopenArgs,
-            $flockArgs
-        ) {
-            $size = $this->file_echo_flock(
+        $result = Lib::php()->poolingSync(
+            $tickUsleep, $timeoutMs,
+            //
+            function (&$refResult) use (
                 $file, $modeLock,
                 $fopenArgs,
-                $flockArgs,
-            );
+                $flockArgs
+            ) {
+                $size = $this->file_echo_flock(
+                    $file, $modeLock,
+                    $fopenArgs,
+                    $flockArgs,
+                );
 
-            if (false === $size) {
-                return;
+                if (false === $size) {
+                    return;
+                }
+
+                $refResult = [ $size ];
             }
-
-            $refResult = [ $size ];
-        };
-
-        $result = Lib::php()->poolingSync($tickUsleep, $timeoutMs, $fnTick);
+        );
 
         return $result;
     }
@@ -2273,5 +2297,33 @@ class FileSafe
         clearstatcache(true, $realpath);
 
         return $realpath;
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public function call_safe(\Closure $fn, array $args = [])
+    {
+        $beforeErrorReporting = error_reporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
+        $beforeErrorHandler = set_error_handler([ Lib::func(), 'safe_call_error_handler' ]);
+
+        $previousCtx = $this->setContext($currentCtx = new FileSafeContext());
+
+        try {
+            array_unshift($args, $currentCtx);
+
+            $result = call_user_func_array($fn, $args);
+        }
+        finally {
+            $currentCtx->handleOnFinally();
+
+            $this->setContext($previousCtx);
+        }
+
+        set_error_handler($beforeErrorHandler);
+        error_reporting($beforeErrorReporting);
+
+        return $result;
     }
 }

@@ -71,7 +71,7 @@ use Gzhegow\Lib\Exception\RuntimeException;
  * @method string|false is_writeable(string $file)
  * @method string|false is_executable(string $file)
  *
- * @method bool clearstatcache(bool|null $clear_realpath_cache = null, string|null $file = null)
+ * @method bool clearstatcache(bool|null $clearRealpathCache = null, string|null $file = null)
  * @method array|false fstat(string $file)
  * @method array|false lstat(string $file)
  * @method array|false stat(resource $resource)
@@ -132,6 +132,8 @@ use Gzhegow\Lib\Exception\RuntimeException;
  *
  * @method string|null|false file_get_contents(string $file, int|null $offset = null, int|null $length = null, $context = null)
  * @method string|false file_put_contents(string $file, string|string[]|resource $data, int|null $flags = null, array $filePutContentsArgs = [], array|null $mkdirpArgs = [], array|null $chmodIfNewArgs = null)
+ *
+ * @method mixed call_safe(\Closure $fn, array $args = [])
  *
  *
  * // @ method fgetcsv()
@@ -323,6 +325,8 @@ class FileSafeProxy
                 'file_get_contents'           => [ '@inner', 'file_get_contents' ],
                 'file_put_contents'           => [ '@inner', 'file_put_contents' ],
                 //
+                'call_safe'                   => [ '@inner', 'call_safe' ],
+                //
                 //
                 'fgetcsv'                     => false,
                 'fputcsv'                     => false,
@@ -373,34 +377,6 @@ class FileSafeProxy
         }
 
         $result = Lib::func()->safe_call($fn, $args);
-
-        return $result;
-    }
-
-
-    /**
-     * @return mixed
-     */
-    public function callSafe(\Closure $fn, array $args = [])
-    {
-        $beforeErrorReporting = error_reporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
-        $beforeErrorHandler = set_error_handler([ Lib::func(), 'safe_call_error_handler' ]);
-
-        $previousCtx = $this->inner->setContext($currentCtx = new FileSafeContext());
-
-        try {
-            array_unshift($args, $currentCtx);
-
-            $result = call_user_func_array($fn, $args);
-        }
-        finally {
-            $currentCtx->handleOnFinally();
-
-            $this->inner->setContext($previousCtx);
-        }
-
-        set_error_handler($beforeErrorHandler);
-        error_reporting($beforeErrorReporting);
 
         return $result;
     }

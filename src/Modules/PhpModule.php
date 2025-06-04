@@ -2537,7 +2537,10 @@ class PhpModule
     /**
      * @return mixed|false
      */
-    public function poolingSync(?int $tickUsleep, ?int $timeoutMs, \Closure $fn)
+    public function poolingSync(
+        ?int $tickUsleep, ?int $timeoutMs,
+        \Closure $fn, \Closure $fnCatch = null
+    )
     {
         $tickUsleep = $tickUsleep ?? $this->static_pooling_tick_usleep();
 
@@ -2561,16 +2564,19 @@ class PhpModule
             $timeoutMicrotime = microtime(true) + ($timeoutMs / 1000);
         }
 
-        $errors = [];
-
         do {
             $result = [];
 
-            try {
-                call_user_func_array($fn, [ &$result, &$errors, &$timeoutMicrotime ]);
-            }
-            catch ( \Throwable $e ) {
-                $errors[] = $e;
+            if (null === $fnCatch) {
+                call_user_func_array($fn, [ &$result, &$timeoutMicrotime ]);
+
+            } else {
+                try {
+                    call_user_func_array($fn, [ &$result, &$timeoutMicrotime ]);
+                }
+                catch ( \Throwable $e ) {
+                    call_user_func_array($fnCatch, [ $e ]);
+                }
             }
 
             if (is_array($result) && array_key_exists(0, $result)) {
