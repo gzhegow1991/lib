@@ -294,6 +294,8 @@ class PromiseManager implements PromiseManagerInterface
             $fnPooling,
             $fnResolve, $fnReject
         ) {
+            $ctx->updateNowMicrotime();
+
             call_user_func_array($fnPooling, [ $ctx ]);
 
             if ($ctx->hasResult($refResult)) {

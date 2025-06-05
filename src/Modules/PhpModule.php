@@ -2595,6 +2595,8 @@ class PhpModule
         $ctx->setTimeoutMs($timeoutMs);
 
         do {
+            $ctx->updateNowMicrotime();
+
             if ($hasFnCatch) {
                 try {
                     call_user_func_array($fnPooling, [ $ctx ]);
