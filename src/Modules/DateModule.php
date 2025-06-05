@@ -1081,21 +1081,20 @@ class DateModule
     /**
      * @param \DateTimeInterface|null $r
      */
-    public function type_date_microtime(&$r, $microtime, $timezoneSet = null) : bool
+    public function type_date_microtime(&$r, $microtime, $timezoneFallback = null) : bool
     {
         $r = null;
 
+        $timezoneFallback = $timezoneFallback ?? date_default_timezone_get();
+
         $dateTime = null;
 
-        $_timezoneSet = null;
-        if ($hasTimezoneSet = (null !== $timezoneSet)) {
-            $status = $this->type_timezone(
-                $_timezoneSet, $timezoneSet
-            );
+        $status = $this->type_timezone(
+            $_timezoneFallback, $timezoneFallback
+        );
 
-            if (! $status) {
-                return false;
-            }
+        if (! $status) {
+            return false;
         }
 
         if ($microtime instanceof \DateTimeInterface) {
@@ -1122,7 +1121,10 @@ class DateModule
 
             if ('' !== $split[ 2 ]) {
                 $frac = $split[ 2 ];
+
                 $microseconds = ltrim($frac, '.');
+                $microseconds = substr($microseconds, 0, 6);
+                $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
 
                 $dateTime = $dateTime->setTime(
                     (int) $dateTime->format('H'),
@@ -1133,11 +1135,7 @@ class DateModule
             }
         }
 
-        if ($hasTimezoneSet) {
-            /** @var \DateTimeZone $_timezoneSet */
-
-            $dateTime = $dateTime->setTimezone($_timezoneSet);
-        }
+        $dateTime = $dateTime->setTimezone($_timezoneFallback);
 
         if (null !== $dateTime) {
             $r = $this->cloneToDate($dateTime);
@@ -1151,21 +1149,20 @@ class DateModule
     /**
      * @param \DateTime|null $r
      */
-    public function type_adate_microtime(&$r, $microtime, $timezoneSet = null) : bool
+    public function type_adate_microtime(&$r, $microtime, $timezoneFallback = null) : bool
     {
         $r = null;
 
+        $timezoneFallback = $timezoneFallback ?? date_default_timezone_get();
+
         $dateTime = null;
 
-        $_timezoneSet = null;
-        if ($hasTimezoneSet = (null !== $timezoneSet)) {
-            $status = $this->type_timezone(
-                $_timezoneSet, $timezoneSet
-            );
+        $status = $this->type_timezone(
+            $_timezoneFallback, $timezoneFallback
+        );
 
-            if (! $status) {
-                return false;
-            }
+        if (! $status) {
+            return false;
         }
 
         if ($microtime instanceof \DateTimeInterface) {
@@ -1192,7 +1189,10 @@ class DateModule
 
             if ('' !== $split[ 2 ]) {
                 $frac = $split[ 2 ];
+
                 $microseconds = ltrim($frac, '.');
+                $microseconds = substr($microseconds, 0, 6);
+                $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
 
                 $dateTime = $dateTime->setTime(
                     (int) $dateTime->format('H'),
@@ -1203,11 +1203,7 @@ class DateModule
             }
         }
 
-        if ($hasTimezoneSet) {
-            /** @var \DateTimeZone $_timezoneSet */
-
-            $dateTime = $dateTime->setTimezone($_timezoneSet);
-        }
+        $dateTime = $dateTime->setTimezone($_timezoneFallback);
 
         if (null !== $dateTime) {
             $r = $this->cloneToDate($dateTime);
@@ -1221,21 +1217,20 @@ class DateModule
     /**
      * @param \DateTimeImmutable|null $r
      */
-    public function type_idate_microtime(&$r, $microtime, $timezoneSet = null) : bool
+    public function type_idate_microtime(&$r, $microtime, $timezoneFallback = null) : bool
     {
         $r = null;
 
+        $timezoneFallback = $timezoneFallback ?? date_default_timezone_get();
+
         $dateTimeImmutable = null;
 
-        $_timezoneSet = null;
-        if ($hasTimezoneSet = (null !== $timezoneSet)) {
-            $status = $this->type_timezone(
-                $_timezoneSet, $timezoneSet
-            );
+        $status = $this->type_timezone(
+            $_timezoneFallback, $timezoneFallback
+        );
 
-            if (! $status) {
-                return false;
-            }
+        if (! $status) {
+            return false;
         }
 
         if ($microtime instanceof \DateTimeInterface) {
@@ -1264,7 +1259,10 @@ class DateModule
 
             if ('' !== $split[ 2 ]) {
                 $frac = $split[ 2 ];
+
                 $microseconds = ltrim($frac, '.');
+                $microseconds = substr($microseconds, 0, 6);
+                $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
 
                 $dateTimeImmutable = $dateTimeImmutable->setTime(
                     (int) $dateTimeImmutable->format('H'),
@@ -1275,11 +1273,7 @@ class DateModule
             }
         }
 
-        if ($hasTimezoneSet) {
-            /** @var \DateTimeZone $_timezoneSet */
-
-            $dateTimeImmutable = $dateTimeImmutable->setTimezone($_timezoneSet);
-        }
+        $dateTimeImmutable = $dateTimeImmutable->setTimezone($_timezoneFallback);
 
         if (null !== $dateTimeImmutable) {
             $r = $this->cloneToDate($dateTimeImmutable);
@@ -1820,6 +1814,7 @@ class DateModule
             $microseconds = sprintf('%.6f', $interval->f);
             $microseconds = substr($microseconds, 2);
             $microseconds = rtrim($microseconds, '0.');
+
             $microseconds = (int) $microseconds;
 
             $result = $interval->format("P%yY%mM%dDT%hH%iM%s.{$microseconds}S");

@@ -1898,25 +1898,25 @@ class TypeBoolModule
     /**
      * @param \DateTimeInterface|null $r
      */
-    public function date_microtime(&$r, $microtime, $timezoneSet = null) : bool
+    public function date_microtime(&$r, $microtime, $timezoneFallback = null) : bool
     {
-        return Lib::date()->type_date_microtime($r, $microtime, $timezoneSet);
+        return Lib::date()->type_date_microtime($r, $microtime, $timezoneFallback);
     }
 
     /**
      * @param \DateTime|null $r
      */
-    public function adate_microtime(&$r, $microtime, $timezoneSet = null) : bool
+    public function adate_microtime(&$r, $microtime, $timezoneFallback = null) : bool
     {
-        return Lib::date()->type_adate_microtime($r, $microtime, $timezoneSet);
+        return Lib::date()->type_adate_microtime($r, $microtime, $timezoneFallback);
     }
 
     /**
      * @param \DateTimeImmutable|null $r
      */
-    public function idate_microtime(&$r, $microtime, $timezoneSet = null) : bool
+    public function idate_microtime(&$r, $microtime, $timezoneFallback = null) : bool
     {
-        return Lib::date()->type_idate_microtime($r, $microtime, $timezoneSet);
+        return Lib::date()->type_idate_microtime($r, $microtime, $timezoneFallback);
     }
 
 

@@ -47,7 +47,6 @@ class ClockManager implements ClockManagerInterface
         $timer->timeoutMicrotime = microtime(true) + ($waitMsInt / 1000);
 
         $this->loop->addTimeout($timer);
-        $this->loop->registerLoop();
 
         return $timer;
     }
@@ -78,7 +77,6 @@ class ClockManager implements ClockManagerInterface
         $interval->timeoutMicrotime = microtime(true) + ($waitMsInt / 1000);
 
         $this->loop->addInterval($interval);
-        $this->loop->registerLoop();
 
         return $interval;
     }

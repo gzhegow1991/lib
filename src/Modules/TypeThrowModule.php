@@ -2200,39 +2200,39 @@ class TypeThrowModule
 	/**
 	 * @param \DateTimeInterface|null $r
 	 */
-	public function date_microtime(&$r, $microtime, $timezoneSet = null): bool
+	public function date_microtime(&$r, $microtime, $timezoneFallback = null): bool
 	{
-		if (Lib::type()->date_microtime($r, $microtime, $timezoneSet)) {
+		if (Lib::type()->date_microtime($r, $microtime, $timezoneFallback)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `date_microtime` is failed", $microtime, $timezoneSet ]);
+		throw new LogicException([ "Typecheck `date_microtime` is failed", $microtime, $timezoneFallback ]);
 	}
 
 
 	/**
 	 * @param \DateTime|null $r
 	 */
-	public function adate_microtime(&$r, $microtime, $timezoneSet = null): bool
+	public function adate_microtime(&$r, $microtime, $timezoneFallback = null): bool
 	{
-		if (Lib::type()->adate_microtime($r, $microtime, $timezoneSet)) {
+		if (Lib::type()->adate_microtime($r, $microtime, $timezoneFallback)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `adate_microtime` is failed", $microtime, $timezoneSet ]);
+		throw new LogicException([ "Typecheck `adate_microtime` is failed", $microtime, $timezoneFallback ]);
 	}
 
 
 	/**
 	 * @param \DateTimeImmutable|null $r
 	 */
-	public function idate_microtime(&$r, $microtime, $timezoneSet = null): bool
+	public function idate_microtime(&$r, $microtime, $timezoneFallback = null): bool
 	{
-		if (Lib::type()->idate_microtime($r, $microtime, $timezoneSet)) {
+		if (Lib::type()->idate_microtime($r, $microtime, $timezoneFallback)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `idate_microtime` is failed", $microtime, $timezoneSet ]);
+		throw new LogicException([ "Typecheck `idate_microtime` is failed", $microtime, $timezoneFallback ]);
 	}
 
 

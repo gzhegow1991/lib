@@ -2592,7 +2592,7 @@ class PhpModule
 
         $ctx = $this->poolingFactory()->newContext();
 
-        $ctx->setTimeoutMs($timeoutMs);
+        $ctx->resetTimeoutMs($timeoutMs);
 
         do {
             $ctx->updateNowMicrotime();

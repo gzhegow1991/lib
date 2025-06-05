@@ -51,9 +51,9 @@ class Loop
     /**
      * @param callable $fn
      */
-    public static function requestNextFrame($fn) : LoopManagerInterface
+    public static function requestAnimationFrame($fn) : LoopManagerInterface
     {
-        return static::getInstance()->requestNextFrame($fn);
+        return static::getInstance()->requestAnimationFrame($fn);
     }
 
 

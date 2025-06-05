@@ -140,20 +140,10 @@ class PoolingContext
         return $this->timeoutMs;
     }
 
-    public function hasTimeoutMicrotime() : ?float
-    {
-        return $this->timeoutMicrotime;
-    }
-
-    public function getTimeoutMicrotime() : float
-    {
-        return $this->timeoutMicrotime;
-    }
-
     /**
      * @return static
      */
-    public function setTimeoutMs(?int $timeoutMs)
+    public function resetTimeoutMs(?int $timeoutMs)
     {
         if (null !== $timeoutMs) {
             if ($timeoutMs < 0) {
@@ -175,12 +165,26 @@ class PoolingContext
         return $this;
     }
 
+
+    public function hasTimeoutMicrotime() : ?float
+    {
+        return $this->timeoutMicrotime;
+    }
+
+    public function getTimeoutMicrotime() : float
+    {
+        return $this->timeoutMicrotime;
+    }
+
     /**
      * @return static
      */
     public function updateTimeoutMicrotime()
     {
-        if (null !== $this->timeoutMs) {
+        if (null === $this->timeoutMs) {
+            $this->timeoutMicrotime = null;
+
+        } else {
             $this->timeoutMicrotime = $this->getNowMicrotime() + ($this->timeoutMs / 1000);
         }
 

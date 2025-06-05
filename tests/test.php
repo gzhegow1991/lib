@@ -2496,8 +2496,8 @@ TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" }
 
 TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" }
 TRUE | { object(serializable) # DateTime # "1970-01-01T00:02:03.000000+00:00" }
-TRUE | { object(serializable) # DateTime # "1970-01-01T00:02:03.000456+00:00" }
-TRUE | { object(serializable) # DateTime # "1970-01-01T02:02:03.000456+02:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T00:02:03.456000+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T02:02:03.456000+02:00" }
 ');
 $test->expectStdoutIf(PHP_VERSION_ID < 80200, '
 "[ DateModule ]"
@@ -2586,8 +2586,8 @@ TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+03:00" }
 
 TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+00:00" }
 TRUE | { object # DateTime # "1970-01-01T00:02:03.000000+00:00" }
-TRUE | { object # DateTime # "1970-01-01T00:02:03.000456+00:00" }
-TRUE | { object # DateTime # "1970-01-01T02:02:03.000456+02:00" }
+TRUE | { object # DateTime # "1970-01-01T00:02:03.456000+00:00" }
+TRUE | { object # DateTime # "1970-01-01T02:02:03.456000+02:00" }
 ');
 $test->run();
 

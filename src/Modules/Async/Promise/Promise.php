@@ -91,7 +91,6 @@ class Promise
         $fn = static::fnExecutor($instance, $fnExecutor);
 
         $loop->addMicrotask($fn);
-        $loop->registerLoop();
 
         return $instance;
     }
@@ -132,7 +131,6 @@ class Promise
         $fn = static::fnThrowIfUnhandledRejectionInSecondStep($loop, $instance);
 
         $loop->addMacrotask($fn);
-        $loop->registerLoop();
 
         return $instance;
     }
@@ -253,7 +251,6 @@ class Promise
                 );
 
                 $this->loop->addMicrotask($fn);
-                $this->loop->registerLoop();
             }
 
         } elseif (Promise::STATE_REJECTED === $this->state) {
@@ -270,7 +267,6 @@ class Promise
                 );
 
                 $this->loop->addMicrotask($fn);
-                $this->loop->registerLoop();
             }
 
         } else {
@@ -321,7 +317,6 @@ class Promise
                 );
 
                 $this->loop->addMicrotask($fn);
-                $this->loop->registerLoop();
             }
 
         } else {
@@ -366,7 +361,6 @@ class Promise
                 );
 
                 $this->loop->addMicrotask($fn);
-                $this->loop->registerLoop();
             }
 
         } elseif (Promise::STATE_REJECTED === $this->state) {
@@ -383,7 +377,6 @@ class Promise
                 );
 
                 $this->loop->addMicrotask($fn);
-                $this->loop->registerLoop();
             }
 
         } else {
@@ -432,7 +425,6 @@ class Promise
                     );
 
                     $this->loop->addMicrotask($fn);
-                    $this->loop->registerLoop();
                 }
 
             } elseif (PromiseSettler::TYPE_CATCH === $settler->type) {
@@ -456,7 +448,6 @@ class Promise
                     );
 
                     $this->loop->addMicrotask($fn);
-                    $this->loop->registerLoop();
                 }
             }
         }
@@ -507,7 +498,6 @@ class Promise
                     );
 
                     $this->loop->addMicrotask($fn);
-                    $this->loop->registerLoop();
                 }
 
             } elseif (PromiseSettler::TYPE_CATCH === $settler->type) {
@@ -520,7 +510,6 @@ class Promise
                 );
 
                 $this->loop->addMicrotask($fn);
-                $this->loop->registerLoop();
 
             } elseif (PromiseSettler::TYPE_FINALLY === $settler->type) {
                 $fnOnFinally = $settler->fnOnFinally;
@@ -538,7 +527,6 @@ class Promise
                     );
 
                     $this->loop->addMicrotask($fn);
-                    $this->loop->registerLoop();
                 }
             }
         }
@@ -547,7 +535,6 @@ class Promise
             $fn = static::fnThrowIfUnhandledRejection($this);
 
             $this->loop->addMicrotask($fn);
-            $this->loop->registerLoop();
         }
 
         $this->settlers = [];

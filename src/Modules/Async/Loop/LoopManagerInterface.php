@@ -50,7 +50,7 @@ interface LoopManagerInterface
      *
      * @return static
      */
-    public function requestNextFrame($fn);
+    public function requestAnimationFrame($fn);
 
 
     /**

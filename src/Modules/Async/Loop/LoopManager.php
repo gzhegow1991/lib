@@ -31,6 +31,10 @@ class LoopManager implements LoopManagerInterface
      * @var \SplQueue<callable>
      */
     protected $queueMacrotask;
+    /**
+     * @var \SplQueue<callable>
+     */
+    protected $queueAnimationFrame;
 
 
     public function __construct()
@@ -40,6 +44,7 @@ class LoopManager implements LoopManagerInterface
 
         $this->resetQueueMicrotask();
         $this->resetQueueMacrotask();
+        $this->resetQueueAnimationFrame();
     }
 
 
@@ -73,6 +78,21 @@ class LoopManager implements LoopManagerInterface
         return $this;
     }
 
+    /**
+     * @param \SplQueue $refQueue
+     *
+     * @return static
+     */
+    protected function resetQueueAnimationFrame(&$refQueue = null)
+    {
+        $this->queueAnimationFrame = new \SplQueue();
+        $this->queueAnimationFrame->setIteratorMode(\SplDoublyLinkedList::IT_MODE_FIFO);
+
+        $refQueue = $this->queueAnimationFrame;
+
+        return $this;
+    }
+
 
     /**
      * @return static
@@ -80,6 +100,7 @@ class LoopManager implements LoopManagerInterface
     public function addInterval(Interval $interval)
     {
         $this->intervals->attach($interval);
+        $this->registerLoop();
 
         return $this;
     }
@@ -101,6 +122,7 @@ class LoopManager implements LoopManagerInterface
     public function addTimeout(Timeout $timer)
     {
         $this->timers->attach($timer);
+        $this->registerLoop();
 
         return $this;
     }
@@ -124,6 +146,7 @@ class LoopManager implements LoopManagerInterface
     public function addMicrotask($fnMicrotask)
     {
         $this->queueMicrotask->enqueue($fnMicrotask);
+        $this->registerLoop();
 
         return $this;
     }
@@ -136,6 +159,7 @@ class LoopManager implements LoopManagerInterface
     public function addMacrotask($fnMacrotask)
     {
         $this->queueMacrotask->enqueue($fnMacrotask);
+        $this->registerLoop();
 
         return $this;
     }
@@ -146,9 +170,10 @@ class LoopManager implements LoopManagerInterface
      *
      * @return static
      */
-    public function requestNextFrame($fn)
+    public function requestAnimationFrame($fn)
     {
-        $this->queueMicrotask->enqueue($fn);
+        $this->queueAnimationFrame->enqueue($fn);
+        $this->registerLoop();
 
         return $this;
     }
@@ -168,7 +193,6 @@ class LoopManager implements LoopManagerInterface
             foreach ( $intervals as $interval ) {
                 if ($now >= $interval->timeoutMicrotime) {
                     $this->addMacrotask($interval->fnHandler);
-                    $this->registerLoop();
 
                     $interval->timeoutMicrotime = $now + ($interval->waitMs / 1000);
                 }
@@ -179,7 +203,6 @@ class LoopManager implements LoopManagerInterface
             foreach ( $timers as $timer ) {
                 if ($now >= $timer->timeoutMicrotime) {
                     $this->addMacrotask($timer->fnHandler);
-                    $this->registerLoop();
 
                     $timers->detach($timer);
                 }
@@ -193,13 +216,24 @@ class LoopManager implements LoopManagerInterface
             while ( ! $queue->isEmpty() ) {
                 $fn = $queue->dequeue();
 
-                call_user_func($fn, $now);
+                call_user_func($fn);
 
                 unset($fn);
             }
 
             $queue = $this->queueMacrotask;
             $this->resetQueueMacrotask($bufferMacrotask);
+
+            while ( ! $queue->isEmpty() ) {
+                $fn = $queue->dequeue();
+
+                call_user_func($fn);
+
+                unset($fn);
+            }
+
+            $queue = $this->queueAnimationFrame;
+            $this->resetQueueAnimationFrame($bufferAnimationFrame);
 
             while ( ! $queue->isEmpty() ) {
                 $fn = $queue->dequeue();
@@ -218,6 +252,7 @@ class LoopManager implements LoopManagerInterface
             && (0 === count($timers))
             && $bufferMicrotask->isEmpty()
             && $bufferMacrotask->isEmpty()
+            && $bufferAnimationFrame->isEmpty()
         ) );
 
         return $this;

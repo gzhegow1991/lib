@@ -2196,9 +2196,9 @@ class ParseNullModule
 	/**
 	 * @return \DateTimeInterface|null
 	 */
-	public function date_microtime($microtime, $timezoneSet = null)
+	public function date_microtime($microtime, $timezoneFallback = null)
 	{
-		if (Lib::type()->date_microtime($r, $microtime, $timezoneSet)) {
+		if (Lib::type()->date_microtime($r, $microtime, $timezoneFallback)) {
 		    return $r;
 		}
 
@@ -2209,9 +2209,9 @@ class ParseNullModule
 	/**
 	 * @return \DateTime|null
 	 */
-	public function adate_microtime($microtime, $timezoneSet = null)
+	public function adate_microtime($microtime, $timezoneFallback = null)
 	{
-		if (Lib::type()->adate_microtime($r, $microtime, $timezoneSet)) {
+		if (Lib::type()->adate_microtime($r, $microtime, $timezoneFallback)) {
 		    return $r;
 		}
 
@@ -2222,9 +2222,9 @@ class ParseNullModule
 	/**
 	 * @return \DateTimeImmutable|null
 	 */
-	public function idate_microtime($microtime, $timezoneSet = null)
+	public function idate_microtime($microtime, $timezoneFallback = null)
 	{
-		if (Lib::type()->idate_microtime($r, $microtime, $timezoneSet)) {
+		if (Lib::type()->idate_microtime($r, $microtime, $timezoneFallback)) {
 		    return $r;
 		}
 

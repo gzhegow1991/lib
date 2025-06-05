@@ -2197,39 +2197,39 @@ class ParseThrowModule
 	/**
 	 * @return \DateTimeInterface|null
 	 */
-	public function date_microtime($microtime, $timezoneSet = null)
+	public function date_microtime($microtime, $timezoneFallback = null)
 	{
-		if (Lib::type()->date_microtime($r, $microtime, $timezoneSet)) {
+		if (Lib::type()->date_microtime($r, $microtime, $timezoneFallback)) {
 		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `date_microtime` is failed", $microtime, $timezoneSet ]);
+		throw new LogicException([ "Parsing `date_microtime` is failed", $microtime, $timezoneFallback ]);
 	}
 
 
 	/**
 	 * @return \DateTime|null
 	 */
-	public function adate_microtime($microtime, $timezoneSet = null)
+	public function adate_microtime($microtime, $timezoneFallback = null)
 	{
-		if (Lib::type()->adate_microtime($r, $microtime, $timezoneSet)) {
+		if (Lib::type()->adate_microtime($r, $microtime, $timezoneFallback)) {
 		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `adate_microtime` is failed", $microtime, $timezoneSet ]);
+		throw new LogicException([ "Parsing `adate_microtime` is failed", $microtime, $timezoneFallback ]);
 	}
 
 
 	/**
 	 * @return \DateTimeImmutable|null
 	 */
-	public function idate_microtime($microtime, $timezoneSet = null)
+	public function idate_microtime($microtime, $timezoneFallback = null)
 	{
-		if (Lib::type()->idate_microtime($r, $microtime, $timezoneSet)) {
+		if (Lib::type()->idate_microtime($r, $microtime, $timezoneFallback)) {
 		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `idate_microtime` is failed", $microtime, $timezoneSet ]);
+		throw new LogicException([ "Parsing `idate_microtime` is failed", $microtime, $timezoneFallback ]);
 	}
 
 

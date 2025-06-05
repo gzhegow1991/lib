@@ -10,7 +10,7 @@ use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
 use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
 use Gzhegow\Lib\Modules\Async\Clock\ClockManagerInterface;
-use Gzhegow\Lib\Modules\Async\Promise\Pooling\PoolingFactoryInterface;
+use Gzhegow\Lib\Modules\Async\Promise\Pooling\PromisePoolingFactoryInterface;
 
 
 class PromiseManager implements PromiseManagerInterface
@@ -20,7 +20,7 @@ class PromiseManager implements PromiseManagerInterface
      */
     protected $loop;
     /**
-     * @var PoolingFactoryInterface
+     * @var PromisePoolingFactoryInterface
      */
     protected $poolingFactory;
 
@@ -45,7 +45,7 @@ class PromiseManager implements PromiseManagerInterface
 
     public function __construct(
         LoopManagerInterface $loop,
-        PoolingFactoryInterface $poolingFactory,
+        PromisePoolingFactoryInterface $poolingFactory,
         //
         ?ClockManagerInterface $clock = null,
         ?FetchApiInterface $fetchApi = null
@@ -287,7 +287,7 @@ class PromiseManager implements PromiseManagerInterface
 
         $ctx = $this->poolingFactory->newContext();
 
-        $ctx->setTimeoutMs($timeoutMs);
+        $ctx->resetTimeoutMs($timeoutMs);
 
         $fnTick = static function () use (
             $ctx,
