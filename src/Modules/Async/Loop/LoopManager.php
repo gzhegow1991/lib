@@ -45,77 +45,124 @@ class LoopManager implements LoopManagerInterface
 
     /**
      * @param \SplQueue $refQueue
+     *
+     * @return static
      */
-    protected function resetQueueMicrotask(&$refQueue = null) : void
+    protected function resetQueueMicrotask(&$refQueue = null)
     {
         $this->queueMicrotask = new \SplQueue();
         $this->queueMicrotask->setIteratorMode(\SplDoublyLinkedList::IT_MODE_FIFO);
 
         $refQueue = $this->queueMicrotask;
+
+        return $this;
     }
 
     /**
      * @param \SplQueue $refQueue
+     *
+     * @return static
      */
-    protected function resetQueueMacrotask(&$refQueue = null) : void
+    protected function resetQueueMacrotask(&$refQueue = null)
     {
         $this->queueMacrotask = new \SplQueue();
         $this->queueMacrotask->setIteratorMode(\SplDoublyLinkedList::IT_MODE_FIFO);
 
         $refQueue = $this->queueMacrotask;
+
+        return $this;
     }
 
 
-    public function addInterval(Interval $interval) : void
+    /**
+     * @return static
+     */
+    public function addInterval(Interval $interval)
     {
         $this->intervals->attach($interval);
+
+        return $this;
     }
 
-    public function clearInterval(Interval $interval) : void
+    /**
+     * @return static
+     */
+    public function clearInterval(Interval $interval)
     {
         $this->intervals->detach($interval);
+
+        return $this;
     }
 
 
-    public function addTimeout(Timeout $timer) : void
+    /**
+     * @return static
+     */
+    public function addTimeout(Timeout $timer)
     {
         $this->timers->attach($timer);
+
+        return $this;
     }
 
-    public function clearTimeout(Timeout $timer) : void
+    /**
+     * @return static
+     */
+    public function clearTimeout(Timeout $timer)
     {
         $this->timers->detach($timer);
+
+        return $this;
     }
 
 
     /**
-     * @param callable $microtask
+     * @param callable $fnMicrotask
      *
-     * @return void
+     * @return static
      */
-    public function addMicrotask($microtask) : void
+    public function addMicrotask($fnMicrotask)
     {
-        $this->queueMicrotask->enqueue($microtask);
+        $this->queueMicrotask->enqueue($fnMicrotask);
+
+        return $this;
     }
 
     /**
-     * @param callable $macrotask
+     * @param callable $fnMacrotask
      *
-     * @return void
+     * @return static
      */
-    public function addMacrotask($macrotask) : void
+    public function addMacrotask($fnMacrotask)
     {
-        $this->queueMacrotask->enqueue($macrotask);
+        $this->queueMacrotask->enqueue($fnMacrotask);
+
+        return $this;
     }
 
 
-    public function runLoop() : void
+    /**
+     * @param callable $fn
+     *
+     * @return static
+     */
+    public function requestNextFrame($fn)
+    {
+        $this->queueMicrotask->enqueue($fn);
+
+        return $this;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function runLoop()
     {
         $intervals = $this->intervals;
         $timers = $this->timers;
 
         do {
-
             $now = microtime(true);
 
             foreach ( $intervals as $interval ) {
@@ -146,7 +193,7 @@ class LoopManager implements LoopManagerInterface
             while ( ! $queue->isEmpty() ) {
                 $fn = $queue->dequeue();
 
-                call_user_func($fn);
+                call_user_func($fn, $now);
 
                 unset($fn);
             }
@@ -157,7 +204,7 @@ class LoopManager implements LoopManagerInterface
             while ( ! $queue->isEmpty() ) {
                 $fn = $queue->dequeue();
 
-                call_user_func($fn);
+                call_user_func($fn, $now);
 
                 unset($fn);
             }
@@ -166,20 +213,27 @@ class LoopManager implements LoopManagerInterface
 
             usleep(1000);
 
-        } while ( ! ( true
+        } while ( ! (true
             && (0 === count($intervals))
             && (0 === count($timers))
             && $bufferMicrotask->isEmpty()
             && $bufferMacrotask->isEmpty()
         ) );
+
+        return $this;
     }
 
-    public function registerLoop() : void
+    /**
+     * @return static
+     */
+    public function registerLoop()
     {
         if (! $this->isLoopRegistered) {
             Lib::entrypoint()->registerShutdownFunction([ $this, 'runLoop' ]);
 
             $this->isLoopRegistered = true;
         }
+
+        return $this;
     }
 }

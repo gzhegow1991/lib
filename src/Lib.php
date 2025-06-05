@@ -13,7 +13,6 @@ use Gzhegow\Lib\Modules\ArrModule;
 use Gzhegow\Lib\Modules\CmpModule;
 use Gzhegow\Lib\Modules\NumModule;
 use Gzhegow\Lib\Modules\FuncModule;
-use Gzhegow\Lib\Modules\JsonModule;
 use Gzhegow\Lib\Modules\HttpModule;
 use Gzhegow\Lib\Modules\TestModule;
 use Gzhegow\Lib\Modules\PregModule;
@@ -61,10 +60,33 @@ class Lib
         static::$parseNull = static::$parseNull ?? new ParseNullModule();
 
         $n = func_num_args();
-        if ($n > 1) $pn = static::$parseNull;
-        if ($n > 0) $pt = static::$parseThrow = static::$parseThrow ?? new ParseThrowModule();
+
+        if ($n === 2) {
+            $pn = static::$parseNull;
+
+        } elseif ($n === 1) {
+            static::$parseThrow = static::$parseThrow ?? new ParseThrowModule();
+
+            $pt = static::$parseThrow;
+        }
 
         return static::$parseNull;
+    }
+
+    /**
+     * @return ParseNullModule
+     */
+    public static function parseNull()
+    {
+        return static::$parseNull = static::$parseNull ?? new ParseNullModule();
+    }
+
+    /**
+     * @return ParseThrowModule
+     */
+    public static function parseThrow()
+    {
+        return static::$parseThrow = static::$parseThrow ?? new ParseThrowModule();
     }
 
 
@@ -91,10 +113,33 @@ class Lib
         static::$typeBool = static::$typeBool ?? new TypeBoolModule();
 
         $n = func_num_args();
-        if ($n > 1) $tb = static::$typeBool;
-        if ($n > 0) $tt = static::$typeThrow = static::$typeThrow ?? new TypeThrowModule();
+
+        if ($n === 2) {
+            $tb = static::$typeBool;
+
+        } elseif ($n === 1) {
+            static::$typeThrow = static::$typeThrow ?? new TypeThrowModule();
+
+            $tt = static::$typeThrow;
+        }
 
         return static::$typeBool;
+    }
+
+    /**
+     * @return TypeBoolModule
+     */
+    public static function typeBool()
+    {
+        return static::$typeBool = static::$typeBool ?? new TypeBoolModule();
+    }
+
+    /**
+     * @return TypeThrowModule
+     */
+    public static function typeThrow()
+    {
+        return static::$typeThrow = static::$typeThrow ?? new TypeThrowModule();
     }
 
 

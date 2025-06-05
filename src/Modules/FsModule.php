@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Php\Result\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
@@ -1335,7 +1334,7 @@ class FsModule
                     $data = Lib::php()->poolingSync(
                         $blockTickUsleep, $blockTimeoutMs,
                         //
-                        static function (&$refResult) use (
+                        static function ($ctx) use (
                             $f,
                             $fileIn, $fileOut,
                             //
@@ -1378,7 +1377,7 @@ class FsModule
                                     if ('' !== $line) {
                                         $data = base64_decode($line);
 
-                                        $refResult = [ $data ];
+                                        $ctx->setResult($data);
                                     }
                                 }
                             }
@@ -1545,7 +1544,7 @@ class FsModule
                     $data = Lib::php()->poolingSync(
                         $blockTickUsleep, $blockTimeoutMs,
                         //
-                        static function (&$refResult) use (
+                        static function ($ctx) use (
                             $f,
                             $fileIn, $fileOut,
                             //
@@ -1593,7 +1592,7 @@ class FsModule
                                     if ('' !== $line) {
                                         $data = base64_decode($line);
 
-                                        $refResult = [ $data ];
+                                        $ctx->setResult($data);
                                     }
                                 }
                             }

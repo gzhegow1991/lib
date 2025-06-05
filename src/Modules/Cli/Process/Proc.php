@@ -852,7 +852,7 @@ class Proc
         if ($this->symfonyProcess) {
             $process = $this->symfonyProcess;
 
-            $fnTick = function (&$result) use ($fnWait, $process) {
+            $fnTick = function ($ctx) use ($fnWait, $process) {
                 if ($this->stdoutRefFile) {
                     $this->stdoutRef .= $process->getIncrementalOutput();
 
@@ -886,13 +886,13 @@ class Proc
                 }
 
 
-                $result = [ $process->getExitCode() ];
+                $ctx->setResult($process->getExitCode());
             };
 
         } else {
             $ph = $this->procOpenResource;
 
-            $fnTick = function (&$result) use ($fnWait, $ph) {
+            $fnTick = function ($ctx) use ($fnWait, $ph) {
                 $status = proc_get_status($ph);
 
 
@@ -930,7 +930,7 @@ class Proc
                 }
 
 
-                $result = [ $status[ 'exitcode' ] ];
+                $ctx->setResult($status[ 'exitcode' ]);
             };
         }
 
@@ -990,7 +990,7 @@ class Proc
         } else {
             $ph = $this->procOpenResource;
 
-            $fnTick = function ($fnResolve) use ($fnWait, $ph) {
+            $fnTick = function ($ctx) use ($fnWait, $ph) {
                 $status = proc_get_status($ph);
 
 
@@ -1014,7 +1014,7 @@ class Proc
                 }
 
 
-                $fnResolve($status[ 'exitcode' ]);
+                $ctx->setResult($status[ 'exitcode' ]);
             };
         }
 

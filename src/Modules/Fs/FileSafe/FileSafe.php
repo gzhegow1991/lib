@@ -150,10 +150,10 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $status = Lib::php()->poolingSync(
+        $resourceLocked = Lib::php()->poolingSync(
             $tickUsleep, $timeoutMs,
             //
-            function (&$refResult) use (
+            function ($ctx) use (
                 $resource, $modeLock,
                 $flockArgs
             ) {
@@ -167,15 +167,11 @@ class FileSafe
 
                 $this->context->onFinallyFrelease($resource);
 
-                $refResult = [ $resource ];
+                $ctx->setResult($resource);
             }
         );
 
-        if (false === $status) {
-            return false;
-        }
-
-        return $resource;
+        return $resourceLocked;
     }
 
     /**
@@ -291,10 +287,10 @@ class FileSafe
 
         $this->context->onFinallyFclose($resource);
 
-        $resource = Lib::php()->poolingSync(
+        $resourceLocked = Lib::php()->poolingSync(
             $tickUsleep, $timeoutMs,
             //
-            function (&$refResult) use (
+            function ($ctx) use (
                 $resource, $modeLock,
                 $flockArgs
             ) {
@@ -302,19 +298,17 @@ class FileSafe
 
                 $status = call_user_func_array('flock', $flockArgs);
 
-                if (false !== $status) {
-                    $refResult = [ $resource ];
-
-                    $this->context->onFinallyFrelease($resource);
+                if (false === $status) {
+                    return;
                 }
+
+                $this->context->onFinallyFrelease($resource);
+
+                $ctx->setResult($resource);
             }
         );
 
-        if (false === $resource) {
-            return false;
-        }
-
-        return $resource;
+        return $resourceLocked;
     }
 
     /**
@@ -450,10 +444,10 @@ class FileSafe
         $this->context->onFinallyUnlink($file);
         $this->context->onFinallyFclose($resource);
 
-        $resource = Lib::php()->poolingSync(
+        $resourceLocked = Lib::php()->poolingSync(
             $tickUsleep, $timeoutMs,
             //
-            function (&$refResult) use (
+            function ($ctx) use (
                 $resource, $modeLock,
                 $flockArgs
             ) {
@@ -467,15 +461,11 @@ class FileSafe
 
                 $this->context->onFinallyFrelease($resource);
 
-                $refResult = [ $resource ];
+                $ctx->setResult($resource);
             }
         );
 
-        if (false === $resource) {
-            return false;
-        }
-
-        return $resource;
+        return $resourceLocked;
     }
 
     /**
@@ -1661,10 +1651,10 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $result = Lib::php()->poolingSync(
+        $content = Lib::php()->poolingSync(
             $tickUsleep, $timeoutMs,
             //
-            function (&$refResult) use (
+            function ($ctx) use (
                 $file, $modeOpen, $modeLock,
                 $fopenArgs,
                 $flockArgs,
@@ -1681,11 +1671,11 @@ class FileSafe
                     return;
                 }
 
-                $refResult = [ $content ];
+                $ctx->setResult($content);
             }
         );
 
-        return $result;
+        return $content;
     }
 
 
@@ -1856,10 +1846,10 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $result = Lib::php()->poolingSync(
+        $len = Lib::php()->poolingSync(
             $tickUsleep, $timeoutMs,
             //
-            function (&$refResult) use (
+            function ($ctx) use (
                 $file, $modeOpen, $modeLock,
                 $data,
                 $fopenArgs,
@@ -1876,11 +1866,11 @@ class FileSafe
                     return;
                 }
 
-                $refResult = [ $len ];
+                $ctx->setResult($len);
             }
         );
 
-        return $result;
+        return $len;
     }
 
 
@@ -2055,10 +2045,10 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $result = Lib::php()->poolingSync(
+        $content = Lib::php()->poolingSync(
             $tickUsleep, $timeoutMs,
             //
-            function (&$refResult) use (
+            function ($ctx) use (
                 $file, $modeLock, $flags,
                 $fopenArgs,
                 $flockArgs
@@ -2073,11 +2063,11 @@ class FileSafe
                     return;
                 }
 
-                $refResult = [ $content ];
+                $ctx->setResult($content);
             }
         );
 
-        return $result;
+        return $content;
     }
 
 
@@ -2169,10 +2159,10 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $result = Lib::php()->poolingSync(
+        $size = Lib::php()->poolingSync(
             $tickUsleep, $timeoutMs,
             //
-            function (&$refResult) use (
+            function ($ctx) use (
                 $file, $modeLock,
                 $fopenArgs,
                 $flockArgs
@@ -2187,11 +2177,11 @@ class FileSafe
                     return;
                 }
 
-                $refResult = [ $size ];
+                $ctx->setResult($size);
             }
         );
 
-        return $result;
+        return $size;
     }
 
 

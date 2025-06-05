@@ -111,9 +111,9 @@ $fn = function () use ($ffn) {
 
 
     \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(900)
-        ->then(function ($value) use ($ffn) {
+        ->then(function () use ($ffn) {
             echo "\n";
-            $ffn->print("[ 900 | THEN 1.1 ]", $value);
+            $ffn->print("[ 900 | THEN 1.1 ]");
 
             return 123;
         })
@@ -142,9 +142,9 @@ $fn = function () use ($ffn) {
 
 
     \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(800)
-        ->then(function ($value) use ($ffn) {
+        ->then(function () use ($ffn) {
             echo "\n";
-            $ffn->print("[ 800 | THEN 2.1 ]", $value);
+            $ffn->print("[ 800 | THEN 2.1 ]");
 
             return 123;
         })
@@ -152,7 +152,9 @@ $fn = function () use ($ffn) {
             $ffn->print("[ 800 | THEN 2.2 ]", $value);
 
             $var = yield \Gzhegow\Lib\Modules\Async\Promise\Promise::delay(400)
-                ->then(function () { return 456; })
+                ->then(function () {
+                    return 456;
+                })
             ;
 
             return $var;
@@ -290,10 +292,10 @@ $test->expectStdout('
 "[ 600 | TIMEOUT ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException # "Timeout: 600ms" }
 
 
-"[ 800 | THEN 2.1 ]" | NULL
+"[ 800 | THEN 2.1 ]"
 "[ 800 | THEN 2.2 ]" | 123
 
-"[ 900 | THEN 1.1 ]" | NULL
+"[ 900 | THEN 1.1 ]"
 "[ 900 | THEN 1.2 ]" | 123
 "[ 900 | CATCH 1.3 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException # "123" }
 "[ 900 | CATCH 1.4 ]" | { object(iterable stringable) # Gzhegow\Lib\Exception\RuntimeException # "123" }

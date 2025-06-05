@@ -10,6 +10,8 @@ use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
 use Gzhegow\Lib\Modules\Async\FetchApi\FilesystemFetchApi;
 use Gzhegow\Lib\Modules\Async\Clock\ClockManagerInterface;
 use Gzhegow\Lib\Modules\Async\Promise\PromiseManagerInterface;
+use Gzhegow\Lib\Modules\Async\Promise\Pooling\DefaultPoolingFactory;
+use Gzhegow\Lib\Modules\Async\Promise\Pooling\PoolingFactoryInterface;
 
 
 class AsyncModule
@@ -18,6 +20,10 @@ class AsyncModule
      * @var LoopManagerInterface
      */
     protected $loopManager;
+    /**
+     * @var PoolingFactoryInterface
+     */
+    protected $poolingFactory;
     /**
      * @var PromiseManagerInterface
      */
@@ -52,9 +58,31 @@ class AsyncModule
     }
 
 
+    public function newPoolingFactory() : PoolingFactoryInterface
+    {
+        return new DefaultPoolingFactory();
+    }
+
+    public function clonePoolingFactory() : PoolingFactoryInterface
+    {
+        return clone $this->poolingFactory();
+    }
+
+    public function poolingFactory(?PoolingFactoryInterface $poolingFactory = null) : PoolingFactoryInterface
+    {
+        return $this->poolingFactory = null
+            ?? $poolingFactory
+            ?? $this->poolingFactory
+            ?? new DefaultPoolingFactory();
+    }
+
+
     public function newPromiseManager() : PromiseManagerInterface
     {
-        return new PromiseManager($this->loopManager());
+        return new PromiseManager(
+            $this->loopManager(),
+            $this->poolingFactory()
+        );
     }
 
     public function clonePromiseManager() : PromiseManagerInterface
@@ -67,7 +95,10 @@ class AsyncModule
         return $this->promiseManager = null
             ?? $promiseFactory
             ?? $this->promiseManager
-            ?? new PromiseManager($this->loopManager());
+            ?? new PromiseManager(
+                $this->loopManager(),
+                $this->poolingFactory()
+            );
     }
 
 

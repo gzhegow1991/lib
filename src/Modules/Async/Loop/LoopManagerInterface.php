@@ -8,32 +8,58 @@ use Gzhegow\Lib\Modules\Async\Clock\Interval;
 
 interface LoopManagerInterface
 {
-    public function addInterval(Interval $interval) : void;
+    /**
+     * @return static
+     */
+    public function addInterval(Interval $interval);
 
-    public function clearInterval(Interval $interval) : void;
-
-
-    public function addTimeout(Timeout $timer) : void;
-
-    public function clearTimeout(Timeout $timer) : void;
+    /**
+     * @return static
+     */
+    public function clearInterval(Interval $interval);
 
 
     /**
-     * @param callable $microtask
-     *
-     * @return void
+     * @return static
      */
-    public function addMicrotask($microtask) : void;
+    public function addTimeout(Timeout $timer);
 
     /**
-     * @param callable $macrotask
-     *
-     * @return void
+     * @return static
      */
-    public function addMacrotask($macrotask) : void;
+    public function clearTimeout(Timeout $timer);
 
 
-    public function runLoop() : void;
+    /**
+     * @param callable $fnMicrotask
+     *
+     * @return static
+     */
+    public function addMicrotask($fnMicrotask);
 
-    public function registerLoop() : void;
+    /**
+     * @param callable $fnMacrotask
+     *
+     * @return static
+     */
+    public function addMacrotask($fnMacrotask);
+
+
+    /**
+     * @param callable $fn
+     *
+     * @return static
+     */
+    public function requestNextFrame($fn);
+
+
+    /**
+     * @return static
+     */
+    public function runLoop();
+
+    /**
+     * @return static
+     */
+    public function registerLoop();
 }

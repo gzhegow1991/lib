@@ -10,6 +10,7 @@ use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
 use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
 use Gzhegow\Lib\Modules\Async\Clock\ClockManagerInterface;
+use Gzhegow\Lib\Modules\Async\Promise\Pooling\PoolingFactoryInterface;
 
 
 class PromiseManager implements PromiseManagerInterface
@@ -18,6 +19,10 @@ class PromiseManager implements PromiseManagerInterface
      * @var LoopManagerInterface
      */
     protected $loop;
+    /**
+     * @var PoolingFactoryInterface
+     */
+    protected $poolingFactory;
 
     /**
      * @var ClockManagerInterface
@@ -40,12 +45,14 @@ class PromiseManager implements PromiseManagerInterface
 
     public function __construct(
         LoopManagerInterface $loop,
+        PoolingFactoryInterface $poolingFactory,
         //
         ?ClockManagerInterface $clock = null,
         ?FetchApiInterface $fetchApi = null
     )
     {
         $this->loop = $loop;
+        $this->poolingFactory = $poolingFactory;
 
         $this->clock = $clock;
         $this->fetchApi = $fetchApi;
@@ -274,39 +281,32 @@ class PromiseManager implements PromiseManagerInterface
             );
         }
 
-        if (null !== ($timeoutMsInt = $timeoutMs)) {
-            if (! $theType->int_positive($timeoutMsInt, $timeoutMs)) {
-                throw new LogicException(
-                    [ 'The `timeoutMs` should be positive integer', $timeoutMs ]
-                );
-            }
-        }
-
         $clock = $this->getClock();
 
         $defer = $this->defer($fnResolve, $fnReject);
 
-        $timeoutMicrotime = null;
-        if (null !== $timeoutMsInt) {
-            $timeoutMicrotime = microtime(true) + ($timeoutMsInt / 1000);
-        }
+        $ctx = $this->poolingFactory->newContext();
+
+        $ctx->setTimeoutMs($timeoutMs);
 
         $fnTick = static function () use (
-            $timeoutMs,
-            &$timeoutMicrotime,
-            //
-            $fnPooling, $fnResolve, $fnReject
+            $ctx,
+            $fnPooling,
+            $fnResolve, $fnReject
         ) {
-            call_user_func_array($fnPooling, [
-                $fnResolve,
-                $fnReject,
-                //
-                &$timeoutMicrotime,
-            ]);
+            call_user_func_array($fnPooling, [ $ctx ]);
 
-            if (null !== $timeoutMicrotime) {
-                if (microtime(true) > $timeoutMicrotime) {
-                    $fnReject("Timeout: {$timeoutMs}");
+            if ($ctx->hasResult($refResult)) {
+                $fnResolve($refResult);
+
+            } elseif ($ctx->hasError($refError)) {
+                $fnReject($refError);
+
+            } else {
+                if (null !== ($timeoutMicrotime = $ctx->hasTimeoutMicrotime())) {
+                    if (microtime(true) > $timeoutMicrotime) {
+                        $fnReject("Timeout: " . $ctx->getTimeoutMs());
+                    }
                 }
             }
         };
@@ -795,12 +795,12 @@ class PromiseManager implements PromiseManagerInterface
 
             $fetchApi->daemonWakeup(10000, 1000);
 
-            $fnPooling = static function ($fnResolve) use ($fetchApi) {
+            $fnPooling = static function ($ctx) use ($fetchApi) {
                 if (! $fetchApi->daemonIsAwake()) {
                     return;
                 }
 
-                $fnResolve();
+                $ctx->setResult(null);
             };
 
             $promise = $this->pooling(100, 10000, $fnPooling);
@@ -821,7 +821,7 @@ class PromiseManager implements PromiseManagerInterface
     {
         $fetchApi = $this->getFetchApi();
 
-        $fnPooling = static function ($fnResolve) use (
+        $fnPooling = static function ($ctx) use (
             $fetchApi,
             //
             $taskId
@@ -831,9 +831,11 @@ class PromiseManager implements PromiseManagerInterface
                 $taskId
             );
 
-            if ($status) {
-                $fnResolve($taskResult);
+            if (false === $status) {
+                return;
             }
+
+            $ctx->setResult($taskResult);
         };
 
         $promise = $this->pooling(100, $timeoutMs, $fnPooling);

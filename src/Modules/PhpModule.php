@@ -13,8 +13,10 @@ use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToObjectInterface;
+use Gzhegow\Lib\Modules\Php\Pooling\DefaultPoolingFactory;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIterableInterface;
+use Gzhegow\Lib\Modules\Php\Pooling\PoolingFactoryInterface;
 use Gzhegow\Lib\Modules\Php\CallableParser\DefaultCallableParser;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
@@ -25,6 +27,10 @@ class PhpModule
      * @var CallableParserInterface
      */
     protected $callableParser;
+    /**
+     * @var PoolingFactoryInterface
+     */
+    protected $poolingFactory;
 
     /**
      * @var class-string<\LogicException|\RuntimeException>
@@ -53,6 +59,26 @@ class PhpModule
             ?? $this->callableParser
             ?? new DefaultCallableParser();
     }
+
+
+    public function newPoolingFactory() : PoolingFactoryInterface
+    {
+        return new DefaultPoolingFactory();
+    }
+
+    public function clonePoolingFactory() : PoolingFactoryInterface
+    {
+        return clone $this->poolingFactory();
+    }
+
+    public function poolingFactory(?PoolingFactoryInterface $poolingFactory = null) : PoolingFactoryInterface
+    {
+        return $this->poolingFactory = null
+            ?? $poolingFactory
+            ?? $this->poolingFactory
+            ?? new DefaultPoolingFactory();
+    }
+
 
     /**
      * @param ErrorBag $ref
@@ -2535,13 +2561,18 @@ class PhpModule
 
 
     /**
+     * @param callable      $fnPooling
+     * @param callable|null $fnCatch
+     *
      * @return mixed|false
      */
     public function poolingSync(
         ?int $tickUsleep, ?int $timeoutMs,
-        \Closure $fn, \Closure $fnCatch = null
+        $fnPooling, $fnCatch = null
     )
     {
+        $hasFnCatch = (null !== $fnCatch);
+
         $tickUsleep = $tickUsleep ?? $this->static_pooling_tick_usleep();
 
         if ($tickUsleep <= 0) {
@@ -2559,31 +2590,33 @@ class PhpModule
             );
         }
 
-        $timeoutMicrotime = null;
-        if (null !== $timeoutMs) {
-            $timeoutMicrotime = microtime(true) + ($timeoutMs / 1000);
-        }
+        $ctx = $this->poolingFactory()->newContext();
+
+        $ctx->setTimeoutMs($timeoutMs);
 
         do {
-            $result = [];
-
-            if (null === $fnCatch) {
-                call_user_func_array($fn, [ &$result, &$timeoutMicrotime ]);
-
-            } else {
+            if ($hasFnCatch) {
                 try {
-                    call_user_func_array($fn, [ &$result, &$timeoutMicrotime ]);
+                    call_user_func_array($fnPooling, [ $ctx ]);
                 }
                 catch ( \Throwable $e ) {
-                    call_user_func_array($fnCatch, [ $e ]);
+                    call_user_func_array($fnCatch, [ $e, $ctx ]);
                 }
+
+            } else {
+                call_user_func_array($fnPooling, [ $ctx ]);
             }
 
-            if (is_array($result) && array_key_exists(0, $result)) {
-                return $result[ 0 ];
+            if ($ctx->hasResult($refResult)) {
+                return $refResult;
+
+            } elseif ($ctx->hasError($refError)) {
+                throw new RuntimeException(
+                    [ 'Pooling function returned error', $refError ]
+                );
             }
 
-            if (null !== $timeoutMicrotime) {
+            if (null !== ($timeoutMicrotime = $ctx->hasTimeoutMicrotime())) {
                 if (microtime(true) > $timeoutMicrotime) {
                     break;
                 }

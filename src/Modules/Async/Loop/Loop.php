@@ -9,52 +9,62 @@ use Gzhegow\Lib\Modules\Async\Clock\Interval;
 
 class Loop
 {
-    public static function addInterval(Interval $interval) : void
+    public static function addInterval(Interval $interval) : LoopManagerInterface
     {
-        static::getInstance()->addInterval($interval);
+        return static::getInstance()->addInterval($interval);
     }
 
-    public static function clearInterval(Interval $interval) : void
+    public static function clearInterval(Interval $interval) : LoopManagerInterface
     {
-        static::getInstance()->clearInterval($interval);
+        return static::getInstance()->clearInterval($interval);
     }
 
 
-    public static function addTimeout(Timeout $timer) : void
+    public static function addTimeout(Timeout $timer) : LoopManagerInterface
     {
-        static::getInstance()->addTimeout($timer);
+        return static::getInstance()->addTimeout($timer);
     }
 
-    public static function clearTimeout(Timeout $timer) : void
+    public static function clearTimeout(Timeout $timer) : LoopManagerInterface
     {
-        static::getInstance()->clearTimeout($timer);
+        return static::getInstance()->clearTimeout($timer);
     }
 
 
     /**
-     * @param callable $microtask
-     *
-     * @return void
+     * @param callable $fnMicrotask
      */
-    public static function addMicrotask($microtask) : void
+    public static function addMicrotask($fnMicrotask) : LoopManagerInterface
     {
-        static::getInstance()->addMicrotask($microtask);
+        return static::getInstance()->addMicrotask($fnMicrotask);
     }
 
     /**
-     * @param callable $macrotask
-     *
-     * @return void
+     * @param callable $fnMacrotask
      */
-    public static function addMacrotask($macrotask) : void
+    public static function addMacrotask($fnMacrotask) : LoopManagerInterface
     {
-        static::getInstance()->addMacrotask($macrotask);
+        return static::getInstance()->addMacrotask($fnMacrotask);
     }
 
 
-    public static function runLoop() : void
+    /**
+     * @param callable $fn
+     */
+    public static function requestNextFrame($fn) : LoopManagerInterface
     {
-        static::getInstance()->runLoop();
+        return static::getInstance()->requestNextFrame($fn);
+    }
+
+
+    public static function runLoop() : LoopManagerInterface
+    {
+        return static::getInstance()->runLoop();
+    }
+
+    public static function registerLoop() : LoopManagerInterface
+    {
+        return static::getInstance()->registerLoop();
     }
 
 
