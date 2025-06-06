@@ -26,12 +26,12 @@ use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
 use Gzhegow\Lib\Modules\SocialModule;
 use Gzhegow\Lib\Modules\TypeBoolModule;
+use Gzhegow\Lib\Modules\Func\Pipe\Pipe;
 use Gzhegow\Lib\Modules\ItertoolsModule;
 use Gzhegow\Lib\Modules\TypeThrowModule;
 use Gzhegow\Lib\Modules\ParseNullModule;
 use Gzhegow\Lib\Modules\EntrypointModule;
 use Gzhegow\Lib\Modules\ParseThrowModule;
-use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 
 
@@ -73,17 +73,11 @@ class Lib
         return static::$parseNull;
     }
 
-    /**
-     * @return ParseNullModule
-     */
     public static function parseNull()
     {
         return static::$parseNull = static::$parseNull ?? new ParseNullModule();
     }
 
-    /**
-     * @return ParseThrowModule
-     */
     public static function parseThrow()
     {
         return static::$parseThrow = static::$parseThrow ?? new ParseThrowModule();
@@ -126,17 +120,11 @@ class Lib
         return static::$typeBool;
     }
 
-    /**
-     * @return TypeBoolModule
-     */
     public static function typeBool()
     {
         return static::$typeBool = static::$typeBool ?? new TypeBoolModule();
     }
 
-    /**
-     * @return TypeThrowModule
-     */
     public static function typeThrow()
     {
         return static::$typeThrow = static::$typeThrow ?? new TypeThrowModule();
@@ -228,7 +216,7 @@ class Lib
      */
     public static $entrypoint;
 
-    public static function entrypoint() : EntrypointModule
+    public static function entrypoint()
     {
         return static::$entrypoint = static::$entrypoint ?? new EntrypointModule();
     }
@@ -397,13 +385,22 @@ class Lib
     /**
      * > фабрика для ErrorBag - добавить теги ошибкам, чтобы потом сохранить в несколько отчетов
      */
-    public static function errorBag(?ErrorBag &$b = null) : ErrorBag
+    public static function errorBag(?ErrorBag &$refB = null) : ErrorBag
     {
-        return Lib::php()->newErrorBag($b);
+        return Lib::php()->newErrorBag($refB);
     }
 
     /**
-     * > в старых PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
+     * > фабрика для Pipe - задать этапы задачи в наглядом виде без деталей
+     */
+    public static function pipe(?Pipe &$refP = null) : Pipe
+    {
+        return Lib::func()->newPipe($refP);
+    }
+
+
+    /**
+     * > в старых версиях PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
      *
      * @return null
      *
@@ -549,9 +546,8 @@ class Lib
 
         if (null !== $clear) {
             $clear = (bool) $clear;
-        }
 
-        if (null === $clear) {
+        } else {
             $last = $current;
 
             $current = null;
@@ -600,74 +596,5 @@ class Lib
     public static function require_composer_global()
     {
         return require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
-    }
-
-    /**
-     * @param \Closure|null $refFn
-     */
-    public static function d(&$refFn = null) : \Closure
-    {
-        return $refFn = function ($var, ...$vars) {
-            $t = \Gzhegow\Lib\Lib::debug()->file_line();
-
-            \Gzhegow\Lib\Lib::debug()->d([ $t ], $var, ...$vars);
-        };
-    }
-
-    /**
-     * @param \Closure|null $refFn
-     */
-    public static function dd(&$refFn = null) : \Closure
-    {
-        return $refFn = function (...$vars) {
-            $t = \Gzhegow\Lib\Lib::debug()->file_line();
-
-            \Gzhegow\Lib\Lib::debug()->dd([ $t ], ...$vars);
-        };
-    }
-
-    /**
-     * @param \Closure|null $refFn
-     */
-    public static function ddd(&$refFn = null) : \Closure
-    {
-        return $refFn = function (?int $limit, $var, ...$vars) {
-            $t = \Gzhegow\Lib\Lib::debug()->file_line();
-
-            \Gzhegow\Lib\Lib::debug()->ddd([ $t ], $limit, $var, ...$vars);
-        };
-    }
-
-    /**
-     * @param \Closure|null $refFn
-     */
-    public static function td(int $throttleMs, &$refFn = null) : \Closure
-    {
-        if ($throttleMs < 0) {
-            throw new LogicException(
-                [ 'The `throttleMs` should be non-negative integer', $throttleMs ]
-            );
-        }
-
-        return $refFn = function ($var, ...$vars) use ($throttleMs) {
-            static $last;
-
-            $last = $last ?? [];
-
-            $t = \Gzhegow\Lib\Lib::debug()->file_line();
-
-            $key = implode(':', $t);
-            $last[ $key ] = $last[ $key ] ?? 0;
-
-            $now = microtime(true);
-
-            if (($now - $last[ $key ]) > ($throttleMs / 1000)) {
-                $last[ $key ] = $now;
-
-                \Gzhegow\Lib\Lib::debug()->d([ $t ], $var, ...$vars);
-            }
-
-            return $var;
-        };
     }
 }

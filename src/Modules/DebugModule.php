@@ -186,31 +186,92 @@ class DebugModule
     }
 
 
-    public function dd(?array $trace, ...$vars) : void
-    {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $this->dumper()->dd($trace, ...$vars);
-    }
-
     /**
      * @return mixed
      */
-    public function d(?array $trace, $var, ...$vars)
+    public function d($var, ...$vars)
     {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
         return $this->dumper()->d($trace, $var, ...$vars);
     }
 
     /**
+     * @return void
+     */
+    public function dd(...$vars)
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $this->dumper()->dd($trace, ...$vars);
+    }
+
+    /**
      * @return mixed|void
      */
-    public function ddd(?array $trace, ?int $limit, $var, ...$vars)
+    public function ddd(?int $limit, $var, ...$vars)
     {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
         return $this->dumper()->ddd($trace, $limit, $var, ...$vars);
+    }
+
+
+    public function fnD() : \Closure
+    {
+        return function ($var, ...$vars) {
+            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+
+            $this->dumper()->d([ $t ], $var, ...$vars);
+        };
+    }
+
+    public function fnDD() : \Closure
+    {
+        return function (...$vars) {
+            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+
+            $this->dumper()->dd([ $t ], ...$vars);
+        };
+    }
+
+    public function fnDDD() : \Closure
+    {
+        return function (?int $limit, $var, ...$vars) {
+            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+
+            $this->dumper()->ddd([ $t ], $limit, $var, ...$vars);
+        };
+    }
+
+    public function fnTD(int $throttleMs) : \Closure
+    {
+        if ($throttleMs < 0) {
+            throw new LogicException(
+                [ 'The `throttleMs` should be non-negative integer', $throttleMs ]
+            );
+        }
+
+        return function ($var, ...$vars) use ($throttleMs) {
+            static $last;
+
+            $last = $last ?? [];
+
+            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+
+            $key = implode(':', $t);
+            $last[ $key ] = $last[ $key ] ?? 0;
+
+            $now = microtime(true);
+
+            if (($now - $last[ $key ]) > ($throttleMs / 1000)) {
+                $last[ $key ] = $now;
+
+                $this->dumper()->d([ $t ], $var, ...$vars);
+            }
+
+            return $var;
+        };
     }
 
 

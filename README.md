@@ -516,12 +516,6 @@ $fn = function () use ($ffn) {
         // > этот шаг никогда не начнется, поскольку в прошлом шаге было выброшено исключение
         ->map('intval')
         //
-        // > этот шаг может поймать исключение
-        // ->catchTo($e) // > исключение будет сохранено в $e по ссылке, а значение удалено
-        // ->catchTo($e, [ 'catchTo' ]) // > тоже, но значение будет заменено на 'catchTo'
-        // ->catchTo($e, [ 'catchTo' ], LogicException::class) > тоже, но только если исключение нужного класса или его потомков
-        ->catchTo($e, [ 'catchTo' ], \LogicException::class)
-        //
         // > или можно обрабатывать исключения обычным способом через callable
         ->catch(function (\Throwable $e, $null, $result) {
             if ($e instanceof \RuntimeException) {

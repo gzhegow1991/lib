@@ -676,7 +676,7 @@ class DefaultDumper implements DumperInterface
         return $var;
     }
 
-    public function dd(?array $trace, ...$vars) : void
+    public function dd(?array $trace, ...$vars)
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
