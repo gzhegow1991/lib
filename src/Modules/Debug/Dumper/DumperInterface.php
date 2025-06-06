@@ -24,7 +24,7 @@ interface DumperInterface
     public function d(?array $trace, $var, ...$vars);
 
     /**
-     * @return void
+     * @return mixed|void
      */
     public function dd(?array $trace, ...$vars);
 

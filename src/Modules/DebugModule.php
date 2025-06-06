@@ -197,13 +197,13 @@ class DebugModule
     }
 
     /**
-     * @return void
+     * @return mixed|void
      */
     public function dd(...$vars)
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $this->dumper()->dd($trace, ...$vars);
+        return $this->dumper()->dd($trace, ...$vars);
     }
 
     /**
