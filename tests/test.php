@@ -1488,18 +1488,38 @@ $fn = function () use ($ffn) {
     $ffn->print('bcround', $result, (string) $result);
     echo "\n";
 
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(5.75, 2);
+    $ffn->print('bcmod', $result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(-5.75, 2);
+    $ffn->print('bcmod', $result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(5.75, 2.25);
+    $ffn->print('bcmod', $result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(-5.75, 2.25);
+    $ffn->print('bcmod', $result, (string) $result);
+    echo "\n";
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcfmod(5.75, 2, 2);
+    $ffn->print('bcfmod', $result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcfmod(-5.75, 2, 2);
+    $ffn->print('bcfmod', $result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcfmod(5.75, 2.25, 2);
+    $ffn->print('bcfmod', $result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcfmod(-5.75, 2.25, 2);
+    $ffn->print('bcfmod', $result, (string) $result);
+    echo "\n";
+
     $result = \Gzhegow\Lib\Lib::bcmath()->bcgcd(8, 12);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcgcd', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcgcd(7, 13);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcgcd', $result, (string) $result);
     echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 6);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bclcm', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 5);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bclcm', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 10);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bclcm', $result, (string) $result);
     echo "\n";
 };
 $test = $ffn->test($fn);
@@ -1546,12 +1566,22 @@ $test->expectStdout('
 "bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.05"
 "bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "4"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+"bcmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+"bcmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+"bcmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+"bcmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "24"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "40"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "40"
+"bcfmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.75"
+"bcfmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.75"
+"bcfmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.25"
+"bcfmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.25"
+
+"bcgcd" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "4"
+"bcgcd" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+
+"bclcm" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "24"
+"bclcm" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "40"
+"bclcm" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "40"
 ');
 $test->run();
 

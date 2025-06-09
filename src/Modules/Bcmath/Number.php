@@ -137,24 +137,40 @@ class Number implements
         return $this->value === "{$this->sign}{$this->int}";
     }
 
+    public function isDecimal() : bool
+    {
+        return true
+            && ($this->value === "{$this->sign}{$this->int}{$this->frac}")
+            && ($this->value !== "{$this->sign}{$this->int}");
+    }
+
+    public function isExponent() : bool
+    {
+        return true
+            && ($this->value === "{$this->sign}{$this->int}{$this->frac}{$this->exp}")
+            && ($this->value !== "{$this->sign}{$this->int}{$this->frac}");
+    }
+
 
     public function isZero() : bool
     {
-        return ('' === $this->frac) && ('0' === $this->int);
+        return true
+            && ('' === $this->frac)
+            && ('0' === $this->int);
     }
 
     public function isPositive() : bool
     {
-        $isZero = (('' === $this->frac) && ('0' === $this->int));
-
-        return ! $isZero && ('' === $this->sign);
+        return true
+            && ('' === $this->sign)
+            && ! (('' === $this->frac) && ('0' === $this->int));
     }
 
     public function isNegative() : bool
     {
-        $isZero = (('' === $this->frac) && ('0' === $this->int));
-
-        return ! $isZero && ('-' === $this->sign);
+        return true
+            && ('-' === $this->sign)
+            && ! (('' === $this->frac) && ('0' === $this->int));
     }
 
     public function isNonPositive() : bool
