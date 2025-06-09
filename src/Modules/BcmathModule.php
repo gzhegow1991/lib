@@ -151,20 +151,20 @@ class BcmathModule
     }
 
 
-    public function scale_min(?int $scale = null, ...$numbers) : int
+    public function scale_min(?int $scale = null, ...$numbers) : ?int
     {
         $scales = [];
 
         $scaleLimit = $this->static_scale_limit();
 
         if (null !== $scale) {
-            if (! Lib::type()->int_non_negative($_scale, $scale)) {
+            if (! Lib::type()->int_non_negative($scaleInt, $scale)) {
                 throw new LogicException(
                     [ 'The `scale` must be non negative integer', $scale ]
                 );
             }
 
-            $scales[] = $_scale;
+            $scales[] = $scaleInt;
         }
 
         if ([] !== $numbers) {
@@ -172,33 +172,37 @@ class BcmathModule
                 $scales,
                 $this->scales(...$numbers)
             );
+        }
+
+        if ([] === $scales) {
+            return null;
         }
 
         $scaleMin = min($scales);
 
         if ($scaleMin > $scaleLimit) {
             throw new RuntimeException(
-                [ 'Scale is bigger than allowed maximum', $scaleMin, $scaleLimit ]
+                [ 'The result `scaleMin` is bigger than allowed maximum', $scaleMin, $scaleLimit ]
             );
         }
 
         return $scaleMin;
     }
 
-    public function scale_max(?int $scale = null, ...$numbers) : int
+    public function scale_max(?int $scale = null, ...$numbers) : ?int
     {
         $scales = [];
 
         $scaleLimit = $this->static_scale_limit();
 
         if (null !== $scale) {
-            if (! Lib::type()->int_non_negative($_scale, $scale)) {
+            if (! Lib::type()->int_non_negative($scaleInt, $scale)) {
                 throw new LogicException(
                     [ 'The `scale` must be non negative integer', $scale ]
                 );
             }
 
-            $scales[] = $_scale;
+            $scales[] = $scaleInt;
         }
 
         if ([] !== $numbers) {
@@ -208,11 +212,15 @@ class BcmathModule
             );
         }
 
+        if ([] === $scales) {
+            return null;
+        }
+
         $scaleMax = max($scales);
 
         if ($scaleMax > $scaleLimit) {
             throw new RuntimeException(
-                [ 'Scale is bigger than allowed maximum', $scaleMax, $scaleLimit ]
+                [ 'The result `scaleMax` is bigger than allowed maximum', $scaleMax, $scaleLimit ]
             );
         }
 
@@ -220,152 +228,32 @@ class BcmathModule
     }
 
 
-    public function bcceil($num, ?int $scale = null) : Bcnumber
-    {
-        $scale = $scale ?? 0;
-
-        if (! $this->type_bcnumber($bcnum, $num)) {
-            throw new LogicException(
-                [ 'The `num` should be valid Bcnumber', $num ]
-            );
-        }
-
-        $frac = $bcnum->getFrac();
-
-        if ('' === $frac) {
-            return $bcnum;
-        }
-
-        $value = $bcnum->getValue();
-        $sign = $bcnum->getSign();
-
-        $_scale = $this->scale_max($scale);
-
-        $result = $value;
-
-        $hasScale = ($_scale > 0);
-        if ($hasScale) {
-            $factor = '1' . str_repeat('0', $_scale);
-
-            $result = bcmul(
-                $value,
-                $factor,
-                0
-            );
-        }
-
-        if ('' === $sign) {
-            $result = bcadd($result, '1');
-        }
-
-        if ($hasScale) {
-            $result = bcdiv(
-                $result,
-                $factor,
-                $_scale
-            );
-
-        } else {
-            $result = bcadd(
-                $result,
-                '0',
-                0
-            );
-        }
-
-        $this->type_bcnumber($bcresult, $result);
-
-        return $bcresult;
-    }
-
-    public function bcfloor($num, ?int $scale = null) : Bcnumber
-    {
-        $scale = $scale ?? 0;
-
-        if (! $this->type_bcnumber($bcnum, $num)) {
-            throw new LogicException(
-                [ 'The `num` should be valid Bcnumber', $num ]
-            );
-        }
-
-        $frac = $bcnum->getFrac();
-
-        if ('' === $frac) {
-            return $bcnum;
-        }
-
-        $value = $bcnum->getValue();
-        $minus = $bcnum->getSign();
-
-        $_scale = $this->scale_max($scale);
-
-        $result = $value;
-
-        $hasScale = ($_scale > 0);
-        if ($hasScale) {
-            $factor = '1' . str_repeat('0', $_scale);
-
-            $result = bcmul(
-                $value,
-                $factor,
-                0
-            );
-        }
-
-        if ($minus) {
-            $result = bcsub($result, '1');
-        }
-
-        if ($hasScale) {
-            $result = bcdiv(
-                $result,
-                $factor,
-                $_scale
-            );
-
-        } else {
-            $result = bcadd(
-                $result,
-                '0',
-                0
-            );
-        }
-
-        $this->type_bcnumber($bcresult, $result);
-
-        return $bcresult;
-    }
-
     public function bcround($num, ?int $scale = null) : Bcnumber
     {
         $scale = $scale ?? 0;
 
-        if (! $this->type_bcnumber($bcnum, $num)) {
+        if (! $this->type_bcnumber($refBcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
             );
         }
 
-        $value = $bcnum->getValue();
-        $minus = $bcnum->getSign();
-
-        $_scale = $this->scale_max($scale);
-
-        $result = $value;
-
-        $hasScale = ($_scale > 0);
-
-        if ($hasScale) {
-            $factor = '1' . str_repeat('0', $_scale);
-
-            $result = bcmul(
-                $value,
-                $factor,
-                1
-            );
+        if (! $refBcnum->hasFrac()) {
+            return $refBcnum;
         }
 
-        if ($minus) {
+        $scaleMax = $this->scale_max($scale);
+
+        $result = $refBcnum->getValue();
+
+        $hasScale = ($scaleMax > 0);
+        if ($hasScale) {
+            $factor = '1' . str_repeat('0', $scaleMax);
+
+            $result = bcmul($result, $factor, 1);
+        }
+
+        if ($refBcnum->isNegative()) {
             $result = bcsub($result, '0.5', 0);
 
         } else {
@@ -373,23 +261,98 @@ class BcmathModule
         }
 
         if ($hasScale) {
-            $result = bcdiv(
-                $result,
-                $factor,
-                $_scale
-            );
+            $result = bcdiv($result, $factor, $scaleMax);
 
         } else {
-            $result = bcadd(
-                $result,
-                '0',
-                0
+            $result = bcadd($result, '0', 0);
+        }
+
+        $this->type_bcnumber($refBcresult, $result);
+
+        return $refBcresult;
+    }
+
+
+    public function bcceil($num, ?int $scale = null) : Bcnumber
+    {
+        $scale = $scale ?? 0;
+
+        if (! $this->type_bcnumber($refBcnum, $num)) {
+            throw new LogicException(
+                [ 'The `num` should be valid Bcnumber', $num ]
             );
         }
 
-        $this->type_bcnumber($bcresult, $result);
+        if (! $refBcnum->hasFrac()) {
+            return $refBcnum;
+        }
 
-        return $bcresult;
+        $scaleMax = $this->scale_max($scale);
+
+        $result = $refBcnum->getValue();
+
+        $hasScale = ($scaleMax > 0);
+        if ($hasScale) {
+            $factor = '1' . str_repeat('0', $scaleMax);
+
+            $result = bcmul($result, $factor, 0);
+        }
+
+        if ($refBcnum->isPositive()) {
+            $result = bcadd($result, '1');
+        }
+
+        if ($hasScale) {
+            $result = bcdiv($result, $factor, $scaleMax);
+
+        } else {
+            $result = bcadd($result, '0', 0);
+        }
+
+        $this->type_bcnumber($refBcresult, $result);
+
+        return $refBcresult;
+    }
+
+    public function bcfloor($num, ?int $scale = null) : Bcnumber
+    {
+        $scale = $scale ?? 0;
+
+        if (! $this->type_bcnumber($refBcnum, $num)) {
+            throw new LogicException(
+                [ 'The `num` should be valid Bcnumber', $num ]
+            );
+        }
+
+        if (! $refBcnum->hasFrac()) {
+            return $refBcnum;
+        }
+
+        $scaleMax = $this->scale_max($scale);
+
+        $result = $refBcnum->getValue();
+
+        $hasScale = ($scaleMax > 0);
+        if ($hasScale) {
+            $factor = '1' . str_repeat('0', $scaleMax);
+
+            $result = bcmul($result, $factor, 0);
+        }
+
+        if ($refBcnum->isNegative()) {
+            $result = bcsub($result, '1');
+        }
+
+        if ($hasScale) {
+            $result = bcdiv($result, $factor, $scaleMax);
+
+        } else {
+            $result = bcadd($result, '0', 0);
+        }
+
+        $this->type_bcnumber($refBcresult, $result);
+
+        return $refBcresult;
     }
 
 
@@ -397,37 +360,28 @@ class BcmathModule
     {
         $scale = $scale ?? 0;
 
-        if (! $this->type_bcnumber($bcnum, $num)) {
+        if (! $this->type_bcnumber($refBcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
             );
         }
 
-        $frac = $bcnum->getFrac();
-
-        if ('' === $frac) {
-            return $bcnum;
+        if (! $refBcnum->hasFrac()) {
+            return $refBcnum;
         }
 
-        $value = $bcnum->getValue();
-        $minus = $bcnum->getSign();
+        $scaleMax = $this->scale_max($scale);
 
-        $_scale = $this->scale_max($scale);
+        $result = $refBcnum->getValue();
 
-        $result = $value;
-
-        $hasScale = ($_scale > 0);
+        $hasScale = ($scaleMax > 0);
         if ($hasScale) {
-            $factor = '1' . str_repeat('0', $_scale);
+            $factor = '1' . str_repeat('0', $scaleMax);
 
-            $result = bcmul(
-                $value,
-                $factor,
-                0
-            );
+            $result = bcmul($result, $factor, 0);
         }
 
-        if ($minus) {
+        if ($refBcnum->isNegative()) {
             $result = bcsub($result, '1');
 
         } else {
@@ -435,54 +389,46 @@ class BcmathModule
         }
 
         if ($hasScale) {
-            $result = bcdiv(
-                $result,
-                $factor,
-                $_scale
-            );
+            $result = bcdiv($result, $factor, $scaleMax);
 
         } else {
-            $result = bcadd(
-                $result,
-                '0',
-                0
-            );
+            $result = bcadd($result, '0', 0);
         }
 
-        $this->type_bcnumber($bcresult, $result);
+        $this->type_bcnumber($refBcresult, $result);
 
-        return $bcresult;
+        return $refBcresult;
     }
 
     public function bcmoneyfloor($num, ?int $scale = null) : Bcnumber
     {
         $scale = $scale ?? 0;
 
-        if (! $this->type_bcnumber($bcnum, $num)) {
+        if (! $this->type_bcnumber($refBcnum, $num)) {
             throw new LogicException(
                 [ 'The `num` should be valid Bcnumber', $num ]
             );
         }
 
-        $frac = $bcnum->getFrac();
-
-        if ('' === $frac) {
-            return $bcnum;
+        if (! $refBcnum->hasFrac()) {
+            return $refBcnum;
         }
 
-        $_scale = $this->scale_max($scale);
+        $scaleMax = $this->scale_max($scale) ?? 0;
 
-        $result = $bcnum->getValue();
+        $result = $refBcnum->getValue();
 
-        $result = bcadd(
-            $result,
-            '0',
-            $_scale
-        );
+        $hasScale = ($scaleMax > 0);
+        if ($hasScale) {
+            $result = bcadd($result, '0', $scaleMax);
 
-        $this->type_bcnumber($bcresult, $result);
+        } else {
+            $result = bcadd($result, '0', 0);
+        }
 
-        return $bcresult;
+        $this->type_bcnumber($refBcresult, $result);
+
+        return $refBcresult;
     }
 
 
@@ -501,8 +447,9 @@ class BcmathModule
         }
 
         $_scale = null
-            ?? $scale
-            ?? $this->scale_max(null, $bcnum1, $bcnum2);
+            ?? $this->scale_max($scale)
+            ?? $this->scale_max(null, $bcnum1, $bcnum2)
+            ?? $this->static_scale_limit();
 
         $result = bccomp(
             $bcnum1->getValue(),
@@ -530,7 +477,8 @@ class BcmathModule
 
         $_scale = null
             ?? $this->scale_max($scale)
-            ?? $this->scale_max(null, $bcnum1, $bcnum2);
+            ?? $this->scale_max(null, $bcnum1, $bcnum2)
+            ?? $this->static_scale_limit();
 
         $result = bcadd(
             $bcnum1->getValue(),
@@ -559,7 +507,8 @@ class BcmathModule
 
         $_scale = null
             ?? $this->scale_max($scale)
-            ?? $this->scale_max(null, $bcnum1, $bcnum2);
+            ?? $this->scale_max(null, $bcnum1, $bcnum2)
+            ?? $this->static_scale_limit();
 
         $result = bcsub(
             $bcnum1->getValue(),
@@ -596,7 +545,8 @@ class BcmathModule
 
         $_scale = null
             ?? $this->scale_max($scale)
-            ?? $this->scale_max(null, $bcnum1, $bcnum2);
+            ?? $this->scale_max(null, $bcnum1, $bcnum2)
+            ?? $this->static_scale_limit();
 
         $result = bcmul(
             $bcnum1->getValue(),
@@ -626,12 +576,12 @@ class BcmathModule
             );
         }
 
-        $_scale = $this->scale_max($scale);
+        $scaleMax = $this->scale_max($scale);
 
         $result = bcdiv(
             $bcnum1->getValue(),
             $bcnum2->getValue(),
-            $_scale
+            $scaleMax
         );
 
         $this->type_bcnumber($bcresult, $result);
@@ -686,14 +636,15 @@ class BcmathModule
             }
         }
 
-        $_scale = null
+        $scaleMax = null
             ?? $this->scale_max($scale)
-            ?? $this->scale_max(null, $bcnum);
+            ?? $this->scale_max(null, $bcnum)
+            ?? $this->static_scale_limit();
 
         $result = bcpow(
             $bcnum->getValue(),
             (string) $exponent,
-            $_scale
+            $scaleMax
         );
 
         $this->type_bcnumber($bcresult, $result);
@@ -710,11 +661,11 @@ class BcmathModule
             );
         }
 
-        $_scale = $this->scale_max($scale);
+        $scaleMax = $this->scale_max($scale);
 
         $result = bcsqrt(
             $bcnum->getValue(),
-            $_scale
+            $scaleMax
         );
 
         $this->type_bcnumber($bcresult, $result);

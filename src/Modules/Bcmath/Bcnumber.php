@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules\Bcmath;
 
 use Gzhegow\Lib\Modules\Php\Result\Ret;
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
@@ -129,7 +130,41 @@ class Bcnumber implements
 
     public function isInteger() : bool
     {
-        return $this->value === $this->getValueInt();
+        return $this->value === "{$this->sign}{$this->int}";
+    }
+
+
+    public function isZero() : bool
+    {
+        return ('' === $this->frac) && ('0' === $this->int);
+    }
+
+    public function isPositive() : bool
+    {
+        $isZero = (('' === $this->frac) && ('0' === $this->int));
+
+        return ! $isZero && ('' === $this->sign);
+    }
+
+    public function isNegative() : bool
+    {
+        $isZero = (('' === $this->frac) && ('0' === $this->int));
+
+        return ! $isZero && ('-' === $this->sign);
+    }
+
+    public function isNonPositive() : bool
+    {
+        return false
+            || ('-' === $this->sign)
+            || (('' === $this->frac) && ('0' === $this->int));
+    }
+
+    public function isNonNegative() : bool
+    {
+        return false
+            || ('' === $this->sign)
+            || (('' === $this->frac) && ('0' === $this->int));
     }
 
 
@@ -169,6 +204,20 @@ class Bcnumber implements
     public function getInt() : string
     {
         return $this->int;
+    }
+
+
+    public function hasFrac(?string &$result = null) : bool
+    {
+        $result = null;
+
+        if ('' !== $this->frac) {
+            $result = $this->frac;
+
+            return true;
+        }
+
+        return false;
     }
 
     public function getFrac() : string

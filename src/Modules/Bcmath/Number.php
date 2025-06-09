@@ -134,7 +134,41 @@ class Number implements
 
     public function isInteger() : bool
     {
-        return $this->value === $this->getValueInt();
+        return $this->value === "{$this->sign}{$this->int}";
+    }
+
+
+    public function isZero() : bool
+    {
+        return ('' === $this->frac) && ('0' === $this->int);
+    }
+
+    public function isPositive() : bool
+    {
+        $isZero = (('' === $this->frac) && ('0' === $this->int));
+
+        return ! $isZero && ('' === $this->sign);
+    }
+
+    public function isNegative() : bool
+    {
+        $isZero = (('' === $this->frac) && ('0' === $this->int));
+
+        return ! $isZero && ('-' === $this->sign);
+    }
+
+    public function isNonPositive() : bool
+    {
+        return false
+            || ('-' === $this->sign)
+            || (('' === $this->frac) && ('0' === $this->int));
+    }
+
+    public function isNonNegative() : bool
+    {
+        return false
+            || ('' === $this->sign)
+            || (('' === $this->frac) && ('0' === $this->int));
     }
 
 
@@ -176,9 +210,37 @@ class Number implements
         return $this->int;
     }
 
+
+    public function hasFrac(?string &$result = null) : bool
+    {
+        $result = null;
+
+        if ('' !== $this->frac) {
+            $result = $this->frac;
+
+            return true;
+        }
+
+        return false;
+    }
+
     public function getFrac() : string
     {
         return $this->frac;
+    }
+
+
+    public function hasExp(?string &$result = null) : bool
+    {
+        $result = null;
+
+        if ('' !== $this->exp) {
+            $result = $this->exp;
+
+            return true;
+        }
+
+        return false;
     }
 
     public function getExp() : string

@@ -1408,76 +1408,84 @@ $fn = function () use ($ffn) {
     $ffn->print('[ BcmathModule ]');
     echo "\n";
 
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('0', 0);
+    $ffn->print('bcceil', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcceil', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 2);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcceil', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcceil', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 2);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcceil', $result, (string) $result);
     echo "\n";
 
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('0', 0);
+    $ffn->print('bcmoneyceil', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcmoneyceil', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 2);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcmoneyceil', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcmoneyceil', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 2);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcmoneyceil', $result, (string) $result);
     echo "\n";
 
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('0', 0);
+    $ffn->print('bcfloor', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcfloor', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005', 2);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcfloor', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcfloor', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005', 2);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcfloor', $result, (string) $result);
     echo "\n";
 
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('0', 0);
+    $ffn->print('bcmoneyfloor', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcmoneyfloor', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 2);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcmoneyfloor', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcmoneyfloor', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 2);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcmoneyfloor', $result, (string) $result);
     echo "\n";
 
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('0', 0);
+    $ffn->print('bcround', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcround', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.05', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcround', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 0);
-    $ffn->print($result, (string) $result);
-    echo "\n";
-
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 2);
-    $ffn->print($result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.05', 2);
-    $ffn->print($result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 2);
-    $ffn->print($result, (string) $result);
-    echo "\n";
-
+    $ffn->print('bcround', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.5', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcround', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.05', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcround', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.005', 0);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcround', $result, (string) $result);
     echo "\n";
 
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('0', 2);
+    $ffn->print('bcround', $result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 2);
+    $ffn->print('bcround', $result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.05', 2);
+    $ffn->print('bcround', $result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 2);
+    $ffn->print('bcround', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.5', 2);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcround', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.05', 2);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcround', $result, (string) $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.005', 2);
-    $ffn->print($result, (string) $result);
+    $ffn->print('bcround', $result, (string) $result);
     echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcgcd(8, 12);
@@ -1498,41 +1506,45 @@ $test = $ffn->test($fn);
 $test->expectStdout('
 "[ BcmathModule ]"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.01"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+"bcceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "0"
+"bcceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
+"bcceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.01"
+"bcceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+"bcceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.01"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-2"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
+"bcmoneyceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "0"
+"bcmoneyceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
+"bcmoneyceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.01"
+"bcmoneyceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-2"
+"bcmoneyceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-2"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
+"bcfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "0"
+"bcfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+"bcfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+"bcfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-2"
+"bcfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+"bcmoneyfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "0"
+"bcmoneyfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+"bcmoneyfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+"bcmoneyfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+"bcmoneyfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "0"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-2"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
 
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.5"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.05"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.01"
-
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-2"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
-
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.5"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.05"
-{ object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "0"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.5"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.05"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.01"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.5"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.05"
+"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
 
 { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "4"
 { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
