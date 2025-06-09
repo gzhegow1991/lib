@@ -138,7 +138,7 @@ class BcmathModule
         $theType = Lib::type();
 
         foreach ( $numbers as $i => $number ) {
-            if ($theType->bcnumber($bcnumber, $number)) {
+            if (! $theType->bcnumber($bcnumber, $number)) {
                 throw new LogicException(
                     [ 'Each of `numbers` should be bcnumber', $number, $i ]
                 );
