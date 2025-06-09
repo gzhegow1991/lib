@@ -198,18 +198,30 @@ class Number implements
         return $this->value;
     }
 
-    public function getValueAbsolute() : string
-    {
-        return "{$this->int}{$this->frac}{$this->exp}";
-    }
 
     public function getValueInteger() : string
     {
         return "{$this->sign}{$this->int}";
     }
 
+    public function getValueFrac() : string
+    {
+        return "{$this->sign}{$this->frac}";
+    }
+
+
+    public function getValueAbsolute() : string
+    {
+        return "{$this->int}{$this->frac}{$this->exp}";
+    }
+
     public function getValueAbsoluteInteger() : string
     {
         return $this->int;
+    }
+
+    public function getValueAbsoluteFrac() : string
+    {
+        return $this->frac;
     }
 }
