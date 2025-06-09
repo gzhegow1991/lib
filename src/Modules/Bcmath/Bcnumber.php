@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Modules\Bcmath;
 
 use Gzhegow\Lib\Modules\Php\Result\Ret;
-use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
@@ -245,7 +244,7 @@ class Bcnumber implements
 
     public function getValueFrac() : string
     {
-        return "{$this->sign}{$this->frac}";
+        return $this->sign . '0' . $this->frac;
     }
 
 
@@ -261,6 +260,6 @@ class Bcnumber implements
 
     public function getValueAbsoluteFrac() : string
     {
-        return $this->frac;
+        return '0' . $this->frac;
     }
 }
