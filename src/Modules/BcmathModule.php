@@ -659,8 +659,8 @@ class BcmathModule
         }
 
         $result = bcmod(
-            $bcnum1->getValueInteger(),
-            $bcnum2->getValueInteger(),
+            $bcnum1->getValueInt(),
+            $bcnum2->getValueInt(),
             0
         );
 

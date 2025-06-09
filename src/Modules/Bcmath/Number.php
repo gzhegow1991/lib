@@ -134,7 +134,7 @@ class Number implements
 
     public function isInteger() : bool
     {
-        return $this->value === $this->getValueInteger();
+        return $this->value === $this->getValueInt();
     }
 
 
@@ -199,7 +199,7 @@ class Number implements
     }
 
 
-    public function getValueInteger() : string
+    public function getValueInt() : string
     {
         return "{$this->sign}{$this->int}";
     }
@@ -215,7 +215,7 @@ class Number implements
         return "{$this->int}{$this->frac}{$this->exp}";
     }
 
-    public function getValueAbsoluteInteger() : string
+    public function getValueAbsoluteInt() : string
     {
         return $this->int;
     }
