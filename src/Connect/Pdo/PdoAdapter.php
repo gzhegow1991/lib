@@ -107,7 +107,7 @@ class PdoAdapter
 
         return Result::err(
             $ret,
-            [ 'The `from` should be instance of: ' . static::class, $from ],
+            [ 'The `from` should be an instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -128,7 +128,7 @@ class PdoAdapter
 
         return Result::err(
             $ret,
-            [ 'The `from` should be instance of: ' . \PDO::class, $from ],
+            [ 'The `from` should be an instance of: ' . \PDO::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -143,7 +143,7 @@ class PdoAdapter
         if (! (is_array($from) && ([] !== $from))) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be non-empty array', $from ],
+                [ 'The `from` should be a non-empty array', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -206,7 +206,7 @@ class PdoAdapter
         if (! (is_array($from) && ([] !== $from))) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be non-empty array', $from ],
+                [ 'The `from` should be a non-empty array', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -285,23 +285,23 @@ class PdoAdapter
 
         if (! (is_string($pdoDsn) && ('' !== $pdoDsn))) {
             throw new RuntimeException(
-                [ 'The `this[pdoDsn]` should be non-empty string', $this ]
+                [ 'The `this[pdoDsn]` should be a non-empty string', $this ]
             );
         }
         if (! (is_string($pdoUsername) && ('' !== $pdoUsername))) {
             throw new RuntimeException(
-                [ 'The `this[pdoUsername]` should be non-empty string', $this ]
+                [ 'The `this[pdoUsername]` should be a non-empty string', $this ]
             );
         }
         if (! (is_string($pdoPassword))) {
             throw new RuntimeException(
-                [ 'The `this[pdoPassword]` should be string', $this ]
+                [ 'The `this[pdoPassword]` should be a string', $this ]
             );
         }
         if (null !== $pdoDatabase) {
             if (! (is_string($pdoDatabase) && ('' !== $pdoDatabase))) {
                 throw new RuntimeException(
-                    [ 'The `this[pdoDatabase]` should be non-empty string', $this ]
+                    [ 'The `this[pdoDatabase]` should be a non-empty string', $this ]
                 );
             }
 
@@ -347,22 +347,22 @@ class PdoAdapter
 
         if (! (is_string($pdoDriver) && ('' !== $pdoDriver))) {
             throw new RuntimeException(
-                [ 'The `this[pdoDriver]` should be non-empty string', $this ]
+                [ 'The `this[pdoDriver]` should be a non-empty string', $this ]
             );
         }
         if (! (is_string($pdoHost) && ('' !== $pdoHost))) {
             throw new RuntimeException(
-                [ 'The `this[pdoHost]` should be non-empty string', $this ]
+                [ 'The `this[pdoHost]` should be a non-empty string', $this ]
             );
         }
         if (! (is_string($pdoUsername) && ('' !== $pdoUsername))) {
             throw new RuntimeException(
-                [ 'The `this[pdoUsername]` should be non-empty string', $this ]
+                [ 'The `this[pdoUsername]` should be a non-empty string', $this ]
             );
         }
         if (! (is_string($pdoPassword))) {
             throw new RuntimeException(
-                [ 'The `this[pdoPassword]` should be string', $this ]
+                [ 'The `this[pdoPassword]` should be a string', $this ]
             );
         }
 
@@ -371,7 +371,7 @@ class PdoAdapter
         if (null !== $pdoPort) {
             if (! (Lib::type()->string_not_empty($pdoPortString, $pdoPort))) {
                 throw new RuntimeException(
-                    [ 'The `this[pdoPort]` should be non-empty string', $this ]
+                    [ 'The `this[pdoPort]` should be a non-empty string', $this ]
                 );
             }
 
@@ -381,7 +381,7 @@ class PdoAdapter
         if (null !== $pdoDatabase) {
             if (! (is_string($pdoDatabase) && ('' !== $pdoDatabase))) {
                 throw new RuntimeException(
-                    [ 'The `this[pdoPassword]` should be non-empty string', $this ]
+                    [ 'The `this[pdoPassword]` should be a non-empty string', $this ]
                 );
             }
 

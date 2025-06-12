@@ -55,7 +55,7 @@ class DefaultInflector implements InflectorInterface
             if (! is_a($doctrineInflector, $interface = static::DOCTRINE_INFLECTOR)) {
                 throw new RuntimeException(
                     [
-                        'The `doctrineInflector` should be instance of: ' . $interface,
+                        'The `doctrineInflector` should be an instance of: ' . $interface,
                         $doctrineInflector,
                     ]
                 );
@@ -124,7 +124,7 @@ class DefaultInflector implements InflectorInterface
             if (! is_a($symfonyInflector, $interface = static::SYMFONY_INFLECTOR_INTERFACE)) {
                 throw new RuntimeException(
                     [
-                        'The `symfonyInflector` should be instance of: ' . $interface,
+                        'The `symfonyInflector` should be an instance of: ' . $interface,
                         $symfonyInflector,
                     ]
                 );

@@ -75,7 +75,7 @@ class DebugBacktracer implements DebugBacktracerInterface
         if (null !== $dirRoot) {
             if (! Lib::fs()->type_dirpath_realpath($realpath, $dirRoot)) {
                 throw new LogicException(
-                    [ 'The `rootDirectory` should be existing directory path', $dirRoot ]
+                    [ 'The `rootDirectory` should be an existing directory path', $dirRoot ]
                 );
             }
         }

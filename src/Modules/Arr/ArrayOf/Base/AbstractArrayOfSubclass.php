@@ -62,7 +62,7 @@ abstract class AbstractArrayOfSubclass extends AbstractArrayOf
         if (! is_object($value)) {
             throw new LogicException(
                 [
-                    'The `value` should be object',
+                    'The `value` should be an object',
                     $value,
                 ]
             );
@@ -71,7 +71,7 @@ abstract class AbstractArrayOfSubclass extends AbstractArrayOf
         if (! is_subclass_of($value, $this->valueClass)) {
             throw new LogicException(
                 [
-                    'The `value` should be subclass of: ' . $this->valueClass,
+                    'The `value` should be an instance of a subclass of: ' . $this->valueClass,
                     $value,
                 ]
             );

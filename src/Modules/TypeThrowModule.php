@@ -1214,6 +1214,58 @@ class TypeThrowModule
 
 
 	/**
+	 * @param string|null $r
+	 */
+	public function numeric_intpart(&$r, $value, array $refs = []): bool
+	{
+		if (Lib::type()->numeric_intpart($r, $value, $refs)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `numeric_intpart` is failed", $value, $refs ]);
+	}
+
+
+	/**
+	 * @param string|null $r
+	 */
+	public function numeric_fracpart(&$r, $value, array $refs = []): bool
+	{
+		if (Lib::type()->numeric_fracpart($r, $value, $refs)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `numeric_fracpart` is failed", $value, $refs ]);
+	}
+
+
+	/**
+	 * @param int|null $r
+	 */
+	public function int_intpart(&$r, $value): bool
+	{
+		if (Lib::type()->int_intpart($r, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `int_intpart` is failed", $value ]);
+	}
+
+
+	/**
+	 * @param float|null $r
+	 */
+	public function float_fracpart(&$r, $value): bool
+	{
+		if (Lib::type()->float_fracpart($r, $value)) {
+		    return true;
+		}
+
+		throw new LogicException([ "Typecheck `float_fracpart` is failed", $value ]);
+	}
+
+
+	/**
 	 * @param Number|null $r
 	 */
 	public function number(&$r, $value, ?bool $allowExp = null): bool

@@ -25,7 +25,7 @@ class ThrowableManager implements ThrowableManagerInterface
         if (null !== $dirRoot) {
             if (! Lib::fs()->type_dirpath_realpath($realpath, $dirRoot)) {
                 throw new LogicException(
-                    [ 'The `dirRoot` should be existing directory path', $dirRoot ]
+                    [ 'The `dirRoot` should be an existing directory path', $dirRoot ]
                 );
             }
         }
@@ -591,27 +591,68 @@ class ThrowableManager implements ThrowableManagerInterface
 
     protected function flagsDefault(?int $flags) : int
     {
-        $flagPairs = [
-            [ _DEBUG_THROWABLE_WITH_FILE, _DEBUG_THROWABLE_WITHOUT_FILE ],
-            [ _DEBUG_THROWABLE_WITH_OBJECT_CLASS, _DEBUG_THROWABLE_WITHOUT_OBJECT_CLASS ],
+        $flagsCurrent = $flags ?? 0;
+
+        $flagGroups = [
+            '_DEBUG_THROWABLE_WITH_FILE'         => [
+                [
+                    _DEBUG_THROWABLE_WITH_FILE,
+                    _DEBUG_THROWABLE_WITHOUT_FILE,
+                ],
+                _DEBUG_THROWABLE_WITH_FILE,
+            ],
             //
-            [ _DEBUG_THROWABLE_WITHOUT_CODE, _DEBUG_THROWABLE_WITH_CODE ],
-            [ _DEBUG_THROWABLE_WITHOUT_OBJECT_ID, _DEBUG_THROWABLE_WITH_OBJECT_ID ],
-            [ _DEBUG_THROWABLE_WITHOUT_PARENTS, _DEBUG_THROWABLE_WITH_PARENTS ],
+            '_DEBUG_THROWABLE_WITH_OBJECT_CLASS' => [
+                [
+                    _DEBUG_THROWABLE_WITH_OBJECT_CLASS,
+                    _DEBUG_THROWABLE_WITHOUT_OBJECT_CLASS,
+                ],
+                _DEBUG_THROWABLE_WITH_OBJECT_CLASS,
+            ],
+            //
+            '_DEBUG_THROWABLE_WITH_CODE'         => [
+                [
+                    _DEBUG_THROWABLE_WITH_CODE,
+                    _DEBUG_THROWABLE_WITHOUT_CODE,
+                ],
+                _DEBUG_THROWABLE_WITHOUT_CODE,
+            ],
+            //
+            '_DEBUG_THROWABLE_WITH_OBJECT_ID'    => [
+                [
+                    _DEBUG_THROWABLE_WITH_OBJECT_ID,
+                    _DEBUG_THROWABLE_WITHOUT_OBJECT_ID,
+                ],
+                _DEBUG_THROWABLE_WITHOUT_OBJECT_ID,
+            ],
+            //
+            '_DEBUG_THROWABLE_WITH_PARENTS'      => [
+                [
+                    _DEBUG_THROWABLE_WITH_PARENTS,
+                    _DEBUG_THROWABLE_WITHOUT_PARENTS,
+                ],
+                _DEBUG_THROWABLE_WITHOUT_PARENTS,
+            ],
         ];
 
-        $_flags = $flags ?? 0;
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flagsCurrent & $flag) {
+                    $cnt++;
+                }
+            }
 
-        foreach ( $flagPairs as [ $with, $without ] ) {
-            $hasWith = (bool) ($_flags & $with);
-            $hasWithout = (bool) ($_flags & $without);
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flags` conflict in group: ' . $groupName, $flags ]
+                );
 
-            if ((int) $hasWith + (int) $hasWithout !== 1) {
-                $_flags &= ~$without;
-                $_flags |= $with;
+            } elseif (0 === $cnt) {
+                $flagsCurrent |= $default;
             }
         }
 
-        return $_flags;
+        return $flagsCurrent;
     }
 }

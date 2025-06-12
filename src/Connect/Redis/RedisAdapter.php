@@ -91,7 +91,7 @@ class RedisAdapter
 
         return Result::err(
             $ret,
-            [ 'The `from` should be instance of: ' . static::class, $from ],
+            [ 'The `from` should be an instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -112,7 +112,7 @@ class RedisAdapter
 
         return Result::err(
             $ret,
-            [ 'The `from` should be instance of: ' . \PDO::class, $from ],
+            [ 'The `from` should be an instance of: ' . \PDO::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -127,7 +127,7 @@ class RedisAdapter
         if (! (is_array($from) && ([] !== $from))) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be non-empty array', $from ],
+                [ 'The `from` should be a non-empty array', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -188,7 +188,7 @@ class RedisAdapter
         if (! (is_array($from) && ([] !== $from))) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be non-empty array', $from ],
+                [ 'The `from` should be a non-empty array', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -220,25 +220,25 @@ class RedisAdapter
 
         if (! (is_string($redisHost) && ('' !== $redisHost))) {
             throw new RuntimeException(
-                [ 'The `this[pdoHost]` should be non-empty string', $this ]
+                [ 'The `this[pdoHost]` should be a non-empty string', $this ]
             );
         }
         if (! (Lib::type()->string_not_empty($redisPortString, $redisPort))) {
             throw new RuntimeException(
-                [ 'The `this[pdoPort]` should be non-empty string', $this ]
+                [ 'The `this[pdoPort]` should be a non-empty string', $this ]
             );
         }
         if (null !== $redisPassword) {
             if (! (is_string($redisPassword))) {
                 throw new RuntimeException(
-                    [ 'The `this[redisPassword]` should be string', $this ]
+                    [ 'The `this[redisPassword]` should be a string', $this ]
                 );
             }
         }
         if (null !== $redisNamespace) {
             if (! (is_string($redisNamespace) && ('' !== $redisNamespace))) {
                 throw new RuntimeException(
-                    [ 'The `this[redisNamespace]` should be non-empty string', $this ]
+                    [ 'The `this[redisNamespace]` should be a non-empty string', $this ]
                 );
             }
         }

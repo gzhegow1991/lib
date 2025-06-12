@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
@@ -1837,176 +1838,148 @@ class CmpModule
 
     protected function flagsModeDefault(?int $flagsMode = null) : int
     {
-        $flagsMode = $flagsMode ?? 0;
+        $flags = $flagsMode ?? 0;
 
-        $flags = $flagsMode;
+        $flagGroups = [
+            '_CMP_MODE_TYPECAST'    => [
+                [
+                    _CMP_MODE_TYPECAST_A,
+                    _CMP_MODE_TYPECAST_B,
+                ],
+                _CMP_MODE_TYPECAST_A | _CMP_MODE_TYPECAST_B,
+            ],
+            //
+            '_CMP_MODE_TYPE'        => [
+                [
+                    _CMP_MODE_TYPE_STRICT,
+                    _CMP_MODE_TYPE_TYPECAST_OR_NAN,
+                    _CMP_MODE_TYPE_TYPECAST_OR_CONTINUE,
+                ],
+                _CMP_MODE_TYPE_TYPECAST_OR_CONTINUE,
+            ],
+            //
+            '_CMP_MODE_STRING_SIZE' => [
+                [
+                    _CMP_MODE_STRING_SIZE_STRLEN,
+                    _CMP_MODE_STRING_SIZE_STRSIZE,
+                    _CMP_MODE_STRING_SIZE_IGNORE,
+                ],
+                _CMP_MODE_STRING_SIZE_STRLEN,
+            ],
+            //
+            '_CMP_MODE_STRING_VS'   => [
+                [
+                    _CMP_MODE_STRING_VS_STRNATCASECMP,
+                    _CMP_MODE_STRING_VS_STRCASECMP,
+                    _CMP_MODE_STRING_VS_STRNATCMP,
+                    _CMP_MODE_STRING_VS_STRCMP,
+                    _CMP_MODE_STRING_VS_IGNORE,
+                ],
+                _CMP_MODE_STRING_VS_STRCMP,
+            ],
+            //
+            '_CMP_MODE_ARRAY_SIZE'  => [
+                [
+                    _CMP_MODE_ARRAY_SIZE_COUNT,
+                    _CMP_MODE_ARRAY_SIZE_IGNORE,
+                ],
+                _CMP_MODE_ARRAY_SIZE_COUNT,
+            ],
+            //
+            '_CMP_MODE_ARRAY_VS'    => [
+                [
+                    _CMP_MODE_ARRAY_VS_SPACESHIP,
+                    _CMP_MODE_ARRAY_VS_IGNORE,
+                ],
+                _CMP_MODE_ARRAY_VS_IGNORE,
+            ],
+            //
+            '_CMP_MODE_DATE_VS'     => [
+                [
+                    _CMP_MODE_DATE_VS_YEAR,
+                    _CMP_MODE_DATE_VS_MONTH,
+                    _CMP_MODE_DATE_VS_DAY,
+                    _CMP_MODE_DATE_VS_HOUR,
+                    _CMP_MODE_DATE_VS_MIN,
+                    _CMP_MODE_DATE_VS_SEC,
+                    _CMP_MODE_DATE_VS_MSEC,
+                    _CMP_MODE_DATE_VS_USEC,
+                ],
+                _CMP_MODE_DATE_VS_USEC,
+            ],
+            //
+            '_CMP_MODE_OBJECT_SIZE' => [
+                [
+                    _CMP_MODE_OBJECT_SIZE_COUNT,
+                    _CMP_MODE_OBJECT_SIZE_IGNORE,
+                ],
+                _CMP_MODE_OBJECT_SIZE_COUNT,
+            ],
+        ];
 
-        $sum = 0;
-        $sum += (($flags & _CMP_MODE_TYPECAST_A) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_TYPECAST_B) ? 1 : 0);
-        if (0 === $sum) {
-            $flags &= ~(
-                _CMP_MODE_TYPECAST_A
-                | _CMP_MODE_TYPECAST_B
-            );
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flags & $flag) {
+                    $cnt++;
+                }
+            }
 
-            $flags |= (_CMP_MODE_TYPECAST_A | _CMP_MODE_TYPECAST_B);
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flagsMode` conflict in group: ' . $groupName, $flags ]
+                );
+
+            } elseif (0 === $cnt) {
+                $flags |= $default;
+            }
         }
-        unset($sum);
-
-        $sum = 0;
-        $sum += (($flags & _CMP_MODE_TYPE_STRICT) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_TYPE_TYPECAST_OR_NAN) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_TYPE_TYPECAST_OR_CONTINUE) ? 1 : 0);
-        if (1 !== $sum) {
-            $flags &= ~(
-                _CMP_MODE_TYPE_STRICT
-                | _CMP_MODE_TYPE_TYPECAST_OR_NAN
-                | _CMP_MODE_TYPE_TYPECAST_OR_CONTINUE
-            );
-
-            $flags |= _CMP_MODE_TYPE_TYPECAST_OR_CONTINUE;
-        }
-        unset($sum);
-
-        $sum = 0;
-        $sum += (($flags & _CMP_MODE_STRING_SIZE_STRLEN) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_STRING_SIZE_STRSIZE) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_STRING_SIZE_IGNORE) ? 1 : 0);
-        if (1 !== $sum) {
-            $flags &= ~(
-                _CMP_MODE_STRING_SIZE_STRLEN
-                | _CMP_MODE_STRING_SIZE_STRSIZE
-                | _CMP_MODE_STRING_SIZE_IGNORE
-            );
-
-            $flags |= _CMP_MODE_STRING_SIZE_STRLEN;
-        }
-        unset($sum);
-
-        $sum = 0;
-        $sum += (($flags & _CMP_MODE_STRING_VS_STRNATCASECMP) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_STRING_VS_STRCASECMP) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_STRING_VS_STRNATCMP) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_STRING_VS_STRCMP) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_STRING_VS_IGNORE) ? 1 : 0);
-        if (1 !== $sum) {
-            $flags &= ~(
-                _CMP_MODE_STRING_VS_STRNATCASECMP
-                | _CMP_MODE_STRING_VS_STRCASECMP
-                | _CMP_MODE_STRING_VS_STRNATCMP
-                | _CMP_MODE_STRING_VS_STRCMP
-                | _CMP_MODE_STRING_VS_IGNORE
-            );
-
-            $flags |= _CMP_MODE_STRING_VS_STRCMP;
-        }
-        unset($sum);
-
-        $sum = 0;
-        $sum += (($flags & _CMP_MODE_ARRAY_SIZE_COUNT) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_ARRAY_SIZE_IGNORE) ? 1 : 0);
-        if (1 !== $sum) {
-            $flags &= ~(
-                _CMP_MODE_ARRAY_SIZE_COUNT
-                | _CMP_MODE_ARRAY_SIZE_IGNORE
-            );
-
-            $flags |= _CMP_MODE_ARRAY_SIZE_COUNT;
-        }
-        unset($sum);
-
-        $sum = 0;
-        $sum += (($flags & _CMP_MODE_ARRAY_VS_SPACESHIP) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_ARRAY_VS_IGNORE) ? 1 : 0);
-        if (1 !== $sum) {
-            $flags &= ~(
-                _CMP_MODE_ARRAY_VS_SPACESHIP
-                | _CMP_MODE_ARRAY_VS_IGNORE
-            );
-
-            $flags |= _CMP_MODE_ARRAY_VS_IGNORE;
-        }
-        unset($sum);
-
-        $sum = 0;
-        $sum += (($flags & _CMP_MODE_DATE_VS_YEAR) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_DATE_VS_MONTH) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_DATE_VS_DAY) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_DATE_VS_HOUR) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_DATE_VS_MIN) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_DATE_VS_SEC) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_DATE_VS_MSEC) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_DATE_VS_USEC) ? 1 : 0);
-        if (1 !== $sum) {
-            $flags &= ~(
-                _CMP_MODE_DATE_VS_YEAR
-                | _CMP_MODE_DATE_VS_MONTH
-                | _CMP_MODE_DATE_VS_DAY
-                | _CMP_MODE_DATE_VS_HOUR
-                | _CMP_MODE_DATE_VS_MIN
-                | _CMP_MODE_DATE_VS_SEC
-                | _CMP_MODE_DATE_VS_MSEC
-                | _CMP_MODE_DATE_VS_USEC
-            );
-
-            $flags |= _CMP_MODE_DATE_VS_USEC;
-        }
-        unset($sum);
-
-        $sum = 0;
-        $sum += (($flags & _CMP_MODE_OBJECT_SIZE_COUNT) ? 1 : 0);
-        $sum += (($flags & _CMP_MODE_OBJECT_SIZE_IGNORE) ? 1 : 0);
-        if (1 !== $sum) {
-            $flags &= ~(
-                _CMP_MODE_OBJECT_SIZE_COUNT
-                | _CMP_MODE_OBJECT_SIZE_IGNORE
-            );
-
-            $flags |= _CMP_MODE_OBJECT_SIZE_COUNT;
-        }
-        unset($sum);
 
         return $flags;
     }
 
     protected function flagsResultDefault(?int $flagsResult = null) : int
     {
-        $flagsResult = $flagsResult ?? 0;
+        $flags = $flagsResult ?? 0;
 
-        $flags = $flagsResult;
+        $flagGroups = [
+            '_CMP_RESULT_NULL' => [
+                [
+                    _CMP_MODE_RESULT_SPACESHIP,
+                    _CMP_RESULT_NULL_0,
+                    _CMP_RESULT_NULL_A_LT,
+                    _CMP_RESULT_NULL_A_GT,
+                    _CMP_RESULT_NULL_NAN,
+                ],
+                _CMP_RESULT_NULL_NAN,
+            ],
+            //
+            '_CMP_RESULT_NAN'  => [
+                [
+                    _CMP_RESULT_NAN_THROW,
+                    _CMP_RESULT_NAN_RETURN,
+                ],
+                _CMP_RESULT_NAN_THROW,
+            ],
+        ];
 
-        $sum = 0;
-        $sum += (($flags & _CMP_MODE_RESULT_SPACESHIP) ? 1 : 0);
-        $sum += (($flags & _CMP_RESULT_NULL_0) ? 1 : 0);
-        $sum += (($flags & _CMP_RESULT_NULL_A_LT) ? 1 : 0);
-        $sum += (($flags & _CMP_RESULT_NULL_A_GT) ? 1 : 0);
-        $sum += (($flags & _CMP_RESULT_NULL_NAN) ? 1 : 0);
-        if (1 !== $sum) {
-            $flags &= ~(
-                _CMP_MODE_RESULT_SPACESHIP
-                | _CMP_RESULT_NULL_0
-                | _CMP_RESULT_NULL_A_LT
-                | _CMP_RESULT_NULL_A_GT
-                | _CMP_RESULT_NULL_NAN
-            );
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flags & $flag) {
+                    $cnt++;
+                }
+            }
 
-            $flags |= _CMP_RESULT_NULL_NAN;
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flagsResult` conflict in group: ' . $groupName, $flags ]
+                );
+
+            } elseif (0 === $cnt) {
+                $flags |= $default;
+            }
         }
-        unset($sum);
-
-        $sum = 0;
-        $sum += (($flags & _CMP_RESULT_NAN_THROW) ? 1 : 0);
-        $sum += (($flags & _CMP_RESULT_NAN_RETURN) ? 1 : 0);
-        if (1 !== $sum) {
-            $flags &= ~(
-                _CMP_RESULT_NAN_THROW
-                | _CMP_RESULT_NAN_RETURN
-            );
-
-            $flags |= _CMP_RESULT_NAN_THROW;
-        }
-        unset($sum);
 
         return $flags;
     }

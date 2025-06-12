@@ -37,7 +37,7 @@ class FormatCsv
         if ([] === $rows) {
             return Result::err(
                 $ret,
-                [ 'The `rows` should be not-empty array' ],
+                [ 'The `rows` should be a non-empty array' ],
                 [ __FILE__, __LINE__ ],
             );
         }
@@ -50,7 +50,7 @@ class FormatCsv
             if (! $isNonEmptyArray) {
                 return Result::err(
                     $ret,
-                    [ 'Each of `rows` should be not-empty array', $row, $i ],
+                    [ 'Each of `rows` should be a non-empty array', $row, $i ],
                     [ __FILE__, __LINE__ ],
                 );
             }
@@ -61,7 +61,7 @@ class FormatCsv
         if (! $theType->char($separatorString, $separator ?? ';')) {
             return Result::err(
                 $ret,
-                [ 'The `separator` should be char', $separator ],
+                [ 'The `separator` should be a char', $separator ],
                 [ __FILE__, __LINE__ ],
             );
         }
@@ -69,7 +69,7 @@ class FormatCsv
         if (! $theType->char($enclosureString, $enclosure ?? '"')) {
             return Result::err(
                 $ret,
-                [ 'The `enclosure` should be char', $enclosure ],
+                [ 'The `enclosure` should be a char', $enclosure ],
                 [ __FILE__, __LINE__ ],
             );
         }
@@ -77,7 +77,7 @@ class FormatCsv
         if (! $theType->char($escapeString, $escape ?? '\\')) {
             return Result::err(
                 $ret,
-                [ 'The `escape` should be char', $escape ],
+                [ 'The `escape` should be a char', $escape ],
                 [ __FILE__, __LINE__ ],
             );
         }
@@ -85,7 +85,7 @@ class FormatCsv
         if (! $theType->string_not_empty($eolString, $eol ?? "\n")) {
             return Result::err(
                 $ret,
-                [ 'The `eol` should be non-empty string', $eol ],
+                [ 'The `eol` should be a non-empty string', $eol ],
                 [ __FILE__, __LINE__ ],
             );
         }
@@ -129,7 +129,7 @@ class FormatCsv
         if ([] === $row) {
             return Result::err(
                 $ret,
-                [ 'The `row` should be not-empty array' ],
+                [ 'The `row` should be a non-empty array' ],
                 [ __FILE__, __LINE__ ],
             );
         }
@@ -139,7 +139,7 @@ class FormatCsv
         if (! $theType->char($separatorString, $separator ?? ';')) {
             return Result::err(
                 $ret,
-                [ 'The `separator` should be char', $separator ],
+                [ 'The `separator` should be a char', $separator ],
                 [ __FILE__, __LINE__ ],
             );
         }
@@ -147,7 +147,7 @@ class FormatCsv
         if (! $theType->char($enclosureString, $enclosure ?? '"')) {
             return Result::err(
                 $ret,
-                [ 'The `enclosure` should be char', $enclosure ],
+                [ 'The `enclosure` should be a char', $enclosure ],
                 [ __FILE__, __LINE__ ],
             );
         }
@@ -155,7 +155,7 @@ class FormatCsv
         if (! $theType->char($escapeString, $escape ?? '\\')) {
             return Result::err(
                 $ret,
-                [ 'The `escape` should be char', $escape ],
+                [ 'The `escape` should be a char', $escape ],
                 [ __FILE__, __LINE__ ],
             );
         }
@@ -163,7 +163,7 @@ class FormatCsv
         if (! $theType->string_not_empty($eolString, $eol ?? "\n")) {
             return Result::err(
                 $ret,
-                [ 'The `eol` should be non-empty string', $eol ],
+                [ 'The `eol` should be a non-empty string', $eol ],
                 [ __FILE__, __LINE__ ],
             );
         }

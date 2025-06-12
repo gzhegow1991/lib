@@ -123,13 +123,13 @@ class UrlModule
 
         if ($hasQuery && (null === $_query)) {
             throw new LogicException(
-                [ 'The `query` should be string, array or false', $query ]
+                [ 'The `query` should be a string, an array or a false', $query ]
             );
         }
 
         if ($hasFragment && (null === $_fragment)) {
             throw new LogicException(
-                [ 'The `fragment` should be string or false', $fragment ]
+                [ 'The `fragment` should be a string or the FALSE', $fragment ]
             );
         }
 
@@ -292,13 +292,13 @@ class UrlModule
 
         if ($hasQuery && (null === $_query)) {
             throw new LogicException(
-                [ 'The `query` should be string, array or false', $query ]
+                [ 'The `query` should be a string, an array or a false', $query ]
             );
         }
 
         if ($hasFragment && (null === $_fragment)) {
             throw new LogicException(
-                [ 'The `fragment` should be string or false', $fragment ]
+                [ 'The `fragment` should be a string or the FALSE', $fragment ]
             );
         }
 

@@ -239,7 +239,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             if (! $theType->regex($regexp, $regex)) {
                 throw new RuntimeException(
                     [
-                        'Each of `regexList` should be valid regular expression',
+                        'Each of `regexList` should be a valid regular expression',
                         $regex,
                         $i,
                     ]
@@ -404,7 +404,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
         } else {
             if (! Lib::type()->string_not_empty($phone, $value)) {
                 throw new LogicException(
-                    [ 'The `value` should be non-empty string' ]
+                    [ 'The `value` should be a non-empty string' ]
                 );
             }
 
@@ -412,7 +412,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
             if ('' === $tel) {
                 throw new LogicException(
-                    [ 'The `tel` should be valid phone number', $value ]
+                    [ 'The `tel` should be a valid phone number', $value ]
                 );
             }
 
@@ -469,7 +469,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
         if (null === $isFake) {
             throw new RuntimeException(
                 [
-                    'The `value` must be fake phone number',
+                    'The `value` should be a fake phone number',
                     $value,
                 ]
             );
@@ -500,7 +500,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
                 if (false !== $dt) {
                     throw new RuntimeException(
                         [
-                            'The `value` must be not date-like',
+                            'The `value` should not be a datelike phone',
                             $value,
                         ]
                     );

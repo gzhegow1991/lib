@@ -56,7 +56,7 @@ abstract class AbstractDictOfResourceType extends AbstractDictOf
         if (! is_resource($value)) {
             throw new LogicException(
                 [
-                    'The `value` should be resource',
+                    'The `value` should be a resource',
                     $value,
                 ]
             );
@@ -65,7 +65,7 @@ abstract class AbstractDictOfResourceType extends AbstractDictOf
         if (get_resource_type($value) !== $this->valueResourceType) {
             throw new LogicException(
                 [
-                    'The `value` should be resource of type: ' . $this->valueResourceType,
+                    'The `value` should be a resource of type: ' . $this->valueResourceType,
                     $value,
                 ]
             );

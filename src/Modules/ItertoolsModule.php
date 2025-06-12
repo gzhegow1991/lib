@@ -47,7 +47,7 @@ class ItertoolsModule
             || is_float($start)
         )) {
             throw new LogicException(
-                [ 'The `start` should be int|float|string', $start ]
+                [ 'The `start` should be an int|float|string', $start ]
             );
         }
 
@@ -57,7 +57,7 @@ class ItertoolsModule
             || is_float($end)
         )) {
             throw new LogicException(
-                [ 'The `end` should be int|float|string', $end ]
+                [ 'The `end` should be an int|float|string', $end ]
             );
         }
 
@@ -66,7 +66,7 @@ class ItertoolsModule
             || is_int($step)
         )) {
             throw new LogicException(
-                [ 'The `step` should be int|float', $step ]
+                [ 'The `step` should be an int|float', $step ]
             );
         }
 
@@ -89,7 +89,7 @@ class ItertoolsModule
 
         if ($isModeString && $isFloatStep) {
             throw new LogicException(
-                [ 'The `step` should be integer if `start` or `end` are strings', $step ]
+                [ 'The `step` should be an integer if `start` or `end` are strings', $step ]
             );
         }
 

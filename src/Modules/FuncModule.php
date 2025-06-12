@@ -415,7 +415,7 @@ class FuncModule
     {
         if ($throttleMs <= 0) {
             throw new LogicException(
-                [ 'The `delayMs` should be positive integer', $throttleMs ]
+                [ 'The `delayMs` should be a positive integer', $throttleMs ]
             );
         }
 

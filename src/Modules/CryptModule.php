@@ -595,7 +595,7 @@ class CryptModule
 
         if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
-                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+                [ 'The `alphabetTo` should be a valid alphabet', $alphabetTo ]
             );
         }
 
@@ -664,7 +664,7 @@ class CryptModule
         if (! $this->type_base($_numbaseString, $baseString, $alphabetFrom)) {
             throw new LogicException(
                 [
-                    'The `numbaseString` should be valid `base` of given `alphabetFrom`',
+                    'The `numbaseString` should be a valid `base` of given `alphabetFrom`',
                     $baseString,
                     $alphabetFrom,
                 ]
@@ -737,7 +737,7 @@ class CryptModule
 
         if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
-                [ 'The `alphabetFrom` should be valid alphabet', $alphabetTo ]
+                [ 'The `alphabetFrom` should be a valid alphabet', $alphabetTo ]
             );
         }
 
@@ -848,7 +848,7 @@ class CryptModule
 
         if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
-                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+                [ 'The `alphabetTo` should be a valid alphabet', $alphabetTo ]
             );
         }
 
@@ -874,7 +874,7 @@ class CryptModule
         foreach ( $binariesIt as $binary ) {
             if (! $this->type_base_bin($_binary, $binary)) {
                 throw new LogicException(
-                    [ 'Each of `binaries` must be valid `baseBin`', $binary ]
+                    [ 'Each of `binaries` should be a valid `baseBin`', $binary ]
                 );
             }
 
@@ -923,7 +923,7 @@ class CryptModule
 
         if (! Lib::type()->alphabet($_alphabetFrom, $alphabetFrom)) {
             throw new LogicException(
-                [ 'The `alphabetTo` should be valid alphabet', $alphabetFrom ]
+                [ 'The `alphabetTo` should be a valid alphabet', $alphabetFrom ]
             );
         }
 
@@ -953,7 +953,7 @@ class CryptModule
             if (preg_match($alphabetFromRegexNot, $baseString)) {
                 if ($isThrow) {
                     throw new LogicException(
-                        [ 'Each of `baseStrings` should be valid baseString of given alphabet', $baseString, $alphabetFrom ]
+                        [ 'Each of `baseStrings` should be a valid `baseString` of given alphabet', $baseString, $alphabetFrom ]
                     );
                 }
 
@@ -996,13 +996,13 @@ class CryptModule
     {
         if (! $this->type_base_bin($_binary, $binary)) {
             throw new LogicException(
-                [ 'The `binary` should be valid `baseBin`', $binary ]
+                [ 'The `binary` should be a valid `baseBin`', $binary ]
             );
         }
 
         if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
-                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+                [ 'The `alphabetTo` should be a valid alphabet', $alphabetTo ]
             );
         }
 
@@ -1066,7 +1066,7 @@ class CryptModule
         if (! $this->type_base($_numbaseString, $binbaseString, $alphabetFrom)) {
             throw new LogicException(
                 [
-                    'The `numbaseString` should be valid `base` of given `alphabetFrom`',
+                    'The `numbaseString` should be a valid `base` of given `alphabetFrom`',
                     $binbaseString,
                     $alphabetFrom,
                 ]
@@ -1128,13 +1128,13 @@ class CryptModule
 
         if (! $this->type_base_dec($_decString, $decString)) {
             throw new LogicException(
-                [ 'The `decString` should be valid `baseDec`', $decString ]
+                [ 'The `decString` should be a valid `baseDec`', $decString ]
             );
         }
 
         if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
-                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+                [ 'The `alphabetTo` should be a valid alphabet', $alphabetTo ]
             );
         }
 
@@ -1159,7 +1159,7 @@ class CryptModule
             if (bccomp($left, '0', 1) === 0) {
                 throw new RuntimeException(
                     [
-                        'The `decInteger` should be greater than zero due to `oneBasedTo` is set to TRUE',
+                        'The `decInteger` should be GT 0 due to `oneBasedTo` is set to TRUE',
                         $alphabetTo,
                         $isOneBasedTo,
                     ]
@@ -1194,7 +1194,7 @@ class CryptModule
         if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
             throw new LogicException(
                 [
-                    'The `numbaseString` should be valid `base` for given alphabet',
+                    'The `numbaseString` should be a valid `base` for given alphabet',
                     $numbaseString,
                     $alphabetFrom,
                 ]
@@ -1254,7 +1254,7 @@ class CryptModule
         if (! $this->type_base($_numbaseString, $numbaseString, $alphabetFrom)) {
             throw new LogicException(
                 [
-                    'The `numbaseString` should be valid `base` of given `alphabetFrom`',
+                    'The `numbaseString` should be a valid `base` of given `alphabetFrom`',
                     $numbaseString,
                     $alphabetFrom,
                 ]
@@ -1263,7 +1263,7 @@ class CryptModule
 
         if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
-                [ 'The `alphabetTo` should be valid alphabet', $alphabetTo ]
+                [ 'The `alphabetTo` should be a valid alphabet', $alphabetTo ]
             );
         }
 

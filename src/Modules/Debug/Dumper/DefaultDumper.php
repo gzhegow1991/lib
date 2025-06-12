@@ -118,7 +118,7 @@ class DefaultDumper implements DumperInterface
             if (! is_a($symfonyCloner, $interface = static::SYMFONY_CLONER_INTERFACE)) {
                 throw new RuntimeException(
                     [
-                        'The `symfonyCloner` should be instance of: ' . $interface,
+                        'The `symfonyCloner` should be an instance of: ' . $interface,
                         $symfonyCloner,
                     ]
                 );
@@ -176,7 +176,7 @@ class DefaultDumper implements DumperInterface
             if (! is_a($symfonyCliDumper, $interface = static::SYMFONY_CLI_DUMPER)) {
                 throw new RuntimeException(
                     [
-                        'The `symfonyCliDumper` should be instance of: ' . $interface,
+                        'The `symfonyCliDumper` should be an instance of: ' . $interface,
                         $symfonyCliDumper,
                     ]
                 );
@@ -230,7 +230,7 @@ class DefaultDumper implements DumperInterface
             if (! is_a($symfonyHtmlDumper, $interface = static::SYMFONY_HTML_DUMPER)) {
                 throw new RuntimeException(
                     [
-                        'The `symfonyHtmlDumper` should be instance of: ' . $interface,
+                        'The `symfonyHtmlDumper` should be an instance of: ' . $interface,
                         $symfonyHtmlDumper,
                     ]
                 );
@@ -634,21 +634,21 @@ class DefaultDumper implements DumperInterface
 
         if (! ($pdo instanceof \PDO)) {
             throw new LogicException(
-                'The `options.pdo` should be instance of: ' . \PDO::class
+                'The `options.pdo` should be an instance of: ' . \PDO::class
             );
         }
 
         $_table = (string) $table;
         if ('' === $_table) {
             throw new LogicException(
-                'The `options.table` should be non-empty string'
+                'The `options.table` should be a non-empty string'
             );
         }
 
         $_column = (string) $column;
         if ('' === $_column) {
             throw new LogicException(
-                'The `options.column` should be non-empty string'
+                'The `options.column` should be a non-empty string'
             );
         }
 

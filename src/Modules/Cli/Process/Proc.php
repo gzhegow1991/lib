@@ -234,7 +234,7 @@ class Proc
         if (null !== ($cwdRealpath = $cwd)) {
             if (! Lib::type()->dirpath_realpath($cwdRealpath, $cwd, true)) {
                 throw new LogicException(
-                    [ 'The `cwd` should be existing directory', $cwd ]
+                    [ 'The `cwd` should be an existing directory', $cwd ]
                 );
             }
         }
@@ -305,7 +305,7 @@ class Proc
 
         } else {
             throw new LogicException(
-                [ 'The `stdin` should be resource, filepath or string', $stdin ]
+                [ 'The `stdin` should be a resource, a filepath or a string', $stdin ]
             );
         }
 
@@ -329,7 +329,7 @@ class Proc
 
             if (! Lib::type()->filepath($stdoutFilePath, $stdoutFile, true)) {
                 throw new LogicException(
-                    [ 'The `stdout` should be resource', $stdoutFile ]
+                    [ 'The `stdout` should be a resource', $stdoutFile ]
                 );
             }
 
@@ -381,7 +381,7 @@ class Proc
 
             if (! is_resource($stdoutResource)) {
                 throw new LogicException(
-                    [ 'The `stdout` should be resource', $stdoutResource ]
+                    [ 'The `stdout` should be a resource', $stdoutResource ]
                 );
             }
         }
@@ -408,7 +408,7 @@ class Proc
 
             if (! Lib::type()->filepath($stderrFilePath, $stderrFile, true)) {
                 throw new LogicException(
-                    [ 'The `stdout` should be resource', $stderrFile ]
+                    [ 'The `stdout` should be a resource', $stderrFile ]
                 );
             }
 
@@ -460,7 +460,7 @@ class Proc
 
             if (! is_resource($stderrResource)) {
                 throw new LogicException(
-                    [ 'The `stdout` should be resource', $stderrResource ]
+                    [ 'The `stdout` should be a resource', $stderrResource ]
                 );
             }
         }
@@ -481,7 +481,7 @@ class Proc
         if (null !== ($timeoutMsInt = $timeoutMs)) {
             if (! Lib::type()->int_positive($timeoutMsInt, $timeoutMs)) {
                 throw new LogicException(
-                    [ 'The `timeoutMs` should be integer positive', $timeoutMs ]
+                    [ 'The `timeoutMs` should be a positive integer', $timeoutMs ]
                 );
             }
         }
@@ -521,7 +521,7 @@ class Proc
 
         if (! $theType->dirpath_realpath($dirSystemRootRealpath, $dirSystemRoot)) {
             throw new LogicException(
-                [ 'The `dirSystemRoot` should be existing directory', $dirSystemRoot ]
+                [ 'The `dirSystemRoot` should be an existing directory', $dirSystemRoot ]
             );
         }
 
@@ -529,7 +529,7 @@ class Proc
 
         if (! $theType->filepath_realpath($cmdExeFileRealpath, $cmdExeFile)) {
             throw new LogicException(
-                [ 'The `cmdExeFile` should be existing file', $cmdExeFile ]
+                [ 'The `cmdExeFile` should be an existing file', $cmdExeFile ]
             );
         }
 
@@ -633,7 +633,7 @@ class Proc
                 foreach ( $this->stdinIterable as $line ) {
                     if (! $theType->string($lineString, $line)) {
                         throw new LogicException(
-                            [ 'The `stdinIterable` should be iterable of strings', $line ]
+                            [ 'The `stdinIterable` should be an iterable of strings', $line ]
                         );
                     }
 
@@ -758,7 +758,7 @@ class Proc
                 foreach ( $this->stdinIterable as $line ) {
                     if (! $theType->string($lineString, $line)) {
                         throw new LogicException(
-                            [ 'The `stdinIterable` should be iterable of strings', $line ]
+                            [ 'The `stdinIterable` should be an iterable of strings', $line ]
                         );
                     }
 
@@ -822,7 +822,7 @@ class Proc
     {
         if (null !== $this->procOpenResource) {
             throw new RuntimeException(
-                [ 'The `procOpenResource` should be resource' ]
+                [ 'The `procOpenResource` should be a resource' ]
             );
         }
 
@@ -934,7 +934,7 @@ class Proc
             };
         }
 
-        $exitCode = Lib::php()->poolingSync(
+        $exitCode = Lib::php()->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             $fnTick

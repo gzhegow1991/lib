@@ -27,7 +27,7 @@ class ExceptionIterator implements \RecursiveIterator
         foreach ( $_items as $e ) {
             if (! ($e instanceof \Throwable)) {
                 throw new \LogicException(
-                    'Each of `items` should be instance of: ' . \Throwable::class
+                    'Each of `items` should be an instance of: ' . \Throwable::class
                 );
             }
         }
@@ -38,13 +38,13 @@ class ExceptionIterator implements \RecursiveIterator
 
             if ('' === $iString) {
                 throw new \LogicException(
-                    'Each of keys of `track` should be non-empty string'
+                    'Each of keys of `track` should be an non-empty string'
                 );
             }
 
             if (! ($e instanceof \Throwable)) {
                 throw new \LogicException(
-                    'Each of `track` should be instance of: ' . \Throwable::class
+                    'Each of `track` should be an instance of: ' . \Throwable::class
                 );
             }
 

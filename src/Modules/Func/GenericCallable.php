@@ -207,7 +207,7 @@ class GenericCallable implements
 
         return Result::err(
             $ret,
-            [ 'The `from` should be instance of: ' . static::class, $from ],
+            [ 'The `from` should be an instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -222,7 +222,7 @@ class GenericCallable implements
         if (! ($from instanceof \Closure)) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be instance of \Closure', $from ],
+                [ 'The `from` should be an instance of \Closure', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -252,7 +252,7 @@ class GenericCallable implements
         if (! Lib::php()->type_method_string($methodString, $from, [ &$methodArray ])) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be existing method', $from ],
+                [ 'The `from` should be an existing method', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -303,7 +303,7 @@ class GenericCallable implements
         if (! is_object($from)) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be object', $from ],
+                [ 'The `from` should be an object', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -311,7 +311,7 @@ class GenericCallable implements
         if (! method_exists($from, '__invoke')) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be invokable object', $from ],
+                [ 'The `from` should be an invokable object', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -342,7 +342,7 @@ class GenericCallable implements
         if (! Lib::type()->string_not_empty($invokableClass, $from)) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be non-empty string', $from ],
+                [ 'The `from` should be a non-empty string', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -350,7 +350,7 @@ class GenericCallable implements
         if (! class_exists($invokableClass)) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be existing class', $from ],
+                [ 'The `from` should be an existing class', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -358,7 +358,7 @@ class GenericCallable implements
         if (! method_exists($invokableClass, '__invoke')) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be invokable class', $from ],
+                [ 'The `from` should be an invokable class', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -388,7 +388,7 @@ class GenericCallable implements
         if (! Lib::type()->string_not_empty($_function, $function)) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be existing function name', $function ],
+                [ 'The `from` should be an existing function name', $function ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -396,7 +396,7 @@ class GenericCallable implements
         if (! function_exists($_function)) {
             return Result::err(
                 $ret,
-                [ 'The `from` should be existing function name', $_function ],
+                [ 'The `from` should be an existing function name', $_function ],
                 [ __FILE__, __LINE__ ]
             );
         }

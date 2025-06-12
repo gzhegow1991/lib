@@ -50,7 +50,7 @@ abstract class AbstractDictOf implements
             throw new LogicException(
                 [
                     ''
-                    . 'The `valueType` must be one of: '
+                    . 'The `valueType` should be one of: '
                     . implode('|', array_keys($mapValueTypes)),
                     //
                     $valueType,
@@ -161,7 +161,7 @@ abstract class AbstractDictOf implements
     {
         if (! is_string($key)) {
             throw new LogicException(
-                [ 'The `key` of dict should be string', $key ]
+                [ 'The `key` of the dict should be a string', $key ]
             );
         }
 

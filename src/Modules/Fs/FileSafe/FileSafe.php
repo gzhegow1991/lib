@@ -90,7 +90,7 @@ class FileSafe
 
         if (! $isResource) {
             throw new LogicException(
-                [ 'The `resource` should be resource', $resource ]
+                [ 'The `resource` should be a resource', $resource ]
             );
         }
 
@@ -150,7 +150,7 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $resourceLocked = Lib::php()->poolingSync(
+        $resourceLocked = Lib::php()->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -203,7 +203,7 @@ class FileSafe
 
         if (! $isResource) {
             throw new LogicException(
-                [ 'The `resource` should be resource', $resource ]
+                [ 'The `resource` should be a resource', $resource ]
             );
         }
 
@@ -287,7 +287,7 @@ class FileSafe
 
         $this->context->onFinallyFclose($resource);
 
-        $resourceLocked = Lib::php()->poolingSync(
+        $resourceLocked = Lib::php()->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -348,7 +348,7 @@ class FileSafe
 
         if (! $isResource) {
             throw new LogicException(
-                [ 'The `resource` should be resource', $resource ]
+                [ 'The `resource` should be a resource', $resource ]
             );
         }
 
@@ -444,7 +444,7 @@ class FileSafe
         $this->context->onFinallyUnlink($file);
         $this->context->onFinallyFclose($resource);
 
-        $resourceLocked = Lib::php()->poolingSync(
+        $resourceLocked = Lib::php()->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -529,7 +529,7 @@ class FileSafe
 
         if (! $isResource) {
             throw new LogicException(
-                [ 'The `resource` should be resource', $resource ]
+                [ 'The `resource` should be a resource', $resource ]
             );
         }
 
@@ -1651,7 +1651,7 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $content = Lib::php()->poolingSync(
+        $content = Lib::php()->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -1736,7 +1736,7 @@ class FileSafe
 
         } else {
             throw new LogicException(
-                [ 'The `data` should be string, array of strings or resource', $data ]
+                [ 'The `data` should be a string, an array of strings or a resource', $data ]
             );
         }
 
@@ -1814,7 +1814,7 @@ class FileSafe
 
         } else {
             throw new LogicException(
-                [ 'The `data` should be string, array of strings or resource', $data ]
+                [ 'The `data` should be a string, an array of strings or a resource', $data ]
             );
         }
 
@@ -1846,7 +1846,7 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $len = Lib::php()->poolingSync(
+        $len = Lib::php()->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -2045,7 +2045,7 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $content = Lib::php()->poolingSync(
+        $content = Lib::php()->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -2159,7 +2159,7 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $size = Lib::php()->poolingSync(
+        $size = Lib::php()->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (

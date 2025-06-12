@@ -87,37 +87,37 @@ class FilesystemFetchApi implements FetchApiInterface
 
         if (! $theType->dirpath_realpath($binDirRealpath, $binDir = $config[ 'bin_dir' ] ?? $binDirDefault)) {
             throw new LogicException(
-                [ 'The `config[bin_dir]` should be existing directory', $binDir ]
+                [ 'The `config[bin_dir]` should be an existing directory', $binDir ]
             );
         }
         if (! $theType->dirpath_realpath($poolDirRealpath, $poolDir = $config[ 'pool_dir' ] ?? $poolDirDefault)) {
             throw new LogicException(
-                [ 'The `config[pool_dir]` should be existing directory', $poolDir ]
+                [ 'The `config[pool_dir]` should be an existing directory', $poolDir ]
             );
         }
         if (! $theType->dirpath_realpath($queueDirRealpath, $queueDir = $config[ 'queue_dir' ] ?? $queueDirDefault)) {
             throw new LogicException(
-                [ 'The `config[queue_dir]` should be existing directory', $queueDir ]
+                [ 'The `config[queue_dir]` should be an existing directory', $queueDir ]
             );
         }
         if (! $theType->dirpath_realpath($taskResultDirRealpath, $taskResultDir = $config[ 'task_result_dir' ] ?? $taskResultDirDefault)) {
             throw new LogicException(
-                [ 'The `config[task_result_dir]` should be existing directory', $taskResultDir ]
+                [ 'The `config[task_result_dir]` should be an existing directory', $taskResultDir ]
             );
         }
         if (! $theType->filename($binFilename, $binFilenameSrc = $config[ 'bin_filename' ] ?? 'curl-api.php')) {
             throw new LogicException(
-                [ 'The `config[bin_filename]` should be valid filename', $binFilenameSrc ]
+                [ 'The `config[bin_filename]` should be a valid filename', $binFilenameSrc ]
             );
         }
         if (! $theType->filename($poolFilename, $poolFilenameSrc = $config[ 'pool_filename' ] ?? 'curl-api.pool')) {
             throw new LogicException(
-                [ 'The `config[pool_filename]` should be valid filename', $poolFilenameSrc ]
+                [ 'The `config[pool_filename]` should be a valid filename', $poolFilenameSrc ]
             );
         }
         if (! $theType->filename($queueFilename, $queueFilenameSrc = $config[ 'queue_filename' ] ?? 'curl-api.queue')) {
             throw new LogicException(
-                [ 'The `config[queue_filename]` should be valid filename', $queueFilenameSrc ]
+                [ 'The `config[queue_filename]` should be a valid filename', $queueFilenameSrc ]
             );
         }
 
@@ -132,17 +132,17 @@ class FilesystemFetchApi implements FetchApiInterface
 
         if (! $theType->filepath_realpath($binFileRealpath, $binFile)) {
             throw new LogicException(
-                [ 'The `binFile` should be existing file', $binFile ]
+                [ 'The `binFile` should be an existing file', $binFile ]
             );
         }
         if (! $theType->filepath($poolFile, $poolFile, true)) {
             throw new LogicException(
-                [ 'The `poolFile` should be valid filepath', $poolFile ]
+                [ 'The `poolFile` should be a valid filepath', $poolFile ]
             );
         }
         if (! $theType->freepath($queueFile, $queueFile)) {
             throw new LogicException(
-                [ 'The `queueFile` should be valid filepath', $queueFile ]
+                [ 'The `queueFile` should be a valid filepath', $queueFile ]
             );
         }
 
@@ -172,13 +172,13 @@ class FilesystemFetchApi implements FetchApiInterface
 
         if (! $theType->url($urlString, $url)) {
             throw new LogicException(
-                [ 'The `url` should be valid url', $url ]
+                [ 'The `url` should be a valid url', $url ]
             );
         }
 
         if (! $theType->list($curlOptionsList, $curlOptions)) {
             throw new LogicException(
-                [ 'The `curlOptions` should be list of CURL options', $curlOptions ]
+                [ 'The `curlOptions` should be a list of `CURL options`', $curlOptions ]
             );
         }
 
@@ -245,7 +245,7 @@ class FilesystemFetchApi implements FetchApiInterface
     {
         if (! Lib::type()->string_not_empty($taskIdString, $taskId)) {
             throw new LogicException(
-                [ 'The `taskId` should be non-empty string', $taskId ]
+                [ 'The `taskId` should be a non-empty string', $taskId ]
             );
         }
 
@@ -259,7 +259,7 @@ class FilesystemFetchApi implements FetchApiInterface
     {
         if (! Lib::type()->string_not_empty($taskIdString, $taskId)) {
             throw new LogicException(
-                [ 'The `taskId` should be non-empty string', $taskId ]
+                [ 'The `taskId` should be a non-empty string', $taskId ]
             );
         }
 
@@ -371,14 +371,14 @@ class FilesystemFetchApi implements FetchApiInterface
 
         if (! $theType->int_positive($daemonTimeoutMsInt, $daemonTimeoutMs)) {
             throw new LogicException(
-                [ 'The `timeoutMs` should be positive integer', $daemonTimeoutMs ]
+                [ 'The `timeoutMs` should be a positive integer', $daemonTimeoutMs ]
             );
         }
 
         if ((null !== ($nowMicrotimeFloat = $nowMicrotime))) {
             if (! $theType->float_non_negative($nowMicrotimeFloat, $nowMicrotime)) {
                 throw new LogicException(
-                    [ 'The `nowMicrotime` should be non-negative float', $nowMicrotime ]
+                    [ 'The `nowMicrotime` should be a non-negative float', $nowMicrotime ]
                 );
             }
         }
@@ -400,7 +400,7 @@ class FilesystemFetchApi implements FetchApiInterface
         if ((null !== ($nowMicrotimeFloat = $nowMicrotime))) {
             if (! $theType->float_non_negative($nowMicrotimeFloat, $nowMicrotime)) {
                 throw new LogicException(
-                    [ 'The `nowMicrotime` should be non-negative float', $nowMicrotime ]
+                    [ 'The `nowMicrotime` should be a non-negative float', $nowMicrotime ]
                 );
             }
         }
@@ -586,7 +586,7 @@ class FilesystemFetchApi implements FetchApiInterface
         if ((null !== ($nowMicrotimeFloat = $nowMicrotime))) {
             if (! $theType->float_non_negative($nowMicrotimeFloat, $nowMicrotime)) {
                 throw new LogicException(
-                    [ 'The `nowMicrotime` should be non-negative float', $nowMicrotime ]
+                    [ 'The `nowMicrotime` should be a non-negative float', $nowMicrotime ]
                 );
             }
         }
@@ -678,13 +678,13 @@ class FilesystemFetchApi implements FetchApiInterface
 
         if (! $theType->int_non_negative_or_minus_one($timeoutMsInt, $timeoutMs)) {
             throw new LogicException(
-                [ 'The `timeoutMs` should be non-negative integer or be -1', $timeoutMs ]
+                [ 'The `timeoutMs` should be a non-negative integer or be -1', $timeoutMs ]
             );
         }
 
         if (! $theType->int_non_negative_or_minus_one($lockWaitTimeoutMsInt, $lockWaitTimeoutMs)) {
             throw new LogicException(
-                [ 'The `lockWaitTimeoutMs` should be non-negative integer or be -1', $lockWaitTimeoutMs ]
+                [ 'The `lockWaitTimeoutMs` should be a non-negative integer or be -1', $lockWaitTimeoutMs ]
             );
         }
 
@@ -717,13 +717,13 @@ class FilesystemFetchApi implements FetchApiInterface
 
         if (! $theType->int_non_negative_or_minus_one($timeoutMsInt, $timeoutMs)) {
             throw new LogicException(
-                [ 'The `timeoutMs` should be non-negative integer or -1', $timeoutMs ]
+                [ 'The `timeoutMs` should be a non-negative integer or -1', $timeoutMs ]
             );
         }
 
         if (! $theType->int_non_negative_or_minus_one($lockWaitTimeoutMsInt, $lockWaitTimeoutMs)) {
             throw new LogicException(
-                [ 'The `lockWaitTimeoutMs` should be non-negative integer or -1', $lockWaitTimeoutMs ]
+                [ 'The `lockWaitTimeoutMs` should be a non-negative integer or -1', $lockWaitTimeoutMs ]
             );
         }
 

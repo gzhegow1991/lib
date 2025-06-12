@@ -1207,6 +1207,58 @@ class ParseNullModule
 
 
 	/**
+	 * @return string|null
+	 */
+	public function numeric_intpart($value, array $refs = [])
+	{
+		if (Lib::type()->numeric_intpart($r, $value, $refs)) {
+		    return $r;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return string|null
+	 */
+	public function numeric_fracpart($value, array $refs = [])
+	{
+		if (Lib::type()->numeric_fracpart($r, $value, $refs)) {
+		    return $r;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return int|null
+	 */
+	public function int_intpart($value)
+	{
+		if (Lib::type()->int_intpart($r, $value)) {
+		    return $r;
+		}
+
+		return null;
+	}
+
+
+	/**
+	 * @return float|null
+	 */
+	public function float_fracpart($value)
+	{
+		if (Lib::type()->float_fracpart($r, $value)) {
+		    return $r;
+		}
+
+		return null;
+	}
+
+
+	/**
 	 * @return Number|null
 	 */
 	public function number($value, ?bool $allowExp = null)

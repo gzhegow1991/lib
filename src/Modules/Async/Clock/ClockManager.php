@@ -36,7 +36,7 @@ class ClockManager implements ClockManagerInterface
     {
         if (! Lib::type()->int_non_negative($waitMsInt, $waitMs)) {
             throw new LogicException(
-                [ 'The `waitMs` should be int non-negative', $waitMs ]
+                [ 'The `waitMs` should be an integer non-negative', $waitMs ]
             );
         }
 
@@ -66,7 +66,7 @@ class ClockManager implements ClockManagerInterface
     {
         if (! Lib::type()->int_non_negative($waitMsInt, $waitMs)) {
             throw new LogicException(
-                [ 'The `waitMs` should be int non-negative', $waitMs ]
+                [ 'The `waitMs` should be an integer non-negative', $waitMs ]
             );
         }
 

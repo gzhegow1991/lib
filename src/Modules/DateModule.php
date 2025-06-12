@@ -1768,7 +1768,7 @@ class DateModule
     {
         if (! $this->type_timezone($dateTimeZone, $timezone)) {
             throw new LogicException(
-                [ 'The `timezone` should be string or instance of \DateTimeZone', $timezone ]
+                [ 'The `timezone` should be a string or instance of \DateTimeZone', $timezone ]
             );
         }
 
@@ -1787,13 +1787,13 @@ class DateModule
     {
         if (! $this->type_timezone($aTz, $a)) {
             throw new LogicException(
-                [ 'The `a` should be string or instance of \DateTimeZone', $a ]
+                [ 'The `a` should be a string or instance of \DateTimeZone', $a ]
             );
         }
 
         if (! $this->type_timezone($bTz, $b)) {
             throw new LogicException(
-                [ 'The `a` should be string or instance of \DateTimeZone', $b ]
+                [ 'The `a` should be a string or instance of \DateTimeZone', $b ]
             );
         }
 
@@ -1845,7 +1845,7 @@ class DateModule
 
         if ('' === $duration) {
             throw new LogicException(
-                [ 'The `duration` should be non-empty string' ]
+                [ 'The `duration` should be a non-empty string' ]
             );
         }
 
@@ -1853,7 +1853,7 @@ class DateModule
             if (! is_a($intervalClass, \DateInterval::class, true)) {
                 throw new LogicException(
                     [
-                        'The `intervalClass` should be class-string of: ' . \DateInterval::class,
+                        'The `intervalClass` should be a class-string of: ' . \DateInterval::class,
                         $intervalClass,
                     ]
                 );

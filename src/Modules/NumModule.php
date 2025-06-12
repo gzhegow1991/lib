@@ -5,6 +5,7 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Bcmath\Number;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
 
 
 class NumModule
@@ -238,56 +239,6 @@ class NumModule
         }
         $refSplit = null;
 
-        $isFloat = is_float($value);
-        if ($isFloat) {
-            if (! is_finite($value)) {
-                // > NAN, INF, -INF is float, but should not be parsed
-
-                unset($refSplit);
-
-                return false;
-            }
-        }
-
-        if (! $withSplit) {
-            if ($isFloat || is_int($value)) {
-                $valueString = (string) $value;
-
-                if (! $isAllowExp) {
-                    if (false !== strpos($valueString, 'e')) {
-                        unset($refSplit);
-
-                        return false;
-                    }
-                }
-
-                $r = $valueString;
-
-                unset($refSplit);
-
-                return true;
-            }
-        }
-
-        if (false
-            || (null === $value)
-            || ('' === $value)
-            || (is_bool($value))
-            || (is_array($value))
-            // || (is_float($value) && (! is_finite($value)))
-            || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->nil($var, $value))
-        ) {
-            // > NULL is not numeric
-            // > EMPTY STRING is not numeric
-            // > BOOLEAN is not numeric
-            // > ARRAY is not numeric
-            // > RESOURCE is not numeric
-            // > NIL is not numeric
-
-            return false;
-        }
-
         if ($value instanceof Number) {
             $number = $value;
 
@@ -295,8 +246,6 @@ class NumModule
 
             if (! $isAllowExp) {
                 if ('' !== $exp) {
-                    unset($refSplit);
-
                     return false;
                 }
             }
@@ -311,19 +260,73 @@ class NumModule
                 $refSplit[ 3 ] = $exp;
             }
 
-            unset($refSplit);
-
             return true;
         }
 
-        if (! Lib::type()->trim($valueTrim, $value)) {
-            unset($refSplit);
+        $theType = Lib::type();
 
+        $isInt = is_int($value);
+        $isFloat = is_float($value);
+
+        if (false
+            || (null === $value)
+            || ('' === $value)
+            || (is_bool($value))
+            || (is_array($value))
+            //
+            // || (is_float($value) && (! is_finite($value)))
+            //
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
+            || ($theType->nil($var, $value))
+        ) {
             return false;
         }
 
-        if (false !== ($pos = stripos($valueTrim, 'e'))) {
-            $valueTrim[ $pos ] = 'E';
+        $valueTrim = null;
+
+        if ($isInt || $isFloat) {
+            if (0 == $value) {
+                $valueTrim = '0';
+
+                if (! $withSplit) {
+                    $r = $valueTrim;
+
+                    return true;
+                }
+            }
+        }
+
+        if (null === $valueTrim) {
+            if (! $theType->trim($valueTrim, $value)) {
+                return false;
+            }
+        }
+
+        if ($hasExp = (false !== ($expPos = stripos($valueTrim, 'e')))) {
+            if (! $isAllowExp) {
+                return false;
+            }
+
+            $valueTrim[ $expPos ] = 'E';
+        }
+
+        if ($isInt && $isFloat) {
+            if (! $withSplit) {
+                if (! $hasExp) {
+                    $valueTrim = rtrim($valueTrim, '0.');
+
+                } else {
+                    [ $left, $right ] = explode('E', $valueTrim);
+
+                    $left = rtrim($left, '0.');
+
+                    $valueTrim = "{$left}{$right}";
+                }
+
+                $r = $valueTrim;
+
+                return true;
+            }
         }
 
         $regex = ''
@@ -335,8 +338,6 @@ class NumModule
             . '$/';
 
         if (! preg_match($regex, $valueTrim, $matches)) {
-            unset($refSplit);
-
             return false;
         }
 
@@ -373,8 +374,6 @@ class NumModule
         $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
 
         $r = $valueNumeric;
-
-        unset($refSplit);
 
         return true;
     }
@@ -507,36 +506,21 @@ class NumModule
     {
         $r = null;
 
-        $withSplit = array_key_exists(0, $refs);
         $refSplit =& $refs[ 0 ];
 
         // > btw, 1.1e1 is can be converted to integer 11 too
         // > we better dont support that numbers here
-        if (! $this->type_numeric($_value, $value, false, $refs)) {
-            unset($refSplit);
-
+        if (! $this->type_numeric($refValueNumeric, $value, false, $refs)) {
             return false;
         }
 
         [ , , $frac ] = $refSplit;
 
         if ('' !== $frac) {
-            unset($refSplit);
-
-            if (! $withSplit) {
-                unset($refs[ 0 ]);
-            }
-
             return false;
         }
 
-        $r = $_value;
-
-        unset($refSplit);
-
-        if (! $withSplit) {
-            unset($refs[ 0 ]);
-        }
+        $r = $refValueNumeric;
 
         return true;
     }
@@ -734,14 +718,11 @@ class NumModule
         $r = null;
 
         $withSplit = array_key_exists(0, $refs);
-
         $refSplit =& $refs[ 0 ];
 
         // > btw, 1.1e-1 is can be converted to float 0.11 too
         // > we better dont support that numbers here
         if (! $this->type_numeric($_value, $value, false, $refs)) {
-            unset($refSplit);
-
             return false;
         }
 
@@ -760,22 +741,10 @@ class NumModule
         if ('0' === $_value) {
             $r = '0.0';
 
-            unset($refSplit);
-
-            if (! $withSplit) {
-                unset($refs[ 0 ]);
-            }
-
             return true;
         }
 
         $r = $_value;
-
-        unset($refSplit);
-
-        if (! $withSplit) {
-            unset($refs[ 0 ]);
-        }
 
         return true;
     }
@@ -902,6 +871,8 @@ class NumModule
 
 
     /**
+     * 1.5 => '1.50'
+     *
      * @param string|null $r
      */
     public function type_numeric_trimpad(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
@@ -912,8 +883,6 @@ class NumModule
         $refSplit =& $refs[ 0 ];
 
         if (! $this->type_numeric($_value, $value, true, $refs)) {
-            unset($refSplit);
-
             return false;
         }
 
@@ -940,12 +909,6 @@ class NumModule
         }
 
         $r = $_value;
-
-        unset($refSplit);
-
-        if (! $withSplit) {
-            unset($refs[ 0 ]);
-        }
 
         return true;
     }
@@ -1072,20 +1035,24 @@ class NumModule
 
 
     /**
+     * 1.5 -> (2) -> '1.50'
+     * 1.500 -> (2) -> '1.50'
+     * 1.501 -> (2) -> false
+     *
      * @param string|null $r
      */
     public function type_decimal(&$r, $value, int $scale = 0, array $refs = []) : bool
     {
         $r = null;
 
-        if ($scale < 0) return false;
+        if ($scale < 0) {
+            return false;
+        }
 
         $withSplit = array_key_exists(0, $refs);
         $refSplit =& $refs[ 0 ];
 
         if (! $this->type_numeric($_value, $value, false, $refs)) {
-            unset($refSplit);
-
             return false;
         }
 
@@ -1094,12 +1061,6 @@ class NumModule
         $valueScale = ('' === $frac) ? 0 : (strlen($frac) - 1);
 
         if ($valueScale > $scale) {
-            unset($refSplit);
-
-            if (! $withSplit) {
-                unset($refs[ 0 ]);
-            }
-
             return false;
         }
 
@@ -1118,12 +1079,6 @@ class NumModule
         }
 
         $r = $_value;
-
-        unset($refSplit);
-
-        if (! $withSplit) {
-            unset($refs[ 0 ]);
-        }
 
         return true;
     }
@@ -1268,6 +1223,13 @@ class NumModule
                 return false;
             }
 
+            if (0 == $value) {
+                // > -0.0 to 0.0
+                $r = 0.0;
+
+                return true;
+            }
+
             if (abs($value) >= _NUM_PHP_FLOAT_MAX_FLOAT_DIG) {
                 $r = $value > 0
                     ? _NUM_PHP_FLOAT_MAX_FLOAT_DIG
@@ -1296,7 +1258,9 @@ class NumModule
             || ('' === $value)
             || (is_bool($value))
             || (is_array($value))
+            //
             // || (is_float($value) && (! is_finite($value)))
+            //
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || (Lib::type()->nil($var, $value))
         ) {
@@ -1448,14 +1412,6 @@ class NumModule
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || (Lib::type()->nil($var, $value))
         ) {
-            // > NULL is not int
-            // > EMPTY STRING is not int
-            // > BOOLEAN is not int
-            // > ARRAY is not int
-            // > NAN, INF, -INF is not int
-            // > RESOURCE is not int
-            // > NIL is not int
-
             return false;
         }
 
@@ -1640,6 +1596,12 @@ class NumModule
                 return false;
             }
 
+            if (-0.0 === $value) {
+                $r = 0.0;
+
+                return true;
+            }
+
             if (abs($value) >= _NUM_PHP_FLOAT_MAX_FLOAT_DIG) {
                 $r = $value > 0
                     ? _NUM_PHP_FLOAT_MAX_FLOAT_DIG
@@ -1798,106 +1760,722 @@ class NumModule
     }
 
 
-    public function round($num, ?int $precision = null) : float
+    /**
+     * @param string|null $r
+     */
+    public function type_numeric_intpart(&$r, $value, array $refs = []) : bool
     {
-        if (! $this->type_numeric($_num, $num)) {
-            throw new LogicException(
-                [ 'The `num` should be a valid number', $num ]
-            );
+        $refSplit =& $refs[ 0 ];
+
+        if (! $this->type_numeric($valueNumeric, $value, false, $refs)) {
+            return false;
         }
 
-        $precision = $precision ?? 0;
+        $refSplit[ 2 ] = '';
+        $refSplit[ 3 ] = '';
 
-        $result = round($_num, $precision);
+        [ $sign, $int ] = $refSplit;
 
-        return $result;
+        $r = "{$sign}{$int}";
+
+        return true;
     }
 
-    public function ceil($num, ?int $precision = null) : float
+    /**
+     * @param string|null $r
+     */
+    public function type_numeric_fracpart(&$r, $value, array $refs = []) : bool
     {
-        if (! $this->type_numeric($_num, $num)) {
-            throw new LogicException(
-                [ 'The `num` should be a valid number', $num ]
-            );
+        $refSplit =& $refs[ 0 ];
+
+        if (! $this->type_numeric($valueNumeric, $value, false, $refs)) {
+            return false;
         }
 
-        $precision = $precision ?? 0;
+        $refSplit[ 1 ] = '';
+        $refSplit[ 3 ] = '';
 
-        $factor = pow(10, $precision);
+        [ $sign, , $frac ] = $refSplit;
 
-        $result = ceil($_num * $factor) / $factor;
+        $r = "{$sign}0{$frac}";
 
-        return $result;
-    }
-
-    public function floor($num, ?int $precision = null) : float
-    {
-        if (! $this->type_numeric($_num, $num)) {
-            throw new LogicException(
-                [ 'The `num` should be a valid number', $num ]
-            );
-        }
-
-        $precision = $precision ?? 0;
-
-        $factor = pow(10, $precision);
-
-        $result = ceil($_num * $factor) / $factor;
-
-        return $result;
+        return true;
     }
 
 
-    public function moneyceil($num, ?int $precision = null) : float
+    /**
+     * @param int|null $r
+     */
+    public function type_int_intpart(&$r, $value) : bool
     {
-        if (! $this->type_numeric($_num, $num)) {
-            throw new LogicException(
-                [ 'The `num` should be a valid number', $num ]
-            );
+        if (! $this->type_numeric($valueNumeric, $value, false, [ &$split ])) {
+            return false;
         }
 
-        $precision = $precision ?? 0;
+        $split[ 2 ] = '';
+        $split[ 3 ] = '';
 
-        $factor = pow(10, $precision);
+        [ $sign, $int ] = $split;
 
-        $result = ($_num >= 0)
-            ? (ceil($_num * $factor) / $factor)
-            : (floor($_num * $factor) / $factor);
+        $valueNumericInt = "{$sign}{$int}";
 
-        return $result;
-    }
+        $valueInt = $this->castNumericToInt($valueNumericInt, ...$split);
 
-    public function moneyfloor($num, ?int $precision = null) : float
-    {
-        if (! $this->type_numeric($_num, $num)) {
-            throw new LogicException(
-                [ 'The `num` should be a valid number', $num ]
-            );
+        if (false !== $valueInt) {
+            $r = $valueInt;
+
+            return true;
         }
 
-        $precision = $precision ?? 0;
+        return false;
+    }
 
-        $factor = pow(10, $precision);
+    /**
+     * @param float|null $r
+     */
+    public function type_float_fracpart(&$r, $value) : bool
+    {
+        if (! $this->type_numeric($valueNumeric, $value, false, [ &$split ])) {
+            return false;
+        }
 
-        $result = ($_num >= 0)
-            ? (floor($_num * $factor) / $factor)
-            : (ceil($_num * $factor) / $factor);
+        $split[ 1 ] = '';
+        $split[ 3 ] = '';
 
-        return $result;
+        [ $sign, , $frac ] = $split;
+
+        $valueNumericFrac = "{$sign}0{$frac}";
+
+        $valueFloat = $this->castNumericToFloat($valueNumericFrac, ...$split);
+
+        if (false !== $valueFloat) {
+            $r = $valueFloat;
+
+            return true;
+        }
+
+        return false;
     }
 
 
-    public function frac_trimpad(string $frac, int $lenTrim, ?int $lenPad = null, string $stringPad = '') : string
+    /**
+     * > .5 -> .500
+     */
+    public function frac_trimpad(
+        string $frac,
+        ?int $trimLen = null,
+        ?int $padLen = null, string $padString = ''
+    ) : string
     {
         $fracDigits = ltrim($frac, '.');
 
-        $fracDigits = substr($fracDigits, 0, $lenTrim);
+        if (null !== $trimLen) {
+            $fracDigits = substr($fracDigits, 0, $trimLen);
+        }
 
-        if (null !== $lenPad) {
-            $fracDigits = str_pad($fracDigits, $lenPad, $stringPad);
+        if (null !== $padLen) {
+            $fracDigits = str_pad($fracDigits, $padLen, $padString);
         }
 
         return ".{$fracDigits}";
+    }
+
+
+    /**
+     * > Математическое округление
+     * > Точка принятия решения - "дробная часть равна .5/.05/.005 и тд"
+     * > Участвует только 1 разряд свыше указанного, как в математике, т.е. если число 1.005, а округляем до 1 знака, то 5 не участвует в решении, число будет 1.00
+     * > Середина определяется по первому не-нулевому разряду, то есть для 1.005 при округлении до 2 знаков решение будет приниматься по третьему знаку 5
+     * > К самой середине применяется правило округления, все что выше середины - правило всегда "от нуля", все что ниже середины - правило "к нулю"
+     *
+     * > 1.5 -> 2
+     * > 1.05 -> 1
+     * > -1.05 -> -1
+     * > -1.5 -> -2
+     */
+    public function mathround(
+        $number, ?int $precision = null,
+        ?int $flags = null, ?int $flagsNegative = null
+    ) : float
+    {
+        $precision = $precision ?? 0;
+
+        if (! $this->type_numeric($refNumberNumeric, $number, false, [ &$split ])) {
+            throw new LogicException(
+                [ 'The `num` should be a valid numeric without exponent', $number ]
+            );
+        }
+
+        if ('0' == $refNumberNumeric) {
+            return 0.0;
+        }
+
+        if ($precision < 0) {
+            throw new LogicException(
+                [ 'The `precision` should be a non-negative integer', $precision ]
+            );
+        }
+
+        $flagsNonNegativeCurrent = 0;
+        $flagsNegativeCurrent = 0;
+
+        $hasFlags = (null !== $flags);
+        $hasFlagsNegative = (null !== $flagsNegative);
+
+        if ($hasFlags && $hasFlagsNegative) {
+            $flagsNonNegativeCurrent = $flags;
+            $flagsNegativeCurrent = $flagsNegative;
+
+        } elseif ($hasFlags) {
+            $flagsNonNegativeCurrent = $flags;
+            $flagsNegativeCurrent = $flags;
+
+        } elseif ($hasFlagsNegative) {
+            throw new LogicException(
+                [ 'Unable to set `flagsNegative` without `flags`', $flagsNegative, $flags ]
+            );
+        }
+
+        $flagGroups = [
+            '_NUM_ROUND_ROUNDING' => [
+                [
+                    _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO,
+                    _NUM_ROUND_ROUNDING_TOWARD_ZERO,
+                    _NUM_ROUND_ROUNDING_TO_POSITIVE_INF,
+                    _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF,
+                    _NUM_ROUND_ROUNDING_EVEN,
+                    _NUM_ROUND_ROUNDING_ODD,
+                ],
+                _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO,
+            ],
+        ];
+
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flagsNonNegativeCurrent & $flag) {
+                    $cnt++;
+                }
+            }
+
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flagsNonNegative` conflict in group: ' . $groupName, $flags ]
+                );
+
+            } elseif (0 === $cnt) {
+                $flagsNonNegativeCurrent |= $default;
+            }
+        }
+
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flagsNegativeCurrent & $flag) {
+                    $cnt++;
+                }
+            }
+
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flagsNegative` conflict in group: ' . $groupName, $flags ]
+                );
+
+            } elseif (0 === $cnt) {
+                $flagsNegativeCurrent |= $default;
+            }
+        }
+
+        $isNonNegativeRoundingToPositiveInf = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_TO_POSITIVE_INF));
+        $isNonNegativeRoundingToNegativeInf = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF));
+        $isNonNegativeRoundingAwayFromZero = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO));
+        $isNonNegativeRoundingTowardZero = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_TOWARD_ZERO));
+        $isNonNegativeRoundingEven = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_EVEN));
+        $isNonNegativeRoundingOdd = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_ODD));
+
+        $isNegativeRoundingToPositiveInf = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_TO_POSITIVE_INF));
+        $isNegativeRoundingToNegativeInf = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF));
+        $isNegativeRoundingAwayFromZero = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO));
+        $isNegativeRoundingTowardZero = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_TOWARD_ZERO));
+        $isNegativeRoundingEven = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_EVEN));
+        $isNegativeRoundingOdd = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_ODD));
+
+        [ $sign ] = $split;
+
+        $isNegative = ('-' === $sign);
+
+        $factor = ($precision > 0)
+            ? ((int) pow(10, $precision))
+            : 1;
+
+        $factorMath = $factor * 10;
+
+        $value = (float) $refNumberNumeric;
+
+        $this->type_int_intpart($scaled, $value * $factorMath);
+
+        $scaled /= 10;
+
+        $this->type_numeric_float($refScaled, $scaled, [ &$splitScaled ]);
+
+        $scaled = (float) $refScaled;
+
+        [ , , $scaledFrac ] = $splitScaled;
+
+        if ($isNegative) {
+            if ($isNegativeRoundingAwayFromZero) {
+                $isNegativeRoundingToNegativeInf = true;
+                unset($isNegativeRoundingAwayFromZero);
+            }
+            if ($isNegativeRoundingTowardZero) {
+                $isNegativeRoundingToPositiveInf = true;
+                unset($isNegativeRoundingTowardZero);
+            }
+
+            $firstNonZeroDigit = ltrim($scaledFrac, '.0');
+            if ('' === $firstNonZeroDigit) {
+                $firstNonZeroDigit = 0;
+
+            } else {
+                $firstNonZeroDigit = (int) $firstNonZeroDigit[ 0 ];
+            }
+
+            $isMidpoint = ($firstNonZeroDigit === 5);
+
+            if (! $isMidpoint) {
+                if ($firstNonZeroDigit > 5) {
+                    $scaled = floor($scaled);
+
+                } elseif ($firstNonZeroDigit < 5) {
+                    $scaled = ceil($scaled);
+
+                } else {
+                    throw new RuntimeException(
+                        [ 'The negative `rounding` mode is unknown', $flags ]
+                    );
+                }
+
+            } else {
+                if ($isNegativeRoundingToPositiveInf) {
+                    $scaled = ceil($scaled);
+
+                } elseif ($isNegativeRoundingToNegativeInf) {
+                    $scaled = floor($scaled);
+
+                } else {
+                    if ($isNegativeRoundingEven) {
+                        $a = floor($scaled);
+                        $b = ($a % 2 === 0) ? $a : ($a - 1);
+                        $c = $b + 2;
+
+                        $scaled = abs($scaled - $b) <= abs($c - $scaled) ? $b : $c;
+
+                    } elseif ($isNegativeRoundingOdd) {
+                        $a = floor($scaled);
+                        $b = ($a % 2) ? $a : ($a - 1);
+                        $c = $b + 2;
+
+                        $scaled = abs($scaled - $b) <= abs($c - $scaled) ? $b : $c;
+
+                    } else {
+                        throw new RuntimeException(
+                            [ 'The negative `rounding` mode is unknown', $flags ]
+                        );
+                    }
+                }
+            }
+
+        } else {
+            // if ($isNonNegative) {
+
+            if ($isNonNegativeRoundingAwayFromZero) {
+                $isNonNegativeRoundingToPositiveInf = true;
+                unset($isNonNegativeRoundingAwayFromZero);
+            }
+            if ($isNonNegativeRoundingTowardZero) {
+                $isNonNegativeRoundingToNegativeInf = true;
+                unset($isNonNegativeRoundingTowardZero);
+            }
+
+            $firstNonZeroDigit = ltrim($scaledFrac, '.0');
+            if ('' === $firstNonZeroDigit) {
+                $firstNonZeroDigit = 0;
+
+            } else {
+                $firstNonZeroDigit = (int) $firstNonZeroDigit[ 0 ];
+            }
+
+            $isMidpoint = ($firstNonZeroDigit === 5);
+
+            if (! $isMidpoint) {
+                if ($firstNonZeroDigit > 5) {
+                    $scaled = ceil($scaled);
+
+                } elseif ($firstNonZeroDigit < 5) {
+                    $scaled = floor($scaled);
+
+                } else {
+                    throw new RuntimeException(
+                        [ 'The non-negative `rounding` mode is unknown', $flags ]
+                    );
+                }
+
+            } else {
+                if ($isNonNegativeRoundingToPositiveInf) {
+                    $scaled = ceil($scaled);
+
+                } elseif ($isNonNegativeRoundingToNegativeInf) {
+                    $scaled = floor($scaled);
+
+                } else {
+                    if ($isNonNegativeRoundingEven) {
+                        $a = floor($scaled);
+                        $b = ($a % 2 === 0) ? $a : ($a - 1);
+                        $c = $b + 2;
+
+                        $scaled = abs($scaled - $b) <= abs($c - $scaled) ? $b : $c;
+
+                    } elseif ($isNonNegativeRoundingOdd) {
+                        $a = floor($scaled);
+                        $b = ($a % 2) ? $a : ($a - 1);
+                        $c = $b + 2;
+
+                        $scaled = abs($scaled - $b) <= abs($c - $scaled) ? $b : $c;
+
+                    } else {
+                        throw new RuntimeException(
+                            [ 'The non-negative `rounding` mode is unknown', $flags ]
+                        );
+                    }
+                }
+            }
+        }
+
+        $result = $scaled / $factor;
+
+        $this->type_float($refResultFloat, $result);
+
+        return $refResultFloat;
+    }
+
+    /**
+     * > 1.5 -> 1
+     * > 1.05 -> 1
+     * > -1.05 -> -1
+     * > -1.5 -> -1
+     */
+    public function mathtrunc($number, ?int $precision = null) : float
+    {
+        return $this->mathround(
+            $number, $precision,
+            _NUM_ROUND_ROUNDING_TOWARD_ZERO, _NUM_ROUND_ROUNDING_TOWARD_ZERO
+        );
+    }
+
+    /**
+     * > 1.5 -> 2
+     * > 1.05 -> 1
+     * > -1.05 -> -1
+     * > -1.5 -> -1
+     */
+    public function mathceil($number, ?int $precision = null) : float
+    {
+        return $this->mathround(
+            $number, $precision,
+            _NUM_ROUND_ROUNDING_TO_POSITIVE_INF, _NUM_ROUND_ROUNDING_TO_POSITIVE_INF
+        );
+    }
+
+    /**
+     * > 1.5 -> 1
+     * > 1.05 -> 1
+     * > -1.05 -> -1
+     * > -1.5 -> -2
+     */
+    public function mathfloor($number, ?int $precision = null) : float
+    {
+        return $this->mathround(
+            $number, $precision,
+            _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF, _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF
+        );
+    }
+
+
+    /**
+     * > Денежное округление
+     * > Точка принятия решения - "наличие дробной части", если есть - округляем, если нет - обрезаем
+     * > Участвует всё число
+     *
+     * > 1.5 -> 2
+     * > 1.05 -> 2
+     * > -1.05 -> -2
+     * > -1.5 -> -2
+     */
+    public function moneyround(
+        $number, ?int $precision = null,
+        ?int $flags = null, ?int $flagsNegative = null
+    ) : float
+    {
+        $precision = $precision ?? 0;
+
+        if (! $this->type_numeric($refNumberNumeric, $number, false, [ &$split ])) {
+            throw new LogicException(
+                [ 'The `num` should be a valid numeric without exponent', $number ]
+            );
+        }
+
+        if ('0' == $refNumberNumeric) {
+            return 0.0;
+        }
+
+        if ($precision < 0) {
+            throw new LogicException(
+                [ 'The `precision` should be a non-negative integer', $precision ]
+            );
+        }
+
+        $flagsNonNegativeCurrent = 0;
+        $flagsNegativeCurrent = 0;
+
+        $hasFlags = (null !== $flags);
+        $hasFlagsNegative = (null !== $flagsNegative);
+
+        if ($hasFlags && $hasFlagsNegative) {
+            $flagsNonNegativeCurrent = $flags;
+            $flagsNegativeCurrent = $flagsNegative;
+
+        } elseif ($hasFlags) {
+            $flagsNonNegativeCurrent = $flags;
+            $flagsNegativeCurrent = $flags;
+
+        } elseif ($hasFlagsNegative) {
+            throw new LogicException(
+                [ 'Unable to set `flagsNegative` without `flags`', $flagsNegative, $flags ]
+            );
+        }
+
+        $flagGroups = [
+            '_NUM_ROUND_ROUNDING' => [
+                [
+                    _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO,
+                    _NUM_ROUND_ROUNDING_TOWARD_ZERO,
+                    _NUM_ROUND_ROUNDING_TO_POSITIVE_INF,
+                    _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF,
+                    _NUM_ROUND_ROUNDING_EVEN,
+                    _NUM_ROUND_ROUNDING_ODD,
+                ],
+                _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO,
+            ],
+        ];
+
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flagsNonNegativeCurrent & $flag) {
+                    $cnt++;
+                }
+            }
+
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flagsNonNegative` conflict in group: ' . $groupName, $flags ]
+                );
+
+            } elseif (0 === $cnt) {
+                $flagsNonNegativeCurrent |= $default;
+            }
+        }
+
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flagsNegativeCurrent & $flag) {
+                    $cnt++;
+                }
+            }
+
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flagsNegative` conflict in group: ' . $groupName, $flags ]
+                );
+
+            } elseif (0 === $cnt) {
+                $flagsNegativeCurrent |= $default;
+            }
+        }
+
+        $isNonNegativeRoundingToPositiveInf = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_TO_POSITIVE_INF));
+        $isNonNegativeRoundingToNegativeInf = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF));
+        $isNonNegativeRoundingAwayFromZero = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO));
+        $isNonNegativeRoundingTowardZero = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_TOWARD_ZERO));
+        $isNonNegativeRoundingEven = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_EVEN));
+        $isNonNegativeRoundingOdd = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_ODD));
+
+        $isNegativeRoundingToPositiveInf = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_TO_POSITIVE_INF));
+        $isNegativeRoundingToNegativeInf = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF));
+        $isNegativeRoundingAwayFromZero = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO));
+        $isNegativeRoundingTowardZero = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_TOWARD_ZERO));
+        $isNegativeRoundingEven = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_EVEN));
+        $isNegativeRoundingOdd = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_ODD));
+
+        [ $sign ] = $split;
+
+        $isNegative = ('-' === $sign);
+
+        $factor = ($precision > 0)
+            ? ((int) pow(10, $precision))
+            : 1;
+
+        $value = (float) $refNumberNumeric;
+
+        $scaled = $value * $factor;
+
+        $this->type_numeric_float($refScaled, $scaled, [ &$splitScaled ]);
+
+        $scaled = (float) $refScaled;
+
+        [ , , $scaledFrac ] = $splitScaled;
+
+        if ($isNegative) {
+            if ($isNegativeRoundingAwayFromZero) {
+                $isNegativeRoundingToNegativeInf = true;
+                unset($isNegativeRoundingAwayFromZero);
+            }
+            if ($isNegativeRoundingTowardZero) {
+                $isNegativeRoundingToPositiveInf = true;
+                unset($isNegativeRoundingTowardZero);
+            }
+
+            $hasFrac = ($scaledFrac !== '');
+
+            if (! $hasFrac) {
+                $scaled = ceil($scaled);
+
+            } else {
+                if ($isNegativeRoundingToPositiveInf) {
+                    $scaled = ceil($scaled);
+
+                } elseif ($isNegativeRoundingToNegativeInf) {
+                    $scaled = floor($scaled);
+
+                } else {
+                    if ($isNegativeRoundingEven) {
+                        $a = floor($scaled);
+                        $b = ($a % 2 === 0) ? $a : ($a - 1);
+                        $c = $b + 2;
+
+                        $scaled = abs($scaled - $b) <= abs($c - $scaled) ? $b : $c;
+
+                    } elseif ($isNegativeRoundingOdd) {
+                        $a = floor($scaled);
+                        $b = ($a % 2) ? $a : ($a - 1);
+                        $c = $b + 2;
+
+                        $scaled = abs($scaled - $b) <= abs($c - $scaled) ? $b : $c;
+
+                    } else {
+                        throw new RuntimeException(
+                            [ 'The negative `rounding` mode is unknown', $flags ]
+                        );
+                    }
+                }
+            }
+
+        } else {
+            // if ($isNonNegative) {
+
+            if ($isNonNegativeRoundingAwayFromZero) {
+                $isNonNegativeRoundingToPositiveInf = true;
+                unset($isNonNegativeRoundingAwayFromZero);
+            }
+            if ($isNonNegativeRoundingTowardZero) {
+                $isNonNegativeRoundingToNegativeInf = true;
+                unset($isNonNegativeRoundingTowardZero);
+            }
+
+            $hasFrac = ($scaledFrac !== '');
+
+            if (! $hasFrac) {
+                $scaled = floor($scaled);
+
+            } else {
+                if ($isNonNegativeRoundingToPositiveInf) {
+                    $scaled = ceil($scaled);
+
+                } elseif ($isNonNegativeRoundingToNegativeInf) {
+                    $scaled = floor($scaled);
+
+                } else {
+                    if ($isNonNegativeRoundingEven) {
+                        $a = floor($scaled);
+                        $b = ($a % 2 === 0) ? $a : ($a - 1);
+                        $c = $b + 2;
+
+                        $scaled = abs($scaled - $b) <= abs($c - $scaled) ? $b : $c;
+
+                    } elseif ($isNonNegativeRoundingOdd) {
+                        $a = floor($scaled);
+                        $b = ($a % 2) ? $a : ($a - 1);
+                        $c = $b + 2;
+
+                        $scaled = abs($scaled - $b) <= abs($c - $scaled) ? $b : $c;
+
+                    } else {
+                        throw new RuntimeException(
+                            [ 'The non-negative `rounding` mode is unknown', $flags ]
+                        );
+                    }
+                }
+            }
+        }
+
+        $result = $scaled / $factor;
+
+        $this->type_float($refResultFloat, $result);
+
+        return $refResultFloat;
+    }
+
+    /**
+     * > 1.5 -> 1
+     * > 1.05 -> 1
+     * > -1.05 -> -1
+     * > -1.5 -> -1
+     */
+    public function moneytrunc($number, ?int $precision = null) : float
+    {
+        return $this->moneyround(
+            $number, $precision,
+            _NUM_ROUND_ROUNDING_TOWARD_ZERO, _NUM_ROUND_ROUNDING_TOWARD_ZERO
+        );
+    }
+
+    /**
+     * > 1.5 -> 2
+     * > 1.05 -> 2
+     * > -1.05 -> -1
+     * > -1.5 -> -1
+     */
+    public function moneyceil($number, ?int $precision = null) : float
+    {
+        return $this->moneyround(
+            $number, $precision,
+            _NUM_ROUND_ROUNDING_TO_POSITIVE_INF, _NUM_ROUND_ROUNDING_TO_POSITIVE_INF
+        );
+    }
+
+    /**
+     * > 1.5 -> 1
+     * > 1.05 -> 1
+     * > -1.05 -> -2
+     * > -1.5 -> -2
+     */
+    public function moneyfloor($number, ?int $precision = null) : float
+    {
+        return $this->moneyround(
+            $number, $precision,
+            _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF, _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF
+        );
     }
 
 
@@ -2059,29 +2637,31 @@ class NumModule
         return $valueFloat;
     }
 
-    /**
-     * @return float|false
-     */
-    protected function castNumericToFloatMin($value, $split = null)
-    {
-        if (null === $split) {
-            if (! $this->type_numeric($numeric, $value, true, [ &$split ])) {
-                return false;
-            }
-        }
-
-        [ $sign, $int, $frac, $exp ] = $split;
-
-        $fracDig = $this->frac_trimpad($frac, PHP_FLOAT_DIG - 1, PHP_FLOAT_DIG, '9');
-
-        $numericAbsDig = "{$int}{$fracDig}{$exp}";
-
-        if ($numericAbsDig === _NUM_PHP_FLOAT_MIN_STRING_DIG) {
-            return ('' === $sign)
-                ? _NUM_PHP_FLOAT_MIN_STRING_DIG
-                : -_NUM_PHP_FLOAT_MIN_STRING_DIG;
-        }
-
-        return false;
-    }
+    // /**
+    //  * > практическая польза нулевая, но для проверки дополнительный вызов и куча работы со строками
+    //  *
+    //  * @return float|false
+    //  */
+    // protected function castNumericToFloatMin($value, $split = null)
+    // {
+    //     if (null === $split) {
+    //         if (! $this->type_numeric($numeric, $value, true, [ &$split ])) {
+    //             return false;
+    //         }
+    //     }
+    //
+    //     [ $sign, $int, $frac, $exp ] = $split;
+    //
+    //     $fracDig = $this->frac_trimpad($frac, PHP_FLOAT_DIG - 1, PHP_FLOAT_DIG, '9');
+    //
+    //     $numericAbsDig = "{$int}{$fracDig}{$exp}";
+    //
+    //     if ($numericAbsDig === _NUM_PHP_FLOAT_MIN_STRING_DIG) {
+    //         return ('' === $sign)
+    //             ? _NUM_PHP_FLOAT_MIN_STRING_DIG
+    //             : -_NUM_PHP_FLOAT_MIN_STRING_DIG;
+    //     }
+    //
+    //     return false;
+    // }
 }

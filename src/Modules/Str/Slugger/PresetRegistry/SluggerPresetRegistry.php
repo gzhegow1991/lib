@@ -40,7 +40,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
         foreach ( $names as $i => $name ) {
             if (! isset($this->presets[ $name ])) {
                 throw new RuntimeException(
-                    [ 'Each of `names` should be registered preset', $name, $i ]
+                    [ 'Each of `names` should be a registered preset', $name, $i ]
                 );
             }
 
@@ -83,7 +83,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
     {
         if ('' === $name) {
             throw new LogicException(
-                [ 'The `name` is should be non-empty string' ]
+                [ 'The `name` is should be a non-empty string' ]
             );
         }
 
@@ -245,7 +245,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
             foreach ( $aList as $i => $a ) {
                 if (! $theType->letter($aString, $a)) {
                     throw new LogicException(
-                        [ 'Each of `lettersIn` must be letter', $a, $i ]
+                        [ 'Each of `lettersIn` should be a letter', $a, $i ]
                     );
                 }
 
@@ -349,7 +349,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
 
             if ([] === $bArray) {
                 throw new LogicException(
-                    'The `bArray` should be non-empty array'
+                    'The `bArray` should be a non-empty array'
                 );
             }
 

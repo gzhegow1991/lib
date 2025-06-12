@@ -153,20 +153,20 @@ class Cookies
 
         if (! $theType->string_not_empty($var, $cookieName)) {
             throw new LogicException(
-                'The `cookieName` should be non empty string'
+                'The `cookieName` should be a non-empty string'
             );
         }
 
         if (! $theType->string_not_empty($var, $cookiePath)) {
             throw new LogicException(
-                'The `cookiePath` should be non empty string'
+                'The `cookiePath` should be a non-empty string'
             );
         }
 
         if (null !== $cookieDomain) {
             if (! $theType->string_not_empty($var, $cookieDomain)) {
                 throw new LogicException(
-                    'The `cookieDomain` should be non empty string'
+                    'The `cookieDomain` should be a non-empty string'
                 );
             }
         }

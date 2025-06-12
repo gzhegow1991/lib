@@ -205,13 +205,13 @@ class RandomModule
 
         if (! $theType->int_positive($_len, $len)) {
             throw new LogicException(
-                [ 'The `len` should be positive integer', $len ]
+                [ 'The `len` should be a positive integer', $len ]
             );
         }
 
         if (! $theType->alphabet($_alphabet, $alphabet)) {
             throw new LogicException(
-                [ 'The `alphabet` should be valid alphabet', $alphabet ]
+                [ 'The `alphabet` should be a valid alphabet', $alphabet ]
             );
         }
 

@@ -204,7 +204,7 @@ class HttpModule
     {
         if ('' === $name) {
             throw new LogicException(
-                'The `name` should be non-empty string'
+                'The `name` should be a non-empty string'
             );
         }
 
@@ -233,7 +233,7 @@ class HttpModule
     {
         if ('' === $name) {
             throw new LogicException(
-                'The `name` should be non-empty string'
+                'The `name` should be a non-empty string'
             );
         }
 
@@ -320,7 +320,7 @@ class HttpModule
 
         if (! strlen($name)) {
             throw new LogicException(
-                'The `name` should be non-empty string'
+                'The `name` should be a non-empty string'
             );
         }
 
@@ -339,7 +339,7 @@ class HttpModule
     {
         if (! strlen($name)) {
             throw new LogicException(
-                'The `name` should be non-empty string'
+                'The `name` should be a non-empty string'
             );
         }
 
@@ -366,7 +366,7 @@ class HttpModule
     {
         if (! strlen($name)) {
             throw new LogicException(
-                'The `name` should be non-empty string'
+                'The `name` should be a non-empty string'
             );
         }
 
@@ -379,7 +379,7 @@ class HttpModule
     {
         if (! strlen($name)) {
             throw new LogicException(
-                'The `name` should be non-empty string'
+                'The `name` should be a non-empty string'
             );
         }
 
@@ -510,7 +510,7 @@ class HttpModule
 
             } else {
                 throw new LogicException(
-                    [ 'Each of `queries` should be string or array', $query, $idx ]
+                    [ 'Each of `queries` should be a string or an array', $query, $idx ]
                 );
             }
         }

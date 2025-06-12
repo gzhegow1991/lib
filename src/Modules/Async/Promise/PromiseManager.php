@@ -145,7 +145,7 @@ class PromiseManager implements PromiseManagerInterface
 
         return Result::err(
             $ret,
-            [ 'The `from` should be instance of: ' . Promise::class, $from ],
+            [ 'The `from` should be an instance of: ' . Promise::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -277,7 +277,7 @@ class PromiseManager implements PromiseManagerInterface
 
         if (! $theType->int_positive($tickMsInt, $tickMs)) {
             throw new LogicException(
-                [ 'The `tickMs` should be positive integer', $tickMs ]
+                [ 'The `tickMs` should be a positive integer', $tickMs ]
             );
         }
 
@@ -335,7 +335,7 @@ class PromiseManager implements PromiseManagerInterface
         if ([] === $ps) {
             if ($rejectIfEmpty) {
                 return $this->rejected(
-                    new LogicException('The `ps` should be non-empty array')
+                    new LogicException('The `ps` should be a non-empty array')
                 );
             }
 
@@ -389,7 +389,7 @@ class PromiseManager implements PromiseManagerInterface
         if ([] === $ps) {
             if ($rejectIfEmpty) {
                 return $this->rejected(
-                    new LogicException('The `ps` should be non-empty array')
+                    new LogicException('The `ps` should be a non-empty array')
                 );
             }
 
@@ -479,7 +479,7 @@ class PromiseManager implements PromiseManagerInterface
         if ([] === $ps) {
             if ($rejectIfEmpty) {
                 return $this->rejected(
-                    new LogicException('The `ps` should be non-empty array')
+                    new LogicException('The `ps` should be a non-empty array')
                 );
             }
 
@@ -560,7 +560,7 @@ class PromiseManager implements PromiseManagerInterface
         if ([] === $ps) {
             if ($rejectIfEmpty) {
                 return $this->rejected(
-                    new LogicException('The `ps` should be non-empty array')
+                    new LogicException('The `ps` should be a non-empty array')
                 );
             }
 
@@ -710,20 +710,20 @@ class PromiseManager implements PromiseManagerInterface
 
         if (! $theType->url($urlString, $url)) {
             throw new LogicException(
-                [ 'The `url` should be valid url', $url ]
+                [ 'The `url` should be a valid url', $url ]
             );
         }
 
         if (! $theType->list($curlOptionsList, $curlOptions)) {
             throw new LogicException(
-                [ 'The `curlOptions` should be list of CURL options', $curlOptions ]
+                [ 'The `curlOptions` should be a list of `CURL options`', $curlOptions ]
             );
         }
 
         if (! is_null($timeoutMsInt = $timeoutMs)) {
             if (! $theType->int_positive($timeoutMsInt, $timeoutMs)) {
                 throw new LogicException(
-                    [ 'The `timeoutMs` should be positive integer', $timeoutMs ]
+                    [ 'The `timeoutMs` should be a positive integer', $timeoutMs ]
                 );
             }
         }

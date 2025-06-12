@@ -119,7 +119,7 @@ class EntrypointModule
         if (null !== $dirRoot) {
             if (! Lib::fs()->type_dirpath_realpath($realpath, $dirRoot)) {
                 throw new LogicException(
-                    [ 'The `dirRoot` should be existing directory path', $dirRoot ]
+                    [ 'The `dirRoot` should be an existing directory path', $dirRoot ]
                 );
             }
         }
@@ -153,7 +153,7 @@ class EntrypointModule
 
             } elseif (($errorReporting & ~(E_ALL | E_DEPRECATED | E_USER_DEPRECATED)) !== 0) {
                 throw new LogicException(
-                    [ 'The `errorReporting` should be valid error_reporting flag', $errorReporting ]
+                    [ 'The `errorReporting` should be a valid `error_reporting` flag', $errorReporting ]
                 );
             }
         }
@@ -242,7 +242,7 @@ class EntrypointModule
         if (null !== ($timeLimitInt = $timeLimit)) {
             if (! Lib::type()->int_non_negative($timeLimitInt, $timeLimit)) {
                 throw new LogicException(
-                    [ 'The `timeLimit` should be non-negative integer', $timeLimit ]
+                    [ 'The `timeLimit` should be a non-negative integer', $timeLimit ]
                 );
             }
         }
@@ -378,7 +378,7 @@ class EntrypointModule
         if (null !== $uploadTmpDir) {
             if (! Lib::fs()->type_dirpath_realpath($realpath, $uploadTmpDir)) {
                 throw new LogicException(
-                    [ 'The `uploadTmpDir` should be existing directory path', $uploadTmpDir ]
+                    [ 'The `uploadTmpDir` should be an existing directory path', $uploadTmpDir ]
                 );
             }
         }
@@ -422,7 +422,7 @@ class EntrypointModule
         if (null !== ($precisionInt = $precision)) {
             if (! Lib::type()->int_non_negative($precisionInt, $precision)) {
                 throw new LogicException(
-                    [ 'The `precision` should be non-negative integer', $precision ]
+                    [ 'The `precision` should be a non-negative integer', $precision ]
                 );
             }
         }
@@ -466,7 +466,7 @@ class EntrypointModule
         if (null !== $umask) {
             if (! (($umask >= 0) && ($umask <= 0777))) {
                 throw new LogicException(
-                    [ 'The `umask` should be valid umask', $umask ]
+                    [ 'The `umask` should be a valid `umask`', $umask ]
                 );
             }
         }
@@ -525,7 +525,7 @@ class EntrypointModule
 
             } elseif (! is_callable($fnErrorHandler)) {
                 throw new LogicException(
-                    [ 'The `fnErrorHandler` should be callable', $fnErrorHandler ]
+                    [ 'The `fnErrorHandler` should be a callable', $fnErrorHandler ]
                 );
             }
         }
@@ -586,7 +586,7 @@ class EntrypointModule
 
             } elseif (! is_callable($fnExceptionHandler)) {
                 throw new LogicException(
-                    [ 'The `fnExceptionHandler` should be callable', $fnExceptionHandler ]
+                    [ 'The `fnExceptionHandler` should be a callable', $fnExceptionHandler ]
                 );
             }
         }

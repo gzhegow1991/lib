@@ -99,7 +99,7 @@ class Test
         if (null !== $resource) {
             if (! is_resource($resource)) {
                 throw new LogicException(
-                    [ 'The `resource` should be opened resource', $resource ]
+                    [ 'The `resource` should be an opened resource', $resource ]
                 );
             }
         }
@@ -207,7 +207,7 @@ class Test
         if ([] !== $returnArray) {
             if (! array_key_exists(0, $returnArray)) {
                 throw new LogicException(
-                    [ 'The `return[0]` should be existing key', $return ]
+                    [ 'The `return[0]` should be an existing key', $return ]
                 );
             }
         }

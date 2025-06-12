@@ -83,7 +83,7 @@ class DefaultEmailParser implements EmailParserInterface
             if (! $theType->regex($regexp, $regex)) {
                 throw new RuntimeException(
                     [
-                        'Each of `regexList` should be valid regular expression',
+                        'Each of `regexList` should be a valid regular expression',
                         $regex,
                         $i,
                     ]
@@ -199,7 +199,7 @@ class DefaultEmailParser implements EmailParserInterface
         if (! Lib::type()->string_not_empty($emailString, $email)) {
             throw new LogicException(
                 [
-                    'The `email` should be non-empty string',
+                    'The `email` should be a non-empty string',
                     $email,
                 ]
             );
@@ -210,7 +210,7 @@ class DefaultEmailParser implements EmailParserInterface
         if ('' === $emailDomain) {
             throw new LogicException(
                 [
-                    'The `domain` should be non-empty string',
+                    'The `domain` should be a non-empty string',
                     $emailDomain,
                     $email,
                 ]

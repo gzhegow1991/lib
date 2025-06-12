@@ -13,7 +13,7 @@ abstract class AbstractArrayOfType extends AbstractArrayOf
             if ($this->valueType !== gettype($value)) {
                 throw new LogicException(
                     [
-                        'The `value` should be of type: ' . $this->valueType,
+                        'The `value` should be a value of type: ' . $this->valueType,
                         $value,
                     ]
                 );

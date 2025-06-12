@@ -96,7 +96,7 @@ class ErrorBag
         foreach ( $orAndTags as $i => $and ) {
             if ([] === $and) {
                 throw new LogicException(
-                    [ 'Each from `orAndTags` should be non-empty array', $and ]
+                    [ 'Each from `orAndTags` should be a non-empty array', $and ]
                 );
             }
 
@@ -179,7 +179,7 @@ class ErrorBag
 
             if (! $theType->string_not_empty($tagString, $tag)) {
                 throw new LogicException(
-                    [ 'Each of `and` in `orAndTags` should be non-empty string', $tag, $i ]
+                    [ 'Each of `and` in `orAndTags` should be a non-empty string', $tag, $i ]
                 );
             }
 

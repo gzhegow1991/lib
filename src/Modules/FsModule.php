@@ -96,7 +96,7 @@ class FsModule
         if (null !== $dir_chmod) {
             if (! $this->type_chmod($dirChmodString, $dir_chmod)) {
                 throw new LogicException(
-                    [ 'The `dir_chmod` should be valid chmod', $dir_chmod ]
+                    [ 'The `dir_chmod` should be a valid chmod', $dir_chmod ]
                 );
             }
 
@@ -120,7 +120,7 @@ class FsModule
         if (null !== $file_chmod) {
             if (! $this->type_chmod($fileChmodString, $file_chmod)) {
                 throw new LogicException(
-                    [ 'The `file_chmod` should be valid chmod', $file_chmod ]
+                    [ 'The `file_chmod` should be a valid chmod', $file_chmod ]
                 );
             }
 
@@ -879,7 +879,7 @@ class FsModule
     {
         if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
@@ -890,7 +890,7 @@ class FsModule
     {
         if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
@@ -927,7 +927,7 @@ class FsModule
     {
         if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
@@ -945,7 +945,7 @@ class FsModule
     {
         if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
@@ -967,7 +967,7 @@ class FsModule
     {
         if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
@@ -989,7 +989,7 @@ class FsModule
     {
         if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
@@ -1011,7 +1011,7 @@ class FsModule
     {
         if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
@@ -1035,13 +1035,13 @@ class FsModule
 
         if (! $theType->freepath($fileString, $file)) {
             throw new LogicException(
-                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+                [ 'The `file` should be a valid freepath', $file ]
             );
         }
 
         if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
             throw new LogicException(
-                [ 'The `fileDir` should be existing directory', $fileDir ]
+                [ 'The `fileDir` should be an existing directory', $fileDir ]
             );
         }
 
@@ -1078,13 +1078,13 @@ class FsModule
 
         if (! $theType->freepath($fileString, $file)) {
             throw new LogicException(
-                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+                [ 'The `file` should be a valid freepath', $file ]
             );
         }
 
         if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
             throw new LogicException(
-                [ 'The `fileDir` should be existing directory', $fileDir ]
+                [ 'The `fileDir` should be an existing directory', $fileDir ]
             );
         }
 
@@ -1121,13 +1121,13 @@ class FsModule
 
         if (! $theType->freepath($fileString, $file)) {
             throw new LogicException(
-                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+                [ 'The `file` should be a valid freepath', $file ]
             );
         }
 
         if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
             throw new LogicException(
-                [ 'The `fileDir` should be existing directory', $fileDir ]
+                [ 'The `fileDir` should be an existing directory', $fileDir ]
             );
         }
 
@@ -1164,13 +1164,13 @@ class FsModule
 
         if (! $theType->freepath($fileString, $file)) {
             throw new LogicException(
-                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+                [ 'The `file` should be a valid freepath', $file ]
             );
         }
 
         if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
             throw new LogicException(
-                [ 'The `fileDir` should be existing directory', $fileDir ]
+                [ 'The `fileDir` should be an existing directory', $fileDir ]
             );
         }
 
@@ -1209,13 +1209,13 @@ class FsModule
 
         if (! $theType->freepath($fileString, $file)) {
             throw new LogicException(
-                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+                [ 'The `file` should be a valid freepath', $file ]
             );
         }
 
         if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
             throw new LogicException(
-                [ 'The `fileDir` should be existing directory', $fileDir ]
+                [ 'The `fileDir` should be an existing directory', $fileDir ]
             );
         }
 
@@ -1301,13 +1301,13 @@ class FsModule
 
         if (! $theType->freepath($fileString, $file)) {
             throw new LogicException(
-                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+                [ 'The `file` should be a valid freepath', $file ]
             );
         }
 
         if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
             throw new LogicException(
-                [ 'The `fileDir` should be existing directory', $fileDir ]
+                [ 'The `fileDir` should be an existing directory', $fileDir ]
             );
         }
 
@@ -1331,7 +1331,7 @@ class FsModule
                 )) {
                     fwrite($fhOutLock, getmypid());
 
-                    $data = Lib::php()->poolingSync(
+                    $data = Lib::php()->pooling_sync(
                         $blockTickUsleep, $blockTimeoutMs,
                         //
                         static function ($ctx) use (
@@ -1414,13 +1414,13 @@ class FsModule
 
         if (! $theType->freepath($fileString, $file)) {
             throw new LogicException(
-                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+                [ 'The `file` should be a valid freepath', $file ]
             );
         }
 
         if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
             throw new LogicException(
-                [ 'The `fileDir` should be existing directory', $fileDir ]
+                [ 'The `fileDir` should be an existing directory', $fileDir ]
             );
         }
 
@@ -1511,13 +1511,13 @@ class FsModule
 
         if (! $theType->freepath($fileString, $file)) {
             throw new LogicException(
-                [ 'The `file` should be valid freepath (file should be not exists)', $file ]
+                [ 'The `file` should be a valid freepath', $file ]
             );
         }
 
         if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
             throw new LogicException(
-                [ 'The `fileDir` should be existing directory', $fileDir ]
+                [ 'The `fileDir` should be an existing directory', $fileDir ]
             );
         }
 
@@ -1541,7 +1541,7 @@ class FsModule
                 )) {
                     fwrite($fhOutLock, getmypid());
 
-                    $data = Lib::php()->poolingSync(
+                    $data = Lib::php()->pooling_sync(
                         $blockTickUsleep, $blockTimeoutMs,
                         //
                         static function ($ctx) use (
@@ -1671,7 +1671,7 @@ class FsModule
 
         if ($length < 1) {
             throw new LogicException(
-                [ 'The `length` should be greater than zero', $length ]
+                [ 'The `length` should be GT 0', $length ]
             );
         }
 
@@ -1873,14 +1873,14 @@ class FsModule
 
         if (! $theType->trim($startTrim, $start, true)) {
             throw new LogicException(
-                [ 'The `start` should be non-empty trim', $start ]
+                [ 'The `start` should be a non-empty trim', $start ]
             );
         }
 
         if (! is_null($endTrim = $end)) {
             if (! $theType->trim($endTrim, $end)) {
                 throw new LogicException(
-                    [ 'The `end` should be non-empty trim', $end ]
+                    [ 'The `end` should be a non-empty trim', $end ]
                 );
             }
         }

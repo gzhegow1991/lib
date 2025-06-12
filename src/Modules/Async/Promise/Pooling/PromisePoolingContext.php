@@ -53,7 +53,7 @@ class PromisePoolingContext
     {
         if ([] === $this->error) {
             throw new RuntimeException(
-                [ 'The `error` should be non-empty' ]
+                [ 'The `error` should be a non-empty var' ]
             );
         }
 
@@ -92,7 +92,7 @@ class PromisePoolingContext
     {
         if ([] === $this->result) {
             throw new RuntimeException(
-                [ 'The `result` should be non-empty' ]
+                [ 'The `result` should be a non-empty var' ]
             );
         }
 
@@ -148,7 +148,7 @@ class PromisePoolingContext
         if (null !== $timeoutMs) {
             if ($timeoutMs < 0) {
                 throw new LogicException(
-                    [ 'The `timeoutMs` should be non-negative integer', $timeoutMs ]
+                    [ 'The `timeoutMs` should be a non-negative integer', $timeoutMs ]
                 );
             }
         }

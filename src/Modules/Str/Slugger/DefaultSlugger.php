@@ -259,7 +259,7 @@ class DefaultSlugger implements SluggerInterface
             )) {
                 throw new LogicException(
                     [
-                        'The `localeDefault` should be string or callable',
+                        'The `localeDefault` should be a string or callable',
                         $localeDefault,
                     ]
                 );
@@ -286,7 +286,7 @@ class DefaultSlugger implements SluggerInterface
 
         } elseif (! Lib::type()->letter($_delimiter, $delimiter)) {
             throw new LogicException(
-                [ 'The `delimiter` should be exactly one letter', $delimiter ]
+                [ 'The `delimiter` should be an exactly one letter', $delimiter ]
             );
         }
 
@@ -321,7 +321,7 @@ class DefaultSlugger implements SluggerInterface
 
         } elseif (! $theType->letter($_delimiter, $delimiter)) {
             throw new LogicException(
-                [ 'The `delimiter` should be exactly one letter', $delimiter ]
+                [ 'The `delimiter` should be an exactly one letter', $delimiter ]
             );
         }
 
@@ -335,7 +335,7 @@ class DefaultSlugger implements SluggerInterface
             if (! $theType->string_not_empty($ignoreSymbolString, $ignoreSymbol)) {
                 throw new LogicException(
                     [
-                        'Each of `ignoreSymbols` should be non-empty string',
+                        'Each of `ignoreSymbols` should be a non-empty string',
                         $ignoreSymbol,
                         $i,
                     ]

@@ -45,7 +45,7 @@ class SocketSafe
 
         if (strlen($header) !== 4) {
             throw new RuntimeException(
-                [ 'First 4 bytes should be length', $header ]
+                [ 'First 4 bytes should be a length of the data', $header ]
             );
         }
 

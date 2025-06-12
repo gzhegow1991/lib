@@ -50,7 +50,7 @@ abstract class AbstractListOf implements
             throw new LogicException(
                 [
                     ''
-                    . 'The `valueType` must be one of: '
+                    . 'The `valueType` should be one of: '
                     . implode('|', array_keys($mapValueTypes)),
                     //
                     $valueType,
@@ -185,7 +185,7 @@ abstract class AbstractListOf implements
     {
         if (! is_int($key)) {
             throw new LogicException(
-                [ 'The `key` of dict should be integer', $key ]
+                [ 'The `key` of dict should be an integer', $key ]
             );
         }
 

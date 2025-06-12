@@ -157,11 +157,11 @@ class NetModule
 
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($_value, $value)) {
+        if (! $theType->string_not_empty($refValueString, $value)) {
             return false;
         }
 
-        [ $subnetOrIp, $subnet ] = explode('/', $_value, 2) + [ '', null ];
+        [ $subnetOrIp, $subnet ] = explode('/', $refValueString, 2) + [ '', null ];
 
         $hasSlash = (null !== $subnet);
 
@@ -310,33 +310,37 @@ class NetModule
     {
         $r = null;
 
-        if (! Lib::type()->string_not_empty($_subnet, $subnet)) {
+        if (! Lib::type()->string_not_empty($refSubnetString, $subnet)) {
             return false;
         }
 
-        if (false === strpos($_subnet, '.')) {
+        if (false === strpos($refSubnetString, '.')) {
             return false;
         }
 
-        if (! filter_var($_subnet, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        if (! filter_var($refSubnetString, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
             return false;
         }
 
-        $long = ip2long($_subnet);
+        $long = ip2long($refSubnetString);
+        if (false === $long) {
+            return false;
+        }
+
         $inv = ~$long & 0xFFFFFFFF;
-
-        $status = (0 === (($inv + 1) & $inv));
-        if ($status) {
+        $isSubnet = (0 === (($inv + 1) & $inv));
+        if ($isSubnet) {
             $subnetInt = decbin($long);
             $subnetInt = rtrim($subnetInt, '0');
             $subnetInt = strlen($subnetInt);
 
-            $r = $subnetInt;
-
-            return true;
+        } else {
+            $subnetInt = 32;
         }
 
-        return false;
+        $r = $subnetInt;
+
+        return true;
     }
 
 
@@ -356,7 +360,7 @@ class NetModule
         if (! $statusIp) {
             throw new LogicException(
                 [
-                    'The `addressIp` should be valid IPv4 or IPv6 address',
+                    'The `addressIp` should be a valid IPv4 or IPv6 address',
                     $addressIp,
                 ]
             );
@@ -378,7 +382,7 @@ class NetModule
             if (! $statusSubnet) {
                 throw new LogicException(
                     [
-                        'Each of `subnets` should be valid IPv4 or IPv6 subnet',
+                        'Each of `subnets` should be a valid IPv4 or IPv6 subnet',
                         $subnet,
                         $i,
                     ]
@@ -419,14 +423,14 @@ class NetModule
     {
         if (! $this->type_address_ip_v4($addressIpV4Object, $addressIpV4)) {
             throw new LogicException(
-                [ 'The `addressIpV4` should be valid IPv4 address', $addressIpV4 ]
+                [ 'The `addressIpV4` should be a valid IPv4 address', $addressIpV4 ]
             );
         }
 
         foreach ( $subnetsV4 as $subnetV4 ) {
             if (! $this->type_subnet_v4($subnetV4Object, $subnetV4)) {
                 throw new LogicException(
-                    [ 'The `subnetV4` should be valid IPv4 subnet', $subnetV4 ]
+                    [ 'The `subnetV4` should be a valid IPv4 subnet', $subnetV4 ]
                 );
             }
 
@@ -446,14 +450,14 @@ class NetModule
     {
         if (! $this->type_address_ip_v6($addressIpV6Object, $addressIpV6)) {
             throw new LogicException(
-                [ 'The `addressIpV6` should be valid IPv6 address', $addressIpV6 ]
+                [ 'The `addressIpV6` should be a valid IPv6 address', $addressIpV6 ]
             );
         }
 
         foreach ( $subnetsV6 as $subnetV6 ) {
             if (! $this->type_subnet_v6($subnetV6Object, $subnetV6)) {
                 throw new LogicException(
-                    [ 'The `subnetV6` should be valid IPv6 subnet', $subnetV6 ]
+                    [ 'The `subnetV6` should be a valid IPv6 subnet', $subnetV6 ]
                 );
             }
 
@@ -482,7 +486,7 @@ class NetModule
         if (! $statusIp) {
             throw new LogicException(
                 [
-                    'The `addressIp` should be valid IPv4 or IPv6 address',
+                    'The `addressIp` should be a valid IPv4 or IPv6 address',
                     $addressIp,
                 ]
             );
@@ -498,7 +502,7 @@ class NetModule
         if (! $statusSubnet) {
             throw new LogicException(
                 [
-                    'The `subnet` should be valid IPv4 or IPv6 subnet',
+                    'The `subnet` should be a valid IPv4 or IPv6 subnet',
                     $addressIp,
                 ]
             );
@@ -528,13 +532,13 @@ class NetModule
     {
         if (! $this->type_address_ip_v4($addressIpV4Object, $addressIpV4)) {
             throw new LogicException(
-                [ 'The `addressIpV4` should be valid IPv4 address', $addressIpV4 ]
+                [ 'The `addressIpV4` should be a valid IPv4 address', $addressIpV4 ]
             );
         }
 
         if (! $this->type_subnet_v4($subnetV4Object, $subnetV4)) {
             throw new LogicException(
-                [ 'The `subnetV4` should be valid IPv4 subnet', $subnetV4 ]
+                [ 'The `subnetV4` should be a valid IPv4 subnet', $subnetV4 ]
             );
         }
 
@@ -559,13 +563,13 @@ class NetModule
     {
         if (! $this->type_address_ip_v6($addressIpV6Object, $addressIpV6)) {
             throw new LogicException(
-                [ 'The `addressIpV6` should be valid IPv6 address', $addressIpV6 ]
+                [ 'The `addressIpV6` should be a valid IPv6 address', $addressIpV6 ]
             );
         }
 
         if (! $this->type_subnet_v6($subnetV6Object, $subnetV6)) {
             throw new LogicException(
-                [ 'The `subnetV6` should be valid IPv6 subnet', $subnetV6 ]
+                [ 'The `subnetV6` should be a valid IPv6 subnet', $subnetV6 ]
             );
         }
 

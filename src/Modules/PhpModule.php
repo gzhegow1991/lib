@@ -117,7 +117,7 @@ class PhpModule
                 throw new LogicException(
                     [
                         ''
-                        . 'The `throwableClass` should be class-string that is subclass one of: '
+                        . 'The `throwableClass` should be a class-string that is subclass one of: '
                         . implode('|', [
                             \LogicException::class,
                             \RuntimeException::class,
@@ -145,7 +145,7 @@ class PhpModule
         if (null !== $pooling_tick_usleep) {
             if ($pooling_tick_usleep < 1) {
                 throw new LogicException(
-                    [ 'The `pooling_tick_usleep` should be positive integer', $pooling_tick_usleep ]
+                    [ 'The `pooling_tick_usleep` should be a positive integer', $pooling_tick_usleep ]
                 );
             }
 
@@ -1015,7 +1015,7 @@ class PhpModule
             );
         }
 
-        if (! Lib::type()->int($_value, $value)) {
+        if (! Lib::type()->int_intpart($_value, $value)) {
             throw new LogicException(
                 [
                     'Unable to convert value to integer',
@@ -1037,6 +1037,10 @@ class PhpModule
                         $value,
                     ]
                 );
+            }
+
+            if (-0.0 === $value) {
+                return 0.0;
             }
 
             return $value;
@@ -1135,7 +1139,7 @@ class PhpModule
             if (! $isStdClass) {
                 throw new LogicException(
                     [
-                        'The `value` (if object) should be instance of: ' . \stdClass::class,
+                        'The `value` (if object) should be an instance of: ' . \stdClass::class,
                         $value,
                     ]
                 );
@@ -1180,7 +1184,7 @@ class PhpModule
             if (! $isStdClass) {
                 throw new LogicException(
                     [
-                        'The `value` (if object) should be instance of: ' . \stdClass::class,
+                        'The `value` (if object) should be an instance of: ' . \stdClass::class,
                         $value,
                     ]
                 );
@@ -1796,7 +1800,7 @@ class PhpModule
     {
         if ('' === $path) {
             throw new LogicException(
-                [ 'The `path` should be non-empty string' ]
+                [ 'The `path` should be a non-empty string' ]
             );
         }
 
@@ -1806,19 +1810,19 @@ class PhpModule
 
         if (! $theType->char($separatorString, $separator ?? '/')) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
         if (! $theType->char($dotString, $dot ?? '.')) {
             throw new LogicException(
-                [ 'The `dot` should be char', $dot ]
+                [ 'The `dot` should be a char', $dot ]
             );
         }
 
         if ('/' === $dotString) {
             throw new LogicException(
-                [ 'The `dot` should not be `/` sign' ]
+                [ 'The `dot` should not be a `/` sign' ]
             );
         }
 
@@ -1901,7 +1905,7 @@ class PhpModule
     {
         if ('' === $path) {
             throw new LogicException(
-                [ 'The `path` should be non-empty string' ]
+                [ 'The `path` should be a non-empty string' ]
             );
         }
 
@@ -1909,13 +1913,13 @@ class PhpModule
 
         if (! $theType->char($separatorString, $separator ?? '/')) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
         if (! $theType->int_positive($levelsInt, $levels ?? 1)) {
             throw new LogicException(
-                [ 'The `levels` should be positive integer', $levels ]
+                [ 'The `levels` should be a positive integer', $levels ]
             );
         }
 
@@ -1939,7 +1943,7 @@ class PhpModule
     {
         if ('' === $path) {
             throw new LogicException(
-                [ 'The `path` should be non-empty string' ]
+                [ 'The `path` should be a non-empty string' ]
             );
         }
 
@@ -1954,13 +1958,13 @@ class PhpModule
     {
         if ('' === $path) {
             throw new LogicException(
-                [ 'The `path` should be non-empty string' ]
+                [ 'The `path` should be a non-empty string' ]
             );
         }
 
         if (! Lib::type()->char($dotString, $dot ?? '.')) {
             throw new LogicException(
-                [ 'The `dot` should be char', $dot ]
+                [ 'The `dot` should be a char', $dot ]
             );
         }
 
@@ -1981,13 +1985,13 @@ class PhpModule
     {
         if ('' === $path) {
             throw new LogicException(
-                [ 'The `path` should be non-empty string' ]
+                [ 'The `path` should be a non-empty string' ]
             );
         }
 
         if (! Lib::type()->char($dotString, $dot ?? '.')) {
             throw new LogicException(
-                [ 'The `dot` should be char', $dot ]
+                [ 'The `dot` should be a char', $dot ]
             );
         }
 
@@ -2004,13 +2008,13 @@ class PhpModule
     {
         if ('' === $path) {
             throw new LogicException(
-                [ 'The `path` should be non-empty string' ]
+                [ 'The `path` should be a non-empty string' ]
             );
         }
 
         if (! Lib::type()->char($dotString, $dot ?? '.')) {
             throw new LogicException(
-                [ 'The `dot` should be char', $dot ]
+                [ 'The `dot` should be a char', $dot ]
             );
         }
 
@@ -2029,19 +2033,19 @@ class PhpModule
     {
         if ('' === $path) {
             throw new LogicException(
-                [ 'The `path` should be non-empty string' ]
+                [ 'The `path` should be a non-empty string' ]
             );
         }
 
         if (! Lib::type()->char($dotString, $dot ?? '.')) {
             throw new LogicException(
-                [ 'The `dot` should be char', $dot ]
+                [ 'The `dot` should be a char', $dot ]
             );
         }
 
         if ('/' === $dotString) {
             throw new LogicException(
-                [ 'The `dot` should not be `/` sign' ]
+                [ 'The `dot` should not be a `/` sign' ]
             );
         }
 
@@ -2069,13 +2073,13 @@ class PhpModule
     {
         if ('' === $path) {
             throw new LogicException(
-                [ 'The `path` should be non-empty string' ]
+                [ 'The `path` should be a non-empty string' ]
             );
         }
 
         if (! Lib::type()->char($separatorString, $separator ?? '/')) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
@@ -2098,7 +2102,7 @@ class PhpModule
     {
         if ('' === $path) {
             throw new LogicException(
-                [ 'The `path` should be non-empty string' ]
+                [ 'The `path` should be a non-empty string' ]
             );
         }
 
@@ -2106,13 +2110,13 @@ class PhpModule
 
         if (! $theType->char($separatorString, $separator ?? '/')) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
         if (! $theType->char($dotString, $dot ?? '.')) {
             throw new LogicException(
-                [ 'The `dot` should be char', $dot ]
+                [ 'The `dot` should be a char', $dot ]
             );
         }
 
@@ -2157,7 +2161,7 @@ class PhpModule
         if ('' === $pathResolved) {
             throw new RuntimeException(
                 [
-                    'Result path should be non-empty string',
+                    'Result path should be a non-empty string',
                     $path,
                     $separatorString,
                     $dotString,
@@ -2179,19 +2183,19 @@ class PhpModule
     {
         if ('' === $path) {
             throw new LogicException(
-                [ 'The `absolute` should be non-empty string' ]
+                [ 'The `absolute` should be a non-empty string' ]
             );
         }
 
         if ('' === $root) {
             throw new LogicException(
-                [ 'The `root` should be non-empty string' ]
+                [ 'The `root` should be a non-empty string' ]
             );
         }
 
         if (! Lib::type()->char($separatorString, $separator ?? '/')) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
@@ -2215,7 +2219,7 @@ class PhpModule
         if ('' === $pathRelative) {
             throw new RuntimeException(
                 [
-                    'Result path should be non-empty string',
+                    'Result path should be a non-empty string',
                     $path,
                     $separatorString,
                     $dot,
@@ -2236,19 +2240,19 @@ class PhpModule
     {
         if ('' === $relative) {
             throw new LogicException(
-                [ 'The `relative` should be non-empty string' ]
+                [ 'The `relative` should be a non-empty string' ]
             );
         }
 
         if ('' === $current) {
             throw new LogicException(
-                [ 'The `current` should be non-empty string' ]
+                [ 'The `current` should be a non-empty string' ]
             );
         }
 
         if (! Lib::type()->char($separatorString, $separator ?? '/')) {
             throw new LogicException(
-                [ 'The `separator` should be char', $separator ]
+                [ 'The `separator` should be a char', $separator ]
             );
         }
 
@@ -2280,19 +2284,19 @@ class PhpModule
     {
         if ('' === $path) {
             throw new LogicException(
-                [ 'The `relative` should be non-empty string' ]
+                [ 'The `relative` should be a non-empty string' ]
             );
         }
 
         if ('' === $current) {
             throw new LogicException(
-                [ 'The `current` should be non-empty string' ]
+                [ 'The `current` should be a non-empty string' ]
             );
         }
 
         if (! Lib::type()->char($dotString, $dot ?? '.')) {
             throw new LogicException(
-                [ 'The `dot` should be char', $separator ]
+                [ 'The `dot` should be a char', $separator ]
             );
         }
 
@@ -2347,6 +2351,97 @@ class PhpModule
         }
 
         return $result;
+    }
+
+
+    public function import(string $filepath)
+    {
+        static $export;
+
+        $export = $export ?? [];
+
+        if (! is_file($filepath)) {
+            throw new RuntimeException([ 'Missing file: ' . $filepath ]);
+        }
+
+        $realpath = realpath($filepath);
+
+        if (! isset($export[ $realpath ])) {
+            $export[ $realpath ] = require_once $realpath;
+        }
+
+        return $export[ $realpath ];
+    }
+
+
+    /**
+     * @param callable      $fnPooling
+     * @param callable|null $fnCatch
+     *
+     * @return mixed|false
+     */
+    public function pooling_sync(
+        ?int $tickUsleep, ?int $timeoutMs,
+        $fnPooling, $fnCatch = null
+    )
+    {
+        $hasFnCatch = (null !== $fnCatch);
+
+        $tickUsleep = $tickUsleep ?? $this->static_pooling_tick_usleep();
+
+        if ($tickUsleep <= 0) {
+            throw new LogicException(
+                [ 'The `tickUsleep` should be an integer positive', $tickUsleep ]
+            );
+        }
+
+        if (! (false
+            || (null === $timeoutMs)
+            || ($timeoutMs >= 0)
+        )) {
+            throw new LogicException(
+                [ 'The `timeoutMs` should be an integer non-negative or a null', $timeoutMs ]
+            );
+        }
+
+        $ctx = $this->poolingFactory()->newContext();
+
+        $ctx->resetTimeoutMs($timeoutMs);
+
+        do {
+            $ctx->updateNowMicrotime();
+
+            if ($hasFnCatch) {
+                try {
+                    call_user_func_array($fnPooling, [ $ctx ]);
+                }
+                catch ( \Throwable $e ) {
+                    call_user_func_array($fnCatch, [ $e, $ctx ]);
+                }
+
+            } else {
+                call_user_func_array($fnPooling, [ $ctx ]);
+            }
+
+            if ($ctx->hasResult($refResult)) {
+                return $refResult;
+
+            } elseif ($ctx->hasError($refError)) {
+                throw new RuntimeException(
+                    [ 'Pooling function returned error', $refError ]
+                );
+            }
+
+            if (null !== ($timeoutMicrotime = $ctx->hasTimeoutMicrotime())) {
+                if (microtime(true) > $timeoutMicrotime) {
+                    break;
+                }
+            }
+
+            usleep($tickUsleep);
+        } while ( true );
+
+        return false;
     }
 
 
@@ -2557,76 +2652,5 @@ class PhpModule
         }
 
         return;
-    }
-
-
-    /**
-     * @param callable      $fnPooling
-     * @param callable|null $fnCatch
-     *
-     * @return mixed|false
-     */
-    public function poolingSync(
-        ?int $tickUsleep, ?int $timeoutMs,
-        $fnPooling, $fnCatch = null
-    )
-    {
-        $hasFnCatch = (null !== $fnCatch);
-
-        $tickUsleep = $tickUsleep ?? $this->static_pooling_tick_usleep();
-
-        if ($tickUsleep <= 0) {
-            throw new LogicException(
-                [ 'The `tickUsleep` should be integer positive', $tickUsleep ]
-            );
-        }
-
-        if (! (false
-            || (null === $timeoutMs)
-            || ($timeoutMs >= 0)
-        )) {
-            throw new LogicException(
-                [ 'The `timeoutMs` should be integer non-negative or be null', $timeoutMs ]
-            );
-        }
-
-        $ctx = $this->poolingFactory()->newContext();
-
-        $ctx->resetTimeoutMs($timeoutMs);
-
-        do {
-            $ctx->updateNowMicrotime();
-
-            if ($hasFnCatch) {
-                try {
-                    call_user_func_array($fnPooling, [ $ctx ]);
-                }
-                catch ( \Throwable $e ) {
-                    call_user_func_array($fnCatch, [ $e, $ctx ]);
-                }
-
-            } else {
-                call_user_func_array($fnPooling, [ $ctx ]);
-            }
-
-            if ($ctx->hasResult($refResult)) {
-                return $refResult;
-
-            } elseif ($ctx->hasError($refError)) {
-                throw new RuntimeException(
-                    [ 'Pooling function returned error', $refError ]
-                );
-            }
-
-            if (null !== ($timeoutMicrotime = $ctx->hasTimeoutMicrotime())) {
-                if (microtime(true) > $timeoutMicrotime) {
-                    break;
-                }
-            }
-
-            usleep($tickUsleep);
-        } while ( true );
-
-        return false;
     }
 }

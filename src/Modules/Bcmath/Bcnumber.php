@@ -88,7 +88,7 @@ class Bcnumber implements
 
         return Result::err(
             $ret,
-            [ 'The `from` must be instance of: ' . static::class, $from ],
+            [ 'The `from` should be an instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }

@@ -220,7 +220,7 @@ abstract class AbstractConfig implements
     {
         if (static::class !== get_class($config)) {
             throw new LogicException(
-                [ 'The `config` should be instance of: ' . static::class, $config ]
+                [ 'The `config` should be an instance of: ' . static::class, $config ]
             );
         }
 

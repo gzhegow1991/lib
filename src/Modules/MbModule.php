@@ -302,7 +302,7 @@ class MbModule
 
         if ($length < 1) {
             throw new LogicException(
-                [ 'The `length` must be greater than 0', $length ]
+                [ 'The `length` should be GT 0', $length ]
             );
         }
 

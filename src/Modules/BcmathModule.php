@@ -79,22 +79,24 @@ class BcmathModule
             return true;
         }
 
-        $status = $this->type_number($refValueNumber, $value, false);
+        $status = Lib::type()->numeric($refValueNumeric, $value, false, [ &$split ]);
         if (! $status) {
             return false;
         }
 
-        $exp = $refValueNumber->getExp();
-        if ('' !== $exp) {
-            return false;
+        $frac = $split[ 2 ];
+
+        $scale = 0;
+        if ('' !== $frac) {
+            $scale = strlen($frac) - 1;
         }
 
         $bcnum = Bcnumber::fromValidArray([
-            'original' => $refValueNumber->getOriginal(),
-            'sign'     => $refValueNumber->getSign(),
-            'int'      => $refValueNumber->getInt(),
-            'frac'     => $refValueNumber->getFrac(),
-            'scale'    => $refValueNumber->getScale(),
+            'original' => $value,
+            'sign'     => $split[ 0 ],
+            'int'      => $split[ 1 ],
+            'frac'     => $split[ 2 ],
+            'scale'    => $scale,
         ]);
 
         $r = $bcnum;
@@ -108,7 +110,7 @@ class BcmathModule
         if (null !== $scaleLimit) {
             if ($scaleLimit < 0) {
                 throw new LogicException(
-                    [ 'The `scaleLimit` must be non-negative integer', $scaleLimit ]
+                    [ 'The `scaleLimit` should be a non-negative integer', $scaleLimit ]
                 );
             }
 
@@ -137,7 +139,7 @@ class BcmathModule
         foreach ( $numbers as $i => $number ) {
             if (! $this->type_bcnumber($refBcnumber, $number)) {
                 throw new LogicException(
-                    [ 'Each of `numbers` should be valid Bcnumber', $number, $i ]
+                    [ 'Each of `numbers` should be a valid Bcnumber', $number, $i ]
                 );
             }
 
@@ -157,7 +159,7 @@ class BcmathModule
         if (null !== $scale) {
             if (! Lib::type()->int_non_negative($refScaleInt, $scale)) {
                 throw new LogicException(
-                    [ 'The `scale` must be non negative integer', $scale ]
+                    [ 'The `scale` should be a non-negative integer', $scale ]
                 );
             }
 
@@ -199,7 +201,7 @@ class BcmathModule
         if (null !== $scale) {
             if (! Lib::type()->int_non_negative($refScaleInt, $scale)) {
                 throw new LogicException(
-                    [ 'The `scale` must be non negative integer', $scale ]
+                    [ 'The `scale` should be a non-negative integer', $scale ]
                 );
             }
 
@@ -233,13 +235,13 @@ class BcmathModule
     {
         if (! $this->type_bcnumber($refBcnum1, $num1)) {
             throw new LogicException(
-                [ 'The `num1` should be valid Bcnumber', $num1 ]
+                [ 'The `num1` should be a valid Bcnumber', $num1 ]
             );
         }
 
         if (! $this->type_bcnumber($refBcnum2, $num2)) {
             throw new LogicException(
-                [ 'The `num2` should be valid Bcnumber', $num2 ]
+                [ 'The `num2` should be a valid Bcnumber', $num2 ]
             );
         }
 
@@ -249,8 +251,8 @@ class BcmathModule
             ?? $this->scale_max(bcscale());
 
         $result = bccomp(
-            $refBcnum1->getValue(),
-            $refBcnum2->getValue(),
+            $refBcnum1,
+            $refBcnum2,
             $scaleMax
         );
 
@@ -258,45 +260,76 @@ class BcmathModule
     }
 
 
-    public function bcround($num, ?int $scale = null) : Bcnumber
+    public function bcabs($number) : Bcnumber
     {
-        $scale = $scale ?? 0;
-
-        if (! $this->type_bcnumber($refBcnum, $num)) {
+        if (! $this->type_bcnumber($refBcnumber, $number)) {
             throw new LogicException(
-                [ 'The `num` should be valid Bcnumber', $num ]
+                [ 'The `num` should be a valid Bcnumber', $number ]
             );
         }
 
-        if (! $refBcnum->hasFrac()) {
-            return $refBcnum;
+        $result = $refBcnumber->getValueAbsolute();
+
+        $this->type_bcnumber($refBcresult, $result);
+
+        return $refBcresult;
+    }
+
+    public function bcceil($number) : Bcnumber
+    {
+        if (! $this->type_bcnumber($refBcnumber, $number)) {
+            throw new LogicException(
+                [ 'The `num` should be a valid Bcnumber', $number ]
+            );
         }
 
-        $scaleMax = $this->scale_max(
-            $scale
-        );
-
-        $result = $refBcnum->getValue();
-
-        $hasScale = ($scaleMax > 0);
-        if ($hasScale) {
-            $factor = '1' . str_repeat('0', $scaleMax);
-
-            $result = bcmul($result, $factor, 1);
+        $hasNonZeroFrac = false;
+        if ($refBcnumber->hasFrac($frac)) {
+            $hasNonZeroFrac = ('' !== ltrim($frac, '.0'));
         }
 
-        if ($refBcnum->isNegative()) {
-            $result = bcsub($result, '0.5', 0);
+        $result = $refBcnumber->getValueInt();
+
+        if ($refBcnumber->isNegative()) {
+            if ($hasNonZeroFrac) {
+                $result = bcadd($result, '0', 0);
+            }
 
         } else {
-            $result = bcadd($result, '0.5', 0);
+            if ($hasNonZeroFrac) {
+                $result = bcadd($result, '1', 0);
+            }
         }
 
-        if ($hasScale) {
-            $result = bcdiv($result, $factor, $scaleMax);
+        $this->type_bcnumber($refBcresult, $result);
+
+        return $refBcresult;
+    }
+
+    public function bcfloor($number) : Bcnumber
+    {
+        if (! $this->type_bcnumber($refBcnumber, $number)) {
+            throw new LogicException(
+                [ 'The `num` should be a valid Bcnumber', $number ]
+            );
+        }
+
+        $hasNonZeroFrac = false;
+        if ($refBcnumber->hasFrac($frac)) {
+            $hasNonZeroFrac = ('' !== ltrim($frac, '.0'));
+        }
+
+        $result = $refBcnumber->getValueInt();
+
+        if ($refBcnumber->isNegative()) {
+            if ($hasNonZeroFrac) {
+                $result = bcsub($result, '1', 0);
+            }
 
         } else {
-            $result = bcadd($result, '0', 0);
+            if ($hasNonZeroFrac) {
+                $result = bcadd($result, '0', 0);
+            }
         }
 
         $this->type_bcnumber($refBcresult, $result);
@@ -305,170 +338,616 @@ class BcmathModule
     }
 
 
-    public function bcceil($num, ?int $scale = null) : Bcnumber
+    /**
+     * > Математическое округление
+     * > Точка принятия решения - "дробная часть равна .5/.05/.005 и тд"
+     * > Участвует только 1 разряд свыше указанного, как в математике, т.е. если число 1.005, а округляем до 1 знака, то 5 не участвует в решении, число будет 1.00
+     * > Середина определяется по первому не-нулевому разряду, то есть для 1.005 при округлении до 2 знаков решение будет приниматься по третьему знаку 5
+     * > К самой середине применяется правило округления, все что выше середины - правило всегда "от нуля", все что ниже середины - правило "к нулю"
+     *
+     * > 1.5 -> 2
+     * > 1.05 -> 1
+     * > -1.05 -> -1
+     * > -1.5 -> -2
+     */
+    public function bcmathround(
+        $number, ?int $scale = null,
+        ?int $flags = null, ?int $flagsNegative = null
+    ) : Bcnumber
     {
         $scale = $scale ?? 0;
 
-        if (! $this->type_bcnumber($refBcnum, $num)) {
+        if (! $this->type_bcnumber($refBcNumber, $number)) {
             throw new LogicException(
-                [ 'The `num` should be valid Bcnumber', $num ]
+                [ 'The `num` should be a valid numeric without exponent', $number ]
             );
         }
 
-        if (! $refBcnum->hasFrac()) {
-            return $refBcnum;
+        if ($refBcNumber->isZero()) {
+            return $refBcNumber;
+        }
+
+        if ($scale < 0) {
+            throw new LogicException(
+                [ 'The `scale` should be a non-negative integer', $scale ]
+            );
         }
 
         $scaleMax = $this->scale_max(
             $scale
         );
 
-        $result = $refBcnum->getValue();
+        $flagsNonNegativeCurrent = 0;
+        $flagsNegativeCurrent = 0;
 
-        $hasScale = ($scaleMax > 0);
-        if ($hasScale) {
-            $factor = '1' . str_repeat('0', $scaleMax);
+        $hasFlags = (null !== $flags);
+        $hasFlagsNegative = (null !== $flagsNegative);
 
-            $result = bcmul($result, $factor, 0);
+        if ($hasFlags && $hasFlagsNegative) {
+            $flagsNonNegativeCurrent = $flags;
+            $flagsNegativeCurrent = $flagsNegative;
+
+        } elseif ($hasFlags) {
+            $flagsNonNegativeCurrent = $flags;
+            $flagsNegativeCurrent = $flags;
+
+        } elseif ($hasFlagsNegative) {
+            throw new LogicException(
+                [ 'Unable to set `flagsNegative` without `flags`', $flagsNegative, $flags ]
+            );
         }
 
-        if ($refBcnum->isPositive()) {
-            $result = bcadd($result, '1');
+        $flagGroups = [
+            '_NUM_ROUND_ROUNDING' => [
+                [
+                    _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO,
+                    _NUM_ROUND_ROUNDING_TOWARD_ZERO,
+                    _NUM_ROUND_ROUNDING_TO_POSITIVE_INF,
+                    _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF,
+                    _NUM_ROUND_ROUNDING_EVEN,
+                    _NUM_ROUND_ROUNDING_ODD,
+                ],
+                _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO,
+            ],
+        ];
+
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flagsNonNegativeCurrent & $flag) {
+                    $cnt++;
+                }
+            }
+
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flagsNonNegative` conflict in group: ' . $groupName, $flags ]
+                );
+
+            } elseif (0 === $cnt) {
+                $flagsNonNegativeCurrent |= $default;
+            }
+        }
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flagsNegativeCurrent & $flag) {
+                    $cnt++;
+                }
+            }
+
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flagsNegative` conflict in group: ' . $groupName, $flags ]
+                );
+
+            } elseif (0 === $cnt) {
+                $flagsNegativeCurrent |= $default;
+            }
         }
 
-        if ($hasScale) {
-            $result = bcdiv($result, $factor, $scaleMax);
+        $isNonNegativeRoundingToPositiveInf = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_TO_POSITIVE_INF));
+        $isNonNegativeRoundingToNegativeInf = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF));
+        $isNonNegativeRoundingAwayFromZero = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO));
+        $isNonNegativeRoundingTowardZero = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_TOWARD_ZERO));
+        $isNonNegativeRoundingEven = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_EVEN));
+        $isNonNegativeRoundingOdd = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_ODD));
+
+        $isNegativeRoundingToPositiveInf = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_TO_POSITIVE_INF));
+        $isNegativeRoundingToNegativeInf = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF));
+        $isNegativeRoundingAwayFromZero = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO));
+        $isNegativeRoundingTowardZero = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_TOWARD_ZERO));
+        $isNegativeRoundingEven = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_EVEN));
+        $isNegativeRoundingOdd = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_ODD));
+
+        $sign = $refBcNumber->getSign();
+
+        $isNegative = ('-' === $sign);
+
+        $factor = ($scaleMax > 0)
+            ? ((string) pow(10, $scaleMax))
+            : '1';
+
+        $factorMath = $factor . '0';
+
+        $scaled = bcmul($refBcNumber, $factorMath, 0);
+        $scaled = bcdiv($scaled, '10', 1);
+
+        $this->type_bcnumber($refBcScaled, $scaled);
+
+        $scaledFrac = $refBcScaled->getFrac();
+
+        if ($isNegative) {
+            if ($isNegativeRoundingAwayFromZero) {
+                $isNegativeRoundingToNegativeInf = true;
+                unset($isNegativeRoundingAwayFromZero);
+            }
+            if ($isNegativeRoundingTowardZero) {
+                $isNegativeRoundingToPositiveInf = true;
+                unset($isNegativeRoundingTowardZero);
+            }
+
+            $firstNonZeroDigit = ltrim($scaledFrac, '.0');
+            if ('' === $firstNonZeroDigit) {
+                $firstNonZeroDigit = 0;
+
+            } else {
+                $firstNonZeroDigit = (int) $firstNonZeroDigit[ 0 ];
+            }
+
+            $isMidpoint = ($firstNonZeroDigit === 5);
+
+            if (! $isMidpoint) {
+                if ($firstNonZeroDigit > 5) {
+                    $refBcScaled = $this->bcfloor($refBcScaled);
+
+                } elseif ($firstNonZeroDigit < 5) {
+                    $refBcScaled = $this->bcceil($refBcScaled);
+
+                } else {
+                    throw new RuntimeException(
+                        [ 'The negative `rounding` mode is unknown', $flags ]
+                    );
+                }
+
+            } else {
+                if ($isNegativeRoundingToPositiveInf) {
+                    $refBcScaled = $this->bcceil($refBcScaled);
+
+                } elseif ($isNegativeRoundingToNegativeInf) {
+                    $refBcScaled = $this->bcfloor($refBcScaled);
+
+                } else {
+                    if ($isNegativeRoundingEven) {
+                        $a = $this->bcfloor($refBcScaled);
+                        $b = ($aIsMod2 = $this->bcmod($a, '2')->isZero()) ? $a : $this->bcsub($a, '1');
+                        $c = $this->bcadd($b, '2');
+
+                        $diff1 = $this->bcabs($this->bcsub($refBcScaled, $b));
+                        $diff2 = $this->bcabs($this->bcsub($c, $refBcScaled));
+
+                        $refBcScaled = ($isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0)) ? $b : $c;
+
+                    } elseif ($isNegativeRoundingOdd) {
+                        $a = $this->bcfloor($refBcScaled);
+                        $b = ($aIsNotMod2 = (! ($this->bcmod($a, '2')->isZero()))) ? $a : $this->bcsub($a, '1');
+                        $c = $this->bcadd($b, '2');
+
+                        $diff1 = $this->bcabs($this->bcsub($refBcScaled, $b));
+                        $diff2 = $this->bcabs($this->bcsub($c, $refBcScaled));
+
+                        $refBcScaled = ($isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0)) ? $b : $c;
+
+                    } else {
+                        throw new RuntimeException(
+                            [ 'The negative `rounding` mode is unknown', $flags ]
+                        );
+                    }
+                }
+            }
 
         } else {
-            $result = bcadd($result, '0', 0);
+            // if ($isNonNegative) {
+
+            if ($isNonNegativeRoundingAwayFromZero) {
+                $isNonNegativeRoundingToPositiveInf = true;
+                unset($isNonNegativeRoundingAwayFromZero);
+            }
+            if ($isNonNegativeRoundingTowardZero) {
+                $isNonNegativeRoundingToNegativeInf = true;
+                unset($isNonNegativeRoundingTowardZero);
+            }
+
+            $firstNonZeroDigit = ltrim($scaledFrac, '.0');
+            if ('' === $firstNonZeroDigit) {
+                $firstNonZeroDigit = 0;
+
+            } else {
+                $firstNonZeroDigit = (int) $firstNonZeroDigit[ 0 ];
+            }
+
+            $isMidpoint = ($firstNonZeroDigit === 5);
+
+            if (! $isMidpoint) {
+                if ($firstNonZeroDigit > 5) {
+                    $refBcScaled = $this->bcceil($refBcScaled);
+
+                } elseif ($firstNonZeroDigit < 5) {
+                    $refBcScaled = $this->bcfloor($refBcScaled);
+
+                } else {
+                    throw new RuntimeException(
+                        [ 'The non-negative `rounding` mode is unknown', $flags ]
+                    );
+                }
+
+            } else {
+                if ($isNonNegativeRoundingToPositiveInf) {
+                    $refBcScaled = $this->bcceil($refBcScaled);
+
+                } elseif ($isNonNegativeRoundingToNegativeInf) {
+                    $refBcScaled = $this->bcfloor($refBcScaled);
+
+                } else {
+                    if ($isNonNegativeRoundingEven) {
+                        $a = $this->bcfloor($refBcScaled);
+                        $b = ($aIsMod2 = $this->bcmod($a, '2')->isZero()) ? $a : $this->bcsub($a, '1');
+                        $c = $this->bcadd($b, '2');
+
+                        $diff1 = $this->bcabs($this->bcsub($refBcScaled, $b));
+                        $diff2 = $this->bcabs($this->bcsub($c, $refBcScaled));
+
+                        $refBcScaled = ($isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0)) ? $b : $c;
+
+                    } elseif ($isNonNegativeRoundingOdd) {
+                        $a = $this->bcfloor($refBcScaled);
+                        $b = ($aIsNotMod2 = (! ($this->bcmod($a, '2')->isZero()))) ? $a : $this->bcsub($a, '1');
+                        $c = $this->bcadd($b, '2');
+
+                        $diff1 = $this->bcabs($this->bcsub($refBcScaled, $b));
+                        $diff2 = $this->bcabs($this->bcsub($c, $refBcScaled));
+
+                        $refBcScaled = ($isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0)) ? $b : $c;
+
+                    } else {
+                        throw new RuntimeException(
+                            [ 'The non-negative `rounding` mode is unknown', $flags ]
+                        );
+                    }
+                }
+            }
         }
 
-        $this->type_bcnumber($refBcresult, $result);
+        $bcResult = $this->bcdiv($refBcScaled, $factor, $scaleMax);
 
-        return $refBcresult;
+        return $bcResult;
     }
 
-    public function bcfloor($num, ?int $scale = null) : Bcnumber
+    /**
+     * > 1.5 -> 1
+     * > 1.05 -> 1
+     * > -1.05 -> -1
+     * > -1.5 -> -1
+     */
+    public function bcmathtrunc($number, ?int $scale = null) : Bcnumber
     {
-        $scale = $scale ?? 0;
-
-        if (! $this->type_bcnumber($refBcnum, $num)) {
-            throw new LogicException(
-                [ 'The `num` should be valid Bcnumber', $num ]
-            );
-        }
-
-        if (! $refBcnum->hasFrac()) {
-            return $refBcnum;
-        }
-
-        $scaleMax = $this->scale_max(
-            $scale
+        return $this->bcmathround(
+            $number, $scale,
+            _NUM_ROUND_ROUNDING_TOWARD_ZERO, _NUM_ROUND_ROUNDING_TOWARD_ZERO
         );
+    }
 
-        $result = $refBcnum->getValue();
+    /**
+     * > 1.5 -> 2
+     * > 1.05 -> 1
+     * > -1.05 -> -1
+     * > -1.5 -> -1
+     */
+    public function bcmathceil($number, ?int $scale = null) : Bcnumber
+    {
+        return $this->bcmathround(
+            $number, $scale,
+            _NUM_ROUND_ROUNDING_TO_POSITIVE_INF, _NUM_ROUND_ROUNDING_TO_POSITIVE_INF
+        );
+    }
 
-        $hasScale = ($scaleMax > 0);
-        if ($hasScale) {
-            $factor = '1' . str_repeat('0', $scaleMax);
-
-            $result = bcmul($result, $factor, 0);
-        }
-
-        if ($refBcnum->isNegative()) {
-            $result = bcsub($result, '1');
-        }
-
-        if ($hasScale) {
-            $result = bcdiv($result, $factor, $scaleMax);
-
-        } else {
-            $result = bcadd($result, '0', 0);
-        }
-
-        $this->type_bcnumber($refBcresult, $result);
-
-        return $refBcresult;
+    /**
+     * > 1.5 -> 1
+     * > 1.05 -> 1
+     * > -1.05 -> -1
+     * > -1.5 -> -2
+     */
+    public function bcmathfloor($number, ?int $scale = null) : Bcnumber
+    {
+        return $this->bcmathround(
+            $number, $scale,
+            _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF, _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF
+        );
     }
 
 
-    public function bcmoneyceil($num, ?int $scale = null) : Bcnumber
+    /**
+     * > Денежное округление
+     * > Точка принятия решения - "наличие дробной части", если есть - округляем, если нет - обрезаем
+     * > Участвует всё число
+     *
+     * > 1.5 -> 2
+     * > 1.05 -> 2
+     * > -1.05 -> -2
+     * > -1.5 -> -2
+     */
+    public function bcmoneyround(
+        $number, ?int $scale = null,
+        ?int $flags = null, ?int $flagsNegative = null
+    ) : Bcnumber
     {
         $scale = $scale ?? 0;
 
-        if (! $this->type_bcnumber($refBcnum, $num)) {
+        if (! $this->type_bcnumber($refBcNumber, $number)) {
             throw new LogicException(
-                [ 'The `num` should be valid Bcnumber', $num ]
+                [ 'The `num` should be a valid numeric without exponent', $number ]
             );
         }
 
-        if (! $refBcnum->hasFrac()) {
-            return $refBcnum;
+        if ($refBcNumber->isZero()) {
+            return $refBcNumber;
+        }
+
+        if ($scale < 0) {
+            throw new LogicException(
+                [ 'The `scale` should be a non-negative integer', $scale ]
+            );
         }
 
         $scaleMax = $this->scale_max(
             $scale
         );
 
-        $result = $refBcnum->getValue();
+        $flagsNonNegativeCurrent = 0;
+        $flagsNegativeCurrent = 0;
 
-        $hasScale = ($scaleMax > 0);
-        if ($hasScale) {
-            $factor = '1' . str_repeat('0', $scaleMax);
+        $hasFlags = (null !== $flags);
+        $hasFlagsNegative = (null !== $flagsNegative);
 
-            $result = bcmul($result, $factor, 0);
+        if ($hasFlags && $hasFlagsNegative) {
+            $flagsNonNegativeCurrent = $flags;
+            $flagsNegativeCurrent = $flagsNegative;
+
+        } elseif ($hasFlags) {
+            $flagsNonNegativeCurrent = $flags;
+            $flagsNegativeCurrent = $flags;
+
+        } elseif ($hasFlagsNegative) {
+            throw new LogicException(
+                [ 'Unable to set `flagsNegative` without `flags`', $flagsNegative, $flags ]
+            );
         }
 
-        if ($refBcnum->isNegative()) {
-            $result = bcsub($result, '1');
+        $flagGroups = [
+            '_NUM_ROUND_ROUNDING' => [
+                [
+                    _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO,
+                    _NUM_ROUND_ROUNDING_TOWARD_ZERO,
+                    _NUM_ROUND_ROUNDING_TO_POSITIVE_INF,
+                    _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF,
+                    _NUM_ROUND_ROUNDING_EVEN,
+                    _NUM_ROUND_ROUNDING_ODD,
+                ],
+                _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO,
+            ],
+        ];
+
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flagsNonNegativeCurrent & $flag) {
+                    $cnt++;
+                }
+            }
+
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flagsNonNegative` conflict in group: ' . $groupName, $flags ]
+                );
+
+            } elseif (0 === $cnt) {
+                $flagsNonNegativeCurrent |= $default;
+            }
+        }
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flagsNegativeCurrent & $flag) {
+                    $cnt++;
+                }
+            }
+
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flagsNegative` conflict in group: ' . $groupName, $flags ]
+                );
+
+            } elseif (0 === $cnt) {
+                $flagsNegativeCurrent |= $default;
+            }
+        }
+
+        $isNonNegativeRoundingToPositiveInf = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_TO_POSITIVE_INF));
+        $isNonNegativeRoundingToNegativeInf = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF));
+        $isNonNegativeRoundingAwayFromZero = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO));
+        $isNonNegativeRoundingTowardZero = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_TOWARD_ZERO));
+        $isNonNegativeRoundingEven = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_EVEN));
+        $isNonNegativeRoundingOdd = ((bool) ($flagsNonNegativeCurrent & _NUM_ROUND_ROUNDING_ODD));
+
+        $isNegativeRoundingToPositiveInf = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_TO_POSITIVE_INF));
+        $isNegativeRoundingToNegativeInf = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF));
+        $isNegativeRoundingAwayFromZero = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO));
+        $isNegativeRoundingTowardZero = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_TOWARD_ZERO));
+        $isNegativeRoundingEven = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_EVEN));
+        $isNegativeRoundingOdd = ((bool) ($flagsNegativeCurrent & _NUM_ROUND_ROUNDING_ODD));
+
+        $sign = $refBcNumber->getSign();
+
+        $isNegative = ('-' === $sign);
+
+        $factor = ($scaleMax > 0)
+            ? ((string) pow(10, $scaleMax))
+            : '1';
+
+        $refBcScaled = $this->bcmul($refBcNumber, $factor);
+
+        $scaledFrac = $refBcScaled->getFrac();
+
+        if ($isNegative) {
+            if ($isNegativeRoundingAwayFromZero) {
+                $isNegativeRoundingToNegativeInf = true;
+                unset($isNegativeRoundingAwayFromZero);
+            }
+            if ($isNegativeRoundingTowardZero) {
+                $isNegativeRoundingToPositiveInf = true;
+                unset($isNegativeRoundingTowardZero);
+            }
+
+            $hasFrac = ($scaledFrac !== '');
+
+            if (! $hasFrac) {
+                $refBcScaled = $this->bcceil($refBcScaled);
+
+            } else {
+                if ($isNegativeRoundingToPositiveInf) {
+                    $refBcScaled = $this->bcceil($refBcScaled);
+
+                } elseif ($isNegativeRoundingToNegativeInf) {
+                    $refBcScaled = $this->bcfloor($refBcScaled);
+
+                } else {
+                    if ($isNegativeRoundingEven) {
+                        $a = $this->bcfloor($refBcScaled);
+                        $b = ($aIsMod2 = $this->bcmod($a, '2')->isZero()) ? $a : $this->bcsub($a, '1');
+                        $c = $this->bcadd($b, '2');
+
+                        $diff1 = $this->bcabs($this->bcsub($refBcScaled, $b));
+                        $diff2 = $this->bcabs($this->bcsub($c, $refBcScaled));
+
+                        $refBcScaled = ($isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0)) ? $b : $c;
+
+                    } elseif ($isNegativeRoundingOdd) {
+                        $a = $this->bcfloor($refBcScaled);
+                        $b = ($aIsNotMod2 = (! ($this->bcmod($a, '2')->isZero()))) ? $a : $this->bcsub($a, '1');
+                        $c = $this->bcadd($b, '2');
+
+                        $diff1 = $this->bcabs($this->bcsub($refBcScaled, $b));
+                        $diff2 = $this->bcabs($this->bcsub($c, $refBcScaled));
+
+                        $refBcScaled = ($isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0)) ? $b : $c;
+
+                    } else {
+                        throw new RuntimeException(
+                            [ 'The negative `rounding` mode is unknown', $flags ]
+                        );
+                    }
+                }
+            }
 
         } else {
-            $result = bcadd($result, '1');
+            // if (! $isNonNegative) {
+
+            if ($isNonNegativeRoundingAwayFromZero) {
+                $isNonNegativeRoundingToPositiveInf = true;
+                unset($isNonNegativeRoundingAwayFromZero);
+            }
+            if ($isNonNegativeRoundingTowardZero) {
+                $isNonNegativeRoundingToNegativeInf = true;
+                unset($isNonNegativeRoundingTowardZero);
+            }
+
+            $hasFrac = ($scaledFrac !== '');
+
+            if (! $hasFrac) {
+                $refBcScaled = $this->bcfloor($refBcScaled);
+
+            } else {
+                if ($isNonNegativeRoundingToPositiveInf) {
+                    $refBcScaled = $this->bcceil($refBcScaled);
+
+                } elseif ($isNonNegativeRoundingToNegativeInf) {
+                    $refBcScaled = $this->bcfloor($refBcScaled);
+
+                } else {
+                    if ($isNonNegativeRoundingEven) {
+                        $a = $this->bcfloor($refBcScaled);
+                        $b = ($aIsMod2 = $this->bcmod($a, '2')->isZero()) ? $a : $this->bcsub($a, '1');
+                        $c = $this->bcadd($b, '2');
+
+                        $diff1 = $this->bcabs($this->bcsub($refBcScaled, $b));
+                        $diff2 = $this->bcabs($this->bcsub($c, $refBcScaled));
+
+                        $refBcScaled = ($isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0)) ? $b : $c;
+
+                    } elseif ($isNonNegativeRoundingOdd) {
+                        $a = $this->bcfloor($refBcScaled);
+                        $b = ($aIsNotMod2 = (! ($this->bcmod($a, '2')->isZero()))) ? $a : $this->bcsub($a, '1');
+                        $c = $this->bcadd($b, '2');
+
+                        $diff1 = $this->bcabs($this->bcsub($refBcScaled, $b));
+                        $diff2 = $this->bcabs($this->bcsub($c, $refBcScaled));
+
+                        $refBcScaled = ($isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0)) ? $b : $c;
+
+                    } else {
+                        throw new RuntimeException(
+                            [ 'The non-negative `rounding` mode is unknown', $flags ]
+                        );
+                    }
+                }
+            }
         }
 
-        if ($hasScale) {
-            $result = bcdiv($result, $factor, $scaleMax);
+        $bcResult = $this->bcdiv($refBcScaled, $factor, $scaleMax);
 
-        } else {
-            $result = bcadd($result, '0', 0);
-        }
-
-        $this->type_bcnumber($refBcresult, $result);
-
-        return $refBcresult;
+        return $bcResult;
     }
 
-    public function bcmoneyfloor($num, ?int $scale = null) : Bcnumber
+    /**
+     * > 1.5 -> 1
+     * > 1.05 -> 1
+     * > -1.05 -> -1
+     * > -1.5 -> -1
+     */
+    public function bcmoneytrunc($number, ?int $scale = null) : Bcnumber
     {
-        $scale = $scale ?? 0;
-
-        if (! $this->type_bcnumber($refBcnum, $num)) {
-            throw new LogicException(
-                [ 'The `num` should be valid Bcnumber', $num ]
-            );
-        }
-
-        if (! $refBcnum->hasFrac()) {
-            return $refBcnum;
-        }
-
-        $scaleMax = $this->scale_max(
-            $scale
+        return $this->bcmoneyround(
+            $number, $scale,
+            _NUM_ROUND_ROUNDING_TOWARD_ZERO, _NUM_ROUND_ROUNDING_TOWARD_ZERO
         );
+    }
 
-        $result = $refBcnum->getValue();
+    /**
+     * > 1.5 -> 2
+     * > 1.05 -> 2
+     * > -1.05 -> -1
+     * > -1.5 -> -1
+     */
+    public function bcmoneyceil($number, ?int $scale = null) : Bcnumber
+    {
+        return $this->bcmoneyround(
+            $number, $scale,
+            _NUM_ROUND_ROUNDING_TO_POSITIVE_INF, _NUM_ROUND_ROUNDING_TO_POSITIVE_INF
+        );
+    }
 
-        $hasScale = ($scaleMax > 0);
-        if ($hasScale) {
-            $result = bcadd($result, '0', $scaleMax);
-
-        } else {
-            $result = bcadd($result, '0', 0);
-        }
-
-        $this->type_bcnumber($refBcresult, $result);
-
-        return $refBcresult;
+    /**
+     * > 1.5 -> 1
+     * > 1.05 -> 1
+     * > -1.05 -> -2
+     * > -1.5 -> -2
+     */
+    public function bcmoneyfloor($number, ?int $scale = null) : Bcnumber
+    {
+        return $this->bcmoneyround(
+            $number, $scale,
+            _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF, _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF
+        );
     }
 
 
@@ -476,13 +955,13 @@ class BcmathModule
     {
         if (! $this->type_bcnumber($refBcnum1, $num1)) {
             throw new LogicException(
-                [ 'The `num1` should be valid Bcnumber', $num1 ]
+                [ 'The `num1` should be a valid Bcnumber', $num1 ]
             );
         }
 
         if (! $this->type_bcnumber($refBcnum2, $num2)) {
             throw new LogicException(
-                [ 'The `num2` should be valid Bcnumber', $num2 ]
+                [ 'The `num2` should be a valid Bcnumber', $num2 ]
             );
         }
 
@@ -492,8 +971,8 @@ class BcmathModule
             ?? $this->scale_max(bcscale());
 
         $result = bcadd(
-            $refBcnum1->getValue(),
-            $refBcnum2->getValue(),
+            $refBcnum1,
+            $refBcnum2,
             $scaleMax
         );
 
@@ -506,13 +985,13 @@ class BcmathModule
     {
         if (! $this->type_bcnumber($refBcnum1, $num1)) {
             throw new LogicException(
-                [ 'The `num1` should be valid Bcnumber', $num1 ]
+                [ 'The `num1` should be a valid Bcnumber', $num1 ]
             );
         }
 
         if (! $this->type_bcnumber($refBcnum2, $num2)) {
             throw new LogicException(
-                [ 'The `num2` should be valid Bcnumber', $num2 ]
+                [ 'The `num2` should be a valid Bcnumber', $num2 ]
             );
         }
 
@@ -522,8 +1001,8 @@ class BcmathModule
             ?? $this->scale_max(bcscale());
 
         $result = bcsub(
-            $refBcnum1->getValue(),
-            $refBcnum2->getValue(),
+            $refBcnum1,
+            $refBcnum2,
             $scaleMax
         );
 
@@ -536,13 +1015,13 @@ class BcmathModule
     {
         if (! $this->type_bcnumber($refBcnum1, $num1)) {
             throw new LogicException(
-                [ 'The `num1` should be valid Bcnumber', $num1 ]
+                [ 'The `num1` should be a valid Bcnumber', $num1 ]
             );
         }
 
         if (! $this->type_bcnumber($refBcnum2, $num2)) {
             throw new LogicException(
-                [ 'The `num2` should be valid Bcnumber', $num2 ]
+                [ 'The `num2` should be a valid Bcnumber', $num2 ]
             );
         }
 
@@ -560,8 +1039,8 @@ class BcmathModule
             ?? $this->scale_max(bcscale());
 
         $result = bcmul(
-            $refBcnum1->getValue(),
-            $refBcnum2->getValue(),
+            $refBcnum1,
+            $refBcnum2,
             $scaleMax
         );
 
@@ -577,13 +1056,13 @@ class BcmathModule
     {
         if (! $this->type_bcnumber($refBcnum1, $num1)) {
             throw new LogicException(
-                [ 'The `num1` should be valid Bcnumber', $num1 ]
+                [ 'The `num1` should be a valid Bcnumber', $num1 ]
             );
         }
 
         if (! $this->type_bcnumber($refBcnum2, $num2)) {
             throw new LogicException(
-                [ 'The `num2` should be valid Bcnumber', $num2 ]
+                [ 'The `num2` should be a valid Bcnumber', $num2 ]
             );
         }
 
@@ -592,8 +1071,8 @@ class BcmathModule
         );
 
         $result = bcdiv(
-            $refBcnum1->getValue(),
-            $refBcnum2->getValue(),
+            $refBcnum1,
+            $refBcnum2,
             $scaleMax
         );
 
@@ -607,13 +1086,13 @@ class BcmathModule
     {
         if (! $this->type_bcnumber($refBcnum1, $num1)) {
             throw new LogicException(
-                [ 'The `num1` should be valid Bcnumber', $num1 ]
+                [ 'The `num1` should be a valid Bcnumber', $num1 ]
             );
         }
 
         if (! $this->type_bcnumber($refBcnum2, $num2)) {
             throw new LogicException(
-                [ 'The `num2` should be valid Bcnumber', $num2 ]
+                [ 'The `num2` should be a valid Bcnumber', $num2 ]
             );
         }
 
@@ -632,13 +1111,13 @@ class BcmathModule
     {
         if (! $this->type_bcnumber($refBcnum1, $num1)) {
             throw new LogicException(
-                [ 'The `num1` should be valid Bcnumber', $num1 ]
+                [ 'The `num1` should be a valid Bcnumber', $num1 ]
             );
         }
 
         if (! $this->type_bcnumber($refBcnum2, $num2)) {
             throw new LogicException(
-                [ 'The `num2` should be valid Bcnumber', $num2 ]
+                [ 'The `num2` should be a valid Bcnumber', $num2 ]
             );
         }
 
@@ -646,18 +1125,19 @@ class BcmathModule
             $scale
         );
 
-        $value1 = $refBcnum1->getValue();
-        $value2 = $refBcnum2->getValue();
-
-        $result = bcdiv($value1, $value2, $scaleMax);
+        $result = bcdiv(
+            $refBcnum1,
+            $refBcnum2,
+            $scaleMax
+        );
 
         $result = (bccomp($result, '0', $scaleMax) >= 0)
             ? bcadd($result, '0', 0)
             : bcsub($result, '0', 0);
 
-        $result = bcmul($result, $value2, $scaleMax);
+        $result = bcmul($result, $refBcnum2, $scaleMax);
 
-        $result = bcsub($value1, $result, $scale);
+        $result = bcsub($refBcnum1, $result, $scale);
 
         $this->type_bcnumber($refBcresult, $result);
 
@@ -669,7 +1149,7 @@ class BcmathModule
     {
         if (! $this->type_bcnumber($refBcnum, $num)) {
             throw new LogicException(
-                [ 'The `num` should be valid Bcnumber', $num ]
+                [ 'The `num` should be a valid Bcnumber', $num ]
             );
         }
 
@@ -688,9 +1168,7 @@ class BcmathModule
             ?? $this->scale_max(null, $refBcnum)
             ?? $this->scale_max(bcscale());
 
-        $result = $refBcnum->getValue();
-
-        $result = bcpow($result, $exponentString, $scaleMax);
+        $result = bcpow($refBcnum, $exponentString, $scaleMax);
 
         $this->type_bcnumber($refBcresult, $result);
 
@@ -702,7 +1180,7 @@ class BcmathModule
     {
         if (! $this->type_bcnumber($refBcnum, $num)) {
             throw new LogicException(
-                [ 'The `num` should be valid Bcnumber', $num ]
+                [ 'The `num` should be a valid Bcnumber', $num ]
             );
         }
 
@@ -710,9 +1188,7 @@ class BcmathModule
             $scale
         );
 
-        $result = $refBcnum->getValue();
-
-        $result = bcsqrt($result, $scaleMax);
+        $result = bcsqrt($refBcnum, $scaleMax);
 
         $this->type_bcnumber($refBcresult, $result);
 
@@ -727,26 +1203,26 @@ class BcmathModule
     {
         if (! $this->type_bcnumber($refBcnum1, $num1)) {
             throw new LogicException(
-                [ 'The `num1` should be valid Bcnumber', $num1 ]
+                [ 'The `num1` should be a valid Bcnumber', $num1 ]
             );
         }
 
         if (! $this->type_bcnumber($refBcnum2, $num2)) {
             throw new LogicException(
-                [ 'The `num2` should be valid Bcnumber', $num2 ]
+                [ 'The `num2` should be a valid Bcnumber', $num2 ]
             );
         }
 
-        $num1Abs = $refBcnum1->getValueAbsolute();
-        $num2Abs = $refBcnum2->getValueAbsolute();
+        $abs1 = $refBcnum1->getValueAbsolute();
+        $abs2 = $refBcnum2->getValueAbsolute();
 
-        while ( '0' !== $num2Abs ) {
-            $mod = bcmod($num1Abs, $num2Abs, 0);
+        while ( '0' !== $abs2 ) {
+            $mod = bcmod($abs1, $abs2, 0);
 
-            [ $num2Abs, $num1Abs ] = [ $mod, $num2Abs ];
+            [ $abs2, $abs1 ] = [ $mod, $abs2 ];
         }
 
-        $result = $num1Abs;
+        $result = $abs1;
 
         $this->type_bcnumber($refBcresult, $result);
 
@@ -760,26 +1236,26 @@ class BcmathModule
     {
         if (! $this->type_bcnumber($refBcnum1, $num1)) {
             throw new LogicException(
-                [ 'The `num1` should be valid Bcnumber', $num1 ]
+                [ 'The `num1` should be a valid Bcnumber', $num1 ]
             );
         }
 
         if (! $this->type_bcnumber($refBcnum2, $num2)) {
             throw new LogicException(
-                [ 'The `num2` should be valid Bcnumber', $num2 ]
+                [ 'The `num2` should be a valid Bcnumber', $num2 ]
             );
         }
 
-        $num1Abs = $refBcnum1->getValueAbsolute();
-        $num2Abs = $refBcnum2->getValueAbsolute();
+        $abs1 = $refBcnum1->getValueAbsolute();
+        $abs2 = $refBcnum2->getValueAbsolute();
 
-        $result = bcmul($num1Abs, $num2Abs, 0);
+        $result = bcmul($abs1, $abs2, 0);
 
-        $bcGcd = $this->bcgcd($num1Abs, $num2Abs);
+        $bcGcd = $this->bcgcd($abs1, $abs2);
 
-        $gcdAbs = $bcGcd->getValueAbsolute();
+        $absGcd = $bcGcd->getValueAbsolute();
 
-        $result = bcdiv($result, $gcdAbs, 0);
+        $result = bcdiv($result, $absGcd, 0);
 
         $this->type_bcnumber($refBcresult, $result);
 

@@ -62,7 +62,7 @@ abstract class AbstractListOfClass extends AbstractListOf
         if (! is_object($value)) {
             throw new LogicException(
                 [
-                    'The `value` should be object',
+                    'The `value` should be an object',
                     $value,
                 ]
             );
@@ -71,7 +71,7 @@ abstract class AbstractListOfClass extends AbstractListOf
         if (get_class($value) !== $this->valueClass) {
             throw new LogicException(
                 [
-                    'The `value` should be of class: ' . $this->valueClass,
+                    'The `value` should be an instance of the class: ' . $this->valueClass,
                     $value,
                 ]
             );

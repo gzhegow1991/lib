@@ -100,7 +100,7 @@ class DebugModule
         if (null !== $dirRoot) {
             if (! Lib::fs()->type_dirpath_realpath($realpath, $dirRoot)) {
                 throw new LogicException(
-                    [ 'The `dirRoot` should be existing directory path', $dirRoot ]
+                    [ 'The `dirRoot` should be an existing directory path', $dirRoot ]
                 );
             }
 
@@ -248,7 +248,7 @@ class DebugModule
     {
         if ($throttleMs < 0) {
             throw new LogicException(
-                [ 'The `throttleMs` should be non-negative integer', $throttleMs ]
+                [ 'The `throttleMs` should be a non-negative integer', $throttleMs ]
             );
         }
 
@@ -664,7 +664,7 @@ class DebugModule
     {
         if (! Lib::type()->string_not_empty($delimiterString, $delimiter ?? ' | ')) {
             throw new LogicException(
-                [ 'The `delimiter` should be non-empty string', $delimiter ]
+                [ 'The `delimiter` should be a non-empty string', $delimiter ]
             );
         }
 
@@ -682,7 +682,7 @@ class DebugModule
     {
         if (! Lib::type()->string_not_empty($delimiterString, $delimiter ?? ' | ')) {
             throw new LogicException(
-                [ 'The `delimiter` should be non-empty string', $delimiter ]
+                [ 'The `delimiter` should be a non-empty string', $delimiter ]
             );
         }
 
@@ -700,7 +700,7 @@ class DebugModule
     {
         if (! Lib::type()->string_not_empty($delimiterString, $delimiter ?? ' | ')) {
             throw new LogicException(
-                [ 'The `delimiter` should be non-empty string', $delimiter ]
+                [ 'The `delimiter` should be a non-empty string', $delimiter ]
             );
         }
 
@@ -718,7 +718,7 @@ class DebugModule
     {
         if (! Lib::type()->string_not_empty($delimiterString, $delimiter ?? ' | ')) {
             throw new LogicException(
-                [ 'The `delimiter` should be non-empty string', $delimiter ]
+                [ 'The `delimiter` should be a non-empty string', $delimiter ]
             );
         }
 

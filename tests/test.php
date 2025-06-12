@@ -613,20 +613,19 @@ $fn = function () use ($ffn) {
     $ffn->print_array($theMap->values(), 2);
 };
 $test = $ffn->test($fn);
-
 $test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
 "[ ArrayOf ]"
 
 { object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOf }
 TRUE | [ 1 ]
 
-"[ CATCH ] The `value` should be of type: object"
+"[ CATCH ] The `value` should be a value of type: object"
 { object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOfType }
 TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable serializable) # ArrayObject }" ]
 
-"[ CATCH ] The `value` should be of class: stdClass"
-"[ CATCH ] The `value` should be of class: stdClass"
-"[ CATCH ] The `value` should be object"
+"[ CATCH ] The `value` should be an instance of the class: stdClass"
+"[ CATCH ] The `value` should be an instance of the class: stdClass"
+"[ CATCH ] The `value` should be an object"
 { object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOfClass }
 TRUE | [ "{ object # stdClass }" ]
 
@@ -635,20 +634,19 @@ TRUE | TRUE
 [ "{ object # stdClass }", "{ array(3) }" ]
 [ 1, 1 ]
 ');
-
 $test->expectStdoutIf(PHP_VERSION_ID < 80000, '
 "[ ArrayOf ]"
 
 { object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf }
 TRUE | [ 1 ]
 
-"[ CATCH ] The `value` should be of type: object"
+"[ CATCH ] The `value` should be a value of type: object"
 { object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfType }
 TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable serializable) # ArrayObject }" ]
 
-"[ CATCH ] The `value` should be of class: stdClass"
-"[ CATCH ] The `value` should be of class: stdClass"
-"[ CATCH ] The `value` should be object"
+"[ CATCH ] The `value` should be an instance of the class: stdClass"
+"[ CATCH ] The `value` should be an instance of the class: stdClass"
+"[ CATCH ] The `value` should be an object"
 { object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfClass }
 TRUE | [ "{ object # stdClass }" ]
 
@@ -657,7 +655,6 @@ TRUE | TRUE
 [ "{ object # stdClass }", "{ array(3) }" ]
 [ 1, 1 ]
 ');
-
 $test->run();
 
 
@@ -888,7 +885,7 @@ $fn = function () use ($ffn) {
             if (! is_string($value)) {
                 return \Gzhegow\Lib\Modules\Php\Result\Result::err(
                     $res,
-                    [ 'The `value` should be string', $value ],
+                    [ 'The `value` should be a string', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
@@ -901,7 +898,7 @@ $fn = function () use ($ffn) {
             if (! (is_string($value) && ('' !== $value))) {
                 return \Gzhegow\Lib\Modules\Php\Result\Result::err(
                     $res,
-                    [ 'The `value` should be non-empty string', $value ],
+                    [ 'The `value` should be a non-empty string', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
@@ -1016,25 +1013,25 @@ $test->expectStdout('
 
 ###
 [
-  "The `from` must be instance of: Gzhegow\Lib\Modules\Bcmath\Number",
+  "The `from` should be an instance of: Gzhegow\Lib\Modules\Bcmath\Number",
   "The `from` should be array"
 ]
 ###
 
 ###
 [
-  "The `from` must be instance of: Gzhegow\Lib\Modules\Bcmath\Number",
+  "The `from` should be an instance of: Gzhegow\Lib\Modules\Bcmath\Number",
   "The `from` should be array"
 ]
 ###
 
-[ 0 ] The `from` must be instance of: Gzhegow\Lib\Modules\Bcmath\Number
+[ 0 ] The `from` should be an instance of: Gzhegow\Lib\Modules\Bcmath\Number
 { object # Gzhegow\Lib\Exception\LogicException }
 
-[ 0 ] The `value` should be string
+[ 0 ] The `value` should be a string
 { object # Gzhegow\Lib\Exception\LogicException }
 
-[ 0 ] The `value` should be string
+[ 0 ] The `value` should be a string
 { object # Gzhegow\Lib\Exception\LogicException }
 
 "123" | "123"
@@ -1409,179 +1406,197 @@ $fn = function () use ($ffn) {
     echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('0', 0);
-    $ffn->print('bcceil', $result, (string) $result);
+    $ffn->print('bcabs', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 0);
-    $ffn->print('bcceil', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 2);
-    $ffn->print('bcceil', $result, (string) $result);
+    $ffn->print('bcabs', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 0);
-    $ffn->print('bcceil', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 2);
-    $ffn->print('bcceil', $result, (string) $result);
+    $ffn->print('bcabs', (string) $result, $result);
     echo "\n";
 
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('0', 0);
-    $ffn->print('bcmoneyceil', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 0);
-    $ffn->print('bcmoneyceil', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 2);
-    $ffn->print('bcmoneyceil', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 0);
-    $ffn->print('bcmoneyceil', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 2);
-    $ffn->print('bcmoneyceil', $result, (string) $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('0', 0);
+    $ffn->print('bcceil', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 0);
+    $ffn->print('bcceil', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 0);
+    $ffn->print('bcceil', (string) $result, $result);
     echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('0', 0);
-    $ffn->print('bcfloor', $result, (string) $result);
+    $ffn->print('bcfloor', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005', 0);
-    $ffn->print('bcfloor', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005', 2);
-    $ffn->print('bcfloor', $result, (string) $result);
+    $ffn->print('bcfloor', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005', 0);
-    $ffn->print('bcfloor', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005', 2);
-    $ffn->print('bcfloor', $result, (string) $result);
+    $ffn->print('bcfloor', (string) $result, $result);
+    echo "\n";
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('0', 0);
+    $ffn->print('bcmathround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('1.5', 0);
+    $ffn->print('bcmathround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('1.05', 0);
+    $ffn->print('bcmathround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('1.005', 0);
+    $ffn->print('bcmathround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('-1.5', 0);
+    $ffn->print('bcmathround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('-1.05', 0);
+    $ffn->print('bcmathround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('-1.005', 0);
+    $ffn->print('bcmathround', (string) $result, $result);
+    echo "\n";
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('0', 2);
+    $ffn->print('bcmathround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('1.5', 2);
+    $ffn->print('bcmathround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('1.05', 2);
+    $ffn->print('bcmathround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('1.005', 2);
+    $ffn->print('bcmathround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('-1.5', 2);
+    $ffn->print('bcmathround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('-1.05', 2);
+    $ffn->print('bcmathround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('-1.005', 2);
+    $ffn->print('bcmathround', (string) $result, $result);
+    echo "\n";
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyround('0', 0);
+    $ffn->print('bcmoneyround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyround('1.005', 0);
+    $ffn->print('bcmoneyround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyround('1.005', 2);
+    $ffn->print('bcmoneyround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyround('-1.005', 0);
+    $ffn->print('bcmoneyround', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyround('-1.005', 2);
+    $ffn->print('bcmoneyround', (string) $result, $result);
+    echo "\n";
+
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('0', 0);
+    $ffn->print('bcmoneyceil', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 0);
+    $ffn->print('bcmoneyceil', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 2);
+    $ffn->print('bcmoneyceil', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 0);
+    $ffn->print('bcmoneyceil', (string) $result, $result);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 2);
+    $ffn->print('bcmoneyceil', (string) $result, $result);
     echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('0', 0);
-    $ffn->print('bcmoneyfloor', $result, (string) $result);
+    $ffn->print('bcmoneyfloor', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 0);
-    $ffn->print('bcmoneyfloor', $result, (string) $result);
+    $ffn->print('bcmoneyfloor', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 2);
-    $ffn->print('bcmoneyfloor', $result, (string) $result);
+    $ffn->print('bcmoneyfloor', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 0);
-    $ffn->print('bcmoneyfloor', $result, (string) $result);
+    $ffn->print('bcmoneyfloor', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 2);
-    $ffn->print('bcmoneyfloor', $result, (string) $result);
-    echo "\n";
-
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('0', 0);
-    $ffn->print('bcround', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 0);
-    $ffn->print('bcround', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.05', 0);
-    $ffn->print('bcround', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 0);
-    $ffn->print('bcround', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.5', 0);
-    $ffn->print('bcround', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.05', 0);
-    $ffn->print('bcround', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.005', 0);
-    $ffn->print('bcround', $result, (string) $result);
-    echo "\n";
-
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('0', 2);
-    $ffn->print('bcround', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.5', 2);
-    $ffn->print('bcround', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.05', 2);
-    $ffn->print('bcround', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('1.005', 2);
-    $ffn->print('bcround', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.5', 2);
-    $ffn->print('bcround', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.05', 2);
-    $ffn->print('bcround', $result, (string) $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcround('-1.005', 2);
-    $ffn->print('bcround', $result, (string) $result);
+    $ffn->print('bcmoneyfloor', (string) $result, $result);
     echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(5.75, 2);
-    $ffn->print('bcmod', $result, (string) $result);
+    $ffn->print('bcmod', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(-5.75, 2);
-    $ffn->print('bcmod', $result, (string) $result);
+    $ffn->print('bcmod', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(5.75, 2.25);
-    $ffn->print('bcmod', $result, (string) $result);
+    $ffn->print('bcmod', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(-5.75, 2.25);
-    $ffn->print('bcmod', $result, (string) $result);
+    $ffn->print('bcmod', (string) $result, $result);
     echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfmod(5.75, 2, 2);
-    $ffn->print('bcfmod', $result, (string) $result);
+    $ffn->print('bcfmod', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfmod(-5.75, 2, 2);
-    $ffn->print('bcfmod', $result, (string) $result);
+    $ffn->print('bcfmod', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfmod(5.75, 2.25, 2);
-    $ffn->print('bcfmod', $result, (string) $result);
+    $ffn->print('bcfmod', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcfmod(-5.75, 2.25, 2);
-    $ffn->print('bcfmod', $result, (string) $result);
+    $ffn->print('bcfmod', (string) $result, $result);
     echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bcgcd(8, 12);
-    $ffn->print('bcgcd', $result, (string) $result);
+    $ffn->print('bcgcd', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcgcd(7, 13);
-    $ffn->print('bcgcd', $result, (string) $result);
+    $ffn->print('bcgcd', (string) $result, $result);
     echo "\n";
 
     $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 6);
-    $ffn->print('bclcm', $result, (string) $result);
+    $ffn->print('bclcm', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 5);
-    $ffn->print('bclcm', $result, (string) $result);
+    $ffn->print('bclcm', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 10);
-    $ffn->print('bclcm', $result, (string) $result);
+    $ffn->print('bclcm', (string) $result, $result);
     echo "\n";
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
 "[ BcmathModule ]"
 
-"bcceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "0"
-"bcceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
-"bcceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.01"
-"bcceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
-"bcceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+"bcabs" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcabs" | "2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcabs" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 
-"bcmoneyceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "0"
-"bcmoneyceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
-"bcmoneyceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.01"
-"bcmoneyceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-2"
-"bcmoneyceil" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
+"bcceil" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcceil" | "2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcceil" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 
-"bcfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "0"
-"bcfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-"bcfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-"bcfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-2"
-"bcfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
+"bcfloor" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcfloor" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcfloor" | "-2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 
-"bcmoneyfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "0"
-"bcmoneyfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-"bcmoneyfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-"bcmoneyfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
-"bcmoneyfloor" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+"bcmathround" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmathround" | "2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmathround" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmathround" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmathround" | "-2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmathround" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmathround" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "0"
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "2"
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-2"
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+"bcmathround" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmathround" | "1.5" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmathround" | "1.05" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmathround" | "1.01" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmathround" | "-1.5" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmathround" | "-1.05" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmathround" | "-1.01" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "0"
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.5"
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.05"
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.01"
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.5"
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.05"
-"bcround" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.01"
+"bcmoneyround" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmoneyround" | "2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmoneyround" | "1.01" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmoneyround" | "-2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmoneyround" | "-1.01" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 
-"bcmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-"bcmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
-"bcmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
-"bcmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1"
+"bcmoneyceil" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmoneyceil" | "2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmoneyceil" | "1.01" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmoneyceil" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmoneyceil" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 
-"bcfmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.75"
-"bcfmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.75"
-"bcfmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1.25"
-"bcfmod" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "-1.25"
+"bcmoneyfloor" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmoneyfloor" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmoneyfloor" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmoneyfloor" | "-2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmoneyfloor" | "-1.01" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 
-"bcgcd" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "4"
-"bcgcd" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "1"
+"bcmod" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmod" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmod" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcmod" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 
-"bclcm" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "24"
-"bclcm" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "40"
-"bclcm" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber } | "40"
+"bcfmod" | "1.75" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcfmod" | "-1.75" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcfmod" | "1.25" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcfmod" | "-1.25" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+
+"bcgcd" | "4" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bcgcd" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+
+"bclcm" | "24" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bclcm" | "40" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+"bclcm" | "40" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 ');
 $test->run();
 
@@ -1717,21 +1732,22 @@ $fn = function () use ($ffn) {
     ];
 
 
-    $valuesY = $valuesXX;
+    $valuesYY = $valuesXX;
 
-    // > commented, should be same object
-    // $valuesY[ 17 ][ 0 ] = clone $valuesY[ 17 ][ 0 ];
-    $valuesY[ 17 ][ 1 ] = clone $valuesY[ 17 ][ 1 ];
-    $valuesY[ 18 ][ 0 ] = clone $valuesY[ 18 ][ 0 ];
-    $valuesY[ 18 ][ 1 ] = clone $valuesY[ 18 ][ 1 ];
-    $valuesY[ 18 ][ 2 ] = clone $valuesY[ 18 ][ 2 ];
-    $valuesY[ 18 ][ 3 ] = clone $valuesY[ 18 ][ 3 ];
-    $valuesY[ 19 ][ 0 ] = clone $valuesY[ 19 ][ 0 ];
-    $valuesY[ 19 ][ 1 ] = clone $valuesY[ 19 ][ 1 ];
-    $valuesY[ 19 ][ 2 ] = clone $valuesY[ 19 ][ 2 ];
-    $valuesY[ 19 ][ 3 ] = clone $valuesY[ 19 ][ 3 ];
+    // > commented, should be the same object
+    // $valuesYY[ 17 ][ 0 ] = clone $valuesYY[ 17 ][ 0 ];
+    //
+    $valuesYY[ 17 ][ 1 ] = clone $valuesYY[ 17 ][ 1 ];
+    $valuesYY[ 18 ][ 0 ] = clone $valuesYY[ 18 ][ 0 ];
+    $valuesYY[ 18 ][ 1 ] = clone $valuesYY[ 18 ][ 1 ];
+    $valuesYY[ 18 ][ 2 ] = clone $valuesYY[ 18 ][ 2 ];
+    $valuesYY[ 18 ][ 3 ] = clone $valuesYY[ 18 ][ 3 ];
+    $valuesYY[ 19 ][ 0 ] = clone $valuesYY[ 19 ][ 0 ];
+    $valuesYY[ 19 ][ 1 ] = clone $valuesYY[ 19 ][ 1 ];
+    $valuesYY[ 19 ][ 2 ] = clone $valuesYY[ 19 ][ 2 ];
+    $valuesYY[ 19 ][ 3 ] = clone $valuesYY[ 19 ][ 3 ];
 
-    $valuesY = array_merge(...$valuesY);
+    $valuesY = array_merge(...$valuesYY);
 
     $theCmp = \Gzhegow\Lib\Lib::cmp();
     $theDebug = \Gzhegow\Lib\Lib::debug();
@@ -1750,7 +1766,7 @@ $fn = function () use ($ffn) {
         [ &$fnCmpSizeName ]
     );
 
-    // $dumpPath = $ffn->root() . '/var/dump/fn_compare_tables2.txt';
+    // $dumpPath = $ffn->root() . '/var/dump/cmp_fn_compare_2.txt';
     // if (is_file($dumpPath)) unlink($dumpPath);
 
     $xi = 0;
@@ -2187,7 +2203,7 @@ $test->expectStdout('
 25 | "Z" | "25"
 26 | "BA" | "26"
 
-0 | "[ CATCH ] The `decInteger` should be greater than zero due to `oneBasedTo` is set to TRUE"
+0 | "[ CATCH ] The `decInteger` should be GT 0 due to `oneBasedTo` is set to TRUE"
 10 | "J" | "10"
 26 | "Z" | "26"
 27 | "AA" | "27"
@@ -3312,10 +3328,10 @@ val1;val2\n
 10
 
 
-"[ CATCH ] The `json` should be non-empty string"
+"[ CATCH ] The `json` should be a non-empty string"
 NULL
 
-"[ CATCH ] The `jsonc` should be non-empty string"
+"[ CATCH ] The `jsonc` should be a non-empty string"
 NULL
 
 [ "hello" => "world" ]
@@ -3371,10 +3387,10 @@ val1;val2\n
 10
 
 
-"[ CATCH ] The `json` should be non-empty string"
+"[ CATCH ] The `json` should be a non-empty string"
 NULL
 
-"[ CATCH ] The `jsonc` should be non-empty string"
+"[ CATCH ] The `jsonc` should be a non-empty string"
 NULL
 
 [ "hello" => "world" ]
@@ -3586,10 +3602,10 @@ $fn = function () use ($ffn) {
         '10.0.0.1/16',
     ];
 
-    foreach ( $ipV4List as $i => $ip ) {
+    foreach ( $ipV4List as $ip ) {
         \Gzhegow\Lib\Lib::net()->type_address_ip_v4($addressIpV4, $ip);
 
-        foreach ( $subnetV4List as $ii => $subnet ) {
+        foreach ( $subnetV4List as $subnet ) {
             \Gzhegow\Lib\Lib::net()->type_subnet_v4($subnetV4, $subnet);
 
             $status1 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet($addressIpV4, $subnetV4);
@@ -3616,10 +3632,10 @@ $fn = function () use ($ffn) {
         '::/0',
     ];
 
-    foreach ( $ipV6List as $i => $ip ) {
+    foreach ( $ipV6List as $ip ) {
         \Gzhegow\Lib\Lib::net()->type_address_ip_v6($addressIpV6, $ip);
 
-        foreach ( $subnetV6List as $ii => $subnet ) {
+        foreach ( $subnetV6List as $subnet ) {
             \Gzhegow\Lib\Lib::net()->type_subnet_v6($subnetV6, $subnet);
 
             $status1 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet($addressIpV6, $subnetV6);
@@ -3698,42 +3714,162 @@ $test->run();
 
 
 // >>> TEST
-// > тесты ParseModule
+// > тесты NumModule
 $fn = function () use ($ffn) {
-    $ffn->print('[ ParseModule ]');
+    $ffn->print('[ NumModule ]');
     echo "\n";
 
+    $values = [];
+    $values[] = [
+        -2.4,
+        -2.04,
+        -2.004,
+        -1.4,
+        -1.04,
+        -1.004,
+        -0.4,
+        -0.04,
+        -0.004,
+        0,
+        0.004,
+        0.04,
+        0.4,
+        1.004,
+        1.04,
+        1.4,
+        2.004,
+        2.04,
+        2.4,
+    ];
+    $values[] = [
+        -2.5,
+        -2.05,
+        -2.005,
+        -1.5,
+        -1.05,
+        -1.005,
+        -0.5,
+        -0.05,
+        -0.005,
+        0,
+        0.005,
+        0.05,
+        0.5,
+        1.005,
+        1.05,
+        1.5,
+        2.005,
+        2.05,
+        2.5,
+    ];
+    $values[] = [
+        -2.6,
+        -2.06,
+        -2.006,
+        -1.6,
+        -1.06,
+        -1.006,
+        -0.6,
+        -0.06,
+        -0.006,
+        0,
+        0.006,
+        0.06,
+        0.6,
+        1.006,
+        1.06,
+        1.6,
+        2.006,
+        2.06,
+        2.6,
+    ];
 
-    $result = \Gzhegow\Lib\Lib::parse()->ctype_digit('123');
-    $ffn->print($result);
-    echo "\n";
+    $precisions = [ 0, 2 ];
+
+    $modes = [];
+    $modes[ 'ROUNDING' ] = [
+        'R_AWAY_FROM_ZERO'  => _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO,
+        'R_TOWARD_ZERO'     => _NUM_ROUND_ROUNDING_TOWARD_ZERO,
+        'R_TO_POSITIVE_INF' => _NUM_ROUND_ROUNDING_TO_POSITIVE_INF,
+        'R_TO_NEGATIVE_INF' => _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF,
+        'R_EVEN'            => _NUM_ROUND_ROUNDING_EVEN,
+        'R_ODD'             => _NUM_ROUND_ROUNDING_ODD,
+    ];
 
 
-    $result = \Gzhegow\Lib\Lib::parse()->ctype_alpha('abcABC');
-    $ffn->print($result);
+    // $dumpPath = $ffn->root() . '/var/dump/num_mathround_2.txt';
+    // if (is_file($dumpPath)) unlink($dumpPath);
 
-    $result = \Gzhegow\Lib\Lib::parse()->ctype_alpha('abcABC', false);
-    $ffn->print($result);
-    echo "\n";
+    foreach ( $values as $array ) {
+        $table = [];
+        foreach ( $array as $v ) {
+            foreach ( $precisions as $precision ) {
+                foreach ( $modes[ 'ROUNDING' ] as $n => $f ) {
+                    $vString = \Gzhegow\Lib\Lib::debug()->value($v);
+
+                    $nString = ".{$precision}|{$n}";
+
+                    $res = \Gzhegow\Lib\Lib::num()->mathround(
+                        $v, $precision,
+                        $f, $f
+                    );
+
+                    $resString = \Gzhegow\Lib\Lib::debug()->value($res);
+
+                    $table[ $nString ][ $vString ] = $resString;
+                }
+            }
+        }
+
+        // $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        // file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
+
+        // dump(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
+        echo md5(serialize($table)) . "\n";
+    }
 
 
-    $result = \Gzhegow\Lib\Lib::parse()->ctype_alnum('123abcABC');
-    $ffn->print($result);
+    // $dumpPath = $ffn->root() . '/var/dump/num_moneyround_2.txt';
+    // if (is_file($dumpPath)) unlink($dumpPath);
 
-    $result = \Gzhegow\Lib\Lib::parse()->ctype_alnum('123abcABC', false);
-    $ffn->print($result);
+    foreach ( $values as $array ) {
+        $table = [];
+        foreach ( $array as $v ) {
+            foreach ( $precisions as $precision ) {
+                foreach ( $modes[ 'ROUNDING' ] as $n => $f ) {
+                    $vString = \Gzhegow\Lib\Lib::debug()->value($v);
+
+                    $nString = ".{$precision}|{$n}";
+
+                    $res = \Gzhegow\Lib\Lib::num()->moneyround(
+                        $v, $precision,
+                        $f, $f
+                    );
+
+                    $resString = \Gzhegow\Lib\Lib::debug()->value($res);
+
+                    $table[ $nString ][ $vString ] = $resString;
+                }
+            }
+        }
+
+        // $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        // file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
+
+        // dump(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
+        echo md5(serialize($table)) . "\n";
+    }
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
-"[ ParseModule ]"
+"[ NumModule ]"
 
-"123"
-
-"abcABC"
-NULL
-
-"123abcABC"
-NULL
+99dc2eb40c3227446051e89753ba0934
+badc8db5c75f326de20847505c20138d
+e75e199fd051315fc60b543f9791aaba
+004baa64cef208c138d4ca4bc8e01dd9
+eab6474281b856dd3aa86a12d87641a4
+16baaadc1d5f2445bfb4279c4a72630c
 ');
 $test->run();
 

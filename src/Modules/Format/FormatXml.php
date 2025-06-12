@@ -36,7 +36,7 @@ class FormatXml
         if (! Lib::type()->string_not_empty($xmlString, $xml)) {
             return Result::err(
                 $ret,
-                [ 'The `xml` should be non-empty string', $xml ],
+                [ 'The `xml` should be a non-empty string', $xml ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -44,7 +44,7 @@ class FormatXml
         if (false === strpos($xmlString, '<')) {
             return Result::err(
                 $ret,
-                [ 'The `xml` must contain at least one symbol `<`', $xml ],
+                [ 'The `xml` should contain at least one symbol `<`', $xml ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -123,7 +123,7 @@ class FormatXml
         if (! Lib::type()->string_not_empty($xmlString, $xml)) {
             return Result::err(
                 $ret,
-                [ 'The `xml` should be non-empty string', $xml ],
+                [ 'The `xml` should be a non-empty string', $xml ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -131,7 +131,7 @@ class FormatXml
         if (false === strpos($xmlString, '<')) {
             return Result::err(
                 $ret,
-                [ 'The `xml` must contain at least one symbol `<`', $xml ],
+                [ 'The `xml` should contain at least one symbol `<`', $xml ],
                 [ __FILE__, __LINE__ ]
             );
         }

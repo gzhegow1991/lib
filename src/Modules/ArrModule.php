@@ -23,7 +23,7 @@ class ArrModule
                 if (0 === ($fn_mode & ~_ARR_FN_USE_ALL)) {
                     throw new LogicException(
                         [
-                            'The `fn_mode` should be valid flags',
+                            'The `fn_mode` should be a valid sequence of flags',
                             $fn_mode,
                             _ARR_FN_USE_ALL,
                         ]
@@ -876,7 +876,7 @@ class ArrModule
     {
         if (! Lib::str()->type_char($symbol, $dot)) {
             throw new LogicException(
-                'The `dot` should be one symbol',
+                'The `dot` should be an one symbol',
                 $dot
             );
         }
@@ -2109,12 +2109,12 @@ class ArrModule
         $walkFlags = $walkFlags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
 
         if (null === $dot) {
-            $dot = '.';
+            $dotChar = '.';
 
-        } elseif (! Lib::str()->type_char($symbol, $dot)) {
+        } elseif (! Lib::type()->char($dotChar, $dot)) {
             throw new LogicException(
                 [
-                    'The `dot` should be one symbol',
+                    'The `dot` should be a char',
                     $dot,
                 ]
             );
@@ -2127,7 +2127,7 @@ class ArrModule
         $gen = $this->walk_it($array, $walkFlags);
 
         foreach ( $gen as $path => $value ) {
-            $result[ implode($dot, $path) ] = $hasFillKeys
+            $result[ implode($dotChar, $path) ] = $hasFillKeys
                 ? $fillKeys[ 0 ]
                 : $value;
         }
@@ -2145,7 +2145,7 @@ class ArrModule
 
         } elseif (! Lib::str()->type_char($symbol, $dot)) {
             throw new LogicException(
-                'The `dot` should be one symbol',
+                'The `dot` should be an one symbol',
                 $dot
             );
         }
@@ -2294,72 +2294,95 @@ class ArrModule
             return;
         }
 
-        $flags = $flags ?? _ARR_WALK_WITH_LEAVES;
+        $flagsCurrent = $flags ?? 0;
 
-        $isModeDepthFirst = (bool) ($flags & _ARR_WALK_MODE_DEPTH_FIRST);
-        $isModeBreadthFirst = (bool) ($flags & _ARR_WALK_MODE_BREADTH_FIRST);
-        $sum = (int) ($isModeDepthFirst + $isModeBreadthFirst);
-        if (1 !== $sum) {
-            $isModeDepthFirst = true;
-            $isModeBreadthFirst = false;
-        }
-        unset($sum);
+        $flagGroups = [
+            '_ARR_WALK_MODE'              => [
+                [
+                    _ARR_WALK_MODE_DEPTH_FIRST,
+                    _ARR_WALK_MODE_BREADTH_FIRST,
+                ],
+                _ARR_WALK_MODE_DEPTH_FIRST,
+            ],
+            //
+            '_ARR_WALK_SORT'              => [
+                [
+                    _ARR_WALK_SORT_SELF_FIRST,
+                    _ARR_WALK_SORT_PARENT_FIRST,
+                    _ARR_WALK_SORT_CHILD_FIRST,
+                ],
+                _ARR_WALK_SORT_SELF_FIRST,
+            ],
+            //
+            '_ARR_WALK_WITH_LEAVES'       => [
+                [
+                    _ARR_WALK_WITH_LEAVES,
+                    _ARR_WALK_WITHOUT_LEAVES,
+                ],
+                _ARR_WALK_WITH_LEAVES,
+            ],
+            //
+            '_ARR_WALK_WITH_EMPTY_ARRAYS' => [
+                [
+                    _ARR_WALK_WITH_EMPTY_ARRAYS,
+                    _ARR_WALK_WITHOUT_EMPTY_ARRAYS,
+                ],
+                _ARR_WALK_WITHOUT_EMPTY_ARRAYS,
+            ],
+            //
+            '_ARR_WALK_WITH_PARENTS'      => [
+                [
+                    _ARR_WALK_WITH_PARENTS,
+                    _ARR_WALK_WITHOUT_PARENTS,
+                ],
+                _ARR_WALK_WITHOUT_PARENTS,
+            ],
+            //
+            '_ARR_WALK_WITH_DICTS'        => [
+                [
+                    _ARR_WALK_WITH_DICTS,
+                    _ARR_WALK_WITHOUT_DICTS,
+                ],
+                _ARR_WALK_WITHOUT_DICTS,
+            ],
+            //
+            '_ARR_WALK_WITH_LISTS'        => [
+                [
+                    _ARR_WALK_WITH_LISTS,
+                    _ARR_WALK_WITHOUT_LISTS,
+                ],
+                _ARR_WALK_WITHOUT_LISTS,
+            ],
+        ];
 
-        $isSortSelfFirst = (bool) ($flags & _ARR_WALK_SORT_SELF_FIRST);
-        $isSortParentFirst = (bool) ($flags & _ARR_WALK_SORT_PARENT_FIRST);
-        $isSortChildFirst = (bool) ($flags & _ARR_WALK_SORT_CHILD_FIRST);
-        $sum = (int) ($isSortSelfFirst + $isSortParentFirst + $isSortChildFirst);
-        if (1 !== $sum) {
-            $isSortSelfFirst = true;
-            $isSortParentFirst = false;
-            $isSortChildFirst = false;
-        }
-        unset($sum);
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flagsCurrent & $flag) {
+                    $cnt++;
+                }
+            }
 
-        $isWithLeaves = (bool) ($flags & _ARR_WALK_WITH_LEAVES);
-        $isWithoutLeaves = (bool) ($flags & _ARR_WALK_WITHOUT_LEAVES);
-        $sum = (int) ($isWithLeaves + $isWithoutLeaves);
-        if (1 !== $sum) {
-            $isWithLeaves = true;
-            // $isWithoutLeaves = false;
-        }
-        unset($sum);
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flags` conflict in group: ' . $groupName, $flags ]
+                );
 
-        $isWithDicts = (bool) ($flags & _ARR_WALK_WITH_DICTS);
-        $isWithoutDicts = (bool) ($flags & _ARR_WALK_WITHOUT_DICTS);
-        $sum = (int) ($isWithDicts + $isWithoutDicts);
-        if (1 !== $sum) {
-            $isWithDicts = false;
-            // $isWithoutDicts = false;
+            } elseif (0 === $cnt) {
+                $flagsCurrent |= $default;
+            }
         }
-        unset($sum);
 
-        $isWithEmptyArrays = (bool) ($flags & _ARR_WALK_WITH_EMPTY_ARRAYS);
-        $isWithoutEmptyArrays = (bool) ($flags & _ARR_WALK_WITHOUT_EMPTY_ARRAYS);
-        $sum = (int) ($isWithEmptyArrays + $isWithoutEmptyArrays);
-        if (1 !== $sum) {
-            $isWithEmptyArrays = false;
-            // $isWithoutEmptyArrays = false;
-        }
-        unset($sum);
-
-        $isWithLists = (bool) ($flags & _ARR_WALK_WITH_LISTS);
-        $isWithoutLists = (bool) ($flags & _ARR_WALK_WITHOUT_LISTS);
-        $sum = (int) ($isWithLists + $isWithoutLists);
-        if (1 !== $sum) {
-            $isWithLists = false;
-            // $isWithoutLists = false;
-        }
-        unset($sum);
-
-        $isWithParents = (bool) ($flags & _ARR_WALK_WITH_PARENTS);
-        $isWithoutParents = (bool) ($flags & _ARR_WALK_WITHOUT_PARENTS);
-        $sum = (int) ($isWithParents + $isWithoutParents);
-        if (1 !== $sum) {
-            $isWithParents = false;
-            // $isWithoutParents = false;
-        }
-        unset($sum);
+        $isModeDepthFirst = (bool) ($flagsCurrent & _ARR_WALK_MODE_DEPTH_FIRST);
+        $isModeBreadthFirst = (bool) ($flagsCurrent & _ARR_WALK_MODE_BREADTH_FIRST);
+        $isSortSelfFirst = (bool) ($flagsCurrent & _ARR_WALK_SORT_SELF_FIRST);
+        $isSortParentFirst = (bool) ($flagsCurrent & _ARR_WALK_SORT_PARENT_FIRST);
+        $isSortChildFirst = (bool) ($flagsCurrent & _ARR_WALK_SORT_CHILD_FIRST);
+        $isWithLeaves = (bool) ($flagsCurrent & _ARR_WALK_WITH_LEAVES);
+        $isWithDicts = (bool) ($flagsCurrent & _ARR_WALK_WITH_DICTS);
+        $isWithEmptyArrays = (bool) ($flagsCurrent & _ARR_WALK_WITH_EMPTY_ARRAYS);
+        $isWithLists = (bool) ($flagsCurrent & _ARR_WALK_WITH_LISTS);
+        $isWithParents = (bool) ($flagsCurrent & _ARR_WALK_WITH_PARENTS);
 
         if ($isSortSelfFirst) {
             $fnUsort = null;
@@ -2514,7 +2537,9 @@ class ArrModule
 
         foreach ( $tree[ $start ] as $boolOrNull ) {
             if ($boolOrNull && ! is_bool($boolOrNull)) {
-                throw new LogicException('Each of `tree` values should be null or boolean, use keys instead (uniqueness)');
+                throw new LogicException(
+                    [ 'Each of `tree` values should be a null or a boolean, use keys instead (uniqueness)' ]
+                );
             }
         }
 
@@ -2562,7 +2587,7 @@ class ArrModule
             if (! is_array($arrayList[ $key ])) {
                 throw new LogicException(
                     [
-                        'Each of `arrayList` must be array',
+                        'Each of `arrayList` should be an array',
                         $arrayList[ $key ],
                         $key,
                     ]

@@ -50,7 +50,7 @@ abstract class AbstractArrayOf implements
             throw new LogicException(
                 [
                     ''
-                    . 'The `valueType` must be one of: '
+                    . 'The `valueType` should be one of: '
                     . implode('|', array_keys($mapValueTypes)),
                     //
                     $valueType,

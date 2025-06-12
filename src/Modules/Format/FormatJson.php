@@ -40,7 +40,7 @@ class FormatJson
         if (null !== $json_depth) {
             if ($json_depth < 0) {
                 throw new LogicException(
-                    'The `jsonDepth` must be non-negative integer'
+                    'The `jsonDepth` should be a non-negative integer'
                 );
             }
 
@@ -61,7 +61,7 @@ class FormatJson
         if (null !== $json_encode_flags) {
             if ($json_encode_flags < 0) {
                 throw new LogicException(
-                    'The `jsonEncodeFlags` must be non-negative integer'
+                    'The `jsonEncodeFlags` should be a non-negative integer'
                 );
             }
 
@@ -82,7 +82,7 @@ class FormatJson
         if (null !== $json_decode_flags) {
             if ($json_decode_flags < 0) {
                 throw new LogicException(
-                    'The `jsonDecodeFlags` must be non-negative integer'
+                    'The `jsonDecodeFlags` should be a non-negative integer'
                 );
             }
 
@@ -113,7 +113,7 @@ class FormatJson
         if (! Lib::type()->string_not_empty($jsonString, $json)) {
             return Result::err(
                 $ret,
-                [ 'The `json` should be non-empty string', $json ],
+                [ 'The `json` should be a non-empty string', $json ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -160,7 +160,7 @@ class FormatJson
         if (! Lib::type()->string_not_empty($jsonString, $jsonc)) {
             return Result::err(
                 $ret,
-                [ 'The `jsonc` should be non-empty string', $jsonc ],
+                [ 'The `jsonc` should be a non-empty string', $jsonc ],
                 [ __FILE__, __LINE__ ]
             );
         }

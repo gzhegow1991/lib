@@ -1330,7 +1330,7 @@ class StrModule
 
         if ($length < 1) {
             throw new LogicException(
-                [ 'The `length` must be greater than 0', $length ]
+                [ 'The `length` should be GT 0', $length ]
             );
         }
 
@@ -1899,7 +1899,7 @@ class StrModule
         if ($hasWildcardSeparatorSymbol) {
             if (! $this->type_char($wildcardSeparatorSymbolString, $wildcardSeparatorSymbol)) {
                 throw new LogicException(
-                    [ 'The `wildcardSeparator` should be null or exactly one letter', $wildcardSeparatorSymbol ]
+                    [ 'The `wildcardSeparator` should be a null or an exactly one letter', $wildcardSeparatorSymbol ]
                 );
             }
 
@@ -1908,7 +1908,7 @@ class StrModule
         if ($hasWildcardSequenceSymbol) {
             if (! $this->type_char($wildcardSequenceSymbolString, $wildcardSequenceSymbol)) {
                 throw new LogicException(
-                    [ 'The `wildcardSequence` should be null or exactly one letter', $wildcardSequenceSymbol ]
+                    [ 'The `wildcardSequence` should be a null or an exactly one letter', $wildcardSequenceSymbol ]
                 );
             }
 
@@ -1917,7 +1917,7 @@ class StrModule
         if ($hasWildcardSingleSymbol) {
             if (! $this->type_char($wildcardSingleSymbolString, $wildcardSingleSymbol)) {
                 throw new LogicException(
-                    [ 'The `wildcardLetter` should be null or exactly one letter', $wildcardSingleSymbol ]
+                    [ 'The `wildcardLetter` should be a null or an exactly one letter', $wildcardSingleSymbol ]
                 );
             }
 
@@ -2258,7 +2258,7 @@ class StrModule
         if (null !== $delimiter) {
             if (! $theType->char($char, $delimiter)) {
                 throw new LogicException(
-                    [ 'The `delimiter` should be exactly one char', $delimiter ]
+                    [ 'The `delimiter` should be an exactly one char', $delimiter ]
                 );
             }
 
@@ -2283,7 +2283,7 @@ class StrModule
 
             } else {
                 throw new LogicException(
-                    [ 'Each of `ignoreSymbols` should be letter', $str ]
+                    [ 'Each of `ignoreSymbols` should be a letter', $str ]
                 );
             }
         }
@@ -2329,7 +2329,7 @@ class StrModule
         foreach ( Lib::php()->to_iterable($strings) as $string ) {
             if (! is_string($string)) {
                 throw new LogicException(
-                    [ 'Each of `strings` should be string', $string ]
+                    [ 'Each of `strings` should be a string', $string ]
                 );
             }
 
@@ -2349,7 +2349,7 @@ class StrModule
         foreach ( Lib::php()->to_iterable($strings) as $string ) {
             if (! is_string($string)) {
                 throw new LogicException(
-                    [ 'Each of `strings` should be string', $string ]
+                    [ 'Each of `strings` should be a string', $string ]
                 );
             }
 
@@ -2369,7 +2369,7 @@ class StrModule
         foreach ( Lib::php()->to_iterable($strings) as $string ) {
             if (! is_string($string)) {
                 throw new LogicException(
-                    [ 'Each of `strings` should be string', $string ]
+                    [ 'Each of `strings` should be a string', $string ]
                 );
             }
 
@@ -2396,7 +2396,7 @@ class StrModule
 
         if ($length < 1) {
             throw new LogicException(
-                [ 'The `length` should be greater than zero', $length ]
+                [ 'The `length` should be GT 0', $length ]
             );
         }
 

@@ -117,7 +117,7 @@ class FormatModule
         if ('' === $size) {
             return Result::err(
                 $ret,
-                [ 'The `size` should be non-empty string', $size ],
+                [ 'The `size` should be a non-empty string', $size ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -206,7 +206,7 @@ class FormatModule
         if (! Lib::type()->num_non_negative($bytesNumber, $bytes)) {
             return Result::err(
                 $ret,
-                [ 'The `bytes` should be non-negative num', $bytes ],
+                [ 'The `bytes` should be a non-negative num', $bytes ],
                 [ __FILE__, __LINE__ ]
             );
         }
