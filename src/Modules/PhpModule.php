@@ -2354,26 +2354,6 @@ class PhpModule
     }
 
 
-    public function import(string $filepath)
-    {
-        static $export;
-
-        $export = $export ?? [];
-
-        if (! is_file($filepath)) {
-            throw new RuntimeException([ 'Missing file: ' . $filepath ]);
-        }
-
-        $realpath = realpath($filepath);
-
-        if (! isset($export[ $realpath ])) {
-            $export[ $realpath ] = require_once $realpath;
-        }
-
-        return $export[ $realpath ];
-    }
-
-
     /**
      * @param callable      $fnPooling
      * @param callable|null $fnCatch

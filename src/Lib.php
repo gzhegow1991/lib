@@ -32,6 +32,8 @@ use Gzhegow\Lib\Modules\TypeThrowModule;
 use Gzhegow\Lib\Modules\ParseNullModule;
 use Gzhegow\Lib\Modules\EntrypointModule;
 use Gzhegow\Lib\Modules\ParseThrowModule;
+use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 
 
@@ -400,40 +402,6 @@ class Lib
 
 
     /**
-     * > в старых версиях PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
-     *
-     * @return null
-     *
-     * @noinspection PhpUnnecessaryStopStatementInspection
-     *
-     * @throws \LogicException|\RuntimeException
-     */
-    public static function throw($throwableOrArg, ...$throwableArgs)
-    {
-        if (false
-            || ($throwableOrArg instanceof \LogicException)
-            || ($throwableOrArg instanceof \RuntimeException)
-        ) {
-            throw $throwableOrArg;
-        }
-
-        array_unshift($throwableArgs, $throwableOrArg);
-
-        $thePhp = Lib::php();
-
-        $throwableClass = $thePhp->static_throwable_class();
-
-        $trace = property_exists($throwableClass, 'trace')
-            ? debug_backtrace()
-            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $thePhp->throw_new_trace($trace, ...$throwableArgs);
-
-        return;
-    }
-
-
-    /**
      * > время в секундах
      */
     public static function time(?\DateTimeInterface $date = null) : string
@@ -585,6 +553,109 @@ class Lib
         }
 
         return $microtime;
+    }
+
+
+    /**
+     * > примитивное глобальное хранилище для импортов-экспортов
+     */
+    public static function &di() : array
+    {
+        static $imports;
+
+        $imports = $imports ?? [];
+
+        return $imports;
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function import(string $file)
+    {
+        if (! is_file($file)) {
+            throw new RuntimeException(
+                [ 'Missing `filepath` file: ' . $file ]
+            );
+        }
+
+        $realpath = realpath($file);
+
+        $imports =& static::di();
+
+        if (! isset($imports[ $realpath ])) {
+            $imports[ $realpath ] = require_once $realpath;
+        }
+
+        return $imports[ $realpath ];
+    }
+
+    public static function export(string $file, $item = null, ?string $name = null) : array
+    {
+        static $export;
+
+        $export = $export ?? [];
+
+        if (! is_file($file)) {
+            throw new LogicException(
+                [ 'Missing `filepath` file: ' . $file ]
+            );
+        }
+
+        $realpath = realpath($file);
+
+        if (null !== $item) {
+            if (null === $name) {
+                if (is_array($item)) {
+                    $export[ $realpath ] = array_replace(
+                        $export[ $file ],
+                        $item
+                    );
+
+                } else {
+                    $export[ $realpath ][] = $item;
+                }
+
+            } else {
+                $export[ $realpath ][ $name ] = $item;
+            }
+        }
+
+        return $export[ $realpath ];
+    }
+
+
+    /**
+     * > в старых версиях PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
+     *
+     * @return null
+     *
+     * @noinspection PhpUnnecessaryStopStatementInspection
+     *
+     * @throws \LogicException|\RuntimeException
+     */
+    public static function throw($throwableOrArg, ...$throwableArgs)
+    {
+        if (false
+            || ($throwableOrArg instanceof \LogicException)
+            || ($throwableOrArg instanceof \RuntimeException)
+        ) {
+            throw $throwableOrArg;
+        }
+
+        array_unshift($throwableArgs, $throwableOrArg);
+
+        $thePhp = Lib::php();
+
+        $throwableClass = $thePhp->static_throwable_class();
+
+        $trace = property_exists($throwableClass, 'trace')
+            ? debug_backtrace()
+            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $thePhp->throw_new_trace($trace, ...$throwableArgs);
+
+        return;
     }
 
 
