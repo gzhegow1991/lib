@@ -63,7 +63,7 @@ class RandomModule
 
             if (false
                 || (strlen($val) > strlen(PHP_INT_MAX))
-                || (((float) $val) >= PHP_INT_MAX)
+                || (floatval($val) >= PHP_INT_MAX)
             ) {
                 $val = bcadd($val, 1);
 

@@ -362,7 +362,8 @@ class Test
         $h = $this->getResource();
         $hasResource = (null !== $h);
 
-        $this->hasTrace($trace)
+        false
+        || $this->hasTrace($trace)
         || ($trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 
         $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';

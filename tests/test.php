@@ -913,8 +913,8 @@ $fn = function () use ($ffn) {
 
     $invalidValue = NAN;
     $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::type();
-    $status =
-        \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx)
+    $status = false
+        || \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx)
         || \Gzhegow\Lib\Modules\Bcmath\Number::fromValidArray($invalidValue, $ctx);
 
     $errors = $ctx->getErrors();
