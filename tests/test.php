@@ -1542,8 +1542,8 @@ $fn = function () use ($ffn) {
     ];
 
 
-    $dumpPath = $ffn->root() . '/var/dump/bc_mathround_2.txt';
-    if (is_file($dumpPath)) unlink($dumpPath);
+    // $dumpPath = $ffn->root() . '/var/dump/bc_mathround_2.txt';
+    // if (is_file($dumpPath)) unlink($dumpPath);
 
     foreach ( $values as $array ) {
         $table = [];
@@ -1566,16 +1566,16 @@ $fn = function () use ($ffn) {
             }
         }
 
-        $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
-        file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
+        // $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        // file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
 
         // dump(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
         echo md5(serialize($table)) . "\n";
     }
 
 
-    $dumpPath = $ffn->root() . '/var/dump/bc_moneyround_2.txt';
-    if (is_file($dumpPath)) unlink($dumpPath);
+    // $dumpPath = $ffn->root() . '/var/dump/bc_moneyround_2.txt';
+    // if (is_file($dumpPath)) unlink($dumpPath);
 
     foreach ( $values as $array ) {
         $table = [];
@@ -1598,8 +1598,8 @@ $fn = function () use ($ffn) {
             }
         }
 
-        $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
-        file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
+        // $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        // file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
 
         // dump(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
         echo md5(serialize($table)) . "\n";
@@ -1812,6 +1812,7 @@ $fn = function () use ($ffn) {
         _CMP_RESULT_NAN_RETURN,
         [ &$fnCmpSizeName ]
     );
+
 
     // $dumpPath = $ffn->root() . '/var/dump/cmp_fn_compare_2.txt';
     // if (is_file($dumpPath)) unlink($dumpPath);
@@ -3844,8 +3845,8 @@ $fn = function () use ($ffn) {
     ];
 
 
-    $dumpPath = $ffn->root() . '/var/dump/num_mathround_2.txt';
-    if (is_file($dumpPath)) unlink($dumpPath);
+    // $dumpPath = $ffn->root() . '/var/dump/num_mathround_2.txt';
+    // if (is_file($dumpPath)) unlink($dumpPath);
 
     foreach ( $values as $array ) {
         $table = [];
@@ -3868,16 +3869,16 @@ $fn = function () use ($ffn) {
             }
         }
 
-        $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
-        file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
+        // $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        // file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
 
         // dump(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
         echo md5(serialize($table)) . "\n";
     }
 
 
-    $dumpPath = $ffn->root() . '/var/dump/num_moneyround_2.txt';
-    if (is_file($dumpPath)) unlink($dumpPath);
+    // $dumpPath = $ffn->root() . '/var/dump/num_moneyround_2.txt';
+    // if (is_file($dumpPath)) unlink($dumpPath);
 
     foreach ( $values as $array ) {
         $table = [];
@@ -3900,8 +3901,8 @@ $fn = function () use ($ffn) {
             }
         }
 
-        $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
-        file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
+        // $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        // file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
 
         // dump(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
         echo md5(serialize($table)) . "\n";
