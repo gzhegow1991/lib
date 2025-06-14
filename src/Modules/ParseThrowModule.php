@@ -502,6 +502,19 @@ class ParseThrowModule
 
 
 	/**
+	 * @return Number|null
+	 */
+	public function number($value, ?bool $allowExp = null)
+	{
+		if (Lib::type()->number($r, $value, $allowExp)) {
+		    return $r;
+		}
+
+		throw new LogicException([ "Parsing `number` is failed", $value, $allowExp ]);
+	}
+
+
+	/**
 	 * @return string|null
 	 */
 	public function numeric($value, ?bool $isAllowExp = null, array $refs = [])
@@ -1204,71 +1217,6 @@ class ParseThrowModule
 		}
 
 		throw new LogicException([ "Parsing `float_positive` is failed", $value ]);
-	}
-
-
-	/**
-	 * @return string|null
-	 */
-	public function numeric_intpart($value, array $refs = [])
-	{
-		if (Lib::type()->numeric_intpart($r, $value, $refs)) {
-		    return $r;
-		}
-
-		throw new LogicException([ "Parsing `numeric_intpart` is failed", $value, $refs ]);
-	}
-
-
-	/**
-	 * @return string|null
-	 */
-	public function numeric_fracpart($value, array $refs = [])
-	{
-		if (Lib::type()->numeric_fracpart($r, $value, $refs)) {
-		    return $r;
-		}
-
-		throw new LogicException([ "Parsing `numeric_fracpart` is failed", $value, $refs ]);
-	}
-
-
-	/**
-	 * @return int|null
-	 */
-	public function int_intpart($value)
-	{
-		if (Lib::type()->int_intpart($r, $value)) {
-		    return $r;
-		}
-
-		throw new LogicException([ "Parsing `int_intpart` is failed", $value ]);
-	}
-
-
-	/**
-	 * @return float|null
-	 */
-	public function float_fracpart($value)
-	{
-		if (Lib::type()->float_fracpart($r, $value)) {
-		    return $r;
-		}
-
-		throw new LogicException([ "Parsing `float_fracpart` is failed", $value ]);
-	}
-
-
-	/**
-	 * @return Number|null
-	 */
-	public function number($value, ?bool $allowExp = null)
-	{
-		if (Lib::type()->number($r, $value, $allowExp)) {
-		    return $r;
-		}
-
-		throw new LogicException([ "Parsing `number` is failed", $value, $allowExp ]);
 	}
 
 

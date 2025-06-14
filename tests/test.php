@@ -1429,74 +1429,6 @@ $fn = function () use ($ffn) {
     $ffn->print('bcfloor', (string) $result, $result);
     echo "\n";
 
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('0', 0);
-    $ffn->print('bcmathround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('1.5', 0);
-    $ffn->print('bcmathround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('1.05', 0);
-    $ffn->print('bcmathround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('1.005', 0);
-    $ffn->print('bcmathround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('-1.5', 0);
-    $ffn->print('bcmathround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('-1.05', 0);
-    $ffn->print('bcmathround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('-1.005', 0);
-    $ffn->print('bcmathround', (string) $result, $result);
-    echo "\n";
-
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('0', 2);
-    $ffn->print('bcmathround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('1.5', 2);
-    $ffn->print('bcmathround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('1.05', 2);
-    $ffn->print('bcmathround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('1.005', 2);
-    $ffn->print('bcmathround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('-1.5', 2);
-    $ffn->print('bcmathround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('-1.05', 2);
-    $ffn->print('bcmathround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmathround('-1.005', 2);
-    $ffn->print('bcmathround', (string) $result, $result);
-    echo "\n";
-
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyround('0', 0);
-    $ffn->print('bcmoneyround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyround('1.005', 0);
-    $ffn->print('bcmoneyround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyround('1.005', 2);
-    $ffn->print('bcmoneyround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyround('-1.005', 0);
-    $ffn->print('bcmoneyround', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyround('-1.005', 2);
-    $ffn->print('bcmoneyround', (string) $result, $result);
-    echo "\n";
-
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('0', 0);
-    $ffn->print('bcmoneyceil', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 0);
-    $ffn->print('bcmoneyceil', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('1.005', 2);
-    $ffn->print('bcmoneyceil', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 0);
-    $ffn->print('bcmoneyceil', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyceil('-1.005', 2);
-    $ffn->print('bcmoneyceil', (string) $result, $result);
-    echo "\n";
-
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('0', 0);
-    $ffn->print('bcmoneyfloor', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 0);
-    $ffn->print('bcmoneyfloor', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('1.005', 2);
-    $ffn->print('bcmoneyfloor', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 0);
-    $ffn->print('bcmoneyfloor', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmoneyfloor('-1.005', 2);
-    $ffn->print('bcmoneyfloor', (string) $result, $result);
-    echo "\n";
-
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(5.75, 2);
     $ffn->print('bcmod', (string) $result, $result);
     $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(-5.75, 2);
@@ -1530,6 +1462,148 @@ $fn = function () use ($ffn) {
     $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 10);
     $ffn->print('bclcm', (string) $result, $result);
     echo "\n";
+
+
+    $values = [];
+    $values[] = [
+        -2.4,
+        -2.04,
+        -2.004,
+        -1.4,
+        -1.04,
+        -1.004,
+        -0.4,
+        -0.04,
+        -0.004,
+        0,
+        0.004,
+        0.04,
+        0.4,
+        1.004,
+        1.04,
+        1.4,
+        2.004,
+        2.04,
+        2.4,
+    ];
+    $values[] = [
+        -2.5,
+        -2.05,
+        -2.005,
+        -1.5,
+        -1.05,
+        -1.005,
+        -0.5,
+        -0.05,
+        -0.005,
+        0,
+        0.005,
+        0.05,
+        0.5,
+        1.005,
+        1.05,
+        1.5,
+        2.005,
+        2.05,
+        2.5,
+    ];
+    $values[] = [
+        -2.6,
+        -2.06,
+        -2.006,
+        -1.6,
+        -1.06,
+        -1.006,
+        -0.6,
+        -0.06,
+        -0.006,
+        0,
+        0.006,
+        0.06,
+        0.6,
+        1.006,
+        1.06,
+        1.6,
+        2.006,
+        2.06,
+        2.6,
+    ];
+
+    $precisions = [ 0, 2 ];
+
+    $modes = [];
+    $modes[ 'ROUNDING' ] = [
+        'R_AWAY_FROM_ZERO'  => _NUM_ROUND_AWAY_FROM_ZERO,
+        'R_TOWARD_ZERO'     => _NUM_ROUND_TOWARD_ZERO,
+        'R_TO_POSITIVE_INF' => _NUM_ROUND_TO_POSITIVE_INF,
+        'R_TO_NEGATIVE_INF' => _NUM_ROUND_TO_NEGATIVE_INF,
+        'R_EVEN'            => _NUM_ROUND_EVEN,
+        'R_ODD'             => _NUM_ROUND_ODD,
+    ];
+
+
+    $dumpPath = $ffn->root() . '/var/dump/bc_mathround_2.txt';
+    if (is_file($dumpPath)) unlink($dumpPath);
+
+    foreach ( $values as $array ) {
+        $table = [];
+        foreach ( $array as $v ) {
+            foreach ( $precisions as $precision ) {
+                foreach ( $modes[ 'ROUNDING' ] as $n => $f ) {
+                    $vString = \Gzhegow\Lib\Lib::debug()->value($v);
+
+                    $nString = ".{$precision}|{$n}";
+
+                    $res = \Gzhegow\Lib\Lib::bcmath()->bcmathround(
+                        $v, $precision,
+                        $f, $f
+                    );
+
+                    $resString = \Gzhegow\Lib\Lib::debug()->value((string) $res);
+
+                    $table[ $nString ][ $vString ] = $resString;
+                }
+            }
+        }
+
+        $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
+
+        // dump(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
+        echo md5(serialize($table)) . "\n";
+    }
+
+
+    $dumpPath = $ffn->root() . '/var/dump/bc_moneyround_2.txt';
+    if (is_file($dumpPath)) unlink($dumpPath);
+
+    foreach ( $values as $array ) {
+        $table = [];
+        foreach ( $array as $v ) {
+            foreach ( $precisions as $precision ) {
+                foreach ( $modes[ 'ROUNDING' ] as $n => $f ) {
+                    $vString = \Gzhegow\Lib\Lib::debug()->value($v);
+
+                    $nString = ".{$precision}|{$n}";
+
+                    $res = \Gzhegow\Lib\Lib::bcmath()->bcmoneyround(
+                        $v, $precision,
+                        $f, $f
+                    );
+
+                    $resString = \Gzhegow\Lib\Lib::debug()->value((string) $res);
+
+                    $table[ $nString ][ $vString ] = $resString;
+                }
+            }
+        }
+
+        $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
+
+        // dump(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
+        echo md5(serialize($table)) . "\n";
+    }
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
@@ -1547,40 +1621,6 @@ $test->expectStdout('
 "bcfloor" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 "bcfloor" | "-2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 
-"bcmathround" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmathround" | "2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmathround" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmathround" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmathround" | "-2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmathround" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmathround" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-
-"bcmathround" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmathround" | "1.5" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmathround" | "1.05" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmathround" | "1.01" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmathround" | "-1.5" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmathround" | "-1.05" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmathround" | "-1.01" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-
-"bcmoneyround" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmoneyround" | "2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmoneyround" | "1.01" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmoneyround" | "-2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmoneyround" | "-1.01" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-
-"bcmoneyceil" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmoneyceil" | "2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmoneyceil" | "1.01" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmoneyceil" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmoneyceil" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-
-"bcmoneyfloor" | "0" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmoneyfloor" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmoneyfloor" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmoneyfloor" | "-2" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-"bcmoneyfloor" | "-1.01" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
-
 "bcmod" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 "bcmod" | "-1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 "bcmod" | "1" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
@@ -1597,6 +1637,13 @@ $test->expectStdout('
 "bclcm" | "24" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 "bclcm" | "40" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
 "bclcm" | "40" | { object(stringable) # Gzhegow\Lib\Modules\Bcmath\Bcnumber }
+
+2a521995645a33b211fe8d256de4fc1e
+3fbd1316b366e26ca5f2a655052a772a
+74cdbaa3f5de6194337fb075c5eae9ff
+099579a899298f5e03f36377c9412a30
+5b9a198f45fc24ba897b0627a38397fe
+3ad9e060542787e4b0eac224a6044986
 ');
 $test->run();
 
@@ -3788,17 +3835,17 @@ $fn = function () use ($ffn) {
 
     $modes = [];
     $modes[ 'ROUNDING' ] = [
-        'R_AWAY_FROM_ZERO'  => _NUM_ROUND_ROUNDING_AWAY_FROM_ZERO,
-        'R_TOWARD_ZERO'     => _NUM_ROUND_ROUNDING_TOWARD_ZERO,
-        'R_TO_POSITIVE_INF' => _NUM_ROUND_ROUNDING_TO_POSITIVE_INF,
-        'R_TO_NEGATIVE_INF' => _NUM_ROUND_ROUNDING_TO_NEGATIVE_INF,
-        'R_EVEN'            => _NUM_ROUND_ROUNDING_EVEN,
-        'R_ODD'             => _NUM_ROUND_ROUNDING_ODD,
+        'R_AWAY_FROM_ZERO'  => _NUM_ROUND_AWAY_FROM_ZERO,
+        'R_TOWARD_ZERO'     => _NUM_ROUND_TOWARD_ZERO,
+        'R_TO_POSITIVE_INF' => _NUM_ROUND_TO_POSITIVE_INF,
+        'R_TO_NEGATIVE_INF' => _NUM_ROUND_TO_NEGATIVE_INF,
+        'R_EVEN'            => _NUM_ROUND_EVEN,
+        'R_ODD'             => _NUM_ROUND_ODD,
     ];
 
 
-    // $dumpPath = $ffn->root() . '/var/dump/num_mathround_2.txt';
-    // if (is_file($dumpPath)) unlink($dumpPath);
+    $dumpPath = $ffn->root() . '/var/dump/num_mathround_2.txt';
+    if (is_file($dumpPath)) unlink($dumpPath);
 
     foreach ( $values as $array ) {
         $table = [];
@@ -3821,16 +3868,16 @@ $fn = function () use ($ffn) {
             }
         }
 
-        // $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
-        // file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
+        $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
 
         // dump(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
         echo md5(serialize($table)) . "\n";
     }
 
 
-    // $dumpPath = $ffn->root() . '/var/dump/num_moneyround_2.txt';
-    // if (is_file($dumpPath)) unlink($dumpPath);
+    $dumpPath = $ffn->root() . '/var/dump/num_moneyround_2.txt';
+    if (is_file($dumpPath)) unlink($dumpPath);
 
     foreach ( $values as $array ) {
         $table = [];
@@ -3853,8 +3900,8 @@ $fn = function () use ($ffn) {
             }
         }
 
-        // $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
-        // file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
+        $content = \Gzhegow\Lib\Lib::debug()->print_table($table, 1);
+        file_put_contents($dumpPath, $content . "\n" . "\n", FILE_APPEND);
 
         // dump(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
         echo md5(serialize($table)) . "\n";

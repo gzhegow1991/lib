@@ -1015,7 +1015,7 @@ class PhpModule
             );
         }
 
-        if (! Lib::type()->int_intpart($_value, $value)) {
+        if (! Lib::type()->number($valueNumber, $value)) {
             throw new LogicException(
                 [
                     'Unable to convert value to integer',
@@ -1024,7 +1024,9 @@ class PhpModule
             );
         }
 
-        return $_value;
+        $valueInt = $valueNumber->getValueInt();
+
+        return $valueInt;
     }
 
     public function to_float($value, array $options = []) : float

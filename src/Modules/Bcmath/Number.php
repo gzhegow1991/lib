@@ -284,7 +284,7 @@ class Number implements
 
     public function getValueFrac() : string
     {
-        return $this->sign . '0' . $this->frac;
+        return "{$this->sign}0{$this->frac}";
     }
 
 
@@ -300,6 +300,6 @@ class Number implements
 
     public function getValueAbsoluteFrac() : string
     {
-        return '0' . $this->frac;
+        return "0{$this->frac}";
     }
 }

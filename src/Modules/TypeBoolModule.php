@@ -723,6 +723,15 @@ class TypeBoolModule
 
 
     /**
+     * @param Number|null $r
+     */
+    public function number(&$r, $value, ?bool $allowExp = null) : bool
+    {
+        return Lib::num()->type_number($r, $value, $allowExp);
+    }
+
+
+    /**
      * @param string|null $r
      */
     public function numeric(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
@@ -1145,48 +1154,6 @@ class TypeBoolModule
         return Lib::num()->type_float_positive($r, $value);
     }
 
-
-    /**
-     * @param string|null $r
-     */
-    public function numeric_intpart(&$r, $value, array $refs = []) : bool
-    {
-        return Lib::num()->type_numeric_intpart($r, $value, $refs);
-    }
-
-    /**
-     * @param string|null $r
-     */
-    public function numeric_fracpart(&$r, $value, array $refs = []) : bool
-    {
-        return Lib::num()->type_numeric_fracpart($r, $value, $refs);
-    }
-
-
-    /**
-     * @param int|null $r
-     */
-    public function int_intpart(&$r, $value) : bool
-    {
-        return Lib::num()->type_int_intpart($r, $value);
-    }
-
-    /**
-     * @param float|null $r
-     */
-    public function float_fracpart(&$r, $value) : bool
-    {
-        return Lib::num()->type_float_fracpart($r, $value);
-    }
-
-
-    /**
-     * @param Number|null $r
-     */
-    public function number(&$r, $value, ?bool $allowExp = null) : bool
-    {
-        return Lib::bcmath()->type_number($r, $value, $allowExp);
-    }
 
     /**
      * @param Bcnumber|null $r
