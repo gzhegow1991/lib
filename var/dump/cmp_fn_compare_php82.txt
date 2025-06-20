@@ -53,9 +53,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                         |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                         |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                         |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                         |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                         |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                         |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                         |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                         |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                         |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                         |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                         |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesNan | -1 ? cmpValuesNull | NAN ? cmpValuesNil                                         |
@@ -124,9 +124,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesNil |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesNil |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesNil |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesNil |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesNil |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesNil |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesNil |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesNil |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesNil |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesNil |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesNil |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesNil |
@@ -195,9 +195,9 @@
 | B@49 | [ "" ]                                                                   | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
 | B@50 | [ "a" ]                                                                  | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
 | B@51 | [ "a", "b" ]                                                             | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
 | B@55 | { object # stdClass }                                                    | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
 | B@56 | { object # stdClass }                                                    | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
 | B@57 | { object # stdClass }                                                    | -1 ? cmpValuesBoolean | 0 ? cmpValuesBoolean |
@@ -266,9 +266,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
@@ -337,9 +337,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
@@ -408,9 +408,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray       | NAN ? cmpValuesArray        | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray       | NAN ? cmpValuesArray        | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray       | NAN ? cmpValuesArray        | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate        | NAN ? cmpValuesDate         | NAN ? cmpValuesDate          | NAN ? cmpValuesDate           |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate        | NAN ? cmpValuesDate         | NAN ? cmpValuesDate          | NAN ? cmpValuesDate           |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate        | NAN ? cmpValuesDate         | NAN ? cmpValuesDate          | NAN ? cmpValuesDate           |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate        | NAN ? cmpValuesDate         | NAN ? cmpValuesDate          | NAN ? cmpValuesDate           |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate        | NAN ? cmpValuesDate         | NAN ? cmpValuesDate          | NAN ? cmpValuesDate           |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate        | NAN ? cmpValuesDate         | NAN ? cmpValuesDate          | NAN ? cmpValuesDate           |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject      | NAN ? cmpValuesObject       | NAN ? cmpValuesObject        | NAN ? cmpValuesObject         |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject      | NAN ? cmpValuesObject       | NAN ? cmpValuesObject        | NAN ? cmpValuesObject         |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject      | NAN ? cmpValuesObject       | NAN ? cmpValuesObject        | NAN ? cmpValuesObject         |
@@ -479,9 +479,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate            | NAN ? cmpValuesDate             |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate            | NAN ? cmpValuesDate             |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate            | NAN ? cmpValuesDate             |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate            | NAN ? cmpValuesDate             |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate            | NAN ? cmpValuesDate             |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate            | NAN ? cmpValuesDate             |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject          | NAN ? cmpValuesObject           |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject          | NAN ? cmpValuesObject           |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject          | NAN ? cmpValuesObject           |
@@ -550,9 +550,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesFloat | NAN ? cmpValuesFloat |
@@ -621,9 +621,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
@@ -692,9 +692,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
@@ -763,9 +763,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
@@ -834,9 +834,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray         | NAN ? cmpValuesArray          | NAN ? cmpValuesArray           | NAN ? cmpValuesArray            |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate           | NAN ? cmpValuesDate            | NAN ? cmpValuesDate             |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate           | NAN ? cmpValuesDate            | NAN ? cmpValuesDate             |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate           | NAN ? cmpValuesDate            | NAN ? cmpValuesDate             |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate           | NAN ? cmpValuesDate            | NAN ? cmpValuesDate             |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate           | NAN ? cmpValuesDate            | NAN ? cmpValuesDate             |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate           | NAN ? cmpValuesDate            | NAN ? cmpValuesDate             |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject        | NAN ? cmpValuesObject         | NAN ? cmpValuesObject          | NAN ? cmpValuesObject           |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject        | NAN ? cmpValuesObject         | NAN ? cmpValuesObject          | NAN ? cmpValuesObject           |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject        | NAN ? cmpValuesObject         | NAN ? cmpValuesObject          | NAN ? cmpValuesObject           |
@@ -905,9 +905,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray            | NAN ? cmpValuesArray             |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray            | NAN ? cmpValuesArray             |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray            | NAN ? cmpValuesArray             |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate             | NAN ? cmpValuesDate              |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate             | NAN ? cmpValuesDate              |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate             | NAN ? cmpValuesDate              |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate             | NAN ? cmpValuesDate              |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate             | NAN ? cmpValuesDate              |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate             | NAN ? cmpValuesDate              |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject           | NAN ? cmpValuesObject            |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject           | NAN ? cmpValuesObject            |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject           | NAN ? cmpValuesObject            |
@@ -976,9 +976,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray    | NAN ? cmpValuesArray    |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate     | NAN ? cmpValuesDate     |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject   | NAN ? cmpValuesObject   |
@@ -1047,9 +1047,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray        |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray        |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray                 | NAN ? cmpValuesArray        |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate                  | NAN ? cmpValuesDate                  | NAN ? cmpValuesDate         |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate                  | NAN ? cmpValuesDate                  | NAN ? cmpValuesDate         |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate                  | NAN ? cmpValuesDate                  | NAN ? cmpValuesDate         |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate                  | NAN ? cmpValuesDate                  | NAN ? cmpValuesDate         |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate                  | NAN ? cmpValuesDate                  | NAN ? cmpValuesDate         |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate                  | NAN ? cmpValuesDate                  | NAN ? cmpValuesDate         |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject                | NAN ? cmpValuesObject                | NAN ? cmpValuesObject       |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject                | NAN ? cmpValuesObject                | NAN ? cmpValuesObject       |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject                | NAN ? cmpValuesObject                | NAN ? cmpValuesObject       |
@@ -1118,9 +1118,9 @@
 | B@49 | [ "" ]                                                                   | -1 ? cmpValuesArray   | 0 ? cmpValuesArray   | 0 ? cmpValuesArray   | 1 ? cmpValuesArray   |
 | B@50 | [ "a" ]                                                                  | -1 ? cmpValuesArray   | 0 ? cmpValuesArray   | 0 ? cmpValuesArray   | 1 ? cmpValuesArray   |
 | B@51 | [ "a", "b" ]                                                             | -1 ? cmpValuesArray   | -1 ? cmpValuesArray  | -1 ? cmpValuesArray  | 0 ? cmpValuesArray   |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesArray  | NAN ? cmpValuesArray | NAN ? cmpValuesArray | NAN ? cmpValuesArray |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesArray  | NAN ? cmpValuesArray | NAN ? cmpValuesArray | NAN ? cmpValuesArray |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesArray  | NAN ? cmpValuesArray | NAN ? cmpValuesArray | NAN ? cmpValuesArray |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesArray  | NAN ? cmpValuesArray | NAN ? cmpValuesArray | NAN ? cmpValuesArray |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesArray  | NAN ? cmpValuesArray | NAN ? cmpValuesArray | NAN ? cmpValuesArray |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesArray  | NAN ? cmpValuesArray | NAN ? cmpValuesArray | NAN ? cmpValuesArray |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesArray  | NAN ? cmpValuesArray | NAN ? cmpValuesArray | NAN ? cmpValuesArray |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesArray  | NAN ? cmpValuesArray | NAN ? cmpValuesArray | NAN ? cmpValuesArray |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesArray  | NAN ? cmpValuesArray | NAN ? cmpValuesArray | NAN ? cmpValuesArray |
@@ -1135,7 +1135,7 @@
 
 
 +---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+
-|                                                                                 | A@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | A@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | A@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } |
+|                                                                                 | A@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | A@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | A@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } |
 +---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+---------------------------------------------------------------------------------+
 | B@0 | NAN                                                                       | NAN ? cmpValuesNan                                                              | NAN ? cmpValuesNan                                                              | NAN ? cmpValuesNan                                                              |
 | B@1 | NULL                                                                      | 1 ? cmpValuesNull                                                               | 1 ? cmpValuesNull                                                               | 1 ? cmpValuesNull                                                               |
@@ -1189,9 +1189,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray                                                            | NAN ? cmpValuesArray                                                            | NAN ? cmpValuesArray                                                            |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray                                                            | NAN ? cmpValuesArray                                                            | NAN ? cmpValuesArray                                                            |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray                                                            | NAN ? cmpValuesArray                                                            | NAN ? cmpValuesArray                                                            |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | 0 ? cmpValuesDate                                                               | 1 ? cmpValuesDate                                                               | 1 ? cmpValuesDate                                                               |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | -1 ? cmpValuesDate                                                              | 0 ? cmpValuesDate                                                               | 0 ? cmpValuesDate                                                               |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | -1 ? cmpValuesDate                                                              | 0 ? cmpValuesDate                                                               | 0 ? cmpValuesDate                                                               |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | 0 ? cmpValuesDate                                                               | 1 ? cmpValuesDate                                                               | 1 ? cmpValuesDate                                                               |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | -1 ? cmpValuesDate                                                              | 0 ? cmpValuesDate                                                               | 0 ? cmpValuesDate                                                               |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | -1 ? cmpValuesDate                                                              | 0 ? cmpValuesDate                                                               | 0 ? cmpValuesDate                                                               |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesDate                                                             | NAN ? cmpValuesDate                                                             | NAN ? cmpValuesDate                                                             |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesDate                                                             | NAN ? cmpValuesDate                                                             | NAN ? cmpValuesDate                                                             |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesDate                                                             | NAN ? cmpValuesDate                                                             | NAN ? cmpValuesDate                                                             |
@@ -1260,9 +1260,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          |
 | B@55 | { object # stdClass }                                                    | 0 ? cmpValuesObject          | NAN ? cmpValuesObject        |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        |
@@ -1331,9 +1331,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         | NAN ? cmpValuesArray         |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          | NAN ? cmpValuesDate          |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        | NAN ? cmpValuesObject        |
@@ -1402,9 +1402,9 @@
 | B@49 | [ "" ]                                                                   | NAN ? cmpValuesArray                                                | NAN ? cmpValuesArray                                                | NAN ? cmpValuesArray                                                | NAN ? cmpValuesArray                                                |
 | B@50 | [ "a" ]                                                                  | NAN ? cmpValuesArray                                                | NAN ? cmpValuesArray                                                | NAN ? cmpValuesArray                                                | NAN ? cmpValuesArray                                                |
 | B@51 | [ "a", "b" ]                                                             | NAN ? cmpValuesArray                                                | NAN ? cmpValuesArray                                                | NAN ? cmpValuesArray                                                | NAN ? cmpValuesArray                                                |
-| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" } | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 |
-| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+03:00" } | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 |
-| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+03:00" } | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 |
+| B@52 | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" } | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 |
+| B@53 | { object(serializable) # DateTime # "1970-01-01T00:00:01.000000+00:00" } | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 |
+| B@54 | { object(serializable) # DateTime # "1970-01-01T00:00:01.500000+00:00" } | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 | NAN ? cmpValuesDate                                                 |
 | B@55 | { object # stdClass }                                                    | NAN ? cmpValuesObject                                               | NAN ? cmpValuesObject                                               | NAN ? cmpValuesObject                                               | NAN ? cmpValuesObject                                               |
 | B@56 | { object # stdClass }                                                    | NAN ? cmpValuesObject                                               | NAN ? cmpValuesObject                                               | NAN ? cmpValuesObject                                               | NAN ? cmpValuesObject                                               |
 | B@57 | { object # stdClass }                                                    | NAN ? cmpValuesObject                                               | NAN ? cmpValuesObject                                               | NAN ? cmpValuesObject                                               | NAN ? cmpValuesObject                                               |

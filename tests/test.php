@@ -7,33 +7,51 @@ require_once __DIR__ . '/../vendor/autoload.php';
 // > некоторые CMS сами по себе применяют настройки глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
 ($ex = \Gzhegow\Lib\Lib::entrypoint())
+    //
     // > частично удаляет путь файла из каждой строки `trace` (`trace[i][file]`) при обработке исключений
     ->setDirRoot(__DIR__ . '/..')
     //
     // > file: index.php
+    //
+    // ->setDisplayErrors(0)
     // ->setErrorReporting(E_ALL)
-    // ->setMemoryLimit('32M')
-    // ->setTimeLimit(30)
-    // ->setPostMaxSize('5M')
-    // ->setUploadMaxFilesize('2M')
-    // ->setUploadTmpDir(sys_get_temp_dir())
-    // ->setPrecision(16)
-    // ->setUmask(0002)
     // ->setErrorHandler([ $ex, 'fnErrorHandler' ])
     // ->setExceptionHandler([ $ex, 'fnExceptionHandler' ])
+    //
+    // ->setMemoryLimit('32M')
+    // ->setPostMaxSize('5M')
+    // ->setPrecision(16)
+    // ->setTimezoneDefault('UTC')
+    // ->setUmask(0002)
+    // ->setUploadMaxFilesize('2M')
+    // ->setUploadTmpDir(sys_get_temp_dir())
+    //
+    // ->setMaxExecutionTime(30)
+    // ->setMaxInputTime(-1)
+    //
     // ->lock(true)
     //
+    //
     // > file: yourscript.php
+    //
+    // ->useAllErrorReporting()
+    ->useDisplayErrors()
     ->useErrorReporting()
-    ->useMemoryLimit()
-    ->useTimeLimit()
-    ->usePostMaxSize()
-    ->useUploadMaxFilesize()
-    ->useUploadTmpDir()
-    ->usePrecision()
-    ->useUmask()
     ->useErrorHandler()
     ->useExceptionHandler()
+    //
+    // ->useAllTime()
+    ->useMaxExecutionTime()
+    ->useMaxInputTime()
+    //
+    // ->useAllNonTime()
+    ->useMemoryLimit()
+    ->usePostMaxSize()
+    ->usePrecision()
+    ->useTimezoneDefault()
+    ->useUmask()
+    ->useUploadMaxFilesize()
+    ->useUploadTmpDir()
 ;
 
 
@@ -1858,128 +1876,128 @@ $test = $ffn->test($fn);
 $test->expectStdoutIf(PHP_VERSION_ID >= 80200, '
 "[ CmpModule ]"
 
-6059906a31fa5125d24ba54dd3b964e3
-6059906a31fa5125d24ba54dd3b964e3
+8fb8614dff541044ba946a4163a2e607
+8fb8614dff541044ba946a4163a2e607
 
-946b93bc140fde11af7fc037f6b1dc24
-010cd4ccdcf75798a323015cc74baabb
+d827876272749d840cc3d9f1039376ca
+527257dcc105a7e6f440e53234a3a8c2
 
-e5e70c7ea54c5df833ac0a9cf44cb0eb
-7f70eca80051635d5e1c03f50abda6fa
+b8f55599f99d468259a5b42a4f06e3cf
+bee34c6dc82128567cb48d42130a2ab5
 
-ced146152b2c97555b813b15b16ae1c8
-b70c6693c28ccb82362470daba595e23
+ae89a652942f04701f6b8ee224d8536a
+24103e0a5985953a83e932e8638e220c
 
-ea0e1bba308de574e4c50a43814e81a8
-f23d3000ccdb2f1553c52f6bf2d34aba
+79a6e40f32634b7ca333eae8c1474368
+79d78c1d9c89bae865f1f261e4e3b27b
 
-17354afc4bf33a1718d921455ab85174
-67192b5dbba558d753853a60805c9777
+37f9ec7049b61cb5658c1ed9bf85016e
+8d3f5fd785c7ae4ea8eda649e2e8f6ba
 
-b6bd2e21911ed651bb8127b056504385
-6307de5fdc129ebd154d4acb7432c6f8
+f685db70cfdafd6c189e4dc5c9625b25
+cf9d1a8041ae85e0b171f978f4eec426
 
-20eaebc512de63b445b9fe1f0a5fd8cd
-4ecd7f38cbcc8b5baa8629c0b9842f77
+4ac6e9f08bc3d58a95df48b894d6586a
+5f33e1430202634f76f82b69f27678e4
 
-0c040ef28f8b5b7715e9769156c8e302
-c98a0d7147c11759375c6eb2ea871898
+e7730b1480752e67c3ea56315777b3a6
+c0cddeffa5d533a217a9d672d3bf304c
 
-3f7d4ae0b4e5a17452bbdc6b124b9e07
-3809ad20a1a941348d6fad8815232778
+5e592b2dc710665901c138fab618bf40
+7977561d2cbbde4003338e894dca0211
 
-b3278bdd4f1408db5306fe5266500334
-a4426a67ecce8870f500067f31309fc7
+1671741996021a4fb708c74b574e0d5b
+2bdf896eabc81db36c4b114eb311b066
 
-fbef265c137bc1c782e48cff53275af4
-94aa32637507a30178d00e17c6bb6110
+7c759f1ebfa86d5f07dcedb5e1889198
+c8245d3f5f85c5ba98b6743e181f1122
 
-94e63395607395d4afe94e2590a39239
-ca47468825e5827a615550db101ca766
+6a40b69e48bb9e408392e526ed85d3cc
+ca68cae9c52866ee00fa192fdecced1d
 
-2bfe19a5f2b0a8f28fc351fde86a1026
-b2fa59d21450ffdf7d134108675fbcf8
+81d3c9fa3b5b062a5c6ac6b84de62950
+32cd397000640521e4d76249f32a7cf3
 
-456d83eefc1188cf3c6a12af1a466bfa
-a61c2637ef644e655455df4271f2b5d4
+d6ecb6a5a28210a689446791d099898f
+f32620cf3eb0ef614c0b50c19c072cb8
 
-bc250e5150d5d579ab65cc94768c0f2e
-9d2909611f86c8c269307b25fb4baa47
+064e364eff28a530b65c90420a66a7e1
+12143f37cfeab922f3e022e9f291fadb
 
-33c8d02cb62067afc2b4dc6b8c7fe8a7
-65264d02c72cd2625df4e1c509471341
+521de67cba5795f6e9b4470ba1911824
+1aa12fa0b41b27e82019866138dabd00
 
-010f12e98155e1c686ac224cfcc3429f
-c4b464b05fe0cc943a8a04885731f0bd
+0c0e2975240da648f7359cadd162e823
+1c26fc92987fbacf13db735c9a1f6657
 
-6c52ef19cdb689e0347d7f736f8ea72b
-5fa15f0fda2c03c6dfc7829f5458436e
+b682bdec6ff275892eddac3beadd484a
+431dba0d82d272badbfeaaa55a16e1a4
 
-4e1eb235990845c9c305c4b6e81c4a41
-d15aaa88fc0599cabcd9ca84eb0ba1ca
+483e929cad8a50735cd35ecb14e458c3
+9d75f52bea268860e1681d086aa1347b
 ');
 $test->expectStdoutIf(PHP_VERSION_ID < 80200, '
 "[ CmpModule ]"
 
-908fbbc10d0524b32e07b18caa682524
-908fbbc10d0524b32e07b18caa682524
+867bed6e3303e24dbccb6ae1b6258af8
+867bed6e3303e24dbccb6ae1b6258af8
 
-165b8d3e81c246955d4533498d6f48fe
-fff1b18ed73d6e21a826e47ea9f4f056
+69119b8480591f23003b7874ef18b27e
+d21ffa4bad46198ca8d8b6fb20e53bab
 
-d30eff66d945cecdd0c96516a6558e3a
-e561399aa4d2187899cdcd3ab6ad000d
+f406f7301eccbe2369c4f92d978f9bc7
+adef371ec1265997c1827318a608da70
 
-97b271c2d613076723b9705cb9c71556
-be6d0776834317ec5fadaff1303f4ff0
+80bf152dd6110f6db2eddfa9a9820e0a
+296dffb822ba2fac9fb187c15dbc58c4
 
-1efefd957627898b2acbba867d75cbc5
-fb0750945139eb06b47a600255676c47
+524446451ea078538c22d16ffc7407ca
+407bae8306a462f7dd31df7665eb972d
 
-c6f8a5b70de94e6eaa2d5fb57ccc3e3e
-96c4d024600d61a61804c7209e34c63c
+b193d867e2e9b8772a023957abcd5ab3
+782616ba9f2625836305d5edb27af988
 
-5826b941dd5d395ee103f9da83fc253a
-c58716f5ae674065028a104ebb0bd146
+f00da4909ce845822117c16f3c6c88b0
+8098cc141981c63dd8355a293753830f
 
-621dba2174ffd2e60446436f1886f62c
-2449e86fde91446dba306c34b99602a1
+4a5ef57f9986cbcdec1d494f3050be01
+894c42a801d4e56097631551604dc2a8
 
-355a59fbca8bd69553c5d8690869d3e2
-c38266d7dd9d1bc9cf32f845fcd04b38
+48466412af0bd08583e780b384d65a66
+a35364fe29a89dda89115f9fb3384099
 
-828629b8067b4860e63bfaf38ba72964
-08d0229be9035ea4428e80a04a4a8372
+890e8c5e276e9f2eec402b3dfed584b1
+542043204ae96d41c33e8c033cae7efa
 
-4869d80916766a53ac11476293c01ab2
-04c6c960e535386f1ac60fc2f3a6e8e6
+40c859a0d73f4011c49e1882509756cc
+e284771d933a66eade1276eba33e9084
 
-2dad24df60dd8b8e1536ed33ee103e84
-7d331f7bdf0ef0ae6a810688292200a3
+2b7ea99ae7905e70effe8bf1913766a4
+51a846b570526767249465433872c2d4
 
-1df0475ec18db2c156c95ea58734e091
-226676c999ac47f898e08cd16cb34681
+56a4ff1e86d1be6d217714b2dfa7b640
+0e5d455db540c2bbb141870838dc5ff9
 
-7a0b364aa70b3c753f57fa934dfea198
-2d023d1a64cab349bfa9c92001510ce5
+0f86bcbd6f04d347357baf0ad5da0cc6
+9ee81ed5ebe9742c6f547b270a8d57b4
 
-4ae9f95cbf71415931dcbecc7747611b
-d0bbd2e6c1b903d51e2a58f05b53fd7f
+34c94919a67eadd6474e8abd0263615f
+79a0cfcdcf951eb8224909acdb023fa5
 
-f1a5b2e3072b88181a4e5e1de7eafa84
-dd8ef9262960ab6cff45009c4b2db54e
+07d82cb5793b234948704d7c20cb284d
+ae8e6667b484151355fa92c069d5793d
 
-3782ec73f791f0498abacac1c137226c
-f6890b0e173dd8aafdbc618d4c4767a6
+28af9f04c7a2fe85694346d7c3fb656c
+0be8825df3990cb351c9ee783a973fe7
 
-2a1a8aa3afbd086df0eb3a712a491db0
-6554c02b004cd4ac2baa4c49dbb71e2b
+84fb8d665403f3f9888af1ae21b6f312
+9cd36898bc84a243e8e2ce31438cd56e
 
-a25b56af54b8de44fe31f2c9a364dc0f
-636b2a406fcb7b7733eca5710f0c3aa0
+098809dc22f412bb928ba7a09bc440f3
+4a670c00a1630c13602f50cf223ad984
 
-33d5dd34a8557216808c11dd17050c8c
-2e66f6507e33f5da1614086aabc66fcf
+eb95474cce527e8a7277b32231834b87
+061f86a33a3b0809ef62560789f80116
 ');
 $test->run();
 

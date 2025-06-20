@@ -1,6 +1,8 @@
 *
 !.gitignore
 
+!/bc_mathround.txt
+!/bc_moneyround.txt
 !/cmp_fn_compare_php73.txt
 !/cmp_fn_compare_php82.txt
 !/num_mathround.txt

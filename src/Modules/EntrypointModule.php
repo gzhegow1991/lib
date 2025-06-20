@@ -25,15 +25,28 @@ class EntrypointModule
      * @var int
      */
     protected $errorReporting;
+    /**
+     * @var int
+     */
+    protected $displayErrors = 0;
 
     /**
      * @var string
      */
     protected $memoryLimit = '32M';
+
     /**
      * @var int
      */
-    protected $timeLimit = 30;
+    protected $maxExecutionTime = 30;
+    /**
+     * @var int
+     */
+    protected $maxInputTime = -1;
+    /**
+     * @var \DateTimeZone
+     */
+    protected $timezoneDefault;
 
     /**
      * @var string
@@ -52,12 +65,12 @@ class EntrypointModule
     /**
      * @var int
      */
-    protected $precision = 16;
+    protected $umask = 0002;
 
     /**
      * @var int
      */
-    protected $umask = 0002;
+    protected $precision = 16;
 
     /**
      * @var callable|null
@@ -81,6 +94,8 @@ class EntrypointModule
     public function __construct()
     {
         $this->errorReporting = (E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
+
+        $this->timezoneDefault = new \DateTimeZone('UTC');
 
         $this->uploadTmpDir = sys_get_temp_dir();
 
@@ -178,6 +193,53 @@ class EntrypointModule
     }
 
 
+    /**
+     * @return string|false
+     */
+    public function getPhpDisplayErrors(string $displayErrorsTmp = '0')
+    {
+        $before = ini_set('display_errors', $displayErrorsTmp);
+
+        ini_set('display_errors', $before);
+
+        return $before;
+    }
+
+    /**
+     * @return static
+     */
+    public function setDisplayErrors(?bool $displayErrors = null)
+    {
+        $this->assertNotLocked();
+
+        if (null !== $displayErrors) {
+            $displayErrors = (int) $displayErrors;
+        }
+
+        $this->displayErrors = $displayErrors;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDisplayErrors(
+        &$refLastDisplayErrors = null,
+        &$refLastDisplayStartupErrors = null
+    )
+    {
+        if (null === $this->displayErrors) {
+            return $this;
+        }
+
+        $refLastDisplayErrors = ini_set('display_errors', $this->displayErrors);
+        $refLastDisplayStartupErrors = ini_set('display_startup_errors', $this->displayErrors);
+
+        return $this;
+    }
+
+
     public function getPhpMemoryLimit(string $memoryLimitTmp = '32M') : string
     {
         $before = ini_set('memory_limit', $memoryLimitTmp);
@@ -223,9 +285,9 @@ class EntrypointModule
     }
 
 
-    public function getPhpTimeLimit(int $timeLimitTmp = 30) : string
+    public function getPhpMaxExecutionTime(int $maxInputTimeTmp = 30) : string
     {
-        $before = ini_set('max_execution_time', $timeLimitTmp);
+        $before = ini_set('max_execution_time', $maxInputTimeTmp);
 
         ini_set('max_execution_time', $before);
 
@@ -235,19 +297,15 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setTimeLimit(?int $timeLimit = null)
+    public function setMaxExecutionTime(?int $maxExecutionTime = null)
     {
         $this->assertNotLocked();
 
-        if (null !== ($timeLimitInt = $timeLimit)) {
-            if (! Lib::type()->int_non_negative($timeLimitInt, $timeLimit)) {
-                throw new LogicException(
-                    [ 'The `timeLimit` should be a non-negative integer', $timeLimit ]
-                );
-            }
+        if (null !== ($maxExecutionTimeInt = $maxExecutionTime)) {
+            Lib::typeThrow()->int_non_negative($maxExecutionTimeInt, $maxExecutionTime);
         }
 
-        $this->timeLimit = $timeLimitInt;
+        $this->maxExecutionTime = $maxExecutionTimeInt;
 
         return $this;
     }
@@ -255,15 +313,89 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useTimeLimit(&$refLast = null)
+    public function useMaxExecutionTime(&$refLast = null)
     {
-        if (null === $this->timeLimit) {
+        if (null === $this->maxExecutionTime) {
             return $this;
         }
 
-        $refLast = ini_set('max_execution_time', $this->timeLimit);
+        $refLast = ini_set('max_execution_time', $this->maxExecutionTime);
 
-        set_time_limit($this->timeLimit);
+        return $this;
+    }
+
+
+    public function getPhpMaxInputTime(int $maxInputTimeTmp = 30) : string
+    {
+        $before = ini_set('max_input_time', $maxInputTimeTmp);
+
+        ini_set('max_input_time', $before);
+
+        return $before;
+    }
+
+    /**
+     * @return static
+     */
+    public function setMaxInputTime(?int $maxInputTime = null)
+    {
+        $this->assertNotLocked();
+
+        if (null !== ($maxInputTimeInt = $maxInputTime)) {
+            Lib::typeThrow()->int_non_negative_or_minus_one($maxInputTimeInt, $maxInputTime);
+        }
+
+        $this->maxInputTime = $maxInputTimeInt;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useMaxInputTime(&$refLast = null)
+    {
+        if (null === $this->maxInputTime) {
+            return $this;
+        }
+
+        $refLast = ini_set('max_input_time', $this->maxInputTime);
+
+        return $this;
+    }
+
+
+    public function getPhpTimezoneDefault() : string
+    {
+        return date_default_timezone_get();
+    }
+
+    /**
+     * @return static
+     */
+    public function setTimezoneDefault($timezoneDefault = null)
+    {
+        $this->assertNotLocked();
+
+        if (null !== $timezoneDefault) {
+            Lib::typeThrow()->timezone($timezoneDefaultTz, $timezoneDefault);
+        }
+
+        $this->timezoneDefault = $timezoneDefaultTz ?? $timezoneDefault;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useTimezoneDefault(&$refLast = null)
+    {
+        if (null === $this->timezoneDefault) {
+            return $this;
+        }
+
+        $refLast = date_default_timezone_set($this->timezoneDefault->getName());
 
         return $this;
     }
@@ -420,11 +552,7 @@ class EntrypointModule
         $this->assertNotLocked();
 
         if (null !== ($precisionInt = $precision)) {
-            if (! Lib::type()->int_non_negative($precisionInt, $precision)) {
-                throw new LogicException(
-                    [ 'The `precision` should be a non-negative integer', $precision ]
-                );
-            }
+            Lib::typeThrow()->int_non_negative($precisionInt, $precision);
         }
 
         $this->precision = $precisionInt;
@@ -658,6 +786,53 @@ class EntrypointModule
         }
 
         exit(1);
+    }
+
+
+    /**
+     * @return static
+     */
+    public function useAllErrorReporting()
+    {
+        $this
+            ->useDisplayErrors()
+            ->useErrorReporting()
+            ->useErrorHandler()
+            ->useExceptionHandler()
+        ;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useAllTime()
+    {
+        $this
+            ->useMaxExecutionTime()
+            ->useMaxInputTime()
+        ;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useAllNonTime()
+    {
+        $this
+            ->useMemoryLimit()
+            ->usePostMaxSize()
+            ->usePrecision()
+            ->useTimezoneDefault()
+            ->useUmask()
+            ->useUploadMaxFilesize()
+            ->useUploadTmpDir()
+        ;
+
+        return $this;
     }
 
 
