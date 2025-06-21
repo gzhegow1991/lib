@@ -34,17 +34,15 @@ require_once __DIR__ . '/../vendor/autoload.php';
     //
     // > file: yourscript.php
     //
-    // ->useAllErrorReporting()
+    // ->useAllErrorReporting() or...
     ->useDisplayErrors()
     ->useErrorReporting()
     ->useErrorHandler()
     ->useExceptionHandler()
     //
-    // ->useAllTime()
     ->useMaxExecutionTime()
     ->useMaxInputTime()
     //
-    // ->useAllNonTime()
     ->useMemoryLimit()
     ->usePostMaxSize()
     ->usePrecision()

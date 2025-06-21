@@ -804,37 +804,6 @@ class EntrypointModule
         return $this;
     }
 
-    /**
-     * @return static
-     */
-    public function useAllTime()
-    {
-        $this
-            ->useMaxExecutionTime()
-            ->useMaxInputTime()
-        ;
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useAllNonTime()
-    {
-        $this
-            ->useMemoryLimit()
-            ->usePostMaxSize()
-            ->usePrecision()
-            ->useTimezoneDefault()
-            ->useUmask()
-            ->useUploadMaxFilesize()
-            ->useUploadTmpDir()
-        ;
-
-        return $this;
-    }
-
 
     protected function assertNotLocked() : void
     {
