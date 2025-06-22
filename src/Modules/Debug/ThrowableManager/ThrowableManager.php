@@ -373,11 +373,16 @@ class ThrowableManager implements ThrowableManagerInterface
             $dirRoot = $this->dirRoot ?? Lib::debug()->static_dir_root();
 
             if (null !== $dirRoot) {
-                $eFileRelative = Lib::fs()->path_relative(
-                    $eFile,
-                    $dirRoot,
-                    '/'
-                );
+                try {
+                    $eFileRelative = Lib::fs()->path_relative(
+                        $eFile,
+                        $dirRoot,
+                        '/'
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $eFileRelative = $eFile;
+                }
 
                 $eFile = $eFileRelative;
             }
@@ -421,11 +426,16 @@ class ThrowableManager implements ThrowableManagerInterface
                 $dirRoot = $this->dirRoot ?? Lib::debug()->static_dir_root();
 
                 if (null !== $dirRoot) {
-                    $eFileRelative = Lib::fs()->path_relative(
-                        $eFile,
-                        $dirRoot,
-                        '/'
-                    );
+                    try {
+                        $eFileRelative = Lib::fs()->path_relative(
+                            $eFile,
+                            $dirRoot,
+                            '/'
+                        );
+                    }
+                    catch ( \Throwable $e ) {
+                        $eFileRelative = $eFile;
+                    }
 
                     $eFile = $eFileRelative;
                 }
@@ -464,9 +474,9 @@ class ThrowableManager implements ThrowableManagerInterface
 
     public function getThrowableTrace(\Throwable $e, ?int $flags = null) : array
     {
-        $dirRoot = $this->dirRoot ?? Lib::debug()->static_dir_root();
-
         $eTrace = $e->getTrace();
+
+        $dirRoot = $this->dirRoot ?? Lib::debug()->static_dir_root();
 
         if (null !== $dirRoot) {
             $theFs = Lib::fs();
@@ -476,13 +486,18 @@ class ThrowableManager implements ThrowableManagerInterface
                     continue;
                 }
 
-                $fileRelative = $theFs->path_relative(
-                    $t[ 'file' ],
-                    $dirRoot,
-                    '/'
-                );
+                try {
+                    $tFileRelative = $theFs->path_relative(
+                        $t[ 'file' ],
+                        $dirRoot,
+                        '/'
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $tFileRelative = $t[ 'file' ];
+                }
 
-                $eTrace[ $i ][ 'file' ] = $fileRelative;
+                $eTrace[ $i ][ 'file' ] = $tFileRelative;
             }
         }
 

@@ -932,13 +932,13 @@ class FsModule
         }
 
         if ($this->type_realpath($realpath, $path)) {
-            $normalized = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
+            $pathNormalized = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
 
         } else {
-            $normalized = Lib::php()->path_normalize($path, $separator);
+            $pathNormalized = Lib::php()->path_normalize($path, $separator);
         }
 
-        return $normalized;
+        return $pathNormalized;
     }
 
     public function path_resolve(string $path, ?string $separator = null) : string
@@ -950,13 +950,13 @@ class FsModule
         }
 
         if ($this->type_realpath($realpath, $path)) {
-            $resolved = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
+            $pathResolved = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
 
         } else {
-            $resolved = Lib::php()->path_resolve($path, $separatorString, '.');
+            $pathResolved = Lib::php()->path_resolve($path, $separatorString, '.');
         }
 
-        return $resolved;
+        return $pathResolved;
     }
 
 
@@ -979,7 +979,9 @@ class FsModule
             $root = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
         }
 
-        return Lib::php()->path_relative($path, $root, $separatorString, '.');
+        $pathRelative = Lib::php()->path_relative($path, $root, $separatorString, '.');
+
+        return $pathRelative;
     }
 
     public function path_absolute(
@@ -1001,7 +1003,9 @@ class FsModule
             $current = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
         }
 
-        return Lib::php()->path_absolute($path, $current, $separatorString, '.');
+        $pathAbsolute = Lib::php()->path_absolute($path, $current, $separatorString, '.');
+
+        return $pathAbsolute;
     }
 
     public function path_or_absolute(
@@ -1023,7 +1027,9 @@ class FsModule
             $current = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
         }
 
-        return Lib::php()->path_or_absolute($path, $current, $separatorString, '.');
+        $pathOrAbsolute = Lib::php()->path_or_absolute($path, $current, $separatorString, '.');
+
+        return $pathOrAbsolute;
     }
 
 

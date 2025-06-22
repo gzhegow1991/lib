@@ -11,45 +11,27 @@ require_once __DIR__ . '/../vendor/autoload.php';
     // > частично удаляет путь файла из каждой строки `trace` (`trace[i][file]`) при обработке исключений
     ->setDirRoot(__DIR__ . '/..')
     //
-    // > file: index.php
-    //
-    // ->setDisplayErrors(0)
-    // ->setErrorReporting(E_ALL)
-    // ->setErrorHandler([ $ex, 'fnErrorHandler' ])
-    // ->setExceptionHandler([ $ex, 'fnExceptionHandler' ])
-    //
-    // ->setMemoryLimit('32M')
-    // ->setPostMaxSize('5M')
-    // ->setPrecision(16)
-    // ->setTimezoneDefault('UTC')
-    // ->setUmask(0002)
-    // ->setUploadMaxFilesize('2M')
-    // ->setUploadTmpDir(sys_get_temp_dir())
-    //
-    // ->setMaxExecutionTime(30)
-    // ->setMaxInputTime(-1)
-    //
-    // ->lock(true)
-    //
-    //
-    // > file: yourscript.php
-    //
-    // ->useAllErrorReporting() or...
-    ->useDisplayErrors()
     ->useErrorReporting()
+    ->useErrorLog()
+    ->useDisplayErrors()
     ->useErrorHandler()
     ->useExceptionHandler()
+    //
+    ->useMemoryLimit()
     //
     ->useMaxExecutionTime()
     ->useMaxInputTime()
     //
-    ->useMemoryLimit()
-    ->usePostMaxSize()
-    ->usePrecision()
     ->useTimezoneDefault()
-    ->useUmask()
+    //
+    ->usePostMaxSize()
+    //
     ->useUploadMaxFilesize()
     ->useUploadTmpDir()
+    //
+    ->usePrecision()
+    //
+    ->useUmask()
 ;
 
 
@@ -2194,15 +2176,6 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    $src = 'HELLO';
-    $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($src);
-    $enc = implode('', iterator_to_array($gen));
-    $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_it($enc);
-    $dec = implode('', iterator_to_array($gen));
-    $ffn->print($src, $enc, $dec);
-    echo "\n";
-
-
     $src = "hello";
     $enc = \Gzhegow\Lib\Lib::crypt()->base58_encode($src);
     $dec = \Gzhegow\Lib\Lib::crypt()->base58_decode($enc);
@@ -2219,6 +2192,7 @@ $fn = function () use ($ffn) {
     $ffn->print($src, $enc, $dec);
 
     echo "\n";
+    echo "\n";
 
 
     $src = "hello";
@@ -2234,6 +2208,116 @@ $fn = function () use ($ffn) {
     $src = '你好';
     $enc = \Gzhegow\Lib\Lib::crypt()->base62_encode($src);
     $dec = \Gzhegow\Lib\Lib::crypt()->base62_decode($enc);
+    $ffn->print($src, $enc, $dec);
+
+    echo "\n";
+    echo "\n";
+
+
+    $src = "hello";
+    $enc = \Gzhegow\Lib\Lib::crypt()->base64_encode($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->base64_decode($enc);
+    $ffn->print($src, $enc, $dec);
+
+    $src = "\x00\x00\x01\x00\xFF";
+    $enc = \Gzhegow\Lib\Lib::crypt()->base64_encode($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->base64_decode($enc);
+    $ffn->print($src, $enc, $dec);
+
+    $src = '你好';
+    $enc = \Gzhegow\Lib\Lib::crypt()->base64_encode($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->base64_decode($enc);
+    $ffn->print($src, $enc, $dec);
+
+    echo "\n";
+
+
+    $src = "hello";
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($src);
+    $enc = implode('', iterator_to_array($gen));
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_it($enc);
+    $dec = implode('', iterator_to_array($gen));
+    $ffn->print($src, $enc, $dec);
+
+    $src = "\x00\x00\x01\x00\xFF";
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($src);
+    $enc = implode('', iterator_to_array($gen));
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_it($enc);
+    $dec = implode('', iterator_to_array($gen));
+    $ffn->print($src, $enc, $dec);
+
+    $src = "你好";
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_it($src);
+    $enc = implode('', iterator_to_array($gen));
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_it($enc);
+    $dec = implode('', iterator_to_array($gen));
+    $ffn->print($src, $enc, $dec);
+
+    echo "\n";
+    echo "\n";
+
+
+    $src = "hello";
+    $enc = \Gzhegow\Lib\Lib::crypt()->base64_encode_urlsafe($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->base64_decode_urlsafe($enc);
+    $ffn->print($src, $enc, $dec);
+
+    $src = "\x00\x00\x01\x00\xFF";
+    $enc = \Gzhegow\Lib\Lib::crypt()->base64_encode_urlsafe($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->base64_decode_urlsafe($enc);
+    $ffn->print($src, $enc, $dec);
+
+    $src = '你好';
+    $enc = \Gzhegow\Lib\Lib::crypt()->base64_encode_urlsafe($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->base64_decode_urlsafe($enc);
+    $ffn->print($src, $enc, $dec);
+
+    $src = 'this+is/a?string=with&special=characters==';
+    $enc = \Gzhegow\Lib\Lib::crypt()->base64_encode_urlsafe($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->base64_decode_urlsafe($enc);
+    $ffn->print($src, $enc, $dec);
+
+    $src = "\xfa\xfb\xfc\xfd\xfe\xff";
+    $enc = \Gzhegow\Lib\Lib::crypt()->base64_encode_urlsafe($src);
+    $dec = \Gzhegow\Lib\Lib::crypt()->base64_decode_urlsafe($enc);
+    $ffn->print($src, $enc, $dec);
+
+    echo "\n";
+
+
+    $src = "hello";
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_urlsafe_it($src);
+    $enc = implode('', iterator_to_array($gen));
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_urlsafe_it($enc);
+    $dec = implode('', iterator_to_array($gen));
+    $ffn->print($src, $enc, $dec);
+
+    $src = "\x00\x00\x01\x00\xFF";
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_urlsafe_it($src);
+    $enc = implode('', iterator_to_array($gen));
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_urlsafe_it($enc);
+    $dec = implode('', iterator_to_array($gen));
+    $ffn->print($src, $enc, $dec);
+
+    $src = "你好";
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_urlsafe_it($src);
+    $enc = implode('', iterator_to_array($gen));
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_urlsafe_it($enc);
+    $dec = implode('', iterator_to_array($gen));
+    $ffn->print($src, $enc, $dec);
+
+    $src = "this+is/a?string=with&special=characters==";
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_urlsafe_it($src);
+    $enc = implode('', iterator_to_array($gen));
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_urlsafe_it($enc);
+    $dec = implode('', iterator_to_array($gen));
+    $ffn->print($src, $enc, $dec);
+
+    $src = "\xfa\xfb\xfc\xfd\xfe\xff";
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_encode_urlsafe_it($src);
+    $enc = implode('', iterator_to_array($gen));
+    $gen = \Gzhegow\Lib\Lib::crypt()->base64_decode_urlsafe_it($enc);
+    $dec = implode('', iterator_to_array($gen));
     $ffn->print($src, $enc, $dec);
 };
 $test = $ffn->test($fn);
@@ -2279,11 +2363,11 @@ $test->expectStdout('
 "1" | "3" | "7" | "F" | "V" | "/"
 
 [ "你" ]
-[ "111001001011110110100000" ]
+[ "11100100", "10111101", "10100000" ]
 [ "你" ]
 
 [ "你好" ]
-[ "111001001011110110100000", "111001011010010110111101" ]
+[ "11100100", "10111101", "10100000", "11100101", "10100101", "10111101" ]
 [ "你", "好" ]
 
 
@@ -2296,15 +2380,36 @@ $test->expectStdout('
 "hello"
 
 
-"HELLO" | "SEVMTE8=" | "HELLO"
-
 "hello" | "Cn8eVZg" | "hello"
 "b`\x00\x00\x01\x00ÿ`" | "11LZL" | "b`\x00\x00\x01\x00ÿ`"
 "你好" | "2xuZUfBKa" | "你好"
 
+
 "hello" | "7tQLFHz" | "hello"
 "b`\x00\x00\x01\x00ÿ`" | "00H79" | "b`\x00\x00\x01\x00ÿ`"
 "你好" | "19PqtKE1t" | "你好"
+
+
+"hello" | "aGVsbG8=" | "hello"
+"b`\x00\x00\x01\x00ÿ`" | "AAABAP8=" | "b`\x00\x00\x01\x00ÿ`"
+"你好" | "5L2g5aW9" | "你好"
+
+"hello" | "aGVsbG8=" | "hello"
+"b`\x00\x00\x01\x00ÿ`" | "AAABAP8=" | "b`\x00\x00\x01\x00ÿ`"
+"你好" | "5L2g5aW9" | "你好"
+
+
+"hello" | "aGVsbG8=" | "hello"
+"b`\x00\x00\x01\x00ÿ`" | "AAABAP8=" | "b`\x00\x00\x01\x00ÿ`"
+"你好" | "5L2g5aW9" | "你好"
+"this+is/a?string=with&special=characters==" | "dGhpcytpcy9hP3N0cmluZz13aXRoJnNwZWNpYWw9Y2hhcmFjdGVycz09" | "this+is/a?string=with&special=characters=="
+"b`úûüýþÿ`" | "-vv8_f7_" | "b`úûüýþÿ`"
+
+"hello" | "aGVsbG8=" | "hello"
+"b`\x00\x00\x01\x00ÿ`" | "AAABAP8=" | "b`\x00\x00\x01\x00ÿ`"
+"你好" | "5L2g5aW9" | "你好"
+"this+is/a?string=with&special=characters==" | "dGhpcytpcy9hP3N0cmluZz13aXRoJnNwZWNpYWw9Y2hhcmFjdGVycz09" | "this+is/a?string=with&special=characters=="
+"b`úûüýþÿ`" | "-vv8_f7_" | "b`úûüýþÿ`"
 ');
 $test->run();
 

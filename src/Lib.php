@@ -48,33 +48,6 @@ class Lib
      */
     public static $parseThrow;
 
-    /**
-     * > Lib::parse([ &$theParseThrow, &$theParseNull ])
-     * > $theParseNull = Lib::parse()
-     *
-     * @param ParseThrowModule|null $pt
-     * @param ParseNullModule|null  $pn
-     *
-     * @return ParseNullModule
-     */
-    public static function parse(&$pt = null, &$pn = null)
-    {
-        static::$parseNull = static::$parseNull ?? new ParseNullModule();
-
-        $n = func_num_args();
-
-        if ($n === 2) {
-            $pn = static::$parseNull;
-
-        } elseif ($n === 1) {
-            static::$parseThrow = static::$parseThrow ?? new ParseThrowModule();
-
-            $pt = static::$parseThrow;
-        }
-
-        return static::$parseNull;
-    }
-
     public static function parseNull()
     {
         return static::$parseNull = static::$parseNull ?? new ParseNullModule();
@@ -83,6 +56,11 @@ class Lib
     public static function parseThrow()
     {
         return static::$parseThrow = static::$parseThrow ?? new ParseThrowModule();
+    }
+
+    public static function parse()
+    {
+        return static::$parseNull = static::$parseNull ?? new ParseNullModule();
     }
 
 
@@ -95,33 +73,6 @@ class Lib
      */
     public static $typeThrow;
 
-    /**
-     * > Lib::type([ &$theTypeThrow, &$theTypeBool ])
-     * > $theTypeBool = Lib::type()
-     *
-     * @param TypeThrowModule|null $tt
-     * @param TypeBoolModule|null  $tb
-     *
-     * @return TypeBoolModule
-     */
-    public static function type(&$tt = null, &$tb = null)
-    {
-        static::$typeBool = static::$typeBool ?? new TypeBoolModule();
-
-        $n = func_num_args();
-
-        if ($n === 2) {
-            $tb = static::$typeBool;
-
-        } elseif ($n === 1) {
-            static::$typeThrow = static::$typeThrow ?? new TypeThrowModule();
-
-            $tt = static::$typeThrow;
-        }
-
-        return static::$typeBool;
-    }
-
     public static function typeBool()
     {
         return static::$typeBool = static::$typeBool ?? new TypeBoolModule();
@@ -130,6 +81,63 @@ class Lib
     public static function typeThrow()
     {
         return static::$typeThrow = static::$typeThrow ?? new TypeThrowModule();
+    }
+
+    public static function type()
+    {
+        return static::$typeBool = static::$typeBool ?? new TypeBoolModule();
+    }
+
+
+    /**
+     * @var FormatModule
+     */
+    public static $format;
+
+    public static function format()
+    {
+        return static::$format = static::$format ?? new FormatModule();
+    }
+
+    public static function formatCsv()
+    {
+        return Lib::format()->csv();
+    }
+
+    public static function formatJson()
+    {
+        return Lib::format()->json();
+    }
+
+    public static function formatXml()
+    {
+        return Lib::format()->xml();
+    }
+
+
+    /**
+     * @var FsModule
+     */
+    public static $fs;
+
+    public static function fs()
+    {
+        return static::$fs = static::$fs ?? new FsModule();
+    }
+
+    public static function fsFile()
+    {
+        return Lib::fs()->fileSafe();
+    }
+
+    public static function fsSocket()
+    {
+        return Lib::fs()->socketSafe();
+    }
+
+    public static function fsStream()
+    {
+        return Lib::fs()->streamSafe();
     }
 
 
@@ -231,26 +239,6 @@ class Lib
     public static function escape()
     {
         return static::$escape = static::$escape ?? new EscapeModule();
-    }
-
-    /**
-     * @var FormatModule
-     */
-    public static $format;
-
-    public static function format()
-    {
-        return static::$format = static::$format ?? new FormatModule();
-    }
-
-    /**
-     * @var FsModule
-     */
-    public static $fs;
-
-    public static function fs()
-    {
-        return static::$fs = static::$fs ?? new FsModule();
     }
 
     /**
@@ -568,28 +556,6 @@ class Lib
         return $imports;
     }
 
-    /**
-     * @return mixed
-     */
-    public static function import(string $file)
-    {
-        if (! is_file($file)) {
-            throw new RuntimeException(
-                [ 'Missing `filepath` file: ' . $file ]
-            );
-        }
-
-        $realpath = realpath($file);
-
-        $imports =& static::di();
-
-        if (! isset($imports[ $realpath ])) {
-            $imports[ $realpath ] = require_once $realpath;
-        }
-
-        return $imports[ $realpath ];
-    }
-
     public static function export(string $file, $item = null, ?string $name = null) : array
     {
         static $export;
@@ -622,6 +588,51 @@ class Lib
         }
 
         return $export[ $realpath ];
+    }
+
+    public static function import(string $file) : array
+    {
+        if (! is_file($file)) {
+            throw new RuntimeException(
+                [ 'Missing `filepath` file: ' . $file ]
+            );
+        }
+
+        $realpath = realpath($file);
+
+        $imports =& static::di();
+
+        if (! isset($imports[ $realpath ])) {
+            $imports[ $realpath ] = require_once $realpath;
+        }
+
+        return $imports[ $realpath ];
+    }
+
+    /**
+     * @template-covariant T of object
+     *
+     * @param class-string<T>|null $classT
+     *
+     * @return T|mixed
+     */
+    public static function importKey(string $file, string $key, ?string $classT = null)
+    {
+        if (! is_file($file)) {
+            throw new RuntimeException(
+                [ 'Missing `filepath` file: ' . $file ]
+            );
+        }
+
+        $realpath = realpath($file);
+
+        $imports =& static::di();
+
+        if (! isset($imports[ $realpath ])) {
+            $imports[ $realpath ] = require_once $realpath;
+        }
+
+        return $imports[ $realpath ][ $key ];
     }
 
 

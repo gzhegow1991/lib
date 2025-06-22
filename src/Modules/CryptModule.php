@@ -263,8 +263,6 @@ class CryptModule
      */
     public function text2bin_it($strings) : \Generator
     {
-        Lib::mb();
-
         $stringsIt = Lib::php()->to_iterable($strings);
 
         foreach ( $stringsIt as $string ) {
@@ -272,23 +270,16 @@ class CryptModule
                 continue;
             }
 
-            $len = mb_strlen($string);
+            $len = strlen($string);
 
             for ( $i = 0; $i < $len; $i++ ) {
-                $letter = mb_substr($string, $i, 1);
+                $bin = $string[ $i ];
 
-                // > convert one UTF-8 letter to 8bit bytes
-                $bytes = unpack('C*', $letter);
+                $bin = ord($bin);
+                $bin = decbin($bin);
+                $bin = str_pad($bin, 8, '0', STR_PAD_LEFT);
 
-                $binary = '';
-                foreach ( $bytes as $byte ) {
-                    $bin = decbin($byte);
-                    $bin = str_pad($bin, 8, '0', STR_PAD_LEFT);
-
-                    $binary .= $bin;
-                }
-
-                yield $binary;
+                yield $bin;
             }
         }
     }
@@ -298,8 +289,6 @@ class CryptModule
      */
     public function bin2text_it($binaries, ?bool $isThrow = null) : \Generator
     {
-        Lib::mb();
-
         $isThrow = $isThrow ?? true;
 
         $binariesIt = Lib::php()->to_iterable($binaries);
@@ -733,7 +722,7 @@ class CryptModule
      */
     public function baseX_encode_it($strings, $alphabetTo) : \Generator
     {
-        Lib::mb();
+        $theBcmath = Lib::bcmath();
 
         if (! Lib::type()->alphabet($_alphabetTo, $alphabetTo)) {
             throw new LogicException(
@@ -761,8 +750,6 @@ class CryptModule
         foreach ( $gen as [ $binaryLen, $baseLetter ] ) {
             yield $baseLetter;
         }
-
-        $theBcmath = Lib::bcmath();
 
         $bytesPerBlock = $theBcmath->bclcm('8', $bytesCnt);
         $bytesPerBlock = bcdiv($bytesPerBlock, '8');

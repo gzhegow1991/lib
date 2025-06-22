@@ -67,7 +67,7 @@ class FilesystemFetchApi implements FetchApiInterface
             );
         }
 
-        $theType = Lib::type($tt);
+        $theType = Lib::type();
 
         $theType->realpath($binDirDefault, __DIR__ . '/../../../../bin/php/');
         $binDirRealpath = '';

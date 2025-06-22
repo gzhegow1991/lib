@@ -26,9 +26,21 @@ class EntrypointModule
      */
     protected $errorReporting;
     /**
+     * @var string
+     */
+    protected $errorLog;
+    /**
+     * @var string
+     */
+    protected $logErrors = 0;
+    /**
      * @var int
      */
     protected $displayErrors = 0;
+    /**
+     * @var int
+     */
+    protected $displayStartupErrors = 0;
 
     /**
      * @var string
@@ -38,11 +50,12 @@ class EntrypointModule
     /**
      * @var int
      */
-    protected $maxExecutionTime = 30;
+    protected $maxExecutionTime = 10;
     /**
      * @var int
      */
     protected $maxInputTime = -1;
+
     /**
      * @var \DateTimeZone
      */
@@ -51,7 +64,7 @@ class EntrypointModule
     /**
      * @var string
      */
-    protected $postMaxSize = '5M';
+    protected $postMaxSize = '8M';
 
     /**
      * @var string
@@ -65,12 +78,12 @@ class EntrypointModule
     /**
      * @var int
      */
-    protected $umask = 0002;
+    protected $precision = 16;
 
     /**
      * @var int
      */
-    protected $precision = 16;
+    protected $umask = 0002;
 
     /**
      * @var callable|null
@@ -94,6 +107,7 @@ class EntrypointModule
     public function __construct()
     {
         $this->errorReporting = (E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
+        $this->errorLog = getcwd() . '/error_log';
 
         $this->timezoneDefault = new \DateTimeZone('UTC');
 
@@ -131,15 +145,14 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        if (null !== $dirRoot) {
-            if (! Lib::fs()->type_dirpath_realpath($realpath, $dirRoot)) {
-                throw new LogicException(
-                    [ 'The `dirRoot` should be an existing directory path', $dirRoot ]
-                );
-            }
-        }
+        if (null === $dirRoot) {
+            $this->dirRoot = null;
 
-        $this->dirRoot = $realpath ?? null;
+        } else {
+            Lib::typeThrow()->dirpath_realpath($dirRootRealpath, $dirRoot);
+
+            $this->dirRoot = $dirRootRealpath;
+        }
 
         return $this;
     }
@@ -162,7 +175,10 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        if (null !== $errorReporting) {
+        if (null === $errorReporting) {
+            $this->errorReporting = (E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
+
+        } else {
             if (-1 === $errorReporting) {
                 $errorReporting = (E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
 
@@ -171,9 +187,10 @@ class EntrypointModule
                     [ 'The `errorReporting` should be a valid `error_reporting` flag', $errorReporting ]
                 );
             }
+
+            $this->errorReporting = $errorReporting;
         }
 
-        $this->errorReporting = $errorReporting;
 
         return $this;
     }
@@ -183,11 +200,67 @@ class EntrypointModule
      */
     public function useErrorReporting(&$refLast = null)
     {
-        if (null === $this->errorReporting) {
-            return $this;
+        $refLast = error_reporting($this->errorReporting);
+
+        return $this;
+    }
+
+
+    /**
+     * @return string|false
+     */
+    public function getPhpLogErrors(string $logErrorsTmp = '0')
+    {
+        $before = ini_set('log_errors', $logErrorsTmp);
+
+        ini_set('log_errors', $before);
+
+        return $before;
+    }
+
+    /**
+     * @return string|false
+     */
+    public function getPhpErrorLog(string $errorLogTmp = '')
+    {
+        $before = ini_set('error_log', $errorLogTmp);
+
+        ini_set('error_log', $before);
+
+        return $before;
+    }
+
+    /**
+     * @return static
+     */
+    public function setErrorLog(?string $errorLog = null)
+    {
+        $this->assertNotLocked();
+
+        if (null === $errorLog) {
+            $this->errorLog = getcwd() . '/error_log';
+            $this->logErrors = 0;
+
+        } else {
+            Lib::typeThrow()->filepath($errorLogString, $errorLog, true);
+
+            $this->errorLog = $errorLogString;
+            $this->logErrors = 1;
         }
 
-        $refLast = error_reporting($this->errorReporting);
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useErrorLog(
+        &$refLastErrorLog = null,
+        &$refLastLogErrors = null
+    )
+    {
+        $refLastErrorLog = ini_set('error_log', $this->errorLog);
+        $refLastLogErrors = ini_set('log_errors', $this->logErrors);
 
         return $this;
     }
@@ -206,17 +279,34 @@ class EntrypointModule
     }
 
     /**
+     * @return string|false
+     */
+    public function getPhpDisplayStartupErrors(string $displayStartupErrorsTmp = '0')
+    {
+        $before = ini_set('display_startup_errors', $displayStartupErrorsTmp);
+
+        ini_set('display_startup_errors', $before);
+
+        return $before;
+    }
+
+    /**
      * @return static
      */
     public function setDisplayErrors(?bool $displayErrors = null)
     {
         $this->assertNotLocked();
 
-        if (null !== $displayErrors) {
-            $displayErrors = (int) $displayErrors;
-        }
+        if (null === $displayErrors) {
+            $this->displayErrors = 0;
+            $this->displayStartupErrors = 0;
 
-        $this->displayErrors = $displayErrors;
+        } else {
+            $displayErrorsInt = (int) $displayErrors;
+
+            $this->displayErrors = $displayErrorsInt;
+            $this->displayStartupErrors = $displayErrorsInt;
+        }
 
         return $this;
     }
@@ -229,10 +319,6 @@ class EntrypointModule
         &$refLastDisplayStartupErrors = null
     )
     {
-        if (null === $this->displayErrors) {
-            return $this;
-        }
-
         $refLastDisplayErrors = ini_set('display_errors', $this->displayErrors);
         $refLastDisplayStartupErrors = ini_set('display_startup_errors', $this->displayErrors);
 
@@ -256,16 +342,17 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        if (null !== $memoryLimit) {
+        if (null === $memoryLimit) {
+            $this->memoryLimit = '32M';
+
+        } else {
             $theFormat = Lib::format();
 
-            $bytes = $theFormat->bytes_decode($memoryLimit);
-            $bytesString = $theFormat->bytes_encode($bytes, 0, 1);
+            $bytesInt = $theFormat->bytes_decode($memoryLimit);
+            $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1);
 
-            $memoryLimit = $bytesString;
+            $this->memoryLimit = $bytesString;
         }
-
-        $this->memoryLimit = $memoryLimit;
 
         return $this;
     }
@@ -275,10 +362,6 @@ class EntrypointModule
      */
     public function useMemoryLimit(&$refLast = null)
     {
-        if (null === $this->memoryLimit) {
-            return $this;
-        }
-
         $refLast = ini_set('memory_limit', $this->memoryLimit);
 
         return $this;
@@ -301,11 +384,15 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        if (null !== ($maxExecutionTimeInt = $maxExecutionTime)) {
+        if (null === $maxExecutionTime) {
+            $this->maxExecutionTime = 10;
+
+        } else {
             Lib::typeThrow()->int_non_negative($maxExecutionTimeInt, $maxExecutionTime);
+
+            $this->maxExecutionTime = $maxExecutionTimeInt;
         }
 
-        $this->maxExecutionTime = $maxExecutionTimeInt;
 
         return $this;
     }
@@ -315,17 +402,13 @@ class EntrypointModule
      */
     public function useMaxExecutionTime(&$refLast = null)
     {
-        if (null === $this->maxExecutionTime) {
-            return $this;
-        }
-
         $refLast = ini_set('max_execution_time', $this->maxExecutionTime);
 
         return $this;
     }
 
 
-    public function getPhpMaxInputTime(int $maxInputTimeTmp = 30) : string
+    public function getPhpMaxInputTime(int $maxInputTimeTmp = -1) : string
     {
         $before = ini_set('max_input_time', $maxInputTimeTmp);
 
@@ -341,11 +424,14 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        if (null !== ($maxInputTimeInt = $maxInputTime)) {
-            Lib::typeThrow()->int_non_negative_or_minus_one($maxInputTimeInt, $maxInputTime);
-        }
+        if (null === $maxInputTime) {
+            $this->maxInputTime = -1;
 
-        $this->maxInputTime = $maxInputTimeInt;
+        } else {
+            Lib::typeThrow()->int_non_negative_or_minus_one($maxInputTimeInt, $maxInputTime);
+
+            $this->maxInputTime = $maxInputTimeInt;
+        }
 
         return $this;
     }
@@ -355,10 +441,6 @@ class EntrypointModule
      */
     public function useMaxInputTime(&$refLast = null)
     {
-        if (null === $this->maxInputTime) {
-            return $this;
-        }
-
         $refLast = ini_set('max_input_time', $this->maxInputTime);
 
         return $this;
@@ -377,11 +459,19 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        if (null !== $timezoneDefault) {
-            Lib::typeThrow()->timezone($timezoneDefaultTz, $timezoneDefault);
-        }
+        if (null === $timezoneDefault) {
+            try {
+                $this->timezoneDefault = new \DateTimeZone(date_default_timezone_get());
+            }
+            catch ( \Exception $e ) {
+                throw new RuntimeException($e);
+            }
 
-        $this->timezoneDefault = $timezoneDefaultTz ?? $timezoneDefault;
+        } else {
+            Lib::typeThrow()->timezone($timezoneDefaultObject, $timezoneDefault);
+
+            $this->timezoneDefault = $timezoneDefaultObject;
+        }
 
         return $this;
     }
@@ -391,17 +481,13 @@ class EntrypointModule
      */
     public function useTimezoneDefault(&$refLast = null)
     {
-        if (null === $this->timezoneDefault) {
-            return $this;
-        }
-
         $refLast = date_default_timezone_set($this->timezoneDefault->getName());
 
         return $this;
     }
 
 
-    public function getPhpPostMaxSize(string $postMaxSizeTmp = '5M') : string
+    public function getPhpPostMaxSize(string $postMaxSizeTmp = '8M') : string
     {
         $before = ini_set('post_max_size', $postMaxSizeTmp);
 
@@ -417,16 +503,18 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        if (null !== $postMaxSize) {
+        if (null === $postMaxSize) {
+            $this->postMaxSize = '8M';
+
+        } else {
             $theFormat = Lib::format();
 
-            $bytes = $theFormat->bytes_decode($postMaxSize);
-            $bytesString = $theFormat->bytes_encode($bytes, 0, 1);
+            $bytesInt = $theFormat->bytes_decode($postMaxSize);
+            $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1);
 
-            $postMaxSize = $bytesString;
+            $this->postMaxSize = $bytesString;
         }
 
-        $this->postMaxSize = $postMaxSize;
 
         return $this;
     }
@@ -436,10 +524,6 @@ class EntrypointModule
      */
     public function usePostMaxSize(&$refLast = null)
     {
-        if (null === $this->postMaxSize) {
-            return $this;
-        }
-
         $refLast = ini_set('post_max_size', $this->postMaxSize);
 
         return $this;
@@ -462,16 +546,17 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        if (null !== $uploadMaxFilesize) {
+        if (null === $uploadMaxFilesize) {
+            $this->uploadMaxFilesize = '2M';
+
+        } else {
             $theFormat = Lib::format();
 
-            $bytes = $theFormat->bytes_decode($uploadMaxFilesize);
-            $bytesString = $theFormat->bytes_encode($bytes, 0, 1);
+            $bytesInt = $theFormat->bytes_decode($uploadMaxFilesize);
+            $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1);
 
-            $uploadMaxFilesize = $bytesString;
+            $this->uploadMaxFilesize = $bytesString;
         }
-
-        $this->uploadMaxFilesize = $uploadMaxFilesize;
 
         return $this;
     }
@@ -507,15 +592,14 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        if (null !== $uploadTmpDir) {
-            if (! Lib::fs()->type_dirpath_realpath($realpath, $uploadTmpDir)) {
-                throw new LogicException(
-                    [ 'The `uploadTmpDir` should be an existing directory path', $uploadTmpDir ]
-                );
-            }
-        }
+        if (null === $uploadTmpDir) {
+            $this->uploadTmpDir = sys_get_temp_dir();
 
-        $this->uploadTmpDir = $realpath ?? null;
+        } else {
+            Lib::typeThrow()->dirpath_realpath($uploadTmpDirRealpath, $uploadTmpDir);
+
+            $this->uploadTmpDir = $uploadTmpDirRealpath;
+        }
 
         return $this;
     }
@@ -525,10 +609,6 @@ class EntrypointModule
      */
     public function useUploadTmpDir(&$refLast = null)
     {
-        if (null === $this->uploadTmpDir) {
-            return $this;
-        }
-
         $refLast = ini_set('upload_tmp_dir', $this->uploadTmpDir);
 
         return $this;
@@ -551,11 +631,15 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        if (null !== ($precisionInt = $precision)) {
+        if (null === $precision) {
+            $this->precision = 16;
+
+        } else {
             Lib::typeThrow()->int_non_negative($precisionInt, $precision);
+
+            $this->precision = $precisionInt;
         }
 
-        $this->precision = $precisionInt;
 
         return $this;
     }
@@ -565,10 +649,6 @@ class EntrypointModule
      */
     public function usePrecision(&$refLast = null)
     {
-        if (null === $this->precision) {
-            return $this;
-        }
-
         $refLast = ini_set('precision', $this->precision);
 
         return $this;
@@ -591,15 +671,18 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        if (null !== $umask) {
+        if (null === $umask) {
+            $this->umask = 0002;
+
+        } else {
             if (! (($umask >= 0) && ($umask <= 0777))) {
                 throw new LogicException(
                     [ 'The `umask` should be a valid `umask`', $umask ]
                 );
             }
-        }
 
-        $this->umask = $umask;
+            $this->umask = $umask;
+        }
 
         return $this;
     }
@@ -609,10 +692,6 @@ class EntrypointModule
      */
     public function useUmask(&$refLast = null)
     {
-        if (null === $this->umask) {
-            return $this;
-        }
-
         $refLast = umask($this->umask);
 
         return $this;
@@ -670,11 +749,11 @@ class EntrypointModule
      */
     public function useErrorHandler(&$refLast = null)
     {
-        if (null === $this->fnErrorHandler) {
-            return $this;
-        }
+        $refLast = null;
 
-        $refLast = set_error_handler($this->fnErrorHandler);
+        if (null !== $this->fnErrorHandler) {
+            $refLast = set_error_handler($this->fnErrorHandler);
+        }
 
         return $this;
     }
@@ -731,11 +810,11 @@ class EntrypointModule
      */
     public function useExceptionHandler(&$refLast = null)
     {
-        if (null === $this->fnExceptionHandler) {
-            return $this;
-        }
+        $refLast = null;
 
-        $refLast = set_exception_handler($this->fnExceptionHandler);
+        if (null !== $this->fnExceptionHandler) {
+            $refLast = set_exception_handler($this->fnExceptionHandler);
+        }
 
         return $this;
     }
@@ -792,13 +871,64 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useAllErrorReporting()
+    public function setAllDefault()
     {
         $this
-            ->useDisplayErrors()
+            ->setDirRoot(null)
+            //
+            ->setErrorReporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED)
+            ->setErrorLog(getcwd() . '/error_log')
+            ->setDisplayErrors(0)
+            ->setErrorHandler([ $this, 'fnErrorHandler' ])
+            ->setExceptionHandler([ $this, 'fnExceptionHandler' ])
+            //
+            ->setMemoryLimit('32M')
+            //
+            ->setMaxExecutionTime(10)
+            ->setMaxInputTime(-1)
+            //
+            ->setTimezoneDefault(date_default_timezone_get())
+            //
+            ->setPostMaxSize('8M')
+            //
+            ->setUploadMaxFilesize('2M')
+            ->setUploadTmpDir(sys_get_temp_dir())
+            //
+            ->setPrecision(16)
+            //
+            ->setUmask(0002)
+        ;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useAll()
+    {
+        $this
             ->useErrorReporting()
+            ->useErrorLog()
+            ->useDisplayErrors()
             ->useErrorHandler()
             ->useExceptionHandler()
+            //
+            ->useMemoryLimit()
+            //
+            ->useMaxExecutionTime()
+            ->useMaxInputTime()
+            //
+            ->useTimezoneDefault()
+            //
+            ->usePostMaxSize()
+            //
+            ->useUploadMaxFilesize()
+            ->useUploadTmpDir()
+            //
+            ->usePrecision()
+            //
+            ->useUmask()
         ;
 
         return $this;
