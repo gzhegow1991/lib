@@ -544,7 +544,7 @@ class DefaultDumper implements DumperInterface
         $isHeadersSent = headers_sent($file, $line);
 
         if (! ($isTerminal || $isHeadersSent)) {
-            header('Content-Type: text/html', true, 500);
+            header('Content-Type: text/html', true, 200);
         }
 
         echo $htmlContent;
@@ -585,7 +585,7 @@ class DefaultDumper implements DumperInterface
         $isHeadersSent = headers_sent($file, $line);
 
         if (! ($isTerminal || $isHeadersSent)) {
-            header('Content-Type: text/html', true, 500);
+            header('Content-Type: text/html', true, 200);
         }
 
         fwrite($resource, $htmlContent);
@@ -610,15 +610,16 @@ class DefaultDumper implements DumperInterface
 
         $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . "\n";
 
+        $isTerminal = Lib::php()->is_terminal();
         $isHeadersSent = headers_sent($file, $line);
 
-        if (! $isHeadersSent) {
-            header('Content-Type: text/html', true, 500);
+        if (! ($isTerminal || $isHeadersSent)) {
+            header('Content-Type: text/html', true, 200);
         }
 
         echo $htmlContent;
 
-        if ($isHeadersSent && $throwIfHeadersSent) {
+        if (! $isTerminal && $isHeadersSent && $throwIfHeadersSent) {
             throw new RuntimeException(
                 [ 'Headers already sent', $file, $line ]
             );
