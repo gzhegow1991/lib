@@ -547,31 +547,31 @@ class Lib
     /**
      * @return mixed
      */
-    public function d($var, ...$vars)
+    public static function d($var, ...$vars)
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->debug()->dumper()->d($trace, $var, ...$vars);
+        return Lib::debug()->dumper()->d($trace, $var, ...$vars);
     }
 
     /**
      * @return mixed|void
      */
-    public function dd(...$vars)
+    public static function dd(...$vars)
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->debug()->dumper()->dd($trace, ...$vars);
+        return Lib::debug()->dumper()->dd($trace, ...$vars);
     }
 
     /**
      * @return mixed|void
      */
-    public function ddd(?int $limit, $var, ...$vars)
+    public static function ddd(?int $limit, $var, ...$vars)
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->debug()->dumper()->ddd($trace, $limit, $var, ...$vars);
+        return Lib::debug()->dumper()->ddd($trace, $limit, $var, ...$vars);
     }
 
 
@@ -580,17 +580,17 @@ class Lib
         return Lib::debug()->fnD();
     }
 
-    public function fnDD() : \Closure
+    public static function fnDD() : \Closure
     {
         return Lib::debug()->fnDD();
     }
 
-    public function fnDDD() : \Closure
+    public static function fnDDD() : \Closure
     {
         return Lib::debug()->fnDDD();
     }
 
-    public function fnTD(int $throttleMs) : \Closure
+    public static function fnTD(int $throttleMs) : \Closure
     {
         return Lib::debug()->fnTD($throttleMs);
     }
