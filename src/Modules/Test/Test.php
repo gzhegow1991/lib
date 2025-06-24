@@ -79,7 +79,7 @@ class Test
 
     public function __construct()
     {
-        $this->resource = Lib::cli()->stdout();
+        $this->resource = Lib::php()->output();
     }
 
 

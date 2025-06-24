@@ -38,15 +38,15 @@ class DefaultDumper implements DumperInterface
 
     const DUMPER_ECHO        = 'echo';
     const DUMPER_ECHO_HTML   = 'echo_html';
-    const DUMPER_STDOUT      = 'stdout';
-    const DUMPER_STDOUT_HTML = 'stdout_html';
+    const DUMPER_OUTPUT      = 'output';
+    const DUMPER_OUTPUT_HTML = 'output_html';
     const DUMPER_DEVTOOLS    = 'devtools';
     const DUMPER_PDO         = 'pdo';
     const DUMPER_LIST        = [
         self::DUMPER_ECHO        => true,
         self::DUMPER_ECHO_HTML   => true,
-        self::DUMPER_STDOUT      => true,
-        self::DUMPER_STDOUT_HTML => true,
+        self::DUMPER_OUTPUT      => true,
+        self::DUMPER_OUTPUT_HTML => true,
         self::DUMPER_DEVTOOLS    => true,
         self::DUMPER_PDO         => true,
     ];
@@ -99,8 +99,8 @@ class DefaultDumper implements DumperInterface
             : 'var_dump';
 
         $dumperDefault = Lib::php()->is_terminal()
-            ? 'stdout'
-            : 'stdout_html';
+            ? 'output'
+            : 'output_html';
 
         $this->printer = $this->printerDefault = $printerDefault;
         $this->dumper = $this->dumperDefault = $dumperDefault;
@@ -496,12 +496,12 @@ class DefaultDumper implements DumperInterface
                 $this->echoDumper_echo_html(...$vars);
                 break;
 
-            case static::DUMPER_STDOUT:
-                $this->echoDumper_stdout(...$vars);
+            case static::DUMPER_OUTPUT:
+                $this->echoDumper_output(...$vars);
                 break;
 
-            case static::DUMPER_STDOUT_HTML:
-                $this->echoDumper_stdout_html(...$vars);
+            case static::DUMPER_OUTPUT_HTML:
+                $this->echoDumper_output_html(...$vars);
                 break;
 
             case static::DUMPER_DEVTOOLS:
@@ -556,11 +556,11 @@ class DefaultDumper implements DumperInterface
         }
     }
 
-    public function echoDumper_stdout(...$vars)
+    public function echoDumper_output(...$vars)
     {
         $options = $this->dumperOptions;
 
-        $resource = $options[ 'stdout' ] ?? Lib::cli()->stdout();
+        $resource = $options[ 'resource' ] ?? Lib::php()->output();
 
         $content = $this->printPrinter(...$vars);
         $content .= "\n";
@@ -569,11 +569,11 @@ class DefaultDumper implements DumperInterface
         fflush($resource);
     }
 
-    public function echoDumper_stdout_html(...$vars)
+    public function echoDumper_output_html(...$vars)
     {
         $options = $this->dumperOptions;
 
-        $resource = $options[ 'stdout' ] ?? Lib::cli()->stdout();
+        $resource = $options[ 'resource' ] ?? Lib::php()->output();
         $throwIfHeadersSent = (bool) ($options[ 'throw_if_headers_sent' ] ?? true);
 
         $content = $this->printPrinter(...$vars);

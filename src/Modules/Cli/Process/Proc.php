@@ -897,12 +897,12 @@ class Proc
 
 
                 if ($this->stdoutRefFile && is_file($this->stdoutRefFile)) {
-                    $this->stdoutRefFileResource = $this->stdoutRefFileResource ?? fopen($this->stdoutRefFile, 'r');
+                    $this->stdoutRefFileResource = $this->stdoutRefFileResource ?? fopen($this->stdoutRefFile, 'rb');
                     $this->stdoutRef .= stream_get_contents($this->stdoutRefFileResource);
                 }
 
                 if ($this->stderrRefFile && is_file($this->stderrRefFile)) {
-                    $this->stderrRefFileResource = $this->stderrRefFileResource ?? fopen($this->stderrRefFile, 'r');
+                    $this->stderrRefFileResource = $this->stderrRefFileResource ?? fopen($this->stderrRefFile, 'rb');
                     $this->stderrRef .= stream_get_contents($this->stderrRefFileResource);
                 }
 
@@ -995,12 +995,12 @@ class Proc
 
 
                 if ($this->stdoutRefFile && is_file($this->stdoutRefFile)) {
-                    $this->stdoutRefFileResource = $this->stdoutRefFileResource ?? fopen($this->stdoutRefFile, 'r');
+                    $this->stdoutRefFileResource = $this->stdoutRefFileResource ?? fopen($this->stdoutRefFile, 'rb');
                     $this->stdoutRef .= stream_get_contents($this->stdoutRefFileResource);
                 }
 
                 if ($this->stderrRefFile && is_file($this->stderrRefFile)) {
-                    $this->stderrRefFileResource = $this->stderrRefFileResource ?? fopen($this->stderrRefFile, 'r');
+                    $this->stderrRefFileResource = $this->stderrRefFileResource ?? fopen($this->stderrRefFile, 'rb');
                     $this->stderrRef .= stream_get_contents($this->stderrRefFileResource);
                 }
 

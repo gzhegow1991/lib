@@ -1676,7 +1676,7 @@ $fn = function () use ($ffn) {
 
     $resourceOpenedStdout = \Gzhegow\Lib\Lib::cli()->stdout();
     $resourceOpenedStderr = \Gzhegow\Lib\Lib::cli()->stderr();
-    $resourceClosed = fopen('php://memory', 'w');
+    $resourceClosed = fopen('php://memory', 'wb');
     fclose($resourceClosed);
 
     $valuesXX = [
@@ -2933,7 +2933,7 @@ $fn = function () use ($ffn) {
     echo \Gzhegow\Lib\Lib::debug()->value('string') . "\n";
     echo \Gzhegow\Lib\Lib::debug()->value([]) . "\n";
     echo \Gzhegow\Lib\Lib::debug()->value((object) []) . "\n";
-    echo \Gzhegow\Lib\Lib::debug()->value(\Gzhegow\Lib\Lib::cli()->stdout()) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->value(\Gzhegow\Lib\Lib::php()->output()) . "\n";
 
     echo "\n";
 
@@ -3013,8 +3013,8 @@ $fn = function () use ($ffn) {
     //     ->cloneDumper()
     //     ->printer(\Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::PRINTER_VAR_DUMP)
     //     ->dumper(
-    //         \Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::DUMPER_STDOUT,
-    //         [ 'resource' => \Gzhegow\Lib\Lib::cli()->stdout() ]
+    //         \Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::DUMPER_OUTPUT,
+    //         [ 'resource' => \Gzhegow\Lib\Lib::php()->output() ]
     //     )
     //     ->dump($varToDump)
     // ;
@@ -3023,8 +3023,8 @@ $fn = function () use ($ffn) {
     //     ->cloneDumper()
     //     ->printer(\Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::PRINTER_VAR_DUMP)
     //     ->dumper(
-    //         \Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::DUMPER_STDOUT_HTML,
-    //         [ 'resource' => \Gzhegow\Lib\Lib::cli()->stdout() ]
+    //         \Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::DUMPER_OUTPUT_HTML,
+    //         [ 'resource' => \Gzhegow\Lib\Lib::php()->output() ]
     //     )
     //     ->dump($varToDump)
     // ;

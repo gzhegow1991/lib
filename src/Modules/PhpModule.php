@@ -953,6 +953,27 @@ class PhpModule
     }
 
 
+    /**
+     * @return resource
+     */
+    public function input()
+    {
+        if (! defined('PHPIN')) define('PHPIN', fopen('php://input', 'rb'));
+
+        return PHPIN;
+    }
+
+    /**
+     * @return resource
+     */
+    public function output()
+    {
+        if (! defined('PHPOUT')) define('PHPOUT', fopen('php://stdout', 'wb'));
+
+        return PHPOUT;
+    }
+
+
     public function to_bool($value, array $options = []) : bool
     {
         if (is_bool($value)) {

@@ -96,7 +96,7 @@ class FormatCsv
             $fputcsvArgs[] = $eolString;
         }
 
-        $h = fopen('php://temp', 'w');
+        $h = fopen('php://temp', 'wb');
         $len = 0;
 
         foreach ( $_rows as $row ) {
@@ -176,7 +176,7 @@ class FormatCsv
             $fputcsvArgs[] = $eolString;
         }
 
-        $h = fopen('php://temp', 'w');
+        $h = fopen('php://temp', 'wb');
 
         $len = fputcsv($h, $_row, ...$fputcsvArgs);
 

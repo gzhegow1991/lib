@@ -1261,7 +1261,7 @@ class FsModule
                     }
 
                     if ($isFileOut) {
-                        if ($fhOut = $f->fopen($fileOut, 'r+')) {
+                        if ($fhOut = $f->fopen($fileOut, 'rb+')) {
                             $line = fgets($fhOut);
                             $rest = stream_get_contents($fhOut);
 
@@ -1365,7 +1365,7 @@ class FsModule
 
                             if ($isFileOut) {
                                 if (! $fhOut) {
-                                    $fhOut = $f->fopen($fileOut, 'r+');
+                                    $fhOut = $f->fopen($fileOut, 'rb+');
                                 }
 
                                 if ($fhOut) {
@@ -1471,7 +1471,7 @@ class FsModule
                     }
 
                     if ($isFileOut) {
-                        if ($fhOut = $f->fopen($fileOut, 'r+')) {
+                        if ($fhOut = $f->fopen($fileOut, 'rb+')) {
                             $line = fgets($fhOut);
                             $contentOut = stream_get_contents($fhOut);
 
@@ -1580,7 +1580,7 @@ class FsModule
 
                             if ($isFileOut) {
                                 if (! $fhOut) {
-                                    $fhOut = $f->fopen($fileOut, 'r+');
+                                    $fhOut = $f->fopen($fileOut, 'rb+');
                                 }
 
                                 if ($fhOut) {
@@ -1897,7 +1897,7 @@ class FsModule
             );
         }
 
-        $input = fopen($filepathRealpath, 'r');
+        $input = fopen($filepathRealpath, 'rb');
         if (false === $input) {
             throw new FilesystemException(
                 [ 'Unable to perform fopen() on file', $filepathRealpath ]
@@ -1906,7 +1906,7 @@ class FsModule
 
         $filepathRealpathTmp = $filepathRealpath . '.tmp';
 
-        $output = fopen($filepathRealpathTmp, 'w');
+        $output = fopen($filepathRealpathTmp, 'wb');
         if (false === $output) {
             throw new FilesystemException(
                 [ 'Unable to perform fopen() on file', $filepathRealpathTmp ]

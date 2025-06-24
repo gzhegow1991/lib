@@ -112,9 +112,8 @@ class CliModule
         }
 
         echo '> Press ENTER to continue...' . "\n";
-        $h = fopen('php://stdin', 'r');
+        $h = $this->stdin();
         fgets($h);
-        fclose($h);
 
         return $var;
     }
@@ -137,9 +136,9 @@ class CliModule
             throw new RuntimeException('Function must be called only in CLI mode');
         }
 
-        $h = fopen('php://stdin', 'r');
+        $h = $this->stdin();
+
         $line = trim(fgets($h));
-        fclose($h);
 
         return $line;
     }
@@ -162,7 +161,7 @@ class CliModule
         $fnSubstr = $theStr->mb_func('substr');
 
         $lines = [];
-        $h = fopen('php://stdin', 'r');
+        $h = $this->stdin();
         while ( false !== ($line = fgets($h)) ) {
             $line = trim($line);
 
@@ -190,7 +189,6 @@ class CliModule
                 $lines[] = $line;
             }
         }
-        fclose($h);
 
         // results
         return implode("\n", $lines);
