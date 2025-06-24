@@ -540,15 +540,16 @@ class DefaultDumper implements DumperInterface
 
         $htmlContent = nl2br($content);
 
+        $isTerminal = Lib::php()->is_terminal();
         $isHeadersSent = headers_sent($file, $line);
 
-        if (! $isHeadersSent) {
+        if (! ($isTerminal || $isHeadersSent)) {
             header('Content-Type: text/html', true, 500);
         }
 
         echo $htmlContent;
 
-        if ($isHeadersSent && $throwIfHeadersSent) {
+        if (! $isTerminal && $isHeadersSent && $throwIfHeadersSent) {
             throw new RuntimeException(
                 [ 'Headers already sent', $file, $line ]
             );
@@ -559,7 +560,7 @@ class DefaultDumper implements DumperInterface
     {
         $options = $this->dumperOptions;
 
-        $resource = $options[ 'stdout' ] ?? STDOUT;
+        $resource = $options[ 'stdout' ] ?? Lib::cli()->stdout();
 
         $content = $this->printPrinter(...$vars);
         $content .= "\n";
@@ -572,7 +573,7 @@ class DefaultDumper implements DumperInterface
     {
         $options = $this->dumperOptions;
 
-        $resource = $options[ 'stdout' ] ?? STDOUT;
+        $resource = $options[ 'stdout' ] ?? Lib::cli()->stdout();
         $throwIfHeadersSent = (bool) ($options[ 'throw_if_headers_sent' ] ?? true);
 
         $content = $this->printPrinter(...$vars);
@@ -580,17 +581,17 @@ class DefaultDumper implements DumperInterface
 
         $htmlContent = nl2br($content);
 
-        $isStdout = ($resource === STDOUT);
+        $isTerminal = Lib::php()->is_terminal();
         $isHeadersSent = headers_sent($file, $line);
 
-        if ($isStdout && ! $isHeadersSent) {
+        if (! ($isTerminal || $isHeadersSent)) {
             header('Content-Type: text/html', true, 500);
         }
 
         fwrite($resource, $htmlContent);
         fflush($resource);
 
-        if ($isStdout && $isHeadersSent && $throwIfHeadersSent) {
+        if (! $isTerminal && $isHeadersSent && $throwIfHeadersSent) {
             throw new RuntimeException(
                 [ 'Headers already sent', $file, $line ]
             );

@@ -689,7 +689,8 @@ class FileSafe
             return false;
         }
 
-        fflush(STDOUT);
+        // fflush($resource);
+        fflush(Lib::cli()->stdout());
 
         return $size;
     }

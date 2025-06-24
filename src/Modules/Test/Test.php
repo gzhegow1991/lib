@@ -21,7 +21,7 @@ class Test
     /**
      * @var resource|null
      */
-    protected $resource = STDOUT;
+    protected $resource;
 
     /**
      * @var array
@@ -75,6 +75,12 @@ class Test
      * @var int
      */
     protected $refMemoryBytes;
+
+
+    public function __construct()
+    {
+        $this->resource = Lib::cli()->stdout();
+    }
 
 
     /**

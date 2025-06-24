@@ -15,6 +15,10 @@ class EntrypointModule
      * @var bool
      */
     protected $isLocked = false;
+    /**
+     * @var array<string, bool>
+     */
+    protected $mapSet = [];
 
     /**
      * @var string
@@ -141,9 +145,18 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setDirRoot(?string $dirRoot)
+    public function setDirRoot(?string $dirRoot, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $dirRoot) {
             $this->dirRoot = null;
@@ -171,9 +184,18 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setErrorReporting(?int $errorReporting = -1)
+    public function setErrorReporting(?int $errorReporting, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $errorReporting) {
             $this->errorReporting = (E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
@@ -190,7 +212,6 @@ class EntrypointModule
 
             $this->errorReporting = $errorReporting;
         }
-
 
         return $this;
     }
@@ -233,9 +254,18 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setErrorLog(?string $errorLog = null)
+    public function setErrorLog(?string $errorLog, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $errorLog) {
             $this->errorLog = getcwd() . '/error_log';
@@ -293,9 +323,18 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setDisplayErrors(?bool $displayErrors = null)
+    public function setDisplayErrors(?bool $displayErrors, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $displayErrors) {
             $this->displayErrors = 0;
@@ -338,9 +377,18 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setMemoryLimit(?string $memoryLimit = null)
+    public function setMemoryLimit(?string $memoryLimit, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $memoryLimit) {
             $this->memoryLimit = '32M';
@@ -380,9 +428,18 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setMaxExecutionTime(?int $maxExecutionTime = null)
+    public function setMaxExecutionTime(?int $maxExecutionTime, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $maxExecutionTime) {
             $this->maxExecutionTime = 10;
@@ -392,7 +449,6 @@ class EntrypointModule
 
             $this->maxExecutionTime = $maxExecutionTimeInt;
         }
-
 
         return $this;
     }
@@ -420,9 +476,18 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setMaxInputTime(?int $maxInputTime = null)
+    public function setMaxInputTime(?int $maxInputTime, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $maxInputTime) {
             $this->maxInputTime = -1;
@@ -453,11 +518,22 @@ class EntrypointModule
     }
 
     /**
+     * @param string|\DateTimeZone $timezoneDefault
+     *
      * @return static
      */
-    public function setTimezoneDefault($timezoneDefault = null)
+    public function setTimezoneDefault($timezoneDefault, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $timezoneDefault) {
             try {
@@ -499,9 +575,18 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setPostMaxSize(?string $postMaxSize = null)
+    public function setPostMaxSize(?string $postMaxSize, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $postMaxSize) {
             $this->postMaxSize = '8M';
@@ -514,7 +599,6 @@ class EntrypointModule
 
             $this->postMaxSize = $bytesString;
         }
-
 
         return $this;
     }
@@ -542,9 +626,18 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setUploadMaxFilesize(?string $uploadMaxFilesize = null)
+    public function setUploadMaxFilesize(?string $uploadMaxFilesize, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $uploadMaxFilesize) {
             $this->uploadMaxFilesize = '2M';
@@ -588,9 +681,18 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setUploadTmpDir(?string $uploadTmpDir = null)
+    public function setUploadTmpDir(?string $uploadTmpDir, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $uploadTmpDir) {
             $this->uploadTmpDir = sys_get_temp_dir();
@@ -627,9 +729,18 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setPrecision(?int $precision = null)
+    public function setPrecision(?int $precision, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $precision) {
             $this->precision = 16;
@@ -667,9 +778,18 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setUmask(?int $umask = null)
+    public function setUmask(?int $umask, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null === $umask) {
             $this->umask = 0002;
@@ -722,9 +842,18 @@ class EntrypointModule
      * @var callable $fnErrorHandler
      *
      */
-    public function setErrorHandler($fnErrorHandler = '')
+    public function setErrorHandler($fnErrorHandler, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null !== $fnErrorHandler) {
             if ('' === $fnErrorHandler) {
@@ -783,9 +912,18 @@ class EntrypointModule
      * @var callable $fnExceptionHandler
      *
      */
-    public function setExceptionHandler($fnExceptionHandler = '')
+    public function setExceptionHandler($fnExceptionHandler, ?bool $replace = null)
     {
         $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
 
         if (null !== $fnExceptionHandler) {
             if ('' === $fnExceptionHandler) {

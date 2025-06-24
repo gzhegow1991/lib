@@ -35,6 +35,13 @@ class CliModule
     }
 
 
+    public function is_symlink(string $symlink) : bool
+    {
+        return false
+            || is_link($symlink)
+            || $this->is_junction($symlink);
+    }
+
     public function is_junction(string $junction) : bool
     {
         // https://github.com/composer/composer/blob/main/src/Composer/Util/Filesystem.php#L807
@@ -62,11 +69,35 @@ class CliModule
         return $result;
     }
 
-    public function is_symlink(string $symlink) : bool
+
+    /**
+     * @return resource
+     */
+    public function stdin()
     {
-        return false
-            || is_link($symlink)
-            || $this->is_junction($symlink);
+        if (! defined('STDIN')) define('STDIN', fopen('php://stdin', 'rb'));
+
+        return STDIN;
+    }
+
+    /**
+     * @return resource
+     */
+    public function stdout()
+    {
+        if (! defined('STDOUT')) define('STDOUT', fopen('php://stdout', 'wb'));
+
+        return STDOUT;
+    }
+
+    /**
+     * @return resource
+     */
+    public function stderr()
+    {
+        if (! defined('STDERR')) define('STDERR', fopen('php://stderr', 'wb'));
+
+        return STDERR;
     }
 
 
