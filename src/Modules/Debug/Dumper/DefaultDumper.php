@@ -38,17 +38,17 @@ class DefaultDumper implements DumperInterface
 
     const DUMPER_ECHO        = 'echo';
     const DUMPER_ECHO_HTML   = 'echo_html';
-    const DUMPER_OUTPUT      = 'output';
-    const DUMPER_OUTPUT_HTML = 'output_html';
-    const DUMPER_DEVTOOLS    = 'devtools';
+    const DUMPER_RESOURCE      = 'output';
+    const DUMPER_RESOURCE_HTML = 'output_html';
+    const DUMPER_DEVTOOLS      = 'devtools';
     const DUMPER_PDO         = 'pdo';
-    const DUMPER_LIST        = [
-        self::DUMPER_ECHO        => true,
-        self::DUMPER_ECHO_HTML   => true,
-        self::DUMPER_OUTPUT      => true,
-        self::DUMPER_OUTPUT_HTML => true,
-        self::DUMPER_DEVTOOLS    => true,
-        self::DUMPER_PDO         => true,
+    const DUMPER_LIST          = [
+        self::DUMPER_ECHO          => true,
+        self::DUMPER_ECHO_HTML     => true,
+        self::DUMPER_RESOURCE      => true,
+        self::DUMPER_RESOURCE_HTML => true,
+        self::DUMPER_DEVTOOLS      => true,
+        self::DUMPER_PDO           => true,
     ];
 
 
@@ -99,8 +99,8 @@ class DefaultDumper implements DumperInterface
             : 'var_dump';
 
         $dumperDefault = Lib::php()->is_terminal()
-            ? 'output'
-            : 'output_html';
+            ? 'echo'
+            : 'echo_html';
 
         $this->printer = $this->printerDefault = $printerDefault;
         $this->dumper = $this->dumperDefault = $dumperDefault;
@@ -496,12 +496,12 @@ class DefaultDumper implements DumperInterface
                 $this->echoDumper_echo_html(...$vars);
                 break;
 
-            case static::DUMPER_OUTPUT:
-                $this->echoDumper_output(...$vars);
+            case static::DUMPER_RESOURCE:
+                $this->echoDumper_resource(...$vars);
                 break;
 
-            case static::DUMPER_OUTPUT_HTML:
-                $this->echoDumper_output_html(...$vars);
+            case static::DUMPER_RESOURCE_HTML:
+                $this->echoDumper_resource_html(...$vars);
                 break;
 
             case static::DUMPER_DEVTOOLS:
@@ -556,7 +556,7 @@ class DefaultDumper implements DumperInterface
         }
     }
 
-    public function echoDumper_output(...$vars)
+    public function echoDumper_resource(...$vars)
     {
         $options = $this->dumperOptions;
 
@@ -569,7 +569,7 @@ class DefaultDumper implements DumperInterface
         fflush($resource);
     }
 
-    public function echoDumper_output_html(...$vars)
+    public function echoDumper_resource_html(...$vars)
     {
         $options = $this->dumperOptions;
 

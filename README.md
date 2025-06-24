@@ -3012,20 +3012,14 @@ $fn = function () use ($ffn) {
     // \Gzhegow\Lib\Lib::debug()
     //     ->cloneDumper()
     //     ->printer(\Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::PRINTER_VAR_DUMP)
-    //     ->dumper(
-    //         \Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::DUMPER_OUTPUT,
-    //         [ 'resource' => \Gzhegow\Lib\Lib::php()->output() ]
-    //     )
+    //     ->dumper(\Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::DUMPER_ECHO)
     //     ->dump($varToDump)
     // ;
     //
     // \Gzhegow\Lib\Lib::debug()
     //     ->cloneDumper()
     //     ->printer(\Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::PRINTER_VAR_DUMP)
-    //     ->dumper(
-    //         \Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::DUMPER_OUTPUT_HTML,
-    //         [ 'resource' => \Gzhegow\Lib\Lib::php()->output() ]
-    //     )
+    //     ->dumper(\Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::DUMPER_ECHO_HTML)
     //     ->dump($varToDump)
     // ;
     //
