@@ -377,7 +377,7 @@ class Lib
      */
     public static function errorBag(?ErrorBag &$refB = null) : ErrorBag
     {
-        return Lib::php()->newErrorBag($refB);
+        return $refB = Lib::php()->newErrorBag();
     }
 
     /**
@@ -385,7 +385,7 @@ class Lib
      */
     public static function pipe(?Pipe &$refP = null) : Pipe
     {
-        return Lib::func()->newPipe($refP);
+        return $refP = Lib::func()->newPipe();
     }
 
 

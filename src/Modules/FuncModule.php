@@ -37,13 +37,11 @@ class FuncModule
 
 
     /**
-     * @param Pipe $ref
-     *
      * @return Pipe
      */
-    public function newPipe(&$ref = null)
+    public function newPipe()
     {
-        return $ref = new Pipe();
+        return new Pipe();
     }
 
 

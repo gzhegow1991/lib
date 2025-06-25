@@ -13,33 +13,27 @@ use Gzhegow\Lib\Modules\Format\FormatJson;
 class FormatModule
 {
     /**
-     * @param FormatCsv $ref
-     *
      * @return FormatCsv
      */
-    public function csv(&$ref = null)
+    public function csv()
     {
-        return $ref = new FormatCsv();
+        return new FormatCsv();
     }
 
     /**
-     * @param FormatJson $ref
-     *
      * @return FormatJson
      */
-    public function json(&$ref = null)
+    public function json()
     {
-        return $ref = new FormatJson();
+        return new FormatJson();
     }
 
     /**
-     * @param FormatXml $ref
-     *
      * @return FormatXml
      */
-    public function xml(&$ref = null)
+    public function xml()
     {
-        return $ref = new FormatXml();
+        return new FormatXml();
     }
 
 

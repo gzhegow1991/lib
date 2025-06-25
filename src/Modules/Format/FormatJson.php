@@ -303,9 +303,11 @@ class FormatJson
 
         $flags = $flags ?? $this->static_json_encode_flags();
         $flags = $flags
+            | JSON_PRETTY_PRINT
             | JSON_UNESCAPED_LINE_TERMINATORS
+            | JSON_UNESCAPED_SLASHES
             | JSON_UNESCAPED_UNICODE
-            | JSON_UNESCAPED_SLASHES;
+        ;
 
         $depth = $depth ?? $this->static_json_depth();
 

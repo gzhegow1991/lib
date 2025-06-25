@@ -81,13 +81,11 @@ class PhpModule
 
 
     /**
-     * @param ErrorBag $ref
-     *
      * @return ErrorBag
      */
-    public function newErrorBag(&$ref = null)
+    public function newErrorBag()
     {
-        return $ref = new ErrorBag();
+        return new ErrorBag();
     }
 
 

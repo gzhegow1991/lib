@@ -42,33 +42,27 @@ class FsModule
 
 
     /**
-     * @param FileSafeProxy $ref
-     *
      * @return FileSafeProxy
      */
-    public function fileSafe(&$ref = null)
+    public function fileSafe()
     {
-        return $ref = new FileSafeProxy(new FileSafe());
+        return new FileSafeProxy(new FileSafe());
     }
 
     /**
-     * @param SocketSafeProxy $ref
-     *
      * @return SocketSafeProxy
      */
-    public function socketSafe(&$ref = null)
+    public function socketSafe()
     {
-        return $ref = new SocketSafeProxy(new SocketSafe());
+        return new SocketSafeProxy(new SocketSafe());
     }
 
     /**
-     * @param StreamSafeProxy $ref
-     *
      * @return StreamSafeProxy
      */
-    public function streamSafe(&$ref = null)
+    public function streamSafe()
     {
-        return $ref = new StreamSafeProxy(new StreamSafe());
+        return new StreamSafeProxy(new StreamSafe());
     }
 
 
