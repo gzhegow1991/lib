@@ -186,6 +186,13 @@ class DebugModule
     }
 
 
+    public function dp($var, ...$vars) : string
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        return $this->dumper()->dp($trace, $var, ...$vars);
+    }
+
     /**
      * @return mixed
      */
@@ -217,30 +224,39 @@ class DebugModule
     }
 
 
+    public function fnDP() : \Closure
+    {
+        return function ($var, ...$vars) {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+            return $this->dumper()->dp($trace, $var, ...$vars);
+        };
+    }
+
     public function fnD() : \Closure
     {
         return function ($var, ...$vars) {
-            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-            $this->dumper()->d([ $t ], $var, ...$vars);
+            return $this->dumper()->d($trace, $var, ...$vars);
         };
     }
 
     public function fnDD() : \Closure
     {
         return function (...$vars) {
-            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-            $this->dumper()->dd([ $t ], ...$vars);
+            return $this->dumper()->dd($trace, ...$vars);
         };
     }
 
     public function fnDDD() : \Closure
     {
         return function (?int $limit, $var, ...$vars) {
-            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-            $this->dumper()->ddd([ $t ], $limit, $var, ...$vars);
+            return $this->dumper()->ddd($trace, $limit, $var, ...$vars);
         };
     }
 
@@ -260,6 +276,7 @@ class DebugModule
             $t = \Gzhegow\Lib\Lib::debug()->file_line();
 
             $key = implode(':', $t);
+
             $last[ $key ] = $last[ $key ] ?? 0;
 
             $now = microtime(true);

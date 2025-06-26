@@ -36,12 +36,12 @@ class DefaultDumper implements DumperInterface
         self::PRINTER_JSON_ENCODE     => true,
     ];
 
-    const DUMPER_ECHO        = 'echo';
-    const DUMPER_ECHO_HTML   = 'echo_html';
+    const DUMPER_ECHO          = 'echo';
+    const DUMPER_ECHO_HTML     = 'echo_html';
     const DUMPER_RESOURCE      = 'output';
     const DUMPER_RESOURCE_HTML = 'output_html';
     const DUMPER_DEVTOOLS      = 'devtools';
-    const DUMPER_PDO         = 'pdo';
+    const DUMPER_PDO           = 'pdo';
     const DUMPER_LIST          = [
         self::DUMPER_ECHO          => true,
         self::DUMPER_ECHO_HTML     => true,
@@ -520,7 +520,7 @@ class DefaultDumper implements DumperInterface
         endswitch;
     }
 
-    public function echoDumper_echo(...$vars)
+    public function echoDumper_echo(...$vars) : void
     {
         $content = $this->printPrinter(...$vars);
 
@@ -529,7 +529,7 @@ class DefaultDumper implements DumperInterface
         echo $content;
     }
 
-    public function echoDumper_echo_html(...$vars)
+    public function echoDumper_echo_html(...$vars) : void
     {
         $options = $this->dumperOptions;
 
@@ -556,7 +556,7 @@ class DefaultDumper implements DumperInterface
         }
     }
 
-    public function echoDumper_resource(...$vars)
+    public function echoDumper_resource(...$vars) : void
     {
         $options = $this->dumperOptions;
 
@@ -569,7 +569,7 @@ class DefaultDumper implements DumperInterface
         fflush($resource);
     }
 
-    public function echoDumper_resource_html(...$vars)
+    public function echoDumper_resource_html(...$vars) : void
     {
         $options = $this->dumperOptions;
 
@@ -598,7 +598,7 @@ class DefaultDumper implements DumperInterface
         }
     }
 
-    public function echoDumper_devtools(...$vars)
+    public function echoDumper_devtools(...$vars) : void
     {
         $options = $this->dumperOptions;
 
@@ -626,7 +626,7 @@ class DefaultDumper implements DumperInterface
         }
     }
 
-    public function echoDumper_pdo(...$vars)
+    public function echoDumper_pdo(...$vars) : void
     {
         $options = $this->dumperOptions;
 
@@ -669,6 +669,15 @@ class DefaultDumper implements DumperInterface
     }
 
 
+    public function dp(?array $trace, $var, ...$vars) : string
+    {
+        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $this->doPrintTrace($trace, $var, ...$vars);
+
+        return $var;
+    }
+
     public function d(?array $trace, $var, ...$vars)
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
@@ -708,7 +717,19 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    protected function doDumpTrace(array $trace, ...$vars)
+    protected function doPrintTrace(array $trace, ...$vars) : string
+    {
+        $traceFile = $trace[ 0 ][ 'file' ] ?? $trace[ 0 ][ 0 ] ?? '{file}';
+        $traceLine = $trace[ 0 ][ 'line' ] ?? $trace[ 0 ][ 1 ] ?? -1;
+
+        $traceWhereIs = "{$traceFile}: {$traceLine}";
+
+        $content = $this->printPrinter($traceWhereIs, ...$vars);
+
+        return $content;
+    }
+
+    protected function doDumpTrace(array $trace, ...$vars) : void
     {
         $traceFile = $trace[ 0 ][ 'file' ] ?? $trace[ 0 ][ 0 ] ?? '{file}';
         $traceLine = $trace[ 0 ][ 'line' ] ?? $trace[ 0 ][ 1 ] ?? -1;

@@ -18,6 +18,8 @@ interface DumperInterface
     public function print(...$vars) : string;
 
 
+    public function dp(?array $trace, $var, ...$vars) : string;
+
     /**
      * @return mixed
      */

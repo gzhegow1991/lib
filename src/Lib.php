@@ -544,6 +544,13 @@ class Lib
     }
 
 
+    public static function dp($var, ...$vars) : string
+    {
+        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        return Lib::debug()->dumper()->dp($trace, $var, ...$vars);
+    }
+
     /**
      * @return mixed
      */
@@ -574,6 +581,11 @@ class Lib
         return Lib::debug()->dumper()->ddd($trace, $limit, $var, ...$vars);
     }
 
+
+    public static function fnDP() : \Closure
+    {
+        return Lib::debug()->fnDP();
+    }
 
     public function fnD() : \Closure
     {

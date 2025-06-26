@@ -2545,6 +2545,7 @@ class PhpModule
         return $result;
     }
 
+
     /**
      * @return null
      *
@@ -2584,6 +2585,7 @@ class PhpModule
 
         return;
     }
+
 
     /**
      * @return null
