@@ -132,7 +132,7 @@ class Proc
     /**
      * @return \Symfony\Component\Process\Process
      */
-    protected function newSymfonyProcess() : object
+    public function newSymfonyProcess() : object
     {
         $commands = [
             'composer require symfony/process',
@@ -149,7 +149,7 @@ class Proc
         }
 
         $timeoutSeconds = null;
-        if (null !== $this->timeoutMs) {
+        if ($this->timeoutMs) {
             $timeoutSeconds = $this->timeoutMs / 1000;
         }
 
@@ -471,6 +471,24 @@ class Proc
     }
 
 
+    public function hasTimeoutMs(&$result = null) : bool
+    {
+        $result = null;
+
+        if (null !== $this->timeoutMs) {
+            $result = $this->timeoutMs;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getTimeoutMs() : int
+    {
+        return $this->timeoutMs;
+    }
+
     /**
      * @param int|null $timeoutMs
      *
@@ -499,7 +517,9 @@ class Proc
     {
         $this->validateSpawn();
 
-        $process = $this->newSymfonyProcess();
+        $theCliProcessManager = Lib::cliProcessManager();
+
+        $process = $theCliProcessManager->newSymfonyProcess($this);
 
         $process->start();
 

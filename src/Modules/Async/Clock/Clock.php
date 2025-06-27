@@ -79,6 +79,6 @@ class Clock
 
     public static function getInstance() : ClockManagerInterface
     {
-        return Lib::async()->clockManager();
+        return Lib::async()->static_clock_manager();
     }
 }

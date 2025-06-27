@@ -297,22 +297,51 @@ class Ret
     }
 
 
+    /**
+     * @return Error[]
+     */
     public function getErrors() : array
     {
         $list = [];
 
         if (null !== $this->errors) {
-            $errorBag = $this->errors->getErrors();
+            $list = $this->errors->getErrors();
+        }
 
-            foreach ( $errorBag as $eObj ) {
-                $list[] = $eObj->error;
+        return $list;
+    }
+
+    /**
+     * @return Error[]
+     */
+    public function getErrorsByTags(array $andTags, array ...$orAndTags) : array
+    {
+        $list = [];
+
+        if (null !== $this->errors) {
+            $list = $this->errors->getErrorsByTags($andTags, ...$orAndTags);
+        }
+
+        return $list;
+    }
+
+
+    public function getErrorList() : array
+    {
+        $list = [];
+
+        if (null !== $this->errors) {
+            $errorObjectList = $this->errors->getErrors();
+
+            foreach ( $errorObjectList as $errorObj ) {
+                $list[] = $errorObj->error;
             }
         }
 
         return $list;
     }
 
-    public function getErrorsByTags(array $andTags, array ...$orAndTags) : array
+    public function getErrorListByTags(array $andTags, array ...$orAndTags) : array
     {
         $list = [];
 

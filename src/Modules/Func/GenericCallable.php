@@ -85,6 +85,7 @@ class GenericCallable implements
 
     private function __construct()
     {
+        $this->invoker = Lib::func()->invoker();
     }
 
     public function __invoke(...$values)

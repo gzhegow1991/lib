@@ -7,7 +7,7 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-class DebugBacktracer implements DebugBacktracerInterface
+class DefaultDebugBacktracer implements DebugBacktracerInterface
 {
     /**
      * @var array

@@ -42,17 +42,16 @@ class PhpModule
     protected $poolingTickUsleep = 1000;
 
 
-    public function newCallableParser() : CallableParserInterface
+    /**
+     * @return ErrorBag
+     */
+    public function newErrorBag()
     {
-        return new DefaultCallableParser();
+        return new ErrorBag();
     }
 
-    public function cloneCallableParser() : CallableParserInterface
-    {
-        return clone $this->callableParser();
-    }
 
-    public function callableParser(?CallableParserInterface $callableParser = null) : CallableParserInterface
+    public function static_callable_parser(?CallableParserInterface $callableParser = null) : CallableParserInterface
     {
         return $this->callableParser = null
             ?? $callableParser
@@ -60,32 +59,12 @@ class PhpModule
             ?? new DefaultCallableParser();
     }
 
-
-    public function newPoolingFactory() : PoolingFactoryInterface
-    {
-        return new DefaultPoolingFactory();
-    }
-
-    public function clonePoolingFactory() : PoolingFactoryInterface
-    {
-        return clone $this->poolingFactory();
-    }
-
-    public function poolingFactory(?PoolingFactoryInterface $poolingFactory = null) : PoolingFactoryInterface
+    public function static_pooling_factory(?PoolingFactoryInterface $poolingFactory = null) : PoolingFactoryInterface
     {
         return $this->poolingFactory = null
             ?? $poolingFactory
             ?? $this->poolingFactory
             ?? new DefaultPoolingFactory();
-    }
-
-
-    /**
-     * @return ErrorBag
-     */
-    public function newErrorBag()
-    {
-        return new ErrorBag();
     }
 
 
@@ -777,7 +756,7 @@ class PhpModule
      */
     public function type_method_array(&$r, $value) : bool
     {
-        return $this->callableParser()->typeMethodArray($r, $value);
+        return $this->static_callable_parser()->typeMethodArray($r, $value);
     }
 
     /**
@@ -788,7 +767,7 @@ class PhpModule
      */
     public function type_method_string(&$r, $value, array $refs = []) : bool
     {
-        return $this->callableParser()->typeMethodString($r, $value, $refs);
+        return $this->static_callable_parser()->typeMethodString($r, $value, $refs);
     }
 
 
@@ -801,7 +780,7 @@ class PhpModule
      */
     public function type_callable(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallable($r, $value, $newScope);
+        return $this->static_callable_parser()->typeCallable($r, $value, $newScope);
     }
 
 
@@ -810,7 +789,7 @@ class PhpModule
      */
     public function type_callable_object(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableObject($r, $value, $newScope);
+        return $this->static_callable_parser()->typeCallableObject($r, $value, $newScope);
     }
 
     /**
@@ -818,7 +797,7 @@ class PhpModule
      */
     public function type_callable_object_closure(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableObjectClosure($r, $value, $newScope);
+        return $this->static_callable_parser()->typeCallableObjectClosure($r, $value, $newScope);
     }
 
     /**
@@ -826,7 +805,7 @@ class PhpModule
      */
     public function type_callable_object_invokable(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableObjectInvokable($r, $value, $newScope);
+        return $this->static_callable_parser()->typeCallableObjectInvokable($r, $value, $newScope);
     }
 
 
@@ -836,7 +815,7 @@ class PhpModule
      */
     public function type_callable_array(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableArray($r, $value, $newScope);
+        return $this->static_callable_parser()->typeCallableArray($r, $value, $newScope);
     }
 
     /**
@@ -845,7 +824,7 @@ class PhpModule
      */
     public function type_callable_array_method(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableArrayMethod($r, $value, $newScope);
+        return $this->static_callable_parser()->typeCallableArrayMethod($r, $value, $newScope);
     }
 
     /**
@@ -854,7 +833,7 @@ class PhpModule
      */
     public function type_callable_array_method_static(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableArrayMethodStatic($r, $value, $newScope);
+        return $this->static_callable_parser()->typeCallableArrayMethodStatic($r, $value, $newScope);
     }
 
     /**
@@ -863,7 +842,7 @@ class PhpModule
      */
     public function type_callable_array_method_non_static(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableArrayMethodNonStatic($r, $value, $newScope);
+        return $this->static_callable_parser()->typeCallableArrayMethodNonStatic($r, $value, $newScope);
     }
 
 
@@ -872,7 +851,7 @@ class PhpModule
      */
     public function type_callable_string(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableString($r, $value, $newScope);
+        return $this->static_callable_parser()->typeCallableString($r, $value, $newScope);
     }
 
     /**
@@ -880,7 +859,7 @@ class PhpModule
      */
     public function type_callable_string_function(&$r, $value) : bool
     {
-        return $this->callableParser()->typeCallableStringFunction($r, $value);
+        return $this->static_callable_parser()->typeCallableStringFunction($r, $value);
     }
 
     /**
@@ -888,7 +867,7 @@ class PhpModule
      */
     public function type_callable_string_function_internal(&$r, $value) : bool
     {
-        return $this->callableParser()->typeCallableStringFunctionInternal($r, $value);
+        return $this->static_callable_parser()->typeCallableStringFunctionInternal($r, $value);
     }
 
     /**
@@ -896,7 +875,7 @@ class PhpModule
      */
     public function type_callable_string_function_non_internal(&$r, $value) : bool
     {
-        return $this->callableParser()->typeCallableStringFunctionNonInternal($r, $value);
+        return $this->static_callable_parser()->typeCallableStringFunctionNonInternal($r, $value);
     }
 
     /**
@@ -904,7 +883,7 @@ class PhpModule
      */
     public function type_callable_string_method_static(&$r, $value, $newScope = 'static') : bool
     {
-        return $this->callableParser()->typeCallableStringMethodStatic($r, $value, $newScope);
+        return $this->static_callable_parser()->typeCallableStringMethodStatic($r, $value, $newScope);
     }
 
 
@@ -2405,7 +2384,7 @@ class PhpModule
             );
         }
 
-        $ctx = $this->poolingFactory()->newContext();
+        $ctx = $this->static_pooling_factory()->newContext();
 
         $ctx->resetTimeoutMs($timeoutMs);
 

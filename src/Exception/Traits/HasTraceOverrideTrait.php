@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Exception\Traits;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\Interfaces\HasTraceOverrideInterface;
 
 
@@ -103,7 +104,11 @@ trait HasTraceOverrideTrait
             $traceAsString = $this->getTraceAsString();
 
             if (null !== $fileRoot) {
-                Lib::file()->realpath($fileRootRealpath, $fileRoot);
+                if (! Lib::type()->realpath($fileRootRealpath, $fileRoot)) {
+                    throw new LogicException(
+                        [ 'The `fileRoot` should be realpath', $fileRoot ]
+                    );
+                }
 
                 $traceAsString = str_replace($fileRootRealpath . DIRECTORY_SEPARATOR, '', $traceAsString);
             }

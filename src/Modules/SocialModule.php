@@ -36,7 +36,7 @@ class SocialModule
         return $this->emailParser = null
             ?? $emailParser
             ?? $this->emailParser
-            ?? new DefaultEmailParser();
+            ?? $this->newEmailParser();
     }
 
 
@@ -55,7 +55,7 @@ class SocialModule
         return $this->phoneManager = null
             ?? $phoneManager
             ?? $this->phoneManager
-            ?? new DefaultPhoneManager(null);
+            ?? $this->newPhoneManager();
     }
 
 

@@ -17,21 +17,22 @@ use Gzhegow\Lib\Modules\Async\Promise\Pooling\PromisePoolingFactoryInterface;
 class AsyncModule
 {
     /**
-     * @var LoopManagerInterface
-     */
-    protected $loopManager;
-    /**
      * @var PromisePoolingFactoryInterface
      */
     protected $poolingFactory;
-    /**
-     * @var PromiseManagerInterface
-     */
-    protected $promiseManager;
+
     /**
      * @var ClockManagerInterface
      */
     protected $clockManager;
+    /**
+     * @var LoopManagerInterface
+     */
+    protected $loopManager;
+    /**
+     * @var PromiseManagerInterface
+     */
+    protected $promiseManager;
 
     /**
      * @var FetchApiInterface
@@ -39,36 +40,7 @@ class AsyncModule
     protected $fetchApi;
 
 
-    public function newLoopManager() : LoopManagerInterface
-    {
-        return new LoopManager();
-    }
-
-    public function cloneLoopManager() : LoopManagerInterface
-    {
-        return clone $this->loopManager();
-    }
-
-    public function loopManager(?LoopManagerInterface $loopManager = null) : LoopManagerInterface
-    {
-        return $this->loopManager = null
-            ?? $loopManager
-            ?? $this->loopManager
-            ?? new LoopManager();
-    }
-
-
-    public function newPoolingFactory() : PromisePoolingFactoryInterface
-    {
-        return new DefaultPromisePoolingFactory();
-    }
-
-    public function clonePoolingFactory() : PromisePoolingFactoryInterface
-    {
-        return clone $this->poolingFactory();
-    }
-
-    public function poolingFactory(?PromisePoolingFactoryInterface $poolingFactory = null) : PromisePoolingFactoryInterface
+    public function static_pooling_factory(?PromisePoolingFactoryInterface $poolingFactory = null) : PromisePoolingFactoryInterface
     {
         return $this->poolingFactory = null
             ?? $poolingFactory
@@ -77,65 +49,41 @@ class AsyncModule
     }
 
 
-    public function newPromiseManager() : PromiseManagerInterface
-    {
-        return new PromiseManager(
-            $this->loopManager(),
-            $this->poolingFactory()
-        );
-    }
-
-    public function clonePromiseManager() : PromiseManagerInterface
-    {
-        return clone $this->promiseManager();
-    }
-
-    public function promiseManager(?PromiseManagerInterface $promiseFactory = null) : PromiseManagerInterface
-    {
-        return $this->promiseManager = null
-            ?? $promiseFactory
-            ?? $this->promiseManager
-            ?? new PromiseManager(
-                $this->loopManager(),
-                $this->poolingFactory()
-            );
-    }
-
-
-    public function newClockManager() : ClockManagerInterface
-    {
-        return new ClockManager(
-            $this->loopManager()
-        );
-    }
-
-    public function cloneClockManager() : ClockManagerInterface
-    {
-        return clone $this->clockManager();
-    }
-
-    public function clockManager(?ClockManagerInterface $clockManager = null) : ClockManagerInterface
+    public function static_clock_manager(?ClockManagerInterface $clockManager = null) : ClockManagerInterface
     {
         return $this->clockManager = null
             ?? $clockManager
             ?? $this->clockManager
             ?? new ClockManager(
-                $this->loopManager()
+                $this->static_loop_manager()
+            );
+    }
+
+    public function static_loop_manager(?LoopManagerInterface $loopManager = null) : LoopManagerInterface
+    {
+        return $this->loopManager = null
+            ?? $loopManager
+            ?? $this->loopManager
+            ?? new LoopManager();
+    }
+
+    public function static_promise_manager(?PromiseManagerInterface $promiseFactory = null) : PromiseManagerInterface
+    {
+        return $this->promiseManager = null
+            ?? $promiseFactory
+            ?? $this->promiseManager
+            ?? new PromiseManager(
+                $this->static_pooling_factory(),
+                //
+                $this->static_clock_manager(),
+                $this->static_loop_manager(),
+                //
+                $this->static_fetch_api()
             );
     }
 
 
-    public function newFetchApi() : FetchApiInterface
-    {
-        return new FilesystemFetchApi();
-    }
-
-    public function cloneFetchApi() : FetchApiInterface
-    {
-        return clone $this->fetchApi();
-    }
-
-    public function fetchApi(?FetchApiInterface $fetchApi = null) : FetchApiInterface
+    public function static_fetch_api(?FetchApiInterface $fetchApi = null) : FetchApiInterface
     {
         return $this->fetchApi = null
             ?? $fetchApi

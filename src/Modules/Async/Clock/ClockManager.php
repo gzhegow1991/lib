@@ -12,12 +12,12 @@ class ClockManager implements ClockManagerInterface
     /**
      * @var LoopManagerInterface
      */
-    protected $loop;
+    protected $loopManager;
 
 
-    public function __construct(LoopManagerInterface $loop)
+    public function __construct(LoopManagerInterface $loopManager)
     {
-        $this->loop = $loop;
+        $this->loopManager = $loopManager;
     }
 
 
@@ -46,14 +46,14 @@ class ClockManager implements ClockManagerInterface
 
         $timer->timeoutMicrotime = microtime(true) + ($waitMsInt / 1000);
 
-        $this->loop->addTimeout($timer);
+        $this->loopManager->addTimeout($timer);
 
         return $timer;
     }
 
     public function clearTimeout(Timeout $timer) : void
     {
-        $this->loop->clearTimeout($timer);
+        $this->loopManager->clearTimeout($timer);
     }
 
 
@@ -76,13 +76,13 @@ class ClockManager implements ClockManagerInterface
 
         $interval->timeoutMicrotime = microtime(true) + ($waitMsInt / 1000);
 
-        $this->loop->addInterval($interval);
+        $this->loopManager->addInterval($interval);
 
         return $interval;
     }
 
     public function clearInterval(Interval $interval) : void
     {
-        $this->loop->clearInterval($interval);
+        $this->loopManager->clearInterval($interval);
     }
 }

@@ -238,7 +238,31 @@ class Result
             return $ret;
 
         } elseif (Ret::MODE_ERROR_THROW === $ret->modeError) {
-            throw new LogicException(...$ret->getErrors());
+            $errorList = $ret->getErrorList();
+
+            if ([] === $trace) {
+                $errorObjectList = $ret->getErrors();
+
+                if ([] !== $errorObjectList) {
+                    $errorObject = end($errorObjectList);
+
+                    if (false !== $errorObject) {
+                        $trace = $errorObject->trace;
+                    }
+                }
+            }
+
+            $e = new LogicException(...$errorList);
+
+            if ([] !== $trace) {
+                $traceFile = $trace[ 'file' ] ?? $trace[ 0 ] ?? null;
+                $traceLine = $trace[ 'line' ] ?? $trace[ 1 ] ?? null;
+
+                $e->setFile($traceFile);
+                $e->setLine($traceLine);
+            }
+
+            throw $e;
         }
 
         throw new RuntimeException([ 'Mode `modeError` is unknown', $ret ]);

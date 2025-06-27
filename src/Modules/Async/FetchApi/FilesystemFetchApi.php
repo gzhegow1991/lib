@@ -12,7 +12,7 @@ class FilesystemFetchApi implements FetchApiInterface
     /**
      * @var bool
      */
-    protected $isShutdownFunctionRegistered = false;
+    protected $isRegisterShutdownFunctionCalled = false;
 
     /**
      * @var string
@@ -224,7 +224,7 @@ class FilesystemFetchApi implements FetchApiInterface
     }
 
 
-    public function clearTaskResults() : void
+    public function taskClearResults() : void
     {
         $gen = Lib::fs()->dir_walk_it($this->taskResultDirRealpath);
 
@@ -240,6 +240,7 @@ class FilesystemFetchApi implements FetchApiInterface
             unlink($spl->getRealPath());
         }
     }
+
 
     public function taskGetResult(&$refTaskResult, string $taskId) : bool
     {
@@ -661,7 +662,7 @@ class FilesystemFetchApi implements FetchApiInterface
     ) : void
     {
         // > метод не должен вызываться, чтобы поднять несколько демонов, для этого есть daemonSpawn
-        $this->clearTaskResults();
+        $this->taskClearResults();
 
         $this->daemonSpawn($timeoutMs, $lockWaitTimeoutMs);
     }
@@ -688,7 +689,7 @@ class FilesystemFetchApi implements FetchApiInterface
             );
         }
 
-        $pm = Lib::cli()->processManager();
+        $pm = Lib::cliProcessManager();
 
         $cmd = [];
         $cmd[] = realpath(PHP_BINARY);
@@ -730,7 +731,7 @@ class FilesystemFetchApi implements FetchApiInterface
         if (-1 === $timeoutMsInt) $timeoutMsInt = null;
         if (-1 === $lockWaitTimeoutMsInt) $lockWaitTimeoutMsInt = null;
 
-        $this->registerShutdownFunctionDaemon();
+        $this->registerShutdownFunction();
 
         echo "[ CURL-API ] Listening for tasks...\n";
 
@@ -741,17 +742,18 @@ class FilesystemFetchApi implements FetchApiInterface
         );
     }
 
-    public function shutdownFunctionDaemon() : void
+
+    public function registerShutdownFunctionFn() : void
     {
         $this->daemonRemoveFromPool();
     }
 
-    protected function registerShutdownFunctionDaemon() : void
+    protected function registerShutdownFunction() : void
     {
-        if (! $this->isShutdownFunctionRegistered) {
-            register_shutdown_function([ $this, 'shutdownFunctionDaemon' ]);
+        if (! $this->isRegisterShutdownFunctionCalled) {
+            register_shutdown_function([ $this, 'registerShutdownFunctionFn' ]);
 
-            $this->isShutdownFunctionRegistered = true;
+            $this->isRegisterShutdownFunctionCalled = true;
         }
     }
 

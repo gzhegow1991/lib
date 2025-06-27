@@ -388,10 +388,8 @@ $fn = function () use ($ffn) {
     $previousList = [ $ee1, $ee2 ];
     $e0 = new \Gzhegow\Lib\Exception\RuntimeException('e', 0, ...$previousList);
 
-    $messages = \Gzhegow\Lib\Lib::debug()
-        ->throwableManager()
-        ->getPreviousMessagesLines($e0, _DEBUG_THROWABLE_WITHOUT_FILE)
-    ;
+    $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesLines($e0, _DEBUG_THROWABLE_WITHOUT_FILE);
+
     echo implode("\n", $messages);
 };
 $test = $ffn->test($fn);
@@ -934,9 +932,9 @@ $fn = function () use ($ffn) {
         || \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx)
         || \Gzhegow\Lib\Modules\Bcmath\Number::fromValidArray($invalidValue, $ctx);
 
-    $errors = $ctx->getErrors();
-    $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $errors);
-    $ffn->print_array_multiline($errors, 2);
+    $errorList = $ctx->getErrorList();
+    $errorList = array_map([ $strInterpolator, 'interpolateMessage' ], $errorList);
+    $ffn->print_array_multiline($errorList, 2);
 
     echo "\n";
 
@@ -947,9 +945,9 @@ $fn = function () use ($ffn) {
         ?? \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx)
         ?? \Gzhegow\Lib\Modules\Bcmath\Number::fromValidArray($invalidValue, $ctx);
 
-    $errors = $ctx->getErrors();
-    $errors = array_map([ $strInterpolator, 'interpolateMessage' ], $errors);
-    $ffn->print_array_multiline($errors, 2);
+    $errorList = $ctx->getErrorList();
+    $errorList = array_map([ $strInterpolator, 'interpolateMessage' ], $errorList);
+    $ffn->print_array_multiline($errorList, 2);
 
     echo "\n";
 
@@ -960,10 +958,7 @@ $fn = function () use ($ffn) {
         \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx);
     }
     catch ( \Throwable $e ) {
-        $messages = \Gzhegow\Lib\Lib::debug()
-            ->throwableManager()
-            ->getPreviousMessagesLines($e, _DEBUG_THROWABLE_WITHOUT_FILE)
-        ;
+        $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesLines($e, _DEBUG_THROWABLE_WITHOUT_FILE);
 
         echo implode("\n", $messages) . "\n";
         echo "\n";
@@ -977,10 +972,7 @@ $fn = function () use ($ffn) {
             && ResultTest::string_not_empty($ctx->getResult(), $ctx);
     }
     catch ( \Throwable $e ) {
-        $messages = \Gzhegow\Lib\Lib::debug()
-            ->throwableManager()
-            ->getPreviousMessagesLines($e, _DEBUG_THROWABLE_WITHOUT_FILE)
-        ;
+        $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesLines($e, _DEBUG_THROWABLE_WITHOUT_FILE);
 
         echo implode("\n", $messages) . "\n";
         echo "\n";
@@ -994,10 +986,7 @@ $fn = function () use ($ffn) {
             ?? ResultTest::string_not_empty($ctx->getResult(), $ctx);
     }
     catch ( \Throwable $e ) {
-        $messages = \Gzhegow\Lib\Lib::debug()
-            ->throwableManager()
-            ->getPreviousMessagesLines($e, _DEBUG_THROWABLE_WITHOUT_FILE)
-        ;
+        $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesLines($e, _DEBUG_THROWABLE_WITHOUT_FILE);
 
         echo implode("\n", $messages) . "\n";
         echo "\n";
@@ -3490,7 +3479,9 @@ XML;
 
     $sxe = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_sxe($xmlInvalid, $ret = \Gzhegow\Lib\Modules\Php\Result\Result::asValue());
     $ffn->print($sxe);
-    $ffn->print_array_multiline($ret->getErrors(), 2);
+
+    $errorList = $ret->getErrorList();
+    $ffn->print_array_multiline($errorList, 2);
 };
 $test = $ffn->test($fn);
 $test->expectStdoutIf(PHP_VERSION_ID >= 70400, '
@@ -3666,6 +3657,51 @@ $test->expectStdout('
 "var\1\1.txt"
 
 "123"
+');
+$test->run();
+
+
+
+// >>> TEST
+// > тесты HttpModule
+$fn = function () use ($ffn) {
+    $ffn->print('[ HttpModule ]');
+    echo "\n";
+
+
+    $theHttpCookies = \Gzhegow\Lib\Lib::httpCookies();
+    $theHttpCookies->set('hello', 'value', 3600, '/', null);
+    $ffn->print($theHttpCookies);
+
+    echo "\n";
+
+
+    $theHttpSession = \Gzhegow\Lib\Lib::httpSession();
+    // $theHttpSession->disableNativeSession();
+    // $theHttpSession->useNativeSession();
+    // $theHttpSession->withSymfonySession(
+    //     new \Symfony\Component\HttpFoundation\Session\Session(
+    //         new \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage([],
+    //             new \Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler(
+    //                 __DIR__ . '/var/session',
+    //             )
+    //         ),
+    //     )
+    // );
+    $theHttpSession->set('hello', 'world');
+    $ffn->print($theHttpSession, $_SESSION ?? []);
+
+    $theHttpSession->unset('hello');
+    $ffn->print($theHttpSession, $_SESSION ?? []);
+};
+$test = $ffn->test($fn);
+$test->expectStdout('
+"[ HttpModule ]"
+
+{ object # Gzhegow\Lib\Modules\Http\Cookies\DefaultCookies }
+
+{ object # Gzhegow\Lib\Modules\Http\Session\DefaultSession } | [ "hello" => "world" ]
+{ object # Gzhegow\Lib\Modules\Http\Session\DefaultSession } | []
 ');
 $test->run();
 

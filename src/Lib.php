@@ -89,6 +89,44 @@ class Lib
     }
 
 
+
+    /**
+     * @var CliModule
+     */
+    public static $cli;
+
+    public static function cli()
+    {
+        return static::$cli = static::$cli ?? new CliModule();
+    }
+
+    public static function cliProcessManager()
+    {
+        return Lib::cli()->processManager();
+    }
+
+
+    /**
+     * @var DebugModule
+     */
+    public static $debug;
+
+    public static function debug()
+    {
+        return static::$debug = static::$debug ?? new DebugModule();
+    }
+
+    public static function debugDumper()
+    {
+        return Lib::debug()->dumper();
+    }
+
+    public static function debugThrowabler()
+    {
+        return Lib::debug()->throwabler();
+    }
+
+
     /**
      * @var FormatModule
      */
@@ -142,6 +180,91 @@ class Lib
 
 
     /**
+     * @var FuncModule
+     */
+    public static $func;
+
+    public static function func()
+    {
+        return static::$func = static::$func ?? new FuncModule();
+    }
+
+    public static function funcInvoker()
+    {
+        return Lib::func()->invoker();
+    }
+
+
+    /**
+     * @var HttpModule
+     */
+    public static $http;
+
+    public static function http()
+    {
+        return static::$http = static::$http ?? new HttpModule();
+    }
+
+    public static function httpCookies()
+    {
+        return Lib::http()->cookies();
+    }
+
+    public static function httpSession()
+    {
+        return Lib::http()->session();
+    }
+
+
+    /**
+     * @var StrModule
+     */
+    public static $social;
+
+    public static function social()
+    {
+        return static::$social = static::$social ?? new SocialModule();
+    }
+
+    public static function socialEmailParser()
+    {
+        return Lib::social()->emailParser();
+    }
+
+    public static function socialPhoneManager()
+    {
+        return Lib::social()->phoneManager();
+    }
+
+
+    /**
+     * @var StrModule
+     */
+    public static $str;
+
+    public static function str()
+    {
+        return static::$str = static::$str ?? new StrModule();
+    }
+
+    public static function strInflector()
+    {
+        return Lib::str()->inflector();
+    }
+
+    public static function strInterpolator()
+    {
+        return Lib::str()->interpolator();
+    }
+
+    public static function strSlugger()
+    {
+        return Lib::str()->slugger();
+    }
+
+
+
+    /**
      * @var ArrModule
      */
     public static $arr;
@@ -169,16 +292,6 @@ class Lib
     public static function bcmath()
     {
         return static::$bcmath = static::$bcmath ?? new BcmathModule();
-    }
-
-    /**
-     * @var CliModule
-     */
-    public static $cli;
-
-    public static function cli()
-    {
-        return static::$cli = static::$cli ?? new CliModule();
     }
 
     /**
@@ -212,16 +325,6 @@ class Lib
     }
 
     /**
-     * @var DebugModule
-     */
-    public static $debug;
-
-    public static function debug()
-    {
-        return static::$debug = static::$debug ?? new DebugModule();
-    }
-
-    /**
      * @var EntrypointModule
      */
     public static $entrypoint;
@@ -239,26 +342,6 @@ class Lib
     public static function escape()
     {
         return static::$escape = static::$escape ?? new EscapeModule();
-    }
-
-    /**
-     * @var FuncModule
-     */
-    public static $func;
-
-    public static function func()
-    {
-        return static::$func = static::$func ?? new FuncModule();
-    }
-
-    /**
-     * @var HttpModule
-     */
-    public static $http;
-
-    public static function http()
-    {
-        return static::$http = static::$http ?? new HttpModule();
     }
 
     /**
@@ -332,26 +415,6 @@ class Lib
     }
 
     /**
-     * @var StrModule
-     */
-    public static $social;
-
-    public static function social()
-    {
-        return static::$social = static::$social ?? new SocialModule();
-    }
-
-    /**
-     * @var StrModule
-     */
-    public static $str;
-
-    public static function str()
-    {
-        return static::$str = static::$str ?? new StrModule();
-    }
-
-    /**
      * @var TestModule
      */
     public static $test;
@@ -372,6 +435,7 @@ class Lib
     }
 
 
+
     /**
      * > фабрика для ErrorBag - добавить теги ошибкам, чтобы потом сохранить в несколько отчетов
      */
@@ -379,6 +443,7 @@ class Lib
     {
         return $refB = Lib::php()->newErrorBag();
     }
+
 
     /**
      * > фабрика для Pipe - задать этапы задачи в наглядом виде без деталей

@@ -19,6 +19,7 @@ class LogicException extends \LogicException implements
 
         $this->messageList = array_values($args[ 'messageList' ]);
         $this->messageObjectList = array_values($args[ 'messageObjectList' ]);
+
         $this->previousList = array_values($args[ 'previousList' ]);
 
         $cnt = count($args[ 'messageList' ]);
@@ -40,9 +41,6 @@ class LogicException extends \LogicException implements
      */
     public function getIterator() : \Traversable
     {
-        return Lib::debug()
-            ->throwableManager()
-            ->getPreviousTrackIterator($this)
-        ;
+        return Lib::debugThrowabler()->getPreviousTrackIterator($this);
     }
 }

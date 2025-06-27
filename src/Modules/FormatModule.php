@@ -12,28 +12,36 @@ use Gzhegow\Lib\Modules\Format\FormatJson;
 
 class FormatModule
 {
-    /**
-     * @return FormatCsv
-     */
-    public function csv()
+    public function newCsv()
     {
         return new FormatCsv();
     }
 
-    /**
-     * @return FormatJson
-     */
-    public function json()
+    public function csv()
+    {
+        return $this->newCsv();
+    }
+
+
+    public function newJson()
     {
         return new FormatJson();
     }
 
-    /**
-     * @return FormatXml
-     */
-    public function xml()
+    public function json()
+    {
+        return $this->newJson();
+    }
+
+
+    public function newXml()
     {
         return new FormatXml();
+    }
+
+    public function xml()
+    {
+        return $this->newXml();
     }
 
 

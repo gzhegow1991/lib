@@ -16,10 +16,6 @@ use Gzhegow\Lib\Modules\Async\Promise\Pooling\PromisePoolingFactoryInterface;
 class PromiseManager implements PromiseManagerInterface
 {
     /**
-     * @var LoopManagerInterface
-     */
-    protected $loop;
-    /**
      * @var PromisePoolingFactoryInterface
      */
     protected $poolingFactory;
@@ -27,7 +23,12 @@ class PromiseManager implements PromiseManagerInterface
     /**
      * @var ClockManagerInterface
      */
-    protected $clock;
+    protected $clockManager;
+    /**
+     * @var LoopManagerInterface
+     */
+    protected $loopManager;
+
     /**
      * @var FetchApiInterface
      */
@@ -44,29 +45,20 @@ class PromiseManager implements PromiseManagerInterface
 
 
     public function __construct(
-        LoopManagerInterface $loop,
         PromisePoolingFactoryInterface $poolingFactory,
         //
-        ?ClockManagerInterface $clock = null,
+        ?ClockManagerInterface $clockManager = null,
+        ?LoopManagerInterface $loopManager = null,
+        //
         ?FetchApiInterface $fetchApi = null
     )
     {
-        $this->loop = $loop;
         $this->poolingFactory = $poolingFactory;
 
-        $this->clock = $clock;
-        $this->fetchApi = $fetchApi;
-    }
+        $this->clockManager = $clockManager ?? Lib::async()->static_clock_manager();
+        $this->loopManager = $loopManager ?? Lib::async()->static_loop_manager();
 
-
-    protected function getClock() : ClockManagerInterface
-    {
-        return $this->clock = $this->clock ?? Lib::async()->clockManager();
-    }
-
-    protected function getFetchApi() : FetchApiInterface
-    {
-        return $this->fetchApi = $this->fetchApi ?? Lib::async()->fetchApi();
+        $this->fetchApi = $fetchApi ?? Lib::async()->static_fetch_api();
     }
 
 
@@ -158,7 +150,7 @@ class PromiseManager implements PromiseManagerInterface
     protected function fromValueResolved($from, $ret = null)
     {
         try {
-            $instance = Promise::newResolved($this, $this->loop, $from);
+            $instance = Promise::newResolved($this, $this->loopManager, $from);
         }
         catch ( \Throwable $e ) {
             return Result::err(
@@ -179,7 +171,7 @@ class PromiseManager implements PromiseManagerInterface
     protected function fromCallableExecutor($from, $ret = null)
     {
         try {
-            $instance = Promise::newPromise($this, $this->loop, $from);
+            $instance = Promise::newPromise($this, $this->loopManager, $from);
         }
         catch ( \Throwable $e ) {
             return Result::err(
@@ -217,21 +209,21 @@ class PromiseManager implements PromiseManagerInterface
      */
     public function new($fnExecutor) : Promise
     {
-        $promise = Promise::newPromise($this, $this->loop, $fnExecutor);
+        $promise = Promise::newPromise($this, $this->loopManager, $fnExecutor);
 
         return $promise;
     }
 
     public function resolved($value = null) : Promise
     {
-        $promise = Promise::newResolved($this, $this->loop, $value);
+        $promise = Promise::newResolved($this, $this->loopManager, $value);
 
         return $promise;
     }
 
     public function rejected($reason = null) : Promise
     {
-        $promise = Promise::newRejected($this, $this->loop, $reason);
+        $promise = Promise::newRejected($this, $this->loopManager, $reason);
 
         return $promise;
     }
@@ -240,7 +232,7 @@ class PromiseManager implements PromiseManagerInterface
     public function never() : Promise
     {
         $promise = Promise::newNever(
-            $this, $this->loop
+            $this, $this->loopManager
         );
 
         return $promise;
@@ -249,7 +241,7 @@ class PromiseManager implements PromiseManagerInterface
     public function defer(?\Closure &$refFnResolve = null, ?\Closure &$refFnReject = null) : Promise
     {
         $promise = Promise::newDefer(
-            $this, $this->loop,
+            $this, $this->loopManager,
             $refFnResolve, $refFnReject
         );
 
@@ -259,11 +251,11 @@ class PromiseManager implements PromiseManagerInterface
 
     public function delay(int $waitMs) : Promise
     {
-        $clock = $this->getClock();
+        $theClock = $this->clockManager;
 
         $defer = $this->defer($fnResolve);
 
-        $clock->setTimeout($waitMs, $fnResolve);
+        $theClock->setTimeout($waitMs, $fnResolve);
 
         return $defer;
     }
@@ -281,7 +273,7 @@ class PromiseManager implements PromiseManagerInterface
             );
         }
 
-        $clock = $this->getClock();
+        $theClock = $this->clockManager;
 
         $defer = $this->defer($fnResolve, $fnReject);
 
@@ -313,11 +305,11 @@ class PromiseManager implements PromiseManagerInterface
             }
         };
 
-        $interval = $clock->setInterval($tickMsInt, $fnTick);
+        $interval = $theClock->setInterval($tickMsInt, $fnTick);
 
         $defer
-            ->finally(static function () use ($clock, $interval) {
-                $clock->clearInterval($interval);
+            ->finally(static function () use ($theClock, $interval) {
+                $theClock->clearInterval($interval);
             })
         ;
 
@@ -664,11 +656,11 @@ class PromiseManager implements PromiseManagerInterface
 
     public function timeout(Promise $promise, int $timeoutMs, $reason = null) : Promise
     {
-        $clock = $this->getClock();
+        $theClock = $this->clockManager;
 
         $promiseTimeout = $this->defer($fnResolveTimeout, $fnRejectTimeout);
 
-        $timer = $clock->setTimeout(
+        $timer = $theClock->setTimeout(
             $timeoutMs,
             static function () use ($timeoutMs, $reason, $fnRejectTimeout) {
                 if ($reason instanceof \Throwable) {
@@ -692,8 +684,8 @@ class PromiseManager implements PromiseManagerInterface
 
         $promiseFirstOf = $this
             ->firstOf([ $promise, $promiseTimeout ])
-            ->finally(static function () use ($clock, $timer) {
-                $clock->clearTimeout($timer);
+            ->finally(static function () use ($theClock, $timer) {
+                $theClock->clearTimeout($timer);
             })
         ;
 
@@ -748,9 +740,9 @@ class PromiseManager implements PromiseManagerInterface
      */
     protected function fetchApiPushTask($url, $curlOptions = [])
     {
-        $fetchApi = $this->getFetchApi();
+        $theFetchApi = $this->fetchApi;
 
-        $statusPush = $fetchApi->pushTask(
+        $statusPush = $theFetchApi->pushTask(
             $taskId,
             $url, $curlOptions, 1000
         );
@@ -769,9 +761,9 @@ class PromiseManager implements PromiseManagerInterface
      */
     protected function fetchApiAwait()
     {
-        $fetchApi = $this->getFetchApi();
+        $theFetchApi = $this->fetchApi;
 
-        if ($fetchApi->daemonIsAwake()) {
+        if ($theFetchApi->daemonIsAwake()) {
             return Promise::resolved();
 
         } elseif ($this->useFetchApiWakeup) {
@@ -793,12 +785,12 @@ class PromiseManager implements PromiseManagerInterface
             || (null === $promise)
             || $promise->isSettled()
         ) {
-            $fetchApi = $this->getFetchApi();
+            $theFetchApi = $this->fetchApi;
 
-            $fetchApi->daemonWakeup(10000, 1000);
+            $theFetchApi->daemonWakeup(10000, 1000);
 
-            $fnPooling = static function ($ctx) use ($fetchApi) {
-                if (! $fetchApi->daemonIsAwake()) {
+            $fnPooling = static function ($ctx) use ($theFetchApi) {
+                if (! $theFetchApi->daemonIsAwake()) {
                     return;
                 }
 
@@ -821,14 +813,14 @@ class PromiseManager implements PromiseManagerInterface
         ?int $timeoutMs = null
     )
     {
-        $fetchApi = $this->getFetchApi();
+        $theFetchApi = $this->fetchApi;
 
         $fnPooling = static function ($ctx) use (
-            $fetchApi,
+            $theFetchApi,
             //
             $taskId
         ) {
-            $status = $fetchApi->taskFlushResult(
+            $status = $theFetchApi->taskFlushResult(
                 $taskResult,
                 $taskId
             );

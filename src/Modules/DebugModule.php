@@ -6,11 +6,11 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper;
+use Gzhegow\Lib\Modules\Debug\Throwabler\DefaultThrowabler;
 use Gzhegow\Lib\Modules\Debug\Dumper\DumperInterface;
-use Gzhegow\Lib\Modules\Debug\DebugBacktracer\DebugBacktracer;
-use Gzhegow\Lib\Modules\Debug\ThrowableManager\ThrowableManager;
+use Gzhegow\Lib\Modules\Debug\Throwabler\ThrowablerInterface;
+use Gzhegow\Lib\Modules\Debug\DebugBacktracer\DefaultDebugBacktracer;
 use Gzhegow\Lib\Modules\Debug\DebugBacktracer\DebugBacktracerInterface;
-use Gzhegow\Lib\Modules\Debug\ThrowableManager\ThrowableManagerInterface;
 
 
 class DebugModule
@@ -20,13 +20,14 @@ class DebugModule
      */
     protected $dumper;
     /**
+     * @var ThrowablerInterface
+     */
+    protected $throwabler;
+
+    /**
      * @var DebugBacktracerInterface
      */
     protected $debugBacktracer;
-    /**
-     * @var ThrowableManagerInterface
-     */
-    protected $throwableManager;
 
     /**
      * @var string
@@ -53,45 +54,35 @@ class DebugModule
         return $this->dumper = null
             ?? $dumper
             ?? $this->dumper
-            ?? new DefaultDumper();
+            ?? $this->newDumper();
     }
 
 
-    public function newDebugBacktracer() : DebugBacktracerInterface
+    public function newThrowabler() : ThrowablerInterface
     {
-        return new DebugBacktracer();
+        return new DefaultThrowabler();
     }
 
-    public function cloneDebugBacktracer() : DebugBacktracerInterface
+    public function cloneThrowabler() : ThrowablerInterface
     {
-        return clone $this->debugBacktracer();
+        return clone $this->throwabler();
     }
 
-    public function debugBacktracer(?DebugBacktracerInterface $debugBacktracer = null) : DebugBacktracerInterface
+    public function throwabler(?ThrowablerInterface $throwableManager = null) : ThrowablerInterface
+    {
+        return $this->throwabler = null
+            ?? $throwabler
+            ?? $this->throwabler
+            ?? $this->newThrowabler();
+    }
+
+
+    public function static_debug_backtracer(?DebugBacktracerInterface $debugBacktracer = null) : DebugBacktracerInterface
     {
         return $this->debugBacktracer = null
             ?? $debugBacktracer
             ?? $this->debugBacktracer
-            ?? new DebugBacktracer();
-    }
-
-
-    public function newThrowableManager() : ThrowableManagerInterface
-    {
-        return new ThrowableManager();
-    }
-
-    public function cloneThrowableManager() : ThrowableManagerInterface
-    {
-        return clone $this->throwableManager();
-    }
-
-    public function throwableManager(?ThrowableManagerInterface $throwableManager = null) : ThrowableManagerInterface
-    {
-        return $this->throwableManager = null
-            ?? $throwableManager
-            ?? $this->throwableManager
-            ?? new ThrowableManager();
+            ?? new DefaultDebugBacktracer();
     }
 
 
@@ -138,7 +129,7 @@ class DebugModule
         ?string $dirRoot = ''
     ) : DebugBacktracerInterface
     {
-        $theDebugBacktracer = $this->cloneDebugBacktracer();
+        $theDebugBacktracer = clone $this->static_debug_backtracer();
 
         if ((null === $options) || ($options >= 0)) {
             $theDebugBacktracer->options($options);

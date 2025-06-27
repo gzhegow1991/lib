@@ -4,29 +4,146 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Modules\Http\Cookies\Cookies;
+use Gzhegow\Lib\Modules\Http\HttpHeader\HttpHeader;
+use Gzhegow\Lib\Modules\Http\Cookies\DefaultCookies;
+use Gzhegow\Lib\Modules\Http\Session\DefaultSession;
+use Gzhegow\Lib\Modules\Http\Cookies\CookiesInterface;
+use Gzhegow\Lib\Modules\Http\Session\SessionInterface;
 
 
 class HttpModule
 {
     /**
-     * @var Cookies
+     * @var CookiesInterface
      */
     protected $cookies;
     /**
-     * @var object
+     * @var SessionInterface
      */
     protected $session;
 
+    /**
+     * @var class-string<DefaultCookies>
+     */
+    protected $cookiesClass = DefaultCookies::class;
+    /**
+     * @var class-string<DefaultSession>
+     */
+    protected $sessionClass = DefaultSession::class;
+    /**
+     * @var array
+     */
+    protected $sessionOptions = [];
 
-    public function __construct()
+
+    public function cookies() : CookiesInterface
     {
-        $this->cookies = new Cookies();
+        if (null !== $this->cookies) {
+            return $this->cookies;
+        }
+
+        $cookiesClass = $this->static_cookies_class();
+
+        return $this->cookies = $cookiesClass::getInstance();
+    }
+
+    public function session() : ?SessionInterface
+    {
+        if (null !== $this->session) {
+            return $this->session;
+        }
+
+        $sessionClass = $this->static_session_class();
+
+        return $this->session = $sessionClass::getInstance();
     }
 
 
-    public function headers_flush() : array
+    /**
+     * @param class-string<CookiesInterface>|null $cookiesClass
+     *
+     * @return class-string<CookiesInterface>
+     */
+    public function static_cookies_class(?string $cookiesClass = null) : string
+    {
+        if (null !== $cookiesClass) {
+            if (! is_subclass_of($cookiesClass, CookiesInterface::class)) {
+                throw new LogicException(
+                    [ 'The `cookiesClass` should be subclass of: ' . CookiesInterface::class, $cookiesClass ]
+                );
+            }
+
+            $last = $this->cookiesClass;
+
+            $this->cookiesClass = $cookiesClass;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->cookiesClass ?? DefaultCookies::class;
+
+        return $result;
+    }
+
+    /**
+     * @param class-string<SessionInterface>|null $sessionClass
+     *
+     * @return class-string<SessionInterface>
+     */
+    public function static_session_class(?string $sessionClass = null) : string
+    {
+        if (null !== $sessionClass) {
+            if (! is_subclass_of($sessionClass, SessionInterface::class)) {
+                throw new LogicException(
+                    [ 'The `sessionClass` should be subclass of: ' . SessionInterface::class, $sessionClass ]
+                );
+            }
+
+            $last = $this->sessionClass;
+
+            $this->sessionClass = $sessionClass;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->sessionClass ?? DefaultSession::class;
+
+        return $result;
+    }
+
+    public function static_session_options(?array $sessionOptions = null) : array
+    {
+        if (null !== $sessionOptions) {
+            $last = $this->sessionOptions;
+
+            $this->sessionOptions = $sessionOptions;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->sessionOptions ?? [];
+
+        return $result;
+    }
+
+
+    /**
+     * @return HttpHeader[]
+     */
+    public function headers_list(?array $headers_list = null) : array
+    {
+        $result = [];
+
+        $headers_list = $headers_list ?? headers_list();
+
+        foreach ( $headers_list as $header ) {
+            $result[] = HttpHeader::fromString($header);
+        }
+
+        return $result;
+    }
+
+    public function headers_clear() : array
     {
         $headers = headers_list();
 
@@ -40,81 +157,25 @@ class HttpModule
     }
 
 
-    public function headers_collect(?array $headersArray, array ...$headersArrays) : array
-    {
-        if ($headersArray) {
-            array_unshift($headersArrays, $headersArray);
-        }
-
-        foreach ( $headersArrays as $idx => $_headerArray ) {
-            if (null === $_headerArray) {
-                unset($headersArrays[ $idx ]);
-            }
-        }
-
-        $result = [];
-
-        foreach ( Lib::arr()->walk_it($headersArrays) as $path => $header ) {
-            /** @var string[] $path */
-
-            if (! Lib::type()->string_not_empty($_header, $header)) {
-                continue;
-            }
-
-            [ $headerName, $headerValue ] = explode(':', $_header, 2) + [ 1 => null ];
-
-            if (null === $headerValue) {
-                $headerValue = $headerName;
-                $headerName = null;
-            }
-
-            if (null !== $headerName) {
-                if (false !== strpos($headerName, ' ')) {
-                    $headerValue = $_header;
-                    $headerName = null;
-                }
-            }
-
-            if (null === $headerName) {
-                foreach ( array_reverse($path) as $current ) {
-                    if (is_string($current)) {
-                        $headerName = $current;
-
-                        break;
-                    }
-                }
-            }
-
-            $result[ $headerName ][] = $headerValue;
-        }
-
-        return $result;
-    }
-
-
     public function header(string $header, ?bool $replace = null, ?int $response_code = null) : void
     {
         $replace = $replace ?? true;
         $response_code = $response_code ?? 0;
 
-        if (headers_sent($file, $line)) {
-            throw new LogicException(
-                "Headers already sent at {$file} : {$line}"
-            );
-        }
-
-        header($header, $replace, $response_code);
+        Lib::func()->safe_call(
+            function () use ($header, $replace, $response_code) {
+                header($header, $replace, $response_code);
+            }
+        );
     }
 
     public function header_remove(?string $name) : void
     {
-        if (headers_sent($file, $line)) {
-            throw new LogicException(
-                "Headers already sent at {$file} : {$line}"
-            );
-        }
-
-        header_remove($name);
+        Lib::func()->safe_call(
+            function () use ($name) {
+                header_remove($name);
+            }
+        );
     }
 
 
@@ -132,13 +193,13 @@ class HttpModule
         $secure = $secure ?? false;
         $httponly = $httponly ?? false;
 
-        if (headers_sent($file, $line)) {
-            throw new LogicException(
-                "Headers already sent at {$file} : {$line}"
-            );
-        }
-
-        setcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
+        Lib::func()->safe_call(
+            function () use ($name, $value, $expires_or_options, $path, $domain, $secure, $httponly) {
+                is_array($expires_or_options)
+                    ? setcookie($name, $value, $expires_or_options)
+                    : setcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
+            }
+        );
     }
 
     public function setrawcookie(
@@ -155,239 +216,13 @@ class HttpModule
         $secure = $secure ?? false;
         $httponly = $httponly ?? false;
 
-        if (headers_sent($file, $line)) {
-            throw new LogicException(
-                "Headers already sent at {$file} : {$line}"
-            );
-        }
-
-        setrawcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
-    }
-
-
-    public function static_cookies(?Cookies $cookies = null) : Cookies
-    {
-        if (null !== $cookies) {
-            $last = $this->cookies;
-
-            $this->cookies = $cookies;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->cookies;
-
-        return $result;
-    }
-
-    public function cookie_has(string $name, &$refValue = null) : bool
-    {
-        $refValue = null;
-
-        if ('' === $name) {
-            return false;
-        }
-
-        if (! array_key_exists($name, $_COOKIE)) {
-            return false;
-        }
-
-        // > convert empty string to null
-        Lib::type()->string_not_empty($cookieString, $_COOKIE[ $name ]);
-
-        $refValue = $cookieString;
-
-        return true;
-    }
-
-    public function cookie_get(string $name, array $fallback = []) : ?string
-    {
-        if ('' === $name) {
-            throw new LogicException(
-                'The `name` should be a non-empty string'
-            );
-        }
-
-        $status = $this->cookie_has($name, $result);
-
-        if (! $status) {
-            if ($fallback) {
-                [ $fallback ] = $fallback;
-
-                return $fallback;
+        Lib::func()->safe_call(
+            function () use ($name, $value, $expires_or_options, $path, $domain, $secure, $httponly) {
+                is_array($expires_or_options)
+                    ? setrawcookie($name, $value, $expires_or_options)
+                    : setrawcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
             }
-
-            throw new RuntimeException(
-                "Missing COOKIE[ {$name} ]"
-            );
-        }
-
-        return $result;
-    }
-
-    public function cookie_set(
-        string $name, string $value, ?int $expires = null,
-        ?string $path = null, ?string $domain = null,
-        ?bool $secure = null, ?bool $httpOnly = null
-    ) : void
-    {
-        if ('' === $name) {
-            throw new LogicException(
-                'The `name` should be a non-empty string'
-            );
-        }
-
-        if ($expires < 0) $expires = 0;
-
-        $_name = $name ?: null;
-        $_path = $path ?: '/';
-        $_domain = $domain ?: null;
-
-        $theCookies = $this->static_cookies();
-
-        // > convert empty string to null
-        Lib::type()->string_not_empty($valueString, $value);
-
-        $_value = $valueString ?? ' ';
-        $_value = rawurlencode($_value);
-
-        $_expires = $expires ?: 0;
-        $_secure = $secure ?? false;
-        $_httpOnly = $httpOnly ?? false;
-
-        $setrawcookieArgs = [
-            $_name,
-            $_value,
-            $_expires,
-            $_path,
-            $_domain,
-            $_secure,
-            $_httpOnly,
-        ];
-
-        $theCookies->remove(
-            $_name, $_path, $_domain
         );
-
-        $theCookies->add(
-            $setrawcookieArgs,
-            $name, $_path, $_domain
-        );
-    }
-
-    public function cookie_unset(
-        string $name,
-        ?string $path = null, ?string $domain = null,
-        ?bool $secure = null, ?bool $httpOnly = null
-    ) : void
-    {
-        // > смещение временной зоны в самых отвратительных кейсах может быть до 26 часов
-        // > в секундах это 93600, пусть будет для красоты 99999
-
-        $this->cookie_set(
-            $name, ' ', time() - 99999,
-            $path, $domain,
-            $secure, $httpOnly
-        );
-    }
-
-
-    public function static_session(?object $session = null) : ?object
-    {
-        /**
-         * @noinspection PhpUndefinedNamespaceInspection
-         *
-         * @see          composer require symfony/http-foundation
-         * @see          \Symfony\Component\HttpFoundation\Session\SessionInterface
-         */
-
-        if (null !== $session) {
-            $last = $this->session;
-
-            $this->session = $session;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->session;
-
-        return $result;
-    }
-
-    public function session_has(string $name, &$refValue = null) : bool
-    {
-        $refValue = null;
-
-        if (! strlen($name)) {
-            throw new LogicException(
-                'The `name` should be a non-empty string'
-            );
-        }
-
-        $theSession = $this->static_session();
-
-        if (! $theSession->has($name)) {
-            return false;
-        }
-
-        $refValue = $theSession->get($name);
-
-        return true;
-    }
-
-    public function session_get(string $name, array $fallback = []) : bool
-    {
-        if (! strlen($name)) {
-            throw new LogicException(
-                'The `name` should be a non-empty string'
-            );
-        }
-
-        $theSession = $this->static_session();
-
-        if (! $theSession->has($name)) {
-            if ($fallback) {
-                [ $fallback ] = $fallback;
-
-                return $fallback;
-            }
-
-            throw new LogicException(
-                'Missing session key: ' . $name
-            );
-        }
-
-        $result = $theSession->get($name);
-
-        return $result;
-    }
-
-    public function session_set(string $name, $value) : void
-    {
-        if (! strlen($name)) {
-            throw new LogicException(
-                'The `name` should be a non-empty string'
-            );
-        }
-
-        $theSession = $this->static_session();
-
-        $theSession->set($name, $value);
-    }
-
-    public function session_unset(string $name)
-    {
-        if (! strlen($name)) {
-            throw new LogicException(
-                'The `name` should be a non-empty string'
-            );
-        }
-
-        $theSession = $this->static_session();
-
-        $last = $theSession->remove($name);
-
-        return $last;
     }
 
 

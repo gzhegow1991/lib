@@ -9,11 +9,12 @@ interface FetchApiInterface
     public function popTask(&$refTask, ?int $blockTimeoutMs = null) : bool;
 
 
+    public function taskClearResults() : void;
+
+
     public function taskGetResult(&$refTaskResult, string $taskId) : bool;
 
     public function taskFlushResult(&$refTaskResult, string $taskId) : bool;
-
-    public function clearTaskResults() : void;
 
 
     public function daemonAddToPool(int $daemonTimeoutMs, ?float $nowMicrotime = null) : bool;

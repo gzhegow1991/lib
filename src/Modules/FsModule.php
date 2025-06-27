@@ -21,6 +21,7 @@ class FsModule
      * @var bool
      */
     protected $realpathReturnTargetPath = true;
+
     /**
      * @var int
      */
@@ -41,28 +42,36 @@ class FsModule
     }
 
 
-    /**
-     * @return FileSafeProxy
-     */
-    public function fileSafe()
+    public function newFileSafe()
     {
         return new FileSafeProxy(new FileSafe());
     }
 
-    /**
-     * @return SocketSafeProxy
-     */
-    public function socketSafe()
+    public function fileSafe()
+    {
+        return $this->newFileSafe();
+    }
+
+
+    public function newSocketSafe()
     {
         return new SocketSafeProxy(new SocketSafe());
     }
 
-    /**
-     * @return StreamSafeProxy
-     */
-    public function streamSafe()
+    public function socketSafe()
+    {
+        return $this->newSocketSafe();
+    }
+
+
+    public function newStreamSafe()
     {
         return new StreamSafeProxy(new StreamSafe());
+    }
+
+    public function streamSafe()
+    {
+        return $this->newStreamSafe();
     }
 
 

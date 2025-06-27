@@ -8,6 +8,7 @@
 namespace Gzhegow\Lib\Modules\Cli\Process;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\Runtime\ComposerException;
 
 
 class DefaultProcessManager implements ProcessManagerInterface
@@ -22,6 +23,17 @@ class DefaultProcessManager implements ProcessManagerInterface
 
 
     /**
+     * @return \Symfony\Component\Process\Process
+     */
+    public function newSymfonyProcess(Proc $proc) : object
+    {
+        $process = $proc->newSymfonyProcess();
+
+        return $process;
+    }
+
+
+    /**
      * @return static
      */
     public function useSymfonyProcess(?bool $useSymfonyProcess = null)
@@ -29,6 +41,22 @@ class DefaultProcessManager implements ProcessManagerInterface
         $classExists = class_exists(static::SYMFONY_PROCESS_CLASS);
 
         $useSymfonyProcess = $useSymfonyProcess ?? $classExists;
+
+        if ($useSymfonyProcess) {
+            if (! $classExists) {
+                $commands = [
+                    'composer require symfony/process',
+                ];
+
+                throw new ComposerException(
+                    [
+                        ''
+                        . 'Please, run following commands: '
+                        . '[ ' . implode(' ][ ', $commands) . ' ]',
+                    ]
+                );
+            }
+        }
 
         $this->useSymfonyProcess = $useSymfonyProcess;
 

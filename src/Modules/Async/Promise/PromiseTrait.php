@@ -363,6 +363,6 @@ trait PromiseTrait
 
     public static function getInstance() : PromiseManagerInterface
     {
-        return Lib::async()->promiseManager();
+        return Lib::async()->static_promise_manager();
     }
 }

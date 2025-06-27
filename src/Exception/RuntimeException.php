@@ -40,9 +40,6 @@ class RuntimeException extends \RuntimeException implements
      */
     public function getIterator() : \Traversable
     {
-        return Lib::debug()
-            ->throwableManager()
-            ->getPreviousTrackIterator($this)
-        ;
+        return Lib::debugThrowabler()->getPreviousTrackIterator($this);
     }
 }

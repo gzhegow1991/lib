@@ -32,7 +32,7 @@ class FuncModule
         return $this->invoker = null
             ?? $invoker
             ?? $this->invoker
-            ?? new DefaultInvoker();
+            ?? $this->newInvoker();
     }
 
 
@@ -233,8 +233,6 @@ class FuncModule
      * > встроенные функции в php такие как strlen() требуют строгое число аргументов
      * > стоит передать туда больше аргументов - сразу throw/trigger_error и это хорошо
      * > но как только array_filter/array_map, то это плохо
-     *
-     * @noinspection PhpUnhandledExceptionInspection
      */
     public function call_user_func($fn, ...$args)
     {
@@ -289,7 +287,7 @@ class FuncModule
                 }
 
                 if ($ex && ! $isKnown) {
-                    throw $ex;
+                    throw new RuntimeException($ex);
                 }
             }
         }
@@ -301,8 +299,6 @@ class FuncModule
      * > встроенные функции в php такие как strlen() требуют строгое число аргументов
      * > стоит передать туда больше аргументов - сразу throw/trigger_error и это хорошо
      * > но как только array_filter/array_map, то это плохо
-     *
-     * @noinspection PhpUnhandledExceptionInspection
      */
     public function call_user_func_array($fn, array $args, ?array &$refArgsNew = null)
     {
@@ -355,7 +351,7 @@ class FuncModule
                 }
 
                 if ($ex && ! $isKnown) {
-                    throw $ex;
+                    throw new RuntimeException($ex);
                 }
 
                 if ($isKnown) {

@@ -75,7 +75,7 @@ class DefaultSlugger implements SluggerInterface
     /**
      * @return \Symfony\Component\String\Slugger\SluggerInterface
      */
-    protected function newSymfonySlugger(
+    public function newSymfonySlugger(
         ?array $ignoreSymbolMap = null,
         ?string $locale = null
     ) : object

@@ -133,7 +133,7 @@ class DefaultDumper implements DumperInterface
     /**
      * @return \Symfony\Component\VarDumper\Cloner\ClonerInterface
      */
-    protected function newSymfonyCloner(array $casters = []) : object
+    public function newSymfonyCloner(...$args) : object
     {
         $commands = [
             'composer require symfony/var-dumper',
@@ -147,18 +147,14 @@ class DefaultDumper implements DumperInterface
             ]);
         }
 
-        return new $symfonyClonerClass($casters);
+        return new $symfonyClonerClass(...$args);
     }
 
     /**
      * @return \Symfony\Component\VarDumper\Cloner\ClonerInterface
      */
-    protected function getSymfonyCloner(?array $casters = null) : object
+    public function getSymfonyCloner() : object
     {
-        if (null !== $casters) {
-            return $this->newSymfonyCloner($casters);
-        }
-
         return $this->symfonyCloner = null
             ?? $this->symfonyCloner
             ?? $this->newSymfonyCloner();
@@ -191,7 +187,7 @@ class DefaultDumper implements DumperInterface
     /**
      * @return \Symfony\Component\VarDumper\Dumper\CliDumper
      */
-    protected function newSymfonyCliDumper() : object
+    public function newSymfonyCliDumper() : object
     {
         $commands = [
             'composer require symfony/var-dumper',
@@ -211,7 +207,7 @@ class DefaultDumper implements DumperInterface
     /**
      * @return \Symfony\Component\VarDumper\Dumper\CliDumper
      */
-    protected function getSymfonyCliDumper() : object
+    public function getSymfonyCliDumper() : object
     {
         return $this->symfonyCliDumper = null
             ?? $this->symfonyCliDumper
@@ -245,7 +241,7 @@ class DefaultDumper implements DumperInterface
     /**
      * @return \Symfony\Component\VarDumper\Dumper\HtmlDumper
      */
-    protected function newSymfonyHtmlDumper() : object
+    public function newSymfonyHtmlDumper() : object
     {
         $commands = [
             'composer require symfony/var-dumper',
@@ -265,7 +261,7 @@ class DefaultDumper implements DumperInterface
     /**
      * @return \Symfony\Component\VarDumper\Dumper\HtmlDumper
      */
-    protected function getSymfonyHtmlDumper() : object
+    public function getSymfonyHtmlDumper() : object
     {
         return $this->symfonyHtmlDumper = null
             ?? $this->symfonyHtmlDumper
@@ -352,7 +348,9 @@ class DefaultDumper implements DumperInterface
 
         $casters = $printerOptions[ 'casters' ] ?? null;
 
-        $cloner = $this->getSymfonyCloner($casters);
+        $cloner = (null === $casters)
+            ? $this->getSymfonyCloner()
+            : $this->newSymfonyCloner($casters);
 
         $dumper = Lib::php()->is_terminal()
             ? $this->getSymfonyCliDumper()

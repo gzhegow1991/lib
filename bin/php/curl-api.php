@@ -27,7 +27,7 @@ $theTypeThrow = \Gzhegow\Lib\Lib::typeThrow();
 $theTypeThrow->int_non_negative_or_minus_one($timeoutMsInt, $timeoutMs);
 $theTypeThrow->int_non_negative_or_minus_one($lockWaitTimeoutMsInt, $lockWaitTimeoutMs);
 
-$fetchApi = \Gzhegow\Lib\Lib::async()->fetchApi();
+$fetchApi = \Gzhegow\Lib\Lib::async()->static_fetch_api();
 
 $fetchApi->daemonMain(
     $timeoutMsInt,

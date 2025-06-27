@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Debug\ThrowableManager;
+namespace Gzhegow\Lib\Modules\Debug\Throwabler;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
@@ -9,7 +9,7 @@ use Gzhegow\Lib\Exception\Interfaces\HasMessageListInterface;
 use Gzhegow\Lib\Exception\Iterator\PHP7\ExceptionIterator as ExceptionIteratorPHP7;
 
 
-class ThrowableManager implements ThrowableManagerInterface
+class DefaultThrowabler implements ThrowablerInterface
 {
     /**
      * @var string

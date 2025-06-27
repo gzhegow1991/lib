@@ -27,6 +27,28 @@ class BcmathModule
     }
 
 
+    public function static_scale_limit(?int $scaleLimit = null) : int
+    {
+        if (null !== $scaleLimit) {
+            if ($scaleLimit < 0) {
+                throw new LogicException(
+                    [ 'The `scaleLimit` should be a non-negative integer', $scaleLimit ]
+                );
+            }
+
+            $last = $this->scaleLimit;
+
+            $this->scaleLimit = $scaleLimit;
+
+            $result = $last;
+        }
+
+        $result = $result ?? $this->scaleLimit ?? 16;
+
+        return $result;
+    }
+
+
     /**
      * @param Bcnumber|null $r
      */
@@ -63,28 +85,6 @@ class BcmathModule
         $r = $bcnum;
 
         return true;
-    }
-
-
-    public function static_scale_limit(?int $scaleLimit = null) : int
-    {
-        if (null !== $scaleLimit) {
-            if ($scaleLimit < 0) {
-                throw new LogicException(
-                    [ 'The `scaleLimit` should be a non-negative integer', $scaleLimit ]
-                );
-            }
-
-            $last = $this->scaleLimit;
-
-            $this->scaleLimit = $scaleLimit;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->scaleLimit ?? 16;
-
-        return $result;
     }
 
 

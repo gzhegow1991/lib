@@ -31,7 +31,7 @@ class CliModule
         return $this->processManager = null
             ?? $processManager
             ?? $this->processManager
-            ?? new DefaultProcessManager();
+            ?? $this->newProcessManager();
     }
 
 

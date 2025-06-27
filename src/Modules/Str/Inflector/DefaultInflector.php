@@ -139,7 +139,7 @@ class DefaultInflector implements InflectorInterface
     /**
      * @return \Symfony\Component\String\Inflector\InflectorInterface
      */
-    protected function newSymfonyInflector() : object
+    public function newSymfonyInflector() : object
     {
         $commands = [
             'composer require symfony/string',
@@ -160,7 +160,7 @@ class DefaultInflector implements InflectorInterface
     /**
      * @return \Symfony\Component\String\Inflector\InflectorInterface
      */
-    protected function getSymfonyInflector() : object
+    public function getSymfonyInflector() : object
     {
         return $this->symfonyInflector = null
             ?? $this->symfonyInflector

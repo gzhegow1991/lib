@@ -1,8 +1,8 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Debug\ThrowableManager;
+namespace Gzhegow\Lib\Modules\Debug\Throwabler;
 
-interface ThrowableManagerInterface
+interface ThrowablerInterface
 {
     /**
      * @return static
