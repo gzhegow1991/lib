@@ -1136,6 +1136,8 @@ class EntrypointModule
             ->setMaxExecutionTime(10)
             ->setMaxInputTime(-1)
             //
+            ->setObImplicitFlush(false, 0)
+            //
             ->setTimezoneDefault(date_default_timezone_get())
             //
             ->setPostMaxSize('8M')
@@ -1167,6 +1169,8 @@ class EntrypointModule
             //
             ->useMaxExecutionTime()
             ->useMaxInputTime()
+            //
+            ->useObImplicitFlush()
             //
             ->useTimezoneDefault()
             //
