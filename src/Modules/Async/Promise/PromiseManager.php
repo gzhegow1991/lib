@@ -251,11 +251,11 @@ class PromiseManager implements PromiseManagerInterface
 
     public function delay(int $waitMs) : Promise
     {
-        $theClock = $this->clockManager;
+        $theClockManager = $this->clockManager;
 
         $defer = $this->defer($fnResolve);
 
-        $theClock->setTimeout($waitMs, $fnResolve);
+        $theClockManager->setTimeout($waitMs, $fnResolve);
 
         return $defer;
     }
@@ -273,7 +273,7 @@ class PromiseManager implements PromiseManagerInterface
             );
         }
 
-        $theClock = $this->clockManager;
+        $theClockManager = $this->clockManager;
 
         $defer = $this->defer($fnResolve, $fnReject);
 
@@ -305,11 +305,11 @@ class PromiseManager implements PromiseManagerInterface
             }
         };
 
-        $interval = $theClock->setInterval($tickMsInt, $fnTick);
+        $interval = $theClockManager->setInterval($tickMsInt, $fnTick);
 
         $defer
-            ->finally(static function () use ($theClock, $interval) {
-                $theClock->clearInterval($interval);
+            ->finally(static function () use ($theClockManager, $interval) {
+                $theClockManager->clearInterval($interval);
             })
         ;
 
@@ -656,11 +656,11 @@ class PromiseManager implements PromiseManagerInterface
 
     public function timeout(Promise $promise, int $timeoutMs, $reason = null) : Promise
     {
-        $theClock = $this->clockManager;
+        $theClockManager = $this->clockManager;
 
         $promiseTimeout = $this->defer($fnResolveTimeout, $fnRejectTimeout);
 
-        $timer = $theClock->setTimeout(
+        $timer = $theClockManager->setTimeout(
             $timeoutMs,
             static function () use ($timeoutMs, $reason, $fnRejectTimeout) {
                 if ($reason instanceof \Throwable) {
@@ -684,8 +684,8 @@ class PromiseManager implements PromiseManagerInterface
 
         $promiseFirstOf = $this
             ->firstOf([ $promise, $promiseTimeout ])
-            ->finally(static function () use ($theClock, $timer) {
-                $theClock->clearTimeout($timer);
+            ->finally(static function () use ($theClockManager, $timer) {
+                $theClockManager->clearTimeout($timer);
             })
         ;
 

@@ -970,11 +970,11 @@ class EntrypointModule
 
     public function fnExceptionHandler(\Throwable $throwable) : void
     {
-        $theThrowableManager = Lib::debugThrowabler();
+        $theThrowabler = Lib::debugThrowabler();
 
-        $theThrowableManager->setDirRoot($this->dirRoot);
+        $theThrowabler->setDirRoot($this->dirRoot);
 
-        $messageLines = $theThrowableManager->getPreviousMessagesLines(
+        $messageLines = $theThrowabler->getPreviousMessagesLines(
             $throwable,
             0
             | _DEBUG_THROWABLE_WITH_CODE
@@ -983,7 +983,7 @@ class EntrypointModule
             | _DEBUG_THROWABLE_WITH_PARENTS
         );
 
-        $traceLines = $theThrowableManager->getThrowableTraceLines($throwable);
+        $traceLines = $theThrowabler->getThrowableTraceLines($throwable);
 
         if ([] !== $messageLines) {
             foreach ( $messageLines as $line ) {

@@ -68,7 +68,7 @@ class DebugModule
         return clone $this->throwabler();
     }
 
-    public function throwabler(?ThrowablerInterface $throwableManager = null) : ThrowablerInterface
+    public function throwabler(?ThrowablerInterface $throwabler = null) : ThrowablerInterface
     {
         return $this->throwabler = null
             ?? $throwabler
