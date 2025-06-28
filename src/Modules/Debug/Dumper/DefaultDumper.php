@@ -671,9 +671,7 @@ class DefaultDumper implements DumperInterface
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $this->doPrintTrace($trace, $var, ...$vars);
-
-        return $var;
+        return $this->doPrintTrace($trace, $var, ...$vars);
     }
 
     public function d(?array $trace, $var, ...$vars)

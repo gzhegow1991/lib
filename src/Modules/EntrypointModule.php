@@ -1125,11 +1125,12 @@ class EntrypointModule
         $this
             ->setDirRoot(null)
             //
-            ->setErrorReporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED)
-            ->setErrorLog(getcwd() . '/error_log')
-            ->setDisplayErrors(0)
             ->setErrorHandler([ $this, 'fnErrorHandler' ])
             ->setExceptionHandler([ $this, 'fnExceptionHandler' ])
+            //
+            ->setErrorReporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED)
+            ->setDisplayErrors(0)
+            ->setErrorLog(getcwd() . '/error_log')
             //
             ->setMemoryLimit('32M')
             //
@@ -1159,11 +1160,12 @@ class EntrypointModule
     public function useAll()
     {
         $this
-            ->useErrorReporting()
-            ->useErrorLog()
-            ->useDisplayErrors()
             ->useErrorHandler()
             ->useExceptionHandler()
+            //
+            ->useErrorReporting()
+            ->useDisplayErrors()
+            ->useErrorLog()
             //
             ->useMemoryLimit()
             //
