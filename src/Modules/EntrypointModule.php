@@ -12,9 +12,9 @@ use Gzhegow\Lib\Modules\Arr\Map\Base\AbstractMap;
 class EntrypointModule
 {
     /**
-     * @var bool
+     * @var array{ 0: string, 1: string }
      */
-    protected $isLocked = false;
+    protected $isLocked;
     /**
      * @var array<string, bool>
      */
@@ -61,6 +61,15 @@ class EntrypointModule
     protected $maxInputTime = -1;
 
     /**
+     * @var bool
+     */
+    protected $obImplicitFlush = false;
+    /**
+     * @var int
+     */
+    protected $obImplicitFlushCommit = 0;
+
+    /**
      * @var \DateTimeZone
      */
     protected $timezoneDefault;
@@ -78,6 +87,10 @@ class EntrypointModule
      * @var string
      */
     protected $uploadTmpDir;
+    /**
+     * @var bool
+     */
+    protected $uploadTmpDirMkdir = false;
 
     /**
      * @var int
@@ -129,9 +142,16 @@ class EntrypointModule
      *
      * @return static
      */
-    public function lock(bool $isLocked)
+    public function lock(?bool $isLocked = null)
     {
-        $this->isLocked = $isLocked;
+        $isLocked = $isLocked ?? true;
+
+        if ($isLocked) {
+            $this->isLocked = Lib::debug()->file_line();
+
+        } else {
+            $this->isLocked = null;
+        }
 
         return $this;
     }
@@ -512,6 +532,74 @@ class EntrypointModule
     }
 
 
+    /**
+     * @return static
+     */
+    public function setObImplicitFlush(
+        ?bool $obImplicitFlush,
+        ?int $obImplicitFlushCommit = null,
+        ?bool $replace = null
+    )
+    {
+        $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
+
+        if (null === $obImplicitFlush) {
+            $this->obImplicitFlush = false;
+
+        } else {
+            $this->obImplicitFlush = $obImplicitFlush;
+        }
+
+        if (null === $obImplicitFlushCommit) {
+            $this->obImplicitFlushCommit = 0;
+
+        } else {
+            Lib::typeThrow()->int($obImplicitFlushCommitInt, $obImplicitFlushCommit);
+
+            if ($obImplicitFlushCommitInt > 1) {
+                $obImplicitFlushCommitInt = 1;
+
+            } elseif ($obImplicitFlushCommitInt < 1) {
+                $obImplicitFlushCommitInt = -1;
+            }
+
+            $this->obImplicitFlushCommit = $obImplicitFlushCommitInt;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useObImplicitFlush()
+    {
+        if (1 === $this->obImplicitFlushCommit) {
+            while ( ob_get_level() ) {
+                ob_end_flush();
+            }
+
+        } elseif (-1 === $this->obImplicitFlushCommit) {
+            while ( ob_get_level() ) {
+                ob_end_clean();
+            }
+        }
+
+        ob_implicit_flush($this->obImplicitFlush);
+
+        return $this;
+    }
+
+
     public function getPhpTimezoneDefault() : string
     {
         return date_default_timezone_get();
@@ -681,7 +769,11 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setUploadTmpDir(?string $uploadTmpDir, ?bool $replace = null)
+    public function setUploadTmpDir(
+        ?string $uploadTmpDir,
+        ?bool $uploadTmpDirMkdir = null,
+        ?bool $replace = null
+    )
     {
         $this->assertNotLocked();
 
@@ -694,13 +786,25 @@ class EntrypointModule
             $this->mapSet[ $mapSetKey ] = true;
         }
 
+        if (null === $uploadTmpDirMkdir) {
+            $this->uploadTmpDirMkdir = false;
+
+        } else {
+            $this->uploadTmpDirMkdir = $uploadTmpDirMkdir;
+        }
+
         if (null === $uploadTmpDir) {
             $this->uploadTmpDir = sys_get_temp_dir();
 
         } else {
-            Lib::typeThrow()->dirpath_realpath($uploadTmpDirRealpath, $uploadTmpDir);
+            if ($this->uploadTmpDirMkdir) {
+                Lib::typeThrow()->dirpath($uploadTmpDirPath, $uploadTmpDir);
 
-            $this->uploadTmpDir = $uploadTmpDirRealpath;
+            } else {
+                Lib::typeThrow()->dirpath_realpath($uploadTmpDirRealpath, $uploadTmpDir);
+            }
+
+            $this->uploadTmpDir = $uploadTmpDirRealpath ?? $uploadTmpDirPath ?? null;
         }
 
         return $this;
@@ -711,7 +815,15 @@ class EntrypointModule
      */
     public function useUploadTmpDir(&$refLast = null)
     {
-        $refLast = ini_set('upload_tmp_dir', $this->uploadTmpDir);
+        if (null !== $this->uploadTmpDir) {
+            if ($this->uploadTmpDirMkdir) {
+                if (! is_dir($this->uploadTmpDir)) {
+                    mkdir($this->uploadTmpDir, 0775, true);
+                }
+            }
+
+            $refLast = ini_set('upload_tmp_dir', $this->uploadTmpDir);
+        }
 
         return $this;
     }
@@ -1074,8 +1186,13 @@ class EntrypointModule
 
     protected function assertNotLocked() : void
     {
-        if ($this->isLocked) {
-            throw new RuntimeException('Unable to change `entrypoint` due to it was locked before');
+        if (null !== $this->isLocked) {
+            throw new RuntimeException(
+                [
+                    'Unable to change entrypoint parameters due to it was locked before',
+                    $this->isLocked,
+                ]
+            );
         }
     }
 
