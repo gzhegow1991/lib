@@ -68,11 +68,11 @@ class DefaultDumper implements DumperInterface
     /**
      * @var string
      */
-    protected $printerDefault;
+    protected $printerDefault = 'var_dump';
     /**
      * @var string
      */
-    protected $printer;
+    protected $printer = 'var_dump';
     /**
      * @var array
      */
@@ -81,11 +81,11 @@ class DefaultDumper implements DumperInterface
     /**
      * @var string
      */
-    protected $dumperDefault;
+    protected $dumperDefault = 'echo';
     /**
      * @var string
      */
-    protected $dumper;
+    protected $dumper = 'echo';
     /**
      * @var array
      */
@@ -94,15 +94,10 @@ class DefaultDumper implements DumperInterface
 
     public function __construct()
     {
-        $printerDefault = interface_exists(static::SYMFONY_CLONER_INTERFACE)
-            ? 'symfony'
-            : 'var_dump';
-
         $dumperDefault = Lib::php()->is_terminal()
             ? 'echo'
             : 'echo_html';
 
-        $this->printer = $this->printerDefault = $printerDefault;
         $this->dumper = $this->dumperDefault = $dumperDefault;
     }
 
