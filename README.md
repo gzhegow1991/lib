@@ -516,7 +516,7 @@ $fn = function () use ($ffn) {
         return intval($value);
     };
 
-    $fnCatch = function (\Throwable $e, $input, $null, $result) {
+    $fnCatch = function (\Throwable $e, $input, $context, $null, $result) {
         echo '> fnCatch' . "\n";
 
         if ($e instanceof \RuntimeException) {
