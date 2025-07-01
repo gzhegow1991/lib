@@ -493,6 +493,7 @@ $fn = function () use ($ffn) {
     $ffn->print('[ Pipe ]');
     echo "\n";
 
+
     $fnStrval = function ($input) {
         echo '> fnStrval' . "\n";
 
@@ -550,6 +551,7 @@ $fn = function () use ($ffn) {
 
         return $input . '2';
     };
+
 
     $pipe = \Gzhegow\Lib\Lib::func()->newPipe();
     $pipe

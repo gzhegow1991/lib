@@ -388,15 +388,23 @@ class Pipe
             }
         }
 
-        if ($this->exception) {
-            $e = $this->exception[ 0 ];
+        if ([] === $this->exception) {
+            return $this->input[ 0 ];
 
-            throw new PipeException(
-                [ 'Unhandled exception during processing pipeline', $e ], $e
-            );
+        } else {
+            if (null === $this->parent) {
+                $e = $this->exception[ 0 ];
+
+                throw new PipeException(
+                    [ 'Unhandled exception during processing pipeline', $e ], $e
+                );
+
+            } else {
+                $this->parent->exception = $this->exception;
+
+                return null;
+            }
         }
-
-        return $this->input[ 0 ];
     }
 
 
