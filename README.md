@@ -568,7 +568,7 @@ $fn = function () use ($ffn) {
         ->middleware($fnMiddleware)
         /**/ ->map($fnMiddlewareStep1)
         /**/ ->map($fnMiddlewareStep2)
-        ->end()
+        ->endMiddleware()
     ;
 
     $result = $pipe(0);

@@ -34,10 +34,6 @@ class Pipe
      * @var array{ 0?: mixed }
      */
     protected $input = [];
-    // /**
-    //  * @var array{ 0?: array }
-    //  */
-    // protected $context = [];
 
     /**
      * @var callable
@@ -184,9 +180,20 @@ class Pipe
     /**
      * @return static
      */
-    public function end()
+    public function endMiddleware()
     {
         return $this->parent;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function throwable(\Throwable $e)
+    {
+        $this->exception = [ $e ];
+
+        return $this;
     }
 
 
