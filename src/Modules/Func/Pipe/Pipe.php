@@ -272,7 +272,10 @@ class Pipe
                             $result = $fnCallUserFuncArray(
                                 $step[ 'fn' ],
                                 $fnCallUserFuncArgs(
-                                    [ 0 => $this->exception[ 0 ] ],
+                                    [
+                                        0 => $this->exception[ 0 ],
+                                        1 => $this->input[ 0 ],
+                                    ],
                                     $refContext,
                                     $args,
                                     $step[ 'args' ]

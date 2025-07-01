@@ -474,20 +474,20 @@ $fn = function () use ($ffn) {
     $ffn->print('[ Pipe ]');
     echo "\n";
 
-    $fnStrval = function ($value) {
+    $fnStrval = function ($input) {
         echo '> fnStrval' . "\n";
 
-        return strval($value);
+        return strval($input);
     };
-    $fnStrlen = function ($value) {
+    $fnStrlen = function ($input) {
         echo '> fnStrlen' . "\n";
 
-        return strlen($value);
+        return strlen($input);
     };
-    $fnTapCustom = function ($value) use ($ffn) {
+    $fnTapCustom = function ($input) use ($ffn) {
         echo '> fnTapCustom' . "\n";
 
-        $ffn->print($value);
+        $ffn->print($input);
 
         throw new \Gzhegow\Lib\Exception\RuntimeException('This is the exception');
     };
@@ -497,7 +497,7 @@ $fn = function () use ($ffn) {
         return intval($value);
     };
 
-    $fnCatch = function (\Throwable $e, $null, $result) {
+    $fnCatch = function (\Throwable $e, $input, $null, $result) {
         echo '> fnCatch' . "\n";
 
         if ($e instanceof \RuntimeException) {
@@ -511,10 +511,10 @@ $fn = function () use ($ffn) {
         1 => 'new_result',
     ];
 
-    $fnMiddleware = function ($fnNext, $value) {
+    $fnMiddleware = function ($fnNext, $input) {
         echo '> fnMiddleware::before' . "\n";
 
-        $result = $fnNext($value);
+        $result = $fnNext($input);
 
         echo '> fnMiddleware::after' . "\n";
 
