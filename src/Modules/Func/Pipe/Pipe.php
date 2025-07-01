@@ -27,7 +27,7 @@ class Pipe
     protected $queueCount = 0;
 
     /**
-     * @var array{ 0?: array }
+     * @var array{ 0?: mixed }
      */
     protected $context = [];
     /**
@@ -50,7 +50,7 @@ class Pipe
     protected $fnCallUserFuncArgs;
 
 
-    public function __invoke($value, ?array &$context = null, ...$args)
+    public function __invoke($value, array $context = [], ...$args)
     {
         $result = $this->run($value, $context, $args);
 
@@ -211,7 +211,7 @@ class Pipe
     }
 
 
-    public function run($input = null, ?array &$context = null, array $argsRun = [])
+    public function run($input = null, array $context = [], array $argsRun = [])
     {
         $this->queueStep = 0;
 
@@ -220,8 +220,8 @@ class Pipe
 
         $this->input = [ $input ];
 
-        if (null === $context) {
-            $this->context = [ &$context ];
+        if (isset($context[ 0 ])) {
+            $this->context = [ &$context[ 0 ] ];
         }
 
         $fnCallUserFuncArray = $this->fnCallUserFuncArray ?? [ $this, 'call_user_func_array' ];
@@ -314,16 +314,24 @@ class Pipe
                     /**
                      * @var static $pipeChild
                      */
+
                     $pipeChild = $step[ 'child' ];
 
-                    $fnNext = static function (
+                    $hasContext = isset($this->context[ 0 ]);
+                    $refContext = null;
+                    if ($hasContext) {
+                        $refContext =& $this->context[ 0 ];
+                    }
+
+                    $fnNext = function (
                         $value, array $args = []
                     ) use (
-                        $pipeChild, &$refContext
+                        $pipeChild,
+                        $hasContext, &$refContext
                     ) {
                         return $pipeChild->run(
                             $value,
-                            $refContext,
+                            ($hasContext ? [ &$refContext ] : []),
                             $args
                         );
                     };
@@ -409,15 +417,9 @@ class Pipe
         array ...$argsLists
     ) : array
     {
-        $args = [];
+        $args = $inputArgs;
 
-        if ([] !== $inputArgs) {
-            $args = $inputArgs;
-        }
-
-        if ([] !== $contextArgs) {
-            $args[] = $contextArgs;
-        }
+        $args[] = $contextArgs;
 
         if ([] !== $argsLists) {
             $arrayArgs = [];
@@ -427,18 +429,15 @@ class Pipe
             }
 
             $arrayArgs[] = null;
+            $arrayArgsKeyLast = array_key_last($arrayArgs);
 
-            $argLast = array_key_last($arrayArgs);
+            $arrayArgs += array_fill(0, $arrayArgsKeyLast, null);
 
-            $arrayArgs += array_fill(0, $argLast, null);
-            unset($arrayArgs[ $argLast ]);
+            unset($arrayArgs[ $arrayArgsKeyLast ]);
 
             ksort($arrayArgs);
 
-            $args = array_merge(
-                $args,
-                $arrayArgs
-            );
+            $args[] = $arrayArgs;
         }
 
         return $args;

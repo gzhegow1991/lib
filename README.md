@@ -516,18 +516,19 @@ $fn = function () use ($ffn) {
         return intval($value);
     };
 
-    $fnCatch = function (\Throwable $e, $input, $context, $null, $result) {
+    $fnCatch = function (\Throwable $e, $input, $context, array $args = []) {
         echo '> fnCatch' . "\n";
 
         if ($e instanceof \RuntimeException) {
-            return $result;
+            return $args[ 2 ];
         }
 
         return $e;
     };
     $fnCatchArgs = [
-        // 0 => null, // > нулевой ключ будет добавлен и заполнен NULL
-        1 => 'new_result',
+        // 0 => null, // > ключ будет добавлен и заполнен NULL
+        // 1 => null, // > ключ будет добавлен и заполнен NULL
+        2 => 'new_result',
     ];
 
     $fnMiddleware = function ($fnNext, $input) {
@@ -574,13 +575,15 @@ $fn = function () use ($ffn) {
         ->endMiddleware()
     ;
 
-    $result = $pipe(0);
+
+    $result = $pipe->run(0);
     $ffn->print($result);
     echo "\n";
 
-    $result = $pipe(1);
+    $result = $pipe->run(1);
     $ffn->print($result);
     echo "\n";
+
 
     $result = $pipe('');
     $ffn->print($result);
