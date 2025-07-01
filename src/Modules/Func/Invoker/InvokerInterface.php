@@ -14,7 +14,8 @@ interface InvokerInterface
      *
      * @return T
      */
-    public function new(string $className, array $options = []) : object;
+    public function newInvokeObject(string $className, array $args = [], array $options = []) : object;
+
 
     /**
      * @param callable|GenericCallable $fn

@@ -16,9 +16,15 @@ class DefaultInvoker implements InvokerInterface
      *
      * @return T
      */
-    public function new(string $className, array $options = []) : object
+    public function newInvokeObject(string $className, array $args = [], array $options = []) : object
     {
-        return new $className();
+        $list = [];
+
+        if ([] !== $args) {
+            [ $list ] = Lib::arr()->kwargs($args);
+        }
+
+        return new $className(...$list);
     }
 
 
@@ -36,7 +42,7 @@ class DefaultInvoker implements InvokerInterface
 
             } elseif ($fn->isMethod()) {
                 if ($fn->hasMethodClass($className)) {
-                    $cbObj = $this->new($fn->getMethodClass(), [ 'args' => $args ]);
+                    $cbObj = $this->newInvokeObject($fn->getMethodClass(), $args);
 
                 } else {
                     $cbObj = $fn->getMethodObject();
@@ -46,7 +52,7 @@ class DefaultInvoker implements InvokerInterface
 
             } elseif ($fn->isInvokable()) {
                 if ($fn->hasInvokableClass($className)) {
-                    $cb = $this->new($className, [ 'args' => $args ]);
+                    $cb = $this->newInvokeObject($className, $args);
 
                 } else {
                     $cb = $fn->getInvokableObject();
@@ -88,7 +94,7 @@ class DefaultInvoker implements InvokerInterface
 
             } elseif ($fn->isMethod()) {
                 if ($fn->hasMethodClass($className)) {
-                    $cbObj = $this->new($fn->getMethodClass(), [ 'args' => $args ]);
+                    $cbObj = $this->newInvokeObject($fn->getMethodClass(), $args);
 
                 } else {
                     $cbObj = $fn->getMethodObject();
@@ -98,7 +104,7 @@ class DefaultInvoker implements InvokerInterface
 
             } elseif ($fn->isInvokable()) {
                 if ($fn->hasInvokableClass($className)) {
-                    $cb = $this->new($className, [ 'args' => $args ]);
+                    $cb = $this->newInvokeObject($className, $args);
 
                 } else {
                     $cb = $fn->getInvokableObject();

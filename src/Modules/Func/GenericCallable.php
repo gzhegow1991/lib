@@ -5,7 +5,6 @@ namespace Gzhegow\Lib\Modules\Func;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Php\Result\Ret;
 use Gzhegow\Lib\Modules\Php\Result\Result;
-use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Func\Invoker\InvokerInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\CanIsSameInterface;
 
@@ -15,11 +14,6 @@ class GenericCallable implements
     //
     CanIsSameInterface
 {
-    /**
-     * @var InvokerInterface
-     */
-    protected $invoker;
-
     /**
      * @var string
      */
@@ -85,60 +79,11 @@ class GenericCallable implements
 
     private function __construct()
     {
-        $this->invoker = Lib::func()->invoker();
     }
 
-    public function __invoke(...$values)
+    public function __invoke(InvokerInterface $invoker, ...$values)
     {
-        if (null !== $this->invoker) {
-            $result = $this->invoker->callUserFuncArray($this, $values);
-
-        } else {
-            if ($this->isClosure) {
-                $fn = $this->closureObject;
-
-            } elseif ($this->isMethod) {
-                if (null !== $this->methodObject) {
-                    $fn = [ $this->methodObject, $this->methodName ];
-
-                } else {
-                    // > ! static
-                    $fn = [ $this->methodClass, $this->methodName ];
-                }
-
-            } elseif ($this->isInvokable) {
-                if (null !== $this->invokableObject) {
-                    $fn = $this->invokableObject;
-
-                } else {
-                    $className = $this->invokableClass;
-
-                    // > ! factory
-                    $fn = new $className();
-                }
-
-            } elseif ($this->isFunction) {
-                if (null !== $this->functionStringNonInternal) {
-                    $fn = $this->functionStringNonInternal;
-
-                } else {
-                    $fnString = $this->functionStringInternal;
-
-                    $fn = static function (...$args) use ($fnString) {
-                        return Lib::func()->call_user_func_array($fnString, $args);
-                    };
-                }
-
-            } else {
-                throw new RuntimeException(
-                    [ 'Unable to extract callable from: ' . GenericCallable::class, $this ]
-                );
-            }
-
-            $result = call_user_func_array($fn, $values);
-        }
-
-        return $result;
+        return $invoker->callUserFuncArray($this, $values);
     }
 
 
@@ -421,16 +366,6 @@ class GenericCallable implements
         $instance->key = "\"{$_function}\"";
 
         return Result::ok($ret, $instance);
-    }
-
-
-    public function setInvoker(?InvokerInterface $invoker) : ?InvokerInterface
-    {
-        $last = $this->invoker;
-
-        $this->invoker = $invoker;
-
-        return $last;
     }
 
 
