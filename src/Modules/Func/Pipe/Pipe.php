@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Func\Pipe;
 
+use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\Runtime\PipeException;
 
 
@@ -47,12 +48,6 @@ class Pipe
 
     public function __invoke($value, ?array $context = null, ...$args)
     {
-        if ([] !== $args) {
-            array_unshift($args, null);
-
-            unset($args[ 0 ]);
-        }
-
         $result = $this->run($value, $context, $args);
 
         return $result;
@@ -227,7 +222,7 @@ class Pipe
                                 $step[ 'fn' ],
                                 $fnCallUserFuncArgs(
                                     [ 0 => $this->input[ 0 ] ],
-                                    ($hasContext ? [ 1 => &$refContext ] : []),
+                                    $refContext,
                                     $args,
                                     $step[ 'args' ]
                                 )
@@ -242,7 +237,7 @@ class Pipe
                                 $step[ 'fn' ],
                                 $fnCallUserFuncArgs(
                                     [ 0 => $this->input[ 0 ] ],
-                                    ($hasContext ? [ 1 => &$refContext ] : []),
+                                    $refContext,
                                     $args,
                                     $step[ 'args' ]
                                 )
@@ -259,7 +254,7 @@ class Pipe
                                 $step[ 'fn' ],
                                 $fnCallUserFuncArgs(
                                     [ 0 => $this->input[ 0 ] ],
-                                    ($hasContext ? [ 1 => &$refContext ] : []),
+                                    $refContext,
                                     $args,
                                     $step[ 'args' ]
                                 )
@@ -278,7 +273,7 @@ class Pipe
                                 $step[ 'fn' ],
                                 $fnCallUserFuncArgs(
                                     [ 0 => $this->exception[ 0 ] ],
-                                    ($hasContext ? [ 1 => &$refContext ] : []),
+                                    $refContext,
                                     $args,
                                     $step[ 'args' ]
                                 )
@@ -322,7 +317,7 @@ class Pipe
                                         0 => $fnNext,
                                         1 => $this->input[ 0 ],
                                     ],
-                                    ($hasContext ? [ 2 => &$refContext ] : []),
+                                    $refContext,
                                     $args,
                                     $step[ 'args' ]
                                 )
@@ -354,20 +349,39 @@ class Pipe
         return call_user_func_array($fn, $args);
     }
 
-    protected function call_user_func_args(array ...$arrays) : array
+    protected function call_user_func_args(
+        array $inputArgs,
+        ?array &$context = null,
+        array ...$arrayArgsList
+    ) : array
     {
-        $args = [];
-        foreach ( $arrays as $arr ) {
-            $args += $arr;
+        $args = $inputArgs;
+
+        if (null !== $context) {
+            $args[] = &$context;
         }
 
-        $args[] = null;
+        if ([] !== $arrayArgsList) {
+            $arrayArgs = [];
 
-        $last = array_key_last($args);
-        $args += array_fill(0, $last, null);
-        unset($args[ $last ]);
+            foreach ( $arrayArgsList as $arr ) {
+                $arrayArgs += $arr;
+            }
 
-        ksort($args);
+            $arrayArgs[] = null;
+
+            $last = array_key_last($arrayArgs);
+            $arrayArgs += array_fill(0, $last, null);
+            unset($arrayArgs[ $last ]);
+
+            ksort($arrayArgs);
+
+            $args = array_merge(
+                $args,
+                $arrayArgs
+            );
+
+        }
 
         return $args;
     }

@@ -506,7 +506,10 @@ $fn = function () use ($ffn) {
 
         return $e;
     };
-    $fnCatchArgs = [ 2 => 'new_result' ];
+    $fnCatchArgs = [
+        // 0 => null, // > нулевой ключ будет добавлен и заполнен NULL
+        1 => 'new_result',
+    ];
 
     $fnMiddleware = function ($fnNext, $value) {
         echo '> fnMiddleware::before' . "\n";
