@@ -474,54 +474,161 @@ $fn = function () use ($ffn) {
     $ffn->print('[ Pipe ]');
     echo "\n";
 
-    $fn = \Gzhegow\Lib\Lib::func()->newPipe();
+    $fnStrval = function ($value) {
+        echo '> fnStrval' . "\n";
 
-    $fn
+        return strval($value);
+    };
+    $fnStrlen = function ($value) {
+        echo '> fnStrlen' . "\n";
+
+        return strlen($value);
+    };
+    $fnTapCustom = function ($value) use ($ffn) {
+        echo '> fnTapCustom' . "\n";
+
+        $ffn->print($value);
+
+        throw new \Gzhegow\Lib\Exception\RuntimeException('This is the exception');
+    };
+    $fnIntval = function ($value) {
+        echo '> fnIntval' . "\n";
+
+        return intval($value);
+    };
+
+    $fnCatch = function (\Throwable $e, $null, $result) {
+        echo '> fnCatch' . "\n";
+
+        if ($e instanceof \RuntimeException) {
+            return $result;
+        }
+
+        return $e;
+    };
+    $fnCatchArgs = [ 2 => 'new_result' ];
+
+    $fnMiddleware = function ($fnNext, $value) {
+        echo '> fnMiddleware::before' . "\n";
+
+        $result = $fnNext($value);
+
+        echo '> fnMiddleware::after' . "\n";
+
+        return $result;
+    };
+    $fnMiddlewareStep1 = function ($input) {
+        echo '> fnMiddlewareStep1' . "\n";
+
+        return $input . '1';
+    };
+    $fnMiddlewareStep2 = function ($input) {
+        echo '> fnMiddlewareStep2' . "\n";
+
+        return $input . '2';
+    };
+
+    $pipe = \Gzhegow\Lib\Lib::func()->newPipe();
+    $pipe
         // > этот шаг может заменить значение, в данном случае приведя его к строке
-        ->map('strval')
+        ->map($fnStrval)
         //
         // > этот шаг может очистить значение (в последующих шаг будет использоваться NULL)
-        ->filter('strlen')
+        ->filter($fnStrlen)
         //
         // > этот шаг может выполнить сторонние действия, а возврат метода игнорируется
-        ->tap(function ($value) use ($ffn) {
-            echo 'Hello World! Your value is: [ ' . $ffn->value($value) . ' ]' . "\n";
-
-            throw new \Gzhegow\Lib\Exception\RuntimeException('This is the exception');
-        })
+        ->tap($fnTapCustom)
         //
         // > этот шаг никогда не начнется, поскольку в прошлом шаге было выброшено исключение
-        ->map('intval')
+        ->map($fnIntval)
         //
         // > или можно обрабатывать исключения обычным способом через callable
-        ->catch(function (\Throwable $e, $null, $result) {
-            if ($e instanceof \RuntimeException) {
-                return $result;
-            }
-
-            return $e;
-        }, $arguments = [ 2 => 'catch' ])
+        ->catch($fnCatch, $fnCatchArgs)
+        //
+        // > ещё можно добавить обёртки-middleware
+        ->middleware($fnMiddleware)
+        /**/ ->map($fnMiddlewareStep1)
+        /**/ ->map($fnMiddlewareStep2)
+        ->end()
     ;
 
-    $result = $fn('');
+    $result = $pipe(0);
     $ffn->print($result);
+    echo "\n";
 
-    $result = $fn(1);
+    $result = $pipe(1);
     $ffn->print($result);
+    echo "\n";
 
-    $result = $fn('0');
+    $result = $pipe('');
+    $ffn->print($result);
+    echo "\n";
+
+    $result = $pipe('0');
+    $ffn->print($result);
+    echo "\n";
+
+    $result = $pipe('1');
     $ffn->print($result);
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
 "[ Pipe ]"
 
-Hello World! Your value is: [ NULL ]
-"catch"
-Hello World! Your value is: [ "1" ]
-"catch"
-Hello World! Your value is: [ "0" ]
-"catch"
+> fnStrval
+> fnStrlen
+> fnTapCustom
+"0"
+> fnCatch
+> fnMiddleware::before
+> fnMiddlewareStep1
+> fnMiddlewareStep2
+> fnMiddleware::after
+"new_result12"
+
+> fnStrval
+> fnStrlen
+> fnTapCustom
+"1"
+> fnCatch
+> fnMiddleware::before
+> fnMiddlewareStep1
+> fnMiddlewareStep2
+> fnMiddleware::after
+"new_result12"
+
+> fnStrval
+> fnStrlen
+> fnTapCustom
+NULL
+> fnCatch
+> fnMiddleware::before
+> fnMiddlewareStep1
+> fnMiddlewareStep2
+> fnMiddleware::after
+"new_result12"
+
+> fnStrval
+> fnStrlen
+> fnTapCustom
+"0"
+> fnCatch
+> fnMiddleware::before
+> fnMiddlewareStep1
+> fnMiddlewareStep2
+> fnMiddleware::after
+"new_result12"
+
+> fnStrval
+> fnStrlen
+> fnTapCustom
+"1"
+> fnCatch
+> fnMiddleware::before
+> fnMiddlewareStep1
+> fnMiddlewareStep2
+> fnMiddleware::after
+"new_result12"
 ');
 $test->run();
 

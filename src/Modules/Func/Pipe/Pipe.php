@@ -8,21 +8,48 @@ use Gzhegow\Lib\Exception\Runtime\PipeException;
 class Pipe
 {
     /**
+     * @var static
+     */
+    protected $parent;
+
+    /**
      * @var array[]
      */
     protected $queue = [];
-
     /**
-     * @var array{ 0?: mixed }
+     * @var int
      */
-    protected $value = [];
+    protected $queueStep = 0;
+    /**
+     * @var int
+     */
+    protected $queueCount = 0;
+
     /**
      * @var array{ 0?: \Throwable}
      */
     protected $exception = [];
 
+    /**
+     * @var array{ 0?: mixed }
+     */
+    protected $input = [];
+    // /**
+    //  * @var array{ 0?: array }
+    //  */
+    // protected $context = [];
 
-    public function __invoke($value, ...$args)
+    /**
+     * @var callable
+     */
+    protected $fnCallUserFuncArray;
+    /**
+     * @var callable
+     */
+    protected $fnCallUserFuncArgs;
+
+
+    public function __invoke($value, ?array $context = null, ...$args)
     {
         if ([] !== $args) {
             array_unshift($args, null);
@@ -30,9 +57,30 @@ class Pipe
             unset($args[ 0 ]);
         }
 
-        $result = $this->run($value, $args);
+        $result = $this->run($value, $context, $args);
 
         return $result;
+    }
+
+
+    /**
+     * @param callable $fnCallUserFuncArray
+     */
+    public function setFnCallUserFuncArray($fnCallUserFuncArray)
+    {
+        $this->fnCallUserFuncArray = $fnCallUserFuncArray;
+
+        return $this;
+    }
+
+    /**
+     * @param callable $fnCallUserFuncArgs
+     */
+    public function setFnCallUserFuncArgs($fnCallUserFuncArgs)
+    {
+        $this->fnCallUserFuncArgs = $fnCallUserFuncArgs;
+
+        return $this;
     }
 
 
@@ -48,6 +96,8 @@ class Pipe
             'fn'   => $fn,
             'args' => $args,
         ];
+
+        $this->queueCount++;
 
         return $this;
     }
@@ -65,8 +115,11 @@ class Pipe
             'args' => $args,
         ];
 
+        $this->queueCount++;
+
         return $this;
     }
+
 
     /**
      * @param callable $fn
@@ -81,8 +134,11 @@ class Pipe
             'args' => $args,
         ];
 
+        $this->queueCount++;
+
         return $this;
     }
+
 
     /**
      * @param callable $fn
@@ -97,58 +153,175 @@ class Pipe
             'args' => $args,
         ];
 
+        $this->queueCount++;
+
         return $this;
     }
 
 
-    public function run($value = null, array $args = [])
+    /**
+     * @param callable $fn
+     *
+     * @return static
+     */
+    public function middleware($fn, array $args = [])
     {
-        $this->value = [ $value ];
+        $child = new static();
+        $child->parent = $this;
+
+        $this->queue[] = [
+            'type'  => __FUNCTION__,
+            'fn'    => $fn,
+            'args'  => $args,
+            'child' => $child,
+        ];
+
+        $this->queueCount++;
+
+        return $child;
+    }
+
+    /**
+     * @return static
+     */
+    public function end()
+    {
+        return $this->parent;
+    }
+
+
+    public function run($input = null, ?array &$context = null, array $args = [])
+    {
+        $this->queueStep = 0;
+
         $this->exception = [];
 
-        foreach ( $this->queue as $step ) {
+        $this->input = [ $input ];
+
+        $hasContext = (null !== $context);
+        $refContext = null;
+        if ($hasContext) {
+            $refContext =& $context;
+        }
+
+        $fnCallUserFuncArray = $this->fnCallUserFuncArray ?? [ $this, 'call_user_func_array' ];
+        $fnCallUserFuncArgs = $this->fnCallUserFuncArgs ?? [ $this, 'call_user_func_args' ];
+
+        for ( $i = $this->queueStep; $i < $this->queueCount; $i++ ) {
+            $this->queueStep = $i;
+
+            $step = $this->queue[ $this->queueStep ];
+
             try {
                 switch ( $step[ 'type' ] ) {
                     case 'tap':
-                        call_user_func_array(
-                            $step[ 'fn' ],
-                            $this->args($this->value, $args, $step[ 'args' ])
-                        );
+                        if ([] === $this->exception) {
+                            $fnCallUserFuncArray(
+                                $step[ 'fn' ],
+                                $fnCallUserFuncArgs(
+                                    [ 0 => $this->input[ 0 ] ],
+                                    ($hasContext ? [ 1 => &$refContext ] : []),
+                                    $args,
+                                    $step[ 'args' ]
+                                )
+                            );
+                        }
 
                         break;
 
                     case 'map':
-                        $result = call_user_func_array(
-                            $step[ 'fn' ],
-                            $this->args($this->value, $args, $step[ 'args' ])
-                        );
+                        if ([] === $this->exception) {
+                            $result = $fnCallUserFuncArray(
+                                $step[ 'fn' ],
+                                $fnCallUserFuncArgs(
+                                    [ 0 => $this->input[ 0 ] ],
+                                    ($hasContext ? [ 1 => &$refContext ] : []),
+                                    $args,
+                                    $step[ 'args' ]
+                                )
+                            );
 
-                        $this->value = [ $result ];
+                            $this->input = [ $result ];
+                        }
 
                         break;
 
                     case 'filter':
-                        $status = call_user_func_array(
-                            $step[ 'fn' ],
-                            $this->args($this->value, $args, $step[ 'args' ])
-                        );
+                        if ([] === $this->exception) {
+                            $status = $fnCallUserFuncArray(
+                                $step[ 'fn' ],
+                                $fnCallUserFuncArgs(
+                                    [ 0 => $this->input[ 0 ] ],
+                                    ($hasContext ? [ 1 => &$refContext ] : []),
+                                    $args,
+                                    $step[ 'args' ]
+                                )
+                            );
 
-                        if (! $status) {
-                            $this->value = [ null ];
+                            if (! $status) {
+                                $this->input = [ null ];
+                            }
                         }
 
                         break;
 
                     case 'catch':
-                        if ($this->exception) {
-                            $result = call_user_func_array(
+                        if ([] !== $this->exception) {
+                            $result = $fnCallUserFuncArray(
                                 $step[ 'fn' ],
-                                $this->args($this->exception, $args, $step[ 'args' ])
+                                $fnCallUserFuncArgs(
+                                    [ 0 => $this->exception[ 0 ] ],
+                                    ($hasContext ? [ 1 => &$refContext ] : []),
+                                    $args,
+                                    $step[ 'args' ]
+                                )
                             );
 
-                            $this->value = [ $result ];
+                            if ($result instanceof \Throwable) {
+                                $this->exception = [ $result ];
 
-                            $this->exception = null;
+                            } else {
+                                $this->exception = [];
+
+                                $this->input = [ $result ];
+                            }
+                        }
+
+                        break;
+
+                    case 'middleware':
+                        if ([] === $this->exception) {
+                            /**
+                             * @var static $pipeChild
+                             */
+                            $pipeChild = $step[ 'child' ];
+
+                            $fnNext = static function (
+                                $value, array $args = []
+                            ) use (
+                                $pipeChild, &$refContext
+                            ) {
+                                return $pipeChild->run(
+                                    $value,
+                                    $refContext,
+                                    $args
+                                );
+                            };
+
+                            $result = $fnCallUserFuncArray(
+                                $step[ 'fn' ],
+                                $fnCallUserFuncArgs(
+                                    [
+                                        0 => $fnNext,
+                                        1 => $this->input[ 0 ],
+                                    ],
+                                    ($hasContext ? [ 2 => &$refContext ] : []),
+                                    $args,
+                                    $step[ 'args' ]
+                                )
+                            );
+
+                            $this->input = [ $result ];
                         }
 
                         break;
@@ -160,14 +333,21 @@ class Pipe
         }
 
         if ($this->exception) {
-            throw new PipeException('Unhandled exception during processing pipeline', $this->exception[ 0 ]);
+            throw new PipeException(
+                'Unhandled exception during processing pipeline', $this->exception[ 0 ]
+            );
         }
 
-        return $this->value[ 0 ];
+        return $this->input[ 0 ];
     }
 
 
-    protected function args(array ...$arrays) : array
+    protected function call_user_func_array($fn, array $args = [])
+    {
+        return call_user_func_array($fn, $args);
+    }
+
+    protected function call_user_func_args(array ...$arrays) : array
     {
         $args = [];
         foreach ( $arrays as $arr ) {
