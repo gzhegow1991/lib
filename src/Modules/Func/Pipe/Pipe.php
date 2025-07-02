@@ -43,9 +43,7 @@ class Pipe
 
     public function __invoke($input = null, ?PipeContext $context = null, ...$args)
     {
-        $result = $this->invoke($input, $context, $args);
-
-        return $result;
+        return $this->invoke($input, $context, $args);
     }
 
     public function invoke($input = null, ?PipeContext $context = null, array $args = [])
@@ -181,7 +179,7 @@ class Pipe
     /**
      * @return static
      */
-    public function context(PipeContext $context)
+    public function setContext(?PipeContext $context)
     {
         $this->context = $context;
 
@@ -191,7 +189,7 @@ class Pipe
     /**
      * @return static
      */
-    public function throwable(\Throwable $e)
+    public function setThrowable(?\Throwable $e)
     {
         $this->exception = $e;
 
