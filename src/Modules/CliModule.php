@@ -108,7 +108,9 @@ class CliModule
         }
 
         if (null !== $var) {
-            Lib::debug()->d($var, ...$vars);
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+            Lib::debugDumper()->d($trace, $var, ...$vars);
         }
 
         echo '> Press ENTER to continue...' . "\n";
