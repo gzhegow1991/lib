@@ -4,6 +4,7 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
 
 
 class UrlModule
@@ -22,10 +23,18 @@ class UrlModule
     {
         $r = null;
 
-        $_value = $this->url($url, $query, $fragment, $refs);
+        try {
+            $result = $this->url(
+                $url, $query, $fragment,
+                $refs
+            );
+        }
+        catch ( \Throwable $e ) {
+            $result = null;
+        }
 
-        if (null !== $_value) {
-            $r = $_value;
+        if (null !== $result) {
+            $r = $result;
 
             return true;
         }
@@ -45,10 +54,15 @@ class UrlModule
     {
         $r = null;
 
-        $_value = $this->host($url, $refs);
+        try {
+            $result = $this->host($url, $refs);
+        }
+        catch ( \Throwable $e ) {
+            $result = null;
+        }
 
-        if (null !== $_value) {
-            $r = $_value;
+        if (null !== $result) {
+            $r = $result;
 
             return true;
         }
@@ -70,10 +84,15 @@ class UrlModule
     {
         $r = null;
 
-        $_value = $this->link($url, $query, $fragment, $refs);
+        try {
+            $result = $this->link($url, $query, $fragment, $refs);
+        }
+        catch ( \Throwable $e ) {
+            $result = null;
+        }
 
-        if (null !== $_value) {
-            $r = $_value;
+        if (null !== $result) {
+            $r = $result;
 
             return true;
         }
@@ -92,6 +111,8 @@ class UrlModule
         array $refs = []
     ) : ?string
     {
+        $theType = Lib::type();
+
         $withParseUrl = array_key_exists(0, $refs);
         if ($withParseUrl) {
             $refParseUrl =& $refs[ 0 ];
@@ -101,14 +122,15 @@ class UrlModule
         $hasQuery = (null !== $query);
         $hasFragment = (null !== $fragment);
 
-        if ('' === $url) {
-            $url = $this->url_current();
-
-        } elseif (null === $url) {
+        if (null === $url) {
             return null;
         }
 
-        if (! Lib::type()->string_not_empty($urlString, $url)) {
+        $_url = null
+            ?? (('' === $url) ? $this->link_current() : null)
+            ?? $url;
+
+        if (! $theType->string_not_empty($_urlString, $_url)) {
             return null;
         }
 
@@ -134,7 +156,7 @@ class UrlModule
         }
 
         if (null === $refParseUrl) {
-            $refParseUrl = parse_url($urlString);
+            $refParseUrl = parse_url($_urlString);
 
             if (false === $refParseUrl) {
                 return null;
@@ -142,9 +164,9 @@ class UrlModule
         }
 
         if (empty($refParseUrl[ 'host' ])) {
-            $urlString = $this->host_current() . '/' . ltrim($urlString, '/');
+            $_urlString = $this->host_current() . '/' . ltrim($_urlString, '/');
 
-            $refParseUrl = parse_url($urlString);
+            $refParseUrl = parse_url($_urlString);
 
             if (false === $refParseUrl) {
                 return null;
@@ -165,13 +187,15 @@ class UrlModule
             unset($refParseUrl[ 'query' ]);
 
         } else {
+            $theHttp = Lib::http();
+
             $httpQuery = null;
             if ($hasQuery && $wasQuery) {
-                $httpQuery = Lib::http()->build_query_array($refParseUrl[ 'query' ], $_query);
+                $httpQuery = $theHttp->build_query_array($refParseUrl[ 'query' ], $_query);
                 $httpQuery = http_build_query($httpQuery);
 
             } elseif ($hasQuery) {
-                $httpQuery = Lib::http()->build_query_array($_query);
+                $httpQuery = $theHttp->build_query_array($_query);
                 $httpQuery = http_build_query($httpQuery);
 
             } elseif ($wasQuery) {
@@ -190,11 +214,11 @@ class UrlModule
             }
         }
 
-        $urlString = $this->url_build($refParseUrl);
+        $result = $this->url_build($refParseUrl);
 
         unset($refParseUrl);
 
-        return $urlString;
+        return $result;
     }
 
     /**
@@ -205,25 +229,28 @@ class UrlModule
         array $refs = []
     ) : ?string
     {
+        $theType = Lib::type();
+
         $withParseUrl = array_key_exists(0, $refs);
         if ($withParseUrl) {
             $refParseUrl =& $refs[ 0 ];
         }
         $refParseUrl = null;
 
-        if ('' === $url) {
-            $url = $this->host_current();
-
-        } elseif (null === $url) {
+        if (null === $url) {
             return null;
         }
 
-        if (! Lib::type()->string_not_empty($_url, $url)) {
+        $_url = null
+            ?? (('' === $url) ? $this->link_current() : null)
+            ?? $url;
+
+        if (! $theType->string_not_empty($_urlString, $_url)) {
             return null;
         }
 
         if (null === $refParseUrl) {
-            $refParseUrl = parse_url($_url);
+            $refParseUrl = parse_url($_urlString);
 
             if (false === $refParseUrl) {
                 return null;
@@ -231,9 +258,9 @@ class UrlModule
         }
 
         if (empty($refParseUrl[ 'host' ])) {
-            $_url = $this->host_current() . '/' . ltrim($_url, '/');
+            $_urlString = $this->host_current() . '/' . ltrim($_urlString, '/');
 
-            $refParseUrl = parse_url($_url);
+            $refParseUrl = parse_url($_urlString);
 
             if (false === $refParseUrl) {
                 return null;
@@ -244,11 +271,11 @@ class UrlModule
         $refParseUrl[ 'query' ] = null;
         $refParseUrl[ 'fragment' ] = null;
 
-        $_url = $this->url_build($refParseUrl);
+        $result = $this->url_build($refParseUrl);
 
         unset($refParseUrl);
 
-        return $_url;
+        return $result;
     }
 
     /**
@@ -261,6 +288,8 @@ class UrlModule
         array $refs = []
     ) : ?string
     {
+        $theType = Lib::type();
+
         $withParseUrl = array_key_exists(0, $refs);
         if ($withParseUrl) {
             $refParseUrl =& $refs[ 0 ];
@@ -270,14 +299,15 @@ class UrlModule
         $hasQuery = (null !== $query);
         $hasFragment = (null !== $fragment);
 
-        if ('' === $url) {
-            $url = $this->link_current();
-
-        } elseif (null === $url) {
+        if (null === $url) {
             return null;
         }
 
-        if (! Lib::type()->string_not_empty($_url, $url)) {
+        $_url = null
+            ?? (('' === $url) ? $this->link_current() : null)
+            ?? $url;
+
+        if (! $theType->string_not_empty($_urlString, $_url)) {
             return null;
         }
 
@@ -303,7 +333,7 @@ class UrlModule
         }
 
         if (null === $refParseUrl) {
-            $refParseUrl = parse_url($_url);
+            $refParseUrl = parse_url($_urlString);
 
             if (false === $refParseUrl) {
                 return null;
@@ -327,13 +357,15 @@ class UrlModule
             unset($refParseUrl[ 'query' ]);
 
         } else {
+            $theHttp = Lib::http();
+
             $httpQuery = null;
             if ($hasQuery && $wasQuery) {
-                $httpQuery = Lib::http()->build_query_array($refParseUrl[ 'query' ], $_query);
+                $httpQuery = $theHttp->build_query_array($refParseUrl[ 'query' ], $_query);
                 $httpQuery = http_build_query($httpQuery);
 
             } elseif ($hasQuery) {
-                $httpQuery = Lib::http()->build_query_array($_query);
+                $httpQuery = $theHttp->build_query_array($_query);
                 $httpQuery = http_build_query($httpQuery);
 
             } elseif ($wasQuery) {
@@ -358,11 +390,11 @@ class UrlModule
         $refParseUrl[ 'host' ] = null;
         $refParseUrl[ 'port' ] = null;
 
-        $_link = $this->link_build($refParseUrl);
+        $result = $this->link_build($refParseUrl);
 
         unset($refParseUrl);
 
-        return $_link;
+        return $result;
     }
 
 
@@ -378,21 +410,29 @@ class UrlModule
 
     public function host_current() : string
     {
+        if (! isset($_SERVER[ 'HTTP_HOST' ])) {
+            throw new RuntimeException(
+                [ 'The `SERVER[HTTP_HOST]` is required', $_SERVER ]
+            );
+        }
+
+        $serverHttpHost = $_SERVER[ 'HTTP_HOST' ];
+
         $serverHttps = $_SERVER[ 'HTTPS' ] ?? null;
+        $serverPhpAuthUser = $_SERVER[ 'PHP_AUTH_USER' ] ?? null;
+        $serverPhpAuthPw = $_SERVER[ 'PHP_AUTH_PW' ] ?? null;
+        $serverPort = $_SERVER[ 'SERVER_PORT' ] ?? null;
+
         $scheme = ($serverHttps && ($serverHttps !== 'off')) ? 'https' : 'http';
         $isScheme = '://';
 
-        $serverPhpAuthUser = $_SERVER[ 'PHP_AUTH_USER' ] ?? null;
-        $serverPhpAuthPw = $_SERVER[ 'PHP_AUTH_PW' ] ?? null;
         $user = $serverPhpAuthUser ?: '';
         $pass = $serverPhpAuthPw ?: '';
         $isPass = $pass ? ':' : '';
         $isUserAndPass = ($user || $pass) ? '@' : '';
 
-        $serverHttpHost = $_SERVER[ 'HTTP_HOST' ] ?? null;
         $host = $serverHttpHost ?: '';
 
-        $serverPort = $_SERVER[ 'SERVER_PORT' ] ?? null;
         $port = in_array($serverPort, [ 80, 443 ]) ? '' : $serverPort;
         $isPort = $port ? ':' : '';
 
@@ -413,11 +453,19 @@ class UrlModule
 
     public function link_current() : string
     {
-        $serverRequestUri = $_SERVER[ 'REQUEST_URI' ] ?? null;
+        if (! isset($_SERVER[ 'REQUEST_URI' ])) {
+            throw new RuntimeException(
+                [ 'The `SERVER[REQUEST_URI]` is required', $_SERVER ]
+            );
+        }
+
+        $serverRequestUri = $_SERVER[ 'REQUEST_URI' ];
+
+        $serverQueryString = $_SERVER[ 'QUERY_STRING' ] ?? null;
+
         $requestUri = $serverRequestUri ?: '';
         [ $requestUri, $queryString ] = explode('?', $requestUri, 2) + [ '', null ];
 
-        $serverQueryString = $_SERVER[ 'QUERY_STRING' ] ?? null;
         $queryString = $serverQueryString ?? $queryString ?? '';
         $isQueryString = $queryString ? '?' : null;
 
@@ -431,23 +479,23 @@ class UrlModule
     }
 
 
-    public function url_referrer($url = '') : ?string
+    public function url_referrer($url = null) : ?string
     {
-        $result = $this->url($_SERVER[ 'HTTP_REFERER' ] ?? $url);
+        $result = $this->url($url ?? $_SERVER[ 'HTTP_REFERER' ] ?? '');
 
         return $result;
     }
 
-    public function host_referrer($url = '') : ?string
+    public function host_referrer($url = null) : ?string
     {
-        $result = $this->host($_SERVER[ 'HTTP_REFERER' ] ?? $url);
+        $result = $this->host($url ?? $_SERVER[ 'HTTP_REFERER' ] ?? '');
 
         return $result;
     }
 
-    public function link_referrer($url = '') : ?string
+    public function link_referrer($url = null) : ?string
     {
-        $result = $this->link($_SERVER[ 'HTTP_REFERER' ] ?? $url);
+        $result = $this->link($url ?? $_SERVER[ 'HTTP_REFERER' ] ?? '');
 
         return $result;
     }

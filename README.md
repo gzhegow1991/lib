@@ -5404,42 +5404,54 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    $result = \Gzhegow\Lib\Lib::url()->url($src = 'https://google.com/hello/world');
-    $ffn->print($src, (bool) $result);
+    $status = \Gzhegow\Lib\Lib::url()->type_url($result, $src = 'https://google.com/hello/world');
+    $ffn->print($src, $status, $result);
 
-    $result = \Gzhegow\Lib\Lib::url()->url($src = ':hello/world');
-    $ffn->print($src, (bool) $result);
+    $status = \Gzhegow\Lib\Lib::url()->type_url($result, $src = ':hello/world');
+    $ffn->print($src, $status, $result);
 
-    echo "\n";
-
-
-    $result = \Gzhegow\Lib\Lib::url()->host($src = 'https://google.com/hello/world');
-    $ffn->print($src, (bool) $result);
-
-    $result = \Gzhegow\Lib\Lib::url()->host($src = ':hello/world');
-    $ffn->print($src, (bool) $result);
+    $status = \Gzhegow\Lib\Lib::url()->type_url($result, $src = '/');
+    $ffn->print($src, $status, $result);
 
     echo "\n";
 
 
-    $result = \Gzhegow\Lib\Lib::url()->link($src = 'https://google.com/hello/world');
-    $ffn->print($src, (bool) $result);
+    $status = \Gzhegow\Lib\Lib::url()->type_host($result, $src = 'https://google.com/hello/world');
+    $ffn->print($src, $status, $result);
 
-    $result = \Gzhegow\Lib\Lib::url()->link($src = ':hello/world');
-    $ffn->print($src, (bool) $result);
+    $status = \Gzhegow\Lib\Lib::url()->type_host($result, $src = ':hello/world');
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_host($result, $src = '/');
+    $ffn->print($src, $status, $result);
+
+    echo "\n";
+
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = 'https://google.com/hello/world');
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = ':hello/world');
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = '/');
+    $ffn->print($src, $status, $result);
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
 "[ UrlModule ]"
 
-"https://google.com/hello/world" | TRUE
-":hello/world" | FALSE
+"https://google.com/hello/world" | TRUE | "https://google.com/hello/world"
+":hello/world" | FALSE | NULL
+"/" | FALSE | NULL
 
-"https://google.com/hello/world" | TRUE
-":hello/world" | FALSE
+"https://google.com/hello/world" | TRUE | "https://google.com"
+":hello/world" | FALSE | NULL
+"/" | FALSE | NULL
 
-"https://google.com/hello/world" | TRUE
-":hello/world" | FALSE
+"https://google.com/hello/world" | TRUE | "/hello/world"
+":hello/world" | FALSE | NULL
+"/" | TRUE | "/"
 ');
 $test->run();
 ```
