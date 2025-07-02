@@ -211,21 +211,27 @@ class Pipe
     }
 
 
-    public function run($input = null, array $context = [], array $argsRun = [])
+    public function run($input = null, array $context = [], array $args = [])
     {
-        $this->queueStep = 0;
-
-        $this->context = [];
-        $this->exception = [];
-
-        $this->input = [ $input ];
-
         if (isset($context[ 0 ])) {
             $this->context = [ &$context[ 0 ] ];
         }
 
-        $fnCallUserFuncArray = $this->fnCallUserFuncArray ?? [ $this, 'call_user_func_array' ];
-        $fnCallUserFuncArgs = $this->fnCallUserFuncArgs ?? [ $this, 'call_user_func_args' ];
+        $result = $this->doRun($input, $args);
+
+        return $result;
+    }
+
+    protected function doRun($input, array $argsRun = [])
+    {
+        $this->queueStep = 0;
+
+        $this->exception = [];
+
+        $this->input = [ $input ];
+
+        $fnCallUserFuncArray = $this->fnCallUserFuncArray ?? [ $this, 'callUserFuncArray' ];
+        $fnCallUserFuncArgs = $this->fnCallUserFuncArgs ?? [ $this, 'callUserFuncArgs' ];
 
         $argsContext = $this->context;
 
@@ -311,27 +317,19 @@ class Pipe
                         continue;
                     }
 
-                    /**
-                     * @var static $pipeChild
-                     */
+                    $pipeChild = $this->stepPipeChild($step);
 
-                    $pipeChild = $step[ 'child' ];
-
-                    $hasContext = isset($this->context[ 0 ]);
-                    $refContext = null;
-                    if ($hasContext) {
-                        $refContext =& $this->context[ 0 ];
-                    }
+                    $pipeChild->fnCallUserFuncArray = $fnCallUserFuncArray;
+                    $pipeChild->fnCallUserFuncArgs = $fnCallUserFuncArgs;
+                    $pipeChild->context($this->context[ 0 ]);
 
                     $fnNext = function (
                         $value, array $args = []
                     ) use (
-                        $pipeChild,
-                        $hasContext, &$refContext
+                        $pipeChild
                     ) {
-                        return $pipeChild->run(
+                        return $pipeChild->doRun(
                             $value,
-                            ($hasContext ? [ &$refContext ] : []),
                             $args
                         );
                     };
@@ -390,28 +388,34 @@ class Pipe
 
         if ([] === $this->exception) {
             return $this->input[ 0 ];
-
-        } else {
-            if (null === $this->parent) {
-                $e = $this->exception[ 0 ];
-
-                throw new PipeException(
-                    [ 'Unhandled exception during processing pipeline', $e ], $e
-                );
-
-            } else {
-                $this->parent->exception = $this->exception;
-
-                return null;
-            }
         }
+
+        if (null !== $this->parent) {
+            $this->parent->exception = $this->exception;
+
+            return null;
+        }
+
+        throw new PipeException(
+            [ 'Unhandled exception during processing pipeline', $this->exception[ 0 ] ],
+            $this->exception[ 0 ]
+        );
+    }
+
+
+    /**
+     * @return static
+     */
+    protected function stepPipeChild(array $step)
+    {
+        return $step[ 'child' ];
     }
 
 
     /**
      * @return mixed
      */
-    protected function call_user_func_array(
+    protected function callUserFuncArray(
         $fn,
         array $args = []
     )
@@ -419,20 +423,20 @@ class Pipe
         return call_user_func_array($fn, $args);
     }
 
-    protected function call_user_func_args(
+    protected function callUserFuncArgs(
         array $inputArgs,
         array $contextArgs,
-        array ...$argsLists
+        array ...$argsList
     ) : array
     {
         $args = $inputArgs;
 
         $args[] = $contextArgs;
 
-        if ([] !== $argsLists) {
+        if ([] !== $argsList) {
             $arrayArgs = [];
 
-            foreach ( $argsLists as $argsItem ) {
+            foreach ( $argsList as $argsItem ) {
                 $arrayArgs += $argsItem;
             }
 
