@@ -107,7 +107,7 @@ class UrlModule
      * @param false|string|null       $fragment
      */
     public function url(
-        $url = '', $query = null, $fragment = null,
+        ?string $url = '', $query = null, $fragment = null,
         array $refs = []
     ) : ?string
     {
@@ -225,7 +225,7 @@ class UrlModule
      * @param string $url
      */
     public function host(
-        $url = '',
+        ?string $url = '',
         array $refs = []
     ) : ?string
     {
@@ -284,7 +284,7 @@ class UrlModule
      * @param string|null       $fragment
      */
     public function link(
-        $url = '', $query = null, $fragment = null,
+        ?string $url = '', $query = null, $fragment = null,
         array $refs = []
     ) : ?string
     {
@@ -479,21 +479,21 @@ class UrlModule
     }
 
 
-    public function url_referrer($url = null) : ?string
+    public function url_referrer(?string $url = null) : ?string
     {
         $result = $this->url($url ?? $_SERVER[ 'HTTP_REFERER' ] ?? '');
 
         return $result;
     }
 
-    public function host_referrer($url = null) : ?string
+    public function host_referrer(?string $url = null) : ?string
     {
         $result = $this->host($url ?? $_SERVER[ 'HTTP_REFERER' ] ?? '');
 
         return $result;
     }
 
-    public function link_referrer($url = null) : ?string
+    public function link_referrer(?string $url = null) : ?string
     {
         $result = $this->link($url ?? $_SERVER[ 'HTTP_REFERER' ] ?? '');
 
