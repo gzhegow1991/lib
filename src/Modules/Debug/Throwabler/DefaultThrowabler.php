@@ -92,14 +92,14 @@ class DefaultThrowabler implements ThrowablerInterface
     /**
      * @return string[]
      */
-    public function getPreviousMessageList(\Throwable $throwable, ?int $flags = null) : array
+    public function getPreviousMessageFirstList(\Throwable $throwable, ?int $flags = null) : array
     {
         $lines = [];
 
         $array = $this->getPreviousArray($throwable);
 
         foreach ( $array as $dotpath => $e ) {
-            $message = $this->getThrowableMessage($e, $flags);
+            $message = $this->getThrowableMessageFirst($e, $flags);
             $message = "[ {$dotpath} ] {$message}";
 
             $level = substr_count($dotpath, '.');
@@ -120,7 +120,7 @@ class DefaultThrowabler implements ThrowablerInterface
     /**
      * @return string[]
      */
-    public function getPreviousMessageLines(\Throwable $throwable, ?int $flags = null) : array
+    public function getPreviousMessageFirstLines(\Throwable $throwable, ?int $flags = null) : array
     {
         $lines = [];
 
@@ -128,7 +128,7 @@ class DefaultThrowabler implements ThrowablerInterface
 
         $first = true;
         foreach ( $array as $dotpath => $e ) {
-            $messageLines = $this->getThrowableMessageLines($e, $flags);
+            $messageLines = $this->getThrowableMessageFirstLines($e, $flags);
             $messageLinesCnt = count($messageLines);
 
             $messageLines[ 0 ] = "[ {$dotpath} ] {$messageLines[ 0 ]}";
@@ -160,7 +160,7 @@ class DefaultThrowabler implements ThrowablerInterface
     /**
      * @return string[]
      */
-    public function getPreviousMessagesList(\Throwable $throwable, ?int $flags = null) : array
+    public function getPreviousMessagesAllList(\Throwable $throwable, ?int $flags = null) : array
     {
         $lines = [];
 
@@ -168,7 +168,7 @@ class DefaultThrowabler implements ThrowablerInterface
 
         $first = true;
         foreach ( $array as $dotpath => $e ) {
-            $messagesLines = $this->getThrowableMessages($e, $flags);
+            $messagesLines = $this->getThrowableMessagesAll($e, $flags);
 
             if (! $first) {
                 array_unshift($messagesLines, '');
@@ -196,7 +196,7 @@ class DefaultThrowabler implements ThrowablerInterface
     /**
      * @return string[]
      */
-    public function getPreviousMessagesLines(\Throwable $throwable, ?int $flags = null) : array
+    public function getPreviousMessagesAllLines(\Throwable $throwable, ?int $flags = null) : array
     {
         $lines = [];
 
@@ -204,7 +204,7 @@ class DefaultThrowabler implements ThrowablerInterface
 
         $first = true;
         foreach ( $array as $dotpath => $e ) {
-            $messagesLines = $this->getThrowableMessagesLines($e, $flags);
+            $messagesLines = $this->getThrowableMessagesAllLines($e, $flags);
             $messagesLinesCnt = count($messagesLines);
 
             $messagesLines[ 0 ] = "[ {$dotpath} ] {$messagesLines[ 0 ]}";
@@ -259,7 +259,7 @@ class DefaultThrowabler implements ThrowablerInterface
     }
 
 
-    public function getThrowableMessage(\Throwable $throwable, ?int $flags = null) : string
+    public function getThrowableMessageFirst(\Throwable $throwable, ?int $flags = null) : string
     {
         $eMessage = $throwable->getMessage();
 
@@ -273,13 +273,13 @@ class DefaultThrowabler implements ThrowablerInterface
     /**
      * @return string[]
      */
-    public function getThrowableMessageLines(\Throwable $throwable, ?int $flags = null) : array
+    public function getThrowableMessageFirstLines(\Throwable $throwable, ?int $flags = null) : array
     {
         $flags = $this->flagsDefault($flags);
 
         $withCode = $flags & _DEBUG_THROWABLE_WITH_CODE;
 
-        $eMessage = $this->getThrowableMessage($throwable, $flags);
+        $eMessage = $this->getThrowableMessageFirst($throwable, $flags);
 
         $lines = [];
 
@@ -308,7 +308,7 @@ class DefaultThrowabler implements ThrowablerInterface
     /**
      * @return string[]
      */
-    public function getThrowableMessages(\Throwable $throwable, ?int $flags = null) : array
+    public function getThrowableMessagesAll(\Throwable $throwable, ?int $flags = null) : array
     {
         if ($throwable instanceof HasMessageListInterface) {
             $throwableMap = array_fill_keys($throwable->getMessageList(), $throwable);
@@ -325,13 +325,13 @@ class DefaultThrowabler implements ThrowablerInterface
     /**
      * @return string[]
      */
-    public function getThrowableMessagesLines(\Throwable $throwable, ?int $flags = null) : array
+    public function getThrowableMessagesAllLines(\Throwable $throwable, ?int $flags = null) : array
     {
         $flags = $this->flagsDefault($flags);
 
         $withCode = $flags & _DEBUG_THROWABLE_WITH_CODE;
 
-        $eMessages = $this->getThrowableMessages($throwable, $flags);
+        $eMessages = $this->getThrowableMessagesAll($throwable, $flags);
 
         $lines = [];
 
@@ -559,6 +559,7 @@ class DefaultThrowabler implements ThrowablerInterface
                 $mbEncodingList = mb_list_encodings();
 
                 array_unshift($mbEncodingList, 'CP1251');
+                array_unshift($mbEncodingList, 'CP866');
 
                 $eMessageUtf8 = mb_convert_encoding(
                     $eMessage,

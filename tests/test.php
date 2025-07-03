@@ -22,6 +22,8 @@ require_once __DIR__ . '/../vendor/autoload.php';
     ->useMaxExecutionTime()
     ->useMaxInputTime()
     //
+    ->useObImplicitFlush()
+    //
     ->useTimezoneDefault()
     //
     ->usePostMaxSize()
@@ -359,9 +361,7 @@ $fn = function () use ($ffn) {
     $eeee1 = new \Exception('eeee1', 0);
     $eeee2 = new \Exception('eeee2', 0);
 
-    $eee0 = new \Gzhegow\Lib\Exception\LogicException('eee');
-    $eee0->addPrevious($eeee1);
-    $eee0->addPrevious($eeee2);
+    $eee0 = new \Gzhegow\Lib\Exception\LogicException('eee', $eeee1, $eeee2);
 
     $ee1 = new \Exception('ee1', 0, $previous = $eee0);
     $ee2 = new \Exception('ee2', 0, $previous = $eee0);
@@ -369,7 +369,9 @@ $fn = function () use ($ffn) {
     $previousList = [ $ee1, $ee2 ];
     $e0 = new \Gzhegow\Lib\Exception\RuntimeException('e', 0, ...$previousList);
 
-    $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesLines($e0, _DEBUG_THROWABLE_WITHOUT_FILE);
+    $messages = \Gzhegow\Lib\Lib::debugThrowabler()
+        ->getPreviousMessagesAllLines($e0, _DEBUG_THROWABLE_WITHOUT_FILE)
+    ;
 
     echo implode("\n", $messages);
 };
@@ -1054,7 +1056,7 @@ $fn = function () use ($ffn) {
         \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx);
     }
     catch ( \Throwable $e ) {
-        $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesLines($e, _DEBUG_THROWABLE_WITHOUT_FILE);
+        $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesAllLines($e, _DEBUG_THROWABLE_WITHOUT_FILE);
 
         echo implode("\n", $messages) . "\n";
         echo "\n";
@@ -1068,7 +1070,7 @@ $fn = function () use ($ffn) {
             && ResultTest::string_not_empty($ctx->getResult(), $ctx);
     }
     catch ( \Throwable $e ) {
-        $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesLines($e, _DEBUG_THROWABLE_WITHOUT_FILE);
+        $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesAllLines($e, _DEBUG_THROWABLE_WITHOUT_FILE);
 
         echo implode("\n", $messages) . "\n";
         echo "\n";
@@ -1082,7 +1084,7 @@ $fn = function () use ($ffn) {
             ?? ResultTest::string_not_empty($ctx->getResult(), $ctx);
     }
     catch ( \Throwable $e ) {
-        $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesLines($e, _DEBUG_THROWABLE_WITHOUT_FILE);
+        $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesAllLines($e, _DEBUG_THROWABLE_WITHOUT_FILE);
 
         echo implode("\n", $messages) . "\n";
         echo "\n";

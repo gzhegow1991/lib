@@ -17,22 +17,41 @@ class LogicException extends \LogicException implements
     {
         $args = Lib::php()->throwable_args(...$throwableArgs);
 
-        $this->messageList = array_values($args[ 'messageList' ]);
-        $this->messageObjectList = array_values($args[ 'messageObjectList' ]);
+        $message = $args[ 'message' ];
+        $messageList = array_values($args[ 'messageList' ]);
+        $messageObjectList = array_values($args[ 'messageObjectList' ]);
 
-        $this->previousList = array_values($args[ 'previousList' ]);
+        $previous = $args[ 'previous' ];
+        $hasPrevious = (null !== $previous);
 
-        $cnt = count($args[ 'messageList' ]);
+        $this->messageList = $messageList;
+        $this->messageObjectList = $messageObjectList;
 
-        if ($cnt > 1) {
-            $args[ 'message' ] = 'Multiple errors occured: ' . $cnt;
+        $errorsCount = count($messageList);
+        if ($hasPrevious) {
+            $previousList = array_values($args[ 'previousList' ]);
+
+            $errorsCount += count($previousList);
+            $errorsCount -= 1;
+
+            $this->previousList = $previousList;
+        }
+
+        if ($errorsCount > 1) {
+            $message = "[ TOTAL: {$errorsCount} ] {$message}";
         }
 
         parent::__construct(
-            $args[ 'message' ],
+            $message,
             $args[ 'code' ],
             $args[ 'previous' ]
         );
+
+        if ($hasPrevious) {
+            $theDebugThrowabler = Lib::debugThrowabler();
+
+            $this->previousMessageList = $theDebugThrowabler->getPreviousMessagesAllList($this);
+        }
     }
 
 

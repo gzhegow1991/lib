@@ -11,7 +11,7 @@ interface HasPreviousListInterface
     public function getPreviousList() : array;
 
     /**
-     * @return static
+     * @return string[]
      */
-    public function addPrevious(\Throwable $e);
+    public function getPreviousMessageList() : array;
 }

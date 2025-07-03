@@ -29,23 +29,23 @@ interface ThrowablerInterface
     /**
      * @return string[]
      */
-    public function getPreviousMessageList(\Throwable $throwable, ?int $flags = null) : array;
+    public function getPreviousMessageFirstList(\Throwable $throwable, ?int $flags = null) : array;
 
     /**
      * @return string[]
      */
-    public function getPreviousMessageLines(\Throwable $throwable, ?int $flags = null) : array;
+    public function getPreviousMessageFirstLines(\Throwable $throwable, ?int $flags = null) : array;
 
 
     /**
      * @return string[]
      */
-    public function getPreviousMessagesList(\Throwable $throwable, ?int $flags = null) : array;
+    public function getPreviousMessagesAllList(\Throwable $throwable, ?int $flags = null) : array;
 
     /**
      * @return string[]
      */
-    public function getPreviousMessagesLines(\Throwable $throwable, ?int $flags = null) : array;
+    public function getPreviousMessagesAllLines(\Throwable $throwable, ?int $flags = null) : array;
 
 
     /**
@@ -59,23 +59,23 @@ interface ThrowablerInterface
     public function catchPrevious(\Throwable $throwable, string $throwableClass = '') : ?\Throwable;
 
 
-    public function getThrowableMessage(\Throwable $throwable, ?int $flags = null) : string;
+    public function getThrowableMessageFirst(\Throwable $throwable, ?int $flags = null) : string;
 
     /**
      * @return string[]
      */
-    public function getThrowableMessageLines(\Throwable $throwable, ?int $flags = null) : array;
+    public function getThrowableMessageFirstLines(\Throwable $throwable, ?int $flags = null) : array;
 
 
     /**
      * @return string[]
      */
-    public function getThrowableMessages(\Throwable $throwable, ?int $flags = null) : array;
+    public function getThrowableMessagesAll(\Throwable $throwable, ?int $flags = null) : array;
 
     /**
      * @return string[]
      */
-    public function getThrowableMessagesLines(\Throwable $throwable, ?int $flags = null) : array;
+    public function getThrowableMessagesAllLines(\Throwable $throwable, ?int $flags = null) : array;
 
 
     public function getThrowableInfo(\Throwable $throwable, ?int $flags = null) : array;

@@ -17,21 +17,41 @@ class RuntimeException extends \RuntimeException implements
     {
         $args = Lib::php()->throwable_args(...$throwableArgs);
 
-        $this->messageList = array_values($args[ 'messageList' ]);
-        $this->messageObjectList = array_values($args[ 'messageObjectList' ]);
-        $this->previousList = array_values($args[ 'previousList' ]);
+        $message = $args[ 'message' ];
+        $messageList = array_values($args[ 'messageList' ]);
+        $messageObjectList = array_values($args[ 'messageObjectList' ]);
 
-        $cnt = count($args[ 'messageList' ]);
+        $previous = $args[ 'previous' ];
+        $hasPrevious = (null !== $previous);
 
-        if ($cnt > 1) {
-            $args[ 'message' ] = 'Multiple errors occured: ' . $cnt;
+        $this->messageList = $messageList;
+        $this->messageObjectList = $messageObjectList;
+
+        $errorsCount = count($messageList);
+        if ($hasPrevious) {
+            $previousList = array_values($args[ 'previousList' ]);
+
+            $errorsCount += count($previousList);
+            $errorsCount -= 1;
+
+            $this->previousList = $previousList;
+        }
+
+        if ($errorsCount > 1) {
+            $message = "[ TOTAL: {$errorsCount} ] {$message}";
         }
 
         parent::__construct(
-            $args[ 'message' ],
+            $message,
             $args[ 'code' ],
             $args[ 'previous' ]
         );
+
+        if ($hasPrevious) {
+            $theDebugThrowabler = Lib::debugThrowabler();
+
+            $this->previousMessageList = $theDebugThrowabler->getPreviousMessagesAllList($this);
+        }
     }
 
 

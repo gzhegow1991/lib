@@ -16,6 +16,10 @@ trait HasPreviousListTrait
      * @var \Throwable[]
      */
     protected $previousList = [];
+    /**
+     * @var array
+     */
+    protected $previousMessageList = [];
 
 
     /**
@@ -27,12 +31,10 @@ trait HasPreviousListTrait
     }
 
     /**
-     * @return static
+     * @return string[]
      */
-    public function addPrevious(\Throwable $e)
+    public function getPreviousMessageList() : array
     {
-        $this->previousList[] = $e;
-
-        return $this;
+        return $this->previousMessageList;
     }
 }

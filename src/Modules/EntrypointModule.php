@@ -1086,7 +1086,7 @@ class EntrypointModule
 
         $theThrowabler->setDirRoot($this->dirRoot);
 
-        $messageLines = $theThrowabler->getPreviousMessagesLines(
+        $messageLines = $theThrowabler->getPreviousMessagesAllLines(
             $throwable,
             0
             | _DEBUG_THROWABLE_WITH_CODE
