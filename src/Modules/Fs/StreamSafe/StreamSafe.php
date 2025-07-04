@@ -4,6 +4,7 @@ namespace Gzhegow\Lib\Modules\Fs\StreamSafe;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class StreamSafe
@@ -17,7 +18,7 @@ class StreamSafe
     public function __construct()
     {
         if (! extension_loaded('fileinfo')) {
-            throw new RuntimeException(
+            throw new ExtensionException(
                 'Missing PHP extension: fileinfo'
             );
         }

@@ -6,6 +6,7 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Php\Result\Ret;
 use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class FormatCsv
@@ -13,7 +14,7 @@ class FormatCsv
     public function __construct()
     {
         if (! extension_loaded('fileinfo')) {
-            throw new RuntimeException(
+            throw new ExtensionException(
                 'Missing PHP extension: fileinfo'
             );
         }

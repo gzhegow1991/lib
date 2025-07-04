@@ -10,6 +10,7 @@ use Gzhegow\Lib\Modules\Fs\FileSafe\FileSafe;
 use Gzhegow\Lib\Modules\Fs\StreamSafe\StreamSafe;
 use Gzhegow\Lib\Modules\Fs\SocketSafe\SocketSafe;
 use Gzhegow\Lib\Modules\Fs\FileSafe\FileSafeProxy;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 use Gzhegow\Lib\Modules\Fs\StreamSafe\StreamSafeProxy;
 use Gzhegow\Lib\Exception\Runtime\FilesystemException;
 use Gzhegow\Lib\Modules\Fs\SocketSafe\SocketSafeProxy;
@@ -35,7 +36,7 @@ class FsModule
     public function __construct()
     {
         if (! extension_loaded('fileinfo')) {
-            throw new RuntimeException(
+            throw new ExtensionException(
                 'Missing PHP extension: fileinfo'
             );
         }

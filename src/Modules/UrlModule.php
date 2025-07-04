@@ -5,112 +5,30 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class UrlModule
 {
     /**
-     * @param string|null       $r
-     * @param string            $url
-     * @param string|array|null $query
-     * @param string|null       $fragment
+     * @param string|null             $r
+     *
+     * @param string|true             $url
+     * @param string|false|array|null $query
+     * @param string|false|null       $fragment
      */
     public function type_url(
         &$r,
         $url, $query = null, $fragment = null,
+        ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null,
         array $refs = []
     ) : bool
     {
         $r = null;
 
-        try {
-            $result = $this->url(
-                $url, $query, $fragment,
-                $refs
-            );
-        }
-        catch ( \Throwable $e ) {
-            $result = null;
-        }
+        $isHostIdnaAscii = $isHostIdnaAscii ?? 0;
+        $isLinkUrlencoded = $isLinkUrlencoded ?? 0;
 
-        if (null !== $result) {
-            $r = $result;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string|null $r
-     * @param string      $url
-     */
-    public function type_host(
-        &$r,
-        $url,
-        array $refs = []
-    ) : bool
-    {
-        $r = null;
-
-        try {
-            $result = $this->host($url, $refs);
-        }
-        catch ( \Throwable $e ) {
-            $result = null;
-        }
-
-        if (null !== $result) {
-            $r = $result;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param string|null       $r
-     * @param string            $url
-     * @param string|array|null $query
-     * @param string|null       $fragment
-     */
-    public function type_link(
-        &$r,
-        $url, $query = null, $fragment = null,
-        array $refs = []
-    ) : bool
-    {
-        $r = null;
-
-        try {
-            $result = $this->link($url, $query, $fragment, $refs);
-        }
-        catch ( \Throwable $e ) {
-            $result = null;
-        }
-
-        if (null !== $result) {
-            $r = $result;
-
-            return true;
-        }
-
-        return false;
-    }
-
-
-    /**
-     * @param string                  $url
-     * @param false|string|array|null $query
-     * @param false|string|null       $fragment
-     */
-    public function url(
-        ?string $url = '', $query = null, $fragment = null,
-        array $refs = []
-    ) : ?string
-    {
         $theType = Lib::type();
 
         $withParseUrl = array_key_exists(0, $refs);
@@ -123,15 +41,14 @@ class UrlModule
         $hasFragment = (null !== $fragment);
 
         if (null === $url) {
-            return null;
+            return false;
         }
 
-        $_url = null
-            ?? (('' === $url) ? $this->link_current() : null)
-            ?? $url;
+        if (true === $url) {
+            $urlString = $this->url_current();
 
-        if (! $theType->string_not_empty($_urlString, $_url)) {
-            return null;
+        } elseif (! $theType->string_not_empty($urlString, $url)) {
+            return false;
         }
 
         $_query = null
@@ -155,29 +72,85 @@ class UrlModule
             );
         }
 
-        if (null === $refParseUrl) {
-            $refParseUrl = parse_url($_urlString);
+        $refParseUrl = parse_url($urlString);
 
-            if (false === $refParseUrl) {
-                return null;
-            }
+        if (false === $refParseUrl) {
+            return false;
         }
 
         if (empty($refParseUrl[ 'host' ])) {
-            $_urlString = $this->host_current() . '/' . ltrim($_urlString, '/');
+            if (! isset($_SERVER[ 'HTTP_HOST' ])) {
+                return false;
+            }
 
-            $refParseUrl = parse_url($_urlString);
+            $urlString = $this->host_current() . '/' . ltrim($urlString, '/');
+
+            $refParseUrl = parse_url($urlString);
 
             if (false === $refParseUrl) {
-                return null;
+                return false;
+            }
+        }
+
+        if (isset($refParseUrl[ 'host' ])) {
+            if (false
+                || (-2 === $isHostIdnaAscii)
+                || (-1 === $isHostIdnaAscii)
+                || (1 === $isHostIdnaAscii)
+                || (2 === $isHostIdnaAscii)
+            ) {
+                if (! extension_loaded('intl')) {
+                    throw new ExtensionException(
+                        'Missing PHP extension: intl'
+                    );
+                }
+
+                if (-2 === $isHostIdnaAscii) {
+                    $utf8 = idn_to_utf8($refParseUrl[ 'host' ]);
+
+                    if (false === $utf8) {
+                        return false;
+                    }
+
+                    $refParseUrl[ 'host' ] = $utf8;
+
+                } elseif (-1 === $isHostIdnaAscii) {
+                    $test = $refParseUrl[ 'host' ];
+
+                    if (idn_to_utf8($test) !== $test) {
+                        return false;
+                    }
+
+                } elseif (1 === $isHostIdnaAscii) {
+                    $test = $refParseUrl[ 'host' ];
+
+                    if (idn_to_ascii($test) !== $test) {
+                        return false;
+                    }
+
+                } elseif (2 === $isHostIdnaAscii) {
+                    $ascii = idn_to_ascii($refParseUrl[ 'host' ]);
+
+                    if (false === $ascii) {
+                        return false;
+                    }
+
+                    $refParseUrl[ 'host' ] = $ascii;
+                }
             }
         }
 
         if (isset($refParseUrl[ 'path' ])) {
-            $test = str_replace('/', '', $refParseUrl[ 'path' ]);
+            if (1 === $isLinkUrlencoded) {
+                $test = str_replace('/', '', $refParseUrl[ 'path' ]);
 
-            if (urlencode($test) !== $test) {
-                return null;
+                if (urlencode($test) !== $test) {
+                    return false;
+                }
+
+            } elseif (2 === $isLinkUrlencoded) {
+                $refParseUrl[ 'path' ] = urlencode($refParseUrl[ 'path' ]);
+                $refParseUrl[ 'path' ] = str_replace('%2F', '/', $refParseUrl[ 'path' ]);
             }
         }
 
@@ -218,17 +191,27 @@ class UrlModule
 
         unset($refParseUrl);
 
-        return $result;
+        $r = $result;
+
+        return true;
     }
 
     /**
-     * @param string $url
+     * @param string|null $r
+     *
+     * @param string|true $url
      */
-    public function host(
-        ?string $url = '',
+    public function type_host(
+        &$r,
+        $url,
+        ?int $isIdnaAscii = null,
         array $refs = []
-    ) : ?string
+    ) : bool
     {
+        $r = null;
+
+        $isIdnaAscii = $isIdnaAscii ?? 0;
+
         $theType = Lib::type();
 
         $withParseUrl = array_key_exists(0, $refs);
@@ -238,32 +221,79 @@ class UrlModule
         $refParseUrl = null;
 
         if (null === $url) {
-            return null;
+            return false;
         }
 
-        $_url = null
-            ?? (('' === $url) ? $this->link_current() : null)
-            ?? $url;
+        if (true === $url) {
+            $urlString = $this->url_current();
 
-        if (! $theType->string_not_empty($_urlString, $_url)) {
-            return null;
+        } elseif (! $theType->string_not_empty($urlString, $url)) {
+            return false;
         }
 
-        if (null === $refParseUrl) {
-            $refParseUrl = parse_url($_urlString);
+        $refParseUrl = parse_url($urlString);
 
-            if (false === $refParseUrl) {
-                return null;
-            }
+        if (false === $refParseUrl) {
+            return false;
         }
 
         if (empty($refParseUrl[ 'host' ])) {
-            $_urlString = $this->host_current() . '/' . ltrim($_urlString, '/');
+            if (! isset($_SERVER[ 'HTTP_HOST' ])) {
+                return false;
+            }
 
-            $refParseUrl = parse_url($_urlString);
+            $urlString = $this->host_current() . '/' . ltrim($urlString, '/');
+
+            $refParseUrl = parse_url($urlString);
 
             if (false === $refParseUrl) {
-                return null;
+                return false;
+            }
+        }
+
+        if (false
+            || (-2 === $isIdnaAscii)
+            || (-1 === $isIdnaAscii)
+            || (1 === $isIdnaAscii)
+            || (2 === $isIdnaAscii)
+        ) {
+            if (! extension_loaded('intl')) {
+                throw new ExtensionException(
+                    'Missing PHP extension: intl'
+                );
+            }
+
+            if (-2 === $isIdnaAscii) {
+                $utf8 = idn_to_utf8($refParseUrl[ 'host' ]);
+
+                if (false === $utf8) {
+                    return false;
+                }
+
+                $refParseUrl[ 'host' ] = $utf8;
+
+            } elseif (-1 === $isIdnaAscii) {
+                $test = $refParseUrl[ 'host' ];
+
+                if (idn_to_utf8($test) !== $test) {
+                    return false;
+                }
+
+            } elseif (1 === $isIdnaAscii) {
+                $test = $refParseUrl[ 'host' ];
+
+                if (idn_to_ascii($test) !== $test) {
+                    return false;
+                }
+
+            } elseif (2 === $isIdnaAscii) {
+                $ascii = idn_to_ascii($refParseUrl[ 'host' ]);
+
+                if (false === $ascii) {
+                    return false;
+                }
+
+                $refParseUrl[ 'host' ] = $ascii;
             }
         }
 
@@ -271,23 +301,33 @@ class UrlModule
         $refParseUrl[ 'query' ] = null;
         $refParseUrl[ 'fragment' ] = null;
 
-        $result = $this->url_build($refParseUrl);
+        $result = $this->host_build($refParseUrl);
 
         unset($refParseUrl);
 
-        return $result;
+        $r = $result;
+
+        return true;
     }
 
     /**
-     * @param string            $url
-     * @param string|array|null $query
-     * @param string|null       $fragment
+     * @param string|null             $r
+     *
+     * @param string|true             $url
+     * @param string|false|array|null $query
+     * @param string|false|null       $fragment
      */
-    public function link(
-        ?string $url = '', $query = null, $fragment = null,
+    public function type_link(
+        &$r,
+        $url, $query = null, $fragment = null,
+        ?int $isUrlencoded = null,
         array $refs = []
-    ) : ?string
+    ) : bool
     {
+        $r = null;
+
+        $isUrlencoded = $isUrlencoded ?? 0;
+
         $theType = Lib::type();
 
         $withParseUrl = array_key_exists(0, $refs);
@@ -296,19 +336,15 @@ class UrlModule
         }
         $refParseUrl = null;
 
-        $hasQuery = (null !== $query);
-        $hasFragment = (null !== $fragment);
-
         if (null === $url) {
-            return null;
+            return false;
         }
 
-        $_url = null
-            ?? (('' === $url) ? $this->link_current() : null)
-            ?? $url;
+        if (true === $url) {
+            $urlString = $this->link_current();
 
-        if (! $theType->string_not_empty($_urlString, $_url)) {
-            return null;
+        } elseif (! $theType->string_not_empty($urlString, $url)) {
+            return false;
         }
 
         $_query = null
@@ -320,11 +356,15 @@ class UrlModule
             ?? ((false === $fragment) ? false : null)
             ?? (is_string($fragment) ? $fragment : null);
 
+        $hasQuery = (null !== $query);
+
         if ($hasQuery && (null === $_query)) {
             throw new LogicException(
                 [ 'The `query` should be a string, an array or a false', $query ]
             );
         }
+
+        $hasFragment = (null !== $fragment);
 
         if ($hasFragment && (null === $_fragment)) {
             throw new LogicException(
@@ -332,23 +372,26 @@ class UrlModule
             );
         }
 
-        if (null === $refParseUrl) {
-            $refParseUrl = parse_url($_urlString);
+        $refParseUrl = parse_url($urlString);
 
-            if (false === $refParseUrl) {
-                return null;
-            }
+        if (false === $refParseUrl) {
+            return false;
         }
 
         if (! isset($refParseUrl[ 'path' ])) {
-            return null;
+            return false;
+        }
 
-        } else {
+        if (1 === $isUrlencoded) {
             $test = str_replace('/', '', $refParseUrl[ 'path' ]);
 
             if (urlencode($test) !== $test) {
-                return null;
+                return false;
             }
+
+        } elseif (2 === $isUrlencoded) {
+            $refParseUrl[ 'path' ] = urlencode($refParseUrl[ 'path' ]);
+            $refParseUrl[ 'path' ] = str_replace('%2F', '/', $refParseUrl[ 'path' ]);
         }
 
         $wasQuery = isset($refParseUrl[ 'query' ]);
@@ -394,7 +437,65 @@ class UrlModule
 
         unset($refParseUrl);
 
-        return $result;
+        $r = $result;
+
+        return true;
+    }
+
+
+    /**
+     * @param string|true             $url
+     * @param string|false|array|null $query
+     * @param string|false|null       $fragment
+     */
+    public function url(
+        $url = true, $query = null, $fragment = null,
+        ?int $toHostIdnaAscii = null, ?int $toLinkUrlencoded = null
+    ) : string
+    {
+        $this->type_url(
+            $urlString,
+            $url, $query, $fragment,
+            $toHostIdnaAscii, $toLinkUrlencoded
+        );
+
+        return $urlString;
+    }
+
+    /**
+     * @param string|true $url
+     */
+    public function host(
+        $url = true,
+        ?int $toIdnaAscii = null
+    ) : string
+    {
+        $this->type_host(
+            $hostString,
+            $url,
+            $toIdnaAscii
+        );
+
+        return $hostString;
+    }
+
+    /**
+     * @param string|true             $url
+     * @param string|false|array|null $query
+     * @param string|false|null       $fragment
+     */
+    public function link(
+        $url = true, $query = null, $fragment = null,
+        ?int $toLinkUrlencoded = null
+    ) : ?string
+    {
+        $this->type_link(
+            $linkString,
+            $url, $query, $fragment,
+            $toLinkUrlencoded
+        );
+
+        return $linkString;
     }
 
 
@@ -479,23 +580,47 @@ class UrlModule
     }
 
 
-    public function url_referrer(?string $url = null) : ?string
+    public function url_referrer(
+        $url = null, $query = null, $fragment = null,
+        ?int $toHostIdnaAscii = null, ?int $toLinkUrlencoded = null
+    ) : string
     {
-        $result = $this->url($url ?? $_SERVER[ 'HTTP_REFERER' ] ?? '');
+        $url = $url ?? $_SERVER[ 'HTTP_REFERER' ] ?? true;
+
+        $result = $this->url(
+            $url, $query, $fragment,
+            $toHostIdnaAscii, $toLinkUrlencoded
+        );
 
         return $result;
     }
 
-    public function host_referrer(?string $url = null) : ?string
+    public function host_referrer(
+        $url = null,
+        ?int $toIdnaAscii = null
+    ) : string
     {
-        $result = $this->host($url ?? $_SERVER[ 'HTTP_REFERER' ] ?? '');
+        $url = $url ?? $_SERVER[ 'HTTP_REFERER' ] ?? true;
+
+        $result = $this->host(
+            $url,
+            $toIdnaAscii
+        );
 
         return $result;
     }
 
-    public function link_referrer(?string $url = null) : ?string
+    public function link_referrer(
+        $url = null, $query = null, $fragment = null,
+        ?int $toUrlencoded = null
+    ) : string
     {
-        $result = $this->link($url ?? $_SERVER[ 'HTTP_REFERER' ] ?? '');
+        $url = $url ?? $_SERVER[ 'HTTP_REFERER' ] ?? true;
+
+        $result = $this->link(
+            $url, $query, $fragment,
+            $toUrlencoded
+        );
 
         return $result;
     }

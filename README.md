@@ -5438,6 +5438,44 @@ $fn = function () use ($ffn) {
 
     $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = '/');
     $ffn->print($src, $status, $result);
+
+    echo "\n";
+
+
+    $status = \Gzhegow\Lib\Lib::url()->type_url($result, $src = 'https://привет.рф/hello/текст');
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_host($result, $src = 'https://привет.рф/hello/текст');
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = 'https://привет.рф/hello/текст');
+    $ffn->print($src, $status, $result);
+
+    echo "\n";
+
+
+    $status = \Gzhegow\Lib\Lib::url()->type_url($result, $src = 'https://привет.рф/hello/текст', null, null, 1, 1);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_host($result, $src = 'https://привет.рф/hello/текст', 1);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = 'https://привет.рф/hello/текст', null, null, 1);
+    $ffn->print($src, $status, $result);
+
+    echo "\n";
+
+
+    $status = \Gzhegow\Lib\Lib::url()->type_url($result, $src = 'https://привет.рф/hello/текст', null, null, 2, 2);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_host($result, $src = 'https://привет.рф/hello/текст', 2);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = 'https://привет.рф/hello/текст', null, null, 2);
+    $ffn->print($src, $status, $result);
+
+    echo "\n";
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
@@ -5452,8 +5490,20 @@ $test->expectStdout('
 "/" | FALSE | NULL
 
 "https://google.com/hello/world" | TRUE | "/hello/world"
-":hello/world" | FALSE | NULL
+":hello/world" | TRUE | ":hello/world"
 "/" | TRUE | "/"
+
+"https://привет.рф/hello/текст" | TRUE | "https://привет.рф/hello/текст"
+"https://привет.рф/hello/текст" | TRUE | "https://привет.рф"
+"https://привет.рф/hello/текст" | TRUE | "/hello/текст"
+
+"https://привет.рф/hello/текст" | FALSE | NULL
+"https://привет.рф/hello/текст" | FALSE | NULL
+"https://привет.рф/hello/текст" | FALSE | NULL
+
+"https://привет.рф/hello/текст" | TRUE | "https://xn--b1agh1afp.xn--p1ai/hello/%D1%82%D0%B5%D0%BA%D1%81%D1%82"
+"https://привет.рф/hello/текст" | TRUE | "https://xn--b1agh1afp.xn--p1ai"
+"https://привет.рф/hello/текст" | TRUE | "/hello/%D1%82%D0%B5%D0%BA%D1%81%D1%82"
 ');
 $test->run();
 ```

@@ -4,6 +4,7 @@ namespace Gzhegow\Lib\Modules\Fs\SocketSafe;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class SocketSafe
@@ -17,7 +18,7 @@ class SocketSafe
     public function __construct()
     {
         if (! extension_loaded('sockets')) {
-            throw new RuntimeException(
+            throw new ExtensionException(
                 'Missing PHP extension: sockets'
             );
         }

@@ -7,6 +7,7 @@ use Gzhegow\Lib\Modules\Php\Result\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class FormatJson
@@ -28,7 +29,7 @@ class FormatJson
     public function __construct()
     {
         if (! extension_loaded('json')) {
-            throw new RuntimeException(
+            throw new ExtensionException(
                 'Missing PHP extension: json'
             );
         }
@@ -306,8 +307,7 @@ class FormatJson
             | JSON_PRETTY_PRINT
             | JSON_UNESCAPED_LINE_TERMINATORS
             | JSON_UNESCAPED_SLASHES
-            | JSON_UNESCAPED_UNICODE
-        ;
+            | JSON_UNESCAPED_UNICODE;
 
         $depth = $depth ?? $this->static_json_depth();
 

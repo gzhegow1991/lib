@@ -5,6 +5,7 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class MbModule
@@ -12,7 +13,7 @@ class MbModule
     public function __construct()
     {
         if (! extension_loaded('mbstring')) {
-            throw new RuntimeException(
+            throw new ExtensionException(
                 'Missing PHP extension: mbstring'
             );
         }

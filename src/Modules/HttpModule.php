@@ -341,6 +341,7 @@ class HttpModule
                 parse_str($_queryString, $queryArray);
 
                 $queries[ $idx ] = $queryArray;
+
                 unset($queryArray);
 
             } else {
