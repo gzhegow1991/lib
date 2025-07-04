@@ -1884,9 +1884,15 @@ class ParseNullModule
 	/**
 	 * @return string|null
 	 */
-	public function url($value, $query = null, $fragment = null, array $refs = [])
-	{
-		if (Lib::type()->url($r, $value, $query, $fragment, $refs)) {
+	public function url(
+		$value,
+		$query = null,
+		$fragment = null,
+		?int $isHostIdnaAscii = null,
+		?int $isLinkUrlencoded = null,
+		array $refs = []
+	) {
+		if (Lib::type()->url($r, $value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs)) {
 		    return $r;
 		}
 
@@ -1897,9 +1903,9 @@ class ParseNullModule
 	/**
 	 * @return string|null
 	 */
-	public function host($value, array $refs = [])
+	public function host($value, ?int $isIdnaAscii = null, array $refs = [])
 	{
-		if (Lib::type()->host($r, $value, $refs)) {
+		if (Lib::type()->host($r, $value, $isIdnaAscii, $refs)) {
 		    return $r;
 		}
 
@@ -1910,9 +1916,9 @@ class ParseNullModule
 	/**
 	 * @return string|null
 	 */
-	public function link($value, $query = null, $fragment = null, array $refs = [])
+	public function link($value, $query = null, $fragment = null, ?int $isUrlencoded = null, array $refs = [])
 	{
-		if (Lib::type()->link($r, $value, $query, $fragment, $refs)) {
+		if (Lib::type()->link($r, $value, $query, $fragment, $isUrlencoded, $refs)) {
 		    return $r;
 		}
 

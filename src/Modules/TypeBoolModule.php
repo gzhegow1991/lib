@@ -1699,25 +1699,55 @@ class TypeBoolModule
     /**
      * @param string|null $r
      */
-    public function url(&$r, $value, $query = null, $fragment = null, array $refs = []) : bool
+    public function url(
+        &$r,
+        $value, $query = null, $fragment = null,
+        ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null,
+        array $refs = []
+    ) : bool
     {
-        return Lib::url()->type_url($r, $value, $query, $fragment, $refs);
+        return Lib::url()->type_url(
+            $r,
+            $value, $query, $fragment,
+            $isHostIdnaAscii, $isLinkUrlencoded,
+            $refs
+        );
     }
 
     /**
      * @param string|null $r
      */
-    public function host(&$r, $value, array $refs = []) : bool
+    public function host(
+        &$r,
+        $value,
+        ?int $isIdnaAscii = null,
+        array $refs = []
+    ) : bool
     {
-        return Lib::url()->type_host($r, $value, $refs);
+        return Lib::url()->type_host(
+            $r,
+            $value,
+            $isIdnaAscii,
+            $refs
+        );
     }
 
     /**
      * @param string|null $r
      */
-    public function link(&$r, $value, $query = null, $fragment = null, array $refs = []) : bool
+    public function link(
+        &$r,
+        $value, $query = null, $fragment = null,
+        ?int $isUrlencoded = null,
+        array $refs = []
+    ) : bool
     {
-        return Lib::url()->type_link($r, $value, $query, $fragment, $refs);
+        return Lib::url()->type_link(
+            $r,
+            $value, $query, $fragment,
+            $isUrlencoded,
+            $refs
+        );
     }
 
 

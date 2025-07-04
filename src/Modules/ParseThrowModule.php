@@ -1885,39 +1885,45 @@ class ParseThrowModule
 	/**
 	 * @return string|null
 	 */
-	public function url($value, $query = null, $fragment = null, array $refs = [])
-	{
-		if (Lib::type()->url($r, $value, $query, $fragment, $refs)) {
+	public function url(
+		$value,
+		$query = null,
+		$fragment = null,
+		?int $isHostIdnaAscii = null,
+		?int $isLinkUrlencoded = null,
+		array $refs = []
+	) {
+		if (Lib::type()->url($r, $value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs)) {
 		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `url` is failed", $value, $query, $fragment, $refs ]);
+		throw new LogicException([ "Parsing `url` is failed", $value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs ]);
 	}
 
 
 	/**
 	 * @return string|null
 	 */
-	public function host($value, array $refs = [])
+	public function host($value, ?int $isIdnaAscii = null, array $refs = [])
 	{
-		if (Lib::type()->host($r, $value, $refs)) {
+		if (Lib::type()->host($r, $value, $isIdnaAscii, $refs)) {
 		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `host` is failed", $value, $refs ]);
+		throw new LogicException([ "Parsing `host` is failed", $value, $isIdnaAscii, $refs ]);
 	}
 
 
 	/**
 	 * @return string|null
 	 */
-	public function link($value, $query = null, $fragment = null, array $refs = [])
+	public function link($value, $query = null, $fragment = null, ?int $isUrlencoded = null, array $refs = [])
 	{
-		if (Lib::type()->link($r, $value, $query, $fragment, $refs)) {
+		if (Lib::type()->link($r, $value, $query, $fragment, $isUrlencoded, $refs)) {
 		    return $r;
 		}
 
-		throw new LogicException([ "Parsing `link` is failed", $value, $query, $fragment, $refs ]);
+		throw new LogicException([ "Parsing `link` is failed", $value, $query, $fragment, $isUrlencoded, $refs ]);
 	}
 
 

@@ -1888,39 +1888,46 @@ class TypeThrowModule
 	/**
 	 * @param string|null $r
 	 */
-	public function url(&$r, $value, $query = null, $fragment = null, array $refs = []): bool
-	{
-		if (Lib::type()->url($r, $value, $query, $fragment, $refs)) {
+	public function url(
+		&$r,
+		$value,
+		$query = null,
+		$fragment = null,
+		?int $isHostIdnaAscii = null,
+		?int $isLinkUrlencoded = null,
+		array $refs = []
+	): bool {
+		if (Lib::type()->url($r, $value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `url` is failed", $value, $query, $fragment, $refs ]);
+		throw new LogicException([ "Typecheck `url` is failed", $value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs ]);
 	}
 
 
 	/**
 	 * @param string|null $r
 	 */
-	public function host(&$r, $value, array $refs = []): bool
+	public function host(&$r, $value, ?int $isIdnaAscii = null, array $refs = []): bool
 	{
-		if (Lib::type()->host($r, $value, $refs)) {
+		if (Lib::type()->host($r, $value, $isIdnaAscii, $refs)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `host` is failed", $value, $refs ]);
+		throw new LogicException([ "Typecheck `host` is failed", $value, $isIdnaAscii, $refs ]);
 	}
 
 
 	/**
 	 * @param string|null $r
 	 */
-	public function link(&$r, $value, $query = null, $fragment = null, array $refs = []): bool
+	public function link(&$r, $value, $query = null, $fragment = null, ?int $isUrlencoded = null, array $refs = []): bool
 	{
-		if (Lib::type()->link($r, $value, $query, $fragment, $refs)) {
+		if (Lib::type()->link($r, $value, $query, $fragment, $isUrlencoded, $refs)) {
 		    return true;
 		}
 
-		throw new LogicException([ "Typecheck `link` is failed", $value, $query, $fragment, $refs ]);
+		throw new LogicException([ "Typecheck `link` is failed", $value, $query, $fragment, $isUrlencoded, $refs ]);
 	}
 
 
