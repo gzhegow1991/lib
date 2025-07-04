@@ -5,7 +5,6 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class UrlModule
@@ -99,14 +98,10 @@ class UrlModule
                 || (1 === $isHostIdnaAscii)
                 || (2 === $isHostIdnaAscii)
             ) {
-                if (! extension_loaded('intl')) {
-                    throw new ExtensionException(
-                        'Missing PHP extension: intl'
-                    );
-                }
+                $theHttp = Lib::http();
 
                 if (-2 === $isHostIdnaAscii) {
-                    $utf8 = idn_to_utf8($refParseUrl[ 'host' ]);
+                    $utf8 = $theHttp->idn_to_utf8($refParseUrl[ 'host' ]);
 
                     if (false === $utf8) {
                         return false;
@@ -117,19 +112,19 @@ class UrlModule
                 } elseif (-1 === $isHostIdnaAscii) {
                     $test = $refParseUrl[ 'host' ];
 
-                    if (idn_to_utf8($test) !== $test) {
+                    if ($theHttp->idn_to_utf8($test) !== $test) {
                         return false;
                     }
 
                 } elseif (1 === $isHostIdnaAscii) {
                     $test = $refParseUrl[ 'host' ];
 
-                    if (idn_to_ascii($test) !== $test) {
+                    if ($theHttp->idn_to_ascii($test) !== $test) {
                         return false;
                     }
 
                 } elseif (2 === $isHostIdnaAscii) {
-                    $ascii = idn_to_ascii($refParseUrl[ 'host' ]);
+                    $ascii = $theHttp->idn_to_ascii($refParseUrl[ 'host' ]);
 
                     if (false === $ascii) {
                         return false;
@@ -257,14 +252,10 @@ class UrlModule
             || (1 === $isIdnaAscii)
             || (2 === $isIdnaAscii)
         ) {
-            if (! extension_loaded('intl')) {
-                throw new ExtensionException(
-                    'Missing PHP extension: intl'
-                );
-            }
+            $theHttp = Lib::http();
 
             if (-2 === $isIdnaAscii) {
-                $utf8 = idn_to_utf8($refParseUrl[ 'host' ]);
+                $utf8 = $theHttp->idn_to_utf8($refParseUrl[ 'host' ]);
 
                 if (false === $utf8) {
                     return false;
@@ -275,19 +266,19 @@ class UrlModule
             } elseif (-1 === $isIdnaAscii) {
                 $test = $refParseUrl[ 'host' ];
 
-                if (idn_to_utf8($test) !== $test) {
+                if ($theHttp->idn_to_utf8($test) !== $test) {
                     return false;
                 }
 
             } elseif (1 === $isIdnaAscii) {
                 $test = $refParseUrl[ 'host' ];
 
-                if (idn_to_ascii($test) !== $test) {
+                if ($theHttp->idn_to_ascii($test) !== $test) {
                     return false;
                 }
 
             } elseif (2 === $isIdnaAscii) {
-                $ascii = idn_to_ascii($refParseUrl[ 'host' ]);
+                $ascii = $theHttp->idn_to_ascii($refParseUrl[ 'host' ]);
 
                 if (false === $ascii) {
                     return false;

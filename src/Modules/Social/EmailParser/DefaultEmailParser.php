@@ -279,9 +279,7 @@ class DefaultEmailParser implements EmailParserInterface
                     $emailDomainAscii = false;
 
                     try {
-                        $emailDomainAscii = (PHP_VERSION_ID < 70200)
-                            ? idn_to_ascii($emailDomain, IDNA_DEFAULT, INTL_IDNA_VARIANT_2003)
-                            : idn_to_ascii($emailDomain, IDNA_DEFAULT, INTL_IDNA_VARIANT_UTS46);
+                        $emailDomainAscii = Lib::http()->idn_to_ascii($emailDomain);
                     }
                     catch ( \Throwable $e ) {
                     }

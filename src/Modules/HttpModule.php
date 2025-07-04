@@ -7,6 +7,7 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Http\HttpHeader\HttpHeader;
 use Gzhegow\Lib\Modules\Http\Cookies\DefaultCookies;
 use Gzhegow\Lib\Modules\Http\Session\DefaultSession;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 use Gzhegow\Lib\Modules\Http\Cookies\CookiesInterface;
 use Gzhegow\Lib\Modules\Http\Session\SessionInterface;
 
@@ -426,5 +427,56 @@ class HttpModule
         }
 
         return [];
+    }
+
+
+    /**
+     * @return string|false
+     */
+    public function idn_to_ascii(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
+    {
+        if (! extension_loaded('intl')) {
+            throw new ExtensionException(
+                'Missing PHP extension: intl'
+            );
+        }
+
+        $flags = $flags ?? IDNA_DEFAULT;
+        $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
+
+        $withIdnaInfo = array_key_exists(0, $refs);
+        if ($withIdnaInfo) {
+            $refIdnaInfo =& $refs[ 0 ];
+        }
+        $refIdnaInfo = null;
+
+        return $withIdnaInfo
+            ? idn_to_ascii($domain, $flags, $variant, $refIdnaInfo)
+            : idn_to_ascii($domain, $flags, $variant);
+    }
+
+    /**
+     * @return string|false
+     */
+    public function idn_to_utf8(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
+    {
+        if (! extension_loaded('intl')) {
+            throw new ExtensionException(
+                'Missing PHP extension: intl'
+            );
+        }
+
+        $flags = $flags ?? IDNA_DEFAULT;
+        $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
+
+        $withIdnaInfo = array_key_exists(0, $refs);
+        if ($withIdnaInfo) {
+            $refIdnaInfo =& $refs[ 0 ];
+        }
+        $refIdnaInfo = null;
+
+        return $withIdnaInfo
+            ? idn_to_utf8($domain, $flags, $variant, $refIdnaInfo)
+            : idn_to_utf8($domain, $flags, $variant);
     }
 }
