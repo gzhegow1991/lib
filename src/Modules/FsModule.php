@@ -939,7 +939,7 @@ class FsModule
             $pathNormalized = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
 
         } else {
-            $pathNormalized = Lib::php()->path_normalize($path, $separator);
+            $pathNormalized = Lib::php()->path_normalize($path, $separatorString);
         }
 
         return $pathNormalized;
