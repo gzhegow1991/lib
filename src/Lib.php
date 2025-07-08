@@ -732,7 +732,7 @@ class Lib
         $imports =& static::di();
 
         if (! isset($imports[ $realpath ])) {
-            $imports[ $realpath ] = require_once $realpath;
+            $imports[ $realpath ] = include $realpath;
         }
 
         return $imports[ $realpath ];

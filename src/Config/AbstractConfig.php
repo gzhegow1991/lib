@@ -140,7 +140,7 @@ abstract class AbstractConfig implements
 
             $fnBound = $fn->bindTo($this, $this);
 
-            call_user_func_array($fnBound, [ $this, $refContext ]);
+            call_user_func_array($fnBound, [ $this, &$refContext ]);
         }
 
         $this->validate($refContext);
@@ -234,8 +234,6 @@ abstract class AbstractConfig implements
 
     protected function validationRecursive(array &$refContext = []) : bool
     {
-        $status = null;
-
         $path = $refContext[ '__path' ] ?? [];
         $key = $refContext[ '__key' ] ?? null;
         $parent = $refContext[ '__parent' ] ?? null;
@@ -249,20 +247,18 @@ abstract class AbstractConfig implements
             $refContext[ '__parent' ] = $this;
 
             // > ! recursion
-            $status = $child->validationRecursive($refContext);
+            $statusChild = $child->validationRecursive($refContext);
 
-            if (! $status) {
-                break;
+            if (! $statusChild) {
+                return false;
             }
         }
 
-        if (null === $status) {
-            $refContext[ '__path' ] = $path;
-            $refContext[ '__key' ] = $key;
-            $refContext[ '__parent' ] = $parent;
+        $refContext[ '__path' ] = $path;
+        $refContext[ '__key' ] = $key;
+        $refContext[ '__parent' ] = $parent;
 
-            $status = $this->validation($refContext);
-        }
+        $status = $this->validation($refContext);
 
         return $status;
     }

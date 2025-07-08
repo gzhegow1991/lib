@@ -2511,8 +2511,12 @@ class StrModule
     public function utf8_encode(string $string, ?string $encoding = null) : ?string
     {
         if (! \function_exists('iconv')) {
-            throw new RuntimeException(
-                'Unable to convert a non-UTF-8 string to UTF-8: required function iconv() does not exist. You should install ext-iconv or symfony/polyfill-iconv.'
+            throw new ExtensionException(
+                [
+                    ''
+                    . 'Unable to convert a non-UTF-8 string to UTF-8: required function iconv() does not exist.'
+                    . 'You should install `ext-iconv` or `symfony/polyfill-iconv`',
+                ]
             );
         }
 
