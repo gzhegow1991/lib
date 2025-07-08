@@ -887,7 +887,7 @@ class FsModule
             );
         }
 
-        return Lib::php()->pathinfo($path, $flags, $separatorString, '.');
+        return Lib::php()->pathinfo($path, $separatorString, '.', $flags);
     }
 
     public function dirname(string $path, ?int $levels = null, ?string $separator = null) : ?string
