@@ -2083,9 +2083,13 @@ class PhpModule
             );
         }
 
+        /**
+         * @noinspection PhpDuplicateArrayKeysInspection
+         */
         $separators = [
-            '\\'                => true,
             DIRECTORY_SEPARATOR => true,
+            '\\'                => true,
+            '/'                 => true,
             $separatorString    => true,
         ];
         $separators = array_keys($separators);
