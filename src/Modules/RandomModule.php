@@ -1,8 +1,13 @@
 <?php
 
+/**
+ * @noinspection PhpFullyQualifiedNameUsageInspection
+ */
+
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
@@ -104,24 +109,33 @@ class RandomModule
 
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_uuid(&$r, $value) : bool
+    public function type_uuid($value)
     {
-        $r = null;
-
         if (! is_string($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be string', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ('' === $value) {
+            return Ret::err(
+                [ 'The `value` should be string, not-empty', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
-        if (preg_match($regex, $value)) {
-            $r = $value;
-
-            return true;
+        if (! preg_match($regex, $value)) {
+            return Ret::err(
+                [ 'The `value` should be valid uuid', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return false;
+        return Ret::ok($value);
     }
 
 
@@ -199,32 +213,23 @@ class RandomModule
 
     public function random_string(int $len, ?string $alphabet = null) : string
     {
-        $theType = Lib::type();
-
         $alphabet = $alphabet ?? '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-        if (! $theType->int_positive($_len, $len)) {
-            throw new LogicException(
-                [ 'The `len` should be a positive integer', $len ]
-            );
-        }
+        $theType = Lib::$type;
 
-        if (! $theType->alphabet($_alphabet, $alphabet)) {
-            throw new LogicException(
-                [ 'The `alphabet` should be a valid alphabet', $alphabet ]
-            );
-        }
+        $lenIntPositive = $theType->int_positive($len)->orThrow();
+        $alphabetValid = $theType->alphabet($alphabet)->orThrow();
 
-        $alphabetLen = $_alphabet->getLength();
+        $alphabetLen = $alphabetValid->getLength();
 
         $min = 0;
         $max = $alphabetLen - 1;
 
         $rand = [];
-        for ( $i = 0; $i < $_len; ++$i ) {
+        for ( $i = 0; $i < $lenIntPositive; ++$i ) {
             $randomInt = $this->random_int($min, $max);
 
-            $rand[ $i ] = mb_substr($_alphabet, $randomInt, 1);
+            $rand[ $i ] = mb_substr($alphabetValid, $randomInt, 1);
         }
 
         $rand = implode('', $rand);
@@ -235,26 +240,36 @@ class RandomModule
 
     public function random_base64_urlsafe(?int $len = null) : string
     {
-        return Lib::crypt()->base64_encode_urlsafe($this->random_bytes($len));
+        $theCrypt = Lib::$crypt;
+
+        return $theCrypt->base64_encode_urlsafe($this->random_bytes($len));
     }
 
     public function random_base64(?int $len = null) : string
     {
-        return Lib::crypt()->base64_encode($this->random_bytes($len));
+        $theCrypt = Lib::$crypt;
+
+        return $theCrypt->base64_encode($this->random_bytes($len));
     }
 
     public function random_base62(?int $len = null) : string
     {
-        return Lib::crypt()->base62_encode($this->random_bytes($len));
+        $theCrypt = Lib::$crypt;
+
+        return $theCrypt->base62_encode($this->random_bytes($len));
     }
 
     public function random_base58(?int $len = null) : string
     {
-        return Lib::crypt()->base58_encode($this->random_bytes($len));
+        $theCrypt = Lib::$crypt;
+
+        return $theCrypt->base58_encode($this->random_bytes($len));
     }
 
     public function random_base36(?int $len = null) : string
     {
-        return Lib::crypt()->base36_encode($this->random_bytes($len));
+        $theCrypt = Lib::$crypt;
+
+        return $theCrypt->base36_encode($this->random_bytes($len));
     }
 }

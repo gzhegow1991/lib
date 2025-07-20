@@ -2,91 +2,99 @@
 
 namespace Gzhegow\Lib\Modules\Php\CallableParser;
 
+use Gzhegow\Lib\Modules\Type\Ret;
+
+
 interface CallableParserInterface
 {
     /**
-     * @param array{ 0: class-string, 1: string }|null $r
+     * @return Ret<array{ 0: class-string, 1: string }>
      */
-    public function typeMethodArray(&$r, $value) : bool;
+    public function typeMethodArray($value);
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function typeMethodString(&$r, $value, array $refs = []) : bool;
+    public function typeMethodString($value, array $refs = []);
 
 
     /**
-     * @param callable|null $r
      * @param string|object $newScope
+     *
+     * @return Ret<callable>
      */
-    public function typeCallable(&$r, $value, $newScope = 'static') : bool;
+    public function typeCallable($value, $newScope = 'static');
 
 
     /**
-     * @param callable|\Closure|object|null $r
+     * @return Ret<callable|\Closure|object>
      */
-    public function typeCallableObject(&$r, $value, $newScope = 'static') : bool;
+    public function typeCallableObject($value, $newScope = 'static');
 
     /**
-     * @param callable|object|null $r
+     * @return Ret<\Closure>
      */
-    public function typeCallableObjectClosure(&$r, $value, $newScope = 'static') : bool;
+    public function typeCallableObjectClosure($value, $newScope = 'static');
 
     /**
-     * @param callable|object|null $r
+     * @return Ret<callable|object>
      */
-    public function typeCallableObjectInvokable(&$r, $value, $newScope = 'static') : bool;
-
-
-    /**
-     * @param callable|array{ 0: object|class-string, 1: string }|null $r
-     * @param string|object                                            $newScope
-     */
-    public function typeCallableArray(&$r, $value, $newScope = 'static') : bool;
-
-    /**
-     * @param callable|array{ 0: object|class-string, 1: string }|null $r
-     * @param string|object                                            $newScope
-     */
-    public function typeCallableArrayMethod(&$r, $value, $newScope = 'static') : bool;
-
-    /**
-     * @param callable|array{ 0: class-string, 1: string }|null $r
-     * @param string|object                                     $newScope
-     */
-    public function typeCallableArrayMethodStatic(&$r, $value, $newScope = 'static') : bool;
-
-    /**
-     * @param callable|array{ 0: object, 1: string }|null $r
-     * @param string|object                               $newScope
-     */
-    public function typeCallableArrayMethodNonStatic(&$r, $value, $newScope = 'static') : bool;
+    public function typeCallableObjectInvokable($value, $newScope = 'static');
 
 
     /**
-     * @param callable-string|null $r
+     * @param string|object $newScope
+     *
+     * @return Ret<callable|array{ 0: object|class-string, 1: string }>
      */
-    public function typeCallableString(&$r, $value, $newScope = 'static') : bool;
+    public function typeCallableArray($value, $newScope = 'static');
 
     /**
-     * @param callable-string|null $r
+     * @param string|object $newScope
+     *
+     * @return Ret<callable|array{ 0: object|class-string, 1: string }>
      */
-    public function typeCallableStringFunction(&$r, $value) : bool;
+    public function typeCallableArrayMethod($value, $newScope = 'static');
 
     /**
-     * @param callable-string|null $r
+     * @param string|object $newScope
+     *
+     * @return Ret<callable|array{ 0: class-string, 1: string }>
      */
-    public function typeCallableStringFunctionInternal(&$r, $value) : bool;
+    public function typeCallableArrayMethodStatic($value, $newScope = 'static');
 
     /**
-     * @param callable-string|null $r
+     * @param string|object $newScope
+     *
+     * @return Ret<callable|array{ 0: object, 1: string }>
      */
-    public function typeCallableStringFunctionNonInternal(&$r, $value) : bool;
+    public function typeCallableArrayMethodNonStatic($value, $newScope = 'static');
+
 
     /**
-     * @param callable-string|null $r
+     * @return Ret<callable-string>
      */
-    public function typeCallableStringMethodStatic(&$r, $value, $newScope = 'static') : bool;
+    public function typeCallableString($value, $newScope = 'static');
+
+    /**
+     * @return Ret<callable-string>
+     */
+    public function typeCallableStringFunction($value);
+
+    /**
+     * @return Ret<callable-string>
+     */
+    public function typeCallableStringFunctionInternal($value);
+
+    /**
+     * @return Ret<callable-string>
+     */
+    public function typeCallableStringFunctionNonInternal($value);
+
+    /**
+     * @return Ret<callable-string>
+     */
+    public function typeCallableStringMethodStatic($value, $newScope = 'static');
 
 
     /**

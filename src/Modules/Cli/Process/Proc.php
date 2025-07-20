@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  * @noinspection PhpUndefinedClassInspection
  * @noinspection PhpUndefinedNamespaceInspection
  */
@@ -207,17 +208,14 @@ class Proc
      */
     public function setCmd($cmd)
     {
-        $theType = Lib::type();
+        $theType = Lib::$type;
 
         $cmdList = [];
-        foreach ( (array) $cmd as $i => $c ) {
-            if (! $theType->trim($cString, $c)) {
-                throw new LogicException(
-                    [ 'Unable to cast command to string', $c, $i, $cmd ]
-                );
-            }
 
-            $cmdList[] = $c;
+        foreach ( (array) $cmd as $c ) {
+            $cString = $theType->trim($c)->orThrow();
+
+            $cmdList[] = $cString;
         }
 
         $this->cmd = $cmdList;
@@ -231,15 +229,13 @@ class Proc
      */
     public function setCwd(?string $cwd)
     {
+        $theType = Lib::$type;
+
         if (null !== ($cwdRealpath = $cwd)) {
-            if (! Lib::type()->dirpath_realpath($cwdRealpath, $cwd, true)) {
-                throw new LogicException(
-                    [ 'The `cwd` should be an existing directory', $cwd ]
-                );
-            }
+            $cwdRealpath = $theType->dirpath_realpath($cwd, true)->orThrow();
         }
 
-        $this->cwd = $cwd;
+        $this->cwd = $cwdRealpath ?? null;
 
         return $this;
     }
@@ -291,16 +287,18 @@ class Proc
      */
     public function setStdin($stdin)
     {
+        $theType = Lib::$type;
+
         if (is_resource($stdin)) {
             $this->stdinResource = $stdin;
 
         } elseif (is_iterable($stdin)) {
             $this->stdinIterable = $stdin;
 
-        } elseif (Lib::type()->filepath_realpath($stdinPath, $stdin, true)) {
-            $this->stdinFile = $stdinPath;
+        } elseif ($theType->filepath_realpath($stdin, true)->isOk([ &$stdinFilepathRealpath ])) {
+            $this->stdinFile = $stdinFilepathRealpath;
 
-        } elseif (Lib::type()->string($stdinString, $stdin)) {
+        } elseif ($theType->string($stdin)->isOk([ &$stdinString ])) {
             $this->stdinIterable = [ $stdinString ];
 
         } else {
@@ -320,6 +318,9 @@ class Proc
      */
     public function setStdoutFile($stdoutFile)
     {
+        $theFs = Lib::$fs;
+        $theType = Lib::$type;
+
         if (null !== ($stdoutFilePath = $stdoutFile)) {
             if ($this->isBackground) {
                 throw new LogicException(
@@ -327,13 +328,13 @@ class Proc
                 );
             }
 
-            if (! Lib::type()->filepath($stdoutFilePath, $stdoutFile, true)) {
+            if (! $theType->filepath($stdoutFilePath, $stdoutFile, true)) {
                 throw new LogicException(
                     [ 'The `stdout` should be a resource', $stdoutFile ]
                 );
             }
 
-            $stdoutFilePath = Lib::fs()->path_normalize($stdoutFilePath, DIRECTORY_SEPARATOR);
+            $stdoutFilePath = $theFs->path_normalize($stdoutFilePath, DIRECTORY_SEPARATOR);
         }
 
         $this->stdoutFile = $stdoutFilePath;
@@ -350,6 +351,8 @@ class Proc
     {
         $refStdout = null;
 
+        $theFs = Lib::$fs;
+
         if ($this->isBackground) {
             throw new LogicException(
                 [ 'The `stdout`/`stderr` cannot be reference or resource if `isBackground` is set to true', $this ]
@@ -357,7 +360,7 @@ class Proc
         }
 
         $tmpFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'proc_open_stdout_' . ((new \DateTime())->format('Ymd_His_u')) . '.log';
-        $tmpFile = Lib::fs()->path_normalize($tmpFile, DIRECTORY_SEPARATOR);
+        $tmpFile = $theFs->path_normalize($tmpFile, DIRECTORY_SEPARATOR);
 
         $this->stdoutRef =& $refStdout;
         $this->stdoutRefFile = $tmpFile;
@@ -399,6 +402,9 @@ class Proc
      */
     public function setStderrFile($stderrFile)
     {
+        $theFs = Lib::$fs;
+        $theType = Lib::$type;
+
         if (null !== ($stderrFilePath = $stderrFile)) {
             if ($this->isBackground) {
                 throw new LogicException(
@@ -406,13 +412,13 @@ class Proc
                 );
             }
 
-            if (! Lib::type()->filepath($stderrFilePath, $stderrFile, true)) {
+            if (! $theType->filepath($stderrFilePath, $stderrFile, true)) {
                 throw new LogicException(
                     [ 'The `stdout` should be a resource', $stderrFile ]
                 );
             }
 
-            $stderrFilePath = Lib::fs()->path_normalize($stderrFilePath, DIRECTORY_SEPARATOR);
+            $stderrFilePath = $theFs->path_normalize($stderrFilePath, DIRECTORY_SEPARATOR);
         }
 
         $this->stderrFile = $stderrFilePath;
@@ -429,6 +435,8 @@ class Proc
     {
         $refStderr = null;
 
+        $theFs = Lib::$fs;
+
         if ($this->isBackground) {
             throw new LogicException(
                 [ 'The `stdout`/`stderr` cannot be reference or resource if `isBackground` is set to true', $this ]
@@ -436,7 +444,7 @@ class Proc
         }
 
         $tmpFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'proc_open_stderr_' . ((new \DateTime())->format('Ymd_His_u')) . '.log';
-        $tmpFile = Lib::fs()->path_normalize($tmpFile, DIRECTORY_SEPARATOR);
+        $tmpFile = $theFs->path_normalize($tmpFile, DIRECTORY_SEPARATOR);
 
         $this->stderrRef =& $refStderr;
         $this->stderrRefFile = $tmpFile;
@@ -496,12 +504,10 @@ class Proc
      */
     public function setTimeoutMs(?int $timeoutMs = null)
     {
+        $theType = Lib::$type;
+
         if (null !== ($timeoutMsInt = $timeoutMs)) {
-            if (! Lib::type()->int_positive($timeoutMsInt, $timeoutMs)) {
-                throw new LogicException(
-                    [ 'The `timeoutMs` should be a positive integer', $timeoutMs ]
-                );
-            }
+            $timeoutMsInt = $theType->int_positive($timeoutMs)->orThrow();
         }
 
         $this->timeoutMs = $timeoutMsInt;
@@ -515,9 +521,10 @@ class Proc
      */
     public function spawnUsingSymfonyProcess()
     {
-        $this->validateSpawn();
+        $theCli = Lib::$cli;
+        $theCliProcessManager = $theCli->processManager();
 
-        $theCliProcessManager = Lib::cliProcessManager();
+        $this->validateSpawn();
 
         $process = $theCliProcessManager->newSymfonyProcess($this);
 
@@ -535,28 +542,21 @@ class Proc
     {
         $this->validateSpawn();
 
-        $theType = Lib::type();
+        $theFunc = Lib::$func;
+        $theType = Lib::$type;
 
         $dirSystemRoot = getenv('SystemRoot');
 
-        if (! $theType->dirpath_realpath($dirSystemRootRealpath, $dirSystemRoot)) {
-            throw new LogicException(
-                [ 'The `dirSystemRoot` should be an existing directory', $dirSystemRoot ]
-            );
-        }
+        $dirSystemRootRealpath = $theType->dirpath_realpath($dirSystemRoot)->orThrow();
 
         $cmdExeFile = $dirSystemRootRealpath . "\\System32\\cmd.exe";
 
-        if (! $theType->filepath_realpath($cmdExeFileRealpath, $cmdExeFile)) {
-            throw new LogicException(
-                [ 'The `cmdExeFile` should be an existing file', $cmdExeFile ]
-            );
-        }
+        $cmdExeFileRealpath = $theType->filepath_realpath($cmdExeFile)->orThrow();
 
         $cmdString = implode(' ', $this->cmd);
 
         $oscmd = [];
-        $oscmd[] = '"' . $cmdExeFile . '" /D /C';
+        $oscmd[] = '"' . $cmdExeFileRealpath . '" /D /C';
         $oscmd[] = '(' . $cmdString . ')';
 
         if (false
@@ -638,7 +638,7 @@ class Proc
         $options = $this->options;
 
         try {
-            $ph = Lib::func()->safe_call(
+            $ph = $theFunc->safe_call(
                 'proc_open',
                 [ $oscmd, $spec, &$pipes, $cwd, $env, $options ],
             );
@@ -651,13 +651,9 @@ class Proc
 
             } elseif ($this->stdinIterable) {
                 foreach ( $this->stdinIterable as $line ) {
-                    if (! $theType->string($lineString, $line)) {
-                        throw new LogicException(
-                            [ 'The `stdinIterable` should be an iterable of strings', $line ]
-                        );
-                    }
+                    $lineString = $theType->string($line)->orThrow();
 
-                    fwrite($pipes[ 0 ], $line);
+                    fwrite($pipes[ 0 ], $lineString);
                 }
 
                 fclose($pipes[ 0 ]);
@@ -679,7 +675,8 @@ class Proc
     {
         $this->validateSpawn();
 
-        $theType = Lib::type();
+        $theFunc = Lib::$func;
+        $theType = Lib::$type;
 
         $cmdString = implode(' ', $this->cmd);
 
@@ -763,7 +760,7 @@ class Proc
         $options = $this->options;
 
         try {
-            $ph = Lib::func()->safe_call(
+            $ph = $theFunc->safe_call(
                 'proc_open',
                 [ $oscmd, $spec, &$pipes, $cwd, $env, $options ],
             );
@@ -776,13 +773,9 @@ class Proc
 
             } elseif ($this->stdinIterable) {
                 foreach ( $this->stdinIterable as $line ) {
-                    if (! $theType->string($lineString, $line)) {
-                        throw new LogicException(
-                            [ 'The `stdinIterable` should be an iterable of strings', $line ]
-                        );
-                    }
+                    $lineString = $theType->string($line)->orThrow();
 
-                    fwrite($pipes[ 0 ], $line);
+                    fwrite($pipes[ 0 ], $lineString);
                 }
 
                 fclose($pipes[ 0 ]);
@@ -869,6 +862,8 @@ class Proc
     {
         $tickUsleep = $tickUsleep ?? 100000;
 
+        $thePhp = Lib::$php;
+
         if ($this->symfonyProcess) {
             $process = $this->symfonyProcess;
 
@@ -954,7 +949,7 @@ class Proc
             };
         }
 
-        $exitCode = Lib::php()->pooling_sync(
+        $exitCode = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             $fnTick

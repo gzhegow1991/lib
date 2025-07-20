@@ -24,11 +24,14 @@ class Promise
     ];
 
 
-    // // > uncomment if you set Promise::$debug = true
-    // /**
-    //  * @var array
-    //  */
-    // public $debug;
+    /**
+     * @var bool
+     */
+    public static $isDebug = false;
+    /**
+     * @var array
+     */
+    public $debugInfo;
 
     /**
      * @var PromiseManagerInterface
@@ -233,8 +236,10 @@ class Promise
 
         $promise = $this->manager->never();
 
-        if (Promise::$debug) {
-            $promise->{'debug'} = Lib::debug()->file_line();
+        if (Promise::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $promise->debugInfo = $theDebug->file_line();
         }
 
         if (Promise::STATE_RESOLVED === $this->state) {
@@ -294,8 +299,10 @@ class Promise
 
         $promise = $this->manager->never();
 
-        if (Promise::$debug) {
-            $promise->{'debug'} = Lib::debug()->file_line();
+        if (Promise::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $promise->debugInfo = $theDebug->file_line();
         }
 
         if (Promise::STATE_RESOLVED === $this->state) {
@@ -343,8 +350,10 @@ class Promise
 
         $promise = $this->manager->never();
 
-        if (Promise::$debug) {
-            $promise->{'debug'} = Lib::debug()->file_line();
+        if (Promise::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $promise->debugInfo = $theDebug->file_line();
         }
 
         if (Promise::STATE_RESOLVED === $this->state) {

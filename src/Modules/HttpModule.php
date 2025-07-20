@@ -163,7 +163,9 @@ class HttpModule
         $replace = $replace ?? true;
         $response_code = $response_code ?? 0;
 
-        Lib::func()->safe_call(
+        $theFunc = Lib::$func;
+
+        $theFunc->safe_call(
             function () use ($header, $replace, $response_code) {
                 header($header, $replace, $response_code);
             }
@@ -172,7 +174,9 @@ class HttpModule
 
     public function header_remove(?string $name) : void
     {
-        Lib::func()->safe_call(
+        $theFunc = Lib::$func;
+
+        $theFunc->safe_call(
             function () use ($name) {
                 header_remove($name);
             }
@@ -194,7 +198,9 @@ class HttpModule
         $secure = $secure ?? false;
         $httponly = $httponly ?? false;
 
-        Lib::func()->safe_call(
+        $theFunc = Lib::$func;
+
+        $theFunc->safe_call(
             function () use ($name, $value, $expires_or_options, $path, $domain, $secure, $httponly) {
                 is_array($expires_or_options)
                     ? setcookie($name, $value, $expires_or_options)
@@ -217,7 +223,9 @@ class HttpModule
         $secure = $secure ?? false;
         $httponly = $httponly ?? false;
 
-        Lib::func()->safe_call(
+        $theFunc = Lib::$func;
+
+        $theFunc->safe_call(
             function () use ($name, $value, $expires_or_options, $path, $domain, $secure, $httponly) {
                 is_array($expires_or_options)
                     ? setrawcookie($name, $value, $expires_or_options)
@@ -229,6 +237,8 @@ class HttpModule
 
     public function data_replace(?array $dataArray, ?array ...$dataArrays) : array
     {
+        $theArr = Lib::$arr;
+
         if ($dataArray) {
             array_unshift($dataArrays, $dataArray);
         }
@@ -242,7 +252,7 @@ class HttpModule
         $dataArraysKeys = array_keys($dataArrays);
 
         foreach (
-            Lib::arr()->walk_collect_it(
+            $theArr->walk_collect_it(
                 $dataArrays,
                 _ARR_WALK_WITH_EMPTY_ARRAYS,
                 [ null ]
@@ -252,20 +262,20 @@ class HttpModule
 
             if (false === $last) {
                 foreach ( $dataArraysKeys as $key ) {
-                    Lib::arr()->unset_path($dataArrays[ $key ], $path);
+                    $theArr->unset_path($dataArrays[ $key ], $path);
                 }
             }
         }
 
         foreach (
-            Lib::arr()->walk_it(
+            $theArr->walk_it(
                 $dataArrays,
                 _ARR_WALK_WITH_EMPTY_ARRAYS
             )
             as $path => $value
         ) {
             if ([] === $value) {
-                Lib::arr()->unset_path($dataArrays, $path);
+                $theArr->unset_path($dataArrays, $path);
             }
         }
 
@@ -276,6 +286,8 @@ class HttpModule
 
     public function data_merge(?array $dataArray, ?array ...$dataArrays) : array
     {
+        $theArr = Lib::$arr;
+
         if ($dataArray) {
             array_unshift($dataArrays, $dataArray);
         }
@@ -289,7 +301,7 @@ class HttpModule
         $dataArraysKeys = array_keys($dataArrays);
 
         foreach (
-            Lib::arr()->walk_collect_it(
+            $theArr->walk_collect_it(
                 $dataArrays,
                 _ARR_WALK_WITH_EMPTY_ARRAYS,
                 [ null ]
@@ -299,20 +311,20 @@ class HttpModule
 
             if (false === $last) {
                 foreach ( $dataArraysKeys as $key ) {
-                    Lib::arr()->unset_path($dataArrays[ $key ], $path);
+                    $theArr->unset_path($dataArrays[ $key ], $path);
                 }
             }
         }
 
         foreach (
-            Lib::arr()->walk_it(
+            $theArr->walk_it(
                 $dataArrays,
                 _ARR_WALK_WITH_EMPTY_ARRAYS
             )
             as $path => $value
         ) {
             if ([] === $value) {
-                Lib::arr()->unset_path($dataArrays, $path);
+                $theArr->unset_path($dataArrays, $path);
             }
         }
 
@@ -324,6 +336,8 @@ class HttpModule
 
     public function build_query_array($query, ...$queries) : array
     {
+        $theType = Lib::$type;
+
         if ($queries) {
             array_unshift($queries, $query);
         }
@@ -338,7 +352,7 @@ class HttpModule
             if (is_array($_query)) {
                 continue;
 
-            } elseif (Lib::type()->string_not_empty($_queryString, $_query)) {
+            } elseif ($theType->string_not_empty($_query)->isOk([ &$_queryString ])) {
                 parse_str($_queryString, $queryArray);
 
                 $queries[ $idx ] = $queryArray;
@@ -360,6 +374,8 @@ class HttpModule
 
     public function accept_match(string $httpAccept, $acceptAnd = null, ...$acceptOr) : array
     {
+        $theType = Lib::$type;
+
         array_unshift($acceptOr, $acceptAnd);
 
         $acceptList = [];
@@ -391,8 +407,7 @@ class HttpModule
                 }
             }
 
-            // > convert non-numeric value to NULL
-            Lib::type()->numeric($qValueNumeric, $qValue);
+            $qValueNumeric = $theType->numeric($qValue)->orNull();
 
             $acceptList[ $acceptItem ] = [ $qValueNumeric, $acceptVarsArray ];
         }

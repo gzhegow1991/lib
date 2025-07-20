@@ -6,6 +6,8 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Php\Nil;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Modules\Str\Alphabet;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
@@ -46,17 +48,19 @@ class StrModule
 
     public function __construct()
     {
+        $theMb = Lib::$mb;
+
         $mbstring = extension_loaded('mbstring');
 
         $this->mbstring = $mbstring;
 
-        $this->mbstringFuncMap[ 'lcfirst' ] = [ Lib::mb(), 'lcfirst' ];
-        $this->mbstringFuncMap[ 'ucfirst' ] = [ Lib::mb(), 'ucfirst' ];
-        $this->mbstringFuncMap[ 'lcwords' ] = [ Lib::mb(), 'lcwords' ];
-        $this->mbstringFuncMap[ 'ucwords' ] = [ Lib::mb(), 'ucwords' ];
+        $this->mbstringFuncMap[ 'lcfirst' ] = [ $theMb, 'lcfirst' ];
+        $this->mbstringFuncMap[ 'ucfirst' ] = [ $theMb, 'ucfirst' ];
+        $this->mbstringFuncMap[ 'lcwords' ] = [ $theMb, 'lcwords' ];
+        $this->mbstringFuncMap[ 'ucwords' ] = [ $theMb, 'ucwords' ];
 
         if (PHP_VERSION_ID < 70400) {
-            $this->mbstringFuncMap[ 'str_split' ] = [ Lib::mb(), 'str_split' ];
+            $this->mbstringFuncMap[ 'str_split' ] = [ $theMb, 'str_split' ];
         }
     }
 
@@ -181,89 +185,84 @@ class StrModule
 
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_a_string(&$r, $value) : bool
+    public function type_a_string($value)
     {
-        $r = null;
-
         if (is_string($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be string', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_a_string_empty(&$r, $value) : bool
+    public function type_a_string_empty($value)
     {
-        $r = null;
-
         if ('' === $value) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be string, empty', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_a_string_not_empty(&$r, $value) : bool
+    public function type_a_string_not_empty($value)
     {
-        $r = null;
-
         if (is_string($value) && ('' !== $value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be string, non empty', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_a_trim(&$r, $value, ?string $characters = null) : bool
+    public function type_a_trim($value, ?string $characters = null)
     {
-        $r = null;
-
         $characters = $characters ?? " \n\r\t\v\0";
 
         if (! is_string($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be string', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $_value = trim($value, $characters);
+        $valueTrim = trim($value, $characters);
 
-        if ('' !== $_value) {
-            $r = $_value;
-
-            return true;
+        if ('' !== $valueTrim) {
+            return Ret::ok($valueTrim);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be trim', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_string(&$r, $value) : bool
+    public function type_string($value)
     {
-        $r = null;
-
         if (is_string($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         if (false
@@ -273,9 +272,9 @@ class StrModule
             || (is_array($value))
             || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->nil($var, $value))
+            || (Nil::is($value))
         ) {
-            // > NULL is equal EMPTY STRING but cannot be casted to
+            // > NULL is equal EMPTY STRING but cannot be cast to
             // > BOOLEAN is not string
             // > NAN, INF, -INF is not string
             // > ARRAY is not string
@@ -283,159 +282,189 @@ class StrModule
             // > CLOSED RESOURCE is not string
             // > NIL is not string
 
-            return false;
+            return Ret::err(
+                [ 'The `value` should be string', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         try {
-            $_value = (string) $value;
+            $valueString = (string) $value;
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be string', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueString);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_string_empty(&$r, $value) : bool
+    public function type_string_empty($value)
     {
-        $r = null;
-
-        if (! $this->type_string($_value, $value)) {
-            return false;
+        if (! $this->type_string($value)->isOk([ &$valueString, &$ret ])) {
+            return $ret;
         }
 
-        if ('' === $_value) {
-            $r = '';
-
-            return true;
+        if ('' === $valueString) {
+            return Ret::ok('');
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be empty string', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_string_not_empty(&$r, $value) : bool
+    public function type_string_not_empty($value)
     {
-        $r = null;
-
-        if (! $this->type_string($_value, $value)) {
-            return false;
+        if (! $this->type_string($value)->isOk([ &$valueString, &$ret ])) {
+            return $ret;
         }
 
-        if ('' !== $_value) {
-            $r = $_value;
-
-            return true;
+        if ('' !== $valueString) {
+            return Ret::ok($valueString);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be string, non empty', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_trim(&$r, $value, ?string $characters = null) : bool
+    public function type_trim($value, ?string $characters = null)
     {
-        $r = null;
-
         $characters = $characters ?? " \n\r\t\v\0";
 
-        if (! $this->type_string($_value, $value)) {
-            return false;
+        if (! $this->type_string($value)->isOk([ &$valueString, &$ret ])) {
+            return $ret;
         }
 
-        $_value = trim($_value, $characters);
+        $valueString = trim($valueString, $characters);
 
-        if ('' !== $_value) {
-            $r = $_value;
-
-            return true;
+        if ('' !== $valueString) {
+            return Ret::ok($valueString);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be trim', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_char(&$r, $value) : bool
+    public function type_char($value)
     {
-        $r = null;
-
-        if (! $this->type_string_not_empty($_value, $value)) {
-            return false;
+        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
-        if (1 === strlen($_value)) {
-            $r = $_value;
-
-            return true;
+        if (1 === strlen($valueStringNotEmpty)) {
+            return Ret::ok($valueStringNotEmpty);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be char', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_letter(&$r, $value) : bool
+    public function type_letter($value)
     {
-        $r = null;
-
-        if (! $this->type_string_not_empty($_value, $value)) {
-            return false;
+        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
-        if (1 === $this->strlen($_value)) {
-            $r = $_value;
-
-            return true;
+        if (1 === $this->strlen($valueStringNotEmpty)) {
+            return Ret::ok($valueStringNotEmpty);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be letter', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param Alphabet|null $r
+     * @return Ret<string>
      */
-    public function type_alphabet(&$r, $value) : bool
+    public function type_word($value)
     {
-        $r = null;
-
-        if (! $this->type_string_not_empty($_value, $value)) {
-            return false;
+        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
-        preg_replace('/\s+/', '', $_value, 1, $count);
+        preg_replace('/\s+/', '', $valueStringNotEmpty, 1, $count);
         if ($count > 0) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should not contain any whitespaces', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::err(
+            [ 'The `value` should be word', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<Alphabet>
+     */
+    public function type_alphabet($value)
+    {
+        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
+        }
+
+        preg_replace('/\s+/', '', $valueStringNotEmpty, 1, $count);
+        if ($count > 0) {
+            return Ret::err(
+                [ 'The `value` should not contain any whitespaces', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $fnStrlen = $this->mb_func('strlen');
+
+        $len = $fnStrlen($valueStringNotEmpty);
+        if ($len <= 1) {
+            return Ret::err(
+                [ 'The `value` should contain at least two letters', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $fnOrd = $this->mb_func('ord');
-        $fnStrlen = $this->mb_func('strlen');
         $fnSubstr = $this->mb_func('substr');
-
-        $len = $fnStrlen($_value);
-        if ($len <= 1) {
-            return false;
-        }
 
         $seen = [];
         $regex = '/[';
         $regexNot = '/[^';
         for ( $i = 0; $i < $len; $i++ ) {
-            $letter = $fnSubstr($_value, $i, 1);
+            $letter = $fnSubstr($valueStringNotEmpty, $i, 1);
 
             if (isset($seen[ $letter ])) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should contain unique letters', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
             $seen[ $letter ] = true;
 
@@ -448,15 +477,134 @@ class StrModule
         $regexNot .= ']/';
 
         $alphabet = new Alphabet(
-            $_value,
+            $valueStringNotEmpty,
             $len,
             $regex,
             $regexNot
         );
 
-        $r = $alphabet;
+        return Ret::ok($alphabet);
+    }
 
-        return true;
+
+    /**
+     * @return Ret<string>
+     */
+    public function type_ctype_digit($value)
+    {
+        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
+        }
+
+        if (extension_loaded('ctype')) {
+            if (ctype_digit($valueStringNotEmpty)) {
+                return Ret::ok($valueStringNotEmpty);
+            }
+
+            return Ret::err(
+                [ 'The `value` should pass `ctype_digit` check', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (! preg_match('~[^0-9]~', $valueStringNotEmpty)) {
+            return Ret::err(
+                [ 'The `value` should contain only digits', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($valueStringNotEmpty);
+    }
+
+    /**
+     * @return Ret<string>
+     */
+    public function type_ctype_alpha($value, ?bool $allowUpperCase = null)
+    {
+        $allowUpperCase = $allowUpperCase ?? true;
+
+        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
+        }
+
+        if (extension_loaded('ctype')) {
+            if (! $allowUpperCase) {
+                if (strtolower($valueStringNotEmpty) !== $valueStringNotEmpty) {
+                    return Ret::err(
+                        [ 'The `value` should not contain upper case letters', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+            }
+
+            if (ctype_alpha($valueStringNotEmpty)) {
+                return Ret::ok($valueStringNotEmpty);
+            }
+
+            return Ret::err(
+                [ 'The `value` should pass `ctype_alpha` check', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $regexFlags = $allowUpperCase
+            ? 'i'
+            : '';
+
+        if (preg_match('~[^a-z]~' . $regexFlags, $valueStringNotEmpty)) {
+            return Ret::err(
+                [ 'The `value` should contain only [a-z] letters', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($valueStringNotEmpty);
+    }
+
+    /**
+     * @return Ret<string>
+     */
+    public function type_ctype_alnum($value, ?bool $allowUpperCase = null)
+    {
+        $allowUpperCase = $allowUpperCase ?? true;
+
+        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
+        }
+
+        if (extension_loaded('ctype')) {
+            if (! $allowUpperCase) {
+                if (strtolower($valueStringNotEmpty) !== $valueStringNotEmpty) {
+                    return Ret::err(
+                        [ 'The `value` should not contain upper case letters', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+            }
+
+            if (ctype_alnum($valueStringNotEmpty)) {
+                return Ret::ok($valueStringNotEmpty);
+            }
+
+            return Ret::err(
+                [ 'The `value` should pass `ctype_alnum` check', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $regexFlags = $allowUpperCase
+            ? 'i'
+            : '';
+
+        if (preg_match('~[^0-9a-z]~' . $regexFlags, $valueStringNotEmpty)) {
+            return Ret::err(
+                [ 'The `value` should contain only [a-z0-9] letters', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($valueStringNotEmpty);
     }
 
 
@@ -880,7 +1028,7 @@ class StrModule
 
     public function loadInvisibles() : array
     {
-        Lib::mb();
+        Lib::$mb->assertExtension();
 
         $list = [
             // mb_chr(0x0020, 'UTF-8') => '\u{0020}', // > \u{0020}	// Space // Обычный пробел (между словами).
@@ -1234,13 +1382,19 @@ class StrModule
      */
     public function lcfirst(string $string, ?string $mb_encoding = null) : string
     {
+        $theMb = Lib::$mb;
+
         if ($this->static_mbstring()) {
-            $result = Lib::mb()->lcfirst($string, $mb_encoding);
+            $result = $theMb->lcfirst($string, $mb_encoding);
 
         } else {
             if ($this->is_utf8($string)) {
                 throw new RuntimeException(
-                    'The `string` contains UTF-8 symbols, but `mb_mode_static()` returns that multibyte features is disabled'
+                    [
+                        ''
+                        . 'The `string` contains UTF-8 symbols '
+                        . 'but `mb_mode_static()` returns that multibyte features is disabled',
+                    ]
                 );
             }
 
@@ -1255,13 +1409,19 @@ class StrModule
      */
     public function ucfirst(string $string, ?string $mb_encoding = null) : string
     {
+        $theMb = Lib::$mb;
+
         if ($this->static_mbstring()) {
-            $result = Lib::mb()->ucfirst($string, $mb_encoding);
+            $result = $theMb->ucfirst($string, $mb_encoding);
 
         } else {
             if ($this->is_utf8($string)) {
                 throw new RuntimeException(
-                    'The `string` contains UTF-8 symbols, but `mb_mode_static()` returns that multibyte features is disabled'
+                    [
+                        ''
+                        . 'The `string` contains UTF-8 symbols '
+                        . 'but `mb_mode_static()` returns that multibyte features is disabled',
+                    ]
                 );
             }
 
@@ -1279,7 +1439,7 @@ class StrModule
     {
         $separators = $separators ?? " \t\r\n\f\v";
 
-        $thePreg = Lib::preg();
+        $thePreg = Lib::$preg;
 
         $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
         $regex = '/(^|[' . $regex . '])(\w)/u';
@@ -1305,7 +1465,7 @@ class StrModule
     {
         $separators = $separators ?? " \t\r\n\f\v";
 
-        $thePreg = Lib::preg();
+        $thePreg = Lib::$preg;
 
         $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
         $regex = '/(^|[' . $regex . '])(\w)/u';
@@ -1329,14 +1489,13 @@ class StrModule
     {
         $length = $length ?? 1;
 
-        if ($length < 1) {
-            throw new LogicException(
-                [ 'The `length` should be GT 0', $length ]
-            );
-        }
+        $theMb = Lib::$mb;
+        $theType = Lib::$type;
+
+        $lengthInt = $theType->int_positive($length)->orThrow();
 
         if ($this->static_mbstring()) {
-            $result = Lib::mb()->str_split($string, $length, $mb_encoding);
+            $result = $theMb->str_split($string, $lengthInt, $mb_encoding);
 
         } else {
             $result = preg_split("/(?<=.{{$length}})/u", $string, -1, PREG_SPLIT_NO_EMPTY);
@@ -1514,28 +1673,30 @@ class StrModule
      */
     public function crop(string $string, $crops, ?bool $ignoreCase = null, $limits = null) : string
     {
-        $_crops = Lib::php()->to_list($crops);
-        $_limits = Lib::php()->to_list($limits ?? [ -1 ]);
+        $thePhp = Lib::$php;
 
-        if ([] === $_crops) {
+        $cropsList = $thePhp->to_list($crops);
+        $limitsList = $thePhp->to_list($limits ?? [ -1 ]);
+
+        if ([] === $cropsList) {
             return $string;
         }
 
-        if ([] === $_limits) {
+        if ([] === $limitsList) {
             throw new LogicException(
                 'The `limits` should be array of integers or be null',
                 $limits
             );
         }
 
-        $needleLcrop = array_shift($_crops);
-        $needleRcrop = ([] !== $_crops)
-            ? array_shift($_crops)
+        $needleLcrop = array_shift($cropsList);
+        $needleRcrop = ([] !== $cropsList)
+            ? array_shift($cropsList)
             : $needleLcrop;
 
-        $limitLcrop = array_shift($_limits);
-        $limitRcrop = ([] !== $_limits)
-            ? array_shift($_limits)
+        $limitLcrop = array_shift($limitsList);
+        $limitRcrop = ([] !== $limitsList)
+            ? array_shift($limitsList)
             : $limitLcrop;
 
         $result = $string;
@@ -1604,28 +1765,30 @@ class StrModule
      */
     public function uncrop(string $string, $crops, $times = null, ?bool $ignoreCase = null) : string
     {
-        $_crops = Lib::php()->to_list($crops);
-        $_times = Lib::php()->to_list($times ?? [ 1 ]);
+        $thePhp = Lib::$php;
 
-        if ([] === $_crops) {
+        $cropsList = $thePhp->to_list($crops);
+        $timesList = $thePhp->to_list($times ?? [ 1 ]);
+
+        if ([] === $cropsList) {
             return $string;
         }
 
-        if ([] === $_times) {
+        if ([] === $timesList) {
             throw new LogicException(
                 'The `times` should be array of integers or be null',
                 $times
             );
         }
 
-        $needleLcrop = array_shift($_crops);
-        $needleRcrop = ([] !== $_crops)
-            ? array_shift($_crops)
+        $needleLcrop = array_shift($cropsList);
+        $needleRcrop = ([] !== $cropsList)
+            ? array_shift($cropsList)
             : $needleLcrop;
 
-        $timesLcrop = array_shift($_times);
-        $timesRcrop = ([] !== $_times)
-            ? array_shift($_times)
+        $timesLcrop = array_shift($timesList);
+        $timesRcrop = ([] !== $timesList)
+            ? array_shift($timesList)
             : $timesLcrop;
 
         $result = $string;
@@ -1651,22 +1814,24 @@ class StrModule
         ?int &$refCount = null
     )
     {
-        $_search = Lib::php()->to_list($search);
-        $_replace = Lib::php()->to_list($replace);
-        $_subject = Lib::php()->to_list($subject);
+        $thePhp = Lib::$php;
 
-        if ([] === $_search) {
+        $searchList = $thePhp->to_list($search);
+        $replaceList = $thePhp->to_list($replace);
+        $subjectList = $thePhp->to_list($subject);
+
+        if ([] === $searchList) {
             return $subject;
         }
-        if ([] === $_replace) {
+        if ([] === $replaceList) {
             return $subject;
         }
-        if ([] === $_subject) {
+        if ([] === $subjectList) {
             return [];
         }
 
         $_regexes = [];
-        foreach ( $_search as $i => $s ) {
+        foreach ( $searchList as $i => $s ) {
             $regex = preg_quote($s, '/');
             $regex = '/' . $regex . '/u';
 
@@ -1693,22 +1858,24 @@ class StrModule
         ?int &$refCount = null
     )
     {
-        $_search = Lib::php()->to_list($search);
-        $_replace = Lib::php()->to_list($replace);
-        $_subject = Lib::php()->to_list($subject);
+        $thePhp = Lib::$php;
 
-        if ([] === $_search) {
+        $searchList = $thePhp->to_list($search);
+        $replaceList = $thePhp->to_list($replace);
+        $subjectList = $thePhp->to_list($subject);
+
+        if ([] === $searchList) {
             return $subject;
         }
-        if ([] === $_replace) {
+        if ([] === $replaceList) {
             return $subject;
         }
-        if ([] === $_subject) {
+        if ([] === $subjectList) {
             return [];
         }
 
         $_regexes = [];
-        foreach ( $_search as $i => $s ) {
+        foreach ( $searchList as $i => $s ) {
             $regex = preg_quote($s, '/');
             $regex = '/' . $regex . '/iu';
 
@@ -1735,9 +1902,11 @@ class StrModule
             return [];
         }
 
-        $_lines = Lib::php()->to_list($lines);
+        $thePhp = Lib::$php;
 
-        if ([] === $_lines) {
+        $linesList = $thePhp->to_list($lines);
+
+        if ([] === $linesList) {
             return [];
         }
 
@@ -1752,7 +1921,7 @@ class StrModule
 
         $result = [];
 
-        foreach ( $_lines as $i => $line ) {
+        foreach ( $linesList as $line ) {
             if (preg_match($regex, $line)) {
                 $result[] = $line;
             }
@@ -1775,9 +1944,11 @@ class StrModule
             return [];
         }
 
-        $_lines = Lib::php()->to_list($lines);
+        $thePhp = Lib::$php;
 
-        if ([] === $_lines) {
+        $linesList = $thePhp->to_list($lines);
+
+        if ([] === $linesList) {
             return [];
         }
 
@@ -1792,7 +1963,7 @@ class StrModule
 
         $result = [];
 
-        foreach ( $_lines as $i => $line ) {
+        foreach ( $linesList as $line ) {
             if (preg_match($regex, $line)) {
                 $result[] = $line;
             }
@@ -1815,9 +1986,11 @@ class StrModule
             return [];
         }
 
-        $_lines = Lib::php()->to_list($lines);
+        $thePhp = Lib::$php;
 
-        if ([] === $_lines) {
+        $linesList = $thePhp->to_list($lines);
+
+        if ([] === $linesList) {
             return [];
         }
 
@@ -1832,7 +2005,7 @@ class StrModule
 
         $result = [];
 
-        foreach ( $_lines as $i => $line ) {
+        foreach ( $linesList as $line ) {
             if (preg_match($regex, $line)) {
                 $result[] = $line;
             }
@@ -1855,9 +2028,11 @@ class StrModule
             return [];
         }
 
-        $_lines = Lib::php()->to_list($lines);
+        $thePhp = Lib::$php;
 
-        if ([] === $_lines) {
+        $linesList = $thePhp->to_list($lines);
+
+        if ([] === $linesList) {
             return [];
         }
 
@@ -1872,7 +2047,7 @@ class StrModule
 
         $result = [];
 
-        foreach ( $_lines as $i => $line ) {
+        foreach ( $linesList as $line ) {
             if (preg_match($regex, $line)) {
                 $result[] = $line;
             }
@@ -1892,35 +2067,25 @@ class StrModule
             return '';
         }
 
+        $thePreg = Lib::$preg;
+
         $hasWildcardSeparatorSymbol = (null !== $wildcardSeparatorSymbol);
         $hasWildcardSequenceSymbol = (null !== $wildcardSequenceSymbol);
         $hasWildcardSingleSymbol = (null !== $wildcardSingleSymbol);
 
         $testUnique = [];
         if ($hasWildcardSeparatorSymbol) {
-            if (! $this->type_char($wildcardSeparatorSymbolString, $wildcardSeparatorSymbol)) {
-                throw new LogicException(
-                    [ 'The `wildcardSeparator` should be a null or an exactly one letter', $wildcardSeparatorSymbol ]
-                );
-            }
+            $wildcardSeparatorSymbolString = $this->type_char($wildcardSeparatorSymbol)->orThrow();
 
             $testUnique[] = $wildcardSeparatorSymbolString;
         }
         if ($hasWildcardSequenceSymbol) {
-            if (! $this->type_char($wildcardSequenceSymbolString, $wildcardSequenceSymbol)) {
-                throw new LogicException(
-                    [ 'The `wildcardSequence` should be a null or an exactly one letter', $wildcardSequenceSymbol ]
-                );
-            }
+            $wildcardSequenceSymbolString = $this->type_char($wildcardSequenceSymbol)->orThrow();
 
             $testUnique[] = $wildcardSequenceSymbolString;
         }
         if ($hasWildcardSingleSymbol) {
-            if (! $this->type_char($wildcardSingleSymbolString, $wildcardSingleSymbol)) {
-                throw new LogicException(
-                    [ 'The `wildcardLetter` should be a null or an exactly one letter', $wildcardSingleSymbol ]
-                );
-            }
+            $wildcardSingleSymbolString = $this->type_char($wildcardSingleSymbol)->orThrow();
 
             $testUnique[] = $wildcardSingleSymbolString;
         }
@@ -1935,8 +2100,6 @@ class StrModule
                 ]
             );
         }
-
-        $thePreg = Lib::preg();
 
         $_pattern = $pattern;
 
@@ -2204,10 +2367,12 @@ class StrModule
             return '';
         }
 
-        Lib::mb();
+        $theMb = Lib::$mb;
+        $thePhp = Lib::$php;
+        $thePreg = Lib::$preg;
+        $theType = Lib::$type;
 
-        $thePreg = Lib::preg();
-        $theType = Lib::type();
+        $theMb->assertExtension();
 
         $dictionary = [
             'а' => 'a',
@@ -2257,27 +2422,19 @@ class StrModule
         ];
 
         if (null !== $delimiter) {
-            if (! $theType->char($char, $delimiter)) {
-                throw new LogicException(
-                    [ 'The `delimiter` should be an exactly one char', $delimiter ]
-                );
-            }
+            $delimiterChar = $theType->char($delimiter)->orThrow();
 
-            if (isset($dictionary[ $delimiter ])) {
-                throw new LogicException(
-                    [ 'The `delimiter` should not be in dictionary', $delimiter ]
-                );
-            }
+            $theType->key_not_exists($delimiterChar, $dictionary)->orThrow();
         }
 
-        $gen = Lib::php()->to_list_it($ignoreSymbols);
+        $gen = $thePhp->to_list_it($ignoreSymbols);
 
         $ignoreSymbolsIndex = [];
         foreach ( $gen as $str ) {
             if (is_array($str)) {
                 continue;
 
-            } elseif ($theType->letter($letter, $str)) {
+            } elseif ($theType->letter($str)->isOk([ &$letter ])) {
                 $letterLower = mb_strtolower($letter);
 
                 $ignoreSymbolsIndex[ $letterLower ] = true;
@@ -2325,16 +2482,18 @@ class StrModule
      */
     public function trim_it($strings, ?string $characters = null) : \Generator
     {
-        $_characters = $characters ?? " \n\r\t\v\0";
+        $characters = $characters ?? " \n\r\t\v\0";
 
-        foreach ( Lib::php()->to_iterable($strings) as $string ) {
+        $thePhp = Lib::$php;
+
+        foreach ( $thePhp->to_iterable($strings) as $string ) {
             if (! is_string($string)) {
                 throw new LogicException(
                     [ 'Each of `strings` should be a string', $string ]
                 );
             }
 
-            yield trim($string, $_characters);
+            yield trim($string, $characters);
         }
     }
 
@@ -2345,16 +2504,18 @@ class StrModule
      */
     public function ltrim_it($strings, ?string $characters = null) : \Generator
     {
-        $_characters = $characters ?? " \n\r\t\v\0";
+        $characters = $characters ?? " \n\r\t\v\0";
 
-        foreach ( Lib::php()->to_iterable($strings) as $string ) {
+        $thePhp = Lib::$php;
+
+        foreach ( $thePhp->to_iterable($strings) as $string ) {
             if (! is_string($string)) {
                 throw new LogicException(
                     [ 'Each of `strings` should be a string', $string ]
                 );
             }
 
-            yield ltrim($string, $_characters);
+            yield ltrim($string, $characters);
         }
     }
 
@@ -2365,16 +2526,18 @@ class StrModule
      */
     public function rtrim_it($strings, ?string $characters = null) : \Generator
     {
-        $_characters = $characters ?? " \n\r\t\v\0";
+        $characters = $characters ?? " \n\r\t\v\0";
 
-        foreach ( Lib::php()->to_iterable($strings) as $string ) {
+        $thePhp = Lib::$php;
+
+        foreach ( $thePhp->to_iterable($strings) as $string ) {
             if (! is_string($string)) {
                 throw new LogicException(
                     [ 'Each of `strings` should be a string', $string ]
                 );
             }
 
-            yield rtrim($string, $_characters);
+            yield rtrim($string, $characters);
         }
     }
 
@@ -2401,7 +2564,7 @@ class StrModule
             );
         }
 
-        $theStr = Lib::str();
+        $theStr = Lib::$str;
 
         $isUnicodeAllowed = $theStr->static_mbstring();
 
@@ -2429,8 +2592,8 @@ class StrModule
 
         $vowels = '';
         $vowelsArray = $this->loadVowels();
-        foreach ( $vowelsArray as $letter => $index ) {
-            $vowels .= implode('', array_keys($index));
+        foreach ( $vowelsArray as $vowelIndex ) {
+            $vowels .= implode('', array_keys($vowelIndex));
         }
 
         $sourceConsonants = [];
@@ -2520,27 +2683,29 @@ class StrModule
             );
         }
 
-        $_encoding = null
+        $encodingString = null
             ?? $encoding
             ?? (\ini_get('php.output_encoding') ?: null)
             ?? (\ini_get('default_charset') ?: null)
             ?? 'UTF-8';
 
-        $stringConverted = @iconv($_encoding, 'UTF-8', $string);
+        $stringConverted = @iconv($encodingString, 'UTF-8', $string);
         if (false !== $stringConverted) {
             return $stringConverted;
         }
 
-        if ('CP1252' !== $_encoding) {
+        if ('CP1252' !== $encodingString) {
             $stringConverted = @iconv('CP1252', 'UTF-8', $string);
             if (false !== $stringConverted) {
                 return $stringConverted;
             }
         }
 
-        $stringConverted = @iconv('CP850', 'UTF-8', $string);
-        if (false !== $stringConverted) {
-            return $stringConverted;
+        if ('CP850' !== $encodingString) {
+            $stringConverted = @iconv('CP850', 'UTF-8', $string);
+            if (false !== $stringConverted) {
+                return $stringConverted;
+            }
         }
 
         return null;
@@ -2568,7 +2733,8 @@ class StrModule
             $foundBinary = true;
         }
 
-        if ($isUtf8 = $this->is_utf8($result)) {
+        $isUtf8 = $this->is_utf8($result);
+        if ($isUtf8) {
             $invisibles = $this->loadInvisibles();
 
             $count = 0;

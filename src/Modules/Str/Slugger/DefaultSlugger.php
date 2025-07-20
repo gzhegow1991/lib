@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  * @noinspection PhpUndefinedClassInspection
  * @noinspection PhpUndefinedNamespaceInspection
  */
@@ -20,6 +21,7 @@ use Gzhegow\Lib\Modules\Str\Slugger\PresetRegistry\SluggerPresetRegistryInterfac
 class DefaultSlugger implements SluggerInterface
 {
     const SYMFONY_ASCII_SLUGGER     = '\Symfony\Component\String\Slugger\AsciiSlugger';
+    const SYMFONY_BYTE_STRING       = '\Symfony\Component\String\ByteString';
     const SYMFONY_SLUGGER_INTERFACE = '\Symfony\Component\String\Slugger\SluggerInterface';
 
 
@@ -55,7 +57,8 @@ class DefaultSlugger implements SluggerInterface
         ?SluggerPresetRegistryInterface $registry
     )
     {
-        Lib::mb();
+        $theMb = Lib::$mb;
+        $theMb->assertExtension();
 
         $this->registry = $registry ?? new SluggerPresetRegistry();
 
@@ -71,6 +74,26 @@ class DefaultSlugger implements SluggerInterface
         $this->registry = clone $this->registry;
     }
 
+
+    /**
+     * @return \Symfony\Component\String\ByteString
+     */
+    public function newSymfonyByteString(string $string = '') : object
+    {
+        $commands = [
+            'composer require symfony/string',
+        ];
+
+        if (! class_exists($symfonyByteStringClass = static::SYMFONY_BYTE_STRING)) {
+            throw new ComposerException([
+                ''
+                . 'Please, run following commands: '
+                . '[ ' . implode(' ][ ', $commands) . ' ]',
+            ]);
+        }
+
+        return new $symfonyByteStringClass($string);
+    }
 
     /**
      * @return \Symfony\Component\String\Slugger\SluggerInterface
@@ -281,26 +304,26 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
-        if (null === $delimiter) {
-            $_delimiter = '-';
+        $theType = Lib::$type;
 
-        } elseif (! Lib::type()->letter($_delimiter, $delimiter)) {
-            throw new LogicException(
-                [ 'The `delimiter` should be an exactly one letter', $delimiter ]
-            );
+        if (null === $delimiter) {
+            $delimiterLetter = '-';
+
+        } else {
+            $delimiterLetter = $theType->letter($delimiter)->orThrow();
         }
 
         $slug = $this->translit(
             $string,
-            $_delimiter, $ignoreSymbols, $locale
+            $delimiterLetter, $ignoreSymbols, $locale
         );
 
-        $delimiterAndSpaceRegex = sprintf('\x{%X}', mb_ord($_delimiter));
+        $delimiterAndSpaceRegex = sprintf('\x{%X}', mb_ord($delimiterLetter));
         $delimiterAndSpaceRegex = '/[' . $delimiterAndSpaceRegex . ' ]+/iu';
 
-        $slug = preg_replace($delimiterAndSpaceRegex, $_delimiter, $slug);
+        $slug = preg_replace($delimiterAndSpaceRegex, $delimiterLetter, $slug);
 
-        $slug = trim($slug, $_delimiter);
+        $slug = trim($slug, $delimiterLetter);
 
         return $slug;
     }
@@ -314,55 +337,45 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
-        $theType = Lib::type();
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
 
         if (null === $delimiter) {
-            $_delimiter = '-';
+            $delimiterLetter = '-';
 
-        } elseif (! $theType->letter($_delimiter, $delimiter)) {
-            throw new LogicException(
-                [ 'The `delimiter` should be an exactly one letter', $delimiter ]
-            );
+        } else {
+            $delimiterLetter = $theType->letter($delimiter)->orThrow();
         }
 
-        $ignoreSymbolUserList = Lib::php()->to_list($ignoreSymbols);
+        $ignoreSymbolUserList = $thePhp->to_list($ignoreSymbols);
         $ignoreSymbolUserMap = [];
         foreach ( $ignoreSymbolUserList as $i => $ignoreSymbol ) {
             if (is_string($i)) {
                 $ignoreSymbol = $i;
             }
 
-            if (! $theType->string_not_empty($ignoreSymbolString, $ignoreSymbol)) {
-                throw new LogicException(
-                    [
-                        'Each of `ignoreSymbols` should be a non-empty string',
-                        $ignoreSymbol,
-                        $i,
-                    ]
-                );
-            }
-
+            $ignoreSymbolString = $theType->string_not_empty($ignoreSymbol)->orThrow();
             $ignoreSymbolUserMap[ $ignoreSymbolString ] = true;
         }
 
         if ($this->usePresets) {
             $result = $this->translitPresets(
-                $string, $_delimiter, $ignoreSymbolUserMap
+                $string, $delimiterLetter, $ignoreSymbolUserMap
             );
 
         } elseif ($this->useSymfonySlugger) {
             $result = $this->translitSymfonySlugger(
-                $string, $_delimiter, $ignoreSymbolUserMap, $locale
+                $string, $delimiterLetter, $ignoreSymbolUserMap, $locale
             );
 
         } elseif ($this->useIntlTransliterator) {
             $result = $this->translitIntlTransliterator(
-                $string, $_delimiter, $ignoreSymbolUserMap
+                $string, $delimiterLetter, $ignoreSymbolUserMap
             );
 
         } else {
             $result = $this->translitDefault(
-                $string, $_delimiter, $ignoreSymbolUserMap
+                $string, $delimiterLetter, $ignoreSymbolUserMap
             );
         }
 
@@ -378,6 +391,8 @@ class DefaultSlugger implements SluggerInterface
         if ('' === $string) {
             return '';
         }
+
+        $thePreg = Lib::$preg;
 
         $presets = $this->registry->getPresetsSelected();
 
@@ -420,7 +435,7 @@ class DefaultSlugger implements SluggerInterface
 
         $knownSymbolMapRegex = array_keys($knownSymbolMap);
         $knownSymbolMapRegex = implode('', $knownSymbolMapRegex);
-        $knownSymbolMapRegex = '/[^' . Lib::preg()->preg_quote_ord($knownSymbolMapRegex) . 'a-z0-9 ]/iu';
+        $knownSymbolMapRegex = '/[^' . $thePreg->preg_quote_ord($knownSymbolMapRegex) . 'a-z0-9 ]/iu';
 
         $translit = preg_replace($knownSymbolMapRegex, $delimiter, $translit);
 
@@ -436,7 +451,7 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
-        $stringObject = new \Symfony\Component\String\BinaryString($string);
+        $stringObject = $this->newSymfonyByteString($string);
 
         if ($stringObject->isUtf8()) {
             $canUseIntl = true
@@ -472,6 +487,8 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
+        $thePreg = Lib::$preg;
+
         $rules = [];
         $rules[] = 'NFKD';                       // > split unicode accents and symbols, e.g. "Å" > "A°"
         $rules[] = 'Latin';                      // > convert everything to the Latin charset e.g. "ま" > "ma":
@@ -497,7 +514,7 @@ class DefaultSlugger implements SluggerInterface
 
         $knownSymbolMapRegex = array_keys($knownSymbolMap);
         $knownSymbolMapRegex = implode('', $knownSymbolMapRegex);
-        $knownSymbolMapRegex = '/[^' . Lib::preg()->preg_quote_ord($knownSymbolMapRegex) . 'a-z0-9 ]/iu';
+        $knownSymbolMapRegex = '/[^' . $thePreg->preg_quote_ord($knownSymbolMapRegex) . 'a-z0-9 ]/iu';
 
         $translit = preg_replace($knownSymbolMapRegex, $delimiter, $translit);
 
@@ -512,6 +529,8 @@ class DefaultSlugger implements SluggerInterface
         if ('' === $string) {
             return '';
         }
+
+        $thePreg = Lib::$preg;
 
         [
             $ignoreSymbolMap,
@@ -546,7 +565,7 @@ class DefaultSlugger implements SluggerInterface
 
         $knownSymbolMapRegex = array_keys($knownSymbolMap);
         $knownSymbolMapRegex = implode('', $knownSymbolMapRegex);
-        $knownSymbolMapRegex = '/[^' . Lib::preg()->preg_quote_ord($knownSymbolMapRegex) . '0-9 ]/iu';
+        $knownSymbolMapRegex = '/[^' . $thePreg->preg_quote_ord($knownSymbolMapRegex) . '0-9 ]/iu';
 
         $translit = preg_replace($knownSymbolMapRegex, $delimiter, $translit);
 

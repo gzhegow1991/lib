@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper;
@@ -88,16 +89,14 @@ class DebugModule
 
     public function static_dir_root(?string $dirRoot = null) : ?string
     {
+        $theType = Lib::$type;
+
         if (null !== $dirRoot) {
-            if (! Lib::fs()->type_dirpath_realpath($realpath, $dirRoot)) {
-                throw new LogicException(
-                    [ 'The `dirRoot` should be an existing directory path', $dirRoot ]
-                );
-            }
+            $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
 
             $last = $this->dirRoot;
 
-            $this->dirRoot = $realpath;
+            $this->dirRoot = $dirRootRealpath;
 
             $result = $last;
         }
@@ -123,49 +122,96 @@ class DebugModule
     }
 
 
+    /**
+     * @return Ret<array{ 0: string, 1: int }>
+     */
+    public function type_fileline($value)
+    {
+        if (! is_array($value)) {
+            return Ret::err(
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $file = $value[ 'file' ] ?? $value[ 0 ] ?? '{{file}}';
+        $line = $value[ 'line' ] ?? $value[ 1 ] ?? -1;
+
+        if ('{{file}}' !== $file) {
+            $fileRealpath = realpath($file);
+
+            if (false === $fileRealpath) {
+                return Ret::err(
+                    [ 'The `value[0]` should be realpath', $file, $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $file = $fileRealpath;
+        }
+
+        if (-1 !== $line) {
+            if (is_int($lineInt = $line) && ($line > 0)) {
+                return Ret::err(
+                    [ 'The `value[1]` should be positive integer', $line, $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $line = $lineInt;
+        }
+
+        return Ret::ok([ $file, $line ]);
+    }
+
+
     public function debug_backtrace(
         ?int $options = -1,
         ?int $limit = -1,
         ?string $dirRoot = ''
     ) : DebugBacktracerInterface
     {
-        $theDebugBacktracer = clone $this->static_debug_backtracer();
+        $backtracer = clone $this->static_debug_backtracer();
 
         if ((null === $options) || ($options >= 0)) {
-            $theDebugBacktracer->options($options);
+            $backtracer->options($options);
         }
 
         if ((null === $limit) || ($limit >= 0)) {
-            $theDebugBacktracer->limit($limit);
+            $backtracer->limit($limit);
         }
 
         if ('' !== $dirRoot) {
-            $theDebugBacktracer->dirRoot($dirRoot);
+            $backtracer->dirRoot($dirRoot);
         }
 
-        return $theDebugBacktracer;
+        return $backtracer;
     }
 
 
     /**
      * @return array{ 0: string, 1: string }
      */
-    public function file_line(?array $trace = null) : array
+    public function file_line(?array $trace = null, int $step = -2) : array
     {
-        if (null !== $trace) {
-            $t = [
-                $trace[ 0 ][ 'file' ] ?? '{file}',
-                $trace[ 0 ][ 'line' ] ?? '{line}',
-            ];
+        $i = 0;
 
-        } else {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 2);
+        if (null === $trace) {
+            if ($step >= 0) {
+                throw new LogicException(
+                    [ 'The `step` should be negative integer', $step ]
+                );
+            }
 
-            $t = [
-                $trace[ 1 ][ 'file' ] ?? '{file}',
-                $trace[ 1 ][ 'line' ] ?? '{line}',
-            ];
+            $i = -$step - 1;
+
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, -$step);
         }
+
+        $t = [
+            $trace[ $i ][ 'file' ] ?? '{{file}}',
+            $trace[ $i ][ 'line' ] ?? '{{line}}',
+        ];
 
         return $t;
     }
@@ -264,7 +310,7 @@ class DebugModule
 
             $last = $last ?? [];
 
-            $t = \Gzhegow\Lib\Lib::debug()->file_line();
+            $t = $this->file_line();
 
             $key = implode(':', $t);
 
@@ -670,11 +716,9 @@ class DebugModule
 
     public function types(array $options = [], ?string $delimiter = null, ...$values) : string
     {
-        if (! Lib::type()->string_not_empty($delimiterString, $delimiter ?? ' | ')) {
-            throw new LogicException(
-                [ 'The `delimiter` should be a non-empty string', $delimiter ]
-            );
-        }
+        $theType = Lib::$type;
+
+        $delimiterString = $theType->string_not_empty($delimiter ?? ' | ')->orThrow();
 
         $list = [];
         foreach ( $values as $value ) {
@@ -688,11 +732,9 @@ class DebugModule
 
     public function type_ids(array $options = [], ?string $delimiter = null, ...$values) : string
     {
-        if (! Lib::type()->string_not_empty($delimiterString, $delimiter ?? ' | ')) {
-            throw new LogicException(
-                [ 'The `delimiter` should be a non-empty string', $delimiter ]
-            );
-        }
+        $theType = Lib::$type;
+
+        $delimiterString = $theType->string_not_empty($delimiter ?? ' | ')->orThrow();
 
         $list = [];
         foreach ( $values as $value ) {
@@ -706,11 +748,9 @@ class DebugModule
 
     public function type_values(array $options = [], ?string $delimiter = null, ...$values) : string
     {
-        if (! Lib::type()->string_not_empty($delimiterString, $delimiter ?? ' | ')) {
-            throw new LogicException(
-                [ 'The `delimiter` should be a non-empty string', $delimiter ]
-            );
-        }
+        $theType = Lib::$type;
+
+        $delimiterString = $theType->string_not_empty($delimiter ?? ' | ')->orThrow();
 
         $list = [];
         foreach ( $values as $value ) {
@@ -724,11 +764,9 @@ class DebugModule
 
     public function values(array $options = [], ?string $delimiter = null, ...$values) : string
     {
-        if (! Lib::type()->string_not_empty($delimiterString, $delimiter ?? ' | ')) {
-            throw new LogicException(
-                [ 'The `delimiter` should be a non-empty string', $delimiter ]
-            );
-        }
+        $theType = Lib::$type;
+
+        $delimiterString = $theType->string_not_empty($delimiter ?? ' | ')->orThrow();
 
         $list = [];
         foreach ( $values as $value ) {
@@ -889,6 +927,8 @@ class DebugModule
     {
         if (! is_string($var)) return null;
 
+        $theStr = Lib::$str;
+
         $withValue = $options[ 'with_value' ] ?? true;
 
         $phpType = gettype($var);
@@ -896,8 +936,6 @@ class DebugModule
 
         $printableValue = [];
         if ($withValue) {
-            $theStr = Lib::str();
-
             $printableValue = str_replace('"', '\"', $var);
             $printableValue = $theStr->dump_encode($printableValue);
             $printableValue = '"' . $printableValue . '"';
@@ -919,6 +957,8 @@ class DebugModule
     protected function var_dump_output_object($var, array $options = [], array &$refContext = []) : ?array
     {
         if (! is_object($var)) return null;
+
+        $theDate = Lib::$date;
 
         $phpType = gettype($var);
 
@@ -954,7 +994,7 @@ class DebugModule
                 $printableValue = [ '"' . $var->getName() . '"' ];
 
             } elseif ($var instanceof \DateInterval) {
-                $printableValue = [ '"' . Lib::date()->interval_encode($var) . '"' ];
+                $printableValue = [ '"' . $theDate->interval_encode($var) . '"' ];
 
             } elseif ($var instanceof \Throwable) {
                 $printableValue = [ '"' . $var->getMessage() . '"' ];
@@ -985,8 +1025,8 @@ class DebugModule
     {
         if (! is_array($var)) return null;
 
-        $theArr = Lib::arr();
-        $theType = Lib::type();
+        $theArr = Lib::$arr;
+        $theType = Lib::$type;
 
         $withValue = $options[ 'with_value' ] ?? true;
 
@@ -1012,7 +1052,7 @@ class DebugModule
             foreach ( $gen as $path => &$value ) {
                 if (false
                     || is_object($value)
-                    || $theType->resource($_value, $value)
+                    || $theType->is_resource($value)
                 ) {
                     // > ! recursion
                     $value = $this->var_dump(
@@ -1140,6 +1180,8 @@ class DebugModule
     {
         $level = $level ?? 0;
 
+        $theType = Lib::$type;
+
         $addcslashes = $options[ 'addcslashes' ] ?? true;
         $indent = $options[ 'indent' ] ?? "  ";
         $newline = $options[ 'newline' ] ?? "\n";
@@ -1175,7 +1217,7 @@ class DebugModule
                     $result = "[]";
 
                 } else {
-                    $isListSorted = Lib::arr()->type_list_sorted($ref, $var);
+                    $isListSorted = $theType->is_list_sorted($var);
 
                     $lines = [];
                     foreach ( $var as $key => $value ) {
@@ -1253,7 +1295,7 @@ class DebugModule
         array $refs = []
     ) : bool
     {
-        $theStr = Lib::str();
+        $theStr = Lib::$str;
 
         $withDiffLines = array_key_exists(0, $refs);
         if ($withDiffLines) {

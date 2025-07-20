@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Exception\Traits;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\Interfaces\HasTraceOverrideInterface;
 
 
@@ -53,12 +52,12 @@ trait HasTraceOverrideTrait
 
     public function getFileOverride(?string $dirRoot = null) : string
     {
+        $theFs = Lib::$fs;
+
         $file = $this->file ?? $this->getFile();
 
         if (null !== $dirRoot) {
-            $file = Lib::fs()->path_relative(
-                $file, $dirRoot, '/'
-            );
+            $file = $theFs->path_relative($file, $dirRoot, '/');
         }
 
         return $file;
@@ -79,19 +78,17 @@ trait HasTraceOverrideTrait
 
     public function getTraceOverride(?string $dirRoot = null) : array
     {
+        $theFs = Lib::$fs;
+
         $trace = $this->trace ?? $this->getTrace();
 
         if (null !== $dirRoot) {
-            $theFs = Lib::fs();
-
             foreach ( $trace as $i => $frame ) {
                 if (! isset($frame[ 'file' ])) {
                     continue;
                 }
 
-                $trace[ $i ][ 'file' ] = $theFs->path_relative(
-                    $frame[ 'file' ], $dirRoot, '/'
-                );
+                $trace[ $i ][ 'file' ] = $theFs->path_relative($frame[ 'file' ], $dirRoot, '/');
             }
         }
 
@@ -100,23 +97,19 @@ trait HasTraceOverrideTrait
 
     public function getTraceAsStringOverride(?string $fileRoot = null) : string
     {
+        $theType = Lib::$type;
+
         if (null === $this->trace) {
             $traceAsString = $this->getTraceAsString();
 
             if (null !== $fileRoot) {
-                if (! Lib::type()->realpath($fileRootRealpath, $fileRoot)) {
-                    throw new LogicException(
-                        [ 'The `fileRoot` should be realpath', $fileRoot ]
-                    );
-                }
+                $fileRootRealpath = $theType->realpath($fileRoot)->orThrow();
 
                 $traceAsString = str_replace($fileRootRealpath . DIRECTORY_SEPARATOR, '', $traceAsString);
             }
 
             return $traceAsString;
         }
-
-        $theType = Lib::type();
 
         $rtn = "";
         $count = 0;
@@ -142,8 +135,8 @@ trait HasTraceOverrideTrait
                     } elseif (is_object($arg)) {
                         $args[] = get_class($arg);
 
-                    } elseif ($theType->resource($var, $arg)) {
-                        $args[] = get_resource_type($arg);
+                    } elseif ($theType->resource($arg)->isOk([ &$ref ])) {
+                        $args[] = get_resource_type($ref);
 
                     } else {
                         $args[] = $arg;

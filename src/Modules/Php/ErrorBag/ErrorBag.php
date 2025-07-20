@@ -168,22 +168,18 @@ class ErrorBag
 
     protected function assertTags(array $tags) : array
     {
-        $index = [];
+        $theType = Lib::$type;
 
-        $theType = Lib::type();
+        $index = [];
 
         foreach ( $tags as $i => $tag ) {
             if (is_string($i)) {
                 $tag = $i;
             }
 
-            if (! $theType->string_not_empty($tagString, $tag)) {
-                throw new LogicException(
-                    [ 'Each of `and` in `orAndTags` should be a non-empty string', $tag, $i ]
-                );
-            }
+            $tagStringNotEmpty = $theType->string_not_empty($tag)->orThrow();
 
-            $index[ $tagString ] = true;
+            $index[ $tagStringNotEmpty ] = true;
         }
 
         return $index;

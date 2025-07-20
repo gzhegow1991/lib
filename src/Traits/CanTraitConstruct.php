@@ -9,12 +9,13 @@ trait CanTraitConstruct
 {
     protected function __traitConstruct(array $args = [])
     {
-        $theType = Lib::type();
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
 
-        $traits = Lib::php()->class_uses_with_parents($this, true);
+        $traits = $thePhp->class_uses_with_parents($this, true);
 
         foreach ( $traits as $trait ) {
-            if (! $theType->struct_basename($traitBasename, $trait)) {
+            if (! $theType->struct_basename($trait)->isOk([ &$traitBasename ])) {
                 continue;
             }
 

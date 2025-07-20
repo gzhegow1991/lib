@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  * @noinspection PhpUndefinedClassInspection
  * @noinspection PhpUndefinedNamespaceInspection
  */
@@ -77,21 +78,13 @@ class DefaultEmailParser implements EmailParserInterface
             return $this;
         }
 
-        $theType = Lib::type();
+        $theType = Lib::$type;
 
-        foreach ( $regexList as $i => $regex ) {
-            if (! $theType->regex($regexp, $regex)) {
-                throw new RuntimeException(
-                    [
-                        'Each of `regexList` should be a valid regular expression',
-                        $regex,
-                        $i,
-                    ]
-                );
-            }
+        foreach ( $regexList as $regex ) {
+            $regexValid = $theType->regex($regex)->orThrow();
 
-            if (! isset($this->emailFakeRegexIndex[ $regexp ])) {
-                $this->emailFakeRegexIndex[ $regexp ] = true;
+            if (! isset($this->emailFakeRegexIndex[ $regexValid ])) {
+                $this->emailFakeRegexIndex[ $regexValid ] = true;
             }
         }
 
@@ -196,16 +189,11 @@ class DefaultEmailParser implements EmailParserInterface
 
     protected function parseEmailDomain(string $email) : array
     {
-        if (! Lib::type()->string_not_empty($emailString, $email)) {
-            throw new LogicException(
-                [
-                    'The `email` should be a non-empty string',
-                    $email,
-                ]
-            );
-        }
+        $theType = Lib::$type;
 
-        [ $emailName, $emailDomain ] = explode('@', $emailString, 2) + [ '', '' ];
+        $emailStringNotEmpty = $theType->string_not_empty($email)->orThrow();
+
+        [ $emailName, $emailDomain ] = explode('@', $emailStringNotEmpty, 2) + [ '', '' ];
 
         if ('' === $emailDomain) {
             throw new LogicException(
@@ -217,17 +205,16 @@ class DefaultEmailParser implements EmailParserInterface
             );
         }
 
-        return [ $emailString, $emailDomain, $emailName ];
+        return [ $emailStringNotEmpty, $emailDomain, $emailName ];
     }
 
-    /**
-     * @noinspection PhpDeprecationInspection
-     */
     protected function parseEmailFilters(
         string $email, string $emailDomain, string $emailName,
         array $filters
     ) : void
     {
+        $theHttp = Lib::$http;
+
         $filtersKnownIndex = [
             'filter'         => true,
             'filter_unicode' => true,
@@ -279,7 +266,7 @@ class DefaultEmailParser implements EmailParserInterface
                     $emailDomainAscii = false;
 
                     try {
-                        $emailDomainAscii = Lib::http()->idn_to_ascii($emailDomain);
+                        $emailDomainAscii = $theHttp->idn_to_ascii($emailDomain);
                     }
                     catch ( \Throwable $e ) {
                     }

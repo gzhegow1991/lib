@@ -184,7 +184,8 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
     {
         $refKnownSymbolMap = [];
 
-        $theMb = Lib::mb();
+        $theMb = Lib::$mb;
+        $theMb->assertExtension();
 
         $result = [];
 
@@ -198,13 +199,15 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
                 ?? (is_string($letter) ? [ $letter ] : null)
                 ?? [];
 
-            $letters = $theMb->str_split($letter, 1);
+            foreach ( $letterArray as $l ) {
+                $letters = $theMb->str_split($l, 1);
 
-            foreach ( $letters as $l ) {
-                if (! isset($result[ $l ])) {
-                    $result[ $l ] = true;
+                foreach ( $letters as $ll ) {
+                    if (! isset($result[ $ll ])) {
+                        $result[ $ll ] = true;
 
-                    $refKnownSymbolMap[ $l ] = true;
+                        $refKnownSymbolMap[ $ll ] = true;
+                    }
                 }
             }
         }
@@ -224,9 +227,11 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
     {
         $refKnownSymbolMap = [];
 
-        $theItertools = Lib::itertools();
-        $theMb = Lib::mb();
-        $theType = Lib::type();
+        $theItertools = Lib::$itertools;
+        $theMb = Lib::$mb;
+        $theType = Lib::$type;
+
+        $theMb->assertExtension();
 
         $result = [];
 
@@ -243,14 +248,10 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
 
             $aCase = [];
             foreach ( $aList as $i => $a ) {
-                if (! $theType->letter($aString, $a)) {
-                    throw new LogicException(
-                        [ 'Each of `lettersIn` should be a letter', $a, $i ]
-                    );
-                }
+                $aLetter = $theType->letter($a)->orThrow();
 
-                $aLower = mb_strtolower($aString);
-                $aUpper = mb_strtoupper($aString);
+                $aLower = mb_strtolower($aLetter);
+                $aUpper = mb_strtoupper($aLetter);
 
                 if (false
                     || isset($ignoreSymbolMap[ $aLower ])
@@ -320,7 +321,8 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
     {
         $refKnownSymbolMap = [];
 
-        $theMb = Lib::mb();
+        $theMb = Lib::$mb;
+        $theMb->assertExtension();
 
         $result = [];
 

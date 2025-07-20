@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @noinspection PhpUnnecessaryFullyQualifiedNameInspection
+ */
+
 namespace Gzhegow\Lib\Modules\Arr\ArrayOf;
 
 

@@ -3,9 +3,8 @@
 namespace Gzhegow\Lib\Modules\Async\Promise;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Php\Result\Ret;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
 use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
@@ -53,135 +52,125 @@ class PromiseManager implements PromiseManagerInterface
         ?FetchApiInterface $fetchApi = null
     )
     {
+        $theAsync = Lib::$async;
+
         $this->poolingFactory = $poolingFactory;
 
-        $this->clockManager = $clockManager ?? Lib::async()->static_clock_manager();
-        $this->loopManager = $loopManager ?? Lib::async()->static_loop_manager();
+        $this->clockManager = $clockManager ?? $theAsync->static_clock_manager();
+        $this->loopManager = $loopManager ?? $theAsync->static_loop_manager();
 
-        $this->fetchApi = $fetchApi ?? Lib::async()->static_fetch_api();
+        $this->fetchApi = $fetchApi ?? $theAsync->static_fetch_api();
     }
 
 
     /**
-     * @param Ret $ret
-     *
-     * @return Promise|bool|null
+     * @return Promise|Ret<Promise>
      */
-    public function from($from, $ret = null)
+    public function from($from, ?array $fallback = null)
     {
-        $retCur = Result::asValue();
+        $ret = Ret::new();
 
         $instance = null
-            ?? $this->fromInstance($from, $retCur)
-            ?? $this->fromCallable($from, $retCur)
-            ?? $this->fromValueResolved($from, $retCur);
+            ?? $this->fromInstance($from)->orNull($ret)
+            ?? $this->fromCallable($from)->orNull($ret)
+            ?? $this->fromValueResolved($from)->orNull($ret);
 
-        if ($retCur->isErr()) {
-            return Result::err($ret, $retCur);
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
         }
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return Promise|bool|null
+     * @return Promise|Ret<Promise>
      */
-    public function fromValue($from, $ret = null)
+    public function fromValue($from, ?array $fallback = null)
     {
-        $retCur = Result::asValue();
+        $ret = Ret::new();
 
         $instance = null
-            ?? $this->fromInstance($from, $retCur)
-            ?? $this->fromValueResolved($from, $retCur);
+            ?? $this->fromInstance($from)->orNull($ret)
+            ?? $this->fromValueResolved($from)->orNull($ret);
 
-        if ($retCur->isErr()) {
-            return Result::err($ret, $retCur);
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
         }
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return Promise|bool|null
+     * @return Promise|Ret<Promise>
      */
-    public function fromCallable($from, $ret = null)
+    public function fromCallable($from, ?array $fallback = null)
     {
-        $retCur = Result::asValue();
+        $ret = Ret::new();
 
         $instance = null
-            ?? $this->fromInstance($from, $retCur)
-            ?? $this->fromCallableExecutor($from, $retCur);
+            ?? $this->fromInstance($from)->orNull($ret)
+            ?? $this->fromCallableExecutor($from)->orNull($ret);
 
-        if ($retCur->isErr()) {
-            return Result::err($ret, $retCur);
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
         }
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
 
     /**
-     * @param Ret $ret
-     *
-     * @return Promise|bool|null
+     * @return Promise|Ret<Promise>
      */
-    protected function fromInstance($from, $ret = null)
+    protected function fromInstance($from, ?array $fallback = null)
     {
         if ($from instanceof Promise) {
-            return Result::ok($ret, $from);
+            return Ret::val($fallback, $from);
         }
 
-        return Result::err(
-            $ret,
+        return Ret::throw(
+            $fallback,
             [ 'The `from` should be an instance of: ' . Promise::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return Promise|bool|null
+     * @return Promise|Ret<Promise>
      */
-    protected function fromValueResolved($from, $ret = null)
+    protected function fromValueResolved($from, ?array $fallback = null)
     {
         try {
             $instance = Promise::newResolved($this, $this->loopManager, $from);
         }
         catch ( \Throwable $e ) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return Promise|bool|null
+     * @return Promise|Ret<Promise>
      */
-    protected function fromCallableExecutor($from, $ret = null)
+    protected function fromCallableExecutor($from, ?array $fallback = null)
     {
         try {
             $instance = Promise::newPromise($this, $this->loopManager, $from);
         }
         catch ( \Throwable $e ) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
 
@@ -209,43 +198,31 @@ class PromiseManager implements PromiseManagerInterface
      */
     public function new($fnExecutor) : Promise
     {
-        $promise = Promise::newPromise($this, $this->loopManager, $fnExecutor);
-
-        return $promise;
+        return Promise::newPromise($this, $this->loopManager, $fnExecutor);
     }
 
     public function resolved($value = null) : Promise
     {
-        $promise = Promise::newResolved($this, $this->loopManager, $value);
-
-        return $promise;
+        return Promise::newResolved($this, $this->loopManager, $value);
     }
 
     public function rejected($reason = null) : Promise
     {
-        $promise = Promise::newRejected($this, $this->loopManager, $reason);
-
-        return $promise;
+        return Promise::newRejected($this, $this->loopManager, $reason);
     }
 
 
     public function never() : Promise
     {
-        $promise = Promise::newNever(
-            $this, $this->loopManager
-        );
-
-        return $promise;
+        return Promise::newNever($this, $this->loopManager);
     }
 
     public function defer(?\Closure &$refFnResolve = null, ?\Closure &$refFnReject = null) : Promise
     {
-        $promise = Promise::newDefer(
+        return Promise::newDefer(
             $this, $this->loopManager,
             $refFnResolve, $refFnReject
         );
-
-        return $promise;
     }
 
 
@@ -265,15 +242,10 @@ class PromiseManager implements PromiseManagerInterface
      */
     public function pooling(int $tickMs, ?int $timeoutMs, $fnPooling) : Promise
     {
-        $theType = Lib::type();
-
-        if (! $theType->int_positive($tickMsInt, $tickMs)) {
-            throw new LogicException(
-                [ 'The `tickMs` should be a positive integer', $tickMs ]
-            );
-        }
-
         $theClockManager = $this->clockManager;
+        $theType = Lib::$type;
+
+        $tickMsInt = $theType->int_positive($tickMs)->orThrow();
 
         $defer = $this->defer($fnResolve, $fnReject);
 
@@ -308,7 +280,10 @@ class PromiseManager implements PromiseManagerInterface
         $interval = $theClockManager->setInterval($tickMsInt, $fnTick);
 
         $defer
-            ->finally(static function () use ($theClockManager, $interval) {
+            ->finally(static function () use (
+                $theClockManager,
+                $interval
+            ) {
                 $theClockManager->clearInterval($interval);
             })
         ;
@@ -654,25 +629,32 @@ class PromiseManager implements PromiseManagerInterface
     }
 
 
-    public function timeout(Promise $promise, int $timeoutMs, $reason = null) : Promise
+    public function timeout(Promise $promise, int $timeoutMs, $rejectReason = null) : Promise
     {
         $theClockManager = $this->clockManager;
+        $theType = Lib::$type;
 
         $promiseTimeout = $this->defer($fnResolveTimeout, $fnRejectTimeout);
 
         $timer = $theClockManager->setTimeout(
             $timeoutMs,
-            static function () use ($timeoutMs, $reason, $fnRejectTimeout) {
-                if ($reason instanceof \Throwable) {
-                    $reasonThrowable = $reason;
+            static function () use (
+                $theType,
+                $timeoutMs,
+                $rejectReason, $fnRejectTimeout
+            ) {
+                if ($rejectReason instanceof \Throwable) {
+                    $reasonThrowable = $rejectReason;
 
-                } elseif (is_array($reason) && ([] !== $reason)) {
-                    $reason[] = $timeoutMs;
+                } elseif (is_array($rejectReason) && ([] !== $rejectReason)) {
+                    $rejectReason[] = $timeoutMs;
 
-                    $reasonThrowable = new RuntimeException($reason);
+                    $reasonThrowable = new RuntimeException($rejectReason);
 
-                } elseif (Lib::type()->string_not_empty($reasonString, $reason)) {
-                    $reasonThrowable = new RuntimeException([ $reasonString, $timeoutMs ]);
+                } elseif ($theType->string_not_empty($rejectReason)->isOk([ &$rejectReasonStringNotEmpty ])) {
+                    $reasonThrowable = new RuntimeException(
+                        [ $rejectReasonStringNotEmpty, $timeoutMs ]
+                    );
 
                 } else {
                     $reasonThrowable = new RuntimeException("Timeout: {$timeoutMs}ms");
@@ -698,33 +680,17 @@ class PromiseManager implements PromiseManagerInterface
      */
     public function fetchCurl(string $url, array $curlOptions = [], ?int $timeoutMs = null) : Promise
     {
-        $theType = Lib::type();
+        $theType = Lib::$type;
 
-        if (! $theType->url($urlString, $url)) {
-            throw new LogicException(
-                [ 'The `url` should be a valid url', $url ]
-            );
+        $urlValid = $theType->url($url)->orThrow();
+        $curlOptionsList = $theType->list($curlOptions)->orThrow();
+
+        $timeoutMsInt = 10000;
+        if (! is_null($timeoutMs)) {
+            $timeoutMsInt = $theType->int_positive($timeoutMs)->orThrow();
         }
 
-        if (! $theType->list($curlOptionsList, $curlOptions)) {
-            throw new LogicException(
-                [ 'The `curlOptions` should be a list of `CURL options`', $curlOptions ]
-            );
-        }
-
-        if (! is_null($timeoutMsInt = $timeoutMs)) {
-            if (! $theType->int_positive($timeoutMsInt, $timeoutMs)) {
-                throw new LogicException(
-                    [ 'The `timeoutMs` should be a positive integer', $timeoutMs ]
-                );
-            }
-        }
-
-        $urlString = $urlString ?? '';
-        $curlOptionsList = $curlOptionsList ?? [];
-        $timeoutMsInt = $timeoutMsInt ?? 10000;
-
-        $taskId = $this->fetchApiPushTask($urlString, $curlOptionsList);
+        $taskId = $this->fetchApiPushTask($urlValid, $curlOptionsList);
 
         $promise = $this->fetchApiAwait()
             ->then(function () use ($taskId, $timeoutMsInt) {
@@ -779,14 +745,14 @@ class PromiseManager implements PromiseManagerInterface
      */
     protected function fetchApiWakeup()
     {
-        $promise = $this->fetchApiWakeupDeferred;
+        $theFetchApi = $this->fetchApi;
+
+        $aPromise = $this->fetchApiWakeupDeferred;
 
         if (false
-            || (null === $promise)
-            || $promise->isSettled()
+            || (null === $aPromise)
+            || ($aPromise->isSettled())
         ) {
-            $theFetchApi = $this->fetchApi;
-
             $theFetchApi->daemonWakeup(10000, 1000);
 
             $fnPooling = static function ($ctx) use ($theFetchApi) {
@@ -797,9 +763,9 @@ class PromiseManager implements PromiseManagerInterface
                 $ctx->setResult(null);
             };
 
-            $promise = $this->pooling(100, 10000, $fnPooling);
+            $aPromise = $this->pooling(100, 10000, $fnPooling);
 
-            $this->fetchApiWakeupDeferred = $promise;
+            $this->fetchApiWakeupDeferred = $aPromise;
         }
 
         return $this->fetchApiWakeupDeferred;

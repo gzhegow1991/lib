@@ -4,7 +4,6 @@ namespace Gzhegow\Lib\Modules\Fs\FileSafe;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
@@ -87,27 +86,23 @@ class FileSafe
      */
     public function fclosef($resource)
     {
-        $isResource = Lib::type()->resource($var, $resource);
+        $theType = Lib::$type;
 
-        if (! $isResource) {
-            throw new LogicException(
-                [ 'The `resource` should be a resource', $resource ]
-            );
-        }
+        $resourceValid = $theType->resource($resource)->orThrow();
 
-        $isResourceOpened = is_resource($resource);
+        $isResourceOpened = is_resource($resourceValid);
 
         if ($isResourceOpened) {
-            $status = fclose($resource);
+            $status = fclose($resourceValid);
 
             if (false === $status) {
                 return false;
             }
         }
 
-        $this->context->offFinallyFclose($resource);
+        $this->context->offFinallyFclose($resourceValid);
 
-        return $resource;
+        return $resourceValid;
     }
 
 
@@ -151,7 +146,9 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $resourceLocked = Lib::php()->pooling_sync(
+        $thePhp = Lib::$php;
+
+        $resourceLocked = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -200,27 +197,23 @@ class FileSafe
      */
     public function freleasef($resource)
     {
-        $isResource = Lib::type()->resource($var, $resource);
+        $theType = Lib::$type;
 
-        if (! $isResource) {
-            throw new LogicException(
-                [ 'The `resource` should be a resource', $resource ]
-            );
-        }
+        $resourceValid = $theType->resource($resource)->orThrow();
 
-        $isResourceOpened = is_resource($resource);
+        $isResourceOpened = is_resource($resourceValid);
 
         if ($isResourceOpened) {
-            $status = flock($resource, LOCK_UN);
+            $status = flock($resourceValid, LOCK_UN);
 
             if (false === $status) {
                 return false;
             }
         }
 
-        $this->context->offFinallyFrelease($resource);
+        $this->context->offFinallyFrelease($resourceValid);
 
-        return $resource;
+        return $resourceValid;
     }
 
 
@@ -278,6 +271,8 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
+        $thePhp = Lib::$php;
+
         array_unshift($fopenArgs, $file, $modeOpen, false);
 
         $resource = call_user_func_array('fopen', $fopenArgs);
@@ -288,7 +283,7 @@ class FileSafe
 
         $this->context->onFinallyFclose($resource);
 
-        $resourceLocked = Lib::php()->pooling_sync(
+        $resourceLocked = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -345,37 +340,33 @@ class FileSafe
      */
     public function freleasef_fclosef($resource)
     {
-        $isResource = Lib::type()->resource($var, $resource);
+        $theType = Lib::$type;
 
-        if (! $isResource) {
-            throw new LogicException(
-                [ 'The `resource` should be a resource', $resource ]
-            );
-        }
+        $resourceValid = $theType->resource($resource)->orThrow();
 
-        $isResourceOpened = is_resource($resource);
+        $isResourceOpened = is_resource($resourceValid);
 
         if ($isResourceOpened) {
-            $statusFlock = flock($resource, LOCK_UN);
+            $statusFlock = flock($resourceValid, LOCK_UN);
 
             if (false === $statusFlock) {
                 return false;
             }
         }
 
-        $this->context->offFinallyFrelease($resource);
+        $this->context->offFinallyFrelease($resourceValid);
 
         if ($isResourceOpened) {
-            $statusFclose = fclose($resource);
+            $statusFclose = fclose($resourceValid);
 
             if (false === $statusFclose) {
                 return false;
             }
         }
 
-        $this->context->offFinallyFclose($resource);
+        $this->context->offFinallyFclose($resourceValid);
 
-        return $resource;
+        return $resourceValid;
     }
 
 
@@ -434,6 +425,8 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
+        $thePhp = Lib::$php;
+
         array_unshift($fopenArgs, $file, $modeOpen, false);
 
         $resource = call_user_func_array('fopen', $fopenArgs);
@@ -445,7 +438,7 @@ class FileSafe
         $this->context->onFinallyUnlink($file);
         $this->context->onFinallyFclose($resource);
 
-        $resourceLocked = Lib::php()->pooling_sync(
+        $resourceLocked = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -477,7 +470,9 @@ class FileSafe
      */
     public function frelease_fclose_unlink($resource, $file)
     {
-        $isWindows = Lib::php()->is_windows();
+        $thePhp = Lib::$php;
+
+        $isWindows = $thePhp->is_windows();
 
         if (! $isWindows) {
             $status = unlink($file);
@@ -526,15 +521,12 @@ class FileSafe
      */
     public function freleasef_fclosef_unlinkf($resource, $file)
     {
-        $isResource = Lib::type()->resource($var, $resource);
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
 
-        if (! $isResource) {
-            throw new LogicException(
-                [ 'The `resource` should be a resource', $resource ]
-            );
-        }
+        $resourceValid = $theType->resource($resource)->orThrow();
 
-        $isWindows = Lib::php()->is_windows();
+        $isWindows = $thePhp->is_windows();
 
         $isFile = is_file($file);
 
@@ -550,27 +542,27 @@ class FileSafe
             $this->context->offFinallyUnlink($file);
         }
 
-        $isResourceOpened = is_resource($resource);
+        $isResourceOpened = is_resource($resourceValid);
 
         if ($isResourceOpened) {
-            $status = flock($resource, LOCK_UN);
+            $status = flock($resourceValid, LOCK_UN);
 
             if (false === $status) {
                 return false;
             }
         }
 
-        $this->context->offFinallyFrelease($resource);
+        $this->context->offFinallyFrelease($resourceValid);
 
         if ($isResourceOpened) {
-            $status = fclose($resource);
+            $status = fclose($resourceValid);
 
             if (false === $status) {
                 return false;
             }
         }
 
-        $this->context->offFinallyFclose($resource);
+        $this->context->offFinallyFclose($resourceValid);
 
         if ($isWindows) {
             if ($isFile) {
@@ -584,7 +576,7 @@ class FileSafe
             $this->context->offFinallyUnlink($file);
         }
 
-        return $resource;
+        return $resourceValid;
     }
 
 
@@ -684,6 +676,8 @@ class FileSafe
      */
     public function fpassthru_fflush($resource)
     {
+        $thePhp = Lib::$php;
+
         $size = fpassthru($resource);
 
         if (false === $size) {
@@ -691,7 +685,7 @@ class FileSafe
         }
 
         // fflush($resource);
-        fflush(Lib::php()->output());
+        fflush($thePhp->output());
 
         return $size;
     }
@@ -1041,7 +1035,9 @@ class FileSafe
      */
     public function realpath($file, $returnTargetPath = null)
     {
-        $returnTargetPath = $returnTargetPath ?? Lib::fs()->static_realpath_return_target_path();
+        $theFs = Lib::$fs;
+
+        $returnTargetPath = $returnTargetPath ?? $theFs->static_realpath_return_target_path();
         $returnTargetPath = (bool) $returnTargetPath;
 
         if ($returnTargetPath) {
@@ -1399,7 +1395,9 @@ class FileSafe
      */
     public function mkdir($directory, $permissions = null, $recursive = null, $context = null)
     {
-        $permissions = $permissions ?? Lib::fs()->static_dir_chmod();
+        $theFs = Lib::$fs;
+
+        $permissions = $permissions ?? $theFs->static_dir_chmod();
         $recursive = $recursive ?? false;
 
         $status = (null !== $context)
@@ -1430,8 +1428,10 @@ class FileSafe
      */
     public function mkdirp($directory, $permissions = null, $recursive = null, $context = null)
     {
+        $theFs = Lib::$fs;
+
         if (! is_dir($directory)) {
-            $permissions = $permissions ?? Lib::fs()->static_dir_chmod();
+            $permissions = $permissions ?? $theFs->static_dir_chmod();
             $recursive = $recursive ?? true;
 
             $status = (null !== $context)
@@ -1653,7 +1653,9 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $content = Lib::php()->pooling_sync(
+        $thePhp = Lib::$php;
+
+        $content = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -1710,17 +1712,13 @@ class FileSafe
             }
 
         } elseif (is_array($data)) {
-            $theType = Lib::type();
+            $theType = Lib::$type;
 
             $len = 0;
-            foreach ( $data as $i => $line ) {
-                if (! $theType->string($lineString, $line)) {
-                    throw new LogicException(
-                        [ 'The `data` should be array of strings', $i, $line ]
-                    );
-                }
+            foreach ( $data as $line ) {
+                $lineString = $theType->string($line)->orThrow();
 
-                $lenLine = fwrite($resource, $line);
+                $lenLine = fwrite($resource, $lineString);
 
                 if (false === $lenLine) {
                     return false;
@@ -1764,6 +1762,8 @@ class FileSafe
         array $flockArgs = []
     )
     {
+        $theType = Lib::$type;
+
         array_unshift($fopenArgs, $file, $modeOpen);
 
         $resource = call_user_func_array([ $this, 'fopen' ], $fopenArgs);
@@ -1788,17 +1788,13 @@ class FileSafe
             }
 
         } elseif (is_array($data)) {
-            $theType = Lib::type();
+
 
             $len = 0;
-            foreach ( $data as $i => $line ) {
-                if (! $theType->string($lineString, $line)) {
-                    throw new LogicException(
-                        [ 'The `data` should be array of strings', $i, $line ]
-                    );
-                }
+            foreach ( $data as $line ) {
+                $lineString = $theType->string($line)->orThrow();
 
-                $lenLine = fwrite($resource, $line);
+                $lenLine = fwrite($resource, $lineString);
 
                 if (false === $lenLine) {
                     return false;
@@ -1848,7 +1844,9 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $len = Lib::php()->pooling_sync(
+        $thePhp = Lib::$php;
+
+        $len = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -2047,7 +2045,9 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $content = Lib::php()->pooling_sync(
+        $thePhp = Lib::$php;
+
+        $content = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -2161,7 +2161,9 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $size = Lib::php()->pooling_sync(
+        $thePhp = Lib::$php;
+
+        $size = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
             //
             function ($ctx) use (
@@ -2297,8 +2299,10 @@ class FileSafe
      */
     public function call_safe(\Closure $fn, array $args = [])
     {
+        $theFunc = Lib::$func;
+
         $beforeErrorReporting = error_reporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
-        $beforeErrorHandler = set_error_handler([ Lib::func(), 'safe_call_error_handler' ]);
+        $beforeErrorHandler = set_error_handler([ $theFunc, 'safe_call_error_handler' ]);
 
         $previousCtx = $this->setContext($currentCtx = new FileSafeContext());
 

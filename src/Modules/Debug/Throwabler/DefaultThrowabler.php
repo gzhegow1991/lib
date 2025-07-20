@@ -22,15 +22,13 @@ class DefaultThrowabler implements ThrowablerInterface
      */
     public function setDirRoot(?string $dirRoot)
     {
+        $theType = Lib::$type;
+
         if (null !== $dirRoot) {
-            if (! Lib::fs()->type_dirpath_realpath($realpath, $dirRoot)) {
-                throw new LogicException(
-                    [ 'The `dirRoot` should be an existing directory path', $dirRoot ]
-                );
-            }
+            $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
         }
 
-        $this->dirRoot = $realpath ?? null;
+        $this->dirRoot = $dirRootRealpath ?? null;
 
         return $this;
     }
@@ -361,6 +359,9 @@ class DefaultThrowabler implements ThrowablerInterface
 
     public function getThrowableInfo(\Throwable $throwable, ?int $flags = null) : array
     {
+        $theDebug = Lib::$debug;
+        $theFs = Lib::$fs;
+
         $eFile = $throwable->getFile();
         $eLine = $throwable->getLine();
         $eObjectClass = get_class($throwable);
@@ -370,11 +371,11 @@ class DefaultThrowabler implements ThrowablerInterface
             $eFile = '{file}';
 
         } else {
-            $dirRoot = $this->dirRoot ?? Lib::debug()->static_dir_root();
+            $dirRoot = $this->dirRoot ?? $theDebug->static_dir_root();
 
             if (null !== $dirRoot) {
                 try {
-                    $eFileRelative = Lib::fs()->path_relative(
+                    $eFileRelative = $theFs->path_relative(
                         $eFile,
                         $dirRoot,
                         '/'
@@ -407,6 +408,9 @@ class DefaultThrowabler implements ThrowablerInterface
      */
     public function getThrowableInfoLines(\Throwable $throwable, ?int $flags = null) : array
     {
+        $theDebug = Lib::$debug;
+        $theFs = Lib::$fs;
+
         $lines = [];
 
         $flags = $this->flagsDefault($flags);
@@ -423,11 +427,11 @@ class DefaultThrowabler implements ThrowablerInterface
                 $eFile = '{file}';
 
             } else {
-                $dirRoot = $this->dirRoot ?? Lib::debug()->static_dir_root();
+                $dirRoot = $this->dirRoot ?? $theDebug->static_dir_root();
 
                 if (null !== $dirRoot) {
                     try {
-                        $eFileRelative = Lib::fs()->path_relative(
+                        $eFileRelative = $theFs->path_relative(
                             $eFile,
                             $dirRoot,
                             '/'
@@ -474,13 +478,14 @@ class DefaultThrowabler implements ThrowablerInterface
 
     public function getThrowableTrace(\Throwable $e, ?int $flags = null) : array
     {
+        $theDebug = Lib::$debug;
+        $theFs = Lib::$fs;
+
         $eTrace = $e->getTrace();
 
-        $dirRoot = $this->dirRoot ?? Lib::debug()->static_dir_root();
+        $dirRoot = $this->dirRoot ?? $theDebug->static_dir_root();
 
         if (null !== $dirRoot) {
-            $theFs = Lib::fs();
-
             foreach ( $eTrace as $i => $t ) {
                 if (! isset($t[ 'file' ])) {
                     continue;

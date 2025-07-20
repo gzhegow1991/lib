@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  * @noinspection PhpUndefinedClassInspection
  * @noinspection PhpUndefinedNamespaceInspection
  */
@@ -85,7 +86,9 @@ class DefaultProcessManager implements ProcessManagerInterface
      */
     public function spawn(Proc $proc)
     {
-        $isWindows = Lib::php()->is_windows();
+        $thePhp = Lib::$php;
+
+        $isWindows = $thePhp->is_windows();
 
         $devnull = null
             ?? ($this->useSymfonyProcess ? $proc->spawnUsingSymfonyProcess() : null)
@@ -100,9 +103,11 @@ class DefaultProcessManager implements ProcessManagerInterface
      */
     public function spawnBackground(Proc $proc)
     {
+        $thePhp = Lib::$php;
+
         $proc->setIsBackground(true);
 
-        $isWindows = Lib::php()->is_windows();
+        $isWindows = $thePhp->is_windows();
 
         $devnull = null
             ?? ($this->useSymfonyProcess ? $proc->spawnUsingSymfonyProcess() : null)

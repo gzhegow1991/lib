@@ -3,7 +3,7 @@
 namespace Gzhegow\Lib\Modules\Async\Promise;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Php\Result\Ret;
+use Gzhegow\Lib\Modules\Type\Ret;
 
 
 /**
@@ -12,58 +12,71 @@ use Gzhegow\Lib\Modules\Php\Result\Ret;
 trait PromiseTrait
 {
     /**
-     * @var bool
+     * @return Promise|Ret<Promise>
      */
-    public static $debug = false;
-
-
-    /**
-     * @param Ret $ret
-     *
-     * @return Promise|bool|null
-     */
-    public static function from($from, $ret = null)
+    public static function from($from, ?array $fallback = null)
     {
-        $p = static::getInstance()->from($from, $ret);
+        $ret = static::getInstance()->from($from);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
         }
 
-        return $p;
+        $p = $ret->getValue();
+
+        if (Promise::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
+        }
+
+        return Ret::val($fallback, $ret);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return Promise|bool|null
+     * @return Promise|Ret<Promise>
      */
-    public static function fromValue($from, $ret = null)
+    public static function fromValue($from, ?array $fallback = null)
     {
-        $p = static::getInstance()->fromValue($from, $ret);
+        $ret = static::getInstance()->fromValue($from);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
         }
 
-        return $p;
+        $p = $ret->getValue();
+
+        if (Promise::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
+        }
+
+        return Ret::val($fallback, $ret);
     }
 
     /**
      * @param callable $from
-     * @param Ret      $ret
      *
-     * @return Promise|bool|null
+     * @return Promise|Ret<Promise>
      */
-    public static function fromCallable($from, $ret = null)
+    public static function fromCallable($from, ?array $fallback = null)
     {
-        $p = static::getInstance()->fromCallable($from, $ret);
+        $ret = static::getInstance()->fromCallable($from);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
         }
 
-        return $p;
+        $p = $ret->getValue();
+
+        if (Promise::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
+        }
+
+        return Ret::val($fallback, $ret);
     }
 
 
@@ -82,8 +95,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->new($fnExecutor);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (Promise::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -96,8 +111,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->resolved($value);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (Promise::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -110,8 +127,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->rejected($reason);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (Promise::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -125,8 +144,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->never();
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -142,8 +163,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->defer($refFnResolve, $refFnReject);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -159,8 +182,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->delay($waitMs);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -177,8 +202,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->pooling($tickMs, $timeoutMs, $fnExecutor);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -195,8 +222,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->firstOf($ps, $rejectIfEmpty);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -212,8 +241,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->firstOf($ps, $rejectIfEmpty);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -230,8 +261,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->firstResolvedOf($ps, $rejectIfEmpty);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -247,8 +280,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->firstResolvedOf($ps, $rejectIfEmpty);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -265,8 +300,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->allOf($ps, $rejectIfEmpty);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -282,8 +319,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->allOf($ps, $rejectIfEmpty);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -300,8 +339,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->allResolvedOf($ps, $rejectIfEmpty);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -317,8 +358,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->allResolvedOf($ps, $rejectIfEmpty);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -335,8 +378,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->timeout($promise, $timeoutMs, $reason);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -353,8 +398,10 @@ trait PromiseTrait
     {
         $p = static::getInstance()->fetchCurl($url, $curlOptions);
 
-        if (static::$debug) {
-            $p->{'debug'} = Lib::debug()->file_line();
+        if (static::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $p->debugInfo = $theDebug->file_line();
         }
 
         return $p;
@@ -363,6 +410,6 @@ trait PromiseTrait
 
     public static function getInstance() : PromiseManagerInterface
     {
-        return Lib::async()->static_promise_manager();
+        return Lib::$async->static_promise_manager();
     }
 }

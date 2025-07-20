@@ -3,8 +3,7 @@
 namespace Gzhegow\Lib\Connect\Pdo;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Php\Result\Ret;
-use Gzhegow\Lib\Modules\Php\Result\Result;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Exception\Runtime\RemoteException;
 
@@ -73,84 +72,76 @@ class PdoAdapter
 
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function from($from, $ret = null)
+    public static function from($from, ?array $fallback = null)
     {
-        $retCur = Result::asValue();
+        $ret = Ret::new();
 
         $instance = null
-            ?? static::fromStatic($from, $retCur)
-            ?? static::fromPdo($from, $retCur)
-            ?? static::fromArrayDsn($from, $retCur)
-            ?? static::fromArrayConfig($from, $retCur);
+            ?? static::fromStatic($from)->orNull($ret)
+            ?? static::fromPdo($from)->orNull($ret)
+            ?? static::fromArrayDsn($from)->orNull($ret)
+            ?? static::fromArrayConfig($from)->orNull($ret);
 
-        if ($retCur->isErr()) {
-            return Result::err($ret, $retCur);
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
         }
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromStatic($from, $ret = null)
+    public static function fromStatic($from, ?array $fallback = null)
     {
         if ($from instanceof static) {
-            return Result::ok($ret, $from);
+            return Ret::val($fallback, $from);
         }
 
-        return Result::err(
-            $ret,
+        return Ret::throw(
+            $fallback,
             [ 'The `from` should be an instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromPdo($from, $ret = null)
+    public static function fromPdo($from, ?array $fallback = null)
     {
         if ($from instanceof \PDO) {
             $instance = new static();
             $instance->pdo = $from;
 
-            return Result::ok($ret, $instance);
+            return Ret::val($fallback, $instance);
         }
 
-        return Result::err(
-            $ret,
+        return Ret::throw(
+            $fallback,
             [ 'The `from` should be an instance of: ' . \PDO::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromArrayDsn($from, $ret = null)
+    public static function fromArrayDsn($from, ?array $fallback = null)
     {
-        if (! (is_array($from) && ([] !== $from))) {
-            return Result::err(
-                $ret,
-                [ 'The `from` should be a non-empty array', $from ],
+        if (! is_array($from)) {
+            return Ret::throw(
+                $fallback,
+                [ 'The `from` should be array', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if (! isset($from[ 'dsn' ])) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from[dsn]` is required', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -162,16 +153,16 @@ class PdoAdapter
         $pdoOptions = $from[ 'options' ] ?? [];
 
         if (null === $pdoUsername) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from[username]` is required', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if (null === $pdoPassword) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from[password]` is required', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -193,58 +184,57 @@ class PdoAdapter
             $instance->pdoCollate = $from[ 'collate' ];
         }
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromArrayConfig($from, $ret = null)
+    public static function fromArrayConfig($from, ?array $fallback = null)
     {
-        if (! (is_array($from) && ([] !== $from))) {
-            return Result::err(
-                $ret,
+        if (! is_array($from)) {
+            return Ret::throw(
+                $fallback,
                 [ 'The `from` should be a non-empty array', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if (! isset($from[ 'driver' ])) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from[driver]` is required', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if (! isset($from[ 'port' ])) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from[port]` is required', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if (! isset($from[ 'username' ])) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from[username]` is required', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
+
         if (! isset($from[ 'password' ])) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from[password]` is required', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if (! isset($from[ 'database' ])) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from[database]` is required', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -271,48 +261,35 @@ class PdoAdapter
             $instance->pdoCollate = $from[ 'collate' ];
         }
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
 
     public function newPdoFromDsn() : \PDO
     {
+        $theType = Lib::$type;
+
         $pdoDsn = $this->pdoDsn;
         $pdoUsername = $this->pdoUsername;
         $pdoPassword = $this->pdoPassword;
         $pdoDatabase = $this->pdoDatabase;
         $pdoOptions = $this->pdoOptions;
 
-        if (! (is_string($pdoDsn) && ('' !== $pdoDsn))) {
-            throw new RuntimeException(
-                [ 'The `this[pdoDsn]` should be a non-empty string', $this ]
-            );
-        }
-        if (! (is_string($pdoUsername) && ('' !== $pdoUsername))) {
-            throw new RuntimeException(
-                [ 'The `this[pdoUsername]` should be a non-empty string', $this ]
-            );
-        }
-        if (! (is_string($pdoPassword))) {
-            throw new RuntimeException(
-                [ 'The `this[pdoPassword]` should be a string', $this ]
-            );
-        }
-        if (null !== $pdoDatabase) {
-            if (! (is_string($pdoDatabase) && ('' !== $pdoDatabase))) {
-                throw new RuntimeException(
-                    [ 'The `this[pdoDatabase]` should be a non-empty string', $this ]
-                );
-            }
+        $pdoDsnValid = $theType->string_not_empty($pdoDsn)->orThrow();
+        $pdoUsernameValid = $theType->string_not_empty($pdoUsername)->orThrow();
+        $pdoPasswordValid = $theType->string($pdoPassword)->orThrow();
 
-            $pdoDsn .= ";dbname={$pdoDatabase}";
+        if (null !== $pdoDatabase) {
+            $pdoDatabaseValid = $theType->string_not_empty($pdoDatabase)->orThrow();
+
+            $pdoDsnValid .= ";dbname={$pdoDatabaseValid}";
         }
 
         try {
             $pdo = new \PDO(
-                $pdoDsn,
-                $pdoUsername,
-                $pdoPassword,
+                $pdoDsnValid,
+                $pdoUsernameValid,
+                $pdoPasswordValid,
                 $pdoOptions
             );
         }
@@ -337,6 +314,8 @@ class PdoAdapter
 
     public function newPdoFromConfig() : \PDO
     {
+        $theType = Lib::$type;
+
         $pdoDriver = $this->pdoDriver;
         $pdoHost = $this->pdoHost;
         $pdoUsername = $this->pdoUsername;
@@ -345,54 +324,30 @@ class PdoAdapter
         $pdoDatabase = $this->pdoDatabase;
         $pdoOptions = $this->pdoOptions ?? [];
 
-        if (! (is_string($pdoDriver) && ('' !== $pdoDriver))) {
-            throw new RuntimeException(
-                [ 'The `this[pdoDriver]` should be a non-empty string', $this ]
-            );
-        }
-        if (! (is_string($pdoHost) && ('' !== $pdoHost))) {
-            throw new RuntimeException(
-                [ 'The `this[pdoHost]` should be a non-empty string', $this ]
-            );
-        }
-        if (! (is_string($pdoUsername) && ('' !== $pdoUsername))) {
-            throw new RuntimeException(
-                [ 'The `this[pdoUsername]` should be a non-empty string', $this ]
-            );
-        }
-        if (! (is_string($pdoPassword))) {
-            throw new RuntimeException(
-                [ 'The `this[pdoPassword]` should be a string', $this ]
-            );
-        }
+        $pdoDriverValid = $theType->string_not_empty($pdoDriver)->orThrow();
+        $pdoHostValid = $theType->string_not_empty($pdoHost)->orThrow();
+        $pdoUsernameValid = $theType->string_not_empty($pdoUsername)->orThrow();
+        $pdoPasswordValid = $theType->string($pdoPassword)->orThrow();
 
-        $pdoDsn = "{$pdoDriver}:host={$pdoHost}";
+        $pdoDsn = "{$pdoDriverValid}:host={$pdoHostValid}";
 
         if (null !== $pdoPort) {
-            if (! (Lib::type()->string_not_empty($pdoPortString, $pdoPort))) {
-                throw new RuntimeException(
-                    [ 'The `this[pdoPort]` should be a non-empty string', $this ]
-                );
-            }
+            $pdoPortValid = $theType->numeric_int_positive($pdoPort)->orThrow();
 
-            $pdoDsn .= ";port={$pdoPort}";
+            $pdoDsn .= ";port={$pdoPortValid}";
         }
 
         if (null !== $pdoDatabase) {
-            if (! (is_string($pdoDatabase) && ('' !== $pdoDatabase))) {
-                throw new RuntimeException(
-                    [ 'The `this[pdoPassword]` should be a non-empty string', $this ]
-                );
-            }
+            $pdoDatabaseValid = $theType->numeric_int_positive($pdoDatabase)->orThrow();
 
-            $pdoDsn .= ";dbname={$pdoDatabase}";
+            $pdoDsn .= ";dbname={$pdoDatabaseValid}";
         }
 
         try {
             $pdo = new \PDO(
                 $pdoDsn,
-                $pdoUsername,
-                $pdoPassword,
+                $pdoUsernameValid,
+                $pdoPasswordValid,
                 $pdoOptions
             );
         }
@@ -497,7 +452,7 @@ class PdoAdapter
     protected function sqlEnsureCharsetMysql() : string
     {
         // > until (PHP_VERSION_ID < 50306) this command was not sent on connect
-        // > actually it have to be done using \PDO::MYSQL_ATTR_INIT_COMMAND but it supports only one query
+        // > actually it have to be done using \PDO::MYSQL_ATTR_INIT_COMMAND, but it supports only one query
 
         $pdoCharset = (string) $this->pdoCharset;
         $pdoCollate = (string) $this->pdoCollate;

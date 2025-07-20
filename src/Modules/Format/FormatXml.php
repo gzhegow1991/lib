@@ -3,8 +3,7 @@
 namespace Gzhegow\Lib\Modules\Format;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Php\Result\Ret;
-use Gzhegow\Lib\Modules\Php\Result\Result;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
@@ -27,23 +26,18 @@ class FormatXml
 
 
     /**
-     * @param Ret $ret
-     *
-     * @return \SimpleXMLElement|mixed
+     * @return Ret<\SimpleXMLElement>
      */
-    public function parse_xml_sxe($xml, $ret = null)
+    public function parse_xml_sxe($xml)
     {
-        if (! Lib::type()->string_not_empty($xmlString, $xml)) {
-            return Result::err(
-                $ret,
-                [ 'The `xml` should be a non-empty string', $xml ],
-                [ __FILE__, __LINE__ ]
-            );
+        $theType = Lib::$type;
+
+        if (! $theType->string_not_empty($xml)->isOk([ &$xmlStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
-        if (false === strpos($xmlString, '<')) {
-            return Result::err(
-                $ret,
+        if (false === strpos($xmlStringNotEmpty, '<')) {
+            return Ret::err(
                 [ 'The `xml` should contain at least one symbol `<`', $xml ],
                 [ __FILE__, __LINE__ ]
             );
@@ -57,8 +51,7 @@ class FormatXml
             || (false !== stripos($xml, 'Envelope'))
             || (preg_match('/<\w+:(\w+)[^>]*>|xmlns:/i', $xml))
         ) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 [ 'The `xml` cannot be parsed using SimpleXmlElement due to it contains complex XML', $xml ],
                 [ __FILE__, __LINE__ ]
             );
@@ -70,7 +63,7 @@ class FormatXml
         $e = null;
 
         try {
-            $sxe = new \SimpleXMLElement($xmlString);
+            $sxe = new \SimpleXMLElement($xmlStringNotEmpty);
         }
         catch ( \Throwable $e ) {
         }
@@ -80,7 +73,9 @@ class FormatXml
         libxml_clear_errors();
         libxml_use_internal_errors(false);
 
-        if (! empty($errorsArray)) {
+        if ([] !== $errorsArray) {
+            $ret = Ret::new();
+
             $lines = preg_split('/\R/', $xml);
 
             foreach ( $errorsArray as $error ) {
@@ -90,47 +85,40 @@ class FormatXml
                 $line = $lines[ ($error->line) - 1 ];
                 $line = rtrim($line);
 
-                Result::err(
-                    $ret,
+                $ret->addError(
                     [ $message, $line, $error ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if ($ret->isErr()) {
-                return Result::pass($ret);
+            if ($ret->isFail()) {
+                return $ret;
             }
         }
 
         if ($e) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Result::ok($ret, $sxe);
+        return Ret::ok($sxe);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return \DOMDocument|mixed
+     * @return Ret<\DOMDocument>
      */
-    public function parse_xml_dom_document($xml, $ret = null)
+    public function parse_xml_dom_document($xml)
     {
-        if (! Lib::type()->string_not_empty($xmlString, $xml)) {
-            return Result::err(
-                $ret,
-                [ 'The `xml` should be a non-empty string', $xml ],
-                [ __FILE__, __LINE__ ]
-            );
+        $theType = Lib::$type;
+
+        if (! $theType->string_not_empty($xml)->isOk([ &$xmlStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
-        if (false === strpos($xmlString, '<')) {
-            return Result::err(
-                $ret,
+        if (false === strpos($xmlStringNotEmpty, '<')) {
+            return Ret::err(
                 [ 'The `xml` should contain at least one symbol `<`', $xml ],
                 [ __FILE__, __LINE__ ]
             );
@@ -143,7 +131,7 @@ class FormatXml
 
         try {
             $ddoc = new \DOMDocument('1.0', 'utf-8');
-            $ddoc->loadXML($xmlString);
+            $ddoc->loadXML($xmlStringNotEmpty);
         }
         catch ( \Throwable $e ) {
         }
@@ -153,7 +141,9 @@ class FormatXml
         libxml_clear_errors();
         libxml_use_internal_errors(false);
 
-        if (! empty($errorsArray)) {
+        if ([] !== $errorsArray) {
+            $ret = Ret::new();
+
             $lines = preg_split('/\R/', $xml);
 
             foreach ( $errorsArray as $error ) {
@@ -163,26 +153,24 @@ class FormatXml
                 $line = $lines[ ($error->line) - 1 ];
                 $line = rtrim($line);
 
-                Result::err(
-                    $ret,
+                $ret->addError(
                     [ $message, $line, $error ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if ($ret->isErr()) {
-                return Result::pass($ret);
+            if ($ret->isFail()) {
+                return $ret;
             }
         }
 
         if ($e) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Result::ok($ret, $ddoc);
+        return Ret::ok($ddoc);
     }
 }

@@ -2,8 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Arr;
 
-use Gzhegow\Lib\Modules\Php\Result\Ret;
-use Gzhegow\Lib\Modules\Php\Result\Result;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 
@@ -23,59 +22,53 @@ class ArrStrict implements
 
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromValid($from, $ret = null)
+    public static function fromValid($from, ?array $fallback = null)
     {
-        $retCur = Result::asValue();
+        $ret = Ret::new();
 
         $instance = null
-            ?? static::fromStatic($from, $retCur)
-            ?? static::fromValidArray($from, $retCur);
+            ?? static::fromStatic($from)->orNull($ret)
+            ?? static::fromValidArray($from)->orNull($ret);
 
-        if ($retCur->isErr()) {
-            return Result::err($ret, $retCur);
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
         }
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromStatic($from, $ret = null)
+    public static function fromStatic($from, ?array $fallback = null)
     {
         if ($from instanceof static) {
-            return Result::ok($ret, $from);
+            return Ret::val($fallback, $from);
         }
 
-        return Result::err(
-            $ret,
+        return Ret::throw(
+            $fallback,
             [ 'The `from` should be an instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromValidArray($from, $ret = null)
+    public static function fromValidArray($from, ?array $fallback = null)
     {
         if (is_array($from)) {
             $instance = new static();
             $instance->array = $from;
 
-            return Result::ok($ret, $instance);
+            return Ret::val($fallback, $instance);
         }
 
-        return Result::err(
-            $ret,
+        return Ret::throw(
+            $fallback,
             [ 'The `from` should be an array', $from ],
             [ __FILE__, __LINE__ ]
         );
@@ -115,7 +108,7 @@ class ArrStrict implements
 
         if (array_key_exists($key, $this->array)) {
             if (is_array($this->array[ $key ])) {
-                $refValue = static::fromValidArray($this->array[ $key ]);
+                $refValue = static::fromValidArray($this->array[ $key ])->orThrow();
 
             } else {
                 $refValue = $this->array[ $key ];
@@ -133,7 +126,7 @@ class ArrStrict implements
 
         if (isset($this->array[ $key ])) {
             if (is_array($this->array[ $key ])) {
-                $refValue = static::fromValidArray($this->array[ $key ]);
+                $refValue = static::fromValidArray($this->array[ $key ])->orThrow();
 
             } else {
                 $refValue = $this->array[ $key ];

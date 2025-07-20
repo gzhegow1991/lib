@@ -32,14 +32,16 @@ class FileSafeContext
 
     public function handleOnFinally() : void
     {
+        $thePhp = Lib::$php;
+
         [ $fhh, $this->fhh ] = [ $this->fhh, [] ];
         [ $fhhToFrelease, $this->fhhToFrelease ] = [ $this->fhhToFrelease, [] ];
         [ $fhhToFclose, $this->fhhToFclose ] = [ $this->fhhToFclose, [] ];
 
-        [ $files, $this->files ] = [ $this->files, [] ];
+        [ , $this->files ] = [ $this->files, [] ];
         [ $filesToUnlink, $this->filesToUnlink ] = [ $this->filesToUnlink, [] ];
 
-        $isWindows = Lib::php()->is_windows();
+        $isWindows = $thePhp->is_windows();
 
         $isResource = [];
 

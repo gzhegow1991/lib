@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Modules\Async\Clock;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
 
 
@@ -21,12 +20,6 @@ class ClockManager implements ClockManagerInterface
     }
 
 
-    public function isTimer($value) : bool
-    {
-        return $value instanceof AbstractTimer;
-    }
-
-
     public function isTimeout($value) : bool
     {
         return $value instanceof Timeout;
@@ -34,11 +27,9 @@ class ClockManager implements ClockManagerInterface
 
     public function setTimeout(int $waitMs, callable $fn) : Timeout
     {
-        if (! Lib::type()->int_non_negative($waitMsInt, $waitMs)) {
-            throw new LogicException(
-                [ 'The `waitMs` should be an integer non-negative', $waitMs ]
-            );
-        }
+        $theType = Lib::$type;
+
+        $waitMsInt = $theType->int_non_negative($waitMs)->orThrow();
 
         $timer = new Timeout();
         $timer->fnHandler = $fn;
@@ -64,11 +55,9 @@ class ClockManager implements ClockManagerInterface
 
     public function setInterval(int $waitMs, callable $fn) : Interval
     {
-        if (! Lib::type()->int_non_negative($waitMsInt, $waitMs)) {
-            throw new LogicException(
-                [ 'The `waitMs` should be an integer non-negative', $waitMs ]
-            );
-        }
+        $theType = Lib::$type;
+
+        $waitMsInt = $theType->int_non_negative($waitMs)->orThrow();
 
         $interval = new Interval();
         $interval->fnHandler = $fn;

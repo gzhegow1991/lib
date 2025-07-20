@@ -10,13 +10,7 @@ class Clock
     /**
      * @var bool
      */
-    public static $debug = false;
-
-
-    public function isTimer($value) : bool
-    {
-        return static::getInstance()->isTimer($value);
-    }
+    public static $isDebug = false;
 
 
     public static function isTimeout($value) : bool
@@ -30,13 +24,15 @@ class Clock
      */
     public static function setTimeout($waitMs, $fn) : Timeout
     {
-        $t = static::getInstance()->setTimeout($waitMs, $fn);
+        $timeout = static::getInstance()->setTimeout($waitMs, $fn);
 
-        if (static::$debug) {
-            $t->{'debug'} = Lib::debug()->file_line();
+        if (Clock::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $timeout->debugInfo = $theDebug->file_line();
         }
 
-        return $t;
+        return $timeout;
     }
 
     /**
@@ -59,13 +55,15 @@ class Clock
      */
     public static function setInterval($waitMs, $fn) : Interval
     {
-        $t = static::getInstance()->setInterval($waitMs, $fn);
+        $interval = static::getInstance()->setInterval($waitMs, $fn);
 
-        if (static::$debug) {
-            $t->{'debug'} = Lib::debug()->file_line();
+        if (Clock::$isDebug) {
+            $theDebug = Lib::$debug;
+
+            $interval->debugInfo = $theDebug->file_line();
         }
 
-        return $t;
+        return $interval;
     }
 
     /**
@@ -79,6 +77,8 @@ class Clock
 
     public static function getInstance() : ClockManagerInterface
     {
-        return Lib::async()->static_clock_manager();
+        $theAsync = Lib::$async;
+
+        return $theAsync->static_clock_manager();
     }
 }

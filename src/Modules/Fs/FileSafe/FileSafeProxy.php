@@ -368,6 +368,8 @@ class FileSafeProxy
             throw new RuntimeException('Method is not exists: ' . $name);
         }
 
+        $theFunc = Lib::$func;
+
         $fn = $map[ $name ];
 
         if (is_array($fn)) {
@@ -376,7 +378,7 @@ class FileSafeProxy
             }
         }
 
-        $result = Lib::func()->safe_call($fn, $args);
+        $result = $theFunc->safe_call($fn, $args);
 
         return $result;
     }

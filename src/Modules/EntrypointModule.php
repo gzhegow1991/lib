@@ -124,7 +124,6 @@ class EntrypointModule
     public function __construct()
     {
         $this->errorReporting = (E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
-        $this->errorLog = getcwd() . '/error_log';
 
         $this->timezoneDefault = new \DateTimeZone('UTC');
 
@@ -146,8 +145,10 @@ class EntrypointModule
     {
         $isLocked = $isLocked ?? true;
 
+        $theDebug = Lib::$debug;
+
         if ($isLocked) {
-            $this->isLocked = Lib::debug()->file_line();
+            $this->isLocked = $theDebug->file_line();
 
         } else {
             $this->isLocked = null;
@@ -169,6 +170,8 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
+        $theType = Lib::$type;
+
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
                 return $this;
@@ -182,7 +185,7 @@ class EntrypointModule
             $this->dirRoot = null;
 
         } else {
-            Lib::typeThrow()->dirpath_realpath($dirRootRealpath, $dirRoot);
+            $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
 
             $this->dirRoot = $dirRootRealpath;
         }
@@ -260,6 +263,47 @@ class EntrypointModule
     }
 
     /**
+     * @return static
+     */
+    public function setLogErrors(?bool $logErrors, ?bool $replace = null)
+    {
+        $this->assertNotLocked();
+
+        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapSet[ $mapSetKey ] = true;
+        }
+
+        if (null === $logErrors) {
+            $this->logErrors = 0;
+
+        } else {
+            $logErrorsBool = $logErrors;
+
+            $this->logErrors = (int) $logErrorsBool;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useLogErrors(
+        &$refLastLogErrors = null
+    )
+    {
+        $refLastLogErrors = ini_set('log_errors', $this->logErrors);
+
+        return $this;
+    }
+
+
+    /**
      * @return string|false
      */
     public function getPhpErrorLog(string $errorLogTmp = '')
@@ -278,6 +322,8 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
+        $theType = Lib::$type;
+
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
                 return $this;
@@ -288,14 +334,12 @@ class EntrypointModule
         }
 
         if (null === $errorLog) {
-            $this->errorLog = getcwd() . '/error_log';
-            $this->logErrors = 0;
+            $this->errorLog = null;
 
         } else {
-            Lib::typeThrow()->filepath($errorLogString, $errorLog, true);
+            $errorLogFilepath = $theType->filepath($errorLog, true)->orThrow();
 
-            $this->errorLog = $errorLogString;
-            $this->logErrors = 1;
+            $this->errorLog = $errorLogFilepath;
         }
 
         return $this;
@@ -305,12 +349,12 @@ class EntrypointModule
      * @return static
      */
     public function useErrorLog(
-        &$refLastErrorLog = null,
-        &$refLastLogErrors = null
+        &$refLastErrorLog = null
     )
     {
-        $refLastErrorLog = ini_set('error_log', $this->errorLog);
-        $refLastLogErrors = ini_set('log_errors', $this->logErrors);
+        if (null !== $this->errorLog) {
+            $refLastErrorLog = ini_set('error_log', $this->errorLog);
+        }
 
         return $this;
     }
@@ -361,10 +405,10 @@ class EntrypointModule
             $this->displayStartupErrors = 0;
 
         } else {
-            $displayErrorsInt = (int) $displayErrors;
+            $displayErrorsBool = $displayErrors;
 
-            $this->displayErrors = $displayErrorsInt;
-            $this->displayStartupErrors = $displayErrorsInt;
+            $this->displayErrors = (int) $displayErrorsBool;
+            $this->displayStartupErrors = (int) $displayErrorsBool;
         }
 
         return $this;
@@ -401,6 +445,8 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
+        $theFormat = Lib::$format;
+
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
                 return $this;
@@ -414,8 +460,6 @@ class EntrypointModule
             $this->memoryLimit = '32M';
 
         } else {
-            $theFormat = Lib::format();
-
             $bytesInt = $theFormat->bytes_decode($memoryLimit);
             $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1);
 
@@ -452,6 +496,8 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
+        $theType = Lib::$type;
+
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
                 return $this;
@@ -465,7 +511,7 @@ class EntrypointModule
             $this->maxExecutionTime = 10;
 
         } else {
-            Lib::typeThrow()->int_non_negative($maxExecutionTimeInt, $maxExecutionTime);
+            $maxExecutionTimeInt = $theType->int_non_negative($maxExecutionTime)->orThrow();
 
             $this->maxExecutionTime = $maxExecutionTimeInt;
         }
@@ -500,6 +546,8 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
+        $theType = Lib::$type;
+
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
                 return $this;
@@ -513,7 +561,7 @@ class EntrypointModule
             $this->maxInputTime = -1;
 
         } else {
-            Lib::typeThrow()->int_non_negative_or_minus_one($maxInputTimeInt, $maxInputTime);
+            $maxInputTimeInt = $theType->int_non_negative_or_minus_one($maxInputTime)->orThrow();
 
             $this->maxInputTime = $maxInputTimeInt;
         }
@@ -543,6 +591,8 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
+        $theType = Lib::$type;
+
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
                 return $this;
@@ -563,7 +613,7 @@ class EntrypointModule
             $this->obImplicitFlushCommit = 0;
 
         } else {
-            Lib::typeThrow()->int($obImplicitFlushCommitInt, $obImplicitFlushCommit);
+            $obImplicitFlushCommitInt = $theType->int($obImplicitFlushCommit)->orThrow();
 
             if ($obImplicitFlushCommitInt > 1) {
                 $obImplicitFlushCommitInt = 1;
@@ -614,6 +664,8 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
+        $theType = Lib::$type;
+
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
                 return $this;
@@ -632,7 +684,7 @@ class EntrypointModule
             }
 
         } else {
-            Lib::typeThrow()->timezone($timezoneDefaultObject, $timezoneDefault);
+            $timezoneDefaultObject = $theType->timezone($timezoneDefault)->orThrow();
 
             $this->timezoneDefault = $timezoneDefaultObject;
         }
@@ -667,6 +719,8 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
+        $theFormat = Lib::$format;
+
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
                 return $this;
@@ -680,8 +734,6 @@ class EntrypointModule
             $this->postMaxSize = '8M';
 
         } else {
-            $theFormat = Lib::format();
-
             $bytesInt = $theFormat->bytes_decode($postMaxSize);
             $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1);
 
@@ -718,6 +770,8 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
+        $theFormat = Lib::$format;
+
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
                 return $this;
@@ -731,8 +785,6 @@ class EntrypointModule
             $this->uploadMaxFilesize = '2M';
 
         } else {
-            $theFormat = Lib::format();
-
             $bytesInt = $theFormat->bytes_decode($uploadMaxFilesize);
             $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1);
 
@@ -777,6 +829,8 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
+        $theType = Lib::$type;
+
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
                 return $this;
@@ -798,10 +852,10 @@ class EntrypointModule
 
         } else {
             if ($this->uploadTmpDirMkdir) {
-                Lib::typeThrow()->dirpath($uploadTmpDirPath, $uploadTmpDir);
+                $uploadTmpDirPath = $theType->dirpath($uploadTmpDir, true)->orThrow();
 
             } else {
-                Lib::typeThrow()->dirpath_realpath($uploadTmpDirRealpath, $uploadTmpDir);
+                $uploadTmpDirRealpath = $theType->dirpath_realpath($uploadTmpDir)->orThrow();
             }
 
             $this->uploadTmpDir = $uploadTmpDirRealpath ?? $uploadTmpDirPath ?? null;
@@ -845,6 +899,8 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
+        $theType = Lib::$type;
+
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
                 return $this;
@@ -858,9 +914,9 @@ class EntrypointModule
             $this->precision = 16;
 
         } else {
-            Lib::typeThrow()->int_non_negative($precisionInt, $precision);
+            $precisionIntNonNegative = $theType->int_non_negative($precision)->orThrow();
 
-            $this->precision = $precisionInt;
+            $this->precision = $precisionIntNonNegative;
         }
 
 
@@ -1082,11 +1138,12 @@ class EntrypointModule
 
     public function fnExceptionHandler(\Throwable $throwable) : void
     {
-        $theThrowabler = Lib::debugThrowabler();
+        $theDebug = Lib::$debug;
+        $theDebugThrowabler = $theDebug->throwabler();
 
-        $theThrowabler->setDirRoot($this->dirRoot);
+        $theDebugThrowabler->setDirRoot($this->dirRoot);
 
-        $messageLines = $theThrowabler->getPreviousMessagesAllLines(
+        $messageLines = $theDebugThrowabler->getPreviousMessagesAllLines(
             $throwable,
             0
             | _DEBUG_THROWABLE_WITH_CODE
@@ -1095,7 +1152,7 @@ class EntrypointModule
             | _DEBUG_THROWABLE_WITH_PARENTS
         );
 
-        $traceLines = $theThrowabler->getThrowableTraceLines($throwable);
+        $traceLines = $theDebugThrowabler->getThrowableTraceLines($throwable);
 
         if ([] !== $messageLines) {
             foreach ( $messageLines as $line ) {
@@ -1129,8 +1186,9 @@ class EntrypointModule
             ->setExceptionHandler([ $this, 'fnExceptionHandler' ])
             //
             ->setErrorReporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED)
+            ->setErrorLog(null)
+            ->setLogErrors(0)
             ->setDisplayErrors(0)
-            ->setErrorLog(getcwd() . '/error_log')
             //
             ->setMemoryLimit('32M')
             //
@@ -1164,8 +1222,9 @@ class EntrypointModule
             ->useExceptionHandler()
             //
             ->useErrorReporting()
-            ->useDisplayErrors()
             ->useErrorLog()
+            ->useLogErrors()
+            ->useDisplayErrors()
             //
             ->useMemoryLimit()
             //

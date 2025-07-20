@@ -3,9 +3,7 @@
 namespace Gzhegow\Lib\Connect\Redis;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Php\Result\Ret;
-use Gzhegow\Lib\Modules\Php\Result\Result;
-use Gzhegow\Lib\Exception\RuntimeException;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\Runtime\RemoteException;
 
 
@@ -36,7 +34,7 @@ class RedisAdapter
     protected $redisPort = 6379;
 
     /**
-     * @var string
+     * @var string|null
      */
     protected $redisPassword;
 
@@ -57,84 +55,76 @@ class RedisAdapter
 
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function from($from, $ret = null)
+    public static function from($from, ?array $fallback = null)
     {
-        $retCur = Result::asValue();
+        $ret = Ret::new();
 
         $instance = null
-            ?? static::fromStatic($from, $retCur)
-            ?? static::fromRedis($from, $retCur)
-            ?? static::fromArrayDsn($from, $retCur)
-            ?? static::fromArrayConfig($from, $retCur);
+            ?? static::fromStatic($from)->orNull($ret)
+            ?? static::fromRedis($from)->orNull($ret)
+            ?? static::fromArrayDsn($from)->orNull($ret)
+            ?? static::fromArrayConfig($from)->orNull($ret);
 
-        if ($retCur->isErr()) {
-            return Result::err($ret, $retCur);
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
         }
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromStatic($from, $ret = null)
+    public static function fromStatic($from, ?array $fallback = null)
     {
         if ($from instanceof static) {
-            return Result::ok($ret, $from);
+            return Ret::val($fallback, $from);
         }
 
-        return Result::err(
-            $ret,
+        return Ret::throw(
+            $fallback,
             [ 'The `from` should be an instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromRedis($from, $ret = null)
+    public static function fromRedis($from, ?array $fallback = null)
     {
         if ($from instanceof \Redis) {
             $instance = new static();
             $instance->redis = $from;
 
-            return Result::ok($ret, $instance);
+            return Ret::val($fallback, $instance);
         }
 
-        return Result::err(
-            $ret,
-            [ 'The `from` should be an instance of: ' . \PDO::class, $from ],
+        return Ret::throw(
+            $fallback,
+            [ 'The `from` should be an instance of: ' . \Redis::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromArrayDsn($from, $ret = null)
+    public static function fromArrayDsn($from, ?array $fallback = null)
     {
-        if (! (is_array($from) && ([] !== $from))) {
-            return Result::err(
-                $ret,
+        if (! is_array($from)) {
+            return Ret::throw(
+                $fallback,
                 [ 'The `from` should be a non-empty array', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if (! isset($from[ 'dsn' ])) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from[dsn]` is required', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -143,16 +133,21 @@ class RedisAdapter
         $redisDsn = $from[ 'dsn' ];
         $redisDsnParsed = parse_url($redisDsn);
 
-        if (! isset($redisDsnParsed[ 'scheme' ], $redisDsnParsed[ 'host' ], $redisDsnParsed[ 'port' ])) {
-            return Result::err(
-                $ret,
+        if (! isset(
+            $redisDsnParsed[ 'scheme' ],
+            $redisDsnParsed[ 'host' ],
+            $redisDsnParsed[ 'port' ]
+        )) {
+            return Ret::throw(
+                $fallback,
                 [ 'The `from[dsn]` is invalid', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
+
         if ('redis' !== $redisDsnParsed[ 'scheme' ]) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from[dsn]` is invalid', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -175,19 +170,17 @@ class RedisAdapter
 
         $instance->redisDsn = $from[ 'dsn' ];
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromArrayConfig($from, $ret = null)
+    public static function fromArrayConfig($from, ?array $fallback = null)
     {
-        if (! (is_array($from) && ([] !== $from))) {
-            return Result::err(
-                $ret,
+        if (! is_array($from)) {
+            return Ret::throw(
+                $fallback,
                 [ 'The `from` should be a non-empty array', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -207,48 +200,38 @@ class RedisAdapter
         $instance->redisPassword = $redisPassword;
         $instance->redisOptions = $redisOptions;
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
 
     public function newRedis() : \Redis
     {
+        $theType = Lib::$type;
+
         $redisHost = $this->redisHost;
         $redisPort = $this->redisPort;
         $redisPassword = $this->redisPassword;
         $redisNamespace = $this->redisNamespace;
 
-        if (! (is_string($redisHost) && ('' !== $redisHost))) {
-            throw new RuntimeException(
-                [ 'The `this[pdoHost]` should be a non-empty string', $this ]
-            );
-        }
-        if (! (Lib::type()->string_not_empty($redisPortString, $redisPort))) {
-            throw new RuntimeException(
-                [ 'The `this[pdoPort]` should be a non-empty string', $this ]
-            );
-        }
+        $redisHostValid = $theType->string_not_empty($redisHost)->orThrow();
+        $redisPortValid = $theType->numeric_int_positive($redisPort)->orThrow();
+
+        $redisPasswordValid = null;
         if (null !== $redisPassword) {
-            if (! (is_string($redisPassword))) {
-                throw new RuntimeException(
-                    [ 'The `this[redisPassword]` should be a string', $this ]
-                );
-            }
+            $redisPasswordValid = $theType->string($redisPassword)->orThrow();
         }
+
+        $redisNamespaceValid = null;
         if (null !== $redisNamespace) {
-            if (! (is_string($redisNamespace) && ('' !== $redisNamespace))) {
-                throw new RuntimeException(
-                    [ 'The `this[redisNamespace]` should be a non-empty string', $this ]
-                );
-            }
+            $redisNamespaceValid = $theType->string_not_empty($redisNamespace)->orThrow();
         }
 
         $redis = new \Redis();
 
-        $this->redisSafeConnect($redis);
-        $this->redisSafeAuth($redis);
+        $this->redisSafeConnect($redis, $redisHostValid, $redisPortValid);
+        $this->redisSafeAuth($redis, $redisPasswordValid);
 
-        $this->redisEnsureOptions($redis);
+        $this->redisEnsureOptions($redis, $redisNamespaceValid);
 
         return $redis;
     }
@@ -256,14 +239,22 @@ class RedisAdapter
 
     public function getRedis() : \Redis
     {
+        $theType = Lib::$type;
+
         if (! $this->isRedisInitialized) {
             if (null === $this->redis) {
                 $redis = $this->newRedis();
 
             } else {
                 $redis = $this->redis;
+                $redisNamespace = $this->redisNamespace;
 
-                $this->redisEnsureOptions($redis);
+                $redisNamespaceValid = null;
+                if (null !== $redisNamespace) {
+                    $redisNamespaceValid = $theType->string_not_empty($redisNamespace)->orThrow();
+                }
+
+                $this->redisEnsureOptions($redis, $redisNamespaceValid);
             }
 
             if (null === $redis) {
@@ -288,11 +279,14 @@ class RedisAdapter
     }
 
 
-    protected function redisEnsureOptions(\Redis $redis) : void
+    protected function redisEnsureOptions(
+        \Redis $redis,
+        ?string $redisNamespace
+    ) : void
     {
         // > namespace
-        if (null !== $this->redisNamespace) {
-            $redis->setOption(\Redis::OPT_PREFIX, "{$this->redisNamespace}:");
+        if (null !== $redisNamespace) {
+            $redis->setOption(\Redis::OPT_PREFIX, "{$redisNamespace}:");
         }
 
         // > serializer
@@ -303,12 +297,17 @@ class RedisAdapter
     }
 
 
-    protected function redisSafeConnect(\Redis $redis) : bool
+    protected function redisSafeConnect(
+        \Redis $redis,
+        string $redisHost, int $redisPort
+    ) : bool
     {
+        $theFunc = Lib::$func;
+
         try {
-            $status = Lib::func()->safe_call(
+            $status = $theFunc->safe_call(
                 [ $redis, 'connect' ],
-                [ $this->redisHost, $this->redisPort ]
+                [ $redisHost, $redisPort ]
             );
         }
         catch ( \Throwable $e ) {
@@ -320,16 +319,21 @@ class RedisAdapter
         return $status;
     }
 
-    protected function redisSafeAuth(\Redis $redis) : ?bool
+    protected function redisSafeAuth(
+        \Redis $redis,
+        ?string $redisPassword
+    ) : ?bool
     {
-        if (null === $this->redisPassword) {
+        if (null === $redisPassword) {
             return null;
         }
 
+        $theFunc = Lib::$func;
+
         try {
-            $status = Lib::func()->safe_call(
+            $status = $theFunc->safe_call(
                 [ $redis, 'auth' ],
-                [ $this->redisPassword ]
+                [ $redisPassword ]
             );
         }
         catch ( \Throwable $e ) {

@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  * @noinspection PhpUndefinedClassInspection
  * @noinspection PhpUndefinedNamespaceInspection
  */
@@ -233,21 +234,13 @@ class DefaultPhoneManager implements PhoneManagerInterface
             return $this;
         }
 
-        $theType = Lib::type();
+        $theType = Lib::$type;
 
-        foreach ( $regexList as $i => $regex ) {
-            if (! $theType->regex($regexp, $regex)) {
-                throw new RuntimeException(
-                    [
-                        'Each of `regexList` should be a valid regular expression',
-                        $regex,
-                        $i,
-                    ]
-                );
-            }
+        foreach ( $regexList as $regex ) {
+            $regexValid = $theType->regex($regex)->orThrow();
 
-            if (! isset($this->phoneFakeRegexIndex[ $regexp ])) {
-                $this->phoneFakeRegexIndex[ $regexp ] = true;
+            if (! isset($this->phoneFakeRegexIndex[ $regexValid ])) {
+                $this->phoneFakeRegexIndex[ $regexValid ] = true;
             }
         }
 
@@ -393,6 +386,8 @@ class DefaultPhoneManager implements PhoneManagerInterface
         $refTelDigits = null;
         $refTelPlus = null;
 
+        $theType = Lib::$type;
+
         if (is_a($value, '\libphonenumber\PhoneNumber')) {
             $tel = $this->formatE164($value);
 
@@ -402,13 +397,9 @@ class DefaultPhoneManager implements PhoneManagerInterface
             $telPlusString = $isPlus ? '+' : '';
 
         } else {
-            if (! Lib::type()->string_not_empty($phone, $value)) {
-                throw new LogicException(
-                    [ 'The `value` should be a non-empty string' ]
-                );
-            }
+            $valueStringNotEmpty = $theType->string_not_empty($value)->orThrow();
 
-            $tel = preg_replace('/[^0-9]/', '', $phone);
+            $tel = preg_replace('/[^0-9]/', '', $valueStringNotEmpty);
 
             if ('' === $tel) {
                 throw new LogicException(
@@ -417,12 +408,12 @@ class DefaultPhoneManager implements PhoneManagerInterface
             }
 
             if (strlen($tel) > 15) {
-                throw new RuntimeException(
+                throw new LogicException(
                     [ 'The `tel` length should be less than 15 (16 - plus sign) according E164', $value ]
                 );
             }
 
-            $isPlus = ($phone[ 0 ] === '+');
+            $isPlus = ($valueStringNotEmpty[ 0 ] === '+');
 
             $telPlusString = $isPlus ? '+' : '';
             $telDigitsString = $tel;
@@ -801,7 +792,9 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
     public function getTimezonesForPhone($phoneNumber, $timezoneWildcards = null, ?string $region = '') : array
     {
-        $timezoneWildcardsList = Lib::php()->to_list($timezoneWildcards);
+        $thePhp = Lib::$php;
+
+        $timezoneWildcardsList = $thePhp->to_list($timezoneWildcards);
 
         $phoneNumberObject = $this->parsePhoneNumber(
             $phoneNumber, $region
@@ -809,9 +802,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         $phoneNumberToTimeZonesMapper = $this->getGiggseyPhoneNumberToTimeZonesMapper();
 
-        $timezones = $phoneNumberToTimeZonesMapper
-            ->getTimeZonesForNumber($phoneNumberObject)
-        ;
+        $timezones = $phoneNumberToTimeZonesMapper->getTimeZonesForNumber($phoneNumberObject);
 
         if ([] !== $timezoneWildcardsList) {
             $wildcards = [];

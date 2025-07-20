@@ -3,45 +3,86 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 
 
 class PregModule
 {
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_regex(&$r, $value) : bool
+    public function type_regex($value)
     {
-        $r = null;
+        $theFunc = Lib::$func;
+        $theType = Lib::$type;
 
-        if (! Lib::type()->string_not_empty($_value, $value)) {
-            return false;
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
+        $regex = $valueStringNotEmpty;
+
         try {
-            $isMatch = Lib::func()->safe_call(
+            $isMatch = $theFunc->safe_call(
                 'preg_match',
-                [ $_value, '' ]
+                [ $regex, '' ]
             );
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid regex', $value ]
+            );
         }
 
         if (false === $isMatch) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid regex', $value ]
+            );
         }
 
-        $r = $_value;
+        return Ret::ok($valueStringNotEmpty);
+    }
 
-        return true;
+    /**
+     * @return Ret<string>
+     */
+    public function type_regexp($value, string $enclosure = '/', ?string $flags = null)
+    {
+        $theFunc = Lib::$func;
+        $theType = Lib::$type;
+
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
+        }
+
+        try {
+            $isMatch = $theFunc->safe_call(
+                'preg_match',
+                [ "{$enclosure}{$valueStringNotEmpty}{$enclosure}{$flags}", '' ]
+            );
+        }
+        catch ( \Throwable $e ) {
+            return Ret::err(
+                [ 'The `value` should be valid regexp', $value ]
+            );
+        }
+
+        if (false === $isMatch) {
+            return Ret::err(
+                [ 'The `value` should be valid regexp', $value ]
+            );
+        }
+
+        return Ret::ok($valueStringNotEmpty);
     }
 
 
     public function preg_quote_ord(string $string, ?string $mb_encoding = null) : string
     {
-        Lib::mb();
+        $theMb = Lib::$mb;
+
+        $theMb->assertExtension();
 
         $len = mb_strlen($string);
 

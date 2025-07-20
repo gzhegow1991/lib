@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Modules\Http\Cookies;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Http\HttpCookie\HttpCookie;
 
@@ -51,14 +50,17 @@ class DefaultCookies implements CookiesInterface
 
     protected function loadCookiesList() : void
     {
-        $httpHeaders = Lib::http()->headers_list();
+        $theHttp = Lib::$http;
+
+        $httpHeaders = $theHttp->headers_list();
 
         foreach ( $httpHeaders as $httpHeader ) {
             if ('SET-COOKIE' !== $httpHeader->getName()) {
                 continue;
             }
 
-            $httpCookie = HttpCookie::fromObjectHttpHeader($httpHeader);
+            $httpCookie = HttpCookie::fromObjectHttpHeader($httpHeader)->orThrow();
+
             $httpCookieName = $httpCookie->getName();
             $httpCookiePath = $httpCookie->getPath();
             $httpCookie->hasDomain($httpCookieDomain);
@@ -200,7 +202,7 @@ class DefaultCookies implements CookiesInterface
 
     protected function setAddToQueue(array $setrawcookieArgs = []) : void
     {
-        $httpCookie = HttpCookie::fromArraySetrawcookieArgs($setrawcookieArgs);
+        $httpCookie = HttpCookie::fromArraySetrawcookieArgs($setrawcookieArgs)->orThrow();
 
         $id = $this->id++;
 
@@ -218,10 +220,12 @@ class DefaultCookies implements CookiesInterface
 
     protected function setSendToResponse(array $setrawcookieArgs = []) : void
     {
-        $httpCookie = HttpCookie::fromArraySetrawcookieArgs($setrawcookieArgs);
+        $theHttp = Lib::$http;
+
+        $httpCookie = HttpCookie::fromArraySetrawcookieArgs($setrawcookieArgs)->orThrow();
 
         call_user_func_array(
-            [ Lib::http(), 'setrawcookie' ],
+            [ $theHttp, 'setrawcookie' ],
             $setrawcookieArgs
         );
 
@@ -323,11 +327,13 @@ class DefaultCookies implements CookiesInterface
      */
     public function flushSend() : array
     {
+        $theHttp = Lib::$http;
+
         $result = $this->flush();
 
         foreach ( $result as $httpCookie ) {
             call_user_func_array(
-                [ Lib::http(), 'setrawcookie' ],
+                [ $theHttp, 'setrawcookie' ],
                 $httpCookie->toArraySetrawcookieArgs()
             );
         }
@@ -353,29 +359,17 @@ class DefaultCookies implements CookiesInterface
 
     protected function indexCookie(string $cookieName, string $cookiePath, ?string $cookieDomain = null) : string
     {
-        $theType = Lib::type();
+        $theType = Lib::$type;
 
-        if (! $theType->string_not_empty($var, $cookieName)) {
-            throw new LogicException(
-                'The `cookieName` should be a non-empty string'
-            );
-        }
+        $cookieNameStringNotEmpty = $theType->string_not_empty($cookieName)->orThrow();
+        $cookiePathStringNotEmpty = $theType->string_not_empty($cookiePath)->orThrow();
 
-        if (! $theType->string_not_empty($var, $cookiePath)) {
-            throw new LogicException(
-                'The `cookiePath` should be a non-empty string'
-            );
-        }
-
+        $cookieDomainStringNotEmpty = '';
         if (null !== $cookieDomain) {
-            if (! $theType->string_not_empty($var, $cookieDomain)) {
-                throw new LogicException(
-                    'The `cookieDomain` should be a non-empty string'
-                );
-            }
+            $cookieDomainStringNotEmpty = $theType->string_not_empty($cookieDomain)->orThrow();
         }
 
-        return "{$cookieDomain}\0{$cookiePath}\0{$cookieName}";
+        return "{$cookieDomainStringNotEmpty}\0{$cookiePathStringNotEmpty}\0{$cookieNameStringNotEmpty}";
     }
 
 

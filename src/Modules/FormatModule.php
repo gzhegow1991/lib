@@ -3,10 +3,9 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Php\Result\Ret;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Modules\Format\FormatCsv;
 use Gzhegow\Lib\Modules\Format\FormatXml;
-use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Modules\Format\FormatJson;
 
 
@@ -46,86 +45,85 @@ class FormatModule
 
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_html_tag(&$r, $value) : bool
+    public function type_html_tag($value)
     {
-        $r = null;
+        $theType = Lib::$type;
 
-        if (! Lib::type()->string_not_empty($valueString, $value)) {
-            return false;
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
-        if (preg_match('/^[a-z][a-z0-9-]*$/', $valueString)) {
-            $r = $valueString;
-
-            return true;
+        if (! preg_match('/^[a-z][a-z0-9-]*$/', $valueStringNotEmpty)) {
+            return Ret::err(
+                [ 'The `value` should be valid html tag', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return false;
+        return Ret::ok($valueStringNotEmpty);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_xml_tag(&$r, $value) : bool
+    public function type_xml_tag($value)
     {
-        $r = null;
+        $theType = Lib::$type;
 
-        if (! Lib::type()->string_not_empty($valueString, $value)) {
-            return false;
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
-        if (preg_match('/^[A-Za-z_][A-Za-z0-9_\-\.]*$/', $valueString)) {
-            $r = $valueString;
-
-            return true;
+        if (! preg_match('/^[A-Za-z_][A-Za-z0-9_\-\.]*$/', $valueStringNotEmpty)) {
+            return Ret::err(
+                [ 'The `value` should be valid xml tag', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return false;
+        return Ret::ok($valueStringNotEmpty);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_xml_nstag(&$r, $value) : bool
+    public function type_xml_nstag($value)
     {
-        $r = null;
+        $theType = Lib::$type;
 
-        if (! Lib::type()->string_not_empty($valueString, $value)) {
-            return false;
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
-        if (preg_match('/^(?:[A-Za-z_][A-Za-z0-9_\-\.]*)?:?[A-Za-z_][A-Za-z0-9_\-\.]*$/', $valueString)) {
-            $r = $valueString;
-
-            return true;
+        if (! preg_match('/^(?:[A-Za-z_][A-Za-z0-9_\-\.]*)?:?[A-Za-z_][A-Za-z0-9_\-\.]*$/', $valueStringNotEmpty)) {
+            return Ret::err(
+                [ 'The `value` should be valid xml nstag', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return false;
+        return Ret::ok($valueStringNotEmpty);
     }
 
 
     /**
-     * @param Ret $ret
-     *
-     * @return int|mixed
+     * @return Ret<int>
      */
-    public function bytes_decode(
-        string $size,
-        $ret = null
-    )
+    public function bytes_decode(string $size)
     {
+        $theType = Lib::$type;
+
         if ('' === $size) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 [ 'The `size` should be a non-empty string', $size ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ('0' === $size) {
-            return Result::ok($ret, 0);
+            return Ret::ok(0);
         }
 
         $strUnitList = [
@@ -142,8 +140,7 @@ class FormatModule
         $strUnitList = array_merge(...$strUnitList);
 
         if (! preg_match($regex = '/^(\d+(?:\.\d+)?)([A-Z]{0,2})$/', $size, $matches)) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 [ 'The `size` should match regex: ' . $regex, $size ],
                 [ __FILE__, __LINE__ ]
             );
@@ -156,25 +153,18 @@ class FormatModule
         }
 
         if (! isset($strUnitList[ $strUnit ])) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 [ 'Unknown `strUnit`', $strUnit ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $theType = Lib::type();
-
-        if (! $theType->num_positive($number, $numUnit)) {
-            return Result::err(
-                $ret,
-                [ 'Unknown `numUnit`', $numUnit ],
-                [ __FILE__, __LINE__ ]
-            );
+        if (! $theType->num_positive($numUnit)->isOk([ &$numUnitNumPositive, &$ret ])) {
+            return $ret;
         }
 
-        if (0 === $number) {
-            return Result::ok($ret, 0);
+        if (0 === $numUnitNumPositive) {
+            return Ret::ok(0);
         }
 
         $bytesNum = $numUnit * pow(1024, $strUnitList[ $strUnit ]);
@@ -182,49 +172,41 @@ class FormatModule
         $bytesCeil = ceil($bytesNum);
 
         if (false === $bytesCeil) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 [ 'Unable to `ceil`', $bytesNum ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Result::ok($ret, (int) $bytesCeil);
+        return Ret::ok((int) $bytesCeil);
     }
 
     /**
-     * @param int|float $bytes
-     * @param Ret       $ret
-     *
-     * @return array{ 0?: string }|mixed
+     * @return Ret<array{ 0?: string }>
      */
     public function bytes_encode(
         $bytes,
-        ?int $roundPrecision = null,
-        ?int $unitLen = null,
-        $ret = null
+        ?int $roundPrecision = null, ?int $unitLen = null
     )
     {
-        if (! Lib::type()->num_non_negative($bytesNumber, $bytes)) {
-            return Result::err(
-                $ret,
-                [ 'The `bytes` should be a non-negative num', $bytes ],
-                [ __FILE__, __LINE__ ]
-            );
+        $theType = Lib::$type;
+
+        if (! $theType->num_non_negative($bytes)->isOk([ &$bytesNumNonNegative, &$ret ])) {
+            return $ret;
         }
 
         $roundPrecision = $roundPrecision ?? 3;
         $unitLen = $unitLen ?? 2;
 
-        if (0 === $bytesNumber) {
-            return Result::ok($ret, '0B');
+        if (0 === $bytesNumNonNegative) {
+            return Ret::ok('0B');
         }
 
         $strUnitList = [ 'B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ];
 
-        $left = $bytesNumber;
+        $left = $bytesNumNonNegative;
 
-        $pow = floor(log($bytesNumber) / log(1024));
+        $pow = floor(log($bytesNumNonNegative) / log(1024));
         $pow = min($pow, count($strUnitList) - 1);
 
         $left /= pow(1024, $pow);
@@ -234,6 +216,6 @@ class FormatModule
 
         $size = round($left, $roundPrecision) . $unit;
 
-        return Result::ok($ret, $size);
+        return Ret::ok($size);
     }
 }

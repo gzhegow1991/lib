@@ -4,7 +4,6 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
@@ -12,11 +11,20 @@ class MbModule
 {
     public function __construct()
     {
+    }
+
+    /**
+     * @return static
+     */
+    public function assertExtension()
+    {
         if (! extension_loaded('mbstring')) {
             throw new ExtensionException(
                 'Missing PHP extension: mbstring'
             );
         }
+
+        return $this;
     }
 
 
@@ -53,6 +61,8 @@ class MbModule
             }
         }
 
+        $thePhp = Lib::$php;
+
         $currentEncGroupPriority = 0;
         $groupsIndexPrioritized = [];
         foreach ( $detect_order as $encGroup ) {
@@ -68,7 +78,7 @@ class MbModule
         if (! isset($cache[ $cacheKey ])) {
             $encsList = mb_list_encodings();
 
-            if (Lib::php()->is_windows()) {
+            if ($thePhp->is_windows()) {
                 $encsList[] = 'CP1251';
                 $encsList[] = 'Windows-1251';
             }
@@ -146,21 +156,25 @@ class MbModule
      *
      * @return array<string, string|false>
      */
-    public function detect_encoding(
-        string $string, $encondings = '', ?bool $strict = null,
-        ?array $detect_order = null
-    ) : array
+    public function detect_encoding(string $string, $encondings = '', ?bool $strict = null) : array
     {
+        $encondings = $encondings ?? '';
         $strict = $strict ?? true;
 
-        if ($encondings === '') {
-            [ , $encsByGroup ] = $this->list_encodings($detect_order);
+        if ('' === $encondings) {
+            [ , $encsByGroup ] = $this->list_encodings();
+
+        } elseif (is_array($encondings)) {
+            [ , $encsByGroup ] = $this->list_encodings($encondings);
+
+        } elseif (is_string($encondings)) {
+            $encsByGroup = [];
+            $encsByGroup[ '' ] = array_map('trim', explode(',', $encondings));
 
         } else {
-            $encsByGroup = [];
-            $encsByGroup[ '' ] = is_array($encondings)
-                ? $encondings
-                : array_map('trim', explode(',', $encondings));
+            throw new LogicException(
+                [ 'The `encodings` must be array of suggestions or comma-separated list of encodings', $encondings ]
+            );
         }
 
         $result = [];
@@ -174,31 +188,17 @@ class MbModule
     /**
      * @param string|string[]|null $from_encoding
      *
-     * @return string|false
+     * @return array<string, string|false>
      */
-    public function convert_encoding($string, string $to_encoding, $from_encoding = '', ?array $detect_order = null)
+    public function convert_encoding($string, string $to_encoding, $from_encoding = '', ?bool $strict = null) : array
     {
-        if ($from_encoding === '') {
-            $detectEncoding = $this->detect_encoding($string);
+        $detectEncodingArray = $this->detect_encoding($string, $from_encoding, $strict);
 
-            $list = [];
-            foreach ( $detectEncoding as $encodingOrFalse ) {
-                if (false === $encodingOrFalse) {
-                    continue;
-                }
+        $result = [];
 
-                $list[] = $encodingOrFalse;
-            }
-
-            $from_encoding = $list;
-
-        } else {
-            $from_encoding = is_array($from_encoding)
-                ? $from_encoding
-                : array_map('trim', explode(',', $from_encoding));
+        foreach ( $detectEncodingArray as $encGroup => $encoding ) {
+            $result[ $encGroup ] = mb_convert_encoding($string, $to_encoding, $encoding);
         }
-
-        $result = mb_convert_encoding($string, $to_encoding, $from_encoding);
 
         return $result;
     }
@@ -248,7 +248,7 @@ class MbModule
     {
         $separators = $separators ?? " \t\r\n\f\v";
 
-        $thePreg = Lib::preg();
+        $thePreg = Lib::$preg;
 
         $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
         $regex = '/(^|[' . $regex . '])(\w)/u';
@@ -274,7 +274,7 @@ class MbModule
     {
         $separators = $separators ?? " \t\r\n\f\v";
 
-        $thePreg = Lib::preg();
+        $thePreg = Lib::$preg;
 
         $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
         $regex = '/(^|[' . $regex . '])(\w)/u';

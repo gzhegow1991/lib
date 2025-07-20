@@ -3,64 +3,64 @@
 namespace Gzhegow\Lib\Modules\Php\CallableParser;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Type\Ret;
 
 
 class DefaultCallableParser implements CallableParserInterface
 {
     /**
-     * @param array{ 0: class-string, 1: string }|null $r
+     * @return Ret<array{ 0: class-string, 1: string }>
      */
-    public function typeMethodArray(&$r, $value) : bool
+    public function typeMethodArray($value)
     {
-        $r = null;
-
         $methodArray = null
             ?? $this->parseMethodArrayFromObject($value)
             ?? $this->parseMethodArrayFromArray($value)
             ?? $this->parseMethodArrayFromString($value);
 
         if (null === $methodArray) {
-            // > passed value is not a method or a \Closure
-
-            return false;
+            return Ret::err(
+                [ 'The `value` should be method (object, array or string)', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        [ , $theClass, $theMethod, $theMagic ] = $methodArray;
+        [ /* $anObject */, $aClass, $aMethod, $aMagic ] = $methodArray;
 
-        if ($theMethod && $theMagic) {
-            // > method provided and not exists, but class or object has magic method __call() or __callStatic()
-            return false;
+        if ($aMethod && $aMagic) {
+            return Ret::err(
+                [ 'The `value` should be real (not magic) method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
 
-        } elseif ($theMagic) {
-            // > method not provided, but but class or object has magic method __invoke()
+        } elseif ($aMagic) {
+            // > method not provided, but class or object has magic method __invoke()
             if (false
-                || ($theMagic === '__invoke')
+                || ($aMagic === '__invoke')
             ) {
-                $r = [ $theClass, $theMagic ];
-
-                return true;
+                return Ret::ok([ $aClass, $aMagic ]);
             }
 
-            return false;
+            return Ret::err(
+                [ 'The `value` should be existing method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
 
-        } elseif ($theMethod) {
-            // > method provided and exists
-
-            $r = [ $theClass, $theMethod ];
-
-            return true;
+        } elseif ($aMethod) {
+            return Ret::ok([ $aClass, $aMethod ]);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be method array', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function typeMethodString(&$r, $value, array $refs = []) : bool
+    public function typeMethodString($value, array $refs = [])
     {
-        $r = null;
-
         $withMethodArray = array_key_exists(0, $refs);
         if ($withMethodArray) {
             $refResultArray =& $refs[ 0 ];
@@ -73,113 +73,108 @@ class DefaultCallableParser implements CallableParserInterface
             ?? $this->parseMethodArrayFromString($value);
 
         if (null === $methodArray) {
-            // > passed value is not a method or a \Closure
-            return false;
+            return Ret::err(
+                [ 'The `value` should be method (object, array or string)', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        [ , $theClass, $theMethod, $theMagic ] = $methodArray;
+        [ /* $anObject */, $aClass, $aMethod, $aMagic ] = $methodArray;
 
-        if ($theMethod && $theMagic) {
-            // > method provided and not exists, but class or object has magic method __call() or __callStatic()
-            return false;
+        if ($aMethod && $aMagic) {
+            return Ret::err(
+                [ 'The `value` should be real (not magic) method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
 
-        } elseif ($theMagic) {
-            // > method not provided, but but class or object has magic method __invoke()
+        } elseif ($aMagic) {
+            // > method not provided, but class or object has magic method __invoke()
             if (false
-                || ($theMagic === '__invoke')
+                || ($aMagic === '__invoke')
             ) {
-                $r = "{$theClass}->__invoke";
+                $refResultArray = [ $aClass, '__invoke' ];
 
-                $refResultArray = [ $theClass, '__invoke' ];
-                unset($refResultArray);
-
-                return true;
+                return Ret::ok("{$aClass}->__invoke");
             }
 
-            return false;
+            return Ret::err(
+                [ 'The `value` should be existing method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
 
-        } elseif ($theMethod) {
+        } elseif ($aMethod) {
             // > method provided and exists
 
             if (false
-                || ($theMethod === '__invoke')
-                || ($theMethod === '__call')
+                || ($aMethod === '__invoke')
+                || ($aMethod === '__call')
             ) {
-                $r = "{$theClass}->{$theMethod}";
+                $refResultArray = [ $aClass, $aMethod ];
 
-                $refResultArray = [ $theClass, $theMethod ];
-                unset($refResultArray);
-
-                return true;
+                return Ret::ok("{$aClass}->{$aMethod}");
             }
 
-            if (false
-                || ($theMethod === '__callStatic')
-            ) {
-                $r = "{$theClass}::{$theMethod}";
+            if ($aMethod === '__callStatic') {
+                $refResultArray = [ $aClass, $aMethod ];
 
-                $refResultArray = [ $theClass, $theMethod ];
-                unset($refResultArray);
-
-                return true;
+                return Ret::ok("{$aClass}::{$aMethod}");
             }
-
-            $refResultArray = [ $theClass, $theMethod ];
-            unset($refResultArray);
 
             try {
-                $rm = new \ReflectionMethod($theClass, $theMethod);
+                $rm = new \ReflectionMethod($aClass, $aMethod);
 
                 $isStatic = $rm->isStatic();
             }
             catch ( \Throwable $e ) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be existing method', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $r = $isStatic
-                ? "{$theClass}::{$theMethod}"
-                : "{$theClass}->{$theMethod}";
+            $refResultArray = [ $aClass, $aMethod ];
 
-            return true;
+            return Ret::ok(
+                $isStatic
+                    ? "{$aClass}::{$aMethod}"
+                    : "{$aClass}->{$aMethod}"
+            );
         }
 
-        unset($refResultArray);
-
-        return false;
+        return Ret::err(
+            [ 'The `value` should be method string', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
-     * @param callable|null $r
      * @param string|object $newScope
+     *
+     * @return Ret<callable>
      */
-    public function typeCallable(&$r, $value, $newScope = 'static') : bool
+    public function typeCallable($value, $newScope = 'static')
     {
-        $r = null;
-
         if (! $this->isCallable($value, $newScope)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be callable in passed scope', $value, $newScope ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (PHP_VERSION_ID >= 80000) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         if (is_object($value)) {
             // > \Closure or invokable
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         $function = $this->parseFunction($value);
         if (null !== $function) {
             // > plain function
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         $methodArray = null
@@ -187,550 +182,656 @@ class DefaultCallableParser implements CallableParserInterface
             ?? $this->parseMethodArrayFromString($value);
 
         if (null === $methodArray) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be method (array or string)', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        [ $theObject, $theClass, $theMethod, $theMagic ] = $methodArray;
+        [ $anObject, $aClass, $aMethod, $aMagic ] = $methodArray;
 
-        if ($theObject) {
+        if ($anObject) {
             // > array with object
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         if (false
-            || ($theMethod === '__callStatic')
-            || ($theMagic === '__callStatic')
+            || ($aMethod === '__callStatic')
+            || ($aMagic === '__callStatic')
         ) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         if (false
-            || ($theMethod === '__invoke')
-            || ($theMethod === '__call')
-            || ($theMagic === '__invoke')
-            || ($theMagic === '__call')
+            || ($aMethod === '__invoke')
+            || ($aMethod === '__call')
+            || ($aMagic === '__invoke')
+            || ($aMagic === '__call')
         ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be real (not magic and not invoke) method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         try {
-            $rm = new \ReflectionMethod($theClass, $theMethod);
+            $rm = new \ReflectionMethod($aClass, $aMethod);
 
             if (! $rm->isStatic()) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be static method', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be existing method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
 
     /**
-     * @param callable|\Closure|object|null $r
+     * @return Ret<callable|\Closure|object>
      */
-    public function typeCallableObject(&$r, $value, $newScope = 'static') : bool
+    public function typeCallableObject($value, $newScope = 'static')
     {
-        $r = null;
-
         if (! is_object($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be object', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $status = $this->typeCallableObjectClosure($closure, $value, $newScope);
-        if ($status) {
-            $r = $closure;
-
-            return true;
+        if ($this
+            ->typeCallableObjectClosure($value, $newScope)
+            ->isOk([ &$valueCallableObjectClosure ])
+        ) {
+            return Ret::ok($valueCallableObjectClosure);
         }
 
-        $status = $this->typeCallableObjectInvokable($invokable, $value, $newScope);
-        if ($status) {
-            $r = $invokable;
-
-            return true;
+        if ($this
+            ->typeCallableObjectInvokable($value, $newScope)
+            ->isOk([ &$valueCallableObjectInvokable ])
+        ) {
+            return Ret::ok($valueCallableObjectInvokable);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be callable, object', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param callable|object|null $r
+     * @return Ret<\Closure>
      */
-    public function typeCallableObjectClosure(&$r, $value, $newScope = 'static') : bool
+    public function typeCallableObjectClosure($value, $newScope = 'static')
     {
-        $r = null;
-
         if (! ($value instanceof \Closure)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be \Closure', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! $this->isCallable($value, $newScope)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` \Closure is not callable in passed scope', $value, $newScope ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
     /**
-     * @param callable|object|null $r
+     * @return Ret<callable|object>
      */
-    public function typeCallableObjectInvokable(&$r, $value, $newScope = 'static') : bool
+    public function typeCallableObjectInvokable($value, $newScope = 'static')
     {
-        $r = null;
-
         $invokable = $this->parseInvokable($value);
-
         if (null === $invokable) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be invokable object', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! $this->isCallable($invokable, $newScope)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` invokable is not callable in passed scope', $value, $newScope ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $invokable;
-
-        return true;
+        return Ret::ok($invokable);
     }
 
 
     /**
-     * @param callable|array{ 0: object|class-string, 1: string }|null $r
-     * @param string|object                                            $newScope
+     * @param string|object $newScope
+     *
+     * @return Ret<callable|array{ 0: object|class-string, 1: string }>
      */
-    public function typeCallableArray(&$r, $value, $newScope = 'static') : bool
+    public function typeCallableArray($value, $newScope = 'static')
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $status = $this->typeCallableArrayMethod($method, $value, $newScope);
-        if ($status) {
-            $r = $method;
-
-            return true;
+        if ($this
+            ->typeCallableArrayMethod($value, $newScope)
+            ->isOk([ &$valueCallableArrayMethod ])
+        ) {
+            return Ret::ok($valueCallableArrayMethod);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be callable array', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param callable|array{ 0: object|class-string, 1: string }|null $r
-     * @param string|object                                            $newScope
+     * @param string|object $newScope
+     *
+     * @return Ret<callable|array{ 0: object|class-string, 1: string }>
      */
-    public function typeCallableArrayMethod(&$r, $value, $newScope = 'static') : bool
+    public function typeCallableArrayMethod($value, $newScope = 'static')
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $methodArray = $this->parseMethodArrayFromArray($value);
-
         if (null === $methodArray) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array with method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        [ $theObject, $theClass, $theMethod, $theMagic ] = $methodArray;
+        [ $anObject, $aClass, $aMethod, $aMagic ] = $methodArray;
 
-        if (null === $theMethod) {
-            return false;
+        if (null === $aMethod) {
+            return Ret::err(
+                [ 'The `value` should be array with method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ($theObject) {
-            $callableMethodPublic = [ $theObject, $theMethod ];
+        if ($anObject) {
+            $callableMethodPublic = [ $anObject, $aMethod ];
 
             $callableMethodPublicMagic = null;
-            if ($theMagic) {
-                $callableMethodPublicMagic = [ $theObject, $theMagic ];
+            if ($aMagic) {
+                $callableMethodPublicMagic = [ $anObject, $aMagic ];
             }
 
             if (! $this->isCallable($callableMethodPublicMagic ?? $callableMethodPublic, $newScope)) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` method is not callable in passed scope', $value, $newScope ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $r = $callableMethodPublic;
-
-            return true;
+            return Ret::ok($callableMethodPublic);
         }
 
         if (false
-            || ($theMethod === '__invoke')
-            || ($theMethod === '__call')
-            || ($theMagic === '__invoke')
-            || ($theMagic === '__call')
+            || ($aMethod === '__invoke')
+            || ($aMethod === '__call')
+            || ($aMagic === '__invoke')
+            || ($aMagic === '__call')
         ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be real (not magic and not invoke) method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $callableMethodStatic = [ $theClass, $theMethod ];
+        $callableMethodStatic = [ $aClass, $aMethod ];
 
         $callableMethodStaticMagic = null;
-        if ($theMagic) {
-            $callableMethodStaticMagic = [ $theClass, $theMagic ];
+        if ($aMagic) {
+            $callableMethodStaticMagic = [ $aClass, $aMagic ];
         }
 
         if (false
-            || ($theMethod === '__callStatic')
-            || ($theMagic === '__callStatic')
+            || ($aMethod === '__callStatic')
+            || ($aMagic === '__callStatic')
         ) {
             if (! $this->isCallable($callableMethodStaticMagic ?? $callableMethodStatic, $newScope)) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` method is not callable in passed scope', $value, $newScope ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $r = $callableMethodStatic;
-
-            return true;
+            return Ret::ok($callableMethodStatic);
         }
 
         try {
-            $rm = new \ReflectionMethod($theClass, $theMethod);
+            $rm = new \ReflectionMethod($aClass, $aMethod);
 
             if (! $rm->isStatic()) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be static method', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be existing method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! $this->isCallable($callableMethodStatic, $newScope)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` method is not callable in passed scope', $value, $newScope ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $callableMethodStatic;
-
-        return true;
+        return Ret::ok($callableMethodStatic);
     }
 
     /**
-     * @param callable|array{ 0: class-string, 1: string }|null $r
-     * @param string|object                                     $newScope
+     * @param string|object $newScope
+     *
+     * @return Ret<callable|array{ 0: class-string, 1: string }>
      */
-    public function typeCallableArrayMethodStatic(&$r, $value, $newScope = 'static') : bool
+    public function typeCallableArrayMethodStatic($value, $newScope = 'static')
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $methodArray = $this->parseMethodArrayFromArray($value);
-
         if (null === $methodArray) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array with method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        [ /* $theObject */, $theClass, $theMethod, $theMagic ] = $methodArray;
+        [ /* $anObject */, $aClass, $aMethod, $aMagic ] = $methodArray;
 
-        if (null === $theMethod) {
-            return false;
+        if (null === $aMethod) {
+            return Ret::err(
+                [ 'The `value` should be array with method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (false
-            || ($theMethod === '__invoke')
-            || ($theMethod === '__call')
-            || ($theMagic === '__invoke')
-            || ($theMagic === '__call')
+            || ($aMethod === '__invoke')
+            || ($aMethod === '__call')
+            || ($aMagic === '__invoke')
+            || ($aMagic === '__call')
         ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be real (not magic and not invoke) method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $callableMethodStatic = [ $theClass, $theMethod ];
+        $callableMethodStatic = [ $aClass, $aMethod ];
 
         $callableMethodStaticMagic = null;
-        if ($theMagic) {
-            $callableMethodStaticMagic = [ $theClass, $theMagic ];
+        if ($aMagic) {
+            $callableMethodStaticMagic = [ $aClass, $aMagic ];
         }
 
         if (false
-            || ($theMethod === '__callStatic')
-            || ($theMagic === '__callStatic')
+            || ($aMethod === '__callStatic')
+            || ($aMagic === '__callStatic')
         ) {
             if (! $this->isCallable($callableMethodStaticMagic ?? $callableMethodStatic, $newScope)) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` method is not callable in passed scope', $value, $newScope ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $r = $callableMethodStatic;
-
-            return true;
+            return Ret::ok($callableMethodStatic);
         }
 
         try {
-            $rm = new \ReflectionMethod($theClass, $theMethod);
+            $rm = new \ReflectionMethod($aClass, $aMethod);
 
             if (! $rm->isStatic()) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be static method', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be existing method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! $this->isCallable($callableMethodStatic, $newScope)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` method is not callable in passed scope', $value, $newScope ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $callableMethodStatic;
-
-        return true;
+        return Ret::ok($callableMethodStatic);
     }
 
     /**
-     * @param callable|array{ 0: object, 1: string }|null $r
-     * @param string|object                               $newScope
+     * @param string|object $newScope
+     *
+     * @return Ret<callable|array{ 0: object, 1: string }>
      */
-    public function typeCallableArrayMethodNonStatic(&$r, $value, $newScope = 'static') : bool
+    public function typeCallableArrayMethodNonStatic($value, $newScope = 'static')
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $methodArray = $this->parseMethodArrayFromArray($value);
-
         if (null === $methodArray) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array with method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        [ $theObject, $theClass, $theMethod, $theMagic ] = $methodArray;
+        [ $anObject, $aClass, $aMethod, $aMagic ] = $methodArray;
 
-        if (null === $theMethod) {
-            return false;
+        if (null === $aMethod) {
+            return Ret::err(
+                [ 'The `value` should be array with method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (false
-            || ($theMethod === '__callStatic')
-            || ($theMagic === '__callStatic')
+            || ($aMethod === '__callStatic')
+            || ($aMagic === '__callStatic')
         ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array with non-static method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if (null === $theObject) {
-            return false;
+        if (null === $anObject) {
+            return Ret::err(
+                [ 'The `value` should be array with non-static method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $callableMethodPublic = [ $theObject, $theMethod ];
+        $callableMethodPublic = [ $anObject, $aMethod ];
 
         if (false
-            || ($theMethod === '__invoke')
-            || ($theMethod === '__call')
-            || ($theMagic === '__invoke')
-            || ($theMagic === '__call')
+            || ($aMethod === '__invoke')
+            || ($aMethod === '__call')
+            || ($aMagic === '__invoke')
+            || ($aMagic === '__call')
         ) {
-            $r = $callableMethodPublic;
-
-            return true;
+            return Ret::ok($callableMethodPublic);
         }
 
         try {
-            $rm = new \ReflectionMethod($theClass, $theMethod);
+            $rm = new \ReflectionMethod($aClass, $aMethod);
 
             if ($rm->isStatic()) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be non static method', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be existing method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! $this->isCallable($callableMethodPublic, $newScope)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` method is not callable in passed scope', $value, $newScope ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $callableMethodPublic;
-
-        return true;
+        return Ret::ok($callableMethodPublic);
     }
 
 
     /**
-     * @param callable-string|null $r
+     * @return Ret<callable-string>
      */
-    public function typeCallableString(&$r, $value, $newScope = 'static') : bool
+    public function typeCallableString($value, $newScope = 'static')
     {
-        $r = null;
-
         if (! is_string($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be string', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $status = $this->typeCallableStringFunction($function, $value);
-        if ($status) {
-            $r = $function;
-
-            return true;
+        if ($this
+            ->typeCallableStringFunction($value)
+            ->isOk([ &$valueCallableStringFunction ])
+        ) {
+            return Ret::ok($valueCallableStringFunction);
         }
 
-        $status = $this->typeCallableStringMethodStatic($methodStatic, $value, $newScope);
-        if ($status) {
-            $r = $methodStatic;
-
-            return true;
+        if ($this
+            ->typeCallableStringMethodStatic($value, $newScope)
+            ->isOk([ &$valueCallableStringMethodStatic ])
+        ) {
+            return Ret::ok($valueCallableStringMethodStatic);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be callable string', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param callable-string|null $r
+     * @return Ret<callable-string>
      */
-    public function typeCallableStringFunction(&$r, $value) : bool
+    public function typeCallableStringFunction($value)
     {
-        $r = null;
-
         if (! is_string($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be string', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (function_exists($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be callable string function', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param callable-string|null $r
+     * @return Ret<callable-string>
      */
-    public function typeCallableStringFunctionInternal(&$r, $value) : bool
+    public function typeCallableStringFunctionInternal($value)
     {
-        $r = null;
-
         if (! is_string($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be string', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         try {
             $rf = new \ReflectionFunction($value);
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be existing function name', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if ($rf->isInternal()) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($rf->getName());
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be internal function name', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param callable-string|null $r
+     * @return Ret<callable-string>
      */
-    public function typeCallableStringFunctionNonInternal(&$r, $value) : bool
+    public function typeCallableStringFunctionNonInternal($value)
     {
-        $r = null;
-
         if (! is_string($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be string', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         try {
             $rf = new \ReflectionFunction($value);
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be existing function name', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! $rf->isInternal()) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($rf->getName());
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be non-internal function name', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param callable-string|null $r
+     * @return Ret<callable-string>
      */
-    public function typeCallableStringMethodStatic(&$r, $value, $newScope = 'static') : bool
+    public function typeCallableStringMethodStatic($value, $newScope = 'static')
     {
-        $r = null;
-
         if (! is_string($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be string', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $methodArray = $this->parseMethodArrayFromString($value);
-
         if (null === $methodArray) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be string with method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        [ , $theClass, $theMethod, $theMagic ] = $methodArray;
+        [ /* $anObject */, $aClass, $aMethod, $aMagic ] = $methodArray;
 
-        if (null === $theMethod) {
-            return false;
+        if (null === $aMethod) {
+            return Ret::err(
+                [ 'The `value` should be array with method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $callableMethodStatic = "{$theClass}::{$theMethod}";
+        $callableMethodStatic = "{$aClass}::{$aMethod}";
 
         $callableMethodStaticMagic = null;
-        if ($theMagic) {
-            $callableMethodStaticMagic = "{$theClass}::{$theMagic}";
+        if ($aMagic) {
+            $callableMethodStaticMagic = "{$aClass}::{$aMagic}";
         }
 
         if (false
-            || ($theMethod === '__callStatic')
-            || ($theMagic === '__callStatic')
+            || ($aMethod === '__callStatic')
+            || ($aMagic === '__callStatic')
         ) {
             if (! $this->isCallable($callableMethodStaticMagic ?? $callableMethodStatic, $newScope)) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` method is not callable in passed scope', $value, $newScope ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $r = $callableMethodStatic;
-
-            return true;
+            return Ret::ok($callableMethodStatic);
         }
 
         if (false
-            || ($theMethod === '__invoke')
-            || ($theMethod === '__call')
-            || ($theMagic === '__invoke')
-            || ($theMagic === '__call')
+            || ($aMethod === '__invoke')
+            || ($aMethod === '__call')
+            || ($aMagic === '__invoke')
+            || ($aMagic === '__call')
         ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be real (not magic and not invoke) method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         try {
-            $rm = new \ReflectionMethod($theClass, $theMethod);
+            $rm = new \ReflectionMethod($aClass, $aMethod);
 
             if (! $rm->isStatic()) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be static method', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be existing method', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! $this->isCallable($callableMethodStatic, $newScope)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` method is not callable in passed scope', $value, $newScope ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $callableMethodStatic;
-
-        return true;
+        return Ret::ok($callableMethodStatic);
     }
 
 
@@ -739,14 +840,16 @@ class DefaultCallableParser implements CallableParserInterface
      */
     public function isCallable($value, $newScope = 'static') : bool
     {
-        return Lib::php()->is_callable($value, $newScope);
+        $thePhp = Lib::$php;
+
+        return $thePhp->is_callable($value, $newScope);
     }
 
 
     /**
      * @return callable-string
      */
-    private function parseFunction($value) : ?string
+    protected function parseFunction($value) : ?string
     {
         if (! is_string($value)) {
             return null;
@@ -763,7 +866,7 @@ class DefaultCallableParser implements CallableParserInterface
     /**
      * @return array{ 0: object, 1: class-string, 2: null, 3: string }
      */
-    private function parseMethodArrayFromObject($value) : ?array
+    protected function parseMethodArrayFromObject($value) : ?array
     {
         if (! is_object($value)) {
             return null;
@@ -773,11 +876,11 @@ class DefaultCallableParser implements CallableParserInterface
             return null;
         }
 
-        $theObject = $value;
-        $theClass = get_class($value);
+        $anObject = $value;
+        $aClass = get_class($value);
 
-        if (method_exists($theClass, $theMagic = '__invoke')) {
-            return [ $theObject, $theClass, null, $theMagic ];
+        if (method_exists($aClass, $aMagic = '__invoke')) {
+            return [ $anObject, $aClass, null, $aMagic ];
         }
 
         return null;
@@ -786,7 +889,7 @@ class DefaultCallableParser implements CallableParserInterface
     /**
      * @return array{ 0: object|null, 1: class-string, 2: string, 3: string|null }
      */
-    private function parseMethodArrayFromArray($value) : ?array
+    protected function parseMethodArrayFromArray($value) : ?array
     {
         if (! is_array($value)) {
             return null;
@@ -794,39 +897,39 @@ class DefaultCallableParser implements CallableParserInterface
 
         $list = array_values($value);
 
-        [ $classOrObject, $theMethod ] = $list + [ '', '' ];
+        [ $aClassOrAnObject, $aMethod ] = $list + [ '', '' ];
 
-        if (! ((is_string($theMethod)) && ('' !== $theMethod))) {
+        if (! ((is_string($aMethod)) && ('' !== $aMethod))) {
             return null;
         }
 
         if (! (false
-            || ($isObject = is_object($classOrObject))
-            || ($isClass = is_string($classOrObject) && class_exists($classOrObject))
+            || ($isObject = is_object($aClassOrAnObject))
+            || ($isClass = is_string($aClassOrAnObject) && class_exists($aClassOrAnObject))
         )) {
             return null;
         }
 
-        $theObject = null;
-        $theClass = null;
+        $anObject = null;
+        $aClass = null;
         if ($isObject) {
-            $theObject = $classOrObject;
-            $theClass = get_class($theObject);
+            $anObject = $aClassOrAnObject;
+            $aClass = get_class($anObject);
 
         } elseif ($isClass) {
-            $theClass = $classOrObject;
+            $aClass = $aClassOrAnObject;
         }
 
-        if (method_exists($theClass, $theMethod)) {
-            return [ $theObject, $theClass, $theMethod, null ];
+        if (method_exists($aClass, $aMethod)) {
+            return [ $anObject, $aClass, $aMethod, null ];
 
         } else {
-            if ($isObject && method_exists($theObject, $theMagic = '__call')) {
-                return [ $theObject, $theClass, $theMethod, $theMagic ];
+            if ($isObject && method_exists($anObject, $aMagic = '__call')) {
+                return [ $anObject, $aClass, $aMethod, $aMagic ];
             }
 
-            if (method_exists($theClass, $theMagic = '__callStatic')) {
-                return [ $theObject, $theClass, $theMethod, $theMagic ];
+            if (method_exists($aClass, $aMagic = '__callStatic')) {
+                return [ $anObject, $aClass, $aMethod, $aMagic ];
             }
         }
 
@@ -836,7 +939,7 @@ class DefaultCallableParser implements CallableParserInterface
     /**
      * @return array{ 0: null, 1: class-string, 2: string|null, 3: string|null }
      */
-    private function parseMethodArrayFromString($value) : ?array
+    protected function parseMethodArrayFromString($value) : ?array
     {
         if (! is_string($value)) {
             return null;
@@ -844,26 +947,26 @@ class DefaultCallableParser implements CallableParserInterface
 
         $list = explode('::', $value);
 
-        [ $theClass, $theMethod ] = $list + [ '', '' ];
+        [ $aClass, $aMethod ] = $list + [ '', '' ];
 
-        $hasClass = ('' !== $theClass);
-        $hasMethod = ('' !== $theMethod);
+        $hasClass = ('' !== $aClass);
+        $hasMethod = ('' !== $aMethod);
 
         if (! $hasClass) {
             return null;
         }
 
         if ($hasMethod) {
-            if (method_exists($theClass, $theMethod)) {
-                return [ null, $theClass, $theMethod, null ];
+            if (method_exists($aClass, $aMethod)) {
+                return [ null, $aClass, $aMethod, null ];
 
-            } elseif (method_exists($theClass, $theMagic = '__callStatic')) {
-                return [ null, $theClass, $theMethod, $theMagic ];
+            } elseif (method_exists($aClass, $aMagic = '__callStatic')) {
+                return [ null, $aClass, $aMethod, $aMagic ];
             }
 
         } else {
-            if (method_exists($theClass, $theMagic = '__invoke')) {
-                return [ null, $theClass, null, $theMagic ];
+            if (method_exists($aClass, $aMagic = '__invoke')) {
+                return [ null, $aClass, null, $aMagic ];
             }
         }
 
@@ -874,7 +977,7 @@ class DefaultCallableParser implements CallableParserInterface
     /**
      * @return object|callable
      */
-    private function parseInvokable($value) : ?object
+    protected function parseInvokable($value) : ?object
     {
         if (! is_object($value)) {
             return null;

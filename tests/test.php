@@ -1,8 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
-
-
 // > настраиваем PHP
 // > некоторые CMS сами по себе применяют настройки глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
@@ -985,170 +982,6 @@ $test->run();
 
 
 // >>> TEST
-// > тесты Result
-$fn = function () use ($ffn) {
-    $ffn->print('[ Result ]');
-    echo "\n";
-
-
-    class ResultTest
-    {
-        public static function string($value, $res = null)
-        {
-            if (! is_string($value)) {
-                return \Gzhegow\Lib\Modules\Php\Result\Result::err(
-                    $res,
-                    [ 'The `value` should be a string', $value ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-
-            return \Gzhegow\Lib\Modules\Php\Result\Result::ok($res, $value);
-        }
-
-        public static function string_not_empty($value, $res = null)
-        {
-            if (! (is_string($value) && ('' !== $value))) {
-                return \Gzhegow\Lib\Modules\Php\Result\Result::err(
-                    $res,
-                    [ 'The `value` should be a non-empty string', $value ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-
-            return \Gzhegow\Lib\Modules\Php\Result\Result::ok($res, $value);
-        }
-    }
-
-
-    $strInterpolator = \Gzhegow\Lib\Lib::str()->interpolator();
-
-
-    $invalidValue = NAN;
-    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::type();
-    $status = false
-        || \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx)
-        || \Gzhegow\Lib\Modules\Bcmath\Number::fromValidArray($invalidValue, $ctx);
-
-    $errorList = $ctx->getErrorList();
-    $errorList = array_map([ $strInterpolator, 'interpolateMessage' ], $errorList);
-    $ffn->print_array_multiline($errorList, 2);
-
-    echo "\n";
-
-
-    $invalidValue = NAN;
-    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::parse();
-    $value = null
-        ?? \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx)
-        ?? \Gzhegow\Lib\Modules\Bcmath\Number::fromValidArray($invalidValue, $ctx);
-
-    $errorList = $ctx->getErrorList();
-    $errorList = array_map([ $strInterpolator, 'interpolateMessage' ], $errorList);
-    $ffn->print_array_multiline($errorList, 2);
-
-    echo "\n";
-
-
-    $invalidValue = NAN;
-    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::parseThrow();
-    try {
-        \Gzhegow\Lib\Modules\Bcmath\Number::fromStatic($invalidValue, $ctx);
-    }
-    catch ( \Throwable $e ) {
-        $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesAllLines($e, _DEBUG_THROWABLE_WITHOUT_FILE);
-
-        echo implode("\n", $messages) . "\n";
-        echo "\n";
-    }
-
-
-    try {
-        $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::typeThrow();
-        $status = true
-            && ResultTest::string($invalidValue, $ctx)
-            && ResultTest::string_not_empty($ctx->getResult(), $ctx);
-    }
-    catch ( \Throwable $e ) {
-        $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesAllLines($e, _DEBUG_THROWABLE_WITHOUT_FILE);
-
-        echo implode("\n", $messages) . "\n";
-        echo "\n";
-    }
-
-
-    try {
-        $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::ignoreThrow();
-        $devnull = null
-            ?? ResultTest::string($invalidValue, $ctx)
-            ?? ResultTest::string_not_empty($ctx->getResult(), $ctx);
-    }
-    catch ( \Throwable $e ) {
-        $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesAllLines($e, _DEBUG_THROWABLE_WITHOUT_FILE);
-
-        echo implode("\n", $messages) . "\n";
-        echo "\n";
-    }
-
-
-    $validValue = '123';
-
-    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::parseThrow();
-    $value = ResultTest::string($validValue, $ctx);
-    $ffn->print($value, $ctx->getResult());
-    echo "\n";
-
-    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::typeThrow();
-    $status = true
-        && ResultTest::string($validValue, $ctx)
-        && ResultTest::string_not_empty($ctx->getResult(), $ctx);
-    $ffn->print($status, $ctx->getResult());
-    echo "\n";
-
-    $ctx = \Gzhegow\Lib\Modules\Php\Result\Result::ignoreThrow();
-    $devnull = null
-        ?? ResultTest::string($validValue, $ctx)
-        ?? ResultTest::string_not_empty($ctx->getResult(), $ctx);
-    $ffn->print($devnull, $ctx->getResult());
-};
-$test = $ffn->test($fn);
-$test->expectStdout('
-"[ Result ]"
-
-###
-[
-  "The `from` should be an instance of: Gzhegow\Lib\Modules\Bcmath\Number",
-  "The `from` should be array"
-]
-###
-
-###
-[
-  "The `from` should be an instance of: Gzhegow\Lib\Modules\Bcmath\Number",
-  "The `from` should be array"
-]
-###
-
-[ 0 ] The `from` should be an instance of: Gzhegow\Lib\Modules\Bcmath\Number
-{ object # Gzhegow\Lib\Exception\LogicException }
-
-[ 0 ] The `value` should be a string
-{ object # Gzhegow\Lib\Exception\LogicException }
-
-[ 0 ] The `value` should be a string
-{ object # Gzhegow\Lib\Exception\LogicException }
-
-"123" | "123"
-
-TRUE | "123"
-
-NULL | "123"
-');
-$test->run();
-
-
-
-// >>> TEST
 // > тесты ArrModule
 $fn = function () use ($ffn) {
     $ffn->print('[ ArrModule ]');
@@ -1356,10 +1189,8 @@ $test->expectStdout('
     2,
     3
   ],
-  4 => [
-    "key0" => "",
-    "key1" => []
-  ],
+  "4.key0" => "",
+  "4.key1" => [],
   "5.key0" => "",
   "5.key1" => [],
   "5.key2" => [
@@ -1381,10 +1212,8 @@ $test->expectStdout('
     2,
     3
   ],
-  "key4" => [
-    "key0" => "",
-    "key1" => []
-  ],
+  "key4.key0" => "",
+  "key4.key1" => [],
   "key5.key0" => "",
   "key5.key1" => [],
   "key5.key2" => [
@@ -1406,10 +1235,8 @@ $test->expectStdout('
     2,
     3
   ],
-  "6.4" => [
-    "key0" => "",
-    "key1" => []
-  ],
+  "6.4.key0" => "",
+  "6.4.key1" => [],
   "6.5.key0" => "",
   "6.5.key1" => [],
   "6.5.key2" => [
@@ -1431,10 +1258,8 @@ $test->expectStdout('
     2,
     3
   ],
-  "6.key4" => [
-    "key0" => "",
-    "key1" => []
-  ],
+  "6.key4.key0" => "",
+  "6.key4.key1" => [],
   "6.key5.key0" => "",
   "6.key5.key1" => [],
   "6.key5.key2" => [
@@ -1456,10 +1281,8 @@ $test->expectStdout('
     2,
     3
   ],
-  "key6.4" => [
-    "key0" => "",
-    "key1" => []
-  ],
+  "key6.4.key0" => "",
+  "key6.4.key1" => [],
   "key6.5.key0" => "",
   "key6.5.key1" => [],
   "key6.5.key2" => [
@@ -1481,10 +1304,8 @@ $test->expectStdout('
     2,
     3
   ],
-  "key6.key4" => [
-    "key0" => "",
-    "key1" => []
-  ],
+  "key6.key4.key0" => "",
+  "key6.key4.key1" => [],
   "key6.key5.key0" => "",
   "key6.key5.key1" => [],
   "key6.key5.key2" => [
@@ -1509,27 +1330,27 @@ $fn = function () use ($ffn) {
     $ffn->print('[ BcmathModule ]');
     echo "\n";
 
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('0', 0);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('0');
     $ffn->print('bcabs', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 0);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005');
     $ffn->print('bcabs', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 0);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005');
     $ffn->print('bcabs', (string) $result, $result);
     echo "\n";
 
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('0', 0);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('0');
     $ffn->print('bcceil', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005', 0);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005');
     $ffn->print('bcceil', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005', 0);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005');
     $ffn->print('bcceil', (string) $result, $result);
     echo "\n";
 
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('0', 0);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('0');
     $ffn->print('bcfloor', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005', 0);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005');
     $ffn->print('bcfloor', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005', 0);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005');
     $ffn->print('bcfloor', (string) $result, $result);
     echo "\n";
 
@@ -2532,155 +2353,155 @@ $fn = function () use ($ffn) {
     date_default_timezone_set('UTC');
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone($dateTimezone, '+0100');
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone('+0100')->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone($dateTimezone, 'EET');
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone('EET')->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone($dateTimezone, 'Europe/Minsk');
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone('Europe/Minsk')->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone($dateTimezone, new \DateTimeZone('UTC'));
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone(new \DateTimeZone('UTC'))->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone($dateTimezone, new \DateTime('now', new \DateTimeZone('UTC')));
-    $ffn->print($status, $dateTimezone);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset($dateTimezone, '+0100');
-    $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset($dateTimezone, new \DateTimeZone('+0100'));
-    $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset($dateTimezone, new \DateTime('now', new \DateTimeZone('+0100')));
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone(new \DateTime('now', new \DateTimeZone('UTC')))->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr($dateTimezone, 'EET');
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset('+0100')->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr($dateTimezone, new \DateTimeZone('EET'));
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset(new \DateTimeZone('+0100'))->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr($dateTimezone, new \DateTime('now', new \DateTimeZone('EET')));
-    $ffn->print($status, $dateTimezone);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name($dateTimezone, 'Europe/Minsk');
-    $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name($dateTimezone, new \DateTimeZone('Europe/Minsk'));
-    $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name($dateTimezone, new \DateTime('now', new \DateTimeZone('Europe/Minsk')));
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset(new \DateTime('now', new \DateTimeZone('+0100')))->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr($dateTimezone, 'EET');
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr('EET')->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr($dateTimezone, 'Europe/Minsk');
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr(new \DateTimeZone('EET'))->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr($dateTimezone, new \DateTimeZone('EET'));
-    $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr($dateTimezone, new \DateTime('now', new \DateTimeZone('Europe/Minsk')));
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr(new \DateTime('now', new \DateTimeZone('EET')))->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
     echo "\n";
 
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name('Europe/Minsk')->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name(new \DateTimeZone('Europe/Minsk'))->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name(new \DateTime('now', new \DateTimeZone('Europe/Minsk')))->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
     echo "\n";
 
-
-    $status = \Gzhegow\Lib\Lib::date()->type_interval($dateInterval, 'P1D');
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval($dateInterval, 'P1.5D');
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval($dateInterval, '+100 seconds');
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval($dateInterval, new \DateInterval('P1D'));
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
-    $ffn->print($status, $dateInterval);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration($dateInterval, 'P1D');
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration($dateInterval, 'P1.5D');
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration($dateInterval, new \DateInterval('P1D'));
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
-    $ffn->print($status, $dateInterval);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring($dateInterval, '+100 seconds');
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring($dateInterval, new \DateInterval('P1D'));
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
-    $ffn->print($status, $dateInterval);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime($dateInterval, '123.456');
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime($dateInterval, new \DateInterval('P1D'));
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
-    $ffn->print($status, $dateInterval);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago($dateInterval, new \DateTime('tomorrow midnight'), new \DateTime('now midnight'));
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago($dateInterval, new \DateInterval('P1D'));
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago($dateInterval, \DateInterval::createFromDateString('+100 seconds'));
-    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr('EET')->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr('Europe/Minsk')->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr(new \DateTimeZone('EET'))->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr(new \DateTime('now', new \DateTimeZone('Europe/Minsk')))->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
     echo "\n";
 
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 midnight');
+    $status = \Gzhegow\Lib\Lib::date()->type_interval('P1D')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval('P1.5D')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval('+100 seconds')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval(new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval(\DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration('P1D')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration('P1.5D')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration(new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration(\DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring('+100 seconds')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring(new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring(\DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime('123.456')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime(new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime(\DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago(new \DateTime('tomorrow midnight'), new \DateTime('now midnight'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago(new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago(\DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    echo "\n";
+
+    echo "\n";
+
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 midnight')->isOk([ &$dateObject ]);
     $dateAtomString1 = $dateObject->format(DATE_ATOM);
     $ffn->print($status, $dateObject);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject2, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject)->isOk([ &$dateObject2 ]);
     $dateAtomString2 = $dateObject2->format(DATE_ATOM);
     $ffn->print($status, $dateObject2, $dateAtomString1 === $dateAtomString2);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject3, $dateAtomString1);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateAtomString1)->isOk([ &$dateObject3 ]);
     $dateAtomString3 = $dateObject3->format(DATE_ATOM);
     $ffn->print($status, $dateObject3, $dateAtomString1 === $dateAtomString3);
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject, '1970-01-01 midnight');
+    $status = \Gzhegow\Lib\Lib::date()->type_idate('1970-01-01 midnight')->isOk([ &$dateImmutableObject ]);
     $dateAtomString1 = $dateImmutableObject->format(DATE_ATOM);
     $ffn->print($status, $dateImmutableObject);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject2, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateObject)->isOk([ &$dateImmutableObject2 ]);
     $dateAtomString2 = $dateImmutableObject2->format(DATE_ATOM);
     $ffn->print($status, $dateImmutableObject2, $dateAtomString1 === $dateAtomString2);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject3, $dateAtomString1);
+    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateAtomString1)->isOk([ &$dateImmutableObject3 ]);
     $dateAtomString3 = $dateImmutableObject3->format(DATE_ATOM);
     $ffn->print($status, $dateImmutableObject3, $dateAtomString1 === $dateAtomString3);
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_date($dateObject, '1970-01-01 midnight');
+    $status = \Gzhegow\Lib\Lib::date()->type_date('1970-01-01 midnight')->isOk([ &$dateObject ]);
     $dateAtomString1 = $dateObject->format(DATE_ATOM);
     $ffn->print($status, $dateObject);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_date($dateObject2, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_date($dateObject)->isOk([ &$dateObject2 ]);
     $dateAtomString2 = $dateObject2->format(DATE_ATOM);
     $ffn->print($status, $dateObject2, $dateAtomString1 === $dateAtomString2);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateImmutableObject, $from = $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_idate($from = $dateObject)->isOk([ &$dateImmutableObject ]);
     $dateAtomString3 = $dateImmutableObject->format(DATE_ATOM);
     $ffn->print($status, $dateImmutableObject, $dateAtomString1 === $dateAtomString3);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_date($dateImmutableObject2, $dateImmutableObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_date($dateImmutableObject)->isOk([ &$dateImmutableObject2 ]);
     $dateAtomString4 = $dateImmutableObject2->format(DATE_ATOM);
     $ffn->print($status, $dateImmutableObject2, $dateAtomString1 === $dateAtomString4);
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject1, '1970-01-01 midnight');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 midnight')->isOk([ &$dateObject1 ]);
     $dateAtomString = $dateObject1->format(DATE_ATOM);
     $ffn->print($status, $dateObject1);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject2, '1970-01-01 midnight', 'EET');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 midnight', 'EET')->isOk([ &$dateObject2 ]);
     $dateAtomString2 = $dateObject2->format(DATE_ATOM);
     $ffn->print($status, $dateObject2, $dateAtomString !== $dateAtomString2);
     echo "\n";
@@ -2688,48 +2509,48 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 12:34:56');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 12:34:56.456');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.456')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 12:34:56.456789');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.456789')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject, '1970-01-01 12:34:56.456789', 'EET');
+    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.456789', 'EET')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 12:34:56 +0100');
-    $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 12:34:56.456 EET');
-    $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz($result, '1970-01-01 12:34:56.456789 Europe/Minsk');
-    $ffn->print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56 +0100')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56.456 EET')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56.456789 Europe/Minsk')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, '1970-01-01 00:00:00 +0100', 'Y-m-d H:i:s O',);
-    $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, '1970-01-01 00:00:00 EET', 'Y-m-d H:i:s T',);
-    $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted($result, '1970-01-01 00:00:00 Europe/Minsk', 'Y-m-d H:i:s e',);
-    $ffn->print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 00:00:00 +0100', 'Y-m-d H:i:s O')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 00:00:00 EET', 'Y-m-d H:i:s T')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 00:00:00 Europe/Minsk', 'Y-m-d H:i:s e')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, '1970-01-01 00:00:00 +0100', 'Y-m-d H:i:s O',);
-    $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, '1970-01-01 00:00:00 EET', 'Y-m-d H:i:s T',);
-    $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted($result, '1970-01-01 00:00:00 Europe/Minsk', 'Y-m-d H:i:s e',);
-    $ffn->print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 00:00:00 +0100', 'Y-m-d H:i:s O')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 00:00:00 EET', 'Y-m-d H:i:s T')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 00:00:00 Europe/Minsk', 'Y-m-d H:i:s e')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '0');
-    $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '123');
-    $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '123.456');
-    $ffn->print($status, $result);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime($result, '123.456', 'EET');
-    $ffn->print($status, $result);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime('0')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime('123')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime('123.456')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime('123.456', 'EET')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
     echo "\n";
 
 
@@ -3367,25 +3188,23 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    $enc = \Gzhegow\Lib\Lib::format()->bytes_encode($src = 1024 * 1024);
+    $enc = \Gzhegow\Lib\Lib::format()->bytes_encode($src = 1024 * 1024)->orNan();
     $ffn->print($enc);
 
-    $dec = \Gzhegow\Lib\Lib::format()->bytes_decode($enc);
+    $dec = \Gzhegow\Lib\Lib::format()->bytes_decode($enc)->orNan();
     $ffn->print($dec, $src === $dec);
 
     echo "\n";
     echo "\n";
 
 
-    [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv()->csv_encode_rows([ [ 'col1', 'col2' ], [ 'val1', 'val2' ] ]);
+    $csv = \Gzhegow\Lib\Lib::format()->csv()->csv_encode_rows([ [ 'col1', 'col2' ], [ 'val1', 'val2' ] ])->orFalse();
     $ffn->print($csv);
-    $ffn->print($bytes);
 
     echo "\n";
 
-    [ $csv, $bytes ] = \Gzhegow\Lib\Lib::format()->csv()->csv_encode_row([ 'col1', 'col2' ]);
+    $csv = \Gzhegow\Lib\Lib::format()->csv()->csv_encode_row([ 'col1', 'col2' ])->orFalse();
     $ffn->print($csv);
-    $ffn->print($bytes);
 
     echo "\n";
     echo "\n";
@@ -3411,117 +3230,105 @@ $fn = function () use ($ffn) {
 
 
     try {
-        \Gzhegow\Lib\Lib::format()->json()->json_decode(null, true);
+        \Gzhegow\Lib\Lib::format()->json()->json_decode($json = null, $isAssociative = true)->orThrow();
     }
     catch ( \Throwable $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode(
-        null, true,
-        null, null,
-        \Gzhegow\Lib\Modules\Php\Result\Result::asValue([ null ])
-    );
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode($json = null, $isAssociative = true)->orNull();
     $ffn->print($result);
 
     echo "\n";
 
 
     try {
-        \Gzhegow\Lib\Lib::format()->json()->jsonc_decode(null, true);
+        \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($json = null, $isAssociative = true)->orThrow();
     }
     catch ( \Throwable $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode(
-        null, true,
-        null, null,
-        \Gzhegow\Lib\Modules\Php\Result\Result::asValue([ null ])
-    );
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($json = null, $isAssociative = true)->orNull();
     $ffn->print($result);
 
     echo "\n";
 
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode($json1, true);
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode($json1, $isAssociative = true)->getValue();
     $ffn->print($result);
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode($json2, true);
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode($json2, $isAssociative = true)->getValue();
     $ffn->print($result);
 
     echo "\n";
 
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($json1, true);
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($json1, $isAssociative = true)->getValue();
     $ffn->print($result);
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($json2, true);
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($json2, $isAssociative = true)->getValue();
     $ffn->print($result);
 
     echo "\n";
 
 
     try {
-        \Gzhegow\Lib\Lib::format()->json()->json_decode($jsonWithComment1, true);
+        \Gzhegow\Lib\Lib::format()->json()->json_decode($jsonWithComment1, $isAssociative = true)->orThrow();
     }
     catch ( \Throwable $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 
     try {
-        \Gzhegow\Lib\Lib::format()->json()->json_decode($jsonWithComment2, true);
+        \Gzhegow\Lib\Lib::format()->json()->json_decode($jsonWithComment2, $isAssociative = true)->orThrow();
     }
     catch ( \Throwable $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($jsonWithComment1, true);
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($jsonWithComment1, $isAssociative = true)->getValue();
     $ffn->print($result);
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($jsonWithComment2, true);
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($jsonWithComment2, $isAssociative = true)->getValue();
     $ffn->print($result);
 
     echo "\n";
 
 
     try {
-        \Gzhegow\Lib\Lib::format()->json()->json_encode(null, false);
+        \Gzhegow\Lib\Lib::format()->json()->json_encode($value = null, $isAllowNull = false)->orThrow();
     }
     catch ( \Throwable $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode(null, false, null, null, \Gzhegow\Lib\Modules\Php\Result\Result::asValue([ null ]));
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode($value = null, $isAllowNull = false)->orNull();
     $ffn->print($result);
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode(null, true);
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode($value = null, $isAllowNull = true)->getValue();
     $ffn->print($result);
 
     echo "\n";
 
 
     try {
-        \Gzhegow\Lib\Lib::format()->json()->json_encode($value = NAN);
+        \Gzhegow\Lib\Lib::format()->json()->json_encode($value = NAN)->orThrow();
     }
     catch ( \Throwable $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode(
-        $value = NAN, null,
-        null, null,
-        \Gzhegow\Lib\Modules\Php\Result\Result::asValue([ "NAN" ])
-    );
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode($value = NAN)->orFallback('NAN');
     $ffn->print($result);
 
     echo "\n";
 
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode("привет");
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode("привет")->getValue();
     $ffn->print($result);
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_print("привет");
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_print("привет")->getValue();
     $ffn->print($result);
 
     echo "\n";
@@ -3537,7 +3344,7 @@ $fn = function () use ($ffn) {
 </example>
 XML;
 
-    $sxe = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_sxe($xml);
+    $sxe = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_sxe($xml)->getValue();
     $ffn->print($sxe);
 
 
@@ -3550,7 +3357,7 @@ XML;
 </example>
 XML;
 
-    $ddoc = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_dom_document($xml);
+    $ddoc = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_dom_document($xml)->getValue();
     $ffn->print($ddoc);
 
 
@@ -3562,7 +3369,7 @@ XML;
 </example>
 XML;
 
-    $ddoc = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_dom_document($xml);
+    $ddoc = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_dom_document($xml)->getValue();
     $ffn->print($ddoc);
 
 
@@ -3575,10 +3382,11 @@ XML;
 </note>
 XML;
 
-    $sxe = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_sxe($xmlInvalid, $ret = \Gzhegow\Lib\Modules\Php\Result\Result::asValue());
-    $ffn->print($sxe);
+    $ret = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_sxe($xmlInvalid);
+    $status = $ret->isOk([ &$sxe ]);
+    $ffn->print($status, $sxe);
 
-    $errorList = $ret->getErrorList();
+    $errorList = $ret->getErrors($isAssociative = true);
     $ffn->print_array_multiline($errorList, 2);
 };
 $test = $ffn->test($fn);
@@ -3592,17 +3400,15 @@ $test->expectStdoutIf(PHP_VERSION_ID >= 70400, '
 "col1;col2\n
 val1;val2\n
 "
-20
 
 "col1;col2\n
 "
-10
 
 
-"[ CATCH ] The `json` should be a non-empty string"
+"[ CATCH ] The `json` should be not null"
 NULL
 
-"[ CATCH ] The `jsonc` should be a non-empty string"
+"[ CATCH ] The `jsonc` should be not null"
 NULL
 
 [ "hello" => "world" ]
@@ -3616,11 +3422,11 @@ NULL
 [ 1, 2, 3 ]
 [ "hello" => "world", "foo1" => "bar1", "foo2" => "bar2", "foo3" => "bar3" ]
 
-"[ CATCH ] The NULL values cannot be encoded to JSON when `allowsNull` is set to FALSE"
+"[ CATCH ] The value `NULL` cannot be encoded to JSON when `allowsNull` is set to FALSE"
 NULL
 "NULL"
 
-"[ CATCH ] The values of types [ NAN ][ resource ] cannot be encoded to JSON"
+"[ CATCH ] The value `NAN` or values of type `resource` cannot be encoded to JSON"
 "NAN"
 
 "\"\u043f\u0440\u0438\u0432\u0435\u0442\""
@@ -3630,7 +3436,7 @@ NULL
 { object(countable(3) iterable stringable) # SimpleXMLElement }
 { object # DOMDocument }
 { object # DOMDocument }
-NULL
+FALSE | NULL
 ###
 [
   [
@@ -3651,17 +3457,15 @@ $test->expectStdoutIf(PHP_VERSION_ID < 70400, '
 "col1;col2\n
 val1;val2\n
 "
-20
 
 "col1;col2\n
 "
-10
 
 
-"[ CATCH ] The `json` should be a non-empty string"
+"[ CATCH ] The `json` should be not null"
 NULL
 
-"[ CATCH ] The `jsonc` should be a non-empty string"
+"[ CATCH ] The `jsonc` should be not null"
 NULL
 
 [ "hello" => "world" ]
@@ -3675,11 +3479,11 @@ NULL
 [ 1, 2, 3 ]
 [ "hello" => "world", "foo1" => "bar1", "foo2" => "bar2", "foo3" => "bar3" ]
 
-"[ CATCH ] The NULL values cannot be encoded to JSON when `allowsNull` is set to FALSE"
+"[ CATCH ] The value `NULL` cannot be encoded to JSON when `allowsNull` is set to FALSE"
 NULL
 "NULL"
 
-"[ CATCH ] The values of types [ NAN ][ resource ] cannot be encoded to JSON"
+"[ CATCH ] The value `NAN` or values of type `resource` cannot be encoded to JSON"
 "NAN"
 
 "\"\u043f\u0440\u0438\u0432\u0435\u0442\""
@@ -3689,7 +3493,7 @@ NULL
 { object(iterable stringable) # SimpleXMLElement }
 { object # DOMDocument }
 { object # DOMDocument }
-NULL
+FALSE | NULL
 ###
 [
   [
@@ -3919,10 +3723,10 @@ $fn = function () use ($ffn) {
     ];
 
     foreach ( $ipV4List as $ip ) {
-        \Gzhegow\Lib\Lib::net()->type_address_ip_v4($addressIpV4, $ip);
+        \Gzhegow\Lib\Lib::net()->type_address_ip_v4($ip)->isOk([ &$addressIpV4 ]);
 
         foreach ( $subnetV4List as $subnet ) {
-            \Gzhegow\Lib\Lib::net()->type_subnet_v4($subnetV4, $subnet);
+            \Gzhegow\Lib\Lib::net()->type_subnet_v4($subnet)->isOk([ &$subnetV4 ]);
 
             $status1 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet($addressIpV4, $subnetV4);
             $status2 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet_v4($addressIpV4, $subnetV4);
@@ -3949,10 +3753,10 @@ $fn = function () use ($ffn) {
     ];
 
     foreach ( $ipV6List as $ip ) {
-        \Gzhegow\Lib\Lib::net()->type_address_ip_v6($addressIpV6, $ip);
+        \Gzhegow\Lib\Lib::net()->type_address_ip_v6($ip)->isOk([ &$addressIpV6 ]);
 
         foreach ( $subnetV6List as $subnet ) {
-            \Gzhegow\Lib\Lib::net()->type_subnet_v6($subnetV6, $subnet);
+            \Gzhegow\Lib\Lib::net()->type_subnet_v6($subnet)->isOk([ &$subnetV6 ]);
 
             $status1 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet($addressIpV6, $subnetV6);
             $status2 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet_v6($addressIpV6, $subnetV6);
@@ -4338,7 +4142,6 @@ $fn = function () use ($ffn) {
     echo md5(serialize($table)) . "\n";
     unset($table);
 
-
     echo "\n";
 
 
@@ -4399,7 +4202,6 @@ $fn = function () use ($ffn) {
     echo md5(serialize($table)) . "\n";
     unset($table);
 
-
     echo "\n";
 
 
@@ -4423,61 +4225,64 @@ $fn = function () use ($ffn) {
     $table2 = [];
     $table3 = [];
     $table4 = [];
-    foreach ( $sources as $i => $src ) {
+    foreach ( $sources as $src ) {
         $tableRow = $ffn->value($src);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_method_string($result, $src);
+        $status = \Gzhegow\Lib\Lib::php()->type_method_string($src)->isOk([ &$result ]);
         $table1[ $tableRow ][ 'method_string' ] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_method_array($result, $src);
+        $status = \Gzhegow\Lib\Lib::php()->type_method_array($src)->isOk([ &$result ]);
         $table1[ $tableRow ][ 'method_array' ] = $ffn->value($result);
 
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable($src, null)->isOk([ &$result ]);
         $table2[ $tableRow ][ 'callable' ] = $ffn->value($result);
         $table3[ $tableRow ][ 'callable' ] = $ffn->value($result);
         $table4[ $tableRow ][ 'callable' ] = $ffn->value($result);
 
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_object($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_object($src, null)->isOk([ &$result ]);
         $table2[ $tableRow ][ 'callable_object' ] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_object_closure($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_object_closure($src, null)->isOk([ &$result ]);
         $table2[ $tableRow ][ 'callable_object_closure' ] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_object_invokable($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_object_invokable($src, null)->isOk([ &$result ]);
         $table2[ $tableRow ][ 'callable_object_invokable' ] = $ffn->value($result);
 
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_array($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_array($src, null)->isOk([ &$result ]);
         $table3[ $tableRow ][ 'callable_array' ] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method($src, null)->isOk([ &$result ]);
         $table3[ $tableRow ][ 'callable_array_method' ] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_static($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_static($src, null)->isOk([ &$result ]);
         $table3[ $tableRow ][ 'callable_array_method_static' ] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_non_static($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_non_static($src, null)->isOk([ &$result ]);
         $table3[ $tableRow ][ 'callable_array_method_non_static' ] = $ffn->value($result);
 
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_string($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_string($src, null)->isOk([ &$result ]);
         $table4[ $tableRow ][ 'callable_string' ] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function($src)->isOk([ &$result ]);
         $table4[ $tableRow ][ 'callable_string_function' ] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_internal($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_internal($src)->isOk([ &$result ]);
         $table4[ $tableRow ][ 'callable_string_function_internal' ] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_non_internal($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_non_internal($src)->isOk([ &$result ]);
         $table4[ $tableRow ][ 'callable_string_function_non_internal' ] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static($result, $src, null);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static($src, null)->isOk([ &$result ]);
         $table4[ $tableRow ][ 'callable_string_method_static' ] = $ffn->value($result);
     }
-    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
+    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table1, 1));
+    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table2, 1));
+    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table3, 1));
+    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table4, 1));
     echo md5(serialize($table1)) . "\n";
     echo md5(serialize($table2)) . "\n";
     echo md5(serialize($table3)) . "\n";
@@ -4486,7 +4291,6 @@ $fn = function () use ($ffn) {
     unset($table2);
     unset($table3);
     unset($table4);
-
 
     echo "\n";
 
@@ -4554,10 +4358,10 @@ $fn = function () use ($ffn) {
             foreach ( $aa as $src ) {
                 $tableRow = $ffn->value($src);
 
-                $status = \Gzhegow\Lib\Lib::php()->type_method_array($result, $src);
+                $status = \Gzhegow\Lib\Lib::php()->type_method_array($src)->isOk([ &$result ]);
                 $table[ $tableRow ][ 'method_array' ] = $ffn->value($result);
 
-                $status = \Gzhegow\Lib\Lib::php()->type_method_string($result, $src);
+                $status = \Gzhegow\Lib\Lib::php()->type_method_string($src)->isOk([ &$result ]);
                 $table[ $tableRow ][ 'method_string' ] = $ffn->value($result);
             }
         }
@@ -4565,7 +4369,6 @@ $fn = function () use ($ffn) {
     // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
     echo md5(serialize($table)) . "\n";
     unset($table);
-
 
     echo "\n";
 
@@ -4585,73 +4388,74 @@ $fn = function () use ($ffn) {
 
                 foreach ( $sourceScopes as $scopeKey => $scope ) {
                     $tableCol = $ffn->values(' / ', 'callable', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable($result, $src, $scope);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable($src, $scope)->isOk([ &$result ]);
                     $table1[ $tableRow ][ $tableCol ] = $ffn->value($status);
                     $table2[ $tableRow ][ $tableCol ] = $ffn->value($status);
                     $table3[ $tableRow ][ $tableCol ] = $ffn->value($status);
 
 
                     $tableCol = $ffn->values(' / ', 'callable_object', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_object($result, $src, $scope);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_object($src, $scope)->isOk([ &$result ]);
                     $table1[ $tableRow ][ $tableCol ] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_object_closure', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_object_closure($result, $src, $scope);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_object_closure($src, $scope)->isOk([ &$result ]);
                     $table1[ $tableRow ][ $tableCol ] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_object_invokable', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_object_invokable($result, $src, $scope);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_object_invokable($src, $scope)->isOk([ &$result ]);
                     $table1[ $tableRow ][ $tableCol ] = $ffn->value($result);
 
 
                     $tableCol = $ffn->values(' / ', 'callable_array', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array($result, $src, $scope);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array($src, $scope)->isOk([ &$result ]);
                     $table2[ $tableRow ][ $tableCol ] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_array_method', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method($result, $src, $scope);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method($src, $scope)->isOk([ &$result ]);
                     $table2[ $tableRow ][ $tableCol ] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_array_method_static', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_static($result, $src, $scope);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_static($src, $scope)->isOk([ &$result ]);
                     $table2[ $tableRow ][ $tableCol ] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_array_method_non_static', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_non_static($result, $src, $scope);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_non_static($src, $scope)->isOk([ &$result ]);
                     $table2[ $tableRow ][ $tableCol ] = $ffn->value($result);
 
 
                     $tableCol = $ffn->values(' / ', 'callable_string', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string($result, $src, $scope);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string($src, $scope)->isOk([ &$result ]);
                     $table3[ $tableRow ][ $tableCol ] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_string_function', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function($result, $src);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function($src)->isOk([ &$result ]);
                     $table3[ $tableRow ][ $tableCol ] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_string_function_internal', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_internal($result, $src);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_internal($src)->isOk([ &$result ]);
                     $table3[ $tableRow ][ $tableCol ] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_string_function_non_internal', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_non_internal($result, $src);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_non_internal($src)->isOk([ &$result ]);
                     $table3[ $tableRow ][ $tableCol ] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_string_method_static', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static($result, $src, $scope);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static($src, $scope)->isOk([ &$result ]);
                     $table3[ $tableRow ][ $tableCol ] = $ffn->value($result);
                 }
             }
         }
     }
-    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table, 1));
+    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table1, 1));
+    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table2, 1));
+    // dd(\Gzhegow\Lib\Lib::debug()->print_table($table3, 1));
     echo md5(serialize($table1)) . "\n";
     echo md5(serialize($table2)) . "\n";
     echo md5(serialize($table3)) . "\n";
     unset($table1);
     unset($table2);
     unset($table3);
-    echo "\n";
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
@@ -4714,7 +4518,7 @@ $fn = function () use ($ffn) {
     echo "\n";
 
     $uuid = \Gzhegow\Lib\Lib::random()->uuid();
-    $status = \Gzhegow\Lib\Lib::random()->type_uuid($result, $uuid);
+    $status = \Gzhegow\Lib\Lib::random()->type_uuid($uuid)->isOk([ &$result ]);
     $ffn->print(strlen($uuid), $status);
 
     echo "\n";
@@ -4732,50 +4536,58 @@ $fn = function () use ($ffn) {
     $rand = \Gzhegow\Lib\Lib::random()->random_string(16);
     $ffn->print(mb_strlen($rand) === 16);
 
+    echo "\n";
+
+
     $rand = \Gzhegow\Lib\Lib::random()->random_base64_urlsafe(16);
-    $test = \Gzhegow\Lib\Lib::parse()
+    $status = \Gzhegow\Lib\Lib::type()
         ->base(
             rtrim($rand, '='),
             \Gzhegow\Lib\Modules\CryptModule::ALPHABET_BASE_64_RFC4648_URLSAFE
         )
+        ->isOk()
     ;
-    $ffn->print(null !== $test);
+    $ffn->print($status);
 
     $rand = \Gzhegow\Lib\Lib::random()->random_base64(16);
-    $test = \Gzhegow\Lib\Lib::parse()
+    $status = \Gzhegow\Lib\Lib::type()
         ->base(
             rtrim($rand, '='),
             \Gzhegow\Lib\Modules\CryptModule::ALPHABET_BASE_64_RFC4648
         )
+        ->isOk()
     ;
-    $ffn->print(null !== $test);
+    $ffn->print($status);
 
     $rand = \Gzhegow\Lib\Lib::random()->random_base62(16);
-    $test = \Gzhegow\Lib\Lib::parse()
+    $status = \Gzhegow\Lib\Lib::type()
         ->base(
             $rand,
             \Gzhegow\Lib\Modules\CryptModule::ALPHABET_BASE_62
         )
+        ->isOk()
     ;
-    $ffn->print(null !== $test);
+    $ffn->print($status);
 
     $rand = \Gzhegow\Lib\Lib::random()->random_base58(16);
-    $test = \Gzhegow\Lib\Lib::parse()
+    $status = \Gzhegow\Lib\Lib::type()
         ->base(
             $rand,
             \Gzhegow\Lib\Modules\CryptModule::ALPHABET_BASE_58
         )
+        ->isOk()
     ;
-    $ffn->print(null !== $test);
+    $ffn->print($status);
 
     $rand = \Gzhegow\Lib\Lib::random()->random_base36(16);
-    $test = \Gzhegow\Lib\Lib::parse()
+    $status = \Gzhegow\Lib\Lib::type()
         ->base(
             $rand,
             \Gzhegow\Lib\Modules\CryptModule::ALPHABET_BASE_36
         )
+        ->isOk()
     ;
-    $ffn->print(null !== $test);
+    $ffn->print($status);
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
@@ -4787,6 +4599,7 @@ $test->expectStdout('
 32 | TRUE
 TRUE | TRUE
 TRUE
+
 TRUE
 TRUE
 TRUE
@@ -4803,37 +4616,37 @@ $fn = function () use ($ffn) {
     $ffn->print('[ SocialModule ]');
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@gmail.com');
+    $status = \Gzhegow\Lib\Lib::social()->type_email('example@gmail.com')->isOk([ &$email ]);
     $ffn->print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф');
+    $status = \Gzhegow\Lib\Lib::social()->type_email('example@привет.рф')->isOk([ &$email ]);
     $ffn->print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', $filters = [ 'filter_unicode' ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email('example@привет.рф', $filters = [ 'filter_unicode' ])->isOk([ &$email ]);
     $ffn->print($status, $email);
     try {
-        $status = \Gzhegow\Lib\Lib::social()->type_email($email, 'example@привет.рф', $filters = [ 'rfc' ]);
+        $status = \Gzhegow\Lib\Lib::social()->type_email('example@привет.рф', $filters = [ 'rfc' ])->isOk([ &$email ]);
     }
     catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@gmail.com');
+    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake('example@gmail.com')->isOk([ &$email ]);
     $ffn->print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф');
+    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake('example@привет.рф')->isOk([ &$email ]);
     $ffn->print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', $filters = [ 'filter_unicode' ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake('example@привет.рф', $filters = [ 'filter_unicode' ])->isOk([ &$email ]);
     $ffn->print($status, $email);
     try {
-        $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake($email, 'example@привет.рф', $filters = [ 'rfc' ]);
+        $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake('example@привет.рф', $filters = [ 'rfc' ])->isOk([ &$email ]);
     }
     catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::social()->type_email_fake($email, 'no-reply@gmail.com');
+    $status = \Gzhegow\Lib\Lib::social()->type_email_fake('no-reply@gmail.com')->isOk([ &$email ]);
     $ffn->print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email_fake($email, 'email@example.com');
+    $status = \Gzhegow\Lib\Lib::social()->type_email_fake('email@example.com')->isOk([ &$email ]);
     $ffn->print($status, $email);
     echo "\n";
 
@@ -4879,27 +4692,27 @@ $fn = function () use ($ffn) {
     ];
 
     foreach ( $phones as $phone ) {
-        $status = \Gzhegow\Lib\Lib::social()->type_phone($result, $phone);
+        $status = \Gzhegow\Lib\Lib::social()->type_phone($phone)->isOk([ &$result ]);
         $ffn->print($phone, $status, $result);
 
-        $status = \Gzhegow\Lib\Lib::social()->type_phone_non_fake($result, $phone);
+        $status = \Gzhegow\Lib\Lib::social()->type_phone_non_fake($phone)->isOk([ &$result ]);
         $ffn->print($phone, $status, $result);
 
         try {
-            $status = \Gzhegow\Lib\Lib::social()->type_phone_real($result, $phone, '');
+            $status = \Gzhegow\Lib\Lib::social()->type_phone_real($phone, '')->isOk([ &$result ]);
         }
         catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
             $ffn->print('[ CATCH ] ' . $e->getMessage());
         }
 
-        $status = \Gzhegow\Lib\Lib::social()->type_tel($result, $phone);
+        $status = \Gzhegow\Lib\Lib::social()->type_tel($phone)->isOk([ &$result ]);
         $ffn->print($phone, $status, $result);
 
-        $status = \Gzhegow\Lib\Lib::social()->type_tel_non_fake($result, $phone);
+        $status = \Gzhegow\Lib\Lib::social()->type_tel_non_fake($phone)->isOk([ &$result ]);
         $ffn->print($phone, $status, $result);
 
         try {
-            $status = \Gzhegow\Lib\Lib::social()->type_tel_real($result, $phone, '');
+            $status = \Gzhegow\Lib\Lib::social()->type_tel_real($phone, '')->isOk([ &$result ]);
         }
         catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
             $ffn->print('[ CATCH ] ' . $e->getMessage());
@@ -5387,73 +5200,73 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::url()->type_url($result, $src = 'https://google.com/hello/world');
+    $status = \Gzhegow\Lib\Lib::url()->type_url($src = 'https://google.com/hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_url($result, $src = ':hello/world');
+    $status = \Gzhegow\Lib\Lib::url()->type_url($src = ':hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_url($result, $src = '/');
-    $ffn->print($src, $status, $result);
-
-    echo "\n";
-
-
-    $status = \Gzhegow\Lib\Lib::url()->type_host($result, $src = 'https://google.com/hello/world');
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_host($result, $src = ':hello/world');
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_host($result, $src = '/');
+    $status = \Gzhegow\Lib\Lib::url()->type_url($src = '/')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = 'https://google.com/hello/world');
+    $status = \Gzhegow\Lib\Lib::url()->type_host($src = 'https://google.com/hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = ':hello/world');
+    $status = \Gzhegow\Lib\Lib::url()->type_host($src = ':hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = '/');
-    $ffn->print($src, $status, $result);
-
-    echo "\n";
-
-
-    $status = \Gzhegow\Lib\Lib::url()->type_url($result, $src = 'https://привет.рф/hello/текст');
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_host($result, $src = 'https://привет.рф/hello/текст');
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = 'https://привет.рф/hello/текст');
+    $status = \Gzhegow\Lib\Lib::url()->type_host($src = '/')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::url()->type_url($result, $src = 'https://привет.рф/hello/текст', null, null, 1, 1);
+    $status = \Gzhegow\Lib\Lib::url()->type_link($src = 'https://google.com/hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_host($result, $src = 'https://привет.рф/hello/текст', 1);
+    $status = \Gzhegow\Lib\Lib::url()->type_link($src = ':hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = 'https://привет.рф/hello/текст', null, null, 1);
+    $status = \Gzhegow\Lib\Lib::url()->type_link($src = '/')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::url()->type_url($result, $src = 'https://привет.рф/hello/текст', null, null, 2, 2);
+    $status = \Gzhegow\Lib\Lib::url()->type_url($src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_host($result, $src = 'https://привет.рф/hello/текст', 2);
+    $status = \Gzhegow\Lib\Lib::url()->type_host($src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_link($result, $src = 'https://привет.рф/hello/текст', null, null, 2);
+    $status = \Gzhegow\Lib\Lib::url()->type_link($src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    echo "\n";
+
+
+    $status = \Gzhegow\Lib\Lib::url()->type_url($src = 'https://привет.рф/hello/текст', null, null, 1, 1)->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_host($src = 'https://привет.рф/hello/текст', 1)->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link($src = 'https://привет.рф/hello/текст', null, null, 1)->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    echo "\n";
+
+
+    $status = \Gzhegow\Lib\Lib::url()->type_url($src = 'https://привет.рф/hello/текст', null, null, 2, 2)->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_host($src = 'https://привет.рф/hello/текст', 2)->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link($src = 'https://привет.рф/hello/текст', null, null, 2)->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
     echo "\n";

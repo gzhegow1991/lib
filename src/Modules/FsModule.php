@@ -3,8 +3,8 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Modules\Php\Result\Result;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Fs\FileSafe\FileSafe;
 use Gzhegow\Lib\Modules\Fs\StreamSafe\StreamSafe;
@@ -35,11 +35,20 @@ class FsModule
 
     public function __construct()
     {
+    }
+
+    /**
+     * @return static
+     */
+    public function assertExtension()
+    {
         if (! extension_loaded('fileinfo')) {
             throw new ExtensionException(
                 'Missing PHP extension: fileinfo'
             );
         }
+
+        return $this;
     }
 
 
@@ -97,16 +106,14 @@ class FsModule
      */
     public function static_dir_chmod($dir_chmod = null) : int
     {
+        $theType = Lib::$type;
+
         if (null !== $dir_chmod) {
-            if (! $this->type_chmod($dirChmodString, $dir_chmod)) {
-                throw new LogicException(
-                    [ 'The `dir_chmod` should be a valid chmod', $dir_chmod ]
-                );
-            }
+            $dir_chmod_valid = $theType->chmod($dir_chmod)->orThrow();
 
             $last = $this->dirChmod;
 
-            $this->dirChmod = $dir_chmod;
+            $this->dirChmod = $dir_chmod_valid;
 
             $result = $last;
         }
@@ -121,16 +128,14 @@ class FsModule
      */
     public function static_file_chmod($file_chmod = null) : int
     {
+        $theType = Lib::$type;
+
         if (null !== $file_chmod) {
-            if (! $this->type_chmod($fileChmodString, $file_chmod)) {
-                throw new LogicException(
-                    [ 'The `file_chmod` should be a valid chmod', $file_chmod ]
-                );
-            }
+            $file_chmod_valid = $theType->chmod($file_chmod)->orThrow();
 
             $last = $this->fileChmod;
 
-            $this->fileChmod = $file_chmod;
+            $this->fileChmod = $file_chmod_valid;
 
             $result = $last;
         }
@@ -142,68 +147,83 @@ class FsModule
 
 
     /**
-     * @param int|null $r
-     * @param string   $value
+     * @param string $value
      *
-     * @return bool
+     * @return Ret<int>
      */
-    public function type_chmod(&$r, $value) : bool
+    public function type_chmod($value)
     {
-        $r = null;
-
         if (is_int($value)) {
             $int = $value;
 
         } elseif (is_string($value)) {
             if ('0' === $value) {
-                $r = 0;
-
-                return true;
+                return Ret::ok(0);
             }
 
             $valueString = ltrim($value, '0');
             if ('' === $valueString) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be string, that contains numbers except zero', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            if (! preg_match('/^[0124]?[0-7]{3}$/', $valueString)) {
-                return false;
+            if (! preg_match($regex = '/^[0124]?[0-7]{3}$/', $valueString)) {
+                return Ret::err(
+                    [ 'The `value` should be string, that match regex: ' . $regex, $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             $int = octdec($valueString);
+
             if (0 === $int) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be valid octal number', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
         } else {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be integer or string', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (($int < 0) || ($int > 04777)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be integer from 0 to 04777', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $octString = decoct($int);
 
         if (! in_array($octString[ 0 ], [ '0', '1', '2', '4' ], true)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be string that starts from [0124]', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $int;
-
-        return true;
+        return Ret::ok($int);
     }
 
 
     /**
-     * @param string|null $r
+     * @param array{ 0: array|null } $refs
+     *
+     * @return Ret<string>
      */
     public function type_path(
-        &$r, $value,
+        $value,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
 
         $withPathInfo = array_key_exists(0, $refs);
         if ($withPathInfo) {
@@ -211,38 +231,41 @@ class FsModule
         }
         $refPathInfo = null;
 
-        if (! Lib::type()->string_not_empty($valueString, $value)) {
-            return false;
+        if (! $theType
+            ->string_not_empty($value)
+            ->isOk([ &$valueStringNotEmpty, &$ret ])
+        ) {
+            return $ret;
         }
 
         if ($withPathInfo) {
             try {
-                $refPathInfo = Lib::php()->pathinfo($valueString);
+                $refPathInfo = $thePhp->pathinfo($valueStringNotEmpty);
             }
             catch ( \Throwable $e ) {
-                unset($refPathInfo);
-
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be valid path', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        $r = $valueString;
-
-        unset($refPathInfo);
-
-        return true;
+        return Ret::ok($valueStringNotEmpty);
     }
 
     /**
-     * @param string|null $r
+     * @param array{ 0: array|null } $refs
+     *
+     * @return Ret<string>
      */
     public function type_realpath(
-        &$r, $value,
+        $value,
         ?bool $isAllowSymlink = null,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
 
         $isAllowSymlink = $isAllowSymlink ?? true;
 
@@ -252,334 +275,373 @@ class FsModule
         }
         $refPathInfo = null;
 
-        if (! Lib::type()->string_not_empty($valueString, $value)) {
-            return false;
+        if (! $theType
+            ->string_not_empty($value)
+            ->isOk([ &$valueStringNotEmpty, &$ret ])
+        ) {
+            return $ret;
         }
 
         if (! $isAllowSymlink) {
-            if (is_link($valueString)) {
-                return false;
+            if (is_link($valueStringNotEmpty)) {
+                return Ret::err(
+                    [ 'The `value` should not be symlink', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        $realpath = realpath($valueString);
-
+        $realpath = realpath($valueStringNotEmpty);
         if (false === $realpath) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid realpath', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if ($withPathInfo) {
             try {
-                $refPathInfo = Lib::php()->pathinfo($realpath);
+                $refPathInfo = $thePhp->pathinfo($realpath);
             }
             catch ( \Throwable $e ) {
-                unset($refPathInfo);
-
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be valid realpath', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        $r = $realpath;
-
-        unset($refPathInfo);
-
-        return true;
+        return Ret::ok($realpath);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
     public function type_freepath(
-        &$r, $value,
+        $value,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
-        if (! $this->type_path($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_path($value, $refs)
+            ->isOk([ &$valuePath, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if (file_exists($_value)) {
-            return false;
+        if (file_exists($valuePath)) {
+            return Ret::err(
+                [ 'The `value` should be existing file', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valuePath);
     }
 
 
     /**
-     * @param string|null $r
+     * @param array{ 0: array|null } $refs
+     *
+     * @return Ret<string>
      */
     public function type_dirpath(
-        &$r, $value,
-        ?bool $isAllowExists = null, ?bool $isAllowSymlink = null,
+        $value,
+        ?bool $isAllowExists, ?bool $isAllowSymlink = null,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $isAllowExists = $isAllowExists ?? true;
         $isAllowSymlink = $isAllowSymlink ?? true;
 
-        if (! $this->type_path($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_path($value, $refs)
+            ->isOk([ &$valuePath, &$ret ])
+        ) {
+            return $ret;
         }
 
-        $exists = file_exists($_value);
+        $exists = file_exists($valuePath);
 
         if (! $isAllowExists) {
             if ($exists) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should not be existing filenode', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $r = $_value;
-
-            return true;
+            return Ret::ok($valuePath);
         }
 
         if ($exists) {
-            if (! is_dir($_value)) {
-                return false;
+            if (! is_dir($valuePath)) {
+                return Ret::err(
+                    [ 'The `value` should be existing directory', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             if (! $isAllowSymlink) {
-                if (is_link($_value)) {
-                    return false;
+                if (is_link($valuePath)) {
+                    return Ret::err(
+                        [ 'The `value` should not be symlink', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
             }
 
-            $realpath = realpath($_value);
-
-            if (false === $realpath) {
-                return false;
+            $valueRealpath = realpath($valuePath);
+            if (false === $valueRealpath) {
+                return Ret::err(
+                    [ 'The `value` should be valid realpath', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $_value = $realpath;
+            $valuePath = $valueRealpath;
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valuePath);
     }
 
     /**
-     * @param string|null $r
+     * @param array{ 0: array|null } $refs
+     *
+     * @return Ret<string>
      */
     public function type_dirpath_realpath(
-        &$r, $value,
+        $value,
         ?bool $isAllowSymlink = null,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $isAllowSymlink = $isAllowSymlink ?? true;
 
-        $status = $this->type_realpath(
-            $_value, $value,
-            $isAllowSymlink,
-            $refs
-        );
-
-        if (! $status) {
-            return false;
+        if (! $this
+            ->type_realpath($value, $isAllowSymlink, $refs)
+            ->isOk([ &$valueRealpath, &$ret ])
+        ) {
+            return $ret;
         }
 
         if (! $isAllowSymlink) {
-            if (is_link($value)) {
-                return false;
+            if (is_link($valueRealpath)) {
+                return Ret::err(
+                    [ 'The `value` should not be symlink', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        if (is_dir($_value)) {
-            $r = $_value;
-
-            return true;
+        if (! is_dir($valueRealpath)) {
+            return Ret::err(
+                [ 'The `value` should be existing directory', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return false;
+        return Ret::ok($valueRealpath);
     }
 
 
     /**
-     * @param string|null $r
+     * @param array{ 0: array|null } $refs
+     *
+     * @return Ret<string>
      */
     public function type_filepath(
-        &$r, $value, ?bool $isAllowExists,
-        ?bool $isAllowSymlink = null,
+        $value,
+        ?bool $isAllowExists, ?bool $isAllowSymlink = null,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $isAllowExists = $isAllowExists ?? true;
         $isAllowSymlink = $isAllowSymlink ?? true;
 
-        if (! $this->type_path($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_path($value, $refs)
+            ->isOk([ &$valuePath, &$ret ])
+        ) {
+            return $ret;
         }
 
-        $exists = file_exists($_value);
+        $exists = file_exists($valuePath);
 
         if (! $isAllowExists) {
             if ($exists) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should not be existing filenode', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $r = $_value;
-
-            return true;
+            return Ret::ok($valuePath);
         }
 
         if ($exists) {
             if (! $isAllowSymlink) {
-                if (is_link($_value)) {
-                    return false;
+                if (is_link($valuePath)) {
+                    return Ret::err(
+                        [ 'The `value` should not be symlink', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
             }
 
-            if (! is_file($_value)) {
-                return false;
+            if (! is_file($valuePath)) {
+                return Ret::err(
+                    [ 'The `value` should be existing file', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $realpath = realpath($_value);
-
-            if (false === $realpath) {
-                return false;
+            $valueRealpath = realpath($valuePath);
+            if (false === $valueRealpath) {
+                return Ret::err(
+                    [ 'The `value` should be valid realpath', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $_value = $realpath;
+            $valuePath = $valueRealpath;
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valuePath);
     }
 
     /**
-     * @param string|null $r
+     * @param array{ 0: array|null } $refs
+     *
+     * @return Ret<string>
      */
     public function type_filepath_realpath(
-        &$r, $value,
+        $value,
         ?bool $isAllowSymlink = null,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
-        $status = $this->type_realpath(
-            $_value, $value,
-            $isAllowSymlink,
-            $refs
-        );
-
-        if (! $status) {
-            return false;
+        if (! $this
+            ->type_realpath($value, $isAllowSymlink, $refs)
+            ->isOk([ &$valueRealpath, &$ret ])
+        ) {
+            return $ret;
         }
 
         if (! $isAllowSymlink) {
             if (is_link($value)) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should not be symlink', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        if (is_file($_value)) {
-            $r = $_value;
-
-            return true;
+        if (! is_file($valueRealpath)) {
+            return Ret::err(
+                [ 'The `value` should be existing file', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return false;
+        return Ret::ok($valueRealpath);
     }
 
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_filename(&$r, $value) : bool
+    public function type_filename($value)
     {
-        $r = null;
+        $theType = Lib::$type;
 
-        if (! Lib::type()->string_not_empty($valueString, $value)) {
-            return false;
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
         $forbidden = [ "/", "\\", DIRECTORY_SEPARATOR ];
 
-        $isForbidden = false;
         foreach ( $forbidden as $f ) {
-            if (false !== strpos($valueString, $f)) {
-                $isForbidden = true;
-
-                break;
+            if (false !== strpos($valueStringNotEmpty, $f)) {
+                return Ret::err(
+                    [ 'The `value` should not contain directory separators', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        if (! $isForbidden) {
-            $r = $valueString;
-
-            return true;
-        }
-
-        return false;
+        return Ret::ok($valueStringNotEmpty);
     }
 
 
     /**
-     * @param \SplFileInfo|null $r
+     * @return Ret<\SplFileInfo>
      */
     public function type_file(
-        &$r, $value,
-        ?array $extensions = null, ?array $mimeTypes = null,
+        $value,
+        ?array $extensions = null,
+        ?array $mimeTypes = null,
         ?array $filters = null
-    ) : bool
+    )
     {
-        $r = null;
-
-        $splFileInfo = null;
         if ($value instanceof \SplFileInfo) {
             $splFileInfo = $value;
 
         } else {
-            if (! $this->type_filepath_realpath($realpath, $value)) {
-                return false;
+            if (! $this
+                ->type_filepath_realpath($value)
+                ->isOk([ &$valueFilepathRealpath, &$ret ])
+            ) {
+                return $ret;
             }
 
             try {
-                $splFileInfo = new \SplFileInfo($realpath);
+                $splFileInfo = new \SplFileInfo($valueFilepathRealpath);
             }
             catch ( \Throwable $e ) {
+                return Ret::err(
+                    [ 'The `value` should be valid file', $value ]
+                );
             }
         }
 
         if (null !== $extensions) {
             if (null !== $splFileInfo) {
                 $splFileInfo = $this->type_file_extensions($splFileInfo, $extensions);
+
+                if (null === $splFileInfo) {
+                    return Ret::err(
+                        [ 'The `value` should be file, that passes extension checks', $value, $extensions ]
+                    );
+                }
             }
         }
 
         if (null !== $mimeTypes) {
             if (null !== $splFileInfo) {
                 $splFileInfo = $this->type_file_mime_types($splFileInfo, $mimeTypes);
+
+                if (null === $splFileInfo) {
+                    return Ret::err(
+                        [ 'The `value` should be file, that passes mime-type checks', $value, $mimeTypes ]
+                    );
+                }
             }
         }
 
         if (null !== $filters) {
             if (null !== $splFileInfo) {
                 $splFileInfo = $this->type_file_filters($splFileInfo, $filters);
+
+                if (null === $splFileInfo) {
+                    return Ret::err(
+                        [ 'The `value` should be file, that passes filter checks', $value, $filters ]
+                    );
+                }
             }
         }
 
-        if (null !== $splFileInfo) {
-            $r = $splFileInfo;
-
-            return true;
-        }
-
-        return false;
+        return Ret::ok($splFileInfo);
     }
 
     protected function type_file_extensions(\SplFileInfo $splFileInfo, array $extensions) : ?\SplFileInfo
@@ -647,6 +709,8 @@ class FsModule
             return $splFileInfo;
         }
 
+        $theFormat = Lib::$format;
+
         $filtersList = [
             'max_size' => true,
             'min_size' => true,
@@ -658,24 +722,21 @@ class FsModule
             $hasMaxSize = array_key_exists('max_size', $filters);
             $hasMinSize = array_key_exists('min_size', $filters);
 
-            $theFormat = null;
             $fileSize = null;
             if ($hasMaxSize || $hasMinSize) {
-                $theFormat = Lib::format();
-
                 $fileSize = $splFileInfo->getSize();
             }
 
             foreach ( $filters as $filter => $value ) {
                 if ('max_size' === $filter) {
-                    $maxSize = $theFormat->bytes_decode($value, Result::asValue([ NAN ]));
+                    $maxSize = $theFormat->bytes_decode($value)->orNan();
 
                     if (! ($fileSize <= $maxSize)) {
                         return null;
                     }
 
                 } elseif ('min_size' === $filter) {
-                    $minSize = $theFormat->bytes_decode($value, Result::asValue([ NAN ]));
+                    $minSize = $theFormat->bytes_decode($value)->orNan();
 
                     if (! ($fileSize >= $minSize)) {
                         return null;
@@ -689,39 +750,35 @@ class FsModule
 
 
     /**
-     * @param \SplFileInfo|null $r
+     * @return Ret<\SplFileInfo>
      */
     public function type_image(
-        &$r, $value,
-        ?array $extensions = null, ?array $mimeTypes = null,
+        $value,
+        ?array $extensions = null,
+        ?array $mimeTypes = null,
         ?array $filters = null
-    ) : bool
+    )
     {
-        $r = null;
-
-        $status = $this->type_file(
-            $splFileInfo, $value,
-            $extensions, $mimeTypes,
-            $filters
-        );
-
-        if (! $status) {
-            return false;
+        if (! $this
+            ->type_file($value, $extensions, $mimeTypes, $filters)
+            ->isOk([ &$splFileInfo, &$ret ])
+        ) {
+            return $ret;
         }
 
         if (null !== $filters) {
             if (null !== $splFileInfo) {
                 $splFileInfo = $this->type_image_filters($splFileInfo, $filters);
+
+                if (null === $splFileInfo) {
+                    return Ret::err(
+                        [ 'The `value` should be image, that passes image filter checks', $value, $filters ]
+                    );
+                }
             }
         }
 
-        if (null !== $splFileInfo) {
-            $r = $splFileInfo;
-
-            return true;
-        }
-
-        return false;
+        return Ret::ok($splFileInfo);
     }
 
     protected function type_image_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
@@ -729,6 +786,8 @@ class FsModule
         if ([] === $filters) {
             return $splFileInfo;
         }
+
+        $theType = Lib::$type;
 
         $filtersList = [
             'max_width'  => true,
@@ -758,11 +817,9 @@ class FsModule
 
             [ $imageWidth, $imageHeight ] = $array;
 
-            $theType = Lib::type();
-
             foreach ( $filters as $filter => $value ) {
                 if ('max_width' === $filter) {
-                    if (! $theType->numeric_int_positive($maxWidth, $value)) {
+                    if (! $theType->numeric_int_positive($value)->isOk([ &$maxWidth ])) {
                         return null;
                     }
 
@@ -771,7 +828,7 @@ class FsModule
                     }
 
                 } elseif ('max_height' === $filter) {
-                    if (! $theType->numeric_int_positive($maxHeight, $value)) {
+                    if (! $theType->numeric_int_positive($value)->isOk([ &$maxHeight ])) {
                         return null;
                     }
 
@@ -780,7 +837,7 @@ class FsModule
                     }
 
                 } elseif ('min_width' === $filter) {
-                    if (! $theType->numeric_int_positive($minWidth, $value)) {
+                    if (! $theType->numeric_int_positive($value)->isOk([ &$minWidth ])) {
                         return null;
                     }
 
@@ -789,7 +846,7 @@ class FsModule
                     }
 
                 } elseif ('min_height' === $filter) {
-                    if (! $theType->numeric_int_positive($minHeight, $value)) {
+                    if (! $theType->numeric_int_positive($value)->isOk([ &$minHeight ])) {
                         return null;
                     }
 
@@ -798,7 +855,7 @@ class FsModule
                     }
 
                 } elseif ('width' === $filter) {
-                    if (! $theType->numeric_int_positive($exactWidth, $value)) {
+                    if (! $theType->numeric_int_positive($value)->isOk([ &$exactWidth ])) {
                         return null;
                     }
 
@@ -807,7 +864,7 @@ class FsModule
                     }
 
                 } elseif ('height' === $filter) {
-                    if (! $theType->numeric_int_positive($exactHeight, $value)) {
+                    if (! $theType->numeric_int_positive($value)->isOk([ &$exactHeight ])) {
                         return null;
                     }
 
@@ -816,17 +873,17 @@ class FsModule
                     }
 
                 } elseif ('ratio' === $filter) {
-                    if ($theType->numeric($number, $value)) {
-                        $ratio = $number;
-                        $ratio = round($ratio, 3);
+                    if ($theType->numeric($value)->isOk([ &$ratioNumeric ])) {
+                        $ratio = round($ratioNumeric, 3);
 
-                    } elseif ($theType->string_not_empty($string, $value)) {
-                        [ $ratioW, $ratioH ] = explode('/', $string) + [ 0, 0 ];
+                    } elseif ($theType->string_not_empty($value)->isOk([ &$ratioStringNotEmpty ])) {
+                        [ $ratioW, $ratioH ] = explode('/', $ratioStringNotEmpty) + [ 0, 0 ];
 
-                        if (! $theType->numeric_int_positive($ratioWInt, $ratioW)) {
+                        if (! $theType->numeric_int_positive($ratioW)->isOk([ &$ratioWNumericIntPositive ])) {
                             return null;
                         }
-                        if (! $theType->numeric_int_positive($ratioHInt, $ratioH)) {
+
+                        if (! $theType->numeric_int_positive($ratioH)->isOk([ &$ratioHNumericIntPositive ])) {
                             return null;
                         }
 
@@ -848,6 +905,44 @@ class FsModule
         }
 
         return $splFileInfo;
+    }
+
+
+    /**
+     * @return Ret<resource|\Socket>
+     */
+    public function type_socket($value)
+    {
+        $theType = Lib::$type;
+
+        if (false
+            || is_a($value, '\Socket')
+            || $theType->resource_opened($value, 'socket')->isOk()
+        ) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be socket, opened' ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<resource>
+     */
+    public function type_stream($value)
+    {
+        $theType = Lib::$type;
+
+        if ($theType->resource_opened($value, 'stream')->isOk()) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be socket, opened' ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
@@ -881,65 +976,72 @@ class FsModule
 
     public function pathinfo(string $path, ?int $flags = null, ?string $separator = null) : array
     {
-        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
-        }
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
 
-        return Lib::php()->pathinfo($path, $separatorString, '.', $flags);
+        $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
+
+        return $thePhp->pathinfo($path, $separatorChar, '.', $flags);
     }
 
     public function dirname(string $path, ?int $levels = null, ?string $separator = null) : ?string
     {
-        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
-        }
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
 
-        return Lib::php()->dirname($path, $separatorString, $levels);
+        $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
+
+        return $thePhp->dirname($path, $separatorChar, $levels);
     }
 
     public function basename(string $path, ?string $extension = null) : ?string
     {
-        return Lib::php()->basename($path, $extension);
+        $thePhp = Lib::$php;
+
+        return $thePhp->basename($path, $extension);
     }
 
     public function filename(string $path) : ?string
     {
-        return Lib::php()->filename($path, '.');
+        $thePhp = Lib::$php;
+
+        return $thePhp->filename($path, '.');
     }
 
     public function fname(string $path) : ?string
     {
-        return Lib::php()->fname($path, '.');
+        $thePhp = Lib::$php;
+
+        return $thePhp->fname($path, '.');
     }
 
     public function extension(string $path) : ?string
     {
-        return Lib::php()->extension($path, '.');
+        $thePhp = Lib::$php;
+
+        return $thePhp->extension($path, '.');
     }
 
     public function extensions(string $path) : ?string
     {
-        return Lib::php()->extensions($path, '.');
+        $thePhp = Lib::$php;
+
+        return $thePhp->extensions($path, '.');
     }
 
 
     public function path_normalize(string $path, ?string $separator = null) : string
     {
-        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
-        }
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
 
-        if ($this->type_realpath($realpath, $path)) {
-            $pathNormalized = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
+        $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
+
+        if ($theType->realpath($path)->isOk([ &$pathRealpath ])) {
+            $pathNormalized = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $pathRealpath);
 
         } else {
-            $pathNormalized = Lib::php()->path_normalize($path, $separatorString);
+            $pathNormalized = $thePhp->path_normalize($path, $separatorChar);
         }
 
         return $pathNormalized;
@@ -947,17 +1049,16 @@ class FsModule
 
     public function path_resolve(string $path, ?string $separator = null) : string
     {
-        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
-        }
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
 
-        if ($this->type_realpath($realpath, $path)) {
-            $pathResolved = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
+        $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
+
+        if ($theType->realpath($path)->isOk([ &$pathRealpath ])) {
+            $pathResolved = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $pathRealpath);
 
         } else {
-            $pathResolved = Lib::php()->path_resolve($path, $separatorString, '.');
+            $pathResolved = $thePhp->path_resolve($path, $separatorChar, '.');
         }
 
         return $pathResolved;
@@ -969,21 +1070,20 @@ class FsModule
         ?string $separator = null
     ) : string
     {
-        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
+
+        $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
+
+        if ($theType->realpath($path)->isOk([ &$pathRealpath ])) {
+            $path = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $pathRealpath);
         }
 
-        if ($this->type_realpath($realpath, $path)) {
-            $path = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
+        if ($theType->realpath($root)->isOk([ &$rootRealpath ])) {
+            $root = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $rootRealpath);
         }
 
-        if ($this->type_realpath($realpath, $root)) {
-            $root = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
-        }
-
-        $pathRelative = Lib::php()->path_relative($path, $root, $separatorString, '.');
+        $pathRelative = $thePhp->path_relative($path, $root, $separatorChar, '.');
 
         return $pathRelative;
     }
@@ -993,21 +1093,20 @@ class FsModule
         ?string $separator = null
     ) : string
     {
-        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
+
+        $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
+
+        if ($theType->realpath($path)->isOk([ &$pathRealpath ])) {
+            $path = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $pathRealpath);
         }
 
-        if ($this->type_realpath($realpath, $path)) {
-            $path = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
+        if ($theType->realpath($current)->isOk([ &$currentRealpath ])) {
+            $current = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $currentRealpath);
         }
 
-        if ($this->type_realpath($realpath, $current)) {
-            $current = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
-        }
-
-        $pathAbsolute = Lib::php()->path_absolute($path, $current, $separatorString, '.');
+        $pathAbsolute = $thePhp->path_absolute($path, $current, $separatorChar, '.');
 
         return $pathAbsolute;
     }
@@ -1017,21 +1116,26 @@ class FsModule
         ?string $separator = null
     ) : string
     {
-        if (! Lib::type()->char($separatorString, $separator ?? DIRECTORY_SEPARATOR)) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
+
+        $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
+
+        if ($this
+            ->type_realpath($path)
+            ->isOk([ &$pathRealpath ])
+        ) {
+            $path = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $pathRealpath);
         }
 
-        if ($this->type_realpath($realpath, $path)) {
-            $path = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
+        if ($this
+            ->type_realpath($current)
+            ->isOk([ &$currentRealpath ])
+        ) {
+            $current = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $currentRealpath);
         }
 
-        if ($this->type_realpath($realpath, $current)) {
-            $current = str_replace(DIRECTORY_SEPARATOR, $separatorString, $realpath);
-        }
-
-        $pathOrAbsolute = Lib::php()->path_or_absolute($path, $current, $separatorString, '.');
+        $pathOrAbsolute = $thePhp->path_or_absolute($path, $current, $separatorChar, '.');
 
         return $pathOrAbsolute;
     }
@@ -1041,30 +1145,23 @@ class FsModule
         string $file, string $data
     ) : bool
     {
-        $theType = Lib::type();
+        $theFsFile = $this->fileSafe();
 
-        if (! $theType->freepath($fileString, $file)) {
-            throw new LogicException(
-                [ 'The `file` should be a valid freepath', $file ]
-            );
-        }
+        $fileFreepath = $this->type_freepath($file)->orThrow();
 
-        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
-            throw new LogicException(
-                [ 'The `fileDir` should be an existing directory', $fileDir ]
-            );
-        }
+        $fileDir = dirname($fileFreepath);
 
-        $f = $this->fileSafe();
-        $f->call_safe(
+        $this->type_dirpath_realpath($fileDir)->orThrow();
+
+        $fileIn = "{$fileFreepath}.in";
+        $fileInLock = "{$fileFreepath}.in.lock";
+
+        $theFsFile->call_safe(
             static function () use (
-                $f,
-                $file, $data
+                $theFsFile,
+                $fileIn, $fileInLock, $data
             ) {
-                $fileIn = "{$file}.in";
-                $fileInLock = "{$file}.in.lock";
-
-                if ($fhInLock = $f->fopen_flock_tmpfile(
+                if ($fhInLock = $theFsFile->fopen_flock_tmpfile(
                     $fileInLock, 'w', LOCK_EX | LOCK_NB,
                 )) {
                     fwrite($fhInLock, getmypid());
@@ -1084,31 +1181,24 @@ class FsModule
         string $file, string $data
     ) : bool
     {
-        $theType = Lib::type();
+        $theFsFile = $this->fileSafe();
 
-        if (! $theType->freepath($fileString, $file)) {
-            throw new LogicException(
-                [ 'The `file` should be a valid freepath', $file ]
-            );
-        }
+        $fileFreepath = $this->type_freepath($file)->orThrow();
 
-        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
-            throw new LogicException(
-                [ 'The `fileDir` should be an existing directory', $fileDir ]
-            );
-        }
+        $fileDir = dirname($fileFreepath);
 
-        $f = $this->fileSafe();
-        $f->call_safe(
+        $this->type_dirpath_realpath($fileDir)->orThrow();
+
+        $fileIn = "{$fileFreepath}.in";
+        $fileInLock = "{$fileFreepath}.in.lock";
+
+        $theFsFile->call_safe(
             static function () use (
-                $f,
+                $theFsFile,
                 $tickUsleep, $timeoutMs,
-                $file, $data
+                $fileIn, $fileInLock, $data
             ) {
-                $fileIn = "{$file}.in";
-                $fileInLock = "{$file}.in.lock";
-
-                if ($fhInLock = $f->fopen_flock_tmpfile_pooling(
+                if ($fhInLock = $theFsFile->fopen_flock_tmpfile_pooling(
                     $tickUsleep, $timeoutMs,
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
                 )) {
@@ -1127,30 +1217,23 @@ class FsModule
 
     public function rpush(string $file, string $data) : bool
     {
-        $theType = Lib::type();
+        $theFsFile = $this->fileSafe();
 
-        if (! $theType->freepath($fileString, $file)) {
-            throw new LogicException(
-                [ 'The `file` should be a valid freepath', $file ]
-            );
-        }
+        $fileFreepath = $this->type_freepath($file)->orThrow();
 
-        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
-            throw new LogicException(
-                [ 'The `fileDir` should be an existing directory', $fileDir ]
-            );
-        }
+        $fileDir = dirname($fileFreepath);
 
-        $f = $this->fileSafe();
-        $f->call_safe(
+        $this->type_dirpath_realpath($fileDir)->orThrow();
+
+        $fileIn = "{$fileFreepath}.in";
+        $fileInLock = "{$fileFreepath}.in.lock";
+
+        $theFsFile->call_safe(
             static function () use (
-                $f,
-                $file, $data
+                $theFsFile,
+                $fileIn, $fileInLock, $data
             ) {
-                $fileIn = "{$file}.in";
-                $fileInLock = "{$file}.in.lock";
-
-                if ($fhInLock = $f->fopen_flock_tmpfile(
+                if ($fhInLock = $theFsFile->fopen_flock_tmpfile(
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
                 )) {
                     fwrite($fhInLock, getmypid());
@@ -1170,31 +1253,24 @@ class FsModule
         string $file, string $data
     ) : bool
     {
-        $theType = Lib::type();
+        $theFsFile = $this->fileSafe();
 
-        if (! $theType->freepath($fileString, $file)) {
-            throw new LogicException(
-                [ 'The `file` should be a valid freepath', $file ]
-            );
-        }
+        $fileFreepath = $this->type_freepath($file)->orThrow();
 
-        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
-            throw new LogicException(
-                [ 'The `fileDir` should be an existing directory', $fileDir ]
-            );
-        }
+        $fileDir = dirname($fileFreepath);
 
-        $f = $this->fileSafe();
-        $f->call_safe(
+        $this->type_dirpath_realpath($fileDir)->orThrow();
+
+        $fileIn = "{$fileFreepath}.in";
+        $fileInLock = "{$fileFreepath}.in.lock";
+
+        $theFsFile->call_safe(
             static function () use (
-                $f,
+                $theFsFile,
                 $tickUsleep, $timeoutMs,
-                $file, $data
+                $fileIn, $fileInLock, $data
             ) {
-                $fileIn = "{$file}.in";
-                $fileInLock = "{$file}.in.lock";
-
-                if ($fhInLock = $f->fopen_flock_tmpfile_pooling(
+                if ($fhInLock = $theFsFile->fopen_flock_tmpfile_pooling(
                     $tickUsleep, $timeoutMs,
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
                 )) {
@@ -1215,34 +1291,26 @@ class FsModule
     {
         $deleteIfEmpty = $deleteIfEmpty ?? false;
 
-        $theType = Lib::type();
+        $theFsFile = $this->fileSafe();
 
-        if (! $theType->freepath($fileString, $file)) {
-            throw new LogicException(
-                [ 'The `file` should be a valid freepath', $file ]
-            );
-        }
+        $fileFreepath = $this->type_freepath($file)->orThrow();
 
-        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
-            throw new LogicException(
-                [ 'The `fileDir` should be an existing directory', $fileDir ]
-            );
-        }
+        $fileDir = dirname($fileFreepath);
 
-        $fileIn = "{$file}.in";
-        $fileOut = "{$file}.lpop";
-        $fileOutLock = "{$file}.lpop.lock";
+        $this->type_dirpath_realpath($fileDir)->orThrow();
 
-        $f = $this->fileSafe();
+        $fileIn = "{$fileFreepath}.in";
+        $fileOut = "{$fileFreepath}.lpop";
+        $fileOutLock = "{$fileFreepath}.lpop.lock";
 
-        $data = $f->call_safe(
+        $data = $theFsFile->call_safe(
             static function () use (
-                $f,
+                $theFsFile,
                 $fileIn, $fileOut, $fileOutLock
             ) {
                 $data = null;
 
-                if ($fhOutLock = $f->fopen_flock_tmpfile(
+                if ($fhOutLock = $theFsFile->fopen_flock_tmpfile(
                     $fileOutLock, 'w', LOCK_EX | LOCK_NB
                 )) {
                     fwrite($fhOutLock, getmypid());
@@ -1265,7 +1333,7 @@ class FsModule
                     }
 
                     if ($isFileOut) {
-                        if ($fhOut = $f->fopen($fileOut, 'rb+')) {
+                        if ($fhOut = $theFsFile->fopen($fileOut, 'rb+')) {
                             $line = fgets($fhOut);
                             $rest = stream_get_contents($fhOut);
 
@@ -1292,6 +1360,7 @@ class FsModule
             if (is_file($fileIn) && ! filesize($fileIn)) {
                 unlink($fileIn);
             }
+
             if (is_file($fileOut) && ! filesize($fileOut)) {
                 unlink($fileOut);
             }
@@ -1302,50 +1371,43 @@ class FsModule
 
     public function blpop(
         $blockTickUsleep, $blockTimeoutMs,
-        string $file, ?bool $unlinkIfEmpty = null
+        string $file, ?bool $deleteIfEmpty = null
     ) : ?string
     {
-        $unlinkIfEmpty = $unlinkIfEmpty ?? false;
+        $deleteIfEmpty = $deleteIfEmpty ?? false;
 
-        $theType = Lib::type();
+        $thePhp = Lib::$php;
+        $theFsFile = $this->fileSafe();
 
-        if (! $theType->freepath($fileString, $file)) {
-            throw new LogicException(
-                [ 'The `file` should be a valid freepath', $file ]
-            );
-        }
+        $fileFreepath = $this->type_freepath($file)->orThrow();
 
-        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
-            throw new LogicException(
-                [ 'The `fileDir` should be an existing directory', $fileDir ]
-            );
-        }
+        $fileDir = dirname($fileFreepath);
 
-        $fileIn = "{$file}.in";
-        $fileOut = "{$file}.lpop";
-        $fileOutLock = "{$file}.lpop.lock";
+        $this->type_dirpath_realpath($fileDir)->orThrow();
 
-        $f = $this->fileSafe();
+        $fileIn = "{$fileFreepath}.in";
+        $fileOut = "{$fileFreepath}.lpop";
+        $fileOutLock = "{$fileFreepath}.lpop.lock";
 
-        $data = $f->call_safe(
+        $data = $theFsFile->call_safe(
             static function () use (
-                $f,
+                $theFsFile, $thePhp,
                 $blockTickUsleep, $blockTimeoutMs,
                 $fileIn, $fileOut, $fileOutLock
             ) {
                 $data = null;
 
-                if ($fhOutLock = $f->fopen_flock_tmpfile_pooling(
+                if ($fhOutLock = $theFsFile->fopen_flock_tmpfile_pooling(
                     $blockTickUsleep, $blockTimeoutMs,
                     $fileOutLock, 'w', LOCK_EX | LOCK_NB
                 )) {
                     fwrite($fhOutLock, getmypid());
 
-                    $data = Lib::php()->pooling_sync(
+                    $data = $thePhp->pooling_sync(
                         $blockTickUsleep, $blockTimeoutMs,
                         //
                         static function ($ctx) use (
-                            $f,
+                            $theFsFile,
                             $fileIn, $fileOut,
                             //
                             &$fhOut
@@ -1369,7 +1431,7 @@ class FsModule
 
                             if ($isFileOut) {
                                 if (! $fhOut) {
-                                    $fhOut = $f->fopen($fileOut, 'rb+');
+                                    $fhOut = $theFsFile->fopen($fileOut, 'rb+');
                                 }
 
                                 if ($fhOut) {
@@ -1384,6 +1446,7 @@ class FsModule
                                     }
 
                                     $line = rtrim($line);
+
                                     if ('' !== $line) {
                                         $data = base64_decode($line);
 
@@ -1403,10 +1466,11 @@ class FsModule
             }
         );
 
-        if ($unlinkIfEmpty) {
+        if ($deleteIfEmpty) {
             if (is_file($fileIn) && ! filesize($fileIn)) {
                 unlink($fileIn);
             }
+
             if (is_file($fileOut) && ! filesize($fileOut)) {
                 unlink($fileOut);
             }
@@ -1416,38 +1480,30 @@ class FsModule
     }
 
 
-    public function rpop(string $file, ?bool $unlinkIfEmpty = null) : ?string
+    public function rpop(string $file, ?bool $deleteIfEmpty = null) : ?string
     {
-        $unlinkIfEmpty = $unlinkIfEmpty ?? false;
+        $deleteIfEmpty = $deleteIfEmpty ?? false;
 
-        $theType = Lib::type();
+        $theFsFile = $this->fileSafe();
 
-        if (! $theType->freepath($fileString, $file)) {
-            throw new LogicException(
-                [ 'The `file` should be a valid freepath', $file ]
-            );
-        }
+        $fileFreepath = $this->type_freepath($file)->orThrow();
 
-        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
-            throw new LogicException(
-                [ 'The `fileDir` should be an existing directory', $fileDir ]
-            );
-        }
+        $fileDir = dirname($fileFreepath);
 
-        $fileIn = "{$file}.in";
-        $fileOut = "{$file}.rpop";
-        $fileOutLock = "{$file}.rpop.lock";
+        $this->type_dirpath_realpath($fileDir)->orThrow();
 
-        $f = $this->fileSafe();
+        $fileIn = "{$fileFreepath}.in";
+        $fileOut = "{$fileFreepath}.rpop";
+        $fileOutLock = "{$fileFreepath}.rpop.lock";
 
-        $data = $f->call_safe(
+        $data = $theFsFile->call_safe(
             static function () use (
-                $f,
+                $theFsFile,
                 $fileIn, $fileOut, $fileOutLock
             ) {
                 $data = null;
 
-                if ($fhOutLock = $f->fopen_flock_tmpfile(
+                if ($fhOutLock = $theFsFile->fopen_flock_tmpfile(
                     $fileOutLock, 'w', LOCK_EX | LOCK_NB
                 )) {
                     fwrite($fhOutLock, getmypid());
@@ -1475,7 +1531,7 @@ class FsModule
                     }
 
                     if ($isFileOut) {
-                        if ($fhOut = $f->fopen($fileOut, 'rb+')) {
+                        if ($fhOut = $theFsFile->fopen($fileOut, 'rb+')) {
                             $line = fgets($fhOut);
                             $contentOut = stream_get_contents($fhOut);
 
@@ -1487,6 +1543,7 @@ class FsModule
                             }
 
                             $line = rtrim($line);
+
                             if ('' !== $line) {
                                 $data = base64_decode($line);
                             }
@@ -1498,7 +1555,7 @@ class FsModule
             }
         );
 
-        if ($unlinkIfEmpty) {
+        if ($deleteIfEmpty) {
             if (is_file($fileIn) && ! filesize($fileIn)) {
                 unlink($fileIn);
             }
@@ -1512,50 +1569,43 @@ class FsModule
 
     public function brpop(
         $blockTickUsleep, $blockTimeoutMs,
-        string $file, ?bool $unlinkIfEmpty = null
+        string $file, ?bool $deleteIfEmpty = null
     ) : ?string
     {
-        $unlinkIfEmpty = $unlinkIfEmpty ?? false;
+        $deleteIfEmpty = $deleteIfEmpty ?? false;
 
-        $theType = Lib::type();
+        $thePhp = Lib::$php;
+        $theFsFile = $this->fileSafe();
 
-        if (! $theType->freepath($fileString, $file)) {
-            throw new LogicException(
-                [ 'The `file` should be a valid freepath', $file ]
-            );
-        }
+        $fileFreepath = $this->type_freepath($file)->orThrow();
 
-        if (! $theType->dirpath_realpath($var, $fileDir = dirname($fileString))) {
-            throw new LogicException(
-                [ 'The `fileDir` should be an existing directory', $fileDir ]
-            );
-        }
+        $fileDir = dirname($fileFreepath);
 
-        $fileIn = "{$file}.in";
-        $fileOut = "{$file}.rpop";
-        $fileOutLock = "{$file}.rpop.lock";
+        $this->type_dirpath_realpath($fileDir)->orThrow();
 
-        $f = $this->fileSafe();
+        $fileIn = "{$fileFreepath}.in";
+        $fileOut = "{$fileFreepath}.rpop";
+        $fileOutLock = "{$fileFreepath}.rpop.lock";
 
-        $data = $f->call_safe(
+        $data = $theFsFile->call_safe(
             static function () use (
-                $f,
+                $theFsFile, $thePhp,
                 $blockTickUsleep, $blockTimeoutMs,
                 $fileIn, $fileOut, $fileOutLock
             ) {
                 $data = null;
 
-                if ($fhOutLock = $f->fopen_flock_pooling(
+                if ($fhOutLock = $theFsFile->fopen_flock_pooling(
                     $blockTickUsleep, $blockTimeoutMs,
                     $fileOutLock, 'w', LOCK_EX | LOCK_NB
                 )) {
                     fwrite($fhOutLock, getmypid());
 
-                    $data = Lib::php()->pooling_sync(
+                    $data = $thePhp->pooling_sync(
                         $blockTickUsleep, $blockTimeoutMs,
                         //
                         static function ($ctx) use (
-                            $f,
+                            $theFsFile,
                             $fileIn, $fileOut,
                             //
                             &$fhOut
@@ -1584,7 +1634,7 @@ class FsModule
 
                             if ($isFileOut) {
                                 if (! $fhOut) {
-                                    $fhOut = $f->fopen($fileOut, 'rb+');
+                                    $fhOut = $theFsFile->fopen($fileOut, 'rb+');
                                 }
 
                                 if ($fhOut) {
@@ -1618,7 +1668,7 @@ class FsModule
             }
         );
 
-        if ($unlinkIfEmpty) {
+        if ($deleteIfEmpty) {
             if (is_file($fileIn) && ! filesize($fileIn)) {
                 unlink($fileIn);
             }
@@ -1643,14 +1693,10 @@ class FsModule
         $recursiveDirectoryIteratorArgs = $recursiveDirectoryIteratorArgs ?: [ \FilesystemIterator::SKIP_DOTS ];
         $recursiveIteratorIteratorArgs = $recursiveIteratorIteratorArgs ?: [ \RecursiveIteratorIterator::CHILD_FIRST ];
 
-        if (! $this->type_dirpath_realpath($_dirpath, $dirpath)) {
-            throw new FilesystemException(
-                [ 'Directory not exists', $dirpath ]
-            );
-        }
+        $dirpathRealpath = $this->type_dirpath_realpath($dirpath)->orThrow();
 
         $it = new \RecursiveDirectoryIterator(
-            $_dirpath,
+            $dirpathRealpath,
             ...$recursiveDirectoryIteratorArgs
         );
 
@@ -1679,11 +1725,10 @@ class FsModule
         $length = $length ?? 8192;                      // > 8kb
         $lengthBuffer = $lengthBuffer ?? (1024 * 1024); // > 1mb
 
-        if ($length < 1) {
-            throw new LogicException(
-                [ 'The `length` should be GT 0', $length ]
-            );
-        }
+        $theType = Lib::$type;
+
+        $lengthInt = $theType->int_positive($length)->orThrow();
+        $lengthBufferInt = $theType->int_positive($lengthBuffer)->orThrow();
 
         $fh1 = fopen($file1, 'rb');
         $fh2 = fopen($file2, 'rb');
@@ -1709,8 +1754,8 @@ class FsModule
             && ! feof($fh1)
             && ! feof($fh2)
         ) {
-            $chunk1 = fread($fh1, $length);
-            $chunk2 = fread($fh2, $length);
+            $chunk1 = fread($fh1, $lengthInt);
+            $chunk2 = fread($fh2, $lengthInt);
 
             $len1 = strlen($chunk1);
             $len2 = strlen($chunk2);
@@ -1773,7 +1818,7 @@ class FsModule
                             $buffer1 = substr($buffer1, $nPos1 + 1);
 
                             while ( ! feof($fh2) ) {
-                                $buffer2 = fgets($fh2, $lengthBuffer);
+                                $buffer2 = fgets($fh2, $lengthBufferInt);
 
                                 if ($buffer2[ strlen($buffer2) - 1 ] === "\n") {
                                     break;
@@ -1789,7 +1834,7 @@ class FsModule
                             $buffer2 = substr($buffer2, $nPos2 + 1);
 
                             while ( ! feof($fh1) ) {
-                                $buffer1 = fgets($fh1, $lengthBuffer);
+                                $buffer1 = fgets($fh1, $lengthBufferInt);
 
                                 if ($buffer1[ strlen($buffer1) - 1 ] === "\n") {
                                     break;
@@ -1813,8 +1858,8 @@ class FsModule
                                 || ($hasFh1 = $hasFh1 && (! feof($fh1)))
                                 || ($hasFh2 = $hasFh2 && (! feof($fh2)))
                             ) {
-                                $buffer1 = fgets($fh1, $lengthBuffer);
-                                $buffer2 = fgets($fh2, $lengthBuffer);
+                                $buffer1 = fgets($fh1, $lengthBufferInt);
+                                $buffer2 = fgets($fh2, $lengthBufferInt);
 
                                 if ($buffer1[ strlen($buffer1) - 1 ] === "\n") {
                                     $hasFh1 = false;
@@ -1858,8 +1903,8 @@ class FsModule
         string $start, $lines, ?string $end = null
     ) : string
     {
-        $thePhp = Lib::php();
-        $theType = Lib::type();
+        $thePhp = Lib::$php;
+        $theType = Lib::$type;
 
         if (! file_exists($filepath)) {
             $len = file_put_contents($filepath, '');
@@ -1881,18 +1926,10 @@ class FsModule
             );
         }
 
-        if (! $theType->trim($startTrim, $start, true)) {
-            throw new LogicException(
-                [ 'The `start` should be a non-empty trim', $start ]
-            );
-        }
+        $startTrim = $theType->trim($start)->orThrow();
 
-        if (! is_null($endTrim = $end)) {
-            if (! $theType->trim($endTrim, $end)) {
-                throw new LogicException(
-                    [ 'The `end` should be a non-empty trim', $end ]
-                );
-            }
+        if (null !== ($endTrim = $end)) {
+            $endTrim = $theType->trim($end)->orThrow();
         }
 
         if ($startTrim === $endTrim) {

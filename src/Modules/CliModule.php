@@ -46,7 +46,9 @@ class CliModule
     {
         // https://github.com/composer/composer/blob/main/src/Composer/Util/Filesystem.php#L807
 
-        if (! Lib::php()->is_windows()) {
+        $thePhp = Lib::$php;
+
+        if (! $thePhp->is_windows()) {
             return false;
         }
 
@@ -103,14 +105,18 @@ class CliModule
 
     public function pause($var = null, ...$vars)
     {
-        if (! Lib::php()->is_terminal()) {
+        $theDebug = Lib::$debug;
+        $thePhp = Lib::$php;
+
+        if (! $thePhp->is_terminal()) {
             throw new RuntimeException('Function must be called only in CLI mode');
         }
 
         if (null !== $var) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+            $theDebugDumper = $theDebug->dumper();
 
-            Lib::debugDumper()->d($trace, $var, ...$vars);
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+            $theDebugDumper->d($trace, $var, ...$vars);
         }
 
         echo '> Press ENTER to continue...' . "\n";
@@ -122,7 +128,9 @@ class CliModule
 
     public function stop(...$vars) : void
     {
-        if (! Lib::php()->is_terminal()) {
+        $thePhp = Lib::$php;
+
+        if (! $thePhp->is_terminal()) {
             throw new RuntimeException('Function must be called only in CLI mode');
         }
 
@@ -134,7 +142,9 @@ class CliModule
 
     public function readln() : string
     {
-        if (! Lib::php()->is_terminal()) {
+        $thePhp = Lib::$php;
+
+        if (! $thePhp->is_terminal()) {
             throw new RuntimeException('Function must be called only in CLI mode');
         }
 
@@ -147,13 +157,14 @@ class CliModule
 
     public function cin(?string $delimiter = null) : string
     {
-        if (! Lib::php()->is_terminal()) {
+        $theStr = Lib::$str;
+        $thePhp = Lib::$php;
+
+        if (! $thePhp->is_terminal()) {
             throw new RuntimeException('Function must be called only in CLI mode');
         }
 
         $delimiter = $delimiter ?? '```';
-
-        $theStr = Lib::str();
 
         echo '> Enter text separating lines by pressing ENTER' . "\n";
         echo '> Write when you\'re done: ' . $delimiter . "\n";
@@ -199,7 +210,9 @@ class CliModule
 
     public function yes(string $message, ?string &$refAnswer = null) : bool
     {
-        if (! Lib::php()->is_terminal()) {
+        $thePhp = Lib::$php;
+
+        if (! $thePhp->is_terminal()) {
             throw new RuntimeException('Function must be called only in CLI mode');
         }
 

@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Modules\Arr\ArrPath;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
@@ -45,351 +46,637 @@ class ArrModule
 
 
     /**
-     * @param mixed|null $r
+     * @return Ret<int|string>
      */
-    public function type_key_exists(&$r, $value, $key) : bool
+    public function type_key($key)
     {
-        $r = null;
+        $theType = Lib::$type;
 
-        if (! is_array($value)) {
-            return false;
-        }
+        if (is_int($key)) {
+            return Ret::ok($key);
 
-        if ([] === $value) {
-            return false;
-        }
+        } elseif (is_string($key)) {
+            return Ret::ok($key);
 
-        if (! array_key_exists($key, $value)) {
-            return false;
-        }
-
-        $r = $value[ $key ];
-
-        return true;
-    }
-
-
-    /**
-     * @param array|null $r
-     */
-    public function type_array_plain(&$r, $value) : bool
-    {
-        $r = null;
-
-        if (! is_array($value)) {
-            return false;
-        }
-
-        if ([] === $value) {
-            return true;
-        }
-
-        foreach ( $value as $v ) {
-            if (is_array($v) && ([] !== $v)) {
-                return false;
+        } else {
+            if ($theType->string($key)->isOk([ &$keyString ])) {
+                return Ret::ok($keyString);
             }
         }
 
-        $r = $value;
+        return Ret::err(
+            [ 'The `key` should be int or string', $key ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
 
-        return true;
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_key_exists($key, array $array)
+    {
+        if (isset($array[ $key ])) {
+            return Ret::ok($array[ $key ]);
+
+        } else {
+            if ($this->type_key($key)->isOk([ &$keyValid ])) {
+                if (array_key_exists($keyValid, $array)) {
+                    return Ret::ok($array[ $keyValid ]);
+                }
+            }
+        }
+
+        return Ret::err(
+            [ 'The `key` should be existing key in `array`', $key, $array ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<true>
+     */
+    public function type_key_not_exists($key, array $array)
+    {
+        if (isset($array[ $key ])) {
+            return Ret::err(
+                [ 'The `key` should be missing key in `array`', $key, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+
+        } else {
+            if ($this->type_key($key)->isOk([ &$keyValid ])) {
+                if (array_key_exists($keyValid, $array)) {
+                    return Ret::err(
+                        [ 'The `key` should be missing key in `array`', $key, $array ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+            }
+        }
+
+        return Ret::ok(true);
     }
 
 
     /**
-     * @param array|null $r
+     * @return Ret<array>
      */
-    public function type_list(&$r, $value, ?bool $isPlain = null) : bool
+    public function type_array_plain($value, ?int $plainMaxDepth = null)
     {
-        $r = null;
+        $plainMaxDepth = $plainMaxDepth ?? 1;
 
-        $isPlain = $isPlain ?? false;
+        if ($plainMaxDepth < 1) {
+            throw new LogicException(
+                [ 'The `maxDepth` should be greater than 1', $plainMaxDepth ]
+            );
+        }
 
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ]
+            );
         }
 
         if ([] === $value) {
-            $r = $value;
-
-            return true;
+            return Ret::err(
+                [ 'The `value` should be array, not empty', $value ]
+            );
         }
 
-        if ($isPlain) {
-            foreach ( $value as $key => $v ) {
-                if (is_string($key)) {
-                    return false;
+        if (1 === $plainMaxDepth) {
+            foreach ( $value as $v ) {
+                if (is_array($v)) {
+                    return Ret::err(
+                        [ 'The `value` should be array of passed `plainMaxDepth`', $value, $plainMaxDepth ]
+                    );
+                }
+            }
+
+        } else {
+            $depth = 0;
+
+            $queue = [
+                [ array_reverse($value), 1 ],
+            ];
+
+            while ( [] !== $queue ) {
+                [ $child, $level ] = array_pop($queue);
+
+                $depth = max($depth, $level);
+
+                foreach ( array_reverse($child) as $v ) {
+                    if (is_array($v)) {
+                        if (($level + 1) > $plainMaxDepth) {
+                            return Ret::err(
+                                [ 'The `value` should be array of passed `plainMaxDepth`', $value, $plainMaxDepth ]
+                            );
+                        }
+
+                        $queue[] = [ $v, $level + 1 ];
+                    }
+                }
+            }
+        }
+
+        return Ret::ok($value);
+    }
+
+
+    /**
+     * @return Ret<array>
+     */
+    public function type_list($value, ?int $plainMaxDepth = null)
+    {
+        $hasMaxDepth = (null !== $plainMaxDepth);
+
+        if (! is_array($value)) {
+            return Ret::err(
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ([] === $value) {
+            return Ret::ok($value);
+        }
+
+        if ($hasMaxDepth) {
+            if ($plainMaxDepth < 1) {
+                throw new LogicException(
+                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ]
+                );
+            }
+
+            if (1 === $plainMaxDepth) {
+                foreach ( $value as $key => $v ) {
+                    if (is_string($key)) {
+                        return Ret::err(
+                            [ 'The `value` should be array without string keys', $value ]
+                        );
+                    }
+
+                    if (is_array($v)) {
+                        return Ret::err(
+                            [ 'The `value` should be array of passed `plainMaxDepth`', $value, $plainMaxDepth ]
+                        );
+                    }
                 }
 
-                if (is_array($v) && ([] !== $v)) {
-                    return false;
+            } else {
+                $depth = 0;
+
+                $queue = [
+                    [ array_reverse($value, true), 1 ],
+                ];
+
+                while ( [] !== $queue ) {
+                    [ $child, $level ] = array_pop($queue);
+
+                    $depth = max($depth, $level);
+
+                    foreach ( array_reverse($child, true) as $key => $v ) {
+                        if (is_string($key)) {
+                            return Ret::err(
+                                [ 'The `value` should be array without string keys', $value ]
+                            );
+                        }
+
+                        if (is_array($v)) {
+                            if (($level + 1) > $plainMaxDepth) {
+                                return Ret::err(
+                                    [ 'The `value` should be array of passed `plainMaxDepth`', $value, $plainMaxDepth ]
+                                );
+                            }
+
+                            $queue[] = [ $v, $level + 1 ];
+                        }
+                    }
                 }
             }
 
         } else {
             foreach ( array_keys($value) as $key ) {
                 if (is_string($key)) {
-                    return false;
+                    return Ret::err(
+                        [ 'The `value` should be array without string keys', $value ]
+                    );
                 }
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
     /**
-     * @param array|null $r
+     * @return Ret<array>
      */
-    public function type_list_sorted(&$r, $value, ?bool $isPlain = null) : bool
+    public function type_list_sorted($value, ?int $plainMaxDepth = null)
     {
-        $r = null;
-
-        $isPlain = $isPlain ?? false;
+        $hasMaxDepth = (null !== $plainMaxDepth);
 
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ]
+            );
         }
 
         if ([] === $value) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         $prev = -1;
 
-        if ($isPlain) {
-            foreach ( $value as $key => $v ) {
-                if (is_string($key)) {
-                    return false;
+        if ($hasMaxDepth) {
+            if ($plainMaxDepth < 1) {
+                throw new LogicException(
+                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ]
+                );
+            }
+
+            if (1 === $plainMaxDepth) {
+                foreach ( $value as $key => $v ) {
+                    if (is_string($key)) {
+                        return Ret::err(
+                            [ 'The `value` should be array without string keys', $value ]
+                        );
+                    }
+
+                    if (($key - $prev) !== 1) {
+                        return Ret::err(
+                            [ 'The `value` should be sorted array', $value ]
+                        );
+                    }
+
+                    if (is_array($v)) {
+                        return Ret::err(
+                            [ 'The `value` should be array of passed `plainMaxDepth`', $value, $plainMaxDepth ]
+                        );
+                    }
                 }
 
-                if (($key - $prev) !== 1) {
-                    return false;
-                }
+            } else {
+                $depth = 0;
 
-                if (is_array($v) && ([] !== $v)) {
-                    return false;
-                }
+                $queue = [
+                    [ array_reverse($value, true), 1 ],
+                ];
 
-                $prev = $key;
+                while ( [] !== $queue ) {
+                    [ $child, $level ] = array_pop($queue);
+
+                    $depth = max($depth, $level);
+
+                    $prev = -1;
+
+                    foreach ( array_reverse($child, true) as $key => $v ) {
+                        if (is_string($key)) {
+                            return Ret::err(
+                                [ 'The `value` should be array without string keys', $value ]
+                            );
+                        }
+
+                        if (($key - $prev) !== 1) {
+                            return Ret::err(
+                                [ 'The `value` should be sorted array', $value ]
+                            );
+                        }
+
+                        if (is_array($v)) {
+                            if (($level + 1) > $plainMaxDepth) {
+                                return Ret::err(
+                                    [ 'The `value` should be array of passed `plainMaxDepth`', $value, $plainMaxDepth ]
+                                );
+                            }
+
+                            $queue[] = [ $v, $level + 1 ];
+                        }
+
+                        $prev = $key;
+                    }
+                }
             }
 
         } else {
             foreach ( array_keys($value) as $key ) {
                 if (is_string($key)) {
-                    return false;
+                    return Ret::err(
+                        [ 'The `value` should be array without string keys', $value ]
+                    );
                 }
 
                 if (($key - $prev) !== 1) {
-                    return false;
+                    return Ret::err(
+                        [ 'The `value` should be sorted array', $value ]
+                    );
                 }
 
                 $prev = $key;
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
 
     /**
-     * @param array|null $r
+     * @return Ret<array>
      */
-    public function type_dict(&$r, $value, ?bool $isPlain = null) : bool
+    public function type_dict($value, ?int $plainMaxDepth = null)
     {
-        $r = null;
-
-        $isPlain = $isPlain ?? false;
+        $hasMaxDepth = (null !== $plainMaxDepth);
 
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ]
+            );
         }
 
         if ([] === $value) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        if ($isPlain) {
-            foreach ( $value as $key => $v ) {
-                if (is_int($key)) {
-                    return false;
+        if ($hasMaxDepth) {
+            if ($plainMaxDepth < 1) {
+                throw new LogicException(
+                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ]
+                );
+            }
+
+            if (1 === $plainMaxDepth) {
+                foreach ( $value as $key => $v ) {
+                    if (is_int($key)) {
+                        return Ret::err(
+                            [ 'The `value` should be array without int keys', $value ]
+                        );
+                    }
+
+                    if (is_array($v)) {
+                        return Ret::err(
+                            [ 'The `value` should be array of passed `plainMaxDepth`', $value, $plainMaxDepth ]
+                        );
+                    }
                 }
 
-                if (is_array($v) && ([] !== $v)) {
-                    return false;
+            } else {
+                $depth = 0;
+
+                $queue = [
+                    [ array_reverse($value, true), 1 ],
+                ];
+
+                while ( [] !== $queue ) {
+                    [ $child, $level ] = array_pop($queue);
+
+                    $depth = max($depth, $level);
+
+                    foreach ( array_reverse($child, true) as $key => $v ) {
+                        if (is_int($key)) {
+                            return Ret::err(
+                                [ 'The `value` should be array without int keys', $value ]
+                            );
+                        }
+
+                        if (is_array($v)) {
+                            if (($level + 1) > $plainMaxDepth) {
+                                return Ret::err(
+                                    [ 'The `value` should be array of passed `plainMaxDepth`', $value, $plainMaxDepth ]
+                                );
+                            }
+
+                            $queue[] = [ $v, $level + 1 ];
+                        }
+                    }
                 }
             }
 
         } else {
             foreach ( array_keys($value) as $key ) {
                 if (is_int($key)) {
-                    return false;
+                    return Ret::err(
+                        [ 'The `value` should be array without int keys', $value ]
+                    );
                 }
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
     /**
-     * @param array|null $r
-     * @param callable   $fnCmp
+     * @param callable $fnSortCmp
+     *
+     * @return Ret<array>
      */
-    public function type_dict_sorted(&$r, $value, ?bool $isPlain = null, $fnCmp = null) : bool
+    public function type_dict_sorted($value, ?int $plainMaxDepth = null, $fnSortCmp = null)
     {
-        $r = null;
+        $hasMaxDepth = (null !== $plainMaxDepth);
 
-        $isPlain = $isPlain ?? false;
-        $fnCmp = $fnCmp ?? 'strcmp';
+        $fnSortCmp = $fnSortCmp ?? 'strcmp';
 
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ]
+            );
         }
 
         if ([] === $value) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         $prev = '';
 
-        if ($isPlain) {
-            foreach ( $value as $key => $v ) {
-                if (is_int($key)) {
-                    return false;
+        if ($hasMaxDepth) {
+            if ($plainMaxDepth < 1) {
+                throw new LogicException(
+                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ]
+                );
+            }
+
+            if (1 === $plainMaxDepth) {
+                foreach ( $value as $key => $v ) {
+                    if (is_int($key)) {
+                        return Ret::err(
+                            [ 'The `value` should be array without int keys', $value ]
+                        );
+                    }
+
+                    if (is_array($v)) {
+                        return Ret::err(
+                            [ 'The `value` should be array of passed `plainMaxDepth`', $value, $plainMaxDepth ]
+                        );
+                    }
+
+                    $cmp = call_user_func($fnSortCmp, $prev, $key);
+
+                    if (! is_int($cmp)) {
+                        throw new RuntimeException(
+                            [ 'The `fnSortCmp` should return integer', $fnSortCmp ]
+                        );
+                    }
+
+                    if ($cmp < 0) {
+                        return Ret::err(
+                            [ 'The `value` should be sorted array', $value ]
+                        );
+                    }
+
+                    $prev = $key;
                 }
 
-                if (is_array($v) && ([] !== $v)) {
-                    return false;
+            } else {
+                $depth = 0;
+
+                $queue = [
+                    [ array_reverse($value, true), 1 ],
+                ];
+
+                while ( [] !== $queue ) {
+                    [ $child, $level ] = array_pop($queue);
+
+                    $depth = max($depth, $level);
+
+                    $prev = -1;
+
+                    foreach ( array_reverse($child, true) as $key => $v ) {
+                        if (is_int($key)) {
+                            return Ret::err(
+                                [ 'The `value` should be array without int keys', $value ]
+                            );
+                        }
+
+                        $cmp = call_user_func($fnSortCmp, $prev, $key);
+
+                        if (! is_int($cmp)) {
+                            throw new RuntimeException(
+                                [ 'The `fnSortCmp` should return integer', $fnSortCmp ]
+                            );
+                        }
+
+                        if ($cmp < 0) {
+                            return Ret::err(
+                                [ 'The `value` should be sorted array', $value ]
+                            );
+                        }
+
+                        if (is_array($v)) {
+                            if (($level + 1) > $plainMaxDepth) {
+                                return Ret::err(
+                                    [ 'The `value` should be array of passed `plainMaxDepth`', $value, $plainMaxDepth ]
+                                );
+                            }
+
+                            $queue[] = [ $v, $level + 1 ];
+                        }
+
+                        $prev = $key;
+                    }
                 }
-
-                $cmp = call_user_func($fnCmp, $prev, $key);
-
-                if (! is_int($cmp)) {
-                    return false;
-                }
-
-                if ($cmp < 0) {
-                    return false;
-                }
-
-                $prev = $key;
             }
 
         } else {
             foreach ( array_keys($value) as $key ) {
                 if (is_int($key)) {
-                    return false;
+                    return Ret::err(
+                        [ 'The `value` should be array without int keys', $value ]
+                    );
                 }
 
-                $cmp = call_user_func($fnCmp, $prev, $key);
+                $cmp = call_user_func($fnSortCmp, $prev, $key);
 
                 if (! is_int($cmp)) {
-                    return false;
+                    throw new RuntimeException(
+                        [ 'The `fnSortCmp` should return integer', $fnSortCmp ]
+                    );
                 }
 
                 if ($cmp < 0) {
-                    return false;
+                    return Ret::err(
+                        [ 'The `value` should be sorted array', $value ]
+                    );
                 }
 
                 $prev = $key;
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
 
     /**
-     * @param array|null $r
+     * @return Ret<array>
      */
-    public function type_table(&$r, $value) : bool
+    public function type_table($value)
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ]
+            );
         }
 
         for ( $i = 0; $i < count($value); $i++ ) {
             if (! is_array($value[ $i ])) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be array of arrays', $value ]
+                );
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
     /**
-     * @param array|null $r
+     * @return Ret<array>
      */
-    public function type_matrix(&$r, $value) : bool
+    public function type_matrix($value)
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ]
+            );
         }
 
         for ( $i = 0; $i < count($value); $i++ ) {
-            if (! $this->type_list($var, $value[ $i ])) {
-                return false;
+            if (! $this->type_list($value[ $i ])) {
+                return Ret::err(
+                    [ 'The `value` should be array of lists', $value ]
+                );
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
     /**
-     * @param array|null $r
+     * @return Ret<array>
      */
-    public function type_matrix_strict(&$r, $value) : bool
+    public function type_matrix_strict($value)
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ]
+            );
         }
 
         for ( $i = 0; $i < count($value); $i++ ) {
-            if (! $this->type_list_sorted($var, $value[ $i ])) {
-                return false;
+            if (! $this->type_list_sorted($value[ $i ])) {
+                return Ret::err(
+                    [ 'The `value` should be array of sorted lists', $value ]
+                );
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
 
     /**
-     * @param ArrPath|null $r
+     * @return Ret<ArrPath>
      */
-    public function type_arrpath(&$r, $value, ?string $dot = null) : bool
+    public function type_arrpath($value, ?string $dot = null)
     {
-        $r = null;
-
         if ($value instanceof ArrPath) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         try {
@@ -397,23 +684,29 @@ class ArrModule
                 ? $this->arrpath_dot($dot, $value)
                 : $this->arrpath($value);
 
-            $r = ArrPath::fromValidArray($array);
+            $arrpathObject = ArrPath::fromValidArray($array)->orThrow();
 
-            return true;
+            return Ret::ok($arrpathObject);
         }
         catch ( \Throwable $e ) {
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be valid arrpath', $value ]
+        );
     }
 
 
-    public function type_array_of_type(&$r, $value, string $type) : bool
+    /**
+     * @return Ret<array>
+     */
+    public function type_array_of_type($value, string $type)
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $mapTypes = [
@@ -436,158 +729,204 @@ class ArrModule
         ];
 
         if (! isset($mapTypes[ $type ])) {
-            return false;
+            throw new LogicException(
+                [
+                    ''
+                    . 'The `type` should be one of: '
+                    . '[ ' . implode(' ][ ', array_keys($mapTypes)) . ' ]',
+                    //
+                    $type,
+                ]
+            );
         }
 
-        foreach ( $value as $v ) {
+        foreach ( $value as $i => $v ) {
             if ($type !== gettype($v)) {
-                return false;
+                return Ret::err(
+                    [ 'Each of `value` should be passed type', $v, $i, $type ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
-    public function type_array_of_resource_type(&$r, $value, string $resourceType) : bool
+    /**
+     * @return Ret<array>
+     */
+    public function type_array_of_resource_type($value, string $resourceType)
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        foreach ( $value as $v ) {
+        foreach ( $value as $i => $v ) {
             if (! is_resource($v)) {
-                return false;
+                return Ret::err(
+                    [ 'Each of `value` should be opened resource', $v, $i, $resourceType ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             if ($resourceType !== get_resource_type($v)) {
-                return false;
+                return Ret::err(
+                    [ 'Each of `value` should be opened resource of type', $v, $i, $resourceType ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
     /**
      * @template T
      *
-     * @param T[]             $r
      * @param class-string<T> $className
+     *
+     * @return Ret<T[]>
      */
-    public function type_array_of_a(&$r, $value, string $className) : bool
+    public function type_array_of_a($value, string $className)
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! class_exists($className)) {
-            return false;
+            throw new LogicException(
+                [ 'The `className` should be existing class', $className ]
+            );
         }
 
-        foreach ( $value as $v ) {
+        foreach ( $value as $i => $v ) {
             if (! is_a($v, $className)) {
-                return false;
+                return Ret::err(
+                    [ 'Each of `value` should be instance of passed `className`', $v, $i, $className ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
     /**
      * @template T
      *
-     * @param T[]             $r
      * @param class-string<T> $className
+     *
+     * @return Ret<T[]>
      */
-    public function type_array_of_class(&$r, $value, string $className) : bool
+    public function type_array_of_class($value, string $className)
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! class_exists($className)) {
-            return false;
+            throw new LogicException(
+                [ 'The `className` should be existing class', $className ]
+            );
         }
 
-        foreach ( $value as $v ) {
+        foreach ( $value as $i => $v ) {
             if (! is_object($v)) {
-                return false;
+                return Ret::err(
+                    [ 'Each of `value` should be object', $v, $i ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            if (get_class($v) !== $className) {
-                return false;
+            if ($className !== get_class($v)) {
+                return Ret::err(
+                    [ 'Each of `value` should be object of passed class (exact match)', $v, $i, $className ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
     /**
      * @template T
      *
-     * @param T[]             $r
      * @param class-string<T> $className
+     *
+     * @return Ret<T[]>
      */
-    public function type_array_of_subclass(&$r, $value, string $className) : bool
+    public function type_array_of_subclass($value, string $className)
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! class_exists($className)) {
-            return false;
+            throw new LogicException(
+                [ 'The `className` should be existing class', $className ]
+            );
         }
 
-        foreach ( $value as $v ) {
+        foreach ( $value as $i => $v ) {
             if (! is_subclass_of($v, $className)) {
-                return false;
+                return Ret::err(
+                    [ 'Each of `value` should be instance of passed subclass `className`', $v, $i, $className ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
-    public function type_array_of_callback(&$r, $value, callable $fn, array $args = []) : bool
+    /**
+     * @param callable $fn
+     *
+     * @return Ret<array>
+     *
+     * @noinspection PhpDocSignatureIsNotCompleteInspection
+     */
+    public function type_array_of_callback($value, callable $fn, array $fnArgs = [])
     {
-        $r = null;
-
         if (! is_array($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        foreach ( $value as $v ) {
-            $vArgs = array_merge([ $v ], $args);
+        foreach ( $value as $i => $v ) {
+            $vArgs = array_merge([ $v ], $fnArgs);
 
             if (! call_user_func_array($fn, $vArgs)) {
-                return false;
+                return Ret::err(
+                    [ 'Each of `value` should pass passed `fn` check', $v, $i, $fn, $fnArgs ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($value);
     }
 
 
     public function has_key($array, $key, array $refs = []) : bool
     {
+        $theType = Lib::$type;
+
         $withValue = array_key_exists(0, $refs);
         if ($withValue) {
             $refValue =& $refs[ 0 ];
@@ -598,16 +937,19 @@ class ArrModule
             return false;
         }
 
-        if (! Lib::type()->string($_key, $key)) {
+        if ([] === $array) {
             return false;
         }
 
-        if (! array_key_exists($_key, $array)) {
+        if (! $keyString = $theType->string($key)->orFalse()) {
             return false;
         }
 
-        $refValue = $array[ $_key ];
-        unset($refValue);
+        if (! array_key_exists($keyString, $array)) {
+            return false;
+        }
+
+        $refValue = $array[ $keyString ];
 
         return true;
     }
@@ -844,25 +1186,21 @@ class ArrModule
      */
     public function arrpath($path, ...$pathes) : array
     {
-        $theType = Lib::type();
+        $theType = Lib::$type;
 
         $arrpath = [];
 
         $gen = $this->arrpath_it($path, ...$pathes);
 
         foreach ( $gen as $p ) {
-            if ($theType->string($var, $p)) {
-                $arrpath[] = $p;
+            if ($theType->string($p)->isOk([ &$pString ])) {
+                $arrpath[] = $pString;
             }
         }
 
         if ([] === $arrpath) {
             throw new LogicException(
-                [
-                    'Result path is empty',
-                    $path,
-                    $pathes,
-                ]
+                [ 'Result path is empty', $path, $pathes ]
             );
         }
 
@@ -874,28 +1212,23 @@ class ArrModule
      */
     public function arrpath_dot(string $dot, $path, ...$pathes) : array
     {
-        if (! Lib::str()->type_char($symbol, $dot)) {
-            throw new LogicException(
-                'The `dot` should be an one symbol',
-                $dot
-            );
-        }
+        $theType = Lib::$type;
 
-        $theType = Lib::type();
+        $dotChar = $theType->char($dot)->orThrow();
 
         $arrpath = [];
 
         $gen = $this->arrpath_it($path, ...$pathes);
 
         foreach ( $gen as $p ) {
-            if ($theType->string($pString, $p)) {
+            if ($theType->string($p)->isOk([ &$pString ])) {
                 if ('' === $pString) {
                     $arrpath[] = $pString;
 
                 } else {
                     $arrpath = array_merge(
                         $arrpath,
-                        explode($dot, $pString)
+                        explode($dotChar, $pString)
                     );
                 }
             }
@@ -951,7 +1284,9 @@ class ArrModule
         array $refs = []
     ) : bool
     {
-        if (! $this->type_arrpath($thePath, $path)) {
+        $theType = Lib::$type;
+
+        if (! $theType->arrpath($path)->isOk([ &$pathObject ])) {
             return false;
         }
 
@@ -967,7 +1302,7 @@ class ArrModule
         }
         $refKey = null;
 
-        $pathArray = $thePath->getPath();
+        $pathArray = $pathObject->getPath();
 
         $refCurrent =& $array;
 
@@ -1019,17 +1354,15 @@ class ArrModule
      */
     public function &fetch_path(array &$refArray, $path)
     {
-        if (! $this->type_arrpath($thePath, $path)) {
-            throw new LogicException(
-                'Unable to ' . __FUNCTION__ . ' due to invalid path'
-            );
-        }
+        $theType = Lib::$type;
 
-        $pathArray = $thePath->getPath();
+        $pathObject = $theType->arrpath($path)->orThrow();
+
+        $pathArray = $pathObject->getPath();
 
         $refCurrent =& $refArray;
 
-        while ( $pathArray ) {
+        while ( [] !== $pathArray ) {
             $pathStep = array_shift($pathArray);
 
             if (! array_key_exists($pathStep, $refCurrent)) {
@@ -1097,17 +1430,15 @@ class ArrModule
      */
     public function &put_path(array &$refArray, $path, $value)
     {
-        if (! $this->type_arrpath($thePath, $path)) {
-            throw new LogicException(
-                'Unable to ' . __FUNCTION__ . ' due to invalid path'
-            );
-        }
+        $theType = Lib::$type;
 
-        $pathArray = $thePath->getPath();
+        $pathObject = $theType->arrpath($path)->orThrow();
+
+        $pathArray = $pathObject->getPath();
 
         $refCurrent =& $refArray;
 
-        while ( null !== key($pathArray) ) {
+        while ( [] !== $pathArray ) {
             $pathStep = array_shift($pathArray);
 
             if (! array_key_exists($pathStep, $refCurrent)) {
@@ -1151,13 +1482,11 @@ class ArrModule
      */
     public function unset_path(array &$refArray, $path) : bool
     {
-        if (! $this->type_arrpath($thePath, $path)) {
-            throw new LogicException(
-                'Unable to ' . __FUNCTION__ . ' due to invalid path'
-            );
-        }
+        $theType = Lib::$type;
 
-        $pathArray = $thePath->getPath();
+        $pathObject = $theType->arrpath($path)->orThrow();
+
+        $pathArray = $pathObject->getPath();
 
         $refCurrent =& $refArray;
 
@@ -1204,6 +1533,28 @@ class ArrModule
         $refCurrent = null;
 
         return $isDeleted;
+    }
+
+
+    public function array_depth(array $array) : int
+    {
+        $depth = 0;
+
+        $queue = [ [ $array, 1 ] ];
+
+        while ( [] !== $queue ) {
+            [ $child, $level ] = array_pop($queue);
+
+            $depth = max($depth, $level);
+
+            foreach ( $child as $v ) {
+                if (is_array($v)) {
+                    $queue[] = [ $v, $level + 1 ];
+                }
+            }
+        }
+
+        return $depth;
     }
 
 
@@ -2108,16 +2459,13 @@ class ArrModule
     {
         $walkFlags = $walkFlags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
 
+        $theType = Lib::$type;
+
         if (null === $dot) {
             $dotChar = '.';
 
-        } elseif (! Lib::type()->char($dotChar, $dot)) {
-            throw new LogicException(
-                [
-                    'The `dot` should be a char',
-                    $dot,
-                ]
-            );
+        } else {
+            $dotChar = $theType->char($dot)->orThrow();
         }
 
         $hasFillKeys = ([] !== $fillKeys);
@@ -2140,14 +2488,13 @@ class ArrModule
      */
     public function undot(array $arrayDot, ?string $dot = null) : array
     {
-        if (null === $dot) {
-            $dot = '.';
+        $theType = Lib::$type;
 
-        } elseif (! Lib::str()->type_char($symbol, $dot)) {
-            throw new LogicException(
-                'The `dot` should be an one symbol',
-                $dot
-            );
+        if (null === $dot) {
+            $dotChar = '.';
+
+        } else {
+            $dotChar = $theType->char($dot)->orThrow();
         }
 
         $result = [];
@@ -2155,7 +2502,7 @@ class ArrModule
         foreach ( $arrayDot as $dotKey => $value ) {
             $this->set_path(
                 $result,
-                explode($dot, $dotKey),
+                explode($dotChar, $dotKey),
                 $value
             );
         }
@@ -2419,8 +2766,6 @@ class ArrModule
             throw new LogicException([ 'Invalid `mode`', $flags ]);
         }
 
-        $theArr = Lib::arr();
-
         // > ref, path
         $buffer[] = [ &$refArray, [] ];
 
@@ -2449,10 +2794,10 @@ class ArrModule
 
             } elseif ((! $isRoot) && ([] !== $cur0)) {
                 if ($isWithLists) {
-                    $isList = $theArr->type_list($var, $cur0, true);
+                    $isList = $this->type_list($cur0, 1)->isOk();
                 }
                 if ($isWithDicts) {
-                    $isDict = $theArr->type_dict($var, $cur0, true);
+                    $isDict = $this->type_dict($cur0, 1)->isOk();
                 }
 
                 $isParent = ! ($isList || $isDict);

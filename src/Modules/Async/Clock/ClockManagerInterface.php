@@ -4,9 +4,6 @@ namespace Gzhegow\Lib\Modules\Async\Clock;
 
 interface ClockManagerInterface
 {
-    public function isTimer($value) : bool;
-
-
     public function isTimeout($value) : bool;
 
     public function setTimeout(int $waitMs, callable $fn) : Timeout;

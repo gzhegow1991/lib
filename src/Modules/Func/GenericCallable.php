@@ -3,8 +3,7 @@
 namespace Gzhegow\Lib\Modules\Func;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Php\Result\Ret;
-use Gzhegow\Lib\Modules\Php\Result\Result;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Modules\Func\Invoker\InvokerInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\CanIsSameInterface;
 
@@ -117,57 +116,51 @@ class GenericCallable implements
 
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function from($from, array $context = [], $ret = null)
+    public static function from($from, array $context = [], ?array $fallback = null)
     {
-        $retCur = Result::asValue();
+        $ret = Ret::new();
 
         $instance = null
-            ?? static::fromInstance($from, $retCur)
-            ?? static::fromFunction($from, $context, $retCur)
-            ?? static::fromMethod($from, $context, $retCur)
-            ?? static::fromClosure($from, $context, $retCur)
-            ?? static::fromInvokableObject($from, $context, $retCur)
-            ?? static::fromInvokableClass($from, $context, $retCur);
+            ?? static::fromInstance($from)->orNull($ret)
+            ?? static::fromFunction($from, $context)->orNull($ret)
+            ?? static::fromMethod($from, $context)->orNull($ret)
+            ?? static::fromClosure($from, $context)->orNull($ret)
+            ?? static::fromInvokableObject($from, $context)->orNull($ret)
+            ?? static::fromInvokableClass($from, $context)->orNull($ret);
 
-        if ($retCur->isErr()) {
-            return Result::err($ret, $retCur);
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
         }
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromInstance($from, $ret = null)
+    public static function fromInstance($from, ?array $fallback = null)
     {
         if ($from instanceof static) {
-            return Result::ok($ret, $from);
+            return Ret::val($fallback, $from);
         }
 
-        return Result::err(
-            $ret,
+        return Ret::throw(
+            $fallback,
             [ 'The `from` should be an instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromClosure($from, array $context = [], $ret = null)
+    public static function fromClosure($from, array $context = [], ?array $fallback = null)
     {
         if (! ($from instanceof \Closure)) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from` should be an instance of \Closure', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -185,22 +178,18 @@ class GenericCallable implements
 
         $instance->key = "{ object # \Closure # {$phpId} }";
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromMethod($from, array $context = [], $ret = null)
+    public static function fromMethod($from, array $context = [], ?array $fallback = null)
     {
-        if (! Lib::php()->type_method_string($methodString, $from, [ &$methodArray ])) {
-            return Result::err(
-                $ret,
-                [ 'The `from` should be an existing method', $from ],
-                [ __FILE__, __LINE__ ]
-            );
+        $theType = Lib::$type;
+
+        if (! $theType->method_string($from, [ &$methodArray ])->isOk([ &$ret ])) {
+            return Ret::throw($fallback, $ret);
         }
 
         $arguments = $context[ 'arguments' ] ?? [];
@@ -236,27 +225,25 @@ class GenericCallable implements
 
         $instance->key = "[ {$key0}, {$key1} ]";
 
-        return Result::ok($ret, $instance);
+        return Ret::throw($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromInvokableObject($from, array $context = [], $ret = null)
+    public static function fromInvokableObject($from, array $context = [], ?array $fallback = null)
     {
         if (! is_object($from)) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from` should be an object', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if (! method_exists($from, '__invoke')) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from` should be an invokable object', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -275,35 +262,33 @@ class GenericCallable implements
 
         $instance->key = "\"{ object # {$phpClass} # {$phpId} }\"";
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromInvokableClass($from, array $context = [], $ret = null)
+    public static function fromInvokableClass($from, array $context = [], ?array $fallback = null)
     {
-        if (! Lib::type()->string_not_empty($invokableClass, $from)) {
-            return Result::err(
-                $ret,
-                [ 'The `from` should be a non-empty string', $from ],
-                [ __FILE__, __LINE__ ]
-            );
+        $theType = Lib::$type;
+
+        if (! $theType->string_not_empty($from)->isOk([ &$fromStringNotEmpty, &$ret ])) {
+            return Ret::throw($fallback, $ret);
         }
 
+        $invokableClass = $fromStringNotEmpty;
+
         if (! class_exists($invokableClass)) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from` should be an existing class', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if (! method_exists($invokableClass, '__invoke')) {
-            return Result::err(
-                $ret,
+            return Ret::throw(
+                $fallback,
                 [ 'The `from` should be an invokable class', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -319,30 +304,24 @@ class GenericCallable implements
 
         $instance->key = "\"{$invokableClass}\"";
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return static|bool|null
+     * @return static|Ret<static>
      */
-    public static function fromFunction($function, array $context = [], $ret = null)
+    public static function fromFunction($function, array $context = [], ?array $fallback = null)
     {
-        $thePhp = Lib::php();
+        $theType = Lib::$type;
 
-        if (! Lib::type()->string_not_empty($_function, $function)) {
-            return Result::err(
-                $ret,
-                [ 'The `from` should be an existing function name', $function ],
-                [ __FILE__, __LINE__ ]
-            );
+        if (! $theType->string_not_empty($function)->isOk([ &$functionStringNotEmpty, &$ret ])) {
+            return Ret::throw($fallback, $ret);
         }
 
-        if (! function_exists($_function)) {
-            return Result::err(
-                $ret,
-                [ 'The `from` should be an existing function name', $_function ],
+        if (! function_exists($functionStringNotEmpty)) {
+            return Ret::throw(
+                $fallback,
+                [ 'The `from` should be an existing function name', $function ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -354,18 +333,16 @@ class GenericCallable implements
 
         $instance->isFunction = true;
 
-        $isInternal = $thePhp->type_callable_string_function_internal($_functionInternal, $_function);
-
-        if ($isInternal) {
-            $instance->functionStringInternal = $_function;
+        if ($theType->callable_string_function_internal($functionStringNotEmpty)->isOk()) {
+            $instance->functionStringInternal = $functionStringNotEmpty;
 
         } else {
-            $instance->functionStringNonInternal = $_function;
+            $instance->functionStringNonInternal = $functionStringNotEmpty;
         }
 
-        $instance->key = "\"{$_function}\"";
+        $instance->key = "\"{$functionStringNotEmpty}\"";
 
-        return Result::ok($ret, $instance);
+        return Ret::val($fallback, $instance);
     }
 
 

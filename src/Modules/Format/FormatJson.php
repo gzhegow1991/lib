@@ -3,10 +3,8 @@
 namespace Gzhegow\Lib\Modules\Format;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Php\Result\Ret;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Modules\Php\Result\Result;
-use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
@@ -101,72 +99,71 @@ class FormatJson
 
 
     /**
-     * @param Ret $ret
-     *
-     * @return mixed
+     * @return Ret<mixed>
      */
     public function json_decode(
-        $json, ?bool $associative = null,
-        ?int $depth = null, ?int $flags = null,
-        $ret = null
+        $json, ?bool $isAssociative = null,
+        ?int $depth = null, ?int $flags = null
     )
     {
-        if (! Lib::type()->string_not_empty($jsonString, $json)) {
-            return Result::err(
-                $ret,
-                [ 'The `json` should be a non-empty string', $json ],
-                [ __FILE__, __LINE__ ]
+        if (null === $json) {
+            return Ret::err(
+                [ 'The `json` should be not null', $json ]
             );
         }
 
         $depth = $depth ?? $this->static_json_depth();
         $flags = $flags ?? $this->static_json_decode_flags();
 
+        $theFunc = Lib::$func;
+        $theType = Lib::$type;
+
+        $jsonStringNotEmpty = $theType->string_not_empty($json)->orThrow();
+
         try {
-            $result = Lib::func()->safe_call(
+            $result = $theFunc->safe_call(
                 'json_decode',
-                [ $jsonString, $associative, $depth, $flags ],
+                [ $jsonStringNotEmpty, $isAssociative, $depth, $flags ],
             );
         }
         catch ( \Throwable $e ) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if (null === $result) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 [ 'Unable to `json_decode` due to invalid JSON', $json ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return $result;
+        return Ret::ok($result);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return mixed
+     * @return Ret<mixed>
      */
     public function jsonc_decode(
-        ?string $jsonc, ?bool $associative = null,
-        ?int $depth = null, ?int $flags = null,
-        $ret = null
+        $jsonc, ?bool $isAssociative = null,
+        ?int $depth = null, ?int $flags = null
     )
     {
-        if (! Lib::type()->string_not_empty($jsonString, $jsonc)) {
-            return Result::err(
-                $ret,
-                [ 'The `jsonc` should be a non-empty string', $jsonc ],
-                [ __FILE__, __LINE__ ]
+        if (null === $jsonc) {
+            return Ret::err(
+                [ 'The `jsonc` should be not null', $jsonc ]
             );
         }
 
-        $jsonString = $jsonc;
+        $depth = $depth ?? $this->static_json_depth();
+        $flags = $flags ?? $this->static_json_decode_flags();
+
+        $theFunc = Lib::$func;
+        $theType = Lib::$type;
+
+        $jsoncStringNotEmpty = $theType->string_not_empty($jsonc)->orThrow();
 
         $regexes = [];
         $regexes[ '#' ] = '/' . preg_quote('#', '/') . '(.*?)$' . '/m';
@@ -174,74 +171,67 @@ class FormatJson
         $regexes[ '/*' ] = '/' . preg_quote('/*', '/') . '([\s\S]*?)' . preg_quote('*/', '/') . '/m';
 
         foreach ( $regexes as $substr => $regex ) {
-            if (false === strpos($jsonString, $substr)) {
+            if (false === strpos($jsoncStringNotEmpty, $substr)) {
                 continue;
             }
 
-            $jsonString = preg_replace($regex, '$1', $jsonString);
+            $jsoncStringNotEmpty = preg_replace($regex, '$1', $jsoncStringNotEmpty);
         }
 
-        $depth = $depth ?? $this->static_json_depth();
-        $flags = $flags ?? $this->static_json_decode_flags();
-
         try {
-            $result = Lib::func()->safe_call(
+            $result = $theFunc->safe_call(
                 'json_decode',
-                [ $jsonString, $associative, $depth, $flags ],
+                [ $jsoncStringNotEmpty, $isAssociative, $depth, $flags ],
             );
         }
         catch ( \Throwable $e ) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if (null === $result) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 [ 'Unable to `jsonc_decode` due to invalid JSON', $jsonc ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return $result;
+        return Ret::ok($result);
     }
 
 
     /**
-     * @param Ret $ret
-     *
-     * @return string|mixed
+     * @return Ret<string>
      */
     public function json_encode(
-        $value, ?bool $allowNull = null,
-        ?int $flags = null, ?int $depth = null,
-        $ret = null
+        $value, ?bool $isAllowNull = null,
+        ?int $flags = null, ?int $depth = null
     )
     {
-        $allowNull = $allowNull ?? false;
+        $isAllowNull = $isAllowNull ?? false;
+
+        $theFunc = Lib::$func;
+        $theType = Lib::$type;
 
         if (null === $value) {
-            if (! $allowNull) {
-                return Result::err(
-                    $ret,
-                    [ 'The NULL values cannot be encoded to JSON when `allowsNull` is set to FALSE', $value ],
+            if (! $isAllowNull) {
+                return Ret::err(
+                    [ 'The value `NULL` cannot be encoded to JSON when `allowsNull` is set to FALSE', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Result::ok($ret, 'NULL');
+            return Ret::ok('NULL');
         }
 
         if (false
-            || (is_float($value) && is_nan($value))
-            || (Lib::type()->resource($var, $value))
+            || ($theType->is_nan($value))
+            || ($theType->is_resource($value))
         ) {
-            return Result::err(
-                $ret,
-                [ 'The values of types [ NAN ][ resource ] cannot be encoded to JSON', $value ],
+            return Ret::err(
+                [ 'The value `NAN` or values of type `resource` cannot be encoded to JSON', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -250,54 +240,51 @@ class FormatJson
         $depth = $depth ?? $this->static_json_depth();
 
         try {
-            $result = Lib::func()->safe_call(
+            $result = $theFunc->safe_call(
                 'json_encode',
                 [ $value, $flags, $depth ],
             );
         }
         catch ( \Throwable $e ) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Result::ok($ret, $result);
+        return Ret::ok($result);
     }
 
     /**
-     * @param Ret $ret
-     *
-     * @return string|mixed
+     * @return Ret<string>
      */
     public function json_print(
-        $value, ?bool $allowNull = null,
-        ?int $flags = null, ?int $depth = null,
-        $ret = null
+        $value, ?bool $isAllowNull = null,
+        ?int $flags = null, ?int $depth = null
     )
     {
-        $allowNull = $allowNull ?? false;
+        $isAllowNull = $isAllowNull ?? false;
+
+        $theFunc = Lib::$func;
+        $theType = Lib::$type;
 
         if (null === $value) {
-            if (! $allowNull) {
-                return Result::err(
-                    $ret,
+            if (! $isAllowNull) {
+                return Ret::err(
                     [ 'Unable to `json_encode`', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Result::ok($ret, 'NULL');
+            return Ret::ok('NULL');
         }
 
         if (false
-            || (is_float($value) && is_nan($value))
-            || (Lib::type()->resource($var, $value))
+            || ($theType->is_nan($value))
+            || ($theType->is_resource($value))
         ) {
-            return Result::err(
-                $ret,
-                [ 'The values of types [ NAN ][ resource ] cannot be encoded to JSON', $value ],
+            return Ret::err(
+                [ 'The value `NAN` or values of type `resource` cannot be encoded to JSON', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -312,19 +299,18 @@ class FormatJson
         $depth = $depth ?? $this->static_json_depth();
 
         try {
-            $result = Lib::func()->safe_call(
+            $result = $theFunc->safe_call(
                 'json_encode',
                 [ $value, $flags, $depth ],
             );
         }
         catch ( \Throwable $e ) {
-            return Result::err(
-                $ret,
+            return Ret::err(
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Result::ok($ret, $result);
+        return Ret::ok($result);
     }
 }

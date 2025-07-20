@@ -1,6 +1,11 @@
 <?php
 
+/**
+ * @noinspection PhpUnnecessaryFullyQualifiedNameInspection
+ */
+
 namespace Gzhegow\Lib\Context;
+
 
 class GenericContext
 {

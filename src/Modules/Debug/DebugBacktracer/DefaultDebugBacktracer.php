@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Modules\Debug\DebugBacktracer;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
@@ -72,15 +71,13 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
      */
     public function dirRoot(?string $dirRoot)
     {
+        $theType = Lib::$type;
+
         if (null !== $dirRoot) {
-            if (! Lib::fs()->type_dirpath_realpath($realpath, $dirRoot)) {
-                throw new LogicException(
-                    [ 'The `rootDirectory` should be an existing directory path', $dirRoot ]
-                );
-            }
+            $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
         }
 
-        $this->dirRoot = $realpath ?? null;
+        $this->dirRoot = $dirRootRealpath ?? null;
 
         return $this;
     }
@@ -181,8 +178,7 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
      */
     public function filter(?array $filter)
     {
-        $theType = Lib::type();
-
+        $theType = Lib::$type;
 
         $_filterFile = $filter[ 'file' ] ?? $filter[ 0 ] ?? [];
         $_filterClass = $filter[ 'class' ] ?? $filter[ 1 ] ?? [];
@@ -195,33 +191,33 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
 
         $_filterFunction = null
             ?? (is_array($_filterFunction) ? $_filterFunction : null)
-            ?? ((is_string($_filterFunction) && strlen($_filterFunction)) ? [ $_filterFunction ] : null)
+            ?? ($theType->string_not_empty($_filterFunction)->isOk([ &$ref ]) ? [ $ref ] : null)
             ?? [];
 
         $_filterClass = null
             ?? (is_array($_filterClass) ? $_filterClass : null)
-            ?? ((is_string($_filterClass) && strlen($_filterClass)) ? [ $_filterClass ] : null)
+            ?? ($theType->string_not_empty($_filterClass)->isOk([ &$ref ]) ? [ $ref ] : null)
             ?? [];
 
         $_filterFile = null
             ?? (is_array($_filterFile) ? $_filterFile : null)
-            ?? ((is_string($_filterFile) && strlen($_filterFile)) ? [ $_filterFile ] : null)
+            ?? ($theType->string_not_empty($_filterFile)->isOk([ &$ref ]) ? [ $ref ] : null)
             ?? [];
 
 
         $_filterType = null
             ?? (is_array($_filterType) ? $_filterType : null)
-            ?? ((is_string($_filterType) && strlen($_filterType)) ? [ $_filterType ] : null)
+            ?? ($theType->string_not_empty($_filterType)->isOk([ &$ref ]) ? [ $ref ] : null)
             ?? [];
 
         $_filterLine = null
             ?? (is_array($_filterLine) ? $_filterLine : null)
-            ?? ($theType->numeric($var, $_filterLine) ? [ $var ] : null)
+            ?? ($theType->numeric_int_positive($_filterLine)->isOk([ &$ref ]) ? [ $ref ] : null)
             ?? [];
 
         $_filterObject = null
             ?? (is_array($_filterObject) ? $_filterObject : null)
-            ?? (is_object($_filterObject) ? [ $_filterObject ] : null)
+            ?? ($theType->object($_filterObject)->isOk([ &$ref ]) ? [ $ref ] : null)
             ?? [];
 
 
@@ -301,8 +297,7 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
      */
     public function filterNot(?array $filter)
     {
-        $theType = Lib::type();
-
+        $theType = Lib::$type;
 
         $_filterFile = $filter[ 'file' ] ?? $filter[ 0 ] ?? [];
         $_filterClass = $filter[ 'class' ] ?? $filter[ 1 ] ?? [];
@@ -315,33 +310,33 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
 
         $_filterFunction = null
             ?? (is_array($_filterFunction) ? $_filterFunction : null)
-            ?? ((is_string($_filterFunction) && strlen($_filterFunction)) ? [ $_filterFunction ] : null)
+            ?? ($theType->string_not_empty($_filterFunction)->isOk([ &$ref ]) ? [ $ref ] : null)
             ?? [];
 
         $_filterClass = null
             ?? (is_array($_filterClass) ? $_filterClass : null)
-            ?? ((is_string($_filterClass) && strlen($_filterClass)) ? [ $_filterClass ] : null)
+            ?? ($theType->string_not_empty($_filterClass)->isOk([ &$ref ]) ? [ $ref ] : null)
             ?? [];
 
         $_filterFile = null
             ?? (is_array($_filterFile) ? $_filterFile : null)
-            ?? ((is_string($_filterFile) && strlen($_filterFile)) ? [ $_filterFile ] : null)
+            ?? ($theType->string_not_empty($_filterFile)->isOk([ &$ref ]) ? [ $ref ] : null)
             ?? [];
 
 
         $_filterType = null
             ?? (is_array($_filterType) ? $_filterType : null)
-            ?? ((is_string($_filterType) && strlen($_filterType)) ? [ $_filterType ] : null)
+            ?? ($theType->string_not_empty($_filterType)->isOk([ &$ref ]) ? [ $ref ] : null)
             ?? [];
 
         $_filterLine = null
             ?? (is_array($_filterLine) ? $_filterLine : null)
-            ?? ($theType->numeric($var, $_filterLine) ? [ $var ] : null)
+            ?? ($theType->numeric_int_positive($_filterLine)->isOk([ &$ref ]) ? [ $ref ] : null)
             ?? [];
 
         $_filterObject = null
             ?? (is_array($_filterObject) ? $_filterObject : null)
-            ?? (is_object($_filterObject) ? [ $_filterObject ] : null)
+            ?? ($theType->object($_filterObject)->isOk([ &$ref ]) ? [ $ref ] : null)
             ?? [];
 
 
@@ -454,9 +449,10 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
 
     protected function execute() : array
     {
-        $theFs = Lib::fs();
+        $theDebug = Lib::$debug;
+        $theFs = Lib::$fs;
 
-        $dirRoot = $this->dirRoot ?? Lib::debug()->static_dir_root();
+        $dirRoot = $this->dirRoot ?? $theDebug->static_dir_root();
         $hasDirRoot = (null !== $dirRoot);
 
         $trace = $this->trace;

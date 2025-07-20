@@ -15,17 +15,24 @@ class Exception extends \Exception implements
 
     public function __construct(...$throwableArgs)
     {
-        $args = Lib::php()->throwable_args(...$throwableArgs);
+        $theDebug = Lib::$debug;
+        $thePhp = Lib::$php;
 
-        $message = $args[ 'message' ];
+        $args = $thePhp->throwable_args(...$throwableArgs);
+
+        $message = $args[ 'message' ] ?? static::class;
         $messageList = array_values($args[ 'messageList' ]);
         $messageObjectList = array_values($args[ 'messageObjectList' ]);
 
-        $previous = $args[ 'previous' ];
-        $hasPrevious = (null !== $previous);
-
         $this->messageList = $messageList;
         $this->messageObjectList = $messageObjectList;
+
+        $file = $args[ 'file' ];
+        $line = $args[ 'line' ];
+        $hasFileLine = (null !== $file);
+
+        $previous = $args[ 'previous' ];
+        $hasPrevious = (null !== $previous);
 
         $errorsCount = count($messageList);
         if ($hasPrevious) {
@@ -38,7 +45,7 @@ class Exception extends \Exception implements
         }
 
         if ($errorsCount > 1) {
-            $message = "[ TOTAL: {$errorsCount} ] {$message}";
+            $message = "Multiple errors occured: {$errorsCount} total";
         }
 
         parent::__construct(
@@ -48,9 +55,14 @@ class Exception extends \Exception implements
         );
 
         if ($hasPrevious) {
-            $theDebugThrowabler = Lib::debugThrowabler();
+            $theDebugThrowabler = $theDebug->throwabler();
 
             $this->previousMessageList = $theDebugThrowabler->getPreviousMessagesAllList($this);
+        }
+
+        if ($hasFileLine) {
+            $this->file = $file;
+            $this->line = $line;
         }
     }
 
@@ -60,6 +72,8 @@ class Exception extends \Exception implements
      */
     public function getIterator() : \Traversable
     {
-        return Lib::debugThrowabler()->getPreviousTrackIterator($this);
+        $theDebugThrowabler = Lib::debugThrowabler();
+
+        return $theDebugThrowabler->getPreviousTrackIterator($this);
     }
 }

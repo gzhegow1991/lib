@@ -18,10 +18,12 @@ class DefaultInvoker implements InvokerInterface
      */
     public function newInvokeObject(string $className, array $args = [], array $options = []) : object
     {
+        $theArr = Lib::$arr;
+
         $list = [];
 
         if ([] !== $args) {
-            [ $list ] = Lib::arr()->kwargs($args);
+            [ $list ] = $theArr->kwargs($args);
         }
 
         return new $className(...$list);
@@ -60,8 +62,13 @@ class DefaultInvoker implements InvokerInterface
 
             } elseif ($fn->isFunction()) {
                 if ($fn->hasFunctionStringInternal($fnString)) {
-                    $cb = static function (...$args) use ($fnString) {
-                        return Lib::func()->call_user_func_array($fnString, $args);
+                    $theFunc = Lib::$func;
+
+                    $cb = static function (...$args) use (
+                        $theFunc,
+                        $fnString
+                    ) {
+                        return $theFunc->call_user_func_array($fnString, $args);
                     };
 
                 } else {
@@ -112,8 +119,13 @@ class DefaultInvoker implements InvokerInterface
 
             } elseif ($fn->isFunction()) {
                 if ($fn->hasFunctionStringInternal($fnString)) {
-                    $cb = static function (...$args) use ($fnString) {
-                        return Lib::func()->call_user_func_array($fnString, $args);
+                    $theFunc = Lib::$func;
+
+                    $cb = static function (...$args) use (
+                        $theFunc,
+                        $fnString
+                    ) {
+                        return $theFunc->call_user_func_array($fnString, $args);
                     };
 
                 } else {

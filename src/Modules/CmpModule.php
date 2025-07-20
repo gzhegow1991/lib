@@ -1,8 +1,13 @@
 <?php
 
+/**
+ * @noinspection PhpIfWithCommonPartsInspection
+ */
+
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Php\Nil;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
@@ -718,10 +723,8 @@ class CmpModule
         ?string &$refFnCmpName = null
     ) // : null|int|NAN
     {
-        $theType = Lib::type();
-
-        $isNilA = $theType->nil($var, $a);
-        $isNilB = $theType->nil($var, $b);
+        $isNilA = Nil::is($a);
+        $isNilB = Nil::is($b);
 
         if ($isNilA && $isNilB) {
             $refFnCmpName = __FUNCTION__;
@@ -757,12 +760,12 @@ class CmpModule
             return 0;
 
         } elseif ($isNullA || $isNullB) {
-            $theType = Lib::type();
+            $theType = Lib::$type;
 
             $aStatus = $isNullA;
             $bStatus = $isNullB;
-            if (! $isNullA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->blank($var, $a);
-            if (! $isNullB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->blank($var, $b);
+            if (! $isNullA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->is_blank($a);
+            if (! $isNullB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->is_blank($b);
 
             if ($aStatus && $bStatus) {
                 $refFnCmpName = __FUNCTION__;
@@ -799,12 +802,12 @@ class CmpModule
             return $a <=> $b;
 
         } elseif ($isBoolA || $isBoolB) {
-            $theType = Lib::type();
+            $theType = Lib::$type;
 
             $aStatus = $isBoolA;
             $bStatus = $isBoolB;
-            if (! $isBoolA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->bool($aBool, $a);
-            if (! $isBoolB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->bool($bBool, $b);
+            if (! $isBoolA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->bool($a)->isOk([ &$aBool ]);
+            if (! $isBoolB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->bool($b)->isOk([ &$bBool ]);
 
             if ($aStatus && $bStatus) {
                 $aBool = $aBool ?? $a;
@@ -846,12 +849,12 @@ class CmpModule
             return $a <=> $b;
 
         } elseif ($isIntA || $isIntB) {
-            $theType = Lib::type();
+            $theType = Lib::$type;
 
             $aStatus = $isIntA;
             $bStatus = $isIntB;
-            if (! $isIntA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->int($aInt, $a);
-            if (! $isIntB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->int($bInt, $b);
+            if (! $isIntA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->int($a)->isOk([ &$aInt ]);
+            if (! $isIntB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->int($b)->isOk([ &$bInt ]);
 
             $aInt = $aInt ?? $a;
             $bInt = $bInt ?? $b;
@@ -903,14 +906,14 @@ class CmpModule
                 return NAN;
             }
 
-            $theType = Lib::type();
+            $theType = Lib::$type;
 
             $aStatus = ($flagsMode & _CMP_MODE_TYPECAST_A)
-                ? $theType->num($aNum, $a)
+                ? $theType->num($a)->isOk([ &$aNum ])
                 : $isFloatA;
 
             $bStatus = ($flagsMode & _CMP_MODE_TYPECAST_B)
-                ? $theType->num($bNum, $b)
+                ? $theType->num($b)->isOk([ &$bNum ])
                 : $isFloatB;
 
             $aNum = $aNum ?? $a;
@@ -968,10 +971,10 @@ class CmpModule
         ?string &$refFnCmpName = null
     ) // : null|int|NAN
     {
-        $theType = Lib::type();
+        $theType = Lib::$type;
 
-        $isNumericA = $theType->numeric($aNumeric, $a);
-        $isNumericB = $theType->numeric($bNumeric, $b);
+        $isNumericA = $theType->numeric($a)->isOk([ &$aNumeric ]);
+        $isNumericB = $theType->numeric($b)->isOk([ &$bNumeric ]);
 
         if ($isNumericA || $isNumericB) {
             $isIntA = is_int($a);
@@ -998,14 +1001,12 @@ class CmpModule
                 return NAN;
             }
 
-            $theType = Lib::type();
-
             $aStatus = ($flagsMode & _CMP_MODE_TYPECAST_A)
-                ? $theType->num($aNum, $a)
+                ? $theType->num($a)->isOk([ &$aNum ])
                 : $isFloatA;
 
             $bStatus = ($flagsMode & _CMP_MODE_TYPECAST_B)
-                ? $theType->num($bNum, $b)
+                ? $theType->num($b)->isOk([ &$bNum ])
                 : $isFloatB;
 
             $aNum = $aNum ?? $a;
@@ -1067,12 +1068,12 @@ class CmpModule
         $isStringB = is_string($b);
 
         if ($isStringA || $isStringB) {
-            $theType = Lib::type();
+            $theType = Lib::$type;
 
             $aStatus = $isStringA;
             $bStatus = $isStringB;
-            if (! $aStatus && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->string($aString, $a);
-            if (! $bStatus && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->string($bString, $b);
+            if (! $aStatus && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->string($a)->isOk([ &$aString ]);
+            if (! $bStatus && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->string($b)->isOk([ &$bString ]);
 
             if ($aStatus && $bStatus) {
                 $aString = $aString ?? $a;
@@ -1087,7 +1088,7 @@ class CmpModule
                 $resultLen = null;
 
                 if ($flagsMode & _CMP_MODE_STRING_SIZE_STRLEN) {
-                    $theStr = Lib::str();
+                    $theStr = Lib::$str;
 
                     $aStringLen = $theStr->strlen($aString);
                     $bStringLen = $theStr->strlen($bString);
@@ -1262,10 +1263,10 @@ class CmpModule
             $resultCnt = null;
 
             if ($flagsMode & _CMP_MODE_OBJECT_SIZE_COUNT) {
-                $theType = Lib::type();
+                $theType = Lib::$type;
 
-                $isCountableA = $theType->countable($aCountable, $a);
-                $isCountableB = $theType->countable($bCountable, $b);
+                $isCountableA = $theType->countable($a)->isOk([ &$aCountable ]);
+                $isCountableB = $theType->countable($b)->isOk([ &$bCountable ]);
 
                 if ($isCountableA && $isCountableB) {
                     $resultCnt = count($a) <=> count($b);
@@ -1313,10 +1314,10 @@ class CmpModule
         ?string &$refFnCmpName = null
     ) // : null|int|NAN
     {
-        $theType = Lib::type();
+        $theType = Lib::$type;
 
-        $isResourceA = $theType->resource($aResource, $a);
-        $isResourceB = $theType->resource($bResource, $b);
+        $isResourceA = $theType->resource($a)->isOk([ &$aResource ]);
+        $isResourceB = $theType->resource($b)->isOk([ &$bResource ]);
 
         if ($isResourceA && $isResourceB) {
             if ($a === $b) {
@@ -1354,12 +1355,12 @@ class CmpModule
         $isStringB = is_string($b);
 
         if ($isStringA || $isStringB) {
-            $theType = Lib::type();
+            $theType = Lib::$type;
 
             $aStatus = $isStringA;
             $bStatus = $isStringB;
-            if (! $aStatus) $aStatus = $theType->string($aString, $a);
-            if (! $bStatus) $bStatus = $theType->string($bString, $b);
+            if (! $aStatus) $aStatus = $theType->string($a)->isOk([ &$aString ]);
+            if (! $bStatus) $bStatus = $theType->string($b)->isOk([ &$bString ]);
 
             if ($aStatus && $bStatus) {
                 $aString = $aString ?? $a;
@@ -1374,7 +1375,7 @@ class CmpModule
                 $resultLen = null;
 
                 if ($flagsMode & _CMP_MODE_STRING_SIZE_STRLEN) {
-                    $theStr = Lib::str();
+                    $theStr = Lib::$str;
 
                     $aStringLen = $theStr->strlen($aString);
                     $bStringLen = $theStr->strlen($bString);
@@ -1495,10 +1496,10 @@ class CmpModule
             }
 
             if ($flagsMode & _CMP_MODE_OBJECT_SIZE_COUNT) {
-                $theType = Lib::type();
+                $theType = Lib::$type;
 
-                $isCountableA = $theType->countable($aCountable, $a);
-                $isCountableB = $theType->countable($bCountable, $b);
+                $isCountableA = $theType->countable($a)->isOk([ &$aCountable ]);
+                $isCountableB = $theType->countable($b)->isOk([ &$bCountable ]);
 
                 if ($isCountableA && $isCountableB) {
                     $resultCnt = count($a) <=> count($b);

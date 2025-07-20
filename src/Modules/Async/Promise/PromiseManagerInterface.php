@@ -2,32 +2,27 @@
 
 namespace Gzhegow\Lib\Modules\Async\Promise;
 
-use Gzhegow\Lib\Modules\Php\Result\Ret;
+use Gzhegow\Lib\Modules\Type\Ret;
 
 
 interface PromiseManagerInterface
 {
     /**
-     * @param Ret $ret
-     *
-     * @return Promise|bool|null
+     * @return Promise|Ret<Promise>
      */
-    public function from($from, $ret = null);
+    public function from($from, ?array $fallback = null);
 
     /**
-     * @param Ret $ret
-     *
-     * @return Promise|bool|null
+     * @return Promise|Ret<Promise>
      */
-    public function fromValue($from, $ret = null);
+    public function fromValue($from, ?array $fallback = null);
 
     /**
      * @param callable $from
-     * @param Ret      $ret
      *
-     * @return Promise|bool|null
+     * @return Promise|Ret<Promise>
      */
-    public function fromCallable($from, $ret = null);
+    public function fromCallable($from, ?array $fallback = null);
 
 
     /**
@@ -84,7 +79,7 @@ interface PromiseManagerInterface
     public function allResolvedOf(array $ps, ?bool $rejectIfEmpty = null) : Promise;
 
 
-    public function timeout(Promise $promise, int $timeoutMs, $reason = null) : Promise;
+    public function timeout(Promise $promise, int $timeoutMs, $rejectReason = null) : Promise;
 
 
     /**

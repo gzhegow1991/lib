@@ -4,6 +4,7 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Php\Nil;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
@@ -73,11 +74,6 @@ class PhpModule
         return new Nil();
     }
 
-    public function the_timezone_nil() : \DateTimeZone
-    {
-        return new \DateTimeZone('+1234');
-    }
-
 
     /**
      * @param class-string<\LogicException|\RuntimeException>|null $throwable_class
@@ -140,200 +136,878 @@ class PhpModule
 
 
     /**
-     * @param array|\Countable|null $r
+     * @return Ret<mixed>
      */
-    public function type_countable(&$r, $value) : bool
+    public function type_empty($value)
     {
-        $r = null;
+        if (empty($value)) {
+            return Ret::ok($value);
+        }
 
-        if (PHP_VERSION_ID >= 70300) {
-            if (is_countable($value)) {
-                $r = $value;
+        return Ret::err(
+            [ 'The `value` should be empty', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
 
-                return true;
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_any_not_empty($value)
+    {
+        if (! empty($value)) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be not empty', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * > Специальный тип, который значит, что значение можно отбросить или не учитывать, т.к. оно не несёт информации
+     *
+     * @return Ret<string|array|\Countable|null>
+     */
+    public function type_blank($value)
+    {
+        // > NIL is not blank (NIL is always passed manually, that literally means NOT BLANK)
+        // > CLOSED RESOURCE is not blank (actually it's still internal object)
+
+        if (false
+            // > NULL is blank (can appear from API to omit any actions on the value)
+            || (null === $value)
+            //
+            // > NAN is blank (can be result of number function calculation or defined as default)
+            || (is_float($value) && is_nan($value))
+            //
+            // > EMPTY STRING is blank (can appear from HTML forms with no input provided)
+            || ('' === $value)
+            //
+            // > EMPTY ARRAY is blank (can appear from HTML forms with no checkbox/radio/select items choosen)
+            || ([] === $value)
+        ) {
+            return Ret::ok($value);
+        }
+
+        // > COUNTABLE w/ ZERO SIZE is blank
+        if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
+            if (0 === count($valueCountable)) {
+                return Ret::ok($value);
+            }
+        }
+
+        return Ret::err(
+            [ 'The `value` should be blank', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_any_not_blank($value)
+    {
+        if (! $this->type_blank($value)->isOk()) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be not blank', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * > Специальный тип, который значит, что значение можно заменить NULL-ом
+     *
+     * @return Ret<mixed>
+     */
+    public function type_nullable($value)
+    {
+        // > NAN is not clearable (NAN means some error in the code and shouldn't be replaced)
+        // > EMPTY ARRAY is not clearable (array functions is not applicable to nulls)
+        // > COUNTABLE w/ ZERO SIZE is not clearable (countable/iterable functions is not applicable to nulls)
+
+        if (false
+            // > NULL is clearable (means nothing)
+            || (null === $value)
+            //
+            // > EMPTY STRING is clearable (can appear from HTML forms with no input provided)
+            || ('' === $value)
+            //
+            // > CLOSED RESOURCE is clearable (this is the internal garbage with no possible purpose)
+            || ('resource (closed)' === gettype($value))
+            //
+            // > NIL is clearable (NIL should be replaced with NULL later or perform deleting actions)
+            || Nil::is($value)
+        ) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be nullable', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_any_not_nullable($value)
+    {
+        if (! $this->type_nullable($value)->isOk()) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be not nullable', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * > Специальный тип, который значит, что значение было отправлено пользователем, а не появилось из PHP
+     *
+     * @return Ret<mixed>
+     */
+    public function type_passed($value)
+    {
+        if ($this->type_nil($value)->isOk()) {
+            return Ret::ok($value);
+        }
+
+        if (false
+            // > NULL is not passed (can appear from API to omit any actions on the value)
+            || (null === $value)
+            //
+            // > EMPTY STRING is not passed (can appear from HTML form with no input provided)
+            || ('' === $value)
+            //
+            // > EMPTY ARRAY is not passed (can appear from HTML forms with no checkbox/radio/select items choosen)
+            || ([] === $value)
+            //
+            // > OBJECTS is not passed (they're only created from source code)
+            || is_object($value)
+            //
+            // > NAN, -INF, INF is not passed (user cannot send NAN, -INF, +INF)
+            || (is_float($value) && ! is_finite($value))
+            //
+            // > RESOURCE not passed (user cannot send resource)
+            || (is_resource($value) || ('resource (closed)' === gettype($value)))
+        ) {
+            return Ret::err(
+                [ 'The `value` should be passed by user', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($value);
+    }
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_any_not_passed($value)
+    {
+        if (! $this->type_passed($value)->isOk()) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be not passed by user', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * > Специальный тип-синоним NULL, переданный пользователем через API, например '{N}'
+     * > в случаях, когда NULL интерпретируется как "не трогать", а NIL как "очистить"
+     *
+     * > NAN не равен ничему даже самому себе
+     * > NIL равен только самому себе
+     * > NULL означает пустоту и им можно заменить значения '', [], `resource (closed)`, NIL, но нельзя заменить NAN
+     *
+     * @return Ret<string|Nil>
+     */
+    public function type_nil($value)
+    {
+        if (Nil::is($value)) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be nil', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_any_not_nil($value)
+    {
+        if (! Nil::is($value)) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be not nil', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * @return Ret<null>
+     */
+    public function type_null($value)
+    {
+        if (null === $value) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be null', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_any_not_null($value)
+    {
+        if (null !== $value) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be not null', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * @return Ret<false>
+     */
+    public function type_false($value)
+    {
+        if (false === $value) {
+            return Ret::ok(false);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be false', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_any_not_false($value)
+    {
+        if (false !== $value) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be not false', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * @return Ret<true>
+     */
+    public function type_true($value)
+    {
+        if (true === $value) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be true', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_any_not_true($value)
+    {
+        if (true !== $value) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be not true', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * @return Ret<bool>
+     */
+    public function type_bool($value)
+    {
+        if (null === $value) {
+            return Ret::err(
+                [ 'The `value` should be bool, null is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (is_bool($value)) {
+            return Ret::ok($value);
+        }
+
+        if (is_int($value)) {
+            return Ret::ok(0 !== $value);
+        }
+
+        if (is_float($value)) {
+            if (is_nan($value)) {
+                return Ret::err(
+                    [ 'The `value` should be bool, nan is not', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            return false;
+            return Ret::ok(0.0 !== $value);
+        }
+
+        if ($this->type_nil($value)->isOk()) {
+            return Ret::err(
+                [ 'The `value` should be bool, nil is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (is_string($value)) {
+            if ('' === $value) {
+                // > EMPTY STRING is false
+                return Ret::ok(false);
+            }
+
+            return Ret::ok(true);
         }
 
         if (is_array($value)) {
-            $r = $value;
-
-            return true;
-        }
-
-        if ($value instanceof \Countable) {
-            $r = $value;
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param \Countable|null $r
-     */
-    public function type_countable_object(&$r, $value) : bool
-    {
-        $r = null;
-
-        if (PHP_VERSION_ID >= 70300) {
-            if (is_object($value) && is_countable($value)) {
-                $r = $value;
-
-                return true;
+            if ([] === $value) {
+                // > EMPTY ARRAY is false
+                return Ret::ok(false);
             }
 
-            return false;
+            return Ret::ok(true);
         }
 
-        if ($value instanceof \Countable) {
-            $r = $value;
+        if (is_resource($value)) {
+            return Ret::ok(true);
 
-            return true;
+        } elseif ('resource (closed)' === gettype($value)) {
+            return Ret::ok(false);
         }
 
-        return false;
+        if (is_object($value)) {
+            if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
+                if (0 === count($valueCountable)) {
+                    // > EMPTY COUNTABLE is false
+                    return Ret::ok(false);
+                }
+            }
+
+            return Ret::ok(true);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be bool', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<false>
+     */
+    public function type_boolfalse($value)
+    {
+        if (! $this->type_bool($value)->isOk([ &$valueBool, &$ret ])) {
+            return $ret;
+        }
+
+        if (false === $valueBool) {
+            return Ret::ok(false);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be bool, false', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<true>
+     */
+    public function type_booltrue($value)
+    {
+        if (! $this->type_bool($value)->isOk([ &$valueBool, &$ret ])) {
+            return $ret;
+        }
+
+        if (true === $valueBool) {
+            return Ret::ok(true);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be bool, true', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
-     * @param array|\Countable|null $r
+     * @return Ret<bool>
      */
-    public function type_sizeable(&$r, $value) : bool
+    public function type_userbool($value)
     {
-        $r = null;
-
-        if ($this->type_countable($countable, $value)) {
-            $r = $value;
-
-            return true;
+        if (null === $value) {
+            return Ret::err(
+                [ 'The `value` should be userbool, null is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if (Lib::str()->type_string($string, $value)) {
-            $r = $value;
-
-            return true;
+        if (is_bool($value)) {
+            return Ret::ok($value);
         }
 
-        return false;
+        if (is_int($value)) {
+            return Ret::ok(0 !== $value);
+        }
+
+        if (is_float($value)) {
+            if (is_nan($value)) {
+                return Ret::err(
+                    [ 'The `value` should be userbool, nan is not', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            return Ret::ok(0.0 !== $value);
+        }
+
+        if (is_string($value)) {
+            $map = [
+                //
+                "true"  => true,
+                'y'     => true,
+                'yes'   => true,
+                'on'    => true,
+                '1'     => true,
+                //
+                "false" => false,
+                'n'     => false,
+                'no'    => false,
+                'off'   => false,
+                '0'     => false,
+            ];
+
+            $valueLower = strtolower($value);
+
+            if (isset($map[ $valueLower ])) {
+                return Ret::ok($map[ $valueLower ]);
+            }
+        }
+
+        return Ret::err(
+            [ 'The `value` should be userbool', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<false>
+     */
+    public function type_userfalse($value)
+    {
+        if (! $this->type_userbool($value)->isOk([ &$valueUserbool, &$ret ])) {
+            return $ret;
+        }
+
+        if (false === $valueUserbool) {
+            return Ret::ok(false);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be userbool, false', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<false>
+     */
+    public function type_usertrue($value)
+    {
+        if (! $this->type_userbool($value)->isOk([ &$valueUserbool, &$ret ])) {
+            return $ret;
+        }
+
+        if (true === $valueUserbool) {
+            return Ret::ok(true);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be userbool, true', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * @return Ret<array>
+     */
+    public function type_array($value)
+    {
+        if (is_array($value)) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be array', $value ]
+        );
+    }
+
+    /**
+     * @return Ret<array>
+     */
+    public function type_array_empty($value)
+    {
+        if ([] === $value) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be array, empty', $value ]
+        );
+    }
+
+    /**
+     * @return Ret<array>
+     */
+    public function type_array_not_empty($value)
+    {
+        if (is_array($value) && ([] !== $value)) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be array, not empty', $value ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_any_not_array_empty($value)
+    {
+        if ([] !== $value) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should not be empty array', $value ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_any_not_array($value)
+    {
+        if (! is_array($value)) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should not be array', $value ]
+        );
+    }
+
+
+    /**
+     * @return Ret<object>
+     */
+    public function type_object($value)
+    {
+        if (is_object($value)) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be object', $value ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_any_not_object($value)
+    {
+        if (! is_object($value)) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should not be empty array', $value ]
+        );
+    }
+
+
+    /**
+     * @return Ret<\stdClass>
+     */
+    public function type_stdclass($value)
+    {
+        if ($value instanceof \stdClass) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be instance of \stdClass', $value ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function type_any_not_stdclass($value)
+    {
+        if (! ($value instanceof \stdClass)) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should not be instance of \stdClass', $value ]
+        );
+    }
+
+
+    /**
+     * @return Ret<array|\Countable>
+     */
+    public function type_countable($value)
+    {
+        if (PHP_VERSION_ID >= 70300) {
+            if (is_countable($value)) {
+                return Ret::ok($value);
+            }
+
+            return Ret::err(
+                [ 'The `value` should be countable', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (is_array($value)) {
+            return Ret::ok($value);
+        }
+
+        if ($value instanceof \Countable) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be countable', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<\Countable>
+     */
+    public function type_countable_object($value)
+    {
+        if (! is_object($value)) {
+            return Ret::err(
+                [ 'The `value` should be object', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (PHP_VERSION_ID >= 70300) {
+            if (! is_countable($value)) {
+                return Ret::err(
+                    [ 'The `value` should be countable object', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            return Ret::ok($value);
+        }
+
+        if ($value instanceof \Countable) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be countable object', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * @return Ret<array|\Countable>
+     */
+    public function type_sizeable($value)
+    {
+        $theStr = Lib::$str;
+
+        if ($this->type_countable($value)->isOk()) {
+            return Ret::ok($value);
+        }
+
+        if ($theStr->type_string($value)->isOk()) {
+            return Ret::ok($value);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be sizeable', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
      * @template-covariant T of object
      *
-     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
+     *
+     * @return Ret<class-string<T>>
      */
-    public function type_struct_exists(&$r, $value, ?int $flags = null)
+    public function type_struct_exists($value, ?int $flags = null)
     {
-        $r = null;
+        $flags = $flags ?? _PHP_STRUCT_TYPE_ALL;
 
-        $_flags = $flags ?? _PHP_STRUCT_TYPE_ALL;
+        $theType = Lib::$type;
+
+        $flagsInt = $flags;
 
         $isObject = is_object($value);
 
         if ($isObject) {
             $class = get_class($value);
 
-        } elseif (Lib::type()->string_not_empty($valueString, $value)) {
-            $class = ltrim($valueString, '\\');
+        } elseif ($theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty ])) {
+            $class = ltrim($valueStringNotEmpty, '\\');
 
             if ('' === $class) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be valid class', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
         } else {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be existing class or object', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if ($class === '__PHP_Incomplete_Class') {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be existing class or object', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ($_flags & _PHP_STRUCT_TYPE_CLASS) {
+        if ($flagsInt & _PHP_STRUCT_TYPE_CLASS) {
             if (PHP_VERSION_ID >= 80100) {
                 if (class_exists($class) && ! enum_exists($class)) {
-                    $r = $class;
-
-                    return true;
+                    return Ret::ok($class);
                 }
 
             } else {
                 if (class_exists($class)) {
-                    $r = $class;
-
-                    return true;
+                    return Ret::ok($class);
                 }
             }
         }
 
-        if ($_flags & _PHP_STRUCT_TYPE_ENUM) {
+        if ($flagsInt & _PHP_STRUCT_TYPE_ENUM) {
             if (PHP_VERSION_ID >= 80100) {
                 if (enum_exists($class)) {
-                    $r = $class;
-
-                    return true;
+                    return Ret::err($class);
                 }
             }
         }
 
         if (! $isObject) {
-            if ($_flags & _PHP_STRUCT_TYPE_INTERFACE) {
+            if ($flagsInt & _PHP_STRUCT_TYPE_INTERFACE) {
                 if (interface_exists($class)) {
-                    $r = $class;
-
-                    return true;
+                    return Ret::ok($class);
                 }
             }
 
-            if ($_flags & _PHP_STRUCT_TYPE_TRAIT) {
+            if ($flagsInt & _PHP_STRUCT_TYPE_TRAIT) {
                 if (trait_exists($class)) {
-                    $r = $class;
-
-                    return true;
+                    return Ret::ok($class);
                 }
             }
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be struct, existing', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
      * @template-covariant T of object
      *
-     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
+     *
+     * @return Ret<class-string<T>>
      */
-    public function type_struct(&$r, $value, ?int $flags = null) : bool
+    public function type_struct($value, ?int $flags = null)
     {
-        $r = null;
+        $theType = Lib::$type;
 
-        $_flags = $flags ?? (
+        $flagsInt = $flags ?? (
             _PHP_STRUCT_TYPE_ALL
             | _PHP_STRUCT_EXISTS_TRUE
         );
 
         $sum = 0;
-        $sum += (($_flags & _PHP_STRUCT_EXISTS_TRUE) ? 1 : 0);
-        $sum += (($_flags & _PHP_STRUCT_EXISTS_FALSE) ? 1 : 0);
-        $sum += (($_flags & _PHP_STRUCT_EXISTS_IGNORE) ? 1 : 0);
+        $sum += (($flagsInt & _PHP_STRUCT_EXISTS_TRUE) ? 1 : 0);
+        $sum += (($flagsInt & _PHP_STRUCT_EXISTS_FALSE) ? 1 : 0);
+        $sum += (($flagsInt & _PHP_STRUCT_EXISTS_IGNORE) ? 1 : 0);
         if (1 !== $sum) {
-            $_flags &= ~(
+            $flagsInt &= ~(
                 _PHP_STRUCT_EXISTS_TRUE
                 | _PHP_STRUCT_EXISTS_FALSE
                 | _PHP_STRUCT_EXISTS_IGNORE
             );
 
-            $_flags |= _PHP_STRUCT_EXISTS_TRUE;
+            $flagsInt |= _PHP_STRUCT_EXISTS_TRUE;
         }
         unset($sum);
 
-        $isExistsTrue = (bool) ($_flags & _PHP_STRUCT_EXISTS_TRUE);
-        $isExistsFalse = (bool) ($_flags & _PHP_STRUCT_EXISTS_FALSE);
-        $isExistsIgnore = (bool) ($_flags & _PHP_STRUCT_EXISTS_IGNORE);
+        $isFlagExistsTrue = (bool) ($flagsInt & _PHP_STRUCT_EXISTS_TRUE);
+        $isFlagExistsFalse = (bool) ($flagsInt & _PHP_STRUCT_EXISTS_FALSE);
+        $isFlagExistsIgnore = (bool) ($flagsInt & _PHP_STRUCT_EXISTS_IGNORE);
 
         $isExists = null;
 
@@ -343,366 +1017,356 @@ class PhpModule
             $isEnum = is_a($value, '\UnitEnum');
             $isClass = ! $isEnum;
 
-            if ($isEnum && ($_flags & _PHP_STRUCT_TYPE_ENUM)) {
+            if ($isEnum && ($flagsInt & _PHP_STRUCT_TYPE_ENUM)) {
                 $isExists = true;
 
-            } elseif ($isClass && ($_flags & _PHP_STRUCT_TYPE_CLASS)) {
+            } elseif ($isClass && ($flagsInt & _PHP_STRUCT_TYPE_CLASS)) {
                 $isExists = true;
             }
 
         } else {
-            if (! Lib::type()->string_not_empty($valueString, $value)) {
-                return false;
+            if (! $theType
+                ->string_not_empty($value)
+                ->isOk([ &$valueStringNotEmpty, &$ret ])
+            ) {
+                return Ret::err(
+                    [ 'The `value` should be string, not empty', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $class = ltrim($valueString, '\\');
+            $class = ltrim($valueStringNotEmpty, '\\');
 
             if ('' === $class) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be valid class', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
         if ('__PHP_Incomplete_Class' === $class) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be existing class or object', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ($isExistsTrue || $isExistsFalse) {
-            $isExists = $isExists ?? $this->type_struct_exists($class, $class, $_flags);
+        if ($isFlagExistsTrue || $isFlagExistsFalse) {
+            $isExists = null
+                ?? $isExists
+                ?? $this->type_struct_exists($class, $flagsInt)->isOk([ &$classString ]);
 
-            if ($isExists && $isExistsFalse) {
-                return false;
+            if ($isExists && $isFlagExistsFalse) {
+                return Ret::err(
+                    [ 'The `value` should be non-existing struct', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
-            if ((! $isExists) && $isExistsTrue) {
-                return false;
+
+            if ((! $isExists) && $isFlagExistsTrue) {
+                return Ret::err(
+                    [ 'The `value` should be existing struct', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            if ($isExists && $isExistsTrue) {
-                $r = $class;
-
-                return true;
+            if ($isExists && $isFlagExistsTrue) {
+                return Ret::ok($class);
             }
         }
 
-        if ($isExistsFalse || $isExistsIgnore) {
-            $isValid = (bool) preg_match(
+        if ($isFlagExistsFalse || $isFlagExistsIgnore) {
+            $isValid = preg_match(
                 '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*$/',
                 $class
             );
 
-            if ($isValid) {
-                $r = $class;
+            // $isValid = (! ((false === $isValid) || (0 === $isValid)));
+            $isValid = (bool) $isValid;
 
-                return true;
+            if ($isValid) {
+                return Ret::ok($class);
             }
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be struct', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
      * @template-covariant T of object
      *
-     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
+     *
+     * @return Ret<class-string<T>>
      */
-    public function type_struct_class(&$r, $value, ?int $flags = null) : bool
+    public function type_struct_class($value, ?int $flags = null)
     {
-        $_flags = $flags;
+        $flagsInt = $flags;
 
-        if (null === $_flags) {
-            $_flags = (
-                _PHP_STRUCT_TYPE_CLASS
+        if (null === $flagsInt) {
+            $flagsInt = (0
+                | _PHP_STRUCT_TYPE_CLASS
                 | _PHP_STRUCT_EXISTS_TRUE
             );
 
         } else {
-            $_flags &= ~_PHP_STRUCT_TYPE_ALL;
-            $_flags |= _PHP_STRUCT_TYPE_CLASS;
+            $flagsInt &= ~_PHP_STRUCT_TYPE_ALL;
+            $flagsInt |= _PHP_STRUCT_TYPE_CLASS;
         }
 
-        return $this->type_struct($r, $value, $_flags);
+        return $this->type_struct($value, $flagsInt);
     }
 
     /**
-     * @param class-string|null $r
+     * @return Ret<class-string>
      */
-    public function type_struct_interface(&$r, $value, ?int $flags = null) : bool
+    public function type_struct_interface($value, ?int $flags = null)
     {
-        $_flags = $flags;
+        $flagsInt = $flags;
 
-        if (null === $_flags) {
-            $_flags = (
-                _PHP_STRUCT_TYPE_INTERFACE
+        if (null === $flagsInt) {
+            $flagsInt = (0
+                | _PHP_STRUCT_TYPE_INTERFACE
                 | _PHP_STRUCT_EXISTS_TRUE
             );
 
         } else {
-            $_flags &= ~_PHP_STRUCT_TYPE_ALL;
-            $_flags |= _PHP_STRUCT_TYPE_INTERFACE;
+            $flagsInt &= ~_PHP_STRUCT_TYPE_ALL;
+            $flagsInt |= _PHP_STRUCT_TYPE_INTERFACE;
         }
 
-        return $this->type_struct($r, $value, $_flags);
+        return $this->type_struct($value, $flagsInt);
     }
 
     /**
-     * @param class-string|null $r
+     * @return Ret<class-string>
      */
-    public function type_struct_trait(&$r, $value, ?int $flags = null) : bool
+    public function type_struct_trait($value, ?int $flags = null)
     {
-        $_flags = $flags;
+        $flagsInt = $flags;
 
-        if (null === $_flags) {
-            $_flags = (
-                _PHP_STRUCT_TYPE_TRAIT
+        if (null === $flagsInt) {
+            $flagsInt = (0
+                | _PHP_STRUCT_TYPE_TRAIT
                 | _PHP_STRUCT_EXISTS_TRUE
             );
 
         } else {
-            $_flags &= ~_PHP_STRUCT_TYPE_ALL;
-            $_flags |= _PHP_STRUCT_TYPE_TRAIT;
+            $flagsInt &= ~_PHP_STRUCT_TYPE_ALL;
+            $flagsInt |= _PHP_STRUCT_TYPE_TRAIT;
         }
 
-        return $this->type_struct($r, $value, $_flags);
+        return $this->type_struct($value, $flagsInt);
     }
 
     /**
      * @template-covariant T of \UnitEnum
      *
-     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
+     *
+     * @return Ret<class-string<T>>
      */
-    public function type_struct_enum(&$r, $value, ?int $flags = null) : bool
+    public function type_struct_enum($value, ?int $flags = null)
     {
-        $_flags = $flags;
+        $flagsInt = $flags;
 
-        if (null === $_flags) {
-            $_flags = (
-                _PHP_STRUCT_TYPE_ENUM
+        if (null === $flagsInt) {
+            $flagsInt = (0
+                | _PHP_STRUCT_TYPE_ENUM
                 | _PHP_STRUCT_EXISTS_TRUE
             );
 
         } else {
-            $_flags &= ~_PHP_STRUCT_TYPE_ALL;
-            $_flags |= _PHP_STRUCT_TYPE_ENUM;
+            $flagsInt &= ~_PHP_STRUCT_TYPE_ALL;
+            $flagsInt |= _PHP_STRUCT_TYPE_ENUM;
         }
 
-        return $this->type_struct($r, $value, $_flags);
+        return $this->type_struct($value, $flagsInt);
     }
 
 
     /**
      * @template-covariant T of object
      *
-     * @param class-string<T>|null    $r
      * @param class-string<T>|T|mixed $value
+     *
+     * @return Ret<class-string<T>>
      */
-    public function type_struct_fqcn(&$r, $value, ?int $flags = null) : bool
+    public function type_struct_fqcn($value, ?int $flags = null)
     {
-        $r = null;
-
-        if (! $this->type_struct($_value, $value, $flags)) {
-            return false;
+        if (! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ])) {
+            return $ret;
         }
 
-        $_value = '\\' . $_value;
+        $valueStruct = '\\' . $valueStruct;
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueStruct);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_struct_namespace(&$r, $value, ?int $flags = null) : bool
+    public function type_struct_namespace($value, ?int $flags = null)
     {
-        $r = null;
-
-        if (! $this->type_struct($_value, $value, $flags)) {
-            return false;
+        if (! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ])) {
+            return $ret;
         }
 
-        $_value = $this->dirname($_value, '\\');
-        if (null === $_value) {
-            return false;
+        $valueNamespace = $this->dirname($valueStruct, '\\');
+
+        if (null === $valueNamespace) {
+            return Ret::err(
+                [ 'The `value` should be struct namespace', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $value;
-
-        return true;
+        return Ret::ok($valueNamespace);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_struct_basename(&$r, $value, ?int $flags = null) : bool
+    public function type_struct_basename($value, ?int $flags = null)
     {
-        $r = null;
-
-        if (! $this->type_struct($_value, $value, $flags)) {
-            return false;
+        if (! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ])) {
+            return $ret;
         }
 
-        $_value = $this->basename($_value, '\\');
+        $valueBasename = $this->basename($valueStruct, '\\');
 
-        if (null !== $_value) {
-            $r = $_value;
-
-            return true;
+        if (null === $valueBasename) {
+            return Ret::err(
+                [ 'The `value` should be struct basename', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return false;
+        return Ret::ok($valueBasename);
     }
 
 
     /**
-     * @param resource|null $r
+     * @return Ret<resource>
      */
-    public function type_resource(&$r, $value, ?string $resourceType = null) : bool
+    public function type_resource($value, ?string $resourceType = null)
     {
-        $r = null;
-
         if (is_resource($value)) {
             if (null === $resourceType) {
-                $r = $value;
-
-                return true;
+                return Ret::ok($value);
 
             } else {
                 if ($resourceType === get_resource_type($value)) {
-                    $r = $value;
-
-                    return true;
+                    return Ret::ok($value);
                 }
             }
         }
 
         if ('resource (closed)' === gettype($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be resource, opened or closed' ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param resource|null $r
+     * @return Ret<resource>
      */
-    public function type_resource_opened(&$r, $value, ?string $resourceType = null) : bool
+    public function type_resource_opened($value, ?string $resourceType = null)
     {
-        $r = null;
-
         if (is_resource($value)) {
             if (null === $resourceType) {
-                $r = $value;
-
-                return true;
+                return Ret::ok($value);
 
             } else {
                 if ($resourceType === get_resource_type($value)) {
-                    $r = $value;
-
-                    return true;
+                    return Ret::ok($value);
                 }
             }
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be resource, opened' ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param resource|null $r
+     * @return Ret<resource>
      */
-    public function type_resource_closed(&$r, $value) : bool
+    public function type_resource_closed($value)
     {
-        $r = null;
-
         if ('resource (closed)' === gettype($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be resource, closed' ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param resource|null $r
+     * @return Ret<resource>
      */
-    public function type_any_not_resource(&$r, $value) : bool
+    public function type_any_not_resource($value)
     {
-        $r = null;
-
         if (! (false
             || is_resource($value)
             || ('resource (closed)' === gettype($value))
         )) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be any not opened or closed resource' ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
-     * @param resource|\CurlHandle|null $r
+     * @return Ret<resource|\CurlHandle>
      */
-    public function type_curl(&$r, $value) : bool
+    public function type_curl($value)
     {
-        $r = null;
-
         if (false
             || is_a($value, '\CurlHandle')
-            || $this->type_resource_opened($var, $value, 'curl')
+            || $this->type_resource_opened($value, 'curl')->isOk()
         ) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
-    }
-
-    /**
-     * @param resource|\Socket|null $r
-     */
-    public function type_socket(&$r, $value) : bool
-    {
-        $r = null;
-
-        if (false
-            || is_a($value, '\Socket')
-            || $this->type_resource_opened($var, $value, 'socket')
-        ) {
-            $r = $value;
-
-            return true;
-        }
-
-        return false;
+        return Ret::err(
+            [ 'The `value` should be curl resource, opened' ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
      * @template-covariant T of \UnitEnum
      *
-     * @param T|null               $r
      * @param T|int|string         $value
      * @param class-string<T>|null $enumClass
      *
-     * @return class-string|null
+     * @return Ret<T>
      */
-    public function type_enum_case(&$r, $value, ?string $enumClass = null) : bool
+    public function type_enum_case($value, ?string $enumClass = null)
     {
-        $r = null;
-
         $hasEnumClass = false;
         if (null !== $enumClass) {
             if (! is_subclass_of($enumClass, '\UnitEnum')) {
-                return false;
+                throw new LogicException(
+                    [ 'The `enumClass` should extend \UnitEnum', $enumClass ]
+                );
             }
 
             $hasEnumClass = true;
@@ -714,21 +1378,25 @@ class PhpModule
                 : is_subclass_of($value, '\UnitEnum');
 
             if ($status) {
-                $r = $value;
-
-                return true;
+                return Ret::ok($value);
             }
         }
 
         if (! $hasEnumClass) {
-            return false;
+            return Ret::err(
+                [ 'Cannot obtain `enumClass` from given data', $value, $enumClass ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! (false
             || is_int($value)
             || is_string($value)
         )) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be int or string, cause Enums only support two types', $value, $enumClass ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $enumCase = null;
@@ -739,12 +1407,13 @@ class PhpModule
         }
 
         if (null !== $enumCase) {
-            $r = $enumCase;
-
-            return true;
+            return Ret::ok($enumCase);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be enum case', $value, $enumClass ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
@@ -752,22 +1421,22 @@ class PhpModule
      * > метод не всегда возвращает callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
      * > используйте type_callable_array, если собираетесь вызывать метод
      *
-     * @param array{ 0: class-string, 1: string }|null $r
+     * @return Ret<array{ 0: class-string, 1: string }>
      */
-    public function type_method_array(&$r, $value) : bool
+    public function type_method_array($value)
     {
-        return $this->static_callable_parser()->typeMethodArray($r, $value);
+        return $this->static_callable_parser()->typeMethodArray($value);
     }
 
     /**
      * > метод не всегда возвращает callable, поскольку строка 'class->method' не является callable
      * > используйте type_callable_string, если собираетесь вызывать метод
      *
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_method_string(&$r, $value, array $refs = []) : bool
+    public function type_method_string($value, array $refs = [])
     {
-        return $this->static_callable_parser()->typeMethodString($r, $value, $refs);
+        return $this->static_callable_parser()->typeMethodString($value, $refs);
     }
 
 
@@ -775,143 +1444,120 @@ class PhpModule
      * > в версиях PHP до 8.0.0 публичный метод считался callable, если его проверить даже на имени класса
      * > при этом вызвать MyClass::publicMethod было нельзя, т.к. вызываемым является только MyClass::publicStaticMethod
      *
-     * @param callable|null $r
      * @param string|object $newScope
-     */
-    public function type_callable(&$r, $value, $newScope = 'static') : bool
-    {
-        return $this->static_callable_parser()->typeCallable($r, $value, $newScope);
-    }
-
-
-    /**
-     * @param callable|\Closure|object|null $r
-     */
-    public function type_callable_object(&$r, $value, $newScope = 'static') : bool
-    {
-        return $this->static_callable_parser()->typeCallableObject($r, $value, $newScope);
-    }
-
-    /**
-     * @param callable|object|null $r
-     */
-    public function type_callable_object_closure(&$r, $value, $newScope = 'static') : bool
-    {
-        return $this->static_callable_parser()->typeCallableObjectClosure($r, $value, $newScope);
-    }
-
-    /**
-     * @param callable|object|null $r
-     */
-    public function type_callable_object_invokable(&$r, $value, $newScope = 'static') : bool
-    {
-        return $this->static_callable_parser()->typeCallableObjectInvokable($r, $value, $newScope);
-    }
-
-
-    /**
-     * @param callable|array{ 0: object|class-string, 1: string }|null $r
-     * @param string|object                                            $newScope
-     */
-    public function type_callable_array(&$r, $value, $newScope = 'static') : bool
-    {
-        return $this->static_callable_parser()->typeCallableArray($r, $value, $newScope);
-    }
-
-    /**
-     * @param callable|array{ 0: object|class-string, 1: string }|null $r
-     * @param string|object                                            $newScope
-     */
-    public function type_callable_array_method(&$r, $value, $newScope = 'static') : bool
-    {
-        return $this->static_callable_parser()->typeCallableArrayMethod($r, $value, $newScope);
-    }
-
-    /**
-     * @param callable|array{ 0: class-string, 1: string }|null $r
-     * @param string|object                                     $newScope
-     */
-    public function type_callable_array_method_static(&$r, $value, $newScope = 'static') : bool
-    {
-        return $this->static_callable_parser()->typeCallableArrayMethodStatic($r, $value, $newScope);
-    }
-
-    /**
-     * @param callable|array{ 0: object, 1: string }|null $r
-     * @param string|object                               $newScope
-     */
-    public function type_callable_array_method_non_static(&$r, $value, $newScope = 'static') : bool
-    {
-        return $this->static_callable_parser()->typeCallableArrayMethodNonStatic($r, $value, $newScope);
-    }
-
-
-    /**
-     * @param callable-string|null $r
-     */
-    public function type_callable_string(&$r, $value, $newScope = 'static') : bool
-    {
-        return $this->static_callable_parser()->typeCallableString($r, $value, $newScope);
-    }
-
-    /**
-     * @param callable-string|null $r
-     */
-    public function type_callable_string_function(&$r, $value) : bool
-    {
-        return $this->static_callable_parser()->typeCallableStringFunction($r, $value);
-    }
-
-    /**
-     * @param callable-string|null $r
-     */
-    public function type_callable_string_function_internal(&$r, $value) : bool
-    {
-        return $this->static_callable_parser()->typeCallableStringFunctionInternal($r, $value);
-    }
-
-    /**
-     * @param callable-string|null $r
-     */
-    public function type_callable_string_function_non_internal(&$r, $value) : bool
-    {
-        return $this->static_callable_parser()->typeCallableStringFunctionNonInternal($r, $value);
-    }
-
-    /**
-     * @param callable-string|null $r
-     */
-    public function type_callable_string_method_static(&$r, $value, $newScope = 'static') : bool
-    {
-        return $this->static_callable_parser()->typeCallableStringMethodStatic($r, $value, $newScope);
-    }
-
-
-    /**
-     * > получает ссылку из массива ссылок или создает новую переменную - если в функцию передали ссылки и нужно убедится, что значение по ссылке требовалось снаружи
      *
-     * @template T
-     *
-     * @param mixed|T        $r
-     * @param int|string     $key
-     * @param array{ 0?: T } $set
+     * @return Ret<callable>
      */
-    public function type_ref(&$r, $key, array $refs = [], array $set = []) : bool
+    public function type_callable($value, $newScope = 'static')
     {
-        $status = array_key_exists($key, $refs);
+        return $this->static_callable_parser()->typeCallable($value, $newScope);
+    }
 
-        if ($status) {
-            $r =& $refs[ $key ];
 
-        } else {
-            $r = null;
-        }
+    /**
+     * @return Ret<callable|\Closure|object>
+     */
+    public function type_callable_object($value, $newScope = 'static')
+    {
+        return $this->static_callable_parser()->typeCallableObject($value, $newScope);
+    }
 
-        if ([] !== $set) {
-            $r = $set[ 0 ];
-        }
+    /**
+     * @return Ret<\Closure>
+     */
+    public function type_callable_object_closure($value, $newScope = 'static')
+    {
+        return $this->static_callable_parser()->typeCallableObjectClosure($value, $newScope);
+    }
 
-        return $status;
+    /**
+     * @return Ret<callable|object>
+     */
+    public function type_callable_object_invokable($value, $newScope = 'static')
+    {
+        return $this->static_callable_parser()->typeCallableObjectInvokable($value, $newScope);
+    }
+
+
+    /**
+     * @param string|object $newScope
+     *
+     * @return Ret<callable|array{ 0: object|class-string, 1: string }>
+     */
+    public function type_callable_array($value, $newScope = 'static')
+    {
+        return $this->static_callable_parser()->typeCallableArray($value, $newScope);
+    }
+
+    /**
+     * @param string|object $newScope
+     *
+     * @return Ret<callable|array{ 0: object|class-string, 1: string }>
+     */
+    public function type_callable_array_method($value, $newScope = 'static')
+    {
+        return $this->static_callable_parser()->typeCallableArrayMethod($value, $newScope);
+    }
+
+    /**
+     * @param string|object $newScope
+     *
+     * @return Ret<callable|array{ 0: class-string, 1: string }>
+     */
+    public function type_callable_array_method_static($value, $newScope = 'static')
+    {
+        return $this->static_callable_parser()->typeCallableArrayMethodStatic($value, $newScope);
+    }
+
+    /**
+     * @param string|object $newScope
+     *
+     * @return Ret<callable|array{ 0: object, 1: string }>
+     */
+    public function type_callable_array_method_non_static($value, $newScope = 'static')
+    {
+        return $this->static_callable_parser()->typeCallableArrayMethodNonStatic($value, $newScope);
+    }
+
+
+    /**
+     * @return Ret<callable-string>
+     */
+    public function type_callable_string($value, $newScope = 'static')
+    {
+        return $this->static_callable_parser()->typeCallableString($value, $newScope);
+    }
+
+    /**
+     * @return Ret<callable-string>
+     */
+    public function type_callable_string_function($value)
+    {
+        return $this->static_callable_parser()->typeCallableStringFunction($value);
+    }
+
+    /**
+     * @return Ret<callable-string>
+     */
+    public function type_callable_string_function_internal($value)
+    {
+        return $this->static_callable_parser()->typeCallableStringFunctionInternal($value);
+    }
+
+    /**
+     * @return Ret<callable-string>
+     */
+    public function type_callable_string_function_non_internal($value)
+    {
+        return $this->static_callable_parser()->typeCallableStringFunctionNonInternal($value);
+    }
+
+    /**
+     * @return Ret<callable-string>
+     */
+    public function type_callable_string_method_static($value, $newScope = 'static')
+    {
+        return $this->static_callable_parser()->typeCallableStringMethodStatic($value, $newScope);
     }
 
 
@@ -961,29 +1607,11 @@ class PhpModule
             return $value->toBool($options);
         }
 
-        if (false
-            || (null === $value)
-            || (is_float($value) && is_nan($value))
-            || (Lib::type()->nil($var, $value))
-        ) {
-            throw new LogicException(
-                [
-                    'Unable to parse value while converting to boolean',
-                    $value,
-                ]
-            );
-        }
+        $theType = Lib::$type;
 
-        if (! Lib::type()->bool($_value, $value)) {
-            throw new LogicException(
-                [
-                    'Unable to convert value to boolean',
-                    $value,
-                ]
-            );
-        }
+        $valueBool = $theType->bool($value)->orThrow();
 
-        return $_value;
+        return $valueBool;
     }
 
     public function to_int($value, array $options = []) : int
@@ -996,6 +1624,8 @@ class PhpModule
             return $value->toInteger($options);
         }
 
+        $theType = Lib::$type;
+
         if (false
             || (null === $value)
             || ('' === $value)
@@ -1003,7 +1633,7 @@ class PhpModule
             || (is_array($value))
             || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->nil($var, $value))
+            || (Nil::is($value))
         ) {
             throw new LogicException(
                 [
@@ -1013,16 +1643,7 @@ class PhpModule
             );
         }
 
-        if (! Lib::type()->number($valueNumber, $value)) {
-            throw new LogicException(
-                [
-                    'Unable to convert value to integer',
-                    $value,
-                ]
-            );
-        }
-
-        $valueInt = $valueNumber->getValueInt();
+        $valueInt = $theType->int($value)->orThrow();
 
         return $valueInt;
     }
@@ -1050,6 +1671,8 @@ class PhpModule
             return $value->toFloat($options);
         }
 
+        $theType = Lib::$type;
+
         if (false
             || (null === $value)
             || ('' === $value)
@@ -1057,7 +1680,7 @@ class PhpModule
             || (is_array($value))
             // || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->nil($var, $value))
+            || (Nil::is($value))
         ) {
             throw new LogicException(
                 [
@@ -1067,16 +1690,9 @@ class PhpModule
             );
         }
 
-        if (! Lib::type()->float($_value, $value)) {
-            throw new LogicException(
-                [
-                    'Unable to convert value to float',
-                    $value,
-                ]
-            );
-        }
+        $valueFloat = $theType->float($value)->orThrow();
 
-        return $_value;
+        return $valueFloat;
     }
 
     public function to_string($value, array $options = []) : string
@@ -1089,6 +1705,8 @@ class PhpModule
             return $value->toString($options);
         }
 
+        $theType = Lib::$type;
+
         if (false
             || (null === $value)
             // || ('' === $value)
@@ -1096,7 +1714,7 @@ class PhpModule
             || (is_array($value))
             || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->nil($var, $value))
+            || (Nil::is($value))
         ) {
             throw new LogicException(
                 [
@@ -1106,16 +1724,9 @@ class PhpModule
             );
         }
 
-        if (! Lib::type()->string($_value, $value)) {
-            throw new LogicException(
-                [
-                    'Unable to convert value to string',
-                    $value,
-                ]
-            );
-        }
+        $valueString = $theType->string($value)->orThrow();
 
-        return $_value;
+        return $valueString;
     }
 
 
@@ -1153,7 +1764,7 @@ class PhpModule
             // || (is_array($value))
             || (is_float($value) && (! is_nan($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->nil($var, $value))
+            || (Nil::is($value))
         ) {
             throw new LogicException(
                 [
@@ -1163,9 +1774,9 @@ class PhpModule
             );
         }
 
-        $_value = (array) $value;
+        $valueArray = (array) $value;
 
-        return $_value;
+        return $valueArray;
     }
 
     public function to_object($value, array $options = []) : \stdClass
@@ -1200,7 +1811,7 @@ class PhpModule
             // || (is_array($value))
             || (is_float($value) && (! is_nan($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->nil($var, $value))
+            || (Nil::is($value))
         ) {
             throw new LogicException(
                 [
@@ -1210,9 +1821,9 @@ class PhpModule
             );
         }
 
-        $_value = (object) (array) $value;
+        $valueStdClass = (object) (array) $value;
 
-        return $_value;
+        return $valueStdClass;
     }
 
     public function to_iterable($value, array $options = []) : iterable
@@ -1251,11 +1862,14 @@ class PhpModule
             return [];
         }
 
+        $theFunc = Lib::$func;
+        $theType = Lib::$type;
+
         $hasAssert = (null !== $fnAssert);
 
         $fnArgs = [];
         if ($hasAssert) {
-            [ $fnArgs ] = Lib::func()->func_args_unique([ $fnAssertValueKey => null ], $fnAssertArgs);
+            [ $fnArgs ] = $theFunc->func_args_unique([ $fnAssertValueKey => null ], $fnAssertArgs);
         }
 
         $listValid = null;
@@ -1275,8 +1889,8 @@ class PhpModule
             }
 
             if (null === $listValid) {
-                if (Lib::arr()->type_list($var, $value)) {
-                    $list = $var;
+                if ($theType->list($value)->isOk([ &$valueList ])) {
+                    $list = $valueList;
 
                 } else {
                     $list = [ $value ];
@@ -1300,11 +1914,7 @@ class PhpModule
 
                     if (! $status) {
                         throw new LogicException(
-                            [
-                                'Each of `value` (if array) should pass `fnAssert` check',
-                                $v,
-                                $i,
-                            ]
+                            [ 'Each of `value` (if array) should pass `fnAssert` check', $v, $i ]
                         );
                     }
                 }
@@ -1320,6 +1930,8 @@ class PhpModule
             return true;
         }
 
+        $theType = Lib::$type;
+
         if ($value instanceof ToListInterface) {
             $list = $value->toList($options);
 
@@ -1330,8 +1942,8 @@ class PhpModule
         } elseif (is_array($value)) {
             yield $value;
 
-            if (Lib::arr()->type_list($list, $value)) {
-                foreach ( $list as $v ) {
+            if ($theType->list($value)->isOk([ &$valueList ])) {
+                foreach ( $valueList as $v ) {
                     yield $v;
                 }
             }
@@ -1349,8 +1961,8 @@ class PhpModule
      */
     public function count($value) // : int|NAN
     {
-        if ($this->type_countable($countable, $value)) {
-            return count($countable);
+        if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
+            return count($valueCountable);
         }
 
         return NAN;
@@ -1361,12 +1973,14 @@ class PhpModule
      */
     public function size($value) // : int|NAN
     {
-        if ($this->type_countable($countable, $value)) {
-            return count($countable);
+        $theType = Lib::$type;
+
+        if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
+            return count($valueCountable);
         }
 
-        if (Lib::str()->type_string($string, $value)) {
-            return strlen($string);
+        if ($theType->string($value)->isOk([ &$valueString ])) {
+            return strlen($valueString);
         }
 
         return NAN;
@@ -1377,14 +1991,15 @@ class PhpModule
      */
     public function length($value) // : int|NAN
     {
-        if ($this->type_countable($countable, $value)) {
-            return count($countable);
+        $theStr = Lib::$str;
+        $theType = Lib::$type;
+
+        if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
+            return count($valueCountable);
         }
 
-        $theStr = Lib::str();
-
-        if ($theStr->type_string($string, $value)) {
-            return $theStr->strlen($string);
+        if ($theType->string($value)->isOk([ &$valueString ])) {
+            return $theStr->strlen($valueString);
         }
 
         return NAN;
@@ -1490,14 +2105,14 @@ class PhpModule
             return false;
         }
 
-        $theObject = null;
-        $theClass = null;
+        $anObject = null;
+        $aClass = null;
         if ($isObject) {
-            $theObject = $object_or_class;
-            $theClass = get_class($object_or_class);
+            $anObject = $object_or_class;
+            $aClass = get_class($object_or_class);
 
         } elseif ($isClass) {
-            $theClass = $object_or_class;
+            $aClass = $object_or_class;
         }
 
         $isPublic = $public === true;
@@ -1516,13 +2131,13 @@ class PhpModule
                 }
             }
 
-            if ($theObject) {
+            if ($anObject) {
                 if ($isNotStaticOrDoesntMatter) {
-                    if (isset($theObject->{$property})) {
+                    if (isset($anObject->{$property})) {
                         return true;
                     }
 
-                    $vars = get_object_vars($theObject);
+                    $vars = get_object_vars($anObject);
                     if ($vars) {
                         if (array_key_exists($property, $vars)) {
                             return true;
@@ -1544,7 +2159,7 @@ class PhpModule
         }
 
         try {
-            $rp = new \ReflectionProperty($theClass, $property);
+            $rp = new \ReflectionProperty($aClass, $property);
 
             $isPublicProp = $rp->isPublic();
             $isStaticProp = $rp->isStatic();
@@ -1592,14 +2207,12 @@ class PhpModule
             return false;
         }
 
-        $theObject = null;
-        $theClass = null;
+        $aClass = null;
         if ($isObject) {
-            $theObject = $object_or_class;
-            $theClass = get_class($object_or_class);
+            $aClass = get_class($object_or_class);
 
         } elseif ($isClass) {
-            $theClass = $object_or_class;
+            $aClass = $object_or_class;
         }
 
         if (! method_exists($object_or_class, $method)) {
@@ -1619,7 +2232,7 @@ class PhpModule
         $isNotStatic = $static === false;
 
         try {
-            $rm = new \ReflectionMethod($theClass, $method);
+            $rm = new \ReflectionMethod($aClass, $method);
 
             $isPublicMethod = $rm->isPublic();
             $isStaticMethod = $rm->isStatic();
@@ -1749,8 +2362,6 @@ class PhpModule
      */
     public function is_callable($value, $newScope = 'static') : bool
     {
-        $result = null;
-
         if ('static' === $newScope) {
             // > if you need `static` scope you may call the existing php function
             throw new RuntimeException(
@@ -1770,8 +2381,6 @@ class PhpModule
             : is_callable($value);
 
         if ($status) {
-            $result = $value;
-
             return true;
         }
 
@@ -1798,27 +2407,13 @@ class PhpModule
         ?int $flags = null
     ) : array
     {
-        if ('' === $path) {
-            throw new LogicException(
-                [ 'The `path` should be a non-empty string' ]
-            );
-        }
+        $flags = $flags ?? _PHP_PATHINFO_ALL;
 
-        $_flags = $flags ?? _PHP_PATHINFO_ALL;
+        $theType = Lib::$type;
 
-        $theType = Lib::type();
-
-        if (! $theType->char($separatorString, $separator ?? '/')) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
-        }
-
-        if (! $theType->char($dotString, $dot ?? '.')) {
-            throw new LogicException(
-                [ 'The `dot` should be a char', $dot ]
-            );
-        }
+        $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
+        $separatorString = $theType->char($separator ?? '/')->orThrow();
+        $dotString = $theType->char($dot ?? '.')->orThrow();
 
         if ('/' === $dotString) {
             throw new LogicException(
@@ -1826,14 +2421,14 @@ class PhpModule
             );
         }
 
-        $normalized = $this->path_normalize($path, '/');
+        $normalized = $this->path_normalize($pathStringNotEmpty, '/');
 
         $dirname = ltrim($normalized, '/');
         $basename = basename($normalized);
 
         $pi = [];
 
-        if ($_flags & PATHINFO_DIRNAME) {
+        if ($flags & PATHINFO_DIRNAME) {
             if (false === strpos($dirname, '/')) {
                 $dirname = null;
 
@@ -1848,15 +2443,15 @@ class PhpModule
             $pi[ 'dirname' ] = $dirname;
         }
 
-        if ($_flags & _PHP_PATHINFO_BASENAME) {
+        if ($flags & _PHP_PATHINFO_BASENAME) {
             $pi[ 'basename' ] = ('' !== $basename) ? $basename : null;
         }
 
         if (false
-            || ($_flags & _PHP_PATHINFO_FILENAME)
-            || ($_flags & _PHP_PATHINFO_EXTENSION)
-            || ($_flags & _PHP_PATHINFO_FILE)
-            || ($_flags & _PHP_PATHINFO_EXTENSIONS)
+            || ($flags & _PHP_PATHINFO_FILENAME)
+            || ($flags & _PHP_PATHINFO_EXTENSION)
+            || ($flags & _PHP_PATHINFO_FILE)
+            || ($flags & _PHP_PATHINFO_EXTENSIONS)
         ) {
             $filename = $basename;
 
@@ -1864,7 +2459,7 @@ class PhpModule
 
             $file = array_shift($split);
 
-            if ($_flags & _PHP_PATHINFO_EXTENSION) {
+            if ($flags & _PHP_PATHINFO_EXTENSION) {
                 $extension = end($split);
 
                 if ('' === $extension) {
@@ -1877,15 +2472,15 @@ class PhpModule
                 }
             }
 
-            if ($_flags & _PHP_PATHINFO_FILENAME) {
+            if ($flags & _PHP_PATHINFO_FILENAME) {
                 $pi[ 'filename' ] = ('' !== $filename) ? $filename : null;
             }
 
-            if ($_flags & _PHP_PATHINFO_FILE) {
+            if ($flags & _PHP_PATHINFO_FILE) {
                 $pi[ 'file' ] = ('' !== $file) ? $file : null;
             }
 
-            if ($_flags & _PHP_PATHINFO_EXTENSIONS) {
+            if ($flags & _PHP_PATHINFO_EXTENSIONS) {
                 $extensions = null;
                 if ([] !== $split) {
                     $extensions = implode($dotString, $split);
@@ -1903,27 +2498,13 @@ class PhpModule
         ?int $levels = null
     ) : ?string
     {
-        if ('' === $path) {
-            throw new LogicException(
-                [ 'The `path` should be a non-empty string' ]
-            );
-        }
+        $theType = Lib::$type;
 
-        $theType = Lib::type();
+        $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
+        $separatorChar = $theType->char($separator ?? '/')->orThrow();
+        $levelsInt = $theType->int_positive($levels ?? 1)->orThrow();
 
-        if (! $theType->char($separatorString, $separator ?? '/')) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
-        }
-
-        if (! $theType->int_positive($levelsInt, $levels ?? 1)) {
-            throw new LogicException(
-                [ 'The `levels` should be a positive integer', $levels ]
-            );
-        }
-
-        $normalized = $this->path_normalize($path, '/');
+        $normalized = $this->path_normalize($pathStringNotEmpty, '/');
 
         $dirname = ltrim($normalized, '/');
 
@@ -1933,7 +2514,7 @@ class PhpModule
         } else {
             $dirname = dirname($dirname, $levelsInt);
 
-            $dirname = str_replace('/', $separatorString, $dirname);
+            $dirname = str_replace('/', $separatorChar, $dirname);
         }
 
         return ('.' !== $dirname) ? $dirname : null;
@@ -1941,13 +2522,11 @@ class PhpModule
 
     public function basename(string $path, ?string $extension = null) : ?string
     {
-        if ('' === $path) {
-            throw new LogicException(
-                [ 'The `path` should be a non-empty string' ]
-            );
-        }
+        $theType = Lib::$type;
 
-        $normalized = $this->path_normalize($path, '/');
+        $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
+
+        $normalized = $this->path_normalize($pathStringNotEmpty, '/');
 
         $basename = basename($normalized, $extension);
 
@@ -1956,46 +2535,32 @@ class PhpModule
 
     public function filename(string $path, ?string $dot = null) : ?string
     {
-        if ('' === $path) {
-            throw new LogicException(
-                [ 'The `path` should be a non-empty string' ]
-            );
-        }
+        $theType = Lib::$type;
 
-        if (! Lib::type()->char($dotString, $dot ?? '.')) {
-            throw new LogicException(
-                [ 'The `dot` should be a char', $dot ]
-            );
-        }
+        $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
+        $dotChar = $theType->char($dot ?? '.')->orThrow();
 
-        $normalized = $this->path_normalize($path, '/');
+        $normalized = $this->path_normalize($pathStringNotEmpty, '/');
 
         $basename = basename($normalized);
 
-        $split = explode($dotString, $basename) + [ '', '' ];
+        $split = explode($dotChar, $basename) + [ '', '' ];
 
         $extension = end($split);
 
-        $filename = basename($basename, "{$dotString}{$extension}");
+        $filename = basename($basename, "{$dotChar}{$extension}");
 
         return ('' !== $filename) ? $filename : null;
     }
 
     public function fname(string $path, ?string $dot = null) : ?string
     {
-        if ('' === $path) {
-            throw new LogicException(
-                [ 'The `path` should be a non-empty string' ]
-            );
-        }
+        $theType = Lib::$type;
 
-        if (! Lib::type()->char($dotString, $dot ?? '.')) {
-            throw new LogicException(
-                [ 'The `dot` should be a char', $dot ]
-            );
-        }
+        $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
+        $dotString = $theType->char($dot ?? '.')->orThrow();
 
-        $normalized = $this->path_normalize($path, '/');
+        $normalized = $this->path_normalize($pathStringNotEmpty, '/');
 
         $basename = basename($normalized);
 
@@ -2006,19 +2571,12 @@ class PhpModule
 
     public function extension(string $path, ?string $dot = null) : ?string
     {
-        if ('' === $path) {
-            throw new LogicException(
-                [ 'The `path` should be a non-empty string' ]
-            );
-        }
+        $theType = Lib::$type;
 
-        if (! Lib::type()->char($dotString, $dot ?? '.')) {
-            throw new LogicException(
-                [ 'The `dot` should be a char', $dot ]
-            );
-        }
+        $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
+        $dotString = $theType->char($dot ?? '.')->orThrow();
 
-        $normalized = $this->path_normalize($path, '/');
+        $normalized = $this->path_normalize($pathStringNotEmpty, '/');
 
         $basename = basename($normalized);
 
@@ -2031,17 +2589,10 @@ class PhpModule
 
     public function extensions(string $path, ?string $dot = null) : ?string
     {
-        if ('' === $path) {
-            throw new LogicException(
-                [ 'The `path` should be a non-empty string' ]
-            );
-        }
+        $theType = Lib::$type;
 
-        if (! Lib::type()->char($dotString, $dot ?? '.')) {
-            throw new LogicException(
-                [ 'The `dot` should be a char', $dot ]
-            );
-        }
+        $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
+        $dotString = $theType->char($dot ?? '.')->orThrow();
 
         if ('/' === $dotString) {
             throw new LogicException(
@@ -2049,7 +2600,7 @@ class PhpModule
             );
         }
 
-        $normalized = $this->path_normalize($path, '/');
+        $normalized = $this->path_normalize($pathStringNotEmpty, '/');
 
         $basename = basename($normalized);
 
@@ -2071,17 +2622,10 @@ class PhpModule
      */
     public function path_normalize(string $path, ?string $separator = null) : string
     {
-        if ('' === $path) {
-            throw new LogicException(
-                [ 'The `path` should be a non-empty string' ]
-            );
-        }
+        $theType = Lib::$type;
 
-        if (! Lib::type()->char($separatorString, $separator ?? '/')) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
-        }
+        $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
+        $separatorString = $theType->char($separator ?? '/')->orThrow();
 
         /**
          * @noinspection PhpDuplicateArrayKeysInspection
@@ -2094,7 +2638,7 @@ class PhpModule
         ];
         $separators = array_keys($separators);
 
-        $normalized = str_replace($separators, $separatorString, $path);
+        $normalized = str_replace($separators, $separatorString, $pathStringNotEmpty);
 
         return $normalized;
     }
@@ -2104,27 +2648,13 @@ class PhpModule
      */
     public function path_resolve(string $path, ?string $separator = null, ?string $dot = null) : string
     {
-        if ('' === $path) {
-            throw new LogicException(
-                [ 'The `path` should be a non-empty string' ]
-            );
-        }
+        $theType = Lib::$type;
 
-        $theType = Lib::type();
+        $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
+        $separatorString = $theType->char($separator ?? '/')->orThrow();
+        $dotString = $theType->char($dot ?? '.')->orThrow();
 
-        if (! $theType->char($separatorString, $separator ?? '/')) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
-        }
-
-        if (! $theType->char($dotString, $dot ?? '.')) {
-            throw new LogicException(
-                [ 'The `dot` should be a char', $dot ]
-            );
-        }
-
-        $pathNormalized = $this->path_normalize($path, '/');
+        $pathNormalized = $this->path_normalize($pathStringNotEmpty, '/');
 
         $root = ($pathNormalized[ 0 ] === '/')
             ? $separatorString
@@ -2185,31 +2715,20 @@ class PhpModule
         ?string $separator = null, ?string $dot = null
     ) : string
     {
-        if ('' === $path) {
-            throw new LogicException(
-                [ 'The `absolute` should be a non-empty string' ]
-            );
-        }
+        $theStr = Lib::$str;
+        $theType = Lib::$type;
 
-        if ('' === $root) {
-            throw new LogicException(
-                [ 'The `root` should be a non-empty string' ]
-            );
-        }
+        $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
+        $rootStringNotEmpty = $theType->string_not_empty($root)->orThrow();
+        $separatorChar = $theType->char($separator ?? '/')->orThrow();
 
-        if (! Lib::type()->char($separatorString, $separator ?? '/')) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
-        }
+        $pathResolved = $this->path_resolve($pathStringNotEmpty, $separatorChar, $dot);
 
-        $pathResolved = $this->path_resolve($path, $separatorString, $dot);
+        $rootNormalized = $this->path_normalize($rootStringNotEmpty, $separatorChar);
+        $rootNormalized = rtrim($rootNormalized, $separatorChar);
 
-        $rootNormalized = $this->path_normalize($root, $separatorString);
-        $rootNormalized = rtrim($rootNormalized, $separatorString);
-
-        $status = Lib::str()->str_starts(
-            $pathResolved, ($rootNormalized . $separatorString),
+        $status = $theStr->str_starts(
+            $pathResolved, ($rootNormalized . $separatorChar),
             false,
             [ &$pathRelative ]
         );
@@ -2225,7 +2744,7 @@ class PhpModule
                 [
                     'Result path should be a non-empty string',
                     $path,
-                    $separatorString,
+                    $separatorChar,
                     $dot,
                 ]
             );
@@ -2242,38 +2761,26 @@ class PhpModule
         ?string $separator = null, ?string $dot = null
     ) : string
     {
-        if ('' === $relative) {
-            throw new LogicException(
-                [ 'The `relative` should be a non-empty string' ]
-            );
-        }
+        $theType = Lib::$type;
 
-        if ('' === $current) {
-            throw new LogicException(
-                [ 'The `current` should be a non-empty string' ]
-            );
-        }
+        $relativeStringNotEmpty = $theType->string_not_empty($relative)->orThrow();
+        $currentStringNotEmpty = $theType->string_not_empty($current)->orThrow();
+        $separatorChar = $theType->char($separator ?? '/')->orThrow();
 
-        if (! Lib::type()->char($separatorString, $separator ?? '/')) {
-            throw new LogicException(
-                [ 'The `separator` should be a char', $separator ]
-            );
-        }
+        $relativeNormalized = $this->path_normalize($relativeStringNotEmpty, $separatorChar);
 
-        $relativeNormalized = $this->path_normalize($relative, $separatorString);
-
-        $isRoot = ($separatorString === $relativeNormalized[ 0 ]);
+        $isRoot = ($separatorChar === $relativeNormalized[ 0 ]);
 
         if ($isRoot) {
             $absoluteNormalized = $relativeNormalized;
 
         } else {
-            $currentNormalized = $this->path_normalize($current, $separatorString);
+            $currentNormalized = $this->path_normalize($currentStringNotEmpty, $separatorChar);
 
-            $absoluteNormalized = $currentNormalized . $separatorString . $relativeNormalized;
+            $absoluteNormalized = $currentNormalized . $separatorChar . $relativeNormalized;
         }
 
-        $absoluteResolved = $this->path_resolve($absoluteNormalized, $separatorString, $dot);
+        $absoluteResolved = $this->path_resolve($absoluteNormalized, $separatorChar, $dot);
 
         return $absoluteResolved;
     }
@@ -2286,31 +2793,24 @@ class PhpModule
         ?string $separator = null, ?string $dot = null
     ) : string
     {
-        if ('' === $path) {
-            throw new LogicException(
-                [ 'The `relative` should be a non-empty string' ]
-            );
-        }
+        $theType = Lib::$type;
 
-        if ('' === $current) {
-            throw new LogicException(
-                [ 'The `current` should be a non-empty string' ]
-            );
-        }
+        $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
+        $currentStringNotEmpty = $theType->string_not_empty($current)->orThrow();
+        $dotChar = $theType->char($dot ?? '.')->orThrow();
 
-        if (! Lib::type()->char($dotString, $dot ?? '.')) {
-            throw new LogicException(
-                [ 'The `dot` should be a char', $separator ]
-            );
-        }
-
-        $isDot = ($dotString === $path[ 0 ]);
+        $isDot = ($dotChar === $path[ 0 ]);
 
         if ($isDot) {
-            $pathResolved = $this->path_absolute($path, $current, $separator, $dotString);
+            $pathResolved = $this->path_absolute(
+                $pathStringNotEmpty,
+                $currentStringNotEmpty,
+                $separator,
+                $dotChar
+            );
 
         } else {
-            $pathResolved = $this->path_normalize($path, $separator);
+            $pathResolved = $this->path_normalize($pathStringNotEmpty, $separator);
         }
 
         return $pathResolved;
@@ -2322,8 +2822,10 @@ class PhpModule
      */
     public function serialize($data) : ?string
     {
+        $theFunc = Lib::$func;
+
         try {
-            $result = Lib::func()->safe_call(
+            $result = $theFunc->safe_call(
                 'serialize',
                 [ $data ]
             );
@@ -2340,8 +2842,10 @@ class PhpModule
      */
     public function unserialize(string $data)
     {
+        $theFunc = Lib::$func;
+
         try {
-            $result = Lib::func()->safe_call(
+            $result = $theFunc->safe_call(
                 'unserialize',
                 [ $data ]
             );
@@ -2439,6 +2943,8 @@ class PhpModule
         $codeIntegerList = [];
         $codeStringList = [];
         $previousList = [];
+        $fileList = [];
+        $lineList = [];
 
         $__unresolved = [];
 
@@ -2452,7 +2958,15 @@ class PhpModule
             }
 
             if (is_string($arg) && ('' !== $arg)) {
-                $messageList[ $i ] = $arg;
+                if (true
+                    && (false === strpos($arg, ' '))
+                    && preg_match('/^[A-Z0-9_]+$/', $arg)
+                ) {
+                    $codeStringList[ $i ] = $arg;
+
+                } else {
+                    $messageList[ $i ] = $arg;
+                }
 
                 continue;
             }
@@ -2461,17 +2975,54 @@ class PhpModule
                 || is_array($arg)
                 || $arg instanceof \stdClass
             ) {
-                $messageData = (array) $arg;
+                $messageDataArray = (array) $arg;
 
-                $messageString = (string) ($messageData[ 0 ] ?? null);
-
-                if ('' !== $messageString) {
-                    unset($messageData[ 0 ]);
-
-                    $messageList[ $i ] = $messageString;
+                if ([] === $messageDataArray) {
+                    continue;
                 }
 
-                $messageDataList[ $i ] = $messageData;
+                if (true
+                    && isset($messageDataArray[ 0 ])
+                    && isset($messageDataArray[ 1 ])
+                    && is_int($messageDataArray[ 1 ])
+                    && is_file($messageDataArray[ 0 ])
+                ) {
+                    $fileList[ $i ] = $messageDataArray[ 0 ];
+                    $lineList[ $i ] = $messageDataArray[ 1 ];
+
+                    continue;
+                }
+
+                if (isset($messageDataArray[ 0 ])) {
+                    $messageString = null;
+
+                    if (false
+                        || is_scalar($messageDataArray[ 0 ])
+                        || is_object($messageDataArray[ 0 ])
+                    ) {
+                        $messageString = (string) $messageDataArray[ 0 ];
+                    }
+
+                    if ('' === $messageString) {
+                        $messageString = null;
+                    }
+
+                    if (null !== $messageString) {
+                        unset($messageDataArray[ 0 ]);
+
+                        if (true
+                            && (false === strpos($messageString, ' '))
+                            && preg_match('/^[A-Z0-9_]+$/', $messageString)
+                        ) {
+                            $codeStringList[ $i ] = $messageString;
+
+                        } else {
+                            $messageList[ $i ] = $messageString;
+                        }
+                    }
+                }
+
+                $messageDataList[ $i ] = $messageDataArray;
 
                 continue;
             }
@@ -2485,16 +3036,27 @@ class PhpModule
             $__unresolved[ $i ] = $arg;
         }
 
-        if (([] === $messageList) && ([] !== $previousList)) {
-            foreach ( $previousList as $i => $previous ) {
-                $messageList[ $i ] = $previous->getMessage();
-            }
-        }
+        if ([] !== $previousList) {
+            $hasNoMessage = ([] === $messageList);
+            $hasNoCode = ([] === $codeIntegerList);
+            $hasNoFileLine = ([] === $fileList);
 
-        for ( $i = 0; $i < $len; $i++ ) {
-            if (isset($messageList[ $i ])) {
-                if (! preg_match('/[^a-z0-9_]/i', $messageList[ $i ])) {
-                    $codeStringList[ $i ] = strtoupper($messageList[ $i ]);
+            if (false
+                || $hasNoMessage
+                || $hasNoCode
+                || $hasNoFileLine
+            ) {
+                foreach ( $previousList as $i => $previous ) {
+                    if ($hasNoMessage) {
+                        $messageList[ $i ] = $previous->getMessage();
+                    }
+                    if ($hasNoCode) {
+                        $codeIntegerList[ $i ] = $previous->getCode();
+                    }
+                    if ($hasNoFileLine) {
+                        $fileList[ $i ] = $previous->getFile();
+                        $lineList[ $i ] = $previous->getLine();
+                    }
                 }
             }
         }
@@ -2513,14 +3075,25 @@ class PhpModule
         $result[ 'codeIntegerList' ] = $codeIntegerList;
         $result[ 'codeStringList' ] = $codeStringList;
         $result[ 'previousList' ] = $previousList;
+        $result[ 'fileList' ] = $fileList;
+        $result[ 'lineList' ] = $lineList;
 
         $result += [
-            'message'       => (([] !== $messageList) ? reset($messageList) : ''),
+            'message'       => (null
+                ?? (([] !== $messageList) ? reset($messageList) : null)
+                ?? (([] !== $codeStringList) ? reset($codeStringList) : null)
+                ?? null
+            ),
             'messageData'   => (([] !== $messageDataList) ? reset($messageDataList) : []),
             'messageObject' => (([] !== $messageObjectList) ? reset($messageObjectList) : null),
+            //
             'code'          => (([] !== $codeIntegerList) ? reset($codeIntegerList) : -1),
             'codeString'    => (([] !== $codeStringList) ? reset($codeStringList) : ''),
+            //
             'previous'      => (([] !== $previousList) ? reset($previousList) : null),
+            //
+            'file'          => (([] !== $fileList) ? reset($fileList) : null),
+            'line'          => (([] !== $lineList) ? reset($lineList) : null),
         ];
 
         $result[ '__unresolved' ] = $__unresolved;

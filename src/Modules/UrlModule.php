@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
@@ -10,25 +11,23 @@ use Gzhegow\Lib\Exception\RuntimeException;
 class UrlModule
 {
     /**
-     * @param string|null             $r
-     *
      * @param string|true             $url
      * @param string|false|array|null $query
      * @param string|false|null       $fragment
+     *
+     * @return Ret<string>
      */
     public function type_url(
-        &$r,
         $url, $query = null, $fragment = null,
         ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $isHostIdnaAscii = $isHostIdnaAscii ?? 0;
         $isLinkUrlencoded = $isLinkUrlencoded ?? 0;
 
-        $theType = Lib::type();
+        $theHttp = Lib::$http;
+        $theType = Lib::$type;
 
         $withParseUrl = array_key_exists(0, $refs);
         if ($withParseUrl) {
@@ -40,14 +39,17 @@ class UrlModule
         $hasFragment = (null !== $fragment);
 
         if (null === $url) {
-            return false;
+            return Ret::err(
+                [ 'The `url` should not be null', $url ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (true === $url) {
-            $urlString = $this->url_current();
+            $urlStringNotEmpty = $this->url_current();
 
-        } elseif (! $theType->string_not_empty($urlString, $url)) {
-            return false;
+        } elseif (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
         $_query = null
@@ -71,23 +73,32 @@ class UrlModule
             );
         }
 
-        $refParseUrl = parse_url($urlString);
+        $refParseUrl = parse_url($urlStringNotEmpty);
 
         if (false === $refParseUrl) {
-            return false;
+            return Ret::err(
+                [ 'The `url` should be valid url', $url ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (empty($refParseUrl[ 'host' ])) {
             if (! isset($_SERVER[ 'HTTP_HOST' ])) {
-                return false;
+                return Ret::err(
+                    [ 'The `url` requires host (domain) prefix', $url ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $urlString = $this->host_current() . '/' . ltrim($urlString, '/');
+            $urlStringNotEmpty = $this->host_current() . '/' . ltrim($urlStringNotEmpty, '/');
 
-            $refParseUrl = parse_url($urlString);
+            $refParseUrl = parse_url($urlStringNotEmpty);
 
             if (false === $refParseUrl) {
-                return false;
+                return Ret::err(
+                    [ 'The `url` should be valid url', $url ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
@@ -98,13 +109,14 @@ class UrlModule
                 || (1 === $isHostIdnaAscii)
                 || (2 === $isHostIdnaAscii)
             ) {
-                $theHttp = Lib::http();
-
                 if (-2 === $isHostIdnaAscii) {
                     $utf8 = $theHttp->idn_to_utf8($refParseUrl[ 'host' ]);
 
                     if (false === $utf8) {
-                        return false;
+                        return Ret::err(
+                            [ 'Cannot encode `url` host to UTF8 using `idn_to_utf8`', $url ],
+                            [ __FILE__, __LINE__ ]
+                        );
                     }
 
                     $refParseUrl[ 'host' ] = $utf8;
@@ -113,21 +125,30 @@ class UrlModule
                     $test = $refParseUrl[ 'host' ];
 
                     if ($theHttp->idn_to_utf8($test) !== $test) {
-                        return false;
+                        return Ret::err(
+                            [ 'The `url` host should be valid UTF8 idn', $url ],
+                            [ __FILE__, __LINE__ ]
+                        );
                     }
 
                 } elseif (1 === $isHostIdnaAscii) {
                     $test = $refParseUrl[ 'host' ];
 
                     if ($theHttp->idn_to_ascii($test) !== $test) {
-                        return false;
+                        return Ret::err(
+                            [ 'The `url` host should be valid ASCII idn', $url ],
+                            [ __FILE__, __LINE__ ]
+                        );
                     }
 
                 } elseif (2 === $isHostIdnaAscii) {
                     $ascii = $theHttp->idn_to_ascii($refParseUrl[ 'host' ]);
 
                     if (false === $ascii) {
-                        return false;
+                        return Ret::err(
+                            [ 'Cannot encode `url` host to ASCII using `idn_to_ascii`', $url ],
+                            [ __FILE__, __LINE__ ]
+                        );
                     }
 
                     $refParseUrl[ 'host' ] = $ascii;
@@ -140,7 +161,10 @@ class UrlModule
                 $test = str_replace('/', '', $refParseUrl[ 'path' ]);
 
                 if (urlencode($test) !== $test) {
-                    return false;
+                    return Ret::err(
+                        [ 'The `url` path should already be URL-encoded', $url ],
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
 
             } elseif (2 === $isLinkUrlencoded) {
@@ -155,8 +179,6 @@ class UrlModule
             unset($refParseUrl[ 'query' ]);
 
         } else {
-            $theHttp = Lib::http();
-
             $httpQuery = null;
             if ($hasQuery && $wasQuery) {
                 $httpQuery = $theHttp->build_query_array($refParseUrl[ 'query' ], $_query);
@@ -184,30 +206,24 @@ class UrlModule
 
         $result = $this->url_build($refParseUrl);
 
-        unset($refParseUrl);
-
-        $r = $result;
-
-        return true;
+        return Ret::ok($result);
     }
 
     /**
-     * @param string|null $r
-     *
      * @param string|true $url
+     *
+     * @return Ret<string>
      */
     public function type_host(
-        &$r,
         $url,
-        ?int $isIdnaAscii = null,
+        ?int $isHostIdnaAscii = null,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
+        $isHostIdnaAscii = $isHostIdnaAscii ?? 0;
 
-        $isIdnaAscii = $isIdnaAscii ?? 0;
-
-        $theType = Lib::type();
+        $theHttp = Lib::$http;
+        $theType = Lib::$type;
 
         $withParseUrl = array_key_exists(0, $refs);
         if ($withParseUrl) {
@@ -216,75 +232,99 @@ class UrlModule
         $refParseUrl = null;
 
         if (null === $url) {
-            return false;
+            return Ret::err(
+                [ 'The `url` should not be null', $url ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (true === $url) {
-            $urlString = $this->url_current();
+            $urlStringNotEmpty = $this->url_current();
 
-        } elseif (! $theType->string_not_empty($urlString, $url)) {
-            return false;
+        } elseif (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
-        $refParseUrl = parse_url($urlString);
+        $refParseUrl = parse_url($urlStringNotEmpty);
 
         if (false === $refParseUrl) {
-            return false;
+            return Ret::err(
+                [ 'The `url` should be valid url', $url ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (empty($refParseUrl[ 'host' ])) {
             if (! isset($_SERVER[ 'HTTP_HOST' ])) {
-                return false;
+                return Ret::err(
+                    [ 'The `url` requires host (domain) prefix', $url ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            $urlString = $this->host_current() . '/' . ltrim($urlString, '/');
+            $urlStringNotEmpty = $this->host_current() . '/' . ltrim($urlStringNotEmpty, '/');
 
-            $refParseUrl = parse_url($urlString);
+            $refParseUrl = parse_url($urlStringNotEmpty);
 
             if (false === $refParseUrl) {
-                return false;
+                return Ret::err(
+                    [ 'The `url` should be valid url', $url ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        if (false
-            || (-2 === $isIdnaAscii)
-            || (-1 === $isIdnaAscii)
-            || (1 === $isIdnaAscii)
-            || (2 === $isIdnaAscii)
-        ) {
-            $theHttp = Lib::http();
+        if (isset($refParseUrl[ 'host' ])) {
+            if (false
+                || (-2 === $isHostIdnaAscii)
+                || (-1 === $isHostIdnaAscii)
+                || (1 === $isHostIdnaAscii)
+                || (2 === $isHostIdnaAscii)
+            ) {
+                if (-2 === $isHostIdnaAscii) {
+                    $utf8 = $theHttp->idn_to_utf8($refParseUrl[ 'host' ]);
 
-            if (-2 === $isIdnaAscii) {
-                $utf8 = $theHttp->idn_to_utf8($refParseUrl[ 'host' ]);
+                    if (false === $utf8) {
+                        return Ret::err(
+                            [ 'Cannot encode `url` host to UTF8 using `idn_to_utf8`', $url ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
 
-                if (false === $utf8) {
-                    return false;
+                    $refParseUrl[ 'host' ] = $utf8;
+
+                } elseif (-1 === $isHostIdnaAscii) {
+                    $test = $refParseUrl[ 'host' ];
+
+                    if ($theHttp->idn_to_utf8($test) !== $test) {
+                        return Ret::err(
+                            [ 'The `url` host should be valid UTF8 idn', $url ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
+
+                } elseif (1 === $isHostIdnaAscii) {
+                    $test = $refParseUrl[ 'host' ];
+
+                    if ($theHttp->idn_to_ascii($test) !== $test) {
+                        return Ret::err(
+                            [ 'The `url` host should be valid ASCII idn', $url ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
+
+                } elseif (2 === $isHostIdnaAscii) {
+                    $ascii = $theHttp->idn_to_ascii($refParseUrl[ 'host' ]);
+
+                    if (false === $ascii) {
+                        return Ret::err(
+                            [ 'Cannot encode `url` host to ASCII using `idn_to_ascii`', $url ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
+
+                    $refParseUrl[ 'host' ] = $ascii;
                 }
-
-                $refParseUrl[ 'host' ] = $utf8;
-
-            } elseif (-1 === $isIdnaAscii) {
-                $test = $refParseUrl[ 'host' ];
-
-                if ($theHttp->idn_to_utf8($test) !== $test) {
-                    return false;
-                }
-
-            } elseif (1 === $isIdnaAscii) {
-                $test = $refParseUrl[ 'host' ];
-
-                if ($theHttp->idn_to_ascii($test) !== $test) {
-                    return false;
-                }
-
-            } elseif (2 === $isIdnaAscii) {
-                $ascii = $theHttp->idn_to_ascii($refParseUrl[ 'host' ]);
-
-                if (false === $ascii) {
-                    return false;
-                }
-
-                $refParseUrl[ 'host' ] = $ascii;
             }
         }
 
@@ -294,32 +334,26 @@ class UrlModule
 
         $result = $this->host_build($refParseUrl);
 
-        unset($refParseUrl);
-
-        $r = $result;
-
-        return true;
+        return Ret::ok($result);
     }
 
     /**
-     * @param string|null             $r
-     *
      * @param string|true             $url
      * @param string|false|array|null $query
      * @param string|false|null       $fragment
+     *
+     * @return Ret<string>
      */
     public function type_link(
-        &$r,
         $url, $query = null, $fragment = null,
-        ?int $isUrlencoded = null,
+        ?int $isLinkUrlencoded = null,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
+        $isLinkUrlencoded = $isLinkUrlencoded ?? 0;
 
-        $isUrlencoded = $isUrlencoded ?? 0;
-
-        $theType = Lib::type();
+        $theHttp = Lib::$http;
+        $theType = Lib::$type;
 
         $withParseUrl = array_key_exists(0, $refs);
         if ($withParseUrl) {
@@ -328,14 +362,17 @@ class UrlModule
         $refParseUrl = null;
 
         if (null === $url) {
-            return false;
+            return Ret::err(
+                [ 'The `url` should not be null', $url ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (true === $url) {
-            $urlString = $this->link_current();
+            $urlStringNotEmpty = $this->url_current();
 
-        } elseif (! $theType->string_not_empty($urlString, $url)) {
-            return false;
+        } elseif (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
+            return $ret;
         }
 
         $_query = null
@@ -363,24 +400,33 @@ class UrlModule
             );
         }
 
-        $refParseUrl = parse_url($urlString);
+        $refParseUrl = parse_url($urlStringNotEmpty);
 
         if (false === $refParseUrl) {
-            return false;
+            return Ret::err(
+                [ 'The `url` should be valid url', $url ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! isset($refParseUrl[ 'path' ])) {
-            return false;
+            return Ret::err(
+                [ 'The `url` should have path', $url ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if (1 === $isUrlencoded) {
+        if (1 === $isLinkUrlencoded) {
             $test = str_replace('/', '', $refParseUrl[ 'path' ]);
 
             if (urlencode($test) !== $test) {
-                return false;
+                return Ret::err(
+                    [ 'The `url` path should already be URL-encoded', $url ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-        } elseif (2 === $isUrlencoded) {
+        } elseif (2 === $isLinkUrlencoded) {
             $refParseUrl[ 'path' ] = urlencode($refParseUrl[ 'path' ]);
             $refParseUrl[ 'path' ] = str_replace('%2F', '/', $refParseUrl[ 'path' ]);
         }
@@ -391,8 +437,6 @@ class UrlModule
             unset($refParseUrl[ 'query' ]);
 
         } else {
-            $theHttp = Lib::http();
-
             $httpQuery = null;
             if ($hasQuery && $wasQuery) {
                 $httpQuery = $theHttp->build_query_array($refParseUrl[ 'query' ], $_query);
@@ -426,11 +470,7 @@ class UrlModule
 
         $result = $this->link_build($refParseUrl);
 
-        unset($refParseUrl);
-
-        $r = $result;
-
-        return true;
+        return Ret::ok($result);
     }
 
 
@@ -441,16 +481,18 @@ class UrlModule
      */
     public function url(
         $url = true, $query = null, $fragment = null,
-        ?int $toHostIdnaAscii = null, ?int $toLinkUrlencoded = null
+        ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null
     ) : string
     {
-        $this->type_url(
-            $urlString,
-            $url, $query, $fragment,
-            $toHostIdnaAscii, $toLinkUrlencoded
-        );
+        $ret = $this
+            ->type_url(
+                $url, $query, $fragment,
+                $isHostIdnaAscii, $isLinkUrlencoded
+            )
+            ->orThrow()
+        ;
 
-        return $urlString;
+        return $ret;
     }
 
     /**
@@ -458,16 +500,18 @@ class UrlModule
      */
     public function host(
         $url = true,
-        ?int $toIdnaAscii = null
+        ?int $isHostIdnaAscii = null
     ) : string
     {
-        $this->type_host(
-            $hostString,
-            $url,
-            $toIdnaAscii
-        );
+        $ret = $this
+            ->type_host(
+                $url,
+                $isHostIdnaAscii
+            )
+            ->orThrow()
+        ;
 
-        return $hostString;
+        return $ret;
     }
 
     /**
@@ -477,16 +521,18 @@ class UrlModule
      */
     public function link(
         $url = true, $query = null, $fragment = null,
-        ?int $toLinkUrlencoded = null
-    ) : ?string
+        ?int $isLinkUrlencoded = null
+    ) : string
     {
-        $this->type_link(
-            $linkString,
-            $url, $query, $fragment,
-            $toLinkUrlencoded
-        );
+        $ret = $this
+            ->type_link(
+                $url, $query, $fragment,
+                $isLinkUrlencoded
+            )
+            ->orThrow()
+        ;
 
-        return $linkString;
+        return $ret;
     }
 
 

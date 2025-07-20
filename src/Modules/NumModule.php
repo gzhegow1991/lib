@@ -3,6 +3,8 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Php\Nil;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Modules\Bcmath\Number;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
@@ -11,159 +13,148 @@ use Gzhegow\Lib\Exception\RuntimeException;
 class NumModule
 {
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_nan(&$r, $value) : bool
+    public function type_nan($value)
     {
-        $r = null;
-
         if (is_float($value) && is_nan($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be nan', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_float_not_nan(&$r, $value) : bool
+    public function type_float_not_nan($value)
     {
-        $r = null;
-
         if (is_float($value) && ! is_nan($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be float not nan', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param mixed|null $r
+     * @return Ret<mixed>
      */
-    public function type_any_not_nan(&$r, $value) : bool
+    public function type_any_not_nan($value)
     {
-        $r = null;
-
         if (! (is_float($value) && is_nan($value))) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be not nan', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_finite(&$r, $value) : bool
+    public function type_finite($value)
     {
-        $r = null;
-
         if (is_float($value) && is_finite($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be finite', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_float_not_finite(&$r, $value) : bool
+    public function type_float_not_finite($value)
     {
-        $r = null;
-
         if (is_float($value) && ! is_finite($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be float not finite', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param mixed|null $r
+     * @return Ret<mixed>
      */
-    public function type_any_not_finite(&$r, $value) : bool
+    public function type_any_not_finite($value)
     {
-        $r = null;
-
         if (! (is_float($value) && is_finite($value))) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be not finite', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_infinite(&$r, $value) : bool
+    public function type_infinite($value)
     {
-        $r = null;
-
         if (is_float($value) && is_infinite($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be infinite', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_float_not_infinite(&$r, $value) : bool
+    public function type_float_not_infinite($value)
     {
-        $r = null;
-
         if (is_float($value) && ! is_infinite($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be bool, null is not', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param mixed|null $r
+     * @return Ret<mixed>
      */
-    public function type_any_not_infinite(&$r, $value) : bool
+    public function type_any_not_infinite($value)
     {
-        $r = null;
-
         if (! (is_float($value) && is_infinite($value))) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be not infinite', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_float_min(&$r, $value) : bool
+    public function type_float_min($value)
     {
-        $r = null;
-
         if (false
             || is_float($value)
             || is_numeric($value)
@@ -177,70 +168,72 @@ class NumModule
             $frac = str_pad($frac, PHP_FLOAT_DIG, '9', STR_PAD_RIGHT);
 
             if ("{$int}{$frac}{$exp}" === _NUM_PHP_FLOAT_MIN_STRING_DIG) {
-                $r = ($value > 0)
-                    ? _NUM_PHP_FLOAT_MIN_FLOAT_DIG
-                    : -_NUM_PHP_FLOAT_MIN_FLOAT_DIG;
-
-                return true;
+                return Ret::ok(
+                    ($value > 0)
+                        ? _NUM_PHP_FLOAT_MIN_FLOAT_DIG
+                        : -_NUM_PHP_FLOAT_MIN_FLOAT_DIG
+                );
             }
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be float min', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_float_not_float_min(&$r, $value) : bool
+    public function type_float_not_float_min($value)
     {
-        $r = null;
-
         if (! is_float($value)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be float', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if (! $this->type_float_min($var, $value)) {
-            $r = $value;
-
-            return true;
+        if ($this->type_float_min($value)) {
+            return Ret::err(
+                [ 'The `value` should be float but not float min', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return false;
+        return Ret::ok($value);
     }
 
     /**
-     * @param mixed|null $r
+     * @return Ret<mixed>
      */
-    public function type_any_not_float_min(&$r, $value) : bool
+    public function type_any_not_float_min($value)
     {
-        $r = null;
-
-        if (! $this->type_float_min($var, $value)) {
-            $r = $value;
-
-            return true;
+        if (! $this->type_float_min($value)) {
+            return Ret::ok($value);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be not float min', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
-     * @param Number|null $r
+     * @return Ret<Number>
      */
-    public function type_number(&$r, $value, ?bool $allowExp = null) : bool
+    public function type_number($value, ?bool $allowExp = null)
     {
-        $r = null;
-
         if ($value instanceof Number) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
-        $status = $this->type_numeric($refValueNumeric, $value, $allowExp, [ &$split ]);
-        if (! $status) {
-            return false;
+        if (! $this
+            ->type_numeric($value, $allowExp, [ &$split ])
+            ->isOk([ 1 => &$ret ])
+        ) {
+            return $ret;
         }
 
         $frac = $split[ 2 ];
@@ -257,22 +250,20 @@ class NumModule
             'frac'     => $split[ 2 ],
             'exp'      => $split[ 3 ],
             'scale'    => $scale,
-        ]);
+        ])->orThrow();
 
-        $r = $number;
-
-        return true;
+        return Ret::ok($number);
     }
 
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
+    public function type_numeric($value, ?bool $isAllowExp = null, array $refs = [])
     {
-        $r = null;
-
         $isAllowExp = $isAllowExp ?? true;
+
+        $theType = Lib::$type;
 
         $withSplit = array_key_exists(0, $refs);
         if ($withSplit) {
@@ -287,11 +278,12 @@ class NumModule
 
             if (! $isAllowExp) {
                 if ('' !== $exp) {
-                    return false;
+                    return Ret::err(
+                        [ 'The `value` should be numeric, without exponent', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
             }
-
-            $r = $number->getValue();
 
             if ($withSplit) {
                 $refSplit = [];
@@ -301,10 +293,8 @@ class NumModule
                 $refSplit[ 3 ] = $exp;
             }
 
-            return true;
+            return Ret::ok($number->getValue());
         }
-
-        $theType = Lib::type();
 
         $isInt = is_int($value);
         $isFloat = is_float($value);
@@ -318,9 +308,12 @@ class NumModule
             // || (is_float($value) && (! is_finite($value)))
             //
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || ($theType->nil($var, $value))
+            || (Nil::is($value))
         ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be numeric', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $valueTrim = null;
@@ -330,22 +323,29 @@ class NumModule
                 $valueTrim = '0';
 
                 if (! $withSplit) {
-                    $r = $valueTrim;
-
-                    return true;
+                    return Ret::ok($valueTrim);
                 }
             }
         }
 
         if (null === $valueTrim) {
-            if (! $theType->trim($valueTrim, $value)) {
-                return false;
+            if (! $theType
+                ->trim($value)
+                ->isOk([ &$valueTrim, &$ret ])
+            ) {
+                return Ret::err(
+                    [ 'The `value` should be numeric, empty trim is not', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
         if ($hasExp = (false !== ($expPos = stripos($valueTrim, 'e')))) {
             if (! $isAllowExp) {
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be numeric, without exponent', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             $valueTrim[ $expPos ] = 'E';
@@ -364,9 +364,7 @@ class NumModule
                     $valueTrim = "{$left}{$right}";
                 }
 
-                $r = $valueTrim;
-
-                return true;
+                return Ret::ok($valueTrim);
             }
         }
 
@@ -379,7 +377,10 @@ class NumModule
             . '$/';
 
         if (! preg_match($regex, $valueTrim, $matches)) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be numeric, regex is not match', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         [
@@ -414,357 +415,381 @@ class NumModule
 
         $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
 
-        $r = $valueNumeric;
-
-        return true;
+        return Ret::ok($valueNumeric);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_non_zero(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
+    public function type_numeric_non_zero($value, ?bool $isAllowExp = null, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric($_value, $value, $isAllowExp, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric($value, $isAllowExp, $refs)
+            ->isOk([ &$valueString, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' !== $_value) {
-            $r = $_value;
-
-            return true;
+        if ('0' !== $valueString) {
+            return Ret::ok($valueString);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric, non zero', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_non_negative(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
+    public function type_numeric_non_negative($value, ?bool $isAllowExp = null, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric($_value, $value, $isAllowExp, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric($value, $isAllowExp, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === $_value) {
-            $r = $_value;
-
-            return true;
+        if ('0' === $valueNumeric) {
+            return Ret::ok($valueNumeric);
         }
 
-        if ('-' !== $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' !== $valueNumeric[ 0 ]) {
+            return Ret::ok($valueNumeric);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric, non negative', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_non_positive(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
+    public function type_numeric_non_positive($value, ?bool $isAllowExp = null, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric($_value, $value, $isAllowExp, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric($value, $isAllowExp, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === $_value) {
-            $r = $_value;
-
-            return true;
+        if ('0' === $valueNumeric) {
+            return Ret::ok($valueNumeric);
         }
 
-        if ('-' === $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' === $valueNumeric[ 0 ]) {
+            return Ret::ok($valueNumeric);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric, non positive', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_negative(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
+    public function type_numeric_negative($value, ?bool $isAllowExp = null, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric($_value, $value, $isAllowExp, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric($value, $isAllowExp, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === $_value) {
-            return false;
+        if ('0' === $valueNumeric) {
+            return Ret::err(
+                [ 'The `value` should be numeric, negative, zero is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ('-' === $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' === $valueNumeric[ 0 ]) {
+            return Ret::ok($valueNumeric);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric, negative', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_positive(&$r, $value, ?bool $isAllowExp = null, array $refs = []) : bool
+    public function type_numeric_positive($value, ?bool $isAllowExp = null, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric($_value, $value, $isAllowExp, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric($value, $isAllowExp, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === $_value) {
-            return false;
+        if ('0' === $valueNumeric) {
+            return Ret::err(
+                [ 'The `value` should be numeric, positive, zero is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ('-' !== $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' !== $valueNumeric[ 0 ]) {
+            return Ret::ok($valueNumeric);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric, positive', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_int(&$r, $value, array $refs = []) : bool
+    public function type_numeric_int($value, array $refs = [])
     {
-        $r = null;
-
         $refSplit =& $refs[ 0 ];
 
         // > btw, 1.1e1 is can be converted to integer 11 too
-        // > we better dont support that numbers here
-        if (! $this->type_numeric($refValueNumeric, $value, false, $refs)) {
-            return false;
+        // > we better don't support that numbers here
+        if (! $this
+            ->type_numeric($value, false, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
         [ , , $frac ] = $refSplit;
 
         if ('' !== $frac) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be numeric int, without fractional part', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $refValueNumeric;
-
-        return true;
+        return Ret::ok($valueNumeric);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_int_non_zero(&$r, $value, array $refs = []) : bool
+    public function type_numeric_int_non_zero($value, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_int($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric_int($value, $refs)
+            ->isOk([ &$valueNumericInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' !== $_value) {
-            $r = $_value;
-
-            return true;
+        if ('0' !== $valueNumericInt) {
+            return Ret::ok($valueNumericInt);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric int, non-zero', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_int_non_negative(&$r, $value, array $refs = []) : bool
+    public function type_numeric_int_non_negative($value, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_int($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric_int($value, $refs)
+            ->isOk([ &$valueNumericInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === $_value) {
-            $r = $_value;
-
-            return true;
+        if ('0' === $valueNumericInt) {
+            return Ret::ok($valueNumericInt);
         }
 
-        if ('-' !== $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' !== $valueNumericInt[ 0 ]) {
+            return Ret::ok($valueNumericInt);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric int, non-negative', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_int_non_positive(&$r, $value, array $refs = []) : bool
+    public function type_numeric_int_non_positive($value, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_int($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric_int($value, $refs)
+            ->isOk([ &$valueNumericInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === $_value) {
-            $r = $_value;
-
-            return true;
+        if ('0' === $valueNumericInt) {
+            return Ret::ok($valueNumericInt);
         }
 
-        if ('-' === $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' === $valueNumericInt[ 0 ]) {
+            return Ret::ok($valueNumericInt);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric int, non-positive', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_int_negative(&$r, $value, array $refs = []) : bool
+    public function type_numeric_int_negative($value, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_int($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric_int($value, $refs)
+            ->isOk([ &$valueNumericInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === $_value) {
-            return false;
+        if ('0' === $valueNumericInt) {
+            return Ret::err(
+                [ 'The `value` should be numeric int, negative, zero is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ('-' === $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' === $valueNumericInt[ 0 ]) {
+            return Ret::ok($valueNumericInt);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric int, negative', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_int_positive(&$r, $value, array $refs = []) : bool
+    public function type_numeric_int_positive($value, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_int($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric_int($value, $refs)
+            ->isOk([ &$valueNumericInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === $_value) {
-            return false;
+        if ('0' === $valueNumericInt) {
+            return Ret::err(
+                [ 'The `value` should be numeric int, positive, zero is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ('-' !== $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' !== $valueNumericInt[ 0 ]) {
+            return Ret::ok($valueNumericInt);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric int, positive', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_int_positive_or_minus_one(&$r, $value, array $refs = []) : bool
+    public function type_numeric_int_positive_or_minus_one($value, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_int($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric_int($value, $refs)
+            ->isOk([ &$valueNumericInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === $_value) {
-            $r = $_value;
-
-            return false;
+        if ('0' === $valueNumericInt) {
+            return Ret::err(
+                [ 'The `value` should be numeric int, positive or minus one, zero is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ('-1' === $_value) {
-            $r = $_value;
-
-            return true;
+        if ('-1' === $valueNumericInt) {
+            return Ret::ok($valueNumericInt);
         }
 
-        if ('-' !== $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' !== $valueNumericInt[ 0 ]) {
+            return Ret::ok($valueNumericInt);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric int, positive or minus one', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_int_non_negative_or_minus_one(&$r, $value, array $refs = []) : bool
+    public function type_numeric_int_non_negative_or_minus_one($value, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_int($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric_int($value, $refs)
+            ->isOk([ &$valueNumericInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('-1' === $_value) {
-            $r = $_value;
-
-            return true;
+        if ('-1' === $valueNumericInt) {
+            return Ret::ok($valueNumericInt);
         }
 
-        if ('0' === $_value) {
-            $r = $_value;
-
-            return true;
+        if ('0' === $valueNumericInt) {
+            return Ret::ok($valueNumericInt);
         }
 
-        if ('-' !== $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' !== $valueNumericInt[ 0 ]) {
+            return Ret::ok($valueNumericInt);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric int, non negative or minus one', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_float(&$r, $value, array $refs = []) : bool
+    public function type_numeric_float($value, array $refs = [])
     {
-        $r = null;
-
         $withSplit = array_key_exists(0, $refs);
         $refSplit =& $refs[ 0 ];
 
         // > btw, 1.1e-1 is can be converted to float 0.11 too
-        // > we better dont support that numbers here
-        if (! $this->type_numeric($_value, $value, false, $refs)) {
-            return false;
+        // > we better don't support that numbers here
+        if (! $this
+            ->type_numeric($value, false, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
         [ $sign, $int, $frac ] = $refSplit;
@@ -772,159 +797,168 @@ class NumModule
         if ('' === $frac) {
             $frac = '.0';
 
-            $_value = "{$sign}{$int}{$frac}";
+            $valueNumeric = "{$sign}{$int}{$frac}";
 
             if ($withSplit) {
                 $refSplit[ 3 ] = $frac;
             }
         }
 
-        if ('0' === $_value) {
-            $r = '0.0';
-
-            return true;
+        if ('0' === $valueNumeric) {
+            return Ret::ok('0.0');
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueNumeric);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_float_non_zero(&$r, $value, array $refs = []) : bool
+    public function type_numeric_float_non_zero($value, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_float($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric($value, false, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0.0' !== $_value) {
-            $r = $_value;
-
-            return true;
+        if ('0.0' !== $valueNumeric) {
+            return Ret::ok($valueNumeric);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric float, non zero', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_float_non_negative(&$r, $value, array $refs = []) : bool
+    public function type_numeric_float_non_negative($value, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_float($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric($value, false, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0.0' === $_value) {
-            $r = $_value;
-
-            return true;
+        if ('0.0' === $valueNumeric) {
+            return Ret::ok($valueNumeric);
         }
 
-        if ('-' !== $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' !== $valueNumeric[ 0 ]) {
+            return Ret::ok($valueNumeric);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric float, non negative', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_float_non_positive(&$r, $value, array $refs = []) : bool
+    public function type_numeric_float_non_positive($value, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_float($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric($value, false, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0.0' === $_value) {
-            $r = $_value;
-
-            return true;
+        if ('0.0' === $valueNumeric) {
+            return Ret::ok($valueNumeric);
         }
 
-        if ('-' === $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' === $valueNumeric[ 0 ]) {
+            return Ret::ok($valueNumeric);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric float, non positive', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_float_negative(&$r, $value, array $refs = []) : bool
+    public function type_numeric_float_negative($value, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_float($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric($value, false, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0.0' === $_value) {
-            return false;
+        if ('0.0' === $valueNumeric) {
+            return Ret::err(
+                [ 'The `value` should be numeric float, negative, zero is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ('-' === $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' === $valueNumeric[ 0 ]) {
+            return Ret::ok($valueNumeric);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric float, negative', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_float_positive(&$r, $value, array $refs = []) : bool
+    public function type_numeric_float_positive($value, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_float($_value, $value, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric($value, false, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0.0' === $_value) {
-            return false;
+        if ('0.0' === $valueNumeric) {
+            return Ret::err(
+                [ 'The `value` should be numeric float, positive, zero is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ('-' !== $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' !== $valueNumeric[ 0 ]) {
+            return Ret::ok($valueNumeric);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric float, positive', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
      * 1.5 => '1.50'
      *
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_trimpad(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
+    public function type_numeric_trimpad($value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = [])
     {
-        $r = null;
-
         $withSplit = array_key_exists(0, $refs);
         $refSplit =& $refs[ 0 ];
 
-        if (! $this->type_numeric($_value, $value, true, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric($value, false, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
         [ $sign, $int, $frac, $exp ] = $refSplit;
@@ -942,136 +976,146 @@ class NumModule
         if ($fracDigitsNew !== $fracDigits) {
             $fracNew = ('' === $fracDigitsNew) ? '' : ".{$fracDigitsNew}";
 
-            $_value = "{$sign}{$int}{$fracNew}{$exp}";
+            $valueNumeric = "{$sign}{$int}{$fracNew}{$exp}";
 
             if ($withSplit) {
                 $refSplit[ 3 ] = $fracNew;
             }
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueNumeric);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_trimpad_non_zero(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
+    public function type_numeric_trimpad_non_zero($value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_trimpad($_value, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric_trimpad($value, $lenTrim, $lenPad, $stringPad, $refs)
+            ->isOk([ &$valueNumericTrimpad, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === rtrim($_value, '0.')) {
-            $r = $_value;
-
-            return true;
+        if ('0' === rtrim($valueNumericTrimpad, '0.')) {
+            return Ret::ok($valueNumericTrimpad);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric trimpad, non zero', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_trimpad_non_negative(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
+    public function type_numeric_trimpad_non_negative($value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_trimpad($_value, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric_trimpad($value, $lenTrim, $lenPad, $stringPad, $refs)
+            ->isOk([ &$valueNumericTrimpad, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === rtrim($_value, '0.')) {
-            $r = $_value;
-
-            return true;
+        if ('0' === rtrim($valueNumericTrimpad, '0.')) {
+            return Ret::ok($valueNumericTrimpad);
         }
 
-        if ('-' !== $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' !== $valueNumericTrimpad[ 0 ]) {
+            return Ret::ok($valueNumericTrimpad);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric trimpad, non negative', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_trimpad_non_positive(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
+    public function type_numeric_trimpad_non_positive($value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_trimpad($_value, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric_trimpad($value, $lenTrim, $lenPad, $stringPad, $refs)
+            ->isOk([ &$valueNumericTrimpad, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === rtrim($_value, '0.')) {
-            $r = $_value;
-
-            return true;
+        if ('0' === rtrim($valueNumericTrimpad, '0.')) {
+            return Ret::ok($valueNumericTrimpad);
         }
 
-        if ('-' === $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' === $valueNumericTrimpad[ 0 ]) {
+            return Ret::ok($valueNumericTrimpad);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric trimpad, non positive', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_trimpad_negative(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
+    public function type_numeric_trimpad_negative($value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_trimpad($_value, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric_trimpad($value, $lenTrim, $lenPad, $stringPad, $refs)
+            ->isOk([ &$valueNumericTrimpad, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === rtrim($_value, '0.')) {
-            return false;
+        if ('0' === rtrim($valueNumericTrimpad, '0.')) {
+            return Ret::err(
+                [ 'The `value` should be numeric trimpad, negative, zero is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ('-' === $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' === $valueNumericTrimpad[ 0 ]) {
+            return Ret::ok($valueNumericTrimpad);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric trimpad, negative', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_numeric_trimpad_positive(&$r, $value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = []) : bool
+    public function type_numeric_trimpad_positive($value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_numeric_trimpad($_value, $value, $lenTrim, $lenPad, $stringPad, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric_trimpad($value, $lenTrim, $lenPad, $stringPad, $refs)
+            ->isOk([ &$valueNumericTrimpad, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === rtrim($_value, '0.')) {
-            return false;
+        if ('0' === rtrim($valueNumericTrimpad, '0.')) {
+            return Ret::err(
+                [ 'The `value` should be numeric trimpad, positive, zero is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ('-' !== $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' !== $valueNumericTrimpad[ 0 ]) {
+            return Ret::ok($valueNumericTrimpad);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be numeric trimpad, positive', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
@@ -1080,29 +1124,38 @@ class NumModule
      * 1.500 -> (2) -> '1.50'
      * 1.501 -> (2) -> false
      *
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_decimal(&$r, $value, int $scale = 0, array $refs = []) : bool
+    public function type_decimal($value, int $scale = 0, array $refs = [])
     {
-        $r = null;
-
         if ($scale < 0) {
-            return false;
+            return Ret::err(
+                [ 'The `scale` should be positive', $scale ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $withSplit = array_key_exists(0, $refs);
         $refSplit =& $refs[ 0 ];
 
-        if (! $this->type_numeric($_value, $value, false, $refs)) {
-            return false;
+        if (! $this
+            ->type_numeric($value, false, $refs)
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
         [ $sign, $int, $frac ] = $refSplit;
 
-        $valueScale = ('' === $frac) ? 0 : (strlen($frac) - 1);
+        $valueScale = ('' === $frac)
+            ? 0
+            : (strlen($frac) - 1);
 
         if ($valueScale > $scale) {
-            return false;
+            return Ret::err(
+                [ 'The `value` scale should be less than limited scale', $scale ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if ($valueScale < $scale) {
@@ -1112,186 +1165,191 @@ class NumModule
 
             $frac = str_pad($frac, $scale + 1, '0', STR_PAD_RIGHT);
 
-            $_value = "{$sign}{$int}{$frac}";
+            $valueNumeric = "{$sign}{$int}{$frac}";
 
             if ($withSplit) {
                 $refSplit[ 3 ] = $frac;
             }
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueNumeric);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_decimal_non_zero(&$r, $value, int $scale = 0, array $refs = []) : bool
+    public function type_decimal_non_zero($value, int $scale = 0, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_decimal($_value, $value, $scale, $refs)) {
-            return false;
+        if (! $this
+            ->type_decimal($value, $scale, $refs)
+            ->isOk([ &$valueDecimal, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === rtrim($_value, '0.')) {
-            $r = $_value;
-
-            return true;
+        if ('0' === rtrim($valueDecimal, '0.')) {
+            return Ret::ok($valueDecimal);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be decimal, non zero', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_decimal_non_negative(&$r, $value, int $scale = 0, array $refs = []) : bool
+    public function type_decimal_non_negative($value, int $scale = 0, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_decimal($_value, $value, $scale, $refs)) {
-            return false;
+        if (! $this
+            ->type_decimal($value, $scale, $refs)
+            ->isOk([ &$valueDecimal, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === rtrim($_value, '0.')) {
-            $r = $_value;
-
-            return true;
+        if ('0' === rtrim($valueDecimal, '0.')) {
+            return Ret::ok($valueDecimal);
         }
 
-        if ('-' !== $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' !== $valueDecimal[ 0 ]) {
+            return Ret::ok($valueDecimal);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be decimal, non negative', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_decimal_non_positive(&$r, $value, int $scale = 0, array $refs = []) : bool
+    public function type_decimal_non_positive($value, int $scale = 0, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_decimal($_value, $value, $scale, $refs)) {
-            return false;
+        if (! $this
+            ->type_decimal($value, $scale, $refs)
+            ->isOk([ &$valueDecimal, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === rtrim($_value, '0.')) {
-            $r = $_value;
-
-            return true;
+        if ('0' === rtrim($valueDecimal, '0.')) {
+            return Ret::ok($valueDecimal);
         }
 
-        if ('-' === $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' === $valueDecimal[ 0 ]) {
+            return Ret::ok($valueDecimal);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be decimal, non positive', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_decimal_negative(&$r, $value, int $scale = 0, array $refs = []) : bool
+    public function type_decimal_negative($value, int $scale = 0, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_decimal($_value, $value, $scale, $refs)) {
-            return false;
+        if (! $this
+            ->type_decimal($value, $scale, $refs)
+            ->isOk([ &$valueDecimal, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === rtrim($_value, '0.')) {
-            return false;
+        if ('0' === rtrim($valueDecimal, '0.')) {
+            return Ret::err(
+                [ 'The `value` should be decimal, negative, zero is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ('-' === $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' === $valueDecimal[ 0 ]) {
+            return Ret::ok($valueDecimal);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be decimal, negative', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<string>
      */
-    public function type_decimal_positive(&$r, $value, int $scale = 0, array $refs = []) : bool
+    public function type_decimal_positive($value, int $scale = 0, array $refs = [])
     {
-        $r = null;
-
-        if (! $this->type_decimal($_value, $value, $scale, $refs)) {
-            return false;
+        if (! $this
+            ->type_decimal($value, $scale, $refs)
+            ->isOk([ &$valueDecimal, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ('0' === rtrim($_value, '0.')) {
-            return false;
+        if ('0' === rtrim($valueDecimal, '0.')) {
+            return Ret::err(
+                [ 'The `value` should be decimal, positive, zero is not', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ('-' !== $_value[ 0 ]) {
-            $r = $_value;
-
-            return true;
+        if ('-' !== $valueDecimal[ 0 ]) {
+            return Ret::ok($valueDecimal);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be decimal, positive', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
     /**
-     * @param int|float|null $r
+     * @return Ret<int|float>
      */
-    public function type_num(&$r, $value) : bool
+    public function type_num($value)
     {
-        $r = null;
-
         if (is_int($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         if (is_float($value)) {
             if (! is_finite($value)) {
                 // > NAN, INF, -INF is float, but should not be parsed
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be num, non finite is not', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             if (0 == $value) {
                 // > -0.0 to 0.0
-                $r = 0.0;
-
-                return true;
+                return Ret::ok(0.0);
             }
 
             if (abs($value) >= _NUM_PHP_FLOAT_MAX_FLOAT_DIG) {
-                $r = $value > 0
-                    ? _NUM_PHP_FLOAT_MAX_FLOAT_DIG
-                    : -_NUM_PHP_FLOAT_MAX_FLOAT_DIG;
-
-                return true;
+                return Ret::ok(
+                    ($value > 0)
+                        ? _NUM_PHP_FLOAT_MAX_FLOAT_DIG
+                        : -_NUM_PHP_FLOAT_MAX_FLOAT_DIG
+                );
             }
 
-            // > практическая польза нулевая, но для проверки дополнительный вызов и куча работы со строками
+            // // > практическая польза нулевая, но для проверки дополнительный вызов и куча работы со строками
             // $valueFloatMin = $this->castNumericToFloatMin($valueAbs);
             // if (false !== $valueFloatMin) {
-            //     $r = $value > 0
-            //         ? _NUM_PHP_FLOAT_MIN_FLOAT_DIG
-            //         : -_NUM_PHP_FLOAT_MIN_FLOAT_DIG;
-            //
-            //     return true;
+            //     return Ret::ok(
+            //         $value > 0
+            //             ? _NUM_PHP_FLOAT_MIN_FLOAT_DIG
+            //             : -_NUM_PHP_FLOAT_MIN_FLOAT_DIG
+            //     );
             // }
 
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         if (false
@@ -1303,7 +1361,7 @@ class NumModule
             // || (is_float($value) && (! is_finite($value)))
             //
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->nil($var, $value))
+            || (Nil::is($value))
         ) {
             // > NULL is not num
             // > EMPTY STRING is not num
@@ -1311,137 +1369,149 @@ class NumModule
             // > ARRAY is not num
             // > RESOURCE is not num
             // > NIL is not num
-
-            return false;
+            return Ret::err(
+                [ 'The `value` should be num', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if (! $this->type_numeric($valueNumeric, $value, true, [ &$split ])) {
-            return false;
+        if (! $this
+            ->type_numeric($value, true, [ &$split ])
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
         $valueNum = $this->castNumericToNum($valueNumeric, ...$split);
 
         if (false !== $valueNum) {
-            $r = $valueNum;
-
-            return true;
+            return Ret::ok($valueNum);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be num', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param int|float|null $r
+     * @return Ret<int|float>
      */
-    public function type_num_non_zero(&$r, $value) : bool
+    public function type_num_non_zero($value)
     {
-        $r = null;
-
-        if (! $this->type_num($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_num($value)
+            ->isOk([ &$valueNum, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value == 0) {
-            return false;
+        if (0 == $valueNum) {
+            return Ret::err(
+                [ 'The `value` should be num, non zero', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueNum);
     }
 
     /**
-     * @param int|float|null $r
+     * @return Ret<int|float>
      */
-    public function type_num_non_negative(&$r, $value) : bool
+    public function type_num_non_negative($value)
     {
-        $r = null;
-
-        if (! $this->type_num($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_num($value)
+            ->isOk([ &$valueNum, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value < 0) {
-            return false;
+        if ($valueNum < 0) {
+            return Ret::err(
+                [ 'The `value` should be num, non negative', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueNum);
     }
 
     /**
-     * @param int|float|null $r
+     * @return Ret<int|float>
      */
-    public function type_num_non_positive(&$r, $value) : bool
+    public function type_num_non_positive($value)
     {
-        $r = null;
-
-        if (! $this->type_num($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_num($value)
+            ->isOk([ &$valueNum, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value > 0) {
-            return false;
+        if ($valueNum > 0) {
+            return Ret::err(
+                [ 'The `value` should be num, non positive', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueNum);
     }
 
     /**
-     * @param int|float|null $r
+     * @return Ret<int|float>
      */
-    public function type_num_negative(&$r, $value) : bool
+    public function type_num_negative($value)
     {
-        $r = null;
-
-        if (! $this->type_num($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_num($value)
+            ->isOk([ &$valueNum, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value >= 0) {
-            return false;
+        if ($valueNum >= 0) {
+            return Ret::err(
+                [ 'The `value` should be num, negative', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueNum);
     }
 
     /**
-     * @param int|float|null $r
+     * @return Ret<int|float>
      */
-    public function type_num_positive(&$r, $value) : bool
+    public function type_num_positive($value)
     {
-        $r = null;
-
-        if (! $this->type_num($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_num($value)
+            ->isOk([ &$valueNum, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value <= 0) {
-            return false;
+        if ($valueNum <= 0) {
+            return Ret::err(
+                [ 'The `value` should be num, positive', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueNum);
     }
 
 
     /**
-     * @param int|null $r
+     * @return Ret<int>
      */
-    public function type_int(&$r, $value) : bool
+    public function type_int($value)
     {
-        $r = null;
-
         if (is_int($value)) {
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         if (false
@@ -1451,219 +1521,233 @@ class NumModule
             || (is_array($value))
             || (is_float($value) && ! is_finite($value))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->nil($var, $value))
+            || (Nil::is($value))
         ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be int', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if (! $this->type_numeric($valueNumeric, $value, true, [ &$split ])) {
-            return false;
+        if (! $this
+            ->type_numeric($value, true, [ &$split ])
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
         $valueInt = $this->castNumericToInt($valueNumeric, ...$split);
 
         if (false !== $valueInt) {
-            $r = $valueInt;
-
-            return true;
+            return Ret::ok($valueInt);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be int', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param int|null $r
+     * @return Ret<int>
      */
-    public function type_int_non_zero(&$r, $value) : bool
+    public function type_int_non_zero($value)
     {
-        $r = null;
-
-        if (! $this->type_int($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_int($value)
+            ->isOk([ &$valueInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value === 0) {
-            return false;
+        if (0 === $valueInt) {
+            return Ret::err(
+                [ 'The `value` should be int, non-zero', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueInt);
     }
 
     /**
-     * @param int|null $r
+     * @return Ret<int>
      */
-    public function type_int_non_negative(&$r, $value) : bool
+    public function type_int_non_negative($value)
     {
-        $r = null;
-
-        if (! $this->type_int($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_int($value)
+            ->isOk([ &$valueInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value < 0) {
-            return false;
+        if ($valueInt < 0) {
+            return Ret::err(
+                [ 'The `value` should be int, non negative', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueInt);
     }
 
     /**
-     * @param int|null $r
+     * @return Ret<int>
      */
-    public function type_int_non_positive(&$r, $value) : bool
+    public function type_int_non_positive($value)
     {
-        $r = null;
-
-        if (! $this->type_int($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_int($value)
+            ->isOk([ &$valueInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value > 0) {
-            return false;
+        if ($valueInt > 0) {
+            return Ret::err(
+                [ 'The `value` should be int, non positive', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueInt);
     }
 
     /**
-     * @param int|null $r
+     * @return Ret<int>
      */
-    public function type_int_negative(&$r, $value) : bool
+    public function type_int_negative($value)
     {
-        $r = null;
-
-        if (! $this->type_int($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_int($value)
+            ->isOk([ &$valueInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value >= 0) {
-            return false;
+        if ($valueInt >= 0) {
+            return Ret::err(
+                [ 'The `value` should be int, negative', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueInt);
     }
 
     /**
-     * @param int|null $r
+     * @return Ret<int>
      */
-    public function type_int_positive(&$r, $value) : bool
+    public function type_int_positive($value)
     {
-        $r = false;
-
-        if (! $this->type_int($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_int($value)
+            ->isOk([ &$valueInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value <= 0) {
-            return false;
+        if ($valueInt <= 0) {
+            return Ret::err(
+                [ 'The `value` should be int, positive', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueInt);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<int>
      */
-    public function type_int_positive_or_minus_one(&$r, $value) : bool
+    public function type_int_positive_or_minus_one($value)
     {
-        $r = null;
-
-        if (! $this->type_int($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_int($value)
+            ->isOk([ &$valueInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if (-1 === $_value) {
-            $r = $_value;
-
-            return true;
+        if (-1 === $valueInt) {
+            return Ret::ok($valueInt);
         }
 
-        if ($_value <= 0) {
-            return false;
+        if ($valueInt <= 0) {
+            return Ret::err(
+                [ 'The `value` should be int, positive or minus one', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueInt);
     }
 
     /**
-     * @param string|null $r
+     * @return Ret<int>
      */
-    public function type_int_non_negative_or_minus_one(&$r, $value) : bool
+    public function type_int_non_negative_or_minus_one($value)
     {
-        $r = null;
-
-        if (! $this->type_int($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_int($value)
+            ->isOk([ &$valueInt, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value < -1) {
-            return false;
+        if ($valueInt < -1) {
+            return Ret::err(
+                [ 'The `value` should be int, negative or minus one', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueInt);
     }
 
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_float(&$r, $value) : bool
+    public function type_float($value)
     {
-        $r = null;
-
         if (is_int($value)) {
-            $r = (float) $value;
-
-            return true;
+            return Ret::ok((float) $value);
         }
 
         if (is_float($value)) {
             if (! is_finite($value)) {
                 // > NAN, INF, -INF is float, but should not be parsed
-                return false;
+                return Ret::err(
+                    [ 'The `value` should be float, non finite is not', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             if (-0.0 === $value) {
-                $r = 0.0;
-
-                return true;
+                return Ret::ok(0.0);
             }
 
             if (abs($value) >= _NUM_PHP_FLOAT_MAX_FLOAT_DIG) {
-                $r = $value > 0
-                    ? _NUM_PHP_FLOAT_MAX_FLOAT_DIG
-                    : -_NUM_PHP_FLOAT_MAX_FLOAT_DIG;
-
-                return true;
+                return Ret::ok(
+                    ($value > 0)
+                        ? _NUM_PHP_FLOAT_MAX_FLOAT_DIG
+                        : -_NUM_PHP_FLOAT_MAX_FLOAT_DIG
+                );
             }
 
-            // > практическая польза нулевая, но для проверки дополнительный вызов и куча работы со строками
+            // // > практическая польза нулевая, но для проверки дополнительный вызов и куча работы со строками
             // $valueFloatMin = $this->castNumericToFloatMin($valueAbs);
             // if (false !== $valueFloatMin) {
-            //     $r = $value > 0
-            //         ? _NUM_PHP_FLOAT_MIN_FLOAT_DIG
-            //         : -_NUM_PHP_FLOAT_MIN_FLOAT_DIG;
-            //
-            //     return true;
+            //     return Ret::ok(
+            //         ($value > 0)
+            //             ? _NUM_PHP_FLOAT_MIN_FLOAT_DIG
+            //             : -_NUM_PHP_FLOAT_MIN_FLOAT_DIG
+            //     );
             // }
 
-            $r = $value;
-
-            return true;
+            return Ret::ok($value);
         }
 
         if (false
@@ -1673,7 +1757,7 @@ class NumModule
             || (is_array($value))
             // || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
-            || (Lib::type()->nil($var, $value))
+            || (Nil::is($value))
         ) {
             // > NULL is not float
             // > EMPTY STRING is not float
@@ -1681,123 +1765,139 @@ class NumModule
             // > ARRAY is not float
             // > RESOURCE is not float
             // > NIL is not float
-
-            return false;
+            return Ret::err(
+                [ 'The `value` should be float', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if (! $this->type_numeric($valueNumeric, $value, true, [ &$split ])) {
-            return false;
+        if (! $this
+            ->type_numeric($value, true, [ &$split ])
+            ->isOk([ &$valueNumeric, &$ret ])
+        ) {
+            return $ret;
         }
 
         $valueFloat = $this->castNumericToFloat($valueNumeric, ...$split);
 
         if (false !== $valueFloat) {
-            $r = $valueFloat;
-
-            return true;
+            return Ret::ok($valueFloat);
         }
 
-        return false;
+        return Ret::err(
+            [ 'The `value` should be float', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_float_non_zero(&$r, $value) : bool
+    public function type_float_non_zero($value)
     {
-        $r = null;
-
-        if (! $this->type_float($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_float($value)
+            ->isOk([ &$valueFloat, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value == 0) {
-            return false;
+        if (0 == $valueFloat) {
+            return Ret::err(
+                [ 'The `value` should be float, non zero', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueFloat);
     }
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_float_non_negative(&$r, $value) : bool
+    public function type_float_non_negative($value)
     {
-        $r = null;
-
-        if (! $this->type_float($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_float($value)
+            ->isOk([ &$valueFloat, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value < 0) {
-            return false;
+        if ($valueFloat < 0) {
+            return Ret::err(
+                [ 'The `value` should be float, non negative', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueFloat);
     }
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_float_non_positive(&$r, $value) : bool
+    public function type_float_non_positive($value)
     {
-        $r = null;
-
-        if (! $this->type_float($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_float($value)
+            ->isOk([ &$valueFloat, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value > 0) {
-            return false;
+        if ($valueFloat > 0) {
+            return Ret::err(
+                [ 'The `value` should be float, non-positive', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueFloat);
     }
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_float_negative(&$r, $value) : bool
+    public function type_float_negative($value)
     {
-        $r = null;
-
-        if (! $this->type_float($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_float($value)
+            ->isOk([ &$valueFloat, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value >= 0) {
-            return false;
+        if ($valueFloat >= 0) {
+            return Ret::err(
+                [ 'The `value` should be float, negative', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueFloat);
     }
 
     /**
-     * @param float|null $r
+     * @return Ret<float>
      */
-    public function type_float_positive(&$r, $value) : bool
+    public function type_float_positive($value)
     {
-        $r = null;
-
-        if (! $this->type_float($_value, $value)) {
-            return false;
+        if (! $this
+            ->type_float($value)
+            ->isOk([ &$valueFloat, &$ret ])
+        ) {
+            return $ret;
         }
 
-        if ($_value <= 0) {
-            return false;
+        if ($valueFloat <= 0) {
+            return Ret::err(
+                [ 'The `value` should be float, positive', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        $r = $_value;
-
-        return true;
+        return Ret::ok($valueFloat);
     }
 
 
@@ -1825,17 +1925,13 @@ class NumModule
             );
         }
 
-        if (! $this->type_number($refNumber, $number, false)) {
-            throw new LogicException(
-                [ 'The `num` should be a valid numeric without exponent', $number ]
-            );
-        }
+        $numberValid = $this->type_number($number, false)->orThrow();
 
-        if ($refNumber->isZero()) {
+        if ($numberValid->isZero()) {
             return 0.0;
         }
 
-        $isNegative = $refNumber->isNegative();
+        $isNegative = $numberValid->isNegative();
 
         $hasFlagsNonNegative = (null !== $flags);
         $hasFlagsNegative = (null !== $flagsNegative);
@@ -1921,9 +2017,9 @@ class NumModule
             ? ((int) pow(10, $precision))
             : 1;
 
-        $scaledAbs = $refNumber->getValueAbsolute() * $factor;
+        $scaledAbs = $numberValid->getValueAbsolute() * $factor;
 
-        $this->type_number($scaledAbsNumber, $scaledAbs, false);
+        $scaledAbsNumber = $this->type_number($scaledAbs, false)->orThrow();
 
         $scaledAbsInt = intval($scaledAbsNumber->getValueAbsoluteInt());
         $scaledAbsFrac = $scaledAbsNumber->getFrac();
@@ -2055,17 +2151,13 @@ class NumModule
             );
         }
 
-        if (! $this->type_number($refNumber, $number, false)) {
-            throw new LogicException(
-                [ 'The `num` should be a valid numeric without exponent', $number ]
-            );
-        }
+        $numberValid = $this->type_number($number, false)->orThrow();
 
-        if ($refNumber->isZero()) {
+        if ($numberValid->isZero()) {
             return 0.0;
         }
 
-        $isNegative = $refNumber->isNegative();
+        $isNegative = $numberValid->isNegative();
 
         $hasFlagsNonNegative = (null !== $flags);
         $hasFlagsNegative = (null !== $flagsNegative);
@@ -2151,9 +2243,9 @@ class NumModule
             ? ((int) pow(10, $precision))
             : 1;
 
-        $scaledAbs = $refNumber->getValueAbsolute() * $factor;
+        $scaledAbs = $numberValid->getValueAbsolute() * $factor;
 
-        $this->type_number($scaledAbsNumber, $scaledAbs, false);
+        $scaledAbsNumber = $this->type_number($scaledAbs, false)->orThrow();
 
         $scaledAbsInt = intval($scaledAbsNumber->getValueAbsoluteInt());
         $scaledAbsFrac = $scaledAbsNumber->getFrac();

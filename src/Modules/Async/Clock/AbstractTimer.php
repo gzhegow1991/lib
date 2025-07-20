@@ -5,12 +5,10 @@ namespace Gzhegow\Lib\Modules\Async\Clock;
 
 abstract class AbstractTimer
 {
-    // // > uncomment if you set Clock::$debug = true
-    // /**
-    //  * @var array
-    //  */
-    // public $debug;
-
+    /**
+     * @var array
+     */
+    public $debugInfo;
 
     /**
      * @var callable

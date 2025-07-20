@@ -263,8 +263,10 @@ class LoopManager implements LoopManagerInterface
      */
     public function registerLoop()
     {
+        $theEntrypoint = Lib::$entrypoint;
+
         if (! $this->isLoopRegistered) {
-            Lib::entrypoint()->registerShutdownFunction([ $this, 'runLoop' ]);
+            $theEntrypoint->registerShutdownFunction([ $this, 'runLoop' ]);
 
             $this->isLoopRegistered = true;
         }

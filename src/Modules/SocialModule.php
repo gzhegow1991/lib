@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules;
 
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\Runtime\ComposerException;
 use Gzhegow\Lib\Modules\Social\EmailParser\DefaultEmailParser;
 use Gzhegow\Lib\Modules\Social\EmailParser\EmailParserInterface;
@@ -60,15 +61,16 @@ class SocialModule
 
 
     /**
-     * @param string|null $r
+     * @param array{ 0?: string, 1?: string } $refs
+     *
+     * @return Ret<string>
      */
     public function type_email(
-        &$r, $value, ?array $filters = null,
+        $value,
+        ?array $filters = null,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $withEmailDomain = array_key_exists(0, $refs);
         if ($withEmailDomain) {
             $refEmailDomain =& $refs[ 0 ];
@@ -100,27 +102,25 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid email, that passes filter checks', $value, $filters ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        unset($refEmailDomain);
-        unset($refEmailName);
-
-        $r = $email;
-
-        return true;
+        return Ret::ok($email);
     }
 
     /**
-     * @param string|null $r
+     * @param array{ 0?: string, 1?: string } $refs
+     *
+     * @return Ret<string>
      */
     public function type_email_fake(
-        &$r, $value,
+        $value,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $withEmailDomain = array_key_exists(0, $refs);
         if ($withEmailDomain) {
             $refEmailDomain =& $refs[ 0 ];
@@ -152,32 +152,31 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid email (fake), that passes filter checks', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        unset($refEmailDomain);
-        unset($refEmailName);
-
-        $r = $email;
-
-        return true;
+        return Ret::ok($email);
     }
 
     /**
-     * @param string|null $r
+     * @param array{ 0?: string, 1?: string } $refs
+     *
+     * @return Ret<string>
      */
     public function type_email_non_fake(
-        &$r, $value, ?array $filters = null,
+        $value,
+        ?array $filters = null,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $withEmailDomain = array_key_exists(0, $refs);
         if ($withEmailDomain) {
             $refEmailDomain =& $refs[ 0 ];
         }
-        $refEmailName = null;
+        $refEmailDomain = null;
 
         $withEmailName = array_key_exists(1, $refs);
         if ($withEmailName) {
@@ -204,28 +203,26 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid email, that passes filter checks', $value, $filters ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        unset($refEmailDomain);
-        unset($refEmailName);
-
-        $r = $email;
-
-        return true;
+        return Ret::ok($email);
     }
 
 
     /**
-     * @param string|null $r
+     * @param array{ 0?: string, 1?: string, 2?: string } $refs
+     *
+     * @return Ret<string>
      */
     public function type_phone(
-        &$r, $value,
+        $value,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $withTel = array_key_exists(0, $refs);
         if ($withTel) {
             $refTel =& $refs[ 0 ];
@@ -256,28 +253,25 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid phone', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        unset($refTel);
-        unset($refTelDigits);
-        unset($refTelPlus);
-
-        $r = $phone;
-
-        return true;
+        return Ret::ok($phone);
     }
 
     /**
-     * @param string|null $r
+     * @param array{ 0?: string, 1?: string, 2?: string } $refs
+     *
+     * @return Ret<string>
      */
     public function type_phone_fake(
-        &$r, $value,
+        $value,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $withTel = array_key_exists(0, $refs);
         if ($withTel) {
             $refTel =& $refs[ 0 ];
@@ -305,28 +299,25 @@ class SocialModule
             );
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid phone (fake)', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        unset($refTel);
-        unset($refTelDigits);
-        unset($refTelPlus);
-
-        $r = $phone;
-
-        return true;
+        return Ret::ok($phone);
     }
 
     /**
-     * @param string|null $r
+     * @param array{ 0?: string, 1?: string, 2?: string } $refs
+     *
+     * @return Ret<string>
      */
     public function type_phone_non_fake(
-        &$r, $value,
+        $value,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $withTel = array_key_exists(0, $refs);
         if ($withTel) {
             $refTel =& $refs[ 0 ];
@@ -357,28 +348,26 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid phone (non-fake)', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        unset($refTel);
-        unset($refTelDigits);
-        unset($refTelPlus);
-
-        $r = $phone;
-
-        return true;
+        return Ret::ok($phone);
     }
 
     /**
-     * @param string|null $r
+     * @param array{ 0?: string, 1?: string, 2?: string, 3?: string } $refs
+     *
+     * @return Ret<string>
      */
     public function type_phone_real(
-        &$r, $value, ?string $region = '',
+        $value,
+        ?string $region = '',
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $withRegionDetected = array_key_exists(0, $refs);
         if ($withRegionDetected) {
             $refRegionDetected =& $refs[ 0 ];
@@ -416,30 +405,26 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid email, that match passed region', $value, $region ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        unset($refRegionDetected);
-        unset($refTel);
-        unset($refTelDigits);
-        unset($refTelPlus);
-
-        $r = $phone;
-
-        return true;
+        return Ret::ok($phone);
     }
 
 
     /**
-     * @param string|null $r
+     * @param array{ 0?: string, 1?: string } $refs
+     *
+     * @return Ret<string>
      */
     public function type_tel(
-        &$r, $value,
+        $value,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $withTelDigits = array_key_exists(0, $refs);
         if ($withTelDigits) {
             $refTelDigits =& $refs[ 0 ];
@@ -464,27 +449,25 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid tel', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        unset($refTelDigits);
-        unset($refTelPlus);
-
-        $r = $tel;
-
-        return true;
+        return Ret::ok($tel);
     }
 
     /**
-     * @param string|null $r
+     * @param array{ 0?: string, 1?: string } $refs
+     *
+     * @return Ret<string>
      */
     public function type_tel_fake(
-        &$r, $value,
+        $value,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $withTelDigits = array_key_exists(0, $refs);
         if ($withTelDigits) {
             $refTelDigits =& $refs[ 0 ];
@@ -509,27 +492,25 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid tel (fake)', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        unset($refTelDigits);
-        unset($refTelPlus);
-
-        $r = $tel;
-
-        return true;
+        return Ret::ok($tel);
     }
 
     /**
-     * @param string|null $r
+     * @param array{ 0?: string, 1?: string, 2?: string } $refs
+     *
+     * @return Ret<string>
      */
     public function type_tel_non_fake(
-        &$r, $value,
+        $value,
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $withTelDigits = array_key_exists(0, $refs);
         if ($withTelDigits) {
             $refTelDigits =& $refs[ 0 ];
@@ -554,27 +535,26 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid tel (non-fake)', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        unset($refTelDigits);
-        unset($refTelPlus);
-
-        $r = $tel;
-
-        return true;
+        return Ret::ok($tel);
     }
 
     /**
-     * @param string|null $r
+     * @param array{ 0?: string, 1?: string, 2?: string } $refs
+     *
+     * @return Ret<string>
      */
     public function type_tel_real(
-        &$r, $value, ?string $region = '',
+        $value,
+        ?string $region = '',
         array $refs = []
-    ) : bool
+    )
     {
-        $r = null;
-
         $withRegionDetected = array_key_exists(0, $refs);
         if ($withRegionDetected) {
             $refRegionDetected =& $refs[ 0 ];
@@ -606,15 +586,12 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return false;
+            return Ret::err(
+                [ 'The `value` should be valid tel, that match passed region', $value, $region ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        unset($refRegionDetected);
-        unset($refTelDigits);
-        unset($refTelPlus);
-
-        $r = $tel;
-
-        return true;
+        return Ret::ok($tel);
     }
 }

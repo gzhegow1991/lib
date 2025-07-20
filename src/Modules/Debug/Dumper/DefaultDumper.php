@@ -1,5 +1,7 @@
 <?php
+
 /**
+ * @noinspection PhpFullyQualifiedNameUsageInspection
  * @noinspection PhpUndefinedClassInspection
  * @noinspection PhpUndefinedNamespaceInspection
  */
@@ -94,7 +96,9 @@ class DefaultDumper implements DumperInterface
 
     public function __construct()
     {
-        $dumperDefault = Lib::php()->is_terminal()
+        $thePhp = Lib::$php;
+
+        $dumperDefault = $thePhp->is_terminal()
             ? 'echo'
             : 'echo_html';
 
@@ -339,6 +343,8 @@ class DefaultDumper implements DumperInterface
 
     public function printPrinter_symfony(...$vars) : string
     {
+        $thePhp = Lib::$php;
+
         $printerOptions = $this->printerOptions[ $this->printer ] ?? [];
 
         $casters = $printerOptions[ 'casters' ] ?? null;
@@ -347,7 +353,7 @@ class DefaultDumper implements DumperInterface
             ? $this->getSymfonyCloner()
             : $this->newSymfonyCloner($casters);
 
-        $dumper = Lib::php()->is_terminal()
+        $dumper = $thePhp->is_terminal()
             ? $this->getSymfonyCliDumper()
             : $this->getSymfonyHtmlDumper();
 
@@ -364,6 +370,8 @@ class DefaultDumper implements DumperInterface
 
     public function printPrinter_var_dump(...$vars) : string
     {
+        $theDebug = Lib::$debug;
+
         $content = '';
 
         foreach ( $vars as $arg ) {
@@ -371,7 +379,7 @@ class DefaultDumper implements DumperInterface
                 $content .= "\n";
             }
 
-            $content .= Lib::debug()->var_dump($arg);
+            $content .= $theDebug->var_dump($arg);
         }
 
         return $content;
@@ -388,6 +396,8 @@ class DefaultDumper implements DumperInterface
 
     public function printPrinter_var_export(...$vars) : string
     {
+        $theDebug = Lib::$debug;
+
         $content = '';
 
         foreach ( $vars as $arg ) {
@@ -395,7 +405,7 @@ class DefaultDumper implements DumperInterface
                 $content .= "\n";
             }
 
-            $content .= Lib::debug()->var_export($arg);
+            $content .= $theDebug->var_export($arg);
         }
 
         return $content;
@@ -441,7 +451,10 @@ class DefaultDumper implements DumperInterface
             }
 
             $content .= json_encode($arg,
-                JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_LINE_TERMINATORS
+                0
+                | JSON_UNESCAPED_UNICODE
+                | JSON_UNESCAPED_SLASHES
+                | JSON_UNESCAPED_LINE_TERMINATORS
             );
         }
 
@@ -524,6 +537,8 @@ class DefaultDumper implements DumperInterface
 
     public function echoDumper_echo_html(...$vars) : void
     {
+        $thePhp = Lib::$php;
+
         $options = $this->dumperOptions;
 
         $throwIfHeadersSent = (bool) ($options[ 'throw_if_headers_sent' ] ?? true);
@@ -533,7 +548,7 @@ class DefaultDumper implements DumperInterface
 
         $htmlContent = nl2br($content);
 
-        $isTerminal = Lib::php()->is_terminal();
+        $isTerminal = $thePhp->is_terminal();
         $isHeadersSent = headers_sent($file, $line);
 
         if (! ($isTerminal || $isHeadersSent)) {
@@ -551,9 +566,11 @@ class DefaultDumper implements DumperInterface
 
     public function echoDumper_resource(...$vars) : void
     {
+        $thePhp = Lib::$php;
+
         $options = $this->dumperOptions;
 
-        $resource = $options[ 'resource' ] ?? Lib::php()->output();
+        $resource = $options[ 'resource' ] ?? $thePhp->output();
 
         $content = $this->printPrinter(...$vars);
         $content .= "\n";
@@ -564,9 +581,11 @@ class DefaultDumper implements DumperInterface
 
     public function echoDumper_resource_html(...$vars) : void
     {
+        $thePhp = Lib::$php;
+
         $options = $this->dumperOptions;
 
-        $resource = $options[ 'resource' ] ?? Lib::php()->output();
+        $resource = $options[ 'resource' ] ?? $thePhp->output();
         $throwIfHeadersSent = (bool) ($options[ 'throw_if_headers_sent' ] ?? true);
 
         $content = $this->printPrinter(...$vars);
@@ -574,7 +593,7 @@ class DefaultDumper implements DumperInterface
 
         $htmlContent = nl2br($content);
 
-        $isTerminal = Lib::php()->is_terminal();
+        $isTerminal = $thePhp->is_terminal();
         $isHeadersSent = headers_sent($file, $line);
 
         if (! ($isTerminal || $isHeadersSent)) {
@@ -593,6 +612,8 @@ class DefaultDumper implements DumperInterface
 
     public function echoDumper_devtools(...$vars) : void
     {
+        $thePhp = Lib::$php;
+
         $options = $this->dumperOptions;
 
         $throwIfHeadersSent = (bool) ($options[ 'throw_if_headers_sent' ] ?? true);
@@ -603,7 +624,7 @@ class DefaultDumper implements DumperInterface
 
         $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . "\n";
 
-        $isTerminal = Lib::php()->is_terminal();
+        $isTerminal = $thePhp->is_terminal();
         $isHeadersSent = headers_sent($file, $line);
 
         if (! ($isTerminal || $isHeadersSent)) {

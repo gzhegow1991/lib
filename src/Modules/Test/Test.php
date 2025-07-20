@@ -79,7 +79,9 @@ class Test
 
     public function __construct()
     {
-        $this->resource = Lib::php()->output();
+        $thePhp = Lib::$php;
+
+        $this->resource = $thePhp->output();
     }
 
 
@@ -138,6 +140,7 @@ class Test
         $refStdout = null;
 
         $this->stdout = $stdout ?? '';
+
         $this->refStdout =& $refStdout;
 
         return $this;
@@ -155,6 +158,7 @@ class Test
         }
 
         $this->stdout = $stdout ?? '';
+
         $this->refStdout =& $refStdout;
 
         return $this;
@@ -170,6 +174,7 @@ class Test
 
         $this->secondsMin = $secondsMin ?? 0.0;
         $this->secondsMax = $secondsMax ?? INF;
+
         $this->refSeconds =& $refSeconds;
 
         return $this;
@@ -183,6 +188,7 @@ class Test
         $refSeconds = null;
 
         $this->secondsMin = $secondsMin ?? 0.0;
+
         $this->refSeconds =& $refSeconds;
 
         return $this;
@@ -196,6 +202,7 @@ class Test
         $refSeconds = null;
 
         $this->secondsMax = $secondsMax ?? INF;
+
         $this->refSeconds =& $refSeconds;
 
         return $this;
@@ -219,6 +226,7 @@ class Test
         }
 
         $this->return = $returnArray;
+
         $this->refReturn =& $refReturn;
 
         return $this;
@@ -231,11 +239,12 @@ class Test
     {
         $refMemoryBytes = null;
 
-        $memoryMaxString = $memoryMax ?? '32M';
+        $theFormat = Lib::$format;
 
-        Lib::format()->bytes_decode($memoryMaxString);
+        $memoryMaxValid = $theFormat->bytes_decode($memoryMax ?? '32M')->orThrow();
 
-        $this->memoryMax = $memoryMax ?? '32M';
+        $this->memoryMax = $memoryMaxValid;
+
         $this->refMemoryBytes =& $refMemoryBytes;
 
         return $this;
@@ -363,6 +372,8 @@ class Test
 
     public function run() : bool
     {
+        $theDebug = Lib::$debug;
+
         [ $fn, $fnArgs ] = $this->getFn();
 
         $h = $this->getResource();
@@ -389,7 +400,7 @@ class Test
         $eArray = [];
 
         if ($this->hasStdout($expectedStdout)) {
-            $isStdoutDiff = Lib::debug()->diff(
+            $isStdoutDiff = $theDebug->diff(
                 trim($this->refStdout),
                 trim($expectedStdout),
                 [ &$diffLines ]
@@ -495,7 +506,7 @@ class Test
             if ($isReturnDiff) {
                 $message = '[ ERROR ] Test ' . __METHOD__ . '() `expectedReturn` failed.';
 
-                Lib::debug()->diff_vars($this->refReturn, $expectedReturn, [ &$diffLines ]);
+                $theDebug->diff_vars($this->refReturn, $expectedReturn, [ &$diffLines ]);
 
                 $diffString = implode("\n", $diffLines);
 

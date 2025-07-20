@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @noinspection PhpFullyQualifiedNameUsageInspection
+ */
+
 namespace Gzhegow\Lib;
 
 use Gzhegow\Lib\Modules\FsModule;
@@ -17,6 +21,7 @@ use Gzhegow\Lib\Modules\HttpModule;
 use Gzhegow\Lib\Modules\TestModule;
 use Gzhegow\Lib\Modules\PregModule;
 use Gzhegow\Lib\Modules\DateModule;
+use Gzhegow\Lib\Modules\TypeModule;
 use Gzhegow\Lib\Modules\DebugModule;
 use Gzhegow\Lib\Modules\CryptModule;
 use Gzhegow\Lib\Modules\AsyncModule;
@@ -25,13 +30,9 @@ use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
 use Gzhegow\Lib\Modules\SocialModule;
-use Gzhegow\Lib\Modules\TypeBoolModule;
 use Gzhegow\Lib\Modules\Func\Pipe\Pipe;
 use Gzhegow\Lib\Modules\ItertoolsModule;
-use Gzhegow\Lib\Modules\TypeThrowModule;
-use Gzhegow\Lib\Modules\ParseNullModule;
 use Gzhegow\Lib\Modules\EntrypointModule;
-use Gzhegow\Lib\Modules\ParseThrowModule;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
@@ -40,54 +41,19 @@ use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 class Lib
 {
     /**
-     * @var ParseNullModule
+     * @var AsyncModule
      */
-    public static $parseNull;
-    /**
-     * @var ParseThrowModule
-     */
-    public static $parseThrow;
+    public static $async;
 
-    public static function parseNull()
+    public static function async()
     {
-        return static::$parseNull = static::$parseNull ?? new ParseNullModule();
+        return static::$async = static::$async ?? new AsyncModule();
     }
 
-    public static function parseThrow()
+    public static function asyncFetchApi()
     {
-        return static::$parseThrow = static::$parseThrow ?? new ParseThrowModule();
+        return Lib::async()->static_fetch_api();
     }
-
-    public static function parse()
-    {
-        return static::$parseNull = static::$parseNull ?? new ParseNullModule();
-    }
-
-
-    /**
-     * @var TypeBoolModule
-     */
-    public static $typeBool;
-    /**
-     * @var TypeThrowModule
-     */
-    public static $typeThrow;
-
-    public static function typeBool()
-    {
-        return static::$typeBool = static::$typeBool ?? new TypeBoolModule();
-    }
-
-    public static function typeThrow()
-    {
-        return static::$typeThrow = static::$typeThrow ?? new TypeThrowModule();
-    }
-
-    public static function type()
-    {
-        return static::$typeBool = static::$typeBool ?? new TypeBoolModule();
-    }
-
 
 
     /**
@@ -160,7 +126,7 @@ class Lib
 
     public static function fs()
     {
-        return static::$fs = static::$fs ?? new FsModule();
+        return static::$fs = static::$fs ?? (new FsModule())->assertExtension();
     }
 
     public static function fsFile()
@@ -217,7 +183,7 @@ class Lib
 
 
     /**
-     * @var StrModule
+     * @var SocialModule
      */
     public static $social;
 
@@ -275,23 +241,13 @@ class Lib
     }
 
     /**
-     * @var AsyncModule
-     */
-    public static $async;
-
-    public static function async()
-    {
-        return static::$async = static::$async ?? new AsyncModule();
-    }
-
-    /**
      * @var BcmathModule
      */
     public static $bcmath;
 
     public static function bcmath()
     {
-        return static::$bcmath = static::$bcmath ?? new BcmathModule();
+        return static::$bcmath = static::$bcmath ?? (new BcmathModule())->assertExtension();
     }
 
     /**
@@ -361,7 +317,7 @@ class Lib
 
     public static function mb()
     {
-        return static::$mb = static::$mb ?? new MbModule();
+        return static::$mb = static::$mb ?? (new MbModule())->assertExtension();
     }
 
     /**
@@ -371,7 +327,7 @@ class Lib
 
     public static function net()
     {
-        return static::$net = static::$net ?? new NetModule();
+        return static::$net = static::$net ?? (new NetModule())->assertExtension();
     }
 
     /**
@@ -422,6 +378,16 @@ class Lib
     public static function test()
     {
         return static::$test = static::$test ?? new TestModule();
+    }
+
+    /**
+     * @var TypeModule
+     */
+    public static $type;
+
+    public static function type()
+    {
+        return static::$type = static::$type ?? new TypeModule();
     }
 
     /**
@@ -674,7 +640,7 @@ class Lib
 
 
     /**
-     * > примитивное глобальное хранилище для импортов-экспортов
+     * > примитивное глобальное хранилище для импортов-экспортов ("сервис-локатор", ОГА)
      */
     public static function &di() : array
     {
@@ -744,6 +710,8 @@ class Lib
      * @param class-string<T>|null $classT
      *
      * @return T|mixed
+     *
+     * @noinspection PhpUnusedParameterInspection
      */
     public static function importKey(string $file, string $key, ?string $classT = null)
     {
@@ -758,7 +726,7 @@ class Lib
         $imports =& static::di();
 
         if (! isset($imports[ $realpath ])) {
-            $imports[ $realpath ] = require_once $realpath;
+            $imports[ $realpath ] = include $realpath;
         }
 
         return $imports[ $realpath ][ $key ];
@@ -783,9 +751,9 @@ class Lib
             throw $throwableOrArg;
         }
 
-        array_unshift($throwableArgs, $throwableOrArg);
+        $thePhp = Lib::$php;
 
-        $thePhp = Lib::php();
+        array_unshift($throwableArgs, $throwableOrArg);
 
         $throwableClass = $thePhp->static_throwable_class();
 
@@ -809,3 +777,36 @@ class Lib
         return require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
     }
 }
+
+
+(function () {
+    // > init
+    //
+    Lib::async();
+    Lib::cli();
+    Lib::debug();
+    Lib::fs();
+    Lib::format();
+    Lib::func();
+    Lib::http();
+    Lib::social();
+    Lib::str();
+    //
+    Lib::arr();
+    Lib::bcmath();
+    Lib::cmp();
+    Lib::crypt();
+    Lib::date();
+    Lib::entrypoint();
+    Lib::escape();
+    Lib::itertools();
+    Lib::mb();
+    Lib::net();
+    Lib::num();
+    Lib::php();
+    Lib::preg();
+    Lib::random();
+    Lib::test();
+    Lib::type();
+    Lib::url();
+})();

@@ -4,7 +4,6 @@ namespace Gzhegow\Lib\Modules\Async\FetchApi;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
@@ -68,55 +67,54 @@ class FilesystemFetchApi implements FetchApiInterface
             );
         }
 
-        $theType = Lib::type();
+        $theType = Lib::$type;
 
-        $theType->realpath($binDirDefault, __DIR__ . '/../../../../bin/php/');
+        $binDirDefault = $theType->realpath(__DIR__ . '/../../../../bin/php/')->orThrow();
         $binDirRealpath = '';
         $binFilename = '';
-        $binFileRealpath = '';
 
-        $theType->realpath($poolDirDefault, __DIR__ . '/../../../../var/run/bin/php/curl-api/');
+        $poolDirDefault = $theType->realpath(__DIR__ . '/../../../../var/run/bin/php/curl-api/')->orThrow();
         $poolDirRealpath = '';
         $poolFilename = '';
 
-        $theType->realpath($queueDirDefault, __DIR__ . '/../../../../var/queue/bin/php/curl-api/task/');
+        $queueDirDefault = $theType->realpath(__DIR__ . '/../../../../var/queue/bin/php/curl-api/task/')->orThrow();
         $queueDirRealpath = '';
         $queueFilename = '';
 
-        $theType->realpath($taskResultDirDefault, __DIR__ . '/../../../../var/tmp/bin/php/curl-api/task-result/');
+        $taskResultDirDefault = $theType->realpath(__DIR__ . '/../../../../var/tmp/bin/php/curl-api/task-result/')->orThrow();
         $taskResultDirRealpath = '';
 
-        if (! $theType->dirpath_realpath($binDirRealpath, $binDir = $config[ 'bin_dir' ] ?? $binDirDefault)) {
+        if (! $theType->dirpath_realpath($binDir = $config[ 'bin_dir' ] ?? $binDirDefault)->isOk([ &$binDirRealpath ])) {
             throw new LogicException(
                 [ 'The `config[bin_dir]` should be an existing directory', $binDir ]
             );
         }
-        if (! $theType->dirpath_realpath($poolDirRealpath, $poolDir = $config[ 'pool_dir' ] ?? $poolDirDefault)) {
+        if (! $theType->dirpath_realpath($poolDir = $config[ 'pool_dir' ] ?? $poolDirDefault)->isOk([ &$poolDirRealpath ])) {
             throw new LogicException(
                 [ 'The `config[pool_dir]` should be an existing directory', $poolDir ]
             );
         }
-        if (! $theType->dirpath_realpath($queueDirRealpath, $queueDir = $config[ 'queue_dir' ] ?? $queueDirDefault)) {
+        if (! $theType->dirpath_realpath($queueDir = $config[ 'queue_dir' ] ?? $queueDirDefault)->isOk([ &$queueDirRealpath ])) {
             throw new LogicException(
                 [ 'The `config[queue_dir]` should be an existing directory', $queueDir ]
             );
         }
-        if (! $theType->dirpath_realpath($taskResultDirRealpath, $taskResultDir = $config[ 'task_result_dir' ] ?? $taskResultDirDefault)) {
+        if (! $theType->dirpath_realpath($taskResultDir = $config[ 'task_result_dir' ] ?? $taskResultDirDefault)->isOk([ &$taskResultDirRealpath ])) {
             throw new LogicException(
                 [ 'The `config[task_result_dir]` should be an existing directory', $taskResultDir ]
             );
         }
-        if (! $theType->filename($binFilename, $binFilenameSrc = $config[ 'bin_filename' ] ?? 'curl-api.php')) {
+        if (! $theType->filename($binFilenameSrc = $config[ 'bin_filename' ] ?? 'curl-api.php')->isOk([ &$binFilename ])) {
             throw new LogicException(
                 [ 'The `config[bin_filename]` should be a valid filename', $binFilenameSrc ]
             );
         }
-        if (! $theType->filename($poolFilename, $poolFilenameSrc = $config[ 'pool_filename' ] ?? 'curl-api.pool')) {
+        if (! $theType->filename($poolFilenameSrc = $config[ 'pool_filename' ] ?? 'curl-api.pool')->isOk([ &$poolFilename ])) {
             throw new LogicException(
                 [ 'The `config[pool_filename]` should be a valid filename', $poolFilenameSrc ]
             );
         }
-        if (! $theType->filename($queueFilename, $queueFilenameSrc = $config[ 'queue_filename' ] ?? 'curl-api.queue')) {
+        if (! $theType->filename($queueFilenameSrc = $config[ 'queue_filename' ] ?? 'curl-api.queue')->isOk([ &$queueFilename ])) {
             throw new LogicException(
                 [ 'The `config[queue_filename]` should be a valid filename', $queueFilenameSrc ]
             );
@@ -131,21 +129,9 @@ class FilesystemFetchApi implements FetchApiInterface
         $poolFilename = basename($poolFilename, '.pool') . '.pool';
         $queueFile = "{$queueDirRealpath}/{$queueFilename}";
 
-        if (! $theType->filepath_realpath($binFileRealpath, $binFile)) {
-            throw new LogicException(
-                [ 'The `binFile` should be an existing file', $binFile ]
-            );
-        }
-        if (! $theType->filepath($poolFile, $poolFile, true)) {
-            throw new LogicException(
-                [ 'The `poolFile` should be a valid filepath', $poolFile ]
-            );
-        }
-        if (! $theType->freepath($queueFile, $queueFile)) {
-            throw new LogicException(
-                [ 'The `queueFile` should be a valid filepath', $queueFile ]
-            );
-        }
+        $binFileRealpath = $theType->filepath_realpath($binFile)->orThrow();
+        $poolFileFilepath = $theType->filepath($poolFile, true)->orThrow();
+        $queueFileFreepath = $theType->freepath($queueFile)->orThrow();
 
         $this->binDirRealpath = $binDirRealpath;
         $this->binFilename = $binFilename;
@@ -153,11 +139,11 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $this->poolDirRealpath = $poolDirRealpath;
         $this->poolFilename = $poolFilename;
-        $this->poolFile = $poolFile;
+        $this->poolFile = $poolFileFilepath;
 
         $this->queueDirRealpath = $queueDirRealpath;
         $this->queueFilename = $queueFilename;
-        $this->queueFile = $queueFile;
+        $this->queueFile = $queueFileFreepath;
 
         $this->taskResultDirRealpath = $taskResultDirRealpath;
     }
@@ -169,36 +155,35 @@ class FilesystemFetchApi implements FetchApiInterface
         ?int $lockWaitTimeoutMs = 0
     ) : bool
     {
-        $theType = Lib::type();
+        $refTaskId = null;
 
-        if (! $theType->url($urlString, $url)) {
-            throw new LogicException(
-                [ 'The `url` should be a valid url', $url ]
-            );
-        }
+        $theFs = Lib::$fs;
+        $theRandom = Lib::$random;
+        $theType = Lib::$type;
 
-        if (! $theType->list($curlOptionsList, $curlOptions)) {
-            throw new LogicException(
-                [ 'The `curlOptions` should be a list of `CURL options`', $curlOptions ]
-            );
-        }
+        $urlString = $theType->url($url)->orThrow();
+        $curlOptionsList = $theType->list($curlOptions)->orThrow();
 
         $queueFile = $this->queueFile;
 
-        $refTaskId = Lib::random()->uuid();
+        $taskId = $theRandom->uuid();
 
         $task = [
-            'id'           => $refTaskId,
-            'url'          => $url,
-            'curl_options' => $curlOptions,
+            'id'           => $taskId,
+            'url'          => $urlString,
+            'curl_options' => $curlOptionsList,
         ];
 
         $serialized = serialize($task);
 
-        $statusPush = Lib::fs()->brpush(
+        $statusPush = $theFs->brpush(
             100000, $lockWaitTimeoutMs,
             $queueFile, $serialized
         );
+
+        if ($statusPush) {
+            $refTaskId = $taskId;
+        }
 
         return $statusPush;
     }
@@ -208,9 +193,13 @@ class FilesystemFetchApi implements FetchApiInterface
         ?int $blockTimeoutMs = 0
     ) : bool
     {
+        $refTask = null;
+
+        $theFs = Lib::$fs;
+
         $queueFile = $this->queueFile;
 
-        $serialized = Lib::fs()->blpop(
+        $serialized = $theFs->blpop(
             100000, $blockTimeoutMs,
             $queueFile, true
         );
@@ -227,7 +216,9 @@ class FilesystemFetchApi implements FetchApiInterface
 
     public function taskClearResults() : void
     {
-        $gen = Lib::fs()->dir_walk_it($this->taskResultDirRealpath);
+        $theFs = Lib::$fs;
+
+        $gen = $theFs->dir_walk_it($this->taskResultDirRealpath);
 
         foreach ( $gen as $spl ) {
             if ($spl->isDir()) {
@@ -245,25 +236,21 @@ class FilesystemFetchApi implements FetchApiInterface
 
     public function taskGetResult(&$refTaskResult, string $taskId) : bool
     {
-        if (! Lib::type()->string_not_empty($taskIdString, $taskId)) {
-            throw new LogicException(
-                [ 'The `taskId` should be a non-empty string', $taskId ]
-            );
-        }
+        $theType = Lib::$type;
+
+        $taskIdStringNotEmpty = $theType->string_not_empty($taskId)->orThrow();
 
         return $this->taskFetchResult(
             $refTaskResult,
-            $taskIdString, false
+            $taskIdStringNotEmpty, false
         );
     }
 
     public function taskFlushResult(&$refTaskResult, string $taskId) : bool
     {
-        if (! Lib::type()->string_not_empty($taskIdString, $taskId)) {
-            throw new LogicException(
-                [ 'The `taskId` should be a non-empty string', $taskId ]
-            );
-        }
+        $theType = Lib::$type;
+
+        $taskIdString = $theType->string_not_empty($taskId)->orThrow();
 
         return $this->taskFetchResult(
             $refTaskResult,
@@ -369,20 +356,12 @@ class FilesystemFetchApi implements FetchApiInterface
 
     public function daemonAddToPool(int $daemonTimeoutMs, ?float $nowMicrotime = null) : bool
     {
-        $theType = Lib::type();
+        $theType = Lib::$type;
 
-        if (! $theType->int_positive($daemonTimeoutMsInt, $daemonTimeoutMs)) {
-            throw new LogicException(
-                [ 'The `timeoutMs` should be a positive integer', $daemonTimeoutMs ]
-            );
-        }
+        $daemonTimeoutMsInt = $theType->int_positive($daemonTimeoutMs)->orThrow();
 
         if ((null !== ($nowMicrotimeFloat = $nowMicrotime))) {
-            if (! $theType->float_non_negative($nowMicrotimeFloat, $nowMicrotime)) {
-                throw new LogicException(
-                    [ 'The `nowMicrotime` should be a non-negative float', $nowMicrotime ]
-                );
-            }
+            $nowMicrotimeFloat = $theType->float_non_negative($nowMicrotime)->orThrow();
         }
 
         $daemonPid = getmypid();
@@ -397,14 +376,10 @@ class FilesystemFetchApi implements FetchApiInterface
 
     public function daemonRemoveFromPool(?float $nowMicrotime = null) : bool
     {
-        $theType = Lib::type();
+        $theType = Lib::$type;
 
         if ((null !== ($nowMicrotimeFloat = $nowMicrotime))) {
-            if (! $theType->float_non_negative($nowMicrotimeFloat, $nowMicrotime)) {
-                throw new LogicException(
-                    [ 'The `nowMicrotime` should be a non-negative float', $nowMicrotime ]
-                );
-            }
+            $nowMicrotimeFloat = $theType->float_non_negative($nowMicrotime)->orThrow();
         }
 
         $daemonPid = getmypid();
@@ -428,19 +403,20 @@ class FilesystemFetchApi implements FetchApiInterface
         $nowMicrotime = null
     ) : bool
     {
+        $theFs = Lib::$fs;
+        $theFsFile = $theFs->fileSafe();
+
         $poolFile = $this->poolFile;
 
-        $f = Lib::fs()->fileSafe();
-
-        $status = $f->call_safe(
+        $status = $theFsFile->call_safe(
             static function () use (
-                $f,
+                $theFsFile,
                 $workerPid, $poolFile,
                 $workerTimeoutMs, $nowMicrotime
             ) {
                 $status = false;
 
-                if ($fhPool = $f->fopen_flock_pooling(
+                if ($fhPool = $theFsFile->fopen_flock_pooling(
                     100000, $workerTimeoutMs,
                     $poolFile, 'c+', LOCK_EX | LOCK_NB
                 )) {
@@ -505,23 +481,24 @@ class FilesystemFetchApi implements FetchApiInterface
         $nowMicrotime = null
     ) : bool
     {
+        $theFs = Lib::$fs;
+        $theFsFile = $theFs->fileSafe();
+
         $poolFile = $this->poolFile;
 
         if (! is_file($poolFile)) {
             return true;
         }
 
-        $f = Lib::fs()->fileSafe();
-
-        $status = $f->call_safe(
+        $status = $theFsFile->call_safe(
             static function () use (
-                $f,
+                $theFsFile,
                 $workerPid, $poolFile,
                 $nowMicrotime
             ) {
                 $status = false;
 
-                if ($fhPool = $f->fopen_flock_pooling(
+                if ($fhPool = $theFsFile->fopen_flock_pooling(
                     100000, 1000,
                     $poolFile, 'r+', LOCK_EX | LOCK_NB
                 )) {
@@ -576,22 +553,12 @@ class FilesystemFetchApi implements FetchApiInterface
     }
 
 
-    public function daemonIsAwake(
-        ?int &$refPidFirst = null,
-        ?float $nowMicrotime = null
-    ) : bool
+    public function daemonIsAwake(?int &$refPidFirst = null) : bool
     {
         $refPidFirst = null;
 
-        $theType = Lib::type();
-
-        if ((null !== ($nowMicrotimeFloat = $nowMicrotime))) {
-            if (! $theType->float_non_negative($nowMicrotimeFloat, $nowMicrotime)) {
-                throw new LogicException(
-                    [ 'The `nowMicrotime` should be a non-negative float', $nowMicrotime ]
-                );
-            }
-        }
+        $theFs = Lib::$fs;
+        $theFsFile = $theFs->fileSafe();
 
         $poolFile = $this->poolFile;
 
@@ -599,19 +566,16 @@ class FilesystemFetchApi implements FetchApiInterface
             return false;
         }
 
-        $f = Lib::fs()->fileSafe();
-
-        $status = $f->call_safe(
+        $status = $theFsFile->call_safe(
             static function () use (
                 &$refPidFirst,
                 //
-                $f,
-                $poolFile,
-                $nowMicrotimeFloat
+                $theFsFile,
+                $poolFile
             ) {
                 $status = false;
 
-                if ($fhPool = $f->fopen_flock_pooling(
+                if ($fhPool = $theFsFile->fopen_flock_pooling(
                     100000, 1000,
                     $poolFile, 'r', LOCK_SH | LOCK_NB
                 )) {
@@ -673,38 +637,29 @@ class FilesystemFetchApi implements FetchApiInterface
         ?int $lockWaitTimeoutMs = null
     ) : void
     {
-        $theType = Lib::type();
-
         $timeoutMs = $timeoutMs ?? 10000;
         $lockWaitTimeoutMs = $lockWaitTimeoutMs ?? 1000;
 
-        if (! $theType->int_non_negative_or_minus_one($timeoutMsInt, $timeoutMs)) {
-            throw new LogicException(
-                [ 'The `timeoutMs` should be a non-negative integer or be -1', $timeoutMs ]
-            );
-        }
+        $theCli = Lib::$cli;
+        $theCliProcessManager = $theCli->processManager();
+        $theType = Lib::$type;
 
-        if (! $theType->int_non_negative_or_minus_one($lockWaitTimeoutMsInt, $lockWaitTimeoutMs)) {
-            throw new LogicException(
-                [ 'The `lockWaitTimeoutMs` should be a non-negative integer or be -1', $lockWaitTimeoutMs ]
-            );
-        }
-
-        $pm = Lib::cliProcessManager();
+        $timeoutMsInt = $theType->int_non_negative_or_minus_one($timeoutMs)->orThrow();
+        $lockWaitTimeoutMsInt = $theType->int_non_negative_or_minus_one($lockWaitTimeoutMs)->orThrow();
 
         $cmd = [];
         $cmd[] = realpath(PHP_BINARY);
         $cmd[] = $this->binFilename;
-        $cmd[] = $timeoutMs;
-        $cmd[] = $lockWaitTimeoutMs;
+        $cmd[] = $timeoutMsInt;
+        $cmd[] = $lockWaitTimeoutMsInt;
 
-        $proc = $pm->newProc()
+        $proc = $theCliProcessManager->newProc()
             ->setIsBackground(true)
             ->setCmd($cmd)
             ->setCwd($this->binDirRealpath)
         ;
 
-        $pm->spawn($proc);
+        $theCliProcessManager->spawn($proc);
     }
 
 
@@ -713,21 +668,12 @@ class FilesystemFetchApi implements FetchApiInterface
         int $lockWaitTimeoutMs
     ) : void
     {
-        $theType = Lib::type();
+        $theType = Lib::$type;
 
         $pid = getmypid();
 
-        if (! $theType->int_non_negative_or_minus_one($timeoutMsInt, $timeoutMs)) {
-            throw new LogicException(
-                [ 'The `timeoutMs` should be a non-negative integer or -1', $timeoutMs ]
-            );
-        }
-
-        if (! $theType->int_non_negative_or_minus_one($lockWaitTimeoutMsInt, $lockWaitTimeoutMs)) {
-            throw new LogicException(
-                [ 'The `lockWaitTimeoutMs` should be a non-negative integer or -1', $lockWaitTimeoutMs ]
-            );
-        }
+        $timeoutMsInt = $theType->int_non_negative_or_minus_one($timeoutMs)->orThrow();
+        $lockWaitTimeoutMsInt = $theType->int_non_negative_or_minus_one($lockWaitTimeoutMs)->orThrow();
 
         if (-1 === $timeoutMsInt) $timeoutMsInt = null;
         if (-1 === $lockWaitTimeoutMsInt) $lockWaitTimeoutMsInt = null;
@@ -759,6 +705,9 @@ class FilesystemFetchApi implements FetchApiInterface
     }
 
 
+    /**
+     * @noinspection PhpVarExportUsedWithoutReturnArgumentInspection
+     */
     protected function workerRunLoop(
         int $pid,
         ?int $timeoutMs = null,
