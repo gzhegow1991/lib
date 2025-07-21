@@ -221,9 +221,9 @@ class DefaultThrowabler implements ThrowablerInterface
             $messagesWithInfoLinesCnt = count($messagesWithInfoLines);
 
             if ($messagesLinesCnt > 1) {
-                array_unshift($messagesWithInfoLines, "[ {$dotpath} ] >>>");
+                array_unshift($messagesWithInfoLines, "[ {$dotpath} >>> ]");
 
-                $messagesWithInfoLines[] = "[ {$dotpath} ] <<<";
+                $messagesWithInfoLines[] = "[ {$dotpath} <<< ]";
 
             } elseif (1 === $messagesLinesCnt) {
                 $messagesWithInfoLines[ 0 ] = "[ {$dotpath} ] {$messagesWithInfoLines[ 0 ]}";
