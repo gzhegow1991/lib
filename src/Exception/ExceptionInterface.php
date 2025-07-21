@@ -10,6 +10,8 @@ use Gzhegow\Lib\Exception\Interfaces\HasTraceOverrideInterface;
  * @mixin \Throwable
  */
 interface ExceptionInterface extends
+    AggregateExceptionInterface,
+    //
     HasMessageListInterface,
     HasTraceOverrideInterface
 {

@@ -6,7 +6,7 @@ use Gzhegow\Lib\Lib;
 
 
 class RuntimeException extends \RuntimeException implements
-    AggregateExceptionInterface,
+    ExceptionInterface,
     //
     \IteratorAggregate
 {

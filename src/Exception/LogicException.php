@@ -6,7 +6,7 @@ use Gzhegow\Lib\Lib;
 
 
 class LogicException extends \LogicException implements
-    AggregateExceptionInterface,
+    ExceptionInterface,
     //
     \IteratorAggregate
 {

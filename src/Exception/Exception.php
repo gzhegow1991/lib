@@ -6,7 +6,7 @@ use Gzhegow\Lib\Lib;
 
 
 class Exception extends \Exception implements
-    AggregateExceptionInterface,
+    ExceptionInterface,
     //
     \IteratorAggregate
 {
