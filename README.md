@@ -338,15 +338,17 @@ $test->run();
 //         ->useFetchApiWakeup(true)
 //     ;
 //
-//     $p1 = \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl($url = 'https://google.com');
-//     $p1->then(function ($result) use ($ffn, $url) {
+//     $p1 = \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl('https://google.com');
+//     $p1->then(function ($result) use ($ffn) {
+//         $url = $result[ 'url' ];
 //         $httpCode = $result[ 'http_code' ];
 //
 //         $ffn->print("{$url} - HTTP: {$httpCode}");
 //     });
 //
-//     $p2 = \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl($url = 'https://yandex.ru');
-//     $p2->then(function ($result) use ($ffn, $url) {
+//     $p2 = \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl('https://yandex.ru');
+//     $p2->then(function ($result) use ($ffn) {
+//         $url = $result[ 'url' ];
 //         $httpCode = $result[ 'http_code' ];
 //
 //         $ffn->print("{$url} - HTTP: {$httpCode}");

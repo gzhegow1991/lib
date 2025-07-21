@@ -20,8 +20,6 @@ require_once __DIR__ . '/../../vendor/autoload.php';
     ->useAll()
 ;
 
-\Gzhegow\Lib\Lib::require_composer_global();
-
 
 $timeoutMs = $argv[ 1 ] ?? 10000;        // 10 sec
 $lockWaitTimeoutMs = $argv[ 2 ] ?? 1000; // 1 sec

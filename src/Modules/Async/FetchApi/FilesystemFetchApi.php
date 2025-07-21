@@ -341,20 +341,24 @@ class FilesystemFetchApi implements FetchApiInterface
             return false;
         }
 
-        $headersSent = curl_getinfo($ch, CURLINFO_HEADER_OUT);
-
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $urlOut = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+        $headersOut = curl_getinfo($ch, CURLINFO_HEADER_OUT);
 
         $headersSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
         $headers = substr($response, 0, $headersSize);
+
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $content = substr($response, $headersSize);
 
         $refTaskResult = [
-            'headers_sent' => $headersSent,
+            'url'         => $taskUrl,
             //
-            'http_code'    => $httpCode,
-            'headers'      => $headers,
-            'content'      => $content,
+            'url_out'     => $urlOut,
+            'headers_out' => $headersOut,
+            //
+            'headers'     => $headers,
+            'http_code'   => $httpCode,
+            'content'     => $content,
         ];
 
         return true;
@@ -752,7 +756,7 @@ class FilesystemFetchApi implements FetchApiInterface
                 && $this->popTask($task, $waitTimeoutMs)
                 && print_r('[ NEW ] Task: ' . $task[ 'id' ] . "\n")
                 && $this->processTask($taskResult, $task)
-                && print_r('[ POP ] Task: ' . $task[ 'id' ] . "\n")
+                && print_r('[ OK ] Task: ' . $task[ 'id' ] . "\n")
                 && $this->taskSaveResult($task, $taskResult);
 
             if (! $isNullTimeout) {
