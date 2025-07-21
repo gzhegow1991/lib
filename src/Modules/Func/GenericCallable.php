@@ -134,7 +134,7 @@ class GenericCallable implements
             return Ret::throw($fallback, $ret);
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -143,7 +143,7 @@ class GenericCallable implements
     public static function fromInstance($from, ?array $fallback = null)
     {
         if ($from instanceof static) {
-            return Ret::val($fallback, $from);
+            return Ret::ok($fallback, $from);
         }
 
         return Ret::throw(
@@ -178,7 +178,7 @@ class GenericCallable implements
 
         $instance->key = "{ object # \Closure # {$phpId} }";
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -262,7 +262,7 @@ class GenericCallable implements
 
         $instance->key = "\"{ object # {$phpClass} # {$phpId} }\"";
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -304,7 +304,7 @@ class GenericCallable implements
 
         $instance->key = "\"{$invokableClass}\"";
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -342,7 +342,7 @@ class GenericCallable implements
 
         $instance->key = "\"{$functionStringNotEmpty}\"";
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
 

@@ -88,7 +88,7 @@ class PdoAdapter
             return Ret::throw($fallback, $ret);
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -97,7 +97,7 @@ class PdoAdapter
     public static function fromStatic($from, ?array $fallback = null)
     {
         if ($from instanceof static) {
-            return Ret::val($fallback, $from);
+            return Ret::ok($fallback, $from);
         }
 
         return Ret::throw(
@@ -116,7 +116,7 @@ class PdoAdapter
             $instance = new static();
             $instance->pdo = $from;
 
-            return Ret::val($fallback, $instance);
+            return Ret::ok($fallback, $instance);
         }
 
         return Ret::throw(
@@ -184,7 +184,7 @@ class PdoAdapter
             $instance->pdoCollate = $from[ 'collate' ];
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -261,7 +261,7 @@ class PdoAdapter
             $instance->pdoCollate = $from[ 'collate' ];
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
 

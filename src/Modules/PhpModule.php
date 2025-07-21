@@ -162,7 +162,7 @@ class PhpModule
     public function type_empty($value)
     {
         if (empty($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -177,7 +177,7 @@ class PhpModule
     public function type_any_not_empty($value)
     {
         if (! empty($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -210,13 +210,13 @@ class PhpModule
             // > EMPTY ARRAY is blank (can appear from HTML forms with no checkbox/radio/select items choosen)
             || ([] === $value)
         ) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         // > COUNTABLE w/ ZERO SIZE is blank
         if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
             if (0 === count($valueCountable)) {
-                return Ret::ok($value);
+                return Ret::val($value);
             }
         }
 
@@ -232,7 +232,7 @@ class PhpModule
     public function type_any_not_blank($value)
     {
         if (! $this->type_blank($value)->isOk()) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -266,7 +266,7 @@ class PhpModule
             // > NIL is clearable (NIL should be replaced with NULL later or perform deleting actions)
             || Nil::is($value)
         ) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -281,7 +281,7 @@ class PhpModule
     public function type_any_not_nullable($value)
     {
         if (! $this->type_nullable($value)->isOk()) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -299,7 +299,7 @@ class PhpModule
     public function type_passed($value)
     {
         if ($this->type_nil($value)->isOk()) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if (false
@@ -327,7 +327,7 @@ class PhpModule
             );
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
     /**
@@ -336,7 +336,7 @@ class PhpModule
     public function type_any_not_passed($value)
     {
         if (! $this->type_passed($value)->isOk()) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -359,7 +359,7 @@ class PhpModule
     public function type_nil($value)
     {
         if (Nil::is($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -374,7 +374,7 @@ class PhpModule
     public function type_any_not_nil($value)
     {
         if (! Nil::is($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -390,7 +390,7 @@ class PhpModule
     public function type_null($value)
     {
         if (null === $value) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -405,7 +405,7 @@ class PhpModule
     public function type_any_not_null($value)
     {
         if (null !== $value) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -421,7 +421,7 @@ class PhpModule
     public function type_false($value)
     {
         if (false === $value) {
-            return Ret::ok(false);
+            return Ret::val(false);
         }
 
         return Ret::err(
@@ -436,7 +436,7 @@ class PhpModule
     public function type_any_not_false($value)
     {
         if (false !== $value) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -452,7 +452,7 @@ class PhpModule
     public function type_true($value)
     {
         if (true === $value) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -467,7 +467,7 @@ class PhpModule
     public function type_any_not_true($value)
     {
         if (true !== $value) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -490,11 +490,11 @@ class PhpModule
         }
 
         if (is_bool($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if (is_int($value)) {
-            return Ret::ok(0 !== $value);
+            return Ret::val(0 !== $value);
         }
 
         if (is_float($value)) {
@@ -505,7 +505,7 @@ class PhpModule
                 );
             }
 
-            return Ret::ok(0.0 !== $value);
+            return Ret::val(0.0 !== $value);
         }
 
         if ($this->type_nil($value)->isOk()) {
@@ -518,37 +518,37 @@ class PhpModule
         if (is_string($value)) {
             if ('' === $value) {
                 // > EMPTY STRING is false
-                return Ret::ok(false);
+                return Ret::val(false);
             }
 
-            return Ret::ok(true);
+            return Ret::val(true);
         }
 
         if (is_array($value)) {
             if ([] === $value) {
                 // > EMPTY ARRAY is false
-                return Ret::ok(false);
+                return Ret::val(false);
             }
 
-            return Ret::ok(true);
+            return Ret::val(true);
         }
 
         if (is_resource($value)) {
-            return Ret::ok(true);
+            return Ret::val(true);
 
         } elseif ('resource (closed)' === gettype($value)) {
-            return Ret::ok(false);
+            return Ret::val(false);
         }
 
         if (is_object($value)) {
             if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
                 if (0 === count($valueCountable)) {
                     // > EMPTY COUNTABLE is false
-                    return Ret::ok(false);
+                    return Ret::val(false);
                 }
             }
 
-            return Ret::ok(true);
+            return Ret::val(true);
         }
 
         return Ret::err(
@@ -567,7 +567,7 @@ class PhpModule
         }
 
         if (false === $valueBool) {
-            return Ret::ok(false);
+            return Ret::val(false);
         }
 
         return Ret::err(
@@ -586,7 +586,7 @@ class PhpModule
         }
 
         if (true === $valueBool) {
-            return Ret::ok(true);
+            return Ret::val(true);
         }
 
         return Ret::err(
@@ -609,11 +609,11 @@ class PhpModule
         }
 
         if (is_bool($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if (is_int($value)) {
-            return Ret::ok(0 !== $value);
+            return Ret::val(0 !== $value);
         }
 
         if (is_float($value)) {
@@ -624,7 +624,7 @@ class PhpModule
                 );
             }
 
-            return Ret::ok(0.0 !== $value);
+            return Ret::val(0.0 !== $value);
         }
 
         if (is_string($value)) {
@@ -646,7 +646,7 @@ class PhpModule
             $valueLower = strtolower($value);
 
             if (isset($map[ $valueLower ])) {
-                return Ret::ok($map[ $valueLower ]);
+                return Ret::val($map[ $valueLower ]);
             }
         }
 
@@ -666,7 +666,7 @@ class PhpModule
         }
 
         if (false === $valueUserbool) {
-            return Ret::ok(false);
+            return Ret::val(false);
         }
 
         return Ret::err(
@@ -685,7 +685,7 @@ class PhpModule
         }
 
         if (true === $valueUserbool) {
-            return Ret::ok(true);
+            return Ret::val(true);
         }
 
         return Ret::err(
@@ -701,7 +701,7 @@ class PhpModule
     public function type_array($value)
     {
         if (is_array($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -715,7 +715,7 @@ class PhpModule
     public function type_array_empty($value)
     {
         if ([] === $value) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -729,7 +729,7 @@ class PhpModule
     public function type_array_not_empty($value)
     {
         if (is_array($value) && ([] !== $value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -743,7 +743,7 @@ class PhpModule
     public function type_any_not_array_empty($value)
     {
         if ([] !== $value) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -757,7 +757,7 @@ class PhpModule
     public function type_any_not_array($value)
     {
         if (! is_array($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -772,7 +772,7 @@ class PhpModule
     public function type_object($value)
     {
         if (is_object($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -786,7 +786,7 @@ class PhpModule
     public function type_any_not_object($value)
     {
         if (! is_object($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -801,7 +801,7 @@ class PhpModule
     public function type_stdclass($value)
     {
         if ($value instanceof \stdClass) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -815,7 +815,7 @@ class PhpModule
     public function type_any_not_stdclass($value)
     {
         if (! ($value instanceof \stdClass)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -831,7 +831,7 @@ class PhpModule
     {
         if (PHP_VERSION_ID >= 70300) {
             if (is_countable($value)) {
-                return Ret::ok($value);
+                return Ret::val($value);
             }
 
             return Ret::err(
@@ -841,11 +841,11 @@ class PhpModule
         }
 
         if (is_array($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if ($value instanceof \Countable) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -874,11 +874,11 @@ class PhpModule
                 );
             }
 
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if ($value instanceof \Countable) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -896,11 +896,11 @@ class PhpModule
         $theStr = Lib::str();
 
         if ($this->type_countable($value)->isOk()) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if ($theStr->type_string($value)->isOk()) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -957,12 +957,12 @@ class PhpModule
         if ($flagsInt & _PHP_STRUCT_TYPE_CLASS) {
             if (PHP_VERSION_ID >= 80100) {
                 if (class_exists($class) && ! enum_exists($class)) {
-                    return Ret::ok($class);
+                    return Ret::val($class);
                 }
 
             } else {
                 if (class_exists($class)) {
-                    return Ret::ok($class);
+                    return Ret::val($class);
                 }
             }
         }
@@ -978,13 +978,13 @@ class PhpModule
         if (! $isObject) {
             if ($flagsInt & _PHP_STRUCT_TYPE_INTERFACE) {
                 if (interface_exists($class)) {
-                    return Ret::ok($class);
+                    return Ret::val($class);
                 }
             }
 
             if ($flagsInt & _PHP_STRUCT_TYPE_TRAIT) {
                 if (trait_exists($class)) {
-                    return Ret::ok($class);
+                    return Ret::val($class);
                 }
             }
         }
@@ -1093,7 +1093,7 @@ class PhpModule
             }
 
             if ($isExists && $isFlagExistsTrue) {
-                return Ret::ok($class);
+                return Ret::val($class);
             }
         }
 
@@ -1107,7 +1107,7 @@ class PhpModule
             $isValid = (bool) $isValid;
 
             if ($isValid) {
-                return Ret::ok($class);
+                return Ret::val($class);
             }
         }
 
@@ -1225,7 +1225,7 @@ class PhpModule
 
         $valueStruct = '\\' . $valueStruct;
 
-        return Ret::ok($valueStruct);
+        return Ret::val($valueStruct);
     }
 
     /**
@@ -1246,7 +1246,7 @@ class PhpModule
             );
         }
 
-        return Ret::ok($valueNamespace);
+        return Ret::val($valueNamespace);
     }
 
     /**
@@ -1267,7 +1267,7 @@ class PhpModule
             );
         }
 
-        return Ret::ok($valueBasename);
+        return Ret::val($valueBasename);
     }
 
 
@@ -1278,17 +1278,17 @@ class PhpModule
     {
         if (is_resource($value)) {
             if (null === $resourceType) {
-                return Ret::ok($value);
+                return Ret::val($value);
 
             } else {
                 if ($resourceType === get_resource_type($value)) {
-                    return Ret::ok($value);
+                    return Ret::val($value);
                 }
             }
         }
 
         if ('resource (closed)' === gettype($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -1304,11 +1304,11 @@ class PhpModule
     {
         if (is_resource($value)) {
             if (null === $resourceType) {
-                return Ret::ok($value);
+                return Ret::val($value);
 
             } else {
                 if ($resourceType === get_resource_type($value)) {
-                    return Ret::ok($value);
+                    return Ret::val($value);
                 }
             }
         }
@@ -1325,7 +1325,7 @@ class PhpModule
     public function type_resource_closed($value)
     {
         if ('resource (closed)' === gettype($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -1343,7 +1343,7 @@ class PhpModule
             || is_resource($value)
             || ('resource (closed)' === gettype($value))
         )) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -1362,7 +1362,7 @@ class PhpModule
             || is_a($value, '\CurlHandle')
             || $this->type_resource_opened($value, 'curl')->isOk()
         ) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -1399,7 +1399,7 @@ class PhpModule
                 : is_subclass_of($value, '\UnitEnum');
 
             if ($status) {
-                return Ret::ok($value);
+                return Ret::val($value);
             }
         }
 
@@ -1428,7 +1428,7 @@ class PhpModule
         }
 
         if (null !== $enumCase) {
-            return Ret::ok($enumCase);
+            return Ret::val($enumCase);
         }
 
         return Ret::err(

@@ -206,7 +206,7 @@ class UrlModule
 
         $result = $this->url_build($refParseUrl);
 
-        return Ret::ok($result);
+        return Ret::val($result);
     }
 
     /**
@@ -334,7 +334,7 @@ class UrlModule
 
         $result = $this->host_build($refParseUrl);
 
-        return Ret::ok($result);
+        return Ret::val($result);
     }
 
     /**
@@ -470,7 +470,7 @@ class UrlModule
 
         $result = $this->link_build($refParseUrl);
 
-        return Ret::ok($result);
+        return Ret::val($result);
     }
 
 

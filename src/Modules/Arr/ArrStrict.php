@@ -36,7 +36,7 @@ class ArrStrict implements
             return Ret::throw($fallback, $ret);
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -45,7 +45,7 @@ class ArrStrict implements
     public static function fromStatic($from, ?array $fallback = null)
     {
         if ($from instanceof static) {
-            return Ret::val($fallback, $from);
+            return Ret::ok($fallback, $from);
         }
 
         return Ret::throw(
@@ -64,7 +64,7 @@ class ArrStrict implements
             $instance = new static();
             $instance->array = $from;
 
-            return Ret::val($fallback, $instance);
+            return Ret::ok($fallback, $instance);
         }
 
         return Ret::throw(

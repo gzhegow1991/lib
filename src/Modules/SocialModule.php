@@ -108,7 +108,7 @@ class SocialModule
             );
         }
 
-        return Ret::ok($email);
+        return Ret::val($email);
     }
 
     /**
@@ -158,7 +158,7 @@ class SocialModule
             );
         }
 
-        return Ret::ok($email);
+        return Ret::val($email);
     }
 
     /**
@@ -209,7 +209,7 @@ class SocialModule
             );
         }
 
-        return Ret::ok($email);
+        return Ret::val($email);
     }
 
 
@@ -259,7 +259,7 @@ class SocialModule
             );
         }
 
-        return Ret::ok($phone);
+        return Ret::val($phone);
     }
 
     /**
@@ -305,7 +305,7 @@ class SocialModule
             );
         }
 
-        return Ret::ok($phone);
+        return Ret::val($phone);
     }
 
     /**
@@ -354,7 +354,7 @@ class SocialModule
             );
         }
 
-        return Ret::ok($phone);
+        return Ret::val($phone);
     }
 
     /**
@@ -411,7 +411,7 @@ class SocialModule
             );
         }
 
-        return Ret::ok($phone);
+        return Ret::val($phone);
     }
 
 
@@ -455,7 +455,7 @@ class SocialModule
             );
         }
 
-        return Ret::ok($tel);
+        return Ret::val($tel);
     }
 
     /**
@@ -498,7 +498,7 @@ class SocialModule
             );
         }
 
-        return Ret::ok($tel);
+        return Ret::val($tel);
     }
 
     /**
@@ -541,7 +541,7 @@ class SocialModule
             );
         }
 
-        return Ret::ok($tel);
+        return Ret::val($tel);
     }
 
     /**
@@ -592,6 +592,6 @@ class SocialModule
             );
         }
 
-        return Ret::ok($tel);
+        return Ret::val($tel);
     }
 }

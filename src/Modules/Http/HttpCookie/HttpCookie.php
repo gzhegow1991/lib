@@ -107,7 +107,7 @@ class HttpCookie implements
             return Ret::throw($fallback, $ret);
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -116,7 +116,7 @@ class HttpCookie implements
     public static function fromStatic($from, ?array $fallback = null)
     {
         if ($from instanceof static) {
-            return Ret::val($fallback, $from);
+            return Ret::ok($fallback, $from);
         }
 
         return Ret::throw(
@@ -182,7 +182,7 @@ class HttpCookie implements
         $instance->domain = $cookieDomain;
         $instance->cookieParams = $headerParams;
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -287,7 +287,7 @@ class HttpCookie implements
         $instance->domain = $domainString;
         $instance->cookieParams = $optionsLower;
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -303,7 +303,7 @@ class HttpCookie implements
             return Ret::throw($fallback, $ret);
         }
 
-        return Ret::val($fallback, $httpCookieObject);
+        return Ret::ok($fallback, $httpCookieObject);
     }
 
 

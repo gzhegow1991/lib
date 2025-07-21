@@ -62,7 +62,7 @@ class FormatModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
     /**
@@ -83,7 +83,7 @@ class FormatModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
     /**
@@ -104,26 +104,29 @@ class FormatModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
 
     /**
-     * @return Ret<int>
+     * @param array{ 0?: mixed }|null $fallback # Pass `null` to return Ret<T> or pass `[]` to throw exception
+     *
+     * @return int|Ret<int>
      */
-    public function bytes_decode(string $size)
+    public function bytes_decode(?array $fallback, string $size)
     {
         $theType = Lib::type();
 
         if ('' === $size) {
-            return Ret::err(
+            return Ret::throw(
+                $fallback,
                 [ 'The `size` should be a non-empty string', $size ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ('0' === $size) {
-            return Ret::ok(0);
+            return Ret::ok($fallback, 0);
         }
 
         $strUnitList = [
@@ -140,7 +143,8 @@ class FormatModule
         $strUnitList = array_merge(...$strUnitList);
 
         if (! preg_match($regex = '/^(\d+(?:\.\d+)?)([A-Z]{0,2})$/', $size, $matches)) {
-            return Ret::err(
+            return Ret::throw(
+                $fallback,
                 [ 'The `size` should match regex: ' . $regex, $size ],
                 [ __FILE__, __LINE__ ]
             );
@@ -153,18 +157,19 @@ class FormatModule
         }
 
         if (! isset($strUnitList[ $strUnit ])) {
-            return Ret::err(
+            return Ret::throw(
+                $fallback,
                 [ 'Unknown `strUnit`', $strUnit ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if (! $theType->num_positive($numUnit)->isOk([ &$numUnitNumPositive, &$ret ])) {
-            return $ret;
+            return Ret::throw($fallback, $ret);
         }
 
         if (0 === $numUnitNumPositive) {
-            return Ret::ok(0);
+            return Ret::ok($fallback, 0);
         }
 
         $bytesNum = $numUnit * pow(1024, $strUnitList[ $strUnit ]);
@@ -172,34 +177,24 @@ class FormatModule
         $bytesCeil = ceil($bytesNum);
 
         if (false === $bytesCeil) {
-            return Ret::err(
+            return Ret::throw(
+                $fallback,
                 [ 'Unable to `ceil`', $bytesNum ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok((int) $bytesCeil);
-    }
-
-    /**
-     * @return int|Ret<int>
-     */
-    public function bytes_decode_fallback(?array $fallback, string $size)
-    {
-        $ret = $this->bytes_decode($size);
-
-        if ($ret->isFail()) {
-            return Ret::throw($fallback, $ret);
-        }
-
-        return Ret::val($fallback, $ret->getValue());
+        return Ret::ok($fallback, (int) $bytesCeil);
     }
 
 
     /**
-     * @return Ret<string>
+     * @param array{ 0?: mixed }|null $fallback # Pass `null` to return Ret<T> or pass `[]` to throw exception
+     *
+     * @return string|Ret<string>
      */
     public function bytes_encode(
+        ?array $fallback,
         $bytes,
         ?int $roundPrecision = null, ?int $unitLen = null
     )
@@ -207,14 +202,14 @@ class FormatModule
         $theType = Lib::type();
 
         if (! $theType->num_non_negative($bytes)->isOk([ &$bytesNumNonNegative, &$ret ])) {
-            return $ret;
+            return Ret::throw($fallback, $ret);
         }
 
         $roundPrecision = $roundPrecision ?? 3;
         $unitLen = $unitLen ?? 2;
 
         if (0 === $bytesNumNonNegative) {
-            return Ret::ok('0B');
+            return Ret::ok($fallback, '0B');
         }
 
         $strUnitList = [ 'B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB' ];
@@ -231,20 +226,6 @@ class FormatModule
 
         $size = round($left, $roundPrecision) . $unit;
 
-        return Ret::ok($size);
-    }
-
-    /**
-     * @return string|Ret<string>
-     */
-    public function bytes_encode_fallback(?array $fallback, string $size)
-    {
-        $ret = $this->bytes_decode($size);
-
-        if ($ret->isFail()) {
-            return Ret::throw($fallback, $ret);
-        }
-
-        return Ret::val($fallback, $ret->getValue());
+        return Ret::ok($fallback, $size);
     }
 }

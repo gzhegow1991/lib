@@ -55,7 +55,7 @@ class HttpHeader implements ToStringInterface
             return Ret::throw($fallback, $ret);
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -64,7 +64,7 @@ class HttpHeader implements ToStringInterface
     public static function fromStatic($from, ?array $fallback = null)
     {
         if ($from instanceof static) {
-            return Ret::val($fallback, $from);
+            return Ret::ok($fallback, $from);
         }
 
         return Ret::throw(
@@ -150,7 +150,7 @@ class HttpHeader implements ToStringInterface
 
         $instance->raw = $raw;
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -226,7 +226,7 @@ class HttpHeader implements ToStringInterface
         $instance->value = $valueStringNotEmpty;
         $instance->headerParams = $paramsLower;
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
 

@@ -190,7 +190,7 @@ class StrModule
     public function type_a_string($value)
     {
         if (is_string($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -205,7 +205,7 @@ class StrModule
     public function type_a_string_empty($value)
     {
         if ('' === $value) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -220,7 +220,7 @@ class StrModule
     public function type_a_string_not_empty($value)
     {
         if (is_string($value) && ('' !== $value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -246,7 +246,7 @@ class StrModule
         $valueTrim = trim($value, $characters);
 
         if ('' !== $valueTrim) {
-            return Ret::ok($valueTrim);
+            return Ret::val($valueTrim);
         }
 
         return Ret::err(
@@ -262,7 +262,7 @@ class StrModule
     public function type_string($value)
     {
         if (is_string($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if (false
@@ -307,7 +307,7 @@ class StrModule
             );
         }
 
-        return Ret::ok($valueString);
+        return Ret::val($valueString);
     }
 
     /**
@@ -320,7 +320,7 @@ class StrModule
         }
 
         if ('' === $valueString) {
-            return Ret::ok('');
+            return Ret::val('');
         }
 
         return Ret::err(
@@ -339,7 +339,7 @@ class StrModule
         }
 
         if ('' !== $valueString) {
-            return Ret::ok($valueString);
+            return Ret::val($valueString);
         }
 
         return Ret::err(
@@ -362,7 +362,7 @@ class StrModule
         $valueString = trim($valueString, $characters);
 
         if ('' !== $valueString) {
-            return Ret::ok($valueString);
+            return Ret::val($valueString);
         }
 
         return Ret::err(
@@ -382,7 +382,7 @@ class StrModule
         }
 
         if (1 === strlen($valueStringNotEmpty)) {
-            return Ret::ok($valueStringNotEmpty);
+            return Ret::val($valueStringNotEmpty);
         }
 
         return Ret::err(
@@ -401,7 +401,7 @@ class StrModule
         }
 
         if (1 === $this->strlen($valueStringNotEmpty)) {
-            return Ret::ok($valueStringNotEmpty);
+            return Ret::val($valueStringNotEmpty);
         }
 
         return Ret::err(
@@ -492,7 +492,7 @@ class StrModule
             $regexNot
         );
 
-        return Ret::ok($alphabet);
+        return Ret::val($alphabet);
     }
 
 
@@ -507,7 +507,7 @@ class StrModule
 
         if (extension_loaded('ctype')) {
             if (ctype_digit($valueStringNotEmpty)) {
-                return Ret::ok($valueStringNotEmpty);
+                return Ret::val($valueStringNotEmpty);
             }
 
             return Ret::err(
@@ -523,7 +523,7 @@ class StrModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
     /**
@@ -548,7 +548,7 @@ class StrModule
             }
 
             if (ctype_alpha($valueStringNotEmpty)) {
-                return Ret::ok($valueStringNotEmpty);
+                return Ret::val($valueStringNotEmpty);
             }
 
             return Ret::err(
@@ -568,7 +568,7 @@ class StrModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
     /**
@@ -593,7 +593,7 @@ class StrModule
             }
 
             if (ctype_alnum($valueStringNotEmpty)) {
-                return Ret::ok($valueStringNotEmpty);
+                return Ret::val($valueStringNotEmpty);
             }
 
             return Ret::err(
@@ -613,7 +613,7 @@ class StrModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
 

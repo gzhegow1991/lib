@@ -18,7 +18,7 @@ class NumModule
     public function type_nan($value)
     {
         if (is_float($value) && is_nan($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -33,7 +33,7 @@ class NumModule
     public function type_float_not_nan($value)
     {
         if (is_float($value) && ! is_nan($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -48,7 +48,7 @@ class NumModule
     public function type_any_not_nan($value)
     {
         if (! (is_float($value) && is_nan($value))) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -64,7 +64,7 @@ class NumModule
     public function type_finite($value)
     {
         if (is_float($value) && is_finite($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -79,7 +79,7 @@ class NumModule
     public function type_float_not_finite($value)
     {
         if (is_float($value) && ! is_finite($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -94,7 +94,7 @@ class NumModule
     public function type_any_not_finite($value)
     {
         if (! (is_float($value) && is_finite($value))) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -110,7 +110,7 @@ class NumModule
     public function type_infinite($value)
     {
         if (is_float($value) && is_infinite($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -125,7 +125,7 @@ class NumModule
     public function type_float_not_infinite($value)
     {
         if (is_float($value) && ! is_infinite($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -140,7 +140,7 @@ class NumModule
     public function type_any_not_infinite($value)
     {
         if (! (is_float($value) && is_infinite($value))) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -168,7 +168,7 @@ class NumModule
             $frac = str_pad($frac, PHP_FLOAT_DIG, '9', STR_PAD_RIGHT);
 
             if ("{$int}{$frac}{$exp}" === _NUM_PHP_FLOAT_MIN_STRING_DIG) {
-                return Ret::ok(
+                return Ret::val(
                     ($value > 0)
                         ? _NUM_PHP_FLOAT_MIN_FLOAT_DIG
                         : -_NUM_PHP_FLOAT_MIN_FLOAT_DIG
@@ -201,7 +201,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
     /**
@@ -210,7 +210,7 @@ class NumModule
     public function type_any_not_float_min($value)
     {
         if (! $this->type_float_min($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -226,7 +226,7 @@ class NumModule
     public function type_number($value, ?bool $allowExp = null)
     {
         if ($value instanceof Number) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if (! $this
@@ -252,7 +252,7 @@ class NumModule
             'scale'    => $scale,
         ])->orThrow();
 
-        return Ret::ok($number);
+        return Ret::val($number);
     }
 
 
@@ -293,7 +293,7 @@ class NumModule
                 $refSplit[ 3 ] = $exp;
             }
 
-            return Ret::ok($number->getValue());
+            return Ret::val($number->getValue());
         }
 
         $isInt = is_int($value);
@@ -323,7 +323,7 @@ class NumModule
                 $valueTrim = '0';
 
                 if (! $withSplit) {
-                    return Ret::ok($valueTrim);
+                    return Ret::val($valueTrim);
                 }
             }
         }
@@ -364,7 +364,7 @@ class NumModule
                     $valueTrim = "{$left}{$right}";
                 }
 
-                return Ret::ok($valueTrim);
+                return Ret::val($valueTrim);
             }
         }
 
@@ -415,7 +415,7 @@ class NumModule
 
         $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
 
-        return Ret::ok($valueNumeric);
+        return Ret::val($valueNumeric);
     }
 
     /**
@@ -431,7 +431,7 @@ class NumModule
         }
 
         if ('0' !== $valueString) {
-            return Ret::ok($valueString);
+            return Ret::val($valueString);
         }
 
         return Ret::err(
@@ -453,11 +453,11 @@ class NumModule
         }
 
         if ('0' === $valueNumeric) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         if ('-' !== $valueNumeric[ 0 ]) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         return Ret::err(
@@ -479,11 +479,11 @@ class NumModule
         }
 
         if ('0' === $valueNumeric) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         if ('-' === $valueNumeric[ 0 ]) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         return Ret::err(
@@ -512,7 +512,7 @@ class NumModule
         }
 
         if ('-' === $valueNumeric[ 0 ]) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         return Ret::err(
@@ -541,7 +541,7 @@ class NumModule
         }
 
         if ('-' !== $valueNumeric[ 0 ]) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         return Ret::err(
@@ -576,7 +576,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueNumeric);
+        return Ret::val($valueNumeric);
     }
 
     /**
@@ -592,7 +592,7 @@ class NumModule
         }
 
         if ('0' !== $valueNumericInt) {
-            return Ret::ok($valueNumericInt);
+            return Ret::val($valueNumericInt);
         }
 
         return Ret::err(
@@ -614,11 +614,11 @@ class NumModule
         }
 
         if ('0' === $valueNumericInt) {
-            return Ret::ok($valueNumericInt);
+            return Ret::val($valueNumericInt);
         }
 
         if ('-' !== $valueNumericInt[ 0 ]) {
-            return Ret::ok($valueNumericInt);
+            return Ret::val($valueNumericInt);
         }
 
         return Ret::err(
@@ -640,11 +640,11 @@ class NumModule
         }
 
         if ('0' === $valueNumericInt) {
-            return Ret::ok($valueNumericInt);
+            return Ret::val($valueNumericInt);
         }
 
         if ('-' === $valueNumericInt[ 0 ]) {
-            return Ret::ok($valueNumericInt);
+            return Ret::val($valueNumericInt);
         }
 
         return Ret::err(
@@ -673,7 +673,7 @@ class NumModule
         }
 
         if ('-' === $valueNumericInt[ 0 ]) {
-            return Ret::ok($valueNumericInt);
+            return Ret::val($valueNumericInt);
         }
 
         return Ret::err(
@@ -702,7 +702,7 @@ class NumModule
         }
 
         if ('-' !== $valueNumericInt[ 0 ]) {
-            return Ret::ok($valueNumericInt);
+            return Ret::val($valueNumericInt);
         }
 
         return Ret::err(
@@ -731,11 +731,11 @@ class NumModule
         }
 
         if ('-1' === $valueNumericInt) {
-            return Ret::ok($valueNumericInt);
+            return Ret::val($valueNumericInt);
         }
 
         if ('-' !== $valueNumericInt[ 0 ]) {
-            return Ret::ok($valueNumericInt);
+            return Ret::val($valueNumericInt);
         }
 
         return Ret::err(
@@ -757,15 +757,15 @@ class NumModule
         }
 
         if ('-1' === $valueNumericInt) {
-            return Ret::ok($valueNumericInt);
+            return Ret::val($valueNumericInt);
         }
 
         if ('0' === $valueNumericInt) {
-            return Ret::ok($valueNumericInt);
+            return Ret::val($valueNumericInt);
         }
 
         if ('-' !== $valueNumericInt[ 0 ]) {
-            return Ret::ok($valueNumericInt);
+            return Ret::val($valueNumericInt);
         }
 
         return Ret::err(
@@ -805,10 +805,10 @@ class NumModule
         }
 
         if ('0' === $valueNumeric) {
-            return Ret::ok('0.0');
+            return Ret::val('0.0');
         }
 
-        return Ret::ok($valueNumeric);
+        return Ret::val($valueNumeric);
     }
 
     /**
@@ -824,7 +824,7 @@ class NumModule
         }
 
         if ('0.0' !== $valueNumeric) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         return Ret::err(
@@ -846,11 +846,11 @@ class NumModule
         }
 
         if ('0.0' === $valueNumeric) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         if ('-' !== $valueNumeric[ 0 ]) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         return Ret::err(
@@ -872,11 +872,11 @@ class NumModule
         }
 
         if ('0.0' === $valueNumeric) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         if ('-' === $valueNumeric[ 0 ]) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         return Ret::err(
@@ -905,7 +905,7 @@ class NumModule
         }
 
         if ('-' === $valueNumeric[ 0 ]) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         return Ret::err(
@@ -934,7 +934,7 @@ class NumModule
         }
 
         if ('-' !== $valueNumeric[ 0 ]) {
-            return Ret::ok($valueNumeric);
+            return Ret::val($valueNumeric);
         }
 
         return Ret::err(
@@ -983,7 +983,7 @@ class NumModule
             }
         }
 
-        return Ret::ok($valueNumeric);
+        return Ret::val($valueNumeric);
     }
 
     /**
@@ -999,7 +999,7 @@ class NumModule
         }
 
         if ('0' === rtrim($valueNumericTrimpad, '0.')) {
-            return Ret::ok($valueNumericTrimpad);
+            return Ret::val($valueNumericTrimpad);
         }
 
         return Ret::err(
@@ -1021,11 +1021,11 @@ class NumModule
         }
 
         if ('0' === rtrim($valueNumericTrimpad, '0.')) {
-            return Ret::ok($valueNumericTrimpad);
+            return Ret::val($valueNumericTrimpad);
         }
 
         if ('-' !== $valueNumericTrimpad[ 0 ]) {
-            return Ret::ok($valueNumericTrimpad);
+            return Ret::val($valueNumericTrimpad);
         }
 
         return Ret::err(
@@ -1047,11 +1047,11 @@ class NumModule
         }
 
         if ('0' === rtrim($valueNumericTrimpad, '0.')) {
-            return Ret::ok($valueNumericTrimpad);
+            return Ret::val($valueNumericTrimpad);
         }
 
         if ('-' === $valueNumericTrimpad[ 0 ]) {
-            return Ret::ok($valueNumericTrimpad);
+            return Ret::val($valueNumericTrimpad);
         }
 
         return Ret::err(
@@ -1080,7 +1080,7 @@ class NumModule
         }
 
         if ('-' === $valueNumericTrimpad[ 0 ]) {
-            return Ret::ok($valueNumericTrimpad);
+            return Ret::val($valueNumericTrimpad);
         }
 
         return Ret::err(
@@ -1109,7 +1109,7 @@ class NumModule
         }
 
         if ('-' !== $valueNumericTrimpad[ 0 ]) {
-            return Ret::ok($valueNumericTrimpad);
+            return Ret::val($valueNumericTrimpad);
         }
 
         return Ret::err(
@@ -1172,7 +1172,7 @@ class NumModule
             }
         }
 
-        return Ret::ok($valueNumeric);
+        return Ret::val($valueNumeric);
     }
 
     /**
@@ -1188,7 +1188,7 @@ class NumModule
         }
 
         if ('0' === rtrim($valueDecimal, '0.')) {
-            return Ret::ok($valueDecimal);
+            return Ret::val($valueDecimal);
         }
 
         return Ret::err(
@@ -1210,11 +1210,11 @@ class NumModule
         }
 
         if ('0' === rtrim($valueDecimal, '0.')) {
-            return Ret::ok($valueDecimal);
+            return Ret::val($valueDecimal);
         }
 
         if ('-' !== $valueDecimal[ 0 ]) {
-            return Ret::ok($valueDecimal);
+            return Ret::val($valueDecimal);
         }
 
         return Ret::err(
@@ -1236,11 +1236,11 @@ class NumModule
         }
 
         if ('0' === rtrim($valueDecimal, '0.')) {
-            return Ret::ok($valueDecimal);
+            return Ret::val($valueDecimal);
         }
 
         if ('-' === $valueDecimal[ 0 ]) {
-            return Ret::ok($valueDecimal);
+            return Ret::val($valueDecimal);
         }
 
         return Ret::err(
@@ -1269,7 +1269,7 @@ class NumModule
         }
 
         if ('-' === $valueDecimal[ 0 ]) {
-            return Ret::ok($valueDecimal);
+            return Ret::val($valueDecimal);
         }
 
         return Ret::err(
@@ -1298,7 +1298,7 @@ class NumModule
         }
 
         if ('-' !== $valueDecimal[ 0 ]) {
-            return Ret::ok($valueDecimal);
+            return Ret::val($valueDecimal);
         }
 
         return Ret::err(
@@ -1314,7 +1314,7 @@ class NumModule
     public function type_num($value)
     {
         if (is_int($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if (is_float($value)) {
@@ -1328,11 +1328,11 @@ class NumModule
 
             if (0 == $value) {
                 // > -0.0 to 0.0
-                return Ret::ok(0.0);
+                return Ret::val(0.0);
             }
 
             if (abs($value) >= _NUM_PHP_FLOAT_MAX_FLOAT_DIG) {
-                return Ret::ok(
+                return Ret::val(
                     ($value > 0)
                         ? _NUM_PHP_FLOAT_MAX_FLOAT_DIG
                         : -_NUM_PHP_FLOAT_MAX_FLOAT_DIG
@@ -1349,7 +1349,7 @@ class NumModule
             //     );
             // }
 
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if (false
@@ -1385,7 +1385,7 @@ class NumModule
         $valueNum = $this->castNumericToNum($valueNumeric, ...$split);
 
         if (false !== $valueNum) {
-            return Ret::ok($valueNum);
+            return Ret::val($valueNum);
         }
 
         return Ret::err(
@@ -1413,7 +1413,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueNum);
+        return Ret::val($valueNum);
     }
 
     /**
@@ -1435,7 +1435,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueNum);
+        return Ret::val($valueNum);
     }
 
     /**
@@ -1457,7 +1457,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueNum);
+        return Ret::val($valueNum);
     }
 
     /**
@@ -1479,7 +1479,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueNum);
+        return Ret::val($valueNum);
     }
 
     /**
@@ -1501,7 +1501,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueNum);
+        return Ret::val($valueNum);
     }
 
 
@@ -1511,7 +1511,7 @@ class NumModule
     public function type_int($value)
     {
         if (is_int($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if (false
@@ -1539,7 +1539,7 @@ class NumModule
         $valueInt = $this->castNumericToInt($valueNumeric, ...$split);
 
         if (false !== $valueInt) {
-            return Ret::ok($valueInt);
+            return Ret::val($valueInt);
         }
 
         return Ret::err(
@@ -1567,7 +1567,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueInt);
+        return Ret::val($valueInt);
     }
 
     /**
@@ -1589,7 +1589,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueInt);
+        return Ret::val($valueInt);
     }
 
     /**
@@ -1611,7 +1611,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueInt);
+        return Ret::val($valueInt);
     }
 
     /**
@@ -1633,7 +1633,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueInt);
+        return Ret::val($valueInt);
     }
 
     /**
@@ -1655,7 +1655,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueInt);
+        return Ret::val($valueInt);
     }
 
     /**
@@ -1671,7 +1671,7 @@ class NumModule
         }
 
         if (-1 === $valueInt) {
-            return Ret::ok($valueInt);
+            return Ret::val($valueInt);
         }
 
         if ($valueInt <= 0) {
@@ -1681,7 +1681,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueInt);
+        return Ret::val($valueInt);
     }
 
     /**
@@ -1703,7 +1703,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueInt);
+        return Ret::val($valueInt);
     }
 
 
@@ -1713,7 +1713,7 @@ class NumModule
     public function type_float($value)
     {
         if (is_int($value)) {
-            return Ret::ok((float) $value);
+            return Ret::val((float) $value);
         }
 
         if (is_float($value)) {
@@ -1726,11 +1726,11 @@ class NumModule
             }
 
             if (-0.0 === $value) {
-                return Ret::ok(0.0);
+                return Ret::val(0.0);
             }
 
             if (abs($value) >= _NUM_PHP_FLOAT_MAX_FLOAT_DIG) {
-                return Ret::ok(
+                return Ret::val(
                     ($value > 0)
                         ? _NUM_PHP_FLOAT_MAX_FLOAT_DIG
                         : -_NUM_PHP_FLOAT_MAX_FLOAT_DIG
@@ -1747,7 +1747,7 @@ class NumModule
             //     );
             // }
 
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if (false
@@ -1781,7 +1781,7 @@ class NumModule
         $valueFloat = $this->castNumericToFloat($valueNumeric, ...$split);
 
         if (false !== $valueFloat) {
-            return Ret::ok($valueFloat);
+            return Ret::val($valueFloat);
         }
 
         return Ret::err(
@@ -1809,7 +1809,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueFloat);
+        return Ret::val($valueFloat);
     }
 
     /**
@@ -1831,7 +1831,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueFloat);
+        return Ret::val($valueFloat);
     }
 
     /**
@@ -1853,7 +1853,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueFloat);
+        return Ret::val($valueFloat);
     }
 
     /**
@@ -1875,7 +1875,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueFloat);
+        return Ret::val($valueFloat);
     }
 
     /**
@@ -1897,7 +1897,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($valueFloat);
+        return Ret::val($valueFloat);
     }
 
 

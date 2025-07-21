@@ -3190,22 +3190,28 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    $enc = \Gzhegow\Lib\Lib::format()->bytes_encode($src = 1024 * 1024)->orNan();
+    $enc = \Gzhegow\Lib\Lib::format()->bytes_encode([ NAN ], $src = 1024 * 1024);
     $ffn->print($enc);
 
-    $dec = \Gzhegow\Lib\Lib::format()->bytes_decode($enc)->orNan();
+    $dec = \Gzhegow\Lib\Lib::format()->bytes_decode([ NAN ], $enc);
     $ffn->print($dec, $src === $dec);
 
     echo "\n";
     echo "\n";
 
 
-    $csv = \Gzhegow\Lib\Lib::format()->csv()->csv_encode_rows([ [ 'col1', 'col2' ], [ 'val1', 'val2' ] ])->orFalse();
+    $csv = \Gzhegow\Lib\Lib::format()->csv()->csv_encode_rows(
+        [ false ],
+        [
+            [ 'col1', 'col2' ],
+            [ 'val1', 'val2' ],
+        ]
+    );
     $ffn->print($csv);
 
     echo "\n";
 
-    $csv = \Gzhegow\Lib\Lib::format()->csv()->csv_encode_row([ 'col1', 'col2' ])->orFalse();
+    $csv = \Gzhegow\Lib\Lib::format()->csv()->csv_encode_row([ false ], [ 'col1', 'col2' ]);
     $ffn->print($csv);
 
     echo "\n";
@@ -3232,105 +3238,105 @@ $fn = function () use ($ffn) {
 
 
     try {
-        \Gzhegow\Lib\Lib::format()->json()->json_decode($json = null, $isAssociative = true)->orThrow();
+        \Gzhegow\Lib\Lib::format()->json()->json_decode([], $json = null, $isAssociative = true);
     }
     catch ( \Throwable $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode($json = null, $isAssociative = true)->orNull();
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode([ null ], $json = null, $isAssociative = true);
     $ffn->print($result);
 
     echo "\n";
 
 
     try {
-        \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($json = null, $isAssociative = true)->orThrow();
+        \Gzhegow\Lib\Lib::format()->json()->jsonc_decode([], $json = null, $isAssociative = true);
     }
     catch ( \Throwable $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($json = null, $isAssociative = true)->orNull();
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode([ null ], $json = null, $isAssociative = true);
     $ffn->print($result);
 
     echo "\n";
 
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode($json1, $isAssociative = true)->getValue();
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode([], $json1, $isAssociative = true);
     $ffn->print($result);
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode($json2, $isAssociative = true)->getValue();
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_decode([], $json2, $isAssociative = true);
     $ffn->print($result);
 
     echo "\n";
 
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($json1, $isAssociative = true)->getValue();
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode([], $json1, $isAssociative = true);
     $ffn->print($result);
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($json2, $isAssociative = true)->getValue();
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode([], $json2, $isAssociative = true);
     $ffn->print($result);
 
     echo "\n";
 
 
     try {
-        \Gzhegow\Lib\Lib::format()->json()->json_decode($jsonWithComment1, $isAssociative = true)->orThrow();
+        \Gzhegow\Lib\Lib::format()->json()->json_decode([], $jsonWithComment1, $isAssociative = true);
     }
     catch ( \Throwable $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 
     try {
-        \Gzhegow\Lib\Lib::format()->json()->json_decode($jsonWithComment2, $isAssociative = true)->orThrow();
+        \Gzhegow\Lib\Lib::format()->json()->json_decode([], $jsonWithComment2, $isAssociative = true);
     }
     catch ( \Throwable $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($jsonWithComment1, $isAssociative = true)->getValue();
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode([], $jsonWithComment1, $isAssociative = true);
     $ffn->print($result);
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode($jsonWithComment2, $isAssociative = true)->getValue();
+    $result = \Gzhegow\Lib\Lib::format()->json()->jsonc_decode([], $jsonWithComment2, $isAssociative = true);
     $ffn->print($result);
 
     echo "\n";
 
 
     try {
-        \Gzhegow\Lib\Lib::format()->json()->json_encode($value = null, $isAllowNull = false)->orThrow();
+        \Gzhegow\Lib\Lib::format()->json()->json_encode([], $value = null, $isAllowNull = false);
     }
     catch ( \Throwable $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode($value = null, $isAllowNull = false)->orNull();
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode([ null ], $value = null, $isAllowNull = false);
     $ffn->print($result);
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode($value = null, $isAllowNull = true)->getValue();
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode([], $value = null, $isAllowNull = true);
     $ffn->print($result);
 
     echo "\n";
 
 
     try {
-        \Gzhegow\Lib\Lib::format()->json()->json_encode($value = NAN)->orThrow();
+        \Gzhegow\Lib\Lib::format()->json()->json_encode([], $value = NAN);
     }
     catch ( \Throwable $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode($value = NAN)->orFallback('NAN');
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode([ 'NAN' ], $value = NAN);
     $ffn->print($result);
 
     echo "\n";
 
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode("привет")->getValue();
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_encode([], "привет");
     $ffn->print($result);
 
-    $result = \Gzhegow\Lib\Lib::format()->json()->json_print("привет")->getValue();
+    $result = \Gzhegow\Lib\Lib::format()->json()->json_print([], "привет");
     $ffn->print($result);
 
     echo "\n";
@@ -3346,7 +3352,7 @@ $fn = function () use ($ffn) {
 </example>
 XML;
 
-    $sxe = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_sxe($xml)->getValue();
+    $sxe = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_sxe([], $xml);
     $ffn->print($sxe);
 
 
@@ -3359,7 +3365,7 @@ XML;
 </example>
 XML;
 
-    $ddoc = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_dom_document($xml)->getValue();
+    $ddoc = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_dom_document([], $xml);
     $ffn->print($ddoc);
 
 
@@ -3371,7 +3377,7 @@ XML;
 </example>
 XML;
 
-    $ddoc = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_dom_document($xml)->getValue();
+    $ddoc = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_dom_document([], $xml);
     $ffn->print($ddoc);
 
 
@@ -3384,7 +3390,7 @@ XML;
 </note>
 XML;
 
-    $ret = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_sxe($xmlInvalid);
+    $ret = \Gzhegow\Lib\Lib::format()->xml()->parse_xml_sxe(null, $xmlInvalid);
     $status = $ret->isOk([ &$sxe ]);
     $ffn->print($status, $sxe);
 

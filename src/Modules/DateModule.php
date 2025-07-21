@@ -151,7 +151,7 @@ class DateModule
         }
 
         if (null !== $dateTimeZone) {
-            return Ret::ok($dateTimeZone);
+            return Ret::val($dateTimeZone);
         }
 
         return Ret::err(
@@ -190,7 +190,7 @@ class DateModule
         }
 
         if (null !== $dateTimeZone) {
-            return Ret::ok($dateTimeZone);
+            return Ret::val($dateTimeZone);
         }
 
         return Ret::err(
@@ -229,7 +229,7 @@ class DateModule
         }
 
         if (null !== $dateTimeZone) {
-            return Ret::ok($dateTimeZone);
+            return Ret::val($dateTimeZone);
         }
 
         return Ret::err(
@@ -268,7 +268,7 @@ class DateModule
         }
 
         if (null !== $dateTimeZone) {
-            return Ret::ok($dateTimeZone);
+            return Ret::val($dateTimeZone);
         }
 
         return Ret::err(
@@ -310,7 +310,7 @@ class DateModule
         }
 
         if (null !== $dateTimeZone) {
-            return Ret::ok($dateTimeZone);
+            return Ret::val($dateTimeZone);
         }
 
         return Ret::err(
@@ -353,7 +353,7 @@ class DateModule
         if (null !== $dateTime) {
             $dateTimeClone = $this->cloneToDate($dateTime);
 
-            return Ret::ok($dateTimeClone);
+            return Ret::val($dateTimeClone);
         }
 
         return Ret::err(
@@ -395,7 +395,7 @@ class DateModule
         if (null !== $dateTime) {
             $dateTimeClone = $this->cloneToADate($dateTime);
 
-            return Ret::ok($dateTimeClone);
+            return Ret::val($dateTimeClone);
         }
 
         return Ret::err(
@@ -437,7 +437,7 @@ class DateModule
         if (null !== $dateTimeImmutable) {
             $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-            return Ret::ok($dateTimeImmutableClone);
+            return Ret::val($dateTimeImmutableClone);
         }
 
         return Ret::err(
@@ -498,7 +498,7 @@ class DateModule
         if (null !== $dateTime) {
             $dateTimeClone = $this->cloneToDate($dateTime);
 
-            return Ret::ok($dateTimeClone);
+            return Ret::val($dateTimeClone);
         }
 
         return Ret::err(
@@ -558,7 +558,7 @@ class DateModule
         if (null !== $dateTime) {
             $dateTimeClone = $this->cloneToADate($dateTime);
 
-            return Ret::ok($dateTimeClone);
+            return Ret::val($dateTimeClone);
         }
 
         return Ret::err(
@@ -618,7 +618,7 @@ class DateModule
         if (null !== $dateTimeImmutable) {
             $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-            return Ret::ok($dateTimeImmutableClone);
+            return Ret::val($dateTimeImmutableClone);
         }
 
         return Ret::err(
@@ -676,7 +676,7 @@ class DateModule
         if (null !== $dateTime) {
             $dateTimeClone = $this->cloneToDate($dateTime);
 
-            return Ret::ok($dateTimeClone);
+            return Ret::val($dateTimeClone);
         }
 
         return Ret::err(
@@ -733,7 +733,7 @@ class DateModule
         if (null !== $dateTime) {
             $dateTimeClone = $this->cloneToADate($dateTime);
 
-            return Ret::ok($dateTimeClone);
+            return Ret::val($dateTimeClone);
         }
 
         return Ret::err(
@@ -790,7 +790,7 @@ class DateModule
         if (null !== $dateTimeImmutable) {
             $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-            return Ret::ok($dateTimeImmutableClone);
+            return Ret::val($dateTimeImmutableClone);
         }
 
         return Ret::err(
@@ -866,7 +866,7 @@ class DateModule
         if (null !== $dateTime) {
             $dateTimeClone = $this->cloneToADate($dateTime);
 
-            return Ret::ok($dateTimeClone);
+            return Ret::val($dateTimeClone);
         }
 
         return Ret::err(
@@ -941,7 +941,7 @@ class DateModule
         if (null !== $dateTime) {
             $dateTimeClone = $this->cloneToADate($dateTime);
 
-            return Ret::ok($dateTimeClone);
+            return Ret::val($dateTimeClone);
         }
 
         return Ret::err(
@@ -1016,7 +1016,7 @@ class DateModule
         if (null !== $dateTimeImmutable) {
             $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-            return Ret::ok($dateTimeImmutableClone);
+            return Ret::val($dateTimeImmutableClone);
         }
 
         return Ret::err(
@@ -1081,7 +1081,7 @@ class DateModule
         if (null !== $dateTime) {
             $dateTimeClone = $this->cloneToDate($dateTime);
 
-            return Ret::ok($dateTimeClone);
+            return Ret::val($dateTimeClone);
         }
 
         return Ret::err(
@@ -1145,7 +1145,7 @@ class DateModule
         if (null !== $dateTime) {
             $dateTimeClone = $this->cloneToDate($dateTime);
 
-            return Ret::ok($dateTimeClone);
+            return Ret::val($dateTimeClone);
         }
 
         return Ret::err(
@@ -1209,7 +1209,7 @@ class DateModule
         if (null !== $dateTimeImmutable) {
             $dateTimeImmutableClone = $this->cloneToDate($dateTimeImmutable);
 
-            return Ret::ok($dateTimeImmutableClone);
+            return Ret::val($dateTimeImmutableClone);
         }
 
         return Ret::err(
@@ -1271,7 +1271,7 @@ class DateModule
         $dateTime = $dateTime->setTimezone($timezoneSetObject);
 
         if (null !== $dateTime) {
-            return Ret::ok($dateTime);
+            return Ret::val($dateTime);
         }
 
         return Ret::err(
@@ -1287,7 +1287,7 @@ class DateModule
     public function type_interval($interval)
     {
         if ($interval instanceof \DateInterval) {
-            return Ret::ok($interval);
+            return Ret::val($interval);
         }
 
         $ret = Ret::new();
@@ -1304,7 +1304,7 @@ class DateModule
             return $ret;
         }
 
-        return Ret::ok($dateInterval);
+        return Ret::val($dateInterval);
     }
 
     /**
@@ -1313,7 +1313,7 @@ class DateModule
     public function type_interval_duration($duration)
     {
         if ($duration instanceof \DateInterval) {
-            return Ret::ok($duration);
+            return Ret::val($duration);
         }
 
         if (! (is_string($duration) && ('' !== $duration))) {
@@ -1326,7 +1326,7 @@ class DateModule
         try {
             $dateInterval = $this->interval_decode($duration);
 
-            return Ret::ok($dateInterval);
+            return Ret::val($dateInterval);
         }
         catch ( \Throwable $e ) {
         }
@@ -1343,7 +1343,7 @@ class DateModule
     public function type_interval_datestring($datestring)
     {
         if ($datestring instanceof \DateInterval) {
-            return Ret::ok($datestring);
+            return Ret::val($datestring);
         }
 
         if (! (is_string($datestring) && ('' !== $datestring))) {
@@ -1357,7 +1357,7 @@ class DateModule
             $dateInterval = \DateInterval::createFromDateString($datestring);
 
             if (false !== $dateInterval) {
-                return Ret::ok($dateInterval);
+                return Ret::val($dateInterval);
             }
         }
         catch ( \Throwable $e ) {
@@ -1375,7 +1375,7 @@ class DateModule
     public function type_interval_microtime($microtime)
     {
         if ($microtime instanceof \DateInterval) {
-            return Ret::ok($microtime);
+            return Ret::val($microtime);
         }
 
         $theType = Lib::type();
@@ -1392,7 +1392,7 @@ class DateModule
         try {
             $dateInterval = $this->interval_decode("PT{$microtimeNumeric}S");
 
-            return Ret::ok($dateInterval);
+            return Ret::val($dateInterval);
         }
         catch ( \Throwable $e ) {
         }
@@ -1414,7 +1414,7 @@ class DateModule
         // $isUntil = (true === $reverse);
 
         if ($date instanceof \DateInterval) {
-            return Ret::ok($date);
+            return Ret::val($date);
         }
 
         if ($date instanceof \DateTimeInterface) {
@@ -1428,7 +1428,7 @@ class DateModule
                 $date = $date->diff($fromDate);
             }
 
-            return Ret::ok($date);
+            return Ret::val($date);
         }
 
         return Ret::err(

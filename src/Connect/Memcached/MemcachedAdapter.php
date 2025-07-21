@@ -58,7 +58,7 @@ class MemcachedAdapter
             return Ret::throw($fallback, $ret);
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -67,7 +67,7 @@ class MemcachedAdapter
     public static function fromStatic($from, ?array $fallback = null)
     {
         if ($from instanceof static) {
-            return Ret::val($fallback, $from);
+            return Ret::ok($fallback, $from);
         }
 
         return Ret::throw(
@@ -86,7 +86,7 @@ class MemcachedAdapter
             $instance = new static();
             $instance->memcached = $from;
 
-            return Ret::val($fallback, $instance);
+            return Ret::ok($fallback, $instance);
         }
 
         return Ret::throw(
@@ -139,7 +139,7 @@ class MemcachedAdapter
         $instance->memcachedNamespace = $from[ 'namespace' ] ?? $from[ 0 ] ?? null;
         $instance->memcachedOptions = $from[ 'options' ] ?? [];
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -162,7 +162,7 @@ class MemcachedAdapter
         $instance->memcachedNamespace = $from[ 'namespace' ] ?? null;
         $instance->memcachedOptions = $from[ 'options' ] ?? [];
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
 

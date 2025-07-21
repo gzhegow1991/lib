@@ -41,7 +41,7 @@ class PregModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
     /**
@@ -74,7 +74,7 @@ class PregModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
 

@@ -149,7 +149,7 @@ class FsModule
 
         } elseif (is_string($value)) {
             if ('0' === $value) {
-                return Ret::ok(0);
+                return Ret::val(0);
             }
 
             $valueString = ltrim($value, '0');
@@ -199,7 +199,7 @@ class FsModule
             );
         }
 
-        return Ret::ok($int);
+        return Ret::val($int);
     }
 
 
@@ -241,7 +241,7 @@ class FsModule
             }
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
     /**
@@ -302,7 +302,7 @@ class FsModule
             }
         }
 
-        return Ret::ok($realpath);
+        return Ret::val($realpath);
     }
 
     /**
@@ -327,7 +327,7 @@ class FsModule
             );
         }
 
-        return Ret::ok($valuePath);
+        return Ret::val($valuePath);
     }
 
 
@@ -362,7 +362,7 @@ class FsModule
                 );
             }
 
-            return Ret::ok($valuePath);
+            return Ret::val($valuePath);
         }
 
         if ($exists) {
@@ -393,7 +393,7 @@ class FsModule
             $valuePath = $valueRealpath;
         }
 
-        return Ret::ok($valuePath);
+        return Ret::val($valuePath);
     }
 
     /**
@@ -432,7 +432,7 @@ class FsModule
             );
         }
 
-        return Ret::ok($valueRealpath);
+        return Ret::val($valueRealpath);
     }
 
 
@@ -467,7 +467,7 @@ class FsModule
                 );
             }
 
-            return Ret::ok($valuePath);
+            return Ret::val($valuePath);
         }
 
         if ($exists) {
@@ -498,7 +498,7 @@ class FsModule
             $valuePath = $valueRealpath;
         }
 
-        return Ret::ok($valuePath);
+        return Ret::val($valuePath);
     }
 
     /**
@@ -535,7 +535,7 @@ class FsModule
             );
         }
 
-        return Ret::ok($valueRealpath);
+        return Ret::val($valueRealpath);
     }
 
 
@@ -561,7 +561,7 @@ class FsModule
             }
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
 
@@ -632,7 +632,7 @@ class FsModule
             }
         }
 
-        return Ret::ok($splFileInfo);
+        return Ret::val($splFileInfo);
     }
 
     protected function type_file_extensions(\SplFileInfo $splFileInfo, array $extensions) : ?\SplFileInfo
@@ -720,14 +720,14 @@ class FsModule
 
             foreach ( $filters as $filter => $value ) {
                 if ('max_size' === $filter) {
-                    $maxSize = $theFormat->bytes_decode($value)->orNan();
+                    $maxSize = $theFormat->bytes_decode([ NAN ], $value);
 
                     if (! ($fileSize <= $maxSize)) {
                         return null;
                     }
 
                 } elseif ('min_size' === $filter) {
-                    $minSize = $theFormat->bytes_decode($value)->orNan();
+                    $minSize = $theFormat->bytes_decode([ NAN ], $value);
 
                     if (! ($fileSize >= $minSize)) {
                         return null;
@@ -769,7 +769,7 @@ class FsModule
             }
         }
 
-        return Ret::ok($splFileInfo);
+        return Ret::val($splFileInfo);
     }
 
     protected function type_image_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
@@ -910,7 +910,7 @@ class FsModule
             || is_a($value, '\Socket')
             || $theType->resource_opened($value, 'socket')->isOk()
         ) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -927,7 +927,7 @@ class FsModule
         $theType = Lib::type();
 
         if ($theType->resource_opened($value, 'stream')->isOk()) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(

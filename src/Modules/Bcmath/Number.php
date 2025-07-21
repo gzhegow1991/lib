@@ -73,7 +73,7 @@ class Number implements
             return Ret::throw($fallback, $ret);
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -82,7 +82,7 @@ class Number implements
     public static function fromStatic($from, ?array $fallback = null)
     {
         if ($from instanceof static) {
-            return Ret::val($fallback, $from);
+            return Ret::ok($fallback, $from);
         }
 
         return Ret::throw(
@@ -118,7 +118,7 @@ class Number implements
 
         $instance->value = "{$instance->sign}{$instance->int}{$instance->frac}{$instance->exp}";
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
 

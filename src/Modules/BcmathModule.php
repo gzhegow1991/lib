@@ -57,7 +57,7 @@ class BcmathModule
     public function type_bcnumber($value)
     {
         if ($value instanceof Bcnumber) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         $theType = Lib::type();
@@ -84,7 +84,7 @@ class BcmathModule
             'scale'    => $scale,
         ])->orThrow();
 
-        return Ret::ok($bcnumber);
+        return Ret::val($bcnumber);
     }
 
 

@@ -53,14 +53,14 @@ class ArrModule
         $theType = Lib::type();
 
         if (is_int($key)) {
-            return Ret::ok($key);
+            return Ret::val($key);
 
         } elseif (is_string($key)) {
-            return Ret::ok($key);
+            return Ret::val($key);
 
         } else {
             if ($theType->string($key)->isOk([ &$keyString ])) {
-                return Ret::ok($keyString);
+                return Ret::val($keyString);
             }
         }
 
@@ -76,12 +76,12 @@ class ArrModule
     public function type_key_exists($key, array $array)
     {
         if (isset($array[ $key ])) {
-            return Ret::ok($array[ $key ]);
+            return Ret::val($array[ $key ]);
 
         } else {
             if ($this->type_key($key)->isOk([ &$keyValid ])) {
                 if (array_key_exists($keyValid, $array)) {
-                    return Ret::ok($array[ $keyValid ]);
+                    return Ret::val($array[ $keyValid ]);
                 }
             }
         }
@@ -114,7 +114,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok(true);
+        return Ret::val(true);
     }
 
 
@@ -178,7 +178,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
 
@@ -197,7 +197,7 @@ class ArrModule
         }
 
         if ([] === $value) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if ($hasMaxDepth) {
@@ -264,7 +264,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
     /**
@@ -281,7 +281,7 @@ class ArrModule
         }
 
         if ([] === $value) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         $prev = -1;
@@ -374,7 +374,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
 
@@ -392,7 +392,7 @@ class ArrModule
         }
 
         if ([] === $value) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if ($hasMaxDepth) {
@@ -459,7 +459,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
     /**
@@ -480,7 +480,7 @@ class ArrModule
         }
 
         if ([] === $value) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         $prev = '';
@@ -599,7 +599,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
 
@@ -622,7 +622,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
     /**
@@ -644,7 +644,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
     /**
@@ -666,7 +666,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
 
@@ -676,7 +676,7 @@ class ArrModule
     public function type_arrpath($value, ?string $dot = null)
     {
         if ($value instanceof ArrPath) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         try {
@@ -686,7 +686,7 @@ class ArrModule
 
             $arrpathObject = ArrPath::fromValidArray($array)->orThrow();
 
-            return Ret::ok($arrpathObject);
+            return Ret::val($arrpathObject);
         }
         catch ( \Throwable $e ) {
         }
@@ -749,7 +749,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
     /**
@@ -780,7 +780,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
     /**
@@ -814,7 +814,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
     /**
@@ -855,7 +855,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
     /**
@@ -889,7 +889,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
     /**
@@ -919,7 +919,7 @@ class ArrModule
             }
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
 

@@ -38,7 +38,7 @@ class DefaultCallableParser implements CallableParserInterface
             if (false
                 || ($aMagic === '__invoke')
             ) {
-                return Ret::ok([ $aClass, $aMagic ]);
+                return Ret::val([ $aClass, $aMagic ]);
             }
 
             return Ret::err(
@@ -47,7 +47,7 @@ class DefaultCallableParser implements CallableParserInterface
             );
 
         } elseif ($aMethod) {
-            return Ret::ok([ $aClass, $aMethod ]);
+            return Ret::val([ $aClass, $aMethod ]);
         }
 
         return Ret::err(
@@ -94,7 +94,7 @@ class DefaultCallableParser implements CallableParserInterface
             ) {
                 $refResultArray = [ $aClass, '__invoke' ];
 
-                return Ret::ok("{$aClass}->__invoke");
+                return Ret::val("{$aClass}->__invoke");
             }
 
             return Ret::err(
@@ -111,13 +111,13 @@ class DefaultCallableParser implements CallableParserInterface
             ) {
                 $refResultArray = [ $aClass, $aMethod ];
 
-                return Ret::ok("{$aClass}->{$aMethod}");
+                return Ret::val("{$aClass}->{$aMethod}");
             }
 
             if ($aMethod === '__callStatic') {
                 $refResultArray = [ $aClass, $aMethod ];
 
-                return Ret::ok("{$aClass}::{$aMethod}");
+                return Ret::val("{$aClass}::{$aMethod}");
             }
 
             try {
@@ -134,7 +134,7 @@ class DefaultCallableParser implements CallableParserInterface
 
             $refResultArray = [ $aClass, $aMethod ];
 
-            return Ret::ok(
+            return Ret::val(
                 $isStatic
                     ? "{$aClass}::{$aMethod}"
                     : "{$aClass}->{$aMethod}"
@@ -163,18 +163,18 @@ class DefaultCallableParser implements CallableParserInterface
         }
 
         if (PHP_VERSION_ID >= 80000) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if (is_object($value)) {
             // > \Closure or invokable
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         $function = $this->parseFunction($value);
         if (null !== $function) {
             // > plain function
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         $methodArray = null
@@ -192,14 +192,14 @@ class DefaultCallableParser implements CallableParserInterface
 
         if ($anObject) {
             // > array with object
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if (false
             || ($aMethod === '__callStatic')
             || ($aMagic === '__callStatic')
         ) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         if (false
@@ -231,7 +231,7 @@ class DefaultCallableParser implements CallableParserInterface
             );
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
 
@@ -251,14 +251,14 @@ class DefaultCallableParser implements CallableParserInterface
             ->typeCallableObjectClosure($value, $newScope)
             ->isOk([ &$valueCallableObjectClosure ])
         ) {
-            return Ret::ok($valueCallableObjectClosure);
+            return Ret::val($valueCallableObjectClosure);
         }
 
         if ($this
             ->typeCallableObjectInvokable($value, $newScope)
             ->isOk([ &$valueCallableObjectInvokable ])
         ) {
-            return Ret::ok($valueCallableObjectInvokable);
+            return Ret::val($valueCallableObjectInvokable);
         }
 
         return Ret::err(
@@ -286,7 +286,7 @@ class DefaultCallableParser implements CallableParserInterface
             );
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
     /**
@@ -309,7 +309,7 @@ class DefaultCallableParser implements CallableParserInterface
             );
         }
 
-        return Ret::ok($invokable);
+        return Ret::val($invokable);
     }
 
 
@@ -331,7 +331,7 @@ class DefaultCallableParser implements CallableParserInterface
             ->typeCallableArrayMethod($value, $newScope)
             ->isOk([ &$valueCallableArrayMethod ])
         ) {
-            return Ret::ok($valueCallableArrayMethod);
+            return Ret::val($valueCallableArrayMethod);
         }
 
         return Ret::err(
@@ -386,7 +386,7 @@ class DefaultCallableParser implements CallableParserInterface
                 );
             }
 
-            return Ret::ok($callableMethodPublic);
+            return Ret::val($callableMethodPublic);
         }
 
         if (false
@@ -419,7 +419,7 @@ class DefaultCallableParser implements CallableParserInterface
                 );
             }
 
-            return Ret::ok($callableMethodStatic);
+            return Ret::val($callableMethodStatic);
         }
 
         try {
@@ -446,7 +446,7 @@ class DefaultCallableParser implements CallableParserInterface
             );
         }
 
-        return Ret::ok($callableMethodStatic);
+        return Ret::val($callableMethodStatic);
     }
 
     /**
@@ -510,7 +510,7 @@ class DefaultCallableParser implements CallableParserInterface
                 );
             }
 
-            return Ret::ok($callableMethodStatic);
+            return Ret::val($callableMethodStatic);
         }
 
         try {
@@ -537,7 +537,7 @@ class DefaultCallableParser implements CallableParserInterface
             );
         }
 
-        return Ret::ok($callableMethodStatic);
+        return Ret::val($callableMethodStatic);
     }
 
     /**
@@ -596,7 +596,7 @@ class DefaultCallableParser implements CallableParserInterface
             || ($aMagic === '__invoke')
             || ($aMagic === '__call')
         ) {
-            return Ret::ok($callableMethodPublic);
+            return Ret::val($callableMethodPublic);
         }
 
         try {
@@ -623,7 +623,7 @@ class DefaultCallableParser implements CallableParserInterface
             );
         }
 
-        return Ret::ok($callableMethodPublic);
+        return Ret::val($callableMethodPublic);
     }
 
 
@@ -643,14 +643,14 @@ class DefaultCallableParser implements CallableParserInterface
             ->typeCallableStringFunction($value)
             ->isOk([ &$valueCallableStringFunction ])
         ) {
-            return Ret::ok($valueCallableStringFunction);
+            return Ret::val($valueCallableStringFunction);
         }
 
         if ($this
             ->typeCallableStringMethodStatic($value, $newScope)
             ->isOk([ &$valueCallableStringMethodStatic ])
         ) {
-            return Ret::ok($valueCallableStringMethodStatic);
+            return Ret::val($valueCallableStringMethodStatic);
         }
 
         return Ret::err(
@@ -672,7 +672,7 @@ class DefaultCallableParser implements CallableParserInterface
         }
 
         if (function_exists($value)) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         return Ret::err(
@@ -704,7 +704,7 @@ class DefaultCallableParser implements CallableParserInterface
         }
 
         if ($rf->isInternal()) {
-            return Ret::ok($rf->getName());
+            return Ret::val($rf->getName());
         }
 
         return Ret::err(
@@ -736,7 +736,7 @@ class DefaultCallableParser implements CallableParserInterface
         }
 
         if (! $rf->isInternal()) {
-            return Ret::ok($rf->getName());
+            return Ret::val($rf->getName());
         }
 
         return Ret::err(
@@ -792,7 +792,7 @@ class DefaultCallableParser implements CallableParserInterface
                 );
             }
 
-            return Ret::ok($callableMethodStatic);
+            return Ret::val($callableMethodStatic);
         }
 
         if (false
@@ -831,7 +831,7 @@ class DefaultCallableParser implements CallableParserInterface
             );
         }
 
-        return Ret::ok($callableMethodStatic);
+        return Ret::val($callableMethodStatic);
     }
 
 

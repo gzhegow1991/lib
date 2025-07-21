@@ -39,7 +39,7 @@ class AddressIpV6
             return Ret::throw($fallback, $ret);
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -48,7 +48,7 @@ class AddressIpV6
     public static function fromStatic($from, ?array $fallback = null)
     {
         if ($from instanceof static) {
-            return Ret::val($fallback, $from);
+            return Ret::ok($fallback, $from);
         }
 
         return Ret::throw(
@@ -67,7 +67,7 @@ class AddressIpV6
             $instance = new static();
             $instance->value = $from;
 
-            return Ret::val($fallback, $instance);
+            return Ret::ok($fallback, $instance);
         }
 
         return Ret::throw(

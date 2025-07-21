@@ -20,14 +20,14 @@ class FormatCsv
 
 
     /**
-     * @return Ret<string>
+     * @param array{ 0?: mixed }|null $fallback # Pass `null` to return Ret<T> or pass `[]` to throw exception
+     *
+     * @return string|Ret<string>
      */
     public function csv_encode_rows(
+        ?array $fallback,
         $rows,
-        ?string $separator = null,
-        ?string $enclosure = null,
-        ?string $escape = null,
-        ?string $eol = null,
+        ?string $separator = null, ?string $enclosure = null, ?string $escape = null, ?string $eol = null,
         array $refs = []
     )
     {
@@ -40,16 +40,16 @@ class FormatCsv
         $refLength = 0;
 
         if (! $theType->array_not_empty($rows)->isOk([ 1 => &$ret ])) {
-            return $ret;
+            return Ret::throw($fallback, $ret);
         }
 
         if (! $theType->list($rows)->isOk([ 1 => &$ret ])) {
-            return $ret;
+            return Ret::throw($fallback, $ret);
         }
 
         foreach ( $rows as $row ) {
             if (! $theType->array_not_empty($row)->isOk([ 1 => &$ret ])) {
-                return $ret;
+                return Ret::throw($fallback, $ret);
             }
         }
 
@@ -79,41 +79,18 @@ class FormatCsv
 
         $refLength = $len;
 
-        return Ret::ok($content);
+        return Ret::ok($fallback, $content);
     }
 
     /**
+     * @param array{ 0?: mixed }|null $fallback # Pass `null` to return Ret<T> or pass `[]` to throw exception
+     *
      * @return string|Ret<string>
      */
-    public function csv_encode_rows_fallback(
-        ?array $fallback,
-        $rows,
-        ?string $separator = null,
-        ?string $enclosure = null,
-        ?string $escape = null,
-        ?string $eol = null,
-        array $refs = []
-    )
-    {
-        $ret = $this->csv_encode_rows($rows, $separator, $enclosure, $escape, $eol, $refs);
-
-        if ($ret->isFail()) {
-            return Ret::throw($fallback, $ret);
-        }
-
-        return Ret::val($fallback, $ret->getValue());
-    }
-
-
-    /**
-     * @return Ret<string>
-     */
     public function csv_encode_row(
+        ?array $fallback,
         $row,
-        ?string $separator = null,
-        ?string $enclosure = null,
-        ?string $escape = null,
-        ?string $eol = null,
+        ?string $separator = null, ?string $enclosure = null, ?string $escape = null, ?string $eol = null,
         array $refs = []
     )
     {
@@ -126,7 +103,7 @@ class FormatCsv
         $refLength = 0;
 
         if (! $theType->array_not_empty($row)->isOk([ 1 => &$ret ])) {
-            return $ret;
+            return Ret::throw($fallback, $ret);
         }
 
         $separatorChar = $theType->char($separator ?? ';')->orThrow();
@@ -152,28 +129,6 @@ class FormatCsv
 
         $refLength = $len;
 
-        return Ret::ok($content);
-    }
-
-    /**
-     * @return string|Ret<string>
-     */
-    public function csv_encode_row_fallback(
-        ?array $fallback,
-        $row,
-        ?string $separator = null,
-        ?string $enclosure = null,
-        ?string $escape = null,
-        ?string $eol = null,
-        array $refs = []
-    )
-    {
-        $ret = $this->csv_encode_rows($row, $separator, $enclosure, $escape, $eol, $refs);
-
-        if ($ret->isFail()) {
-            return Ret::throw($fallback, $ret);
-        }
-
-        return Ret::val($fallback, $ret->getValue());
+        return Ret::ok($fallback, $content);
     }
 }

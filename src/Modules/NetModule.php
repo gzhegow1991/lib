@@ -45,7 +45,7 @@ class NetModule
             );
         }
 
-        return Ret::ok($valueFiltered);
+        return Ret::val($valueFiltered);
     }
 
     /**
@@ -54,7 +54,7 @@ class NetModule
     public function type_address_ip_v4($value)
     {
         if ($value instanceof AddressIpV4) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         $theType = Lib::type();
@@ -75,7 +75,7 @@ class NetModule
 
         $valueAddressIpV4 = AddressIpV6::fromValidString($valueFiltered)->orThrow();
 
-        return Ret::ok($valueAddressIpV4);
+        return Ret::val($valueAddressIpV4);
     }
 
     /**
@@ -84,7 +84,7 @@ class NetModule
     public function type_address_ip_v6($value)
     {
         if ($value instanceof AddressIpV6) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         $theType = Lib::type();
@@ -105,7 +105,7 @@ class NetModule
 
         $valueAddressIpV6 = AddressIpV6::fromValidString($valueFiltered)->orThrow();
 
-        return Ret::ok($valueAddressIpV6);
+        return Ret::val($valueAddressIpV6);
     }
 
 
@@ -137,7 +137,7 @@ class NetModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
 
@@ -156,7 +156,7 @@ class NetModule
             return Ret::err([ __FILE__, __LINE__ ]);
         }
 
-        return Ret::ok($valueSubnet);
+        return Ret::val($valueSubnet);
     }
 
     /**
@@ -165,7 +165,7 @@ class NetModule
     public function type_subnet_v4($value, ?string $ipFallback = null)
     {
         if ($value instanceof SubnetV4) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         $theType = Lib::type();
@@ -265,7 +265,7 @@ class NetModule
 
             $valueSubnetV4 = SubnetV4::fromValidString($subnetV4)->orThrow();
 
-            return Ret::ok($valueSubnetV4);
+            return Ret::val($valueSubnetV4);
         }
 
         return Ret::err(
@@ -280,7 +280,7 @@ class NetModule
     public function type_subnet_v6($value, ?string $ipFallback = null)
     {
         if ($value instanceof SubnetV6) {
-            return Ret::ok($value);
+            return Ret::val($value);
         }
 
         $theType = Lib::type();
@@ -339,7 +339,7 @@ class NetModule
 
             $valueSubnetV6 = SubnetV6::fromValidString($subnetV6)->orThrow();
 
-            return Ret::ok($valueSubnetV6);
+            return Ret::val($valueSubnetV6);
         }
 
         return Ret::err(
@@ -399,7 +399,7 @@ class NetModule
             $subnetInt = 32;
         }
 
-        return Ret::ok($subnetInt);
+        return Ret::val($subnetInt);
     }
 
 

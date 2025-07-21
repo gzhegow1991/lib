@@ -80,7 +80,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
             return Ret::throw($fallback, $ret);
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -98,7 +98,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
             return Ret::throw($fallback, $ret);
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -116,7 +116,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
             return Ret::throw($fallback, $ret);
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
 
@@ -126,7 +126,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
     protected function fromInstance($from, ?array $fallback = null)
     {
         if ($from instanceof Promise) {
-            return Ret::val($fallback, $from);
+            return Ret::ok($fallback, $from);
         }
 
         return Ret::throw(
@@ -152,7 +152,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
             );
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
@@ -171,7 +171,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
             );
         }
 
-        return Ret::val($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
 

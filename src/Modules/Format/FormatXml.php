@@ -26,18 +26,19 @@ class FormatXml
 
 
     /**
-     * @return Ret<\SimpleXMLElement>
+     * @return \SimpleXMLElement|Ret<\SimpleXMLElement>
      */
-    public function parse_xml_sxe($xml)
+    public function parse_xml_sxe(?array $fallback, $xml)
     {
         $theType = Lib::type();
 
         if (! $theType->string_not_empty($xml)->isOk([ &$xmlStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::throw($fallback, $ret);
         }
 
         if (false === strpos($xmlStringNotEmpty, '<')) {
-            return Ret::err(
+            return Ret::throw(
+                $fallback,
                 [ 'The `xml` should contain at least one symbol `<`', $xml ],
                 [ __FILE__, __LINE__ ]
             );
@@ -51,7 +52,8 @@ class FormatXml
             || (false !== stripos($xml, 'Envelope'))
             || (preg_match('/<\w+:(\w+)[^>]*>|xmlns:/i', $xml))
         ) {
-            return Ret::err(
+            return Ret::throw(
+                $fallback,
                 [ 'The `xml` cannot be parsed using SimpleXmlElement due to it contains complex XML', $xml ],
                 [ __FILE__, __LINE__ ]
             );
@@ -92,48 +94,36 @@ class FormatXml
             }
 
             if ($ret->isFail()) {
-                return $ret;
+                return Ret::throw($fallback, $ret);
             }
         }
 
         if ($e) {
-            return Ret::err(
+            return Ret::throw(
+                $fallback,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($sxe);
-    }
-
-    /**
-     * @return \SimpleXMLElement|Ret<\SimpleXMLElement>
-     */
-    public function parse_xml_sxe_fallback(?array $fallback, $xml)
-    {
-        $ret = $this->parse_xml_sxe($xml);
-
-        if ($ret->isFail()) {
-            return Ret::throw($fallback, $ret);
-        }
-
-        return Ret::val($fallback, $ret->getValue());
+        return Ret::ok($fallback, $sxe);
     }
 
 
     /**
-     * @return Ret<\DOMDocument>
+     * @return \DOMDocument|Ret<\DOMDocument>
      */
-    public function parse_xml_dom_document($xml)
+    public function parse_xml_dom_document(?array $fallback, $xml)
     {
         $theType = Lib::type();
 
         if (! $theType->string_not_empty($xml)->isOk([ &$xmlStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::throw($fallback, $ret);
         }
 
         if (false === strpos($xmlStringNotEmpty, '<')) {
-            return Ret::err(
+            return Ret::throw(
+                $fallback,
                 [ 'The `xml` should contain at least one symbol `<`', $xml ],
                 [ __FILE__, __LINE__ ]
             );
@@ -175,31 +165,18 @@ class FormatXml
             }
 
             if ($ret->isFail()) {
-                return $ret;
+                return Ret::throw($fallback, $ret);
             }
         }
 
         if ($e) {
-            return Ret::err(
+            return Ret::throw(
+                $fallback,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($ddoc);
-    }
-
-    /**
-     * @return \DOMDocument|Ret<\DOMDocument>
-     */
-    public function parse_xml_dom_document_fallback(?array $fallback, $xml)
-    {
-        $ret = $this->parse_xml_dom_document($xml);
-
-        if ($ret->isFail()) {
-            return Ret::throw($fallback, $ret);
-        }
-
-        return Ret::val($fallback, $ret->getValue());
+        return Ret::ok($fallback, $ddoc);
     }
 }

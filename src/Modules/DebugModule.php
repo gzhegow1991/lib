@@ -171,7 +171,7 @@ class DebugModule
             $line = $lineInt;
         }
 
-        return Ret::ok([ $file, $line ]);
+        return Ret::val([ $file, $line ]);
     }
 
 

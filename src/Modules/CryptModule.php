@@ -72,7 +72,7 @@ class CryptModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
     /**
@@ -93,7 +93,7 @@ class CryptModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
     /**
@@ -114,7 +114,7 @@ class CryptModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
     /**
@@ -135,7 +135,7 @@ class CryptModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
     /**
@@ -156,7 +156,7 @@ class CryptModule
             );
         }
 
-        return Ret::ok($valueStringNotEmpty);
+        return Ret::val($valueStringNotEmpty);
     }
 
 

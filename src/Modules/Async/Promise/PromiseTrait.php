@@ -30,7 +30,7 @@ trait PromiseTrait
             $p->debugInfo = $theDebug->file_line();
         }
 
-        return Ret::val($fallback, $ret);
+        return Ret::ok($fallback, $ret);
     }
 
     /**
@@ -52,7 +52,7 @@ trait PromiseTrait
             $p->debugInfo = $theDebug->file_line();
         }
 
-        return Ret::val($fallback, $ret);
+        return Ret::ok($fallback, $ret);
     }
 
     /**
@@ -76,7 +76,7 @@ trait PromiseTrait
             $p->debugInfo = $theDebug->file_line();
         }
 
-        return Ret::val($fallback, $ret);
+        return Ret::ok($fallback, $ret);
     }
 
 

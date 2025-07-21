@@ -460,8 +460,8 @@ class EntrypointModule
             $this->memoryLimit = '32M';
 
         } else {
-            $bytesInt = $theFormat->bytes_decode($memoryLimit)->orThrow();
-            $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1)->orThrow();
+            $bytesInt = $theFormat->bytes_decode([], $memoryLimit);
+            $bytesString = $theFormat->bytes_encode([], $bytesInt, 0, 1);
 
             $this->memoryLimit = $bytesString;
         }
@@ -734,8 +734,8 @@ class EntrypointModule
             $this->postMaxSize = '8M';
 
         } else {
-            $bytesInt = $theFormat->bytes_decode($postMaxSize)->orThrow();
-            $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1)->orThrow();
+            $bytesInt = $theFormat->bytes_decode([], $postMaxSize);
+            $bytesString = $theFormat->bytes_encode([], $bytesInt, 0, 1);
 
             $this->postMaxSize = $bytesString;
         }
@@ -785,8 +785,8 @@ class EntrypointModule
             $this->uploadMaxFilesize = '2M';
 
         } else {
-            $bytesInt = $theFormat->bytes_decode($uploadMaxFilesize)->orThrow();
-            $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1)->orThrow();
+            $bytesInt = $theFormat->bytes_decode([], $uploadMaxFilesize);
+            $bytesString = $theFormat->bytes_encode([], $bytesInt, 0, 1);
 
             $this->uploadMaxFilesize = $bytesString;
         }

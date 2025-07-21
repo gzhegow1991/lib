@@ -43,7 +43,7 @@ class Ret
      *
      * @return static<T>
      */
-    public static function ok($value)
+    public static function val($value)
     {
         if ($value instanceof static) {
             throw new LogicException(
@@ -88,7 +88,7 @@ class Ret
      *
      * @return T|static<T>
      */
-    public static function val(
+    public static function ok(
         ?array $fallback,
         $value
     )
@@ -139,7 +139,7 @@ class Ret
         }
 
         if ([] !== $fallback) {
-            return $instance->orFallback($fallback[ 0 ]);
+            return $fallback[ 0 ];
         }
 
         $fileLine = $fileLine ?? Lib::debug()->file_line();
@@ -317,7 +317,7 @@ class Ret
 
 
     /**
-     * @return T|mixed
+     * @return T
      */
     public function orThrow(array $fileLine = [], ...$throwableArgs)
     {
@@ -355,22 +355,50 @@ class Ret
     }
 
     /**
+     * @param array{ 0?: mixed } $fallback
+     *
      * @return T|mixed
      */
-    public function orFallback($fallback = null, ?self &$refRetTo = null)
+    public function orFallback(
+        array $fallback = [],
+        array $fileLine = [], ...$throwableArgs
+    )
     {
-        if (null === $refRetTo) {
-            $refRetTo = $this;
-
-        } else {
-            $this->mergeTo($refRetTo);
-        }
-
         if ([] !== $this->value) {
             return $this->value[ 0 ];
         }
 
-        return $fallback;
+        if ([] !== $fallback) {
+            return $fallback[ 0 ];
+        }
+
+        $fileLine = $fileLine ?? Lib::debug()->file_line();
+
+        $errorList = $this->errors;
+
+        $previousList = [];
+
+        while ( [] !== $errorList ) {
+            [
+                'args' => $throwableArgsItem,
+                'file' => $fileLineItem,
+            ] = array_pop($errorList);
+
+            $previousList[] = new LogicException($fileLineItem, ...$throwableArgsItem);
+        }
+
+        if ([] !== $throwableArgs) {
+            throw new LogicException(
+                $fileLine,
+                ...$previousList
+            );
+        }
+
+        throw new LogicException(
+            $fileLine,
+            ...$throwableArgs,
+            ...$previousList
+        );
     }
 
 

@@ -135,7 +135,7 @@ class RandomModule
             );
         }
 
-        return Ret::ok($value);
+        return Ret::val($value);
     }
 
 

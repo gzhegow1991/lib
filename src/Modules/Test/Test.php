@@ -241,7 +241,7 @@ class Test
 
         $theFormat = Lib::format();
 
-        $memoryMaxValid = $theFormat->bytes_decode($memoryMax ?? '32M')->orThrow();
+        $memoryMaxValid = $theFormat->bytes_decode([ NAN ], $memoryMax ?? '32M');
 
         $this->memoryMax = $memoryMaxValid;
 
