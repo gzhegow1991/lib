@@ -221,7 +221,7 @@ abstract class AbstractContext implements
      */
     public function toCamelCase()
     {
-        $theStr = Lib::$str;
+        $theStr = Lib::str();
 
         $instance = new static();
 
@@ -239,7 +239,7 @@ abstract class AbstractContext implements
      */
     public function toSnakeCase()
     {
-        $theStr = Lib::$str;
+        $theStr = Lib::str();
 
         $instance = new static();
 

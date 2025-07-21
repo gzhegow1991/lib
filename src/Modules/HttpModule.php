@@ -163,7 +163,7 @@ class HttpModule
         $replace = $replace ?? true;
         $response_code = $response_code ?? 0;
 
-        $theFunc = Lib::$func;
+        $theFunc = Lib::func();
 
         $theFunc->safe_call(
             function () use ($header, $replace, $response_code) {
@@ -174,7 +174,7 @@ class HttpModule
 
     public function header_remove(?string $name) : void
     {
-        $theFunc = Lib::$func;
+        $theFunc = Lib::func();
 
         $theFunc->safe_call(
             function () use ($name) {
@@ -198,7 +198,7 @@ class HttpModule
         $secure = $secure ?? false;
         $httponly = $httponly ?? false;
 
-        $theFunc = Lib::$func;
+        $theFunc = Lib::func();
 
         $theFunc->safe_call(
             function () use ($name, $value, $expires_or_options, $path, $domain, $secure, $httponly) {
@@ -223,7 +223,7 @@ class HttpModule
         $secure = $secure ?? false;
         $httponly = $httponly ?? false;
 
-        $theFunc = Lib::$func;
+        $theFunc = Lib::func();
 
         $theFunc->safe_call(
             function () use ($name, $value, $expires_or_options, $path, $domain, $secure, $httponly) {
@@ -237,7 +237,7 @@ class HttpModule
 
     public function data_replace(?array $dataArray, ?array ...$dataArrays) : array
     {
-        $theArr = Lib::$arr;
+        $theArr = Lib::arr();
 
         if ($dataArray) {
             array_unshift($dataArrays, $dataArray);
@@ -286,7 +286,7 @@ class HttpModule
 
     public function data_merge(?array $dataArray, ?array ...$dataArrays) : array
     {
-        $theArr = Lib::$arr;
+        $theArr = Lib::arr();
 
         if ($dataArray) {
             array_unshift($dataArrays, $dataArray);
@@ -336,7 +336,7 @@ class HttpModule
 
     public function build_query_array($query, ...$queries) : array
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if ($queries) {
             array_unshift($queries, $query);
@@ -374,7 +374,7 @@ class HttpModule
 
     public function accept_match(string $httpAccept, $acceptAnd = null, ...$acceptOr) : array
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         array_unshift($acceptOr, $acceptAnd);
 

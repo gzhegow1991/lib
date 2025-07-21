@@ -21,20 +21,11 @@ class BcmathModule
 
     public function __construct()
     {
-    }
-
-    /**
-     * @return static
-     */
-    public function assertExtension()
-    {
         if (! extension_loaded('bcmath')) {
             throw new ExtensionException(
                 'Missing PHP extension: bcmath'
             );
         }
-
-        return $this;
     }
 
 
@@ -69,7 +60,7 @@ class BcmathModule
             return Ret::ok($value);
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType
             ->numeric($value, false, [ &$split ])
@@ -104,7 +95,7 @@ class BcmathModule
      */
     public function scales(...$numbers) : array
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $scaleList = [];
 
@@ -120,7 +111,7 @@ class BcmathModule
 
     public function scale_min(?int $scale = null, ...$numbers) : ?int
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $scaleIntList = [];
 
@@ -160,7 +151,7 @@ class BcmathModule
 
     public function scale_max(?int $scale = null, ...$numbers) : ?int
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $scaleIntList = [];
 
@@ -197,7 +188,7 @@ class BcmathModule
 
     public function bccomp($num1, $num2, ?int $scale = null) : int
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
@@ -219,7 +210,7 @@ class BcmathModule
 
     public function bcabs($number) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnumber = $theType->bcnumber($number)->orThrow();
 
@@ -232,7 +223,7 @@ class BcmathModule
 
     public function bcceil($number) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnumber = $theType->bcnumber($number)->orThrow();
 
@@ -261,7 +252,7 @@ class BcmathModule
 
     public function bcfloor($number) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnumber = $theType->bcnumber($number)->orThrow();
 
@@ -309,7 +300,7 @@ class BcmathModule
     {
         $scale = $scale ?? 0;
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnumber = $theType->bcnumber($number)->orThrow();
         $scaleInt = $theType->int_non_negative($scale)->orThrow();
@@ -551,7 +542,7 @@ class BcmathModule
     {
         $scale = $scale ?? 0;
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnumber = $theType->bcnumber($number)->orThrow();
         $scaleInt = $theType->int_non_negative($scale)->orThrow();
@@ -762,7 +753,7 @@ class BcmathModule
 
     public function bcadd($num1, $num2, ?int $scale = null) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
@@ -785,7 +776,7 @@ class BcmathModule
 
     public function bcsub($num1, $num2, ?int $scale = null) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
@@ -808,7 +799,7 @@ class BcmathModule
 
     public function bcmul($num1, $num2, ?int $scale = null) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
@@ -842,7 +833,7 @@ class BcmathModule
      */
     public function bcdiv($num1, $num2, int $scale) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
@@ -866,7 +857,7 @@ class BcmathModule
 
     public function bcmod($num1, $num2) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
@@ -884,7 +875,7 @@ class BcmathModule
 
     public function bcfmod($num1, $num2, int $scale) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
@@ -916,7 +907,7 @@ class BcmathModule
 
     public function bcpow($num, int $exponent, ?int $scale = null) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnum = $theType->bcnumber($num)->orThrow();
 
@@ -945,7 +936,7 @@ class BcmathModule
 
     public function bcsqrt($num, int $scale) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnum = $theType->bcnumber($num)->orThrow();
         $scaleInt = $theType->int_non_negative($scale)->orThrow();
@@ -967,7 +958,7 @@ class BcmathModule
      */
     public function bcgcd($num1, $num2) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
@@ -993,7 +984,7 @@ class BcmathModule
      */
     public function bclcm($num1, $num2) : Bcnumber
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();

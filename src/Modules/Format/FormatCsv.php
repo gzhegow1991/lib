@@ -31,7 +31,7 @@ class FormatCsv
         array $refs = []
     )
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $withLength = array_key_exists(0, $refs);
         if ($withLength) {
@@ -83,6 +83,29 @@ class FormatCsv
     }
 
     /**
+     * @return string|Ret<string>
+     */
+    public function csv_encode_rows_fallback(
+        ?array $fallback,
+        $rows,
+        ?string $separator = null,
+        ?string $enclosure = null,
+        ?string $escape = null,
+        ?string $eol = null,
+        array $refs = []
+    )
+    {
+        $ret = $this->csv_encode_rows($rows, $separator, $enclosure, $escape, $eol, $refs);
+
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        return Ret::val($fallback, $ret->getValue());
+    }
+
+
+    /**
      * @return Ret<string>
      */
     public function csv_encode_row(
@@ -94,7 +117,7 @@ class FormatCsv
         array $refs = []
     )
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $withLength = array_key_exists(0, $refs);
         if ($withLength) {
@@ -130,5 +153,27 @@ class FormatCsv
         $refLength = $len;
 
         return Ret::ok($content);
+    }
+
+    /**
+     * @return string|Ret<string>
+     */
+    public function csv_encode_row_fallback(
+        ?array $fallback,
+        $row,
+        ?string $separator = null,
+        ?string $enclosure = null,
+        ?string $escape = null,
+        ?string $eol = null,
+        array $refs = []
+    )
+    {
+        $ret = $this->csv_encode_rows($row, $separator, $enclosure, $escape, $eol, $refs);
+
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        return Ret::val($fallback, $ret->getValue());
     }
 }

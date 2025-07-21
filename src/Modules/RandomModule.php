@@ -215,7 +215,7 @@ class RandomModule
     {
         $alphabet = $alphabet ?? '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $lenIntPositive = $theType->int_positive($len)->orThrow();
         $alphabetValid = $theType->alphabet($alphabet)->orThrow();
@@ -240,36 +240,26 @@ class RandomModule
 
     public function random_base64_urlsafe(?int $len = null) : string
     {
-        $theCrypt = Lib::$crypt;
-
-        return $theCrypt->base64_encode_urlsafe($this->random_bytes($len));
+        return Lib::crypt()->base64_encode_urlsafe($this->random_bytes($len));
     }
 
     public function random_base64(?int $len = null) : string
     {
-        $theCrypt = Lib::$crypt;
-
-        return $theCrypt->base64_encode($this->random_bytes($len));
+        return Lib::crypt()->base64_encode($this->random_bytes($len));
     }
 
     public function random_base62(?int $len = null) : string
     {
-        $theCrypt = Lib::$crypt;
-
-        return $theCrypt->base62_encode($this->random_bytes($len));
+        return Lib::crypt()->base62_encode($this->random_bytes($len));
     }
 
     public function random_base58(?int $len = null) : string
     {
-        $theCrypt = Lib::$crypt;
-
-        return $theCrypt->base58_encode($this->random_bytes($len));
+        return Lib::crypt()->base58_encode($this->random_bytes($len));
     }
 
     public function random_base36(?int $len = null) : string
     {
-        $theCrypt = Lib::$crypt;
-
-        return $theCrypt->base36_encode($this->random_bytes($len));
+        return Lib::crypt()->base36_encode($this->random_bytes($len));
     }
 }

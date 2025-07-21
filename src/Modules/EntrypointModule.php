@@ -145,7 +145,7 @@ class EntrypointModule
     {
         $isLocked = $isLocked ?? true;
 
-        $theDebug = Lib::$debug;
+        $theDebug = Lib::debug();
 
         if ($isLocked) {
             $this->isLocked = $theDebug->file_line();
@@ -170,7 +170,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
@@ -322,7 +322,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
@@ -445,7 +445,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $theFormat = Lib::$format;
+        $theFormat = Lib::format();
 
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
@@ -460,8 +460,8 @@ class EntrypointModule
             $this->memoryLimit = '32M';
 
         } else {
-            $bytesInt = $theFormat->bytes_decode($memoryLimit);
-            $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1);
+            $bytesInt = $theFormat->bytes_decode($memoryLimit)->orThrow();
+            $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1)->orThrow();
 
             $this->memoryLimit = $bytesString;
         }
@@ -496,7 +496,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
@@ -546,7 +546,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
@@ -591,7 +591,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
@@ -664,7 +664,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
@@ -719,7 +719,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $theFormat = Lib::$format;
+        $theFormat = Lib::format();
 
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
@@ -734,8 +734,8 @@ class EntrypointModule
             $this->postMaxSize = '8M';
 
         } else {
-            $bytesInt = $theFormat->bytes_decode($postMaxSize);
-            $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1);
+            $bytesInt = $theFormat->bytes_decode($postMaxSize)->orThrow();
+            $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1)->orThrow();
 
             $this->postMaxSize = $bytesString;
         }
@@ -770,7 +770,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $theFormat = Lib::$format;
+        $theFormat = Lib::format();
 
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
@@ -785,8 +785,8 @@ class EntrypointModule
             $this->uploadMaxFilesize = '2M';
 
         } else {
-            $bytesInt = $theFormat->bytes_decode($uploadMaxFilesize);
-            $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1);
+            $bytesInt = $theFormat->bytes_decode($uploadMaxFilesize)->orThrow();
+            $bytesString = $theFormat->bytes_encode($bytesInt, 0, 1)->orThrow();
 
             $this->uploadMaxFilesize = $bytesString;
         }
@@ -829,7 +829,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
@@ -899,7 +899,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
             if (! $replace) {
@@ -1138,7 +1138,7 @@ class EntrypointModule
 
     public function fnExceptionHandler(\Throwable $throwable) : void
     {
-        $theDebug = Lib::$debug;
+        $theDebug = Lib::debug();
         $theDebugThrowabler = $theDebug->throwabler();
 
         $theDebugThrowabler->setDirRoot($this->dirRoot);

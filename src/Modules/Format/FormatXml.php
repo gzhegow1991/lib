@@ -30,7 +30,7 @@ class FormatXml
      */
     public function parse_xml_sxe($xml)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($xml)->isOk([ &$xmlStringNotEmpty, &$ret ])) {
             return $ret;
@@ -107,11 +107,26 @@ class FormatXml
     }
 
     /**
+     * @return \SimpleXMLElement|Ret<\SimpleXMLElement>
+     */
+    public function parse_xml_sxe_fallback(?array $fallback, $xml)
+    {
+        $ret = $this->parse_xml_sxe($xml);
+
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        return Ret::val($fallback, $ret->getValue());
+    }
+
+
+    /**
      * @return Ret<\DOMDocument>
      */
     public function parse_xml_dom_document($xml)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($xml)->isOk([ &$xmlStringNotEmpty, &$ret ])) {
             return $ret;
@@ -172,5 +187,19 @@ class FormatXml
         }
 
         return Ret::ok($ddoc);
+    }
+
+    /**
+     * @return \DOMDocument|Ret<\DOMDocument>
+     */
+    public function parse_xml_dom_document_fallback(?array $fallback, $xml)
+    {
+        $ret = $this->parse_xml_dom_document($xml);
+
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        return Ret::val($fallback, $ret->getValue());
     }
 }

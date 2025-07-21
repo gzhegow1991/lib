@@ -7,11 +7,11 @@ use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper;
-use Gzhegow\Lib\Modules\Debug\Throwabler\DefaultThrowabler;
 use Gzhegow\Lib\Modules\Debug\Dumper\DumperInterface;
+use Gzhegow\Lib\Modules\Debug\Throwabler\DefaultThrowabler;
 use Gzhegow\Lib\Modules\Debug\Throwabler\ThrowablerInterface;
-use Gzhegow\Lib\Modules\Debug\DebugBacktracer\DefaultDebugBacktracer;
-use Gzhegow\Lib\Modules\Debug\DebugBacktracer\DebugBacktracerInterface;
+use Gzhegow\Lib\Modules\Debug\Backtracer\DefaultBacktracer;
+use Gzhegow\Lib\Modules\Debug\Backtracer\BacktracerInterface;
 
 
 class DebugModule
@@ -26,9 +26,9 @@ class DebugModule
     protected $throwabler;
 
     /**
-     * @var DebugBacktracerInterface
+     * @var BacktracerInterface
      */
-    protected $debugBacktracer;
+    protected $backtracer;
 
     /**
      * @var string
@@ -38,6 +38,25 @@ class DebugModule
      * @var array
      */
     protected $varDumpOptions = [];
+
+
+    public function newBacktracer() : BacktracerInterface
+    {
+        return new DefaultBacktracer();
+    }
+
+    public function cloneBacktracer() : BacktracerInterface
+    {
+        return clone $this->backtracer();
+    }
+
+    public function backtracer(?BacktracerInterface $backtracer = null) : BacktracerInterface
+    {
+        return $this->backtracer = null
+            ?? $backtracer
+            ?? $this->backtracer
+            ?? $this->newBacktracer();
+    }
 
 
     public function newDumper() : DumperInterface
@@ -78,18 +97,9 @@ class DebugModule
     }
 
 
-    public function static_debug_backtracer(?DebugBacktracerInterface $debugBacktracer = null) : DebugBacktracerInterface
-    {
-        return $this->debugBacktracer = null
-            ?? $debugBacktracer
-            ?? $this->debugBacktracer
-            ?? new DefaultDebugBacktracer();
-    }
-
-
     public function static_dir_root(?string $dirRoot = null) : ?string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (null !== $dirRoot) {
             $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
@@ -169,9 +179,9 @@ class DebugModule
         ?int $options = -1,
         ?int $limit = -1,
         ?string $dirRoot = ''
-    ) : DebugBacktracerInterface
+    ) : BacktracerInterface
     {
-        $backtracer = clone $this->static_debug_backtracer();
+        $backtracer = $this->cloneBacktracer();
 
         if ((null === $options) || ($options >= 0)) {
             $backtracer->options($options);
@@ -716,7 +726,7 @@ class DebugModule
 
     public function types(array $options = [], ?string $delimiter = null, ...$values) : string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $delimiterString = $theType->string_not_empty($delimiter ?? ' | ')->orThrow();
 
@@ -732,7 +742,7 @@ class DebugModule
 
     public function type_ids(array $options = [], ?string $delimiter = null, ...$values) : string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $delimiterString = $theType->string_not_empty($delimiter ?? ' | ')->orThrow();
 
@@ -748,7 +758,7 @@ class DebugModule
 
     public function type_values(array $options = [], ?string $delimiter = null, ...$values) : string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $delimiterString = $theType->string_not_empty($delimiter ?? ' | ')->orThrow();
 
@@ -764,7 +774,7 @@ class DebugModule
 
     public function values(array $options = [], ?string $delimiter = null, ...$values) : string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $delimiterString = $theType->string_not_empty($delimiter ?? ' | ')->orThrow();
 
@@ -927,7 +937,7 @@ class DebugModule
     {
         if (! is_string($var)) return null;
 
-        $theStr = Lib::$str;
+        $theStr = Lib::str();
 
         $withValue = $options[ 'with_value' ] ?? true;
 
@@ -958,7 +968,7 @@ class DebugModule
     {
         if (! is_object($var)) return null;
 
-        $theDate = Lib::$date;
+        $theDate = Lib::date();
 
         $phpType = gettype($var);
 
@@ -1025,8 +1035,8 @@ class DebugModule
     {
         if (! is_array($var)) return null;
 
-        $theArr = Lib::$arr;
-        $theType = Lib::$type;
+        $theArr = Lib::arr();
+        $theType = Lib::type();
 
         $withValue = $options[ 'with_value' ] ?? true;
 
@@ -1052,7 +1062,7 @@ class DebugModule
             foreach ( $gen as $path => &$value ) {
                 if (false
                     || is_object($value)
-                    || $theType->is_resource($value)
+                    || $theType->resource($value)->isOk()
                 ) {
                     // > ! recursion
                     $value = $this->var_dump(
@@ -1180,7 +1190,7 @@ class DebugModule
     {
         $level = $level ?? 0;
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $addcslashes = $options[ 'addcslashes' ] ?? true;
         $indent = $options[ 'indent' ] ?? "  ";
@@ -1217,7 +1227,7 @@ class DebugModule
                     $result = "[]";
 
                 } else {
-                    $isListSorted = $theType->is_list_sorted($var);
+                    $isListSorted = $theType->list_sorted($var)->isOk();
 
                     $lines = [];
                     foreach ( $var as $key => $value ) {
@@ -1295,7 +1305,7 @@ class DebugModule
         array $refs = []
     ) : bool
     {
-        $theStr = Lib::$str;
+        $theStr = Lib::str();
 
         $withDiffLines = array_key_exists(0, $refs);
         if ($withDiffLines) {

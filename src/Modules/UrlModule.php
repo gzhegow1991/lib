@@ -26,8 +26,8 @@ class UrlModule
         $isHostIdnaAscii = $isHostIdnaAscii ?? 0;
         $isLinkUrlencoded = $isLinkUrlencoded ?? 0;
 
-        $theHttp = Lib::$http;
-        $theType = Lib::$type;
+        $theHttp = Lib::http();
+        $theType = Lib::type();
 
         $withParseUrl = array_key_exists(0, $refs);
         if ($withParseUrl) {
@@ -222,8 +222,8 @@ class UrlModule
     {
         $isHostIdnaAscii = $isHostIdnaAscii ?? 0;
 
-        $theHttp = Lib::$http;
-        $theType = Lib::$type;
+        $theHttp = Lib::http();
+        $theType = Lib::type();
 
         $withParseUrl = array_key_exists(0, $refs);
         if ($withParseUrl) {
@@ -352,8 +352,8 @@ class UrlModule
     {
         $isLinkUrlencoded = $isLinkUrlencoded ?? 0;
 
-        $theHttp = Lib::$http;
-        $theType = Lib::$type;
+        $theHttp = Lib::http();
+        $theType = Lib::type();
 
         $withParseUrl = array_key_exists(0, $refs);
         if ($withParseUrl) {

@@ -186,7 +186,7 @@ class GenericCallable implements
      */
     public static function fromMethod($from, array $context = [], ?array $fallback = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->method_string($from, [ &$methodArray ])->isOk([ &$ret ])) {
             return Ret::throw($fallback, $ret);
@@ -270,7 +270,7 @@ class GenericCallable implements
      */
     public static function fromInvokableClass($from, array $context = [], ?array $fallback = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($from)->isOk([ &$fromStringNotEmpty, &$ret ])) {
             return Ret::throw($fallback, $ret);
@@ -312,7 +312,7 @@ class GenericCallable implements
      */
     public static function fromFunction($function, array $context = [], ?array $fallback = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($function)->isOk([ &$functionStringNotEmpty, &$ret ])) {
             return Ret::throw($fallback, $ret);

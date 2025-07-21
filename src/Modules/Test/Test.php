@@ -79,7 +79,7 @@ class Test
 
     public function __construct()
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $this->resource = $thePhp->output();
     }
@@ -239,7 +239,7 @@ class Test
     {
         $refMemoryBytes = null;
 
-        $theFormat = Lib::$format;
+        $theFormat = Lib::format();
 
         $memoryMaxValid = $theFormat->bytes_decode($memoryMax ?? '32M')->orThrow();
 
@@ -372,7 +372,7 @@ class Test
 
     public function run() : bool
     {
-        $theDebug = Lib::$debug;
+        $theDebug = Lib::debug();
 
         [ $fn, $fnArgs ] = $this->getFn();
 

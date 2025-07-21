@@ -27,7 +27,7 @@ abstract class AbstractConfig implements
 
     public function __construct()
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $publicVars = $thePhp->get_object_vars($this, null);
 

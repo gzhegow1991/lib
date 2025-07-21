@@ -263,7 +263,7 @@ class NumModule
     {
         $isAllowExp = $isAllowExp ?? true;
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $withSplit = array_key_exists(0, $refs);
         if ($withSplit) {

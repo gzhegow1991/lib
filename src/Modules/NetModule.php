@@ -16,20 +16,11 @@ class NetModule
 {
     public function __construct()
     {
-    }
-
-    /**
-     * @return static
-     */
-    public function assertExtension()
-    {
         if (! extension_loaded('filter')) {
             throw new ExtensionException(
                 'Missing PHP extension: filter'
             );
         }
-
-        return $this;
     }
 
 
@@ -38,7 +29,7 @@ class NetModule
      */
     public function type_address_ip($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType
             ->string_not_empty($value)
@@ -66,7 +57,7 @@ class NetModule
             return Ret::ok($value);
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType
             ->string_not_empty($value)
@@ -96,7 +87,7 @@ class NetModule
             return Ret::ok($value);
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType
             ->string_not_empty($value)
@@ -123,7 +114,7 @@ class NetModule
      */
     public function type_address_mac($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType
             ->string_not_empty($value)
@@ -177,7 +168,7 @@ class NetModule
             return Ret::ok($value);
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType
             ->string_not_empty($value)
@@ -292,7 +283,7 @@ class NetModule
             return Ret::ok($value);
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
             return $ret;
@@ -362,7 +353,7 @@ class NetModule
      */
     protected function type_subnet_v4_iplike($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType
             ->string_not_empty($value)
@@ -677,7 +668,7 @@ class NetModule
 
     public function user_agent_client() : ?string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         return $theType->string_not_empty($_SERVER[ 'HTTP_USER_AGENT' ] ?? null)->orThrow();
     }

@@ -27,7 +27,7 @@ class Clock
         $timeout = static::getInstance()->setTimeout($waitMs, $fn);
 
         if (Clock::$isDebug) {
-            $theDebug = Lib::$debug;
+            $theDebug = Lib::debug();
 
             $timeout->debugInfo = $theDebug->file_line();
         }
@@ -58,7 +58,7 @@ class Clock
         $interval = static::getInstance()->setInterval($waitMs, $fn);
 
         if (Clock::$isDebug) {
-            $theDebug = Lib::$debug;
+            $theDebug = Lib::debug();
 
             $interval->debugInfo = $theDebug->file_line();
         }
@@ -77,8 +77,6 @@ class Clock
 
     public static function getInstance() : ClockManagerInterface
     {
-        $theAsync = Lib::$async;
-
-        return $theAsync->static_clock_manager();
+        return Lib::async()->clockManager();
     }
 }

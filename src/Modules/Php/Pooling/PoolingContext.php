@@ -37,13 +37,15 @@ class PoolingContext
      */
     public function hasError(&$refError = null) : bool
     {
-        if ([] === $this->error) {
-            return false;
+        $refError = null;
+
+        if ([] !== $this->error) {
+            $refError = $this->error[ 0 ];
+
+            return true;
         }
 
-        $refError = $this->error[ 0 ];
-
-        return true;
+        return false;
     }
 
     /**
@@ -76,13 +78,15 @@ class PoolingContext
      */
     public function hasResult(&$refResult = null) : bool
     {
-        if ([] === $this->result) {
-            return false;
+        $refResult = null;
+
+        if ([] !== $this->result) {
+            $refResult = $this->result[ 0 ];
+
+            return true;
         }
 
-        $refResult = $this->result[ 0 ];
-
-        return true;
+        return false;
     }
 
     /**
@@ -92,7 +96,7 @@ class PoolingContext
     {
         if ([] === $this->result) {
             throw new RuntimeException(
-                [ 'The `result` should be a non-empty' ]
+                [ 'The `result[0]` should exists', $this ]
             );
         }
 
@@ -119,14 +123,11 @@ class PoolingContext
         return $this->nowMicrotime;
     }
 
-    /**
-     * @return static
-     */
-    public function updateNowMicrotime()
+    public function updateNowMicrotime() : float
     {
         $this->nowMicrotime = microtime(true);
 
-        return $this;
+        return $this->nowMicrotime;
     }
 
 
@@ -176,10 +177,7 @@ class PoolingContext
         return $this->timeoutMicrotime;
     }
 
-    /**
-     * @return static
-     */
-    public function updateTimeoutMicrotime()
+    public function updateTimeoutMicrotime() : ?float
     {
         if (null === $this->timeoutMs) {
             $this->timeoutMicrotime = null;
@@ -188,6 +186,6 @@ class PoolingContext
             $this->timeoutMicrotime = $this->getNowMicrotime() + ($this->timeoutMs / 1000);
         }
 
-        return $this;
+        return $this->timeoutMicrotime;
     }
 }

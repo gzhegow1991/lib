@@ -6,7 +6,7 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
 
 
-class ClockManager implements ClockManagerInterface
+class DefaultClockManager implements ClockManagerInterface
 {
     /**
      * @var LoopManagerInterface
@@ -27,7 +27,7 @@ class ClockManager implements ClockManagerInterface
 
     public function setTimeout(int $waitMs, callable $fn) : Timeout
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $waitMsInt = $theType->int_non_negative($waitMs)->orThrow();
 
@@ -55,7 +55,7 @@ class ClockManager implements ClockManagerInterface
 
     public function setInterval(int $waitMs, callable $fn) : Interval
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $waitMsInt = $theType->int_non_negative($waitMs)->orThrow();
 

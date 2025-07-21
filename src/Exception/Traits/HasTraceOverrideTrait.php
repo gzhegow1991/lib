@@ -52,7 +52,7 @@ trait HasTraceOverrideTrait
 
     public function getFileOverride(?string $dirRoot = null) : string
     {
-        $theFs = Lib::$fs;
+        $theFs = Lib::fs();
 
         $file = $this->file ?? $this->getFile();
 
@@ -78,7 +78,7 @@ trait HasTraceOverrideTrait
 
     public function getTraceOverride(?string $dirRoot = null) : array
     {
-        $theFs = Lib::$fs;
+        $theFs = Lib::fs();
 
         $trace = $this->trace ?? $this->getTrace();
 
@@ -97,7 +97,7 @@ trait HasTraceOverrideTrait
 
     public function getTraceAsStringOverride(?string $fileRoot = null) : string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (null === $this->trace) {
             $traceAsString = $this->getTraceAsString();

@@ -338,21 +338,19 @@ $test->run();
 //         ->useFetchApiWakeup(true)
 //     ;
 //
-//     \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl($url = 'https://google.com')
-//         ->then(function ($result) use ($ffn, $url) {
-//             $httpCode = $result[ 'http_code' ];
+//     $p1 = \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl($url = 'https://google.com');
+//     $p1->then(function ($result) use ($ffn, $url) {
+//         $httpCode = $result[ 'http_code' ];
 //
-//             $ffn->print("{$url} - HTTP: {$httpCode}");
-//         })
-//     ;
+//         $ffn->print("{$url} - HTTP: {$httpCode}");
+//     });
 //
-//     \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl($url = 'https://yandex.ru')
-//         ->then(function ($result) use ($ffn, $url) {
-//             $httpCode = $result[ 'http_code' ];
+//     $p2 = \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl($url = 'https://yandex.ru');
+//     $p2->then(function ($result) use ($ffn, $url) {
+//         $httpCode = $result[ 'http_code' ];
 //
-//             $ffn->print("{$url} - HTTP: {$httpCode}");
-//         })
-//     ;
+//         $ffn->print("{$url} - HTTP: {$httpCode}");
+//     });
 //
 //     \Gzhegow\Lib\Modules\Async\Loop\Loop::runLoop();
 // };
@@ -1599,10 +1597,12 @@ $fn = function () use ($ffn) {
     $ffn->print('[ CmpModule ]');
     echo "\n";
 
+    $theCli = \Gzhegow\Lib\Lib::cli();
+
     $object = new \StdClass();
 
-    $resourceOpenedStdout = \Gzhegow\Lib\Lib::cli()->stdout();
-    $resourceOpenedStderr = \Gzhegow\Lib\Lib::cli()->stderr();
+    $resourceOpenedStdout = $theCli->stdout();
+    $resourceOpenedStderr = $theCli->stderr();
     $resourceClosed = fopen('php://memory', 'wb');
     fclose($resourceClosed);
 

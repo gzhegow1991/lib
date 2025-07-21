@@ -50,7 +50,7 @@ class ArrModule
      */
     public function type_key($key)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (is_int($key)) {
             return Ret::ok($key);
@@ -925,7 +925,7 @@ class ArrModule
 
     public function has_key($array, $key, array $refs = []) : bool
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $withValue = array_key_exists(0, $refs);
         if ($withValue) {
@@ -1186,7 +1186,7 @@ class ArrModule
      */
     public function arrpath($path, ...$pathes) : array
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $arrpath = [];
 
@@ -1212,7 +1212,7 @@ class ArrModule
      */
     public function arrpath_dot(string $dot, $path, ...$pathes) : array
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $dotChar = $theType->char($dot)->orThrow();
 
@@ -1284,7 +1284,7 @@ class ArrModule
         array $refs = []
     ) : bool
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->arrpath($path)->isOk([ &$pathObject ])) {
             return false;
@@ -1354,7 +1354,7 @@ class ArrModule
      */
     public function &fetch_path(array &$refArray, $path)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathObject = $theType->arrpath($path)->orThrow();
 
@@ -1430,7 +1430,7 @@ class ArrModule
      */
     public function &put_path(array &$refArray, $path, $value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathObject = $theType->arrpath($path)->orThrow();
 
@@ -1482,7 +1482,7 @@ class ArrModule
      */
     public function unset_path(array &$refArray, $path) : bool
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathObject = $theType->arrpath($path)->orThrow();
 
@@ -2459,7 +2459,7 @@ class ArrModule
     {
         $walkFlags = $walkFlags ?? _ARR_WALK_WITH_EMPTY_ARRAYS;
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (null === $dot) {
             $dotChar = '.';
@@ -2488,7 +2488,7 @@ class ArrModule
      */
     public function undot(array $arrayDot, ?string $dot = null) : array
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (null === $dot) {
             $dotChar = '.';

@@ -168,7 +168,7 @@ class ErrorBag
 
     protected function assertTags(array $tags) : array
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $index = [];
 

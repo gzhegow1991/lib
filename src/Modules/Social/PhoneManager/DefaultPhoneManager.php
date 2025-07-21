@@ -234,7 +234,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             return $this;
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         foreach ( $regexList as $regex ) {
             $regexValid = $theType->regex($regex)->orThrow();
@@ -386,7 +386,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
         $refTelDigits = null;
         $refTelPlus = null;
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (is_a($value, '\libphonenumber\PhoneNumber')) {
             $tel = $this->formatE164($value);
@@ -792,7 +792,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
     public function getTimezonesForPhone($phoneNumber, $timezoneWildcards = null, ?string $region = '') : array
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $timezoneWildcardsList = $thePhp->to_list($timezoneWildcards);
 

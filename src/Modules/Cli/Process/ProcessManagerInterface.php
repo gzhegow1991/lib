@@ -21,7 +21,7 @@ interface ProcessManagerInterface
     public function useSymfonyProcess(?bool $useSymfonyProcess = null);
 
 
-    public function newProc() : Proc;
+    public function newProcNormal() : Proc;
 
     public function newProcBackground() : Proc;
 
@@ -29,7 +29,7 @@ interface ProcessManagerInterface
     /**
      * @return static
      */
-    public function spawn(Proc $proc);
+    public function spawnNormal(Proc $proc);
 
     /**
      * @return static

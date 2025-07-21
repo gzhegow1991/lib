@@ -1,8 +1,8 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Debug\DebugBacktracer;
+namespace Gzhegow\Lib\Modules\Debug\Backtracer;
 
-interface DebugBacktracerInterface
+interface BacktracerInterface
 {
     /**
      * @return static

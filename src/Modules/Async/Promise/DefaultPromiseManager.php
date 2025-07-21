@@ -9,10 +9,11 @@ use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
 use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
 use Gzhegow\Lib\Modules\Async\Clock\ClockManagerInterface;
+use Gzhegow\Lib\Modules\Async\Promise\Pooling\PromisePoolingContext;
 use Gzhegow\Lib\Modules\Async\Promise\Pooling\PromisePoolingFactoryInterface;
 
 
-class PromiseManager implements PromiseManagerInterface
+class DefaultPromiseManager implements PromiseManagerInterface
 {
     /**
      * @var PromisePoolingFactoryInterface
@@ -52,14 +53,14 @@ class PromiseManager implements PromiseManagerInterface
         ?FetchApiInterface $fetchApi = null
     )
     {
-        $theAsync = Lib::$async;
+        $theAsync = Lib::async();
 
         $this->poolingFactory = $poolingFactory;
 
-        $this->clockManager = $clockManager ?? $theAsync->static_clock_manager();
-        $this->loopManager = $loopManager ?? $theAsync->static_loop_manager();
+        $this->clockManager = $clockManager ?? $theAsync->clockManager();
+        $this->loopManager = $loopManager ?? $theAsync->loopManager();
 
-        $this->fetchApi = $fetchApi ?? $theAsync->static_fetch_api();
+        $this->fetchApi = $fetchApi ?? $theAsync->fetchApi();
     }
 
 
@@ -243,7 +244,7 @@ class PromiseManager implements PromiseManagerInterface
     public function pooling(int $tickMs, ?int $timeoutMs, $fnPooling) : Promise
     {
         $theClockManager = $this->clockManager;
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $tickMsInt = $theType->int_positive($tickMs)->orThrow();
 
@@ -255,10 +256,9 @@ class PromiseManager implements PromiseManagerInterface
 
         $fnTick = static function () use (
             $ctx,
-            $fnPooling,
-            $fnResolve, $fnReject
+            $fnPooling, $fnResolve, $fnReject
         ) {
-            $ctx->updateNowMicrotime();
+            $nowMicrotime = $ctx->updateNowMicrotime();
 
             call_user_func_array($fnPooling, [ $ctx ]);
 
@@ -270,7 +270,7 @@ class PromiseManager implements PromiseManagerInterface
 
             } else {
                 if (null !== ($timeoutMicrotime = $ctx->hasTimeoutMicrotime())) {
-                    if (microtime(true) > $timeoutMicrotime) {
+                    if ($nowMicrotime > $timeoutMicrotime) {
                         $fnReject("Timeout: " . $ctx->getTimeoutMs());
                     }
                 }
@@ -282,7 +282,8 @@ class PromiseManager implements PromiseManagerInterface
         $defer
             ->finally(static function () use (
                 $theClockManager,
-                $interval
+                $interval,
+                $defer
             ) {
                 $theClockManager->clearInterval($interval);
             })
@@ -632,7 +633,7 @@ class PromiseManager implements PromiseManagerInterface
     public function timeout(Promise $promise, int $timeoutMs, $rejectReason = null) : Promise
     {
         $theClockManager = $this->clockManager;
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $promiseTimeout = $this->defer($fnResolveTimeout, $fnRejectTimeout);
 
@@ -680,7 +681,7 @@ class PromiseManager implements PromiseManagerInterface
      */
     public function fetchCurl(string $url, array $curlOptions = [], ?int $timeoutMs = null) : Promise
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $urlValid = $theType->url($url)->orThrow();
         $curlOptionsList = $theType->list($curlOptions)->orThrow();
@@ -692,7 +693,8 @@ class PromiseManager implements PromiseManagerInterface
 
         $taskId = $this->fetchApiPushTask($urlValid, $curlOptionsList);
 
-        $promise = $this->fetchApiAwait()
+        $promise = $this->fetchApiAwait();
+        $promise = $promise
             ->then(function () use ($taskId, $timeoutMsInt) {
                 return $this->fetchApiTaskGetResult($taskId, $timeoutMsInt);
             })
@@ -756,6 +758,8 @@ class PromiseManager implements PromiseManagerInterface
             $theFetchApi->daemonWakeup(10000, 1000);
 
             $fnPooling = static function ($ctx) use ($theFetchApi) {
+                /** @var PromisePoolingContext $ctx */
+
                 if (! $theFetchApi->daemonIsAwake()) {
                     return;
                 }
@@ -786,6 +790,8 @@ class PromiseManager implements PromiseManagerInterface
             //
             $taskId
         ) {
+            /** @var PromisePoolingContext $ctx */
+
             $status = $theFetchApi->taskFlushResult(
                 $taskResult,
                 $taskId

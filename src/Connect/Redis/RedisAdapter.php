@@ -206,7 +206,7 @@ class RedisAdapter
 
     public function newRedis() : \Redis
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $redisHost = $this->redisHost;
         $redisPort = $this->redisPort;
@@ -239,7 +239,7 @@ class RedisAdapter
 
     public function getRedis() : \Redis
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $this->isRedisInitialized) {
             if (null === $this->redis) {
@@ -302,7 +302,7 @@ class RedisAdapter
         string $redisHost, int $redisPort
     ) : bool
     {
-        $theFunc = Lib::$func;
+        $theFunc = Lib::func();
 
         try {
             $status = $theFunc->safe_call(
@@ -328,7 +328,7 @@ class RedisAdapter
             return null;
         }
 
-        $theFunc = Lib::$func;
+        $theFunc = Lib::func();
 
         try {
             $status = $theFunc->safe_call(

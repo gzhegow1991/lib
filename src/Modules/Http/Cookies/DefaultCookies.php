@@ -50,7 +50,7 @@ class DefaultCookies implements CookiesInterface
 
     protected function loadCookiesList() : void
     {
-        $theHttp = Lib::$http;
+        $theHttp = Lib::http();
 
         $httpHeaders = $theHttp->headers_list();
 
@@ -220,7 +220,7 @@ class DefaultCookies implements CookiesInterface
 
     protected function setSendToResponse(array $setrawcookieArgs = []) : void
     {
-        $theHttp = Lib::$http;
+        $theHttp = Lib::http();
 
         $httpCookie = HttpCookie::fromArraySetrawcookieArgs($setrawcookieArgs)->orThrow();
 
@@ -327,7 +327,7 @@ class DefaultCookies implements CookiesInterface
      */
     public function flushSend() : array
     {
-        $theHttp = Lib::$http;
+        $theHttp = Lib::http();
 
         $result = $this->flush();
 
@@ -359,7 +359,7 @@ class DefaultCookies implements CookiesInterface
 
     protected function indexCookie(string $cookieName, string $cookiePath, ?string $cookieDomain = null) : string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $cookieNameStringNotEmpty = $theType->string_not_empty($cookieName)->orThrow();
         $cookiePathStringNotEmpty = $theType->string_not_empty($cookiePath)->orThrow();

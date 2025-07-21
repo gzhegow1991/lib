@@ -168,7 +168,7 @@ class MemcachedAdapter
 
     public function newMemcached() : \Memcached
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $memcachedHost = $this->memcachedHost;
         $memcachedPort = $this->memcachedPort;

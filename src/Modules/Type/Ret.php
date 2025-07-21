@@ -142,7 +142,7 @@ class Ret
             return $instance->orFallback($fallback[ 0 ]);
         }
 
-        $fileLine = $fileLine ?? Lib::$debug->file_line();
+        $fileLine = $fileLine ?? Lib::debug()->file_line();
 
         $errorList = $instance->errors;
 
@@ -325,7 +325,7 @@ class Ret
             return $this->value[ 0 ];
         }
 
-        $fileLine = $fileLine ?? Lib::$debug->file_line();
+        $fileLine = $fileLine ?? Lib::debug()->file_line();
 
         $errorList = $this->errors;
 
@@ -493,7 +493,7 @@ class Ret
     {
         $isAssociative = $isAssociative ?? false;
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $errorList = $errors ?? $this->errors;
 

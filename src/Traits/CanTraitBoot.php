@@ -13,8 +13,8 @@ trait CanTraitBoot
             return;
         }
 
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $traits = $thePhp->class_uses_with_parents(static::class, true);
 

@@ -46,7 +46,7 @@ class CliModule
     {
         // https://github.com/composer/composer/blob/main/src/Composer/Util/Filesystem.php#L807
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         if (! $thePhp->is_windows()) {
             return false;
@@ -105,8 +105,8 @@ class CliModule
 
     public function pause($var = null, ...$vars)
     {
-        $theDebug = Lib::$debug;
-        $thePhp = Lib::$php;
+        $theDebug = Lib::debug();
+        $thePhp = Lib::php();
 
         if (! $thePhp->is_terminal()) {
             throw new RuntimeException('Function must be called only in CLI mode');
@@ -128,7 +128,7 @@ class CliModule
 
     public function stop(...$vars) : void
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         if (! $thePhp->is_terminal()) {
             throw new RuntimeException('Function must be called only in CLI mode');
@@ -142,7 +142,7 @@ class CliModule
 
     public function readln() : string
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         if (! $thePhp->is_terminal()) {
             throw new RuntimeException('Function must be called only in CLI mode');
@@ -157,8 +157,8 @@ class CliModule
 
     public function cin(?string $delimiter = null) : string
     {
-        $theStr = Lib::$str;
-        $thePhp = Lib::$php;
+        $theStr = Lib::str();
+        $thePhp = Lib::php();
 
         if (! $thePhp->is_terminal()) {
             throw new RuntimeException('Function must be called only in CLI mode');
@@ -210,7 +210,7 @@ class CliModule
 
     public function yes(string $message, ?string &$refAnswer = null) : bool
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         if (! $thePhp->is_terminal()) {
             throw new RuntimeException('Function must be called only in CLI mode');

@@ -52,20 +52,41 @@ class PhpModule
     }
 
 
-    public function static_callable_parser(?CallableParserInterface $callableParser = null) : CallableParserInterface
+    public function newPoolingFactory() : PoolingFactoryInterface
     {
-        return $this->callableParser = null
-            ?? $callableParser
-            ?? $this->callableParser
-            ?? new DefaultCallableParser();
+        return new DefaultPoolingFactory();
     }
 
-    public function static_pooling_factory(?PoolingFactoryInterface $poolingFactory = null) : PoolingFactoryInterface
+    public function clonePoolingFactory() : PoolingFactoryInterface
+    {
+        return clone $this->poolingFactory();
+    }
+
+    public function poolingFactory(?PoolingFactoryInterface $poolingFactory = null) : PoolingFactoryInterface
     {
         return $this->poolingFactory = null
             ?? $poolingFactory
             ?? $this->poolingFactory
-            ?? new DefaultPoolingFactory();
+            ?? $this->newPoolingFactory();
+    }
+
+
+    public function newCallableParser() : CallableParserInterface
+    {
+        return new DefaultCallableParser();
+    }
+
+    public function cloneCallableParser() : CallableParserInterface
+    {
+        return clone $this->callableParser();
+    }
+
+    public function callableParser(?CallableParserInterface $callableParser = null) : CallableParserInterface
+    {
+        return $this->callableParser = null
+            ?? $callableParser
+            ?? $this->callableParser
+            ?? $this->newCallableParser();
     }
 
 
@@ -872,7 +893,7 @@ class PhpModule
      */
     public function type_sizeable($value)
     {
-        $theStr = Lib::$str;
+        $theStr = Lib::str();
 
         if ($this->type_countable($value)->isOk()) {
             return Ret::ok($value);
@@ -900,7 +921,7 @@ class PhpModule
     {
         $flags = $flags ?? _PHP_STRUCT_TYPE_ALL;
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $flagsInt = $flags;
 
@@ -983,7 +1004,7 @@ class PhpModule
      */
     public function type_struct($value, ?int $flags = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $flagsInt = $flags ?? (
             _PHP_STRUCT_TYPE_ALL
@@ -1425,7 +1446,7 @@ class PhpModule
      */
     public function type_method_array($value)
     {
-        return $this->static_callable_parser()->typeMethodArray($value);
+        return $this->callableParser()->typeMethodArray($value);
     }
 
     /**
@@ -1436,7 +1457,7 @@ class PhpModule
      */
     public function type_method_string($value, array $refs = [])
     {
-        return $this->static_callable_parser()->typeMethodString($value, $refs);
+        return $this->callableParser()->typeMethodString($value, $refs);
     }
 
 
@@ -1450,7 +1471,7 @@ class PhpModule
      */
     public function type_callable($value, $newScope = 'static')
     {
-        return $this->static_callable_parser()->typeCallable($value, $newScope);
+        return $this->callableParser()->typeCallable($value, $newScope);
     }
 
 
@@ -1459,7 +1480,7 @@ class PhpModule
      */
     public function type_callable_object($value, $newScope = 'static')
     {
-        return $this->static_callable_parser()->typeCallableObject($value, $newScope);
+        return $this->callableParser()->typeCallableObject($value, $newScope);
     }
 
     /**
@@ -1467,7 +1488,7 @@ class PhpModule
      */
     public function type_callable_object_closure($value, $newScope = 'static')
     {
-        return $this->static_callable_parser()->typeCallableObjectClosure($value, $newScope);
+        return $this->callableParser()->typeCallableObjectClosure($value, $newScope);
     }
 
     /**
@@ -1475,7 +1496,7 @@ class PhpModule
      */
     public function type_callable_object_invokable($value, $newScope = 'static')
     {
-        return $this->static_callable_parser()->typeCallableObjectInvokable($value, $newScope);
+        return $this->callableParser()->typeCallableObjectInvokable($value, $newScope);
     }
 
 
@@ -1486,7 +1507,7 @@ class PhpModule
      */
     public function type_callable_array($value, $newScope = 'static')
     {
-        return $this->static_callable_parser()->typeCallableArray($value, $newScope);
+        return $this->callableParser()->typeCallableArray($value, $newScope);
     }
 
     /**
@@ -1496,7 +1517,7 @@ class PhpModule
      */
     public function type_callable_array_method($value, $newScope = 'static')
     {
-        return $this->static_callable_parser()->typeCallableArrayMethod($value, $newScope);
+        return $this->callableParser()->typeCallableArrayMethod($value, $newScope);
     }
 
     /**
@@ -1506,7 +1527,7 @@ class PhpModule
      */
     public function type_callable_array_method_static($value, $newScope = 'static')
     {
-        return $this->static_callable_parser()->typeCallableArrayMethodStatic($value, $newScope);
+        return $this->callableParser()->typeCallableArrayMethodStatic($value, $newScope);
     }
 
     /**
@@ -1516,7 +1537,7 @@ class PhpModule
      */
     public function type_callable_array_method_non_static($value, $newScope = 'static')
     {
-        return $this->static_callable_parser()->typeCallableArrayMethodNonStatic($value, $newScope);
+        return $this->callableParser()->typeCallableArrayMethodNonStatic($value, $newScope);
     }
 
 
@@ -1525,7 +1546,7 @@ class PhpModule
      */
     public function type_callable_string($value, $newScope = 'static')
     {
-        return $this->static_callable_parser()->typeCallableString($value, $newScope);
+        return $this->callableParser()->typeCallableString($value, $newScope);
     }
 
     /**
@@ -1533,7 +1554,7 @@ class PhpModule
      */
     public function type_callable_string_function($value)
     {
-        return $this->static_callable_parser()->typeCallableStringFunction($value);
+        return $this->callableParser()->typeCallableStringFunction($value);
     }
 
     /**
@@ -1541,7 +1562,7 @@ class PhpModule
      */
     public function type_callable_string_function_internal($value)
     {
-        return $this->static_callable_parser()->typeCallableStringFunctionInternal($value);
+        return $this->callableParser()->typeCallableStringFunctionInternal($value);
     }
 
     /**
@@ -1549,7 +1570,7 @@ class PhpModule
      */
     public function type_callable_string_function_non_internal($value)
     {
-        return $this->static_callable_parser()->typeCallableStringFunctionNonInternal($value);
+        return $this->callableParser()->typeCallableStringFunctionNonInternal($value);
     }
 
     /**
@@ -1557,7 +1578,7 @@ class PhpModule
      */
     public function type_callable_string_method_static($value, $newScope = 'static')
     {
-        return $this->static_callable_parser()->typeCallableStringMethodStatic($value, $newScope);
+        return $this->callableParser()->typeCallableStringMethodStatic($value, $newScope);
     }
 
 
@@ -1607,7 +1628,7 @@ class PhpModule
             return $value->toBool($options);
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $valueBool = $theType->bool($value)->orThrow();
 
@@ -1624,7 +1645,7 @@ class PhpModule
             return $value->toInteger($options);
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (false
             || (null === $value)
@@ -1671,7 +1692,7 @@ class PhpModule
             return $value->toFloat($options);
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (false
             || (null === $value)
@@ -1705,7 +1726,7 @@ class PhpModule
             return $value->toString($options);
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (false
             || (null === $value)
@@ -1862,8 +1883,8 @@ class PhpModule
             return [];
         }
 
-        $theFunc = Lib::$func;
-        $theType = Lib::$type;
+        $theFunc = Lib::func();
+        $theType = Lib::type();
 
         $hasAssert = (null !== $fnAssert);
 
@@ -1930,7 +1951,7 @@ class PhpModule
             return true;
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if ($value instanceof ToListInterface) {
             $list = $value->toList($options);
@@ -1973,7 +1994,7 @@ class PhpModule
      */
     public function size($value) // : int|NAN
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
             return count($valueCountable);
@@ -1991,8 +2012,8 @@ class PhpModule
      */
     public function length($value) // : int|NAN
     {
-        $theStr = Lib::$str;
-        $theType = Lib::$type;
+        $theStr = Lib::str();
+        $theType = Lib::type();
 
         if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
             return count($valueCountable);
@@ -2409,7 +2430,7 @@ class PhpModule
     {
         $flags = $flags ?? _PHP_PATHINFO_ALL;
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
         $separatorString = $theType->char($separator ?? '/')->orThrow();
@@ -2498,7 +2519,7 @@ class PhpModule
         ?int $levels = null
     ) : ?string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
         $separatorChar = $theType->char($separator ?? '/')->orThrow();
@@ -2522,7 +2543,7 @@ class PhpModule
 
     public function basename(string $path, ?string $extension = null) : ?string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
 
@@ -2535,7 +2556,7 @@ class PhpModule
 
     public function filename(string $path, ?string $dot = null) : ?string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
         $dotChar = $theType->char($dot ?? '.')->orThrow();
@@ -2555,7 +2576,7 @@ class PhpModule
 
     public function fname(string $path, ?string $dot = null) : ?string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
         $dotString = $theType->char($dot ?? '.')->orThrow();
@@ -2571,7 +2592,7 @@ class PhpModule
 
     public function extension(string $path, ?string $dot = null) : ?string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
         $dotString = $theType->char($dot ?? '.')->orThrow();
@@ -2589,7 +2610,7 @@ class PhpModule
 
     public function extensions(string $path, ?string $dot = null) : ?string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
         $dotString = $theType->char($dot ?? '.')->orThrow();
@@ -2622,7 +2643,7 @@ class PhpModule
      */
     public function path_normalize(string $path, ?string $separator = null) : string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
         $separatorString = $theType->char($separator ?? '/')->orThrow();
@@ -2648,7 +2669,7 @@ class PhpModule
      */
     public function path_resolve(string $path, ?string $separator = null, ?string $dot = null) : string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
         $separatorString = $theType->char($separator ?? '/')->orThrow();
@@ -2715,8 +2736,8 @@ class PhpModule
         ?string $separator = null, ?string $dot = null
     ) : string
     {
-        $theStr = Lib::$str;
-        $theType = Lib::$type;
+        $theStr = Lib::str();
+        $theType = Lib::type();
 
         $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
         $rootStringNotEmpty = $theType->string_not_empty($root)->orThrow();
@@ -2761,7 +2782,7 @@ class PhpModule
         ?string $separator = null, ?string $dot = null
     ) : string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $relativeStringNotEmpty = $theType->string_not_empty($relative)->orThrow();
         $currentStringNotEmpty = $theType->string_not_empty($current)->orThrow();
@@ -2793,7 +2814,7 @@ class PhpModule
         ?string $separator = null, ?string $dot = null
     ) : string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
         $currentStringNotEmpty = $theType->string_not_empty($current)->orThrow();
@@ -2822,7 +2843,7 @@ class PhpModule
      */
     public function serialize($data) : ?string
     {
-        $theFunc = Lib::$func;
+        $theFunc = Lib::func();
 
         try {
             $result = $theFunc->safe_call(
@@ -2842,7 +2863,7 @@ class PhpModule
      */
     public function unserialize(string $data)
     {
-        $theFunc = Lib::$func;
+        $theFunc = Lib::func();
 
         try {
             $result = $theFunc->safe_call(
@@ -2892,12 +2913,14 @@ class PhpModule
             );
         }
 
-        $ctx = $this->static_pooling_factory()->newContext();
+        $thePoolingFactory = $this->poolingFactory();
+
+        $ctx = $thePoolingFactory->newContext();
 
         $ctx->resetTimeoutMs($timeoutMs);
 
         do {
-            $ctx->updateNowMicrotime();
+            $nowMicrotime = $ctx->updateNowMicrotime();
 
             if ($hasFnCatch) {
                 try {
@@ -2921,7 +2944,7 @@ class PhpModule
             }
 
             if (null !== ($timeoutMicrotime = $ctx->hasTimeoutMicrotime())) {
-                if (microtime(true) > $timeoutMicrotime) {
+                if ($nowMicrotime > $timeoutMicrotime) {
                     break;
                 }
             }

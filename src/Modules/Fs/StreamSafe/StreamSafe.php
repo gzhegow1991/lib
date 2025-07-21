@@ -92,7 +92,7 @@ class StreamSafe
      */
     public function call_safe(\Closure $fn, array $args = [])
     {
-        $theFunc = Lib::$func;
+        $theFunc = Lib::func();
 
         $beforeErrorReporting = error_reporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
         $beforeErrorHandler = set_error_handler([ $theFunc, 'safe_call_error_handler' ]);

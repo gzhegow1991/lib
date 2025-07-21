@@ -1,12 +1,12 @@
 <?php
 
-namespace Gzhegow\Lib\Modules\Debug\DebugBacktracer;
+namespace Gzhegow\Lib\Modules\Debug\Backtracer;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-class DefaultDebugBacktracer implements DebugBacktracerInterface
+class DefaultBacktracer implements BacktracerInterface
 {
     /**
      * @var array
@@ -71,7 +71,7 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
      */
     public function dirRoot(?string $dirRoot)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (null !== $dirRoot) {
             $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
@@ -178,7 +178,7 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
      */
     public function filter(?array $filter)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $_filterFile = $filter[ 'file' ] ?? $filter[ 0 ] ?? [];
         $_filterClass = $filter[ 'class' ] ?? $filter[ 1 ] ?? [];
@@ -297,7 +297,7 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
      */
     public function filterNot(?array $filter)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $_filterFile = $filter[ 'file' ] ?? $filter[ 0 ] ?? [];
         $_filterClass = $filter[ 'class' ] ?? $filter[ 1 ] ?? [];
@@ -449,8 +449,8 @@ class DefaultDebugBacktracer implements DebugBacktracerInterface
 
     protected function execute() : array
     {
-        $theDebug = Lib::$debug;
-        $theFs = Lib::$fs;
+        $theDebug = Lib::debug();
+        $theFs = Lib::fs();
 
         $dirRoot = $this->dirRoot ?? $theDebug->static_dir_root();
         $hasDirRoot = (null !== $dirRoot);

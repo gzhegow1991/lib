@@ -96,7 +96,7 @@ class DefaultDumper implements DumperInterface
 
     public function __construct()
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $dumperDefault = $thePhp->is_terminal()
             ? 'echo'
@@ -343,7 +343,7 @@ class DefaultDumper implements DumperInterface
 
     public function printPrinter_symfony(...$vars) : string
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $printerOptions = $this->printerOptions[ $this->printer ] ?? [];
 
@@ -370,7 +370,7 @@ class DefaultDumper implements DumperInterface
 
     public function printPrinter_var_dump(...$vars) : string
     {
-        $theDebug = Lib::$debug;
+        $theDebug = Lib::debug();
 
         $content = '';
 
@@ -396,7 +396,7 @@ class DefaultDumper implements DumperInterface
 
     public function printPrinter_var_export(...$vars) : string
     {
-        $theDebug = Lib::$debug;
+        $theDebug = Lib::debug();
 
         $content = '';
 
@@ -537,7 +537,7 @@ class DefaultDumper implements DumperInterface
 
     public function echoDumper_echo_html(...$vars) : void
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $options = $this->dumperOptions;
 
@@ -566,7 +566,7 @@ class DefaultDumper implements DumperInterface
 
     public function echoDumper_resource(...$vars) : void
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $options = $this->dumperOptions;
 
@@ -581,7 +581,7 @@ class DefaultDumper implements DumperInterface
 
     public function echoDumper_resource_html(...$vars) : void
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $options = $this->dumperOptions;
 
@@ -612,7 +612,7 @@ class DefaultDumper implements DumperInterface
 
     public function echoDumper_devtools(...$vars) : void
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $options = $this->dumperOptions;
 

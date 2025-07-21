@@ -49,7 +49,7 @@ class FormatModule
      */
     public function type_html_tag($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
             return $ret;
@@ -70,7 +70,7 @@ class FormatModule
      */
     public function type_xml_tag($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
             return $ret;
@@ -91,7 +91,7 @@ class FormatModule
      */
     public function type_xml_nstag($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
             return $ret;
@@ -113,7 +113,7 @@ class FormatModule
      */
     public function bytes_decode(string $size)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if ('' === $size) {
             return Ret::err(
@@ -182,14 +182,29 @@ class FormatModule
     }
 
     /**
-     * @return Ret<array{ 0?: string }>
+     * @return int|Ret<int>
+     */
+    public function bytes_decode_fallback(?array $fallback, string $size)
+    {
+        $ret = $this->bytes_decode($size);
+
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        return Ret::val($fallback, $ret->getValue());
+    }
+
+
+    /**
+     * @return Ret<string>
      */
     public function bytes_encode(
         $bytes,
         ?int $roundPrecision = null, ?int $unitLen = null
     )
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->num_non_negative($bytes)->isOk([ &$bytesNumNonNegative, &$ret ])) {
             return $ret;
@@ -217,5 +232,19 @@ class FormatModule
         $size = round($left, $roundPrecision) . $unit;
 
         return Ret::ok($size);
+    }
+
+    /**
+     * @return string|Ret<string>
+     */
+    public function bytes_encode_fallback(?array $fallback, string $size)
+    {
+        $ret = $this->bytes_decode($size);
+
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        return Ret::val($fallback, $ret->getValue());
     }
 }

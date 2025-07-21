@@ -70,8 +70,6 @@ class Loop
 
     public static function getInstance() : LoopManagerInterface
     {
-        $theAsync = Lib::$async;
-
-        return $theAsync->static_loop_manager();
+        return Lib::async()->loopManager();
     }
 }

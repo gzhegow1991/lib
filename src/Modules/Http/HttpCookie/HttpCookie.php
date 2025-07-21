@@ -60,8 +60,8 @@ class HttpCookie implements
 
     public function toArraySetrawcookieArgs() : array
     {
-        $theDate = Lib::$date;
-        $theType = Lib::$type;
+        $theDate = Lib::date();
+        $theType = Lib::type();
 
         $cookieExpiresString = $this->cookieParams[ 'expires' ] ?? '';
 
@@ -131,7 +131,7 @@ class HttpCookie implements
      */
     public static function fromObjectHttpHeader($from, ?array $fallback = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! ($from instanceof HttpHeader)) {
             return Ret::throw(
@@ -190,7 +190,7 @@ class HttpCookie implements
      */
     public static function fromArraySetrawcookieArgs($from, ?array $fallback = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! is_array($from)) {
             return Ret::throw(

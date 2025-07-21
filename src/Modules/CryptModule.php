@@ -57,7 +57,7 @@ class CryptModule
      */
     public function type_base($value, $alphabet)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
             return $ret;
@@ -80,7 +80,7 @@ class CryptModule
      */
     public function type_base_bin($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
             return $ret;
@@ -101,7 +101,7 @@ class CryptModule
      */
     public function type_base_oct($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
             return $ret;
@@ -122,7 +122,7 @@ class CryptModule
      */
     public function type_base_dec($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
             return $ret;
@@ -143,7 +143,7 @@ class CryptModule
      */
     public function type_base_hex($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
             return $ret;
@@ -267,7 +267,7 @@ class CryptModule
      */
     public function text2bin_it($strings) : \Generator
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $stringsIt = $thePhp->to_iterable($strings);
 
@@ -297,7 +297,7 @@ class CryptModule
     {
         $isThrow = $isThrow ?? true;
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $binariesIt = $thePhp->to_iterable($binaries);
 
@@ -588,7 +588,7 @@ class CryptModule
             return '';
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $alphabetToObject = $theType->alphabet($alphabetTo)->orThrow();
 
@@ -651,7 +651,7 @@ class CryptModule
             return '';
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $baseStringValid = $theType->base($baseString, $alphabetFrom)->orThrow();
 
@@ -717,10 +717,8 @@ class CryptModule
      */
     public function baseX_encode_it($strings, $alphabetTo) : \Generator
     {
-        $theBcmath = Lib::$bcmath;
-        $theType = Lib::$type;
-
-        $theBcmath->assertExtension();
+        $theBcmath = Lib::bcmath();
+        $theType = Lib::type();
 
         $alphabetToValid = $theType->alphabet($alphabetTo)->orThrow();
 
@@ -766,7 +764,7 @@ class CryptModule
      */
     public function baseX_decode_it($baseStrings, $alphabetFrom, ?bool $isThrow = null) : \Generator
     {
-        $theStr = Lib::$str;
+        $theStr = Lib::str();
 
         $gen = $theStr->rtrim_it($baseStrings, '=');
 
@@ -824,8 +822,8 @@ class CryptModule
      */
     public function bin2base_it($binaries, $alphabetTo) : \Generator
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $binariesIt = $thePhp->to_iterable($binaries);
 
@@ -892,11 +890,9 @@ class CryptModule
     {
         $isThrow = $isThrow ?? true;
 
-        $theMb = Lib::$mb;
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
-
-        $theMb->assertExtension();
+        $theMb = Lib::mb();
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $baseStringsIt = $thePhp->to_iterable($baseStrings);
 
@@ -969,7 +965,7 @@ class CryptModule
      */
     public function bin2binbase(string $binary, $alphabetTo) : string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $binaryValid = $this->type_base_bin($binary)->orThrow();
         $alphabetToValid = $theType->alphabet($alphabetTo)->orThrow();
@@ -1029,9 +1025,7 @@ class CryptModule
      */
     public function binbase2bin(string $binbaseString, $alphabetFrom) : string
     {
-        $theMb = Lib::$mb;
-
-        $theMb->assertExtension();
+        $theMb = Lib::mb();
 
         $binbaseStringValid = $this->type_base($binbaseString, $alphabetFrom)->orThrow();
 
@@ -1085,10 +1079,8 @@ class CryptModule
      */
     public function dec2numbase(string $decString, $alphabetTo, ?bool $isOneBasedTo = null) : string
     {
-        $theBcmath = Lib::$bcmath;
-        $theType = Lib::$type;
-
-        $theBcmath->assertExtension();
+        $theBcmath = Lib::bcmath();
+        $theType = Lib::type();
 
         $decStringValid = $this->type_base_dec($decString)->orThrow();
         $alphabetToValid = $theType->alphabet($alphabetTo)->orThrow();
@@ -1143,11 +1135,8 @@ class CryptModule
      */
     public function numbase2dec(string $numbaseString, $alphabetFrom, ?bool $isOneBasedFrom = null) : string
     {
-        $theBcmath = Lib::$bcmath;
-        $theMb = Lib::$mb;
-
-        $theBcmath->assertExtension();
-        $theMb->assertExtension();
+        $theBcmath = Lib::bcmath();
+        $theMb = Lib::mb();
 
         $numbaseStringValid = $this->type_base($numbaseString, $alphabetFrom)->orThrow();
 
@@ -1201,7 +1190,7 @@ class CryptModule
         ?bool $oneBasedTo = null, ?bool $oneBasedFrom = null
     ) : string
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $numbaseStringValid = $this->type_base($numbaseString, $alphabetFrom)->orThrow();
         $alphabetToValid = $theType->alphabet($alphabetTo)->orThrow();

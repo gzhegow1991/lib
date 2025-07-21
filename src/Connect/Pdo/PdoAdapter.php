@@ -267,7 +267,7 @@ class PdoAdapter
 
     public function newPdoFromDsn() : \PDO
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pdoDsn = $this->pdoDsn;
         $pdoUsername = $this->pdoUsername;
@@ -314,7 +314,7 @@ class PdoAdapter
 
     public function newPdoFromConfig() : \PDO
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pdoDriver = $this->pdoDriver;
         $pdoHost = $this->pdoHost;

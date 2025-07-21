@@ -115,8 +115,8 @@ class FormatJson
         $depth = $depth ?? $this->static_json_depth();
         $flags = $flags ?? $this->static_json_decode_flags();
 
-        $theFunc = Lib::$func;
-        $theType = Lib::$type;
+        $theFunc = Lib::func();
+        $theType = Lib::type();
 
         $jsonStringNotEmpty = $theType->string_not_empty($json)->orThrow();
 
@@ -146,6 +146,25 @@ class FormatJson
     /**
      * @return Ret<mixed>
      */
+    public function json_decode_fallback(
+        ?array $fallback,
+        $json, ?bool $isAssociative = null,
+        ?int $depth = null, ?int $flags = null
+    )
+    {
+        $ret = $this->json_decode($json, $isAssociative, $depth, $flags);
+
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        return Ret::val($fallback, $ret->getValue());
+    }
+
+
+    /**
+     * @return Ret<mixed>
+     */
     public function jsonc_decode(
         $jsonc, ?bool $isAssociative = null,
         ?int $depth = null, ?int $flags = null
@@ -160,8 +179,8 @@ class FormatJson
         $depth = $depth ?? $this->static_json_depth();
         $flags = $flags ?? $this->static_json_decode_flags();
 
-        $theFunc = Lib::$func;
-        $theType = Lib::$type;
+        $theFunc = Lib::func();
+        $theType = Lib::type();
 
         $jsoncStringNotEmpty = $theType->string_not_empty($jsonc)->orThrow();
 
@@ -201,6 +220,24 @@ class FormatJson
         return Ret::ok($result);
     }
 
+    /**
+     * @return mixed|Ret<mixed>
+     */
+    public function jsonc_decode_fallback(
+        ?array $fallback,
+        $jsonc, ?bool $isAssociative = null,
+        ?int $depth = null, ?int $flags = null
+    )
+    {
+        $ret = $this->jsonc_decode($jsonc, $isAssociative, $depth, $flags);
+
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        return Ret::val($fallback, $ret->getValue());
+    }
+
 
     /**
      * @return Ret<string>
@@ -212,8 +249,8 @@ class FormatJson
     {
         $isAllowNull = $isAllowNull ?? false;
 
-        $theFunc = Lib::$func;
-        $theType = Lib::$type;
+        $theFunc = Lib::func();
+        $theType = Lib::type();
 
         if (null === $value) {
             if (! $isAllowNull) {
@@ -227,8 +264,8 @@ class FormatJson
         }
 
         if (false
-            || ($theType->is_nan($value))
-            || ($theType->is_resource($value))
+            || ($theType->nan($value)->isOk())
+            || ($theType->resource($value)->isOk())
         ) {
             return Ret::err(
                 [ 'The value `NAN` or values of type `resource` cannot be encoded to JSON', $value ],
@@ -256,6 +293,25 @@ class FormatJson
     }
 
     /**
+     * @return string|Ret<string>
+     */
+    public function json_encode_fallback(
+        ?array $fallback,
+        $value, ?bool $isAllowNull = null,
+        ?int $flags = null, ?int $depth = null
+    )
+    {
+        $ret = $this->json_encode($value, $isAllowNull, $flags, $depth);
+
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        return Ret::val($fallback, $ret->getValue());
+    }
+
+
+    /**
      * @return Ret<string>
      */
     public function json_print(
@@ -265,8 +321,8 @@ class FormatJson
     {
         $isAllowNull = $isAllowNull ?? false;
 
-        $theFunc = Lib::$func;
-        $theType = Lib::$type;
+        $theFunc = Lib::func();
+        $theType = Lib::type();
 
         if (null === $value) {
             if (! $isAllowNull) {
@@ -280,8 +336,8 @@ class FormatJson
         }
 
         if (false
-            || ($theType->is_nan($value))
-            || ($theType->is_resource($value))
+            || ($theType->nan($value)->isOk())
+            || ($theType->resource($value)->isOk())
         ) {
             return Ret::err(
                 [ 'The value `NAN` or values of type `resource` cannot be encoded to JSON', $value ],
@@ -312,5 +368,23 @@ class FormatJson
         }
 
         return Ret::ok($result);
+    }
+
+    /**
+     * @return string|Ret<string>
+     */
+    public function json_print_fallback(
+        ?array $fallback,
+        $value, ?bool $isAllowNull = null,
+        ?int $flags = null, ?int $depth = null
+    )
+    {
+        $ret = $this->json_print($value, $isAllowNull, $flags, $depth);
+
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        return Ret::val($fallback, $ret->getValue());
     }
 }

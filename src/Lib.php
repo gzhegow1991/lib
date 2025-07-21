@@ -52,7 +52,7 @@ class Lib
 
     public static function asyncFetchApi()
     {
-        return Lib::async()->static_fetch_api();
+        return Lib::async()->fetchApi();
     }
 
 
@@ -80,6 +80,11 @@ class Lib
     public static function debug()
     {
         return static::$debug = static::$debug ?? new DebugModule();
+    }
+
+    public static function debugBacktracer()
+    {
+        return Lib::debug()->backtracer();
     }
 
     public static function debugDumper()
@@ -126,7 +131,7 @@ class Lib
 
     public static function fs()
     {
-        return static::$fs = static::$fs ?? (new FsModule())->assertExtension();
+        return static::$fs = static::$fs ?? new FsModule();
     }
 
     public static function fsFile()
@@ -247,7 +252,7 @@ class Lib
 
     public static function bcmath()
     {
-        return static::$bcmath = static::$bcmath ?? (new BcmathModule())->assertExtension();
+        return static::$bcmath = static::$bcmath ?? new BcmathModule();
     }
 
     /**
@@ -317,7 +322,7 @@ class Lib
 
     public static function mb()
     {
-        return static::$mb = static::$mb ?? (new MbModule())->assertExtension();
+        return static::$mb = static::$mb ?? new MbModule();
     }
 
     /**
@@ -327,7 +332,7 @@ class Lib
 
     public static function net()
     {
-        return static::$net = static::$net ?? (new NetModule())->assertExtension();
+        return static::$net = static::$net ?? new NetModule();
     }
 
     /**
@@ -751,7 +756,7 @@ class Lib
             throw $throwableOrArg;
         }
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         array_unshift($throwableArgs, $throwableOrArg);
 
@@ -777,36 +782,3 @@ class Lib
         return require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
     }
 }
-
-
-(function () {
-    // > init
-    //
-    Lib::async();
-    Lib::cli();
-    Lib::debug();
-    Lib::fs();
-    Lib::format();
-    Lib::func();
-    Lib::http();
-    Lib::social();
-    Lib::str();
-    //
-    Lib::arr();
-    Lib::bcmath();
-    Lib::cmp();
-    Lib::crypt();
-    Lib::date();
-    Lib::entrypoint();
-    Lib::escape();
-    Lib::itertools();
-    Lib::mb();
-    Lib::net();
-    Lib::num();
-    Lib::php();
-    Lib::preg();
-    Lib::random();
-    Lib::test();
-    Lib::type();
-    Lib::url();
-})();

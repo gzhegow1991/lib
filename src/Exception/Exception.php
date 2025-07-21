@@ -15,8 +15,8 @@ class Exception extends \Exception implements
 
     public function __construct(...$throwableArgs)
     {
-        $theDebug = Lib::$debug;
-        $thePhp = Lib::$php;
+        $theDebug = Lib::debug();
+        $thePhp = Lib::php();
 
         $args = $thePhp->throwable_args(...$throwableArgs);
 

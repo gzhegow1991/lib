@@ -32,7 +32,7 @@ class FileSafeContext
 
     public function handleOnFinally() : void
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         [ $fhh, $this->fhh ] = [ $this->fhh, [] ];
         [ $fhhToFrelease, $this->fhhToFrelease ] = [ $this->fhhToFrelease, [] ];

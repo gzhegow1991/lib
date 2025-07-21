@@ -57,8 +57,7 @@ class DefaultSlugger implements SluggerInterface
         ?SluggerPresetRegistryInterface $registry
     )
     {
-        $theMb = Lib::$mb;
-        $theMb->assertExtension();
+        $theMb = Lib::mb();
 
         $this->registry = $registry ?? new SluggerPresetRegistry();
 
@@ -304,7 +303,7 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (null === $delimiter) {
             $delimiterLetter = '-';
@@ -337,8 +336,8 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         if (null === $delimiter) {
             $delimiterLetter = '-';
@@ -392,7 +391,7 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
-        $thePreg = Lib::$preg;
+        $thePreg = Lib::preg();
 
         $presets = $this->registry->getPresetsSelected();
 
@@ -487,7 +486,7 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
-        $thePreg = Lib::$preg;
+        $thePreg = Lib::preg();
 
         $rules = [];
         $rules[] = 'NFKD';                       // > split unicode accents and symbols, e.g. "Å" > "A°"
@@ -530,7 +529,7 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
-        $thePreg = Lib::$preg;
+        $thePreg = Lib::preg();
 
         [
             $ignoreSymbolMap,

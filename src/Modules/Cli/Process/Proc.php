@@ -185,19 +185,23 @@ class Proc
      */
     public function setIsBackground(?bool $isBackground)
     {
-        if (false
-            || $this->stdoutRefFile
-            || $this->stdoutResource
-            //
-            || $this->stderrRefFile
-            || $this->stderrResource
-        ) {
-            throw new LogicException(
-                [ 'The `stdout`/`stderr` cannot be reference or resource if `isBackground` is set to true', $this ]
-            );
+        $isBackground = $isBackground ?? false;
+
+        if ($isBackground) {
+            if (false
+                || $this->stdoutRefFile
+                || $this->stdoutResource
+                //
+                || $this->stderrRefFile
+                || $this->stderrResource
+            ) {
+                throw new LogicException(
+                    [ 'The `stdout` / `stderr` cannot be reference or resource if `isBackground` is TRUE', $this ]
+                );
+            }
         }
 
-        $this->isBackground = $isBackground ?? false;
+        $this->isBackground = $isBackground;
 
         return $this;
     }
@@ -208,7 +212,7 @@ class Proc
      */
     public function setCmd($cmd)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $cmdList = [];
 
@@ -229,7 +233,7 @@ class Proc
      */
     public function setCwd(?string $cwd)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (null !== ($cwdRealpath = $cwd)) {
             $cwdRealpath = $theType->dirpath_realpath($cwd, true)->orThrow();
@@ -287,7 +291,7 @@ class Proc
      */
     public function setStdin($stdin)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (is_resource($stdin)) {
             $this->stdinResource = $stdin;
@@ -318,19 +322,13 @@ class Proc
      */
     public function setStdoutFile($stdoutFile)
     {
-        $theFs = Lib::$fs;
-        $theType = Lib::$type;
+        $theFs = Lib::fs();
+        $theType = Lib::type();
 
         if (null !== ($stdoutFilePath = $stdoutFile)) {
-            if ($this->isBackground) {
-                throw new LogicException(
-                    [ 'The `stdout`/`stderr` cannot be reference or resource if `isBackground` is set to true', $this ]
-                );
-            }
-
             if (! $theType->filepath($stdoutFilePath, $stdoutFile, true)) {
                 throw new LogicException(
-                    [ 'The `stdout` should be a resource', $stdoutFile ]
+                    [ 'The `stdoutFile` should be valid filepath', $stdoutFile ]
                 );
             }
 
@@ -351,11 +349,11 @@ class Proc
     {
         $refStdout = null;
 
-        $theFs = Lib::$fs;
+        $theFs = Lib::fs();
 
         if ($this->isBackground) {
             throw new LogicException(
-                [ 'The `stdout`/`stderr` cannot be reference or resource if `isBackground` is set to true', $this ]
+                [ 'The `refStdout` cannot be set if `isBackground` is TRUE', $this ]
             );
         }
 
@@ -378,13 +376,13 @@ class Proc
         if (null !== $stdoutResource) {
             if ($this->isBackground) {
                 throw new LogicException(
-                    [ 'The `stdout` cannot be reference if `isBackground` is set to true', $stdoutResource ]
+                    [ 'The `stdoutResource` cannot be set if `isBackground` is TRUE', $stdoutResource ]
                 );
             }
 
             if (! is_resource($stdoutResource)) {
                 throw new LogicException(
-                    [ 'The `stdout` should be a resource', $stdoutResource ]
+                    [ 'The `stdoutResource` should be a resource', $stdoutResource ]
                 );
             }
         }
@@ -402,19 +400,13 @@ class Proc
      */
     public function setStderrFile($stderrFile)
     {
-        $theFs = Lib::$fs;
-        $theType = Lib::$type;
+        $theFs = Lib::fs();
+        $theType = Lib::type();
 
         if (null !== ($stderrFilePath = $stderrFile)) {
-            if ($this->isBackground) {
-                throw new LogicException(
-                    [ 'The `stdout`/`stderr` cannot be reference or resource if `isBackground` is set to true', $this ]
-                );
-            }
-
             if (! $theType->filepath($stderrFilePath, $stderrFile, true)) {
                 throw new LogicException(
-                    [ 'The `stdout` should be a resource', $stderrFile ]
+                    [ 'The `stderrFile` should be valid filepath', $stderrFile ]
                 );
             }
 
@@ -435,11 +427,11 @@ class Proc
     {
         $refStderr = null;
 
-        $theFs = Lib::$fs;
+        $theFs = Lib::fs();
 
         if ($this->isBackground) {
             throw new LogicException(
-                [ 'The `stdout`/`stderr` cannot be reference or resource if `isBackground` is set to true', $this ]
+                [ 'The `refStderr` cannot be set if `isBackground` is TRUE', $this ]
             );
         }
 
@@ -462,18 +454,18 @@ class Proc
         if (null !== $stderrResource) {
             if ($this->isBackground) {
                 throw new LogicException(
-                    [ 'The `stdout` cannot be reference if `isBackground` is set to true', $stderrResource ]
+                    [ 'The `stderrResource` cannot be set if `isBackground` is TRUE', $stderrResource ]
                 );
             }
 
             if (! is_resource($stderrResource)) {
                 throw new LogicException(
-                    [ 'The `stdout` should be a resource', $stderrResource ]
+                    [ 'The `stderrResource` should be a resource', $stderrResource ]
                 );
             }
         }
 
-        $this->stdoutResource = $stderrResource;
+        $this->stderrResource = $stderrResource;
 
         return $this;
     }
@@ -504,7 +496,7 @@ class Proc
      */
     public function setTimeoutMs(?int $timeoutMs = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (null !== ($timeoutMsInt = $timeoutMs)) {
             $timeoutMsInt = $theType->int_positive($timeoutMs)->orThrow();
@@ -521,7 +513,7 @@ class Proc
      */
     public function spawnUsingSymfonyProcess()
     {
-        $theCli = Lib::$cli;
+        $theCli = Lib::cli();
         $theCliProcessManager = $theCli->processManager();
 
         $this->validateSpawn();
@@ -542,8 +534,8 @@ class Proc
     {
         $this->validateSpawn();
 
-        $theFunc = Lib::$func;
-        $theType = Lib::$type;
+        $theFunc = Lib::func();
+        $theType = Lib::type();
 
         $dirSystemRoot = getenv('SystemRoot');
 
@@ -601,32 +593,14 @@ class Proc
             $spec[ 0 ] = [ 'pipe', 'r' ];
         }
 
-        if ($this->stdoutResource) {
-            $spec[ 1 ] = [ 'pipe', 'w' ];
-
-        } elseif ($this->stdoutRef) {
-            $spec[ 1 ] = [ 'file', $this->stdoutRefFile, 'w' ];
-
-        } elseif ($this->stdoutFile) {
-            $spec[ 1 ] = [ 'file', $this->stdoutFile, 'w' ];
-
-        } elseif ($this->isBackground) {
+        if ($this->isBackground) {
             $spec[ 1 ] = [ 'file', 'NUL', 'w' ];
 
         } else {
             $spec[ 1 ] = [ 'pipe', 'w' ];
         }
 
-        if ($this->stderrResource) {
-            $spec[ 2 ] = [ 'pipe', 'w' ];
-
-        } elseif ($this->stderrRef) {
-            $spec[ 2 ] = [ 'file', $this->stderrRefFile, 'w' ];
-
-        } elseif ($this->stderrFile) {
-            $spec[ 2 ] = [ 'file', $this->stderrFile, 'w' ];
-
-        } elseif ($this->isBackground) {
+        if ($this->isBackground) {
             $spec[ 2 ] = [ 'file', 'NUL', 'w' ];
 
         } else {
@@ -644,16 +618,19 @@ class Proc
             );
 
             $this->procOpenResource = $ph;
+
             $this->procOpenPipes =& $pipes;
 
             if ($this->stdinResource) {
                 stream_copy_to_stream($this->stdinResource, $pipes[ 0 ]);
 
             } elseif ($this->stdinIterable) {
-                foreach ( $this->stdinIterable as $line ) {
-                    $lineString = $theType->string($line)->orThrow();
+                foreach ( $this->stdinIterable as $string ) {
+                    $stringValid = $theType->string($string)->orThrow();
 
-                    fwrite($pipes[ 0 ], $lineString);
+                    if ('' !== $stringValid) {
+                        fwrite($pipes[ 0 ], $stringValid);
+                    }
                 }
 
                 fclose($pipes[ 0 ]);
@@ -675,8 +652,8 @@ class Proc
     {
         $this->validateSpawn();
 
-        $theFunc = Lib::$func;
-        $theType = Lib::$type;
+        $theFunc = Lib::func();
+        $theType = Lib::type();
 
         $cmdString = implode(' ', $this->cmd);
 
@@ -732,11 +709,11 @@ class Proc
         if ($this->stdoutResource) {
             $spec[ 1 ] = [ 'pipe', 'w' ];
 
-        } elseif ($this->stdoutRef) {
-            $spec[ 1 ] = [ 'file', $this->stdoutRefFile, 'w' ];
-
-        } elseif ($this->stdoutFile) {
+        } elseif (null !== $this->stdoutFile) {
             $spec[ 1 ] = [ 'file', $this->stdoutFile, 'w' ];
+
+        } elseif (null !== $this->stdoutRefFile) {
+            $spec[ 1 ] = [ 'file', $this->stdoutRefFile, 'w' ];
 
         } else {
             $spec[ 1 ] = [ 'pipe', 'w' ];
@@ -745,11 +722,11 @@ class Proc
         if ($this->stderrResource) {
             $spec[ 2 ] = [ 'pipe', 'w' ];
 
-        } elseif ($this->stderrRef) {
-            $spec[ 2 ] = [ 'file', $this->stderrRefFile, 'w' ];
-
-        } elseif ($this->stderrFile) {
+        } elseif (null !== $this->stderrFile) {
             $spec[ 2 ] = [ 'file', $this->stderrFile, 'w' ];
+
+        } elseif (null !== $this->stderrRef) {
+            $spec[ 2 ] = [ 'file', $this->stderrRefFile, 'w' ];
 
         } else {
             $spec[ 2 ] = [ 'pipe', 'w' ];
@@ -766,16 +743,19 @@ class Proc
             );
 
             $this->procOpenResource = $ph;
+
             $this->procOpenPipes =& $pipes;
 
             if ($this->stdinResource) {
                 stream_copy_to_stream($this->stdinResource, $pipes[ 0 ]);
 
             } elseif ($this->stdinIterable) {
-                foreach ( $this->stdinIterable as $line ) {
-                    $lineString = $theType->string($line)->orThrow();
+                foreach ( $this->stdinIterable as $string ) {
+                    $stringValid = $theType->string($string)->orThrow();
 
-                    fwrite($pipes[ 0 ], $lineString);
+                    if ('' !== $stringValid) {
+                        fwrite($pipes[ 0 ], $stringValid);
+                    }
                 }
 
                 fclose($pipes[ 0 ]);
@@ -849,7 +829,12 @@ class Proc
             return $this->symfonyProcess->isRunning();
 
         } elseif ($this->procOpenResource) {
-            $status = proc_get_status($this->procOpenResource);
+            $theFunc = Lib::func();
+
+            $status = $theFunc->safe_call(
+                'proc_get_status',
+                [ $this->procOpenResource ],
+            );
 
             return $status[ 'running' ];
         }
@@ -862,7 +847,8 @@ class Proc
     {
         $tickUsleep = $tickUsleep ?? 100000;
 
-        $thePhp = Lib::$php;
+        $theFunc = Lib::func();
+        $thePhp = Lib::php();
 
         if ($this->symfonyProcess) {
             $process = $this->symfonyProcess;
@@ -876,7 +862,7 @@ class Proc
                 }
 
                 if ($this->stderrRefFile) {
-                    $this->stderrRef = $process->getIncrementalErrorOutput();
+                    $this->stderrRef .= $process->getIncrementalErrorOutput();
 
                 } elseif ($this->stderrResource) {
                     fwrite($this->stderrResource, $process->getIncrementalErrorOutput());
@@ -907,18 +893,34 @@ class Proc
         } else {
             $ph = $this->procOpenResource;
 
-            $fnTick = function ($ctx) use ($fnWait, $ph) {
-                $status = proc_get_status($ph);
-
+            $fnTick = function ($ctx) use (
+                $theFunc,
+                $ph,
+                $fnWait
+            ) {
+                $status = $theFunc->safe_call(
+                    'proc_get_status',
+                    [ $ph ],
+                );
 
                 if ($this->stdoutRefFile && is_file($this->stdoutRefFile)) {
-                    $this->stdoutRefFileResource = $this->stdoutRefFileResource ?? fopen($this->stdoutRefFile, 'rb');
-                    $this->stdoutRef .= stream_get_contents($this->stdoutRefFileResource);
+                    $h = fopen($this->stdoutRefFile, 'rb');
+
+                    $this->stdoutRef .= stream_get_contents($h);
+                    rewind($h);
+                    ftruncate($h, 0);
+
+                    fclose($h);
                 }
 
                 if ($this->stderrRefFile && is_file($this->stderrRefFile)) {
-                    $this->stderrRefFileResource = $this->stderrRefFileResource ?? fopen($this->stderrRefFile, 'rb');
-                    $this->stderrRef .= stream_get_contents($this->stderrRefFileResource);
+                    $h = fopen($this->stderrRefFile, 'rb');
+
+                    $this->stderrRef .= stream_get_contents($h);
+                    rewind($h);
+                    ftruncate($h, 0);
+
+                    fclose($h);
                 }
 
 
@@ -931,13 +933,22 @@ class Proc
                 }
 
 
+                if ($this->stdoutRefFileResource && is_resource($this->stdoutRefFileResource)) {
+                    fclose($this->stdoutRefFileResource);
+
+                    unset($this->stdoutRefFileResource);
+                }
                 if ($this->stdoutRefFile && is_file($this->stdoutRefFile)) {
-                    fclose($this->stderrRefFileResource);
                     unlink($this->stdoutRefFile);
 
                     unset($this->stdoutRefFile);
                 }
 
+                if ($this->stderrRefFileResource && is_resource($this->stderrRefFileResource)) {
+                    fclose($this->stderrRefFileResource);
+
+                    unset($this->stderrRefFileResource);
+                }
                 if ($this->stderrRefFile && is_file($this->stderrRefFile)) {
                     unlink($this->stderrRefFile);
 
@@ -962,6 +973,8 @@ class Proc
     {
         $tickMs = $tickMs ?? 100;
 
+        $theFunc = Lib::func();
+
         if ($this->symfonyProcess) {
             $process = $this->symfonyProcess;
 
@@ -974,7 +987,7 @@ class Proc
                 }
 
                 if ($this->stderrRefFile) {
-                    $this->stderrRef = $process->getIncrementalErrorOutput();
+                    $this->stderrRef .= $process->getIncrementalErrorOutput();
 
                 } elseif ($this->stderrResource) {
                     fwrite($this->stderrResource, $process->getIncrementalErrorOutput());
@@ -1005,18 +1018,35 @@ class Proc
         } else {
             $ph = $this->procOpenResource;
 
-            $fnTick = function ($ctx) use ($fnWait, $ph) {
-                $status = proc_get_status($ph);
+            $fnTick = function ($fnResolve) use (
+                $theFunc,
+                $ph,
+                $fnWait
+            ) {
+                $status = $theFunc->safe_call(
+                    'proc_get_status',
+                    [ $ph ],
+                );
 
 
                 if ($this->stdoutRefFile && is_file($this->stdoutRefFile)) {
-                    $this->stdoutRefFileResource = $this->stdoutRefFileResource ?? fopen($this->stdoutRefFile, 'rb');
-                    $this->stdoutRef .= stream_get_contents($this->stdoutRefFileResource);
+                    $h = fopen($this->stdoutRefFile, 'rb');
+
+                    $this->stdoutRef .= stream_get_contents($h);
+                    rewind($h);
+                    ftruncate($h, 0);
+
+                    fclose($h);
                 }
 
                 if ($this->stderrRefFile && is_file($this->stderrRefFile)) {
-                    $this->stderrRefFileResource = $this->stderrRefFileResource ?? fopen($this->stderrRefFile, 'rb');
-                    $this->stderrRef .= stream_get_contents($this->stderrRefFileResource);
+                    $h = fopen($this->stderrRefFile, 'rb');
+
+                    $this->stderrRef .= stream_get_contents($h);
+                    rewind($h);
+                    ftruncate($h, 0);
+
+                    fclose($h);
                 }
 
 
@@ -1029,7 +1059,30 @@ class Proc
                 }
 
 
-                $ctx->setResult($status[ 'exitcode' ]);
+                if ($this->stdoutRefFileResource && is_resource($this->stdoutRefFileResource)) {
+                    fclose($this->stdoutRefFileResource);
+
+                    unset($this->stdoutRefFileResource);
+                }
+                if ($this->stdoutRefFile && is_file($this->stdoutRefFile)) {
+                    unlink($this->stdoutRefFile);
+
+                    unset($this->stdoutRefFile);
+                }
+
+                if ($this->stderrRefFileResource && is_resource($this->stderrRefFileResource)) {
+                    fclose($this->stderrRefFileResource);
+
+                    unset($this->stderrRefFileResource);
+                }
+                if ($this->stderrRefFile && is_file($this->stderrRefFile)) {
+                    unlink($this->stderrRefFile);
+
+                    unset($this->stderrRefFile);
+                }
+
+
+                $fnResolve($status[ 'exitcode' ]);
             };
         }
 

@@ -22,7 +22,7 @@ class DefaultThrowabler implements ThrowablerInterface
      */
     public function setDirRoot(?string $dirRoot)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (null !== $dirRoot) {
             $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
@@ -359,8 +359,8 @@ class DefaultThrowabler implements ThrowablerInterface
 
     public function getThrowableInfo(\Throwable $throwable, ?int $flags = null) : array
     {
-        $theDebug = Lib::$debug;
-        $theFs = Lib::$fs;
+        $theDebug = Lib::debug();
+        $theFs = Lib::fs();
 
         $eFile = $throwable->getFile();
         $eLine = $throwable->getLine();
@@ -408,8 +408,8 @@ class DefaultThrowabler implements ThrowablerInterface
      */
     public function getThrowableInfoLines(\Throwable $throwable, ?int $flags = null) : array
     {
-        $theDebug = Lib::$debug;
-        $theFs = Lib::$fs;
+        $theDebug = Lib::debug();
+        $theFs = Lib::fs();
 
         $lines = [];
 
@@ -478,8 +478,8 @@ class DefaultThrowabler implements ThrowablerInterface
 
     public function getThrowableTrace(\Throwable $e, ?int $flags = null) : array
     {
-        $theDebug = Lib::$debug;
-        $theFs = Lib::$fs;
+        $theDebug = Lib::debug();
+        $theFs = Lib::fs();
 
         $eTrace = $e->getTrace();
 

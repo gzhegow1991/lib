@@ -79,8 +79,8 @@ class HttpHeader implements ToStringInterface
      */
     public static function fromArray($from, ?array $fallback = null)
     {
-        $theStr = Lib::$str;
-        $theType = Lib::$type;
+        $theStr = Lib::str();
+        $theType = Lib::type();
 
         if (! is_array($from)) {
             return Ret::throw(
@@ -158,8 +158,8 @@ class HttpHeader implements ToStringInterface
      */
     public static function fromString($from, ?array $fallback = null)
     {
-        $theStr = Lib::$str;
-        $theType = Lib::$type;
+        $theStr = Lib::str();
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($from)->isOk([ &$fromStringNotEmpty, &$ret ])) {
             return Ret::throw($fallback, $ret);

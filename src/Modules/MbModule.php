@@ -11,20 +11,11 @@ class MbModule
 {
     public function __construct()
     {
-    }
-
-    /**
-     * @return static
-     */
-    public function assertExtension()
-    {
         if (! extension_loaded('mbstring')) {
             throw new ExtensionException(
                 'Missing PHP extension: mbstring'
             );
         }
-
-        return $this;
     }
 
 
@@ -61,7 +52,7 @@ class MbModule
             }
         }
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $currentEncGroupPriority = 0;
         $groupsIndexPrioritized = [];
@@ -248,7 +239,7 @@ class MbModule
     {
         $separators = $separators ?? " \t\r\n\f\v";
 
-        $thePreg = Lib::$preg;
+        $thePreg = Lib::preg();
 
         $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
         $regex = '/(^|[' . $regex . '])(\w)/u';
@@ -274,7 +265,7 @@ class MbModule
     {
         $separators = $separators ?? " \t\r\n\f\v";
 
-        $thePreg = Lib::$preg;
+        $thePreg = Lib::preg();
 
         $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
         $regex = '/(^|[' . $regex . '])(\w)/u';

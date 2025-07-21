@@ -7,7 +7,7 @@ use Gzhegow\Lib\Modules\Async\Clock\Timeout;
 use Gzhegow\Lib\Modules\Async\Clock\Interval;
 
 
-class LoopManager implements LoopManagerInterface
+class DefaultLoopManager implements LoopManagerInterface
 {
     /**
      * @var bool
@@ -263,7 +263,7 @@ class LoopManager implements LoopManagerInterface
      */
     public function registerLoop()
     {
-        $theEntrypoint = Lib::$entrypoint;
+        $theEntrypoint = Lib::entrypoint();
 
         if (! $this->isLoopRegistered) {
             $theEntrypoint->registerShutdownFunction([ $this, 'runLoop' ]);

@@ -53,7 +53,7 @@ class StreamSafeProxy
             throw new RuntimeException('Method is not exists: ' . $name);
         }
 
-        $theFunc = Lib::$func;
+        $theFunc = Lib::func();
 
         $fn = $map[ $name ];
 

@@ -48,7 +48,7 @@ class StrModule
 
     public function __construct()
     {
-        $theMb = Lib::$mb;
+        $theMb = Lib::mb();
 
         $mbstring = extension_loaded('mbstring');
 
@@ -288,12 +288,21 @@ class StrModule
             );
         }
 
+        if (is_object($value)) {
+            if (! method_exists($value, '__toString')) {
+                return Ret::err(
+                    [ 'The `value` unable to be converted to string', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
         try {
             $valueString = (string) $value;
         }
         catch ( \Throwable $e ) {
             return Ret::err(
-                [ 'The `value` should be string', $value ],
+                [ 'The `value` is unable to be converted to string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -1028,7 +1037,7 @@ class StrModule
 
     public function loadInvisibles() : array
     {
-        Lib::$mb->assertExtension();
+        $theMb = Lib::mb();
 
         $list = [
             // mb_chr(0x0020, 'UTF-8') => '\u{0020}', // > \u{0020}	// Space // Обычный пробел (между словами).
@@ -1382,7 +1391,7 @@ class StrModule
      */
     public function lcfirst(string $string, ?string $mb_encoding = null) : string
     {
-        $theMb = Lib::$mb;
+        $theMb = Lib::mb();
 
         if ($this->static_mbstring()) {
             $result = $theMb->lcfirst($string, $mb_encoding);
@@ -1409,7 +1418,7 @@ class StrModule
      */
     public function ucfirst(string $string, ?string $mb_encoding = null) : string
     {
-        $theMb = Lib::$mb;
+        $theMb = Lib::mb();
 
         if ($this->static_mbstring()) {
             $result = $theMb->ucfirst($string, $mb_encoding);
@@ -1439,7 +1448,7 @@ class StrModule
     {
         $separators = $separators ?? " \t\r\n\f\v";
 
-        $thePreg = Lib::$preg;
+        $thePreg = Lib::preg();
 
         $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
         $regex = '/(^|[' . $regex . '])(\w)/u';
@@ -1465,7 +1474,7 @@ class StrModule
     {
         $separators = $separators ?? " \t\r\n\f\v";
 
-        $thePreg = Lib::$preg;
+        $thePreg = Lib::preg();
 
         $regex = $thePreg->preg_quote_ord($separators, $mb_encoding);
         $regex = '/(^|[' . $regex . '])(\w)/u';
@@ -1489,8 +1498,8 @@ class StrModule
     {
         $length = $length ?? 1;
 
-        $theMb = Lib::$mb;
-        $theType = Lib::$type;
+        $theMb = Lib::mb();
+        $theType = Lib::type();
 
         $lengthInt = $theType->int_positive($length)->orThrow();
 
@@ -1673,7 +1682,7 @@ class StrModule
      */
     public function crop(string $string, $crops, ?bool $ignoreCase = null, $limits = null) : string
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $cropsList = $thePhp->to_list($crops);
         $limitsList = $thePhp->to_list($limits ?? [ -1 ]);
@@ -1765,7 +1774,7 @@ class StrModule
      */
     public function uncrop(string $string, $crops, $times = null, ?bool $ignoreCase = null) : string
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $cropsList = $thePhp->to_list($crops);
         $timesList = $thePhp->to_list($times ?? [ 1 ]);
@@ -1814,7 +1823,7 @@ class StrModule
         ?int &$refCount = null
     )
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $searchList = $thePhp->to_list($search);
         $replaceList = $thePhp->to_list($replace);
@@ -1858,7 +1867,7 @@ class StrModule
         ?int &$refCount = null
     )
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $searchList = $thePhp->to_list($search);
         $replaceList = $thePhp->to_list($replace);
@@ -1902,7 +1911,7 @@ class StrModule
             return [];
         }
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $linesList = $thePhp->to_list($lines);
 
@@ -1944,7 +1953,7 @@ class StrModule
             return [];
         }
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $linesList = $thePhp->to_list($lines);
 
@@ -1986,7 +1995,7 @@ class StrModule
             return [];
         }
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $linesList = $thePhp->to_list($lines);
 
@@ -2028,7 +2037,7 @@ class StrModule
             return [];
         }
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $linesList = $thePhp->to_list($lines);
 
@@ -2067,7 +2076,7 @@ class StrModule
             return '';
         }
 
-        $thePreg = Lib::$preg;
+        $thePreg = Lib::preg();
 
         $hasWildcardSeparatorSymbol = (null !== $wildcardSeparatorSymbol);
         $hasWildcardSequenceSymbol = (null !== $wildcardSequenceSymbol);
@@ -2367,12 +2376,10 @@ class StrModule
             return '';
         }
 
-        $theMb = Lib::$mb;
-        $thePhp = Lib::$php;
-        $thePreg = Lib::$preg;
-        $theType = Lib::$type;
-
-        $theMb->assertExtension();
+        $theMb = Lib::mb();
+        $thePhp = Lib::php();
+        $thePreg = Lib::preg();
+        $theType = Lib::type();
 
         $dictionary = [
             'а' => 'a',
@@ -2484,7 +2491,7 @@ class StrModule
     {
         $characters = $characters ?? " \n\r\t\v\0";
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         foreach ( $thePhp->to_iterable($strings) as $string ) {
             if (! is_string($string)) {
@@ -2506,7 +2513,7 @@ class StrModule
     {
         $characters = $characters ?? " \n\r\t\v\0";
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         foreach ( $thePhp->to_iterable($strings) as $string ) {
             if (! is_string($string)) {
@@ -2528,7 +2535,7 @@ class StrModule
     {
         $characters = $characters ?? " \n\r\t\v\0";
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         foreach ( $thePhp->to_iterable($strings) as $string ) {
             if (! is_string($string)) {
@@ -2564,7 +2571,7 @@ class StrModule
             );
         }
 
-        $theStr = Lib::$str;
+        $theStr = Lib::str();
 
         $isUnicodeAllowed = $theStr->static_mbstring();
 

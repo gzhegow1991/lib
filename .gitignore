@@ -1,10 +1,10 @@
 /.idea/
 /.editorconfig
 
+/vendor/
+/composer.lock
+
 /.ignore/
 
 /.generator/
 /generator.php
-
-/vendor/
-composer.lock

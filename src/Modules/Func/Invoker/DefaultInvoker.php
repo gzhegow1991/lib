@@ -18,7 +18,7 @@ class DefaultInvoker implements InvokerInterface
      */
     public function newInvokeObject(string $className, array $args = [], array $options = []) : object
     {
-        $theArr = Lib::$arr;
+        $theArr = Lib::arr();
 
         $list = [];
 
@@ -62,7 +62,7 @@ class DefaultInvoker implements InvokerInterface
 
             } elseif ($fn->isFunction()) {
                 if ($fn->hasFunctionStringInternal($fnString)) {
-                    $theFunc = Lib::$func;
+                    $theFunc = Lib::func();
 
                     $cb = static function (...$args) use (
                         $theFunc,
@@ -119,7 +119,7 @@ class DefaultInvoker implements InvokerInterface
 
             } elseif ($fn->isFunction()) {
                 if ($fn->hasFunctionStringInternal($fnString)) {
-                    $theFunc = Lib::$func;
+                    $theFunc = Lib::func();
 
                     $cb = static function (...$args) use (
                         $theFunc,

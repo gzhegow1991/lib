@@ -237,7 +237,7 @@ class Promise
         $promise = $this->manager->never();
 
         if (Promise::$isDebug) {
-            $theDebug = Lib::$debug;
+            $theDebug = Lib::debug();
 
             $promise->debugInfo = $theDebug->file_line();
         }
@@ -300,7 +300,7 @@ class Promise
         $promise = $this->manager->never();
 
         if (Promise::$isDebug) {
-            $theDebug = Lib::$debug;
+            $theDebug = Lib::debug();
 
             $promise->debugInfo = $theDebug->file_line();
         }
@@ -351,7 +351,7 @@ class Promise
         $promise = $this->manager->never();
 
         if (Promise::$isDebug) {
-            $theDebug = Lib::$debug;
+            $theDebug = Lib::debug();
 
             $promise->debugInfo = $theDebug->file_line();
         }

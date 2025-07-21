@@ -840,9 +840,7 @@ class DefaultCallableParser implements CallableParserInterface
      */
     public function isCallable($value, $newScope = 'static') : bool
     {
-        $thePhp = Lib::$php;
-
-        return $thePhp->is_callable($value, $newScope);
+        return Lib::php()->is_callable($value, $newScope);
     }
 
 

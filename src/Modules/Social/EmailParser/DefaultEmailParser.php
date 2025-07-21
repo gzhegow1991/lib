@@ -78,7 +78,7 @@ class DefaultEmailParser implements EmailParserInterface
             return $this;
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         foreach ( $regexList as $regex ) {
             $regexValid = $theType->regex($regex)->orThrow();
@@ -189,7 +189,7 @@ class DefaultEmailParser implements EmailParserInterface
 
     protected function parseEmailDomain(string $email) : array
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $emailStringNotEmpty = $theType->string_not_empty($email)->orThrow();
 
@@ -213,7 +213,7 @@ class DefaultEmailParser implements EmailParserInterface
         array $filters
     ) : void
     {
-        $theHttp = Lib::$http;
+        $theHttp = Lib::http();
 
         $filtersKnownIndex = [
             'filter'         => true,

@@ -14,8 +14,8 @@ class PregModule
      */
     public function type_regex($value)
     {
-        $theFunc = Lib::$func;
-        $theType = Lib::$type;
+        $theFunc = Lib::func();
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
             return $ret;
@@ -49,8 +49,8 @@ class PregModule
      */
     public function type_regexp($value, string $enclosure = '/', ?string $flags = null)
     {
-        $theFunc = Lib::$func;
-        $theType = Lib::$type;
+        $theFunc = Lib::func();
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
             return $ret;
@@ -80,9 +80,7 @@ class PregModule
 
     public function preg_quote_ord(string $string, ?string $mb_encoding = null) : string
     {
-        $theMb = Lib::$mb;
-
-        $theMb->assertExtension();
+        $theMb = Lib::mb();
 
         $len = mb_strlen($string);
 

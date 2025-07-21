@@ -65,9 +65,11 @@ class DefaultProcessManager implements ProcessManagerInterface
     }
 
 
-    public function newProc() : Proc
+    public function newProcNormal() : Proc
     {
         $processSpawn = new Proc();
+
+        $processSpawn->setIsBackground(false);
 
         return $processSpawn;
     }
@@ -75,6 +77,7 @@ class DefaultProcessManager implements ProcessManagerInterface
     public function newProcBackground() : Proc
     {
         $processSpawn = new Proc();
+
         $processSpawn->setIsBackground(true);
 
         return $processSpawn;
@@ -84,16 +87,23 @@ class DefaultProcessManager implements ProcessManagerInterface
     /**
      * @return static
      */
-    public function spawn(Proc $proc)
+    public function spawnNormal(Proc $proc)
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $isWindows = $thePhp->is_windows();
 
-        $devnull = null
-            ?? ($this->useSymfonyProcess ? $proc->spawnUsingSymfonyProcess() : null)
-            ?? ($isWindows ? $proc->spawnUsingProcOpenWindows() : null)
-            ?? ($proc->spawnUsingProcOpenUnix());
+        $proc->setIsBackground(false);
+
+        if ($this->useSymfonyProcess) {
+            $proc->spawnUsingSymfonyProcess();
+
+        } elseif ($isWindows) {
+            $proc->spawnUsingProcOpenWindows();
+
+        } else {
+            $proc->spawnUsingProcOpenUnix();
+        }
 
         return $this;
     }
@@ -103,16 +113,21 @@ class DefaultProcessManager implements ProcessManagerInterface
      */
     public function spawnBackground(Proc $proc)
     {
-        $thePhp = Lib::$php;
-
-        $proc->setIsBackground(true);
+        $thePhp = Lib::php();
 
         $isWindows = $thePhp->is_windows();
 
-        $devnull = null
-            ?? ($this->useSymfonyProcess ? $proc->spawnUsingSymfonyProcess() : null)
-            ?? ($isWindows ? $proc->spawnUsingProcOpenWindows() : null)
-            ?? ($proc->spawnUsingProcOpenUnix());
+        $proc->setIsBackground(true);
+
+        if ($this->useSymfonyProcess) {
+            $proc->spawnUsingSymfonyProcess();
+
+        } elseif ($isWindows) {
+            $proc->spawnUsingProcOpenWindows();
+
+        } else {
+            $proc->spawnUsingProcOpenUnix();
+        }
 
         return $this;
     }

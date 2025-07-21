@@ -35,20 +35,11 @@ class FsModule
 
     public function __construct()
     {
-    }
-
-    /**
-     * @return static
-     */
-    public function assertExtension()
-    {
         if (! extension_loaded('fileinfo')) {
             throw new ExtensionException(
                 'Missing PHP extension: fileinfo'
             );
         }
-
-        return $this;
     }
 
 
@@ -106,7 +97,7 @@ class FsModule
      */
     public function static_dir_chmod($dir_chmod = null) : int
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (null !== $dir_chmod) {
             $dir_chmod_valid = $theType->chmod($dir_chmod)->orThrow();
@@ -128,7 +119,7 @@ class FsModule
      */
     public function static_file_chmod($file_chmod = null) : int
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (null !== $file_chmod) {
             $file_chmod_valid = $theType->chmod($file_chmod)->orThrow();
@@ -222,8 +213,8 @@ class FsModule
         array $refs = []
     )
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $withPathInfo = array_key_exists(0, $refs);
         if ($withPathInfo) {
@@ -264,8 +255,8 @@ class FsModule
         array $refs = []
     )
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $isAllowSymlink = $isAllowSymlink ?? true;
 
@@ -553,7 +544,7 @@ class FsModule
      */
     public function type_filename($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
             return $ret;
@@ -709,7 +700,7 @@ class FsModule
             return $splFileInfo;
         }
 
-        $theFormat = Lib::$format;
+        $theFormat = Lib::format();
 
         $filtersList = [
             'max_size' => true,
@@ -787,7 +778,7 @@ class FsModule
             return $splFileInfo;
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $filtersList = [
             'max_width'  => true,
@@ -913,7 +904,7 @@ class FsModule
      */
     public function type_socket($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (false
             || is_a($value, '\Socket')
@@ -933,7 +924,7 @@ class FsModule
      */
     public function type_stream($value)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if ($theType->resource_opened($value, 'stream')->isOk()) {
             return Ret::ok($value);
@@ -976,8 +967,8 @@ class FsModule
 
     public function pathinfo(string $path, ?int $flags = null, ?string $separator = null) : array
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
@@ -986,8 +977,8 @@ class FsModule
 
     public function dirname(string $path, ?int $levels = null, ?string $separator = null) : ?string
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
@@ -996,35 +987,35 @@ class FsModule
 
     public function basename(string $path, ?string $extension = null) : ?string
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         return $thePhp->basename($path, $extension);
     }
 
     public function filename(string $path) : ?string
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         return $thePhp->filename($path, '.');
     }
 
     public function fname(string $path) : ?string
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         return $thePhp->fname($path, '.');
     }
 
     public function extension(string $path) : ?string
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         return $thePhp->extension($path, '.');
     }
 
     public function extensions(string $path) : ?string
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         return $thePhp->extensions($path, '.');
     }
@@ -1032,8 +1023,8 @@ class FsModule
 
     public function path_normalize(string $path, ?string $separator = null) : string
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
@@ -1049,8 +1040,8 @@ class FsModule
 
     public function path_resolve(string $path, ?string $separator = null) : string
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
@@ -1070,8 +1061,8 @@ class FsModule
         ?string $separator = null
     ) : string
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
@@ -1093,8 +1084,8 @@ class FsModule
         ?string $separator = null
     ) : string
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
@@ -1116,8 +1107,8 @@ class FsModule
         ?string $separator = null
     ) : string
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
@@ -1376,7 +1367,7 @@ class FsModule
     {
         $deleteIfEmpty = $deleteIfEmpty ?? false;
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
         $theFsFile = $this->fileSafe();
 
         $fileFreepath = $this->type_freepath($file)->orThrow();
@@ -1574,7 +1565,7 @@ class FsModule
     {
         $deleteIfEmpty = $deleteIfEmpty ?? false;
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
         $theFsFile = $this->fileSafe();
 
         $fileFreepath = $this->type_freepath($file)->orThrow();
@@ -1725,7 +1716,7 @@ class FsModule
         $length = $length ?? 8192;                      // > 8kb
         $lengthBuffer = $lengthBuffer ?? (1024 * 1024); // > 1mb
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $lengthInt = $theType->int_positive($length)->orThrow();
         $lengthBufferInt = $theType->int_positive($lengthBuffer)->orThrow();
@@ -1903,8 +1894,8 @@ class FsModule
         string $start, $lines, ?string $end = null
     ) : string
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         if (! file_exists($filepath)) {
             $len = file_put_contents($filepath, '');

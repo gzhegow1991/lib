@@ -67,7 +67,7 @@ class FilesystemFetchApi implements FetchApiInterface
             );
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $binDirDefault = $theType->realpath(__DIR__ . '/../../../../bin/php/')->orThrow();
         $binDirRealpath = '';
@@ -157,9 +157,9 @@ class FilesystemFetchApi implements FetchApiInterface
     {
         $refTaskId = null;
 
-        $theFs = Lib::$fs;
-        $theRandom = Lib::$random;
-        $theType = Lib::$type;
+        $theFs = Lib::fs();
+        $theRandom = Lib::random();
+        $theType = Lib::type();
 
         $urlString = $theType->url($url)->orThrow();
         $curlOptionsList = $theType->list($curlOptions)->orThrow();
@@ -195,7 +195,7 @@ class FilesystemFetchApi implements FetchApiInterface
     {
         $refTask = null;
 
-        $theFs = Lib::$fs;
+        $theFs = Lib::fs();
 
         $queueFile = $this->queueFile;
 
@@ -216,7 +216,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
     public function taskClearResults() : void
     {
-        $theFs = Lib::$fs;
+        $theFs = Lib::fs();
 
         $gen = $theFs->dir_walk_it($this->taskResultDirRealpath);
 
@@ -236,26 +236,30 @@ class FilesystemFetchApi implements FetchApiInterface
 
     public function taskGetResult(&$refTaskResult, string $taskId) : bool
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $taskIdStringNotEmpty = $theType->string_not_empty($taskId)->orThrow();
 
-        return $this->taskFetchResult(
+        $statusGet = $this->taskFetchResult(
             $refTaskResult,
             $taskIdStringNotEmpty, false
         );
+
+        return $statusGet;
     }
 
     public function taskFlushResult(&$refTaskResult, string $taskId) : bool
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $taskIdString = $theType->string_not_empty($taskId)->orThrow();
 
-        return $this->taskFetchResult(
+        $statusFetch = $this->taskFetchResult(
             $refTaskResult,
             $taskIdString, true
         );
+
+        return $statusFetch;
     }
 
     protected function taskFetchResult(
@@ -267,12 +271,12 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $taskResultFile = "{$this->taskResultDirRealpath}/{$taskId}.result";
 
-        $statusGet = false;
+        $statusFetch = false;
         if (is_file($taskResultFile) && (filesize($taskResultFile) > 0)) {
             $serialized = file_get_contents($taskResultFile);
 
             if (false !== $serialized) {
-                $statusGet = true;
+                $statusFetch = true;
 
                 if ($delete) {
                     unlink($taskResultFile);
@@ -282,7 +286,7 @@ class FilesystemFetchApi implements FetchApiInterface
             }
         }
 
-        return $statusGet;
+        return $statusFetch;
     }
 
     protected function taskSaveResult(array $task, array $taskResult) : bool
@@ -295,9 +299,9 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $len = file_put_contents($taskResultFile, $serialized);
 
-        $statusGet = $len !== false;
+        $statusSave = false !== $len;
 
-        return $statusGet;
+        return $statusSave;
     }
 
 
@@ -316,10 +320,13 @@ class FilesystemFetchApi implements FetchApiInterface
         $ch = curl_init($taskUrl);
 
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+
         curl_setopt($ch, CURLOPT_HEADER, 1);
-        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
+
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
@@ -356,7 +363,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
     public function daemonAddToPool(int $daemonTimeoutMs, ?float $nowMicrotime = null) : bool
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $daemonTimeoutMsInt = $theType->int_positive($daemonTimeoutMs)->orThrow();
 
@@ -376,7 +383,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
     public function daemonRemoveFromPool(?float $nowMicrotime = null) : bool
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if ((null !== ($nowMicrotimeFloat = $nowMicrotime))) {
             $nowMicrotimeFloat = $theType->float_non_negative($nowMicrotime)->orThrow();
@@ -403,7 +410,7 @@ class FilesystemFetchApi implements FetchApiInterface
         $nowMicrotime = null
     ) : bool
     {
-        $theFs = Lib::$fs;
+        $theFs = Lib::fs();
         $theFsFile = $theFs->fileSafe();
 
         $poolFile = $this->poolFile;
@@ -481,7 +488,7 @@ class FilesystemFetchApi implements FetchApiInterface
         $nowMicrotime = null
     ) : bool
     {
-        $theFs = Lib::$fs;
+        $theFs = Lib::fs();
         $theFsFile = $theFs->fileSafe();
 
         $poolFile = $this->poolFile;
@@ -557,7 +564,7 @@ class FilesystemFetchApi implements FetchApiInterface
     {
         $refPidFirst = null;
 
-        $theFs = Lib::$fs;
+        $theFs = Lib::fs();
         $theFsFile = $theFs->fileSafe();
 
         $poolFile = $this->poolFile;
@@ -640,9 +647,9 @@ class FilesystemFetchApi implements FetchApiInterface
         $timeoutMs = $timeoutMs ?? 10000;
         $lockWaitTimeoutMs = $lockWaitTimeoutMs ?? 1000;
 
-        $theCli = Lib::$cli;
+        $theCli = Lib::cli();
         $theCliProcessManager = $theCli->processManager();
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $timeoutMsInt = $theType->int_non_negative_or_minus_one($timeoutMs)->orThrow();
         $lockWaitTimeoutMsInt = $theType->int_non_negative_or_minus_one($lockWaitTimeoutMs)->orThrow();
@@ -653,13 +660,14 @@ class FilesystemFetchApi implements FetchApiInterface
         $cmd[] = $timeoutMsInt;
         $cmd[] = $lockWaitTimeoutMsInt;
 
-        $proc = $theCliProcessManager->newProc()
-            ->setIsBackground(true)
+        $proc = $theCliProcessManager->newProcNormal();
+
+        $proc
             ->setCmd($cmd)
             ->setCwd($this->binDirRealpath)
         ;
 
-        $theCliProcessManager->spawn($proc);
+        $theCliProcessManager->spawnNormal($proc);
     }
 
 
@@ -668,7 +676,7 @@ class FilesystemFetchApi implements FetchApiInterface
         int $lockWaitTimeoutMs
     ) : void
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $pid = getmypid();
 
@@ -705,24 +713,22 @@ class FilesystemFetchApi implements FetchApiInterface
     }
 
 
-    /**
-     * @noinspection PhpVarExportUsedWithoutReturnArgumentInspection
-     */
     protected function workerRunLoop(
         int $pid,
         ?int $timeoutMs = null,
-        ?int $lockWaitTimeoutMs = null
+        ?int $waitTimeoutMs = null
     ) : void
     {
         $isNullTimeout = (null === $timeoutMs);
 
         $nowMicrotime = microtime(true);
 
+        $timeoutBreakMs = $timeoutMs ?? 10000;
         $timeoutReportMs = $timeoutMs ?? 10000;
 
-        $timeoutMicrotime = null;
+        $timeoutBreakMicrotime = null;
         if (! $isNullTimeout) {
-            $timeoutMicrotime = $nowMicrotime + ($timeoutMs / 1000);
+            $timeoutBreakMicrotime = $nowMicrotime + ($timeoutBreakMs / 1000);
         }
 
         $timeoutReportMicrotime = 0.0;
@@ -739,18 +745,21 @@ class FilesystemFetchApi implements FetchApiInterface
             $task = [];
             $taskResult = [];
 
+            /**
+             * @noinspection PhpVarExportUsedWithoutReturnArgumentInspection
+             */
             $status = true
-                && $this->popTask($task, $lockWaitTimeoutMs)
+                && $this->popTask($task, $waitTimeoutMs)
                 && print_r('[ NEW ] Task: ' . $task[ 'id' ] . "\n")
                 && $this->processTask($taskResult, $task)
-                && print_r('[ END ] Task: ' . $task[ 'id' ] . "\n")
+                && print_r('[ POP ] Task: ' . $task[ 'id' ] . "\n")
                 && $this->taskSaveResult($task, $taskResult);
 
             if (! $isNullTimeout) {
                 if ($status) {
-                    $timeoutMicrotime = $nowMicrotime + ($timeoutMs / 1000);
+                    $timeoutBreakMicrotime = $nowMicrotime + ($timeoutBreakMs / 1000);
 
-                } elseif ($nowMicrotime > $timeoutMicrotime) {
+                } elseif ($nowMicrotime > $timeoutBreakMicrotime) {
                     break;
                 }
             }

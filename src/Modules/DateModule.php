@@ -325,7 +325,7 @@ class DateModule
      */
     public function type_date($datestring, $timezoneFallback = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $dateTime = null;
 
@@ -367,7 +367,7 @@ class DateModule
      */
     public function type_adate($datestring, $timezoneFallback = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $dateTime = null;
 
@@ -409,7 +409,7 @@ class DateModule
      */
     public function type_idate($datestring, $timezoneFallback = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $dateTimeImmutable = null;
 
@@ -452,8 +452,8 @@ class DateModule
      */
     public function type_date_formatted($dateFormatted, $formats, $timezoneFallback = null)
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $dateTime = null;
 
@@ -512,8 +512,8 @@ class DateModule
      */
     public function type_adate_formatted($dateFormatted, $formats, $timezoneFallback = null)
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $dateTime = null;
 
@@ -572,8 +572,8 @@ class DateModule
      */
     public function type_idate_formatted($dateFormatted, $formats, $timezoneFallback = null)
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $dateTimeImmutable = null;
 
@@ -633,7 +633,7 @@ class DateModule
      */
     public function type_date_tz($datestring, ?array $allowedTimezoneTypes = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $dateTime = null;
 
@@ -690,7 +690,7 @@ class DateModule
      */
     public function type_adate_tz($datestring, ?array $allowedTimezoneTypes = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $dateTime = null;
 
@@ -747,7 +747,7 @@ class DateModule
      */
     public function type_idate_tz($datestring, ?array $allowedTimezoneTypes = null)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $dateTimeImmutable = null;
 
@@ -805,8 +805,8 @@ class DateModule
      */
     public function type_date_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $dateTime = null;
 
@@ -880,8 +880,8 @@ class DateModule
      */
     public function type_adate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $dateTime = null;
 
@@ -955,8 +955,8 @@ class DateModule
      */
     public function type_idate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $dateTimeImmutable = null;
 
@@ -1033,7 +1033,7 @@ class DateModule
     {
         $timezoneSet = $timezoneSet ?? date_default_timezone_get();
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $dateTime = null;
 
@@ -1097,7 +1097,7 @@ class DateModule
     {
         $timezoneSet = $timezoneSet ?? date_default_timezone_get();
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $dateTime = null;
 
@@ -1161,7 +1161,7 @@ class DateModule
     {
         $timezoneSet = $timezoneSet ?? date_default_timezone_get();
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $dateTimeImmutable = null;
 
@@ -1225,7 +1225,7 @@ class DateModule
     {
         $timezoneSet = $timezoneSet ?? date_default_timezone_get();
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $dateTime = null;
 
@@ -1378,7 +1378,7 @@ class DateModule
             return Ret::ok($microtime);
         }
 
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         if (! $theType
             ->numeric($microtime, false)
@@ -1440,7 +1440,7 @@ class DateModule
 
     public function date_remote(\DateTimeInterface $date, $timezoneSet) : \DateTimeInterface
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $timezoneSetObject = $theType->timezone($timezoneSet)->orThrow();
 
@@ -1453,7 +1453,7 @@ class DateModule
 
     public function adate_remote(\DateTimeInterface $date, $timezoneSet) : \DateTime
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $timezoneSetObject = $theType->timezone($timezoneSet)->orThrow();
 
@@ -1466,7 +1466,7 @@ class DateModule
 
     public function idate_remote(\DateTimeInterface $date, $timezoneSet) : \DateTimeImmutable
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $timezoneSetObject = $theType->timezone($timezoneSet)->orThrow();
 
@@ -1741,7 +1741,7 @@ class DateModule
      */
     public function timezone_type($timezone) : int
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $timezoneObject = $theType->timezone($timezone)->orThrow();
 
@@ -1756,7 +1756,7 @@ class DateModule
      */
     public function timezone_same($a, $b) : bool
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $aObject = $theType->timezone($a)->orThrow();
         $bObject = $theType->timezone($b)->orThrow();
@@ -1816,8 +1816,8 @@ class DateModule
 
         $intervalClass = $intervalClass ?? \DateInterval::class;
 
-        $theStr = Lib::$str;
-        $theType = Lib::$type;
+        $theStr = Lib::str();
+        $theType = Lib::type();
 
         $durationValid = $theType->string_not_empty($duration)->orThrow();
 

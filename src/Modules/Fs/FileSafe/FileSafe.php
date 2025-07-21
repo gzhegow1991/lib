@@ -86,7 +86,7 @@ class FileSafe
      */
     public function fclosef($resource)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $resourceValid = $theType->resource($resource)->orThrow();
 
@@ -146,7 +146,7 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $resourceLocked = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
@@ -197,7 +197,7 @@ class FileSafe
      */
     public function freleasef($resource)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $resourceValid = $theType->resource($resource)->orThrow();
 
@@ -271,7 +271,7 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         array_unshift($fopenArgs, $file, $modeOpen, false);
 
@@ -340,7 +340,7 @@ class FileSafe
      */
     public function freleasef_fclosef($resource)
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         $resourceValid = $theType->resource($resource)->orThrow();
 
@@ -425,7 +425,7 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         array_unshift($fopenArgs, $file, $modeOpen, false);
 
@@ -470,7 +470,7 @@ class FileSafe
      */
     public function frelease_fclose_unlink($resource, $file)
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $isWindows = $thePhp->is_windows();
 
@@ -521,8 +521,8 @@ class FileSafe
      */
     public function freleasef_fclosef_unlinkf($resource, $file)
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $resourceValid = $theType->resource($resource)->orThrow();
 
@@ -676,7 +676,7 @@ class FileSafe
      */
     public function fpassthru_fflush($resource)
     {
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $size = fpassthru($resource);
 
@@ -1035,7 +1035,7 @@ class FileSafe
      */
     public function realpath($file, $returnTargetPath = null)
     {
-        $theFs = Lib::$fs;
+        $theFs = Lib::fs();
 
         $returnTargetPath = $returnTargetPath ?? $theFs->static_realpath_return_target_path();
         $returnTargetPath = (bool) $returnTargetPath;
@@ -1395,7 +1395,7 @@ class FileSafe
      */
     public function mkdir($directory, $permissions = null, $recursive = null, $context = null)
     {
-        $theFs = Lib::$fs;
+        $theFs = Lib::fs();
 
         $permissions = $permissions ?? $theFs->static_dir_chmod();
         $recursive = $recursive ?? false;
@@ -1428,7 +1428,7 @@ class FileSafe
      */
     public function mkdirp($directory, $permissions = null, $recursive = null, $context = null)
     {
-        $theFs = Lib::$fs;
+        $theFs = Lib::fs();
 
         if (! is_dir($directory)) {
             $permissions = $permissions ?? $theFs->static_dir_chmod();
@@ -1653,7 +1653,7 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $content = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
@@ -1712,7 +1712,7 @@ class FileSafe
             }
 
         } elseif (is_array($data)) {
-            $theType = Lib::$type;
+            $theType = Lib::type();
 
             $len = 0;
             foreach ( $data as $line ) {
@@ -1762,7 +1762,7 @@ class FileSafe
         array $flockArgs = []
     )
     {
-        $theType = Lib::$type;
+        $theType = Lib::type();
 
         array_unshift($fopenArgs, $file, $modeOpen);
 
@@ -1844,7 +1844,7 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $len = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
@@ -2045,7 +2045,7 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $content = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
@@ -2161,7 +2161,7 @@ class FileSafe
     {
         $modeLock |= LOCK_NB;
 
-        $thePhp = Lib::$php;
+        $thePhp = Lib::php();
 
         $size = $thePhp->pooling_sync(
             $tickUsleep, $timeoutMs,
@@ -2299,7 +2299,7 @@ class FileSafe
      */
     public function call_safe(\Closure $fn, array $args = [])
     {
-        $theFunc = Lib::$func;
+        $theFunc = Lib::func();
 
         $beforeErrorReporting = error_reporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
         $beforeErrorHandler = set_error_handler([ $theFunc, 'safe_call_error_handler' ]);

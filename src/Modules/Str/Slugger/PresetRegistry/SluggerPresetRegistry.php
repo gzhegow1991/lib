@@ -184,8 +184,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
     {
         $refKnownSymbolMap = [];
 
-        $theMb = Lib::$mb;
-        $theMb->assertExtension();
+        $theMb = Lib::mb();
 
         $result = [];
 
@@ -227,11 +226,9 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
     {
         $refKnownSymbolMap = [];
 
-        $theItertools = Lib::$itertools;
-        $theMb = Lib::$mb;
-        $theType = Lib::$type;
-
-        $theMb->assertExtension();
+        $theItertools = Lib::itertools();
+        $theMb = Lib::mb();
+        $theType = Lib::type();
 
         $result = [];
 
@@ -321,8 +318,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
     {
         $refKnownSymbolMap = [];
 
-        $theMb = Lib::$mb;
-        $theMb->assertExtension();
+        $theMb = Lib::mb();
 
         $result = [];
 

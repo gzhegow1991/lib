@@ -9,8 +9,8 @@ trait CanTraitConstruct
 {
     protected function __traitConstruct(array $args = [])
     {
-        $thePhp = Lib::$php;
-        $theType = Lib::$type;
+        $thePhp = Lib::php();
+        $theType = Lib::type();
 
         $traits = $thePhp->class_uses_with_parents($this, true);
 
