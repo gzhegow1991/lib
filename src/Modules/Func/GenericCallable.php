@@ -225,7 +225,7 @@ class GenericCallable implements
 
         $instance->key = "[ {$key0}, {$key1} ]";
 
-        return Ret::throw($fallback, $instance);
+        return Ret::ok($fallback, $instance);
     }
 
     /**
