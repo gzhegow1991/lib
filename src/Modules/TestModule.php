@@ -2,13 +2,13 @@
 
 namespace Gzhegow\Lib\Modules;
 
-use Gzhegow\Lib\Modules\Test\Test;
+use Gzhegow\Lib\Modules\Test\TestCase;
 
 
 class TestModule
 {
-    public function newTest() : Test
+    public function newTestCase() : TestCase
     {
-        return new Test();
+        return new TestCase();
     }
 }

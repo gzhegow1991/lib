@@ -230,6 +230,7 @@ class HttpHeader implements ToStringInterface
     }
 
 
+
     public function getRaw() : string
     {
         return $this->raw;

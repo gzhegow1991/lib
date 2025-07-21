@@ -166,7 +166,7 @@ class DefaultThrowabler implements ThrowablerInterface
 
         $first = true;
         foreach ( $array as $dotpath => $e ) {
-            $messagesLines = $this->getThrowableMessagesAll($e, $flags);
+            $messagesLines = $this->getThrowableMessagesAllList($e, $flags);
 
             if (! $first) {
                 array_unshift($messagesLines, '');
@@ -285,7 +285,9 @@ class DefaultThrowabler implements ThrowablerInterface
             $eMessage = 'CODE[' . $throwable->getCode() . '] ' . $eMessage;
         }
 
-        foreach ( explode("\n", $eMessage) as $line ) {
+        $eMessageLines = explode("\n", $eMessage);
+
+        foreach ( $eMessageLines as $line ) {
             $line = trim($line);
             if ('' === $line) {
                 continue;
@@ -306,7 +308,7 @@ class DefaultThrowabler implements ThrowablerInterface
     /**
      * @return string[]
      */
-    public function getThrowableMessagesAll(\Throwable $throwable, ?int $flags = null) : array
+    public function getThrowableMessagesAllList(\Throwable $throwable, ?int $flags = null) : array
     {
         if ($throwable instanceof HasMessageListInterface) {
             $throwableMap = array_fill_keys($throwable->getMessageList(), $throwable);
@@ -329,7 +331,7 @@ class DefaultThrowabler implements ThrowablerInterface
 
         $withCode = $flags & _DEBUG_THROWABLE_WITH_CODE;
 
-        $eMessages = $this->getThrowableMessagesAll($throwable, $flags);
+        $eMessages = $this->getThrowableMessagesAllList($throwable, $flags);
 
         $lines = [];
 
@@ -338,13 +340,19 @@ class DefaultThrowabler implements ThrowablerInterface
                 $eMessage = 'CODE[' . $throwable->getCode() . '] ' . $eMessage;
             }
 
-            foreach ( explode("\n", $eMessage) as $line ) {
-                $line = trim($line);
+            $eMessageLines = explode("\n", $eMessage);
+
+            foreach ( $eMessageLines as $line ) {
+                $line = rtrim($line);
                 if ('' === $line) {
                     continue;
                 }
 
                 $lines[] = $line;
+            }
+
+            if (count($eMessageLines) > 1) {
+                $lines[] = '';
             }
         }
 

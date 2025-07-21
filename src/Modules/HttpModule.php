@@ -48,7 +48,7 @@ class HttpModule
         return $this->cookies = $cookiesClass::getInstance();
     }
 
-    public function session() : ?SessionInterface
+    public function session() : SessionInterface
     {
         if (null !== $this->session) {
             return $this->session;
@@ -243,8 +243,8 @@ class HttpModule
             array_unshift($dataArrays, $dataArray);
         }
 
-        foreach ( $dataArrays as $idx => $_dataArray ) {
-            if (null === $_dataArray) {
+        foreach ( $dataArrays as $idx => $dataArrayItem ) {
+            if (null === $dataArrayItem) {
                 unset($dataArrays[ $idx ]);
             }
         }

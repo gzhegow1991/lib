@@ -47,12 +47,19 @@ class RandomModule
     }
 
 
+    /**
+     * @param string $refValue
+     *
+     * @return string
+     */
     public function idIncrement(&$refValue) : string
     {
         $val = $refValue;
 
         if (is_int($val)) {
-            if ($val >= PHP_INT_MAX) {
+            if ($val === PHP_INT_MAX) {
+                $theBcmath = Lib::bcmath();
+
                 $val = bcadd($val, 1);
 
             } else {
@@ -60,16 +67,16 @@ class RandomModule
             }
 
         } else {
-            if (! ctype_digit($val)) {
-                throw new LogicException(
-                    [ 'The `value` should contain big integer value', $refValue ]
-                );
-            }
+            $theType = Lib::type();
+
+            $theType->ctype_digit($val)->orThrow();
 
             if (false
                 || (strlen($val) > strlen(PHP_INT_MAX))
                 || (floatval($val) >= PHP_INT_MAX)
             ) {
+                $theBcmath = Lib::bcmath();
+
                 $val = bcadd($val, 1);
 
             } else {
@@ -77,9 +84,11 @@ class RandomModule
             }
         }
 
-        $refValue = $val;
+        $valString = (string) $val;
 
-        return $val;
+        $refValue = $valString;
+
+        return $valString;
     }
 
 

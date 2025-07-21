@@ -30,6 +30,7 @@ use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
 use Gzhegow\Lib\Modules\RandomModule;
 use Gzhegow\Lib\Modules\SocialModule;
+use Gzhegow\Lib\Modules\Test\TestCase;
 use Gzhegow\Lib\Modules\Func\Pipe\Pipe;
 use Gzhegow\Lib\Modules\ItertoolsModule;
 use Gzhegow\Lib\Modules\EntrypointModule;
@@ -48,6 +49,21 @@ class Lib
     public static function async()
     {
         return static::$async = static::$async ?? new AsyncModule();
+    }
+
+    public static function asyncClock()
+    {
+        return Lib::async()->clockManager();
+    }
+
+    public static function asyncLoop()
+    {
+        return Lib::async()->loopManager();
+    }
+
+    public static function asyncPromise()
+    {
+        return Lib::async()->promiseManager();
     }
 
     public static function asyncFetchApi()
@@ -188,6 +204,22 @@ class Lib
 
 
     /**
+     * @var PhpModule
+     */
+    public static $php;
+
+    public static function php()
+    {
+        return static::$php = static::$php ?? new PhpModule();
+    }
+
+    public static function phpCallableParser()
+    {
+        return Lib::php()->callableParser();
+    }
+
+
+    /**
      * @var SocialModule
      */
     public static $social;
@@ -197,12 +229,12 @@ class Lib
         return static::$social = static::$social ?? new SocialModule();
     }
 
-    public static function socialEmailParser()
+    public static function socialEmail()
     {
         return Lib::social()->emailParser();
     }
 
-    public static function socialPhoneManager()
+    public static function socialPhone()
     {
         return Lib::social()->phoneManager();
     }
@@ -346,16 +378,6 @@ class Lib
     }
 
     /**
-     * @var PhpModule
-     */
-    public static $php;
-
-    public static function php()
-    {
-        return static::$php = static::$php ?? new PhpModule();
-    }
-
-    /**
      * @var PregModule
      */
     public static $preg;
@@ -406,6 +428,13 @@ class Lib
     }
 
 
+    /**
+     * > фабрика для Pipe - задать этапы задачи в наглядом виде без деталей
+     */
+    public static function pipe(?Pipe &$refP = null) : Pipe
+    {
+        return $refP = Lib::func()->newPipe();
+    }
 
     /**
      * > фабрика для ErrorBag - добавить теги ошибкам, чтобы потом сохранить в несколько отчетов
@@ -415,13 +444,12 @@ class Lib
         return $refB = Lib::php()->newErrorBag();
     }
 
-
     /**
-     * > фабрика для Pipe - задать этапы задачи в наглядом виде без деталей
+     * > фабрика для TestCase - быстро создать тест, проверяющий вывод, возврат, затраты времени и памяти
      */
-    public static function pipe(?Pipe &$refP = null) : Pipe
+    public static function testCase(?TestCase &$refT = null) : TestCase
     {
-        return $refP = Lib::func()->newPipe();
+        return $refT = Lib::test()->newTestCase();
     }
 
 
@@ -739,7 +767,7 @@ class Lib
 
 
     /**
-     * > в старых версиях PHP нельзя выбросить исключения в рамках цепочки тернарных операторов
+     * > в версиях PHP ниже 8.0 нельзя выбросить исключения в рамках цепочки тернарных операторов
      *
      * @return null
      *
@@ -773,12 +801,16 @@ class Lib
 
 
     /**
-     * > подключить композер, установленный глобально - чтобы дебаг пакеты не добавлять в библиотеки, но пользоваться ими (временно)
+     * > подключить Composer, установленный глобально - чтобы дебаг пакеты не добавлять в библиотеки, но пользоваться ими (временно)
      *
      * @return \Composer\Autoload\ClassLoader
      */
     public static function require_composer_global()
     {
-        return require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
+        static $loader;
+
+        $loader = $loader ?? require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
+
+        return $loader;
     }
 }

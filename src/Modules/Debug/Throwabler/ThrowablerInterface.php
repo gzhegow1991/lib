@@ -70,7 +70,7 @@ interface ThrowablerInterface
     /**
      * @return string[]
      */
-    public function getThrowableMessagesAll(\Throwable $throwable, ?int $flags = null) : array;
+    public function getThrowableMessagesAllList(\Throwable $throwable, ?int $flags = null) : array;
 
     /**
      * @return string[]

@@ -106,11 +106,11 @@ $ffn = new class {
     }
 
 
-    function test(\Closure $fn, array $args = []) : \Gzhegow\Lib\Modules\Test\Test
+    function test(\Closure $fn, array $args = []) : \Gzhegow\Lib\Modules\Test\TestCase
     {
         $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return \Gzhegow\Lib\Lib::test()->newTest()
+        return \Gzhegow\Lib\Lib::test()->newTestCase()
             ->fn($fn, $args)
             ->trace($trace)
         ;

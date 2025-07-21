@@ -7,7 +7,7 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
-class Test
+class TestCase
 {
     /**
      * @var \Closure
