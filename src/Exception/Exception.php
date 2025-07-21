@@ -20,7 +20,7 @@ class Exception extends \Exception implements
 
         $args = $thePhp->throwable_args(...$throwableArgs);
 
-        $message = $args[ 'message' ] ?? static::class;
+        $message = $args[ 'message' ] ?? '[ NO MESSAGE ]';
         $messageList = array_values($args[ 'messageList' ]);
         $messageObjectList = array_values($args[ 'messageObjectList' ]);
 
