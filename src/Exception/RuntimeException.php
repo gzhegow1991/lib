@@ -57,7 +57,7 @@ class RuntimeException extends \RuntimeException implements
         if ($hasPrevious) {
             $theDebugThrowabler = $theDebug->throwabler();
 
-            $this->previousMessageList = $theDebugThrowabler->getPreviousMessagesAllList($this);
+            $this->previousMessageList = $theDebugThrowabler->getPreviousMessageFirstList($this);
         }
 
         if ($hasFileLine) {
