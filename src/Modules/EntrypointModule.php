@@ -19,7 +19,7 @@ class EntrypointModule
     /**
      * @var array<string, mixed>
      */
-    protected $mapDefault = [
+    protected $mapRecommended = [
         'dirRoot'               => null,
         //
         'fnErrorHandler'        => null,
@@ -225,7 +225,7 @@ class EntrypointModule
 
     public function __construct()
     {
-        $this->mapDefault = [
+        $this->mapRecommended = [
             'dirRoot'               => null,
             //
             'fnErrorHandler'        => [ $this, 'fnErrorHandler' ],
@@ -291,7 +291,7 @@ class EntrypointModule
             'obImplicitFlushCommit' => 0,
         ];
 
-        foreach ( $this->mapDefault as $key => $value ) {
+        foreach ( $this->mapRecommended as $key => $value ) {
             $this->{$key} = [ $value ];
         }
 
@@ -366,7 +366,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$key} = [ $this->mapDefault[ 'dirRoot' ] ];
+            $this->{$key} = [ $this->mapRecommended[ 'dirRoot' ] ];
 
         } elseif (false === $var) {
             $this->{$key} = [ $this->mapInitial[ 'dirRoot' ] ];
@@ -424,7 +424,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$key} = [ $this->mapDefault[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$key} = [ $this->mapInitial[ $key ] ];
@@ -459,9 +459,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultErrorHandler(&$refLast = null)
+    public function useRecommendedErrorHandler(&$refLast = null)
     {
-        $refLast = set_error_handler($this->mapDefault[ 'fnErrorHandler' ]);
+        $refLast = set_error_handler($this->mapRecommended[ 'fnErrorHandler' ]);
 
         return $this;
     }
@@ -508,7 +508,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$key} = [ $this->mapDefault[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$key} = [ $this->mapInitial[ $key ] ];
@@ -543,9 +543,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultExceptionHandler(&$refLast = null)
+    public function useRecommendedExceptionHandler(&$refLast = null)
     {
-        $refLast = set_exception_handler($this->mapDefault[ 'fnExceptionHandler' ]);
+        $refLast = set_exception_handler($this->mapRecommended[ 'fnExceptionHandler' ]);
 
         return $this;
     }
@@ -583,7 +583,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$key} = [ $this->mapDefault[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$key} = [ $this->mapInitial[ $key ] ];
@@ -618,9 +618,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultErrorReporting(&$refLast = null)
+    public function useRecommendedErrorReporting(&$refLast = null)
     {
-        $refLast = error_reporting($this->mapDefault[ 'errorReporting' ]);
+        $refLast = error_reporting($this->mapRecommended[ 'errorReporting' ]);
 
         return $this;
     }
@@ -660,7 +660,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$key} = [ $this->mapDefault[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$key} = [ $this->mapInitial[ $key ] ];
@@ -693,9 +693,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultErrorLog(&$refLast = null)
+    public function useRecommendedErrorLog(&$refLast = null)
     {
-        $refLast = ini_set('error_log', $this->mapDefault[ 'errorLog' ]);
+        $refLast = ini_set('error_log', $this->mapRecommended[ 'errorLog' ]);
 
         return $this;
     }
@@ -735,7 +735,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$key} = [ $this->mapDefault[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$key} = [ $this->mapInitial[ $key ] ];
@@ -768,9 +768,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultLogErrors(&$refLast = null)
+    public function useRecommendedLogErrors(&$refLast = null)
     {
-        $refLast = ini_set('log_errors', $this->mapDefault[ 'logErrors' ]);
+        $refLast = ini_set('log_errors', $this->mapRecommended[ 'logErrors' ]);
 
         return $this;
     }
@@ -823,8 +823,8 @@ class EntrypointModule
         }
 
         if (null === $displayErrors) {
-            $this->displayErrors = [ $this->mapDefault[ 'displayErrors' ] ];
-            $this->displayStartupErrors = [ $this->mapDefault[ 'displayStartupErrors' ] ];
+            $this->displayErrors = [ $this->mapRecommended[ 'displayErrors' ] ];
+            $this->displayStartupErrors = [ $this->mapRecommended[ 'displayStartupErrors' ] ];
 
         } elseif (false === $displayErrors) {
             $this->displayErrors = [ $this->mapInitial[ 'displayErrors' ] ];
@@ -867,13 +867,13 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultDisplayErrors(
+    public function useRecommendedDisplayErrors(
         &$refLastDisplayErrors = null,
         &$refLastDisplayStartupErrors = null
     )
     {
-        $refLastDisplayErrors = ini_set('display_errors', $this->mapDefault[ 'displayErrors' ]);
-        $refLastDisplayStartupErrors = ini_set('display_startup_errors', $this->mapDefault[ 'displayStartupErrors' ]);
+        $refLastDisplayErrors = ini_set('display_errors', $this->mapRecommended[ 'displayErrors' ]);
+        $refLastDisplayStartupErrors = ini_set('display_startup_errors', $this->mapRecommended[ 'displayStartupErrors' ]);
 
         return $this;
     }
@@ -910,7 +910,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapDefault[ $key ] ];
+            $this->{$var} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$var} = [ $this->mapInitial[ $key ] ];
@@ -944,9 +944,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultMemoryLimit(&$refLast = null)
+    public function useRecommendedMemoryLimit(&$refLast = null)
     {
-        $refLast = ini_set('memory_limit', $this->mapDefault[ 'memoryLimit' ]);
+        $refLast = ini_set('memory_limit', $this->mapRecommended[ 'memoryLimit' ]);
 
         return $this;
     }
@@ -983,7 +983,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapDefault[ $key ] ];
+            $this->{$var} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$var} = [ $this->mapInitial[ $key ] ];
@@ -1016,9 +1016,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultMaxExecutionTime(&$refLast = null)
+    public function useRecommendedMaxExecutionTime(&$refLast = null)
     {
-        $refLast = ini_set('max_execution_time', $this->mapDefault[ 'maxExecutionTime' ]);
+        $refLast = ini_set('max_execution_time', $this->mapRecommended[ 'maxExecutionTime' ]);
 
         return $this;
     }
@@ -1055,7 +1055,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapDefault[ $key ] ];
+            $this->{$var} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$var} = [ $this->mapInitial[ $key ] ];
@@ -1088,9 +1088,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultMaxInputTime(&$refLast = null)
+    public function useRecommendedMaxInputTime(&$refLast = null)
     {
-        $refLast = ini_set('max_input_time', $this->mapDefault[ 'maxInputTime' ]);
+        $refLast = ini_set('max_input_time', $this->mapRecommended[ 'maxInputTime' ]);
 
         return $this;
     }
@@ -1130,7 +1130,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapDefault[ $key ] ];
+            $this->{$var} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$var} = [ $this->mapInitial[ $key ] ];
@@ -1163,9 +1163,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultTimezoneDefault(&$refLast = null)
+    public function useRecommendedTimezoneDefault(&$refLast = null)
     {
-        $refLast = date_default_timezone_set($this->mapDefault[ 'timezoneDefault' ]->getName());
+        $refLast = date_default_timezone_set($this->mapRecommended[ 'timezoneDefault' ]->getName());
 
         return $this;
     }
@@ -1202,7 +1202,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapDefault[ $key ] ];
+            $this->{$var} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$var} = [ $this->mapInitial[ $key ] ];
@@ -1233,9 +1233,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultPrecision(&$refLast = null)
+    public function useRecommendedPrecision(&$refLast = null)
     {
-        $refLast = ini_set('precision', $this->mapDefault[ 'precision' ]);
+        $refLast = ini_set('precision', $this->mapRecommended[ 'precision' ]);
 
         return $this;
     }
@@ -1272,7 +1272,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapDefault[ $key ] ];
+            $this->{$var} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$var} = [ $this->mapInitial[ $key ] ];
@@ -1307,9 +1307,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultUmask(&$refLast = null)
+    public function useRecommendedUmask(&$refLast = null)
     {
-        $refLast = umask($this->mapDefault[ 'umask' ]);
+        $refLast = umask($this->mapRecommended[ 'umask' ]);
 
         return $this;
     }
@@ -1346,7 +1346,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapDefault[ $key ] ];
+            $this->{$var} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$var} = [ $this->mapInitial[ $key ] ];
@@ -1380,9 +1380,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultPostMaxSize(&$refLast = null)
+    public function useRecommendedPostMaxSize(&$refLast = null)
     {
-        $refLast = ini_set('post_max_size', $this->mapDefault[ 'postMaxSize' ]);
+        $refLast = ini_set('post_max_size', $this->mapRecommended[ 'postMaxSize' ]);
 
         return $this;
     }
@@ -1419,7 +1419,7 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapDefault[ $key ] ];
+            $this->{$var} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
             $this->{$var} = [ $this->mapInitial[ $key ] ];
@@ -1453,9 +1453,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultUploadMaxFilesize(&$refLast = null)
+    public function useRecommendedUploadMaxFilesize(&$refLast = null)
     {
-        $refLast = ini_set('upload_max_filesize', $this->mapDefault[ 'uploadMaxFilesize' ]);
+        $refLast = ini_set('upload_max_filesize', $this->mapRecommended[ 'uploadMaxFilesize' ]);
 
         return $this;
     }
@@ -1498,8 +1498,8 @@ class EntrypointModule
         }
 
         if (null === $uploadTmpDir) {
-            $this->uploadTmpDir = [ $this->mapDefault[ 'uploadTmpDir' ] ];
-            $this->uploadTmpDirMkdir = [ $this->mapDefault[ 'uploadTmpDirMkdir' ] ];
+            $this->uploadTmpDir = [ $this->mapRecommended[ 'uploadTmpDir' ] ];
+            $this->uploadTmpDirMkdir = [ $this->mapRecommended[ 'uploadTmpDirMkdir' ] ];
 
         } elseif (false === $uploadTmpDir) {
             $this->uploadTmpDir = [ $this->mapInitial[ 'uploadTmpDir' ] ];
@@ -1553,9 +1553,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultUploadTmpDir(&$refLast = null)
+    public function useRecommendedUploadTmpDir(&$refLast = null)
     {
-        $refLast = ini_set('upload_tmp_dir', $this->mapDefault[ 'uploadTmpDir' ]);
+        $refLast = ini_set('upload_tmp_dir', $this->mapRecommended[ 'uploadTmpDir' ]);
 
         return $this;
     }
@@ -1591,7 +1591,7 @@ class EntrypointModule
         }
 
         if (null === $obImplicitFlush) {
-            $this->obImplicitFlush = [ $this->mapDefault[ 'obImplicitFlush' ] ];
+            $this->obImplicitFlush = [ $this->mapRecommended[ 'obImplicitFlush' ] ];
 
         } elseif (false === $obImplicitFlush) {
             $this->obImplicitFlush = [ $this->mapInitial[ 'obImplicitFlush' ] ];
@@ -1603,7 +1603,7 @@ class EntrypointModule
         }
 
         if (null === $obImplicitFlushCommit) {
-            $this->obImplicitFlushCommit = [ $this->mapDefault[ 'obImplicitFlushCommit' ] ];
+            $this->obImplicitFlushCommit = [ $this->mapRecommended[ 'obImplicitFlushCommit' ] ];
 
         } elseif (false === $obImplicitFlushCommit) {
             $this->obImplicitFlushCommit = [ $this->mapInitial[ 'obImplicitFlushCommit' ] ];
@@ -1656,9 +1656,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDefaultObImplicitFlush()
+    public function useRecommendedObImplicitFlush()
     {
-        ob_implicit_flush($this->mapDefault[ 'obImplicitFlush' ]);
+        ob_implicit_flush($this->mapRecommended[ 'obImplicitFlush' ]);
 
         return $this;
     }
@@ -1717,11 +1717,11 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setAllDefault()
+    public function setAllRecommended()
     {
         $this->assertNotLocked();
 
-        foreach ( $this->mapDefault as $key => $value ) {
+        foreach ( $this->mapRecommended as $key => $value ) {
             $this->{$key} = [ $value ];
 
             $this->mapWasSet[ $key ] = true;
@@ -1787,29 +1787,29 @@ class EntrypointModule
     public function useAllDefault()
     {
         $this
-            ->useDefaultErrorHandler()
-            ->useDefaultExceptionHandler()
+            ->useRecommendedErrorHandler()
+            ->useRecommendedExceptionHandler()
             //
-            ->useDefaultErrorReporting()
-            ->useDefaultErrorLog()
-            ->useDefaultLogErrors()
-            ->useDefaultDisplayErrors()
+            ->useRecommendedErrorReporting()
+            ->useRecommendedErrorLog()
+            ->useRecommendedLogErrors()
+            ->useRecommendedDisplayErrors()
             //
-            ->useDefaultMemoryLimit()
+            ->useRecommendedMemoryLimit()
             //
-            ->useDefaultMaxExecutionTime()
-            ->useDefaultMaxInputTime()
+            ->useRecommendedMaxExecutionTime()
+            ->useRecommendedMaxInputTime()
             //
-            ->useDefaultTimezoneDefault()
+            ->useRecommendedTimezoneDefault()
             //
-            ->useDefaultPrecision()
+            ->useRecommendedPrecision()
             //
-            ->useDefaultUmask()
+            ->useRecommendedUmask()
             //
-            ->useDefaultPostMaxSize()
+            ->useRecommendedPostMaxSize()
             //
-            ->useDefaultUploadMaxFilesize()
-            ->useDefaultUploadTmpDir()
+            ->useRecommendedUploadMaxFilesize()
+            ->useRecommendedUploadTmpDir()
         ;
 
         return $this;

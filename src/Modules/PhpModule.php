@@ -923,8 +923,6 @@ class PhpModule
 
         $theType = Lib::type();
 
-        $flagsInt = $flags;
-
         $isObject = is_object($value);
 
         if ($isObject) {
@@ -947,14 +945,14 @@ class PhpModule
             );
         }
 
-        if ($class === '__PHP_Incomplete_Class') {
+        if ('__PHP_Incomplete_Class' === $class) {
             return Ret::err(
                 [ 'The `value` should be existing class or object', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ($flagsInt & _PHP_STRUCT_TYPE_CLASS) {
+        if ($flags & _PHP_STRUCT_TYPE_CLASS) {
             if (PHP_VERSION_ID >= 80100) {
                 if (class_exists($class) && ! enum_exists($class)) {
                     return Ret::val($class);
@@ -967,22 +965,22 @@ class PhpModule
             }
         }
 
-        if ($flagsInt & _PHP_STRUCT_TYPE_ENUM) {
+        if ($flags & _PHP_STRUCT_TYPE_ENUM) {
             if (PHP_VERSION_ID >= 80100) {
                 if (enum_exists($class)) {
-                    return Ret::err($class);
+                    return Ret::val($class);
                 }
             }
         }
 
         if (! $isObject) {
-            if ($flagsInt & _PHP_STRUCT_TYPE_INTERFACE) {
+            if ($flags & _PHP_STRUCT_TYPE_INTERFACE) {
                 if (interface_exists($class)) {
                     return Ret::val($class);
                 }
             }
 
-            if ($flagsInt & _PHP_STRUCT_TYPE_TRAIT) {
+            if ($flags & _PHP_STRUCT_TYPE_TRAIT) {
                 if (trait_exists($class)) {
                     return Ret::val($class);
                 }
@@ -1006,25 +1004,36 @@ class PhpModule
     {
         $theType = Lib::type();
 
-        $flagsInt = $flags ?? (
-            _PHP_STRUCT_TYPE_ALL
-            | _PHP_STRUCT_EXISTS_TRUE
-        );
+        $flagsInt = $flags ?? (_PHP_STRUCT_TYPE_ALL | _PHP_STRUCT_EXISTS_TRUE);
 
-        $sum = 0;
-        $sum += (($flagsInt & _PHP_STRUCT_EXISTS_TRUE) ? 1 : 0);
-        $sum += (($flagsInt & _PHP_STRUCT_EXISTS_FALSE) ? 1 : 0);
-        $sum += (($flagsInt & _PHP_STRUCT_EXISTS_IGNORE) ? 1 : 0);
-        if (1 !== $sum) {
-            $flagsInt &= ~(
-                _PHP_STRUCT_EXISTS_TRUE
-                | _PHP_STRUCT_EXISTS_FALSE
-                | _PHP_STRUCT_EXISTS_IGNORE
-            );
+        $flagGroups = [
+            '_PHP_STRUCT_EXISTS' => [
+                [
+                    _PHP_STRUCT_EXISTS_TRUE,
+                    _PHP_STRUCT_EXISTS_FALSE,
+                    _PHP_STRUCT_EXISTS_IGNORE,
+                ],
+                _PHP_STRUCT_EXISTS_TRUE,
+            ],
+        ];
 
-            $flagsInt |= _PHP_STRUCT_EXISTS_TRUE;
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flagsInt & $flag) {
+                    $cnt++;
+                }
+            }
+
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flags` conflict in group: ' . $groupName, $flags ]
+                );
+
+            } elseif (0 === $cnt) {
+                $flagsInt |= $default;
+            }
         }
-        unset($sum);
 
         $isFlagExistsTrue = (bool) ($flagsInt & _PHP_STRUCT_EXISTS_TRUE);
         $isFlagExistsFalse = (bool) ($flagsInt & _PHP_STRUCT_EXISTS_FALSE);
@@ -1046,14 +1055,8 @@ class PhpModule
             }
 
         } else {
-            if (! $theType
-                ->string_not_empty($value)
-                ->isOk([ &$valueStringNotEmpty, &$ret ])
-            ) {
-                return Ret::err(
-                    [ 'The `value` should be string, not empty', $value ],
-                    [ __FILE__, __LINE__ ]
-                );
+            if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+                return $ret;
             }
 
             $class = ltrim($valueStringNotEmpty, '\\');
@@ -1168,15 +1171,12 @@ class PhpModule
      */
     public function type_struct_trait($value, ?int $flags = null)
     {
-        $flagsInt = $flags;
+        $flagsInt = $flags ?? (0
+            | _PHP_STRUCT_TYPE_TRAIT
+            | _PHP_STRUCT_EXISTS_TRUE
+        );
 
-        if (null === $flagsInt) {
-            $flagsInt = (0
-                | _PHP_STRUCT_TYPE_TRAIT
-                | _PHP_STRUCT_EXISTS_TRUE
-            );
-
-        } else {
+        if (null !== $flagsInt) {
             $flagsInt &= ~_PHP_STRUCT_TYPE_ALL;
             $flagsInt |= _PHP_STRUCT_TYPE_TRAIT;
         }
