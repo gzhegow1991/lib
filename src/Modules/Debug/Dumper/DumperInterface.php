@@ -7,15 +7,17 @@ interface DumperInterface
     /**
      * @return static
      */
-    public function printer(?string $printer, ?array $printerOptions = null);
+    public function selectPrinter(?string $printer, ?array $printerOptions = null);
+
+    public function printerPrint(...$vars) : string;
+
 
     /**
      * @return static
      */
-    public function dumper(?string $dumper, ?array $dumperOptions = null);
+    public function selectDumper(?string $dumper, ?array $dumperOptions = null);
 
-
-    public function print(...$vars) : string;
+    public function dumperEcho(...$vars) : void;
 
 
     public function dp(?array $trace, $var, ...$vars) : string;

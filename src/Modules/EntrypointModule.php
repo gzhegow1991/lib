@@ -15,101 +15,203 @@ class EntrypointModule
      * @var array{ 0: string, 1: string }
      */
     protected $isLocked;
+
     /**
-     * @var array<string, bool>
+     * @var array<string, mixed>
      */
-    protected $mapSet = [];
+    protected $mapDefault = [
+        'dirRoot'               => null,
+        //
+        'fnErrorHandler'        => null,
+        'fnExceptionHandler'    => null,
+        //
+        'errorReporting'        => null,
+        'errorLog'              => null,
+        'logErrors'             => null,
+        'displayErrors'         => null,
+        'displayStartupErrors'  => null,
+        //
+        'memoryLimit'           => null,
+        //
+        'maxExecutionTime'      => null,
+        'maxInputTime'          => null,
+        //
+        'timezoneDefault'       => null,
+        //
+        'precision'             => null,
+        //
+        'umask'                 => null,
+        //
+        'postMaxSize'           => null,
+        //
+        'uploadMaxFilesize'     => null,
+        'uploadTmpDir'          => null,
+        'uploadTmpDirMkdir'     => null,
+        //
+        'obImplicitFlush'       => null,
+        'obImplicitFlushCommit' => null,
+    ];
+    /**
+     * @var array<string, mixed>
+     */
+    protected $mapInitial = [
+        'dirRoot'               => null,
+        //
+        'fnErrorHandler'        => null,
+        'fnExceptionHandler'    => null,
+        //
+        'errorReporting'        => null,
+        'errorLog'              => null,
+        'logErrors'             => null,
+        'displayErrors'         => null,
+        'displayStartupErrors'  => null,
+        //
+        'memoryLimit'           => null,
+        //
+        'maxExecutionTime'      => null,
+        'maxInputTime'          => null,
+        //
+        'timezoneDefault'       => null,
+        //
+        'precision'             => null,
+        //
+        'umask'                 => null,
+        //
+        'postMaxSize'           => null,
+        //
+        'uploadMaxFilesize'     => null,
+        'uploadTmpDir'          => null,
+        'uploadTmpDirMkdir'     => null,
+        //
+        'obImplicitFlush'       => null,
+        'obImplicitFlushCommit' => null,
+    ];
+    /**
+     * @var array<string, mixed>
+     */
+    protected $mapWasSet = [
+        'dirRoot'               => false,
+        //
+        'fnErrorHandler'        => false,
+        'fnExceptionHandler'    => false,
+        //
+        'errorReporting'        => false,
+        'errorLog'              => false,
+        'logErrors'             => false,
+        'displayErrors'         => false,
+        'displayStartupErrors'  => false,
+        //
+        'memoryLimit'           => false,
+        //
+        'maxExecutionTime'      => false,
+        'maxInputTime'          => false,
+        //
+        'timezoneDefault'       => false,
+        //
+        'precision'             => false,
+        //
+        'umask'                 => false,
+        //
+        'postMaxSize'           => false,
+        //
+        'uploadMaxFilesize'     => false,
+        'uploadTmpDir'          => false,
+        'uploadTmpDirMkdir'     => false,
+        //
+        'obImplicitFlush'       => false,
+        'obImplicitFlushCommit' => false,
+    ];
 
     /**
      * @var string
      */
-    protected $dirRoot;
+    protected $dirRoot = [];
 
     /**
-     * @var int
+     * @var array{ 0?: callable|null }
      */
-    protected $errorReporting;
+    protected $fnErrorHandler = [];
     /**
-     * @var string
+     * @var array{ 0?: callable|null }
      */
-    protected $errorLog;
-    /**
-     * @var string
-     */
-    protected $logErrors = 0;
-    /**
-     * @var int
-     */
-    protected $displayErrors = 0;
-    /**
-     * @var int
-     */
-    protected $displayStartupErrors = 0;
+    protected $fnExceptionHandler = [];
 
     /**
-     * @var string
+     * @var array{ 0?: int }
      */
-    protected $memoryLimit = '32M';
+    protected $errorReporting = [];
+    /**
+     * @var array{ 0?: string }
+     */
+    protected $errorLog = [];
+    /**
+     * @var array{ 0?: string }
+     */
+    protected $logErrors = [];
+    /**
+     * @var array{ 0?: int }
+     */
+    protected $displayErrors = [];
+    /**
+     * @var array{ 0?: int }
+     */
+    protected $displayStartupErrors = [];
 
     /**
-     * @var int
+     * @var array{ 0?: string }
      */
-    protected $maxExecutionTime = 10;
-    /**
-     * @var int
-     */
-    protected $maxInputTime = -1;
+    protected $memoryLimit = [];
 
     /**
-     * @var bool
+     * @var array{ 0?: int }
      */
-    protected $obImplicitFlush = false;
+    protected $maxExecutionTime = [];
     /**
-     * @var int
+     * @var array{ 0?: int }
      */
-    protected $obImplicitFlushCommit = 0;
+    protected $maxInputTime = [];
 
     /**
-     * @var \DateTimeZone
+     * @var array{ 0?: \DateTimeZone }
      */
-    protected $timezoneDefault;
+    protected $timezoneDefault = [];
 
     /**
-     * @var string
+     * @var array{ 0?: int }
      */
-    protected $postMaxSize = '8M';
+    protected $precision = [];
 
     /**
-     * @var string
+     * @var array{ 0?: int }
      */
-    protected $uploadMaxFilesize = '2M';
-    /**
-     * @var string
-     */
-    protected $uploadTmpDir;
-    /**
-     * @var bool
-     */
-    protected $uploadTmpDirMkdir = false;
+    protected $umask = [];
 
     /**
-     * @var int
+     * @var array{ 0?: string }
      */
-    protected $precision = 16;
+    protected $postMaxSize = [];
 
     /**
-     * @var int
+     * @var array{ 0?: string }
      */
-    protected $umask = 0002;
+    protected $uploadMaxFilesize = [];
+    /**
+     * @var array{ 0?: string }
+     */
+    protected $uploadTmpDir = [];
+    /**
+     * @var array{ 0?: bool }
+     */
+    protected $uploadTmpDirMkdir = [];
 
     /**
-     * @var callable|null
+     * @var array{ 0?: bool }
      */
-    protected $fnErrorHandler;
+    protected $obImplicitFlush = [];
     /**
-     * @var callable|null
+     * @var array{ 0?: int }
      */
-    protected $fnExceptionHandler;
+    protected $obImplicitFlushCommit = [];
 
     /**
      * @var bool
@@ -123,14 +225,75 @@ class EntrypointModule
 
     public function __construct()
     {
-        $this->errorReporting = (E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
+        $this->mapDefault = [
+            'dirRoot'               => null,
+            //
+            'fnErrorHandler'        => [ $this, 'fnErrorHandler' ],
+            'fnExceptionHandler'    => [ $this, 'fnExceptionHandler' ],
+            //
+            'errorReporting'        => (E_ALL | E_DEPRECATED | E_USER_DEPRECATED),
+            'errorLog'              => null,
+            'logErrors'             => 0,
+            'displayErrors'         => 0,
+            'displayStartupErrors'  => 0,
+            //
+            'memoryLimit'           => '32M',
+            //
+            'maxExecutionTime'      => 10,
+            'maxInputTime'          => -1,
+            //
+            'timezoneDefault'       => new \DateTimeZone('UTC'),
+            //
+            'precision'             => 16,
+            //
+            'umask'                 => 0002,
+            //
+            'postMaxSize'           => '8M',
+            //
+            'uploadMaxFilesize'     => '2M',
+            'uploadTmpDir'          => null,
+            'uploadTmpDirMkdir'     => false,
+            //
+            'obImplicitFlush'       => false,
+            'obImplicitFlushCommit' => 0,
+        ];
 
-        $this->timezoneDefault = new \DateTimeZone('UTC');
+        $this->mapInitial = [
+            'dirRoot'               => null,
+            //
+            'fnErrorHandler'        => $this->getPhpErrorHandler(),
+            'fnExceptionHandler'    => $this->getPhpExceptionHandler(),
+            //
+            'errorReporting'        => $this->getPhpErrorReporting(),
+            'errorLog'              => $this->getPhpErrorLog(),
+            'logErrors'             => $this->getPhpLogErrors(),
+            'displayErrors'         => $this->getPhpDisplayErrors(),
+            'displayStartupErrors'  => $this->getPhpDisplayStartupErrors(),
+            //
+            'memoryLimit'           => $this->getPhpMemoryLimit(),
+            //
+            'maxExecutionTime'      => $this->getPhpMaxExecutionTime(),
+            'maxInputTime'          => $this->getPhpMaxInputTime(),
+            //
+            'timezoneDefault'       => $this->getPhpTimezoneDefault(),
+            //
+            'precision'             => $this->getPhpPrecision(),
+            //
+            'umask'                 => $this->getPhpUmask(),
+            //
+            'postMaxSize'           => $this->getPhpPostMaxSize(),
+            //
+            'uploadMaxFilesize'     => $this->getPhpUploadMaxFilesize(),
+            'uploadTmpDir'          => $this->getPhpUploadTmpDir(),
+            'uploadTmpDirMkdir'     => false,
+            //
+            'obImplicitFlush'       => false,
+            'obImplicitFlushCommit' => 0,
+        ];
 
-        $this->uploadTmpDir = sys_get_temp_dir();
-
-        $this->fnErrorHandler = [ $this, 'fnErrorHandler' ];
-        $this->fnExceptionHandler = [ $this, 'fnExceptionHandler' ];
+        foreach ( $this->mapDefault as $key => $value ) {
+            $this->{$key} = [ $value ];
+        }
 
         $this->registerShutdownFunctionMap = Map::new();
     }
@@ -164,31 +327,209 @@ class EntrypointModule
     }
 
     /**
+     * > частично удаляет путь файла из каждой строки `trace` (`trace[i][file]`) при обработке исключений
+     *
+     * @param string|bool|false $dirRoot
+     *
      * @return static
      */
-    public function setDirRoot(?string $dirRoot, ?bool $replace = null)
+    public function setDirRoot($dirRoot, ?bool $replace = null)
     {
         $this->assertNotLocked();
 
-        $theType = Lib::type();
+        $key = 'dirRoot';
+        $var = $dirRoot;
 
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+        if (false !== $this->mapWasSet[ $key ]) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
-            $this->mapSet[ $mapSetKey ] = true;
+            $this->mapWasSet[ $key ] = true;
         }
 
-        if (null === $dirRoot) {
-            $this->dirRoot = null;
+        if (null === $var) {
+            $this->{$key} = [ $this->mapDefault[ 'dirRoot' ] ];
+
+        } elseif (false === $var) {
+            $this->{$key} = [ $this->mapInitial[ 'dirRoot' ] ];
 
         } else {
-            $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
+            $theType = Lib::type();
 
-            $this->dirRoot = $dirRootRealpath;
+            $varValid = $theType->dirpath_realpath($var)->orThrow();
+
+            $this->{$key} = [ $varValid ];
         }
+
+        return $this;
+    }
+
+
+    /**
+     * @return callable|null
+     */
+    public function getPhpErrorHandler()
+    {
+        $handler = set_error_handler(static function () { });
+        restore_error_handler();
+
+        return $handler;
+    }
+
+    /**
+     * @return callable|null
+     */
+    public function getErrorHandler()
+    {
+        return $this->fnErrorHandler;
+    }
+
+    /**
+     * @param callable|false|null $fnErrorHandler
+     *
+     * @return static
+     */
+    public function setErrorHandler($fnErrorHandler, ?bool $replace = null)
+    {
+        $this->assertNotLocked();
+
+        $key = 'fnErrorHandler';
+        $var = $fnErrorHandler;
+
+        if (false !== $this->mapWasSet[ $key ]) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapWasSet[ $key ] = true;
+        }
+
+        if (null === $var) {
+            $this->{$key} = [ $this->mapDefault[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
+
+        } else {
+            if (! is_callable($var)) {
+                throw new LogicException(
+                    [ 'The `fnErrorHandler` should be a callable', $var ]
+                );
+            }
+
+            $this->{$key} = [ $var ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useErrorHandler(&$refLast = null)
+    {
+        $refLast = null;
+
+        if ([] !== $this->fnErrorHandler) {
+            $refLast = set_error_handler($this->fnErrorHandler[ 0 ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDefaultErrorHandler(&$refLast = null)
+    {
+        $refLast = set_error_handler($this->mapDefault[ 'fnErrorHandler' ]);
+
+        return $this;
+    }
+
+
+    /**
+     * @return callable|null
+     */
+    public function getPhpExceptionHandler()
+    {
+        $handler = set_exception_handler(static function () { });
+        restore_exception_handler();
+
+        return $handler;
+    }
+
+    /**
+     * @return callable|null
+     */
+    public function getExceptionHandler()
+    {
+        return $this->fnExceptionHandler;
+    }
+
+    /**
+     * @param callable|false|null $fnExceptionHandler
+     *
+     * @return static
+     */
+    public function setExceptionHandler($fnExceptionHandler, ?bool $replace = null)
+    {
+        $this->assertNotLocked();
+
+        $key = 'fnExceptionHandler';
+        $var = $fnExceptionHandler;
+
+        if (false !== $this->mapWasSet[ $key ]) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapWasSet[ $key ] = true;
+        }
+
+        if (null === $var) {
+            $this->{$key} = [ $this->mapDefault[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
+
+        } else {
+            if (! is_callable($var)) {
+                throw new LogicException(
+                    [ 'The `fnExceptionHandler` should be a callable', $var ]
+                );
+            }
+
+            $this->{$key} = [ $var ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useExceptionHandler(&$refLast = null)
+    {
+        $refLast = null;
+
+        if ([] !== $this->fnExceptionHandler) {
+            $refLast = set_exception_handler($this->fnExceptionHandler[ 0 ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDefaultExceptionHandler(&$refLast = null)
+    {
+        $refLast = set_exception_handler($this->mapDefault[ 'fnExceptionHandler' ]);
 
         return $this;
     }
@@ -205,35 +546,40 @@ class EntrypointModule
     }
 
     /**
+     * @param int|false|null $errorReporting
+     *
      * @return static
      */
-    public function setErrorReporting(?int $errorReporting, ?bool $replace = null)
+    public function setErrorReporting($errorReporting, ?bool $replace = null)
     {
         $this->assertNotLocked();
 
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+        $key = 'errorReporting';
+        $var = $errorReporting;
+
+        if (false !== $this->mapWasSet[ $key ]) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
-            $this->mapSet[ $mapSetKey ] = true;
+            $this->mapWasSet[ $key ] = true;
         }
 
-        if (null === $errorReporting) {
-            $this->errorReporting = (E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
+        if (null === $var) {
+            $this->{$key} = [ $this->mapDefault[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
 
         } else {
-            if (-1 === $errorReporting) {
-                $errorReporting = (E_ALL | E_DEPRECATED | E_USER_DEPRECATED);
-
-            } elseif (($errorReporting & ~(E_ALL | E_DEPRECATED | E_USER_DEPRECATED)) !== 0) {
+            if (0 !== ($errorReporting & ~(E_ALL | E_DEPRECATED | E_USER_DEPRECATED))) {
                 throw new LogicException(
-                    [ 'The `errorReporting` should be a valid `error_reporting` flag', $errorReporting ]
+                    [ 'The `errorReporting` should be valid flag', $var ]
                 );
             }
 
-            $this->errorReporting = $errorReporting;
+            $this->{$key} = [ $var ];
         }
 
         return $this;
@@ -244,47 +590,10 @@ class EntrypointModule
      */
     public function useErrorReporting(&$refLast = null)
     {
-        $refLast = error_reporting($this->errorReporting);
+        $refLast = null;
 
-        return $this;
-    }
-
-
-    /**
-     * @return string|false
-     */
-    public function getPhpLogErrors(string $logErrorsTmp = '0')
-    {
-        $before = ini_set('log_errors', $logErrorsTmp);
-
-        ini_set('log_errors', $before);
-
-        return $before;
-    }
-
-    /**
-     * @return static
-     */
-    public function setLogErrors(?bool $logErrors, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
-            if (! $replace) {
-                return $this;
-            }
-
-        } else {
-            $this->mapSet[ $mapSetKey ] = true;
-        }
-
-        if (null === $logErrors) {
-            $this->logErrors = 0;
-
-        } else {
-            $logErrorsBool = $logErrors;
-
-            $this->logErrors = (int) $logErrorsBool;
+        if ([] !== $this->errorReporting) {
+            $refLast = error_reporting($this->errorReporting[ 0 ]);
         }
 
         return $this;
@@ -293,11 +602,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useLogErrors(
-        &$refLastLogErrors = null
-    )
+    public function useDefaultErrorReporting(&$refLast = null)
     {
-        $refLastLogErrors = ini_set('log_errors', $this->logErrors);
+        $refLast = error_reporting($this->mapDefault[ 'errorReporting' ]);
 
         return $this;
     }
@@ -316,30 +623,38 @@ class EntrypointModule
     }
 
     /**
+     * @param string|false|null $errorLog
+     *
      * @return static
      */
-    public function setErrorLog(?string $errorLog, ?bool $replace = null)
+    public function setErrorLog($errorLog, ?bool $replace = null)
     {
         $this->assertNotLocked();
 
-        $theType = Lib::type();
+        $key = 'errorLog';
+        $var = $errorLog;
 
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+        if (false !== $this->mapWasSet[ $key ]) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
-            $this->mapSet[ $mapSetKey ] = true;
+            $this->mapWasSet[ $key ] = true;
         }
 
-        if (null === $errorLog) {
-            $this->errorLog = null;
+        if (null === $var) {
+            $this->{$key} = [ $this->mapDefault[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
 
         } else {
-            $errorLogFilepath = $theType->filepath($errorLog, true)->orThrow();
+            $theType = Lib::type();
 
-            $this->errorLog = $errorLogFilepath;
+            $varValid = $theType->filepath($errorLog, true)->orThrow();
+
+            $this->{$key} = [ $varValid ];
         }
 
         return $this;
@@ -348,13 +663,98 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useErrorLog(
-        &$refLastErrorLog = null
-    )
+    public function useErrorLog(&$refLast = null)
     {
-        if (null !== $this->errorLog) {
-            $refLastErrorLog = ini_set('error_log', $this->errorLog);
+        $refLast = null;
+
+        if ([] !== $this->errorLog) {
+            $refLast = ini_set('error_log', $this->errorLog[ 0 ]);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDefaultErrorLog(&$refLast = null)
+    {
+        $refLast = ini_set('error_log', $this->mapDefault[ 'errorLog' ]);
+
+        return $this;
+    }
+
+
+    /**
+     * @return string|false
+     */
+    public function getPhpLogErrors(string $logErrorsTmp = '0')
+    {
+        $before = ini_set('log_errors', $logErrorsTmp);
+
+        ini_set('log_errors', $before);
+
+        return $before;
+    }
+
+    /**
+     * @param bool|false|null $logErrors
+     *
+     * @return static
+     */
+    public function setLogErrors($logErrors, ?bool $replace = null)
+    {
+        $this->assertNotLocked();
+
+        $key = 'logErrors';
+        $var = $logErrors;
+
+        if (false !== $this->mapWasSet[ $key ]) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapWasSet[ $key ] = true;
+        }
+
+        if (null === $var) {
+            $this->{$key} = [ $this->mapDefault[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
+
+        } else {
+            $theType = Lib::type();
+
+            $varValid = $theType->bool($var)->orThrow();
+
+            $this->{$key} = [ (int) $varValid ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useLogErrors(&$refLast = null)
+    {
+        $refLast = null;
+
+        if ([] !== $this->logErrors) {
+            $refLast = ini_set('log_errors', $this->logErrors[ 0 ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDefaultLogErrors(&$refLast = null)
+    {
+        $refLast = ini_set('log_errors', $this->mapDefault[ 'logErrors' ]);
 
         return $this;
     }
@@ -385,30 +785,42 @@ class EntrypointModule
     }
 
     /**
+     * @param bool|false|null $displayErrors
+     *
      * @return static
      */
-    public function setDisplayErrors(?bool $displayErrors, ?bool $replace = null)
+    public function setDisplayErrors($displayErrors, ?bool $replace = null)
     {
         $this->assertNotLocked();
 
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+        if (false
+            || (false !== $this->mapWasSet[ 'displayErrors' ])
+            || (false !== $this->mapWasSet[ 'displayStartupErrors' ])
+        ) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
-            $this->mapSet[ $mapSetKey ] = true;
+            $this->mapWasSet[ 'displayErrors' ] = true;
+            $this->mapWasSet[ 'displayStartupErrors' ] = true;
         }
 
         if (null === $displayErrors) {
-            $this->displayErrors = 0;
-            $this->displayStartupErrors = 0;
+            $this->displayErrors = [ $this->mapDefault[ 'displayErrors' ] ];
+            $this->displayStartupErrors = [ $this->mapDefault[ 'displayStartupErrors' ] ];
+
+        } elseif (false === $displayErrors) {
+            $this->displayErrors = [ $this->mapInitial[ 'displayErrors' ] ];
+            $this->displayStartupErrors = [ $this->mapInitial[ 'displayStartupErrors' ] ];
 
         } else {
-            $displayErrorsBool = $displayErrors;
+            $theType = Lib::type();
 
-            $this->displayErrors = (int) $displayErrorsBool;
-            $this->displayStartupErrors = (int) $displayErrorsBool;
+            $displayErrorsValid = $theType->bool($displayErrors)->orThrow();
+
+            $this->displayErrors = [ (int) $displayErrorsValid ];
+            $this->displayStartupErrors = [ (int) $displayErrorsValid ];
         }
 
         return $this;
@@ -422,8 +834,30 @@ class EntrypointModule
         &$refLastDisplayStartupErrors = null
     )
     {
-        $refLastDisplayErrors = ini_set('display_errors', $this->displayErrors);
-        $refLastDisplayStartupErrors = ini_set('display_startup_errors', $this->displayErrors);
+        $refLastDisplayErrors = null;
+        $refLastDisplayStartupErrors = null;
+
+        if ([] !== $this->displayErrors) {
+            $refLastDisplayErrors = ini_set('display_errors', $this->displayErrors[ 0 ]);
+        }
+
+        if ([] !== $this->displayStartupErrors) {
+            $refLastDisplayStartupErrors = ini_set('display_startup_errors', $this->displayStartupErrors[ 0 ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDefaultDisplayErrors(
+        &$refLastDisplayErrors = null,
+        &$refLastDisplayStartupErrors = null
+    )
+    {
+        $refLastDisplayErrors = ini_set('display_errors', $this->mapDefault[ 'displayErrors' ]);
+        $refLastDisplayStartupErrors = ini_set('display_startup_errors', $this->mapDefault[ 'displayStartupErrors' ]);
 
         return $this;
     }
@@ -439,31 +873,39 @@ class EntrypointModule
     }
 
     /**
+     * @param string|false|null $memoryLimit
+     *
      * @return static
      */
-    public function setMemoryLimit(?string $memoryLimit, ?bool $replace = null)
+    public function setMemoryLimit($memoryLimit, ?bool $replace = null)
     {
         $this->assertNotLocked();
 
-        $theFormat = Lib::format();
+        $key = 'memoryLimit';
+        $var = $memoryLimit;
 
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+        if (false !== $this->mapWasSet[ $key ]) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
-            $this->mapSet[ $mapSetKey ] = true;
+            $this->mapWasSet[ $key ] = true;
         }
 
-        if (null === $memoryLimit) {
-            $this->memoryLimit = '32M';
+        if (null === $var) {
+            $this->{$var} = [ $this->mapDefault[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$var} = [ $this->mapInitial[ $key ] ];
 
         } else {
-            $bytesInt = $theFormat->bytes_decode([], $memoryLimit);
-            $bytesString = $theFormat->bytes_encode([], $bytesInt, 0, 1);
+            $theFormat = Lib::format();
 
-            $this->memoryLimit = $bytesString;
+            $varValidInt = $theFormat->bytes_decode([], $var);
+            $varValidString = $theFormat->bytes_encode([], $varValidInt, 0, 1);
+
+            $this->{$var} = [ $varValidString ];
         }
 
         return $this;
@@ -474,7 +916,21 @@ class EntrypointModule
      */
     public function useMemoryLimit(&$refLast = null)
     {
-        $refLast = ini_set('memory_limit', $this->memoryLimit);
+        $refLast = null;
+
+        if ([] !== $this->memoryLimit) {
+            $refLast = ini_set('memory_limit', $this->memoryLimit[ 0 ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDefaultMemoryLimit(&$refLast = null)
+    {
+        $refLast = ini_set('memory_limit', $this->mapDefault[ 'memoryLimit' ]);
 
         return $this;
     }
@@ -490,30 +946,38 @@ class EntrypointModule
     }
 
     /**
+     * @param int|false|null $maxExecutionTime
+     *
      * @return static
      */
-    public function setMaxExecutionTime(?int $maxExecutionTime, ?bool $replace = null)
+    public function setMaxExecutionTime($maxExecutionTime, ?bool $replace = null)
     {
         $this->assertNotLocked();
 
-        $theType = Lib::type();
+        $key = 'maxExecutionTime';
+        $var = $maxExecutionTime;
 
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+        if (false !== $this->mapWasSet[ $key ]) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
-            $this->mapSet[ $mapSetKey ] = true;
+            $this->mapWasSet[ $key ] = true;
         }
 
-        if (null === $maxExecutionTime) {
-            $this->maxExecutionTime = 10;
+        if (null === $var) {
+            $this->{$var} = [ $this->mapDefault[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$var} = [ $this->mapInitial[ $key ] ];
 
         } else {
-            $maxExecutionTimeInt = $theType->int_non_negative($maxExecutionTime)->orThrow();
+            $theType = Lib::type();
 
-            $this->maxExecutionTime = $maxExecutionTimeInt;
+            $varValid = $theType->int_non_negative($var)->orThrow();
+
+            $this->{$var} = [ $varValid ];
         }
 
         return $this;
@@ -524,7 +988,21 @@ class EntrypointModule
      */
     public function useMaxExecutionTime(&$refLast = null)
     {
-        $refLast = ini_set('max_execution_time', $this->maxExecutionTime);
+        $refLast = null;
+
+        if ([] !== $this->maxExecutionTime) {
+            $refLast = ini_set('max_execution_time', $this->maxExecutionTime[ 0 ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDefaultMaxExecutionTime(&$refLast = null)
+    {
+        $refLast = ini_set('max_execution_time', $this->mapDefault[ 'maxExecutionTime' ]);
 
         return $this;
     }
@@ -540,30 +1018,38 @@ class EntrypointModule
     }
 
     /**
+     * @param int|bool|null $maxInputTime
+     *
      * @return static
      */
-    public function setMaxInputTime(?int $maxInputTime, ?bool $replace = null)
+    public function setMaxInputTime($maxInputTime, ?bool $replace = null)
     {
         $this->assertNotLocked();
 
-        $theType = Lib::type();
+        $key = 'maxInputTime';
+        $var = $maxInputTime;
 
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+        if (false !== $this->mapWasSet[ $key ]) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
-            $this->mapSet[ $mapSetKey ] = true;
+            $this->mapWasSet[ $key ] = true;
         }
 
-        if (null === $maxInputTime) {
-            $this->maxInputTime = -1;
+        if (null === $var) {
+            $this->{$var} = [ $this->mapDefault[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$var} = [ $this->mapInitial[ $key ] ];
 
         } else {
-            $maxInputTimeInt = $theType->int_non_negative_or_minus_one($maxInputTime)->orThrow();
+            $theType = Lib::type();
 
-            $this->maxInputTime = $maxInputTimeInt;
+            $varValid = $theType->int_non_negative_or_minus_one($var)->orThrow();
+
+            $this->{$var} = [ $varValid ];
         }
 
         return $this;
@@ -574,55 +1060,10 @@ class EntrypointModule
      */
     public function useMaxInputTime(&$refLast = null)
     {
-        $refLast = ini_set('max_input_time', $this->maxInputTime);
+        $refLast = null;
 
-        return $this;
-    }
-
-
-    /**
-     * @return static
-     */
-    public function setObImplicitFlush(
-        ?bool $obImplicitFlush,
-        ?int $obImplicitFlushCommit = null,
-        ?bool $replace = null
-    )
-    {
-        $this->assertNotLocked();
-
-        $theType = Lib::type();
-
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
-            if (! $replace) {
-                return $this;
-            }
-
-        } else {
-            $this->mapSet[ $mapSetKey ] = true;
-        }
-
-        if (null === $obImplicitFlush) {
-            $this->obImplicitFlush = false;
-
-        } else {
-            $this->obImplicitFlush = $obImplicitFlush;
-        }
-
-        if (null === $obImplicitFlushCommit) {
-            $this->obImplicitFlushCommit = 0;
-
-        } else {
-            $obImplicitFlushCommitInt = $theType->int($obImplicitFlushCommit)->orThrow();
-
-            if ($obImplicitFlushCommitInt > 1) {
-                $obImplicitFlushCommitInt = 1;
-
-            } elseif ($obImplicitFlushCommitInt < 1) {
-                $obImplicitFlushCommitInt = -1;
-            }
-
-            $this->obImplicitFlushCommit = $obImplicitFlushCommitInt;
+        if ([] !== $this->maxInputTime) {
+            $refLast = ini_set('max_input_time', $this->maxInputTime[ 0 ]);
         }
 
         return $this;
@@ -631,32 +1072,28 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useObImplicitFlush()
+    public function useDefaultMaxInputTime(&$refLast = null)
     {
-        if (1 === $this->obImplicitFlushCommit) {
-            while ( ob_get_level() ) {
-                ob_end_flush();
-            }
-
-        } elseif (-1 === $this->obImplicitFlushCommit) {
-            while ( ob_get_level() ) {
-                ob_end_clean();
-            }
-        }
-
-        ob_implicit_flush($this->obImplicitFlush);
+        $refLast = ini_set('max_input_time', $this->mapDefault[ 'maxInputTime' ]);
 
         return $this;
     }
 
 
-    public function getPhpTimezoneDefault() : string
+    public function getPhpTimezoneDefault() : \DateTimeZone
     {
-        return date_default_timezone_get();
+        try {
+            $timezone = new \DateTimeZone(date_default_timezone_get());
+        }
+        catch ( \Exception $e ) {
+            throw new RuntimeException($e);
+        }
+
+        return $timezone;
     }
 
     /**
-     * @param string|\DateTimeZone $timezoneDefault
+     * @param \DateTimeZone|string|false|null $timezoneDefault
      *
      * @return static
      */
@@ -664,29 +1101,30 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $theType = Lib::type();
+        $key = 'timezoneDefault';
+        $var = $timezoneDefault;
 
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+        if (false !== $this->mapWasSet[ $key ]) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
-            $this->mapSet[ $mapSetKey ] = true;
+            $this->mapWasSet[ $key ] = true;
         }
 
-        if (null === $timezoneDefault) {
-            try {
-                $this->timezoneDefault = new \DateTimeZone(date_default_timezone_get());
-            }
-            catch ( \Exception $e ) {
-                throw new RuntimeException($e);
-            }
+        if (null === $var) {
+            $this->{$var} = [ $this->mapDefault[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$var} = [ $this->mapInitial[ $key ] ];
 
         } else {
-            $timezoneDefaultObject = $theType->timezone($timezoneDefault)->orThrow();
+            $theType = Lib::type();
 
-            $this->timezoneDefault = $timezoneDefaultObject;
+            $varValid = $theType->timezone($var)->orThrow();
+
+            $this->{$var} = [ $varValid ];
         }
 
         return $this;
@@ -697,47 +1135,10 @@ class EntrypointModule
      */
     public function useTimezoneDefault(&$refLast = null)
     {
-        $refLast = date_default_timezone_set($this->timezoneDefault->getName());
+        $refLast = null;
 
-        return $this;
-    }
-
-
-    public function getPhpPostMaxSize(string $postMaxSizeTmp = '8M') : string
-    {
-        $before = ini_set('post_max_size', $postMaxSizeTmp);
-
-        ini_set('post_max_size', $before);
-
-        return $before;
-    }
-
-    /**
-     * @return static
-     */
-    public function setPostMaxSize(?string $postMaxSize, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $theFormat = Lib::format();
-
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
-            if (! $replace) {
-                return $this;
-            }
-
-        } else {
-            $this->mapSet[ $mapSetKey ] = true;
-        }
-
-        if (null === $postMaxSize) {
-            $this->postMaxSize = '8M';
-
-        } else {
-            $bytesInt = $theFormat->bytes_decode([], $postMaxSize);
-            $bytesString = $theFormat->bytes_encode([], $bytesInt, 0, 1);
-
-            $this->postMaxSize = $bytesString;
+        if ([] !== $this->timezoneDefault) {
+            $refLast = date_default_timezone_set($this->timezoneDefault[ 0 ]->getName());
         }
 
         return $this;
@@ -746,138 +1147,9 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function usePostMaxSize(&$refLast = null)
+    public function useDefaultTimezoneDefault(&$refLast = null)
     {
-        $refLast = ini_set('post_max_size', $this->postMaxSize);
-
-        return $this;
-    }
-
-
-    public function getPhpUploadMaxFilesize(string $uploadMaxFilesizeTmp = '2M') : string
-    {
-        $before = ini_set('upload_max_filesize', $uploadMaxFilesizeTmp);
-
-        ini_set('upload_max_filesize', $before);
-
-        return $before;
-    }
-
-    /**
-     * @return static
-     */
-    public function setUploadMaxFilesize(?string $uploadMaxFilesize, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $theFormat = Lib::format();
-
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
-            if (! $replace) {
-                return $this;
-            }
-
-        } else {
-            $this->mapSet[ $mapSetKey ] = true;
-        }
-
-        if (null === $uploadMaxFilesize) {
-            $this->uploadMaxFilesize = '2M';
-
-        } else {
-            $bytesInt = $theFormat->bytes_decode([], $uploadMaxFilesize);
-            $bytesString = $theFormat->bytes_encode([], $bytesInt, 0, 1);
-
-            $this->uploadMaxFilesize = $bytesString;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useUploadMaxFilesize(&$refLast = null)
-    {
-        if (null === $this->uploadMaxFilesize) {
-            return $this;
-        }
-
-        $refLast = ini_set('upload_max_filesize', $this->uploadMaxFilesize);
-
-        return $this;
-    }
-
-
-    public function getPhpUploadTmpDir() : string
-    {
-        $before = ini_set('upload_tmp_dir', sys_get_temp_dir());
-
-        ini_set('upload_tmp_dir', $before);
-
-        return $before;
-    }
-
-    /**
-     * @return static
-     */
-    public function setUploadTmpDir(
-        ?string $uploadTmpDir,
-        ?bool $uploadTmpDirMkdir = null,
-        ?bool $replace = null
-    )
-    {
-        $this->assertNotLocked();
-
-        $theType = Lib::type();
-
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
-            if (! $replace) {
-                return $this;
-            }
-
-        } else {
-            $this->mapSet[ $mapSetKey ] = true;
-        }
-
-        if (null === $uploadTmpDirMkdir) {
-            $this->uploadTmpDirMkdir = false;
-
-        } else {
-            $this->uploadTmpDirMkdir = $uploadTmpDirMkdir;
-        }
-
-        if (null === $uploadTmpDir) {
-            $this->uploadTmpDir = sys_get_temp_dir();
-
-        } else {
-            if ($this->uploadTmpDirMkdir) {
-                $uploadTmpDirPath = $theType->dirpath($uploadTmpDir, true)->orThrow();
-
-            } else {
-                $uploadTmpDirRealpath = $theType->dirpath_realpath($uploadTmpDir)->orThrow();
-            }
-
-            $this->uploadTmpDir = $uploadTmpDirRealpath ?? $uploadTmpDirPath ?? null;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useUploadTmpDir(&$refLast = null)
-    {
-        if (null !== $this->uploadTmpDir) {
-            if ($this->uploadTmpDirMkdir) {
-                if (! is_dir($this->uploadTmpDir)) {
-                    mkdir($this->uploadTmpDir, 0775, true);
-                }
-            }
-
-            $refLast = ini_set('upload_tmp_dir', $this->uploadTmpDir);
-        }
+        $refLast = date_default_timezone_set($this->mapDefault[ 'timezoneDefault' ]->getName());
 
         return $this;
     }
@@ -893,32 +1165,39 @@ class EntrypointModule
     }
 
     /**
+     * @param int|false|null $precision
+     *
      * @return static
      */
-    public function setPrecision(?int $precision, ?bool $replace = null)
+    public function setPrecision($precision, ?bool $replace = null)
     {
         $this->assertNotLocked();
 
-        $theType = Lib::type();
+        $key = 'precision';
+        $var = $precision;
 
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+        if (false !== $this->mapWasSet[ $key ]) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
-            $this->mapSet[ $mapSetKey ] = true;
+            $this->mapWasSet[ $key ] = true;
         }
 
-        if (null === $precision) {
-            $this->precision = 16;
+        if (null === $var) {
+            $this->{$var} = [ $this->mapDefault[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$var} = [ $this->mapInitial[ $key ] ];
 
         } else {
-            $precisionIntNonNegative = $theType->int_non_negative($precision)->orThrow();
+            $theType = Lib::type();
 
-            $this->precision = $precisionIntNonNegative;
+            $varValid = $theType->int_non_negative($var)->orThrow();
+
+            $this->{$var} = [ $varValid ];
         }
-
 
         return $this;
     }
@@ -928,7 +1207,19 @@ class EntrypointModule
      */
     public function usePrecision(&$refLast = null)
     {
-        $refLast = ini_set('precision', $this->precision);
+        if ([] !== $this->precision) {
+            $refLast = ini_set('precision', $this->precision[ 0 ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDefaultPrecision(&$refLast = null)
+    {
+        $refLast = ini_set('precision', $this->mapDefault[ 'precision' ]);
 
         return $this;
     }
@@ -944,32 +1235,40 @@ class EntrypointModule
     }
 
     /**
+     * @param int|false|null $umask
+     *
      * @return static
      */
-    public function setUmask(?int $umask, ?bool $replace = null)
+    public function setUmask($umask, ?bool $replace = null)
     {
         $this->assertNotLocked();
 
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+        $key = 'umask';
+        $var = $umask;
+
+        if (false !== $this->mapWasSet[ $key ]) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
-            $this->mapSet[ $mapSetKey ] = true;
+            $this->mapWasSet[ $key ] = true;
         }
 
-        if (null === $umask) {
-            $this->umask = 0002;
+        if (null === $var) {
+            $this->{$var} = [ $this->mapDefault[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$var} = [ $this->mapInitial[ $key ] ];
 
         } else {
-            if (! (($umask >= 0) && ($umask <= 0777))) {
+            if (! (($var >= 0) && ($var <= 0777))) {
                 throw new LogicException(
                     [ 'The `umask` should be a valid `umask`', $umask ]
                 );
             }
 
-            $this->umask = $umask;
+            $this->{$var} = [ $var ];
         }
 
         return $this;
@@ -980,147 +1279,370 @@ class EntrypointModule
      */
     public function useUmask(&$refLast = null)
     {
-        $refLast = umask($this->umask);
+        $refLast = null;
+
+        if ([] !== $this->umask) {
+            $refLast = umask($this->umask[ 0 ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDefaultUmask(&$refLast = null)
+    {
+        $refLast = umask($this->mapDefault[ 'umask' ]);
 
         return $this;
     }
 
 
-    /**
-     * @return callable|null
-     */
-    public function getPhpErrorHandler()
+    public function getPhpPostMaxSize(string $postMaxSizeTmp = '8M') : string
     {
-        $handler = set_error_handler(static function () { });
-        restore_error_handler();
+        $before = ini_set('post_max_size', $postMaxSizeTmp);
 
-        return $handler;
+        ini_set('post_max_size', $before);
+
+        return $before;
     }
 
     /**
-     * @return callable|null
-     */
-    public function getErrorHandler()
-    {
-        return $this->fnErrorHandler;
-    }
-
-    /**
-     * @return static
-     * @var callable $fnErrorHandler
+     * @param string|false|null $postMaxSize
      *
+     * @return static
      */
-    public function setErrorHandler($fnErrorHandler, ?bool $replace = null)
+    public function setPostMaxSize($postMaxSize, ?bool $replace = null)
     {
         $this->assertNotLocked();
 
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+        $key = 'postMaxSize';
+        $var = $postMaxSize;
+
+        if (false !== $this->mapWasSet[ $key ]) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
-            $this->mapSet[ $mapSetKey ] = true;
+            $this->mapWasSet[ $key ] = true;
         }
 
-        if (null !== $fnErrorHandler) {
-            if ('' === $fnErrorHandler) {
-                $fnErrorHandler = [ $this, 'fnErrorHandler' ];
+        if (null === $var) {
+            $this->{$var} = [ $this->mapDefault[ $key ] ];
 
-            } elseif (! is_callable($fnErrorHandler)) {
-                throw new LogicException(
-                    [ 'The `fnErrorHandler` should be a callable', $fnErrorHandler ]
-                );
-            }
+        } elseif (false === $var) {
+            $this->{$var} = [ $this->mapInitial[ $key ] ];
+
+        } else {
+            $theFormat = Lib::format();
+
+            $varValidInt = $theFormat->bytes_decode([], $var);
+            $varValidString = $theFormat->bytes_encode([], $varValidInt, 0, 1);
+
+            $this->{$var} = [ $varValidString ];
         }
-
-        $this->fnErrorHandler = $fnErrorHandler;
 
         return $this;
     }
 
     /**
-     * @param callable|null $refLast
-     *
      * @return static
      */
-    public function useErrorHandler(&$refLast = null)
+    public function usePostMaxSize(&$refLast = null)
     {
         $refLast = null;
 
-        if (null !== $this->fnErrorHandler) {
-            $refLast = set_error_handler($this->fnErrorHandler);
+        if ([] !== $this->postMaxSize) {
+            $refLast = ini_set('post_max_size', $this->postMaxSize[ 0 ]);
         }
 
         return $this;
     }
 
-
-    /**
-     * @return callable|null
-     */
-    public function getPhpExceptionHandler()
-    {
-        $handler = set_exception_handler(static function () { });
-        restore_exception_handler();
-
-        return $handler;
-    }
-
-    /**
-     * @return callable|null
-     */
-    public function getExceptionHandler()
-    {
-        return $this->fnExceptionHandler;
-    }
-
     /**
      * @return static
-     * @var callable $fnExceptionHandler
-     *
      */
-    public function setExceptionHandler($fnExceptionHandler, ?bool $replace = null)
+    public function useDefaultPostMaxSize(&$refLast = null)
+    {
+        $refLast = ini_set('post_max_size', $this->mapDefault[ 'postMaxSize' ]);
+
+        return $this;
+    }
+
+
+    public function getPhpUploadMaxFilesize(string $uploadMaxFilesizeTmp = '2M') : string
+    {
+        $before = ini_set('upload_max_filesize', $uploadMaxFilesizeTmp);
+
+        ini_set('upload_max_filesize', $before);
+
+        return $before;
+    }
+
+    /**
+     * @param string|false|null $uploadMaxFilesize
+     *
+     * @return static
+     */
+    public function setUploadMaxFilesize($uploadMaxFilesize, ?bool $replace = null)
     {
         $this->assertNotLocked();
 
-        if (isset($this->mapSet[ $mapSetKey = __FUNCTION__ ])) {
+        $key = 'uploadMaxFilesize';
+        $var = $uploadMaxFilesize;
+
+        if (false !== $this->mapWasSet[ $key ]) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
-            $this->mapSet[ $mapSetKey ] = true;
+            $this->mapWasSet[ $key ] = true;
         }
 
-        if (null !== $fnExceptionHandler) {
-            if ('' === $fnExceptionHandler) {
-                $fnExceptionHandler = [ $this, 'fnErrorHandler' ];
+        if (null === $var) {
+            $this->{$var} = [ $this->mapDefault[ $key ] ];
 
-            } elseif (! is_callable($fnExceptionHandler)) {
-                throw new LogicException(
-                    [ 'The `fnExceptionHandler` should be a callable', $fnExceptionHandler ]
-                );
-            }
+        } elseif (false === $var) {
+            $this->{$var} = [ $this->mapInitial[ $key ] ];
+
+        } else {
+            $theFormat = Lib::format();
+
+            $varValidInt = $theFormat->bytes_decode([], $var);
+            $varValidString = $theFormat->bytes_encode([], $varValidInt, 0, 1);
+
+            $this->{$var} = [ $varValidString ];
         }
-
-        $this->fnExceptionHandler = $fnExceptionHandler;
 
         return $this;
     }
 
     /**
-     * @param callable|null $refLast
-     *
      * @return static
      */
-    public function useExceptionHandler(&$refLast = null)
+    public function useUploadMaxFilesize(&$refLast = null)
     {
         $refLast = null;
 
-        if (null !== $this->fnExceptionHandler) {
-            $refLast = set_exception_handler($this->fnExceptionHandler);
+        if ([] !== $this->uploadMaxFilesize) {
+            $refLast = ini_set('upload_max_filesize', $this->uploadMaxFilesize[ 0 ]);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDefaultUploadMaxFilesize(&$refLast = null)
+    {
+        $refLast = ini_set('upload_max_filesize', $this->mapDefault[ 'uploadMaxFilesize' ]);
+
+        return $this;
+    }
+
+
+    public function getPhpUploadTmpDir() : string
+    {
+        $before = ini_set('upload_tmp_dir', sys_get_temp_dir());
+
+        ini_set('upload_tmp_dir', $before);
+
+        return $before;
+    }
+
+    /**
+     * @param string|false|null $uploadTmpDir
+     * @param bool|false|null   $uploadTmpDirMkdir
+     *
+     * @return static
+     */
+    public function setUploadTmpDir(
+        $uploadTmpDir,
+        $uploadTmpDirMkdir,
+        ?bool $replace = null
+    )
+    {
+        $this->assertNotLocked();
+
+        if (false
+            || (false !== $this->mapWasSet[ 'uploadTmpDir' ])
+            || (false !== $this->mapWasSet[ 'uploadTmpDirMkdir' ])
+        ) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapWasSet[ 'uploadTmpDir' ] = true;
+            $this->mapWasSet[ 'uploadTmpDirMkdir' ] = true;
+        }
+
+        if (null === $uploadTmpDir) {
+            $this->uploadTmpDir = [ $this->mapDefault[ 'uploadTmpDir' ] ];
+            $this->uploadTmpDirMkdir = [ $this->mapDefault[ 'uploadTmpDirMkdir' ] ];
+
+        } elseif (false === $uploadTmpDir) {
+            $this->uploadTmpDir = [ $this->mapInitial[ 'uploadTmpDir' ] ];
+            $this->uploadTmpDirMkdir = [ $this->mapInitial[ 'uploadTmpDirMkdir' ] ];
+
+        } else {
+            $theType = Lib::type();
+
+            $uploadTmpDirMkdirValid = (bool) $uploadTmpDirMkdir;
+
+            if ($uploadTmpDirMkdirValid) {
+                $uploadTmpDirValid = $theType->dirpath($uploadTmpDir, true)->orThrow();
+
+            } else {
+                $uploadTmpDirValid = $theType->dirpath_realpath($uploadTmpDir)->orThrow();
+            }
+
+            $this->uploadTmpDir = [ $uploadTmpDirValid ];
+            $this->uploadTmpDirMkdir = [ $uploadTmpDirMkdirValid ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useUploadTmpDir(&$refLast = null)
+    {
+        $refLast = null;
+
+        if ([] !== $this->uploadTmpDir) {
+            $uploadTmpDirValid = $this->uploadTmpDir[ 0 ];
+
+            if ([] !== $this->uploadTmpDirMkdir) {
+                $uploadTmpDirMkdirValid = (bool) $this->uploadTmpDirMkdir[ 0 ];
+
+                if ($uploadTmpDirMkdirValid) {
+                    if (! is_dir($uploadTmpDirValid)) {
+                        mkdir($uploadTmpDirValid, 0775, true);
+                    }
+                }
+            }
+
+            $refLast = ini_set('upload_tmp_dir', $uploadTmpDirValid);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDefaultUploadTmpDir(&$refLast = null)
+    {
+        $refLast = ini_set('upload_tmp_dir', $this->mapDefault[ 'uploadTmpDir' ]);
+
+        return $this;
+    }
+
+
+    /**
+     * > устанавливает немедленный вывод echo напрямую в браузер в runtime
+     *
+     * @param bool|false|null $obImplicitFlush
+     * @param int|false|null  $obImplicitFlushCommit
+     *
+     * @return static
+     */
+    public function setObImplicitFlush(
+        $obImplicitFlush,
+        $obImplicitFlushCommit,
+        ?bool $replace = null
+    )
+    {
+        $this->assertNotLocked();
+
+        if (false
+            || (false !== $this->mapWasSet[ 'obImplicitFlush' ])
+            || (false !== $this->mapWasSet[ 'obImplicitFlushCommit' ])
+        ) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapWasSet[ 'obImplicitFlush' ] = true;
+            $this->mapWasSet[ 'obImplicitFlushCommit' ] = true;
+        }
+
+        if (null === $obImplicitFlush) {
+            $this->obImplicitFlush = [ $this->mapDefault[ 'obImplicitFlush' ] ];
+
+        } elseif (false === $obImplicitFlush) {
+            $this->obImplicitFlush = [ $this->mapInitial[ 'obImplicitFlush' ] ];
+
+        } else {
+            $obImplicitFlushValid = (bool) $obImplicitFlush;
+
+            $this->obImplicitFlush = $obImplicitFlushValid;
+        }
+
+        if (null === $obImplicitFlushCommit) {
+            $this->obImplicitFlushCommit = [ $this->mapDefault[ 'obImplicitFlushCommit' ] ];
+
+        } elseif (false === $obImplicitFlushCommit) {
+            $this->obImplicitFlushCommit = [ $this->mapInitial[ 'obImplicitFlushCommit' ] ];
+
+        } else {
+            $theType = Lib::type();
+
+            $obImplicitFlushCommitValid = $theType->int($obImplicitFlushCommit)->orThrow();
+
+            if ($obImplicitFlushCommitValid > 1) {
+                $obImplicitFlushCommitValid = 1;
+
+            } elseif ($obImplicitFlushCommitValid < 1) {
+                $obImplicitFlushCommitValid = -1;
+            }
+
+            $this->obImplicitFlushCommit = $obImplicitFlushCommitValid;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useObImplicitFlush()
+    {
+        if ([] !== $this->obImplicitFlushCommit) {
+            $obImplicitFlushCommitValid = $this->obImplicitFlushCommit[ 0 ];
+
+            if (1 === $obImplicitFlushCommitValid) {
+                while ( ob_get_level() ) {
+                    ob_end_flush();
+                }
+
+            } elseif (-1 === $obImplicitFlushCommitValid) {
+                while ( ob_get_level() ) {
+                    ob_end_clean();
+                }
+            }
+        }
+
+        if ([] !== $this->obImplicitFlush) {
+            ob_implicit_flush($this->obImplicitFlush[ 0 ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useDefaultObImplicitFlush()
+    {
+        ob_implicit_flush($this->mapDefault[ 'obImplicitFlush' ]);
 
         return $this;
     }
@@ -1179,38 +1701,33 @@ class EntrypointModule
      */
     public function setAllDefault()
     {
-        $this
-            ->setDirRoot(null)
-            //
-            ->setErrorHandler([ $this, 'fnErrorHandler' ])
-            ->setExceptionHandler([ $this, 'fnExceptionHandler' ])
-            //
-            ->setErrorReporting(E_ALL | E_DEPRECATED | E_USER_DEPRECATED)
-            ->setErrorLog(null)
-            ->setLogErrors(0)
-            ->setDisplayErrors(0)
-            //
-            ->setMemoryLimit('32M')
-            //
-            ->setMaxExecutionTime(10)
-            ->setMaxInputTime(-1)
-            //
-            ->setObImplicitFlush(false, 0)
-            //
-            ->setTimezoneDefault(date_default_timezone_get())
-            //
-            ->setPostMaxSize('8M')
-            //
-            ->setUploadMaxFilesize('2M')
-            ->setUploadTmpDir(sys_get_temp_dir())
-            //
-            ->setPrecision(16)
-            //
-            ->setUmask(0002)
-        ;
+        $this->assertNotLocked();
+
+        foreach ( $this->mapDefault as $key => $value ) {
+            $this->{$key} = [ $value ];
+
+            $this->mapWasSet[ $key ] = true;
+        }
 
         return $this;
     }
+
+    /**
+     * @return static
+     */
+    public function setAllInitial()
+    {
+        $this->assertNotLocked();
+
+        foreach ( $this->mapInitial as $key => $value ) {
+            $this->{$key} = [ $value ];
+
+            $this->mapWasSet[ $key ] = true;
+        }
+
+        return $this;
+    }
+
 
     /**
      * @return static
@@ -1231,8 +1748,6 @@ class EntrypointModule
             ->useMaxExecutionTime()
             ->useMaxInputTime()
             //
-            ->useObImplicitFlush()
-            //
             ->useTimezoneDefault()
             //
             ->usePostMaxSize()
@@ -1243,6 +1758,40 @@ class EntrypointModule
             ->usePrecision()
             //
             ->useUmask()
+        ;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useAllDefault()
+    {
+        $this
+            ->useDefaultErrorHandler()
+            ->useDefaultExceptionHandler()
+            //
+            ->useDefaultErrorReporting()
+            ->useDefaultErrorLog()
+            ->useDefaultLogErrors()
+            ->useDefaultDisplayErrors()
+            //
+            ->useDefaultMemoryLimit()
+            //
+            ->useDefaultMaxExecutionTime()
+            ->useDefaultMaxInputTime()
+            //
+            ->useDefaultTimezoneDefault()
+            //
+            ->useDefaultPrecision()
+            //
+            ->useDefaultUmask()
+            //
+            ->useDefaultPostMaxSize()
+            //
+            ->useDefaultUploadMaxFilesize()
+            ->useDefaultUploadTmpDir()
         ;
 
         return $this;

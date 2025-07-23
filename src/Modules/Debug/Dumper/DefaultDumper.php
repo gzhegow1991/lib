@@ -39,15 +39,19 @@ class DefaultDumper implements DumperInterface
     ];
 
     const DUMPER_ECHO          = 'echo';
+    const DUMPER_ECHO_TEXT     = 'echo_text';
     const DUMPER_ECHO_HTML     = 'echo_html';
     const DUMPER_RESOURCE      = 'output';
+    const DUMPER_RESOURCE_TEXT = 'output_text';
     const DUMPER_RESOURCE_HTML = 'output_html';
     const DUMPER_DEVTOOLS      = 'devtools';
     const DUMPER_PDO           = 'pdo';
     const DUMPER_LIST          = [
         self::DUMPER_ECHO          => true,
+        self::DUMPER_ECHO_TEXT     => true,
         self::DUMPER_ECHO_HTML     => true,
         self::DUMPER_RESOURCE      => true,
+        self::DUMPER_RESOURCE_TEXT => true,
         self::DUMPER_RESOURCE_HTML => true,
         self::DUMPER_DEVTOOLS      => true,
         self::DUMPER_PDO           => true,
@@ -271,7 +275,7 @@ class DefaultDumper implements DumperInterface
     /**
      * @return static
      */
-    public function printer(?string $printer, ?array $printerOptions = null)
+    public function selectPrinter(?string $printer, ?array $printerOptions = null)
     {
         if (null !== $printer) {
             if (! isset(static::PRINTER_LIST[ $printer ])) {
@@ -298,37 +302,36 @@ class DefaultDumper implements DumperInterface
         return $this;
     }
 
-
-    protected function printPrinter(...$vars) : string
+    public function printerPrint(...$vars) : string
     {
         switch ( $this->printer ):
+            case static::PRINTER_JSON_ENCODE:
+                $content = $this->printerPrint_json_encode(...$vars);
+                break;
+
+            case static::PRINTER_PRINT_R:
+                $content = $this->printerPrint_print_r(...$vars);
+                break;
+
             case static::PRINTER_SYMFONY:
-                $content = $this->printPrinter_symfony(...$vars);
+                $content = $this->printerPrint_symfony(...$vars);
 
                 break;
 
             case static::PRINTER_VAR_DUMP:
-                $content = $this->printPrinter_var_dump(...$vars);
+                $content = $this->printerPrint_var_dump(...$vars);
                 break;
 
             case static::PRINTER_VAR_DUMP_NATIVE:
-                $content = $this->printPrinter_var_dump_native(...$vars);
+                $content = $this->printerPrint_var_dump_native(...$vars);
                 break;
 
             case static::PRINTER_VAR_EXPORT:
-                $content = $this->printPrinter_var_export(...$vars);
+                $content = $this->printerPrint_var_export(...$vars);
                 break;
 
             case static::PRINTER_EXPORT_NATIVE:
-                $content = $this->printPrint_var_export_native(...$vars);
-                break;
-
-            case static::PRINTER_PRINT_R:
-                $content = $this->printPrinter_print_r(...$vars);
-                break;
-
-            case static::PRINTER_JSON_ENCODE:
-                $content = $this->printPrinter_json_encode(...$vars);
+                $content = $this->printerPrint_var_export_native(...$vars);
                 break;
 
             default:
@@ -341,7 +344,42 @@ class DefaultDumper implements DumperInterface
         return $content;
     }
 
-    public function printPrinter_symfony(...$vars) : string
+    public function printerPrint_json_encode(...$vars) : string
+    {
+        $content = '';
+
+        foreach ( $vars as $arg ) {
+            if ($content) {
+                $content .= "\n";
+            }
+
+            $content .= json_encode($arg,
+                0
+                | JSON_UNESCAPED_UNICODE
+                | JSON_UNESCAPED_SLASHES
+                | JSON_UNESCAPED_LINE_TERMINATORS
+            );
+        }
+
+        return $content;
+    }
+
+    public function printerPrint_print_r(...$vars) : string
+    {
+        $content = '';
+
+        foreach ( $vars as $arg ) {
+            if ($content) {
+                $content .= "\n";
+            }
+
+            $content .= print_r($arg, true);
+        }
+
+        return $content;
+    }
+
+    public function printerPrint_symfony(...$vars) : string
     {
         $thePhp = Lib::php();
 
@@ -368,7 +406,7 @@ class DefaultDumper implements DumperInterface
         return $content;
     }
 
-    public function printPrinter_var_dump(...$vars) : string
+    public function printerPrint_var_dump(...$vars) : string
     {
         $theDebug = Lib::debug();
 
@@ -385,7 +423,7 @@ class DefaultDumper implements DumperInterface
         return $content;
     }
 
-    public function printPrinter_var_dump_native(...$vars) : string
+    public function printerPrint_var_dump_native(...$vars) : string
     {
         ob_start();
         var_dump(...$vars);
@@ -394,7 +432,7 @@ class DefaultDumper implements DumperInterface
         return $content;
     }
 
-    public function printPrinter_var_export(...$vars) : string
+    public function printerPrint_var_export(...$vars) : string
     {
         $theDebug = Lib::debug();
 
@@ -411,7 +449,7 @@ class DefaultDumper implements DumperInterface
         return $content;
     }
 
-    public function printPrint_var_export_native(...$vars) : string
+    public function printerPrint_var_export_native(...$vars) : string
     {
         $content = '';
 
@@ -426,46 +464,11 @@ class DefaultDumper implements DumperInterface
         return $content;
     }
 
-    public function printPrinter_print_r(...$vars) : string
-    {
-        $content = '';
-
-        foreach ( $vars as $arg ) {
-            if ($content) {
-                $content .= "\n";
-            }
-
-            $content .= print_r($arg, true);
-        }
-
-        return $content;
-    }
-
-    public function printPrinter_json_encode(...$vars) : string
-    {
-        $content = '';
-
-        foreach ( $vars as $arg ) {
-            if ($content) {
-                $content .= "\n";
-            }
-
-            $content .= json_encode($arg,
-                0
-                | JSON_UNESCAPED_UNICODE
-                | JSON_UNESCAPED_SLASHES
-                | JSON_UNESCAPED_LINE_TERMINATORS
-            );
-        }
-
-        return $content;
-    }
-
 
     /**
      * @return static
      */
-    public function dumper(?string $dumper, ?array $dumperOptions = null)
+    public function selectDumper(?string $dumper, ?array $dumperOptions = null)
     {
         if (null !== $dumper) {
             if (! isset(static::DUMPER_LIST[ $dumper ])) {
@@ -490,32 +493,39 @@ class DefaultDumper implements DumperInterface
         return $this;
     }
 
-
-    protected function echoDumper(...$vars) : void
+    public function dumperEcho(...$vars) : void
     {
         switch ( $this->dumper ):
+            case static::DUMPER_DEVTOOLS:
+                $this->dumperEcho_devtools(...$vars);
+                break;
+
             case static::DUMPER_ECHO:
-                $this->echoDumper_echo(...$vars);
+                $this->dumperEcho_echo(...$vars);
+                break;
+
+            case static::DUMPER_ECHO_TEXT:
+                $this->dumperEcho_echo_text(...$vars);
                 break;
 
             case static::DUMPER_ECHO_HTML:
-                $this->echoDumper_echo_html(...$vars);
-                break;
-
-            case static::DUMPER_RESOURCE:
-                $this->echoDumper_resource(...$vars);
-                break;
-
-            case static::DUMPER_RESOURCE_HTML:
-                $this->echoDumper_resource_html(...$vars);
-                break;
-
-            case static::DUMPER_DEVTOOLS:
-                $this->echoDumper_devtools(...$vars);
+                $this->dumperEcho_echo_html(...$vars);
                 break;
 
             case static::DUMPER_PDO:
-                $this->echoDumper_pdo(...$vars);
+                $this->dumperEcho_pdo(...$vars);
+                break;
+
+            case static::DUMPER_RESOURCE:
+                $this->dumperEcho_resource(...$vars);
+                break;
+
+            case static::DUMPER_RESOURCE_TEXT:
+                $this->dumperEcho_resource_text(...$vars);
+                break;
+
+            case static::DUMPER_RESOURCE_HTML:
+                $this->dumperEcho_resource_html(...$vars);
                 break;
 
             default:
@@ -526,121 +536,74 @@ class DefaultDumper implements DumperInterface
         endswitch;
     }
 
-    public function echoDumper_echo(...$vars) : void
-    {
-        $content = $this->printPrinter(...$vars);
-
-        $content .= "\n";
-
-        echo $content;
-    }
-
-    public function echoDumper_echo_html(...$vars) : void
+    public function dumperEcho_devtools(...$vars) : void
     {
         $thePhp = Lib::php();
 
-        $options = $this->dumperOptions;
-
-        $throwIfHeadersSent = (bool) ($options[ 'throw_if_headers_sent' ] ?? true);
-
-        $content = $this->printPrinter(...$vars);
-        $content .= "\n";
-
-        $htmlContent = nl2br($content);
-
-        $isTerminal = $thePhp->is_terminal();
-        $isHeadersSent = headers_sent($file, $line);
-
-        if (! ($isTerminal || $isHeadersSent)) {
-            header('Content-Type: text/html', true, 200);
-        }
-
-        echo $htmlContent;
-
-        if (! $isTerminal && $isHeadersSent && $throwIfHeadersSent) {
-            throw new RuntimeException(
-                [ 'Headers already sent', $file, $line ]
-            );
-        }
-    }
-
-    public function echoDumper_resource(...$vars) : void
-    {
-        $thePhp = Lib::php();
-
-        $options = $this->dumperOptions;
-
-        $resource = $options[ 'resource' ] ?? $thePhp->output();
-
-        $content = $this->printPrinter(...$vars);
-        $content .= "\n";
-
-        fwrite($resource, $content);
-        fflush($resource);
-    }
-
-    public function echoDumper_resource_html(...$vars) : void
-    {
-        $thePhp = Lib::php();
-
-        $options = $this->dumperOptions;
-
-        $resource = $options[ 'resource' ] ?? $thePhp->output();
-        $throwIfHeadersSent = (bool) ($options[ 'throw_if_headers_sent' ] ?? true);
-
-        $content = $this->printPrinter(...$vars);
-        $content .= "\n";
-
-        $htmlContent = nl2br($content);
-
-        $isTerminal = $thePhp->is_terminal();
-        $isHeadersSent = headers_sent($file, $line);
-
-        if (! ($isTerminal || $isHeadersSent)) {
-            header('Content-Type: text/html', true, 200);
-        }
-
-        fwrite($resource, $htmlContent);
-        fflush($resource);
-
-        if (! $isTerminal && $isHeadersSent && $throwIfHeadersSent) {
-            throw new RuntimeException(
-                [ 'Headers already sent', $file, $line ]
-            );
-        }
-    }
-
-    public function echoDumper_devtools(...$vars) : void
-    {
-        $thePhp = Lib::php();
-
-        $options = $this->dumperOptions;
-
-        $throwIfHeadersSent = (bool) ($options[ 'throw_if_headers_sent' ] ?? true);
-
-        $content = $this->printPrinter(...$vars);
+        $content = $this->printerPrint(...$vars);
 
         $b64content = base64_encode($content);
 
         $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . "\n";
 
         $isTerminal = $thePhp->is_terminal();
-        $isHeadersSent = headers_sent($file, $line);
+        $isHeadersSent = headers_sent();
 
         if (! ($isTerminal || $isHeadersSent)) {
             header('Content-Type: text/html', true, 200);
         }
 
         echo $htmlContent;
-
-        if (! $isTerminal && $isHeadersSent && $throwIfHeadersSent) {
-            throw new RuntimeException(
-                [ 'Headers already sent', $file, $line ]
-            );
-        }
     }
 
-    public function echoDumper_pdo(...$vars) : void
+    public function dumperEcho_echo(...$vars) : void
+    {
+        $content = $this->printerPrint(...$vars);
+
+        $content .= "\n";
+
+        echo $content;
+    }
+
+    public function dumperEcho_echo_text(...$vars) : void
+    {
+        $thePhp = Lib::php();
+
+        $content = $this->printerPrint(...$vars);
+        $content .= "\n";
+
+        $htmlContent = nl2br($content);
+
+        $isTerminal = $thePhp->is_terminal();
+        $isHeadersSent = headers_sent();
+
+        if (! ($isTerminal || $isHeadersSent)) {
+            header('Content-Type: text/plain', true, 200);
+        }
+
+        echo $htmlContent;
+    }
+
+    public function dumperEcho_echo_html(...$vars) : void
+    {
+        $thePhp = Lib::php();
+
+        $content = $this->printerPrint(...$vars);
+        $content .= "\n";
+
+        $htmlContent = nl2br($content);
+
+        $isTerminal = $thePhp->is_terminal();
+        $isHeadersSent = headers_sent();
+
+        if (! ($isTerminal || $isHeadersSent)) {
+            header('Content-Type: text/html', true, 200);
+        }
+
+        echo $htmlContent;
+    }
+
+    public function dumperEcho_pdo(...$vars) : void
     {
         $options = $this->dumperOptions;
 
@@ -650,36 +613,93 @@ class DefaultDumper implements DumperInterface
 
         if (! ($pdo instanceof \PDO)) {
             throw new LogicException(
-                'The `options.pdo` should be an instance of: ' . \PDO::class
+                [ 'The `options.pdo` should be an instance of: ' . \PDO::class, $options ]
             );
         }
 
-        $_table = (string) $table;
-        if ('' === $_table) {
+        $tableString = (string) $table;
+        if ('' === $tableString) {
             throw new LogicException(
-                'The `options.table` should be a non-empty string'
+                [ 'The `options.table` should be a non-empty string', $options ]
             );
         }
 
-        $_column = (string) $column;
-        if ('' === $_column) {
+        $columnString = (string) $column;
+        if ('' === $columnString) {
             throw new LogicException(
-                'The `options.column` should be a non-empty string'
+                [ 'The `options.column` should be a non-empty string', $options ]
             );
         }
 
-        $content = $this->printPrinter(...$vars);
+        $content = $this->printerPrint(...$vars);
 
-        $sql = "INSERT INTO {$_table} ({$_column}) VALUES (?);";
+        $sql = "INSERT INTO {$tableString} ({$columnString}) VALUES (?);";
 
         $stmt = $pdo->prepare($sql);
         $stmt->execute([ $content ]);
     }
 
-
-    public function print(...$vars) : string
+    public function dumperEcho_resource(...$vars) : void
     {
-        return $this->printPrinter(...$vars);
+        $thePhp = Lib::php();
+
+        $options = $this->dumperOptions;
+
+        $resource = $options[ 'resource' ] ?? $thePhp->output();
+
+        $content = $this->printerPrint(...$vars);
+        $content .= "\n";
+
+        fwrite($resource, $content);
+        fflush($resource);
+    }
+
+    public function dumperEcho_resource_text(...$vars) : void
+    {
+        $thePhp = Lib::php();
+
+        $options = $this->dumperOptions;
+
+        $resource = $options[ 'resource' ] ?? $thePhp->output();
+
+        $content = $this->printerPrint(...$vars);
+        $content .= "\n";
+
+        $htmlContent = nl2br($content);
+
+        $isTerminal = $thePhp->is_terminal();
+        $isHeadersSent = headers_sent();
+
+        if (! ($isTerminal || $isHeadersSent)) {
+            header('Content-Type: text/html', true, 200);
+        }
+
+        fwrite($resource, $htmlContent);
+        fflush($resource);
+    }
+
+    public function dumperEcho_resource_html(...$vars) : void
+    {
+        $thePhp = Lib::php();
+
+        $options = $this->dumperOptions;
+
+        $resource = $options[ 'resource' ] ?? $thePhp->output();
+
+        $content = $this->printerPrint(...$vars);
+        $content .= "\n";
+
+        $htmlContent = nl2br($content);
+
+        $isTerminal = $thePhp->is_terminal();
+        $isHeadersSent = headers_sent();
+
+        if (! ($isTerminal || $isHeadersSent)) {
+            header('Content-Type: text/html', true, 200);
+        }
+
+        fwrite($resource, $htmlContent);
+        fflush($resource);
     }
 
 
@@ -687,14 +707,15 @@ class DefaultDumper implements DumperInterface
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->doPrintTrace($trace, $var, ...$vars);
+        return $this->doPrinterPrintTrace($trace, $var, ...$vars);
     }
+
 
     public function d(?array $trace, $var, ...$vars)
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $this->doDumpTrace($trace, $var, ...$vars);
+        $this->doDumperEchoTrace($trace, $var, ...$vars);
 
         return $var;
     }
@@ -703,7 +724,7 @@ class DefaultDumper implements DumperInterface
     {
         $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $this->doDumpTrace($trace, ...$vars);
+        $this->doDumperEchoTrace($trace, ...$vars);
 
         die();
     }
@@ -719,7 +740,7 @@ class DefaultDumper implements DumperInterface
 
         $current = $current ?? $limit;
 
-        $this->doDumpTrace($trace, $var, ...$vars);
+        $this->doDumperEchoTrace($trace, $var, ...$vars);
 
         if (0 === --$current) {
             die();
@@ -729,25 +750,25 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    protected function doPrintTrace(array $trace, ...$vars) : string
+    protected function doPrinterPrintTrace(array $trace, ...$vars) : string
     {
         $traceFile = $trace[ 0 ][ 'file' ] ?? $trace[ 0 ][ 0 ] ?? '{file}';
         $traceLine = $trace[ 0 ][ 'line' ] ?? $trace[ 0 ][ 1 ] ?? -1;
 
         $traceWhereIs = "{$traceFile}: {$traceLine}";
 
-        $content = $this->printPrinter($traceWhereIs, ...$vars);
+        $content = $this->printerPrint($traceWhereIs, ...$vars);
 
         return $content;
     }
 
-    protected function doDumpTrace(array $trace, ...$vars) : void
+    protected function doDumperEchoTrace(array $trace, ...$vars) : void
     {
         $traceFile = $trace[ 0 ][ 'file' ] ?? $trace[ 0 ][ 0 ] ?? '{file}';
         $traceLine = $trace[ 0 ][ 'line' ] ?? $trace[ 0 ][ 1 ] ?? -1;
 
         $traceWhereIs = "{$traceFile}: {$traceLine}";
 
-        $this->echoDumper($traceWhereIs, ...$vars);
+        $this->dumperEcho($traceWhereIs, ...$vars);
     }
 }

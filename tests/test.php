@@ -3,35 +3,37 @@
 // > настраиваем PHP
 // > некоторые CMS сами по себе применяют настройки глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
-($ex = \Gzhegow\Lib\Lib::entrypoint())
+\Gzhegow\Lib\Lib::entrypoint()
     //
-    // > частично удаляет путь файла из каждой строки `trace` (`trace[i][file]`) при обработке исключений
     ->setDirRoot(__DIR__ . '/..')
+    //
+    ->useErrorHandler()
+    ->useExceptionHandler()
     //
     ->useErrorReporting()
     ->useErrorLog()
+    ->useLogErrors()
     ->useDisplayErrors()
-    ->useErrorHandler()
-    ->useExceptionHandler()
     //
     ->useMemoryLimit()
     //
     ->useMaxExecutionTime()
     ->useMaxInputTime()
     //
-    ->useObImplicitFlush()
-    //
     ->useTimezoneDefault()
+    //
+    ->usePrecision()
+    //
+    ->useUmask()
     //
     ->usePostMaxSize()
     //
     ->useUploadMaxFilesize()
     ->useUploadTmpDir()
     //
-    ->usePrecision()
-    //
-    ->useUmask()
+    ->useObImplicitFlush()
 ;
+
 
 
 // > добавляем несколько функций для тестирования
@@ -2895,22 +2897,22 @@ $fn = function () use ($ffn) {
 
     $string = \Gzhegow\Lib\Lib::debug()
         ->cloneDumper()
-        ->printer(\Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::PRINTER_VAR_DUMP)
-        ->print($varToPrint)
+        ->selectPrinter(\Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::PRINTER_VAR_DUMP)
+        ->printerPrint($varToPrint)
     ;
     $ffn->print($string);
 
     $string = \Gzhegow\Lib\Lib::debug()
         ->cloneDumper()
-        ->printer(\Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::PRINTER_PRINT_R)
-        ->print($varToPrint)
+        ->selectPrinter(\Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::PRINTER_PRINT_R)
+        ->printerPrint($varToPrint)
     ;
     $ffn->print($string);
 
     $string = \Gzhegow\Lib\Lib::debug()
         ->cloneDumper()
-        ->printer(\Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::PRINTER_JSON_ENCODE)
-        ->print($varToPrint)
+        ->selectPrinter(\Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper::PRINTER_JSON_ENCODE)
+        ->printerPrint($varToPrint)
     ;
     $ffn->print($string);
 
