@@ -1784,7 +1784,7 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useAllDefault()
+    public function useAllRecommended()
     {
         $this
             ->useRecommendedErrorHandler()
