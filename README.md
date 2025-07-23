@@ -65,23 +65,23 @@ $ffn = new class {
 
     function value($value) : string
     {
-        return \Gzhegow\Lib\Lib::debug()->value($value, []);
+        return \Gzhegow\Lib\Lib::debug()->dump_value($value, []);
     }
 
     function value_array($value, ?int $maxLevel = null, array $options = []) : string
     {
-        return \Gzhegow\Lib\Lib::debug()->value_array($value, $maxLevel, $options);
+        return \Gzhegow\Lib\Lib::debug()->dump_value_array($value, $maxLevel, $options);
     }
 
     function value_array_multiline($value, ?int $maxLevel = null, array $options = []) : string
     {
-        return \Gzhegow\Lib\Lib::debug()->value_array_multiline($value, $maxLevel, $options);
+        return \Gzhegow\Lib\Lib::debug()->dump_value_array_multiline($value, $maxLevel, $options);
     }
 
 
     function values($separator = null, ...$values) : string
     {
-        return \Gzhegow\Lib\Lib::debug()->values([], $separator, ...$values);
+        return \Gzhegow\Lib\Lib::debug()->dump_values([], $separator, ...$values);
     }
 
 
@@ -1496,7 +1496,7 @@ $fn = function () use ($ffn) {
         foreach ( $array as $v ) {
             foreach ( $precisions as $precision ) {
                 foreach ( $modes[ 'ROUNDING' ] as $n => $f ) {
-                    $vString = \Gzhegow\Lib\Lib::debug()->value($v);
+                    $vString = \Gzhegow\Lib\Lib::debug()->dump_value($v);
 
                     $nString = ".{$precision}|{$n}";
 
@@ -1505,7 +1505,7 @@ $fn = function () use ($ffn) {
                         $f, $f
                     );
 
-                    $resString = \Gzhegow\Lib\Lib::debug()->value((string) $res);
+                    $resString = \Gzhegow\Lib\Lib::debug()->dump_value((string) $res);
 
                     $table[ $nString ][ $vString ] = $resString;
                 }
@@ -1528,7 +1528,7 @@ $fn = function () use ($ffn) {
         foreach ( $array as $v ) {
             foreach ( $precisions as $precision ) {
                 foreach ( $modes[ 'ROUNDING' ] as $n => $f ) {
-                    $vString = \Gzhegow\Lib\Lib::debug()->value($v);
+                    $vString = \Gzhegow\Lib\Lib::debug()->dump_value($v);
 
                     $nString = ".{$precision}|{$n}";
 
@@ -1537,7 +1537,7 @@ $fn = function () use ($ffn) {
                         $f, $f
                     );
 
-                    $resString = \Gzhegow\Lib\Lib::debug()->value((string) $res);
+                    $resString = \Gzhegow\Lib\Lib::debug()->dump_value((string) $res);
 
                     $table[ $nString ][ $vString ] = $resString;
                 }
@@ -1770,11 +1770,11 @@ $fn = function () use ($ffn) {
         $table = [];
         $tableSize = [];
         foreach ( $valuesX as $x ) {
-            $xKey = "A@{$xi} | " . $theDebug->value($x);
+            $xKey = "A@{$xi} | " . $theDebug->dump_value($x);
 
             $yi = 0;
             foreach ( $valuesY as $y ) {
-                $yKey = "B@{$yi} | " . $theDebug->value($y);
+                $yKey = "B@{$yi} | " . $theDebug->dump_value($y);
 
                 $result = $fnCmp($x, $y);
                 $resultSize = $fnCmpSize($x, $y);
@@ -2857,19 +2857,19 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    echo \Gzhegow\Lib\Lib::debug()->value(null) . "\n";
-    echo \Gzhegow\Lib\Lib::debug()->value(false) . "\n";
-    echo \Gzhegow\Lib\Lib::debug()->value(1) . "\n";
-    echo \Gzhegow\Lib\Lib::debug()->value(1.1) . "\n";
-    echo \Gzhegow\Lib\Lib::debug()->value('string') . "\n";
-    echo \Gzhegow\Lib\Lib::debug()->value([]) . "\n";
-    echo \Gzhegow\Lib\Lib::debug()->value((object) []) . "\n";
-    echo \Gzhegow\Lib\Lib::debug()->value(\Gzhegow\Lib\Lib::php()->output()) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->dump_value(null) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->dump_value(false) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->dump_value(1) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->dump_value(1.1) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->dump_value('string') . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->dump_value([]) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->dump_value((object) []) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->dump_value(\Gzhegow\Lib\Lib::php()->output()) . "\n";
 
     echo "\n";
 
     $stdClass = (object) [];
-    echo \Gzhegow\Lib\Lib::debug()->value(
+    echo \Gzhegow\Lib\Lib::debug()->dump_value(
         [
             [ 1, 'apple', $stdClass ],
             [ 2, 'apples', $stdClass ],
@@ -2877,7 +2877,7 @@ $fn = function () use ($ffn) {
         ]
     );
     echo "\n";
-    echo \Gzhegow\Lib\Lib::debug()->value_array(
+    echo \Gzhegow\Lib\Lib::debug()->dump_value_array(
         [
             [ 1, 'apple', $stdClass ],
             [ 2, 'apples', $stdClass ],
@@ -2890,7 +2890,7 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    echo \Gzhegow\Lib\Lib::debug()->value_multiline(
+    echo \Gzhegow\Lib\Lib::debug()->dump_value_multiline(
         [
             [ 1, 'apple', $stdClass ],
             [ 2, 'apples', $stdClass ],
@@ -2899,7 +2899,7 @@ $fn = function () use ($ffn) {
     );
     echo "\n";
 
-    echo \Gzhegow\Lib\Lib::debug()->value_array_multiline(
+    echo \Gzhegow\Lib\Lib::debug()->dump_value_array_multiline(
         [
             [ 1, 'apple', $stdClass ],
             [ 2, 'apples', $stdClass ],
@@ -3954,7 +3954,7 @@ $fn = function () use ($ffn) {
         foreach ( $array as $v ) {
             foreach ( $precisions as $precision ) {
                 foreach ( $modes[ 'ROUNDING' ] as $n => $f ) {
-                    $vString = \Gzhegow\Lib\Lib::debug()->value($v);
+                    $vString = \Gzhegow\Lib\Lib::debug()->dump_value($v);
 
                     $nString = ".{$precision}|{$n}";
 
@@ -3963,7 +3963,7 @@ $fn = function () use ($ffn) {
                         $f, $f
                     );
 
-                    $resString = \Gzhegow\Lib\Lib::debug()->value($res);
+                    $resString = \Gzhegow\Lib\Lib::debug()->dump_value($res);
 
                     $table[ $nString ][ $vString ] = $resString;
                 }
@@ -3986,7 +3986,7 @@ $fn = function () use ($ffn) {
         foreach ( $array as $v ) {
             foreach ( $precisions as $precision ) {
                 foreach ( $modes[ 'ROUNDING' ] as $n => $f ) {
-                    $vString = \Gzhegow\Lib\Lib::debug()->value($v);
+                    $vString = \Gzhegow\Lib\Lib::debug()->dump_value($v);
 
                     $nString = ".{$precision}|{$n}";
 
@@ -3995,7 +3995,7 @@ $fn = function () use ($ffn) {
                         $f, $f
                     );
 
-                    $resString = \Gzhegow\Lib\Lib::debug()->value($res);
+                    $resString = \Gzhegow\Lib\Lib::debug()->dump_value($res);
 
                     $table[ $nString ][ $vString ] = $resString;
                 }

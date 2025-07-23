@@ -175,30 +175,6 @@ class DebugModule
     }
 
 
-    public function debug_backtrace(
-        ?int $options = -1,
-        ?int $limit = -1,
-        ?string $dirRoot = ''
-    ) : BacktracerInterface
-    {
-        $backtracer = $this->cloneBacktracer();
-
-        if ((null === $options) || ($options >= 0)) {
-            $backtracer->options($options);
-        }
-
-        if ((null === $limit) || ($limit >= 0)) {
-            $backtracer->limit($limit);
-        }
-
-        if ('' !== $dirRoot) {
-            $backtracer->dirRoot($dirRoot);
-        }
-
-        return $backtracer;
-    }
-
-
     /**
      * @return array{ 0: string, 1: string }
      */
@@ -227,9 +203,33 @@ class DebugModule
     }
 
 
+    public function debug_backtrace(
+        ?int $options = -1,
+        ?int $limit = -1,
+        ?string $dirRoot = ''
+    ) : BacktracerInterface
+    {
+        $backtracer = $this->cloneBacktracer();
+
+        if ((null === $options) || ($options >= 0)) {
+            $backtracer->options($options);
+        }
+
+        if ((null === $limit) || ($limit >= 0)) {
+            $backtracer->limit($limit);
+        }
+
+        if ('' !== $dirRoot) {
+            $backtracer->dirRoot($dirRoot);
+        }
+
+        return $backtracer;
+    }
+
+
     public function print(...$vars) : string
     {
-        return $this->dumper()->print(...$vars);
+        return $this->dumper()->printerPrint(...$vars);
     }
 
 
@@ -239,6 +239,16 @@ class DebugModule
 
         return $this->dumper()->dp($trace, $var, ...$vars);
     }
+
+    public function fnDP() : \Closure
+    {
+        return function ($var, ...$vars) {
+            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+            return $this->dumper()->dp($trace, $var, ...$vars);
+        };
+    }
+
 
     /**
      * @return mixed
@@ -271,15 +281,6 @@ class DebugModule
     }
 
 
-    public function fnDP() : \Closure
-    {
-        return function ($var, ...$vars) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-            return $this->dumper()->dp($trace, $var, ...$vars);
-        };
-    }
-
     public function fnD() : \Closure
     {
         return function ($var, ...$vars) {
@@ -306,6 +307,7 @@ class DebugModule
             return $this->dumper()->ddd($trace, $limit, $var, ...$vars);
         };
     }
+
 
     public function fnTD(int $throttleMs) : \Closure
     {
@@ -339,7 +341,7 @@ class DebugModule
     }
 
 
-    public function type($value, array $options = [], array &$refContext = []) : string
+    public function dump_type($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + [
@@ -385,7 +387,7 @@ class DebugModule
         return $content;
     }
 
-    public function type_id($value, array $options = [], array &$refContext = []) : string
+    public function dump_type_id($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + [
@@ -435,7 +437,7 @@ class DebugModule
     }
 
 
-    public function type_value($value, array $options = [], array &$refContext = []) : string
+    public function dump_type_value($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + [
@@ -484,7 +486,7 @@ class DebugModule
         return $content;
     }
 
-    public function type_value_multiline($value, array $options = [], array &$refContext = []) : string
+    public function dump_type_value_multiline($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + [
@@ -542,7 +544,7 @@ class DebugModule
     }
 
 
-    public function value($value, array $options = [], array &$refContext = []) : string
+    public function dump_value($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + [
@@ -617,7 +619,7 @@ class DebugModule
         return $content;
     }
 
-    public function value_multiline($value, array $options = [], array &$refContext = []) : string
+    public function dump_value_multiline($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
             + [
@@ -699,32 +701,32 @@ class DebugModule
     }
 
 
-    public function value_array($value, ?int $levelMax = null, array $options = [], array &$refContext = []) : string
+    public function dump_value_array($value, ?int $levelMax = null, array $options = [], array &$refContext = []) : string
     {
         $levelMax = $levelMax ?? 1;
         if ($levelMax < 0) $levelMax = 0;
 
         $options[ 'array_level_max' ] = $levelMax;
 
-        $content = $this->value($value, $options, $refContext);
+        $content = $this->dump_value($value, $options, $refContext);
 
         return $content;
     }
 
-    public function value_array_multiline($value, ?int $levelMax = null, array $options = [], array &$refContext = []) : string
+    public function dump_value_array_multiline($value, ?int $levelMax = null, array $options = [], array &$refContext = []) : string
     {
         $levelMax = $levelMax ?? 1;
         if ($levelMax < 0) $levelMax = 0;
 
         $options[ 'array_level_max' ] = $levelMax;
 
-        $content = $this->value_multiline($value, $options, $refContext);
+        $content = $this->dump_value_multiline($value, $options, $refContext);
 
         return $content;
     }
 
 
-    public function types(array $options = [], ?string $delimiter = null, ...$values) : string
+    public function dump_types(array $options = [], ?string $delimiter = null, ...$values) : string
     {
         $theType = Lib::type();
 
@@ -732,7 +734,7 @@ class DebugModule
 
         $list = [];
         foreach ( $values as $value ) {
-            $list[] = $this->type($value, $options);
+            $list[] = $this->dump_type($value, $options);
         }
 
         $content = implode($delimiterString, $list);
@@ -740,7 +742,7 @@ class DebugModule
         return $content;
     }
 
-    public function type_ids(array $options = [], ?string $delimiter = null, ...$values) : string
+    public function dump_type_ids(array $options = [], ?string $delimiter = null, ...$values) : string
     {
         $theType = Lib::type();
 
@@ -748,7 +750,7 @@ class DebugModule
 
         $list = [];
         foreach ( $values as $value ) {
-            $list[] = $this->type_id($value, $options);
+            $list[] = $this->dump_type_id($value, $options);
         }
 
         $content = implode($delimiterString, $list);
@@ -756,7 +758,7 @@ class DebugModule
         return $content;
     }
 
-    public function type_values(array $options = [], ?string $delimiter = null, ...$values) : string
+    public function dump_type_values(array $options = [], ?string $delimiter = null, ...$values) : string
     {
         $theType = Lib::type();
 
@@ -764,7 +766,7 @@ class DebugModule
 
         $list = [];
         foreach ( $values as $value ) {
-            $list[] = $this->type_value($value, $options);
+            $list[] = $this->dump_type_value($value, $options);
         }
 
         $content = implode($delimiterString, $list);
@@ -772,7 +774,8 @@ class DebugModule
         return $content;
     }
 
-    public function values(array $options = [], ?string $delimiter = null, ...$values) : string
+
+    public function dump_values(array $options = [], ?string $delimiter = null, ...$values) : string
     {
         $theType = Lib::type();
 
@@ -780,7 +783,7 @@ class DebugModule
 
         $list = [];
         foreach ( $values as $value ) {
-            $list[] = $this->value($value, $options);
+            $list[] = $this->dump_value($value, $options);
         }
 
         $content = implode($delimiterString, $list);

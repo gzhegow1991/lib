@@ -1142,7 +1142,9 @@ class PhpModule
             $flagsInt |= _PHP_STRUCT_TYPE_CLASS;
         }
 
-        return $this->type_struct($value, $flagsInt);
+        $ret = $this->type_struct($value, $flagsInt);
+
+        return $ret;
     }
 
     /**
@@ -1163,7 +1165,9 @@ class PhpModule
             $flagsInt |= _PHP_STRUCT_TYPE_INTERFACE;
         }
 
-        return $this->type_struct($value, $flagsInt);
+        $ret = $this->type_struct($value, $flagsInt);
+
+        return $ret;
     }
 
     /**
@@ -1181,7 +1185,9 @@ class PhpModule
             $flagsInt |= _PHP_STRUCT_TYPE_TRAIT;
         }
 
-        return $this->type_struct($value, $flagsInt);
+        $ret = $this->type_struct($value, $flagsInt);
+
+        return $ret;
     }
 
     /**
@@ -1206,7 +1212,9 @@ class PhpModule
             $flagsInt |= _PHP_STRUCT_TYPE_ENUM;
         }
 
-        return $this->type_struct($value, $flagsInt);
+        $ret = $this->type_struct($value, $flagsInt);
+
+        return $ret;
     }
 
 

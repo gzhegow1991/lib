@@ -337,7 +337,7 @@ class DateModule
 
             $timezoneFallbackObject = null;
             if (null !== $timezoneFallback) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback);
+                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
             }
 
             try {
@@ -1480,21 +1480,13 @@ class DateModule
 
     public function adate_now($timezoneFallback = null) : \DateTime
     {
-        $_timezone = null;
+        $timezoneFallbackObject = null;
         if (null !== $timezoneFallback) {
-            $status = $this->type_timezone(
-                $_timezone, $timezoneFallback
-            );
-
-            if (! $status) {
-                throw new LogicException(
-                    [ 'The `timezone` is invalid', $timezoneFallback ]
-                );
-            }
+            $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
         }
 
         try {
-            $dateTime = new \DateTime('now', $_timezone);
+            $dateTime = new \DateTime('now', $timezoneFallbackObject);
         }
         catch ( \Exception $e ) {
             throw new LogicException('Unable to create datetime', $e);
@@ -1505,21 +1497,13 @@ class DateModule
 
     public function idate_now($timezoneFallback = null) : \DateTimeImmutable
     {
-        $_timezone = null;
+        $timezoneFallbackObject = null;
         if (null !== $timezoneFallback) {
-            $status = $this->type_timezone(
-                $_timezone, $timezoneFallback
-            );
-
-            if (! $status) {
-                throw new LogicException(
-                    [ 'The `timezone` is invalid', $timezoneFallback ]
-                );
-            }
+            $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
         }
 
         try {
-            $dateTimeImmutable = new \DateTimeImmutable('now', $_timezone);
+            $dateTimeImmutable = new \DateTimeImmutable('now', $timezoneFallbackObject);
         }
         catch ( \Exception $e ) {
             throw new LogicException('Unable to create datetime', $e);
@@ -1531,21 +1515,13 @@ class DateModule
 
     public function adate_epoch($timezoneFallback = null) : \DateTime
     {
-        $_timezone = null;
+        $timezoneFallbackObject = null;
         if (null !== $timezoneFallback) {
-            $status = $this->type_timezone(
-                $_timezone, $timezoneFallback
-            );
-
-            if (! $status) {
-                throw new LogicException(
-                    [ 'The `timezone` is invalid', $timezoneFallback ]
-                );
-            }
+            $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
         }
 
         try {
-            $dateTime = new \DateTime('1970-01-01 00:00:00.000000', $_timezone);
+            $dateTime = new \DateTime('1970-01-01 00:00:00.000000', $timezoneFallbackObject);
         }
         catch ( \Exception $e ) {
             throw new LogicException('Unable to create datetime', $e);
@@ -1556,21 +1532,13 @@ class DateModule
 
     public function idate_epoch($timezoneFallback = null) : \DateTimeImmutable
     {
-        $_timezone = null;
+        $timezoneFallbackObject = null;
         if (null !== $timezoneFallback) {
-            $status = $this->type_timezone(
-                $_timezone, $timezoneFallback
-            );
-
-            if (! $status) {
-                throw new LogicException(
-                    [ 'The `timezone` is invalid', $timezoneFallback ]
-                );
-            }
+            $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
         }
 
         try {
-            $dateTimeImmutable = new \DateTimeImmutable('1970-01-01 00:00:00.000000', $_timezone);
+            $dateTimeImmutable = new \DateTimeImmutable('1970-01-01 00:00:00.000000', $timezoneFallbackObject);
         }
         catch ( \Exception $e ) {
             throw new LogicException('Unable to create datetime', $e);
@@ -1582,21 +1550,13 @@ class DateModule
 
     public function adate_zero($timezoneFallback = null) : \DateTime
     {
-        $_timezone = null;
+        $timezoneFallbackObject = null;
         if (null !== $timezoneFallback) {
-            $status = $this->type_timezone(
-                $_timezone, $timezoneFallback
-            );
-
-            if (! $status) {
-                throw new LogicException(
-                    [ 'The `timezone` is invalid', $timezoneFallback ]
-                );
-            }
+            $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
         }
 
         try {
-            $dateTime = new \DateTime('0000-01-01 00:00:00.000000', $_timezone);
+            $dateTime = new \DateTime('0000-01-01 00:00:00.000000', $timezoneFallbackObject);
         }
         catch ( \Exception $e ) {
             throw new LogicException('Unable to create datetime', $e);
@@ -1607,21 +1567,13 @@ class DateModule
 
     public function idate_zero($timezoneFallback = null) : \DateTimeImmutable
     {
-        $_timezone = null;
+        $timezoneFallbackObject = null;
         if (null !== $timezoneFallback) {
-            $status = $this->type_timezone(
-                $_timezone, $timezoneFallback
-            );
-
-            if (! $status) {
-                throw new LogicException(
-                    [ 'The `timezone` is invalid', $timezoneFallback ]
-                );
-            }
+            $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
         }
 
         try {
-            $dateTimeImmutable = new \DateTimeImmutable('0000-01-01 00:00:00.000000', $_timezone);
+            $dateTimeImmutable = new \DateTimeImmutable('0000-01-01 00:00:00.000000', $timezoneFallbackObject);
         }
         catch ( \Exception $e ) {
             throw new LogicException('Unable to create datetime', $e);

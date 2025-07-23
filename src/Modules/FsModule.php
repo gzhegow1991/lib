@@ -313,10 +313,7 @@ class FsModule
         array $refs = []
     )
     {
-        if (! $this
-            ->type_path($value, $refs)
-            ->isOk([ &$valuePath, &$ret ])
-        ) {
+        if (! $this->type_path($value, $refs)->isOk([ &$valuePath, &$ret ])) {
             return $ret;
         }
 
@@ -345,10 +342,7 @@ class FsModule
         $isAllowExists = $isAllowExists ?? true;
         $isAllowSymlink = $isAllowSymlink ?? true;
 
-        if (! $this
-            ->type_path($value, $refs)
-            ->isOk([ &$valuePath, &$ret ])
-        ) {
+        if (! $this->type_path($value, $refs)->isOk([ &$valuePath, &$ret ])) {
             return $ret;
         }
 
@@ -409,10 +403,7 @@ class FsModule
     {
         $isAllowSymlink = $isAllowSymlink ?? true;
 
-        if (! $this
-            ->type_realpath($value, $isAllowSymlink, $refs)
-            ->isOk([ &$valueRealpath, &$ret ])
-        ) {
+        if (! $this->type_realpath($value, $isAllowSymlink, $refs)->isOk([ &$valueRealpath, &$ret ])) {
             return $ret;
         }
 
@@ -450,10 +441,7 @@ class FsModule
         $isAllowExists = $isAllowExists ?? true;
         $isAllowSymlink = $isAllowSymlink ?? true;
 
-        if (! $this
-            ->type_path($value, $refs)
-            ->isOk([ &$valuePath, &$ret ])
-        ) {
+        if (! $this->type_path($value, $refs)->isOk([ &$valuePath, &$ret ])) {
             return $ret;
         }
 
@@ -512,10 +500,7 @@ class FsModule
         array $refs = []
     )
     {
-        if (! $this
-            ->type_realpath($value, $isAllowSymlink, $refs)
-            ->isOk([ &$valueRealpath, &$ret ])
-        ) {
+        if (! $this->type_realpath($value, $isAllowSymlink, $refs)->isOk([ &$valueRealpath, &$ret ])) {
             return $ret;
         }
 
@@ -579,10 +564,7 @@ class FsModule
             $splFileInfo = $value;
 
         } else {
-            if (! $this
-                ->type_filepath_realpath($value)
-                ->isOk([ &$valueFilepathRealpath, &$ret ])
-            ) {
+            if (! $this->type_filepath_realpath($value)->isOk([ &$valueFilepathRealpath, &$ret ])) {
                 return $ret;
             }
 
@@ -598,7 +580,7 @@ class FsModule
 
         if (null !== $extensions) {
             if (null !== $splFileInfo) {
-                $splFileInfo = $this->type_file_extensions($splFileInfo, $extensions);
+                $splFileInfo = $this->_type_file_extensions($splFileInfo, $extensions);
 
                 if (null === $splFileInfo) {
                     return Ret::err(
@@ -610,7 +592,7 @@ class FsModule
 
         if (null !== $mimeTypes) {
             if (null !== $splFileInfo) {
-                $splFileInfo = $this->type_file_mime_types($splFileInfo, $mimeTypes);
+                $splFileInfo = $this->_type_file_mime_types($splFileInfo, $mimeTypes);
 
                 if (null === $splFileInfo) {
                     return Ret::err(
@@ -622,7 +604,7 @@ class FsModule
 
         if (null !== $filters) {
             if (null !== $splFileInfo) {
-                $splFileInfo = $this->type_file_filters($splFileInfo, $filters);
+                $splFileInfo = $this->_type_file_filters($splFileInfo, $filters);
 
                 if (null === $splFileInfo) {
                     return Ret::err(
@@ -635,7 +617,7 @@ class FsModule
         return Ret::val($splFileInfo);
     }
 
-    protected function type_file_extensions(\SplFileInfo $splFileInfo, array $extensions) : ?\SplFileInfo
+    protected function _type_file_extensions(\SplFileInfo $splFileInfo, array $extensions) : ?\SplFileInfo
     {
         if ([] === $extensions) {
             return null;
@@ -663,7 +645,7 @@ class FsModule
         return null;
     }
 
-    protected function type_file_mime_types(\SplFileInfo $splFileInfo, array $mimeTypes) : ?\SplFileInfo
+    protected function _type_file_mime_types(\SplFileInfo $splFileInfo, array $mimeTypes) : ?\SplFileInfo
     {
         if ([] === $mimeTypes) {
             return null;
@@ -694,7 +676,7 @@ class FsModule
         return null;
     }
 
-    protected function type_file_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
+    protected function _type_file_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
     {
         if ([] === $filters) {
             return $splFileInfo;
@@ -750,16 +732,13 @@ class FsModule
         ?array $filters = null
     )
     {
-        if (! $this
-            ->type_file($value, $extensions, $mimeTypes, $filters)
-            ->isOk([ &$splFileInfo, &$ret ])
-        ) {
+        if (! $this->type_file($value, $extensions, $mimeTypes, $filters)->isOk([ &$splFileInfo, &$ret ])) {
             return $ret;
         }
 
         if (null !== $filters) {
             if (null !== $splFileInfo) {
-                $splFileInfo = $this->type_image_filters($splFileInfo, $filters);
+                $splFileInfo = $this->_type_image_filters($splFileInfo, $filters);
 
                 if (null === $splFileInfo) {
                     return Ret::err(
@@ -772,7 +751,7 @@ class FsModule
         return Ret::val($splFileInfo);
     }
 
-    protected function type_image_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
+    protected function _type_image_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
     {
         if ([] === $filters) {
             return $splFileInfo;
@@ -1112,17 +1091,11 @@ class FsModule
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
-        if ($this
-            ->type_realpath($path)
-            ->isOk([ &$pathRealpath ])
-        ) {
+        if ($this->type_realpath($path)->isOk([ &$pathRealpath ])) {
             $path = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $pathRealpath);
         }
 
-        if ($this
-            ->type_realpath($current)
-            ->isOk([ &$currentRealpath ])
-        ) {
+        if ($this->type_realpath($current)->isOk([ &$currentRealpath ])) {
             $current = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $currentRealpath);
         }
 

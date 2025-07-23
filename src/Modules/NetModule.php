@@ -213,10 +213,7 @@ class NetModule
                 $addressIpString = $ipFallback;
 
             } else {
-                if (! $this
-                    ->type_address_ip_v4($addressPart)
-                    ->isOk([ &$addressIpString, &$ret ])
-                ) {
+                if (! $this->type_address_ip_v4($addressPart)->isOk([ &$addressIpString, &$ret ])) {
                     return $ret;
                 }
             }
@@ -229,10 +226,7 @@ class NetModule
                 );
             }
 
-            if ($this
-                ->type_subnet_v4_iplike($addressPart)
-                ->isOk([ &$subnetInt, &$ret ])
-            ) {
+            if ($this->type_subnet_v4_iplike($addressPart)->isOk([ &$subnetInt, &$ret ])) {
                 if (($subnetInt < 0) || ($subnetInt > 32)) {
                     return Ret::err(
                         [ 'The `value` subnet integer should be between 0 and 32', $value ],
@@ -242,10 +236,7 @@ class NetModule
 
                 $addressIpString = $ipFallback;
 
-            } elseif ($this
-                ->type_address_ip_v4($addressPart)
-                ->isOk([ &$addressIpString ])
-            ) {
+            } elseif ($this->type_address_ip_v4($addressPart)->isOk([ &$addressIpString ])) {
                 $subnetInt = 32;
             }
         }
@@ -435,8 +426,8 @@ class NetModule
             $subnetV6 = null;
 
             $statusSubnet = false
-                || ($isV4 && $this->type_subnet_v4($subnetV4, $subnet))
-                || ($isV6 && $this->type_subnet_v4($subnetV6, $subnet));
+                || ($isV4 && $this->type_subnet_v4($subnet)->isOk([ &$subnetV4 ]))
+                || ($isV6 && $this->type_subnet_v4($subnet)->isOk([ &$subnetV6 ]));
 
             if (! $statusSubnet) {
                 throw new LogicException(

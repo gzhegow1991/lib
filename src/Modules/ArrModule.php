@@ -637,7 +637,7 @@ class ArrModule
         }
 
         for ( $i = 0; $i < count($value); $i++ ) {
-            if (! $this->type_list($value[ $i ])) {
+            if (! $this->type_list($value[ $i ])->isOk()) {
                 return Ret::err(
                     [ 'The `value` should be array of lists', $value ]
                 );
@@ -659,7 +659,7 @@ class ArrModule
         }
 
         for ( $i = 0; $i < count($value); $i++ ) {
-            if (! $this->type_list_sorted($value[ $i ])) {
+            if (! $this->type_list_sorted($value[ $i ])->isOk()) {
                 return Ret::err(
                     [ 'The `value` should be array of sorted lists', $value ]
                 );

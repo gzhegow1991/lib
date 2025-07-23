@@ -484,15 +484,17 @@ class UrlModule
         ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null
     ) : string
     {
-        $ret = $this
-            ->type_url(
-                $url, $query, $fragment,
-                $isHostIdnaAscii, $isLinkUrlencoded
-            )
-            ->orThrow()
-        ;
+        $args = [
+            $url,
+            $query,
+            $fragment,
+            $isHostIdnaAscii,
+            $isLinkUrlencoded,
+        ];
 
-        return $ret;
+        $result = $this->type_url(...$args)->orThrow();
+
+        return $result;
     }
 
     /**
@@ -503,15 +505,14 @@ class UrlModule
         ?int $isHostIdnaAscii = null
     ) : string
     {
-        $ret = $this
-            ->type_host(
-                $url,
-                $isHostIdnaAscii
-            )
-            ->orThrow()
-        ;
+        $args = [
+            $url,
+            $isHostIdnaAscii
+        ];
 
-        return $ret;
+        $result = $this->type_host(...$args)->orThrow();
+
+        return $result;
     }
 
     /**
@@ -524,15 +525,16 @@ class UrlModule
         ?int $isLinkUrlencoded = null
     ) : string
     {
-        $ret = $this
-            ->type_link(
-                $url, $query, $fragment,
-                $isLinkUrlencoded
-            )
-            ->orThrow()
-        ;
+        $args = [
+            $url,
+            $query,
+            $fragment,
+            $isLinkUrlencoded,
+        ];
 
-        return $ret;
+        $result = $this->type_link(...$args)->orThrow();
+
+        return $result;
     }
 
 
