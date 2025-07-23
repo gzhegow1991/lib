@@ -615,6 +615,7 @@ class Lib
         return Lib::debug()->dumper()->dp($trace, $var, ...$vars);
     }
 
+
     /**
      * @return mixed
      */
@@ -651,7 +652,7 @@ class Lib
         return Lib::debug()->fnDP();
     }
 
-    public function fnD() : \Closure
+    public static function fnD() : \Closure
     {
         return Lib::debug()->fnD();
     }
