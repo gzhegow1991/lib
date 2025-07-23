@@ -321,9 +321,25 @@ class EntrypointModule
     }
 
 
-    public function getDirRoot() : ?string
+    /**
+     * @param string $refResult
+     */
+    public function hasDirRoot(&$refResult = null) : bool
     {
-        return $this->dirRoot;
+        $refResult = null;
+
+        if ([] !== $this->dirRoot) {
+            $refResult = $this->dirRoot[ 0 ];
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public function getDirRoot() : string
+    {
+        return $this->dirRoot[ 0 ];
     }
 
     /**
@@ -1663,7 +1679,9 @@ class EntrypointModule
         $theDebug = Lib::debug();
         $theDebugThrowabler = $theDebug->throwabler();
 
-        $theDebugThrowabler->setDirRoot($this->dirRoot);
+        if ($this->hasDirRoot($refDirRoot)) {
+            $theDebugThrowabler->setDirRoot($refDirRoot);
+        }
 
         $messageLines = $theDebugThrowabler->getPreviousMessagesAllLines(
             $throwable,
