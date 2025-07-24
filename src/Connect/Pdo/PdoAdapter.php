@@ -338,7 +338,7 @@ class PdoAdapter
         }
 
         if (null !== $pdoDatabase) {
-            $pdoDatabaseValid = $theType->numeric_int_positive($pdoDatabase)->orThrow();
+            $pdoDatabaseValid = $theType->string_not_empty($pdoDatabase)->orThrow();
 
             $pdoDsn .= ";dbname={$pdoDatabaseValid}";
         }
