@@ -1456,7 +1456,7 @@ class PhpModule
      *
      * @return Ret<bool>
      */
-    public function type_method($value, array $refs)
+    public function type_method($value, array $refs = [])
     {
         return $this->callableParser()->typeMethod($value, $refs);
     }
