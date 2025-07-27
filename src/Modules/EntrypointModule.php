@@ -14,7 +14,7 @@ class EntrypointModule
     /**
      * @var array{ 0: string, 1: string }
      */
-    protected $isLocked;
+    protected $isLocked = [];
 
     /**
      * @var array<string, mixed>
@@ -299,9 +299,20 @@ class EntrypointModule
     }
 
 
+    public function isLocked(?array &$fileLine = null) : bool
+    {
+        $fileLine = null;
+
+        if ([] !== $this->isLocked) {
+            $fileLine = $this->isLocked;
+
+            return true;
+        }
+
+        return false;
+    }
+
     /**
-     * @param bool $isLocked
-     *
      * @return static
      */
     public function lock(?bool $isLocked = null)
@@ -314,7 +325,7 @@ class EntrypointModule
             $this->isLocked = $theDebug->file_line();
 
         } else {
-            $this->isLocked = null;
+            $this->isLocked = [];
         }
 
         return $this;
@@ -1818,7 +1829,7 @@ class EntrypointModule
 
     protected function assertNotLocked() : void
     {
-        if (null !== $this->isLocked) {
+        if ([] !== $this->isLocked) {
             throw new RuntimeException(
                 [
                     'Unable to change entrypoint parameters due to it was locked before',

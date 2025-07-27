@@ -615,6 +615,11 @@ class Lib
         return Lib::debug()->dumper()->dp($trace, $var, ...$vars);
     }
 
+    public static function fnDP() : \Closure
+    {
+        return Lib::debug()->fnDP();
+    }
+
 
     /**
      * @return mixed
@@ -647,11 +652,6 @@ class Lib
     }
 
 
-    public static function fnDP() : \Closure
-    {
-        return Lib::debug()->fnDP();
-    }
-
     public static function fnD() : \Closure
     {
         return Lib::debug()->fnD();
@@ -674,22 +674,17 @@ class Lib
 
 
     /**
-     * > примитивное глобальное хранилище для импортов-экспортов ("сервис-локатор", ОГА)
+     * > конструкция require в PHP бросает FATAL, который не отлавливается с помощью set_error_handler()/set_exception_handler()
+     *
+     * @return mixed
      */
-    public static function &di() : array
+    public static function require(string $file)
     {
-        static $imports;
-
-        $imports = $imports ?? [];
-
-        return $imports;
-    }
-
-    public static function export(string $file, $item = null, ?string $name = null) : array
-    {
-        static $export;
-
-        $export = $export ?? [];
+        if (! is_file($file)) {
+            throw new LogicException(
+                [ 'Missing `filepath` file: ' . $file ]
+            );
+        }
 
         if (! is_file($file)) {
             throw new LogicException(
@@ -699,80 +694,42 @@ class Lib
 
         $realpath = realpath($file);
 
-        if (null !== $item) {
-            if (null === $name) {
-                if (is_array($item)) {
-                    $export[ $realpath ] = array_replace(
-                        $export[ $file ] ?? [],
-                        $item
-                    );
-
-                } else {
-                    $export[ $realpath ][] = $item;
-                }
-
-            } else {
-                $export[ $realpath ][ $name ] = $item;
-            }
-        }
-
-        return $export[ $realpath ];
-    }
-
-    public static function import(string $file) : array
-    {
-        if (! is_file($file)) {
-            throw new RuntimeException(
-                [ 'Missing `filepath` file: ' . $file ]
-            );
-        }
-
-        $realpath = realpath($file);
-
-        $imports =& static::di();
-
-        if (! isset($imports[ $realpath ])) {
-            $imports[ $realpath ] = include $realpath;
-        }
-
-        return $imports[ $realpath ];
+        return include $realpath;
     }
 
     /**
-     * @template-covariant T of object
+     * > конструкция require в PHP бросает FATAL, который не отлавливается с помощью set_error_handler()/set_exception_handler()
      *
-     * @param class-string<T>|null $classT
-     *
-     * @return T|mixed
-     *
-     * @noinspection PhpUnusedParameterInspection
+     * @return mixed
      */
-    public static function importKey(string $file, string $key, ?string $classT = null)
+    public static function require_once(string $file)
     {
+        static $requireOnce;
+
+        $requireOnce = $requireOnce ?? [];
+
         if (! is_file($file)) {
-            throw new RuntimeException(
+            throw new LogicException(
                 [ 'Missing `filepath` file: ' . $file ]
             );
         }
 
         $realpath = realpath($file);
 
-        $imports =& static::di();
-
-        if (! isset($imports[ $realpath ])) {
-            $imports[ $realpath ] = include $realpath;
+        if (! isset($requireOnce[ $realpath ])) {
+            $requireOnce[ $realpath ] = include $realpath;
         }
 
-        return $imports[ $realpath ][ $key ];
+        return $requireOnce[ $realpath ];
     }
 
 
     /**
      * > в версиях PHP ниже 8.0 нельзя выбросить исключения в рамках цепочки тернарных операторов
      *
-     * @return null
-     *
      * @noinspection PhpUnnecessaryStopStatementInspection
+     *
+     * @return null
      *
      * @throws \LogicException|\RuntimeException
      */
@@ -799,6 +756,90 @@ class Lib
 
         return;
     }
+
+
+    /**
+     * > примитивное глобальное хранилище для импортов-экспортов ("сервис-локатор", ОГА)
+     */
+    public static function &di() : array
+    {
+        static $services;
+
+        $services = $services ?? [];
+
+        return $services;
+    }
+
+    public static function export(string $file, $item, ?string $key = null) : array
+    {
+        if (! is_file($file)) {
+            throw new LogicException(
+                [ 'Missing `filepath` file: ' . $file ]
+            );
+        }
+
+        if (null === $item) {
+            throw new LogicException(
+                [ 'The `item` should be not-null' ]
+            );
+        }
+
+        $services =& static::di();
+
+        $realpath = realpath($file);
+
+        if (null !== $key) {
+            $services[ $realpath ][ $key ] = $item;
+
+            return $services[ $realpath ];
+        }
+
+        if (is_array($item)) {
+            $services[ $realpath ] = array_replace(
+                $services[ $file ] ?? [],
+                $item
+            );
+
+            return $services[ $realpath ];
+        }
+
+        $services[ $realpath ][] = $item;
+
+        return $services[ $realpath ];
+    }
+
+    /**
+     * @template-covariant T of object
+     *
+     * @param class-string<T>|null $classT
+     *
+     * @return T|mixed
+     *
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public static function import(string $file, ?string $key = null, ?string $classT = null)
+    {
+        if (! is_file($file)) {
+            throw new RuntimeException(
+                [ 'Missing `filepath` file: ' . $file ]
+            );
+        }
+
+        $services =& static::di();
+
+        $realpath = realpath($file);
+
+        if (! isset($services[ $realpath ])) {
+            $services[ $realpath ] = include $realpath;
+        }
+
+        if (null !== $key) {
+            return $services[ $realpath ][ $key ];
+        }
+
+        return $services[ $realpath ];
+    }
+
 
 
     /**

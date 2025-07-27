@@ -5,7 +5,17 @@
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
 \Gzhegow\Lib\Lib::entrypoint()
     //
+    // ->getDirRoot(__DIR__ . '/..')
     ->setDirRoot(__DIR__ . '/..')
+    //
+    // ->getPhpErrorHandler()
+    // ->getErrorHandler()
+    // ->setErrorHandler()
+    // ->useErrorHandler()
+    // ->useRecommendedErrorHandler()
+    //
+    // ->isLocked($refFileLine)
+    // ->lock(true)
     //
     ->useErrorHandler()
     ->useExceptionHandler()

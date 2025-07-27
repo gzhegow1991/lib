@@ -21,8 +21,8 @@ class Exception extends \Exception implements
         $args = $thePhp->throwable_args(...$throwableArgs);
 
         $message = $args[ 'message' ] ?? '[ NO MESSAGE ]';
-        $messageList = array_values($args[ 'messageList' ]);
-        $messageObjectList = array_values($args[ 'messageObjectList' ]);
+        $messageList = array_values($args[ 'messageList' ]) ?: [ $message ];
+        $messageObjectList = array_values($args[ 'messageObjectList' ]) ?: [ (object) [ $message ] ];
 
         $this->messageList = $messageList;
         $this->messageObjectList = $messageObjectList;
