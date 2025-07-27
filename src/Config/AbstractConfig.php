@@ -135,17 +135,20 @@ abstract class AbstractConfig implements
     }
 
 
-    public function configure(?\Closure $fn = null, array &$refContext = []) : void
+    /**
+     * @param array{ 0?: mixed } $context
+     */
+    public function configure(?\Closure $fn = null, array $context = []) : void
     {
         if (null !== $fn) {
             $this->invalidate();
 
             $fnBound = $fn->bindTo($this, $this);
 
-            call_user_func_array($fnBound, [ $this, &$refContext ]);
+            call_user_func_array($fnBound, [ $this, $context ]);
         }
 
-        $this->validate($refContext);
+        $this->validate($context);
     }
 
 
@@ -154,15 +157,21 @@ abstract class AbstractConfig implements
         $this->__valid = null;
     }
 
-    public function validate(array &$refContext = []) : void
+    /**
+     * @param array{ 0?: mixed } $context
+     */
+    public function validate(array $context = []) : void
     {
         if (null === $this->__valid) {
+            $refContext =& $context[ 1 ];
+            $refContext = $refContext ?? [];
+
             $refContext[ '__path' ] = [];
             $refContext[ '__key' ] = null;
             $refContext[ '__parent' ] = null;
             $refContext[ '__root' ] = $this;
 
-            $this->__valid = $this->validationRecursive($refContext);
+            $this->__valid = $this->validationRecursive($context);
 
             unset($refContext[ '__path' ]);
             unset($refContext[ '__key' ]);
@@ -234,8 +243,14 @@ abstract class AbstractConfig implements
     }
 
 
-    protected function validationRecursive(array &$refContext = []) : bool
+    /**
+     * @param array{ 0?: mixed, 1: array } $context
+     */
+    protected function validationRecursive(array $context = []) : bool
     {
+        $refContext =& $context[ 1 ];
+        $refContext = $refContext ?? [];
+
         $path = $refContext[ '__path' ] ?? [];
         $key = $refContext[ '__key' ] ?? null;
         $parent = $refContext[ '__parent' ] ?? null;
@@ -260,12 +275,15 @@ abstract class AbstractConfig implements
         $refContext[ '__key' ] = $key;
         $refContext[ '__parent' ] = $parent;
 
-        $status = $this->validation($refContext);
+        $status = $this->validation($context);
 
         return $status;
     }
 
-    protected function validation(array &$refContext = []) : bool
+    /**
+     * @param array{ 0?: mixed, 1: array } $context
+     */
+    protected function validation(array $context = []) : bool
     {
         return true;
     }

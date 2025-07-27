@@ -896,7 +896,7 @@ $fn = function () use ($ffn) {
         protected $foo = 1;
         protected $foo2;
 
-        protected function validation(array &$refContext = []) : bool
+        protected function validation(array $context = []) : bool
         {
             if ($this->foo2 !== $this->foo) {
                 return false;
