@@ -9,63 +9,23 @@ use Gzhegow\Lib\Modules\Type\Ret;
 class DefaultCallableParser implements CallableParserInterface
 {
     /**
-     * @return Ret<array{ 0: class-string, 1: string }>
+     * @param array{ 0?: array, 1?: string } $refs
+     *
+     * @return Ret<bool>
      */
-    public function typeMethodArray($value)
-    {
-        $methodArray = null
-            ?? $this->parseMethodArrayFromObject($value)
-            ?? $this->parseMethodArrayFromArray($value)
-            ?? $this->parseMethodArrayFromString($value);
-
-        if (null === $methodArray) {
-            return Ret::err(
-                [ 'The `value` should be method (object, array or string)', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        [ /* $anObject */, $aClass, $aMethod, $aMagic ] = $methodArray;
-
-        if ($aMethod && $aMagic) {
-            return Ret::err(
-                [ 'The `value` should be real (not magic) method', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-
-        } elseif ($aMagic) {
-            // > method not provided, but class or object has magic method __invoke()
-            if (false
-                || ($aMagic === '__invoke')
-            ) {
-                return Ret::val([ $aClass, $aMagic ]);
-            }
-
-            return Ret::err(
-                [ 'The `value` should be existing method', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-
-        } elseif ($aMethod) {
-            return Ret::val([ $aClass, $aMethod ]);
-        }
-
-        return Ret::err(
-            [ 'The `value` should be method array', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<string>
-     */
-    public function typeMethodString($value, array $refs = [])
+    public function typeMethod($value, array $refs = [])
     {
         $withMethodArray = array_key_exists(0, $refs);
         if ($withMethodArray) {
-            $refResultArray =& $refs[ 0 ];
+            $refMethodArray =& $refs[ 0 ];
         }
-        $refResultArray = null;
+        $refMethodArray = null;
+
+        $withMethodString = array_key_exists(1, $refs);
+        if ($withMethodString) {
+            $refMethodString =& $refs[ 1 ];
+        }
+        $refMethodString = null;
 
         $methodArray = null
             ?? $this->parseMethodArrayFromObject($value)
@@ -88,13 +48,14 @@ class DefaultCallableParser implements CallableParserInterface
             );
 
         } elseif ($aMagic) {
-            // > method not provided, but class or object has magic method __invoke()
+            // > method not provided, but class or object has magic method
             if (false
                 || ($aMagic === '__invoke')
             ) {
-                $refResultArray = [ $aClass, '__invoke' ];
+                $refMethodArray = [ $aClass, '__invoke' ];
+                $refMethodString = "{$aClass}->__invoke";
 
-                return Ret::val("{$aClass}->__invoke");
+                return Ret::val(true);
             }
 
             return Ret::err(
@@ -109,15 +70,19 @@ class DefaultCallableParser implements CallableParserInterface
                 || ($aMethod === '__invoke')
                 || ($aMethod === '__call')
             ) {
-                $refResultArray = [ $aClass, $aMethod ];
+                $refMethodArray = [ $aClass, $aMethod ];
+                $refMethodString = "{$aClass}->{$aMethod}";
 
-                return Ret::val("{$aClass}->{$aMethod}");
+                return Ret::val(true);
             }
 
-            if ($aMethod === '__callStatic') {
-                $refResultArray = [ $aClass, $aMethod ];
+            if (false
+                || ($aMethod === '__callStatic')
+            ) {
+                $refMethodArray = [ $aClass, $aMethod ];
+                $refMethodString = "{$aClass}::{$aMethod}";
 
-                return Ret::val("{$aClass}::{$aMethod}");
+                return Ret::val(true);
             }
 
             try {
@@ -132,19 +97,42 @@ class DefaultCallableParser implements CallableParserInterface
                 );
             }
 
-            $refResultArray = [ $aClass, $aMethod ];
+            $refMethodArray = [ $aClass, $aMethod ];
+            $refMethodString = $isStatic
+                ? "{$aClass}::{$aMethod}"
+                : "{$aClass}->{$aMethod}";
 
-            return Ret::val(
-                $isStatic
-                    ? "{$aClass}::{$aMethod}"
-                    : "{$aClass}->{$aMethod}"
-            );
+            return Ret::val(true);
         }
 
         return Ret::err(
-            [ 'The `value` should be method string', $value ],
+            [ 'The `value` should be valid method', $value ],
             [ __FILE__, __LINE__ ]
         );
+    }
+
+    /**
+     * @return Ret<array{ 0: class-string, 1: string }>
+     */
+    public function typeMethodArray($value)
+    {
+        if (! $this->typeMethod($value, [ &$refMethodArray ])->isOk([ 1 => &$ret ])) {
+            return $ret;
+        }
+
+        return Ret::val($refMethodArray);
+    }
+
+    /**
+     * @return Ret<string>
+     */
+    public function typeMethodString($value)
+    {
+        if (! $this->typeMethod($value, [ 1 => &$refMethodString ])->isOk([ 1 => &$ret ])) {
+            return $ret;
+        }
+
+        return Ret::val($refMethodString);
     }
 
 

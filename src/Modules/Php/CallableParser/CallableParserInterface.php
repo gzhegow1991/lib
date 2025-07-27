@@ -8,6 +8,13 @@ use Gzhegow\Lib\Modules\Type\Ret;
 interface CallableParserInterface
 {
     /**
+     * @param array{ 0?: array, 1?: string } $refs
+     *
+     * @return Ret<bool>
+     */
+    public function typeMethod($value, array $refs = []);
+
+    /**
      * @return Ret<array{ 0: class-string, 1: string }>
      */
     public function typeMethodArray($value);
@@ -15,7 +22,7 @@ interface CallableParserInterface
     /**
      * @return Ret<string>
      */
-    public function typeMethodString($value, array $refs = []);
+    public function typeMethodString($value);
 
 
     /**

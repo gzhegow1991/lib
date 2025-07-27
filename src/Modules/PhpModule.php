@@ -1447,7 +1447,24 @@ class PhpModule
 
 
     /**
-     * > метод не всегда возвращает callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
+     * > метод не всегда callable, поскольку строка 'class->method' не является callable
+     * > метод не всегда callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
+     * > используйте type_callable_string, если собираетесь вызывать метод
+     * > используйте type_callable_array, если собираетесь вызывать метод
+     *
+     * @param array{ 0?: array, 1?: string } $refs
+     *
+     * @return Ret<bool>
+     */
+    public function type_method($value, array $refs)
+    {
+        return $this->callableParser()->typeMethod($value, $refs);
+    }
+
+    /**
+     * > метод не всегда callable, поскольку строка 'class->method' не является callable
+     * > метод не всегда callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
+     * > используйте type_callable_string, если собираетесь вызывать метод
      * > используйте type_callable_array, если собираетесь вызывать метод
      *
      * @return Ret<array{ 0: class-string, 1: string }>
@@ -1458,14 +1475,16 @@ class PhpModule
     }
 
     /**
-     * > метод не всегда возвращает callable, поскольку строка 'class->method' не является callable
+     * > метод не всегда callable, поскольку строка 'class->method' не является callable
+     * > метод не всегда callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
      * > используйте type_callable_string, если собираетесь вызывать метод
+     * > используйте type_callable_array, если собираетесь вызывать метод
      *
      * @return Ret<string>
      */
-    public function type_method_string($value, array $refs = [])
+    public function type_method_string($value)
     {
-        return $this->callableParser()->typeMethodString($value, $refs);
+        return $this->callableParser()->typeMethodString($value);
     }
 
 
