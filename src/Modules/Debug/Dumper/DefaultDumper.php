@@ -16,8 +16,9 @@ use Gzhegow\Lib\Exception\Runtime\ComposerException;
 
 class DefaultDumper implements DumperInterface
 {
+    const SYMFONY_VAR_DUMPER       = '\Symfony\Component\VarDumper\VarDumper';
     const SYMFONY_CLONER_INTERFACE = '\Symfony\Component\VarDumper\Cloner\ClonerInterface';
-    const SYMFONY_CLONER           = '\Symfony\Component\VarDumper\Cloner\VarCloner';
+    const SYMFONY_VAR_CLONER       = '\Symfony\Component\VarDumper\Cloner\VarCloner';
     const SYMFONY_CLI_DUMPER       = '\Symfony\Component\VarDumper\Dumper\CliDumper';
     const SYMFONY_HTML_DUMPER      = '\Symfony\Component\VarDumper\Dumper\HtmlDumper';
 
@@ -110,9 +111,9 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    public function hasSymfony() : bool
+    public function hasSymfonyVarDumper() : bool
     {
-        return class_exists(static::SYMFONY_CLONER_INTERFACE);
+        return class_exists(static::SYMFONY_VAR_DUMPER);
     }
 
 
@@ -148,7 +149,7 @@ class DefaultDumper implements DumperInterface
             'composer require symfony/var-dumper',
         ];
 
-        if (! class_exists($symfonyClonerClass = static::SYMFONY_CLONER)) {
+        if (! class_exists($symfonyClonerClass = static::SYMFONY_VAR_CLONER)) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
