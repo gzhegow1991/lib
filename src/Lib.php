@@ -789,7 +789,7 @@ class Lib
 
         array_unshift($throwableArgs, $throwableOrArg);
 
-        $throwableClass = $thePhp->static_throwable_class();
+        $throwableClass = $thePhp->staticThrowableClass();
 
         $trace = property_exists($throwableClass, 'trace')
             ? debug_backtrace()

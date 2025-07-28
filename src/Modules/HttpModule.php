@@ -15,6 +15,81 @@ use Gzhegow\Lib\Modules\Http\Session\SessionInterface;
 class HttpModule
 {
     /**
+     * @var class-string<DefaultCookies>
+     */
+    protected static $cookiesClass = DefaultCookies::class;
+    /**
+     * @var class-string<DefaultSession>
+     */
+    protected static $sessionClass = DefaultSession::class;
+    /**
+     * @var array
+     */
+    protected static $sessionOptions = [];
+
+    /**
+     * @param class-string<CookiesInterface>|null $cookiesClass
+     *
+     * @return class-string<CookiesInterface>
+     */
+    public static function staticCookiesClass(?string $cookiesClass = null) : string
+    {
+        $last = static::$cookiesClass;
+
+        if (null !== $cookiesClass) {
+            if (! is_subclass_of($cookiesClass, CookiesInterface::class)) {
+                throw new LogicException(
+                    [ 'The `cookiesClass` should be subclass of: ' . CookiesInterface::class, $cookiesClass ]
+                );
+            }
+
+            static::$cookiesClass = $cookiesClass;
+        }
+
+        static::$cookiesClass = static::$cookiesClass ?? DefaultCookies::class;
+
+        return $last;
+    }
+
+    /**
+     * @param class-string<SessionInterface>|null $sessionClass
+     *
+     * @return class-string<SessionInterface>
+     */
+    public static function staticSessionClass(?string $sessionClass = null) : string
+    {
+        $last = static::$sessionClass;
+
+        if (null !== $sessionClass) {
+            if (! is_subclass_of($sessionClass, SessionInterface::class)) {
+                throw new LogicException(
+                    [ 'The `cookiesClass` should be subclass of: ' . SessionInterface::class, $sessionClass ]
+                );
+            }
+
+            static::$sessionClass = $sessionClass;
+        }
+
+        static::$sessionClass = static::$sessionClass ?? DefaultSession::class;
+
+        return $last;
+    }
+
+    public static function staticSessionOptions(?array $sessionOptions = null) : array
+    {
+        $last = static::$sessionOptions;
+
+        if (null !== $sessionOptions) {
+            static::$sessionOptions = $sessionOptions;
+        }
+
+        static::$sessionOptions = static::$sessionOptions ?? [];
+
+        return $last;
+    }
+
+
+    /**
      * @var CookiesInterface
      */
     protected $cookies;
@@ -23,27 +98,13 @@ class HttpModule
      */
     protected $session;
 
-    /**
-     * @var class-string<DefaultCookies>
-     */
-    protected $cookiesClass = DefaultCookies::class;
-    /**
-     * @var class-string<DefaultSession>
-     */
-    protected $sessionClass = DefaultSession::class;
-    /**
-     * @var array
-     */
-    protected $sessionOptions = [];
-
-
     public function cookies() : CookiesInterface
     {
         if (null !== $this->cookies) {
             return $this->cookies;
         }
 
-        $cookiesClass = $this->static_cookies_class();
+        $cookiesClass = $this->staticCookiesClass();
 
         return $this->cookies = $cookiesClass::getInstance();
     }
@@ -54,77 +115,9 @@ class HttpModule
             return $this->session;
         }
 
-        $sessionClass = $this->static_session_class();
+        $sessionClass = $this->staticSessionClass();
 
         return $this->session = $sessionClass::getInstance();
-    }
-
-
-    /**
-     * @param class-string<CookiesInterface>|null $cookiesClass
-     *
-     * @return class-string<CookiesInterface>
-     */
-    public function static_cookies_class(?string $cookiesClass = null) : string
-    {
-        if (null !== $cookiesClass) {
-            if (! is_subclass_of($cookiesClass, CookiesInterface::class)) {
-                throw new LogicException(
-                    [ 'The `cookiesClass` should be subclass of: ' . CookiesInterface::class, $cookiesClass ]
-                );
-            }
-
-            $last = $this->cookiesClass;
-
-            $this->cookiesClass = $cookiesClass;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->cookiesClass ?? DefaultCookies::class;
-
-        return $result;
-    }
-
-    /**
-     * @param class-string<SessionInterface>|null $sessionClass
-     *
-     * @return class-string<SessionInterface>
-     */
-    public function static_session_class(?string $sessionClass = null) : string
-    {
-        if (null !== $sessionClass) {
-            if (! is_subclass_of($sessionClass, SessionInterface::class)) {
-                throw new LogicException(
-                    [ 'The `sessionClass` should be subclass of: ' . SessionInterface::class, $sessionClass ]
-                );
-            }
-
-            $last = $this->sessionClass;
-
-            $this->sessionClass = $sessionClass;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->sessionClass ?? DefaultSession::class;
-
-        return $result;
-    }
-
-    public function static_session_options(?array $sessionOptions = null) : array
-    {
-        if (null !== $sessionOptions) {
-            $last = $this->sessionOptions;
-
-            $this->sessionOptions = $sessionOptions;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->sessionOptions ?? [];
-
-        return $result;
     }
 
 

@@ -411,7 +411,7 @@ class DefaultThrowabler implements ThrowablerInterface
             $eFile = '{file}';
 
         } else {
-            $dirRoot = $this->dirRoot ?? $theDebug->static_dir_root();
+            $dirRoot = $this->dirRoot ?? $theDebug->staticDirRoot();
 
             if (null !== $dirRoot) {
                 try {
@@ -467,7 +467,7 @@ class DefaultThrowabler implements ThrowablerInterface
                 $eFile = '{file}';
 
             } else {
-                $dirRoot = $this->dirRoot ?? $theDebug->static_dir_root();
+                $dirRoot = $this->dirRoot ?? $theDebug->staticDirRoot();
 
                 if (null !== $dirRoot) {
                     try {
@@ -523,7 +523,7 @@ class DefaultThrowabler implements ThrowablerInterface
 
         $eTrace = $e->getTrace();
 
-        $dirRoot = $this->dirRoot ?? $theDebug->static_dir_root();
+        $dirRoot = $this->dirRoot ?? $theDebug->staticDirRoot();
 
         if (null !== $dirRoot) {
             foreach ( $eTrace as $i => $t ) {

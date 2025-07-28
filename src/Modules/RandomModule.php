@@ -17,33 +17,36 @@ class RandomModule
     /**
      * @var callable
      */
-    protected $fnUuid;
+    protected static $fnUuid;
+
+    /**
+     * @param callable $fnUuid
+     *
+     * @return callable
+     */
+    public static function staticUuidFn($fnUuid = null)
+    {
+        $last = static::$fnUuid;
+
+        if (null !== $fnUuid) {
+            if (! is_callable($fnUuid)) {
+                throw new LogicException(
+                    [ 'The `fnUuid` should be callable', $fnUuid ]
+                );
+            }
+
+            static::$fnUuid = $fnUuid;
+        }
+
+        static::$fnUuid = static::$fnUuid ?? null;
+
+        return $last;
+    }
 
 
     public function __construct()
     {
-        $this->fnUuid = [ $this, 'fnUuid' ];
-    }
-
-
-    /**
-     * @param callable $fn_uuid
-     *
-     * @return callable
-     */
-    public function static_uuid_fn($fn_uuid = null) : callable
-    {
-        if (null !== $fn_uuid) {
-            $last = $this->fnUuid;
-
-            $this->fnUuid = $fn_uuid;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->fnUuid ?? [ $this, 'fnUuid' ];
-
-        return $result;
+        static::$fnUuid = static::$fnUuid ?? [ $this, 'fnUuid' ];
     }
 
 
@@ -94,7 +97,7 @@ class RandomModule
 
     public function uuid() : string
     {
-        $fn = $this->static_uuid_fn();
+        $fn = $this->staticUuidFn();
 
         $uuid = call_user_func($fn);
 

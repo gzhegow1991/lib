@@ -452,7 +452,7 @@ class DefaultBacktracer implements BacktracerInterface
         $theDebug = Lib::debug();
         $theFs = Lib::fs();
 
-        $dirRoot = $this->dirRoot ?? $theDebug->static_dir_root();
+        $dirRoot = $this->dirRoot ?? $theDebug->staticDirRoot();
         $hasDirRoot = (null !== $dirRoot);
 
         $trace = $this->trace;

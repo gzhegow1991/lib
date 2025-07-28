@@ -25,6 +25,68 @@ use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 class PhpModule
 {
     /**
+     * @var class-string<\LogicException|\RuntimeException>
+     */
+    protected static $throwableClass = RuntimeException::class;
+    /**
+     * @var int
+     */
+    protected static $poolingTickUsleep = 1000;
+
+    /**
+     * @param class-string<\LogicException|\RuntimeException>|null $throwableClass
+     *
+     * @return class-string<\LogicException|\RuntimeException>
+     */
+    public static function staticThrowableClass(?string $throwableClass = null) : string
+    {
+        $last = static::$throwableClass;
+
+        if (null !== $throwableClass) {
+            if (! (false
+                || is_subclass_of($throwableClass, \LogicException::class)
+                || is_subclass_of($throwableClass, \RuntimeException::class)
+            )) {
+                throw new LogicException(
+                    [
+                        ''
+                        . 'The `throwableClass` should be a class-string that is subclass one of: '
+                        . '[ ' . implode(' ][ ', [ \LogicException::class, \RuntimeException::class ]) . ' ]',
+                        //
+                        $throwableClass,
+                    ]
+                );
+            }
+
+            static::$throwableClass = $throwableClass;
+        }
+
+        static::$throwableClass = static::$throwableClass ?? RuntimeException::class;
+
+        return $last;
+    }
+
+    public static function staticPoolingTickUsleep(?int $poolingTickUsleep = null) : int
+    {
+        $last = static::$poolingTickUsleep;
+
+        if (null !== $poolingTickUsleep) {
+            if ($poolingTickUsleep < 1) {
+                throw new LogicException(
+                    [ 'The `pooling_tick_usleep` should be a positive integer', $poolingTickUsleep ]
+                );
+            }
+
+            static::$poolingTickUsleep = $poolingTickUsleep;
+        }
+
+        static::$poolingTickUsleep = static::$poolingTickUsleep ?? 1000;
+
+        return $last;
+    }
+
+
+    /**
      * @var CallableParserInterface
      */
     protected $callableParser;
@@ -32,15 +94,6 @@ class PhpModule
      * @var PoolingFactoryInterface
      */
     protected $poolingFactory;
-
-    /**
-     * @var class-string<\LogicException|\RuntimeException>
-     */
-    protected $throwableClass = RuntimeException::class;
-    /**
-     * @var int
-     */
-    protected $poolingTickUsleep = 1000;
 
 
     /**
@@ -93,66 +146,6 @@ class PhpModule
     public function the_nil() : Nil
     {
         return new Nil();
-    }
-
-
-    /**
-     * @param class-string<\LogicException|\RuntimeException>|null $throwable_class
-     *
-     * @return class-string<\LogicException|\RuntimeException>
-     */
-    public function static_throwable_class(?string $throwable_class = null) : string
-    {
-        if (null !== $throwable_class) {
-            if (! (false
-                || is_subclass_of($throwable_class, \LogicException::class)
-                || is_subclass_of($throwable_class, \RuntimeException::class)
-            )) {
-                throw new LogicException(
-                    [
-                        ''
-                        . 'The `throwableClass` should be a class-string that is subclass one of: '
-                        . implode('|', [
-                            \LogicException::class,
-                            \RuntimeException::class,
-                        ]),
-                        //
-                        $throwable_class,
-                    ]
-                );
-            }
-
-            $last = $this->throwableClass;
-
-            $this->throwableClass = $throwable_class;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->throwableClass ?? RuntimeException::class;
-
-        return $result;
-    }
-
-    public function static_pooling_tick_usleep(?int $pooling_tick_usleep = null) : int
-    {
-        if (null !== $pooling_tick_usleep) {
-            if ($pooling_tick_usleep < 1) {
-                throw new LogicException(
-                    [ 'The `pooling_tick_usleep` should be a positive integer', $pooling_tick_usleep ]
-                );
-            }
-
-            $last = $this->poolingTickUsleep;
-
-            $this->poolingTickUsleep = $pooling_tick_usleep;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->poolingTickUsleep ?? 1000;
-
-        return $result;
     }
 
 
@@ -2923,7 +2916,7 @@ class PhpModule
     {
         $hasFnCatch = (null !== $fnCatch);
 
-        $tickUsleep = $tickUsleep ?? $this->static_pooling_tick_usleep();
+        $tickUsleep = $tickUsleep ?? $this->staticPoolingTickUsleep();
 
         if ($tickUsleep <= 0) {
             throw new LogicException(
@@ -3161,7 +3154,7 @@ class PhpModule
      */
     public function throw($throwableOrArg, ...$throwableArgs)
     {
-        $throwableClass = $this->static_throwable_class();
+        $throwableClass = $this->staticThrowableClass();
 
         $trace = property_exists($throwableClass, 'trace')
             ? debug_backtrace()
@@ -3181,7 +3174,7 @@ class PhpModule
      */
     public function throw_new(...$throwableArgs)
     {
-        $throwableClass = $this->static_throwable_class();
+        $throwableClass = $this->staticThrowableClass();
 
         $trace = property_exists($throwableClass, 'trace')
             ? debug_backtrace()
@@ -3225,7 +3218,7 @@ class PhpModule
      */
     public function throw_new_trace(array $trace, ...$throwableArgs)
     {
-        $throwableClass = $this->static_throwable_class();
+        $throwableClass = $this->staticThrowableClass();
 
         $throwableArgsNew = $this->throwable_args(...$throwableArgs);
         $throwableArgsNew[ 'file' ] = $trace[ 0 ][ 'file' ] ?? '{file}';

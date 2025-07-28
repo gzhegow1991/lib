@@ -13,15 +13,72 @@ class FormatJson
     /**
      * @var int
      */
-    protected $jsonDepth = 512;
+    protected static $jsonDepth = 512;
     /**
      * @var int
      */
-    protected $jsonEncodeFlags = 0;
+    protected static $jsonEncodeFlags = 0;
     /**
      * @var int
      */
-    protected $jsonDecodeFlags = 0;
+    protected static $jsonDecodeFlags = 0;
+
+    public static function staticJsonDepth(?int $jsonDepth = null) : int
+    {
+        $last = static::$jsonDepth;
+
+        if (null !== $jsonDepth) {
+            if ($jsonDepth < 0) {
+                throw new LogicException(
+                    [ 'The `jsonDepth` should be a non-negative integer', $jsonDepth ]
+                );
+            }
+
+            static::$jsonDepth = $jsonDepth;
+        }
+
+        static::$jsonDepth = static::$jsonDepth ?? 512;
+
+        return $last;
+    }
+
+    public static function staticJsonEncodeFlags(?int $jsonEncodeFlags = null) : int
+    {
+        $last = static::$jsonEncodeFlags;
+
+        if (null !== $jsonEncodeFlags) {
+            if ($jsonEncodeFlags < 0) {
+                throw new LogicException(
+                    [ 'The `jsonEncodeFlags` should be a non-negative integer', $jsonEncodeFlags ]
+                );
+            }
+
+            static::$jsonEncodeFlags = $jsonEncodeFlags;
+        }
+
+        static::$jsonEncodeFlags = static::$jsonEncodeFlags ?? 0;
+
+        return $last;
+    }
+
+    public static function staticJsonDecodeFlags(?int $jsonDecodeFlags = null) : int
+    {
+        $last = static::$jsonDecodeFlags;
+
+        if (null !== $jsonDecodeFlags) {
+            if ($jsonDecodeFlags < 0) {
+                throw new LogicException(
+                    [ 'The `jsonDecodeFlags` should be a non-negative integer', $jsonDecodeFlags ]
+                );
+            }
+
+            static::$jsonDecodeFlags = $jsonDecodeFlags;
+        }
+
+        static::$jsonDecodeFlags = static::$jsonDecodeFlags ?? 0;
+
+        return $last;
+    }
 
 
     public function __construct()
@@ -31,70 +88,6 @@ class FormatJson
                 'Missing PHP extension: json'
             );
         }
-    }
-
-
-    public function static_json_depth(?int $json_depth = null) : int
-    {
-        if (null !== $json_depth) {
-            if ($json_depth < 0) {
-                throw new LogicException(
-                    'The `jsonDepth` should be a non-negative integer'
-                );
-            }
-
-            $last = $this->jsonDepth;
-
-            $this->jsonDepth = $json_depth;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->jsonDepth ?? 512;
-
-        return $result;
-    }
-
-    public function static_json_encode_flags(?int $json_encode_flags = null) : int
-    {
-        if (null !== $json_encode_flags) {
-            if ($json_encode_flags < 0) {
-                throw new LogicException(
-                    'The `jsonEncodeFlags` should be a non-negative integer'
-                );
-            }
-
-            $last = $this->jsonEncodeFlags;
-
-            $this->jsonEncodeFlags = $json_encode_flags;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->jsonEncodeFlags ?? 0;
-
-        return $result;
-    }
-
-    public function static_json_decode_flags(?int $json_decode_flags = null) : int
-    {
-        if (null !== $json_decode_flags) {
-            if ($json_decode_flags < 0) {
-                throw new LogicException(
-                    'The `jsonDecodeFlags` should be a non-negative integer'
-                );
-            }
-
-            $last = $this->jsonDecodeFlags;
-
-            $this->jsonDecodeFlags = $json_decode_flags;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->jsonDecodeFlags ?? 0;
-
-        return $result;
     }
 
 
@@ -117,8 +110,8 @@ class FormatJson
             );
         }
 
-        $depth = $depth ?? $this->static_json_depth();
-        $flags = $flags ?? $this->static_json_decode_flags();
+        $depth = $depth ?? $this->staticJsonDepth();
+        $flags = $flags ?? $this->staticJsonDecodeFlags();
 
         $theFunc = Lib::func();
         $theType = Lib::type();
@@ -169,8 +162,8 @@ class FormatJson
             );
         }
 
-        $depth = $depth ?? $this->static_json_depth();
-        $flags = $flags ?? $this->static_json_decode_flags();
+        $depth = $depth ?? $this->staticJsonDepth();
+        $flags = $flags ?? $this->staticJsonDecodeFlags();
 
         $theFunc = Lib::func();
         $theType = Lib::type();
@@ -255,8 +248,8 @@ class FormatJson
             );
         }
 
-        $flags = $flags ?? $this->static_json_encode_flags();
-        $depth = $depth ?? $this->static_json_depth();
+        $flags = $flags ?? $this->staticJsonEncodeFlags();
+        $depth = $depth ?? $this->staticJsonDepth();
 
         try {
             $result = $theFunc->safe_call(
@@ -312,14 +305,14 @@ class FormatJson
             );
         }
 
-        $flags = $flags ?? $this->static_json_encode_flags();
+        $flags = $flags ?? $this->staticJsonEncodeFlags();
         $flags = $flags
             | JSON_PRETTY_PRINT
             | JSON_UNESCAPED_LINE_TERMINATORS
             | JSON_UNESCAPED_SLASHES
             | JSON_UNESCAPED_UNICODE;
 
-        $depth = $depth ?? $this->static_json_depth();
+        $depth = $depth ?? $this->staticJsonDepth();
 
         try {
             $result = $theFunc->safe_call(

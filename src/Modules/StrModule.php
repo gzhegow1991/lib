@@ -23,6 +23,33 @@ use Gzhegow\Lib\Modules\Str\Interpolator\InterpolatorInterface;
 class StrModule
 {
     /**
+     * @var bool
+     */
+    protected static $mbstring;
+
+    public static function staticMbstring(?bool $mbstring = null) : bool
+    {
+        $last = static::$mbstring;
+
+        if (null !== $mbstring) {
+            if ($mbstring) {
+                if (! extension_loaded('mbstring')) {
+                    throw new ExtensionException(
+                        'Missing PHP extension: mbstring'
+                    );
+                }
+            }
+
+            static::$mbstring = $mbstring;
+        }
+
+        static::$mbstring = static::$mbstring ?? false;
+
+        return $last;
+    }
+
+
+    /**
      * @var InflectorInterface
      */
     protected $inflector;
@@ -36,11 +63,6 @@ class StrModule
     protected $slugger;
 
     /**
-     * @var bool
-     */
-    protected $mbstring = false;
-
-    /**
      * @var array<string, callable-string>
      */
     protected $mbstringFuncMap = [];
@@ -48,19 +70,19 @@ class StrModule
 
     public function __construct()
     {
-        $theMb = Lib::mb();
+        static::$mbstring = static::$mbstring ?? extension_loaded('mbstring');
 
-        $mbstring = extension_loaded('mbstring');
+        if (static::$mbstring) {
+            $theMb = Lib::mb();
 
-        $this->mbstring = $mbstring;
+            $this->mbstringFuncMap[ 'lcfirst' ] = [ $theMb, 'lcfirst' ];
+            $this->mbstringFuncMap[ 'ucfirst' ] = [ $theMb, 'ucfirst' ];
+            $this->mbstringFuncMap[ 'lcwords' ] = [ $theMb, 'lcwords' ];
+            $this->mbstringFuncMap[ 'ucwords' ] = [ $theMb, 'ucwords' ];
 
-        $this->mbstringFuncMap[ 'lcfirst' ] = [ $theMb, 'lcfirst' ];
-        $this->mbstringFuncMap[ 'ucfirst' ] = [ $theMb, 'ucfirst' ];
-        $this->mbstringFuncMap[ 'lcwords' ] = [ $theMb, 'lcwords' ];
-        $this->mbstringFuncMap[ 'ucwords' ] = [ $theMb, 'ucwords' ];
-
-        if (PHP_VERSION_ID < 70400) {
-            $this->mbstringFuncMap[ 'str_split' ] = [ $theMb, 'str_split' ];
+            if (PHP_VERSION_ID < 70400) {
+                $this->mbstringFuncMap[ 'str_split' ] = [ $theMb, 'str_split' ];
+            }
         }
     }
 
@@ -122,30 +144,6 @@ class StrModule
     }
 
 
-    public function static_mbstring(?bool $mbstring = null) : bool
-    {
-        if (null !== $mbstring) {
-            if ($mbstring) {
-                if (! extension_loaded('mbstring')) {
-                    throw new ExtensionException(
-                        'Missing PHP extension: mbstring'
-                    );
-                }
-            }
-
-            $last = $this->mbstring;
-
-            $this->mbstring = $mbstring;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->mbstring ?? false;
-
-        return $result;
-    }
-
-
     /**
      * @param string   $fnName
      * @param callable $fn
@@ -172,7 +170,7 @@ class StrModule
      */
     public function mb_func(string $fn)
     {
-        if (! $this->static_mbstring()) {
+        if (! $this->staticMbstring()) {
             return $fn;
         }
 
@@ -1308,7 +1306,7 @@ class StrModule
             return 0;
         }
 
-        $len = $this->static_mbstring()
+        $len = $this->staticMbstring()
             ? ((null !== $mb_encoding)
                 ? mb_strlen($value, $mb_encoding)
                 : mb_strlen($value)
@@ -1344,7 +1342,7 @@ class StrModule
      */
     public function lower(string $string, ?string $mb_encoding = null) : string
     {
-        if ($this->static_mbstring()) {
+        if ($this->staticMbstring()) {
             $result = (null !== $mb_encoding)
                 ? mb_strtolower($string, $mb_encoding)
                 : mb_strtolower($string);
@@ -1352,7 +1350,11 @@ class StrModule
         } else {
             if ($this->is_utf8($string)) {
                 throw new RuntimeException(
-                    'The `string` contains UTF-8 symbols, but `mb_mode_static()` returns that multibyte features is disabled'
+                    [
+                        ''
+                        . 'The `string` contains UTF-8 symbols'
+                        . 'but `staticMbstring()` returned that multibyte features is disabled',
+                    ]
                 );
             }
 
@@ -1367,7 +1369,7 @@ class StrModule
      */
     public function upper(string $string, ?string $mb_encoding = null) : string
     {
-        if ($this->static_mbstring()) {
+        if ($this->staticMbstring()) {
             $result = (null !== $mb_encoding)
                 ? mb_strtoupper($string, $mb_encoding)
                 : mb_strtoupper($string);
@@ -1375,7 +1377,11 @@ class StrModule
         } else {
             if ($this->is_utf8($string)) {
                 throw new RuntimeException(
-                    'The `string` contains UTF-8 symbols, but `mb_mode_static()` returns that multibyte features is disabled'
+                    [
+                        ''
+                        . 'The `string` contains UTF-8 symbols'
+                        . 'but `staticMbstring()` returned that multibyte features is disabled',
+                    ]
                 );
             }
 
@@ -1393,7 +1399,7 @@ class StrModule
     {
         $theMb = Lib::mb();
 
-        if ($this->static_mbstring()) {
+        if ($this->staticMbstring()) {
             $result = $theMb->lcfirst($string, $mb_encoding);
 
         } else {
@@ -1401,8 +1407,8 @@ class StrModule
                 throw new RuntimeException(
                     [
                         ''
-                        . 'The `string` contains UTF-8 symbols '
-                        . 'but `mb_mode_static()` returns that multibyte features is disabled',
+                        . 'The `string` contains UTF-8 symbols'
+                        . 'but `staticMbstring()` returned that multibyte features is disabled',
                     ]
                 );
             }
@@ -1420,7 +1426,7 @@ class StrModule
     {
         $theMb = Lib::mb();
 
-        if ($this->static_mbstring()) {
+        if ($this->staticMbstring()) {
             $result = $theMb->ucfirst($string, $mb_encoding);
 
         } else {
@@ -1428,8 +1434,8 @@ class StrModule
                 throw new RuntimeException(
                     [
                         ''
-                        . 'The `string` contains UTF-8 symbols '
-                        . 'but `mb_mode_static()` returns that multibyte features is disabled',
+                        . 'The `string` contains UTF-8 symbols'
+                        . 'but `staticMbstring()` returned that multibyte features is disabled',
                     ]
                 );
             }
@@ -1503,7 +1509,7 @@ class StrModule
 
         $lengthInt = $theType->int_positive($length)->orThrow();
 
-        if ($this->static_mbstring()) {
+        if ($this->staticMbstring()) {
             $result = $theMb->str_split($string, $lengthInt, $mb_encoding);
 
         } else {
@@ -2573,7 +2579,7 @@ class StrModule
 
         $theStr = Lib::str();
 
-        $isUnicodeAllowed = $theStr->static_mbstring();
+        $isUnicodeAllowed = $theStr->staticMbstring();
 
         $_string = $isUnicodeAllowed
             ? preg_replace('/(?:[^\w]|[_])+/u', '', $string)

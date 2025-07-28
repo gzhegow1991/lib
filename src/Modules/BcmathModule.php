@@ -16,7 +16,26 @@ class BcmathModule
     /**
      * @var int
      */
-    protected $scaleLimit = 16;
+    protected static $scaleLimit = 16;
+
+    public static function staticScaleLimit(?int $scaleLimit = null) : int
+    {
+        $last = static::$scaleLimit;
+
+        if (null !== $scaleLimit) {
+            if ($scaleLimit < 0) {
+                throw new LogicException(
+                    [ 'The `scaleLimit` should be a non-negative integer', $scaleLimit ]
+                );
+            }
+
+            static::$scaleLimit = $scaleLimit;
+        }
+
+        static::$scaleLimit = static::$scaleLimit ?? 16;
+
+        return $last;
+    }
 
 
     public function __construct()
@@ -26,28 +45,6 @@ class BcmathModule
                 'Missing PHP extension: bcmath'
             );
         }
-    }
-
-
-    public function static_scale_limit(?int $scaleLimit = null) : int
-    {
-        if (null !== $scaleLimit) {
-            if ($scaleLimit < 0) {
-                throw new LogicException(
-                    [ 'The `scaleLimit` should be a non-negative integer', $scaleLimit ]
-                );
-            }
-
-            $last = $this->scaleLimit;
-
-            $this->scaleLimit = $scaleLimit;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->scaleLimit ?? 16;
-
-        return $result;
     }
 
 
@@ -115,7 +112,7 @@ class BcmathModule
 
         $scaleIntList = [];
 
-        $scaleLimit = $this->static_scale_limit();
+        $scaleLimit = $this->staticScaleLimit();
 
         if (null !== $scale) {
             $scaleInt = $theType->int_non_negative($scale)->orThrow();
@@ -155,7 +152,7 @@ class BcmathModule
 
         $scaleIntList = [];
 
-        $scaleLimit = $this->static_scale_limit();
+        $scaleLimit = $this->staticScaleLimit();
 
         if (null !== $scale) {
             $scaleInt = $theType->int_non_negative($scale)->orThrow();

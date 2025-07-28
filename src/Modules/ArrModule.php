@@ -14,34 +14,32 @@ class ArrModule
     /**
      * @var int
      */
-    protected $fnMode;
+    protected static $fnMode = _ARR_FN_USE_VALUE;
 
-
-    public function static_fn_mode(?int $fn_mode = null) : ?int
+    public static function staticFnMode(?int $fnMode = null) : ?int
     {
-        if (null !== $fn_mode) {
-            if ($fn_mode) {
-                if (0 === ($fn_mode & ~_ARR_FN_USE_ALL)) {
+        $last = static::$fnMode;
+
+        if (null !== $fnMode) {
+            if ($fnMode) {
+                if (0 === ($fnMode & ~_ARR_FN_USE_ALL)) {
                     throw new LogicException(
                         [
                             'The `fn_mode` should be a valid sequence of flags',
-                            $fn_mode,
+                            //
+                            $fnMode,
                             _ARR_FN_USE_ALL,
                         ]
                     );
                 }
             }
 
-            $last = $this->fnMode;
-
-            $this->fnMode = $fn_mode;
-
-            $result = $last;
+            static::$fnMode = $fnMode;
         }
 
-        $result = $result ?? $this->fnMode;
+        static::$fnMode = static::$fnMode ?? _ARR_FN_USE_VALUE;
 
-        return $result;
+        return $last;
     }
 
 
@@ -1681,7 +1679,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->static_fn_mode()
+            ?? $this->staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -1715,7 +1713,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->static_fn_mode()
+            ?? $this->staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -1757,7 +1755,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->static_fn_mode()
+            ?? $this->staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -1796,7 +1794,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->static_fn_mode()
+            ?? $this->staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -1840,7 +1838,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->static_fn_mode()
+            ?? $this->staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -1881,7 +1879,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->static_fn_mode()
+            ?? $this->staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -1919,7 +1917,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->static_fn_mode()
+            ?? $this->staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -1989,7 +1987,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->static_fn_mode()
+            ?? $this->staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -2029,7 +2027,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->static_fn_mode()
+            ?? $this->staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);

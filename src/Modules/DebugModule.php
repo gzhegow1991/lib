@@ -17,6 +17,46 @@ use Gzhegow\Lib\Modules\Debug\Backtracer\BacktracerInterface;
 class DebugModule
 {
     /**
+     * @var string
+     */
+    protected static $dirRoot;
+    /**
+     * @var array
+     */
+    protected static $varDumpOptions = [];
+
+    public static function staticDirRoot(?string $dirRoot = null) : ?string
+    {
+        $last = static::$dirRoot;
+
+        if (null !== $dirRoot) {
+            $theType = Lib::type();
+
+            $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
+
+            static::$dirRoot = $dirRootRealpath;
+        }
+
+        static::$dirRoot = static::$dirRoot ?? null;
+
+        return $last;
+    }
+
+    public static function staticVarDumpOptions(?array $varDumpOptions = null) : array
+    {
+        $last = static::$varDumpOptions;
+
+        if (null !== $varDumpOptions) {
+            static::$varDumpOptions = $varDumpOptions;
+        }
+
+        static::$varDumpOptions = static::$varDumpOptions ?? [];
+
+        return $last;
+    }
+
+
+    /**
      * @var DumperInterface
      */
     protected $dumper;
@@ -24,20 +64,10 @@ class DebugModule
      * @var ThrowablerInterface
      */
     protected $throwabler;
-
     /**
      * @var BacktracerInterface
      */
     protected $backtracer;
-
-    /**
-     * @var string
-     */
-    protected $dirRoot;
-    /**
-     * @var array
-     */
-    protected $varDumpOptions = [];
 
 
     public function newBacktracer() : BacktracerInterface
@@ -94,41 +124,6 @@ class DebugModule
             ?? $throwabler
             ?? $this->throwabler
             ?? $this->newThrowabler();
-    }
-
-
-    public function static_dir_root(?string $dirRoot = null) : ?string
-    {
-        $theType = Lib::type();
-
-        if (null !== $dirRoot) {
-            $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
-
-            $last = $this->dirRoot;
-
-            $this->dirRoot = $dirRootRealpath;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->dirRoot;
-
-        return $result;
-    }
-
-    public function static_var_dump_options(?array $varDumpOptions = null) : array
-    {
-        if (null !== $varDumpOptions) {
-            $last = $this->varDumpOptions;
-
-            $this->varDumpOptions = $varDumpOptions;
-
-            $result = $last;
-        }
-
-        $result = $result ?? $this->varDumpOptions ?? [];
-
-        return $result;
     }
 
 
@@ -352,7 +347,7 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
-            + $this->static_var_dump_options()
+            + $this->staticVarDumpOptions()
             + [
                 'array_level_max'  => 1,
                 'multiline_escape' => '###',
@@ -398,7 +393,7 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
-            + $this->static_var_dump_options()
+            + $this->staticVarDumpOptions()
             + [
                 'array_level_max'  => 1,
                 'multiline_escape' => '###',
@@ -448,7 +443,7 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
-            + $this->static_var_dump_options()
+            + $this->staticVarDumpOptions()
             + [
                 'array_level_max'  => 1,
                 'multiline_escape' => '###',
@@ -497,7 +492,7 @@ class DebugModule
                 'array_newline' => "\n",
             ]
             + $options
-            + $this->static_var_dump_options()
+            + $this->staticVarDumpOptions()
             + [
                 'array_level_max'  => 0,
                 'multiline_escape' => '###',
@@ -555,7 +550,7 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
-            + $this->static_var_dump_options()
+            + $this->staticVarDumpOptions()
             + [
                 'array_level_max'  => 0,
                 'multiline_escape' => '###',
@@ -630,7 +625,7 @@ class DebugModule
                 'array_newline' => "\n",
             ]
             + $options
-            + $this->static_var_dump_options()
+            + $this->staticVarDumpOptions()
             + [
                 'array_level_max'  => 0,
                 'multiline_escape' => '###',
@@ -796,7 +791,7 @@ class DebugModule
     {
         $options = []
             + $options
-            + $this->static_var_dump_options()
+            + $this->staticVarDumpOptions()
             + [
                 'with_type'        => true,
                 'with_id'          => true,

@@ -62,6 +62,42 @@ class DefaultDumper implements DumperInterface
 
 
     /**
+     * @var array{ 0?: string|false }
+     */
+    protected static $debugContentType = [];
+
+    /**
+     * @param array{ 0?: string|false }|null $contentType
+     *
+     * @return array{ 0?: string|false }
+     */
+    public static function staticDebugContentType(?array $contentType = null) : array
+    {
+        $last = static::$debugContentType;
+
+        if (null !== $contentType) {
+            $contentTypeValue = $contentType[ 0 ];
+
+            if (false === $contentTypeValue) {
+                static::$debugContentType = [ false ];
+
+            } elseif (is_string($contentTypeValue) && ('' !== $contentTypeValue)) {
+                static::$debugContentType = [ $contentTypeValue ];
+
+            } else {
+                throw new LogicException(
+                    [ 'The `contentType` should be non-empty string or be FALSE', $contentType ]
+                );
+            }
+        }
+
+        static::$debugContentType = static::$debugContentType ?? [];
+
+        return $last;
+    }
+
+
+    /**
      * @var \Symfony\Component\VarDumper\Cloner\ClonerInterface
      */
     protected $symfonyCloner;
@@ -556,7 +592,7 @@ class DefaultDumper implements DumperInterface
         $content = $this->printerPrint(...$vars);
         $content .= "\n";
 
-        $this->sendContentType('text/plain');
+        $this->sendDebugContentTypeOnShutdown('text/plain');
 
         echo $content;
     }
@@ -568,7 +604,7 @@ class DefaultDumper implements DumperInterface
 
         $htmlContent = nl2br($content);
 
-        $this->sendContentType('text/html');
+        $this->sendDebugContentTypeOnShutdown('text/html');
 
         echo $htmlContent;
     }
@@ -581,7 +617,7 @@ class DefaultDumper implements DumperInterface
 
         $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . "\n";
 
-        $this->sendContentType('text/html');
+        $this->sendDebugContentTypeOnShutdown('text/html');
 
         echo $htmlContent;
     }
@@ -648,7 +684,7 @@ class DefaultDumper implements DumperInterface
         $content = $this->printerPrint(...$vars);
         $content .= "\n";
 
-        $this->sendContentType('text/plain');
+        $this->sendDebugContentTypeOnShutdown('text/plain');
 
         fwrite($resource, $content);
         fflush($resource);
@@ -667,7 +703,7 @@ class DefaultDumper implements DumperInterface
 
         $htmlContent = nl2br($content);
 
-        $this->sendContentType('text/html');
+        $this->sendDebugContentTypeOnShutdown('text/html');
 
         fwrite($resource, $htmlContent);
         fflush($resource);
@@ -687,7 +723,7 @@ class DefaultDumper implements DumperInterface
 
         $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . "\n";
 
-        $this->sendContentType('text/html');
+        $this->sendDebugContentTypeOnShutdown('text/html');
 
         fwrite($resource, $htmlContent);
         fflush($resource);
@@ -764,24 +800,32 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    protected function sendContentType(string $contentType) : void
+    protected function sendDebugContentTypeOnShutdown(string $contentType) : void
     {
-        static $debugContentType;
+        $debugContentType = $this->staticDebugContentType();
 
-        $debugContentType = $debugContentType ?? null;
-
-        if (null !== $debugContentType) {
+        if ([] !== $debugContentType) {
             return;
         }
 
+        $theEntrypoint = Lib::entrypoint();
         $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $contentTypeValid = $theType->string_not_empty($contentType)->orThrow();
+        $contentTypeValid = strtolower($contentTypeValid);
 
         $isTerminal = $thePhp->is_terminal();
 
         if ($isTerminal) {
-            $debugContentType = 'terminal';
+            $this->staticDebugContentType([ false ]);
 
             return;
+        }
+
+        $level = ob_get_level();
+        for ( $i = $level; $i > 0; $i-- ) {
+            ob_flush();
         }
 
         $headerSentContentType = null;
@@ -796,17 +840,32 @@ class DefaultDumper implements DumperInterface
         }
 
         if (null === $headerSentContentType) {
-            header("Content-Type: {$contentType}", true, 418);
+            $this->staticDebugContentType([ $contentTypeValid ]);
 
-            $debugContentType = $contentType;
-
-        } elseif ($contentType === $headerSentContentType) {
-            $debugContentType = $contentType;
+        } elseif ($contentTypeValid === $headerSentContentType) {
+            $this->staticDebugContentType([ $contentTypeValid ]);
 
         } else {
             throw new RuntimeException(
                 [ 'Headers already sent', $file, $line ]
             );
+        }
+
+        $theEntrypoint->registerShutdownFunction(
+            [ static::class, 'onShutdownEnsureDebugContentType' ]
+        );
+    }
+
+    public static function onShutdownEnsureDebugContentType() : void
+    {
+        $debugContentType = static::staticDebugContentType();
+
+        if ([] !== $debugContentType) {
+            $debugContentTypeCurrentValue = $debugContentType[ 0 ];
+
+            if (false !== $debugContentTypeCurrentValue) {
+                header("Content-Type: {$debugContentTypeCurrentValue}", true, 418);
+            }
         }
     }
 }
