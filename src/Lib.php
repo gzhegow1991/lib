@@ -35,8 +35,31 @@ use Gzhegow\Lib\Modules\Func\Pipe\Pipe;
 use Gzhegow\Lib\Modules\ItertoolsModule;
 use Gzhegow\Lib\Modules\EntrypointModule;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Modules\Format\FormatCsv;
+use Gzhegow\Lib\Modules\Format\FormatXml;
+use Gzhegow\Lib\Modules\Format\FormatJson;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
+use Gzhegow\Lib\Modules\Fs\FileSafe\FileSafeProxy;
+use Gzhegow\Lib\Modules\Debug\Dumper\DumperInterface;
+use Gzhegow\Lib\Modules\Str\Slugger\SluggerInterface;
+use Gzhegow\Lib\Modules\Fs\SocketSafe\SocketSafeProxy;
+use Gzhegow\Lib\Modules\Fs\StreamSafe\StreamSafeProxy;
+use Gzhegow\Lib\Modules\Func\Invoker\InvokerInterface;
+use Gzhegow\Lib\Modules\Http\Cookies\CookiesInterface;
+use Gzhegow\Lib\Modules\Http\Session\SessionInterface;
+use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
+use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
+use Gzhegow\Lib\Modules\Str\Inflector\InflectorInterface;
+use Gzhegow\Lib\Modules\Async\Clock\ClockManagerInterface;
+use Gzhegow\Lib\Modules\Cli\Process\ProcessManagerInterface;
+use Gzhegow\Lib\Modules\Debug\Backtracer\BacktracerInterface;
+use Gzhegow\Lib\Modules\Debug\Throwabler\ThrowablerInterface;
+use Gzhegow\Lib\Modules\Async\Promise\PromiseManagerInterface;
+use Gzhegow\Lib\Modules\Str\Interpolator\InterpolatorInterface;
+use Gzhegow\Lib\Modules\Social\EmailParser\EmailParserInterface;
+use Gzhegow\Lib\Modules\Social\PhoneManager\PhoneManagerInterface;
+use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
 
 class Lib
@@ -51,22 +74,22 @@ class Lib
         return static::$async = static::$async ?? new AsyncModule();
     }
 
-    public static function asyncClock()
+    public static function asyncClock() : ClockManagerInterface
     {
         return Lib::async()->clockManager();
     }
 
-    public static function asyncLoop()
+    public static function asyncLoop() : LoopManagerInterface
     {
         return Lib::async()->loopManager();
     }
 
-    public static function asyncPromise()
+    public static function asyncPromise() : PromiseManagerInterface
     {
         return Lib::async()->promiseManager();
     }
 
-    public static function asyncFetchApi()
+    public static function asyncFetchApi() : FetchApiInterface
     {
         return Lib::async()->fetchApi();
     }
@@ -82,7 +105,7 @@ class Lib
         return static::$cli = static::$cli ?? new CliModule();
     }
 
-    public static function cliProcessManager()
+    public static function cliProcessManager() : ProcessManagerInterface
     {
         return Lib::cli()->processManager();
     }
@@ -98,17 +121,17 @@ class Lib
         return static::$debug = static::$debug ?? new DebugModule();
     }
 
-    public static function debugBacktracer()
+    public static function debugBacktracer() : BacktracerInterface
     {
         return Lib::debug()->backtracer();
     }
 
-    public static function debugDumper()
+    public static function debugDumper() : DumperInterface
     {
         return Lib::debug()->dumper();
     }
 
-    public static function debugThrowabler()
+    public static function debugThrowabler() : ThrowablerInterface
     {
         return Lib::debug()->throwabler();
     }
@@ -124,17 +147,17 @@ class Lib
         return static::$format = static::$format ?? new FormatModule();
     }
 
-    public static function formatCsv()
+    public static function formatCsv() : FormatCsv
     {
         return Lib::format()->csv();
     }
 
-    public static function formatJson()
+    public static function formatJson() : FormatJson
     {
         return Lib::format()->json();
     }
 
-    public static function formatXml()
+    public static function formatXml() : FormatXml
     {
         return Lib::format()->xml();
     }
@@ -150,17 +173,17 @@ class Lib
         return static::$fs = static::$fs ?? new FsModule();
     }
 
-    public static function fsFile()
+    public static function fsFile() : FileSafeProxy
     {
         return Lib::fs()->fileSafe();
     }
 
-    public static function fsSocket()
+    public static function fsSocket() : SocketSafeProxy
     {
         return Lib::fs()->socketSafe();
     }
 
-    public static function fsStream()
+    public static function fsStream() : StreamSafeProxy
     {
         return Lib::fs()->streamSafe();
     }
@@ -176,7 +199,7 @@ class Lib
         return static::$func = static::$func ?? new FuncModule();
     }
 
-    public static function funcInvoker()
+    public static function funcInvoker() : InvokerInterface
     {
         return Lib::func()->invoker();
     }
@@ -192,12 +215,12 @@ class Lib
         return static::$http = static::$http ?? new HttpModule();
     }
 
-    public static function httpCookies()
+    public static function httpCookies() : CookiesInterface
     {
         return Lib::http()->cookies();
     }
 
-    public static function httpSession()
+    public static function httpSession() : SessionInterface
     {
         return Lib::http()->session();
     }
@@ -213,7 +236,7 @@ class Lib
         return static::$php = static::$php ?? new PhpModule();
     }
 
-    public static function phpCallableParser()
+    public static function phpCallableParser() : CallableParserInterface
     {
         return Lib::php()->callableParser();
     }
@@ -229,12 +252,12 @@ class Lib
         return static::$social = static::$social ?? new SocialModule();
     }
 
-    public static function socialEmail()
+    public static function socialEmail() : EmailParserInterface
     {
         return Lib::social()->emailParser();
     }
 
-    public static function socialPhone()
+    public static function socialPhone() : PhoneManagerInterface
     {
         return Lib::social()->phoneManager();
     }
@@ -250,17 +273,17 @@ class Lib
         return static::$str = static::$str ?? new StrModule();
     }
 
-    public static function strInflector()
+    public static function strInflector() : InflectorInterface
     {
         return Lib::str()->inflector();
     }
 
-    public static function strInterpolator()
+    public static function strInterpolator() : InterpolatorInterface
     {
         return Lib::str()->interpolator();
     }
 
-    public static function strSlugger()
+    public static function strSlugger() : SluggerInterface
     {
         return Lib::str()->slugger();
     }
@@ -605,6 +628,26 @@ class Lib
         }
 
         return $microtime;
+    }
+
+
+    public static function dumper($dumper = null, $printer = null) : DumperInterface
+    {
+        $theDebugDumper = Lib::debugDumper();
+
+        if (null !== $dumper) {
+            $dumperArray = (array) $dumper;
+
+            $theDebugDumper->selectDumper(...$dumperArray);
+        }
+
+        if (null !== $printer) {
+            $printerArray = (array) $printer;
+
+            $theDebugDumper->selectPrinter(...$printerArray);
+        }
+
+        return $theDebugDumper;
     }
 
 

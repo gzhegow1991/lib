@@ -128,6 +128,19 @@ class HttpModule
     }
 
 
+    public function is_ajax() : bool
+    {
+        $serverXRequestedWith = $_SERVER[ 'HTTP_X_REQUESTED_WITH' ] ?? null;
+        $serverXRequestedWith = (string) $serverXRequestedWith;
+        $serverXRequestedWith = strtolower($serverXRequestedWith);
+        $serverXRequestedWith = $serverXRequestedWith ?: null;
+
+        $isAjax = ('xmlhttprequest' === $serverXRequestedWith);
+
+        return $isAjax;
+    }
+
+
     /**
      * @return HttpHeader[]
      */

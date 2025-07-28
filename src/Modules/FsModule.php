@@ -43,34 +43,34 @@ class FsModule
     }
 
 
-    public function newFileSafe()
+    public function newFileSafe() : FileSafeProxy
     {
         return new FileSafeProxy(new FileSafe());
     }
 
-    public function fileSafe()
+    public function fileSafe() : FileSafeProxy
     {
         return $this->newFileSafe();
     }
 
 
-    public function newSocketSafe()
+    public function newSocketSafe() : SocketSafeProxy
     {
         return new SocketSafeProxy(new SocketSafe());
     }
 
-    public function socketSafe()
+    public function socketSafe() : SocketSafeProxy
     {
         return $this->newSocketSafe();
     }
 
 
-    public function newStreamSafe()
+    public function newStreamSafe() : StreamSafeProxy
     {
         return new StreamSafeProxy(new StreamSafe());
     }
 
-    public function streamSafe()
+    public function streamSafe() : StreamSafeProxy
     {
         return $this->newStreamSafe();
     }

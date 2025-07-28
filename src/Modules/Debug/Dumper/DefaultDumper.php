@@ -74,11 +74,11 @@ class DefaultDumper implements DumperInterface
     /**
      * @var string
      */
-    protected $printerDefault = 'var_dump';
+    protected $printer = 'var_dump';
     /**
      * @var string
      */
-    protected $printer = 'var_dump';
+    protected $printerDefault = 'var_dump';
     /**
      * @var array
      */
@@ -87,11 +87,11 @@ class DefaultDumper implements DumperInterface
     /**
      * @var string
      */
-    protected $dumperDefault = 'echo';
+    protected $dumper = 'echo';
     /**
      * @var string
      */
-    protected $dumper = 'echo';
+    protected $dumperDefault = 'echo';
     /**
      * @var array
      */
@@ -107,6 +107,12 @@ class DefaultDumper implements DumperInterface
             : 'echo_html';
 
         $this->dumper = $this->dumperDefault = $dumperDefault;
+    }
+
+
+    public function hasSymfony() : bool
+    {
+        return class_exists(static::SYMFONY_CLONER_INTERFACE);
     }
 
 
@@ -291,12 +297,10 @@ class DefaultDumper implements DumperInterface
             }
         }
 
-        $printer = $printer ?? $this->printerDefault;
-
-        $this->printer = $printer;
+        $this->printer = $printer ?? $this->printerDefault;
 
         if (null !== $printerOptions) {
-            $this->printerOptions[ $printer ] = $printerOptions;
+            $this->printerOptions[ $this->printer ] = $printerOptions;
         }
 
         return $this;
@@ -487,7 +491,7 @@ class DefaultDumper implements DumperInterface
         $this->dumper = $dumper ?? $this->dumperDefault;
 
         if (null !== $dumperOptions) {
-            $this->dumperOptions = $dumperOptions;
+            $this->dumperOptions[ $this->dumper ] = $dumperOptions;
         }
 
         return $this;
@@ -538,20 +542,13 @@ class DefaultDumper implements DumperInterface
 
     public function dumperEcho_devtools(...$vars) : void
     {
-        $thePhp = Lib::php();
-
         $content = $this->printerPrint(...$vars);
 
         $b64content = base64_encode($content);
 
         $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . "\n";
 
-        $isTerminal = $thePhp->is_terminal();
-        $isHeadersSent = headers_sent();
-
-        if (! ($isTerminal || $isHeadersSent)) {
-            header('Content-Type: text/html', true, 200);
-        }
+        $this->sendContentType('text/html');
 
         echo $htmlContent;
     }
@@ -567,67 +564,51 @@ class DefaultDumper implements DumperInterface
 
     public function dumperEcho_echo_text(...$vars) : void
     {
-        $thePhp = Lib::php();
-
         $content = $this->printerPrint(...$vars);
         $content .= "\n";
 
-        $htmlContent = nl2br($content);
+        $this->sendContentType('text/plain');
 
-        $isTerminal = $thePhp->is_terminal();
-        $isHeadersSent = headers_sent();
-
-        if (! ($isTerminal || $isHeadersSent)) {
-            header('Content-Type: text/plain', true, 200);
-        }
-
-        echo $htmlContent;
+        echo $content;
     }
 
     public function dumperEcho_echo_html(...$vars) : void
     {
-        $thePhp = Lib::php();
-
         $content = $this->printerPrint(...$vars);
         $content .= "\n";
 
         $htmlContent = nl2br($content);
 
-        $isTerminal = $thePhp->is_terminal();
-        $isHeadersSent = headers_sent();
-
-        if (! ($isTerminal || $isHeadersSent)) {
-            header('Content-Type: text/html', true, 200);
-        }
+        $this->sendContentType('text/html');
 
         echo $htmlContent;
     }
 
     public function dumperEcho_pdo(...$vars) : void
     {
-        $options = $this->dumperOptions;
+        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
 
-        $pdo = $options[ 'pdo' ] ?? $options[ 0 ];
-        $table = $options[ 'table' ] ?? $options[ 1 ];
-        $column = $options[ 'column' ] ?? $options[ 2 ];
+        $pdo = $dumperOptions[ 'pdo' ] ?? $dumperOptions[ 0 ];
+        $table = $dumperOptions[ 'table' ] ?? $dumperOptions[ 1 ];
+        $column = $dumperOptions[ 'column' ] ?? $dumperOptions[ 2 ];
 
         if (! ($pdo instanceof \PDO)) {
             throw new LogicException(
-                [ 'The `options.pdo` should be an instance of: ' . \PDO::class, $options ]
+                [ 'The `options.pdo` should be an instance of: ' . \PDO::class, $dumperOptions ]
             );
         }
 
         $tableString = (string) $table;
         if ('' === $tableString) {
             throw new LogicException(
-                [ 'The `options.table` should be a non-empty string', $options ]
+                [ 'The `options.table` should be a non-empty string', $dumperOptions ]
             );
         }
 
         $columnString = (string) $column;
         if ('' === $columnString) {
             throw new LogicException(
-                [ 'The `options.column` should be a non-empty string', $options ]
+                [ 'The `options.column` should be a non-empty string', $dumperOptions ]
             );
         }
 
@@ -643,9 +624,9 @@ class DefaultDumper implements DumperInterface
     {
         $thePhp = Lib::php();
 
-        $options = $this->dumperOptions;
+        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
 
-        $resource = $options[ 'resource' ] ?? $thePhp->output();
+        $resource = $dumperOptions[ 'resource' ] ?? $thePhp->output();
 
         $content = $this->printerPrint(...$vars);
         $content .= "\n";
@@ -658,23 +639,16 @@ class DefaultDumper implements DumperInterface
     {
         $thePhp = Lib::php();
 
-        $options = $this->dumperOptions;
+        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
 
-        $resource = $options[ 'resource' ] ?? $thePhp->output();
+        $resource = $dumperOptions[ 'resource' ] ?? $thePhp->output();
 
         $content = $this->printerPrint(...$vars);
         $content .= "\n";
 
-        $htmlContent = nl2br($content);
+        $this->sendContentType('text/plain');
 
-        $isTerminal = $thePhp->is_terminal();
-        $isHeadersSent = headers_sent();
-
-        if (! ($isTerminal || $isHeadersSent)) {
-            header('Content-Type: text/html', true, 200);
-        }
-
-        fwrite($resource, $htmlContent);
+        fwrite($resource, $content);
         fflush($resource);
     }
 
@@ -682,21 +656,16 @@ class DefaultDumper implements DumperInterface
     {
         $thePhp = Lib::php();
 
-        $options = $this->dumperOptions;
+        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
 
-        $resource = $options[ 'resource' ] ?? $thePhp->output();
+        $resource = $dumperOptions[ 'resource' ] ?? $thePhp->output();
 
         $content = $this->printerPrint(...$vars);
         $content .= "\n";
 
         $htmlContent = nl2br($content);
 
-        $isTerminal = $thePhp->is_terminal();
-        $isHeadersSent = headers_sent();
-
-        if (! ($isTerminal || $isHeadersSent)) {
-            header('Content-Type: text/html', true, 200);
-        }
+        $this->sendContentType('text/html');
 
         fwrite($resource, $htmlContent);
         fflush($resource);
@@ -770,5 +739,52 @@ class DefaultDumper implements DumperInterface
         $traceWhereIs = "{$traceFile}: {$traceLine}";
 
         $this->dumperEcho($traceWhereIs, ...$vars);
+    }
+
+
+    protected function sendContentType(string $contentType) : void
+    {
+        static $debugContentType;
+
+        $debugContentType = $debugContentType ?? null;
+
+        if (null !== $debugContentType) {
+            return;
+        }
+
+        $thePhp = Lib::php();
+
+        $isTerminal = $thePhp->is_terminal();
+
+        if ($isTerminal) {
+            $debugContentType = 'terminal';
+
+            return;
+        }
+
+        $headerSentContentType = null;
+        if (headers_sent($file, $line)) {
+            foreach ( headers_list() as $header ) {
+                if (0 === stripos($header, 'Content-Type:')) {
+                    $headerSentContentType = substr($header, strlen('Content-Type:'));
+                    $headerSentContentType = explode(';', $headerSentContentType)[ 0 ];
+                    $headerSentContentType = strtolower(trim($headerSentContentType));
+                }
+            }
+
+            if (null === $headerSentContentType) {
+                header("Content-Type: {$contentType}", true, 418);
+
+                $debugContentType = $contentType;
+
+            } elseif ($contentType === $headerSentContentType) {
+                $debugContentType = $contentType;
+
+            } else {
+                throw new RuntimeException(
+                    [ 'Headers already sent', $file, $line ]
+                );
+            }
+        }
     }
 }

@@ -11,34 +11,34 @@ use Gzhegow\Lib\Modules\Format\FormatJson;
 
 class FormatModule
 {
-    public function newCsv()
+    public function newCsv() : FormatCsv
     {
         return new FormatCsv();
     }
 
-    public function csv()
+    public function csv() : FormatCsv
     {
         return $this->newCsv();
     }
 
 
-    public function newJson()
+    public function newJson() : FormatJson
     {
         return new FormatJson();
     }
 
-    public function json()
+    public function json() : FormatJson
     {
         return $this->newJson();
     }
 
 
-    public function newXml()
+    public function newXml() : FormatXml
     {
         return new FormatXml();
     }
 
-    public function xml()
+    public function xml() : FormatXml
     {
         return $this->newXml();
     }
