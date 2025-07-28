@@ -15,9 +15,18 @@ class DefaultCookies implements CookiesInterface
     protected $id = 0;
 
     /**
+     * @var bool
+     */
+    protected $useQueueMode = true;
+
+    /**
      * @var array<int, HttpCookie>
      */
     protected $cookiesList = [];
+    /**
+     * @var array<int, HttpCookie>
+     */
+    protected $cookiesListAlreadySent = [];
 
     /**
      * @var array<int, string>
@@ -28,25 +37,13 @@ class DefaultCookies implements CookiesInterface
      */
     protected $cookiesIndexByIndex = [];
 
-    /**
-     * @var bool
-     */
-    protected $isHeadersSent = false;
-    /**
-     * @var bool
-     */
-    protected $isHeaderRegisterCallbackCalled = false;
-
 
     private function __construct()
     {
         $this->loadCookiesList();
 
-        $this->isHeadersSent();
-
-        $this->headerRegisterCallback();
+        $this->registerShutdownFunction();
     }
-
 
     protected function loadCookiesList() : void
     {
@@ -61,34 +58,44 @@ class DefaultCookies implements CookiesInterface
 
             $httpCookie = HttpCookie::fromObjectHttpHeader($httpHeader)->orThrow();
 
-            $httpCookieName = $httpCookie->getName();
-            $httpCookiePath = $httpCookie->getPath();
-            $httpCookie->hasDomain($httpCookieDomain);
-
-            $id = $this->id++;
-
-            $index = $this->indexCookie($httpCookieName, $httpCookiePath, $httpCookieDomain);
-
-            $this->cookiesIndexById[ $id ] = $index;
-            $this->cookiesIndexByIndex[ $index ] = $id;
-
-            $this->cookiesList[ $id ] = $httpCookie;
+            $this->registerCookie($httpCookie, $alreadySent = true);
         }
     }
 
 
-    protected function isHeadersSent() : bool
+    /**
+     * @return static
+     */
+    public function useQueueMode(?bool $useQueueMode = null)
     {
-        return $this->isHeadersSent = headers_sent();
+        $useQueueMode = $useQueueMode ?? true;
+
+        $this->useQueueMode = $useQueueMode;
+
+        if (! $this->useQueueMode) {
+            if ([] !== $this->cookiesList) {
+                $this->endFlush();
+            }
+        }
+
+        return $this;
     }
 
 
     /**
      * @return array<int, HttpCookie>
      */
-    public function getList() : array
+    public function getCookieList() : array
     {
         return $this->cookiesList;
+    }
+
+    /**
+     * @return array<int, HttpCookie>
+     */
+    public function getCookiesListAlreadySent() : array
+    {
+        return $this->cookiesListAlreadySent;
     }
 
 
@@ -142,11 +149,22 @@ class DefaultCookies implements CookiesInterface
         return false;
     }
 
-
-    public function getById(int $cookieId) : HttpCookie
+    public function hasById(
+        int $cookieId,
+        ?HttpCookie &$cookie = null
+    ) : bool
     {
-        return $this->cookiesList[ $cookieId ];
+        $cookie = null;
+
+        if (isset($this->cookiesList[ $cookieId ])) {
+            $cookie = $this->cookiesList[ $cookieId ];
+
+            return true;
+        }
+
+        return false;
     }
+
 
     public function get(string $cookieName, string $cookiePath, ?string $cookieDomain = null) : HttpCookie
     {
@@ -179,6 +197,11 @@ class DefaultCookies implements CookiesInterface
         return $cookieList;
     }
 
+    public function getById(int $cookieId) : HttpCookie
+    {
+        return $this->cookiesList[ $cookieId ];
+    }
+
 
     /**
      * @return static
@@ -190,57 +213,24 @@ class DefaultCookies implements CookiesInterface
         ?bool $secure = null, ?bool $httponly = null
     )
     {
-        if ($this->isHeadersSent()) {
-            $this->setSendToResponse(func_get_args());
+        $setrawcookieArgs = func_get_args();
 
-        } else {
-            $this->setAddToQueue(func_get_args());
+        $httpCookie = HttpCookie::fromArraySetrawcookieArgs($setrawcookieArgs)->orThrow();
+
+        $cookieId = $this->registerCookie($httpCookie);
+
+        if (! $this->useQueueMode) {
+            $theHttp = Lib::http();
+
+            call_user_func_array(
+                [ $theHttp, 'setrawcookie' ],
+                $setrawcookieArgs
+            );
+
+            $this->cookiesListAlreadySent[ $cookieId ] = $httpCookie;
         }
 
         return $this;
-    }
-
-    protected function setAddToQueue(array $setrawcookieArgs = []) : void
-    {
-        $httpCookie = HttpCookie::fromArraySetrawcookieArgs($setrawcookieArgs)->orThrow();
-
-        $id = $this->id++;
-
-        $httpCookieName = $httpCookie->getName();
-        $httpCookiePath = $httpCookie->getPath();
-        $httpCookie->hasDomain($httpCookieDomain);
-
-        $index = $this->indexCookie($httpCookieName, $httpCookiePath, $httpCookieDomain);
-
-        $this->cookiesIndexById[ $id ] = $index;
-        $this->cookiesIndexByIndex[ $index ][ $id ] = true;
-
-        $this->cookiesList[ $id ] = $httpCookie;
-    }
-
-    protected function setSendToResponse(array $setrawcookieArgs = []) : void
-    {
-        $theHttp = Lib::http();
-
-        $httpCookie = HttpCookie::fromArraySetrawcookieArgs($setrawcookieArgs)->orThrow();
-
-        call_user_func_array(
-            [ $theHttp, 'setrawcookie' ],
-            $setrawcookieArgs
-        );
-
-        $id = $this->id++;
-
-        $httpCookieName = $httpCookie->getName();
-        $httpCookiePath = $httpCookie->getPath();
-        $httpCookie->hasDomain($httpCookieDomain);
-
-        $index = $this->indexCookie($httpCookieName, $httpCookiePath, $httpCookieDomain);
-
-        $this->cookiesIndexById[ $id ] = $index;
-        $this->cookiesIndexByIndex[ $index ][ $id ] = true;
-
-        $this->cookiesList[ $id ] = $httpCookie;
     }
 
 
@@ -264,14 +254,17 @@ class DefaultCookies implements CookiesInterface
 
         unset($this->cookiesList[ $cookieId ]);
 
-        $isHeadersSent = $this->isHeadersSent();
+        if (isset($this->cookiesListAlreadySent[ $cookieId ])) {
+            $theHttp = Lib::http();
 
-        if ($isHeadersSent) {
             $setrawcookieArgs = $httpCookie->toArraySetrawcookieArgs();
             $setrawcookieArgs[ 1 ] = '';
             $setrawcookieArgs[ 2 ][ 'expires' ] = time() - 99999;
 
-            setrawcookie(...$setrawcookieArgs);
+            call_user_func_array(
+                [ $theHttp, 'setrawcookie' ],
+                $setrawcookieArgs
+            );
         }
 
         return $this;
@@ -310,52 +303,89 @@ class DefaultCookies implements CookiesInterface
     /**
      * @return HttpCookie[]
      */
-    public function flush() : array
+    public function endClean() : array
     {
-        $result = $this->cookiesList;
+        $cookieList = $this->cookiesList;
 
         $this->cookiesList = [];
 
         $this->cookiesIndexById = [];
         $this->cookiesIndexByIndex = [];
 
-        return $result;
+        return $cookieList;
     }
 
     /**
      * @return HttpCookie[]
      */
-    public function flushSend() : array
+    public function endFlush() : array
     {
         $theHttp = Lib::http();
 
-        $result = $this->flush();
+        $cookieList = $this->cookiesList;
 
-        foreach ( $result as $httpCookie ) {
-            call_user_func_array(
-                [ $theHttp, 'setrawcookie' ],
-                $httpCookie->toArraySetrawcookieArgs()
-            );
+        $this->cookiesList = [];
+
+        $this->cookiesIndexById = [];
+        $this->cookiesIndexByIndex = [];
+
+        $isHeadersSent = headers_sent();
+
+        if (! $isHeadersSent) {
+            foreach ( $cookieList as $cookieId => $httpCookie ) {
+                if (isset($this->cookiesListAlreadySent[ $cookieId ])) {
+                    continue;
+                }
+
+                call_user_func_array(
+                    [ $theHttp, 'setrawcookie' ],
+                    $httpCookie->toArraySetrawcookieArgs()
+                );
+
+                $this->cookiesListAlreadySent[ $cookieId ] = $httpCookie;
+            }
         }
 
-        return $result;
+        return $cookieList;
     }
 
 
-    public function headerRegisterCallbackFn() : void
+    public function registerShutdownFunction() : void
     {
-        $this->flushSend();
+        $theEntrypoint = Lib::entrypoint();
+
+        $theEntrypoint->registerShutdownFunction([ $this, 'onShutdownSendCookiesRegistered' ]);
     }
 
-    public function headerRegisterCallback() : void
+    public function onShutdownSendCookiesRegistered() : void
     {
-        if (! $this->isHeaderRegisterCallbackCalled) {
-            register_shutdown_function([ $this, 'headerRegisterCallbackFn' ]);
+        $this->endFlush();
+    }
 
-            $this->isHeaderRegisterCallbackCalled = true;
+
+    protected function registerCookie(HttpCookie $httpCookie, ?bool $alreadySent = null) : int
+    {
+        $alreadySent = $alreadySent ?? false;
+
+        $id = $this->id++;
+
+        $httpCookieName = $httpCookie->getName();
+        $httpCookiePath = $httpCookie->getPath();
+        $httpCookie->hasDomain($httpCookieDomain);
+
+        $index = $this->indexCookie($httpCookieName, $httpCookiePath, $httpCookieDomain);
+
+        $this->cookiesIndexById[ $id ] = $index;
+        $this->cookiesIndexByIndex[ $index ][ $id ] = true;
+
+        $this->cookiesList[ $id ] = $httpCookie;
+
+        if ($alreadySent) {
+            $this->cookiesListAlreadySent[ $id ] = $httpCookie;
         }
-    }
 
+        return $id;
+    }
 
     protected function indexCookie(string $cookieName, string $cookiePath, ?string $cookieDomain = null) : string
     {

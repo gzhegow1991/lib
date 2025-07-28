@@ -585,6 +585,7 @@ class DefaultDumper implements DumperInterface
         $content .= "\n";
 
         echo $content;
+        flush();
     }
 
     public function dumperEcho_echo_text(...$vars) : void
@@ -595,6 +596,7 @@ class DefaultDumper implements DumperInterface
         $this->sendDebugContentTypeOnShutdown('text/plain');
 
         echo $content;
+        flush();
     }
 
     public function dumperEcho_echo_html(...$vars) : void
@@ -607,6 +609,7 @@ class DefaultDumper implements DumperInterface
         $this->sendDebugContentTypeOnShutdown('text/html');
 
         echo $htmlContent;
+        flush();
     }
 
     public function dumperEcho_echo_devtools(...$vars) : void
@@ -620,6 +623,7 @@ class DefaultDumper implements DumperInterface
         $this->sendDebugContentTypeOnShutdown('text/html');
 
         echo $htmlContent;
+        flush();
     }
 
     public function dumperEcho_pdo(...$vars) : void
@@ -808,7 +812,6 @@ class DefaultDumper implements DumperInterface
             return;
         }
 
-        $theEntrypoint = Lib::entrypoint();
         $thePhp = Lib::php();
         $theType = Lib::type();
 
@@ -828,14 +831,18 @@ class DefaultDumper implements DumperInterface
             ob_flush();
         }
 
-        $headerSentContentType = null;
         if (headers_sent($file, $line)) {
-            foreach ( headers_list() as $header ) {
-                if (0 === stripos($header, 'Content-Type:')) {
-                    $headerSentContentType = substr($header, strlen('Content-Type:'));
-                    $headerSentContentType = explode(';', $headerSentContentType)[ 0 ];
-                    $headerSentContentType = strtolower(trim($headerSentContentType));
-                }
+            throw new RuntimeException(
+                [ 'Headers already sent', $file, $line ]
+            );
+        }
+
+        $headerSentContentType = null;
+        foreach ( headers_list() as $header ) {
+            if (0 === stripos($header, 'Content-Type:')) {
+                $headerSentContentType = substr($header, strlen('Content-Type:'));
+                $headerSentContentType = explode(';', $headerSentContentType)[ 0 ];
+                $headerSentContentType = strtolower(trim($headerSentContentType));
             }
         }
 
@@ -844,26 +851,30 @@ class DefaultDumper implements DumperInterface
 
         } elseif ($contentTypeValid === $headerSentContentType) {
             $this->staticDebugContentType([ $contentTypeValid ]);
-
-        } else {
-            throw new RuntimeException(
-                [ 'Headers already sent', $file, $line ]
-            );
         }
 
-        $theEntrypoint->registerShutdownFunction(
-            [ static::class, 'onShutdownEnsureDebugContentType' ]
-        );
+        $this->registerShutdownFunction();
     }
 
-    public static function onShutdownEnsureDebugContentType() : void
+    public function registerShutdownFunction() : void
     {
-        $debugContentType = static::staticDebugContentType();
+        $theEntrypoint = Lib::entrypoint();
+
+        $theEntrypoint->registerShutdownFunction([ $this, 'onShutdownEnsureDebugContentType' ]);
+    }
+
+    public function onShutdownEnsureDebugContentType() : void
+    {
+        $debugContentType = $this->staticDebugContentType();
 
         if ([] !== $debugContentType) {
             $debugContentTypeCurrentValue = $debugContentType[ 0 ];
 
-            if (false !== $debugContentTypeCurrentValue) {
+            if (false === $debugContentTypeCurrentValue) {
+                return;
+            }
+
+            if (! headers_sent()) {
                 header("Content-Type: {$debugContentTypeCurrentValue}", true, 418);
             }
         }

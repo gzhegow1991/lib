@@ -172,10 +172,14 @@ class DefaultSession implements SessionInterface
             );
         }
 
-        if (PHP_SESSION_NONE === $sessionStatus) {
-            $theHttp = Lib::http();
+        $headersSent = headers_sent();
 
-            session_start($theHttp->staticSessionOptions());
+        if (! $headersSent) {
+            if (PHP_SESSION_NONE === $sessionStatus) {
+                $theHttp = Lib::http();
+
+                session_start($theHttp->staticSessionOptions());
+            }
         }
 
         $_SESSION = $_SESSION ?? [];

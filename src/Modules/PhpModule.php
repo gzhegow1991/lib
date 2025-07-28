@@ -1632,7 +1632,7 @@ class PhpModule
      */
     public function output()
     {
-        if (! defined('PHPOUT')) define('PHPOUT', fopen('php://stdout', 'wb'));
+        if (! defined('PHPOUT')) define('PHPOUT', fopen('php://output', 'wb'));
 
         return PHPOUT;
     }

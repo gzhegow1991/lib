@@ -10,7 +10,7 @@ interface CookiesInterface
     /**
      * @return array<int, HttpCookie>
      */
-    public function getList() : array;
+    public function getCookieList() : array;
 
 
     /**
@@ -64,12 +64,12 @@ interface CookiesInterface
     /**
      * @return HttpCookie[]
      */
-    public function flush() : array;
+    public function endClean() : array;
 
     /**
      * @return HttpCookie[]
      */
-    public function flushSend() : array;
+    public function endFlush() : array;
 
 
     /**
