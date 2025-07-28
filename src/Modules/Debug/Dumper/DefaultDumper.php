@@ -39,23 +39,25 @@ class DefaultDumper implements DumperInterface
         self::PRINTER_JSON_ENCODE     => true,
     ];
 
-    const DUMPER_ECHO          = 'echo';
-    const DUMPER_ECHO_TEXT     = 'echo_text';
-    const DUMPER_ECHO_HTML     = 'echo_html';
-    const DUMPER_RESOURCE      = 'output';
-    const DUMPER_RESOURCE_TEXT = 'output_text';
-    const DUMPER_RESOURCE_HTML = 'output_html';
-    const DUMPER_DEVTOOLS      = 'devtools';
-    const DUMPER_PDO           = 'pdo';
-    const DUMPER_LIST          = [
-        self::DUMPER_ECHO          => true,
-        self::DUMPER_ECHO_TEXT     => true,
-        self::DUMPER_ECHO_HTML     => true,
-        self::DUMPER_RESOURCE      => true,
-        self::DUMPER_RESOURCE_TEXT => true,
-        self::DUMPER_RESOURCE_HTML => true,
-        self::DUMPER_DEVTOOLS      => true,
-        self::DUMPER_PDO           => true,
+    const DUMPER_ECHO              = 'echo';
+    const DUMPER_ECHO_TEXT         = 'echo_text';
+    const DUMPER_ECHO_HTML         = 'echo_html';
+    const DUMPER_ECHO_DEVTOOLS     = 'echo_devtools';
+    const DUMPER_RESOURCE          = 'resource';
+    const DUMPER_RESOURCE_TEXT     = 'resource_text';
+    const DUMPER_RESOURCE_HTML     = 'resource_html';
+    const DUMPER_RESOURCE_DEVTOOLS = 'resource_devtools';
+    const DUMPER_PDO               = 'pdo';
+    const DUMPER_LIST              = [
+        self::DUMPER_ECHO              => true,
+        self::DUMPER_ECHO_TEXT         => true,
+        self::DUMPER_ECHO_HTML         => true,
+        self::DUMPER_ECHO_DEVTOOLS     => true,
+        self::DUMPER_RESOURCE          => true,
+        self::DUMPER_RESOURCE_TEXT     => true,
+        self::DUMPER_RESOURCE_HTML     => true,
+        self::DUMPER_RESOURCE_DEVTOOLS => true,
+        self::DUMPER_PDO               => true,
     ];
 
 
@@ -88,11 +90,11 @@ class DefaultDumper implements DumperInterface
     /**
      * @var string
      */
-    protected $dumper = 'echo';
+    protected $dumper = 'resource';
     /**
      * @var string
      */
-    protected $dumperDefault = 'echo';
+    protected $dumperDefault = 'resource';
     /**
      * @var array
      */
@@ -104,8 +106,8 @@ class DefaultDumper implements DumperInterface
         $thePhp = Lib::php();
 
         $dumperDefault = $thePhp->is_terminal()
-            ? 'echo'
-            : 'echo_html';
+            ? static::DUMPER_RESOURCE
+            : static::DUMPER_RESOURCE_HTML;
 
         $this->dumper = $this->dumperDefault = $dumperDefault;
     }
@@ -501,8 +503,8 @@ class DefaultDumper implements DumperInterface
     public function dumperEcho(...$vars) : void
     {
         switch ( $this->dumper ):
-            case static::DUMPER_DEVTOOLS:
-                $this->dumperEcho_devtools(...$vars);
+            case static::DUMPER_RESOURCE_DEVTOOLS:
+                $this->dumperEcho_echo_devtools(...$vars);
                 break;
 
             case static::DUMPER_ECHO:
@@ -541,23 +543,9 @@ class DefaultDumper implements DumperInterface
         endswitch;
     }
 
-    public function dumperEcho_devtools(...$vars) : void
-    {
-        $content = $this->printerPrint(...$vars);
-
-        $b64content = base64_encode($content);
-
-        $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . "\n";
-
-        $this->sendContentType('text/html');
-
-        echo $htmlContent;
-    }
-
     public function dumperEcho_echo(...$vars) : void
     {
         $content = $this->printerPrint(...$vars);
-
         $content .= "\n";
 
         echo $content;
@@ -579,6 +567,19 @@ class DefaultDumper implements DumperInterface
         $content .= "\n";
 
         $htmlContent = nl2br($content);
+
+        $this->sendContentType('text/html');
+
+        echo $htmlContent;
+    }
+
+    public function dumperEcho_echo_devtools(...$vars) : void
+    {
+        $content = $this->printerPrint(...$vars);
+
+        $b64content = base64_encode($content);
+
+        $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . "\n";
 
         $this->sendContentType('text/html');
 
@@ -665,6 +666,26 @@ class DefaultDumper implements DumperInterface
         $content .= "\n";
 
         $htmlContent = nl2br($content);
+
+        $this->sendContentType('text/html');
+
+        fwrite($resource, $htmlContent);
+        fflush($resource);
+    }
+
+    public function dumperEcho_resource_devtools(...$vars) : void
+    {
+        $thePhp = Lib::php();
+
+        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
+
+        $resource = $dumperOptions[ 'resource' ] ?? $thePhp->output();
+
+        $content = $this->printerPrint(...$vars);
+
+        $b64content = base64_encode($content);
+
+        $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . "\n";
 
         $this->sendContentType('text/html');
 
@@ -772,20 +793,20 @@ class DefaultDumper implements DumperInterface
                     $headerSentContentType = strtolower(trim($headerSentContentType));
                 }
             }
+        }
 
-            if (null === $headerSentContentType) {
-                header("Content-Type: {$contentType}", true, 418);
+        if (null === $headerSentContentType) {
+            header("Content-Type: {$contentType}", true, 418);
 
-                $debugContentType = $contentType;
+            $debugContentType = $contentType;
 
-            } elseif ($contentType === $headerSentContentType) {
-                $debugContentType = $contentType;
+        } elseif ($contentType === $headerSentContentType) {
+            $debugContentType = $contentType;
 
-            } else {
-                throw new RuntimeException(
-                    [ 'Headers already sent', $file, $line ]
-                );
-            }
+        } else {
+            throw new RuntimeException(
+                [ 'Headers already sent', $file, $line ]
+            );
         }
     }
 }
