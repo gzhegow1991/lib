@@ -38,6 +38,7 @@ class Ret
         return new static();
     }
 
+
     /**
      * @param T $value
      *
@@ -278,8 +279,6 @@ class Ret
      *     0: T,
      *     1: Ret<T>,
      * } $refs
-     *
-     * @return bool
      */
     public function isOk(array $refs = []) : bool
     {
@@ -297,6 +296,12 @@ class Ret
         return false;
     }
 
+    /**
+     * @param array{
+     *     0: \stdClass[],
+     *     1: Ret<T>,
+     * } $refs
+     */
     public function isFail(array $refs = []) : bool
     {
         if (array_key_exists(0, $refs)) $refErrors =& $refs[ 0 ];
@@ -309,6 +314,28 @@ class Ret
         }
 
         if ([] === $this->value) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array{
+     *     0: \stdClass[],
+     *     1: Ret<T>,
+     * } $refs
+     */
+    public function isErr(array $refs = []) : bool
+    {
+        if (array_key_exists(0, $refs)) $refErrors =& $refs[ 0 ];
+        if (array_key_exists(1, $refs)) $refRet =& $refs[ 1 ];
+        $refErrors = [];
+        $refRet = $this;
+
+        if ([] !== $this->errors) {
+            $refErrors = $this->prepareErrors();
+
             return true;
         }
 
@@ -330,7 +357,6 @@ class Ret
         $errorList = $this->errors;
 
         $previousList = [];
-
         while ( [] !== $errorList ) {
             [
                 'args' => $throwableArgsItem,
@@ -377,7 +403,6 @@ class Ret
         $errorList = $this->errors;
 
         $previousList = [];
-
         while ( [] !== $errorList ) {
             [
                 'args' => $throwableArgsItem,
@@ -523,25 +548,27 @@ class Ret
 
         $thePhp = Lib::php();
 
-        $errorList = $errors ?? $this->errors;
+        $errorsCurrent = $this->errors;
 
-        $messageObjectList = [];
-
-        while ( [] !== $errorList ) {
+        $errorList = [];
+        while ( [] !== $errorsCurrent ) {
             [
                 'args' => $throwableArgsItem,
                 'file' => $fileLineItem,
-            ] = array_shift($errorList);
+            ] = array_shift($errorsCurrent);
 
             $throwableArgsArray = $thePhp->throwable_args($fileLineItem, ...$throwableArgsItem);
 
             foreach ( $throwableArgsArray[ 'messageObjectList' ] as $messageObject ) {
-                $messageObjectList[] = $isAssociative
-                    ? ((array) $messageObject)
-                    : ($messageObject);
+                if ($isAssociative) {
+                    $errorList[] = (array) $messageObject;
+
+                } else {
+                    $errorList[] = $messageObject;
+                }
             }
         }
 
-        return $messageObjectList;
+        return $errorList;
     }
 }
