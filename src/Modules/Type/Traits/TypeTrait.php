@@ -1102,7 +1102,7 @@ trait TypeTrait
     /**
      * @return Ret<ArrPath>
      */
-    public function arrpath_dot($path, ?string $dot = null)
+    public function arrpath_dot($path, ?string $dot = '.')
     {
         return Lib::arr()->type_arrpath_dot($path, $dot);
     }

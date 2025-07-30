@@ -733,16 +733,16 @@ class ArrModule
     /**
      * @return Ret<ArrPath>
      */
-    public function type_arrpath_dot($value, ?string $dot = null)
+    public function type_arrpath_dot($value, ?string $dot = '.')
     {
         if ($value instanceof ArrPath) {
             return Ret::val($value);
         }
 
-        $dot = $dot ?? '.';
-
         try {
-            $array = $this->arrpath_dot($dot, $value);
+            $array = (null === $dot)
+                ? $this->arrpath($dot, $value)
+                : $this->arrpath_dot($dot, $value);
         }
         catch ( \Throwable $e ) {
             return Ret::err(
@@ -1361,7 +1361,7 @@ class ArrModule
     }
 
 
-    public function has(array $arr, $path, ?string $dot = null, array $refs = []) : bool
+    public function has(array $arr, $path, ?string $dot = '.', array $refs = []) : bool
     {
         if (! $this->type_arrpath_dot($path, $dot)->isOk([ &$pathObject ])) {
             return false;
@@ -1437,7 +1437,7 @@ class ArrModule
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function &fetch(array &$arr, $path, ?string $dot = null)
+    public function &fetch(array &$arr, $path, ?string $dot = '.')
     {
         $pathObject = $this->type_arrpath_dot($path, $dot)->orThrow();
 
@@ -1488,7 +1488,7 @@ class ArrModule
     /**
      * @throws \RuntimeException
      */
-    public function get(array $arr, $path, array $fallback = [], ?string $dot = null)
+    public function get(array $arr, $path, array $fallback = [], ?string $dot = '.')
     {
         $pathObject = $this->type_arrpath_dot($path, $dot)->orFallback($fallback);
 
@@ -1521,7 +1521,7 @@ class ArrModule
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function &put(array &$arr, $path, $val, ?string $dot = null)
+    public function &put(array &$arr, $path, $val, ?string $dot = '.')
     {
         $pathObject = $this->type_arrpath_dot($path, $dot)->orThrow();
 
@@ -1531,7 +1531,7 @@ class ArrModule
     /**
      * @throws \LogicException|\RuntimeException
      */
-    public function &set(array &$arr, $path, $val, ?string $dot = null)
+    public function &set(array &$arr, $path, $val, ?string $dot = '.')
     {
         $pathObject = $this->type_arrpath_dot($path, $dot)->orThrow();
 
@@ -1579,7 +1579,7 @@ class ArrModule
     /**
      * @throws \LogicException
      */
-    public function unset(array &$arr, $path, ?string $dot = null) : bool
+    public function unset(array &$arr, $path, ?string $dot = '.') : bool
     {
         /** @var ArrPath $pathObject */
 

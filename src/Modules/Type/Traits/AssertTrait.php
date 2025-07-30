@@ -1871,7 +1871,7 @@ trait AssertTrait
 	/**
 	 * @return ArrPath
 	 */
-	public function assert_arrpath_dot($path, ?string $dot = null)
+	public function assert_arrpath_dot($path, ?string $dot = '.')
 	{
 		if (Lib::arr()->type_arrpath_dot($path, $dot)->isOk([ &$ref ])) return $ref;
 

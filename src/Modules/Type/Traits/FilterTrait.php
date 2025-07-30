@@ -1490,7 +1490,7 @@ trait FilterTrait
 	/**
 	 * @param array{ 0?: ArrPath, 1?: Ret<ArrPath> } $r
 	 */
-	public function filter_arrpath_dot(array $r, $path, ?string $dot = null): bool
+	public function filter_arrpath_dot(array $r, $path, ?string $dot = '.'): bool
 	{
 		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
 		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];

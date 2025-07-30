@@ -830,7 +830,7 @@ trait IsTrait
 	}
 
 
-	public function is_arrpath_dot($path, ?string $dot = null): bool
+	public function is_arrpath_dot($path, ?string $dot = '.'): bool
 	{
 		return Lib::arr()->type_arrpath_dot($path, $dot)->isOk();
 	}
