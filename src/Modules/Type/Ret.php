@@ -29,6 +29,52 @@ class Ret
     {
     }
 
+    /**
+     * @param array{ 0?: mixed } $fallback
+     *
+     * @return T|mixed
+     */
+    public function __invoke(
+        array $fallback = [],
+        array $fileLine = [], ...$throwableArgs
+    )
+    {
+        if ([] !== $this->value) {
+            return $this->value[ 0 ];
+        }
+
+        if ([] !== $fallback) {
+            return $fallback[ 0 ];
+        }
+
+        $errorList = $this->errors;
+
+        $previousList = [];
+        while ( [] !== $errorList ) {
+            [
+                'args' => $throwableArgsItem,
+                'file' => $fileLineItem,
+            ] = array_pop($errorList);
+
+            $previousList[] = new LogicException($fileLineItem, ...$throwableArgsItem);
+        }
+
+        $fileLine = $fileLine ?: Lib::debug()->file_line();
+
+        if ([] !== $throwableArgs) {
+            throw new LogicException(
+                $fileLine,
+                ...$previousList
+            );
+        }
+
+        throw new LogicException(
+            $fileLine,
+            ...$throwableArgs,
+            ...$previousList
+        );
+    }
+
 
     /**
      * @return static
@@ -60,6 +106,8 @@ class Ret
     }
 
     /**
+     * @param Ret|mixed                  $throwableArg
+     *
      * @param array{ 0: string, 1: int } $fileLine
      *
      * @return static<T>
@@ -75,9 +123,9 @@ class Ret
             );
 
         } else {
-            $instance->addError(
-                $throwableArg, $fileLine, ...$throwableArgs
-            );
+            $fileLine = $fileLine ?: Lib::debug()->file_line();
+
+            $instance->addError($throwableArg, $fileLine, ...$throwableArgs);
         }
 
         return $instance;
@@ -112,6 +160,8 @@ class Ret
     }
 
     /**
+     * @param Ret|mixed                  $throwableArg
+     *
      * @param array{ 0: string, 1: int } $fileLine
      *
      * @return T|static<T>
@@ -130,9 +180,9 @@ class Ret
             );
 
         } else {
-            $instance->addError(
-                $throwableArg, $fileLine, ...$throwableArgs
-            );
+            $fileLine = $fileLine ?: Lib::debug()->file_line();
+
+            $instance->addError($throwableArg, $fileLine, ...$throwableArgs);
         }
 
         if (null === $fallback) {
@@ -142,8 +192,6 @@ class Ret
         if ([] !== $fallback) {
             return $fallback[ 0 ];
         }
-
-        $fileLine = $fileLine ?? Lib::debug()->file_line();
 
         $errorList = $instance->errors;
 
@@ -210,9 +258,11 @@ class Ret
     {
         array_unshift($throwableArgs, $throwableArg);
 
+        $fileLine = $fileLine ?: Lib::debug()->file_line();
+
         $this->errors[] = [
-            'args' => $throwableArgs,
             'file' => $fileLine,
+            'args' => $throwableArgs,
         ];
 
         return $this;
@@ -241,6 +291,8 @@ class Ret
         }
 
         if (null !== $throwableArg) {
+            $fileLine = $fileLine ?: Lib::debug()->file_line();
+
             $this->addError($throwableArg, $fileLine, ...$throwableArgs);
         }
 
@@ -267,6 +319,8 @@ class Ret
         }
 
         if (null !== $throwableArg) {
+            $fileLine = $fileLine ?: Lib::debug()->file_line();
+
             $retTo->addError($throwableArg, $fileLine, ...$throwableArgs);
         }
 
@@ -352,19 +406,19 @@ class Ret
             return $this->value[ 0 ];
         }
 
-        $fileLine = $fileLine ?? Lib::debug()->file_line();
-
         $errorList = $this->errors;
 
         $previousList = [];
         while ( [] !== $errorList ) {
             [
-                'args' => $throwableArgsItem,
                 'file' => $fileLineItem,
+                'args' => $throwableArgsItem,
             ] = array_pop($errorList);
 
             $previousList[] = new LogicException($fileLineItem, ...$throwableArgsItem);
         }
+
+        $fileLine = $fileLine ?: Lib::debug()->file_line();
 
         if ([] !== $throwableArgs) {
             throw new LogicException(
@@ -398,19 +452,19 @@ class Ret
             return $fallback[ 0 ];
         }
 
-        $fileLine = $fileLine ?? Lib::debug()->file_line();
-
         $errorList = $this->errors;
 
         $previousList = [];
         while ( [] !== $errorList ) {
             [
-                'args' => $throwableArgsItem,
                 'file' => $fileLineItem,
+                'args' => $throwableArgsItem,
             ] = array_pop($errorList);
 
             $previousList[] = new LogicException($fileLineItem, ...$throwableArgsItem);
         }
+
+        $fileLine = $fileLine ?: Lib::debug()->file_line();
 
         if ([] !== $throwableArgs) {
             throw new LogicException(
@@ -553,8 +607,8 @@ class Ret
         $errorList = [];
         while ( [] !== $errorsCurrent ) {
             [
-                'args' => $throwableArgsItem,
                 'file' => $fileLineItem,
+                'args' => $throwableArgsItem,
             ] = array_shift($errorsCurrent);
 
             $throwableArgsArray = $thePhp->throwable_args($fileLineItem, ...$throwableArgsItem);
