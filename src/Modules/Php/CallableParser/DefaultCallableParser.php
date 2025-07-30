@@ -9,7 +9,7 @@ use Gzhegow\Lib\Modules\Type\Ret;
 class DefaultCallableParser implements CallableParserInterface
 {
     /**
-     * @param array{ 0?: array, 1?: string } $refs
+     * @param array{ 0?: array{ 0: class-string, 1: string }, 1?: string } $refs
      *
      * @return Ret<bool>
      */

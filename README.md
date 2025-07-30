@@ -1019,6 +1019,61 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
+    $arr0 = [];
+    $arr1 = [ true ];
+    $arr2 = [ [ true ] ];
+    $arr3 = [ [ [ true ] ] ];
+
+    $status = [];
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr0, 1)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr0, 2)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr0, 3)->isOk();
+    $ffn->print(...$status);
+
+    $status = [];
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr1, 1)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr1, 2)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr1, 3)->isOk();
+    $ffn->print(...$status);
+
+    $status = [];
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr2, 1)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr2, 2)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr2, 3)->isOk();
+    $ffn->print(...$status);
+
+    $status = [];
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr3, 1)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr3, 2)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr3, 3)->isOk();
+    $ffn->print(...$status);
+
+    echo "\n";
+
+
+    $arr = [ [ [ true ] ] ];
+
+    $has = \Gzhegow\Lib\Lib::arr()->has($arr, '0.0');
+    $get = \Gzhegow\Lib\Lib::arr()->get($arr, '0.0');
+    $ffn->print($has);
+    $ffn->print_array_multiline($get, 2);
+
+    echo "\n";
+
+    $has = \Gzhegow\Lib\Lib::arr()->has($arr, '0.1');
+    $get = \Gzhegow\Lib\Lib::arr()->get($arr, '0.1', [ null ]);
+    $ffn->print($has, $get);
+
+    try {
+        \Gzhegow\Lib\Lib::arr()->get($arr, '0.1');
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+
+    echo "\n";
+
+
     $cases = [
         [ [ 1, 2, 3 ], [ 2, 3, 4 ] ],
         [ [ 1, '2', 3 ], [ 2, 3 ] ],
@@ -1030,11 +1085,19 @@ $fn = function () use ($ffn) {
     foreach ( $cases as [ $a, $b ] ) {
         $resStrict = \Gzhegow\Lib\Lib::arr()->intersect($a, $b);
         $resNonStrict = \Gzhegow\Lib\Lib::arr()->intersect_non_strict($a, $b);
-        $ffn->print($resStrict, $resNonStrict, $resNonStrict === array_intersect($a, $b));
+        $ffn->print(
+            $resStrict,
+            $resNonStrict,
+            $resNonStrict === array_intersect($a, $b)
+        );
 
         $resStrict = \Gzhegow\Lib\Lib::arr()->diff($a, $b);
         $resNonStrict = \Gzhegow\Lib\Lib::arr()->diff_non_strict($a, $b);
-        $ffn->print($resStrict, $resNonStrict, $resNonStrict === array_diff($a, $b));
+        $ffn->print(
+            $resStrict,
+            $resNonStrict,
+            $resNonStrict === array_diff($a, $b)
+        );
     }
 
     echo "\n";
@@ -1192,6 +1255,21 @@ $fn = function () use ($ffn) {
 $test = $ffn->test($fn);
 $test->expectStdout('
 "[ ArrModule ]"
+
+TRUE | TRUE | TRUE
+TRUE | TRUE | TRUE
+FALSE | TRUE | TRUE
+FALSE | FALSE | TRUE
+
+TRUE
+###
+[
+  TRUE
+]
+###
+
+FALSE | NULL
+"[ CATCH ] Missing array path"
 
 [ 1 => 2, 2 => 3 ] | [ 1 => 2, 2 => 3 ] | TRUE
 [ 1 ] | [ 1 ] | TRUE

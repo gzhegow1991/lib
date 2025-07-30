@@ -33,6 +33,8 @@ class Ret
      * @param array{ 0?: mixed } $fallback
      *
      * @return T|mixed
+     * @see static::orFallback()
+     *
      */
     public function __invoke(
         array $fallback = [],

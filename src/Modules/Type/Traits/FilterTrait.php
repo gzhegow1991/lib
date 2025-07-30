@@ -1378,7 +1378,7 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: true, 1?: Ret<true> } $r
+	 * @param array{ 0?: null, 1?: Ret<null> } $r
 	 */
 	public function filter_key_not_exists(array $r, $key, array $array): bool
 	{
@@ -1479,11 +1479,22 @@ trait FilterTrait
 	/**
 	 * @param array{ 0?: ArrPath, 1?: Ret<ArrPath> } $r
 	 */
-	public function filter_arrpath(array $r, $path, ?string $dot = null): bool
+	public function filter_arrpath(array $r, $path): bool
 	{
 		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
 		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
-		return ($refRet = Lib::arr()->type_arrpath($path, $dot))->isOk([ &$refValue ]);
+		return ($refRet = Lib::arr()->type_arrpath($path))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: ArrPath, 1?: Ret<ArrPath> } $r
+	 */
+	public function filter_arrpath_dot(array $r, $path, ?string $dot = null): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::arr()->type_arrpath_dot($path, $dot))->isOk([ &$refValue ]);
 	}
 
 
@@ -2277,6 +2288,23 @@ trait FilterTrait
 
 
 	/**
+	 * @param array{ 0?: bool, 1?: Ret<bool> } $r
+	 *
+	 * > метод не всегда callable, поскольку строка 'class->method' не является callable
+	 * > метод не всегда callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
+	 * > используйте type_callable_string, если собираетесь вызывать метод
+	 * > используйте type_callable_array, если собираетесь вызывать метод
+	 * @param array{ 0?: array{ 0: class-string, 1: string }, 1?: string } $refs
+	 */
+	public function filter_method(array $r, $value, array $refs = []): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::php()->type_method($value, $refs))->isOk([ &$refValue ]);
+	}
+
+
+	/**
 	 * @param array{ 0?: array{ 0: class-string, 1: string }, 1?: Ret<array{ 0: class-string, 1: string }> } $r
 	 */
 	public function filter_method_array(array $r, $value): bool
@@ -2290,11 +2318,11 @@ trait FilterTrait
 	/**
 	 * @param array{ 0?: string, 1?: Ret<string> } $r
 	 */
-	public function filter_method_string(array $r, $value, array $refs = []): bool
+	public function filter_method_string(array $r, $value): bool
 	{
 		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
 		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
-		return ($refRet = Lib::php()->type_method_string($value, $refs))->isOk([ &$refValue ]);
+		return ($refRet = Lib::php()->type_method_string($value))->isOk([ &$refValue ]);
 	}
 
 

@@ -698,7 +698,8 @@ class PhpModule
         }
 
         return Ret::err(
-            [ 'The `value` should be array', $value ]
+            [ 'The `value` should be array', $value ],
+            [ __FILE__, __LINE__ ]
         );
     }
 
@@ -712,7 +713,8 @@ class PhpModule
         }
 
         return Ret::err(
-            [ 'The `value` should be array, empty', $value ]
+            [ 'The `value` should be array, empty', $value ],
+            [ __FILE__, __LINE__ ]
         );
     }
 
@@ -726,7 +728,8 @@ class PhpModule
         }
 
         return Ret::err(
-            [ 'The `value` should be array, not empty', $value ]
+            [ 'The `value` should be array, not empty', $value ],
+            [ __FILE__, __LINE__ ]
         );
     }
 
@@ -740,7 +743,8 @@ class PhpModule
         }
 
         return Ret::err(
-            [ 'The `value` should not be empty array', $value ]
+            [ 'The `value` should not be empty array', $value ],
+            [ __FILE__, __LINE__ ]
         );
     }
 
@@ -754,7 +758,8 @@ class PhpModule
         }
 
         return Ret::err(
-            [ 'The `value` should not be array', $value ]
+            [ 'The `value` should not be array', $value ],
+            [ __FILE__, __LINE__ ]
         );
     }
 
@@ -769,7 +774,8 @@ class PhpModule
         }
 
         return Ret::err(
-            [ 'The `value` should be object', $value ]
+            [ 'The `value` should be object', $value ],
+            [ __FILE__, __LINE__ ]
         );
     }
 
@@ -783,7 +789,8 @@ class PhpModule
         }
 
         return Ret::err(
-            [ 'The `value` should not be empty array', $value ]
+            [ 'The `value` should not be empty array', $value ],
+            [ __FILE__, __LINE__ ]
         );
     }
 
@@ -798,7 +805,8 @@ class PhpModule
         }
 
         return Ret::err(
-            [ 'The `value` should be instance of \stdClass', $value ]
+            [ 'The `value` should be instance of \stdClass', $value ],
+            [ __FILE__, __LINE__ ]
         );
     }
 
@@ -812,7 +820,8 @@ class PhpModule
         }
 
         return Ret::err(
-            [ 'The `value` should not be instance of \stdClass', $value ]
+            [ 'The `value` should not be instance of \stdClass', $value ],
+            [ __FILE__, __LINE__ ]
         );
     }
 
@@ -1445,7 +1454,7 @@ class PhpModule
      * > используйте type_callable_string, если собираетесь вызывать метод
      * > используйте type_callable_array, если собираетесь вызывать метод
      *
-     * @param array{ 0?: array, 1?: string } $refs
+     * @param array{ 0?: array{ 0: class-string, 1: string }, 1?: string } $refs
      *
      * @return Ret<bool>
      */

@@ -31,13 +31,15 @@ class PregModule
         }
         catch ( \Throwable $e ) {
             return Ret::err(
-                [ 'The `value` should be valid regex', $value ]
+                [ 'The `value` should be valid regex', $value ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
         if (false === $isMatch) {
             return Ret::err(
-                [ 'The `value` should be valid regex', $value ]
+                [ 'The `value` should be valid regex', $value ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
@@ -64,13 +66,15 @@ class PregModule
         }
         catch ( \Throwable $e ) {
             return Ret::err(
-                [ 'The `value` should be valid regexp', $value ]
+                [ 'The `value` should be valid regexp', $value ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
         if (false === $isMatch) {
             return Ret::err(
-                [ 'The `value` should be valid regexp', $value ]
+                [ 'The `value` should be valid regexp', $value ],
+                [ __FILE__, __LINE__ ]
             );
         }
 

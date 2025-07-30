@@ -824,9 +824,15 @@ trait IsTrait
 	}
 
 
-	public function is_arrpath($path, ?string $dot = null): bool
+	public function is_arrpath($path): bool
 	{
-		return Lib::arr()->type_arrpath($path, $dot)->isOk();
+		return Lib::arr()->type_arrpath($path)->isOk();
+	}
+
+
+	public function is_arrpath_dot($path, ?string $dot = null): bool
+	{
+		return Lib::arr()->type_arrpath_dot($path, $dot)->isOk();
 	}
 
 
@@ -1287,15 +1293,28 @@ trait IsTrait
 	}
 
 
+	/**
+	 * > метод не всегда callable, поскольку строка 'class->method' не является callable
+	 * > метод не всегда callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
+	 * > используйте type_callable_string, если собираетесь вызывать метод
+	 * > используйте type_callable_array, если собираетесь вызывать метод
+	 * @param array{ 0?: array{ 0: class-string, 1: string }, 1?: string } $refs
+	 */
+	public function is_method($value, array $refs = []): bool
+	{
+		return Lib::php()->type_method($value, $refs)->isOk();
+	}
+
+
 	public function is_method_array($value): bool
 	{
 		return Lib::php()->type_method_array($value)->isOk();
 	}
 
 
-	public function is_method_string($value, array $refs = []): bool
+	public function is_method_string($value): bool
 	{
-		return Lib::php()->type_method_string($value, $refs)->isOk();
+		return Lib::php()->type_method_string($value)->isOk();
 	}
 
 

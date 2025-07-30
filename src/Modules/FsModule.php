@@ -564,7 +564,8 @@ class FsModule
             }
             catch ( \Throwable $e ) {
                 return Ret::err(
-                    [ 'The `value` should be valid file', $value ]
+                    [ 'The `value` should be valid file', $value ],
+                    [ __FILE__, __LINE__ ]
                 );
             }
         }
@@ -575,7 +576,8 @@ class FsModule
 
                 if (null === $splFileInfo) {
                     return Ret::err(
-                        [ 'The `value` should be file, that passes extension checks', $value, $extensions ]
+                        [ 'The `value` should be file, that passes extension checks', $value, $extensions ],
+                        [ __FILE__, __LINE__ ]
                     );
                 }
             }
@@ -587,7 +589,8 @@ class FsModule
 
                 if (null === $splFileInfo) {
                     return Ret::err(
-                        [ 'The `value` should be file, that passes mime-type checks', $value, $mimeTypes ]
+                        [ 'The `value` should be file, that passes mime-type checks', $value, $mimeTypes ],
+                        [ __FILE__, __LINE__ ]
                     );
                 }
             }
@@ -599,7 +602,8 @@ class FsModule
 
                 if (null === $splFileInfo) {
                     return Ret::err(
-                        [ 'The `value` should be file, that passes filter checks', $value, $filters ]
+                        [ 'The `value` should be file, that passes filter checks', $value, $filters ],
+                        [ __FILE__, __LINE__ ]
                     );
                 }
             }
@@ -733,7 +737,8 @@ class FsModule
 
                 if (null === $splFileInfo) {
                     return Ret::err(
-                        [ 'The `value` should be image, that passes image filter checks', $value, $filters ]
+                        [ 'The `value` should be image, that passes image filter checks', $value, $filters ],
+                        [ __FILE__, __LINE__ ]
                     );
                 }
             }

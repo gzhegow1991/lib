@@ -1015,7 +1015,7 @@ trait TypeTrait
     }
 
     /**
-     * @return Ret<true>
+     * @return Ret<null>
      */
     public function key_not_exists($key, array $array)
     {
@@ -1094,9 +1094,17 @@ trait TypeTrait
     /**
      * @return Ret<ArrPath>
      */
-    public function arrpath($path, ?string $dot = null)
+    public function arrpath($path)
     {
-        return Lib::arr()->type_arrpath($path, $dot);
+        return Lib::arr()->type_arrpath($path);
+    }
+
+    /**
+     * @return Ret<ArrPath>
+     */
+    public function arrpath_dot($path, ?string $dot = null)
+    {
+        return Lib::arr()->type_arrpath_dot($path, $dot);
     }
 
 
@@ -1706,6 +1714,21 @@ trait TypeTrait
 
 
     /**
+     * > метод не всегда callable, поскольку строка 'class->method' не является callable
+     * > метод не всегда callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
+     * > используйте type_callable_string, если собираетесь вызывать метод
+     * > используйте type_callable_array, если собираетесь вызывать метод
+     *
+     * @param array{ 0?: array{ 0: class-string, 1: string }, 1?: string } $refs
+     *
+     * @return Ret<bool>
+     */
+    public function method($value, array $refs = [])
+    {
+        return Lib::php()->type_method($value, $refs);
+    }
+
+    /**
      * @return Ret<array{ 0: class-string, 1: string }>
      */
     public function method_array($value)
@@ -1716,9 +1739,9 @@ trait TypeTrait
     /**
      * @return Ret<string>
      */
-    public function method_string($value, array $refs = [])
+    public function method_string($value)
     {
-        return Lib::php()->type_method_string($value, $refs);
+        return Lib::php()->type_method_string($value);
     }
 
 

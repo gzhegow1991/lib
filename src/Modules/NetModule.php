@@ -41,7 +41,8 @@ class NetModule
         $valueFiltered = filter_var($valueStringNotEmpty, FILTER_VALIDATE_IP);
         if (false === $valueFiltered) {
             return Ret::err(
-                [ 'The `value` should be valid address IP', $value ]
+                [ 'The `value` should be valid address IP', $value ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
@@ -69,7 +70,8 @@ class NetModule
         $valueFiltered = filter_var($valueStringNotEmpty, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
         if (false === $valueFiltered) {
             return Ret::err(
-                [ 'The `value` should be valid address IP v4', $value ]
+                [ 'The `value` should be valid address IP v4', $value ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
@@ -99,7 +101,8 @@ class NetModule
         $valueFiltered = filter_var($valueStringNotEmpty, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
         if (false === $valueFiltered) {
             return Ret::err(
-                [ 'The `value` should be valid address IP v6', $value ]
+                [ 'The `value` should be valid address IP v6', $value ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
@@ -133,7 +136,8 @@ class NetModule
             || (0 === $status)
         ) {
             return Ret::err(
-                [ 'The `value` should be valid address MAC', $value ]
+                [ 'The `value` should be valid address MAC', $value ],
+                [ __FILE__, __LINE__ ]
             );
         }
 

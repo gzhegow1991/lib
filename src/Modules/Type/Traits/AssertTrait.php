@@ -1729,7 +1729,7 @@ trait AssertTrait
 
 
 	/**
-	 * @return true
+	 * @return null
 	 */
 	public function assert_key_not_exists($key, array $array)
 	{
@@ -1857,14 +1857,28 @@ trait AssertTrait
 	/**
 	 * @return ArrPath
 	 */
-	public function assert_arrpath($path, ?string $dot = null)
+	public function assert_arrpath($path)
 	{
-		if (Lib::arr()->type_arrpath($path, $dot)->isOk([ &$ref ])) return $ref;
+		if (Lib::arr()->type_arrpath($path)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `arrpath` is failed', [ $path, $dot ] ]);
+		throw new LogicException($t, [ 'Assert `arrpath` is failed', [ $path ] ]);
+	}
+
+
+	/**
+	 * @return ArrPath
+	 */
+	public function assert_arrpath_dot($path, ?string $dot = null)
+	{
+		if (Lib::arr()->type_arrpath_dot($path, $dot)->isOk([ &$ref ])) return $ref;
+
+		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
+
+		throw new LogicException($t, [ 'Assert `arrpath_dot` is failed', [ $path, $dot ] ]);
 	}
 
 
@@ -2841,6 +2855,26 @@ trait AssertTrait
 
 
 	/**
+	 * > метод не всегда callable, поскольку строка 'class->method' не является callable
+	 * > метод не всегда callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
+	 * > используйте type_callable_string, если собираетесь вызывать метод
+	 * > используйте type_callable_array, если собираетесь вызывать метод
+	 * @param array{ 0?: array{ 0: class-string, 1: string }, 1?: string } $refs
+	 *
+	 * @return bool
+	 */
+	public function assert_method($value, array $refs = [])
+	{
+		if (Lib::php()->type_method($value, $refs)->isOk([ &$ref ])) return $ref;
+
+		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
+
+		throw new LogicException($t, [ 'Assert `method` is failed', [ $value, $refs ] ]);
+	}
+
+
+	/**
 	 * @return array{ 0: class-string, 1: string }
 	 */
 	public function assert_method_array($value)
@@ -2857,14 +2891,14 @@ trait AssertTrait
 	/**
 	 * @return string
 	 */
-	public function assert_method_string($value, array $refs = [])
+	public function assert_method_string($value)
 	{
-		if (Lib::php()->type_method_string($value, $refs)->isOk([ &$ref ])) return $ref;
+		if (Lib::php()->type_method_string($value)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `method_string` is failed', [ $value, $refs ] ]);
+		throw new LogicException($t, [ 'Assert `method_string` is failed', [ $value ] ]);
 	}
 
 
