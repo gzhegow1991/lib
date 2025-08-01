@@ -637,14 +637,14 @@ trait AssertTrait
 	/**
 	 * @return Number
 	 */
-	public function assert_number($value, ?bool $allowExp = null)
+	public function assert_number($value, ?bool $isAllowExp = null)
 	{
-		if (Lib::num()->type_number($value, $allowExp)->isOk([ &$ref ])) return $ref;
+		if (Lib::num()->type_number($value, $isAllowExp)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `number` is failed', [ $value, $allowExp ] ]);
+		throw new LogicException($t, [ 'Assert `number` is failed', [ $value, $isAllowExp ] ]);
 	}
 
 

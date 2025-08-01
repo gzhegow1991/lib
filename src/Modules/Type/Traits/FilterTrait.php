@@ -508,11 +508,11 @@ trait FilterTrait
 	/**
 	 * @param array{ 0?: Number, 1?: Ret<Number> } $r
 	 */
-	public function filter_number(array $r, $value, ?bool $allowExp = null): bool
+	public function filter_number(array $r, $value, ?bool $isAllowExp = null): bool
 	{
 		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
 		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
-		return ($refRet = Lib::num()->type_number($value, $allowExp))->isOk([ &$refValue ]);
+		return ($refRet = Lib::num()->type_number($value, $isAllowExp))->isOk([ &$refValue ]);
 	}
 
 

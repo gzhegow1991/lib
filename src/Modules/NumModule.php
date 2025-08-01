@@ -223,13 +223,13 @@ class NumModule
     /**
      * @return Ret<Number>
      */
-    public function type_number($value, ?bool $allowExp = null)
+    public function type_number($value, ?bool $isAllowExp = null)
     {
         if ($value instanceof Number) {
             return Ret::val($value);
         }
 
-        if (! $this->type_numeric($value, $allowExp, [ &$split ])->isOk([ 1 => &$ret ])) {
+        if (! $this->type_numeric($value, $isAllowExp, [ &$split ])->isOk([ 1 => &$ret ])) {
             return $ret;
         }
 

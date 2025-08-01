@@ -284,9 +284,9 @@ trait IsTrait
 	}
 
 
-	public function is_number($value, ?bool $allowExp = null): bool
+	public function is_number($value, ?bool $isAllowExp = null): bool
 	{
-		return Lib::num()->type_number($value, $allowExp)->isOk();
+		return Lib::num()->type_number($value, $isAllowExp)->isOk();
 	}
 
 

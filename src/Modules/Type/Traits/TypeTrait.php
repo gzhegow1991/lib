@@ -394,9 +394,9 @@ trait TypeTrait
     /**
      * @return Ret<Number>
      */
-    public function number($value, ?bool $allowExp = null)
+    public function number($value, ?bool $isAllowExp = null)
     {
-        return Lib::num()->type_number($value, $allowExp);
+        return Lib::num()->type_number($value, $isAllowExp);
     }
 
 
