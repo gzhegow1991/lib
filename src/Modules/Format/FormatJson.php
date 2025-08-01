@@ -182,7 +182,7 @@ class FormatJson
                 continue;
             }
 
-            $jsoncStringNotEmpty = preg_replace($regex, '$1', $jsoncStringNotEmpty);
+            $jsoncStringNotEmpty = preg_replace($regex, '', $jsoncStringNotEmpty);
         }
 
         try {

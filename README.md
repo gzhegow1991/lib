@@ -3335,13 +3335,14 @@ $fn = function () use ($ffn) {
         }
     ';
 
-    $jsonWithComment1 = "[1,/* 2 */,3]";
+    $jsonWithComment1 = "[1, /* 2, */ 3]";
     $jsonWithComment2 = '
         {
             "hello": "world",
             # "foo1": "bar1",
             // "foo2": "bar2",
             /* "foo3": "bar3" */
+            "foo": "bar"
         }
     ';
 
@@ -3536,8 +3537,8 @@ NULL
 
 "[ CATCH ] Unable to `json_decode` due to invalid JSON"
 "[ CATCH ] Unable to `json_decode` due to invalid JSON"
-[ 1, 2, 3 ]
-[ "hello" => "world", "foo1" => "bar1", "foo2" => "bar2", "foo3" => "bar3" ]
+[ 1, 3 ]
+[ "hello" => "world", "foo" => "bar" ]
 
 "[ CATCH ] The value `NULL` cannot be encoded to JSON when `allowsNull` is set to FALSE"
 NULL
@@ -3593,8 +3594,8 @@ NULL
 
 "[ CATCH ] Unable to `json_decode` due to invalid JSON"
 "[ CATCH ] Unable to `json_decode` due to invalid JSON"
-[ 1, 2, 3 ]
-[ "hello" => "world", "foo1" => "bar1", "foo2" => "bar2", "foo3" => "bar3" ]
+[ 1, 3 ]
+[ "hello" => "world", "foo" => "bar" ]
 
 "[ CATCH ] The value `NULL` cannot be encoded to JSON when `allowsNull` is set to FALSE"
 NULL
