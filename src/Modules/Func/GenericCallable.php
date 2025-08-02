@@ -188,7 +188,7 @@ class GenericCallable implements
     {
         $theType = Lib::type();
 
-        if (! $theType->method_string($from, [ &$methodArray ])->isOk([ &$ret ])) {
+        if (! $theType->method($from, [ &$methodArray ])->isOk([ &$ret ])) {
             return Ret::throw($fallback, $ret);
         }
 

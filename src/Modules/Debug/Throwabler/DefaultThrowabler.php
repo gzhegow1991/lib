@@ -35,6 +35,32 @@ class DefaultThrowabler implements ThrowablerInterface
 
 
     /**
+     * @template-covariant T of \Throwable
+     *
+     * @param \Throwable      $throwable
+     * @param class-string<T> $throwableClass
+     *
+     * @return T|null
+     */
+    public function catchPrevious(\Throwable $throwable, string $throwableClass = '') : ?\Throwable
+    {
+        if ('' === $throwableClass) {
+            return $throwable;
+        }
+
+        $gen = $this->getPreviousIterator($throwable);
+
+        foreach ( $gen as $e ) {
+            if ($e instanceof $throwableClass) {
+                return $e;
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
      * @return array<string, \Throwable>
      */
     public function getPreviousArray(\Throwable $throwable) : array
@@ -92,27 +118,15 @@ class DefaultThrowabler implements ThrowablerInterface
      */
     public function getPreviousMessageFirstList(\Throwable $throwable, ?int $flags = null) : array
     {
-        $lines = [];
+        $messagesList = [];
 
         $array = $this->getPreviousArray($throwable);
 
         foreach ( $array as $dotpath => $e ) {
-            $message = $this->getThrowableMessageFirst($e, $flags);
-            $message = "[ {$dotpath} ] {$message}";
-
-            $level = substr_count($dotpath, '.');
-            $messageLines = $this->addPaddingToLines(
-                $level,
-                [ $message ]
-            );
-
-            $lines = array_merge(
-                $lines,
-                $messageLines
-            );
+            $messagesList[ $dotpath ] = $this->getThrowableMessageFirstString($e, $flags);
         }
 
-        return $lines;
+        return $messagesList;
     }
 
     /**
@@ -158,37 +172,17 @@ class DefaultThrowabler implements ThrowablerInterface
     /**
      * @return string[]
      */
-    public function getPreviousMessagesAllList(\Throwable $throwable, ?int $flags = null) : array
+    public function getPreviousMessagesAllDict(\Throwable $throwable, ?int $flags = null) : array
     {
-        $lines = [];
+        $messagesLists = [];
 
         $array = $this->getPreviousArray($throwable);
 
-        $first = true;
         foreach ( $array as $dotpath => $e ) {
-            $messages = $this->getThrowableMessagesAllList($e, $flags);
-
-            if (! $first) {
-                array_unshift($messages, '');
-            }
-
-            $level = substr_count($dotpath, '.');
-            $messages = $this->addPaddingToLines(
-                $level,
-                $messages
-            );
-
-            $lines = array_merge(
-                $lines,
-                $messages
-            );
-
-            if ($first) {
-                $first = false;
-            }
+            $messagesLists[ $dotpath ] = $this->getThrowableMessagesAllList($e, $flags);
         }
 
-        return $lines;
+        return $messagesLists;
     }
 
     /**
@@ -198,11 +192,14 @@ class DefaultThrowabler implements ThrowablerInterface
     {
         $flags = $this->flagsDefault($flags);
 
-        $flagsNoInfo = $flags;
-        $flagsNoInfo |= _DEBUG_THROWABLE_WITHOUT_INFO;
-        $flagsNoInfo &= ~_DEBUG_THROWABLE_WITH_INFO;
+        $flagsNoInfoNoTrace = $flags;
+        $flagsNoInfoNoTrace |= _DEBUG_THROWABLER_WITHOUT_INFO;
+        $flagsNoInfoNoTrace |= _DEBUG_THROWABLER_WITHOUT_TRACE;
+        $flagsNoInfoNoTrace &= ~_DEBUG_THROWABLER_WITH_INFO;
+        $flagsNoInfoNoTrace &= ~_DEBUG_THROWABLER_WITH_TRACE;
 
-        $isWithInfo = $flags & _DEBUG_THROWABLE_WITH_INFO;
+        $isWithInfo = $flags & _DEBUG_THROWABLER_WITH_INFO;
+        $isWithTrace = $flags & _DEBUG_THROWABLER_WITH_TRACE;
 
         $array = $this->getPreviousArray($throwable);
 
@@ -210,44 +207,57 @@ class DefaultThrowabler implements ThrowablerInterface
 
         $first = true;
         foreach ( $array as $dotpath => $e ) {
-            $messagesLines = $this->getThrowableMessagesAllLines($e, $flagsNoInfo);
+            $messagesLines = $this->getThrowableMessagesAllLines($e, $flagsNoInfoNoTrace);
             $messagesLinesCnt = count($messagesLines);
 
-            $messagesWithInfoLines = $messagesLines;
+            $messagesWithInfoAndTraceLines = $messagesLines;
 
             if ($isWithInfo) {
                 $infoLines = $this->getThrowableInfoLines($e, $flags);
 
-                $messagesWithInfoLines = array_merge($messagesWithInfoLines, $infoLines);
+                $messagesWithInfoAndTraceLines = array_merge($messagesWithInfoAndTraceLines, $infoLines);
             }
 
-            $messagesWithInfoLinesCnt = count($messagesWithInfoLines);
+            if ($isWithTrace) {
+                $infoLines = $this->getThrowableTraceLines($e, $flags);
+
+                $messagesWithInfoAndTraceLines = array_merge(
+                    $messagesWithInfoAndTraceLines,
+                    [
+                        '',
+                        'Trace: ',
+                    ],
+                    $infoLines
+                );
+            }
+
+            $messagesWithInfoLinesCnt = count($messagesWithInfoAndTraceLines);
 
             if ($messagesLinesCnt > 1) {
-                array_unshift($messagesWithInfoLines, "[ {$dotpath} >>> ]");
+                array_unshift($messagesWithInfoAndTraceLines, "[ {$dotpath} >>> ]");
 
-                $messagesWithInfoLines[] = "[ {$dotpath} <<< ]";
+                $messagesWithInfoAndTraceLines[] = "[ {$dotpath} <<< ]";
 
             } elseif (1 === $messagesLinesCnt) {
-                $messagesWithInfoLines[ 0 ] = "[ {$dotpath} ] {$messagesWithInfoLines[ 0 ]}";
+                $messagesWithInfoAndTraceLines[ 0 ] = "[ {$dotpath} ] {$messagesWithInfoAndTraceLines[ 0 ]}";
 
             } else {
                 continue;
             }
 
             if (! $first && ($messagesWithInfoLinesCnt > 1)) {
-                array_unshift($messagesWithInfoLines, '');
+                array_unshift($messagesWithInfoAndTraceLines, '');
             }
 
             $level = substr_count($dotpath, '.');
-            $messagesWithInfoLines = $this->addPaddingToLines(
+            $messagesWithInfoAndTraceLines = $this->addPaddingToLines(
                 $level,
-                $messagesWithInfoLines
+                $messagesWithInfoAndTraceLines
             );
 
             $lines = array_merge(
                 $lines,
-                $messagesWithInfoLines
+                $messagesWithInfoAndTraceLines
             );
 
             if ($first) {
@@ -259,33 +269,8 @@ class DefaultThrowabler implements ThrowablerInterface
     }
 
 
-    /**
-     * @template-covariant T of \Throwable
-     *
-     * @param \Throwable      $throwable
-     * @param class-string<T> $throwableClass
-     *
-     * @return T|null
-     */
-    public function catchPrevious(\Throwable $throwable, string $throwableClass = '') : ?\Throwable
-    {
-        if ('' === $throwableClass) {
-            return $throwable;
-        }
 
-        $gen = $this->getPreviousIterator($throwable);
-
-        foreach ( $gen as $e ) {
-            if ($e instanceof $throwableClass) {
-                return $e;
-            }
-        }
-
-        return null;
-    }
-
-
-    public function getThrowableMessageFirst(\Throwable $throwable, ?int $flags = null) : string
+    public function getThrowableMessageFirstString(\Throwable $throwable, ?int $flags = null) : string
     {
         $eMessage = $throwable->getMessage();
 
@@ -303,10 +288,11 @@ class DefaultThrowabler implements ThrowablerInterface
     {
         $flags = $this->flagsDefault($flags);
 
-        $isWithCode = $flags & _DEBUG_THROWABLE_WITH_CODE;
-        $isWithInfo = $flags & _DEBUG_THROWABLE_WITH_INFO;
+        $isWithCode = $flags & _DEBUG_THROWABLER_WITH_CODE;
+        $isWithInfo = $flags & _DEBUG_THROWABLER_WITH_INFO;
+        $isWithTrace = $flags & _DEBUG_THROWABLER_WITH_TRACE;
 
-        $eMessage = $this->getThrowableMessageFirst($throwable, $flags);
+        $eMessage = $this->getThrowableMessageFirstString($throwable, $flags);
 
         $lines = [];
 
@@ -329,6 +315,19 @@ class DefaultThrowabler implements ThrowablerInterface
             $linesInfo = $this->getThrowableInfoLines($throwable, $flags);
 
             $lines = array_merge($lines, $linesInfo);
+        }
+
+        if ($isWithTrace) {
+            $linesTrace = $this->getThrowableTraceLines($throwable, $flags);
+
+            $lines = array_merge(
+                $lines,
+                [
+                    '',
+                    'Trace:',
+                ],
+                $linesTrace
+            );
         }
 
         return $lines;
@@ -359,8 +358,9 @@ class DefaultThrowabler implements ThrowablerInterface
     {
         $flags = $this->flagsDefault($flags);
 
-        $isWithCode = $flags & _DEBUG_THROWABLE_WITH_CODE;
-        $isWithInfo = $flags & _DEBUG_THROWABLE_WITH_INFO;
+        $isWithCode = $flags & _DEBUG_THROWABLER_WITH_CODE;
+        $isWithInfo = $flags & _DEBUG_THROWABLER_WITH_INFO;
+        $isWithTrace = $flags & _DEBUG_THROWABLER_WITH_TRACE;
 
         $eMessages = $this->getThrowableMessagesAllList($throwable, $flags);
 
@@ -393,11 +393,24 @@ class DefaultThrowabler implements ThrowablerInterface
             $lines = array_merge($lines, $linesInfo);
         }
 
+        if ($isWithTrace) {
+            $linesTrace = $this->getThrowableTraceLines($throwable, $flags);
+
+            $lines = array_merge(
+                $lines,
+                [
+                    '',
+                    'Trace:',
+                ],
+                $linesTrace
+            );
+        }
+
         return $lines;
     }
 
 
-    public function getThrowableInfo(\Throwable $throwable, ?int $flags = null) : array
+    public function getThrowableInfoArray(\Throwable $throwable, ?int $flags = null) : array
     {
         $theDebug = Lib::debug();
         $theFs = Lib::fs();
@@ -448,14 +461,14 @@ class DefaultThrowabler implements ThrowablerInterface
      */
     public function getThrowableInfoLines(\Throwable $throwable, ?int $flags = null) : array
     {
-        $flags = $this->flagsDefault($flags);
+        $flags = $this->flagsInfoDefault($flags);
 
         $theDebug = Lib::debug();
         $theFs = Lib::fs();
 
-        $isWithFile = $flags & _DEBUG_THROWABLE_WITH_FILE;
-        $isWithObjectClass = $flags & _DEBUG_THROWABLE_WITH_OBJECT_CLASS;
-        $isWithObjectId = $flags & _DEBUG_THROWABLE_WITH_OBJECT_ID;
+        $isWithFile = $flags & _DEBUG_THROWABLER_INFO_WITH_FILE;
+        $isWithObjectClass = $flags & _DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS;
+        $isWithObjectId = $flags & _DEBUG_THROWABLER_INFO_WITH_OBJECT_ID;
 
         $lines = [];
 
@@ -516,7 +529,7 @@ class DefaultThrowabler implements ThrowablerInterface
     }
 
 
-    public function getThrowableTrace(\Throwable $e, ?int $flags = null) : array
+    public function getThrowableTraceArray(\Throwable $e, ?int $flags = null) : array
     {
         $theDebug = Lib::debug();
         $theFs = Lib::fs();
@@ -556,7 +569,7 @@ class DefaultThrowabler implements ThrowablerInterface
     {
         $lines = [];
 
-        $trace = $this->getThrowableTrace(
+        $trace = $this->getThrowableTraceArray(
             $throwable, $flags
         );
 
@@ -655,52 +668,79 @@ class DefaultThrowabler implements ThrowablerInterface
         $flags = $flags ?? 0;
 
         $flagGroups = [
-            '_DEBUG_THROWABLE_WITH_CODE'         => [
+            '_DEBUG_THROWABLER_WITH_CODE'  => [
                 [
-                    _DEBUG_THROWABLE_WITH_CODE,
-                    _DEBUG_THROWABLE_WITHOUT_CODE,
+                    _DEBUG_THROWABLER_WITH_CODE,
+                    _DEBUG_THROWABLER_WITHOUT_CODE,
                 ],
-                _DEBUG_THROWABLE_WITHOUT_CODE,
+                _DEBUG_THROWABLER_WITHOUT_CODE,
             ],
             //
-            '_DEBUG_THROWABLE_WITH_INFO'         => [
+            '_DEBUG_THROWABLER_WITH_INFO'  => [
                 [
-                    _DEBUG_THROWABLE_WITH_INFO,
-                    _DEBUG_THROWABLE_WITHOUT_INFO,
+                    _DEBUG_THROWABLER_WITH_INFO,
+                    _DEBUG_THROWABLER_WITHOUT_INFO,
                 ],
-                _DEBUG_THROWABLE_WITH_INFO,
+                _DEBUG_THROWABLER_WITH_INFO,
             ],
             //
-            '_DEBUG_THROWABLE_WITH_FILE'         => [
+            '_DEBUG_THROWABLER_WITH_TRACE' => [
                 [
-                    _DEBUG_THROWABLE_WITH_FILE,
-                    _DEBUG_THROWABLE_WITHOUT_FILE,
+                    _DEBUG_THROWABLER_WITH_TRACE,
+                    _DEBUG_THROWABLER_WITHOUT_TRACE,
                 ],
-                _DEBUG_THROWABLE_WITH_FILE,
+                _DEBUG_THROWABLER_WITHOUT_TRACE,
+            ],
+        ];
+
+        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+            $cnt = 0;
+            foreach ( $conflict as $flag ) {
+                if ($flags & $flag) {
+                    $cnt++;
+                }
+            }
+
+            if ($cnt > 1) {
+                throw new LogicException(
+                    [ 'The `flags` conflict in group: ' . $groupName, $flags ]
+                );
+
+            } elseif (0 === $cnt) {
+                $flags |= $default;
+            }
+        }
+
+        return $flags;
+    }
+
+    protected function flagsInfoDefault(?int $flags) : int
+    {
+        $flags = $flags ?? 0;
+
+        $flagGroups = [
+            '_DEBUG_THROWABLER_WITH_FILE'         => [
+                [
+                    _DEBUG_THROWABLER_INFO_WITH_FILE,
+                    _DEBUG_THROWABLER_INFO_WITHOUT_FILE,
+                ],
+                _DEBUG_THROWABLER_INFO_WITH_FILE,
             ],
             //
-            '_DEBUG_THROWABLE_WITH_OBJECT_CLASS' => [
+            '_DEBUG_THROWABLER_WITH_OBJECT_CLASS' => [
                 [
-                    _DEBUG_THROWABLE_WITH_OBJECT_CLASS,
-                    _DEBUG_THROWABLE_WITHOUT_OBJECT_CLASS,
+                    _DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS,
+                    _DEBUG_THROWABLER_INFO_WITHOUT_OBJECT_CLASS,
                 ],
-                _DEBUG_THROWABLE_WITH_OBJECT_CLASS,
+                _DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS,
             ],
             //
-            '_DEBUG_THROWABLE_WITH_OBJECT_ID'    => [
+            '_DEBUG_THROWABLER_WITH_OBJECT_ID'    => [
                 [
-                    _DEBUG_THROWABLE_WITH_OBJECT_ID,
-                    _DEBUG_THROWABLE_WITHOUT_OBJECT_ID,
+                    _DEBUG_THROWABLER_INFO_WITH_OBJECT_ID,
+                    _DEBUG_THROWABLER_INFO_WITHOUT_OBJECT_ID,
                 ],
-                _DEBUG_THROWABLE_WITHOUT_OBJECT_ID,
-            ],
-            //
-            '_DEBUG_THROWABLE_WITH_PARENTS'      => [
-                [
-                    _DEBUG_THROWABLE_WITH_PARENTS,
-                    _DEBUG_THROWABLE_WITHOUT_PARENTS,
-                ],
-                _DEBUG_THROWABLE_WITHOUT_PARENTS,
+                _DEBUG_THROWABLER_INFO_WITHOUT_OBJECT_ID,
             ],
         ];
 

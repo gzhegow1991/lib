@@ -378,9 +378,9 @@ $fn = function () use ($ffn) {
     $previousList = [ $ee1, $ee2 ];
     $e0 = new \Gzhegow\Lib\Exception\RuntimeException('e', 0, ...$previousList);
 
-    $messages = \Gzhegow\Lib\Lib::debugThrowabler()
-        ->getPreviousMessagesAllLines($e0, _DEBUG_THROWABLE_WITHOUT_FILE)
-    ;
+    $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesAllLines($e0, 0
+        | _DEBUG_THROWABLER_INFO_WITHOUT_FILE
+    );
 
     echo implode("\n", $messages);
 };

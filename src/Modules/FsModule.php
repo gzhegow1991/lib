@@ -36,7 +36,7 @@ class FsModule
         $last = static::$realpathReturnTargetPath;
 
         if (null !== $realpath_return_target_path) {
-            static::$realpathReturnTargetPath = (bool) $realpath_return_target_path;
+            static::$realpathReturnTargetPath = $realpath_return_target_path;
         }
 
         static::$realpathReturnTargetPath = static::$realpathReturnTargetPath ?? true;

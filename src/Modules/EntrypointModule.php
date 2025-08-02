@@ -1694,32 +1694,19 @@ class EntrypointModule
             $theDebugThrowabler->setDirRoot($refDirRoot);
         }
 
-        $messageLines = $theDebugThrowabler->getPreviousMessagesAllLines(
+        $lines = $theDebugThrowabler->getPreviousMessagesAllLines(
             $throwable,
             0
-            | _DEBUG_THROWABLE_WITH_CODE
-            | _DEBUG_THROWABLE_WITH_FILE
-            | _DEBUG_THROWABLE_WITH_OBJECT_CLASS
-            | _DEBUG_THROWABLE_WITH_PARENTS
+            //
+            | _DEBUG_THROWABLER_WITH_CODE
+            | _DEBUG_THROWABLER_WITH_INFO
+            | _DEBUG_THROWABLER_WITH_TRACE
+            //
+            | _DEBUG_THROWABLER_INFO_WITH_FILE
+            | _DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS
         );
 
-        $traceLines = $theDebugThrowabler->getThrowableTraceLines($throwable);
-
-        if ([] !== $messageLines) {
-            foreach ( $messageLines as $line ) {
-                echo $line . "\n";
-            }
-        }
-
-        if ([] !== $traceLines) {
-            echo "\n";
-
-            echo 'Trace: ' . "\n";
-
-            foreach ( $traceLines as $line ) {
-                echo $line . "\n";
-            }
-        }
+        echo implode("\n", $lines);
 
         exit(1);
     }

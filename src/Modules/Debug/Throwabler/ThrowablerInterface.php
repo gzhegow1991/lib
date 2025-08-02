@@ -40,7 +40,7 @@ interface ThrowablerInterface
     /**
      * @return string[]
      */
-    public function getPreviousMessagesAllList(\Throwable $throwable, ?int $flags = null) : array;
+    public function getPreviousMessagesAllDict(\Throwable $throwable, ?int $flags = null) : array;
 
     /**
      * @return string[]
@@ -59,7 +59,7 @@ interface ThrowablerInterface
     public function catchPrevious(\Throwable $throwable, string $throwableClass = '') : ?\Throwable;
 
 
-    public function getThrowableMessageFirst(\Throwable $throwable, ?int $flags = null) : string;
+    public function getThrowableMessageFirstString(\Throwable $throwable, ?int $flags = null) : string;
 
     /**
      * @return string[]
@@ -78,7 +78,7 @@ interface ThrowablerInterface
     public function getThrowableMessagesAllLines(\Throwable $throwable, ?int $flags = null) : array;
 
 
-    public function getThrowableInfo(\Throwable $throwable, ?int $flags = null) : array;
+    public function getThrowableInfoArray(\Throwable $throwable, ?int $flags = null) : array;
 
     /**
      * @return string[]
@@ -86,7 +86,7 @@ interface ThrowablerInterface
     public function getThrowableInfoLines(\Throwable $throwable, ?int $flags = null) : array;
 
 
-    public function getThrowableTrace(\Throwable $e, ?int $flags = null) : array;
+    public function getThrowableTraceArray(\Throwable $e, ?int $flags = null) : array;
 
     /**
      * @return string[]
