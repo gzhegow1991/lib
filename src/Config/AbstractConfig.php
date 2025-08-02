@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Config;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
@@ -20,7 +21,7 @@ abstract class AbstractConfig implements
      */
     protected $__children = [];
     /**
-     * @var bool
+     * @var bool|null
      */
     protected $__valid;
 
@@ -37,14 +38,14 @@ abstract class AbstractConfig implements
             );
         }
 
-        $__keys = [
+        $__ignore = [
             '__keys'     => true,
             '__children' => true,
             '__valid'    => true,
         ];
 
         foreach ( get_object_vars($this) as $key => $value ) {
-            if (isset($__keys[ $key ])) {
+            if (isset($__ignore[ $key ])) {
                 continue;
             }
 
@@ -57,64 +58,88 @@ abstract class AbstractConfig implements
     }
 
 
-    public function __isset($name)
+    /**
+     * @return static|Ret<static>
+     */
+    public static function from($from, ?array $fallback = null)
     {
-        if (! isset($this->__keys[ $name ])) {
-            return false;
+        $ret = Ret::new();
+
+        $instance = null
+            ?? static::fromStatic($from)->orNull($ret)
+            ?? static::fromArray($from)->orNull($ret);
+
+        if ($ret->isFail()) {
+            return Ret::throw($fallback, $ret);
         }
 
-        return true;
+        return Ret::ok($fallback, $instance);
+    }
+
+    /**
+     * @return static|Ret<static>
+     */
+    public static function fromStatic($from, ?array $fallback = null)
+    {
+        if ($from instanceof static) {
+            return Ret::ok($fallback, $from);
+        }
+
+        return Ret::throw(
+            $fallback,
+            [ 'The `from` should be instance of: ' . static::class, $from ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return static|Ret<static>
+     */
+    public static function fromArray($from, ?array $fallback = null)
+    {
+        if (! is_array($from)) {
+            return Ret::throw(
+                $fallback,
+                [],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $instance = new static();
+
+        try {
+            $instance->load($from);
+        }
+        catch ( \Throwable $e ) {
+            return Ret::throw(
+                $fallback,
+                $e->getMessage(),
+                [ $e->getFile(), $e->getLine() ]
+            );
+        }
+
+        return Ret::ok($fallback, $instance);
+    }
+
+
+    public function __isset($name)
+    {
+        return $this->exists($name);
     }
 
     public function __get($name)
     {
-        if (! isset($this->__keys[ $name ])) {
-            throw new LogicException(
-                'Missing property: ' . $name
-            );
-        }
-
-        $this->validate();
-
-        return $this->{$name};
+        return $this->get($name);
     }
 
     public function __set($name, $value)
     {
-        if (! isset($this->__keys[ $name ])) {
-            throw new LogicException(
-                'Missing property: ' . $name
-            );
-        }
-
-        $this->invalidate();
-
-        if (isset($this->__children[ $name ])) {
-            $this->{$name}->fill($value);
-
-        } else {
-            $this->{$name} = $value;
-        }
+        $this->set($name, $value);
     }
 
     public function __unset($name)
     {
-        if (! isset($this->__keys[ $name ])) {
-            throw new LogicException(
-                'Missing property: ' . $name
-            );
-        }
-
-        $this->invalidate();
-
-        $valueDefault = (new static())->{$name};
-
-        if (isset($this->__children[ $name ])) {
-            $this->{$name}->fill($valueDefault);
-
-        } else {
-            $this->{$name} = $valueDefault;
-        }
+        $this->unset($name);
     }
 
 
@@ -179,11 +204,136 @@ abstract class AbstractConfig implements
             unset($refContext[ '__root' ]);
         }
 
-        if (! $this->__valid) {
+        if (false === $this->__valid) {
             throw new RuntimeException(
                 [ 'Configuration is invalid', $this ]
             );
         }
+    }
+
+
+    public function exists($name, &$value = null) : bool
+    {
+        $value = null;
+
+        if (! isset($this->__keys[ $name ])) {
+            return false;
+        }
+
+        $value = $this->{$name};
+
+        return true;
+    }
+
+    public function isset($name, &$value = null) : bool
+    {
+        $value = null;
+
+        if (! isset($this->__keys[ $name ])) {
+            return false;
+        }
+
+        if (null === $this->{$name}) {
+            return false;
+        }
+
+        $value = $this->{$name};
+
+        return true;
+    }
+
+    public function get($name, array $fallback = [])
+    {
+        $error = null;
+
+        if (! isset($this->__keys[ $name ])) {
+            $error = [
+                [ 'Missing property: ' . $name ],
+                [ __FILE__, __LINE__ ],
+            ];
+        }
+
+        if (null === $error) {
+            try {
+                $this->validate();
+            }
+            catch ( \Throwable $e ) {
+                $error = [
+                    [ $e->getMessage() ],
+                    [ $e->getFile(), $e->getLine() ],
+                ];
+            }
+
+            if (false === $this->__valid) {
+                $error = [
+                    [ 'The config is invalid', $this ],
+                    [ __FILE__, __LINE__ ],
+                ];
+            }
+        }
+
+        if (null !== $error) {
+            if ([] !== $fallback) {
+                [ $fallback ] = $fallback;
+
+                return $fallback;
+            }
+
+            throw new LogicException(...$error);
+        }
+
+        return $this->{$name};
+    }
+
+    /**
+     * @return static
+     */
+    public function set($name, $value)
+    {
+        if (! isset($this->__keys[ $name ])) {
+            throw new LogicException(
+                'Missing property: ' . $name
+            );
+        }
+
+        $this->invalidate();
+
+        if (isset($this->__children[ $name ])) {
+            /** @var self $child */
+
+            $child = $this->{$name};
+            $child->fill($value);
+
+        } else {
+            $this->{$name} = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function unset($name)
+    {
+        if (! isset($this->__keys[ $name ])) {
+            throw new LogicException(
+                'Missing property: ' . $name
+            );
+        }
+
+        $this->invalidate();
+
+        $valueDefault = (new static())->{$name};
+
+        if (isset($this->__children[ $name ])) {
+            $this->{$name}->fill($valueDefault);
+
+        } else {
+            $this->{$name} = $valueDefault;
+        }
+
+        return $this;
     }
 
 
@@ -218,7 +368,7 @@ abstract class AbstractConfig implements
                 $value = $instance;
             }
 
-            $this->__set($key, $value);
+            $this->set($key, $value);
         }
 
         return $this;
@@ -227,16 +377,19 @@ abstract class AbstractConfig implements
     /**
      * @return static
      */
-    public function fill(self $config)
+    public function fill($config)
     {
-        if (static::class !== get_class($config)) {
+        if (! (true
+            && is_object($config)
+            && (static::class === get_class($config))
+        )) {
             throw new LogicException(
                 [ 'The `config` should be an instance of: ' . static::class, $config ]
             );
         }
 
         foreach ( $this->__keys as $key => $bool ) {
-            $this->__set($key, $config->{$key});
+            $this->set($key, $config->{$key});
         }
 
         return $this;

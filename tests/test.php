@@ -860,30 +860,30 @@ $fn = function () use ($ffn) {
     echo "\n";
 
     /**
-     * @property $child
+     * @property \TestConfigChild $child
      */
-    class ConfigDummy extends \Gzhegow\Lib\Config\AbstractConfig
+    class TestConfig extends \Gzhegow\Lib\Config\AbstractConfig
     {
         protected $child;
 
         public function __construct()
         {
-            $this->child = new \ConfigChildDummy();
+            $this->child = new \TestConfigChild();
 
             parent::__construct();
         }
     }
 
     /**
-     * @property $foo
+     * @property string $foo
      */
-    class ConfigChildDummy extends \Gzhegow\Lib\Config\AbstractConfig
+    class TestConfigChild extends \Gzhegow\Lib\Config\AbstractConfig
     {
         protected $foo = 'bar';
     }
 
     /**
-     * @property $child
+     * @property \TestConfigChildValidate $child
      */
     class ConfigValidateDummy extends \Gzhegow\Lib\Config\AbstractConfig
     {
@@ -891,17 +891,17 @@ $fn = function () use ($ffn) {
 
         public function __construct()
         {
-            $this->child = new \ConfigChildValidateDummy();
+            $this->child = new \TestConfigChildValidate();
 
             parent::__construct();
         }
     }
 
     /**
-     * @property $foo
-     * @property $foo2
+     * @property int $foo
+     * @property int $foo2
      */
-    class ConfigChildValidateDummy extends \Gzhegow\Lib\Config\AbstractConfig
+    class TestConfigChildValidate extends \Gzhegow\Lib\Config\AbstractConfig
     {
         protected $foo = 1;
         protected $foo2;
@@ -917,12 +917,12 @@ $fn = function () use ($ffn) {
     }
 
 
-    $config = new \ConfigDummy();
+    $config = new \TestConfig();
 
     $configChildDefault = $config->child;
 
     $configChildNewFooValue = 'baz';
-    $configChildNew = new \ConfigChildDummy();
+    $configChildNew = new \TestConfigChild();
     $configChildNew->foo = $configChildNewFooValue;
 
     $config->child = $configChildNew;
@@ -934,17 +934,19 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    $config = new \ConfigDummy();
+    $config = new \TestConfig();
     $configChildDefault = $config->child;
 
     $configChildNewFooValue = 'baz';
-    $config->load([
-        'hello' => 'world',
-        'foo'   => 'bar',
-        'child' => [
-            'foo' => $configChildNewFooValue,
-        ],
-    ]);
+    $config->load(
+        [
+            'hello' => 'world',
+            'foo'   => 'bar',
+            'child' => [
+                'foo' => $configChildNewFooValue,
+            ],
+        ]
+    );
 
     $ffn->print($config);
     $ffn->print($config->child, $config->child === $configChildDefault);
@@ -975,16 +977,16 @@ $test = $ffn->test($fn);
 $test->expectStdout('
 "[ Config ]"
 
-{ object # ConfigDummy }
-{ object # ConfigChildDummy } | TRUE
+{ object # TestConfig }
+{ object # TestConfigChild } | TRUE
 "baz" | TRUE
 
-{ object # ConfigDummy }
-{ object # ConfigChildDummy } | TRUE
+{ object # TestConfig }
+{ object # TestConfigChild } | TRUE
 "baz" | TRUE
 
-{ object # ConfigDummy }
-{ object # ConfigChildDummy } | TRUE
+{ object # TestConfig }
+{ object # TestConfigChild } | TRUE
 "baz" | TRUE
 
 "[ CATCH ] Configuration is invalid"
