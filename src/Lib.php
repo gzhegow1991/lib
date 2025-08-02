@@ -813,7 +813,7 @@ class Lib
         return $services;
     }
 
-    public static function export(string $file, $item, ?string $key = null) : array
+    public static function export(string $file, $item = null, ?string $key = null) : array
     {
         if (! is_file($file)) {
             throw new LogicException(
@@ -821,32 +821,24 @@ class Lib
             );
         }
 
-        if (null === $item) {
-            throw new LogicException(
-                [ 'The `item` should be not-null' ]
-            );
-        }
-
         $services =& static::di();
 
         $realpath = realpath($file);
 
-        if (null !== $key) {
-            $services[ $realpath ][ $key ] = $item;
+        if (null !== $item) {
+            if (null !== $key) {
+                $services[ $realpath ][ $key ] = $item;
 
-            return $services[ $realpath ];
+            } elseif (is_array($item)) {
+                $services[ $realpath ] = array_replace(
+                    $services[ $file ] ?? [],
+                    $item
+                );
+
+            } else {
+                $services[ $realpath ][] = $item;
+            }
         }
-
-        if (is_array($item)) {
-            $services[ $realpath ] = array_replace(
-                $services[ $file ] ?? [],
-                $item
-            );
-
-            return $services[ $realpath ];
-        }
-
-        $services[ $realpath ][] = $item;
 
         return $services[ $realpath ];
     }
