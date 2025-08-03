@@ -16,6 +16,11 @@ class FormatModule
         return new FormatCsv();
     }
 
+    public function cloneCsv() : FormatCsv
+    {
+        return clone $this->csv();
+    }
+
     public function csv() : FormatCsv
     {
         return $this->newCsv();
@@ -27,6 +32,11 @@ class FormatModule
         return new FormatJson();
     }
 
+    public function cloneJson() : FormatJson
+    {
+        return clone $this->json();
+    }
+
     public function json() : FormatJson
     {
         return $this->newJson();
@@ -36,6 +46,11 @@ class FormatModule
     public function newXml() : FormatXml
     {
         return new FormatXml();
+    }
+
+    public function cloneXml() : FormatXml
+    {
+        return clone $this->xml();
     }
 
     public function xml() : FormatXml

@@ -22,21 +22,21 @@ class DefaultDumper implements DumperInterface
     const SYMFONY_CLI_DUMPER       = '\Symfony\Component\VarDumper\Dumper\CliDumper';
     const SYMFONY_HTML_DUMPER      = '\Symfony\Component\VarDumper\Dumper\HtmlDumper';
 
-    const PRINTER_SYMFONY         = 'symfony';
-    const PRINTER_VAR_DUMP        = 'var_dump';
-    const PRINTER_VAR_DUMP_NATIVE = 'var_dump_native';
-    const PRINTER_VAR_EXPORT      = 'var_export';
-    const PRINTER_EXPORT_NATIVE   = 'var_export_native';
-    const PRINTER_PRINT_R         = 'print_r';
-    const PRINTER_JSON_ENCODE     = 'json_encode';
-    const PRINTER_LIST            = [
-        self::PRINTER_SYMFONY         => true,
-        self::PRINTER_VAR_DUMP        => true,
-        self::PRINTER_VAR_DUMP_NATIVE => true,
-        self::PRINTER_VAR_EXPORT      => true,
-        self::PRINTER_EXPORT_NATIVE   => true,
-        self::PRINTER_PRINT_R         => true,
-        self::PRINTER_JSON_ENCODE     => true,
+    const PRINTER_SYMFONY           = 'symfony';
+    const PRINTER_VAR_DUMP          = 'var_dump';
+    const PRINTER_VAR_DUMP_NATIVE   = 'var_dump_native';
+    const PRINTER_VAR_EXPORT        = 'var_export';
+    const PRINTER_VAR_EXPORT_NATIVE = 'var_export_native';
+    const PRINTER_PRINT_R           = 'print_r';
+    const PRINTER_JSON_ENCODE       = 'json_encode';
+    const PRINTER_LIST              = [
+        self::PRINTER_SYMFONY           => true,
+        self::PRINTER_VAR_DUMP          => true,
+        self::PRINTER_VAR_DUMP_NATIVE   => true,
+        self::PRINTER_VAR_EXPORT        => true,
+        self::PRINTER_VAR_EXPORT_NATIVE => true,
+        self::PRINTER_PRINT_R           => true,
+        self::PRINTER_JSON_ENCODE       => true,
     ];
 
     const DUMPER_ECHO              = 'echo';
@@ -373,7 +373,7 @@ class DefaultDumper implements DumperInterface
                 $content = $this->printerPrint_var_export(...$vars);
                 break;
 
-            case static::PRINTER_EXPORT_NATIVE:
+            case static::PRINTER_VAR_EXPORT_NATIVE:
                 $content = $this->printerPrint_var_export_native(...$vars);
                 break;
 

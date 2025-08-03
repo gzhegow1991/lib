@@ -74,24 +74,32 @@ class Lib
         return static::$async = static::$async ?? new AsyncModule();
     }
 
-    public static function asyncClock() : ClockManagerInterface
+    public static function asyncClock(?bool $clone = null) : ClockManagerInterface
     {
-        return Lib::async()->clockManager();
+        return $clone
+            ? Lib::async()->cloneClockManager()
+            : Lib::async()->clockManager();
     }
 
-    public static function asyncLoop() : LoopManagerInterface
+    public static function asyncLoop(?bool $clone = null) : LoopManagerInterface
     {
-        return Lib::async()->loopManager();
+        return $clone
+            ? Lib::async()->cloneLoopManager()
+            : Lib::async()->loopManager();
     }
 
-    public static function asyncPromise() : PromiseManagerInterface
+    public static function asyncPromise(?bool $clone = null) : PromiseManagerInterface
     {
-        return Lib::async()->promiseManager();
+        return $clone
+            ? Lib::async()->clonePromiseManager()
+            : Lib::async()->promiseManager();
     }
 
-    public static function asyncFetchApi() : FetchApiInterface
+    public static function asyncFetchApi(?bool $clone = null) : FetchApiInterface
     {
-        return Lib::async()->fetchApi();
+        return $clone
+            ? Lib::async()->cloneFetchApi()
+            : Lib::async()->fetchApi();
     }
 
 
@@ -105,9 +113,11 @@ class Lib
         return static::$cli = static::$cli ?? new CliModule();
     }
 
-    public static function cliProcessManager() : ProcessManagerInterface
+    public static function cliProcessManager(?bool $clone = null) : ProcessManagerInterface
     {
-        return Lib::cli()->processManager();
+        return $clone
+            ? Lib::cli()->cloneProcessManager()
+            : Lib::cli()->processManager();
     }
 
 
@@ -121,19 +131,25 @@ class Lib
         return static::$debug = static::$debug ?? new DebugModule();
     }
 
-    public static function debugBacktracer() : BacktracerInterface
+    public static function debugBacktracer(?bool $clone = null) : BacktracerInterface
     {
-        return Lib::debug()->backtracer();
+        return $clone
+            ? Lib::debug()->cloneBacktracer()
+            : Lib::debug()->backtracer();
     }
 
-    public static function debugDumper() : DumperInterface
+    public static function debugDumper(?bool $clone = null) : DumperInterface
     {
-        return Lib::debug()->dumper();
+        return $clone
+            ? Lib::debug()->cloneDumper()
+            : Lib::debug()->dumper();
     }
 
-    public static function debugThrowabler() : ThrowablerInterface
+    public static function debugThrowabler(?bool $clone = null) : ThrowablerInterface
     {
-        return Lib::debug()->throwabler();
+        return $clone
+            ? Lib::debug()->cloneThrowabler()
+            : Lib::debug()->throwabler();
     }
 
 
@@ -147,19 +163,25 @@ class Lib
         return static::$format = static::$format ?? new FormatModule();
     }
 
-    public static function formatCsv() : FormatCsv
+    public static function formatCsv(?bool $clone = null) : FormatCsv
     {
-        return Lib::format()->csv();
+        return $clone
+            ? Lib::format()->cloneCsv()
+            : Lib::format()->csv();
     }
 
-    public static function formatJson() : FormatJson
+    public static function formatJson(?bool $clone = null) : FormatJson
     {
-        return Lib::format()->json();
+        return $clone
+            ? Lib::format()->cloneJson()
+            : Lib::format()->json();
     }
 
-    public static function formatXml() : FormatXml
+    public static function formatXml(?bool $clone = null) : FormatXml
     {
-        return Lib::format()->xml();
+        return $clone
+            ? Lib::format()->cloneXml()
+            : Lib::format()->xml();
     }
 
 
@@ -199,9 +221,11 @@ class Lib
         return static::$func = static::$func ?? new FuncModule();
     }
 
-    public static function funcInvoker() : InvokerInterface
+    public static function funcInvoker(?bool $clone = null) : InvokerInterface
     {
-        return Lib::func()->invoker();
+        return $clone
+            ? Lib::func()->cloneInvoker()
+            : Lib::func()->invoker();
     }
 
 
@@ -236,9 +260,11 @@ class Lib
         return static::$php = static::$php ?? new PhpModule();
     }
 
-    public static function phpCallableParser() : CallableParserInterface
+    public static function phpCallableParser(?bool $clone = null) : CallableParserInterface
     {
-        return Lib::php()->callableParser();
+        return $clone
+            ? Lib::php()->cloneCallableParser()
+            : Lib::php()->callableParser();
     }
 
 
@@ -252,14 +278,18 @@ class Lib
         return static::$social = static::$social ?? new SocialModule();
     }
 
-    public static function socialEmail() : EmailParserInterface
+    public static function socialEmail(?bool $clone = null) : EmailParserInterface
     {
-        return Lib::social()->emailParser();
+        return $clone
+            ? Lib::social()->cloneEmailParser()
+            : Lib::social()->emailParser();
     }
 
-    public static function socialPhone() : PhoneManagerInterface
+    public static function socialPhone(?bool $clone = null) : PhoneManagerInterface
     {
-        return Lib::social()->phoneManager();
+        return $clone
+            ? Lib::social()->clonePhoneManager()
+            : Lib::social()->phoneManager();
     }
 
 
@@ -273,19 +303,25 @@ class Lib
         return static::$str = static::$str ?? new StrModule();
     }
 
-    public static function strInflector() : InflectorInterface
+    public static function strInflector(?bool $clone = null) : InflectorInterface
     {
-        return Lib::str()->inflector();
+        return $clone
+            ? Lib::str()->cloneInflector()
+            : Lib::str()->inflector();
     }
 
-    public static function strInterpolator() : InterpolatorInterface
+    public static function strInterpolator(?bool $clone = null) : InterpolatorInterface
     {
-        return Lib::str()->interpolator();
+        return $clone
+            ? Lib::str()->cloneInterpolator()
+            : Lib::str()->interpolator();
     }
 
-    public static function strSlugger() : SluggerInterface
+    public static function strSlugger(?bool $clone = null) : SluggerInterface
     {
-        return Lib::str()->slugger();
+        return $clone
+            ? Lib::str()->cloneSlugger()
+            : Lib::str()->slugger();
     }
 
 
