@@ -23,20 +23,20 @@ interface DumperInterface
     public function dumperEcho(...$vars) : void;
 
 
-    public function dp(?array $trace, $var, ...$vars) : string;
+    public function dp(?array $debugBacktraceOverride, $var, ...$vars) : string;
 
     /**
      * @return mixed
      */
-    public function d(?array $trace, $var, ...$vars);
+    public function d(?array $debugBacktraceOverride, $var, ...$vars);
 
     /**
      * @return mixed|void
      */
-    public function dd(?array $trace, ...$vars);
+    public function dd(?array $debugBacktraceOverride, ...$vars);
 
     /**
      * @return mixed|void
      */
-    public function ddd(?array $trace, ?int $limit, $var, ...$vars);
+    public function ddd(?array $debugBacktraceOverride, ?int $times, $var, ...$vars);
 }

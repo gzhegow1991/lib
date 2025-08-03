@@ -694,9 +694,9 @@ class Lib
         return Lib::debug()->dumper()->dp($trace, $var, ...$vars);
     }
 
-    public static function fnDP() : \Closure
+    public static function fnDP(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        return Lib::debug()->fnDP();
+        return Lib::debug()->fnDP($limit, $debugBacktraceOverride);
     }
 
 
@@ -731,24 +731,33 @@ class Lib
     }
 
 
-    public static function fnD() : \Closure
+    public static function fnD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        return Lib::debug()->fnD();
+        return Lib::debug()->fnD($limit, $debugBacktraceOverride);
     }
 
-    public static function fnDD() : \Closure
+    public static function fnDD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        return Lib::debug()->fnDD();
+        return Lib::debug()->fnDD($limit, $debugBacktraceOverride);
     }
 
-    public static function fnDDD() : \Closure
+    public static function fnDDD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        return Lib::debug()->fnDDD();
+        return Lib::debug()->fnDDD($limit, $debugBacktraceOverride);
     }
 
-    public static function fnTD(int $throttleMs) : \Closure
+
+    /**
+     * @return mixed|void
+     */
+    public function td(int $throttleMs, $var, ...$vars)
     {
-        return Lib::debug()->fnTD($throttleMs);
+        return Lib::debug()->td($throttleMs, $var, ...$vars);
+    }
+
+    public static function fnTD(int $throttleMs, ?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    {
+        return Lib::debug()->fnTD($throttleMs, $limit, $debugBacktraceOverride);
     }
 
 

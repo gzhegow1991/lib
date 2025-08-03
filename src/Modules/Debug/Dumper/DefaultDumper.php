@@ -738,44 +738,44 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    public function dp(?array $trace, $var, ...$vars) : string
+    public function dp(?array $debugBacktraceOverride, $var, ...$vars) : string
     {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $debugBacktraceOverride = $debugBacktraceOverride ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->doPrinterPrintTrace($trace, $var, ...$vars);
+        return $this->doPrinterPrintTrace($debugBacktraceOverride, $var, ...$vars);
     }
 
 
-    public function d(?array $trace, $var, ...$vars)
+    public function d(?array $debugBacktraceOverride, $var, ...$vars)
     {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $debugBacktraceOverride = $debugBacktraceOverride ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $this->doDumperEchoTrace($trace, $var, ...$vars);
+        $this->doDumperEchoTrace($debugBacktraceOverride, $var, ...$vars);
 
         return $var;
     }
 
-    public function dd(?array $trace, ...$vars)
+    public function dd(?array $debugBacktraceOverride, ...$vars)
     {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $debugBacktraceOverride = $debugBacktraceOverride ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $this->doDumperEchoTrace($trace, ...$vars);
+        $this->doDumperEchoTrace($debugBacktraceOverride, ...$vars);
 
         die();
     }
 
-    public function ddd(?array $trace, ?int $limit, $var, ...$vars)
+    public function ddd(?array $debugBacktraceOverride, ?int $times, $var, ...$vars)
     {
-        $trace = $trace ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $debugBacktraceOverride = $debugBacktraceOverride ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
         static $current;
 
-        $limit = $limit ?? 1;
-        if ($limit < 1) $limit = 1;
+        $times = $times ?? 1;
+        if ($times < 1) $times = 1;
 
-        $current = $current ?? $limit;
+        $current = $current ?? $times;
 
-        $this->doDumperEchoTrace($trace, $var, ...$vars);
+        $this->doDumperEchoTrace($debugBacktraceOverride, $var, ...$vars);
 
         if (0 === --$current) {
             die();
@@ -785,24 +785,36 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    protected function doPrinterPrintTrace(array $trace, ...$vars) : string
+    protected function doPrinterPrintTrace(array $debugBacktrace, ...$vars) : string
     {
-        $traceFile = $trace[ 0 ][ 'file' ] ?? $trace[ 0 ][ 0 ] ?? '{file}';
-        $traceLine = $trace[ 0 ][ 'line' ] ?? $trace[ 0 ][ 1 ] ?? -1;
+        if (! (isset($debugBacktrace[ 0 ]) && is_array($debugBacktrace[ 0 ]))) {
+            throw new LogicException(
+                [ 'The `debugBacktrace` should be valid result of `debug_backtrace` function', $debugBacktrace ]
+            );
+        }
 
-        $traceWhereIs = "{$traceFile}: {$traceLine}";
+        $traceFile = $debugBacktrace[ 0 ][ 'file' ] ?? $debugBacktrace[ 0 ][ 0 ] ?? '{file}';
+        $traceLine = $debugBacktrace[ 0 ][ 'line' ] ?? $debugBacktrace[ 0 ][ 1 ] ?? -1;
+
+        $traceWhereIs = "[ {$traceFile} ({$traceLine}) ]";
 
         $content = $this->printerPrint($traceWhereIs, ...$vars);
 
         return $content;
     }
 
-    protected function doDumperEchoTrace(array $trace, ...$vars) : void
+    protected function doDumperEchoTrace(array $debugBacktrace, ...$vars) : void
     {
-        $traceFile = $trace[ 0 ][ 'file' ] ?? $trace[ 0 ][ 0 ] ?? '{file}';
-        $traceLine = $trace[ 0 ][ 'line' ] ?? $trace[ 0 ][ 1 ] ?? -1;
+        if (! (isset($debugBacktrace[ 0 ]) && is_array($debugBacktrace[ 0 ]))) {
+            throw new LogicException(
+                [ 'The `debugBacktrace` should be valid result of `debug_backtrace` function', $debugBacktrace ]
+            );
+        }
 
-        $traceWhereIs = "{$traceFile}: {$traceLine}";
+        $traceFile = $debugBacktrace[ 0 ][ 'file' ] ?? $debugBacktrace[ 0 ][ 0 ] ?? '{file}';
+        $traceLine = $debugBacktrace[ 0 ][ 'line' ] ?? $debugBacktrace[ 0 ][ 1 ] ?? -1;
+
+        $traceWhereIs = "[ {$traceFile} ({$traceLine}) ]";
 
         $this->dumperEcho($traceWhereIs, ...$vars);
     }

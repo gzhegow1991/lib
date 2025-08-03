@@ -170,34 +170,6 @@ class DebugModule
     }
 
 
-    /**
-     * @return array{ 0: string, 1: string }
-     */
-    public function file_line(?array $trace = null, int $step = -2) : array
-    {
-        $i = 0;
-
-        if (null === $trace) {
-            if ($step >= 0) {
-                throw new LogicException(
-                    [ 'The `step` should be negative integer', $step ]
-                );
-            }
-
-            $i = -$step - 1;
-
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, -$step);
-        }
-
-        $t = [
-            $trace[ $i ][ 'file' ] ?? '{{file}}',
-            $trace[ $i ][ 'line' ] ?? '{{line}}',
-        ];
-
-        return $t;
-    }
-
-
     public function debug_backtrace(
         ?int $options = -1,
         ?int $limit = -1,
@@ -221,6 +193,35 @@ class DebugModule
         return $backtracer;
     }
 
+    /**
+     * @return array{ 0: string, 1: string }
+     */
+    public function file_line(?int $limit = null, ?array $debugBacktraceOverride = null) : array
+    {
+        $limit = $limit ?? 1;
+
+        if (null === $debugBacktraceOverride) {
+            $limit++;
+
+            $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit);
+        }
+
+        $i = $limit - 1;
+
+        if (! isset($debugBacktraceOverride[ $i ])) {
+            throw new LogicException(
+                [ 'The key is not exists in trace: ' . $i, $debugBacktraceOverride ]
+            );
+        }
+
+        $fileLine = [
+            $debugBacktraceOverride[ $i ][ 'file' ] ?? '{{file}}',
+            $debugBacktraceOverride[ $i ][ 'line' ] ?? '{{line}}',
+        ];
+
+        return $fileLine;
+    }
+
 
     public function print(...$vars) : string
     {
@@ -230,17 +231,17 @@ class DebugModule
 
     public function dp($var, ...$vars) : string
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->dumper()->dp($trace, $var, ...$vars);
+        return $this->dumper()->dp($debugBacktraceOverride, $var, ...$vars);
     }
 
-    public function fnDP() : \Closure
+    public function fnDP(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        return function ($var, ...$vars) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        return function ($var, ...$vars) use ($limit, $debugBacktraceOverride) {
+            $t = $this->file_line($limit, $debugBacktraceOverride);
 
-            return $this->dumper()->dp($trace, $var, ...$vars);
+            return $this->dumper()->dp([ $t ], $var, ...$vars);
         };
     }
 
@@ -250,9 +251,9 @@ class DebugModule
      */
     public function d($var, ...$vars)
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->dumper()->d($trace, $var, ...$vars);
+        return $this->dumper()->d($debugBacktraceOverride, $var, ...$vars);
     }
 
     /**
@@ -260,51 +261,97 @@ class DebugModule
      */
     public function dd(...$vars)
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->dumper()->dd($trace, ...$vars);
+        return $this->dumper()->dd($debugBacktraceOverride, ...$vars);
     }
 
     /**
      * @return mixed|void
      */
-    public function ddd(?int $limit, $var, ...$vars)
+    public function ddd(?int $times, $var, ...$vars)
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return $this->dumper()->ddd($trace, $limit, $var, ...$vars);
+        return $this->dumper()->ddd($debugBacktraceOverride, $times, $var, ...$vars);
     }
 
 
-    public function fnD() : \Closure
+    public function fnD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        return function ($var, ...$vars) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        /**
+         * @return mixed
+         */
+        return function ($var, ...$vars) use ($limit, $debugBacktraceOverride) {
+            $t = $this->file_line($limit, $debugBacktraceOverride);
 
-            return $this->dumper()->d($trace, $var, ...$vars);
+            return $this->dumper()->d([ $t ], $var, ...$vars);
         };
     }
 
-    public function fnDD() : \Closure
+    public function fnDD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        return function (...$vars) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        /**
+         * @return mixed|void
+         */
+        return function (...$vars) use ($limit, $debugBacktraceOverride) {
+            $t = $this->file_line($limit, $debugBacktraceOverride);
 
-            return $this->dumper()->dd($trace, ...$vars);
+            return $this->dumper()->dd([ $t ], ...$vars);
         };
     }
 
-    public function fnDDD() : \Closure
+    public function fnDDD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        return function (?int $limit, $var, ...$vars) {
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        /**
+         * @return mixed|void
+         */
+        return function (?int $times, $var, ...$vars) use ($limit, $debugBacktraceOverride) {
+            $t = $this->file_line($limit, $debugBacktraceOverride);
 
-            return $this->dumper()->ddd($trace, $limit, $var, ...$vars);
+            return $this->dumper()->ddd([ $t ], $times, $var, ...$vars);
         };
     }
 
 
-    public function fnTD(int $throttleMs) : \Closure
+    /**
+     * @return mixed|void
+     */
+    public function td(int $throttleMs, $var, ...$vars)
+    {
+        static $last;
+
+        $last = $last ?? [];
+
+        if ($throttleMs < 0) {
+            throw new LogicException(
+                [ 'The `throttleMs` should be a non-negative integer', $throttleMs ]
+            );
+        }
+
+        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        $traceFile = $debugBacktraceOverride[ 0 ][ 'file' ] ?? $debugBacktraceOverride[ 0 ][ 0 ] ?? '{file}';
+        $traceLine = $debugBacktraceOverride[ 0 ][ 'line' ] ?? $debugBacktraceOverride[ 0 ][ 1 ] ?? -1;
+
+        $t = [ $traceFile, $traceLine ];
+
+        $key = implode(':', $t);
+
+        $last[ $key ] = $last[ $key ] ?? 0;
+
+        $now = microtime(true);
+
+        if (($now - $last[ $key ]) > ($throttleMs / 1000)) {
+            $last[ $key ] = $now;
+
+            $this->dumper()->d([ $t ], $var, ...$vars);
+        }
+
+        return $var;
+    }
+
+    public function fnTD(int $throttleMs, ?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
         if ($throttleMs < 0) {
             throw new LogicException(
@@ -312,12 +359,15 @@ class DebugModule
             );
         }
 
-        return function ($var, ...$vars) use ($throttleMs) {
+        /**
+         * @return mixed|void
+         */
+        return function ($var, ...$vars) use ($throttleMs, $limit, $debugBacktraceOverride) {
             static $last;
 
             $last = $last ?? [];
 
-            $t = $this->file_line();
+            $t = $this->file_line($limit, $debugBacktraceOverride);
 
             $key = implode(':', $t);
 
