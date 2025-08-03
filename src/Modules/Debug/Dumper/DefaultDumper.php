@@ -745,7 +745,22 @@ class DefaultDumper implements DumperInterface
         return $this->doPrinterPrintTrace($debugBacktraceOverride, $var, ...$vars);
     }
 
+    public function fnDP(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    {
+        /**
+         * @return string
+         */
+        return function ($var, ...$vars) use ($limit, $debugBacktraceOverride) {
+            $t = $this->file_line($limit, $debugBacktraceOverride);
 
+            return $this->dp([ $t ], $var, ...$vars);
+        };
+    }
+
+
+    /**
+     * @return mixed
+     */
     public function d(?array $debugBacktraceOverride, $var, ...$vars)
     {
         $debugBacktraceOverride = $debugBacktraceOverride ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
@@ -755,6 +770,9 @@ class DefaultDumper implements DumperInterface
         return $var;
     }
 
+    /**
+     * @return mixed|void
+     */
     public function dd(?array $debugBacktraceOverride, ...$vars)
     {
         $debugBacktraceOverride = $debugBacktraceOverride ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
@@ -764,16 +782,22 @@ class DefaultDumper implements DumperInterface
         die();
     }
 
-    public function ddd(?array $debugBacktraceOverride, ?int $times, $var, ...$vars)
+    /**
+     * @return mixed|void
+     */
+    public function ddd(?array $debugBacktraceOverride, int $times, $var, ...$vars)
     {
-        $debugBacktraceOverride = $debugBacktraceOverride ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        if ($times < 1) {
+            throw new LogicException(
+                [ 'The `times` should be positive integer', $times ]
+            );
+        }
 
         static $current;
 
-        $times = $times ?? 1;
-        if ($times < 1) $times = 1;
-
         $current = $current ?? $times;
+
+        $debugBacktraceOverride = $debugBacktraceOverride ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
         $this->doDumperEchoTrace($debugBacktraceOverride, $var, ...$vars);
 
@@ -782,6 +806,99 @@ class DefaultDumper implements DumperInterface
         }
 
         return $var;
+    }
+
+
+    public function fnD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    {
+        /**
+         * @return mixed
+         */
+        return function ($var, ...$vars) use ($limit, $debugBacktraceOverride) {
+            $t = $this->file_line($limit, $debugBacktraceOverride);
+
+            return $this->d([ $t ], $var, ...$vars);
+        };
+    }
+
+    public function fnDD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    {
+        /**
+         * @return mixed|void
+         */
+        return function (...$vars) use ($limit, $debugBacktraceOverride) {
+            $t = $this->file_line($limit, $debugBacktraceOverride);
+
+            return $this->dd([ $t ], ...$vars);
+        };
+    }
+
+    public function fnDDD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    {
+        /**
+         * @return mixed|void
+         */
+        return function (?int $times, $var, ...$vars) use ($limit, $debugBacktraceOverride) {
+            $t = $this->file_line($limit, $debugBacktraceOverride);
+
+            return $this->ddd([ $t ], $times, $var, ...$vars);
+        };
+    }
+
+
+    /**
+     * @return mixed|void
+     */
+    public function td(?array $debugBacktraceOverride, int $throttleMs, $var, ...$vars)
+    {
+        if ($throttleMs < 0) {
+            throw new LogicException(
+                [ 'The `throttleMs` should be a non-negative integer', $throttleMs ]
+            );
+        }
+
+        static $last;
+
+        $last = $last ?? [];
+
+        $debugBacktraceOverride = $debugBacktraceOverride ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        if (! (isset($debugBacktrace[ 0 ]) && is_array($debugBacktrace[ 0 ]))) {
+            throw new LogicException(
+                [ 'The `debugBacktraceOverride` should be valid result of `debug_backtrace` function', $debugBacktrace ]
+            );
+        }
+
+        $traceFile = $debugBacktraceOverride[ 0 ][ 'file' ] ?? $debugBacktraceOverride[ 0 ][ 0 ] ?? '{file}';
+        $traceLine = $debugBacktraceOverride[ 0 ][ 'line' ] ?? $debugBacktraceOverride[ 0 ][ 1 ] ?? -1;
+
+        $t = [ $traceFile, $traceLine ];
+
+        $key = implode(':', $t);
+
+        $now = microtime(true);
+
+        $last[ $key ] = $last[ $key ] ?? 0;
+
+        if (($now - $last[ $key ]) > ($throttleMs / 1000)) {
+            $last[ $key ] = $now;
+
+            $this->doDumperEchoTrace([ $t ], $var, ...$vars);
+        }
+
+        return $var;
+    }
+
+    public function fnTD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    {
+        /**
+         * @return mixed|void
+         */
+        return function (int $throttleMs, $var, ...$vars) use ($limit, $debugBacktraceOverride) {
+            $t = $this->file_line($limit, $debugBacktraceOverride);
+
+            return $this->td([ $t ], $throttleMs, $var, ...$vars);
+        };
     }
 
 
@@ -817,6 +934,36 @@ class DefaultDumper implements DumperInterface
         $traceWhereIs = "[ {$traceFile} ({$traceLine}) ]";
 
         $this->dumperEcho($traceWhereIs, ...$vars);
+    }
+
+
+    /**
+     * @return array{ 0: string, 1: string }
+     */
+    protected function file_line(?int $limit = null, ?array $debugBacktraceOverride = null) : array
+    {
+        $limit = $limit ?? 1;
+
+        if (null === $debugBacktraceOverride) {
+            $limit++;
+
+            $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit);
+        }
+
+        $i = $limit - 1;
+
+        if (! isset($debugBacktraceOverride[ $i ])) {
+            throw new LogicException(
+                [ 'The key is not exists in trace: ' . $i, $debugBacktraceOverride ]
+            );
+        }
+
+        $fileLine = [
+            $debugBacktraceOverride[ $i ][ 'file' ] ?? '{{file}}',
+            $debugBacktraceOverride[ $i ][ 'line' ] ?? '{{line}}',
+        ];
+
+        return $fileLine;
     }
 
 

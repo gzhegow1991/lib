@@ -689,9 +689,9 @@ class Lib
 
     public static function dp($var, ...$vars) : string
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return Lib::debug()->dumper()->dp($trace, $var, ...$vars);
+        return Lib::debug()->dumper()->dp($debugBacktraceOverride, $var, ...$vars);
     }
 
     public static function fnDP(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
@@ -705,9 +705,9 @@ class Lib
      */
     public static function d($var, ...$vars)
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return Lib::debug()->dumper()->d($trace, $var, ...$vars);
+        return Lib::debug()->dumper()->d($debugBacktraceOverride, $var, ...$vars);
     }
 
     /**
@@ -715,9 +715,9 @@ class Lib
      */
     public static function dd(...$vars)
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return Lib::debug()->dumper()->dd($trace, ...$vars);
+        return Lib::debug()->dumper()->dd($debugBacktraceOverride, ...$vars);
     }
 
     /**
@@ -725,9 +725,9 @@ class Lib
      */
     public static function ddd(?int $limit, $var, ...$vars)
     {
-        $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        return Lib::debug()->dumper()->ddd($trace, $limit, $var, ...$vars);
+        return Lib::debug()->dumper()->ddd($debugBacktraceOverride, $limit, $var, ...$vars);
     }
 
 
@@ -752,7 +752,9 @@ class Lib
      */
     public function td(int $throttleMs, $var, ...$vars)
     {
-        return Lib::debug()->td($throttleMs, $var, ...$vars);
+        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+
+        return Lib::debug()->dumper()->td($debugBacktraceOverride, $throttleMs, $var, ...$vars);
     }
 
     public static function fnTD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure

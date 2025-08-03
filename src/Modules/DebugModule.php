@@ -238,11 +238,7 @@ class DebugModule
 
     public function fnDP(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        return function ($var, ...$vars) use ($limit, $debugBacktraceOverride) {
-            $t = $this->file_line($limit, $debugBacktraceOverride);
-
-            return $this->dumper()->dp([ $t ], $var, ...$vars);
-        };
+        return $this->dumper()->fnDP($limit, $debugBacktraceOverride);
     }
 
 
@@ -279,38 +275,17 @@ class DebugModule
 
     public function fnD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        /**
-         * @return mixed
-         */
-        return function ($var, ...$vars) use ($limit, $debugBacktraceOverride) {
-            $t = $this->file_line($limit, $debugBacktraceOverride);
-
-            return $this->dumper()->d([ $t ], $var, ...$vars);
-        };
+        return $this->dumper()->fnD($limit, $debugBacktraceOverride);
     }
 
     public function fnDD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        /**
-         * @return mixed|void
-         */
-        return function (...$vars) use ($limit, $debugBacktraceOverride) {
-            $t = $this->file_line($limit, $debugBacktraceOverride);
-
-            return $this->dumper()->dd([ $t ], ...$vars);
-        };
+        return $this->dumper()->fnDD($limit, $debugBacktraceOverride);
     }
 
     public function fnDDD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        /**
-         * @return mixed|void
-         */
-        return function (?int $times, $var, ...$vars) use ($limit, $debugBacktraceOverride) {
-            $t = $this->file_line($limit, $debugBacktraceOverride);
-
-            return $this->dumper()->ddd([ $t ], $times, $var, ...$vars);
-        };
+        return $this->dumper()->fnDDD($limit, $debugBacktraceOverride);
     }
 
 
@@ -319,70 +294,14 @@ class DebugModule
      */
     public function td(int $throttleMs, $var, ...$vars)
     {
-        static $last;
-
-        $last = $last ?? [];
-
-        if ($throttleMs < 0) {
-            throw new LogicException(
-                [ 'The `throttleMs` should be a non-negative integer', $throttleMs ]
-            );
-        }
-
         $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        $traceFile = $debugBacktraceOverride[ 0 ][ 'file' ] ?? $debugBacktraceOverride[ 0 ][ 0 ] ?? '{file}';
-        $traceLine = $debugBacktraceOverride[ 0 ][ 'line' ] ?? $debugBacktraceOverride[ 0 ][ 1 ] ?? -1;
-
-        $t = [ $traceFile, $traceLine ];
-
-        $key = implode(':', $t);
-
-        $last[ $key ] = $last[ $key ] ?? 0;
-
-        $now = microtime(true);
-
-        if (($now - $last[ $key ]) > ($throttleMs / 1000)) {
-            $last[ $key ] = $now;
-
-            $this->dumper()->d([ $t ], $var, ...$vars);
-        }
-
-        return $var;
+        return $this->dumper()->td($debugBacktraceOverride, $throttleMs, $var, ...$vars);
     }
 
     public function fnTD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        /**
-         * @return mixed|void
-         */
-        return function (int $throttleMs, $var, ...$vars) use ($limit, $debugBacktraceOverride) {
-            static $last;
-
-            $last = $last ?? [];
-
-            if ($throttleMs < 0) {
-                throw new LogicException(
-                    [ 'The `throttleMs` should be a non-negative integer', $throttleMs ]
-                );
-            }
-
-            $t = $this->file_line($limit, $debugBacktraceOverride);
-
-            $key = implode(':', $t);
-
-            $last[ $key ] = $last[ $key ] ?? 0;
-
-            $now = microtime(true);
-
-            if (($now - $last[ $key ]) > ($throttleMs / 1000)) {
-                $last[ $key ] = $now;
-
-                $this->dumper()->d([ $t ], $var, ...$vars);
-            }
-
-            return $var;
-        };
+        return $this->dumper()->fnTd($limit, $debugBacktraceOverride);
     }
 
 
