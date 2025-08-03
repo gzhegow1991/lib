@@ -755,9 +755,9 @@ class Lib
         return Lib::debug()->td($throttleMs, $var, ...$vars);
     }
 
-    public static function fnTD(int $throttleMs, ?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    public static function fnTD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        return Lib::debug()->fnTD($throttleMs, $limit, $debugBacktraceOverride);
+        return Lib::debug()->fnTD($limit, $debugBacktraceOverride);
     }
 
 

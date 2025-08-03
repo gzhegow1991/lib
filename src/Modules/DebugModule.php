@@ -351,21 +351,21 @@ class DebugModule
         return $var;
     }
 
-    public function fnTD(int $throttleMs, ?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    public function fnTD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
     {
-        if ($throttleMs < 0) {
-            throw new LogicException(
-                [ 'The `throttleMs` should be a non-negative integer', $throttleMs ]
-            );
-        }
-
         /**
          * @return mixed|void
          */
-        return function ($var, ...$vars) use ($throttleMs, $limit, $debugBacktraceOverride) {
+        return function (int $throttleMs, $var, ...$vars) use ($limit, $debugBacktraceOverride) {
             static $last;
 
             $last = $last ?? [];
+
+            if ($throttleMs < 0) {
+                throw new LogicException(
+                    [ 'The `throttleMs` should be a non-negative integer', $throttleMs ]
+                );
+            }
 
             $t = $this->file_line($limit, $debugBacktraceOverride);
 

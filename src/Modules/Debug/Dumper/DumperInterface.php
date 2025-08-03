@@ -25,6 +25,7 @@ interface DumperInterface
 
     public function dp(?array $debugBacktraceOverride, $var, ...$vars) : string;
 
+
     /**
      * @return mixed
      */
