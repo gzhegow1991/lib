@@ -640,8 +640,10 @@ class EntrypointModule
     /**
      * @return string|false
      */
-    public function getPhpErrorLog(string $errorLogTmp = '')
+    public function getPhpErrorLog(?string $errorLogTmp = null)
     {
+        $errorLogTmp = $errorLogTmp ?? (getcwd() . '/error_log');
+
         $before = ini_set('error_log', $errorLogTmp);
 
         ini_set('error_log', $before);
