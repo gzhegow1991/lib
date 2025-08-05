@@ -59,8 +59,6 @@ php test.php
     //
     ->useUploadMaxFilesize()
     ->useUploadTmpDir()
-    //
-    ->useObImplicitFlush()
 ;
 
 

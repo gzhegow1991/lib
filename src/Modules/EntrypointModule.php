@@ -47,9 +47,6 @@ class EntrypointModule
         'uploadMaxFilesize'     => null,
         'uploadTmpDir'          => null,
         'uploadTmpDirMkdir'     => null,
-        //
-        'obImplicitFlush'       => null,
-        'obImplicitFlushCommit' => null,
     ];
     /**
      * @var array<string, mixed>
@@ -82,9 +79,6 @@ class EntrypointModule
         'uploadMaxFilesize'     => null,
         'uploadTmpDir'          => null,
         'uploadTmpDirMkdir'     => null,
-        //
-        'obImplicitFlush'       => null,
-        'obImplicitFlushCommit' => null,
     ];
     /**
      * @var array<string, mixed>
@@ -117,9 +111,6 @@ class EntrypointModule
         'uploadMaxFilesize'     => false,
         'uploadTmpDir'          => false,
         'uploadTmpDirMkdir'     => false,
-        //
-        'obImplicitFlush'       => false,
-        'obImplicitFlushCommit' => false,
     ];
 
     /**
@@ -205,15 +196,6 @@ class EntrypointModule
     protected $uploadTmpDirMkdir = [];
 
     /**
-     * @var array{ 0?: bool }
-     */
-    protected $obImplicitFlush = [];
-    /**
-     * @var array{ 0?: int }
-     */
-    protected $obImplicitFlushCommit = [];
-
-    /**
      * @var bool
      */
     protected $signalIgnoreShutdownFunction = false;
@@ -253,9 +235,6 @@ class EntrypointModule
             'uploadMaxFilesize'     => '2M',
             'uploadTmpDir'          => null,
             'uploadTmpDirMkdir'     => false,
-            //
-            'obImplicitFlush'       => false,
-            'obImplicitFlushCommit' => 0,
         ];
 
         $this->mapInitial = [
@@ -286,9 +265,6 @@ class EntrypointModule
             'uploadMaxFilesize'     => $this->getPhpUploadMaxFilesize(),
             'uploadTmpDir'          => $this->getPhpUploadTmpDir(),
             'uploadTmpDirMkdir'     => false,
-            //
-            'obImplicitFlush'       => false,
-            'obImplicitFlushCommit' => 0,
         ];
 
         foreach ( $this->mapRecommended as $key => $value ) {
@@ -1527,109 +1503,6 @@ class EntrypointModule
     public function useRecommendedUploadTmpDir(&$refLast = null)
     {
         $refLast = ini_set('upload_tmp_dir', $this->mapRecommended[ 'uploadTmpDir' ]);
-
-        return $this;
-    }
-
-
-    /**
-     * > устанавливает немедленный вывод echo напрямую в браузер в runtime
-     *
-     * @param bool|false|null $obImplicitFlush
-     * @param int|false|null  $obImplicitFlushCommit
-     *
-     * @return static
-     */
-    public function setObImplicitFlush(
-        $obImplicitFlush,
-        $obImplicitFlushCommit,
-        ?bool $replace = null
-    )
-    {
-        $this->assertNotLocked();
-
-        if (false
-            || (false !== $this->mapWasSet[ 'obImplicitFlush' ])
-            || (false !== $this->mapWasSet[ 'obImplicitFlushCommit' ])
-        ) {
-            if (! $replace) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[ 'obImplicitFlush' ] = true;
-            $this->mapWasSet[ 'obImplicitFlushCommit' ] = true;
-        }
-
-        if (null === $obImplicitFlush) {
-            $this->obImplicitFlush = [ $this->mapRecommended[ 'obImplicitFlush' ] ];
-
-        } elseif (false === $obImplicitFlush) {
-            $this->obImplicitFlush = [ $this->mapInitial[ 'obImplicitFlush' ] ];
-
-        } else {
-            $obImplicitFlushValid = (bool) $obImplicitFlush;
-
-            $this->obImplicitFlush = $obImplicitFlushValid;
-        }
-
-        if (null === $obImplicitFlushCommit) {
-            $this->obImplicitFlushCommit = [ $this->mapRecommended[ 'obImplicitFlushCommit' ] ];
-
-        } elseif (false === $obImplicitFlushCommit) {
-            $this->obImplicitFlushCommit = [ $this->mapInitial[ 'obImplicitFlushCommit' ] ];
-
-        } else {
-            $theType = Lib::type();
-
-            $obImplicitFlushCommitValid = $theType->int($obImplicitFlushCommit)->orThrow();
-
-            if ($obImplicitFlushCommitValid > 1) {
-                $obImplicitFlushCommitValid = 1;
-
-            } elseif ($obImplicitFlushCommitValid < 1) {
-                $obImplicitFlushCommitValid = -1;
-            }
-
-            $this->obImplicitFlushCommit = $obImplicitFlushCommitValid;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useObImplicitFlush()
-    {
-        if ([] !== $this->obImplicitFlushCommit) {
-            $obImplicitFlushCommitValid = $this->obImplicitFlushCommit[ 0 ];
-
-            if (1 === $obImplicitFlushCommitValid) {
-                while ( ob_get_level() ) {
-                    ob_end_flush();
-                }
-
-            } elseif (-1 === $obImplicitFlushCommitValid) {
-                while ( ob_get_level() ) {
-                    ob_end_clean();
-                }
-            }
-        }
-
-        if ([] !== $this->obImplicitFlush) {
-            ob_implicit_flush($this->obImplicitFlush[ 0 ]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedObImplicitFlush()
-    {
-        ob_implicit_flush($this->mapRecommended[ 'obImplicitFlush' ]);
 
         return $this;
     }
