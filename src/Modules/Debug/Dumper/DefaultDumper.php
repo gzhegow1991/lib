@@ -109,6 +109,10 @@ class DefaultDumper implements DumperInterface
      * @var \Symfony\Component\VarDumper\Dumper\HtmlDumper
      */
     protected $symfonyHtmlDumper;
+    /**
+     * @var \Closure
+     */
+    protected $symfonyLineDumper;
 
     /**
      * @var string
@@ -318,6 +322,21 @@ class DefaultDumper implements DumperInterface
 
 
     /**
+     * @param resouce $h
+     *
+     * @return \Closure
+     */
+    public function getSymfonyOutputLineDumper(&$h = null) : \Closure
+    {
+        return $this->symfonyLineDumper = $this->symfonyLineDumper
+            ?? function ($line) use (&$h) {
+                /** @noinspection PhpParamsInspection */
+                fwrite($h, $line);
+            };
+    }
+
+
+    /**
      * @return static
      */
     public function selectPrinter(?string $printer, ?array $printerOptions = null)
@@ -438,12 +457,22 @@ class DefaultDumper implements DumperInterface
             ? $this->getSymfonyCliDumper()
             : $this->getSymfonyHtmlDumper();
 
+        $output = $this->getSymfonyOutputLineDumper($h);
+
+        $dumper->setOutput($output);
+
         $content = '';
 
         foreach ( $vars as $arg ) {
-            $clonedVar = $cloner->cloneVar($arg);
+            $h = fopen('php://memory', 'wb');
 
-            $content .= $dumper->dump($clonedVar);
+            $dumper->dump($cloner->cloneVar($arg));
+
+            rewind($h);
+
+            $content .= stream_get_contents($h);
+
+            fclose($h);
         }
 
         return $content;
@@ -937,36 +966,6 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    /**
-     * @return array{ 0: string, 1: string }
-     */
-    protected function file_line(?int $limit = null, ?array $debugBacktraceOverride = null) : array
-    {
-        $limit = $limit ?? 1;
-
-        if (null === $debugBacktraceOverride) {
-            $limit++;
-
-            $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit);
-        }
-
-        $i = $limit - 1;
-
-        if (! isset($debugBacktraceOverride[ $i ])) {
-            throw new LogicException(
-                [ 'The key is not exists in trace: ' . $i, $debugBacktraceOverride ]
-            );
-        }
-
-        $fileLine = [
-            $debugBacktraceOverride[ $i ][ 'file' ] ?? '{{file}}',
-            $debugBacktraceOverride[ $i ][ 'line' ] ?? '{{line}}',
-        ];
-
-        return $fileLine;
-    }
-
-
     protected function sendDebugContentTypeOnShutdown(string $contentType) : void
     {
         $debugContentType = $this->staticDebugContentType();
@@ -1041,5 +1040,35 @@ class DefaultDumper implements DumperInterface
                 header("Content-Type: {$debugContentTypeCurrentValue}", true, 418);
             }
         }
+    }
+
+
+    /**
+     * @return array{ 0: string, 1: string }
+     */
+    protected function file_line(?int $limit = null, ?array $debugBacktraceOverride = null) : array
+    {
+        $limit = $limit ?? 1;
+
+        if (null === $debugBacktraceOverride) {
+            $limit++;
+
+            $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit);
+        }
+
+        $i = $limit - 1;
+
+        if (! isset($debugBacktraceOverride[ $i ])) {
+            throw new LogicException(
+                [ 'The key is not exists in trace: ' . $i, $debugBacktraceOverride ]
+            );
+        }
+
+        $fileLine = [
+            $debugBacktraceOverride[ $i ][ 'file' ] ?? '{{file}}',
+            $debugBacktraceOverride[ $i ][ 'line' ] ?? '{{line}}',
+        ];
+
+        return $fileLine;
     }
 }
