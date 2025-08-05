@@ -400,6 +400,7 @@ class EntrypointModule
     public function getPhpErrorHandler()
     {
         $handler = set_error_handler(static function () { });
+
         restore_error_handler();
 
         return $handler;
@@ -484,6 +485,7 @@ class EntrypointModule
     public function getPhpExceptionHandler()
     {
         $handler = set_exception_handler(static function () { });
+
         restore_exception_handler();
 
         return $handler;
@@ -640,15 +642,9 @@ class EntrypointModule
     /**
      * @return string|false
      */
-    public function getPhpErrorLog(?string $errorLogTmp = null)
+    public function getPhpErrorLog()
     {
-        $errorLogTmp = $errorLogTmp ?? (getcwd() . '/error_log');
-
-        $before = ini_set('error_log', $errorLogTmp);
-
-        ini_set('error_log', $before);
-
-        return $before;
+        return ini_get('error_log');
     }
 
     /**
@@ -717,13 +713,9 @@ class EntrypointModule
     /**
      * @return string|false
      */
-    public function getPhpLogErrors(string $logErrorsTmp = '0')
+    public function getPhpLogErrors()
     {
-        $before = ini_set('log_errors', $logErrorsTmp);
-
-        ini_set('log_errors', $before);
-
-        return $before;
+        return ini_get('log_errors');
     }
 
     /**
@@ -792,25 +784,17 @@ class EntrypointModule
     /**
      * @return string|false
      */
-    public function getPhpDisplayErrors(string $displayErrorsTmp = '0')
+    public function getPhpDisplayErrors()
     {
-        $before = ini_set('display_errors', $displayErrorsTmp);
-
-        ini_set('display_errors', $before);
-
-        return $before;
+        return ini_get('display_errors');
     }
 
     /**
      * @return string|false
      */
-    public function getPhpDisplayStartupErrors(string $displayStartupErrorsTmp = '0')
+    public function getPhpDisplayStartupErrors()
     {
-        $before = ini_set('display_startup_errors', $displayStartupErrorsTmp);
-
-        ini_set('display_startup_errors', $before);
-
-        return $before;
+        return ini_get('display_startup_errors');
     }
 
     /**
@@ -892,13 +876,9 @@ class EntrypointModule
     }
 
 
-    public function getPhpMemoryLimit(string $memoryLimitTmp = '32M') : string
+    public function getPhpMemoryLimit() : string
     {
-        $before = ini_set('memory_limit', $memoryLimitTmp);
-
-        ini_set('memory_limit', $before);
-
-        return $before;
+        return ini_get('memory_limit');
     }
 
     /**
@@ -965,13 +945,9 @@ class EntrypointModule
     }
 
 
-    public function getPhpMaxExecutionTime(int $maxInputTimeTmp = 30) : string
+    public function getPhpMaxExecutionTime() : string
     {
-        $before = ini_set('max_execution_time', $maxInputTimeTmp);
-
-        ini_set('max_execution_time', $before);
-
-        return $before;
+        return ini_get('max_execution_time');
     }
 
     /**
@@ -1037,13 +1013,9 @@ class EntrypointModule
     }
 
 
-    public function getPhpMaxInputTime(int $maxInputTimeTmp = -1) : string
+    public function getPhpMaxInputTime() : string
     {
-        $before = ini_set('max_input_time', $maxInputTimeTmp);
-
-        ini_set('max_input_time', $before);
-
-        return $before;
+        return ini_get('max_input_time');
     }
 
     /**
@@ -1114,7 +1086,7 @@ class EntrypointModule
         try {
             $timezone = new \DateTimeZone(date_default_timezone_get());
         }
-        catch ( \Exception $e ) {
+        catch ( \Throwable $e ) {
             throw new RuntimeException($e);
         }
 
@@ -1184,13 +1156,9 @@ class EntrypointModule
     }
 
 
-    public function getPhpPrecision(int $precisionTmp = 16) : string
+    public function getPhpPrecision() : string
     {
-        $before = ini_set('precision', $precisionTmp);
-
-        ini_set('precision', $before);
-
-        return $before;
+        return ini_get('precision');
     }
 
     /**
@@ -1254,8 +1222,10 @@ class EntrypointModule
     }
 
 
-    public function getPhpUmask(int $umaskTmp = 0002) : string
+    public function getPhpUmask() : string
     {
+        $umaskTmp = $umaskTmp ?? 0002;
+
         $before = umask($umaskTmp);
 
         umask($before);
@@ -1328,13 +1298,9 @@ class EntrypointModule
     }
 
 
-    public function getPhpPostMaxSize(string $postMaxSizeTmp = '8M') : string
+    public function getPhpPostMaxSize() : string
     {
-        $before = ini_set('post_max_size', $postMaxSizeTmp);
-
-        ini_set('post_max_size', $before);
-
-        return $before;
+        return ini_get('post_max_size');
     }
 
     /**
@@ -1401,13 +1367,9 @@ class EntrypointModule
     }
 
 
-    public function getPhpUploadMaxFilesize(string $uploadMaxFilesizeTmp = '2M') : string
+    public function getPhpUploadMaxFilesize() : string
     {
-        $before = ini_set('upload_max_filesize', $uploadMaxFilesizeTmp);
-
-        ini_set('upload_max_filesize', $before);
-
-        return $before;
+        return ini_get('upload_max_filesize');
     }
 
     /**
@@ -1476,11 +1438,7 @@ class EntrypointModule
 
     public function getPhpUploadTmpDir() : string
     {
-        $before = ini_set('upload_tmp_dir', sys_get_temp_dir());
-
-        ini_set('upload_tmp_dir', $before);
-
-        return $before;
+        return ini_get('upload_tmp_dir');
     }
 
     /**

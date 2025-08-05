@@ -186,32 +186,6 @@ class Lib
 
 
     /**
-     * @var FsModule
-     */
-    public static $fs;
-
-    public static function fs()
-    {
-        return static::$fs = static::$fs ?? new FsModule();
-    }
-
-    public static function fsFile() : FileSafeProxy
-    {
-        return Lib::fs()->fileSafe();
-    }
-
-    public static function fsSocket() : SocketSafeProxy
-    {
-        return Lib::fs()->socketSafe();
-    }
-
-    public static function fsStream() : StreamSafeProxy
-    {
-        return Lib::fs()->streamSafe();
-    }
-
-
-    /**
      * @var FuncModule
      */
     public static $func;
@@ -226,27 +200,6 @@ class Lib
         return $clone
             ? Lib::func()->cloneInvoker()
             : Lib::func()->invoker();
-    }
-
-
-    /**
-     * @var HttpModule
-     */
-    public static $http;
-
-    public static function http()
-    {
-        return static::$http = static::$http ?? new HttpModule();
-    }
-
-    public static function httpCookies() : CookiesInterface
-    {
-        return Lib::http()->cookies();
-    }
-
-    public static function httpSession() : SessionInterface
-    {
-        return Lib::http()->session();
     }
 
 
@@ -322,6 +275,54 @@ class Lib
         return $clone
             ? Lib::str()->cloneSlugger()
             : Lib::str()->slugger();
+    }
+
+
+
+    /**
+     * @var FsModule
+     */
+    public static $fs;
+
+    public static function fs()
+    {
+        return static::$fs = static::$fs ?? new FsModule();
+    }
+
+    public static function fsFile() : FileSafeProxy
+    {
+        return Lib::fs()->fileSafe();
+    }
+
+    public static function fsSocket() : SocketSafeProxy
+    {
+        return Lib::fs()->socketSafe();
+    }
+
+    public static function fsStream() : StreamSafeProxy
+    {
+        return Lib::fs()->streamSafe();
+    }
+
+
+    /**
+     * @var HttpModule
+     */
+    public static $http;
+
+    public static function http()
+    {
+        return static::$http = static::$http ?? new HttpModule();
+    }
+
+    public static function httpCookies() : CookiesInterface
+    {
+        return Lib::http()->cookies();
+    }
+
+    public static function httpSession() : SessionInterface
+    {
+        return Lib::http()->session();
     }
 
 
