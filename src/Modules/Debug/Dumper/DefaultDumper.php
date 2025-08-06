@@ -326,11 +326,22 @@ class DefaultDumper implements DumperInterface
      *
      * @return \Closure
      */
-    public function getSymfonyOutputLineDumper(&$h = null) : \Closure
+    protected function getSymfonyOutputLineDumper(&$h = null) : \Closure
     {
-        return $this->symfonyLineDumper = $this->symfonyLineDumper
-            ?? function ($line) use (&$h) {
-                /** @noinspection PhpParamsInspection */
+        return $this->symfonyLineDumper = null
+            ?? $this->symfonyLineDumper
+            ?? function ($line, $depth, $indentPad) use (&$h) {
+                $line = rtrim($line);
+                if ('' === $line) {
+                    return;
+                }
+
+                fwrite($h, "\n");
+
+                if (($depth > 0) && ('' !== $indentPad)) {
+                    fwrite($h, str_repeat($indentPad, $depth));
+                }
+
                 fwrite($h, $line);
             };
     }
@@ -457,22 +468,27 @@ class DefaultDumper implements DumperInterface
             ? $this->getSymfonyCliDumper()
             : $this->getSymfonyHtmlDumper();
 
+        $h = null;
         $output = $this->getSymfonyOutputLineDumper($h);
-
         $dumper->setOutput($output);
 
         $content = '';
-
-        foreach ( $vars as $arg ) {
+        foreach ( $vars as $var ) {
             $h = fopen('php://memory', 'wb');
 
-            $dumper->dump($cloner->cloneVar($arg));
+            $dumper->dump($cloner->cloneVar($var));
 
             rewind($h);
 
-            $content .= stream_get_contents($h);
+            $contentVar = stream_get_contents($h);
 
             fclose($h);
+
+            $contentVar = ltrim($contentVar);
+            $contentVar = nl2br($contentVar);
+            $contentVar = str_replace("\n", '',$contentVar);
+
+            $content .= $contentVar;
         }
 
         return $content;
