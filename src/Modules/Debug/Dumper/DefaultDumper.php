@@ -109,10 +109,11 @@ class DefaultDumper implements DumperInterface
      * @var \Symfony\Component\VarDumper\Dumper\HtmlDumper
      */
     protected $symfonyHtmlDumper;
+
     /**
-     * @var \Closure
+     * @var resource
      */
-    protected $symfonyLineDumper;
+    protected $symfonyOutputLineDumpResource;
 
     /**
      * @var string
@@ -309,31 +310,22 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    /**
-     * @param resouce $h
-     *
-     * @return \Closure
-     */
-    protected function getSymfonyOutputLineDumper(&$h = null) : \Closure
+    public function doSymfonyOutputLineDump($line, $depth, $indentPad) : void
     {
-        return $this->symfonyLineDumper = null
-            ?? $this->symfonyLineDumper
-            ?? function ($line, $depth, $indentPad) use (&$h) {
-                /** @var resource $h */
+        $h = $this->symfonyOutputLineDumpResource;
 
-                $line = rtrim($line);
-                if ('' === $line) {
-                    return;
-                }
+        $line = rtrim($line);
+        if ('' === $line) {
+            return;
+        }
 
-                fwrite($h, "\n");
+        fwrite($h, "\n");
 
-                if (($depth > 0) && ('' !== $indentPad)) {
-                    fwrite($h, str_repeat($indentPad, $depth));
-                }
+        if (($depth > 0) && ('' !== $indentPad)) {
+            fwrite($h, str_repeat($indentPad, $depth));
+        }
 
-                fwrite($h, $line);
-            };
+        fwrite($h, $line);
     }
 
 
@@ -458,38 +450,30 @@ class DefaultDumper implements DumperInterface
             ? $this->getSymfonyCliDumper()
             : $this->getSymfonyHtmlDumper();
 
-        if ($isTerminal) {
-            ob_start();
+        $dumper->setColors(true);
+        $dumper->setOutput([ $this, 'doSymfonyOutputLineDump' ]);
 
-            foreach ( $vars as $var ) {
-                $dumper->dump($cloner->cloneVar($var));
-            }
+        $content = '';
+        foreach ( $vars as $var ) {
+            $h = $this->symfonyOutputLineDumpResource = fopen('php://memory', 'wb');
 
-            $content = ob_get_clean();
+            $dumper->dump($cloner->cloneVar($var));
 
-        } else {
-            $h = null;
-            $output = $this->getSymfonyOutputLineDumper($h);
-            $dumper->setOutput($output);
+            rewind($h);
 
-            $content = '';
-            foreach ( $vars as $var ) {
-                $h = fopen('php://memory', 'wb');
+            $contentVar = stream_get_contents($h);
 
-                $dumper->dump($cloner->cloneVar($var));
+            fclose($h);
 
-                rewind($h);
-
-                $contentVar = stream_get_contents($h);
-
-                fclose($h);
-
-                $contentVar = ltrim($contentVar);
+            $contentVar = trim($contentVar);
+            if (! $isTerminal) {
                 $contentVar = nl2br($contentVar);
-                $contentVar = str_replace("\n", '', $contentVar);
-
-                $content .= $contentVar;
             }
+            $contentVar = str_replace("\n", '', $contentVar);
+
+            $content .= $contentVar;
+
+            $this->symfonyOutputLineDumpResource = null;
         }
 
         return $content;
