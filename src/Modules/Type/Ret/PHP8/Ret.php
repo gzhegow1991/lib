@@ -3,14 +3,10 @@
 namespace Gzhegow\Lib\Modules\Type\Ret\PHP8;
 
 use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Modules\Type\Ret\Base\AbstractRet as RetBase;
+use Gzhegow\Lib\Modules\Type\Ret\Base\AbstractRet;
 
 
-/**
- * @template T of mixed
- */
-class Ret extends RetBase implements
-    \ArrayAccess
+class Ret extends AbstractRet implements \ArrayAccess
 {
     public function __construct()
     {
@@ -29,17 +25,6 @@ class Ret extends RetBase implements
         throw new RuntimeException(
             [ 'Unable to unset property `name` in the instance of: ' . static::class, $name ]
         );
-    }
-
-
-    /**
-     * @param array{ 0?: mixed } $fallback
-     *
-     * @return T|mixed
-     */
-    public function __invoke(array $fallback, $throwableArg = null, array $fileLine = [], ...$throwableArgs)
-    {
-        return $this->orFallbackAt($fallback, $throwableArg, $fileLine, ...$throwableArgs);
     }
 
 

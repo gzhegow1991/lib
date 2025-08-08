@@ -111,7 +111,7 @@ $ffn = new class {
 
 
 // >>> TEST
-// > тесты Promise
+// > тесты Promise ( да, я написал ECMAScript-like Promise на PHP :D )
 $fn = function () use ($ffn) {
     $ffn->print('[ Promise ]');
     echo "\n";
@@ -316,9 +316,9 @@ $test->run();
 
 
 
+// // >>> TEST
 // // > Тест закомментирован, поскольку приводит к поднятию дополнительных процессов
 // // > Если неверные права пользователя в Unix, с этим будут проблемы, раскоментируйте, чтобы протестировать
-// // >>> TEST
 // $fn = function () use ($ffn) {
 //     $ffn->print('[ Fetch ]');
 //     echo "\n";
@@ -356,6 +356,169 @@ $test->run();
 // ');
 // $test->run();
 // die();
+
+
+
+// >>> TEST
+// > тесты Ret ( один из современных паттернов это возврат одновременно статуса, ошибок и результата Result<T,E> называется )
+$fn = function () use ($ffn) {
+    $ffn->print('[ Ret ]');
+    echo "\n";
+
+    $tz = 'UTC';
+    $ret = \Gzhegow\Lib\Lib::type()->timezone_nameabbr($tz);
+    $ffn->print($ret);
+    $ffn->print_array_multiline([
+        // > [ bool, bool ]
+        [ $ret->getStatus(), $ret[ 0 ] ],
+        // > [ mixed|throw, mixed|null ]
+        [ $ret->getValue($fallback = [ null ]), $ret[ 1 ] ],
+        // > [ \stdClass[]|array[], \stdClass[] ]
+        [ $ret->getErrors($isAssociative = true), $ret[ 2 ] ],
+        // > [ mixed|NAN, mixed|NAN ]
+        [ $ret->orFallback($fallback = [ NAN ]), $ret($fallback = [ NAN ]) ],
+        // > [ mixed|throw, mixed|throw ]
+        [ $ret->orFallback($fallback = []), $ret($fallback = []) ],
+    ], 4);
+
+    echo "\n";
+
+    $tz = '[ INVALID_TIMEZONE ]';
+    $ret = \Gzhegow\Lib\Lib::type()->timezone_nameabbr($tz);
+    $ffn->print($ret);
+    $ffn->print_array_multiline([
+        // > [ bool, bool ]
+        [ $ret->getStatus(), $ret[ 0 ] ],
+        // > [ mixed|throw, mixed|null ]
+        [ $ret->getValue($fallback = [ null ]), $ret[ 1 ] ],
+        // > [ \stdClass[]|array[], \stdClass[] ]
+        [ $ret->getErrors($isAssociative = true), $ret[ 2 ] ],
+        // > [ mixed|NAN, mixed|NAN ]
+        [ $ret->orFallback($fallback = [ NAN ]), $ret($fallback = [ NAN ]) ],
+    ], 4);
+};
+$test = $ffn->test($fn);
+$test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
+"[ Ret ]"
+
+{ object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
+###
+[
+  [
+    TRUE,
+    TRUE
+  ],
+  [
+    "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }"
+  ],
+  [
+    [],
+    []
+  ],
+  [
+    "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }"
+  ],
+  [
+    "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }"
+  ]
+]
+###
+
+{ object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
+###
+[
+  [
+    FALSE,
+    FALSE
+  ],
+  [
+    NULL,
+    NULL
+  ],
+  [
+    [
+      [
+        "The `timezoneOrNameOrAbbr` should be valid timezone or its name/abbreviation",
+        "[ INVALID_TIMEZONE ]"
+      ]
+    ],
+    [
+      [
+        1 => "{ object # stdClass }"
+      ]
+    ]
+  ],
+  [
+    NAN,
+    NAN
+  ]
+]
+###
+');
+$test->expectStdoutIf(PHP_VERSION_ID < 80000, '
+"[ Ret ]"
+
+{ object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP7\Ret }
+###
+[
+  [
+    TRUE,
+    TRUE
+  ],
+  [
+    "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }"
+  ],
+  [
+    [],
+    []
+  ],
+  [
+    "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }"
+  ],
+  [
+    "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }"
+  ]
+]
+###
+
+{ object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP7\Ret }
+###
+[
+  [
+    FALSE,
+    FALSE
+  ],
+  [
+    NULL,
+    NULL
+  ],
+  [
+    [
+      [
+        "The `timezoneOrNameOrAbbr` should be valid timezone or its name/abbreviation",
+        "[ INVALID_TIMEZONE ]"
+      ]
+    ],
+    [
+      [
+        1 => "{ object # stdClass }"
+      ]
+    ]
+  ],
+  [
+    NAN,
+    NAN
+  ]
+]
+###
+');
+$test->run();
 
 
 

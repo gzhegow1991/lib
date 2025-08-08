@@ -8,7 +8,7 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 
 /**
- * @template T of mixed
+ * @template-covariant T
  */
 abstract class AbstractRet
 {
@@ -30,6 +30,17 @@ abstract class AbstractRet
     protected $errorsRaw = [];
 
 
+    /**
+     * @param array{ 0?: mixed } $fallback
+     *
+     * @return T|mixed
+     */
+    public function __invoke(array $fallback, $throwableArg = null, array $fileLine = [], ...$throwableArgs)
+    {
+        return $this->orFallback($fallback, $throwableArg, $fileLine, ...$throwableArgs);
+    }
+
+
     public function getStatus() : bool
     {
         return [] !== $this->value;
@@ -38,9 +49,15 @@ abstract class AbstractRet
     /**
      * @return T
      */
-    public function getValue()
+    public function getValue(array $fallback = [])
     {
         if ([] === $this->value) {
+            if ([] !== $fallback) {
+                [ $fallback ] = $fallback;
+
+                return $fallback;
+            }
+
             throw new RuntimeException(
                 [ 'The `value` should exists', $this ]
             );
@@ -189,26 +206,7 @@ abstract class AbstractRet
     /**
      * @return T
      */
-    public function orThrow(...$throwableArgs)
-    {
-        if ([] !== $this->value) {
-            return $this->value[ 0 ];
-        }
-
-        if ([] !== $throwableArgs) {
-            $this->errorsRaw[] = [
-                'file_line'      => Lib::debug()->file_line(),
-                'throwable_args' => $throwableArgs,
-            ];
-        }
-
-        $this->throwErrors();
-    }
-
-    /**
-     * @return T
-     */
-    public function orThrowAt($throwableArg = null, array $fileLine = [], ...$throwableArgs)
+    public function orThrow($throwableArg = null, array $fileLine = [], ...$throwableArgs)
     {
         if ([] !== $this->value) {
             return $this->value[ 0 ];
@@ -228,38 +226,12 @@ abstract class AbstractRet
         $this->throwErrors();
     }
 
-
     /**
      * @param array{ 0?: mixed } $fallback
      *
      * @return T|mixed
      */
-    public function orFallback(array $fallback = [], ...$throwableArgs)
-    {
-        if ([] !== $this->value) {
-            return $this->value[ 0 ];
-        }
-
-        if ([] !== $fallback) {
-            return $fallback[ 0 ];
-        }
-
-        if ([] !== $throwableArgs) {
-            $this->errorsRaw[] = [
-                'file_line'      => Lib::debug()->file_line(),
-                'throwable_args' => $throwableArgs,
-            ];
-        }
-
-        $this->throwErrors();
-    }
-
-    /**
-     * @param array{ 0?: mixed } $fallback
-     *
-     * @return T|mixed
-     */
-    public function orFallbackAt(array $fallback, $throwableArg = null, array $fileLine = [], ...$throwableArgs)
+    public function orFallback(array $fallback = [], $throwableArg = null, array $fileLine = [], ...$throwableArgs)
     {
         if ([] !== $this->value) {
             return $this->value[ 0 ];

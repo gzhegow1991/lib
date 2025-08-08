@@ -8,17 +8,15 @@ use Gzhegow\Lib\Modules\Type\Ret\Base\AbstractRet;
 
 
 /**
- * @template T of mixed
- *
  * @mixin AbstractRet
+ *
+ * @template T of mixed
+ * @template-extends AbstractRet<T>
  */
 class Ret
 {
     /**
-     * @return static
-     *
-     * @noinspection PhpIncompatibleReturnTypeInspection
-     * @noinspection PhpReturnDocTypeMismatchInspection
+     * @return AbstractRet
      */
     public static function new()
     {
@@ -33,10 +31,7 @@ class Ret
     /**
      * @param T $value
      *
-     * @return static<T>
-     *
-     * @noinspection PhpIncompatibleReturnTypeInspection
-     * @noinspection PhpReturnDocTypeMismatchInspection
+     * @return AbstractRet<T>
      */
     public static function val($value)
     {
@@ -58,14 +53,11 @@ class Ret
     }
 
     /**
-     * @param static|mixed               $throwableArg
+     * @param AbstractRet|mixed          $throwableArg
      *
      * @param array{ 0: string, 1: int } $fileLine
      *
-     * @return static<T>
-     *
-     * @noinspection PhpIncompatibleReturnTypeInspection
-     * @noinspection PhpReturnDocTypeMismatchInspection
+     * @return AbstractRet<T>
      */
     public static function err($throwableArg, array $fileLine = [], ...$throwableArgs)
     {
@@ -91,10 +83,7 @@ class Ret
     /**
      * @param T $value
      *
-     * @return T|static<T>
-     *
-     * @noinspection PhpIncompatibleReturnTypeInspection
-     * @noinspection PhpReturnDocTypeMismatchInspection
+     * @return T|AbstractRet<T>
      */
     public static function ok(?array $fallback, $value)
     {
@@ -120,14 +109,11 @@ class Ret
     }
 
     /**
-     * @param static|mixed               $throwableArg
+     * @param AbstractRet|mixed          $throwableArg
      *
      * @param array{ 0: string, 1: int } $fileLine
      *
-     * @return T|static<T>
-     *
-     * @noinspection PhpIncompatibleReturnTypeInspection
-     * @noinspection PhpReturnDocTypeMismatchInspection
+     * @return T|AbstractRet<T>
      */
     public static function throw(?array $fallback, $throwableArg, array $fileLine = [], ...$throwableArgs)
     {
