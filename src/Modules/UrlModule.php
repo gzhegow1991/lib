@@ -181,11 +181,11 @@ class UrlModule
         } else {
             $httpQuery = null;
             if ($hasQuery && $wasQuery) {
-                $httpQuery = $theHttp->build_query_array($refParseUrl[ 'query' ], $_query);
+                $httpQuery = $theHttp->http_build_query_array($refParseUrl[ 'query' ], $_query);
                 $httpQuery = http_build_query($httpQuery);
 
             } elseif ($hasQuery) {
-                $httpQuery = $theHttp->build_query_array($_query);
+                $httpQuery = $theHttp->http_build_query_array($_query);
                 $httpQuery = http_build_query($httpQuery);
 
             } elseif ($wasQuery) {
@@ -439,11 +439,11 @@ class UrlModule
         } else {
             $httpQuery = null;
             if ($hasQuery && $wasQuery) {
-                $httpQuery = $theHttp->build_query_array($refParseUrl[ 'query' ], $_query);
+                $httpQuery = $theHttp->http_build_query_array($refParseUrl[ 'query' ], $_query);
                 $httpQuery = http_build_query($httpQuery);
 
             } elseif ($hasQuery) {
-                $httpQuery = $theHttp->build_query_array($_query);
+                $httpQuery = $theHttp->http_build_query_array($_query);
                 $httpQuery = http_build_query($httpQuery);
 
             } elseif ($wasQuery) {

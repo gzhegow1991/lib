@@ -3010,6 +3010,9 @@ class PhpModule
             }
 
             if (is_string($arg) && ('' !== $arg)) {
+                /**
+                 * @noinspection PhpStrFunctionsInspection
+                 */
                 if (true
                     && (false === strpos($arg, ' '))
                     && preg_match('/^[A-Z0-9_]+$/', $arg)
@@ -3062,6 +3065,9 @@ class PhpModule
                     if (null !== $messageString) {
                         unset($messageDataArray[ 0 ]);
 
+                        /**
+                         * @noinspection PhpStrFunctionsInspection
+                         */
                         if (true
                             && (false === strpos($messageString, ' '))
                             && preg_match('/^[A-Z0-9_]+$/', $messageString)
@@ -3089,26 +3095,17 @@ class PhpModule
         }
 
         if ([] !== $previousList) {
-            $hasNoMessage = ([] === $messageList);
-            $hasNoCode = ([] === $codeIntegerList);
-            $hasNoFileLine = ([] === $fileList);
+            if ([] === $messageList) {
+                $messageList = [];
+                $codeIntegerList = [];
+                $fileList = [];
+                $lineList = [];
 
-            if (false
-                || $hasNoMessage
-                || $hasNoCode
-                || $hasNoFileLine
-            ) {
                 foreach ( $previousList as $i => $previous ) {
-                    if ($hasNoMessage) {
-                        $messageList[ $i ] = $previous->getMessage();
-                    }
-                    if ($hasNoCode) {
-                        $codeIntegerList[ $i ] = $previous->getCode();
-                    }
-                    if ($hasNoFileLine) {
-                        $fileList[ $i ] = $previous->getFile();
-                        $lineList[ $i ] = $previous->getLine();
-                    }
+                    $messageList[ $i ] = $previous->getMessage();
+                    $codeIntegerList[ $i ] = $previous->getCode();
+                    $fileList[ $i ] = $previous->getFile();
+                    $lineList[ $i ] = $previous->getLine();
                 }
             }
         }

@@ -3298,7 +3298,6 @@ $fn = function () use ($ffn) {
     $ffn->print('[ FormatModule ]');
     echo "\n";
 
-
     $enc = \Gzhegow\Lib\Lib::format()->bytes_encode([ NAN ], $src = 1024 * 1024);
     $ffn->print($enc);
 
@@ -3708,11 +3707,48 @@ $fn = function () use ($ffn) {
     //         ),
     //     )
     // );
+
     $theHttpSession->set('hello', 'world');
     $ffn->print($theHttpSession, $_SESSION ?? []);
 
     $theHttpSession->unset('hello');
     $ffn->print($theHttpSession, $_SESSION ?? []);
+
+    echo "\n";
+
+
+    $res = \Gzhegow\Lib\Lib::http()->http_accept_match(
+        'text/html',
+        [ 'text/html', 'application/signed-exchange' ],
+    );
+    $ffn->print_array_multiline($res, 3);
+
+    $res = \Gzhegow\Lib\Lib::http()->http_accept_match(
+        'text/html',
+        [ 'text/html' ],
+        [ 'application/signed-exchange' ]
+    );
+    $ffn->print_array_multiline($res, 3);
+
+    $res = \Gzhegow\Lib\Lib::http()->http_accept_match(
+        'application/signed-exchange;v=b3;q=0.7',
+        [ 'text/html' ],
+        [ 'application/signed-exchange' ]
+    );
+    $ffn->print_array_multiline($res, 3);
+
+    $res = \Gzhegow\Lib\Lib::http()->http_accept_match(
+        'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        [ 'text/html' ],
+        [ 'application/signed-exchange' ]
+    );
+    $ffn->print_array_multiline($res, 3);
+
+    $res = \Gzhegow\Lib\Lib::http()->http_accept_match(
+        'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+        [ 'text/html', 'application/signed-exchange' ]
+    );
+    $ffn->print_array_multiline($res, 3);
 };
 $test = $ffn->test($fn);
 $test->expectStdout('
@@ -3722,6 +3758,59 @@ $test->expectStdout('
 
 { object # Gzhegow\Lib\Modules\Http\Session\DefaultSession } | [ "hello" => "world" ]
 { object # Gzhegow\Lib\Modules\Http\Session\DefaultSession } | []
+
+###
+[]
+###
+###
+[
+  "text/html" => [
+    "1",
+    []
+  ]
+]
+###
+###
+[
+  "application/signed-exchange" => [
+    "0.7",
+    [
+      "v" => "b3",
+      "q" => "0.7"
+    ]
+  ]
+]
+###
+###
+[
+  "text/html" => [
+    "1",
+    []
+  ],
+  "application/signed-exchange" => [
+    "0.7",
+    [
+      "v" => "b3",
+      "q" => "0.7"
+    ]
+  ]
+]
+###
+###
+[
+  "text/html" => [
+    "1",
+    []
+  ],
+  "application/signed-exchange" => [
+    "0.7",
+    [
+      "v" => "b3",
+      "q" => "0.7"
+    ]
+  ]
+]
+###
 ');
 $test->run();
 

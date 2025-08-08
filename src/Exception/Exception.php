@@ -35,11 +35,9 @@ class Exception extends \Exception implements
         $hasPrevious = (null !== $previous);
 
         $errorsCount = count($messageList);
+
         if ($hasPrevious) {
             $previousList = array_values($args[ 'previousList' ]);
-
-            $errorsCount += count($previousList);
-            $errorsCount -= 1;
 
             $this->previousList = $previousList;
         }

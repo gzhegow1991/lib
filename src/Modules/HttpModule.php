@@ -18,6 +18,7 @@ class HttpModule
      * @var class-string<DefaultCookies>
      */
     protected static $cookiesClass = DefaultCookies::class;
+
     /**
      * @var class-string<DefaultSession>
      */
@@ -26,6 +27,7 @@ class HttpModule
      * @var array
      */
     protected static $sessionOptions = [];
+
 
     /**
      * @param class-string<CookiesInterface>|null $cookiesClass
@@ -241,6 +243,177 @@ class HttpModule
     }
 
 
+    public function http_build_query_array($query, ...$queries) : array
+    {
+        $theType = Lib::type();
+
+        if ($queries) {
+            array_unshift($queries, $query);
+        }
+
+        foreach ( $queries as $idx => $_query ) {
+            if (null === $_query) {
+                unset($queries[ $idx ]);
+            }
+        }
+
+        foreach ( $queries as $idx => $_query ) {
+            if (is_array($_query)) {
+                continue;
+
+            } elseif ($theType->string_not_empty($_query)->isOk([ &$_queryString ])) {
+                parse_str($_queryString, $queryArray);
+
+                $queries[ $idx ] = $queryArray;
+
+                unset($queryArray);
+
+            } else {
+                throw new LogicException(
+                    [ 'Each of `queries` should be a string or an array', $query, $idx ]
+                );
+            }
+        }
+
+        $result = $this->data_merge(...$queries);
+
+        return $result;
+    }
+
+
+    /**
+     * @noinspection PhpStrFunctionsInspection
+     */
+    public function http_accept_match(string $httpAccept, array $acceptAnd = [], array ...$orAcceptAnd) : array
+    {
+        $theType = Lib::type();
+
+        if ([] !== $acceptAnd) {
+            array_unshift($orAcceptAnd, $acceptAnd);
+        }
+
+        $acceptList = [];
+
+        $httpAcceptString = strtolower($httpAccept);
+        if (0 === strpos($httpAcceptString, $substr = 'accept: ')) {
+            $httpAcceptString = substr($httpAcceptString, strlen($substr));
+        }
+
+        $httpAcceptList = explode(',', $httpAcceptString);
+        $httpAcceptList = array_map('trim', $httpAcceptList);
+
+        foreach ( $httpAcceptList as $httpAcceptItem ) {
+            $acceptVarsSplit = explode(';', $httpAcceptItem);
+
+            $httpAcceptContentType = array_shift($acceptVarsSplit);
+
+            $qValue = 1;
+            $acceptVarsArray = [];
+            foreach ( $acceptVarsSplit as $acceptVarsSplitItem ) {
+                $acceptVarSplit = $acceptVarsSplitItem;
+                $acceptVarSplit = explode('=', $acceptVarSplit, 2);
+                $acceptVarSplit += [ '', '' ];
+
+                [ $acceptVarName, $acceptVarValue ] = $acceptVarSplit;
+
+                if ('q' === $acceptVarName) {
+                    $qValue = $acceptVarValue;
+                }
+
+                $acceptVarsArray[ $acceptVarName ] = $acceptVarValue;
+            }
+
+            $qValueNumeric = $theType->numeric($qValue)->orNull();
+
+            if (null === $qValueNumeric) {
+                throw new LogicException(
+                    [ 'The `httpAccept` has invalid header Accept value', [ $httpAcceptItem, 'q=' . $qValue ] ]
+                );
+            }
+
+            $acceptList[ $httpAcceptContentType ] = [ $qValueNumeric, $acceptVarsArray ];
+        }
+
+        arsort($acceptList);
+
+        if (! isset($acceptAnd)) {
+            return $acceptList;
+        }
+
+        $result = [];
+
+        foreach ( $orAcceptAnd as $acceptOrItem ) {
+            $acceptAndList = array_map('strtolower', $acceptOrItem);
+            $acceptAndList = array_filter($acceptAndList);
+
+            $resultCurrent = [];
+
+            foreach ( $acceptAndList as $acceptAndItem ) {
+                if (! isset($acceptList[ $acceptAndItem ])) {
+                    continue 2;
+                }
+
+                $resultCurrent[ $acceptAndItem ] = $acceptList[ $acceptAndItem ];
+            }
+
+            $result += $resultCurrent;
+        }
+
+        return $result;
+    }
+
+
+    /**
+     * @return string|false
+     */
+    public function idn_to_ascii(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
+    {
+        if (! extension_loaded('intl')) {
+            throw new ExtensionException(
+                'Missing PHP extension: intl'
+            );
+        }
+
+        $flags = $flags ?? IDNA_DEFAULT;
+        $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
+
+        $withIdnaInfo = array_key_exists(0, $refs);
+        if ($withIdnaInfo) {
+            $refIdnaInfo =& $refs[ 0 ];
+        }
+        $refIdnaInfo = null;
+
+        return $withIdnaInfo
+            ? idn_to_ascii($domain, $flags, $variant, $refIdnaInfo)
+            : idn_to_ascii($domain, $flags, $variant);
+    }
+
+    /**
+     * @return string|false
+     */
+    public function idn_to_utf8(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
+    {
+        if (! extension_loaded('intl')) {
+            throw new ExtensionException(
+                'Missing PHP extension: intl'
+            );
+        }
+
+        $flags = $flags ?? IDNA_DEFAULT;
+        $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
+
+        $withIdnaInfo = array_key_exists(0, $refs);
+        if ($withIdnaInfo) {
+            $refIdnaInfo =& $refs[ 0 ];
+        }
+        $refIdnaInfo = null;
+
+        return $withIdnaInfo
+            ? idn_to_utf8($domain, $flags, $variant, $refIdnaInfo)
+            : idn_to_utf8($domain, $flags, $variant);
+    }
+
+
     public function data_replace(?array $dataArray, ?array ...$dataArrays) : array
     {
         $theArr = Lib::arr();
@@ -337,167 +510,5 @@ class HttpModule
         $result = array_merge_recursive(...$dataArrays);
 
         return $result;
-    }
-
-
-    public function build_query_array($query, ...$queries) : array
-    {
-        $theType = Lib::type();
-
-        if ($queries) {
-            array_unshift($queries, $query);
-        }
-
-        foreach ( $queries as $idx => $_query ) {
-            if (null === $_query) {
-                unset($queries[ $idx ]);
-            }
-        }
-
-        foreach ( $queries as $idx => $_query ) {
-            if (is_array($_query)) {
-                continue;
-
-            } elseif ($theType->string_not_empty($_query)->isOk([ &$_queryString ])) {
-                parse_str($_queryString, $queryArray);
-
-                $queries[ $idx ] = $queryArray;
-
-                unset($queryArray);
-
-            } else {
-                throw new LogicException(
-                    [ 'Each of `queries` should be a string or an array', $query, $idx ]
-                );
-            }
-        }
-
-        $result = $this->data_merge(...$queries);
-
-        return $result;
-    }
-
-
-    public function accept_match(string $httpAccept, $acceptAnd = null, ...$acceptOr) : array
-    {
-        $theType = Lib::type();
-
-        array_unshift($acceptOr, $acceptAnd);
-
-        $acceptList = [];
-
-        $accept = str_replace(' ', '', $httpAccept);
-        $accept = strtolower($accept);
-        $accept = explode(',', $accept);
-
-        foreach ( $accept as $acceptItem ) {
-            $qValue = 1;
-
-            $acceptVarsArray = null;
-            if (strpos($acceptItem, $substr = ';')) {
-                $acceptVars = explode($substr, $acceptItem);
-
-                $acceptItem = array_shift($acceptVars);
-
-                foreach ( $acceptVars as $acceptVar ) {
-                    [
-                        $acceptVarName,
-                        $acceptVarValue,
-                    ] = explode('=', $acceptVar, 2) + [ null, '' ];
-
-                    if ($acceptVarName === 'q') {
-                        $qValue = $acceptVarValue;
-                    }
-
-                    $acceptVarsArray[ $acceptVarName ] = $acceptVarValue;
-                }
-            }
-
-            $qValueNumeric = $theType->numeric($qValue)->orNull();
-
-            $acceptList[ $acceptItem ] = [ $qValueNumeric, $acceptVarsArray ];
-        }
-        arsort($acceptList);
-
-        if (! isset($acceptAnd)) {
-            return $acceptList;
-        }
-
-        foreach ( $acceptOr as $i => $list ) {
-            $list = (array) $list;
-            $list = array_map('strtolower', $list);
-            $list = array_filter($list);
-
-            if ($list) {
-                $acceptOr[ $i ] = $list;
-
-            } else {
-                unset($acceptOr[ $i ]);
-            }
-
-            $result = [];
-            foreach ( $list as $item ) {
-                if (null === $acceptList[ $item ][ 0 ]) {
-                    continue 2;
-                }
-
-                $result[ $item ] = $acceptList[ $item ];
-            }
-
-            return $result;
-        }
-
-        return [];
-    }
-
-
-    /**
-     * @return string|false
-     */
-    public function idn_to_ascii(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
-    {
-        if (! extension_loaded('intl')) {
-            throw new ExtensionException(
-                'Missing PHP extension: intl'
-            );
-        }
-
-        $flags = $flags ?? IDNA_DEFAULT;
-        $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
-
-        $withIdnaInfo = array_key_exists(0, $refs);
-        if ($withIdnaInfo) {
-            $refIdnaInfo =& $refs[ 0 ];
-        }
-        $refIdnaInfo = null;
-
-        return $withIdnaInfo
-            ? idn_to_ascii($domain, $flags, $variant, $refIdnaInfo)
-            : idn_to_ascii($domain, $flags, $variant);
-    }
-
-    /**
-     * @return string|false
-     */
-    public function idn_to_utf8(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
-    {
-        if (! extension_loaded('intl')) {
-            throw new ExtensionException(
-                'Missing PHP extension: intl'
-            );
-        }
-
-        $flags = $flags ?? IDNA_DEFAULT;
-        $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
-
-        $withIdnaInfo = array_key_exists(0, $refs);
-        if ($withIdnaInfo) {
-            $refIdnaInfo =& $refs[ 0 ];
-        }
-        $refIdnaInfo = null;
-
-        return $withIdnaInfo
-            ? idn_to_utf8($domain, $flags, $variant, $refIdnaInfo)
-            : idn_to_utf8($domain, $flags, $variant);
     }
 }
