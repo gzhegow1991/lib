@@ -448,37 +448,48 @@ class DefaultDumper implements DumperInterface
 
         $printerOptions = $this->printerOptions[ $this->printer ] ?? [];
 
-        $casters = $printerOptions[ 'casters' ] ?? null;
-
-        $cloner = (null === $casters)
+        $clonerCasters = $printerOptions[ 'casters' ] ?? null;
+        $cloner = (null === $clonerCasters)
             ? $this->getSymfonyCloner()
-            : $this->newSymfonyCloner($casters);
+            : $this->newSymfonyCloner($clonerCasters);
 
-        $dumper = $thePhp->is_terminal()
+        $isTerminal = $thePhp->is_terminal();
+        $dumper = $isTerminal
             ? $this->getSymfonyCliDumper()
             : $this->getSymfonyHtmlDumper();
 
-        $h = null;
-        $output = $this->getSymfonyOutputLineDumper($h);
-        $dumper->setOutput($output);
+        if ($isTerminal) {
+            ob_start();
 
-        $content = '';
-        foreach ( $vars as $var ) {
-            $h = fopen('php://memory', 'wb');
+            foreach ( $vars as $var ) {
+                $dumper->dump($cloner->cloneVar($var));
+            }
 
-            $dumper->dump($cloner->cloneVar($var));
+            $content = ob_get_clean();
 
-            rewind($h);
+        } else {
+            $h = null;
+            $output = $this->getSymfonyOutputLineDumper($h);
+            $dumper->setOutput($output);
 
-            $contentVar = stream_get_contents($h);
+            $content = '';
+            foreach ( $vars as $var ) {
+                $h = fopen('php://memory', 'wb');
 
-            fclose($h);
+                $dumper->dump($cloner->cloneVar($var));
 
-            $contentVar = ltrim($contentVar);
-            $contentVar = nl2br($contentVar);
-            $contentVar = str_replace("\n", '', $contentVar);
+                rewind($h);
 
-            $content .= $contentVar;
+                $contentVar = stream_get_contents($h);
+
+                fclose($h);
+
+                $contentVar = ltrim($contentVar);
+                $contentVar = nl2br($contentVar);
+                $contentVar = str_replace("\n", '', $contentVar);
+
+                $content .= $contentVar;
+            }
         }
 
         return $content;
