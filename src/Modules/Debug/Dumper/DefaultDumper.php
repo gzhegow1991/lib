@@ -130,27 +130,15 @@ class DefaultDumper implements DumperInterface
     /**
      * @var string
      */
-    protected $dumper = 'resource';
+    protected $dumper = 'echo';
     /**
      * @var string
      */
-    protected $dumperDefault = 'resource';
+    protected $dumperDefault = 'echo';
     /**
      * @var array
      */
     protected $dumperOptions = [];
-
-
-    public function __construct()
-    {
-        $thePhp = Lib::php();
-
-        $dumperDefault = $thePhp->is_terminal()
-            ? static::DUMPER_RESOURCE
-            : static::DUMPER_RESOURCE_HTML;
-
-        $this->dumper = $this->dumperDefault = $dumperDefault;
-    }
 
 
     public function hasSymfonyVarDumper() : bool
@@ -331,6 +319,8 @@ class DefaultDumper implements DumperInterface
         return $this->symfonyLineDumper = null
             ?? $this->symfonyLineDumper
             ?? function ($line, $depth, $indentPad) use (&$h) {
+                /** @var resource $h */
+
                 $line = rtrim($line);
                 if ('' === $line) {
                     return;
@@ -486,7 +476,7 @@ class DefaultDumper implements DumperInterface
 
             $contentVar = ltrim($contentVar);
             $contentVar = nl2br($contentVar);
-            $contentVar = str_replace("\n", '',$contentVar);
+            $contentVar = str_replace("\n", '', $contentVar);
 
             $content .= $contentVar;
         }
@@ -630,11 +620,11 @@ class DefaultDumper implements DumperInterface
 
     public function dumperEcho_echo(...$vars) : void
     {
-        $content = $this->printerPrint(...$vars);
-        $content .= "\n";
+        $thePhp = Lib::php();
 
-        echo $content;
-        flush();
+        $thePhp->is_terminal()
+            ? $this->dumperEcho_echo_text(...$vars)
+            : $this->dumperEcho_echo_html(...$vars);
     }
 
     public function dumperEcho_echo_devtools(...$vars) : void
@@ -715,15 +705,9 @@ class DefaultDumper implements DumperInterface
     {
         $thePhp = Lib::php();
 
-        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
-
-        $resource = $dumperOptions[ 'resource' ] ?? $thePhp->output();
-
-        $content = $this->printerPrint(...$vars);
-        $content .= "\n";
-
-        fwrite($resource, $content);
-        fflush($resource);
+        $thePhp->is_terminal()
+            ? $this->dumperEcho_resource_text(...$vars)
+            : $this->dumperEcho_resource_html(...$vars);
     }
 
     public function dumperEcho_resource_devtools(...$vars) : void
