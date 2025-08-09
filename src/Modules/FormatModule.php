@@ -7,10 +7,27 @@ use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Modules\Format\FormatCsv;
 use Gzhegow\Lib\Modules\Format\FormatXml;
 use Gzhegow\Lib\Modules\Format\FormatJson;
+use Gzhegow\Lib\Modules\Format\FormatBase64;
 
 
 class FormatModule
 {
+    public function newBase64() : FormatBase64
+    {
+        return new FormatBase64();
+    }
+
+    public function cloneBase64() : FormatBase64
+    {
+        return clone $this->base64();
+    }
+
+    public function base64() : FormatBase64
+    {
+        return $this->newBase64();
+    }
+
+
     public function newCsv() : FormatCsv
     {
         return new FormatCsv();
@@ -128,16 +145,12 @@ class FormatModule
      *
      * @return int|Ret<int>
      */
-    public function bytes_decode(?array $fallback, string $size)
+    public function bytes_decode(?array $fallback, $size)
     {
         $theType = Lib::type();
 
-        if ('' === $size) {
-            return Ret::throw(
-                $fallback,
-                [ 'The `size` should be a non-empty string', $size ],
-                [ __FILE__, __LINE__ ]
-            );
+        if (! $theType->string_not_empty($size)->isOk([ &$sizeString, &$ret ])) {
+            return Ret::throw($fallback, $ret);
         }
 
         if ('0' === $size) {
@@ -179,19 +192,22 @@ class FormatModule
             );
         }
 
-        if (! $theType->num_positive($numUnit)->isOk([ &$numUnitNumPositive, &$ret ])) {
+        if (! $theType->num_non_negative($numUnit)->isOk([ &$numUnitNumNonNegative, &$ret ])) {
             return Ret::throw($fallback, $ret);
         }
 
-        if (0 === $numUnitNumPositive) {
+        if (0 == $numUnitNumNonNegative) {
             return Ret::ok($fallback, 0);
         }
 
         $bytesNum = $numUnit * pow(1024, $strUnitList[ $strUnit ]);
+        $bytesNumCeil = ceil($bytesNum);
 
-        $bytesCeil = ceil($bytesNum);
-
-        if (false === $bytesCeil) {
+        /**
+         * > ceil() may return false, suppress damn PHPStorm
+         * @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection
+         */
+        if (false === $bytesNumCeil) {
             return Ret::throw(
                 $fallback,
                 [ 'Unable to `ceil`', $bytesNum ],
@@ -199,9 +215,8 @@ class FormatModule
             );
         }
 
-        return Ret::ok($fallback, (int) $bytesCeil);
+        return Ret::ok($fallback, (int) $bytesNumCeil);
     }
-
 
     /**
      * @param array{ 0?: mixed }|null $fallback # Pass `null` to return Ret<T> or pass `[]` to throw exception
@@ -242,5 +257,68 @@ class FormatModule
         $size = round($left, $roundPrecision) . $unit;
 
         return Ret::ok($fallback, $size);
+    }
+
+
+    /**
+     * @param array{ 0?: mixed }|null $fallback # Pass `null` to return Ret<T> or pass `[]` to throw exception
+     *
+     * @return mixed|Ret<mixed>
+     */
+    public function json_base64_decode(
+        ?array $fallback,
+        $base64, ?bool $isAssociative = null,
+        ?int $depth = null, ?int $flags = null
+    )
+    {
+        $theFormatBase64 = Lib::formatBase64();
+        $theFormatJson = Lib::formatJson();
+
+        if (! $theFormatBase64->base64_decode(null, $base64)->isOk([ &$jsonString, &$ret ])) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        $ret = $theFormatJson->json_decode(
+            null,
+            $jsonString, $isAssociative,
+            $depth, $flags
+        );
+
+        if (! $ret->isOk([ &$data, &$ret ])) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        return Ret::ok($fallback, $data);
+    }
+
+    /**
+     * @param array{ 0?: mixed }|null $fallback # Pass `null` to return Ret<T> or pass `[]` to throw exception
+     *
+     * @return string|Ret<string>
+     */
+    public function json_base64_encode(
+        ?array $fallback,
+        $value, ?bool $isAllowNull = null,
+        ?int $flags = null, ?int $depth = null
+    )
+    {
+        $theFormatBase64 = Lib::formatBase64();
+        $theFormatJson = Lib::formatJson();
+
+        $ret = $theFormatJson->json_encode(
+            null,
+            $value, $isAllowNull,
+            $flags, $depth
+        );
+
+        if (! $ret->isOk([ &$jsonString, &$ret ])) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        if (! $theFormatBase64->base64_encode(null, $jsonString)->isOk([ &$base64String, &$ret ])) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        return Ret::ok($fallback, $base64String);
     }
 }

@@ -62,42 +62,6 @@ class DefaultDumper implements DumperInterface
 
 
     /**
-     * @var array{ 0?: string|false }
-     */
-    protected static $debugContentType = [];
-
-    /**
-     * @param array{ 0?: string|false }|null $contentType
-     *
-     * @return array{ 0?: string|false }
-     */
-    public static function staticDebugContentType(?array $contentType = null) : array
-    {
-        $last = static::$debugContentType;
-
-        if (null !== $contentType) {
-            $contentTypeValue = $contentType[ 0 ];
-
-            if (false === $contentTypeValue) {
-                static::$debugContentType = [ false ];
-
-            } elseif (is_string($contentTypeValue) && ('' !== $contentTypeValue)) {
-                static::$debugContentType = [ $contentTypeValue ];
-
-            } else {
-                throw new LogicException(
-                    [ 'The `contentType` should be non-empty string or be FALSE', $contentType ]
-                );
-            }
-        }
-
-        static::$debugContentType = static::$debugContentType ?? [];
-
-        return $last;
-    }
-
-
-    /**
      * @var \Symfony\Component\VarDumper\Cloner\ClonerInterface
      */
     protected $symfonyCloner;
@@ -610,7 +574,9 @@ class DefaultDumper implements DumperInterface
 
         $content = "<script>console.log(window.atob('{$content}'));</script>" . "\n";
 
-        $this->sendDebugContentTypeOnShutdown('text/html');
+        if (! headers_sent()) {
+            header('Content-Type: text/html', true, 418);
+        }
 
         echo $content;
         flush();
@@ -621,7 +587,9 @@ class DefaultDumper implements DumperInterface
         $content = $this->printerPrint(...$vars);
         $content = rtrim($content) . "\n";
 
-        $this->sendDebugContentTypeOnShutdown('text/html');
+        if (! headers_sent()) {
+            header('Content-Type: text/html', true, 418);
+        }
 
         echo $content;
         flush();
@@ -632,7 +600,9 @@ class DefaultDumper implements DumperInterface
         $content = $this->printerPrint(...$vars);
         $content = rtrim($content) . "\n";
 
-        $this->sendDebugContentTypeOnShutdown('text/plain');
+        if (! headers_sent()) {
+            header('Content-Type: text/plain', true, 418);
+        }
 
         echo $content;
         flush();
@@ -696,13 +666,15 @@ class DefaultDumper implements DumperInterface
         $content = $this->printerPrint(...$vars);
         $content = rtrim($content);
 
-        $b64content = base64_encode($content);
+        $content = base64_encode($content);
 
-        $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . "\n";
+        $content = "<script>console.log(window.atob('{$content}'));</script>" . "\n";
 
-        $this->sendDebugContentTypeOnShutdown('text/html');
+        if (! headers_sent()) {
+            header('Content-Type: text/html', true, 418);
+        }
 
-        fwrite($resource, $htmlContent);
+        fwrite($resource, $content);
         fflush($resource);
     }
 
@@ -717,7 +689,9 @@ class DefaultDumper implements DumperInterface
         $content = $this->printerPrint(...$vars);
         $content = rtrim($content) . "\n";
 
-        $this->sendDebugContentTypeOnShutdown('text/html');
+        if (! headers_sent()) {
+            header('Content-Type: text/html', true, 418);
+        }
 
         fwrite($resource, $content);
         fflush($resource);
@@ -734,7 +708,9 @@ class DefaultDumper implements DumperInterface
         $content = $this->printerPrint(...$vars);
         $content = rtrim($content) . "\n";
 
-        $this->sendDebugContentTypeOnShutdown('text/plain');
+        if (! headers_sent()) {
+            header('Content-Type: text/plain', true, 418);
+        }
 
         fwrite($resource, $content);
         fflush($resource);
@@ -937,83 +913,6 @@ class DefaultDumper implements DumperInterface
         $traceWhereIs = "[ {$traceFile} ({$traceLine}) ]";
 
         $this->dumperEcho($traceWhereIs, ...$vars);
-    }
-
-
-    protected function sendDebugContentTypeOnShutdown(string $contentType) : void
-    {
-        $debugContentType = $this->staticDebugContentType();
-
-        if ([] !== $debugContentType) {
-            return;
-        }
-
-        $thePhp = Lib::php();
-        $theType = Lib::type();
-
-        $contentTypeValid = $theType->string_not_empty($contentType)->orThrow();
-        $contentTypeValid = strtolower($contentTypeValid);
-
-        $isTerminal = $thePhp->is_terminal();
-
-        if ($isTerminal) {
-            $this->staticDebugContentType([ false ]);
-
-            return;
-        }
-
-        $level = ob_get_level();
-        for ( $i = $level; $i > 0; $i-- ) {
-            ob_flush();
-        }
-
-        if (headers_sent($file, $line)) {
-            throw new RuntimeException(
-                [ 'Headers already sent', $file, $line ]
-            );
-        }
-
-        $headerSentContentType = null;
-        foreach ( headers_list() as $header ) {
-            if (0 === stripos($header, 'Content-Type:')) {
-                $headerSentContentType = substr($header, strlen('Content-Type:'));
-                $headerSentContentType = explode(';', $headerSentContentType)[ 0 ];
-                $headerSentContentType = strtolower(trim($headerSentContentType));
-            }
-        }
-
-        if (null === $headerSentContentType) {
-            $this->staticDebugContentType([ $contentTypeValid ]);
-
-        } elseif ($contentTypeValid === $headerSentContentType) {
-            $this->staticDebugContentType([ $contentTypeValid ]);
-        }
-
-        $this->registerShutdownFunction();
-    }
-
-    public function registerShutdownFunction() : void
-    {
-        $theEntrypoint = Lib::entrypoint();
-
-        $theEntrypoint->registerShutdownFunction([ $this, 'onShutdownEnsureDebugContentType' ]);
-    }
-
-    public function onShutdownEnsureDebugContentType() : void
-    {
-        $debugContentType = $this->staticDebugContentType();
-
-        if ([] !== $debugContentType) {
-            $debugContentTypeCurrentValue = $debugContentType[ 0 ];
-
-            if (false === $debugContentTypeCurrentValue) {
-                return;
-            }
-
-            if (! headers_sent()) {
-                header("Content-Type: {$debugContentTypeCurrentValue}", true, 418);
-            }
-        }
     }
 
 

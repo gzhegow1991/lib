@@ -3,10 +3,10 @@
 namespace Gzhegow\Lib\Modules\Type\Ret\PHP7;
 
 use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Modules\Type\Ret\Base\AbstractRet;
+use Gzhegow\Lib\Modules\Type\Ret as RetBase;
 
 
-class Ret extends AbstractRet implements \ArrayAccess
+class Ret extends RetBase implements \ArrayAccess
 {
     public function __construct()
     {

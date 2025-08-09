@@ -370,15 +370,28 @@ $fn = function () use ($ffn) {
     $ffn->print($ret);
     $ffn->print_array_multiline([
         // > [ bool, bool ]
-        [ $ret->getStatus(), $ret[ 0 ] ],
-        // > [ mixed|throw, mixed|null ]
-        [ $ret->getValue($fallback = [ null ]), $ret[ 1 ] ],
+        [
+            $ret->getStatus(),
+            $ret[ 0 ],
+        ],
+        // > [ mixed|throw, mixed|null, mixed|null ]
+        [
+            $ret->getValue($fallback = []),
+            $ret->getValue($fallback = [ null ]),
+            $ret[ 1 ],
+        ],
         // > [ \stdClass[]|array[], \stdClass[] ]
-        [ $ret->getErrors($isAssociative = true), $ret[ 2 ] ],
-        // > [ mixed|NAN, mixed|NAN ]
-        [ $ret->orFallback($fallback = [ NAN ]), $ret($fallback = [ NAN ]) ],
-        // > [ mixed|throw, mixed|throw ]
-        [ $ret->orFallback($fallback = []), $ret($fallback = []) ],
+        [
+            $ret->getErrors($isAssociative = true),
+            $ret[ 2 ],
+        ],
+        // > [ mixed|throw, mixed|NAN, mixed|throw, mixed|NAN ]
+        [
+            $ret->orFallback($fallback = []),
+            $ret->orFallback($fallback = [ NAN ]),
+            $ret($fallback = []),
+            $ret($fallback = [ NAN ]),
+        ],
     ], 4);
 
     echo "\n";
@@ -388,13 +401,32 @@ $fn = function () use ($ffn) {
     $ffn->print($ret);
     $ffn->print_array_multiline([
         // > [ bool, bool ]
-        [ $ret->getStatus(), $ret[ 0 ] ],
-        // > [ mixed|throw, mixed|null ]
-        [ $ret->getValue($fallback = [ null ]), $ret[ 1 ] ],
+        [
+            $ret->getStatus(),
+            $ret[ 0 ],
+        ],
+        // > [ 0: mixed|throw, 1: mixed|null, 2: mixed|null ]
+        [
+            // > commented, needs try/catch around otherwise
+            // $ret->getValue($fallback = []), // 0
+            //
+            $ret->getValue($fallback = [ null ]), // 1
+            $ret[ 1 ], // 2
+        ],
         // > [ \stdClass[]|array[], \stdClass[] ]
-        [ $ret->getErrors($isAssociative = true), $ret[ 2 ] ],
-        // > [ mixed|NAN, mixed|NAN ]
-        [ $ret->orFallback($fallback = [ NAN ]), $ret($fallback = [ NAN ]) ],
+        [
+            $ret->getErrors($isAssociative = true),
+            $ret[ 2 ],
+        ],
+        // > [ 0: mixed|throw, 1: mixed|throw, 2: mixed|NAN, 3: mixed|NAN ]
+        [
+            // > commented, needs try/catch around otherwise
+            // $ret->orFallback($fallback = []), // 0
+            // $ret($fallback = []), // 1
+            //
+            $ret->orFallback($fallback = [ NAN ]), // 2
+            $ret($fallback = [ NAN ]), // 3
+        ],
     ], 4);
 };
 $test = $ffn->test($fn);
@@ -410,6 +442,7 @@ $test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
   ],
   [
     "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }",
     "{ object # DateTimeZone }"
   ],
   [
@@ -418,9 +451,7 @@ $test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
   ],
   [
     "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }"
-  ],
-  [
+    "{ object # DateTimeZone }",
     "{ object # DateTimeZone }",
     "{ object # DateTimeZone }"
   ]
@@ -470,6 +501,7 @@ $test->expectStdoutIf(PHP_VERSION_ID < 80000, '
   ],
   [
     "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }",
     "{ object # DateTimeZone }"
   ],
   [
@@ -478,9 +510,7 @@ $test->expectStdoutIf(PHP_VERSION_ID < 80000, '
   ],
   [
     "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }"
-  ],
-  [
+    "{ object # DateTimeZone }",
     "{ object # DateTimeZone }",
     "{ object # DateTimeZone }"
   ]

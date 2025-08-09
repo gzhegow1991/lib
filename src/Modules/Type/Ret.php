@@ -4,19 +4,45 @@ namespace Gzhegow\Lib\Modules\Type;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Modules\Type\Ret\Base\AbstractRet;
+use Gzhegow\Lib\Exception\RuntimeException;
 
 
 /**
- * @mixin AbstractRet
- *
  * @template T of mixed
- * @template-extends AbstractRet<T>
  */
 class Ret
 {
     /**
-     * @return AbstractRet
+     * @var array{ 0?: T }
+     */
+    public $value = [];
+
+    /**
+     * @var \stdClass[]
+     */
+    public $errors = [];
+    /**
+     * @var array{
+     *     file_line: array{ 0: string, 1: int },
+     *     throwable_args: array
+     * }[]
+     */
+    protected $errorsRaw = [];
+
+
+    /**
+     * @param array{ 0?: mixed } $fallback
+     *
+     * @return T|mixed
+     */
+    public function __invoke(array $fallback, $throwableArg = null, array $fileLine = [], ...$throwableArgs)
+    {
+        return $this->orFallback($fallback, $throwableArg, $fileLine, ...$throwableArgs);
+    }
+
+
+    /**
+     * @return static
      */
     public static function new()
     {
@@ -31,13 +57,13 @@ class Ret
     /**
      * @param T $value
      *
-     * @return AbstractRet<T>
+     * @return static<T>
      */
     public static function val($value)
     {
-        if ($value instanceof AbstractRet) {
+        if ($value instanceof self) {
             throw new LogicException(
-                [ 'The `value` should not be instance of: ' . static::class, $value ]
+                [ 'The `value` should not be instance of: ' . self::class, $value ]
             );
         }
 
@@ -53,11 +79,11 @@ class Ret
     }
 
     /**
-     * @param AbstractRet|mixed          $throwableArg
+     * @param static|mixed               $throwableArg
      *
      * @param array{ 0: string, 1: int } $fileLine
      *
-     * @return AbstractRet<T>
+     * @return static<T>
      */
     public static function err($throwableArg, array $fileLine = [], ...$throwableArgs)
     {
@@ -67,7 +93,7 @@ class Ret
 
         $instance = new $className();
 
-        if ($throwableArg instanceof AbstractRet) {
+        if ($throwableArg instanceof self) {
             $instance->mergeFrom($throwableArg);
 
         } else {
@@ -83,13 +109,13 @@ class Ret
     /**
      * @param T $value
      *
-     * @return T|AbstractRet<T>
+     * @return T|static<T>
      */
     public static function ok(?array $fallback, $value)
     {
-        if ($value instanceof AbstractRet) {
+        if ($value instanceof self) {
             throw new LogicException(
-                [ 'The `value` should not be instance of: ' . static::class, $value ]
+                [ 'The `value` should not be instance of: ' . self::class, $value ]
             );
         }
 
@@ -109,11 +135,11 @@ class Ret
     }
 
     /**
-     * @param AbstractRet|mixed          $throwableArg
+     * @param static|mixed               $throwableArg
      *
      * @param array{ 0: string, 1: int } $fileLine
      *
-     * @return T|AbstractRet<T>
+     * @return T|static<T>
      */
     public static function throw(?array $fallback, $throwableArg, array $fileLine = [], ...$throwableArgs)
     {
@@ -123,7 +149,7 @@ class Ret
 
         $instance = new $className();
 
-        if ($throwableArg instanceof AbstractRet) {
+        if ($throwableArg instanceof self) {
             $instance->mergeFrom($throwableArg);
 
             if ([] !== $throwableArgs) {
@@ -147,5 +173,396 @@ class Ret
         }
 
         return $instance->orThrow();
+    }
+
+
+    public function getStatus() : bool
+    {
+        return [] !== $this->value;
+    }
+
+    /**
+     * @return T
+     */
+    public function getValue(array $fallback = [])
+    {
+        if ([] === $this->value) {
+            if ([] !== $fallback) {
+                [ $fallback ] = $fallback;
+
+                return $fallback;
+            }
+
+            throw new RuntimeException(
+                [ 'The `value` should exists', $this ]
+            );
+        }
+
+        return $this->value[ 0 ];
+    }
+
+
+    /**
+     * @return \stdClass[]
+     */
+    public function getErrors(?bool $isAssociative = null) : array
+    {
+        return $this->fetchErrors($isAssociative);
+    }
+
+    /**
+     * @param array{ 0: string, 1: int } $fileLine
+     *
+     * @return static
+     */
+    public function addError($throwableArg, array $fileLine = [], ...$throwableArgs)
+    {
+        array_unshift($throwableArgs, $throwableArg);
+
+        $fileLine = $fileLine ?: Lib::debug()->file_line();
+
+        $this->errorsRaw[] = [
+            'file_line'      => $fileLine,
+            'throwable_args' => $throwableArgs,
+        ];
+
+        return $this;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function mergeFrom(self $retFrom)
+    {
+        if ([] !== $retFrom->value) {
+            $this->value = $retFrom->value;
+        }
+
+        if ([] !== $retFrom->errorsRaw) {
+            $this->errorsRaw = array_merge(
+                $this->errorsRaw,
+                $retFrom->errorsRaw
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function mergeTo(self $retTo)
+    {
+        if ([] !== $this->value) {
+            $retTo->value = $this->value;
+        }
+
+        if ([] !== $this->errorsRaw) {
+            $retTo->errorsRaw = array_merge(
+                $retTo->errorsRaw,
+                $this->errorsRaw
+            );
+        }
+
+        return $retTo;
+    }
+
+
+    /**
+     * @param array{
+     *     0: T,
+     *     1: static<T>,
+     * } $refs
+     */
+    public function isOk(array $refs = []) : bool
+    {
+        if (array_key_exists(0, $refs)) $refValue =& $refs[ 0 ];
+        if (array_key_exists(1, $refs)) $refRet =& $refs[ 1 ];
+        $refValue = null;
+        $refRet = $this;
+
+        if ([] !== $this->value) {
+            $refValue = $this->value[ 0 ];
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array{
+     *     0: \stdClass[],
+     *     1: static<T>,
+     * } $refs
+     */
+    public function isFail(array $refs = []) : bool
+    {
+        if (array_key_exists(0, $refs)) $refErrors =& $refs[ 0 ];
+        if (array_key_exists(1, $refs)) $refRet =& $refs[ 1 ];
+        $refErrors = [];
+        $refRet = $this;
+
+        if ([] !== $this->errorsRaw) {
+            $refErrors = $this->fetchErrors();
+        }
+
+        if ([] === $this->value) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array{
+     *     0: \stdClass[],
+     *     1: static<T>,
+     * } $refs
+     */
+    public function isErr(array $refs = []) : bool
+    {
+        if (array_key_exists(0, $refs)) $refErrors =& $refs[ 0 ];
+        if (array_key_exists(1, $refs)) $refRet =& $refs[ 1 ];
+        $refErrors = [];
+        $refRet = $this;
+
+        if ([] !== $this->errorsRaw) {
+            $refErrors = $this->fetchErrors();
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @return T
+     */
+    public function orThrow($throwableArg = null, array $fileLine = [], ...$throwableArgs)
+    {
+        if ([] !== $this->value) {
+            return $this->value[ 0 ];
+        }
+
+        if (null !== $throwableArg) {
+            array_unshift($throwableArgs, $throwableArg);
+
+            $fileLine = $fileLine ?? Lib::debug()->file_line();
+
+            $this->errorsRaw[] = [
+                'file_line'      => $fileLine,
+                'throwable_args' => $throwableArgs,
+            ];
+        }
+
+        $this->throwErrors();
+    }
+
+    /**
+     * @param array{ 0?: mixed } $fallback
+     *
+     * @return T|mixed
+     */
+    public function orFallback(array $fallback = [], $throwableArg = null, array $fileLine = [], ...$throwableArgs)
+    {
+        if ([] !== $this->value) {
+            return $this->value[ 0 ];
+        }
+
+        if ([] !== $fallback) {
+            return $fallback[ 0 ];
+        }
+
+        if (null !== $throwableArg) {
+            array_unshift($throwableArgs, $throwableArg);
+
+            $fileLine = $fileLine ?? Lib::debug()->file_line();
+
+            $this->errorsRaw[] = [
+                'file_line'      => $fileLine,
+                'throwable_args' => $throwableArgs,
+            ];
+        }
+
+        $this->throwErrors();
+    }
+
+
+    /**
+     * @return T|null
+     */
+    public function orNull(?self &$refRetTo = null)
+    {
+        if (null === $refRetTo) {
+            $refRetTo = $this;
+
+        } else {
+            $this->mergeTo($refRetTo);
+        }
+
+        if ([] !== $this->value) {
+            return $this->value[ 0 ];
+        }
+
+        return null;
+    }
+
+    /**
+     * @return T|false
+     */
+    public function orFalse(?self &$refRetTo = null)
+    {
+        if (null === $refRetTo) {
+            $refRetTo = $this;
+
+        } else {
+            $this->mergeTo($refRetTo);
+        }
+
+        if ([] !== $this->value) {
+            return $this->value[ 0 ];
+        }
+
+        return false;
+    }
+
+    /**
+     * @return T|float
+     */
+    public function orNan(?self &$refRetTo = null)
+    {
+        if (null === $refRetTo) {
+            $refRetTo = $this;
+
+        } else {
+            $this->mergeTo($refRetTo);
+        }
+
+        if ([] !== $this->value) {
+            return $this->value[ 0 ];
+        }
+
+        return NAN;
+    }
+
+    /**
+     * @return T|string
+     */
+    public function orEmptyString(?self &$refRetTo = null)
+    {
+        if (null === $refRetTo) {
+            $refRetTo = $this;
+
+        } else {
+            $this->mergeTo($refRetTo);
+        }
+
+        if ([] !== $this->value) {
+            return $this->value[ 0 ];
+        }
+
+        return '';
+    }
+
+    /**
+     * @return T|array
+     */
+    public function orEmptyArray(?self &$refRetTo = null)
+    {
+        if (null === $refRetTo) {
+            $refRetTo = $this;
+
+        } else {
+            $this->mergeTo($refRetTo);
+        }
+
+        if ([] !== $this->value) {
+            return $this->value[ 0 ];
+        }
+
+        return [];
+    }
+
+    /**
+     * @return T|\stdClass
+     */
+    public function orEmptyStdclass(?self &$refRetTo = null)
+    {
+        if (null === $refRetTo) {
+            $refRetTo = $this;
+
+        } else {
+            $this->mergeTo($refRetTo);
+        }
+
+        if ([] !== $this->value) {
+            return $this->value[ 0 ];
+        }
+
+        return new \stdClass();
+    }
+
+
+    protected function fetchErrors(?bool $isAssociative = null) : array
+    {
+        $isAssociative = $isAssociative ?? false;
+
+        $thePhp = Lib::php();
+
+        $errorsQueue = $this->errorsRaw;
+
+        if ([] !== $errorsQueue) {
+            reset($errorsQueue);
+
+            while ( null !== ($i = key($errorsQueue)) ) {
+                if (! isset($this->errors[ $i ])) {
+                    [
+                        'file_line'      => $fileLine,
+                        'throwable_args' => $throwableArgs,
+                    ] = current($errorsQueue);
+
+                    $throwableArgsArray = $thePhp->throwable_args($fileLine, ...$throwableArgs);
+
+                    $this->errors[ $i ] = $throwableArgsArray[ 'messageObjectList' ];
+                }
+
+                next($errorsQueue);
+            }
+        }
+
+        $result = [];
+
+        if ($isAssociative) {
+            foreach ( $this->errors as $stdClasses ) {
+                foreach ( $stdClasses as $stdClass ) {
+                    $result[] = (array) $stdClass;
+                }
+            }
+
+        } else {
+            $result = array_merge(...$this->errors);
+        }
+
+        return $result;
+    }
+
+    protected function throwErrors() : void
+    {
+        $errorsQueue = $this->errorsRaw;
+
+        $previousList = [];
+        while ( [] !== $errorsQueue ) {
+            [
+                'file_line'      => $fileLine,
+                'throwable_args' => $throwableArgs,
+            ] = array_pop($errorsQueue);
+
+            $previousList[] = new LogicException($fileLine, ...$throwableArgs);
+        }
+
+        throw new LogicException(...$previousList);
     }
 }
