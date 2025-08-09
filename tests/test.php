@@ -3096,7 +3096,7 @@ $fn = function () use ($ffn) {
     echo \Gzhegow\Lib\Lib::debug()->dump_value('string') . "\n";
     echo \Gzhegow\Lib\Lib::debug()->dump_value([]) . "\n";
     echo \Gzhegow\Lib\Lib::debug()->dump_value((object) []) . "\n";
-    echo \Gzhegow\Lib\Lib::debug()->dump_value(\Gzhegow\Lib\Lib::php()->output()) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->dump_value(\Gzhegow\Lib\Lib::php()->hOutput()) . "\n";
 
     echo "\n";
 

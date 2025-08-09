@@ -1629,7 +1629,7 @@ class PhpModule
     /**
      * @return resource
      */
-    public function input()
+    public function hInput()
     {
         if (! defined('PHPIN')) define('PHPIN', fopen('php://input', 'rb'));
 
@@ -1639,7 +1639,7 @@ class PhpModule
     /**
      * @return resource
      */
-    public function output()
+    public function hOutput()
     {
         if (! defined('PHPOUT')) define('PHPOUT', fopen('php://output', 'wb'));
 

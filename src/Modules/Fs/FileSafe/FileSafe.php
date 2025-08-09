@@ -685,7 +685,7 @@ class FileSafe
         }
 
         // fflush($resource);
-        fflush($thePhp->output());
+        fflush($thePhp->hOutput());
 
         return $size;
     }

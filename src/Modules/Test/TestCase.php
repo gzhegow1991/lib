@@ -81,7 +81,7 @@ class TestCase
     {
         $thePhp = Lib::php();
 
-        $this->resource = $thePhp->output();
+        $this->resource = $thePhp->hOutput();
     }
 
 

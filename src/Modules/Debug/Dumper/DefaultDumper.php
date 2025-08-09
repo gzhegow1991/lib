@@ -448,14 +448,6 @@ class DefaultDumper implements DumperInterface
 
             $contentVar = trim($contentVar);
 
-            // if (! $isTerminal) {
-            //     $contentVar = nl2br($contentVar);
-            //     $contentVar = str_replace("\n", '', $contentVar);
-            // }
-
-            // dump($contentVar);
-            // die();
-
             $content[] = $contentVar;
 
             $this->symfonyOutputLineDumpResource = null;
@@ -627,7 +619,7 @@ class DefaultDumper implements DumperInterface
     public function dumperEcho_echo_html(...$vars) : void
     {
         $content = $this->printerPrint(...$vars);
-        $content = rtrim($content);
+        $content = rtrim($content) . "\n";
 
         $this->sendDebugContentTypeOnShutdown('text/html');
 
@@ -638,7 +630,7 @@ class DefaultDumper implements DumperInterface
     public function dumperEcho_echo_text(...$vars) : void
     {
         $content = $this->printerPrint(...$vars);
-        $content = rtrim($content);
+        $content = rtrim($content) . "\n";
 
         $this->sendDebugContentTypeOnShutdown('text/plain');
 
@@ -676,6 +668,7 @@ class DefaultDumper implements DumperInterface
         }
 
         $content = $this->printerPrint(...$vars);
+        $content = rtrim($content);
 
         $sql = "INSERT INTO {$tableString} ({$columnString}) VALUES (?);";
 
@@ -698,7 +691,7 @@ class DefaultDumper implements DumperInterface
 
         $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
 
-        $resource = $dumperOptions[ 'resource' ] ?? $thePhp->output();
+        $resource = $dumperOptions[ 'resource' ] ?? $thePhp->hOutput();
 
         $content = $this->printerPrint(...$vars);
         $content = rtrim($content);
@@ -719,10 +712,10 @@ class DefaultDumper implements DumperInterface
 
         $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
 
-        $resource = $dumperOptions[ 'resource' ] ?? $thePhp->output();
+        $resource = $dumperOptions[ 'resource' ] ?? $thePhp->hOutput();
 
         $content = $this->printerPrint(...$vars);
-        $content = rtrim($content);
+        $content = rtrim($content) . "\n";
 
         $this->sendDebugContentTypeOnShutdown('text/html');
 
@@ -736,10 +729,10 @@ class DefaultDumper implements DumperInterface
 
         $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
 
-        $resource = $dumperOptions[ 'resource' ] ?? $thePhp->output();
+        $resource = $dumperOptions[ 'resource' ] ?? $thePhp->hOutput();
 
         $content = $this->printerPrint(...$vars);
-        $content = rtrim($content);
+        $content = rtrim($content) . "\n";
 
         $this->sendDebugContentTypeOnShutdown('text/plain');
 
