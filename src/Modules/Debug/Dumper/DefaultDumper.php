@@ -310,25 +310,6 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    public function doSymfonyOutputLineDump($line, $depth, $indentPad) : void
-    {
-        $h = $this->symfonyOutputLineDumpResource;
-
-        $line = rtrim($line);
-        if ('' === $line) {
-            return;
-        }
-
-        fwrite($h, "\n");
-
-        if (($depth > 0) && ('' !== $indentPad)) {
-            fwrite($h, str_repeat($indentPad, $depth));
-        }
-
-        fwrite($h, $line);
-    }
-
-
     /**
      * @return static
      */
@@ -451,9 +432,9 @@ class DefaultDumper implements DumperInterface
             : $this->getSymfonyHtmlDumper();
 
         $dumper->setColors(true);
-        $dumper->setOutput([ $this, 'doSymfonyOutputLineDump' ]);
+        $dumper->setOutput([ $this, 'doSymfonyPrinterOutputDumpLine' ]);
 
-        $content = '';
+        $content = [];
         foreach ( $vars as $var ) {
             $h = $this->symfonyOutputLineDumpResource = fopen('php://memory', 'wb');
 
@@ -466,15 +447,21 @@ class DefaultDumper implements DumperInterface
             fclose($h);
 
             $contentVar = trim($contentVar);
-            if (! $isTerminal) {
-                $contentVar = nl2br($contentVar);
-            }
-            $contentVar = str_replace("\n", '', $contentVar);
 
-            $content .= $contentVar;
+            // if (! $isTerminal) {
+            //     $contentVar = nl2br($contentVar);
+            //     $contentVar = str_replace("\n", '', $contentVar);
+            // }
+
+            // dump($contentVar);
+            // die();
+
+            $content[] = $contentVar;
 
             $this->symfonyOutputLineDumpResource = null;
         }
+
+        $content = implode("\n", $content);
 
         return $content;
     }
@@ -625,34 +612,33 @@ class DefaultDumper implements DumperInterface
     public function dumperEcho_echo_devtools(...$vars) : void
     {
         $content = $this->printerPrint(...$vars);
+        $content = rtrim($content);
 
-        $b64content = base64_encode($content);
+        $content = base64_encode($content);
 
-        $htmlContent = "<script>console.log(window.atob('{$b64content}'));</script>" . "\n";
+        $content = "<script>console.log(window.atob('{$content}'));</script>" . "\n";
 
         $this->sendDebugContentTypeOnShutdown('text/html');
 
-        echo $htmlContent;
+        echo $content;
         flush();
     }
 
     public function dumperEcho_echo_html(...$vars) : void
     {
         $content = $this->printerPrint(...$vars);
-        $content .= "\n";
-
-        $htmlContent = nl2br($content);
+        $content = rtrim($content);
 
         $this->sendDebugContentTypeOnShutdown('text/html');
 
-        echo $htmlContent;
+        echo $content;
         flush();
     }
 
     public function dumperEcho_echo_text(...$vars) : void
     {
         $content = $this->printerPrint(...$vars);
-        $content .= "\n";
+        $content = rtrim($content);
 
         $this->sendDebugContentTypeOnShutdown('text/plain');
 
@@ -675,13 +661,14 @@ class DefaultDumper implements DumperInterface
         }
 
         $tableString = (string) $table;
+        $columnString = (string) $column;
+
         if ('' === $tableString) {
             throw new LogicException(
                 [ 'The `options.table` should be a non-empty string', $dumperOptions ]
             );
         }
 
-        $columnString = (string) $column;
         if ('' === $columnString) {
             throw new LogicException(
                 [ 'The `options.column` should be a non-empty string', $dumperOptions ]
@@ -714,6 +701,7 @@ class DefaultDumper implements DumperInterface
         $resource = $dumperOptions[ 'resource' ] ?? $thePhp->output();
 
         $content = $this->printerPrint(...$vars);
+        $content = rtrim($content);
 
         $b64content = base64_encode($content);
 
@@ -734,13 +722,11 @@ class DefaultDumper implements DumperInterface
         $resource = $dumperOptions[ 'resource' ] ?? $thePhp->output();
 
         $content = $this->printerPrint(...$vars);
-        $content .= "\n";
-
-        $htmlContent = nl2br($content);
+        $content = rtrim($content);
 
         $this->sendDebugContentTypeOnShutdown('text/html');
 
-        fwrite($resource, $htmlContent);
+        fwrite($resource, $content);
         fflush($resource);
     }
 
@@ -753,7 +739,7 @@ class DefaultDumper implements DumperInterface
         $resource = $dumperOptions[ 'resource' ] ?? $thePhp->output();
 
         $content = $this->printerPrint(...$vars);
-        $content .= "\n";
+        $content = rtrim($content);
 
         $this->sendDebugContentTypeOnShutdown('text/plain');
 
@@ -1065,5 +1051,19 @@ class DefaultDumper implements DumperInterface
         ];
 
         return $fileLine;
+    }
+
+
+    public function doSymfonyPrinterOutputDumpLine($line, $depth, $indentPad) : void
+    {
+        if ($depth !== -1) {
+            fwrite($this->symfonyOutputLineDumpResource, str_repeat($indentPad, $depth) . $line . "\n");
+
+        } else {
+            $h = $this->symfonyOutputLineDumpResource;
+
+            fseek($h, -1, SEEK_CUR);
+            fwrite($h, $line);
+        }
     }
 }
