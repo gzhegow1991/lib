@@ -8,6 +8,7 @@ use Gzhegow\Lib\Modules\Format\FormatCsv;
 use Gzhegow\Lib\Modules\Format\FormatXml;
 use Gzhegow\Lib\Modules\Format\FormatJson;
 use Gzhegow\Lib\Modules\Format\FormatBase64;
+use Gzhegow\Lib\Modules\Format\FormatSerialize;
 
 
 class FormatModule
@@ -57,6 +58,22 @@ class FormatModule
     public function json() : FormatJson
     {
         return $this->newJson();
+    }
+
+
+    public function newSerialize() : FormatSerialize
+    {
+        return new FormatSerialize();
+    }
+
+    public function cloneSerialize() : FormatSerialize
+    {
+        return clone $this->serialize();
+    }
+
+    public function serialize() : FormatSerialize
+    {
+        return $this->newSerialize();
     }
 
 

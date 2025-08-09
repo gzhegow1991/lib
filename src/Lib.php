@@ -41,6 +41,7 @@ use Gzhegow\Lib\Modules\Format\FormatJson;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Format\FormatBase64;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
+use Gzhegow\Lib\Modules\Format\FormatSerialize;
 use Gzhegow\Lib\Modules\Fs\FileSafe\FileSafeProxy;
 use Gzhegow\Lib\Modules\Debug\Dumper\DumperInterface;
 use Gzhegow\Lib\Modules\Str\Slugger\SluggerInterface;
@@ -183,6 +184,13 @@ class Lib
         return $clone
             ? Lib::format()->cloneJson()
             : Lib::format()->json();
+    }
+
+    public static function formatSerialize(?bool $clone = null) : FormatSerialize
+    {
+        return $clone
+            ? Lib::format()->cloneSerialize()
+            : Lib::format()->serialize();
     }
 
     public static function formatXml(?bool $clone = null) : FormatXml

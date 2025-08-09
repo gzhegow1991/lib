@@ -2884,6 +2884,10 @@ class PhpModule
             $result = null;
         }
 
+        if (! is_string($result)) {
+            $result = null;
+        }
+
         return $result;
     }
 
