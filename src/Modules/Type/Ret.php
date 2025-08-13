@@ -442,6 +442,14 @@ class Ret
 
             $fileLine = $fileLine ?? Lib::debug()->file_line();
 
+            foreach ( $throwableArgs as $i => $throwableArg ) {
+                if (null === $throwableArg) {
+                    unset($throwableArgs[ $i ]);
+                }
+            }
+
+            $throwableArgs = array_values($throwableArgs);
+
             $this->errorsRaw[] = [
                 'file_line'      => $fileLine,
                 'throwable_args' => $throwableArgs,
@@ -470,6 +478,14 @@ class Ret
             array_unshift($throwableArgs, $throwableArg);
 
             $fileLine = $fileLine ?? Lib::debug()->file_line();
+
+            foreach ( $throwableArgs as $i => $throwableArg ) {
+                if (null === $throwableArg) {
+                    unset($throwableArgs[ $i ]);
+                }
+            }
+
+            $throwableArgs = array_values($throwableArgs);
 
             $this->errorsRaw[] = [
                 'file_line'      => $fileLine,

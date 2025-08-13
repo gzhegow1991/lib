@@ -207,6 +207,10 @@ class MemcachedAdapter
                 );
             }
 
+            $host = null;
+            $port = null;
+            $sock = null;
+
         } elseif ($isDsn) {
             $status = $theType->url(
                 $dsn, null, null,
@@ -232,11 +236,13 @@ class MemcachedAdapter
             }
 
         } elseif ($isHost) {
-            $host = $from[ 'host' ];
-            $port = $from[ 'port' ];
+            $memcached = null;
+            $sock = null;
 
         } elseif ($isSock) {
-            $sock = $from[ 'sock' ];
+            $memcached = null;
+            $host = null;
+            $port = null;
 
         } else {
             return Ret::throw(
@@ -255,9 +261,6 @@ class MemcachedAdapter
             );
         }
 
-        /**
-         * @noinspection PhpStatementHasEmptyBodyInspection
-         */
         if ($isMemcached) {
             //
 

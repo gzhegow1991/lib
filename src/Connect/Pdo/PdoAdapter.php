@@ -280,12 +280,17 @@ class PdoAdapter
 
             $driver = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
+            $host = null;
+            $port = null;
+            $sock = null;
+
         } elseif ($isDsn) {
             if (! $theType->dsn_pdo($dsn, [ &$dsnParams, &$parseUrl ])->isOk([ &$dsn, &$ret ])) {
                 return Ret::throw($fallback, $ret);
             }
 
             $driver = $from[ 'driver' ] ?? $parseUrl[ 'scheme' ] ?? null;
+
             $host = $from[ 'host' ] ?? $dsnParams[ 'host' ] ?? null;
             $port = $from[ 'port' ] ?? $dsnParams[ 'port' ] ?? null;
             $database = $from[ 'database' ] ?? $dsnParams[ 'dbname' ] ?? null;
@@ -293,10 +298,13 @@ class PdoAdapter
             $sock = $from[ 'sock' ] ?? $dsnParams[ 'unix_socket' ] ?? null;
 
         } elseif ($isHost) {
-            // $host = $from[ 'host' ];
+            $pdo = null;
+            $sock = null;
 
         } elseif ($isSock) {
-            // $sock = $from[ 'sock' ];
+            $pdo = null;
+            $host = null;
+            $port = null;
 
         } else {
             return Ret::throw(

@@ -222,6 +222,10 @@ class RedisAdapter
                 );
             }
 
+            $host = null;
+            $port = null;
+            $sock = null;
+
         } elseif ($isDsn) {
             if (! $theType->url(
                 $dsn, null, null,
@@ -260,11 +264,13 @@ class RedisAdapter
             }
 
         } elseif ($isHost) {
-            $host = $from[ 'host' ];
-            $port = $from[ 'port' ];
+            $redis = null;
+            $sock = null;
 
         } elseif ($isSock) {
-            $sock = $from[ 'sock' ];
+            $redis = null;
+            $host = null;
+            $port = null;
 
         } else {
             return Ret::throw(
@@ -283,9 +289,6 @@ class RedisAdapter
             );
         }
 
-        /**
-         * @noinspection PhpStatementHasEmptyBodyInspection
-         */
         if ($isRedis) {
             //
 
