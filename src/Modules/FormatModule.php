@@ -288,10 +288,10 @@ class FormatModule
         ?int $depth = null, ?int $flags = null
     )
     {
-        $theFormatBase64 = Lib::formatBaseN();
+        $theFormatBaseN = Lib::formatBaseN();
         $theFormatJson = Lib::formatJson();
 
-        if (! $theFormatBase64->base64_decode(null, $base64)->isOk([ &$jsonString, &$ret ])) {
+        if (! $theFormatBaseN->base64_decode(null, $base64)->isOk([ &$jsonString, &$ret ])) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -319,7 +319,7 @@ class FormatModule
         ?int $flags = null, ?int $depth = null
     )
     {
-        $theFormatBase64 = Lib::formatBaseN();
+        $theFormatBaseN = Lib::formatBaseN();
         $theFormatJson = Lib::formatJson();
 
         $ret = $theFormatJson->json_encode(
@@ -332,7 +332,7 @@ class FormatModule
             return Ret::throw($fallback, $ret);
         }
 
-        if (! $theFormatBase64->base64_encode(null, $jsonString)->isOk([ &$base64String, &$ret ])) {
+        if (! $theFormatBaseN->base64_encode(null, $jsonString)->isOk([ &$base64String, &$ret ])) {
             return Ret::throw($fallback, $ret);
         }
 

@@ -270,6 +270,8 @@ class PdoAdapter
                 );
             }
 
+            $driver = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
         } elseif ($isDsn) {
             if (! $theType->dsn_pdo($dsn, [ &$dsnParams, &$parseUrl ])->isOk([ &$dsn, &$ret ])) {
                 return Ret::throw($fallback, $ret);
@@ -283,11 +285,10 @@ class PdoAdapter
             $sock = $from[ 'sock' ] ?? $dsnParams[ 'unix_socket' ] ?? null;
 
         } elseif ($isHost) {
-            $host = $from[ 'host' ];
-            $port = $from[ 'port' ];
+            // $host = $from[ 'host' ];
 
         } elseif ($isSock) {
-            $sock = $from[ 'sock' ];
+            // $sock = $from[ 'sock' ];
 
         } else {
             return Ret::throw(
@@ -303,11 +304,10 @@ class PdoAdapter
             );
         }
 
-        /**
-         * @noinspection PhpStatementHasEmptyBodyInspection
-         */
         if ($isPdo) {
-            //
+            if (! $theType->string_not_empty($driver)->isOk([ &$driver, &$ret ])) {
+                return Ret::throw($fallback, $ret);
+            }
 
         } else {
             if ($isDsn || $isHost) {
