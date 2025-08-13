@@ -218,12 +218,20 @@ class PdoAdapter
         $password = $from[ 2 ];
         $pdoOptionsNew = $from[ 3 ];
 
-        if (true
-            && (null !== $dsn)
-            && (null !== $username)
-            && (null !== $password)
-        ) {
+        if (null !== $dsn) {
             $from[ 'dsn' ] = $dsn;
+
+            if (! (true
+                && (null !== $username)
+                && (null !== $password)
+            )) {
+                return Ret::throw(
+                    $fallback,
+                    [ 'The `from[1]` (`username`) and `from[2]` (`password`) is required if `from[0]` (`dsn`) is present', $from ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
             $from[ 'username' ] = $username;
             $from[ 'password' ] = $password;
         }
