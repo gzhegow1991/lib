@@ -63,7 +63,7 @@ class StrModule
     protected $slugger;
 
     /**
-     * @var array<string, callable-string>
+     * @var array<string, callable|callable-string>
      */
     protected $mbstringFuncMap = [];
 

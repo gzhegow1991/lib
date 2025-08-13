@@ -4,49 +4,71 @@ namespace Gzhegow\Lib\Connect\Redis;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
+use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Exception\Runtime\RemoteException;
 
 
 class RedisAdapter
 {
     /**
-     * @var bool
+     * @var \Redis
      */
-    protected $isRedisInitialized = false;
-
-    /**
-     * @var string
-     */
-    protected $redisDsn;
-
-    /**
-     * @var string|null
-     */
-    protected $redisNamespace;
-
-    /**
-     * @var string
-     */
-    protected $redisHost = '127.0.0.1';
-    /**
-     * @var string
-     */
-    protected $redisPort = 6379;
-
-    /**
-     * @var string|null
-     */
-    protected $redisPassword;
-
-    /**
-     * @var array
-     */
-    protected $redisOptions = [];
+    protected $redis;
 
     /**
      * @var \Redis
      */
-    protected $redis;
+    protected $configRedis;
+    /**
+     * @var array
+     */
+    protected $configRedisOptionsNew = [];
+    /**
+     * @var array
+     */
+    protected $configRedisOptionsBoot = [];
+
+    /**
+     * @var string
+     */
+    protected $configDsn;
+
+    /**
+     * @var string
+     */
+    protected $configHost = '127.0.0.1';
+    /**
+     * @var int
+     */
+    protected $configPort = 6379;
+    /**
+     * @var string
+     */
+    protected $configSock;
+    // protected $configSock = '/var/run/redis/redis.sock';
+
+    /**
+     * @var array{ 0?: string, 1?: string }|null
+     */
+    protected $configCredentials;
+    /**
+     * @var string|null
+     */
+    protected $configPassword;
+
+    /**
+     * @var int
+     */
+    protected $configDatabase = 0;
+    /**
+     * @var string|null
+     */
+    protected $configNamespace;
+
+    /**
+     * @var array
+     */
+    protected $configUserOptions = [];
 
 
     private function __construct()
@@ -64,8 +86,7 @@ class RedisAdapter
         $instance = null
             ?? static::fromStatic($from)->orNull($ret)
             ?? static::fromRedis($from)->orNull($ret)
-            ?? static::fromArrayDsn($from)->orNull($ret)
-            ?? static::fromArrayConfig($from)->orNull($ret);
+            ?? static::fromArray($from)->orNull($ret);
 
         if ($ret->isFail()) {
             return Ret::throw($fallback, $ret);
@@ -112,181 +133,342 @@ class RedisAdapter
     /**
      * @return static|Ret<static>
      */
-    public static function fromArrayDsn($from, ?array $fallback = null)
+    public static function fromArray($from, ?array $fallback = null)
     {
         if (! is_array($from)) {
             return Ret::throw(
                 $fallback,
-                [ 'The `from` should be a non-empty array', $from ],
+                [ 'The `from` should be array', $from ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! isset($from[ 'dsn' ])) {
-            return Ret::throw(
-                $fallback,
-                [ 'The `from[dsn]` is required', $from ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        $redisDsn = $from[ 'dsn' ];
-        $redisDsnParsed = parse_url($redisDsn);
-
-        if (! isset(
-            $redisDsnParsed[ 'scheme' ],
-            $redisDsnParsed[ 'host' ],
-            $redisDsnParsed[ 'port' ]
-        )) {
-            return Ret::throw(
-                $fallback,
-                [ 'The `from[dsn]` is invalid', $from ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        if ('redis' !== $redisDsnParsed[ 'scheme' ]) {
-            return Ret::throw(
-                $fallback,
-                [ 'The `from[dsn]` is invalid', $from ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        $redisHost = $redisDsnParsed[ 'host' ];
-        $redisPort = $redisDsnParsed[ 'port' ];
-
-        $redisNamespace = $from[ 'namespace' ] ?? $from[ 0 ] ?? null;
-        $redisPassword = $from[ 'password' ] ?? $from[ 1 ] ?? null;
-        $redisOptions = $from[ 'options' ] ?? [];
-
-        $instance = new static();
-
-        $instance->redisNamespace = $redisNamespace;
-        $instance->redisHost = $redisHost;
-        $instance->redisPort = $redisPort;
-        $instance->redisPassword = $redisPassword;
-        $instance->redisOptions = $redisOptions;
-
-        $instance->redisDsn = $from[ 'dsn' ];
-
-        return Ret::ok($fallback, $instance);
-    }
-
-    /**
-     * @return static|Ret<static>
-     */
-    public static function fromArrayConfig($from, ?array $fallback = null)
-    {
-        if (! is_array($from)) {
-            return Ret::throw(
-                $fallback,
-                [ 'The `from` should be a non-empty array', $from ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        $redisHost = $from[ 'host' ] ?? '127.0.0.1';
-        $redisPort = $from[ 'port' ] ?? 6379;
-        $redisPassword = $from[ 'password' ] ?? null;
-        $redisNamespace = $from[ 'namespace' ] ?? null;
-        $redisOptions = $from[ 'options' ] ?? [];
-
-        $instance = new static();
-
-        $instance->redisNamespace = $redisNamespace;
-        $instance->redisHost = $redisHost;
-        $instance->redisPort = $redisPort;
-        $instance->redisPassword = $redisPassword;
-        $instance->redisOptions = $redisOptions;
-
-        return Ret::ok($fallback, $instance);
-    }
-
-
-    public function newRedis() : \Redis
-    {
         $theType = Lib::type();
 
-        $redisHost = $this->redisHost;
-        $redisPort = $this->redisPort;
-        $redisPassword = $this->redisPassword;
-        $redisNamespace = $this->redisNamespace;
+        $from += [
+            0                    => null, // dsn
+            1                    => null, // credentials / password
+            2                    => null, // namespace
+            3                    => null, // redis_options_new
+            //
+            'redis'              => null,
+            'redis_options_new'  => null,
+            'redis_options_boot' => null,
+            //
+            'dsn'                => null,
+            'host'               => null,
+            'port'               => null,
+            'sock'               => null,
+            //
+            'credentials'        => null,
+            'password'           => null,
+            //
+            'database'           => null,
+            'namespace'          => null,
+            //
+            'user_options'       => null,
+        ];
 
-        $redisHostValid = $theType->string_not_empty($redisHost)->orThrow();
-        $redisPortValid = $theType->numeric_int_positive($redisPort)->orThrow();
+        $dsn = $from[ 0 ];
+        $credentials = $password = $from[ 1 ];
+        $namespace = $from[ 2 ];
+        $redisOptionsNew = $from[ 3 ];
 
-        $redisPasswordValid = null;
-        if (null !== $redisPassword) {
-            $redisPasswordValid = $theType->string($redisPassword)->orThrow();
+        if (null !== $dsn) {
+            $from[ 'dsn' ] = $dsn;
+        }
+        if (is_array($credentials)) {
+            $from[ 'credentials' ] = $credentials;
+        }
+        if (is_string($password)) {
+            $from[ 'password' ] = $password;
+        }
+        if (null !== $namespace) {
+            $from[ 'namespace' ] = $namespace;
         }
 
-        $redisNamespaceValid = null;
-        if (null !== $redisNamespace) {
-            $redisNamespaceValid = $theType->string_not_empty($redisNamespace)->orThrow();
+        if (null !== $redisOptionsNew) {
+            $from[ 'redis_options_new' ] = $redisOptionsNew;
         }
 
-        $redis = new \Redis();
+        $redis = $from[ 'redis' ];
+        $redisOptionsNew = $from[ 'redis_options_new' ] ?? [];
+        $redisOptionsBoot = $from[ 'redis_options_boot' ] ?? [];
 
-        $this->redisSafeConnect($redis, $redisHostValid, $redisPortValid);
-        $this->redisSafeAuth($redis, $redisPasswordValid);
+        $dsn = $from[ 'dsn' ];
+        $host = $from[ 'host' ];
+        $port = $from[ 'port' ];
+        $sock = $from[ 'sock' ];
 
-        $this->redisEnsureOptions($redis, $redisNamespaceValid);
+        $credentials = $from[ 'credentials' ];
+        $password = $from[ 'password' ];
+
+        $database = $from[ 'database' ];
+        $namespace = $from[ 'namespace' ];
+
+        $userOptions = $from[ 'user_options' ] ?? [];
+
+        $isRedis = (null !== $redis);
+        $isDsn = (null !== $dsn);
+        $isHost = (null !== $host);
+        $isSock = (null !== $sock);
+
+        if ($isRedis) {
+            if (! ($redis instanceof \Redis)) {
+                return Ret::throw(
+                    $fallback,
+                    [ 'The `redis` should be instance of: ' . \Redis::class, $redis ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+        } elseif ($isDsn) {
+            if (! $theType->url(
+                $dsn, null, null,
+                0, 0,
+                [ &$parseUrl ]
+            )->isOk([ &$dsn, &$ret ])) {
+                return Ret::throw($fallback, $ret);
+            }
+
+            $host = $host ?? $parseUrl[ 'host' ] ?? null;
+            $port = $port ?? $parseUrl[ 'port' ] ?? null;
+            $password = $password ?? $parseUrl[ 'pass' ] ?? null;
+
+            $path = $parseUrl[ 'path' ] ?? '';
+            $query = $parseUrl[ 'query' ] ?? '';
+
+            if ('' !== $path) {
+                $pos = strrpos($path, '/');
+
+                if ($pos !== false) {
+                    $database = $database ?? substr($path, $pos + 1);
+                    $path = substr($path, 0, $pos);
+
+                    if (basename($path, '.sock') !== basename($path)) {
+                        $sock = $path;
+                    }
+                }
+            }
+
+            if ('' !== $query) {
+                parse_str($query, $query);
+
+                if ([] !== $query) {
+                    $redisOptionsNew += $query;
+                }
+            }
+
+        } elseif ($isHost) {
+            $host = $from[ 'host' ];
+            $port = $from[ 'port' ];
+
+        } elseif ($isSock) {
+            $sock = $from[ 'sock' ];
+
+        } else {
+            return Ret::throw(
+                $fallback,
+                [
+                    ''
+                    . 'The `from` should contain at least one of: '
+                    . '(`redis`) or '
+                    . '(`dsn`) or '
+                    . '(`host` and `port`) or '
+                    . '(`sock`)',
+                    //
+                    $from,
+                ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        /**
+         * @noinspection PhpStatementHasEmptyBodyInspection
+         */
+        if ($isRedis) {
+            //
+
+        } elseif ($isDsn || $isHost) {
+            if (! $theType->string_not_empty($host)->isOk([ &$host, &$ret ])) {
+                return Ret::throw($fallback, $ret);
+            }
+
+            $port = $port ?: 6379;
+
+            if (! $theType->int_positive($port)->isOk([ &$port, &$ret ])) {
+                return Ret::throw($fallback, $ret);
+            }
+
+        } elseif ($isSock) {
+            if (! $theType->string_not_empty($sock)->isOk([ &$sock, &$ret ])) {
+                return Ret::throw($fallback, $ret);
+            }
+        }
+
+        if (null !== $credentials) {
+            if (! $theType->list_sorted($credentials)->isOk([ &$credentials, &$ret ])) {
+                return Ret::throw($fallback, $ret);
+            }
+            if (! $theType->string_not_empty($credentials[ 0 ] ?? null)->isOk([ 1 => &$ret ])) {
+                return Ret::throw($fallback, $ret);
+            }
+            if (! $theType->string($credentials[ 1 ] ?? null)->isOk([ 1 => &$ret ])) {
+                return Ret::throw($fallback, $ret);
+            }
+        }
+
+        if (null !== $password) {
+            if (! $theType->string($password)->isOk([ &$password, &$ret ])) {
+                return Ret::throw($fallback, $ret);
+            }
+        }
+
+        $database = $database ?: '0';
+
+        if (! $theType->int_non_negative($database)->isOk([ &$database, &$ret ])) {
+            return Ret::throw($fallback, $ret);
+        }
+
+        if (null !== $namespace) {
+            if (! $theType->string_not_empty($namespace)->isOk([ &$namespace, &$ret ])) {
+                return Ret::throw($fallback, $ret);
+            }
+        }
+
+        $instance = new static();
+        //
+        $instance->configRedis = $redis;
+        $instance->configRedisOptionsNew = $redisOptionsNew;
+        $instance->configRedisOptionsBoot = $redisOptionsBoot;
+        //
+        $instance->configDsn = $dsn;
+        $instance->configHost = $host;
+        $instance->configPort = $port;
+        $instance->configSock = $sock;
+        //
+        $instance->configCredentials = $credentials;
+        $instance->configPassword = $password;
+        //
+        $instance->configDatabase = $database;
+        $instance->configNamespace = $namespace;
+        //
+        $instance->configUserOptions = $userOptions;
+
+        return Ret::ok($fallback, $instance);
+    }
+
+
+    public function getConfig() : array
+    {
+        return [
+            'redis'              => $this->configRedis,
+            'redis_options_new'  => $this->configRedisOptionsNew,
+            'redis_options_boot' => $this->configRedisOptionsBoot,
+            //
+            'dsn'                => $this->configDsn,
+            'host'               => $this->configHost,
+            'port'               => $this->configPort,
+            'sock'               => $this->configSock,
+            //
+            'credentials'        => $this->configCredentials,
+            'password'           => $this->configPassword,
+            //
+            'database'           => $this->configDatabase,
+            'namespace'          => $this->configNamespace,
+            //
+            'user_options'       => $this->configUserOptions,
+        ];
+    }
+
+
+    public function newRedisFromConfig(array $configValid) : \Redis
+    {
+        $configValid += [
+            'redis'              => null,
+            'redis_options_new'  => null,
+            'redis_options_boot' => null,
+            //
+            'dsn'                => null,
+            'host'               => null,
+            'port'               => null,
+            'sock'               => null,
+            //
+            'credentials'        => null,
+            'password'           => null,
+            //
+            'database'           => null,
+            'namespace'          => null,
+            //
+            'user_options'       => null,
+        ];
+
+        if (null !== $configValid[ 'redis' ]) {
+            $redis = $configValid[ 'redis' ];
+
+        } else {
+            $redisOptionsNew = $configValid[ 'redis_options_new' ];
+
+            try {
+                $redis = new \Redis($redisOptionsNew);
+            }
+            catch ( \Throwable $e ) {
+                throw new RemoteException(
+                    [ 'Unable to ' . __METHOD__, $this ], $e
+                );
+            }
+        }
+
+        $this->redisSafeConnect($redis, $configValid);
+        $this->redisSafeAuth($redis, $configValid);
+        $this->redisSafeSelectDatabase($redis, $configValid);
+
+        $this->redisEnsureOptions($redis, $configValid);
 
         return $redis;
     }
 
 
+    public function isRedis(?\Redis &$redis = null) : bool
+    {
+        $redis = null;
+
+        if (null !== $this->redis) {
+            $redis = $this->redis;
+
+            return true;
+        }
+
+        return false;
+    }
+
     public function getRedis() : \Redis
     {
-        $theType = Lib::type();
+        if (null === $this->redis) {
+            $config = $this->getConfig();
 
-        if (! $this->isRedisInitialized) {
-            if (null === $this->redis) {
-                $redis = $this->newRedis();
-
-            } else {
-                $redis = $this->redis;
-                $redisNamespace = $this->redisNamespace;
-
-                $redisNamespaceValid = null;
-                if (null !== $redisNamespace) {
-                    $redisNamespaceValid = $theType->string_not_empty($redisNamespace)->orThrow();
-                }
-
-                $this->redisEnsureOptions($redis, $redisNamespaceValid);
-            }
-
-            if (null === $redis) {
-                throw new RemoteException(
-                    [ 'Unable to ' . __METHOD__, $this ]
-                );
-            }
+            $redis = $this->newRedisFromConfig($config);
 
             $this->redis = $redis;
-
-            $this->redisDsn = null;
-            $this->redisNamespace = null;
-            $this->redisHost = null;
-            $this->redisPort = null;
-            $this->redisPassword = null;
-            $this->redisOptions = null;
-
-            $this->isRedisInitialized = true;
         }
 
         return $this->redis;
     }
 
 
-    protected function redisEnsureOptions(
-        \Redis $redis,
-        ?string $redisNamespace
-    ) : void
+    protected function redisEnsureOptions(\Redis $redis, array $configValid) : void
     {
-        // > namespace
-        if (null !== $redisNamespace) {
-            $redis->setOption(\Redis::OPT_PREFIX, "{$redisNamespace}:");
+        $this->redisEnsureOptionsDefault($redis, $configValid);
+        $this->redisEnsureOptionsBoot($redis, $configValid);
+        $this->redisEnsureOptionsUser($redis, $configValid);
+    }
+
+    protected function redisEnsureOptionsDefault(\Redis $redis, array $configValid) : void
+    {
+        $namespace = $configValid[ 'namespace' ];
+
+        if (null !== $namespace) {
+            $redis->setOption(\Redis::OPT_PREFIX, "{$namespace}:");
         }
 
         // > serializer
@@ -296,52 +478,149 @@ class RedisAdapter
         $redis->setOption(\Redis::OPT_READ_TIMEOUT, 3.0);
     }
 
+    protected function redisEnsureOptionsBoot(\Redis $redis, array $configValid) : void
+    {
+        $redisOptionsBoot = $configValid[ 'redis_options_boot' ] ?? [];
+        if ([] === $redisOptionsBoot) {
+            return;
+        }
 
-    protected function redisSafeConnect(
-        \Redis $redis,
-        string $redisHost, int $redisPort
-    ) : bool
+        foreach ( $redisOptionsBoot as $redisOpt => $value ) {
+            $status = $redis->setOption($redisOpt, $value);
+
+            if (false === $status) {
+                throw new RuntimeException(
+                    [ 'Unable to set `pdo_options` on \PDO object', $redisOptionsBoot ]
+                );
+            }
+        }
+    }
+
+    /**
+     * @noinspection PhpUnnecessaryStopStatementInspection
+     */
+    protected function redisEnsureOptionsUser(\Redis $redis, array $configValid) : void
+    {
+        $userOptions = $configValid[ 'user_options' ] ?? [];
+        if ([] === $userOptions) {
+            return;
+        }
+
+        // > your own code
+    }
+
+
+    protected function redisSafeConnect(\Redis $redis, array $configValid) : void
     {
         $theFunc = Lib::func();
 
+        $host = $configValid[ 'host' ];
+        $port = $configValid[ 'port' ];
+        $sock = $configValid[ 'sock' ];
+
+        $connectArgs = [];
+        if (null !== $sock) {
+            $connectArgs[] = $sock;
+
+        } elseif ((null !== $host) && (null !== $port)) {
+            $connectArgs[] = $host;
+            $connectArgs[] = $port;
+
+        } else {
+            throw new RuntimeException(
+                [ 'At least one of (`sock`) or (`host` and `port`) is required', $configValid ]
+            );
+        }
+
+        $error = 'Status is false';
+        $exception = null;
         try {
             $status = $theFunc->safe_call(
                 [ $redis, 'connect' ],
-                [ $redisHost, $redisPort ]
+                $connectArgs
             );
         }
         catch ( \Throwable $e ) {
+            $status = false;
+
+            $error = $e->getMessage();
+            $exception = $e;
+        }
+
+        if (false === $status) {
             throw new RemoteException(
-                [ 'Unable to connect to Redis: ' . $e->getMessage() ], $e
+                [ 'Unable to ' . __FUNCTION__ . ': ' . $error ],
+                $exception
             );
         }
-
-        return $status;
     }
 
-    protected function redisSafeAuth(
-        \Redis $redis,
-        ?string $redisPassword
-    ) : ?bool
+    protected function redisSafeAuth(\Redis $redis, array $configValid) : void
     {
-        if (null === $redisPassword) {
-            return null;
-        }
-
         $theFunc = Lib::func();
 
+        $redisCredentials = $configValid[ 'credentials' ];
+        $redisPassword = $configValid[ 'password' ];
+
+        if (null !== $redisCredentials) {
+            $authArgs = [ $redisCredentials ];
+
+        } elseif (null !== $redisPassword) {
+            $authArgs = [ $redisPassword ];
+
+        } else {
+            return;
+        }
+
+        $error = 'Status is false';
+        $exception = null;
         try {
             $status = $theFunc->safe_call(
                 [ $redis, 'auth' ],
-                [ $redisPassword ]
+                $authArgs
             );
         }
         catch ( \Throwable $e ) {
-            throw new RemoteException(
-                [ 'Unable to authorize into Redis: ' . $e->getMessage() ], $e
-            );
+            $status = false;
+
+            $error = $e->getMessage();
+            $exception = $e;
         }
 
-        return $status;
+        if (false === $status) {
+            throw new RemoteException(
+                [ 'Unable to ' . __METHOD__ . ': ' . $error ],
+                $exception
+            );
+        }
+    }
+
+    protected function redisSafeSelectDatabase(\Redis $redis, array $configValid) : void
+    {
+        $theFunc = Lib::func();
+
+        $database = $configValid[ 'database' ];
+
+        $error = 'Status is false';
+        $exception = null;
+        try {
+            $status = $theFunc->safe_call(
+                [ $redis, 'select' ],
+                [ $database ]
+            );
+        }
+        catch ( \Throwable $e ) {
+            $status = false;
+
+            $error = $e->getMessage();
+            $exception = $e;
+        }
+
+        if (false === $status) {
+            throw new RemoteException(
+                [ 'Unable to ' . __METHOD__ . ': ' . $error ],
+                $exception
+            );
+        }
     }
 }

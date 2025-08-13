@@ -1004,6 +1004,15 @@ trait IsTrait
 	}
 
 
+	/**
+	 * @param string $value
+	 */
+	public function is_dsn_pdo($value, array $refs = []): bool
+	{
+		return Lib::url()->type_dsn_pdo($value, $refs)->isOk();
+	}
+
+
 	public function is_uuid($value): bool
 	{
 		return Lib::random()->type_uuid($value)->isOk();

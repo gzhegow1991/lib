@@ -7,25 +7,25 @@ use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Modules\Format\FormatCsv;
 use Gzhegow\Lib\Modules\Format\FormatXml;
 use Gzhegow\Lib\Modules\Format\FormatJson;
-use Gzhegow\Lib\Modules\Format\FormatBase64;
+use Gzhegow\Lib\Modules\Format\FormatBaseN;
 use Gzhegow\Lib\Modules\Format\FormatSerialize;
 
 
 class FormatModule
 {
-    public function newBase64() : FormatBase64
+    public function newBaseN() : FormatBaseN
     {
-        return new FormatBase64();
+        return new FormatBaseN();
     }
 
-    public function cloneBase64() : FormatBase64
+    public function cloneBaseN() : FormatBaseN
     {
-        return clone $this->base64();
+        return clone $this->baseN();
     }
 
-    public function base64() : FormatBase64
+    public function baseN() : FormatBaseN
     {
-        return $this->newBase64();
+        return $this->newBaseN();
     }
 
 
@@ -288,7 +288,7 @@ class FormatModule
         ?int $depth = null, ?int $flags = null
     )
     {
-        $theFormatBase64 = Lib::formatBase64();
+        $theFormatBase64 = Lib::formatBaseN();
         $theFormatJson = Lib::formatJson();
 
         if (! $theFormatBase64->base64_decode(null, $base64)->isOk([ &$jsonString, &$ret ])) {
@@ -319,7 +319,7 @@ class FormatModule
         ?int $flags = null, ?int $depth = null
     )
     {
-        $theFormatBase64 = Lib::formatBase64();
+        $theFormatBase64 = Lib::formatBaseN();
         $theFormatJson = Lib::formatJson();
 
         $ret = $theFormatJson->json_encode(

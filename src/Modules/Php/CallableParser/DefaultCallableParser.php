@@ -616,7 +616,7 @@ class DefaultCallableParser implements CallableParserInterface
 
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function typeCallableString($value, $newScope = 'static')
     {
@@ -648,7 +648,7 @@ class DefaultCallableParser implements CallableParserInterface
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function typeCallableStringFunction($value)
     {
@@ -670,7 +670,7 @@ class DefaultCallableParser implements CallableParserInterface
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function typeCallableStringFunctionInternal($value)
     {
@@ -702,7 +702,7 @@ class DefaultCallableParser implements CallableParserInterface
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function typeCallableStringFunctionNonInternal($value)
     {
@@ -734,7 +734,7 @@ class DefaultCallableParser implements CallableParserInterface
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function typeCallableStringMethodStatic($value, $newScope = 'static')
     {
@@ -833,7 +833,7 @@ class DefaultCallableParser implements CallableParserInterface
 
 
     /**
-     * @return callable-string
+     * @return callable|callable-string|null
      */
     protected function parseFunction($value) : ?string
     {

@@ -73,7 +73,7 @@ class DefaultSession implements SessionInterface
 
         $this->symfonySession = $symfonySession;
 
-        $this->useSymfonySession = true;
+        $this->useSymfonySession = (null !== $symfonySession);
 
         return $this;
     }

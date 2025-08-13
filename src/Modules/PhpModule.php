@@ -1571,7 +1571,7 @@ class PhpModule
 
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function type_callable_string($value, $newScope = 'static')
     {
@@ -1579,7 +1579,7 @@ class PhpModule
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function type_callable_string_function($value)
     {
@@ -1587,7 +1587,7 @@ class PhpModule
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function type_callable_string_function_internal($value)
     {
@@ -1595,7 +1595,7 @@ class PhpModule
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function type_callable_string_function_non_internal($value)
     {
@@ -1603,7 +1603,7 @@ class PhpModule
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function type_callable_string_method_static($value, $newScope = 'static')
     {

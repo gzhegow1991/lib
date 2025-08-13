@@ -9,10 +9,6 @@ class ItertoolsModule
 {
     /**
      * > reversed([ 'A', 'B', 'C' ]) --> C B A
-     *
-     * @param iterable $it
-     *
-     * @return \Generator
      */
     public function reversed_it(iterable $it) : \Generator
     {
@@ -34,8 +30,6 @@ class ItertoolsModule
      * @param int|float|string $start
      * @param int|float|string $end
      * @param int|float|null   $step
-     *
-     * @return \Generator
      */
     public function range_it($start, $end, $step = null) : \Generator
     {
@@ -172,10 +166,6 @@ class ItertoolsModule
 
     /**
      * > product([ 'A', 'B', 'C', 'D' ], [ 'x', 'y' ]) --> Ax Ay Bx By Cx Cy Dx Dy
-     *
-     * @param iterable ...$iterables
-     *
-     * @return \Generator
      */
     public function product_it(iterable ...$iterables) : \Generator
     {
@@ -206,11 +196,6 @@ class ItertoolsModule
 
     /**
      * > product_repeat(3, range(2)) --> 000 001 010 011 100 101 110 111
-     *
-     * @param null|int $repeat
-     * @param iterable ...$iterables
-     *
-     * @return \Generator
      */
     public function product_repeat_it(int $repeat, iterable ...$iterables) : \Generator
     {
@@ -237,11 +222,6 @@ class ItertoolsModule
     /**
      * > combinations_unique([ 'A', 'B', 'C', 'D' ], 2) --> AB AC AD BC BD CD
      * > combinations_unique(range(4), 3) --> 012 013 023 123
-     *
-     * @param iterable $it
-     * @param int      $len
-     *
-     * @return \Generator
      */
     public function combinations_unique_it(iterable $it, int $len) : ?\Generator
     {
@@ -304,11 +284,6 @@ class ItertoolsModule
 
     /**
      * > combinations_all([ 'A', 'B', 'C' ], 2) --> AA AB AC BB BC CC
-     *
-     * @param iterable $it
-     * @param int      $len
-     *
-     * @return \Generator
      */
     public function combinations_all_it(iterable $it, int $len) : ?\Generator
     {
@@ -374,11 +349,6 @@ class ItertoolsModule
     /**
      * > permutations([ 'A', 'B', 'C', 'D' ], 2) --> AB AC AD BA BC BD CA CB CD DA DB DC
      * > permutations(range(3)) --> 012 021 102 120 201 210
-     *
-     * @param iterable $it
-     * @param null|int $len
-     *
-     * @return \Generator
      */
     public function permutations_it(iterable $it, ?int $len = null) : \Generator
     {
@@ -386,16 +356,15 @@ class ItertoolsModule
         foreach ( $it as $v ) {
             $pool[] = $v;
         }
+        $poolSize = count($pool);
 
-        $size = count($pool);
+        $len = $len ?? $poolSize;
 
-        $len = $len ?? $size;
-
-        if ($len > $size) {
+        if ($len > $poolSize) {
             return;
         }
 
-        $iMax = $size - 1;
+        $iMax = $poolSize - 1;
         $indices = [];
         for ( $i = 0; $i <= $iMax; $i++ ) {
             $indices[] = $i;
@@ -408,14 +377,14 @@ class ItertoolsModule
 
         yield $row;
 
-        $iMax = $size;
-        $iMin = ($size - $len - 1);
+        $iMax = $poolSize;
+        $iMin = ($poolSize - $len - 1);
         $cycles = [];
         for ( $i = $iMax; $i >= $iMin; $i-- ) {
             $cycles[] = $i;
         }
 
-        while ( $size ) {
+        while ( $poolSize ) {
             $found = null;
             $iMax = ($len - 1);
             $iMin = 0;
@@ -431,7 +400,7 @@ class ItertoolsModule
                         )
                     );
 
-                    $cycles[ $i ] = $size - $i;
+                    $cycles[ $i ] = $poolSize - $i;
 
                 } else {
                     $j = $cycles[ $i ];

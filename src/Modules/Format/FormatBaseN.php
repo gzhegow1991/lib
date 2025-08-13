@@ -6,7 +6,7 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 
 
-class FormatBase64
+class FormatBaseN
 {
     /**
      * @param array{ 0?: mixed }|null $fallback # Pass `null` to return Ret<T> or pass `[]` to throw exception

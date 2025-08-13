@@ -1299,11 +1299,7 @@ trait TypeTrait
      *
      * @return Ret<string>
      */
-    public function host(
-        $value,
-        ?int $isHostIdnaAscii = null,
-        array $refs = []
-    )
+    public function host($value, ?int $isHostIdnaAscii = null, array $refs = [])
     {
         return Lib::url()->type_host($value, $isHostIdnaAscii, $refs);
     }
@@ -1318,6 +1314,16 @@ trait TypeTrait
     public function link($value, $query = null, $fragment = null, ?int $isLinkUrlencoded = null, array $refs = [])
     {
         return Lib::url()->type_link($value, $query, $fragment, $isLinkUrlencoded, $refs);
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return Ret<string>
+     */
+    public function dsn_pdo($value, array $refs = [])
+    {
+        return Lib::url()->type_dsn_pdo($value, $refs);
     }
 
 
@@ -1820,7 +1826,7 @@ trait TypeTrait
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function callable_string($value, $newScope = 'static')
     {
@@ -1828,7 +1834,7 @@ trait TypeTrait
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function callable_string_function($value)
     {
@@ -1836,7 +1842,7 @@ trait TypeTrait
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function callable_string_function_internal($value)
     {
@@ -1844,7 +1850,7 @@ trait TypeTrait
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function callable_string_function_non_internal($value)
     {
@@ -1852,7 +1858,7 @@ trait TypeTrait
     }
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function callable_string_method_static($value, $newScope = 'static')
     {

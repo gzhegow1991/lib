@@ -82,6 +82,20 @@ class UrlModule
             );
         }
 
+        $refParseUrl = array_replace(
+            [
+                'scheme'   => null,
+                'user'     => null,
+                'pass'     => null,
+                'host'     => null,
+                'port'     => null,
+                'path'     => null,
+                'query'    => null,
+                'fragment' => null,
+            ],
+            $refParseUrl
+        );
+
         if (empty($refParseUrl[ 'host' ])) {
             if (! isset($_SERVER[ 'HTTP_HOST' ])) {
                 return Ret::err(
@@ -100,9 +114,23 @@ class UrlModule
                     [ __FILE__, __LINE__ ]
                 );
             }
+
+            $refParseUrl = array_replace(
+                [
+                    'scheme'   => null,
+                    'user'     => null,
+                    'pass'     => null,
+                    'host'     => null,
+                    'port'     => null,
+                    'path'     => null,
+                    'query'    => null,
+                    'fragment' => null,
+                ],
+                $refParseUrl
+            );
         }
 
-        if (isset($refParseUrl[ 'host' ])) {
+        if (null !== $refParseUrl[ 'host' ]) {
             if (false
                 || (-2 === $isHostIdnaAscii)
                 || (-1 === $isHostIdnaAscii)
@@ -156,7 +184,7 @@ class UrlModule
             }
         }
 
-        if (isset($refParseUrl[ 'path' ])) {
+        if (null !== $refParseUrl[ 'path' ]) {
             if (1 === $isLinkUrlencoded) {
                 $test = str_replace('/', '', $refParseUrl[ 'path' ]);
 
@@ -173,7 +201,7 @@ class UrlModule
             }
         }
 
-        $wasQuery = isset($refParseUrl[ 'query' ]);
+        $wasQuery = (null !== $refParseUrl[ 'query' ]);
 
         if (false === $_query) {
             unset($refParseUrl[ 'query' ]);
@@ -254,6 +282,20 @@ class UrlModule
             );
         }
 
+        $refParseUrl = array_replace(
+            [
+                'scheme'   => null,
+                'user'     => null,
+                'pass'     => null,
+                'host'     => null,
+                'port'     => null,
+                'path'     => null,
+                'query'    => null,
+                'fragment' => null,
+            ],
+            $refParseUrl
+        );
+
         if (empty($refParseUrl[ 'host' ])) {
             if (! isset($_SERVER[ 'HTTP_HOST' ])) {
                 return Ret::err(
@@ -272,9 +314,23 @@ class UrlModule
                     [ __FILE__, __LINE__ ]
                 );
             }
+
+            $refParseUrl = array_replace(
+                [
+                    'scheme'   => null,
+                    'user'     => null,
+                    'pass'     => null,
+                    'host'     => null,
+                    'port'     => null,
+                    'path'     => null,
+                    'query'    => null,
+                    'fragment' => null,
+                ],
+                $refParseUrl
+            );
         }
 
-        if (isset($refParseUrl[ 'host' ])) {
+        if (null !== $refParseUrl[ 'host' ]) {
             if (false
                 || (-2 === $isHostIdnaAscii)
                 || (-1 === $isHostIdnaAscii)
@@ -328,10 +384,6 @@ class UrlModule
             }
         }
 
-        $refParseUrl[ 'path' ] = null;
-        $refParseUrl[ 'query' ] = null;
-        $refParseUrl[ 'fragment' ] = null;
-
         $result = $this->host_build($refParseUrl);
 
         return Ret::val($result);
@@ -361,6 +413,9 @@ class UrlModule
         }
         $refParseUrl = null;
 
+        $hasQuery = (null !== $query);
+        $hasFragment = (null !== $fragment);
+
         if (null === $url) {
             return Ret::err(
                 [ 'The `url` should not be null', $url ],
@@ -384,15 +439,12 @@ class UrlModule
             ?? ((false === $fragment) ? false : null)
             ?? (is_string($fragment) ? $fragment : null);
 
-        $hasQuery = (null !== $query);
 
         if ($hasQuery && (null === $_query)) {
             throw new LogicException(
                 [ 'The `query` should be a string, an array or a false', $query ]
             );
         }
-
-        $hasFragment = (null !== $fragment);
 
         if ($hasFragment && (null === $_fragment)) {
             throw new LogicException(
@@ -409,7 +461,21 @@ class UrlModule
             );
         }
 
-        if (! isset($refParseUrl[ 'path' ])) {
+        $refParseUrl = array_replace(
+            [
+                'scheme'   => null,
+                'user'     => null,
+                'pass'     => null,
+                'host'     => null,
+                'port'     => null,
+                'path'     => null,
+                'query'    => null,
+                'fragment' => null,
+            ],
+            $refParseUrl
+        );
+
+        if (null === $refParseUrl[ 'path' ]) {
             return Ret::err(
                 [ 'The `url` should have path', $url ],
                 [ __FILE__, __LINE__ ]
@@ -431,7 +497,7 @@ class UrlModule
             $refParseUrl[ 'path' ] = str_replace('%2F', '/', $refParseUrl[ 'path' ]);
         }
 
-        $wasQuery = isset($refParseUrl[ 'query' ]);
+        $wasQuery = (null !== $refParseUrl[ 'query' ]);
 
         if (false === $_query) {
             unset($refParseUrl[ 'query' ]);
@@ -462,13 +528,83 @@ class UrlModule
             }
         }
 
-        $refParseUrl[ 'scheme' ] = null;
-        $refParseUrl[ 'user' ] = null;
-        $refParseUrl[ 'pass' ] = null;
-        $refParseUrl[ 'host' ] = null;
-        $refParseUrl[ 'port' ] = null;
-
         $result = $this->link_build($refParseUrl);
+
+        return Ret::val($result);
+    }
+
+    /**
+     * @return Ret<string>
+     */
+    public function type_dsn_pdo($dsn, array $refs = [])
+    {
+        $theType = Lib::type();
+
+        $withDsnParams = array_key_exists(0, $refs);
+        if ($withDsnParams) {
+            $refDsnParams =& $refs[ 0 ];
+        }
+        $refDsnParams = null;
+
+        $withParseUrl = array_key_exists(1, $refs);
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 1 ];
+        }
+        $refParseUrl = null;
+
+        if (! $theType->string_not_empty($dsn)->isOk([ &$dsnStringNotEmpty, &$ret ])) {
+            return $ret;
+        }
+
+        $refParseUrl = parse_url($dsnStringNotEmpty);
+
+        if (false === $refParseUrl) {
+            return Ret::err(
+                [ 'The `dsn` should be pass `parse_url` check', $dsn ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $refParseUrl = array_replace(
+            [
+                'scheme'   => null,
+                'user'     => null,
+                'pass'     => null,
+                'host'     => null,
+                'port'     => null,
+                'path'     => null,
+                'query'    => null,
+                'fragment' => null,
+            ],
+            $refParseUrl
+        );
+
+        if (null === $refParseUrl[ 'scheme' ]) {
+            return Ret::err(
+                [ 'The `dsn` should have key `scheme`', $dsn, $refParseUrl ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (null === $refParseUrl[ 'path' ]) {
+            return Ret::err(
+                [ 'The `dsn` should have key `path`', $dsn, $refParseUrl ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $params = explode(';', $refParseUrl[ 'path' ]);
+        foreach ( $params as $p ) {
+            [ $key, $value ] = explode('=', $p, 2) + [ '', '' ];
+
+            if (! $theType->string_not_empty($key)->isOk([ &$keyString, &$ret ])) {
+                return $ret;
+            }
+
+            $refDsnParams[ $key ] = $value;
+        }
+
+        $result = $this->dsn_pdo_build($refParseUrl);
 
         return Ret::val($result);
     }
@@ -507,7 +643,7 @@ class UrlModule
     {
         $args = [
             $url,
-            $isHostIdnaAscii
+            $isHostIdnaAscii,
         ];
 
         $result = $this->type_host(...$args)->orThrow();
@@ -775,6 +911,10 @@ class UrlModule
             ];
 
         $urlScheme = $_parseUrlResult[ 'scheme' ];
+        if (in_array($urlScheme, [ 'http', 'https' ])) {
+            $urlScheme = '';
+        }
+
         $isUrlScheme = $urlScheme ? ':' : '';
 
         $urlPath = $_parseUrlResult[ 'path' ] ?? '';
@@ -794,6 +934,29 @@ class UrlModule
             $urlQuery,
             $isFragment,
             $urlFragment,
+        ]);
+
+        return $result;
+    }
+
+    public function dsn_pdo_build(array $parseUrlResult) : string
+    {
+        $_parseUrlResult = $parseUrlResult
+            + [
+                'scheme' => null,
+                'path'   => null,
+            ];
+
+        $urlScheme = $_parseUrlResult[ 'scheme' ];
+        $isUrlScheme = $urlScheme ? ':' : '';
+
+        $urlPath = $_parseUrlResult[ 'path' ] ?? '';
+        [ $path ] = explode('?', $urlPath, 2);
+
+        $result = implode('', [
+            $urlScheme,
+            $isUrlScheme,
+            $path,
         ]);
 
         return $result;

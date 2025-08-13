@@ -1778,6 +1778,19 @@ trait FilterTrait
 
 	/**
 	 * @param array{ 0?: string, 1?: Ret<string> } $r
+	 *
+	 * @param string $value
+	 */
+	public function filter_dsn_pdo(array $r, $value, array $refs = []): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::url()->type_dsn_pdo($value, $refs))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: string, 1?: Ret<string> } $r
 	 */
 	public function filter_uuid(array $r, $value): bool
 	{

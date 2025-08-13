@@ -79,27 +79,27 @@ interface CallableParserInterface
 
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function typeCallableString($value, $newScope = 'static');
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function typeCallableStringFunction($value);
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function typeCallableStringFunctionInternal($value);
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function typeCallableStringFunctionNonInternal($value);
 
     /**
-     * @return Ret<callable-string>
+     * @return Ret<callable|callable-string>
      */
     public function typeCallableStringMethodStatic($value, $newScope = 'static');
 

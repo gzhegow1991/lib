@@ -535,7 +535,7 @@ class DebugModule
         $hasValue = array_key_exists('value', $output);
 
         $isObject = is_object($value);
-        $isResource = is_resource($value) || ('resource(closed)' === gettype($value));
+        $isResource = is_resource($value) || ('resource (closed)' === gettype($value));
 
         $content = '';
         if ($isObject || $isResource) {
@@ -610,7 +610,7 @@ class DebugModule
         $hasValue = array_key_exists('value', $output);
 
         $isObject = is_object($value);
-        $isResource = is_resource($value) || ('resource(closed)' === gettype($value));
+        $isResource = is_resource($value) || ('resource (closed)' === gettype($value));
 
         $content = '';
         if ($isObject || $isResource) {

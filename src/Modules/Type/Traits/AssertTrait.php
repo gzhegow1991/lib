@@ -2220,6 +2220,22 @@ trait AssertTrait
 
 
 	/**
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public function assert_dsn_pdo($value, array $refs = [])
+	{
+		if (Lib::url()->type_dsn_pdo($value, $refs)->isOk([ &$ref ])) return $ref;
+
+		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
+
+		throw new LogicException($t, [ 'Assert `dsn_pdo` is failed', [ $value, $refs ] ]);
+	}
+
+
+	/**
 	 * @return string
 	 */
 	public function assert_uuid($value)

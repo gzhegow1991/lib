@@ -39,7 +39,7 @@ use Gzhegow\Lib\Modules\Format\FormatCsv;
 use Gzhegow\Lib\Modules\Format\FormatXml;
 use Gzhegow\Lib\Modules\Format\FormatJson;
 use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Modules\Format\FormatBase64;
+use Gzhegow\Lib\Modules\Format\FormatBaseN;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 use Gzhegow\Lib\Modules\Format\FormatSerialize;
 use Gzhegow\Lib\Modules\Fs\FileSafe\FileSafeProxy;
@@ -165,11 +165,11 @@ class Lib
         return static::$format = static::$format ?? new FormatModule();
     }
 
-    public static function formatBase64(?bool $clone = null) : FormatBase64
+    public static function formatBaseN(?bool $clone = null) : FormatBaseN
     {
         return $clone
-            ? Lib::format()->cloneBase64()
-            : Lib::format()->base64();
+            ? Lib::format()->cloneBaseN()
+            : Lib::format()->baseN();
     }
 
     public static function formatCsv(?bool $clone = null) : FormatCsv

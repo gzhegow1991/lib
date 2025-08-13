@@ -2727,6 +2727,8 @@ class ArrModule
      * @param int|null $flags
      *
      * @return \Iterator<array<TKey>, TValue>|\Generator<array<TKey>, TValue>
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function &walk_it(array &$refArray, ?int $flags = null) : \Generator
     {
@@ -2957,6 +2959,8 @@ class ArrModule
      * @param TKey|null                      $start
      *
      * @return \Iterator<array<TKey>, TValue>|\Generator<array<TKey>, TValue>
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function walk_tree_it(array $tree, ?array $list = null, $start = null) : \Generator
     {
@@ -3014,7 +3018,10 @@ class ArrModule
      * @template TValue
      *
      * @return \Iterator<array<TKey>, array<TValue>>|\Generator<array<TKey>, array<TValue>>
+     *
      * @throws \LogicException
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function walk_collect_it(array $arrayList, ?int $arrayWalkFlags = null, array $fallback = []) : \Generator
     {

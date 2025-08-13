@@ -183,7 +183,7 @@ abstract class AbstractConfig implements
     }
 
     /**
-     * @param array{ 0?: mixed } $context
+     * @param array{ 0?: mixed, 1: array } $context
      */
     public function validate(array $context = []) : void
     {

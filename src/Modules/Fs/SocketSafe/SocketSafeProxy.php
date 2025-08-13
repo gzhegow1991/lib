@@ -1,9 +1,5 @@
 <?php
 
-/**
- * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection
- */
-
 namespace Gzhegow\Lib\Modules\Fs\SocketSafe;
 
 use Gzhegow\Lib\Lib;
