@@ -65,10 +65,16 @@ class MemcachedAdapter
      */
     protected $configShardList = [];
 
+    /**
+     * @var \Closure
+     */
+    protected $fnEnsureOptionsUser;
+
 
     private function __construct()
     {
     }
+
 
     /**
      * @return static|Ret<static>
@@ -455,6 +461,17 @@ class MemcachedAdapter
     }
 
 
+    /**
+     * @return static
+     */
+    public function setFnEnsureOptionsUser(?\Closure $fnEnsureOptionsUser)
+    {
+        $this->fnEnsureOptionsUser = $fnEnsureOptionsUser;
+
+        return $this;
+    }
+
+
     protected function memcachedEnsureOptions(\Memcached $memcached, array $configValid) : void
     {
         $this->memcachedEnsureOptionsDefault($memcached, $configValid);
@@ -492,17 +509,13 @@ class MemcachedAdapter
         }
     }
 
-    /**
-     * @noinspection PhpUnnecessaryStopStatementInspection
-     */
     protected function memcachedEnsureOptionsUser(\Memcached $memcached, array $configValid) : void
     {
-        $userOptions = $configValid[ 'user_options' ] ?? [];
-        if ([] === $userOptions) {
-            return;
-        }
+        $fn = $this->fnEnsureOptionsUser;
 
-        // > your own code
+        if (null !== $fn) {
+            call_user_func($fn, $memcached, $configValid, $this);
+        }
     }
 
 

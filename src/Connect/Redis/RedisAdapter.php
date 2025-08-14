@@ -70,6 +70,11 @@ class RedisAdapter
      */
     protected $configUserOptions = [];
 
+    /**
+     * @var \Closure
+     */
+    protected $fnEnsureOptionsUser;
+
 
     private function __construct()
     {
@@ -459,6 +464,17 @@ class RedisAdapter
     }
 
 
+    /**
+     * @return static
+     */
+    public function setFnEnsureOptionsUser(?\Closure $fnEnsureOptionsUser)
+    {
+        $this->fnEnsureOptionsUser = $fnEnsureOptionsUser;
+
+        return $this;
+    }
+
+
     protected function redisEnsureOptions(\Redis $redis, array $configValid) : void
     {
         $this->redisEnsureOptionsDefault($redis, $configValid);
@@ -499,17 +515,13 @@ class RedisAdapter
         }
     }
 
-    /**
-     * @noinspection PhpUnnecessaryStopStatementInspection
-     */
     protected function redisEnsureOptionsUser(\Redis $redis, array $configValid) : void
     {
-        $userOptions = $configValid[ 'user_options' ] ?? [];
-        if ([] === $userOptions) {
-            return;
-        }
+        $fn = $this->fnEnsureOptionsUser;
 
-        // > your own code
+        if (null !== $fn) {
+            call_user_func($fn, $redis, $configValid, $this);
+        }
     }
 
 

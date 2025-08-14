@@ -105,6 +105,24 @@ class PdoAdapter
      */
     protected $fnSelectPdoWrite;
 
+    /**
+     * @var \Closure
+     */
+    protected $fnEnsureOptionsUser;
+
+    /**
+     * @var \Closure
+     */
+    protected $fnSqlEnsureCharsetUser;
+    /**
+     * @var \Closure
+     */
+    protected $fnSqlEnsureDatabaseUser;
+    /**
+     * @var \Closure
+     */
+    protected $fnSqlEnsureTimezoneUser;
+
 
     private function __construct()
     {
@@ -797,6 +815,48 @@ class PdoAdapter
     }
 
 
+    /**
+     * @return static
+     */
+    public function setFnEnsureOptionsUser(?\Closure $fnEnsureOptionsUser)
+    {
+        $this->fnEnsureOptionsUser = $fnEnsureOptionsUser;
+
+        return $this;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function setFnSqlEnsureCharsetUser(?\Closure $fnSqlEnsureCharsetUser)
+    {
+        $this->fnSqlEnsureCharsetUser = $fnSqlEnsureCharsetUser;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function setFnSqlEnsureDatabaseUser(?\Closure $fnSqlEnsureDatabaseUser)
+    {
+        $this->fnSqlEnsureDatabaseUser = $fnSqlEnsureDatabaseUser;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function setFnSqlEnsureTimezoneUser(?\Closure $fnSqlEnsureTimezoneUser)
+    {
+        $this->fnSqlEnsureTimezoneUser = $fnSqlEnsureTimezoneUser;
+
+        return $this;
+    }
+
+
     protected function pdoEnsureOptions(\PDO $pdo, array $configValid) : void
     {
         $this->pdoEnsureOptionsDefault($pdo, $configValid);
@@ -838,34 +898,40 @@ class PdoAdapter
         }
     }
 
-    /**
-     * @noinspection PhpUnnecessaryStopStatementInspection
-     */
     protected function pdoEnsureOptionsUser(\PDO $pdo, array $configValid) : void
     {
-        $userOptions = $configValid[ 'user_options' ] ?? [];
-        if ([] === $userOptions) {
-            return;
-        }
+        $fn = $this->fnEnsureOptionsUser;
 
-        // > your own code
+        if (null !== $fn) {
+            call_user_func($fn, $pdo, $configValid, $this);
+        }
     }
 
 
     protected function sqlEnsureCharset(\PDO $pdo, array $configValid) : string
     {
-        $driverName = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
-
         $sql = '';
 
+        $sql .= $this->sqlEnsureCharsetDriver($pdo, $configValid);
+        $sql .= $this->sqlEnsureCharsetUser($pdo, $configValid);
+
+        return $sql;
+    }
+
+    protected function sqlEnsureCharsetDriver(\PDO $pdo, array $configValid) : string
+    {
+        $sql = '';
+
+        $driverName = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
         if ('mysql' === $driverName) {
-            $sql = $this->sqlEnsureCharsetMysql($pdo, $configValid);
+            $sql = $this->sqlEnsureCharsetDriverMysql($pdo, $configValid);
         }
 
         return $sql;
     }
 
-    protected function sqlEnsureCharsetMysql(\PDO $pdo, array $configValid) : string
+    protected function sqlEnsureCharsetDriverMysql(\PDO $pdo, array $configValid) : string
     {
         // > until (PHP_VERSION_ID < 50306) this command was not sent on connect
         // > actually it have to be done using \PDO::MYSQL_ATTR_INIT_COMMAND, but it supports only one query
@@ -901,21 +967,44 @@ class PdoAdapter
         return $sql;
     }
 
+    protected function sqlEnsureCharsetUser(\PDO $pdo, array $configValid) : string
+    {
+        $sql = '';
+
+        $fn = $this->fnSqlEnsureCharsetUser;
+
+        if (null !== $fn) {
+            $sql .= call_user_func($fn, $pdo, $configValid, $this);
+        }
+
+        return $sql;
+    }
+
 
     protected function sqlEnsureDatabase(\PDO $pdo, array $configValid) : string
+    {
+        $sql = '';
+
+        $sql .= $this->sqlEnsureDatabaseDriver($pdo, $configValid);
+        $sql .= $this->sqlEnsureDatabaseUser($pdo, $configValid);
+
+        return $sql;
+    }
+
+    protected function sqlEnsureDatabaseDriver(\PDO $pdo, array $configValid) : string
     {
         $driverName = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
         $sql = '';
 
         if ('mysql' === $driverName) {
-            $sql = $this->sqlEnsureDatabaseMysql($pdo, $configValid);
+            $sql = $this->sqlEnsureDatabaseDriverMysql($pdo, $configValid);
         }
 
         return $sql;
     }
 
-    protected function sqlEnsureDatabaseMysql(\PDO $pdo, array $configValid) : string
+    protected function sqlEnsureDatabaseDriverMysql(\PDO $pdo, array $configValid) : string
     {
         $database = (string) $configValid[ 'database' ];
 
@@ -926,6 +1015,72 @@ class PdoAdapter
                 . "USE {$database};";
 
             $sql = rtrim($sql, ';');
+        }
+
+        return $sql;
+    }
+
+    protected function sqlEnsureDatabaseUser(\PDO $pdo, array $configValid) : string
+    {
+        $sql = '';
+
+        $fn = $this->fnSqlEnsureDatabaseUser;
+
+        if (null !== $fn) {
+            $sql .= call_user_func($fn, $pdo, $configValid, $this);
+        }
+
+        return $sql;
+    }
+
+
+    protected function sqlEnsureTimezone(\PDO $pdo, array $configValid) : string
+    {
+        $sql = '';
+
+        $sql .= $this->sqlEnsureTimezoneDriver($pdo, $configValid);
+        $sql .= $this->sqlEnsureTimezoneUser($pdo, $configValid);
+
+        return $sql;
+    }
+
+    protected function sqlEnsureTimezoneDriver(\PDO $pdo, array $configValid) : string
+    {
+        $driverName = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
+        $sql = '';
+
+        if ('mysql' === $driverName) {
+            $sql = $this->sqlEnsureTimezoneDriverMysql($pdo, $configValid);
+        }
+
+        return $sql;
+    }
+
+    protected function sqlEnsureTimezoneDriverMysql(\PDO $pdo, array $configValid) : string
+    {
+        $database = (string) $configValid[ 'database' ];
+
+        $sql = '';
+
+        if ('' !== $database) {
+            $sql = ''
+                . "SET time_zone = '+00:00';";
+
+            $sql = rtrim($sql, ';');
+        }
+
+        return $sql;
+    }
+
+    protected function sqlEnsureTimezoneUser(\PDO $pdo, array $configValid) : string
+    {
+        $sql = '';
+
+        $fn = $this->fnSqlEnsureTimezoneUser;
+
+        if (null !== $fn) {
+            $sql .= call_user_func($fn, $pdo, $configValid, $this);
         }
 
         return $sql;
