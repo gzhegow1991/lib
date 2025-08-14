@@ -96,18 +96,10 @@ class Ret
         if ($throwableArg instanceof self) {
             $instance->mergeFrom($throwableArg);
 
-            $hasLastError = $instance->hasLastError();
-            $isAddError = ([] !== $throwableArgs);
-
-            if ($hasLastError || $isAddError) {
+            if ([] !== $throwableArgs) {
                 $fileLine = $fileLine ?: Lib::debug()->file_line(2);
 
-                if ($hasLastError) {
-                    $instance->lastError([ 'file_line' => $fileLine ]);
-
-                } elseif ($isAddError) {
-                    $instance->addError(null, $fileLine, ...$throwableArgs);
-                }
+                $instance->addError(null, $fileLine, ...$throwableArgs);
             }
 
         } else {
@@ -166,18 +158,10 @@ class Ret
         if ($throwableArg instanceof self) {
             $instance->mergeFrom($throwableArg);
 
-            $hasLastError = $instance->hasLastError();
-            $isAddError = ([] !== $throwableArgs);
-
-            if ($hasLastError || $isAddError) {
+            if ([] !== $throwableArgs) {
                 $fileLine = $fileLine ?: Lib::debug()->file_line(2);
 
-                if ($hasLastError) {
-                    $instance->lastError([ 'file_line' => $fileLine ]);
-
-                } elseif ($isAddError) {
-                    $instance->addError(null, $fileLine, ...$throwableArgs);
-                }
+                $instance->addError(null, $fileLine, ...$throwableArgs);
             }
 
         } else {
@@ -257,66 +241,6 @@ class Ret
         ];
 
         return $this;
-    }
-
-
-    public function hasLastError(?array &$lastError = null) : bool
-    {
-        $lastError = null;
-
-        if ([] !== $this->errorsRaw) {
-            $lastError = end($this->errorsRaw);
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public function getLastError() : ?array
-    {
-        if ([] === $this->errorsRaw) {
-            throw new RuntimeException(
-                [ 'No errors in this instance of: ' . static::class, $this ]
-            );
-        }
-
-        return end($this->errorsRaw);
-    }
-
-    public function lastError(?array $updateLastError) : ?array
-    {
-        $hasErrors = ([] !== $this->errorsRaw);
-
-        $last = $hasErrors ? end($this->errorsRaw) : null;
-
-        if (null !== $updateLastError) {
-            if (! $hasErrors) {
-                throw new RuntimeException(
-                    [ 'No errors in this instance of: ' . static::class, $this ]
-                );
-            }
-
-            $updateLastErrorNew = [];
-
-            if (array_key_exists('file_line', $updateLastError)) {
-                $updateLastErrorNew[ 'file_line' ] = $updateLastError[ 'file_line' ];
-            }
-            if (array_key_exists('throwable_args', $updateLastError)) {
-                $updateLastErrorNew[ 'file_line' ] = $updateLastError[ 'throwable_args' ];
-            }
-
-            if ([] !== $updateLastErrorNew) {
-                $i = key($this->errorsRaw);
-
-                $this->errorsRaw[ $i ] = array_replace(
-                    $this->errorsRaw[ $i ],
-                    $updateLastErrorNew
-                );
-            }
-        }
-
-        return $last;
     }
 
 
