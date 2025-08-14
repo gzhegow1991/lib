@@ -606,6 +606,7 @@ class PdoAdapter
         $sql = implode(";\n", [
             $this->sqlEnsureCharset($pdo, $configValid),
             $this->sqlEnsureDatabase($pdo, $configValid),
+            $this->sqlEnsureTimezone($pdo, $configValid),
         ]);
 
         if ('' !== $sql) {
