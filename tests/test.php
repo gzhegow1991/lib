@@ -5,17 +5,22 @@
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
 \Gzhegow\Lib\Lib::entrypoint()
     //
-    // ->getDirRoot(__DIR__ . '/..')
-    ->setDirRoot(__DIR__ . '/..')
+    // ->getPhp{ErrorHandler}()
+    // ->get{ErrorHandler}()
+    // ->set{ErrorHandler}()
     //
-    // ->getPhpErrorHandler()
-    // ->getErrorHandler()
-    // ->setErrorHandler()
-    // ->useErrorHandler()
-    // ->useRecommendedErrorHandler()
+    // ->use{ErrorHandler}()
+    // ->useRecommended{ErrorHandler}()
+    //
+    // ->useAll()
+    // ->useAllRecommended()
     //
     // ->isLocked($refFileLine)
     // ->lock(true)
+    //
+    // ->hasDirRoot($refDirRoot)
+    // ->getDirRoot()
+    ->setDirRoot(__DIR__ . '/..')
     //
     ->useErrorHandler()
     ->useExceptionHandler()
@@ -38,12 +43,12 @@
     //
     ->usePostMaxSize()
     //
+    ->useSessionCookieParams()
     ->useSessionSavePath()
     //
     ->useUploadMaxFilesize()
     ->useUploadTmpDir()
 ;
-
 
 
 // > добавляем несколько функций для тестирования

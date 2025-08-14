@@ -20,10 +20,8 @@ class EntrypointModule
      * @var array<string, mixed>
      */
     protected $mapRecommended = [
-        'dirRoot'              => null,
-        //
-        'fnErrorHandler'       => null,
-        'fnExceptionHandler'   => null,
+        'errorHandler'         => null,
+        'exceptionHandler'     => null,
         //
         'errorReporting'       => null,
         'errorLog'             => null,
@@ -44,6 +42,7 @@ class EntrypointModule
         //
         'postMaxSize'          => null,
         //
+        'sessionCookieParams'  => null,
         'sessionSavePath'      => null,
         'sessionSavePathMkdir' => null,
         //
@@ -55,10 +54,8 @@ class EntrypointModule
      * @var array<string, mixed>
      */
     protected $mapInitial = [
-        'dirRoot'              => null,
-        //
-        'fnErrorHandler'       => null,
-        'fnExceptionHandler'   => null,
+        'errorHandler'         => null,
+        'exceptionHandler'     => null,
         //
         'errorReporting'       => null,
         'errorLog'             => null,
@@ -79,6 +76,7 @@ class EntrypointModule
         //
         'postMaxSize'          => null,
         //
+        'sessionCookieParams'  => null,
         'sessionSavePath'      => null,
         'sessionSavePathMkdir' => null,
         //
@@ -92,8 +90,8 @@ class EntrypointModule
     protected $mapWasSet = [
         'dirRoot'              => false,
         //
-        'fnErrorHandler'       => false,
-        'fnExceptionHandler'   => false,
+        'errorHandler'         => false,
+        'exceptionHandler'     => false,
         //
         'errorReporting'       => false,
         'errorLog'             => false,
@@ -114,6 +112,7 @@ class EntrypointModule
         //
         'postMaxSize'          => false,
         //
+        'sessionCookieParams'  => false,
         'sessionSavePath'      => false,
         'sessionSavePathMkdir' => false,
         //
@@ -130,11 +129,11 @@ class EntrypointModule
     /**
      * @var array{ 0?: callable|null }
      */
-    protected $fnErrorHandler = [];
+    protected $errorHandler = [];
     /**
      * @var array{ 0?: callable|null }
      */
-    protected $fnExceptionHandler = [];
+    protected $exceptionHandler = [];
 
     /**
      * @var array{ 0?: int }
@@ -192,6 +191,10 @@ class EntrypointModule
     protected $postMaxSize = [];
 
     /**
+     * @var array{ 0?: array }
+     */
+    protected $sessionCookieParams = [];
+    /**
      * @var array{ 0?: string }
      */
     protected $sessionSavePath = [];
@@ -226,10 +229,8 @@ class EntrypointModule
     public function __construct()
     {
         $this->mapRecommended = [
-            'dirRoot'              => null,
-            //
-            'fnErrorHandler'       => [ $this, 'fnErrorHandler' ],
-            'fnExceptionHandler'   => [ $this, 'fnExceptionHandler' ],
+            'errorHandler'         => [ $this, 'fnErrorHandler' ],
+            'exceptionHandler'     => [ $this, 'fnExceptionHandler' ],
             //
             'errorReporting'       => (E_ALL | E_DEPRECATED | E_USER_DEPRECATED),
             'errorLog'             => null,
@@ -250,16 +251,25 @@ class EntrypointModule
             //
             'postMaxSize'          => '8M',
             //
+            'sessionCookieParams'  => [
+                'lifetime' => 0,
+                'path'     => '/',
+                'domain'   => '',
+                'secure'   => true,
+                'httponly' => true,
+                'samesite' => 'Lax',
+            ],
+            'sessionSavePath'      => null,
+            'sessionSavePathMkdir' => false,
+            //
             'uploadMaxFilesize'    => '2M',
             'uploadTmpDir'         => null,
             'uploadTmpDirMkdir'    => false,
         ];
 
         $this->mapInitial = [
-            'dirRoot'              => null,
-            //
-            'fnErrorHandler'       => $this->getPhpErrorHandler(),
-            'fnExceptionHandler'   => $this->getPhpExceptionHandler(),
+            'errorHandler'         => $this->getPhpErrorHandler(),
+            'exceptionHandler'     => $this->getPhpExceptionHandler(),
             //
             'errorReporting'       => $this->getPhpErrorReporting(),
             'errorLog'             => $this->getPhpErrorLog(),
@@ -280,7 +290,8 @@ class EntrypointModule
             //
             'postMaxSize'          => $this->getPhpPostMaxSize(),
             //
-            'sessionSavePath'      => $this->getPhpUploadTmpDir(),
+            'sessionCookieParams'  => $this->getPhpSessionCookieParams(),
+            'sessionSavePath'      => $this->getPhpSessionSavePath(),
             'sessionSavePathMkdir' => false,
             //
             'uploadMaxFilesize'    => $this->getPhpUploadMaxFilesize(),
@@ -312,13 +323,13 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function lock(?bool $isLocked = null)
+    public function lock(?bool $lock = null)
     {
-        $isLocked = $isLocked ?? true;
+        $lock = $lock ?? true;
 
         $theDebug = Lib::debug();
 
-        if ($isLocked) {
+        if ($lock) {
             $this->isLocked = $theDebug->file_line();
 
         } else {
@@ -408,7 +419,7 @@ class EntrypointModule
      */
     public function getErrorHandler()
     {
-        return $this->fnErrorHandler;
+        return $this->errorHandler;
     }
 
     /**
@@ -420,7 +431,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $key = 'fnErrorHandler';
+        $key = 'errorHandler';
         $var = $fnErrorHandler;
 
         if (false !== $this->mapWasSet[ $key ]) {
@@ -458,8 +469,8 @@ class EntrypointModule
     {
         $refLast = null;
 
-        if ([] !== $this->fnErrorHandler) {
-            $refLast = set_error_handler($this->fnErrorHandler[ 0 ]);
+        if ([] !== $this->errorHandler) {
+            $refLast = set_error_handler($this->errorHandler[ 0 ]);
         }
 
         return $this;
@@ -470,7 +481,7 @@ class EntrypointModule
      */
     public function useRecommendedErrorHandler(&$refLast = null)
     {
-        $refLast = set_error_handler($this->mapRecommended[ 'fnErrorHandler' ]);
+        $refLast = set_error_handler($this->mapRecommended[ 'errorHandler' ]);
 
         return $this;
     }
@@ -493,7 +504,7 @@ class EntrypointModule
      */
     public function getExceptionHandler()
     {
-        return $this->fnExceptionHandler;
+        return $this->exceptionHandler;
     }
 
     /**
@@ -505,7 +516,7 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        $key = 'fnExceptionHandler';
+        $key = 'exceptionHandler';
         $var = $fnExceptionHandler;
 
         if (false !== $this->mapWasSet[ $key ]) {
@@ -543,8 +554,8 @@ class EntrypointModule
     {
         $refLast = null;
 
-        if ([] !== $this->fnExceptionHandler) {
-            $refLast = set_exception_handler($this->fnExceptionHandler[ 0 ]);
+        if ([] !== $this->exceptionHandler) {
+            $refLast = set_exception_handler($this->exceptionHandler[ 0 ]);
         }
 
         return $this;
@@ -555,7 +566,7 @@ class EntrypointModule
      */
     public function useRecommendedExceptionHandler(&$refLast = null)
     {
-        $refLast = set_exception_handler($this->mapRecommended[ 'fnExceptionHandler' ]);
+        $refLast = set_exception_handler($this->mapRecommended[ 'exceptionHandler' ]);
 
         return $this;
     }
@@ -1364,6 +1375,99 @@ class EntrypointModule
     }
 
 
+    public function getPhpSessionCookieParams() : array
+    {
+        $theHttpSession = Lib::httpSession();
+
+        return $theHttpSession->session_get_cookie_params();
+    }
+
+    /**
+     * @param array|false|null $sessionCookieParams
+     *
+     * @return static
+     */
+    public function setSessionCookieParams($sessionCookieParams, ?bool $replace = null)
+    {
+        $this->assertNotLocked();
+
+        $key = 'sessionCookieParams';
+        $var = $sessionCookieParams;
+
+        if (false !== $this->mapWasSet[ $key ]) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapWasSet[ $key ] = true;
+        }
+
+        if (null === $var) {
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
+
+        } else {
+            $sessionCookieParamsValid = Lib::type()->array($sessionCookieParams)->orThrow();
+
+            $sessionCookieParamsAll = [
+                'lifetime' => null,
+                'path'     => null,
+                'domain'   => null,
+                'secure'   => null,
+                'httponly' => null,
+                'samesite' => null,
+            ];
+
+            if ($diff = array_diff_key($sessionCookieParams, $sessionCookieParamsAll)) {
+                throw new RuntimeException(
+                    [
+                        ''
+                        . 'The `sessionCookieParams` contains unexpected keys: '
+                        . implode('|', array_keys($diff)),
+                        //
+                        $sessionCookieParams,
+                    ]
+                );
+            }
+
+            $this->{$var} = [ $sessionCookieParamsValid ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useSessionCookieParams(&$refLast = null)
+    {
+        $refLast = null;
+
+        if ([] !== $this->sessionCookieParams) {
+            $theHttpSession = Lib::httpSession();
+
+            $refLast = $theHttpSession->session_set_cookie_params($this->sessionCookieParams[ 0 ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useRecommendedSessionCookieParams(&$refLast = null)
+    {
+        $theHttpSession = Lib::httpSession();
+
+        $refLast = $theHttpSession->session_set_cookie_params($this->mapRecommended[ 'sessionCookieParams' ]);
+
+        return $this;
+    }
+
+
     public function getPhpSessionSavePath() : string
     {
         $theHttpSession = Lib::httpSession();
@@ -1704,33 +1808,24 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useAll()
+    public function useAll(?bool $lock = null)
     {
-        $this
-            ->useErrorHandler()
-            ->useExceptionHandler()
-            //
-            ->useErrorReporting()
-            ->useErrorLog()
-            ->useLogErrors()
-            ->useDisplayErrors()
-            //
-            ->useMemoryLimit()
-            //
-            ->useMaxExecutionTime()
-            ->useMaxInputTime()
-            //
-            ->useTimezoneDefault()
-            //
-            ->usePostMaxSize()
-            //
-            ->useUploadMaxFilesize()
-            ->useUploadTmpDir()
-            //
-            ->usePrecision()
-            //
-            ->useUmask()
-        ;
+        $lock = $lock ?? true;
+
+        $map = $this->mapInitial;
+        unset($map[ 'displayStartupErrors' ]);
+        unset($map[ 'sessionSavePathMkdir' ]);
+        unset($map[ 'uploadTmpDirMkdir' ]);
+
+        foreach ( $map as $key => $value ) {
+            $ukey = ucfirst($key);
+
+            $this->{'use' . $ukey}();
+        }
+
+        if ($lock) {
+            $this->lock(true);
+        }
 
         return $this;
     }
@@ -1738,33 +1833,24 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useAllRecommended()
+    public function useAllRecommended(?bool $lock = null)
     {
-        $this
-            ->useRecommendedErrorHandler()
-            ->useRecommendedExceptionHandler()
-            //
-            ->useRecommendedErrorReporting()
-            ->useRecommendedErrorLog()
-            ->useRecommendedLogErrors()
-            ->useRecommendedDisplayErrors()
-            //
-            ->useRecommendedMemoryLimit()
-            //
-            ->useRecommendedMaxExecutionTime()
-            ->useRecommendedMaxInputTime()
-            //
-            ->useRecommendedTimezoneDefault()
-            //
-            ->useRecommendedPrecision()
-            //
-            ->useRecommendedUmask()
-            //
-            ->useRecommendedPostMaxSize()
-            //
-            ->useRecommendedUploadMaxFilesize()
-            ->useRecommendedUploadTmpDir()
-        ;
+        $lock = $lock ?? true;
+
+        $map = $this->mapRecommended;
+        unset($map[ 'displayStartupErrors' ]);
+        unset($map[ 'sessionSavePathMkdir' ]);
+        unset($map[ 'uploadTmpDirMkdir' ]);
+
+        foreach ( $map as $key => $value ) {
+            $ukey = ucfirst($key);
+
+            $this->{'useRecommended' . $ukey}();
+        }
+
+        if ($lock) {
+            $this->lock(true);
+        }
 
         return $this;
     }
