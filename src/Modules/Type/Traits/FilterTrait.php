@@ -2438,7 +2438,7 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: callable-string, 1?: Ret<callable-string> } $r
+	 * @param array{ 0?: callable|callable-string, 1?: Ret<callable|callable-string> } $r
 	 */
 	public function filter_callable_string(array $r, $value, $newScope = 'static'): bool
 	{
@@ -2449,7 +2449,7 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: callable-string, 1?: Ret<callable-string> } $r
+	 * @param array{ 0?: callable|callable-string, 1?: Ret<callable|callable-string> } $r
 	 */
 	public function filter_callable_string_function(array $r, $value): bool
 	{
@@ -2460,7 +2460,7 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: callable-string, 1?: Ret<callable-string> } $r
+	 * @param array{ 0?: callable|callable-string, 1?: Ret<callable|callable-string> } $r
 	 */
 	public function filter_callable_string_function_internal(array $r, $value): bool
 	{
@@ -2471,7 +2471,7 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: callable-string, 1?: Ret<callable-string> } $r
+	 * @param array{ 0?: callable|callable-string, 1?: Ret<callable|callable-string> } $r
 	 */
 	public function filter_callable_string_function_non_internal(array $r, $value): bool
 	{
@@ -2482,7 +2482,7 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: callable-string, 1?: Ret<callable-string> } $r
+	 * @param array{ 0?: callable|callable-string, 1?: Ret<callable|callable-string> } $r
 	 */
 	public function filter_callable_string_method_static(array $r, $value, $newScope = 'static'): bool
 	{

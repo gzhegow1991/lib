@@ -50,7 +50,9 @@ class StreamSafeProxy
         }
 
         if (empty($map[ $name ])) {
-            throw new RuntimeException('Method is not exists: ' . $name);
+            throw new RuntimeException(
+                [ 'Method is not exists: ' . $name ]
+            );
         }
 
         $theFunc = Lib::func();

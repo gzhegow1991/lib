@@ -49,7 +49,6 @@ use Gzhegow\Lib\Modules\Fs\SocketSafe\SocketSafeProxy;
 use Gzhegow\Lib\Modules\Fs\StreamSafe\StreamSafeProxy;
 use Gzhegow\Lib\Modules\Func\Invoker\InvokerInterface;
 use Gzhegow\Lib\Modules\Http\Cookies\CookiesInterface;
-use Gzhegow\Lib\Modules\Http\Session\SessionInterface;
 use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
 use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
 use Gzhegow\Lib\Modules\Str\Inflector\InflectorInterface;
@@ -60,6 +59,7 @@ use Gzhegow\Lib\Modules\Debug\Throwabler\ThrowablerInterface;
 use Gzhegow\Lib\Modules\Async\Promise\PromiseManagerInterface;
 use Gzhegow\Lib\Modules\Str\Interpolator\InterpolatorInterface;
 use Gzhegow\Lib\Modules\Social\EmailParser\EmailParserInterface;
+use Gzhegow\Lib\Modules\Http\Session\SessionSafe\SessionSafeProxy;
 use Gzhegow\Lib\Modules\Social\PhoneManager\PhoneManagerInterface;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
@@ -305,19 +305,25 @@ class Lib
         return static::$fs = static::$fs ?? new FsModule();
     }
 
-    public static function fsFile() : FileSafeProxy
+    public static function fsFile(?bool $clone = null) : FileSafeProxy
     {
-        return Lib::fs()->fileSafe();
+        return $clone
+            ? Lib::fs()->cloneFileSafe()
+            : Lib::fs()->fileSafe();
     }
 
-    public static function fsSocket() : SocketSafeProxy
+    public static function fsSocket(?bool $clone = null) : SocketSafeProxy
     {
-        return Lib::fs()->socketSafe();
+        return $clone
+            ? Lib::fs()->cloneSocketSafe()
+            : Lib::fs()->socketSafe();
     }
 
-    public static function fsStream() : StreamSafeProxy
+    public static function fsStream(?bool $clone = null) : StreamSafeProxy
     {
-        return Lib::fs()->streamSafe();
+        return $clone
+            ? Lib::fs()->cloneStreamSafe()
+            : Lib::fs()->streamSafe();
     }
 
 
@@ -336,11 +342,12 @@ class Lib
         return Lib::http()->cookies();
     }
 
-    public static function httpSession() : SessionInterface
+    public static function httpSession(?bool $clone = null) : SessionSafeProxy
     {
-        return Lib::http()->session();
+        return $clone
+            ? Lib::http()->cloneSessionSafe()
+            : Lib::http()->sessionSafe();
     }
-
 
 
     /**

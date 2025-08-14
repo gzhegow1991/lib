@@ -39,7 +39,8 @@
     "require": {
         "php": "^7.3|^8.0",
 
-        "ext-pcre": "*"
+        "ext-pcre": "*",
+        "symfony/http-foundation": "^6.4"
     },
     "suggest": {
         "ext-bcmath": "*",

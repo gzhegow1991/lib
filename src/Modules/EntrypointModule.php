@@ -20,97 +20,106 @@ class EntrypointModule
      * @var array<string, mixed>
      */
     protected $mapRecommended = [
-        'dirRoot'               => null,
+        'dirRoot'              => null,
         //
-        'fnErrorHandler'        => null,
-        'fnExceptionHandler'    => null,
+        'fnErrorHandler'       => null,
+        'fnExceptionHandler'   => null,
         //
-        'errorReporting'        => null,
-        'errorLog'              => null,
-        'logErrors'             => null,
-        'displayErrors'         => null,
-        'displayStartupErrors'  => null,
+        'errorReporting'       => null,
+        'errorLog'             => null,
+        'logErrors'            => null,
+        'displayErrors'        => null,
+        'displayStartupErrors' => null,
         //
-        'memoryLimit'           => null,
+        'memoryLimit'          => null,
         //
-        'maxExecutionTime'      => null,
-        'maxInputTime'          => null,
+        'maxExecutionTime'     => null,
+        'maxInputTime'         => null,
         //
-        'timezoneDefault'       => null,
+        'timezoneDefault'      => null,
         //
-        'precision'             => null,
+        'precision'            => null,
         //
-        'umask'                 => null,
+        'umask'                => null,
         //
-        'postMaxSize'           => null,
+        'postMaxSize'          => null,
         //
-        'uploadMaxFilesize'     => null,
-        'uploadTmpDir'          => null,
-        'uploadTmpDirMkdir'     => null,
+        'sessionSavePath'      => null,
+        'sessionSavePathMkdir' => null,
+        //
+        'uploadMaxFilesize'    => null,
+        'uploadTmpDir'         => null,
+        'uploadTmpDirMkdir'    => null,
     ];
     /**
      * @var array<string, mixed>
      */
     protected $mapInitial = [
-        'dirRoot'               => null,
+        'dirRoot'              => null,
         //
-        'fnErrorHandler'        => null,
-        'fnExceptionHandler'    => null,
+        'fnErrorHandler'       => null,
+        'fnExceptionHandler'   => null,
         //
-        'errorReporting'        => null,
-        'errorLog'              => null,
-        'logErrors'             => null,
-        'displayErrors'         => null,
-        'displayStartupErrors'  => null,
+        'errorReporting'       => null,
+        'errorLog'             => null,
+        'logErrors'            => null,
+        'displayErrors'        => null,
+        'displayStartupErrors' => null,
         //
-        'memoryLimit'           => null,
+        'memoryLimit'          => null,
         //
-        'maxExecutionTime'      => null,
-        'maxInputTime'          => null,
+        'maxExecutionTime'     => null,
+        'maxInputTime'         => null,
         //
-        'timezoneDefault'       => null,
+        'timezoneDefault'      => null,
         //
-        'precision'             => null,
+        'precision'            => null,
         //
-        'umask'                 => null,
+        'umask'                => null,
         //
-        'postMaxSize'           => null,
+        'postMaxSize'          => null,
         //
-        'uploadMaxFilesize'     => null,
-        'uploadTmpDir'          => null,
-        'uploadTmpDirMkdir'     => null,
+        'sessionSavePath'      => null,
+        'sessionSavePathMkdir' => null,
+        //
+        'uploadMaxFilesize'    => null,
+        'uploadTmpDir'         => null,
+        'uploadTmpDirMkdir'    => null,
     ];
     /**
      * @var array<string, mixed>
      */
     protected $mapWasSet = [
-        'dirRoot'               => false,
+        'dirRoot'              => false,
         //
-        'fnErrorHandler'        => false,
-        'fnExceptionHandler'    => false,
+        'fnErrorHandler'       => false,
+        'fnExceptionHandler'   => false,
         //
-        'errorReporting'        => false,
-        'errorLog'              => false,
-        'logErrors'             => false,
-        'displayErrors'         => false,
-        'displayStartupErrors'  => false,
+        'errorReporting'       => false,
+        'errorLog'             => false,
+        'logErrors'            => false,
+        'displayErrors'        => false,
+        'displayStartupErrors' => false,
         //
-        'memoryLimit'           => false,
+        'memoryLimit'          => false,
         //
-        'maxExecutionTime'      => false,
-        'maxInputTime'          => false,
+        'maxExecutionTime'     => false,
+        'maxInputTime'         => false,
         //
-        'timezoneDefault'       => false,
+        'timezoneDefault'      => false,
         //
-        'precision'             => false,
+        'precision'            => false,
         //
-        'umask'                 => false,
+        'umask'                => false,
         //
-        'postMaxSize'           => false,
+        'postMaxSize'          => false,
         //
-        'uploadMaxFilesize'     => false,
-        'uploadTmpDir'          => false,
-        'uploadTmpDirMkdir'     => false,
+        'sessionSavePath'      => false,
+        'sessionSavePathMkdir' => false,
+        //
+        'uploadMaxFilesize'    => false,
+        'uploadTmpDir'         => false,
+        'uploadTmpDirMkdir'    => false,
     ];
 
     /**
@@ -185,6 +194,15 @@ class EntrypointModule
     /**
      * @var array{ 0?: string }
      */
+    protected $sessionSavePath = [];
+    /**
+     * @var array{ 0?: bool }
+     */
+    protected $sessionSavePathMkdir = [];
+
+    /**
+     * @var array{ 0?: string }
+     */
     protected $uploadMaxFilesize = [];
     /**
      * @var array{ 0?: string }
@@ -208,63 +226,66 @@ class EntrypointModule
     public function __construct()
     {
         $this->mapRecommended = [
-            'dirRoot'               => null,
+            'dirRoot'              => null,
             //
-            'fnErrorHandler'        => [ $this, 'fnErrorHandler' ],
-            'fnExceptionHandler'    => [ $this, 'fnExceptionHandler' ],
+            'fnErrorHandler'       => [ $this, 'fnErrorHandler' ],
+            'fnExceptionHandler'   => [ $this, 'fnExceptionHandler' ],
             //
-            'errorReporting'        => (E_ALL | E_DEPRECATED | E_USER_DEPRECATED),
-            'errorLog'              => null,
-            'logErrors'             => 0,
-            'displayErrors'         => 0,
-            'displayStartupErrors'  => 0,
+            'errorReporting'       => (E_ALL | E_DEPRECATED | E_USER_DEPRECATED),
+            'errorLog'             => null,
+            'logErrors'            => 0,
+            'displayErrors'        => 0,
+            'displayStartupErrors' => 0,
             //
-            'memoryLimit'           => '32M',
+            'memoryLimit'          => '32M',
             //
-            'maxExecutionTime'      => 10,
-            'maxInputTime'          => -1,
+            'maxExecutionTime'     => 10,
+            'maxInputTime'         => -1,
             //
-            'timezoneDefault'       => new \DateTimeZone('UTC'),
+            'timezoneDefault'      => new \DateTimeZone('UTC'),
             //
-            'precision'             => 16,
+            'precision'            => 16,
             //
-            'umask'                 => 0002,
+            'umask'                => 0002,
             //
-            'postMaxSize'           => '8M',
+            'postMaxSize'          => '8M',
             //
-            'uploadMaxFilesize'     => '2M',
-            'uploadTmpDir'          => null,
-            'uploadTmpDirMkdir'     => false,
+            'uploadMaxFilesize'    => '2M',
+            'uploadTmpDir'         => null,
+            'uploadTmpDirMkdir'    => false,
         ];
 
         $this->mapInitial = [
-            'dirRoot'               => null,
+            'dirRoot'              => null,
             //
-            'fnErrorHandler'        => $this->getPhpErrorHandler(),
-            'fnExceptionHandler'    => $this->getPhpExceptionHandler(),
+            'fnErrorHandler'       => $this->getPhpErrorHandler(),
+            'fnExceptionHandler'   => $this->getPhpExceptionHandler(),
             //
-            'errorReporting'        => $this->getPhpErrorReporting(),
-            'errorLog'              => $this->getPhpErrorLog(),
-            'logErrors'             => $this->getPhpLogErrors(),
-            'displayErrors'         => $this->getPhpDisplayErrors(),
-            'displayStartupErrors'  => $this->getPhpDisplayStartupErrors(),
+            'errorReporting'       => $this->getPhpErrorReporting(),
+            'errorLog'             => $this->getPhpErrorLog(),
+            'logErrors'            => $this->getPhpLogErrors(),
+            'displayErrors'        => $this->getPhpDisplayErrors(),
+            'displayStartupErrors' => $this->getPhpDisplayStartupErrors(),
             //
-            'memoryLimit'           => $this->getPhpMemoryLimit(),
+            'memoryLimit'          => $this->getPhpMemoryLimit(),
             //
-            'maxExecutionTime'      => $this->getPhpMaxExecutionTime(),
-            'maxInputTime'          => $this->getPhpMaxInputTime(),
+            'maxExecutionTime'     => $this->getPhpMaxExecutionTime(),
+            'maxInputTime'         => $this->getPhpMaxInputTime(),
             //
-            'timezoneDefault'       => $this->getPhpTimezoneDefault(),
+            'timezoneDefault'      => $this->getPhpTimezoneDefault(),
             //
-            'precision'             => $this->getPhpPrecision(),
+            'precision'            => $this->getPhpPrecision(),
             //
-            'umask'                 => $this->getPhpUmask(),
+            'umask'                => $this->getPhpUmask(),
             //
-            'postMaxSize'           => $this->getPhpPostMaxSize(),
+            'postMaxSize'          => $this->getPhpPostMaxSize(),
             //
-            'uploadMaxFilesize'     => $this->getPhpUploadMaxFilesize(),
-            'uploadTmpDir'          => $this->getPhpUploadTmpDir(),
-            'uploadTmpDirMkdir'     => false,
+            'sessionSavePath'      => $this->getPhpUploadTmpDir(),
+            'sessionSavePathMkdir' => false,
+            //
+            'uploadMaxFilesize'    => $this->getPhpUploadMaxFilesize(),
+            'uploadTmpDir'         => $this->getPhpUploadTmpDir(),
+            'uploadTmpDirMkdir'    => false,
         ];
 
         foreach ( $this->mapRecommended as $key => $value ) {
@@ -879,10 +900,10 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapRecommended[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
-            $this->{$var} = [ $this->mapInitial[ $key ] ];
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
 
         } else {
             $theFormat = Lib::format();
@@ -948,10 +969,10 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapRecommended[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
-            $this->{$var} = [ $this->mapInitial[ $key ] ];
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
 
         } else {
             $theType = Lib::type();
@@ -1016,10 +1037,10 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapRecommended[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
-            $this->{$var} = [ $this->mapInitial[ $key ] ];
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
 
         } else {
             $theType = Lib::type();
@@ -1091,10 +1112,10 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapRecommended[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
-            $this->{$var} = [ $this->mapInitial[ $key ] ];
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
 
         } else {
             $theType = Lib::type();
@@ -1159,10 +1180,10 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapRecommended[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
-            $this->{$var} = [ $this->mapInitial[ $key ] ];
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
 
         } else {
             $theType = Lib::type();
@@ -1231,10 +1252,10 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapRecommended[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
-            $this->{$var} = [ $this->mapInitial[ $key ] ];
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
 
         } else {
             if (! (($var >= 0) && ($var <= 0777))) {
@@ -1301,10 +1322,10 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapRecommended[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
-            $this->{$var} = [ $this->mapInitial[ $key ] ];
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
 
         } else {
             $theFormat = Lib::format();
@@ -1343,6 +1364,108 @@ class EntrypointModule
     }
 
 
+    public function getPhpSessionSavePath() : string
+    {
+        $theHttpSession = Lib::httpSession();
+
+        return $theHttpSession->session_save_path();
+    }
+
+    /**
+     * @param string|false|null $sessionSavePath
+     * @param bool|false|null   $sessionSavePathMkdir
+     *
+     * @return static
+     */
+    public function setSessionSavePath(
+        $sessionSavePath,
+        $sessionSavePathMkdir,
+        ?bool $replace = null
+    )
+    {
+        $this->assertNotLocked();
+
+        if (false
+            || (false !== $this->mapWasSet[ 'sessionSavePath' ])
+            || (false !== $this->mapWasSet[ 'sessionSavePathMkdir' ])
+        ) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapWasSet[ 'sessionSavePath' ] = true;
+            $this->mapWasSet[ 'sessionSavePathMkdir' ] = true;
+        }
+
+        if (null === $sessionSavePath) {
+            $this->sessionSavePath = [ $this->mapRecommended[ 'sessionSavePath' ] ];
+            $this->sessionSavePathMkdir = [ $this->mapRecommended[ 'sessionSavePathMkdir' ] ];
+
+        } elseif (false === $sessionSavePath) {
+            $this->sessionSavePath = [ $this->mapInitial[ 'sessionSavePath' ] ];
+            $this->sessionSavePathMkdir = [ $this->mapInitial[ 'sessionSavePathMkdir' ] ];
+
+        } else {
+            $theType = Lib::type();
+
+            $sessionSavePathMkdirValid = (bool) $sessionSavePathMkdir;
+
+            if ($sessionSavePathMkdirValid) {
+                $sessionSavePathValid = $theType->dirpath($sessionSavePath, true)->orThrow();
+
+            } else {
+                $sessionSavePathValid = $theType->dirpath_realpath($sessionSavePath)->orThrow();
+            }
+
+            $this->sessionSavePath = [ $sessionSavePathValid ];
+            $this->sessionSavePathMkdir = [ $sessionSavePathValid ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useSessionSavePath(&$refLast = null)
+    {
+        $refLast = null;
+
+        if ([] !== $this->sessionSavePath) {
+            $sessionSavePathValid = $this->sessionSavePath[ 0 ];
+
+            if ([] !== $this->sessionSavePathMkdir) {
+                $sessionSavePathMkdirValid = (bool) $this->sessionSavePathMkdir[ 0 ];
+
+                if ($sessionSavePathMkdirValid) {
+                    if (! is_dir($sessionSavePathValid)) {
+                        mkdir($sessionSavePathValid, 0775, true);
+                    }
+                }
+            }
+
+            $theHttpSession = Lib::httpSession();
+
+            $refLast = $theHttpSession->session_save_path($sessionSavePathValid);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useRecommendedSessionSavePath(&$refLast = null)
+    {
+        $theHttpSession = Lib::httpSession();
+
+        $refLast = $theHttpSession->session_save_path($this->mapRecommended[ 'sessionSavePath' ]);
+
+        return $this;
+    }
+
+
     public function getPhpUploadMaxFilesize() : string
     {
         return ini_get('upload_max_filesize');
@@ -1370,10 +1493,10 @@ class EntrypointModule
         }
 
         if (null === $var) {
-            $this->{$var} = [ $this->mapRecommended[ $key ] ];
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
 
         } elseif (false === $var) {
-            $this->{$var} = [ $this->mapInitial[ $key ] ];
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
 
         } else {
             $theFormat = Lib::format();

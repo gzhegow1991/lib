@@ -3041,7 +3041,7 @@ trait AssertTrait
 
 
 	/**
-	 * @return callable-string
+	 * @return callable|callable-string
 	 */
 	public function assert_callable_string($value, $newScope = 'static')
 	{
@@ -3055,7 +3055,7 @@ trait AssertTrait
 
 
 	/**
-	 * @return callable-string
+	 * @return callable|callable-string
 	 */
 	public function assert_callable_string_function($value)
 	{
@@ -3069,7 +3069,7 @@ trait AssertTrait
 
 
 	/**
-	 * @return callable-string
+	 * @return callable|callable-string
 	 */
 	public function assert_callable_string_function_internal($value)
 	{
@@ -3083,7 +3083,7 @@ trait AssertTrait
 
 
 	/**
-	 * @return callable-string
+	 * @return callable|callable-string
 	 */
 	public function assert_callable_string_function_non_internal($value)
 	{
@@ -3097,7 +3097,7 @@ trait AssertTrait
 
 
 	/**
-	 * @return callable-string
+	 * @return callable|callable-string
 	 */
 	public function assert_callable_string_method_static($value, $newScope = 'static')
 	{

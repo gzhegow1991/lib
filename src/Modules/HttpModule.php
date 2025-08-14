@@ -4,12 +4,14 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Http\HttpHeader\HttpHeader;
 use Gzhegow\Lib\Modules\Http\Cookies\DefaultCookies;
-use Gzhegow\Lib\Modules\Http\Session\DefaultSession;
 use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 use Gzhegow\Lib\Modules\Http\Cookies\CookiesInterface;
-use Gzhegow\Lib\Modules\Http\Session\SessionInterface;
+use Gzhegow\Lib\Modules\Http\Session\SessionSafe\SessionSafe;
+use Gzhegow\Lib\Modules\Http\Session\SessionSafe\SessionSafeProxy;
+use Gzhegow\Lib\Modules\Http\Session\SessionDisabler\SessionDisabler;
 
 
 class HttpModule
@@ -18,16 +20,6 @@ class HttpModule
      * @var class-string<DefaultCookies>
      */
     protected static $cookiesClass = DefaultCookies::class;
-
-    /**
-     * @var class-string<DefaultSession>
-     */
-    protected static $sessionClass = DefaultSession::class;
-    /**
-     * @var array
-     */
-    protected static $sessionOptions = [];
-
 
     /**
      * @param class-string<CookiesInterface>|null $cookiesClass
@@ -53,52 +45,17 @@ class HttpModule
         return $last;
     }
 
-    /**
-     * @param class-string<SessionInterface>|null $sessionClass
-     *
-     * @return class-string<SessionInterface>
-     */
-    public static function staticSessionClass(?string $sessionClass = null) : string
-    {
-        $last = static::$sessionClass;
-
-        if (null !== $sessionClass) {
-            if (! is_subclass_of($sessionClass, SessionInterface::class)) {
-                throw new LogicException(
-                    [ 'The `cookiesClass` should be subclass of: ' . SessionInterface::class, $sessionClass ]
-                );
-            }
-
-            static::$sessionClass = $sessionClass;
-        }
-
-        static::$sessionClass = static::$sessionClass ?? DefaultSession::class;
-
-        return $last;
-    }
-
-    public static function staticSessionOptions(?array $sessionOptions = null) : array
-    {
-        $last = static::$sessionOptions;
-
-        if (null !== $sessionOptions) {
-            static::$sessionOptions = $sessionOptions;
-        }
-
-        static::$sessionOptions = static::$sessionOptions ?? [];
-
-        return $last;
-    }
-
 
     /**
      * @var CookiesInterface
      */
     protected $cookies;
+
     /**
-     * @var SessionInterface
+     * @var SessionSafe
      */
-    protected $session;
+    protected $sessionSafe;
+
 
     public function cookies() : CookiesInterface
     {
@@ -111,20 +68,47 @@ class HttpModule
         return $this->cookies = $cookiesClass::getInstance();
     }
 
-    public function session() : SessionInterface
+
+    public function newSessionSafe() : SessionSafeProxy
     {
-        if (null !== $this->session) {
-            return $this->session;
-        }
+        $sessionSafe = $this->createSessionSafe();
 
-        $sessionClass = $this->staticSessionClass();
+        return new SessionSafeProxy($sessionSafe);
+    }
 
-        return $this->session = $sessionClass::getInstance();
+    public function cloneSessionSafe() : SessionSafeProxy
+    {
+        $sessionSafe = clone $this->getSessionSafe();
+
+        return new SessionSafeProxy($sessionSafe);
+    }
+
+    public function sessionSafe() : SessionSafeProxy
+    {
+        $sessionSafe = $this->getSessionSafe();
+
+        return new SessionSafeProxy($sessionSafe);
+    }
+
+    protected function createSessionSafe() : SessionSafe
+    {
+        return new SessionSafe();
+    }
+
+    protected function getSessionSafe() : SessionSafe
+    {
+        return $this->sessionSafe = $this->sessionSafe ?? $this->createSessionSafe();
     }
 
 
     public function is_ajax() : bool
     {
+        $thePhp = Lib::php();
+
+        if ($thePhp->is_terminal()) {
+            return false;
+        }
+
         $serverXRequestedWith = $_SERVER[ 'HTTP_X_REQUESTED_WITH' ] ?? null;
         $serverXRequestedWith = (string) $serverXRequestedWith;
         $serverXRequestedWith = strtolower($serverXRequestedWith);
@@ -133,6 +117,46 @@ class HttpModule
         $isAjax = ('xmlhttprequest' === $serverXRequestedWith);
 
         return $isAjax;
+    }
+
+    public function is_web() : bool
+    {
+        $thePhp = Lib::php();
+
+        if ($thePhp->is_terminal()) {
+            return false;
+        }
+
+        if ($this->is_ajax()) {
+            return false;
+        }
+
+        return true;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function disableSession()
+    {
+        if (isset($_SESSION)) {
+            if (SessionDisabler::is($_SESSION)) {
+                return $this;
+            }
+
+            if ([] !== $_SESSION) {
+                throw new RuntimeException(
+                    [ 'Unable to disable non-empty $_SESSION' ]
+                );
+            }
+        }
+
+        $sessionDisablerObject = SessionDisabler::new();
+
+        $_SESSION =& $sessionDisablerObject;
+
+        return $this;
     }
 
 
@@ -166,7 +190,10 @@ class HttpModule
     }
 
 
-    public function header(string $header, ?bool $replace = null, ?int $response_code = null) : void
+    /**
+     * @return static
+     */
+    public function header(string $header, ?bool $replace = null, ?int $response_code = null)
     {
         $replace = $replace ?? true;
         $response_code = $response_code ?? 0;
@@ -178,9 +205,14 @@ class HttpModule
                 header($header, $replace, $response_code);
             }
         );
+
+        return $this;
     }
 
-    public function header_remove(?string $name) : void
+    /**
+     * @return static
+     */
+    public function header_remove(?string $name)
     {
         $theFunc = Lib::func();
 
@@ -189,15 +221,20 @@ class HttpModule
                 header_remove($name);
             }
         );
+
+        return $this;
     }
 
 
+    /**
+     * @return static
+     */
     public function setcookie(
         string $name, ?string $value = null,
         $expires_or_options = null,
         ?string $path = null, ?string $domain = null,
         ?bool $secure = null, ?bool $httponly = null
-    ) : void
+    )
     {
         $value = $value ?? '';
         $expires_or_options = $expires_or_options ?? 0;
@@ -215,14 +252,19 @@ class HttpModule
                     : setcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
             }
         );
+
+        return $this;
     }
 
+    /**
+     * @return static
+     */
     public function setrawcookie(
         string $name, ?string $value = null,
         $expires_or_options = null,
         ?string $path = null, ?string $domain = null,
         ?bool $secure = null, ?bool $httponly = null
-    ) : void
+    )
     {
         $value = $value ?? '';
         $expires_or_options = $expires_or_options ?? 0;
@@ -240,6 +282,8 @@ class HttpModule
                     : setrawcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
             }
         );
+
+        return $this;
     }
 
 

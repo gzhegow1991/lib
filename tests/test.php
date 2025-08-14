@@ -38,6 +38,8 @@
     //
     ->usePostMaxSize()
     //
+    ->useSessionSavePath()
+    //
     ->useUploadMaxFilesize()
     ->useUploadTmpDir()
 ;
@@ -3870,17 +3872,7 @@ $fn = function () use ($ffn) {
 
 
     $theHttpSession = \Gzhegow\Lib\Lib::httpSession();
-    // $theHttpSession->disableNativeSession();
-    // $theHttpSession->useNativeSession();
-    // $theHttpSession->withSymfonySession(
-    //     new \Symfony\Component\HttpFoundation\Session\Session(
-    //         new \Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage([],
-    //             new \Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler(
-    //                 __DIR__ . '/var/session',
-    //             )
-    //         ),
-    //     )
-    // );
+    // \Gzhegow\Lib\Lib::http()->disableSession();
 
     $theHttpSession->set('hello', 'world');
     $ffn->print($theHttpSession, $_SESSION ?? []);
@@ -3930,8 +3922,8 @@ $test->expectStdout('
 
 { object # Gzhegow\Lib\Modules\Http\Cookies\DefaultCookies }
 
-{ object # Gzhegow\Lib\Modules\Http\Session\DefaultSession } | [ "hello" => "world" ]
-{ object # Gzhegow\Lib\Modules\Http\Session\DefaultSession } | []
+{ object # Gzhegow\Lib\Modules\Http\Session\SessionSafe\SessionSafeProxy } | [ "hello" => "world" ]
+{ object # Gzhegow\Lib\Modules\Http\Session\SessionSafe\SessionSafeProxy } | []
 
 ###
 []

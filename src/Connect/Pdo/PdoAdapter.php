@@ -83,6 +83,11 @@ class PdoAdapter
     protected $configCollate = 'utf8_unicode_ci';
 
     /**
+     * @var string|null
+     */
+    protected $configTimezone = '+00:00';
+
+    /**
      * @var array
      */
     protected $configUserOptions = [];
@@ -225,6 +230,8 @@ class PdoAdapter
             'charset'          => null,
             'collate'          => null,
             //
+            'timezone'         => null,
+            //
             'user_options'     => null,
             //
             'read'             => null,
@@ -276,6 +283,8 @@ class PdoAdapter
 
         $charset = $from[ 'charset' ];
         $collate = $from[ 'collate' ];
+
+        $timezone = $from[ 'timezone' ];
 
         $userOptions = $from[ 'user_options' ] ?? [];
 
@@ -390,6 +399,12 @@ class PdoAdapter
             }
         }
 
+        if (null !== $timezone) {
+            if (! $theType->string_not_empty($timezone)->isOk([ &$timezone, &$ret ])) {
+                return Ret::throw($fallback, $ret);
+            }
+        }
+
         $instance = new static();
         //
         $instance->configPdo = $pdo;
@@ -410,6 +425,8 @@ class PdoAdapter
         //
         $instance->configCharset = $charset;
         $instance->configCollate = $collate;
+        //
+        $instance->configTimezone = $timezone;
         //
         $instance->configUserOptions = $userOptions;
 
@@ -508,6 +525,8 @@ class PdoAdapter
             'charset'          => $this->configCharset,
             'collate'          => $this->configCollate,
             //
+            'timezone'         => $this->configTimezone,
+            //
             'user_options'     => $this->configUserOptions,
         ];
     }
@@ -535,6 +554,8 @@ class PdoAdapter
             //
             'charset'          => null,
             'collate'          => null,
+            //
+            'timezone'         => null,
             //
             'user_options'     => null,
         ];
@@ -649,6 +670,7 @@ class PdoAdapter
         $configDefault = $this->getConfigDefault();
 
         $configs = [];
+
         foreach ( $this->configReadList as $i => $config ) {
             $configs[ $i ] = []
                 + $config
@@ -710,6 +732,7 @@ class PdoAdapter
         $configDefault = $this->getConfigDefault();
 
         $configs = [];
+
         foreach ( $this->configWriteList as $i => $config ) {
             $configs[ $i ] = []
                 + $config
@@ -1060,13 +1083,13 @@ class PdoAdapter
 
     protected function sqlEnsureTimezoneDriverMysql(\PDO $pdo, array $configValid) : string
     {
-        $database = (string) $configValid[ 'database' ];
+        $timezone = (string) $configValid[ 'timezone' ];
 
         $sql = '';
 
-        if ('' !== $database) {
+        if ('' !== $timezone) {
             $sql = ''
-                . "SET time_zone = '+00:00';";
+                . "SET time_zone = '{$timezone}';";
 
             $sql = rtrim($sql, ';');
         }
