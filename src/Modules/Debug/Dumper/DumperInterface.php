@@ -20,7 +20,7 @@ interface DumperInterface
      */
     public function selectDumper(?string $dumper, ?array $dumperOptions = null);
 
-    public function dumperEcho(...$vars) : void;
+    public function dumperDump(...$vars) : void;
 
 
     public function dp(?array $debugBacktraceOverride, $var, ...$vars) : string;
