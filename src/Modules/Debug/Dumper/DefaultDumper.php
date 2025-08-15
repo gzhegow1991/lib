@@ -26,6 +26,8 @@ class DefaultDumper implements DumperInterface
     const PRINTER_JSON_ENCODE       = 'json_encode';
     const PRINTER_PRINT_R           = 'print_r';
     const PRINTER_SYMFONY           = 'symfony';
+    const PRINTER_SYMFONY_CLI       = 'symfony_cli';
+    const PRINTER_SYMFONY_HTML      = 'symfony_html';
     const PRINTER_VAR_DUMP          = 'var_dump';
     const PRINTER_VAR_DUMP_NATIVE   = 'var_dump_native';
     const PRINTER_VAR_EXPORT        = 'var_export';
@@ -34,6 +36,8 @@ class DefaultDumper implements DumperInterface
         self::PRINTER_JSON_ENCODE       => true,
         self::PRINTER_PRINT_R           => true,
         self::PRINTER_SYMFONY           => true,
+        self::PRINTER_SYMFONY_CLI       => true,
+        self::PRINTER_SYMFONY_HTML      => true,
         self::PRINTER_VAR_DUMP          => true,
         self::PRINTER_VAR_DUMP_NATIVE   => true,
         self::PRINTER_VAR_EXPORT        => true,
@@ -328,7 +332,14 @@ class DefaultDumper implements DumperInterface
 
             case static::PRINTER_SYMFONY:
                 $content = $this->printerPrint_symfony(...$vars);
+                break;
 
+            case static::PRINTER_SYMFONY_CLI:
+                $content = $this->printerPrint_symfony_cli(...$vars);
+                break;
+
+            case static::PRINTER_SYMFONY_HTML:
+                $content = $this->printerPrint_symfony_html(...$vars);
                 break;
 
             case static::PRINTER_VAR_DUMP:
@@ -396,6 +407,15 @@ class DefaultDumper implements DumperInterface
     {
         $thePhp = Lib::php();
 
+        return $thePhp->is_terminal()
+            ? $this->printerPrint_symfony_cli(...$vars)
+            : $this->printerPrint_symfony_html(...$vars);
+    }
+
+    public function printerPrint_symfony_cli(...$vars) : string
+    {
+        $thePhp = Lib::php();
+
         $printerOptions = $this->printerOptions[ $this->printer ] ?? [];
 
         $clonerCasters = $printerOptions[ 'casters' ] ?? null;
@@ -403,13 +423,54 @@ class DefaultDumper implements DumperInterface
             ? $this->getSymfonyCloner()
             : $this->newSymfonyCloner($clonerCasters);
 
-        $isTerminal = $thePhp->is_terminal();
-        $dumper = $isTerminal
-            ? $this->getSymfonyCliDumper()
-            : $this->getSymfonyHtmlDumper();
-
-        $dumper->setColors(true);
+        $dumper = $this->getSymfonyCliDumper();
         $dumper->setOutput([ $this, 'doSymfonyPrinterOutputDumpLine' ]);
+
+        if ($thePhp->is_terminal()) {
+            $dumper->setColors(true);
+        }
+
+        $content = [];
+        foreach ( $vars as $var ) {
+            $h = $this->symfonyOutputLineDumpResource = fopen('php://memory', 'wb');
+
+            $dumper->dump($cloner->cloneVar($var));
+
+            rewind($h);
+
+            $contentVar = stream_get_contents($h);
+
+            fclose($h);
+
+            $contentVar = trim($contentVar);
+
+            $content[] = $contentVar;
+
+            $this->symfonyOutputLineDumpResource = null;
+        }
+
+        $content = implode("\n", $content);
+
+        return $content;
+    }
+
+    public function printerPrint_symfony_html(...$vars) : string
+    {
+        $thePhp = Lib::php();
+
+        $printerOptions = $this->printerOptions[ $this->printer ] ?? [];
+
+        $clonerCasters = $printerOptions[ 'casters' ] ?? null;
+        $cloner = (null === $clonerCasters)
+            ? $this->getSymfonyCloner()
+            : $this->newSymfonyCloner($clonerCasters);
+
+        $dumper = $this->getSymfonyHtmlDumper();
+        $dumper->setOutput([ $this, 'doSymfonyPrinterOutputDumpLine' ]);
+
+        if ($thePhp->is_terminal()) {
+            $dumper->setColors(true);
+        }
 
         $content = [];
         foreach ( $vars as $var ) {
