@@ -31,8 +31,8 @@ use Gzhegow\Lib\Exception\RuntimeException;
  * @method bool session_unset()
  * @method bool session_write_close()
  *
- * @method bool has(string $key, &$refValue = null) : bool
- * @method mixed get(string $key)
+ * @method bool has(string $key, array $refs = [])
+ * @method mixed get(string $key, array $fallback = [])
  * @method self set(string $key, $value)
  * @method self unset(string $key)
  * @method self clear()

@@ -9,10 +9,14 @@ use Gzhegow\Lib\Exception\RuntimeException;
 class SessionSafe
 {
     /**
-     * @param mixed $refValue
+     * @param array{ 0?: mixed } $refs
      */
-    public function has(string $key, &$refValue = null) : bool
+    public function has(string $key, array $refs = []) : bool
     {
+        $withValue = array_key_exists(0, $refs);
+        if ($withValue) {
+            $refValue =& $refs[ 0 ];
+        }
         $refValue = null;
 
         if (array_key_exists($key, $_SESSION)) {
@@ -27,9 +31,13 @@ class SessionSafe
     /**
      * @return mixed
      */
-    public function get(string $key)
+    public function get(string $key, array $fallback = [])
     {
         if (! array_key_exists($key, $_SESSION)) {
+            if ([] !== $fallback) {
+                return $fallback[ 0 ];
+            }
+
             throw new RuntimeException(
                 [ "Missing session key: \$_SESSION[{$key}]", $key ]
             );
