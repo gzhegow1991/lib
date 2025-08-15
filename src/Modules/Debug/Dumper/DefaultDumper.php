@@ -445,11 +445,11 @@ class DefaultDumper implements DumperInterface
                 break;
 
             case '':
-                if ($theHttp->is_api()) {
-                    $dumper->setColors(false);
-
-                } elseif ($thePhp->is_terminal()) {
+                if ($thePhp->is_terminal()) {
                     $dumper->setColors(true);
+
+                } elseif ($theHttp->is_api()) {
+                    $dumper->setColors(false);
                 }
 
                 break;
@@ -520,11 +520,11 @@ class DefaultDumper implements DumperInterface
                 break;
 
             case '':
-                if ($theHttp->is_api()) {
-                    $dumper->setColors(false);
-
-                } elseif ($thePhp->is_terminal()) {
+                if ($thePhp->is_terminal()) {
                     $dumper->setColors(true);
+
+                } elseif ($theHttp->is_api()) {
+                    $dumper->setColors(false);
                 }
 
                 break;
