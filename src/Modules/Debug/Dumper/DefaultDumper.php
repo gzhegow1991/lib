@@ -788,6 +788,8 @@ class DefaultDumper implements DumperInterface
             if (! is_resource($resource)) {
                 $theFsFile = Lib::fsFile();
 
+                $theFsFile->mkdirp(dirname($resource));
+
                 $resource = $theFsFile->fopen($resource, 'wb');
             }
         }
@@ -818,6 +820,8 @@ class DefaultDumper implements DumperInterface
             if (! is_resource($resource)) {
                 $theFsFile = Lib::fsFile();
 
+                $theFsFile->mkdirp(dirname($resource));
+
                 $resource = $theFsFile->fopen($resource, 'wb');
             }
         }
@@ -845,6 +849,8 @@ class DefaultDumper implements DumperInterface
 
             if (! is_resource($resource)) {
                 $theFsFile = Lib::fsFile();
+
+                $theFsFile->mkdirp(dirname($resource));
 
                 $resource = $theFsFile->fopen($resource, 'wb');
             }
