@@ -45,6 +45,9 @@ class DefaultDumper implements DumperInterface
     const DUMPER_ECHO_HTML         = 'echo_html';
     const DUMPER_ECHO_TEXT         = 'echo_text';
     const DUMPER_PDO               = 'pdo';
+    const DUMPER_PDO_DEVTOOLS      = 'pdo_devtools';
+    const DUMPER_PDO_HTML          = 'pdo_html';
+    const DUMPER_PDO_TEXT          = 'pdo_text';
     const DUMPER_RESOURCE          = 'resource';
     const DUMPER_RESOURCE_DEVTOOLS = 'resource_devtools';
     const DUMPER_RESOURCE_HTML     = 'resource_html';
@@ -55,6 +58,9 @@ class DefaultDumper implements DumperInterface
         self::DUMPER_ECHO_HTML         => true,
         self::DUMPER_ECHO_TEXT         => true,
         self::DUMPER_PDO               => true,
+        self::DUMPER_PDO_DEVTOOLS      => true,
+        self::DUMPER_PDO_HTML          => true,
+        self::DUMPER_PDO_TEXT          => true,
         self::DUMPER_RESOURCE          => true,
         self::DUMPER_RESOURCE_DEVTOOLS => true,
         self::DUMPER_RESOURCE_HTML     => true,
