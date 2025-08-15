@@ -14,11 +14,6 @@ class DefaultBacktracer implements BacktracerInterface
     protected $trace;
 
     /**
-     * @var string
-     */
-    protected $dirRoot;
-
-    /**
      * @var int
      */
     protected $options = DEBUG_BACKTRACE_IGNORE_ARGS;
@@ -69,28 +64,13 @@ class DefaultBacktracer implements BacktracerInterface
     /**
      * @return static
      */
-    public function dirRoot(?string $dirRoot)
-    {
-        $theType = Lib::type();
-
-        if (null !== $dirRoot) {
-            $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
-        }
-
-        $this->dirRoot = $dirRootRealpath ?? null;
-
-        return $this;
-    }
-
-
-    /**
-     * @return static
-     */
     public function options(?int $options)
     {
         if (null !== $options) {
-            if ($options < 0) {
-                $options = null;
+            if (0 === ($options & ~(DEBUG_BACKTRACE_PROVIDE_OBJECT | DEBUG_BACKTRACE_IGNORE_ARGS))) {
+                throw new RuntimeException(
+                    [ 'The `options` should be valid `debug_backtrace` options', $options ]
+                );
             }
         }
 
@@ -106,7 +86,9 @@ class DefaultBacktracer implements BacktracerInterface
     {
         if (null !== $limit) {
             if ($limit < 0) {
-                $limit = null;
+                throw new RuntimeException(
+                    [ 'The `limit` should be non-negative int', $limit ]
+                );
             }
         }
 
@@ -452,7 +434,7 @@ class DefaultBacktracer implements BacktracerInterface
         $theDebug = Lib::debug();
         $theFs = Lib::fs();
 
-        $dirRoot = $this->dirRoot ?? $theDebug->staticDirRoot();
+        $dirRoot = $theDebug->staticDirRoot();
         $hasDirRoot = (null !== $dirRoot);
 
         $trace = $this->trace;

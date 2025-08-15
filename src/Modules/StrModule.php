@@ -27,23 +27,33 @@ class StrModule
      */
     protected static $mbstring;
 
-    public static function staticMbstring(?bool $mbstring = null) : bool
+    /**
+     * @param int|false|null $mbstring
+     */
+    public static function staticMbstring($mbstring = null) : bool
     {
         $last = static::$mbstring;
 
         if (null !== $mbstring) {
-            if ($mbstring) {
-                if (! extension_loaded('mbstring')) {
-                    throw new ExtensionException(
-                        'Missing PHP extension: mbstring'
-                    );
-                }
-            }
+            if (false === $mbstring) {
+                static::$mbstring = extension_loaded('mbstring');
 
-            static::$mbstring = $mbstring;
+            } else {
+                $mbstringBool = (bool) $mbstring;
+
+                if ($mbstringBool) {
+                    if (! extension_loaded('mbstring')) {
+                        throw new ExtensionException(
+                            [ 'Missing PHP extension: mbstring' ]
+                        );
+                    }
+                }
+
+                static::$mbstring = $mbstringBool;
+            }
         }
 
-        static::$mbstring = static::$mbstring ?? false;
+        static::$mbstring = static::$mbstring ?? extension_loaded('mbstring');
 
         return $last;
     }
@@ -167,6 +177,8 @@ class StrModule
      * @param callable|callable-string $fn
      *
      * @return callable
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function mb_func(string $fn)
     {
@@ -2688,11 +2700,7 @@ class StrModule
     {
         if (! \function_exists('iconv')) {
             throw new ExtensionException(
-                [
-                    ''
-                    . 'Unable to convert a non-UTF-8 string to UTF-8: required function iconv() does not exist.'
-                    . 'You should install `ext-iconv` or `symfony/polyfill-iconv`',
-                ]
+                [ 'Missing PHP extension: iconv' ]
             );
         }
 

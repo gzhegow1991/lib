@@ -19,7 +19,7 @@ class SocketSafe
     {
         if (! extension_loaded('sockets')) {
             throw new ExtensionException(
-                'Missing PHP extension: sockets'
+                [ 'Missing PHP extension: sockets' ]
             );
         }
     }

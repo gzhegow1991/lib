@@ -13,7 +13,7 @@ class FormatCsv
     {
         if (! extension_loaded('fileinfo')) {
             throw new ExtensionException(
-                'Missing PHP extension: fileinfo'
+                [ 'Missing PHP extension: fileinfo' ]
             );
         }
     }

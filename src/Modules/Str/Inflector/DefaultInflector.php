@@ -49,6 +49,8 @@ class DefaultInflector implements InflectorInterface
      * @param null|object|\Symfony\Component\String\Inflector\InflectorInterface $doctrineInflector
      *
      * @return object
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function withDoctrineInflector(?object $doctrineInflector) : object
     {
@@ -118,6 +120,8 @@ class DefaultInflector implements InflectorInterface
      * @param null|object|\Symfony\Component\String\Inflector\InflectorInterface $symfonyInflector
      *
      * @return object
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function withSymfonyInflector(?object $symfonyInflector) : object
     {
@@ -206,13 +210,6 @@ class DefaultInflector implements InflectorInterface
     }
 
 
-    /**
-     * @param string   $singular
-     * @param null|int $offset
-     * @param null|int $limit
-     *
-     * @return array
-     */
     public function pluralize(string $singular, ?int $limit = null, ?int $offset = null) : array
     {
         $limit = $limit ?? 0;
@@ -262,13 +259,6 @@ class DefaultInflector implements InflectorInterface
         return $result;
     }
 
-    /**
-     * @param string   $plural
-     * @param null|int $offset
-     * @param null|int $limit
-     *
-     * @return null|array
-     */
     public function singularize(string $plural, ?int $limit = null, ?int $offset = null) : array
     {
         $limit = $limit ?? 0;

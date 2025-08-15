@@ -13,6 +13,33 @@ use Gzhegow\Lib\Exception\RuntimeException;
 class Ret
 {
     /**
+     * @var bool
+     */
+    protected static $withTrace = false;
+
+    /**
+     * @param int|false|null $withTrace
+     */
+    public static function staticWithTrace(?bool $withTrace = null) : bool
+    {
+        $last = static::$withTrace;
+
+        if (null !== $withTrace) {
+            if (false === $withTrace) {
+                static::$withTrace = false;
+
+            } else {
+                static::$withTrace = (bool) $withTrace;
+            }
+        }
+
+        static::$withTrace = static::$withTrace ?? false;
+
+        return $last;
+    }
+
+
+    /**
      * @var array{ 0?: T }
      */
     public $value = [];
@@ -24,7 +51,8 @@ class Ret
     /**
      * @var array{
      *     file_line: array{ 0: string, 1: int },
-     *     throwable_args: array
+     *     throwable_args: array,
+     *     trace: array[],
      * }[]
      */
     protected $errorsRaw = [];
@@ -97,7 +125,7 @@ class Ret
             $instance->mergeFrom($throwableArg);
 
             if ([] !== $throwableArgs) {
-                $fileLine = $fileLine ?: Lib::debug()->file_line(2);
+                $fileLine = $fileLine ?: Lib::debug()->file_line();
 
                 $instance->addError(null, $fileLine, ...$throwableArgs);
             }
@@ -159,15 +187,11 @@ class Ret
             $instance->mergeFrom($throwableArg);
 
             if ([] !== $throwableArgs) {
-                $fileLine = $fileLine ?: Lib::debug()->file_line(2);
-
-                $instance->addError(null, $fileLine, ...$throwableArgs);
+                $instance->doAddError(null, $fileLine, ...$throwableArgs);
             }
 
         } else {
-            $fileLine = $fileLine ?: Lib::debug()->file_line(2);
-
-            $instance->addError($throwableArg, $fileLine, ...$throwableArgs);
+            $instance->doAddError(null, $fileLine, $throwableArg, ...$throwableArgs);
         }
 
         if (null === $fallback) {
@@ -223,9 +247,25 @@ class Ret
      */
     public function addError($throwableArg, array $fileLine = [], ...$throwableArgs)
     {
-        array_unshift($throwableArgs, $throwableArg);
+        $this->doAddError(null, $fileLine, $throwableArg, ...$throwableArgs);
 
-        $fileLine = $fileLine ?: Lib::debug()->file_line();
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    protected function doAddError(?array $trace, ?array $fileLine, ...$throwableArgs)
+    {
+        $theDebug = Lib::debug();
+
+        $traceValid = null
+            ?? ($trace ?: null)
+            ?? (static::staticWithTrace() ? $theDebug->trace(2) : null);
+
+        $fileLineValid = null
+            ?? ($fileLine ?: null)
+            ?? $theDebug->file_line(2, $traceValid);
 
         foreach ( $throwableArgs as $i => $throwableArg ) {
             if (null === $throwableArg) {
@@ -233,11 +273,12 @@ class Ret
             }
         }
 
-        $throwableArgs = array_values($throwableArgs);
+        $throwableArgsValid = array_values($throwableArgs);
 
         $this->errorsRaw[] = [
-            'file_line'      => $fileLine,
-            'throwable_args' => $throwableArgs,
+            'file_line'      => $fileLineValid,
+            'throwable_args' => $throwableArgsValid,
+            'trace'          => $traceValid,
         ];
 
         return $this;
@@ -285,52 +326,6 @@ class Ret
 
     /**
      * @param array{
-     *     0: T,
-     *     1: static<T>,
-     * } $refs
-     */
-    public function isOk(array $refs = []) : bool
-    {
-        if (array_key_exists(0, $refs)) $refValue =& $refs[ 0 ];
-        if (array_key_exists(1, $refs)) $refRet =& $refs[ 1 ];
-        $refValue = null;
-        $refRet = $this;
-
-        if ([] !== $this->value) {
-            $refValue = $this->value[ 0 ];
-
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param array{
-     *     0: \stdClass[],
-     *     1: static<T>,
-     * } $refs
-     */
-    public function isFail(array $refs = []) : bool
-    {
-        if (array_key_exists(0, $refs)) $refErrors =& $refs[ 0 ];
-        if (array_key_exists(1, $refs)) $refRet =& $refs[ 1 ];
-        $refErrors = [];
-        $refRet = $this;
-
-        if ([] !== $this->errorsRaw) {
-            $refErrors = $this->fetchErrors();
-        }
-
-        if ([] === $this->value) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * @param array{
      *     0: \stdClass[],
      *     1: static<T>,
      * } $refs
@@ -351,6 +346,84 @@ class Ret
         return false;
     }
 
+    /**
+     * @param array{
+     *     0: T,
+     *     1: static<T>,
+     * } $refs
+     */
+    public function isOk(array $refs = []) : bool
+    {
+        if (array_key_exists(0, $refs)) $refValue =& $refs[ 0 ];
+        if (array_key_exists(1, $refs)) $refRet =& $refs[ 1 ];
+        $refValue = null;
+        $refRet = $this;
+
+        if ([] !== $this->value) {
+            $refValue = $this->value[ 0 ];
+
+            return true;
+        }
+
+        return false;
+    }
+
+
+    /**
+     * @param array{
+     *     0: \stdClass[],
+     *     1: static<T>,
+     * } $refs
+     */
+    public function isFail(array $refs = []) : bool
+    {
+        if (array_key_exists(0, $refs)) $refErrors =& $refs[ 0 ];
+        if (array_key_exists(1, $refs)) $refRet =& $refs[ 1 ];
+        $refErrors = [];
+        $refRet = $this;
+
+        if ([] === $this->errorsRaw) {
+            return false;
+        }
+
+        if ([] !== $this->value) {
+            return false;
+        }
+
+        $refErrors = $this->fetchErrors();
+
+        return true;
+    }
+
+    /**
+     * @param array{
+     *     0: T,
+     *     1: \stdClass[],
+     *     2: static<T>,
+     * } $refs
+     */
+    public function isWarn(array $refs = []) : bool
+    {
+        if (array_key_exists(0, $refs)) $refValue =& $refs[ 0 ];
+        if (array_key_exists(1, $refs)) $refErrors =& $refs[ 1 ];
+        if (array_key_exists(2, $refs)) $refRet =& $refs[ 2 ];
+        $refErrors = [];
+        $refRet = $this;
+
+        if ([] === $this->errorsRaw) {
+            return false;
+        }
+
+        if ([] === $this->value) {
+            return false;
+        }
+
+        $refValue = $this->value[ 0 ];
+        $refErrors = $this->fetchErrors();
+
+        return true;
+    }
+
 
     /**
      * @return T
@@ -362,22 +435,7 @@ class Ret
         }
 
         if (null !== $throwableArg) {
-            array_unshift($throwableArgs, $throwableArg);
-
-            $fileLine = $fileLine ?? Lib::debug()->file_line();
-
-            foreach ( $throwableArgs as $i => $throwableArg ) {
-                if (null === $throwableArg) {
-                    unset($throwableArgs[ $i ]);
-                }
-            }
-
-            $throwableArgs = array_values($throwableArgs);
-
-            $this->errorsRaw[] = [
-                'file_line'      => $fileLine,
-                'throwable_args' => $throwableArgs,
-            ];
+            $this->doAddError(null, $fileLine, $throwableArg, ...$throwableArgs);
         }
 
         $this->throwErrors();
@@ -399,22 +457,7 @@ class Ret
         }
 
         if (null !== $throwableArg) {
-            array_unshift($throwableArgs, $throwableArg);
-
-            $fileLine = $fileLine ?? Lib::debug()->file_line();
-
-            foreach ( $throwableArgs as $i => $throwableArg ) {
-                if (null === $throwableArg) {
-                    unset($throwableArgs[ $i ]);
-                }
-            }
-
-            $throwableArgs = array_values($throwableArgs);
-
-            $this->errorsRaw[] = [
-                'file_line'      => $fileLine,
-                'throwable_args' => $throwableArgs,
-            ];
+            $this->doAddError(null, $fileLine, $throwableArg, ...$throwableArgs);
         }
 
         $this->throwErrors();
@@ -552,6 +595,7 @@ class Ret
                     [
                         'file_line'      => $fileLine,
                         'throwable_args' => $throwableArgs,
+                        // 'trace'          => $trace,
                     ] = current($errorsQueue);
 
                     $throwableArgsArray = $thePhp->throwable_args($fileLine, ...$throwableArgs);
@@ -588,9 +632,15 @@ class Ret
             [
                 'file_line'      => $fileLine,
                 'throwable_args' => $throwableArgs,
+                'trace'          => $trace,
             ] = array_pop($errorsQueue);
 
-            $previousList[] = new LogicException($fileLine, ...$throwableArgs);
+            $previous = new LogicException(...$throwableArgs);
+            $previous->setFile($fileLine[ 0 ]);
+            $previous->setLine($fileLine[ 1 ]);
+            $previous->setTrace($trace);
+
+            $previousList[] = $previous;
         }
 
         throw new LogicException(...$previousList);

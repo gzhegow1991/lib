@@ -143,7 +143,7 @@ class DefaultDumper implements DumperInterface
     /**
      * @return \Symfony\Component\VarDumper\Cloner\ClonerInterface
      */
-    public function newSymfonyCloner(...$args) : object
+    public function newSymfonyCloner(array $options = []) : object
     {
         $commands = [
             'composer require symfony/var-dumper',
@@ -155,6 +155,14 @@ class DefaultDumper implements DumperInterface
                 . 'Please, run following commands: '
                 . '[ ' . implode(' ][ ', $commands) . ' ]',
             ]);
+        }
+
+        $clonerCasters = $options[ 'casters' ] ?? [];
+
+        $args = [];
+
+        if ([] !== $clonerCasters) {
+            $args[] = $clonerCasters;
         }
 
         return new $symfonyClonerClass(...$args);
@@ -406,21 +414,52 @@ class DefaultDumper implements DumperInterface
 
     public function printerPrint_symfony_cli(...$vars) : string
     {
+        $theHttp = Lib::http();
         $thePhp = Lib::php();
 
         $printerOptions = $this->printerOptions[ $this->printer ] ?? [];
 
         $clonerCasters = $printerOptions[ 'casters' ] ?? null;
-        $cloner = (null === $clonerCasters)
+        $dumperColors = $printerOptions[ 'colors' ] ?? null;
+
+        $cloner = (null !== $clonerCasters)
             ? $this->getSymfonyCloner()
-            : $this->newSymfonyCloner($clonerCasters);
+            : $this->newSymfonyCloner([ 'casters' => $clonerCasters ]);
 
         $dumper = $this->getSymfonyCliDumper();
-        $dumper->setOutput([ $this, 'doSymfonyPrinterOutputDumpLine' ]);
 
-        if ($thePhp->is_terminal()) {
-            $dumper->setColors(true);
-        }
+        $fnDumperOutput = [ $this, 'doSymfonyPrinterOutputDumpLine' ];
+        $dumper->setOutput($fnDumperOutput);
+
+        switch ( (string) $dumperColors ):
+            case '0':
+                // > no action
+                break;
+
+            case '1':
+                $dumper->setColors(true);
+                break;
+
+            case '-1':
+                $dumper->setColors(false);
+                break;
+
+            case '':
+                if ($theHttp->is_api()) {
+                    $dumper->setColors(false);
+
+                } elseif ($thePhp->is_terminal()) {
+                    $dumper->setColors(true);
+                }
+
+                break;
+
+            default:
+                throw new RuntimeException(
+                    [ 'The `options[colors]` is unknown', $dumperColors ]
+                );
+
+        endswitch;
 
         $content = [];
         foreach ( $vars as $var ) {
@@ -448,21 +487,54 @@ class DefaultDumper implements DumperInterface
 
     public function printerPrint_symfony_html(...$vars) : string
     {
+        $theHttp = Lib::http();
         $thePhp = Lib::php();
 
         $printerOptions = $this->printerOptions[ $this->printer ] ?? [];
 
         $clonerCasters = $printerOptions[ 'casters' ] ?? null;
-        $cloner = (null === $clonerCasters)
+        $dumperColors = $printerOptions[ 'colors' ] ?? null;
+
+        $cloner = (null !== $clonerCasters)
             ? $this->getSymfonyCloner()
-            : $this->newSymfonyCloner($clonerCasters);
+            : $this->newSymfonyCloner([
+                'casters' => $clonerCasters,
+            ]);
 
         $dumper = $this->getSymfonyHtmlDumper();
-        $dumper->setOutput([ $this, 'doSymfonyPrinterOutputDumpLine' ]);
 
-        if ($thePhp->is_terminal()) {
-            $dumper->setColors(true);
-        }
+        $fnDumperOutput = [ $this, 'doSymfonyPrinterOutputDumpLine' ];
+        $dumper->setOutput($fnDumperOutput);
+
+        switch ( (string) $dumperColors ):
+            case '0':
+                // > no action
+                break;
+
+            case '1':
+                $dumper->setColors(true);
+                break;
+
+            case '-1':
+                $dumper->setColors(false);
+                break;
+
+            case '':
+                if ($theHttp->is_api()) {
+                    $dumper->setColors(false);
+
+                } elseif ($thePhp->is_terminal()) {
+                    $dumper->setColors(true);
+                }
+
+                break;
+
+            default:
+                throw new RuntimeException(
+                    [ 'The `options[colors]` is unknown', $dumperColors ]
+                );
+
+        endswitch;
 
         $content = [];
         foreach ( $vars as $var ) {

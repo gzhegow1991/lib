@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Modules\Arr\Map\Map;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
@@ -84,11 +85,13 @@ class EntrypointModule
         'uploadTmpDir'         => null,
         'uploadTmpDirMkdir'    => null,
     ];
+
     /**
      * @var array<string, mixed>
      */
     protected $mapWasSet = [
         'dirRoot'              => false,
+        'retTrace'             => false,
         //
         'errorHandler'         => false,
         'exceptionHandler'     => false,
@@ -122,9 +125,13 @@ class EntrypointModule
     ];
 
     /**
-     * @var string
+     * @var array{ 0?: string }
      */
     protected $dirRoot = [];
+    /**
+     * @var array{ 0?: bool }
+     */
+    protected $retTrace = [];
 
     /**
      * @var array{ 0?: callable|null }
@@ -364,7 +371,7 @@ class EntrypointModule
     /**
      * > частично удаляет путь файла из каждой строки `trace` (`trace[i][file]`) при обработке исключений
      *
-     * @param string|bool|false $dirRoot
+     * @param string|false|null $dirRoot
      *
      * @return static
      */
@@ -384,11 +391,8 @@ class EntrypointModule
             $this->mapWasSet[ $key ] = true;
         }
 
-        if (null === $var) {
-            $this->{$key} = [ $this->mapRecommended[ 'dirRoot' ] ];
-
-        } elseif (false === $var) {
-            $this->{$key} = [ $this->mapInitial[ 'dirRoot' ] ];
+        if (! $var) {
+            $this->{$key} = [ null ];
 
         } else {
             $theType = Lib::type();
@@ -396,6 +400,57 @@ class EntrypointModule
             $varValid = $theType->dirpath_realpath($var)->orThrow();
 
             $this->{$key} = [ $varValid ];
+        }
+
+        [ $current ] = $this->{$key};
+
+        if (null !== $current) {
+            DebugModule::staticDirRoot($dirRoot);
+        }
+
+        return $this;
+    }
+
+
+    public function isRetTrace() : bool
+    {
+        return $this->retTrace[ 0 ] ?? false;
+    }
+
+    /**
+     * > собирает трейсы при добавлении каждой ошибки для отлова пути, где она произошла
+     *
+     * @param bool|null $retTrace
+     *
+     * @return static
+     */
+    public function setRetTrace($retTrace, ?bool $replace = null)
+    {
+        $this->assertNotLocked();
+
+        $key = 'retTrace';
+        $var = $retTrace;
+
+        if (false !== $this->mapWasSet[ $key ]) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapWasSet[ $key ] = true;
+        }
+
+        if (null === $var) {
+            $this->{$key} = [ false ];
+
+        } else {
+            $this->{$key} = [ (bool) $retTrace ];
+        }
+
+        [ $current ] = $this->{$key};
+
+        if (null !== $current) {
+            Ret::staticWithTrace($current);
         }
 
         return $this;
@@ -1747,12 +1802,7 @@ class EntrypointModule
 
     public function fnExceptionHandler(\Throwable $throwable) : void
     {
-        $theDebug = Lib::debug();
-        $theDebugThrowabler = $theDebug->throwabler();
-
-        if ($this->hasDirRoot($refDirRoot)) {
-            $theDebugThrowabler->setDirRoot($refDirRoot);
-        }
+        $theDebugThrowabler = Lib::debugThrowabler();
 
         $lines = $theDebugThrowabler->getPreviousMessagesAllLines(
             $throwable,

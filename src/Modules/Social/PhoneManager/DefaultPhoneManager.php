@@ -528,6 +528,8 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
     /**
      * @return object|\libphonenumber\PhoneNumber
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function parsePhoneNumber(
         $value, ?string $region = '',

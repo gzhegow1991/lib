@@ -13,7 +13,7 @@ class MbModule
     {
         if (! extension_loaded('mbstring')) {
             throw new ExtensionException(
-                'Missing PHP extension: mbstring'
+                [ 'Missing PHP extension: mbstring' ]
             );
         }
     }

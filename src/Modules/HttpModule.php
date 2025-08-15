@@ -22,25 +22,56 @@ class HttpModule
     protected static $cookiesClass = DefaultCookies::class;
 
     /**
-     * @param class-string<CookiesInterface>|null $cookiesClass
+     * @var bool
+     */
+    protected static $isApi = null;
+
+    /**
+     * @param class-string<CookiesInterface>|false|null $cookiesClass
      *
      * @return class-string<CookiesInterface>
      */
-    public static function staticCookiesClass(?string $cookiesClass = null) : string
+    public static function staticCookiesClass($cookiesClass = null) : string
     {
         $last = static::$cookiesClass;
 
         if (null !== $cookiesClass) {
-            if (! is_subclass_of($cookiesClass, CookiesInterface::class)) {
-                throw new LogicException(
-                    [ 'The `cookiesClass` should be subclass of: ' . CookiesInterface::class, $cookiesClass ]
-                );
-            }
+            if (false === $cookiesClass) {
+                static::$cookiesClass = DefaultCookies::class;
 
-            static::$cookiesClass = $cookiesClass;
+            } else {
+                if (! is_subclass_of($cookiesClass, CookiesInterface::class)) {
+                    throw new LogicException(
+                        [ 'The `cookiesClass` should be subclass of: ' . CookiesInterface::class, $cookiesClass ]
+                    );
+                }
+
+                static::$cookiesClass = $cookiesClass;
+            }
         }
 
         static::$cookiesClass = static::$cookiesClass ?? DefaultCookies::class;
+
+        return $last;
+    }
+
+    /**
+     * @param int|false|null $isApi
+     */
+    public static function staticIsApi($isApi = null) : ?bool
+    {
+        $last = static::$isApi;
+
+        if (null !== $isApi) {
+            if (false === $isApi) {
+                static::$isApi = null;
+
+            } else {
+                static::$isApi = (bool) $isApi;
+            }
+        }
+
+        static::$isApi = static::$isApi ?? null;
 
         return $last;
     }
@@ -111,15 +142,19 @@ class HttpModule
 
         $serverXRequestedWith = $_SERVER[ 'HTTP_X_REQUESTED_WITH' ] ?? null;
         $serverXRequestedWith = (string) $serverXRequestedWith;
-        $serverXRequestedWith = strtolower($serverXRequestedWith);
-        $serverXRequestedWith = $serverXRequestedWith ?: null;
+        if ('' === $serverXRequestedWith) {
+            return false;
+        }
 
-        $isAjax = ('xmlhttprequest' === $serverXRequestedWith);
+        $isAjax = ('xmlhttprequest' === strtolower($serverXRequestedWith));
+        if (! $isAjax) {
+            return false;
+        }
 
-        return $isAjax;
+        return true;
     }
 
-    public function is_web() : bool
+    public function is_api() : bool
     {
         $thePhp = Lib::php();
 
@@ -127,11 +162,37 @@ class HttpModule
             return false;
         }
 
-        if ($this->is_ajax()) {
+        $isApi = static::staticIsApi();
+        if (true === $isApi) {
+            return true;
+
+        } elseif (false === $isApi) {
             return false;
         }
 
-        return true;
+        if (! headers_sent()) {
+            return false;
+        }
+
+        $headersConcat = '[ ' . implode(' ][', headers_list()) . ' ]';
+
+        $isHeadersSentAndContentTypeIsHtml = (false
+            || (false !== stripos($headersConcat, '[ Content-Type: application/html'))
+            || (false !== stripos($headersConcat, '[ Content-Type: application/x-httpd-php'))
+            || (false !== stripos($headersConcat, '[ Content-Type: application/x-php'))
+            || (false !== stripos($headersConcat, '[ Content-Type: application/xhtml+xml'))
+            || (false !== stripos($headersConcat, '[ Content-Type: text/html'))
+            || (false !== stripos($headersConcat, '[ Content-Type: text/x-server-parsed-html'))
+            || (false !== stripos($headersConcat, '[ Content-Type: text/xhtml'))
+        );
+
+        static::staticIsApi(! $isHeadersSentAndContentTypeIsHtml);
+
+        if (! $isHeadersSentAndContentTypeIsHtml) {
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -201,7 +262,7 @@ class HttpModule
         $theFunc = Lib::func();
 
         $theFunc->safe_call(
-            function () use ($header, $replace, $response_code) {
+            static function () use ($header, $replace, $response_code) {
                 header($header, $replace, $response_code);
             }
         );
@@ -217,7 +278,7 @@ class HttpModule
         $theFunc = Lib::func();
 
         $theFunc->safe_call(
-            function () use ($name) {
+            static function () use ($name) {
                 header_remove($name);
             }
         );
@@ -246,7 +307,7 @@ class HttpModule
         $theFunc = Lib::func();
 
         $theFunc->safe_call(
-            function () use ($name, $value, $expires_or_options, $path, $domain, $secure, $httponly) {
+            static function () use ($name, $value, $expires_or_options, $path, $domain, $secure, $httponly) {
                 is_array($expires_or_options)
                     ? setcookie($name, $value, $expires_or_options)
                     : setcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
@@ -276,7 +337,7 @@ class HttpModule
         $theFunc = Lib::func();
 
         $theFunc->safe_call(
-            function () use ($name, $value, $expires_or_options, $path, $domain, $secure, $httponly) {
+            static function () use ($name, $value, $expires_or_options, $path, $domain, $secure, $httponly) {
                 is_array($expires_or_options)
                     ? setrawcookie($name, $value, $expires_or_options)
                     : setrawcookie($name, $value, $expires_or_options, $path, $domain, $secure, $httponly);
@@ -414,7 +475,7 @@ class HttpModule
     {
         if (! extension_loaded('intl')) {
             throw new ExtensionException(
-                'Missing PHP extension: intl'
+                [ 'Missing PHP extension: intl' ]
             );
         }
 
@@ -439,7 +500,7 @@ class HttpModule
     {
         if (! extension_loaded('intl')) {
             throw new ExtensionException(
-                'Missing PHP extension: intl'
+                [ 'Missing PHP extension: intl' ]
             );
         }
 

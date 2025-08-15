@@ -8,7 +8,7 @@ use Gzhegow\Lib\Exception\Interfaces\HasMessageListInterface;
 /**
  * @mixin \Throwable
  *
- * @mixin HasMessageListInterface
+ * @see HasMessageListInterface
  */
 trait HasMessageListTrait
 {

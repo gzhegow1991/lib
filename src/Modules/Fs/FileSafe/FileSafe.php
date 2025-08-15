@@ -19,7 +19,7 @@ class FileSafe
     {
         if (! extension_loaded('fileinfo')) {
             throw new ExtensionException(
-                'Missing PHP extension: fileinfo'
+                [ 'Missing PHP extension: fileinfo' ]
             );
         }
 
@@ -680,6 +680,9 @@ class FileSafe
 
         $size = fpassthru($resource);
 
+        /**
+         * @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection
+         */
         if (false === $size) {
             return false;
         }
@@ -2096,6 +2099,9 @@ class FileSafe
 
         $size = fpassthru($fh);
 
+        /**
+         * @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection
+         */
         if (false === $size) {
             return false;
         }
@@ -2135,6 +2141,9 @@ class FileSafe
 
         $size = fpassthru($resource);
 
+        /**
+         * @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection
+         */
         if (false === $size) {
             return false;
         }

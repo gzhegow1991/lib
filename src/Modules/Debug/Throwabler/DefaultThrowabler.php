@@ -6,45 +6,25 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\Iterator\ExceptionIterator;
 use Gzhegow\Lib\Exception\Interfaces\HasMessageListInterface;
+use Gzhegow\Lib\Exception\Interfaces\HasTraceOverrideInterface;
 use Gzhegow\Lib\Exception\Iterator\PHP7\ExceptionIterator as ExceptionIteratorPHP7;
 
 
 class DefaultThrowabler implements ThrowablerInterface
 {
     /**
-     * @var string
-     */
-    protected $dirRoot;
-
-
-    /**
-     * @return static
-     */
-    public function setDirRoot(?string $dirRoot)
-    {
-        $theType = Lib::type();
-
-        if (null !== $dirRoot) {
-            $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
-        }
-
-        $this->dirRoot = $dirRootRealpath ?? null;
-
-        return $this;
-    }
-
-
-    /**
      * @template-covariant T of \Throwable
      *
-     * @param \Throwable      $throwable
-     * @param class-string<T> $throwableClass
+     * @param \Throwable           $throwable
+     * @param class-string<T>|null $throwableClass
      *
      * @return T|null
+     *
+     * @noinspection PhpDocSignatureInspection
      */
-    public function catchPrevious(\Throwable $throwable, string $throwableClass = '') : ?\Throwable
+    public function catchPrevious(\Throwable $throwable, ?string $throwableClass = null) : ?\Throwable
     {
-        if ('' === $throwableClass) {
+        if (null === $throwableClass) {
             return $throwable;
         }
 
@@ -424,7 +404,7 @@ class DefaultThrowabler implements ThrowablerInterface
             $eFile = '{file}';
 
         } else {
-            $dirRoot = $this->dirRoot ?? $theDebug->staticDirRoot();
+            $dirRoot = $theDebug->staticDirRoot();
 
             if (null !== $dirRoot) {
                 try {
@@ -480,7 +460,7 @@ class DefaultThrowabler implements ThrowablerInterface
                 $eFile = '{file}';
 
             } else {
-                $dirRoot = $this->dirRoot ?? $theDebug->staticDirRoot();
+                $dirRoot = $theDebug->staticDirRoot();
 
                 if (null !== $dirRoot) {
                     try {
@@ -534,9 +514,11 @@ class DefaultThrowabler implements ThrowablerInterface
         $theDebug = Lib::debug();
         $theFs = Lib::fs();
 
-        $eTrace = $e->getTrace();
+        $eTrace = $e instanceof HasTraceOverrideInterface
+            ? $e->getTraceOverride()
+            : $e->getTrace();
 
-        $dirRoot = $this->dirRoot ?? $theDebug->staticDirRoot();
+        $dirRoot = $theDebug->staticDirRoot();
 
         if (null !== $dirRoot) {
             foreach ( $eTrace as $i => $t ) {

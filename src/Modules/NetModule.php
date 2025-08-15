@@ -18,7 +18,7 @@ class NetModule
     {
         if (! extension_loaded('filter')) {
             throw new ExtensionException(
-                'Missing PHP extension: filter'
+                [ 'Missing PHP extension: filter' ]
             );
         }
     }

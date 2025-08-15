@@ -489,6 +489,8 @@ class GenericCallable implements
 
     /**
      * @return callable|object
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function getInvokableObject() : object
     {
@@ -542,7 +544,9 @@ class GenericCallable implements
     }
 
     /**
-     * @return callable|string
+     * @return callable|callable-string|string
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function getFunctionStringInternal() : string
     {
@@ -566,7 +570,9 @@ class GenericCallable implements
     }
 
     /**
-     * @return callable|string
+     * @return callable|callable-string|string
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function getFunctionStringNonInternal() : string
     {

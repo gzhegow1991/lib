@@ -1750,6 +1750,8 @@ class DateModule
      * @param class-string<T>|null $intervalClass
      *
      * @return T
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function interval_decode(string $duration, ?string $intervalClass = null) : \DateInterval
     {

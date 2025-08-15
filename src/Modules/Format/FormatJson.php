@@ -23,18 +23,26 @@ class FormatJson
      */
     protected static $jsonDecodeFlags = 0;
 
-    public static function staticJsonDepth(?int $jsonDepth = null) : int
+    /**
+     * @param int|false|null $jsonDepth
+     */
+    public static function staticJsonDepth($jsonDepth = null) : int
     {
         $last = static::$jsonDepth;
 
         if (null !== $jsonDepth) {
-            if ($jsonDepth < 0) {
-                throw new LogicException(
-                    [ 'The `jsonDepth` should be a non-negative integer', $jsonDepth ]
-                );
-            }
+            if (false === $jsonDepth) {
+                static::$jsonDepth = 512;
 
-            static::$jsonDepth = $jsonDepth;
+            } else {
+                if ($jsonDepth < 0) {
+                    throw new LogicException(
+                        [ 'The `jsonDepth` should be a non-negative integer', $jsonDepth ]
+                    );
+                }
+
+                static::$jsonDepth = $jsonDepth;
+            }
         }
 
         static::$jsonDepth = static::$jsonDepth ?? 512;
@@ -42,18 +50,26 @@ class FormatJson
         return $last;
     }
 
-    public static function staticJsonEncodeFlags(?int $jsonEncodeFlags = null) : int
+    /**
+     * @param int|false|null $jsonEncodeFlags
+     */
+    public static function staticJsonEncodeFlags($jsonEncodeFlags = null) : int
     {
         $last = static::$jsonEncodeFlags;
 
         if (null !== $jsonEncodeFlags) {
-            if ($jsonEncodeFlags < 0) {
-                throw new LogicException(
-                    [ 'The `jsonEncodeFlags` should be a non-negative integer', $jsonEncodeFlags ]
-                );
-            }
+            if (false === $jsonEncodeFlags) {
+                static::$jsonEncodeFlags = 0;
 
-            static::$jsonEncodeFlags = $jsonEncodeFlags;
+            } else {
+                if ($jsonEncodeFlags < 0) {
+                    throw new LogicException(
+                        [ 'The `jsonEncodeFlags` should be a non-negative integer', $jsonEncodeFlags ]
+                    );
+                }
+
+                static::$jsonEncodeFlags = $jsonEncodeFlags;
+            }
         }
 
         static::$jsonEncodeFlags = static::$jsonEncodeFlags ?? 0;
@@ -61,18 +77,26 @@ class FormatJson
         return $last;
     }
 
-    public static function staticJsonDecodeFlags(?int $jsonDecodeFlags = null) : int
+    /**
+     * @param int|false|null $jsonDecodeFlags
+     */
+    public static function staticJsonDecodeFlags($jsonDecodeFlags = null) : int
     {
         $last = static::$jsonDecodeFlags;
 
         if (null !== $jsonDecodeFlags) {
-            if ($jsonDecodeFlags < 0) {
-                throw new LogicException(
-                    [ 'The `jsonDecodeFlags` should be a non-negative integer', $jsonDecodeFlags ]
-                );
-            }
+            if (false === $jsonDecodeFlags) {
+                static::$jsonDecodeFlags = 0;
 
-            static::$jsonDecodeFlags = $jsonDecodeFlags;
+            } else {
+                if ($jsonDecodeFlags < 0) {
+                    throw new LogicException(
+                        [ 'The `jsonDecodeFlags` should be a non-negative integer', $jsonDecodeFlags ]
+                    );
+                }
+
+                static::$jsonDecodeFlags = $jsonDecodeFlags;
+            }
         }
 
         static::$jsonDecodeFlags = static::$jsonDecodeFlags ?? 0;
@@ -85,7 +109,7 @@ class FormatJson
     {
         if (! extension_loaded('json')) {
             throw new ExtensionException(
-                'Missing PHP extension: json'
+                [ 'Missing PHP extension: json' ]
             );
         }
     }

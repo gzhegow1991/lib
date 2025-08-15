@@ -13,12 +13,6 @@ interface BacktracerInterface
     /**
      * @return static
      */
-    public function dirRoot(?string $dirRoot);
-
-
-    /**
-     * @return static
-     */
     public function options(?int $options);
 
     /**

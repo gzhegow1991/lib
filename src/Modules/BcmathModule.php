@@ -18,18 +18,26 @@ class BcmathModule
      */
     protected static $scaleLimit = 16;
 
-    public static function staticScaleLimit(?int $scaleLimit = null) : int
+    /**
+     * @param int|false|null $scaleLimit
+     */
+    public static function staticScaleLimit($scaleLimit = null) : int
     {
         $last = static::$scaleLimit;
 
         if (null !== $scaleLimit) {
-            if ($scaleLimit < 0) {
-                throw new LogicException(
-                    [ 'The `scaleLimit` should be a non-negative integer', $scaleLimit ]
-                );
-            }
+            if (false === $scaleLimit) {
+                static::$scaleLimit = 16;
 
-            static::$scaleLimit = $scaleLimit;
+            } else {
+                if ($scaleLimit < 0) {
+                    throw new LogicException(
+                        [ 'The `scaleLimit` should be a non-negative integer', $scaleLimit ]
+                    );
+                }
+
+                static::$scaleLimit = $scaleLimit;
+            }
         }
 
         static::$scaleLimit = static::$scaleLimit ?? 16;
@@ -42,7 +50,7 @@ class BcmathModule
     {
         if (! extension_loaded('bcmath')) {
             throw new ExtensionException(
-                'Missing PHP extension: bcmath'
+                [ 'Missing PHP extension: bcmath' ]
             );
         }
     }

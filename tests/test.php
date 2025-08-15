@@ -22,6 +22,9 @@
     // ->getDirRoot()
     ->setDirRoot(__DIR__ . '/..')
     //
+    // ->isRetTrace()
+    ->setRetTrace(false)
+    //
     ->useErrorHandler()
     ->useExceptionHandler()
     //
@@ -320,7 +323,6 @@ $test->expectStdout('
 $test->expectSecondsMin(1.2);
 $test->expectSecondsMax(1.3);
 $test->run();
-
 
 
 // // >>> TEST

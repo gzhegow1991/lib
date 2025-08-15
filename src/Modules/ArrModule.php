@@ -16,12 +16,18 @@ class ArrModule
      */
     protected static $fnMode = _ARR_FN_USE_VALUE;
 
-    public static function staticFnMode(?int $fnMode = null) : ?int
+    /**
+     * @param int|false|null $fnMode
+     */
+    public static function staticFnMode($fnMode = null) : ?int
     {
         $last = static::$fnMode;
 
         if (null !== $fnMode) {
-            if ($fnMode) {
+            if (false === $fnMode) {
+                static::$fnMode = _ARR_FN_USE_VALUE;
+
+            } else {
                 if (0 === ($fnMode & ~_ARR_FN_USE_ALL)) {
                     throw new LogicException(
                         [
@@ -32,9 +38,9 @@ class ArrModule
                         ]
                     );
                 }
-            }
 
-            static::$fnMode = $fnMode;
+                static::$fnMode = $fnMode;
+            }
         }
 
         static::$fnMode = static::$fnMode ?? _ARR_FN_USE_VALUE;

@@ -5,12 +5,6 @@ namespace Gzhegow\Lib\Modules\Debug\Throwabler;
 interface ThrowablerInterface
 {
     /**
-     * @return static
-     */
-    public function setDirRoot(?string $dirRoot);
-
-
-    /**
      * @return array<string, \Throwable>
      */
     public function getPreviousArray(\Throwable $throwable) : array;
@@ -55,6 +49,8 @@ interface ThrowablerInterface
      * @param class-string<T> $throwableClass
      *
      * @return T|null
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function catchPrevious(\Throwable $throwable, string $throwableClass = '') : ?\Throwable;
 

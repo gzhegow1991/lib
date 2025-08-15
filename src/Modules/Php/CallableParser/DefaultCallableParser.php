@@ -834,6 +834,8 @@ class DefaultCallableParser implements CallableParserInterface
 
     /**
      * @return callable|callable-string|null
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     protected function parseFunction($value) : ?string
     {
@@ -851,6 +853,8 @@ class DefaultCallableParser implements CallableParserInterface
 
     /**
      * @return array{ 0: object, 1: class-string, 2: null, 3: string }
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     protected function parseMethodArrayFromObject($value) : ?array
     {
@@ -874,6 +878,8 @@ class DefaultCallableParser implements CallableParserInterface
 
     /**
      * @return array{ 0: object|null, 1: class-string, 2: string, 3: string|null }
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     protected function parseMethodArrayFromArray($value) : ?array
     {
@@ -924,6 +930,8 @@ class DefaultCallableParser implements CallableParserInterface
 
     /**
      * @return array{ 0: null, 1: class-string, 2: string|null, 3: string|null }
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     protected function parseMethodArrayFromString($value) : ?array
     {

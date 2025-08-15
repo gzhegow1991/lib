@@ -63,7 +63,7 @@ class FilesystemFetchApi implements FetchApiInterface
     {
         if (! extension_loaded('curl')) {
             throw new ExtensionException(
-                'Missing PHP extension: curl'
+                [ 'Missing PHP extension: curl' ]
             );
         }
 

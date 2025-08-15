@@ -9,8 +9,8 @@ use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper;
 use Gzhegow\Lib\Modules\Debug\Dumper\DumperInterface;
 use Gzhegow\Lib\Modules\Debug\Throwabler\DefaultThrowabler;
-use Gzhegow\Lib\Modules\Debug\Throwabler\ThrowablerInterface;
 use Gzhegow\Lib\Modules\Debug\Backtracer\DefaultBacktracer;
+use Gzhegow\Lib\Modules\Debug\Throwabler\ThrowablerInterface;
 use Gzhegow\Lib\Modules\Debug\Backtracer\BacktracerInterface;
 
 
@@ -25,16 +25,24 @@ class DebugModule
      */
     protected static $varDumpOptions = [];
 
-    public static function staticDirRoot(?string $dirRoot = null) : ?string
+    /**
+     * @param string|false|null $dirRoot
+     */
+    public static function staticDirRoot($dirRoot = null) : ?string
     {
         $last = static::$dirRoot;
 
         if (null !== $dirRoot) {
-            $theType = Lib::type();
+            if (false === $dirRoot) {
+                static::$dirRoot = null;
 
-            $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
+            } else {
+                $theType = Lib::type();
 
-            static::$dirRoot = $dirRootRealpath;
+                $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
+
+                static::$dirRoot = $dirRootRealpath;
+            }
         }
 
         static::$dirRoot = static::$dirRoot ?? null;
@@ -42,12 +50,20 @@ class DebugModule
         return $last;
     }
 
-    public static function staticVarDumpOptions(?array $varDumpOptions = null) : array
+    /**
+     * @param array|false|null $varDumpOptions
+     */
+    public static function staticVarDumpOptions($varDumpOptions = null) : array
     {
         $last = static::$varDumpOptions;
 
         if (null !== $varDumpOptions) {
-            static::$varDumpOptions = $varDumpOptions;
+            if (false === $varDumpOptions) {
+                static::$varDumpOptions = [];
+
+            } else {
+                static::$varDumpOptions = $varDumpOptions;
+            }
         }
 
         static::$varDumpOptions = static::$varDumpOptions ?? [];
@@ -156,14 +172,12 @@ class DebugModule
         }
 
         if (-1 !== $line) {
-            if (is_int($lineInt = $line) && ($line > 0)) {
+            if (! (is_int($line) && ($line > 0))) {
                 return Ret::err(
                     [ 'The `value[1]` should be positive integer', $line, $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
-
-            $line = $lineInt;
         }
 
         return Ret::val([ $file, $line ]);
@@ -172,8 +186,7 @@ class DebugModule
 
     public function debug_backtrace(
         ?int $options = -1,
-        ?int $limit = -1,
-        ?string $dirRoot = ''
+        ?int $limit = -1
     ) : BacktracerInterface
     {
         $backtracer = $this->cloneBacktracer();
@@ -186,40 +199,86 @@ class DebugModule
             $backtracer->limit($limit);
         }
 
-        if ('' !== $dirRoot) {
-            $backtracer->dirRoot($dirRoot);
-        }
-
         return $backtracer;
     }
 
     /**
      * @return array{ 0: string, 1: string }
      */
-    public function file_line(?int $limit = null, ?array $debugBacktraceOverride = null) : array
+    public function file_line(?int $offset = null, ?array $debugBacktraceOverride = null) : array
     {
-        $limit = $limit ?? 1;
+        $offset = $offset ?? 1;
 
         if (null === $debugBacktraceOverride) {
-            $limit++;
+            $offset++;
 
-            $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit);
+            $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $offset);
         }
 
-        $i = $limit - 1;
+        $key = $offset - 1;
 
-        if (! isset($debugBacktraceOverride[ $i ])) {
+        if (! isset($debugBacktraceOverride[ $key ])) {
             throw new LogicException(
-                [ 'The key is not exists in trace: ' . $i, $debugBacktraceOverride ]
+                [ 'The `key` is not exists in `debugBacktraceOverride`: ' . $key, $debugBacktraceOverride ]
             );
         }
 
         $fileLine = [
-            $debugBacktraceOverride[ $i ][ 'file' ] ?? '{{file}}',
-            $debugBacktraceOverride[ $i ][ 'line' ] ?? '{{line}}',
+            $debugBacktraceOverride[ $key ][ 'file' ] ?? '{{file}}',
+            $debugBacktraceOverride[ $key ][ 'line' ] ?? '{{line}}',
         ];
 
         return $fileLine;
+    }
+
+    /**
+     * @return array{ 0: string, 1: string }
+     */
+    public function trace(?int $offset = null, ?int $limit = null, ?int $options = null, ?array $debugBacktraceOverride = null) : array
+    {
+        $offset = $offset ?? 0;
+        $limit = $limit ?? 0;
+        $options = $options ?? DEBUG_BACKTRACE_IGNORE_ARGS;
+
+        if (null === $debugBacktraceOverride) {
+            $offset++;
+
+            if ($limit > 0) {
+                $limit++;
+            }
+
+            $debugBacktraceOverride = debug_backtrace($options, $limit);
+        }
+
+        $key = $offset - 1;
+
+        if (! isset($debugBacktraceOverride[ $key ])) {
+            throw new LogicException(
+                [ 'The `key` is not exists in `debugBacktraceOverride`: ' . $key, $debugBacktraceOverride ]
+            );
+        }
+
+        $cnt = count($debugBacktraceOverride);
+
+        $result = [];
+
+        for ( $i = $key; $i < $cnt; $i++ ) {
+            $t = []
+                + $debugBacktraceOverride[ $i ]
+                + [
+                    'function' => null,
+                    'line'     => null,
+                    'file'     => null,
+                    'class'    => null,
+                    'object'   => null,
+                    'type'     => null,
+                    'args'     => null,
+                ];
+
+            $result[ $i ] = $t;
+        }
+
+        return $result;
     }
 
 

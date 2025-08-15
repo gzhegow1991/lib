@@ -31,12 +31,20 @@ class FsModule
      */
     protected static $fileChmod = 0664;
 
-    public static function staticRealpathReturnTargetPath(?bool $realpath_return_target_path = null) : bool
+    /**
+     * @param int|false|null $realpath_return_target_path
+     */
+    public static function staticRealpathReturnTargetPath($realpath_return_target_path = null) : bool
     {
         $last = static::$realpathReturnTargetPath;
 
         if (null !== $realpath_return_target_path) {
-            static::$realpathReturnTargetPath = $realpath_return_target_path;
+            if (false === $realpath_return_target_path) {
+                static::$realpathReturnTargetPath = true;
+
+            } else {
+                static::$realpathReturnTargetPath = (bool) $realpath_return_target_path;
+            }
         }
 
         static::$realpathReturnTargetPath = static::$realpathReturnTargetPath ?? true;
@@ -45,18 +53,23 @@ class FsModule
     }
 
     /**
-     * @param int|string|null $dirChmod
+     * @param int|string|false|null $dirChmod
      */
     public static function staticDirChmod($dirChmod = null) : int
     {
         $last = static::$dirChmod;
 
         if (null !== $dirChmod) {
-            $theType = Lib::type();
+            if (false === $dirChmod) {
+                static::$dirChmod = 0775;
 
-            $dirChmodValid = $theType->chmod($dirChmod)->orThrow();
+            } else {
+                $theType = Lib::type();
 
-            static::$dirChmod = $dirChmodValid;
+                $dirChmodValid = $theType->chmod($dirChmod)->orThrow();
+
+                static::$dirChmod = $dirChmodValid;
+            }
         }
 
         static::$dirChmod = static::$dirChmod ?? 0775;
@@ -65,18 +78,23 @@ class FsModule
     }
 
     /**
-     * @param int|string|null $fileChmod
+     * @param int|string|false|null $fileChmod
      */
     public static function staticFileChmod($fileChmod = null) : int
     {
         $last = static::$fileChmod;
 
         if (null !== $fileChmod) {
-            $theType = Lib::type();
+            if (false === $fileChmod) {
+                static::$fileChmod = 0664;
 
-            $fileChmodValid = $theType->chmod($fileChmod)->orThrow();
+            } else {
+                $theType = Lib::type();
 
-            static::$fileChmod = $fileChmodValid;
+                $fileChmodValid = $theType->chmod($fileChmod)->orThrow();
+
+                static::$fileChmod = $fileChmodValid;
+            }
         }
 
         static::$fileChmod = static::$fileChmod ?? 0664;
@@ -105,7 +123,7 @@ class FsModule
     {
         if (! extension_loaded('fileinfo')) {
             throw new ExtensionException(
-                'Missing PHP extension: fileinfo'
+                [ 'Missing PHP extension: fileinfo' ]
             );
         }
     }

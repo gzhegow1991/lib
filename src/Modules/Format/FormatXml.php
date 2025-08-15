@@ -13,13 +13,13 @@ class FormatXml
     {
         if (! extension_loaded('dom')) {
             throw new ExtensionException(
-                'Missing PHP extension: dom'
+                [ 'Missing PHP extension: dom' ]
             );
         }
 
         if (! extension_loaded('simplexml')) {
             throw new ExtensionException(
-                'Missing PHP extension: simplexml'
+                [ 'Missing PHP extension: simplexml' ]
             );
         }
     }

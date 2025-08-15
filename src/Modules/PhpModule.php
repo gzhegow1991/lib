@@ -34,31 +34,36 @@ class PhpModule
     protected static $poolingTickUsleep = 1000;
 
     /**
-     * @param class-string<\LogicException|\RuntimeException>|null $throwableClass
+     * @param class-string<\LogicException|\RuntimeException>|false|null $throwableClass
      *
      * @return class-string<\LogicException|\RuntimeException>
      */
-    public static function staticThrowableClass(?string $throwableClass = null) : string
+    public static function staticThrowableClass($throwableClass = null) : string
     {
         $last = static::$throwableClass;
 
         if (null !== $throwableClass) {
-            if (! (false
-                || is_subclass_of($throwableClass, \LogicException::class)
-                || is_subclass_of($throwableClass, \RuntimeException::class)
-            )) {
-                throw new LogicException(
-                    [
-                        ''
-                        . 'The `throwableClass` should be a class-string that is subclass one of: '
-                        . '[ ' . implode(' ][ ', [ \LogicException::class, \RuntimeException::class ]) . ' ]',
-                        //
-                        $throwableClass,
-                    ]
-                );
-            }
+            if (false === $throwableClass) {
+                static::$throwableClass = RuntimeException::class;
 
-            static::$throwableClass = $throwableClass;
+            } else {
+                if (! (false
+                    || is_subclass_of($throwableClass, \LogicException::class)
+                    || is_subclass_of($throwableClass, \RuntimeException::class)
+                )) {
+                    throw new LogicException(
+                        [
+                            ''
+                            . 'The `throwableClass` should be a class-string that is subclass one of: '
+                            . '[ ' . implode(' ][ ', [ \LogicException::class, \RuntimeException::class ]) . ' ]',
+                            //
+                            $throwableClass,
+                        ]
+                    );
+                }
+
+                static::$throwableClass = $throwableClass;
+            }
         }
 
         static::$throwableClass = static::$throwableClass ?? RuntimeException::class;
@@ -66,18 +71,26 @@ class PhpModule
         return $last;
     }
 
-    public static function staticPoolingTickUsleep(?int $poolingTickUsleep = null) : int
+    /**
+     * @param int|false|null $poolingTickUsleep
+     */
+    public static function staticPoolingTickUsleep($poolingTickUsleep = null) : int
     {
         $last = static::$poolingTickUsleep;
 
         if (null !== $poolingTickUsleep) {
-            if ($poolingTickUsleep < 1) {
-                throw new LogicException(
-                    [ 'The `pooling_tick_usleep` should be a positive integer', $poolingTickUsleep ]
-                );
-            }
+            if (false === $poolingTickUsleep) {
+                static::$poolingTickUsleep = 1000;
 
-            static::$poolingTickUsleep = $poolingTickUsleep;
+            } else {
+                if ($poolingTickUsleep < 1) {
+                    throw new LogicException(
+                        [ 'The `pooling_tick_usleep` should be a positive integer', $poolingTickUsleep ]
+                    );
+                }
+
+                static::$poolingTickUsleep = $poolingTickUsleep;
+            }
         }
 
         static::$poolingTickUsleep = static::$poolingTickUsleep ?? 1000;

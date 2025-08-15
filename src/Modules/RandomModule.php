@@ -20,7 +20,7 @@ class RandomModule
     protected static $fnUuid;
 
     /**
-     * @param callable $fnUuid
+     * @param callable|false|null $fnUuid
      *
      * @return callable
      */
@@ -29,13 +29,18 @@ class RandomModule
         $last = static::$fnUuid;
 
         if (null !== $fnUuid) {
-            if (! is_callable($fnUuid)) {
-                throw new LogicException(
-                    [ 'The `fnUuid` should be callable', $fnUuid ]
-                );
-            }
+            if (false === $fnUuid) {
+                static::$fnUuid = null;
 
-            static::$fnUuid = $fnUuid;
+            } else {
+                if (! is_callable($fnUuid)) {
+                    throw new LogicException(
+                        [ 'The `fnUuid` should be callable', $fnUuid ]
+                    );
+                }
+
+                static::$fnUuid = $fnUuid;
+            }
         }
 
         static::$fnUuid = static::$fnUuid ?? null;
