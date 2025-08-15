@@ -670,10 +670,6 @@ class DefaultDumper implements DumperInterface
 
         $content = "<script>console.log(window.atob('{$content}'));</script>" . "\n";
 
-        if (! headers_sent()) {
-            header('Content-Type: text/html', true, 418);
-        }
-
         fwrite($resource, $content);
         fflush($resource);
     }
@@ -689,10 +685,6 @@ class DefaultDumper implements DumperInterface
         $content = $this->printerPrint(...$vars);
         $content = rtrim($content) . "\n";
 
-        if (! headers_sent()) {
-            header('Content-Type: text/html', true, 418);
-        }
-
         fwrite($resource, $content);
         fflush($resource);
     }
@@ -707,10 +699,6 @@ class DefaultDumper implements DumperInterface
 
         $content = $this->printerPrint(...$vars);
         $content = rtrim($content) . "\n";
-
-        if (! headers_sent()) {
-            header('Content-Type: text/plain', true, 418);
-        }
 
         fwrite($resource, $content);
         fflush($resource);
