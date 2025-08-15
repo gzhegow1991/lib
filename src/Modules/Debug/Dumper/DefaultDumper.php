@@ -545,6 +545,18 @@ class DefaultDumper implements DumperInterface
                 $this->dumperDump_pdo(...$vars);
                 break;
 
+            case static::DUMPER_PDO_DEVTOOLS:
+                $this->dumperDump_pdo_devtools(...$vars);
+                break;
+
+            case static::DUMPER_PDO_HTML:
+                $this->dumperDump_pdo_html(...$vars);
+                break;
+
+            case static::DUMPER_PDO_TEXT:
+                $this->dumperDump_pdo_text(...$vars);
+                break;
+
             case static::DUMPER_RESOURCE:
                 $this->dumperDump_resource(...$vars);
                 break;
@@ -598,7 +610,7 @@ class DefaultDumper implements DumperInterface
     public function dumperDump_echo_html(...$vars) : void
     {
         $content = $this->printerPrint(...$vars);
-        $content = rtrim($content) . "\n";
+        $content = rtrim($content);
 
         $content = nl2br($content);
 
@@ -811,7 +823,7 @@ class DefaultDumper implements DumperInterface
         }
 
         $content = $this->printerPrint(...$vars);
-        $content = rtrim($content) . "\n";
+        $content = rtrim($content);
 
         $content = nl2br($content);
 
