@@ -50,12 +50,8 @@ class DefaultDumper implements DumperInterface
     const DUMPER_ECHO_TEXT         = 'echo_text';
     const DUMPER_PDO               = 'pdo';
     const DUMPER_PDO_DEVTOOLS      = 'pdo_devtools';
-    const DUMPER_PDO_HTML          = 'pdo_html';
-    const DUMPER_PDO_TEXT          = 'pdo_text';
     const DUMPER_RESOURCE          = 'resource';
     const DUMPER_RESOURCE_DEVTOOLS = 'resource_devtools';
-    const DUMPER_RESOURCE_HTML     = 'resource_html';
-    const DUMPER_RESOURCE_TEXT     = 'resource_text';
     const DUMPER_LIST              = [
         self::DUMPER_ECHO              => true,
         self::DUMPER_ECHO_DEVTOOLS     => true,
@@ -63,12 +59,8 @@ class DefaultDumper implements DumperInterface
         self::DUMPER_ECHO_TEXT         => true,
         self::DUMPER_PDO               => true,
         self::DUMPER_PDO_DEVTOOLS      => true,
-        self::DUMPER_PDO_HTML          => true,
-        self::DUMPER_PDO_TEXT          => true,
         self::DUMPER_RESOURCE          => true,
         self::DUMPER_RESOURCE_DEVTOOLS => true,
-        self::DUMPER_RESOURCE_HTML     => true,
-        self::DUMPER_RESOURCE_TEXT     => true,
     ];
 
 
@@ -610,28 +602,12 @@ class DefaultDumper implements DumperInterface
                 $this->dumperDump_pdo_devtools(...$vars);
                 break;
 
-            case static::DUMPER_PDO_HTML:
-                $this->dumperDump_pdo_html(...$vars);
-                break;
-
-            case static::DUMPER_PDO_TEXT:
-                $this->dumperDump_pdo_text(...$vars);
-                break;
-
             case static::DUMPER_RESOURCE:
                 $this->dumperDump_resource(...$vars);
                 break;
 
             case static::DUMPER_RESOURCE_DEVTOOLS:
                 $this->dumperDump_resource_devtools(...$vars);
-                break;
-
-            case static::DUMPER_RESOURCE_HTML:
-                $this->dumperDump_resource_html(...$vars);
-                break;
-
-            case static::DUMPER_RESOURCE_TEXT:
-                $this->dumperDump_resource_text(...$vars);
                 break;
 
             default:
@@ -671,9 +647,7 @@ class DefaultDumper implements DumperInterface
     public function dumperDump_echo_html(...$vars) : void
     {
         $content = $this->printerPrint(...$vars);
-        $content = rtrim($content);
-
-        $content = nl2br($content);
+        $content = rtrim($content) . "\n";
 
         if (! headers_sent()) {
             header('Content-Type: text/html', true, 418);
@@ -698,11 +672,40 @@ class DefaultDumper implements DumperInterface
 
     public function dumperDump_pdo(...$vars) : void
     {
-        $thePhp = Lib::php();
+        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
 
-        $thePhp->is_terminal()
-            ? $this->dumperDump_pdo_text(...$vars)
-            : $this->dumperDump_pdo_html(...$vars);
+        $pdo = $dumperOptions[ 'pdo' ] ?? $dumperOptions[ 0 ];
+        $table = $dumperOptions[ 'table' ] ?? $dumperOptions[ 1 ] ?? 'dumper';
+        $column = $dumperOptions[ 'column' ] ?? $dumperOptions[ 2 ] ?? 'dump';
+
+        $pdoAdapter = PdoAdapter::from($pdo)->orThrow(
+            [ 'The `options.pdo` should be valid PDO or adapter', $dumperOptions ]
+        );
+
+        $pdo = $pdoAdapter->getPdoDefault();
+
+        $tableString = (string) $table;
+        $columnString = (string) $column;
+
+        if ('' === $tableString) {
+            throw new LogicException(
+                [ 'The `options.table` should be a non-empty string', $dumperOptions ]
+            );
+        }
+
+        if ('' === $columnString) {
+            throw new LogicException(
+                [ 'The `options.column` should be a non-empty string', $dumperOptions ]
+            );
+        }
+
+        $content = $this->printerPrint(...$vars);
+        $content = rtrim($content);
+
+        $sql = "INSERT INTO {$tableString} ({$columnString}) VALUES (?);";
+
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([ $content ]);
     }
 
     public function dumperDump_pdo_devtools(...$vars) : void
@@ -747,91 +750,32 @@ class DefaultDumper implements DumperInterface
         $stmt->execute([ $content ]);
     }
 
-    public function dumperDump_pdo_html(...$vars) : void
-    {
-        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
-
-        $pdo = $dumperOptions[ 'pdo' ] ?? $dumperOptions[ 0 ];
-        $table = $dumperOptions[ 'table' ] ?? $dumperOptions[ 1 ] ?? 'dumper';
-        $column = $dumperOptions[ 'column' ] ?? $dumperOptions[ 2 ] ?? 'dump';
-
-        $pdoAdapter = PdoAdapter::from($pdo)->orThrow(
-            [ 'The `options.pdo` should be valid PDO or adapter', $dumperOptions ]
-        );
-
-        $pdo = $pdoAdapter->getPdoDefault();
-
-        $tableString = (string) $table;
-        $columnString = (string) $column;
-
-        if ('' === $tableString) {
-            throw new LogicException(
-                [ 'The `options.table` should be a non-empty string', $dumperOptions ]
-            );
-        }
-
-        if ('' === $columnString) {
-            throw new LogicException(
-                [ 'The `options.column` should be a non-empty string', $dumperOptions ]
-            );
-        }
-
-        $content = $this->printerPrint(...$vars);
-        $content = rtrim($content);
-
-        $content = nl2br($content);
-
-        $sql = "INSERT INTO {$tableString} ({$columnString}) VALUES (?);";
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([ $content ]);
-    }
-
-    public function dumperDump_pdo_text(...$vars) : void
-    {
-        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
-
-        $pdo = $dumperOptions[ 'pdo' ] ?? $dumperOptions[ 0 ];
-        $table = $dumperOptions[ 'table' ] ?? $dumperOptions[ 1 ] ?? 'dumper';
-        $column = $dumperOptions[ 'column' ] ?? $dumperOptions[ 2 ] ?? 'dump';
-
-        $pdoAdapter = PdoAdapter::from($pdo)->orThrow(
-            [ 'The `options.pdo` should be valid PDO or adapter', $dumperOptions ]
-        );
-
-        $pdo = $pdoAdapter->getPdoDefault();
-
-        $tableString = (string) $table;
-        $columnString = (string) $column;
-
-        if ('' === $tableString) {
-            throw new LogicException(
-                [ 'The `options.table` should be a non-empty string', $dumperOptions ]
-            );
-        }
-
-        if ('' === $columnString) {
-            throw new LogicException(
-                [ 'The `options.column` should be a non-empty string', $dumperOptions ]
-            );
-        }
-
-        $content = $this->printerPrint(...$vars);
-        $content = rtrim($content);
-
-        $sql = "INSERT INTO {$tableString} ({$columnString}) VALUES (?);";
-
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute([ $content ]);
-    }
-
     public function dumperDump_resource(...$vars) : void
     {
         $thePhp = Lib::php();
 
-        $thePhp->is_terminal()
-            ? $this->dumperDump_resource_text(...$vars)
-            : $this->dumperDump_resource_html(...$vars);
+        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
+
+        if (! array_key_exists('resource', $dumperOptions)) {
+            $resource = $thePhp->hOutput();
+
+        } else {
+            $resource = $dumperOptions[ 'resource' ];
+
+            if (! is_resource($resource)) {
+                $theFsFile = Lib::fsFile();
+
+                $theFsFile->mkdirp(dirname($resource));
+
+                $resource = $theFsFile->fopen($resource, 'wb');
+            }
+        }
+
+        $content = $this->printerPrint(...$vars);
+        $content = rtrim($content) . "\n";
+
+        fwrite($resource, $content);
+        fflush($resource);
     }
 
     public function dumperDump_resource_devtools(...$vars) : void
@@ -861,64 +805,6 @@ class DefaultDumper implements DumperInterface
         $content = base64_encode($content);
 
         $content = "<script>console.log(window.atob('{$content}'));</script>" . "\n";
-
-        fwrite($resource, $content);
-        fflush($resource);
-    }
-
-    public function dumperDump_resource_html(...$vars) : void
-    {
-        $thePhp = Lib::php();
-
-        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
-
-        if (! array_key_exists('resource', $dumperOptions)) {
-            $resource = $thePhp->hOutput();
-
-        } else {
-            $resource = $dumperOptions[ 'resource' ];
-
-            if (! is_resource($resource)) {
-                $theFsFile = Lib::fsFile();
-
-                $theFsFile->mkdirp(dirname($resource));
-
-                $resource = $theFsFile->fopen($resource, 'wb');
-            }
-        }
-
-        $content = $this->printerPrint(...$vars);
-        $content = rtrim($content);
-
-        $content = nl2br($content);
-
-        fwrite($resource, $content);
-        fflush($resource);
-    }
-
-    public function dumperDump_resource_text(...$vars) : void
-    {
-        $thePhp = Lib::php();
-
-        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
-
-        if (! array_key_exists('resource', $dumperOptions)) {
-            $resource = $thePhp->hOutput();
-
-        } else {
-            $resource = $dumperOptions[ 'resource' ];
-
-            if (! is_resource($resource)) {
-                $theFsFile = Lib::fsFile();
-
-                $theFsFile->mkdirp(dirname($resource));
-
-                $resource = $theFsFile->fopen($resource, 'wb');
-            }
-        }
-
-        $content = $this->printerPrint(...$vars);
-        $content = rtrim($content) . "\n";
 
         fwrite($resource, $content);
         fflush($resource);
