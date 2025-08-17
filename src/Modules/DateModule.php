@@ -38,10 +38,14 @@ class DateModule
     const FORMAT_SQL_TIME_MSEC = 'H:i:s.v';
     const FORMAT_SQL_TIME_USEC = 'H:i:s.u';
 
-    const FORMAT_JAVASCRIPT      = self::FORMAT_JAVASCRIPT_SEC;
-    const FORMAT_JAVASCRIPT_SEC  = "Y-m-d\TH:i:sP";
-    const FORMAT_JAVASCRIPT_MSEC = "Y-m-d\TH:i:s.vP";
-    const FORMAT_JAVASCRIPT_USEC = "Y-m-d\TH:i:s.uP";
+    const FORMAT_JAVASCRIPT                = self::FORMAT_JAVASCRIPT_SEC;
+    const FORMAT_JAVASCRIPT_SEC            = "Y-m-d\TH:i:sP";
+    const FORMAT_JAVASCRIPT_MSEC           = "Y-m-d\TH:i:s.vP";
+    const FORMAT_JAVASCRIPT_USEC           = "Y-m-d\TH:i:s.uP";
+    const FORMAT_JAVASCRIPT_NO_OFFSET      = self::FORMAT_JAVASCRIPT_NO_OFFSET_SEC;
+    const FORMAT_JAVASCRIPT_NO_OFFSET_SEC  = "Y-m-d\TH:i:s";
+    const FORMAT_JAVASCRIPT_NO_OFFSET_MSEC = "Y-m-d\TH:i:s.v";
+    const FORMAT_JAVASCRIPT_NO_OFFSET_USEC = "Y-m-d\TH:i:s.u";
 
     const FORMAT_FILENAME_DATE       = self::FORMAT_FILENAME_DATE_DAY;
     const FORMAT_FILENAME_DATE_YEAR  = 'y0000';
@@ -94,6 +98,10 @@ class DateModule
         self::FORMAT_JAVASCRIPT_SEC  => true,
         self::FORMAT_JAVASCRIPT_MSEC => true,
         self::FORMAT_JAVASCRIPT_USEC => true,
+
+        self::FORMAT_JAVASCRIPT_NO_OFFSET_SEC  => true,
+        self::FORMAT_JAVASCRIPT_NO_OFFSET_MSEC => true,
+        self::FORMAT_JAVASCRIPT_NO_OFFSET_USEC => true,
 
         self::FORMAT_FILENAME_DATE_YEAR  => true,
         self::FORMAT_FILENAME_DATE_MONTH => true,
@@ -2027,27 +2035,61 @@ class DateModule
 
     public function format_javascript(\DateTimeInterface $dateTime) : string
     {
-        return $dateTime->format(static::FORMAT_JAVASCRIPT);
+        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
+
+        $offset = $dateTime->format('P');
+
+        return "{$formatted}{$offset}";
     }
 
     public function format_javascript_msec(\DateTimeInterface $dateTime) : string
     {
-        $formattedJavascript = $dateTime->format(static::FORMAT_JAVASCRIPT);
+        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
 
         $milliseconds = $dateTime->format('v');
         $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
 
-        return "{$formattedJavascript}.{$milliseconds}";
+        $offset = $dateTime->format('P');
+
+        return "{$formatted}.{$milliseconds}{$offset}";
     }
 
     public function format_javascript_usec(\DateTimeInterface $dateTime) : string
     {
-        $formattedJavascript = $dateTime->format(static::FORMAT_JAVASCRIPT);
+        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
 
         $microseconds = $dateTime->format('u');
         $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
 
-        return "{$formattedJavascript}.{$microseconds}";
+        $offset = $dateTime->format('P');
+
+        return "{$formatted}.{$microseconds}{$offset}";
+    }
+
+
+    public function format_javascript_no_offset(\DateTimeInterface $dateTime) : string
+    {
+        return $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
+    }
+
+    public function format_javascript_no_offset_msec(\DateTimeInterface $dateTime) : string
+    {
+        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
+
+        $milliseconds = $dateTime->format('v');
+        $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
+
+        return "{$formatted}.{$milliseconds}";
+    }
+
+    public function format_javascript_no_offset_usec(\DateTimeInterface $dateTime) : string
+    {
+        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
+
+        $microseconds = $dateTime->format('u');
+        $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
+
+        return "{$formatted}.{$microseconds}";
     }
 
 
@@ -2073,6 +2115,34 @@ class DateModule
     {
         $formatted = [];
         $formatted[] = $this->format_javascript_usec($dateTime);
+        $formatted[] = $dateTime->getTimezone()->getName();
+
+        return $formatted;
+    }
+
+
+    public function array_javascript_no_offset_tz(\DateTimeInterface $dateTime) : array
+    {
+        $formatted = [];
+        $formatted[] = $this->format_javascript_no_offset($dateTime);
+        $formatted[] = $dateTime->getTimezone()->getName();
+
+        return $formatted;
+    }
+
+    public function array_javascript_no_offset_tz_msec(\DateTimeInterface $dateTime) : array
+    {
+        $formatted = [];
+        $formatted[] = $this->format_javascript_no_offset_msec($dateTime);
+        $formatted[] = $dateTime->getTimezone()->getName();
+
+        return $formatted;
+    }
+
+    public function array_javascript_no_offset_tz_usec(\DateTimeInterface $dateTime) : array
+    {
+        $formatted = [];
+        $formatted[] = $this->format_javascript_no_offset_usec($dateTime);
         $formatted[] = $dateTime->getTimezone()->getName();
 
         return $formatted;
