@@ -907,7 +907,9 @@ class Lib
                 );
 
             } else {
-                $key = basename($realpath);
+                $theFs = Lib::fs();
+
+                $key = $theFs->fname($realpath);
 
                 $services[ $realpath ][ $key ] = $service;
             }
@@ -946,7 +948,11 @@ class Lib
         }
 
         if (null !== $classT) {
-            $key = $key ?? basename($realpath);
+            if (null === $key) {
+                $theFs = Lib::fs();
+
+                $key = $theFs->fname($realpath);
+            }
 
             $service = $services[ $realpath ][ $key ];
 
