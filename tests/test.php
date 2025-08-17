@@ -25,9 +25,6 @@
     // ->isRetTrace()
     ->setRetTrace(false)
     //
-    ->useErrorHandler()
-    ->useExceptionHandler()
-    //
     ->useErrorReporting()
     ->useErrorLog()
     ->useLogErrors()
@@ -51,6 +48,9 @@
     //
     ->useUploadMaxFilesize()
     ->useUploadTmpDir()
+    //
+    ->useErrorHandler()
+    ->useExceptionHandler()
 ;
 
 

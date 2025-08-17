@@ -44,9 +44,6 @@ php test.php
     // ->isRetTrace()
     ->setRetTrace(false)
     //
-    ->useErrorHandler()
-    ->useExceptionHandler()
-    //
     ->useErrorReporting()
     ->useErrorLog()
     ->useLogErrors()
@@ -70,6 +67,9 @@ php test.php
     //
     ->useUploadMaxFilesize()
     ->useUploadTmpDir()
+    //
+    ->useErrorHandler()
+    ->useExceptionHandler()
 ;
 
 

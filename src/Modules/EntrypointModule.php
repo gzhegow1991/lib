@@ -261,7 +261,7 @@ class EntrypointModule
 
         $this->mapRecommended = [
             'errorReporting'       => (E_ALL | E_DEPRECATED | E_USER_DEPRECATED),
-            'errorLog'             => (getcwd() . '/error_log'),
+            'errorLog'             => null,
             'logErrors'            => 0,
             'displayErrors'        => 0,
             //
@@ -286,11 +286,11 @@ class EntrypointModule
                 'httponly' => true,
                 'samesite' => 'Lax',
             ],
-            'sessionSavePath'      => sys_get_temp_dir(),
+            'sessionSavePath'      => null,
             'sessionSavePathMkdir' => false,
             //
             'uploadMaxFilesize'    => '2M',
-            'uploadTmpDir'         => sys_get_temp_dir(),
+            'uploadTmpDir'         => null,
             'uploadTmpDirMkdir'    => false,
             //
             'errorHandler'         => [ $this, 'fnErrorHandler' ],
@@ -449,176 +449,6 @@ class EntrypointModule
 
 
     /**
-     * @return callable|null
-     */
-    public function getPhpErrorHandler()
-    {
-        $handler = set_error_handler(static function () { });
-
-        restore_error_handler();
-
-        return $handler;
-    }
-
-    /**
-     * @return callable|null
-     */
-    public function getErrorHandler()
-    {
-        return $this->errorHandler;
-    }
-
-    /**
-     * @param callable|false|null $fnErrorHandler
-     *
-     * @return static
-     */
-    public function setErrorHandler($fnErrorHandler, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'errorHandler';
-        $var = $fnErrorHandler;
-
-        if (false !== $this->mapWasSet[ $key ]) {
-            if (! $replace) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[ $key ] = true;
-        }
-
-        if (null === $var) {
-            $this->{$key} = [ $this->mapRecommended[ $key ] ];
-
-        } elseif (false === $var) {
-            $this->{$key} = [ $this->mapInitial[ $key ] ];
-
-        } else {
-            if (! is_callable($var)) {
-                throw new LogicException(
-                    [ 'The `fnErrorHandler` should be a callable', $var ]
-                );
-            }
-
-            $this->{$key} = [ $var ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useErrorHandler(&$refLast = null)
-    {
-        $refLast = null;
-
-        if ([] !== $this->errorHandler) {
-            $refLast = set_error_handler($this->errorHandler[ 0 ]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedErrorHandler(&$refLast = null)
-    {
-        $refLast = set_error_handler($this->mapRecommended[ 'errorHandler' ]);
-
-        return $this;
-    }
-
-
-    /**
-     * @return callable|null
-     */
-    public function getPhpExceptionHandler()
-    {
-        $handler = set_exception_handler(static function () { });
-
-        restore_exception_handler();
-
-        return $handler;
-    }
-
-    /**
-     * @return callable|null
-     */
-    public function getExceptionHandler()
-    {
-        return $this->exceptionHandler;
-    }
-
-    /**
-     * @param callable|false|null $fnExceptionHandler
-     *
-     * @return static
-     */
-    public function setExceptionHandler($fnExceptionHandler, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'exceptionHandler';
-        $var = $fnExceptionHandler;
-
-        if (false !== $this->mapWasSet[ $key ]) {
-            if (! $replace) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[ $key ] = true;
-        }
-
-        if (null === $var) {
-            $this->{$key} = [ $this->mapRecommended[ $key ] ];
-
-        } elseif (false === $var) {
-            $this->{$key} = [ $this->mapInitial[ $key ] ];
-
-        } else {
-            if (! is_callable($var)) {
-                throw new LogicException(
-                    [ 'The `fnExceptionHandler` should be a callable', $var ]
-                );
-            }
-
-            $this->{$key} = [ $var ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useExceptionHandler(&$refLast = null)
-    {
-        $refLast = null;
-
-        if ([] !== $this->exceptionHandler) {
-            $refLast = set_exception_handler($this->exceptionHandler[ 0 ]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedExceptionHandler(&$refLast = null)
-    {
-        $refLast = set_exception_handler($this->mapRecommended[ 'exceptionHandler' ]);
-
-        return $this;
-    }
-
-
-    /**
      * @return int|null
      */
     public function getPhpErrorReporting()
@@ -673,10 +503,10 @@ class EntrypointModule
      */
     public function useErrorReporting(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpErrorReporting();
 
         if ([] !== $this->errorReporting) {
-            $refLast = error_reporting($this->errorReporting[ 0 ]);
+            error_reporting($this->errorReporting[ 0 ]);
         }
 
         return $this;
@@ -687,7 +517,11 @@ class EntrypointModule
      */
     public function useRecommendedErrorReporting(&$refLast = null)
     {
-        $refLast = error_reporting($this->mapRecommended[ 'errorReporting' ]);
+        $refLast = $this->getPhpErrorReporting();
+
+        if (null !== $this->mapRecommended[ 'errorReporting' ]) {
+            error_reporting($this->mapRecommended[ 'errorReporting' ]);
+        }
 
         return $this;
     }
@@ -744,10 +578,10 @@ class EntrypointModule
      */
     public function useErrorLog(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpErrorLog();
 
         if ([] !== $this->errorLog) {
-            $refLast = ini_set('error_log', $this->errorLog[ 0 ]);
+            ini_set('error_log', $this->errorLog[ 0 ]);
         }
 
         return $this;
@@ -758,7 +592,11 @@ class EntrypointModule
      */
     public function useRecommendedErrorLog(&$refLast = null)
     {
-        $refLast = ini_set('error_log', $this->mapRecommended[ 'errorLog' ]);
+        $refLast = $this->getPhpErrorLog();
+
+        if (null !== $this->mapRecommended[ 'errorLog' ]) {
+            ini_set('error_log', $this->mapRecommended[ 'errorLog' ]);
+        }
 
         return $this;
     }
@@ -815,10 +653,10 @@ class EntrypointModule
      */
     public function useLogErrors(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpLogErrors();
 
         if ([] !== $this->logErrors) {
-            $refLast = ini_set('log_errors', $this->logErrors[ 0 ]);
+            ini_set('log_errors', $this->logErrors[ 0 ]);
         }
 
         return $this;
@@ -829,7 +667,11 @@ class EntrypointModule
      */
     public function useRecommendedLogErrors(&$refLast = null)
     {
-        $refLast = ini_set('log_errors', $this->mapRecommended[ 'logErrors' ]);
+        $refLast = $this->getPhpLogErrors();
+
+        if (null !== $this->mapRecommended[ 'logErrors' ]) {
+            ini_set('log_errors', $this->mapRecommended[ 'logErrors' ]);
+        }
 
         return $this;
     }
@@ -881,13 +723,12 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDisplayErrors(&$refLastDisplayErrors = null)
+    public function useDisplayErrors(&$refLast = null)
     {
-        $refLastDisplayErrors = null;
+        $refLast = $this->getPhpDisplayErrors();
 
         if ([] !== $this->displayErrors) {
-            $refLastDisplayErrors = ini_set('display_errors', $this->displayErrors[ 0 ]);
-
+            ini_set('display_errors', $this->displayErrors[ 0 ]);
             ini_set('display_startup_errors', $this->displayErrors[ 0 ]);
         }
 
@@ -897,11 +738,14 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useRecommendedDisplayErrors(&$refLastDisplayErrors = null)
+    public function useRecommendedDisplayErrors(&$refLast = null)
     {
-        $refLastDisplayErrors = ini_set('display_errors', $this->mapRecommended[ 'displayErrors' ]);
+        $refLast = $this->getPhpDisplayErrors();
 
-        ini_set('display_startup_errors', $this->mapRecommended[ 'displayErrors' ]);
+        if (null !== $this->mapRecommended[ 'displayErrors' ]) {
+            ini_set('display_errors', $this->mapRecommended[ 'displayErrors' ]);
+            ini_set('display_startup_errors', $this->mapRecommended[ 'displayErrors' ]);
+        }
 
         return $this;
     }
@@ -956,10 +800,10 @@ class EntrypointModule
      */
     public function useMemoryLimit(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpMemoryLimit();
 
         if ([] !== $this->memoryLimit) {
-            $refLast = ini_set('memory_limit', $this->memoryLimit[ 0 ]);
+            ini_set('memory_limit', $this->memoryLimit[ 0 ]);
         }
 
         return $this;
@@ -970,7 +814,11 @@ class EntrypointModule
      */
     public function useRecommendedMemoryLimit(&$refLast = null)
     {
-        $refLast = ini_set('memory_limit', $this->mapRecommended[ 'memoryLimit' ]);
+        $refLast = $this->getPhpMemoryLimit();
+
+        if (null !== $this->mapRecommended[ 'memoryLimit' ]) {
+            ini_set('memory_limit', $this->mapRecommended[ 'memoryLimit' ]);
+        }
 
         return $this;
     }
@@ -1024,10 +872,10 @@ class EntrypointModule
      */
     public function useMaxExecutionTime(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpMaxExecutionTime();
 
         if ([] !== $this->maxExecutionTime) {
-            $refLast = ini_set('max_execution_time', $this->maxExecutionTime[ 0 ]);
+            ini_set('max_execution_time', $this->maxExecutionTime[ 0 ]);
         }
 
         return $this;
@@ -1038,7 +886,11 @@ class EntrypointModule
      */
     public function useRecommendedMaxExecutionTime(&$refLast = null)
     {
-        $refLast = ini_set('max_execution_time', $this->mapRecommended[ 'maxExecutionTime' ]);
+        $refLast = $this->getPhpMaxExecutionTime();
+
+        if (null !== $this->mapRecommended[ 'maxExecutionTime' ]) {
+            ini_set('max_execution_time', $this->mapRecommended[ 'maxExecutionTime' ]);
+        }
 
         return $this;
     }
@@ -1092,10 +944,10 @@ class EntrypointModule
      */
     public function useMaxInputTime(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpMaxInputTime();
 
         if ([] !== $this->maxInputTime) {
-            $refLast = ini_set('max_input_time', $this->maxInputTime[ 0 ]);
+            ini_set('max_input_time', $this->maxInputTime[ 0 ]);
         }
 
         return $this;
@@ -1106,7 +958,11 @@ class EntrypointModule
      */
     public function useRecommendedMaxInputTime(&$refLast = null)
     {
-        $refLast = ini_set('max_input_time', $this->mapRecommended[ 'maxInputTime' ]);
+        $refLast = $this->getPhpMaxInputTime();
+
+        if (null !== $this->mapRecommended[ 'maxInputTime' ]) {
+            ini_set('max_input_time', $this->mapRecommended[ 'maxInputTime' ]);
+        }
 
         return $this;
     }
@@ -1167,10 +1023,10 @@ class EntrypointModule
      */
     public function useTimezoneDefault(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpTimezoneDefault();
 
         if ([] !== $this->timezoneDefault) {
-            $refLast = date_default_timezone_set($this->timezoneDefault[ 0 ]->getName());
+            date_default_timezone_set($this->timezoneDefault[ 0 ]->getName());
         }
 
         return $this;
@@ -1181,7 +1037,11 @@ class EntrypointModule
      */
     public function useRecommendedTimezoneDefault(&$refLast = null)
     {
-        $refLast = date_default_timezone_set($this->mapRecommended[ 'timezoneDefault' ]->getName());
+        $refLast = $this->getPhpTimezoneDefault();
+
+        if (null !== $this->mapRecommended[ 'timezoneDefault' ]) {
+            date_default_timezone_set($this->mapRecommended[ 'timezoneDefault' ]->getName());
+        }
 
         return $this;
     }
@@ -1235,8 +1095,10 @@ class EntrypointModule
      */
     public function usePrecision(&$refLast = null)
     {
+        $refLast = $this->getPhpPrecision();
+
         if ([] !== $this->precision) {
-            $refLast = ini_set('precision', $this->precision[ 0 ]);
+            ini_set('precision', $this->precision[ 0 ]);
         }
 
         return $this;
@@ -1247,7 +1109,11 @@ class EntrypointModule
      */
     public function useRecommendedPrecision(&$refLast = null)
     {
-        $refLast = ini_set('precision', $this->mapRecommended[ 'precision' ]);
+        $refLast = $this->getPhpPrecision();
+
+        if (null !== $this->mapRecommended[ 'precision' ]) {
+            ini_set('precision', $this->mapRecommended[ 'precision' ]);
+        }
 
         return $this;
     }
@@ -1309,10 +1175,10 @@ class EntrypointModule
      */
     public function useUmask(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpUmask();
 
         if ([] !== $this->umask) {
-            $refLast = umask($this->umask[ 0 ]);
+            umask($this->umask[ 0 ]);
         }
 
         return $this;
@@ -1323,7 +1189,11 @@ class EntrypointModule
      */
     public function useRecommendedUmask(&$refLast = null)
     {
-        $refLast = umask($this->mapRecommended[ 'umask' ]);
+        $refLast = $this->getPhpUmask();
+
+        if (null !== $this->mapRecommended[ 'umask' ]) {
+            umask($this->mapRecommended[ 'umask' ]);
+        }
 
         return $this;
     }
@@ -1378,10 +1248,10 @@ class EntrypointModule
      */
     public function usePostMaxSize(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpPostMaxSize();
 
         if ([] !== $this->postMaxSize) {
-            $refLast = ini_set('post_max_size', $this->postMaxSize[ 0 ]);
+            ini_set('post_max_size', $this->postMaxSize[ 0 ]);
         }
 
         return $this;
@@ -1392,7 +1262,11 @@ class EntrypointModule
      */
     public function useRecommendedPostMaxSize(&$refLast = null)
     {
-        $refLast = ini_set('post_max_size', $this->mapRecommended[ 'postMaxSize' ]);
+        $refLast = $this->getPhpPostMaxSize();
+
+        if (null !== $this->mapRecommended[ 'postMaxSize' ]) {
+            ini_set('post_max_size', $this->mapRecommended[ 'postMaxSize' ]);
+        }
 
         return $this;
     }
@@ -1467,12 +1341,12 @@ class EntrypointModule
      */
     public function useSessionCookieParams(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpSessionCookieParams();
 
         if ([] !== $this->sessionCookieParams) {
             $theHttpSession = Lib::httpSession();
 
-            $refLast = $theHttpSession->session_set_cookie_params($this->sessionCookieParams[ 0 ]);
+            $theHttpSession->session_set_cookie_params($this->sessionCookieParams[ 0 ]);
         }
 
         return $this;
@@ -1483,9 +1357,13 @@ class EntrypointModule
      */
     public function useRecommendedSessionCookieParams(&$refLast = null)
     {
-        $theHttpSession = Lib::httpSession();
+        $refLast = $this->getPhpSessionCookieParams();
 
-        $refLast = $theHttpSession->session_set_cookie_params($this->mapRecommended[ 'sessionCookieParams' ]);
+        if (null !== $this->mapRecommended[ 'sessionCookieParams' ]) {
+            $theHttpSession = Lib::httpSession();
+
+            $theHttpSession->session_set_cookie_params($this->mapRecommended[ 'sessionCookieParams' ]);
+        }
 
         return $this;
     }
@@ -1557,7 +1435,7 @@ class EntrypointModule
      */
     public function useSessionSavePath(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpSessionSavePath();
 
         if ([] !== $this->sessionSavePath) {
             $sessionSavePathValid = $this->sessionSavePath[ 0 ];
@@ -1566,15 +1444,15 @@ class EntrypointModule
                 $sessionSavePathMkdirValid = (bool) $this->sessionSavePathMkdir[ 0 ];
 
                 if ($sessionSavePathMkdirValid) {
-                    if (! is_dir($sessionSavePathValid)) {
-                        mkdir($sessionSavePathValid, 0775, true);
-                    }
+                    $theFsFile = Lib::fsFile();
+
+                    $theFsFile->mkdirp($sessionSavePathValid, 0775, true);
                 }
             }
 
             $theHttpSession = Lib::httpSession();
 
-            $refLast = $theHttpSession->session_save_path($sessionSavePathValid);
+            $theHttpSession->session_save_path($sessionSavePathValid);
         }
 
         return $this;
@@ -1585,9 +1463,16 @@ class EntrypointModule
      */
     public function useRecommendedSessionSavePath(&$refLast = null)
     {
-        $theHttpSession = Lib::httpSession();
+        $refLast = $this->getPhpSessionSavePath();
 
-        $refLast = $theHttpSession->session_save_path($this->mapRecommended[ 'sessionSavePath' ]);
+        if (null !== $this->mapRecommended[ 'sessionSavePath' ]) {
+            $theFsFile = Lib::fsFile();
+            $theHttpSession = Lib::httpSession();
+
+            $theFsFile->mkdirp($this->mapRecommended[ 'sessionSavePath' ], 0775, true);
+
+            $theHttpSession->session_save_path($this->mapRecommended[ 'sessionSavePath' ]);
+        }
 
         return $this;
     }
@@ -1642,10 +1527,10 @@ class EntrypointModule
      */
     public function useUploadMaxFilesize(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpUploadMaxFilesize();
 
         if ([] !== $this->uploadMaxFilesize) {
-            $refLast = ini_set('upload_max_filesize', $this->uploadMaxFilesize[ 0 ]);
+            ini_set('upload_max_filesize', $this->uploadMaxFilesize[ 0 ]);
         }
 
         return $this;
@@ -1656,7 +1541,11 @@ class EntrypointModule
      */
     public function useRecommendedUploadMaxFilesize(&$refLast = null)
     {
-        $refLast = ini_set('upload_max_filesize', $this->mapRecommended[ 'uploadMaxFilesize' ]);
+        $refLast = $this->getPhpUploadMaxFilesize();
+
+        if (null !== $this->mapRecommended[ 'uploadMaxFilesize' ]) {
+            ini_set('upload_max_filesize', $this->mapRecommended[ 'uploadMaxFilesize' ]);
+        }
 
         return $this;
     }
@@ -1726,7 +1615,7 @@ class EntrypointModule
      */
     public function useUploadTmpDir(&$refLast = null)
     {
-        $refLast = null;
+        $refLast = $this->getPhpUploadTmpDir();
 
         if ([] !== $this->uploadTmpDir) {
             $uploadTmpDirValid = $this->uploadTmpDir[ 0 ];
@@ -1736,12 +1625,14 @@ class EntrypointModule
 
                 if ($uploadTmpDirMkdirValid) {
                     if (! is_dir($uploadTmpDirValid)) {
-                        mkdir($uploadTmpDirValid, 0775, true);
+                        $theFsFile = Lib::fsFile();
+
+                        $theFsFile->mkdirp($uploadTmpDirValid, 0775, true);
                     }
                 }
             }
 
-            $refLast = ini_set('upload_tmp_dir', $uploadTmpDirValid);
+            ini_set('upload_tmp_dir', $uploadTmpDirValid);
         }
 
         return $this;
@@ -1752,7 +1643,193 @@ class EntrypointModule
      */
     public function useRecommendedUploadTmpDir(&$refLast = null)
     {
-        $refLast = ini_set('upload_tmp_dir', $this->mapRecommended[ 'uploadTmpDir' ]);
+        $refLast = $this->getPhpUploadTmpDir();
+
+        if (null !== $this->mapRecommended[ 'uploadTmpDir' ]) {
+            $theFsFile = Lib::fsFile();
+
+            $theFsFile->mkdirp($this->mapRecommended[ 'uploadTmpDir' ], 0775, true);
+
+            ini_set('upload_tmp_dir', $this->mapRecommended[ 'uploadTmpDir' ]);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @return callable|null
+     */
+    public function getPhpErrorHandler()
+    {
+        $handler = set_error_handler(static function () { });
+
+        restore_error_handler();
+
+        return $handler;
+    }
+
+    /**
+     * @return callable|null
+     */
+    public function getErrorHandler()
+    {
+        return $this->errorHandler;
+    }
+
+    /**
+     * @param callable|false|null $fnErrorHandler
+     *
+     * @return static
+     */
+    public function setErrorHandler($fnErrorHandler, ?bool $replace = null)
+    {
+        $this->assertNotLocked();
+
+        $key = 'errorHandler';
+        $var = $fnErrorHandler;
+
+        if (false !== $this->mapWasSet[ $key ]) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapWasSet[ $key ] = true;
+        }
+
+        if (null === $var) {
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
+
+        } else {
+            if (! is_callable($var)) {
+                throw new LogicException(
+                    [ 'The `fnErrorHandler` should be a callable', $var ]
+                );
+            }
+
+            $this->{$key} = [ $var ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useErrorHandler(&$refLast = null)
+    {
+        $refLast = $this->getPhpErrorHandler();
+
+        if ([] !== $this->errorHandler) {
+            set_error_handler($this->errorHandler[ 0 ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useRecommendedErrorHandler(&$refLast = null)
+    {
+        $refLast = $this->getPhpErrorHandler();
+
+        if (null !== $this->mapRecommended[ 'errorHandler' ]) {
+            set_error_handler($this->mapRecommended[ 'errorHandler' ]);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @return callable|null
+     */
+    public function getPhpExceptionHandler()
+    {
+        $handler = set_exception_handler(static function () { });
+
+        restore_exception_handler();
+
+        return $handler;
+    }
+
+    /**
+     * @return callable|null
+     */
+    public function getExceptionHandler()
+    {
+        return $this->exceptionHandler;
+    }
+
+    /**
+     * @param callable|false|null $fnExceptionHandler
+     *
+     * @return static
+     */
+    public function setExceptionHandler($fnExceptionHandler, ?bool $replace = null)
+    {
+        $this->assertNotLocked();
+
+        $key = 'exceptionHandler';
+        $var = $fnExceptionHandler;
+
+        if (false !== $this->mapWasSet[ $key ]) {
+            if (! $replace) {
+                return $this;
+            }
+
+        } else {
+            $this->mapWasSet[ $key ] = true;
+        }
+
+        if (null === $var) {
+            $this->{$key} = [ $this->mapRecommended[ $key ] ];
+
+        } elseif (false === $var) {
+            $this->{$key} = [ $this->mapInitial[ $key ] ];
+
+        } else {
+            if (! is_callable($var)) {
+                throw new LogicException(
+                    [ 'The `fnExceptionHandler` should be a callable', $var ]
+                );
+            }
+
+            $this->{$key} = [ $var ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useExceptionHandler(&$refLast = null)
+    {
+        $refLast = $this->getPhpExceptionHandler();
+
+        if ([] !== $this->exceptionHandler) {
+            set_exception_handler($this->exceptionHandler[ 0 ]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useRecommendedExceptionHandler(&$refLast = null)
+    {
+        $refLast = $this->getPhpExceptionHandler();
+
+        if (null !== $this->mapRecommended[ 'exceptionHandler' ]) {
+            set_exception_handler($this->mapRecommended[ 'exceptionHandler' ]);
+        }
 
         return $this;
     }
