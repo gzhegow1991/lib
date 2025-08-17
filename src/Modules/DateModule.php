@@ -16,21 +16,6 @@ class DateModule
     const INTERVAL_MONTH  = 2592000;
     const INTERVAL_YEAR   = 31536000;
 
-    const FORMAT_FILENAME_DATE       = self::FORMAT_FILENAME_DATE_DAY;
-    const FORMAT_FILENAME_DATE_YEAR  = 'y0000';
-    const FORMAT_FILENAME_DATE_MONTH = 'ym00';
-    const FORMAT_FILENAME_DATE_DAY   = 'ymd';
-
-    const FORMAT_FILENAME       = self::FORMAT_FILENAME_SEC;
-    const FORMAT_FILENAME_YEAR  = 'y0000_000000';
-    const FORMAT_FILENAME_MONTH = 'ym00_000000';
-    const FORMAT_FILENAME_DAY   = 'ymd_000000';
-    const FORMAT_FILENAME_HOUR  = 'ymd_H0000';
-    const FORMAT_FILENAME_MIN   = 'ymd_Hi00';
-    const FORMAT_FILENAME_SEC   = 'ymd_His';
-    const FORMAT_FILENAME_MSEC  = 'ymd_His_v';
-    const FORMAT_FILENAME_USEC  = 'ymd_His_u';
-
     const FORMAT_SQL_DATE       = self::FORMAT_SQL_DATE_DAY;
     const FORMAT_SQL_DATE_YEAR  = 'Y-00-00';
     const FORMAT_SQL_DATE_MONTH = 'Y-m-00';
@@ -58,8 +43,23 @@ class DateModule
     const FORMAT_JAVASCRIPT_MSEC = "Y-m-d\TH:i:s.vP";
     const FORMAT_JAVASCRIPT_USEC = "Y-m-d\TH:i:s.uP";
 
-    const FORMAT_HUMAN_DATE = "D, d M Y O";
-    const FORMAT_HUMAN      = "D, d M Y H:i:s O";
+    const FORMAT_FILENAME_DATE       = self::FORMAT_FILENAME_DATE_DAY;
+    const FORMAT_FILENAME_DATE_YEAR  = 'y0000';
+    const FORMAT_FILENAME_DATE_MONTH = 'ym00';
+    const FORMAT_FILENAME_DATE_DAY   = 'ymd';
+
+    const FORMAT_FILENAME       = self::FORMAT_FILENAME_SEC;
+    const FORMAT_FILENAME_YEAR  = 'y0000_000000';
+    const FORMAT_FILENAME_MONTH = 'ym00_000000';
+    const FORMAT_FILENAME_DAY   = 'ymd_000000';
+    const FORMAT_FILENAME_HOUR  = 'ymd_H0000';
+    const FORMAT_FILENAME_MIN   = 'ymd_Hi00';
+    const FORMAT_FILENAME_SEC   = 'ymd_His';
+    const FORMAT_FILENAME_MSEC  = 'ymd_His_v';
+    const FORMAT_FILENAME_USEC  = 'ymd_His_u';
+
+    const FORMAT_HUMAN_DATE = "D, d M Y P e";
+    const FORMAT_HUMAN      = "D, d M Y H:i:s P e";
 
 
     const LIST_INTERVAL = [
@@ -72,19 +72,6 @@ class DateModule
     ];
 
     const LIST_FORMAT = [
-        self::FORMAT_FILENAME_DATE_YEAR  => true,
-        self::FORMAT_FILENAME_DATE_MONTH => true,
-        self::FORMAT_FILENAME_DATE_DAY   => true,
-
-        self::FORMAT_FILENAME_YEAR  => true,
-        self::FORMAT_FILENAME_MONTH => true,
-        self::FORMAT_FILENAME_DAY   => true,
-        self::FORMAT_FILENAME_HOUR  => true,
-        self::FORMAT_FILENAME_MIN   => true,
-        self::FORMAT_FILENAME_SEC   => true,
-        self::FORMAT_FILENAME_MSEC  => true,
-        self::FORMAT_FILENAME_USEC  => true,
-
         self::FORMAT_SQL_DATE_YEAR  => true,
         self::FORMAT_SQL_DATE_MONTH => true,
         self::FORMAT_SQL_DATE_DAY   => true,
@@ -107,6 +94,19 @@ class DateModule
         self::FORMAT_JAVASCRIPT_SEC  => true,
         self::FORMAT_JAVASCRIPT_MSEC => true,
         self::FORMAT_JAVASCRIPT_USEC => true,
+
+        self::FORMAT_FILENAME_DATE_YEAR  => true,
+        self::FORMAT_FILENAME_DATE_MONTH => true,
+        self::FORMAT_FILENAME_DATE_DAY   => true,
+
+        self::FORMAT_FILENAME_YEAR  => true,
+        self::FORMAT_FILENAME_MONTH => true,
+        self::FORMAT_FILENAME_DAY   => true,
+        self::FORMAT_FILENAME_HOUR  => true,
+        self::FORMAT_FILENAME_MIN   => true,
+        self::FORMAT_FILENAME_SEC   => true,
+        self::FORMAT_FILENAME_MSEC  => true,
+        self::FORMAT_FILENAME_USEC  => true,
 
         self::FORMAT_HUMAN_DATE => true,
         self::FORMAT_HUMAN      => true,
@@ -1950,9 +1950,7 @@ class DateModule
 
     public function format_sql(\DateTimeInterface $dateTime) : string
     {
-        $formattedSql = $dateTime->format(static::FORMAT_SQL);
-
-        return $formattedSql;
+        return $dateTime->format(static::FORMAT_SQL);
     }
 
     public function format_sql_msec(\DateTimeInterface $dateTime) : string
@@ -1998,12 +1996,38 @@ class DateModule
     }
 
 
+    public function array_sql_tz(\DateTimeInterface $dateTime) : array
+    {
+        $formatted = [];
+        $formatted[] = $this->format_sql($dateTime);
+        $formatted[] = $dateTime->getTimezone()->getName();
+
+        return $formatted;
+    }
+
+    public function array_sql_msec_tz(\DateTimeInterface $dateTime) : array
+    {
+        $formatted = [];
+        $formatted[] = $this->format_sql_msec($dateTime);
+        $formatted[] = $dateTime->getTimezone()->getName();
+
+        return $formatted;
+    }
+
+    public function array_sql_usec_tz(\DateTimeInterface $dateTime) : array
+    {
+        $formatted = [];
+        $formatted[] = $this->format_sql_usec($dateTime);
+        $formatted[] = $dateTime->getTimezone()->getName();
+
+        return $formatted;
+    }
+
+
 
     public function format_javascript(\DateTimeInterface $dateTime) : string
     {
-        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT);
-
-        return $formatted;
+        return $dateTime->format(static::FORMAT_JAVASCRIPT);
     }
 
     public function format_javascript_msec(\DateTimeInterface $dateTime) : string
@@ -2024,6 +2048,34 @@ class DateModule
         $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
 
         return "{$formattedJavascript}.{$microseconds}";
+    }
+
+
+    public function array_javascript_tz(\DateTimeInterface $dateTime) : array
+    {
+        $formatted = [];
+        $formatted[] = $this->format_javascript($dateTime);
+        $formatted[] = $dateTime->getTimezone()->getName();
+
+        return $formatted;
+    }
+
+    public function array_javascript_tz_msec(\DateTimeInterface $dateTime) : array
+    {
+        $formatted = [];
+        $formatted[] = $this->format_javascript_msec($dateTime);
+        $formatted[] = $dateTime->getTimezone()->getName();
+
+        return $formatted;
+    }
+
+    public function array_javascript_tz_usec(\DateTimeInterface $dateTime) : array
+    {
+        $formatted = [];
+        $formatted[] = $this->format_javascript_usec($dateTime);
+        $formatted[] = $dateTime->getTimezone()->getName();
+
+        return $formatted;
     }
 
 
