@@ -20,15 +20,11 @@ class EntrypointModule
     /**
      * @var array<string, mixed>
      */
-    protected $mapRecommended = [
-        'errorHandler'         => null,
-        'exceptionHandler'     => null,
-        //
+    protected $mapInitial = [
         'errorReporting'       => null,
         'errorLog'             => null,
         'logErrors'            => null,
         'displayErrors'        => null,
-        'displayStartupErrors' => null,
         //
         'memoryLimit'          => null,
         //
@@ -50,19 +46,18 @@ class EntrypointModule
         'uploadMaxFilesize'    => null,
         'uploadTmpDir'         => null,
         'uploadTmpDirMkdir'    => null,
+        //
+        'errorHandler'         => null,
+        'exceptionHandler'     => null,
     ];
     /**
      * @var array<string, mixed>
      */
-    protected $mapInitial = [
-        'errorHandler'         => null,
-        'exceptionHandler'     => null,
-        //
+    protected $mapRecommended = [
         'errorReporting'       => null,
         'errorLog'             => null,
         'logErrors'            => null,
         'displayErrors'        => null,
-        'displayStartupErrors' => null,
         //
         'memoryLimit'          => null,
         //
@@ -84,6 +79,9 @@ class EntrypointModule
         'uploadMaxFilesize'    => null,
         'uploadTmpDir'         => null,
         'uploadTmpDirMkdir'    => null,
+        //
+        'errorHandler'         => null,
+        'exceptionHandler'     => null,
     ];
 
     /**
@@ -93,14 +91,10 @@ class EntrypointModule
         'dirRoot'              => false,
         'retTrace'             => false,
         //
-        'errorHandler'         => false,
-        'exceptionHandler'     => false,
-        //
         'errorReporting'       => false,
         'errorLog'             => false,
         'logErrors'            => false,
         'displayErrors'        => false,
-        'displayStartupErrors' => false,
         //
         'memoryLimit'          => false,
         //
@@ -122,6 +116,9 @@ class EntrypointModule
         'uploadMaxFilesize'    => false,
         'uploadTmpDir'         => false,
         'uploadTmpDirMkdir'    => false,
+        //
+        'errorHandler'         => false,
+        'exceptionHandler'     => false,
     ];
 
     /**
@@ -132,15 +129,6 @@ class EntrypointModule
      * @var array{ 0?: bool }
      */
     protected $retTrace = [];
-
-    /**
-     * @var array{ 0?: callable|null }
-     */
-    protected $errorHandler = [];
-    /**
-     * @var array{ 0?: callable|null }
-     */
-    protected $exceptionHandler = [];
 
     /**
      * @var array{ 0?: int }
@@ -158,10 +146,6 @@ class EntrypointModule
      * @var array{ 0?: int }
      */
     protected $displayErrors = [];
-    /**
-     * @var array{ 0?: int }
-     */
-    protected $displayStartupErrors = [];
 
     /**
      * @var array{ 0?: string }
@@ -224,6 +208,15 @@ class EntrypointModule
     protected $uploadTmpDirMkdir = [];
 
     /**
+     * @var array{ 0?: callable|null }
+     */
+    protected $errorHandler = [];
+    /**
+     * @var array{ 0?: callable|null }
+     */
+    protected $exceptionHandler = [];
+
+    /**
      * @var bool
      */
     protected $signalIgnoreShutdownFunction = false;
@@ -235,15 +228,42 @@ class EntrypointModule
 
     public function __construct()
     {
-        $this->mapRecommended = [
-            'errorHandler'         => [ $this, 'fnErrorHandler' ],
-            'exceptionHandler'     => [ $this, 'fnExceptionHandler' ],
+        $this->mapInitial = [
+            'errorReporting'       => $this->getPhpErrorReporting(),
+            'errorLog'             => $this->getPhpErrorLog(),
+            'logErrors'            => $this->getPhpLogErrors(),
+            'displayErrors'        => $this->getPhpDisplayErrors(),
             //
+            'memoryLimit'          => $this->getPhpMemoryLimit(),
+            //
+            'maxExecutionTime'     => $this->getPhpMaxExecutionTime(),
+            'maxInputTime'         => $this->getPhpMaxInputTime(),
+            //
+            'timezoneDefault'      => $this->getPhpTimezoneDefault(),
+            //
+            'precision'            => $this->getPhpPrecision(),
+            //
+            'umask'                => $this->getPhpUmask(),
+            //
+            'postMaxSize'          => $this->getPhpPostMaxSize(),
+            //
+            'sessionCookieParams'  => $this->getPhpSessionCookieParams(),
+            'sessionSavePath'      => $this->getPhpSessionSavePath(),
+            'sessionSavePathMkdir' => false,
+            //
+            'uploadMaxFilesize'    => $this->getPhpUploadMaxFilesize(),
+            'uploadTmpDir'         => $this->getPhpUploadTmpDir(),
+            'uploadTmpDirMkdir'    => false,
+            //
+            'errorHandler'         => $this->getPhpErrorHandler(),
+            'exceptionHandler'     => $this->getPhpExceptionHandler(),
+        ];
+
+        $this->mapRecommended = [
             'errorReporting'       => (E_ALL | E_DEPRECATED | E_USER_DEPRECATED),
-            'errorLog'             => null,
+            'errorLog'             => (getcwd() . '/error_log'),
             'logErrors'            => 0,
             'displayErrors'        => 0,
-            'displayStartupErrors' => 0,
             //
             'memoryLimit'          => '32M',
             //
@@ -266,44 +286,15 @@ class EntrypointModule
                 'httponly' => true,
                 'samesite' => 'Lax',
             ],
-            'sessionSavePath'      => null,
+            'sessionSavePath'      => sys_get_temp_dir(),
             'sessionSavePathMkdir' => false,
             //
             'uploadMaxFilesize'    => '2M',
-            'uploadTmpDir'         => null,
+            'uploadTmpDir'         => sys_get_temp_dir(),
             'uploadTmpDirMkdir'    => false,
-        ];
-
-        $this->mapInitial = [
-            'errorHandler'         => $this->getPhpErrorHandler(),
-            'exceptionHandler'     => $this->getPhpExceptionHandler(),
             //
-            'errorReporting'       => $this->getPhpErrorReporting(),
-            'errorLog'             => $this->getPhpErrorLog(),
-            'logErrors'            => $this->getPhpLogErrors(),
-            'displayErrors'        => $this->getPhpDisplayErrors(),
-            'displayStartupErrors' => $this->getPhpDisplayStartupErrors(),
-            //
-            'memoryLimit'          => $this->getPhpMemoryLimit(),
-            //
-            'maxExecutionTime'     => $this->getPhpMaxExecutionTime(),
-            'maxInputTime'         => $this->getPhpMaxInputTime(),
-            //
-            'timezoneDefault'      => $this->getPhpTimezoneDefault(),
-            //
-            'precision'            => $this->getPhpPrecision(),
-            //
-            'umask'                => $this->getPhpUmask(),
-            //
-            'postMaxSize'          => $this->getPhpPostMaxSize(),
-            //
-            'sessionCookieParams'  => $this->getPhpSessionCookieParams(),
-            'sessionSavePath'      => $this->getPhpSessionSavePath(),
-            'sessionSavePathMkdir' => false,
-            //
-            'uploadMaxFilesize'    => $this->getPhpUploadMaxFilesize(),
-            'uploadTmpDir'         => $this->getPhpUploadTmpDir(),
-            'uploadTmpDirMkdir'    => false,
+            'errorHandler'         => [ $this, 'fnErrorHandler' ],
+            'exceptionHandler'     => [ $this, 'fnExceptionHandler' ],
         ];
 
         foreach ( $this->mapRecommended as $key => $value ) {
@@ -853,14 +844,6 @@ class EntrypointModule
     }
 
     /**
-     * @return string|false
-     */
-    public function getPhpDisplayStartupErrors()
-    {
-        return ini_get('display_startup_errors');
-    }
-
-    /**
      * @param bool|false|null $displayErrors
      *
      * @return static
@@ -869,26 +852,20 @@ class EntrypointModule
     {
         $this->assertNotLocked();
 
-        if (false
-            || (false !== $this->mapWasSet[ 'displayErrors' ])
-            || (false !== $this->mapWasSet[ 'displayStartupErrors' ])
-        ) {
+        if (false !== $this->mapWasSet[ 'displayErrors' ]) {
             if (! $replace) {
                 return $this;
             }
 
         } else {
             $this->mapWasSet[ 'displayErrors' ] = true;
-            $this->mapWasSet[ 'displayStartupErrors' ] = true;
         }
 
         if (null === $displayErrors) {
             $this->displayErrors = [ $this->mapRecommended[ 'displayErrors' ] ];
-            $this->displayStartupErrors = [ $this->mapRecommended[ 'displayStartupErrors' ] ];
 
         } elseif (false === $displayErrors) {
             $this->displayErrors = [ $this->mapInitial[ 'displayErrors' ] ];
-            $this->displayStartupErrors = [ $this->mapInitial[ 'displayStartupErrors' ] ];
 
         } else {
             $theType = Lib::type();
@@ -896,7 +873,6 @@ class EntrypointModule
             $displayErrorsValid = $theType->bool($displayErrors)->orThrow();
 
             $this->displayErrors = [ (int) $displayErrorsValid ];
-            $this->displayStartupErrors = [ (int) $displayErrorsValid ];
         }
 
         return $this;
@@ -905,20 +881,14 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useDisplayErrors(
-        &$refLastDisplayErrors = null,
-        &$refLastDisplayStartupErrors = null
-    )
+    public function useDisplayErrors(&$refLastDisplayErrors = null)
     {
         $refLastDisplayErrors = null;
-        $refLastDisplayStartupErrors = null;
 
         if ([] !== $this->displayErrors) {
             $refLastDisplayErrors = ini_set('display_errors', $this->displayErrors[ 0 ]);
-        }
 
-        if ([] !== $this->displayStartupErrors) {
-            $refLastDisplayStartupErrors = ini_set('display_startup_errors', $this->displayStartupErrors[ 0 ]);
+            ini_set('display_startup_errors', $this->displayErrors[ 0 ]);
         }
 
         return $this;
@@ -927,13 +897,11 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function useRecommendedDisplayErrors(
-        &$refLastDisplayErrors = null,
-        &$refLastDisplayStartupErrors = null
-    )
+    public function useRecommendedDisplayErrors(&$refLastDisplayErrors = null)
     {
         $refLastDisplayErrors = ini_set('display_errors', $this->mapRecommended[ 'displayErrors' ]);
-        $refLastDisplayStartupErrors = ini_set('display_startup_errors', $this->mapRecommended[ 'displayStartupErrors' ]);
+
+        ini_set('display_startup_errors', $this->mapRecommended[ 'displayErrors' ]);
 
         return $this;
     }
@@ -977,7 +945,7 @@ class EntrypointModule
             $varValidInt = $theFormat->bytes_decode([], $var);
             $varValidString = $theFormat->bytes_encode([], $varValidInt, 0, 1);
 
-            $this->{$var} = [ $varValidString ];
+            $this->{$key} = [ $varValidString ];
         }
 
         return $this;
@@ -1045,7 +1013,7 @@ class EntrypointModule
 
             $varValid = $theType->int_non_negative($var)->orThrow();
 
-            $this->{$var} = [ $varValid ];
+            $this->{$key} = [ $varValid ];
         }
 
         return $this;
@@ -1113,7 +1081,7 @@ class EntrypointModule
 
             $varValid = $theType->int_non_negative_or_minus_one($var)->orThrow();
 
-            $this->{$var} = [ $varValid ];
+            $this->{$key} = [ $varValid ];
         }
 
         return $this;
@@ -1188,7 +1156,7 @@ class EntrypointModule
 
             $varValid = $theType->timezone($var)->orThrow();
 
-            $this->{$var} = [ $varValid ];
+            $this->{$key} = [ $varValid ];
         }
 
         return $this;
@@ -1256,7 +1224,7 @@ class EntrypointModule
 
             $varValid = $theType->int_non_negative($var)->orThrow();
 
-            $this->{$var} = [ $varValid ];
+            $this->{$key} = [ $varValid ];
         }
 
         return $this;
@@ -1330,7 +1298,7 @@ class EntrypointModule
                 );
             }
 
-            $this->{$var} = [ $var ];
+            $this->{$key} = [ $var ];
         }
 
         return $this;
@@ -1399,7 +1367,7 @@ class EntrypointModule
             $varValidInt = $theFormat->bytes_decode([], $var);
             $varValidString = $theFormat->bytes_encode([], $varValidInt, 0, 1);
 
-            $this->{$var} = [ $varValidString ];
+            $this->{$key} = [ $varValidString ];
         }
 
         return $this;
@@ -1488,7 +1456,7 @@ class EntrypointModule
                 );
             }
 
-            $this->{$var} = [ $sessionCookieParamsValid ];
+            $this->{$key} = [ $sessionCookieParamsValid ];
         }
 
         return $this;
@@ -1663,7 +1631,7 @@ class EntrypointModule
             $varValidInt = $theFormat->bytes_decode([], $var);
             $varValidString = $theFormat->bytes_encode([], $varValidInt, 0, 1);
 
-            $this->{$var} = [ $varValidString ];
+            $this->{$key} = [ $varValidString ];
         }
 
         return $this;
@@ -1863,7 +1831,6 @@ class EntrypointModule
         $lock = $lock ?? true;
 
         $map = $this->mapInitial;
-        unset($map[ 'displayStartupErrors' ]);
         unset($map[ 'sessionSavePathMkdir' ]);
         unset($map[ 'uploadTmpDirMkdir' ]);
 
@@ -1888,7 +1855,6 @@ class EntrypointModule
         $lock = $lock ?? true;
 
         $map = $this->mapRecommended;
-        unset($map[ 'displayStartupErrors' ]);
         unset($map[ 'sessionSavePathMkdir' ]);
         unset($map[ 'uploadTmpDirMkdir' ]);
 

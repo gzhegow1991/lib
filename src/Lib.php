@@ -884,30 +884,32 @@ class Lib
         return $services;
     }
 
-    public static function export(string $file, $item = null, ?string $key = null) : array
+    public static function export(string $file, $service = null, ?string $key = null) : array
     {
-        if (! is_file($file)) {
-            throw new LogicException(
+        $realpath = realpath($file);
+
+        if (false === $realpath) {
+            throw new RuntimeException(
                 [ 'Missing `filepath` file: ' . $file ]
             );
         }
 
         $services =& static::di();
 
-        $realpath = realpath($file);
-
-        if (null !== $item) {
+        if (null !== $service) {
             if (null !== $key) {
-                $services[ $realpath ][ $key ] = $item;
+                $services[ $realpath ][ $key ] = $service;
 
-            } elseif (is_array($item)) {
+            } elseif (is_array($service)) {
                 $services[ $realpath ] = array_replace(
                     $services[ $file ] ?? [],
-                    $item
+                    $service
                 );
 
             } else {
-                $services[ $realpath ][] = $item;
+                $key = basename($realpath);
+
+                $services[ $realpath ][ $key ] = $service;
             }
         }
 
@@ -920,12 +922,12 @@ class Lib
      * @param class-string<T>|null $classT
      *
      * @return T|mixed
-     *
-     * @noinspection PhpUnusedParameterInspection
      */
-    public static function import(string $file, ?string $key = null, ?string $classT = null)
+    public static function import(string $file, ?string $classT = null, ?string $key = null)
     {
-        if (! is_file($file)) {
+        $realpath = realpath($file);
+
+        if (false === $realpath) {
             throw new RuntimeException(
                 [ 'Missing `filepath` file: ' . $file ]
             );
@@ -933,19 +935,36 @@ class Lib
 
         $services =& static::di();
 
-        $realpath = realpath($file);
-
         if (! isset($services[ $realpath ])) {
             $services[ $realpath ] = include $realpath;
         }
 
-        if (null !== $key) {
+        if (! is_array($services[ $realpath ])) {
+            throw new RuntimeException(
+                [ 'The `services[realpath]` should be array', $services[ $realpath ] ]
+            );
+        }
+
+        if (null !== $classT) {
+            $key = $key ?? basename($realpath);
+
+            $service = $services[ $realpath ][ $key ];
+
+            if (! ($service instanceof $classT)) {
+                throw new RuntimeException(
+                    [ 'The `services[realpath][' . $key . ']` should be instance of: ' . $classT, $service ]
+                );
+            }
+
             return $services[ $realpath ][ $key ];
         }
 
+        $services[ $realpath ] = []
+            + $services[ $realpath ]
+            + array_values($services[ $realpath ]);
+
         return $services[ $realpath ];
     }
-
 
 
     /**
