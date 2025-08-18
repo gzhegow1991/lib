@@ -147,7 +147,7 @@ abstract class AbstractConfig implements
     {
         $result = [];
 
-        foreach ( $this->__keys as $key => $bool ) {
+        foreach ( array_keys($this->__keys) as $key ) {
             if (isset($this->__children[ $key ])) {
                 $result[ $key ] = $this->{$key}->toArray();
 
@@ -168,9 +168,7 @@ abstract class AbstractConfig implements
         if (null !== $fn) {
             $this->invalidate();
 
-            $fnBound = $fn->bindTo($this, $this);
-
-            call_user_func_array($fnBound, [ $this, $context ]);
+            call_user_func_array($fn, [ $this, $context ]);
         }
 
         $this->validate($context);

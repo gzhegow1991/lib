@@ -788,91 +788,6 @@ class Lib
 
 
     /**
-     * > конструкция require в PHP бросает FATAL, который не отлавливается с помощью set_error_handler()/set_exception_handler()
-     *
-     * @return mixed
-     */
-    public static function require(string $file)
-    {
-        if (! is_file($file)) {
-            throw new LogicException(
-                [ 'Missing `filepath` file: ' . $file ]
-            );
-        }
-
-        if (! is_file($file)) {
-            throw new LogicException(
-                [ 'Missing `filepath` file: ' . $file ]
-            );
-        }
-
-        $realpath = realpath($file);
-
-        return include $realpath;
-    }
-
-    /**
-     * > конструкция require в PHP бросает FATAL, который не отлавливается с помощью set_error_handler()/set_exception_handler()
-     *
-     * @return mixed
-     */
-    public static function require_once(string $file)
-    {
-        static $requireOnce;
-
-        $requireOnce = $requireOnce ?? [];
-
-        if (! is_file($file)) {
-            throw new LogicException(
-                [ 'Missing `filepath` file: ' . $file ]
-            );
-        }
-
-        $realpath = realpath($file);
-
-        if (! isset($requireOnce[ $realpath ])) {
-            $requireOnce[ $realpath ] = include $realpath;
-        }
-
-        return $requireOnce[ $realpath ];
-    }
-
-
-    /**
-     * > в версиях PHP ниже 8.0 нельзя выбросить исключения в рамках цепочки тернарных операторов
-     *
-     * @noinspection PhpUnnecessaryStopStatementInspection
-     *
-     * @return null
-     *
-     * @throws \LogicException|\RuntimeException
-     */
-    public static function throw($throwableOrArg, ...$throwableArgs)
-    {
-        if (false
-            || ($throwableOrArg instanceof \LogicException)
-            || ($throwableOrArg instanceof \RuntimeException)
-        ) {
-            throw $throwableOrArg;
-        }
-
-        $thePhp = Lib::php();
-
-        array_unshift($throwableArgs, $throwableOrArg);
-
-        $throwableClass = $thePhp->staticThrowableClass();
-
-        $trace = property_exists($throwableClass, 'trace')
-            ? debug_backtrace()
-            : debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-
-        $thePhp->throw_new_trace($trace, ...$throwableArgs);
-
-        return;
-    }
-
-
-    /**
      * > примитивное глобальное хранилище для импортов-экспортов ("сервис-локатор", ОГА)
      */
     public static function &di() : array
@@ -974,16 +889,56 @@ class Lib
 
 
     /**
+     * > конструкция require в PHP бросает FATAL, который не отлавливается с помощью set_error_handler()/set_exception_handler()
+     *
+     * @return mixed
+     */
+    public static function require(string $file)
+    {
+        $realpath = realpath($file);
+
+        if (false === $realpath) {
+            throw new LogicException(
+                [ 'Missing `filepath` file: ' . $file ]
+            );
+        }
+
+        return include $realpath;
+    }
+
+    /**
+     * > конструкция require в PHP бросает FATAL, который не отлавливается с помощью set_error_handler()/set_exception_handler()
+     *
+     * @return mixed
+     */
+    public static function require_once(string $file)
+    {
+        static $requireOnce;
+
+        $requireOnce = $requireOnce ?? [];
+
+        $realpath = realpath($file);
+
+        if (false === $realpath) {
+            throw new LogicException(
+                [ 'Missing `filepath` file: ' . $file ]
+            );
+        }
+
+        if (! isset($requireOnce[ $realpath ])) {
+            $requireOnce[ $realpath ] = include $realpath;
+        }
+
+        return $requireOnce[ $realpath ];
+    }
+
+    /**
      * > подключить Composer, установленный глобально - чтобы дебаг пакеты не добавлять в библиотеки, но пользоваться ими (временно)
      *
      * @return \Composer\Autoload\ClassLoader
      */
     public static function require_composer_global()
     {
-        static $loader;
-
-        $loader = $loader ?? require_once getenv('COMPOSER_HOME') . '/vendor/autoload.php';
-
-        return $loader;
+        return static::require_once(getenv('COMPOSER_HOME') . '/vendor/autoload.php');
     }
 }
