@@ -790,7 +790,7 @@ class Lib
     /**
      * > примитивное глобальное хранилище для импортов-экспортов ("сервис-локатор", ОГА)
      */
-    public static function &di() : array
+    public static function &imports() : array
     {
         static $services;
 
@@ -799,7 +799,14 @@ class Lib
         return $services;
     }
 
-    public static function export(string $file, $service = null, ?string $key = null) : array
+    /**
+     * @template-covariant T of object
+     *
+     * @param class-string<T>|null $keyOrClassT
+     *
+     * @return T|mixed
+     */
+    public static function import(string $file, ?string $keyOrClassT = null, ?string $key = null)
     {
         $realpath = realpath($file);
 
@@ -809,16 +816,86 @@ class Lib
             );
         }
 
-        $services =& static::di();
+        $imports =& static::imports();
 
-        if (null !== $service) {
+        if (! isset($imports[ $realpath ])) {
+            $imports[ $realpath ] = include $realpath;
+        }
+
+        if (! is_array($imports[ $realpath ])) {
+            throw new RuntimeException(
+                [ 'The `imports[realpath]` should be array', $imports[ $realpath ] ]
+            );
+        }
+
+        $hasKeyOrClassT = (null !== $keyOrClassT);
+        $hasClassT = $hasKeyOrClassT && class_exists($keyOrClassT);
+        $hasKey = (null !== $key);
+
+        if ($hasKeyOrClassT && $hasKey) {
+            if (! $hasClassT) {
+                throw new RuntimeException(
+                    [ 'The `keyOrClassT` should be existing class: ' . $keyOrClassT, $keyOrClassT ]
+                );
+            }
+
+            $import = $imports[ $realpath ][ $key ];
+
+            if (! ($import instanceof $keyOrClassT)) {
+                throw new RuntimeException(
+                    [ 'The `imports[realpath][' . $key . ']` should be instance of: ' . $keyOrClassT, $import ]
+                );
+            }
+
+            return $import;
+        }
+
+        if ($hasKeyOrClassT) {
+            if ($hasClassT) {
+                $theFs = Lib::fs();
+
+                $key = $theFs->fname($realpath);
+
+            } else {
+                $key = $keyOrClassT;
+            }
+
+            $hasKey = true;
+        }
+
+        if ($hasKey) {
+            $import = $imports[ $realpath ][ $key ];
+
+            return $import;
+        }
+
+        $imports[ $realpath ] = []
+            + $imports[ $realpath ]
+            + array_values($imports[ $realpath ]);
+
+        return $imports[ $realpath ];
+    }
+
+    public static function export(string $file, $export = null, ?string $key = null) : array
+    {
+        $realpath = realpath($file);
+
+        if (false === $realpath) {
+            throw new RuntimeException(
+                [ 'Missing `filepath` file: ' . $file ]
+            );
+        }
+
+        $imports =& static::imports();
+
+        if (null !== $export) {
             if (null !== $key) {
-                $services[ $realpath ][ $key ] = $service;
+                $imports[ $realpath ][ $key ] = $export;
 
-            } elseif (is_array($service)) {
-                $services[ $realpath ] = array_replace(
-                    $services[ $file ] ?? [],
-                    $service
+            } elseif (is_array($export)) {
+                $imports[ $realpath ] = array_replace(
+                    $imports[ $file ] ?? [],
+                    $export
                 );
 
             } else {
@@ -826,65 +903,11 @@ class Lib
 
                 $key = $theFs->fname($realpath);
 
-                $services[ $realpath ][ $key ] = $service;
+                $imports[ $realpath ][ $key ] = $export;
             }
         }
 
-        return $services[ $realpath ];
-    }
-
-    /**
-     * @template-covariant T of object
-     *
-     * @param class-string<T>|null $classT
-     *
-     * @return T|mixed
-     */
-    public static function import(string $file, ?string $classT = null, ?string $key = null)
-    {
-        $realpath = realpath($file);
-
-        if (false === $realpath) {
-            throw new RuntimeException(
-                [ 'Missing `filepath` file: ' . $file ]
-            );
-        }
-
-        $services =& static::di();
-
-        if (! isset($services[ $realpath ])) {
-            $services[ $realpath ] = include $realpath;
-        }
-
-        if (! is_array($services[ $realpath ])) {
-            throw new RuntimeException(
-                [ 'The `services[realpath]` should be array', $services[ $realpath ] ]
-            );
-        }
-
-        if (null !== $classT) {
-            if (null === $key) {
-                $theFs = Lib::fs();
-
-                $key = $theFs->fname($realpath);
-            }
-
-            $service = $services[ $realpath ][ $key ];
-
-            if (! ($service instanceof $classT)) {
-                throw new RuntimeException(
-                    [ 'The `services[realpath][' . $key . ']` should be instance of: ' . $classT, $service ]
-                );
-            }
-
-            return $services[ $realpath ][ $key ];
-        }
-
-        $services[ $realpath ] = []
-            + $services[ $realpath ]
-            + array_values($services[ $realpath ]);
-
-        return $services[ $realpath ];
+        return $imports[ $realpath ];
     }
 
 
