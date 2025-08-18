@@ -24,8 +24,8 @@ class ItertoolsModule
 
 
     /**
-     * > range(0,2) -> 0 1 2
-     * > range(2,0,-1) -> 2 1 0
+     * > range(0, 2) --> 0 1 2
+     * > range(2, 0, -1) --> 2 1 0
      *
      * @param int|float|string $start
      * @param int|float|string $end
@@ -195,11 +195,16 @@ class ItertoolsModule
     }
 
     /**
-     * > product_repeat(3, range(2)) --> 000 001 010 011 100 101 110 111
+     * > product_repeat(1, [ 'A', 'B', 'C', 'D' ], [ 'x', 'y' ]) --> Ax Ay Bx By Cx Cy Dx Dy
+     * > product_repeat(3, [ 0, 1 ]) --> 000 001 010 011 100 101 110 111
      */
     public function product_repeat_it(int $repeat, iterable ...$iterables) : \Generator
     {
-        $repeat = ($repeat > 1) ? $repeat : 1;
+        if ($repeat < 1) {
+            throw new LogicException(
+                [ 'The `repeat` should be positive integer', $repeat ]
+            );
+        }
 
         $pools = [];
         foreach ( $iterables as $i => $iterable ) {
@@ -215,13 +220,28 @@ class ItertoolsModule
 
         $pools = array_merge(...$list);
 
-        yield from $this->product_it(...$pools);
+        $result = [ [] ];
+        foreach ( $pools as $pool ) {
+            $resultCurrent = [];
+
+            foreach ( $result as $x ) {
+                foreach ( $pool as $y ) {
+                    $resultCurrent[] = array_merge($x, [ $y ]);
+                }
+            }
+
+            $result = $resultCurrent;
+        }
+
+        foreach ( $result as $item ) {
+            yield $item;
+        }
     }
 
 
     /**
      * > combinations_unique([ 'A', 'B', 'C', 'D' ], 2) --> AB AC AD BC BD CD
-     * > combinations_unique(range(4), 3) --> 012 013 023 123
+     * > combinations_unique([ 0, 1, 2, 3 ], 3) --> 012 013 023 123
      */
     public function combinations_unique_it(iterable $it, int $len) : ?\Generator
     {
@@ -284,6 +304,7 @@ class ItertoolsModule
 
     /**
      * > combinations_all([ 'A', 'B', 'C' ], 2) --> AA AB AC BB BC CC
+     * > combinations_all([ 0, 1, 2, 3 ], 3) --> 000 001 002 003 011 012 013 022 023 033 111 112 113 122 123 133 222 223 233 333
      */
     public function combinations_all_it(iterable $it, int $len) : ?\Generator
     {
@@ -347,8 +368,8 @@ class ItertoolsModule
 
 
     /**
+     * > permutations([ 'A', 'B', 'C' ]) --> ABC ACB BAC BCA CAB CBA
      * > permutations([ 'A', 'B', 'C', 'D' ], 2) --> AB AC AD BA BC BD CA CB CD DA DB DC
-     * > permutations(range(3)) --> 012 021 102 120 201 210
      */
     public function permutations_it(iterable $it, ?int $len = null) : \Generator
     {
