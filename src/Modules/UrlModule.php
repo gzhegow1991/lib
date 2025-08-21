@@ -84,19 +84,21 @@ class UrlModule
 
         $refParseUrl = array_replace(
             [
-                'scheme'   => null,
-                'user'     => null,
-                'pass'     => null,
-                'host'     => null,
-                'port'     => null,
-                'path'     => null,
-                'query'    => null,
-                'fragment' => null,
+                'scheme'   => '',
+                'user'     => '',
+                'pass'     => '',
+                'host'     => '',
+                'port'     => '',
+                'path'     => '',
+                'query'    => '',
+                'fragment' => '',
             ],
             $refParseUrl
         );
 
-        if (empty($refParseUrl[ 'host' ])) {
+        $hasHost = ('' !== $refParseUrl[ 'host' ]);
+
+        if (! $hasHost) {
             if (! isset($_SERVER[ 'HTTP_HOST' ])) {
                 return Ret::err(
                     [ 'The `url` requires host (domain) prefix', $url ],
@@ -117,20 +119,23 @@ class UrlModule
 
             $refParseUrl = array_replace(
                 [
-                    'scheme'   => null,
-                    'user'     => null,
-                    'pass'     => null,
-                    'host'     => null,
-                    'port'     => null,
-                    'path'     => null,
-                    'query'    => null,
-                    'fragment' => null,
+                    'scheme'   => '',
+                    'user'     => '',
+                    'pass'     => '',
+                    'host'     => '',
+                    'port'     => '',
+                    'path'     => '',
+                    'query'    => '',
+                    'fragment' => '',
                 ],
                 $refParseUrl
             );
         }
 
-        if (null !== $refParseUrl[ 'host' ]) {
+        $hasHost = ('' !== $refParseUrl[ 'host' ]);
+        $hasPath = ('' !== $refParseUrl[ 'path' ]);
+
+        if ($hasHost) {
             if (false
                 || (-2 === $isHostIdnaAscii)
                 || (-1 === $isHostIdnaAscii)
@@ -184,7 +189,7 @@ class UrlModule
             }
         }
 
-        if (null !== $refParseUrl[ 'path' ]) {
+        if ($hasPath) {
             if (1 === $isLinkUrlencoded) {
                 $test = str_replace('/', '', $refParseUrl[ 'path' ]);
 
@@ -284,19 +289,21 @@ class UrlModule
 
         $refParseUrl = array_replace(
             [
-                'scheme'   => null,
-                'user'     => null,
-                'pass'     => null,
-                'host'     => null,
-                'port'     => null,
-                'path'     => null,
-                'query'    => null,
-                'fragment' => null,
+                'scheme'   => '',
+                'user'     => '',
+                'pass'     => '',
+                'host'     => '',
+                'port'     => '',
+                'path'     => '',
+                'query'    => '',
+                'fragment' => '',
             ],
             $refParseUrl
         );
 
-        if (empty($refParseUrl[ 'host' ])) {
+        $hasHost = ('' !== $refParseUrl[ 'host' ]);
+
+        if (! $hasHost) {
             if (! isset($_SERVER[ 'HTTP_HOST' ])) {
                 return Ret::err(
                     [ 'The `url` requires host (domain) prefix', $url ],
@@ -317,20 +324,22 @@ class UrlModule
 
             $refParseUrl = array_replace(
                 [
-                    'scheme'   => null,
-                    'user'     => null,
-                    'pass'     => null,
-                    'host'     => null,
-                    'port'     => null,
-                    'path'     => null,
-                    'query'    => null,
-                    'fragment' => null,
+                    'scheme'   => '',
+                    'user'     => '',
+                    'pass'     => '',
+                    'host'     => '',
+                    'port'     => '',
+                    'path'     => '',
+                    'query'    => '',
+                    'fragment' => '',
                 ],
                 $refParseUrl
             );
         }
 
-        if (null !== $refParseUrl[ 'host' ]) {
+        $hasHost = ('' !== $refParseUrl[ 'host' ]);
+
+        if ($hasHost) {
             if (false
                 || (-2 === $isHostIdnaAscii)
                 || (-1 === $isHostIdnaAscii)
@@ -463,19 +472,21 @@ class UrlModule
 
         $refParseUrl = array_replace(
             [
-                'scheme'   => null,
-                'user'     => null,
-                'pass'     => null,
-                'host'     => null,
-                'port'     => null,
-                'path'     => null,
-                'query'    => null,
-                'fragment' => null,
+                'scheme'   => '',
+                'user'     => '',
+                'pass'     => '',
+                'host'     => '',
+                'port'     => '',
+                'path'     => '',
+                'query'    => '',
+                'fragment' => '',
             ],
             $refParseUrl
         );
 
-        if (null === $refParseUrl[ 'path' ]) {
+        $hasPath = ('' !== $refParseUrl[ 'path' ]);
+
+        if (! $hasPath) {
             return Ret::err(
                 [ 'The `url` should have path', $url ],
                 [ __FILE__, __LINE__ ]
@@ -533,6 +544,206 @@ class UrlModule
         return Ret::val($result);
     }
 
+
+    /**
+     * @param string|true             $url
+     * @param string|false|array|null $query
+     * @param string|false|null       $fragment
+     *
+     * @return Ret<string>
+     */
+    public function type_uri(
+        $url, $query = null, $fragment = null,
+        ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null,
+        array $refs = []
+    )
+    {
+        $isHostIdnaAscii = $isHostIdnaAscii ?? 0;
+        $isLinkUrlencoded = $isLinkUrlencoded ?? 0;
+
+        $theHttp = Lib::http();
+        $theType = Lib::type();
+
+        $withParseUrl = array_key_exists(0, $refs);
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+        }
+        $refParseUrl = null;
+
+        $hasQuery = (null !== $query);
+        $hasFragment = (null !== $fragment);
+
+        if (null === $url) {
+            return Ret::err(
+                [ 'The `url` should not be null', $url ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (true === $url) {
+            $urlStringNotEmpty = $this->url_current();
+
+        } elseif (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
+            return $ret;
+        }
+
+        $_query = null
+            ?? ((false === $query) ? false : null)
+            ?? (is_array($query) ? $query : null)
+            ?? (is_string($query) ? [ $query ] : null);
+
+        $_fragment = null
+            ?? ((false === $fragment) ? false : null)
+            ?? (is_string($fragment) ? $fragment : null);
+
+        if ($hasQuery && (null === $_query)) {
+            throw new LogicException(
+                [ 'The `query` should be a string, an array or a false', $query ]
+            );
+        }
+
+        if ($hasFragment && (null === $_fragment)) {
+            throw new LogicException(
+                [ 'The `fragment` should be a string or the FALSE', $fragment ]
+            );
+        }
+
+        $refParseUrl = parse_url($urlStringNotEmpty);
+
+        if (false === $refParseUrl) {
+            return Ret::err(
+                [ 'The `url` should be valid url', $url ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $refParseUrl = array_replace(
+            [
+                'scheme'   => '',
+                'user'     => '',
+                'pass'     => '',
+                'host'     => '',
+                'port'     => '',
+                'path'     => '',
+                'query'    => '',
+                'fragment' => '',
+            ],
+            $refParseUrl
+        );
+
+        $hasHost = ('' !== $refParseUrl[ 'host' ]);
+        $hasPath = ('' !== $refParseUrl[ 'path' ]);
+
+        if ($hasHost) {
+            if (false
+                || (-2 === $isHostIdnaAscii)
+                || (-1 === $isHostIdnaAscii)
+                || (1 === $isHostIdnaAscii)
+                || (2 === $isHostIdnaAscii)
+            ) {
+                if (-2 === $isHostIdnaAscii) {
+                    $utf8 = $theHttp->idn_to_utf8($refParseUrl[ 'host' ]);
+
+                    if (false === $utf8) {
+                        return Ret::err(
+                            [ 'Cannot encode `url` host to UTF8 using `idn_to_utf8`', $url ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
+
+                    $refParseUrl[ 'host' ] = $utf8;
+
+                } elseif (-1 === $isHostIdnaAscii) {
+                    $test = $refParseUrl[ 'host' ];
+
+                    if ($theHttp->idn_to_utf8($test) !== $test) {
+                        return Ret::err(
+                            [ 'The `url` host should be valid UTF8 idn', $url ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
+
+                } elseif (1 === $isHostIdnaAscii) {
+                    $test = $refParseUrl[ 'host' ];
+
+                    if ($theHttp->idn_to_ascii($test) !== $test) {
+                        return Ret::err(
+                            [ 'The `url` host should be valid ASCII idn', $url ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
+
+                } elseif (2 === $isHostIdnaAscii) {
+                    $ascii = $theHttp->idn_to_ascii($refParseUrl[ 'host' ]);
+
+                    if (false === $ascii) {
+                        return Ret::err(
+                            [ 'Cannot encode `url` host to ASCII using `idn_to_ascii`', $url ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
+
+                    $refParseUrl[ 'host' ] = $ascii;
+                }
+            }
+        }
+
+        if ($hasPath) {
+            if (1 === $isLinkUrlencoded) {
+                $test = str_replace('/', '', $refParseUrl[ 'path' ]);
+
+                if (urlencode($test) !== $test) {
+                    return Ret::err(
+                        [ 'The `url` path should already be URL-encoded', $url ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+            } elseif (2 === $isLinkUrlencoded) {
+                $refParseUrl[ 'path' ] = urlencode($refParseUrl[ 'path' ]);
+                $refParseUrl[ 'path' ] = str_replace('%2F', '/', $refParseUrl[ 'path' ]);
+            }
+        }
+
+        $wasQuery = (null !== $refParseUrl[ 'query' ]);
+
+        if (false === $_query) {
+            unset($refParseUrl[ 'query' ]);
+
+        } else {
+            $httpQuery = null;
+            if ($hasQuery && $wasQuery) {
+                $httpQuery = $theHttp->http_build_query_array($refParseUrl[ 'query' ], $_query);
+                $httpQuery = http_build_query($httpQuery);
+
+            } elseif ($hasQuery) {
+                $httpQuery = $theHttp->http_build_query_array($_query);
+                $httpQuery = http_build_query($httpQuery);
+
+            } elseif ($wasQuery) {
+                $httpQuery = $refParseUrl[ 'query' ];
+            }
+
+            $refParseUrl[ 'query' ] = $httpQuery;
+        }
+
+        if (false === $_fragment) {
+            unset($refParseUrl[ 'fragment' ]);
+
+        } else {
+            if ($hasFragment) {
+                $refParseUrl[ 'fragment' ] = $_fragment;
+            }
+        }
+
+        $result = $hasHost
+            ? $this->url_build($refParseUrl)
+            : $this->link_build($refParseUrl);
+
+        return Ret::val($result);
+    }
+
+
     /**
      * @return Ret<string>
      */
@@ -567,26 +778,26 @@ class UrlModule
 
         $refParseUrl = array_replace(
             [
-                'scheme'   => null,
-                'user'     => null,
-                'pass'     => null,
-                'host'     => null,
-                'port'     => null,
-                'path'     => null,
-                'query'    => null,
-                'fragment' => null,
+                'scheme'   => '',
+                'user'     => '',
+                'pass'     => '',
+                'host'     => '',
+                'port'     => '',
+                'path'     => '',
+                'query'    => '',
+                'fragment' => '',
             ],
             $refParseUrl
         );
 
-        if (null === $refParseUrl[ 'scheme' ]) {
+        if ('' === $refParseUrl[ 'scheme' ]) {
             return Ret::err(
                 [ 'The `dsn` should have key `scheme`', $dsn, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (null === $refParseUrl[ 'path' ]) {
+        if ('' === $refParseUrl[ 'path' ]) {
             return Ret::err(
                 [ 'The `dsn` should have key `path`', $dsn, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
@@ -594,6 +805,7 @@ class UrlModule
         }
 
         $params = explode(';', $refParseUrl[ 'path' ]);
+
         foreach ( $params as $p ) {
             [ $key, $value ] = explode('=', $p, 2) + [ '', '' ];
 
@@ -673,6 +885,29 @@ class UrlModule
         return $result;
     }
 
+    /**
+     * @param string|true             $url
+     * @param string|false|array|null $query
+     * @param string|false|null       $fragment
+     */
+    public function uri(
+        $url = true, $query = null, $fragment = null,
+        ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null
+    ) : string
+    {
+        $args = [
+            $url,
+            $query,
+            $fragment,
+            $isHostIdnaAscii,
+            $isLinkUrlencoded,
+        ];
+
+        $result = $this->type_uri(...$args)->orThrow();
+
+        return $result;
+    }
+
 
     public function url_current() : string
     {
@@ -697,20 +932,31 @@ class UrlModule
         $serverHttps = $_SERVER[ 'HTTPS' ] ?? null;
         $serverPhpAuthUser = $_SERVER[ 'PHP_AUTH_USER' ] ?? null;
         $serverPhpAuthPw = $_SERVER[ 'PHP_AUTH_PW' ] ?? null;
-        $serverPort = $_SERVER[ 'SERVER_PORT' ] ?? null;
+        $serverServerPort = $_SERVER[ 'SERVER_PORT' ] ?? null;
+
+        $serverHttpHost = (string) $serverHttpHost;
+        $serverHttps = (string) $serverHttps;
+        $serverPhpAuthUser = (string) $serverPhpAuthUser;
+        $serverPhpAuthPw = (string) $serverPhpAuthPw;
+        $serverServerPort = (string) $serverServerPort;
+
+        $hasServerHttpHost = ('' !== $serverHttpHost);
+        $hasServerPhpAuthUser = ('' !== $serverPhpAuthUser);
+        $hasServerPhpAuthPw = ('' !== $serverPhpAuthPw);
 
         $scheme = ($serverHttps && ($serverHttps !== 'off')) ? 'https' : 'http';
         $isScheme = '://';
 
-        $user = $serverPhpAuthUser ?: '';
-        $pass = $serverPhpAuthPw ?: '';
-        $isPass = $pass ? ':' : '';
-        $isUserAndPass = ($user || $pass) ? '@' : '';
+        $user = $hasServerPhpAuthUser ? $serverPhpAuthUser : '';
+        $pass = $hasServerPhpAuthPw ? $serverPhpAuthPw : '';
+        $isPass = $hasServerPhpAuthPw ? ':' : '';
+        $isUserAndPass = ($hasServerPhpAuthUser || $hasServerPhpAuthPw) ? '@' : '';
 
-        $host = $serverHttpHost ?: '';
+        $host = $hasServerHttpHost ? $serverHttpHost : '';
 
-        $port = in_array($serverPort, [ 80, 443 ]) ? '' : $serverPort;
-        $isPort = $port ? ':' : '';
+        $port = in_array($serverServerPort, [ 80, 443 ]) ? '' : $serverServerPort;
+        $hasPort = ('' !== $port);
+        $isPort = $hasPort ? ':' : '';
 
         $result = implode('', [
             $scheme,
@@ -739,16 +985,30 @@ class UrlModule
 
         $serverQueryString = $_SERVER[ 'QUERY_STRING' ] ?? null;
 
-        $requestUri = $serverRequestUri ?: '';
-        [ $requestUri, $queryString ] = explode('?', $requestUri, 2) + [ '', null ];
+        $serverRequestUri = (string) $serverRequestUri;
+        $serverQueryString = (string) $serverQueryString;
 
-        $queryString = $serverQueryString ?? $queryString ?? '';
-        $isQueryString = $queryString ? '?' : null;
+        [
+            $serverRequestUri,
+            $serverRequestUriQueryString,
+        ] = explode('?', $serverRequestUri, 2) + [ '', '' ];
+
+        $hasServerQueryString = ('' !== $serverQueryString);
+        $hasServerRequestUriQueryString = ('' !== $serverRequestUriQueryString);
+
+        $newQueryString = null
+            ?? ($hasServerQueryString ? $serverQueryString : null)
+            ?? ($hasServerRequestUriQueryString ? $serverRequestUriQueryString : null)
+            ?? '';
+
+        $hasNewQueryString = ('' !== $newQueryString);
+
+        $isQueryString = $hasNewQueryString ? '?' : '';
 
         $result = implode('', [
-            $requestUri,
+            $serverRequestUri,
             $isQueryString,
-            $queryString,
+            $newQueryString,
         ]);
 
         return $result;
@@ -757,14 +1017,14 @@ class UrlModule
 
     public function url_referrer(
         $url = null, $query = null, $fragment = null,
-        ?int $toHostIdnaAscii = null, ?int $toLinkUrlencoded = null
+        ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null
     ) : string
     {
         $url = $url ?? $_SERVER[ 'HTTP_REFERER' ] ?? true;
 
         $result = $this->url(
             $url, $query, $fragment,
-            $toHostIdnaAscii, $toLinkUrlencoded
+            $isHostIdnaAscii, $isLinkUrlencoded
         );
 
         return $result;
@@ -772,14 +1032,14 @@ class UrlModule
 
     public function host_referrer(
         $url = null,
-        ?int $toIdnaAscii = null
+        ?int $isIdnaAscii = null
     ) : string
     {
         $url = $url ?? $_SERVER[ 'HTTP_REFERER' ] ?? true;
 
         $result = $this->host(
             $url,
-            $toIdnaAscii
+            $isIdnaAscii
         );
 
         return $result;
@@ -787,14 +1047,14 @@ class UrlModule
 
     public function link_referrer(
         $url = null, $query = null, $fragment = null,
-        ?int $toUrlencoded = null
+        ?int $isUrlencoded = null
     ) : string
     {
         $url = $url ?? $_SERVER[ 'HTTP_REFERER' ] ?? true;
 
         $result = $this->link(
             $url, $query, $fragment,
-            $toUrlencoded
+            $isUrlencoded
         );
 
         return $result;
@@ -803,41 +1063,48 @@ class UrlModule
 
     public function url_build(array $parseUrlResult) : string
     {
-        $_parseUrlResult = []
-            + $parseUrlResult
+        $parseUrlResultValid = []
+            + array_map('strval', $parseUrlResult)
             + [
-                'scheme'   => null,
-                'user'     => null,
-                'pass'     => null,
-                'host'     => null,
-                'port'     => null,
-                'path'     => null,
-                'query'    => null,
-                'fragment' => null,
+                'scheme'   => '',
+                'user'     => '',
+                'pass'     => '',
+                'host'     => '',
+                'port'     => '',
+                'path'     => '',
+                'query'    => '',
+                'fragment' => '',
             ];
 
-        $urlScheme = $_parseUrlResult[ 'scheme' ];
-        $isUrlScheme = $urlScheme ? '://' : '//';
+        $urlScheme = $parseUrlResultValid[ 'scheme' ];
+        $hasUrlScheme = ('' !== $urlScheme);
+        $isUrlScheme = $hasUrlScheme ? '://' : '//';
 
-        $urlUser = $_parseUrlResult[ 'user' ];
-        $urlPass = $_parseUrlResult[ 'pass' ];
-        $isPass = $urlPass ? ':' : '';
-        $isUserAndPass = ($urlUser || $urlPass) ? '@' : '';
+        $urlUser = $parseUrlResultValid[ 'user' ];
+        $urlPass = $parseUrlResultValid[ 'pass' ];
+        $hasUrlUser = ('' !== $urlUser);
+        $hasUrlPass = ('' !== $urlPass);
 
-        $urlHost = $_parseUrlResult[ 'host' ];
+        $isPass = $hasUrlPass ? ':' : '';
+        $isUserAndPass = ($hasUrlUser || $hasUrlPass) ? '@' : '';
 
-        $urlPort = $_parseUrlResult[ 'port' ];
-        $port = in_array($urlPort, [ 80, 443 ]) ? '' : $urlPort;
-        $isPort = $port ? ':' : '';
+        $urlHost = $parseUrlResultValid[ 'host' ];
 
-        $urlPath = $_parseUrlResult[ 'path' ] ?? '';
-        [ $path ] = explode('?', $urlPath, 2);
+        $urlPort = $parseUrlResultValid[ 'port' ];
+        $urlPort = in_array($urlPort, [ 80, 443 ]) ? '' : $urlPort;
+        $hasUrlPort = ('' !== $urlPort);
+        $isPort = $hasUrlPort ? ':' : '';
 
-        $urlQuery = $_parseUrlResult[ 'query' ];
-        $isQuery = $urlQuery ? '?' : null;
+        $urlPath = $parseUrlResultValid[ 'path' ];
+        [ $urlPath ] = explode('?', $urlPath, 2);
 
-        $urlFragment = $_parseUrlResult[ 'fragment' ] ?: '';
-        $isFragment = $urlFragment ? '#' : null;
+        $urlQuery = $parseUrlResultValid[ 'query' ];
+        $hasUrlQuery = ('' !== $urlQuery);
+        $isQuery = $hasUrlQuery ? '?' : null;
+
+        $urlFragment = $parseUrlResultValid[ 'fragment' ] ?: '';
+        $hasUrlFragment = ('' !== $urlFragment);
+        $isFragment = $hasUrlFragment ? '#' : null;
 
         $result = implode('', [
             $urlScheme,
@@ -848,8 +1115,8 @@ class UrlModule
             $isUserAndPass,
             $urlHost,
             $isPort,
-            $port,
-            $path,
+            $urlPort,
+            $urlPath,
             $isQuery,
             $urlQuery,
             $isFragment,
@@ -861,29 +1128,34 @@ class UrlModule
 
     public function host_build(array $parseUrlResult) : string
     {
-        $_parseUrlResult = []
-            + $parseUrlResult
+        $parseUrlResultValid = []
+            + array_map('strval', $parseUrlResult)
             + [
-                'scheme' => null,
-                'user'   => null,
-                'pass'   => null,
-                'host'   => null,
-                'port'   => null,
+                'scheme' => '',
+                'user'   => '',
+                'pass'   => '',
+                'host'   => '',
+                'port'   => '',
             ];
 
-        $urlScheme = $_parseUrlResult[ 'scheme' ];
-        $isUrlScheme = $urlScheme ? '://' : '//';
+        $urlScheme = $parseUrlResultValid[ 'scheme' ];
+        $hasUrlScheme = ('' !== $urlScheme);
+        $isUrlScheme = $hasUrlScheme ? '://' : '//';
 
-        $urlUser = $_parseUrlResult[ 'user' ];
-        $urlPass = $_parseUrlResult[ 'pass' ];
-        $isPass = $urlPass ? ':' : '';
-        $isUserAndPass = ($urlUser || $urlPass) ? '@' : '';
+        $urlUser = $parseUrlResultValid[ 'user' ];
+        $urlPass = $parseUrlResultValid[ 'pass' ];
+        $hasUrlUser = ('' !== $urlUser);
+        $hasUrlPass = ('' !== $urlPass);
 
-        $urlHost = $_parseUrlResult[ 'host' ];
+        $isPass = $hasUrlPass ? ':' : '';
+        $isUserAndPass = ($hasUrlUser || $hasUrlPass) ? '@' : '';
 
-        $urlPort = $_parseUrlResult[ 'port' ];
-        $port = in_array($urlPort, [ 80, 443 ]) ? '' : $urlPort;
-        $isPort = $port ? ':' : '';
+        $urlHost = $parseUrlResultValid[ 'host' ];
+
+        $urlPort = $parseUrlResultValid[ 'port' ];
+        $urlPort = in_array($urlPort, [ 80, 443 ]) ? '' : $urlPort;
+        $hasUrlPort = ('' !== $urlPort);
+        $isPort = $hasUrlPort ? ':' : '';
 
         $result = implode('', [
             $urlScheme,
@@ -894,7 +1166,7 @@ class UrlModule
             $isUserAndPass,
             $urlHost,
             $isPort,
-            $port,
+            $urlPort,
         ]);
 
         return $result;
@@ -902,34 +1174,38 @@ class UrlModule
 
     public function link_build(array $parseUrlResult) : string
     {
-        $_parseUrlResult = $parseUrlResult
+        $parseUrlResultValid = []
+            + array_map('strval', $parseUrlResult)
             + [
-                'scheme'   => null,
-                'path'     => null,
-                'query'    => null,
-                'fragment' => null,
+                'scheme'   => '',
+                'path'     => '',
+                'query'    => '',
+                'fragment' => '',
             ];
 
-        $urlScheme = $_parseUrlResult[ 'scheme' ];
+        $urlScheme = $parseUrlResultValid[ 'scheme' ];
         if (in_array($urlScheme, [ 'http', 'https' ])) {
             $urlScheme = '';
         }
 
-        $isUrlScheme = $urlScheme ? ':' : '';
+        $hasUrlScheme = ('' !== $urlScheme);
+        $isUrlScheme = $hasUrlScheme ? ':' : '';
 
-        $urlPath = $_parseUrlResult[ 'path' ] ?? '';
-        [ $path ] = explode('?', $urlPath, 2);
+        $urlPath = $parseUrlResultValid[ 'path' ];
+        [ $urlPath ] = explode('?', $urlPath, 2);
 
-        $urlQuery = $_parseUrlResult[ 'query' ];
-        $isQuery = $urlQuery ? '?' : null;
+        $urlQuery = $parseUrlResultValid[ 'query' ];
+        $hasUrlQuery = ('' !== $urlQuery);
+        $isQuery = $hasUrlQuery ? '?' : null;
 
-        $urlFragment = $_parseUrlResult[ 'fragment' ] ?: '';
-        $isFragment = $urlFragment ? '#' : null;
+        $urlFragment = $parseUrlResultValid[ 'fragment' ] ?: '';
+        $hasUrlFragment = ('' !== $urlFragment);
+        $isFragment = $hasUrlFragment ? '#' : null;
 
         $result = implode('', [
             $urlScheme,
             $isUrlScheme,
-            $path,
+            $urlPath,
             $isQuery,
             $urlQuery,
             $isFragment,
@@ -939,24 +1215,27 @@ class UrlModule
         return $result;
     }
 
+
     public function dsn_pdo_build(array $parseUrlResult) : string
     {
-        $_parseUrlResult = $parseUrlResult
+        $parseUrlResultValid = []
+            + array_map('strval', $parseUrlResult)
             + [
-                'scheme' => null,
-                'path'   => null,
+                'scheme' => '',
+                'path'   => '',
             ];
 
-        $urlScheme = $_parseUrlResult[ 'scheme' ];
-        $isUrlScheme = $urlScheme ? ':' : '';
+        $urlScheme = $parseUrlResultValid[ 'scheme' ];
+        $hasUrlScheme = ('' !== $urlScheme);
+        $isUrlScheme = $hasUrlScheme ? ':' : '';
 
-        $urlPath = $_parseUrlResult[ 'path' ] ?? '';
-        [ $path ] = explode('?', $urlPath, 2);
+        $urlPath = $parseUrlResultValid[ 'path' ];
+        [ $urlPath ] = explode('?', $urlPath, 2);
 
         $result = implode('', [
             $urlScheme,
             $isUrlScheme,
-            $path,
+            $urlPath,
         ]);
 
         return $result;

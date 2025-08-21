@@ -1779,6 +1779,28 @@ trait FilterTrait
 	/**
 	 * @param array{ 0?: string, 1?: Ret<string> } $r
 	 *
+	 * @param string|true             $value
+	 * @param string|false|array|null $query
+	 * @param string|false|null       $fragment
+	 */
+	public function filter_uri(
+		array $r,
+		$value,
+		$query = null,
+		$fragment = null,
+		?int $isHostIdnaAscii = null,
+		?int $isLinkUrlencoded = null,
+		array $refs = []
+	): bool {
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::url()->type_uri($value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: string, 1?: Ret<string> } $r
+	 *
 	 * @param string $value
 	 */
 	public function filter_dsn_pdo(array $r, $value, array $refs = []): bool

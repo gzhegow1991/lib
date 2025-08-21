@@ -1317,6 +1317,19 @@ trait TypeTrait
     }
 
     /**
+     * @param string|true             $value
+     * @param string|false|array|null $query
+     * @param string|false|null       $fragment
+     *
+     * @return Ret<string>
+     */
+    public function uri($value, $query = null, $fragment = null, ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null, array $refs = [])
+    {
+        return Lib::url()->type_uri($value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs);
+    }
+
+
+    /**
      * @param string $value
      *
      * @return Ret<string>

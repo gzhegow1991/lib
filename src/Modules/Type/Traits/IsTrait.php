@@ -1005,6 +1005,23 @@ trait IsTrait
 
 
 	/**
+	 * @param string|true             $value
+	 * @param string|false|array|null $query
+	 * @param string|false|null       $fragment
+	 */
+	public function is_uri(
+		$value,
+		$query = null,
+		$fragment = null,
+		?int $isHostIdnaAscii = null,
+		?int $isLinkUrlencoded = null,
+		array $refs = []
+	): bool {
+		return Lib::url()->type_uri($value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs)->isOk();
+	}
+
+
+	/**
 	 * @param string $value
 	 */
 	public function is_dsn_pdo($value, array $refs = []): bool
