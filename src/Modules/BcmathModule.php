@@ -67,10 +67,7 @@ class BcmathModule
 
         $theType = Lib::type();
 
-        if (! $theType
-            ->numeric($value, false, [ &$split ])
-            ->isOk([ 1 => &$ret ])
-        ) {
+        if (! $theType->numeric($value, false, [ &$split ])->isOk([ 1 => &$ret ])) {
             return $ret;
         }
 
@@ -81,13 +78,17 @@ class BcmathModule
             $scale = strlen($frac) - 1;
         }
 
-        $bcnumber = Bcnumber::fromValidArray([
+        Bcnumber::fromValidArray([
             'original' => $value,
             'sign'     => $split[ 0 ],
             'int'      => $split[ 1 ],
             'frac'     => $split[ 2 ],
             'scale'    => $scale,
-        ])->orThrow();
+        ])->isOk([ &$bcnumber, &$ret ]);
+
+        if ($ret->isFail()) {
+            return $ret;
+        }
 
         return Ret::val($bcnumber);
     }

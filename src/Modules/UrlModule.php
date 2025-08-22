@@ -45,10 +45,7 @@ class UrlModule
             );
         }
 
-        if (true === $url) {
-            $urlStringNotEmpty = $this->url_current();
-
-        } elseif (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
+        if (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
             return $ret;
         }
 
@@ -62,14 +59,16 @@ class UrlModule
             ?? (is_string($fragment) ? $fragment : null);
 
         if ($hasQuery && (null === $_query)) {
-            throw new LogicException(
-                [ 'The `query` should be a string, an array or a false', $query ]
+            return Ret::err(
+                [ 'The `query` should be a string, an array or a false', $query ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
         if ($hasFragment && (null === $_fragment)) {
-            throw new LogicException(
-                [ 'The `fragment` should be a string or the FALSE', $fragment ]
+            return Ret::err(
+                [ 'The `fragment` should be a string or the FALSE', $fragment ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
@@ -97,400 +96,69 @@ class UrlModule
         );
 
         $hasHost = ('' !== $refParseUrl[ 'host' ]);
+        $hasPath = ('' !== $refParseUrl[ 'path' ]);
 
         if (! $hasHost) {
-            if (! isset($_SERVER[ 'HTTP_HOST' ])) {
-                return Ret::err(
-                    [ 'The `url` requires host (domain) prefix', $url ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-
-            $urlStringNotEmpty = $this->host_current() . '/' . ltrim($urlStringNotEmpty, '/');
-
-            $refParseUrl = parse_url($urlStringNotEmpty);
-
-            if (false === $refParseUrl) {
-                return Ret::err(
-                    [ 'The `url` should be valid url', $url ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-
-            $refParseUrl = array_replace(
-                [
-                    'scheme'   => '',
-                    'user'     => '',
-                    'pass'     => '',
-                    'host'     => '',
-                    'port'     => '',
-                    'path'     => '',
-                    'query'    => '',
-                    'fragment' => '',
-                ],
-                $refParseUrl
+            return Ret::err(
+                [ 'The `url` requires a host', $url, $refParseUrl ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
-        $hasHost = ('' !== $refParseUrl[ 'host' ]);
-        $hasPath = ('' !== $refParseUrl[ 'path' ]);
-
-        if ($hasHost) {
-            if (false
-                || (-2 === $isHostIdnaAscii)
-                || (-1 === $isHostIdnaAscii)
-                || (1 === $isHostIdnaAscii)
-                || (2 === $isHostIdnaAscii)
-            ) {
-                if (-2 === $isHostIdnaAscii) {
-                    $utf8 = $theHttp->idn_to_utf8($refParseUrl[ 'host' ]);
-
-                    if (false === $utf8) {
-                        return Ret::err(
-                            [ 'Cannot encode `url` host to UTF8 using `idn_to_utf8`', $url ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                    $refParseUrl[ 'host' ] = $utf8;
-
-                } elseif (-1 === $isHostIdnaAscii) {
-                    $test = $refParseUrl[ 'host' ];
-
-                    if ($theHttp->idn_to_utf8($test) !== $test) {
-                        return Ret::err(
-                            [ 'The `url` host should be valid UTF8 idn', $url ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                } elseif (1 === $isHostIdnaAscii) {
-                    $test = $refParseUrl[ 'host' ];
-
-                    if ($theHttp->idn_to_ascii($test) !== $test) {
-                        return Ret::err(
-                            [ 'The `url` host should be valid ASCII idn', $url ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                } elseif (2 === $isHostIdnaAscii) {
-                    $ascii = $theHttp->idn_to_ascii($refParseUrl[ 'host' ]);
-
-                    if (false === $ascii) {
-                        return Ret::err(
-                            [ 'Cannot encode `url` host to ASCII using `idn_to_ascii`', $url ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                    $refParseUrl[ 'host' ] = $ascii;
-                }
-            }
+        if (! $hasPath) {
+            $refParseUrl[ 'path' ] = '/';
         }
 
-        if ($hasPath) {
-            if (1 === $isLinkUrlencoded) {
-                $test = str_replace('/', '', $refParseUrl[ 'path' ]);
+        if (false
+            || (-2 === $isHostIdnaAscii)
+            || (-1 === $isHostIdnaAscii)
+            || (1 === $isHostIdnaAscii)
+            || (2 === $isHostIdnaAscii)
+        ) {
+            if (-2 === $isHostIdnaAscii) {
+                $utf8 = $theHttp->idn_to_utf8($refParseUrl[ 'host' ]);
 
-                if (urlencode($test) !== $test) {
+                if (false === $utf8) {
                     return Ret::err(
-                        [ 'The `url` path should already be URL-encoded', $url ],
+                        [ 'Cannot encode `url` host to UTF8 using `idn_to_utf8`', $url ],
                         [ __FILE__, __LINE__ ]
                     );
                 }
 
-            } elseif (2 === $isLinkUrlencoded) {
-                $refParseUrl[ 'path' ] = urlencode($refParseUrl[ 'path' ]);
-                $refParseUrl[ 'path' ] = str_replace('%2F', '/', $refParseUrl[ 'path' ]);
-            }
-        }
+                $refParseUrl[ 'host' ] = $utf8;
 
-        $wasQuery = (null !== $refParseUrl[ 'query' ]);
+            } elseif (-1 === $isHostIdnaAscii) {
+                $test = $refParseUrl[ 'host' ];
 
-        if (false === $_query) {
-            unset($refParseUrl[ 'query' ]);
-
-        } else {
-            $httpQuery = null;
-            if ($hasQuery && $wasQuery) {
-                $httpQuery = $theHttp->http_build_query_array($refParseUrl[ 'query' ], $_query);
-                $httpQuery = http_build_query($httpQuery);
-
-            } elseif ($hasQuery) {
-                $httpQuery = $theHttp->http_build_query_array($_query);
-                $httpQuery = http_build_query($httpQuery);
-
-            } elseif ($wasQuery) {
-                $httpQuery = $refParseUrl[ 'query' ];
-            }
-
-            $refParseUrl[ 'query' ] = $httpQuery;
-        }
-
-        if (false === $_fragment) {
-            unset($refParseUrl[ 'fragment' ]);
-
-        } else {
-            if ($hasFragment) {
-                $refParseUrl[ 'fragment' ] = $_fragment;
-            }
-        }
-
-        $result = $this->url_build($refParseUrl);
-
-        return Ret::val($result);
-    }
-
-    /**
-     * @param string|true $url
-     *
-     * @return Ret<string>
-     */
-    public function type_host(
-        $url,
-        ?int $isHostIdnaAscii = null,
-        array $refs = []
-    )
-    {
-        $isHostIdnaAscii = $isHostIdnaAscii ?? 0;
-
-        $theHttp = Lib::http();
-        $theType = Lib::type();
-
-        $withParseUrl = array_key_exists(0, $refs);
-        if ($withParseUrl) {
-            $refParseUrl =& $refs[ 0 ];
-        }
-        $refParseUrl = null;
-
-        if (null === $url) {
-            return Ret::err(
-                [ 'The `url` should not be null', $url ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        if (true === $url) {
-            $urlStringNotEmpty = $this->url_current();
-
-        } elseif (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
-            return $ret;
-        }
-
-        $refParseUrl = parse_url($urlStringNotEmpty);
-
-        if (false === $refParseUrl) {
-            return Ret::err(
-                [ 'The `url` should be valid url', $url ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        $refParseUrl = array_replace(
-            [
-                'scheme'   => '',
-                'user'     => '',
-                'pass'     => '',
-                'host'     => '',
-                'port'     => '',
-                'path'     => '',
-                'query'    => '',
-                'fragment' => '',
-            ],
-            $refParseUrl
-        );
-
-        $hasHost = ('' !== $refParseUrl[ 'host' ]);
-
-        if (! $hasHost) {
-            if (! isset($_SERVER[ 'HTTP_HOST' ])) {
-                return Ret::err(
-                    [ 'The `url` requires host (domain) prefix', $url ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-
-            $urlStringNotEmpty = $this->host_current() . '/' . ltrim($urlStringNotEmpty, '/');
-
-            $refParseUrl = parse_url($urlStringNotEmpty);
-
-            if (false === $refParseUrl) {
-                return Ret::err(
-                    [ 'The `url` should be valid url', $url ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-
-            $refParseUrl = array_replace(
-                [
-                    'scheme'   => '',
-                    'user'     => '',
-                    'pass'     => '',
-                    'host'     => '',
-                    'port'     => '',
-                    'path'     => '',
-                    'query'    => '',
-                    'fragment' => '',
-                ],
-                $refParseUrl
-            );
-        }
-
-        $hasHost = ('' !== $refParseUrl[ 'host' ]);
-
-        if ($hasHost) {
-            if (false
-                || (-2 === $isHostIdnaAscii)
-                || (-1 === $isHostIdnaAscii)
-                || (1 === $isHostIdnaAscii)
-                || (2 === $isHostIdnaAscii)
-            ) {
-                if (-2 === $isHostIdnaAscii) {
-                    $utf8 = $theHttp->idn_to_utf8($refParseUrl[ 'host' ]);
-
-                    if (false === $utf8) {
-                        return Ret::err(
-                            [ 'Cannot encode `url` host to UTF8 using `idn_to_utf8`', $url ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                    $refParseUrl[ 'host' ] = $utf8;
-
-                } elseif (-1 === $isHostIdnaAscii) {
-                    $test = $refParseUrl[ 'host' ];
-
-                    if ($theHttp->idn_to_utf8($test) !== $test) {
-                        return Ret::err(
-                            [ 'The `url` host should be valid UTF8 idn', $url ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                } elseif (1 === $isHostIdnaAscii) {
-                    $test = $refParseUrl[ 'host' ];
-
-                    if ($theHttp->idn_to_ascii($test) !== $test) {
-                        return Ret::err(
-                            [ 'The `url` host should be valid ASCII idn', $url ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                } elseif (2 === $isHostIdnaAscii) {
-                    $ascii = $theHttp->idn_to_ascii($refParseUrl[ 'host' ]);
-
-                    if (false === $ascii) {
-                        return Ret::err(
-                            [ 'Cannot encode `url` host to ASCII using `idn_to_ascii`', $url ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                    $refParseUrl[ 'host' ] = $ascii;
+                if ($theHttp->idn_to_utf8($test) !== $test) {
+                    return Ret::err(
+                        [ 'The `url` host should be valid UTF8 idn', $url ],
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
+
+            } elseif (1 === $isHostIdnaAscii) {
+                $test = $refParseUrl[ 'host' ];
+
+                if ($theHttp->idn_to_ascii($test) !== $test) {
+                    return Ret::err(
+                        [ 'The `url` host should be valid ASCII idn', $url ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+            } elseif (2 === $isHostIdnaAscii) {
+                $ascii = $theHttp->idn_to_ascii($refParseUrl[ 'host' ]);
+
+                if (false === $ascii) {
+                    return Ret::err(
+                        [ 'Cannot encode `url` host to ASCII using `idn_to_ascii`', $url ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+                $refParseUrl[ 'host' ] = $ascii;
             }
-        }
-
-        $result = $this->host_build($refParseUrl);
-
-        return Ret::val($result);
-    }
-
-    /**
-     * @param string|true             $url
-     * @param string|false|array|null $query
-     * @param string|false|null       $fragment
-     *
-     * @return Ret<string>
-     */
-    public function type_link(
-        $url, $query = null, $fragment = null,
-        ?int $isLinkUrlencoded = null,
-        array $refs = []
-    )
-    {
-        $isLinkUrlencoded = $isLinkUrlencoded ?? 0;
-
-        $theHttp = Lib::http();
-        $theType = Lib::type();
-
-        $withParseUrl = array_key_exists(0, $refs);
-        if ($withParseUrl) {
-            $refParseUrl =& $refs[ 0 ];
-        }
-        $refParseUrl = null;
-
-        $hasQuery = (null !== $query);
-        $hasFragment = (null !== $fragment);
-
-        if (null === $url) {
-            return Ret::err(
-                [ 'The `url` should not be null', $url ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        if (true === $url) {
-            $urlStringNotEmpty = $this->url_current();
-
-        } elseif (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
-            return $ret;
-        }
-
-        $_query = null
-            ?? ((false === $query) ? false : null)
-            ?? (is_array($query) ? $query : null)
-            ?? (is_string($query) ? [ $query ] : null);
-
-        $_fragment = null
-            ?? ((false === $fragment) ? false : null)
-            ?? (is_string($fragment) ? $fragment : null);
-
-
-        if ($hasQuery && (null === $_query)) {
-            throw new LogicException(
-                [ 'The `query` should be a string, an array or a false', $query ]
-            );
-        }
-
-        if ($hasFragment && (null === $_fragment)) {
-            throw new LogicException(
-                [ 'The `fragment` should be a string or the FALSE', $fragment ]
-            );
-        }
-
-        $refParseUrl = parse_url($urlStringNotEmpty);
-
-        if (false === $refParseUrl) {
-            return Ret::err(
-                [ 'The `url` should be valid url', $url ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        $refParseUrl = array_replace(
-            [
-                'scheme'   => '',
-                'user'     => '',
-                'pass'     => '',
-                'host'     => '',
-                'port'     => '',
-                'path'     => '',
-                'query'    => '',
-                'fragment' => '',
-            ],
-            $refParseUrl
-        );
-
-        $hasPath = ('' !== $refParseUrl[ 'path' ]);
-
-        if (! $hasPath) {
-            return Ret::err(
-                [ 'The `url` should have path', $url ],
-                [ __FILE__, __LINE__ ]
-            );
         }
 
         if (1 === $isLinkUrlencoded) {
@@ -539,11 +207,10 @@ class UrlModule
             }
         }
 
-        $result = $this->link_build($refParseUrl);
+        $result = $this->url_build($refParseUrl);
 
         return Ret::val($result);
     }
-
 
     /**
      * @param string|true             $url
@@ -580,10 +247,7 @@ class UrlModule
             );
         }
 
-        if (true === $url) {
-            $urlStringNotEmpty = $this->url_current();
-
-        } elseif (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
+        if (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
             return $ret;
         }
 
@@ -597,14 +261,16 @@ class UrlModule
             ?? (is_string($fragment) ? $fragment : null);
 
         if ($hasQuery && (null === $_query)) {
-            throw new LogicException(
-                [ 'The `query` should be a string, an array or a false', $query ]
+            return Ret::err(
+                [ 'The `query` should be a string, an array or a false', $query ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
         if ($hasFragment && (null === $_fragment)) {
-            throw new LogicException(
-                [ 'The `fragment` should be a string or the FALSE', $fragment ]
+            return Ret::err(
+                [ 'The `fragment` should be a string or the FALSE', $fragment ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
@@ -633,6 +299,19 @@ class UrlModule
 
         $hasHost = ('' !== $refParseUrl[ 'host' ]);
         $hasPath = ('' !== $refParseUrl[ 'path' ]);
+
+        if (! $hasPath && $hasHost) {
+            $refParseUrl[ 'path' ] = '/';
+
+            $hasPath = true;
+        }
+
+        if (! ($hasHost || $hasPath)) {
+            return Ret::err(
+                [ 'The `url` requires at least one `host` or `path`' ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
 
         if ($hasHost) {
             if (false
@@ -743,6 +422,273 @@ class UrlModule
         return Ret::val($result);
     }
 
+    /**
+     * @param string|true $url
+     *
+     * @return Ret<string>
+     */
+    public function type_host(
+        $url,
+        ?int $isHostIdnaAscii = null,
+        array $refs = []
+    )
+    {
+        $isHostIdnaAscii = $isHostIdnaAscii ?? 0;
+
+        $theHttp = Lib::http();
+        $theType = Lib::type();
+
+        $withParseUrl = array_key_exists(0, $refs);
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+        }
+        $refParseUrl = null;
+
+        if (null === $url) {
+            return Ret::err(
+                [ 'The `url` should not be null', $url ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
+            return $ret;
+        }
+
+        $refParseUrl = parse_url($urlStringNotEmpty);
+
+        if (false === $refParseUrl) {
+            return Ret::err(
+                [ 'The `url` should be valid url', $url ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $refParseUrl = array_replace(
+            [
+                'scheme'   => '',
+                'user'     => '',
+                'pass'     => '',
+                'host'     => '',
+                'port'     => '',
+                'path'     => '',
+                'query'    => '',
+                'fragment' => '',
+            ],
+            $refParseUrl
+        );
+
+        $hasHost = ('' !== $refParseUrl[ 'host' ]);
+
+        if (! $hasHost) {
+            return Ret::err(
+                [ 'The `url` requires a host', $url, $refParseUrl ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (false
+            || (-2 === $isHostIdnaAscii)
+            || (-1 === $isHostIdnaAscii)
+            || (1 === $isHostIdnaAscii)
+            || (2 === $isHostIdnaAscii)
+        ) {
+            if (-2 === $isHostIdnaAscii) {
+                $utf8 = $theHttp->idn_to_utf8($refParseUrl[ 'host' ]);
+
+                if (false === $utf8) {
+                    return Ret::err(
+                        [ 'Cannot encode `url` host to UTF8 using `idn_to_utf8`', $url ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+                $refParseUrl[ 'host' ] = $utf8;
+
+            } elseif (-1 === $isHostIdnaAscii) {
+                $test = $refParseUrl[ 'host' ];
+
+                if ($theHttp->idn_to_utf8($test) !== $test) {
+                    return Ret::err(
+                        [ 'The `url` host should be valid UTF8 idn', $url ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+            } elseif (1 === $isHostIdnaAscii) {
+                $test = $refParseUrl[ 'host' ];
+
+                if ($theHttp->idn_to_ascii($test) !== $test) {
+                    return Ret::err(
+                        [ 'The `url` host should be valid ASCII idn', $url ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+            } elseif (2 === $isHostIdnaAscii) {
+                $ascii = $theHttp->idn_to_ascii($refParseUrl[ 'host' ]);
+
+                if (false === $ascii) {
+                    return Ret::err(
+                        [ 'Cannot encode `url` host to ASCII using `idn_to_ascii`', $url ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+                $refParseUrl[ 'host' ] = $ascii;
+            }
+        }
+
+        $result = $this->host_build($refParseUrl);
+
+        return Ret::val($result);
+    }
+
+    /**
+     * @param string|true             $url
+     * @param string|false|array|null $query
+     * @param string|false|null       $fragment
+     *
+     * @return Ret<string>
+     */
+    public function type_link(
+        $url, $query = null, $fragment = null,
+        ?int $isLinkUrlencoded = null,
+        array $refs = []
+    )
+    {
+        $isLinkUrlencoded = $isLinkUrlencoded ?? 0;
+
+        $theHttp = Lib::http();
+        $theType = Lib::type();
+
+        $withParseUrl = array_key_exists(0, $refs);
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+        }
+        $refParseUrl = null;
+
+        $hasQuery = (null !== $query);
+        $hasFragment = (null !== $fragment);
+
+        if (null === $url) {
+            return Ret::err(
+                [ 'The `url` should not be null', $url ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
+            return $ret;
+        }
+
+        $_query = null
+            ?? ((false === $query) ? false : null)
+            ?? (is_array($query) ? $query : null)
+            ?? (is_string($query) ? [ $query ] : null);
+
+        $_fragment = null
+            ?? ((false === $fragment) ? false : null)
+            ?? (is_string($fragment) ? $fragment : null);
+
+
+        if ($hasQuery && (null === $_query)) {
+            return Ret::err(
+                [ 'The `query` should be a string, an array or a false', $query ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ($hasFragment && (null === $_fragment)) {
+            return Ret::err(
+                [ 'The `fragment` should be a string or the FALSE', $fragment ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $refParseUrl = parse_url($urlStringNotEmpty);
+
+        if (false === $refParseUrl) {
+            return Ret::err(
+                [ 'The `url` should be valid url', $url ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $refParseUrl = array_replace(
+            [
+                'scheme'   => '',
+                'user'     => '',
+                'pass'     => '',
+                'host'     => '',
+                'port'     => '',
+                'path'     => '',
+                'query'    => '',
+                'fragment' => '',
+            ],
+            $refParseUrl
+        );
+
+        $hasPath = ('' !== $refParseUrl[ 'path' ]);
+
+        if (! $hasPath) {
+            return Ret::err(
+                [ 'The `url` should have path', $url ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (1 === $isLinkUrlencoded) {
+            $test = str_replace('/', '', $refParseUrl[ 'path' ]);
+
+            if (urlencode($test) !== $test) {
+                return Ret::err(
+                    [ 'The `url` path should already be URL-encoded', $url ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+        } elseif (2 === $isLinkUrlencoded) {
+            $refParseUrl[ 'path' ] = urlencode($refParseUrl[ 'path' ]);
+            $refParseUrl[ 'path' ] = str_replace('%2F', '/', $refParseUrl[ 'path' ]);
+        }
+
+        $wasQuery = (null !== $refParseUrl[ 'query' ]);
+
+        if (false === $_query) {
+            unset($refParseUrl[ 'query' ]);
+
+        } else {
+            $httpQuery = null;
+            if ($hasQuery && $wasQuery) {
+                $httpQuery = $theHttp->http_build_query_array($refParseUrl[ 'query' ], $_query);
+                $httpQuery = http_build_query($httpQuery);
+
+            } elseif ($hasQuery) {
+                $httpQuery = $theHttp->http_build_query_array($_query);
+                $httpQuery = http_build_query($httpQuery);
+
+            } elseif ($wasQuery) {
+                $httpQuery = $refParseUrl[ 'query' ];
+            }
+
+            $refParseUrl[ 'query' ] = $httpQuery;
+        }
+
+        if (false === $_fragment) {
+            unset($refParseUrl[ 'fragment' ]);
+
+        } else {
+            if ($hasFragment) {
+                $refParseUrl[ 'fragment' ] = $_fragment;
+            }
+        }
+
+        $result = $this->link_build($refParseUrl);
+
+        return Ret::val($result);
+    }
+
 
     /**
      * @return Ret<string>
@@ -790,16 +736,19 @@ class UrlModule
             $refParseUrl
         );
 
-        if ('' === $refParseUrl[ 'scheme' ]) {
+        $hasScheme = ('' !== $refParseUrl[ 'scheme' ]);
+        $hasPath = ('' !== $refParseUrl[ 'path' ]);
+
+        if (! $hasScheme) {
             return Ret::err(
-                [ 'The `dsn` should have key `scheme`', $dsn, $refParseUrl ],
+                [ 'The `dsn` requires a `scheme`', $dsn, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ('' === $refParseUrl[ 'path' ]) {
+        if (! $hasPath) {
             return Ret::err(
-                [ 'The `dsn` should have key `path`', $dsn, $refParseUrl ],
+                [ 'The `dsn` requires a `path`', $dsn, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -829,18 +778,117 @@ class UrlModule
      */
     public function url(
         $url = true, $query = null, $fragment = null,
-        ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null
+        ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null,
+        array $refs = []
     ) : string
     {
+        $theType = Lib::type();
+
+        $withParseUrl = array_key_exists(0, $refs);
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+        }
+        $refParseUrl = null;
+
+        if (null === $url) {
+            throw new LogicException(
+                [ 'The `url` should not be null', $url ]
+            );
+        }
+
+        if (true === $url) {
+            $urlStringNotEmpty = $this->url_current();
+
+        } else {
+            $urlStringNotEmpty = $theType->string_not_empty($url)->orThrow();
+        }
+
+        $refParseUrl = parse_url($urlStringNotEmpty);
+
+        if (false === $refParseUrl) {
+            throw new LogicException(
+                [ 'The `url` should be valid url', $url ]
+            );
+        }
+
+        $refParseUrl = array_replace(
+            [
+                'scheme'   => '',
+                'user'     => '',
+                'pass'     => '',
+                'host'     => '',
+                'port'     => '',
+                'path'     => '',
+                'query'    => '',
+                'fragment' => '',
+            ],
+            $refParseUrl
+        );
+
+        $hasHost = ('' !== $refParseUrl[ 'host' ]);
+
+        if (! $hasHost) {
+            $refParseUrl[ 'host' ] = $this->host_current();
+
+            $urlStringNotEmpty = $this->url_build($refParseUrl);
+        }
+
         $args = [
-            $url,
+            $urlStringNotEmpty,
             $query,
             $fragment,
             $isHostIdnaAscii,
             $isLinkUrlencoded,
+            $refs,
         ];
 
         $result = $this->type_url(...$args)->orThrow();
+
+        return $result;
+    }
+
+    /**
+     * @param string|true             $url
+     * @param string|false|array|null $query
+     * @param string|false|null       $fragment
+     */
+    public function uri(
+        $url = true, $query = null, $fragment = null,
+        ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null,
+        array $refs = []
+    ) : string
+    {
+        $theType = Lib::type();
+
+        $withParseUrl = array_key_exists(0, $refs);
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+        }
+        $refParseUrl = null;
+
+        if (null === $url) {
+            throw new LogicException(
+                [ 'The `url` should not be null', $url ]
+            );
+        }
+
+        if (true === $url) {
+            $urlStringNotEmpty = $this->url_current();
+
+        } else {
+            $urlStringNotEmpty = $theType->string_not_empty($url)->orThrow();
+        }
+
+        $args = [
+            $urlStringNotEmpty,
+            $query,
+            $fragment,
+            $isHostIdnaAscii,
+            $isLinkUrlencoded,
+            $refs,
+        ];
+
+        $result = $this->type_uri(...$args)->orThrow();
 
         return $result;
     }
@@ -850,11 +898,63 @@ class UrlModule
      */
     public function host(
         $url = true,
-        ?int $isHostIdnaAscii = null
+        ?int $isHostIdnaAscii = null,
+        array $refs = []
     ) : string
     {
+        $theType = Lib::type();
+
+        $withParseUrl = array_key_exists(0, $refs);
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+        }
+        $refParseUrl = null;
+
+        if (null === $url) {
+            throw new LogicException(
+                [ 'The `url` should not be null', $url ]
+            );
+        }
+
+        if (true === $url) {
+            $urlStringNotEmpty = $this->url_current();
+
+        } else {
+            $urlStringNotEmpty = $theType->string_not_empty($url)->orThrow();
+        }
+
+        $refParseUrl = parse_url($urlStringNotEmpty);
+
+        if (false === $refParseUrl) {
+            throw new LogicException(
+                [ 'The `url` should be valid url', $url ]
+            );
+        }
+
+        $refParseUrl = array_replace(
+            [
+                'scheme'   => '',
+                'user'     => '',
+                'pass'     => '',
+                'host'     => '',
+                'port'     => '',
+                'path'     => '',
+                'query'    => '',
+                'fragment' => '',
+            ],
+            $refParseUrl
+        );
+
+        $hasHost = ('' !== $refParseUrl[ 'host' ]);
+
+        if (! $hasHost) {
+            $refParseUrl[ 'host' ] = $this->host_current();
+
+            $urlStringNotEmpty = $this->url_build($refParseUrl);
+        }
+
         $args = [
-            $url,
+            $urlStringNotEmpty,
             $isHostIdnaAscii,
         ];
 
@@ -870,40 +970,39 @@ class UrlModule
      */
     public function link(
         $url = true, $query = null, $fragment = null,
-        ?int $isLinkUrlencoded = null
+        ?int $isLinkUrlencoded = null,
+        array $refs = []
     ) : string
     {
+        $theType = Lib::type();
+
+        $withParseUrl = array_key_exists(0, $refs);
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+        }
+        $refParseUrl = null;
+
+        if (null === $url) {
+            throw new LogicException(
+                [ 'The `url` should not be null', $url ]
+            );
+        }
+
+        if (true === $url) {
+            $urlStringNotEmpty = $this->url_current();
+
+        } else {
+            $urlStringNotEmpty = $theType->string_not_empty($url)->orThrow();
+        }
+
         $args = [
-            $url,
+            $urlStringNotEmpty,
             $query,
             $fragment,
             $isLinkUrlencoded,
         ];
 
         $result = $this->type_link(...$args)->orThrow();
-
-        return $result;
-    }
-
-    /**
-     * @param string|true             $url
-     * @param string|false|array|null $query
-     * @param string|false|null       $fragment
-     */
-    public function uri(
-        $url = true, $query = null, $fragment = null,
-        ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null
-    ) : string
-    {
-        $args = [
-            $url,
-            $query,
-            $fragment,
-            $isHostIdnaAscii,
-            $isLinkUrlencoded,
-        ];
-
-        $result = $this->type_uri(...$args)->orThrow();
 
         return $result;
     }

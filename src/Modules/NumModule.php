@@ -240,14 +240,18 @@ class NumModule
             $scale = strlen($frac) - 1;
         }
 
-        $number = Number::fromValidArray([
+        Number::fromValidArray([
             'original' => $value,
             'sign'     => $split[ 0 ],
             'int'      => $split[ 1 ],
             'frac'     => $split[ 2 ],
             'exp'      => $split[ 3 ],
             'scale'    => $scale,
-        ])->orThrow();
+        ])->isOk([ &$number, &$ret ]);
+
+        if ($ret->isFail()) {
+            return $ret;
+        }
 
         return Ret::val($number);
     }

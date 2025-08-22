@@ -1041,8 +1041,9 @@ class PhpModule
             }
 
             if ($cnt > 1) {
-                throw new LogicException(
-                    [ 'The `flags` conflict in group: ' . $groupName, $flags ]
+                return Ret::err(
+                    [ 'The `flags` conflict in group: ' . $groupName, $flags ],
+                    [ __FILE__, __LINE__ ]
                 );
 
             } elseif (0 === $cnt) {
@@ -1408,8 +1409,9 @@ class PhpModule
         $hasEnumClass = false;
         if (null !== $enumClass) {
             if (! is_subclass_of($enumClass, '\UnitEnum')) {
-                throw new LogicException(
-                    [ 'The `enumClass` should extend \UnitEnum', $enumClass ]
+                return Ret::err(
+                    [ 'The `enumClass` should extend \UnitEnum', $enumClass ],
+                    [ __FILE__, __LINE__ ]
                 );
             }
 

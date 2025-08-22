@@ -2186,6 +2186,30 @@ trait AssertTrait
 
 
 	/**
+	 * @param string|true             $value
+	 * @param string|false|array|null $query
+	 * @param string|false|null       $fragment
+	 *
+	 * @return string
+	 */
+	public function assert_uri(
+		$value,
+		$query = null,
+		$fragment = null,
+		?int $isHostIdnaAscii = null,
+		?int $isLinkUrlencoded = null,
+		array $refs = []
+	) {
+		if (Lib::url()->type_uri($value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs)->isOk([ &$ref ])) return $ref;
+
+		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
+
+		throw new LogicException($t, [ 'Assert `uri` is failed', [ $value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs ] ]);
+	}
+
+
+	/**
 	 * @param string|true $value
 	 *
 	 * @return string
@@ -2216,30 +2240,6 @@ trait AssertTrait
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
 		throw new LogicException($t, [ 'Assert `link` is failed', [ $value, $query, $fragment, $isLinkUrlencoded, $refs ] ]);
-	}
-
-
-	/**
-	 * @param string|true             $value
-	 * @param string|false|array|null $query
-	 * @param string|false|null       $fragment
-	 *
-	 * @return string
-	 */
-	public function assert_uri(
-		$value,
-		$query = null,
-		$fragment = null,
-		?int $isHostIdnaAscii = null,
-		?int $isLinkUrlencoded = null,
-		array $refs = []
-	) {
-		if (Lib::url()->type_uri($value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs)->isOk([ &$ref ])) return $ref;
-
-		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
-		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
-
-		throw new LogicException($t, [ 'Assert `uri` is failed', [ $value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs ] ]);
 	}
 
 

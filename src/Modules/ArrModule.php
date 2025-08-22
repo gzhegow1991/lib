@@ -130,8 +130,9 @@ class ArrModule
         $plainMaxDepth = $plainMaxDepth ?? 1;
 
         if ($plainMaxDepth < 1) {
-            throw new LogicException(
-                [ 'The `maxDepth` should be greater than 1', $plainMaxDepth ]
+            return Ret::err(
+                [ 'The `maxDepth` should be greater than 1', $plainMaxDepth ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
@@ -207,8 +208,9 @@ class ArrModule
 
         if ($hasMaxDepth) {
             if ($plainMaxDepth < 1) {
-                throw new LogicException(
-                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ]
+                return Ret::err(
+                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
+                    [ __FILE__, __LINE__ ]
                 );
             }
 
@@ -299,8 +301,9 @@ class ArrModule
 
         if ($hasMaxDepth) {
             if ($plainMaxDepth < 1) {
-                throw new LogicException(
-                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ]
+                return Ret::err(
+                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
+                    [ __FILE__, __LINE__ ]
                 );
             }
 
@@ -417,8 +420,9 @@ class ArrModule
 
         if ($hasMaxDepth) {
             if ($plainMaxDepth < 1) {
-                throw new LogicException(
-                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ]
+                return Ret::err(
+                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
+                    [ __FILE__, __LINE__ ]
                 );
             }
 
@@ -513,8 +517,9 @@ class ArrModule
 
         if ($hasMaxDepth) {
             if ($plainMaxDepth < 1) {
-                throw new LogicException(
-                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ]
+                return Ret::err(
+                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
+                    [ __FILE__, __LINE__ ]
                 );
             }
 
@@ -537,8 +542,9 @@ class ArrModule
                     $cmp = call_user_func($fnSortCmp, $prev, $key);
 
                     if (! is_int($cmp)) {
-                        throw new RuntimeException(
-                            [ 'The `fnSortCmp` should return integer', $fnSortCmp ]
+                        return Ret::err(
+                            [ 'The `fnSortCmp` should return integer', $fnSortCmp ],
+                            [ __FILE__, __LINE__ ]
                         );
                     }
 
@@ -577,8 +583,9 @@ class ArrModule
                         $cmp = call_user_func($fnSortCmp, $prev, $key);
 
                         if (! is_int($cmp)) {
-                            throw new RuntimeException(
-                                [ 'The `fnSortCmp` should return integer', $fnSortCmp ]
+                            return Ret::err(
+                                [ 'The `fnSortCmp` should return integer', $fnSortCmp ],
+                                [ __FILE__, __LINE__ ]
                             );
                         }
 
@@ -617,8 +624,9 @@ class ArrModule
                 $cmp = call_user_func($fnSortCmp, $prev, $key);
 
                 if (! is_int($cmp)) {
-                    throw new RuntimeException(
-                        [ 'The `fnSortCmp` should return integer', $fnSortCmp ]
+                    return Ret::err(
+                        [ 'The `fnSortCmp` should return integer', $fnSortCmp ],
+                        [ __FILE__, __LINE__ ]
                     );
                 }
 
@@ -797,14 +805,15 @@ class ArrModule
         ];
 
         if (! isset($mapTypes[ $type ])) {
-            throw new LogicException(
+            return Ret::err(
                 [
                     ''
                     . 'The `type` should be one of: '
                     . '[ ' . implode(' ][ ', array_keys($mapTypes)) . ' ]',
                     //
                     $type,
-                ]
+                ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
@@ -868,8 +877,9 @@ class ArrModule
         }
 
         if (! class_exists($className)) {
-            throw new LogicException(
-                [ 'The `className` should be existing class', $className ]
+            return Ret::err(
+                [ 'The `className` should be existing class', $className ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
@@ -902,8 +912,9 @@ class ArrModule
         }
 
         if (! class_exists($className)) {
-            throw new LogicException(
-                [ 'The `className` should be existing class', $className ]
+            return Ret::err(
+                [ 'The `className` should be existing class', $className ],
+                [ __FILE__, __LINE__ ]
             );
         }
 
@@ -943,8 +954,9 @@ class ArrModule
         }
 
         if (! class_exists($className)) {
-            throw new LogicException(
-                [ 'The `className` should be existing class', $className ]
+            return Ret::err(
+                [ 'The `className` should be existing class', $className ],
+                [ __FILE__, __LINE__ ]
             );
         }
 

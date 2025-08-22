@@ -5624,6 +5624,18 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
+    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = 'https://google.com/hello/world')->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = ':hello/world')->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = '/')->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    echo "\n";
+
+
     $status = \Gzhegow\Lib\Lib::url()->type_host($src = 'https://google.com/hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
@@ -5648,19 +5660,10 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = 'https://google.com/hello/world')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = ':hello/world')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = '/')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    echo "\n";
-
-
     $status = \Gzhegow\Lib\Lib::url()->type_url($src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
     $status = \Gzhegow\Lib\Lib::url()->type_host($src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
@@ -5669,13 +5672,13 @@ $fn = function () use ($ffn) {
     $status = \Gzhegow\Lib\Lib::url()->type_link($src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
     echo "\n";
 
 
     $status = \Gzhegow\Lib\Lib::url()->type_url($src = 'https://привет.рф/hello/текст', null, null, 1, 1)->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = 'https://привет.рф/hello/текст', null, null, 1)->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
     $status = \Gzhegow\Lib\Lib::url()->type_host($src = 'https://привет.рф/hello/текст', 1)->isOk([ &$result ]);
@@ -5684,22 +5687,19 @@ $fn = function () use ($ffn) {
     $status = \Gzhegow\Lib\Lib::url()->type_link($src = 'https://привет.рф/hello/текст', null, null, 1)->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = 'https://привет.рф/hello/текст', null, null, 1)->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
     echo "\n";
 
 
     $status = \Gzhegow\Lib\Lib::url()->type_url($src = 'https://привет.рф/hello/текст', null, null, 2, 2)->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
+    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = 'https://привет.рф/hello/текст', null, null, 2, 2)->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
     $status = \Gzhegow\Lib\Lib::url()->type_host($src = 'https://привет.рф/hello/текст', 2)->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
     $status = \Gzhegow\Lib\Lib::url()->type_link($src = 'https://привет.рф/hello/текст', null, null, 2)->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = 'https://привет.рф/hello/текст', null, null, 2, 2)->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
 
@@ -5716,35 +5716,35 @@ $test->expectStdout('
 "[ UrlModule ]"
 
 "https://google.com/hello/world" | TRUE | "https://google.com/hello/world"
-":hello/world" | TRUE | "http://test.local/:hello/world"
-"/" | TRUE | "http://test.local/"
-
-"https://google.com/hello/world" | TRUE | "https://google.com"
-":hello/world" | TRUE | "http://test.local"
-"/" | TRUE | "http://test.local"
-
-"https://google.com/hello/world" | TRUE | "/hello/world"
-":hello/world" | TRUE | ":hello/world"
-"/" | TRUE | "/"
+":hello/world" | FALSE | NULL
+"/" | FALSE | NULL
 
 "https://google.com/hello/world" | TRUE | "https://google.com/hello/world"
 ":hello/world" | TRUE | ":hello/world"
 "/" | TRUE | "/"
 
+"https://google.com/hello/world" | TRUE | "https://google.com"
+":hello/world" | FALSE | NULL
+"/" | FALSE | NULL
+
+"https://google.com/hello/world" | TRUE | "/hello/world"
+":hello/world" | TRUE | ":hello/world"
+"/" | TRUE | "/"
+
+"https://привет.рф/hello/текст" | TRUE | "https://привет.рф/hello/текст"
 "https://привет.рф/hello/текст" | TRUE | "https://привет.рф/hello/текст"
 "https://привет.рф/hello/текст" | TRUE | "https://привет.рф"
 "https://привет.рф/hello/текст" | TRUE | "/hello/текст"
-"https://привет.рф/hello/текст" | TRUE | "https://привет.рф/hello/текст"
 
 "https://привет.рф/hello/текст" | FALSE | NULL
 "https://привет.рф/hello/текст" | FALSE | NULL
 "https://привет.рф/hello/текст" | FALSE | NULL
 "https://привет.рф/hello/текст" | FALSE | NULL
 
+"https://привет.рф/hello/текст" | TRUE | "https://xn--b1agh1afp.xn--p1ai/hello/%D1%82%D0%B5%D0%BA%D1%81%D1%82"
 "https://привет.рф/hello/текст" | TRUE | "https://xn--b1agh1afp.xn--p1ai/hello/%D1%82%D0%B5%D0%BA%D1%81%D1%82"
 "https://привет.рф/hello/текст" | TRUE | "https://xn--b1agh1afp.xn--p1ai"
 "https://привет.рф/hello/текст" | TRUE | "/hello/%D1%82%D0%B5%D0%BA%D1%81%D1%82"
-"https://привет.рф/hello/текст" | TRUE | "https://xn--b1agh1afp.xn--p1ai/hello/%D1%82%D0%B5%D0%BA%D1%81%D1%82"
 ');
 $test->run();
 ```
