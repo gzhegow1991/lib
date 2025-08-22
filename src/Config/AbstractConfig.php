@@ -168,7 +168,9 @@ abstract class AbstractConfig implements
         if (null !== $fn) {
             $this->invalidate();
 
-            call_user_func_array($fn, [ $this, $context ]);
+            $fnBound = $fn->bindTo($this, $this);
+
+            call_user_func_array($fnBound, [ $this, $context ]);
         }
 
         $this->validate($context);
