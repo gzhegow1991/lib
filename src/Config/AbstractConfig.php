@@ -24,6 +24,10 @@ abstract class AbstractConfig implements
      * @var bool|null
      */
     protected $__valid;
+    /**
+     * @var bool
+     */
+    protected $__validate = true;
 
 
     public function __construct()
@@ -42,6 +46,7 @@ abstract class AbstractConfig implements
             '__keys'     => true,
             '__children' => true,
             '__valid'    => true,
+            '__validate' => true,
         ];
 
         foreach ( get_object_vars($this) as $key => $value ) {
@@ -168,9 +173,23 @@ abstract class AbstractConfig implements
         if (null !== $fn) {
             $this->invalidate();
 
-            $fnBound = $fn->bindTo($this, $this);
+            $this->__validate = false;
 
-            call_user_func_array($fnBound, [ $this, $context ]);
+            foreach ( array_keys($this->__keys) as $key ) {
+                if (isset($this->__children[ $key ])) {
+                    $this->{$key}->__validate = false;
+                }
+            }
+
+            call_user_func_array($fn, [ $this, $context ]);
+
+            foreach ( array_keys($this->__keys) as $key ) {
+                if (isset($this->__children[ $key ])) {
+                    $this->{$key}->__validate = true;
+                }
+            }
+
+            $this->__validate = true;
         }
 
         $this->validate($context);
@@ -254,21 +273,23 @@ abstract class AbstractConfig implements
         }
 
         if (null === $error) {
-            try {
-                $this->validate();
-            }
-            catch ( \Throwable $e ) {
-                $error = [
-                    [ $e->getMessage() ],
-                    [ $e->getFile(), $e->getLine() ],
-                ];
-            }
+            if (true === $this->__validate) {
+                try {
+                    $this->validate();
+                }
+                catch ( \Throwable $e ) {
+                    $error = [
+                        [ $e->getMessage() ],
+                        [ $e->getFile(), $e->getLine() ],
+                    ];
+                }
 
-            if (false === $this->__valid) {
-                $error = [
-                    [ 'The config is invalid', $this ],
-                    [ __FILE__, __LINE__ ],
-                ];
+                if (false === $this->__valid) {
+                    $error = [
+                        [ 'The config is invalid', $this ],
+                        [ __FILE__, __LINE__ ],
+                    ];
+                }
             }
         }
 
@@ -292,7 +313,7 @@ abstract class AbstractConfig implements
     {
         if (! isset($this->__keys[ $name ])) {
             throw new LogicException(
-                'Missing property: ' . $name
+                [ 'Missing property: ' . $name, $name ]
             );
         }
 
