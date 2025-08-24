@@ -1437,18 +1437,27 @@ trait IsTrait
 	}
 
 
-	public function is_chmod($value): bool
+	/**
+	 * @param array{ 0: array|null } $refs
+	 */
+	public function is_path($value, array $refs = []): bool
 	{
-		return Lib::fs()->type_chmod($value)->isOk();
+		return Lib::php()->type_path($value, $refs)->isOk();
 	}
 
 
 	/**
 	 * @param array{ 0: array|null } $refs
 	 */
-	public function is_path($value, array $refs = []): bool
+	public function is_path_normalized($value, ?string $separator = null, array $refs = []): bool
 	{
-		return Lib::fs()->type_path($value, $refs)->isOk();
+		return Lib::php()->type_path_normalized($value, $separator, $refs)->isOk();
+	}
+
+
+	public function is_chmod($value): bool
+	{
+		return Lib::fs()->type_chmod($value)->isOk();
 	}
 
 
@@ -1467,6 +1476,12 @@ trait IsTrait
 	public function is_freepath($value, array $refs = []): bool
 	{
 		return Lib::fs()->type_freepath($value, $refs)->isOk();
+	}
+
+
+	public function is_freepath_normalized($value, ?string $separator = null, array $refs = []): bool
+	{
+		return Lib::fs()->type_freepath_normalized($value, $separator, $refs)->isOk();
 	}
 
 

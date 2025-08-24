@@ -158,10 +158,7 @@ class HttpCookie implements
 
         [ $cookieName, $cookieValue ] = $headerArray;
 
-        if (! $theType
-            ->string_not_empty($cookieName)
-            ->isOk([ 1 => &$ret ])
-        ) {
+        if (! $theType->string_not_empty($cookieName)->isOk([ &$cookieNameString, &$ret ])) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -176,7 +173,7 @@ class HttpCookie implements
         unset($headerParams[ 'domain' ]);
 
         $instance = new static();
-        $instance->name = $cookieName;
+        $instance->name = $cookieNameString;
         $instance->value = $cookieValueRawurlencode;
         $instance->path = $cookiePath;
         $instance->domain = $cookieDomain;
@@ -247,26 +244,17 @@ class HttpCookie implements
 
         $secure = $secure ?? false;
 
-        if (! $theType
-            ->int($expires)
-            ->isOk([ &$expiresInt, &$ret ])
-        ) {
+        if (! $theType->int($expires)->isOk([ &$expiresInt, &$ret ])) {
             return Ret::throw($fallback, $ret);
         }
 
-        if (! $theType
-            ->string_not_empty($path)
-            ->isOk([ &$pathStringNotEmpty, &$ret ])
-        ) {
+        if (! $theType->string_not_empty($path)->isOk([ &$pathStringNotEmpty, &$ret ])) {
             return Ret::throw($fallback, $ret);
         }
 
         $domainString = null;
         if (null !== $domain) {
-            if (! $theType
-                ->string_not_empty($domain)
-                ->isOk([ &$domainStringNotEmpty, &$ret ])
-            ) {
+            if (! $theType->string_not_empty($domain)->isOk([ &$domainStringNotEmpty, &$ret ])) {
                 return Ret::throw($fallback, $ret);
             }
         }

@@ -128,6 +128,11 @@ class Ret
                 $fileLine = $fileLine ?: Lib::debug()->file_line();
 
                 $instance->addError(null, $fileLine, ...$throwableArgs);
+
+            } elseif (([] !== $fileLine) && ([] !== $throwableArg->errorsRaw)) {
+                $errorLast = end($throwableArg->errorsRaw);
+
+                $instance->doAddError($errorLast[ 'trace' ], $fileLine, ...$errorLast[ 'throwable_args' ]);
             }
 
         } else {
@@ -188,6 +193,11 @@ class Ret
 
             if ([] !== $throwableArgs) {
                 $instance->doAddError(null, $fileLine, ...$throwableArgs);
+
+            } elseif (([] !== $fileLine) && ([] !== $throwableArg->errorsRaw)) {
+                $errorLast = end($throwableArg->errorsRaw);
+
+                $instance->doAddError($errorLast[ 'trace' ], $fileLine, ...$errorLast[ 'throwable_args' ]);
             }
 
         } else {

@@ -3135,6 +3135,38 @@ trait AssertTrait
 
 
 	/**
+	 * @param array{ 0: array|null } $refs
+	 *
+	 * @return string
+	 */
+	public function assert_path($value, array $refs = [])
+	{
+		if (Lib::php()->type_path($value, $refs)->isOk([ &$ref ])) return $ref;
+
+		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
+
+		throw new LogicException($t, [ 'Assert `path` is failed', [ $value, $refs ] ]);
+	}
+
+
+	/**
+	 * @param array{ 0: array|null } $refs
+	 *
+	 * @return string
+	 */
+	public function assert_path_normalized($value, ?string $separator = null, array $refs = [])
+	{
+		if (Lib::php()->type_path_normalized($value, $separator, $refs)->isOk([ &$ref ])) return $ref;
+
+		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
+
+		throw new LogicException($t, [ 'Assert `path_normalized` is failed', [ $value, $separator, $refs ] ]);
+	}
+
+
+	/**
 	 * @return int
 	 */
 	public function assert_chmod($value)
@@ -3145,22 +3177,6 @@ trait AssertTrait
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
 		throw new LogicException($t, [ 'Assert `chmod` is failed', [ $value ] ]);
-	}
-
-
-	/**
-	 * @param array{ 0: array|null } $refs
-	 *
-	 * @return string
-	 */
-	public function assert_path($value, array $refs = [])
-	{
-		if (Lib::fs()->type_path($value, $refs)->isOk([ &$ref ])) return $ref;
-
-		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
-		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
-
-		throw new LogicException($t, [ 'Assert `path` is failed', [ $value, $refs ] ]);
 	}
 
 
@@ -3193,6 +3209,20 @@ trait AssertTrait
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
 		throw new LogicException($t, [ 'Assert `freepath` is failed', [ $value, $refs ] ]);
+	}
+
+
+	/**
+	 * @return string
+	 */
+	public function assert_freepath_normalized($value, ?string $separator = null, array $refs = [])
+	{
+		if (Lib::fs()->type_freepath_normalized($value, $separator, $refs)->isOk([ &$ref ])) return $ref;
+
+		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
+
+		throw new LogicException($t, [ 'Assert `freepath_normalized` is failed', [ $value, $separator, $refs ] ]);
 	}
 
 

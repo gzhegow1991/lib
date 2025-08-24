@@ -31,11 +31,11 @@ class NetModule
     {
         $theType = Lib::type();
 
-        if (! $theType
-            ->string_not_empty($value)
-            ->isOk([ &$valueStringNotEmpty, &$ret ])
-        ) {
-            return $ret;
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $valueFiltered = filter_var($valueStringNotEmpty, FILTER_VALIDATE_IP);
@@ -60,11 +60,11 @@ class NetModule
 
         $theType = Lib::type();
 
-        if (! $theType
-            ->string_not_empty($value)
-            ->isOk([ &$valueStringNotEmpty, &$ret ])
-        ) {
-            return $ret;
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $valueFiltered = filter_var($valueStringNotEmpty, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
@@ -91,11 +91,11 @@ class NetModule
 
         $theType = Lib::type();
 
-        if (! $theType
-            ->string_not_empty($value)
-            ->isOk([ &$valueStringNotEmpty, &$ret ])
-        ) {
-            return $ret;
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $valueFiltered = filter_var($valueStringNotEmpty, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
@@ -119,11 +119,11 @@ class NetModule
     {
         $theType = Lib::type();
 
-        if (! $theType
-            ->string_not_empty($value)
-            ->isOk([ &$valueStringNotEmpty, &$ret ])
-        ) {
-            return $ret;
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $status = preg_match(
@@ -174,11 +174,11 @@ class NetModule
 
         $theType = Lib::type();
 
-        if (! $theType
-            ->string_not_empty($value)
-            ->isOk([ &$valueStringNotEmpty, &$ret ])
-        ) {
-            return $ret;
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         [ $addressPart, $subnetPart ] = explode('/', $valueStringNotEmpty, 2) + [ '', null ];
@@ -203,7 +203,10 @@ class NetModule
                 ?? $theType->numeric_int($subnetPart)->orNull($ret);
 
             if ($ret->isFail()) {
-                return $ret;
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             if (($subnetInt < 0) || ($subnetInt > 32)) {
@@ -218,7 +221,10 @@ class NetModule
 
             } else {
                 if (! $this->type_address_ip_v4($addressPart)->isOk([ &$addressIpString, &$ret ])) {
-                    return $ret;
+                    return Ret::err(
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
             }
 
@@ -281,7 +287,10 @@ class NetModule
         $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         [ $addressPart, $subnetPart ] = explode('/', $valueStringNotEmpty, 2) + [ '', null ];
@@ -301,7 +310,10 @@ class NetModule
         }
 
         if (! $theType->numeric_int($subnetPart)->isOk([ &$subnetNumericInt, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (($subnetNumericInt < 0) || ($subnetNumericInt > 128)) {
@@ -325,7 +337,10 @@ class NetModule
 
         } else {
             if (! $this->type_address_ip_v6($addressPart)->isOk([ &$addressIpString, &$ret ])) {
-                return $ret;
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
@@ -350,11 +365,11 @@ class NetModule
     {
         $theType = Lib::type();
 
-        if (! $theType
-            ->string_not_empty($value)
-            ->isOk([ &$valueStringNotEmpty, &$ret ])
-        ) {
-            return $ret;
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $ipStringNotEmpty = $valueStringNotEmpty;

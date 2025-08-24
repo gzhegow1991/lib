@@ -738,7 +738,10 @@ class ArrModule
         }
 
         if (! ArrPath::fromValidArray($array)->isOk([ &$arrpathObject, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         return Ret::val($arrpathObject);
@@ -766,7 +769,10 @@ class ArrModule
         }
 
         if (! ArrPath::fromValidArray($array)->isOk([ &$arrpathObject, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         return Ret::val($arrpathObject);

@@ -46,7 +46,10 @@ class UrlModule
         }
 
         if (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $_query = null
@@ -248,7 +251,10 @@ class UrlModule
         }
 
         if (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $_query = null
@@ -452,7 +458,10 @@ class UrlModule
         }
 
         if (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $refParseUrl = parse_url($urlStringNotEmpty);
@@ -579,7 +588,10 @@ class UrlModule
         }
 
         if (! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $_query = null
@@ -710,7 +722,10 @@ class UrlModule
         $refParseUrl = null;
 
         if (! $theType->string_not_empty($dsn)->isOk([ &$dsnStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $refParseUrl = parse_url($dsnStringNotEmpty);
@@ -759,7 +774,10 @@ class UrlModule
             [ $key, $value ] = explode('=', $p, 2) + [ '', '' ];
 
             if (! $theType->string_not_empty($key)->isOk([ &$keyString, &$ret ])) {
-                return $ret;
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             $refDsnParams[ $key ] = $value;

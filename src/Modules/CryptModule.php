@@ -60,7 +60,10 @@ class CryptModule
         $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $alphabetValid = $theType->alphabet($alphabet)->orThrow();
@@ -83,7 +86,10 @@ class CryptModule
         $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (preg_match('~[^01]~', $valueStringNotEmpty)) {
@@ -104,7 +110,10 @@ class CryptModule
         $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (preg_match('~[^01234567]~', $valueStringNotEmpty)) {
@@ -125,7 +134,10 @@ class CryptModule
         $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (preg_match('~[^0123456789]~', $valueStringNotEmpty)) {
@@ -146,7 +158,10 @@ class CryptModule
         $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (preg_match('~[^0123456789ABCDEF]~', $valueStringNotEmpty)) {

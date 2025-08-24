@@ -1880,6 +1880,27 @@ trait TypeTrait
 
 
     /**
+     * @param array{ 0: array|null } $refs
+     *
+     * @return Ret<string>
+     */
+    public function path($value, array $refs = [])
+    {
+        return Lib::php()->type_path($value, $refs);
+    }
+
+    /**
+     * @param array{ 0: array|null } $refs
+     *
+     * @return Ret<string>
+     */
+    public function path_normalized($value, ?string $separator = null, array $refs = [])
+    {
+        return Lib::php()->type_path_normalized($value, $separator, $refs);
+    }
+
+
+    /**
      * @return Ret<int>
      */
     public function chmod($value)
@@ -1887,16 +1908,6 @@ trait TypeTrait
         return Lib::fs()->type_chmod($value);
     }
 
-
-    /**
-     * @param array{ 0: array|null } $refs
-     *
-     * @return Ret<string>
-     */
-    public function path($value, array $refs = [])
-    {
-        return Lib::fs()->type_path($value, $refs);
-    }
 
     /**
      * @param array{ 0: array|null } $refs
@@ -1916,6 +1927,14 @@ trait TypeTrait
     public function freepath($value, array $refs = [])
     {
         return Lib::fs()->type_freepath($value, $refs);
+    }
+
+    /**
+     * @return Ret<string>
+     */
+    public function freepath_normalized($value, ?string $separator = null, array $refs = [])
+    {
+        return Lib::fs()->type_freepath_normalized($value, $separator, $refs);
     }
 
 

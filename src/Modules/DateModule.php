@@ -1047,11 +1047,12 @@ class DateModule
 
         $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
 
-        if (! $theType->numeric($microtime, false, [ &$split ])->isOk([ 1 => &$ret ])) {
-            return $ret;
+        if (! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
-
-        $microtimeNumeric = $ret->getValue();
 
         $timezoneDefault = new \DateTimeZone('UTC');
 
@@ -1111,11 +1112,12 @@ class DateModule
 
         $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
 
-        if (! $theType->numeric($microtime, false, [ &$split ])->isOk([ 1 => &$ret ])) {
-            return $ret;
+        if (! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
-
-        $microtimeNumeric = $ret->getValue();
 
         $timezoneDefault = new \DateTimeZone('UTC');
 
@@ -1175,11 +1177,12 @@ class DateModule
 
         $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
 
-        if (! $theType->numeric($microtime, false, [ &$split ])->isOk([ 1 => &$ret ])) {
-            return $ret;
+        if (! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
-
-        $microtimeNumeric = $ret->getValue();
 
         $timezoneDefault = new \DateTimeZone('UTC');
 
@@ -1239,11 +1242,12 @@ class DateModule
 
         $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
 
-        if (! $theType->numeric($microtime, false, [ &$split ])->isOk([ 1 => &$ret ])) {
-            return $ret;
+        if (! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
-
-        $microtimeNumeric = $ret->getValue();
 
         $timezoneDefault = new \DateTimeZone('UTC');
 
@@ -1309,7 +1313,10 @@ class DateModule
         ;
 
         if ($ret->isFail()) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         return Ret::val($dateInterval);
@@ -1333,16 +1340,15 @@ class DateModule
 
         try {
             $dateInterval = $this->interval_decode($duration);
-
-            return Ret::val($dateInterval);
         }
         catch ( \Throwable $e ) {
+            return Ret::err(
+                $e,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::err(
-            [],
-            []
-        );
+        return Ret::val($dateInterval);
     }
 
     /**
@@ -1364,11 +1370,16 @@ class DateModule
         try {
             $dateInterval = \DateInterval::createFromDateString($datestring);
 
-            if (false !== $dateInterval) {
-                return Ret::val($dateInterval);
-            }
         }
         catch ( \Throwable $e ) {
+            return Ret::err(
+                $e,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (false !== $dateInterval) {
+            return Ret::val($dateInterval);
         }
 
         return Ret::err(
@@ -1388,27 +1399,26 @@ class DateModule
 
         $theType = Lib::type();
 
-        if (! $theType
-            ->numeric($microtime, false)
-            ->isOk([ 1 => &$ret ])
-        ) {
-            return $ret;
+        if (! $theType->numeric($microtime, false)->isOk([ 1 => &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $microtimeNumeric = $ret->getValue();
 
         try {
             $dateInterval = $this->interval_decode("PT{$microtimeNumeric}S");
-
-            return Ret::val($dateInterval);
         }
         catch ( \Throwable $e ) {
+            return Ret::err(
+                $e,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::err(
-            [ 'Cannot encode `microtime` to interval', $microtime ],
-            [ __FILE__, __LINE__ ]
-        );
+        return Ret::val($dateInterval);
     }
 
     /**

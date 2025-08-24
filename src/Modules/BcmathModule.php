@@ -68,7 +68,10 @@ class BcmathModule
         $theType = Lib::type();
 
         if (! $theType->numeric($value, false, [ &$split ])->isOk([ 1 => &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $frac = $split[ 2 ];
@@ -87,7 +90,10 @@ class BcmathModule
         ])->isOk([ &$bcnumber, &$ret ]);
 
         if ($ret->isFail()) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         return Ret::val($bcnumber);

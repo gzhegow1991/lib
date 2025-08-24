@@ -2515,17 +2515,6 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: int, 1?: Ret<int> } $r
-	 */
-	public function filter_chmod(array $r, $value): bool
-	{
-		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
-		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
-		return ($refRet = Lib::fs()->type_chmod($value))->isOk([ &$refValue ]);
-	}
-
-
-	/**
 	 * @param array{ 0?: string, 1?: Ret<string> } $r
 	 *
 	 * @param array{ 0: array|null } $refs
@@ -2534,7 +2523,31 @@ trait FilterTrait
 	{
 		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
 		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
-		return ($refRet = Lib::fs()->type_path($value, $refs))->isOk([ &$refValue ]);
+		return ($refRet = Lib::php()->type_path($value, $refs))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: string, 1?: Ret<string> } $r
+	 *
+	 * @param array{ 0: array|null } $refs
+	 */
+	public function filter_path_normalized(array $r, $value, ?string $separator = null, array $refs = []): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::php()->type_path_normalized($value, $separator, $refs))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: int, 1?: Ret<int> } $r
+	 */
+	public function filter_chmod(array $r, $value): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::fs()->type_chmod($value))->isOk([ &$refValue ]);
 	}
 
 
@@ -2561,6 +2574,17 @@ trait FilterTrait
 		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
 		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
 		return ($refRet = Lib::fs()->type_freepath($value, $refs))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: string, 1?: Ret<string> } $r
+	 */
+	public function filter_freepath_normalized(array $r, $value, ?string $separator = null, array $refs = []): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::fs()->type_freepath_normalized($value, $separator, $refs))->isOk([ &$refValue ]);
 	}
 
 

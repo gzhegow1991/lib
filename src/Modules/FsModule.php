@@ -296,47 +296,6 @@ class FsModule
      *
      * @return Ret<string>
      */
-    public function type_path(
-        $value,
-        array $refs = []
-    )
-    {
-        $thePhp = Lib::php();
-        $theType = Lib::type();
-
-        $withPathInfo = array_key_exists(0, $refs);
-        if ($withPathInfo) {
-            $refPathInfo =& $refs[ 0 ];
-        }
-        $refPathInfo = null;
-
-        if (! $theType
-            ->string_not_empty($value)
-            ->isOk([ &$valueStringNotEmpty, &$ret ])
-        ) {
-            return $ret;
-        }
-
-        if ($withPathInfo) {
-            try {
-                $refPathInfo = $thePhp->pathinfo($valueStringNotEmpty);
-            }
-            catch ( \Throwable $e ) {
-                return Ret::err(
-                    [ 'The `value` should be valid path', $value ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-        }
-
-        return Ret::val($valueStringNotEmpty);
-    }
-
-    /**
-     * @param array{ 0: array|null } $refs
-     *
-     * @return Ret<string>
-     */
     public function type_realpath(
         $value,
         ?bool $isAllowSymlink = null,
@@ -354,11 +313,11 @@ class FsModule
         }
         $refPathInfo = null;
 
-        if (! $theType
-            ->string_not_empty($value)
-            ->isOk([ &$valueStringNotEmpty, &$ret ])
-        ) {
-            return $ret;
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! $isAllowSymlink) {
@@ -384,7 +343,7 @@ class FsModule
             }
             catch ( \Throwable $e ) {
                 return Ret::err(
-                    [ 'The `value` should be valid realpath', $value ],
+                    $e,
                     [ __FILE__, __LINE__ ]
                 );
             }
@@ -401,8 +360,47 @@ class FsModule
         array $refs = []
     )
     {
-        if (! $this->type_path($value, $refs)->isOk([ &$valuePath, &$ret ])) {
-            return $ret;
+        $theType = Lib::type();
+
+        if (! $theType->path($value, $refs)->isOk([ &$valuePath, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (file_exists($valuePath)) {
+            return Ret::err(
+                [ 'The `value` should be existing file', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::val($valuePath);
+    }
+
+    /**
+     * @return Ret<string>
+     */
+    public function type_freepath_normalized(
+        $value, ?string $separator = null,
+        array $refs = []
+    )
+    {
+        $theType = Lib::type();
+
+        if (! $theType->char($separator ?? DIRECTORY_SEPARATOR)->isOk([ &$separatorChar, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if (! $theType->path_normalized($value, $separatorChar, $refs)->isOk([ &$valuePath, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (file_exists($valuePath)) {
@@ -430,8 +428,13 @@ class FsModule
         $isAllowExists = $isAllowExists ?? true;
         $isAllowSymlink = $isAllowSymlink ?? true;
 
-        if (! $this->type_path($value, $refs)->isOk([ &$valuePath, &$ret ])) {
-            return $ret;
+        $theType = Lib::type();
+
+        if (! $theType->path($value, $refs)->isOk([ &$valuePath, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $exists = file_exists($valuePath);
@@ -492,7 +495,10 @@ class FsModule
         $isAllowSymlink = $isAllowSymlink ?? true;
 
         if (! $this->type_realpath($value, $isAllowSymlink, $refs)->isOk([ &$valueRealpath, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! $isAllowSymlink) {
@@ -529,8 +535,13 @@ class FsModule
         $isAllowExists = $isAllowExists ?? true;
         $isAllowSymlink = $isAllowSymlink ?? true;
 
-        if (! $this->type_path($value, $refs)->isOk([ &$valuePath, &$ret ])) {
-            return $ret;
+        $theType = Lib::type();
+
+        if (! $theType->path($value, $refs)->isOk([ &$valuePath, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $exists = file_exists($valuePath);
@@ -589,7 +600,10 @@ class FsModule
     )
     {
         if (! $this->type_realpath($value, $isAllowSymlink, $refs)->isOk([ &$valueRealpath, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (! $isAllowSymlink) {
@@ -620,7 +634,10 @@ class FsModule
         $theType = Lib::type();
 
         if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $forbidden = [ "/", "\\", DIRECTORY_SEPARATOR ];
@@ -653,7 +670,10 @@ class FsModule
 
         } else {
             if (! $this->type_filepath_realpath($value)->isOk([ &$valueFilepathRealpath, &$ret ])) {
-                return $ret;
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             try {
@@ -661,7 +681,7 @@ class FsModule
             }
             catch ( \Throwable $e ) {
                 return Ret::err(
-                    [ 'The `value` should be valid file', $value ],
+                    $e,
                     [ __FILE__, __LINE__ ]
                 );
             }
@@ -825,7 +845,10 @@ class FsModule
     )
     {
         if (! $this->type_file($value, $extensions, $mimeTypes, $filters)->isOk([ &$splFileInfo, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (null !== $filters) {

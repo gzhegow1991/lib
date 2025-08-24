@@ -569,7 +569,10 @@ class PhpModule
     public function type_boolfalse($value)
     {
         if (! $this->type_bool($value)->isOk([ &$valueBool, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (false === $valueBool) {
@@ -588,7 +591,10 @@ class PhpModule
     public function type_booltrue($value)
     {
         if (! $this->type_bool($value)->isOk([ &$valueBool, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (true === $valueBool) {
@@ -668,7 +674,10 @@ class PhpModule
     public function type_userfalse($value)
     {
         if (! $this->type_userbool($value)->isOk([ &$valueUserbool, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (false === $valueUserbool) {
@@ -687,7 +696,10 @@ class PhpModule
     public function type_usertrue($value)
     {
         if (! $this->type_userbool($value)->isOk([ &$valueUserbool, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (true === $valueUserbool) {
@@ -1072,7 +1084,10 @@ class PhpModule
 
         } else {
             if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-                return $ret;
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             $class = ltrim($valueStringNotEmpty, '\\');
@@ -1158,9 +1173,14 @@ class PhpModule
             $flagsInt |= _PHP_STRUCT_TYPE_CLASS;
         }
 
-        $ret = $this->type_struct($value, $flagsInt);
+        if (! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
 
-        return $ret;
+        return Ret::val($struct);
     }
 
     /**
@@ -1181,9 +1201,14 @@ class PhpModule
             $flagsInt |= _PHP_STRUCT_TYPE_INTERFACE;
         }
 
-        $ret = $this->type_struct($value, $flagsInt);
+        if (! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
 
-        return $ret;
+        return Ret::val($struct);
     }
 
     /**
@@ -1201,9 +1226,14 @@ class PhpModule
             $flagsInt |= _PHP_STRUCT_TYPE_TRAIT;
         }
 
-        $ret = $this->type_struct($value, $flagsInt);
+        if (! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
 
-        return $ret;
+        return Ret::val($struct);
     }
 
     /**
@@ -1228,9 +1258,14 @@ class PhpModule
             $flagsInt |= _PHP_STRUCT_TYPE_ENUM;
         }
 
-        $ret = $this->type_struct($value, $flagsInt);
+        if (! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
 
-        return $ret;
+        return Ret::val($struct);
     }
 
 
@@ -1244,7 +1279,10 @@ class PhpModule
     public function type_struct_fqcn($value, ?int $flags = null)
     {
         if (! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $valueStruct = '\\' . $valueStruct;
@@ -1258,7 +1296,10 @@ class PhpModule
     public function type_struct_namespace($value, ?int $flags = null)
     {
         if (! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $valueNamespace = $this->dirname($valueStruct, '\\');
@@ -1279,7 +1320,10 @@ class PhpModule
     public function type_struct_basename($value, ?int $flags = null)
     {
         if (! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $valueBasename = $this->basename($valueStruct, '\\');
@@ -1623,6 +1667,97 @@ class PhpModule
     public function type_callable_string_method_static($value, $newScope = 'static')
     {
         return $this->callableParser()->typeCallableStringMethodStatic($value, $newScope);
+    }
+
+
+    /**
+     * @param array{ 0: array|null } $refs
+     *
+     * @return Ret<string>
+     */
+    public function type_path(
+        $value,
+        array $refs = []
+    )
+    {
+        $theType = Lib::type();
+
+        $withPathInfo = array_key_exists(0, $refs);
+        if ($withPathInfo) {
+            $refPathInfo =& $refs[ 0 ];
+        }
+        $refPathInfo = null;
+
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ($withPathInfo) {
+            try {
+                $refPathInfo = $this->pathinfo($valueStringNotEmpty);
+            }
+            catch ( \Throwable $e ) {
+                return Ret::err(
+                    [ 'The `value` should be valid path', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        return Ret::val($valueStringNotEmpty);
+    }
+
+    /**
+     * @param array{ 0: array|null } $refs
+     *
+     * @return Ret<string>
+     */
+    public function type_path_normalized(
+        $value, ?string $separator = null,
+        array $refs = []
+    )
+    {
+        $theType = Lib::type();
+
+        $withPathInfo = array_key_exists(0, $refs);
+        if ($withPathInfo) {
+            $refPathInfo =& $refs[ 0 ];
+        }
+        $refPathInfo = null;
+
+        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        try {
+            $pathNormalized = $this->path_normalize($valueStringNotEmpty, $separator);
+        }
+        catch ( \Throwable $e ) {
+            return Ret::err(
+                $e,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ($withPathInfo) {
+            try {
+                $refPathInfo = $this->pathinfo($pathNormalized);
+            }
+            catch ( \Throwable $e ) {
+                return Ret::err(
+                    $e,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        return Ret::val($valueStringNotEmpty);
     }
 
 

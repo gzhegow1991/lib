@@ -117,7 +117,10 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeMethodArray($value)
     {
         if (! $this->typeMethod($value, [ &$refMethodArray ])->isOk([ 1 => &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         return Ret::val($refMethodArray);
@@ -129,7 +132,10 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeMethodString($value)
     {
         if (! $this->typeMethod($value, [ 1 => &$refMethodString ])->isOk([ 1 => &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         return Ret::val($refMethodString);
@@ -235,17 +241,11 @@ class DefaultCallableParser implements CallableParserInterface
             );
         }
 
-        if ($this
-            ->typeCallableObjectClosure($value, $newScope)
-            ->isOk([ &$valueCallableObjectClosure ])
-        ) {
+        if ($this->typeCallableObjectClosure($value, $newScope)->isOk([ &$valueCallableObjectClosure ])) {
             return Ret::val($valueCallableObjectClosure);
         }
 
-        if ($this
-            ->typeCallableObjectInvokable($value, $newScope)
-            ->isOk([ &$valueCallableObjectInvokable ])
-        ) {
+        if ($this->typeCallableObjectInvokable($value, $newScope)->isOk([ &$valueCallableObjectInvokable ])) {
             return Ret::val($valueCallableObjectInvokable);
         }
 
@@ -315,10 +315,7 @@ class DefaultCallableParser implements CallableParserInterface
             );
         }
 
-        if ($this
-            ->typeCallableArrayMethod($value, $newScope)
-            ->isOk([ &$valueCallableArrayMethod ])
-        ) {
+        if ($this->typeCallableArrayMethod($value, $newScope)->isOk([ &$valueCallableArrayMethod ])) {
             return Ret::val($valueCallableArrayMethod);
         }
 
@@ -627,17 +624,11 @@ class DefaultCallableParser implements CallableParserInterface
             );
         }
 
-        if ($this
-            ->typeCallableStringFunction($value)
-            ->isOk([ &$valueCallableStringFunction ])
-        ) {
+        if ($this->typeCallableStringFunction($value)->isOk([ &$valueCallableStringFunction ])) {
             return Ret::val($valueCallableStringFunction);
         }
 
-        if ($this
-            ->typeCallableStringMethodStatic($value, $newScope)
-            ->isOk([ &$valueCallableStringMethodStatic ])
-        ) {
+        if ($this->typeCallableStringMethodStatic($value, $newScope)->isOk([ &$valueCallableStringMethodStatic ])) {
             return Ret::val($valueCallableStringMethodStatic);
         }
 

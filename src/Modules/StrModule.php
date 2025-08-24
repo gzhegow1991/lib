@@ -326,7 +326,10 @@ class StrModule
     public function type_string_empty($value)
     {
         if (! $this->type_string($value)->isOk([ &$valueString, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if ('' === $valueString) {
@@ -345,7 +348,10 @@ class StrModule
     public function type_string_not_empty($value)
     {
         if (! $this->type_string($value)->isOk([ &$valueString, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if ('' !== $valueString) {
@@ -366,7 +372,10 @@ class StrModule
         $characters = $characters ?? " \n\r\t\v\0";
 
         if (! $this->type_string($value)->isOk([ &$valueString, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $valueString = trim($valueString, $characters);
@@ -388,7 +397,10 @@ class StrModule
     public function type_char($value)
     {
         if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (1 === strlen($valueStringNotEmpty)) {
@@ -407,7 +419,10 @@ class StrModule
     public function type_letter($value)
     {
         if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (1 === $this->strlen($valueStringNotEmpty)) {
@@ -426,7 +441,10 @@ class StrModule
     public function type_word($value)
     {
         if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         preg_replace('/\s+/', '', $valueStringNotEmpty, 1, $count);
@@ -449,7 +467,10 @@ class StrModule
     public function type_alphabet($value)
     {
         if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         preg_replace('/\s+/', '', $valueStringNotEmpty, 1, $count);
@@ -512,7 +533,10 @@ class StrModule
     public function type_ctype_digit($value)
     {
         if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (extension_loaded('ctype')) {
@@ -544,7 +568,10 @@ class StrModule
         $allowUpperCase = $allowUpperCase ?? true;
 
         if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (extension_loaded('ctype')) {
@@ -589,7 +616,10 @@ class StrModule
         $allowUpperCase = $allowUpperCase ?? true;
 
         if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
-            return $ret;
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (extension_loaded('ctype')) {
