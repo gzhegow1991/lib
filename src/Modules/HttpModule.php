@@ -352,26 +352,28 @@ class HttpModule
     {
         $theType = Lib::type();
 
-        if ($queries) {
+        if ([] !== $queries) {
             array_unshift($queries, $query);
+
+        } else {
+            $queries = [ $query ];
         }
 
-        foreach ( $queries as $idx => $_query ) {
-            if (null === $_query) {
+        foreach ( $queries as $idx => $q ) {
+            if (null === $q) {
                 unset($queries[ $idx ]);
             }
         }
 
-        foreach ( $queries as $idx => $_query ) {
-            if (is_array($_query)) {
+        foreach ( $queries as $idx => $q ) {
+            if (is_array($q)) {
                 continue;
 
-            } elseif ($theType->string_not_empty($_query)->isOk([ &$_queryString ])) {
-                parse_str($_queryString, $queryArray);
+            } elseif ($theType->string_not_empty($q)->isOk([ &$qString ])) {
+                $queryArray = [];
+                parse_str($q, $queryArray);
 
                 $queries[ $idx ] = $queryArray;
-
-                unset($queryArray);
 
             } else {
                 throw new LogicException(
@@ -380,7 +382,11 @@ class HttpModule
             }
         }
 
-        $result = $this->data_merge(...$queries);
+        $result = [];
+
+        if ([] !== $queries) {
+            $result = $this->data_merge(...$queries);
+        }
 
         return $result;
     }

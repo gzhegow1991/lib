@@ -98,17 +98,17 @@ class UrlModule
             $refParseUrl
         );
 
-        $hasHost = ('' !== $refParseUrl[ 'host' ]);
-        $hasPath = ('' !== $refParseUrl[ 'path' ]);
+        $wasHost = ('' !== $refParseUrl[ 'host' ]);
+        $wasPath = ('' !== $refParseUrl[ 'path' ]);
 
-        if (! $hasHost) {
+        if (! $wasHost) {
             return Ret::err(
                 [ 'The `url` requires a host', $url, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! $hasPath) {
+        if (! $wasPath) {
             $refParseUrl[ 'path' ] = '/';
         }
 
@@ -179,7 +179,7 @@ class UrlModule
             $refParseUrl[ 'path' ] = str_replace('%2F', '/', $refParseUrl[ 'path' ]);
         }
 
-        $wasQuery = (null !== $refParseUrl[ 'query' ]);
+        $wasQuery = ('' !== $refParseUrl[ 'query' ]);
 
         if (false === $_query) {
             unset($refParseUrl[ 'query' ]);
@@ -303,23 +303,23 @@ class UrlModule
             $refParseUrl
         );
 
-        $hasHost = ('' !== $refParseUrl[ 'host' ]);
-        $hasPath = ('' !== $refParseUrl[ 'path' ]);
+        $wasHost = ('' !== $refParseUrl[ 'host' ]);
+        $wasPath = ('' !== $refParseUrl[ 'path' ]);
 
-        if (! $hasPath && $hasHost) {
+        if (! $wasPath && $wasHost) {
             $refParseUrl[ 'path' ] = '/';
 
-            $hasPath = true;
+            $wasPath = true;
         }
 
-        if (! ($hasHost || $hasPath)) {
+        if (! ($wasHost || $wasPath)) {
             return Ret::err(
                 [ 'The `url` requires at least one `host` or `path`' ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ($hasHost) {
+        if ($wasHost) {
             if (false
                 || (-2 === $isHostIdnaAscii)
                 || (-1 === $isHostIdnaAscii)
@@ -373,7 +373,7 @@ class UrlModule
             }
         }
 
-        if ($hasPath) {
+        if ($wasPath) {
             if (1 === $isLinkUrlencoded) {
                 $test = str_replace('/', '', $refParseUrl[ 'path' ]);
 
@@ -390,7 +390,7 @@ class UrlModule
             }
         }
 
-        $wasQuery = (null !== $refParseUrl[ 'query' ]);
+        $wasQuery = ('' !== $refParseUrl[ 'query' ]);
 
         if (false === $_query) {
             unset($refParseUrl[ 'query' ]);
@@ -421,7 +421,7 @@ class UrlModule
             }
         }
 
-        $result = $hasHost
+        $result = $wasHost
             ? $this->url_build($refParseUrl)
             : $this->link_build($refParseUrl);
 
@@ -487,9 +487,9 @@ class UrlModule
             $refParseUrl
         );
 
-        $hasHost = ('' !== $refParseUrl[ 'host' ]);
+        $wasHost = ('' !== $refParseUrl[ 'host' ]);
 
-        if (! $hasHost) {
+        if (! $wasHost) {
             return Ret::err(
                 [ 'The `url` requires a host', $url, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
@@ -641,9 +641,9 @@ class UrlModule
             $refParseUrl
         );
 
-        $hasPath = ('' !== $refParseUrl[ 'path' ]);
+        $wasPath = ('' !== $refParseUrl[ 'path' ]);
 
-        if (! $hasPath) {
+        if (! $wasPath) {
             return Ret::err(
                 [ 'The `url` should have path', $url ],
                 [ __FILE__, __LINE__ ]
@@ -665,7 +665,7 @@ class UrlModule
             $refParseUrl[ 'path' ] = str_replace('%2F', '/', $refParseUrl[ 'path' ]);
         }
 
-        $wasQuery = (null !== $refParseUrl[ 'query' ]);
+        $wasQuery = ('' !== $refParseUrl[ 'query' ]);
 
         if (false === $_query) {
             unset($refParseUrl[ 'query' ]);
@@ -751,17 +751,17 @@ class UrlModule
             $refParseUrl
         );
 
-        $hasScheme = ('' !== $refParseUrl[ 'scheme' ]);
-        $hasPath = ('' !== $refParseUrl[ 'path' ]);
+        $wasScheme = ('' !== $refParseUrl[ 'scheme' ]);
+        $wasPath = ('' !== $refParseUrl[ 'path' ]);
 
-        if (! $hasScheme) {
+        if (! $wasScheme) {
             return Ret::err(
                 [ 'The `dsn` requires a `scheme`', $dsn, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! $hasPath) {
+        if (! $wasPath) {
             return Ret::err(
                 [ 'The `dsn` requires a `path`', $dsn, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
@@ -843,9 +843,9 @@ class UrlModule
             $refParseUrl
         );
 
-        $hasHost = ('' !== $refParseUrl[ 'host' ]);
+        $wasHost = ('' !== $refParseUrl[ 'host' ]);
 
-        if (! $hasHost) {
+        if (! $wasHost) {
             $refParseUrl[ 'host' ] = $this->host_current();
 
             $urlStringNotEmpty = $this->url_build($refParseUrl);
@@ -963,9 +963,9 @@ class UrlModule
             $refParseUrl
         );
 
-        $hasHost = ('' !== $refParseUrl[ 'host' ]);
+        $wasHost = ('' !== $refParseUrl[ 'host' ]);
 
-        if (! $hasHost) {
+        if (! $wasHost) {
             $refParseUrl[ 'host' ] = $this->host_current();
 
             $urlStringNotEmpty = $this->url_build($refParseUrl);
