@@ -4,7 +4,7 @@ if (! defined('_PHP_PATHINFO_DIRNAME')) define('_PHP_PATHINFO_DIRNAME', PATHINFO
 if (! defined('_PHP_PATHINFO_BASENAME')) define('_PHP_PATHINFO_BASENAME', PATHINFO_BASENAME);    // 1 << 1
 if (! defined('_PHP_PATHINFO_EXTENSION')) define('_PHP_PATHINFO_EXTENSION', PATHINFO_EXTENSION); // 1 << 2
 if (! defined('_PHP_PATHINFO_FILENAME')) define('_PHP_PATHINFO_FILENAME', PATHINFO_FILENAME);    // 1 << 3
-if (! defined('_PHP_PATHINFO_FILE')) define('_PHP_PATHINFO_FILE', 1 << 4);
+if (! defined('_PHP_PATHINFO_FILE')) define('_PHP_PATHINFO_FNAME', 1 << 4);
 if (! defined('_PHP_PATHINFO_EXTENSIONS')) define('_PHP_PATHINFO_EXTENSIONS', 1 << 5);
 if (! defined('_PHP_PATHINFO_ALL')) define('_PHP_PATHINFO_ALL', ((1 << 6) - 1));
 

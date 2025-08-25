@@ -438,6 +438,8 @@ class PhpModule
 
     /**
      * @return Ret<mixed>
+     *
+     * @noinspection PhpConditionAlreadyCheckedInspection
      */
     public function type_any_not_false($value)
     {
@@ -454,6 +456,8 @@ class PhpModule
 
     /**
      * @return Ret<true>
+     *
+     * @noinspection PhpConditionAlreadyCheckedInspection
      */
     public function type_true($value)
     {
@@ -469,6 +473,8 @@ class PhpModule
 
     /**
      * @return Ret<mixed>
+     *
+     * @noinspection PhpConditionAlreadyCheckedInspection
      */
     public function type_any_not_true($value)
     {
@@ -1489,11 +1495,14 @@ class PhpModule
             );
         }
 
-        $enumCase = null;
         try {
             $enumCase = $enumClass::tryFrom($value);
         }
         catch ( \Throwable $e ) {
+            return Ret::err(
+                $e,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if (null !== $enumCase) {
@@ -1701,7 +1710,7 @@ class PhpModule
             }
             catch ( \Throwable $e ) {
                 return Ret::err(
-                    [ 'The `value` should be valid path', $value ],
+                    $e,
                     [ __FILE__, __LINE__ ]
                 );
             }
@@ -2648,16 +2657,16 @@ class PhpModule
         }
 
         if (false
-            || ($flags & _PHP_PATHINFO_FILENAME)
             || ($flags & _PHP_PATHINFO_EXTENSION)
-            || ($flags & _PHP_PATHINFO_FILE)
             || ($flags & _PHP_PATHINFO_EXTENSIONS)
+            || ($flags & _PHP_PATHINFO_FILENAME)
+            || ($flags & _PHP_PATHINFO_FNAME)
         ) {
             $filename = $basename;
 
             $split = explode($dotString, $basename) + [ '', '' ];
 
-            $file = array_shift($split);
+            $fname = array_shift($split);
 
             if ($flags & _PHP_PATHINFO_EXTENSION) {
                 $extension = end($split);
@@ -2672,14 +2681,6 @@ class PhpModule
                 }
             }
 
-            if ($flags & _PHP_PATHINFO_FILENAME) {
-                $pi[ 'filename' ] = ('' !== $filename) ? $filename : null;
-            }
-
-            if ($flags & _PHP_PATHINFO_FILE) {
-                $pi[ 'file' ] = ('' !== $file) ? $file : null;
-            }
-
             if ($flags & _PHP_PATHINFO_EXTENSIONS) {
                 $extensions = null;
                 if ([] !== $split) {
@@ -2687,6 +2688,14 @@ class PhpModule
                 }
 
                 $pi[ 'extensions' ] = $extensions;
+            }
+
+            if ($flags & _PHP_PATHINFO_FILENAME) {
+                $pi[ 'filename' ] = ('' !== $filename) ? $filename : null;
+            }
+
+            if ($flags & _PHP_PATHINFO_FNAME) {
+                $pi[ 'fname' ] = ('' !== $fname) ? $fname : null;
             }
         }
 
@@ -3250,7 +3259,7 @@ class PhpModule
 
         if ([] !== $previousList) {
             if ([] === $messageList) {
-                $messageList = [];
+                // $messageList = [];
                 $codeIntegerList = [];
                 $fileList = [];
                 $lineList = [];
