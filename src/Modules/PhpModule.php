@@ -2905,14 +2905,60 @@ class PhpModule
             throw new RuntimeException(
                 [
                     'Result path should be a non-empty string',
+                    //
                     $path,
-                    $separatorString,
-                    $dotString,
+                    $separator,
+                    $dot,
                 ]
             );
         }
 
         return $pathResolved;
+    }
+
+    /**
+     * > соединяет несколько путей в один, нормализует и резолвит его
+     *
+     * @param string|string[] $parts
+     */
+    public function path_join($parts, ?string $separator = null, ?string $dot = null) : string
+    {
+        $theType = Lib::type();
+
+        $partsValid = (array) $parts;
+
+        $partsValid = $theType->array_not_empty($partsValid)->orThrow();
+        $separatorString = $theType->char($separator ?? '/')->orThrow();
+
+        $partsPlain = [];
+        array_walk_recursive(
+            $partsValid,
+            function ($v) use (
+                $theType,
+                //
+                &$partsPlain
+            ) {
+                if (! $theType->string_not_empty($v)->isOk([ &$vString ])) {
+                    return;
+                }
+
+                if ('.' === $vString) {
+                    return;
+                }
+
+                $partsPlain[] = $vString;
+            }
+        );
+
+        $partsPlain = $theType->array_not_empty($partsPlain)->orThrow();
+
+        $join = implode($separatorString, $partsPlain);
+
+        $normalized = $this->path_normalize($join, $separatorString);
+
+        $resolved = $this->path_resolve($normalized, $separatorString, $dot);
+
+        return $resolved;
     }
 
 
@@ -2952,8 +2998,9 @@ class PhpModule
             throw new RuntimeException(
                 [
                     'Result path should be a non-empty string',
+                    //
                     $path,
-                    $separatorChar,
+                    $separator,
                     $dot,
                 ]
             );

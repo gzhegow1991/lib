@@ -1116,6 +1116,9 @@ class FsModule
     }
 
 
+    /**
+     * > заменяет слеши в пути на указанные
+     */
     public function path_normalize(string $path, ?string $separator = null) : string
     {
         $thePhp = Lib::php();
@@ -1133,6 +1136,9 @@ class FsModule
         return $pathNormalized;
     }
 
+    /**
+     * > разбирает последовательности `./path` и `../path` и возвращает нормализованный путь
+     */
     public function path_resolve(string $path, ?string $separator = null) : string
     {
         $thePhp = Lib::php();
@@ -1148,6 +1154,19 @@ class FsModule
         }
 
         return $pathResolved;
+    }
+
+    /**
+     * > соединяет несколько путей в один, нормализует и резолвит его
+     */
+    public function path_join(array $parts, ?string $separator = null) : string
+    {
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
+
+        return $thePhp->path_join($parts, $separatorChar, '.');
     }
 
 
