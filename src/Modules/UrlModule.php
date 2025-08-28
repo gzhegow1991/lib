@@ -11,6 +11,34 @@ use Gzhegow\Lib\Exception\RuntimeException;
 class UrlModule
 {
     /**
+     * @var string
+     */
+    protected $urlCurrent;
+    /**
+     * @var array
+     */
+    protected $urlCurrentParseUrl;
+
+    /**
+     * @var string
+     */
+    protected $hostCurrent;
+    /**
+     * @var array
+     */
+    protected $hostCurrentParseUrl;
+
+    /**
+     * @var string
+     */
+    protected $linkCurrent;
+    /**
+     * @var array
+     */
+    protected $linkCurrentParseUrl;
+
+
+    /**
      * @param string|true             $url
      * @param string|false|array|null $query
      * @param string|false|null       $fragment
@@ -846,7 +874,10 @@ class UrlModule
         $wasHost = ('' !== $refParseUrl[ 'host' ]);
 
         if (! $wasHost) {
-            $refParseUrl[ 'host' ] = $this->host_current();
+            $this->host_current([ &$refHostCurrentParseUrl ]);
+
+            $refParseUrl = $refHostCurrentParseUrl + $refParseUrl;
+            $refParseUrl[ 'path' ] = '/' . ltrim($refParseUrl[ 'path' ] ?? '', '/');
 
             $urlStringNotEmpty = $this->url_build($refParseUrl);
         }
@@ -966,7 +997,10 @@ class UrlModule
         $wasHost = ('' !== $refParseUrl[ 'host' ]);
 
         if (! $wasHost) {
-            $refParseUrl[ 'host' ] = $this->host_current();
+            $this->host_current([ &$refHostCurrentParseUrl ]);
+
+            $refParseUrl = $refHostCurrentParseUrl + $refParseUrl;
+            $refParseUrl[ 'path' ] = '/' . ltrim($refParseUrl[ 'path' ] ?? '', '/');
 
             $urlStringNotEmpty = $this->url_build($refParseUrl);
         }
@@ -974,6 +1008,7 @@ class UrlModule
         $args = [
             $urlStringNotEmpty,
             $isHostIdnaAscii,
+            $refs,
         ];
 
         $result = $this->type_host(...$args)->orThrow();
@@ -1018,6 +1053,7 @@ class UrlModule
             $query,
             $fragment,
             $isLinkUrlencoded,
+            $refs,
         ];
 
         $result = $this->type_link(...$args)->orThrow();
@@ -1026,155 +1062,157 @@ class UrlModule
     }
 
 
-    public function url_current() : string
+    public function url_current(array $refs = []) : string
     {
-        $urlHostCurrent = $this->host_current();
-        $urlLinkCurrent = $this->link_current();
+        $withParseUrl = array_key_exists(0, $refs);
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+        }
+        $refParseUrl = null;
 
-        $result = "{$urlHostCurrent}{$urlLinkCurrent}";
+        if (null === $this->urlCurrent) {
+            $urlHostCurrent = $this->host_current();
+            $urlLinkCurrent = $this->link_current();
 
-        return $result;
-    }
-
-    public function host_current() : string
-    {
-        if (! isset($_SERVER[ 'HTTP_HOST' ])) {
-            throw new RuntimeException(
-                [ 'The `SERVER[HTTP_HOST]` is required', $_SERVER ]
-            );
+            $this->urlCurrent = "{$urlHostCurrent}{$urlLinkCurrent}";
         }
 
-        $serverHttpHost = $_SERVER[ 'HTTP_HOST' ];
+        if ($withParseUrl) {
+            if (null !== $this->urlCurrentParseUrl) {
+                $this->urlCurrentParseUrl = parse_url($this->urlCurrent);
+            }
 
-        $serverHttps = $_SERVER[ 'HTTPS' ] ?? null;
-        $serverPhpAuthUser = $_SERVER[ 'PHP_AUTH_USER' ] ?? null;
-        $serverPhpAuthPw = $_SERVER[ 'PHP_AUTH_PW' ] ?? null;
-        $serverServerPort = $_SERVER[ 'SERVER_PORT' ] ?? null;
-
-        $serverHttpHost = (string) $serverHttpHost;
-        $serverHttps = (string) $serverHttps;
-        $serverPhpAuthUser = (string) $serverPhpAuthUser;
-        $serverPhpAuthPw = (string) $serverPhpAuthPw;
-        $serverServerPort = (string) $serverServerPort;
-
-        $hasServerHttpHost = ('' !== $serverHttpHost);
-        $hasServerPhpAuthUser = ('' !== $serverPhpAuthUser);
-        $hasServerPhpAuthPw = ('' !== $serverPhpAuthPw);
-
-        $scheme = ($serverHttps && ($serverHttps !== 'off')) ? 'https' : 'http';
-        $isScheme = '://';
-
-        $user = $hasServerPhpAuthUser ? $serverPhpAuthUser : '';
-        $pass = $hasServerPhpAuthPw ? $serverPhpAuthPw : '';
-        $isPass = $hasServerPhpAuthPw ? ':' : '';
-        $isUserAndPass = ($hasServerPhpAuthUser || $hasServerPhpAuthPw) ? '@' : '';
-
-        $host = $hasServerHttpHost ? $serverHttpHost : '';
-
-        $port = in_array($serverServerPort, [ 80, 443 ]) ? '' : $serverServerPort;
-        $hasPort = ('' !== $port);
-        $isPort = $hasPort ? ':' : '';
-
-        $result = implode('', [
-            $scheme,
-            $isScheme,
-            $user,
-            $isPass,
-            $pass,
-            $isUserAndPass,
-            $host,
-            $isPort,
-            $port,
-        ]);
-
-        return $result;
-    }
-
-    public function link_current() : string
-    {
-        if (! isset($_SERVER[ 'REQUEST_URI' ])) {
-            throw new RuntimeException(
-                [ 'The `SERVER[REQUEST_URI]` is required', $_SERVER ]
-            );
+            $refParseUrl = $this->urlCurrentParseUrl;
         }
 
-        $serverRequestUri = $_SERVER[ 'REQUEST_URI' ];
-
-        $serverQueryString = $_SERVER[ 'QUERY_STRING' ] ?? null;
-
-        $serverRequestUri = (string) $serverRequestUri;
-        $serverQueryString = (string) $serverQueryString;
-
-        [
-            $serverRequestUri,
-            $serverRequestUriQueryString,
-        ] = explode('?', $serverRequestUri, 2) + [ '', '' ];
-
-        $hasServerQueryString = ('' !== $serverQueryString);
-        $hasServerRequestUriQueryString = ('' !== $serverRequestUriQueryString);
-
-        $newQueryString = null
-            ?? ($hasServerQueryString ? $serverQueryString : null)
-            ?? ($hasServerRequestUriQueryString ? $serverRequestUriQueryString : null)
-            ?? '';
-
-        $hasNewQueryString = ('' !== $newQueryString);
-
-        $isQueryString = $hasNewQueryString ? '?' : '';
-
-        $result = implode('', [
-            $serverRequestUri,
-            $isQueryString,
-            $newQueryString,
-        ]);
-
-        return $result;
+        return $this->urlCurrent;
     }
 
-
-    public function url_referrer(
-        $url = null, $query = null, $fragment = null,
-        ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null
-    ) : string
+    public function host_current(array $refs = []) : string
     {
-        $url = $url ?? $_SERVER[ 'HTTP_REFERER' ] ?? true;
+        $withParseUrl = array_key_exists(0, $refs);
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+        }
+        $refParseUrl = null;
 
-        $result = $this->url(
-            $url, $query, $fragment,
-            $isHostIdnaAscii, $isLinkUrlencoded
-        );
+        if (null === $this->hostCurrent) {
+            if (! isset($_SERVER[ 'HTTP_HOST' ])) {
+                throw new RuntimeException(
+                    [ 'The `SERVER[HTTP_HOST]` is required', $_SERVER ]
+                );
+            }
 
-        return $result;
+            $serverHttpHost = $_SERVER[ 'HTTP_HOST' ];
+
+            $serverHttps = $_SERVER[ 'HTTPS' ] ?? null;
+            $serverPhpAuthUser = $_SERVER[ 'PHP_AUTH_USER' ] ?? null;
+            $serverPhpAuthPw = $_SERVER[ 'PHP_AUTH_PW' ] ?? null;
+            $serverServerPort = $_SERVER[ 'SERVER_PORT' ] ?? null;
+
+            $serverHttpHost = (string) $serverHttpHost;
+            $serverHttps = (string) $serverHttps;
+            $serverPhpAuthUser = (string) $serverPhpAuthUser;
+            $serverPhpAuthPw = (string) $serverPhpAuthPw;
+            $serverServerPort = (string) $serverServerPort;
+
+            $hasServerHttpHost = ('' !== $serverHttpHost);
+            $hasServerPhpAuthUser = ('' !== $serverPhpAuthUser);
+            $hasServerPhpAuthPw = ('' !== $serverPhpAuthPw);
+
+            $scheme = ($serverHttps && ($serverHttps !== 'off')) ? 'https' : 'http';
+            $isScheme = '://';
+
+            $user = $hasServerPhpAuthUser ? $serverPhpAuthUser : '';
+            $pass = $hasServerPhpAuthPw ? $serverPhpAuthPw : '';
+            $isPass = $hasServerPhpAuthPw ? ':' : '';
+            $isUserAndPass = ($hasServerPhpAuthUser || $hasServerPhpAuthPw) ? '@' : '';
+
+            $host = $hasServerHttpHost ? $serverHttpHost : '';
+
+            $port = in_array($serverServerPort, [ 80, 443 ]) ? '' : $serverServerPort;
+            $hasPort = ('' !== $port);
+            $isPort = $hasPort ? ':' : '';
+
+            $this->hostCurrent = implode('', [
+                $scheme,
+                $isScheme,
+                $user,
+                $isPass,
+                $pass,
+                $isUserAndPass,
+                $host,
+                $isPort,
+                $port,
+            ]);
+        }
+
+        if ($withParseUrl) {
+            if (null !== $this->hostCurrentParseUrl) {
+                $this->hostCurrentParseUrl = parse_url($this->hostCurrent);
+            }
+
+            $refParseUrl = $this->hostCurrentParseUrl;
+        }
+
+        return $this->hostCurrent;
     }
 
-    public function host_referrer(
-        $url = null,
-        ?int $isIdnaAscii = null
-    ) : string
+    public function link_current(array $refs = []) : string
     {
-        $url = $url ?? $_SERVER[ 'HTTP_REFERER' ] ?? true;
+        $withParseUrl = array_key_exists(0, $refs);
+        if ($withParseUrl) {
+            $refParseUrl =& $refs[ 0 ];
+        }
+        $refParseUrl = null;
 
-        $result = $this->host(
-            $url,
-            $isIdnaAscii
-        );
+        if (null === $this->linkCurrent) {
+            if (! isset($_SERVER[ 'REQUEST_URI' ])) {
+                throw new RuntimeException(
+                    [ 'The `SERVER[REQUEST_URI]` is required', $_SERVER ]
+                );
+            }
 
-        return $result;
-    }
+            $serverRequestUri = $_SERVER[ 'REQUEST_URI' ];
 
-    public function link_referrer(
-        $url = null, $query = null, $fragment = null,
-        ?int $isUrlencoded = null
-    ) : string
-    {
-        $url = $url ?? $_SERVER[ 'HTTP_REFERER' ] ?? true;
+            $serverQueryString = $_SERVER[ 'QUERY_STRING' ] ?? null;
 
-        $result = $this->link(
-            $url, $query, $fragment,
-            $isUrlencoded
-        );
+            $serverRequestUri = (string) $serverRequestUri;
+            $serverQueryString = (string) $serverQueryString;
 
-        return $result;
+            [
+                $serverRequestUri,
+                $serverRequestUriQueryString,
+            ] = explode('?', $serverRequestUri, 2) + [ '', '' ];
+
+            $hasServerQueryString = ('' !== $serverQueryString);
+            $hasServerRequestUriQueryString = ('' !== $serverRequestUriQueryString);
+
+            $newQueryString = null
+                ?? ($hasServerQueryString ? $serverQueryString : null)
+                ?? ($hasServerRequestUriQueryString ? $serverRequestUriQueryString : null)
+                ?? '';
+
+            $hasNewQueryString = ('' !== $newQueryString);
+
+            $isQueryString = $hasNewQueryString ? '?' : '';
+
+            $this->linkCurrent = implode('', [
+                $serverRequestUri,
+                $isQueryString,
+                $newQueryString,
+            ]);
+        }
+
+        if ($withParseUrl) {
+            if (null !== $this->linkCurrentParseUrl) {
+                $this->linkCurrentParseUrl = parse_url($this->linkCurrent);
+            }
+
+            $refParseUrl = $this->linkCurrentParseUrl;
+        }
+
+        return $this->linkCurrent;
     }
 
 
