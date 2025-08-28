@@ -1078,7 +1078,7 @@ class UrlModule
         }
 
         if ($withParseUrl) {
-            if (null !== $this->urlCurrentParseUrl) {
+            if (null === $this->urlCurrentParseUrl) {
                 $this->urlCurrentParseUrl = parse_url($this->urlCurrent);
             }
 
@@ -1148,7 +1148,7 @@ class UrlModule
         }
 
         if ($withParseUrl) {
-            if (null !== $this->hostCurrentParseUrl) {
+            if (null === $this->hostCurrentParseUrl) {
                 $this->hostCurrentParseUrl = parse_url($this->hostCurrent);
             }
 
@@ -1205,7 +1205,7 @@ class UrlModule
         }
 
         if ($withParseUrl) {
-            if (null !== $this->linkCurrentParseUrl) {
+            if (null === $this->linkCurrentParseUrl) {
                 $this->linkCurrentParseUrl = parse_url($this->linkCurrent);
             }
 
