@@ -25,12 +25,12 @@ class BcmathModule
     {
         $last = static::$scaleLimit;
 
-        if (null !== $scaleLimit) {
-            if (false === $scaleLimit) {
+        if ( null !== $scaleLimit ) {
+            if ( false === $scaleLimit ) {
                 static::$scaleLimit = 16;
 
             } else {
-                if ($scaleLimit < 0) {
+                if ( $scaleLimit < 0 ) {
                     throw new LogicException(
                         [ 'The `scaleLimit` should be a non-negative integer', $scaleLimit ]
                     );
@@ -48,7 +48,7 @@ class BcmathModule
 
     public function __construct()
     {
-        if (! extension_loaded('bcmath')) {
+        if ( ! extension_loaded('bcmath') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: bcmath' ]
             );
@@ -61,35 +61,35 @@ class BcmathModule
      */
     public function type_bcnumber($value)
     {
-        if ($value instanceof Bcnumber) {
+        if ( $value instanceof Bcnumber ) {
             return Ret::val($value);
         }
 
         $theType = Lib::type();
 
-        if (! $theType->numeric($value, false, [ &$split ])->isOk([ 1 => &$ret ])) {
+        if ( ! $theType->numeric($value, false, [ &$split ])->isOk([ 1 => &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $frac = $split[ 2 ];
+        $frac = $split[2];
 
         $scale = 0;
-        if ('' !== $frac) {
+        if ( '' !== $frac ) {
             $scale = strlen($frac) - 1;
         }
 
         Bcnumber::fromValidArray([
             'original' => $value,
-            'sign'     => $split[ 0 ],
-            'int'      => $split[ 1 ],
-            'frac'     => $split[ 2 ],
+            'sign'     => $split[0],
+            'int'      => $split[1],
+            'frac'     => $split[2],
             'scale'    => $scale,
         ])->isOk([ &$bcnumber, &$ret ]);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -129,26 +129,26 @@ class BcmathModule
 
         $scaleLimit = $this->staticScaleLimit();
 
-        if (null !== $scale) {
+        if ( null !== $scale ) {
             $scaleInt = $theType->int_non_negative($scale)->orThrow();
 
             $scaleIntList[] = $scaleInt;
         }
 
-        if ([] !== $numbers) {
+        if ( [] !== $numbers ) {
             $scaleIntList = array_merge(
                 $scaleIntList,
                 $this->scales(...$numbers)
             );
         }
 
-        if ([] === $scaleIntList) {
+        if ( [] === $scaleIntList ) {
             return null;
         }
 
         $scaleMin = min($scaleIntList);
 
-        if ($scaleMin > $scaleLimit) {
+        if ( $scaleMin > $scaleLimit ) {
             throw new RuntimeException(
                 [
                     'The result `scaleMin` is bigger than allowed maximum',
@@ -169,26 +169,26 @@ class BcmathModule
 
         $scaleLimit = $this->staticScaleLimit();
 
-        if (null !== $scale) {
+        if ( null !== $scale ) {
             $scaleInt = $theType->int_non_negative($scale)->orThrow();
 
             $scaleIntList[] = $scaleInt;
         }
 
-        if ([] !== $numbers) {
+        if ( [] !== $numbers ) {
             $scaleIntList = array_merge(
                 $scaleIntList,
                 $this->scales(...$numbers)
             );
         }
 
-        if ([] === $scaleIntList) {
+        if ( [] === $scaleIntList ) {
             return null;
         }
 
         $scaleMax = max($scaleIntList);
 
-        if ($scaleMax > $scaleLimit) {
+        if ( $scaleMax > $scaleLimit ) {
             throw new RuntimeException(
                 [ 'The result `scaleMax` is bigger than allowed maximum', $scaleMax, $scaleLimit ]
             );
@@ -240,19 +240,19 @@ class BcmathModule
         $bcnumber = $theType->bcnumber($number)->orThrow();
 
         $hasNonZeroFrac = false;
-        if ($bcnumber->hasFrac($frac)) {
+        if ( $bcnumber->hasFrac($frac) ) {
             $hasNonZeroFrac = ('' !== ltrim($frac, '.0'));
         }
 
         $result = $bcnumber->getValueInt();
 
-        if ($bcnumber->isNegative()) {
-            if ($hasNonZeroFrac) {
+        if ( $bcnumber->isNegative() ) {
+            if ( $hasNonZeroFrac ) {
                 $result = bcadd($result, '0', 0);
             }
 
         } else {
-            if ($hasNonZeroFrac) {
+            if ( $hasNonZeroFrac ) {
                 $result = bcadd($result, '1', 0);
             }
         }
@@ -269,19 +269,19 @@ class BcmathModule
         $bcnumber = $theType->bcnumber($number)->orThrow();
 
         $hasNonZeroFrac = false;
-        if ($bcnumber->hasFrac($frac)) {
+        if ( $bcnumber->hasFrac($frac) ) {
             $hasNonZeroFrac = ('' !== ltrim($frac, '.0'));
         }
 
         $result = $bcnumber->getValueInt();
 
-        if ($bcnumber->isNegative()) {
-            if ($hasNonZeroFrac) {
+        if ( $bcnumber->isNegative() ) {
+            if ( $hasNonZeroFrac ) {
                 $result = bcsub($result, '1', 0);
             }
 
         } else {
-            if ($hasNonZeroFrac) {
+            if ( $hasNonZeroFrac ) {
                 $result = bcadd($result, '0', 0);
             }
         }
@@ -317,7 +317,7 @@ class BcmathModule
         $bcnumber = $theType->bcnumber($number)->orThrow();
         $scaleInt = $theType->int_non_negative($scale)->orThrow();
 
-        if ($bcnumber->isZero()) {
+        if ( $bcnumber->isZero() ) {
             return clone $bcnumber;
         }
 
@@ -331,19 +331,19 @@ class BcmathModule
         $hasFlagsNegative = (null !== $flagsNegative);
 
         $flagsCurrent = 0;
-        if ($isNegative) {
-            if ($hasFlagsNegative) {
+        if ( $isNegative ) {
+            if ( $hasFlagsNegative ) {
                 $flagsCurrent = $flagsNegative;
 
-            } elseif ($hasFlagsNonNegative) {
+            } elseif ( $hasFlagsNonNegative ) {
                 $flagsCurrent = $flags;
             }
 
         } else {
-            if ($hasFlagsNonNegative) {
+            if ( $hasFlagsNonNegative ) {
                 $flagsCurrent = $flags;
 
-            } elseif ($hasFlagsNegative) {
+            } elseif ( $hasFlagsNegative ) {
                 throw new LogicException(
                     [ 'Unable to set `flagsNegative` without `flags`', $flagsNegative, $flags ]
                 );
@@ -364,20 +364,20 @@ class BcmathModule
             ],
         ];
 
-        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+        foreach ( $flagGroups as $groupName => [$conflict, $default] ) {
             $cnt = 0;
             foreach ( $conflict as $flag ) {
-                if ($flagsCurrent & $flag) {
+                if ( $flagsCurrent & $flag ) {
                     $cnt++;
                 }
             }
 
-            if ($cnt > 1) {
+            if ( $cnt > 1 ) {
                 throw new LogicException(
                     [ 'The `flagsNonNegative` conflict in group: ' . $groupName, $flags ]
                 );
 
-            } elseif (0 === $cnt) {
+            } elseif ( 0 === $cnt ) {
                 $flagsCurrent |= $default;
             }
         }
@@ -388,22 +388,22 @@ class BcmathModule
         $isRoundToNegativeInf = false;
         $isRoundEven = false;
         $isRoundOdd = false;
-        if ($flagsCurrent & _NUM_ROUND_AWAY_FROM_ZERO) {
+        if ( $flagsCurrent & _NUM_ROUND_AWAY_FROM_ZERO ) {
             $isRoundAwayFromZero = true;
 
-        } elseif ($flagsCurrent & _NUM_ROUND_TOWARD_ZERO) {
+        } elseif ( $flagsCurrent & _NUM_ROUND_TOWARD_ZERO ) {
             $isRoundTowardZero = true;
 
-        } elseif ($flagsCurrent & _NUM_ROUND_TO_POSITIVE_INF) {
+        } elseif ( $flagsCurrent & _NUM_ROUND_TO_POSITIVE_INF ) {
             $isRoundToPositiveInf = true;
 
-        } elseif ($flagsCurrent & _NUM_ROUND_TO_NEGATIVE_INF) {
+        } elseif ( $flagsCurrent & _NUM_ROUND_TO_NEGATIVE_INF ) {
             $isRoundToNegativeInf = true;
 
-        } elseif ($flagsCurrent & _NUM_ROUND_EVEN) {
+        } elseif ( $flagsCurrent & _NUM_ROUND_EVEN ) {
             $isRoundEven = true;
 
-        } elseif ($flagsCurrent & _NUM_ROUND_ODD) {
+        } elseif ( $flagsCurrent & _NUM_ROUND_ODD ) {
             $isRoundOdd = true;
         }
 
@@ -416,19 +416,19 @@ class BcmathModule
         $scaledAbsInt = intval($refBcScaledAbs->getValueAbsoluteInt());
         $scaledAbsFrac = $refBcScaledAbs->getFrac();
 
-        $isMidpoint = isset($scaledAbsFrac[ 1 ]) && ('5' === $scaledAbsFrac[ 1 ]);
+        $isMidpoint = isset($scaledAbsFrac[1]) && ('5' === $scaledAbsFrac[1]);
 
-        if (! $isMidpoint) {
+        if ( ! $isMidpoint ) {
             $scaledAbsFracLen = strlen($scaledAbsFrac);
 
             $isUp = false;
             for ( $i = 1; $i < $scaledAbsFracLen; $i++ ) {
-                $digit = $scaledAbsFrac[ $i ];
+                $digit = $scaledAbsFrac[$i];
 
-                if ('4' === $digit) {
+                if ( '4' === $digit ) {
                     continue;
 
-                } elseif ($digit >= 5) {
+                } elseif ( $digit >= 5 ) {
                     $isUp = true;
 
                     break;
@@ -440,7 +440,7 @@ class BcmathModule
                 }
             }
 
-            if ($isUp) {
+            if ( $isUp ) {
                 $scaledAbs = $scaledAbsInt + 1;
 
             } else {
@@ -448,29 +448,29 @@ class BcmathModule
             }
 
         } else {
-            if ($isRoundAwayFromZero) {
+            if ( $isRoundAwayFromZero ) {
                 $scaledAbs = $scaledAbsInt + 1;
 
-            } elseif ($isRoundTowardZero) {
+            } elseif ( $isRoundTowardZero ) {
                 $scaledAbs = $scaledAbsInt;
 
-            } elseif ($isRoundToPositiveInf) {
-                if ($isNegative) {
+            } elseif ( $isRoundToPositiveInf ) {
+                if ( $isNegative ) {
                     $scaledAbs = $scaledAbsInt;
 
                 } else {
                     $scaledAbs = $scaledAbsInt + 1;
                 }
 
-            } elseif ($isRoundToNegativeInf) {
-                if ($isNegative) {
+            } elseif ( $isRoundToNegativeInf ) {
+                if ( $isNegative ) {
                     $scaledAbs = $scaledAbsInt + 1;
 
                 } else {
                     $scaledAbs = $scaledAbsInt;
                 }
 
-            } elseif ($isRoundEven) {
+            } elseif ( $isRoundEven ) {
                 $a = $scaledAbsInt;
                 $b = (0 === ($a % 2)) ? $a : ($a - 1);
                 $c = $b + 2;
@@ -481,7 +481,7 @@ class BcmathModule
                 $isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0);
                 $scaledAbs = $isLessThanOrEqual ? $b : $c;
 
-            } elseif ($isRoundOdd) {
+            } elseif ( $isRoundOdd ) {
                 $a = $scaledAbsInt;
                 $b = ($a % 2) ? $a : ($a - 1);
                 $c = $b + 2;
@@ -559,7 +559,7 @@ class BcmathModule
         $bcnumber = $theType->bcnumber($number)->orThrow();
         $scaleInt = $theType->int_non_negative($scale)->orThrow();
 
-        if ($bcnumber->isZero()) {
+        if ( $bcnumber->isZero() ) {
             return clone $bcnumber;
         }
 
@@ -573,19 +573,19 @@ class BcmathModule
         $hasFlagsNegative = (null !== $flagsNegative);
 
         $flagsCurrent = 0;
-        if ($isNegative) {
-            if ($hasFlagsNegative) {
+        if ( $isNegative ) {
+            if ( $hasFlagsNegative ) {
                 $flagsCurrent = $flagsNegative;
 
-            } elseif ($hasFlagsNonNegative) {
+            } elseif ( $hasFlagsNonNegative ) {
                 $flagsCurrent = $flags;
             }
 
         } else {
-            if ($hasFlagsNonNegative) {
+            if ( $hasFlagsNonNegative ) {
                 $flagsCurrent = $flags;
 
-            } elseif ($hasFlagsNegative) {
+            } elseif ( $hasFlagsNegative ) {
                 throw new LogicException(
                     [ 'Unable to set `flagsNegative` without `flags`', $flagsNegative, $flags ]
                 );
@@ -606,20 +606,20 @@ class BcmathModule
             ],
         ];
 
-        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+        foreach ( $flagGroups as $groupName => [$conflict, $default] ) {
             $cnt = 0;
             foreach ( $conflict as $flag ) {
-                if ($flagsCurrent & $flag) {
+                if ( $flagsCurrent & $flag ) {
                     $cnt++;
                 }
             }
 
-            if ($cnt > 1) {
+            if ( $cnt > 1 ) {
                 throw new LogicException(
                     [ 'The `flagsNonNegative` conflict in group: ' . $groupName, $flags ]
                 );
 
-            } elseif (0 === $cnt) {
+            } elseif ( 0 === $cnt ) {
                 $flagsCurrent |= $default;
             }
         }
@@ -630,22 +630,22 @@ class BcmathModule
         $isRoundToNegativeInf = false;
         $isRoundEven = false;
         $isRoundOdd = false;
-        if ($flagsCurrent & _NUM_ROUND_AWAY_FROM_ZERO) {
+        if ( $flagsCurrent & _NUM_ROUND_AWAY_FROM_ZERO ) {
             $isRoundAwayFromZero = true;
 
-        } elseif ($flagsCurrent & _NUM_ROUND_TOWARD_ZERO) {
+        } elseif ( $flagsCurrent & _NUM_ROUND_TOWARD_ZERO ) {
             $isRoundTowardZero = true;
 
-        } elseif ($flagsCurrent & _NUM_ROUND_TO_POSITIVE_INF) {
+        } elseif ( $flagsCurrent & _NUM_ROUND_TO_POSITIVE_INF ) {
             $isRoundToPositiveInf = true;
 
-        } elseif ($flagsCurrent & _NUM_ROUND_TO_NEGATIVE_INF) {
+        } elseif ( $flagsCurrent & _NUM_ROUND_TO_NEGATIVE_INF ) {
             $isRoundToNegativeInf = true;
 
-        } elseif ($flagsCurrent & _NUM_ROUND_EVEN) {
+        } elseif ( $flagsCurrent & _NUM_ROUND_EVEN ) {
             $isRoundEven = true;
 
-        } elseif ($flagsCurrent & _NUM_ROUND_ODD) {
+        } elseif ( $flagsCurrent & _NUM_ROUND_ODD ) {
             $isRoundOdd = true;
         }
 
@@ -658,33 +658,33 @@ class BcmathModule
         $scaledAbsInt = intval($refBcScaledAbs->getValueAbsoluteInt());
         $scaledAbsFrac = $refBcScaledAbs->getFrac();
 
-        if ('' === $scaledAbsFrac) {
+        if ( '' === $scaledAbsFrac ) {
             $scaledAbs = $scaledAbsInt;
 
         } else {
-            if ($isRoundAwayFromZero) {
+            if ( $isRoundAwayFromZero ) {
                 $scaledAbs = $scaledAbsInt + 1;
 
-            } elseif ($isRoundTowardZero) {
+            } elseif ( $isRoundTowardZero ) {
                 $scaledAbs = $scaledAbsInt;
 
-            } elseif ($isRoundToPositiveInf) {
-                if ($isNegative) {
+            } elseif ( $isRoundToPositiveInf ) {
+                if ( $isNegative ) {
                     $scaledAbs = $scaledAbsInt;
 
                 } else {
                     $scaledAbs = $scaledAbsInt + 1;
                 }
 
-            } elseif ($isRoundToNegativeInf) {
-                if ($isNegative) {
+            } elseif ( $isRoundToNegativeInf ) {
+                if ( $isNegative ) {
                     $scaledAbs = $scaledAbsInt + 1;
 
                 } else {
                     $scaledAbs = $scaledAbsInt;
                 }
 
-            } elseif ($isRoundEven) {
+            } elseif ( $isRoundEven ) {
                 $a = $scaledAbsInt;
                 $b = (0 === ($a % 2)) ? $a : ($a - 1);
                 $c = $b + 2;
@@ -695,7 +695,7 @@ class BcmathModule
                 $isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0);
                 $scaledAbs = $isLessThanOrEqual ? $b : $c;
 
-            } elseif ($isRoundOdd) {
+            } elseif ( $isRoundOdd ) {
                 $a = $scaledAbsInt;
                 $b = ($a % 2) ? $a : ($a - 1);
                 $c = $b + 2;
@@ -816,8 +816,8 @@ class BcmathModule
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
 
-        if (null === $scale) {
-            if ($bcnum1->getFrac() && $bcnum2->getFrac()) {
+        if ( null === $scale ) {
+            if ( $bcnum1->getFrac() && $bcnum2->getFrac() ) {
                 throw new LogicException(
                     [ 'The `scale` should be passed if both arguments have fractional parts', $num1, $num2 ]
                 );
@@ -923,8 +923,8 @@ class BcmathModule
 
         $bcnum = $theType->bcnumber($num)->orThrow();
 
-        if (null === $scale) {
-            if ($bcnum->hasFrac()) {
+        if ( null === $scale ) {
+            if ( $bcnum->hasFrac() ) {
                 throw new LogicException(
                     [ 'The `scale` should be passed if `num` has fractional part', $num ]
                 );

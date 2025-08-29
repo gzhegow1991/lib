@@ -30,12 +30,12 @@ class FormatJson
     {
         $last = static::$jsonDepth;
 
-        if (null !== $jsonDepth) {
-            if (false === $jsonDepth) {
+        if ( null !== $jsonDepth ) {
+            if ( false === $jsonDepth ) {
                 static::$jsonDepth = 512;
 
             } else {
-                if ($jsonDepth < 0) {
+                if ( $jsonDepth < 0 ) {
                     throw new LogicException(
                         [ 'The `jsonDepth` should be a non-negative integer', $jsonDepth ]
                     );
@@ -57,12 +57,12 @@ class FormatJson
     {
         $last = static::$jsonEncodeFlags;
 
-        if (null !== $jsonEncodeFlags) {
-            if (false === $jsonEncodeFlags) {
+        if ( null !== $jsonEncodeFlags ) {
+            if ( false === $jsonEncodeFlags ) {
                 static::$jsonEncodeFlags = 0;
 
             } else {
-                if ($jsonEncodeFlags < 0) {
+                if ( $jsonEncodeFlags < 0 ) {
                     throw new LogicException(
                         [ 'The `jsonEncodeFlags` should be a non-negative integer', $jsonEncodeFlags ]
                     );
@@ -84,12 +84,12 @@ class FormatJson
     {
         $last = static::$jsonDecodeFlags;
 
-        if (null !== $jsonDecodeFlags) {
-            if (false === $jsonDecodeFlags) {
+        if ( null !== $jsonDecodeFlags ) {
+            if ( false === $jsonDecodeFlags ) {
                 static::$jsonDecodeFlags = 0;
 
             } else {
-                if ($jsonDecodeFlags < 0) {
+                if ( $jsonDecodeFlags < 0 ) {
                     throw new LogicException(
                         [ 'The `jsonDecodeFlags` should be a non-negative integer', $jsonDecodeFlags ]
                     );
@@ -107,7 +107,7 @@ class FormatJson
 
     public function __construct()
     {
-        if (! extension_loaded('json')) {
+        if ( ! extension_loaded('json') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: json' ]
             );
@@ -126,7 +126,7 @@ class FormatJson
         ?int $depth = null, ?int $flags = null
     )
     {
-        if (null === $json) {
+        if ( null === $json ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `json` should be not null', $json ],
@@ -156,7 +156,7 @@ class FormatJson
             );
         }
 
-        if (null === $result) {
+        if ( null === $result ) {
             return Ret::throw(
                 $fallback,
                 [ 'Unable to `json_decode` due to invalid JSON', $json ],
@@ -178,7 +178,7 @@ class FormatJson
         ?int $depth = null, ?int $flags = null
     )
     {
-        if (null === $jsonc) {
+        if ( null === $jsonc ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `jsonc` should be not null', $jsonc ],
@@ -192,17 +192,17 @@ class FormatJson
         $theFunc = Lib::func();
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($jsonc)->isOk([ &$jsoncStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($jsonc)->isOk([ &$jsoncStringNotEmpty, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
         $regexes = [];
-        $regexes[ '#' ] = '/' . preg_quote('#', '/') . '(.*?)$' . '/m';
-        $regexes[ '//' ] = '/' . preg_quote('//', '/') . '(.*?)$' . '/m';
-        $regexes[ '/*' ] = '/' . preg_quote('/*', '/') . '([\s\S]*?)' . preg_quote('*/', '/') . '/m';
+        $regexes['#'] = '/' . preg_quote('#', '/') . '(.*?)$' . '/m';
+        $regexes['//'] = '/' . preg_quote('//', '/') . '(.*?)$' . '/m';
+        $regexes['/*'] = '/' . preg_quote('/*', '/') . '([\s\S]*?)' . preg_quote('*/', '/') . '/m';
 
         foreach ( $regexes as $substr => $regex ) {
-            if (false === strpos($jsoncStringNotEmpty, $substr)) {
+            if ( false === strpos($jsoncStringNotEmpty, $substr) ) {
                 continue;
             }
 
@@ -223,7 +223,7 @@ class FormatJson
             );
         }
 
-        if (null === $result) {
+        if ( null === $result ) {
             return Ret::throw(
                 $fallback,
                 [ 'Unable to `jsonc_decode` due to invalid JSON', $jsonc ],
@@ -249,8 +249,8 @@ class FormatJson
         $theFunc = Lib::func();
         $theType = Lib::type();
 
-        if (null === $value) {
-            if (! $isAllowNull) {
+        if ( null === $value ) {
+            if ( ! $isAllowNull ) {
                 return Ret::throw(
                     $fallback,
                     [ 'The value `NULL` cannot be encoded to JSON when `allowsNull` is set to FALSE', $value ],
@@ -261,7 +261,7 @@ class FormatJson
             return Ret::ok($fallback, 'NULL');
         }
 
-        if (false
+        if ( false
             || ($theType->nan($value)->isOk())
             || ($theType->resource($value)->isOk())
         ) {
@@ -306,8 +306,8 @@ class FormatJson
         $theFunc = Lib::func();
         $theType = Lib::type();
 
-        if (null === $value) {
-            if (! $isAllowNull) {
+        if ( null === $value ) {
+            if ( ! $isAllowNull ) {
                 return Ret::throw(
                     $fallback,
                     [ 'Unable to `json_encode`', $value ],
@@ -318,7 +318,7 @@ class FormatJson
             return Ret::ok($fallback, 'NULL');
         }
 
-        if (false
+        if ( false
             || ($theType->nan($value)->isOk())
             || ($theType->resource($value)->isOk())
         ) {

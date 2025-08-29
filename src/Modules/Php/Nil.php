@@ -21,11 +21,11 @@ final class Nil implements ToStringInterface
 
     public static function is($value) : bool
     {
-        if (_TYPE_NIL === $value) {
+        if ( _TYPE_NIL === $value ) {
             return true;
         }
 
-        if ($value instanceof self) {
+        if ( $value instanceof self ) {
             return true;
         }
 

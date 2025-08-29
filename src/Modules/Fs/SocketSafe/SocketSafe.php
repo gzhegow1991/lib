@@ -17,7 +17,7 @@ class SocketSafe
 
     public function __construct()
     {
-        if (! extension_loaded('sockets')) {
+        if ( ! extension_loaded('sockets') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: sockets' ]
             );
@@ -44,20 +44,20 @@ class SocketSafe
     {
         $header = socket_read($socket, 4);
 
-        if (strlen($header) !== 4) {
+        if ( strlen($header) !== 4 ) {
             throw new RuntimeException(
                 [ 'First 4 bytes should be a length of the data', $header ]
             );
         }
 
-        $len = unpack("N", $header)[ 1 ];
+        $len = unpack("N", $header)[1];
 
         $buff = '';
 
         while ( strlen($buff) < $len ) {
             $chunk = socket_read($socket, $len - strlen($buff));
 
-            if (false
+            if ( false
                 || ($chunk === false)
                 || ($chunk === '')
             ) {

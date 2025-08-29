@@ -17,7 +17,7 @@ class FileSafe
 
     public function __construct()
     {
-        if (! extension_loaded('fileinfo')) {
+        if ( ! extension_loaded('fileinfo') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: fileinfo' ]
             );
@@ -52,7 +52,7 @@ class FileSafe
 
         $resource = call_user_func_array('fopen', $fopenArgs);
 
-        if (false === $resource) {
+        if ( false === $resource ) {
             return false;
         }
 
@@ -70,7 +70,7 @@ class FileSafe
     {
         $status = fclose($resource);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -92,10 +92,10 @@ class FileSafe
 
         $isResourceOpened = is_resource($resourceValid);
 
-        if ($isResourceOpened) {
+        if ( $isResourceOpened ) {
             $status = fclose($resourceValid);
 
-            if (false === $status) {
+            if ( false === $status ) {
                 return false;
             }
         }
@@ -121,7 +121,7 @@ class FileSafe
 
         $status = call_user_func_array('flock', $flockArgs);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -159,7 +159,7 @@ class FileSafe
 
                 $status = call_user_func_array('flock', $flockArgs);
 
-                if (false === $status) {
+                if ( false === $status ) {
                     return;
                 }
 
@@ -181,7 +181,7 @@ class FileSafe
     {
         $status = flock($resource, LOCK_UN);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -203,10 +203,10 @@ class FileSafe
 
         $isResourceOpened = is_resource($resourceValid);
 
-        if ($isResourceOpened) {
+        if ( $isResourceOpened ) {
             $status = flock($resourceValid, LOCK_UN);
 
-            if (false === $status) {
+            if ( false === $status ) {
                 return false;
             }
         }
@@ -234,7 +234,7 @@ class FileSafe
 
         $resource = call_user_func_array('fopen', $fopenArgs);
 
-        if (false === $resource) {
+        if ( false === $resource ) {
             return false;
         }
 
@@ -244,7 +244,7 @@ class FileSafe
 
         $status = call_user_func_array('flock', $flockArgs);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -277,7 +277,7 @@ class FileSafe
 
         $resource = call_user_func_array('fopen', $fopenArgs);
 
-        if (false === $resource) {
+        if ( false === $resource ) {
             return false;
         }
 
@@ -294,7 +294,7 @@ class FileSafe
 
                 $status = call_user_func_array('flock', $flockArgs);
 
-                if (false === $status) {
+                if ( false === $status ) {
                     return;
                 }
 
@@ -316,7 +316,7 @@ class FileSafe
     {
         $statusFlock = flock($resource, LOCK_UN);
 
-        if (false === $statusFlock) {
+        if ( false === $statusFlock ) {
             return false;
         }
 
@@ -324,7 +324,7 @@ class FileSafe
 
         $statusFclose = fclose($resource);
 
-        if (false === $statusFclose) {
+        if ( false === $statusFclose ) {
             return false;
         }
 
@@ -346,20 +346,20 @@ class FileSafe
 
         $isResourceOpened = is_resource($resourceValid);
 
-        if ($isResourceOpened) {
+        if ( $isResourceOpened ) {
             $statusFlock = flock($resourceValid, LOCK_UN);
 
-            if (false === $statusFlock) {
+            if ( false === $statusFlock ) {
                 return false;
             }
         }
 
         $this->context->offFinallyFrelease($resourceValid);
 
-        if ($isResourceOpened) {
+        if ( $isResourceOpened ) {
             $statusFclose = fclose($resourceValid);
 
-            if (false === $statusFclose) {
+            if ( false === $statusFclose ) {
                 return false;
             }
         }
@@ -387,7 +387,7 @@ class FileSafe
 
         $resource = call_user_func_array('fopen', $fopenArgs);
 
-        if (false === $resource) {
+        if ( false === $resource ) {
             return false;
         }
 
@@ -398,7 +398,7 @@ class FileSafe
 
         $status = call_user_func_array('flock', $flockArgs);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -431,7 +431,7 @@ class FileSafe
 
         $resource = call_user_func_array('fopen', $fopenArgs);
 
-        if (false === $resource) {
+        if ( false === $resource ) {
             return false;
         }
 
@@ -449,7 +449,7 @@ class FileSafe
 
                 $status = call_user_func_array('flock', $flockArgs);
 
-                if (false === $status) {
+                if ( false === $status ) {
                     return;
                 }
 
@@ -474,10 +474,10 @@ class FileSafe
 
         $isWindows = $thePhp->is_windows();
 
-        if (! $isWindows) {
+        if ( ! $isWindows ) {
             $status = unlink($file);
 
-            if (false === $status) {
+            if ( false === $status ) {
                 return false;
             }
 
@@ -486,7 +486,7 @@ class FileSafe
 
         $statusFlock = flock($resource, LOCK_UN);
 
-        if (false === $statusFlock) {
+        if ( false === $statusFlock ) {
             return false;
         }
 
@@ -494,16 +494,16 @@ class FileSafe
 
         $statusFclose = fclose($resource);
 
-        if (false === $statusFclose) {
+        if ( false === $statusFclose ) {
             return false;
         }
 
         $this->context->offFinallyFclose($resource);
 
-        if ($isWindows) {
+        if ( $isWindows ) {
             $status = unlink($file);
 
-            if (false === $status) {
+            if ( false === $status ) {
                 return false;
             }
 
@@ -530,11 +530,11 @@ class FileSafe
 
         $isFile = is_file($file);
 
-        if (! $isWindows) {
-            if ($isFile) {
+        if ( ! $isWindows ) {
+            if ( $isFile ) {
                 $status = unlink($file);
 
-                if (false === $status) {
+                if ( false === $status ) {
                     return false;
                 }
             }
@@ -544,31 +544,31 @@ class FileSafe
 
         $isResourceOpened = is_resource($resourceValid);
 
-        if ($isResourceOpened) {
+        if ( $isResourceOpened ) {
             $status = flock($resourceValid, LOCK_UN);
 
-            if (false === $status) {
+            if ( false === $status ) {
                 return false;
             }
         }
 
         $this->context->offFinallyFrelease($resourceValid);
 
-        if ($isResourceOpened) {
+        if ( $isResourceOpened ) {
             $status = fclose($resourceValid);
 
-            if (false === $status) {
+            if ( false === $status ) {
                 return false;
             }
         }
 
         $this->context->offFinallyFclose($resourceValid);
 
-        if ($isWindows) {
-            if ($isFile) {
+        if ( $isWindows ) {
+            if ( $isFile ) {
                 $status = unlink($file);
 
-                if (false === $status) {
+                if ( false === $status ) {
                     return false;
                 }
             }
@@ -593,13 +593,13 @@ class FileSafe
 
         $statusInt = fseek($resource, $offset, $whence);
 
-        if (-1 === $statusInt) {
+        if ( -1 === $statusInt ) {
             return false;
         }
 
         $pos = ftell($resource);
 
-        if (false === $pos) {
+        if ( false === $pos ) {
             return false;
         }
 
@@ -615,7 +615,7 @@ class FileSafe
     {
         $status = rewind($resource);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -636,7 +636,7 @@ class FileSafe
             ? fwrite($resource, $data, $length)
             : fwrite($resource, $data);
 
-        if (false === $len) {
+        if ( false === $len ) {
             return false;
         }
 
@@ -659,7 +659,7 @@ class FileSafe
             ? fputs($resource, $data, $length)
             : fputs($resource, $data);
 
-        if (false === $len) {
+        if ( false === $len ) {
             return false;
         }
 
@@ -683,7 +683,7 @@ class FileSafe
         /**
          * @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection
          */
-        if (false === $size) {
+        if ( false === $size ) {
             return false;
         }
 
@@ -703,13 +703,13 @@ class FileSafe
     {
         $status = file_exists($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -729,13 +729,13 @@ class FileSafe
     {
         $status = file_exists($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -752,13 +752,13 @@ class FileSafe
     {
         $status = is_file($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -774,13 +774,13 @@ class FileSafe
     {
         $status = is_file($file) && ! is_link($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -797,13 +797,13 @@ class FileSafe
     {
         $status = is_dir($directory);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($directory);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -819,13 +819,13 @@ class FileSafe
     {
         $status = is_dir($directory) && ! is_link($directory);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($directory);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -842,13 +842,13 @@ class FileSafe
     {
         $status = is_link($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = $this->realpath_link($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -864,13 +864,13 @@ class FileSafe
     {
         $status = is_link($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -886,13 +886,13 @@ class FileSafe
     {
         $status = is_link($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (! is_file($realpath)) {
+        if ( ! is_file($realpath) ) {
             return false;
         }
 
@@ -908,13 +908,13 @@ class FileSafe
     {
         $status = is_link($directory);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($directory);
 
-        if (! is_dir($realpath)) {
+        if ( ! is_dir($realpath) ) {
             return false;
         }
 
@@ -931,13 +931,13 @@ class FileSafe
     {
         $status = is_readable($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -953,13 +953,13 @@ class FileSafe
     {
         $status = is_writable($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -975,13 +975,13 @@ class FileSafe
     {
         $status = is_writeable($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -997,13 +997,13 @@ class FileSafe
     {
         $status = is_executable($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1043,18 +1043,18 @@ class FileSafe
         $returnTargetPath = $returnTargetPath ?? $theFs->staticRealpathReturnTargetPath();
         $returnTargetPath = (bool) $returnTargetPath;
 
-        if ($returnTargetPath) {
+        if ( $returnTargetPath ) {
             $realpath = realpath($file);
 
         } else {
             $realpath = realpath(dirname($file));
         }
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
-        if (! $returnTargetPath) {
+        if ( ! $returnTargetPath ) {
             $realpath .= DIRECTORY_SEPARATOR . basename($file);
         }
 
@@ -1080,7 +1080,7 @@ class FileSafe
     {
         $realpath = realpath(dirname($file));
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1100,13 +1100,13 @@ class FileSafe
     {
         $status = chmod($file, $permissions);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1123,13 +1123,13 @@ class FileSafe
     {
         $status = chown($file, $user);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1146,13 +1146,13 @@ class FileSafe
     {
         $status = lchown($file, $user);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1169,13 +1169,13 @@ class FileSafe
     {
         $status = chgrp($file, $group);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1192,13 +1192,13 @@ class FileSafe
     {
         $status = lchgrp($file, $group);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1216,18 +1216,18 @@ class FileSafe
     public function touch($file, $mtime = null, $atime = null)
     {
         $args = [];
-        if (null !== $mtime) $args[] = $mtime;
-        if (null !== $atime) $args[] = $atime;
+        if ( null !== $mtime ) $args[] = $mtime;
+        if ( null !== $atime ) $args[] = $atime;
 
         $status = touch($file, ...$args);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1246,13 +1246,13 @@ class FileSafe
             ? copy($from, $to, $context)
             : copy($from, $to);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($to);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1271,13 +1271,13 @@ class FileSafe
             ? rename($from, $to, $context)
             : rename($from, $to);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($to);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1299,7 +1299,7 @@ class FileSafe
             ? unlink($file, $context)
             : unlink($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -1317,7 +1317,7 @@ class FileSafe
      */
     public function unlinkf($file, $context = null)
     {
-        if (! is_file($file)) {
+        if ( ! is_file($file) ) {
             return $file;
         }
 
@@ -1325,7 +1325,7 @@ class FileSafe
             ? unlink($file, $context)
             : unlink($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -1344,7 +1344,7 @@ class FileSafe
     {
         $status = is_file($file) && ! is_link($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -1352,7 +1352,7 @@ class FileSafe
             ? unlink($file, $context)
             : unlink($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -1371,7 +1371,7 @@ class FileSafe
      */
     public function rmf($file, $context = null)
     {
-        if (! is_file($file)) {
+        if ( ! is_file($file) ) {
             return $file;
         }
 
@@ -1379,7 +1379,7 @@ class FileSafe
             ? unlink($file, $context)
             : unlink($file);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -1407,13 +1407,13 @@ class FileSafe
             ? mkdir($directory, $permissions, $recursive, $context)
             : mkdir($directory, $permissions, $recursive);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = realpath($directory);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1433,7 +1433,7 @@ class FileSafe
     {
         $theFs = Lib::fs();
 
-        if (! is_dir($directory)) {
+        if ( ! is_dir($directory) ) {
             $permissions = $permissions ?? $theFs->staticDirChmod();
             $recursive = $recursive ?? true;
 
@@ -1441,14 +1441,14 @@ class FileSafe
                 ? mkdir($directory, $permissions, $recursive, $context)
                 : mkdir($directory, $permissions, $recursive);
 
-            if (false === $status) {
+            if ( false === $status ) {
                 return false;
             }
         }
 
         $realpath = realpath($directory);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1465,7 +1465,7 @@ class FileSafe
     {
         $status = is_dir($directory) && ! is_link($directory);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -1473,7 +1473,7 @@ class FileSafe
             ? rmdir($directory, $context)
             : rmdir($directory);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -1492,11 +1492,11 @@ class FileSafe
      */
     public function rmdirf($directory, $context = null)
     {
-        if (! is_dir($directory)) {
+        if ( ! is_dir($directory) ) {
             return $directory;
         }
 
-        if (is_link($directory)) {
+        if ( is_link($directory) ) {
             $status = (null !== $context)
                 ? unlink($directory, $context)
                 : unlink($directory);
@@ -1507,7 +1507,7 @@ class FileSafe
                 : rmdir($directory);
         }
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
@@ -1527,13 +1527,13 @@ class FileSafe
     {
         $status = link($target, $link);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = $this->realpath_link($link);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1550,13 +1550,13 @@ class FileSafe
     {
         $status = symlink($target, $link);
 
-        if (false === $status) {
+        if ( false === $status ) {
             return false;
         }
 
         $realpath = $this->realpath_link($link);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
@@ -1580,13 +1580,13 @@ class FileSafe
 
         $fh = call_user_func_array([ $this, 'fopen' ], $fopenArgs);
 
-        if (false === $fh) {
+        if ( false === $fh ) {
             return false;
         }
 
         $content = stream_get_contents($fh, ...$streamGetContentsArgs);
 
-        if (false === $content) {
+        if ( false === $content ) {
             return false;
         }
 
@@ -1613,7 +1613,7 @@ class FileSafe
 
         $resource = call_user_func_array([ $this, 'fopen' ], $fopenArgs);
 
-        if (false === $resource) {
+        if ( false === $resource ) {
             return false;
         }
 
@@ -1621,13 +1621,13 @@ class FileSafe
 
         $resource = call_user_func_array([ $this, 'flock' ], $flockArgs);
 
-        if (false === $resource) {
+        if ( false === $resource ) {
             return false;
         }
 
         $content = stream_get_contents($resource, ...$streamGetContentsArgs);
 
-        if (false === $content) {
+        if ( false === $content ) {
             return false;
         }
 
@@ -1674,7 +1674,7 @@ class FileSafe
                     $streamGetContentsArgs,
                 );
 
-                if (false === $content) {
+                if ( false === $content ) {
                     return;
                 }
 
@@ -1703,18 +1703,18 @@ class FileSafe
 
         $resource = call_user_func_array([ $this, 'fopen' ], $fopenArgs);
 
-        if (false === $resource) {
+        if ( false === $resource ) {
             return false;
         }
 
-        if (is_resource($data)) {
+        if ( is_resource($data) ) {
             $len = stream_copy_to_stream($data, $resource);
 
-            if (false === $len) {
+            if ( false === $len ) {
                 return false;
             }
 
-        } elseif (is_array($data)) {
+        } elseif ( is_array($data) ) {
             $theType = Lib::type();
 
             $len = 0;
@@ -1723,17 +1723,17 @@ class FileSafe
 
                 $lenLine = fwrite($resource, $lineString);
 
-                if (false === $lenLine) {
+                if ( false === $lenLine ) {
                     return false;
                 }
 
                 $len += $lenLine;
             }
 
-        } elseif (is_string($data)) {
+        } elseif ( is_string($data) ) {
             $len = fwrite($resource, $data);
 
-            if (false === $len) {
+            if ( false === $len ) {
                 return false;
             }
 
@@ -1771,7 +1771,7 @@ class FileSafe
 
         $resource = call_user_func_array([ $this, 'fopen' ], $fopenArgs);
 
-        if (false === $resource) {
+        if ( false === $resource ) {
             return false;
         }
 
@@ -1779,18 +1779,18 @@ class FileSafe
 
         $resource = call_user_func_array([ $this, 'flock' ], $flockArgs);
 
-        if (false === $resource) {
+        if ( false === $resource ) {
             return false;
         }
 
-        if (is_resource($data)) {
+        if ( is_resource($data) ) {
             $len = stream_copy_to_stream($data, $resource);
 
-            if (false === $len) {
+            if ( false === $len ) {
                 return false;
             }
 
-        } elseif (is_array($data)) {
+        } elseif ( is_array($data) ) {
 
 
             $len = 0;
@@ -1799,17 +1799,17 @@ class FileSafe
 
                 $lenLine = fwrite($resource, $lineString);
 
-                if (false === $lenLine) {
+                if ( false === $lenLine ) {
                     return false;
                 }
 
                 $len += $lenLine;
             }
 
-        } elseif (is_string($data)) {
+        } elseif ( is_string($data) ) {
             $len = fwrite($resource, $data);
 
-            if (false === $len) {
+            if ( false === $len ) {
                 return false;
             }
 
@@ -1865,7 +1865,7 @@ class FileSafe
                     $flockArgs
                 );
 
-                if (false === $len) {
+                if ( false === $len ) {
                     return;
                 }
 
@@ -1899,7 +1899,7 @@ class FileSafe
             $fopenArgs
         );
 
-        if (false === $content) {
+        if ( false === $content ) {
             return false;
         }
 
@@ -1910,19 +1910,19 @@ class FileSafe
 
         $lines = [];
 
-        if ($isIgnoreNewLines) {
+        if ( $isIgnoreNewLines ) {
             $parts = preg_split($regex, $content);
 
-            if ($parts === [ '' ] && $isSkipEmptyLines) {
+            if ( $parts === [ '' ] && $isSkipEmptyLines ) {
                 return [];
             }
 
             $cnt = count($parts);
 
             for ( $i = 0; $i < $cnt; $i++ ) {
-                $line = $parts[ $i ];
+                $line = $parts[$i];
 
-                if (('' === $line) && $isSkipEmptyLines) {
+                if ( ('' === $line) && $isSkipEmptyLines ) {
                     continue;
                 }
 
@@ -1932,20 +1932,20 @@ class FileSafe
         } else {
             $parts = preg_split($regex, $content, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-            if ($parts === [ '' ] && $isSkipEmptyLines) {
+            if ( $parts === [ '' ] && $isSkipEmptyLines ) {
                 return [];
             }
 
             $cnt = count($parts);
 
             for ( $i = 0; $i < $cnt; $i += 2 ) {
-                $line = $parts[ $i ];
+                $line = $parts[$i];
 
-                if (('' === $line) && $isSkipEmptyLines) {
+                if ( ('' === $line) && $isSkipEmptyLines ) {
                     continue;
                 }
 
-                $eol = $parts[ $i + 1 ] ?? '';
+                $eol = $parts[$i + 1] ?? '';
 
                 $lines[] = $line . $eol;
             }
@@ -1976,7 +1976,7 @@ class FileSafe
             $flockArgs
         );
 
-        if (false === $content) {
+        if ( false === $content ) {
             return false;
         }
 
@@ -1987,19 +1987,19 @@ class FileSafe
 
         $lines = [];
 
-        if ($isIgnoreNewLines) {
+        if ( $isIgnoreNewLines ) {
             $parts = preg_split($regex, $content);
 
-            if ($parts === [ '' ] && $isSkipEmptyLines) {
+            if ( $parts === [ '' ] && $isSkipEmptyLines ) {
                 return [];
             }
 
             $cnt = count($parts);
 
             for ( $i = 0; $i < $cnt; $i++ ) {
-                $line = $parts[ $i ];
+                $line = $parts[$i];
 
-                if (('' === $line) && $isSkipEmptyLines) {
+                if ( ('' === $line) && $isSkipEmptyLines ) {
                     continue;
                 }
 
@@ -2009,20 +2009,20 @@ class FileSafe
         } else {
             $parts = preg_split($regex, $content, -1, PREG_SPLIT_DELIM_CAPTURE);
 
-            if ($parts === [ '' ] && $isSkipEmptyLines) {
+            if ( $parts === [ '' ] && $isSkipEmptyLines ) {
                 return [];
             }
 
             $cnt = count($parts);
 
             for ( $i = 0; $i < $cnt; $i += 2 ) {
-                $line = $parts[ $i ];
+                $line = $parts[$i];
 
-                if (('' === $line) && $isSkipEmptyLines) {
+                if ( ('' === $line) && $isSkipEmptyLines ) {
                     continue;
                 }
 
-                $eol = $parts[ $i + 1 ] ?? '';
+                $eol = $parts[$i + 1] ?? '';
 
                 $lines[] = $line . $eol;
             }
@@ -2064,7 +2064,7 @@ class FileSafe
                     $flockArgs,
                 );
 
-                if (false === $content) {
+                if ( false === $content ) {
                     return;
                 }
 
@@ -2093,7 +2093,7 @@ class FileSafe
 
         $fh = call_user_func_array([ $this, 'fopen' ], $fopenArgs);
 
-        if (false === $fh) {
+        if ( false === $fh ) {
             return false;
         }
 
@@ -2102,7 +2102,7 @@ class FileSafe
         /**
          * @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection
          */
-        if (false === $size) {
+        if ( false === $size ) {
             return false;
         }
 
@@ -2127,7 +2127,7 @@ class FileSafe
 
         $resource = call_user_func_array([ $this, 'fopen' ], $fopenArgs);
 
-        if (false === $resource) {
+        if ( false === $resource ) {
             return false;
         }
 
@@ -2135,7 +2135,7 @@ class FileSafe
 
         $resource = call_user_func_array([ $this, 'flock' ], $flockArgs);
 
-        if (false === $resource) {
+        if ( false === $resource ) {
             return false;
         }
 
@@ -2144,7 +2144,7 @@ class FileSafe
         /**
          * @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection
          */
-        if (false === $size) {
+        if ( false === $size ) {
             return false;
         }
 
@@ -2186,7 +2186,7 @@ class FileSafe
                     $flockArgs,
                 );
 
-                if (false === $size) {
+                if ( false === $size ) {
                     return;
                 }
 
@@ -2209,26 +2209,26 @@ class FileSafe
      */
     public function file_get_contents($file, $offset = null, $length = null, $context = null)
     {
-        if (! file_exists($file)) {
+        if ( ! file_exists($file) ) {
             return null;
 
-        } elseif (! is_file($file)) {
+        } elseif ( ! is_file($file) ) {
             return false;
         }
 
-        if (! filesize($file)) {
+        if ( ! filesize($file) ) {
             return null;
         }
 
         $args = [];
-        if (null !== $length) array_unshift($args, $length);
-        if (null !== $offset) array_unshift($args, $offset);
-        if (null !== $context) array_unshift($args, $context);
+        if ( null !== $length ) array_unshift($args, $length);
+        if ( null !== $offset ) array_unshift($args, $offset);
+        if ( null !== $context ) array_unshift($args, $context);
         array_unshift($args, $file, false);
 
         $content = call_user_func_array('file_get_contents', $args);
 
-        if (false === $content) {
+        if ( false === $content ) {
             return false;
         }
 
@@ -2259,15 +2259,15 @@ class FileSafe
         $flags = $flags ?? 0;
         $flags &= ~FILE_USE_INCLUDE_PATH;
 
-        if ($hasMkdirp) {
+        if ( $hasMkdirp ) {
             $dirFile = dirname($file);
 
-            if ('.' !== $dirFile) {
+            if ( '.' !== $dirFile ) {
                 array_unshift($mkdirpArgs, dirname($file));
 
                 $realpath = call_user_func_array([ $this, 'mkdirp' ], $mkdirpArgs);
 
-                if (false === $realpath) {
+                if ( false === $realpath ) {
                     return false;
                 }
             }
@@ -2277,22 +2277,22 @@ class FileSafe
 
         $len = call_user_func_array('file_put_contents', $filePutContentsArgs);
 
-        if (false === $len) {
+        if ( false === $len ) {
             return false;
         }
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return false;
         }
 
-        if ($hasChmodIfNew) {
+        if ( $hasChmodIfNew ) {
             array_unshift($chmodIfNewArgs, $realpath);
 
             $status = call_user_func_array('chmod', $chmodIfNewArgs);
 
-            if (false === $status) {
+            if ( false === $status ) {
                 return false;
             }
         }

@@ -148,7 +148,7 @@ class PdoAdapter
             ?? static::fromPdo($from)->orNull($ret)
             ?? static::fromArray($from)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -160,7 +160,7 @@ class PdoAdapter
      */
     public static function fromStatic($from, ?array $fallback = null)
     {
-        if ($from instanceof static) {
+        if ( $from instanceof static ) {
             return Ret::ok($fallback, $from);
         }
 
@@ -176,7 +176,7 @@ class PdoAdapter
      */
     public static function fromPdo($from, ?array $fallback = null)
     {
-        if ($from instanceof \PDO) {
+        if ( $from instanceof \PDO ) {
             $instance = new static();
             $instance->configPdo = $from;
 
@@ -195,7 +195,7 @@ class PdoAdapter
      */
     public static function fromArray($from, ?array $fallback = null)
     {
-        if (! is_array($from)) {
+        if ( ! is_array($from) ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `from` should be array', $from ],
@@ -238,18 +238,18 @@ class PdoAdapter
             'write'            => null,
         ];
 
-        $dsn = $from[ 0 ];
-        $username = $from[ 1 ];
-        $password = $from[ 2 ];
-        $pdoOptionsNew = $from[ 3 ];
+        $dsn = $from[0];
+        $username = $from[1];
+        $password = $from[2];
+        $pdoOptionsNew = $from[3];
 
-        if (null !== $dsn) {
-            $from[ 'dsn' ] = $dsn;
+        if ( null !== $dsn ) {
+            $from['dsn'] = $dsn;
 
-            if (! (true
+            if ( ! (true
                 && (null !== $username)
                 && (null !== $password)
-            )) {
+            ) ) {
                 return Ret::throw(
                     $fallback,
                     [ 'The `from[1]` (`username`) and `from[2]` (`password`) is required if `from[0]` (`dsn`) is present', $from ],
@@ -257,47 +257,47 @@ class PdoAdapter
                 );
             }
 
-            $from[ 'username' ] = $username;
-            $from[ 'password' ] = $password;
+            $from['username'] = $username;
+            $from['password'] = $password;
         }
 
-        if (null !== $pdoOptionsNew) {
-            $from[ 'pdo_options_new' ] = $pdoOptionsNew;
+        if ( null !== $pdoOptionsNew ) {
+            $from['pdo_options_new'] = $pdoOptionsNew;
         }
 
-        $pdo = $from[ 'pdo' ];
-        $pdoOptionsNew = $from[ 'pdo_options_new' ] ?? [];
-        $pdoOptionsBoot = $from[ 'pdo_options_boot' ] ?? [];
+        $pdo = $from['pdo'];
+        $pdoOptionsNew = $from['pdo_options_new'] ?? [];
+        $pdoOptionsBoot = $from['pdo_options_boot'] ?? [];
 
-        $dsn = $from[ 'dsn' ];
-        $host = $from[ 'host' ];
-        $port = $from[ 'port' ];
-        $sock = $from[ 'sock' ];
+        $dsn = $from['dsn'];
+        $host = $from['host'];
+        $port = $from['port'];
+        $sock = $from['sock'];
 
-        $driver = $from[ 'driver' ];
+        $driver = $from['driver'];
 
-        $username = $from[ 'username' ];
-        $password = $from[ 'password' ];
+        $username = $from['username'];
+        $password = $from['password'];
 
-        $database = $from[ 'database' ];
+        $database = $from['database'];
 
-        $charset = $from[ 'charset' ];
-        $collate = $from[ 'collate' ];
+        $charset = $from['charset'];
+        $collate = $from['collate'];
 
-        $timezone = $from[ 'timezone' ];
+        $timezone = $from['timezone'];
 
-        $userOptions = $from[ 'user_options' ] ?? [];
+        $userOptions = $from['user_options'] ?? [];
 
-        $readList = $from[ 'read' ];
-        $writeList = $from[ 'write' ];
+        $readList = $from['read'];
+        $writeList = $from['write'];
 
         $isPdo = (null !== $pdo);
         $isDsn = (null !== $dsn);
         $isHost = (null !== $host);
         $isSock = (null !== $sock);
 
-        if ($isPdo) {
-            if (! ($pdo instanceof \PDO)) {
+        if ( $isPdo ) {
+            if ( ! ($pdo instanceof \PDO) ) {
                 return Ret::throw(
                     $fallback,
                     [ 'The `pdo` should be instance of: ' . \PDO::class, $pdo ],
@@ -311,24 +311,24 @@ class PdoAdapter
             $port = null;
             $sock = null;
 
-        } elseif ($isDsn) {
-            if (! $theType->dsn_pdo($dsn, [ &$dsnParams, &$parseUrl ])->isOk([ &$dsn, &$ret ])) {
+        } elseif ( $isDsn ) {
+            if ( ! $theType->dsn_pdo($dsn, [ &$dsnParams, &$parseUrl ])->isOk([ &$dsn, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
 
-            $driver = $from[ 'driver' ] ?? $parseUrl[ 'scheme' ] ?? null;
+            $driver = $from['driver'] ?? $parseUrl['scheme'] ?? null;
 
-            $host = $from[ 'host' ] ?? $dsnParams[ 'host' ] ?? null;
-            $port = $from[ 'port' ] ?? $dsnParams[ 'port' ] ?? null;
-            $database = $from[ 'database' ] ?? $dsnParams[ 'dbname' ] ?? null;
-            $charset = $from[ 'charset' ] ?? $dsnParams[ 'charset' ] ?? null;
-            $sock = $from[ 'sock' ] ?? $dsnParams[ 'unix_socket' ] ?? null;
+            $host = $from['host'] ?? $dsnParams['host'] ?? null;
+            $port = $from['port'] ?? $dsnParams['port'] ?? null;
+            $database = $from['database'] ?? $dsnParams['dbname'] ?? null;
+            $charset = $from['charset'] ?? $dsnParams['charset'] ?? null;
+            $sock = $from['sock'] ?? $dsnParams['unix_socket'] ?? null;
 
-        } elseif ($isHost) {
+        } elseif ( $isHost ) {
             $pdo = null;
             $sock = null;
 
-        } elseif ($isSock) {
+        } elseif ( $isSock ) {
             $pdo = null;
             $host = null;
             $port = null;
@@ -347,60 +347,60 @@ class PdoAdapter
             );
         }
 
-        if ($isPdo) {
-            if (! $theType->string_not_empty($driver)->isOk([ &$driver, &$ret ])) {
+        if ( $isPdo ) {
+            if ( ! $theType->string_not_empty($driver)->isOk([ &$driver, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
 
         } else {
-            if ($isDsn || $isHost) {
-                if (! $theType->string_not_empty($driver)->isOk([ &$driver, &$ret ])) {
+            if ( $isDsn || $isHost ) {
+                if ( ! $theType->string_not_empty($driver)->isOk([ &$driver, &$ret ]) ) {
                     return Ret::throw($fallback, $ret);
                 }
 
-                if (! $theType->string_not_empty($host)->isOk([ &$host, &$ret ])) {
+                if ( ! $theType->string_not_empty($host)->isOk([ &$host, &$ret ]) ) {
                     return Ret::throw($fallback, $ret);
                 }
 
-                if (! $theType->int_positive($port)->isOk([ &$port, &$ret ])) {
+                if ( ! $theType->int_positive($port)->isOk([ &$port, &$ret ]) ) {
                     return Ret::throw($fallback, $ret);
                 }
 
-            } elseif ($isSock) {
-                if (! $theType->string_not_empty($sock)->isOk([ &$sock, &$ret ])) {
+            } elseif ( $isSock ) {
+                if ( ! $theType->string_not_empty($sock)->isOk([ &$sock, &$ret ]) ) {
                     return Ret::throw($fallback, $ret);
                 }
             }
 
-            if (! $theType->string_not_empty($username)->isOk([ &$username, &$ret ])) {
+            if ( ! $theType->string_not_empty($username)->isOk([ &$username, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
 
-            if (! $theType->string($password)->isOk([ &$password, &$ret ])) {
+            if ( ! $theType->string($password)->isOk([ &$password, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
 
-        if (null !== $database) {
-            if (! $theType->string_not_empty($database)->isOk([ &$database, &$ret ])) {
+        if ( null !== $database ) {
+            if ( ! $theType->string_not_empty($database)->isOk([ &$database, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
 
-        if (null !== $charset) {
-            if (! $theType->string_not_empty($charset)->isOk([ &$charset, &$ret ])) {
+        if ( null !== $charset ) {
+            if ( ! $theType->string_not_empty($charset)->isOk([ &$charset, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
 
-        if (null !== $collate) {
-            if (! $theType->string_not_empty($collate)->isOk([ &$collate, &$ret ])) {
+        if ( null !== $collate ) {
+            if ( ! $theType->string_not_empty($collate)->isOk([ &$collate, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
 
-        if (null !== $timezone) {
-            if (! $theType->string_not_empty($timezone)->isOk([ &$timezone, &$ret ])) {
+        if ( null !== $timezone ) {
+            if ( ! $theType->string_not_empty($timezone)->isOk([ &$timezone, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
@@ -433,15 +433,15 @@ class PdoAdapter
         $isReadArray = is_array($readList);
         $isWriteArray = is_array($writeList);
 
-        if ($isReadArray || $isWriteArray) {
+        if ( $isReadArray || $isWriteArray ) {
             $configDefault = $instance->getConfigDefault();
 
             // > `dsn` key is not supported for read/write servers for now
-            unset($configDefault[ 'dsn' ]);
+            unset($configDefault['dsn']);
 
-            if ($isReadArray) {
+            if ( $isReadArray ) {
                 foreach ( $readList as $i => $rConfig ) {
-                    if (! is_array($rConfig)) {
+                    if ( ! is_array($rConfig) ) {
                         return Ret::throw(
                             $fallback,
                             [ 'Each of `from[read]` should be array', $from, $rConfig, $i ],
@@ -449,7 +449,7 @@ class PdoAdapter
                         );
                     }
 
-                    if ($diff = array_diff_key($rConfig, $configDefault)) {
+                    if ( $diff = array_diff_key($rConfig, $configDefault) ) {
                         return Ret::throw(
                             $fallback,
                             [
@@ -469,9 +469,9 @@ class PdoAdapter
                 $instance->configReadList = $readList;
             }
 
-            if ($isWriteArray) {
+            if ( $isWriteArray ) {
                 foreach ( $writeList as $i => $wConfig ) {
-                    if (! is_array($wConfig)) {
+                    if ( ! is_array($wConfig) ) {
                         return Ret::throw(
                             $fallback,
                             [ 'Each of `from[write]` should be array', $from, $wConfig, $i ],
@@ -479,7 +479,7 @@ class PdoAdapter
                         );
                     }
 
-                    if ($diff = array_diff_key($wConfig, $configDefault)) {
+                    if ( $diff = array_diff_key($wConfig, $configDefault) ) {
                         return Ret::throw(
                             $fallback,
                             [
@@ -560,32 +560,32 @@ class PdoAdapter
             'user_options'     => null,
         ];
 
-        if (null !== $configValid[ 'pdo' ]) {
-            $pdo = $configValid[ 'pdo' ];
+        if ( null !== $configValid['pdo'] ) {
+            $pdo = $configValid['pdo'];
 
         } else {
-            $pdoOptionsNew = $configValid[ 'pdo_options_new' ];
+            $pdoOptionsNew = $configValid['pdo_options_new'];
 
-            $dsn = $configValid[ 'dsn' ];
-            $host = $configValid[ 'host' ];
-            $port = $configValid[ 'port' ];
-            $sock = $configValid[ 'sock' ];
+            $dsn = $configValid['dsn'];
+            $host = $configValid['host'];
+            $port = $configValid['port'];
+            $sock = $configValid['sock'];
 
-            $driver = $configValid[ 'driver' ];
+            $driver = $configValid['driver'];
 
-            $username = $configValid[ 'username' ];
-            $password = $configValid[ 'password' ];
-            $database = $configValid[ 'database' ];
+            $username = $configValid['username'];
+            $password = $configValid['password'];
+            $database = $configValid['database'];
 
-            $charset = $configValid[ 'charset' ];
+            $charset = $configValid['charset'];
 
-            if (null !== $sock) {
+            if ( null !== $sock ) {
                 $dsn = "{$driver}:unix_socket={$sock}";
 
-            } elseif (null !== $dsn) {
+            } elseif ( null !== $dsn ) {
                 $theType->dsn_pdo($dsn, [ &$dsnParams ])->orThrow();
 
-            } elseif (null !== $host) {
+            } elseif ( null !== $host ) {
                 $dsn = "{$driver}:host={$host}";
 
             } else {
@@ -594,16 +594,16 @@ class PdoAdapter
                 );
             }
 
-            if (null === $sock) {
-                if ((null !== $port) && (! isset($dsnParams[ 'port' ]))) {
+            if ( null === $sock ) {
+                if ( (null !== $port) && (! isset($dsnParams['port'])) ) {
                     $dsn .= ";port={$host}";
                 }
             }
 
-            if ((null !== $database) && (! isset($dsnParams[ 'dbname' ]))) {
+            if ( (null !== $database) && (! isset($dsnParams['dbname'])) ) {
                 $dsn .= ";dbname={$database}";
             }
-            if ((null !== $charset) && (! isset($dsnParams[ 'charset' ]))) {
+            if ( (null !== $charset) && (! isset($dsnParams['charset'])) ) {
                 $dsn .= ";charset={$charset}";
             }
 
@@ -630,7 +630,7 @@ class PdoAdapter
             $this->sqlEnsureTimezone($pdo, $configValid),
         ]);
 
-        if ('' !== $sql) {
+        if ( '' !== $sql ) {
             $pdo->exec($sql);
         }
 
@@ -642,7 +642,7 @@ class PdoAdapter
     {
         $pdo = null;
 
-        if (null !== $this->pdoDefault) {
+        if ( null !== $this->pdoDefault ) {
             $pdo = $this->pdoDefault;
 
             return true;
@@ -653,7 +653,7 @@ class PdoAdapter
 
     public function getPdoDefault() : \PDO
     {
-        if (null === $this->pdoDefault) {
+        if ( null === $this->pdoDefault ) {
             $configDefault = $this->getConfigDefault();
 
             $pdo = $this->newPdoFromConfig($configDefault);
@@ -672,7 +672,7 @@ class PdoAdapter
         $configs = [];
 
         foreach ( $this->configReadList as $i => $config ) {
-            $configs[ $i ] = []
+            $configs[$i] = []
                 + $config
                 + $configDefault;
         }
@@ -684,46 +684,46 @@ class PdoAdapter
     {
         $i = $this->selectPdoRead();
 
-        if (-1 === $i) {
+        if ( -1 === $i ) {
             throw new RuntimeException(
                 [ 'The `configReadList` is empty' ]
             );
         }
 
-        if (! isset($this->pdoReadList[ $i ])) {
+        if ( ! isset($this->pdoReadList[$i]) ) {
             $configRead = []
-                + $this->configReadList[ $i ]
+                + $this->configReadList[$i]
                 + $this->getConfigDefault();
 
             $pdo = $this->newPdoFromConfig($configRead);
 
-            $this->pdoReadList[ $i ] = $pdo;
+            $this->pdoReadList[$i] = $pdo;
         }
 
-        return $this->pdoReadList[ $i ];
+        return $this->pdoReadList[$i];
     }
 
     public function getPdoReadRandom() : \PDO
     {
         $i = $this->doSelectPdoReadDefault();
 
-        if (-1 === $i) {
+        if ( -1 === $i ) {
             throw new RuntimeException(
                 [ 'The `configReadList` is empty' ]
             );
         }
 
-        if (! isset($this->pdoReadList[ $i ])) {
+        if ( ! isset($this->pdoReadList[$i]) ) {
             $configRead = []
-                + $this->configReadList[ $i ]
+                + $this->configReadList[$i]
                 + $this->getConfigDefault();
 
             $pdo = $this->newPdoFromConfig($configRead);
 
-            $this->pdoReadList[ $i ] = $pdo;
+            $this->pdoReadList[$i] = $pdo;
         }
 
-        return $this->pdoReadList[ $i ];
+        return $this->pdoReadList[$i];
     }
 
 
@@ -734,7 +734,7 @@ class PdoAdapter
         $configs = [];
 
         foreach ( $this->configWriteList as $i => $config ) {
-            $configs[ $i ] = []
+            $configs[$i] = []
                 + $config
                 + $configDefault;
         }
@@ -746,46 +746,46 @@ class PdoAdapter
     {
         $i = $this->selectPdoWrite();
 
-        if (-1 === $i) {
+        if ( -1 === $i ) {
             throw new RuntimeException(
                 [ 'The `configReadList` is empty' ]
             );
         }
 
-        if (! isset($this->pdoWriteList[ $i ])) {
+        if ( ! isset($this->pdoWriteList[$i]) ) {
             $configWrite = []
-                + $this->configWriteList[ $i ]
+                + $this->configWriteList[$i]
                 + $this->getConfigDefault();
 
             $pdo = $this->newPdoFromConfig($configWrite);
 
-            $this->pdoWriteList[ $i ] = $pdo;
+            $this->pdoWriteList[$i] = $pdo;
         }
 
-        return $this->pdoWriteList[ $i ];
+        return $this->pdoWriteList[$i];
     }
 
     public function getPdoWriteRandom() : \PDO
     {
         $i = $this->doSelectPdoWriteDefault();
 
-        if (-1 === $i) {
+        if ( -1 === $i ) {
             throw new RuntimeException(
                 [ 'The `configReadList` is empty' ]
             );
         }
 
-        if (! isset($this->pdoWriteList[ $i ])) {
+        if ( ! isset($this->pdoWriteList[$i]) ) {
             $configWrite = []
-                + $this->configWriteList[ $i ]
+                + $this->configWriteList[$i]
                 + $this->getConfigDefault();
 
             $pdo = $this->newPdoFromConfig($configWrite);
 
-            $this->pdoWriteList[ $i ] = $pdo;
+            $this->pdoWriteList[$i] = $pdo;
         }
 
-        return $this->pdoWriteList[ $i ];
+        return $this->pdoWriteList[$i];
     }
 
 
@@ -906,15 +906,15 @@ class PdoAdapter
 
     protected function pdoEnsureOptionsBoot(\PDO $pdo, array $configValid) : void
     {
-        $pdoOptionsBoot = $configValid[ 'pdo_options_boot' ] ?? [];
-        if ([] === $pdoOptionsBoot) {
+        $pdoOptionsBoot = $configValid['pdo_options_boot'] ?? [];
+        if ( [] === $pdoOptionsBoot ) {
             return;
         }
 
         foreach ( $pdoOptionsBoot as $pdoOpt => $value ) {
             $status = $pdo->setAttribute($pdoOpt, $value);
 
-            if (false === $status) {
+            if ( false === $status ) {
                 throw new RuntimeException(
                     [ 'Unable to set `pdo_options_boot` on \PDO object', $pdoOptionsBoot ]
                 );
@@ -926,7 +926,7 @@ class PdoAdapter
     {
         $fn = $this->fnEnsureOptionsUser;
 
-        if (null !== $fn) {
+        if ( null !== $fn ) {
             call_user_func($fn, $pdo, $configValid, $this);
         }
     }
@@ -948,7 +948,7 @@ class PdoAdapter
 
         $driverName = $pdo->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
-        if ('mysql' === $driverName) {
+        if ( 'mysql' === $driverName ) {
             $sql = $this->sqlEnsureCharsetDriverMysql($pdo, $configValid);
         }
 
@@ -960,27 +960,27 @@ class PdoAdapter
         // > until (PHP_VERSION_ID < 50306) this command was not sent on connect
         // > actually it have to be done using \PDO::MYSQL_ATTR_INIT_COMMAND, but it supports only one query
 
-        $pdoCharset = (string) $configValid[ 'charset' ];
-        $pdoCollate = (string) $configValid[ 'collate' ];
+        $pdoCharset = (string) $configValid['charset'];
+        $pdoCollate = (string) $configValid['collate'];
 
         $hasCharset = ('' !== $pdoCharset);
         $hasCollate = ('' !== $pdoCollate);
 
         $sql = '';
 
-        if ($hasCharset || $hasCollate) {
-            if ($hasCharset && $hasCollate) {
+        if ( $hasCharset || $hasCollate ) {
+            if ( $hasCharset && $hasCollate ) {
                 $sql = ''
                     . "SET CHARACTER SET {$pdoCharset};"
                     . "\n" . "SET NAMES {$pdoCharset} COLLATE {$pdoCollate};"
                     . "\n" . "SET collation_connection = \"{$pdoCollate}\";";
 
-            } elseif ($hasCharset) {
+            } elseif ( $hasCharset ) {
                 $sql = ''
                     . "\n" . "SET CHARACTER SET {$pdoCharset};"
                     . "\n" . "SET NAMES {$pdoCharset};";
 
-            } elseif ($hasCollate) {
+            } elseif ( $hasCollate ) {
                 $sql = ''
                     . "SET collation_connection = \"{$pdoCollate}\";";
             }
@@ -997,7 +997,7 @@ class PdoAdapter
 
         $fn = $this->fnSqlEnsureCharsetUser;
 
-        if (null !== $fn) {
+        if ( null !== $fn ) {
             $sql .= call_user_func($fn, $pdo, $configValid, $this);
         }
 
@@ -1021,7 +1021,7 @@ class PdoAdapter
 
         $sql = '';
 
-        if ('mysql' === $driverName) {
+        if ( 'mysql' === $driverName ) {
             $sql = $this->sqlEnsureDatabaseDriverMysql($pdo, $configValid);
         }
 
@@ -1030,11 +1030,11 @@ class PdoAdapter
 
     protected function sqlEnsureDatabaseDriverMysql(\PDO $pdo, array $configValid) : string
     {
-        $database = (string) $configValid[ 'database' ];
+        $database = (string) $configValid['database'];
 
         $sql = '';
 
-        if ('' !== $database) {
+        if ( '' !== $database ) {
             $sql = ''
                 . "USE {$database};";
 
@@ -1050,7 +1050,7 @@ class PdoAdapter
 
         $fn = $this->fnSqlEnsureDatabaseUser;
 
-        if (null !== $fn) {
+        if ( null !== $fn ) {
             $sql .= call_user_func($fn, $pdo, $configValid, $this);
         }
 
@@ -1074,7 +1074,7 @@ class PdoAdapter
 
         $sql = '';
 
-        if ('mysql' === $driverName) {
+        if ( 'mysql' === $driverName ) {
             $sql = $this->sqlEnsureTimezoneDriverMysql($pdo, $configValid);
         }
 
@@ -1083,11 +1083,11 @@ class PdoAdapter
 
     protected function sqlEnsureTimezoneDriverMysql(\PDO $pdo, array $configValid) : string
     {
-        $timezone = (string) $configValid[ 'timezone' ];
+        $timezone = (string) $configValid['timezone'];
 
         $sql = '';
 
-        if ('' !== $timezone) {
+        if ( '' !== $timezone ) {
             $sql = ''
                 . "SET time_zone = '{$timezone}';";
 
@@ -1103,7 +1103,7 @@ class PdoAdapter
 
         $fn = $this->fnSqlEnsureTimezoneUser;
 
-        if (null !== $fn) {
+        if ( null !== $fn ) {
             $sql .= call_user_func($fn, $pdo, $configValid, $this);
         }
 

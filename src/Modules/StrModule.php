@@ -34,15 +34,15 @@ class StrModule
     {
         $last = static::$mbstring;
 
-        if (null !== $mbstring) {
-            if (false === $mbstring) {
+        if ( null !== $mbstring ) {
+            if ( false === $mbstring ) {
                 static::$mbstring = extension_loaded('mbstring');
 
             } else {
                 $mbstringBool = (bool) $mbstring;
 
-                if ($mbstringBool) {
-                    if (! extension_loaded('mbstring')) {
+                if ( $mbstringBool ) {
+                    if ( ! extension_loaded('mbstring') ) {
                         throw new ExtensionException(
                             [ 'Missing PHP extension: mbstring' ]
                         );
@@ -82,16 +82,16 @@ class StrModule
     {
         static::$mbstring = static::$mbstring ?? extension_loaded('mbstring');
 
-        if (static::$mbstring) {
+        if ( static::$mbstring ) {
             $theMb = Lib::mb();
 
-            $this->mbstringFuncMap[ 'lcfirst' ] = [ $theMb, 'lcfirst' ];
-            $this->mbstringFuncMap[ 'ucfirst' ] = [ $theMb, 'ucfirst' ];
-            $this->mbstringFuncMap[ 'lcwords' ] = [ $theMb, 'lcwords' ];
-            $this->mbstringFuncMap[ 'ucwords' ] = [ $theMb, 'ucwords' ];
+            $this->mbstringFuncMap['lcfirst'] = [ $theMb, 'lcfirst' ];
+            $this->mbstringFuncMap['ucfirst'] = [ $theMb, 'ucfirst' ];
+            $this->mbstringFuncMap['lcwords'] = [ $theMb, 'lcwords' ];
+            $this->mbstringFuncMap['ucwords'] = [ $theMb, 'ucwords' ];
 
-            if (PHP_VERSION_ID < 70400) {
-                $this->mbstringFuncMap[ 'str_split' ] = [ $theMb, 'str_split' ];
+            if ( PHP_VERSION_ID < 70400 ) {
+                $this->mbstringFuncMap['str_split'] = [ $theMb, 'str_split' ];
             }
         }
     }
@@ -162,13 +162,13 @@ class StrModule
      */
     public function mb_func_register(string $fnName, $fn)
     {
-        if (isset($this->mbstringFuncMap[ $fnName ])) {
+        if ( isset($this->mbstringFuncMap[$fnName]) ) {
             throw new LogicException(
                 [ 'The `fnName` is already registered', $fnName ]
             );
         }
 
-        $this->mbstringFuncMap[ $fnName ] = $fn;
+        $this->mbstringFuncMap[$fnName] = $fn;
 
         return $this;
     }
@@ -182,12 +182,12 @@ class StrModule
      */
     public function mb_func(string $fn)
     {
-        if (! $this->staticMbstring()) {
+        if ( ! $this->staticMbstring() ) {
             return $fn;
         }
 
         $result = null
-            ?? $this->mbstringFuncMap[ $fn ]
+            ?? $this->mbstringFuncMap[$fn]
             ?? 'mb_' . $fn;
 
         return $result;
@@ -199,7 +199,7 @@ class StrModule
      */
     public function type_a_string($value)
     {
-        if (is_string($value)) {
+        if ( is_string($value) ) {
             return Ret::val($value);
         }
 
@@ -214,7 +214,7 @@ class StrModule
      */
     public function type_a_string_empty($value)
     {
-        if ('' === $value) {
+        if ( '' === $value ) {
             return Ret::val($value);
         }
 
@@ -229,7 +229,7 @@ class StrModule
      */
     public function type_a_string_not_empty($value)
     {
-        if (is_string($value) && ('' !== $value)) {
+        if ( is_string($value) && ('' !== $value) ) {
             return Ret::val($value);
         }
 
@@ -246,7 +246,7 @@ class StrModule
     {
         $characters = $characters ?? " \n\r\t\v\0";
 
-        if (! is_string($value)) {
+        if ( ! is_string($value) ) {
             return Ret::err(
                 [ 'The `value` should be string', $value ],
                 [ __FILE__, __LINE__ ]
@@ -255,7 +255,7 @@ class StrModule
 
         $valueTrim = trim($value, $characters);
 
-        if ('' !== $valueTrim) {
+        if ( '' !== $valueTrim ) {
             return Ret::val($valueTrim);
         }
 
@@ -271,11 +271,11 @@ class StrModule
      */
     public function type_string($value)
     {
-        if (is_string($value)) {
+        if ( is_string($value) ) {
             return Ret::val($value);
         }
 
-        if (false
+        if ( false
             || (null === $value)
             // || ('' === $value)
             || (is_bool($value))
@@ -298,8 +298,8 @@ class StrModule
             );
         }
 
-        if (is_object($value)) {
-            if (! method_exists($value, '__toString')) {
+        if ( is_object($value) ) {
+            if ( ! method_exists($value, '__toString') ) {
                 return Ret::err(
                     [ 'The `value` unable to be converted to string', $value ],
                     [ __FILE__, __LINE__ ]
@@ -325,14 +325,14 @@ class StrModule
      */
     public function type_string_empty($value)
     {
-        if (! $this->type_string($value)->isOk([ &$valueString, &$ret ])) {
+        if ( ! $this->type_string($value)->isOk([ &$valueString, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ('' === $valueString) {
+        if ( '' === $valueString ) {
             return Ret::val('');
         }
 
@@ -347,14 +347,14 @@ class StrModule
      */
     public function type_string_not_empty($value)
     {
-        if (! $this->type_string($value)->isOk([ &$valueString, &$ret ])) {
+        if ( ! $this->type_string($value)->isOk([ &$valueString, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ('' !== $valueString) {
+        if ( '' !== $valueString ) {
             return Ret::val($valueString);
         }
 
@@ -371,7 +371,7 @@ class StrModule
     {
         $characters = $characters ?? " \n\r\t\v\0";
 
-        if (! $this->type_string($value)->isOk([ &$valueString, &$ret ])) {
+        if ( ! $this->type_string($value)->isOk([ &$valueString, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -380,7 +380,7 @@ class StrModule
 
         $valueString = trim($valueString, $characters);
 
-        if ('' !== $valueString) {
+        if ( '' !== $valueString ) {
             return Ret::val($valueString);
         }
 
@@ -396,14 +396,14 @@ class StrModule
      */
     public function type_char($value)
     {
-        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (1 === strlen($valueStringNotEmpty)) {
+        if ( 1 === strlen($valueStringNotEmpty) ) {
             return Ret::val($valueStringNotEmpty);
         }
 
@@ -418,14 +418,14 @@ class StrModule
      */
     public function type_letter($value)
     {
-        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (1 === $this->strlen($valueStringNotEmpty)) {
+        if ( 1 === $this->strlen($valueStringNotEmpty) ) {
             return Ret::val($valueStringNotEmpty);
         }
 
@@ -440,7 +440,7 @@ class StrModule
      */
     public function type_word($value)
     {
-        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -448,7 +448,7 @@ class StrModule
         }
 
         preg_replace('/\s+/', '', $valueStringNotEmpty, 1, $count);
-        if ($count > 0) {
+        if ( $count > 0 ) {
             return Ret::err(
                 [ 'The `value` should not contain any whitespaces', $value ],
                 [ __FILE__, __LINE__ ]
@@ -466,7 +466,7 @@ class StrModule
      */
     public function type_alphabet($value)
     {
-        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -474,7 +474,7 @@ class StrModule
         }
 
         preg_replace('/\s+/', '', $valueStringNotEmpty, 1, $count);
-        if ($count > 0) {
+        if ( $count > 0 ) {
             return Ret::err(
                 [ 'The `value` should not contain any whitespaces', $value ],
                 [ __FILE__, __LINE__ ]
@@ -484,7 +484,7 @@ class StrModule
         $fnStrlen = $this->mb_func('strlen');
 
         $len = $fnStrlen($valueStringNotEmpty);
-        if ($len <= 1) {
+        if ( $len <= 1 ) {
             return Ret::err(
                 [ 'The `value` should contain at least two letters', $value ],
                 [ __FILE__, __LINE__ ]
@@ -500,13 +500,13 @@ class StrModule
         for ( $i = 0; $i < $len; $i++ ) {
             $letter = $fnSubstr($valueStringNotEmpty, $i, 1);
 
-            if (isset($seen[ $letter ])) {
+            if ( isset($seen[$letter]) ) {
                 return Ret::err(
                     [ 'The `value` should contain unique letters', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
-            $seen[ $letter ] = true;
+            $seen[$letter] = true;
 
             $letterRegex = sprintf('\x{%X}', $fnOrd($letter));
 
@@ -532,15 +532,15 @@ class StrModule
      */
     public function type_ctype_digit($value)
     {
-        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (extension_loaded('ctype')) {
-            if (ctype_digit($valueStringNotEmpty)) {
+        if ( extension_loaded('ctype') ) {
+            if ( ctype_digit($valueStringNotEmpty) ) {
                 return Ret::val($valueStringNotEmpty);
             }
 
@@ -550,7 +550,7 @@ class StrModule
             );
         }
 
-        if (! preg_match('~[^0-9]~', $valueStringNotEmpty)) {
+        if ( ! preg_match('~[^0-9]~', $valueStringNotEmpty) ) {
             return Ret::err(
                 [ 'The `value` should contain only digits', $value ],
                 [ __FILE__, __LINE__ ]
@@ -567,16 +567,16 @@ class StrModule
     {
         $allowUpperCase = $allowUpperCase ?? true;
 
-        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (extension_loaded('ctype')) {
-            if (! $allowUpperCase) {
-                if (strtolower($valueStringNotEmpty) !== $valueStringNotEmpty) {
+        if ( extension_loaded('ctype') ) {
+            if ( ! $allowUpperCase ) {
+                if ( strtolower($valueStringNotEmpty) !== $valueStringNotEmpty ) {
                     return Ret::err(
                         [ 'The `value` should not contain upper case letters', $value ],
                         [ __FILE__, __LINE__ ]
@@ -584,7 +584,7 @@ class StrModule
                 }
             }
 
-            if (ctype_alpha($valueStringNotEmpty)) {
+            if ( ctype_alpha($valueStringNotEmpty) ) {
                 return Ret::val($valueStringNotEmpty);
             }
 
@@ -598,7 +598,7 @@ class StrModule
             ? 'i'
             : '';
 
-        if (preg_match('~[^a-z]~' . $regexFlags, $valueStringNotEmpty)) {
+        if ( preg_match('~[^a-z]~' . $regexFlags, $valueStringNotEmpty) ) {
             return Ret::err(
                 [ 'The `value` should contain only [a-z] letters', $value ],
                 [ __FILE__, __LINE__ ]
@@ -615,16 +615,16 @@ class StrModule
     {
         $allowUpperCase = $allowUpperCase ?? true;
 
-        if (! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (extension_loaded('ctype')) {
-            if (! $allowUpperCase) {
-                if (strtolower($valueStringNotEmpty) !== $valueStringNotEmpty) {
+        if ( extension_loaded('ctype') ) {
+            if ( ! $allowUpperCase ) {
+                if ( strtolower($valueStringNotEmpty) !== $valueStringNotEmpty ) {
                     return Ret::err(
                         [ 'The `value` should not contain upper case letters', $value ],
                         [ __FILE__, __LINE__ ]
@@ -632,7 +632,7 @@ class StrModule
                 }
             }
 
-            if (ctype_alnum($valueStringNotEmpty)) {
+            if ( ctype_alnum($valueStringNotEmpty) ) {
                 return Ret::val($valueStringNotEmpty);
             }
 
@@ -646,7 +646,7 @@ class StrModule
             ? 'i'
             : '';
 
-        if (preg_match('~[^0-9a-z]~' . $regexFlags, $valueStringNotEmpty)) {
+        if ( preg_match('~[^0-9a-z]~' . $regexFlags, $valueStringNotEmpty) ) {
             return Ret::err(
                 [ 'The `value` should contain only [a-z0-9] letters', $value ],
                 [ __FILE__, __LINE__ ]
@@ -661,7 +661,7 @@ class StrModule
     {
         $hex = $hex ?? false;
 
-        if ($hex) {
+        if ( $hex ) {
             $list = [
                 chr(0)  => '\x00', // "\0"   // NULL (ASCII 0)
                 chr(1)  => '\x01', // "\x01" // SOH (Start of Heading) (ASCII 1)
@@ -741,10 +741,10 @@ class StrModule
     {
         $list = $this->loadAsciiControls($hex);
 
-        unset($list[ chr(9) ]);
-        unset($list[ chr(10) ]);
-        unset($list[ chr(11) ]);
-        unset($list[ chr(13) ]);
+        unset($list[chr(9)]);
+        unset($list[chr(10)]);
+        unset($list[chr(11)]);
+        unset($list[chr(13)]);
 
         return $list;
     }
@@ -753,7 +753,7 @@ class StrModule
     {
         $hex = $hex ?? false;
 
-        if ($hex) {
+        if ( $hex ) {
             $list = [
                 chr(9)  => '\x09', // "\t" // TAB (Horizontal Tab)  (ASCII 9)
                 chr(10) => '\x0A', // "\n" // LF  (Line Feed)       (ASCII 10)
@@ -1340,11 +1340,11 @@ class StrModule
      */
     public function strlen($value, ?string $mb_encoding = null) // : int|NAN
     {
-        if (! is_string($value)) {
+        if ( ! is_string($value) ) {
             return NAN;
         }
 
-        if ('' === $value) {
+        if ( '' === $value ) {
             return 0;
         }
 
@@ -1365,11 +1365,11 @@ class StrModule
      */
     public function strsize($value) // : int|NAN
     {
-        if (! is_string($value)) {
+        if ( ! is_string($value) ) {
             return NAN;
         }
 
-        if ('' === $value) {
+        if ( '' === $value ) {
             return 0;
         }
 
@@ -1384,13 +1384,13 @@ class StrModule
      */
     public function lower(string $string, ?string $mb_encoding = null) : string
     {
-        if ($this->staticMbstring()) {
+        if ( $this->staticMbstring() ) {
             $result = (null !== $mb_encoding)
                 ? mb_strtolower($string, $mb_encoding)
                 : mb_strtolower($string);
 
         } else {
-            if ($this->is_utf8($string)) {
+            if ( $this->is_utf8($string) ) {
                 throw new RuntimeException(
                     [
                         ''
@@ -1411,13 +1411,13 @@ class StrModule
      */
     public function upper(string $string, ?string $mb_encoding = null) : string
     {
-        if ($this->staticMbstring()) {
+        if ( $this->staticMbstring() ) {
             $result = (null !== $mb_encoding)
                 ? mb_strtoupper($string, $mb_encoding)
                 : mb_strtoupper($string);
 
         } else {
-            if ($this->is_utf8($string)) {
+            if ( $this->is_utf8($string) ) {
                 throw new RuntimeException(
                     [
                         ''
@@ -1441,11 +1441,11 @@ class StrModule
     {
         $theMb = Lib::mb();
 
-        if ($this->staticMbstring()) {
+        if ( $this->staticMbstring() ) {
             $result = $theMb->lcfirst($string, $mb_encoding);
 
         } else {
-            if ($this->is_utf8($string)) {
+            if ( $this->is_utf8($string) ) {
                 throw new RuntimeException(
                     [
                         ''
@@ -1468,11 +1468,11 @@ class StrModule
     {
         $theMb = Lib::mb();
 
-        if ($this->staticMbstring()) {
+        if ( $this->staticMbstring() ) {
             $result = $theMb->ucfirst($string, $mb_encoding);
 
         } else {
-            if ($this->is_utf8($string)) {
+            if ( $this->is_utf8($string) ) {
                 throw new RuntimeException(
                     [
                         ''
@@ -1504,8 +1504,8 @@ class StrModule
         $result = preg_replace_callback(
             $regex,
             function ($m) use ($mb_encoding) {
-                $first = $m[ 1 ];
-                $last = $this->lcfirst($m[ 2 ], $mb_encoding);
+                $first = $m[1];
+                $last = $this->lcfirst($m[2], $mb_encoding);
 
                 return "{$first}{$last}";
             },
@@ -1530,8 +1530,8 @@ class StrModule
         $result = preg_replace_callback(
             $regex,
             function ($m) use ($mb_encoding) {
-                $first = $m[ 1 ];
-                $last = $this->ucfirst($m[ 2 ], $mb_encoding);
+                $first = $m[1];
+                $last = $this->ucfirst($m[2], $mb_encoding);
 
                 return "{$first}{$last}";
             },
@@ -1551,7 +1551,7 @@ class StrModule
 
         $lengthInt = $theType->int_positive($length)->orThrow();
 
-        if ($this->staticMbstring()) {
+        if ( $this->staticMbstring() ) {
             $result = $theMb->str_split($string, $lengthInt, $mb_encoding);
 
         } else {
@@ -1568,15 +1568,15 @@ class StrModule
     ) : bool
     {
         $withSubstr = array_key_exists(0, $refs);
-        if ($withSubstr) {
-            $refSubstr =& $refs[ 0 ];
+        if ( $withSubstr ) {
+            $refSubstr =& $refs[0];
         }
         $refSubstr = null;
 
         $ignoreCase = $ignoreCase ?? true;
 
-        if ('' === $string) return false;
-        if ('' === $needle) {
+        if ( '' === $string ) return false;
+        if ( '' === $needle ) {
             $refSubstr = $string;
 
             return true;
@@ -1591,7 +1591,7 @@ class StrModule
         $pos = $fnStrpos($string, $needle);
         $status = (0 === $pos);
 
-        if ($status && $withSubstr) {
+        if ( $status && $withSubstr ) {
             $refSubstr = $fnSubstr($string, $fnStrlen($needle));
         }
 
@@ -1606,15 +1606,15 @@ class StrModule
     ) : bool
     {
         $withSubstr = array_key_exists(0, $refs);
-        if ($withSubstr) {
-            $refSubstr =& $refs[ 0 ];
+        if ( $withSubstr ) {
+            $refSubstr =& $refs[0];
         }
         $refSubstr = null;
 
         $ignoreCase = $ignoreCase ?? true;
 
-        if ('' === $string) return false;
-        if ('' === $needle) {
+        if ( '' === $string ) return false;
+        if ( '' === $needle ) {
             $refSubstr = $string;
 
             return false;
@@ -1629,7 +1629,7 @@ class StrModule
         $pos = $fnStrrpos($string, $needle);
         $status = ($pos === $fnStrlen($string) - $fnStrlen($needle));
 
-        if ($status && $withSubstr) {
+        if ( $status && $withSubstr ) {
             $refSubstr = $fnSubstr($string, 0, $pos);
         }
 
@@ -1647,11 +1647,11 @@ class StrModule
         $limit = $limit ?? -1;
         $ignoreCase = $ignoreCase ?? true;
 
-        if ('' === $string) return $string;
-        if ('' === $needle) return $string;
-        if (0 === $limit) return $string;
+        if ( '' === $string ) return $string;
+        if ( '' === $needle ) return $string;
+        if ( 0 === $limit ) return $string;
 
-        if ($limit < -1) {
+        if ( $limit < -1 ) {
             throw new LogicException(
                 'The `limit` should be GTE -1',
                 $limit
@@ -1669,7 +1669,7 @@ class StrModule
         $pos = $fnStrpos($result, $needle);
 
         while ( $pos === 0 ) {
-            if (0 === $limit--) {
+            if ( 0 === $limit-- ) {
                 break;
             }
 
@@ -1691,11 +1691,11 @@ class StrModule
         $limit = $limit ?? -1;
         $ignoreCase = $ignoreCase ?? true;
 
-        if ('' === $string) return $string;
-        if ('' === $needle) return $string;
-        if (0 === $limit) return $string;
+        if ( '' === $string ) return $string;
+        if ( '' === $needle ) return $string;
+        if ( 0 === $limit ) return $string;
 
-        if ($limit < -1) {
+        if ( $limit < -1 ) {
             throw new LogicException(
                 'The `limit` should be GTE -1',
                 $limit
@@ -1713,7 +1713,7 @@ class StrModule
         $pos = $fnStrrpos($result, $needle);
 
         while ( $pos === ($fnStrlen($result) - $fnStrlen($needle)) ) {
-            if (0 === $limit--) {
+            if ( 0 === $limit-- ) {
                 break;
             }
 
@@ -1735,11 +1735,11 @@ class StrModule
         $cropsList = $thePhp->to_list($crops);
         $limitsList = $thePhp->to_list($limits ?? [ -1 ]);
 
-        if ([] === $cropsList) {
+        if ( [] === $cropsList ) {
             return $string;
         }
 
-        if ([] === $limitsList) {
+        if ( [] === $limitsList ) {
             throw new LogicException(
                 'The `limits` should be array of integers or be null',
                 $limits
@@ -1772,10 +1772,10 @@ class StrModule
         $times = $times ?? 1;
         $isIgnoreCase = $isIgnoreCase ?? true;
 
-        if ('' === $needle) return $string;
-        if (0 === $times) return $string;
+        if ( '' === $needle ) return $string;
+        if ( 0 === $times ) return $string;
 
-        if ($times < 1) {
+        if ( $times < 1 ) {
             throw new LogicException(
                 'The `times` should be GTE 1',
                 $times
@@ -1797,10 +1797,10 @@ class StrModule
         $times = $times ?? 1;
         $isIgnoreCase = $isIgnoreCase ?? true;
 
-        if ('' === $needle) return $string;
-        if (0 === $times) return $string;
+        if ( '' === $needle ) return $string;
+        if ( 0 === $times ) return $string;
 
-        if ($times < 1) {
+        if ( $times < 1 ) {
             throw new LogicException(
                 'The `times` should be GTE 1',
                 $times
@@ -1827,11 +1827,11 @@ class StrModule
         $cropsList = $thePhp->to_list($crops);
         $timesList = $thePhp->to_list($times ?? [ 1 ]);
 
-        if ([] === $cropsList) {
+        if ( [] === $cropsList ) {
             return $string;
         }
 
-        if ([] === $timesList) {
+        if ( [] === $timesList ) {
             throw new LogicException(
                 'The `times` should be array of integers or be null',
                 $times
@@ -1877,13 +1877,13 @@ class StrModule
         $replaceList = $thePhp->to_list($replace);
         $subjectList = $thePhp->to_list($subject);
 
-        if ([] === $searchList) {
+        if ( [] === $searchList ) {
             return $subject;
         }
-        if ([] === $replaceList) {
+        if ( [] === $replaceList ) {
             return $subject;
         }
-        if ([] === $subjectList) {
+        if ( [] === $subjectList ) {
             return [];
         }
 
@@ -1892,7 +1892,7 @@ class StrModule
             $regex = preg_quote($s, '/');
             $regex = '/' . $regex . '/u';
 
-            $_regexes[ $i ] = $regex;
+            $_regexes[$i] = $regex;
         }
 
         $result = preg_replace($_regexes, $replace, $subject, $limit, $refCount);
@@ -1921,13 +1921,13 @@ class StrModule
         $replaceList = $thePhp->to_list($replace);
         $subjectList = $thePhp->to_list($subject);
 
-        if ([] === $searchList) {
+        if ( [] === $searchList ) {
             return $subject;
         }
-        if ([] === $replaceList) {
+        if ( [] === $replaceList ) {
             return $subject;
         }
-        if ([] === $subjectList) {
+        if ( [] === $subjectList ) {
             return [];
         }
 
@@ -1936,7 +1936,7 @@ class StrModule
             $regex = preg_quote($s, '/');
             $regex = '/' . $regex . '/iu';
 
-            $_regexes[ $i ] = $regex;
+            $_regexes[$i] = $regex;
         }
 
         $result = preg_replace($_regexes, $replace, $subject, $limit, $refCount);
@@ -1955,7 +1955,7 @@ class StrModule
         ?string $wildcardLetterSingle = null
     ) : array
     {
-        if ('' === $pattern) {
+        if ( '' === $pattern ) {
             return [];
         }
 
@@ -1963,7 +1963,7 @@ class StrModule
 
         $linesList = $thePhp->to_list($lines);
 
-        if ([] === $linesList) {
+        if ( [] === $linesList ) {
             return [];
         }
 
@@ -1979,7 +1979,7 @@ class StrModule
         $result = [];
 
         foreach ( $linesList as $line ) {
-            if (preg_match($regex, $line)) {
+            if ( preg_match($regex, $line) ) {
                 $result[] = $line;
             }
         }
@@ -1997,7 +1997,7 @@ class StrModule
         ?string $wildcardLetterSingle = null
     ) : array
     {
-        if ('' === $pattern) {
+        if ( '' === $pattern ) {
             return [];
         }
 
@@ -2005,7 +2005,7 @@ class StrModule
 
         $linesList = $thePhp->to_list($lines);
 
-        if ([] === $linesList) {
+        if ( [] === $linesList ) {
             return [];
         }
 
@@ -2021,7 +2021,7 @@ class StrModule
         $result = [];
 
         foreach ( $linesList as $line ) {
-            if (preg_match($regex, $line)) {
+            if ( preg_match($regex, $line) ) {
                 $result[] = $line;
             }
         }
@@ -2039,7 +2039,7 @@ class StrModule
         ?string $wildcardLetterSingle = null
     ) : array
     {
-        if ('' === $pattern) {
+        if ( '' === $pattern ) {
             return [];
         }
 
@@ -2047,7 +2047,7 @@ class StrModule
 
         $linesList = $thePhp->to_list($lines);
 
-        if ([] === $linesList) {
+        if ( [] === $linesList ) {
             return [];
         }
 
@@ -2063,7 +2063,7 @@ class StrModule
         $result = [];
 
         foreach ( $linesList as $line ) {
-            if (preg_match($regex, $line)) {
+            if ( preg_match($regex, $line) ) {
                 $result[] = $line;
             }
         }
@@ -2081,7 +2081,7 @@ class StrModule
         ?string $wildcardLetterSingle = null
     ) : array
     {
-        if ('' === $pattern) {
+        if ( '' === $pattern ) {
             return [];
         }
 
@@ -2089,7 +2089,7 @@ class StrModule
 
         $linesList = $thePhp->to_list($lines);
 
-        if ([] === $linesList) {
+        if ( [] === $linesList ) {
             return [];
         }
 
@@ -2105,7 +2105,7 @@ class StrModule
         $result = [];
 
         foreach ( $linesList as $line ) {
-            if (preg_match($regex, $line)) {
+            if ( preg_match($regex, $line) ) {
                 $result[] = $line;
             }
         }
@@ -2120,7 +2120,7 @@ class StrModule
         ?string $wildcardSingleSymbol = null
     ) : string
     {
-        if ('' === $pattern) {
+        if ( '' === $pattern ) {
             return '';
         }
 
@@ -2131,23 +2131,23 @@ class StrModule
         $hasWildcardSingleSymbol = (null !== $wildcardSingleSymbol);
 
         $testUnique = [];
-        if ($hasWildcardSeparatorSymbol) {
+        if ( $hasWildcardSeparatorSymbol ) {
             $wildcardSeparatorSymbolString = $this->type_char($wildcardSeparatorSymbol)->orThrow();
 
             $testUnique[] = $wildcardSeparatorSymbolString;
         }
-        if ($hasWildcardSequenceSymbol) {
+        if ( $hasWildcardSequenceSymbol ) {
             $wildcardSequenceSymbolString = $this->type_char($wildcardSequenceSymbol)->orThrow();
 
             $testUnique[] = $wildcardSequenceSymbolString;
         }
-        if ($hasWildcardSingleSymbol) {
+        if ( $hasWildcardSingleSymbol ) {
             $wildcardSingleSymbolString = $this->type_char($wildcardSingleSymbol)->orThrow();
 
             $testUnique[] = $wildcardSingleSymbolString;
         }
 
-        if (count(array_unique($testUnique)) !== count($testUnique)) {
+        if ( count(array_unique($testUnique)) !== count($testUnique) ) {
             throw new LogicException(
                 [
                     'The wildcards should be different letters or nulls',
@@ -2162,23 +2162,23 @@ class StrModule
 
         $notASymbolRegex = '';
 
-        if ($hasWildcardSeparatorSymbol) {
+        if ( $hasWildcardSeparatorSymbol ) {
             $wildcardSeparatorRegex = $thePreg->preg_quote_ord($wildcardSeparatorSymbolString);
 
             $notASymbolRegex .= $wildcardSeparatorRegex;
         }
-        if ($hasWildcardSequenceSymbol) {
+        if ( $hasWildcardSequenceSymbol ) {
             $wildcardLetterSequenceRegex = $thePreg->preg_quote_ord($wildcardSequenceSymbolString);
 
             $notASymbolRegex .= $wildcardLetterSequenceRegex;
         }
-        if ($hasWildcardSingleSymbol) {
+        if ( $hasWildcardSingleSymbol ) {
             $wildcardLetterSingleRegex = $thePreg->preg_quote_ord($wildcardSingleSymbolString);
 
             $notASymbolRegex .= $wildcardLetterSingleRegex;
         }
 
-        if ('' === $notASymbolRegex) {
+        if ( '' === $notASymbolRegex ) {
             $anySymbolRegex = '.';
 
         } else {
@@ -2187,9 +2187,9 @@ class StrModule
 
         $replacements = [];
 
-        if ($hasWildcardSeparatorSymbol) {
+        if ( $hasWildcardSeparatorSymbol ) {
             $replacement = '{{ 1 }}';
-            $replacements[ preg_quote($replacement, '/') ] = $wildcardSeparatorRegex;
+            $replacements[preg_quote($replacement, '/')] = $wildcardSeparatorRegex;
 
             $_pattern = str_replace(
                 $wildcardSeparatorSymbolString,
@@ -2197,9 +2197,9 @@ class StrModule
                 $_pattern
             );
         }
-        if ($hasWildcardSequenceSymbol) {
+        if ( $hasWildcardSequenceSymbol ) {
             $replacement = '{{ 2 }}';
-            $replacements[ preg_quote($replacement, '/') ] = $anySymbolRegex . '+';
+            $replacements[preg_quote($replacement, '/')] = $anySymbolRegex . '+';
 
             $_pattern = str_replace(
                 $wildcardSequenceSymbolString,
@@ -2207,9 +2207,9 @@ class StrModule
                 $_pattern
             );
         }
-        if ($hasWildcardSingleSymbol) {
+        if ( $hasWildcardSingleSymbol ) {
             $replacement = '{{ 3 }}';
-            $replacements[ preg_quote($replacement, '/') ] = $anySymbolRegex;
+            $replacements[preg_quote($replacement, '/')] = $anySymbolRegex;
 
             $_pattern = str_replace(
                 $wildcardSingleSymbolString,
@@ -2220,13 +2220,13 @@ class StrModule
 
         $_pattern = preg_quote($_pattern, '/');
 
-        if ([] !== $replacements) {
+        if ( [] !== $replacements ) {
             $_pattern = strtr($_pattern, $replacements);
         }
 
         $patternRegex = "/{$_pattern}/";
 
-        if (false === preg_match($patternRegex, '')) {
+        if ( false === preg_match($patternRegex, '') ) {
             throw new RuntimeException(
                 'Invalid regex for `str_match`: ' . $patternRegex
             );
@@ -2241,14 +2241,14 @@ class StrModule
      */
     public function camel(string $string) : string
     {
-        if ('' === $string) return '';
+        if ( '' === $string ) return '';
 
         $result = $string;
 
         $regex = '/[^\p{L}\d]+([\p{L}\d])/iu';
 
         $result = preg_replace_callback($regex, function ($m) {
-            return $this->mb_func('strtoupper')($m[ 1 ]);
+            return $this->mb_func('strtoupper')($m[1]);
         }, $result);
 
         $result = $this->lcfirst($result);
@@ -2261,14 +2261,14 @@ class StrModule
      */
     public function pascal(string $string) : string
     {
-        if ('' === $string) return '';
+        if ( '' === $string ) return '';
 
         $result = $string;
 
         $regex = '/[^\p{L}\d]+([\p{L}\d])/iu';
 
         $result = preg_replace_callback($regex, function ($m) {
-            return $this->mb_func('strtoupper')($m[ 1 ]);
+            return $this->mb_func('strtoupper')($m[1]);
         }, $result);
 
         $result = $this->ucfirst($result);
@@ -2282,7 +2282,7 @@ class StrModule
      */
     public function space(string $string) : string
     {
-        if ('' === $string) return '';
+        if ( '' === $string ) return '';
 
         $result = $string;
 
@@ -2302,7 +2302,7 @@ class StrModule
      */
     public function snake(string $string) : string
     {
-        if ('' === $string) return '';
+        if ( '' === $string ) return '';
 
         $result = $string;
 
@@ -2322,7 +2322,7 @@ class StrModule
      */
     public function kebab(string $string) : string
     {
-        if ('' === $string) return '';
+        if ( '' === $string ) return '';
 
         $result = $string;
 
@@ -2420,7 +2420,7 @@ class StrModule
      */
     public function translit_ru2ascii(string $string, ?string $delimiter = null, $ignoreSymbols = null) : string
     {
-        if ('' === $string) {
+        if ( '' === $string ) {
             return '';
         }
 
@@ -2476,7 +2476,7 @@ class StrModule
             '9' => '9',
         ];
 
-        if (null !== $delimiter) {
+        if ( null !== $delimiter ) {
             $delimiterChar = $theType->char($delimiter)->orThrow();
 
             $theType->key_not_exists($delimiterChar, $dictionary)->orThrow();
@@ -2486,13 +2486,13 @@ class StrModule
 
         $ignoreSymbolsIndex = [];
         foreach ( $gen as $str ) {
-            if (is_array($str)) {
+            if ( is_array($str) ) {
                 continue;
 
-            } elseif ($theType->letter($str)->isOk([ &$letter ])) {
+            } elseif ( $theType->letter($str)->isOk([ &$letter ]) ) {
                 $letterLower = mb_strtolower($letter);
 
-                $ignoreSymbolsIndex[ $letterLower ] = true;
+                $ignoreSymbolsIndex[$letterLower] = true;
 
             } else {
                 throw new LogicException(
@@ -2513,7 +2513,7 @@ class StrModule
             "/[^а-яё0-9{$ignoreSymbolsRegex} ]/u",
             static function ($m) use ($delimiter) {
                 return $delimiter
-                    ?? ('{' . $m[ 0 ] . '}');
+                    ?? ('{' . $m[0] . '}');
             },
             $stringLower
         );
@@ -2542,7 +2542,7 @@ class StrModule
         $thePhp = Lib::php();
 
         foreach ( $thePhp->to_iterable($strings) as $string ) {
-            if (! is_string($string)) {
+            if ( ! is_string($string) ) {
                 throw new LogicException(
                     [ 'Each of `strings` should be a string', $string ]
                 );
@@ -2564,7 +2564,7 @@ class StrModule
         $thePhp = Lib::php();
 
         foreach ( $thePhp->to_iterable($strings) as $string ) {
-            if (! is_string($string)) {
+            if ( ! is_string($string) ) {
                 throw new LogicException(
                     [ 'Each of `strings` should be a string', $string ]
                 );
@@ -2586,7 +2586,7 @@ class StrModule
         $thePhp = Lib::php();
 
         foreach ( $thePhp->to_iterable($strings) as $string ) {
-            if (! is_string($string)) {
+            if ( ! is_string($string) ) {
                 throw new LogicException(
                     [ 'Each of `strings` should be a string', $string ]
                 );
@@ -2607,13 +2607,13 @@ class StrModule
      */
     public function prefix(string $string, ?int $length = null) : string
     {
-        if ('' === $string) {
+        if ( '' === $string ) {
             return '';
         }
 
         $length = $length ?? 3;
 
-        if ($length < 1) {
+        if ( $length < 1 ) {
             throw new LogicException(
                 [ 'The `length` should be GT 0', $length ]
             );
@@ -2627,7 +2627,7 @@ class StrModule
             ? preg_replace('/(?:[^\w]|[_])+/u', '', $string)
             : preg_replace('/(?:[^\w]|[_])+/', '', $string);
 
-        if ('' === $_string) {
+        if ( '' === $_string ) {
             throw new LogicException(
                 [ 'The `string` should contain at least one letter', $string ]
             );
@@ -2641,7 +2641,7 @@ class StrModule
 
         $_length = min($length, $sourceLen);
 
-        if (0 === $_length) {
+        if ( 0 === $_length ) {
             return '';
         }
 
@@ -2657,7 +2657,7 @@ class StrModule
             $letter = $fnSubstr($source, $i, 1);
 
             ('' === trim($letter, $vowels))
-                ? ($sourceVowels[ $i ] = $letter)
+                ? ($sourceVowels[$i] = $letter)
                 : ($sourceConsonants[] = $letter);
         }
 
@@ -2667,13 +2667,13 @@ class StrModule
         $left = $_length;
         for ( $i = 0; $i < $_length; $i++ ) {
             $letter = null;
-            if (isset($sourceVowels[ $i ])) {
-                if (! $hasVowel) {
-                    $letter = $sourceVowels[ $i ];
+            if ( isset($sourceVowels[$i]) ) {
+                if ( ! $hasVowel ) {
+                    $letter = $sourceVowels[$i];
                     $hasVowel = true;
 
-                } elseif ($left > count($sourceConsonants)) {
-                    $letter = $sourceVowels[ $i ];
+                } elseif ( $left > count($sourceConsonants) ) {
+                    $letter = $sourceVowels[$i];
                 }
             }
 
@@ -2696,7 +2696,7 @@ class StrModule
         foreach ( $lines as $i => $line ) {
             $line = rtrim($line);
 
-            $lines[ $i ] = $line;
+            $lines[$i] = $line;
         }
 
         return $lines;
@@ -2705,8 +2705,8 @@ class StrModule
     public function eol(string $text, $eol = null, array $refs = []) : string
     {
         $withLines = array_key_exists(0, $refs);
-        if ($withLines) {
-            $refLines =& $refs[ 0 ];
+        if ( $withLines ) {
+            $refLines =& $refs[0];
         }
         $refLines = null;
 
@@ -2728,7 +2728,7 @@ class StrModule
      */
     public function utf8_encode(string $string, ?string $encoding = null) : ?string
     {
-        if (! \function_exists('iconv')) {
+        if ( ! \function_exists('iconv') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: iconv' ]
             );
@@ -2741,20 +2741,20 @@ class StrModule
             ?? 'UTF-8';
 
         $stringConverted = @iconv($encodingString, 'UTF-8', $string);
-        if (false !== $stringConverted) {
+        if ( false !== $stringConverted ) {
             return $stringConverted;
         }
 
-        if ('CP1252' !== $encodingString) {
+        if ( 'CP1252' !== $encodingString ) {
             $stringConverted = @iconv('CP1252', 'UTF-8', $string);
-            if (false !== $stringConverted) {
+            if ( false !== $stringConverted ) {
                 return $stringConverted;
             }
         }
 
-        if ('CP850' !== $encodingString) {
+        if ( 'CP850' !== $encodingString ) {
             $stringConverted = @iconv('CP850', 'UTF-8', $string);
-            if (false !== $stringConverted) {
+            if ( false !== $stringConverted ) {
                 return $stringConverted;
             }
         }
@@ -2780,12 +2780,12 @@ class StrModule
             $result,
             $count
         );
-        if ($count) {
+        if ( $count ) {
             $foundBinary = true;
         }
 
         $isUtf8 = $this->is_utf8($result);
-        if ($isUtf8) {
+        if ( $isUtf8 ) {
             $invisibles = $this->loadInvisibles();
 
             $count = 0;
@@ -2797,27 +2797,27 @@ class StrModule
                 $count
             );
 
-            if ($count) {
+            if ( $count ) {
                 $foundBinary = true;
             }
 
         } else {
             $_varUtf8 = $this->utf8_encode($result, $encoding);
 
-            if ($_varUtf8 !== $result) {
+            if ( $_varUtf8 !== $result ) {
                 $result = $_varUtf8;
 
                 $foundBinary = true;
             }
         }
 
-        if ($foundBinary) {
+        if ( $foundBinary ) {
             $result = "b`{$result}`";
         }
 
         foreach ( $asciiControlsOnlyTrims as $i => $v ) {
-            if ($i === "\n") {
-                $asciiControlsOnlyTrims[ $i ] .= $i;
+            if ( $i === "\n" ) {
+                $asciiControlsOnlyTrims[$i] .= $i;
             }
         }
         $result = str_replace(

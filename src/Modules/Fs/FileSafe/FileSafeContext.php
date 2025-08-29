@@ -46,16 +46,16 @@ class FileSafeContext
         $isResource = [];
 
         foreach ( $fhh as $i => $fh ) {
-            $isResource[ $i ] = is_resource($fh);
+            $isResource[$i] = is_resource($fh);
 
-            if ($isResource[ $i ]) {
+            if ( $isResource[$i] ) {
                 fflush($fh);
             }
         }
 
-        if (! $isWindows) {
+        if ( ! $isWindows ) {
             foreach ( $filesToUnlink as $file => $bool ) {
-                if (file_exists($file)) {
+                if ( file_exists($file) ) {
                     unlink($file);
                     clearstatcache(true, $file);
                 }
@@ -63,20 +63,20 @@ class FileSafeContext
         }
 
         foreach ( $fhhToFrelease as $i => $fh ) {
-            if ($isResource[ $i ]) {
+            if ( $isResource[$i] ) {
                 flock($fh, LOCK_UN);
             }
         }
 
         foreach ( $fhhToFclose as $i => $fh ) {
-            if ($isResource[ $i ]) {
+            if ( $isResource[$i] ) {
                 fclose($fh);
             }
         }
 
-        if ($isWindows) {
+        if ( $isWindows ) {
             foreach ( $filesToUnlink as $file => $bool ) {
-                if (file_exists($file)) {
+                if ( file_exists($file) ) {
                     unlink($file);
                     clearstatcache(true, $file);
                 }
@@ -96,8 +96,8 @@ class FileSafeContext
     {
         $id = (int) $fh;
 
-        $this->fhh[ $id ] = $fh;
-        $this->fhhToFrelease[ $id ] = $fh;
+        $this->fhh[$id] = $fh;
+        $this->fhhToFrelease[$id] = $fh;
 
         return $this;
     }
@@ -111,10 +111,10 @@ class FileSafeContext
     {
         $id = (int) $fh;
 
-        unset($this->fhhToFrelease[ $id ]);
+        unset($this->fhhToFrelease[$id]);
 
-        if (! isset($this->fhhToFclose[ $id ])) {
-            unset($this->fhh[ $id ]);
+        if ( ! isset($this->fhhToFclose[$id]) ) {
+            unset($this->fhh[$id]);
         }
 
         return $this;
@@ -130,8 +130,8 @@ class FileSafeContext
     {
         $id = (int) $fh;
 
-        $this->fhh[ $id ] = $fh;
-        $this->fhhToFclose[ $id ] = $fh;
+        $this->fhh[$id] = $fh;
+        $this->fhhToFclose[$id] = $fh;
 
         return $this;
     }
@@ -145,10 +145,10 @@ class FileSafeContext
     {
         $id = (int) $fh;
 
-        unset($this->fhhToFclose[ $id ]);
+        unset($this->fhhToFclose[$id]);
 
-        if (! isset($this->fhhToFrelease[ $id ])) {
-            unset($this->fhh[ $id ]);
+        if ( ! isset($this->fhhToFrelease[$id]) ) {
+            unset($this->fhh[$id]);
         }
 
         return $this;
@@ -162,8 +162,8 @@ class FileSafeContext
      */
     public function onFinallyUnlink($file)
     {
-        $this->files[ $file ] = true;
-        $this->filesToUnlink[ $file ] = true;
+        $this->files[$file] = true;
+        $this->filesToUnlink[$file] = true;
 
         return $this;
     }
@@ -175,8 +175,8 @@ class FileSafeContext
      */
     public function offFinallyUnlink($file)
     {
-        unset($this->files[ $file ]);
-        unset($this->filesToUnlink[ $file ]);
+        unset($this->files[$file]);
+        unset($this->filesToUnlink[$file]);
 
         return $this;
     }

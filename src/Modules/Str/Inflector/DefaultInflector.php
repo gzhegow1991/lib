@@ -54,8 +54,8 @@ class DefaultInflector implements InflectorInterface
      */
     public function withDoctrineInflector(?object $doctrineInflector) : object
     {
-        if (null !== $doctrineInflector) {
-            if (! is_a($doctrineInflector, $interface = static::DOCTRINE_INFLECTOR)) {
+        if ( null !== $doctrineInflector ) {
+            if ( ! is_a($doctrineInflector, $interface = static::DOCTRINE_INFLECTOR) ) {
                 throw new RuntimeException(
                     [
                         'The `doctrineInflector` should be an instance of: ' . $interface,
@@ -79,7 +79,7 @@ class DefaultInflector implements InflectorInterface
             'composer require doctrine/inflector',
         ];
 
-        if (! class_exists($doctrineInflectorClass = static::DOCTRINE_INFLECTOR)) {
+        if ( ! class_exists($doctrineInflectorClass = static::DOCTRINE_INFLECTOR) ) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -125,8 +125,8 @@ class DefaultInflector implements InflectorInterface
      */
     public function withSymfonyInflector(?object $symfonyInflector) : object
     {
-        if (null !== $symfonyInflector) {
-            if (! is_a($symfonyInflector, $interface = static::SYMFONY_INFLECTOR_INTERFACE)) {
+        if ( null !== $symfonyInflector ) {
+            if ( ! is_a($symfonyInflector, $interface = static::SYMFONY_INFLECTOR_INTERFACE) ) {
                 throw new RuntimeException(
                     [
                         'The `symfonyInflector` should be an instance of: ' . $interface,
@@ -151,7 +151,7 @@ class DefaultInflector implements InflectorInterface
             'composer require symfony/translation-contracts',
         ];
 
-        if (! class_exists($symfonyInflectorClass = static::SYMFONY_INFLECTOR_ENGLISH_INFLECTOR)) {
+        if ( ! class_exists($symfonyInflectorClass = static::SYMFONY_INFLECTOR_ENGLISH_INFLECTOR) ) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -182,7 +182,7 @@ class DefaultInflector implements InflectorInterface
 
         $useDoctrineInflector = $useDoctrineInflector ?? $classExists;
 
-        if ($useDoctrineInflector) {
+        if ( $useDoctrineInflector ) {
             $this->getDoctrineInflector();
         }
 
@@ -200,7 +200,7 @@ class DefaultInflector implements InflectorInterface
 
         $useSymfonyInflector = $useSymfonyInflector ?? $classExists;
 
-        if ($useSymfonyInflector) {
+        if ( $useSymfonyInflector ) {
             $this->getSymfonyInflector();
         }
 
@@ -217,7 +217,7 @@ class DefaultInflector implements InflectorInterface
 
         $list = [];
 
-        if ($this->useDoctrineInflector) {
+        if ( $this->useDoctrineInflector ) {
             try {
                 $list[] = $this->pluralizeUsingDoctrineInflector($singular);
             }
@@ -226,7 +226,7 @@ class DefaultInflector implements InflectorInterface
             }
         }
 
-        if ($this->useSymfonyInflector) {
+        if ( $this->useSymfonyInflector ) {
             try {
                 $list[] = $this->pluralizeUsingSymfonyInflector($singular);
             }
@@ -249,11 +249,11 @@ class DefaultInflector implements InflectorInterface
         $result = [];
 
         foreach ( $list as $i => $string ) {
-            if ($i < $offset) continue;
+            if ( $i < $offset ) continue;
 
-            $result[ $i ] = $string;
+            $result[$i] = $string;
 
-            if (! --$limit) break;
+            if ( ! --$limit ) break;
         }
 
         return $result;
@@ -266,7 +266,7 @@ class DefaultInflector implements InflectorInterface
 
         $list = [];
 
-        if ($this->useDoctrineInflector) {
+        if ( $this->useDoctrineInflector ) {
             try {
                 $list[] = $this->singularizeUsingDoctrineInflector($plural);
             }
@@ -275,7 +275,7 @@ class DefaultInflector implements InflectorInterface
             }
         }
 
-        if ($this->useSymfonyInflector) {
+        if ( $this->useSymfonyInflector ) {
             try {
                 $list[] = $this->singularizeUsingSymfonyInflector($plural);
             }
@@ -298,11 +298,11 @@ class DefaultInflector implements InflectorInterface
         $result = [];
 
         foreach ( $list as $i => $string ) {
-            if ($offset--) continue;
+            if ( $offset-- ) continue;
 
-            $result[ $i ] = $string;
+            $result[$i] = $string;
 
-            if (! --$limit) break;
+            if ( ! --$limit ) break;
         }
 
         return $result;
@@ -345,7 +345,7 @@ class DefaultInflector implements InflectorInterface
 
     protected function pluralizeUsingSimpleInflector(string $singular) : array
     {
-        if ('s' === substr($singular, -1)) {
+        if ( 's' === substr($singular, -1) ) {
             $string = $singular . 'es';
 
         } else {
@@ -361,7 +361,7 @@ class DefaultInflector implements InflectorInterface
     {
         $string = rtrim($plural, 'sS');
 
-        if ($plural !== $string) {
+        if ( $plural !== $string ) {
             $result = [ $string ];
 
         } else {

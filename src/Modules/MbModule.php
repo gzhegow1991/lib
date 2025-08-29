@@ -11,7 +11,7 @@ class MbModule
 {
     public function __construct()
     {
-        if (! extension_loaded('mbstring')) {
+        if ( ! extension_loaded('mbstring') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: mbstring' ]
             );
@@ -28,7 +28,7 @@ class MbModule
     {
         static $cache;
 
-        if (null === $detect_order) {
+        if ( null === $detect_order ) {
             $detect_order = [
                 'utf32',
                 'utf16',
@@ -46,7 +46,7 @@ class MbModule
                 'ucs',
             ];
 
-        } elseif ([] === $detect_order) {
+        } elseif ( [] === $detect_order ) {
             foreach ( explode(',', mb_detect_order()) as $encGroup ) {
                 $detect_order[] = $encGroup;
             }
@@ -61,21 +61,21 @@ class MbModule
             $encGroupString = strtolower($encGroupString);
             $encGroupString = str_replace([ ' ', '-' ], '', $encGroupString);
 
-            $groupsIndexPrioritized[ $encGroupString ] = ++$currentEncGroupPriority;
+            $groupsIndexPrioritized[$encGroupString] = ++$currentEncGroupPriority;
         }
 
         $cacheKey = crc32(serialize($groupsIndexPrioritized));
 
-        if (! isset($cache[ $cacheKey ])) {
+        if ( ! isset($cache[$cacheKey]) ) {
             $encsList = mb_list_encodings();
 
-            if ($thePhp->is_windows()) {
+            if ( $thePhp->is_windows() ) {
                 $encsList[] = 'CP1251';
                 $encsList[] = 'Windows-1251';
             }
 
             $remove = [];
-            if (PHP_VERSION_ID < 82000) {
+            if ( PHP_VERSION_ID < 82000 ) {
                 $remove = [
                     '7bit'            => true,
                     '8bit'            => true,
@@ -93,8 +93,8 @@ class MbModule
                 $encString = strtolower($encString);
                 $encString = str_replace([ ' ', '-' ], '', $encString);
 
-                if (! isset($remove[ $encString ])) {
-                    $encsIndexed[ $encString ] = $enc;
+                if ( ! isset($remove[$encString]) ) {
+                    $encsIndexed[$encString] = $enc;
                 }
             }
 
@@ -104,7 +104,7 @@ class MbModule
                 $currentEncGroupPriority = null;
 
                 foreach ( $groupsIndexPrioritized as $encGroup => $encGroupPriority ) {
-                    if (0 === stripos($encString, $encGroup)) {
+                    if ( 0 === stripos($encString, $encGroup) ) {
                         $currentEncGroup = $encGroup;
                         $currentEncGroupPriority = $encGroupPriority;
 
@@ -114,13 +114,13 @@ class MbModule
 
                 $currentEncGroupPriority = $currentEncGroupPriority ?? INF;
 
-                $encsOrder[ $enc ] = [ $currentEncGroup, $currentEncGroupPriority ];
+                $encsOrder[$enc] = [ $currentEncGroup, $currentEncGroupPriority ];
             }
 
             usort($encsIndexed,
                 static function ($encA, $encB) use (&$encsOrder) {
-                    $aPriority = $encsOrder[ $encA ][ 1 ];
-                    $bPriority = $encsOrder[ $encB ][ 1 ];
+                    $aPriority = $encsOrder[$encA][1];
+                    $bPriority = $encsOrder[$encB][1];
 
                     return 0
                         ?: ($aPriority <=> $bPriority)
@@ -131,15 +131,15 @@ class MbModule
 
             $encsByGroup = [];
             foreach ( $encsIndexed as $enc ) {
-                $encGroup = $encsOrder[ $enc ][ 0 ];
+                $encGroup = $encsOrder[$enc][0];
 
-                $encsByGroup[ $encGroup ][] = $enc;
+                $encsByGroup[$encGroup][] = $enc;
             }
 
-            $cache[ $cacheKey ] = [ $encsList, $encsByGroup ];
+            $cache[$cacheKey] = [ $encsList, $encsByGroup ];
         }
 
-        return $cache[ $cacheKey ];
+        return $cache[$cacheKey];
     }
 
     /**
@@ -152,15 +152,15 @@ class MbModule
         $encondings = $encondings ?? '';
         $strict = $strict ?? true;
 
-        if ('' === $encondings) {
+        if ( '' === $encondings ) {
             [ , $encsByGroup ] = $this->list_encodings();
 
-        } elseif (is_array($encondings)) {
+        } elseif ( is_array($encondings) ) {
             [ , $encsByGroup ] = $this->list_encodings($encondings);
 
-        } elseif (is_string($encondings)) {
+        } elseif ( is_string($encondings) ) {
             $encsByGroup = [];
-            $encsByGroup[ '' ] = array_map('trim', explode(',', $encondings));
+            $encsByGroup[''] = array_map('trim', explode(',', $encondings));
 
         } else {
             throw new LogicException(
@@ -170,7 +170,7 @@ class MbModule
 
         $result = [];
         foreach ( $encsByGroup as $encGroup => $encList ) {
-            $result[ $encGroup ] = mb_detect_encoding($string, $encList, $strict);
+            $result[$encGroup] = mb_detect_encoding($string, $encList, $strict);
         }
 
         return $result;
@@ -188,7 +188,7 @@ class MbModule
         $result = [];
 
         foreach ( $detectEncodingArray as $encGroup => $encoding ) {
-            $result[ $encGroup ] = mb_convert_encoding($string, $to_encoding, $encoding);
+            $result[$encGroup] = mb_convert_encoding($string, $to_encoding, $encoding);
         }
 
         return $result;
@@ -201,7 +201,7 @@ class MbModule
     public function lcfirst(string $string, ?string $mb_encoding = null) : string
     {
         $mbEncodingArgs = [];
-        if (null !== $mb_encoding) {
+        if ( null !== $mb_encoding ) {
             $mbEncodingArgs[] = $mb_encoding;
         }
 
@@ -219,7 +219,7 @@ class MbModule
     public function ucfirst(string $string, ?string $mb_encoding = null) : string
     {
         $mbEncodingArgs = [];
-        if (null !== $mb_encoding) {
+        if ( null !== $mb_encoding ) {
             $mbEncodingArgs[] = $mb_encoding;
         }
 
@@ -247,8 +247,8 @@ class MbModule
         $result = preg_replace_callback(
             $regex,
             function ($m) use ($mb_encoding) {
-                $first = $m[ 1 ];
-                $last = $this->lcfirst($m[ 2 ], $mb_encoding);
+                $first = $m[1];
+                $last = $this->lcfirst($m[2], $mb_encoding);
 
                 return "{$first}{$last}";
             },
@@ -273,8 +273,8 @@ class MbModule
         $result = preg_replace_callback(
             $regex,
             function ($m) use ($mb_encoding) {
-                $first = $m[ 1 ];
-                $last = $this->ucfirst($m[ 2 ], $mb_encoding);
+                $first = $m[1];
+                $last = $this->ucfirst($m[2], $mb_encoding);
 
                 return "{$first}{$last}";
             },
@@ -292,18 +292,18 @@ class MbModule
     {
         $length = $length ?? 1;
 
-        if ($length < 1) {
+        if ( $length < 1 ) {
             throw new LogicException(
                 [ 'The `length` should be GT 0', $length ]
             );
         }
 
         $mbEncodingArgs = [];
-        if (null !== $mb_encoding) {
+        if ( null !== $mb_encoding ) {
             $mbEncodingArgs[] = $mb_encoding;
         }
 
-        if (PHP_VERSION_ID >= 74000) {
+        if ( PHP_VERSION_ID >= 74000 ) {
             return mb_str_split($string, $length, ...$mbEncodingArgs);
         }
 

@@ -88,7 +88,7 @@ class MemcachedAdapter
             ?? static::fromMemcached($from)->orNull($ret)
             ?? static::fromArray($from)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -100,7 +100,7 @@ class MemcachedAdapter
      */
     public static function fromStatic($from, ?array $fallback = null)
     {
-        if ($from instanceof static) {
+        if ( $from instanceof static ) {
             return Ret::ok($fallback, $from);
         }
 
@@ -116,7 +116,7 @@ class MemcachedAdapter
      */
     public static function fromMemcached($from, ?array $fallback = null)
     {
-        if ($from instanceof \Memcached) {
+        if ( $from instanceof \Memcached ) {
             $instance = new static();
             $instance->memcached = $from;
 
@@ -135,7 +135,7 @@ class MemcachedAdapter
      */
     public static function fromArray($from, ?array $fallback = null)
     {
-        if (! is_array($from)) {
+        if ( ! is_array($from) ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `from` should be array', $from ],
@@ -168,44 +168,44 @@ class MemcachedAdapter
             'shard'                  => null,
         ];
 
-        $dsn = $from[ 0 ];
-        $namespace = $from[ 1 ];
-        $memcachedOptionsNew = $from[ 2 ];
+        $dsn = $from[0];
+        $namespace = $from[1];
+        $memcachedOptionsNew = $from[2];
 
-        if (null !== $dsn) {
-            $from[ 'dsn' ] = $dsn;
+        if ( null !== $dsn ) {
+            $from['dsn'] = $dsn;
         }
-        if (null !== $namespace) {
-            $from[ 'namespace' ] = $namespace;
+        if ( null !== $namespace ) {
+            $from['namespace'] = $namespace;
         }
-        if (null !== $memcachedOptionsNew) {
-            $from[ 'memcached_options_new' ] = $memcachedOptionsNew;
+        if ( null !== $memcachedOptionsNew ) {
+            $from['memcached_options_new'] = $memcachedOptionsNew;
         }
 
-        $memcached = $from[ 'memcached' ];
-        $memcachedOptionsNew = $from[ 'memcached_options_new' ] ?? [];
-        $memcachedOptionsBoot = $from[ 'memcached_options_boot' ] ?? [];
+        $memcached = $from['memcached'];
+        $memcachedOptionsNew = $from['memcached_options_new'] ?? [];
+        $memcachedOptionsBoot = $from['memcached_options_boot'] ?? [];
 
-        $dsn = $from[ 'dsn' ];
-        $host = $from[ 'host' ];
-        $port = $from[ 'port' ];
-        $sock = $from[ 'sock' ];
+        $dsn = $from['dsn'];
+        $host = $from['host'];
+        $port = $from['port'];
+        $sock = $from['sock'];
 
-        $weight = $from[ 'weight' ];
+        $weight = $from['weight'];
 
-        $namespace = $from[ 'namespace' ];
+        $namespace = $from['namespace'];
 
-        $userOptions = $from[ 'user_options' ] ?? [];
+        $userOptions = $from['user_options'] ?? [];
 
-        $shardList = $from[ 'shard' ];
+        $shardList = $from['shard'];
 
         $isMemcached = (null !== $memcached);
         $isDsn = (null !== $dsn);
         $isHost = (null !== $host);
         $isSock = (null !== $sock);
 
-        if ($isMemcached) {
-            if (! ($memcached instanceof \Memcached)) {
+        if ( $isMemcached ) {
+            if ( ! ($memcached instanceof \Memcached) ) {
                 return Ret::throw(
                     $fallback,
                     [ 'The `redis` should be instance of: ' . \Redis::class, $memcached ],
@@ -217,35 +217,35 @@ class MemcachedAdapter
             $port = null;
             $sock = null;
 
-        } elseif ($isDsn) {
+        } elseif ( $isDsn ) {
             $status = $theType->url(
                 $dsn, null, null,
                 0, 0,
                 [ &$parseUrl ]
             )->isOk([ &$dsn, &$ret ]);
 
-            if (false === $status) {
+            if ( false === $status ) {
                 return Ret::throw($fallback, $ret);
             }
 
-            $host = $host ?? $parseUrl[ 'host' ] ?? null;
-            $port = $port ?? $parseUrl[ 'port' ] ?? null;
+            $host = $host ?? $parseUrl['host'] ?? null;
+            $port = $port ?? $parseUrl['port'] ?? null;
 
-            $query = $parseUrl[ 'query' ] ?? '';
+            $query = $parseUrl['query'] ?? '';
 
-            if ('' !== $query) {
+            if ( '' !== $query ) {
                 parse_str($query, $query);
 
-                if ([] !== $query) {
+                if ( [] !== $query ) {
                     $memcachedOptionsNew += $query;
                 }
             }
 
-        } elseif ($isHost) {
+        } elseif ( $isHost ) {
             $memcached = null;
             $sock = null;
 
-        } elseif ($isSock) {
+        } elseif ( $isSock ) {
             $memcached = null;
             $host = null;
             $port = null;
@@ -267,56 +267,56 @@ class MemcachedAdapter
             );
         }
 
-        if ($isMemcached) {
+        if ( $isMemcached ) {
             //
 
-        } elseif ($isDsn || $isHost) {
-            if (! $theType->string_not_empty($host)->isOk([ &$host, &$ret ])) {
+        } elseif ( $isDsn || $isHost ) {
+            if ( ! $theType->string_not_empty($host)->isOk([ &$host, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
 
             $port = $port ?: 11211;
 
-            if (! $theType->int_positive($port)->isOk([ &$port, &$ret ])) {
+            if ( ! $theType->int_positive($port)->isOk([ &$port, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
 
-        } elseif ($isSock) {
-            if (! $theType->string_not_empty($sock)->isOk([ &$sock, &$ret ])) {
+        } elseif ( $isSock ) {
+            if ( ! $theType->string_not_empty($sock)->isOk([ &$sock, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
 
         $weight = $weight ?: 0;
 
-        if (! $theType->int_non_negative($weight)->isOk([ &$weight, &$ret ])) {
+        if ( ! $theType->int_non_negative($weight)->isOk([ &$weight, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
-        if (null !== $namespace) {
-            if (! $theType->string_not_empty($namespace)->isOk([ &$namespace, &$ret ])) {
+        if ( null !== $namespace ) {
+            if ( ! $theType->string_not_empty($namespace)->isOk([ &$namespace, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
 
-        if (is_array($memcachedOptionsNew)) {
-            $persistentId = $memcachedOptionsNew[ 'persistent_id' ] ?? null;
-            $connectionStr = $memcachedOptionsNew[ 'connection_str' ] ?? null;
+        if ( is_array($memcachedOptionsNew) ) {
+            $persistentId = $memcachedOptionsNew['persistent_id'] ?? null;
+            $connectionStr = $memcachedOptionsNew['connection_str'] ?? null;
 
-            if (null !== $persistentId) {
-                if (! $theType->string_not_empty($persistentId)->isOk([ &$persistentId, &$ret ])) {
+            if ( null !== $persistentId ) {
+                if ( ! $theType->string_not_empty($persistentId)->isOk([ &$persistentId, &$ret ]) ) {
                     return Ret::throw($fallback, $ret);
                 }
 
-                $memcachedOptionsNew[ 'persistent_id' ] = $persistentId;
+                $memcachedOptionsNew['persistent_id'] = $persistentId;
             }
 
-            if (null !== $connectionStr) {
-                if (! $theType->string_not_empty($connectionStr)->isOk([ &$connectionStr, &$ret ])) {
+            if ( null !== $connectionStr ) {
+                if ( ! $theType->string_not_empty($connectionStr)->isOk([ &$connectionStr, &$ret ]) ) {
                     return Ret::throw($fallback, $ret);
                 }
 
-                $memcachedOptionsNew[ 'connection_str' ] = $connectionStr;
+                $memcachedOptionsNew['connection_str'] = $connectionStr;
             }
         }
 
@@ -337,14 +337,14 @@ class MemcachedAdapter
         //
         $instance->configUserOptions = $userOptions;
 
-        if (is_array($shardList)) {
+        if ( is_array($shardList) ) {
             $configDefault = $instance->getConfigDefault();
 
             // > `dsn` key is not supported for shard servers for now
-            unset($configDefault[ 'dsn' ]);
+            unset($configDefault['dsn']);
 
             foreach ( $shardList as $i => $r ) {
-                if (! is_array($r)) {
+                if ( ! is_array($r) ) {
                     return Ret::throw(
                         $fallback,
                         [ 'Each of `from[shard]` should be array', $from, $r, $i ],
@@ -352,7 +352,7 @@ class MemcachedAdapter
                     );
                 }
 
-                if ($diff = array_diff_key($r, $configDefault)) {
+                if ( $diff = array_diff_key($r, $configDefault) ) {
                     return Ret::throw(
                         $fallback,
                         [
@@ -401,8 +401,8 @@ class MemcachedAdapter
     {
         $memcachedOptionsNew = $this->configMemcachedOptionsNew;
 
-        $persistentId = $memcachedOptionsNew[ 'persistent_id' ] ?? null;
-        $connectionStr = $memcachedOptionsNew[ 'connection_str' ] ?? null;
+        $persistentId = $memcachedOptionsNew['persistent_id'] ?? null;
+        $connectionStr = $memcachedOptionsNew['connection_str'] ?? null;
 
         $fnOnNewObjectCb = function (\Memcached $m) use ($configValid) {
             $this->memcachedAddServers($m, $configValid);
@@ -423,7 +423,7 @@ class MemcachedAdapter
     {
         $memcached = null;
 
-        if (null !== $this->memcached) {
+        if ( null !== $this->memcached ) {
             $memcached = $this->memcached;
 
             return true;
@@ -434,7 +434,7 @@ class MemcachedAdapter
 
     public function getMemcached() : \Memcached
     {
-        if (null === $this->memcached) {
+        if ( null === $this->memcached ) {
             $configDefault = $this->getConfigDefault();
 
             $memcached = $this->newMemcachedFromConfig($configDefault);
@@ -452,7 +452,7 @@ class MemcachedAdapter
 
         $configs = [];
         foreach ( $this->configShardList as $i => $config ) {
-            $configs[ $i ] = []
+            $configs[$i] = []
                 + $config
                 + $configDefault;
         }
@@ -483,7 +483,7 @@ class MemcachedAdapter
     {
         $namespace = $this->configNamespace;
 
-        if (null !== $namespace) {
+        if ( null !== $namespace ) {
             $memcached->setOption(\Memcached::OPT_PREFIX_KEY, "{$namespace}:");
         }
 
@@ -493,15 +493,15 @@ class MemcachedAdapter
 
     protected function memcachedEnsureOptionsBoot(\Memcached $memcached, array $configValid) : void
     {
-        $memcachedOptionsBoot = $configValid[ 'memcached_options_boot' ] ?? [];
-        if ([] === $memcachedOptionsBoot) {
+        $memcachedOptionsBoot = $configValid['memcached_options_boot'] ?? [];
+        if ( [] === $memcachedOptionsBoot ) {
             return;
         }
 
         foreach ( $memcachedOptionsBoot as $memcachedOpt => $value ) {
             $status = $memcached->setOption($memcachedOpt, $value);
 
-            if (false === $status) {
+            if ( false === $status ) {
                 throw new RuntimeException(
                     [ 'Unable to set `memcached_options_boot` on \PDO object', $memcachedOptionsBoot ]
                 );
@@ -513,7 +513,7 @@ class MemcachedAdapter
     {
         $fn = $this->fnEnsureOptionsUser;
 
-        if (null !== $fn) {
+        if ( null !== $fn ) {
             call_user_func($fn, $memcached, $configValid, $this);
         }
     }
@@ -529,44 +529,44 @@ class MemcachedAdapter
         $weight = $this->configWeight;
         $shardList = $this->configShardList;
 
-        if (null !== $sock) {
-            $serverList[ "{$sock}:0" ] = [ $sock, 0, $weight ];
+        if ( null !== $sock ) {
+            $serverList["{$sock}:0"] = [ $sock, 0, $weight ];
 
         } else {
             // } elseif (null !== $host) {
-            $serverList[ "{$host}:{$port}" ] = [ $host, $port, $weight ];
+            $serverList["{$host}:{$port}"] = [ $host, $port, $weight ];
         }
 
-        if (is_array($shardList)) {
+        if ( is_array($shardList) ) {
             foreach ( $shardList as $s ) {
                 $s += $configValid;
 
-                $sHost = $s[ 'host' ];
-                $sPort = $s[ 'port' ];
-                $sSock = $s[ 'sock' ];
-                $sWeight = $s[ 'weight' ];
+                $sHost = $s['host'];
+                $sPort = $s['port'];
+                $sSock = $s['sock'];
+                $sWeight = $s['weight'];
 
-                if (null !== $sSock) {
+                if ( null !== $sSock ) {
                     $key = "{$sSock}:0";
 
-                    if (isset($serverList[ $key ])) {
+                    if ( isset($serverList[$key]) ) {
                         throw new RuntimeException(
                             [ 'This server key is already registered: ' . $key ]
                         );
                     }
 
-                    $serverList[ $key ] = [ $sSock, 0, $sWeight ];
+                    $serverList[$key] = [ $sSock, 0, $sWeight ];
 
-                } elseif (null !== $sHost) {
+                } elseif ( null !== $sHost ) {
                     $key = "{$sHost}:{$sPort}";
 
-                    if (isset($serverList[ $key ])) {
+                    if ( isset($serverList[$key]) ) {
                         throw new RuntimeException(
                             [ 'This server key is already registered: ' . $key ]
                         );
                     }
 
-                    $serverList[ $key ] = [ $sHost, $sPort, $sWeight ];
+                    $serverList[$key] = [ $sHost, $sPort, $sWeight ];
                 }
             }
         }

@@ -32,7 +32,7 @@ class ArrStrict implements
             ?? static::fromStatic($from)->orNull($ret)
             ?? static::fromValidArray($from)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -44,7 +44,7 @@ class ArrStrict implements
      */
     public static function fromStatic($from, ?array $fallback = null)
     {
-        if ($from instanceof static) {
+        if ( $from instanceof static ) {
             return Ret::ok($fallback, $from);
         }
 
@@ -60,7 +60,7 @@ class ArrStrict implements
      */
     public static function fromValidArray($from, ?array $fallback = null)
     {
-        if (is_array($from)) {
+        if ( is_array($from) ) {
             $instance = new static();
             $instance->array = $from;
 
@@ -106,12 +106,12 @@ class ArrStrict implements
     {
         $refValue = null;
 
-        if (array_key_exists($key, $this->array)) {
-            if (is_array($this->array[ $key ])) {
-                $refValue = static::fromValidArray($this->array[ $key ])->orThrow();
+        if ( array_key_exists($key, $this->array) ) {
+            if ( is_array($this->array[$key]) ) {
+                $refValue = static::fromValidArray($this->array[$key])->orThrow();
 
             } else {
-                $refValue = $this->array[ $key ];
+                $refValue = $this->array[$key];
             }
 
             return true;
@@ -124,12 +124,12 @@ class ArrStrict implements
     {
         $refValue = null;
 
-        if (isset($this->array[ $key ])) {
-            if (is_array($this->array[ $key ])) {
-                $refValue = static::fromValidArray($this->array[ $key ])->orThrow();
+        if ( isset($this->array[$key]) ) {
+            if ( is_array($this->array[$key]) ) {
+                $refValue = static::fromValidArray($this->array[$key])->orThrow();
 
             } else {
-                $refValue = $this->array[ $key ];
+                $refValue = $this->array[$key];
             }
 
             return true;
@@ -143,12 +143,12 @@ class ArrStrict implements
      */
     public function get($key, array $fallback = [])
     {
-        if (array_key_exists($key, $this->array)) {
-            return $this->array[ $key ];
+        if ( array_key_exists($key, $this->array) ) {
+            return $this->array[$key];
         }
 
-        if ([] !== $fallback) {
-            return $fallback[ 0 ];
+        if ( [] !== $fallback ) {
+            return $fallback[0];
         }
 
         throw new RuntimeException(

@@ -17,7 +17,7 @@ class FormatBaseN
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueString, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueString, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -35,13 +35,13 @@ class FormatBaseN
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($base64)->isOk([ &$base64String, &$ret ])) {
+        if ( ! $theType->string_not_empty($base64)->isOk([ &$base64String, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
         $b64 = base64_decode($base64String, true);
 
-        if (false === $b64) {
+        if ( false === $b64 ) {
             return Ret::throw(
                 $fallback,
                 [ 'Unable to decode value from base64', $base64 ],

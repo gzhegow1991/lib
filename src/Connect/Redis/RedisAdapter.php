@@ -93,7 +93,7 @@ class RedisAdapter
             ?? static::fromRedis($from)->orNull($ret)
             ?? static::fromArray($from)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -105,7 +105,7 @@ class RedisAdapter
      */
     public static function fromStatic($from, ?array $fallback = null)
     {
-        if ($from instanceof static) {
+        if ( $from instanceof static ) {
             return Ret::ok($fallback, $from);
         }
 
@@ -121,7 +121,7 @@ class RedisAdapter
      */
     public static function fromRedis($from, ?array $fallback = null)
     {
-        if ($from instanceof \Redis) {
+        if ( $from instanceof \Redis ) {
             $instance = new static();
             $instance->redis = $from;
 
@@ -140,7 +140,7 @@ class RedisAdapter
      */
     public static function fromArray($from, ?array $fallback = null)
     {
-        if (! is_array($from)) {
+        if ( ! is_array($from) ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `from` should be array', $from ],
@@ -174,52 +174,52 @@ class RedisAdapter
             'user_options'       => null,
         ];
 
-        $dsn = $from[ 0 ];
-        $credentials = $password = $from[ 1 ];
-        $namespace = $from[ 2 ];
-        $redisOptionsNew = $from[ 3 ];
+        $dsn = $from[0];
+        $credentials = $password = $from[1];
+        $namespace = $from[2];
+        $redisOptionsNew = $from[3];
 
-        if (null !== $dsn) {
-            $from[ 'dsn' ] = $dsn;
+        if ( null !== $dsn ) {
+            $from['dsn'] = $dsn;
         }
-        if (is_array($credentials)) {
-            $from[ 'credentials' ] = $credentials;
+        if ( is_array($credentials) ) {
+            $from['credentials'] = $credentials;
         }
-        if (is_string($password)) {
-            $from[ 'password' ] = $password;
+        if ( is_string($password) ) {
+            $from['password'] = $password;
         }
-        if (null !== $namespace) {
-            $from[ 'namespace' ] = $namespace;
-        }
-
-        if (null !== $redisOptionsNew) {
-            $from[ 'redis_options_new' ] = $redisOptionsNew;
+        if ( null !== $namespace ) {
+            $from['namespace'] = $namespace;
         }
 
-        $redis = $from[ 'redis' ];
-        $redisOptionsNew = $from[ 'redis_options_new' ] ?? [];
-        $redisOptionsBoot = $from[ 'redis_options_boot' ] ?? [];
+        if ( null !== $redisOptionsNew ) {
+            $from['redis_options_new'] = $redisOptionsNew;
+        }
 
-        $dsn = $from[ 'dsn' ];
-        $host = $from[ 'host' ];
-        $port = $from[ 'port' ];
-        $sock = $from[ 'sock' ];
+        $redis = $from['redis'];
+        $redisOptionsNew = $from['redis_options_new'] ?? [];
+        $redisOptionsBoot = $from['redis_options_boot'] ?? [];
 
-        $credentials = $from[ 'credentials' ];
-        $password = $from[ 'password' ];
+        $dsn = $from['dsn'];
+        $host = $from['host'];
+        $port = $from['port'];
+        $sock = $from['sock'];
 
-        $database = $from[ 'database' ];
-        $namespace = $from[ 'namespace' ];
+        $credentials = $from['credentials'];
+        $password = $from['password'];
 
-        $userOptions = $from[ 'user_options' ] ?? [];
+        $database = $from['database'];
+        $namespace = $from['namespace'];
+
+        $userOptions = $from['user_options'] ?? [];
 
         $isRedis = (null !== $redis);
         $isDsn = (null !== $dsn);
         $isHost = (null !== $host);
         $isSock = (null !== $sock);
 
-        if ($isRedis) {
-            if (! ($redis instanceof \Redis)) {
+        if ( $isRedis ) {
+            if ( ! ($redis instanceof \Redis) ) {
                 return Ret::throw(
                     $fallback,
                     [ 'The `redis` should be instance of: ' . \Redis::class, $redis ],
@@ -231,48 +231,48 @@ class RedisAdapter
             $port = null;
             $sock = null;
 
-        } elseif ($isDsn) {
-            if (! $theType->url(
+        } elseif ( $isDsn ) {
+            if ( ! $theType->url(
                 $dsn, null, null,
                 0, 0,
                 [ &$parseUrl ]
-            )->isOk([ &$dsn, &$ret ])) {
+            )->isOk([ &$dsn, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
 
-            $host = $host ?? $parseUrl[ 'host' ] ?? null;
-            $port = $port ?? $parseUrl[ 'port' ] ?? null;
-            $password = $password ?? $parseUrl[ 'pass' ] ?? null;
+            $host = $host ?? $parseUrl['host'] ?? null;
+            $port = $port ?? $parseUrl['port'] ?? null;
+            $password = $password ?? $parseUrl['pass'] ?? null;
 
-            $path = $parseUrl[ 'path' ] ?? '';
-            $query = $parseUrl[ 'query' ] ?? '';
+            $path = $parseUrl['path'] ?? '';
+            $query = $parseUrl['query'] ?? '';
 
-            if ('' !== $path) {
+            if ( '' !== $path ) {
                 $pos = strrpos($path, '/');
 
-                if ($pos !== false) {
+                if ( $pos !== false ) {
                     $database = $database ?? substr($path, $pos + 1);
                     $path = substr($path, 0, $pos);
 
-                    if (basename($path, '.sock') !== basename($path)) {
+                    if ( basename($path, '.sock') !== basename($path) ) {
                         $sock = $path;
                     }
                 }
             }
 
-            if ('' !== $query) {
+            if ( '' !== $query ) {
                 parse_str($query, $query);
 
-                if ([] !== $query) {
+                if ( [] !== $query ) {
                     $redisOptionsNew += $query;
                 }
             }
 
-        } elseif ($isHost) {
+        } elseif ( $isHost ) {
             $redis = null;
             $sock = null;
 
-        } elseif ($isSock) {
+        } elseif ( $isSock ) {
             $redis = null;
             $host = null;
             $port = null;
@@ -294,52 +294,52 @@ class RedisAdapter
             );
         }
 
-        if ($isRedis) {
+        if ( $isRedis ) {
             //
 
-        } elseif ($isDsn || $isHost) {
-            if (! $theType->string_not_empty($host)->isOk([ &$host, &$ret ])) {
+        } elseif ( $isDsn || $isHost ) {
+            if ( ! $theType->string_not_empty($host)->isOk([ &$host, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
 
             $port = $port ?: 6379;
 
-            if (! $theType->int_positive($port)->isOk([ &$port, &$ret ])) {
+            if ( ! $theType->int_positive($port)->isOk([ &$port, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
 
-        } elseif ($isSock) {
-            if (! $theType->string_not_empty($sock)->isOk([ &$sock, &$ret ])) {
+        } elseif ( $isSock ) {
+            if ( ! $theType->string_not_empty($sock)->isOk([ &$sock, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
 
-        if (null !== $credentials) {
-            if (! $theType->list_sorted($credentials)->isOk([ &$credentials, &$ret ])) {
+        if ( null !== $credentials ) {
+            if ( ! $theType->list_sorted($credentials)->isOk([ &$credentials, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
-            if (! $theType->string_not_empty($credentials[ 0 ] ?? null)->isOk([ 1 => &$ret ])) {
+            if ( ! $theType->string_not_empty($credentials[0] ?? null)->isOk([ 1 => &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
-            if (! $theType->string($credentials[ 1 ] ?? null)->isOk([ 1 => &$ret ])) {
+            if ( ! $theType->string($credentials[1] ?? null)->isOk([ 1 => &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
 
-        if (null !== $password) {
-            if (! $theType->string($password)->isOk([ &$password, &$ret ])) {
+        if ( null !== $password ) {
+            if ( ! $theType->string($password)->isOk([ &$password, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
 
         $database = $database ?: '0';
 
-        if (! $theType->int_non_negative($database)->isOk([ &$database, &$ret ])) {
+        if ( ! $theType->int_non_negative($database)->isOk([ &$database, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
-        if (null !== $namespace) {
-            if (! $theType->string_not_empty($namespace)->isOk([ &$namespace, &$ret ])) {
+        if ( null !== $namespace ) {
+            if ( ! $theType->string_not_empty($namespace)->isOk([ &$namespace, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
@@ -411,11 +411,11 @@ class RedisAdapter
             'user_options'       => null,
         ];
 
-        if (null !== $configValid[ 'redis' ]) {
-            $redis = $configValid[ 'redis' ];
+        if ( null !== $configValid['redis'] ) {
+            $redis = $configValid['redis'];
 
         } else {
-            $redisOptionsNew = $configValid[ 'redis_options_new' ];
+            $redisOptionsNew = $configValid['redis_options_new'];
 
             try {
                 $redis = new \Redis($redisOptionsNew);
@@ -441,7 +441,7 @@ class RedisAdapter
     {
         $redis = null;
 
-        if (null !== $this->redis) {
+        if ( null !== $this->redis ) {
             $redis = $this->redis;
 
             return true;
@@ -452,7 +452,7 @@ class RedisAdapter
 
     public function getRedis() : \Redis
     {
-        if (null === $this->redis) {
+        if ( null === $this->redis ) {
             $config = $this->getConfig();
 
             $redis = $this->newRedisFromConfig($config);
@@ -484,9 +484,9 @@ class RedisAdapter
 
     protected function redisEnsureOptionsDefault(\Redis $redis, array $configValid) : void
     {
-        $namespace = $configValid[ 'namespace' ];
+        $namespace = $configValid['namespace'];
 
-        if (null !== $namespace) {
+        if ( null !== $namespace ) {
             $redis->setOption(\Redis::OPT_PREFIX, "{$namespace}:");
         }
 
@@ -499,15 +499,15 @@ class RedisAdapter
 
     protected function redisEnsureOptionsBoot(\Redis $redis, array $configValid) : void
     {
-        $redisOptionsBoot = $configValid[ 'redis_options_boot' ] ?? [];
-        if ([] === $redisOptionsBoot) {
+        $redisOptionsBoot = $configValid['redis_options_boot'] ?? [];
+        if ( [] === $redisOptionsBoot ) {
             return;
         }
 
         foreach ( $redisOptionsBoot as $redisOpt => $value ) {
             $status = $redis->setOption($redisOpt, $value);
 
-            if (false === $status) {
+            if ( false === $status ) {
                 throw new RuntimeException(
                     [ 'Unable to set `pdo_options` on \PDO object', $redisOptionsBoot ]
                 );
@@ -519,7 +519,7 @@ class RedisAdapter
     {
         $fn = $this->fnEnsureOptionsUser;
 
-        if (null !== $fn) {
+        if ( null !== $fn ) {
             call_user_func($fn, $redis, $configValid, $this);
         }
     }
@@ -529,15 +529,15 @@ class RedisAdapter
     {
         $theFunc = Lib::func();
 
-        $host = $configValid[ 'host' ];
-        $port = $configValid[ 'port' ];
-        $sock = $configValid[ 'sock' ];
+        $host = $configValid['host'];
+        $port = $configValid['port'];
+        $sock = $configValid['sock'];
 
         $connectArgs = [];
-        if (null !== $sock) {
+        if ( null !== $sock ) {
             $connectArgs[] = $sock;
 
-        } elseif ((null !== $host) && (null !== $port)) {
+        } elseif ( (null !== $host) && (null !== $port) ) {
             $connectArgs[] = $host;
             $connectArgs[] = $port;
 
@@ -562,7 +562,7 @@ class RedisAdapter
             $exception = $e;
         }
 
-        if (false === $status) {
+        if ( false === $status ) {
             throw new RemoteException(
                 [ 'Unable to ' . __FUNCTION__ . ': ' . $error ],
                 $exception
@@ -574,13 +574,13 @@ class RedisAdapter
     {
         $theFunc = Lib::func();
 
-        $redisCredentials = $configValid[ 'credentials' ];
-        $redisPassword = $configValid[ 'password' ];
+        $redisCredentials = $configValid['credentials'];
+        $redisPassword = $configValid['password'];
 
-        if (null !== $redisCredentials) {
+        if ( null !== $redisCredentials ) {
             $authArgs = [ $redisCredentials ];
 
-        } elseif (null !== $redisPassword) {
+        } elseif ( null !== $redisPassword ) {
             $authArgs = [ $redisPassword ];
 
         } else {
@@ -602,7 +602,7 @@ class RedisAdapter
             $exception = $e;
         }
 
-        if (false === $status) {
+        if ( false === $status ) {
             throw new RemoteException(
                 [ 'Unable to ' . __METHOD__ . ': ' . $error ],
                 $exception
@@ -614,7 +614,7 @@ class RedisAdapter
     {
         $theFunc = Lib::func();
 
-        $database = $configValid[ 'database' ];
+        $database = $configValid['database'];
 
         $error = 'Status is false';
         $exception = null;
@@ -631,7 +631,7 @@ class RedisAdapter
             $exception = $e;
         }
 
-        if (false === $status) {
+        if ( false === $status ) {
             throw new RemoteException(
                 [ 'Unable to ' . __METHOD__ . ': ' . $error ],
                 $exception

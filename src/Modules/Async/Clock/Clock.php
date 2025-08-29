@@ -26,7 +26,7 @@ class Clock
     {
         $timeout = static::getInstance()->setTimeout($waitMs, $fn);
 
-        if (Clock::$isDebug) {
+        if ( Clock::$isDebug ) {
             $theDebug = Lib::debug();
 
             $timeout->debugInfo = $theDebug->file_line();
@@ -57,7 +57,7 @@ class Clock
     {
         $interval = static::getInstance()->setInterval($waitMs, $fn);
 
-        if (Clock::$isDebug) {
+        if ( Clock::$isDebug ) {
             $theDebug = Lib::debug();
 
             $interval->debugInfo = $theDebug->file_line();

@@ -36,7 +36,7 @@ abstract class AbstractConfig implements
 
         $publicVars = $thePhp->get_object_vars($this, null);
 
-        if ([] !== $publicVars) {
+        if ( [] !== $publicVars ) {
             throw new LogicException(
                 [ 'The configuration must not have any public properties', $this ]
             );
@@ -50,14 +50,14 @@ abstract class AbstractConfig implements
         ];
 
         foreach ( get_object_vars($this) as $key => $value ) {
-            if (isset($__ignore[ $key ])) {
+            if ( isset($__ignore[$key]) ) {
                 continue;
             }
 
-            $this->__keys[ $key ] = true;
+            $this->__keys[$key] = true;
 
-            if ($value instanceof self) {
-                $this->__children[ $key ] = $value;
+            if ( $value instanceof self ) {
+                $this->__children[$key] = $value;
             }
         }
     }
@@ -74,7 +74,7 @@ abstract class AbstractConfig implements
             ?? static::fromStatic($from)->orNull($ret)
             ?? static::fromArray($from)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -86,7 +86,7 @@ abstract class AbstractConfig implements
      */
     public static function fromStatic($from, ?array $fallback = null)
     {
-        if ($from instanceof static) {
+        if ( $from instanceof static ) {
             return Ret::ok($fallback, $from);
         }
 
@@ -102,7 +102,7 @@ abstract class AbstractConfig implements
      */
     public static function fromArray($from, ?array $fallback = null)
     {
-        if (! is_array($from)) {
+        if ( ! is_array($from) ) {
             return Ret::throw(
                 $fallback,
                 [],
@@ -153,11 +153,11 @@ abstract class AbstractConfig implements
         $result = [];
 
         foreach ( array_keys($this->__keys) as $key ) {
-            if (isset($this->__children[ $key ])) {
-                $result[ $key ] = $this->{$key}->toArray();
+            if ( isset($this->__children[$key]) ) {
+                $result[$key] = $this->{$key}->toArray();
 
             } else {
-                $result[ $key ] = $this->{$key};
+                $result[$key] = $this->{$key};
             }
         }
 
@@ -170,13 +170,13 @@ abstract class AbstractConfig implements
      */
     public function configure(?\Closure $fn = null, array $context = []) : void
     {
-        if (null !== $fn) {
+        if ( null !== $fn ) {
             $this->invalidate();
 
             $this->__validate = false;
 
             foreach ( array_keys($this->__keys) as $key ) {
-                if (isset($this->__children[ $key ])) {
+                if ( isset($this->__children[$key]) ) {
                     $this->{$key}->__validate = false;
                 }
             }
@@ -184,7 +184,7 @@ abstract class AbstractConfig implements
             call_user_func_array($fn, [ $this, $context ]);
 
             foreach ( array_keys($this->__keys) as $key ) {
-                if (isset($this->__children[ $key ])) {
+                if ( isset($this->__children[$key]) ) {
                     $this->{$key}->__validate = true;
                 }
             }
@@ -206,24 +206,24 @@ abstract class AbstractConfig implements
      */
     public function validate(array $context = []) : void
     {
-        if (null === $this->__valid) {
-            $refContext =& $context[ 1 ];
+        if ( null === $this->__valid ) {
+            $refContext =& $context[1];
             $refContext = $refContext ?? [];
 
-            $refContext[ '__path' ] = [];
-            $refContext[ '__key' ] = null;
-            $refContext[ '__parent' ] = null;
-            $refContext[ '__root' ] = $this;
+            $refContext['__path'] = [];
+            $refContext['__key'] = null;
+            $refContext['__parent'] = null;
+            $refContext['__root'] = $this;
 
             $this->__valid = $this->validationRecursive($context);
 
-            unset($refContext[ '__path' ]);
-            unset($refContext[ '__key' ]);
-            unset($refContext[ '__parent' ]);
-            unset($refContext[ '__root' ]);
+            unset($refContext['__path']);
+            unset($refContext['__key']);
+            unset($refContext['__parent']);
+            unset($refContext['__root']);
         }
 
-        if (false === $this->__valid) {
+        if ( false === $this->__valid ) {
             throw new RuntimeException(
                 [ 'Configuration is invalid', $this ]
             );
@@ -235,7 +235,7 @@ abstract class AbstractConfig implements
     {
         $value = null;
 
-        if (! isset($this->__keys[ $name ])) {
+        if ( ! isset($this->__keys[$name]) ) {
             return false;
         }
 
@@ -248,11 +248,11 @@ abstract class AbstractConfig implements
     {
         $value = null;
 
-        if (! isset($this->__keys[ $name ])) {
+        if ( ! isset($this->__keys[$name]) ) {
             return false;
         }
 
-        if (null === $this->{$name}) {
+        if ( null === $this->{$name} ) {
             return false;
         }
 
@@ -265,15 +265,15 @@ abstract class AbstractConfig implements
     {
         $error = null;
 
-        if (! isset($this->__keys[ $name ])) {
+        if ( ! isset($this->__keys[$name]) ) {
             $error = [
                 [ 'Missing property: ' . $name ],
                 [ __FILE__, __LINE__ ],
             ];
         }
 
-        if (null === $error) {
-            if (true === $this->__validate) {
+        if ( null === $error ) {
+            if ( true === $this->__validate ) {
                 try {
                     $this->validate();
                 }
@@ -284,7 +284,7 @@ abstract class AbstractConfig implements
                     ];
                 }
 
-                if (false === $this->__valid) {
+                if ( false === $this->__valid ) {
                     $error = [
                         [ 'The config is invalid', $this ],
                         [ __FILE__, __LINE__ ],
@@ -293,8 +293,8 @@ abstract class AbstractConfig implements
             }
         }
 
-        if (null !== $error) {
-            if ([] !== $fallback) {
+        if ( null !== $error ) {
+            if ( [] !== $fallback ) {
                 [ $fallback ] = $fallback;
 
                 return $fallback;
@@ -311,7 +311,7 @@ abstract class AbstractConfig implements
      */
     public function set($name, $value)
     {
-        if (! isset($this->__keys[ $name ])) {
+        if ( ! isset($this->__keys[$name]) ) {
             throw new LogicException(
                 [ 'Missing property: ' . $name, $name ]
             );
@@ -319,7 +319,7 @@ abstract class AbstractConfig implements
 
         $this->invalidate();
 
-        if (isset($this->__children[ $name ])) {
+        if ( isset($this->__children[$name]) ) {
             /** @var self $child */
 
             $child = $this->{$name};
@@ -337,7 +337,7 @@ abstract class AbstractConfig implements
      */
     public function unset($name)
     {
-        if (! isset($this->__keys[ $name ])) {
+        if ( ! isset($this->__keys[$name]) ) {
             throw new LogicException(
                 'Missing property: ' . $name
             );
@@ -347,7 +347,7 @@ abstract class AbstractConfig implements
 
         $valueDefault = (new static())->{$name};
 
-        if (isset($this->__children[ $name ])) {
+        if ( isset($this->__children[$name]) ) {
             $this->{$name}->fill($valueDefault);
 
         } else {
@@ -374,14 +374,14 @@ abstract class AbstractConfig implements
     public function load(array $config)
     {
         foreach ( $this->__keys as $key => $bool ) {
-            if (! array_key_exists($key, $config)) {
+            if ( ! array_key_exists($key, $config) ) {
                 continue;
             }
 
-            $value = $config[ $key ];
+            $value = $config[$key];
 
-            if (isset($this->__children[ $key ])) {
-                $configClass = get_class($this->__children[ $key ]);
+            if ( isset($this->__children[$key]) ) {
+                $configClass = get_class($this->__children[$key]);
 
                 $instance = new $configClass();
                 $instance->load($value);
@@ -400,10 +400,10 @@ abstract class AbstractConfig implements
      */
     public function fill($config)
     {
-        if (! (true
+        if ( ! (true
             && is_object($config)
             && (static::class === get_class($config))
-        )) {
+        ) ) {
             throw new LogicException(
                 [ 'The `config` should be an instance of: ' . static::class, $config ]
             );
@@ -422,32 +422,32 @@ abstract class AbstractConfig implements
      */
     protected function validationRecursive(array $context = []) : bool
     {
-        $refContext =& $context[ 1 ];
+        $refContext =& $context[1];
         $refContext = $refContext ?? [];
 
-        $path = $refContext[ '__path' ] ?? [];
-        $key = $refContext[ '__key' ] ?? null;
-        $parent = $refContext[ '__parent' ] ?? null;
+        $path = $refContext['__path'] ?? [];
+        $key = $refContext['__key'] ?? null;
+        $parent = $refContext['__parent'] ?? null;
 
         foreach ( $this->__children as $childKey => $child ) {
             $fullpath = $path;
             $fullpath[] = $childKey;
 
-            $refContext[ '__path' ] = $fullpath;
-            $refContext[ '__key' ] = $childKey;
-            $refContext[ '__parent' ] = $this;
+            $refContext['__path'] = $fullpath;
+            $refContext['__key'] = $childKey;
+            $refContext['__parent'] = $this;
 
             // > ! recursion
             $statusChild = $child->validationRecursive($refContext);
 
-            if (! $statusChild) {
+            if ( ! $statusChild ) {
                 return false;
             }
         }
 
-        $refContext[ '__path' ] = $path;
-        $refContext[ '__key' ] = $key;
-        $refContext[ '__parent' ] = $parent;
+        $refContext['__path'] = $path;
+        $refContext['__key'] = $key;
+        $refContext['__parent'] = $parent;
 
         $status = $this->validation($context);
 

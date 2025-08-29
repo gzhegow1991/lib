@@ -11,13 +11,13 @@ class FormatXml
 {
     public function __construct()
     {
-        if (! extension_loaded('dom')) {
+        if ( ! extension_loaded('dom') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: dom' ]
             );
         }
 
-        if (! extension_loaded('simplexml')) {
+        if ( ! extension_loaded('simplexml') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: simplexml' ]
             );
@@ -32,11 +32,11 @@ class FormatXml
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($xml)->isOk([ &$xmlStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($xml)->isOk([ &$xmlStringNotEmpty, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
-        if (false === strpos($xmlStringNotEmpty, '<')) {
+        if ( false === strpos($xmlStringNotEmpty, '<') ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `xml` should contain at least one symbol `<`', $xml ],
@@ -44,7 +44,7 @@ class FormatXml
             );
         }
 
-        if (false
+        if ( false
             || (false !== stripos($xml, '<!--'))
             || (false !== stripos($xml, '<![CDATA['))
             || (false !== stripos($xml, '<?xml'))
@@ -75,7 +75,7 @@ class FormatXml
         libxml_clear_errors();
         libxml_use_internal_errors(false);
 
-        if ([] !== $errorsArray) {
+        if ( [] !== $errorsArray ) {
             $ret = Ret::new();
 
             $lines = preg_split('/\R/', $xml);
@@ -84,7 +84,7 @@ class FormatXml
                 $message = rtrim($error->message);
                 $message = "[ ERROR ] {$message} at line {$error->line}";
 
-                $line = $lines[ ($error->line) - 1 ];
+                $line = $lines[($error->line) - 1];
                 $line = rtrim($line);
 
                 $ret->addError(
@@ -93,12 +93,12 @@ class FormatXml
                 );
             }
 
-            if ($ret->isFail()) {
+            if ( $ret->isFail() ) {
                 return Ret::throw($fallback, $ret);
             }
         }
 
-        if ($e) {
+        if ( $e ) {
             return Ret::throw(
                 $fallback,
                 $e,
@@ -117,11 +117,11 @@ class FormatXml
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($xml)->isOk([ &$xmlStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($xml)->isOk([ &$xmlStringNotEmpty, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
-        if (false === strpos($xmlStringNotEmpty, '<')) {
+        if ( false === strpos($xmlStringNotEmpty, '<') ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `xml` should contain at least one symbol `<`', $xml ],
@@ -146,7 +146,7 @@ class FormatXml
         libxml_clear_errors();
         libxml_use_internal_errors(false);
 
-        if ([] !== $errorsArray) {
+        if ( [] !== $errorsArray ) {
             $ret = Ret::new();
 
             $lines = preg_split('/\R/', $xml);
@@ -155,7 +155,7 @@ class FormatXml
                 $message = rtrim($error->message);
                 $message = "[ ERROR ] {$message} at line {$error->line}";
 
-                $line = $lines[ ($error->line) - 1 ];
+                $line = $lines[($error->line) - 1];
                 $line = rtrim($line);
 
                 $ret->addError(
@@ -164,12 +164,12 @@ class FormatXml
                 );
             }
 
-            if ($ret->isFail()) {
+            if ( $ret->isFail() ) {
                 return Ret::throw($fallback, $ret);
             }
         }
 
-        if ($e) {
+        if ( $e ) {
             return Ret::throw(
                 $fallback,
                 $e,

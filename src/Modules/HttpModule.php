@@ -35,12 +35,12 @@ class HttpModule
     {
         $last = static::$cookiesClass;
 
-        if (null !== $cookiesClass) {
-            if (false === $cookiesClass) {
+        if ( null !== $cookiesClass ) {
+            if ( false === $cookiesClass ) {
                 static::$cookiesClass = DefaultCookies::class;
 
             } else {
-                if (! is_subclass_of($cookiesClass, CookiesInterface::class)) {
+                if ( ! is_subclass_of($cookiesClass, CookiesInterface::class) ) {
                     throw new LogicException(
                         [ 'The `cookiesClass` should be subclass of: ' . CookiesInterface::class, $cookiesClass ]
                     );
@@ -62,8 +62,8 @@ class HttpModule
     {
         $last = static::$isApi;
 
-        if (null !== $isApi) {
-            if (false === $isApi) {
+        if ( null !== $isApi ) {
+            if ( false === $isApi ) {
                 static::$isApi = null;
 
             } else {
@@ -90,7 +90,7 @@ class HttpModule
 
     public function cookies() : CookiesInterface
     {
-        if (null !== $this->cookies) {
+        if ( null !== $this->cookies ) {
             return $this->cookies;
         }
 
@@ -136,18 +136,18 @@ class HttpModule
     {
         $thePhp = Lib::php();
 
-        if ($thePhp->is_terminal()) {
+        if ( $thePhp->is_terminal() ) {
             return false;
         }
 
-        $serverXRequestedWith = $_SERVER[ 'HTTP_X_REQUESTED_WITH' ] ?? null;
+        $serverXRequestedWith = $_SERVER['HTTP_X_REQUESTED_WITH'] ?? null;
         $serverXRequestedWith = (string) $serverXRequestedWith;
-        if ('' === $serverXRequestedWith) {
+        if ( '' === $serverXRequestedWith ) {
             return false;
         }
 
         $isAjax = ('xmlhttprequest' === strtolower($serverXRequestedWith));
-        if (! $isAjax) {
+        if ( ! $isAjax ) {
             return false;
         }
 
@@ -158,19 +158,19 @@ class HttpModule
     {
         $thePhp = Lib::php();
 
-        if ($thePhp->is_terminal()) {
+        if ( $thePhp->is_terminal() ) {
             return false;
         }
 
         $isApi = static::staticIsApi();
-        if (true === $isApi) {
+        if ( true === $isApi ) {
             return true;
 
-        } elseif (false === $isApi) {
+        } elseif ( false === $isApi ) {
             return false;
         }
 
-        if (! headers_sent()) {
+        if ( ! headers_sent() ) {
             return false;
         }
 
@@ -188,7 +188,7 @@ class HttpModule
 
         static::staticIsApi(! $isHeadersSentAndContentTypeIsHtml);
 
-        if (! $isHeadersSentAndContentTypeIsHtml) {
+        if ( ! $isHeadersSentAndContentTypeIsHtml ) {
             return true;
         }
 
@@ -201,12 +201,12 @@ class HttpModule
      */
     public function disableSession()
     {
-        if (isset($_SESSION)) {
-            if (SessionDisabler::is($_SESSION)) {
+        if ( isset($_SESSION) ) {
+            if ( SessionDisabler::is($_SESSION) ) {
                 return $this;
             }
 
-            if ([] !== $_SESSION) {
+            if ( [] !== $_SESSION ) {
                 throw new RuntimeException(
                     [ 'Unable to disable non-empty $_SESSION' ]
                 );
@@ -352,7 +352,7 @@ class HttpModule
     {
         $theType = Lib::type();
 
-        if ([] !== $queries) {
+        if ( [] !== $queries ) {
             array_unshift($queries, $query);
 
         } else {
@@ -360,20 +360,20 @@ class HttpModule
         }
 
         foreach ( $queries as $idx => $q ) {
-            if (null === $q) {
-                unset($queries[ $idx ]);
+            if ( null === $q ) {
+                unset($queries[$idx]);
             }
         }
 
         foreach ( $queries as $idx => $q ) {
-            if (is_array($q)) {
+            if ( is_array($q) ) {
                 continue;
 
-            } elseif ($theType->string_not_empty($q)->isOk([ &$qString ])) {
+            } elseif ( $theType->string_not_empty($q)->isOk([ &$qString ]) ) {
                 $queryArray = [];
                 parse_str($q, $queryArray);
 
-                $queries[ $idx ] = $queryArray;
+                $queries[$idx] = $queryArray;
 
             } else {
                 throw new LogicException(
@@ -384,7 +384,7 @@ class HttpModule
 
         $result = [];
 
-        if ([] !== $queries) {
+        if ( [] !== $queries ) {
             $result = $this->data_merge(...$queries);
         }
 
@@ -399,14 +399,14 @@ class HttpModule
     {
         $theType = Lib::type();
 
-        if ([] !== $acceptAnd) {
+        if ( [] !== $acceptAnd ) {
             array_unshift($orAcceptAnd, $acceptAnd);
         }
 
         $acceptList = [];
 
         $httpAcceptString = strtolower($httpAccept);
-        if (0 === strpos($httpAcceptString, $substr = 'accept: ')) {
+        if ( 0 === strpos($httpAcceptString, $substr = 'accept: ') ) {
             $httpAcceptString = substr($httpAcceptString, strlen($substr));
         }
 
@@ -427,27 +427,27 @@ class HttpModule
 
                 [ $acceptVarName, $acceptVarValue ] = $acceptVarSplit;
 
-                if ('q' === $acceptVarName) {
+                if ( 'q' === $acceptVarName ) {
                     $qValue = $acceptVarValue;
                 }
 
-                $acceptVarsArray[ $acceptVarName ] = $acceptVarValue;
+                $acceptVarsArray[$acceptVarName] = $acceptVarValue;
             }
 
             $qValueNumeric = $theType->numeric($qValue)->orNull();
 
-            if (null === $qValueNumeric) {
+            if ( null === $qValueNumeric ) {
                 throw new LogicException(
                     [ 'The `httpAccept` has invalid header Accept value', [ $httpAcceptItem, 'q=' . $qValue ] ]
                 );
             }
 
-            $acceptList[ $httpAcceptContentType ] = [ $qValueNumeric, $acceptVarsArray ];
+            $acceptList[$httpAcceptContentType] = [ $qValueNumeric, $acceptVarsArray ];
         }
 
         arsort($acceptList);
 
-        if (! isset($acceptAnd)) {
+        if ( ! isset($acceptAnd) ) {
             return $acceptList;
         }
 
@@ -460,11 +460,11 @@ class HttpModule
             $resultCurrent = [];
 
             foreach ( $acceptAndList as $acceptAndItem ) {
-                if (! isset($acceptList[ $acceptAndItem ])) {
+                if ( ! isset($acceptList[$acceptAndItem]) ) {
                     continue 2;
                 }
 
-                $resultCurrent[ $acceptAndItem ] = $acceptList[ $acceptAndItem ];
+                $resultCurrent[$acceptAndItem] = $acceptList[$acceptAndItem];
             }
 
             $result += $resultCurrent;
@@ -479,7 +479,7 @@ class HttpModule
      */
     public function idn_to_ascii(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
     {
-        if (! extension_loaded('intl')) {
+        if ( ! extension_loaded('intl') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: intl' ]
             );
@@ -489,8 +489,8 @@ class HttpModule
         $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
 
         $withIdnaInfo = array_key_exists(0, $refs);
-        if ($withIdnaInfo) {
-            $refIdnaInfo =& $refs[ 0 ];
+        if ( $withIdnaInfo ) {
+            $refIdnaInfo =& $refs[0];
         }
         $refIdnaInfo = null;
 
@@ -504,7 +504,7 @@ class HttpModule
      */
     public function idn_to_utf8(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
     {
-        if (! extension_loaded('intl')) {
+        if ( ! extension_loaded('intl') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: intl' ]
             );
@@ -514,8 +514,8 @@ class HttpModule
         $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
 
         $withIdnaInfo = array_key_exists(0, $refs);
-        if ($withIdnaInfo) {
-            $refIdnaInfo =& $refs[ 0 ];
+        if ( $withIdnaInfo ) {
+            $refIdnaInfo =& $refs[0];
         }
         $refIdnaInfo = null;
 
@@ -529,13 +529,13 @@ class HttpModule
     {
         $theArr = Lib::arr();
 
-        if ($dataArray) {
+        if ( $dataArray ) {
             array_unshift($dataArrays, $dataArray);
         }
 
         foreach ( $dataArrays as $idx => $dataArrayItem ) {
-            if (null === $dataArrayItem) {
-                unset($dataArrays[ $idx ]);
+            if ( null === $dataArrayItem ) {
+                unset($dataArrays[$idx]);
             }
         }
 
@@ -550,9 +550,9 @@ class HttpModule
         ) {
             $last = end($values);
 
-            if (false === $last) {
+            if ( false === $last ) {
                 foreach ( $dataArraysKeys as $key ) {
-                    $theArr->unset_path($dataArrays[ $key ], $path);
+                    $theArr->unset_path($dataArrays[$key], $path);
                 }
             }
         }
@@ -564,7 +564,7 @@ class HttpModule
             )
             as $path => $value
         ) {
-            if ([] === $value) {
+            if ( [] === $value ) {
                 $theArr->unset_path($dataArrays, $path);
             }
         }
@@ -578,13 +578,13 @@ class HttpModule
     {
         $theArr = Lib::arr();
 
-        if ($dataArray) {
+        if ( $dataArray ) {
             array_unshift($dataArrays, $dataArray);
         }
 
         foreach ( $dataArrays as $idx => $_dataArray ) {
-            if (null === $_dataArray) {
-                unset($dataArrays[ $idx ]);
+            if ( null === $_dataArray ) {
+                unset($dataArrays[$idx]);
             }
         }
 
@@ -599,9 +599,9 @@ class HttpModule
         ) {
             $last = end($values);
 
-            if (false === $last) {
+            if ( false === $last ) {
                 foreach ( $dataArraysKeys as $key ) {
-                    $theArr->unset_path($dataArrays[ $key ], $path);
+                    $theArr->unset_path($dataArrays[$key], $path);
                 }
             }
         }
@@ -613,7 +613,7 @@ class HttpModule
             )
             as $path => $value
         ) {
-            if ([] === $value) {
+            if ( [] === $value ) {
                 $theArr->unset_path($dataArrays, $path);
             }
         }

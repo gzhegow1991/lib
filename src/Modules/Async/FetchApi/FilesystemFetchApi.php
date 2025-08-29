@@ -61,7 +61,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
     public function __construct(array $config = [])
     {
-        if (! extension_loaded('curl')) {
+        if ( ! extension_loaded('curl') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: curl' ]
             );
@@ -84,37 +84,37 @@ class FilesystemFetchApi implements FetchApiInterface
         $taskResultDirDefault = $theType->realpath(__DIR__ . '/../../../../var/tmp/bin/php/curl-api/task-result/')->orThrow();
         $taskResultDirRealpath = '';
 
-        if (! $theType->dirpath_realpath($binDir = $config[ 'bin_dir' ] ?? $binDirDefault)->isOk([ &$binDirRealpath ])) {
+        if ( ! $theType->dirpath_realpath($binDir = $config['bin_dir'] ?? $binDirDefault)->isOk([ &$binDirRealpath ]) ) {
             throw new LogicException(
                 [ 'The `config[bin_dir]` should be an existing directory', $binDir ]
             );
         }
-        if (! $theType->dirpath_realpath($poolDir = $config[ 'pool_dir' ] ?? $poolDirDefault)->isOk([ &$poolDirRealpath ])) {
+        if ( ! $theType->dirpath_realpath($poolDir = $config['pool_dir'] ?? $poolDirDefault)->isOk([ &$poolDirRealpath ]) ) {
             throw new LogicException(
                 [ 'The `config[pool_dir]` should be an existing directory', $poolDir ]
             );
         }
-        if (! $theType->dirpath_realpath($queueDir = $config[ 'queue_dir' ] ?? $queueDirDefault)->isOk([ &$queueDirRealpath ])) {
+        if ( ! $theType->dirpath_realpath($queueDir = $config['queue_dir'] ?? $queueDirDefault)->isOk([ &$queueDirRealpath ]) ) {
             throw new LogicException(
                 [ 'The `config[queue_dir]` should be an existing directory', $queueDir ]
             );
         }
-        if (! $theType->dirpath_realpath($taskResultDir = $config[ 'task_result_dir' ] ?? $taskResultDirDefault)->isOk([ &$taskResultDirRealpath ])) {
+        if ( ! $theType->dirpath_realpath($taskResultDir = $config['task_result_dir'] ?? $taskResultDirDefault)->isOk([ &$taskResultDirRealpath ]) ) {
             throw new LogicException(
                 [ 'The `config[task_result_dir]` should be an existing directory', $taskResultDir ]
             );
         }
-        if (! $theType->filename($binFilenameSrc = $config[ 'bin_filename' ] ?? 'curl-api.php')->isOk([ &$binFilename ])) {
+        if ( ! $theType->filename($binFilenameSrc = $config['bin_filename'] ?? 'curl-api.php')->isOk([ &$binFilename ]) ) {
             throw new LogicException(
                 [ 'The `config[bin_filename]` should be a valid filename', $binFilenameSrc ]
             );
         }
-        if (! $theType->filename($poolFilenameSrc = $config[ 'pool_filename' ] ?? 'curl-api.pool')->isOk([ &$poolFilename ])) {
+        if ( ! $theType->filename($poolFilenameSrc = $config['pool_filename'] ?? 'curl-api.pool')->isOk([ &$poolFilename ]) ) {
             throw new LogicException(
                 [ 'The `config[pool_filename]` should be a valid filename', $poolFilenameSrc ]
             );
         }
-        if (! $theType->filename($queueFilenameSrc = $config[ 'queue_filename' ] ?? 'curl-api.queue')->isOk([ &$queueFilename ])) {
+        if ( ! $theType->filename($queueFilenameSrc = $config['queue_filename'] ?? 'curl-api.queue')->isOk([ &$queueFilename ]) ) {
             throw new LogicException(
                 [ 'The `config[queue_filename]` should be a valid filename', $queueFilenameSrc ]
             );
@@ -181,7 +181,7 @@ class FilesystemFetchApi implements FetchApiInterface
             $queueFile, $serialized
         );
 
-        if ($statusPush) {
+        if ( $statusPush ) {
             $refTaskId = $taskId;
         }
 
@@ -204,7 +204,7 @@ class FilesystemFetchApi implements FetchApiInterface
             $queueFile, true
         );
 
-        if (null !== $serialized) {
+        if ( null !== $serialized ) {
             $refTask = unserialize($serialized);
 
             return true;
@@ -221,11 +221,11 @@ class FilesystemFetchApi implements FetchApiInterface
         $gen = $theFs->dir_walk_it($this->taskResultDirRealpath);
 
         foreach ( $gen as $spl ) {
-            if ($spl->isDir()) {
+            if ( $spl->isDir() ) {
                 continue;
             }
 
-            if ($spl->getBasename() === '.gitignore') {
+            if ( $spl->getBasename() === '.gitignore' ) {
                 continue;
             }
 
@@ -272,13 +272,13 @@ class FilesystemFetchApi implements FetchApiInterface
         $taskResultFile = "{$this->taskResultDirRealpath}/{$taskId}.result";
 
         $statusFetch = false;
-        if (is_file($taskResultFile) && (filesize($taskResultFile) > 0)) {
+        if ( is_file($taskResultFile) && (filesize($taskResultFile) > 0) ) {
             $serialized = file_get_contents($taskResultFile);
 
-            if (false !== $serialized) {
+            if ( false !== $serialized ) {
                 $statusFetch = true;
 
-                if ($delete) {
+                if ( $delete ) {
                     unlink($taskResultFile);
                 }
 
@@ -291,7 +291,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
     protected function taskSaveResult(array $task, array $taskResult) : bool
     {
-        $taskId = $task[ 'id' ];
+        $taskId = $task['id'];
 
         $taskResultFile = "{$this->taskResultDirRealpath}/{$taskId}.result";
 
@@ -314,8 +314,8 @@ class FilesystemFetchApi implements FetchApiInterface
     {
         $refTaskResult = null;
 
-        $taskUrl = $task[ 'url' ];
-        $taskCurlOptions = $task[ 'curl_options' ];
+        $taskUrl = $task['url'];
+        $taskCurlOptions = $task['curl_options'];
 
         $ch = curl_init($taskUrl);
 
@@ -332,12 +332,12 @@ class FilesystemFetchApi implements FetchApiInterface
 
         curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
 
-        if ([] !== $taskCurlOptions) {
+        if ( [] !== $taskCurlOptions ) {
             curl_setopt_array($ch, $taskCurlOptions);
         }
 
         $response = curl_exec($ch);
-        if (false === $response) {
+        if ( false === $response ) {
             return false;
         }
 
@@ -371,7 +371,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $daemonTimeoutMsInt = $theType->int_positive($daemonTimeoutMs)->orThrow();
 
-        if ((null !== ($nowMicrotimeFloat = $nowMicrotime))) {
+        if ( (null !== ($nowMicrotimeFloat = $nowMicrotime)) ) {
             $nowMicrotimeFloat = $theType->float_non_negative($nowMicrotime)->orThrow();
         }
 
@@ -389,7 +389,7 @@ class FilesystemFetchApi implements FetchApiInterface
     {
         $theType = Lib::type();
 
-        if ((null !== ($nowMicrotimeFloat = $nowMicrotime))) {
+        if ( (null !== ($nowMicrotimeFloat = $nowMicrotime)) ) {
             $nowMicrotimeFloat = $theType->float_non_negative($nowMicrotime)->orThrow();
         }
 
@@ -427,10 +427,10 @@ class FilesystemFetchApi implements FetchApiInterface
             ) {
                 $status = false;
 
-                if ($fhPool = $theFsFile->fopen_flock_pooling(
+                if ( $fhPool = $theFsFile->fopen_flock_pooling(
                     100000, $workerTimeoutMs,
                     $poolFile, 'c+', LOCK_EX | LOCK_NB
-                )) {
+                ) ) {
                     $nowMicrotimeFloat = $nowMicrotime ?? microtime(true);
 
                     $workerPidString = ltrim($workerPid, '0');
@@ -440,19 +440,19 @@ class FilesystemFetchApi implements FetchApiInterface
                         $line = fgets($fhPool);
 
                         $lineTrim = rtrim($line);
-                        if ('' === $lineTrim) {
+                        if ( '' === $lineTrim ) {
                             continue;
                         }
 
                         [ $pidLineString, $workerTimeoutMicrotimeLineString ] = explode('|', $lineTrim);
 
                         $workerTimeoutMicrotimeLineFloat = (float) $workerTimeoutMicrotimeLineString;
-                        if ($nowMicrotimeFloat > $workerTimeoutMicrotimeLineFloat) {
+                        if ( $nowMicrotimeFloat > $workerTimeoutMicrotimeLineFloat ) {
                             continue;
                         }
 
                         $pidLineString = ltrim($pidLineString, '0');
-                        if ($pidLineString === $workerPidString) {
+                        if ( $pidLineString === $workerPidString ) {
                             continue;
                         }
 
@@ -497,7 +497,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $poolFile = $this->poolFile;
 
-        if (! is_file($poolFile)) {
+        if ( ! is_file($poolFile) ) {
             return true;
         }
 
@@ -509,10 +509,10 @@ class FilesystemFetchApi implements FetchApiInterface
             ) {
                 $status = false;
 
-                if ($fhPool = $theFsFile->fopen_flock_pooling(
+                if ( $fhPool = $theFsFile->fopen_flock_pooling(
                     100000, 1000,
                     $poolFile, 'r+', LOCK_EX | LOCK_NB
-                )) {
+                ) ) {
                     $pidString = ltrim($workerPid, '0');
                     $nowMicrotimeFloat = $nowMicrotime ?? microtime(true);
 
@@ -521,19 +521,19 @@ class FilesystemFetchApi implements FetchApiInterface
                         $line = fgets($fhPool);
 
                         $lineTrim = rtrim($line);
-                        if ('' === $lineTrim) {
+                        if ( '' === $lineTrim ) {
                             continue;
                         }
 
                         [ $pidLineString, $timeoutMicrotimeLineString ] = explode('|', $lineTrim);
 
                         $timeoutMicrotimeLineFloat = (float) $timeoutMicrotimeLineString;
-                        if ($nowMicrotimeFloat > $timeoutMicrotimeLineFloat) {
+                        if ( $nowMicrotimeFloat > $timeoutMicrotimeLineFloat ) {
                             continue;
                         }
 
                         $pidLineString = ltrim($pidLineString, '0');
-                        if ($pidLineString === $pidString) {
+                        if ( $pidLineString === $pidString ) {
                             continue;
                         }
 
@@ -543,7 +543,7 @@ class FilesystemFetchApi implements FetchApiInterface
                     rewind($fhPool);
                     ftruncate($fhPool, 0);
 
-                    if ([] !== $lines) {
+                    if ( [] !== $lines ) {
                         $content = implode("\n", $lines);
 
                         fwrite($fhPool, $content);
@@ -556,7 +556,7 @@ class FilesystemFetchApi implements FetchApiInterface
             }
         );
 
-        if (is_file($poolFile) && ! filesize($poolFile)) {
+        if ( is_file($poolFile) && ! filesize($poolFile) ) {
             unlink($poolFile);
         }
 
@@ -573,7 +573,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $poolFile = $this->poolFile;
 
-        if (! is_file($poolFile)) {
+        if ( ! is_file($poolFile) ) {
             return false;
         }
 
@@ -586,10 +586,10 @@ class FilesystemFetchApi implements FetchApiInterface
             ) {
                 $status = false;
 
-                if ($fhPool = $theFsFile->fopen_flock_pooling(
+                if ( $fhPool = $theFsFile->fopen_flock_pooling(
                     100000, 1000,
                     $poolFile, 'r', LOCK_SH | LOCK_NB
-                )) {
+                ) ) {
                     $nowMicrotimeFloat = microtime(true);
 
                     $pidFirstLine = null;
@@ -598,14 +598,14 @@ class FilesystemFetchApi implements FetchApiInterface
                         $line = fgets($fhPool);
 
                         $lineTrim = rtrim($line);
-                        if ('' === $lineTrim) {
+                        if ( '' === $lineTrim ) {
                             continue;
                         }
 
                         [ $pidLineString, $timeoutMicrotimeLineString ] = explode('|', $lineTrim);
 
                         $timeoutMicrotimeFloat = (float) $timeoutMicrotimeLineString;
-                        if ($nowMicrotimeFloat > $timeoutMicrotimeFloat) {
+                        if ( $nowMicrotimeFloat > $timeoutMicrotimeFloat ) {
                             continue;
                         }
 
@@ -614,7 +614,7 @@ class FilesystemFetchApi implements FetchApiInterface
                         break;
                     }
 
-                    if (null !== $pidFirstLine) {
+                    if ( null !== $pidFirstLine ) {
                         $refPidFirst = (int) ltrim($pidFirstLine, '0');
 
                         $status = true;
@@ -625,7 +625,7 @@ class FilesystemFetchApi implements FetchApiInterface
             }
         );
 
-        if (is_file($poolFile) && ! filesize($poolFile)) {
+        if ( is_file($poolFile) && ! filesize($poolFile) ) {
             unlink($poolFile);
         }
 
@@ -687,8 +687,8 @@ class FilesystemFetchApi implements FetchApiInterface
         $timeoutMsInt = $theType->int_non_negative_or_minus_one($timeoutMs)->orThrow();
         $lockWaitTimeoutMsInt = $theType->int_non_negative_or_minus_one($lockWaitTimeoutMs)->orThrow();
 
-        if (-1 === $timeoutMsInt) $timeoutMsInt = null;
-        if (-1 === $lockWaitTimeoutMsInt) $lockWaitTimeoutMsInt = null;
+        if ( -1 === $timeoutMsInt ) $timeoutMsInt = null;
+        if ( -1 === $lockWaitTimeoutMsInt ) $lockWaitTimeoutMsInt = null;
 
         $this->registerShutdownFunction();
 
@@ -709,7 +709,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
     protected function registerShutdownFunction() : void
     {
-        if (! $this->isRegisterShutdownFunctionCalled) {
+        if ( ! $this->isRegisterShutdownFunctionCalled ) {
             register_shutdown_function([ $this, 'registerShutdownFunctionFn' ]);
 
             $this->isRegisterShutdownFunctionCalled = true;
@@ -731,7 +731,7 @@ class FilesystemFetchApi implements FetchApiInterface
         $timeoutReportMs = $timeoutMs ?? 10000;
 
         $timeoutBreakMicrotime = null;
-        if (! $isNullTimeout) {
+        if ( ! $isNullTimeout ) {
             $timeoutBreakMicrotime = $nowMicrotime + ($timeoutBreakMs / 1000);
         }
 
@@ -740,7 +740,7 @@ class FilesystemFetchApi implements FetchApiInterface
         do {
             $nowMicrotime = microtime(true);
 
-            if ($nowMicrotime > $timeoutReportMicrotime) {
+            if ( $nowMicrotime > $timeoutReportMicrotime ) {
                 $this->workerAddToPool($pid, $timeoutReportMs, $nowMicrotime);
 
                 $timeoutReportMicrotime = $nowMicrotime + ($timeoutReportMs / 1000);
@@ -754,16 +754,16 @@ class FilesystemFetchApi implements FetchApiInterface
              */
             $status = true
                 && $this->popTask($task, $waitTimeoutMs)
-                && print_r('[ NEW ] Task: ' . $task[ 'id' ] . "\n")
+                && print_r('[ NEW ] Task: ' . $task['id'] . "\n")
                 && $this->processTask($taskResult, $task)
-                && print_r('[ OK ] Task: ' . $task[ 'id' ] . "\n")
+                && print_r('[ OK ] Task: ' . $task['id'] . "\n")
                 && $this->taskSaveResult($task, $taskResult);
 
-            if (! $isNullTimeout) {
-                if ($status) {
+            if ( ! $isNullTimeout ) {
+                if ( $status ) {
                     $timeoutBreakMicrotime = $nowMicrotime + ($timeoutBreakMs / 1000);
 
-                } elseif ($nowMicrotime > $timeoutBreakMicrotime) {
+                } elseif ( $nowMicrotime > $timeoutBreakMicrotime ) {
                     break;
                 }
             }

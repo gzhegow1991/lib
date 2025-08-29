@@ -28,12 +28,12 @@ class RandomModule
     {
         $last = static::$fnUuid;
 
-        if (null !== $fnUuid) {
-            if (false === $fnUuid) {
+        if ( null !== $fnUuid ) {
+            if ( false === $fnUuid ) {
                 static::$fnUuid = null;
 
             } else {
-                if (! is_callable($fnUuid)) {
+                if ( ! is_callable($fnUuid) ) {
                     throw new LogicException(
                         [ 'The `fnUuid` should be callable', $fnUuid ]
                     );
@@ -64,8 +64,8 @@ class RandomModule
     {
         $val = $refValue;
 
-        if (is_int($val)) {
-            if ($val === PHP_INT_MAX) {
+        if ( is_int($val) ) {
+            if ( $val === PHP_INT_MAX ) {
                 $theBcmath = Lib::bcmath();
 
                 $val = bcadd($val, 1);
@@ -79,7 +79,7 @@ class RandomModule
 
             $theType->ctype_digit($val)->orThrow();
 
-            if (false
+            if ( false
                 || (strlen($val) > strlen(PHP_INT_MAX))
                 || (floatval($val) >= PHP_INT_MAX)
             ) {
@@ -114,8 +114,8 @@ class RandomModule
         $bytes = $this->random_bytes(16);
 
         $arr = array_values(unpack('N1a/n1b/n1c/n1d/n1e/N1f', $bytes));
-        $arr[ 2 ] = ($arr[ 2 ] & 0x0fff) | 0x4000;
-        $arr[ 3 ] = ($arr[ 3 ] & 0x3fff) | 0x8000;
+        $arr[2] = ($arr[2] & 0x0fff) | 0x4000;
+        $arr[3] = ($arr[3] & 0x3fff) | 0x8000;
 
         array_unshift($arr, '%08x-%04x-%04x-%04x-%04x%08x');
 
@@ -130,14 +130,14 @@ class RandomModule
      */
     public function type_uuid($value)
     {
-        if (! is_string($value)) {
+        if ( ! is_string($value) ) {
             return Ret::err(
                 [ 'The `value` should be string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ('' === $value) {
+        if ( '' === $value ) {
             return Ret::err(
                 [ 'The `value` should be string, not-empty', $value ],
                 [ __FILE__, __LINE__ ]
@@ -145,7 +145,7 @@ class RandomModule
         }
 
         $regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
-        if (! preg_match($regex, $value)) {
+        if ( ! preg_match($regex, $value) ) {
             return Ret::err(
                 [ 'The `value` should be valid uuid', $value ],
                 [ __FILE__, __LINE__ ]
@@ -166,11 +166,11 @@ class RandomModule
     {
         $len = $len ?? 16;
 
-        if ($len < 1) $len = 1;
+        if ( $len < 1 ) $len = 1;
 
         $result = null;
 
-        if (function_exists('random_bytes')) {
+        if ( function_exists('random_bytes') ) {
             try {
                 $result = random_bytes($len);
             }
@@ -178,21 +178,21 @@ class RandomModule
                 throw new RuntimeException($e->getMessage(), $e->getCode(), $e);
             }
 
-        } elseif (function_exists('\\Sodium\\randombytes_buf')) {
+        } elseif ( function_exists('\\Sodium\\randombytes_buf') ) {
             $result = \Sodium\randombytes_buf($len);
 
-        } elseif (function_exists('openssl_random_pseudo_bytes')) {
+        } elseif ( function_exists('openssl_random_pseudo_bytes') ) {
             $result = openssl_random_pseudo_bytes($len);
 
-        } elseif (file_exists('/dev/urandom')) {
+        } elseif ( file_exists('/dev/urandom') ) {
             $handle = fopen('/dev/urandom', 'rb');
 
-            if ($handle !== false) {
+            if ( $handle !== false ) {
                 stream_set_read_buffer($handle, 0);
                 $ret = fread($handle, $len);
                 fclose($handle);
 
-                if (strlen($ret) != $len) {
+                if ( strlen($ret) != $len ) {
                     throw new RuntimeException('Unexpected partial read from random device');
                 }
 
@@ -200,7 +200,7 @@ class RandomModule
             }
         }
 
-        if (null === $result) {
+        if ( null === $result ) {
             throw new RuntimeException('No random device available');
         }
 
@@ -246,7 +246,7 @@ class RandomModule
         for ( $i = 0; $i < $lenIntPositive; ++$i ) {
             $randomInt = $this->random_int($min, $max);
 
-            $rand[ $i ] = mb_substr($alphabetValid, $randomInt, 1);
+            $rand[$i] = mb_substr($alphabetValid, $randomInt, 1);
         }
 
         $rand = implode('', $rand);

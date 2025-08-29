@@ -9,8 +9,8 @@ abstract class AbstractArrayOfType extends AbstractArrayOf
 {
     protected function setValue($key, $value)
     {
-        if (null !== $this->valueType) {
-            if ($this->valueType !== gettype($value)) {
+        if ( null !== $this->valueType ) {
+            if ( $this->valueType !== gettype($value) ) {
                 throw new LogicException(
                     [
                         'The `value` should be a value of type: ' . $this->valueType,

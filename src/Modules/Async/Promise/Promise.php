@@ -203,7 +203,7 @@ class Promise
     {
         $refValue = null;
 
-        if (static::STATE_RESOLVED === $this->state) {
+        if ( static::STATE_RESOLVED === $this->state ) {
             $refValue = $this->resolvedValue;
 
             return true;
@@ -216,7 +216,7 @@ class Promise
     {
         $refReason = null;
 
-        if (static::STATE_REJECTED === $this->state) {
+        if ( static::STATE_REJECTED === $this->state ) {
             $refReason = $this->rejectedReason;
 
             return true;
@@ -236,14 +236,14 @@ class Promise
 
         $promise = $this->manager->never();
 
-        if (Promise::$isDebug) {
+        if ( Promise::$isDebug ) {
             $theDebug = Lib::debug();
 
             $promise->debugInfo = $theDebug->file_line();
         }
 
-        if (Promise::STATE_RESOLVED === $this->state) {
-            if (null === $fnOnResolved) {
+        if ( Promise::STATE_RESOLVED === $this->state ) {
+            if ( null === $fnOnResolved ) {
                 $promise->resolve(
                     $this->resolvedValue
                 );
@@ -258,8 +258,8 @@ class Promise
                 $this->loop->addMicrotask($fn);
             }
 
-        } elseif (Promise::STATE_REJECTED === $this->state) {
-            if (null === $fnOnRejected) {
+        } elseif ( Promise::STATE_REJECTED === $this->state ) {
+            if ( null === $fnOnRejected ) {
                 $promise->reject(
                     $this->rejectedReason
                 );
@@ -299,19 +299,19 @@ class Promise
 
         $promise = $this->manager->never();
 
-        if (Promise::$isDebug) {
+        if ( Promise::$isDebug ) {
             $theDebug = Lib::debug();
 
             $promise->debugInfo = $theDebug->file_line();
         }
 
-        if (Promise::STATE_RESOLVED === $this->state) {
+        if ( Promise::STATE_RESOLVED === $this->state ) {
             $promise->resolve(
                 $this->resolvedValue
             );
 
-        } elseif (Promise::STATE_REJECTED === $this->state) {
-            if (null === $fnOnRejected) {
+        } elseif ( Promise::STATE_REJECTED === $this->state ) {
+            if ( null === $fnOnRejected ) {
                 $promise->reject(
                     $this->rejectedReason
                 );
@@ -350,14 +350,14 @@ class Promise
 
         $promise = $this->manager->never();
 
-        if (Promise::$isDebug) {
+        if ( Promise::$isDebug ) {
             $theDebug = Lib::debug();
 
             $promise->debugInfo = $theDebug->file_line();
         }
 
-        if (Promise::STATE_RESOLVED === $this->state) {
-            if (null === $fnOnFinally) {
+        if ( Promise::STATE_RESOLVED === $this->state ) {
+            if ( null === $fnOnFinally ) {
                 $promise->resolve(
                     $this->resolvedValue
                 );
@@ -372,8 +372,8 @@ class Promise
                 $this->loop->addMicrotask($fn);
             }
 
-        } elseif (Promise::STATE_REJECTED === $this->state) {
-            if (null === $fnOnFinally) {
+        } elseif ( Promise::STATE_REJECTED === $this->state ) {
+            if ( null === $fnOnFinally ) {
                 $promise->reject(
                     $this->rejectedReason
                 );
@@ -406,7 +406,7 @@ class Promise
 
     protected function resolve($value = null) : void
     {
-        if (static::STATE_PENDING !== $this->state) {
+        if ( static::STATE_PENDING !== $this->state ) {
             throw new RuntimeException(
                 [ 'Promise is already `settled`', $this ]
             );
@@ -418,10 +418,10 @@ class Promise
         foreach ( $this->settlers as $settler ) {
             $promise = $settler->promise;
 
-            if (PromiseSettler::TYPE_THEN === $settler->type) {
+            if ( PromiseSettler::TYPE_THEN === $settler->type ) {
                 $fnOnResolved = $settler->fnOnResolved;
 
-                if (null === $fnOnResolved) {
+                if ( null === $fnOnResolved ) {
                     $promise->resolve(
                         $this->resolvedValue
                     );
@@ -436,15 +436,15 @@ class Promise
                     $this->loop->addMicrotask($fn);
                 }
 
-            } elseif (PromiseSettler::TYPE_CATCH === $settler->type) {
+            } elseif ( PromiseSettler::TYPE_CATCH === $settler->type ) {
                 $promise->resolve(
                     $this->resolvedValue
                 );
 
-            } elseif (PromiseSettler::TYPE_FINALLY === $settler->type) {
+            } elseif ( PromiseSettler::TYPE_FINALLY === $settler->type ) {
                 $fnOnFinally = $settler->fnOnFinally;
 
-                if (null === $fnOnFinally) {
+                if ( null === $fnOnFinally ) {
                     $promise->resolve(
                         $this->resolvedValue
                     );
@@ -479,7 +479,7 @@ class Promise
 
     protected function reject($reason = null) : void
     {
-        if (static::STATE_PENDING !== $this->state) {
+        if ( static::STATE_PENDING !== $this->state ) {
             throw new RuntimeException(
                 [ 'Promise is already `settled`', $this ]
             );
@@ -491,10 +491,10 @@ class Promise
         foreach ( $this->settlers as $settler ) {
             $promise = $settler->promise;
 
-            if (PromiseSettler::TYPE_THEN === $settler->type) {
+            if ( PromiseSettler::TYPE_THEN === $settler->type ) {
                 $fnOnRejected = $settler->fnOnRejected;
 
-                if (null === $fnOnRejected) {
+                if ( null === $fnOnRejected ) {
                     $promise->reject(
                         $this->rejectedReason
                     );
@@ -509,7 +509,7 @@ class Promise
                     $this->loop->addMicrotask($fn);
                 }
 
-            } elseif (PromiseSettler::TYPE_CATCH === $settler->type) {
+            } elseif ( PromiseSettler::TYPE_CATCH === $settler->type ) {
                 $fnOnRejected = $settler->fnOnRejected;
 
                 $fn = static::fnSettlerCatch(
@@ -520,10 +520,10 @@ class Promise
 
                 $this->loop->addMicrotask($fn);
 
-            } elseif (PromiseSettler::TYPE_FINALLY === $settler->type) {
+            } elseif ( PromiseSettler::TYPE_FINALLY === $settler->type ) {
                 $fnOnFinally = $settler->fnOnFinally;
 
-                if (null === $fnOnFinally) {
+                if ( null === $fnOnFinally ) {
                     $promise->reject(
                         $this->rejectedReason
                     );
@@ -540,7 +540,7 @@ class Promise
             }
         }
 
-        if (! $this->isRejectionDelegated) {
+        if ( ! $this->isRejectionDelegated ) {
             $fn = static::fnThrowIfUnhandledRejection($this);
 
             $this->loop->addMicrotask($fn);
@@ -581,7 +581,7 @@ class Promise
         catch ( \Throwable $throwable ) {
         }
 
-        if (null !== $throwable) {
+        if ( null !== $throwable ) {
             $this->reject(
                 $throwable
             );
@@ -589,7 +589,7 @@ class Promise
             return;
         }
 
-        if ($result instanceof \Generator) {
+        if ( $result instanceof \Generator ) {
             static::awaitGen($result, $this, null);
         }
     }
@@ -618,7 +618,7 @@ class Promise
     protected static function fnSettlerThen($fnOnResolved, $promise, $value)
     {
         return static function () use ($fnOnResolved, $promise, $value) {
-            if (null === $fnOnResolved) {
+            if ( null === $fnOnResolved ) {
                 $promise->resolve($value);
 
                 return;
@@ -633,7 +633,7 @@ class Promise
             catch ( \Throwable $throwable ) {
             }
 
-            if (null !== $throwable) {
+            if ( null !== $throwable ) {
                 $promise->reject(
                     $throwable
                 );
@@ -641,14 +641,14 @@ class Promise
                 return;
             }
 
-            if ($result instanceof \Generator) {
+            if ( $result instanceof \Generator ) {
                 static::awaitGen($result, $promise, $promise);
 
                 return;
             }
 
-            if ($result instanceof self) {
-                if ($result === $promise) {
+            if ( $result instanceof self ) {
+                if ( $result === $promise ) {
                     $promise->reject(
                         new RuntimeException(
                             [
@@ -685,7 +685,7 @@ class Promise
     protected static function fnSettlerCatch($fnOnRejected, $promise, $reason)
     {
         return static function () use ($fnOnRejected, $promise, $reason) {
-            if (null === $fnOnRejected) {
+            if ( null === $fnOnRejected ) {
                 $promise->reject($reason);
 
                 return;
@@ -700,7 +700,7 @@ class Promise
             catch ( \Throwable $throwable ) {
             }
 
-            if (null !== $throwable) {
+            if ( null !== $throwable ) {
                 $promise->reject(
                     $throwable
                 );
@@ -708,14 +708,14 @@ class Promise
                 return;
             }
 
-            if ($result instanceof \Generator) {
+            if ( $result instanceof \Generator ) {
                 static::awaitGen($result, $promise, $promise);
 
                 return;
             }
 
-            if ($result instanceof self) {
-                if ($result === $promise) {
+            if ( $result instanceof self ) {
+                if ( $result === $promise ) {
                     $promise->reject(
                         new RuntimeException(
                             [
@@ -752,7 +752,7 @@ class Promise
     protected static function fnSettlerFinally($fnOnFinally, $promise, $promiseParent)
     {
         return static function () use ($fnOnFinally, $promise, $promiseParent) {
-            if (null !== $fnOnFinally) {
+            if ( null !== $fnOnFinally ) {
                 $result = null;
                 $throwable = null;
 
@@ -762,7 +762,7 @@ class Promise
                 catch ( \Throwable $throwable ) {
                 }
 
-                if (null !== $throwable) {
+                if ( null !== $throwable ) {
                     $promise->reject(
                         $throwable
                     );
@@ -770,14 +770,14 @@ class Promise
                     return;
                 }
 
-                if ($result instanceof \Generator) {
+                if ( $result instanceof \Generator ) {
                     static::awaitGen($result, $promise, null);
 
                     return;
                 }
 
-                if ($result instanceof self) {
-                    if ($result === $promise) {
+                if ( $result instanceof self ) {
+                    if ( $result === $promise ) {
                         $promise->reject(
                             new RuntimeException(
                                 [
@@ -798,12 +798,12 @@ class Promise
                 }
             }
 
-            if (static::STATE_RESOLVED === $promiseParent->state) {
+            if ( static::STATE_RESOLVED === $promiseParent->state ) {
                 $promise->resolve(
                     $promiseParent->resolvedValue
                 );
 
-            } elseif (static::STATE_REJECTED === $promiseParent->state) {
+            } elseif ( static::STATE_REJECTED === $promiseParent->state ) {
                 $promise->reject(
                     $promiseParent->rejectedReason
                 );
@@ -820,7 +820,7 @@ class Promise
     protected static function fnThrowIfUnhandledRejection($promise)
     {
         return static function () use ($promise) {
-            if ($promise->isRejectionDelegated) {
+            if ( $promise->isRejectionDelegated ) {
                 return;
             }
 
@@ -841,7 +841,7 @@ class Promise
     protected static function fnThrowIfUnhandledRejectionInSecondStep($loop, $promise)
     {
         return static function () use ($loop, $promise) {
-            if (! $promise->isRejectionDelegated) {
+            if ( ! $promise->isRejectionDelegated ) {
                 $fn = static::fnThrowIfUnhandledRejection($promise);
 
                 $loop->addMicrotask($fn);
@@ -864,14 +864,14 @@ class Promise
         $result = null;
         $throwable = null;
 
-        if (! $isValid) {
+        if ( ! $isValid ) {
             try {
                 $result = $gen->getReturn();
             }
             catch ( \Throwable $throwable ) {
             }
 
-            if (null !== $throwable) {
+            if ( null !== $throwable ) {
                 $promiseToReject->reject(
                     $throwable
                 );
@@ -879,7 +879,7 @@ class Promise
                 return;
             }
 
-            if ($result instanceof \Generator) {
+            if ( $result instanceof \Generator ) {
                 $promiseToReject->reject(
                     new RuntimeException(
                         [
@@ -893,8 +893,8 @@ class Promise
                 return;
             }
 
-            if ($result instanceof self) {
-                if (false
+            if ( $result instanceof self ) {
+                if ( false
                     || ($result === $promiseToReject)
                     || ($result === $promiseToResolve)
                 ) {
@@ -924,7 +924,7 @@ class Promise
                 return;
             }
 
-            if ($hasPromiseToResolve) {
+            if ( $hasPromiseToResolve ) {
                 $promiseToResolve->resolve(
                     $result
                 );
@@ -939,7 +939,7 @@ class Promise
         catch ( \Throwable $throwable ) {
         }
 
-        if (null !== $throwable) {
+        if ( null !== $throwable ) {
             $promiseToReject->reject(
                 $throwable
             );
@@ -947,7 +947,7 @@ class Promise
             return;
         }
 
-        if ($current instanceof \Generator) {
+        if ( $current instanceof \Generator ) {
             $promiseToReject->reject(
                 new RuntimeException(
                     [
@@ -961,7 +961,7 @@ class Promise
             return;
         }
 
-        if ($current instanceof Promise) {
+        if ( $current instanceof Promise ) {
             $fnGenSend = static::fnGenSend($gen, $promiseToReject, $promiseToResolve);
             $fnGenThrow = static::fnGenThrow($gen, $promiseToReject, $promiseToResolve);
 
@@ -979,7 +979,7 @@ class Promise
         catch ( \Throwable $throwable ) {
         }
 
-        if (null !== $throwable) {
+        if ( null !== $throwable ) {
             $promiseToReject->reject(
                 $throwable
             );
@@ -1014,7 +1014,7 @@ class Promise
             catch ( \Throwable $throwable ) {
             }
 
-            if (null !== $throwable) {
+            if ( null !== $throwable ) {
                 $promiseToReject->reject(
                     $throwable
                 );
@@ -1049,7 +1049,7 @@ class Promise
             catch ( \Throwable $throwable ) {
             }
 
-            if (null !== $throwable) {
+            if ( null !== $throwable ) {
                 $promiseToReject->reject(
                     $throwable
                 );

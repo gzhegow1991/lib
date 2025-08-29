@@ -43,8 +43,8 @@ class DefaultProcessManager implements ProcessManagerInterface
 
         $useSymfonyProcess = $useSymfonyProcess ?? $classExists;
 
-        if ($useSymfonyProcess) {
-            if (! $classExists) {
+        if ( $useSymfonyProcess ) {
+            if ( ! $classExists ) {
                 $commands = [
                     'composer require symfony/process',
                 ];
@@ -95,10 +95,10 @@ class DefaultProcessManager implements ProcessManagerInterface
 
         $proc->setIsBackground(false);
 
-        if ($this->useSymfonyProcess) {
+        if ( $this->useSymfonyProcess ) {
             $proc->spawnUsingSymfonyProcess();
 
-        } elseif ($isWindows) {
+        } elseif ( $isWindows ) {
             $proc->spawnUsingProcOpenWindows();
 
         } else {
@@ -119,10 +119,10 @@ class DefaultProcessManager implements ProcessManagerInterface
 
         $proc->setIsBackground(true);
 
-        if ($this->useSymfonyProcess) {
+        if ( $this->useSymfonyProcess ) {
             $proc->spawnUsingSymfonyProcess();
 
-        } elseif ($isWindows) {
+        } elseif ( $isWindows ) {
             $proc->spawnUsingProcOpenWindows();
 
         } else {

@@ -20,8 +20,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -63,8 +63,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -100,8 +100,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -135,8 +135,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -180,8 +180,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -213,8 +213,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -247,8 +247,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -282,8 +282,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -317,8 +317,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -352,8 +352,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -389,8 +389,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -424,8 +424,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -459,8 +459,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -494,8 +494,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -530,8 +530,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -566,8 +566,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -601,8 +601,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -636,8 +636,8 @@ class CmpModule
     ) : \Closure
     {
         $withFnCmpName = array_key_exists(0, $refs);
-        if ($withFnCmpName) {
-            $fnCmpName =& $refs[ 0 ];
+        if ( $withFnCmpName ) {
+            $fnCmpName =& $refs[0];
         }
         $fnCmpName = null;
 
@@ -679,8 +679,8 @@ class CmpModule
         ?string &$refFnCmpName = null
     ) // : null|NAN
     {
-        if ($flagsMode & _CMP_MODE_TYPE_STRICT) {
-            if (gettype($a) !== gettype($b)) {
+        if ( $flagsMode & _CMP_MODE_TYPE_STRICT ) {
+            if ( gettype($a) !== gettype($b) ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return NAN;
@@ -707,7 +707,7 @@ class CmpModule
         $isNanA = is_float($a) && is_nan($a);
         $isNanB = is_float($b) && is_nan($b);
 
-        if ($isNanA || $isNanB) {
+        if ( $isNanA || $isNanB ) {
             $refFnCmpName = __FUNCTION__;
 
             return NAN;
@@ -732,12 +732,12 @@ class CmpModule
         $isNilA = Nil::is($a);
         $isNilB = Nil::is($b);
 
-        if ($isNilA && $isNilB) {
+        if ( $isNilA && $isNilB ) {
             $refFnCmpName = __FUNCTION__;
 
             return 0;
 
-        } elseif ($isNilA || $isNilB) {
+        } elseif ( $isNilA || $isNilB ) {
             $refFnCmpName = __FUNCTION__;
 
             return NAN;
@@ -762,25 +762,25 @@ class CmpModule
         $isNullA = ($a === null);
         $isNullB = ($b === null);
 
-        if ($isNullA && $isNullB) {
+        if ( $isNullA && $isNullB ) {
             $refFnCmpName = __FUNCTION__;
 
             return 0;
 
-        } elseif ($isNullA || $isNullB) {
+        } elseif ( $isNullA || $isNullB ) {
             $theType = Lib::type();
 
             $aStatus = $isNullA;
             $bStatus = $isNullB;
-            if (! $isNullA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->blank($a)->isOk();
-            if (! $isNullB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->blank($b)->isOk();
+            if ( ! $isNullA && ($flagsMode & _CMP_MODE_TYPECAST_A) ) $aStatus = $theType->blank($a)->isOk();
+            if ( ! $isNullB && ($flagsMode & _CMP_MODE_TYPECAST_B) ) $bStatus = $theType->blank($b)->isOk();
 
-            if ($aStatus && $bStatus) {
+            if ( $aStatus && $bStatus ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return 0;
 
-            } elseif ($aStatus || $bStatus) {
+            } elseif ( $aStatus || $bStatus ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return $bStatus <=> $aStatus;
@@ -806,20 +806,20 @@ class CmpModule
         $isBoolA = is_bool($a);
         $isBoolB = is_bool($b);
 
-        if ($isBoolA && $isBoolB) {
+        if ( $isBoolA && $isBoolB ) {
             $refFnCmpName = __FUNCTION__;
 
             return $a <=> $b;
 
-        } elseif ($isBoolA || $isBoolB) {
+        } elseif ( $isBoolA || $isBoolB ) {
             $theType = Lib::type();
 
             $aStatus = $isBoolA;
             $bStatus = $isBoolB;
-            if (! $isBoolA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->bool($a)->isOk([ &$aBool ]);
-            if (! $isBoolB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->bool($b)->isOk([ &$bBool ]);
+            if ( ! $isBoolA && ($flagsMode & _CMP_MODE_TYPECAST_A) ) $aStatus = $theType->bool($a)->isOk([ &$aBool ]);
+            if ( ! $isBoolB && ($flagsMode & _CMP_MODE_TYPECAST_B) ) $bStatus = $theType->bool($b)->isOk([ &$bBool ]);
 
-            if ($aStatus && $bStatus) {
+            if ( $aStatus && $bStatus ) {
                 $aBool = $aBool ?? $a;
                 $bBool = $bBool ?? $b;
 
@@ -855,23 +855,23 @@ class CmpModule
         $isIntA = is_int($a);
         $isIntB = is_int($b);
 
-        if ($isIntA && $isIntB) {
+        if ( $isIntA && $isIntB ) {
             $refFnCmpName = __FUNCTION__;
 
             return $a <=> $b;
 
-        } elseif ($isIntA || $isIntB) {
+        } elseif ( $isIntA || $isIntB ) {
             $theType = Lib::type();
 
             $aStatus = $isIntA;
             $bStatus = $isIntB;
-            if (! $isIntA && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->int($a)->isOk([ &$aInt ]);
-            if (! $isIntB && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->int($b)->isOk([ &$bInt ]);
+            if ( ! $isIntA && ($flagsMode & _CMP_MODE_TYPECAST_A) ) $aStatus = $theType->int($a)->isOk([ &$aInt ]);
+            if ( ! $isIntB && ($flagsMode & _CMP_MODE_TYPECAST_B) ) $bStatus = $theType->int($b)->isOk([ &$bInt ]);
 
             $aInt = $aInt ?? $a;
             $bInt = $bInt ?? $b;
 
-            if ($aStatus && $bStatus) {
+            if ( $aStatus && $bStatus ) {
                 $aInt = $aInt ?? $a;
                 $bInt = $bInt ?? $b;
 
@@ -907,14 +907,14 @@ class CmpModule
         $isFloatA = is_float($a);
         $isFloatB = is_float($b);
 
-        if ($isFloatA || $isFloatB) {
+        if ( $isFloatA || $isFloatB ) {
             $isNanA = $isFloatA && is_nan($a);
             $isNanB = $isFloatB && is_nan($b);
 
             $isInfiniteA = $isFloatA && is_infinite($a);
             $isInfiniteB = $isFloatB && is_infinite($b);
 
-            if ($isNanA || $isNanB) {
+            if ( $isNanA || $isNanB ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return NAN;
@@ -933,20 +933,20 @@ class CmpModule
             $aNum = $aNum ?? $a;
             $bNum = $bNum ?? $b;
 
-            if ($isInfiniteA || $isInfiniteB) {
-                if ($isInfiniteA && $isInfiniteB) {
+            if ( $isInfiniteA || $isInfiniteB ) {
+                if ( $isInfiniteA && $isInfiniteB ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return $a <=> $b;
                 }
 
-                if ($isInfiniteA && $bStatus) {
+                if ( $isInfiniteA && $bStatus ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return $a <=> $bNum;
                 }
 
-                if ($isInfiniteB && $aStatus) {
+                if ( $isInfiniteB && $aStatus ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return $aNum <=> $b;
@@ -957,7 +957,7 @@ class CmpModule
                 return NAN;
             }
 
-            if ($aStatus && $bStatus) {
+            if ( $aStatus && $bStatus ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return $aNum <=> $bNum;
@@ -992,11 +992,11 @@ class CmpModule
         $isNumericA = $theType->numeric($a)->isOk([ &$aNumeric ]);
         $isNumericB = $theType->numeric($b)->isOk([ &$bNumeric ]);
 
-        if ($isNumericA || $isNumericB) {
+        if ( $isNumericA || $isNumericB ) {
             $isIntA = is_int($a);
             $isIntB = is_int($b);
 
-            if ($isIntA && $isIntB) {
+            if ( $isIntA && $isIntB ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return $a <=> $b;
@@ -1011,7 +1011,7 @@ class CmpModule
             $isInfiniteA = $isFloatA && is_infinite($a);
             $isInfiniteB = $isFloatB && is_infinite($b);
 
-            if ($isNanA || $isNanB) {
+            if ( $isNanA || $isNanB ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return NAN;
@@ -1028,20 +1028,20 @@ class CmpModule
             $aNum = $aNum ?? $a;
             $bNum = $bNum ?? $b;
 
-            if ($isInfiniteA || $isInfiniteB) {
-                if ($isInfiniteA && $isInfiniteB) {
+            if ( $isInfiniteA || $isInfiniteB ) {
+                if ( $isInfiniteA && $isInfiniteB ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return $a <=> $b;
                 }
 
-                if ($isInfiniteA && $bStatus) {
+                if ( $isInfiniteA && $bStatus ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return $a <=> $bNum;
                 }
 
-                if ($isInfiniteB && $aStatus) {
+                if ( $isInfiniteB && $aStatus ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return $aNum <=> $b;
@@ -1052,7 +1052,7 @@ class CmpModule
                 return NAN;
             }
 
-            if ($aStatus && $bStatus) {
+            if ( $aStatus && $bStatus ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return $aNum <=> $bNum;
@@ -1085,19 +1085,19 @@ class CmpModule
         $isStringA = is_string($a);
         $isStringB = is_string($b);
 
-        if ($isStringA || $isStringB) {
+        if ( $isStringA || $isStringB ) {
             $theType = Lib::type();
 
             $aStatus = $isStringA;
             $bStatus = $isStringB;
-            if (! $aStatus && ($flagsMode & _CMP_MODE_TYPECAST_A)) $aStatus = $theType->string($a)->isOk([ &$aString ]);
-            if (! $bStatus && ($flagsMode & _CMP_MODE_TYPECAST_B)) $bStatus = $theType->string($b)->isOk([ &$bString ]);
+            if ( ! $aStatus && ($flagsMode & _CMP_MODE_TYPECAST_A) ) $aStatus = $theType->string($a)->isOk([ &$aString ]);
+            if ( ! $bStatus && ($flagsMode & _CMP_MODE_TYPECAST_B) ) $bStatus = $theType->string($b)->isOk([ &$bString ]);
 
-            if ($aStatus && $bStatus) {
+            if ( $aStatus && $bStatus ) {
                 $aString = $aString ?? $a;
                 $bString = $bString ?? $b;
 
-                if ($aString === $bString) {
+                if ( $aString === $bString ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return 0;
@@ -1105,7 +1105,7 @@ class CmpModule
 
                 $resultLen = null;
 
-                if ($flagsMode & _CMP_MODE_STRING_SIZE_STRLEN) {
+                if ( $flagsMode & _CMP_MODE_STRING_SIZE_STRLEN ) {
                     $theStr = Lib::str();
 
                     $aStringLen = $theStr->strlen($aString);
@@ -1113,16 +1113,16 @@ class CmpModule
 
                     $resultLen = ($aStringLen <=> $bStringLen);
 
-                    if (0 !== $resultLen) {
+                    if ( 0 !== $resultLen ) {
                         $refFnCmpName = __FUNCTION__;
 
                         return $resultLen;
                     }
 
-                } elseif ($flagsMode & _CMP_MODE_STRING_SIZE_STRSIZE) {
+                } elseif ( $flagsMode & _CMP_MODE_STRING_SIZE_STRSIZE ) {
                     $resultLen = (strlen($a) <=> strlen($b));
 
-                    if (0 !== $resultLen) {
+                    if ( 0 !== $resultLen ) {
                         $refFnCmpName = __FUNCTION__;
 
                         return $resultLen;
@@ -1136,7 +1136,7 @@ class CmpModule
                     ?? (($flagsMode & _CMP_MODE_STRING_VS_STRCMP) ? strcmp($aString, $bString) : null)
                     ?? $resultLen;
 
-                if (null !== $result) {
+                if ( null !== $result ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return $result;
@@ -1174,8 +1174,8 @@ class CmpModule
         $isArrayA = is_array($a);
         $isArrayB = is_array($b);
 
-        if ($isArrayA && $isArrayB) {
-            if ($a === $b) {
+        if ( $isArrayA && $isArrayB ) {
+            if ( $a === $b ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return 0;
@@ -1183,10 +1183,10 @@ class CmpModule
 
             $resultCnt = null;
 
-            if ($flagsMode & _CMP_MODE_ARRAY_SIZE_COUNT) {
+            if ( $flagsMode & _CMP_MODE_ARRAY_SIZE_COUNT ) {
                 $resultCnt = (count($a) <=> count($b));
 
-                if (0 !== $resultCnt) {
+                if ( 0 !== $resultCnt ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return $resultCnt;
@@ -1197,7 +1197,7 @@ class CmpModule
                 ?? (($flagsMode & _CMP_MODE_ARRAY_VS_SPACESHIP) ? ($a <=> $b) : null)
                 ?? $resultCnt;
 
-            if (null !== $result) {
+            if ( null !== $result ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return $result;
@@ -1207,7 +1207,7 @@ class CmpModule
 
             return NAN;
 
-        } elseif ($isArrayA || $isArrayB) {
+        } elseif ( $isArrayA || $isArrayB ) {
             $refFnCmpName = __FUNCTION__;
 
             return NAN;
@@ -1232,8 +1232,8 @@ class CmpModule
         $isDateA = $a instanceof \DateTimeInterface;
         $isDateB = $b instanceof \DateTimeInterface;
 
-        if ($isDateA && $isDateB) {
-            if ($a === $b) {
+        if ( $isDateA && $isDateB ) {
+            if ( $a === $b ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return 0;
@@ -1246,7 +1246,7 @@ class CmpModule
 
             return $aCut <=> $bCut;
 
-        } elseif ($isDateA || $isDateB) {
+        } elseif ( $isDateA || $isDateB ) {
             $refFnCmpName = __FUNCTION__;
 
             return NAN;
@@ -1271,14 +1271,14 @@ class CmpModule
         $isObjectA = is_object($a);
         $isObjectB = is_object($b);
 
-        if ($isObjectA && $isObjectB) {
-            if ($a === $b) {
+        if ( $isObjectA && $isObjectB ) {
+            if ( $a === $b ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return 0;
             }
 
-            if (get_class($a) !== get_class($b)) {
+            if ( get_class($a) !== get_class($b) ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return NAN;
@@ -1286,29 +1286,29 @@ class CmpModule
 
             $resultCnt = null;
 
-            if ($flagsMode & _CMP_MODE_OBJECT_SIZE_COUNT) {
+            if ( $flagsMode & _CMP_MODE_OBJECT_SIZE_COUNT ) {
                 $theType = Lib::type();
 
                 $isCountableA = $theType->countable($a)->isOk([ &$aCountable ]);
                 $isCountableB = $theType->countable($b)->isOk([ &$bCountable ]);
 
-                if ($isCountableA && $isCountableB) {
+                if ( $isCountableA && $isCountableB ) {
                     $resultCnt = count($a) <=> count($b);
 
-                    if (0 !== $resultCnt) {
+                    if ( 0 !== $resultCnt ) {
                         $refFnCmpName = __FUNCTION__;
 
                         return $resultCnt;
                     }
 
-                } elseif ($isCountableA || $isCountableB) {
+                } elseif ( $isCountableA || $isCountableB ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return NAN;
                 }
             }
 
-            if (null !== $resultCnt) {
+            if ( null !== $resultCnt ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return $resultCnt;
@@ -1318,7 +1318,7 @@ class CmpModule
 
             return NAN;
 
-        } elseif ($isObjectA || $isObjectB) {
+        } elseif ( $isObjectA || $isObjectB ) {
             $refFnCmpName = __FUNCTION__;
 
             return NAN;
@@ -1345,8 +1345,8 @@ class CmpModule
         $isResourceA = $theType->resource($a)->isOk([ &$aResource ]);
         $isResourceB = $theType->resource($b)->isOk([ &$bResource ]);
 
-        if ($isResourceA && $isResourceB) {
-            if ($a === $b) {
+        if ( $isResourceA && $isResourceB ) {
+            if ( $a === $b ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return 0;
@@ -1356,7 +1356,7 @@ class CmpModule
 
             return NAN;
 
-        } elseif ($isResourceA || $isResourceB) {
+        } elseif ( $isResourceA || $isResourceB ) {
             $refFnCmpName = __FUNCTION__;
 
             return NAN;
@@ -1382,19 +1382,19 @@ class CmpModule
         $isStringA = is_string($a);
         $isStringB = is_string($b);
 
-        if ($isStringA || $isStringB) {
+        if ( $isStringA || $isStringB ) {
             $theType = Lib::type();
 
             $aStatus = $isStringA;
             $bStatus = $isStringB;
-            if (! $aStatus) $aStatus = $theType->string($a)->isOk([ &$aString ]);
-            if (! $bStatus) $bStatus = $theType->string($b)->isOk([ &$bString ]);
+            if ( ! $aStatus ) $aStatus = $theType->string($a)->isOk([ &$aString ]);
+            if ( ! $bStatus ) $bStatus = $theType->string($b)->isOk([ &$bString ]);
 
-            if ($aStatus && $bStatus) {
+            if ( $aStatus && $bStatus ) {
                 $aString = $aString ?? $a;
                 $bString = $bString ?? $b;
 
-                if ($aString === $bString) {
+                if ( $aString === $bString ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return 0;
@@ -1402,7 +1402,7 @@ class CmpModule
 
                 $resultLen = null;
 
-                if ($flagsMode & _CMP_MODE_STRING_SIZE_STRLEN) {
+                if ( $flagsMode & _CMP_MODE_STRING_SIZE_STRLEN ) {
                     $theStr = Lib::str();
 
                     $aStringLen = $theStr->strlen($aString);
@@ -1410,23 +1410,23 @@ class CmpModule
 
                     $resultLen = ($aStringLen <=> $bStringLen);
 
-                    if (0 !== $resultLen) {
+                    if ( 0 !== $resultLen ) {
                         $refFnCmpName = __FUNCTION__;
 
                         return $resultLen;
                     }
 
-                } elseif ($flagsMode & _CMP_MODE_STRING_SIZE_STRSIZE) {
+                } elseif ( $flagsMode & _CMP_MODE_STRING_SIZE_STRSIZE ) {
                     $resultLen = (strlen($a) <=> strlen($b));
 
-                    if (0 !== $resultLen) {
+                    if ( 0 !== $resultLen ) {
                         $refFnCmpName = __FUNCTION__;
 
                         return $resultLen;
                     }
                 }
 
-                if (null !== $resultLen) {
+                if ( null !== $resultLen ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return $resultLen;
@@ -1464,8 +1464,8 @@ class CmpModule
         $isArrayA = is_array($a);
         $isArrayB = is_array($b);
 
-        if ($isArrayA && $isArrayB) {
-            if ($a === $b) {
+        if ( $isArrayA && $isArrayB ) {
+            if ( $a === $b ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return 0;
@@ -1473,17 +1473,17 @@ class CmpModule
 
             $resultCnt = null;
 
-            if ($flagsMode & _CMP_MODE_ARRAY_SIZE_COUNT) {
+            if ( $flagsMode & _CMP_MODE_ARRAY_SIZE_COUNT ) {
                 $resultCnt = (count($a) <=> count($b));
 
-                if (0 !== $resultCnt) {
+                if ( 0 !== $resultCnt ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return $resultCnt;
                 }
             }
 
-            if (null !== $resultCnt) {
+            if ( null !== $resultCnt ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return $resultCnt;
@@ -1493,7 +1493,7 @@ class CmpModule
 
             return NAN;
 
-        } elseif ($isArrayA || $isArrayB) {
+        } elseif ( $isArrayA || $isArrayB ) {
             $refFnCmpName = __FUNCTION__;
 
             return NAN;
@@ -1518,38 +1518,38 @@ class CmpModule
         $isObjectA = is_object($a);
         $isObjectB = is_object($b);
 
-        if ($isObjectA && $isObjectB) {
+        if ( $isObjectA && $isObjectB ) {
             $resultCnt = null;
 
-            if (get_class($a) !== get_class($b)) {
+            if ( get_class($a) !== get_class($b) ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return NAN;
             }
 
-            if ($flagsMode & _CMP_MODE_OBJECT_SIZE_COUNT) {
+            if ( $flagsMode & _CMP_MODE_OBJECT_SIZE_COUNT ) {
                 $theType = Lib::type();
 
                 $isCountableA = $theType->countable($a)->isOk([ &$aCountable ]);
                 $isCountableB = $theType->countable($b)->isOk([ &$bCountable ]);
 
-                if ($isCountableA && $isCountableB) {
+                if ( $isCountableA && $isCountableB ) {
                     $resultCnt = count($a) <=> count($b);
 
-                    if (0 !== $resultCnt) {
+                    if ( 0 !== $resultCnt ) {
                         $refFnCmpName = __FUNCTION__;
 
                         return $resultCnt;
                     }
 
-                } elseif ($isCountableA || $isCountableB) {
+                } elseif ( $isCountableA || $isCountableB ) {
                     $refFnCmpName = __FUNCTION__;
 
                     return NAN;
                 }
             }
 
-            if (null !== $resultCnt) {
+            if ( null !== $resultCnt ) {
                 $refFnCmpName = __FUNCTION__;
 
                 return $resultCnt;
@@ -1559,7 +1559,7 @@ class CmpModule
 
             return NAN;
 
-        } elseif ($isObjectA || $isObjectB) {
+        } elseif ( $isObjectA || $isObjectB ) {
             $refFnCmpName = __FUNCTION__;
 
             return NAN;
@@ -1602,43 +1602,43 @@ class CmpModule
 
         $result = null;
 
-        if (false
+        if ( false
             || ($_aStart > $_aEnd)
             || ($_bStart > $_bEnd)
         ) {
             // > invalid
             $result = NAN;
 
-        } elseif (true
+        } elseif ( true
             && ($_aStart == $_bStart)
             && ($_aEnd == $_bEnd)
         ) {
             // | AB--AB |
             $result = 0;
 
-        } elseif (true
+        } elseif ( true
             && ($_aStart >= $_bStart)
             && ($_aEnd <= $_bEnd)
         ) {
             // | B-A-A-B |
             $result = -1;
 
-        } elseif (true
+        } elseif ( true
             && ($_aStart <= $_bStart)
             && ($_aEnd >= $_bEnd)
         ) {
             // | A-B-B-A |
             $result = 1;
 
-        } elseif ($_aEnd == $_bStart) {
+        } elseif ( $_aEnd == $_bStart ) {
             // | A--AB--B |
             $result = -3;
 
-        } elseif ($_aStart == $_bEnd) {
+        } elseif ( $_aStart == $_bEnd ) {
             // | B--BA--A |
             $result = 3;
 
-        } elseif (true
+        } elseif ( true
             && ($_aStart < $_bStart)
             && ($_aEnd > $_bStart)
             && ($_aEnd < $_bEnd)
@@ -1646,7 +1646,7 @@ class CmpModule
             // | A-B-A-B |
             $result = -2;
 
-        } elseif (true
+        } elseif ( true
             && ($_aStart > $_bStart)
             && ($_aStart < $_bEnd)
             && ($_aEnd > $_bEnd)
@@ -1654,16 +1654,16 @@ class CmpModule
             // | B-A-B-A |
             $result = 2;
 
-        } elseif ($_aEnd < $_bStart) {
+        } elseif ( $_aEnd < $_bStart ) {
             // | A--A B--B |
             $result = -4;
 
-        } elseif ($_aStart > $_bEnd) {
+        } elseif ( $_aStart > $_bEnd ) {
             // | B--B A--A |
             $result = 4;
         }
 
-        if (null !== $result) {
+        if ( null !== $result ) {
             $refFnCmpName = __FUNCTION__;
 
             return $result;
@@ -1681,13 +1681,13 @@ class CmpModule
             ?? (($date instanceof \DateTimeImmutable) ? \DateTime::createFromImmutable($date) : null)
             ?? (($date instanceof \DateTime) ? (clone $date) : null);
 
-        if ($flagsMode & _CMP_MODE_DATE_VS_YEAR) {
+        if ( $flagsMode & _CMP_MODE_DATE_VS_YEAR ) {
             $dt
                 ->setDate($date->format('Y'), 1, 1)
                 ->setTime(0, 0, 0, 0)
             ;
 
-        } elseif ($flagsMode & _CMP_MODE_DATE_VS_MONTH) {
+        } elseif ( $flagsMode & _CMP_MODE_DATE_VS_MONTH ) {
             $dt
                 ->setDate(
                     (int) $date->format('Y'),
@@ -1697,7 +1697,7 @@ class CmpModule
                 ->setTime(0, 0, 0, 0)
             ;
 
-        } elseif ($flagsMode & _CMP_MODE_DATE_VS_DAY) {
+        } elseif ( $flagsMode & _CMP_MODE_DATE_VS_DAY ) {
             $dt
                 ->setDate(
                     (int) $date->format('Y'),
@@ -1707,7 +1707,7 @@ class CmpModule
                 ->setTime(0, 0, 0, 0)
             ;
 
-        } elseif ($flagsMode & _CMP_MODE_DATE_VS_HOUR) {
+        } elseif ( $flagsMode & _CMP_MODE_DATE_VS_HOUR ) {
             $dt
                 ->setDate(
                     (int) $date->format('Y'),
@@ -1717,7 +1717,7 @@ class CmpModule
                 ->setTime((int) $date->format('H'), 0, 0, 0)
             ;
 
-        } elseif ($flagsMode & _CMP_MODE_DATE_VS_MIN) {
+        } elseif ( $flagsMode & _CMP_MODE_DATE_VS_MIN ) {
             $dt
                 ->setDate(
                     (int) $date->format('Y'),
@@ -1732,7 +1732,7 @@ class CmpModule
                 )
             ;
 
-        } elseif ($flagsMode & _CMP_MODE_DATE_VS_SEC) {
+        } elseif ( $flagsMode & _CMP_MODE_DATE_VS_SEC ) {
             $dt
                 ->setDate(
                     (int) $date->format('Y'),
@@ -1747,7 +1747,7 @@ class CmpModule
                 )
             ;
 
-        } elseif ($flagsMode & _CMP_MODE_DATE_VS_MSEC) {
+        } elseif ( $flagsMode & _CMP_MODE_DATE_VS_MSEC ) {
             $dt
                 ->setDate(
                     (int) $date->format('Y'),
@@ -1762,7 +1762,7 @@ class CmpModule
                 )
             ;
 
-        } elseif ($flagsMode & _CMP_MODE_DATE_VS_USEC) {
+        } elseif ( $flagsMode & _CMP_MODE_DATE_VS_USEC ) {
             $dt
                 ->setDate(
                     (int) $date->format('Y'),
@@ -1794,15 +1794,15 @@ class CmpModule
         ?string &$refFnCmpName = null
     ) // : null|int|NAN
     {
-        if ($flagsMode & _CMP_MODE_TYPE_TYPECAST_OR_CONTINUE) {
+        if ( $flagsMode & _CMP_MODE_TYPE_TYPECAST_OR_CONTINUE ) {
             return null;
 
-        } elseif ($flagsMode & _CMP_MODE_TYPE_TYPECAST_OR_NAN) {
+        } elseif ( $flagsMode & _CMP_MODE_TYPE_TYPECAST_OR_NAN ) {
             $refFnCmpName = __FUNCTION__;
 
             return NAN;
 
-        } elseif ($flagsMode & _CMP_MODE_TYPE_STRICT) {
+        } elseif ( $flagsMode & _CMP_MODE_TYPE_STRICT ) {
             /** @see static::cmpTypesStrict() */
 
             return NAN;
@@ -1832,23 +1832,23 @@ class CmpModule
     {
         $_result = $result;
 
-        if (null === $result) {
-            if ($flagsResult & _CMP_MODE_RESULT_SPACESHIP) {
+        if ( null === $result ) {
+            if ( $flagsResult & _CMP_MODE_RESULT_SPACESHIP ) {
                 $refFnCmpName = __FUNCTION__;
 
                 $_result = $a <=> $b;
 
-            } elseif ($flagsResult & _CMP_RESULT_NULL_0) {
+            } elseif ( $flagsResult & _CMP_RESULT_NULL_0 ) {
                 $refFnCmpName = __FUNCTION__;
 
                 $_result = 0;
 
-            } elseif ($flagsResult & _CMP_RESULT_NULL_A_LT) {
+            } elseif ( $flagsResult & _CMP_RESULT_NULL_A_LT ) {
                 $refFnCmpName = __FUNCTION__;
 
                 $_result = 1;
 
-            } elseif ($flagsResult & _CMP_RESULT_NULL_A_GT) {
+            } elseif ( $flagsResult & _CMP_RESULT_NULL_A_GT ) {
                 $refFnCmpName = __FUNCTION__;
 
                 $_result = -1;
@@ -1861,8 +1861,8 @@ class CmpModule
             }
         }
 
-        if (is_float($_result) && is_nan($_result)) {
-            if ($flagsResult & _CMP_RESULT_NAN_THROW) {
+        if ( is_float($_result) && is_nan($_result) ) {
+            if ( $flagsResult & _CMP_RESULT_NAN_THROW ) {
                 throw new RuntimeException(
                     [ 'Values are incomparable', $a, $b ]
                 );
@@ -1954,20 +1954,20 @@ class CmpModule
             ],
         ];
 
-        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+        foreach ( $flagGroups as $groupName => [$conflict, $default] ) {
             $cnt = 0;
             foreach ( $conflict as $flag ) {
-                if ($flags & $flag) {
+                if ( $flags & $flag ) {
                     $cnt++;
                 }
             }
 
-            if ($cnt > 1) {
+            if ( $cnt > 1 ) {
                 throw new LogicException(
                     [ 'The `flagsMode` conflict in group: ' . $groupName, $flags ]
                 );
 
-            } elseif (0 === $cnt) {
+            } elseif ( 0 === $cnt ) {
                 $flags |= $default;
             }
         }
@@ -2000,20 +2000,20 @@ class CmpModule
             ],
         ];
 
-        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+        foreach ( $flagGroups as $groupName => [$conflict, $default] ) {
             $cnt = 0;
             foreach ( $conflict as $flag ) {
-                if ($flags & $flag) {
+                if ( $flags & $flag ) {
                     $cnt++;
                 }
             }
 
-            if ($cnt > 1) {
+            if ( $cnt > 1 ) {
                 throw new LogicException(
                     [ 'The `flagsResult` conflict in group: ' . $groupName, $flags ]
                 );
 
-            } elseif (0 === $cnt) {
+            } elseif ( 0 === $cnt ) {
                 $flags |= $default;
             }
         }

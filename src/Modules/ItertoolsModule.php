@@ -17,7 +17,7 @@ class ItertoolsModule
             $reversed[] = [ $key, $item ];
         }
 
-        foreach ( array_reverse($reversed) as [ $key, $item ] ) {
+        foreach ( array_reverse($reversed) as [$key, $item] ) {
             yield $key => $item;
         }
     }
@@ -35,30 +35,30 @@ class ItertoolsModule
     {
         $step = $step ?? 1;
 
-        if (! (false
+        if ( ! (false
             || ($isStringStart = is_string($start))
             || is_int($start)
             || is_float($start)
-        )) {
+        ) ) {
             throw new LogicException(
                 [ 'The `start` should be an int|float|string', $start ]
             );
         }
 
-        if (! (false
+        if ( ! (false
             || ($isStringEnd = is_string($end))
             || is_int($end)
             || is_float($end)
-        )) {
+        ) ) {
             throw new LogicException(
                 [ 'The `end` should be an int|float|string', $end ]
             );
         }
 
-        if (! (false
+        if ( ! (false
             || ($isFloatStep = is_float($step))
             || is_int($step)
-        )) {
+        ) ) {
             throw new LogicException(
                 [ 'The `step` should be an int|float', $step ]
             );
@@ -69,19 +69,19 @@ class ItertoolsModule
         $intStep = (int) $step;
         $floatStep = (float) $step;
 
-        if ($floatStep === (float) $intStep) {
+        if ( $floatStep === (float) $intStep ) {
             $_step = $intStep;
 
             $isFloatStep = false;
         }
 
-        if (0 == $_step) {
+        if ( 0 == $_step ) {
             return;
         }
 
         $isModeString = ($isStringStart || $isStringEnd);
 
-        if ($isModeString && $isFloatStep) {
+        if ( $isModeString && $isFloatStep ) {
             throw new LogicException(
                 [ 'The `step` should be an integer if `start` or `end` are strings', $step ]
             );
@@ -90,12 +90,12 @@ class ItertoolsModule
         $_start = $start;
         $_end = $end;
 
-        if ($isModeString) {
-            if (! $isStringStart) {
+        if ( $isModeString ) {
+            if ( ! $isStringStart ) {
                 $_start = (string) $_start;
             }
 
-            if (! $isStringEnd) {
+            if ( ! $isStringEnd ) {
                 $_end = (string) $_end;
             }
 
@@ -106,14 +106,14 @@ class ItertoolsModule
             $floatStart = (float) $start;
             $floatEnd = (float) $end;
 
-            if ($floatStart === (float) $intStart) {
+            if ( $floatStart === (float) $intStart ) {
                 $_start = $intStart;
 
             } else {
                 $_start = $floatStart;
             }
 
-            if ($floatEnd === (float) $intEnd) {
+            if ( $floatEnd === (float) $intEnd ) {
                 $_end = $intEnd;
 
             } else {
@@ -125,12 +125,12 @@ class ItertoolsModule
 
         $i = $_start;
 
-        if ($isReverse) {
+        if ( $isReverse ) {
             while ( $i >= $_end ) {
                 yield $i;
 
-                if ($isModeString) {
-                    if ($i === $_start) {
+                if ( $isModeString ) {
+                    if ( $i === $_start ) {
                         break;
                     }
 
@@ -147,8 +147,8 @@ class ItertoolsModule
             while ( $i <= $_end ) {
                 yield $i;
 
-                if ($isModeString) {
-                    if ($i === $_end) {
+                if ( $isModeString ) {
+                    if ( $i === $_end ) {
                         break;
                     }
 
@@ -172,7 +172,7 @@ class ItertoolsModule
         $pools = [];
         foreach ( $iterables as $i => $iterable ) {
             foreach ( $iterable as $ii => $v ) {
-                $pools[ $i ][ $ii ] = $v;
+                $pools[$i][$ii] = $v;
             }
         }
 
@@ -200,7 +200,7 @@ class ItertoolsModule
      */
     public function product_repeat_it(int $repeat, iterable ...$iterables) : \Generator
     {
-        if ($repeat < 1) {
+        if ( $repeat < 1 ) {
             throw new LogicException(
                 [ 'The `repeat` should be positive integer', $repeat ]
             );
@@ -209,7 +209,7 @@ class ItertoolsModule
         $pools = [];
         foreach ( $iterables as $i => $iterable ) {
             foreach ( $iterable as $ii => $v ) {
-                $pools[ $i ][ $ii ] = $v;
+                $pools[$i][$ii] = $v;
             }
         }
 
@@ -252,7 +252,7 @@ class ItertoolsModule
 
         $size = count($pool);
 
-        if ($len > $size) {
+        if ( $len > $size ) {
             return;
         }
 
@@ -260,7 +260,7 @@ class ItertoolsModule
         $row = [];
         $indexes = [];
         for ( $i = 0; $i <= $iMax; $i++ ) {
-            $row[] = $pool[ $i ];
+            $row[] = $pool[$i];
             $indexes[] = $i;
         }
 
@@ -272,30 +272,30 @@ class ItertoolsModule
             $iMax = ($len - 1);
             // foreach ( $this->range_it(($len - 1), 0, -1) as $i ) {
             for ( $i = $iMax; $i >= 0; $i-- ) {
-                if ($indexes[ $i ] !== $i + $size - $len) {
+                if ( $indexes[$i] !== $i + $size - $len ) {
                     $found = $i;
                     break;
                 }
             }
 
-            if (null === $found) {
+            if ( null === $found ) {
                 return;
             }
 
             $i = $found;
 
-            $indexes[ $i ] += 1;
+            $indexes[$i] += 1;
 
             $iMin = ($i + 1);
             $iMax = ($len - 1);
             // foreach ( $this->range_it(($i + 1), ($len - 1)) as $j ) {
             for ( $j = $iMin; $j <= $iMax; $j++ ) {
-                $indexes[ $j ] = $indexes[ $j - 1 ] + 1;
+                $indexes[$j] = $indexes[$j - 1] + 1;
             }
 
             $row = [];
             foreach ( $indexes as $i ) {
-                $row[] = $pool[ $i ];
+                $row[] = $pool[$i];
             }
 
             yield $row;
@@ -315,7 +315,7 @@ class ItertoolsModule
 
         $size = count($pool);
 
-        if ((0 === $size) && $len) {
+        if ( (0 === $size) && $len ) {
             return;
         }
 
@@ -323,7 +323,7 @@ class ItertoolsModule
         $row = [];
         $indices = [];
         for ( $i = 0; $i <= $iMax; $i++ ) {
-            $row[] = $pool[ 0 ];
+            $row[] = $pool[0];
             $indices[] = 0;
         }
 
@@ -335,14 +335,14 @@ class ItertoolsModule
             $iMax = ($len - 1);
             // foreach ( $this->range_it(($len - 1), 0, -1) as $i ) {
             for ( $i = $iMax; $i >= 0; $i-- ) {
-                if ($indices[ $i ] !== ($size - 1)) {
+                if ( $indices[$i] !== ($size - 1) ) {
                     $found = $i;
 
                     break;
                 }
             }
 
-            if (null === $found) {
+            if ( null === $found ) {
                 return;
             }
 
@@ -352,14 +352,14 @@ class ItertoolsModule
             $replace = [];
             // foreach ( $this->range_it(0, ($len - $i - 1), 1) as $i ) {
             for ( $ii = 0; $ii <= $iMax; $ii++ ) {
-                $replace[] = $indices[ $i ] + 1;
+                $replace[] = $indices[$i] + 1;
             }
 
             array_splice($indices, $i, count($indices), $replace);
 
             $row = [];
             foreach ( $indices as $i ) {
-                $row[] = $pool[ $i ];
+                $row[] = $pool[$i];
             }
 
             yield $row;
@@ -381,7 +381,7 @@ class ItertoolsModule
 
         $len = $len ?? $poolSize;
 
-        if ($len > $poolSize) {
+        if ( $len > $poolSize ) {
             return;
         }
 
@@ -393,7 +393,7 @@ class ItertoolsModule
 
         $row = [];
         foreach ( array_slice($indices, 0, $len) as $i ) {
-            $row[] = $pool[ $i ];
+            $row[] = $pool[$i];
         }
 
         yield $row;
@@ -410,9 +410,9 @@ class ItertoolsModule
             $iMax = ($len - 1);
             $iMin = 0;
             for ( $i = $iMax; $i >= $iMin; $i-- ) {
-                $cycles[ $i ] -= 1;
+                $cycles[$i] -= 1;
 
-                if ($cycles[ $i ] === 0) {
+                if ( $cycles[$i] === 0 ) {
                     array_splice(
                         $indices, $i, count($indices),
                         array_merge(
@@ -421,22 +421,22 @@ class ItertoolsModule
                         )
                     );
 
-                    $cycles[ $i ] = $poolSize - $i;
+                    $cycles[$i] = $poolSize - $i;
 
                 } else {
-                    $j = $cycles[ $i ];
+                    $j = $cycles[$i];
 
                     [
-                        $indices[ $i ],
-                        $indices[ count($indices) - $j ],
+                        $indices[$i],
+                        $indices[count($indices) - $j],
                     ] = [
-                        $indices[ count($indices) - $j ],
-                        $indices[ $i ],
+                        $indices[count($indices) - $j],
+                        $indices[$i],
                     ];
 
                     $row = [];
                     foreach ( array_slice($indices, 0, $len) as $ii ) {
-                        $row[] = $pool[ $ii ];
+                        $row[] = $pool[$ii];
                     }
 
                     yield $row;
@@ -447,7 +447,7 @@ class ItertoolsModule
                 }
             }
 
-            if (null === $found) {
+            if ( null === $found ) {
                 return;
             }
         }

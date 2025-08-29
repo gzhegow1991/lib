@@ -14,7 +14,7 @@ class EscapeModule
     {
         $refPdoParams = $refPdoParams ?? [];
 
-        if ([] === $in) {
+        if ( [] === $in ) {
             return '';
         }
 
@@ -25,16 +25,16 @@ class EscapeModule
         $i = 0;
         $sqlIn = '';
         foreach ( $in as $value ) {
-            if ($hasParamNamePrefix) {
+            if ( $hasParamNamePrefix ) {
                 $pdoParamName = ":{$paramNamePrefix}{$i}";
 
-                if (isset($refPdoParams[ $pdoParamName ])) {
+                if ( isset($refPdoParams[$pdoParamName]) ) {
                     throw new RuntimeException(
                         [ 'The `params` already has parameter named: ' . $pdoParamName, $refPdoParams ]
                     );
                 }
 
-                $refPdoParams[ $pdoParamName ] = $value;
+                $refPdoParams[$pdoParamName] = $value;
 
                 $sqlIn .= "{$pdoParamName}, ";
 
@@ -55,14 +55,14 @@ class EscapeModule
 
     public function sql_like_escape(string $sql, string $like = 'LIKE', ...$valueParts)
     {
-        if ([] === $valueParts) {
+        if ( [] === $valueParts ) {
             return '';
         }
 
         $value = '';
         foreach ( $valueParts as $v ) {
             $value .= is_array($v)
-                ? $v[ 0 ]
+                ? $v[0]
                 : $this->sql_like_quote($v);
         }
 

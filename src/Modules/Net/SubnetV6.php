@@ -35,7 +35,7 @@ class SubnetV6
             ?? static::fromStatic($from)->orNull($ret)
             ?? static::fromValidString($from)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -47,7 +47,7 @@ class SubnetV6
      */
     public static function fromStatic($from, ?array $fallback = null)
     {
-        if ($from instanceof static) {
+        if ( $from instanceof static ) {
             return Ret::ok($fallback, $from);
         }
 
@@ -63,7 +63,7 @@ class SubnetV6
      */
     public static function fromValidString($from, ?array $fallback = null)
     {
-        if (is_string($from)) {
+        if ( is_string($from) ) {
             $instance = new static();
             $instance->value = $from;
 

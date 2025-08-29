@@ -29,7 +29,7 @@ class FormatSerialize
             return Ret::throw($fallback, $e);
         }
 
-        if (! is_string($result)) {
+        if ( ! is_string($result) ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `serialize` returned non-string, serialization is failed', $result ],
@@ -50,7 +50,7 @@ class FormatSerialize
         $theFunc = Lib::func();
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($serialized)->isOk([ &$serializedString, &$ret ])) {
+        if ( ! $theType->string_not_empty($serialized)->isOk([ &$serializedString, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -64,7 +64,7 @@ class FormatSerialize
             return Ret::throw($fallback, $e);
         }
 
-        if (is_object($result) && (get_class($result) === '__PHP_Incomplete_Class')) {
+        if ( is_object($result) && (get_class($result) === '__PHP_Incomplete_Class') ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `unserialize` returned object of class that was not loaded in current PHP script', $result ],

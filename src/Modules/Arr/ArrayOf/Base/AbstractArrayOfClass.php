@@ -26,7 +26,7 @@ abstract class AbstractArrayOfClass extends AbstractArrayOf
      */
     public function __construct(string $className)
     {
-        if (! class_exists($className)) {
+        if ( ! class_exists($className) ) {
             throw new LogicException(
                 [ 'Class not exists: ' . $className ]
             );
@@ -50,16 +50,16 @@ abstract class AbstractArrayOfClass extends AbstractArrayOf
 
     public function __unserialize(array $data) : void
     {
-        $this->valueType = $data[ 'valueType' ];
-        $this->valueClass = $data[ 'valueClass' ];
+        $this->valueType = $data['valueType'];
+        $this->valueClass = $data['valueClass'];
         //
-        $this->values = $data[ 'values' ];
+        $this->values = $data['values'];
     }
 
 
     protected function setValue($key, $value)
     {
-        if (! is_object($value)) {
+        if ( ! is_object($value) ) {
             throw new LogicException(
                 [
                     'The `value` should be an object',
@@ -68,7 +68,7 @@ abstract class AbstractArrayOfClass extends AbstractArrayOf
             );
         }
 
-        if (get_class($value) !== $this->valueClass) {
+        if ( get_class($value) !== $this->valueClass ) {
             throw new LogicException(
                 [
                     'The `value` should be an instance of the class: ' . $this->valueClass,

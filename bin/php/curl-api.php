@@ -1,6 +1,6 @@
 <?php
 
-if (PHP_SAPI !== 'cli') {
+if ( PHP_SAPI !== 'cli' ) {
     echo "This script should run in CLI mode\n";
 
     exit(1);
@@ -21,8 +21,8 @@ require_once __DIR__ . '/../../vendor/autoload.php';
 ;
 
 
-$timeoutMs = $argv[ 1 ] ?? 10000;        // 10 sec
-$lockWaitTimeoutMs = $argv[ 2 ] ?? 1000; // 1 sec
+$timeoutMs = $argv[1] ?? 10000;        // 10 sec
+$lockWaitTimeoutMs = $argv[2] ?? 1000; // 1 sec
 
 $theType = \Gzhegow\Lib\Lib::type();
 

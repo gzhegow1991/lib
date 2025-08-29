@@ -17,7 +17,7 @@ class StreamSafe
 
     public function __construct()
     {
-        if (! extension_loaded('fileinfo')) {
+        if ( ! extension_loaded('fileinfo') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: fileinfo' ]
             );
@@ -44,20 +44,20 @@ class StreamSafe
     {
         $header = fread($resource, 4);
 
-        if (strlen($header) !== 4) {
+        if ( strlen($header) !== 4 ) {
             throw new RuntimeException(
                 [ 'First 4 bytes should be a length of the data', $header ]
             );
         }
 
-        $len = unpack("N", $header)[ 1 ];
+        $len = unpack("N", $header)[1];
 
         $buff = '';
 
         while ( strlen($buff) < $len ) {
             $chunk = fread($resource, $len - strlen($buff));
 
-            if (false
+            if ( false
                 || ($chunk === false)
                 || ($chunk === '')
             ) {

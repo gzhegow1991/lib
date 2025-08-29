@@ -26,7 +26,7 @@ abstract class AbstractDictOfA extends AbstractDictOf
      */
     public function __construct(string $className)
     {
-        if (! class_exists($className)) {
+        if ( ! class_exists($className) ) {
             throw new LogicException(
                 [ 'Class not exists: ' . $className ]
             );
@@ -50,16 +50,16 @@ abstract class AbstractDictOfA extends AbstractDictOf
 
     public function __unserialize(array $data) : void
     {
-        $this->valueType = $data[ 'valueType' ];
-        $this->valueClass = $data[ 'valueClass' ];
+        $this->valueType = $data['valueType'];
+        $this->valueClass = $data['valueClass'];
         //
-        $this->values = $data[ 'values' ];
+        $this->values = $data['values'];
     }
 
 
     protected function setValue($key, $value)
     {
-        if (! is_object($value)) {
+        if ( ! is_object($value) ) {
             throw new LogicException(
                 [
                     'The `value` should be an object',
@@ -68,7 +68,7 @@ abstract class AbstractDictOfA extends AbstractDictOf
             );
         }
 
-        if (! is_a($value, $this->valueClass)) {
+        if ( ! is_a($value, $this->valueClass) ) {
             throw new LogicException(
                 [
                     'The `value` should be an instance of a class or subclass of: ' . $this->valueClass,

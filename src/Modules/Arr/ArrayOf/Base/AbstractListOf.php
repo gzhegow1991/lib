@@ -46,7 +46,7 @@ abstract class AbstractListOf implements
         ];
 
         $lower = strtolower($valueType);
-        if (! isset($mapValueTypes[ $lower ])) {
+        if ( ! isset($mapValueTypes[$lower]) ) {
             throw new LogicException(
                 [
                     ''
@@ -57,7 +57,7 @@ abstract class AbstractListOf implements
                 ]
             );
         }
-        $valueTypeNormalized = $mapValueTypes[ $lower ];
+        $valueTypeNormalized = $mapValueTypes[$lower];
 
         $this->valueType = $valueTypeNormalized;
     }
@@ -103,9 +103,9 @@ abstract class AbstractListOf implements
 
     public function __unserialize(array $data) : void
     {
-        $this->valueType = $data[ 'valueType' ];
+        $this->valueType = $data['valueType'];
         //
-        $this->values = $data[ 'values' ];
+        $this->values = $data['values'];
     }
 
 
@@ -128,9 +128,9 @@ abstract class AbstractListOf implements
 
     public function get($key, array $fallback = [])
     {
-        if (! $this->exists($key)) {
-            if (0 < count($fallback)) {
-                return $fallback[ 0 ];
+        if ( ! $this->exists($key) ) {
+            if ( 0 < count($fallback) ) {
+                return $fallback[0];
             }
 
             throw new RuntimeException(
@@ -138,7 +138,7 @@ abstract class AbstractListOf implements
             );
         }
 
-        return $this->values[ $key ];
+        return $this->values[$key];
     }
 
 
@@ -147,7 +147,7 @@ abstract class AbstractListOf implements
      */
     public function set($key, $value)
     {
-        if (null === $key) {
+        if ( null === $key ) {
             $this->push($value);
 
         } else {
@@ -168,7 +168,7 @@ abstract class AbstractListOf implements
 
         $refKey = array_key_last($this->values);
 
-        unset($this->values[ $refKey ]);
+        unset($this->values[$refKey]);
 
         $this->setValue($refKey, $value);
 
@@ -183,13 +183,13 @@ abstract class AbstractListOf implements
      */
     protected function setValue($key, $value)
     {
-        if (! is_int($key)) {
+        if ( ! is_int($key) ) {
             throw new LogicException(
                 [ 'The `key` of dict should be an integer', $key ]
             );
         }
 
-        $this->values[ $key ] = $value;
+        $this->values[$key] = $value;
 
         return $this;
     }
@@ -200,7 +200,7 @@ abstract class AbstractListOf implements
      */
     public function add($key, $value)
     {
-        if (isset($this->values[ $key ])) {
+        if ( isset($this->values[$key]) ) {
             throw new RuntimeException(
                 [ 'The array key is already exists: ' . var_export($key, true) ]
             );
@@ -216,7 +216,7 @@ abstract class AbstractListOf implements
      */
     public function replace($key, $value)
     {
-        if (! isset($this->values[ $key ])) {
+        if ( ! isset($this->values[$key]) ) {
             throw new RuntimeException(
                 [ 'Missing array key: ' . var_export($key, true) ]
             );
@@ -243,7 +243,7 @@ abstract class AbstractListOf implements
      */
     public function remove($key)
     {
-        if (! isset($this->values[ $key ])) {
+        if ( ! isset($this->values[$key]) ) {
             throw new RuntimeException(
                 [ 'Missing array key: ' . var_export($key, true) ]
             );
@@ -261,7 +261,7 @@ abstract class AbstractListOf implements
      */
     protected function unsetValue($key)
     {
-        unset($this->values[ $key ]);
+        unset($this->values[$key]);
 
         return $this;
     }

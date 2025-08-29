@@ -69,7 +69,7 @@ class Number implements
             ?? static::fromStatic($from)->orNull($ret)
             ?? static::fromValidArray($from)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -81,7 +81,7 @@ class Number implements
      */
     public static function fromStatic($from, ?array $fallback = null)
     {
-        if ($from instanceof static) {
+        if ( $from instanceof static ) {
             return Ret::ok($fallback, $from);
         }
 
@@ -97,7 +97,7 @@ class Number implements
      */
     public static function fromValidArray($from, ?array $fallback = null)
     {
-        if (! is_array($from)) {
+        if ( ! is_array($from) ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `from` should be array', $from ],
@@ -180,7 +180,7 @@ class Number implements
 
     public function toInteger(array $options = []) : int
     {
-        if (! $this->isInteger()) {
+        if ( ! $this->isInteger() ) {
             throw new RuntimeException(
                 [ 'This number cannot be converted to an integer', $this ]
             );
@@ -221,7 +221,7 @@ class Number implements
     {
         $result = null;
 
-        if ('' !== $this->frac) {
+        if ( '' !== $this->frac ) {
             $result = $this->frac;
 
             return true;
@@ -240,7 +240,7 @@ class Number implements
     {
         $result = null;
 
-        if ('' !== $this->exp) {
+        if ( '' !== $this->exp ) {
             $result = $this->exp;
 
             return true;

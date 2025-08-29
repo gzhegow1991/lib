@@ -134,10 +134,10 @@ class DateModule
     {
         $dateTimeZone = null;
 
-        if ($timezone instanceof \DateTimeZone) {
+        if ( $timezone instanceof \DateTimeZone ) {
             $dateTimeZone = $timezone;
 
-        } elseif ($timezone instanceof \DateTimeInterface) {
+        } elseif ( $timezone instanceof \DateTimeInterface ) {
             $dateTimeZone = $timezone->getTimezone();
 
         } else {
@@ -148,17 +148,17 @@ class DateModule
             }
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTimeZone) {
+        if ( null !== $allowedTimezoneTypes ) {
+            if ( null !== $dateTimeZone ) {
                 $timezoneType = $this->timezone_type($dateTimeZone);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                     $dateTimeZone = null;
                 }
             }
         }
 
-        if (null !== $dateTimeZone) {
+        if ( null !== $dateTimeZone ) {
             return Ret::val($dateTimeZone);
         }
 
@@ -175,10 +175,10 @@ class DateModule
     {
         $dateTimeZone = null;
 
-        if ($timezoneOrOffset instanceof \DateTimeZone) {
+        if ( $timezoneOrOffset instanceof \DateTimeZone ) {
             $dateTimeZone = $timezoneOrOffset;
 
-        } elseif ($timezoneOrOffset instanceof \DateTimeInterface) {
+        } elseif ( $timezoneOrOffset instanceof \DateTimeInterface ) {
             $dateTimeZone = $timezoneOrOffset->getTimezone();
 
         } else {
@@ -189,15 +189,15 @@ class DateModule
             }
         }
 
-        if (null !== $dateTimeZone) {
+        if ( null !== $dateTimeZone ) {
             $timezoneType = $this->timezone_type($dateTimeZone);
 
-            if ($timezoneType !== 1) {
+            if ( $timezoneType !== 1 ) {
                 $dateTimeZone = null;
             }
         }
 
-        if (null !== $dateTimeZone) {
+        if ( null !== $dateTimeZone ) {
             return Ret::val($dateTimeZone);
         }
 
@@ -214,10 +214,10 @@ class DateModule
     {
         $dateTimeZone = null;
 
-        if ($timezoneOrAbbr instanceof \DateTimeZone) {
+        if ( $timezoneOrAbbr instanceof \DateTimeZone ) {
             $dateTimeZone = $timezoneOrAbbr;
 
-        } elseif ($timezoneOrAbbr instanceof \DateTimeInterface) {
+        } elseif ( $timezoneOrAbbr instanceof \DateTimeInterface ) {
             $dateTimeZone = $timezoneOrAbbr->getTimezone();
 
         } else {
@@ -228,15 +228,15 @@ class DateModule
             }
         }
 
-        if (null !== $dateTimeZone) {
+        if ( null !== $dateTimeZone ) {
             $timezoneType = $this->timezone_type($dateTimeZone);
 
-            if ($timezoneType !== 2) {
+            if ( $timezoneType !== 2 ) {
                 $dateTimeZone = null;
             }
         }
 
-        if (null !== $dateTimeZone) {
+        if ( null !== $dateTimeZone ) {
             return Ret::val($dateTimeZone);
         }
 
@@ -253,10 +253,10 @@ class DateModule
     {
         $dateTimeZone = null;
 
-        if ($timezoneOrName instanceof \DateTimeZone) {
+        if ( $timezoneOrName instanceof \DateTimeZone ) {
             $dateTimeZone = $timezoneOrName;
 
-        } elseif ($timezoneOrName instanceof \DateTimeInterface) {
+        } elseif ( $timezoneOrName instanceof \DateTimeInterface ) {
             $dateTimeZone = $timezoneOrName->getTimezone();
 
         } else {
@@ -267,15 +267,15 @@ class DateModule
             }
         }
 
-        if (null !== $dateTimeZone) {
+        if ( null !== $dateTimeZone ) {
             $timezoneType = $this->timezone_type($dateTimeZone);
 
-            if ($timezoneType !== 3) {
+            if ( $timezoneType !== 3 ) {
                 $dateTimeZone = null;
             }
         }
 
-        if (null !== $dateTimeZone) {
+        if ( null !== $dateTimeZone ) {
             return Ret::val($dateTimeZone);
         }
 
@@ -292,10 +292,10 @@ class DateModule
     {
         $dateTimeZone = null;
 
-        if ($timezoneOrNameOrAbbr instanceof \DateTimeZone) {
+        if ( $timezoneOrNameOrAbbr instanceof \DateTimeZone ) {
             $dateTimeZone = $timezoneOrNameOrAbbr;
 
-        } elseif ($timezoneOrNameOrAbbr instanceof \DateTimeInterface) {
+        } elseif ( $timezoneOrNameOrAbbr instanceof \DateTimeInterface ) {
             $dateTimeZone = $timezoneOrNameOrAbbr->getTimezone();
 
         } else {
@@ -306,18 +306,18 @@ class DateModule
             }
         }
 
-        if (null !== $dateTimeZone) {
+        if ( null !== $dateTimeZone ) {
             $timezoneType = $this->timezone_type($dateTimeZone);
 
-            if (! (
+            if ( ! (
                 ($timezoneType === 2)
                 || ($timezoneType === 3)
-            )) {
+            ) ) {
                 $dateTimeZone = null;
             }
         }
 
-        if (null !== $dateTimeZone) {
+        if ( null !== $dateTimeZone ) {
             return Ret::val($dateTimeZone);
         }
 
@@ -337,14 +337,14 @@ class DateModule
 
         $dateTime = null;
 
-        if ($datestring instanceof \DateTimeInterface) {
+        if ( $datestring instanceof \DateTimeInterface ) {
             $dateTime = $datestring;
 
         } else {
             $theType->string_not_empty($datestring)->orThrow();
 
             $timezoneFallbackObject = null;
-            if (null !== $timezoneFallback) {
+            if ( null !== $timezoneFallback ) {
                 $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
             }
 
@@ -358,7 +358,7 @@ class DateModule
             }
         }
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $dateTimeClone = $this->cloneToDate($dateTime);
 
             return Ret::val($dateTimeClone);
@@ -379,14 +379,14 @@ class DateModule
 
         $dateTime = null;
 
-        if ($datestring instanceof \DateTimeInterface) {
+        if ( $datestring instanceof \DateTimeInterface ) {
             $dateTime = $datestring;
 
         } else {
             $theType->string_not_empty($datestring)->orThrow();
 
             $timezoneFallbackObject = null;
-            if (null !== $timezoneFallback) {
+            if ( null !== $timezoneFallback ) {
                 $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
             }
 
@@ -400,7 +400,7 @@ class DateModule
             }
         }
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $dateTimeClone = $this->cloneToADate($dateTime);
 
             return Ret::val($dateTimeClone);
@@ -421,14 +421,14 @@ class DateModule
 
         $dateTimeImmutable = null;
 
-        if ($datestring instanceof \DateTimeInterface) {
+        if ( $datestring instanceof \DateTimeInterface ) {
             $dateTimeImmutable = $datestring;
 
         } else {
             $theType->string_not_empty($datestring)->orThrow();
 
             $timezoneFallbackObject = null;
-            if (null !== $timezoneFallback) {
+            if ( null !== $timezoneFallback ) {
                 $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
             }
 
@@ -442,7 +442,7 @@ class DateModule
             }
         }
 
-        if (null !== $dateTimeImmutable) {
+        if ( null !== $dateTimeImmutable ) {
             $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
             return Ret::val($dateTimeImmutableClone);
@@ -465,7 +465,7 @@ class DateModule
 
         $dateTime = null;
 
-        if ($dateFormatted instanceof \DateTimeInterface) {
+        if ( $dateFormatted instanceof \DateTimeInterface ) {
             $dateTime = $dateFormatted;
 
         } else {
@@ -477,11 +477,11 @@ class DateModule
             foreach ( $formatsList as $i => $format ) {
                 $formatValid = $theType->string_not_empty($format)->orThrow();
 
-                $formatsList[ $i ] = $formatValid;
+                $formatsList[$i] = $formatValid;
             }
 
             $timezoneFallbackObject = null;
-            if (null !== $timezoneFallback) {
+            if ( null !== $timezoneFallback ) {
                 $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
             }
 
@@ -498,12 +498,12 @@ class DateModule
                 }
             }
 
-            if (false === $dateTime) {
+            if ( false === $dateTime ) {
                 $dateTime = null;
             }
         }
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $dateTimeClone = $this->cloneToDate($dateTime);
 
             return Ret::val($dateTimeClone);
@@ -525,7 +525,7 @@ class DateModule
 
         $dateTime = null;
 
-        if ($dateFormatted instanceof \DateTimeInterface) {
+        if ( $dateFormatted instanceof \DateTimeInterface ) {
             $dateTime = $dateFormatted;
 
         } else {
@@ -537,11 +537,11 @@ class DateModule
             foreach ( $formatsList as $i => $format ) {
                 $formatValid = $theType->string_not_empty($format)->orThrow();
 
-                $formatsList[ $i ] = $formatValid;
+                $formatsList[$i] = $formatValid;
             }
 
             $timezoneFallbackObject = null;
-            if (null !== $timezoneFallback) {
+            if ( null !== $timezoneFallback ) {
                 $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
             }
 
@@ -558,12 +558,12 @@ class DateModule
                 }
             }
 
-            if (false === $dateTime) {
+            if ( false === $dateTime ) {
                 $dateTime = null;
             }
         }
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $dateTimeClone = $this->cloneToADate($dateTime);
 
             return Ret::val($dateTimeClone);
@@ -585,7 +585,7 @@ class DateModule
 
         $dateTimeImmutable = null;
 
-        if ($dateFormatted instanceof \DateTimeInterface) {
+        if ( $dateFormatted instanceof \DateTimeInterface ) {
             $dateTimeImmutable = $dateFormatted;
 
         } else {
@@ -597,11 +597,11 @@ class DateModule
             foreach ( $formatsList as $i => $format ) {
                 $formatValid = $theType->string_not_empty($format)->orThrow();
 
-                $formatsList[ $i ] = $formatValid;
+                $formatsList[$i] = $formatValid;
             }
 
             $timezoneFallbackObject = null;
-            if (null !== $timezoneFallback) {
+            if ( null !== $timezoneFallback ) {
                 $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
             }
 
@@ -618,12 +618,12 @@ class DateModule
                 }
             }
 
-            if (false === $dateTimeImmutable) {
+            if ( false === $dateTimeImmutable ) {
                 $dateTimeImmutable = null;
             }
         }
 
-        if (null !== $dateTimeImmutable) {
+        if ( null !== $dateTimeImmutable ) {
             $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
             return Ret::val($dateTimeImmutableClone);
@@ -647,7 +647,7 @@ class DateModule
 
         $timezoneNil = $this->the_timezone_nil();
 
-        if ($datestring instanceof \DateTimeInterface) {
+        if ( $datestring instanceof \DateTimeInterface ) {
             $dateTime = $datestring;
 
         } else {
@@ -663,25 +663,25 @@ class DateModule
             }
         }
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $timezone = $dateTime->getTimezone();
 
-            if ($timezone->getName() == $timezoneNil->getName()) {
+            if ( $timezone->getName() == $timezoneNil->getName() ) {
                 $dateTime = null;
             }
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTime) {
+        if ( null !== $allowedTimezoneTypes ) {
+            if ( null !== $dateTime ) {
                 $timezoneType = $this->timezone_type($timezone);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                     $dateTime = null;
                 }
             }
         }
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $dateTimeClone = $this->cloneToDate($dateTime);
 
             return Ret::val($dateTimeClone);
@@ -704,7 +704,7 @@ class DateModule
 
         $timezoneNil = $this->the_timezone_nil();
 
-        if ($datestring instanceof \DateTimeInterface) {
+        if ( $datestring instanceof \DateTimeInterface ) {
             $dateTime = $datestring;
 
         } else {
@@ -720,25 +720,25 @@ class DateModule
             }
         }
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $timezone = $dateTime->getTimezone();
 
-            if ($timezone->getName() === $timezoneNil->getName()) {
+            if ( $timezone->getName() === $timezoneNil->getName() ) {
                 $dateTime = null;
             }
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTime) {
+        if ( null !== $allowedTimezoneTypes ) {
+            if ( null !== $dateTime ) {
                 $timezoneType = $this->timezone_type($timezone);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                     $dateTime = null;
                 }
             }
         }
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $dateTimeClone = $this->cloneToADate($dateTime);
 
             return Ret::val($dateTimeClone);
@@ -761,7 +761,7 @@ class DateModule
 
         $timezoneNil = $this->the_timezone_nil();
 
-        if ($datestring instanceof \DateTimeInterface) {
+        if ( $datestring instanceof \DateTimeInterface ) {
             $dateTimeImmutable = $datestring;
 
         } else {
@@ -777,25 +777,25 @@ class DateModule
             }
         }
 
-        if (null !== $dateTimeImmutable) {
+        if ( null !== $dateTimeImmutable ) {
             $timezone = $dateTimeImmutable->getTimezone();
 
-            if ($timezone->getName() == $timezoneNil->getName()) {
+            if ( $timezone->getName() == $timezoneNil->getName() ) {
                 $dateTimeImmutable = null;
             }
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTimeImmutable) {
+        if ( null !== $allowedTimezoneTypes ) {
+            if ( null !== $dateTimeImmutable ) {
                 $timezoneType = $this->timezone_type($timezone);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                     $dateTimeImmutable = null;
                 }
             }
         }
 
-        if (null !== $dateTimeImmutable) {
+        if ( null !== $dateTimeImmutable ) {
             $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
             return Ret::val($dateTimeImmutableClone);
@@ -820,7 +820,7 @@ class DateModule
 
         $timezoneNil = $this->the_timezone_nil();
 
-        if ($dateFormatted instanceof \DateTimeInterface) {
+        if ( $dateFormatted instanceof \DateTimeInterface ) {
             $dateTime = $dateFormatted;
 
         } else {
@@ -832,7 +832,7 @@ class DateModule
             foreach ( $formatsList as $i => $format ) {
                 $formatValid = $theType->string_not_empty($format)->orThrow();
 
-                $formatsList[ $i ] = $formatValid;
+                $formatsList[$i] = $formatValid;
             }
 
             foreach ( $formatsList as $format ) {
@@ -848,30 +848,30 @@ class DateModule
                 }
             }
 
-            if (false === $dateTime) {
+            if ( false === $dateTime ) {
                 $dateTime = null;
             }
         }
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $timezone = $dateTime->getTimezone();
 
-            if ($timezone->getName() == $timezoneNil->getName()) {
+            if ( $timezone->getName() == $timezoneNil->getName() ) {
                 $dateTime = null;
             }
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTime) {
+        if ( null !== $allowedTimezoneTypes ) {
+            if ( null !== $dateTime ) {
                 $timezoneType = $this->timezone_type($timezone);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                     $dateTime = null;
                 }
             }
         }
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $dateTimeClone = $this->cloneToADate($dateTime);
 
             return Ret::val($dateTimeClone);
@@ -895,7 +895,7 @@ class DateModule
 
         $timezoneNil = $this->the_timezone_nil();
 
-        if ($dateFormatted instanceof \DateTimeInterface) {
+        if ( $dateFormatted instanceof \DateTimeInterface ) {
             $dateTime = $dateFormatted;
 
         } else {
@@ -907,7 +907,7 @@ class DateModule
             foreach ( $formatsList as $i => $format ) {
                 $formatValid = $theType->string_not_empty($format)->orThrow();
 
-                $formatsList[ $i ] = $formatValid;
+                $formatsList[$i] = $formatValid;
             }
 
             foreach ( $formatsList as $format ) {
@@ -923,30 +923,30 @@ class DateModule
                 }
             }
 
-            if (false === $dateTime) {
+            if ( false === $dateTime ) {
                 $dateTime = null;
             }
         }
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $timezone = $dateTime->getTimezone();
 
-            if ($timezone->getName() == $timezoneNil->getName()) {
+            if ( $timezone->getName() == $timezoneNil->getName() ) {
                 $dateTime = null;
             }
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTime) {
+        if ( null !== $allowedTimezoneTypes ) {
+            if ( null !== $dateTime ) {
                 $timezoneType = $this->timezone_type($timezone);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                     $dateTime = null;
                 }
             }
         }
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $dateTimeClone = $this->cloneToADate($dateTime);
 
             return Ret::val($dateTimeClone);
@@ -970,7 +970,7 @@ class DateModule
 
         $timezoneNil = $this->the_timezone_nil();
 
-        if ($dateFormatted instanceof \DateTimeInterface) {
+        if ( $dateFormatted instanceof \DateTimeInterface ) {
             $dateTimeImmutable = $dateFormatted;
 
         } else {
@@ -982,7 +982,7 @@ class DateModule
             foreach ( $formatsList as $i => $format ) {
                 $formatValid = $theType->string_not_empty($format)->orThrow();
 
-                $formatsList[ $i ] = $formatValid;
+                $formatsList[$i] = $formatValid;
             }
 
             foreach ( $formatsList as $format ) {
@@ -998,30 +998,30 @@ class DateModule
                 }
             }
 
-            if (false === $dateTimeImmutable) {
+            if ( false === $dateTimeImmutable ) {
                 $dateTimeImmutable = null;
             }
         }
 
-        if (null !== $dateTimeImmutable) {
+        if ( null !== $dateTimeImmutable ) {
             $timezone = $dateTimeImmutable->getTimezone();
 
-            if ($timezone->getName() == $timezoneNil->getName()) {
+            if ( $timezone->getName() == $timezoneNil->getName() ) {
                 $dateTimeImmutable = null;
             }
         }
 
-        if (null !== $allowedTimezoneTypes) {
-            if (null !== $dateTimeImmutable) {
+        if ( null !== $allowedTimezoneTypes ) {
+            if ( null !== $dateTimeImmutable ) {
                 $timezoneType = $this->timezone_type($timezone);
 
-                if (! in_array($timezoneType, $allowedTimezoneTypes, true)) {
+                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                     $dateTimeImmutable = null;
                 }
             }
         }
 
-        if (null !== $dateTimeImmutable) {
+        if ( null !== $dateTimeImmutable ) {
             $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
             return Ret::val($dateTimeImmutableClone);
@@ -1047,7 +1047,7 @@ class DateModule
 
         $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
 
-        if (! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ])) {
+        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1057,11 +1057,11 @@ class DateModule
         $timezoneDefault = new \DateTimeZone('UTC');
 
         try {
-            if (PHP_VERSION_ID >= 80000) {
+            if ( PHP_VERSION_ID >= 80000 ) {
                 $dateTime = new \DateTime("@{$microtimeNumeric}", $timezoneDefault);
 
             } else {
-                $int = $split[ 1 ];
+                $int = $split[1];
                 $seconds = $int;
 
                 $dateTime = new \DateTime("@{$seconds}", $timezoneDefault);
@@ -1070,8 +1070,8 @@ class DateModule
         catch ( \Throwable $e ) {
         }
 
-        if ('' !== $split[ 2 ]) {
-            $frac = $split[ 2 ];
+        if ( '' !== $split[2] ) {
+            $frac = $split[2];
 
             $microseconds = ltrim($frac, '.');
             $microseconds = substr($microseconds, 0, 6);
@@ -1087,7 +1087,7 @@ class DateModule
 
         $dateTime = $dateTime->setTimezone($timezoneSetObject);
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $dateTimeClone = $this->cloneToDate($dateTime);
 
             return Ret::val($dateTimeClone);
@@ -1112,7 +1112,7 @@ class DateModule
 
         $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
 
-        if (! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ])) {
+        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1122,11 +1122,11 @@ class DateModule
         $timezoneDefault = new \DateTimeZone('UTC');
 
         try {
-            if (PHP_VERSION_ID >= 80000) {
+            if ( PHP_VERSION_ID >= 80000 ) {
                 $dateTime = new \DateTime("@{$microtimeNumeric}", $timezoneDefault);
 
             } else {
-                $int = $split[ 1 ];
+                $int = $split[1];
                 $seconds = $int;
 
                 $dateTime = new \DateTime("@{$seconds}", $timezoneDefault);
@@ -1135,8 +1135,8 @@ class DateModule
         catch ( \Throwable $e ) {
         }
 
-        if ('' !== $split[ 2 ]) {
-            $frac = $split[ 2 ];
+        if ( '' !== $split[2] ) {
+            $frac = $split[2];
 
             $microseconds = ltrim($frac, '.');
             $microseconds = substr($microseconds, 0, 6);
@@ -1152,7 +1152,7 @@ class DateModule
 
         $dateTime = $dateTime->setTimezone($timezoneSetObject);
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             $dateTimeClone = $this->cloneToDate($dateTime);
 
             return Ret::val($dateTimeClone);
@@ -1177,7 +1177,7 @@ class DateModule
 
         $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
 
-        if (! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ])) {
+        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1187,11 +1187,11 @@ class DateModule
         $timezoneDefault = new \DateTimeZone('UTC');
 
         try {
-            if (PHP_VERSION_ID >= 80000) {
+            if ( PHP_VERSION_ID >= 80000 ) {
                 $dateTimeImmutable = new \DateTimeImmutable("@{$microtimeNumeric}", $timezoneDefault);
 
             } else {
-                $int = $split[ 1 ];
+                $int = $split[1];
                 $seconds = $int;
 
                 $dateTimeImmutable = new \DateTimeImmutable("@{$seconds}", $timezoneDefault);
@@ -1200,8 +1200,8 @@ class DateModule
         catch ( \Throwable $e ) {
         }
 
-        if ('' !== $split[ 2 ]) {
-            $frac = $split[ 2 ];
+        if ( '' !== $split[2] ) {
+            $frac = $split[2];
 
             $microseconds = ltrim($frac, '.');
             $microseconds = substr($microseconds, 0, 6);
@@ -1217,7 +1217,7 @@ class DateModule
 
         $dateTimeImmutable = $dateTimeImmutable->setTimezone($timezoneSetObject);
 
-        if (null !== $dateTimeImmutable) {
+        if ( null !== $dateTimeImmutable ) {
             $dateTimeImmutableClone = $this->cloneToDate($dateTimeImmutable);
 
             return Ret::val($dateTimeImmutableClone);
@@ -1242,7 +1242,7 @@ class DateModule
 
         $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
 
-        if (! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ])) {
+        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1252,11 +1252,11 @@ class DateModule
         $timezoneDefault = new \DateTimeZone('UTC');
 
         try {
-            if (PHP_VERSION_ID >= 80000) {
+            if ( PHP_VERSION_ID >= 80000 ) {
                 $dateTime = new \DateTime("@{$microtimeNumeric}", $timezoneDefault);
 
             } else {
-                $int = $split[ 1 ];
+                $int = $split[1];
                 $seconds = $int;
 
                 $dateTime = new \DateTime("@{$seconds}", $timezoneDefault);
@@ -1265,8 +1265,8 @@ class DateModule
         catch ( \Throwable $e ) {
         }
 
-        if ('' !== $split[ 2 ]) {
-            $frac = $split[ 2 ];
+        if ( '' !== $split[2] ) {
+            $frac = $split[2];
 
             $microseconds = ltrim($frac, '.');
             $microseconds = substr($microseconds, 0, 6);
@@ -1282,7 +1282,7 @@ class DateModule
 
         $dateTime = $dateTime->setTimezone($timezoneSetObject);
 
-        if (null !== $dateTime) {
+        if ( null !== $dateTime ) {
             return Ret::val($dateTime);
         }
 
@@ -1298,7 +1298,7 @@ class DateModule
      */
     public function type_interval($interval)
     {
-        if ($interval instanceof \DateInterval) {
+        if ( $interval instanceof \DateInterval ) {
             return Ret::val($interval);
         }
 
@@ -1312,7 +1312,7 @@ class DateModule
             // ?? $this->type_interval_microtime($interval)->orNull($ret)
         ;
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1327,11 +1327,11 @@ class DateModule
      */
     public function type_interval_duration($duration)
     {
-        if ($duration instanceof \DateInterval) {
+        if ( $duration instanceof \DateInterval ) {
             return Ret::val($duration);
         }
 
-        if (! (is_string($duration) && ('' !== $duration))) {
+        if ( ! (is_string($duration) && ('' !== $duration)) ) {
             return Ret::err(
                 [ 'The `duration` should be string, not empty', $duration ],
                 [ __FILE__, __LINE__ ]
@@ -1356,11 +1356,11 @@ class DateModule
      */
     public function type_interval_datestring($datestring)
     {
-        if ($datestring instanceof \DateInterval) {
+        if ( $datestring instanceof \DateInterval ) {
             return Ret::val($datestring);
         }
 
-        if (! (is_string($datestring) && ('' !== $datestring))) {
+        if ( ! (is_string($datestring) && ('' !== $datestring)) ) {
             return Ret::err(
                 [ 'The `datestring` should be string, not empty', $datestring ],
                 [ __FILE__, __LINE__ ]
@@ -1378,7 +1378,7 @@ class DateModule
             );
         }
 
-        if (false !== $dateInterval) {
+        if ( false !== $dateInterval ) {
             return Ret::val($dateInterval);
         }
 
@@ -1393,13 +1393,13 @@ class DateModule
      */
     public function type_interval_microtime($microtime)
     {
-        if ($microtime instanceof \DateInterval) {
+        if ( $microtime instanceof \DateInterval ) {
             return Ret::val($microtime);
         }
 
         $theType = Lib::type();
 
-        if (! $theType->numeric($microtime, false)->isOk([ 1 => &$ret ])) {
+        if ( ! $theType->numeric($microtime, false)->isOk([ 1 => &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1431,14 +1431,14 @@ class DateModule
         $isFrom = (false === $reverse);
         // $isUntil = (true === $reverse);
 
-        if ($date instanceof \DateInterval) {
+        if ( $date instanceof \DateInterval ) {
             return Ret::val($date);
         }
 
-        if ($date instanceof \DateTimeInterface) {
+        if ( $date instanceof \DateTimeInterface ) {
             $fromDate = $from ?? new \DateTime('now');
 
-            if ($isFrom) {
+            if ( $isFrom ) {
                 $date = $fromDate->diff($date);
 
             } else {
@@ -1499,7 +1499,7 @@ class DateModule
     public function adate_now($timezoneFallback = null) : \DateTime
     {
         $timezoneFallbackObject = null;
-        if (null !== $timezoneFallback) {
+        if ( null !== $timezoneFallback ) {
             $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
         }
 
@@ -1516,7 +1516,7 @@ class DateModule
     public function idate_now($timezoneFallback = null) : \DateTimeImmutable
     {
         $timezoneFallbackObject = null;
-        if (null !== $timezoneFallback) {
+        if ( null !== $timezoneFallback ) {
             $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
         }
 
@@ -1534,7 +1534,7 @@ class DateModule
     public function adate_epoch($timezoneFallback = null) : \DateTime
     {
         $timezoneFallbackObject = null;
-        if (null !== $timezoneFallback) {
+        if ( null !== $timezoneFallback ) {
             $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
         }
 
@@ -1551,7 +1551,7 @@ class DateModule
     public function idate_epoch($timezoneFallback = null) : \DateTimeImmutable
     {
         $timezoneFallbackObject = null;
-        if (null !== $timezoneFallback) {
+        if ( null !== $timezoneFallback ) {
             $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
         }
 
@@ -1569,7 +1569,7 @@ class DateModule
     public function adate_zero($timezoneFallback = null) : \DateTime
     {
         $timezoneFallbackObject = null;
-        if (null !== $timezoneFallback) {
+        if ( null !== $timezoneFallback ) {
             $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
         }
 
@@ -1586,7 +1586,7 @@ class DateModule
     public function idate_zero($timezoneFallback = null) : \DateTimeImmutable
     {
         $timezoneFallbackObject = null;
-        if (null !== $timezoneFallback) {
+        if ( null !== $timezoneFallback ) {
             $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
         }
 
@@ -1717,7 +1717,7 @@ class DateModule
 
         return (PHP_VERSION_ID >= 70400)
             ? json_decode(json_encode($timezoneObject))->timezone_type
-            : get_object_vars($timezoneObject)[ 'timezone_type' ];
+            : get_object_vars($timezoneObject)['timezone_type'];
     }
 
     /**
@@ -1742,7 +1742,7 @@ class DateModule
         $search = [ 'M0S', 'H0M', 'DT0H', 'M0D', 'P0Y', 'Y0M', 'P0M' ];
         $replace = [ 'M', 'H', 'DT', 'M', 'P', 'Y', 'P' ];
 
-        if ($interval->f) {
+        if ( $interval->f ) {
             $microseconds = sprintf('%.6f', $interval->f);
             $microseconds = substr($microseconds, 2);
             $microseconds = rtrim($microseconds, '0.');
@@ -1775,8 +1775,8 @@ class DateModule
     {
         // > ISO 8601
 
-        if (null !== $intervalClass) {
-            if (! is_a($intervalClass, \DateInterval::class, true)) {
+        if ( null !== $intervalClass ) {
+            if ( ! is_a($intervalClass, \DateInterval::class, true) ) {
                 throw new LogicException(
                     [
                         'The `intervalClass` should be a class-string of: ' . \DateInterval::class,
@@ -1799,13 +1799,13 @@ class DateModule
 
         $decimalValueFrac = null;
         $decimalLetter = null;
-        if ($hasDecimalValue) {
-            $decimal = $matches[ 0 ];
-            $decimalSubstr = $matches[ 0 ][ 0 ];
-            $decimalValue = $matches[ 1 ][ 0 ];
-            $decimalLetter = $matches[ 2 ][ 0 ];
+        if ( $hasDecimalValue ) {
+            $decimal = $matches[0];
+            $decimalSubstr = $matches[0][0];
+            $decimalValue = $matches[1][0];
+            $decimalLetter = $matches[2][0];
 
-            if (count($decimal) > 1) {
+            if ( count($decimal) > 1 ) {
                 throw new LogicException(
                     [
                         'The `duration` can contain only one `.` in smallest period (according ISO 8601)',
@@ -1814,7 +1814,7 @@ class DateModule
                 );
             }
 
-            if (! $theStr->str_ends($duration, $decimalSubstr, false)) {
+            if ( ! $theStr->str_ends($duration, $decimalSubstr, false) ) {
                 throw new LogicException(
                     [
                         'The `duration` can contain only one `.` in smallest period (according ISO 8601)',
@@ -1838,7 +1838,7 @@ class DateModule
             throw new LogicException($e);
         }
 
-        if ($hasDecimalValue) {
+        if ( $hasDecimalValue ) {
             $now = new \DateTime('now');
             $nowModified = clone $now;
 
@@ -1867,7 +1867,7 @@ class DateModule
                     break;
 
                 case 'M':
-                    if (false === strpos($duration, 'T')) {
+                    if ( false === strpos($duration, 'T') ) {
                         $seconds = (int) ($decimalValueFrac * static::INTERVAL_MONTH);
 
                     } else {
@@ -1878,7 +1878,7 @@ class DateModule
 
             endswitch;
 
-            if (null !== $seconds) {
+            if ( null !== $seconds ) {
                 $nowModified->modify("+{$seconds} seconds");
             }
 
@@ -1891,8 +1891,8 @@ class DateModule
             $instance->i = $interval->i;
             $instance->s = $interval->s;
 
-            if (null !== $decimalValueFrac) {
-                if ('S' === $decimalLetter) {
+            if ( null !== $decimalValueFrac ) {
+                if ( 'S' === $decimalLetter ) {
                     $instance->f = $decimalValueFrac;
                 }
             }
@@ -2167,10 +2167,10 @@ class DateModule
 
     protected function cloneToADate(\DateTimeInterface $dateTime) : ?\DateTime
     {
-        if ($dateTime instanceof \DateTime) {
+        if ( $dateTime instanceof \DateTime ) {
             return clone $dateTime;
 
-        } elseif ($dateTime instanceof \DateTimeImmutable) {
+        } elseif ( $dateTime instanceof \DateTimeImmutable ) {
             return \DateTime::createFromImmutable($dateTime);
         }
 
@@ -2179,10 +2179,10 @@ class DateModule
 
     protected function cloneToIDate(\DateTimeInterface $dateTime) : ?\DateTimeImmutable
     {
-        if ($dateTime instanceof \DateTime) {
+        if ( $dateTime instanceof \DateTime ) {
             return \DateTimeImmutable::createFromMutable($dateTime);
 
-        } elseif ($dateTime instanceof \DateTimeImmutable) {
+        } elseif ( $dateTime instanceof \DateTimeImmutable ) {
             return clone $dateTime;
         }
 

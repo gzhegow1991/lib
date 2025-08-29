@@ -83,7 +83,7 @@ class DefaultSlugger implements SluggerInterface
             'composer require symfony/string',
         ];
 
-        if (! class_exists($symfonyByteStringClass = static::SYMFONY_BYTE_STRING)) {
+        if ( ! class_exists($symfonyByteStringClass = static::SYMFONY_BYTE_STRING) ) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -107,7 +107,7 @@ class DefaultSlugger implements SluggerInterface
             'composer require symfony/translation-contracts',
         ];
 
-        if (! class_exists($symfonyAsciiSluggerClass = static::SYMFONY_ASCII_SLUGGER)) {
+        if ( ! class_exists($symfonyAsciiSluggerClass = static::SYMFONY_ASCII_SLUGGER) ) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -123,10 +123,10 @@ class DefaultSlugger implements SluggerInterface
 
         $symbolMapSymfonyForLocale = null;
 
-        if (null !== $ignoreSymbolMap) {
+        if ( null !== $ignoreSymbolMap ) {
             $symbolMapSymfony = [];
             foreach ( array_keys($ignoreSymbolMap) as $letter ) {
-                $symbolMapSymfony[ $letter ] = $letter;
+                $symbolMapSymfony[$letter] = $letter;
             }
 
             $symbolMapSymfonyForLocale = [ $localeDefault => $symbolMapSymfony ];
@@ -160,8 +160,8 @@ class DefaultSlugger implements SluggerInterface
 
         $useSymfonySlugger = $useSymfonySlugger ?? $classExists;
 
-        if ($useSymfonySlugger) {
-            if (! $classExists) {
+        if ( $useSymfonySlugger ) {
+            if ( ! $classExists ) {
                 $commands = [
                     'composer require symfony/string',
                     'composer require symfony/translation-contracts',
@@ -191,8 +191,8 @@ class DefaultSlugger implements SluggerInterface
 
         $useIntlTransliterator = $useIntlTransliterator ?? $extensionAndFunctionExists;
 
-        if ($useIntlTransliterator) {
-            if (! $extensionAndFunctionExists) {
+        if ( $useIntlTransliterator ) {
+            if ( ! $extensionAndFunctionExists ) {
                 throw new ComposerException(
                     [
                         ''
@@ -255,12 +255,12 @@ class DefaultSlugger implements SluggerInterface
     {
         $localeDefaultPhp = null;
 
-        if (extension_loaded('intl')
+        if ( extension_loaded('intl')
             && function_exists('locale_get_default')
         ) {
             $localeDefaultPhp = locale_get_default();
 
-        } elseif ('C' !== ($locale = setlocale(LC_ALL, 0))) {
+        } elseif ( 'C' !== ($locale = setlocale(LC_ALL, 0)) ) {
             $localeDefaultPhp = $locale;
         }
 
@@ -274,11 +274,11 @@ class DefaultSlugger implements SluggerInterface
      */
     public function localeDefault($localeDefault)
     {
-        if (null !== $localeDefault) {
-            if (! (false
+        if ( null !== $localeDefault ) {
+            if ( ! (false
                 || is_string($localeDefault)
                 || is_callable($localeDefault)
-            )) {
+            ) ) {
                 throw new LogicException(
                     [
                         'The `localeDefault` should be a string or callable',
@@ -299,13 +299,13 @@ class DefaultSlugger implements SluggerInterface
         ?string $delimiter = null, ?array $ignoreSymbols = null, ?string $locale = null
     ) : string
     {
-        if ('' === $string) {
+        if ( '' === $string ) {
             return '';
         }
 
         $theType = Lib::type();
 
-        if (null === $delimiter) {
+        if ( null === $delimiter ) {
             $delimiterLetter = '-';
 
         } else {
@@ -332,14 +332,14 @@ class DefaultSlugger implements SluggerInterface
         ?string $delimiter = null, ?array $ignoreSymbols = null, ?string $locale = null
     ) : string
     {
-        if ('' === $string) {
+        if ( '' === $string ) {
             return '';
         }
 
         $thePhp = Lib::php();
         $theType = Lib::type();
 
-        if (null === $delimiter) {
+        if ( null === $delimiter ) {
             $delimiterLetter = '-';
 
         } else {
@@ -349,25 +349,25 @@ class DefaultSlugger implements SluggerInterface
         $ignoreSymbolUserList = $thePhp->to_list($ignoreSymbols);
         $ignoreSymbolUserMap = [];
         foreach ( $ignoreSymbolUserList as $i => $ignoreSymbol ) {
-            if (is_string($i)) {
+            if ( is_string($i) ) {
                 $ignoreSymbol = $i;
             }
 
             $ignoreSymbolString = $theType->string_not_empty($ignoreSymbol)->orThrow();
-            $ignoreSymbolUserMap[ $ignoreSymbolString ] = true;
+            $ignoreSymbolUserMap[$ignoreSymbolString] = true;
         }
 
-        if ($this->usePresets) {
+        if ( $this->usePresets ) {
             $result = $this->translitPresets(
                 $string, $delimiterLetter, $ignoreSymbolUserMap
             );
 
-        } elseif ($this->useSymfonySlugger) {
+        } elseif ( $this->useSymfonySlugger ) {
             $result = $this->translitSymfonySlugger(
                 $string, $delimiterLetter, $ignoreSymbolUserMap, $locale
             );
 
-        } elseif ($this->useIntlTransliterator) {
+        } elseif ( $this->useIntlTransliterator ) {
             $result = $this->translitIntlTransliterator(
                 $string, $delimiterLetter, $ignoreSymbolUserMap
             );
@@ -387,7 +387,7 @@ class DefaultSlugger implements SluggerInterface
         array $ignoreSymbolUserMap
     ) : string
     {
-        if ('' === $string) {
+        if ( '' === $string ) {
             return '';
         }
 
@@ -395,7 +395,7 @@ class DefaultSlugger implements SluggerInterface
 
         $presets = $this->registry->getPresetsSelected();
 
-        if ([] === $presets) {
+        if ( [] === $presets ) {
             throw new RuntimeException(
                 [ 'Unable to ' . __FUNCTION__ . ' | No presets was selected' ]
             );
@@ -408,7 +408,7 @@ class DefaultSlugger implements SluggerInterface
             $knownSymbolMap,
         ] = $this->registry->getSymbolMapsForPresetsSelected();
 
-        if ([] !== $ignoreSymbolUserMap) {
+        if ( [] !== $ignoreSymbolUserMap ) {
             $ignoreSymbolMap += $ignoreSymbolUserMap;
             $knownSymbolMap += $ignoreSymbolUserMap;
         }
@@ -416,7 +416,7 @@ class DefaultSlugger implements SluggerInterface
         $gen = $this->translit_it($string, $ignoreSymbolMap);
 
         $translit = '';
-        foreach ( $gen as [ $chunk, $chunkDelimiter ] ) {
+        foreach ( $gen as [$chunk, $chunkDelimiter] ) {
             $chunk = str_replace(
                 array_keys($sequnceMap),
                 array_values($sequnceMap),
@@ -446,18 +446,18 @@ class DefaultSlugger implements SluggerInterface
         array $ignoreSymbolUserMap, ?string $locale = null
     ) : string
     {
-        if ('' === $string) {
+        if ( '' === $string ) {
             return '';
         }
 
         $stringObject = $this->newSymfonyByteString($string);
 
-        if ($stringObject->isUtf8()) {
+        if ( $stringObject->isUtf8() ) {
             $canUseIntl = true
                 && extension_loaded('intl')
                 && function_exists('transliterator_transliterate');
 
-            if (! $canUseIntl) {
+            if ( ! $canUseIntl ) {
                 throw new ComposerException(
                     [
                         'Symfony Transliterator works incorectly without `ext-intl` if used on UTF-8 strings',
@@ -482,7 +482,7 @@ class DefaultSlugger implements SluggerInterface
         array $ignoreSymbolUserMap
     ) : string
     {
-        if ('' === $string) {
+        if ( '' === $string ) {
             return '';
         }
 
@@ -500,7 +500,7 @@ class DefaultSlugger implements SluggerInterface
         $gen = $this->translit_it($string, $ignoreSymbolUserMap);
 
         $translit = '';
-        foreach ( $gen as [ $chunk, $chunkDelimiter ] ) {
+        foreach ( $gen as [$chunk, $chunkDelimiter] ) {
             $chunk = transliterator_transliterate(
                 $rules,
                 $chunk
@@ -525,7 +525,7 @@ class DefaultSlugger implements SluggerInterface
         array $ignoreSymbolUserMap
     ) : string
     {
-        if ('' === $string) {
+        if ( '' === $string ) {
             return '';
         }
 
@@ -538,7 +538,7 @@ class DefaultSlugger implements SluggerInterface
             $knownSymbolMap,
         ] = $this->registryDefault->getSymbolMapsForPresetsSelected();
 
-        if ([] !== $ignoreSymbolUserMap) {
+        if ( [] !== $ignoreSymbolUserMap ) {
             $ignoreSymbolMap += $ignoreSymbolUserMap;
             $knownSymbolMap += $ignoreSymbolUserMap;
         }
@@ -546,7 +546,7 @@ class DefaultSlugger implements SluggerInterface
         $gen = $this->translit_it($string, $ignoreSymbolMap);
 
         $translit = '';
-        foreach ( $gen as [ $chunk, $chunkDelimiter ] ) {
+        foreach ( $gen as [$chunk, $chunkDelimiter] ) {
             $chunk = str_replace(
                 array_keys($sequnceMap),
                 array_values($sequnceMap),
@@ -574,7 +574,7 @@ class DefaultSlugger implements SluggerInterface
 
     protected function translit_it(string $string, array $ignoreSymbolMap) : \Generator
     {
-        if ([] === $ignoreSymbolMap) {
+        if ( [] === $ignoreSymbolMap ) {
             yield [ $string, '' ];
 
         } else {
@@ -584,7 +584,7 @@ class DefaultSlugger implements SluggerInterface
             for ( $i = 0; $i < $len; $i++ ) {
                 $letter = mb_substr($string, $i, 1);
 
-                if (isset($ignoreSymbolMap[ $letter ])) {
+                if ( isset($ignoreSymbolMap[$letter]) ) {
                     $chunk = mb_substr($string, $prev, $i - $prev);
 
                     yield [ $chunk, $letter ];
@@ -593,7 +593,7 @@ class DefaultSlugger implements SluggerInterface
                 }
             }
 
-            if ($prev < $len) {
+            if ( $prev < $len ) {
                 $chunk = mb_substr($string, $prev);
 
                 yield [ $chunk, '' ];

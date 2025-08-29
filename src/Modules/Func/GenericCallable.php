@@ -130,7 +130,7 @@ class GenericCallable implements
             ?? static::fromInvokableObject($from, $context)->orNull($ret)
             ?? static::fromInvokableClass($from, $context)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -142,7 +142,7 @@ class GenericCallable implements
      */
     public static function fromInstance($from, ?array $fallback = null)
     {
-        if ($from instanceof static) {
+        if ( $from instanceof static ) {
             return Ret::ok($fallback, $from);
         }
 
@@ -158,7 +158,7 @@ class GenericCallable implements
      */
     public static function fromClosure($from, array $context = [], ?array $fallback = null)
     {
-        if (! ($from instanceof \Closure)) {
+        if ( ! ($from instanceof \Closure) ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `from` should be an instance of \Closure', $from ],
@@ -166,7 +166,7 @@ class GenericCallable implements
             );
         }
 
-        $arguments = $context[ 'arguments' ] ?? [];
+        $arguments = $context['arguments'] ?? [];
 
         $instance = new static();
         $instance->args = $arguments;
@@ -188,11 +188,11 @@ class GenericCallable implements
     {
         $theType = Lib::type();
 
-        if (! $theType->method($from, [ &$methodArray ])->isOk([ &$ret ])) {
+        if ( ! $theType->method($from, [ &$methodArray ])->isOk([ &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
-        $arguments = $context[ 'arguments' ] ?? [];
+        $arguments = $context['arguments'] ?? [];
 
         [ $objectOrClass, $methodName ] = $methodArray;
 
@@ -201,7 +201,7 @@ class GenericCallable implements
 
         $instance->isMethod = true;
 
-        if (is_object($objectOrClass)) {
+        if ( is_object($objectOrClass) ) {
             $object = $objectOrClass;
 
             $phpClass = get_class($object);
@@ -233,7 +233,7 @@ class GenericCallable implements
      */
     public static function fromInvokableObject($from, array $context = [], ?array $fallback = null)
     {
-        if (! is_object($from)) {
+        if ( ! is_object($from) ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `from` should be an object', $from ],
@@ -241,7 +241,7 @@ class GenericCallable implements
             );
         }
 
-        if (! method_exists($from, '__invoke')) {
+        if ( ! method_exists($from, '__invoke') ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `from` should be an invokable object', $from ],
@@ -249,7 +249,7 @@ class GenericCallable implements
             );
         }
 
-        $arguments = $context[ 'arguments' ] ?? [];
+        $arguments = $context['arguments'] ?? [];
 
         $instance = new static();
         $instance->args = $arguments;
@@ -272,13 +272,13 @@ class GenericCallable implements
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($from)->isOk([ &$fromStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($from)->isOk([ &$fromStringNotEmpty, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
         $invokableClass = $fromStringNotEmpty;
 
-        if (! class_exists($invokableClass)) {
+        if ( ! class_exists($invokableClass) ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `from` should be an existing class', $from ],
@@ -286,7 +286,7 @@ class GenericCallable implements
             );
         }
 
-        if (! method_exists($invokableClass, '__invoke')) {
+        if ( ! method_exists($invokableClass, '__invoke') ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `from` should be an invokable class', $from ],
@@ -294,7 +294,7 @@ class GenericCallable implements
             );
         }
 
-        $arguments = $context[ 'arguments' ] ?? [];
+        $arguments = $context['arguments'] ?? [];
 
         $instance = new static();
         $instance->args = $arguments;
@@ -314,11 +314,11 @@ class GenericCallable implements
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($function)->isOk([ &$functionStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($function)->isOk([ &$functionStringNotEmpty, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
-        if (! function_exists($functionStringNotEmpty)) {
+        if ( ! function_exists($functionStringNotEmpty) ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `from` should be an existing function name', $function ],
@@ -326,14 +326,14 @@ class GenericCallable implements
             );
         }
 
-        $arguments = $context[ 'arguments' ] ?? [];
+        $arguments = $context['arguments'] ?? [];
 
         $instance = new static();
         $instance->args = $arguments;
 
         $instance->isFunction = true;
 
-        if ($theType->callable_string_function_internal($functionStringNotEmpty)->isOk()) {
+        if ( $theType->callable_string_function_internal($functionStringNotEmpty)->isOk() ) {
             $instance->functionStringInternal = $functionStringNotEmpty;
 
         } else {
@@ -379,7 +379,7 @@ class GenericCallable implements
     {
         $refFn = null;
 
-        if (null !== $this->closureObject) {
+        if ( null !== $this->closureObject ) {
             $refFn = $this->closureObject;
 
             return true;
@@ -406,7 +406,7 @@ class GenericCallable implements
     {
         $refMethodClass = null;
 
-        if (null !== $this->methodClass) {
+        if ( null !== $this->methodClass ) {
             $refMethodClass = $this->methodClass;
 
             return true;
@@ -430,7 +430,7 @@ class GenericCallable implements
     {
         $refMethodObject = null;
 
-        if (null !== $this->methodObject) {
+        if ( null !== $this->methodObject ) {
             $refMethodObject = $this->methodObject;
 
             return true;
@@ -451,7 +451,7 @@ class GenericCallable implements
     {
         $refMethodName = null;
 
-        if (null !== $this->methodName) {
+        if ( null !== $this->methodName ) {
             $refMethodName = $this->methodName;
 
             return true;
@@ -478,7 +478,7 @@ class GenericCallable implements
     {
         $refInvokableObject = null;
 
-        if (null !== $this->invokableObject) {
+        if ( null !== $this->invokableObject ) {
             $refInvokableObject = $this->invokableObject;
 
             return true;
@@ -504,7 +504,7 @@ class GenericCallable implements
     {
         $refInvokableClass = null;
 
-        if (null !== $this->invokableClass) {
+        if ( null !== $this->invokableClass ) {
             $refInvokableClass = $this->invokableClass;
 
             return true;
@@ -534,7 +534,7 @@ class GenericCallable implements
     {
         $refFunctionStringInternal = null;
 
-        if (null !== $this->functionStringInternal) {
+        if ( null !== $this->functionStringInternal ) {
             $refFunctionStringInternal = $this->functionStringInternal;
 
             return true;
@@ -560,7 +560,7 @@ class GenericCallable implements
     {
         $refFunctionStringNonInternal = null;
 
-        if (null !== $this->functionStringNonInternal) {
+        if ( null !== $this->functionStringNonInternal ) {
             $refFunctionStringNonInternal = $this->functionStringNonInternal;
 
             return true;

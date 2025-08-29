@@ -37,7 +37,7 @@ class DefaultEmailParser implements EmailParserInterface
             'composer require egulias/email-validator',
         ];
 
-        if (! class_exists($eguliasEmailValidatorClass = static::EGULIAS_EMAIL_VALIDATOR)) {
+        if ( ! class_exists($eguliasEmailValidatorClass = static::EGULIAS_EMAIL_VALIDATOR) ) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -54,7 +54,7 @@ class DefaultEmailParser implements EmailParserInterface
      */
     public function setEmailFakeRegexes(?array $regexList)
     {
-        if (null === $regexList) {
+        if ( null === $regexList ) {
             $this->emailFakeRegexIndex = [
                 '/^no-reply@/'    => true,
                 '/@example.com$/' => true,
@@ -74,7 +74,7 @@ class DefaultEmailParser implements EmailParserInterface
      */
     public function addEmailFakeRegexes(array $regexList)
     {
-        if ([] === $regexList) {
+        if ( [] === $regexList ) {
             return $this;
         }
 
@@ -83,8 +83,8 @@ class DefaultEmailParser implements EmailParserInterface
         foreach ( $regexList as $regex ) {
             $regexValid = $theType->regex($regex)->orThrow();
 
-            if (! isset($this->emailFakeRegexIndex[ $regexValid ])) {
-                $this->emailFakeRegexIndex[ $regexValid ] = true;
+            if ( ! isset($this->emailFakeRegexIndex[$regexValid]) ) {
+                $this->emailFakeRegexIndex[$regexValid] = true;
             }
         }
 
@@ -124,7 +124,7 @@ class DefaultEmailParser implements EmailParserInterface
             $refEmailName,
         ] = $this->parseEmailDomain($value);
 
-        if (false === filter_var($emailString, FILTER_VALIDATE_EMAIL)) {
+        if ( false === filter_var($emailString, FILTER_VALIDATE_EMAIL) ) {
             throw new RuntimeException(
                 [
                     'The `email` must pass `filter_var` check',
@@ -135,14 +135,14 @@ class DefaultEmailParser implements EmailParserInterface
 
         $isFake = false;
         foreach ( $this->emailFakeRegexIndex as $regexp => $bool ) {
-            if (preg_match($regexp, $emailString)) {
+            if ( preg_match($regexp, $emailString) ) {
                 $isFake = true;
 
                 break;
             }
         }
 
-        if (! $isFake) {
+        if ( ! $isFake ) {
             throw new RuntimeException(
                 [
                     'The `email` must match at least one of `emailFakeRegexIndex` items',
@@ -168,7 +168,7 @@ class DefaultEmailParser implements EmailParserInterface
         ] = $this->parseEmailDomain($value);
 
         foreach ( $this->emailFakeRegexIndex as $regexp => $bool ) {
-            if (preg_match($regexp, $emailString)) {
+            if ( preg_match($regexp, $emailString) ) {
                 throw new RuntimeException(
                     [
                         'The `email` must not match any of `emailFakeRegexIndex` items',
@@ -195,7 +195,7 @@ class DefaultEmailParser implements EmailParserInterface
 
         [ $emailName, $emailDomain ] = explode('@', $emailStringNotEmpty, 2) + [ '', '' ];
 
-        if ('' === $emailDomain) {
+        if ( '' === $emailDomain ) {
             throw new LogicException(
                 [
                     'The `domain` should be a non-empty string',
@@ -229,31 +229,31 @@ class DefaultEmailParser implements EmailParserInterface
 
         $filtersIndex = [];
         foreach ( $filters as $filterKey => $filter ) {
-            if (is_string($filterKey)) {
+            if ( is_string($filterKey) ) {
                 $filter = $filterKey;
             }
 
-            $filtersIndex[ $filter ] = true;
+            $filtersIndex[$filter] = true;
         }
 
         $filtersIntersectIndex = array_intersect_key($filtersIndex, $filtersKnownIndex);
 
         $eguliasEmailValidator = null;
-        if (false
-            || isset($filtersIntersectIndex[ 'rfc' ])
-            || isset($filtersIntersectIndex[ 'rfc_non_strict' ])
-            || isset($filtersIntersectIndex[ 'spoof' ])
-            || isset($filtersIntersectIndex[ 'dns' ])
+        if ( false
+            || isset($filtersIntersectIndex['rfc'])
+            || isset($filtersIntersectIndex['rfc_non_strict'])
+            || isset($filtersIntersectIndex['spoof'])
+            || isset($filtersIntersectIndex['dns'])
         ) {
             $eguliasEmailValidator = $this->newEguliasEmailValidator();
         }
 
-        if ([] !== $filtersIntersectIndex) {
+        if ( [] !== $filtersIntersectIndex ) {
             $eguliasFilters = [];
 
             foreach ( $filtersIntersectIndex as $filter => $bool ) {
-                if ('filter' === $filter) {
-                    if (false === filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                if ( 'filter' === $filter ) {
+                    if ( false === filter_var($email, FILTER_VALIDATE_EMAIL) ) {
                         throw new RuntimeException(
                             [
                                 'The `email` must pass `filter_var()` check',
@@ -262,7 +262,7 @@ class DefaultEmailParser implements EmailParserInterface
                         );
                     }
 
-                } elseif ('filter_unicode' === $filter) {
+                } elseif ( 'filter_unicode' === $filter ) {
                     $emailDomainAscii = false;
 
                     try {
@@ -271,7 +271,7 @@ class DefaultEmailParser implements EmailParserInterface
                     catch ( \Throwable $e ) {
                     }
 
-                    if (false === $emailDomainAscii) {
+                    if ( false === $emailDomainAscii ) {
                         throw new RuntimeException(
                             [
                                 'The `email` is unable to transform `emailDomain` to ASCII',
@@ -283,7 +283,7 @@ class DefaultEmailParser implements EmailParserInterface
 
                     $emailAscii = $emailName . '@' . $emailDomainAscii;
 
-                    if (false === filter_var($emailAscii, FILTER_VALIDATE_EMAIL)) {
+                    if ( false === filter_var($emailAscii, FILTER_VALIDATE_EMAIL) ) {
                         throw new RuntimeException(
                             [
                                 'The `email` must pass `filter_var()` check',
@@ -293,10 +293,10 @@ class DefaultEmailParser implements EmailParserInterface
                         );
                     }
 
-                } elseif ('mx' === $filter) {
+                } elseif ( 'mx' === $filter ) {
                     $hasMxRecords = getmxrr($emailDomain, $mxHosts);
 
-                    if (false === $hasMxRecords) {
+                    if ( false === $hasMxRecords ) {
                         throw new RuntimeException(
                             [
                                 'The `email` must pass `getmxrr()` check',
@@ -305,21 +305,21 @@ class DefaultEmailParser implements EmailParserInterface
                         );
                     }
 
-                } elseif ('rfc_non_strict' === $filter) {
+                } elseif ( 'rfc_non_strict' === $filter ) {
                     $eguliasFilters[] = new \Egulias\EmailValidator\Validation\RFCValidation();
 
-                } elseif ('rfc' === $filter) {
+                } elseif ( 'rfc' === $filter ) {
                     $eguliasFilters[] = new \Egulias\EmailValidator\Validation\NoRFCWarningsValidation();
 
-                } elseif ('spoof' === $filter) {
+                } elseif ( 'spoof' === $filter ) {
                     $eguliasFilters[] = new \Egulias\EmailValidator\Validation\DNSCheckValidation();
 
-                } elseif ('dns' === $filter) {
+                } elseif ( 'dns' === $filter ) {
                     $eguliasFilters[] = new \Egulias\EmailValidator\Validation\DNSCheckValidation();
                 }
             }
 
-            if ([] !== $eguliasFilters) {
+            if ( [] !== $eguliasFilters ) {
                 $emailValidation = new \Egulias\EmailValidator\Validation\MultipleValidationWithAnd(
                     $eguliasFilters
                 );
@@ -329,7 +329,7 @@ class DefaultEmailParser implements EmailParserInterface
                     $emailValidation
                 );
 
-                if (false === $isValid) {
+                if ( false === $isValid ) {
                     throw new RuntimeException(
                         'The `email` must succesfully pass filters',
                         $filters,

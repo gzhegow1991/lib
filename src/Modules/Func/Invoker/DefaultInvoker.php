@@ -22,7 +22,7 @@ class DefaultInvoker implements InvokerInterface
 
         $list = [];
 
-        if ([] !== $args) {
+        if ( [] !== $args ) {
             [ $list ] = $theArr->kwargs($args);
         }
 
@@ -35,15 +35,15 @@ class DefaultInvoker implements InvokerInterface
      */
     public function callUserFunc($fn, ...$args)
     {
-        if (! ($fn instanceof GenericCallable)) {
+        if ( ! ($fn instanceof GenericCallable) ) {
             $result = call_user_func_array($fn, $args);
 
         } else {
-            if ($fn->isClosure()) {
+            if ( $fn->isClosure() ) {
                 $cb = $fn->getClosureObject();
 
-            } elseif ($fn->isMethod()) {
-                if ($fn->hasMethodClass($className)) {
+            } elseif ( $fn->isMethod() ) {
+                if ( $fn->hasMethodClass($className) ) {
                     $cbObj = $this->newInvokeObject($fn->getMethodClass(), $args);
 
                 } else {
@@ -52,16 +52,16 @@ class DefaultInvoker implements InvokerInterface
 
                 $cb = [ $cbObj, $fn->getMethodName() ];
 
-            } elseif ($fn->isInvokable()) {
-                if ($fn->hasInvokableClass($className)) {
+            } elseif ( $fn->isInvokable() ) {
+                if ( $fn->hasInvokableClass($className) ) {
                     $cb = $this->newInvokeObject($className, $args);
 
                 } else {
                     $cb = $fn->getInvokableObject();
                 }
 
-            } elseif ($fn->isFunction()) {
-                if ($fn->hasFunctionStringInternal($fnString)) {
+            } elseif ( $fn->isFunction() ) {
+                if ( $fn->hasFunctionStringInternal($fnString) ) {
                     $theFunc = Lib::func();
 
                     $cb = static function (...$args) use (
@@ -92,15 +92,15 @@ class DefaultInvoker implements InvokerInterface
      */
     public function callUserFuncArray($fn, array $args = [])
     {
-        if (! ($fn instanceof GenericCallable)) {
+        if ( ! ($fn instanceof GenericCallable) ) {
             $result = call_user_func_array($fn, $args);
 
         } else {
-            if ($fn->isClosure()) {
+            if ( $fn->isClosure() ) {
                 $cb = $fn->getClosureObject();
 
-            } elseif ($fn->isMethod()) {
-                if ($fn->hasMethodClass($className)) {
+            } elseif ( $fn->isMethod() ) {
+                if ( $fn->hasMethodClass($className) ) {
                     $cbObj = $this->newInvokeObject($fn->getMethodClass(), $args);
 
                 } else {
@@ -109,16 +109,16 @@ class DefaultInvoker implements InvokerInterface
 
                 $cb = [ $cbObj, $fn->getMethodName() ];
 
-            } elseif ($fn->isInvokable()) {
-                if ($fn->hasInvokableClass($className)) {
+            } elseif ( $fn->isInvokable() ) {
+                if ( $fn->hasInvokableClass($className) ) {
                     $cb = $this->newInvokeObject($className, $args);
 
                 } else {
                     $cb = $fn->getInvokableObject();
                 }
 
-            } elseif ($fn->isFunction()) {
-                if ($fn->hasFunctionStringInternal($fnString)) {
+            } elseif ( $fn->isFunction() ) {
+                if ( $fn->hasFunctionStringInternal($fnString) ) {
                     $theFunc = Lib::func();
 
                     $cb = static function (...$args) use (

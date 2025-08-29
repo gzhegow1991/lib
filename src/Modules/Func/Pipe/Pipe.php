@@ -48,7 +48,7 @@ class Pipe
 
     public function invoke($input = null, ?PipeContext $context = null, array $args = [])
     {
-        if (null !== $context) {
+        if ( null !== $context ) {
             $this->context = $context;
         }
 
@@ -201,7 +201,7 @@ class Pipe
     {
         $this->input = [ $input ];
 
-        if ([] !== $this->queue) {
+        if ( [] !== $this->queue ) {
             $hasContext = (null !== $this->context);
 
             $fnCallUserFuncArray = $this->fnCallUserFuncArray ?? [ $this, 'callUserFuncArray' ];
@@ -209,7 +209,7 @@ class Pipe
 
             $pipeContext = null;
             $argsContext = [];
-            if ($hasContext) {
+            if ( $hasContext ) {
                 $pipeContext = $this->context;
                 $argsContext = [ $pipeContext ];
             }
@@ -222,13 +222,13 @@ class Pipe
                 ] = $step;
 
                 try {
-                    if ('tap' === $stepType) {
-                        if (null !== $this->exception) {
+                    if ( 'tap' === $stepType ) {
+                        if ( null !== $this->exception ) {
                             continue;
                         }
 
                         $argsInput = [
-                            0 => $this->input[ 0 ],
+                            0 => $this->input[0],
                         ];
 
                         $fnCallUserFuncArray(
@@ -242,13 +242,13 @@ class Pipe
                             )
                         );
 
-                    } elseif ('map' === $stepType) {
-                        if (null !== $this->exception) {
+                    } elseif ( 'map' === $stepType ) {
+                        if ( null !== $this->exception ) {
                             continue;
                         }
 
                         $argsInput = [
-                            0 => $this->input[ 0 ],
+                            0 => $this->input[0],
                         ];
 
                         $result = $fnCallUserFuncArray(
@@ -264,13 +264,13 @@ class Pipe
 
                         $this->input = [ $result ];
 
-                    } elseif ('filter' === $stepType) {
-                        if (null !== $this->exception) {
+                    } elseif ( 'filter' === $stepType ) {
+                        if ( null !== $this->exception ) {
                             continue;
                         }
 
                         $argsInput = [
-                            0 => $this->input[ 0 ],
+                            0 => $this->input[0],
                         ];
 
                         $status = $fnCallUserFuncArray(
@@ -284,18 +284,18 @@ class Pipe
                             )
                         );
 
-                        if (! $status) {
+                        if ( ! $status ) {
                             $this->input = [ null ];
                         }
 
-                    } elseif ('middleware' === $stepType) {
-                        if (null !== $this->exception) {
+                    } elseif ( 'middleware' === $stepType ) {
+                        if ( null !== $this->exception ) {
                             continue;
                         }
 
                         $pipeChild = $this->stepPipeChild($step);
 
-                        if ($hasContext) {
+                        if ( $hasContext ) {
                             $pipeChildContext = $pipeContext;
                             $pipeChildContext->setPipe($pipeChild);
 
@@ -307,7 +307,7 @@ class Pipe
 
                         $argsInput = [
                             0 => [ $pipeChild, 'run' ],
-                            1 => $this->input[ 0 ],
+                            1 => $this->input[0],
                         ];
 
                         $result = $fnCallUserFuncArray(
@@ -323,14 +323,14 @@ class Pipe
 
                         $this->input = [ $result ];
 
-                    } elseif ('catch' === $stepType) {
-                        if (null === $this->exception) {
+                    } elseif ( 'catch' === $stepType ) {
+                        if ( null === $this->exception ) {
                             continue;
                         }
 
                         $argsInput = [
                             0 => $this->exception,
-                            1 => $this->input[ 0 ],
+                            1 => $this->input[0],
                         ];
 
                         $result = $fnCallUserFuncArray(
@@ -344,7 +344,7 @@ class Pipe
                             )
                         );
 
-                        if ($result instanceof \Throwable) {
+                        if ( $result instanceof \Throwable ) {
                             $this->exception = $result;
 
                         } else {
@@ -360,11 +360,11 @@ class Pipe
             }
         }
 
-        if (null === $this->exception) {
-            return $this->input[ 0 ];
+        if ( null === $this->exception ) {
+            return $this->input[0];
         }
 
-        if (null !== $this->parent) {
+        if ( null !== $this->parent ) {
             $this->parent->exception = $this->exception;
 
             return null;
@@ -382,7 +382,7 @@ class Pipe
      */
     protected function stepPipeChild(array $step)
     {
-        return $step[ 'child' ];
+        return $step['child'];
     }
 
 
@@ -407,7 +407,7 @@ class Pipe
 
         $args[] = $contextArgs;
 
-        if ([] !== $argsList) {
+        if ( [] !== $argsList ) {
             $arrayArgs = [];
 
             foreach ( $argsList as $argsItem ) {
@@ -419,7 +419,7 @@ class Pipe
 
             $arrayArgs += array_fill(0, $arrayArgsKeyLast, null);
 
-            unset($arrayArgs[ $arrayArgsKeyLast ]);
+            unset($arrayArgs[$arrayArgsKeyLast]);
 
             ksort($arrayArgs);
 

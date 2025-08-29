@@ -25,7 +25,7 @@ class ExceptionIterator implements \RecursiveIterator
     {
         $_items = $items;
         foreach ( $_items as $e ) {
-            if (! ($e instanceof \Throwable)) {
+            if ( ! ($e instanceof \Throwable) ) {
                 throw new \LogicException(
                     'Each of `items` should be an instance of: ' . \Throwable::class
                 );
@@ -36,19 +36,19 @@ class ExceptionIterator implements \RecursiveIterator
         foreach ( $track as $i => $e ) {
             $iString = (string) $i;
 
-            if ('' === $iString) {
+            if ( '' === $iString ) {
                 throw new \LogicException(
                     'Each of keys of `track` should be an non-empty string'
                 );
             }
 
-            if (! ($e instanceof \Throwable)) {
+            if ( ! ($e instanceof \Throwable) ) {
                 throw new \LogicException(
                     'Each of `track` should be an instance of: ' . \Throwable::class
                 );
             }
 
-            $_track[ $i ] = $e;
+            $_track[$i] = $e;
         }
 
         $this->items = $_items;
@@ -67,7 +67,7 @@ class ExceptionIterator implements \RecursiveIterator
             ? array_key_last($this->track) . '.' . key($this->items)
             : key($this->items);
 
-        $track[ $key ] = current($this->items);
+        $track[$key] = current($this->items);
 
         return $track;
     }
@@ -105,7 +105,7 @@ class ExceptionIterator implements \RecursiveIterator
     {
         $current = current($this->items);
 
-        if ($current instanceof AggregateExceptionInterface) {
+        if ( $current instanceof AggregateExceptionInterface ) {
             return count($current->getPreviousList()) > 0;
         }
 
@@ -121,23 +121,23 @@ class ExceptionIterator implements \RecursiveIterator
 
         $list = [];
 
-        if ($current instanceof AggregateExceptionInterface) {
+        if ( $current instanceof AggregateExceptionInterface ) {
             $list = $current->getPreviousList();
 
-        } elseif ($ePrev = $current->getPrevious()) {
+        } elseif ( $ePrev = $current->getPrevious() ) {
             $list[] = $ePrev;
         }
 
         $it = null;
 
-        if ([] !== $list) {
+        if ( [] !== $list ) {
             $fulltrack = $this->track;
 
             $key = ([] !== $this->track)
                 ? array_key_last($this->track) . '.' . key($this->items)
                 : key($this->items);
 
-            $fulltrack[ $key ] = $current;
+            $fulltrack[$key] = $current;
 
             $it = new static($list, $fulltrack);
         }

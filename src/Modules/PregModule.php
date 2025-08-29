@@ -17,7 +17,7 @@ class PregModule
         $theFunc = Lib::func();
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -39,7 +39,7 @@ class PregModule
             );
         }
 
-        if (false === $isMatch) {
+        if ( false === $isMatch ) {
             return Ret::err(
                 [ 'The `value` should be valid regex', $value ],
                 [ __FILE__, __LINE__ ]
@@ -57,7 +57,7 @@ class PregModule
         $theFunc = Lib::func();
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -77,7 +77,7 @@ class PregModule
             );
         }
 
-        if (false === $isMatch) {
+        if ( false === $isMatch ) {
             return Ret::err(
                 [ 'The `value` should be valid regexp', $value ],
                 [ __FILE__, __LINE__ ]
@@ -111,7 +111,7 @@ class PregModule
 
     public function preg_escape(string $delimiter, ...$regexParts) : string
     {
-        if ([] === $regexParts) {
+        if ( [] === $regexParts ) {
             return '';
         }
 
@@ -119,13 +119,13 @@ class PregModule
 
         foreach ( $regexParts as $v ) {
             $regex .= is_array($v)
-                ? $v[ 0 ]
+                ? $v[0]
                 : preg_quote($v, $delimiter);
         }
 
         $regex = "{$delimiter}{$regex}{$delimiter}";
 
-        if (false === preg_match($regex, '')) {
+        if ( false === preg_match($regex, '') ) {
             throw new LogicException(
                 [ 'Invalid regular expression: ' . $regex ]
             );
@@ -136,7 +136,7 @@ class PregModule
 
     public function preg_escape_ord(?string $mb_encoding, string $delimiter, ...$regexParts) : string
     {
-        if ([] === $regexParts) {
+        if ( [] === $regexParts ) {
             return '';
         }
 
@@ -144,13 +144,13 @@ class PregModule
 
         foreach ( $regexParts as $v ) {
             $regex .= is_array($v)
-                ? $v[ 0 ]
+                ? $v[0]
                 : $this->preg_quote_ord($v, $mb_encoding);
         }
 
         $regex = "{$delimiter}{$regex}{$delimiter}";
 
-        if (false === preg_match($regex, '')) {
+        if ( false === preg_match($regex, '') ) {
             throw new LogicException(
                 [ 'Invalid regular expression: ' . $regex ]
             );

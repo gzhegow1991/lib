@@ -72,7 +72,7 @@ abstract class AbstractContext implements
 
         $status = $this->exists($name);
 
-        if ($status) {
+        if ( $status ) {
             $refResult = $this->{$name} ?? null;
 
             return true;
@@ -85,8 +85,8 @@ abstract class AbstractContext implements
     {
         $status = $this->exists($name);
 
-        if (! $status) {
-            if ($fallback) {
+        if ( ! $status ) {
+            if ( $fallback ) {
                 [ $fallback ] = $fallback;
 
                 return $fallback;
@@ -104,7 +104,7 @@ abstract class AbstractContext implements
      */
     public function set(string $name, $value)
     {
-        if ('' === $name) {
+        if ( '' === $name ) {
             throw new LogicException(
                 'Empty `name` is not supported'
             );
@@ -120,7 +120,7 @@ abstract class AbstractContext implements
      */
     public function clear(string $name)
     {
-        if ($this->exists($name)) {
+        if ( $this->exists($name) ) {
             $this->{$name} = null;
         }
 
@@ -135,7 +135,7 @@ abstract class AbstractContext implements
     {
         $instance = new static();
 
-        if ($instance->exists($name)) {
+        if ( $instance->exists($name) ) {
             $this->{$name} = $instance->get($name);
         }
 
@@ -200,7 +200,7 @@ abstract class AbstractContext implements
     public function fill(array $data) : void
     {
         foreach ( $data as $key => $value ) {
-            if ($this->exists($key)) {
+            if ( $this->exists($key) ) {
                 $this->set($key, $value);
             }
         }
@@ -209,7 +209,7 @@ abstract class AbstractContext implements
     public function append(array $data) : void
     {
         foreach ( $data as $key => $value ) {
-            if (! $this->exists($key)) {
+            if ( ! $this->exists($key) ) {
                 $this->set($key, $value);
             }
         }

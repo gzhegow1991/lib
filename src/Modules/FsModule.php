@@ -38,8 +38,8 @@ class FsModule
     {
         $last = static::$realpathReturnTargetPath;
 
-        if (null !== $realpath_return_target_path) {
-            if (false === $realpath_return_target_path) {
+        if ( null !== $realpath_return_target_path ) {
+            if ( false === $realpath_return_target_path ) {
                 static::$realpathReturnTargetPath = true;
 
             } else {
@@ -59,8 +59,8 @@ class FsModule
     {
         $last = static::$dirChmod;
 
-        if (null !== $dirChmod) {
-            if (false === $dirChmod) {
+        if ( null !== $dirChmod ) {
+            if ( false === $dirChmod ) {
                 static::$dirChmod = 0775;
 
             } else {
@@ -84,8 +84,8 @@ class FsModule
     {
         $last = static::$fileChmod;
 
-        if (null !== $fileChmod) {
-            if (false === $fileChmod) {
+        if ( null !== $fileChmod ) {
+            if ( false === $fileChmod ) {
                 static::$fileChmod = 0664;
 
             } else {
@@ -121,7 +121,7 @@ class FsModule
 
     public function __construct()
     {
-        if (! extension_loaded('fileinfo')) {
+        if ( ! extension_loaded('fileinfo') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: fileinfo' ]
             );
@@ -232,23 +232,23 @@ class FsModule
      */
     public function type_chmod($value)
     {
-        if (is_int($value)) {
+        if ( is_int($value) ) {
             $int = $value;
 
-        } elseif (is_string($value)) {
-            if ('0' === $value) {
+        } elseif ( is_string($value) ) {
+            if ( '0' === $value ) {
                 return Ret::val(0);
             }
 
             $valueString = ltrim($value, '0');
-            if ('' === $valueString) {
+            if ( '' === $valueString ) {
                 return Ret::err(
                     [ 'The `value` should be string, that contains numbers except zero', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if (! preg_match($regex = '/^[0124]?[0-7]{3}$/', $valueString)) {
+            if ( ! preg_match($regex = '/^[0124]?[0-7]{3}$/', $valueString) ) {
                 return Ret::err(
                     [ 'The `value` should be string, that match regex: ' . $regex, $value ],
                     [ __FILE__, __LINE__ ]
@@ -257,7 +257,7 @@ class FsModule
 
             $int = octdec($valueString);
 
-            if (0 === $int) {
+            if ( 0 === $int ) {
                 return Ret::err(
                     [ 'The `value` should be valid octal number', $value ],
                     [ __FILE__, __LINE__ ]
@@ -271,7 +271,7 @@ class FsModule
             );
         }
 
-        if (($int < 0) || ($int > 04777)) {
+        if ( ($int < 0) || ($int > 04777) ) {
             return Ret::err(
                 [ 'The `value` should be integer from 0 to 04777', $value ],
                 [ __FILE__, __LINE__ ]
@@ -280,7 +280,7 @@ class FsModule
 
         $octString = decoct($int);
 
-        if (! in_array($octString[ 0 ], [ '0', '1', '2', '4' ], true)) {
+        if ( ! in_array($octString[0], [ '0', '1', '2', '4' ], true) ) {
             return Ret::err(
                 [ 'The `value` should be string that starts from [0124]', $value ],
                 [ __FILE__, __LINE__ ]
@@ -308,20 +308,20 @@ class FsModule
         $isAllowSymlink = $isAllowSymlink ?? true;
 
         $withPathInfo = array_key_exists(0, $refs);
-        if ($withPathInfo) {
-            $refPathInfo =& $refs[ 0 ];
+        if ( $withPathInfo ) {
+            $refPathInfo =& $refs[0];
         }
         $refPathInfo = null;
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! $isAllowSymlink) {
-            if (is_link($valueStringNotEmpty)) {
+        if ( ! $isAllowSymlink ) {
+            if ( is_link($valueStringNotEmpty) ) {
                 return Ret::err(
                     [ 'The `value` should not be symlink', $value ],
                     [ __FILE__, __LINE__ ]
@@ -330,14 +330,14 @@ class FsModule
         }
 
         $realpath = realpath($valueStringNotEmpty);
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             return Ret::err(
                 [ 'The `value` should be valid realpath', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ($withPathInfo) {
+        if ( $withPathInfo ) {
             try {
                 $refPathInfo = $thePhp->pathinfo($realpath);
             }
@@ -362,14 +362,14 @@ class FsModule
     {
         $theType = Lib::type();
 
-        if (! $theType->path($value, $refs)->isOk([ &$valuePath, &$ret ])) {
+        if ( ! $theType->path($value, $refs)->isOk([ &$valuePath, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (file_exists($valuePath)) {
+        if ( file_exists($valuePath) ) {
             return Ret::err(
                 [ 'The `value` should be existing file', $value ],
                 [ __FILE__, __LINE__ ]
@@ -389,21 +389,21 @@ class FsModule
     {
         $theType = Lib::type();
 
-        if (! $theType->char($separator ?? DIRECTORY_SEPARATOR)->isOk([ &$separatorChar, &$ret ])) {
+        if ( ! $theType->char($separator ?? DIRECTORY_SEPARATOR)->isOk([ &$separatorChar, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! $theType->path_normalized($value, $separatorChar, $refs)->isOk([ &$valuePath, &$ret ])) {
+        if ( ! $theType->path_normalized($value, $separatorChar, $refs)->isOk([ &$valuePath, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (file_exists($valuePath)) {
+        if ( file_exists($valuePath) ) {
             return Ret::err(
                 [ 'The `value` should be existing file', $value ],
                 [ __FILE__, __LINE__ ]
@@ -430,7 +430,7 @@ class FsModule
 
         $theType = Lib::type();
 
-        if (! $theType->path($value, $refs)->isOk([ &$valuePath, &$ret ])) {
+        if ( ! $theType->path($value, $refs)->isOk([ &$valuePath, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -439,8 +439,8 @@ class FsModule
 
         $exists = file_exists($valuePath);
 
-        if (! $isAllowExists) {
-            if ($exists) {
+        if ( ! $isAllowExists ) {
+            if ( $exists ) {
                 return Ret::err(
                     [ 'The `value` should not be existing filenode', $value ],
                     [ __FILE__, __LINE__ ]
@@ -450,16 +450,16 @@ class FsModule
             return Ret::val($valuePath);
         }
 
-        if ($exists) {
-            if (! is_dir($valuePath)) {
+        if ( $exists ) {
+            if ( ! is_dir($valuePath) ) {
                 return Ret::err(
                     [ 'The `value` should be existing directory', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if (! $isAllowSymlink) {
-                if (is_link($valuePath)) {
+            if ( ! $isAllowSymlink ) {
+                if ( is_link($valuePath) ) {
                     return Ret::err(
                         [ 'The `value` should not be symlink', $value ],
                         [ __FILE__, __LINE__ ]
@@ -468,7 +468,7 @@ class FsModule
             }
 
             $valueRealpath = realpath($valuePath);
-            if (false === $valueRealpath) {
+            if ( false === $valueRealpath ) {
                 return Ret::err(
                     [ 'The `value` should be valid realpath', $value ],
                     [ __FILE__, __LINE__ ]
@@ -494,15 +494,15 @@ class FsModule
     {
         $isAllowSymlink = $isAllowSymlink ?? true;
 
-        if (! $this->type_realpath($value, $isAllowSymlink, $refs)->isOk([ &$valueRealpath, &$ret ])) {
+        if ( ! $this->type_realpath($value, $isAllowSymlink, $refs)->isOk([ &$valueRealpath, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! $isAllowSymlink) {
-            if (is_link($valueRealpath)) {
+        if ( ! $isAllowSymlink ) {
+            if ( is_link($valueRealpath) ) {
                 return Ret::err(
                     [ 'The `value` should not be symlink', $value ],
                     [ __FILE__, __LINE__ ]
@@ -510,7 +510,7 @@ class FsModule
             }
         }
 
-        if (! is_dir($valueRealpath)) {
+        if ( ! is_dir($valueRealpath) ) {
             return Ret::err(
                 [ 'The `value` should be existing directory', $value ],
                 [ __FILE__, __LINE__ ]
@@ -537,7 +537,7 @@ class FsModule
 
         $theType = Lib::type();
 
-        if (! $theType->path($value, $refs)->isOk([ &$valuePath, &$ret ])) {
+        if ( ! $theType->path($value, $refs)->isOk([ &$valuePath, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -546,8 +546,8 @@ class FsModule
 
         $exists = file_exists($valuePath);
 
-        if (! $isAllowExists) {
-            if ($exists) {
+        if ( ! $isAllowExists ) {
+            if ( $exists ) {
                 return Ret::err(
                     [ 'The `value` should not be existing filenode', $value ],
                     [ __FILE__, __LINE__ ]
@@ -557,9 +557,9 @@ class FsModule
             return Ret::val($valuePath);
         }
 
-        if ($exists) {
-            if (! $isAllowSymlink) {
-                if (is_link($valuePath)) {
+        if ( $exists ) {
+            if ( ! $isAllowSymlink ) {
+                if ( is_link($valuePath) ) {
                     return Ret::err(
                         [ 'The `value` should not be symlink', $value ],
                         [ __FILE__, __LINE__ ]
@@ -567,7 +567,7 @@ class FsModule
                 }
             }
 
-            if (! is_file($valuePath)) {
+            if ( ! is_file($valuePath) ) {
                 return Ret::err(
                     [ 'The `value` should be existing file', $value ],
                     [ __FILE__, __LINE__ ]
@@ -575,7 +575,7 @@ class FsModule
             }
 
             $valueRealpath = realpath($valuePath);
-            if (false === $valueRealpath) {
+            if ( false === $valueRealpath ) {
                 return Ret::err(
                     [ 'The `value` should be valid realpath', $value ],
                     [ __FILE__, __LINE__ ]
@@ -599,15 +599,15 @@ class FsModule
         array $refs = []
     )
     {
-        if (! $this->type_realpath($value, $isAllowSymlink, $refs)->isOk([ &$valueRealpath, &$ret ])) {
+        if ( ! $this->type_realpath($value, $isAllowSymlink, $refs)->isOk([ &$valueRealpath, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! $isAllowSymlink) {
-            if (is_link($value)) {
+        if ( ! $isAllowSymlink ) {
+            if ( is_link($value) ) {
                 return Ret::err(
                     [ 'The `value` should not be symlink', $value ],
                     [ __FILE__, __LINE__ ]
@@ -615,7 +615,7 @@ class FsModule
             }
         }
 
-        if (! is_file($valueRealpath)) {
+        if ( ! is_file($valueRealpath) ) {
             return Ret::err(
                 [ 'The `value` should be existing file', $value ],
                 [ __FILE__, __LINE__ ]
@@ -633,7 +633,7 @@ class FsModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -643,7 +643,7 @@ class FsModule
         $forbidden = [ "/", "\\", DIRECTORY_SEPARATOR ];
 
         foreach ( $forbidden as $f ) {
-            if (false !== strpos($valueStringNotEmpty, $f)) {
+            if ( false !== strpos($valueStringNotEmpty, $f) ) {
                 return Ret::err(
                     [ 'The `value` should not contain directory separators', $value ],
                     [ __FILE__, __LINE__ ]
@@ -665,11 +665,11 @@ class FsModule
         ?array $filters = null
     )
     {
-        if ($value instanceof \SplFileInfo) {
+        if ( $value instanceof \SplFileInfo ) {
             $splFileInfo = $value;
 
         } else {
-            if (! $this->type_filepath_realpath($value)->isOk([ &$valueFilepathRealpath, &$ret ])) {
+            if ( ! $this->type_filepath_realpath($value)->isOk([ &$valueFilepathRealpath, &$ret ]) ) {
                 return Ret::err(
                     $ret,
                     [ __FILE__, __LINE__ ]
@@ -687,11 +687,11 @@ class FsModule
             }
         }
 
-        if (null !== $extensions) {
-            if (null !== $splFileInfo) {
+        if ( null !== $extensions ) {
+            if ( null !== $splFileInfo ) {
                 $splFileInfo = $this->_type_file_extensions($splFileInfo, $extensions);
 
-                if (null === $splFileInfo) {
+                if ( null === $splFileInfo ) {
                     return Ret::err(
                         [ 'The `value` should be file, that passes extension checks', $value, $extensions ],
                         [ __FILE__, __LINE__ ]
@@ -700,11 +700,11 @@ class FsModule
             }
         }
 
-        if (null !== $mimeTypes) {
-            if (null !== $splFileInfo) {
+        if ( null !== $mimeTypes ) {
+            if ( null !== $splFileInfo ) {
                 $splFileInfo = $this->_type_file_mime_types($splFileInfo, $mimeTypes);
 
-                if (null === $splFileInfo) {
+                if ( null === $splFileInfo ) {
                     return Ret::err(
                         [ 'The `value` should be file, that passes mime-type checks', $value, $mimeTypes ],
                         [ __FILE__, __LINE__ ]
@@ -713,11 +713,11 @@ class FsModule
             }
         }
 
-        if (null !== $filters) {
-            if (null !== $splFileInfo) {
+        if ( null !== $filters ) {
+            if ( null !== $splFileInfo ) {
                 $splFileInfo = $this->_type_file_filters($splFileInfo, $filters);
 
-                if (null === $splFileInfo) {
+                if ( null === $splFileInfo ) {
                     return Ret::err(
                         [ 'The `value` should be file, that passes filter checks', $value, $filters ],
                         [ __FILE__, __LINE__ ]
@@ -731,7 +731,7 @@ class FsModule
 
     protected function _type_file_extensions(\SplFileInfo $splFileInfo, array $extensions) : ?\SplFileInfo
     {
-        if ([] === $extensions) {
+        if ( [] === $extensions ) {
             return null;
         }
 
@@ -739,18 +739,18 @@ class FsModule
 
         $fileExtensions = $this->extensions($fileRealpath);
 
-        if (null === $fileExtensions) {
+        if ( null === $fileExtensions ) {
             return null;
         }
 
-        if (in_array($fileExtensions, $extensions, true)) {
+        if ( in_array($fileExtensions, $extensions, true) ) {
             return $splFileInfo;
         }
 
         $fileExtensionLast = explode('.', $fileExtensions);
         $fileExtensionLast = end($fileExtensionLast);
 
-        if (in_array($fileExtensionLast, $extensions, true)) {
+        if ( in_array($fileExtensionLast, $extensions, true) ) {
             return $splFileInfo;
         }
 
@@ -759,7 +759,7 @@ class FsModule
 
     protected function _type_file_mime_types(\SplFileInfo $splFileInfo, array $mimeTypes) : ?\SplFileInfo
     {
-        if ([] === $mimeTypes) {
+        if ( [] === $mimeTypes ) {
             return null;
         }
 
@@ -771,16 +771,16 @@ class FsModule
 
         finfo_close($finfo);
 
-        if (false === $mimeType) {
+        if ( false === $mimeType ) {
             return null;
         }
 
-        if (in_array($mimeType, $mimeTypes, true)) {
+        if ( in_array($mimeType, $mimeTypes, true) ) {
             return $splFileInfo;
         }
 
         foreach ( $mimeTypes as $strStarts ) {
-            if (0 === strpos($mimeType, $strStarts)) {
+            if ( 0 === strpos($mimeType, $strStarts) ) {
                 return $splFileInfo;
             }
         }
@@ -790,7 +790,7 @@ class FsModule
 
     protected function _type_file_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
     {
-        if ([] === $filters) {
+        if ( [] === $filters ) {
             return $splFileInfo;
         }
 
@@ -803,27 +803,27 @@ class FsModule
 
         $filtersIntersect = array_intersect_key($filters, $filtersList);
 
-        if ([] !== $filtersIntersect) {
+        if ( [] !== $filtersIntersect ) {
             $hasMaxSize = array_key_exists('max_size', $filters);
             $hasMinSize = array_key_exists('min_size', $filters);
 
             $fileSize = null;
-            if ($hasMaxSize || $hasMinSize) {
+            if ( $hasMaxSize || $hasMinSize ) {
                 $fileSize = $splFileInfo->getSize();
             }
 
             foreach ( $filters as $filter => $value ) {
-                if ('max_size' === $filter) {
+                if ( 'max_size' === $filter ) {
                     $maxSize = $theFormat->bytes_decode([ NAN ], $value);
 
-                    if (! ($fileSize <= $maxSize)) {
+                    if ( ! ($fileSize <= $maxSize) ) {
                         return null;
                     }
 
-                } elseif ('min_size' === $filter) {
+                } elseif ( 'min_size' === $filter ) {
                     $minSize = $theFormat->bytes_decode([ NAN ], $value);
 
-                    if (! ($fileSize >= $minSize)) {
+                    if ( ! ($fileSize >= $minSize) ) {
                         return null;
                     }
                 }
@@ -844,18 +844,18 @@ class FsModule
         ?array $filters = null
     )
     {
-        if (! $this->type_file($value, $extensions, $mimeTypes, $filters)->isOk([ &$splFileInfo, &$ret ])) {
+        if ( ! $this->type_file($value, $extensions, $mimeTypes, $filters)->isOk([ &$splFileInfo, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (null !== $filters) {
-            if (null !== $splFileInfo) {
+        if ( null !== $filters ) {
+            if ( null !== $splFileInfo ) {
                 $splFileInfo = $this->_type_image_filters($splFileInfo, $filters);
 
-                if (null === $splFileInfo) {
+                if ( null === $splFileInfo ) {
                     return Ret::err(
                         [ 'The `value` should be image, that passes image filter checks', $value, $filters ],
                         [ __FILE__, __LINE__ ]
@@ -869,7 +869,7 @@ class FsModule
 
     protected function _type_image_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
     {
-        if ([] === $filters) {
+        if ( [] === $filters ) {
             return $splFileInfo;
         }
 
@@ -887,7 +887,7 @@ class FsModule
 
         $filtersIntersect = array_intersect_key($filters, $filtersList);
 
-        if ([] !== $filtersIntersect) {
+        if ( [] !== $filtersIntersect ) {
             $fileRealpath = $splFileInfo->getRealPath();
 
             try {
@@ -897,79 +897,79 @@ class FsModule
                 $array = false;
             }
 
-            if (false === $array) {
+            if ( false === $array ) {
                 return null;
             }
 
             [ $imageWidth, $imageHeight ] = $array;
 
             foreach ( $filters as $filter => $value ) {
-                if ('max_width' === $filter) {
-                    if (! $theType->numeric_int_positive($value)->isOk([ &$maxWidth ])) {
+                if ( 'max_width' === $filter ) {
+                    if ( ! $theType->numeric_int_positive($value)->isOk([ &$maxWidth ]) ) {
                         return null;
                     }
 
-                    if (! ($imageWidth <= $maxWidth)) {
+                    if ( ! ($imageWidth <= $maxWidth) ) {
                         return null;
                     }
 
-                } elseif ('max_height' === $filter) {
-                    if (! $theType->numeric_int_positive($value)->isOk([ &$maxHeight ])) {
+                } elseif ( 'max_height' === $filter ) {
+                    if ( ! $theType->numeric_int_positive($value)->isOk([ &$maxHeight ]) ) {
                         return null;
                     }
 
-                    if (! ($imageHeight <= $maxHeight)) {
+                    if ( ! ($imageHeight <= $maxHeight) ) {
                         return null;
                     }
 
-                } elseif ('min_width' === $filter) {
-                    if (! $theType->numeric_int_positive($value)->isOk([ &$minWidth ])) {
+                } elseif ( 'min_width' === $filter ) {
+                    if ( ! $theType->numeric_int_positive($value)->isOk([ &$minWidth ]) ) {
                         return null;
                     }
 
-                    if (! ($imageWidth >= $minWidth)) {
+                    if ( ! ($imageWidth >= $minWidth) ) {
                         return null;
                     }
 
-                } elseif ('min_height' === $filter) {
-                    if (! $theType->numeric_int_positive($value)->isOk([ &$minHeight ])) {
+                } elseif ( 'min_height' === $filter ) {
+                    if ( ! $theType->numeric_int_positive($value)->isOk([ &$minHeight ]) ) {
                         return null;
                     }
 
-                    if (! ($imageHeight >= $minHeight)) {
+                    if ( ! ($imageHeight >= $minHeight) ) {
                         return null;
                     }
 
-                } elseif ('width' === $filter) {
-                    if (! $theType->numeric_int_positive($value)->isOk([ &$exactWidth ])) {
+                } elseif ( 'width' === $filter ) {
+                    if ( ! $theType->numeric_int_positive($value)->isOk([ &$exactWidth ]) ) {
                         return null;
                     }
 
-                    if (! ($imageWidth == $exactWidth)) {
+                    if ( ! ($imageWidth == $exactWidth) ) {
                         return null;
                     }
 
-                } elseif ('height' === $filter) {
-                    if (! $theType->numeric_int_positive($value)->isOk([ &$exactHeight ])) {
+                } elseif ( 'height' === $filter ) {
+                    if ( ! $theType->numeric_int_positive($value)->isOk([ &$exactHeight ]) ) {
                         return null;
                     }
 
-                    if (! ($imageHeight == $exactHeight)) {
+                    if ( ! ($imageHeight == $exactHeight) ) {
                         return null;
                     }
 
-                } elseif ('ratio' === $filter) {
-                    if ($theType->numeric($value)->isOk([ &$ratioNumeric ])) {
+                } elseif ( 'ratio' === $filter ) {
+                    if ( $theType->numeric($value)->isOk([ &$ratioNumeric ]) ) {
                         $ratio = round($ratioNumeric, 3);
 
-                    } elseif ($theType->string_not_empty($value)->isOk([ &$ratioStringNotEmpty ])) {
+                    } elseif ( $theType->string_not_empty($value)->isOk([ &$ratioStringNotEmpty ]) ) {
                         [ $ratioW, $ratioH ] = explode('/', $ratioStringNotEmpty) + [ 0, 0 ];
 
-                        if (! $theType->numeric_int_positive($ratioW)->isOk([ &$ratioWNumericIntPositive ])) {
+                        if ( ! $theType->numeric_int_positive($ratioW)->isOk([ &$ratioWNumericIntPositive ]) ) {
                             return null;
                         }
 
-                        if (! $theType->numeric_int_positive($ratioH)->isOk([ &$ratioHNumericIntPositive ])) {
+                        if ( ! $theType->numeric_int_positive($ratioH)->isOk([ &$ratioHNumericIntPositive ]) ) {
                             return null;
                         }
 
@@ -983,7 +983,7 @@ class FsModule
                     $imageRatio = $imageWidth / $imageHeight;
                     $imageRatio = round($imageRatio, 3);
 
-                    if ($ratio !== $imageRatio) {
+                    if ( $ratio !== $imageRatio ) {
                         return null;
                     }
                 }
@@ -1001,7 +1001,7 @@ class FsModule
     {
         $theType = Lib::type();
 
-        if (false
+        if ( false
             || is_a($value, '\Socket')
             || $theType->resource_opened($value, 'socket')->isOk()
         ) {
@@ -1021,7 +1021,7 @@ class FsModule
     {
         $theType = Lib::type();
 
-        if ($theType->resource_opened($value, 'stream')->isOk()) {
+        if ( $theType->resource_opened($value, 'stream')->isOk() ) {
             return Ret::val($value);
         }
 
@@ -1043,7 +1043,7 @@ class FsModule
         $fileUmask = $defaultFileMask & (~$fileMode);
         $dirUmask = $defaultDirMask & (~$dirMode);
 
-        if ($fileUmask !== $dirUmask) {
+        if ( $fileUmask !== $dirUmask ) {
             throw new RuntimeException(
                 [
                     'Unable to create one umask for both given `fileMode` and `dirMode`',
@@ -1126,7 +1126,7 @@ class FsModule
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
-        if ($theType->realpath($path)->isOk([ &$pathRealpath ])) {
+        if ( $theType->realpath($path)->isOk([ &$pathRealpath ]) ) {
             $pathNormalized = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $pathRealpath);
 
         } else {
@@ -1146,7 +1146,7 @@ class FsModule
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
-        if ($theType->realpath($path)->isOk([ &$pathRealpath ])) {
+        if ( $theType->realpath($path)->isOk([ &$pathRealpath ]) ) {
             $pathResolved = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $pathRealpath);
 
         } else {
@@ -1180,11 +1180,11 @@ class FsModule
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
-        if ($theType->realpath($path)->isOk([ &$pathRealpath ])) {
+        if ( $theType->realpath($path)->isOk([ &$pathRealpath ]) ) {
             $path = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $pathRealpath);
         }
 
-        if ($theType->realpath($root)->isOk([ &$rootRealpath ])) {
+        if ( $theType->realpath($root)->isOk([ &$rootRealpath ]) ) {
             $root = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $rootRealpath);
         }
 
@@ -1203,11 +1203,11 @@ class FsModule
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
-        if ($theType->realpath($path)->isOk([ &$pathRealpath ])) {
+        if ( $theType->realpath($path)->isOk([ &$pathRealpath ]) ) {
             $path = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $pathRealpath);
         }
 
-        if ($theType->realpath($current)->isOk([ &$currentRealpath ])) {
+        if ( $theType->realpath($current)->isOk([ &$currentRealpath ]) ) {
             $current = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $currentRealpath);
         }
 
@@ -1226,11 +1226,11 @@ class FsModule
 
         $separatorChar = $theType->char($separator ?? DIRECTORY_SEPARATOR)->orThrow();
 
-        if ($this->type_realpath($path)->isOk([ &$pathRealpath ])) {
+        if ( $this->type_realpath($path)->isOk([ &$pathRealpath ]) ) {
             $path = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $pathRealpath);
         }
 
-        if ($this->type_realpath($current)->isOk([ &$currentRealpath ])) {
+        if ( $this->type_realpath($current)->isOk([ &$currentRealpath ]) ) {
             $current = str_replace(DIRECTORY_SEPARATOR, $separatorChar, $currentRealpath);
         }
 
@@ -1260,9 +1260,9 @@ class FsModule
                 $theFsFile,
                 $fileIn, $fileInLock, $data
             ) {
-                if ($fhInLock = $theFsFile->fopen_flock_tmpfile(
+                if ( $fhInLock = $theFsFile->fopen_flock_tmpfile(
                     $fileInLock, 'w', LOCK_EX | LOCK_NB,
-                )) {
+                ) ) {
                     fwrite($fhInLock, getmypid());
 
                     $line = base64_encode($data);
@@ -1297,10 +1297,10 @@ class FsModule
                 $tickUsleep, $timeoutMs,
                 $fileIn, $fileInLock, $data
             ) {
-                if ($fhInLock = $theFsFile->fopen_flock_tmpfile_pooling(
+                if ( $fhInLock = $theFsFile->fopen_flock_tmpfile_pooling(
                     $tickUsleep, $timeoutMs,
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
-                )) {
+                ) ) {
                     fwrite($fhInLock, getmypid());
 
                     $line = base64_encode($data);
@@ -1332,9 +1332,9 @@ class FsModule
                 $theFsFile,
                 $fileIn, $fileInLock, $data
             ) {
-                if ($fhInLock = $theFsFile->fopen_flock_tmpfile(
+                if ( $fhInLock = $theFsFile->fopen_flock_tmpfile(
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
-                )) {
+                ) ) {
                     fwrite($fhInLock, getmypid());
 
                     $line = base64_encode($data);
@@ -1369,10 +1369,10 @@ class FsModule
                 $tickUsleep, $timeoutMs,
                 $fileIn, $fileInLock, $data
             ) {
-                if ($fhInLock = $theFsFile->fopen_flock_tmpfile_pooling(
+                if ( $fhInLock = $theFsFile->fopen_flock_tmpfile_pooling(
                     $tickUsleep, $timeoutMs,
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
-                )) {
+                ) ) {
                     fwrite($fhInLock, getmypid());
 
                     $line = base64_encode($data);
@@ -1409,20 +1409,20 @@ class FsModule
             ) {
                 $data = null;
 
-                if ($fhOutLock = $theFsFile->fopen_flock_tmpfile(
+                if ( $fhOutLock = $theFsFile->fopen_flock_tmpfile(
                     $fileOutLock, 'w', LOCK_EX | LOCK_NB
-                )) {
+                ) ) {
                     fwrite($fhOutLock, getmypid());
 
                     $isFileOut = is_file($fileOut) && filesize($fileOut);
 
-                    if (! $isFileOut) {
+                    if ( ! $isFileOut ) {
                         $isFileIn = is_file($fileIn) && filesize($fileIn);
 
-                        if ($isFileIn) {
+                        if ( $isFileIn ) {
                             $content = file_get_contents($fileIn);
 
-                            if (! ((false === $content) || ('' === $content))) {
+                            if ( ! ((false === $content) || ('' === $content)) ) {
                                 file_put_contents($fileOut, $content, FILE_APPEND);
                                 file_put_contents($fileIn, '');
 
@@ -1431,20 +1431,20 @@ class FsModule
                         }
                     }
 
-                    if ($isFileOut) {
-                        if ($fhOut = $theFsFile->fopen($fileOut, 'rb+')) {
+                    if ( $isFileOut ) {
+                        if ( $fhOut = $theFsFile->fopen($fileOut, 'rb+') ) {
                             $line = fgets($fhOut);
                             $rest = stream_get_contents($fhOut);
 
                             rewind($fhOut);
                             ftruncate($fhOut, 0);
 
-                            if ('' !== $rest) {
+                            if ( '' !== $rest ) {
                                 fwrite($fhOut, $rest);
                             }
 
                             $line = rtrim($line);
-                            if ('' !== $line) {
+                            if ( '' !== $line ) {
                                 $data = base64_decode($line);
                             }
                         }
@@ -1455,12 +1455,12 @@ class FsModule
             }
         );
 
-        if ($deleteIfEmpty) {
-            if (is_file($fileIn) && ! filesize($fileIn)) {
+        if ( $deleteIfEmpty ) {
+            if ( is_file($fileIn) && ! filesize($fileIn) ) {
                 unlink($fileIn);
             }
 
-            if (is_file($fileOut) && ! filesize($fileOut)) {
+            if ( is_file($fileOut) && ! filesize($fileOut) ) {
                 unlink($fileOut);
             }
         }
@@ -1496,10 +1496,10 @@ class FsModule
             ) {
                 $data = null;
 
-                if ($fhOutLock = $theFsFile->fopen_flock_tmpfile_pooling(
+                if ( $fhOutLock = $theFsFile->fopen_flock_tmpfile_pooling(
                     $blockTickUsleep, $blockTimeoutMs,
                     $fileOutLock, 'w', LOCK_EX | LOCK_NB
-                )) {
+                ) ) {
                     fwrite($fhOutLock, getmypid());
 
                     $data = $thePhp->pooling_sync(
@@ -1513,13 +1513,13 @@ class FsModule
                         ) {
                             $isFileOut = is_file($fileOut) && filesize($fileOut);
 
-                            if (! $isFileOut) {
+                            if ( ! $isFileOut ) {
                                 $isFileIn = is_file($fileIn) && filesize($fileIn);
 
-                                if ($isFileIn) {
+                                if ( $isFileIn ) {
                                     $content = file_get_contents($fileIn);
 
-                                    if (! ((false === $content) || ('' === $content))) {
+                                    if ( ! ((false === $content) || ('' === $content)) ) {
                                         file_put_contents($fileOut, $content, FILE_APPEND);
                                         file_put_contents($fileIn, '');
 
@@ -1528,25 +1528,25 @@ class FsModule
                                 }
                             }
 
-                            if ($isFileOut) {
-                                if (! $fhOut) {
+                            if ( $isFileOut ) {
+                                if ( ! $fhOut ) {
                                     $fhOut = $theFsFile->fopen($fileOut, 'rb+');
                                 }
 
-                                if ($fhOut) {
+                                if ( $fhOut ) {
                                     $line = fgets($fhOut);
                                     $rest = stream_get_contents($fhOut);
 
                                     rewind($fhOut);
                                     ftruncate($fhOut, 0);
 
-                                    if ('' !== $rest) {
+                                    if ( '' !== $rest ) {
                                         fwrite($fhOut, $rest);
                                     }
 
                                     $line = rtrim($line);
 
-                                    if ('' !== $line) {
+                                    if ( '' !== $line ) {
                                         $data = base64_decode($line);
 
                                         $ctx->setResult($data);
@@ -1556,7 +1556,7 @@ class FsModule
                         }
                     );
 
-                    if (false === $data) {
+                    if ( false === $data ) {
                         $data = null;
                     }
                 }
@@ -1565,12 +1565,12 @@ class FsModule
             }
         );
 
-        if ($deleteIfEmpty) {
-            if (is_file($fileIn) && ! filesize($fileIn)) {
+        if ( $deleteIfEmpty ) {
+            if ( is_file($fileIn) && ! filesize($fileIn) ) {
                 unlink($fileIn);
             }
 
-            if (is_file($fileOut) && ! filesize($fileOut)) {
+            if ( is_file($fileOut) && ! filesize($fileOut) ) {
                 unlink($fileOut);
             }
         }
@@ -1602,20 +1602,20 @@ class FsModule
             ) {
                 $data = null;
 
-                if ($fhOutLock = $theFsFile->fopen_flock_tmpfile(
+                if ( $fhOutLock = $theFsFile->fopen_flock_tmpfile(
                     $fileOutLock, 'w', LOCK_EX | LOCK_NB
-                )) {
+                ) ) {
                     fwrite($fhOutLock, getmypid());
 
                     $isFileOut = is_file($fileOut) && filesize($fileOut);
 
-                    if (! $isFileOut) {
+                    if ( ! $isFileOut ) {
                         $isFileIn = is_file($fileIn) && filesize($fileIn);
 
-                        if ($isFileIn) {
+                        if ( $isFileIn ) {
                             $lines = file($fileIn);
 
-                            if (! ((false === $lines) || ([] === $lines))) {
+                            if ( ! ((false === $lines) || ([] === $lines)) ) {
                                 $lines = array_map('trim', $lines);
                                 $lines = array_reverse($lines);
 
@@ -1629,21 +1629,21 @@ class FsModule
                         }
                     }
 
-                    if ($isFileOut) {
-                        if ($fhOut = $theFsFile->fopen($fileOut, 'rb+')) {
+                    if ( $isFileOut ) {
+                        if ( $fhOut = $theFsFile->fopen($fileOut, 'rb+') ) {
                             $line = fgets($fhOut);
                             $contentOut = stream_get_contents($fhOut);
 
                             rewind($fhOut);
                             ftruncate($fhOut, 0);
 
-                            if ('' !== $contentOut) {
+                            if ( '' !== $contentOut ) {
                                 fwrite($fhOut, $contentOut);
                             }
 
                             $line = rtrim($line);
 
-                            if ('' !== $line) {
+                            if ( '' !== $line ) {
                                 $data = base64_decode($line);
                             }
                         }
@@ -1654,11 +1654,11 @@ class FsModule
             }
         );
 
-        if ($deleteIfEmpty) {
-            if (is_file($fileIn) && ! filesize($fileIn)) {
+        if ( $deleteIfEmpty ) {
+            if ( is_file($fileIn) && ! filesize($fileIn) ) {
                 unlink($fileIn);
             }
-            if (is_file($fileOut) && ! filesize($fileOut)) {
+            if ( is_file($fileOut) && ! filesize($fileOut) ) {
                 unlink($fileOut);
             }
         }
@@ -1694,10 +1694,10 @@ class FsModule
             ) {
                 $data = null;
 
-                if ($fhOutLock = $theFsFile->fopen_flock_pooling(
+                if ( $fhOutLock = $theFsFile->fopen_flock_pooling(
                     $blockTickUsleep, $blockTimeoutMs,
                     $fileOutLock, 'w', LOCK_EX | LOCK_NB
-                )) {
+                ) ) {
                     fwrite($fhOutLock, getmypid());
 
                     $data = $thePhp->pooling_sync(
@@ -1711,13 +1711,13 @@ class FsModule
                         ) {
                             $isFileOut = is_file($fileOut) && filesize($fileOut);
 
-                            if (! $isFileOut) {
+                            if ( ! $isFileOut ) {
                                 $isFileIn = is_file($fileIn) && filesize($fileIn);
 
-                                if ($isFileIn) {
+                                if ( $isFileIn ) {
                                     $lines = file($fileIn);
 
-                                    if (! ((false === $lines) || ([] === $lines))) {
+                                    if ( ! ((false === $lines) || ([] === $lines)) ) {
                                         $lines = array_map('trim', $lines);
                                         $lines = array_reverse($lines);
 
@@ -1731,24 +1731,24 @@ class FsModule
                                 }
                             }
 
-                            if ($isFileOut) {
-                                if (! $fhOut) {
+                            if ( $isFileOut ) {
+                                if ( ! $fhOut ) {
                                     $fhOut = $theFsFile->fopen($fileOut, 'rb+');
                                 }
 
-                                if ($fhOut) {
+                                if ( $fhOut ) {
                                     $line = fgets($fhOut);
                                     $contentOut = stream_get_contents($fhOut);
 
                                     rewind($fhOut);
                                     ftruncate($fhOut, 0);
 
-                                    if ('' === $contentOut) {
+                                    if ( '' === $contentOut ) {
                                         fwrite($fhOut, $contentOut);
                                     }
 
                                     $line = rtrim($line);
-                                    if ('' !== $line) {
+                                    if ( '' !== $line ) {
                                         $data = base64_decode($line);
 
                                         $ctx->setResult($data);
@@ -1758,7 +1758,7 @@ class FsModule
                         }
                     );
 
-                    if (false === $data) {
+                    if ( false === $data ) {
                         $data = null;
                     }
                 }
@@ -1767,11 +1767,11 @@ class FsModule
             }
         );
 
-        if ($deleteIfEmpty) {
-            if (is_file($fileIn) && ! filesize($fileIn)) {
+        if ( $deleteIfEmpty ) {
+            if ( is_file($fileIn) && ! filesize($fileIn) ) {
                 unlink($fileIn);
             }
-            if (is_file($fileOut) && ! filesize($fileOut)) {
+            if ( is_file($fileOut) && ! filesize($fileOut) ) {
                 unlink($fileOut);
             }
         }
@@ -1832,12 +1832,12 @@ class FsModule
         $fh1 = fopen($file1, 'rb');
         $fh2 = fopen($file2, 'rb');
 
-        if (false === $fh1) {
+        if ( false === $fh1 ) {
             throw new FilesystemException(
                 [ 'Unable to open file with flags: rb', $file1 ]
             );
         }
-        if (false === $fh2) {
+        if ( false === $fh2 ) {
             throw new FilesystemException(
                 [ 'Unable to open file with flags: rb', $file2 ]
             );
@@ -1862,7 +1862,7 @@ class FsModule
             $buffer1 .= $chunk1;
             $buffer2 .= $chunk2;
 
-            if ($len1 !== $len2) {
+            if ( $len1 !== $len2 ) {
                 $maxlen = max(
                     strlen($buffer1),
                     strlen($buffer2)
@@ -1871,7 +1871,7 @@ class FsModule
                 $line1 = substr($buffer1, 0, $maxlen);
                 $line2 = substr($buffer2, 0, $maxlen);
 
-                if ($line1 !== $line2) {
+                if ( $line1 !== $line2 ) {
                     $diff[] = [
                         $lineNumber,
                         [ strlen($line1), $line1 ],
@@ -1883,11 +1883,11 @@ class FsModule
                 $buffer2 = '';
 
             } else {
-                if ($chunk1 !== $chunk2) {
+                if ( $chunk1 !== $chunk2 ) {
                     $hasNPos1 = (false !== ($nPos1 = strpos($buffer1, "\n")));
                     $hasNPos2 = (false !== ($nPos2 = strpos($buffer2, "\n")));
 
-                    if ($hasNPos1 && $hasNPos2) {
+                    if ( $hasNPos1 && $hasNPos2 ) {
                         while ( true
                             && (false !== ($nPos1 = strpos($buffer1, "\n")))
                             && (false !== ($nPos2 = strpos($buffer2, "\n")))
@@ -1898,7 +1898,7 @@ class FsModule
                             $buffer1 = substr($buffer1, $nPos1 + 1);
                             $buffer2 = substr($buffer2, $nPos2 + 1);
 
-                            if ($line1 !== $line2) {
+                            if ( $line1 !== $line2 ) {
                                 $diff[] = [
                                     $lineNumber,
                                     [ strlen($line1), $line1 ],
@@ -1910,7 +1910,7 @@ class FsModule
                         }
 
                     } else {
-                        if ($hasNPos1) {
+                        if ( $hasNPos1 ) {
                             $line1 = substr($buffer1, 0, $nPos1 + 1);
                             $line2 = substr($buffer2, 0, $nPos1 + 1);
 
@@ -1919,14 +1919,14 @@ class FsModule
                             while ( ! feof($fh2) ) {
                                 $buffer2 = fgets($fh2, $lengthBufferInt);
 
-                                if ($buffer2[ strlen($buffer2) - 1 ] === "\n") {
+                                if ( $buffer2[strlen($buffer2) - 1] === "\n" ) {
                                     break;
                                 }
                             }
 
                             $buffer2 = '';
 
-                        } elseif ($hasNPos2) {
+                        } elseif ( $hasNPos2 ) {
                             $line1 = substr($buffer1, 0, $nPos2 + 1);
                             $line2 = substr($buffer2, 0, $nPos2 + 1);
 
@@ -1935,7 +1935,7 @@ class FsModule
                             while ( ! feof($fh1) ) {
                                 $buffer1 = fgets($fh1, $lengthBufferInt);
 
-                                if ($buffer1[ strlen($buffer1) - 1 ] === "\n") {
+                                if ( $buffer1[strlen($buffer1) - 1] === "\n" ) {
                                     break;
                                 }
                             }
@@ -1960,14 +1960,14 @@ class FsModule
                                 $buffer1 = fgets($fh1, $lengthBufferInt);
                                 $buffer2 = fgets($fh2, $lengthBufferInt);
 
-                                if ($buffer1[ strlen($buffer1) - 1 ] === "\n") {
+                                if ( $buffer1[strlen($buffer1) - 1] === "\n" ) {
                                     $hasFh1 = false;
                                 }
-                                if ($buffer2[ strlen($buffer2) - 1 ] === "\n") {
+                                if ( $buffer2[strlen($buffer2) - 1] === "\n" ) {
                                     $hasFh2 = false;
                                 }
 
-                                if (! $hasFh1 && ! $hasFh2) {
+                                if ( ! $hasFh1 && ! $hasFh2 ) {
                                     break;
                                 }
                             }
@@ -1976,7 +1976,7 @@ class FsModule
                             $buffer2 = '';
                         }
 
-                        if ($line1 !== $line2) {
+                        if ( $line1 !== $line2 ) {
                             $diff[] = [
                                 $lineNumber,
                                 [ strlen($line1), $line1 ],
@@ -2005,10 +2005,10 @@ class FsModule
         $thePhp = Lib::php();
         $theType = Lib::type();
 
-        if (! file_exists($filepath)) {
+        if ( ! file_exists($filepath) ) {
             $len = file_put_contents($filepath, '');
 
-            if (false === $len) {
+            if ( false === $len ) {
                 throw new LogicException(
                     [ 'Unable to create file', $filepath ]
                 );
@@ -2019,7 +2019,7 @@ class FsModule
 
         $filepathRealpath = realpath($filepath);
 
-        if (false === $filepathRealpath) {
+        if ( false === $filepathRealpath ) {
             throw new LogicException(
                 [ 'Unable to realpath', $filepath ]
             );
@@ -2027,18 +2027,18 @@ class FsModule
 
         $startTrim = $theType->trim($start)->orThrow();
 
-        if (null !== ($endTrim = $end)) {
+        if ( null !== ($endTrim = $end) ) {
             $endTrim = $theType->trim($end)->orThrow();
         }
 
-        if ($startTrim === $endTrim) {
+        if ( $startTrim === $endTrim ) {
             throw new LogicException(
                 [ 'The `start` should not be equal to `end`', $startTrim, $endTrim ]
             );
         }
 
         $input = fopen($filepathRealpath, 'rb');
-        if (false === $input) {
+        if ( false === $input ) {
             throw new FilesystemException(
                 [ 'Unable to perform fopen() on file', $filepathRealpath ]
             );
@@ -2047,7 +2047,7 @@ class FsModule
         $filepathRealpathTmp = $filepathRealpath . '.tmp';
 
         $output = fopen($filepathRealpathTmp, 'wb');
-        if (false === $output) {
+        if ( false === $output ) {
             throw new FilesystemException(
                 [ 'Unable to perform fopen() on file', $filepathRealpathTmp ]
             );
@@ -2060,26 +2060,26 @@ class FsModule
 
             $fgets = rtrim($fgets);
 
-            if ('' !== $startTrim) {
-                if (ltrim($fgets) === $startTrim) {
+            if ( '' !== $startTrim ) {
+                if ( ltrim($fgets) === $startTrim ) {
                     $insideBlock = 1;
                 }
             }
 
-            if ('' !== $endTrim) {
-                if (ltrim($fgets) === $endTrim) {
+            if ( '' !== $endTrim ) {
+                if ( ltrim($fgets) === $endTrim ) {
                     $insideBlock = 0;
                 }
             }
 
-            if (! $insideBlock) {
+            if ( ! $insideBlock ) {
                 fwrite($output, $fgets . "\n");
 
-            } elseif (1 === $insideBlock) {
+            } elseif ( 1 === $insideBlock ) {
                 fwrite($output, $startTrim . "\n");
 
                 foreach ( $thePhp->to_list_it($lines) as $line ) {
-                    if (is_array($line)) {
+                    if ( is_array($line) ) {
                         continue;
                     }
 
@@ -2094,13 +2094,13 @@ class FsModule
             }
         }
 
-        if (null === $insideBlock) {
+        if ( null === $insideBlock ) {
             fwrite($output, "\n");
 
             fwrite($output, $startTrim . "\n");
 
             foreach ( $thePhp->to_list_it($lines) as $line ) {
-                if (is_array($line)) {
+                if ( is_array($line) ) {
                     continue;
                 }
 
@@ -2117,7 +2117,7 @@ class FsModule
 
         $status = rename($filepathRealpathTmp, $filepathRealpath);
 
-        if (false === $status) {
+        if ( false === $status ) {
             throw new FilesystemException(
                 [ 'Unable to perform rename() on file', $filepathRealpathTmp ]
             );

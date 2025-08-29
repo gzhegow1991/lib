@@ -44,16 +44,16 @@ abstract class AbstractListOfResourceType extends AbstractListOf
 
     public function __unserialize(array $data) : void
     {
-        $this->valueType = $data[ 'valueType' ];
-        $this->valueResourceType = $data[ 'valueResourceType' ];
+        $this->valueType = $data['valueType'];
+        $this->valueResourceType = $data['valueResourceType'];
         //
-        $this->values = $data[ 'values' ];
+        $this->values = $data['values'];
     }
 
 
     protected function setValue($key, $value)
     {
-        if (! is_resource($value)) {
+        if ( ! is_resource($value) ) {
             throw new LogicException(
                 [
                     'The `value` should be a resource',
@@ -62,7 +62,7 @@ abstract class AbstractListOfResourceType extends AbstractListOf
             );
         }
 
-        if (get_resource_type($value) !== $this->valueResourceType) {
+        if ( get_resource_type($value) !== $this->valueResourceType ) {
             throw new LogicException(
                 [
                     'The `value` should be a resource of type: ' . $this->valueResourceType,

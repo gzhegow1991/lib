@@ -90,7 +90,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             'composer require giggsey/libphonenumber-for-php',
         ];
 
-        if (! class_exists($giggseyPhoneNumberUtilClass = static::GIGGSEY_PHONE_NUMBER_UTIL_CLASS)) {
+        if ( ! class_exists($giggseyPhoneNumberUtilClass = static::GIGGSEY_PHONE_NUMBER_UTIL_CLASS) ) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -121,7 +121,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             'composer require giggsey/libphonenumber-for-php',
         ];
 
-        if (! class_exists($giggseyPhoneNumberOfflineGeocoderClass = static::GIGGSEY_PHONE_NUMBER_OFFLINE_GEOCODER_CLASS)) {
+        if ( ! class_exists($giggseyPhoneNumberOfflineGeocoderClass = static::GIGGSEY_PHONE_NUMBER_OFFLINE_GEOCODER_CLASS) ) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -152,7 +152,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             'composer require giggsey/libphonenumber-for-php',
         ];
 
-        if (! class_exists($giggseyPhoneNumberToCarrierMapperClass = static::GIGGSEY_PHONE_NUMBER_TO_CARRIER_MAPPER_CLASS)) {
+        if ( ! class_exists($giggseyPhoneNumberToCarrierMapperClass = static::GIGGSEY_PHONE_NUMBER_TO_CARRIER_MAPPER_CLASS) ) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -183,7 +183,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             'composer require giggsey/libphonenumber-for-php',
         ];
 
-        if (! class_exists($giggseyPhoneNumberToTimeZonesMapperClass = static::GIGGSEY_PHONE_NUMBER_TO_TIME_ZONES_MAPPER_CLASS)) {
+        if ( ! class_exists($giggseyPhoneNumberToTimeZonesMapperClass = static::GIGGSEY_PHONE_NUMBER_TO_TIME_ZONES_MAPPER_CLASS) ) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -210,7 +210,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
      */
     public function setPhoneFakeRegexes(?array $regexList)
     {
-        if (null === $regexList) {
+        if ( null === $regexList ) {
             $this->phoneFakeRegexIndex = [
                 '/^[+]7999/'  => true,
                 '/^[+]37599/' => true,
@@ -230,7 +230,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
      */
     public function addPhoneFakeRegexes(array $regexList)
     {
-        if ([] === $regexList) {
+        if ( [] === $regexList ) {
             return $this;
         }
 
@@ -239,8 +239,8 @@ class DefaultPhoneManager implements PhoneManagerInterface
         foreach ( $regexList as $regex ) {
             $regexValid = $theType->regex($regex)->orThrow();
 
-            if (! isset($this->phoneFakeRegexIndex[ $regexValid ])) {
-                $this->phoneFakeRegexIndex[ $regexValid ] = true;
+            if ( ! isset($this->phoneFakeRegexIndex[$regexValid]) ) {
+                $this->phoneFakeRegexIndex[$regexValid] = true;
             }
         }
 
@@ -300,7 +300,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         $phone = preg_replace("/{$allowedSymbolsRegex}/", '', $value);
 
-        if ($refTelPlus) {
+        if ( $refTelPlus ) {
             $phone = '+' . $phone;
         }
 
@@ -323,7 +323,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         $phoneFake = preg_replace("/{$allowedSymbolsRegex}/", '', $value);
 
-        if ($refTelPlus) {
+        if ( $refTelPlus ) {
             $phoneFake = '+' . $phoneFake;
         }
 
@@ -346,7 +346,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         $phoneNonFake = preg_replace("/{$allowedSymbolsRegex}/", '', $value);
 
-        if ($refTelPlus) {
+        if ( $refTelPlus ) {
             $phoneNonFake = '+' . $phoneNonFake;
         }
 
@@ -388,10 +388,10 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         $theType = Lib::type();
 
-        if (is_a($value, '\libphonenumber\PhoneNumber')) {
+        if ( is_a($value, '\libphonenumber\PhoneNumber') ) {
             $tel = $this->formatE164($value);
 
-            $isPlus = ($tel[ 0 ] === '+');
+            $isPlus = ($tel[0] === '+');
 
             $telDigitsString = $isPlus ? substr($tel, 1) : $tel;
             $telPlusString = $isPlus ? '+' : '';
@@ -401,19 +401,19 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
             $tel = preg_replace('/[^0-9]/', '', $valueStringNotEmpty);
 
-            if ('' === $tel) {
+            if ( '' === $tel ) {
                 throw new LogicException(
                     [ 'The `tel` should be a valid phone number', $value ]
                 );
             }
 
-            if (strlen($tel) > 15) {
+            if ( strlen($tel) > 15 ) {
                 throw new LogicException(
                     [ 'The `tel` length should be less than 15 (16 - plus sign) according E164', $value ]
                 );
             }
 
-            $isPlus = ($valueStringNotEmpty[ 0 ] === '+');
+            $isPlus = ($valueStringNotEmpty[0] === '+');
 
             $telPlusString = $isPlus ? '+' : '';
             $telDigitsString = $tel;
@@ -436,19 +436,19 @@ class DefaultPhoneManager implements PhoneManagerInterface
         $isFake = null;
 
         foreach ( $this->phoneFakeRegexIndex as $regexp => $bool ) {
-            if (preg_match($regexp, $telString)) {
+            if ( preg_match($regexp, $telString) ) {
                 $isFake = true;
 
                 break;
             }
         }
 
-        if (null === $isFake) {
-            if ($this->usePhoneFakeDatelike) {
+        if ( null === $isFake ) {
+            if ( $this->usePhoneFakeDatelike ) {
                 try {
                     $dt = \DateTime::createFromFormat('YmdHis', $refTelDigits);
 
-                    if (false !== $dt) {
+                    if ( false !== $dt ) {
                         $isFake = true;
                     }
                 }
@@ -457,7 +457,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             }
         }
 
-        if (null === $isFake) {
+        if ( null === $isFake ) {
             throw new RuntimeException(
                 [
                     'The `value` should be a fake phone number',
@@ -474,7 +474,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
         $telString = $this->parseTel($value, $refTelDigits, $refTelPlus);
 
         foreach ( $this->phoneFakeRegexIndex as $regexp => $bool ) {
-            if (preg_match($regexp, $telString)) {
+            if ( preg_match($regexp, $telString) ) {
                 throw new RuntimeException(
                     [
                         'The `value` must not match any of `phoneFakeRegexIndex` items',
@@ -484,11 +484,11 @@ class DefaultPhoneManager implements PhoneManagerInterface
             }
         }
 
-        if ($this->usePhoneFakeDatelike) {
+        if ( $this->usePhoneFakeDatelike ) {
             try {
                 $dt = \DateTime::createFromFormat('+YmdHis', $telString);
 
-                if (false !== $dt) {
+                if ( false !== $dt ) {
                     throw new RuntimeException(
                         [
                             'The `value` should not be a datelike phone',
@@ -538,7 +538,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
     {
         $refRegionDetected = null;
 
-        if ($value instanceof \libphonenumber\PhoneNumber) {
+        if ( $value instanceof \libphonenumber\PhoneNumber ) {
             $phoneNumber = $value;
 
             $regionString = $value->getCountryCode();
@@ -546,21 +546,21 @@ class DefaultPhoneManager implements PhoneManagerInterface
         } else {
             $phone = $this->parsePhone($value, $tel, $telDigits);
 
-            if ('' === $region) {
+            if ( '' === $region ) {
                 $regionString = null;
 
-                if ($this->useRegionDetector) {
-                    if (null === $regionString) {
+                if ( $this->useRegionDetector ) {
+                    if ( null === $regionString ) {
                         $regionString = $this->regionDetector->detectRegion($telDigits);
                     }
                 }
-                if ($this->useRegionAutoDetection) {
-                    if (null === $regionString) {
+                if ( $this->useRegionAutoDetection ) {
+                    if ( null === $regionString ) {
                         $regionString = \libphonenumber\PhoneNumberUtil::UNKNOWN_REGION;
                     }
                 }
 
-                if (null === $regionString) {
+                if ( null === $regionString ) {
                     throw new RuntimeException(
                         [
                             'Unable to detect region',
@@ -602,7 +602,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             $formatted = $this->formatE164($phoneNumber, $region);
         }
         catch ( \Throwable $e ) {
-            if ([] === $fallback) {
+            if ( [] === $fallback ) {
                 throw new RuntimeException(
                     'Unable to ' . __FUNCTION__, $e
                 );
@@ -623,7 +623,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             $formatted = $this->formatInternational($phoneNumber, $region);
         }
         catch ( \Throwable $e ) {
-            if ([] === $fallback) {
+            if ( [] === $fallback ) {
                 throw new RuntimeException(
                     'Unable to ' . __FUNCTION__, $e
                 );
@@ -644,7 +644,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             $formatted = $this->formatRFC3966($phoneNumber, $region);
         }
         catch ( \Throwable $e ) {
-            if ([] === $fallback) {
+            if ( [] === $fallback ) {
                 throw new RuntimeException(
                     'Unable to ' . __FUNCTION__, $e
                 );
@@ -666,7 +666,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
      */
     public function formatE164($phoneNumber, ?string $region = '') : ?string
     {
-        if ($phoneNumber instanceof \libphonenumber\PhoneNumber) {
+        if ( $phoneNumber instanceof \libphonenumber\PhoneNumber ) {
             $phoneNumberObject = $phoneNumber;
 
         } else {
@@ -690,7 +690,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
      */
     public function formatRFC3966($phoneNumber, ?string $region = '') : ?string
     {
-        if ($phoneNumber instanceof \libphonenumber\PhoneNumber) {
+        if ( $phoneNumber instanceof \libphonenumber\PhoneNumber ) {
             $phoneNumberObject = $phoneNumber;
 
         } else {
@@ -714,7 +714,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
      */
     public function formatInternational($phoneNumber, ?string $region = '') : ?string
     {
-        if ($phoneNumber instanceof \libphonenumber\PhoneNumber) {
+        if ( $phoneNumber instanceof \libphonenumber\PhoneNumber ) {
             $phoneNumberObject = $phoneNumber;
 
         } else {
@@ -738,7 +738,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
      */
     public function formatNational($phoneNumber, ?string $region = '') : ?string
     {
-        if ($phoneNumber instanceof \libphonenumber\PhoneNumber) {
+        if ( $phoneNumber instanceof \libphonenumber\PhoneNumber ) {
             $phoneNumberObject = $phoneNumber;
 
         } else {
@@ -764,14 +764,14 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         $regionString = null;
 
-        if ($this->useRegionDetector) {
-            if (null === $regionString) {
+        if ( $this->useRegionDetector ) {
+            if ( null === $regionString ) {
                 $regionString = $this->regionDetector->detectRegion($telDigits);
             }
         }
 
-        if ($this->useRegionAutoDetection) {
-            if (null === $regionString) {
+        if ( $this->useRegionAutoDetection ) {
+            if ( null === $regionString ) {
                 $this->parsePhoneNumber(
                     $tel, \libphonenumber\PhoneNumberUtil::UNKNOWN_REGION,
                     $regionString
@@ -779,7 +779,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             }
         }
 
-        if (null === $regionString) {
+        if ( null === $regionString ) {
             throw new RuntimeException(
                 [
                     'Unable to detect region',
@@ -806,29 +806,29 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         $timezones = $phoneNumberToTimeZonesMapper->getTimeZonesForNumber($phoneNumberObject);
 
-        if ([] !== $timezoneWildcardsList) {
+        if ( [] !== $timezoneWildcardsList ) {
             $wildcards = [];
             foreach ( $timezoneWildcardsList as $i => $wildcard ) {
-                if (is_string($i)) {
+                if ( is_string($i) ) {
                     $wildcard = $i;
                 }
 
-                $wildcards[ $wildcard ] = true;
+                $wildcards[$wildcard] = true;
             }
             $wildcards = array_keys($wildcards);
 
             foreach ( $timezones as $i => $timezoneName ) {
                 $isMatch = false;
                 foreach ( $wildcards as $wildcard ) {
-                    if (false !== strpos($timezoneName, $wildcard)) {
+                    if ( false !== strpos($timezoneName, $wildcard) ) {
                         $isMatch = true;
 
                         break;
                     }
                 }
 
-                if (! $isMatch) {
-                    unset($timezones[ $i ]);
+                if ( ! $isMatch ) {
+                    unset($timezones[$i]);
                 }
             }
         }

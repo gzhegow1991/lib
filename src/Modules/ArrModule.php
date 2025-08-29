@@ -23,12 +23,12 @@ class ArrModule
     {
         $last = static::$fnMode;
 
-        if (null !== $fnMode) {
-            if (false === $fnMode) {
+        if ( null !== $fnMode ) {
+            if ( false === $fnMode ) {
                 static::$fnMode = _ARR_FN_USE_VALUE;
 
             } else {
-                if (0 === ($fnMode & ~_ARR_FN_USE_ALL)) {
+                if ( 0 === ($fnMode & ~_ARR_FN_USE_ALL) ) {
                     throw new LogicException(
                         [
                             'The `fn_mode` should be a valid sequence of flags',
@@ -56,14 +56,14 @@ class ArrModule
     {
         $theType = Lib::type();
 
-        if (is_int($key)) {
+        if ( is_int($key) ) {
             return Ret::val($key);
 
-        } elseif (is_string($key)) {
+        } elseif ( is_string($key) ) {
             return Ret::val($key);
 
         } else {
-            if ($theType->string($key)->isOk([ &$keyString ])) {
+            if ( $theType->string($key)->isOk([ &$keyString ]) ) {
                 return Ret::val($keyString);
             }
         }
@@ -79,13 +79,13 @@ class ArrModule
      */
     public function type_key_exists($key, array $array)
     {
-        if (isset($array[ $key ])) {
-            return Ret::val($array[ $key ]);
+        if ( isset($array[$key]) ) {
+            return Ret::val($array[$key]);
 
         } else {
-            if ($this->type_key($key)->isOk([ &$keyValid ])) {
-                if (array_key_exists($keyValid, $array)) {
-                    return Ret::val($array[ $keyValid ]);
+            if ( $this->type_key($key)->isOk([ &$keyValid ]) ) {
+                if ( array_key_exists($keyValid, $array) ) {
+                    return Ret::val($array[$keyValid]);
                 }
             }
         }
@@ -101,15 +101,15 @@ class ArrModule
      */
     public function type_key_not_exists($key, array $array)
     {
-        if (isset($array[ $key ])) {
+        if ( isset($array[$key]) ) {
             return Ret::err(
                 [ 'The `key` should be missing key in `array`', $key, $array ],
                 [ __FILE__, __LINE__ ]
             );
 
         } else {
-            if ($this->type_key($key)->isOk([ &$keyValid ])) {
-                if (array_key_exists($keyValid, $array)) {
+            if ( $this->type_key($key)->isOk([ &$keyValid ]) ) {
+                if ( array_key_exists($keyValid, $array) ) {
                     return Ret::err(
                         [ 'The `key` should be missing key in `array`', $key, $array ],
                         [ __FILE__, __LINE__ ]
@@ -129,27 +129,27 @@ class ArrModule
     {
         $plainMaxDepth = $plainMaxDepth ?? 1;
 
-        if ($plainMaxDepth < 1) {
+        if ( $plainMaxDepth < 1 ) {
             return Ret::err(
                 [ 'The `maxDepth` should be greater than 1', $plainMaxDepth ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ([] === $value) {
+        if ( [] === $value ) {
             return Ret::val($value);
         }
 
-        if (1 === $plainMaxDepth) {
+        if ( 1 === $plainMaxDepth ) {
             foreach ( $value as $v ) {
-                if (is_array($v)) {
+                if ( is_array($v) ) {
                     return Ret::err(
                         [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                         [ __FILE__, __LINE__ ]
@@ -170,8 +170,8 @@ class ArrModule
                 $depth = max($depth, $level);
 
                 foreach ( array_reverse($child) as $v ) {
-                    if (is_array($v)) {
-                        if (($level + 1) > $plainMaxDepth) {
+                    if ( is_array($v) ) {
+                        if ( ($level + 1) > $plainMaxDepth ) {
                             return Ret::err(
                                 [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                                 [ __FILE__, __LINE__ ]
@@ -195,35 +195,35 @@ class ArrModule
     {
         $hasMaxDepth = (null !== $plainMaxDepth);
 
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ([] === $value) {
+        if ( [] === $value ) {
             return Ret::val($value);
         }
 
-        if ($hasMaxDepth) {
-            if ($plainMaxDepth < 1) {
+        if ( $hasMaxDepth ) {
+            if ( $plainMaxDepth < 1 ) {
                 return Ret::err(
                     [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if (1 === $plainMaxDepth) {
+            if ( 1 === $plainMaxDepth ) {
                 foreach ( $value as $key => $v ) {
-                    if (is_string($key)) {
+                    if ( is_string($key) ) {
                         return Ret::err(
                             [ 'The `value` should be array without string keys', $value ],
                             [ __FILE__, __LINE__ ]
                         );
                     }
 
-                    if (is_array($v)) {
+                    if ( is_array($v) ) {
                         return Ret::err(
                             [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                             [ __FILE__, __LINE__ ]
@@ -244,15 +244,15 @@ class ArrModule
                     $depth = max($depth, $level);
 
                     foreach ( array_reverse($child, true) as $key => $v ) {
-                        if (is_string($key)) {
+                        if ( is_string($key) ) {
                             return Ret::err(
                                 [ 'The `value` should be array without string keys', $value ],
                                 [ __FILE__, __LINE__ ]
                             );
                         }
 
-                        if (is_array($v)) {
-                            if (($level + 1) > $plainMaxDepth) {
+                        if ( is_array($v) ) {
+                            if ( ($level + 1) > $plainMaxDepth ) {
                                 return Ret::err(
                                     [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                                     [ __FILE__, __LINE__ ]
@@ -267,7 +267,7 @@ class ArrModule
 
         } else {
             foreach ( array_keys($value) as $key ) {
-                if (is_string($key)) {
+                if ( is_string($key) ) {
                     return Ret::err(
                         [ 'The `value` should be array without string keys', $value ],
                         [ __FILE__, __LINE__ ]
@@ -286,44 +286,44 @@ class ArrModule
     {
         $hasMaxDepth = (null !== $plainMaxDepth);
 
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ([] === $value) {
+        if ( [] === $value ) {
             return Ret::val($value);
         }
 
         $prev = -1;
 
-        if ($hasMaxDepth) {
-            if ($plainMaxDepth < 1) {
+        if ( $hasMaxDepth ) {
+            if ( $plainMaxDepth < 1 ) {
                 return Ret::err(
                     [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if (1 === $plainMaxDepth) {
+            if ( 1 === $plainMaxDepth ) {
                 foreach ( $value as $key => $v ) {
-                    if (is_string($key)) {
+                    if ( is_string($key) ) {
                         return Ret::err(
                             [ 'The `value` should be array without string keys', $value ],
                             [ __FILE__, __LINE__ ]
                         );
                     }
 
-                    if (($key - $prev) !== 1) {
+                    if ( ($key - $prev) !== 1 ) {
                         return Ret::err(
                             [ 'The `value` should be sorted array', $value ],
                             [ __FILE__, __LINE__ ]
                         );
                     }
 
-                    if (is_array($v)) {
+                    if ( is_array($v) ) {
                         return Ret::err(
                             [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                             [ __FILE__, __LINE__ ]
@@ -346,22 +346,22 @@ class ArrModule
                     $prev = -1;
 
                     foreach ( array_reverse($child, true) as $key => $v ) {
-                        if (is_string($key)) {
+                        if ( is_string($key) ) {
                             return Ret::err(
                                 [ 'The `value` should be array without string keys', $value ],
                                 [ __FILE__, __LINE__ ]
                             );
                         }
 
-                        if (($key - $prev) !== 1) {
+                        if ( ($key - $prev) !== 1 ) {
                             return Ret::err(
                                 [ 'The `value` should be sorted array', $value ],
                                 [ __FILE__, __LINE__ ]
                             );
                         }
 
-                        if (is_array($v)) {
-                            if (($level + 1) > $plainMaxDepth) {
+                        if ( is_array($v) ) {
+                            if ( ($level + 1) > $plainMaxDepth ) {
                                 return Ret::err(
                                     [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                                     [ __FILE__, __LINE__ ]
@@ -378,14 +378,14 @@ class ArrModule
 
         } else {
             foreach ( array_keys($value) as $key ) {
-                if (is_string($key)) {
+                if ( is_string($key) ) {
                     return Ret::err(
                         [ 'The `value` should be array without string keys', $value ],
                         [ __FILE__, __LINE__ ]
                     );
                 }
 
-                if (($key - $prev) !== 1) {
+                if ( ($key - $prev) !== 1 ) {
                     return Ret::err(
                         [ 'The `value` should be sorted array', $value ],
                         [ __FILE__, __LINE__ ]
@@ -407,35 +407,35 @@ class ArrModule
     {
         $hasMaxDepth = (null !== $plainMaxDepth);
 
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ([] === $value) {
+        if ( [] === $value ) {
             return Ret::val($value);
         }
 
-        if ($hasMaxDepth) {
-            if ($plainMaxDepth < 1) {
+        if ( $hasMaxDepth ) {
+            if ( $plainMaxDepth < 1 ) {
                 return Ret::err(
                     [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if (1 === $plainMaxDepth) {
+            if ( 1 === $plainMaxDepth ) {
                 foreach ( $value as $key => $v ) {
-                    if (is_int($key)) {
+                    if ( is_int($key) ) {
                         return Ret::err(
                             [ 'The `value` should be array without int keys', $value ],
                             [ __FILE__, __LINE__ ]
                         );
                     }
 
-                    if (is_array($v)) {
+                    if ( is_array($v) ) {
                         return Ret::err(
                             [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                             [ __FILE__, __LINE__ ]
@@ -456,15 +456,15 @@ class ArrModule
                     $depth = max($depth, $level);
 
                     foreach ( array_reverse($child, true) as $key => $v ) {
-                        if (is_int($key)) {
+                        if ( is_int($key) ) {
                             return Ret::err(
                                 [ 'The `value` should be array without int keys', $value ],
                                 [ __FILE__, __LINE__ ]
                             );
                         }
 
-                        if (is_array($v)) {
-                            if (($level + 1) > $plainMaxDepth) {
+                        if ( is_array($v) ) {
+                            if ( ($level + 1) > $plainMaxDepth ) {
                                 return Ret::err(
                                     [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                                     [ __FILE__, __LINE__ ]
@@ -479,7 +479,7 @@ class ArrModule
 
         } else {
             foreach ( array_keys($value) as $key ) {
-                if (is_int($key)) {
+                if ( is_int($key) ) {
                     return Ret::err(
                         [ 'The `value` should be array without int keys', $value ],
                         [ __FILE__, __LINE__ ]
@@ -502,37 +502,37 @@ class ArrModule
 
         $fnSortCmp = $fnSortCmp ?? 'strcmp';
 
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ([] === $value) {
+        if ( [] === $value ) {
             return Ret::val($value);
         }
 
         $prev = '';
 
-        if ($hasMaxDepth) {
-            if ($plainMaxDepth < 1) {
+        if ( $hasMaxDepth ) {
+            if ( $plainMaxDepth < 1 ) {
                 return Ret::err(
                     [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if (1 === $plainMaxDepth) {
+            if ( 1 === $plainMaxDepth ) {
                 foreach ( $value as $key => $v ) {
-                    if (is_int($key)) {
+                    if ( is_int($key) ) {
                         return Ret::err(
                             [ 'The `value` should be array without int keys', $value ],
                             [ __FILE__, __LINE__ ]
                         );
                     }
 
-                    if (is_array($v)) {
+                    if ( is_array($v) ) {
                         return Ret::err(
                             [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                             [ __FILE__, __LINE__ ]
@@ -541,14 +541,14 @@ class ArrModule
 
                     $cmp = call_user_func($fnSortCmp, $prev, $key);
 
-                    if (! is_int($cmp)) {
+                    if ( ! is_int($cmp) ) {
                         return Ret::err(
                             [ 'The `fnSortCmp` should return integer', $fnSortCmp ],
                             [ __FILE__, __LINE__ ]
                         );
                     }
 
-                    if ($cmp < 0) {
+                    if ( $cmp < 0 ) {
                         return Ret::err(
                             [ 'The `value` should be sorted array', $value ],
                             [ __FILE__, __LINE__ ]
@@ -573,7 +573,7 @@ class ArrModule
                     $prev = -1;
 
                     foreach ( array_reverse($child, true) as $key => $v ) {
-                        if (is_int($key)) {
+                        if ( is_int($key) ) {
                             return Ret::err(
                                 [ 'The `value` should be array without int keys', $value ],
                                 [ __FILE__, __LINE__ ]
@@ -582,22 +582,22 @@ class ArrModule
 
                         $cmp = call_user_func($fnSortCmp, $prev, $key);
 
-                        if (! is_int($cmp)) {
+                        if ( ! is_int($cmp) ) {
                             return Ret::err(
                                 [ 'The `fnSortCmp` should return integer', $fnSortCmp ],
                                 [ __FILE__, __LINE__ ]
                             );
                         }
 
-                        if ($cmp < 0) {
+                        if ( $cmp < 0 ) {
                             return Ret::err(
                                 [ 'The `value` should be sorted array', $value ],
                                 [ __FILE__, __LINE__ ]
                             );
                         }
 
-                        if (is_array($v)) {
-                            if (($level + 1) > $plainMaxDepth) {
+                        if ( is_array($v) ) {
+                            if ( ($level + 1) > $plainMaxDepth ) {
                                 return Ret::err(
                                     [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                                     [ __FILE__, __LINE__ ]
@@ -614,7 +614,7 @@ class ArrModule
 
         } else {
             foreach ( array_keys($value) as $key ) {
-                if (is_int($key)) {
+                if ( is_int($key) ) {
                     return Ret::err(
                         [ 'The `value` should be array without int keys', $value ],
                         [ __FILE__, __LINE__ ]
@@ -623,14 +623,14 @@ class ArrModule
 
                 $cmp = call_user_func($fnSortCmp, $prev, $key);
 
-                if (! is_int($cmp)) {
+                if ( ! is_int($cmp) ) {
                     return Ret::err(
                         [ 'The `fnSortCmp` should return integer', $fnSortCmp ],
                         [ __FILE__, __LINE__ ]
                     );
                 }
 
-                if ($cmp < 0) {
+                if ( $cmp < 0 ) {
                     return Ret::err(
                         [ 'The `value` should be sorted array', $value ],
                         [ __FILE__, __LINE__ ]
@@ -650,7 +650,7 @@ class ArrModule
      */
     public function type_table($value)
     {
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
@@ -658,7 +658,7 @@ class ArrModule
         }
 
         for ( $i = 0; $i < count($value); $i++ ) {
-            if (! is_array($value[ $i ])) {
+            if ( ! is_array($value[$i]) ) {
                 return Ret::err(
                     [ 'The `value` should be array of arrays', $value ],
                     [ __FILE__, __LINE__ ]
@@ -674,7 +674,7 @@ class ArrModule
      */
     public function type_matrix($value)
     {
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
@@ -682,7 +682,7 @@ class ArrModule
         }
 
         for ( $i = 0; $i < count($value); $i++ ) {
-            if (! $this->type_list($value[ $i ])->isOk()) {
+            if ( ! $this->type_list($value[$i])->isOk() ) {
                 return Ret::err(
                     [ 'The `value` should be array of lists', $value ],
                     [ __FILE__, __LINE__ ]
@@ -698,7 +698,7 @@ class ArrModule
      */
     public function type_matrix_strict($value)
     {
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
@@ -706,7 +706,7 @@ class ArrModule
         }
 
         for ( $i = 0; $i < count($value); $i++ ) {
-            if (! $this->type_list_sorted($value[ $i ])->isOk()) {
+            if ( ! $this->type_list_sorted($value[$i])->isOk() ) {
                 return Ret::err(
                     [ 'The `value` should be array of sorted lists', $value ],
                     [ __FILE__, __LINE__ ]
@@ -723,7 +723,7 @@ class ArrModule
      */
     public function type_arrpath($value)
     {
-        if ($value instanceof ArrPath) {
+        if ( $value instanceof ArrPath ) {
             return Ret::val($value);
         }
 
@@ -737,7 +737,7 @@ class ArrModule
             );
         }
 
-        if (! ArrPath::fromValidArray($array)->isOk([ &$arrpathObject, &$ret ])) {
+        if ( ! ArrPath::fromValidArray($array)->isOk([ &$arrpathObject, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -752,7 +752,7 @@ class ArrModule
      */
     public function type_arrpath_dot($value, ?string $dot = '.')
     {
-        if ($value instanceof ArrPath) {
+        if ( $value instanceof ArrPath ) {
             return Ret::val($value);
         }
 
@@ -768,7 +768,7 @@ class ArrModule
             );
         }
 
-        if (! ArrPath::fromValidArray($array)->isOk([ &$arrpathObject, &$ret ])) {
+        if ( ! ArrPath::fromValidArray($array)->isOk([ &$arrpathObject, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -784,7 +784,7 @@ class ArrModule
      */
     public function type_array_of_type($value, string $type)
     {
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
@@ -810,7 +810,7 @@ class ArrModule
             "float"             => "double",
         ];
 
-        if (! isset($mapTypes[ $type ])) {
+        if ( ! isset($mapTypes[$type]) ) {
             return Ret::err(
                 [
                     ''
@@ -824,7 +824,7 @@ class ArrModule
         }
 
         foreach ( $value as $i => $v ) {
-            if ($type !== gettype($v)) {
+            if ( $type !== gettype($v) ) {
                 return Ret::err(
                     [ 'Each of `value` should be passed type', $v, $i, $type ],
                     [ __FILE__, __LINE__ ]
@@ -840,7 +840,7 @@ class ArrModule
      */
     public function type_array_of_resource_type($value, string $resourceType)
     {
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
@@ -848,14 +848,14 @@ class ArrModule
         }
 
         foreach ( $value as $i => $v ) {
-            if (! is_resource($v)) {
+            if ( ! is_resource($v) ) {
                 return Ret::err(
                     [ 'Each of `value` should be opened resource', $v, $i, $resourceType ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if ($resourceType !== get_resource_type($v)) {
+            if ( $resourceType !== get_resource_type($v) ) {
                 return Ret::err(
                     [ 'Each of `value` should be opened resource of type', $v, $i, $resourceType ],
                     [ __FILE__, __LINE__ ]
@@ -875,14 +875,14 @@ class ArrModule
      */
     public function type_array_of_a($value, string $className)
     {
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! class_exists($className)) {
+        if ( ! class_exists($className) ) {
             return Ret::err(
                 [ 'The `className` should be existing class', $className ],
                 [ __FILE__, __LINE__ ]
@@ -890,7 +890,7 @@ class ArrModule
         }
 
         foreach ( $value as $i => $v ) {
-            if (! is_a($v, $className)) {
+            if ( ! is_a($v, $className) ) {
                 return Ret::err(
                     [ 'Each of `value` should be instance of passed `className`', $v, $i, $className ],
                     [ __FILE__, __LINE__ ]
@@ -910,14 +910,14 @@ class ArrModule
      */
     public function type_array_of_class($value, string $className)
     {
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! class_exists($className)) {
+        if ( ! class_exists($className) ) {
             return Ret::err(
                 [ 'The `className` should be existing class', $className ],
                 [ __FILE__, __LINE__ ]
@@ -925,14 +925,14 @@ class ArrModule
         }
 
         foreach ( $value as $i => $v ) {
-            if (! is_object($v)) {
+            if ( ! is_object($v) ) {
                 return Ret::err(
                     [ 'Each of `value` should be object', $v, $i ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if ($className !== get_class($v)) {
+            if ( $className !== get_class($v) ) {
                 return Ret::err(
                     [ 'Each of `value` should be object of passed class (exact match)', $v, $i, $className ],
                     [ __FILE__, __LINE__ ]
@@ -952,14 +952,14 @@ class ArrModule
      */
     public function type_array_of_subclass($value, string $className)
     {
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! class_exists($className)) {
+        if ( ! class_exists($className) ) {
             return Ret::err(
                 [ 'The `className` should be existing class', $className ],
                 [ __FILE__, __LINE__ ]
@@ -967,7 +967,7 @@ class ArrModule
         }
 
         foreach ( $value as $i => $v ) {
-            if (! is_subclass_of($v, $className)) {
+            if ( ! is_subclass_of($v, $className) ) {
                 return Ret::err(
                     [ 'Each of `value` should be instance of passed subclass `className`', $v, $i, $className ],
                     [ __FILE__, __LINE__ ]
@@ -987,7 +987,7 @@ class ArrModule
      */
     public function type_array_of_callback($value, callable $fn, array $fnArgs = [])
     {
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::err(
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
@@ -997,7 +997,7 @@ class ArrModule
         foreach ( $value as $i => $v ) {
             $vArgs = array_merge([ $v ], $fnArgs);
 
-            if (! call_user_func_array($fn, $vArgs)) {
+            if ( ! call_user_func_array($fn, $vArgs) ) {
                 return Ret::err(
                     [ 'Each of `value` should pass passed `fn` check', $v, $i, $fn, $fnArgs ],
                     [ __FILE__, __LINE__ ]
@@ -1014,28 +1014,28 @@ class ArrModule
         $theType = Lib::type();
 
         $withValue = array_key_exists(0, $refs);
-        if ($withValue) {
-            $refValue =& $refs[ 0 ];
+        if ( $withValue ) {
+            $refValue =& $refs[0];
         }
         $refValue = null;
 
-        if (! is_array($array)) {
+        if ( ! is_array($array) ) {
             return false;
         }
 
-        if ([] === $array) {
+        if ( [] === $array ) {
             return false;
         }
 
-        if (! $theType->string($key)->isOk([ &$keyString ])) {
+        if ( ! $theType->string($key)->isOk([ &$keyString ]) ) {
             return false;
         }
 
-        if (! array_key_exists($keyString, $array)) {
+        if ( ! array_key_exists($keyString, $array) ) {
             return false;
         }
 
-        $refValue = $array[ $keyString ];
+        $refValue = $array[$keyString];
 
         return true;
     }
@@ -1047,8 +1047,8 @@ class ArrModule
     {
         $status = $this->has_key($array, $key, [ &$value ]);
 
-        if (! $status) {
-            if ($fallback) {
+        if ( ! $status ) {
+            if ( $fallback ) {
                 [ $fallback ] = $fallback;
 
                 return $fallback;
@@ -1068,7 +1068,7 @@ class ArrModule
      */
     public function key_first(array $array)
     {
-        if (PHP_VERSION_ID >= 70300) {
+        if ( PHP_VERSION_ID >= 70300 ) {
             return array_key_first($array);
 
         } else {
@@ -1083,8 +1083,8 @@ class ArrModule
      */
     public function first(array $array, array $fallback = [])
     {
-        if ([] === $array) {
-            if ($fallback) {
+        if ( [] === $array ) {
+            if ( $fallback ) {
                 [ $fallback ] = $fallback;
 
                 return $fallback;
@@ -1095,8 +1095,8 @@ class ArrModule
             );
         }
 
-        if (PHP_VERSION_ID >= 70300) {
-            return $array[ array_key_first($array) ];
+        if ( PHP_VERSION_ID >= 70300 ) {
+            return $array[array_key_first($array)];
         }
 
         $first = reset($array);
@@ -1110,7 +1110,7 @@ class ArrModule
      */
     public function key_last(array $array)
     {
-        if (PHP_VERSION_ID >= 70300) {
+        if ( PHP_VERSION_ID >= 70300 ) {
             return array_key_last($array);
 
         } else {
@@ -1125,8 +1125,8 @@ class ArrModule
      */
     public function last(array $array, array $fallback = [])
     {
-        if ([] === $array) {
-            if ($fallback) {
+        if ( [] === $array ) {
+            if ( $fallback ) {
                 [ $fallback ] = $fallback;
 
                 return $fallback;
@@ -1137,8 +1137,8 @@ class ArrModule
             );
         }
 
-        if (PHP_VERSION_ID >= 70300) {
-            return $array[ array_key_last($array) ];
+        if ( PHP_VERSION_ID >= 70300 ) {
+            return $array[array_key_last($array)];
         }
 
         $last = end($array);
@@ -1156,7 +1156,7 @@ class ArrModule
 
         $arr[] = true;
 
-        if (PHP_VERSION_ID >= 70300) {
+        if ( PHP_VERSION_ID >= 70300 ) {
             $lastKey = array_key_last($arr);
 
         } else {
@@ -1175,22 +1175,22 @@ class ArrModule
     ) : bool
     {
         $withValue = array_key_exists(0, $refs);
-        if ($withValue) {
-            $refValue =& $refs[ 0 ];
+        if ( $withValue ) {
+            $refValue =& $refs[0];
         }
         $refValue = null;
 
         $withKey = array_key_exists(1, $refs);
-        if ($withKey) {
-            $refKey =& $refs[ 1 ];
+        if ( $withKey ) {
+            $refKey =& $refs[1];
         }
         $refKey = null;
 
-        if (! is_array($array)) {
+        if ( ! is_array($array) ) {
             return false;
         }
 
-        if (! is_int($pos)) {
+        if ( ! is_int($pos) ) {
             return false;
         }
 
@@ -1198,7 +1198,7 @@ class ArrModule
 
         $copyArray = $array;
 
-        if ($isNegativePos) {
+        if ( $isNegativePos ) {
             end($copyArray);
 
             $abs = abs($pos) - 1;
@@ -1210,8 +1210,8 @@ class ArrModule
         }
 
         while ( null !== ($k = key($copyArray)) ) {
-            if (0 === $abs) {
-                $refValue = $array[ $k ];
+            if ( 0 === $abs ) {
+                $refValue = $array[$k];
                 $refKey = $k;
 
                 unset($refValue);
@@ -1237,7 +1237,7 @@ class ArrModule
     {
         $status = $this->has_pos($array, $pos, [ 1 => &$key ]);
 
-        if ($status) {
+        if ( $status ) {
             return $key;
         }
 
@@ -1251,8 +1251,8 @@ class ArrModule
     {
         $status = $this->has_pos($array, $pos, [ &$value, &$key ]);
 
-        if (! $status) {
-            if ($fallback) {
+        if ( ! $status ) {
+            if ( $fallback ) {
                 [ $fallback ] = $fallback;
 
                 return $fallback;
@@ -1278,12 +1278,12 @@ class ArrModule
 
         $arrpath = [];
         foreach ( $gen as $p ) {
-            if ($theType->string($p)->isOk([ &$pString ])) {
+            if ( $theType->string($p)->isOk([ &$pString ]) ) {
                 $arrpath[] = $pString;
             }
         }
 
-        if ([] === $arrpath) {
+        if ( [] === $arrpath ) {
             throw new LogicException(
                 [ 'Result path is empty', $path, $pathes ]
             );
@@ -1305,8 +1305,8 @@ class ArrModule
 
         $arrpath = [];
         foreach ( $gen as $p ) {
-            if ($theType->string($p)->isOk([ &$pString ])) {
-                if ('' === $pString) {
+            if ( $theType->string($p)->isOk([ &$pString ]) ) {
+                if ( '' === $pString ) {
                     $arrpath[] = $pString;
 
                 } else {
@@ -1318,7 +1318,7 @@ class ArrModule
             }
         }
 
-        if ([] === $arrpath) {
+        if ( [] === $arrpath ) {
             throw new LogicException(
                 [
                     'Result path is empty',
@@ -1336,8 +1336,8 @@ class ArrModule
      */
     public function arrpath_it($path, ...$pathes) : \Generator
     {
-        if ([] === $pathes) {
-            if ($path instanceof ArrPath) {
+        if ( [] === $pathes ) {
+            if ( $path instanceof ArrPath ) {
                 foreach ( $path->getPath() as $p ) {
                     yield $p;
                 }
@@ -1351,7 +1351,7 @@ class ArrModule
         $gen = $this->walk_it($pathes);
 
         foreach ( $gen as $p ) {
-            if ($p instanceof ArrPath) {
+            if ( $p instanceof ArrPath ) {
                 foreach ( $p->getPath() as $pp ) {
                     yield $pp;
                 }
@@ -1375,7 +1375,7 @@ class ArrModule
             $depth = max($depth, $level);
 
             foreach ( $child as $v ) {
-                if (is_array($v)) {
+                if ( is_array($v) ) {
                     $queue[] = [ $v, $level + 1 ];
                 }
             }
@@ -1387,7 +1387,7 @@ class ArrModule
 
     public function has(array $arr, $path, ?string $dot = '.', array $refs = []) : bool
     {
-        if (! $this->type_arrpath_dot($path, $dot)->isOk([ &$pathObject ])) {
+        if ( ! $this->type_arrpath_dot($path, $dot)->isOk([ &$pathObject ]) ) {
             return false;
         }
 
@@ -1398,21 +1398,21 @@ class ArrModule
     {
         /** @var ArrPath $pathObject */
 
-        if (! $this->type_arrpath($path)->isOk([ &$pathObject ])) {
+        if ( ! $this->type_arrpath($path)->isOk([ &$pathObject ]) ) {
             return false;
         }
 
         $pathArray = $pathObject->getPath();
 
         $withValue = array_key_exists(0, $refs);
-        if ($withValue) {
-            $refValue =& $refs[ 0 ];
+        if ( $withValue ) {
+            $refValue =& $refs[0];
         }
         $refValue = null;
 
         $withKey = array_key_exists(1, $refs);
-        if ($withKey) {
-            $refKey =& $refs[ 1 ];
+        if ( $withKey ) {
+            $refKey =& $refs[1];
         }
         $refKey = null;
 
@@ -1424,7 +1424,7 @@ class ArrModule
         while ( $pathArray ) {
             $pathStep = array_shift($pathArray);
 
-            if (! array_key_exists($pathStep, $refCurrent)) {
+            if ( ! array_key_exists($pathStep, $refCurrent) ) {
                 $isFound = false;
 
                 $pathStep = null;
@@ -1435,9 +1435,9 @@ class ArrModule
                 break;
             }
 
-            $refCurrent =& $refCurrent[ $pathStep ];
+            $refCurrent =& $refCurrent[$pathStep];
 
-            if ((! is_array($refCurrent)) && $pathArray) {
+            if ( (! is_array($refCurrent)) && $pathArray ) {
                 $isFound = false;
 
                 $pathStep = null;
@@ -1449,7 +1449,7 @@ class ArrModule
             }
         }
 
-        if ($isFound) {
+        if ( $isFound ) {
             $refValue = $refCurrent;
             $refKey = $pathStep;
         }
@@ -1482,20 +1482,20 @@ class ArrModule
         while ( [] !== $pathArray ) {
             $pathStep = array_shift($pathArray);
 
-            if (! array_key_exists($pathStep, $refCurrent)) {
+            if ( ! array_key_exists($pathStep, $refCurrent) ) {
                 unset($refCurrent);
                 $refCurrent = null;
 
-                if ([] === $pathArray) {
+                if ( [] === $pathArray ) {
                     throw new RuntimeException(
                         [ 'Missing key in array', $pathStep, $path ]
                     );
                 }
             }
 
-            $refCurrent =& $refCurrent[ $pathStep ];
+            $refCurrent =& $refCurrent[$pathStep];
 
-            if ((! is_array($refCurrent)) && $pathArray) {
+            if ( (! is_array($refCurrent)) && $pathArray ) {
                 unset($refCurrent);
                 $refCurrent = null;
 
@@ -1526,8 +1526,8 @@ class ArrModule
     {
         $status = $this->has_path($array, $path, [ &$value ]);
 
-        if (! $status) {
-            if ($fallback) {
+        if ( ! $status ) {
+            if ( $fallback ) {
                 [ $fallback ] = $fallback;
 
                 return $fallback;
@@ -1576,15 +1576,15 @@ class ArrModule
         while ( [] !== $pathArray ) {
             $pathStep = array_shift($pathArray);
 
-            if (! array_key_exists($pathStep, $refCurrent)) {
-                $refCurrent[ $pathStep ] = $pathArray
+            if ( ! array_key_exists($pathStep, $refCurrent) ) {
+                $refCurrent[$pathStep] = $pathArray
                     ? []
                     : null;
             }
 
-            $refCurrent =& $refCurrent[ $pathStep ];
+            $refCurrent =& $refCurrent[$pathStep];
 
-            if ((! is_array($refCurrent)) && $pathArray) {
+            if ( (! is_array($refCurrent)) && $pathArray ) {
                 unset($refCurrent);
                 $refCurrent = null;
 
@@ -1607,7 +1607,7 @@ class ArrModule
     {
         /** @var ArrPath $pathObject */
 
-        if (! $this->type_arrpath_dot($path, $dot)->isOk([ &$pathObject ])) {
+        if ( ! $this->type_arrpath_dot($path, $dot)->isOk([ &$pathObject ]) ) {
             return false;
         }
 
@@ -1621,7 +1621,7 @@ class ArrModule
     {
         /** @var ArrPath $pathObject */
 
-        if (! $this->type_arrpath($path)->isOk([ &$pathObject ])) {
+        if ( ! $this->type_arrpath($path)->isOk([ &$pathObject ]) ) {
             return false;
         }
 
@@ -1637,28 +1637,28 @@ class ArrModule
         foreach ( $pathArray as $pathStep ) {
             $refPrevious =& $refCurrent;
 
-            if (! is_array($refCurrent)) {
+            if ( ! is_array($refCurrent) ) {
                 unset($refPrevious);
 
                 break;
             }
 
-            if (! array_key_exists($pathStep, $refCurrent)) {
+            if ( ! array_key_exists($pathStep, $refCurrent) ) {
                 unset($refPrevious);
 
                 break;
             }
 
-            $refCurrent = &$refCurrent[ $pathStep ];
+            $refCurrent = &$refCurrent[$pathStep];
         }
 
-        if (isset($refPrevious)
+        if ( isset($refPrevious)
             && (false
-                || isset($refPrevious[ $pathStep ])
+                || isset($refPrevious[$pathStep])
                 || array_key_exists($pathStep, $refPrevious)
             )
         ) {
-            unset($refPrevious[ $pathStep ]);
+            unset($refPrevious[$pathStep]);
 
             $isDeleted = true;
         }
@@ -1680,21 +1680,21 @@ class ArrModule
      */
     public function fill_keys(array $keys, array $new = []) : array
     {
-        if ([] === $keys) {
+        if ( [] === $keys ) {
             return [];
         }
 
         $hasNew = ([] !== $new);
 
-        if ($hasNew) {
-            $result = array_fill_keys($keys, $new[ 0 ]);
+        if ( $hasNew ) {
+            $result = array_fill_keys($keys, $new[0]);
 
         } else {
             $result = [];
 
             $i = 0;
             foreach ( $keys as $key ) {
-                $result[ $key ] = ++$i;
+                $result[$key] = ++$i;
             }
         }
 
@@ -1709,22 +1709,22 @@ class ArrModule
     {
         $keys = (array) $keys;
 
-        if ([] === $keys) {
+        if ( [] === $keys ) {
             return $src;
         }
 
         $hasNew = ([] !== $new);
 
         foreach ( (array) $keys as $key ) {
-            if (! array_key_exists($key, $src)) {
+            if ( ! array_key_exists($key, $src) ) {
                 continue;
             }
 
-            if ($hasNew) {
-                $src[ $key ] = $new[ 0 ];
+            if ( $hasNew ) {
+                $src[$key] = $new[0];
 
             } else {
-                unset($src[ $key ]);
+                unset($src[$key]);
             }
         }
 
@@ -1738,7 +1738,7 @@ class ArrModule
     {
         $keys = (array) $keys;
 
-        if ([] === $keys) {
+        if ( [] === $keys ) {
             return [];
         }
 
@@ -1747,12 +1747,12 @@ class ArrModule
         $keysToKeep = array_flip($keys);
 
         foreach ( $src as $key => $val ) {
-            if (! isset($keysToKeep[ $key ])) {
-                if ($hasNew) {
-                    $src[ $key ] = $new[ 0 ];
+            if ( ! isset($keysToKeep[$key]) ) {
+                if ( $hasNew ) {
+                    $src[$key] = $new[0];
 
                 } else {
-                    unset($src[ $key ]);
+                    unset($src[$key]);
                 }
             }
         }
@@ -1768,11 +1768,11 @@ class ArrModule
      */
     public function filter(array $src, $fn = null, ?int $flags = null) : array
     {
-        if (null === $fn) {
+        if ( null === $fn ) {
             return $src;
         }
 
-        if ([] === $src) {
+        if ( [] === $src ) {
             return [];
         }
 
@@ -1788,11 +1788,11 @@ class ArrModule
      */
     public function tap(array $src, $fn = null, ?int $flags = null) : void
     {
-        if (null === $fn) {
+        if ( null === $fn ) {
             return;
         }
 
-        if ([] === $src) {
+        if ( [] === $src ) {
             return;
         }
 
@@ -1807,9 +1807,9 @@ class ArrModule
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($isUseValue) $args[] = $val;
-            if ($isUseKey) $args[] = $key;
-            if ($isUseSrc) $args[] = $src;
+            if ( $isUseValue ) $args[] = $val;
+            if ( $isUseKey ) $args[] = $key;
+            if ( $isUseSrc ) $args[] = $src;
 
             call_user_func_array($fn, $args);
         }
@@ -1822,11 +1822,11 @@ class ArrModule
      */
     public function map(array $src, $fn = null, ?int $flags = null) : array
     {
-        if (null === $fn) {
+        if ( null === $fn ) {
             return $src;
         }
 
-        if ([] === $src) {
+        if ( [] === $src ) {
             return [];
         }
 
@@ -1841,11 +1841,11 @@ class ArrModule
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($isUseValue) $args[] = $val;
-            if ($isUseKey) $args[] = $key;
-            if ($isUseSrc) $args[] = $src;
+            if ( $isUseValue ) $args[] = $val;
+            if ( $isUseKey ) $args[] = $key;
+            if ( $isUseSrc ) $args[] = $src;
 
-            $src[ $key ] = call_user_func_array($fn, $args);
+            $src[$key] = call_user_func_array($fn, $args);
         }
 
         return $src;
@@ -1864,11 +1864,11 @@ class ArrModule
      */
     public function reduce(array $src, $fn = null, $initial = null, ?int $flags = null)
     {
-        if (null === $fn) {
+        if ( null === $fn ) {
             return $initial;
         }
 
-        if ([] === $src) {
+        if ( [] === $src ) {
             return $initial;
         }
 
@@ -1885,9 +1885,9 @@ class ArrModule
         foreach ( $src as $key => $val ) {
             $args = [];
             $args[] = $current;
-            if ($isUseValue) $args[] = $val;
-            if ($isUseKey) $args[] = $key;
-            if ($isUseSrc) $args[] = $src;
+            if ( $isUseValue ) $args[] = $val;
+            if ( $isUseKey ) $args[] = $key;
+            if ( $isUseSrc ) $args[] = $src;
 
             $current = call_user_func_array($fn, $args);
         }
@@ -1903,11 +1903,11 @@ class ArrModule
      */
     public function keep(array $src, $fn = null, ?int $flags = null) : array
     {
-        if (null === $fn) {
+        if ( null === $fn ) {
             return [];
         }
 
-        if ([] === $src) {
+        if ( [] === $src ) {
             return [];
         }
 
@@ -1922,15 +1922,15 @@ class ArrModule
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($isUseValue) $args[] = $val;
-            if ($isUseKey) $args[] = $key;
-            if ($isUseSrc) $args[] = $src;
+            if ( $isUseValue ) $args[] = $val;
+            if ( $isUseKey ) $args[] = $key;
+            if ( $isUseSrc ) $args[] = $src;
 
-            if (call_user_func_array($fn, $args)) {
+            if ( call_user_func_array($fn, $args) ) {
                 continue;
             }
 
-            unset($src[ $key ]);
+            unset($src[$key]);
         }
 
         return $src;
@@ -1943,13 +1943,13 @@ class ArrModule
      */
     public function keep_new(array $src, $new = null, $fn = null, ?int $flags = null) : array
     {
-        if ([] === $src) {
+        if ( [] === $src ) {
             return [];
         }
 
-        if (null === $fn) {
+        if ( null === $fn ) {
             foreach ( $src as $key => $val ) {
-                $src[ $key ] = $new;
+                $src[$key] = $new;
             }
 
             return $src;
@@ -1966,15 +1966,15 @@ class ArrModule
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($isUseValue) $args[] = $val;
-            if ($isUseKey) $args[] = $key;
-            if ($isUseSrc) $args[] = $src;
+            if ( $isUseValue ) $args[] = $val;
+            if ( $isUseKey ) $args[] = $key;
+            if ( $isUseSrc ) $args[] = $src;
 
-            if (call_user_func_array($fn, $args)) {
+            if ( call_user_func_array($fn, $args) ) {
                 continue;
             }
 
-            $src[ $key ] = $new;
+            $src[$key] = $new;
         }
 
         return $src;
@@ -1988,11 +1988,11 @@ class ArrModule
      */
     public function drop(array $src, $fn = null, ?int $flags = null) : array
     {
-        if (null === $fn) {
+        if ( null === $fn ) {
             return $src;
         }
 
-        if ([] === $src) {
+        if ( [] === $src ) {
             return [];
         }
 
@@ -2007,12 +2007,12 @@ class ArrModule
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($isUseValue) $args[] = $val;
-            if ($isUseKey) $args[] = $key;
-            if ($isUseSrc) $args[] = $src;
+            if ( $isUseValue ) $args[] = $val;
+            if ( $isUseKey ) $args[] = $key;
+            if ( $isUseSrc ) $args[] = $src;
 
-            if (call_user_func_array($fn, $args)) {
-                unset($src[ $key ]);
+            if ( call_user_func_array($fn, $args) ) {
+                unset($src[$key]);
             }
         }
 
@@ -2026,11 +2026,11 @@ class ArrModule
      */
     public function drop_new(array $src, $new = null, $fn = null, ?int $flags = null) : array
     {
-        if (null === $fn) {
+        if ( null === $fn ) {
             return $src;
         }
 
-        if ([] === $src) {
+        if ( [] === $src ) {
             return [];
         }
 
@@ -2045,12 +2045,12 @@ class ArrModule
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($isUseValue) $args[] = $val;
-            if ($isUseKey) $args[] = $key;
-            if ($isUseSrc) $args[] = $src;
+            if ( $isUseValue ) $args[] = $val;
+            if ( $isUseKey ) $args[] = $key;
+            if ( $isUseSrc ) $args[] = $src;
 
-            if (call_user_func_array($fn, $args)) {
-                $src[ $key ] = $new;
+            if ( call_user_func_array($fn, $args) ) {
+                $src[$key] = $new;
             }
         }
 
@@ -2068,7 +2068,7 @@ class ArrModule
      */
     public function kwargs(array $src) : array
     {
-        if ([] === $src) {
+        if ( [] === $src ) {
             return [ [], [] ];
         }
 
@@ -2077,8 +2077,8 @@ class ArrModule
 
         foreach ( $src as $key => $val ) {
             is_int($key)
-                ? ($list[ $key ] = $val)
-                : ($dict[ $key ] = $val);
+                ? ($list[$key] = $val)
+                : ($dict[$key] = $val);
         }
 
         return [ $list, $dict ];
@@ -2093,11 +2093,11 @@ class ArrModule
      */
     public function both(array $src, $fn = null, ?int $flags = null) : array
     {
-        if (null === $fn) {
+        if ( null === $fn ) {
             return [ $src, [] ];
         }
 
-        if ([] === $src) {
+        if ( [] === $src ) {
             return [ [], [] ];
         }
 
@@ -2115,13 +2115,13 @@ class ArrModule
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($isUseValue) $args[] = $val;
-            if ($isUseKey) $args[] = $key;
-            if ($isUseSrc) $args[] = $src;
+            if ( $isUseValue ) $args[] = $val;
+            if ( $isUseKey ) $args[] = $key;
+            if ( $isUseSrc ) $args[] = $src;
 
             call_user_func_array($fn, $args)
-                ? ($left[ $key ] = $val)
-                : ($right[ $key ] = $val);
+                ? ($left[$key] = $val)
+                : ($right[$key] = $val);
         }
 
         return [ $left, $right ];
@@ -2136,11 +2136,11 @@ class ArrModule
      */
     public function group(array $src, $fn = null, ?int $flags = null) : array
     {
-        if (null === $fn) {
+        if ( null === $fn ) {
             return [ '' => $src ];
         }
 
-        if ([] === $src) {
+        if ( [] === $src ) {
             return [ '' => [] ];
         }
 
@@ -2157,14 +2157,14 @@ class ArrModule
 
         foreach ( $src as $key => $val ) {
             $args = [];
-            if ($isUseValue) $args[] = $val;
-            if ($isUseKey) $args[] = $key;
-            if ($isUseSrc) $args[] = $src;
+            if ( $isUseValue ) $args[] = $val;
+            if ( $isUseKey ) $args[] = $key;
+            if ( $isUseSrc ) $args[] = $src;
 
             $groupNames = call_user_func_array($fn, $args);
 
             foreach ( (array) $groupNames as $groupName ) {
-                $result[ $groupName ][ $key ] = $val;
+                $result[$groupName][$key] = $val;
             }
         }
 
@@ -2187,18 +2187,18 @@ class ArrModule
         $result = [];
 
         foreach ( $index as $k => $v ) {
-            if (is_int($v)) {
+            if ( is_int($v) ) {
                 $key = $v;
 
-                $result[ $key ] = true;
+                $result[$key] = true;
 
-            } elseif (! isset($result[ $k ])) {
+            } elseif ( ! isset($result[$k]) ) {
                 $key = $k;
 
                 $v = (bool) $v;
 
-                if ($v) {
-                    $result[ $key ] = true;
+                if ( $v ) {
+                    $result[$key] = true;
                 }
             }
         }
@@ -2221,19 +2221,19 @@ class ArrModule
         $result = [];
 
         foreach ( $index as $k => $v ) {
-            if (is_string($k) && ($k !== '')) {
+            if ( is_string($k) && ($k !== '') ) {
                 $key = $k;
 
                 $v = (bool) $v;
 
-                if ($v) {
-                    $result[ $key ] = true;
+                if ( $v ) {
+                    $result[$key] = true;
                 }
 
-            } elseif (is_string($v) && ! isset($result[ $v ])) {
+            } elseif ( is_string($v) && ! isset($result[$v]) ) {
                 $key = $v;
 
-                $result[ $key ] = true;
+                $result[$key] = true;
             }
         }
 
@@ -2246,16 +2246,16 @@ class ArrModule
         $seen = [];
 
         foreach ( $arrays as $arr ) {
-            if ([] === $arr) {
+            if ( [] === $arr ) {
                 continue;
             }
 
             foreach ( array_keys($arr) as $k ) {
-                if (isset($seen[ $k ])) {
+                if ( isset($seen[$k]) ) {
                     return false;
                 }
 
-                $seen[ $k ] = true;
+                $seen[$k] = true;
             }
         }
 
@@ -2265,11 +2265,11 @@ class ArrModule
 
     public function is_diff_key(array ...$arrays) : bool
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return false;
         }
 
-        if (1 === count($arrays)) {
+        if ( 1 === count($arrays) ) {
             return false;
         }
 
@@ -2278,7 +2278,7 @@ class ArrModule
 
         foreach ( $arrays as $array ) {
             foreach ( array_keys($array) as $ii ) {
-                if (! array_key_exists($ii, $src)) {
+                if ( ! array_key_exists($ii, $src) ) {
                     return true;
                 }
             }
@@ -2289,11 +2289,11 @@ class ArrModule
 
     public function is_diff(array ...$arrays) : bool
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return false;
         }
 
-        if (1 === count($arrays)) {
+        if ( 1 === count($arrays) ) {
             return false;
         }
 
@@ -2302,7 +2302,7 @@ class ArrModule
 
         foreach ( $arrays as $array ) {
             foreach ( $array as $v ) {
-                if (! in_array($v, $src, true)) {
+                if ( ! in_array($v, $src, true) ) {
                     return true;
                 }
             }
@@ -2313,11 +2313,11 @@ class ArrModule
 
     public function is_diff_non_strict(array ...$arrays) : bool
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return false;
         }
 
-        if (1 === count($arrays)) {
+        if ( 1 === count($arrays) ) {
             return false;
         }
 
@@ -2326,7 +2326,7 @@ class ArrModule
 
         foreach ( $arrays as $array ) {
             foreach ( $array as $v ) {
-                if (! in_array($v, $src)) {
+                if ( ! in_array($v, $src) ) {
                     return true;
                 }
             }
@@ -2338,11 +2338,11 @@ class ArrModule
 
     public function is_intersect_key(array ...$arrays) : bool
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return false;
         }
 
-        if (1 === count($arrays)) {
+        if ( 1 === count($arrays) ) {
             return false;
         }
 
@@ -2351,7 +2351,7 @@ class ArrModule
 
         foreach ( $arrays as $array ) {
             foreach ( array_keys($array) as $ii ) {
-                if (array_key_exists($ii, $src)) {
+                if ( array_key_exists($ii, $src) ) {
                     return true;
                 }
             }
@@ -2362,11 +2362,11 @@ class ArrModule
 
     public function is_intersect(array ...$arrays) : bool
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return false;
         }
 
-        if (1 === count($arrays)) {
+        if ( 1 === count($arrays) ) {
             return false;
         }
 
@@ -2375,7 +2375,7 @@ class ArrModule
 
         foreach ( $arrays as $array ) {
             foreach ( $array as $v ) {
-                if (in_array($v, $src, true)) {
+                if ( in_array($v, $src, true) ) {
                     return true;
                 }
             }
@@ -2386,11 +2386,11 @@ class ArrModule
 
     public function is_intersect_non_strict(array ...$arrays) : bool
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return false;
         }
 
-        if (1 === count($arrays)) {
+        if ( 1 === count($arrays) ) {
             return false;
         }
 
@@ -2399,7 +2399,7 @@ class ArrModule
 
         foreach ( $arrays as $array ) {
             foreach ( $array as $v ) {
-                if (in_array($v, $src)) {
+                if ( in_array($v, $src) ) {
                     return true;
                 }
             }
@@ -2414,12 +2414,12 @@ class ArrModule
      */
     public function diff_key(array ...$arrays) : array
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return [];
         }
 
-        if (1 === count($arrays)) {
-            return $arrays[ 0 ];
+        if ( 1 === count($arrays) ) {
+            return $arrays[0];
         }
 
         $result = array_diff_key(...$arrays);
@@ -2433,24 +2433,24 @@ class ArrModule
      */
     public function diff(array ...$arrays) : array
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return [];
         }
 
-        if (1 === count($arrays)) {
-            return $arrays[ 0 ];
+        if ( 1 === count($arrays) ) {
+            return $arrays[0];
         }
 
         $src = array_shift($arrays);
 
         foreach ( array_keys($arrays) as $i ) {
-            sort($arrays[ $i ]);
+            sort($arrays[$i]);
         }
 
         foreach ( $src as $i => $v ) {
             foreach ( array_keys($arrays) as $ii ) {
-                if (in_array($v, $arrays[ $ii ], true)) {
-                    unset($src[ $i ]);
+                if ( in_array($v, $arrays[$ii], true) ) {
+                    unset($src[$i]);
 
                     break;
                 }
@@ -2465,12 +2465,12 @@ class ArrModule
      */
     public function diff_non_strict(array ...$arrays) : array
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return [];
         }
 
-        if (1 === count($arrays)) {
-            return $arrays[ 0 ];
+        if ( 1 === count($arrays) ) {
+            return $arrays[0];
         }
 
         $result = array_diff(...$arrays);
@@ -2484,12 +2484,12 @@ class ArrModule
      */
     public function intersect_key(array ...$arrays) : array
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return [];
         }
 
-        if (1 === count($arrays)) {
-            return $arrays[ 0 ];
+        if ( 1 === count($arrays) ) {
+            return $arrays[0];
         }
 
         $result = array_intersect_key(...$arrays);
@@ -2503,28 +2503,28 @@ class ArrModule
      */
     public function intersect(array ...$arrays) : array
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return [];
         }
 
-        if (1 === count($arrays)) {
-            return $arrays[ 0 ];
+        if ( 1 === count($arrays) ) {
+            return $arrays[0];
         }
 
         $src = array_shift($arrays);
 
         foreach ( array_keys($arrays) as $i ) {
-            sort($arrays[ $i ]);
+            sort($arrays[$i]);
         }
 
         foreach ( $src as $i => $v ) {
             foreach ( array_keys($arrays) as $ii ) {
-                if (in_array($v, $arrays[ $ii ], true)) {
+                if ( in_array($v, $arrays[$ii], true) ) {
                     continue 2;
                 }
             }
 
-            unset($src[ $i ]);
+            unset($src[$i]);
         }
 
         return $src;
@@ -2535,12 +2535,12 @@ class ArrModule
      */
     public function intersect_non_strict(array ...$arrays) : array
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return [];
         }
 
-        if (1 === count($arrays)) {
-            return $arrays[ 0 ];
+        if ( 1 === count($arrays) ) {
+            return $arrays[0];
         }
 
         $result = array_intersect(...$arrays);
@@ -2578,7 +2578,7 @@ class ArrModule
 
         $theType = Lib::type();
 
-        if (null === $dot) {
+        if ( null === $dot ) {
             $dotChar = '.';
 
         } else {
@@ -2592,8 +2592,8 @@ class ArrModule
         $gen = $this->walk_it($array, $walkFlags);
 
         foreach ( $gen as $path => $value ) {
-            $result[ implode($dotChar, $path) ] = $hasFillKeys
-                ? $fillKeys[ 0 ]
+            $result[implode($dotChar, $path)] = $hasFillKeys
+                ? $fillKeys[0]
                 : $value;
         }
 
@@ -2607,7 +2607,7 @@ class ArrModule
     {
         $theType = Lib::type();
 
-        if (null === $dot) {
+        if ( null === $dot ) {
             $dotChar = '.';
 
         } else {
@@ -2659,11 +2659,11 @@ class ArrModule
         while ( [] !== $stack ) {
             $current = array_pop($stack);
 
-            $currentArray = $current[ 'array' ];
-            $currentObject = $current[ 'object' ];
+            $currentArray = $current['array'];
+            $currentObject = $current['object'];
 
             foreach ( $currentArray as $key => $value ) {
-                if (! is_array($value)) {
+                if ( ! is_array($value) ) {
                     $e = null;
                     $ee = null;
                     try {
@@ -2683,7 +2683,7 @@ class ArrModule
                 } else {
                     $childObject = null;
 
-                    if (property_exists($currentObject, $key)) {
+                    if ( property_exists($currentObject, $key) ) {
                         $e = null;
                         $ee = null;
                         try {
@@ -2700,12 +2700,12 @@ class ArrModule
                             }
                         }
 
-                        if (is_object($var)) {
+                        if ( is_object($var) ) {
                             $childObject = $var;
                         }
                     }
 
-                    if (null === $childObject) {
+                    if ( null === $childObject ) {
                         $childObject = new \stdClass();
 
                         $e = null;
@@ -2756,7 +2756,7 @@ class ArrModule
      */
     public function &walk_it(array &$refArray, ?int $flags = null) : \Generator
     {
-        if ([] === $refArray) {
+        if ( [] === $refArray ) {
             return;
         }
 
@@ -2821,20 +2821,20 @@ class ArrModule
             ],
         ];
 
-        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+        foreach ( $flagGroups as $groupName => [$conflict, $default] ) {
             $cnt = 0;
             foreach ( $conflict as $flag ) {
-                if ($flagsCurrent & $flag) {
+                if ( $flagsCurrent & $flag ) {
                     $cnt++;
                 }
             }
 
-            if ($cnt > 1) {
+            if ( $cnt > 1 ) {
                 throw new LogicException(
                     [ 'The `flags` conflict in group: ' . $groupName, $flags ]
                 );
 
-            } elseif (0 === $cnt) {
+            } elseif ( 0 === $cnt ) {
                 $flagsCurrent |= $default;
             }
         }
@@ -2850,10 +2850,10 @@ class ArrModule
         $isWithLists = (bool) ($flagsCurrent & _ARR_WALK_WITH_LISTS);
         $isWithParents = (bool) ($flagsCurrent & _ARR_WALK_WITH_PARENTS);
 
-        if ($isSortSelfFirst) {
+        if ( $isSortSelfFirst ) {
             $fnUsort = null;
 
-        } elseif ($isSortParentFirst) {
+        } elseif ( $isSortParentFirst ) {
             $fnUsort = static function ($a, $b) {
                 $isParentA = is_array($a) && ! empty($a);
                 $isParentB = is_array($b) && ! empty($b);
@@ -2861,7 +2861,7 @@ class ArrModule
                 return $isParentA <=> $isParentB;
             };
 
-        } elseif ($isSortChildFirst) {
+        } elseif ( $isSortChildFirst ) {
             $fnUsort = static function ($a, $b) {
                 $isParentA = is_array($a) && ! empty($a);
                 $isParentB = is_array($b) && ! empty($b);
@@ -2873,11 +2873,11 @@ class ArrModule
             throw new LogicException([ 'Invalid `sort`', $flags ]);
         }
 
-        if ($isModeDepthFirst) {
+        if ( $isModeDepthFirst ) {
             $stack = [];
             $buffer =& $stack;
 
-        } elseif ($isModeBreadthFirst) {
+        } elseif ( $isModeBreadthFirst ) {
             $queue = [];
             $buffer =& $queue;
 
@@ -2892,48 +2892,48 @@ class ArrModule
         while ( ! empty($buffer) ) {
             $cur = [];
 
-            if ($isModeDepthFirst) {
+            if ( $isModeDepthFirst ) {
                 $cur = array_pop($buffer);
 
-            } elseif ($isModeBreadthFirst) {
+            } elseif ( $isModeBreadthFirst ) {
                 $cur = array_shift($buffer);
             }
 
-            $cur0 = $cur[ 0 ];
+            $cur0 = $cur[0];
 
             $isArray = is_array($cur0);
 
             $isLeaf = $isEmptyArray = $isParent = $isList = $isDict = false;
 
-            if (! $isArray) {
+            if ( ! $isArray ) {
                 $isLeaf = true;
 
-            } elseif ((! $isRoot) && ([] === $cur0)) {
+            } elseif ( (! $isRoot) && ([] === $cur0) ) {
                 $isEmptyArray = true;
 
-            } elseif ((! $isRoot) && ([] !== $cur0)) {
-                if ($isWithLists) {
+            } elseif ( (! $isRoot) && ([] !== $cur0) ) {
+                if ( $isWithLists ) {
                     $isList = $this->type_list($cur0, 1)->isOk();
                 }
-                if ($isWithDicts) {
+                if ( $isWithDicts ) {
                     $isDict = $this->type_dict($cur0, 1)->isOk();
                 }
 
                 $isParent = ! ($isList || $isDict);
             }
 
-            if (false
+            if ( false
                 || ($isWithLeaves && $isLeaf)
                 || ($isWithDicts && $isDict)
                 || ($isWithEmptyArrays && $isEmptyArray)
                 || ($isWithLists && $isList)
                 || ($isWithParents && $isParent)
             ) {
-                $refCur0 =& $cur[ 0 ];
+                $refCur0 =& $cur[0];
 
-                yield $cur[ 1 ] => $refCur0;
+                yield $cur[1] => $refCur0;
 
-                if ($refCur0 !== $cur0) {
+                if ( $refCur0 !== $cur0 ) {
                     $isParent = is_array($refCur0) && ([] !== $refCur0);
                 }
 
@@ -2941,28 +2941,28 @@ class ArrModule
                 unset($refValueBefore);
             }
 
-            if ($isRoot || $isParent) {
+            if ( $isRoot || $isParent ) {
                 $children = $cur0;
 
-                if ($fnUsort) {
+                if ( $fnUsort ) {
                     uasort($children, $fnUsort);
                 }
 
                 $keys = [];
-                if ($isModeDepthFirst) {
+                if ( $isModeDepthFirst ) {
                     $keys = array_reverse(array_keys($children));
 
-                } elseif ($isModeBreadthFirst) {
+                } elseif ( $isModeBreadthFirst ) {
                     $keys = array_keys($children);
                 }
 
                 unset($children);
 
                 foreach ( $keys as $kk ) {
-                    $fullpath = $cur[ 1 ];
+                    $fullpath = $cur[1];
                     $fullpath[] = $kk;
 
-                    $buffer[] = [ &$cur[ 0 ][ $kk ], $fullpath ];
+                    $buffer[] = [ &$cur[0][$kk], $fullpath ];
                 }
 
                 unset($keys);
@@ -2988,21 +2988,21 @@ class ArrModule
      */
     public function walk_tree_it(array $tree, ?array $list = null, $start = null) : \Generator
     {
-        if (null === $start) {
+        if ( null === $start ) {
             $start = null
-                ?? (isset($tree[ 0 ]) ? 0 : null)
-                ?? (isset($tree[ '' ]) ? '' : null);
+                ?? (isset($tree[0]) ? 0 : null)
+                ?? (isset($tree['']) ? '' : null);
         }
 
-        if (false
+        if ( false
             || (null === $start)
-            || ! isset($tree[ $start ])
+            || ! isset($tree[$start])
         ) {
             return;
         }
 
-        foreach ( $tree[ $start ] as $boolOrNull ) {
-            if ($boolOrNull && ! is_bool($boolOrNull)) {
+        foreach ( $tree[$start] as $boolOrNull ) {
+            if ( $boolOrNull && ! is_bool($boolOrNull) ) {
                 throw new LogicException(
                     [ 'Each of `tree` values should be a null or a boolean, use keys instead (uniqueness)' ]
                 );
@@ -3015,15 +3015,15 @@ class ArrModule
             [ $current, $path ] = array_pop($stack);
 
             $item = (null !== $list)
-                ? ($list[ $current ] ?? null)
+                ? ($list[$current] ?? null)
                 : $current;
 
-            if (null !== $item) {
+            if ( null !== $item ) {
                 yield $path => $item;
             }
 
-            if (isset($tree[ $current ])) {
-                $parents = array_keys($tree[ $current ]);
+            if ( isset($tree[$current]) ) {
+                $parents = array_keys($tree[$current]);
 
                 foreach ( array_reverse($parents) as $parent ) {
                     $fullpath = $path;
@@ -3053,17 +3053,17 @@ class ArrModule
 
         $generators = [];
         foreach ( $keyList as $key ) {
-            if (! is_array($arrayList[ $key ])) {
+            if ( ! is_array($arrayList[$key]) ) {
                 throw new LogicException(
                     [
                         'Each of `arrayList` should be an array',
-                        $arrayList[ $key ],
+                        $arrayList[$key],
                         $key,
                     ]
                 );
             }
 
-            $generators[ $key ] = $this->walk_it($arrayList[ $key ], $arrayWalkFlags);
+            $generators[$key] = $this->walk_it($arrayList[$key], $arrayWalkFlags);
         }
 
         $result = [];
@@ -3073,8 +3073,8 @@ class ArrModule
             foreach ( $generators as $generatorKey => $generator ) {
                 /** @var \Generator $generator */
 
-                if (! $generator->valid()) {
-                    unset($generators[ $generatorKey ]);
+                if ( ! $generator->valid() ) {
+                    unset($generators[$generatorKey]);
 
                 } else {
                     /** @var array $path */
@@ -3082,32 +3082,32 @@ class ArrModule
                     $path = $generator->key();
                     $pathString = implode("\0", $path);
 
-                    if (! isset($pathes[ $pathString ])) {
+                    if ( ! isset($pathes[$pathString]) ) {
                         $yield = false;
 
                         $values = [];
                         foreach ( $keyList as $idx => $key ) {
                             $isFound = $this->has_path(
-                                $arrayList[ $idx ], $path,
+                                $arrayList[$idx], $path,
                                 [ &$value ]
                             );
 
-                            if ($isFound || $fallback) {
-                                if (! $isFound) {
+                            if ( $isFound || $fallback ) {
+                                if ( ! $isFound ) {
                                     [ $value ] = $fallback;
                                 }
 
-                                $values[ $key ] = $value;
+                                $values[$key] = $value;
 
                                 $yield = true;
                             }
                         }
 
-                        if ($yield) {
+                        if ( $yield ) {
                             yield $path => $values;
                         }
 
-                        $pathes[ $pathString ] = true;
+                        $pathes[$pathString] = true;
                     }
 
                     $generator->next();

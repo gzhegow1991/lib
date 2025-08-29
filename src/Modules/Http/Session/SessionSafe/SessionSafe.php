@@ -14,13 +14,13 @@ class SessionSafe
     public function has(string $key, array $refs = []) : bool
     {
         $withValue = array_key_exists(0, $refs);
-        if ($withValue) {
-            $refValue =& $refs[ 0 ];
+        if ( $withValue ) {
+            $refValue =& $refs[0];
         }
         $refValue = null;
 
-        if (array_key_exists($key, $_SESSION)) {
-            $refValue = $_SESSION[ $key ];
+        if ( array_key_exists($key, $_SESSION) ) {
+            $refValue = $_SESSION[$key];
 
             return true;
         }
@@ -33,9 +33,9 @@ class SessionSafe
      */
     public function get(string $key, array $fallback = [])
     {
-        if (! array_key_exists($key, $_SESSION)) {
-            if ([] !== $fallback) {
-                return $fallback[ 0 ];
+        if ( ! array_key_exists($key, $_SESSION) ) {
+            if ( [] !== $fallback ) {
+                return $fallback[0];
             }
 
             throw new RuntimeException(
@@ -43,7 +43,7 @@ class SessionSafe
             );
         }
 
-        return $_SESSION[ $key ];
+        return $_SESSION[$key];
     }
 
     /**
@@ -51,7 +51,7 @@ class SessionSafe
      */
     public function set(string $key, $value)
     {
-        $_SESSION[ $key ] = $value;
+        $_SESSION[$key] = $value;
 
         return $this;
     }
@@ -61,7 +61,7 @@ class SessionSafe
      */
     public function unset(string $key)
     {
-        unset($_SESSION[ $key ]);
+        unset($_SESSION[$key]);
 
         return $this;
     }

@@ -48,17 +48,17 @@ class CliModule
 
         $thePhp = Lib::php();
 
-        if (! $thePhp->is_windows()) {
+        if ( ! $thePhp->is_windows() ) {
             return false;
         }
 
         clearstatcache(true, $junction);
 
-        if (! is_dir($junction)) {
+        if ( ! is_dir($junction) ) {
             return false;
         }
 
-        if (is_link($junction)) {
+        if ( is_link($junction) ) {
             return false;
         }
 
@@ -66,7 +66,7 @@ class CliModule
 
         // S_ISDIR test (S_IFDIR is 0x4000, S_IFMT is 0xF000 bitmask)
         $result = is_array($stat)
-            && 0x4000 !== ($stat[ 'mode' ] & 0xF000);
+            && 0x4000 !== ($stat['mode'] & 0xF000);
 
         return $result;
     }
@@ -77,7 +77,7 @@ class CliModule
      */
     public function stdin()
     {
-        if (! defined('STDIN')) define('STDIN', fopen('php://stdin', 'rb'));
+        if ( ! defined('STDIN') ) define('STDIN', fopen('php://stdin', 'rb'));
 
         return STDIN;
     }
@@ -87,7 +87,7 @@ class CliModule
      */
     public function stdout()
     {
-        if (! defined('STDOUT')) define('STDOUT', fopen('php://stdout', 'wb'));
+        if ( ! defined('STDOUT') ) define('STDOUT', fopen('php://stdout', 'wb'));
 
         return STDOUT;
     }
@@ -97,7 +97,7 @@ class CliModule
      */
     public function stderr()
     {
-        if (! defined('STDERR')) define('STDERR', fopen('php://stderr', 'wb'));
+        if ( ! defined('STDERR') ) define('STDERR', fopen('php://stderr', 'wb'));
 
         return STDERR;
     }
@@ -108,11 +108,11 @@ class CliModule
         $theDebug = Lib::debug();
         $thePhp = Lib::php();
 
-        if (! $thePhp->is_terminal()) {
+        if ( ! $thePhp->is_terminal() ) {
             throw new RuntimeException('Function must be called only in CLI mode');
         }
 
-        if (null !== $var) {
+        if ( null !== $var ) {
             $theDebugDumper = $theDebug->dumper();
 
             $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
@@ -130,7 +130,7 @@ class CliModule
     {
         $thePhp = Lib::php();
 
-        if (! $thePhp->is_terminal()) {
+        if ( ! $thePhp->is_terminal() ) {
             throw new RuntimeException('Function must be called only in CLI mode');
         }
 
@@ -144,7 +144,7 @@ class CliModule
     {
         $thePhp = Lib::php();
 
-        if (! $thePhp->is_terminal()) {
+        if ( ! $thePhp->is_terminal() ) {
             throw new RuntimeException('Function must be called only in CLI mode');
         }
 
@@ -160,7 +160,7 @@ class CliModule
         $theStr = Lib::str();
         $thePhp = Lib::php();
 
-        if (! $thePhp->is_terminal()) {
+        if ( ! $thePhp->is_terminal() ) {
             throw new RuntimeException('Function must be called only in CLI mode');
         }
 
@@ -178,7 +178,7 @@ class CliModule
         while ( false !== ($line = fgets($h)) ) {
             $line = trim($line);
 
-            if ('' === $line) {
+            if ( '' === $line ) {
                 echo '> Write `' . $delimiter . '` when done...' . "\n";
 
                 continue;
@@ -188,10 +188,10 @@ class CliModule
             $pos = $fnStrrpos($line, $delimiter);
 
             // end found
-            if ($expected_pos === $pos) {
+            if ( $expected_pos === $pos ) {
                 $line = $fnSubstr($line, 0, $pos);
 
-                if ($line) {
+                if ( $line ) {
                     $lines[] = $line;
                 }
 
@@ -212,7 +212,7 @@ class CliModule
     {
         $thePhp = Lib::php();
 
-        if (! $thePhp->is_terminal()) {
+        if ( ! $thePhp->is_terminal() ) {
             throw new RuntimeException('Function must be called only in CLI mode');
         }
 
@@ -221,8 +221,8 @@ class CliModule
         $isYes = ('y' === $refAnswer) || ('yy' === $refAnswer);
         $isAll = ('nn' === $refAnswer) || ('yy' === $refAnswer);
 
-        if (! $isAll) {
-            if (! $isYes) {
+        if ( ! $isAll ) {
+            if ( ! $isYes ) {
                 $accepted = [ 'yy', 'y', 'n', 'nn' ];
 
                 echo $message . ' [' . implode('/', $accepted) . ']' . "\n";
@@ -237,7 +237,7 @@ class CliModule
                 $isAll = ('nn' === $refAnswer) || ('yy' === $refAnswer);
             }
 
-            if (! $isAll) {
+            if ( ! $isAll ) {
                 $refAnswer = null;
             }
         }

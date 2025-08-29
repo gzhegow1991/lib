@@ -5,7 +5,7 @@ namespace Gzhegow\Lib\Exception;
 use Gzhegow\Lib\Lib;
 
 
-class Exception extends \Exception implements
+class ErrorException extends \ErrorException implements
     ExceptionInterface,
     //
     \IteratorAggregate
@@ -13,25 +13,24 @@ class Exception extends \Exception implements
     use ExceptionTrait;
 
 
-    public function __construct(...$throwableArgs)
+    public function __construct(
+        string $message = "", int $code = 0, int $severity = 1,
+        ?string $filename = null, ?int $line = null,
+        ?\Throwable $previous = null
+    )
     {
         $theDebug = Lib::debug();
         $thePhp = Lib::php();
 
-        $args = $thePhp->throwable_args(...$throwableArgs);
+        $args = $thePhp->throwable_args($message, $code, [ $filename, $line ], $previous);
 
-        $message = $args['message'] ?? '[ NO MESSAGE ]';
         $messageList = array_values($args['messageList']) ?: [ $message ];
         $messageObjectList = array_values($args['messageObjectList']) ?: [ (object) [ $message ] ];
 
         $this->messageList = $messageList;
         $this->messageObjectList = $messageObjectList;
 
-        $file = $args['file'];
-        $line = $args['line'];
-        $hasFileLine = (null !== $file);
-
-        $previous = $args['previous'];
+        $hasFileLine = (null !== $filename);
         $hasPrevious = (null !== $previous);
 
         $errorsCount = count($messageList);
@@ -47,9 +46,10 @@ class Exception extends \Exception implements
         }
 
         parent::__construct(
-            $message,
-            $args['code'],
-            $args['previous']
+            $message, $code,
+            $severity,
+            $filename, $line,
+            $previous
         );
 
         if ( $hasPrevious ) {
@@ -59,7 +59,7 @@ class Exception extends \Exception implements
         }
 
         if ( $hasFileLine ) {
-            $this->file = $file;
+            $this->file = $filename;
             $this->line = $line;
         }
     }

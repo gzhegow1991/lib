@@ -541,7 +541,7 @@ class Lib
      */
     public static function time(?\DateTimeInterface $date = null) : string
     {
-        if (null === $date) {
+        if ( null === $date ) {
             $sec = time();
 
         } else {
@@ -556,7 +556,7 @@ class Lib
      */
     public static function mtime(?\DateTimeInterface $date = null) : string
     {
-        if (null === $date) {
+        if ( null === $date ) {
             $now = microtime();
 
             [ $msec, $sec ] = explode(' ', $now, 2);
@@ -582,7 +582,7 @@ class Lib
      */
     public static function utime(?\DateTimeInterface $date = null) : string
     {
-        if (null === $date) {
+        if ( null === $date ) {
             $now = microtime();
 
             [ $usec, $sec ] = explode(' ', $now, 2);
@@ -606,7 +606,7 @@ class Lib
      */
     public static function ntime(?\DateTimeInterface $date = null) : string
     {
-        if (null === $date) {
+        if ( null === $date ) {
             $now = microtime();
 
             [ $usec, $sec ] = explode(' ', $now, 2);
@@ -619,11 +619,11 @@ class Lib
         }
 
         $hr = hrtime();
-        $nsec = substr($hr[ 1 ], 0, 9);
+        $nsec = substr($hr[1], 0, 9);
 
         $nanosec = '';
         for ( $i = 0; $i < 9; $i++ ) {
-            $nanosec[ $i ] = $usec[ $i ] ?? $nsec[ $i ] ?? '0';
+            $nanosec[$i] = $usec[$i] ?? $nsec[$i] ?? '0';
         }
 
         $result = "{$sec}.{$nanosec}";
@@ -647,7 +647,7 @@ class Lib
 
         $tag = $tag ?? '';
 
-        if (null !== $clear) {
+        if ( null !== $clear ) {
             $clear = (bool) $clear;
 
         } else {
@@ -659,7 +659,7 @@ class Lib
             return $last->report ?? [];
         }
 
-        if (null === $current) {
+        if ( null === $current ) {
             $current = new class {
                 /**
                  * @var float[][]
@@ -672,19 +672,19 @@ class Lib
             };
         }
 
-        if (! isset($current->report[ $tag ])) {
-            $current->report[ $tag ] = [];
+        if ( ! isset($current->report[$tag]) ) {
+            $current->report[$tag] = [];
         }
 
-        if (isset($current->microtimes[ $tag ])) {
-            $current->report[ $tag ][] = $microtime - $current->microtimes[ $tag ];
+        if ( isset($current->microtimes[$tag]) ) {
+            $current->report[$tag][] = $microtime - $current->microtimes[$tag];
         }
 
-        if ($clear) {
-            unset($current->microtimes[ $tag ]);
+        if ( $clear ) {
+            unset($current->microtimes[$tag]);
 
         } else {
-            $current->microtimes[ $tag ] = $microtime;
+            $current->microtimes[$tag] = $microtime;
         }
 
         return $microtime;
@@ -695,13 +695,13 @@ class Lib
     {
         $theDebugDumper = Lib::debugDumper();
 
-        if (null !== $dumper) {
+        if ( null !== $dumper ) {
             $dumperArray = (array) $dumper;
 
             $theDebugDumper->selectDumper(...$dumperArray);
         }
 
-        if (null !== $printer) {
+        if ( null !== $printer ) {
             $printerArray = (array) $printer;
 
             $theDebugDumper->selectPrinter(...$printerArray);
@@ -810,7 +810,7 @@ class Lib
     {
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             throw new RuntimeException(
                 [ 'Missing `filepath` file: ' . $file ]
             );
@@ -818,13 +818,13 @@ class Lib
 
         $imports =& static::imports();
 
-        if (! isset($imports[ $realpath ])) {
-            $imports[ $realpath ] = include $realpath;
+        if ( ! isset($imports[$realpath]) ) {
+            $imports[$realpath] = include $realpath;
         }
 
-        if (! is_array($imports[ $realpath ])) {
+        if ( ! is_array($imports[$realpath]) ) {
             throw new RuntimeException(
-                [ 'The `imports[realpath]` should be array', $imports[ $realpath ] ]
+                [ 'The `imports[realpath]` should be array', $imports[$realpath] ]
             );
         }
 
@@ -832,16 +832,16 @@ class Lib
         $hasClassT = $hasKeyOrClassT && class_exists($keyOrClassT);
         $hasKey = (null !== $key);
 
-        if ($hasKeyOrClassT && $hasKey) {
-            if (! $hasClassT) {
+        if ( $hasKeyOrClassT && $hasKey ) {
+            if ( ! $hasClassT ) {
                 throw new RuntimeException(
                     [ 'The `keyOrClassT` should be existing class: ' . $keyOrClassT, $keyOrClassT ]
                 );
             }
 
-            $import = $imports[ $realpath ][ $key ];
+            $import = $imports[$realpath][$key];
 
-            if (! ($import instanceof $keyOrClassT)) {
+            if ( ! ($import instanceof $keyOrClassT) ) {
                 throw new RuntimeException(
                     [ 'The `imports[realpath][' . $key . ']` should be instance of: ' . $keyOrClassT, $import ]
                 );
@@ -850,8 +850,8 @@ class Lib
             return $import;
         }
 
-        if ($hasKeyOrClassT) {
-            if ($hasClassT) {
+        if ( $hasKeyOrClassT ) {
+            if ( $hasClassT ) {
                 $theFs = Lib::fs();
 
                 $key = $theFs->fname($realpath);
@@ -863,24 +863,24 @@ class Lib
             $hasKey = true;
         }
 
-        if ($hasKey) {
-            $import = $imports[ $realpath ][ $key ];
+        if ( $hasKey ) {
+            $import = $imports[$realpath][$key];
 
             return $import;
         }
 
-        $imports[ $realpath ] = []
-            + $imports[ $realpath ]
-            + array_values($imports[ $realpath ]);
+        $imports[$realpath] = []
+            + $imports[$realpath]
+            + array_values($imports[$realpath]);
 
-        return $imports[ $realpath ];
+        return $imports[$realpath];
     }
 
     public static function export(string $file, $export = null, ?string $key = null) : array
     {
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             throw new RuntimeException(
                 [ 'Missing `filepath` file: ' . $file ]
             );
@@ -888,13 +888,13 @@ class Lib
 
         $imports =& static::imports();
 
-        if (null !== $export) {
-            if (null !== $key) {
-                $imports[ $realpath ][ $key ] = $export;
+        if ( null !== $export ) {
+            if ( null !== $key ) {
+                $imports[$realpath][$key] = $export;
 
-            } elseif (is_array($export)) {
-                $imports[ $realpath ] = array_replace(
-                    $imports[ $file ] ?? [],
+            } elseif ( is_array($export) ) {
+                $imports[$realpath] = array_replace(
+                    $imports[$file] ?? [],
                     $export
                 );
 
@@ -903,11 +903,11 @@ class Lib
 
                 $key = $theFs->fname($realpath);
 
-                $imports[ $realpath ][ $key ] = $export;
+                $imports[$realpath][$key] = $export;
             }
         }
 
-        return $imports[ $realpath ];
+        return $imports[$realpath];
     }
 
 
@@ -920,7 +920,7 @@ class Lib
     {
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             throw new LogicException(
                 [ 'Missing `filepath` file: ' . $file ]
             );
@@ -942,17 +942,17 @@ class Lib
 
         $realpath = realpath($file);
 
-        if (false === $realpath) {
+        if ( false === $realpath ) {
             throw new LogicException(
                 [ 'Missing `filepath` file: ' . $file ]
             );
         }
 
-        if (! isset($requireOnce[ $realpath ])) {
-            $requireOnce[ $realpath ] = include $realpath;
+        if ( ! isset($requireOnce[$realpath]) ) {
+            $requireOnce[$realpath] = include $realpath;
         }
 
-        return $requireOnce[ $realpath ];
+        return $requireOnce[$realpath];
     }
 
     /**

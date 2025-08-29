@@ -100,14 +100,14 @@ class FormatModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! preg_match('/^[a-z][a-z0-9-]*$/', $valueStringNotEmpty)) {
+        if ( ! preg_match('/^[a-z][a-z0-9-]*$/', $valueStringNotEmpty) ) {
             return Ret::err(
                 [ 'The `value` should be valid html tag', $value ],
                 [ __FILE__, __LINE__ ]
@@ -124,14 +124,14 @@ class FormatModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! preg_match('/^[A-Za-z_][A-Za-z0-9_\-\.]*$/', $valueStringNotEmpty)) {
+        if ( ! preg_match('/^[A-Za-z_][A-Za-z0-9_\-\.]*$/', $valueStringNotEmpty) ) {
             return Ret::err(
                 [ 'The `value` should be valid xml tag', $value ],
                 [ __FILE__, __LINE__ ]
@@ -148,14 +148,14 @@ class FormatModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! preg_match('/^(?:[A-Za-z_][A-Za-z0-9_\-\.]*)?:?[A-Za-z_][A-Za-z0-9_\-\.]*$/', $valueStringNotEmpty)) {
+        if ( ! preg_match('/^(?:[A-Za-z_][A-Za-z0-9_\-\.]*)?:?[A-Za-z_][A-Za-z0-9_\-\.]*$/', $valueStringNotEmpty) ) {
             return Ret::err(
                 [ 'The `value` should be valid xml nstag', $value ],
                 [ __FILE__, __LINE__ ]
@@ -175,11 +175,11 @@ class FormatModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($size)->isOk([ &$sizeString, &$ret ])) {
+        if ( ! $theType->string_not_empty($size)->isOk([ &$sizeString, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
-        if ('0' === $size) {
+        if ( '0' === $size ) {
             return Ret::ok($fallback, 0);
         }
 
@@ -196,7 +196,7 @@ class FormatModule
         ];
         $strUnitList = array_merge(...$strUnitList);
 
-        if (! preg_match($regex = '/^(\d+(?:\.\d+)?)([A-Z]{0,2})$/', $size, $matches)) {
+        if ( ! preg_match($regex = '/^(\d+(?:\.\d+)?)([A-Z]{0,2})$/', $size, $matches) ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `size` should match regex: ' . $regex, $size ],
@@ -206,11 +206,11 @@ class FormatModule
 
         [ , $numUnit, $strUnit ] = $matches;
 
-        if ('' === $strUnit) {
+        if ( '' === $strUnit ) {
             $strUnit = 'B';
         }
 
-        if (! isset($strUnitList[ $strUnit ])) {
+        if ( ! isset($strUnitList[$strUnit]) ) {
             return Ret::throw(
                 $fallback,
                 [ 'Unknown `strUnit`', $strUnit ],
@@ -218,22 +218,22 @@ class FormatModule
             );
         }
 
-        if (! $theType->num_non_negative($numUnit)->isOk([ &$numUnitNumNonNegative, &$ret ])) {
+        if ( ! $theType->num_non_negative($numUnit)->isOk([ &$numUnitNumNonNegative, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
-        if (0 == $numUnitNumNonNegative) {
+        if ( 0 == $numUnitNumNonNegative ) {
             return Ret::ok($fallback, 0);
         }
 
-        $bytesNum = $numUnit * pow(1024, $strUnitList[ $strUnit ]);
+        $bytesNum = $numUnit * pow(1024, $strUnitList[$strUnit]);
         $bytesNumCeil = ceil($bytesNum);
 
         /**
          * > ceil() may return false, suppress damn PHPStorm
          * @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection
          */
-        if (false === $bytesNumCeil) {
+        if ( false === $bytesNumCeil ) {
             return Ret::throw(
                 $fallback,
                 [ 'Unable to `ceil`', $bytesNum ],
@@ -257,14 +257,14 @@ class FormatModule
     {
         $theType = Lib::type();
 
-        if (! $theType->num_non_negative($bytes)->isOk([ &$bytesNumNonNegative, &$ret ])) {
+        if ( ! $theType->num_non_negative($bytes)->isOk([ &$bytesNumNonNegative, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
         $roundPrecision = $roundPrecision ?? 3;
         $unitLen = $unitLen ?? 2;
 
-        if (0 === $bytesNumNonNegative) {
+        if ( 0 === $bytesNumNonNegative ) {
             return Ret::ok($fallback, '0B');
         }
 
@@ -277,7 +277,7 @@ class FormatModule
 
         $left /= pow(1024, $pow);
 
-        $unit = $strUnitList[ $pow ];
+        $unit = $strUnitList[$pow];
         $unit = substr($unit, 0, $unitLen);
 
         $size = round($left, $roundPrecision) . $unit;
@@ -300,7 +300,7 @@ class FormatModule
         $theFormatBaseN = Lib::formatBaseN();
         $theFormatJson = Lib::formatJson();
 
-        if (! $theFormatBaseN->base64_decode(null, $base64)->isOk([ &$jsonString, &$ret ])) {
+        if ( ! $theFormatBaseN->base64_decode(null, $base64)->isOk([ &$jsonString, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -310,7 +310,7 @@ class FormatModule
             $depth, $flags
         );
 
-        if (! $ret->isOk([ &$data, &$ret ])) {
+        if ( ! $ret->isOk([ &$data, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -337,11 +337,11 @@ class FormatModule
             $flags, $depth
         );
 
-        if (! $ret->isOk([ &$jsonString, &$ret ])) {
+        if ( ! $ret->isOk([ &$jsonString, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
-        if (! $theFormatBaseN->base64_encode(null, $jsonString)->isOk([ &$base64String, &$ret ])) {
+        if ( ! $theFormatBaseN->base64_encode(null, $jsonString)->isOk([ &$base64String, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 

@@ -124,8 +124,8 @@ class DefaultDumper implements DumperInterface
      */
     public function withSymfonyCloner(?object $symfonyCloner) : object
     {
-        if (null !== $symfonyCloner) {
-            if (! is_a($symfonyCloner, $interface = static::SYMFONY_CLONER_INTERFACE)) {
+        if ( null !== $symfonyCloner ) {
+            if ( ! is_a($symfonyCloner, $interface = static::SYMFONY_CLONER_INTERFACE) ) {
                 throw new RuntimeException(
                     [
                         'The `symfonyCloner` should be an instance of: ' . $interface,
@@ -149,7 +149,7 @@ class DefaultDumper implements DumperInterface
             'composer require symfony/var-dumper',
         ];
 
-        if (! class_exists($symfonyClonerClass = static::SYMFONY_VAR_CLONER)) {
+        if ( ! class_exists($symfonyClonerClass = static::SYMFONY_VAR_CLONER) ) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -157,11 +157,11 @@ class DefaultDumper implements DumperInterface
             ]);
         }
 
-        $clonerCasters = $options[ 'casters' ] ?? [];
+        $clonerCasters = $options['casters'] ?? [];
 
         $args = [];
 
-        if ([] !== $clonerCasters) {
+        if ( [] !== $clonerCasters ) {
             $args[] = $clonerCasters;
         }
 
@@ -188,8 +188,8 @@ class DefaultDumper implements DumperInterface
      */
     public function withSymfonyCliDumper(?object $symfonyCliDumper) : object
     {
-        if (null !== $symfonyCliDumper) {
-            if (! is_a($symfonyCliDumper, $interface = static::SYMFONY_CLI_DUMPER)) {
+        if ( null !== $symfonyCliDumper ) {
+            if ( ! is_a($symfonyCliDumper, $interface = static::SYMFONY_CLI_DUMPER) ) {
                 throw new RuntimeException(
                     [
                         'The `symfonyCliDumper` should be an instance of: ' . $interface,
@@ -213,7 +213,7 @@ class DefaultDumper implements DumperInterface
             'composer require symfony/var-dumper',
         ];
 
-        if (! class_exists($symfonyCliDumperClass = static::SYMFONY_CLI_DUMPER)) {
+        if ( ! class_exists($symfonyCliDumperClass = static::SYMFONY_CLI_DUMPER) ) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -244,8 +244,8 @@ class DefaultDumper implements DumperInterface
      */
     public function withSymfonyHtmlDumper(?object $symfonyHtmlDumper) : object
     {
-        if (null !== $symfonyHtmlDumper) {
-            if (! is_a($symfonyHtmlDumper, $interface = static::SYMFONY_HTML_DUMPER)) {
+        if ( null !== $symfonyHtmlDumper ) {
+            if ( ! is_a($symfonyHtmlDumper, $interface = static::SYMFONY_HTML_DUMPER) ) {
                 throw new RuntimeException(
                     [
                         'The `symfonyHtmlDumper` should be an instance of: ' . $interface,
@@ -269,7 +269,7 @@ class DefaultDumper implements DumperInterface
             'composer require symfony/var-dumper',
         ];
 
-        if (! class_exists($symfonyHtmlDumperClass = static::SYMFONY_HTML_DUMPER)) {
+        if ( ! class_exists($symfonyHtmlDumperClass = static::SYMFONY_HTML_DUMPER) ) {
             throw new ComposerException([
                 ''
                 . 'Please, run following commands: '
@@ -296,8 +296,8 @@ class DefaultDumper implements DumperInterface
      */
     public function selectPrinter(?string $printer, ?array $printerOptions = null)
     {
-        if (null !== $printer) {
-            if (! isset(static::PRINTER_LIST[ $printer ])) {
+        if ( null !== $printer ) {
+            if ( ! isset(static::PRINTER_LIST[$printer]) ) {
                 throw new LogicException(
                     [
                         ''
@@ -312,8 +312,8 @@ class DefaultDumper implements DumperInterface
 
         $this->printer = $printer ?? $this->printerDefault;
 
-        if (null !== $printerOptions) {
-            $this->printerOptions[ $this->printer ] = $printerOptions;
+        if ( null !== $printerOptions ) {
+            $this->printerOptions[$this->printer] = $printerOptions;
         }
 
         return $this;
@@ -373,7 +373,7 @@ class DefaultDumper implements DumperInterface
         $content = '';
 
         foreach ( $vars as $arg ) {
-            if ($content) {
+            if ( $content ) {
                 $content .= "\n";
             }
 
@@ -393,7 +393,7 @@ class DefaultDumper implements DumperInterface
         $content = '';
 
         foreach ( $vars as $arg ) {
-            if ($content) {
+            if ( $content ) {
                 $content .= "\n";
             }
 
@@ -417,10 +417,10 @@ class DefaultDumper implements DumperInterface
         $theHttp = Lib::http();
         $thePhp = Lib::php();
 
-        $printerOptions = $this->printerOptions[ $this->printer ] ?? [];
+        $printerOptions = $this->printerOptions[$this->printer] ?? [];
 
-        $clonerCasters = $printerOptions[ 'casters' ] ?? null;
-        $dumperColors = $printerOptions[ 'colors' ] ?? null;
+        $clonerCasters = $printerOptions['casters'] ?? null;
+        $dumperColors = $printerOptions['colors'] ?? null;
 
         $cloner = (null !== $clonerCasters)
             ? $this->getSymfonyCloner()
@@ -445,10 +445,10 @@ class DefaultDumper implements DumperInterface
                 break;
 
             case '':
-                if ($thePhp->is_terminal()) {
+                if ( $thePhp->is_terminal() ) {
                     $dumper->setColors(true);
 
-                } elseif ($theHttp->is_api()) {
+                } elseif ( $theHttp->is_api() ) {
                     $dumper->setColors(false);
                 }
 
@@ -490,10 +490,10 @@ class DefaultDumper implements DumperInterface
         $theHttp = Lib::http();
         $thePhp = Lib::php();
 
-        $printerOptions = $this->printerOptions[ $this->printer ] ?? [];
+        $printerOptions = $this->printerOptions[$this->printer] ?? [];
 
-        $clonerCasters = $printerOptions[ 'casters' ] ?? null;
-        $dumperColors = $printerOptions[ 'colors' ] ?? null;
+        $clonerCasters = $printerOptions['casters'] ?? null;
+        $dumperColors = $printerOptions['colors'] ?? null;
 
         $cloner = (null !== $clonerCasters)
             ? $this->getSymfonyCloner()
@@ -520,10 +520,10 @@ class DefaultDumper implements DumperInterface
                 break;
 
             case '':
-                if ($thePhp->is_terminal()) {
+                if ( $thePhp->is_terminal() ) {
                     $dumper->setColors(true);
 
-                } elseif ($theHttp->is_api()) {
+                } elseif ( $theHttp->is_api() ) {
                     $dumper->setColors(false);
                 }
 
@@ -567,7 +567,7 @@ class DefaultDumper implements DumperInterface
         $content = '';
 
         foreach ( $vars as $arg ) {
-            if ($content) {
+            if ( $content ) {
                 $content .= "\n";
             }
 
@@ -593,7 +593,7 @@ class DefaultDumper implements DumperInterface
         $content = '';
 
         foreach ( $vars as $arg ) {
-            if ($content) {
+            if ( $content ) {
                 $content .= "\n";
             }
 
@@ -608,7 +608,7 @@ class DefaultDumper implements DumperInterface
         $content = '';
 
         foreach ( $vars as $arg ) {
-            if ($content) {
+            if ( $content ) {
                 $content .= "\n";
             }
 
@@ -624,8 +624,8 @@ class DefaultDumper implements DumperInterface
      */
     public function selectDumper(?string $dumper, ?array $dumperOptions = null)
     {
-        if (null !== $dumper) {
-            if (! isset(static::DUMPER_LIST[ $dumper ])) {
+        if ( null !== $dumper ) {
+            if ( ! isset(static::DUMPER_LIST[$dumper]) ) {
                 throw new LogicException(
                     [
                         ''
@@ -640,8 +640,8 @@ class DefaultDumper implements DumperInterface
 
         $this->dumper = $dumper ?? $this->dumperDefault;
 
-        if (null !== $dumperOptions) {
-            $this->dumperOptions[ $this->dumper ] = $dumperOptions;
+        if ( null !== $dumperOptions ) {
+            $this->dumperOptions[$this->dumper] = $dumperOptions;
         }
 
         return $this;
@@ -708,7 +708,7 @@ class DefaultDumper implements DumperInterface
 
         $content = "<script>console.log(window.atob('{$content}'));</script>" . "\n";
 
-        if (! headers_sent()) {
+        if ( ! headers_sent() ) {
             header('Content-Type: text/html', true, 418);
         }
 
@@ -721,7 +721,7 @@ class DefaultDumper implements DumperInterface
         $content = $this->printerPrint(...$vars);
         $content = rtrim($content) . "\n";
 
-        if (! headers_sent()) {
+        if ( ! headers_sent() ) {
             header('Content-Type: text/html', true, 418);
         }
 
@@ -734,7 +734,7 @@ class DefaultDumper implements DumperInterface
         $content = $this->printerPrint(...$vars);
         $content = rtrim($content) . "\n";
 
-        if (! headers_sent()) {
+        if ( ! headers_sent() ) {
             header('Content-Type: text/plain', true, 418);
         }
 
@@ -744,11 +744,11 @@ class DefaultDumper implements DumperInterface
 
     public function dumperDump_pdo(...$vars) : void
     {
-        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
+        $dumperOptions = $this->dumperOptions[$this->dumper] ?? [];
 
-        $pdo = $dumperOptions[ 'pdo' ] ?? $dumperOptions[ 0 ];
-        $table = $dumperOptions[ 'table' ] ?? $dumperOptions[ 1 ] ?? 'dumper';
-        $column = $dumperOptions[ 'column' ] ?? $dumperOptions[ 2 ] ?? 'dump';
+        $pdo = $dumperOptions['pdo'] ?? $dumperOptions[0];
+        $table = $dumperOptions['table'] ?? $dumperOptions[1] ?? 'dumper';
+        $column = $dumperOptions['column'] ?? $dumperOptions[2] ?? 'dump';
 
         $pdoAdapter = PdoAdapter::from($pdo)->orThrow(
             [ 'The `options.pdo` should be valid PDO or adapter', $dumperOptions ]
@@ -759,13 +759,13 @@ class DefaultDumper implements DumperInterface
         $tableString = (string) $table;
         $columnString = (string) $column;
 
-        if ('' === $tableString) {
+        if ( '' === $tableString ) {
             throw new LogicException(
                 [ 'The `options.table` should be a non-empty string', $dumperOptions ]
             );
         }
 
-        if ('' === $columnString) {
+        if ( '' === $columnString ) {
             throw new LogicException(
                 [ 'The `options.column` should be a non-empty string', $dumperOptions ]
             );
@@ -782,11 +782,11 @@ class DefaultDumper implements DumperInterface
 
     public function dumperDump_pdo_devtools(...$vars) : void
     {
-        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
+        $dumperOptions = $this->dumperOptions[$this->dumper] ?? [];
 
-        $pdo = $dumperOptions[ 'pdo' ] ?? $dumperOptions[ 0 ];
-        $table = $dumperOptions[ 'table' ] ?? $dumperOptions[ 1 ] ?? 'dumper';
-        $column = $dumperOptions[ 'column' ] ?? $dumperOptions[ 2 ] ?? 'dump';
+        $pdo = $dumperOptions['pdo'] ?? $dumperOptions[0];
+        $table = $dumperOptions['table'] ?? $dumperOptions[1] ?? 'dumper';
+        $column = $dumperOptions['column'] ?? $dumperOptions[2] ?? 'dump';
 
         $pdoAdapter = PdoAdapter::from($pdo)->orThrow(
             [ 'The `options.pdo` should be valid PDO or adapter', $dumperOptions ]
@@ -797,13 +797,13 @@ class DefaultDumper implements DumperInterface
         $tableString = (string) $table;
         $columnString = (string) $column;
 
-        if ('' === $tableString) {
+        if ( '' === $tableString ) {
             throw new LogicException(
                 [ 'The `options.table` should be a non-empty string', $dumperOptions ]
             );
         }
 
-        if ('' === $columnString) {
+        if ( '' === $columnString ) {
             throw new LogicException(
                 [ 'The `options.column` should be a non-empty string', $dumperOptions ]
             );
@@ -826,15 +826,15 @@ class DefaultDumper implements DumperInterface
     {
         $thePhp = Lib::php();
 
-        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
+        $dumperOptions = $this->dumperOptions[$this->dumper] ?? [];
 
-        if (! array_key_exists('resource', $dumperOptions)) {
+        if ( ! array_key_exists('resource', $dumperOptions) ) {
             $resource = $thePhp->hOutput();
 
         } else {
-            $resource = $dumperOptions[ 'resource' ];
+            $resource = $dumperOptions['resource'];
 
-            if (! is_resource($resource)) {
+            if ( ! is_resource($resource) ) {
                 $theFsFile = Lib::fsFile();
 
                 $theFsFile->mkdirp(dirname($resource));
@@ -854,15 +854,15 @@ class DefaultDumper implements DumperInterface
     {
         $thePhp = Lib::php();
 
-        $dumperOptions = $this->dumperOptions[ $this->dumper ] ?? [];
+        $dumperOptions = $this->dumperOptions[$this->dumper] ?? [];
 
-        if (! array_key_exists('resource', $dumperOptions)) {
+        if ( ! array_key_exists('resource', $dumperOptions) ) {
             $resource = $thePhp->hOutput();
 
         } else {
-            $resource = $dumperOptions[ 'resource' ];
+            $resource = $dumperOptions['resource'];
 
-            if (! is_resource($resource)) {
+            if ( ! is_resource($resource) ) {
                 $theFsFile = Lib::fsFile();
 
                 $theFsFile->mkdirp(dirname($resource));
@@ -936,7 +936,7 @@ class DefaultDumper implements DumperInterface
      */
     public function ddd(?array $debugBacktraceOverride, int $times, $var, ...$vars)
     {
-        if ($times < 1) {
+        if ( $times < 1 ) {
             throw new LogicException(
                 [ 'The `times` should be positive integer', $times ]
             );
@@ -950,7 +950,7 @@ class DefaultDumper implements DumperInterface
 
         $this->doDumperEchoTrace($debugBacktraceOverride, $var, ...$vars);
 
-        if (0 === --$current) {
+        if ( 0 === --$current ) {
             die();
         }
 
@@ -1000,7 +1000,7 @@ class DefaultDumper implements DumperInterface
      */
     public function td(?array $debugBacktraceOverride, int $throttleMs, $var, ...$vars)
     {
-        if ($throttleMs < 0) {
+        if ( $throttleMs < 0 ) {
             throw new LogicException(
                 [ 'The `throttleMs` should be a non-negative integer', $throttleMs ]
             );
@@ -1012,14 +1012,14 @@ class DefaultDumper implements DumperInterface
 
         $debugBacktraceOverride = $debugBacktraceOverride ?? debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
 
-        if (! (isset($debugBacktrace[ 0 ]) && is_array($debugBacktrace[ 0 ]))) {
+        if ( ! (isset($debugBacktrace[0]) && is_array($debugBacktrace[0])) ) {
             throw new LogicException(
                 [ 'The `debugBacktraceOverride` should be valid result of `debug_backtrace` function', $debugBacktrace ]
             );
         }
 
-        $traceFile = $debugBacktraceOverride[ 0 ][ 'file' ] ?? $debugBacktraceOverride[ 0 ][ 0 ] ?? '{file}';
-        $traceLine = $debugBacktraceOverride[ 0 ][ 'line' ] ?? $debugBacktraceOverride[ 0 ][ 1 ] ?? -1;
+        $traceFile = $debugBacktraceOverride[0]['file'] ?? $debugBacktraceOverride[0][0] ?? '{file}';
+        $traceLine = $debugBacktraceOverride[0]['line'] ?? $debugBacktraceOverride[0][1] ?? -1;
 
         $t = [ $traceFile, $traceLine ];
 
@@ -1027,10 +1027,10 @@ class DefaultDumper implements DumperInterface
 
         $now = microtime(true);
 
-        $last[ $key ] = $last[ $key ] ?? 0;
+        $last[$key] = $last[$key] ?? 0;
 
-        if (($now - $last[ $key ]) > ($throttleMs / 1000)) {
-            $last[ $key ] = $now;
+        if ( ($now - $last[$key]) > ($throttleMs / 1000) ) {
+            $last[$key] = $now;
 
             $this->doDumperEchoTrace([ $t ], $var, ...$vars);
         }
@@ -1053,14 +1053,14 @@ class DefaultDumper implements DumperInterface
 
     protected function doPrinterPrintTrace(array $debugBacktrace, ...$vars) : string
     {
-        if (! (isset($debugBacktrace[ 0 ]) && is_array($debugBacktrace[ 0 ]))) {
+        if ( ! (isset($debugBacktrace[0]) && is_array($debugBacktrace[0])) ) {
             throw new LogicException(
                 [ 'The `debugBacktrace` should be valid result of `debug_backtrace` function', $debugBacktrace ]
             );
         }
 
-        $traceFile = $debugBacktrace[ 0 ][ 'file' ] ?? $debugBacktrace[ 0 ][ 0 ] ?? '{file}';
-        $traceLine = $debugBacktrace[ 0 ][ 'line' ] ?? $debugBacktrace[ 0 ][ 1 ] ?? -1;
+        $traceFile = $debugBacktrace[0]['file'] ?? $debugBacktrace[0][0] ?? '{file}';
+        $traceLine = $debugBacktrace[0]['line'] ?? $debugBacktrace[0][1] ?? -1;
 
         $traceWhereIs = "[ {$traceFile} ({$traceLine}) ]";
 
@@ -1071,14 +1071,14 @@ class DefaultDumper implements DumperInterface
 
     protected function doDumperEchoTrace(array $debugBacktrace, ...$vars) : void
     {
-        if (! (isset($debugBacktrace[ 0 ]) && is_array($debugBacktrace[ 0 ]))) {
+        if ( ! (isset($debugBacktrace[0]) && is_array($debugBacktrace[0])) ) {
             throw new LogicException(
                 [ 'The `debugBacktrace` should be valid result of `debug_backtrace` function', $debugBacktrace ]
             );
         }
 
-        $traceFile = $debugBacktrace[ 0 ][ 'file' ] ?? $debugBacktrace[ 0 ][ 0 ] ?? '{file}';
-        $traceLine = $debugBacktrace[ 0 ][ 'line' ] ?? $debugBacktrace[ 0 ][ 1 ] ?? -1;
+        $traceFile = $debugBacktrace[0]['file'] ?? $debugBacktrace[0][0] ?? '{file}';
+        $traceLine = $debugBacktrace[0]['line'] ?? $debugBacktrace[0][1] ?? -1;
 
         $traceWhereIs = "[ {$traceFile} ({$traceLine}) ]";
 
@@ -1093,7 +1093,7 @@ class DefaultDumper implements DumperInterface
     {
         $limit = $limit ?? 1;
 
-        if (null === $debugBacktraceOverride) {
+        if ( null === $debugBacktraceOverride ) {
             $limit++;
 
             $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, $limit);
@@ -1101,15 +1101,15 @@ class DefaultDumper implements DumperInterface
 
         $i = $limit - 1;
 
-        if (! isset($debugBacktraceOverride[ $i ])) {
+        if ( ! isset($debugBacktraceOverride[$i]) ) {
             throw new LogicException(
                 [ 'The key is not exists in trace: ' . $i, $debugBacktraceOverride ]
             );
         }
 
         $fileLine = [
-            $debugBacktraceOverride[ $i ][ 'file' ] ?? '{{file}}',
-            $debugBacktraceOverride[ $i ][ 'line' ] ?? '{{line}}',
+            $debugBacktraceOverride[$i]['file'] ?? '{{file}}',
+            $debugBacktraceOverride[$i]['line'] ?? '{{line}}',
         ];
 
         return $fileLine;
@@ -1118,7 +1118,7 @@ class DefaultDumper implements DumperInterface
 
     public function doSymfonyPrinterOutputDumpLine($line, $depth, $indentPad) : void
     {
-        if ($depth !== -1) {
+        if ( $depth !== -1 ) {
             fwrite($this->symfonyOutputLineDumpResource, str_repeat($indentPad, $depth) . $line . "\n");
 
         } else {

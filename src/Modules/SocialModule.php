@@ -72,14 +72,14 @@ class SocialModule
     )
     {
         $withEmailDomain = array_key_exists(0, $refs);
-        if ($withEmailDomain) {
-            $refEmailDomain =& $refs[ 0 ];
+        if ( $withEmailDomain ) {
+            $refEmailDomain =& $refs[0];
         }
         $refEmailDomain = null;
 
         $withEmailName = array_key_exists(1, $refs);
-        if ($withEmailName) {
-            $refEmailName =& $refs[ 1 ];
+        if ( $withEmailName ) {
+            $refEmailName =& $refs[1];
         }
         $refEmailName = null;
 
@@ -91,10 +91,10 @@ class SocialModule
                 $emailDomain, $emailName
             );
 
-            if ($withEmailDomain) {
+            if ( $withEmailDomain ) {
                 $refEmailDomain = $emailDomain;
             }
-            if ($withEmailName) {
+            if ( $withEmailName ) {
                 $refEmailName = $emailName;
             }
         }
@@ -122,14 +122,14 @@ class SocialModule
     )
     {
         $withEmailDomain = array_key_exists(0, $refs);
-        if ($withEmailDomain) {
-            $refEmailDomain =& $refs[ 0 ];
+        if ( $withEmailDomain ) {
+            $refEmailDomain =& $refs[0];
         }
         $refEmailDomain = null;
 
         $withEmailName = array_key_exists(1, $refs);
-        if ($withEmailName) {
-            $refEmailName =& $refs[ 1 ];
+        if ( $withEmailName ) {
+            $refEmailName =& $refs[1];
         }
         $refEmailName = null;
 
@@ -141,10 +141,10 @@ class SocialModule
                 $emailDomain, $emailName
             );
 
-            if ($withEmailDomain) {
+            if ( $withEmailDomain ) {
                 $refEmailDomain = $emailDomain;
             }
-            if ($withEmailName) {
+            if ( $withEmailName ) {
                 $refEmailName = $emailName;
             }
         }
@@ -173,14 +173,14 @@ class SocialModule
     )
     {
         $withEmailDomain = array_key_exists(0, $refs);
-        if ($withEmailDomain) {
-            $refEmailDomain =& $refs[ 0 ];
+        if ( $withEmailDomain ) {
+            $refEmailDomain =& $refs[0];
         }
         $refEmailDomain = null;
 
         $withEmailName = array_key_exists(1, $refs);
-        if ($withEmailName) {
-            $refEmailName =& $refs[ 1 ];
+        if ( $withEmailName ) {
+            $refEmailName =& $refs[1];
         }
         $refEmailDomain = null;
 
@@ -192,10 +192,10 @@ class SocialModule
                 $emailDomain, $emailName
             );
 
-            if ($withEmailDomain) {
+            if ( $withEmailDomain ) {
                 $refEmailDomain = $emailDomain;
             }
-            if ($withEmailName) {
+            if ( $withEmailName ) {
                 $refEmailName = $emailName;
             }
         }
@@ -224,20 +224,20 @@ class SocialModule
     )
     {
         $withTel = array_key_exists(0, $refs);
-        if ($withTel) {
-            $refTel =& $refs[ 0 ];
+        if ( $withTel ) {
+            $refTel =& $refs[0];
         }
         $refTel = null;
 
         $withTelDigits = array_key_exists(1, $refs);
-        if ($withTelDigits) {
-            $refTelDigits =& $refs[ 1 ];
+        if ( $withTelDigits ) {
+            $refTelDigits =& $refs[1];
         }
         $refTelDigits = null;
 
         $withTelPlus = array_key_exists(2, $refs);
-        if ($withTelPlus) {
-            $refTelPlus =& $refs[ 2 ];
+        if ( $withTelPlus ) {
+            $refTelPlus =& $refs[2];
         }
         $refTelPlus = null;
 
@@ -273,20 +273,20 @@ class SocialModule
     )
     {
         $withTel = array_key_exists(0, $refs);
-        if ($withTel) {
-            $refTel =& $refs[ 0 ];
+        if ( $withTel ) {
+            $refTel =& $refs[0];
         }
         $refTel = null;
 
         $withTelDigits = array_key_exists(1, $refs);
-        if ($withTelDigits) {
-            $refTelDigits =& $refs[ 1 ];
+        if ( $withTelDigits ) {
+            $refTelDigits =& $refs[1];
         }
         $refTelDigits = null;
 
         $withTelPlus = array_key_exists(2, $refs);
-        if ($withTelPlus) {
-            $refTelPlus =& $refs[ 2 ];
+        if ( $withTelPlus ) {
+            $refTelPlus =& $refs[2];
         }
         $refTelPlus = null;
 
@@ -319,20 +319,20 @@ class SocialModule
     )
     {
         $withTel = array_key_exists(0, $refs);
-        if ($withTel) {
-            $refTel =& $refs[ 0 ];
+        if ( $withTel ) {
+            $refTel =& $refs[0];
         }
         $refTel = null;
 
         $withTelDigits = array_key_exists(1, $refs);
-        if ($withTelDigits) {
-            $refTelDigits =& $refs[ 1 ];
+        if ( $withTelDigits ) {
+            $refTelDigits =& $refs[1];
         }
         $refTelDigits = null;
 
         $withTelPlus = array_key_exists(2, $refs);
-        if ($withTelPlus) {
-            $refTelPlus =& $refs[ 2 ];
+        if ( $withTelPlus ) {
+            $refTelPlus =& $refs[2];
         }
         $refTelPlus = null;
 
@@ -369,26 +369,26 @@ class SocialModule
     )
     {
         $withRegionDetected = array_key_exists(0, $refs);
-        if ($withRegionDetected) {
-            $refRegionDetected =& $refs[ 0 ];
+        if ( $withRegionDetected ) {
+            $refRegionDetected =& $refs[0];
         }
         $refRegionDetected = null;
 
         $withTel = array_key_exists(1, $refs);
-        if ($withTel) {
-            $refTel =& $refs[ 1 ];
+        if ( $withTel ) {
+            $refTel =& $refs[1];
         }
         $refTel = null;
 
         $withTelDigits = array_key_exists(2, $refs);
-        if ($withTelDigits) {
-            $refTelDigits =& $refs[ 2 ];
+        if ( $withTelDigits ) {
+            $refTelDigits =& $refs[2];
         }
         $refTelDigits = null;
 
         $withTelPlus = array_key_exists(3, $refs);
-        if ($withTelPlus) {
-            $refTelPlus =& $refs[ 3 ];
+        if ( $withTelPlus ) {
+            $refTelPlus =& $refs[3];
         }
         $refTelPlus = null;
 
@@ -426,14 +426,14 @@ class SocialModule
     )
     {
         $withTelDigits = array_key_exists(0, $refs);
-        if ($withTelDigits) {
-            $refTelDigits =& $refs[ 0 ];
+        if ( $withTelDigits ) {
+            $refTelDigits =& $refs[0];
         }
         $refTelDigits = null;
 
         $withTelPlus = array_key_exists(1, $refs);
-        if ($withTelPlus) {
-            $refTelPlus =& $refs[ 1 ];
+        if ( $withTelPlus ) {
+            $refTelPlus =& $refs[1];
         }
         $refTelPlus = null;
 
@@ -469,14 +469,14 @@ class SocialModule
     )
     {
         $withTelDigits = array_key_exists(0, $refs);
-        if ($withTelDigits) {
-            $refTelDigits =& $refs[ 0 ];
+        if ( $withTelDigits ) {
+            $refTelDigits =& $refs[0];
         }
         $refTelDigits = null;
 
         $withTelPlus = array_key_exists(1, $refs);
-        if ($withTelPlus) {
-            $refTelPlus =& $refs[ 1 ];
+        if ( $withTelPlus ) {
+            $refTelPlus =& $refs[1];
         }
         $refTelPlus = null;
 
@@ -512,14 +512,14 @@ class SocialModule
     )
     {
         $withTelDigits = array_key_exists(0, $refs);
-        if ($withTelDigits) {
-            $refTelDigits =& $refs[ 0 ];
+        if ( $withTelDigits ) {
+            $refTelDigits =& $refs[0];
         }
         $refTelDigits = null;
 
         $withTelPlus = array_key_exists(1, $refs);
-        if ($withTelPlus) {
-            $refTelPlus =& $refs[ 1 ];
+        if ( $withTelPlus ) {
+            $refTelPlus =& $refs[1];
         }
         $refTelPlus = null;
 
@@ -556,20 +556,20 @@ class SocialModule
     )
     {
         $withRegionDetected = array_key_exists(0, $refs);
-        if ($withRegionDetected) {
-            $refRegionDetected =& $refs[ 0 ];
+        if ( $withRegionDetected ) {
+            $refRegionDetected =& $refs[0];
         }
         $refRegionDetected = null;
 
         $withTelDigits = array_key_exists(1, $refs);
-        if ($withTelDigits) {
-            $refTelDigits =& $refs[ 1 ];
+        if ( $withTelDigits ) {
+            $refTelDigits =& $refs[1];
         }
         $refTelDigits = null;
 
         $withTelPlus = array_key_exists(2, $refs);
-        if ($withTelPlus) {
-            $refTelPlus =& $refs[ 2 ];
+        if ( $withTelPlus ) {
+            $refTelPlus =& $refs[2];
         }
         $refTelPlus = null;
 

@@ -58,7 +58,7 @@ trait HasTraceOverrideTrait
 
         $file = $this->file ?? $this->getFile();
 
-        if (null !== $dirRoot) {
+        if ( null !== $dirRoot ) {
             $file = $theFs->path_relative(
                 $file,
                 $dirRoot,
@@ -88,14 +88,14 @@ trait HasTraceOverrideTrait
 
         $trace = $this->trace ?? $this->getTrace();
 
-        if (null !== $dirRoot) {
+        if ( null !== $dirRoot ) {
             foreach ( $trace as $i => $frame ) {
-                if (! isset($frame[ 'file' ])) {
+                if ( ! isset($frame['file']) ) {
                     continue;
                 }
 
-                $trace[ $i ][ 'file' ] = $theFs->path_relative(
-                    $frame[ 'file' ],
+                $trace[$i]['file'] = $theFs->path_relative(
+                    $frame['file'],
                     $dirRoot,
                     '/'
                 );
@@ -111,10 +111,10 @@ trait HasTraceOverrideTrait
 
         $dirRoot = $dirRoot ?? Lib::debug()->staticDirRoot();
 
-        if (null === $this->trace) {
+        if ( null === $this->trace ) {
             $traceAsString = $this->getTraceAsString();
 
-            if (null !== $dirRoot) {
+            if ( null !== $dirRoot ) {
                 $fileRootRealpath = $theType->realpath($dirRoot)->orThrow();
 
                 $traceAsString = str_replace($fileRootRealpath . DIRECTORY_SEPARATOR, '', $traceAsString);
@@ -128,26 +128,26 @@ trait HasTraceOverrideTrait
         foreach ( $this->getTraceOverride($dirRoot) as $frame ) {
             $args = "";
 
-            if (isset($frame[ 'args' ])) {
+            if ( isset($frame['args']) ) {
                 $args = [];
 
-                foreach ( $frame[ 'args' ] as $arg ) {
-                    if (is_string($arg)) {
+                foreach ( $frame['args'] as $arg ) {
+                    if ( is_string($arg) ) {
                         $args[] = "'" . $arg . "'";
 
-                    } elseif (is_array($arg)) {
+                    } elseif ( is_array($arg) ) {
                         $args[] = "Array";
 
-                    } elseif (is_null($arg)) {
+                    } elseif ( is_null($arg) ) {
                         $args[] = 'NULL';
 
-                    } elseif (is_bool($arg)) {
+                    } elseif ( is_bool($arg) ) {
                         $args[] = ($arg) ? "true" : "false";
 
-                    } elseif (is_object($arg)) {
+                    } elseif ( is_object($arg) ) {
                         $args[] = get_class($arg);
 
-                    } elseif ($theType->resource($arg)->isOk([ &$ref ])) {
+                    } elseif ( $theType->resource($arg)->isOk([ &$ref ]) ) {
                         $args[] = get_resource_type($ref);
 
                     } else {
@@ -161,11 +161,11 @@ trait HasTraceOverrideTrait
             $rtn .= sprintf(
                 "#%s %s(%s): %s%s%s(%s)\n",
                 $count,
-                $frame[ 'file' ],
-                $frame[ 'line' ],
-                $frame[ 'class' ] ?? '',
-                $frame[ 'type' ] ?? '', // "->" or "::"
-                $frame[ 'function' ],
+                $frame['file'],
+                $frame['line'],
+                $frame['class'] ?? '',
+                $frame['type'] ?? '', // "->" or "::"
+                $frame['function'],
                 $args
             );
 

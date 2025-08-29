@@ -41,8 +41,11 @@ php test.php
     // ->getDirRoot()
     ->setDirRoot(__DIR__ . '/..')
     //
-    // ->isRetTrace()
-    ->setRetTrace(false)
+    // ->isHeadersAlreadySentAsync()
+    ->setHeadersAlreadySentAsync(true)
+    //
+    // ->isRetCollectTrace()
+    ->setRetCollectTrace(false)
     //
     ->useErrorReporting()
     ->useErrorLog()
@@ -71,6 +74,7 @@ php test.php
     ->useErrorHandler()
     ->useExceptionHandler()
 ;
+
 
 
 // > добавляем несколько функций для тестирования
@@ -400,18 +404,18 @@ $fn = function () use ($ffn) {
         // > [ bool, bool ]
         [
             $ret->getStatus(),
-            $ret[ 0 ],
+            $ret[0],
         ],
         // > [ mixed|throw, mixed|null, mixed|null ]
         [
             $ret->getValue($fallback = []),
             $ret->getValue($fallback = [ null ]),
-            $ret[ 1 ],
+            $ret[1],
         ],
         // > [ \stdClass[]|array[], \stdClass[] ]
         [
             $ret->getErrors($isAssociative = true),
-            $ret[ 2 ],
+            $ret[2],
         ],
         // > [ mixed|throw, mixed|NAN, mixed|throw, mixed|NAN ]
         [
@@ -431,7 +435,7 @@ $fn = function () use ($ffn) {
         // > [ bool, bool ]
         [
             $ret->getStatus(),
-            $ret[ 0 ],
+            $ret[0],
         ],
         // > [ 0: mixed|throw, 1: mixed|null, 2: mixed|null ]
         [
@@ -439,12 +443,12 @@ $fn = function () use ($ffn) {
             // $ret->getValue($fallback = []), // 0
             //
             $ret->getValue($fallback = [ null ]), // 1
-            $ret[ 1 ], // 2
+            $ret[1], // 2
         ],
         // > [ \stdClass[]|array[], \stdClass[] ]
         [
             $ret->getErrors($isAssociative = true),
-            $ret[ 2 ],
+            $ret[2],
         ],
         // > [ 0: mixed|throw, 1: mixed|throw, 2: mixed|NAN, 3: mixed|NAN ]
         [
@@ -731,8 +735,8 @@ $fn = function () use ($ffn) {
     $fnCatch = function (\Throwable $e, $input, $context, array $args = []) {
         echo '> fnCatch' . "\n";
 
-        if ($e instanceof \RuntimeException) {
-            return $args[ 2 ];
+        if ( $e instanceof \RuntimeException ) {
+            return $args[2];
         }
 
         return $e;
@@ -946,10 +950,10 @@ $fn = function () use ($ffn) {
      * @var \Gzhegow\Lib\Modules\Arr\Map\PHP8\Map $theMap
      */
     $theMap = \Gzhegow\Lib\Modules\Arr\Map\Map::new();
-    $theMap[ $stdClass = new \stdClass() ] = 1;
-    $theMap[ $array = [ 1, 2, 3 ] ] = 1;
+    $theMap[$stdClass = new \stdClass()] = 1;
+    $theMap[$array = [ 1, 2, 3 ]] = 1;
     $ffn->print($theMap);
-    $ffn->print(isset($theMap[ $stdClass ]), isset($theMap[ $array ]));
+    $ffn->print(isset($theMap[$stdClass]), isset($theMap[$array]));
     $ffn->print_array($theMap->keys(), 1);
     $ffn->print_array($theMap->values(), 2);
 };
@@ -1047,7 +1051,7 @@ $fn = function () use ($ffn) {
     $reportIndex = array_keys($report);
 
     foreach ( $report as $tag => $floats ) {
-        $report[ $tag ] = $expect[ $tag ] < array_sum($floats);
+        $report[$tag] = $expect[$tag] < array_sum($floats);
     }
 
     $ffn->print_array_multiline($report, 2);
@@ -1127,7 +1131,7 @@ $fn = function () use ($ffn) {
 
         protected function validation(array $context = []) : bool
         {
-            if ($this->foo2 !== $this->foo) {
+            if ( $this->foo2 !== $this->foo ) {
                 return false;
             }
 
@@ -1284,7 +1288,7 @@ $fn = function () use ($ffn) {
         [ [ 'x' => 100, 'y' => 200, 'z' => 300 ], [ 200, 300, 400 ] ],
     ];
 
-    foreach ( $cases as [ $a, $b ] ) {
+    foreach ( $cases as [$a, $b] ) {
         $resStrict = \Gzhegow\Lib\Lib::arr()->intersect($a, $b);
         $resNonStrict = \Gzhegow\Lib\Lib::arr()->intersect_non_strict($a, $b);
         $ffn->print(
@@ -1768,7 +1772,7 @@ $fn = function () use ($ffn) {
     $precisions = [ 0, 2 ];
 
     $modes = [];
-    $modes[ 'ROUNDING' ] = [
+    $modes['ROUNDING'] = [
         'R_AWAY_FROM_ZERO'  => _NUM_ROUND_AWAY_FROM_ZERO,
         'R_TOWARD_ZERO'     => _NUM_ROUND_TOWARD_ZERO,
         'R_TO_POSITIVE_INF' => _NUM_ROUND_TO_POSITIVE_INF,
@@ -1785,7 +1789,7 @@ $fn = function () use ($ffn) {
         $table = [];
         foreach ( $array as $v ) {
             foreach ( $precisions as $precision ) {
-                foreach ( $modes[ 'ROUNDING' ] as $n => $f ) {
+                foreach ( $modes['ROUNDING'] as $n => $f ) {
                     $vString = \Gzhegow\Lib\Lib::debug()->dump_value($v);
 
                     $nString = ".{$precision}|{$n}";
@@ -1797,7 +1801,7 @@ $fn = function () use ($ffn) {
 
                     $resString = \Gzhegow\Lib\Lib::debug()->dump_value((string) $res);
 
-                    $table[ $nString ][ $vString ] = $resString;
+                    $table[$nString][$vString] = $resString;
                 }
             }
         }
@@ -1817,7 +1821,7 @@ $fn = function () use ($ffn) {
         $table = [];
         foreach ( $array as $v ) {
             foreach ( $precisions as $precision ) {
-                foreach ( $modes[ 'ROUNDING' ] as $n => $f ) {
+                foreach ( $modes['ROUNDING'] as $n => $f ) {
                     $vString = \Gzhegow\Lib\Lib::debug()->dump_value($v);
 
                     $nString = ".{$precision}|{$n}";
@@ -1829,7 +1833,7 @@ $fn = function () use ($ffn) {
 
                     $resString = \Gzhegow\Lib\Lib::debug()->dump_value((string) $res);
 
-                    $table[ $nString ][ $vString ] = $resString;
+                    $table[$nString][$vString] = $resString;
                 }
             }
         }
@@ -2022,15 +2026,15 @@ $fn = function () use ($ffn) {
     // > commented, should be the same object
     // $valuesYY[ 17 ][ 0 ] = clone $valuesYY[ 17 ][ 0 ];
     //
-    $valuesYY[ 17 ][ 1 ] = clone $valuesYY[ 17 ][ 1 ];
-    $valuesYY[ 18 ][ 0 ] = clone $valuesYY[ 18 ][ 0 ];
-    $valuesYY[ 18 ][ 1 ] = clone $valuesYY[ 18 ][ 1 ];
-    $valuesYY[ 18 ][ 2 ] = clone $valuesYY[ 18 ][ 2 ];
-    $valuesYY[ 18 ][ 3 ] = clone $valuesYY[ 18 ][ 3 ];
-    $valuesYY[ 19 ][ 0 ] = clone $valuesYY[ 19 ][ 0 ];
-    $valuesYY[ 19 ][ 1 ] = clone $valuesYY[ 19 ][ 1 ];
-    $valuesYY[ 19 ][ 2 ] = clone $valuesYY[ 19 ][ 2 ];
-    $valuesYY[ 19 ][ 3 ] = clone $valuesYY[ 19 ][ 3 ];
+    $valuesYY[17][1] = clone $valuesYY[17][1];
+    $valuesYY[18][0] = clone $valuesYY[18][0];
+    $valuesYY[18][1] = clone $valuesYY[18][1];
+    $valuesYY[18][2] = clone $valuesYY[18][2];
+    $valuesYY[18][3] = clone $valuesYY[18][3];
+    $valuesYY[19][0] = clone $valuesYY[19][0];
+    $valuesYY[19][1] = clone $valuesYY[19][1];
+    $valuesYY[19][2] = clone $valuesYY[19][2];
+    $valuesYY[19][3] = clone $valuesYY[19][3];
 
     $valuesY = array_merge(...$valuesYY);
 
@@ -2072,8 +2076,8 @@ $fn = function () use ($ffn) {
                 $row = $yKey;
                 $col = $xKey;
 
-                $table[ $row ][ $col ] = "{$result} ? {$fnCmpName}";
-                $tableSize[ $row ][ $col ] = "{$resultSize} ? {$fnCmpSizeName}";
+                $table[$row][$col] = "{$result} ? {$fnCmpName}";
+                $tableSize[$row][$col] = "{$resultSize} ? {$fnCmpSizeName}";
 
                 $yi++;
             }
@@ -4306,7 +4310,7 @@ $fn = function () use ($ffn) {
     $precisions = [ 0, 2 ];
 
     $modes = [];
-    $modes[ 'ROUNDING' ] = [
+    $modes['ROUNDING'] = [
         'R_AWAY_FROM_ZERO'  => _NUM_ROUND_AWAY_FROM_ZERO,
         'R_TOWARD_ZERO'     => _NUM_ROUND_TOWARD_ZERO,
         'R_TO_POSITIVE_INF' => _NUM_ROUND_TO_POSITIVE_INF,
@@ -4323,7 +4327,7 @@ $fn = function () use ($ffn) {
         $table = [];
         foreach ( $array as $v ) {
             foreach ( $precisions as $precision ) {
-                foreach ( $modes[ 'ROUNDING' ] as $n => $f ) {
+                foreach ( $modes['ROUNDING'] as $n => $f ) {
                     $vString = \Gzhegow\Lib\Lib::debug()->dump_value($v);
 
                     $nString = ".{$precision}|{$n}";
@@ -4335,7 +4339,7 @@ $fn = function () use ($ffn) {
 
                     $resString = \Gzhegow\Lib\Lib::debug()->dump_value($res);
 
-                    $table[ $nString ][ $vString ] = $resString;
+                    $table[$nString][$vString] = $resString;
                 }
             }
         }
@@ -4355,7 +4359,7 @@ $fn = function () use ($ffn) {
         $table = [];
         foreach ( $array as $v ) {
             foreach ( $precisions as $precision ) {
-                foreach ( $modes[ 'ROUNDING' ] as $n => $f ) {
+                foreach ( $modes['ROUNDING'] as $n => $f ) {
                     $vString = \Gzhegow\Lib\Lib::debug()->dump_value($v);
 
                     $nString = ".{$precision}|{$n}";
@@ -4367,7 +4371,7 @@ $fn = function () use ($ffn) {
 
                     $resString = \Gzhegow\Lib\Lib::debug()->dump_value($res);
 
-                    $table[ $nString ][ $vString ] = $resString;
+                    $table[$nString][$vString] = $resString;
                 }
             }
         }
@@ -4512,7 +4516,7 @@ $fn = function () use ($ffn) {
     $table = [];
     foreach ( $sources as $src ) {
         foreach ( $sourceProperties as $sourceProperty ) {
-            foreach ( $sourceFlags as [ $isPublic, $isStatic ] ) {
+            foreach ( $sourceFlags as [$isPublic, $isStatic] ) {
                 $status = \Gzhegow\Lib\Lib::php()->property_exists(
                     $src,
                     $sourceProperty,
@@ -4533,7 +4537,7 @@ $fn = function () use ($ffn) {
                 $tableRow = $ffn->values(' / ', $src, $sourceProperty);
                 $tableCol = $ffn->values(' / ', $tableColPublic, $tableColStatic);
 
-                $table[ $tableRow ][ $tableCol ] = $ffn->value($status);
+                $table[$tableRow][$tableCol] = $ffn->value($status);
             }
         }
     }
@@ -4572,7 +4576,7 @@ $fn = function () use ($ffn) {
     $table = [];
     foreach ( $sources as $src ) {
         foreach ( $sourceMethods as $sourceMethod ) {
-            foreach ( $sourceFlags as [ $isPublic, $isStatic ] ) {
+            foreach ( $sourceFlags as [$isPublic, $isStatic] ) {
                 $status = \Gzhegow\Lib\Lib::php()->method_exists(
                     $src,
                     $sourceMethod,
@@ -4593,7 +4597,7 @@ $fn = function () use ($ffn) {
                 $tableRow = $ffn->values(' / ', $src, $sourceMethod);
                 $tableCol = $ffn->values(' / ', $tableColPublic, $tableColStatic);
 
-                $table[ $tableRow ][ $tableCol ] = $ffn->value($status);
+                $table[$tableRow][$tableCol] = $ffn->value($status);
             }
         }
     }
@@ -4628,55 +4632,55 @@ $fn = function () use ($ffn) {
         $tableRow = $ffn->value($src);
 
         $status = \Gzhegow\Lib\Lib::php()->type_method_string($src)->isOk([ &$result ]);
-        $table1[ $tableRow ][ 'method_string' ] = $ffn->value($result);
+        $table1[$tableRow]['method_string'] = $ffn->value($result);
 
         $status = \Gzhegow\Lib\Lib::php()->type_method_array($src)->isOk([ &$result ]);
-        $table1[ $tableRow ][ 'method_array' ] = $ffn->value($result);
+        $table1[$tableRow]['method_array'] = $ffn->value($result);
 
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable($src, null)->isOk([ &$result ]);
-        $table2[ $tableRow ][ 'callable' ] = $ffn->value($result);
-        $table3[ $tableRow ][ 'callable' ] = $ffn->value($result);
-        $table4[ $tableRow ][ 'callable' ] = $ffn->value($result);
+        $table2[$tableRow]['callable'] = $ffn->value($result);
+        $table3[$tableRow]['callable'] = $ffn->value($result);
+        $table4[$tableRow]['callable'] = $ffn->value($result);
 
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_object($src, null)->isOk([ &$result ]);
-        $table2[ $tableRow ][ 'callable_object' ] = $ffn->value($result);
+        $table2[$tableRow]['callable_object'] = $ffn->value($result);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_object_closure($src, null)->isOk([ &$result ]);
-        $table2[ $tableRow ][ 'callable_object_closure' ] = $ffn->value($result);
+        $table2[$tableRow]['callable_object_closure'] = $ffn->value($result);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_object_invokable($src, null)->isOk([ &$result ]);
-        $table2[ $tableRow ][ 'callable_object_invokable' ] = $ffn->value($result);
+        $table2[$tableRow]['callable_object_invokable'] = $ffn->value($result);
 
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_array($src, null)->isOk([ &$result ]);
-        $table3[ $tableRow ][ 'callable_array' ] = $ffn->value($result);
+        $table3[$tableRow]['callable_array'] = $ffn->value($result);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method($src, null)->isOk([ &$result ]);
-        $table3[ $tableRow ][ 'callable_array_method' ] = $ffn->value($result);
+        $table3[$tableRow]['callable_array_method'] = $ffn->value($result);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_static($src, null)->isOk([ &$result ]);
-        $table3[ $tableRow ][ 'callable_array_method_static' ] = $ffn->value($result);
+        $table3[$tableRow]['callable_array_method_static'] = $ffn->value($result);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_non_static($src, null)->isOk([ &$result ]);
-        $table3[ $tableRow ][ 'callable_array_method_non_static' ] = $ffn->value($result);
+        $table3[$tableRow]['callable_array_method_non_static'] = $ffn->value($result);
 
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_string($src, null)->isOk([ &$result ]);
-        $table4[ $tableRow ][ 'callable_string' ] = $ffn->value($result);
+        $table4[$tableRow]['callable_string'] = $ffn->value($result);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function($src)->isOk([ &$result ]);
-        $table4[ $tableRow ][ 'callable_string_function' ] = $ffn->value($result);
+        $table4[$tableRow]['callable_string_function'] = $ffn->value($result);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_internal($src)->isOk([ &$result ]);
-        $table4[ $tableRow ][ 'callable_string_function_internal' ] = $ffn->value($result);
+        $table4[$tableRow]['callable_string_function_internal'] = $ffn->value($result);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_non_internal($src)->isOk([ &$result ]);
-        $table4[ $tableRow ][ 'callable_string_function_non_internal' ] = $ffn->value($result);
+        $table4[$tableRow]['callable_string_function_non_internal'] = $ffn->value($result);
 
         $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static($src, null)->isOk([ &$result ]);
-        $table4[ $tableRow ][ 'callable_string_method_static' ] = $ffn->value($result);
+        $table4[$tableRow]['callable_string_method_static'] = $ffn->value($result);
     }
     // dd(\Gzhegow\Lib\Lib::debug()->print_table($table1, 1));
     // dd(\Gzhegow\Lib\Lib::debug()->print_table($table2, 1));
@@ -4705,11 +4709,11 @@ $fn = function () use ($ffn) {
     foreach ( $sourceClasses as $sourceClass ) {
         $sourceObject = new $sourceClass();
 
-        $sources[ 0 ][ $sourceClass ] = [
+        $sources[0][$sourceClass] = [
             $sourceClass, // class
             $sourceObject, // object
         ];
-        $sources[ 1 ][ $sourceClass ] = [
+        $sources[1][$sourceClass] = [
             $sourceClass . '::publicMethod', // 'class::publicMethod'
             $sourceClass . '::protectedMethod', // 'class::protectedMethod'
             $sourceClass . '::privateMethod', // 'class::privateMethod'
@@ -4722,7 +4726,7 @@ $fn = function () use ($ffn) {
             $sourceClass . '::__callStatic', // 'class::__callStatic'
             $sourceClass . '::__invoke', // 'class::__invoke'
         ];
-        $sources[ 2 ][ $sourceClass ] = [
+        $sources[2][$sourceClass] = [
             [ $sourceClass, 'publicMethod' ], // '[ class, publicMethod ]'
             [ $sourceClass, 'protectedMethod' ], // '[ class, protectedMethod ]'
             [ $sourceClass, 'privateMethod' ], // '[ class, privateMethod ]'
@@ -4735,7 +4739,7 @@ $fn = function () use ($ffn) {
             [ $sourceClass, '__callStatic' ], // '[ class, __callStatic ]'
             [ $sourceClass, '__invoke' ], // '[ class, __invoke ]'
         ];
-        $sources[ 3 ][ $sourceClass ] = [
+        $sources[3][$sourceClass] = [
             [ $sourceObject, 'publicMethod' ], // '[ object, publicMethod ]'
             [ $sourceObject, 'protectedMethod' ], // '[ object, protectedMethod ]'
             [ $sourceObject, 'privateMethod' ], // '[ object, privateMethod ]'
@@ -4758,10 +4762,10 @@ $fn = function () use ($ffn) {
                 $tableRow = $ffn->value($src);
 
                 $status = \Gzhegow\Lib\Lib::php()->type_method_array($src)->isOk([ &$result ]);
-                $table[ $tableRow ][ 'method_array' ] = $ffn->value($result);
+                $table[$tableRow]['method_array'] = $ffn->value($result);
 
                 $status = \Gzhegow\Lib\Lib::php()->type_method_string($src)->isOk([ &$result ]);
-                $table[ $tableRow ][ 'method_string' ] = $ffn->value($result);
+                $table[$tableRow]['method_string'] = $ffn->value($result);
             }
         }
     }
@@ -4788,60 +4792,60 @@ $fn = function () use ($ffn) {
                 foreach ( $sourceScopes as $scopeKey => $scope ) {
                     $tableCol = $ffn->values(' / ', 'callable', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable($src, $scope)->isOk([ &$result ]);
-                    $table1[ $tableRow ][ $tableCol ] = $ffn->value($status);
-                    $table2[ $tableRow ][ $tableCol ] = $ffn->value($status);
-                    $table3[ $tableRow ][ $tableCol ] = $ffn->value($status);
+                    $table1[$tableRow][$tableCol] = $ffn->value($status);
+                    $table2[$tableRow][$tableCol] = $ffn->value($status);
+                    $table3[$tableRow][$tableCol] = $ffn->value($status);
 
 
                     $tableCol = $ffn->values(' / ', 'callable_object', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_object($src, $scope)->isOk([ &$result ]);
-                    $table1[ $tableRow ][ $tableCol ] = $ffn->value($result);
+                    $table1[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_object_closure', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_object_closure($src, $scope)->isOk([ &$result ]);
-                    $table1[ $tableRow ][ $tableCol ] = $ffn->value($result);
+                    $table1[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_object_invokable', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_object_invokable($src, $scope)->isOk([ &$result ]);
-                    $table1[ $tableRow ][ $tableCol ] = $ffn->value($result);
+                    $table1[$tableRow][$tableCol] = $ffn->value($result);
 
 
                     $tableCol = $ffn->values(' / ', 'callable_array', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_array($src, $scope)->isOk([ &$result ]);
-                    $table2[ $tableRow ][ $tableCol ] = $ffn->value($result);
+                    $table2[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_array_method', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method($src, $scope)->isOk([ &$result ]);
-                    $table2[ $tableRow ][ $tableCol ] = $ffn->value($result);
+                    $table2[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_array_method_static', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_static($src, $scope)->isOk([ &$result ]);
-                    $table2[ $tableRow ][ $tableCol ] = $ffn->value($result);
+                    $table2[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_array_method_non_static', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_non_static($src, $scope)->isOk([ &$result ]);
-                    $table2[ $tableRow ][ $tableCol ] = $ffn->value($result);
+                    $table2[$tableRow][$tableCol] = $ffn->value($result);
 
 
                     $tableCol = $ffn->values(' / ', 'callable_string', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_string($src, $scope)->isOk([ &$result ]);
-                    $table3[ $tableRow ][ $tableCol ] = $ffn->value($result);
+                    $table3[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_string_function', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function($src)->isOk([ &$result ]);
-                    $table3[ $tableRow ][ $tableCol ] = $ffn->value($result);
+                    $table3[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_string_function_internal', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_internal($src)->isOk([ &$result ]);
-                    $table3[ $tableRow ][ $tableCol ] = $ffn->value($result);
+                    $table3[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_string_function_non_internal', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_non_internal($src)->isOk([ &$result ]);
-                    $table3[ $tableRow ][ $tableCol ] = $ffn->value($result);
+                    $table3[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_string_method_static', $scopeKey);
                     $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static($src, $scope)->isOk([ &$result ]);
-                    $table3[ $tableRow ][ $tableCol ] = $ffn->value($result);
+                    $table3[$tableRow][$tableCol] = $ffn->value($result);
                 }
             }
         }
@@ -5599,17 +5603,17 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    $serverHttpHost = $_SERVER[ 'HTTP_HOST' ] ?? null;
-    $serverRequestUri = $_SERVER[ 'REQUEST_URI' ] ?? null;
-    $serverQueryString = $_SERVER[ 'QUERY_STRING' ] ?? null;
+    $serverHttpHost = $_SERVER['HTTP_HOST'] ?? null;
+    $serverRequestUri = $_SERVER['REQUEST_URI'] ?? null;
+    $serverQueryString = $_SERVER['QUERY_STRING'] ?? null;
 
     $hasServerHttpHost = (null === $serverHttpHost);
     $hasServerRequestUri = (null === $serverRequestUri);
     $hasServerQueryString = (null === $serverQueryString);
 
-    $_SERVER[ 'HTTP_HOST' ] = 'test.local:80';
-    $_SERVER[ 'REQUEST_URI' ] = '/';
-    $_SERVER[ 'QUERY_STRING' ] = '';
+    $_SERVER['HTTP_HOST'] = 'test.local:80';
+    $_SERVER['REQUEST_URI'] = '/';
+    $_SERVER['QUERY_STRING'] = '';
 
 
     $status = \Gzhegow\Lib\Lib::url()->type_url($src = 'https://google.com/hello/world')->isOk([ &$result ]);
@@ -5703,13 +5707,13 @@ $fn = function () use ($ffn) {
     $ffn->print($src, $status, $result);
 
 
-    $_SERVER[ 'HTTP_HOST' ] = $serverHttpHost;
-    $_SERVER[ 'REQUEST_URI' ] = $serverRequestUri;
-    $_SERVER[ 'QUERY_STRING' ] = $serverQueryString;
+    $_SERVER['HTTP_HOST'] = $serverHttpHost;
+    $_SERVER['REQUEST_URI'] = $serverRequestUri;
+    $_SERVER['QUERY_STRING'] = $serverQueryString;
 
-    if (! $hasServerHttpHost) unset($_SERVER[ 'HTTP_HOST' ]);
-    if (! $hasServerRequestUri) unset($_SERVER[ 'REQUEST_URI' ]);
-    if (! $hasServerQueryString) unset($_SERVER[ 'QUERY_STRING' ]);
+    if ( ! $hasServerHttpHost ) unset($_SERVER['HTTP_HOST']);
+    if ( ! $hasServerRequestUri ) unset($_SERVER['REQUEST_URI']);
+    if ( ! $hasServerQueryString ) unset($_SERVER['QUERY_STRING']);
 };
 $test = $ffn->test($fn);
 $test->expectStdout('

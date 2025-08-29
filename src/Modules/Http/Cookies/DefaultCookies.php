@@ -52,7 +52,7 @@ class DefaultCookies implements CookiesInterface
         $httpHeaders = $theHttp->headers_list();
 
         foreach ( $httpHeaders as $httpHeader ) {
-            if ('SET-COOKIE' !== $httpHeader->getName()) {
+            if ( 'SET-COOKIE' !== $httpHeader->getName() ) {
                 continue;
             }
 
@@ -72,8 +72,8 @@ class DefaultCookies implements CookiesInterface
 
         $this->useQueueMode = $useQueueMode;
 
-        if (! $this->useQueueMode) {
-            if ([] !== $this->cookiesList) {
+        if ( ! $this->useQueueMode ) {
+            if ( [] !== $this->cookiesList ) {
                 $this->endFlush();
             }
         }
@@ -111,8 +111,8 @@ class DefaultCookies implements CookiesInterface
 
         $cookieIndex = $this->indexCookie($cookieName, $cookiePath, $cookieDomain);
 
-        if (isset($this->cookiesIndexByIndex[ $cookieIndex ])) {
-            $cookieIds = $this->cookiesIndexByIndex[ $cookieIndex ];
+        if ( isset($this->cookiesIndexByIndex[$cookieIndex]) ) {
+            $cookieIds = $this->cookiesIndexByIndex[$cookieIndex];
             $cookieId = key($cookieIds);
 
             $refId = $cookieId;
@@ -135,10 +135,10 @@ class DefaultCookies implements CookiesInterface
 
         $index = $this->indexCookie($cookieName, $cookiePath, $cookieDomain);
 
-        if (isset($this->cookiesIndexByIndex[ $index ])) {
+        if ( isset($this->cookiesIndexByIndex[$index]) ) {
             $list = [];
-            foreach ( $this->cookiesIndexByIndex[ $index ] as $cookieId => $bool ) {
-                $list[ $cookieId ] = $this->cookiesList[ $cookieId ];
+            foreach ( $this->cookiesIndexByIndex[$index] as $cookieId => $bool ) {
+                $list[$cookieId] = $this->cookiesList[$cookieId];
             }
 
             $refList = $list;
@@ -156,8 +156,8 @@ class DefaultCookies implements CookiesInterface
     {
         $cookie = null;
 
-        if (isset($this->cookiesList[ $cookieId ])) {
-            $cookie = $this->cookiesList[ $cookieId ];
+        if ( isset($this->cookiesList[$cookieId]) ) {
+            $cookie = $this->cookiesList[$cookieId];
 
             return true;
         }
@@ -170,7 +170,7 @@ class DefaultCookies implements CookiesInterface
     {
         $status = $this->has($cookieName, $cookiePath, $cookieDomain, $cookieId);
 
-        if (! $status) {
+        if ( ! $status ) {
             throw new RuntimeException(
                 [
                     ''
@@ -184,7 +184,7 @@ class DefaultCookies implements CookiesInterface
             );
         }
 
-        return $this->cookiesList[ $cookieId ];
+        return $this->cookiesList[$cookieId];
     }
 
     /**
@@ -199,7 +199,7 @@ class DefaultCookies implements CookiesInterface
 
     public function getById(int $cookieId) : HttpCookie
     {
-        return $this->cookiesList[ $cookieId ];
+        return $this->cookiesList[$cookieId];
     }
 
 
@@ -219,7 +219,7 @@ class DefaultCookies implements CookiesInterface
 
         $cookieId = $this->registerCookie($httpCookie);
 
-        if (! $this->useQueueMode) {
+        if ( ! $this->useQueueMode ) {
             $theHttp = Lib::http();
 
             call_user_func_array(
@@ -227,7 +227,7 @@ class DefaultCookies implements CookiesInterface
                 $setrawcookieArgs
             );
 
-            $this->cookiesListAlreadySent[ $cookieId ] = $httpCookie;
+            $this->cookiesListAlreadySent[$cookieId] = $httpCookie;
         }
 
         return $this;
@@ -239,27 +239,27 @@ class DefaultCookies implements CookiesInterface
      */
     public function deleteById(int $cookieId)
     {
-        if (! isset($this->cookiesList[ $cookieId ])) {
+        if ( ! isset($this->cookiesList[$cookieId]) ) {
             return null;
         }
 
-        if (isset($this->cookiesIndexById[ $cookieId ])) {
-            $cookieIndex = $this->cookiesIndexById[ $cookieId ];
+        if ( isset($this->cookiesIndexById[$cookieId]) ) {
+            $cookieIndex = $this->cookiesIndexById[$cookieId];
 
-            unset($this->cookiesIndexById[ $cookieId ]);
-            unset($this->cookiesIndexByIndex[ $cookieIndex ][ $cookieId ]);
+            unset($this->cookiesIndexById[$cookieId]);
+            unset($this->cookiesIndexByIndex[$cookieIndex][$cookieId]);
         }
 
-        $httpCookie = $this->cookiesList[ $cookieId ];
+        $httpCookie = $this->cookiesList[$cookieId];
 
-        unset($this->cookiesList[ $cookieId ]);
+        unset($this->cookiesList[$cookieId]);
 
-        if (isset($this->cookiesListAlreadySent[ $cookieId ])) {
+        if ( isset($this->cookiesListAlreadySent[$cookieId]) ) {
             $theHttp = Lib::http();
 
             $setrawcookieArgs = $httpCookie->toArraySetrawcookieArgs();
-            $setrawcookieArgs[ 1 ] = '';
-            $setrawcookieArgs[ 2 ][ 'expires' ] = time() - 99999;
+            $setrawcookieArgs[1] = '';
+            $setrawcookieArgs[2]['expires'] = time() - 99999;
 
             call_user_func_array(
                 [ $theHttp, 'setrawcookie' ],
@@ -278,7 +278,7 @@ class DefaultCookies implements CookiesInterface
     {
         $status = $this->has($cookieName, $cookiePath, $cookieDomain, $cookieId);
 
-        if ($status) {
+        if ( $status ) {
             $this->deleteById($cookieId);
         }
 
@@ -331,9 +331,9 @@ class DefaultCookies implements CookiesInterface
 
         $isHeadersSent = headers_sent();
 
-        if (! $isHeadersSent) {
+        if ( ! $isHeadersSent ) {
             foreach ( $cookieList as $cookieId => $httpCookie ) {
-                if (isset($this->cookiesListAlreadySent[ $cookieId ])) {
+                if ( isset($this->cookiesListAlreadySent[$cookieId]) ) {
                     continue;
                 }
 
@@ -342,7 +342,7 @@ class DefaultCookies implements CookiesInterface
                     $httpCookie->toArraySetrawcookieArgs()
                 );
 
-                $this->cookiesListAlreadySent[ $cookieId ] = $httpCookie;
+                $this->cookiesListAlreadySent[$cookieId] = $httpCookie;
             }
         }
 
@@ -375,13 +375,13 @@ class DefaultCookies implements CookiesInterface
 
         $index = $this->indexCookie($httpCookieName, $httpCookiePath, $httpCookieDomain);
 
-        $this->cookiesIndexById[ $id ] = $index;
-        $this->cookiesIndexByIndex[ $index ][ $id ] = true;
+        $this->cookiesIndexById[$id] = $index;
+        $this->cookiesIndexByIndex[$index][$id] = true;
 
-        $this->cookiesList[ $id ] = $httpCookie;
+        $this->cookiesList[$id] = $httpCookie;
 
-        if ($alreadySent) {
-            $this->cookiesListAlreadySent[ $id ] = $httpCookie;
+        if ( $alreadySent ) {
+            $this->cookiesListAlreadySent[$id] = $httpCookie;
         }
 
         return $id;
@@ -395,7 +395,7 @@ class DefaultCookies implements CookiesInterface
         $cookiePathStringNotEmpty = $theType->string_not_empty($cookiePath)->orThrow();
 
         $cookieDomainStringNotEmpty = '';
-        if (null !== $cookieDomain) {
+        if ( null !== $cookieDomain ) {
             $cookieDomainStringNotEmpty = $theType->string_not_empty($cookieDomain)->orThrow();
         }
 

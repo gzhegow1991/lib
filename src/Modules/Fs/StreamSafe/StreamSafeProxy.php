@@ -38,7 +38,7 @@ class StreamSafeProxy
          */
         static $map;
 
-        if (null === $map) {
+        if ( null === $map ) {
             $map = [
                 'stream_get_contents'   => 'stream_get_contents',
                 //
@@ -49,7 +49,7 @@ class StreamSafeProxy
             ];
         }
 
-        if (empty($map[ $name ])) {
+        if ( empty($map[$name]) ) {
             throw new RuntimeException(
                 [ 'Method is not exists: ' . $name ]
             );
@@ -57,11 +57,11 @@ class StreamSafeProxy
 
         $theFunc = Lib::func();
 
-        $fn = $map[ $name ];
+        $fn = $map[$name];
 
-        if (is_array($fn)) {
-            if ('@inner' === $fn[ 0 ]) {
-                $fn[ 0 ] = $this->inner;
+        if ( is_array($fn) ) {
+            if ( '@inner' === $fn[0] ) {
+                $fn[0] = $this->inner;
             }
         }
 

@@ -50,17 +50,17 @@ class FuncModule
      */
     public function func_args(array ...$arrays) : array
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return [];
         }
 
         $args = [];
 
         for ( $i = 0; $i < count($arrays); $i++ ) {
-            $args += $arrays[ $i ];
+            $args += $arrays[$i];
         }
 
-        if ([] === $args) {
+        if ( [] === $args ) {
             return [];
         }
 
@@ -70,8 +70,8 @@ class FuncModule
         $hasInt = false;
         $hasString = false;
         foreach ( $args as $i => $arg ) {
-            if (! is_int($i)) {
-                if (PHP_VERSION_ID < 80000) {
+            if ( ! is_int($i) ) {
+                if ( PHP_VERSION_ID < 80000 ) {
                     throw new LogicException(
                         [ 'PHP does not support string keys', $args, $i ]
                     );
@@ -82,14 +82,14 @@ class FuncModule
                 continue;
             }
 
-            if ($i > $max) {
+            if ( $i > $max ) {
                 $max = $i;
             }
 
             $hasInt = true;
         }
 
-        if ($hasInt && $hasString) {
+        if ( $hasInt && $hasString ) {
             throw new LogicException(
                 [
                     'The `args` should contain arguments of single type: string or int',
@@ -98,9 +98,9 @@ class FuncModule
             );
         }
 
-        if ($max >= 0) {
+        if ( $max >= 0 ) {
             for ( $i = 0; $i <= $max; $i++ ) {
-                $iArgs[ $i ] = $args[ $i ] ?? null;
+                $iArgs[$i] = $args[$i] ?? null;
             }
         }
 
@@ -115,7 +115,7 @@ class FuncModule
      */
     public function func_args_unique(array ...$arrays) : array
     {
-        if ([] === $arrays) {
+        if ( [] === $arrays ) {
             return [];
         }
 
@@ -123,16 +123,16 @@ class FuncModule
 
         for ( $i = 0; $i < count($arrays); $i++ ) {
             $argsCnt = count($args);
-            $args += $arrays[ $i ];
+            $args += $arrays[$i];
 
-            if (count($args) !== ($argsCnt + count($arrays[ $i ]))) {
+            if ( count($args) !== ($argsCnt + count($arrays[$i])) ) {
                 throw new LogicException(
                     [ 'Key intersection detected', $arrays, $i ]
                 );
             }
         }
 
-        if ([] === $args) {
+        if ( [] === $args ) {
             return [];
         }
 
@@ -142,8 +142,8 @@ class FuncModule
         $hasInt = false;
         $hasString = false;
         foreach ( $args as $i => $arg ) {
-            if (! is_int($i)) {
-                if (PHP_VERSION_ID < 80000) {
+            if ( ! is_int($i) ) {
+                if ( PHP_VERSION_ID < 80000 ) {
                     throw new LogicException(
                         [ 'PHP does not support string keys', $args, $i ]
                     );
@@ -154,14 +154,14 @@ class FuncModule
                 continue;
             }
 
-            if ($i > $max) {
+            if ( $i > $max ) {
                 $max = $i;
             }
 
             $hasInt = true;
         }
 
-        if ($hasInt && $hasString) {
+        if ( $hasInt && $hasString ) {
             throw new LogicException(
                 [
                     'The `args` should contain arguments of single type: string or int',
@@ -170,9 +170,9 @@ class FuncModule
             );
         }
 
-        if ($max >= 0) {
+        if ( $max >= 0 ) {
             for ( $i = 0; $i <= $max; $i++ ) {
-                $iArgs[ $i ] = $args[ $i ] ?? null;
+                $iArgs[$i] = $args[$i] ?? null;
             }
         }
 
@@ -192,7 +192,7 @@ class FuncModule
         $hasNewThis = (null !== $newThis);
         $hasNewScope = (null !== $newScope);
 
-        if ($hasNewThis || $hasNewScope) {
+        if ( $hasNewThis || $hasNewScope ) {
             $fn = \Closure::bind($fn, $newThis, $newScope);
         }
 
@@ -215,7 +215,7 @@ class FuncModule
         $hasNewThis = (null !== $newThis);
         $hasNewScope = (null !== $newScope);
 
-        if ($hasNewThis || $hasNewScope) {
+        if ( $hasNewThis || $hasNewScope ) {
             $fn = \Closure::bind($fn, $newThis, $newScope);
         }
 
@@ -238,7 +238,7 @@ class FuncModule
     {
         $isMaybeInternalFunction = is_string($fn) && function_exists($fn);
 
-        if (! $isMaybeInternalFunction) {
+        if ( ! $isMaybeInternalFunction ) {
             $result = call_user_func($fn, ...$args);
 
         } else {
@@ -258,11 +258,11 @@ class FuncModule
             $err = error_get_last();
             error_reporting($before);
 
-            if (null !== $err) {
-                $eMsg = $err[ 'message' ];
+            if ( null !== $err ) {
+                $eMsg = $err['message'];
             }
 
-            if (null !== $eMsg) {
+            if ( null !== $eMsg ) {
                 $eMsgKnownList = [
                     '() expects exactly '  => 19,
                     '() expects at most '  => 19,
@@ -271,14 +271,14 @@ class FuncModule
 
                 $isKnown = false;
                 foreach ( $eMsgKnownList as $eSubstr => $eSubstrLen ) {
-                    if (false !== ($pos = strpos($eMsg, $eSubstr))) {
+                    if ( false !== ($pos = strpos($eMsg, $eSubstr)) ) {
                         $isKnown = true;
 
                         break;
                     }
                 }
 
-                if ($isKnown) {
+                if ( $isKnown ) {
                     $max = (int) substr($eMsg, $pos + $eSubstrLen);
 
                     array_splice($args, $max);
@@ -286,7 +286,7 @@ class FuncModule
                     $result = call_user_func($fn, ...$args);
                 }
 
-                if ($ex && ! $isKnown) {
+                if ( $ex && ! $isKnown ) {
                     throw new RuntimeException($ex);
                 }
             }
@@ -310,7 +310,7 @@ class FuncModule
 
         $isIntKeys = array_key_exists(0, $fnArgs);
 
-        if (! ($isMaybeInternalFunction || ! $isIntKeys)) {
+        if ( ! ($isMaybeInternalFunction || ! $isIntKeys) ) {
             $result = call_user_func_array($fn, $fnArgs);
 
         } else {
@@ -330,11 +330,11 @@ class FuncModule
             $err = error_get_last();
             error_reporting($before);
 
-            if (null !== $err) {
-                $eMsg = $err[ 'message' ];
+            if ( null !== $err ) {
+                $eMsg = $err['message'];
             }
 
-            if (null !== $eMsg) {
+            if ( null !== $eMsg ) {
                 $eMsgKnownList = [
                     '() expects exactly '  => 19,
                     '() expects at most '  => 19,
@@ -343,18 +343,18 @@ class FuncModule
 
                 $isKnown = false;
                 foreach ( $eMsgKnownList as $eSubstr => $eSubstrLen ) {
-                    if (false !== ($pos = strpos($eMsg, $eSubstr))) {
+                    if ( false !== ($pos = strpos($eMsg, $eSubstr)) ) {
                         $isKnown = true;
 
                         break;
                     }
                 }
 
-                if ($ex && ! $isKnown) {
+                if ( $ex && ! $isKnown ) {
                     throw new RuntimeException($ex);
                 }
 
-                if ($isKnown) {
+                if ( $isKnown ) {
                     $max = (int) substr($eMsg, $pos + $eSubstrLen);
 
                     array_splice($fnArgs, $max);
@@ -407,7 +407,7 @@ class FuncModule
      */
     public function throttle(int $throttleMs, $fn) : \Closure
     {
-        if ($throttleMs <= 0) {
+        if ( $throttleMs <= 0 ) {
             throw new LogicException(
                 [ 'The `delayMs` should be a positive integer', $throttleMs ]
             );
@@ -423,7 +423,7 @@ class FuncModule
         ) : array {
             $now = microtime(true);
 
-            if (($now - $lastCall) >= $throttleSeconds) {
+            if ( ($now - $lastCall) >= $throttleSeconds ) {
                 $lastCall = $now;
 
                 $result = call_user_func_array($fn, $args);

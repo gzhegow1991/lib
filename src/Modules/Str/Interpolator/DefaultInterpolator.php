@@ -10,7 +10,7 @@ class DefaultInterpolator implements InterpolatorInterface
         $replacements = [];
 
         foreach ( $placeholders as $key => $value ) {
-            $replacements[ "{{" . $key . "}}" ] = $value;
+            $replacements["{{" . $key . "}}"] = $value;
         }
 
         $result = strtr($string, $replacements);
@@ -26,11 +26,11 @@ class DefaultInterpolator implements InterpolatorInterface
     public function interpolateMessage($message) : string
     {
         $messageArray = (array) $message;
-        $messageString = $messageArray[ 'message' ] ?? $messageArray[ 0 ] ?? '';
+        $messageString = $messageArray['message'] ?? $messageArray[0] ?? '';
 
         $replacements = [];
         foreach ( $messageArray as $key => $value ) {
-            $replacements[ "{{" . $key . "}}" ] = $value;
+            $replacements["{{" . $key . "}}"] = $value;
         }
 
         $result = strtr($messageString, $replacements);

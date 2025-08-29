@@ -15,25 +15,25 @@ class Ret
     /**
      * @var bool
      */
-    protected static $withTrace = false;
+    protected static $isCollectTrace = false;
 
     /**
-     * @param int|false|null $withTrace
+     * @param int|false|null $isCollectTrace
      */
-    public static function staticWithTrace(?bool $withTrace = null) : bool
+    public static function staticIsCollectTrace(?bool $isCollectTrace = null) : bool
     {
-        $last = static::$withTrace;
+        $last = static::$isCollectTrace;
 
-        if (null !== $withTrace) {
-            if (false === $withTrace) {
-                static::$withTrace = false;
+        if ( null !== $isCollectTrace ) {
+            if ( false === $isCollectTrace ) {
+                static::$isCollectTrace = false;
 
             } else {
-                static::$withTrace = (bool) $withTrace;
+                static::$isCollectTrace = (bool) $isCollectTrace;
             }
         }
 
-        static::$withTrace = static::$withTrace ?? false;
+        static::$isCollectTrace = static::$isCollectTrace ?? false;
 
         return $last;
     }
@@ -89,7 +89,7 @@ class Ret
      */
     public static function val($value)
     {
-        if ($value instanceof self) {
+        if ( $value instanceof self ) {
             throw new LogicException(
                 [ 'The `value` should not be instance of: ' . self::class, $value ]
             );
@@ -121,18 +121,18 @@ class Ret
 
         $instance = new $className();
 
-        if ($throwableArg instanceof self) {
+        if ( $throwableArg instanceof self ) {
             $instance->mergeFrom($throwableArg);
 
-            if ([] !== $throwableArgs) {
+            if ( [] !== $throwableArgs ) {
                 $fileLine = $fileLine ?: Lib::debug()->file_line();
 
                 $instance->addError(null, $fileLine, ...$throwableArgs);
 
-            } elseif (([] !== $fileLine) && ([] !== $throwableArg->errorsRaw)) {
+            } elseif ( ([] !== $fileLine) && ([] !== $throwableArg->errorsRaw) ) {
                 $errorLast = end($throwableArg->errorsRaw);
 
-                $instance->doAddError($errorLast[ 'trace' ], $fileLine, ...$errorLast[ 'throwable_args' ]);
+                $instance->doAddError($errorLast['trace'], $fileLine, ...$errorLast['throwable_args']);
             }
 
         } else {
@@ -152,13 +152,13 @@ class Ret
      */
     public static function ok(?array $fallback, $value)
     {
-        if ($value instanceof self) {
+        if ( $value instanceof self ) {
             throw new LogicException(
                 [ 'The `value` should not be instance of: ' . self::class, $value ]
             );
         }
 
-        if (null === $fallback) {
+        if ( null === $fallback ) {
             $className = (PHP_VERSION_ID >= 80000)
                 ? '\Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret'
                 : '\Gzhegow\Lib\Modules\Type\Ret\PHP7\Ret';
@@ -188,28 +188,28 @@ class Ret
 
         $instance = new $className();
 
-        if ($throwableArg instanceof self) {
+        if ( $throwableArg instanceof self ) {
             $instance->mergeFrom($throwableArg);
 
-            if ([] !== $throwableArgs) {
+            if ( [] !== $throwableArgs ) {
                 $instance->doAddError(null, $fileLine, ...$throwableArgs);
 
-            } elseif (([] !== $fileLine) && ([] !== $throwableArg->errorsRaw)) {
+            } elseif ( ([] !== $fileLine) && ([] !== $throwableArg->errorsRaw) ) {
                 $errorLast = end($throwableArg->errorsRaw);
 
-                $instance->doAddError($errorLast[ 'trace' ], $fileLine, ...$errorLast[ 'throwable_args' ]);
+                $instance->doAddError($errorLast['trace'], $fileLine, ...$errorLast['throwable_args']);
             }
 
         } else {
             $instance->doAddError(null, $fileLine, $throwableArg, ...$throwableArgs);
         }
 
-        if (null === $fallback) {
+        if ( null === $fallback ) {
             return $instance;
         }
 
-        if ([] !== $fallback) {
-            return $fallback[ 0 ];
+        if ( [] !== $fallback ) {
+            return $fallback[0];
         }
 
         return $instance->orThrow();
@@ -226,8 +226,8 @@ class Ret
      */
     public function getValue(array $fallback = [])
     {
-        if ([] === $this->value) {
-            if ([] !== $fallback) {
+        if ( [] === $this->value ) {
+            if ( [] !== $fallback ) {
                 [ $fallback ] = $fallback;
 
                 return $fallback;
@@ -238,7 +238,7 @@ class Ret
             );
         }
 
-        return $this->value[ 0 ];
+        return $this->value[0];
     }
 
 
@@ -271,15 +271,15 @@ class Ret
 
         $traceValid = null
             ?? ($trace ?: null)
-            ?? (static::staticWithTrace() ? $theDebug->trace(2) : null);
+            ?? (static::staticIsCollectTrace() ? $theDebug->trace(2) : null);
 
         $fileLineValid = null
             ?? ($fileLine ?: null)
             ?? $theDebug->file_line(2, $traceValid);
 
         foreach ( $throwableArgs as $i => $throwableArg ) {
-            if (null === $throwableArg) {
-                unset($throwableArgs[ $i ]);
+            if ( null === $throwableArg ) {
+                unset($throwableArgs[$i]);
             }
         }
 
@@ -300,11 +300,11 @@ class Ret
      */
     public function mergeFrom(self $retFrom)
     {
-        if ([] !== $retFrom->value) {
+        if ( [] !== $retFrom->value ) {
             $this->value = $retFrom->value;
         }
 
-        if ([] !== $retFrom->errorsRaw) {
+        if ( [] !== $retFrom->errorsRaw ) {
             $this->errorsRaw = array_merge(
                 $this->errorsRaw,
                 $retFrom->errorsRaw
@@ -319,11 +319,11 @@ class Ret
      */
     public function mergeTo(self $retTo)
     {
-        if ([] !== $this->value) {
+        if ( [] !== $this->value ) {
             $retTo->value = $this->value;
         }
 
-        if ([] !== $this->errorsRaw) {
+        if ( [] !== $this->errorsRaw ) {
             $retTo->errorsRaw = array_merge(
                 $retTo->errorsRaw,
                 $this->errorsRaw
@@ -342,12 +342,12 @@ class Ret
      */
     public function isErr(array $refs = []) : bool
     {
-        if (array_key_exists(0, $refs)) $refErrors =& $refs[ 0 ];
-        if (array_key_exists(1, $refs)) $refRet =& $refs[ 1 ];
+        if ( array_key_exists(0, $refs) ) $refErrors =& $refs[0];
+        if ( array_key_exists(1, $refs) ) $refRet =& $refs[1];
         $refErrors = [];
         $refRet = $this;
 
-        if ([] !== $this->errorsRaw) {
+        if ( [] !== $this->errorsRaw ) {
             $refErrors = $this->fetchErrors();
 
             return true;
@@ -364,13 +364,13 @@ class Ret
      */
     public function isOk(array $refs = []) : bool
     {
-        if (array_key_exists(0, $refs)) $refValue =& $refs[ 0 ];
-        if (array_key_exists(1, $refs)) $refRet =& $refs[ 1 ];
+        if ( array_key_exists(0, $refs) ) $refValue =& $refs[0];
+        if ( array_key_exists(1, $refs) ) $refRet =& $refs[1];
         $refValue = null;
         $refRet = $this;
 
-        if ([] !== $this->value) {
-            $refValue = $this->value[ 0 ];
+        if ( [] !== $this->value ) {
+            $refValue = $this->value[0];
 
             return true;
         }
@@ -387,16 +387,16 @@ class Ret
      */
     public function isFail(array $refs = []) : bool
     {
-        if (array_key_exists(0, $refs)) $refErrors =& $refs[ 0 ];
-        if (array_key_exists(1, $refs)) $refRet =& $refs[ 1 ];
+        if ( array_key_exists(0, $refs) ) $refErrors =& $refs[0];
+        if ( array_key_exists(1, $refs) ) $refRet =& $refs[1];
         $refErrors = [];
         $refRet = $this;
 
-        if ([] === $this->errorsRaw) {
+        if ( [] === $this->errorsRaw ) {
             return false;
         }
 
-        if ([] !== $this->value) {
+        if ( [] !== $this->value ) {
             return false;
         }
 
@@ -414,21 +414,21 @@ class Ret
      */
     public function isWarn(array $refs = []) : bool
     {
-        if (array_key_exists(0, $refs)) $refValue =& $refs[ 0 ];
-        if (array_key_exists(1, $refs)) $refErrors =& $refs[ 1 ];
-        if (array_key_exists(2, $refs)) $refRet =& $refs[ 2 ];
+        if ( array_key_exists(0, $refs) ) $refValue =& $refs[0];
+        if ( array_key_exists(1, $refs) ) $refErrors =& $refs[1];
+        if ( array_key_exists(2, $refs) ) $refRet =& $refs[2];
         $refErrors = [];
         $refRet = $this;
 
-        if ([] === $this->errorsRaw) {
+        if ( [] === $this->errorsRaw ) {
             return false;
         }
 
-        if ([] === $this->value) {
+        if ( [] === $this->value ) {
             return false;
         }
 
-        $refValue = $this->value[ 0 ];
+        $refValue = $this->value[0];
         $refErrors = $this->fetchErrors();
 
         return true;
@@ -440,11 +440,11 @@ class Ret
      */
     public function orThrow($throwableArg = null, array $fileLine = [], ...$throwableArgs)
     {
-        if ([] !== $this->value) {
-            return $this->value[ 0 ];
+        if ( [] !== $this->value ) {
+            return $this->value[0];
         }
 
-        if (null !== $throwableArg) {
+        if ( null !== $throwableArg ) {
             $this->doAddError(null, $fileLine, $throwableArg, ...$throwableArgs);
         }
 
@@ -458,15 +458,15 @@ class Ret
      */
     public function orFallback(array $fallback = [], $throwableArg = null, array $fileLine = [], ...$throwableArgs)
     {
-        if ([] !== $this->value) {
-            return $this->value[ 0 ];
+        if ( [] !== $this->value ) {
+            return $this->value[0];
         }
 
-        if ([] !== $fallback) {
-            return $fallback[ 0 ];
+        if ( [] !== $fallback ) {
+            return $fallback[0];
         }
 
-        if (null !== $throwableArg) {
+        if ( null !== $throwableArg ) {
             $this->doAddError(null, $fileLine, $throwableArg, ...$throwableArgs);
         }
 
@@ -479,15 +479,15 @@ class Ret
      */
     public function orNull(?self &$refRetTo = null)
     {
-        if (null === $refRetTo) {
+        if ( null === $refRetTo ) {
             $refRetTo = $this;
 
         } else {
             $this->mergeTo($refRetTo);
         }
 
-        if ([] !== $this->value) {
-            return $this->value[ 0 ];
+        if ( [] !== $this->value ) {
+            return $this->value[0];
         }
 
         return null;
@@ -498,15 +498,15 @@ class Ret
      */
     public function orFalse(?self &$refRetTo = null)
     {
-        if (null === $refRetTo) {
+        if ( null === $refRetTo ) {
             $refRetTo = $this;
 
         } else {
             $this->mergeTo($refRetTo);
         }
 
-        if ([] !== $this->value) {
-            return $this->value[ 0 ];
+        if ( [] !== $this->value ) {
+            return $this->value[0];
         }
 
         return false;
@@ -517,15 +517,15 @@ class Ret
      */
     public function orNan(?self &$refRetTo = null)
     {
-        if (null === $refRetTo) {
+        if ( null === $refRetTo ) {
             $refRetTo = $this;
 
         } else {
             $this->mergeTo($refRetTo);
         }
 
-        if ([] !== $this->value) {
-            return $this->value[ 0 ];
+        if ( [] !== $this->value ) {
+            return $this->value[0];
         }
 
         return NAN;
@@ -536,15 +536,15 @@ class Ret
      */
     public function orEmptyString(?self &$refRetTo = null)
     {
-        if (null === $refRetTo) {
+        if ( null === $refRetTo ) {
             $refRetTo = $this;
 
         } else {
             $this->mergeTo($refRetTo);
         }
 
-        if ([] !== $this->value) {
-            return $this->value[ 0 ];
+        if ( [] !== $this->value ) {
+            return $this->value[0];
         }
 
         return '';
@@ -555,15 +555,15 @@ class Ret
      */
     public function orEmptyArray(?self &$refRetTo = null)
     {
-        if (null === $refRetTo) {
+        if ( null === $refRetTo ) {
             $refRetTo = $this;
 
         } else {
             $this->mergeTo($refRetTo);
         }
 
-        if ([] !== $this->value) {
-            return $this->value[ 0 ];
+        if ( [] !== $this->value ) {
+            return $this->value[0];
         }
 
         return [];
@@ -574,15 +574,15 @@ class Ret
      */
     public function orEmptyStdclass(?self &$refRetTo = null)
     {
-        if (null === $refRetTo) {
+        if ( null === $refRetTo ) {
             $refRetTo = $this;
 
         } else {
             $this->mergeTo($refRetTo);
         }
 
-        if ([] !== $this->value) {
-            return $this->value[ 0 ];
+        if ( [] !== $this->value ) {
+            return $this->value[0];
         }
 
         return new \stdClass();
@@ -597,11 +597,11 @@ class Ret
 
         $errorsQueue = $this->errorsRaw;
 
-        if ([] !== $errorsQueue) {
+        if ( [] !== $errorsQueue ) {
             reset($errorsQueue);
 
             while ( null !== ($i = key($errorsQueue)) ) {
-                if (! isset($this->errors[ $i ])) {
+                if ( ! isset($this->errors[$i]) ) {
                     [
                         'file_line'      => $fileLine,
                         'throwable_args' => $throwableArgs,
@@ -610,7 +610,7 @@ class Ret
 
                     $throwableArgsArray = $thePhp->throwable_args($fileLine, ...$throwableArgs);
 
-                    $this->errors[ $i ] = $throwableArgsArray[ 'messageObjectList' ];
+                    $this->errors[$i] = $throwableArgsArray['messageObjectList'];
                 }
 
                 next($errorsQueue);
@@ -619,7 +619,7 @@ class Ret
 
         $result = [];
 
-        if ($isAssociative) {
+        if ( $isAssociative ) {
             foreach ( $this->errors as $stdClasses ) {
                 foreach ( $stdClasses as $stdClass ) {
                     $result[] = (array) $stdClass;
@@ -646,8 +646,8 @@ class Ret
             ] = array_pop($errorsQueue);
 
             $previous = new LogicException(...$throwableArgs);
-            $previous->setFile($fileLine[ 0 ]);
-            $previous->setLine($fileLine[ 1 ]);
+            $previous->setFile($fileLine[0]);
+            $previous->setLine($fileLine[1]);
             $previous->setTrace($trace);
 
             $previousList[] = $previous;

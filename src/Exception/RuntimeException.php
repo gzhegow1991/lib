@@ -20,45 +20,45 @@ class RuntimeException extends \RuntimeException implements
 
         $args = $thePhp->throwable_args(...$throwableArgs);
 
-        $message = $args[ 'message' ] ?? '[ NO MESSAGE ]';
-        $messageList = array_values($args[ 'messageList' ]) ?: [ $message ];
-        $messageObjectList = array_values($args[ 'messageObjectList' ]) ?: [ (object) [ $message ] ];
+        $message = $args['message'] ?? '[ NO MESSAGE ]';
+        $messageList = array_values($args['messageList']) ?: [ $message ];
+        $messageObjectList = array_values($args['messageObjectList']) ?: [ (object) [ $message ] ];
 
         $this->messageList = $messageList;
         $this->messageObjectList = $messageObjectList;
 
-        $file = $args[ 'file' ];
-        $line = $args[ 'line' ];
+        $file = $args['file'];
+        $line = $args['line'];
         $hasFileLine = (null !== $file);
 
-        $previous = $args[ 'previous' ];
+        $previous = $args['previous'];
         $hasPrevious = (null !== $previous);
 
         $errorsCount = count($messageList);
 
-        if ($hasPrevious) {
-            $previousList = array_values($args[ 'previousList' ]);
+        if ( $hasPrevious ) {
+            $previousList = array_values($args['previousList']);
 
             $this->previousList = $previousList;
         }
 
-        if ($errorsCount > 1) {
+        if ( $errorsCount > 1 ) {
             $message = "Multiple errors occured: {$errorsCount} total";
         }
 
         parent::__construct(
             $message,
-            $args[ 'code' ],
-            $args[ 'previous' ]
+            $args['code'],
+            $args['previous']
         );
 
-        if ($hasPrevious) {
+        if ( $hasPrevious ) {
             $theDebugThrowabler = $theDebug->throwabler();
 
             $this->previousMessageList = $theDebugThrowabler->getPreviousMessageFirstList($this);
         }
 
-        if ($hasFileLine) {
+        if ( $hasFileLine ) {
             $this->file = $file;
             $this->line = $line;
         }

@@ -76,7 +76,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
             ?? $this->fromCallable($from)->orNull($ret)
             ?? $this->fromValueResolved($from)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -94,7 +94,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
             ?? $this->fromInstance($from)->orNull($ret)
             ?? $this->fromValueResolved($from)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -112,7 +112,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
             ?? $this->fromInstance($from)->orNull($ret)
             ?? $this->fromCallableExecutor($from)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -125,7 +125,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
      */
     protected function fromInstance($from, ?array $fallback = null)
     {
-        if ($from instanceof Promise) {
+        if ( $from instanceof Promise ) {
             return Ret::ok($fallback, $from);
         }
 
@@ -262,15 +262,15 @@ class DefaultPromiseManager implements PromiseManagerInterface
 
             call_user_func_array($fnPooling, [ $ctx ]);
 
-            if ($ctx->hasResult($refResult)) {
+            if ( $ctx->hasResult($refResult) ) {
                 $fnResolve($refResult);
 
-            } elseif ($ctx->hasError($refError)) {
+            } elseif ( $ctx->hasError($refError) ) {
                 $fnReject($refError);
 
             } else {
-                if (null !== ($timeoutMicrotime = $ctx->hasTimeoutMicrotime())) {
-                    if ($nowMicrotime > $timeoutMicrotime) {
+                if ( null !== ($timeoutMicrotime = $ctx->hasTimeoutMicrotime()) ) {
+                    if ( $nowMicrotime > $timeoutMicrotime ) {
                         $fnReject("Timeout: " . $ctx->getTimeoutMs());
                     }
                 }
@@ -300,8 +300,8 @@ class DefaultPromiseManager implements PromiseManagerInterface
     {
         $rejectIfEmpty = $rejectIfEmpty ?? true;
 
-        if ([] === $ps) {
-            if ($rejectIfEmpty) {
+        if ( [] === $ps ) {
+            if ( $rejectIfEmpty ) {
                 return $this->rejected(
                     new LogicException('The `ps` should be a non-empty array')
                 );
@@ -319,7 +319,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
             //
             $fnResolveParent
         ) {
-            if (! $isSettled) {
+            if ( ! $isSettled ) {
                 $isSettled = true;
 
                 call_user_func($fnResolveParent, $value);
@@ -331,7 +331,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
             //
             $fnRejectParent
         ) {
-            if (! $isSettled) {
+            if ( ! $isSettled ) {
                 $isSettled = true;
 
                 call_user_func($fnRejectParent, $reason);
@@ -354,8 +354,8 @@ class DefaultPromiseManager implements PromiseManagerInterface
     {
         $rejectIfEmpty = $rejectIfEmpty ?? true;
 
-        if ([] === $ps) {
-            if ($rejectIfEmpty) {
+        if ( [] === $ps ) {
+            if ( $rejectIfEmpty ) {
                 return $this->rejected(
                     new LogicException('The `ps` should be a non-empty array')
                 );
@@ -380,8 +380,8 @@ class DefaultPromiseManager implements PromiseManagerInterface
                 //
                 $fnResolveParent, $i
             ) {
-                if (false !== $report) {
-                    $report[ $i ] = [
+                if ( false !== $report ) {
+                    $report[$i] = [
                         'status' => Promise::STATE_RESOLVED,
                         'value'  => $value,
                     ];
@@ -389,7 +389,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
 
                 $psLeft--;
 
-                if (! $isSettled) {
+                if ( ! $isSettled ) {
                     call_user_func($fnResolveParent, $value);
 
                     $report = false;
@@ -408,8 +408,8 @@ class DefaultPromiseManager implements PromiseManagerInterface
                 //
                 $fnRejectParent, $i
             ) {
-                if (false !== $report) {
-                    $report[ $i ] = [
+                if ( false !== $report ) {
+                    $report[$i] = [
                         'status' => Promise::STATE_REJECTED,
                         'reason' => $reason,
                     ];
@@ -417,10 +417,10 @@ class DefaultPromiseManager implements PromiseManagerInterface
 
                 $psLeft--;
 
-                if (! $isSettled) {
+                if ( ! $isSettled ) {
                     $isLast = ($psLeft === 0);
 
-                    if ($isLast) {
+                    if ( $isLast ) {
                         call_user_func($fnRejectParent, $report);
 
                         $isSettled = true;
@@ -444,8 +444,8 @@ class DefaultPromiseManager implements PromiseManagerInterface
     {
         $rejectIfEmpty = $rejectIfEmpty ?? true;
 
-        if ([] === $ps) {
-            if ($rejectIfEmpty) {
+        if ( [] === $ps ) {
+            if ( $rejectIfEmpty ) {
                 return $this->rejected(
                     new LogicException('The `ps` should be a non-empty array')
                 );
@@ -472,16 +472,16 @@ class DefaultPromiseManager implements PromiseManagerInterface
                 //
                 $fnResolveParent, $i
             ) {
-                $report[ $i ] = [
+                $report[$i] = [
                     'status' => Promise::STATE_RESOLVED,
                     'value'  => $value,
                 ];
 
                 $psLeft--;
 
-                if (! $isSettled) {
+                if ( ! $isSettled ) {
                     $isLast = ($psLeft === 0);
-                    if ($isLast) {
+                    if ( $isLast ) {
                         call_user_func($fnResolveParent, $report);
                     }
                 }
@@ -495,16 +495,16 @@ class DefaultPromiseManager implements PromiseManagerInterface
                 //
                 $fnResolveParent, $i
             ) {
-                $report[ $i ] = [
+                $report[$i] = [
                     'status' => Promise::STATE_REJECTED,
                     'reason' => $reason,
                 ];
 
                 $psLeft--;
 
-                if (! $isSettled) {
+                if ( ! $isSettled ) {
                     $isLast = ($psLeft === 0);
-                    if ($isLast) {
+                    if ( $isLast ) {
                         call_user_func($fnResolveParent, $report);
                     }
                 }
@@ -525,8 +525,8 @@ class DefaultPromiseManager implements PromiseManagerInterface
     {
         $rejectIfEmpty = $rejectIfEmpty ?? true;
 
-        if ([] === $ps) {
-            if ($rejectIfEmpty) {
+        if ( [] === $ps ) {
+            if ( $rejectIfEmpty ) {
                 return $this->rejected(
                     new LogicException('The `ps` should be a non-empty array')
                 );
@@ -546,7 +546,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
         $report = [];
 
         foreach ( $ps as $i => $v ) {
-            $results[ $i ] = null;
+            $results[$i] = null;
 
             $fnOnResolvedChild = static function ($value) use (
                 &$isSettled,
@@ -557,12 +557,12 @@ class DefaultPromiseManager implements PromiseManagerInterface
                 //
                 $fnResolveParent, $i
             ) {
-                if (false !== $results) {
-                    $results[ $i ] = $value;
+                if ( false !== $results ) {
+                    $results[$i] = $value;
                 }
 
-                if (false !== $report) {
-                    $report[ $i ] = [
+                if ( false !== $report ) {
+                    $report[$i] = [
                         'status' => Promise::STATE_RESOLVED,
                         'value'  => $value,
                     ];
@@ -570,10 +570,10 @@ class DefaultPromiseManager implements PromiseManagerInterface
 
                 $psLeft--;
 
-                if (! $isSettled) {
+                if ( ! $isSettled ) {
                     $isLast = ($psLeft === 0);
 
-                    if ($isLast) {
+                    if ( $isLast ) {
                         call_user_func($fnResolveParent, $results);
 
                         $report = false;
@@ -594,8 +594,8 @@ class DefaultPromiseManager implements PromiseManagerInterface
                 //
                 $fnRejectParent, $i
             ) {
-                if (false !== $report) {
-                    $report[ $i ] = [
+                if ( false !== $report ) {
+                    $report[$i] = [
                         'status' => Promise::STATE_REJECTED,
                         'reason' => $reason,
                     ];
@@ -603,10 +603,10 @@ class DefaultPromiseManager implements PromiseManagerInterface
 
                 $psLeft--;
 
-                if (! $isSettled) {
+                if ( ! $isSettled ) {
                     $isLast = ($psLeft === 0);
 
-                    if ($isLast) {
+                    if ( $isLast ) {
                         call_user_func($fnRejectParent, $report);
 
                     } else {
@@ -644,15 +644,15 @@ class DefaultPromiseManager implements PromiseManagerInterface
                 $timeoutMs,
                 $rejectReason, $fnRejectTimeout
             ) {
-                if ($rejectReason instanceof \Throwable) {
+                if ( $rejectReason instanceof \Throwable ) {
                     $reasonThrowable = $rejectReason;
 
-                } elseif (is_array($rejectReason) && ([] !== $rejectReason)) {
+                } elseif ( is_array($rejectReason) && ([] !== $rejectReason) ) {
                     $rejectReason[] = $timeoutMs;
 
                     $reasonThrowable = new RuntimeException($rejectReason);
 
-                } elseif ($theType->string_not_empty($rejectReason)->isOk([ &$rejectReasonStringNotEmpty ])) {
+                } elseif ( $theType->string_not_empty($rejectReason)->isOk([ &$rejectReasonStringNotEmpty ]) ) {
                     $reasonThrowable = new RuntimeException(
                         [ $rejectReasonStringNotEmpty, $timeoutMs ]
                     );
@@ -687,7 +687,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
         $curlOptionsList = $theType->list($curlOptions)->orThrow();
 
         $timeoutMsInt = 10000;
-        if (! is_null($timeoutMs)) {
+        if ( ! is_null($timeoutMs) ) {
             $timeoutMsInt = $theType->int_positive($timeoutMs)->orThrow();
         }
 
@@ -715,7 +715,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
             $url, $curlOptions, 1000
         );
 
-        if (! $statusPush) {
+        if ( ! $statusPush ) {
             throw new RuntimeException(
                 [ 'Unable to ' . __METHOD__, func_get_args() ]
             );
@@ -731,10 +731,10 @@ class DefaultPromiseManager implements PromiseManagerInterface
     {
         $theFetchApi = $this->fetchApi;
 
-        if ($theFetchApi->daemonIsAwake()) {
+        if ( $theFetchApi->daemonIsAwake() ) {
             return Promise::resolved();
 
-        } elseif ($this->useFetchApiWakeup) {
+        } elseif ( $this->useFetchApiWakeup ) {
             return $this->fetchApiWakeup();
 
         } else {
@@ -751,7 +751,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
 
         $aPromise = $this->fetchApiWakeupDeferred;
 
-        if (false
+        if ( false
             || (null === $aPromise)
             || ($aPromise->isSettled())
         ) {
@@ -760,7 +760,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
             $fnPooling = static function ($ctx) use ($theFetchApi) {
                 /** @var PromisePoolingContext $ctx */
 
-                if (! $theFetchApi->daemonIsAwake()) {
+                if ( ! $theFetchApi->daemonIsAwake() ) {
                     return;
                 }
 
@@ -797,7 +797,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
                 $taskId
             );
 
-            if (false === $status) {
+            if ( false === $status ) {
                 return;
             }
 

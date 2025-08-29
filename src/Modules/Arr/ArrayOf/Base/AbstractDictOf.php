@@ -46,7 +46,7 @@ abstract class AbstractDictOf implements
         ];
 
         $lower = strtolower($valueType);
-        if (! isset($mapValueTypes[ $lower ])) {
+        if ( ! isset($mapValueTypes[$lower]) ) {
             throw new LogicException(
                 [
                     ''
@@ -57,7 +57,7 @@ abstract class AbstractDictOf implements
                 ]
             );
         }
-        $valueTypeNormalized = $mapValueTypes[ $lower ];
+        $valueTypeNormalized = $mapValueTypes[$lower];
 
         $this->valueType = $valueTypeNormalized;
     }
@@ -103,9 +103,9 @@ abstract class AbstractDictOf implements
 
     public function __unserialize(array $data) : void
     {
-        $this->valueType = $data[ 'valueType' ];
+        $this->valueType = $data['valueType'];
         //
-        $this->values = $data[ 'values' ];
+        $this->values = $data['values'];
     }
 
 
@@ -128,9 +128,9 @@ abstract class AbstractDictOf implements
 
     public function get($key, array $fallback = [])
     {
-        if (! $this->exists($key)) {
-            if (0 < count($fallback)) {
-                return $fallback[ 0 ];
+        if ( ! $this->exists($key) ) {
+            if ( 0 < count($fallback) ) {
+                return $fallback[0];
             }
 
             throw new RuntimeException(
@@ -138,7 +138,7 @@ abstract class AbstractDictOf implements
             );
         }
 
-        return $this->values[ $key ];
+        return $this->values[$key];
     }
 
 
@@ -159,13 +159,13 @@ abstract class AbstractDictOf implements
      */
     protected function setValue($key, $value)
     {
-        if (! is_string($key)) {
+        if ( ! is_string($key) ) {
             throw new LogicException(
                 [ 'The `key` of the dict should be a string', $key ]
             );
         }
 
-        $this->values[ $key ] = $value;
+        $this->values[$key] = $value;
 
         return $this;
     }
@@ -176,7 +176,7 @@ abstract class AbstractDictOf implements
      */
     public function add($key, $value)
     {
-        if (isset($this->values[ $key ])) {
+        if ( isset($this->values[$key]) ) {
             throw new RuntimeException(
                 [ 'The array key is already exists: ' . var_export($key, true) ]
             );
@@ -192,7 +192,7 @@ abstract class AbstractDictOf implements
      */
     public function replace($key, $value)
     {
-        if (! isset($this->values[ $key ])) {
+        if ( ! isset($this->values[$key]) ) {
             throw new RuntimeException(
                 [ 'Missing array key: ' . var_export($key, true) ]
             );
@@ -219,7 +219,7 @@ abstract class AbstractDictOf implements
      */
     public function remove($key)
     {
-        if (! isset($this->values[ $key ])) {
+        if ( ! isset($this->values[$key]) ) {
             throw new RuntimeException(
                 [ 'Missing array key: ' . var_export($key, true) ]
             );
@@ -237,7 +237,7 @@ abstract class AbstractDictOf implements
      */
     protected function unsetValue($key)
     {
-        unset($this->values[ $key ]);
+        unset($this->values[$key]);
 
         return $this;
     }

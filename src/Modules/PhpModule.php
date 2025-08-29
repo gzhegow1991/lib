@@ -42,15 +42,15 @@ class PhpModule
     {
         $last = static::$throwableClass;
 
-        if (null !== $throwableClass) {
-            if (false === $throwableClass) {
+        if ( null !== $throwableClass ) {
+            if ( false === $throwableClass ) {
                 static::$throwableClass = RuntimeException::class;
 
             } else {
-                if (! (false
+                if ( ! (false
                     || is_subclass_of($throwableClass, \LogicException::class)
                     || is_subclass_of($throwableClass, \RuntimeException::class)
-                )) {
+                ) ) {
                     throw new LogicException(
                         [
                             ''
@@ -78,12 +78,12 @@ class PhpModule
     {
         $last = static::$poolingTickUsleep;
 
-        if (null !== $poolingTickUsleep) {
-            if (false === $poolingTickUsleep) {
+        if ( null !== $poolingTickUsleep ) {
+            if ( false === $poolingTickUsleep ) {
                 static::$poolingTickUsleep = 1000;
 
             } else {
-                if ($poolingTickUsleep < 1) {
+                if ( $poolingTickUsleep < 1 ) {
                     throw new LogicException(
                         [ 'The `pooling_tick_usleep` should be a positive integer', $poolingTickUsleep ]
                     );
@@ -167,7 +167,7 @@ class PhpModule
      */
     public function type_empty($value)
     {
-        if (empty($value)) {
+        if ( empty($value) ) {
             return Ret::val($value);
         }
 
@@ -182,7 +182,7 @@ class PhpModule
      */
     public function type_any_not_empty($value)
     {
-        if (! empty($value)) {
+        if ( ! empty($value) ) {
             return Ret::val($value);
         }
 
@@ -203,7 +203,7 @@ class PhpModule
         // > NIL is not blank (NIL is always passed manually, that literally means NOT BLANK)
         // > CLOSED RESOURCE is not blank (actually it's still internal object)
 
-        if (false
+        if ( false
             // > NULL is blank (can appear from API to omit any actions on the value)
             || (null === $value)
             //
@@ -220,8 +220,8 @@ class PhpModule
         }
 
         // > COUNTABLE w/ ZERO SIZE is blank
-        if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
-            if (0 === count($valueCountable)) {
+        if ( $this->type_countable($value)->isOk([ &$valueCountable ]) ) {
+            if ( 0 === count($valueCountable) ) {
                 return Ret::val($value);
             }
         }
@@ -237,7 +237,7 @@ class PhpModule
      */
     public function type_any_not_blank($value)
     {
-        if (! $this->type_blank($value)->isOk()) {
+        if ( ! $this->type_blank($value)->isOk() ) {
             return Ret::val($value);
         }
 
@@ -259,7 +259,7 @@ class PhpModule
         // > EMPTY ARRAY is not clearable (array functions is not applicable to nulls)
         // > COUNTABLE w/ ZERO SIZE is not clearable (countable/iterable functions is not applicable to nulls)
 
-        if (false
+        if ( false
             // > NULL is clearable (means nothing)
             || (null === $value)
             //
@@ -286,7 +286,7 @@ class PhpModule
      */
     public function type_any_not_nullable($value)
     {
-        if (! $this->type_nullable($value)->isOk()) {
+        if ( ! $this->type_nullable($value)->isOk() ) {
             return Ret::val($value);
         }
 
@@ -304,11 +304,11 @@ class PhpModule
      */
     public function type_passed($value)
     {
-        if ($this->type_nil($value)->isOk()) {
+        if ( $this->type_nil($value)->isOk() ) {
             return Ret::val($value);
         }
 
-        if (false
+        if ( false
             // > NULL is not passed (can appear from API to omit any actions on the value)
             || (null === $value)
             //
@@ -341,7 +341,7 @@ class PhpModule
      */
     public function type_any_not_passed($value)
     {
-        if (! $this->type_passed($value)->isOk()) {
+        if ( ! $this->type_passed($value)->isOk() ) {
             return Ret::val($value);
         }
 
@@ -364,7 +364,7 @@ class PhpModule
      */
     public function type_nil($value)
     {
-        if (Nil::is($value)) {
+        if ( Nil::is($value) ) {
             return Ret::val($value);
         }
 
@@ -379,7 +379,7 @@ class PhpModule
      */
     public function type_any_not_nil($value)
     {
-        if (! Nil::is($value)) {
+        if ( ! Nil::is($value) ) {
             return Ret::val($value);
         }
 
@@ -395,7 +395,7 @@ class PhpModule
      */
     public function type_null($value)
     {
-        if (null === $value) {
+        if ( null === $value ) {
             return Ret::val($value);
         }
 
@@ -410,7 +410,7 @@ class PhpModule
      */
     public function type_any_not_null($value)
     {
-        if (null !== $value) {
+        if ( null !== $value ) {
             return Ret::val($value);
         }
 
@@ -426,7 +426,7 @@ class PhpModule
      */
     public function type_false($value)
     {
-        if (false === $value) {
+        if ( false === $value ) {
             return Ret::val(false);
         }
 
@@ -443,7 +443,7 @@ class PhpModule
      */
     public function type_any_not_false($value)
     {
-        if (false !== $value) {
+        if ( false !== $value ) {
             return Ret::val($value);
         }
 
@@ -461,7 +461,7 @@ class PhpModule
      */
     public function type_true($value)
     {
-        if (true === $value) {
+        if ( true === $value ) {
             return Ret::val($value);
         }
 
@@ -478,7 +478,7 @@ class PhpModule
      */
     public function type_any_not_true($value)
     {
-        if (true !== $value) {
+        if ( true !== $value ) {
             return Ret::val($value);
         }
 
@@ -494,23 +494,23 @@ class PhpModule
      */
     public function type_bool($value)
     {
-        if (null === $value) {
+        if ( null === $value ) {
             return Ret::err(
                 [ 'The `value` should be bool, null is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (is_bool($value)) {
+        if ( is_bool($value) ) {
             return Ret::val($value);
         }
 
-        if (is_int($value)) {
+        if ( is_int($value) ) {
             return Ret::val(0 !== $value);
         }
 
-        if (is_float($value)) {
-            if (is_nan($value)) {
+        if ( is_float($value) ) {
+            if ( is_nan($value) ) {
                 return Ret::err(
                     [ 'The `value` should be bool, nan is not', $value ],
                     [ __FILE__, __LINE__ ]
@@ -520,15 +520,15 @@ class PhpModule
             return Ret::val(0.0 !== $value);
         }
 
-        if ($this->type_nil($value)->isOk()) {
+        if ( $this->type_nil($value)->isOk() ) {
             return Ret::err(
                 [ 'The `value` should be bool, nil is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (is_string($value)) {
-            if ('' === $value) {
+        if ( is_string($value) ) {
+            if ( '' === $value ) {
                 // > EMPTY STRING is false
                 return Ret::val(false);
             }
@@ -536,8 +536,8 @@ class PhpModule
             return Ret::val(true);
         }
 
-        if (is_array($value)) {
-            if ([] === $value) {
+        if ( is_array($value) ) {
+            if ( [] === $value ) {
                 // > EMPTY ARRAY is false
                 return Ret::val(false);
             }
@@ -545,16 +545,16 @@ class PhpModule
             return Ret::val(true);
         }
 
-        if (is_resource($value)) {
+        if ( is_resource($value) ) {
             return Ret::val(true);
 
-        } elseif ('resource (closed)' === gettype($value)) {
+        } elseif ( 'resource (closed)' === gettype($value) ) {
             return Ret::val(false);
         }
 
-        if (is_object($value)) {
-            if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
-                if (0 === count($valueCountable)) {
+        if ( is_object($value) ) {
+            if ( $this->type_countable($value)->isOk([ &$valueCountable ]) ) {
+                if ( 0 === count($valueCountable) ) {
                     // > EMPTY COUNTABLE is false
                     return Ret::val(false);
                 }
@@ -574,14 +574,14 @@ class PhpModule
      */
     public function type_boolfalse($value)
     {
-        if (! $this->type_bool($value)->isOk([ &$valueBool, &$ret ])) {
+        if ( ! $this->type_bool($value)->isOk([ &$valueBool, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (false === $valueBool) {
+        if ( false === $valueBool ) {
             return Ret::val(false);
         }
 
@@ -596,14 +596,14 @@ class PhpModule
      */
     public function type_booltrue($value)
     {
-        if (! $this->type_bool($value)->isOk([ &$valueBool, &$ret ])) {
+        if ( ! $this->type_bool($value)->isOk([ &$valueBool, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (true === $valueBool) {
+        if ( true === $valueBool ) {
             return Ret::val(true);
         }
 
@@ -619,23 +619,23 @@ class PhpModule
      */
     public function type_userbool($value)
     {
-        if (null === $value) {
+        if ( null === $value ) {
             return Ret::err(
                 [ 'The `value` should be userbool, null is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (is_bool($value)) {
+        if ( is_bool($value) ) {
             return Ret::val($value);
         }
 
-        if (is_int($value)) {
+        if ( is_int($value) ) {
             return Ret::val(0 !== $value);
         }
 
-        if (is_float($value)) {
-            if (is_nan($value)) {
+        if ( is_float($value) ) {
+            if ( is_nan($value) ) {
                 return Ret::err(
                     [ 'The `value` should be userbool, nan is not', $value ],
                     [ __FILE__, __LINE__ ]
@@ -645,7 +645,7 @@ class PhpModule
             return Ret::val(0.0 !== $value);
         }
 
-        if (is_string($value)) {
+        if ( is_string($value) ) {
             $map = [
                 //
                 "true"  => true,
@@ -663,8 +663,8 @@ class PhpModule
 
             $valueLower = strtolower($value);
 
-            if (isset($map[ $valueLower ])) {
-                return Ret::val($map[ $valueLower ]);
+            if ( isset($map[$valueLower]) ) {
+                return Ret::val($map[$valueLower]);
             }
         }
 
@@ -679,14 +679,14 @@ class PhpModule
      */
     public function type_userfalse($value)
     {
-        if (! $this->type_userbool($value)->isOk([ &$valueUserbool, &$ret ])) {
+        if ( ! $this->type_userbool($value)->isOk([ &$valueUserbool, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (false === $valueUserbool) {
+        if ( false === $valueUserbool ) {
             return Ret::val(false);
         }
 
@@ -701,14 +701,14 @@ class PhpModule
      */
     public function type_usertrue($value)
     {
-        if (! $this->type_userbool($value)->isOk([ &$valueUserbool, &$ret ])) {
+        if ( ! $this->type_userbool($value)->isOk([ &$valueUserbool, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (true === $valueUserbool) {
+        if ( true === $valueUserbool ) {
             return Ret::val(true);
         }
 
@@ -724,7 +724,7 @@ class PhpModule
      */
     public function type_array($value)
     {
-        if (is_array($value)) {
+        if ( is_array($value) ) {
             return Ret::val($value);
         }
 
@@ -739,7 +739,7 @@ class PhpModule
      */
     public function type_array_empty($value)
     {
-        if ([] === $value) {
+        if ( [] === $value ) {
             return Ret::val($value);
         }
 
@@ -754,7 +754,7 @@ class PhpModule
      */
     public function type_array_not_empty($value)
     {
-        if (is_array($value) && ([] !== $value)) {
+        if ( is_array($value) && ([] !== $value) ) {
             return Ret::val($value);
         }
 
@@ -769,7 +769,7 @@ class PhpModule
      */
     public function type_any_not_array_empty($value)
     {
-        if ([] !== $value) {
+        if ( [] !== $value ) {
             return Ret::val($value);
         }
 
@@ -784,7 +784,7 @@ class PhpModule
      */
     public function type_any_not_array($value)
     {
-        if (! is_array($value)) {
+        if ( ! is_array($value) ) {
             return Ret::val($value);
         }
 
@@ -800,7 +800,7 @@ class PhpModule
      */
     public function type_object($value)
     {
-        if (is_object($value)) {
+        if ( is_object($value) ) {
             return Ret::val($value);
         }
 
@@ -815,7 +815,7 @@ class PhpModule
      */
     public function type_any_not_object($value)
     {
-        if (! is_object($value)) {
+        if ( ! is_object($value) ) {
             return Ret::val($value);
         }
 
@@ -831,7 +831,7 @@ class PhpModule
      */
     public function type_stdclass($value)
     {
-        if ($value instanceof \stdClass) {
+        if ( $value instanceof \stdClass ) {
             return Ret::val($value);
         }
 
@@ -846,7 +846,7 @@ class PhpModule
      */
     public function type_any_not_stdclass($value)
     {
-        if (! ($value instanceof \stdClass)) {
+        if ( ! ($value instanceof \stdClass) ) {
             return Ret::val($value);
         }
 
@@ -862,8 +862,8 @@ class PhpModule
      */
     public function type_countable($value)
     {
-        if (PHP_VERSION_ID >= 70300) {
-            if (is_countable($value)) {
+        if ( PHP_VERSION_ID >= 70300 ) {
+            if ( is_countable($value) ) {
                 return Ret::val($value);
             }
 
@@ -873,11 +873,11 @@ class PhpModule
             );
         }
 
-        if (is_array($value)) {
+        if ( is_array($value) ) {
             return Ret::val($value);
         }
 
-        if ($value instanceof \Countable) {
+        if ( $value instanceof \Countable ) {
             return Ret::val($value);
         }
 
@@ -892,15 +892,15 @@ class PhpModule
      */
     public function type_countable_object($value)
     {
-        if (! is_object($value)) {
+        if ( ! is_object($value) ) {
             return Ret::err(
                 [ 'The `value` should be object', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (PHP_VERSION_ID >= 70300) {
-            if (! is_countable($value)) {
+        if ( PHP_VERSION_ID >= 70300 ) {
+            if ( ! is_countable($value) ) {
                 return Ret::err(
                     [ 'The `value` should be countable object', $value ],
                     [ __FILE__, __LINE__ ]
@@ -910,7 +910,7 @@ class PhpModule
             return Ret::val($value);
         }
 
-        if ($value instanceof \Countable) {
+        if ( $value instanceof \Countable ) {
             return Ret::val($value);
         }
 
@@ -928,11 +928,11 @@ class PhpModule
     {
         $theStr = Lib::str();
 
-        if ($this->type_countable($value)->isOk()) {
+        if ( $this->type_countable($value)->isOk() ) {
             return Ret::val($value);
         }
 
-        if ($theStr->type_string($value)->isOk()) {
+        if ( $theStr->type_string($value)->isOk() ) {
             return Ret::val($value);
         }
 
@@ -958,13 +958,13 @@ class PhpModule
 
         $isObject = is_object($value);
 
-        if ($isObject) {
+        if ( $isObject ) {
             $class = get_class($value);
 
-        } elseif ($theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty ])) {
+        } elseif ( $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty ]) ) {
             $class = ltrim($valueStringNotEmpty, '\\');
 
-            if ('' === $class) {
+            if ( '' === $class ) {
                 return Ret::err(
                     [ 'The `value` should be valid class', $value ],
                     [ __FILE__, __LINE__ ]
@@ -978,43 +978,43 @@ class PhpModule
             );
         }
 
-        if ('__PHP_Incomplete_Class' === $class) {
+        if ( '__PHP_Incomplete_Class' === $class ) {
             return Ret::err(
                 [ 'The `value` should be existing class or object', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ($flags & _PHP_STRUCT_TYPE_CLASS) {
-            if (PHP_VERSION_ID >= 80100) {
-                if (class_exists($class) && ! enum_exists($class)) {
+        if ( $flags & _PHP_STRUCT_TYPE_CLASS ) {
+            if ( PHP_VERSION_ID >= 80100 ) {
+                if ( class_exists($class) && ! enum_exists($class) ) {
                     return Ret::val($class);
                 }
 
             } else {
-                if (class_exists($class)) {
+                if ( class_exists($class) ) {
                     return Ret::val($class);
                 }
             }
         }
 
-        if ($flags & _PHP_STRUCT_TYPE_ENUM) {
-            if (PHP_VERSION_ID >= 80100) {
-                if (enum_exists($class)) {
+        if ( $flags & _PHP_STRUCT_TYPE_ENUM ) {
+            if ( PHP_VERSION_ID >= 80100 ) {
+                if ( enum_exists($class) ) {
                     return Ret::val($class);
                 }
             }
         }
 
-        if (! $isObject) {
-            if ($flags & _PHP_STRUCT_TYPE_INTERFACE) {
-                if (interface_exists($class)) {
+        if ( ! $isObject ) {
+            if ( $flags & _PHP_STRUCT_TYPE_INTERFACE ) {
+                if ( interface_exists($class) ) {
                     return Ret::val($class);
                 }
             }
 
-            if ($flags & _PHP_STRUCT_TYPE_TRAIT) {
-                if (trait_exists($class)) {
+            if ( $flags & _PHP_STRUCT_TYPE_TRAIT ) {
+                if ( trait_exists($class) ) {
                     return Ret::val($class);
                 }
             }
@@ -1050,21 +1050,21 @@ class PhpModule
             ],
         ];
 
-        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+        foreach ( $flagGroups as $groupName => [$conflict, $default] ) {
             $cnt = 0;
             foreach ( $conflict as $flag ) {
-                if ($flagsInt & $flag) {
+                if ( $flagsInt & $flag ) {
                     $cnt++;
                 }
             }
 
-            if ($cnt > 1) {
+            if ( $cnt > 1 ) {
                 return Ret::err(
                     [ 'The `flags` conflict in group: ' . $groupName, $flags ],
                     [ __FILE__, __LINE__ ]
                 );
 
-            } elseif (0 === $cnt) {
+            } elseif ( 0 === $cnt ) {
                 $flagsInt |= $default;
             }
         }
@@ -1075,21 +1075,21 @@ class PhpModule
 
         $isExists = null;
 
-        if (is_object($value)) {
+        if ( is_object($value) ) {
             $class = get_class($value);
 
             $isEnum = is_a($value, '\UnitEnum');
             $isClass = ! $isEnum;
 
-            if ($isEnum && ($flagsInt & _PHP_STRUCT_TYPE_ENUM)) {
+            if ( $isEnum && ($flagsInt & _PHP_STRUCT_TYPE_ENUM) ) {
                 $isExists = true;
 
-            } elseif ($isClass && ($flagsInt & _PHP_STRUCT_TYPE_CLASS)) {
+            } elseif ( $isClass && ($flagsInt & _PHP_STRUCT_TYPE_CLASS) ) {
                 $isExists = true;
             }
 
         } else {
-            if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+            if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
                 return Ret::err(
                     $ret,
                     [ __FILE__, __LINE__ ]
@@ -1098,7 +1098,7 @@ class PhpModule
 
             $class = ltrim($valueStringNotEmpty, '\\');
 
-            if ('' === $class) {
+            if ( '' === $class ) {
                 return Ret::err(
                     [ 'The `value` should be valid class', $value ],
                     [ __FILE__, __LINE__ ]
@@ -1106,38 +1106,38 @@ class PhpModule
             }
         }
 
-        if ('__PHP_Incomplete_Class' === $class) {
+        if ( '__PHP_Incomplete_Class' === $class ) {
             return Ret::err(
                 [ 'The `value` should be existing class or object', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ($isFlagExistsTrue || $isFlagExistsFalse) {
+        if ( $isFlagExistsTrue || $isFlagExistsFalse ) {
             $isExists = null
                 ?? $isExists
                 ?? $this->type_struct_exists($class, $flagsInt)->isOk([ &$classString ]);
 
-            if ($isExists && $isFlagExistsFalse) {
+            if ( $isExists && $isFlagExistsFalse ) {
                 return Ret::err(
                     [ 'The `value` should be non-existing struct', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if ((! $isExists) && $isFlagExistsTrue) {
+            if ( (! $isExists) && $isFlagExistsTrue ) {
                 return Ret::err(
                     [ 'The `value` should be existing struct', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if ($isExists && $isFlagExistsTrue) {
+            if ( $isExists && $isFlagExistsTrue ) {
                 return Ret::val($class);
             }
         }
 
-        if ($isFlagExistsFalse || $isFlagExistsIgnore) {
+        if ( $isFlagExistsFalse || $isFlagExistsIgnore ) {
             $isValid = preg_match(
                 '/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*(\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*$/',
                 $class
@@ -1146,7 +1146,7 @@ class PhpModule
             // $isValid = (! ((false === $isValid) || (0 === $isValid)));
             $isValid = (bool) $isValid;
 
-            if ($isValid) {
+            if ( $isValid ) {
                 return Ret::val($class);
             }
         }
@@ -1168,7 +1168,7 @@ class PhpModule
     {
         $flagsInt = $flags;
 
-        if (null === $flagsInt) {
+        if ( null === $flagsInt ) {
             $flagsInt = (0
                 | _PHP_STRUCT_TYPE_CLASS
                 | _PHP_STRUCT_EXISTS_TRUE
@@ -1179,7 +1179,7 @@ class PhpModule
             $flagsInt |= _PHP_STRUCT_TYPE_CLASS;
         }
 
-        if (! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ])) {
+        if ( ! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1196,7 +1196,7 @@ class PhpModule
     {
         $flagsInt = $flags;
 
-        if (null === $flagsInt) {
+        if ( null === $flagsInt ) {
             $flagsInt = (0
                 | _PHP_STRUCT_TYPE_INTERFACE
                 | _PHP_STRUCT_EXISTS_TRUE
@@ -1207,7 +1207,7 @@ class PhpModule
             $flagsInt |= _PHP_STRUCT_TYPE_INTERFACE;
         }
 
-        if (! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ])) {
+        if ( ! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1227,12 +1227,12 @@ class PhpModule
             | _PHP_STRUCT_EXISTS_TRUE
         );
 
-        if (null !== $flagsInt) {
+        if ( null !== $flagsInt ) {
             $flagsInt &= ~_PHP_STRUCT_TYPE_ALL;
             $flagsInt |= _PHP_STRUCT_TYPE_TRAIT;
         }
 
-        if (! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ])) {
+        if ( ! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1253,7 +1253,7 @@ class PhpModule
     {
         $flagsInt = $flags;
 
-        if (null === $flagsInt) {
+        if ( null === $flagsInt ) {
             $flagsInt = (0
                 | _PHP_STRUCT_TYPE_ENUM
                 | _PHP_STRUCT_EXISTS_TRUE
@@ -1264,7 +1264,7 @@ class PhpModule
             $flagsInt |= _PHP_STRUCT_TYPE_ENUM;
         }
 
-        if (! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ])) {
+        if ( ! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1284,7 +1284,7 @@ class PhpModule
      */
     public function type_struct_fqcn($value, ?int $flags = null)
     {
-        if (! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ])) {
+        if ( ! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1301,7 +1301,7 @@ class PhpModule
      */
     public function type_struct_namespace($value, ?int $flags = null)
     {
-        if (! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ])) {
+        if ( ! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1310,7 +1310,7 @@ class PhpModule
 
         $valueNamespace = $this->dirname($valueStruct, '\\');
 
-        if (null === $valueNamespace) {
+        if ( null === $valueNamespace ) {
             return Ret::err(
                 [ 'The `value` should be struct namespace', $value ],
                 [ __FILE__, __LINE__ ]
@@ -1325,7 +1325,7 @@ class PhpModule
      */
     public function type_struct_basename($value, ?int $flags = null)
     {
-        if (! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ])) {
+        if ( ! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1334,7 +1334,7 @@ class PhpModule
 
         $valueBasename = $this->basename($valueStruct, '\\');
 
-        if (null === $valueBasename) {
+        if ( null === $valueBasename ) {
             return Ret::err(
                 [ 'The `value` should be struct basename', $value ],
                 [ __FILE__, __LINE__ ]
@@ -1350,18 +1350,18 @@ class PhpModule
      */
     public function type_resource($value, ?string $resourceType = null)
     {
-        if (is_resource($value)) {
-            if (null === $resourceType) {
+        if ( is_resource($value) ) {
+            if ( null === $resourceType ) {
                 return Ret::val($value);
 
             } else {
-                if ($resourceType === get_resource_type($value)) {
+                if ( $resourceType === get_resource_type($value) ) {
                     return Ret::val($value);
                 }
             }
         }
 
-        if ('resource (closed)' === gettype($value)) {
+        if ( 'resource (closed)' === gettype($value) ) {
             return Ret::val($value);
         }
 
@@ -1376,12 +1376,12 @@ class PhpModule
      */
     public function type_resource_opened($value, ?string $resourceType = null)
     {
-        if (is_resource($value)) {
-            if (null === $resourceType) {
+        if ( is_resource($value) ) {
+            if ( null === $resourceType ) {
                 return Ret::val($value);
 
             } else {
-                if ($resourceType === get_resource_type($value)) {
+                if ( $resourceType === get_resource_type($value) ) {
                     return Ret::val($value);
                 }
             }
@@ -1398,7 +1398,7 @@ class PhpModule
      */
     public function type_resource_closed($value)
     {
-        if ('resource (closed)' === gettype($value)) {
+        if ( 'resource (closed)' === gettype($value) ) {
             return Ret::val($value);
         }
 
@@ -1413,10 +1413,10 @@ class PhpModule
      */
     public function type_any_not_resource($value)
     {
-        if (! (false
+        if ( ! (false
             || is_resource($value)
             || ('resource (closed)' === gettype($value))
-        )) {
+        ) ) {
             return Ret::val($value);
         }
 
@@ -1432,7 +1432,7 @@ class PhpModule
      */
     public function type_curl($value)
     {
-        if (false
+        if ( false
             || is_a($value, '\CurlHandle')
             || $this->type_resource_opened($value, 'curl')->isOk()
         ) {
@@ -1457,8 +1457,8 @@ class PhpModule
     public function type_enum_case($value, ?string $enumClass = null)
     {
         $hasEnumClass = false;
-        if (null !== $enumClass) {
-            if (! is_subclass_of($enumClass, '\UnitEnum')) {
+        if ( null !== $enumClass ) {
+            if ( ! is_subclass_of($enumClass, '\UnitEnum') ) {
                 return Ret::err(
                     [ 'The `enumClass` should extend \UnitEnum', $enumClass ],
                     [ __FILE__, __LINE__ ]
@@ -1468,27 +1468,27 @@ class PhpModule
             $hasEnumClass = true;
         }
 
-        if (is_object($value)) {
+        if ( is_object($value) ) {
             $status = $hasEnumClass
                 ? is_a($value, $enumClass)
                 : is_subclass_of($value, '\UnitEnum');
 
-            if ($status) {
+            if ( $status ) {
                 return Ret::val($value);
             }
         }
 
-        if (! $hasEnumClass) {
+        if ( ! $hasEnumClass ) {
             return Ret::err(
                 [ 'Cannot obtain `enumClass` from given data', $value, $enumClass ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! (false
+        if ( ! (false
             || is_int($value)
             || is_string($value)
-        )) {
+        ) ) {
             return Ret::err(
                 [ 'The `value` should be int or string, cause Enums only support two types', $value, $enumClass ],
                 [ __FILE__, __LINE__ ]
@@ -1505,7 +1505,7 @@ class PhpModule
             );
         }
 
-        if (null !== $enumCase) {
+        if ( null !== $enumCase ) {
             return Ret::val($enumCase);
         }
 
@@ -1692,19 +1692,19 @@ class PhpModule
         $theType = Lib::type();
 
         $withPathInfo = array_key_exists(0, $refs);
-        if ($withPathInfo) {
-            $refPathInfo =& $refs[ 0 ];
+        if ( $withPathInfo ) {
+            $refPathInfo =& $refs[0];
         }
         $refPathInfo = null;
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ($withPathInfo) {
+        if ( $withPathInfo ) {
             try {
                 $refPathInfo = $this->pathinfo($valueStringNotEmpty);
             }
@@ -1732,12 +1732,12 @@ class PhpModule
         $theType = Lib::type();
 
         $withPathInfo = array_key_exists(0, $refs);
-        if ($withPathInfo) {
-            $refPathInfo =& $refs[ 0 ];
+        if ( $withPathInfo ) {
+            $refPathInfo =& $refs[0];
         }
         $refPathInfo = null;
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -1754,7 +1754,7 @@ class PhpModule
             );
         }
 
-        if ($withPathInfo) {
+        if ( $withPathInfo ) {
             try {
                 $refPathInfo = $this->pathinfo($pathNormalized);
             }
@@ -1790,7 +1790,7 @@ class PhpModule
      */
     public function hInput()
     {
-        if (! defined('PHPIN')) define('PHPIN', fopen('php://input', 'rb'));
+        if ( ! defined('PHPIN') ) define('PHPIN', fopen('php://input', 'rb'));
 
         return PHPIN;
     }
@@ -1800,7 +1800,7 @@ class PhpModule
      */
     public function hOutput()
     {
-        if (! defined('PHPOUT')) define('PHPOUT', fopen('php://output', 'wb'));
+        if ( ! defined('PHPOUT') ) define('PHPOUT', fopen('php://output', 'wb'));
 
         return PHPOUT;
     }
@@ -1808,11 +1808,11 @@ class PhpModule
 
     public function to_bool($value, array $options = []) : bool
     {
-        if (is_bool($value)) {
+        if ( is_bool($value) ) {
             return $value;
         }
 
-        if ($value instanceof ToBoolInterface) {
+        if ( $value instanceof ToBoolInterface ) {
             return $value->toBool($options);
         }
 
@@ -1825,17 +1825,17 @@ class PhpModule
 
     public function to_int($value, array $options = []) : int
     {
-        if (is_int($value)) {
+        if ( is_int($value) ) {
             return $value;
         }
 
-        if ($value instanceof ToIntegerInterface) {
+        if ( $value instanceof ToIntegerInterface ) {
             return $value->toInteger($options);
         }
 
         $theType = Lib::type();
 
-        if (false
+        if ( false
             || (null === $value)
             || ('' === $value)
             || (is_bool($value))
@@ -1859,8 +1859,8 @@ class PhpModule
 
     public function to_float($value, array $options = []) : float
     {
-        if (is_float($value)) {
-            if (! is_finite($value)) {
+        if ( is_float($value) ) {
+            if ( ! is_finite($value) ) {
                 throw new LogicException(
                     [
                         'Unable to parse value while converting to float',
@@ -1869,20 +1869,20 @@ class PhpModule
                 );
             }
 
-            if (-0.0 === $value) {
+            if ( -0.0 === $value ) {
                 return 0.0;
             }
 
             return $value;
         }
 
-        if ($value instanceof ToFloatInterface) {
+        if ( $value instanceof ToFloatInterface ) {
             return $value->toFloat($options);
         }
 
         $theType = Lib::type();
 
-        if (false
+        if ( false
             || (null === $value)
             || ('' === $value)
             || (is_bool($value))
@@ -1906,17 +1906,17 @@ class PhpModule
 
     public function to_string($value, array $options = []) : string
     {
-        if (is_string($value)) {
+        if ( is_string($value) ) {
             return $value;
         }
 
-        if ($value instanceof ToStringInterface) {
+        if ( $value instanceof ToStringInterface ) {
             return $value->toString($options);
         }
 
         $theType = Lib::type();
 
-        if (false
+        if ( false
             || (null === $value)
             // || ('' === $value)
             || (is_bool($value))
@@ -1941,22 +1941,22 @@ class PhpModule
 
     public function to_array($value, array $options = []) : array
     {
-        if (is_array($value)) {
+        if ( is_array($value) ) {
             return $value;
         }
 
-        if (is_object($value)) {
-            if ($value instanceof ToArrayInterface) {
+        if ( is_object($value) ) {
+            if ( $value instanceof ToArrayInterface ) {
                 return $value->toArray($options);
             }
 
-            if ($value instanceof ToObjectInterface) {
+            if ( $value instanceof ToObjectInterface ) {
                 return (array) $value->toObject($options);
             }
 
             $isStdClass = (get_class($value) === \stdClass::class);
 
-            if (! $isStdClass) {
+            if ( ! $isStdClass ) {
                 throw new LogicException(
                     [
                         'The `value` (if object) should be an instance of: ' . \stdClass::class,
@@ -1966,7 +1966,7 @@ class PhpModule
             }
         }
 
-        if (false
+        if ( false
             || (null === $value)
             // || ('' === $value)
             // || (is_bool($value))
@@ -1990,18 +1990,18 @@ class PhpModule
 
     public function to_object($value, array $options = []) : \stdClass
     {
-        if (is_object($value)) {
-            if ($value instanceof ToObjectInterface) {
+        if ( is_object($value) ) {
+            if ( $value instanceof ToObjectInterface ) {
                 return $value->toObject($options);
             }
 
-            if ($value instanceof ToArrayInterface) {
+            if ( $value instanceof ToArrayInterface ) {
                 return (object) $value->toArray($options);
             }
 
             $isStdClass = (get_class($value) === \stdClass::class);
 
-            if (! $isStdClass) {
+            if ( ! $isStdClass ) {
                 throw new LogicException(
                     [
                         'The `value` (if object) should be an instance of: ' . \stdClass::class,
@@ -2013,7 +2013,7 @@ class PhpModule
             return $value;
         }
 
-        if (false
+        if ( false
             || (null === $value)
             // || ('' === $value)
             // || (is_bool($value))
@@ -2037,21 +2037,21 @@ class PhpModule
 
     public function to_iterable($value, array $options = []) : iterable
     {
-        if (null === $value) {
+        if ( null === $value ) {
             return [];
         }
 
-        if (is_object($value)) {
-            if ($value instanceof ToIterableInterface) {
+        if ( is_object($value) ) {
+            if ( $value instanceof ToIterableInterface ) {
                 return $value->toIterable($options);
             }
 
-            if ($value instanceof \Traversable) {
+            if ( $value instanceof \Traversable ) {
                 return $value;
             }
         }
 
-        if (is_array($value)) {
+        if ( is_array($value) ) {
             return $value;
         }
 
@@ -2067,7 +2067,7 @@ class PhpModule
         $fnAssert = null, array $fnAssertArgs = [], $fnAssertValueKey = 0
     ) : array
     {
-        if (null === $value) {
+        if ( null === $value ) {
             return [];
         }
 
@@ -2077,28 +2077,28 @@ class PhpModule
         $hasAssert = (null !== $fnAssert);
 
         $fnArgs = [];
-        if ($hasAssert) {
+        if ( $hasAssert ) {
             [ $fnArgs ] = $theFunc->func_args_unique([ $fnAssertValueKey => null ], $fnAssertArgs);
         }
 
         $listValid = null;
 
-        if ($value instanceof ToListInterface) {
+        if ( $value instanceof ToListInterface ) {
             $list = $value->toList($options);
 
-        } elseif (is_array($value)) {
-            if ($hasAssert) {
-                $fnArgs[ $fnAssertValueKey ] = $value;
+        } elseif ( is_array($value) ) {
+            if ( $hasAssert ) {
+                $fnArgs[$fnAssertValueKey] = $value;
 
                 $status = (bool) call_user_func_array($fnAssert, $fnArgs);
 
-                if ($status) {
+                if ( $status ) {
                     $listValid = [ $value ];
                 }
             }
 
-            if (null === $listValid) {
-                if ($theType->list($value)->isOk([ &$valueList ])) {
+            if ( null === $listValid ) {
+                if ( $theType->list($value)->isOk([ &$valueList ]) ) {
                     $list = $valueList;
 
                 } else {
@@ -2110,18 +2110,18 @@ class PhpModule
             $list = [ $value ];
         }
 
-        if (null !== $listValid) {
+        if ( null !== $listValid ) {
             return $listValid;
         }
 
-        if ([] !== $list) {
-            if ($hasAssert) {
+        if ( [] !== $list ) {
+            if ( $hasAssert ) {
                 foreach ( $list as $i => $v ) {
-                    $fnArgs[ $fnAssertValueKey ] = $v;
+                    $fnArgs[$fnAssertValueKey] = $v;
 
                     $status = (bool) call_user_func_array($fnAssert, $fnArgs);
 
-                    if (! $status) {
+                    if ( ! $status ) {
                         throw new LogicException(
                             [ 'Each of `value` (if array) should pass `fnAssert` check', $v, $i ]
                         );
@@ -2135,23 +2135,23 @@ class PhpModule
 
     public function to_list_it($value, array $options = []) : \Generator
     {
-        if (null === $value) {
+        if ( null === $value ) {
             return true;
         }
 
         $theType = Lib::type();
 
-        if ($value instanceof ToListInterface) {
+        if ( $value instanceof ToListInterface ) {
             $list = $value->toList($options);
 
             foreach ( $list as $v ) {
                 yield $v;
             }
 
-        } elseif (is_array($value)) {
+        } elseif ( is_array($value) ) {
             yield $value;
 
-            if ($theType->list($value)->isOk([ &$valueList ])) {
+            if ( $theType->list($value)->isOk([ &$valueList ]) ) {
                 foreach ( $valueList as $v ) {
                     yield $v;
                 }
@@ -2170,7 +2170,7 @@ class PhpModule
      */
     public function count($value) // : int|NAN
     {
-        if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
+        if ( $this->type_countable($value)->isOk([ &$valueCountable ]) ) {
             return count($valueCountable);
         }
 
@@ -2184,11 +2184,11 @@ class PhpModule
     {
         $theType = Lib::type();
 
-        if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
+        if ( $this->type_countable($value)->isOk([ &$valueCountable ]) ) {
             return count($valueCountable);
         }
 
-        if ($theType->string($value)->isOk([ &$valueString ])) {
+        if ( $theType->string($value)->isOk([ &$valueString ]) ) {
             return strlen($valueString);
         }
 
@@ -2203,11 +2203,11 @@ class PhpModule
         $theStr = Lib::str();
         $theType = Lib::type();
 
-        if ($this->type_countable($value)->isOk([ &$valueCountable ])) {
+        if ( $this->type_countable($value)->isOk([ &$valueCountable ]) ) {
             return count($valueCountable);
         }
 
-        if ($theType->string($value)->isOk([ &$valueString ])) {
+        if ( $theType->string($value)->isOk([ &$valueString ]) ) {
             return $theStr->strlen($valueString);
         }
 
@@ -2225,15 +2225,15 @@ class PhpModule
     {
         $getDefinedFunctions = get_defined_functions();
 
-        $flipInternal = array_fill_keys($getDefinedFunctions[ 'internal' ] ?? [], true);
-        $flipUser = array_fill_keys($getDefinedFunctions[ 'user' ] ?? [], true);
+        $flipInternal = array_fill_keys($getDefinedFunctions['internal'] ?? [], true);
+        $flipUser = array_fill_keys($getDefinedFunctions['user'] ?? [], true);
 
         ksort($flipInternal);
         ksort($flipUser);
 
         $result = [];
-        $result[ 'internal' ] += $flipInternal;
-        $result[ 'user' ] += $flipUser;
+        $result['internal'] += $flipInternal;
+        $result['user'] += $flipUser;
 
         return $result;
     }
@@ -2248,13 +2248,13 @@ class PhpModule
         $isRecursive = $isRecursive ?? false;
 
         $className = $objectOrClass;
-        if (is_object($objectOrClass)) {
+        if ( is_object($objectOrClass) ) {
             $className = get_class($objectOrClass);
         }
 
         $uses = class_uses($className) ?: [];
 
-        if ($isRecursive) {
+        if ( $isRecursive ) {
             foreach ( $uses as $usesItem ) {
                 // > ! recursion
                 $uses += $this->class_uses($usesItem);
@@ -2274,7 +2274,7 @@ class PhpModule
         $recursive = $recursive ?? false;
 
         $className = $objectOrClass;
-        if (is_object($objectOrClass)) {
+        if ( is_object($objectOrClass) ) {
             $className = get_class($objectOrClass);
         }
 
@@ -2307,20 +2307,20 @@ class PhpModule
     {
         $isObject = false;
         $isClass = false;
-        if (! (false
+        if ( ! (false
             || ($isObject = (is_object($object_or_class)))
             || ($isClass = (is_string($object_or_class) && class_exists($object_or_class)))
-        )) {
+        ) ) {
             return false;
         }
 
         $anObject = null;
         $aClass = null;
-        if ($isObject) {
+        if ( $isObject ) {
             $anObject = $object_or_class;
             $aClass = get_class($object_or_class);
 
-        } elseif ($isClass) {
+        } elseif ( $isClass ) {
             $aClass = $object_or_class;
         }
 
@@ -2333,22 +2333,22 @@ class PhpModule
         $isMaybeStatic = ! $isNotStatic;
         $isNotStaticOrDoesntMatter = ! $isStatic;
 
-        if ($isMaybePublic) {
-            if ($isMaybeStatic) {
-                if (isset($object_or_class::${$property})) {
+        if ( $isMaybePublic ) {
+            if ( $isMaybeStatic ) {
+                if ( isset($object_or_class::${$property}) ) {
                     return true;
                 }
             }
 
-            if ($anObject) {
-                if ($isNotStaticOrDoesntMatter) {
-                    if (isset($anObject->{$property})) {
+            if ( $anObject ) {
+                if ( $isNotStaticOrDoesntMatter ) {
+                    if ( isset($anObject->{$property}) ) {
                         return true;
                     }
 
                     $vars = get_object_vars($anObject);
-                    if ($vars) {
-                        if (array_key_exists($property, $vars)) {
+                    if ( $vars ) {
+                        if ( array_key_exists($property, $vars) ) {
                             return true;
                         }
                     }
@@ -2356,14 +2356,14 @@ class PhpModule
             }
         }
 
-        if (! property_exists($object_or_class, $property)) {
+        if ( ! property_exists($object_or_class, $property) ) {
             return false;
         }
 
         $isMattersPublic = $public !== null;
         $isMattersStatic = $static !== null;
 
-        if (! $isMattersPublic && ! $isMattersStatic) {
+        if ( ! $isMattersPublic && ! $isMattersStatic ) {
             return true;
         }
 
@@ -2373,19 +2373,19 @@ class PhpModule
             $isPublicProp = $rp->isPublic();
             $isStaticProp = $rp->isStatic();
 
-            if (! $isPublicProp && $isPublic) {
+            if ( ! $isPublicProp && $isPublic ) {
                 return false;
             }
 
-            if (! $isStaticProp && $isStatic) {
+            if ( ! $isStaticProp && $isStatic ) {
                 return false;
             }
 
-            if ($isPublicProp && $isNotPublic) {
+            if ( $isPublicProp && $isNotPublic ) {
                 return false;
             }
 
-            if ($isStaticProp && $isNotStatic) {
+            if ( $isStaticProp && $isNotStatic ) {
                 return false;
             }
         }
@@ -2409,29 +2409,29 @@ class PhpModule
     {
         $isObject = false;
         $isClass = false;
-        if (! (false
+        if ( ! (false
             || ($isObject = (is_object($object_or_class)))
             || ($isClass = (is_string($object_or_class) && class_exists($object_or_class)))
-        )) {
+        ) ) {
             return false;
         }
 
         $aClass = null;
-        if ($isObject) {
+        if ( $isObject ) {
             $aClass = get_class($object_or_class);
 
-        } elseif ($isClass) {
+        } elseif ( $isClass ) {
             $aClass = $object_or_class;
         }
 
-        if (! method_exists($object_or_class, $method)) {
+        if ( ! method_exists($object_or_class, $method) ) {
             return false;
         }
 
         $isMattersPublic = $public !== null;
         $isMattersStatic = $static !== null;
 
-        if (! $isMattersPublic && ! $isMattersStatic) {
+        if ( ! $isMattersPublic && ! $isMattersStatic ) {
             return true;
         }
 
@@ -2446,19 +2446,19 @@ class PhpModule
             $isPublicMethod = $rm->isPublic();
             $isStaticMethod = $rm->isStatic();
 
-            if (! $isPublicMethod && $isPublic) {
+            if ( ! $isPublicMethod && $isPublic ) {
                 return false;
             }
 
-            if (! $isStaticMethod && $isStatic) {
+            if ( ! $isStaticMethod && $isStatic ) {
                 return false;
             }
 
-            if ($isPublicMethod && $isNotPublic) {
+            if ( $isPublicMethod && $isNotPublic ) {
                 return false;
             }
 
-            if ($isStaticMethod && $isNotStatic) {
+            if ( $isStaticMethod && $isNotStatic ) {
                 return false;
             }
         }
@@ -2478,7 +2478,7 @@ class PhpModule
      */
     public function get_object_vars(object $object, $newScope = 'static') : array
     {
-        if ('static' === $newScope) {
+        if ( 'static' === $newScope ) {
             // > if you need `static` scope you may call the existing php function
             throw new RuntimeException(
                 'You should pass constant __CLASS__ to second argument to keep scope `static`'
@@ -2486,7 +2486,7 @@ class PhpModule
         }
 
         $fnGetObjectVars = null;
-        if (null !== $newScope) {
+        if ( null !== $newScope ) {
             $fnGetObjectVars = (static function ($object) {
                 return get_object_vars($object);
             })->bindTo(null, $newScope);
@@ -2507,7 +2507,7 @@ class PhpModule
      */
     public function get_class_vars($object_or_class, $newScope = 'static') : array
     {
-        if ('static' === $newScope) {
+        if ( 'static' === $newScope ) {
             // > if you need `static` scope you may call the existing php function
             throw new RuntimeException(
                 'You should pass constant __CLASS__ to second argument to keep scope `static`'
@@ -2515,7 +2515,7 @@ class PhpModule
         }
 
         $fnGetClassVars = null;
-        if (null !== $newScope) {
+        if ( null !== $newScope ) {
             $fnGetClassVars = (static function ($class) {
                 return get_class_vars($class);
             })->bindTo(null, $newScope);
@@ -2540,7 +2540,7 @@ class PhpModule
      */
     public function get_class_methods($object_or_class, $newScope = 'static') : array
     {
-        if ('static' === $newScope) {
+        if ( 'static' === $newScope ) {
             // > if you need `static` scope you may call the existing php function
             throw new RuntimeException(
                 'You should pass constant __CLASS__ to second argument to keep scope `static`'
@@ -2548,7 +2548,7 @@ class PhpModule
         }
 
         $fnGetClassMethods = null;
-        if (null !== $newScope) {
+        if ( null !== $newScope ) {
             $fnGetClassMethods = (static function ($object_or_class) {
                 return get_class_methods($object_or_class);
             })->bindTo(null, $newScope);
@@ -2571,7 +2571,7 @@ class PhpModule
      */
     public function is_callable($value, $newScope = 'static') : bool
     {
-        if ('static' === $newScope) {
+        if ( 'static' === $newScope ) {
             // > if you need `static` scope you may call the existing php function
             throw new RuntimeException(
                 'You should pass constant __CLASS__ to second argument to keep scope `static`'
@@ -2579,7 +2579,7 @@ class PhpModule
         }
 
         $fnIsCallable = null;
-        if (null !== $newScope) {
+        if ( null !== $newScope ) {
             $fnIsCallable = (static function ($callable) {
                 return is_callable($callable);
             })->bindTo(null, $newScope);
@@ -2589,7 +2589,7 @@ class PhpModule
             ? $fnIsCallable($value)
             : is_callable($value);
 
-        if ($status) {
+        if ( $status ) {
             return true;
         }
 
@@ -2624,7 +2624,7 @@ class PhpModule
         $separatorString = $theType->char($separator ?? '/')->orThrow();
         $dotString = $theType->char($dot ?? '.')->orThrow();
 
-        if ('/' === $dotString) {
+        if ( '/' === $dotString ) {
             throw new LogicException(
                 [ 'The `dot` should not be a `/` sign' ]
             );
@@ -2637,8 +2637,8 @@ class PhpModule
 
         $pi = [];
 
-        if ($flags & PATHINFO_DIRNAME) {
-            if (false === strpos($dirname, '/')) {
+        if ( $flags & PATHINFO_DIRNAME ) {
+            if ( false === strpos($dirname, '/') ) {
                 $dirname = null;
 
             } else {
@@ -2649,14 +2649,14 @@ class PhpModule
                 $dirname = ('.' !== $dirname) ? $dirname : null;
             }
 
-            $pi[ 'dirname' ] = $dirname;
+            $pi['dirname'] = $dirname;
         }
 
-        if ($flags & _PHP_PATHINFO_BASENAME) {
-            $pi[ 'basename' ] = ('' !== $basename) ? $basename : null;
+        if ( $flags & _PHP_PATHINFO_BASENAME ) {
+            $pi['basename'] = ('' !== $basename) ? $basename : null;
         }
 
-        if (false
+        if ( false
             || ($flags & _PHP_PATHINFO_EXTENSION)
             || ($flags & _PHP_PATHINFO_EXTENSIONS)
             || ($flags & _PHP_PATHINFO_FILENAME)
@@ -2668,34 +2668,34 @@ class PhpModule
 
             $fname = array_shift($split);
 
-            if ($flags & _PHP_PATHINFO_EXTENSION) {
+            if ( $flags & _PHP_PATHINFO_EXTENSION ) {
                 $extension = end($split);
 
-                if ('' === $extension) {
-                    $pi[ 'extension' ] = null;
+                if ( '' === $extension ) {
+                    $pi['extension'] = null;
 
                 } else {
-                    $pi[ 'extension' ] = $extension;
+                    $pi['extension'] = $extension;
 
                     $filename = basename($basename, "{$dotString}{$extension}");
                 }
             }
 
-            if ($flags & _PHP_PATHINFO_EXTENSIONS) {
+            if ( $flags & _PHP_PATHINFO_EXTENSIONS ) {
                 $extensions = null;
-                if ([] !== $split) {
+                if ( [] !== $split ) {
                     $extensions = implode($dotString, $split);
                 }
 
-                $pi[ 'extensions' ] = $extensions;
+                $pi['extensions'] = $extensions;
             }
 
-            if ($flags & _PHP_PATHINFO_FILENAME) {
-                $pi[ 'filename' ] = ('' !== $filename) ? $filename : null;
+            if ( $flags & _PHP_PATHINFO_FILENAME ) {
+                $pi['filename'] = ('' !== $filename) ? $filename : null;
             }
 
-            if ($flags & _PHP_PATHINFO_FNAME) {
-                $pi[ 'fname' ] = ('' !== $fname) ? $fname : null;
+            if ( $flags & _PHP_PATHINFO_FNAME ) {
+                $pi['fname'] = ('' !== $fname) ? $fname : null;
             }
         }
 
@@ -2717,7 +2717,7 @@ class PhpModule
 
         $dirname = ltrim($normalized, '/');
 
-        if (false === strpos($dirname, '/')) {
+        if ( false === strpos($dirname, '/') ) {
             $dirname = null;
 
         } else {
@@ -2803,7 +2803,7 @@ class PhpModule
         $pathStringNotEmpty = $theType->string_not_empty($path)->orThrow();
         $dotString = $theType->char($dot ?? '.')->orThrow();
 
-        if ('/' === $dotString) {
+        if ( '/' === $dotString ) {
             throw new LogicException(
                 [ 'The `dot` should not be a `/` sign' ]
             );
@@ -2818,7 +2818,7 @@ class PhpModule
         array_shift($split);
 
         $extensions = null;
-        if ([] !== $split) {
+        if ( [] !== $split ) {
             $extensions = implode($dotString, $split);
         }
 
@@ -2865,7 +2865,7 @@ class PhpModule
 
         $pathNormalized = $this->path_normalize($pathStringNotEmpty, '/');
 
-        $root = ($pathNormalized[ 0 ] === '/')
+        $root = ($pathNormalized[0] === '/')
             ? $separatorString
             : '';
 
@@ -2874,15 +2874,15 @@ class PhpModule
 
         $segmentsNew = [];
         foreach ( $segments as $segment ) {
-            if (false
+            if ( false
                 || ('' === $segment)
                 || ($dotString === $segment)
             ) {
                 continue;
             }
 
-            if ($segment === "{$dotString}{$dotString}") {
-                if ([] === $segmentsNew) {
+            if ( $segment === "{$dotString}{$dotString}" ) {
+                if ( [] === $segmentsNew ) {
                     throw new RuntimeException(
                         [
                             'The `path` is invalid to parse `..` segments',
@@ -2901,7 +2901,7 @@ class PhpModule
 
         $pathResolved = $root . implode($separatorString, $segmentsNew);
 
-        if ('' === $pathResolved) {
+        if ( '' === $pathResolved ) {
             throw new RuntimeException(
                 [
                     'Result path should be a non-empty string',
@@ -2938,11 +2938,11 @@ class PhpModule
                 //
                 &$partsPlain
             ) {
-                if (! $theType->string_not_empty($v)->isOk([ &$vString ])) {
+                if ( ! $theType->string_not_empty($v)->isOk([ &$vString ]) ) {
                     return;
                 }
 
-                if ('.' === $vString) {
+                if ( '.' === $vString ) {
                     return;
                 }
 
@@ -2988,13 +2988,13 @@ class PhpModule
             [ &$pathRelative ]
         );
 
-        if (! $status) {
+        if ( ! $status ) {
             throw new RuntimeException(
                 [ 'The `absolute` is not a part of the `root`', $root ]
             );
         }
 
-        if ('' === $pathRelative) {
+        if ( '' === $pathRelative ) {
             throw new RuntimeException(
                 [
                     'Result path should be a non-empty string',
@@ -3025,9 +3025,9 @@ class PhpModule
 
         $relativeNormalized = $this->path_normalize($relativeStringNotEmpty, $separatorChar);
 
-        $isRoot = ($separatorChar === $relativeNormalized[ 0 ]);
+        $isRoot = ($separatorChar === $relativeNormalized[0]);
 
-        if ($isRoot) {
+        if ( $isRoot ) {
             $absoluteNormalized = $relativeNormalized;
 
         } else {
@@ -3055,9 +3055,9 @@ class PhpModule
         $currentStringNotEmpty = $theType->string_not_empty($current)->orThrow();
         $dotChar = $theType->char($dot ?? '.')->orThrow();
 
-        $isDot = ($dotChar === $path[ 0 ]);
+        $isDot = ($dotChar === $path[0]);
 
-        if ($isDot) {
+        if ( $isDot ) {
             $pathResolved = $this->path_absolute(
                 $pathStringNotEmpty,
                 $currentStringNotEmpty,
@@ -3090,7 +3090,7 @@ class PhpModule
             $result = null;
         }
 
-        if (! is_string($result)) {
+        if ( ! is_string($result) ) {
             $result = null;
         }
 
@@ -3114,7 +3114,7 @@ class PhpModule
             $result = null;
         }
 
-        if (is_object($result) && (get_class($result) === '__PHP_Incomplete_Class')) {
+        if ( is_object($result) && (get_class($result) === '__PHP_Incomplete_Class') ) {
             $result = null;
         }
 
@@ -3137,16 +3137,16 @@ class PhpModule
 
         $tickUsleep = $tickUsleep ?? $this->staticPoolingTickUsleep();
 
-        if ($tickUsleep <= 0) {
+        if ( $tickUsleep <= 0 ) {
             throw new LogicException(
                 [ 'The `tickUsleep` should be an integer positive', $tickUsleep ]
             );
         }
 
-        if (! (false
+        if ( ! (false
             || (null === $timeoutMs)
             || ($timeoutMs >= 0)
-        )) {
+        ) ) {
             throw new LogicException(
                 [ 'The `timeoutMs` should be an integer non-negative or a null', $timeoutMs ]
             );
@@ -3161,7 +3161,7 @@ class PhpModule
         do {
             $nowMicrotime = $ctx->updateNowMicrotime();
 
-            if ($hasFnCatch) {
+            if ( $hasFnCatch ) {
                 try {
                     call_user_func_array($fnPooling, [ $ctx ]);
                 }
@@ -3173,17 +3173,17 @@ class PhpModule
                 call_user_func_array($fnPooling, [ $ctx ]);
             }
 
-            if ($ctx->hasResult($refResult)) {
+            if ( $ctx->hasResult($refResult) ) {
                 return $refResult;
 
-            } elseif ($ctx->hasError($refError)) {
+            } elseif ( $ctx->hasError($refError) ) {
                 throw new RuntimeException(
                     [ 'Pooling function returned error', $refError ]
                 );
             }
 
-            if (null !== ($timeoutMicrotime = $ctx->hasTimeoutMicrotime())) {
-                if ($nowMicrotime > $timeoutMicrotime) {
+            if ( null !== ($timeoutMicrotime = $ctx->hasTimeoutMicrotime()) ) {
+                if ( $nowMicrotime > $timeoutMicrotime ) {
                     break;
                 }
             }
@@ -3211,131 +3211,131 @@ class PhpModule
         $__unresolved = [];
 
         for ( $i = 0; $i < $len; $i++ ) {
-            $arg = $throwableArgs[ $i ];
+            $arg = $throwableArgs[$i];
 
-            if (is_int($arg)) {
-                $codeIntegerList[ $i ] = $arg;
+            if ( is_int($arg) ) {
+                $codeIntegerList[$i] = $arg;
 
                 continue;
             }
 
-            if (is_string($arg) && ('' !== $arg)) {
+            if ( is_string($arg) && ('' !== $arg) ) {
                 /**
                  * @noinspection PhpStrFunctionsInspection
                  */
-                if (true
+                if ( true
                     && (false === strpos($arg, ' '))
                     && preg_match('/^[A-Z0-9_]+$/', $arg)
                 ) {
-                    $codeStringList[ $i ] = $arg;
+                    $codeStringList[$i] = $arg;
 
                 } else {
-                    $messageList[ $i ] = $arg;
+                    $messageList[$i] = $arg;
                 }
 
                 continue;
             }
 
-            if (false
+            if ( false
                 || is_array($arg)
                 || $arg instanceof \stdClass
             ) {
                 $messageDataArray = (array) $arg;
 
-                if ([] === $messageDataArray) {
+                if ( [] === $messageDataArray ) {
                     continue;
                 }
 
-                if (true
-                    && isset($messageDataArray[ 0 ])
-                    && isset($messageDataArray[ 1 ])
-                    && is_int($messageDataArray[ 1 ])
-                    && is_file($messageDataArray[ 0 ])
+                if ( true
+                    && isset($messageDataArray[0])
+                    && isset($messageDataArray[1])
+                    && is_int($messageDataArray[1])
+                    && is_file($messageDataArray[0])
                 ) {
-                    $fileList[ $i ] = $messageDataArray[ 0 ];
-                    $lineList[ $i ] = $messageDataArray[ 1 ];
+                    $fileList[$i] = $messageDataArray[0];
+                    $lineList[$i] = $messageDataArray[1];
 
                     continue;
                 }
 
-                if (isset($messageDataArray[ 0 ])) {
+                if ( isset($messageDataArray[0]) ) {
                     $messageString = null;
 
-                    if (false
-                        || is_scalar($messageDataArray[ 0 ])
-                        || is_object($messageDataArray[ 0 ])
+                    if ( false
+                        || is_scalar($messageDataArray[0])
+                        || is_object($messageDataArray[0])
                     ) {
-                        $messageString = (string) $messageDataArray[ 0 ];
+                        $messageString = (string) $messageDataArray[0];
                     }
 
-                    if ('' === $messageString) {
+                    if ( '' === $messageString ) {
                         $messageString = null;
                     }
 
-                    if (null !== $messageString) {
-                        unset($messageDataArray[ 0 ]);
+                    if ( null !== $messageString ) {
+                        unset($messageDataArray[0]);
 
                         /**
                          * @noinspection PhpStrFunctionsInspection
                          */
-                        if (true
+                        if ( true
                             && (false === strpos($messageString, ' '))
                             && preg_match('/^[A-Z0-9_]+$/', $messageString)
                         ) {
-                            $codeStringList[ $i ] = $messageString;
+                            $codeStringList[$i] = $messageString;
 
                         } else {
-                            $messageList[ $i ] = $messageString;
+                            $messageList[$i] = $messageString;
                         }
                     }
                 }
 
-                $messageDataList[ $i ] = $messageDataArray;
+                $messageDataList[$i] = $messageDataArray;
 
                 continue;
             }
 
-            if ($arg instanceof \Throwable) {
-                $previousList[ $i ] = $arg;
+            if ( $arg instanceof \Throwable ) {
+                $previousList[$i] = $arg;
 
                 continue;
             }
 
-            $__unresolved[ $i ] = $arg;
+            $__unresolved[$i] = $arg;
         }
 
-        if ([] !== $previousList) {
-            if ([] === $messageList) {
+        if ( [] !== $previousList ) {
+            if ( [] === $messageList ) {
                 // $messageList = [];
                 $codeIntegerList = [];
                 $fileList = [];
                 $lineList = [];
 
                 foreach ( $previousList as $i => $previous ) {
-                    $messageList[ $i ] = $previous->getMessage();
-                    $codeIntegerList[ $i ] = $previous->getCode();
-                    $fileList[ $i ] = $previous->getFile();
-                    $lineList[ $i ] = $previous->getLine();
+                    $messageList[$i] = $previous->getMessage();
+                    $codeIntegerList[$i] = $previous->getCode();
+                    $fileList[$i] = $previous->getFile();
+                    $lineList[$i] = $previous->getLine();
                 }
             }
         }
 
         foreach ( $messageList as $i => $messageString ) {
-            $messageData = $messageDataList[ $i ] ?? [];
+            $messageData = $messageDataList[$i] ?? [];
 
-            $messageObjectList[ $i ] = (object) ([ $messageString ] + $messageData);
+            $messageObjectList[$i] = (object) ([ $messageString ] + $messageData);
         }
 
         $result = [];
 
-        $result[ 'messageList' ] = $messageList;
-        $result[ 'messageDataList' ] = $messageDataList;
-        $result[ 'messageObjectList' ] = $messageObjectList;
-        $result[ 'codeIntegerList' ] = $codeIntegerList;
-        $result[ 'codeStringList' ] = $codeStringList;
-        $result[ 'previousList' ] = $previousList;
-        $result[ 'fileList' ] = $fileList;
-        $result[ 'lineList' ] = $lineList;
+        $result['messageList'] = $messageList;
+        $result['messageDataList'] = $messageDataList;
+        $result['messageObjectList'] = $messageObjectList;
+        $result['codeIntegerList'] = $codeIntegerList;
+        $result['codeStringList'] = $codeStringList;
+        $result['previousList'] = $previousList;
+        $result['fileList'] = $fileList;
+        $result['lineList'] = $lineList;
 
         $result += [
             'message'       => (null
@@ -3355,7 +3355,7 @@ class PhpModule
             'line'          => (([] !== $lineList) ? reset($lineList) : null),
         ];
 
-        $result[ '__unresolved' ] = $__unresolved;
+        $result['__unresolved'] = $__unresolved;
 
         return $result;
     }

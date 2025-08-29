@@ -24,14 +24,14 @@ class DefaultThrowabler implements ThrowablerInterface
      */
     public function catchPrevious(\Throwable $throwable, ?string $throwableClass = null) : ?\Throwable
     {
-        if (null === $throwableClass) {
+        if ( null === $throwableClass ) {
             return $throwable;
         }
 
         $gen = $this->getPreviousIterator($throwable);
 
         foreach ( $gen as $e ) {
-            if ($e instanceof $throwableClass) {
+            if ( $e instanceof $throwableClass ) {
                 return $e;
             }
         }
@@ -50,7 +50,7 @@ class DefaultThrowabler implements ThrowablerInterface
         $dot = [];
 
         foreach ( $it as $i => $e ) {
-            $dot[ $i ] = $e;
+            $dot[$i] = $e;
         }
 
         return $dot;
@@ -67,13 +67,13 @@ class DefaultThrowabler implements ThrowablerInterface
 
         foreach ( $it as $track ) {
             foreach ( $track as $ii => $e ) {
-                if (isset($index[ $ii ])) {
+                if ( isset($index[$ii]) ) {
                     continue;
                 }
 
                 yield $ii => $e;
 
-                $index[ $ii ] = true;
+                $index[$ii] = true;
             }
         }
     }
@@ -103,7 +103,7 @@ class DefaultThrowabler implements ThrowablerInterface
         $array = $this->getPreviousArray($throwable);
 
         foreach ( $array as $dotpath => $e ) {
-            $messagesList[ $dotpath ] = $this->getThrowableMessageFirstString($e, $flags);
+            $messagesList[$dotpath] = $this->getThrowableMessageFirstString($e, $flags);
         }
 
         return $messagesList;
@@ -123,9 +123,9 @@ class DefaultThrowabler implements ThrowablerInterface
             $messageLines = $this->getThrowableMessageFirstLines($e, $flags);
             $messageLinesCnt = count($messageLines);
 
-            $messageLines[ 0 ] = "[ {$dotpath} ] {$messageLines[ 0 ]}";
+            $messageLines[0] = "[ {$dotpath} ] {$messageLines[ 0 ]}";
 
-            if (! $first && ($messageLinesCnt > 1)) {
+            if ( ! $first && ($messageLinesCnt > 1) ) {
                 array_unshift($messageLines, '');
             }
 
@@ -140,7 +140,7 @@ class DefaultThrowabler implements ThrowablerInterface
                 $messageLines
             );
 
-            if ($first) {
+            if ( $first ) {
                 $first = false;
             }
         }
@@ -159,7 +159,7 @@ class DefaultThrowabler implements ThrowablerInterface
         $array = $this->getPreviousArray($throwable);
 
         foreach ( $array as $dotpath => $e ) {
-            $messagesLists[ $dotpath ] = $this->getThrowableMessagesAllList($e, $flags);
+            $messagesLists[$dotpath] = $this->getThrowableMessagesAllList($e, $flags);
         }
 
         return $messagesLists;
@@ -192,13 +192,13 @@ class DefaultThrowabler implements ThrowablerInterface
 
             $messagesWithInfoAndTraceLines = $messagesLines;
 
-            if ($isWithInfo) {
+            if ( $isWithInfo ) {
                 $infoLines = $this->getThrowableInfoLines($e, $flags);
 
                 $messagesWithInfoAndTraceLines = array_merge($messagesWithInfoAndTraceLines, $infoLines);
             }
 
-            if ($isWithTrace) {
+            if ( $isWithTrace ) {
                 $infoLines = $this->getThrowableTraceLines($e, $flags);
 
                 $messagesWithInfoAndTraceLines = array_merge(
@@ -213,19 +213,19 @@ class DefaultThrowabler implements ThrowablerInterface
 
             $messagesWithInfoLinesCnt = count($messagesWithInfoAndTraceLines);
 
-            if ($messagesLinesCnt > 1) {
+            if ( $messagesLinesCnt > 1 ) {
                 array_unshift($messagesWithInfoAndTraceLines, "[ {$dotpath} >>> ]");
 
                 $messagesWithInfoAndTraceLines[] = "[ {$dotpath} <<< ]";
 
-            } elseif (1 === $messagesLinesCnt) {
-                $messagesWithInfoAndTraceLines[ 0 ] = "[ {$dotpath} ] {$messagesWithInfoAndTraceLines[ 0 ]}";
+            } elseif ( 1 === $messagesLinesCnt ) {
+                $messagesWithInfoAndTraceLines[0] = "[ {$dotpath} ] {$messagesWithInfoAndTraceLines[ 0 ]}";
 
             } else {
                 continue;
             }
 
-            if (! $first && ($messagesWithInfoLinesCnt > 1)) {
+            if ( ! $first && ($messagesWithInfoLinesCnt > 1) ) {
                 array_unshift($messagesWithInfoAndTraceLines, '');
             }
 
@@ -240,7 +240,7 @@ class DefaultThrowabler implements ThrowablerInterface
                 $messagesWithInfoAndTraceLines
             );
 
-            if ($first) {
+            if ( $first ) {
                 $first = false;
             }
         }
@@ -256,7 +256,7 @@ class DefaultThrowabler implements ThrowablerInterface
 
         $throwableMap = [ $eMessage => $throwable ];
 
-        $eMessages = $this->convertMessagesToUtf8($throwableMap, $flags);
+        $eMessages = $this->extractMessagesUtf8FromThrowableMap($throwableMap, $flags);
 
         return reset($eMessages);
     }
@@ -276,7 +276,7 @@ class DefaultThrowabler implements ThrowablerInterface
 
         $lines = [];
 
-        if ($isWithCode) {
+        if ( $isWithCode ) {
             $eMessage = 'CODE[' . $throwable->getCode() . '] ' . $eMessage;
         }
 
@@ -284,20 +284,20 @@ class DefaultThrowabler implements ThrowablerInterface
 
         foreach ( $eMessageLines as $line ) {
             $line = rtrim($line);
-            if ('' === $line) {
+            if ( '' === $line ) {
                 continue;
             }
 
             $lines[] = $line;
         }
 
-        if ($isWithInfo) {
+        if ( $isWithInfo ) {
             $linesInfo = $this->getThrowableInfoLines($throwable, $flags);
 
             $lines = array_merge($lines, $linesInfo);
         }
 
-        if ($isWithTrace) {
+        if ( $isWithTrace ) {
             $linesTrace = $this->getThrowableTraceLines($throwable, $flags);
 
             $lines = array_merge(
@@ -319,14 +319,14 @@ class DefaultThrowabler implements ThrowablerInterface
      */
     public function getThrowableMessagesAllList(\Throwable $throwable, ?int $flags = null) : array
     {
-        if ($throwable instanceof HasMessageListInterface) {
+        if ( $throwable instanceof HasMessageListInterface ) {
             $throwableMap = array_fill_keys($throwable->getMessageList(), $throwable);
 
         } else {
             $throwableMap = [ $throwable->getMessage() => $throwable ];
         }
 
-        $eMessages = $this->convertMessagesToUtf8($throwableMap, $flags);
+        $eMessages = $this->extractMessagesUtf8FromThrowableMap($throwableMap, $flags);
 
         return $eMessages;
     }
@@ -347,7 +347,7 @@ class DefaultThrowabler implements ThrowablerInterface
         $lines = [];
 
         foreach ( $eMessages as $eMessage ) {
-            if ($isWithCode) {
+            if ( $isWithCode ) {
                 $eMessage = 'CODE[' . $throwable->getCode() . '] ' . $eMessage;
             }
 
@@ -355,25 +355,25 @@ class DefaultThrowabler implements ThrowablerInterface
 
             foreach ( $eMessageLines as $line ) {
                 $line = rtrim($line);
-                if ('' === $line) {
+                if ( '' === $line ) {
                     continue;
                 }
 
                 $lines[] = $line;
             }
 
-            if (count($eMessageLines) > 1) {
+            if ( count($eMessageLines) > 1 ) {
                 $lines[] = '';
             }
         }
 
-        if ($isWithInfo) {
+        if ( $isWithInfo ) {
             $linesInfo = $this->getThrowableInfoLines($throwable, $flags);
 
             $lines = array_merge($lines, $linesInfo);
         }
 
-        if ($isWithTrace) {
+        if ( $isWithTrace ) {
             $linesTrace = $this->getThrowableTraceLines($throwable, $flags);
 
             $lines = array_merge(
@@ -395,18 +395,25 @@ class DefaultThrowabler implements ThrowablerInterface
         $theDebug = Lib::debug();
         $theFs = Lib::fs();
 
-        $eFile = $throwable->getFile();
-        $eLine = $throwable->getLine();
+        if ( $throwable instanceof HasTraceOverrideInterface ) {
+            $eFile = $throwable->getFileOverride();
+            $eLine = $throwable->getLineOverride();
+
+        } else {
+            $eFile = $throwable->getFile();
+            $eLine = $throwable->getLine();
+        }
+
         $eObjectClass = get_class($throwable);
         $eObjectId = spl_object_id($throwable);
 
-        if ('' === $eFile) {
+        if ( '' === $eFile ) {
             $eFile = '{file}';
 
         } else {
             $dirRoot = $theDebug->staticDirRoot();
 
-            if (null !== $dirRoot) {
+            if ( null !== $dirRoot ) {
                 try {
                     $eFileRelative = $theFs->path_relative(
                         $eFile,
@@ -422,7 +429,7 @@ class DefaultThrowabler implements ThrowablerInterface
             }
         }
 
-        if (0 >= $eLine) {
+        if ( 0 >= $eLine ) {
             $eLine = -1;
         }
 
@@ -452,17 +459,39 @@ class DefaultThrowabler implements ThrowablerInterface
 
         $lines = [];
 
-        if ($isWithFile) {
-            $eFile = $throwable->getFile();
-            $eLine = $throwable->getLine();
+        if ( $isWithObjectClass ) {
+            $eObjectClass = get_class($throwable);
 
-            if ('' === $eFile) {
+            $line = "object # {$eObjectClass}";
+
+            if ( $isWithObjectId ) {
+                $eObjectId = spl_object_id($throwable);
+
+                $line .= " # {$eObjectId}";
+            }
+
+            $line = "{ {$line} }";
+
+            $lines[] = $line;
+        }
+
+        if ( $isWithFile ) {
+            if ( $throwable instanceof HasTraceOverrideInterface ) {
+                $eFile = $throwable->getFileOverride();
+                $eLine = $throwable->getLineOverride();
+
+            } else {
+                $eFile = $throwable->getFile();
+                $eLine = $throwable->getLine();
+            }
+
+            if ( '' === $eFile ) {
                 $eFile = '{file}';
 
             } else {
                 $dirRoot = $theDebug->staticDirRoot();
 
-                if (null !== $dirRoot) {
+                if ( null !== $dirRoot ) {
                     try {
                         $eFileRelative = $theFs->path_relative(
                             $eFile,
@@ -478,28 +507,10 @@ class DefaultThrowabler implements ThrowablerInterface
                 }
             }
 
-            if ($eLine <= 0) {
+            if ( $eLine <= 0 ) {
                 $eLine = -1;
             }
-        }
 
-        if ($isWithObjectClass) {
-            $eObjectClass = get_class($throwable);
-
-            $line = "object # {$eObjectClass}";
-
-            if ($isWithObjectId) {
-                $eObjectId = spl_object_id($throwable);
-
-                $line .= " # {$eObjectId}";
-            }
-
-            $line = "{ {$line} }";
-
-            $lines[] = $line;
-        }
-
-        if ($isWithFile) {
             $line = "{$eFile} : {$eLine}";
 
             $lines[] = $line;
@@ -520,24 +531,24 @@ class DefaultThrowabler implements ThrowablerInterface
 
         $dirRoot = $theDebug->staticDirRoot();
 
-        if (null !== $dirRoot) {
+        if ( null !== $dirRoot ) {
             foreach ( $eTrace as $i => $t ) {
-                if (! isset($t[ 'file' ])) {
+                if ( ! isset($t['file']) ) {
                     continue;
                 }
 
                 try {
                     $tFileRelative = $theFs->path_relative(
-                        $t[ 'file' ],
+                        $t['file'],
                         $dirRoot,
                         '/'
                     );
                 }
                 catch ( \Throwable $e ) {
-                    $tFileRelative = $t[ 'file' ];
+                    $tFileRelative = $t['file'];
                 }
 
-                $eTrace[ $i ][ 'file' ] = $tFileRelative;
+                $eTrace[$i]['file'] = $tFileRelative;
             }
         }
 
@@ -556,10 +567,17 @@ class DefaultThrowabler implements ThrowablerInterface
         );
 
         foreach ( $trace as $traceItem ) {
-            $phpFile = $traceItem[ 'file' ] ?? '{file}';
-            $phpLine = $traceItem[ 'line' ] ?? 0;
+            $phpLine = $traceItem['line'] ?? 0;
+            $phpFile = $traceItem['file'] ?? '{file}';
 
-            $lines[] = "{$phpFile} : {$phpLine}";
+            $phpClass = $traceItem['class'] ?? '';
+            $phpType = $traceItem['type'] ?? '';
+            $phpFunction = $traceItem['function'] ?? '';
+
+            $phpFn = array_filter([ $phpClass, $phpType, $phpFunction ]) ?: [];
+            $phpFn = $phpFn ? implode('', $phpFn) : '{function}';
+
+            $lines[] = "{$phpFile} : {$phpLine} : {$phpFn}";
         }
 
         return $lines;
@@ -571,17 +589,17 @@ class DefaultThrowabler implements ThrowablerInterface
      *
      * @return string[]
      */
-    protected function convertMessagesToUtf8(array $throwableMap, ?int $flags = null) : array
+    protected function extractMessagesUtf8FromThrowableMap(array $throwableMap, ?int $flags = null) : array
     {
         // > mbstring is required to convert to UTF-8
         $isMbstring = extension_loaded('mbstring');
-        if (! $isMbstring) {
+        if ( ! $isMbstring ) {
             return array_keys($throwableMap);
         }
 
         // > unix/mac works well with non-utf8 strings in terminal
         $isWindows = strtoupper(substr(PHP_OS, 0, 3)) === 'WIN';
-        if (! $isWindows) {
+        if ( ! $isWindows ) {
             return array_keys($throwableMap);
         }
 
@@ -589,13 +607,13 @@ class DefaultThrowabler implements ThrowablerInterface
 
         foreach ( $throwableMap as $eMessage => $throwable ) {
             $isUtf8 = (1 === preg_match('//u', $eMessage));
-            if ($isUtf8) {
+            if ( $isUtf8 ) {
                 continue;
             }
 
             $eMessageUtf8 = $eMessage;
 
-            if ($isMbstringSupportsEncodingListWithCp1251) {
+            if ( $isMbstringSupportsEncodingListWithCp1251 ) {
                 $mbEncodingList = mb_list_encodings();
 
                 array_unshift($mbEncodingList, 'CP1251');
@@ -609,7 +627,7 @@ class DefaultThrowabler implements ThrowablerInterface
 
             } else {
                 // > gzhegow, 2025-02-26, case is happened only with \PDOException
-                if ($throwable instanceof \PDOException) {
+                if ( $throwable instanceof \PDOException ) {
                     $eMessageUtf8 = mb_convert_encoding(
                         $eMessage,
                         'UTF-8',
@@ -618,9 +636,9 @@ class DefaultThrowabler implements ThrowablerInterface
                 }
             }
 
-            unset($throwableMap[ $eMessage ]);
+            unset($throwableMap[$eMessage]);
 
-            $throwableMap[ $eMessageUtf8 ] = $throwable;
+            $throwableMap[$eMessageUtf8] = $throwable;
         }
 
         return array_keys($throwableMap);
@@ -638,7 +656,7 @@ class DefaultThrowabler implements ThrowablerInterface
             : '';
 
         foreach ( $linesSource as $i => $line ) {
-            $lines[ $i ] = $padding . $line;
+            $lines[$i] = $padding . $line;
         }
 
         return $lines;
@@ -675,20 +693,20 @@ class DefaultThrowabler implements ThrowablerInterface
             ],
         ];
 
-        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+        foreach ( $flagGroups as $groupName => [$conflict, $default] ) {
             $cnt = 0;
             foreach ( $conflict as $flag ) {
-                if ($flags & $flag) {
+                if ( $flags & $flag ) {
                     $cnt++;
                 }
             }
 
-            if ($cnt > 1) {
+            if ( $cnt > 1 ) {
                 throw new LogicException(
                     [ 'The `flags` conflict in group: ' . $groupName, $flags ]
                 );
 
-            } elseif (0 === $cnt) {
+            } elseif ( 0 === $cnt ) {
                 $flags |= $default;
             }
         }
@@ -701,7 +719,7 @@ class DefaultThrowabler implements ThrowablerInterface
         $flags = $flags ?? 0;
 
         $flagGroups = [
-            '_DEBUG_THROWABLER_WITH_FILE'         => [
+            '_DEBUG_THROWABLER_INFO_WITH_FILE'         => [
                 [
                     _DEBUG_THROWABLER_INFO_WITH_FILE,
                     _DEBUG_THROWABLER_INFO_WITHOUT_FILE,
@@ -709,7 +727,7 @@ class DefaultThrowabler implements ThrowablerInterface
                 _DEBUG_THROWABLER_INFO_WITH_FILE,
             ],
             //
-            '_DEBUG_THROWABLER_WITH_OBJECT_CLASS' => [
+            '_DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS' => [
                 [
                     _DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS,
                     _DEBUG_THROWABLER_INFO_WITHOUT_OBJECT_CLASS,
@@ -717,7 +735,7 @@ class DefaultThrowabler implements ThrowablerInterface
                 _DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS,
             ],
             //
-            '_DEBUG_THROWABLER_WITH_OBJECT_ID'    => [
+            '_DEBUG_THROWABLER_INFO_WITH_OBJECT_ID'    => [
                 [
                     _DEBUG_THROWABLER_INFO_WITH_OBJECT_ID,
                     _DEBUG_THROWABLER_INFO_WITHOUT_OBJECT_ID,
@@ -726,20 +744,20 @@ class DefaultThrowabler implements ThrowablerInterface
             ],
         ];
 
-        foreach ( $flagGroups as $groupName => [ $conflict, $default ] ) {
+        foreach ( $flagGroups as $groupName => [$conflict, $default] ) {
             $cnt = 0;
             foreach ( $conflict as $flag ) {
-                if ($flags & $flag) {
+                if ( $flags & $flag ) {
                     $cnt++;
                 }
             }
 
-            if ($cnt > 1) {
+            if ( $cnt > 1 ) {
                 throw new LogicException(
                     [ 'The `flags` conflict in group: ' . $groupName, $flags ]
                 );
 
-            } elseif (0 === $cnt) {
+            } elseif ( 0 === $cnt ) {
                 $flags |= $default;
             }
         }

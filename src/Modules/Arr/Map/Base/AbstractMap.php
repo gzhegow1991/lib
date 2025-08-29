@@ -71,7 +71,7 @@ abstract class AbstractMap
         ];
 
         foreach ( $this->keysQueue as $keyPos => $keyPosType ) {
-            $keys[] = $refs[ $keyPosType ][ $keyPos ];
+            $keys[] = $refs[$keyPosType][$keyPos];
         }
 
         return $keys;
@@ -103,9 +103,9 @@ abstract class AbstractMap
     {
         $key = $this->existsKey($keyValue);
 
-        if (null === $key) {
-            if (0 < count($fallback)) {
-                return $fallback[ 0 ];
+        if ( null === $key ) {
+            if ( 0 < count($fallback) ) {
+                return $fallback[0];
             }
 
             throw new RuntimeException(
@@ -115,7 +115,7 @@ abstract class AbstractMap
 
         [ $keyPos ] = $key;
 
-        return $this->values[ $keyPos ];
+        return $this->values[$keyPos];
     }
 
 
@@ -139,28 +139,28 @@ abstract class AbstractMap
     {
         [ $keyPos, $keyPosType, $keyPosIndex ] = $key;
 
-        if (null === $keyPos) {
+        if ( null === $keyPos ) {
             $this->keysQueue[] = null;
 
             end($this->keysQueue);
             $keyPos = key($this->keysQueue);
         }
 
-        $this->keysQueue[ $keyPos ] = $keyPosType;
+        $this->keysQueue[$keyPos] = $keyPosType;
 
-        if (1 === $keyPosType) {
-            $this->keysNative[ $keyPos ] = $keyValue;
-            $this->keysNativeIndex[ $keyPosIndex ] = $keyPos;
+        if ( 1 === $keyPosType ) {
+            $this->keysNative[$keyPos] = $keyValue;
+            $this->keysNativeIndex[$keyPosIndex] = $keyPos;
 
-        } elseif (2 === $keyPosType) {
-            $this->keysObject[ $keyPos ] = $keyValue;
-            $this->keysObjectIndex[ $keyPosIndex ] = $keyPos;
+        } elseif ( 2 === $keyPosType ) {
+            $this->keysObject[$keyPos] = $keyValue;
+            $this->keysObjectIndex[$keyPosIndex] = $keyPos;
 
-        } elseif (3 === $keyPosType) {
-            $this->keysComplex[ $keyPos ] = $keyValue;
+        } elseif ( 3 === $keyPosType ) {
+            $this->keysComplex[$keyPos] = $keyValue;
 
-        } elseif (4 === $keyPosType) {
-            $this->keysComplexSame[ $keyPos ] = $keyValue;
+        } elseif ( 4 === $keyPosType ) {
+            $this->keysComplexSame[$keyPos] = $keyValue;
         }
 
         return $keyPos;
@@ -173,7 +173,7 @@ abstract class AbstractMap
      */
     protected function setValue($keyPos, $value)
     {
-        $this->values[ $keyPos ] = $value;
+        $this->values[$keyPos] = $value;
 
         return $this;
     }
@@ -188,7 +188,7 @@ abstract class AbstractMap
             ?? $this->existsKey($keyValue)
             ?? $this->newKey($keyValue);
 
-        if (null !== $key[ 0 ]) {
+        if ( null !== $key[0] ) {
             throw new RuntimeException(
                 [ 'The map key is already exists: ' . ($keyValue ?? '{ NULL }') ]
             );
@@ -206,7 +206,7 @@ abstract class AbstractMap
     {
         $key = $this->existsKey($keyValue);
 
-        if (null === $key[ 0 ]) {
+        if ( null === $key[0] ) {
             throw new RuntimeException(
                 [ 'Missing map key: ' . ($keyValue ?? '{ NULL }') ]
             );
@@ -228,7 +228,7 @@ abstract class AbstractMap
 
         $refKeyValue = array_key_last($this->values);
 
-        unset($this->values[ $refKeyValue ]);
+        unset($this->values[$refKeyValue]);
 
         $this->set($refKeyValue, $value);
 
@@ -243,7 +243,7 @@ abstract class AbstractMap
     {
         $key = $this->existsKey($keyValue);
 
-        if (null !== $key) {
+        if ( null !== $key ) {
             [ $keyPos ] = $key;
 
             $this->unsetKey($key);
@@ -260,7 +260,7 @@ abstract class AbstractMap
     {
         $key = $this->existsKey($keyValue);
 
-        if (null === $key) {
+        if ( null === $key ) {
             throw new RuntimeException(
                 [ 'Missing array key: ' . ($keyValue ?? '{ NULL }') ]
             );
@@ -278,21 +278,21 @@ abstract class AbstractMap
     {
         [ $keyPos, $keyPosType, $keyPosIndex ] = $key;
 
-        unset($this->keysQueue[ $keyPos ]);
+        unset($this->keysQueue[$keyPos]);
 
-        if (1 === $keyPosType) {
-            unset($this->keysNative[ $keyPos ]);
-            unset($this->keysNativeIndex[ $keyPosIndex ]);
+        if ( 1 === $keyPosType ) {
+            unset($this->keysNative[$keyPos]);
+            unset($this->keysNativeIndex[$keyPosIndex]);
 
-        } elseif (2 === $keyPosType) {
-            unset($this->keysObject[ $keyPos ]);
-            unset($this->keysObjectIndex[ $keyPosIndex ]);
+        } elseif ( 2 === $keyPosType ) {
+            unset($this->keysObject[$keyPos]);
+            unset($this->keysObjectIndex[$keyPosIndex]);
 
-        } elseif (3 === $keyPosType) {
-            unset($this->keysComplex[ $keyPos ]);
+        } elseif ( 3 === $keyPosType ) {
+            unset($this->keysComplex[$keyPos]);
 
-        } elseif (4 === $keyPosType) {
-            unset($this->keysComplexSame[ $keyPos ]);
+        } elseif ( 4 === $keyPosType ) {
+            unset($this->keysComplexSame[$keyPos]);
         }
 
         return $this;
@@ -305,7 +305,7 @@ abstract class AbstractMap
      */
     protected function unsetValue($keyPos)
     {
-        unset($this->values[ $keyPos ]);
+        unset($this->values[$keyPos]);
 
         return $this;
     }
@@ -318,16 +318,16 @@ abstract class AbstractMap
     {
         $keyPos = null;
 
-        if (null === $keyValue) {
+        if ( null === $keyValue ) {
             $keyPosType = 1;
             $keyPosIndex = '';
 
-        } elseif (is_scalar($keyValue)) {
+        } elseif ( is_scalar($keyValue) ) {
             $keyPosType = 1;
             $keyPosIndex = (string) $keyValue;
 
-        } elseif (is_object($keyValue)) {
-            if ($keyValue instanceof CanIsSameInterface) {
+        } elseif ( is_object($keyValue) ) {
+            if ( $keyValue instanceof CanIsSameInterface ) {
                 $keyPosType = 4;
                 $keyPosIndex = null;
 
@@ -349,23 +349,23 @@ abstract class AbstractMap
      */
     protected function existsKey($keyValue) : ?array
     {
-        if (null === $keyValue) {
+        if ( null === $keyValue ) {
             $keyPosIndex = '';
             $keyPosType = 1;
-            $keyPos = $this->keysNativeIndex[ $keyPosIndex ] ?? false;
+            $keyPos = $this->keysNativeIndex[$keyPosIndex] ?? false;
 
-        } elseif (is_scalar($keyValue)) {
+        } elseif ( is_scalar($keyValue) ) {
             $keyPosIndex = (string) $keyValue;
             $keyPosType = 1;
-            $keyPos = $this->keysNativeIndex[ $keyPosIndex ] ?? false;
+            $keyPos = $this->keysNativeIndex[$keyPosIndex] ?? false;
 
-        } elseif (is_object($keyValue)) {
-            if ($keyValue instanceof CanIsSameInterface) {
+        } elseif ( is_object($keyValue) ) {
+            if ( $keyValue instanceof CanIsSameInterface ) {
                 $keyPosIndex = null;
                 $keyPosType = 4;
                 $keyPos = null;
                 foreach ( $this->keysComplexSame as $i => $key ) {
-                    if ($key->isSame($keyValue)) {
+                    if ( $key->isSame($keyValue) ) {
                         $keyPos = $i;
 
                         break;
@@ -375,7 +375,7 @@ abstract class AbstractMap
             } else {
                 $keyPosIndex = spl_object_id($keyValue);
                 $keyPosType = 2;
-                $keyPos = $this->keysObjectIndex[ $keyPosIndex ] ?? false;
+                $keyPos = $this->keysObjectIndex[$keyPosIndex] ?? false;
             }
 
         } else {
@@ -384,7 +384,7 @@ abstract class AbstractMap
             $keyPos = array_search($keyValue, $this->keysComplex, true);
         }
 
-        if (false === $keyPos) {
+        if ( false === $keyPos ) {
             return null;
         }
 

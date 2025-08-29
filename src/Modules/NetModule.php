@@ -16,7 +16,7 @@ class NetModule
 {
     public function __construct()
     {
-        if (! extension_loaded('filter')) {
+        if ( ! extension_loaded('filter') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: filter' ]
             );
@@ -31,7 +31,7 @@ class NetModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -39,7 +39,7 @@ class NetModule
         }
 
         $valueFiltered = filter_var($valueStringNotEmpty, FILTER_VALIDATE_IP);
-        if (false === $valueFiltered) {
+        if ( false === $valueFiltered ) {
             return Ret::err(
                 [ 'The `value` should be valid address IP', $value ],
                 [ __FILE__, __LINE__ ]
@@ -54,13 +54,13 @@ class NetModule
      */
     public function type_address_ip_v4($value)
     {
-        if ($value instanceof AddressIpV4) {
+        if ( $value instanceof AddressIpV4 ) {
             return Ret::val($value);
         }
 
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -68,7 +68,7 @@ class NetModule
         }
 
         $valueFiltered = filter_var($valueStringNotEmpty, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4);
-        if (false === $valueFiltered) {
+        if ( false === $valueFiltered ) {
             return Ret::err(
                 [ 'The `value` should be valid address IP v4', $value ],
                 [ __FILE__, __LINE__ ]
@@ -85,13 +85,13 @@ class NetModule
      */
     public function type_address_ip_v6($value)
     {
-        if ($value instanceof AddressIpV6) {
+        if ( $value instanceof AddressIpV6 ) {
             return Ret::val($value);
         }
 
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -99,7 +99,7 @@ class NetModule
         }
 
         $valueFiltered = filter_var($valueStringNotEmpty, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
-        if (false === $valueFiltered) {
+        if ( false === $valueFiltered ) {
             return Ret::err(
                 [ 'The `value` should be valid address IP v6', $value ],
                 [ __FILE__, __LINE__ ]
@@ -119,7 +119,7 @@ class NetModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -131,7 +131,7 @@ class NetModule
             $valueStringNotEmpty
         );
 
-        if (false
+        if ( false
             || (false === $status)
             || (0 === $status)
         ) {
@@ -156,7 +156,7 @@ class NetModule
             ?? $this->type_subnet_v4($value, $ipFallback)->orNull($ret)
             ?? $this->type_subnet_v6($value, $ipFallback)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::err([ __FILE__, __LINE__ ]);
         }
 
@@ -168,13 +168,13 @@ class NetModule
      */
     public function type_subnet_v4($value, ?string $ipFallback = null)
     {
-        if ($value instanceof SubnetV4) {
+        if ( $value instanceof SubnetV4 ) {
             return Ret::val($value);
         }
 
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -188,8 +188,8 @@ class NetModule
         $addressIpString = null;
         $subnetInt = null;
 
-        if ($hasSlash) {
-            if ('' === $subnetPart) {
+        if ( $hasSlash ) {
+            if ( '' === $subnetPart ) {
                 return Ret::err(
                     [ 'The `value` subnet part should be non-empty string', $value ],
                     [ __FILE__, __LINE__ ]
@@ -202,25 +202,25 @@ class NetModule
                 ?? $this->type_subnet_v4_iplike($subnetPart)->orNull($ret)
                 ?? $theType->numeric_int($subnetPart)->orNull($ret);
 
-            if ($ret->isFail()) {
+            if ( $ret->isFail() ) {
                 return Ret::err(
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if (($subnetInt < 0) || ($subnetInt > 32)) {
+            if ( ($subnetInt < 0) || ($subnetInt > 32) ) {
                 return Ret::err(
                     [ 'The `value` subnet integer should be between 0 and 32', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if ($addressPart === '') {
+            if ( $addressPart === '' ) {
                 $addressIpString = $ipFallback;
 
             } else {
-                if (! $this->type_address_ip_v4($addressPart)->isOk([ &$addressIpString, &$ret ])) {
+                if ( ! $this->type_address_ip_v4($addressPart)->isOk([ &$addressIpString, &$ret ]) ) {
                     return Ret::err(
                         $ret,
                         [ __FILE__, __LINE__ ]
@@ -229,15 +229,15 @@ class NetModule
             }
 
         } else {
-            if ($addressPart === '') {
+            if ( $addressPart === '' ) {
                 return Ret::err(
                     [ 'The `value` address part should be non empty string', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if ($this->type_subnet_v4_iplike($addressPart)->isOk([ &$subnetInt, &$ret ])) {
-                if (($subnetInt < 0) || ($subnetInt > 32)) {
+            if ( $this->type_subnet_v4_iplike($addressPart)->isOk([ &$subnetInt, &$ret ]) ) {
+                if ( ($subnetInt < 0) || ($subnetInt > 32) ) {
                     return Ret::err(
                         [ 'The `value` subnet integer should be between 0 and 32', $value ],
                         [ __FILE__, __LINE__ ]
@@ -246,19 +246,19 @@ class NetModule
 
                 $addressIpString = $ipFallback;
 
-            } elseif ($this->type_address_ip_v4($addressPart)->isOk([ &$addressIpString ])) {
+            } elseif ( $this->type_address_ip_v4($addressPart)->isOk([ &$addressIpString ]) ) {
                 $subnetInt = 32;
             }
         }
 
-        if (! filter_var($addressIpString, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        if ( ! filter_var($addressIpString, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ) {
             return Ret::err(
                 [ 'The `ipFallback` should be valid IP v4 address', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (true
+        if ( true
             && (null !== $addressIpString)
             && (null !== $subnetInt)
         ) {
@@ -280,13 +280,13 @@ class NetModule
      */
     public function type_subnet_v6($value, ?string $ipFallback = null)
     {
-        if ($value instanceof SubnetV6) {
+        if ( $value instanceof SubnetV6 ) {
             return Ret::val($value);
         }
 
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -295,28 +295,28 @@ class NetModule
 
         [ $addressPart, $subnetPart ] = explode('/', $valueStringNotEmpty, 2) + [ '', null ];
 
-        if (null === $subnetPart) {
+        if ( null === $subnetPart ) {
             return Ret::err(
                 [ 'The `value` should contain slash because it is only valid IP v6 subnet', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ('' === $subnetPart) {
+        if ( '' === $subnetPart ) {
             return Ret::err(
                 [ 'The `value` should contain valid subnet after slash', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! $theType->numeric_int($subnetPart)->isOk([ &$subnetNumericInt, &$ret ])) {
+        if ( ! $theType->numeric_int($subnetPart)->isOk([ &$subnetNumericInt, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (($subnetNumericInt < 0) || ($subnetNumericInt > 128)) {
+        if ( ($subnetNumericInt < 0) || ($subnetNumericInt > 128) ) {
             return Ret::err(
                 [ 'The `value` subnet integer should be between 0 and 128', $value ],
                 [ __FILE__, __LINE__ ]
@@ -325,10 +325,10 @@ class NetModule
 
         $addressIpString = null;
 
-        if ($addressPart === '') {
+        if ( $addressPart === '' ) {
             $addressIpString = $ipFallback;
 
-            if (! filter_var($addressIpString, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+            if ( ! filter_var($addressIpString, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) ) {
                 return Ret::err(
                     [ 'The `ipFallback` should be valid IP v6 address', $value ],
                     [ __FILE__, __LINE__ ]
@@ -336,7 +336,7 @@ class NetModule
             }
 
         } else {
-            if (! $this->type_address_ip_v6($addressPart)->isOk([ &$addressIpString, &$ret ])) {
+            if ( ! $this->type_address_ip_v6($addressPart)->isOk([ &$addressIpString, &$ret ]) ) {
                 return Ret::err(
                     $ret,
                     [ __FILE__, __LINE__ ]
@@ -344,7 +344,7 @@ class NetModule
             }
         }
 
-        if ($addressIpString !== null && $subnetNumericInt !== null) {
+        if ( $addressIpString !== null && $subnetNumericInt !== null ) {
             $subnetV6 = "{$addressIpString}/{$subnetNumericInt}";
 
             $valueSubnetV6 = SubnetV6::fromValidString($subnetV6)->orThrow();
@@ -365,7 +365,7 @@ class NetModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -374,14 +374,14 @@ class NetModule
 
         $ipStringNotEmpty = $valueStringNotEmpty;
 
-        if (false === strpos($ipStringNotEmpty, '.')) {
+        if ( false === strpos($ipStringNotEmpty, '.') ) {
             return Ret::err(
                 [ 'The `value` should contain at least one dot', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (! filter_var($ipStringNotEmpty, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+        if ( ! filter_var($ipStringNotEmpty, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) ) {
             return Ret::err(
                 [ 'The `value` should be valid address IP v4', $value ],
                 [ __FILE__, __LINE__ ]
@@ -389,7 +389,7 @@ class NetModule
         }
 
         $ipLong = ip2long($ipStringNotEmpty);
-        if (false === $ipLong) {
+        if ( false === $ipLong ) {
             return Ret::err(
                 [ 'The `value` should be valid address IP v4', $value ],
                 [ __FILE__, __LINE__ ]
@@ -399,7 +399,7 @@ class NetModule
         $inverted = ~$ipLong & 0xFFFFFFFF;
         $isSubnetMask = (($inverted + 1) & $inverted) === 0;
 
-        if ($isSubnetMask) {
+        if ( $isSubnetMask ) {
             $subnetInt = $ipLong;
             $subnetInt = decbin($subnetInt);
             $subnetInt = rtrim($subnetInt, '0');
@@ -426,7 +426,7 @@ class NetModule
             || $this->type_address_ip_v4($addressIp)->isOk([ &$addressIpV4 ])
             || $this->type_address_ip_v6($addressIp)->isOk([ &$addressIpV6 ]);
 
-        if (! $statusIp) {
+        if ( ! $statusIp ) {
             throw new LogicException(
                 [
                     'The `addressIp` should be a valid IPv4 or IPv6 address',
@@ -448,7 +448,7 @@ class NetModule
                 || ($isV4 && $this->type_subnet_v4($subnet)->isOk([ &$subnetV4 ]))
                 || ($isV6 && $this->type_subnet_v4($subnet)->isOk([ &$subnetV6 ]));
 
-            if (! $statusSubnet) {
+            if ( ! $statusSubnet ) {
                 throw new LogicException(
                     [
                         'Each of `subnets` should be a valid IPv4 or IPv6 subnet',
@@ -458,24 +458,24 @@ class NetModule
                 );
             }
 
-            if ($isV4) {
-                $subnetsV4[ $i ] = $subnetV4;
+            if ( $isV4 ) {
+                $subnetsV4[$i] = $subnetV4;
 
-            } elseif ($isV6) {
-                $subnetsV6[ $i ] = $subnetV6;
+            } elseif ( $isV6 ) {
+                $subnetsV6[$i] = $subnetV6;
             }
         }
 
-        if ($isV4 && ([] !== $subnetsV4)) {
+        if ( $isV4 && ([] !== $subnetsV4) ) {
             foreach ( $subnetsV4 as $subnetV4 ) {
-                if ($this->is_ip_in_subnet_v4($addressIpV4, $subnetV4)) {
+                if ( $this->is_ip_in_subnet_v4($addressIpV4, $subnetV4) ) {
                     return true;
                 }
             }
 
-        } elseif ($isV6 && ([] !== $subnetsV6)) {
+        } elseif ( $isV6 && ([] !== $subnetsV6) ) {
             foreach ( $subnetsV6 as $subnetV6 ) {
-                if ($this->is_ip_in_subnet_v6($addressIpV6, $subnetV6)) {
+                if ( $this->is_ip_in_subnet_v6($addressIpV6, $subnetV6) ) {
                     return true;
                 }
             }
@@ -490,14 +490,14 @@ class NetModule
      */
     public function is_ip_in_subnets_v4($addressIpV4, array $subnetsV4) : bool
     {
-        if (! $this->type_address_ip_v4($addressIpV4)->isOk([ &$addressIpV4Object ])) {
+        if ( ! $this->type_address_ip_v4($addressIpV4)->isOk([ &$addressIpV4Object ]) ) {
             return false;
         }
 
         foreach ( $subnetsV4 as $subnetV4 ) {
             $subnetV4Object = $this->type_subnet_v4($subnetV4)->orThrow();
 
-            if ($this->is_ip_in_subnet_v4($addressIpV4Object, $subnetV4Object)) {
+            if ( $this->is_ip_in_subnet_v4($addressIpV4Object, $subnetV4Object) ) {
                 return true;
             }
         }
@@ -511,14 +511,14 @@ class NetModule
      */
     public function is_ip_in_subnets_v6($addressIpV6, array $subnetsV6) : bool
     {
-        if (! $this->type_address_ip_v6($addressIpV6)->isOk([ &$addressIpV6Object ])) {
+        if ( ! $this->type_address_ip_v6($addressIpV6)->isOk([ &$addressIpV6Object ]) ) {
             return false;
         }
 
         foreach ( $subnetsV6 as $subnetV6 ) {
             $subnetV6Object = $this->type_subnet_v6($subnetV6)->orThrow();
 
-            if ($this->is_ip_in_subnet_v6($addressIpV6Object, $subnetV6Object)) {
+            if ( $this->is_ip_in_subnet_v6($addressIpV6Object, $subnetV6Object) ) {
                 return true;
             }
         }
@@ -540,7 +540,7 @@ class NetModule
             || $this->type_address_ip_v4($addressIp)->isOk([ &$addressIpV4 ])
             || $this->type_address_ip_v6($addressIp)->isOk([ &$addressIpV6 ]);
 
-        if (! $statusIp) {
+        if ( ! $statusIp ) {
             throw new LogicException(
                 [
                     'The `addressIp` should be a valid IPv4 or IPv6 address',
@@ -556,7 +556,7 @@ class NetModule
             || $this->type_subnet_v4($subnet)->isOk([ &$subnetV4 ])
             || $this->type_subnet_v6($subnet)->isOk([ &$subnetV6 ]);
 
-        if (! $statusSubnet) {
+        if ( ! $statusSubnet ) {
             throw new LogicException(
                 [
                     'The `subnet` should be a valid IPv4 or IPv6 subnet',
@@ -568,10 +568,10 @@ class NetModule
         $isV4 = (null !== $addressIpV4) && (null !== $subnetV4);
         $isV6 = (null !== $addressIpV6) && (null !== $subnetV6);
 
-        if ($isV4) {
+        if ( $isV4 ) {
             $status = $this->is_ip_in_subnet_v4($addressIpV4, $subnetV4);
 
-        } elseif ($isV6) {
+        } elseif ( $isV6 ) {
             $status = $this->is_ip_in_subnet_v6($addressIpV6, $subnetV6);
 
         } else {
@@ -587,7 +587,7 @@ class NetModule
      */
     public function is_ip_in_subnet_v4($addressIpV4, $subnetV4) : bool
     {
-        if (! $this->type_address_ip_v4($addressIpV4)->isOk([ &$addressIpV4Object ])) {
+        if ( ! $this->type_address_ip_v4($addressIpV4)->isOk([ &$addressIpV4Object ]) ) {
             return false;
         }
 
@@ -612,7 +612,7 @@ class NetModule
      */
     public function is_ip_in_subnet_v6($addressIpV6, $subnetV6) : bool
     {
-        if (! $this->type_address_ip_v6($addressIpV6)->isOk([ &$addressIpV6Object ])) {
+        if ( ! $this->type_address_ip_v6($addressIpV6)->isOk([ &$addressIpV6Object ]) ) {
             return false;
         }
 
@@ -624,8 +624,8 @@ class NetModule
         $subnetIpBin = inet_pton($subnetIpString);
         $subnetBitsInt = (int) $subnetBitsInt;
 
-        $ipBits = unpack('H*', $ipBin)[ 1 ];
-        $subnetIpBits = unpack('H*', $subnetIpBin)[ 1 ];
+        $ipBits = unpack('H*', $ipBin)[1];
+        $subnetIpBits = unpack('H*', $subnetIpBin)[1];
 
         $len = strlen($ipBits);
         $ipBin = '';
@@ -656,15 +656,15 @@ class NetModule
 
     public function ip_client() : string
     {
-        return $this->type_address_ip($_SERVER[ 'REMOTE_ADDR' ] ?? null)->orThrow();
+        return $this->type_address_ip($_SERVER['REMOTE_ADDR'] ?? null)->orThrow();
     }
 
     public function ip_client_proxy() : string
     {
         $ip = null
-            ?? $_SERVER[ 'REMOTE_ADDR' ]
-            ?? $_SERVER[ 'HTTP_CLIENT_IP' ]
-            ?? $_SERVER[ 'HTTP_X_FORWARDED_FOR' ]
+            ?? $_SERVER['REMOTE_ADDR']
+            ?? $_SERVER['HTTP_CLIENT_IP']
+            ?? $_SERVER['HTTP_X_FORWARDED_FOR']
             ?? null;
 
         return $this->type_address_ip($ip)->orThrow();
@@ -680,7 +680,7 @@ class NetModule
     {
         $theType = Lib::type();
 
-        return $theType->string_not_empty($_SERVER[ 'HTTP_USER_AGENT' ] ?? null)->orThrow();
+        return $theType->string_not_empty($_SERVER['HTTP_USER_AGENT'] ?? null)->orThrow();
     }
 
     public function user_agent_browser() : string

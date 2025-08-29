@@ -19,7 +19,7 @@ class ErrorBag
      */
     public function merge(ErrorBag $bag)
     {
-        if ($bag === $this) {
+        if ( $bag === $this ) {
             return $this;
         }
 
@@ -37,7 +37,7 @@ class ErrorBag
      */
     public function error($error, array $tags = [], array $trace = [])
     {
-        if ($error instanceof Error) {
+        if ( $error instanceof Error ) {
             $errorItem = $error;
 
         } else {
@@ -45,15 +45,15 @@ class ErrorBag
             $errorItem->error = $error;
         }
 
-        if ([] !== $tags) {
+        if ( [] !== $tags ) {
             $tagIndex = $this->assertTags($tags);
 
             $errorItem->tags = $tagIndex;
         }
 
-        if ([] !== $trace) {
-            $errorItem->trace[ 'file' ] = $trace[ 'file' ] ?? $trace[ 0 ] ?? '{file}';
-            $errorItem->trace[ 'line' ] = $trace[ 'line' ] ?? $trace[ 1 ] ?? -1;
+        if ( [] !== $trace ) {
+            $errorItem->trace['file'] = $trace['file'] ?? $trace[0] ?? '{file}';
+            $errorItem->trace['line'] = $trace['line'] ?? $trace[1] ?? -1;
         }
 
         $this->errors[] = $errorItem;
@@ -87,14 +87,14 @@ class ErrorBag
     {
         $list = [];
 
-        if ([] === $andTags) {
+        if ( [] === $andTags ) {
             return [];
         }
 
         array_unshift($orAndTags, $andTags);
 
         foreach ( $orAndTags as $i => $and ) {
-            if ([] === $and) {
+            if ( [] === $and ) {
                 throw new LogicException(
                     [ 'Each from `orAndTags` should be a non-empty array', $and ]
                 );
@@ -102,13 +102,13 @@ class ErrorBag
 
             $tagIndex = $this->assertTags($and);
 
-            $orAndTags[ $i ] = $tagIndex;
+            $orAndTags[$i] = $tagIndex;
         }
 
         foreach ( $this->errors as $error ) {
             foreach ( $orAndTags as $and ) {
                 foreach ( $and as $tag => $bool ) {
-                    if (! isset($error->tags[ $tag ])) {
+                    if ( ! isset($error->tags[$tag]) ) {
                         continue 2;
                     }
                 }
@@ -173,13 +173,13 @@ class ErrorBag
         $index = [];
 
         foreach ( $tags as $i => $tag ) {
-            if (is_string($i)) {
+            if ( is_string($i) ) {
                 $tag = $i;
             }
 
             $tagStringNotEmpty = $theType->string_not_empty($tag)->orThrow();
 
-            $index[ $tagStringNotEmpty ] = true;
+            $index[$tagStringNotEmpty] = true;
         }
 
         return $index;

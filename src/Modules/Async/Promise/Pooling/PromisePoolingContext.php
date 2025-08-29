@@ -39,8 +39,8 @@ class PromisePoolingContext
     {
         $refError = null;
 
-        if ([] !== $this->error) {
-            $refError = $this->error[ 0 ];
+        if ( [] !== $this->error ) {
+            $refError = $this->error[0];
 
             return true;
         }
@@ -53,13 +53,13 @@ class PromisePoolingContext
      */
     public function getError()
     {
-        if ([] === $this->error) {
+        if ( [] === $this->error ) {
             throw new RuntimeException(
                 [ 'The `error` should be a non-empty var' ]
             );
         }
 
-        return $this->error[ 0 ];
+        return $this->error[0];
     }
 
     /**
@@ -80,8 +80,8 @@ class PromisePoolingContext
     {
         $refResult = null;
 
-        if ([] !== $this->result) {
-            $refResult = $this->result[ 0 ];
+        if ( [] !== $this->result ) {
+            $refResult = $this->result[0];
 
             return true;
         }
@@ -94,13 +94,13 @@ class PromisePoolingContext
      */
     public function getResult()
     {
-        if ([] === $this->result) {
+        if ( [] === $this->result ) {
             throw new RuntimeException(
                 [ 'The `result[0]` should exists', $this ]
             );
         }
 
-        return $this->result[ 0 ];
+        return $this->result[0];
     }
 
     /**
@@ -116,7 +116,7 @@ class PromisePoolingContext
 
     public function getNowMicrotime() : float
     {
-        if (null === $this->nowMicrotime) {
+        if ( null === $this->nowMicrotime ) {
             $this->updateNowMicrotime();
         }
 
@@ -146,8 +146,8 @@ class PromisePoolingContext
      */
     public function resetTimeoutMs(?int $timeoutMs)
     {
-        if (null !== $timeoutMs) {
-            if ($timeoutMs < 0) {
+        if ( null !== $timeoutMs ) {
+            if ( $timeoutMs < 0 ) {
                 throw new LogicException(
                     [ 'The `timeoutMs` should be a non-negative integer', $timeoutMs ]
                 );
@@ -156,7 +156,7 @@ class PromisePoolingContext
 
         $this->timeoutMs = $timeoutMs;
 
-        if (null === $timeoutMs) {
+        if ( null === $timeoutMs ) {
             $this->timeoutMicrotime = null;
 
         } else {
@@ -179,7 +179,7 @@ class PromisePoolingContext
 
     public function updateTimeoutMicrotime() : ?float
     {
-        if (null === $this->timeoutMs) {
+        if ( null === $this->timeoutMs ) {
             $this->timeoutMicrotime = null;
 
         } else {

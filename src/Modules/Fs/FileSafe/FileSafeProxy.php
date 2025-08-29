@@ -194,7 +194,7 @@ class FileSafeProxy
          */
         static $map;
 
-        if (null === $map) {
+        if ( null === $map ) {
             $map = [
                 'umask'                       => 'umask',
                 //
@@ -364,7 +364,7 @@ class FileSafeProxy
             ];
         }
 
-        if (empty($map[ $name ])) {
+        if ( empty($map[$name]) ) {
             throw new RuntimeException(
                 [ 'Method is not exists: ' . $name ]
             );
@@ -372,11 +372,11 @@ class FileSafeProxy
 
         $theFunc = Lib::func();
 
-        $fn = $map[ $name ];
+        $fn = $map[$name];
 
-        if (is_array($fn)) {
-            if ('@inner' === $fn[ 0 ]) {
-                $fn[ 0 ] = $this->inner;
+        if ( is_array($fn) ) {
+            if ( '@inner' === $fn[0] ) {
+                $fn[0] = $this->inner;
             }
         }
 

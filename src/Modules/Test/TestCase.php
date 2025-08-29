@@ -104,8 +104,8 @@ class TestCase
      */
     public function resource($resource = null)
     {
-        if (null !== $resource) {
-            if (! is_resource($resource)) {
+        if ( null !== $resource ) {
+            if ( ! is_resource($resource) ) {
                 throw new LogicException(
                     [ 'The `resource` should be an opened resource', $resource ]
                 );
@@ -153,7 +153,7 @@ class TestCase
     {
         $refStdout = null;
 
-        if (! $if) {
+        if ( ! $if ) {
             return $this;
         }
 
@@ -217,8 +217,8 @@ class TestCase
 
         $returnArray = $return ?? [];
 
-        if ([] !== $returnArray) {
-            if (! array_key_exists(0, $returnArray)) {
+        if ( [] !== $returnArray ) {
+            if ( ! array_key_exists(0, $returnArray) ) {
                 throw new LogicException(
                     [ 'The `return[0]` should be an existing key', $return ]
                 );
@@ -253,7 +253,7 @@ class TestCase
 
     public function getFn() : array
     {
-        if (null === $this->fn) {
+        if ( null === $this->fn ) {
             throw new RuntimeException(
                 [ 'The `fn` should be not null', $this ]
             );
@@ -279,7 +279,7 @@ class TestCase
     {
         $refTrace = null;
 
-        if (null !== $this->trace) {
+        if ( null !== $this->trace ) {
             $refTrace = $this->trace;
 
             return true;
@@ -296,7 +296,7 @@ class TestCase
     {
         $refStdout = null;
 
-        if (null !== $this->stdout) {
+        if ( null !== $this->stdout ) {
             $refStdout = $this->stdout;
 
             return true;
@@ -312,7 +312,7 @@ class TestCase
     {
         $refSecondsMin = null;
 
-        if (null !== $this->secondsMin) {
+        if ( null !== $this->secondsMin ) {
             $refSecondsMin = $this->secondsMin;
 
             return true;
@@ -328,7 +328,7 @@ class TestCase
     {
         $refSecondsMax = null;
 
-        if (null !== $this->secondsMax) {
+        if ( null !== $this->secondsMax ) {
             $refSecondsMax = $this->secondsMax;
 
             return true;
@@ -344,8 +344,8 @@ class TestCase
     {
         $refReturn = null;
 
-        if (null !== $this->return) {
-            $refReturn = $this->return[ 0 ];
+        if ( null !== $this->return ) {
+            $refReturn = $this->return[0];
 
             return true;
         }
@@ -360,7 +360,7 @@ class TestCase
     {
         $refMemoryMaxBytes = null;
 
-        if (null !== $this->memoryMaxBytes) {
+        if ( null !== $this->memoryMaxBytes ) {
             $refMemoryMaxBytes = $this->memoryMaxBytes;
 
             return true;
@@ -383,8 +383,8 @@ class TestCase
         || $this->hasTrace($trace)
         || ($trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 
-        $traceFile = $trace[ 0 ][ 'file' ] ?? '{file}';
-        $traceLine = $trace[ 0 ][ 'line' ] ?? -1;
+        $traceFile = $trace[0]['file'] ?? '{file}';
+        $traceLine = $trace[0]['line'] ?? -1;
 
         $memoryBytesBefore = memory_get_usage();
         $secondsBefore = microtime(true);
@@ -399,19 +399,19 @@ class TestCase
 
         $eArray = [];
 
-        if ($this->hasStdout($expectedStdout)) {
+        if ( $this->hasStdout($expectedStdout) ) {
             $isStdoutDiff = $theDebug->diff(
                 trim($this->refStdout),
                 trim($expectedStdout),
                 [ &$diffLines ]
             );
 
-            if ($isStdoutDiff) {
+            if ( $isStdoutDiff ) {
                 $message = '[ ERROR ] Test ' . __METHOD__ . '() `expectedStdout` failed.';
 
                 $diffString = implode("\n", $diffLines);
 
-                if ($hasResource) {
+                if ( $hasResource ) {
                     fwrite($h, '------' . "\n");
                     fwrite($h, $message . "\n");
                     fwrite($h, "{$traceFile} : {$traceLine}" . "\n");
@@ -430,7 +430,7 @@ class TestCase
 
         $expectedSecondsMin = null;
         $expectedSecondsMax = null;
-        if (false
+        if ( false
             || $this->hasSecondsMin($expectedSecondsMin)
             || $this->hasSecondsMax($expectedSecondsMax)
         ) {
@@ -439,8 +439,8 @@ class TestCase
             $messageMin = null;
             $messageCaseMax = null;
             $messageCaseMin = null;
-            if (null !== $expectedSecondsMax) {
-                if ($this->refSeconds > $expectedSecondsMax) {
+            if ( null !== $expectedSecondsMax ) {
+                if ( $this->refSeconds > $expectedSecondsMax ) {
                     $messageMax = '[ ERROR ] Test ' . __METHOD__ . '() `expectedSecondsMax` failed.';
                     $messageCaseMax = ''
                         . 'Case: '
@@ -451,8 +451,8 @@ class TestCase
                     $isError = true;
                 }
             }
-            if (null !== $expectedSecondsMin) {
-                if ($this->refSeconds < $expectedSecondsMin) {
+            if ( null !== $expectedSecondsMin ) {
+                if ( $this->refSeconds < $expectedSecondsMin ) {
                     $messageMin = '[ ERROR ] Test ' . __METHOD__ . '() `expectedSecondsMin` failed.';
                     $messageCaseMin = ''
                         . 'Case: '
@@ -463,7 +463,7 @@ class TestCase
                     $isError = true;
                 }
             }
-            if ($isError) {
+            if ( $isError ) {
                 $message = [
                     $messageMax,
                     $messageCaseMax,
@@ -471,19 +471,19 @@ class TestCase
                     $messageCaseMin,
                 ];
 
-                if ($hasResource) {
+                if ( $hasResource ) {
                     fwrite($h, '------' . "\n");
-                    if (null !== $messageMax) {
+                    if ( null !== $messageMax ) {
                         fwrite($h, $messageMax . "\n");
                     }
-                    if (null !== $messageMin) {
+                    if ( null !== $messageMin ) {
                         fwrite($h, $messageMin . "\n");
                     }
                     fwrite($h, "{$traceFile} : {$traceLine}" . "\n");
-                    if (null !== $messageCaseMax) {
+                    if ( null !== $messageCaseMax ) {
                         fwrite($h, $messageCaseMax . "\n");
                     }
-                    if (null !== $messageCaseMin) {
+                    if ( null !== $messageCaseMin ) {
                         fwrite($h, $messageCaseMin . "\n");
                     }
                     fwrite($h, '------' . "\n");
@@ -498,19 +498,19 @@ class TestCase
             }
         }
 
-        if ($this->hasReturn($return)) {
-            $expectedReturn = $expectedReturn[ 0 ] ?? null;
+        if ( $this->hasReturn($return) ) {
+            $expectedReturn = $expectedReturn[0] ?? null;
 
             $isReturnDiff = ($this->refReturn !== $expectedReturn);
 
-            if ($isReturnDiff) {
+            if ( $isReturnDiff ) {
                 $message = '[ ERROR ] Test ' . __METHOD__ . '() `expectedReturn` failed.';
 
                 $theDebug->diff_vars($this->refReturn, $expectedReturn, [ &$diffLines ]);
 
                 $diffString = implode("\n", $diffLines);
 
-                if ($hasResource) {
+                if ( $hasResource ) {
                     fwrite($h, '------' . "\n");
                     fwrite($h, $message . "\n");
                     fwrite($h, "{$traceFile} : {$traceLine}" . "\n");
@@ -527,8 +527,8 @@ class TestCase
             }
         }
 
-        if ($this->hasMemoryMax($expectedMemoryMaxBytes)) {
-            if ($this->refMemoryBytes > $expectedMemoryMaxBytes) {
+        if ( $this->hasMemoryMax($expectedMemoryMaxBytes) ) {
+            if ( $this->refMemoryBytes > $expectedMemoryMaxBytes ) {
                 $message = '[ ERROR ] Test ' . __METHOD__ . '() `expectedBytesMax` failed.';
                 $messageCase = ''
                     . 'Case: '
@@ -536,7 +536,7 @@ class TestCase
                     . ' > '
                     . sprintf('%f', $this->refMemoryBytes);
 
-                if ($hasResource) {
+                if ( $hasResource ) {
                     fwrite($h, '------' . "\n");
                     fwrite($h, $message . "\n");
                     fwrite($h, "{$traceFile} : {$traceLine}" . "\n");
@@ -553,17 +553,17 @@ class TestCase
             }
         }
 
-        if ([] !== $eArray) {
+        if ( [] !== $eArray ) {
             $message = '[ ERROR ] Test ' . __METHOD__ . '() failed.';
 
-            if ($hasResource) {
+            if ( $hasResource ) {
                 return false;
             }
 
             throw new RuntimeException($message, ...$eArray);
         }
 
-        if ($hasResource) {
+        if ( $hasResource ) {
             fwrite($h, '[ OK ] Test ' . __METHOD__ . '() passed.' . "\n");
         }
 

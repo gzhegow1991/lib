@@ -59,7 +59,7 @@ class CryptModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
@@ -68,7 +68,7 @@ class CryptModule
 
         $alphabetValid = $theType->alphabet($alphabet)->orThrow();
 
-        if (preg_match($alphabetValid->getRegexNot(), $valueStringNotEmpty)) {
+        if ( preg_match($alphabetValid->getRegexNot(), $valueStringNotEmpty) ) {
             return Ret::err(
                 [ 'The `value` should be valid base of given alphabet', $value, $alphabet ],
                 [ __FILE__, __LINE__ ]
@@ -85,14 +85,14 @@ class CryptModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (preg_match('~[^01]~', $valueStringNotEmpty)) {
+        if ( preg_match('~[^01]~', $valueStringNotEmpty) ) {
             return Ret::err(
                 [ 'The `value` should be valid binary string', $value ],
                 [ __FILE__, __LINE__ ]
@@ -109,14 +109,14 @@ class CryptModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (preg_match('~[^01234567]~', $valueStringNotEmpty)) {
+        if ( preg_match('~[^01234567]~', $valueStringNotEmpty) ) {
             return Ret::err(
                 [ 'The `value` should be valid octal string', $value ],
                 [ __FILE__, __LINE__ ]
@@ -133,14 +133,14 @@ class CryptModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (preg_match('~[^0123456789]~', $valueStringNotEmpty)) {
+        if ( preg_match('~[^0123456789]~', $valueStringNotEmpty) ) {
             return Ret::err(
                 [ 'The `value` should be valid decimal string', $value ],
                 [ __FILE__, __LINE__ ]
@@ -157,14 +157,14 @@ class CryptModule
     {
         $theType = Lib::type();
 
-        if (! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if (preg_match('~[^0123456789ABCDEF]~', $valueStringNotEmpty)) {
+        if ( preg_match('~[^0123456789ABCDEF]~', $valueStringNotEmpty) ) {
             return Ret::err(
                 [ 'The `value` should be valid hexademical string', $value ],
                 [ __FILE__, __LINE__ ]
@@ -287,14 +287,14 @@ class CryptModule
         $stringsIt = $thePhp->to_iterable($strings);
 
         foreach ( $stringsIt as $string ) {
-            if ('' === $string) {
+            if ( '' === $string ) {
                 continue;
             }
 
             $len = strlen($string);
 
             for ( $i = 0; $i < $len; $i++ ) {
-                $bin = $string[ $i ];
+                $bin = $string[$i];
 
                 $bin = ord($bin);
                 $bin = decbin($bin);
@@ -331,12 +331,12 @@ class CryptModule
                 $buff .= $bit;
                 $buffLen += 1;
 
-                if ($buffLen === 8) {
+                if ( $buffLen === 8 ) {
                     $bin = substr($buff, 0, 8);
                     $byte = bindec($bin);
 
-                    if ($followingBitsCount === null) {
-                        if (($byte & 0b11111000) === 0b11110000) {
+                    if ( $followingBitsCount === null ) {
+                        if ( ($byte & 0b11111000) === 0b11110000 ) {
                             $bytes[] = $byte;
 
                             $buff = substr($buff, 8);
@@ -344,7 +344,7 @@ class CryptModule
 
                             $followingBitsCount = 24;
 
-                        } elseif (($byte & 0b11110000) === 0b11100000) {
+                        } elseif ( ($byte & 0b11110000) === 0b11100000 ) {
                             $bytes[] = $byte;
 
                             $buff = substr($buff, 8);
@@ -352,7 +352,7 @@ class CryptModule
 
                             $followingBitsCount = 16;
 
-                        } elseif (($byte & 0b11100000) === 0b11000000) {
+                        } elseif ( ($byte & 0b11100000) === 0b11000000 ) {
                             $bytes[] = $byte;
 
                             $buff = substr($buff, 8);
@@ -360,7 +360,7 @@ class CryptModule
 
                             $followingBitsCount = 8;
 
-                        } elseif (($byte & 0b10000000) === 0) {
+                        } elseif ( ($byte & 0b10000000) === 0 ) {
                             $bytes[] = $byte;
 
                             $buff = substr($buff, 8);
@@ -385,8 +385,8 @@ class CryptModule
                             ];
                         }
 
-                    } elseif ($followingBitsCount > 0) {
-                        if (($byte & 0b11000000) !== 0b10000000) {
+                    } elseif ( $followingBitsCount > 0 ) {
+                        if ( ($byte & 0b11000000) !== 0b10000000 ) {
                             $error = [ 'The `nextByte` should be 10xxxxxx', $bin ];
 
                         } else {
@@ -400,8 +400,8 @@ class CryptModule
                     }
                 }
 
-                if ($followingBitsCount === 0) {
-                    if ($buffLen > 0) {
+                if ( $followingBitsCount === 0 ) {
+                    if ( $buffLen > 0 ) {
                         $error = [ 'The `buff` should be empty after parsing bytes', $buff ];
 
                     } else {
@@ -420,8 +420,8 @@ class CryptModule
                     }
                 }
 
-                if ($error) {
-                    if ($isThrow) {
+                if ( $error ) {
+                    if ( $isThrow ) {
                         throw new RuntimeException($error);
                     }
 
@@ -599,7 +599,7 @@ class CryptModule
 
     public function baseX_encode(string $string, $alphabetTo) : string
     {
-        if ('' === $string) {
+        if ( '' === $string ) {
             return '';
         }
 
@@ -619,22 +619,22 @@ class CryptModule
         for ( $i = 0; $i < $stringSize; $i++ ) {
             $digitsCnt = count($digits);
 
-            $ord = ord($string[ $i ]);
+            $ord = ord($string[$i]);
             $ordString = (string) $ord;
 
             for ( $ii = 0; $ii < $digitsCnt; $ii++ ) {
-                $digits[ $ii ] = bcmul($digits[ $ii ], '256', 0);
+                $digits[$ii] = bcmul($digits[$ii], '256', 0);
             }
 
-            $digits[ 0 ] = bcadd($digits[ 0 ], $ordString);
+            $digits[0] = bcadd($digits[0], $ordString);
 
             $overflow = '0';
             for ( $ii = 0; $ii < $digitsCnt; $ii++ ) {
-                $digits[ $ii ] = bcadd($digits[ $ii ], $overflow, 0);
+                $digits[$ii] = bcadd($digits[$ii], $overflow, 0);
 
-                $overflow = bcdiv($digits[ $ii ], $baseToString, 0);
+                $overflow = bcdiv($digits[$ii], $baseToString, 0);
 
-                $digits[ $ii ] = bcmod($digits[ $ii ], $baseToString, 0);
+                $digits[$ii] = bcmod($digits[$ii], $baseToString, 0);
             }
 
             while ( bccomp($overflow, '0', 1) > 0 ) {
@@ -645,7 +645,7 @@ class CryptModule
         }
 
         for ( $i = 0; $i < ($stringSize - 1); $i++ ) {
-            if (ord($string[ $i ]) !== 0) {
+            if ( ord($string[$i]) !== 0 ) {
                 break;
             }
 
@@ -654,7 +654,7 @@ class CryptModule
 
         $result = '';
         foreach ( array_reverse($digits) as $digit ) {
-            $result .= $alphabetToValue[ $digit ];
+            $result .= $alphabetToValue[$digit];
         }
 
         return $result;
@@ -662,7 +662,7 @@ class CryptModule
 
     public function baseX_decode(string $baseString, $alphabetFrom) : string
     {
-        if ('' === $baseString) {
+        if ( '' === $baseString ) {
             return '';
         }
 
@@ -685,20 +685,20 @@ class CryptModule
             $chr = mb_substr($baseStringValid, $i, 1);
 
             for ( $ii = 0; $ii < $bytesCnt; $ii++ ) {
-                $bytes[ $ii ] = bcmul($bytes[ $ii ], $baseFromString, 0);
+                $bytes[$ii] = bcmul($bytes[$ii], $baseFromString, 0);
             }
 
             $idx = mb_strpos($alphabetFrom, $chr);
 
-            $bytes[ 0 ] = bcadd($bytes[ 0 ], $idx, 0);
+            $bytes[0] = bcadd($bytes[0], $idx, 0);
 
             $overflow = '0';
             for ( $ii = 0; $ii < $bytesCnt; $ii++ ) {
-                $bytes[ $ii ] = bcadd($bytes[ $ii ], $overflow, 0);
+                $bytes[$ii] = bcadd($bytes[$ii], $overflow, 0);
 
-                $overflow = bcdiv($bytes[ $ii ], '256', 0);
+                $overflow = bcdiv($bytes[$ii], '256', 0);
 
-                $bytes[ $ii ] = bcmod($bytes[ $ii ], '256', 0);
+                $bytes[$ii] = bcmod($bytes[$ii], '256', 0);
             }
 
             while ( bccomp($overflow, '0', 1) > 0 ) {
@@ -711,7 +711,7 @@ class CryptModule
         for ( $i = 0; $i < $numbaseStringLen; $i++ ) {
             $chr = mb_substr($baseString, $i, 1);
 
-            if ($chr !== $alphabetFromZero) {
+            if ( $chr !== $alphabetFromZero ) {
                 break;
             }
 
@@ -739,7 +739,7 @@ class CryptModule
 
         $baseTo = $alphabetToValid->getLength();
 
-        if (! $this->isPowOf2($baseTo)) {
+        if ( ! $this->isPowOf2($baseTo) ) {
             throw new LogicException(
                 [
                     'The `alphabetTo` length should be a power of 2: ' . $alphabetTo,
@@ -755,7 +755,7 @@ class CryptModule
         $gen = $this->bin2base_it($gen, $alphabetToValid);
 
         $binaryLen = '0';
-        foreach ( $gen as [ $binaryLen, $baseLetter ] ) {
+        foreach ( $gen as [$binaryLen, $baseLetter] ) {
             yield $baseLetter;
         }
 
@@ -809,7 +809,7 @@ class CryptModule
 
         $gen = $this->bin2base_it($binaries, $alphabetTo);
 
-        foreach ( $gen as [ $binaryLen, $baseLetter ] ) {
+        foreach ( $gen as [$binaryLen, $baseLetter] ) {
             $result .= $baseLetter;
         }
 
@@ -848,7 +848,7 @@ class CryptModule
         $alphabetToLen = $alphabetToValid->getLength();
 
         $baseTo = $alphabetToLen;
-        if (! $this->isPowOf2($baseTo)) {
+        if ( ! $this->isPowOf2($baseTo) ) {
             throw new LogicException(
                 [
                     'The `alphabetTo` length should be a power of 2: ' . $alphabetTo,
@@ -869,14 +869,14 @@ class CryptModule
             $binarySize = strlen($binaryValid);
 
             for ( $ii = 0; $ii < $binarySize; $ii++ ) {
-                $binaryBuff .= $binaryValid[ $ii ];
+                $binaryBuff .= $binaryValid[$ii];
                 $binarySizeTotal = bcadd($binarySizeTotal, '1', 0);
 
                 $bitsLeft--;
 
-                if ($bitsLeft === 0) {
+                if ( $bitsLeft === 0 ) {
                     $baseLetterIdx = bindec($binaryBuff);
-                    $baseLetter = $alphabetToValue[ $baseLetterIdx ];
+                    $baseLetter = $alphabetToValue[$baseLetterIdx];
 
                     yield [ $binarySizeTotal, $baseLetter ];
 
@@ -887,12 +887,12 @@ class CryptModule
             }
         }
 
-        if ('' !== $binaryBuff) {
+        if ( '' !== $binaryBuff ) {
             $binaryBuff = str_pad($binaryBuff, $bitsCnt, '0', STR_PAD_RIGHT);
             $binarySizeTotal = bcadd($binarySizeTotal, '1', 0);
 
             $baseLetterIdx = bindec($binaryBuff);
-            $baseLetter = $alphabetToValue[ $baseLetterIdx ];
+            $baseLetter = $alphabetToValue[$baseLetterIdx];
 
             yield [ $binarySizeTotal, $baseLetter ];
         }
@@ -918,7 +918,7 @@ class CryptModule
 
         $baseFrom = $alphabetFromLen;
 
-        if (! $this->isPowOf2($baseFrom)) {
+        if ( ! $this->isPowOf2($baseFrom) ) {
             throw new LogicException(
                 [
                     'The `alphabetFrom` length should be a power of 2: ' . $alphabetFrom,
@@ -932,12 +932,12 @@ class CryptModule
         $binaryBuff = '';
         $left = 8;
         foreach ( $baseStringsIt as $baseString ) {
-            if ('' === $baseString) {
+            if ( '' === $baseString ) {
                 continue;
             }
 
-            if (preg_match($alphabetFromRegexNot, $baseString)) {
-                if ($isThrow) {
+            if ( preg_match($alphabetFromRegexNot, $baseString) ) {
+                if ( $isThrow ) {
                     throw new LogicException(
                         [ 'Each of `baseStrings` should be a valid `baseString` of given alphabet', $baseString, $alphabetFrom ]
                     );
@@ -951,18 +951,18 @@ class CryptModule
             $baseStringLen = mb_strlen($_baseString);
 
             for ( $i = 0; $i < $baseStringLen; $i++ ) {
-                $idx = mb_strpos($alphabetFromValid, $_baseString[ $i ]);
+                $idx = mb_strpos($alphabetFromValid, $_baseString[$i]);
 
                 $bin = decbin($idx);
 
                 $bin = str_pad($bin, $bytesCnt, '0', STR_PAD_LEFT);
 
                 for ( $ii = 0; $ii < $bytesCnt; $ii++ ) {
-                    $binaryBuff .= $bin[ $ii ];
+                    $binaryBuff .= $bin[$ii];
 
                     $left--;
 
-                    if ($left === 0) {
+                    if ( $left === 0 ) {
                         yield $binaryBuff;
 
                         $left = 8;
@@ -988,14 +988,14 @@ class CryptModule
         $alphabetToValue = $alphabetToValid->getValue();
         $alphabetToLen = $alphabetToValid->getLength();
 
-        if ($alphabetToValue === '01') {
+        if ( $alphabetToValue === '01' ) {
             return $binaryValid;
         }
 
         $binaryLen = strlen($binaryValid);
 
         $baseTo = $alphabetToLen;
-        if (! $this->isPowOf2($baseTo)) {
+        if ( ! $this->isPowOf2($baseTo) ) {
             throw new LogicException(
                 [
                     'The `alphabetTo` length should be a power of 2: ' . $alphabetTo,
@@ -1011,24 +1011,24 @@ class CryptModule
         $buff = '';
         $left = $bytesCnt;
         for ( $i = $binaryLen; $i >= 1; $i-- ) {
-            $buff = $binaryValid[ $i - 1 ] . $buff;
+            $buff = $binaryValid[$i - 1] . $buff;
 
             $left--;
 
-            if ($left === 0) {
+            if ( $left === 0 ) {
                 $idx = bindec($buff);
 
-                $result .= $alphabetToValue[ $idx ];
+                $result .= $alphabetToValue[$idx];
 
                 $left = $bytesCnt;
                 $buff = '';
             }
         }
 
-        if ('' !== $buff) {
+        if ( '' !== $buff ) {
             $idx = bindec($buff);
 
-            $result .= $alphabetToValue[ $idx ];
+            $result .= $alphabetToValue[$idx];
         }
 
         return $result;
@@ -1048,7 +1048,7 @@ class CryptModule
         $alphabetFromLen = mb_strlen($alphabetFrom);
 
         $baseFrom = $alphabetFromLen;
-        if (! $this->isPowOf2($baseFrom)) {
+        if ( ! $this->isPowOf2($baseFrom) ) {
             throw new LogicException(
                 [
                     'The `alphabetFrom` length should be a power of 2: ' . $alphabetFrom,
@@ -1064,18 +1064,18 @@ class CryptModule
         $buff = '';
         $left = 8;
         for ( $i = 0; $i < $binbaseStringLen; $i++ ) {
-            $idx = mb_strpos($alphabetFrom, $binbaseStringValid[ $i ]);
+            $idx = mb_strpos($alphabetFrom, $binbaseStringValid[$i]);
 
             $bin = decbin($idx);
 
             $bin = str_pad($bin, $bytesCnt, '0', STR_PAD_LEFT);
 
             for ( $ii = $bytesCnt; $ii >= 1; $ii-- ) {
-                $buff = $bin[ $ii - 1 ] . $buff;
+                $buff = $bin[$ii - 1] . $buff;
 
                 $left--;
 
-                if ($left === 0) {
+                if ( $left === 0 ) {
                     $result = $buff . $result;
 
                     $left = 8;
@@ -1103,13 +1103,13 @@ class CryptModule
         $alphabetToValue = $alphabetToValid->getValue();
         $alphabetToLen = $alphabetToValid->getLength();
 
-        if ($alphabetToValue === '0123456789') {
+        if ( $alphabetToValue === '0123456789' ) {
             return $decStringValid;
         }
 
         $_oneBasedTo = null
             ?? $isOneBasedTo
-            ?? ($alphabetToValue[ 0 ] !== '0');
+            ?? ($alphabetToValue[0] !== '0');
 
         $baseTo = $alphabetToLen;
         $baseToString = (string) $baseTo;
@@ -1117,8 +1117,8 @@ class CryptModule
         $result = '';
 
         $left = $decStringValid;
-        if ($_oneBasedTo) {
-            if (bccomp($left, '0', 1) === 0) {
+        if ( $_oneBasedTo ) {
+            if ( bccomp($left, '0', 1) === 0 ) {
                 throw new RuntimeException(
                     [
                         'The `decInteger` should be GT 0 due to `oneBasedTo` is set to TRUE',
@@ -1130,7 +1130,7 @@ class CryptModule
         }
 
         do {
-            if ($_oneBasedTo) {
+            if ( $_oneBasedTo ) {
                 $left = bcsub($left, '1', 0);
             }
 
@@ -1155,13 +1155,13 @@ class CryptModule
 
         $numbaseStringValid = $this->type_base($numbaseString, $alphabetFrom)->orThrow();
 
-        if ($alphabetFrom === '0123456789') {
+        if ( $alphabetFrom === '0123456789' ) {
             return $numbaseStringValid;
         }
 
         $_oneBasedFrom = null
             ?? $isOneBasedFrom
-            ?? ($alphabetFrom[ 0 ] !== '0');
+            ?? ($alphabetFrom[0] !== '0');
 
         $numbaseStringLen = mb_strlen($numbaseStringValid);
 
@@ -1176,7 +1176,7 @@ class CryptModule
             $chr = mb_substr($numbaseStringValid, $i - 1, 1);
 
             $mod = mb_strpos($alphabetFrom, $chr);
-            if (false === $mod) {
+            if ( false === $mod ) {
                 throw new LogicException(
                     [ 'The `baseInteger` contains char that is outside `alphabetFrom`: ' . $chr, $chr ]
                 );
@@ -1212,19 +1212,19 @@ class CryptModule
 
         $result = null;
 
-        if ($oneBasedFrom === $oneBasedTo) {
-            if ($alphabetFrom === $alphabetToValid) {
+        if ( $oneBasedFrom === $oneBasedTo ) {
+            if ( $alphabetFrom === $alphabetToValid ) {
                 $result = $numbaseStringValid;
 
-            } elseif ($alphabetFrom === '01234567890') {
+            } elseif ( $alphabetFrom === '01234567890' ) {
                 $result = $this->dec2numbase($numbaseStringValid, $alphabetToValid, $oneBasedTo);
 
-            } elseif ($alphabetToValid === '01234567890') {
+            } elseif ( $alphabetToValid === '01234567890' ) {
                 $result = $this->numbase2dec($numbaseStringValid, $alphabetFrom, $oneBasedFrom);
             }
         }
 
-        if (null === $result) {
+        if ( null === $result ) {
             $result = $numbaseStringValid;
             $result = $this->numbase2dec($result, $alphabetFrom, $oneBasedFrom);
             $result = $this->dec2numbase($result, $alphabetToValid, $oneBasedTo);

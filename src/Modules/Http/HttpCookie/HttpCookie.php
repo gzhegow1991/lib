@@ -63,14 +63,14 @@ class HttpCookie implements
         $theDate = Lib::date();
         $theType = Lib::type();
 
-        $cookieExpiresString = $this->cookieParams[ 'expires' ] ?? '';
+        $cookieExpiresString = $this->cookieParams['expires'] ?? '';
 
         $cookieExpires = -99999;
-        if ($theType->idate_formatted($cookieExpiresString, 'D, d M Y H:i:s T')->isOk([ &$cookieExpiresDate ])) {
+        if ( $theType->idate_formatted($cookieExpiresString, 'D, d M Y H:i:s T')->isOk([ &$cookieExpiresDate ]) ) {
             $now = $theDate->idate_now();
             $cookieExpires = $cookieExpiresDate->getTimestamp() - $now->getTimestamp();
 
-        } elseif ($theType->int($cookieExpiresString)->isOk([ &$cookieExpiresInt ])) {
+        } elseif ( $theType->int($cookieExpiresString)->isOk([ &$cookieExpiresInt ]) ) {
             $cookieExpires = $cookieExpiresInt;
         }
 
@@ -78,10 +78,10 @@ class HttpCookie implements
             'path'     => $this->path,
             'domain'   => $this->domain,
             //
-            'httponly' => $this->cookieParams[ 'httponly' ] ?? null,
+            'httponly' => $this->cookieParams['httponly'] ?? null,
             //
-            'secure'   => $this->cookieParams[ 'secure' ] ?? null,
-            'samesite' => $this->cookieParams[ 'samesite' ] ?? null,
+            'secure'   => $this->cookieParams['secure'] ?? null,
+            'samesite' => $this->cookieParams['samesite'] ?? null,
             //
             'expires'  => $cookieExpires,
         ];
@@ -103,7 +103,7 @@ class HttpCookie implements
             ?? static::fromArraySetrawcookieArgs($from)->orNull($ret)
             ?? static::fromString($from)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -115,7 +115,7 @@ class HttpCookie implements
      */
     public static function fromStatic($from, ?array $fallback = null)
     {
-        if ($from instanceof static) {
+        if ( $from instanceof static ) {
             return Ret::ok($fallback, $from);
         }
 
@@ -133,7 +133,7 @@ class HttpCookie implements
     {
         $theType = Lib::type();
 
-        if (! ($from instanceof HttpHeader)) {
+        if ( ! ($from instanceof HttpHeader) ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `from` should be instance of ' . HttpHeader::class, $from ],
@@ -143,7 +143,7 @@ class HttpCookie implements
 
         $header = $from;
 
-        if ('SET-COOKIE' !== $header->getName()) {
+        if ( 'SET-COOKIE' !== $header->getName() ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `header` name should be SET-COOKIE', $header ],
@@ -158,7 +158,7 @@ class HttpCookie implements
 
         [ $cookieName, $cookieValue ] = $headerArray;
 
-        if (! $theType->string_not_empty($cookieName)->isOk([ &$cookieNameString, &$ret ])) {
+        if ( ! $theType->string_not_empty($cookieName)->isOk([ &$cookieNameString, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -166,11 +166,11 @@ class HttpCookie implements
 
         $headerParams = $header->getParams();
 
-        $cookiePath = $headerParams[ 'path' ];
-        $cookieDomain = $headerParams[ 'domain' ] ?? null;
+        $cookiePath = $headerParams['path'];
+        $cookieDomain = $headerParams['domain'] ?? null;
 
-        unset($headerParams[ 'path' ]);
-        unset($headerParams[ 'domain' ]);
+        unset($headerParams['path']);
+        unset($headerParams['domain']);
 
         $instance = new static();
         $instance->name = $cookieNameString;
@@ -189,7 +189,7 @@ class HttpCookie implements
     {
         $theType = Lib::type();
 
-        if (! is_array($from)) {
+        if ( ! is_array($from) ) {
             return Ret::throw(
                 $fallback,
                 [ 'The `from` should be array', $from ],
@@ -197,36 +197,36 @@ class HttpCookie implements
             );
         }
 
-        $name = $from[ 'name' ] ?? $from[ 0 ] ?? null;
-        $value = $from[ 'value' ] ?? $from[ 1 ] ?? '';
-        $expiresOrOptions = $from[ 'expires_or_options' ] ?? $from[ 2 ] ?? null;
+        $name = $from['name'] ?? $from[0] ?? null;
+        $value = $from['value'] ?? $from[1] ?? '';
+        $expiresOrOptions = $from['expires_or_options'] ?? $from[2] ?? null;
 
-        if (! $theType->string_not_empty($name)->isOk([ 1 => &$ret ])) {
+        if ( ! $theType->string_not_empty($name)->isOk([ 1 => &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
         $valueRawurlencode = rawurlencode($value);
 
-        if (is_array($expiresOrOptions)) {
-            $expires = $expiresOrOptions[ 'expires' ] ?? null;
+        if ( is_array($expiresOrOptions) ) {
+            $expires = $expiresOrOptions['expires'] ?? null;
 
-            $path = $expiresOrOptions[ 'path' ] ?? null;
-            $domain = $expiresOrOptions[ 'domain' ] ?? null;
+            $path = $expiresOrOptions['path'] ?? null;
+            $domain = $expiresOrOptions['domain'] ?? null;
 
-            $httponly = $expiresOrOptions[ 'httponly' ] ?? null;
+            $httponly = $expiresOrOptions['httponly'] ?? null;
 
-            $secure = $expiresOrOptions[ 'secure' ] ?? null;
-            $samesite = $expiresOrOptions[ 'samesite' ] ?? null;
+            $secure = $expiresOrOptions['secure'] ?? null;
+            $samesite = $expiresOrOptions['samesite'] ?? null;
 
-        } elseif (is_int($expiresOrOptions)) {
+        } elseif ( is_int($expiresOrOptions) ) {
             $expires = $expiresOrOptions;
 
-            $path = $from[ 'path' ] ?? $from[ 3 ] ?? null;
-            $domain = $from[ 'domain' ] ?? $from[ 4 ] ?? null;
+            $path = $from['path'] ?? $from[3] ?? null;
+            $domain = $from['domain'] ?? $from[4] ?? null;
 
-            $httponly = $from[ 'httponly' ] ?? $from[ 6 ] ?? null;
+            $httponly = $from['httponly'] ?? $from[6] ?? null;
 
-            $secure = $from[ 'secure' ] ?? $from[ 5 ] ?? null;
+            $secure = $from['secure'] ?? $from[5] ?? null;
             $samesite = null;
 
         } else {
@@ -244,17 +244,17 @@ class HttpCookie implements
 
         $secure = $secure ?? false;
 
-        if (! $theType->int($expires)->isOk([ &$expiresInt, &$ret ])) {
+        if ( ! $theType->int($expires)->isOk([ &$expiresInt, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
-        if (! $theType->string_not_empty($path)->isOk([ &$pathStringNotEmpty, &$ret ])) {
+        if ( ! $theType->string_not_empty($path)->isOk([ &$pathStringNotEmpty, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
         $domainString = null;
-        if (null !== $domain) {
-            if (! $theType->string_not_empty($domain)->isOk([ &$domainStringNotEmpty, &$ret ])) {
+        if ( null !== $domain ) {
+            if ( ! $theType->string_not_empty($domain)->isOk([ &$domainStringNotEmpty, &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
@@ -283,11 +283,11 @@ class HttpCookie implements
      */
     public static function fromString($from, ?array $fallback = null)
     {
-        if (! HttpHeader::fromString($from)->isOk([ &$httpHeaderObject, &$ret ])) {
+        if ( ! HttpHeader::fromString($from)->isOk([ &$httpHeaderObject, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
-        if (! static::fromObjectHttpHeader($httpHeaderObject)->isOk([ &$httpCookieObject, &$ret ])) {
+        if ( ! static::fromObjectHttpHeader($httpHeaderObject)->isOk([ &$httpCookieObject, &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -322,7 +322,7 @@ class HttpCookie implements
     {
         $result = null;
 
-        if (null !== $this->domain) {
+        if ( null !== $this->domain ) {
             $result = $this->domain;
 
             return true;

@@ -30,17 +30,17 @@ class Ret extends RetBase implements \ArrayAccess
 
     public function offsetExists($offset)
     {
-        if (! in_array($offset, [ 0, 1, 2 ], true)) {
+        if ( ! in_array($offset, [ 0, 1, 2 ], true) ) {
             return false;
         }
 
-        if (0 === $offset) {
+        if ( 0 === $offset ) {
             return true;
 
-        } elseif (1 === $offset) {
+        } elseif ( 1 === $offset ) {
             return [] !== $this->value;
 
-        } elseif (2 === $offset) {
+        } elseif ( 2 === $offset ) {
             return [] != $this->errors;
 
         } else {
@@ -50,13 +50,13 @@ class Ret extends RetBase implements \ArrayAccess
 
     public function offsetGet($offset)
     {
-        if (0 === $offset) {
+        if ( 0 === $offset ) {
             return $this->getStatus();
 
-        } elseif (1 === $offset) {
-            return ([] === $this->value) ? null : $this->value[ 0 ];
+        } elseif ( 1 === $offset ) {
+            return ([] === $this->value) ? null : $this->value[0];
 
-        } elseif (2 === $offset) {
+        } elseif ( 2 === $offset ) {
             return $this->errors;
 
         } else {

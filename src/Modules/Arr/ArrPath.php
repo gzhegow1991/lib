@@ -31,7 +31,7 @@ class ArrPath implements
             ?? static::fromStatic($from)->orNull($ret)
             ?? static::fromValidArray($from)->orNull($ret);
 
-        if ($ret->isFail()) {
+        if ( $ret->isFail() ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -43,7 +43,7 @@ class ArrPath implements
      */
     public static function fromStatic($from, ?array $fallback = null)
     {
-        if ($from instanceof static) {
+        if ( $from instanceof static ) {
             return Ret::ok($fallback, $from);
         }
 
@@ -59,7 +59,7 @@ class ArrPath implements
      */
     public static function fromValidArray($from, ?array $fallback = null)
     {
-        if (is_array($from)) {
+        if ( is_array($from) ) {
             $instance = new static();
             $instance->path = $from;
 

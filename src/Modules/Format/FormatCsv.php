@@ -11,7 +11,7 @@ class FormatCsv
 {
     public function __construct()
     {
-        if (! extension_loaded('fileinfo')) {
+        if ( ! extension_loaded('fileinfo') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: fileinfo' ]
             );
@@ -34,21 +34,21 @@ class FormatCsv
         $theType = Lib::type();
 
         $withLength = array_key_exists(0, $refs);
-        if ($withLength) {
-            $refLength =& $refs[ 0 ];
+        if ( $withLength ) {
+            $refLength =& $refs[0];
         }
         $refLength = 0;
 
-        if (! $theType->array_not_empty($rows)->isOk([ 1 => &$ret ])) {
+        if ( ! $theType->array_not_empty($rows)->isOk([ 1 => &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
-        if (! $theType->list($rows)->isOk([ 1 => &$ret ])) {
+        if ( ! $theType->list($rows)->isOk([ 1 => &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
         foreach ( $rows as $row ) {
-            if (! $theType->array_not_empty($row)->isOk([ 1 => &$ret ])) {
+            if ( ! $theType->array_not_empty($row)->isOk([ 1 => &$ret ]) ) {
                 return Ret::throw($fallback, $ret);
             }
         }
@@ -60,7 +60,7 @@ class FormatCsv
 
         $fputcsvArgs = [ $separatorChar, $enclosureChar, $escapeChar ];
 
-        if (PHP_VERSION > 80100) {
+        if ( PHP_VERSION > 80100 ) {
             $fputcsvArgs[] = $eolStringNotEmpty;
         }
 
@@ -97,12 +97,12 @@ class FormatCsv
         $theType = Lib::type();
 
         $withLength = array_key_exists(0, $refs);
-        if ($withLength) {
-            $refLength =& $refs[ 0 ];
+        if ( $withLength ) {
+            $refLength =& $refs[0];
         }
         $refLength = 0;
 
-        if (! $theType->array_not_empty($row)->isOk([ 1 => &$ret ])) {
+        if ( ! $theType->array_not_empty($row)->isOk([ 1 => &$ret ]) ) {
             return Ret::throw($fallback, $ret);
         }
 
@@ -115,7 +115,7 @@ class FormatCsv
 
         $fputcsvArgs = [ $separatorChar, $enclosureChar, $escapeChar ];
 
-        if (PHP_VERSION > 80100) {
+        if ( PHP_VERSION > 80100 ) {
             $fputcsvArgs[] = $eolStringNotEmpty;
         }
 
