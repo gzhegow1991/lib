@@ -882,15 +882,17 @@ class ArrModule
             );
         }
 
-        if ( ! class_exists($className) ) {
+        $theType = Lib::type();
+
+        if ( ! $theType->struct_exists($className)->isOk([ &$classNameValid, &$ret ]) ) {
             return Ret::err(
-                [ 'The `className` should be existing class', $className ],
+                $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         foreach ( $value as $i => $v ) {
-            if ( ! is_a($v, $className) ) {
+            if ( ! is_a($v, $classNameValid) ) {
                 return Ret::err(
                     [ 'Each of `value` should be instance of passed `className`', $v, $i, $className ],
                     [ __FILE__, __LINE__ ]
@@ -917,9 +919,11 @@ class ArrModule
             );
         }
 
-        if ( ! class_exists($className) ) {
+        $theType = Lib::type();
+
+        if ( ! $theType->struct_exists($className)->isOk([ &$classNameValid, &$ret ]) ) {
             return Ret::err(
-                [ 'The `className` should be existing class', $className ],
+                $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -959,9 +963,11 @@ class ArrModule
             );
         }
 
-        if ( ! class_exists($className) ) {
+        $theType = Lib::type();
+
+        if ( ! $theType->struct_exists($className)->isOk([ &$classNameValid, &$ret ]) ) {
             return Ret::err(
-                [ 'The `className` should be existing class', $className ],
+                $ret,
                 [ __FILE__, __LINE__ ]
             );
         }

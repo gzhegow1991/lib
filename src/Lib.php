@@ -829,8 +829,14 @@ class Lib
         }
 
         $hasKeyOrClassT = (null !== $keyOrClassT);
-        $hasClassT = $hasKeyOrClassT && class_exists($keyOrClassT);
         $hasKey = (null !== $key);
+
+        $hasClassT = false;
+        if ( $hasKeyOrClassT ) {
+            $theType = Lib::type();
+
+            $hasClassT = $theType->struct_exists($keyOrClassT)->isOk();
+        }
 
         if ( $hasKeyOrClassT && $hasKey ) {
             if ( ! $hasClassT ) {

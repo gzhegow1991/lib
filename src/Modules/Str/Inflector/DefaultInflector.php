@@ -196,9 +196,9 @@ class DefaultInflector implements InflectorInterface
      */
     public function useSymfonyInflector(?bool $useSymfonyInflector = null)
     {
-        $classExists = class_exists(static::SYMFONY_INFLECTOR_INTERFACE);
+        $interfaceExists = interface_exists(static::SYMFONY_INFLECTOR_INTERFACE);
 
-        $useSymfonyInflector = $useSymfonyInflector ?? $classExists;
+        $useSymfonyInflector = $useSymfonyInflector ?? $interfaceExists;
 
         if ( $useSymfonyInflector ) {
             $this->getSymfonyInflector();

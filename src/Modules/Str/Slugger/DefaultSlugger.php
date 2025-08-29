@@ -156,12 +156,12 @@ class DefaultSlugger implements SluggerInterface
      */
     public function useSymfonySlugger(?bool $useSymfonySlugger = null)
     {
-        $classExists = class_exists(static::SYMFONY_SLUGGER_INTERFACE);
+        $interfaceExists = interface_exists(static::SYMFONY_SLUGGER_INTERFACE);
 
-        $useSymfonySlugger = $useSymfonySlugger ?? $classExists;
+        $useSymfonySlugger = $useSymfonySlugger ?? $interfaceExists;
 
         if ( $useSymfonySlugger ) {
-            if ( ! $classExists ) {
+            if ( ! $interfaceExists ) {
                 $commands = [
                     'composer require symfony/string',
                     'composer require symfony/translation-contracts',

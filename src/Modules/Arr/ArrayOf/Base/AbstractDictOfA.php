@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Arr\ArrayOf\Base;
 
+use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
 
 
@@ -26,13 +27,15 @@ abstract class AbstractDictOfA extends AbstractDictOf
      */
     public function __construct(string $className)
     {
-        if ( ! class_exists($className) ) {
+        $theType = Lib::type();
+
+        if ( ! $theType->struct_exists($className)->isOk([ &$classNameValid ]) ) {
             throw new LogicException(
-                [ 'Class not exists: ' . $className ]
+                [ 'Struct not exists: ' . $className ]
             );
         }
 
-        $this->valueClass = $className;
+        $this->valueClass = $classNameValid;
 
         parent::__construct('object');
     }
