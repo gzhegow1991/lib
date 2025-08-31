@@ -2795,7 +2795,7 @@ class PhpModule
 
         $normalized = $this->path_normalize($pathStringNotEmpty, '/');
 
-        $basename = basename($normalized, $extension);
+        $basename = basename($normalized, $extension ?? '');
 
         return ('' !== $basename) ? $basename : null;
     }
