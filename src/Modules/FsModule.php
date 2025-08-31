@@ -1276,7 +1276,7 @@ class FsModule
     }
 
     public function blpush(
-        $tickUsleep, $timeoutMs,
+        $tickUsleep, $blockTimeoutMs,
         string $file, string $data
     ) : bool
     {
@@ -1294,11 +1294,11 @@ class FsModule
         $theFsFile->call_safe(
             static function () use (
                 $theFsFile,
-                $tickUsleep, $timeoutMs,
+                $tickUsleep, $blockTimeoutMs,
                 $fileIn, $fileInLock, $data
             ) {
                 if ( $fhInLock = $theFsFile->fopen_flock_tmpfile_pooling(
-                    $tickUsleep, $timeoutMs,
+                    $tickUsleep, $blockTimeoutMs,
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
                 ) ) {
                     fwrite($fhInLock, getmypid());
@@ -1348,7 +1348,7 @@ class FsModule
     }
 
     public function brpush(
-        $tickUsleep, $timeoutMs,
+        $tickUsleep, $blockTimeoutMs,
         string $file, string $data
     ) : bool
     {
@@ -1366,11 +1366,11 @@ class FsModule
         $theFsFile->call_safe(
             static function () use (
                 $theFsFile,
-                $tickUsleep, $timeoutMs,
+                $tickUsleep, $blockTimeoutMs,
                 $fileIn, $fileInLock, $data
             ) {
                 if ( $fhInLock = $theFsFile->fopen_flock_tmpfile_pooling(
-                    $tickUsleep, $timeoutMs,
+                    $tickUsleep, $blockTimeoutMs,
                     $fileInLock, 'w', LOCK_EX | LOCK_NB
                 ) ) {
                     fwrite($fhInLock, getmypid());

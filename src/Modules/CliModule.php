@@ -4,102 +4,19 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Modules\Cli\Process\DefaultProcessManager;
-use Gzhegow\Lib\Modules\Cli\Process\ProcessManagerInterface;
 
 
 class CliModule
 {
-    /**
-     * @var ProcessManagerInterface
-     */
-    protected $processManager;
-
-
-    public function newProcessManager() : ProcessManagerInterface
+    public function __construct()
     {
-        return new DefaultProcessManager();
-    }
-
-    public function cloneProcessManager() : ProcessManagerInterface
-    {
-        return clone $this->processManager();
-    }
-
-    public function processManager(?ProcessManagerInterface $processManager = null) : ProcessManagerInterface
-    {
-        return $this->processManager = null
-            ?? $processManager
-            ?? $this->processManager
-            ?? $this->newProcessManager();
-    }
-
-
-    public function is_symlink(string $symlink) : bool
-    {
-        return false
-            || is_link($symlink)
-            || $this->is_junction($symlink);
-    }
-
-    public function is_junction(string $junction) : bool
-    {
-        // https://github.com/composer/composer/blob/main/src/Composer/Util/Filesystem.php#L807
-
         $thePhp = Lib::php();
 
-        if ( ! $thePhp->is_windows() ) {
-            return false;
+        if ( ! $thePhp->is_terminal() ) {
+            throw new RuntimeException(
+                [ 'Function must be called only in CLI mode' ]
+            );
         }
-
-        clearstatcache(true, $junction);
-
-        if ( ! is_dir($junction) ) {
-            return false;
-        }
-
-        if ( is_link($junction) ) {
-            return false;
-        }
-
-        $stat = lstat($junction);
-
-        // S_ISDIR test (S_IFDIR is 0x4000, S_IFMT is 0xF000 bitmask)
-        $result = is_array($stat)
-            && 0x4000 !== ($stat['mode'] & 0xF000);
-
-        return $result;
-    }
-
-
-    /**
-     * @return resource
-     */
-    public function stdin()
-    {
-        if ( ! defined('STDIN') ) define('STDIN', fopen('php://stdin', 'rb'));
-
-        return STDIN;
-    }
-
-    /**
-     * @return resource
-     */
-    public function stdout()
-    {
-        if ( ! defined('STDOUT') ) define('STDOUT', fopen('php://stdout', 'wb'));
-
-        return STDOUT;
-    }
-
-    /**
-     * @return resource
-     */
-    public function stderr()
-    {
-        if ( ! defined('STDERR') ) define('STDERR', fopen('php://stderr', 'wb'));
-
-        return STDERR;
     }
 
 
@@ -107,10 +24,6 @@ class CliModule
     {
         $theDebug = Lib::debug();
         $thePhp = Lib::php();
-
-        if ( ! $thePhp->is_terminal() ) {
-            throw new RuntimeException('Function must be called only in CLI mode');
-        }
 
         if ( null !== $var ) {
             $theDebugDumper = $theDebug->dumper();
@@ -120,7 +33,7 @@ class CliModule
         }
 
         echo '> Press ENTER to continue...' . "\n";
-        $h = $this->stdin();
+        $h = $thePhp->stdin();
         fgets($h);
 
         return $var;
@@ -128,12 +41,6 @@ class CliModule
 
     public function stop(...$vars) : void
     {
-        $thePhp = Lib::php();
-
-        if ( ! $thePhp->is_terminal() ) {
-            throw new RuntimeException('Function must be called only in CLI mode');
-        }
-
         $this->pause(...$vars);
 
         exit(1);
@@ -144,11 +51,7 @@ class CliModule
     {
         $thePhp = Lib::php();
 
-        if ( ! $thePhp->is_terminal() ) {
-            throw new RuntimeException('Function must be called only in CLI mode');
-        }
-
-        $h = $this->stdin();
+        $h = $thePhp->stdin();
 
         $line = trim(fgets($h));
 
@@ -160,10 +63,6 @@ class CliModule
         $theStr = Lib::str();
         $thePhp = Lib::php();
 
-        if ( ! $thePhp->is_terminal() ) {
-            throw new RuntimeException('Function must be called only in CLI mode');
-        }
-
         $delimiter = $delimiter ?? '```';
 
         echo '> Enter text separating lines by pressing ENTER' . "\n";
@@ -174,7 +73,7 @@ class CliModule
         $fnSubstr = $theStr->mb_func('substr');
 
         $lines = [];
-        $h = $this->stdin();
+        $h = $thePhp->stdin();
         while ( false !== ($line = fgets($h)) ) {
             $line = trim($line);
 
@@ -210,12 +109,6 @@ class CliModule
 
     public function yes(string $message, ?string &$refAnswer = null) : bool
     {
-        $thePhp = Lib::php();
-
-        if ( ! $thePhp->is_terminal() ) {
-            throw new RuntimeException('Function must be called only in CLI mode');
-        }
-
         $refAnswer = $refAnswer ?? 'n';
 
         $isYes = ('y' === $refAnswer) || ('yy' === $refAnswer);
@@ -227,9 +120,15 @@ class CliModule
 
                 echo $message . ' [' . implode('/', $accepted) . ']' . "\n";
 
-                while ( ! in_array($passed = $this->readln(), $accepted) ) {
+                do {
                     echo 'Please enter one of: [' . implode('/', $accepted) . ']';
-                }
+
+                    $passed = $this->readln();
+
+                    if ( in_array($passed, $accepted) ) {
+                        break;
+                    }
+                } while ( true );
 
                 $refAnswer = $passed;
 

@@ -1,37 +1,21 @@
 <?php
 
-if ( PHP_SAPI !== 'cli' ) {
-    echo "This script should run in CLI mode\n";
-
-    exit(1);
-}
-
-
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 \Gzhegow\Lib\Lib::entrypoint()
     ->setDirRoot(__DIR__ . '/../..')
-    //
     ->setMaxExecutionTime(0)
-    //
-    ->setPostMaxSize(0)
-    ->setUploadMaxFilesize(0)
     //
     ->useAll()
 ;
 
+$theAsyncFetchApi = \Gzhegow\Lib\Lib::asyncFetchApi();
+$theCli = \Gzhegow\Lib\Lib::cli();
+$theType = \Gzhegow\Lib\Lib::type();
 
 $timeoutMs = $argv[1] ?? 10000;        // 10 sec
 $lockWaitTimeoutMs = $argv[2] ?? 1000; // 1 sec
 
-$theType = \Gzhegow\Lib\Lib::type();
+echo "[ CURL-API ] Listening for tasks...\n";
 
-$timeoutMsInt = $theType->int_non_negative_or_minus_one($timeoutMs)->orThrow();
-$lockWaitTimeoutMsInt = $theType->int_non_negative_or_minus_one($lockWaitTimeoutMs)->orThrow();
-
-\Gzhegow\Lib\Lib::asyncFetchApi()
-    ->daemonMain(
-        $timeoutMsInt,
-        $lockWaitTimeoutMsInt
-    )
-;
+$theAsyncFetchApi->daemonMain($timeoutMs, $lockWaitTimeoutMs);

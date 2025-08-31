@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules\Fs\FileSafe;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
@@ -688,7 +689,7 @@ class FileSafe
         }
 
         // fflush($resource);
-        fflush($thePhp->hOutput());
+        fflush($thePhp->phpout());
 
         return $size;
     }
@@ -919,6 +920,55 @@ class FileSafe
         }
 
         return $realpath;
+    }
+
+
+    public function is_symlink($symlink) : bool
+    {
+        $theType = Lib::type();
+
+        if ( ! $theType->string_not_empty($symlink)->isOk([ &$symlinkString ]) ) {
+            return false;
+        }
+
+        return false
+            || is_link($symlinkString)
+            || $this->is_junction($symlinkString);
+    }
+
+    public function is_junction(string $junction) : bool
+    {
+        // > https://github.com/composer/composer/blob/main/src/Composer/Util/Filesystem.php#L807
+
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        if ( ! $thePhp->is_windows() ) {
+            return false;
+        }
+
+        if ( ! $theType->string_not_empty($junction)->isOk([ &$junctionString ]) ) {
+            return false;
+        }
+
+        clearstatcache(true, $junctionString);
+
+        if ( ! is_dir($junctionString) ) {
+            return false;
+        }
+
+        if ( is_link($junctionString) ) {
+            return false;
+        }
+
+        $stat = lstat($junctionString);
+
+        // > S_ISDIR test (S_IFDIR is 0x4000, S_IFMT is 0xF000 bitmask)
+        $result = true
+            && is_array($stat)
+            && 0x4000 !== ($stat['mode'] & 0xF000);
+
+        return $result;
     }
 
 

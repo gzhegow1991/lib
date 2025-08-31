@@ -829,7 +829,7 @@ class DefaultDumper implements DumperInterface
         $dumperOptions = $this->dumperOptions[$this->dumper] ?? [];
 
         if ( ! array_key_exists('resource', $dumperOptions) ) {
-            $resource = $thePhp->hOutput();
+            $resource = $thePhp->phpout();
 
         } else {
             $resource = $dumperOptions['resource'];
@@ -857,7 +857,7 @@ class DefaultDumper implements DumperInterface
         $dumperOptions = $this->dumperOptions[$this->dumper] ?? [];
 
         if ( ! array_key_exists('resource', $dumperOptions) ) {
-            $resource = $thePhp->hOutput();
+            $resource = $thePhp->phpout();
 
         } else {
             $resource = $dumperOptions['resource'];

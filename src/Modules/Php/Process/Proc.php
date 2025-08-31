@@ -6,7 +6,7 @@
  * @noinspection PhpUndefinedNamespaceInspection
  */
 
-namespace Gzhegow\Lib\Modules\Cli\Process;
+namespace Gzhegow\Lib\Modules\Php\Process;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
@@ -513,12 +513,11 @@ class Proc
      */
     public function spawnUsingSymfonyProcess()
     {
-        $theCli = Lib::cli();
-        $theCliProcessManager = $theCli->processManager();
+        $thePhpProcessManager = Lib::phpProcessManager();
 
         $this->validateSpawn();
 
-        $process = $theCliProcessManager->newSymfonyProcess($this);
+        $process = $thePhpProcessManager->newSymfonyProcess($this);
 
         $process->start();
 

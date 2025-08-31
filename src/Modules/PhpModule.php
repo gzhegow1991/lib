@@ -16,8 +16,10 @@ use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToObjectInterface;
 use Gzhegow\Lib\Modules\Php\Pooling\DefaultPoolingFactory;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
+use Gzhegow\Lib\Modules\Php\Process\DefaultProcessManager;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIterableInterface;
 use Gzhegow\Lib\Modules\Php\Pooling\PoolingFactoryInterface;
+use Gzhegow\Lib\Modules\Php\Process\ProcessManagerInterface;
 use Gzhegow\Lib\Modules\Php\CallableParser\DefaultCallableParser;
 use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 
@@ -153,6 +155,31 @@ class PhpModule
             ?? $callableParser
             ?? $this->callableParser
             ?? $this->newCallableParser();
+    }
+
+
+    /**
+     * @var ProcessManagerInterface
+     */
+    protected $processManager;
+
+
+    public function newProcessManager() : ProcessManagerInterface
+    {
+        return new DefaultProcessManager();
+    }
+
+    public function cloneProcessManager() : ProcessManagerInterface
+    {
+        return clone $this->processManager();
+    }
+
+    public function processManager(?ProcessManagerInterface $processManager = null) : ProcessManagerInterface
+    {
+        return $this->processManager = null
+            ?? $processManager
+            ?? $this->processManager
+            ?? $this->newProcessManager();
     }
 
 
@@ -1788,7 +1815,7 @@ class PhpModule
     /**
      * @return resource
      */
-    public function hInput()
+    public function phpin()
     {
         if ( ! defined('PHPIN') ) define('PHPIN', fopen('php://input', 'rb'));
 
@@ -1798,11 +1825,42 @@ class PhpModule
     /**
      * @return resource
      */
-    public function hOutput()
+    public function phpout()
     {
         if ( ! defined('PHPOUT') ) define('PHPOUT', fopen('php://output', 'wb'));
 
         return PHPOUT;
+    }
+
+
+    /**
+     * @return resource
+     */
+    public function stdin()
+    {
+        if ( ! defined('STDIN') ) define('STDIN', fopen('php://stdin', 'rb'));
+
+        return STDIN;
+    }
+
+    /**
+     * @return resource
+     */
+    public function stdout()
+    {
+        if ( ! defined('STDOUT') ) define('STDOUT', fopen('php://stdout', 'wb'));
+
+        return STDOUT;
+    }
+
+    /**
+     * @return resource
+     */
+    public function stderr()
+    {
+        if ( ! defined('STDERR') ) define('STDERR', fopen('php://stderr', 'wb'));
+
+        return STDERR;
     }
 
 

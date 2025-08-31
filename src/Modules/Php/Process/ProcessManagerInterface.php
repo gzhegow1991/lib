@@ -6,7 +6,7 @@
  * @noinspection PhpUndefinedNamespaceInspection
  */
 
-namespace Gzhegow\Lib\Modules\Cli\Process;
+namespace Gzhegow\Lib\Modules\Php\Process;
 
 interface ProcessManagerInterface
 {
@@ -21,10 +21,17 @@ interface ProcessManagerInterface
     public function useSymfonyProcess(?bool $useSymfonyProcess = null);
 
 
+    public function newProc() : Proc;
+
     public function newProcNormal() : Proc;
 
     public function newProcBackground() : Proc;
 
+
+    /**
+     * @return static
+     */
+    public function spawn(Proc $proc);
 
     /**
      * @return static

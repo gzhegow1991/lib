@@ -4,7 +4,7 @@ namespace Gzhegow\Lib\Modules\Async\FetchApi;
 
 interface FetchApiInterface
 {
-    public function pushTask(&$refTaskId, string $url, array $curlOptions = [], ?int $lockWaitTimeoutMs = null) : bool;
+    public function pushTask(&$refTaskId, string $url, array $curlOptions = [], ?int $blockTimeoutMs = null) : bool;
 
     public function popTask(&$refTask, ?int $blockTimeoutMs = null) : bool;
 
@@ -29,5 +29,5 @@ interface FetchApiInterface
     public function daemonSpawn(?int $timeoutMs = null, ?int $lockWaitTimeoutMs = null) : void;
 
 
-    public function daemonMain(int $timeoutMs, int $lockWaitTimeoutMs) : void;
+    public function daemonMain(int $timeoutMs, int $blockTimeoutMs) : void;
 }

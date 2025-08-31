@@ -6,7 +6,7 @@
  * @noinspection PhpUndefinedNamespaceInspection
  */
 
-namespace Gzhegow\Lib\Modules\Cli\Process;
+namespace Gzhegow\Lib\Modules\Php\Process;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\Runtime\ComposerException;
@@ -65,6 +65,13 @@ class DefaultProcessManager implements ProcessManagerInterface
     }
 
 
+    public function newProc() : Proc
+    {
+        $processSpawn = new Proc();
+
+        return $processSpawn;
+    }
+
     public function newProcNormal() : Proc
     {
         $processSpawn = new Proc();
@@ -87,18 +94,36 @@ class DefaultProcessManager implements ProcessManagerInterface
     /**
      * @return static
      */
-    public function spawnNormal(Proc $proc)
+    public function spawn(Proc $proc)
     {
         $thePhp = Lib::php();
 
-        $isWindows = $thePhp->is_windows();
+        if ( $this->useSymfonyProcess ) {
+            $proc->spawnUsingSymfonyProcess();
+
+        } elseif ( $thePhp->is_windows() ) {
+            $proc->spawnUsingProcOpenWindows();
+
+        } else {
+            $proc->spawnUsingProcOpenUnix();
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function spawnNormal(Proc $proc)
+    {
+        $thePhp = Lib::php();
 
         $proc->setIsBackground(false);
 
         if ( $this->useSymfonyProcess ) {
             $proc->spawnUsingSymfonyProcess();
 
-        } elseif ( $isWindows ) {
+        } elseif ( $thePhp->is_windows() ) {
             $proc->spawnUsingProcOpenWindows();
 
         } else {
@@ -115,14 +140,12 @@ class DefaultProcessManager implements ProcessManagerInterface
     {
         $thePhp = Lib::php();
 
-        $isWindows = $thePhp->is_windows();
-
         $proc->setIsBackground(true);
 
         if ( $this->useSymfonyProcess ) {
             $proc->spawnUsingSymfonyProcess();
 
-        } elseif ( $isWindows ) {
+        } elseif ( $thePhp->is_windows() ) {
             $proc->spawnUsingProcOpenWindows();
 
         } else {

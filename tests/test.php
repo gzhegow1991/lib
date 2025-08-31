@@ -329,6 +329,7 @@ $test->expectSecondsMax(1.3);
 $test->run();
 
 
+
 // // >>> TEST
 // // > Тест закомментирован, поскольку приводит к поднятию дополнительных процессов
 // // > Если неверные права пользователя в Unix, с этим будут проблемы, раскоментируйте, чтобы протестировать
@@ -364,8 +365,8 @@ $test->run();
 // $test->expectStdout('
 // "[ Fetch ]"
 //
-// "https://google.com - HTTP: 200"
-// "https://yandex.ru - HTTP: 200"
+// "https://google.com/ - HTTP: 200"
+// "https://yandex.ru/ - HTTP: 200"
 // ');
 // $test->run();
 // die();
@@ -1876,12 +1877,10 @@ $fn = function () use ($ffn) {
     $ffn->print('[ CmpModule ]');
     echo "\n";
 
-    $theCli = \Gzhegow\Lib\Lib::cli();
-
     $object = new \StdClass();
 
-    $resourceOpenedStdout = $theCli->stdout();
-    $resourceOpenedStderr = $theCli->stderr();
+    $resourceOpenedStdout = \Gzhegow\Lib\Lib::php()->stdout();
+    $resourceOpenedStderr = \Gzhegow\Lib\Lib::php()->stderr();
     $resourceClosed = fopen('php://memory', 'wb');
     fclose($resourceClosed);
 
@@ -3139,7 +3138,7 @@ $fn = function () use ($ffn) {
     echo \Gzhegow\Lib\Lib::debug()->dump_value('string') . "\n";
     echo \Gzhegow\Lib\Lib::debug()->dump_value([]) . "\n";
     echo \Gzhegow\Lib\Lib::debug()->dump_value((object) []) . "\n";
-    echo \Gzhegow\Lib\Lib::debug()->dump_value(\Gzhegow\Lib\Lib::php()->hOutput()) . "\n";
+    echo \Gzhegow\Lib\Lib::debug()->dump_value(\Gzhegow\Lib\Lib::php()->phpout()) . "\n";
 
     echo "\n";
 

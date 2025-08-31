@@ -251,9 +251,12 @@ class FileSafeProxy
                 'is_realdir'                  => [ '@inner', 'is_realdir' ],
                 //
                 'is_link'                     => [ '@inner', 'is_link' ],
-                'is_link_dir'                 => [ '@inner', 'is_link_dir' ],
-                'is_link_file'                => [ '@inner', 'is_link_file' ],
                 'is_link_target'              => [ '@inner', 'is_link_target' ],
+                'is_link_file'                => [ '@inner', 'is_link_file' ],
+                'is_link_dir'                 => [ '@inner', 'is_link_dir' ],
+                //
+                'is_symlink'                  => [ '@inner', 'is_symlink' ],
+                'is_junction'                 => [ '@inner', 'is_junction' ],
                 //
                 'is_readable'                 => [ '@inner', 'is_readable' ],
                 'is_writable'                 => [ '@inner', 'is_writable' ],

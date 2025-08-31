@@ -10,11 +10,6 @@ use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 class FilesystemFetchApi implements FetchApiInterface
 {
     /**
-     * @var bool
-     */
-    protected $isRegisterShutdownFunctionCalled = false;
-
-    /**
      * @var string
      */
     protected $binDirRealpath;
@@ -152,7 +147,7 @@ class FilesystemFetchApi implements FetchApiInterface
     public function pushTask(
         &$refTaskId,
         string $url, array $curlOptions = [],
-        ?int $lockWaitTimeoutMs = 0
+        ?int $blockTimeoutMs = 0
     ) : bool
     {
         $refTaskId = null;
@@ -177,7 +172,7 @@ class FilesystemFetchApi implements FetchApiInterface
         $serialized = serialize($task);
 
         $statusPush = $theFs->brpush(
-            100000, $lockWaitTimeoutMs,
+            null, $blockTimeoutMs,
             $queueFile, $serialized
         );
 
@@ -200,7 +195,7 @@ class FilesystemFetchApi implements FetchApiInterface
         $queueFile = $this->queueFile;
 
         $serialized = $theFs->blpop(
-            100000, $blockTimeoutMs,
+            null, $blockTimeoutMs,
             $queueFile, true
         );
 
@@ -406,12 +401,12 @@ class FilesystemFetchApi implements FetchApiInterface
 
     /**
      * @param int        $workerPid
-     * @param int        $workerTimeoutMs
+     * @param int        $blockTimeoutMs
      * @param float|null $nowMicrotime
      */
     protected function workerAddToPool(
-        $workerPid, $workerTimeoutMs,
-        $nowMicrotime = null
+        $workerPid,
+        $blockTimeoutMs, $nowMicrotime = null
     ) : bool
     {
         $theFs = Lib::fs();
@@ -423,12 +418,12 @@ class FilesystemFetchApi implements FetchApiInterface
             static function () use (
                 $theFsFile,
                 $workerPid, $poolFile,
-                $workerTimeoutMs, $nowMicrotime
+                $blockTimeoutMs, $nowMicrotime
             ) {
                 $status = false;
 
                 if ( $fhPool = $theFsFile->fopen_flock_pooling(
-                    100000, $workerTimeoutMs,
+                    100000, $blockTimeoutMs,
                     $poolFile, 'c+', LOCK_EX | LOCK_NB
                 ) ) {
                     $nowMicrotimeFloat = $nowMicrotime ?? microtime(true);
@@ -459,7 +454,7 @@ class FilesystemFetchApi implements FetchApiInterface
                         $lines[] = $lineTrim;
                     }
 
-                    $workerTimeoutMicrotimeFloat = $nowMicrotimeFloat + ($workerTimeoutMs / 1000);
+                    $workerTimeoutMicrotimeFloat = $nowMicrotimeFloat + ($blockTimeoutMs / 1000);
 
                     $workerPidNewString = str_pad($workerPid, 10, '0', STR_PAD_LEFT);
                     $workerTimeoutMicrotimeNewString = sprintf('%.6f', $workerTimeoutMicrotimeFloat);
@@ -651,8 +646,7 @@ class FilesystemFetchApi implements FetchApiInterface
         $timeoutMs = $timeoutMs ?? 10000;
         $lockWaitTimeoutMs = $lockWaitTimeoutMs ?? 1000;
 
-        $theCli = Lib::cli();
-        $theCliProcessManager = $theCli->processManager();
+        $thePhpProcessManager = Lib::phpProcessManager();
         $theType = Lib::type();
 
         $timeoutMsInt = $theType->int_non_negative_or_minus_one($timeoutMs)->orThrow();
@@ -664,75 +658,67 @@ class FilesystemFetchApi implements FetchApiInterface
         $cmd[] = $timeoutMsInt;
         $cmd[] = $lockWaitTimeoutMsInt;
 
-        $proc = $theCliProcessManager->newProcNormal();
+        $proc = $thePhpProcessManager->newProcBackground();
 
         $proc
             ->setCmd($cmd)
             ->setCwd($this->binDirRealpath)
         ;
 
-        $theCliProcessManager->spawnNormal($proc);
+        $thePhpProcessManager->spawnBackground($proc);
     }
 
 
     public function daemonMain(
         int $timeoutMs,
-        int $lockWaitTimeoutMs
+        int $blockTimeoutMs
     ) : void
     {
+        $theEntrypoint = Lib::entrypoint();
         $theType = Lib::type();
 
         $pid = getmypid();
 
         $timeoutMsInt = $theType->int_non_negative_or_minus_one($timeoutMs)->orThrow();
-        $lockWaitTimeoutMsInt = $theType->int_non_negative_or_minus_one($lockWaitTimeoutMs)->orThrow();
+        $blockTimeoutMsInt = $theType->int_non_negative_or_minus_one($blockTimeoutMs)->orThrow();
 
         if ( -1 === $timeoutMsInt ) $timeoutMsInt = null;
-        if ( -1 === $lockWaitTimeoutMsInt ) $lockWaitTimeoutMsInt = null;
+        if ( -1 === $blockTimeoutMsInt ) $blockTimeoutMsInt = null;
 
-        $this->registerShutdownFunction();
-
-        echo "[ CURL-API ] Listening for tasks...\n";
+        $theEntrypoint->registerShutdownFunction([ $this, 'daemonRemoveFromPool' ]);
 
         $this->workerRunLoop(
             $pid,
-            $timeoutMsInt,
-            $lockWaitTimeoutMsInt
+            $timeoutMsInt, $blockTimeoutMsInt
         );
     }
 
 
-    public function registerShutdownFunctionFn() : void
-    {
-        $this->daemonRemoveFromPool();
-    }
-
-    protected function registerShutdownFunction() : void
-    {
-        if ( ! $this->isRegisterShutdownFunctionCalled ) {
-            register_shutdown_function([ $this, 'registerShutdownFunctionFn' ]);
-
-            $this->isRegisterShutdownFunctionCalled = true;
-        }
-    }
-
-
     protected function workerRunLoop(
-        int $pid,
+        $workerPid,
         ?int $timeoutMs = null,
-        ?int $waitTimeoutMs = null
+        ?int $blockTimeoutMs = null
     ) : void
     {
-        $isNullTimeout = (null === $timeoutMs);
+        $isInfiniteTimeout = (null === $timeoutMs);
+        $isInfiniteBlockTimeout = (null === $blockTimeoutMs);
 
         $nowMicrotime = microtime(true);
 
-        $timeoutBreakMs = $timeoutMs ?? 10000;
-        $timeoutReportMs = $timeoutMs ?? 10000;
+        $breakTimeoutMsInt = $timeoutMs;
+        $blockTimeoutMsInt = $blockTimeoutMs;
+
+        $reportTimeoutMsInt = $timeoutMs ?? 10000;
 
         $timeoutBreakMicrotime = null;
-        if ( ! $isNullTimeout ) {
-            $timeoutBreakMicrotime = $nowMicrotime + ($timeoutBreakMs / 1000);
+        if ( ! $isInfiniteTimeout ) {
+            $breakTimeoutMsInt = $breakTimeoutMsInt ?: 10000;
+
+            $timeoutBreakMicrotime = $nowMicrotime + ($breakTimeoutMsInt / 1000);
+        }
+
+        if ( ! $isInfiniteBlockTimeout ) {
+            $blockTimeoutMsInt = $blockTimeoutMsInt ?: 1000;
         }
 
         $timeoutReportMicrotime = 0.0;
@@ -741,9 +727,12 @@ class FilesystemFetchApi implements FetchApiInterface
             $nowMicrotime = microtime(true);
 
             if ( $nowMicrotime > $timeoutReportMicrotime ) {
-                $this->workerAddToPool($pid, $timeoutReportMs, $nowMicrotime);
+                $this->workerAddToPool(
+                    $workerPid,
+                    $blockTimeoutMsInt, $nowMicrotime
+                );
 
-                $timeoutReportMicrotime = $nowMicrotime + ($timeoutReportMs / 1000);
+                $timeoutReportMicrotime = $nowMicrotime + ($reportTimeoutMsInt / 1000);
             }
 
             $task = [];
@@ -753,22 +742,22 @@ class FilesystemFetchApi implements FetchApiInterface
              * @noinspection PhpVarExportUsedWithoutReturnArgumentInspection
              */
             $status = true
-                && $this->popTask($task, $waitTimeoutMs)
+                && $this->popTask($task, $blockTimeoutMsInt)
                 && print_r('[ NEW ] Task: ' . $task['id'] . "\n")
                 && $this->processTask($taskResult, $task)
                 && print_r('[ OK ] Task: ' . $task['id'] . "\n")
                 && $this->taskSaveResult($task, $taskResult);
 
-            if ( ! $isNullTimeout ) {
+            if ( ! $isInfiniteTimeout ) {
                 if ( $status ) {
-                    $timeoutBreakMicrotime = $nowMicrotime + ($timeoutBreakMs / 1000);
+                    $timeoutBreakMicrotime = $nowMicrotime + ($breakTimeoutMsInt / 1000);
 
                 } elseif ( $nowMicrotime > $timeoutBreakMicrotime ) {
                     break;
                 }
             }
 
-            usleep(1000);
+            usleep(10000);
         } while ( true );
     }
 }

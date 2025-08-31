@@ -295,7 +295,7 @@ class EntrypointModule
             //
             'umask'                   => 0002,
             //
-            'postMaxSize'             => '8M',
+            'postMaxSize'             => '1M',
             //
             'sessionCookieParams'     => [
                 'lifetime' => 0,
@@ -308,7 +308,7 @@ class EntrypointModule
             'sessionSavePath'         => null,
             'sessionSavePathMkdir'    => false,
             //
-            'uploadMaxFilesize'       => '2M',
+            'uploadMaxFilesize'       => '0',
             'uploadTmpDir'            => null,
             'uploadTmpDirMkdir'       => false,
             //

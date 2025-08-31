@@ -8,23 +8,23 @@ namespace Gzhegow\Lib;
 
 use Gzhegow\Lib\Modules\FsModule;
 use Gzhegow\Lib\Modules\MbModule;
+use Gzhegow\Lib\Modules\ArrModule;
 use Gzhegow\Lib\Modules\CliModule;
+use Gzhegow\Lib\Modules\CmpModule;
 use Gzhegow\Lib\Modules\NetModule;
+use Gzhegow\Lib\Modules\NumModule;
 use Gzhegow\Lib\Modules\PhpModule;
 use Gzhegow\Lib\Modules\StrModule;
 use Gzhegow\Lib\Modules\UrlModule;
-use Gzhegow\Lib\Modules\ArrModule;
-use Gzhegow\Lib\Modules\CmpModule;
-use Gzhegow\Lib\Modules\NumModule;
+use Gzhegow\Lib\Modules\DateModule;
 use Gzhegow\Lib\Modules\FuncModule;
 use Gzhegow\Lib\Modules\HttpModule;
-use Gzhegow\Lib\Modules\TestModule;
 use Gzhegow\Lib\Modules\PregModule;
-use Gzhegow\Lib\Modules\DateModule;
+use Gzhegow\Lib\Modules\TestModule;
 use Gzhegow\Lib\Modules\TypeModule;
-use Gzhegow\Lib\Modules\DebugModule;
-use Gzhegow\Lib\Modules\CryptModule;
 use Gzhegow\Lib\Modules\AsyncModule;
+use Gzhegow\Lib\Modules\CryptModule;
+use Gzhegow\Lib\Modules\DebugModule;
 use Gzhegow\Lib\Modules\BcmathModule;
 use Gzhegow\Lib\Modules\EscapeModule;
 use Gzhegow\Lib\Modules\FormatModule;
@@ -33,8 +33,8 @@ use Gzhegow\Lib\Modules\SocialModule;
 use Gzhegow\Lib\Modules\Test\TestCase;
 use Gzhegow\Lib\Modules\Func\Pipe\Pipe;
 use Gzhegow\Lib\Modules\ItertoolsModule;
-use Gzhegow\Lib\Modules\EntrypointModule;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Modules\EntrypointModule;
 use Gzhegow\Lib\Modules\Format\FormatCsv;
 use Gzhegow\Lib\Modules\Format\FormatXml;
 use Gzhegow\Lib\Modules\Format\FormatJson;
@@ -53,7 +53,7 @@ use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
 use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
 use Gzhegow\Lib\Modules\Str\Inflector\InflectorInterface;
 use Gzhegow\Lib\Modules\Async\Clock\ClockManagerInterface;
-use Gzhegow\Lib\Modules\Cli\Process\ProcessManagerInterface;
+use Gzhegow\Lib\Modules\Php\Process\ProcessManagerInterface;
 use Gzhegow\Lib\Modules\Debug\Backtracer\BacktracerInterface;
 use Gzhegow\Lib\Modules\Debug\Throwabler\ThrowablerInterface;
 use Gzhegow\Lib\Modules\Async\Promise\PromiseManagerInterface;
@@ -113,13 +113,6 @@ class Lib
     public static function cli()
     {
         return static::$cli = static::$cli ?? new CliModule();
-    }
-
-    public static function cliProcessManager(?bool $clone = null) : ProcessManagerInterface
-    {
-        return $clone
-            ? Lib::cli()->cloneProcessManager()
-            : Lib::cli()->processManager();
     }
 
 
@@ -234,6 +227,13 @@ class Lib
         return $clone
             ? Lib::php()->cloneCallableParser()
             : Lib::php()->callableParser();
+    }
+
+    public static function phpProcessManager(?bool $clone = null) : ProcessManagerInterface
+    {
+        return $clone
+            ? Lib::php()->cloneProcessManager()
+            : Lib::php()->processManager();
     }
 
 
