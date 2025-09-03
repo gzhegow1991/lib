@@ -115,7 +115,6 @@ class UrlModule
         $refParseUrl = $this->parse_url($urlStringNotEmpty);
 
         $wasHost = ('' !== $refParseUrl['host']);
-        // $wasPath = ('' !== $refParseUrl['path']);
 
         if ( ! $wasHost ) {
             return Ret::err(
@@ -123,10 +122,6 @@ class UrlModule
                 [ __FILE__, __LINE__ ]
             );
         }
-
-        // if ( ! $wasPath ) {
-        //     $refParseUrl['path'] = '/';
-        // }
 
         if ( false
             || (-2 === $isHostIdnaAscii)
@@ -198,10 +193,12 @@ class UrlModule
         $wasQuery = ('' !== $refParseUrl['query']);
 
         if ( false === $_query ) {
-            unset($refParseUrl['query']);
+            $refParseUrl['is_query'] = '';
+            $refParseUrl['query'] = '';
 
         } else {
-            $httpQuery = null;
+            $httpQuery = '';
+
             if ( $hasQuery && $wasQuery ) {
                 $httpQuery = $theHttp->http_build_query_array($refParseUrl['query'], $_query);
                 $httpQuery = http_build_query($httpQuery);
@@ -214,14 +211,19 @@ class UrlModule
                 $httpQuery = $refParseUrl['query'];
             }
 
-            $refParseUrl['query'] = $httpQuery;
+            if ( '' !== $httpQuery ) {
+                $refParseUrl['is_query'] = '?';
+                $refParseUrl['query'] = $httpQuery;
+            }
         }
 
         if ( false === $_fragment ) {
-            unset($refParseUrl['fragment']);
+            $refParseUrl['is_fragment'] = '';
+            $refParseUrl['fragment'] = '';
 
         } else {
             if ( $hasFragment ) {
+                $refParseUrl['is_fragment'] = '#';
                 $refParseUrl['fragment'] = $_fragment;
             }
         }
@@ -382,10 +384,12 @@ class UrlModule
         $wasQuery = ('' !== $refParseUrl['query']);
 
         if ( false === $_query ) {
-            unset($refParseUrl['query']);
+            $refParseUrl['is_query'] = '';
+            $refParseUrl['query'] = '';
 
         } else {
-            $httpQuery = null;
+            $httpQuery = '';
+
             if ( $hasQuery && $wasQuery ) {
                 $httpQuery = $theHttp->http_build_query_array($refParseUrl['query'], $_query);
                 $httpQuery = http_build_query($httpQuery);
@@ -398,14 +402,19 @@ class UrlModule
                 $httpQuery = $refParseUrl['query'];
             }
 
-            $refParseUrl['query'] = $httpQuery;
+            if ( '' !== $httpQuery ) {
+                $refParseUrl['is_query'] = '?';
+                $refParseUrl['query'] = $httpQuery;
+            }
         }
 
         if ( false === $_fragment ) {
-            unset($refParseUrl['fragment']);
+            $refParseUrl['is_fragment'] = '';
+            $refParseUrl['fragment'] = '';
 
         } else {
             if ( $hasFragment ) {
+                $refParseUrl['is_fragment'] = '#';
                 $refParseUrl['fragment'] = $_fragment;
             }
         }
@@ -719,10 +728,12 @@ class UrlModule
         $wasQuery = ('' !== $refParseUrl['query']);
 
         if ( false === $_query ) {
-            unset($refParseUrl['query']);
+            $refParseUrl['is_query'] = '';
+            $refParseUrl['query'] = '';
 
         } else {
-            $httpQuery = null;
+            $httpQuery = '';
+
             if ( $hasQuery && $wasQuery ) {
                 $httpQuery = $theHttp->http_build_query_array($refParseUrl['query'], $_query);
                 $httpQuery = http_build_query($httpQuery);
@@ -735,14 +746,19 @@ class UrlModule
                 $httpQuery = $refParseUrl['query'];
             }
 
-            $refParseUrl['query'] = $httpQuery;
+            if ( '' !== $httpQuery ) {
+                $refParseUrl['is_query'] = '?';
+                $refParseUrl['query'] = $httpQuery;
+            }
         }
 
         if ( false === $_fragment ) {
-            unset($refParseUrl['fragment']);
+            $refParseUrl['is_fragment'] = '';
+            $refParseUrl['fragment'] = '';
 
         } else {
             if ( $hasFragment ) {
+                $refParseUrl['is_fragment'] = '#';
                 $refParseUrl['fragment'] = $_fragment;
             }
         }
