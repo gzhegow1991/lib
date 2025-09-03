@@ -1011,6 +1011,15 @@ trait IsTrait
 
 
 	/**
+	 * @param string|true $value
+	 */
+	public function is_domain($value, ?int $isHostIdnaAscii = null, array $refs = []): bool
+	{
+		return Lib::url()->type_domain($value, $isHostIdnaAscii, $refs)->isOk();
+	}
+
+
+	/**
 	 * @param string|true             $value
 	 * @param string|false|array|null $query
 	 * @param string|false|null       $fragment

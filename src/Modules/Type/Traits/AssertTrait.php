@@ -2226,6 +2226,22 @@ trait AssertTrait
 
 
 	/**
+	 * @param string|true $value
+	 *
+	 * @return string
+	 */
+	public function assert_domain($value, ?int $isHostIdnaAscii = null, array $refs = [])
+	{
+		if (Lib::url()->type_domain($value, $isHostIdnaAscii, $refs)->isOk([ &$ref ])) return $ref;
+
+		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
+
+		throw new LogicException($t, [ 'Assert `domain` is failed', [ $value, $isHostIdnaAscii, $refs ] ]);
+	}
+
+
+	/**
 	 * @param string|true             $value
 	 * @param string|false|array|null $query
 	 * @param string|false|null       $fragment

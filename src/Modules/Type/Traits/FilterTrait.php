@@ -1780,6 +1780,19 @@ trait FilterTrait
 	/**
 	 * @param array{ 0?: string, 1?: Ret<string> } $r
 	 *
+	 * @param string|true $value
+	 */
+	public function filter_domain(array $r, $value, ?int $isHostIdnaAscii = null, array $refs = []): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::url()->type_domain($value, $isHostIdnaAscii, $refs))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: string, 1?: Ret<string> } $r
+	 *
 	 * @param string|true             $value
 	 * @param string|false|array|null $query
 	 * @param string|false|null       $fragment

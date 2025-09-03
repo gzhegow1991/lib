@@ -1317,6 +1317,16 @@ trait TypeTrait
     }
 
     /**
+     * @param string|true $value
+     *
+     * @return Ret<string>
+     */
+    public function domain($value, ?int $isHostIdnaAscii = null, array $refs = [])
+    {
+        return Lib::url()->type_domain($value, $isHostIdnaAscii, $refs);
+    }
+
+    /**
      * @param string|true             $value
      * @param string|false|array|null $query
      * @param string|false|null       $fragment
@@ -1327,7 +1337,6 @@ trait TypeTrait
     {
         return Lib::url()->type_link($value, $query, $fragment, $isLinkUrlencoded, $refs);
     }
-
 
     /**
      * @param string $value
