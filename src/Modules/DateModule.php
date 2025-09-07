@@ -2160,6 +2160,138 @@ class DateModule
 
 
 
+    public function format_locale_month(\DateTimeInterface $dateTime, string $locale) : string
+    {
+        $formatter = new \IntlDateFormatter(
+            $locale,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE,
+            null,
+            \IntlDateFormatter::GREGORIAN,
+            'LLLL'
+        );
+
+        $content = $formatter->format($dateTime);
+
+        $content = mb_strtolower($content);
+
+        return $content;
+    }
+
+    public function format_locale_day(\DateTimeInterface $dateTime, string $locale) : string
+    {
+        $formatter = new \IntlDateFormatter(
+            $locale,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE,
+            null,
+            \IntlDateFormatter::GREGORIAN,
+            'EEEE'
+        );
+
+        $content = $formatter->format($dateTime);
+
+        $content = mb_strtolower($content);
+
+        return $content;
+    }
+
+    public function format_locale_day_short(\DateTimeInterface $dateTime, string $locale) : string
+    {
+        $formatter = new \IntlDateFormatter(
+            $locale,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE,
+            null,
+            \IntlDateFormatter::GREGORIAN,
+            'EEE'
+        );
+
+        $content = $formatter->format($dateTime);
+
+        $content = mb_strtolower($content);
+
+        return $content;
+    }
+
+
+    public function get_locale_months(string $locale) : array
+    {
+        $formatter = new \IntlDateFormatter(
+            $locale,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE,
+            null,
+            \IntlDateFormatter::GREGORIAN,
+            'LLLL'
+        );
+
+        $date = new \DateTime('1970-01-01');
+
+        for ( $i = 1; $i <= 12; $i++ ) {
+            $content = $formatter->format($date);
+            $content = mb_strtolower($content);
+
+            $days[] = $content;
+
+            $date->modify("+1 month");
+        }
+
+        return $days;
+    }
+
+    public function get_locale_days(string $locale) : array
+    {
+        $formatter = new \IntlDateFormatter(
+            $locale,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE,
+            null,
+            \IntlDateFormatter::GREGORIAN,
+            'EEEE'
+        );
+
+        $date = new \DateTime('Sunday this week midnight');
+
+        for ( $i = 1; $i <= 7; $i++ ) {
+            $content = $formatter->format($date);
+            $content = mb_strtolower($content);
+
+            $days[] = $content;
+
+            $date->modify("+1 day");
+        }
+
+        return $days;
+    }
+
+    public function get_locale_days_short(string $locale) : array
+    {
+        $formatter = new \IntlDateFormatter(
+            $locale,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE,
+            null,
+            \IntlDateFormatter::GREGORIAN,
+            'EEE'
+        );
+
+        $date = new \DateTime('Sunday this week midnight');
+
+        for ( $i = 1; $i <= 7; $i++ ) {
+            $content = $formatter->format($date);
+            $content = mb_strtolower($content);
+
+            $days[] = $content;
+
+            $date->modify("+1 day");
+        }
+
+        return $days;
+    }
+
+
+
     protected function cloneToDate(\DateTimeInterface $dateTime) : ?\DateTimeInterface
     {
         return clone $dateTime;

@@ -2001,17 +2001,17 @@ trait TypeTrait
     /**
      * @return Ret<\SplFileInfo>
      */
-    public function file($value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null)
+    public function file($value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null, array $refs = [])
     {
-        return Lib::fs()->type_file($value, $extensions, $mimeTypes, $filters);
+        return Lib::fs()->type_file($value, $extensions, $mimeTypes, $filters, $refs);
     }
 
     /**
      * @return Ret<\SplFileInfo>
      */
-    public function image($value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null)
+    public function image($value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null, array $refs = [])
     {
-        return Lib::fs()->type_image($value, $extensions, $mimeTypes, $filters);
+        return Lib::fs()->type_image($value, $extensions, $mimeTypes, $filters, $refs);
     }
 
 

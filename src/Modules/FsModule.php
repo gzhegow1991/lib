@@ -662,9 +662,16 @@ class FsModule
         $value,
         ?array $extensions = null,
         ?array $mimeTypes = null,
-        ?array $filters = null
+        ?array $filters = null,
+        array $refs = []
     )
     {
+        $withMimeType = array_key_exists(0, $refs);
+        if ( $withMimeType ) {
+            $refMimeType =& $refs[0];
+        }
+        $refMimeType = null;
+
         if ( $value instanceof \SplFileInfo ) {
             $splFileInfo = $value;
 
@@ -700,9 +707,26 @@ class FsModule
             }
         }
 
-        if ( null !== $mimeTypes ) {
+        $hasMimeType = (null !== $mimeTypes);
+
+        if ( $withMimeType || $hasMimeType ) {
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $finfoRes = finfo_file($finfo, $valueFilepathRealpath);
+            finfo_close($finfo);
+
+            if ( false === $finfoRes ) {
+                return Ret::err(
+                    [ 'The `value` should pass `finfo_file` call', $value, $mimeTypes ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $refMimeType = $finfoRes;
+        }
+
+        if ( $hasMimeType ) {
             if ( null !== $splFileInfo ) {
-                $splFileInfo = $this->_type_file_mime_types($splFileInfo, $mimeTypes);
+                $splFileInfo = $this->_type_file_mime_types($splFileInfo, $refMimeType, $mimeTypes);
 
                 if ( null === $splFileInfo ) {
                     return Ret::err(
@@ -729,7 +753,7 @@ class FsModule
         return Ret::val($splFileInfo);
     }
 
-    protected function _type_file_extensions(\SplFileInfo $splFileInfo, array $extensions) : ?\SplFileInfo
+    protected function _type_file_extensions(\SplFileInfo $splFileInfo, array $extensions = []) : ?\SplFileInfo
     {
         if ( [] === $extensions ) {
             return null;
@@ -757,21 +781,9 @@ class FsModule
         return null;
     }
 
-    protected function _type_file_mime_types(\SplFileInfo $splFileInfo, array $mimeTypes) : ?\SplFileInfo
+    protected function _type_file_mime_types(\SplFileInfo $splFileInfo, string $mimeType, array $mimeTypes = []) : ?\SplFileInfo
     {
         if ( [] === $mimeTypes ) {
-            return null;
-        }
-
-        $fileRealpath = $splFileInfo->getRealPath();
-
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-
-        $mimeType = finfo_file($finfo, $fileRealpath);
-
-        finfo_close($finfo);
-
-        if ( false === $mimeType ) {
             return null;
         }
 
@@ -788,7 +800,7 @@ class FsModule
         return null;
     }
 
-    protected function _type_file_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
+    protected function _type_file_filters(\SplFileInfo $splFileInfo, array $filters, array $refs = []) : ?\SplFileInfo
     {
         if ( [] === $filters ) {
             return $splFileInfo;
@@ -841,19 +853,55 @@ class FsModule
         $value,
         ?array $extensions = null,
         ?array $mimeTypes = null,
-        ?array $filters = null
+        ?array $filters = null,
+        array $refs = []
     )
     {
-        if ( ! $this->type_file($value, $extensions, $mimeTypes, $filters)->isOk([ &$splFileInfo, &$ret ]) ) {
+        // $withMimeType = array_key_exists(0, $refs);
+        $withGetimagesize = array_key_exists(1, $refs);
+        if ( $withGetimagesize ) {
+            $refGetimagesize =& $refs[0];
+        }
+        $refGetimagesize = null;
+
+        if ( ! $this->type_file($value, $extensions, $mimeTypes, $filters, $refs)->isOk([ &$splFileInfo, &$ret ]) ) {
             return Ret::err(
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ( null !== $filters ) {
+        $hasFilters = (null !== $filters);
+
+        if ( $withGetimagesize || $hasFilters ) {
+            $theFunc = Lib::func();
+
+            $fileRealpath = $splFileInfo->getRealPath();
+
+            try {
+                $getimagesizeRes = $theFunc->safe_call(
+                    static function () use ($fileRealpath) {
+                        return getimagesize($fileRealpath);
+                    }
+                );
+            }
+            catch ( \Throwable $e ) {
+                $getimagesizeRes = false;
+            }
+
+            if ( false === $getimagesizeRes ) {
+                return Ret::err(
+                    [ 'The `value` should pass `getimagesize` call', $value, $filters ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $refGetimagesize = $getimagesizeRes;
+        }
+
+        if ( $hasFilters ) {
             if ( null !== $splFileInfo ) {
-                $splFileInfo = $this->_type_image_filters($splFileInfo, $filters);
+                $splFileInfo = $this->_type_image_filters($splFileInfo, $refGetimagesize, $filters);
 
                 if ( null === $splFileInfo ) {
                     return Ret::err(
@@ -867,10 +915,10 @@ class FsModule
         return Ret::val($splFileInfo);
     }
 
-    protected function _type_image_filters(\SplFileInfo $splFileInfo, array $filters) : ?\SplFileInfo
+    protected function _type_image_filters(\SplFileInfo $splFileInfo, array $getimagesize, array $filters) : ?\SplFileInfo
     {
-        if ( [] === $filters ) {
-            return $splFileInfo;
+        if ( [] !== $filters ) {
+            return null;
         }
 
         $theType = Lib::type();
@@ -887,21 +935,10 @@ class FsModule
 
         $filtersIntersect = array_intersect_key($filters, $filtersList);
 
-        if ( [] !== $filtersIntersect ) {
-            $fileRealpath = $splFileInfo->getRealPath();
+        $hasIntersection = ([] !== $filtersIntersect);
 
-            try {
-                $array = getimagesize($fileRealpath);
-            }
-            catch ( \Throwable $e ) {
-                $array = false;
-            }
-
-            if ( false === $array ) {
-                return null;
-            }
-
-            [ $imageWidth, $imageHeight ] = $array;
+        if ( $hasIntersection ) {
+            [ $imageWidth, $imageHeight ] = $getimagesize;
 
             foreach ( $filters as $filter => $value ) {
                 if ( 'max_width' === $filter ) {

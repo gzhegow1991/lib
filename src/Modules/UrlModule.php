@@ -1479,8 +1479,12 @@ class UrlModule
             ) {
                 $parseUrlResultValid['is_hostport'] = '/';
 
-                if ( '/' === $parseUrlResultValid['path'][0] ) {
-                    $parseUrlResultValid['path'] = ltrim($parseUrlResultValid['path'], '/');
+                if ( null !== $parseUrlResultValid['path'] ) {
+                    $first = $parseUrlResultValid['path'][0] ?? '';
+
+                    if ( '/' === $first ) {
+                        $parseUrlResultValid['path'] = ltrim($parseUrlResultValid['path'], '/');
+                    }
                 }
             }
         }

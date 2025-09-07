@@ -1536,15 +1536,25 @@ trait IsTrait
 	}
 
 
-	public function is_file($value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null): bool
-	{
-		return Lib::fs()->type_file($value, $extensions, $mimeTypes, $filters)->isOk();
+	public function is_file(
+		$value,
+		?array $extensions = null,
+		?array $mimeTypes = null,
+		?array $filters = null,
+		array $refs = []
+	): bool {
+		return Lib::fs()->type_file($value, $extensions, $mimeTypes, $filters, $refs)->isOk();
 	}
 
 
-	public function is_image($value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null): bool
-	{
-		return Lib::fs()->type_image($value, $extensions, $mimeTypes, $filters)->isOk();
+	public function is_image(
+		$value,
+		?array $extensions = null,
+		?array $mimeTypes = null,
+		?array $filters = null,
+		array $refs = []
+	): bool {
+		return Lib::fs()->type_image($value, $extensions, $mimeTypes, $filters, $refs)->isOk();
 	}
 
 

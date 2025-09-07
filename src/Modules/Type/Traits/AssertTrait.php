@@ -3323,28 +3323,38 @@ trait AssertTrait
 	/**
 	 * @return \SplFileInfo
 	 */
-	public function assert_file($value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null)
-	{
-		if (Lib::fs()->type_file($value, $extensions, $mimeTypes, $filters)->isOk([ &$ref ])) return $ref;
+	public function assert_file(
+		$value,
+		?array $extensions = null,
+		?array $mimeTypes = null,
+		?array $filters = null,
+		array $refs = []
+	) {
+		if (Lib::fs()->type_file($value, $extensions, $mimeTypes, $filters, $refs)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `file` is failed', [ $value, $extensions, $mimeTypes, $filters ] ]);
+		throw new LogicException($t, [ 'Assert `file` is failed', [ $value, $extensions, $mimeTypes, $filters, $refs ] ]);
 	}
 
 
 	/**
 	 * @return \SplFileInfo
 	 */
-	public function assert_image($value, ?array $extensions = null, ?array $mimeTypes = null, ?array $filters = null)
-	{
-		if (Lib::fs()->type_image($value, $extensions, $mimeTypes, $filters)->isOk([ &$ref ])) return $ref;
+	public function assert_image(
+		$value,
+		?array $extensions = null,
+		?array $mimeTypes = null,
+		?array $filters = null,
+		array $refs = []
+	) {
+		if (Lib::fs()->type_image($value, $extensions, $mimeTypes, $filters, $refs)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `image` is failed', [ $value, $extensions, $mimeTypes, $filters ] ]);
+		throw new LogicException($t, [ 'Assert `image` is failed', [ $value, $extensions, $mimeTypes, $filters, $refs ] ]);
 	}
 
 

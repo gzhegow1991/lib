@@ -2682,11 +2682,12 @@ trait FilterTrait
 		$value,
 		?array $extensions = null,
 		?array $mimeTypes = null,
-		?array $filters = null
+		?array $filters = null,
+		array $refs = []
 	): bool {
 		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
 		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
-		return ($refRet = Lib::fs()->type_file($value, $extensions, $mimeTypes, $filters))->isOk([ &$refValue ]);
+		return ($refRet = Lib::fs()->type_file($value, $extensions, $mimeTypes, $filters, $refs))->isOk([ &$refValue ]);
 	}
 
 
@@ -2698,11 +2699,12 @@ trait FilterTrait
 		$value,
 		?array $extensions = null,
 		?array $mimeTypes = null,
-		?array $filters = null
+		?array $filters = null,
+		array $refs = []
 	): bool {
 		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
 		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
-		return ($refRet = Lib::fs()->type_image($value, $extensions, $mimeTypes, $filters))->isOk([ &$refValue ]);
+		return ($refRet = Lib::fs()->type_image($value, $extensions, $mimeTypes, $filters, $refs))->isOk([ &$refValue ]);
 	}
 
 
