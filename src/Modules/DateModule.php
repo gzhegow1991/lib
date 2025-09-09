@@ -46,6 +46,10 @@ class DateModule
     const FORMAT_JAVASCRIPT_NO_OFFSET_SEC  = "Y-m-d\TH:i:s";
     const FORMAT_JAVASCRIPT_NO_OFFSET_MSEC = "Y-m-d\TH:i:s.v";
     const FORMAT_JAVASCRIPT_NO_OFFSET_USEC = "Y-m-d\TH:i:s.u";
+    const FORMAT_JAVASCRIPT_Z              = self::FORMAT_JAVASCRIPT_Z_SEC;
+    const FORMAT_JAVASCRIPT_Z_SEC          = "Y-m-d\TH:i:s\Z";
+    const FORMAT_JAVASCRIPT_Z_MSEC         = "Y-m-d\TH:i:s.v\Z";
+    const FORMAT_JAVASCRIPT_Z_USEC         = "Y-m-d\TH:i:s.u\Z";
 
     const FORMAT_FILENAME_DATE       = self::FORMAT_FILENAME_DATE_DAY;
     const FORMAT_FILENAME_DATE_YEAR  = 'y0000';
@@ -2103,6 +2107,34 @@ class DateModule
     }
 
 
+    public function format_javascript_z(\DateTimeInterface $dateTime) : string
+    {
+        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
+
+        return "{$formatted}Z";
+    }
+
+    public function format_javascript_z_msec(\DateTimeInterface $dateTime) : string
+    {
+        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
+
+        $milliseconds = $dateTime->format('v');
+        $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
+
+        return "{$formatted}.{$milliseconds}Z";
+    }
+
+    public function format_javascript_z_usec(\DateTimeInterface $dateTime) : string
+    {
+        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
+
+        $microseconds = $dateTime->format('u');
+        $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
+
+        return "{$formatted}.{$microseconds}Z";
+    }
+
+
     public function array_javascript_tz(\DateTimeInterface $dateTime) : array
     {
         $formatted = [];
@@ -2159,6 +2191,34 @@ class DateModule
     }
 
 
+    public function array_javascript_tz_z(\DateTimeInterface $dateTime) : array
+    {
+        $formatted = [];
+        $formatted[] = $this->format_javascript_z($dateTime);
+        $formatted[] = $dateTime->getTimezone()->getName();
+
+        return $formatted;
+    }
+
+    public function array_javascript_tz_z_msec(\DateTimeInterface $dateTime) : array
+    {
+        $formatted = [];
+        $formatted[] = $this->format_javascript_z_msec($dateTime);
+        $formatted[] = $dateTime->getTimezone()->getName();
+
+        return $formatted;
+    }
+
+    public function array_javascript_tz_z_usec(\DateTimeInterface $dateTime) : array
+    {
+        $formatted = [];
+        $formatted[] = $this->format_javascript_z_usec($dateTime);
+        $formatted[] = $dateTime->getTimezone()->getName();
+
+        return $formatted;
+    }
+
+
 
     public function format_locale_month(\DateTimeInterface $dateTime, string $locale) : string
     {
@@ -2177,6 +2237,25 @@ class DateModule
 
         return $content;
     }
+
+    public function format_locale_month_short(\DateTimeInterface $dateTime, string $locale) : string
+    {
+        $formatter = new \IntlDateFormatter(
+            $locale,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE,
+            null,
+            \IntlDateFormatter::GREGORIAN,
+            'MMM'
+        );
+
+        $content = $formatter->format($dateTime);
+
+        $content = mb_strtolower($content);
+
+        return $content;
+    }
+
 
     public function format_locale_day(\DateTimeInterface $dateTime, string $locale) : string
     {
@@ -2239,6 +2318,32 @@ class DateModule
 
         return $days;
     }
+
+    public function get_locale_months_short(string $locale) : array
+    {
+        $formatter = new \IntlDateFormatter(
+            $locale,
+            \IntlDateFormatter::NONE,
+            \IntlDateFormatter::NONE,
+            null,
+            \IntlDateFormatter::GREGORIAN,
+            'MMM'
+        );
+
+        $date = new \DateTime('1970-01-01');
+
+        for ( $i = 1; $i <= 12; $i++ ) {
+            $content = $formatter->format($date);
+            $content = mb_strtolower($content);
+
+            $days[] = $content;
+
+            $date->modify("+1 month");
+        }
+
+        return $days;
+    }
+
 
     public function get_locale_days(string $locale) : array
     {
