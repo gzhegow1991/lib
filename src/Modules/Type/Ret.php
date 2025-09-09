@@ -419,6 +419,7 @@ class Ret
         if ( array_key_exists(0, $refs) ) $refValue =& $refs[0];
         if ( array_key_exists(1, $refs) ) $refErrors =& $refs[1];
         if ( array_key_exists(2, $refs) ) $refRet =& $refs[2];
+        $refValue = null;
         $refErrors = [];
         $refRet = $this;
 
