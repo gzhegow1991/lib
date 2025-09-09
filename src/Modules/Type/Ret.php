@@ -127,7 +127,7 @@ class Ret
             if ( [] !== $throwableArgs ) {
                 $fileLine = $fileLine ?: Lib::debug()->file_line();
 
-                $instance->addError(null, $fileLine, ...$throwableArgs);
+                $instance->doAddError(null, $fileLine, ...$throwableArgs);
 
             } elseif ( ([] !== $fileLine) && ([] !== $throwableArg->errorsRaw) ) {
                 $errorLast = end($throwableArg->errorsRaw);
@@ -138,7 +138,7 @@ class Ret
         } else {
             $fileLine = $fileLine ?: Lib::debug()->file_line();
 
-            $instance->addError($throwableArg, $fileLine, ...$throwableArgs);
+            $instance->doAddError(null, $fileLine, $throwableArg, ...$throwableArgs);
         }
 
         return $instance;
