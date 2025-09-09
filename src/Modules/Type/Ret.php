@@ -265,7 +265,7 @@ class Ret
     /**
      * @return static
      */
-    protected function doAddError(?array $trace, ?array $fileLine, ...$throwableArgs)
+    protected function doAddError(?array $trace, ?array $fileLine, $throwableArg, ...$throwableArgs)
     {
         $theDebug = Lib::debug();
 
@@ -277,13 +277,15 @@ class Ret
             ?? ($fileLine ?: null)
             ?? $theDebug->file_line(2, $traceValid);
 
-        foreach ( $throwableArgs as $i => $throwableArg ) {
-            if ( null === $throwableArg ) {
+        foreach ( $throwableArgs as $i => $t ) {
+            if ( null === $t ) {
                 unset($throwableArgs[$i]);
             }
         }
 
         $throwableArgsValid = array_values($throwableArgs);
+
+        array_unshift($throwableArgsValid, $throwableArg);
 
         $this->errorsRaw[] = [
             'file_line'      => $fileLineValid,
