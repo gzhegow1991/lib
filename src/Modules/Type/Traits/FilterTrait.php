@@ -2066,6 +2066,72 @@ trait FilterTrait
 	/**
 	 * @param array{ 0?: \DateTimeInterface, 1?: Ret<\DateTimeInterface> } $r
 	 */
+	public function filter_date_no_tz(array $r, $datestring, $timezoneSet = null): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::date()->type_date_no_tz($datestring, $timezoneSet))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: \DateTime, 1?: Ret<\DateTime> } $r
+	 */
+	public function filter_adate_no_tz(array $r, $datestring, $timezoneSet = null): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::date()->type_adate_no_tz($datestring, $timezoneSet))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: \DateTimeImmutable, 1?: Ret<\DateTimeImmutable> } $r
+	 */
+	public function filter_idate_no_tz(array $r, $datestring, $timezoneSet = null): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::date()->type_idate_no_tz($datestring, $timezoneSet))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: \DateTimeInterface, 1?: Ret<\DateTimeInterface> } $r
+	 */
+	public function filter_date_no_tz_formatted(array $r, $dateFormatted, $formats, $timezoneSet = null): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::date()->type_date_no_tz_formatted($dateFormatted, $formats, $timezoneSet))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: \DateTime, 1?: Ret<\DateTime> } $r
+	 */
+	public function filter_adate_no_tz_formatted(array $r, $dateFormatted, $formats, $timezoneSet = null): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::date()->type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: \DateTimeImmutable, 1?: Ret<\DateTimeImmutable> } $r
+	 */
+	public function filter_idate_no_tz_formatted(array $r, $dateFormatted, $formats, $timezoneSet = null): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::date()->type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: \DateTimeInterface, 1?: Ret<\DateTimeInterface> } $r
+	 */
 	public function filter_date_microtime(array $r, $microtime, $timezoneFallback = null): bool
 	{
 		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];

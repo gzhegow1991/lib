@@ -1527,6 +1527,56 @@ trait TypeTrait
     /**
      * @return Ret<\DateTimeInterface>
      */
+    public function date_no_tz($datestring, $timezoneSet = null)
+    {
+        return Lib::date()->type_date_no_tz($datestring, $timezoneSet);
+    }
+
+    /**
+     * @return Ret<\DateTime>
+     */
+    public function adate_no_tz($datestring, $timezoneSet = null)
+    {
+        return Lib::date()->type_adate_no_tz($datestring, $timezoneSet);
+    }
+
+    /**
+     * @return Ret<\DateTimeImmutable>
+     */
+    public function idate_no_tz($datestring, $timezoneSet = null)
+    {
+        return Lib::date()->type_idate_no_tz($datestring, $timezoneSet);
+    }
+
+
+    /**
+     * @return Ret<\DateTimeInterface>
+     */
+    public function date_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+    {
+        return Lib::date()->type_date_no_tz_formatted($dateFormatted, $formats, $timezoneSet);
+    }
+
+    /**
+     * @return Ret<\DateTime>
+     */
+    public function adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+    {
+        return Lib::date()->type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet);
+    }
+
+    /**
+     * @return Ret<\DateTimeImmutable>
+     */
+    public function idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+    {
+        return Lib::date()->type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet);
+    }
+
+
+    /**
+     * @return Ret<\DateTimeInterface>
+     */
     public function date_microtime($microtime, $timezoneFallback = null)
     {
         return Lib::date()->type_date_microtime($microtime, $timezoneFallback);

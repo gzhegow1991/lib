@@ -130,6 +130,11 @@ class DateModule
         return new \DateTimeZone('+1234');
     }
 
+    public function the_timezone_utc() : \DateTimeZone
+    {
+        return new \DateTimeZone('UTC');
+    }
+
 
     /**
      * @return Ret<\DateTimeZone>
@@ -152,24 +157,25 @@ class DateModule
             }
         }
 
-        if ( null !== $allowedTimezoneTypes ) {
-            if ( null !== $dateTimeZone ) {
-                $timezoneType = $this->timezone_type($dateTimeZone);
+        if ( null === $dateTimeZone ) {
+            return Ret::err(
+                [ 'The `timezone` should be valid timezone', $timezone ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
 
-                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                    $dateTimeZone = null;
-                }
+        if ( null !== $allowedTimezoneTypes ) {
+            $timezoneType = $this->timezone_type($dateTimeZone);
+
+            if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
+                return Ret::err(
+                    [ 'The `timezone` should be timezone of one of the allowed types', $timezone, $allowedTimezoneTypes ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        if ( null !== $dateTimeZone ) {
-            return Ret::val($dateTimeZone);
-        }
-
-        return Ret::err(
-            [ 'The `timezone` should be valid timezone', $timezone ],
-            [ __FILE__, __LINE__ ]
-        );
+        return Ret::val($dateTimeZone);
     }
 
     /**
@@ -193,22 +199,23 @@ class DateModule
             }
         }
 
-        if ( null !== $dateTimeZone ) {
-            $timezoneType = $this->timezone_type($dateTimeZone);
-
-            if ( $timezoneType !== 1 ) {
-                $dateTimeZone = null;
-            }
+        if ( null === $dateTimeZone ) {
+            return Ret::err(
+                [ 'The `timezoneOrOffset` should be valid timezone', $timezoneOrOffset ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ( null !== $dateTimeZone ) {
-            return Ret::val($dateTimeZone);
+        $timezoneType = $this->timezone_type($dateTimeZone);
+
+        if ( $timezoneType !== 1 ) {
+            return Ret::err(
+                [ 'The `timezoneOrOffset` should be offset timezone', $timezoneOrOffset ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::err(
-            [ 'The `timezoneOrOffset` should be valid timezone or its offset', $timezoneOrOffset ],
-            [ __FILE__, __LINE__ ]
-        );
+        return Ret::val($dateTimeZone);
     }
 
     /**
@@ -232,22 +239,23 @@ class DateModule
             }
         }
 
-        if ( null !== $dateTimeZone ) {
-            $timezoneType = $this->timezone_type($dateTimeZone);
-
-            if ( $timezoneType !== 2 ) {
-                $dateTimeZone = null;
-            }
+        if ( null === $dateTimeZone ) {
+            return Ret::err(
+                [ 'The `timezoneOrAbbr` should be valid timezone', $timezoneOrAbbr ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ( null !== $dateTimeZone ) {
-            return Ret::val($dateTimeZone);
+        $timezoneType = $this->timezone_type($dateTimeZone);
+
+        if ( $timezoneType !== 2 ) {
+            return Ret::err(
+                [ 'The `timezoneOrAbbr` should be abbr timezone', $timezoneOrAbbr ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::err(
-            [ 'The `timezoneOrAbbr` should be valid timezone or its abbreviation', $timezoneOrAbbr ],
-            [ __FILE__, __LINE__ ]
-        );
+        return Ret::val($dateTimeZone);
     }
 
     /**
@@ -271,22 +279,23 @@ class DateModule
             }
         }
 
-        if ( null !== $dateTimeZone ) {
-            $timezoneType = $this->timezone_type($dateTimeZone);
-
-            if ( $timezoneType !== 3 ) {
-                $dateTimeZone = null;
-            }
+        if ( null === $dateTimeZone ) {
+            return Ret::err(
+                [ 'The `timezoneOrName` should be valid timezone', $timezoneOrName ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ( null !== $dateTimeZone ) {
-            return Ret::val($dateTimeZone);
+        $timezoneType = $this->timezone_type($dateTimeZone);
+
+        if ( $timezoneType !== 3 ) {
+            return Ret::err(
+                [ 'The `timezoneOrName` should be name timezone', $timezoneOrName ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::err(
-            [ 'The `timezoneOrName` should be valid timezone or its name', $timezoneOrName ],
-            [ __FILE__, __LINE__ ]
-        );
+        return Ret::val($dateTimeZone);
     }
 
     /**
@@ -310,990 +319,26 @@ class DateModule
             }
         }
 
-        if ( null !== $dateTimeZone ) {
-            $timezoneType = $this->timezone_type($dateTimeZone);
-
-            if ( ! (
-                ($timezoneType === 2)
-                || ($timezoneType === 3)
-            ) ) {
-                $dateTimeZone = null;
-            }
-        }
-
-        if ( null !== $dateTimeZone ) {
-            return Ret::val($dateTimeZone);
-        }
-
-        return Ret::err(
-            [ 'The `timezoneOrNameOrAbbr` should be valid timezone or its name/abbreviation', $timezoneOrNameOrAbbr ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-
-    /**
-     * @return Ret<\DateTimeInterface>
-     */
-    public function type_date($datestring, $timezoneFallback = null)
-    {
-        $theType = Lib::type();
-
-        $dateTime = null;
-
-        if ( $datestring instanceof \DateTimeInterface ) {
-            $dateTime = $datestring;
-
-        } else {
-            $theType->string_not_empty($datestring)->orThrow();
-
-            $timezoneFallbackObject = null;
-            if ( null !== $timezoneFallback ) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
-            }
-
-            try {
-                $dateTime = new \DateTime(
-                    $datestring,
-                    $timezoneFallbackObject
-                );
-            }
-            catch ( \Throwable $e ) {
-            }
-        }
-
-        if ( null !== $dateTime ) {
-            $dateTimeClone = $this->cloneToDate($dateTime);
-
-            return Ret::val($dateTimeClone);
-        }
-
-        return Ret::err(
-            [ 'The `datestring` should be valid datestring', $datestring ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<\DateTime>
-     */
-    public function type_adate($datestring, $timezoneFallback = null)
-    {
-        $theType = Lib::type();
-
-        $dateTime = null;
-
-        if ( $datestring instanceof \DateTimeInterface ) {
-            $dateTime = $datestring;
-
-        } else {
-            $theType->string_not_empty($datestring)->orThrow();
-
-            $timezoneFallbackObject = null;
-            if ( null !== $timezoneFallback ) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
-            }
-
-            try {
-                $dateTime = new \DateTime(
-                    $datestring,
-                    $timezoneFallbackObject
-                );
-            }
-            catch ( \Throwable $e ) {
-            }
-        }
-
-        if ( null !== $dateTime ) {
-            $dateTimeClone = $this->cloneToADate($dateTime);
-
-            return Ret::val($dateTimeClone);
-        }
-
-        return Ret::err(
-            [ 'The `datestring` should be valid datestring', $datestring ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<\DateTimeImmutable>
-     */
-    public function type_idate($datestring, $timezoneFallback = null)
-    {
-        $theType = Lib::type();
-
-        $dateTimeImmutable = null;
-
-        if ( $datestring instanceof \DateTimeInterface ) {
-            $dateTimeImmutable = $datestring;
-
-        } else {
-            $theType->string_not_empty($datestring)->orThrow();
-
-            $timezoneFallbackObject = null;
-            if ( null !== $timezoneFallback ) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
-            }
-
-            try {
-                $dateTimeImmutable = new \DateTime(
-                    $datestring,
-                    $timezoneFallbackObject
-                );
-            }
-            catch ( \Throwable $e ) {
-            }
-        }
-
-        if ( null !== $dateTimeImmutable ) {
-            $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
-
-            return Ret::val($dateTimeImmutableClone);
-        }
-
-        return Ret::err(
-            [ 'The `datestring` should be valid datestring', $datestring ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-
-    /**
-     * @return Ret<\DateTimeInterface>
-     */
-    public function type_date_formatted($dateFormatted, $formats, $timezoneFallback = null)
-    {
-        $thePhp = Lib::php();
-        $theType = Lib::type();
-
-        $dateTime = null;
-
-        if ( $dateFormatted instanceof \DateTimeInterface ) {
-            $dateTime = $dateFormatted;
-
-        } else {
-            $dateFormattedValid = $theType->string_not_empty($dateFormatted)->orThrow();
-
-            $formatsList = $thePhp->to_list($formats);
-            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
-
-            foreach ( $formatsList as $i => $format ) {
-                $formatValid = $theType->string_not_empty($format)->orThrow();
-
-                $formatsList[$i] = $formatValid;
-            }
-
-            $timezoneFallbackObject = null;
-            if ( null !== $timezoneFallback ) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
-            }
-
-            foreach ( $formatsList as $format ) {
-                try {
-                    $dateTime = \DateTime::createFromFormat(
-                        $format,
-                        $dateFormattedValid,
-                        $timezoneFallbackObject
-                    );
-                }
-                catch ( \Throwable $e ) {
-                    $dateTime = false;
-                }
-            }
-
-            if ( false === $dateTime ) {
-                $dateTime = null;
-            }
-        }
-
-        if ( null !== $dateTime ) {
-            $dateTimeClone = $this->cloneToDate($dateTime);
-
-            return Ret::val($dateTimeClone);
-        }
-
-        return Ret::err(
-            [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<\DateTime>
-     */
-    public function type_adate_formatted($dateFormatted, $formats, $timezoneFallback = null)
-    {
-        $thePhp = Lib::php();
-        $theType = Lib::type();
-
-        $dateTime = null;
-
-        if ( $dateFormatted instanceof \DateTimeInterface ) {
-            $dateTime = $dateFormatted;
-
-        } else {
-            $dateFormattedValid = $theType->string_not_empty($dateFormatted)->orThrow();
-
-            $formatsList = $thePhp->to_list($formats);
-            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
-
-            foreach ( $formatsList as $i => $format ) {
-                $formatValid = $theType->string_not_empty($format)->orThrow();
-
-                $formatsList[$i] = $formatValid;
-            }
-
-            $timezoneFallbackObject = null;
-            if ( null !== $timezoneFallback ) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
-            }
-
-            foreach ( $formatsList as $format ) {
-                try {
-                    $dateTime = \DateTime::createFromFormat(
-                        $format,
-                        $dateFormattedValid,
-                        $timezoneFallbackObject
-                    );
-                }
-                catch ( \Throwable $e ) {
-                    $dateTime = false;
-                }
-            }
-
-            if ( false === $dateTime ) {
-                $dateTime = null;
-            }
-        }
-
-        if ( null !== $dateTime ) {
-            $dateTimeClone = $this->cloneToADate($dateTime);
-
-            return Ret::val($dateTimeClone);
-        }
-
-        return Ret::err(
-            [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<\DateTimeImmutable>
-     */
-    public function type_idate_formatted($dateFormatted, $formats, $timezoneFallback = null)
-    {
-        $thePhp = Lib::php();
-        $theType = Lib::type();
-
-        $dateTimeImmutable = null;
-
-        if ( $dateFormatted instanceof \DateTimeInterface ) {
-            $dateTimeImmutable = $dateFormatted;
-
-        } else {
-            $dateFormattedValid = $theType->string_not_empty($dateFormatted)->orThrow();
-
-            $formatsList = $thePhp->to_list($formats);
-            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
-
-            foreach ( $formatsList as $i => $format ) {
-                $formatValid = $theType->string_not_empty($format)->orThrow();
-
-                $formatsList[$i] = $formatValid;
-            }
-
-            $timezoneFallbackObject = null;
-            if ( null !== $timezoneFallback ) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
-            }
-
-            foreach ( $formatsList as $format ) {
-                try {
-                    $dateTimeImmutable = \DateTime::createFromFormat(
-                        $format,
-                        $dateFormattedValid,
-                        $timezoneFallbackObject
-                    );
-                }
-                catch ( \Throwable $e ) {
-                    $dateTimeImmutable = false;
-                }
-            }
-
-            if ( false === $dateTimeImmutable ) {
-                $dateTimeImmutable = null;
-            }
-        }
-
-        if ( null !== $dateTimeImmutable ) {
-            $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
-
-            return Ret::val($dateTimeImmutableClone);
-        }
-
-        return Ret::err(
-            [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-
-    /**
-     * @return Ret<\DateTimeInterface>
-     */
-    public function type_date_tz($datestring, ?array $allowedTimezoneTypes = null)
-    {
-        $theType = Lib::type();
-
-        $dateTime = null;
-
-        $timezoneNil = $this->the_timezone_nil();
-
-        if ( $datestring instanceof \DateTimeInterface ) {
-            $dateTime = $datestring;
-
-        } else {
-            $theType->string_not_empty($datestring)->orThrow();
-
-            try {
-                $dateTime = new \DateTime(
-                    $datestring,
-                    $timezoneNil
-                );
-            }
-            catch ( \Throwable $e ) {
-            }
-        }
-
-        if ( null !== $dateTime ) {
-            $timezone = $dateTime->getTimezone();
-
-            if ( $timezone->getName() == $timezoneNil->getName() ) {
-                $dateTime = null;
-            }
-        }
-
-        if ( null !== $allowedTimezoneTypes ) {
-            if ( null !== $dateTime ) {
-                $timezoneType = $this->timezone_type($timezone);
-
-                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                    $dateTime = null;
-                }
-            }
-        }
-
-        if ( null !== $dateTime ) {
-            $dateTimeClone = $this->cloneToDate($dateTime);
-
-            return Ret::val($dateTimeClone);
-        }
-
-        return Ret::err(
-            [ 'The `datestring` should be valid date with timezone', $datestring ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<\DateTime>
-     */
-    public function type_adate_tz($datestring, ?array $allowedTimezoneTypes = null)
-    {
-        $theType = Lib::type();
-
-        $dateTime = null;
-
-        $timezoneNil = $this->the_timezone_nil();
-
-        if ( $datestring instanceof \DateTimeInterface ) {
-            $dateTime = $datestring;
-
-        } else {
-            $theType->string_not_empty($datestring)->orThrow();
-
-            try {
-                $dateTime = new \DateTime(
-                    $datestring,
-                    $timezoneNil
-                );
-            }
-            catch ( \Throwable $e ) {
-            }
-        }
-
-        if ( null !== $dateTime ) {
-            $timezone = $dateTime->getTimezone();
-
-            if ( $timezone->getName() === $timezoneNil->getName() ) {
-                $dateTime = null;
-            }
-        }
-
-        if ( null !== $allowedTimezoneTypes ) {
-            if ( null !== $dateTime ) {
-                $timezoneType = $this->timezone_type($timezone);
-
-                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                    $dateTime = null;
-                }
-            }
-        }
-
-        if ( null !== $dateTime ) {
-            $dateTimeClone = $this->cloneToADate($dateTime);
-
-            return Ret::val($dateTimeClone);
-        }
-
-        return Ret::err(
-            [ 'The `datestring` should be valid date with timezone', $datestring ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<\DateTimeImmutable>
-     */
-    public function type_idate_tz($datestring, ?array $allowedTimezoneTypes = null)
-    {
-        $theType = Lib::type();
-
-        $dateTimeImmutable = null;
-
-        $timezoneNil = $this->the_timezone_nil();
-
-        if ( $datestring instanceof \DateTimeInterface ) {
-            $dateTimeImmutable = $datestring;
-
-        } else {
-            $theType->string_not_empty($datestring)->orThrow();
-
-            try {
-                $dateTimeImmutable = new \DateTime(
-                    $datestring,
-                    $timezoneNil
-                );
-            }
-            catch ( \Throwable $e ) {
-            }
-        }
-
-        if ( null !== $dateTimeImmutable ) {
-            $timezone = $dateTimeImmutable->getTimezone();
-
-            if ( $timezone->getName() == $timezoneNil->getName() ) {
-                $dateTimeImmutable = null;
-            }
-        }
-
-        if ( null !== $allowedTimezoneTypes ) {
-            if ( null !== $dateTimeImmutable ) {
-                $timezoneType = $this->timezone_type($timezone);
-
-                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                    $dateTimeImmutable = null;
-                }
-            }
-        }
-
-        if ( null !== $dateTimeImmutable ) {
-            $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
-
-            return Ret::val($dateTimeImmutableClone);
-        }
-
-        return Ret::err(
-            [ 'The `datestring` should be valid date with timezone', $datestring ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-
-    /**
-     * @return Ret<\DateTimeInterface>
-     */
-    public function type_date_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
-    {
-        $thePhp = Lib::php();
-        $theType = Lib::type();
-
-        $dateTime = null;
-
-        $timezoneNil = $this->the_timezone_nil();
-
-        if ( $dateFormatted instanceof \DateTimeInterface ) {
-            $dateTime = $dateFormatted;
-
-        } else {
-            $dateFormattedValid = $theType->string_not_empty($dateFormatted)->orThrow();
-
-            $formatsList = $thePhp->to_list($formats);
-            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
-
-            foreach ( $formatsList as $i => $format ) {
-                $formatValid = $theType->string_not_empty($format)->orThrow();
-
-                $formatsList[$i] = $formatValid;
-            }
-
-            foreach ( $formatsList as $format ) {
-                try {
-                    $dateTime = \DateTime::createFromFormat(
-                        $format,
-                        $dateFormattedValid,
-                        $timezoneNil
-                    );
-                }
-                catch ( \Throwable $e ) {
-                    $dateTime = false;
-                }
-            }
-
-            if ( false === $dateTime ) {
-                $dateTime = null;
-            }
-        }
-
-        if ( null !== $dateTime ) {
-            $timezone = $dateTime->getTimezone();
-
-            if ( $timezone->getName() == $timezoneNil->getName() ) {
-                $dateTime = null;
-            }
-        }
-
-        if ( null !== $allowedTimezoneTypes ) {
-            if ( null !== $dateTime ) {
-                $timezoneType = $this->timezone_type($timezone);
-
-                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                    $dateTime = null;
-                }
-            }
-        }
-
-        if ( null !== $dateTime ) {
-            $dateTimeClone = $this->cloneToADate($dateTime);
-
-            return Ret::val($dateTimeClone);
-        }
-
-        return Ret::err(
-            [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<\DateTime>
-     */
-    public function type_adate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
-    {
-        $thePhp = Lib::php();
-        $theType = Lib::type();
-
-        $dateTime = null;
-
-        $timezoneNil = $this->the_timezone_nil();
-
-        if ( $dateFormatted instanceof \DateTimeInterface ) {
-            $dateTime = $dateFormatted;
-
-        } else {
-            $dateFormattedValid = $theType->string_not_empty($dateFormatted)->orThrow();
-
-            $formatsList = $thePhp->to_list($formats);
-            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
-
-            foreach ( $formatsList as $i => $format ) {
-                $formatValid = $theType->string_not_empty($format)->orThrow();
-
-                $formatsList[$i] = $formatValid;
-            }
-
-            foreach ( $formatsList as $format ) {
-                try {
-                    $dateTime = \DateTime::createFromFormat(
-                        $format,
-                        $dateFormattedValid,
-                        $timezoneNil
-                    );
-                }
-                catch ( \Throwable $e ) {
-                    $dateTime = false;
-                }
-            }
-
-            if ( false === $dateTime ) {
-                $dateTime = null;
-            }
-        }
-
-        if ( null !== $dateTime ) {
-            $timezone = $dateTime->getTimezone();
-
-            if ( $timezone->getName() == $timezoneNil->getName() ) {
-                $dateTime = null;
-            }
-        }
-
-        if ( null !== $allowedTimezoneTypes ) {
-            if ( null !== $dateTime ) {
-                $timezoneType = $this->timezone_type($timezone);
-
-                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                    $dateTime = null;
-                }
-            }
-        }
-
-        if ( null !== $dateTime ) {
-            $dateTimeClone = $this->cloneToADate($dateTime);
-
-            return Ret::val($dateTimeClone);
-        }
-
-        return Ret::err(
-            [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<\DateTimeImmutable>
-     */
-    public function type_idate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
-    {
-        $thePhp = Lib::php();
-        $theType = Lib::type();
-
-        $dateTimeImmutable = null;
-
-        $timezoneNil = $this->the_timezone_nil();
-
-        if ( $dateFormatted instanceof \DateTimeInterface ) {
-            $dateTimeImmutable = $dateFormatted;
-
-        } else {
-            $dateFormattedValid = $theType->string_not_empty($dateFormatted)->orThrow();
-
-            $formatsList = $thePhp->to_list($formats);
-            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
-
-            foreach ( $formatsList as $i => $format ) {
-                $formatValid = $theType->string_not_empty($format)->orThrow();
-
-                $formatsList[$i] = $formatValid;
-            }
-
-            foreach ( $formatsList as $format ) {
-                try {
-                    $dateTimeImmutable = \DateTime::createFromFormat(
-                        $format,
-                        $dateFormattedValid,
-                        $timezoneNil
-                    );
-                }
-                catch ( \Throwable $e ) {
-                    $dateTimeImmutable = false;
-                }
-            }
-
-            if ( false === $dateTimeImmutable ) {
-                $dateTimeImmutable = null;
-            }
-        }
-
-        if ( null !== $dateTimeImmutable ) {
-            $timezone = $dateTimeImmutable->getTimezone();
-
-            if ( $timezone->getName() == $timezoneNil->getName() ) {
-                $dateTimeImmutable = null;
-            }
-        }
-
-        if ( null !== $allowedTimezoneTypes ) {
-            if ( null !== $dateTimeImmutable ) {
-                $timezoneType = $this->timezone_type($timezone);
-
-                if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                    $dateTimeImmutable = null;
-                }
-            }
-        }
-
-        if ( null !== $dateTimeImmutable ) {
-            $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
-
-            return Ret::val($dateTimeImmutableClone);
-        }
-
-        return Ret::err(
-            [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-
-    /**
-     * @return Ret<\DateTimeInterface>
-     */
-    public function type_date_microtime($microtime, $timezoneSet = null)
-    {
-        $timezoneSet = $timezoneSet ?? date_default_timezone_get();
-
-        $theType = Lib::type();
-
-        $dateTime = null;
-
-        $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
-
-        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
+        if ( null === $dateTimeZone ) {
             return Ret::err(
-                $ret,
+                [ 'The `timezoneOrNameOrAbbr` should be valid timezone', $timezoneOrNameOrAbbr ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $timezoneDefault = new \DateTimeZone('UTC');
+        $timezoneType = $this->timezone_type($dateTimeZone);
 
-        try {
-            if ( PHP_VERSION_ID >= 80000 ) {
-                $dateTime = new \DateTime("@{$microtimeNumeric}", $timezoneDefault);
-
-            } else {
-                $int = $split[1];
-                $seconds = $int;
-
-                $dateTime = new \DateTime("@{$seconds}", $timezoneDefault);
-            }
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        if ( '' !== $split[2] ) {
-            $frac = $split[2];
-
-            $microseconds = ltrim($frac, '.');
-            $microseconds = substr($microseconds, 0, 6);
-            $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
-
-            $dateTime = $dateTime->setTime(
-                (int) $dateTime->format('H'),
-                (int) $dateTime->format('i'),
-                (int) $dateTime->format('s'),
-                (int) $microseconds
-            );
-        }
-
-        $dateTime = $dateTime->setTimezone($timezoneSetObject);
-
-        if ( null !== $dateTime ) {
-            $dateTimeClone = $this->cloneToDate($dateTime);
-
-            return Ret::val($dateTimeClone);
-        }
-
-        return Ret::err(
-            [ 'The `microtime` should be valid microtime', $microtime ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<\DateTime>
-     */
-    public function type_adate_microtime($microtime, $timezoneSet = null)
-    {
-        $timezoneSet = $timezoneSet ?? date_default_timezone_get();
-
-        $theType = Lib::type();
-
-        $dateTime = null;
-
-        $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
-
-        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
+        if ( ! (
+            ($timezoneType === 2)
+            || ($timezoneType === 3)
+        ) ) {
             return Ret::err(
-                $ret,
+                [ 'The `timezoneOrName` should be name or abbr timezone', $timezoneOrNameOrAbbr ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $timezoneDefault = new \DateTimeZone('UTC');
-
-        try {
-            if ( PHP_VERSION_ID >= 80000 ) {
-                $dateTime = new \DateTime("@{$microtimeNumeric}", $timezoneDefault);
-
-            } else {
-                $int = $split[1];
-                $seconds = $int;
-
-                $dateTime = new \DateTime("@{$seconds}", $timezoneDefault);
-            }
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        if ( '' !== $split[2] ) {
-            $frac = $split[2];
-
-            $microseconds = ltrim($frac, '.');
-            $microseconds = substr($microseconds, 0, 6);
-            $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
-
-            $dateTime = $dateTime->setTime(
-                (int) $dateTime->format('H'),
-                (int) $dateTime->format('i'),
-                (int) $dateTime->format('s'),
-                (int) $microseconds
-            );
-        }
-
-        $dateTime = $dateTime->setTimezone($timezoneSetObject);
-
-        if ( null !== $dateTime ) {
-            $dateTimeClone = $this->cloneToDate($dateTime);
-
-            return Ret::val($dateTimeClone);
-        }
-
-        return Ret::err(
-            [ 'The `microtime` should be valid microtime', $microtime ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<\DateTimeImmutable>
-     */
-    public function type_idate_microtime($microtime, $timezoneSet = null)
-    {
-        $timezoneSet = $timezoneSet ?? date_default_timezone_get();
-
-        $theType = Lib::type();
-
-        $dateTimeImmutable = null;
-
-        $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
-
-        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
-            return Ret::err(
-                $ret,
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        $timezoneDefault = new \DateTimeZone('UTC');
-
-        try {
-            if ( PHP_VERSION_ID >= 80000 ) {
-                $dateTimeImmutable = new \DateTimeImmutable("@{$microtimeNumeric}", $timezoneDefault);
-
-            } else {
-                $int = $split[1];
-                $seconds = $int;
-
-                $dateTimeImmutable = new \DateTimeImmutable("@{$seconds}", $timezoneDefault);
-            }
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        if ( '' !== $split[2] ) {
-            $frac = $split[2];
-
-            $microseconds = ltrim($frac, '.');
-            $microseconds = substr($microseconds, 0, 6);
-            $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
-
-            $dateTimeImmutable = $dateTimeImmutable->setTime(
-                (int) $dateTimeImmutable->format('H'),
-                (int) $dateTimeImmutable->format('i'),
-                (int) $dateTimeImmutable->format('s'),
-                (int) $microseconds
-            );
-        }
-
-        $dateTimeImmutable = $dateTimeImmutable->setTimezone($timezoneSetObject);
-
-        if ( null !== $dateTimeImmutable ) {
-            $dateTimeImmutableClone = $this->cloneToDate($dateTimeImmutable);
-
-            return Ret::val($dateTimeImmutableClone);
-        }
-
-        return Ret::err(
-            [ 'The `microtime` should be valid microtime', $microtime ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<\DateTimeInterface>
-     */
-    protected function _type_date_microtime($microtime, $timezoneSet = null)
-    {
-        $timezoneSet = $timezoneSet ?? date_default_timezone_get();
-
-        $theType = Lib::type();
-
-        $dateTime = null;
-
-        $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
-
-        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
-            return Ret::err(
-                $ret,
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        $timezoneDefault = new \DateTimeZone('UTC');
-
-        try {
-            if ( PHP_VERSION_ID >= 80000 ) {
-                $dateTime = new \DateTime("@{$microtimeNumeric}", $timezoneDefault);
-
-            } else {
-                $int = $split[1];
-                $seconds = $int;
-
-                $dateTime = new \DateTime("@{$seconds}", $timezoneDefault);
-            }
-        }
-        catch ( \Throwable $e ) {
-        }
-
-        if ( '' !== $split[2] ) {
-            $frac = $split[2];
-
-            $microseconds = ltrim($frac, '.');
-            $microseconds = substr($microseconds, 0, 6);
-            $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
-
-            $dateTime = $dateTime->setTime(
-                (int) $dateTime->format('H'),
-                (int) $dateTime->format('i'),
-                (int) $dateTime->format('s'),
-                (int) $microseconds
-            );
-        }
-
-        $dateTime = $dateTime->setTimezone($timezoneSetObject);
-
-        if ( null !== $dateTime ) {
-            return Ret::val($dateTime);
-        }
-
-        return Ret::err(
-            [ 'The `microtime` should be valid microtime', $microtime ],
-            [ __FILE__, __LINE__ ]
-        );
+        return Ret::val($dateTimeZone);
     }
 
 
@@ -1460,8 +505,1679 @@ class DateModule
     }
 
 
-    public function date_remote(\DateTimeInterface $date, $timezoneSet) : \DateTimeInterface
+    /**
+     * @return Ret<\DateTimeInterface>
+     */
+    public function type_date($datestring, $timezoneFallback = null)
     {
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        if ( $datestring instanceof \DateTimeInterface ) {
+            $dateTime = $datestring;
+
+        } else {
+            if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $timezoneFallbackObject = null;
+            if ( null !== $timezoneFallback ) {
+                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+            }
+
+            try {
+                $dateTime = new \DateTime(
+                    $datestringString,
+                    $timezoneFallbackObject
+                );
+            }
+            catch ( \Throwable $e ) {
+            }
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `datestring` should be valid datestring', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $dateTimeClone = $this->cloneToDate($dateTime);
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTime>
+     */
+    public function type_adate($datestring, $timezoneFallback = null)
+    {
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        if ( $datestring instanceof \DateTimeInterface ) {
+            $dateTime = $datestring;
+
+        } else {
+            if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $timezoneFallbackObject = null;
+            if ( null !== $timezoneFallback ) {
+                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+            }
+
+            try {
+                $dateTime = new \DateTime(
+                    $datestringString,
+                    $timezoneFallbackObject
+                );
+            }
+            catch ( \Throwable $e ) {
+            }
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `datestring` should be valid datestring', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $dateTimeClone = $this->cloneToADate($dateTime);
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTimeImmutable>
+     */
+    public function type_idate($datestring, $timezoneFallback = null)
+    {
+        $theType = Lib::type();
+
+        $dateTimeImmutable = null;
+
+        if ( $datestring instanceof \DateTimeInterface ) {
+            $dateTimeImmutable = $datestring;
+
+        } else {
+            if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $timezoneFallbackObject = null;
+            if ( null !== $timezoneFallback ) {
+                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+            }
+
+            try {
+                $dateTimeImmutable = new \DateTimeImmutable(
+                    $datestringString,
+                    $timezoneFallbackObject
+                );
+            }
+            catch ( \Throwable $e ) {
+            }
+        }
+
+        if ( null === $dateTimeImmutable ) {
+            return Ret::err(
+                [ 'The `datestring` should be valid datestring', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
+
+        return Ret::val($dateTimeImmutableClone);
+    }
+
+
+    /**
+     * @return Ret<\DateTimeInterface>
+     */
+    public function type_date_formatted($dateFormatted, $formats, $timezoneFallback = null)
+    {
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        if ( $dateFormatted instanceof \DateTimeInterface ) {
+            $dateTime = $dateFormatted;
+
+        } else {
+            if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $formatsList = $thePhp->to_list($formats);
+            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+
+            foreach ( $formatsList as $i => $format ) {
+                $formatValid = $theType->string_not_empty($format)->orThrow();
+
+                $formatsList[$i] = $formatValid;
+            }
+
+            $timezoneFallbackObject = null;
+            if ( null !== $timezoneFallback ) {
+                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+            }
+
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTime = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormattedString,
+                        $timezoneFallbackObject
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTime = false;
+                }
+
+                if ( false !== $dateTime ) {
+                    break;
+                }
+            }
+
+            if ( false === $dateTime ) {
+                $dateTime = null;
+            }
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $dateTimeClone = $this->cloneToDate($dateTime);
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTime>
+     */
+    public function type_adate_formatted($dateFormatted, $formats, $timezoneFallback = null)
+    {
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        if ( $dateFormatted instanceof \DateTimeInterface ) {
+            $dateTime = $dateFormatted;
+
+        } else {
+            if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $formatsList = $thePhp->to_list($formats);
+            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+
+            foreach ( $formatsList as $i => $format ) {
+                $formatValid = $theType->string_not_empty($format)->orThrow();
+
+                $formatsList[$i] = $formatValid;
+            }
+
+            $timezoneFallbackObject = null;
+            if ( null !== $timezoneFallback ) {
+                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+            }
+
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTime = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormattedString,
+                        $timezoneFallbackObject
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTime = false;
+                }
+
+                if ( false !== $dateTime ) {
+                    break;
+                }
+            }
+
+            if ( false === $dateTime ) {
+                $dateTime = null;
+            }
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $dateTimeClone = $this->cloneToADate($dateTime);
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTimeImmutable>
+     */
+    public function type_idate_formatted($dateFormatted, $formats, $timezoneFallback = null)
+    {
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $dateTimeImmutable = null;
+
+        if ( $dateFormatted instanceof \DateTimeInterface ) {
+            $dateTimeImmutable = $dateFormatted;
+
+        } else {
+            if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $formatsList = $thePhp->to_list($formats);
+            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+
+            foreach ( $formatsList as $i => $format ) {
+                $formatValid = $theType->string_not_empty($format)->orThrow();
+
+                $formatsList[$i] = $formatValid;
+            }
+
+            $timezoneFallbackObject = null;
+            if ( null !== $timezoneFallback ) {
+                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+            }
+
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTimeImmutable = \DateTimeImmutable::createFromFormat(
+                        $format,
+                        $dateFormattedString,
+                        $timezoneFallbackObject
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTimeImmutable = false;
+                }
+
+                if ( false !== $dateTimeImmutable ) {
+                    break;
+                }
+            }
+
+            if ( false === $dateTimeImmutable ) {
+                $dateTimeImmutable = null;
+            }
+        }
+
+        if ( null === $dateTimeImmutable ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
+
+        return Ret::val($dateTimeImmutableClone);
+    }
+
+
+    /**
+     * @return Ret<\DateTimeInterface>
+     */
+    public function type_date_tz($datestring, ?array $allowedTimezoneTypes = null)
+    {
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        $timezoneNil = $this->the_timezone_nil();
+
+        if ( $datestring instanceof \DateTimeInterface ) {
+            $dateTime = $datestring;
+
+        } else {
+            if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            try {
+                $dateTime = new \DateTime(
+                    $datestringString,
+                    $timezoneNil
+                );
+            }
+            catch ( \Throwable $e ) {
+            }
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `datestring` should be valid date or datestring', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezone = $dateTime->getTimezone();
+
+        if ( $timezone->getName() === $timezoneNil->getName() ) {
+            return Ret::err(
+                [ 'The `datestring` should be date with timezone', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( null !== $allowedTimezoneTypes ) {
+            $timezoneType = $this->timezone_type($timezone);
+
+            if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
+                return Ret::err(
+                    [ 'The `datestring` should be date with timezone of one of the allowed types', $datestring, $allowedTimezoneTypes ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        $dateTimeClone = $this->cloneToDate($dateTime);
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTime>
+     */
+    public function type_adate_tz($datestring, ?array $allowedTimezoneTypes = null)
+    {
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        $timezoneNil = $this->the_timezone_nil();
+
+        if ( $datestring instanceof \DateTimeInterface ) {
+            $dateTime = $datestring;
+
+        } else {
+            if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            try {
+                $dateTime = new \DateTime(
+                    $datestringString,
+                    $timezoneNil
+                );
+            }
+            catch ( \Throwable $e ) {
+            }
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `datestring` should be valid date or datestring', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezone = $dateTime->getTimezone();
+
+        if ( $timezone->getName() === $timezoneNil->getName() ) {
+            return Ret::err(
+                [ 'The `datestring` should be date with timezone', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( null !== $allowedTimezoneTypes ) {
+            $timezoneType = $this->timezone_type($timezone);
+
+            if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
+                return Ret::err(
+                    [ 'The `datestring` should be date with timezone of one of the allowed types', $datestring, $allowedTimezoneTypes ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        $dateTimeClone = $this->cloneToADate($dateTime);
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTimeImmutable>
+     */
+    public function type_idate_tz($datestring, ?array $allowedTimezoneTypes = null)
+    {
+        $theType = Lib::type();
+
+        $dateTimeImmutable = null;
+
+        $timezoneNil = $this->the_timezone_nil();
+
+        if ( $datestring instanceof \DateTimeInterface ) {
+            $dateTimeImmutable = $datestring;
+
+        } else {
+            if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            try {
+                $dateTimeImmutable = new \DateTimeImmutable(
+                    $datestringString,
+                    $timezoneNil
+                );
+            }
+            catch ( \Throwable $e ) {
+            }
+        }
+
+        if ( null === $dateTimeImmutable ) {
+            return Ret::err(
+                [ 'The `datestring` should be valid date or datestring', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezone = $dateTimeImmutable->getTimezone();
+
+        if ( $timezone->getName() === $timezoneNil->getName() ) {
+            return Ret::err(
+                [ 'The `datestring` should be date with timezone', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( null !== $allowedTimezoneTypes ) {
+            $timezoneType = $this->timezone_type($timezone);
+
+            if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
+                return Ret::err(
+                    [ 'The `datestring` should be date with timezone of one of the allowed types', $datestring, $allowedTimezoneTypes ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        $dateTimeClone = $this->cloneToDate($dateTimeImmutable);
+
+        return Ret::val($dateTimeClone);
+    }
+
+
+    /**
+     * @return Ret<\DateTimeInterface>
+     */
+    public function type_date_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
+    {
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        $timezoneNil = $this->the_timezone_nil();
+
+        if ( $dateFormatted instanceof \DateTimeInterface ) {
+            $dateTime = $dateFormatted;
+
+        } else {
+            if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $formatsList = $thePhp->to_list($formats);
+            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+
+            foreach ( $formatsList as $i => $format ) {
+                $formatValid = $theType->string_not_empty($format)->orThrow();
+
+                $formatsList[$i] = $formatValid;
+            }
+
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTime = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormattedString,
+                        $timezoneNil
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTime = false;
+                }
+
+                if ( false !== $dateTime ) {
+                    break;
+                }
+            }
+
+            if ( false === $dateTime ) {
+                $dateTime = null;
+            }
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezone = $dateTime->getTimezone();
+
+        if ( $timezone->getName() === $timezoneNil->getName() ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be date with timezone', $dateFormatted ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( null !== $allowedTimezoneTypes ) {
+            $timezoneType = $this->timezone_type($timezone);
+
+            if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
+                return Ret::err(
+                    [ 'The `dateFormatted` should be date with timezone of one of the allowed types', $dateFormatted, $allowedTimezoneTypes ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        $dateTimeClone = $this->cloneToDate($dateTime);
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTime>
+     */
+    public function type_adate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
+    {
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        $timezoneNil = $this->the_timezone_nil();
+
+        if ( $dateFormatted instanceof \DateTimeInterface ) {
+            $dateTime = $dateFormatted;
+
+        } else {
+            if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $formatsList = $thePhp->to_list($formats);
+            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+
+            foreach ( $formatsList as $i => $format ) {
+                $formatValid = $theType->string_not_empty($format)->orThrow();
+
+                $formatsList[$i] = $formatValid;
+            }
+
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTime = \DateTime::createFromFormat(
+                        $format,
+                        $dateFormattedString,
+                        $timezoneNil
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTime = false;
+                }
+
+                if ( false !== $dateTime ) {
+                    break;
+                }
+            }
+
+            if ( false === $dateTime ) {
+                $dateTime = null;
+            }
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezone = $dateTime->getTimezone();
+
+        if ( $timezone->getName() === $timezoneNil->getName() ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be date with timezone', $dateFormatted ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( null !== $allowedTimezoneTypes ) {
+            $timezoneType = $this->timezone_type($timezone);
+
+            if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
+                return Ret::err(
+                    [ 'The `dateFormatted` should be date with timezone of one of the allowed types', $dateFormatted, $allowedTimezoneTypes ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        $dateTimeClone = $this->cloneToADate($dateTime);
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTimeImmutable>
+     */
+    public function type_idate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
+    {
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $dateTimeImmutable = null;
+
+        $timezoneNil = $this->the_timezone_nil();
+
+        if ( $dateFormatted instanceof \DateTimeInterface ) {
+            $dateTimeImmutable = $dateFormatted;
+
+        } else {
+            if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $formatsList = $thePhp->to_list($formats);
+            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+
+            foreach ( $formatsList as $i => $format ) {
+                $formatValid = $theType->string_not_empty($format)->orThrow();
+
+                $formatsList[$i] = $formatValid;
+            }
+
+            foreach ( $formatsList as $format ) {
+                try {
+                    $dateTimeImmutable = \DateTimeImmutable::createFromFormat(
+                        $format,
+                        $dateFormattedString,
+                        $timezoneNil
+                    );
+                }
+                catch ( \Throwable $e ) {
+                    $dateTimeImmutable = false;
+                }
+
+                if ( false !== $dateTimeImmutable ) {
+                    break;
+                }
+            }
+
+            if ( false === $dateTimeImmutable ) {
+                $dateTimeImmutable = null;
+            }
+        }
+
+        if ( null === $dateTimeImmutable ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezone = $dateTimeImmutable->getTimezone();
+
+        if ( $timezone->getName() === $timezoneNil->getName() ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be date with timezone', $dateFormatted ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( null !== $allowedTimezoneTypes ) {
+            $timezoneType = $this->timezone_type($timezone);
+
+            if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
+                return Ret::err(
+                    [ 'The `dateFormatted` should be date with timezone of one of the allowed types', $dateFormatted, $allowedTimezoneTypes ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
+
+        return Ret::val($dateTimeImmutableClone);
+    }
+
+
+    /**
+     * @return Ret<\DateTimeInterface>
+     */
+    public function type_date_no_tz($datestring, $timezoneSet = null)
+    {
+        $timezoneSet = $timezoneSet ?? 'UTC';
+
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezoneNil = $this->the_timezone_nil();
+        $timezoneUtc = $this->the_timezone_utc();
+
+        try {
+            $dateTime = new \DateTime(
+                $datestringString,
+                $timezoneNil
+            );
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `datestring` should be valid date or datestring', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezone = $dateTime->getTimezone();
+
+        if ( $timezone->getName() !== $timezoneNil->getName() ) {
+            return Ret::err(
+                [ 'The `datestring` should be date without timezone', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        try {
+            $dateTime = new \DateTime(
+                $datestringString,
+                $timezoneUtc
+            );
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        $dateTimeClone = $this->cloneToDate($dateTime);
+
+        if ( null !== $timezoneSet ) {
+            $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
+
+            $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
+        }
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTime>
+     */
+    public function type_adate_no_tz($datestring, $timezoneSet = null)
+    {
+        $timezoneSet = $timezoneSet ?? 'UTC';
+
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezoneNil = $this->the_timezone_nil();
+        $timezoneUtc = $this->the_timezone_utc();
+
+        try {
+            $dateTime = new \DateTime(
+                $datestringString,
+                $timezoneNil
+            );
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `datestring` should be valid date or datestring', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezone = $dateTime->getTimezone();
+
+        if ( $timezone->getName() !== $timezoneNil->getName() ) {
+            return Ret::err(
+                [ 'The `datestring` should be date without timezone', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        try {
+            $dateTime = new \DateTime(
+                $datestringString,
+                $timezoneUtc
+            );
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        $dateTimeClone = $this->cloneToADate($dateTime);
+
+        if ( null !== $timezoneSet ) {
+            $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
+
+            $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
+        }
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTimeImmutable>
+     */
+    public function type_idate_no_tz($datestring, $timezoneSet = null)
+    {
+        $timezoneSet = $timezoneSet ?? 'UTC';
+
+        $theType = Lib::type();
+
+        $dateTimeImmutable = null;
+
+        if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezoneNil = $this->the_timezone_nil();
+        $timezoneUtc = $this->the_timezone_utc();
+
+        try {
+            $dateTimeImmutable = new \DateTimeImmutable(
+                $datestringString,
+                $timezoneNil
+            );
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ( null === $dateTimeImmutable ) {
+            return Ret::err(
+                [ 'The `datestring` should be valid date or datestring', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezone = $dateTimeImmutable->getTimezone();
+
+        if ( $timezone->getName() !== $timezoneNil->getName() ) {
+            return Ret::err(
+                [ 'The `datestring` should be date without timezone', $datestring ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        try {
+            $dateTimeImmutable = new \DateTimeImmutable(
+                $datestringString,
+                $timezoneUtc
+            );
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
+
+        if ( null !== $timezoneSet ) {
+            $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
+
+            $dateTimeImmutableClone = $dateTimeImmutableClone->setTimezone($timezoneSetObject);
+        }
+
+        return Ret::val($dateTimeImmutableClone);
+    }
+
+
+    /**
+     * @return Ret<\DateTimeInterface>
+     */
+    public function type_date_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+    {
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $formatsList = $thePhp->to_list($formats);
+        $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+
+        foreach ( $formatsList as $i => $format ) {
+            $formatValid = $theType->string_not_empty($format)->orThrow();
+
+            $formatsList[$i] = $formatValid;
+        }
+
+        $timezoneNil = $this->the_timezone_nil();
+        $timezoneUtc = $this->the_timezone_utc();
+
+        foreach ( $formatsList as $format ) {
+            try {
+                $dateTime = \DateTime::createFromFormat(
+                    $format,
+                    $dateFormattedString,
+                    $timezoneNil
+                );
+            }
+            catch ( \Throwable $e ) {
+                $dateTime = false;
+            }
+
+            if ( false !== $dateTime ) {
+                break;
+            }
+        }
+
+        if ( false === $dateTime ) {
+            $dateTime = null;
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezone = $dateTime->getTimezone();
+
+        if ( $timezone->getName() !== $timezoneNil->getName() ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be date without timezone', $dateFormatted ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        foreach ( $formatsList as $format ) {
+            try {
+                $dateTime = \DateTime::createFromFormat(
+                    $format,
+                    $dateFormattedString,
+                    $timezoneUtc
+                );
+            }
+            catch ( \Throwable $e ) {
+                $dateTime = false;
+            }
+
+            if ( false !== $dateTime ) {
+                break;
+            }
+        }
+
+        $dateTimeClone = $this->cloneToDate($dateTime);
+
+        if ( null !== $timezoneSet ) {
+            $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
+
+            $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
+        }
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTime>
+     */
+    public function type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+    {
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $formatsList = $thePhp->to_list($formats);
+        $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+
+        foreach ( $formatsList as $i => $format ) {
+            $formatValid = $theType->string_not_empty($format)->orThrow();
+
+            $formatsList[$i] = $formatValid;
+        }
+
+        $timezoneNil = $this->the_timezone_nil();
+        $timezoneUtc = $this->the_timezone_utc();
+
+        foreach ( $formatsList as $format ) {
+            try {
+                $dateTime = \DateTime::createFromFormat(
+                    $format,
+                    $dateFormattedString,
+                    $timezoneNil
+                );
+            }
+            catch ( \Throwable $e ) {
+                $dateTime = false;
+            }
+
+            if ( false !== $dateTime ) {
+                break;
+            }
+        }
+
+        if ( false === $dateTime ) {
+            $dateTime = null;
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezone = $dateTime->getTimezone();
+
+        if ( $timezone->getName() !== $timezoneNil->getName() ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be date without timezone', $dateFormatted ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        foreach ( $formatsList as $format ) {
+            try {
+                $dateTime = \DateTime::createFromFormat(
+                    $format,
+                    $dateFormattedString,
+                    $timezoneUtc
+                );
+            }
+            catch ( \Throwable $e ) {
+                $dateTime = false;
+            }
+
+            if ( false !== $dateTime ) {
+                break;
+            }
+        }
+
+        $dateTimeClone = $this->cloneToADate($dateTime);
+
+        if ( null !== $timezoneSet ) {
+            $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
+
+            $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
+        }
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTimeImmutable>
+     */
+    public function type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+    {
+        $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $dateTimeImmutable = null;
+
+        if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $formatsList = $thePhp->to_list($formats);
+        $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+
+        foreach ( $formatsList as $i => $format ) {
+            $formatValid = $theType->string_not_empty($format)->orThrow();
+
+            $formatsList[$i] = $formatValid;
+        }
+
+        $timezoneNil = $this->the_timezone_nil();
+        $timezoneUtc = $this->the_timezone_utc();
+
+        foreach ( $formatsList as $format ) {
+            try {
+                $dateTimeImmutable = \DateTimeImmutable::createFromFormat(
+                    $format,
+                    $dateFormattedString,
+                    $timezoneNil
+                );
+            }
+            catch ( \Throwable $e ) {
+                $dateTimeImmutable = false;
+            }
+
+            if ( false !== $dateTimeImmutable ) {
+                break;
+            }
+        }
+
+        if ( false === $dateTimeImmutable ) {
+            $dateTimeImmutable = null;
+        }
+
+        if ( null === $dateTimeImmutable ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezone = $dateTimeImmutable->getTimezone();
+
+        if ( $timezone->getName() !== $timezoneNil->getName() ) {
+            return Ret::err(
+                [ 'The `dateFormatted` should be date without timezone', $dateFormatted ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        foreach ( $formatsList as $format ) {
+            try {
+                $dateTimeImmutable = \DateTimeImmutable::createFromFormat(
+                    $format,
+                    $dateFormattedString,
+                    $timezoneUtc
+                );
+            }
+            catch ( \Throwable $e ) {
+                $dateTimeImmutable = false;
+            }
+
+            if ( false !== $dateTimeImmutable ) {
+                break;
+            }
+        }
+
+        $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
+
+        if ( null !== $timezoneSet ) {
+            $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
+
+            $dateTimeImmutableClone = $dateTimeImmutableClone->setTimezone($timezoneSetObject);
+        }
+
+        return Ret::val($dateTimeImmutableClone);
+    }
+
+
+    /**
+     * @return Ret<\DateTimeInterface>
+     */
+    public function type_date_microtime($microtime, $timezoneSet = null)
+    {
+        $timezoneSet = $timezoneSet ?? date_default_timezone_get();
+
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
+
+        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezoneDefault = $this->the_timezone_utc();
+
+        try {
+            if ( PHP_VERSION_ID >= 80000 ) {
+                $dateTime = new \DateTime("@{$microtimeNumeric}", $timezoneDefault);
+
+            } else {
+                $int = $split[1];
+                $seconds = $int;
+
+                $dateTime = new \DateTime("@{$seconds}", $timezoneDefault);
+
+                if ( '' !== $split[2] ) {
+                    $frac = $split[2];
+
+                    $microseconds = ltrim($frac, '.');
+                    $microseconds = substr($microseconds, 0, 6);
+                    $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
+
+                    $dateTime = $dateTime->setTime(
+                        (int) $dateTime->format('H'),
+                        (int) $dateTime->format('i'),
+                        (int) $dateTime->format('s'),
+                        (int) $microseconds
+                    );
+                }
+            }
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `microtime` should be valid microtime', $microtime ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $dateTimeClone = $this->cloneToDate($dateTime);
+
+        $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTime>
+     */
+    public function type_adate_microtime($microtime, $timezoneSet = null)
+    {
+        $timezoneSet = $timezoneSet ?? date_default_timezone_get();
+
+        $theType = Lib::type();
+
+        $dateTime = null;
+
+        $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
+
+        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezoneDefault = $this->the_timezone_utc();
+
+        try {
+            if ( PHP_VERSION_ID >= 80000 ) {
+                $dateTime = new \DateTime("@{$microtimeNumeric}", $timezoneDefault);
+
+            } else {
+                $int = $split[1];
+                $seconds = $int;
+
+                $dateTime = new \DateTime("@{$seconds}", $timezoneDefault);
+
+                if ( '' !== $split[2] ) {
+                    $frac = $split[2];
+
+                    $microseconds = ltrim($frac, '.');
+                    $microseconds = substr($microseconds, 0, 6);
+                    $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
+
+                    $dateTime = $dateTime->setTime(
+                        (int) $dateTime->format('H'),
+                        (int) $dateTime->format('i'),
+                        (int) $dateTime->format('s'),
+                        (int) $microseconds
+                    );
+                }
+            }
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ( null === $dateTime ) {
+            return Ret::err(
+                [ 'The `microtime` should be valid microtime', $microtime ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $dateTimeClone = $this->cloneToADate($dateTime);
+
+        $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
+
+        return Ret::val($dateTimeClone);
+    }
+
+    /**
+     * @return Ret<\DateTimeImmutable>
+     */
+    public function type_idate_microtime($microtime, $timezoneSet = null)
+    {
+        $timezoneSet = $timezoneSet ?? date_default_timezone_get();
+
+        $theType = Lib::type();
+
+        $dateTimeImmutable = null;
+
+        $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
+
+        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
+            return Ret::err(
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $timezoneDefault = $this->the_timezone_utc();
+
+        try {
+            if ( PHP_VERSION_ID >= 80000 ) {
+                $dateTimeImmutable = new \DateTimeImmutable("@{$microtimeNumeric}", $timezoneDefault);
+
+            } else {
+                $int = $split[1];
+                $seconds = $int;
+
+                $dateTimeImmutable = new \DateTimeImmutable("@{$seconds}", $timezoneDefault);
+
+                if ( '' !== $split[2] ) {
+                    $frac = $split[2];
+
+                    $microseconds = ltrim($frac, '.');
+                    $microseconds = substr($microseconds, 0, 6);
+                    $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
+
+                    $dateTimeImmutable = $dateTimeImmutable->setTime(
+                        (int) $dateTimeImmutable->format('H'),
+                        (int) $dateTimeImmutable->format('i'),
+                        (int) $dateTimeImmutable->format('s'),
+                        (int) $microseconds
+                    );
+                }
+            }
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ( null === $dateTimeImmutable ) {
+            return Ret::err(
+                [ 'The `microtime` should be valid microtime', $microtime ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
+
+        $dateTimeImmutableClone = $dateTimeImmutableClone->setTimezone($timezoneSetObject);
+
+        return Ret::val($dateTimeImmutableClone);
+    }
+
+
+    /**
+     * @param string|\DateTimeInterface|\DateTimeZone $a
+     * @param string|\DateTimeInterface|\DateTimeZone $b
+     */
+    public function timezone_same($a, $b) : bool
+    {
+        $theType = Lib::type();
+
+        $aObject = $theType->timezone($a)->orThrow();
+        $bObject = $theType->timezone($b)->orThrow();
+
+        return $aObject->getName() === $bObject->getName();
+    }
+
+    public function timezone_type(\DateTimeZone $timezone) : int
+    {
+        return (PHP_VERSION_ID >= 70400)
+            ? json_decode(json_encode($timezone))->timezone_type
+            : get_object_vars($timezone)['timezone_type'];
+    }
+
+
+    public function interval_encode(\DateInterval $interval) : string
+    {
+        // > ISO 8601
+
+        $search = [ 'M0S', 'H0M', 'DT0H', 'M0D', 'P0Y', 'Y0M', 'P0M' ];
+        $replace = [ 'M', 'H', 'DT', 'M', 'P', 'Y', 'P' ];
+
+        if ( $interval->f ) {
+            $microseconds = sprintf('%.6f', $interval->f);
+            $microseconds = substr($microseconds, 2);
+            $microseconds = rtrim($microseconds, '0.');
+
+            $microseconds = (int) $microseconds;
+
+            $result = $interval->format("P%yY%mM%dDT%hH%iM%s.{$microseconds}S");
+
+        } else {
+            $result = $interval->format('P%yY%mM%dDT%hH%iM%sS');
+        }
+
+        $result = str_replace($search, $replace, $result);
+        $result = rtrim($result, 'PT') ?: 'P0D';
+
+        return $result;
+    }
+
+    /**
+     * @template-covariant T of \DateInterval
+     *
+     * @param string               $duration
+     * @param class-string<T>|null $intervalClass
+     *
+     * @return T
+     *
+     * @noinspection PhpDocSignatureInspection
+     */
+    public function interval_decode(string $duration, ?string $intervalClass = null) : \DateInterval
+    {
+        // > ISO 8601
+
+        if ( null !== $intervalClass ) {
+            if ( ! is_a($intervalClass, \DateInterval::class, true) ) {
+                throw new LogicException(
+                    [
+                        'The `intervalClass` should be a class-string of: ' . \DateInterval::class,
+                        $intervalClass,
+                    ]
+                );
+            }
+        }
+
+        $intervalClass = $intervalClass ?? \DateInterval::class;
+
+        $theStr = Lib::str();
+        $theType = Lib::type();
+
+        $durationValid = $theType->string_not_empty($duration)->orThrow();
+
+        $regex = '/(\d+\.\d+)([YMWDHS])/';
+
+        $hasDecimalValue = preg_match_all($regex, $durationValid, $matches);
+
+        $decimalValueFrac = null;
+        $decimalLetter = null;
+        if ( $hasDecimalValue ) {
+            $decimal = $matches[0];
+            $decimalSubstr = $matches[0][0];
+            $decimalValue = $matches[1][0];
+            $decimalLetter = $matches[2][0];
+
+            if ( count($decimal) > 1 ) {
+                throw new LogicException(
+                    [
+                        'The `duration` can contain only one `.` in smallest period (according ISO 8601)',
+                        $duration,
+                    ]
+                );
+            }
+
+            if ( ! $theStr->str_ends($duration, $decimalSubstr, false) ) {
+                throw new LogicException(
+                    [
+                        'The `duration` can contain only one `.` in smallest period (according ISO 8601)',
+                        $duration,
+                    ]
+                );
+            }
+
+            $decimalValueFloat = (float) $decimalValue;
+            $decimalValueInt = (int) $decimalValue;
+
+            $decimalValueFrac = $decimalValueFloat - (float) $decimalValueInt;
+
+            $durationValid = str_replace($decimalValue, $decimalValueInt, $durationValid);
+        }
+
+        try {
+            $instance = new $intervalClass($durationValid);
+        }
+        catch ( \Throwable $e ) {
+            throw new LogicException($e);
+        }
+
+        if ( $hasDecimalValue ) {
+            $now = new \DateTime('now');
+            $nowModified = clone $now;
+
+            $nowModified->add($instance);
+
+            $seconds = null;
+            switch ( $decimalLetter ):
+                case 'Y':
+                    $seconds = (int) ($decimalValueFrac * static::INTERVAL_YEAR);
+
+                    break;
+
+                case 'W':
+                    $seconds = (int) ($decimalValueFrac * static::INTERVAL_WEEK);
+
+                    break;
+
+                case 'D':
+                    $seconds = (int) ($decimalValueFrac * static::INTERVAL_DAY);
+
+                    break;
+
+                case 'H':
+                    $seconds = (int) ($decimalValueFrac * static::INTERVAL_HOUR);
+
+                    break;
+
+                case 'M':
+                    if ( false === strpos($duration, 'T') ) {
+                        $seconds = (int) ($decimalValueFrac * static::INTERVAL_MONTH);
+
+                    } else {
+                        $seconds = (int) ($decimalValueFrac * static::INTERVAL_MINUTE);
+                    }
+
+                    break;
+
+            endswitch;
+
+            if ( null !== $seconds ) {
+                $nowModified->modify("+{$seconds} seconds");
+            }
+
+            $interval = $nowModified->diff($now);
+
+            $instance->y = $interval->y;
+            $instance->m = $interval->m;
+            $instance->d = $interval->d;
+            $instance->h = $interval->h;
+            $instance->i = $interval->i;
+            $instance->s = $interval->s;
+
+            if ( null !== $decimalValueFrac ) {
+                if ( 'S' === $decimalLetter ) {
+                    $instance->f = $decimalValueFrac;
+                }
+            }
+        }
+
+        return $instance;
+    }
+
+
+    public function date_remote(\DateTimeInterface $date, $timezoneSet = null) : \DateTimeInterface
+    {
+        $timezoneSet = $timezoneSet ?? date_default_timezone_get();
+
         $theType = Lib::type();
 
         $timezoneSetObject = $theType->timezone($timezoneSet)->orThrow();
@@ -1473,8 +2189,10 @@ class DateModule
         return $clone;
     }
 
-    public function adate_remote(\DateTimeInterface $date, $timezoneSet) : \DateTime
+    public function adate_remote(\DateTimeInterface $date, $timezoneSet = null) : \DateTime
     {
+        $timezoneSet = $timezoneSet ?? date_default_timezone_get();
+
         $theType = Lib::type();
 
         $timezoneSetObject = $theType->timezone($timezoneSet)->orThrow();
@@ -1486,8 +2204,10 @@ class DateModule
         return $clone;
     }
 
-    public function idate_remote(\DateTimeInterface $date, $timezoneSet) : \DateTimeImmutable
+    public function idate_remote(\DateTimeInterface $date, $timezoneSet = null) : \DateTimeImmutable
     {
+        $timezoneSet = $timezoneSet ?? date_default_timezone_get();
+
         $theType = Lib::type();
 
         $timezoneSetObject = $theType->timezone($timezoneSet)->orThrow();
@@ -1708,204 +2428,6 @@ class DateModule
     }
 
 
-    /**
-     * @param string|\DateTimeInterface|\DateTimeZone $timezone
-     *
-     * @return int
-     */
-    public function timezone_type($timezone) : int
-    {
-        $theType = Lib::type();
-
-        $timezoneObject = $theType->timezone($timezone)->orThrow();
-
-        return (PHP_VERSION_ID >= 70400)
-            ? json_decode(json_encode($timezoneObject))->timezone_type
-            : get_object_vars($timezoneObject)['timezone_type'];
-    }
-
-    /**
-     * @param string|\DateTimeInterface|\DateTimeZone $a
-     * @param string|\DateTimeInterface|\DateTimeZone $b
-     */
-    public function timezone_same($a, $b) : bool
-    {
-        $theType = Lib::type();
-
-        $aObject = $theType->timezone($a)->orThrow();
-        $bObject = $theType->timezone($b)->orThrow();
-
-        return $aObject->getName() === $bObject->getName();
-    }
-
-
-    public function interval_encode(\DateInterval $interval) : string
-    {
-        // > ISO 8601
-
-        $search = [ 'M0S', 'H0M', 'DT0H', 'M0D', 'P0Y', 'Y0M', 'P0M' ];
-        $replace = [ 'M', 'H', 'DT', 'M', 'P', 'Y', 'P' ];
-
-        if ( $interval->f ) {
-            $microseconds = sprintf('%.6f', $interval->f);
-            $microseconds = substr($microseconds, 2);
-            $microseconds = rtrim($microseconds, '0.');
-
-            $microseconds = (int) $microseconds;
-
-            $result = $interval->format("P%yY%mM%dDT%hH%iM%s.{$microseconds}S");
-
-        } else {
-            $result = $interval->format('P%yY%mM%dDT%hH%iM%sS');
-        }
-
-        $result = str_replace($search, $replace, $result);
-        $result = rtrim($result, 'PT') ?: 'P0D';
-
-        return $result;
-    }
-
-    /**
-     * @template-covariant T of \DateInterval
-     *
-     * @param string               $duration
-     * @param class-string<T>|null $intervalClass
-     *
-     * @return T
-     *
-     * @noinspection PhpDocSignatureInspection
-     */
-    public function interval_decode(string $duration, ?string $intervalClass = null) : \DateInterval
-    {
-        // > ISO 8601
-
-        if ( null !== $intervalClass ) {
-            if ( ! is_a($intervalClass, \DateInterval::class, true) ) {
-                throw new LogicException(
-                    [
-                        'The `intervalClass` should be a class-string of: ' . \DateInterval::class,
-                        $intervalClass,
-                    ]
-                );
-            }
-        }
-
-        $intervalClass = $intervalClass ?? \DateInterval::class;
-
-        $theStr = Lib::str();
-        $theType = Lib::type();
-
-        $durationValid = $theType->string_not_empty($duration)->orThrow();
-
-        $regex = '/(\d+\.\d+)([YMWDHS])/';
-
-        $hasDecimalValue = preg_match_all($regex, $durationValid, $matches);
-
-        $decimalValueFrac = null;
-        $decimalLetter = null;
-        if ( $hasDecimalValue ) {
-            $decimal = $matches[0];
-            $decimalSubstr = $matches[0][0];
-            $decimalValue = $matches[1][0];
-            $decimalLetter = $matches[2][0];
-
-            if ( count($decimal) > 1 ) {
-                throw new LogicException(
-                    [
-                        'The `duration` can contain only one `.` in smallest period (according ISO 8601)',
-                        $duration,
-                    ]
-                );
-            }
-
-            if ( ! $theStr->str_ends($duration, $decimalSubstr, false) ) {
-                throw new LogicException(
-                    [
-                        'The `duration` can contain only one `.` in smallest period (according ISO 8601)',
-                        $duration,
-                    ]
-                );
-            }
-
-            $decimalValueFloat = (float) $decimalValue;
-            $decimalValueInt = (int) $decimalValue;
-
-            $decimalValueFrac = $decimalValueFloat - (float) $decimalValueInt;
-
-            $durationValid = str_replace($decimalValue, $decimalValueInt, $durationValid);
-        }
-
-        try {
-            $instance = new $intervalClass($durationValid);
-        }
-        catch ( \Throwable $e ) {
-            throw new LogicException($e);
-        }
-
-        if ( $hasDecimalValue ) {
-            $now = new \DateTime('now');
-            $nowModified = clone $now;
-
-            $nowModified->add($instance);
-
-            $seconds = null;
-            switch ( $decimalLetter ):
-                case 'Y':
-                    $seconds = (int) ($decimalValueFrac * static::INTERVAL_YEAR);
-
-                    break;
-
-                case 'W':
-                    $seconds = (int) ($decimalValueFrac * static::INTERVAL_WEEK);
-
-                    break;
-
-                case 'D':
-                    $seconds = (int) ($decimalValueFrac * static::INTERVAL_DAY);
-
-                    break;
-
-                case 'H':
-                    $seconds = (int) ($decimalValueFrac * static::INTERVAL_HOUR);
-
-                    break;
-
-                case 'M':
-                    if ( false === strpos($duration, 'T') ) {
-                        $seconds = (int) ($decimalValueFrac * static::INTERVAL_MONTH);
-
-                    } else {
-                        $seconds = (int) ($decimalValueFrac * static::INTERVAL_MINUTE);
-                    }
-
-                    break;
-
-            endswitch;
-
-            if ( null !== $seconds ) {
-                $nowModified->modify("+{$seconds} seconds");
-            }
-
-            $interval = $nowModified->diff($now);
-
-            $instance->y = $interval->y;
-            $instance->m = $interval->m;
-            $instance->d = $interval->d;
-            $instance->h = $interval->h;
-            $instance->i = $interval->i;
-            $instance->s = $interval->s;
-
-            if ( null !== $decimalValueFrac ) {
-                if ( 'S' === $decimalLetter ) {
-                    $instance->f = $decimalValueFrac;
-                }
-            }
-        }
-
-        return $instance;
-    }
-
-
     public function format_timestamp(\DateTimeInterface $dateTime) : string
     {
         return (string) $dateTime->getTimestamp();
@@ -1969,82 +2491,155 @@ class DateModule
     }
 
 
-
     public function format_sql(\DateTimeInterface $dateTime) : string
     {
-        return $dateTime->format(static::FORMAT_SQL);
+        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
+
+        $formatted = $clone->format(static::FORMAT_SQL);
+
+        return $formatted;
+    }
+
+    public function format_sql_sec(\DateTimeInterface $dateTime) : string
+    {
+        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
+
+        $formatted = $clone->format(static::FORMAT_SQL_SEC);
+
+        return $formatted;
     }
 
     public function format_sql_msec(\DateTimeInterface $dateTime) : string
     {
-        $formattedSql = $dateTime->format(static::FORMAT_SQL);
+        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
 
-        $milliseconds = $dateTime->format('v');
+        $formatted = $clone->format(static::FORMAT_SQL_SEC);
+
+        $milliseconds = $clone->format('v');
         $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
 
-        return "{$formattedSql}.{$milliseconds}";
+        return "{$formatted}.{$milliseconds}";
     }
 
     public function format_sql_usec(\DateTimeInterface $dateTime) : string
     {
-        $formattedSql = $dateTime->format(static::FORMAT_SQL);
+        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
+
+        $formatted = $clone->format(static::FORMAT_SQL_SEC);
+
+        $microseconds = $clone->format('v');
+        $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
+
+        return "{$formatted}.{$microseconds}";
+    }
+
+
+    public function format_sql_non_utc(\DateTimeInterface $dateTime) : string
+    {
+        return $dateTime->format(static::FORMAT_SQL);
+    }
+
+    public function format_sql_sec_non_utc(\DateTimeInterface $dateTime) : string
+    {
+        return $dateTime->format(static::FORMAT_SQL_SEC);
+    }
+
+    public function format_sql_msec_non_utc(\DateTimeInterface $dateTime) : string
+    {
+        $formatted = $dateTime->format(static::FORMAT_SQL_SEC);
+
+        $milliseconds = $dateTime->format('v');
+        $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
+
+        return "{$formatted}.{$milliseconds}";
+    }
+
+    public function format_sql_usec_non_utc(\DateTimeInterface $dateTime) : string
+    {
+        $formatted = $dateTime->format(static::FORMAT_SQL_SEC);
 
         $microseconds = $dateTime->format('v');
         $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
 
-        return "{$formattedSql}.{$microseconds}";
+        return "{$formatted}.{$microseconds}";
     }
 
 
-    public function format_sql_utc(\DateTimeInterface $dateTime) : string
+    public function array_sql(\DateTimeInterface $dateTime) : array
     {
-        $clone = (clone $dateTime)->setTimezone(new \DateTimeZone('UTC'));
+        $timezone = $dateTime->getTimezone();
 
-        return $this->format_sql($clone);
-    }
-
-    public function format_sql_msec_utc(\DateTimeInterface $dateTime) : string
-    {
-        $clone = (clone $dateTime)->setTimezone(new \DateTimeZone('UTC'));
-
-        return $this->format_sql_msec($clone);
-    }
-
-    public function format_sql_usec_utc(\DateTimeInterface $dateTime) : string
-    {
-        $clone = (clone $dateTime)->setTimezone(new \DateTimeZone('UTC'));
-
-        return $this->format_sql_usec($clone);
-    }
-
-
-    public function array_sql_tz(\DateTimeInterface $dateTime) : array
-    {
         $formatted = [];
         $formatted[] = $this->format_sql($dateTime);
-        $formatted[] = $dateTime->getTimezone()->getName();
+        $formatted[] = $timezone->getName();
+        $formatted[] = $dateTime->format('P');
+        $formatted[] = $dateTime->getOffset();
+        $formatted[] = $this->timezone_type($timezone);
+        $formatted['date_utc'] = $this->format_sql($dateTime);
+        $formatted['timezone'] = $timezone->getName();
+        $formatted['diff'] = $dateTime->format('P');
+        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
     }
 
-    public function array_sql_msec_tz(\DateTimeInterface $dateTime) : array
+    public function array_sql_sec(\DateTimeInterface $dateTime) : array
     {
+        $timezone = $dateTime->getTimezone();
+
+        $formatted = [];
+        $formatted[] = $this->format_sql_sec($dateTime);
+        $formatted[] = $timezone->getName();
+        $formatted[] = $dateTime->format('P');
+        $formatted[] = $dateTime->getOffset();
+        $formatted[] = $this->timezone_type($timezone);
+        $formatted['date_utc'] = $this->format_sql_sec($dateTime);
+        $formatted['timezone'] = $timezone->getName();
+        $formatted['diff'] = $dateTime->format('P');
+        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        return $formatted;
+    }
+
+    public function array_sql_msec(\DateTimeInterface $dateTime) : array
+    {
+        $timezone = $dateTime->getTimezone();
+
         $formatted = [];
         $formatted[] = $this->format_sql_msec($dateTime);
-        $formatted[] = $dateTime->getTimezone()->getName();
+        $formatted[] = $timezone->getName();
+        $formatted[] = $dateTime->format('P');
+        $formatted[] = $dateTime->getOffset();
+        $formatted[] = $this->timezone_type($timezone);
+        $formatted['date_utc'] = $this->format_sql_msec($dateTime);
+        $formatted['timezone'] = $timezone->getName();
+        $formatted['diff'] = $dateTime->format('P');
+        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
     }
 
-    public function array_sql_usec_tz(\DateTimeInterface $dateTime) : array
+    public function array_sql_usec(\DateTimeInterface $dateTime) : array
     {
+        $timezone = $dateTime->getTimezone();
+
         $formatted = [];
         $formatted[] = $this->format_sql_usec($dateTime);
-        $formatted[] = $dateTime->getTimezone()->getName();
+        $formatted[] = $timezone->getName();
+        $formatted[] = $dateTime->format('P');
+        $formatted[] = $dateTime->getOffset();
+        $formatted[] = $this->timezone_type($timezone);
+        $formatted['date_utc'] = $this->format_sql_usec($dateTime);
+        $formatted['timezone'] = $timezone->getName();
+        $formatted['diff'] = $dateTime->format('P');
+        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
     }
-
 
 
     public function format_javascript(\DateTimeInterface $dateTime) : string
@@ -2056,9 +2651,18 @@ class DateModule
         return "{$formatted}{$offset}";
     }
 
+    public function format_javascript_sec(\DateTimeInterface $dateTime) : string
+    {
+        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
+
+        $offset = $dateTime->format('P');
+
+        return "{$formatted}{$offset}";
+    }
+
     public function format_javascript_msec(\DateTimeInterface $dateTime) : string
     {
-        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
+        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
 
         $milliseconds = $dateTime->format('v');
         $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
@@ -2070,7 +2674,7 @@ class DateModule
 
     public function format_javascript_usec(\DateTimeInterface $dateTime) : string
     {
-        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
+        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
 
         $microseconds = $dateTime->format('u');
         $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
@@ -2081,139 +2685,129 @@ class DateModule
     }
 
 
-    public function format_javascript_no_offset(\DateTimeInterface $dateTime) : string
+    public function format_javascript_utc(\DateTimeInterface $dateTime) : string
     {
-        return $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
-    }
+        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
 
-    public function format_javascript_no_offset_msec(\DateTimeInterface $dateTime) : string
-    {
-        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
-
-        $milliseconds = $dateTime->format('v');
-        $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
-
-        return "{$formatted}.{$milliseconds}";
-    }
-
-    public function format_javascript_no_offset_usec(\DateTimeInterface $dateTime) : string
-    {
-        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
-
-        $microseconds = $dateTime->format('u');
-        $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
-
-        return "{$formatted}.{$microseconds}";
-    }
-
-
-    public function format_javascript_z(\DateTimeInterface $dateTime) : string
-    {
-        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
+        $formatted = $clone->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
 
         return "{$formatted}Z";
     }
 
-    public function format_javascript_z_msec(\DateTimeInterface $dateTime) : string
+    public function format_javascript_sec_utc(\DateTimeInterface $dateTime) : string
     {
-        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
+        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
 
-        $milliseconds = $dateTime->format('v');
+        $formatted = $clone->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
+
+        return "{$formatted}Z";
+    }
+
+    public function format_javascript_msec_utc(\DateTimeInterface $dateTime) : string
+    {
+        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
+
+        $formatted = $clone->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
+
+        $milliseconds = $clone->format('v');
         $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
 
         return "{$formatted}.{$milliseconds}Z";
     }
 
-    public function format_javascript_z_usec(\DateTimeInterface $dateTime) : string
+    public function format_javascript_usec_utc(\DateTimeInterface $dateTime) : string
     {
-        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
+        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
 
-        $microseconds = $dateTime->format('u');
+        $formatted = $clone->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
+
+        $microseconds = $clone->format('u');
         $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
 
         return "{$formatted}.{$microseconds}Z";
     }
 
 
-    public function array_javascript_tz(\DateTimeInterface $dateTime) : array
+    public function array_javascript(\DateTimeInterface $dateTime) : array
     {
+        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
+
+        $timezone = $dateTime->getTimezone();
+
         $formatted = [];
-        $formatted[] = $this->format_javascript($dateTime);
-        $formatted[] = $dateTime->getTimezone()->getName();
+        $formatted[] = $this->format_javascript($clone);
+        $formatted[] = $timezone->getName();
+        $formatted[] = $dateTime->format('P');
+        $formatted[] = $dateTime->getOffset();
+        $formatted[] = $this->timezone_type($timezone);
+        $formatted['date_utc'] = $this->format_javascript($clone);
+        $formatted['timezone'] = $timezone->getName();
+        $formatted['diff'] = $dateTime->format('P');
+        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
     }
 
-    public function array_javascript_tz_msec(\DateTimeInterface $dateTime) : array
+    public function array_javascript_sec(\DateTimeInterface $dateTime) : array
     {
+        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
+
+        $timezone = $dateTime->getTimezone();
+
         $formatted = [];
-        $formatted[] = $this->format_javascript_msec($dateTime);
-        $formatted[] = $dateTime->getTimezone()->getName();
+        $formatted[] = $this->format_javascript_sec($clone);
+        $formatted[] = $timezone->getName();
+        $formatted[] = $dateTime->format('P');
+        $formatted[] = $dateTime->getOffset();
+        $formatted[] = $this->timezone_type($timezone);
+        $formatted['date_utc'] = $this->format_javascript_sec($clone);
+        $formatted['timezone'] = $timezone->getName();
+        $formatted['diff'] = $dateTime->format('P');
+        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
     }
 
-    public function array_javascript_tz_usec(\DateTimeInterface $dateTime) : array
+    public function array_javascript_msec(\DateTimeInterface $dateTime) : array
     {
+        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
+
+        $timezone = $dateTime->getTimezone();
+
         $formatted = [];
-        $formatted[] = $this->format_javascript_usec($dateTime);
-        $formatted[] = $dateTime->getTimezone()->getName();
+        $formatted[] = $this->format_javascript_msec($clone);
+        $formatted[] = $timezone->getName();
+        $formatted[] = $dateTime->format('P');
+        $formatted[] = $dateTime->getOffset();
+        $formatted[] = $this->timezone_type($timezone);
+        $formatted['date_utc'] = $this->format_javascript_msec($clone);
+        $formatted['timezone'] = $timezone->getName();
+        $formatted['diff'] = $dateTime->format('P');
+        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
     }
 
-
-    public function array_javascript_no_offset_tz(\DateTimeInterface $dateTime) : array
+    public function array_javascript_usec(\DateTimeInterface $dateTime) : array
     {
+        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
+
+        $timezone = $dateTime->getTimezone();
+
         $formatted = [];
-        $formatted[] = $this->format_javascript_no_offset($dateTime);
-        $formatted[] = $dateTime->getTimezone()->getName();
-
-        return $formatted;
-    }
-
-    public function array_javascript_no_offset_tz_msec(\DateTimeInterface $dateTime) : array
-    {
-        $formatted = [];
-        $formatted[] = $this->format_javascript_no_offset_msec($dateTime);
-        $formatted[] = $dateTime->getTimezone()->getName();
-
-        return $formatted;
-    }
-
-    public function array_javascript_no_offset_tz_usec(\DateTimeInterface $dateTime) : array
-    {
-        $formatted = [];
-        $formatted[] = $this->format_javascript_no_offset_usec($dateTime);
-        $formatted[] = $dateTime->getTimezone()->getName();
-
-        return $formatted;
-    }
-
-
-    public function array_javascript_tz_z(\DateTimeInterface $dateTime) : array
-    {
-        $formatted = [];
-        $formatted[] = $this->format_javascript_z($dateTime);
-        $formatted[] = $dateTime->getTimezone()->getName();
-
-        return $formatted;
-    }
-
-    public function array_javascript_tz_z_msec(\DateTimeInterface $dateTime) : array
-    {
-        $formatted = [];
-        $formatted[] = $this->format_javascript_z_msec($dateTime);
-        $formatted[] = $dateTime->getTimezone()->getName();
-
-        return $formatted;
-    }
-
-    public function array_javascript_tz_z_usec(\DateTimeInterface $dateTime) : array
-    {
-        $formatted = [];
-        $formatted[] = $this->format_javascript_z_usec($dateTime);
-        $formatted[] = $dateTime->getTimezone()->getName();
+        $formatted[] = $this->format_javascript_usec($clone);
+        $formatted[] = $timezone->getName();
+        $formatted[] = $dateTime->format('P');
+        $formatted[] = $dateTime->getOffset();
+        $formatted[] = $this->timezone_type($timezone);
+        $formatted['date_utc'] = $this->format_javascript_usec($clone);
+        $formatted['timezone'] = $timezone->getName();
+        $formatted['diff'] = $dateTime->format('P');
+        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
     }

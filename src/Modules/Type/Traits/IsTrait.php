@@ -1165,6 +1165,42 @@ trait IsTrait
 	}
 
 
+	public function is_date_no_tz($datestring, $timezoneSet = null): bool
+	{
+		return Lib::date()->type_date_no_tz($datestring, $timezoneSet)->isOk();
+	}
+
+
+	public function is_adate_no_tz($datestring, $timezoneSet = null): bool
+	{
+		return Lib::date()->type_adate_no_tz($datestring, $timezoneSet)->isOk();
+	}
+
+
+	public function is_idate_no_tz($datestring, $timezoneSet = null): bool
+	{
+		return Lib::date()->type_idate_no_tz($datestring, $timezoneSet)->isOk();
+	}
+
+
+	public function is_date_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null): bool
+	{
+		return Lib::date()->type_date_no_tz_formatted($dateFormatted, $formats, $timezoneSet)->isOk();
+	}
+
+
+	public function is_adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null): bool
+	{
+		return Lib::date()->type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet)->isOk();
+	}
+
+
+	public function is_idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null): bool
+	{
+		return Lib::date()->type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet)->isOk();
+	}
+
+
 	public function is_date_microtime($microtime, $timezoneFallback = null): bool
 	{
 		return Lib::date()->type_date_microtime($microtime, $timezoneFallback)->isOk();

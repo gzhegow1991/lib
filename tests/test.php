@@ -455,19 +455,19 @@ $test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
     TRUE
   ],
   [
-    "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }"
+    "{ object(serializable) # DateTimeZone }",
+    "{ object(serializable) # DateTimeZone }",
+    "{ object(serializable) # DateTimeZone }"
   ],
   [
     [],
     []
   ],
   [
-    "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }"
+    "{ object(serializable) # DateTimeZone }",
+    "{ object(serializable) # DateTimeZone }",
+    "{ object(serializable) # DateTimeZone }",
+    "{ object(serializable) # DateTimeZone }"
   ]
 ]
 ###
@@ -486,7 +486,7 @@ $test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
   [
     [
       [
-        "The `timezoneOrNameOrAbbr` should be valid timezone or its name/abbreviation",
+        "The `timezoneOrNameOrAbbr` should be valid timezone",
         "[ INVALID_TIMEZONE ]"
       ]
     ],
@@ -545,7 +545,7 @@ $test->expectStdoutIf(PHP_VERSION_ID < 80000, '
   [
     [
       [
-        "The `timezoneOrNameOrAbbr` should be valid timezone or its name/abbreviation",
+        "The `timezoneOrNameOrAbbr` should be valid timezone",
         "[ INVALID_TIMEZONE ]"
       ]
     ],
@@ -2806,37 +2806,63 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.7')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.456')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.78')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.456789')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.789')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.456789', 'EET')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56 +0100')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56.456 EET')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56.456789 Europe/Minsk')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.7890', 'EET')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 00:00:00 +0100', 'Y-m-d H:i:s O')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56.7')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 00:00:00 EET', 'Y-m-d H:i:s T')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56.78 +0100')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 00:00:00 Europe/Minsk', 'Y-m-d H:i:s e')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56.789 EET')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56.7890 Europe/Minsk')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 00:00:00 +0100', 'Y-m-d H:i:s O')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.7', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 00:00:00 EET', 'Y-m-d H:i:s T')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.78 +0100')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 00:00:00 Europe/Minsk', 'Y-m-d H:i:s e')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.789 EET')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.7890 Europe/Minsk')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 12:34:56.7', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 12:34:56.78 +0100', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 12:34:56.789 EET', 'Y-m-d H:i:s.u T')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 12:34:56.7890 Europe/Minsk', 'Y-m-d H:i:s.u e')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 12:34:56.7', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 12:34:56.78 +0100', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 12:34:56.789 EET', 'Y-m-d H:i:s.u T')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 12:34:56.7890 Europe/Minsk', 'Y-m-d H:i:s.u e')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.7', 'Y-m-d H:i:s.u', 'UTC')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.78 +0100', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.789 EET', 'Y-m-d H:i:s.u T')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.7890 Europe/Minsk', 'Y-m-d H:i:s.u e')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
     echo "\n";
 
@@ -2922,22 +2948,35 @@ TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" }
 TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+02:00" } | TRUE
 
 
-TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.000000+00:00" }
-TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.456000+00:00" }
-TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.456789+00:00" }
-TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.456789+02:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.700000+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.780000+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.789000+00:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.789000+02:00" }
 
-TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.000000+01:00" }
-TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.456000+02:00" }
-TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.456789+03:00" }
+FALSE | NULL
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.780000+01:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.789000+02:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.789000+03:00" }
 
-TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+01:00" }
-TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+02:00" }
-TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.700000+00:00" }
+FALSE | NULL
+FALSE | NULL
+FALSE | NULL
 
-TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+01:00" }
-TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+02:00" }
-TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+03:00" }
+FALSE | NULL
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.780000+01:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.789000+02:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.789000+03:00" }
+
+FALSE | NULL
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.780000+01:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.789000+02:00" }
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.789000+03:00" }
+
+TRUE | { object(serializable) # DateTime # "1970-01-01T12:34:56.700000+00:00" }
+FALSE | NULL
+FALSE | NULL
+FALSE | NULL
 
 TRUE | { object(serializable) # DateTime # "1970-01-01T00:00:00.000000+00:00" }
 TRUE | { object(serializable) # DateTime # "1970-01-01T00:02:03.000000+00:00" }
@@ -3012,22 +3051,35 @@ TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+00:00" }
 TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+02:00" } | TRUE
 
 
-TRUE | { object # DateTime # "1970-01-01T12:34:56.000000+00:00" }
-TRUE | { object # DateTime # "1970-01-01T12:34:56.456000+00:00" }
-TRUE | { object # DateTime # "1970-01-01T12:34:56.456789+00:00" }
-TRUE | { object # DateTime # "1970-01-01T12:34:56.456789+02:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.700000+00:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.780000+00:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.789000+00:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.789000+02:00" }
 
-TRUE | { object # DateTime # "1970-01-01T12:34:56.000000+01:00" }
-TRUE | { object # DateTime # "1970-01-01T12:34:56.456000+02:00" }
-TRUE | { object # DateTime # "1970-01-01T12:34:56.456789+03:00" }
+FALSE | NULL
+TRUE | { object # DateTime # "1970-01-01T12:34:56.780000+01:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.789000+02:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.789000+03:00" }
 
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+01:00" }
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+02:00" }
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+03:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.700000+00:00" }
+FALSE | NULL
+FALSE | NULL
+FALSE | NULL
 
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+01:00" }
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+02:00" }
-TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+03:00" }
+FALSE | NULL
+TRUE | { object # DateTime # "1970-01-01T12:34:56.780000+01:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.789000+02:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.789000+03:00" }
+
+FALSE | NULL
+TRUE | { object # DateTime # "1970-01-01T12:34:56.780000+01:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.789000+02:00" }
+TRUE | { object # DateTime # "1970-01-01T12:34:56.789000+03:00" }
+
+TRUE | { object # DateTime # "1970-01-01T12:34:56.700000+00:00" }
+FALSE | NULL
+FALSE | NULL
+FALSE | NULL
 
 TRUE | { object # DateTime # "1970-01-01T00:00:00.000000+00:00" }
 TRUE | { object # DateTime # "1970-01-01T00:02:03.000000+00:00" }
