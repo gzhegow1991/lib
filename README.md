@@ -463,7 +463,7 @@ $fn = function () use ($ffn) {
     ], 4);
 };
 $test = $ffn->test($fn);
-$test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
+$test->expectStdoutIf(PHP_VERSION_ID >= 80200, '
 "[ Ret ]"
 
 { object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
@@ -487,6 +487,65 @@ $test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
     "{ object(serializable) # DateTimeZone }",
     "{ object(serializable) # DateTimeZone }",
     "{ object(serializable) # DateTimeZone }"
+  ]
+]
+###
+
+{ object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
+###
+[
+  [
+    FALSE,
+    FALSE
+  ],
+  [
+    NULL,
+    NULL
+  ],
+  [
+    [
+      [
+        "The `timezoneOrNameOrAbbr` should be valid timezone",
+        "[ INVALID_TIMEZONE ]"
+      ]
+    ],
+    [
+      [
+        1 => "{ object # stdClass }"
+      ]
+    ]
+  ],
+  [
+    NAN,
+    NAN
+  ]
+]
+###
+');
+$test->expectStdoutIf(((PHP_VERSION_ID >= 80000) && (PHP_VERSION_ID < 80200)), '
+"[ Ret ]"
+
+{ object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
+###
+[
+  [
+    TRUE,
+    TRUE
+  ],
+  [
+    "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }"
+  ],
+  [
+    [],
+    []
+  ],
+  [
+    "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }",
+    "{ object # DateTimeZone }"
   ]
 ]
 ###

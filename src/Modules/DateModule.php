@@ -1312,8 +1312,6 @@ class DateModule
      */
     public function type_date_no_tz($datestring, $timezoneSet = null)
     {
-        $timezoneSet = $timezoneSet ?? 'UTC';
-
         $theType = Lib::type();
 
         $dateTime = null;
@@ -1378,8 +1376,6 @@ class DateModule
      */
     public function type_adate_no_tz($datestring, $timezoneSet = null)
     {
-        $timezoneSet = $timezoneSet ?? 'UTC';
-
         $theType = Lib::type();
 
         $dateTime = null;
@@ -1444,8 +1440,6 @@ class DateModule
      */
     public function type_idate_no_tz($datestring, $timezoneSet = null)
     {
-        $timezoneSet = $timezoneSet ?? 'UTC';
-
         $theType = Lib::type();
 
         $dateTimeImmutable = null;
@@ -2576,9 +2570,9 @@ class DateModule
         $formatted[] = $dateTime->getOffset();
         $formatted[] = $this->timezone_type($timezone);
         $formatted['date_utc'] = $this->format_sql($dateTime);
-        $formatted['timezone'] = $timezone->getName();
-        $formatted['diff'] = $dateTime->format('P');
-        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_name'] = $timezone->getName();
+        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+        $formatted['timezone_offset_string'] = $dateTime->format('P');
         $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
@@ -2595,9 +2589,9 @@ class DateModule
         $formatted[] = $dateTime->getOffset();
         $formatted[] = $this->timezone_type($timezone);
         $formatted['date_utc'] = $this->format_sql_sec($dateTime);
-        $formatted['timezone'] = $timezone->getName();
-        $formatted['diff'] = $dateTime->format('P');
-        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_name'] = $timezone->getName();
+        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+        $formatted['timezone_offset_string'] = $dateTime->format('P');
         $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
@@ -2614,9 +2608,9 @@ class DateModule
         $formatted[] = $dateTime->getOffset();
         $formatted[] = $this->timezone_type($timezone);
         $formatted['date_utc'] = $this->format_sql_msec($dateTime);
-        $formatted['timezone'] = $timezone->getName();
-        $formatted['diff'] = $dateTime->format('P');
-        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_name'] = $timezone->getName();
+        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+        $formatted['timezone_offset_string'] = $dateTime->format('P');
         $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
@@ -2633,9 +2627,9 @@ class DateModule
         $formatted[] = $dateTime->getOffset();
         $formatted[] = $this->timezone_type($timezone);
         $formatted['date_utc'] = $this->format_sql_usec($dateTime);
-        $formatted['timezone'] = $timezone->getName();
-        $formatted['diff'] = $dateTime->format('P');
-        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_name'] = $timezone->getName();
+        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+        $formatted['timezone_offset_string'] = $dateTime->format('P');
         $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
@@ -2741,9 +2735,9 @@ class DateModule
         $formatted[] = $dateTime->getOffset();
         $formatted[] = $this->timezone_type($timezone);
         $formatted['date_utc'] = $this->format_javascript($clone);
-        $formatted['timezone'] = $timezone->getName();
-        $formatted['diff'] = $dateTime->format('P');
-        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_name'] = $timezone->getName();
+        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+        $formatted['timezone_offset_string'] = $dateTime->format('P');
         $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
@@ -2762,9 +2756,9 @@ class DateModule
         $formatted[] = $dateTime->getOffset();
         $formatted[] = $this->timezone_type($timezone);
         $formatted['date_utc'] = $this->format_javascript_sec($clone);
-        $formatted['timezone'] = $timezone->getName();
-        $formatted['diff'] = $dateTime->format('P');
-        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_name'] = $timezone->getName();
+        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+        $formatted['timezone_offset_string'] = $dateTime->format('P');
         $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
@@ -2804,9 +2798,9 @@ class DateModule
         $formatted[] = $dateTime->getOffset();
         $formatted[] = $this->timezone_type($timezone);
         $formatted['date_utc'] = $this->format_javascript_usec($clone);
-        $formatted['timezone'] = $timezone->getName();
-        $formatted['diff'] = $dateTime->format('P');
-        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_name'] = $timezone->getName();
+        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+        $formatted['timezone_offset_string'] = $dateTime->format('P');
         $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
