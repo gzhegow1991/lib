@@ -2777,9 +2777,9 @@ class DateModule
         $formatted[] = $dateTime->getOffset();
         $formatted[] = $this->timezone_type($timezone);
         $formatted['date_utc'] = $this->format_javascript_msec($clone);
-        $formatted['timezone'] = $timezone->getName();
-        $formatted['diff'] = $dateTime->format('P');
-        $formatted['offset'] = $dateTime->getOffset();
+        $formatted['timezone_name'] = $timezone->getName();
+        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+        $formatted['timezone_offset_string'] = $dateTime->format('P');
         $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         return $formatted;
