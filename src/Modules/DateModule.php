@@ -2561,6 +2561,8 @@ class DateModule
 
     public function array_sql(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
+        $keys = $keys ?? false;
+
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
@@ -2615,6 +2617,8 @@ class DateModule
 
     public function array_sql_msec(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
+        $keys = $keys ?? false;
+
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
@@ -2641,6 +2645,8 @@ class DateModule
 
     public function array_sql_usec(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
+        $keys = $keys ?? false;
+
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
@@ -2754,6 +2760,8 @@ class DateModule
 
     public function array_javascript(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
+        $keys = $keys ?? false;
+
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
@@ -2780,6 +2788,8 @@ class DateModule
 
     public function array_javascript_sec(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
+        $keys = $keys ?? false;
+
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
@@ -2806,6 +2816,8 @@ class DateModule
 
     public function array_javascript_msec(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
+        $keys = $keys ?? false;
+
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
@@ -2832,6 +2844,8 @@ class DateModule
 
     public function array_javascript_usec(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
+        $keys = $keys ?? false;
+
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
