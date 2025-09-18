@@ -2559,78 +2559,108 @@ class DateModule
     }
 
 
-    public function array_sql(\DateTimeInterface $dateTime) : array
+    public function array_sql(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
-        $formatted[] = $this->format_sql($dateTime);
-        $formatted[] = $timezone->getName();
-        $formatted[] = $dateTime->format('P');
-        $formatted[] = $dateTime->getOffset();
-        $formatted[] = $this->timezone_type($timezone);
-        $formatted['date_utc'] = $this->format_sql($dateTime);
-        $formatted['timezone_name'] = $timezone->getName();
-        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
-        $formatted['timezone_offset_string'] = $dateTime->format('P');
-        $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        if ( $keys ) {
+            $formatted['date'] = $this->format_sql_non_utc($dateTime);
+            $formatted['date_utc'] = $this->format_sql($dateTime);
+            $formatted['timezone_name'] = $timezone->getName();
+            $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+            $formatted['timezone_offset_string'] = $dateTime->format('P');
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        } else {
+            $formatted[] = $this->format_sql_non_utc($dateTime);
+            $formatted[] = $this->format_sql($dateTime);
+            $formatted[] = $timezone->getName();
+            $formatted[] = $dateTime->format('P');
+            $formatted[] = $dateTime->getOffset();
+            $formatted[] = $this->timezone_type($timezone);
+        }
 
         return $formatted;
     }
 
-    public function array_sql_sec(\DateTimeInterface $dateTime) : array
+    public function array_sql_sec(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
+        $keys = $keys ?? false;
+
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
-        $formatted[] = $this->format_sql_sec($dateTime);
-        $formatted[] = $timezone->getName();
-        $formatted[] = $dateTime->format('P');
-        $formatted[] = $dateTime->getOffset();
-        $formatted[] = $this->timezone_type($timezone);
-        $formatted['date_utc'] = $this->format_sql_sec($dateTime);
-        $formatted['timezone_name'] = $timezone->getName();
-        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
-        $formatted['timezone_offset_string'] = $dateTime->format('P');
-        $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        if ( $keys ) {
+            $formatted['date'] = $this->format_sql_sec_non_utc($dateTime);
+            $formatted['date_utc'] = $this->format_sql_sec($dateTime);
+            $formatted['timezone_name'] = $timezone->getName();
+            $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+            $formatted['timezone_offset_string'] = $dateTime->format('P');
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        } else {
+            $formatted[] = $this->format_sql_sec_non_utc($dateTime);
+            $formatted[] = $this->format_sql_sec($dateTime);
+            $formatted[] = $timezone->getName();
+            $formatted[] = $dateTime->format('P');
+            $formatted[] = $dateTime->getOffset();
+            $formatted[] = $this->timezone_type($timezone);
+        }
 
         return $formatted;
     }
 
-    public function array_sql_msec(\DateTimeInterface $dateTime) : array
+    public function array_sql_msec(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
-        $formatted[] = $this->format_sql_msec($dateTime);
-        $formatted[] = $timezone->getName();
-        $formatted[] = $dateTime->format('P');
-        $formatted[] = $dateTime->getOffset();
-        $formatted[] = $this->timezone_type($timezone);
-        $formatted['date_utc'] = $this->format_sql_msec($dateTime);
-        $formatted['timezone_name'] = $timezone->getName();
-        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
-        $formatted['timezone_offset_string'] = $dateTime->format('P');
-        $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        if ( $keys ) {
+            $formatted['date'] = $this->format_sql_msec_non_utc($dateTime);
+            $formatted['date_utc'] = $this->format_sql_msec($dateTime);
+            $formatted['timezone_name'] = $timezone->getName();
+            $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+            $formatted['timezone_offset_string'] = $dateTime->format('P');
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        } else {
+            $formatted[] = $this->format_sql_msec_non_utc($dateTime);
+            $formatted[] = $this->format_sql_msec($dateTime);
+            $formatted[] = $timezone->getName();
+            $formatted[] = $dateTime->format('P');
+            $formatted[] = $dateTime->getOffset();
+            $formatted[] = $this->timezone_type($timezone);
+        }
 
         return $formatted;
     }
 
-    public function array_sql_usec(\DateTimeInterface $dateTime) : array
+    public function array_sql_usec(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
-        $formatted[] = $this->format_sql_usec($dateTime);
-        $formatted[] = $timezone->getName();
-        $formatted[] = $dateTime->format('P');
-        $formatted[] = $dateTime->getOffset();
-        $formatted[] = $this->timezone_type($timezone);
-        $formatted['date_utc'] = $this->format_sql_usec($dateTime);
-        $formatted['timezone_name'] = $timezone->getName();
-        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
-        $formatted['timezone_offset_string'] = $dateTime->format('P');
-        $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        if ( $keys ) {
+            $formatted['date'] = $this->format_sql_usec_non_utc($dateTime);
+            $formatted['date_utc'] = $this->format_sql_usec($dateTime);
+            $formatted['timezone_name'] = $timezone->getName();
+            $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+            $formatted['timezone_offset_string'] = $dateTime->format('P');
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        } else {
+            $formatted[] = $this->format_sql_usec_non_utc($dateTime);
+            $formatted[] = $this->format_sql_usec($dateTime);
+            $formatted[] = $timezone->getName();
+            $formatted[] = $dateTime->format('P');
+            $formatted[] = $dateTime->getOffset();
+            $formatted[] = $this->timezone_type($timezone);
+        }
 
         return $formatted;
     }
@@ -2722,86 +2752,106 @@ class DateModule
     }
 
 
-    public function array_javascript(\DateTimeInterface $dateTime) : array
+    public function array_javascript(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
-        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
-
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
-        $formatted[] = $this->format_javascript($clone);
-        $formatted[] = $timezone->getName();
-        $formatted[] = $dateTime->format('P');
-        $formatted[] = $dateTime->getOffset();
-        $formatted[] = $this->timezone_type($timezone);
-        $formatted['date_utc'] = $this->format_javascript($clone);
-        $formatted['timezone_name'] = $timezone->getName();
-        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
-        $formatted['timezone_offset_string'] = $dateTime->format('P');
-        $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        if ( $keys ) {
+            $formatted['date'] = $this->format_javascript($dateTime);
+            $formatted['date_utc'] = $this->format_javascript_utc($dateTime);
+            $formatted['timezone_name'] = $timezone->getName();
+            $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+            $formatted['timezone_offset_string'] = $dateTime->format('P');
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        } else {
+            $formatted[] = $this->format_javascript($dateTime);
+            $formatted[] = $this->format_javascript_utc($dateTime);
+            $formatted[] = $timezone->getName();
+            $formatted[] = $dateTime->format('P');
+            $formatted[] = $dateTime->getOffset();
+            $formatted[] = $this->timezone_type($timezone);
+        }
 
         return $formatted;
     }
 
-    public function array_javascript_sec(\DateTimeInterface $dateTime) : array
+    public function array_javascript_sec(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
-        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
-
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
-        $formatted[] = $this->format_javascript_sec($clone);
-        $formatted[] = $timezone->getName();
-        $formatted[] = $dateTime->format('P');
-        $formatted[] = $dateTime->getOffset();
-        $formatted[] = $this->timezone_type($timezone);
-        $formatted['date_utc'] = $this->format_javascript_sec($clone);
-        $formatted['timezone_name'] = $timezone->getName();
-        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
-        $formatted['timezone_offset_string'] = $dateTime->format('P');
-        $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        if ( $keys ) {
+            $formatted['date'] = $this->format_javascript_sec($dateTime);
+            $formatted['date_utc'] = $this->format_javascript_sec_utc($dateTime);
+            $formatted['timezone_name'] = $timezone->getName();
+            $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+            $formatted['timezone_offset_string'] = $dateTime->format('P');
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        } else {
+            $formatted[] = $this->format_javascript_sec($dateTime);
+            $formatted[] = $this->format_javascript_sec_utc($dateTime);
+            $formatted[] = $timezone->getName();
+            $formatted[] = $dateTime->format('P');
+            $formatted[] = $dateTime->getOffset();
+            $formatted[] = $this->timezone_type($timezone);
+        }
 
         return $formatted;
     }
 
-    public function array_javascript_msec(\DateTimeInterface $dateTime) : array
+    public function array_javascript_msec(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
-        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
-
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
-        $formatted[] = $this->format_javascript_msec($clone);
-        $formatted[] = $timezone->getName();
-        $formatted[] = $dateTime->format('P');
-        $formatted[] = $dateTime->getOffset();
-        $formatted[] = $this->timezone_type($timezone);
-        $formatted['date_utc'] = $this->format_javascript_msec($clone);
-        $formatted['timezone_name'] = $timezone->getName();
-        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
-        $formatted['timezone_offset_string'] = $dateTime->format('P');
-        $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        if ( $keys ) {
+            $formatted['date'] = $this->format_javascript_msec($dateTime);
+            $formatted['date_utc'] = $this->format_javascript_msec_utc($dateTime);
+            $formatted['timezone_name'] = $timezone->getName();
+            $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+            $formatted['timezone_offset_string'] = $dateTime->format('P');
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        } else {
+            $formatted[] = $this->format_javascript_msec($dateTime);
+            $formatted[] = $this->format_javascript_msec_utc($dateTime);
+            $formatted[] = $timezone->getName();
+            $formatted[] = $dateTime->format('P');
+            $formatted[] = $dateTime->getOffset();
+            $formatted[] = $this->timezone_type($timezone);
+        }
 
         return $formatted;
     }
 
-    public function array_javascript_usec(\DateTimeInterface $dateTime) : array
+    public function array_javascript_usec(\DateTimeInterface $dateTime, ?bool $keys = null) : array
     {
-        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
-
         $timezone = $dateTime->getTimezone();
 
         $formatted = [];
-        $formatted[] = $this->format_javascript_usec($clone);
-        $formatted[] = $timezone->getName();
-        $formatted[] = $dateTime->format('P');
-        $formatted[] = $dateTime->getOffset();
-        $formatted[] = $this->timezone_type($timezone);
-        $formatted['date_utc'] = $this->format_javascript_usec($clone);
-        $formatted['timezone_name'] = $timezone->getName();
-        $formatted['timezone_offset_integer'] = $dateTime->getOffset();
-        $formatted['timezone_offset_string'] = $dateTime->format('P');
-        $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        if ( $keys ) {
+            $formatted['date'] = $this->format_javascript_usec($dateTime);
+            $formatted['date_utc'] = $this->format_javascript_usec_utc($dateTime);
+            $formatted['timezone_name'] = $timezone->getName();
+            $formatted['timezone_offset_integer'] = $dateTime->getOffset();
+            $formatted['timezone_offset_string'] = $dateTime->format('P');
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
+
+        } else {
+            $formatted[] = $this->format_javascript_usec($dateTime);
+            $formatted[] = $this->format_javascript_usec_utc($dateTime);
+            $formatted[] = $timezone->getName();
+            $formatted[] = $dateTime->format('P');
+            $formatted[] = $dateTime->getOffset();
+            $formatted[] = $this->timezone_type($timezone);
+        }
 
         return $formatted;
     }
