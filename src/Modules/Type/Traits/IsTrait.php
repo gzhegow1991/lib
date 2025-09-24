@@ -1165,57 +1165,57 @@ trait IsTrait
 	}
 
 
-	public function is_date_no_tz($datestring, $timezoneSet = null): bool
+	public function is_date_no_tz($datestring, $timezoneFallback = null): bool
 	{
-		return Lib::date()->type_date_no_tz($datestring, $timezoneSet)->isOk();
+		return Lib::date()->type_date_no_tz($datestring, $timezoneFallback)->isOk();
 	}
 
 
-	public function is_adate_no_tz($datestring, $timezoneSet = null): bool
+	public function is_adate_no_tz($datestring, $timezoneFallback = null): bool
 	{
-		return Lib::date()->type_adate_no_tz($datestring, $timezoneSet)->isOk();
+		return Lib::date()->type_adate_no_tz($datestring, $timezoneFallback)->isOk();
 	}
 
 
-	public function is_idate_no_tz($datestring, $timezoneSet = null): bool
+	public function is_idate_no_tz($datestring, $timezoneFallback = null): bool
 	{
-		return Lib::date()->type_idate_no_tz($datestring, $timezoneSet)->isOk();
+		return Lib::date()->type_idate_no_tz($datestring, $timezoneFallback)->isOk();
 	}
 
 
-	public function is_date_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null): bool
+	public function is_date_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null): bool
 	{
-		return Lib::date()->type_date_no_tz_formatted($dateFormatted, $formats, $timezoneSet)->isOk();
+		return Lib::date()->type_date_no_tz_formatted($dateFormatted, $formats, $timezoneFallback)->isOk();
 	}
 
 
-	public function is_adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null): bool
+	public function is_adate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null): bool
 	{
-		return Lib::date()->type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet)->isOk();
+		return Lib::date()->type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback)->isOk();
 	}
 
 
-	public function is_idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null): bool
+	public function is_idate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null): bool
 	{
-		return Lib::date()->type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet)->isOk();
+		return Lib::date()->type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback)->isOk();
 	}
 
 
-	public function is_date_microtime($microtime, $timezoneFallback = null): bool
+	public function is_date_microtime($microtime, $timezoneSet = null): bool
 	{
-		return Lib::date()->type_date_microtime($microtime, $timezoneFallback)->isOk();
+		return Lib::date()->type_date_microtime($microtime, $timezoneSet)->isOk();
 	}
 
 
-	public function is_adate_microtime($microtime, $timezoneFallback = null): bool
+	public function is_adate_microtime($microtime, $timezoneSet = null): bool
 	{
-		return Lib::date()->type_adate_microtime($microtime, $timezoneFallback)->isOk();
+		return Lib::date()->type_adate_microtime($microtime, $timezoneSet)->isOk();
 	}
 
 
-	public function is_idate_microtime($microtime, $timezoneFallback = null): bool
+	public function is_idate_microtime($microtime, $timezoneSet = null): bool
 	{
-		return Lib::date()->type_idate_microtime($microtime, $timezoneFallback)->isOk();
+		return Lib::date()->type_idate_microtime($microtime, $timezoneSet)->isOk();
 	}
 
 

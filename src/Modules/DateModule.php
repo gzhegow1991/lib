@@ -2301,76 +2301,57 @@ class DateModule
     }
 
 
-    public function datefloor_year(\DateTimeInterface $date) : \DateTimeInterface
+    public function startof_year(\DateTimeInterface $date) : \DateTimeInterface
     {
         $clone = $this->cloneToDate($date);
 
         $clone = $clone
-            ->setDate((int) $clone->format('Y'), 0, 0)
+            ->modify('first day of january')
             ->setTime(0, 0, 0, 0)
         ;
 
         return $clone;
     }
 
-    public function datefloor_month(\DateTimeInterface $date) : \DateTimeInterface
+    public function startof_month(\DateTimeInterface $date) : \DateTimeInterface
     {
         $clone = $this->cloneToDate($date);
 
         $clone = $clone
-            ->setDate(
-                (int) $clone->format('Y'),
-                (int) $clone->format('m'),
-                0
-            )
+            ->modify('first day of this month')
             ->setTime(0, 0, 0, 0)
         ;
 
         return $clone;
     }
 
-    public function datefloor_day(\DateTimeInterface $date) : \DateTimeInterface
+    public function startof_day(\DateTimeInterface $date) : \DateTimeInterface
     {
         $clone = $this->cloneToDate($date);
 
         $clone = $clone
-            ->setDate(
-                (int) $clone->format('Y'),
-                (int) $clone->format('m'),
-                (int) $clone->format('d'),
-            )
             ->setTime(0, 0, 0, 0)
         ;
 
         return $clone;
     }
 
-    public function datefloor_hour(\DateTimeInterface $date) : \DateTimeInterface
+    public function startof_hour(\DateTimeInterface $date) : \DateTimeInterface
     {
         $clone = $this->cloneToDate($date);
 
         $clone = $clone
-            ->setDate(
-                (int) $clone->format('Y'),
-                (int) $clone->format('m'),
-                (int) $clone->format('d'),
-            )
             ->setTime((int) $clone->format('H'), 0, 0, 0)
         ;
 
         return $clone;
     }
 
-    public function datefloor_minute(\DateTimeInterface $date) : \DateTimeInterface
+    public function startof_minute(\DateTimeInterface $date) : \DateTimeInterface
     {
         $clone = $this->cloneToDate($date);
 
         $clone = $clone
-            ->setDate(
-                (int) $clone->format('Y'),
-                (int) $clone->format('m'),
-                (int) $clone->format('d'),
-            )
             ->setTime(
                 (int) $clone->format('H'),
                 (int) $clone->format('i'),
@@ -2382,21 +2363,100 @@ class DateModule
         return $clone;
     }
 
-    public function datefloor_second(\DateTimeInterface $date) : \DateTimeInterface
+    public function startof_second(\DateTimeInterface $date) : \DateTimeInterface
     {
         $clone = $this->cloneToDate($date);
 
         $clone = $clone
-            ->setDate(
-                (int) $clone->format('Y'),
-                (int) $clone->format('m'),
-                (int) $clone->format('d'),
-            )
             ->setTime(
                 (int) $clone->format('H'),
                 (int) $clone->format('i'),
                 (int) $clone->format('s'),
                 0
+            )
+        ;
+
+        return $clone;
+    }
+
+
+    public function endof_year(\DateTimeInterface $date) : \DateTimeInterface
+    {
+        $clone = $this->cloneToDate($date);
+
+        $clone = $clone
+            ->modify('last day of december')
+            ->setTime(23, 59, 59, 999999)
+        ;
+
+        return $clone;
+    }
+
+    public function endof_month(\DateTimeInterface $date) : \DateTimeInterface
+    {
+        $clone = $this->cloneToDate($date);
+
+        $clone = $clone
+            ->modify('last day of this month')
+            ->setTime(23, 59, 59, 999999)
+        ;
+
+        return $clone;
+    }
+
+    public function endof_day(\DateTimeInterface $date) : \DateTimeInterface
+    {
+        $clone = $this->cloneToDate($date);
+
+        $clone = $clone
+            ->setTime(23, 59, 59, 999999)
+        ;
+
+        return $clone;
+    }
+
+    public function endof_hour(\DateTimeInterface $date) : \DateTimeInterface
+    {
+        $clone = $this->cloneToDate($date);
+
+        $clone = $clone
+            ->setTime(
+                (int) $clone->format('H'),
+                59,
+                59,
+                999999
+            )
+        ;
+
+        return $clone;
+    }
+
+    public function endof_minute(\DateTimeInterface $date) : \DateTimeInterface
+    {
+        $clone = $this->cloneToDate($date);
+
+        $clone = $clone
+            ->setTime(
+                (int) $clone->format('H'),
+                (int) $clone->format('i'),
+                59,
+                999999
+            )
+        ;
+
+        return $clone;
+    }
+
+    public function endof_second(\DateTimeInterface $date) : \DateTimeInterface
+    {
+        $clone = $this->cloneToDate($date);
+
+        $clone = $clone
+            ->setTime(
+                (int) $clone->format('H'),
+                (int) $clone->format('i'),
+                (int) $clone->format('s'),
+                999999
             )
         ;
 

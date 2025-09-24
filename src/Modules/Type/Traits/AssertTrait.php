@@ -2572,126 +2572,126 @@ trait AssertTrait
 	/**
 	 * @return \DateTimeInterface
 	 */
-	public function assert_date_no_tz($datestring, $timezoneSet = null)
+	public function assert_date_no_tz($datestring, $timezoneFallback = null)
 	{
-		if (Lib::date()->type_date_no_tz($datestring, $timezoneSet)->isOk([ &$ref ])) return $ref;
+		if (Lib::date()->type_date_no_tz($datestring, $timezoneFallback)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `date_no_tz` is failed', [ $datestring, $timezoneSet ] ]);
+		throw new LogicException($t, [ 'Assert `date_no_tz` is failed', [ $datestring, $timezoneFallback ] ]);
 	}
 
 
 	/**
 	 * @return \DateTime
 	 */
-	public function assert_adate_no_tz($datestring, $timezoneSet = null)
+	public function assert_adate_no_tz($datestring, $timezoneFallback = null)
 	{
-		if (Lib::date()->type_adate_no_tz($datestring, $timezoneSet)->isOk([ &$ref ])) return $ref;
+		if (Lib::date()->type_adate_no_tz($datestring, $timezoneFallback)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `adate_no_tz` is failed', [ $datestring, $timezoneSet ] ]);
+		throw new LogicException($t, [ 'Assert `adate_no_tz` is failed', [ $datestring, $timezoneFallback ] ]);
 	}
 
 
 	/**
 	 * @return \DateTimeImmutable
 	 */
-	public function assert_idate_no_tz($datestring, $timezoneSet = null)
+	public function assert_idate_no_tz($datestring, $timezoneFallback = null)
 	{
-		if (Lib::date()->type_idate_no_tz($datestring, $timezoneSet)->isOk([ &$ref ])) return $ref;
+		if (Lib::date()->type_idate_no_tz($datestring, $timezoneFallback)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `idate_no_tz` is failed', [ $datestring, $timezoneSet ] ]);
+		throw new LogicException($t, [ 'Assert `idate_no_tz` is failed', [ $datestring, $timezoneFallback ] ]);
 	}
 
 
 	/**
 	 * @return \DateTimeInterface
 	 */
-	public function assert_date_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+	public function assert_date_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
 	{
-		if (Lib::date()->type_date_no_tz_formatted($dateFormatted, $formats, $timezoneSet)->isOk([ &$ref ])) return $ref;
+		if (Lib::date()->type_date_no_tz_formatted($dateFormatted, $formats, $timezoneFallback)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `date_no_tz_formatted` is failed', [ $dateFormatted, $formats, $timezoneSet ] ]);
+		throw new LogicException($t, [ 'Assert `date_no_tz_formatted` is failed', [ $dateFormatted, $formats, $timezoneFallback ] ]);
 	}
 
 
 	/**
 	 * @return \DateTime
 	 */
-	public function assert_adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+	public function assert_adate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
 	{
-		if (Lib::date()->type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet)->isOk([ &$ref ])) return $ref;
+		if (Lib::date()->type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `adate_no_tz_formatted` is failed', [ $dateFormatted, $formats, $timezoneSet ] ]);
+		throw new LogicException($t, [ 'Assert `adate_no_tz_formatted` is failed', [ $dateFormatted, $formats, $timezoneFallback ] ]);
 	}
 
 
 	/**
 	 * @return \DateTimeImmutable
 	 */
-	public function assert_idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+	public function assert_idate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
 	{
-		if (Lib::date()->type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet)->isOk([ &$ref ])) return $ref;
+		if (Lib::date()->type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `idate_no_tz_formatted` is failed', [ $dateFormatted, $formats, $timezoneSet ] ]);
+		throw new LogicException($t, [ 'Assert `idate_no_tz_formatted` is failed', [ $dateFormatted, $formats, $timezoneFallback ] ]);
 	}
 
 
 	/**
 	 * @return \DateTimeInterface
 	 */
-	public function assert_date_microtime($microtime, $timezoneFallback = null)
+	public function assert_date_microtime($microtime, $timezoneSet = null)
 	{
-		if (Lib::date()->type_date_microtime($microtime, $timezoneFallback)->isOk([ &$ref ])) return $ref;
+		if (Lib::date()->type_date_microtime($microtime, $timezoneSet)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `date_microtime` is failed', [ $microtime, $timezoneFallback ] ]);
+		throw new LogicException($t, [ 'Assert `date_microtime` is failed', [ $microtime, $timezoneSet ] ]);
 	}
 
 
 	/**
 	 * @return \DateTime
 	 */
-	public function assert_adate_microtime($microtime, $timezoneFallback = null)
+	public function assert_adate_microtime($microtime, $timezoneSet = null)
 	{
-		if (Lib::date()->type_adate_microtime($microtime, $timezoneFallback)->isOk([ &$ref ])) return $ref;
+		if (Lib::date()->type_adate_microtime($microtime, $timezoneSet)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `adate_microtime` is failed', [ $microtime, $timezoneFallback ] ]);
+		throw new LogicException($t, [ 'Assert `adate_microtime` is failed', [ $microtime, $timezoneSet ] ]);
 	}
 
 
 	/**
 	 * @return \DateTimeImmutable
 	 */
-	public function assert_idate_microtime($microtime, $timezoneFallback = null)
+	public function assert_idate_microtime($microtime, $timezoneSet = null)
 	{
-		if (Lib::date()->type_idate_microtime($microtime, $timezoneFallback)->isOk([ &$ref ])) return $ref;
+		if (Lib::date()->type_idate_microtime($microtime, $timezoneSet)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `idate_microtime` is failed', [ $microtime, $timezoneFallback ] ]);
+		throw new LogicException($t, [ 'Assert `idate_microtime` is failed', [ $microtime, $timezoneSet ] ]);
 	}
 
 

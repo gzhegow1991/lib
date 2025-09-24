@@ -1527,75 +1527,75 @@ trait TypeTrait
     /**
      * @return Ret<\DateTimeInterface>
      */
-    public function date_no_tz($datestring, $timezoneSet = null)
+    public function date_no_tz($datestring, $timezoneFallback = null)
     {
-        return Lib::date()->type_date_no_tz($datestring, $timezoneSet);
+        return Lib::date()->type_date_no_tz($datestring, $timezoneFallback);
     }
 
     /**
      * @return Ret<\DateTime>
      */
-    public function adate_no_tz($datestring, $timezoneSet = null)
+    public function adate_no_tz($datestring, $timezoneFallback = null)
     {
-        return Lib::date()->type_adate_no_tz($datestring, $timezoneSet);
+        return Lib::date()->type_adate_no_tz($datestring, $timezoneFallback);
     }
 
     /**
      * @return Ret<\DateTimeImmutable>
      */
-    public function idate_no_tz($datestring, $timezoneSet = null)
+    public function idate_no_tz($datestring, $timezoneFallback = null)
     {
-        return Lib::date()->type_idate_no_tz($datestring, $timezoneSet);
+        return Lib::date()->type_idate_no_tz($datestring, $timezoneFallback);
     }
 
 
     /**
      * @return Ret<\DateTimeInterface>
      */
-    public function date_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+    public function date_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
     {
-        return Lib::date()->type_date_no_tz_formatted($dateFormatted, $formats, $timezoneSet);
+        return Lib::date()->type_date_no_tz_formatted($dateFormatted, $formats, $timezoneFallback);
     }
 
     /**
      * @return Ret<\DateTime>
      */
-    public function adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+    public function adate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
     {
-        return Lib::date()->type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet);
+        return Lib::date()->type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback);
     }
 
     /**
      * @return Ret<\DateTimeImmutable>
      */
-    public function idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+    public function idate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
     {
-        return Lib::date()->type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet);
+        return Lib::date()->type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback);
     }
 
 
     /**
      * @return Ret<\DateTimeInterface>
      */
-    public function date_microtime($microtime, $timezoneFallback = null)
+    public function date_microtime($microtime, $timezoneSet = null)
     {
-        return Lib::date()->type_date_microtime($microtime, $timezoneFallback);
+        return Lib::date()->type_date_microtime($microtime, $timezoneSet);
     }
 
     /**
      * @return Ret<\DateTime>
      */
-    public function adate_microtime($microtime, $timezoneFallback = null)
+    public function adate_microtime($microtime, $timezoneSet = null)
     {
-        return Lib::date()->type_adate_microtime($microtime, $timezoneFallback);
+        return Lib::date()->type_adate_microtime($microtime, $timezoneSet);
     }
 
     /**
      * @return Ret<\DateTimeImmutable>
      */
-    public function idate_microtime($microtime, $timezoneFallback = null)
+    public function idate_microtime($microtime, $timezoneSet = null)
     {
-        return Lib::date()->type_idate_microtime($microtime, $timezoneFallback);
+        return Lib::date()->type_idate_microtime($microtime, $timezoneSet);
     }
 
 
