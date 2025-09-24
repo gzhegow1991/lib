@@ -2906,11 +2906,11 @@ $fn = function () use ($ffn) {
 
     $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.7', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.78 +0100')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.78 +0100', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.789 EET')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.789 EET', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.7890 Europe/Minsk')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.7890 Europe/Minsk', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
     echo "\n";
 
@@ -2936,11 +2936,11 @@ $fn = function () use ($ffn) {
 
     $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.7', 'Y-m-d H:i:s.u', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.78 +0100', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.78 +0100', 'Y-m-d H:i:s.u O', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.789 EET', 'Y-m-d H:i:s.u T')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.789 EET', 'Y-m-d H:i:s.u T', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.7890 Europe/Minsk', 'Y-m-d H:i:s.u e')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.7890 Europe/Minsk', 'Y-m-d H:i:s.u e', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
     echo "\n";
 

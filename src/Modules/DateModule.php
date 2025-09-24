@@ -1310,8 +1310,10 @@ class DateModule
     /**
      * @return Ret<\DateTimeInterface>
      */
-    public function type_date_no_tz($datestring, $timezoneSet = null)
+    public function type_date_no_tz($datestring, $timezoneFallback = null)
     {
+        $timezoneFallback = $timezoneFallback ?? $this->the_timezone_utc();
+
         $theType = Lib::type();
 
         $dateTime = null;
@@ -1324,7 +1326,6 @@ class DateModule
         }
 
         $timezoneNil = $this->the_timezone_nil();
-        $timezoneUtc = $this->the_timezone_utc();
 
         try {
             $dateTime = new \DateTime(
@@ -1351,10 +1352,12 @@ class DateModule
             );
         }
 
+        $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+
         try {
             $dateTime = new \DateTime(
                 $datestringString,
-                $timezoneUtc
+                $timezoneFallbackObject
             );
         }
         catch ( \Throwable $e ) {
@@ -1362,20 +1365,16 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        if ( null !== $timezoneSet ) {
-            $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
-
-            $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
-        }
-
         return Ret::val($dateTimeClone);
     }
 
     /**
      * @return Ret<\DateTime>
      */
-    public function type_adate_no_tz($datestring, $timezoneSet = null)
+    public function type_adate_no_tz($datestring, $timezoneFallback = null)
     {
+        $timezoneFallback = $timezoneFallback ?? $this->the_timezone_utc();
+
         $theType = Lib::type();
 
         $dateTime = null;
@@ -1388,7 +1387,6 @@ class DateModule
         }
 
         $timezoneNil = $this->the_timezone_nil();
-        $timezoneUtc = $this->the_timezone_utc();
 
         try {
             $dateTime = new \DateTime(
@@ -1415,10 +1413,12 @@ class DateModule
             );
         }
 
+        $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+
         try {
             $dateTime = new \DateTime(
                 $datestringString,
-                $timezoneUtc
+                $timezoneFallbackObject
             );
         }
         catch ( \Throwable $e ) {
@@ -1426,20 +1426,16 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        if ( null !== $timezoneSet ) {
-            $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
-
-            $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
-        }
-
         return Ret::val($dateTimeClone);
     }
 
     /**
      * @return Ret<\DateTimeImmutable>
      */
-    public function type_idate_no_tz($datestring, $timezoneSet = null)
+    public function type_idate_no_tz($datestring, $timezoneFallback = null)
     {
+        $timezoneFallback = $timezoneFallback ?? $this->the_timezone_utc();
+
         $theType = Lib::type();
 
         $dateTimeImmutable = null;
@@ -1452,7 +1448,6 @@ class DateModule
         }
 
         $timezoneNil = $this->the_timezone_nil();
-        $timezoneUtc = $this->the_timezone_utc();
 
         try {
             $dateTimeImmutable = new \DateTimeImmutable(
@@ -1479,22 +1474,18 @@ class DateModule
             );
         }
 
+        $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+
         try {
             $dateTimeImmutable = new \DateTimeImmutable(
                 $datestringString,
-                $timezoneUtc
+                $timezoneFallbackObject
             );
         }
         catch ( \Throwable $e ) {
         }
 
         $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
-
-        if ( null !== $timezoneSet ) {
-            $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
-
-            $dateTimeImmutableClone = $dateTimeImmutableClone->setTimezone($timezoneSetObject);
-        }
 
         return Ret::val($dateTimeImmutableClone);
     }
@@ -1503,8 +1494,10 @@ class DateModule
     /**
      * @return Ret<\DateTimeInterface>
      */
-    public function type_date_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+    public function type_date_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
     {
+        $timezoneFallback = $timezoneFallback ?? $this->the_timezone_utc();
+
         $thePhp = Lib::php();
         $theType = Lib::type();
 
@@ -1527,7 +1520,6 @@ class DateModule
         }
 
         $timezoneNil = $this->the_timezone_nil();
-        $timezoneUtc = $this->the_timezone_utc();
 
         foreach ( $formatsList as $format ) {
             try {
@@ -1566,12 +1558,14 @@ class DateModule
             );
         }
 
+        $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+
         foreach ( $formatsList as $format ) {
             try {
                 $dateTime = \DateTime::createFromFormat(
                     $format,
                     $dateFormattedString,
-                    $timezoneUtc
+                    $timezoneFallbackObject
                 );
             }
             catch ( \Throwable $e ) {
@@ -1585,20 +1579,16 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        if ( null !== $timezoneSet ) {
-            $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
-
-            $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
-        }
-
         return Ret::val($dateTimeClone);
     }
 
     /**
      * @return Ret<\DateTime>
      */
-    public function type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+    public function type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
     {
+        $timezoneFallback = $timezoneFallback ?? $this->the_timezone_utc();
+
         $thePhp = Lib::php();
         $theType = Lib::type();
 
@@ -1621,7 +1611,6 @@ class DateModule
         }
 
         $timezoneNil = $this->the_timezone_nil();
-        $timezoneUtc = $this->the_timezone_utc();
 
         foreach ( $formatsList as $format ) {
             try {
@@ -1660,12 +1649,14 @@ class DateModule
             );
         }
 
+        $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+
         foreach ( $formatsList as $format ) {
             try {
                 $dateTime = \DateTime::createFromFormat(
                     $format,
                     $dateFormattedString,
-                    $timezoneUtc
+                    $timezoneFallbackObject
                 );
             }
             catch ( \Throwable $e ) {
@@ -1679,20 +1670,16 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        if ( null !== $timezoneSet ) {
-            $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
-
-            $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
-        }
-
         return Ret::val($dateTimeClone);
     }
 
     /**
      * @return Ret<\DateTimeImmutable>
      */
-    public function type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneSet = null)
+    public function type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
     {
+        $timezoneFallback = $timezoneFallback ?? $this->the_timezone_utc();
+
         $thePhp = Lib::php();
         $theType = Lib::type();
 
@@ -1715,7 +1702,6 @@ class DateModule
         }
 
         $timezoneNil = $this->the_timezone_nil();
-        $timezoneUtc = $this->the_timezone_utc();
 
         foreach ( $formatsList as $format ) {
             try {
@@ -1754,12 +1740,14 @@ class DateModule
             );
         }
 
+        $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+
         foreach ( $formatsList as $format ) {
             try {
                 $dateTimeImmutable = \DateTimeImmutable::createFromFormat(
                     $format,
                     $dateFormattedString,
-                    $timezoneUtc
+                    $timezoneFallbackObject
                 );
             }
             catch ( \Throwable $e ) {
@@ -1772,12 +1760,6 @@ class DateModule
         }
 
         $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
-
-        if ( null !== $timezoneSet ) {
-            $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
-
-            $dateTimeImmutableClone = $dateTimeImmutableClone->setTimezone($timezoneSetObject);
-        }
 
         return Ret::val($dateTimeImmutableClone);
     }
