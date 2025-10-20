@@ -7,6 +7,16 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 class EscapeModule
 {
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
+
+
     public function sql_in(
         ?array &$refPdoParams,
         string $sql, array $in, ?string $paramNamePrefix = null

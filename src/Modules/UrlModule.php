@@ -47,6 +47,16 @@ class UrlModule
     protected $linkCurrentParseUrl;
 
 
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
+
+
     /**
      * @param string|true             $url
      * @param string|false|array|null $query

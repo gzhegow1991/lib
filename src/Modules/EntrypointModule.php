@@ -323,6 +323,11 @@ class EntrypointModule
         $this->registerShutdownFunctionMap = Map::new();
     }
 
+    public function __initialize()
+    {
+        return $this;
+    }
+
 
     public function isLocked(?array &$fileLine = null) : bool
     {

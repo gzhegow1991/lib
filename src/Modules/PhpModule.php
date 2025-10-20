@@ -102,13 +102,28 @@ class PhpModule
 
 
     /**
+     * @var PoolingFactoryInterface
+     */
+    protected $poolingFactory;
+
+    /**
      * @var CallableParserInterface
      */
     protected $callableParser;
     /**
-     * @var PoolingFactoryInterface
+     * @var ProcessManagerInterface
      */
-    protected $poolingFactory;
+    protected $processManager;
+
+
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
 
 
     /**
@@ -116,7 +131,9 @@ class PhpModule
      */
     public function newErrorBag()
     {
-        return new ErrorBag();
+        $instance = new ErrorBag();
+
+        return $instance;
     }
 
 
@@ -141,7 +158,9 @@ class PhpModule
 
     public function newCallableParser() : CallableParserInterface
     {
-        return new DefaultCallableParser();
+        $instance = new DefaultCallableParser();
+
+        return $instance;
     }
 
     public function cloneCallableParser() : CallableParserInterface
@@ -156,12 +175,6 @@ class PhpModule
             ?? $this->callableParser
             ?? $this->newCallableParser();
     }
-
-
-    /**
-     * @var ProcessManagerInterface
-     */
-    protected $processManager;
 
 
     public function newProcessManager() : ProcessManagerInterface

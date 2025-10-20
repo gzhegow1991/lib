@@ -14,4 +14,14 @@ class TypeModule
     use FilterTrait;
     use IsTrait;
     use TypeTrait;
+
+
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
 }

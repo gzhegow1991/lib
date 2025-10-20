@@ -107,12 +107,10 @@ class FsModule
      * @var SocketSafe
      */
     protected $fileSafe;
-
     /**
      * @var SocketSafe
      */
     protected $socketSafe;
-
     /**
      * @var StreamSafe
      */
@@ -121,107 +119,140 @@ class FsModule
 
     public function __construct()
     {
+    }
+
+    public function __initialize()
+    {
         if ( ! extension_loaded('fileinfo') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: fileinfo' ]
             );
         }
+
+        return $this;
     }
 
 
     public function newFileSafe() : FileSafeProxy
     {
-        $fileSafe = $this->createFileSafe();
+        $instance = $this->createFileSafe();
 
-        return new FileSafeProxy($fileSafe);
+        $proxy = new FileSafeProxy($instance);
+
+        return $proxy;
     }
 
     public function cloneFileSafe() : FileSafeProxy
     {
-        $fileSafe = clone $this->getFileSafe();
+        $instance = clone $this->getFileSafe();
 
-        return new FileSafeProxy($fileSafe);
+        $proxy = new FileSafeProxy($instance);
+
+        return $proxy;
     }
 
     public function fileSafe() : FileSafeProxy
     {
-        $fileSafe = $this->getFileSafe();
+        $instance = $this->getFileSafe();
 
-        return new FileSafeProxy($fileSafe);
+        $proxy = new FileSafeProxy($instance);
+
+        return $proxy;
     }
 
     protected function createFileSafe() : FileSafe
     {
-        return new FileSafe();
+        $instance = new FileSafe();
+
+        return $instance;
     }
 
     protected function getFileSafe() : FileSafe
     {
-        return $this->fileSafe = $this->fileSafe ?? $this->createFileSafe();
+        return $this->fileSafe = $this->fileSafe
+            ?? $this->createFileSafe();
     }
 
 
     public function newSocketSafe() : SocketSafeProxy
     {
-        $socketSafe = $this->createSocketSafe();
+        $instance = $this->createSocketSafe();
 
-        return new SocketSafeProxy($socketSafe);
+        $proxy = new SocketSafeProxy($instance);
+
+        return $proxy;
     }
 
     public function cloneSocketSafe() : SocketSafeProxy
     {
-        $socketSafe = clone $this->getSocketSafe();
+        $instance = clone $this->getSocketSafe();
 
-        return new SocketSafeProxy($socketSafe);
+        $proxy = new SocketSafeProxy($instance);
+
+        return $proxy;
     }
 
     public function socketSafe() : SocketSafeProxy
     {
-        $socketSafe = $this->getSocketSafe();
+        $instance = $this->getSocketSafe();
 
-        return new SocketSafeProxy($socketSafe);
+        $proxy = new SocketSafeProxy($instance);
+
+        return $proxy;
     }
 
     protected function createSocketSafe() : SocketSafe
     {
-        return new SocketSafe();
+        $instance = new SocketSafe();
+
+        return $instance;
     }
 
     protected function getSocketSafe() : SocketSafe
     {
-        return $this->socketSafe = $this->socketSafe ?? $this->createSocketSafe();
+        return $this->socketSafe = $this->socketSafe
+            ?? $this->createSocketSafe();
     }
 
 
     public function newStreamSafe() : StreamSafeProxy
     {
-        $streamSafe = $this->createStreamSafe();
+        $instance = $this->createStreamSafe();
 
-        return new StreamSafeProxy($streamSafe);
+        $proxy = new StreamSafeProxy($instance);
+
+        return $proxy;
     }
 
     public function cloneStreamSafe() : StreamSafeProxy
     {
-        $streamSafe = clone $this->getStreamSafe();
+        $instance = clone $this->getStreamSafe();
 
-        return new StreamSafeProxy($streamSafe);
+        $proxy = new StreamSafeProxy($instance);
+
+        return $proxy;
     }
 
     public function streamSafe() : StreamSafeProxy
     {
-        $streamSafe = $this->getStreamSafe();
+        $instance = $this->getStreamSafe();
 
-        return new StreamSafeProxy($streamSafe);
+        $proxy = new StreamSafeProxy($instance);
+
+        return $proxy;
     }
 
     protected function createStreamSafe() : StreamSafe
     {
-        return new StreamSafe();
+        $instance = new StreamSafe();
+
+        return $instance;
     }
 
     protected function getStreamSafe() : StreamSafe
     {
-        return $this->streamSafe = $this->streamSafe ?? $this->createStreamSafe();
+        return $this->streamSafe = $this->streamSafe
+            ?? $this->createStreamSafe();
     }
 
 

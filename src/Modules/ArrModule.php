@@ -49,6 +49,16 @@ class ArrModule
     }
 
 
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
+
+
     /**
      * @return Ret<int|string>
      */

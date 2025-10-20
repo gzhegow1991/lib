@@ -24,7 +24,7 @@ class RandomModule
      *
      * @return callable
      */
-    public static function staticUuidFn($fnUuid = null)
+    public static function staticFnUuid($fnUuid = null)
     {
         $last = static::$fnUuid;
 
@@ -52,6 +52,11 @@ class RandomModule
     public function __construct()
     {
         static::$fnUuid = static::$fnUuid ?? [ $this, 'fnUuid' ];
+    }
+
+    public function __initialize()
+    {
+        return $this;
     }
 
 
@@ -102,7 +107,7 @@ class RandomModule
 
     public function uuid() : string
     {
-        $fn = $this->staticUuidFn();
+        $fn = $this->staticFnUuid();
 
         $uuid = call_user_func($fn);
 

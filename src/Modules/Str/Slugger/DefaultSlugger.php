@@ -54,10 +54,10 @@ class DefaultSlugger implements SluggerInterface
 
 
     public function __construct(
-        ?SluggerPresetRegistryInterface $registry
+        ?SluggerPresetRegistryInterface $registry = null
     )
     {
-        $theMb = Lib::mb();
+        Lib::mb(); // initialize
 
         $this->registry = $registry ?? new SluggerPresetRegistry();
 

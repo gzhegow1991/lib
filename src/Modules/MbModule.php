@@ -11,11 +11,17 @@ class MbModule
 {
     public function __construct()
     {
+    }
+
+    public function __initialize()
+    {
         if ( ! extension_loaded('mbstring') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: mbstring' ]
             );
         }
+
+        return $this;
     }
 
 

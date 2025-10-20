@@ -14,6 +14,16 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 class CmpModule
 {
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
+
+
     public function fnCompareValues(
         ?int $flagsMode = null, ?int $flagsResult = null,
         array $refs = []

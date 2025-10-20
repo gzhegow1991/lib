@@ -86,9 +86,21 @@ class DebugModule
     protected $backtracer;
 
 
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
+
+
     public function newBacktracer() : BacktracerInterface
     {
-        return new DefaultBacktracer();
+        $instance = new DefaultBacktracer();
+
+        return $instance;
     }
 
     public function cloneBacktracer() : BacktracerInterface
@@ -107,7 +119,9 @@ class DebugModule
 
     public function newDumper() : DumperInterface
     {
-        return new DefaultDumper();
+        $instance = new DefaultDumper();
+
+        return $instance;
     }
 
     public function cloneDumper() : DumperInterface
@@ -126,7 +140,9 @@ class DebugModule
 
     public function newThrowabler() : ThrowablerInterface
     {
-        return new DefaultThrowabler();
+        $instance = new DefaultThrowabler();
+
+        return $instance;
     }
 
     public function cloneThrowabler() : ThrowablerInterface

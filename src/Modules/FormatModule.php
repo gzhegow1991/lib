@@ -13,9 +13,21 @@ use Gzhegow\Lib\Modules\Format\FormatSerialize;
 
 class FormatModule
 {
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
+
+
     public function newBaseN() : FormatBaseN
     {
-        return new FormatBaseN();
+        $instance = new FormatBaseN();
+
+        return $instance;
     }
 
     public function cloneBaseN() : FormatBaseN
@@ -31,7 +43,9 @@ class FormatModule
 
     public function newCsv() : FormatCsv
     {
-        return new FormatCsv();
+        $instance = new FormatCsv();
+
+        return $instance;
     }
 
     public function cloneCsv() : FormatCsv
@@ -47,7 +61,9 @@ class FormatModule
 
     public function newJson() : FormatJson
     {
-        return new FormatJson();
+        $instance = new FormatJson();
+
+        return $instance;
     }
 
     public function cloneJson() : FormatJson
@@ -63,7 +79,9 @@ class FormatModule
 
     public function newSerialize() : FormatSerialize
     {
-        return new FormatSerialize();
+        $instance = new FormatSerialize();
+
+        return $instance;
     }
 
     public function cloneSerialize() : FormatSerialize
@@ -79,7 +97,9 @@ class FormatModule
 
     public function newXml() : FormatXml
     {
-        return new FormatXml();
+        $instance = new FormatXml();
+
+        return $instance;
     }
 
     public function cloneXml() : FormatXml

@@ -12,6 +12,16 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 class NumModule
 {
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
+
+
     /**
      * @return Ret<float>
      */

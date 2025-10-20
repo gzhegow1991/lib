@@ -46,13 +46,19 @@ class BcmathModule
     }
 
 
-    public function __construct()
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
     {
         if ( ! extension_loaded('bcmath') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: bcmath' ]
             );
         }
+
+        return $this;
     }
 
 

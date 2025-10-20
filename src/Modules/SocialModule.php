@@ -8,6 +8,8 @@ use Gzhegow\Lib\Modules\Social\EmailParser\DefaultEmailParser;
 use Gzhegow\Lib\Modules\Social\EmailParser\EmailParserInterface;
 use Gzhegow\Lib\Modules\Social\PhoneManager\DefaultPhoneManager;
 use Gzhegow\Lib\Modules\Social\PhoneManager\PhoneManagerInterface;
+use Gzhegow\Lib\Modules\Social\PhoneRegionDetector\PassPhoneRegionDetector;
+use Gzhegow\Lib\Modules\Social\PhoneRegionDetector\PhoneRegionDetectorInterface;
 
 
 class SocialModule
@@ -22,9 +24,21 @@ class SocialModule
     protected $phoneManager;
 
 
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
+
+
     public function newEmailParser() : EmailParserInterface
     {
-        return new DefaultEmailParser();
+        $instance = new DefaultEmailParser();
+
+        return $instance;
     }
 
     public function cloneEmailParser() : EmailParserInterface
@@ -41,9 +55,13 @@ class SocialModule
     }
 
 
-    public function newPhoneManager() : PhoneManagerInterface
+    public function newPhoneManager(?PhoneRegionDetectorInterface $theRegionDetector = null) : PhoneManagerInterface
     {
-        return new DefaultPhoneManager(null);
+        $theRegionDetector = $theRegionDetector ?? new PassPhoneRegionDetector();
+
+        $instance = new DefaultPhoneManager($theRegionDetector);
+
+        return $instance;
     }
 
     public function clonePhoneManager() : PhoneManagerInterface
@@ -83,10 +101,10 @@ class SocialModule
         }
         $refEmailName = null;
 
-        try {
-            $emailParser = $this->emailParser();
+        $theEmailParser = $this->emailParser();
 
-            $email = $emailParser->parseEmail(
+        try {
+            $email = $theEmailParser->parseEmail(
                 $value, $filters,
                 $emailDomain, $emailName
             );
@@ -133,10 +151,10 @@ class SocialModule
         }
         $refEmailName = null;
 
-        try {
-            $emailParser = $this->emailParser();
+        $theEmailParser = $this->emailParser();
 
-            $email = $emailParser->parseEmailFake(
+        try {
+            $email = $theEmailParser->parseEmailFake(
                 $value,
                 $emailDomain, $emailName
             );
@@ -184,10 +202,10 @@ class SocialModule
         }
         $refEmailDomain = null;
 
-        try {
-            $emailParser = $this->emailParser();
+        $theEmailParser = $this->emailParser();
 
-            $email = $emailParser->parseEmailNonFake(
+        try {
+            $email = $theEmailParser->parseEmailNonFake(
                 $value, $filters,
                 $emailDomain, $emailName
             );
@@ -392,10 +410,10 @@ class SocialModule
         }
         $refTelPlus = null;
 
-        try {
-            $phoneManager = $this->phoneManager();
+        $thePhoneManager = $this->phoneManager();
 
-            $phone = $phoneManager->parsePhoneReal(
+        try {
+            $phone = $thePhoneManager->parsePhoneReal(
                 $value, $region,
                 $refRegionDetected,
                 $refTel, $refTelDigits, $refTelPlus
@@ -437,10 +455,10 @@ class SocialModule
         }
         $refTelPlus = null;
 
-        try {
-            $phoneManager = $this->phoneManager();
+        $thePhoneManager = $this->phoneManager();
 
-            $tel = $phoneManager->parseTel(
+        try {
+            $tel = $thePhoneManager->parseTel(
                 $value,
                 $refTelDigits, $refTelPlus
             );
@@ -480,10 +498,10 @@ class SocialModule
         }
         $refTelPlus = null;
 
-        try {
-            $phoneManager = $this->phoneManager();
+        $thePhoneManager = $this->phoneManager();
 
-            $tel = $phoneManager->parseTelFake(
+        try {
+            $tel = $thePhoneManager->parseTelFake(
                 $value,
                 $refTelDigits, $refTelPlus
             );
@@ -523,10 +541,10 @@ class SocialModule
         }
         $refTelPlus = null;
 
-        try {
-            $phoneManager = $this->phoneManager();
+        $thePhoneManager = $this->phoneManager();
 
-            $tel = $phoneManager->parseTelNonFake(
+        try {
+            $tel = $thePhoneManager->parseTelNonFake(
                 $value,
                 $refTelDigits, $refTelPlus
             );

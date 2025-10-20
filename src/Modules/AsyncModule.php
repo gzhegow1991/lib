@@ -26,6 +26,10 @@ class AsyncModule
      */
     protected $clockManager;
     /**
+     * @var FetchApiInterface
+     */
+    protected $fetchApi;
+    /**
      * @var LoopManagerInterface
      */
     protected $loopManager;
@@ -34,15 +38,22 @@ class AsyncModule
      */
     protected $promiseManager;
 
-    /**
-     * @var FetchApiInterface
-     */
-    protected $fetchApi;
+
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
 
 
     public function newPoolingFactory() : PromisePoolingFactoryInterface
     {
-        return new DefaultPromisePoolingFactory();
+        $instance = new DefaultPromisePoolingFactory();
+
+        return $instance;
     }
 
     public function clonePoolingFactory() : PromisePoolingFactoryInterface
@@ -61,9 +72,13 @@ class AsyncModule
 
     public function newClockManager() : ClockManagerInterface
     {
-        return new DefaultClockManager(
-            $this->loopManager()
+        $theLoopManager = $this->loopManager();
+
+        $instance = new DefaultClockManager(
+            $theLoopManager
         );
+
+        return $instance;
     }
 
     public function cloneClockManager() : ClockManagerInterface
@@ -80,9 +95,32 @@ class AsyncModule
     }
 
 
+    public function newFetchApi() : FetchApiInterface
+    {
+        $instance = new FilesystemFetchApi();
+
+        return $instance;
+    }
+
+    public function cloneFetchApi() : FetchApiInterface
+    {
+        return clone $this->fetchApi();
+    }
+
+    public function fetchApi(?FetchApiInterface $fetchApi = null) : FetchApiInterface
+    {
+        return $this->fetchApi = null
+            ?? $fetchApi
+            ?? $this->fetchApi
+            ?? $this->newFetchApi();
+    }
+
+
     public function newLoopManager() : LoopManagerInterface
     {
-        return new DefaultLoopManager();
+        $instance = new DefaultLoopManager();
+
+        return $instance;
     }
 
     public function cloneLoopManager() : LoopManagerInterface
@@ -101,14 +139,21 @@ class AsyncModule
 
     public function newPromiseManager() : PromiseManagerInterface
     {
-        return new DefaultPromiseManager(
-            $this->poolingFactory(),
+        $thePoolingFactory = $this->poolingFactory();
+        $theClockManager = $this->clockManager();
+        $theLoopManager = $this->loopManager();
+        $theFetchApi = $this->fetchApi();
+
+        $instance = new DefaultPromiseManager(
+            $thePoolingFactory,
             //
-            $this->clockManager(),
-            $this->loopManager(),
+            $theClockManager,
+            $theLoopManager,
             //
-            $this->fetchApi()
+            $theFetchApi
         );
+
+        return $instance;
     }
 
     public function clonePromiseManager() : PromiseManagerInterface
@@ -122,24 +167,5 @@ class AsyncModule
             ?? $promiseFactory
             ?? $this->promiseManager
             ?? $this->newPromiseManager();
-    }
-
-
-    public function newFetchApi() : FetchApiInterface
-    {
-        return new FilesystemFetchApi();
-    }
-
-    public function cloneFetchApi() : FetchApiInterface
-    {
-        return clone $this->fetchApi();
-    }
-
-    public function fetchApi(?FetchApiInterface $fetchApi = null) : FetchApiInterface
-    {
-        return $this->fetchApi = null
-            ?? $fetchApi
-            ?? $this->fetchApi
-            ?? $this->newFetchApi();
     }
 }

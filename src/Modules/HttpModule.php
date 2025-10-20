@@ -81,11 +81,20 @@ class HttpModule
      * @var CookiesInterface
      */
     protected $cookies;
-
     /**
      * @var SessionSafe
      */
     protected $sessionSafe;
+
+
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
 
 
     public function cookies() : CookiesInterface
@@ -96,39 +105,52 @@ class HttpModule
 
         $cookiesClass = $this->staticCookiesClass();
 
-        return $this->cookies = $cookiesClass::getInstance();
+        $instance = $cookiesClass::getInstance();
+
+        $this->cookies = $instance;
+
+        return $instance;
     }
 
 
     public function newSessionSafe() : SessionSafeProxy
     {
-        $sessionSafe = $this->createSessionSafe();
+        $instance = $this->createSessionSafe();
 
-        return new SessionSafeProxy($sessionSafe);
+        $proxy = new SessionSafeProxy($instance);
+
+        return $proxy;
     }
 
     public function cloneSessionSafe() : SessionSafeProxy
     {
-        $sessionSafe = clone $this->getSessionSafe();
+        $instance = clone $this->getSessionSafe();
 
-        return new SessionSafeProxy($sessionSafe);
+        $proxy = new SessionSafeProxy($instance);
+
+        return $proxy;
     }
 
     public function sessionSafe() : SessionSafeProxy
     {
-        $sessionSafe = $this->getSessionSafe();
+        $instance = $this->getSessionSafe();
 
-        return new SessionSafeProxy($sessionSafe);
+        $proxy = new SessionSafeProxy($instance);
+
+        return $proxy;
     }
 
     protected function createSessionSafe() : SessionSafe
     {
-        return new SessionSafe();
+        $instance = new SessionSafe();
+
+        return $instance;
     }
 
     protected function getSessionSafe() : SessionSafe
     {
-        return $this->sessionSafe = $this->sessionSafe ?? $this->createSessionSafe();
+        return $this->sessionSafe = $this->sessionSafe
+            ?? $this->createSessionSafe();
     }
 
 

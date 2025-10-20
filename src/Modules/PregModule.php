@@ -9,6 +9,16 @@ use Gzhegow\Lib\Exception\LogicException;
 
 class PregModule
 {
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
+
+
     /**
      * @return Ret<string>
      */

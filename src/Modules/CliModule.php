@@ -8,7 +8,11 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 class CliModule
 {
-    public function __construct()
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
     {
         $thePhp = Lib::php();
 
@@ -17,6 +21,8 @@ class CliModule
                 [ 'Function must be called only in CLI mode' ]
             );
         }
+
+        return $this;
     }
 
 

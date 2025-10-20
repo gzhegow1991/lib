@@ -14,13 +14,19 @@ use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 class NetModule
 {
-    public function __construct()
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
     {
         if ( ! extension_loaded('filter') ) {
             throw new ExtensionException(
                 [ 'Missing PHP extension: filter' ]
             );
         }
+
+        return $this;
     }
 
 

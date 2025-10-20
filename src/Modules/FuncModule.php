@@ -17,9 +17,21 @@ class FuncModule
     protected $invoker;
 
 
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
+
+
     public function newInvoker() : InvokerInterface
     {
-        return new DefaultInvoker();
+        $instance = new DefaultInvoker();
+
+        return $instance;
     }
 
     public function cloneInvoker() : InvokerInterface
@@ -41,7 +53,9 @@ class FuncModule
      */
     public function newPipe()
     {
-        return new Pipe();
+        $instance = new Pipe();
+
+        return $instance;
     }
 
 

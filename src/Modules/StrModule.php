@@ -96,10 +96,17 @@ class StrModule
         }
     }
 
+    public function __initialize()
+    {
+        return $this;
+    }
+
 
     public function newInflector() : InflectorInterface
     {
-        return new DefaultInflector();
+        $instance = new DefaultInflector();
+
+        return $instance;
     }
 
     public function cloneInflector() : InflectorInterface
@@ -118,7 +125,9 @@ class StrModule
 
     public function newInterpolator() : InterpolatorInterface
     {
-        return new DefaultInterpolator();
+        $instance = new DefaultInterpolator();
+
+        return $instance;
     }
 
     public function cloneInterpolator() : InterpolatorInterface
@@ -137,7 +146,9 @@ class StrModule
 
     public function newSlugger() : SluggerInterface
     {
-        return new DefaultSlugger(null);
+        $instance = new DefaultSlugger();
+
+        return $instance;
     }
 
     public function cloneSlugger() : SluggerInterface

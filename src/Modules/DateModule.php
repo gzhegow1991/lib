@@ -5,6 +5,7 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class DateModule
@@ -123,6 +124,22 @@ class DateModule
         self::FORMAT_HUMAN_DATE => true,
         self::FORMAT_HUMAN      => true,
     ];
+
+
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        if ( ! extension_loaded('date') ) {
+            throw new ExtensionException(
+                [ 'Missing PHP extension: date' ]
+            );
+        }
+
+        return $this;
+    }
 
 
     public function the_timezone_nil() : \DateTimeZone

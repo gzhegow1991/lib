@@ -73,7 +73,7 @@ class Lib
 
     public static function async()
     {
-        return static::$async = static::$async ?? new AsyncModule();
+        return static::$async = static::$async ?? (new AsyncModule())->__initialize();
     }
 
     public static function asyncClock(?bool $clone = null) : ClockManagerInterface
@@ -81,6 +81,13 @@ class Lib
         return $clone
             ? Lib::async()->cloneClockManager()
             : Lib::async()->clockManager();
+    }
+
+    public static function asyncFetchApi(?bool $clone = null) : FetchApiInterface
+    {
+        return $clone
+            ? Lib::async()->cloneFetchApi()
+            : Lib::async()->fetchApi();
     }
 
     public static function asyncLoop(?bool $clone = null) : LoopManagerInterface
@@ -97,13 +104,6 @@ class Lib
             : Lib::async()->promiseManager();
     }
 
-    public static function asyncFetchApi(?bool $clone = null) : FetchApiInterface
-    {
-        return $clone
-            ? Lib::async()->cloneFetchApi()
-            : Lib::async()->fetchApi();
-    }
-
 
     /**
      * @var CliModule
@@ -112,7 +112,7 @@ class Lib
 
     public static function cli()
     {
-        return static::$cli = static::$cli ?? new CliModule();
+        return static::$cli = static::$cli ?? (new CliModule())->__initialize();
     }
 
 
@@ -123,7 +123,7 @@ class Lib
 
     public static function debug()
     {
-        return static::$debug = static::$debug ?? new DebugModule();
+        return static::$debug = static::$debug ?? (new DebugModule())->__initialize();
     }
 
     public static function debugBacktracer(?bool $clone = null) : BacktracerInterface
@@ -155,7 +155,7 @@ class Lib
 
     public static function format()
     {
-        return static::$format = static::$format ?? new FormatModule();
+        return static::$format = static::$format ?? (new FormatModule())->__initialize();
     }
 
     public static function formatBaseN(?bool $clone = null) : FormatBaseN
@@ -201,7 +201,7 @@ class Lib
 
     public static function func()
     {
-        return static::$func = static::$func ?? new FuncModule();
+        return static::$func = static::$func ?? (new FuncModule())->__initialize();
     }
 
     public static function funcInvoker(?bool $clone = null) : InvokerInterface
@@ -219,7 +219,7 @@ class Lib
 
     public static function php()
     {
-        return static::$php = static::$php ?? new PhpModule();
+        return static::$php = static::$php ?? (new PhpModule())->__initialize();
     }
 
     public static function phpCallableParser(?bool $clone = null) : CallableParserInterface
@@ -244,7 +244,7 @@ class Lib
 
     public static function social()
     {
-        return static::$social = static::$social ?? new SocialModule();
+        return static::$social = static::$social ?? (new SocialModule())->__initialize();
     }
 
     public static function socialEmail(?bool $clone = null) : EmailParserInterface
@@ -269,7 +269,7 @@ class Lib
 
     public static function str()
     {
-        return static::$str = static::$str ?? new StrModule();
+        return static::$str = static::$str ?? (new StrModule())->__initialize();
     }
 
     public static function strInflector(?bool $clone = null) : InflectorInterface
@@ -302,7 +302,7 @@ class Lib
 
     public static function fs()
     {
-        return static::$fs = static::$fs ?? new FsModule();
+        return static::$fs = static::$fs ?? (new FsModule())->__initialize();
     }
 
     public static function fsFile(?bool $clone = null) : FileSafeProxy
@@ -334,7 +334,7 @@ class Lib
 
     public static function http()
     {
-        return static::$http = static::$http ?? new HttpModule();
+        return static::$http = static::$http ?? (new HttpModule())->__initialize();
     }
 
     public static function httpCookies() : CookiesInterface
@@ -357,7 +357,7 @@ class Lib
 
     public static function arr()
     {
-        return static::$arr = static::$arr ?? new ArrModule();
+        return static::$arr = static::$arr ?? (new ArrModule())->__initialize();
     }
 
     /**
@@ -367,7 +367,7 @@ class Lib
 
     public static function bcmath()
     {
-        return static::$bcmath = static::$bcmath ?? new BcmathModule();
+        return static::$bcmath = static::$bcmath ?? (new BcmathModule())->__initialize();
     }
 
     /**
@@ -377,7 +377,7 @@ class Lib
 
     public static function cmp()
     {
-        return static::$cmp = static::$cmp ?? new CmpModule();
+        return static::$cmp = static::$cmp ?? (new CmpModule())->__initialize();
     }
 
     /**
@@ -387,7 +387,7 @@ class Lib
 
     public static function crypt()
     {
-        return static::$crypt = static::$crypt ?? new CryptModule();
+        return static::$crypt = static::$crypt ?? (new CryptModule())->__initialize();
     }
 
     /**
@@ -397,7 +397,7 @@ class Lib
 
     public static function date()
     {
-        return static::$date = static::$date ?? new DateModule();
+        return static::$date = static::$date ?? (new DateModule())->__initialize();
     }
 
     /**
@@ -407,7 +407,7 @@ class Lib
 
     public static function entrypoint()
     {
-        return static::$entrypoint = static::$entrypoint ?? new EntrypointModule();
+        return static::$entrypoint = static::$entrypoint ?? (new EntrypointModule())->__initialize();
     }
 
     /**
@@ -417,7 +417,7 @@ class Lib
 
     public static function escape()
     {
-        return static::$escape = static::$escape ?? new EscapeModule();
+        return static::$escape = static::$escape ?? (new EscapeModule())->__initialize();
     }
 
     /**
@@ -427,7 +427,7 @@ class Lib
 
     public static function itertools()
     {
-        return static::$itertools = static::$itertools ?? new ItertoolsModule();
+        return static::$itertools = static::$itertools ?? (new ItertoolsModule())->__initialize();
     }
 
     /**
@@ -437,7 +437,7 @@ class Lib
 
     public static function mb()
     {
-        return static::$mb = static::$mb ?? new MbModule();
+        return static::$mb = static::$mb ?? (new MbModule())->__initialize();
     }
 
     /**
@@ -447,7 +447,7 @@ class Lib
 
     public static function net()
     {
-        return static::$net = static::$net ?? new NetModule();
+        return static::$net = static::$net ?? (new NetModule())->__initialize();
     }
 
     /**
@@ -457,7 +457,7 @@ class Lib
 
     public static function num()
     {
-        return static::$num = static::$num ?? new NumModule();
+        return static::$num = static::$num ?? (new NumModule())->__initialize();
     }
 
     /**
@@ -467,7 +467,7 @@ class Lib
 
     public static function preg()
     {
-        return static::$preg = static::$preg ?? new PregModule();
+        return static::$preg = static::$preg ?? (new PregModule())->__initialize();
     }
 
     /**
@@ -477,7 +477,7 @@ class Lib
 
     public static function random()
     {
-        return static::$random = static::$random ?? new RandomModule();
+        return static::$random = static::$random ?? (new RandomModule())->__initialize();
     }
 
     /**
@@ -487,7 +487,7 @@ class Lib
 
     public static function test()
     {
-        return static::$test = static::$test ?? new TestModule();
+        return static::$test = static::$test ?? (new TestModule())->__initialize();
     }
 
     /**
@@ -497,7 +497,7 @@ class Lib
 
     public static function type()
     {
-        return static::$type = static::$type ?? new TypeModule();
+        return static::$type = static::$type ?? (new TypeModule())->__initialize();
     }
 
     /**
@@ -507,7 +507,7 @@ class Lib
 
     public static function url()
     {
-        return static::$url = static::$url ?? new UrlModule();
+        return static::$url = static::$url ?? (new UrlModule())->__initialize();
     }
 
 
@@ -788,7 +788,7 @@ class Lib
 
 
     /**
-     * > примитивное глобальное хранилище для импортов-экспортов ("сервис-локатор", ОГА)
+     * > примитивное глобальное хранилище для импортов-экспортов ("сервис-локатор", ага)
      */
     public static function &imports() : array
     {

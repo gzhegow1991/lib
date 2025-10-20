@@ -69,7 +69,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
 
     public function __construct(
-        ?PhoneRegionDetectorInterface $regionDetector
+        ?PhoneRegionDetectorInterface $regionDetector = null
     )
     {
         $this->regionDetector = $regionDetector ?? new DefaultPhoneRegionDetector();
@@ -539,33 +539,32 @@ class DefaultPhoneManager implements PhoneManagerInterface
         $refRegionDetected = null;
 
         if ( $value instanceof \libphonenumber\PhoneNumber ) {
-            $phoneNumber = $value;
+            $phoneNumberObject = $value;
 
             $regionString = $value->getCountryCode();
 
         } else {
-            $phone = $this->parsePhone($value, $tel, $telDigits);
+            $thePhoneNumberUtil = $this->getGiggseyPhoneNumberUtil();
+
+            $phoneString = $this->parsePhone($value, $tel, $telDigits);
 
             if ( '' === $region ) {
                 $regionString = null;
 
-                if ( $this->useRegionDetector ) {
-                    if ( null === $regionString ) {
+                if ( null === $regionString ) {
+                    if ( $this->useRegionDetector ) {
                         $regionString = $this->regionDetector->detectRegion($telDigits);
                     }
                 }
-                if ( $this->useRegionAutoDetection ) {
-                    if ( null === $regionString ) {
+                if ( null === $regionString ) {
+                    if ( $this->useRegionAutoDetection ) {
                         $regionString = \libphonenumber\PhoneNumberUtil::UNKNOWN_REGION;
                     }
                 }
 
                 if ( null === $regionString ) {
                     throw new RuntimeException(
-                        [
-                            'Unable to detect region',
-                            $value,
-                        ]
+                        [ 'Unable to detect region', $value ]
                     );
                 }
 
@@ -574,11 +573,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             }
 
             try {
-                $phoneNumberUtil = $this->getGiggseyPhoneNumberUtil();
-
-                $phoneNumber = $phoneNumberUtil
-                    ->parse($phone, $regionString)
-                ;
+                $phoneNumberObject = $thePhoneNumberUtil->parse($phoneString, $regionString);
             }
             catch ( \libphonenumber\NumberParseException $e ) {
                 throw new RuntimeException(
@@ -589,7 +584,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         $refRegionDetected = $regionString;
 
-        return $phoneNumber;
+        return $phoneNumberObject;
     }
 
 
@@ -764,14 +759,14 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         $regionString = null;
 
-        if ( $this->useRegionDetector ) {
-            if ( null === $regionString ) {
+        if ( null === $regionString ) {
+            if ( $this->useRegionDetector ) {
                 $regionString = $this->regionDetector->detectRegion($telDigits);
             }
         }
 
-        if ( $this->useRegionAutoDetection ) {
-            if ( null === $regionString ) {
+        if ( null === $regionString ) {
+            if ( $this->useRegionAutoDetection ) {
                 $this->parsePhoneNumber(
                     $tel, \libphonenumber\PhoneNumberUtil::UNKNOWN_REGION,
                     $regionString
@@ -781,10 +776,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
         if ( null === $regionString ) {
             throw new RuntimeException(
-                [
-                    'Unable to detect region',
-                    $phone,
-                ]
+                [ 'Unable to detect region', $phone ]
             );
         }
 
@@ -792,19 +784,22 @@ class DefaultPhoneManager implements PhoneManagerInterface
     }
 
 
+    /**
+     * @return string[]
+     */
     public function getTimezonesForPhone($phoneNumber, $timezoneWildcards = null, ?string $region = '') : array
     {
         $thePhp = Lib::php();
 
         $timezoneWildcardsList = $thePhp->to_list($timezoneWildcards);
 
+        $theGiggseyPhoneNumberToTimeZonesMapper = $this->getGiggseyPhoneNumberToTimeZonesMapper();
+
         $phoneNumberObject = $this->parsePhoneNumber(
             $phoneNumber, $region
         );
 
-        $phoneNumberToTimeZonesMapper = $this->getGiggseyPhoneNumberToTimeZonesMapper();
-
-        $timezones = $phoneNumberToTimeZonesMapper->getTimeZonesForNumber($phoneNumberObject);
+        $timezones = $theGiggseyPhoneNumberToTimeZonesMapper->getTimeZonesForNumber($phoneNumberObject);
 
         if ( [] !== $timezoneWildcardsList ) {
             $wildcards = [];
@@ -836,40 +831,45 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $timezones;
     }
 
-    public function getLocationNameForPhone($phoneNumber, ?string $region = '') : string
+    /**
+     * @return array{ 0: string, 1: string }
+     */
+    public function getLocationNameForPhone($phoneNumber, ?string $region = '') : array
     {
-        $_phoneNumber = $this->parsePhoneNumber(
+        $theGiggseyPhoneNumberOfflineGeocoder = $this->getGiggseyPhoneNumberOfflineGeocoder();
+
+        $phoneNumberObject = $this->parsePhoneNumber(
             $phoneNumber, $region,
             $regionParsed
         );
 
-        $phoneNumberOfflineGeocoder = $this->getGiggseyPhoneNumberOfflineGeocoder();
-
-        $location = $phoneNumberOfflineGeocoder
-            ->getDescriptionForValidNumber($_phoneNumber, 'en_US')
+        $location = $theGiggseyPhoneNumberOfflineGeocoder
+            ->getDescriptionForValidNumber($phoneNumberObject, 'en_US')
         ;
 
         $location = $location ?: '{{ Unknown }}';
 
-        $location = "{$regionParsed} / {$location}";
-
-        return $location;
+        return [ $regionParsed, $location ];
     }
 
-    public function getOperatorNameForPhone($phoneNumber, ?string $region = '') : string
+    /**
+     * @return array{ 0: string, 1: string }
+     */
+    public function getOperatorNameForPhone($phoneNumber, ?string $region = '') : array
     {
-        $_phoneNumber = $this->parsePhoneNumber(
-            $phoneNumber, $region
+        $theGiggseyPhoneNumberToCarrierMapper = $this->getGiggseyPhoneNumberToCarrierMapper();
+
+        $phoneNumberObject = $this->parsePhoneNumber(
+            $phoneNumber, $region,
+            $regionParsed
         );
 
-        $phoneNumberToCarrierMapper = $this->getGiggseyPhoneNumberToCarrierMapper();
-
-        $operatorName = $phoneNumberToCarrierMapper
-            ->getNameForValidNumber($_phoneNumber, 'en')
+        $operatorName = $theGiggseyPhoneNumberToCarrierMapper
+            ->getNameForValidNumber($phoneNumberObject, 'en')
         ;
 
         $operatorName = $operatorName ?: "{{ Unknown }}";
 
-        return $operatorName;
+        return [ $regionParsed, $operatorName ];
     }
 }

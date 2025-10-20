@@ -7,6 +7,16 @@ use Gzhegow\Lib\Exception\LogicException;
 
 class ItertoolsModule
 {
+    // public function __construct()
+    // {
+    // }
+
+    public function __initialize()
+    {
+        return $this;
+    }
+
+
     /**
      * > reversed([ 'A', 'B', 'C' ]) --> C B A
      */
@@ -270,6 +280,7 @@ class ItertoolsModule
             $found = null;
 
             $iMax = ($len - 1);
+
             // foreach ( $this->range_it(($len - 1), 0, -1) as $i ) {
             for ( $i = $iMax; $i >= 0; $i-- ) {
                 if ( $indexes[$i] !== $i + $size - $len ) {
@@ -288,6 +299,7 @@ class ItertoolsModule
 
             $iMin = ($i + 1);
             $iMax = ($len - 1);
+
             // foreach ( $this->range_it(($i + 1), ($len - 1)) as $j ) {
             for ( $j = $iMin; $j <= $iMax; $j++ ) {
                 $indexes[$j] = $indexes[$j - 1] + 1;
@@ -333,6 +345,7 @@ class ItertoolsModule
             $found = null;
 
             $iMax = ($len - 1);
+
             // foreach ( $this->range_it(($len - 1), 0, -1) as $i ) {
             for ( $i = $iMax; $i >= 0; $i-- ) {
                 if ( $indices[$i] !== ($size - 1) ) {
@@ -350,6 +363,7 @@ class ItertoolsModule
 
             $iMax = ($len - $i - 1);
             $replace = [];
+
             // foreach ( $this->range_it(0, ($len - $i - 1), 1) as $i ) {
             for ( $ii = 0; $ii <= $iMax; $ii++ ) {
                 $replace[] = $indices[$i] + 1;

@@ -115,9 +115,18 @@ interface PhoneManagerInterface
     public function detectRegion($phone) : string;
 
 
+    /**
+     * @return string[]
+     */
     public function getTimezonesForPhone($phoneNumber, $timezoneWildcards = null, ?string $region = '') : array;
 
-    public function getLocationNameForPhone($phoneNumber, ?string $region = '') : string;
+    /**
+     * @return array{ 0: string, 1: string }
+     */
+    public function getLocationNameForPhone($phoneNumber, ?string $region = '') : array;
 
-    public function getOperatorNameForPhone($phoneNumber, ?string $region = '') : string;
+    /**
+     * @return array{ 0: string, 1: string }
+     */
+    public function getOperatorNameForPhone($phoneNumber, ?string $region = '') : array;
 }
