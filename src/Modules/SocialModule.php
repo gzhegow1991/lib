@@ -8,7 +8,6 @@ use Gzhegow\Lib\Modules\Social\EmailParser\DefaultEmailParser;
 use Gzhegow\Lib\Modules\Social\EmailParser\EmailParserInterface;
 use Gzhegow\Lib\Modules\Social\PhoneManager\DefaultPhoneManager;
 use Gzhegow\Lib\Modules\Social\PhoneManager\PhoneManagerInterface;
-use Gzhegow\Lib\Modules\Social\PhoneRegionDetector\PassPhoneRegionDetector;
 use Gzhegow\Lib\Modules\Social\PhoneRegionDetector\PhoneRegionDetectorInterface;
 
 
@@ -55,10 +54,10 @@ class SocialModule
     }
 
 
-    public function newPhoneManager(?PhoneRegionDetectorInterface $theRegionDetector = null) : PhoneManagerInterface
+    public function newPhoneManager(
+        ?PhoneRegionDetectorInterface $theRegionDetector = null
+    ) : PhoneManagerInterface
     {
-        $theRegionDetector = $theRegionDetector ?? new PassPhoneRegionDetector();
-
         $instance = new DefaultPhoneManager($theRegionDetector);
 
         return $instance;
