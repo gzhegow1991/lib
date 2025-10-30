@@ -57,9 +57,4 @@ interface LoopManagerInterface
      * @return static
      */
     public function runLoop();
-
-    /**
-     * @return static
-     */
-    public function registerLoop();
 }

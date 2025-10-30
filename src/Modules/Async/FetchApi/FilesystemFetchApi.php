@@ -674,7 +674,6 @@ class FilesystemFetchApi implements FetchApiInterface
         int $blockTimeoutMs
     ) : void
     {
-        $theEntrypoint = Lib::entrypoint();
         $theType = Lib::type();
 
         $pid = getmypid();
@@ -685,12 +684,25 @@ class FilesystemFetchApi implements FetchApiInterface
         if ( -1 === $timeoutMsInt ) $timeoutMsInt = null;
         if ( -1 === $blockTimeoutMsInt ) $blockTimeoutMsInt = null;
 
-        $theEntrypoint->registerShutdownFunction([ $this, 'daemonRemoveFromPool' ]);
+        $this->registerShutdownFunction();
 
         $this->workerRunLoop(
             $pid,
             $timeoutMsInt, $blockTimeoutMsInt
         );
+    }
+
+
+    public function registerShutdownFunction() : void
+    {
+        $theEntrypoint = Lib::entrypoint();
+
+        $theEntrypoint->registerShutdownFunction([ $this, 'onShutdown_daemonRemoveFromPool' ]);
+    }
+
+    public function onShutdown_daemonRemoveFromPool() : void
+    {
+        $this->daemonRemoveFromPool();
     }
 
 

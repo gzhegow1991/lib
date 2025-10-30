@@ -354,10 +354,10 @@ class DefaultCookies implements CookiesInterface
     {
         $theEntrypoint = Lib::entrypoint();
 
-        $theEntrypoint->registerShutdownFunction([ $this, 'onShutdownSendCookiesRegistered' ]);
+        $theEntrypoint->registerShutdownFunction([ $this, 'onShutdown_sendCookiesRegistered' ]);
     }
 
-    public function onShutdownSendCookiesRegistered() : void
+    public function onShutdown_sendCookiesRegistered() : void
     {
         $this->endFlush();
     }

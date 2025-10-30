@@ -3,30 +3,31 @@
 // > настраиваем PHP
 // > некоторые CMS сами по себе применяют настройки глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
-\Gzhegow\Lib\Lib::entrypoint()
-    //
-    // ->getPhp{ErrorHandler}()
-    // ->get{ErrorHandler}()
-    // ->set{ErrorHandler}()
-    //
-    // ->use{ErrorHandler}()
-    // ->useRecommended{ErrorHandler}()
-    //
-    // ->useAll()
-    // ->useAllRecommended()
+($entry = \Gzhegow\Lib\Lib::entrypoint())
     //
     // ->isLocked($refFileLine)
     // ->lock(true)
     //
-    // ->hasDirRoot($refDirRoot)
-    // ->getDirRoot()
+    // ->setAllInitial()
+    // ->setAllRecommended()
+    //
+    // ->useAll()
+    // ->useAllRecommended()
+    //
+    // ->use{ErrorHandler}($refLast)
+    // ->useRecommended{ErrorHandler}($refLast)
+    //
+    // ->has{DirRoot}($refValue)
+    // ->set{DirRoot}($value)
+    //
     ->setDirRoot(__DIR__ . '/..')
+    ->setTimezoneDefault('UTC')
     //
-    // ->isHeadersAlreadySentAsync()
-    ->setHeadersAlreadySentAsync(true)
+    ->useErrorHandler()
+    ->useErrorHandlerOnShutdown()
     //
-    // ->isRetCollectTrace()
-    ->setRetCollectTrace(false)
+    ->useExceptionHandler()
+    ->useThrowableHandler()
     //
     ->useErrorReporting()
     ->useErrorLog()
@@ -52,8 +53,7 @@
     ->useUploadMaxFilesize()
     ->useUploadTmpDir()
     //
-    ->useErrorHandler()
-    ->useExceptionHandler()
+    ->useRetCollectTrace()
 ;
 
 
@@ -2096,7 +2096,7 @@ $fn = function () use ($ffn) {
 
 
     // $dumpPath = $ffn->root() . '/var/dump/cmp_fn_compare_2.txt';
-    // if (is_file($dumpPath)) unlink($dumpPath);
+    // if ( is_file($dumpPath) ) unlink($dumpPath);
 
     $xi = 0;
     foreach ( $valuesXX as $valuesX ) {

@@ -93,9 +93,21 @@ abstract class AbstractMap
     }
 
 
-    public function exists($keyValue) : bool
+    public function exists($keyValue, &$value = null) : bool
     {
-        return null !== $this->existsKey($keyValue);
+        $value = null;
+
+        $key = $this->existsKey($keyValue);
+
+        if ( null !== $key ) {
+            [ $keyPos ] = $key;
+
+            $value = $this->values[$keyPos];
+
+            return true;
+        }
+
+        return false;
     }
 
 

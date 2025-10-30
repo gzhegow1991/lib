@@ -10,11 +10,6 @@ use Gzhegow\Lib\Modules\Async\Clock\Interval;
 class DefaultLoopManager implements LoopManagerInterface
 {
     /**
-     * @var bool
-     */
-    protected $isLoopRegistered = false;
-
-    /**
      * @var \SplObjectStorage<Interval>
      */
     protected $intervals;
@@ -100,7 +95,7 @@ class DefaultLoopManager implements LoopManagerInterface
     public function addInterval(Interval $interval)
     {
         $this->intervals->attach($interval);
-        $this->registerLoop();
+        $this->registerShutdownFunction();
 
         return $this;
     }
@@ -122,7 +117,7 @@ class DefaultLoopManager implements LoopManagerInterface
     public function addTimeout(Timeout $timer)
     {
         $this->timers->attach($timer);
-        $this->registerLoop();
+        $this->registerShutdownFunction();
 
         return $this;
     }
@@ -146,7 +141,7 @@ class DefaultLoopManager implements LoopManagerInterface
     public function addMicrotask($fnMicrotask)
     {
         $this->queueMicrotask->enqueue($fnMicrotask);
-        $this->registerLoop();
+        $this->registerShutdownFunction();
 
         return $this;
     }
@@ -159,7 +154,7 @@ class DefaultLoopManager implements LoopManagerInterface
     public function addMacrotask($fnMacrotask)
     {
         $this->queueMacrotask->enqueue($fnMacrotask);
-        $this->registerLoop();
+        $this->registerShutdownFunction();
 
         return $this;
     }
@@ -173,7 +168,7 @@ class DefaultLoopManager implements LoopManagerInterface
     public function requestAnimationFrame($fn)
     {
         $this->queueAnimationFrame->enqueue($fn);
-        $this->registerLoop();
+        $this->registerShutdownFunction();
 
         return $this;
     }
@@ -258,19 +253,16 @@ class DefaultLoopManager implements LoopManagerInterface
         return $this;
     }
 
-    /**
-     * @return static
-     */
-    public function registerLoop()
+
+    public function registerShutdownFunction() : void
     {
         $theEntrypoint = Lib::entrypoint();
 
-        if ( ! $this->isLoopRegistered ) {
-            $theEntrypoint->registerShutdownFunction([ $this, 'runLoop' ]);
+        $theEntrypoint->registerShutdownFunction([ $this, 'onShutdown_runLoop' ]);
+    }
 
-            $this->isLoopRegistered = true;
-        }
-
-        return $this;
+    public function onShutdown_runLoop() : void
+    {
+        $this->runLoop();
     }
 }

@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Modules\Arr\Map\Map;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\ErrorException;
@@ -13,6 +12,77 @@ use Gzhegow\Lib\Modules\Arr\Map\Base\AbstractMap;
 
 class EntrypointModule
 {
+    const OPT_ERROR_HANDLER             = 'errorHandler';
+    const OPT_ERROR_HANDLER_ON_SHUTDOWN = 'errorHandlerOnShutdown';
+
+    const OPT_EXCEPTION_HANDLER = 'exceptionHandler';
+    const OPT_THROWABLE_HANDLER = 'throwableHandler';
+
+    const OPT_DIR_ROOT = 'dirRoot';
+
+    const OPT_ERROR_REPORTING = 'errorReporting';
+    const OPT_ERROR_LOG       = 'errorLog';
+    const OPT_LOG_ERRORS      = 'logErrors';
+    const OPT_DISPLAY_ERRORS  = 'displayErrors';
+
+    const OPT_MEMORY_LIMIT = 'memoryLimit';
+
+    const OPT_MAX_EXECUTION_TIME = 'maxExecutionTime';
+    const OPT_MAX_INPUT_TIME     = 'maxInputTime';
+
+    const OPT_TIMEZONE_DEFAULT = 'timezoneDefault';
+
+    const OPT_PRECISION = 'precision';
+
+    const OPT_UMASK = 'umask';
+
+    const OPT_POST_MAX_SIZE = 'postMaxSize';
+
+    const OPT_SESSION_COOKIE_PARAMS = 'sessionCookieParams';
+    const OPT_SESSION_SAVE_PATH     = 'sessionSavePath';
+
+    const OPT_UPLOAD_MAX_FILESIZE = 'uploadMaxFilesize';
+    const OPT_UPLOAD_TMP_DIR      = 'uploadTmpDir';
+
+    const OPT_RET_COLLECT_TRACE = 'retCollectTrace';
+
+    const LIST_OPT = [
+        self::OPT_ERROR_HANDLER             => true,
+        self::OPT_ERROR_HANDLER_ON_SHUTDOWN => true,
+        //
+        self::OPT_EXCEPTION_HANDLER         => true,
+        self::OPT_THROWABLE_HANDLER         => true,
+        //
+        self::OPT_DIR_ROOT                  => true,
+        //
+        self::OPT_ERROR_REPORTING           => true,
+        self::OPT_ERROR_LOG                 => true,
+        self::OPT_LOG_ERRORS                => true,
+        self::OPT_DISPLAY_ERRORS            => true,
+        //
+        self::OPT_MEMORY_LIMIT              => true,
+        //
+        self::OPT_MAX_EXECUTION_TIME        => true,
+        self::OPT_MAX_INPUT_TIME            => true,
+        //
+        self::OPT_TIMEZONE_DEFAULT          => true,
+        //
+        self::OPT_PRECISION                 => true,
+        //
+        self::OPT_UMASK                     => true,
+        //
+        self::OPT_POST_MAX_SIZE             => true,
+        //
+        self::OPT_SESSION_COOKIE_PARAMS     => true,
+        self::OPT_SESSION_SAVE_PATH         => true,
+        //
+        self::OPT_UPLOAD_MAX_FILESIZE       => true,
+        self::OPT_UPLOAD_TMP_DIR            => true,
+        //
+        self::OPT_RET_COLLECT_TRACE         => true,
+    ];
+
+
     /**
      * @var array{ 0: string, 1: string }
      */
@@ -21,283 +91,103 @@ class EntrypointModule
     /**
      * @var array<string, mixed>
      */
-    protected $mapInitial = [
-        'headersAlreadySentAsync' => null,
-        'retCollectTrace'         => null,
-        //
-        'errorReporting'          => null,
-        'errorLog'                => null,
-        'logErrors'               => null,
-        'displayErrors'           => null,
-        //
-        'memoryLimit'             => null,
-        //
-        'maxExecutionTime'        => null,
-        'maxInputTime'            => null,
-        //
-        'timezoneDefault'         => null,
-        //
-        'precision'               => null,
-        //
-        'umask'                   => null,
-        //
-        'postMaxSize'             => null,
-        //
-        'sessionCookieParams'     => null,
-        'sessionSavePath'         => null,
-        'sessionSavePathMkdir'    => null,
-        //
-        'uploadMaxFilesize'       => null,
-        'uploadTmpDir'            => null,
-        'uploadTmpDirMkdir'       => null,
-        //
-        'errorHandler'            => null,
-        'exceptionHandler'        => null,
-    ];
+    protected $mapInitial = [];
     /**
      * @var array<string, mixed>
      */
-    protected $mapRecommended = [
-        'headersAlreadySentAsync' => true,
-        'retCollectTrace'         => false,
-        //
-        'errorReporting'          => null,
-        'errorLog'                => null,
-        'logErrors'               => null,
-        'displayErrors'           => null,
-        //
-        'memoryLimit'             => null,
-        //
-        'maxExecutionTime'        => null,
-        'maxInputTime'            => null,
-        //
-        'timezoneDefault'         => null,
-        //
-        'precision'               => null,
-        //
-        'umask'                   => null,
-        //
-        'postMaxSize'             => null,
-        //
-        'sessionCookieParams'     => null,
-        'sessionSavePath'         => null,
-        'sessionSavePathMkdir'    => null,
-        //
-        'uploadMaxFilesize'       => null,
-        'uploadTmpDir'            => null,
-        'uploadTmpDirMkdir'       => null,
-        //
-        'errorHandler'            => null,
-        'exceptionHandler'        => null,
-    ];
-
+    protected $mapRecommended = [];
     /**
      * @var array<string, mixed>
      */
-    protected $mapWasSet = [
-        'dirRoot'                 => false,
-        //
-        'headersAlreadySentAsync' => false,
-        'retCollectTrace'         => false,
-        //
-        'errorReporting'          => false,
-        'errorLog'                => false,
-        'logErrors'               => false,
-        'displayErrors'           => false,
-        //
-        'memoryLimit'             => false,
-        //
-        'maxExecutionTime'        => false,
-        'maxInputTime'            => false,
-        //
-        'timezoneDefault'         => false,
-        //
-        'precision'               => false,
-        //
-        'umask'                   => false,
-        //
-        'postMaxSize'             => false,
-        //
-        'sessionCookieParams'     => false,
-        'sessionSavePath'         => false,
-        'sessionSavePathMkdir'    => false,
-        //
-        'uploadMaxFilesize'       => false,
-        'uploadTmpDir'            => false,
-        'uploadTmpDirMkdir'       => false,
-        //
-        'errorHandler'            => false,
-        'exceptionHandler'        => false,
-    ];
-
+    protected $mapSet = [];
     /**
-     * @var array{ 0?: string }
+     * @var array<string, mixed>
      */
-    protected $dirRoot = [];
-    /**
-     * @var array{ 0?: bool }
-     */
-    protected $headersAlreadySentAsync = [];
-    /**
-     * @var array{ 0?: bool }
-     */
-    protected $retCollectTrace = [];
-
-    /**
-     * @var array{ 0?: int }
-     */
-    protected $errorReporting = [];
-    /**
-     * @var array{ 0?: string }
-     */
-    protected $errorLog = [];
-    /**
-     * @var array{ 0?: string }
-     */
-    protected $logErrors = [];
-    /**
-     * @var array{ 0?: int }
-     */
-    protected $displayErrors = [];
-
-    /**
-     * @var array{ 0?: string }
-     */
-    protected $memoryLimit = [];
-
-    /**
-     * @var array{ 0?: int }
-     */
-    protected $maxExecutionTime = [];
-    /**
-     * @var array{ 0?: int }
-     */
-    protected $maxInputTime = [];
-
-    /**
-     * @var array{ 0?: \DateTimeZone }
-     */
-    protected $timezoneDefault = [];
-
-    /**
-     * @var array{ 0?: int }
-     */
-    protected $precision = [];
-
-    /**
-     * @var array{ 0?: int }
-     */
-    protected $umask = [];
-
-    /**
-     * @var array{ 0?: string }
-     */
-    protected $postMaxSize = [];
-
-    /**
-     * @var array{ 0?: array }
-     */
-    protected $sessionCookieParams = [];
-    /**
-     * @var array{ 0?: string }
-     */
-    protected $sessionSavePath = [];
-    /**
-     * @var array{ 0?: bool }
-     */
-    protected $sessionSavePathMkdir = [];
-
-    /**
-     * @var array{ 0?: string }
-     */
-    protected $uploadMaxFilesize = [];
-    /**
-     * @var array{ 0?: string }
-     */
-    protected $uploadTmpDir = [];
-    /**
-     * @var array{ 0?: bool }
-     */
-    protected $uploadTmpDirMkdir = [];
-
-    /**
-     * @var array{ 0?: callable|null }
-     */
-    protected $errorHandler = [];
-    /**
-     * @var array{ 0?: callable|null }
-     */
-    protected $exceptionHandler = [];
+    protected $mapCurrent = [];
 
     /**
      * @var bool
      */
-    protected $signalIgnoreShutdownFunction = false;
+    protected $signalIgnoreShutdownFunctions = false;
     /**
      * @var AbstractMap
      */
     protected $registerShutdownFunctionMap;
 
+    /**
+     * @var \Throwable[]
+     */
+    protected $throwablesOnShutdown = [];
+
 
     public function __construct()
     {
+        $this->registerShutdownFunctionMap = Map::new();
+
         $this->mapInitial = [
-            'headersAlreadySentAsync' => true,
-            'retCollectTrace'         => false,
+            static::OPT_ERROR_HANDLER             => $this->getPhpErrorHandler(),
+            static::OPT_ERROR_HANDLER_ON_SHUTDOWN => null,
             //
-            'errorReporting'          => $this->getPhpErrorReporting(),
-            'errorLog'                => $this->getPhpErrorLog(),
-            'logErrors'               => $this->getPhpLogErrors(),
-            'displayErrors'           => $this->getPhpDisplayErrors(),
+            static::OPT_EXCEPTION_HANDLER         => $this->getPhpExceptionHandler(),
+            static::OPT_THROWABLE_HANDLER         => null,
             //
-            'memoryLimit'             => $this->getPhpMemoryLimit(),
+            static::OPT_DIR_ROOT                  => null,
             //
-            'maxExecutionTime'        => $this->getPhpMaxExecutionTime(),
-            'maxInputTime'            => $this->getPhpMaxInputTime(),
+            static::OPT_ERROR_REPORTING           => $this->getPhpErrorReporting(),
+            static::OPT_ERROR_LOG                 => $this->getPhpErrorLog(),
+            static::OPT_LOG_ERRORS                => $this->getPhpLogErrors(),
+            static::OPT_DISPLAY_ERRORS            => $this->getPhpDisplayErrors(),
             //
-            'timezoneDefault'         => $this->getPhpTimezoneDefault(),
+            static::OPT_MEMORY_LIMIT              => $this->getPhpMemoryLimit(),
             //
-            'precision'               => $this->getPhpPrecision(),
+            static::OPT_MAX_EXECUTION_TIME        => $this->getPhpMaxExecutionTime(),
+            static::OPT_MAX_INPUT_TIME            => $this->getPhpMaxInputTime(),
             //
-            'umask'                   => $this->getPhpUmask(),
+            static::OPT_TIMEZONE_DEFAULT          => $this->getPhpTimezoneDefault(),
             //
-            'postMaxSize'             => $this->getPhpPostMaxSize(),
+            static::OPT_PRECISION                 => $this->getPhpPrecision(),
             //
-            'sessionCookieParams'     => $this->getPhpSessionCookieParams(),
-            'sessionSavePath'         => $this->getPhpSessionSavePath(),
-            'sessionSavePathMkdir'    => false,
+            static::OPT_UMASK                     => $this->getPhpUmask(),
             //
-            'uploadMaxFilesize'       => $this->getPhpUploadMaxFilesize(),
-            'uploadTmpDir'            => $this->getPhpUploadTmpDir(),
-            'uploadTmpDirMkdir'       => false,
+            static::OPT_POST_MAX_SIZE             => $this->getPhpPostMaxSize(),
             //
-            'errorHandler'            => $this->getPhpErrorHandler(),
-            'exceptionHandler'        => $this->getPhpExceptionHandler(),
+            static::OPT_SESSION_COOKIE_PARAMS     => $this->getPhpSessionCookieParams(),
+            static::OPT_SESSION_SAVE_PATH         => $this->getPhpSessionSavePath(),
+            //
+            static::OPT_UPLOAD_MAX_FILESIZE       => $this->getPhpUploadMaxFilesize(),
+            static::OPT_UPLOAD_TMP_DIR            => $this->getPhpUploadTmpDir(),
+            //
+            static::OPT_RET_COLLECT_TRACE         => false,
         ];
 
         $this->mapRecommended = [
-            'headersAlreadySentAsync' => true,
-            'retCollectTrace'         => false,
+            static::OPT_ERROR_HANDLER             => [ $this, 'fnErrorHandler' ],
+            static::OPT_ERROR_HANDLER_ON_SHUTDOWN => [ $this, 'fnErrorHandlerOnShutdown' ],
             //
-            'errorReporting'          => (E_ALL | E_DEPRECATED | E_USER_DEPRECATED),
-            'errorLog'                => null,
-            'logErrors'               => 0,
-            'displayErrors'           => 0,
+            static::OPT_EXCEPTION_HANDLER         => [ $this, 'fnExceptionHandler' ],
+            static::OPT_THROWABLE_HANDLER         => [ $this, 'fnThrowableHandler' ],
             //
-            'memoryLimit'             => '32M',
+            static::OPT_DIR_ROOT                  => null,
             //
-            'maxExecutionTime'        => 10,
-            'maxInputTime'            => -1,
+            static::OPT_ERROR_REPORTING           => (E_ALL | E_DEPRECATED | E_USER_DEPRECATED),
+            static::OPT_ERROR_LOG                 => null,
+            static::OPT_LOG_ERRORS                => 0,
+            static::OPT_DISPLAY_ERRORS            => 0,
             //
-            'timezoneDefault'         => new \DateTimeZone('UTC'),
+            static::OPT_MEMORY_LIMIT              => '32M',
             //
-            'precision'               => 16,
+            static::OPT_MAX_EXECUTION_TIME        => 10,
+            static::OPT_MAX_INPUT_TIME            => -1,
             //
-            'umask'                   => 0002,
+            static::OPT_TIMEZONE_DEFAULT          => new \DateTimeZone('UTC'),
             //
-            'postMaxSize'             => '1M',
+            static::OPT_PRECISION                 => 16,
             //
-            'sessionCookieParams'     => [
+            static::OPT_UMASK                     => 0002,
+            //
+            static::OPT_POST_MAX_SIZE             => '1M',
+            //
+            static::OPT_SESSION_COOKIE_PARAMS     => [
                 'lifetime' => 0,
                 'path'     => '/',
                 'domain'   => '',
@@ -305,27 +195,1814 @@ class EntrypointModule
                 'httponly' => true,
                 'samesite' => 'Lax',
             ],
-            'sessionSavePath'         => null,
-            'sessionSavePathMkdir'    => false,
+            static::OPT_SESSION_SAVE_PATH         => null,
             //
-            'uploadMaxFilesize'       => '0',
-            'uploadTmpDir'            => null,
-            'uploadTmpDirMkdir'       => false,
+            static::OPT_UPLOAD_MAX_FILESIZE       => '0',
+            static::OPT_UPLOAD_TMP_DIR            => null,
             //
-            'errorHandler'            => [ $this, 'fnErrorHandler' ],
-            'exceptionHandler'        => [ $this, 'fnExceptionHandler' ],
+            static::OPT_RET_COLLECT_TRACE         => false,
         ];
 
-        foreach ( $this->mapRecommended as $key => $value ) {
-            $this->{$key} = [ $value ];
+        foreach ( $this->mapInitial as $key => $value ) {
+            $this->mapCurrent[$key] = $value;
         }
-
-        $this->registerShutdownFunctionMap = Map::new();
     }
 
     public function __initialize()
     {
         return $this;
+    }
+
+
+    protected function hasOpt(string $opt, &$refValue = null) : bool
+    {
+        $refValue = null;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $refValue = $this->mapCurrent[$opt];
+
+            return true;
+        }
+
+        return false;
+    }
+
+    protected function setOpt(string $opt, $value, ?bool $replace = null)
+    {
+        $this->assertNotLocked();
+
+        $isAlreadySet = array_key_exists($opt, $this->mapSet);
+        if ( $isAlreadySet && ! $replace ) {
+            return $this;
+        }
+
+        if ( null === $value ) {
+            if ( array_key_exists($opt, $this->mapRecommended) ) {
+                $this->mapCurrent[$opt] = $this->mapRecommended[$opt];
+            }
+
+        } elseif ( false === $value ) {
+            if ( array_key_exists($opt, $this->mapInitial) ) {
+                $this->mapCurrent[$opt] = $this->mapInitial[$opt];
+            }
+
+        } else {
+            $fn = '_set' . ucfirst($opt);
+
+            $varValid = $this->{$fn}($value);
+
+            $this->mapSet[$opt] = $varValid;
+
+            $this->mapCurrent[$opt] = $varValid;
+        }
+
+        return $this;
+    }
+
+    protected function useOpt(string $opt, &$refLast = null)
+    {
+        $refLast = $this->mapCurrent[$opt] ?? null;
+
+        if ( array_key_exists($opt, $this->mapSet) ) {
+            $this->mapCurrent[$opt] = $this->mapSet[$opt];
+        }
+
+        if ( ! array_key_exists($opt, $this->mapCurrent) ) {
+            return $this;
+        }
+
+        $fn = '_use' . ucfirst($opt);
+
+        $this->{$fn}();
+
+        return $this;
+    }
+
+    protected function useRecommendedOpt(string $opt, &$refLast = null)
+    {
+        $refLast = $this->mapCurrent[$opt] ?? null;
+
+        if ( ! array_key_exists($opt, $this->mapRecommended) ) {
+            return $this;
+        }
+
+        $this->mapCurrent[$opt] = $this->mapRecommended[$opt];
+
+        $fn = '_use' . ucfirst($opt);
+
+        $this->{$fn}();
+
+        return $this;
+    }
+
+
+    /**
+     * @param string|null $refValue
+     */
+    public function hasDirRoot(&$refValue = null) : bool
+    {
+        $opt = static::OPT_DIR_ROOT;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param string|false|null $value
+     *
+     * @return static
+     */
+    public function setDirRoot($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_DIR_ROOT;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useDirRoot(&$refLast = null)
+    {
+        $opt = static::OPT_DIR_ROOT;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedDirRoot(&$refLast = null)
+    {
+        $opt = static::OPT_DIR_ROOT;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setDirRoot($var)
+    {
+        $theType = Lib::type();
+
+        $varValid = $theType->dirpath_realpath($var)->orThrow();
+
+        return $varValid;
+    }
+
+    protected function _useDirRoot()
+    {
+        $opt = static::OPT_DIR_ROOT;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            if ( null === $var ) {
+                DebugModule::staticDirRoot(false);
+
+            } else {
+                DebugModule::staticDirRoot($var);
+            }
+        }
+    }
+
+
+    /**
+     * @return int|null
+     */
+    public function getPhpErrorReporting()
+    {
+        $errorReporting = error_reporting();
+
+        return $errorReporting;
+    }
+
+    /**
+     * @param int|null $refValue
+     */
+    public function hasErrorReporting(&$refValue = null) : bool
+    {
+        $opt = static::OPT_ERROR_REPORTING;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param int|false|null $value
+     *
+     * @return static
+     */
+    public function setErrorReporting($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_ERROR_REPORTING;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useErrorReporting(&$refLast = null)
+    {
+        $opt = static::OPT_ERROR_REPORTING;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedErrorReporting(&$refLast = null)
+    {
+        $opt = static::OPT_ERROR_REPORTING;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setErrorReporting($var)
+    {
+        if ( 0 !== ($var & ~(E_ALL | E_DEPRECATED | E_USER_DEPRECATED)) ) {
+            throw new LogicException(
+                [ 'The `errorReporting` should be valid flag', $var ]
+            );
+        }
+
+        return $var;
+    }
+
+    protected function _useErrorReporting()
+    {
+        $opt = static::OPT_ERROR_REPORTING;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            error_reporting($var);
+        }
+    }
+
+
+    /**
+     * @return string|false
+     */
+    public function getPhpErrorLog()
+    {
+        return ini_get('error_log');
+    }
+
+    /**
+     * @param string|null $refValue
+     */
+    public function hasErrorLog(&$refValue = null) : bool
+    {
+        $opt = static::OPT_ERROR_LOG;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param string|false|null $value
+     *
+     * @return static
+     */
+    public function setErrorLog($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_ERROR_LOG;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useErrorLog(&$refLast = null)
+    {
+        $opt = static::OPT_ERROR_LOG;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedErrorLog(&$refLast = null)
+    {
+        $opt = static::OPT_ERROR_LOG;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setErrorLog($var)
+    {
+        $theType = Lib::type();
+
+        $varValid = $theType->filepath($var, true)->orThrow();
+
+        return $varValid;
+    }
+
+    protected function _useErrorLog()
+    {
+        $opt = static::OPT_ERROR_LOG;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            ini_set('error_log', $var);
+        }
+    }
+
+
+    /**
+     * @return string|false
+     */
+    public function getPhpLogErrors()
+    {
+        return ini_get('log_errors');
+    }
+
+    /**
+     * @param bool|null $refValue
+     */
+    public function hasLogErrors(&$refValue = null) : bool
+    {
+        $opt = static::OPT_LOG_ERRORS;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param bool|false|null $value
+     *
+     * @return static
+     */
+    public function setLogErrors($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_LOG_ERRORS;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useLogErrors(&$refLast = null)
+    {
+        $opt = static::OPT_LOG_ERRORS;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedLogErrors(&$refLast = null)
+    {
+        $opt = static::OPT_LOG_ERRORS;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setLogErrors($var)
+    {
+        $theType = Lib::type();
+
+        $varValid = $theType->bool($var)->orThrow();
+
+        return (int) $varValid;
+    }
+
+    protected function _useLogErrors()
+    {
+        $opt = static::OPT_LOG_ERRORS;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            ini_set('log_errors', $var);
+        }
+    }
+
+
+    /**
+     * @return string|false
+     */
+    public function getPhpDisplayErrors()
+    {
+        return ini_get('display_errors');
+    }
+
+    /**
+     * @param bool|null $refValue
+     */
+    public function hasDisplayErrors(&$refValue = null) : bool
+    {
+        $opt = static::OPT_DISPLAY_ERRORS;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param bool|false|null $value
+     *
+     * @return static
+     */
+    public function setDisplayErrors($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_DISPLAY_ERRORS;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useDisplayErrors(&$refLast = null)
+    {
+        $opt = static::OPT_DISPLAY_ERRORS;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedDisplayErrors(&$refLast = null)
+    {
+        $opt = static::OPT_DISPLAY_ERRORS;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setDisplayErrors($var)
+    {
+        $theType = Lib::type();
+
+        $varValid = $theType->bool($var)->orThrow();
+
+        return (int) $varValid;
+    }
+
+    protected function _useDisplayErrors()
+    {
+        $opt = static::OPT_DISPLAY_ERRORS;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            ini_set('display_errors', $var);
+            ini_set('display_startup_errors', $var);
+        }
+    }
+
+
+    public function getPhpMemoryLimit() : string
+    {
+        return ini_get('memory_limit');
+    }
+
+    /**
+     * @param string|null $refValue
+     */
+    public function hasMemoryLimit(&$refValue = null) : bool
+    {
+        $opt = static::OPT_MEMORY_LIMIT;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param string|false|null $value
+     *
+     * @return static
+     */
+    public function setMemoryLimit($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_MEMORY_LIMIT;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useMemoryLimit(&$refLast = null)
+    {
+        $opt = static::OPT_MEMORY_LIMIT;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedMemoryLimit(&$refLast = null)
+    {
+        $opt = static::OPT_MEMORY_LIMIT;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setMemoryLimit($var)
+    {
+        $theFormat = Lib::format();
+
+        $varValidInt = $theFormat->bytes_decode([], $var);
+        $varValidString = $theFormat->bytes_encode([], $varValidInt, 0, 1);
+
+        return $varValidString;
+    }
+
+    protected function _useMemoryLimit()
+    {
+        $opt = static::OPT_MEMORY_LIMIT;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            ini_set('memory_limit', $var);
+        }
+    }
+
+
+    public function getPhpMaxExecutionTime() : string
+    {
+        return ini_get('max_execution_time');
+    }
+
+    /**
+     * @param int|null $refValue
+     */
+    public function hasMaxExecutionTime(&$refValue = null) : bool
+    {
+        $opt = static::OPT_MAX_EXECUTION_TIME;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param int|false|null $value
+     *
+     * @return static
+     */
+    public function setMaxExecutionTime($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_MAX_EXECUTION_TIME;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useMaxExecutionTime(&$refLast = null)
+    {
+        $opt = static::OPT_MAX_EXECUTION_TIME;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedMaxExecutionTime(&$refLast = null)
+    {
+        $opt = static::OPT_MAX_EXECUTION_TIME;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setMaxExecutionTime($var)
+    {
+        $theType = Lib::type();
+
+        $varValid = $theType->int_non_negative($var)->orThrow();
+
+        return $varValid;
+    }
+
+    protected function _useMaxExecutionTime()
+    {
+        $opt = static::OPT_MAX_EXECUTION_TIME;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            ini_set('max_execution_time', $var);
+        }
+    }
+
+
+    public function getPhpMaxInputTime() : string
+    {
+        return ini_get('max_input_time');
+    }
+
+    /**
+     * @param int|null $refValue
+     */
+    public function hasMaxInputTime(&$refValue = null) : bool
+    {
+        $opt = static::OPT_MAX_INPUT_TIME;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param int|false|null $value
+     *
+     * @return static
+     */
+    public function setMaxInputTime($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_MAX_INPUT_TIME;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useMaxInputTime(&$refLast = null)
+    {
+        $opt = static::OPT_MAX_INPUT_TIME;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedMaxInputTime(&$refLast = null)
+    {
+        $opt = static::OPT_MAX_INPUT_TIME;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setMaxInputTime($var)
+    {
+        $theType = Lib::type();
+
+        $varValid = $theType->int_non_negative_or_minus_one($var)->orThrow();
+
+        return $varValid;
+    }
+
+    protected function _useMaxInputTime()
+    {
+        $opt = static::OPT_MAX_INPUT_TIME;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            ini_set('max_input_time', $var);
+        }
+    }
+
+
+    public function getPhpTimezoneDefault() : \DateTimeZone
+    {
+        try {
+            $timezone = new \DateTimeZone(date_default_timezone_get());
+        }
+        catch ( \Throwable $e ) {
+            throw new RuntimeException($e);
+        }
+
+        return $timezone;
+    }
+
+    /**
+     * @param \DateTimeZone|null $refValue
+     */
+    public function hasTimezoneDefault(&$refValue = null) : bool
+    {
+        $opt = static::OPT_TIMEZONE_DEFAULT;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param string|\DateTimeZone|false|null $value
+     *
+     * @return static
+     */
+    public function setTimezoneDefault($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_TIMEZONE_DEFAULT;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useTimezoneDefault(&$refLast = null)
+    {
+        $opt = static::OPT_TIMEZONE_DEFAULT;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedTimezoneDefault(&$refLast = null)
+    {
+        $opt = static::OPT_TIMEZONE_DEFAULT;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setTimezoneDefault($var)
+    {
+        $theType = Lib::type();
+
+        $varValid = $theType->timezone($var)->orThrow();
+
+        return $varValid;
+    }
+
+    protected function _useTimezoneDefault()
+    {
+        $opt = static::OPT_TIMEZONE_DEFAULT;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            if ( null !== $var ) {
+                date_default_timezone_set($var->getName());
+            }
+        }
+    }
+
+
+    public function getPhpPrecision() : string
+    {
+        return ini_get('precision');
+    }
+
+    /**
+     * @param string|null $refValue
+     */
+    public function hasPrecision(&$refValue = null) : bool
+    {
+        $opt = static::OPT_PRECISION;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param int|false|null $value
+     *
+     * @return static
+     */
+    public function setPrecision($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_PRECISION;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function usePrecision(&$refLast = null)
+    {
+        $opt = static::OPT_PRECISION;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedPrecision(&$refLast = null)
+    {
+        $opt = static::OPT_PRECISION;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setPrecision($var)
+    {
+        $theType = Lib::type();
+
+        $varValid = $theType->int_non_negative($var)->orThrow();
+
+        return $varValid;
+    }
+
+    protected function _usePrecision()
+    {
+        $opt = static::OPT_PRECISION;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            ini_set('precision', $var);
+        }
+    }
+
+
+    public function getPhpUmask() : string
+    {
+        $umaskTmp = $umaskTmp ?? 0002;
+
+        $before = umask($umaskTmp);
+
+        umask($before);
+
+        return $before;
+    }
+
+    /**
+     * @param int|null $refValue
+     */
+    public function hasUmask(&$refValue = null) : bool
+    {
+        $opt = static::OPT_UMASK;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param int|false|null $value
+     *
+     * @return static
+     */
+    public function setUmask($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_UMASK;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useUmask(&$refLast = null)
+    {
+        $opt = static::OPT_UMASK;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedUmask(&$refLast = null)
+    {
+        $opt = static::OPT_UMASK;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setUmask($var)
+    {
+        if ( ! (($var >= 0) && ($var <= 0777)) ) {
+            throw new LogicException(
+                [ 'The `umask` should be a valid `umask`', $var ]
+            );
+        }
+
+        return $var;
+    }
+
+    protected function _useUmask()
+    {
+        $opt = static::OPT_UMASK;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            umask($var);
+        }
+    }
+
+
+    public function getPhpPostMaxSize() : string
+    {
+        return ini_get('post_max_size');
+    }
+
+    /**
+     * @param string|null $refValue
+     */
+    public function hasPostMaxSize(&$refValue = null) : bool
+    {
+        $opt = static::OPT_POST_MAX_SIZE;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param string|false|null $value
+     *
+     * @return static
+     */
+    public function setPostMaxSize($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_POST_MAX_SIZE;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function usePostMaxSize(&$refLast = null)
+    {
+        $opt = static::OPT_POST_MAX_SIZE;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedPostMaxSize(&$refLast = null)
+    {
+        $opt = static::OPT_POST_MAX_SIZE;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setPostMaxSize($var)
+    {
+        $theFormat = Lib::format();
+
+        $varValidInt = $theFormat->bytes_decode([], $var);
+        $varValidString = $theFormat->bytes_encode([], $varValidInt, 0, 1);
+
+        return $varValidString;
+    }
+
+    protected function _usePostMaxSize()
+    {
+        $opt = static::OPT_POST_MAX_SIZE;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            ini_set('post_max_size', $var);
+        }
+    }
+
+
+    public function getPhpSessionCookieParams() : array
+    {
+        $theHttpSession = Lib::httpSession();
+
+        return $theHttpSession->session_get_cookie_params();
+    }
+
+    /**
+     * @param array|null $refValue
+     */
+    public function hasSessionCookieParams(&$refValue = null) : bool
+    {
+        $opt = static::OPT_SESSION_COOKIE_PARAMS;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param array|false|null $value
+     *
+     * @return static
+     */
+    public function setSessionCookieParams($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_SESSION_COOKIE_PARAMS;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useSessionCookieParams(&$refLast = null)
+    {
+        $opt = static::OPT_SESSION_COOKIE_PARAMS;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedSessionCookieParams(&$refLast = null)
+    {
+        $opt = static::OPT_SESSION_COOKIE_PARAMS;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setSessionCookieParams($var)
+    {
+        $theType = Lib::type();
+
+        $varValid = $theType->array($var)->orThrow();
+        $varValidScheme = [
+            'lifetime' => null,
+            'path'     => null,
+            'domain'   => null,
+            'secure'   => null,
+            'httponly' => null,
+            'samesite' => null,
+        ];
+
+        if ( $diff = array_diff_key($varValid, $varValidScheme) ) {
+            throw new RuntimeException(
+                [
+                    ''
+                    . 'The `sessionCookieParams` contains unexpected keys: '
+                    . implode('|', array_keys($diff)),
+                    //
+                    $varValid,
+                ]
+            );
+        }
+
+        return $varValid;
+    }
+
+    protected function _useSessionCookieParams()
+    {
+        $opt = static::OPT_SESSION_COOKIE_PARAMS;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $theHttpSession = Lib::httpSession();
+
+            $var = $this->mapCurrent[$opt];
+
+            $theHttpSession->session_set_cookie_params($var);
+        }
+    }
+
+
+    public function getPhpSessionSavePath() : string
+    {
+        $theHttpSession = Lib::httpSession();
+
+        return $theHttpSession->session_save_path();
+    }
+
+    /**
+     * @param string|null $refValue
+     */
+    public function hasSessionSavePath(&$refValue = null) : bool
+    {
+        $opt = static::OPT_SESSION_SAVE_PATH;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param string|false|null $value
+     *
+     * @return static
+     */
+    public function setSessionSavePath($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_SESSION_SAVE_PATH;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useSessionSavePath(&$refLast = null)
+    {
+        $opt = static::OPT_SESSION_SAVE_PATH;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedSessionSavePath(&$refLast = null)
+    {
+        $opt = static::OPT_SESSION_SAVE_PATH;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setSessionSavePath($var)
+    {
+        $theType = Lib::type();
+
+        $varValid = $theType->dirpath($var, true)->orThrow();
+
+        return $varValid;
+    }
+
+    protected function _useSessionSavePath()
+    {
+        $opt = static::OPT_SESSION_SAVE_PATH;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $theFsFile = Lib::fsFile();
+            $theHttpSession = Lib::httpSession();
+
+            $var = $this->mapCurrent[$opt];
+
+            if ( null !== $var ) {
+                $theFsFile->mkdirp($var, 0775, true);
+            }
+
+            $theHttpSession->session_save_path($var);
+        }
+    }
+
+
+    public function getPhpUploadMaxFilesize() : string
+    {
+        return ini_get('upload_max_filesize');
+    }
+
+    /**
+     * @param string|null $refValue
+     */
+    public function hasUploadMaxFilesize(&$refValue = null) : bool
+    {
+        $opt = static::OPT_UPLOAD_MAX_FILESIZE;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param string|false|null $value
+     *
+     * @return static
+     */
+    public function setUploadMaxFilesize($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_UPLOAD_MAX_FILESIZE;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useUploadMaxFilesize(&$refLast = null)
+    {
+        $opt = static::OPT_UPLOAD_MAX_FILESIZE;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedUploadMaxFilesize(&$refLast = null)
+    {
+        $opt = static::OPT_UPLOAD_MAX_FILESIZE;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setUploadMaxFilesize($var)
+    {
+        $theFormat = Lib::format();
+
+        $varValidInt = $theFormat->bytes_decode([], $var);
+        $varValidString = $theFormat->bytes_encode([], $varValidInt, 0, 1);
+
+        return $varValidString;
+    }
+
+    protected function _useUploadMaxFilesize()
+    {
+        $opt = static::OPT_UPLOAD_MAX_FILESIZE;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            ini_set('upload_max_filesize', $var);
+        }
+    }
+
+
+    public function getPhpUploadTmpDir() : string
+    {
+        return ini_get('upload_tmp_dir');
+    }
+
+    /**
+     * @param string|null $refValue
+     */
+    public function hasUploadTmpDir(&$refValue = null) : bool
+    {
+        $opt = static::OPT_UPLOAD_TMP_DIR;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param string|false|null $value
+     *
+     * @return static
+     */
+    public function setUploadTmpDir($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_UPLOAD_TMP_DIR;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useUploadTmpDir(&$refLast = null)
+    {
+        $opt = static::OPT_UPLOAD_TMP_DIR;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedUploadTmpDir(&$refLast = null)
+    {
+        $opt = static::OPT_UPLOAD_TMP_DIR;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setUploadTmpDir($var)
+    {
+        $theType = Lib::type();
+
+        $varValid = $theType->dirpath($var, true)->orThrow();
+
+        return $varValid;
+    }
+
+    protected function _useUploadTmpDir()
+    {
+        $opt = static::OPT_UPLOAD_TMP_DIR;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $theFsFile = Lib::fsFile();
+
+            $var = $this->mapCurrent[$opt];
+
+            if ( null !== $var ) {
+                $theFsFile->mkdirp($var, 0775, true);
+            }
+
+            ini_set('upload_tmp_dir', $var);
+        }
+    }
+
+
+    /**
+     * @param bool|null $refValue
+     */
+    public function hasRetCollectTrace(&$refValue = null) : bool
+    {
+        $opt = static::OPT_RET_COLLECT_TRACE;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param callable|false|null $value
+     *
+     * @return static
+     */
+    public function setRetCollectTrace($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_RET_COLLECT_TRACE;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useRetCollectTrace(&$refLast = null)
+    {
+        $opt = static::OPT_RET_COLLECT_TRACE;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedRetCollectTrace(&$refLast = null)
+    {
+        $opt = static::OPT_RET_COLLECT_TRACE;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setRetCollectTrace($var)
+    {
+        return (bool) $var;
+    }
+
+    protected function _useRetCollectTrace()
+    {
+        //
+    }
+
+
+    /**
+     * @return callable|null
+     */
+    public function getPhpErrorHandler()
+    {
+        $handler = set_error_handler(static function () { });
+
+        restore_error_handler();
+
+        return $handler;
+    }
+
+    /**
+     * @param callable|null $refValue
+     */
+    public function hasErrorHandler(&$refValue = null) : bool
+    {
+        $opt = static::OPT_ERROR_HANDLER;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param callable|false|null $value
+     *
+     * @return static
+     */
+    public function setErrorHandler($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_ERROR_HANDLER;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useErrorHandler(&$refLast = null)
+    {
+        $opt = static::OPT_ERROR_HANDLER;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedErrorHandler(&$refLast = null)
+    {
+        $opt = static::OPT_ERROR_HANDLER;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setErrorHandler($var)
+    {
+        if ( ! is_callable($var) ) {
+            throw new LogicException(
+                [ 'The `fnErrorHandler` should be a callable', $var ]
+            );
+        }
+
+        return $var;
+    }
+
+    protected function _useErrorHandler()
+    {
+        $opt = static::OPT_ERROR_HANDLER;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            set_error_handler([ $this, 'fnErrorHandlerWrapper' ]);
+
+            $this->registerShutdownFunction([ $this, 'onShutdown_fatalErrorOnShutdown' ]);
+            $this->registerShutdownFunction([ $this, 'onShutdown_throwablesOnShutdown' ]);
+        }
+    }
+
+
+    /**
+     * @param callable|null $refValue
+     */
+    public function hasErrorHandlerOnShutdown(&$refValue = null) : bool
+    {
+        $opt = static::OPT_ERROR_HANDLER_ON_SHUTDOWN;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param callable|false|null $value
+     *
+     * @return static
+     */
+    public function setErrorHandlerOnShutdown($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_ERROR_HANDLER_ON_SHUTDOWN;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useErrorHandlerOnShutdown(&$refLast = null)
+    {
+        $opt = static::OPT_ERROR_HANDLER_ON_SHUTDOWN;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedErrorHandlerOnShutdown(&$refLast = null)
+    {
+        $opt = static::OPT_ERROR_HANDLER_ON_SHUTDOWN;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setErrorHandlerOnShutdown($var)
+    {
+        if ( ! is_callable($var) ) {
+            throw new LogicException(
+                [ 'The `fnErrorHandlerOnShutdown` should be a callable', $var ]
+            );
+        }
+
+        return $var;
+    }
+
+    protected function _useErrorHandlerOnShutdown()
+    {
+        $opt = static::OPT_ERROR_HANDLER_ON_SHUTDOWN;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            set_error_handler([ $this, 'fnErrorHandlerWrapper' ]);
+
+            $this->registerShutdownFunction([ $this, 'onShutdown_fatalErrorOnShutdown' ]);
+            $this->registerShutdownFunction([ $this, 'onShutdown_throwablesOnShutdown' ]);
+        }
+    }
+
+
+    /**
+     * @return callable|null
+     */
+    public function getPhpExceptionHandler()
+    {
+        $handler = set_exception_handler(static function () { });
+
+        restore_exception_handler();
+
+        return $handler;
+    }
+
+    /**
+     * @param callable|null $refValue
+     */
+    public function hasExceptionHandler(&$refValue = null) : bool
+    {
+        $opt = static::OPT_EXCEPTION_HANDLER;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param callable|false|null $value
+     *
+     * @return static
+     */
+    public function setExceptionHandler($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_EXCEPTION_HANDLER;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useExceptionHandler(&$refLast = null)
+    {
+        $opt = static::OPT_EXCEPTION_HANDLER;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedExceptionHandler(&$refLast = null)
+    {
+        $opt = static::OPT_EXCEPTION_HANDLER;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setExceptionHandler($var)
+    {
+        if ( ! is_callable($var) ) {
+            throw new LogicException(
+                [ 'The `fnExceptionHandler` should be a callable', $var ]
+            );
+        }
+
+        return $var;
+    }
+
+    protected function _useExceptionHandler()
+    {
+        $opt = static::OPT_EXCEPTION_HANDLER;
+
+        if ( array_key_exists($opt, $this->mapCurrent) ) {
+            $var = $this->mapCurrent[$opt];
+
+            set_exception_handler($var);
+        }
+    }
+
+
+    /**
+     * @param callable|null $refValue
+     */
+    public function hasThrowableHandler(&$refValue = null) : bool
+    {
+        $opt = static::OPT_THROWABLE_HANDLER;
+
+        return $this->hasOpt($opt, $refValue);
+    }
+
+    /**
+     * @param callable|false|null $value
+     *
+     * @return static
+     */
+    public function setThrowableHandler($value, ?bool $replace = null)
+    {
+        $opt = static::OPT_THROWABLE_HANDLER;
+
+        $this->setOpt($opt, $value, $replace);
+
+        return $this;
+    }
+
+    public function useThrowableHandler(&$refLast = null)
+    {
+        $opt = static::OPT_THROWABLE_HANDLER;
+
+        $this->useOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    public function useRecommendedThrowableHandler(&$refLast = null)
+    {
+        $opt = static::OPT_THROWABLE_HANDLER;
+
+        $this->useRecommendedOpt($opt, $refLast);
+
+        return $this;
+    }
+
+    protected function _setThrowableHandler($var)
+    {
+        if ( ! is_callable($var) ) {
+            throw new LogicException(
+                [ 'The `fnThrowableHandler` should be a callable', $var ]
+            );
+        }
+
+        return $var;
+    }
+
+    protected function _useThrowableHandler()
+    {
+        //
+    }
+
+
+    /**
+     * @throws ErrorException
+     */
+    public function fnErrorHandlerWrapper($errno, $errstr, $errfile, $errline) : void
+    {
+        $e = null;
+
+        if ( null === $e ) {
+            if ( $this->hasErrorHandlerOnShutdown($fn) ) {
+                if ( null !== $fn ) {
+                    $e = $fn($errno, $errstr, $errfile, $errline);
+                }
+            }
+        }
+
+        if ( null === $e ) {
+            if ( $this->hasErrorHandler($fn) ) {
+                if ( null !== $fn ) {
+                    $e = $fn($errno, $errstr, $errfile, $errline);
+                }
+            }
+        }
+    }
+
+    public function fnErrorHandlerOnShutdown($errno, $errstr, $errfile, $errline)
+    {
+        $isErrorHeadersAlreadySent = (false !== strpos($errstr, 'Cannot modify header information'));
+
+        $isThrowableOnShutdown = false
+            || $isErrorHeadersAlreadySent;
+
+        if ( $isThrowableOnShutdown ) {
+            $e = new ErrorException($errstr, -1, $errno, $errfile, $errline);
+
+            $trace = debug_backtrace();
+
+            array_shift($trace);
+
+            $e->setTrace($trace);
+
+            $this->addThrowableOnShutdown($e);
+
+            return $this;
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws ErrorException
+     */
+    public function fnErrorHandler($errno, $errstr, $errfile, $errline) : void
+    {
+        if ( ! (error_reporting() & $errno) ) {
+            return;
+        }
+
+        throw new ErrorException($errstr, -1, $errno, $errfile, $errline);
+    }
+
+
+    public function fnExceptionHandler(\Throwable $e) : void
+    {
+        if ( $this->hasThrowableHandler($fn) ) {
+            if ( null !== $fn ) {
+                $fn($e);
+            }
+        }
+
+        exit(1);
+    }
+
+
+    public function fnThrowableHandler(\Throwable $e) : void
+    {
+        $theDebugThrowabler = Lib::debugThrowabler();
+
+        $lines = $theDebugThrowabler->getPreviousMessagesAllLines(
+            $e,
+            0
+            //
+            | _DEBUG_THROWABLER_WITH_CODE
+            | _DEBUG_THROWABLER_WITH_INFO
+            | _DEBUG_THROWABLER_WITH_TRACE
+            //
+            | _DEBUG_THROWABLER_INFO_WITH_FILE
+            | _DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS
+            | _DEBUG_THROWABLER_INFO_WITHOUT_OBJECT_ID
+        );
+
+        echo "\n" . implode("\n", $lines) . "\n";
+    }
+
+    public function onShutdown_fatalErrorOnShutdown() : void
+    {
+        $err = error_get_last();
+        if ( null === $err ) return;
+        if ( ! in_array($err['type'], [ E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR ]) ) return;
+
+        $e = new ErrorException($err['message'], -1, $err['type'], $err['file'], $err['line']);
+
+        $this->addThrowableOnShutdown($e);
+    }
+
+
+    /**
+     * @return static
+     */
+    public function setAllInitial()
+    {
+        $this->assertNotLocked();
+
+        foreach ( $this->mapInitial as $key => $value ) {
+            $this->mapCurrent[$key] = $value;
+            $this->mapSet[$key] = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function setAllRecommended()
+    {
+        $this->assertNotLocked();
+
+        foreach ( $this->mapRecommended as $key => $value ) {
+            $this->mapCurrent[$key] = $value;
+            $this->mapSet[$key] = $value;
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @return static
+     */
+    public function useAll(?bool $lock = null)
+    {
+        $lock = $lock ?? true;
+
+        foreach ( array_keys($this->mapCurrent) as $key ) {
+            $fn = 'use' . ucfirst($key);
+
+            $this->{$fn}();
+        }
+
+        if ( $lock ) {
+            $this->lock(true);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function useAllRecommended(?bool $lock = null)
+    {
+        $lock = $lock ?? true;
+
+        foreach ( array_keys($this->mapRecommended) as $key ) {
+            $fn = 'useRecommended' . ucfirst($key);
+
+            $this->{$fn}();
+        }
+
+        if ( $lock ) {
+            $this->lock(true);
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @return \Throwable[]
+     */
+    public function getThrowablesOnShutdown() : array
+    {
+        return $this->throwablesOnShutdown;
+    }
+
+    /**
+     * @return static
+     */
+    protected function addThrowableOnShutdown(\Throwable $e)
+    {
+        $this->throwablesOnShutdown[] = $e;
+
+        $this->registerShutdownFunction([ $this, 'onShutdown_throwablesOnShutdown' ]);
+
+        return $this;
+    }
+
+    public function onShutdown_throwablesOnShutdown() : void
+    {
+        if ( [] === $this->throwablesOnShutdown ) {
+            return;
+        }
+
+        if ( $this->hasThrowableHandler($fn) ) {
+            if ( null !== $fn ) {
+                foreach ( $this->throwablesOnShutdown as $e ) {
+                    $fn($e);
+                }
+            }
+        }
     }
 
 
@@ -361,1700 +2038,6 @@ class EntrypointModule
         return $this;
     }
 
-
-    /**
-     * @param string $refResult
-     */
-    public function hasDirRoot(&$refResult = null) : bool
-    {
-        $refResult = null;
-
-        if ( [] !== $this->dirRoot ) {
-            $refResult = $this->dirRoot[0];
-
-            return true;
-        }
-
-        return false;
-    }
-
-    public function getDirRoot() : string
-    {
-        return $this->dirRoot[0];
-    }
-
-    /**
-     * > частично удаляет путь файла из каждой строки `trace` (`trace[i][file]`) при обработке исключений
-     *
-     * @param string|false|null $dirRoot
-     *
-     * @return static
-     */
-    public function setDirRoot($dirRoot, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'dirRoot';
-        $var = $dirRoot;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( ! $var ) {
-            $this->{$key} = [ null ];
-
-        } else {
-            $theType = Lib::type();
-
-            $varValid = $theType->dirpath_realpath($var)->orThrow();
-
-            $this->{$key} = [ $varValid ];
-        }
-
-        [ $current ] = $this->{$key};
-
-        if ( null !== $current ) {
-            DebugModule::staticDirRoot($dirRoot);
-        }
-
-        return $this;
-    }
-
-
-    public function isHeadersAlreadySentAsync() : bool
-    {
-        return $this->headersAlreadySentAsync[0] ?? false;
-    }
-
-    /**
-     * > откладывает обработку исключения `Headers Already Sent` на register_shutdown_function
-     *
-     * @param bool|null $headersAlreadySentAsync
-     *
-     * @return static
-     */
-    public function setHeadersAlreadySentAsync($headersAlreadySentAsync, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'headersAlreadySentAsync';
-        $var = $headersAlreadySentAsync;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ false ];
-
-        } else {
-            $this->{$key} = [ (bool) $headersAlreadySentAsync ];
-        }
-
-        return $this;
-    }
-
-
-    public function isRetCollectTrace() : bool
-    {
-        return $this->retCollectTrace[0] ?? false;
-    }
-
-    /**
-     * > собирает трейсы при добавлении каждой ошибки для отлова пути, где она произошла
-     *
-     * @param bool|null $retCollectTrace
-     *
-     * @return static
-     */
-    public function setRetCollectTrace($retCollectTrace, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'retCollectTrace';
-        $var = $retCollectTrace;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ false ];
-
-        } else {
-            $this->{$key} = [ (bool) $retCollectTrace ];
-        }
-
-        [ $current ] = $this->{$key};
-
-        if ( null !== $current ) {
-            Ret::staticIsCollectTrace($current);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @return int|null
-     */
-    public function getPhpErrorReporting()
-    {
-        $errorReporting = error_reporting();
-
-        return $errorReporting;
-    }
-
-    /**
-     * @param int|false|null $errorReporting
-     *
-     * @return static
-     */
-    public function setErrorReporting($errorReporting, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'errorReporting';
-        $var = $errorReporting;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            if ( 0 !== ($errorReporting & ~(E_ALL | E_DEPRECATED | E_USER_DEPRECATED)) ) {
-                throw new LogicException(
-                    [ 'The `errorReporting` should be valid flag', $var ]
-                );
-            }
-
-            $this->{$key} = [ $var ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useErrorReporting(&$refLast = null)
-    {
-        $refLast = $this->getPhpErrorReporting();
-
-        if ( [] !== $this->errorReporting ) {
-            error_reporting($this->errorReporting[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedErrorReporting(&$refLast = null)
-    {
-        $refLast = $this->getPhpErrorReporting();
-
-        if ( null !== $this->mapRecommended['errorReporting'] ) {
-            error_reporting($this->mapRecommended['errorReporting']);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @return string|false
-     */
-    public function getPhpErrorLog()
-    {
-        return ini_get('error_log');
-    }
-
-    /**
-     * @param string|false|null $errorLog
-     *
-     * @return static
-     */
-    public function setErrorLog($errorLog, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'errorLog';
-        $var = $errorLog;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            $theType = Lib::type();
-
-            $varValid = $theType->filepath($errorLog, true)->orThrow();
-
-            $this->{$key} = [ $varValid ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useErrorLog(&$refLast = null)
-    {
-        $refLast = $this->getPhpErrorLog();
-
-        if ( [] !== $this->errorLog ) {
-            ini_set('error_log', $this->errorLog[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedErrorLog(&$refLast = null)
-    {
-        $refLast = $this->getPhpErrorLog();
-
-        if ( null !== $this->mapRecommended['errorLog'] ) {
-            ini_set('error_log', $this->mapRecommended['errorLog']);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @return string|false
-     */
-    public function getPhpLogErrors()
-    {
-        return ini_get('log_errors');
-    }
-
-    /**
-     * @param bool|false|null $logErrors
-     *
-     * @return static
-     */
-    public function setLogErrors($logErrors, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'logErrors';
-        $var = $logErrors;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            $theType = Lib::type();
-
-            $varValid = $theType->bool($var)->orThrow();
-
-            $this->{$key} = [ (int) $varValid ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useLogErrors(&$refLast = null)
-    {
-        $refLast = $this->getPhpLogErrors();
-
-        if ( [] !== $this->logErrors ) {
-            ini_set('log_errors', $this->logErrors[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedLogErrors(&$refLast = null)
-    {
-        $refLast = $this->getPhpLogErrors();
-
-        if ( null !== $this->mapRecommended['logErrors'] ) {
-            ini_set('log_errors', $this->mapRecommended['logErrors']);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @return string|false
-     */
-    public function getPhpDisplayErrors()
-    {
-        return ini_get('display_errors');
-    }
-
-    /**
-     * @param bool|false|null $displayErrors
-     *
-     * @return static
-     */
-    public function setDisplayErrors($displayErrors, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        if ( false !== $this->mapWasSet['displayErrors'] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet['displayErrors'] = true;
-        }
-
-        if ( null === $displayErrors ) {
-            $this->displayErrors = [ $this->mapRecommended['displayErrors'] ];
-
-        } elseif ( false === $displayErrors ) {
-            $this->displayErrors = [ $this->mapInitial['displayErrors'] ];
-
-        } else {
-            $theType = Lib::type();
-
-            $displayErrorsValid = $theType->bool($displayErrors)->orThrow();
-
-            $this->displayErrors = [ (int) $displayErrorsValid ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useDisplayErrors(&$refLast = null)
-    {
-        $refLast = $this->getPhpDisplayErrors();
-
-        if ( [] !== $this->displayErrors ) {
-            ini_set('display_errors', $this->displayErrors[0]);
-            ini_set('display_startup_errors', $this->displayErrors[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedDisplayErrors(&$refLast = null)
-    {
-        $refLast = $this->getPhpDisplayErrors();
-
-        if ( null !== $this->mapRecommended['displayErrors'] ) {
-            ini_set('display_errors', $this->mapRecommended['displayErrors']);
-            ini_set('display_startup_errors', $this->mapRecommended['displayErrors']);
-        }
-
-        return $this;
-    }
-
-
-    public function getPhpMemoryLimit() : string
-    {
-        return ini_get('memory_limit');
-    }
-
-    /**
-     * @param string|false|null $memoryLimit
-     *
-     * @return static
-     */
-    public function setMemoryLimit($memoryLimit, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'memoryLimit';
-        $var = $memoryLimit;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            $theFormat = Lib::format();
-
-            $varValidInt = $theFormat->bytes_decode([], $var);
-            $varValidString = $theFormat->bytes_encode([], $varValidInt, 0, 1);
-
-            $this->{$key} = [ $varValidString ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useMemoryLimit(&$refLast = null)
-    {
-        $refLast = $this->getPhpMemoryLimit();
-
-        if ( [] !== $this->memoryLimit ) {
-            ini_set('memory_limit', $this->memoryLimit[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedMemoryLimit(&$refLast = null)
-    {
-        $refLast = $this->getPhpMemoryLimit();
-
-        if ( null !== $this->mapRecommended['memoryLimit'] ) {
-            ini_set('memory_limit', $this->mapRecommended['memoryLimit']);
-        }
-
-        return $this;
-    }
-
-
-    public function getPhpMaxExecutionTime() : string
-    {
-        return ini_get('max_execution_time');
-    }
-
-    /**
-     * @param int|false|null $maxExecutionTime
-     *
-     * @return static
-     */
-    public function setMaxExecutionTime($maxExecutionTime, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'maxExecutionTime';
-        $var = $maxExecutionTime;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            $theType = Lib::type();
-
-            $varValid = $theType->int_non_negative($var)->orThrow();
-
-            $this->{$key} = [ $varValid ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useMaxExecutionTime(&$refLast = null)
-    {
-        $refLast = $this->getPhpMaxExecutionTime();
-
-        if ( [] !== $this->maxExecutionTime ) {
-            ini_set('max_execution_time', $this->maxExecutionTime[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedMaxExecutionTime(&$refLast = null)
-    {
-        $refLast = $this->getPhpMaxExecutionTime();
-
-        if ( null !== $this->mapRecommended['maxExecutionTime'] ) {
-            ini_set('max_execution_time', $this->mapRecommended['maxExecutionTime']);
-        }
-
-        return $this;
-    }
-
-
-    public function getPhpMaxInputTime() : string
-    {
-        return ini_get('max_input_time');
-    }
-
-    /**
-     * @param int|bool|null $maxInputTime
-     *
-     * @return static
-     */
-    public function setMaxInputTime($maxInputTime, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'maxInputTime';
-        $var = $maxInputTime;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            $theType = Lib::type();
-
-            $varValid = $theType->int_non_negative_or_minus_one($var)->orThrow();
-
-            $this->{$key} = [ $varValid ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useMaxInputTime(&$refLast = null)
-    {
-        $refLast = $this->getPhpMaxInputTime();
-
-        if ( [] !== $this->maxInputTime ) {
-            ini_set('max_input_time', $this->maxInputTime[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedMaxInputTime(&$refLast = null)
-    {
-        $refLast = $this->getPhpMaxInputTime();
-
-        if ( null !== $this->mapRecommended['maxInputTime'] ) {
-            ini_set('max_input_time', $this->mapRecommended['maxInputTime']);
-        }
-
-        return $this;
-    }
-
-
-    public function getPhpTimezoneDefault() : \DateTimeZone
-    {
-        try {
-            $timezone = new \DateTimeZone(date_default_timezone_get());
-        }
-        catch ( \Throwable $e ) {
-            throw new RuntimeException($e);
-        }
-
-        return $timezone;
-    }
-
-    /**
-     * @param \DateTimeZone|string|false|null $timezoneDefault
-     *
-     * @return static
-     */
-    public function setTimezoneDefault($timezoneDefault, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'timezoneDefault';
-        $var = $timezoneDefault;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            $theType = Lib::type();
-
-            $varValid = $theType->timezone($var)->orThrow();
-
-            $this->{$key} = [ $varValid ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useTimezoneDefault(&$refLast = null)
-    {
-        $refLast = $this->getPhpTimezoneDefault();
-
-        if ( [] !== $this->timezoneDefault ) {
-            date_default_timezone_set($this->timezoneDefault[0]->getName());
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedTimezoneDefault(&$refLast = null)
-    {
-        $refLast = $this->getPhpTimezoneDefault();
-
-        if ( null !== $this->mapRecommended['timezoneDefault'] ) {
-            date_default_timezone_set($this->mapRecommended['timezoneDefault']->getName());
-        }
-
-        return $this;
-    }
-
-
-    public function getPhpPrecision() : string
-    {
-        return ini_get('precision');
-    }
-
-    /**
-     * @param int|false|null $precision
-     *
-     * @return static
-     */
-    public function setPrecision($precision, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'precision';
-        $var = $precision;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            $theType = Lib::type();
-
-            $varValid = $theType->int_non_negative($var)->orThrow();
-
-            $this->{$key} = [ $varValid ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function usePrecision(&$refLast = null)
-    {
-        $refLast = $this->getPhpPrecision();
-
-        if ( [] !== $this->precision ) {
-            ini_set('precision', $this->precision[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedPrecision(&$refLast = null)
-    {
-        $refLast = $this->getPhpPrecision();
-
-        if ( null !== $this->mapRecommended['precision'] ) {
-            ini_set('precision', $this->mapRecommended['precision']);
-        }
-
-        return $this;
-    }
-
-
-    public function getPhpUmask() : string
-    {
-        $umaskTmp = $umaskTmp ?? 0002;
-
-        $before = umask($umaskTmp);
-
-        umask($before);
-
-        return $before;
-    }
-
-    /**
-     * @param int|false|null $umask
-     *
-     * @return static
-     */
-    public function setUmask($umask, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'umask';
-        $var = $umask;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            if ( ! (($var >= 0) && ($var <= 0777)) ) {
-                throw new LogicException(
-                    [ 'The `umask` should be a valid `umask`', $umask ]
-                );
-            }
-
-            $this->{$key} = [ $var ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useUmask(&$refLast = null)
-    {
-        $refLast = $this->getPhpUmask();
-
-        if ( [] !== $this->umask ) {
-            umask($this->umask[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedUmask(&$refLast = null)
-    {
-        $refLast = $this->getPhpUmask();
-
-        if ( null !== $this->mapRecommended['umask'] ) {
-            umask($this->mapRecommended['umask']);
-        }
-
-        return $this;
-    }
-
-
-    public function getPhpPostMaxSize() : string
-    {
-        return ini_get('post_max_size');
-    }
-
-    /**
-     * @param string|false|null $postMaxSize
-     *
-     * @return static
-     */
-    public function setPostMaxSize($postMaxSize, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'postMaxSize';
-        $var = $postMaxSize;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            $theFormat = Lib::format();
-
-            $varValidInt = $theFormat->bytes_decode([], $var);
-            $varValidString = $theFormat->bytes_encode([], $varValidInt, 0, 1);
-
-            $this->{$key} = [ $varValidString ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function usePostMaxSize(&$refLast = null)
-    {
-        $refLast = $this->getPhpPostMaxSize();
-
-        if ( [] !== $this->postMaxSize ) {
-            ini_set('post_max_size', $this->postMaxSize[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedPostMaxSize(&$refLast = null)
-    {
-        $refLast = $this->getPhpPostMaxSize();
-
-        if ( null !== $this->mapRecommended['postMaxSize'] ) {
-            ini_set('post_max_size', $this->mapRecommended['postMaxSize']);
-        }
-
-        return $this;
-    }
-
-
-    public function getPhpSessionCookieParams() : array
-    {
-        $theHttpSession = Lib::httpSession();
-
-        return $theHttpSession->session_get_cookie_params();
-    }
-
-    /**
-     * @param array|false|null $sessionCookieParams
-     *
-     * @return static
-     */
-    public function setSessionCookieParams($sessionCookieParams, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'sessionCookieParams';
-        $var = $sessionCookieParams;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            $sessionCookieParamsValid = Lib::type()->array($sessionCookieParams)->orThrow();
-
-            $sessionCookieParamsAll = [
-                'lifetime' => null,
-                'path'     => null,
-                'domain'   => null,
-                'secure'   => null,
-                'httponly' => null,
-                'samesite' => null,
-            ];
-
-            if ( $diff = array_diff_key($sessionCookieParams, $sessionCookieParamsAll) ) {
-                throw new RuntimeException(
-                    [
-                        ''
-                        . 'The `sessionCookieParams` contains unexpected keys: '
-                        . implode('|', array_keys($diff)),
-                        //
-                        $sessionCookieParams,
-                    ]
-                );
-            }
-
-            $this->{$key} = [ $sessionCookieParamsValid ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useSessionCookieParams(&$refLast = null)
-    {
-        $refLast = $this->getPhpSessionCookieParams();
-
-        if ( [] !== $this->sessionCookieParams ) {
-            $theHttpSession = Lib::httpSession();
-
-            $theHttpSession->session_set_cookie_params($this->sessionCookieParams[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedSessionCookieParams(&$refLast = null)
-    {
-        $refLast = $this->getPhpSessionCookieParams();
-
-        if ( null !== $this->mapRecommended['sessionCookieParams'] ) {
-            $theHttpSession = Lib::httpSession();
-
-            $theHttpSession->session_set_cookie_params($this->mapRecommended['sessionCookieParams']);
-        }
-
-        return $this;
-    }
-
-
-    public function getPhpSessionSavePath() : string
-    {
-        $theHttpSession = Lib::httpSession();
-
-        return $theHttpSession->session_save_path();
-    }
-
-    /**
-     * @param string|false|null $sessionSavePath
-     * @param bool|false|null   $sessionSavePathMkdir
-     *
-     * @return static
-     */
-    public function setSessionSavePath(
-        $sessionSavePath,
-        $sessionSavePathMkdir,
-        ?bool $replace = null
-    )
-    {
-        $this->assertNotLocked();
-
-        if ( false
-            || (false !== $this->mapWasSet['sessionSavePath'])
-            || (false !== $this->mapWasSet['sessionSavePathMkdir'])
-        ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet['sessionSavePath'] = true;
-            $this->mapWasSet['sessionSavePathMkdir'] = true;
-        }
-
-        if ( null === $sessionSavePath ) {
-            $this->sessionSavePath = [ $this->mapRecommended['sessionSavePath'] ];
-            $this->sessionSavePathMkdir = [ $this->mapRecommended['sessionSavePathMkdir'] ];
-
-        } elseif ( false === $sessionSavePath ) {
-            $this->sessionSavePath = [ $this->mapInitial['sessionSavePath'] ];
-            $this->sessionSavePathMkdir = [ $this->mapInitial['sessionSavePathMkdir'] ];
-
-        } else {
-            $theType = Lib::type();
-
-            $sessionSavePathMkdirValid = (bool) $sessionSavePathMkdir;
-
-            if ( $sessionSavePathMkdirValid ) {
-                $sessionSavePathValid = $theType->dirpath($sessionSavePath, true)->orThrow();
-
-            } else {
-                $sessionSavePathValid = $theType->dirpath_realpath($sessionSavePath)->orThrow();
-            }
-
-            $this->sessionSavePath = [ $sessionSavePathValid ];
-            $this->sessionSavePathMkdir = [ $sessionSavePathValid ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useSessionSavePath(&$refLast = null)
-    {
-        $refLast = $this->getPhpSessionSavePath();
-
-        if ( [] !== $this->sessionSavePath ) {
-            $sessionSavePathValid = $this->sessionSavePath[0];
-
-            if ( [] !== $this->sessionSavePathMkdir ) {
-                $sessionSavePathMkdirValid = (bool) $this->sessionSavePathMkdir[0];
-
-                if ( $sessionSavePathMkdirValid ) {
-                    $theFsFile = Lib::fsFile();
-
-                    $theFsFile->mkdirp($sessionSavePathValid, 0775, true);
-                }
-            }
-
-            $theHttpSession = Lib::httpSession();
-
-            $theHttpSession->session_save_path($sessionSavePathValid);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedSessionSavePath(&$refLast = null)
-    {
-        $refLast = $this->getPhpSessionSavePath();
-
-        if ( null !== $this->mapRecommended['sessionSavePath'] ) {
-            $theFsFile = Lib::fsFile();
-            $theHttpSession = Lib::httpSession();
-
-            $theFsFile->mkdirp($this->mapRecommended['sessionSavePath'], 0775, true);
-
-            $theHttpSession->session_save_path($this->mapRecommended['sessionSavePath']);
-        }
-
-        return $this;
-    }
-
-
-    public function getPhpUploadMaxFilesize() : string
-    {
-        return ini_get('upload_max_filesize');
-    }
-
-    /**
-     * @param string|false|null $uploadMaxFilesize
-     *
-     * @return static
-     */
-    public function setUploadMaxFilesize($uploadMaxFilesize, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'uploadMaxFilesize';
-        $var = $uploadMaxFilesize;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            $theFormat = Lib::format();
-
-            $varValidInt = $theFormat->bytes_decode([], $var);
-            $varValidString = $theFormat->bytes_encode([], $varValidInt, 0, 1);
-
-            $this->{$key} = [ $varValidString ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useUploadMaxFilesize(&$refLast = null)
-    {
-        $refLast = $this->getPhpUploadMaxFilesize();
-
-        if ( [] !== $this->uploadMaxFilesize ) {
-            ini_set('upload_max_filesize', $this->uploadMaxFilesize[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedUploadMaxFilesize(&$refLast = null)
-    {
-        $refLast = $this->getPhpUploadMaxFilesize();
-
-        if ( null !== $this->mapRecommended['uploadMaxFilesize'] ) {
-            ini_set('upload_max_filesize', $this->mapRecommended['uploadMaxFilesize']);
-        }
-
-        return $this;
-    }
-
-
-    public function getPhpUploadTmpDir() : string
-    {
-        return ini_get('upload_tmp_dir');
-    }
-
-    /**
-     * @param string|false|null $uploadTmpDir
-     * @param bool|false|null   $uploadTmpDirMkdir
-     *
-     * @return static
-     */
-    public function setUploadTmpDir(
-        $uploadTmpDir,
-        $uploadTmpDirMkdir,
-        ?bool $replace = null
-    )
-    {
-        $this->assertNotLocked();
-
-        if ( false
-            || (false !== $this->mapWasSet['uploadTmpDir'])
-            || (false !== $this->mapWasSet['uploadTmpDirMkdir'])
-        ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet['uploadTmpDir'] = true;
-            $this->mapWasSet['uploadTmpDirMkdir'] = true;
-        }
-
-        if ( null === $uploadTmpDir ) {
-            $this->uploadTmpDir = [ $this->mapRecommended['uploadTmpDir'] ];
-            $this->uploadTmpDirMkdir = [ $this->mapRecommended['uploadTmpDirMkdir'] ];
-
-        } elseif ( false === $uploadTmpDir ) {
-            $this->uploadTmpDir = [ $this->mapInitial['uploadTmpDir'] ];
-            $this->uploadTmpDirMkdir = [ $this->mapInitial['uploadTmpDirMkdir'] ];
-
-        } else {
-            $theType = Lib::type();
-
-            $uploadTmpDirMkdirValid = (bool) $uploadTmpDirMkdir;
-
-            if ( $uploadTmpDirMkdirValid ) {
-                $uploadTmpDirValid = $theType->dirpath($uploadTmpDir, true)->orThrow();
-
-            } else {
-                $uploadTmpDirValid = $theType->dirpath_realpath($uploadTmpDir)->orThrow();
-            }
-
-            $this->uploadTmpDir = [ $uploadTmpDirValid ];
-            $this->uploadTmpDirMkdir = [ $uploadTmpDirMkdirValid ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useUploadTmpDir(&$refLast = null)
-    {
-        $refLast = $this->getPhpUploadTmpDir();
-
-        if ( [] !== $this->uploadTmpDir ) {
-            $uploadTmpDirValid = $this->uploadTmpDir[0];
-
-            if ( [] !== $this->uploadTmpDirMkdir ) {
-                $uploadTmpDirMkdirValid = (bool) $this->uploadTmpDirMkdir[0];
-
-                if ( $uploadTmpDirMkdirValid ) {
-                    if ( ! is_dir($uploadTmpDirValid) ) {
-                        $theFsFile = Lib::fsFile();
-
-                        $theFsFile->mkdirp($uploadTmpDirValid, 0775, true);
-                    }
-                }
-            }
-
-            ini_set('upload_tmp_dir', $uploadTmpDirValid);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedUploadTmpDir(&$refLast = null)
-    {
-        $refLast = $this->getPhpUploadTmpDir();
-
-        if ( null !== $this->mapRecommended['uploadTmpDir'] ) {
-            $theFsFile = Lib::fsFile();
-
-            $theFsFile->mkdirp($this->mapRecommended['uploadTmpDir'], 0775, true);
-
-            ini_set('upload_tmp_dir', $this->mapRecommended['uploadTmpDir']);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @return callable|null
-     */
-    public function getPhpErrorHandler()
-    {
-        $handler = set_error_handler(static function () { });
-
-        restore_error_handler();
-
-        return $handler;
-    }
-
-    /**
-     * @return callable|null
-     */
-    public function getErrorHandler()
-    {
-        return $this->errorHandler;
-    }
-
-    /**
-     * @param callable|false|null $fnErrorHandler
-     *
-     * @return static
-     */
-    public function setErrorHandler($fnErrorHandler, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'errorHandler';
-        $var = $fnErrorHandler;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            if ( ! is_callable($var) ) {
-                throw new LogicException(
-                    [ 'The `fnErrorHandler` should be a callable', $var ]
-                );
-            }
-
-            $this->{$key} = [ $var ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useErrorHandler(&$refLast = null)
-    {
-        $refLast = $this->getPhpErrorHandler();
-
-        if ( [] !== $this->errorHandler ) {
-            set_error_handler($this->errorHandler[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedErrorHandler(&$refLast = null)
-    {
-        $refLast = $this->getPhpErrorHandler();
-
-        if ( null !== $this->mapRecommended['errorHandler'] ) {
-            set_error_handler($this->mapRecommended['errorHandler']);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @return callable|null
-     */
-    public function getPhpExceptionHandler()
-    {
-        $handler = set_exception_handler(static function () { });
-
-        restore_exception_handler();
-
-        return $handler;
-    }
-
-    /**
-     * @return callable|null
-     */
-    public function getExceptionHandler()
-    {
-        return $this->exceptionHandler;
-    }
-
-    /**
-     * @param callable|false|null $fnExceptionHandler
-     *
-     * @return static
-     */
-    public function setExceptionHandler($fnExceptionHandler, ?bool $replace = null)
-    {
-        $this->assertNotLocked();
-
-        $key = 'exceptionHandler';
-        $var = $fnExceptionHandler;
-
-        if ( false !== $this->mapWasSet[$key] ) {
-            if ( ! $replace ) {
-                return $this;
-            }
-
-        } else {
-            $this->mapWasSet[$key] = true;
-        }
-
-        if ( null === $var ) {
-            $this->{$key} = [ $this->mapRecommended[$key] ];
-
-        } elseif ( false === $var ) {
-            $this->{$key} = [ $this->mapInitial[$key] ];
-
-        } else {
-            if ( ! is_callable($var) ) {
-                throw new LogicException(
-                    [ 'The `fnExceptionHandler` should be a callable', $var ]
-                );
-            }
-
-            $this->{$key} = [ $var ];
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useExceptionHandler(&$refLast = null)
-    {
-        $refLast = $this->getPhpExceptionHandler();
-
-        if ( [] !== $this->exceptionHandler ) {
-            set_exception_handler($this->exceptionHandler[0]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useRecommendedExceptionHandler(&$refLast = null)
-    {
-        $refLast = $this->getPhpExceptionHandler();
-
-        if ( null !== $this->mapRecommended['exceptionHandler'] ) {
-            set_exception_handler($this->mapRecommended['exceptionHandler']);
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @throws \ErrorException
-     */
-    public function fnErrorHandler($errno, $errstr, $errfile, $errline) : void
-    {
-        if ( error_reporting() & $errno ) {
-            $isHeadersAlreadySent = (false !== strpos($errstr, 'Cannot modify header information'));
-
-            if ( $isHeadersAlreadySent ) {
-                if ( ! $this->isHeadersAlreadySentAsync() ) {
-                    throw new \ErrorException($errstr, -1, $errno, $errfile, $errline);
-                }
-
-                static $e;
-
-                if ( null === $e ) {
-                    $this->registerShutdownFunction(
-                        function () use (&$e) {
-                            $fn = $this->getPhpExceptionHandler();
-                            $fn($e);
-                        },
-                        'fnHeadersAlreadySentAsync'
-                    );
-                }
-
-                $e = $e
-                    ? new ErrorException($errstr, -1, $errno, $errfile, $errline, $e)
-                    : new ErrorException($errstr, -1, $errno, $errfile, $errline);
-
-                $trace = debug_backtrace();
-
-                array_shift($trace);
-
-                $e->setTrace($trace);
-
-                return;
-            }
-
-            throw new \ErrorException($errstr, -1, $errno, $errfile, $errline);
-        }
-    }
-
-    public function fnExceptionHandler(\Throwable $throwable) : void
-    {
-        $theDebugThrowabler = Lib::debugThrowabler();
-
-        $lines = $theDebugThrowabler->getPreviousMessagesAllLines(
-            $throwable,
-            0
-            //
-            | _DEBUG_THROWABLER_WITH_CODE
-            | _DEBUG_THROWABLER_WITH_INFO
-            | _DEBUG_THROWABLER_WITH_TRACE
-            //
-            | _DEBUG_THROWABLER_INFO_WITH_FILE
-            | _DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS
-            | _DEBUG_THROWABLER_INFO_WITHOUT_OBJECT_ID
-        );
-
-        echo implode("\n", $lines);
-
-        exit(1);
-    }
-
-
-    /**
-     * @return static
-     */
-    public function setAllRecommended()
-    {
-        $this->assertNotLocked();
-
-        foreach ( $this->mapRecommended as $key => $value ) {
-            $this->{$key} = [ $value ];
-
-            $this->mapWasSet[$key] = true;
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function setAllInitial()
-    {
-        $this->assertNotLocked();
-
-        foreach ( $this->mapInitial as $key => $value ) {
-            $this->{$key} = [ $value ];
-
-            $this->mapWasSet[$key] = true;
-        }
-
-        return $this;
-    }
-
-
-    /**
-     * @return static
-     */
-    public function useAll(?bool $lock = null)
-    {
-        $lock = $lock ?? true;
-
-        $map = $this->mapInitial;
-
-        unset(
-            $map['headersAlreadySentAsync'],
-            $map['retCollectTrace'],
-            $map['sessionSavePathMkdir'],
-            $map['uploadTmpDirMkdir']
-        );
-
-        foreach ( array_keys($map) as $key ) {
-            $ukey = ucfirst($key);
-
-            $this->{'use' . $ukey}();
-        }
-
-        if ( $lock ) {
-            $this->lock(true);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return static
-     */
-    public function useAllRecommended(?bool $lock = null)
-    {
-        $lock = $lock ?? true;
-
-        $map = $this->mapRecommended;
-
-        unset(
-            $map['headersAlreadySentAsync'],
-            $map['retCollectTrace'],
-            $map['sessionSavePathMkdir'],
-            $map['uploadTmpDirMkdir']
-        );
-
-        foreach ( array_keys($map) as $key ) {
-            $ukey = ucfirst($key);
-
-            $this->{'useRecommended' . $ukey}();
-        }
-
-        if ( $lock ) {
-            $this->lock(true);
-        }
-
-        return $this;
-    }
-
-
     protected function assertNotLocked() : void
     {
         if ( [] !== $this->isLocked ) {
@@ -2069,14 +2052,90 @@ class EntrypointModule
 
 
     /**
+     * > проверяет наличие функции в списке перед тем, как ее регистрировать, например, если регистрация функций происходит в цикле
+     * > также учитывает глобальный сигнал на игнор таких функций, чтобы отключить их единым переключателем
+     * > переопределяет функцию, если по уже зарегистрированному ключу приходит другой callable
+     *
+     * @param callable $fn
+     */
+    public function registerShutdownFunction($fn, ?string $name = null) : void
+    {
+        $mapKey = (null === $name)
+            ? $fn
+            : $name;
+
+        $isExists = $this->registerShutdownFunctionMap->exists($mapKey, $mapValue);
+
+        if ( $isExists ) {
+            if ( $fn !== $mapValue['fn'] ) {
+                $mapValue['active'] = true;
+                $mapValue['fn'] = $fn;
+
+                $this->registerShutdownFunctionMap->replace($mapKey, $mapValue);
+            }
+
+        } else {
+            $fnWrapper = function () use (&$fnWrapper, $fn, $mapKey) {
+                if ( $this->signalIgnoreShutdownFunctions ) {
+                    return;
+                }
+
+                $mapValue = $this->registerShutdownFunctionMap->get($mapKey);
+
+                [
+                    'active' => $active,
+                    'fn'     => $fn,
+                ] = $mapValue;
+
+                if ( ! $active ) {
+                    return;
+                }
+
+                if ( null !== $fn ) {
+                    call_user_func($fn);
+                }
+            };
+
+            $mapValue = [
+                'active' => true,
+                'fn'     => $fn,
+            ];
+
+            $this->registerShutdownFunctionMap->add($mapKey, $mapValue);
+
+            register_shutdown_function($fnWrapper);
+        }
+    }
+
+    /**
+     * > отключает ранее зарегистрированную shutdown-функцию
+     *
+     * @param callable|string $fnOrName
+     */
+    public function unregisterShutdownFunction($fnOrName) : void
+    {
+        $mapKey = $fnOrName;
+
+        if ( ! $this->registerShutdownFunctionMap->exists($mapKey, $mapValue) ) {
+            return;
+        }
+
+        $mapValue['active'] = false;
+        $mapValue['fn'] = null;
+
+        $this->registerShutdownFunctionMap->replace($fnOrName, $mapValue);
+    }
+
+
+    /**
      * @param int|string $status
      */
-    public function die($status, ?bool $ignoreShutdownFunction = null)
+    public function die($status, ?bool $ignoreShutdownFunctions = null)
     {
         $status = $status ?? '';
-        $ignoreShutdownFunction = $ignoreShutdownFunction ?? true;
+        $ignoreShutdownFunctions = $ignoreShutdownFunctions ?? true;
 
-        $this->signalIgnoreShutdownFunction = $ignoreShutdownFunction;
+        $this->signalIgnoreShutdownFunctions = $ignoreShutdownFunctions;
 
         die($status);
     }
@@ -2084,42 +2143,13 @@ class EntrypointModule
     /**
      * @param int|string $status
      */
-    public function exit($status, ?bool $ignoreShutdownFunction = null)
+    public function exit($status, ?bool $ignoreShutdownFunctions = null)
     {
         $status = $status ?? '';
-        $ignoreShutdownFunction = $ignoreShutdownFunction ?? true;
+        $ignoreShutdownFunctions = $ignoreShutdownFunctions ?? true;
 
-        $this->signalIgnoreShutdownFunction = $ignoreShutdownFunction;
+        $this->signalIgnoreShutdownFunctions = $ignoreShutdownFunctions;
 
         exit($status);
-    }
-
-    /**
-     * > проверяет наличие функции в списке перед тем, как ее регистрировать, если регистрация функций происходит в цикле
-     *
-     * @param callable $fn
-     */
-    public function registerShutdownFunction($fn, ?string $name = null) : void
-    {
-        $isExists = (null === $name)
-            ? $this->registerShutdownFunctionMap->exists($fn)
-            : $this->registerShutdownFunctionMap->exists($name);
-
-        if ( ! $isExists ) {
-            if ( null === $name ) {
-                $this->registerShutdownFunctionMap->add($fn, true);
-
-            } else {
-                $this->registerShutdownFunctionMap->add($name, $fn);
-            }
-
-            $fnWithSignal = function () use ($fn) {
-                if ( $this->signalIgnoreShutdownFunction ) return;
-
-                call_user_func($fn);
-            };
-
-            register_shutdown_function($fnWithSignal);
-        }
     }
 }
