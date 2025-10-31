@@ -232,8 +232,18 @@ class EntrypointModule
         $this->assertNotLocked();
 
         $isAlreadySet = array_key_exists($opt, $this->mapSet);
-        if ( $isAlreadySet && ! $replace ) {
-            return $this;
+        if ( $isAlreadySet ) {
+            if ( true === $replace ) {
+                //
+
+            } elseif ( false === $replace ) {
+                throw new RuntimeException(
+                    [ 'The `opt` is already set: ' . $opt, $opt, $value ],
+                );
+
+            } else {
+                return $this;
+            }
         }
 
         if ( null === $value ) {
@@ -313,6 +323,8 @@ class EntrypointModule
      */
     public function setDirRoot($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_DIR_ROOT;
 
         $this->setOpt($opt, $value, $replace);
@@ -391,6 +403,8 @@ class EntrypointModule
      */
     public function setErrorReporting($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_ERROR_REPORTING;
 
         $this->setOpt($opt, $value, $replace);
@@ -464,6 +478,8 @@ class EntrypointModule
      */
     public function setErrorLog($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_ERROR_LOG;
 
         $this->setOpt($opt, $value, $replace);
@@ -535,6 +551,8 @@ class EntrypointModule
      */
     public function setLogErrors($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_LOG_ERRORS;
 
         $this->setOpt($opt, $value, $replace);
@@ -606,6 +624,8 @@ class EntrypointModule
      */
     public function setDisplayErrors($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_DISPLAY_ERRORS;
 
         $this->setOpt($opt, $value, $replace);
@@ -675,6 +695,8 @@ class EntrypointModule
      */
     public function setMemoryLimit($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_MEMORY_LIMIT;
 
         $this->setOpt($opt, $value, $replace);
@@ -744,6 +766,8 @@ class EntrypointModule
      */
     public function setMaxExecutionTime($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_MAX_EXECUTION_TIME;
 
         $this->setOpt($opt, $value, $replace);
@@ -812,6 +836,8 @@ class EntrypointModule
      */
     public function setMaxInputTime($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_MAX_INPUT_TIME;
 
         $this->setOpt($opt, $value, $replace);
@@ -887,6 +913,8 @@ class EntrypointModule
      */
     public function setTimezoneDefault($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_TIMEZONE_DEFAULT;
 
         $this->setOpt($opt, $value, $replace);
@@ -957,6 +985,8 @@ class EntrypointModule
      */
     public function setPrecision($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_PRECISION;
 
         $this->setOpt($opt, $value, $replace);
@@ -1031,6 +1061,8 @@ class EntrypointModule
      */
     public function setUmask($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_UMASK;
 
         $this->setOpt($opt, $value, $replace);
@@ -1101,6 +1133,8 @@ class EntrypointModule
      */
     public function setPostMaxSize($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_POST_MAX_SIZE;
 
         $this->setOpt($opt, $value, $replace);
@@ -1172,6 +1206,8 @@ class EntrypointModule
      */
     public function setSessionCookieParams($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_SESSION_COOKIE_PARAMS;
 
         $this->setOpt($opt, $value, $replace);
@@ -1264,6 +1300,8 @@ class EntrypointModule
      */
     public function setSessionSavePath($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_SESSION_SAVE_PATH;
 
         $this->setOpt($opt, $value, $replace);
@@ -1339,6 +1377,8 @@ class EntrypointModule
      */
     public function setUploadMaxFilesize($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_UPLOAD_MAX_FILESIZE;
 
         $this->setOpt($opt, $value, $replace);
@@ -1408,6 +1448,8 @@ class EntrypointModule
      */
     public function setUploadTmpDir($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_UPLOAD_TMP_DIR;
 
         $this->setOpt($opt, $value, $replace);
@@ -1477,6 +1519,8 @@ class EntrypointModule
      */
     public function setRetCollectTrace($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_RET_COLLECT_TRACE;
 
         $this->setOpt($opt, $value, $replace);
@@ -1542,6 +1586,8 @@ class EntrypointModule
      */
     public function setErrorHandler($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_ERROR_HANDLER;
 
         $this->setOpt($opt, $value, $replace);
@@ -1583,7 +1629,7 @@ class EntrypointModule
         $opt = static::OPT_ERROR_HANDLER;
 
         if ( array_key_exists($opt, $this->mapCurrent) ) {
-            set_error_handler([ $this, 'fnErrorHandlerWrapper' ]);
+            set_error_handler([ $this, 'fnErrorHandlerMain' ]);
 
             $this->registerShutdownFunction([ $this, 'onShutdown_fatalErrorOnShutdown' ]);
             $this->registerShutdownFunction([ $this, 'onShutdown_throwablesOnShutdown' ]);
@@ -1608,6 +1654,8 @@ class EntrypointModule
      */
     public function setErrorHandlerOnShutdown($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_ERROR_HANDLER_ON_SHUTDOWN;
 
         $this->setOpt($opt, $value, $replace);
@@ -1649,7 +1697,7 @@ class EntrypointModule
         $opt = static::OPT_ERROR_HANDLER_ON_SHUTDOWN;
 
         if ( array_key_exists($opt, $this->mapCurrent) ) {
-            set_error_handler([ $this, 'fnErrorHandlerWrapper' ]);
+            set_error_handler([ $this, 'fnErrorHandlerMain' ]);
 
             $this->registerShutdownFunction([ $this, 'onShutdown_fatalErrorOnShutdown' ]);
             $this->registerShutdownFunction([ $this, 'onShutdown_throwablesOnShutdown' ]);
@@ -1686,6 +1734,8 @@ class EntrypointModule
      */
     public function setExceptionHandler($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_EXCEPTION_HANDLER;
 
         $this->setOpt($opt, $value, $replace);
@@ -1751,6 +1801,8 @@ class EntrypointModule
      */
     public function setThrowableHandler($value, ?bool $replace = null)
     {
+        $replace = $replace ?? false;
+
         $opt = static::OPT_THROWABLE_HANDLER;
 
         $this->setOpt($opt, $value, $replace);
@@ -1796,7 +1848,7 @@ class EntrypointModule
     /**
      * @throws ErrorException
      */
-    public function fnErrorHandlerWrapper($errno, $errstr, $errfile, $errline) : void
+    public function fnErrorHandlerMain($errno, $errstr, $errfile, $errline) : void
     {
         $e = null;
 
@@ -1901,13 +1953,29 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setAllInitial()
+    public function setAllInitial(?bool $replace = null)
     {
+        $replace = $replace ?? true;
+
         $this->assertNotLocked();
 
-        foreach ( $this->mapInitial as $key => $value ) {
-            $this->mapCurrent[$key] = $value;
-            $this->mapSet[$key] = $value;
+        foreach ( $this->mapInitial as $opt => $value ) {
+            if ( $isAlreadySet = array_key_exists($opt, $this->mapSet) ) {
+                if ( true === $replace ) {
+                    //
+
+                } elseif ( false === $replace ) {
+                    throw new RuntimeException(
+                        [ 'The `opt` is already set: ' . $opt, $opt, $value ],
+                    );
+
+                } else {
+                    continue;
+                }
+            }
+
+            $this->mapCurrent[$opt] = $value;
+            $this->mapSet[$opt] = $value;
         }
 
         return $this;
@@ -1916,13 +1984,29 @@ class EntrypointModule
     /**
      * @return static
      */
-    public function setAllRecommended()
+    public function setAllRecommended(?bool $replace = null)
     {
+        $replace = $replace ?? true;
+
         $this->assertNotLocked();
 
-        foreach ( $this->mapRecommended as $key => $value ) {
-            $this->mapCurrent[$key] = $value;
-            $this->mapSet[$key] = $value;
+        foreach ( $this->mapRecommended as $opt => $value ) {
+            if ( $isAlreadySet = array_key_exists($opt, $this->mapSet) ) {
+                if ( true === $replace ) {
+                    //
+
+                } elseif ( false === $replace ) {
+                    throw new RuntimeException(
+                        [ 'The `opt` is already set: ' . $opt, $opt, $value ],
+                    );
+
+                } else {
+                    continue;
+                }
+            }
+
+            $this->mapCurrent[$opt] = $value;
+            $this->mapSet[$opt] = $value;
         }
 
         return $this;
