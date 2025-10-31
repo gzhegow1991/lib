@@ -11,14 +11,14 @@
     // ->setAllInitial()
     // ->setAllRecommended()
     //
+    // ->has{DirRoot}($refValue)
+    // ->set{DirRoot}($value, $replace = true)
+    //
     // ->useAll()
     // ->useAllRecommended()
     //
-    // ->use{ErrorHandler}($refLast)
-    // ->useRecommended{ErrorHandler}($refLast)
-    //
-    // ->has{DirRoot}($refValue)
-    // ->set{DirRoot}($value)
+    // ->use{DirRoot}($refLast)
+    // ->useRecommended{DirRoot}($refLast)
     //
     ->setDirRoot(__DIR__ . '/..')
     ->setTimezoneDefault('UTC')
