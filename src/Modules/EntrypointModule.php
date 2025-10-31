@@ -238,7 +238,7 @@ class EntrypointModule
 
             } elseif ( false === $replace ) {
                 throw new RuntimeException(
-                    [ 'The `opt` is already set: ' . $opt, $opt, $value ],
+                    [ 'The `opt` is already set: ' . $opt, $opt, $this->mapSet[ $opt ] ],
                 );
 
             } else {
@@ -1966,7 +1966,7 @@ class EntrypointModule
 
                 } elseif ( false === $replace ) {
                     throw new RuntimeException(
-                        [ 'The `opt` is already set: ' . $opt, $opt, $value ],
+                        [ 'The `opt` is already set: ' . $opt, $opt, $this->mapSet[ $opt ] ],
                     );
 
                 } else {
@@ -1997,7 +1997,7 @@ class EntrypointModule
 
                 } elseif ( false === $replace ) {
                     throw new RuntimeException(
-                        [ 'The `opt` is already set: ' . $opt, $opt, $value ],
+                        [ 'The `opt` is already set: ' . $opt, $opt, $this->mapSet[ $opt ] ],
                     );
 
                 } else {
