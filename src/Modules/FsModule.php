@@ -793,7 +793,6 @@ class FsModule
         $fileRealpath = $splFileInfo->getRealPath();
 
         $fileExtensions = $this->extensions($fileRealpath);
-
         if ( null === $fileExtensions ) {
             return null;
         }
@@ -846,7 +845,9 @@ class FsModule
 
         $filtersIntersect = array_intersect_key($filters, $filtersList);
 
-        if ( [] !== $filtersIntersect ) {
+        $hasIntersection = ([] !== $filtersIntersect);
+
+        if ( $hasIntersection ) {
             $hasMaxSize = array_key_exists('max_size', $filters);
             $hasMinSize = array_key_exists('min_size', $filters);
 
@@ -948,20 +949,19 @@ class FsModule
 
     protected function _type_image_filters(\SplFileInfo $splFileInfo, array $getimagesize, array $filters) : ?\SplFileInfo
     {
-        if ( [] !== $filters ) {
+        if ( [] === $filters ) {
             return null;
         }
 
         $theType = Lib::type();
 
         $filtersList = [
-            'max_width'  => true,
             'max_height' => true,
-            'min_width'  => true,
+            'max_ratio'  => true,
+            'max_width'  => true,
             'min_height' => true,
-            'width'      => true,
-            'height'     => true,
-            'ratio'      => true,
+            'min_ratio'  => true,
+            'min_width'  => true,
         ];
 
         $filtersIntersect = array_intersect_key($filters, $filtersList);
@@ -971,17 +971,17 @@ class FsModule
         if ( $hasIntersection ) {
             [ $imageWidth, $imageHeight ] = $getimagesize;
 
+            $hasMaxRatio = array_key_exists('max_ratio', $filters);
+            $hasMinRatio = array_key_exists('min_ratio', $filters);
+
+            $imageRatio = null;
+            if ( $hasMaxRatio || $hasMinRatio ) {
+                $imageRatio = $imageWidth / $imageHeight;
+                $imageRatio = round($imageRatio, 3);
+            }
+
             foreach ( $filters as $filter => $value ) {
-                if ( 'max_width' === $filter ) {
-                    if ( ! $theType->numeric_int_positive($value)->isOk([ &$maxWidth ]) ) {
-                        return null;
-                    }
-
-                    if ( ! ($imageWidth <= $maxWidth) ) {
-                        return null;
-                    }
-
-                } elseif ( 'max_height' === $filter ) {
+                if ( 'max_height' === $filter ) {
                     if ( ! $theType->numeric_int_positive($value)->isOk([ &$maxHeight ]) ) {
                         return null;
                     }
@@ -990,12 +990,27 @@ class FsModule
                         return null;
                     }
 
-                } elseif ( 'min_width' === $filter ) {
-                    if ( ! $theType->numeric_int_positive($value)->isOk([ &$minWidth ]) ) {
+                } elseif ( 'max_ratio' === $filter ) {
+                    if ( $theType->ratio($value)->isOk([ &$ratioStringNotEmpty ]) ) {
+                        [ $ratioW, $ratioH ] = explode('/', $ratioStringNotEmpty);
+
+                        $ratio = $ratioW / $ratioH;
+                        $ratio = round($ratio, 3);
+
+                    } else {
                         return null;
                     }
 
-                    if ( ! ($imageWidth >= $minWidth) ) {
+                    if ( ! ($imageRatio <= $ratio) ) {
+                        return null;
+                    }
+
+                } elseif ( 'max_width' === $filter ) {
+                    if ( ! $theType->numeric_int_positive($value)->isOk([ &$maxWidth ]) ) {
+                        return null;
+                    }
+
+                    if ( ! ($imageWidth <= $maxWidth) ) {
                         return null;
                     }
 
@@ -1008,38 +1023,9 @@ class FsModule
                         return null;
                     }
 
-                } elseif ( 'width' === $filter ) {
-                    if ( ! $theType->numeric_int_positive($value)->isOk([ &$exactWidth ]) ) {
-                        return null;
-                    }
-
-                    if ( ! ($imageWidth == $exactWidth) ) {
-                        return null;
-                    }
-
-                } elseif ( 'height' === $filter ) {
-                    if ( ! $theType->numeric_int_positive($value)->isOk([ &$exactHeight ]) ) {
-                        return null;
-                    }
-
-                    if ( ! ($imageHeight == $exactHeight) ) {
-                        return null;
-                    }
-
-                } elseif ( 'ratio' === $filter ) {
-                    if ( $theType->numeric($value)->isOk([ &$ratioNumeric ]) ) {
-                        $ratio = round($ratioNumeric, 3);
-
-                    } elseif ( $theType->string_not_empty($value)->isOk([ &$ratioStringNotEmpty ]) ) {
-                        [ $ratioW, $ratioH ] = explode('/', $ratioStringNotEmpty) + [ 0, 0 ];
-
-                        if ( ! $theType->numeric_int_positive($ratioW)->isOk([ &$ratioWNumericIntPositive ]) ) {
-                            return null;
-                        }
-
-                        if ( ! $theType->numeric_int_positive($ratioH)->isOk([ &$ratioHNumericIntPositive ]) ) {
-                            return null;
-                        }
+                } elseif ( 'min_ratio' === $filter ) {
+                    if ( $theType->ratio($value)->isOk([ &$ratioStringNotEmpty ]) ) {
+                        [ $ratioW, $ratioH ] = explode('/', $ratioStringNotEmpty);
 
                         $ratio = $ratioW / $ratioH;
                         $ratio = round($ratio, 3);
@@ -1048,10 +1034,16 @@ class FsModule
                         return null;
                     }
 
-                    $imageRatio = $imageWidth / $imageHeight;
-                    $imageRatio = round($imageRatio, 3);
+                    if ( ! ($imageRatio >= $ratio) ) {
+                        return null;
+                    }
 
-                    if ( $ratio !== $imageRatio ) {
+                } elseif ( 'min_width' === $filter ) {
+                    if ( ! $theType->numeric_int_positive($value)->isOk([ &$minWidth ]) ) {
+                        return null;
+                    }
+
+                    if ( ! ($imageWidth >= $minWidth) ) {
                         return null;
                     }
                 }

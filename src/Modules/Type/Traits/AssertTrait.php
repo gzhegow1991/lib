@@ -931,6 +931,20 @@ trait AssertTrait
 	/**
 	 * @return string
 	 */
+	public function assert_ratio($value)
+	{
+		if (Lib::num()->type_ratio($value)->isOk([ &$ref ])) return $ref;
+
+		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
+
+		throw new LogicException($t, [ 'Assert `ratio` is failed', [ $value ] ]);
+	}
+
+
+	/**
+	 * @return string
+	 */
 	public function assert_numeric_trimpad(
 		$value,
 		?int $lenTrim = null,

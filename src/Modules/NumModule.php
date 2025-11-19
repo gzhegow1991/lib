@@ -1916,6 +1916,42 @@ class NumModule
 
 
     /**
+     * @return Ret<string>
+     */
+    public function type_ratio($value)
+    {
+        $theType = Lib::type();
+
+        if ( $theType->string_not_empty($value)->isOk([ &$ratioStringNotEmpty ]) ) {
+            [ $ratioW, $ratioH ] = explode('/', $ratioStringNotEmpty) + [ 0, 0 ];
+
+            if ( ! $theType->numeric_int_positive($ratioW)->isOk([ 1 => &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            if ( ! $theType->numeric_int_positive($ratioH)->isOk([ 1 => &$ret ]) ) {
+                return Ret::err(
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $ratioString = "{$ratioW}/{$ratioH}";
+
+            return Ret::val($ratioString);
+        }
+
+        return Ret::err(
+            [ 'The `value` should be ratio', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
      * > Математическое округление
      *
      * > Точка принятия решения - "дробная часть равна .5/.05/.005 и тд"
@@ -2043,7 +2079,7 @@ class NumModule
         if ( ! $isMidpoint ) {
             $scaledAbsFracLen = strlen($scaledAbsFrac);
 
-            $isUp = false;
+            $isUp = null;
             for ( $i = 1; $i < $scaledAbsFracLen; $i++ ) {
                 $digit = $scaledAbsFrac[$i];
 

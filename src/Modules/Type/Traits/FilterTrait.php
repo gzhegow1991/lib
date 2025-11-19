@@ -739,6 +739,17 @@ trait FilterTrait
 	/**
 	 * @param array{ 0?: string, 1?: Ret<string> } $r
 	 */
+	public function filter_ratio(array $r, $value): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::num()->type_ratio($value))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: string, 1?: Ret<string> } $r
+	 */
 	public function filter_numeric_trimpad(
 		array $r,
 		$value,

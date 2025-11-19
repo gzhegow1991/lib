@@ -238,7 +238,7 @@ class EntrypointModule
 
             } elseif ( false === $replace ) {
                 throw new RuntimeException(
-                    [ 'The `opt` is already set: ' . $opt, $opt, $this->mapSet[ $opt ] ],
+                    [ 'The `opt` is already set: ' . $opt, $opt, $this->mapSet[$opt] ],
                 );
 
             } else {
@@ -292,11 +292,13 @@ class EntrypointModule
     {
         $refLast = $this->mapCurrent[$opt] ?? null;
 
-        if ( ! array_key_exists($opt, $this->mapRecommended) ) {
-            return $this;
+        if ( array_key_exists($opt, $this->mapRecommended) ) {
+            $this->mapCurrent[$opt] = $this->mapRecommended[$opt];
         }
 
-        $this->mapCurrent[$opt] = $this->mapRecommended[$opt];
+        if ( ! array_key_exists($opt, $this->mapCurrent) ) {
+            return $this;
+        }
 
         $fn = '_use' . ucfirst($opt);
 
@@ -1966,7 +1968,7 @@ class EntrypointModule
 
                 } elseif ( false === $replace ) {
                     throw new RuntimeException(
-                        [ 'The `opt` is already set: ' . $opt, $opt, $this->mapSet[ $opt ] ],
+                        [ 'The `opt` is already set: ' . $opt, $opt, $this->mapSet[$opt] ],
                     );
 
                 } else {
@@ -1997,7 +1999,7 @@ class EntrypointModule
 
                 } elseif ( false === $replace ) {
                     throw new RuntimeException(
-                        [ 'The `opt` is already set: ' . $opt, $opt, $this->mapSet[ $opt ] ],
+                        [ 'The `opt` is already set: ' . $opt, $opt, $this->mapSet[$opt] ],
                     );
 
                 } else {

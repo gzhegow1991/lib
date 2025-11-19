@@ -410,6 +410,12 @@ trait IsTrait
 	}
 
 
+	public function is_ratio($value): bool
+	{
+		return Lib::num()->type_ratio($value)->isOk();
+	}
+
+
 	public function is_numeric_trimpad(
 		$value,
 		?int $lenTrim = null,

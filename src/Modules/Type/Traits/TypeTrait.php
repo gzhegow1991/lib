@@ -566,6 +566,15 @@ trait TypeTrait
     /**
      * @return Ret<string>
      */
+    public function ratio($value)
+    {
+        return Lib::num()->type_ratio($value);
+    }
+
+
+    /**
+     * @return Ret<string>
+     */
     public function numeric_trimpad($value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = [])
     {
         return Lib::num()->type_numeric_trimpad($value, $lenTrim, $lenPad, $stringPad, $refs);

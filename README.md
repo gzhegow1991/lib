@@ -31,10 +31,10 @@ php test.php
     // ->setAllRecommended()
     //
     // ->has{DirRoot}($refValue)
-    // ->set{DirRoot}($value, $replace = true)
+    // ->set{DirRoot}($value, $replace = false)
     //
-    // ->useAll()
-    // ->useAllRecommended()
+    // ->useAll($lock = true)
+    // ->useAllRecommended($lock = true)
     //
     // ->use{DirRoot}($refLast)
     // ->useRecommended{DirRoot}($refLast)
