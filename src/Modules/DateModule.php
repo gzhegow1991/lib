@@ -175,7 +175,8 @@ class DateModule
         }
 
         if ( null === $dateTimeZone ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `timezone` should be valid timezone', $timezone ],
                 [ __FILE__, __LINE__ ]
             );
@@ -185,14 +186,15 @@ class DateModule
             $timezoneType = $this->timezone_type($dateTimeZone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `timezone` should be timezone of one of the allowed types', $timezone, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::val($dateTimeZone);
+        return Ret::ok(null, $dateTimeZone);
     }
 
     /**
@@ -217,7 +219,8 @@ class DateModule
         }
 
         if ( null === $dateTimeZone ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `timezoneOrOffset` should be valid timezone', $timezoneOrOffset ],
                 [ __FILE__, __LINE__ ]
             );
@@ -226,13 +229,14 @@ class DateModule
         $timezoneType = $this->timezone_type($dateTimeZone);
 
         if ( $timezoneType !== 1 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `timezoneOrOffset` should be offset timezone', $timezoneOrOffset ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($dateTimeZone);
+        return Ret::ok(null, $dateTimeZone);
     }
 
     /**
@@ -257,7 +261,8 @@ class DateModule
         }
 
         if ( null === $dateTimeZone ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `timezoneOrAbbr` should be valid timezone', $timezoneOrAbbr ],
                 [ __FILE__, __LINE__ ]
             );
@@ -266,13 +271,14 @@ class DateModule
         $timezoneType = $this->timezone_type($dateTimeZone);
 
         if ( $timezoneType !== 2 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `timezoneOrAbbr` should be abbr timezone', $timezoneOrAbbr ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($dateTimeZone);
+        return Ret::ok(null, $dateTimeZone);
     }
 
     /**
@@ -297,7 +303,8 @@ class DateModule
         }
 
         if ( null === $dateTimeZone ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `timezoneOrName` should be valid timezone', $timezoneOrName ],
                 [ __FILE__, __LINE__ ]
             );
@@ -306,13 +313,14 @@ class DateModule
         $timezoneType = $this->timezone_type($dateTimeZone);
 
         if ( $timezoneType !== 3 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `timezoneOrName` should be name timezone', $timezoneOrName ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($dateTimeZone);
+        return Ret::ok(null, $dateTimeZone);
     }
 
     /**
@@ -337,7 +345,8 @@ class DateModule
         }
 
         if ( null === $dateTimeZone ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `timezoneOrNameOrAbbr` should be valid timezone', $timezoneOrNameOrAbbr ],
                 [ __FILE__, __LINE__ ]
             );
@@ -349,13 +358,14 @@ class DateModule
             ($timezoneType === 2)
             || ($timezoneType === 3)
         ) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `timezoneOrName` should be name or abbr timezone', $timezoneOrNameOrAbbr ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($dateTimeZone);
+        return Ret::ok(null, $dateTimeZone);
     }
 
 
@@ -365,7 +375,7 @@ class DateModule
     public function type_interval($interval)
     {
         if ( $interval instanceof \DateInterval ) {
-            return Ret::val($interval);
+            return Ret::ok(null, $interval);
         }
 
         $ret = Ret::new();
@@ -379,13 +389,14 @@ class DateModule
         ;
 
         if ( $ret->isFail() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($dateInterval);
+        return Ret::ok(null, $dateInterval);
     }
 
     /**
@@ -394,11 +405,12 @@ class DateModule
     public function type_interval_duration($duration)
     {
         if ( $duration instanceof \DateInterval ) {
-            return Ret::val($duration);
+            return Ret::ok(null, $duration);
         }
 
         if ( ! (is_string($duration) && ('' !== $duration)) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `duration` should be string, not empty', $duration ],
                 [ __FILE__, __LINE__ ]
             );
@@ -408,13 +420,14 @@ class DateModule
             $dateInterval = $this->interval_decode($duration);
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($dateInterval);
+        return Ret::ok(null, $dateInterval);
     }
 
     /**
@@ -423,11 +436,12 @@ class DateModule
     public function type_interval_datestring($datestring)
     {
         if ( $datestring instanceof \DateInterval ) {
-            return Ret::val($datestring);
+            return Ret::ok(null, $datestring);
         }
 
         if ( ! (is_string($datestring) && ('' !== $datestring)) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be string, not empty', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -438,17 +452,19 @@ class DateModule
 
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( false !== $dateInterval ) {
-            return Ret::val($dateInterval);
+            return Ret::ok(null, $dateInterval);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'Cannot encode `datestring` to intervel', $datestring ],
             [ __FILE__, __LINE__ ]
         );
@@ -460,13 +476,14 @@ class DateModule
     public function type_interval_microtime($microtime)
     {
         if ( $microtime instanceof \DateInterval ) {
-            return Ret::val($microtime);
+            return Ret::ok(null, $microtime);
         }
 
         $theType = Lib::type();
 
         if ( ! $theType->numeric($microtime, false)->isOk([ 1 => &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -478,13 +495,14 @@ class DateModule
             $dateInterval = $this->interval_decode("PT{$microtimeNumeric}S");
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($dateInterval);
+        return Ret::ok(null, $dateInterval);
     }
 
     /**
@@ -498,7 +516,7 @@ class DateModule
         // $isUntil = (true === $reverse);
 
         if ( $date instanceof \DateInterval ) {
-            return Ret::val($date);
+            return Ret::ok(null, $date);
         }
 
         if ( $date instanceof \DateTimeInterface ) {
@@ -512,10 +530,11 @@ class DateModule
                 $date = $date->diff($fromDate);
             }
 
-            return Ret::val($date);
+            return Ret::ok(null, $date);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `date` should be interval', $date ],
             [ __FILE__, __LINE__ ]
         );
@@ -536,7 +555,8 @@ class DateModule
 
         } else {
             if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -558,7 +578,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be valid datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -566,7 +587,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -583,7 +604,8 @@ class DateModule
 
         } else {
             if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -605,7 +627,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be valid datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -613,7 +636,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -630,7 +653,8 @@ class DateModule
 
         } else {
             if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -652,7 +676,8 @@ class DateModule
         }
 
         if ( null === $dateTimeImmutable ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be valid datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -660,7 +685,7 @@ class DateModule
 
         $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-        return Ret::val($dateTimeImmutableClone);
+        return Ret::ok(null, $dateTimeImmutableClone);
     }
 
 
@@ -679,7 +704,8 @@ class DateModule
 
         } else {
             if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -722,7 +748,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -730,7 +757,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -748,7 +775,8 @@ class DateModule
 
         } else {
             if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -791,7 +819,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -799,7 +828,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -817,7 +846,8 @@ class DateModule
 
         } else {
             if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -860,7 +890,8 @@ class DateModule
         }
 
         if ( null === $dateTimeImmutable ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -868,7 +899,7 @@ class DateModule
 
         $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-        return Ret::val($dateTimeImmutableClone);
+        return Ret::ok(null, $dateTimeImmutableClone);
     }
 
 
@@ -888,7 +919,8 @@ class DateModule
 
         } else {
             if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -905,7 +937,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be valid date or datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -914,7 +947,8 @@ class DateModule
         $timezone = $dateTime->getTimezone();
 
         if ( $timezone->getName() === $timezoneNil->getName() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be date with timezone', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -924,7 +958,8 @@ class DateModule
             $timezoneType = $this->timezone_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `datestring` should be date with timezone of one of the allowed types', $datestring, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -933,7 +968,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -952,7 +987,8 @@ class DateModule
 
         } else {
             if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -969,7 +1005,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be valid date or datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -978,7 +1015,8 @@ class DateModule
         $timezone = $dateTime->getTimezone();
 
         if ( $timezone->getName() === $timezoneNil->getName() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be date with timezone', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -988,7 +1026,8 @@ class DateModule
             $timezoneType = $this->timezone_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `datestring` should be date with timezone of one of the allowed types', $datestring, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -997,7 +1036,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -1016,7 +1055,8 @@ class DateModule
 
         } else {
             if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -1033,7 +1073,8 @@ class DateModule
         }
 
         if ( null === $dateTimeImmutable ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be valid date or datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1042,7 +1083,8 @@ class DateModule
         $timezone = $dateTimeImmutable->getTimezone();
 
         if ( $timezone->getName() === $timezoneNil->getName() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be date with timezone', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1052,7 +1094,8 @@ class DateModule
             $timezoneType = $this->timezone_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `datestring` should be date with timezone of one of the allowed types', $datestring, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1061,7 +1104,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTimeImmutable);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
 
@@ -1082,7 +1125,8 @@ class DateModule
 
         } else {
             if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -1120,7 +1164,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1129,7 +1174,8 @@ class DateModule
         $timezone = $dateTime->getTimezone();
 
         if ( $timezone->getName() === $timezoneNil->getName() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be date with timezone', $dateFormatted ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1139,7 +1185,8 @@ class DateModule
             $timezoneType = $this->timezone_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `dateFormatted` should be date with timezone of one of the allowed types', $dateFormatted, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1148,7 +1195,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -1168,7 +1215,8 @@ class DateModule
 
         } else {
             if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -1206,7 +1254,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1215,7 +1264,8 @@ class DateModule
         $timezone = $dateTime->getTimezone();
 
         if ( $timezone->getName() === $timezoneNil->getName() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be date with timezone', $dateFormatted ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1225,7 +1275,8 @@ class DateModule
             $timezoneType = $this->timezone_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `dateFormatted` should be date with timezone of one of the allowed types', $dateFormatted, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1234,7 +1285,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -1254,7 +1305,8 @@ class DateModule
 
         } else {
             if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -1292,7 +1344,8 @@ class DateModule
         }
 
         if ( null === $dateTimeImmutable ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1301,7 +1354,8 @@ class DateModule
         $timezone = $dateTimeImmutable->getTimezone();
 
         if ( $timezone->getName() === $timezoneNil->getName() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be date with timezone', $dateFormatted ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1311,7 +1365,8 @@ class DateModule
             $timezoneType = $this->timezone_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `dateFormatted` should be date with timezone of one of the allowed types', $dateFormatted, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1320,7 +1375,7 @@ class DateModule
 
         $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-        return Ret::val($dateTimeImmutableClone);
+        return Ret::ok(null, $dateTimeImmutableClone);
     }
 
 
@@ -1336,7 +1391,8 @@ class DateModule
         $dateTime = null;
 
         if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1354,7 +1410,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be valid date or datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1363,7 +1420,8 @@ class DateModule
         $timezone = $dateTime->getTimezone();
 
         if ( $timezone->getName() !== $timezoneNil->getName() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be date without timezone', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1382,7 +1440,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -1397,7 +1455,8 @@ class DateModule
         $dateTime = null;
 
         if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1415,7 +1474,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be valid date or datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1424,7 +1484,8 @@ class DateModule
         $timezone = $dateTime->getTimezone();
 
         if ( $timezone->getName() !== $timezoneNil->getName() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be date without timezone', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1443,7 +1504,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -1458,7 +1519,8 @@ class DateModule
         $dateTimeImmutable = null;
 
         if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1476,7 +1538,8 @@ class DateModule
         }
 
         if ( null === $dateTimeImmutable ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be valid date or datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1485,7 +1548,8 @@ class DateModule
         $timezone = $dateTimeImmutable->getTimezone();
 
         if ( $timezone->getName() !== $timezoneNil->getName() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `datestring` should be date without timezone', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1504,7 +1568,7 @@ class DateModule
 
         $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-        return Ret::val($dateTimeImmutableClone);
+        return Ret::ok(null, $dateTimeImmutableClone);
     }
 
 
@@ -1521,7 +1585,8 @@ class DateModule
         $dateTime = null;
 
         if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1560,7 +1625,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1569,7 +1635,8 @@ class DateModule
         $timezone = $dateTime->getTimezone();
 
         if ( $timezone->getName() !== $timezoneNil->getName() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be date without timezone', $dateFormatted ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1596,7 +1663,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -1612,7 +1679,8 @@ class DateModule
         $dateTime = null;
 
         if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1651,7 +1719,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1660,7 +1729,8 @@ class DateModule
         $timezone = $dateTime->getTimezone();
 
         if ( $timezone->getName() !== $timezoneNil->getName() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be date without timezone', $dateFormatted ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1687,7 +1757,7 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -1703,7 +1773,8 @@ class DateModule
         $dateTimeImmutable = null;
 
         if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1742,7 +1813,8 @@ class DateModule
         }
 
         if ( null === $dateTimeImmutable ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1751,7 +1823,8 @@ class DateModule
         $timezone = $dateTimeImmutable->getTimezone();
 
         if ( $timezone->getName() !== $timezoneNil->getName() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `dateFormatted` should be date without timezone', $dateFormatted ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1778,7 +1851,7 @@ class DateModule
 
         $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-        return Ret::val($dateTimeImmutableClone);
+        return Ret::ok(null, $dateTimeImmutableClone);
     }
 
 
@@ -1796,7 +1869,8 @@ class DateModule
         $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
 
         if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1834,7 +1908,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `microtime` should be valid microtime', $microtime ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1844,7 +1919,7 @@ class DateModule
 
         $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -1861,7 +1936,8 @@ class DateModule
         $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
 
         if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1899,7 +1975,8 @@ class DateModule
         }
 
         if ( null === $dateTime ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `microtime` should be valid microtime', $microtime ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1909,7 +1986,7 @@ class DateModule
 
         $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
 
-        return Ret::val($dateTimeClone);
+        return Ret::ok(null, $dateTimeClone);
     }
 
     /**
@@ -1926,7 +2003,8 @@ class DateModule
         $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
 
         if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1964,7 +2042,8 @@ class DateModule
         }
 
         if ( null === $dateTimeImmutable ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `microtime` should be valid microtime', $microtime ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1974,7 +2053,7 @@ class DateModule
 
         $dateTimeImmutableClone = $dateTimeImmutableClone->setTimezone($timezoneSetObject);
 
-        return Ret::val($dateTimeImmutableClone);
+        return Ret::ok(null, $dateTimeImmutableClone);
     }
 
 

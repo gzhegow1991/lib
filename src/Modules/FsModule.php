@@ -268,19 +268,21 @@ class FsModule
 
         } elseif ( is_string($value) ) {
             if ( '0' === $value ) {
-                return Ret::val(0);
+                return Ret::ok(null, 0);
             }
 
             $valueString = ltrim($value, '0');
             if ( '' === $valueString ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be string, that contains numbers except zero', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
             if ( ! preg_match($regex = '/^[0124]?[0-7]{3}$/', $valueString) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be string, that match regex: ' . $regex, $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -289,21 +291,24 @@ class FsModule
             $int = octdec($valueString);
 
             if ( 0 === $int ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be valid octal number', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
         } else {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be integer or string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ($int < 0) || ($int > 04777) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be integer from 0 to 04777', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -312,13 +317,14 @@ class FsModule
         $octString = decoct($int);
 
         if ( ! in_array($octString[0], [ '0', '1', '2', '4' ], true) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be string that starts from [0124]', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($int);
+        return Ret::ok(null, $int);
     }
 
 
@@ -345,7 +351,8 @@ class FsModule
         $refPathInfo = null;
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -353,7 +360,8 @@ class FsModule
 
         if ( ! $isAllowSymlink ) {
             if ( is_link($valueStringNotEmpty) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should not be symlink', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -362,7 +370,8 @@ class FsModule
 
         $realpath = realpath($valueStringNotEmpty);
         if ( false === $realpath ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid realpath', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -373,14 +382,15 @@ class FsModule
                 $refPathInfo = $thePhp->pathinfo($realpath);
             }
             catch ( \Throwable $e ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $e,
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::val($realpath);
+        return Ret::ok(null, $realpath);
     }
 
     /**
@@ -394,20 +404,22 @@ class FsModule
         $theType = Lib::type();
 
         if ( ! $theType->path($value, $refs)->isOk([ &$valuePath, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( file_exists($valuePath) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing file', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valuePath);
+        return Ret::ok(null, $valuePath);
     }
 
     /**
@@ -421,27 +433,30 @@ class FsModule
         $theType = Lib::type();
 
         if ( ! $theType->char($separator ?? DIRECTORY_SEPARATOR)->isOk([ &$separatorChar, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! $theType->path_normalized($value, $separatorChar, $refs)->isOk([ &$valuePath, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( file_exists($valuePath) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing file', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valuePath);
+        return Ret::ok(null, $valuePath);
     }
 
 
@@ -462,7 +477,8 @@ class FsModule
         $theType = Lib::type();
 
         if ( ! $theType->path($value, $refs)->isOk([ &$valuePath, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -472,18 +488,20 @@ class FsModule
 
         if ( ! $isAllowExists ) {
             if ( $exists ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should not be existing filenode', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Ret::val($valuePath);
+            return Ret::ok(null, $valuePath);
         }
 
         if ( $exists ) {
             if ( ! is_dir($valuePath) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be existing directory', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -491,7 +509,8 @@ class FsModule
 
             if ( ! $isAllowSymlink ) {
                 if ( is_link($valuePath) ) {
-                    return Ret::err(
+                    return Ret::throw(
+                        null,
                         [ 'The `value` should not be symlink', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -500,7 +519,8 @@ class FsModule
 
             $valueRealpath = realpath($valuePath);
             if ( false === $valueRealpath ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be valid realpath', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -509,7 +529,7 @@ class FsModule
             $valuePath = $valueRealpath;
         }
 
-        return Ret::val($valuePath);
+        return Ret::ok(null, $valuePath);
     }
 
     /**
@@ -526,7 +546,8 @@ class FsModule
         $isAllowSymlink = $isAllowSymlink ?? true;
 
         if ( ! $this->type_realpath($value, $isAllowSymlink, $refs)->isOk([ &$valueRealpath, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -534,7 +555,8 @@ class FsModule
 
         if ( ! $isAllowSymlink ) {
             if ( is_link($valueRealpath) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should not be symlink', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -542,13 +564,14 @@ class FsModule
         }
 
         if ( ! is_dir($valueRealpath) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing directory', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueRealpath);
+        return Ret::ok(null, $valueRealpath);
     }
 
 
@@ -569,7 +592,8 @@ class FsModule
         $theType = Lib::type();
 
         if ( ! $theType->path($value, $refs)->isOk([ &$valuePath, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -579,19 +603,21 @@ class FsModule
 
         if ( ! $isAllowExists ) {
             if ( $exists ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should not be existing filenode', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Ret::val($valuePath);
+            return Ret::ok(null, $valuePath);
         }
 
         if ( $exists ) {
             if ( ! $isAllowSymlink ) {
                 if ( is_link($valuePath) ) {
-                    return Ret::err(
+                    return Ret::throw(
+                        null,
                         [ 'The `value` should not be symlink', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -599,7 +625,8 @@ class FsModule
             }
 
             if ( ! is_file($valuePath) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be existing file', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -607,7 +634,8 @@ class FsModule
 
             $valueRealpath = realpath($valuePath);
             if ( false === $valueRealpath ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be valid realpath', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -616,7 +644,7 @@ class FsModule
             $valuePath = $valueRealpath;
         }
 
-        return Ret::val($valuePath);
+        return Ret::ok(null, $valuePath);
     }
 
     /**
@@ -631,7 +659,8 @@ class FsModule
     )
     {
         if ( ! $this->type_realpath($value, $isAllowSymlink, $refs)->isOk([ &$valueRealpath, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -639,7 +668,8 @@ class FsModule
 
         if ( ! $isAllowSymlink ) {
             if ( is_link($value) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should not be symlink', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -647,13 +677,14 @@ class FsModule
         }
 
         if ( ! is_file($valueRealpath) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing file', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueRealpath);
+        return Ret::ok(null, $valueRealpath);
     }
 
 
@@ -665,7 +696,8 @@ class FsModule
         $theType = Lib::type();
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -675,14 +707,15 @@ class FsModule
 
         foreach ( $forbidden as $f ) {
             if ( false !== strpos($valueStringNotEmpty, $f) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should not contain directory separators', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
 
@@ -708,7 +741,8 @@ class FsModule
 
         } else {
             if ( ! $this->type_filepath_realpath($value)->isOk([ &$valueFilepathRealpath, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -718,7 +752,8 @@ class FsModule
                 $splFileInfo = new \SplFileInfo($valueFilepathRealpath);
             }
             catch ( \Throwable $e ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $e,
                     [ __FILE__, __LINE__ ]
                 );
@@ -730,7 +765,8 @@ class FsModule
                 $splFileInfo = $this->_type_file_extensions($splFileInfo, $extensions);
 
                 if ( null === $splFileInfo ) {
-                    return Ret::err(
+                    return Ret::throw(
+                        null,
                         [ 'The `value` should be file, that passes extension checks', $value, $extensions ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -746,7 +782,8 @@ class FsModule
             finfo_close($finfo);
 
             if ( false === $finfoRes ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should pass `finfo_file` call', $value, $mimeTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -760,7 +797,8 @@ class FsModule
                 $splFileInfo = $this->_type_file_mime_types($splFileInfo, $refMimeType, $mimeTypes);
 
                 if ( null === $splFileInfo ) {
-                    return Ret::err(
+                    return Ret::throw(
+                        null,
                         [ 'The `value` should be file, that passes mime-type checks', $value, $mimeTypes ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -773,7 +811,8 @@ class FsModule
                 $splFileInfo = $this->_type_file_filters($splFileInfo, $filters);
 
                 if ( null === $splFileInfo ) {
-                    return Ret::err(
+                    return Ret::throw(
+                        null,
                         [ 'The `value` should be file, that passes filter checks', $value, $filters ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -781,7 +820,7 @@ class FsModule
             }
         }
 
-        return Ret::val($splFileInfo);
+        return Ret::ok(null, $splFileInfo);
     }
 
     protected function _type_file_extensions(\SplFileInfo $splFileInfo, array $extensions = []) : ?\SplFileInfo
@@ -897,7 +936,8 @@ class FsModule
         $refGetimagesize = null;
 
         if ( ! $this->type_file($value, $extensions, $mimeTypes, $filters, $refs)->isOk([ &$splFileInfo, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -922,7 +962,8 @@ class FsModule
             }
 
             if ( false === $getimagesizeRes ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should pass `getimagesize` call', $value, $filters ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -936,7 +977,8 @@ class FsModule
                 $splFileInfo = $this->_type_image_filters($splFileInfo, $refGetimagesize, $filters);
 
                 if ( null === $splFileInfo ) {
-                    return Ret::err(
+                    return Ret::throw(
+                        null,
                         [ 'The `value` should be image, that passes image filter checks', $value, $filters ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -944,7 +986,7 @@ class FsModule
             }
         }
 
-        return Ret::val($splFileInfo);
+        return Ret::ok(null, $splFileInfo);
     }
 
     protected function _type_image_filters(\SplFileInfo $splFileInfo, array $getimagesize, array $filters) : ?\SplFileInfo
@@ -1065,10 +1107,11 @@ class FsModule
             || is_a($value, '\Socket')
             || $theType->resource_opened($value, 'socket')->isOk()
         ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be socket, opened' ],
             [ __FILE__, __LINE__ ]
         );
@@ -1082,10 +1125,11 @@ class FsModule
         $theType = Lib::type();
 
         if ( $theType->resource_opened($value, 'stream')->isOk() ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be socket, opened' ],
             [ __FILE__, __LINE__ ]
         );

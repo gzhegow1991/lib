@@ -136,14 +136,16 @@ class RandomModule
     public function type_uuid($value)
     {
         if ( ! is_string($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '' === $value ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be string, not-empty', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -151,13 +153,14 @@ class RandomModule
 
         $regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
         if ( ! preg_match($regex, $value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid uuid', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($value);
+        return Ret::ok(null, $value);
     }
 
 

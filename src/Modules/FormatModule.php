@@ -121,20 +121,22 @@ class FormatModule
         $theType = Lib::type();
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! preg_match('/^[a-z][a-z0-9-]*$/', $valueStringNotEmpty) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid html tag', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
     /**
@@ -145,20 +147,22 @@ class FormatModule
         $theType = Lib::type();
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! preg_match('/^[A-Za-z_][A-Za-z0-9_\-\.]*$/', $valueStringNotEmpty) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid xml tag', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
     /**
@@ -169,20 +173,22 @@ class FormatModule
         $theType = Lib::type();
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! preg_match('/^(?:[A-Za-z_][A-Za-z0-9_\-\.]*)?:?[A-Za-z_][A-Za-z0-9_\-\.]*$/', $valueStringNotEmpty) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid xml nstag', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
 

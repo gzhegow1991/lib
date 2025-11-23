@@ -85,69 +85,6 @@ class Ret
     /**
      * @param T $value
      *
-     * @return static<T>
-     */
-    public static function val($value)
-    {
-        if ( $value instanceof self ) {
-            throw new LogicException(
-                [ 'The `value` should not be instance of: ' . self::class, $value ]
-            );
-        }
-
-        $className = (PHP_VERSION_ID >= 80000)
-            ? '\Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret'
-            : '\Gzhegow\Lib\Modules\Type\Ret\PHP7\Ret';
-
-        $instance = new $className();
-
-        $instance->value = [ $value ];
-
-        return $instance;
-    }
-
-    /**
-     * @param static|mixed               $throwableArg
-     *
-     * @param array{ 0: string, 1: int } $fileLine
-     *
-     * @return static<T>
-     */
-    public static function err($throwableArg, array $fileLine = [], ...$throwableArgs)
-    {
-        $className = (PHP_VERSION_ID >= 80000)
-            ? '\Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret'
-            : '\Gzhegow\Lib\Modules\Type\Ret\PHP7\Ret';
-
-        $instance = new $className();
-
-        if ( $throwableArg instanceof self ) {
-            $instance->mergeFrom($throwableArg);
-
-            if ( [] !== $throwableArgs ) {
-                $fileLine = $fileLine ?: Lib::debug()->file_line();
-
-                $instance->doAddError(null, $fileLine, ...$throwableArgs);
-
-            } elseif ( ([] !== $fileLine) && ([] !== $throwableArg->errorsRaw) ) {
-                $errorLast = end($throwableArg->errorsRaw);
-
-                $instance->doAddError($errorLast['trace'], $fileLine, ...$errorLast['throwable_args']);
-            }
-
-        } else {
-            $fileLine = $fileLine ?: Lib::debug()->file_line();
-
-            $instance->doAddError(null, $fileLine, $throwableArg, ...$throwableArgs);
-        }
-
-        return $instance;
-    }
-
-
-    /**
-     * @param T $value
-     *
      * @return T|static<T>
      */
     public static function ok(?array $fallback, $value)

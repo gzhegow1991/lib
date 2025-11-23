@@ -68,13 +68,14 @@ class BcmathModule
     public function type_bcnumber($value)
     {
         if ( $value instanceof Bcnumber ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         $theType = Lib::type();
 
         if ( ! $theType->numeric($value, false, [ &$split ])->isOk([ 1 => &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -96,13 +97,14 @@ class BcmathModule
         ])->isOk([ &$bcnumber, &$ret ]);
 
         if ( $ret->isFail() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($bcnumber);
+        return Ret::ok(null, $bcnumber);
     }
 
 

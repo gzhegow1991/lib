@@ -165,7 +165,8 @@ class DebugModule
     public function type_fileline($value)
     {
         if ( ! is_array($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -178,7 +179,8 @@ class DebugModule
             $fileRealpath = realpath($file);
 
             if ( false === $fileRealpath ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value[0]` should be realpath', $file, $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -189,14 +191,15 @@ class DebugModule
 
         if ( -1 !== $line ) {
             if ( ! (is_int($line) && ($line > 0)) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value[1]` should be positive integer', $line, $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::val([ $file, $line ]);
+        return Ret::ok(null, [ $file, $line ]);
     }
 
 

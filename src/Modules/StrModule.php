@@ -211,10 +211,11 @@ class StrModule
     public function type_a_string($value)
     {
         if ( is_string($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be string', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -226,10 +227,11 @@ class StrModule
     public function type_a_string_empty($value)
     {
         if ( '' === $value ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be string, empty', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -241,10 +243,11 @@ class StrModule
     public function type_a_string_not_empty($value)
     {
         if ( is_string($value) && ('' !== $value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be string, non empty', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -258,7 +261,8 @@ class StrModule
         $characters = $characters ?? " \n\r\t\v\0";
 
         if ( ! is_string($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be string', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -267,10 +271,11 @@ class StrModule
         $valueTrim = trim($value, $characters);
 
         if ( '' !== $valueTrim ) {
-            return Ret::val($valueTrim);
+            return Ret::ok(null, $valueTrim);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be trim', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -283,7 +288,7 @@ class StrModule
     public function type_string($value)
     {
         if ( is_string($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( false
@@ -303,7 +308,8 @@ class StrModule
             // > CLOSED RESOURCE is not string
             // > NIL is not string
 
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be string', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -311,7 +317,8 @@ class StrModule
 
         if ( is_object($value) ) {
             if ( ! method_exists($value, '__toString') ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` unable to be converted to string', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -322,13 +329,14 @@ class StrModule
             $valueString = (string) $value;
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` is unable to be converted to string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueString);
+        return Ret::ok(null, $valueString);
     }
 
     /**
@@ -337,17 +345,19 @@ class StrModule
     public function type_string_empty($value)
     {
         if ( ! $this->type_string($value)->isOk([ &$valueString, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '' === $valueString ) {
-            return Ret::val('');
+            return Ret::ok(null, '');
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be empty string', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -359,17 +369,19 @@ class StrModule
     public function type_string_not_empty($value)
     {
         if ( ! $this->type_string($value)->isOk([ &$valueString, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '' !== $valueString ) {
-            return Ret::val($valueString);
+            return Ret::ok(null, $valueString);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be string, non empty', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -383,7 +395,8 @@ class StrModule
         $characters = $characters ?? " \n\r\t\v\0";
 
         if ( ! $this->type_string($value)->isOk([ &$valueString, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -392,10 +405,11 @@ class StrModule
         $valueString = trim($valueString, $characters);
 
         if ( '' !== $valueString ) {
-            return Ret::val($valueString);
+            return Ret::ok(null, $valueString);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be trim', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -408,17 +422,19 @@ class StrModule
     public function type_char($value)
     {
         if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( 1 === strlen($valueStringNotEmpty) ) {
-            return Ret::val($valueStringNotEmpty);
+            return Ret::ok(null, $valueStringNotEmpty);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be char', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -430,17 +446,19 @@ class StrModule
     public function type_letter($value)
     {
         if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( 1 === $this->strlen($valueStringNotEmpty) ) {
-            return Ret::val($valueStringNotEmpty);
+            return Ret::ok(null, $valueStringNotEmpty);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be letter', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -452,7 +470,8 @@ class StrModule
     public function type_word($value)
     {
         if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -460,13 +479,15 @@ class StrModule
 
         preg_replace('/\s+/', '', $valueStringNotEmpty, 1, $count);
         if ( $count > 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should not contain any whitespaces', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be word', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -478,7 +499,8 @@ class StrModule
     public function type_alphabet($value)
     {
         if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -486,7 +508,8 @@ class StrModule
 
         preg_replace('/\s+/', '', $valueStringNotEmpty, 1, $count);
         if ( $count > 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should not contain any whitespaces', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -496,7 +519,8 @@ class StrModule
 
         $len = $fnStrlen($valueStringNotEmpty);
         if ( $len <= 1 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should contain at least two letters', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -512,7 +536,8 @@ class StrModule
             $letter = $fnSubstr($valueStringNotEmpty, $i, 1);
 
             if ( isset($seen[$letter]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should contain unique letters', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -534,7 +559,7 @@ class StrModule
             $regexNot
         );
 
-        return Ret::val($alphabet);
+        return Ret::ok(null, $alphabet);
     }
 
 
@@ -544,7 +569,8 @@ class StrModule
     public function type_ctype_digit($value)
     {
         if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -552,23 +578,25 @@ class StrModule
 
         if ( extension_loaded('ctype') ) {
             if ( ctype_digit($valueStringNotEmpty) ) {
-                return Ret::val($valueStringNotEmpty);
+                return Ret::ok(null, $valueStringNotEmpty);
             }
 
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should pass `ctype_digit` check', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! preg_match('~[^0-9]~', $valueStringNotEmpty) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should contain only digits', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
     /**
@@ -579,7 +607,8 @@ class StrModule
         $allowUpperCase = $allowUpperCase ?? true;
 
         if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -588,7 +617,8 @@ class StrModule
         if ( extension_loaded('ctype') ) {
             if ( ! $allowUpperCase ) {
                 if ( strtolower($valueStringNotEmpty) !== $valueStringNotEmpty ) {
-                    return Ret::err(
+                    return Ret::throw(
+                        null,
                         [ 'The `value` should not contain upper case letters', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -596,10 +626,11 @@ class StrModule
             }
 
             if ( ctype_alpha($valueStringNotEmpty) ) {
-                return Ret::val($valueStringNotEmpty);
+                return Ret::ok(null, $valueStringNotEmpty);
             }
 
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should pass `ctype_alpha` check', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -610,13 +641,14 @@ class StrModule
             : '';
 
         if ( preg_match('~[^a-z]~' . $regexFlags, $valueStringNotEmpty) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should contain only [a-z] letters', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
     /**
@@ -627,7 +659,8 @@ class StrModule
         $allowUpperCase = $allowUpperCase ?? true;
 
         if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -636,7 +669,8 @@ class StrModule
         if ( extension_loaded('ctype') ) {
             if ( ! $allowUpperCase ) {
                 if ( strtolower($valueStringNotEmpty) !== $valueStringNotEmpty ) {
-                    return Ret::err(
+                    return Ret::throw(
+                        null,
                         [ 'The `value` should not contain upper case letters', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -644,10 +678,11 @@ class StrModule
             }
 
             if ( ctype_alnum($valueStringNotEmpty) ) {
-                return Ret::val($valueStringNotEmpty);
+                return Ret::ok(null, $valueStringNotEmpty);
             }
 
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should pass `ctype_alnum` check', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -658,13 +693,14 @@ class StrModule
             : '';
 
         if ( preg_match('~[^0-9a-z]~' . $regexFlags, $valueStringNotEmpty) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should contain only [a-z0-9] letters', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
 

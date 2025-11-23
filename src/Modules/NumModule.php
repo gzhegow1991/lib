@@ -28,10 +28,11 @@ class NumModule
     public function type_nan($value)
     {
         if ( is_float($value) && is_nan($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be nan', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -43,10 +44,11 @@ class NumModule
     public function type_float_not_nan($value)
     {
         if ( is_float($value) && ! is_nan($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be float not nan', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -58,10 +60,11 @@ class NumModule
     public function type_any_not_nan($value)
     {
         if ( ! (is_float($value) && is_nan($value)) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be not nan', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -74,10 +77,11 @@ class NumModule
     public function type_finite($value)
     {
         if ( is_float($value) && is_finite($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be finite', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -89,10 +93,11 @@ class NumModule
     public function type_float_not_finite($value)
     {
         if ( is_float($value) && ! is_finite($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be float not finite', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -104,10 +109,11 @@ class NumModule
     public function type_any_not_finite($value)
     {
         if ( ! (is_float($value) && is_finite($value)) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be not finite', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -120,10 +126,11 @@ class NumModule
     public function type_infinite($value)
     {
         if ( is_float($value) && is_infinite($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be infinite', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -135,10 +142,11 @@ class NumModule
     public function type_float_not_infinite($value)
     {
         if ( is_float($value) && ! is_infinite($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be bool, null is not', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -150,10 +158,11 @@ class NumModule
     public function type_any_not_infinite($value)
     {
         if ( ! (is_float($value) && is_infinite($value)) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be not infinite', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -178,7 +187,7 @@ class NumModule
             $frac = str_pad($frac, PHP_FLOAT_DIG, '9', STR_PAD_RIGHT);
 
             if ( "{$int}{$frac}{$exp}" === _NUM_PHP_FLOAT_MIN_STRING_DIG ) {
-                return Ret::val(
+                return Ret::ok(null,
                     ($value > 0)
                         ? _NUM_PHP_FLOAT_MIN_FLOAT_DIG
                         : -_NUM_PHP_FLOAT_MIN_FLOAT_DIG
@@ -186,7 +195,8 @@ class NumModule
             }
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be float min', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -198,20 +208,22 @@ class NumModule
     public function type_float_not_float_min($value)
     {
         if ( ! is_float($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be float', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $this->type_float_min($value)->isOk() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be float but not equal `float_min`', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($value);
+        return Ret::ok(null, $value);
     }
 
     /**
@@ -220,10 +232,11 @@ class NumModule
     public function type_any_not_float_min($value)
     {
         if ( ! $this->type_float_min($value)->isOk() ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be not equal to `float_min`', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -236,11 +249,12 @@ class NumModule
     public function type_number($value, ?bool $isAllowExp = null)
     {
         if ( $value instanceof Number ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( ! $this->type_numeric($value, $isAllowExp, [ &$split ])->isOk([ 1 => &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -263,13 +277,14 @@ class NumModule
         ])->isOk([ &$number, &$ret ]);
 
         if ( $ret->isFail() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($number);
+        return Ret::ok(null, $number);
     }
 
 
@@ -295,7 +310,8 @@ class NumModule
 
             if ( ! $isAllowExp ) {
                 if ( '' !== $exp ) {
-                    return Ret::err(
+                    return Ret::throw(
+                        null,
                         [ 'The `value` should be numeric, without exponent', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -310,7 +326,7 @@ class NumModule
                 $refSplit[3] = $exp;
             }
 
-            return Ret::val($number->getValue());
+            return Ret::ok(null, $number->getValue());
         }
 
         $isInt = is_int($value);
@@ -327,7 +343,8 @@ class NumModule
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || (Nil::is($value))
         ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be numeric', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -340,14 +357,15 @@ class NumModule
                 $valueTrim = '0';
 
                 if ( ! $withSplit ) {
-                    return Ret::val($valueTrim);
+                    return Ret::ok(null, $valueTrim);
                 }
             }
         }
 
         if ( null === $valueTrim ) {
             if ( ! $theType->trim($value)->isOk([ &$valueTrim, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be numeric, empty trim is not', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -356,7 +374,8 @@ class NumModule
 
         if ( $hasExp = (false !== ($expPos = stripos($valueTrim, 'e'))) ) {
             if ( ! $isAllowExp ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be numeric, without exponent', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -378,7 +397,7 @@ class NumModule
                     $valueTrim = "{$left}{$right}";
                 }
 
-                return Ret::val($valueTrim);
+                return Ret::ok(null, $valueTrim);
             }
         }
 
@@ -391,7 +410,8 @@ class NumModule
             . '$/';
 
         if ( ! preg_match($regex, $valueTrim, $matches) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be numeric, regex is not match', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -429,7 +449,7 @@ class NumModule
 
         $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
 
-        return Ret::val($valueNumeric);
+        return Ret::ok(null, $valueNumeric);
     }
 
     /**
@@ -438,17 +458,19 @@ class NumModule
     public function type_numeric_non_zero($value, ?bool $isAllowExp = null, array $refs = [])
     {
         if ( ! $this->type_numeric($value, $isAllowExp, $refs)->isOk([ &$valueString, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' !== $valueString ) {
-            return Ret::val($valueString);
+            return Ret::ok(null, $valueString);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric, non zero', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -460,21 +482,23 @@ class NumModule
     public function type_numeric_non_negative($value, ?bool $isAllowExp = null, array $refs = [])
     {
         if ( ! $this->type_numeric($value, $isAllowExp, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === $valueNumeric ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
         if ( '-' !== $valueNumeric[0] ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric, non negative', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -486,21 +510,23 @@ class NumModule
     public function type_numeric_non_positive($value, ?bool $isAllowExp = null, array $refs = [])
     {
         if ( ! $this->type_numeric($value, $isAllowExp, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === $valueNumeric ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
         if ( '-' === $valueNumeric[0] ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric, non positive', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -512,24 +538,27 @@ class NumModule
     public function type_numeric_negative($value, ?bool $isAllowExp = null, array $refs = [])
     {
         if ( ! $this->type_numeric($value, $isAllowExp, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === $valueNumeric ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be numeric, negative, zero is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '-' === $valueNumeric[0] ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric, negative', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -541,24 +570,27 @@ class NumModule
     public function type_numeric_positive($value, ?bool $isAllowExp = null, array $refs = [])
     {
         if ( ! $this->type_numeric($value, $isAllowExp, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === $valueNumeric ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be numeric, positive, zero is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '-' !== $valueNumeric[0] ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric, positive', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -575,7 +607,8 @@ class NumModule
         // > btw, 1.1e1 is can be converted to integer 11 too
         // > we better don't support that numbers here
         if ( ! $this->type_numeric($value, false, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -584,13 +617,14 @@ class NumModule
         [ , , $frac ] = $refSplit;
 
         if ( '' !== $frac ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be numeric int, without fractional part', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueNumeric);
+        return Ret::ok(null, $valueNumeric);
     }
 
     /**
@@ -599,17 +633,19 @@ class NumModule
     public function type_numeric_int_non_zero($value, array $refs = [])
     {
         if ( ! $this->type_numeric_int($value, $refs)->isOk([ &$valueNumericInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' !== $valueNumericInt ) {
-            return Ret::val($valueNumericInt);
+            return Ret::ok(null, $valueNumericInt);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric int, non-zero', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -621,21 +657,23 @@ class NumModule
     public function type_numeric_int_non_negative($value, array $refs = [])
     {
         if ( ! $this->type_numeric_int($value, $refs)->isOk([ &$valueNumericInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === $valueNumericInt ) {
-            return Ret::val($valueNumericInt);
+            return Ret::ok(null, $valueNumericInt);
         }
 
         if ( '-' !== $valueNumericInt[0] ) {
-            return Ret::val($valueNumericInt);
+            return Ret::ok(null, $valueNumericInt);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric int, non-negative', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -647,21 +685,23 @@ class NumModule
     public function type_numeric_int_non_positive($value, array $refs = [])
     {
         if ( ! $this->type_numeric_int($value, $refs)->isOk([ &$valueNumericInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === $valueNumericInt ) {
-            return Ret::val($valueNumericInt);
+            return Ret::ok(null, $valueNumericInt);
         }
 
         if ( '-' === $valueNumericInt[0] ) {
-            return Ret::val($valueNumericInt);
+            return Ret::ok(null, $valueNumericInt);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric int, non-positive', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -673,24 +713,27 @@ class NumModule
     public function type_numeric_int_negative($value, array $refs = [])
     {
         if ( ! $this->type_numeric_int($value, $refs)->isOk([ &$valueNumericInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === $valueNumericInt ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be numeric int, negative, zero is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '-' === $valueNumericInt[0] ) {
-            return Ret::val($valueNumericInt);
+            return Ret::ok(null, $valueNumericInt);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric int, negative', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -702,24 +745,27 @@ class NumModule
     public function type_numeric_int_positive($value, array $refs = [])
     {
         if ( ! $this->type_numeric_int($value, $refs)->isOk([ &$valueNumericInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === $valueNumericInt ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be numeric int, positive, zero is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '-' !== $valueNumericInt[0] ) {
-            return Ret::val($valueNumericInt);
+            return Ret::ok(null, $valueNumericInt);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric int, positive', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -731,28 +777,31 @@ class NumModule
     public function type_numeric_int_positive_or_minus_one($value, array $refs = [])
     {
         if ( ! $this->type_numeric_int($value, $refs)->isOk([ &$valueNumericInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === $valueNumericInt ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be numeric int, positive or minus one, zero is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '-1' === $valueNumericInt ) {
-            return Ret::val($valueNumericInt);
+            return Ret::ok(null, $valueNumericInt);
         }
 
         if ( '-' !== $valueNumericInt[0] ) {
-            return Ret::val($valueNumericInt);
+            return Ret::ok(null, $valueNumericInt);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric int, positive or minus one', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -764,25 +813,27 @@ class NumModule
     public function type_numeric_int_non_negative_or_minus_one($value, array $refs = [])
     {
         if ( ! $this->type_numeric_int($value, $refs)->isOk([ &$valueNumericInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '-1' === $valueNumericInt ) {
-            return Ret::val($valueNumericInt);
+            return Ret::ok(null, $valueNumericInt);
         }
 
         if ( '0' === $valueNumericInt ) {
-            return Ret::val($valueNumericInt);
+            return Ret::ok(null, $valueNumericInt);
         }
 
         if ( '-' !== $valueNumericInt[0] ) {
-            return Ret::val($valueNumericInt);
+            return Ret::ok(null, $valueNumericInt);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric int, non negative or minus one', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -800,7 +851,8 @@ class NumModule
         // > btw, 1.1e-1 is can be converted to float 0.11 too
         // > we better don't support that numbers here
         if ( ! $this->type_numeric($value, false, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -819,10 +871,10 @@ class NumModule
         }
 
         if ( '0' === $valueNumeric ) {
-            return Ret::val('0.0');
+            return Ret::ok(null, '0.0');
         }
 
-        return Ret::val($valueNumeric);
+        return Ret::ok(null, $valueNumeric);
     }
 
     /**
@@ -831,17 +883,19 @@ class NumModule
     public function type_numeric_float_non_zero($value, array $refs = [])
     {
         if ( ! $this->type_numeric($value, false, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0.0' !== $valueNumeric ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric float, non zero', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -853,21 +907,23 @@ class NumModule
     public function type_numeric_float_non_negative($value, array $refs = [])
     {
         if ( ! $this->type_numeric($value, false, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0.0' === $valueNumeric ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
         if ( '-' !== $valueNumeric[0] ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric float, non negative', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -879,21 +935,23 @@ class NumModule
     public function type_numeric_float_non_positive($value, array $refs = [])
     {
         if ( ! $this->type_numeric($value, false, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0.0' === $valueNumeric ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
         if ( '-' === $valueNumeric[0] ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric float, non positive', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -905,24 +963,27 @@ class NumModule
     public function type_numeric_float_negative($value, array $refs = [])
     {
         if ( ! $this->type_numeric($value, false, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0.0' === $valueNumeric ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be numeric float, negative, zero is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '-' === $valueNumeric[0] ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric float, negative', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -934,24 +995,27 @@ class NumModule
     public function type_numeric_float_positive($value, array $refs = [])
     {
         if ( ! $this->type_numeric($value, false, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0.0' === $valueNumeric ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be numeric float, positive, zero is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '-' !== $valueNumeric[0] ) {
-            return Ret::val($valueNumeric);
+            return Ret::ok(null, $valueNumeric);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric float, positive', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -969,7 +1033,8 @@ class NumModule
         $refSplit =& $refs[0];
 
         if ( ! $this->type_numeric($value, false, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -997,7 +1062,7 @@ class NumModule
             }
         }
 
-        return Ret::val($valueNumeric);
+        return Ret::ok(null, $valueNumeric);
     }
 
     /**
@@ -1006,17 +1071,19 @@ class NumModule
     public function type_numeric_trimpad_non_zero($value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = [])
     {
         if ( ! $this->type_numeric_trimpad($value, $lenTrim, $lenPad, $stringPad, $refs)->isOk([ &$valueNumericTrimpad, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === rtrim($valueNumericTrimpad, '0.') ) {
-            return Ret::val($valueNumericTrimpad);
+            return Ret::ok(null, $valueNumericTrimpad);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric trimpad, non zero', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1028,21 +1095,23 @@ class NumModule
     public function type_numeric_trimpad_non_negative($value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = [])
     {
         if ( ! $this->type_numeric_trimpad($value, $lenTrim, $lenPad, $stringPad, $refs)->isOk([ &$valueNumericTrimpad, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === rtrim($valueNumericTrimpad, '0.') ) {
-            return Ret::val($valueNumericTrimpad);
+            return Ret::ok(null, $valueNumericTrimpad);
         }
 
         if ( '-' !== $valueNumericTrimpad[0] ) {
-            return Ret::val($valueNumericTrimpad);
+            return Ret::ok(null, $valueNumericTrimpad);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric trimpad, non negative', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1054,21 +1123,23 @@ class NumModule
     public function type_numeric_trimpad_non_positive($value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = [])
     {
         if ( ! $this->type_numeric_trimpad($value, $lenTrim, $lenPad, $stringPad, $refs)->isOk([ &$valueNumericTrimpad, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === rtrim($valueNumericTrimpad, '0.') ) {
-            return Ret::val($valueNumericTrimpad);
+            return Ret::ok(null, $valueNumericTrimpad);
         }
 
         if ( '-' === $valueNumericTrimpad[0] ) {
-            return Ret::val($valueNumericTrimpad);
+            return Ret::ok(null, $valueNumericTrimpad);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric trimpad, non positive', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1080,24 +1151,27 @@ class NumModule
     public function type_numeric_trimpad_negative($value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = [])
     {
         if ( ! $this->type_numeric_trimpad($value, $lenTrim, $lenPad, $stringPad, $refs)->isOk([ &$valueNumericTrimpad, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === rtrim($valueNumericTrimpad, '0.') ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be numeric trimpad, negative, zero is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '-' === $valueNumericTrimpad[0] ) {
-            return Ret::val($valueNumericTrimpad);
+            return Ret::ok(null, $valueNumericTrimpad);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric trimpad, negative', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1109,24 +1183,27 @@ class NumModule
     public function type_numeric_trimpad_positive($value, ?int $lenTrim = null, ?int $lenPad = null, string $stringPad = '0', array $refs = [])
     {
         if ( ! $this->type_numeric_trimpad($value, $lenTrim, $lenPad, $stringPad, $refs)->isOk([ &$valueNumericTrimpad, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === rtrim($valueNumericTrimpad, '0.') ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be numeric trimpad, positive, zero is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '-' !== $valueNumericTrimpad[0] ) {
-            return Ret::val($valueNumericTrimpad);
+            return Ret::ok(null, $valueNumericTrimpad);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be numeric trimpad, positive', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1143,7 +1220,8 @@ class NumModule
     public function type_decimal($value, int $scale = 0, array $refs = [])
     {
         if ( $scale < 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `scale` should be positive', $scale ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1153,7 +1231,8 @@ class NumModule
         $refSplit =& $refs[0];
 
         if ( ! $this->type_numeric($value, false, $refs)->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1166,7 +1245,8 @@ class NumModule
             : (strlen($frac) - 1);
 
         if ( $valueScale > $scale ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` scale should be less than limited scale', $scale ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1186,7 +1266,7 @@ class NumModule
             }
         }
 
-        return Ret::val($valueNumeric);
+        return Ret::ok(null, $valueNumeric);
     }
 
     /**
@@ -1195,17 +1275,19 @@ class NumModule
     public function type_decimal_non_zero($value, int $scale = 0, array $refs = [])
     {
         if ( ! $this->type_decimal($value, $scale, $refs)->isOk([ &$valueDecimal, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === rtrim($valueDecimal, '0.') ) {
-            return Ret::val($valueDecimal);
+            return Ret::ok(null, $valueDecimal);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be decimal, non zero', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1217,21 +1299,23 @@ class NumModule
     public function type_decimal_non_negative($value, int $scale = 0, array $refs = [])
     {
         if ( ! $this->type_decimal($value, $scale, $refs)->isOk([ &$valueDecimal, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === rtrim($valueDecimal, '0.') ) {
-            return Ret::val($valueDecimal);
+            return Ret::ok(null, $valueDecimal);
         }
 
         if ( '-' !== $valueDecimal[0] ) {
-            return Ret::val($valueDecimal);
+            return Ret::ok(null, $valueDecimal);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be decimal, non negative', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1243,21 +1327,23 @@ class NumModule
     public function type_decimal_non_positive($value, int $scale = 0, array $refs = [])
     {
         if ( ! $this->type_decimal($value, $scale, $refs)->isOk([ &$valueDecimal, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === rtrim($valueDecimal, '0.') ) {
-            return Ret::val($valueDecimal);
+            return Ret::ok(null, $valueDecimal);
         }
 
         if ( '-' === $valueDecimal[0] ) {
-            return Ret::val($valueDecimal);
+            return Ret::ok(null, $valueDecimal);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be decimal, non positive', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1269,24 +1355,27 @@ class NumModule
     public function type_decimal_negative($value, int $scale = 0, array $refs = [])
     {
         if ( ! $this->type_decimal($value, $scale, $refs)->isOk([ &$valueDecimal, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === rtrim($valueDecimal, '0.') ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be decimal, negative, zero is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '-' === $valueDecimal[0] ) {
-            return Ret::val($valueDecimal);
+            return Ret::ok(null, $valueDecimal);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be decimal, negative', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1298,24 +1387,27 @@ class NumModule
     public function type_decimal_positive($value, int $scale = 0, array $refs = [])
     {
         if ( ! $this->type_decimal($value, $scale, $refs)->isOk([ &$valueDecimal, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '0' === rtrim($valueDecimal, '0.') ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be decimal, positive, zero is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '-' !== $valueDecimal[0] ) {
-            return Ret::val($valueDecimal);
+            return Ret::ok(null, $valueDecimal);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be decimal, positive', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1328,13 +1420,14 @@ class NumModule
     public function type_num($value)
     {
         if ( is_int($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( is_float($value) ) {
             if ( ! is_finite($value) ) {
                 // > NAN, INF, -INF is float, but should not be parsed
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be num, non finite is not', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1342,11 +1435,11 @@ class NumModule
 
             if ( 0 == $value ) {
                 // > -0.0 to 0.0
-                return Ret::val(0.0);
+                return Ret::ok(null, 0.0);
             }
 
             if ( abs($value) >= _NUM_PHP_FLOAT_MAX_FLOAT_DIG ) {
-                return Ret::val(
+                return Ret::ok(null,
                     ($value > 0)
                         ? _NUM_PHP_FLOAT_MAX_FLOAT_DIG
                         : -_NUM_PHP_FLOAT_MAX_FLOAT_DIG
@@ -1363,7 +1456,7 @@ class NumModule
             //     );
             // }
 
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( false
@@ -1383,14 +1476,16 @@ class NumModule
             // > ARRAY is not num
             // > RESOURCE is not num
             // > NIL is not num
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be num', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! $this->type_numeric($value, true, [ &$split ])->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1399,10 +1494,11 @@ class NumModule
         $valueNum = $this->castNumericToNum($valueNumeric, ...$split);
 
         if ( false !== $valueNum ) {
-            return Ret::val($valueNum);
+            return Ret::ok(null, $valueNum);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be num', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1414,20 +1510,22 @@ class NumModule
     public function type_num_non_zero($value)
     {
         if ( ! $this->type_num($value)->isOk([ &$valueNum, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( 0 == $valueNum ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be num, non zero', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueNum);
+        return Ret::ok(null, $valueNum);
     }
 
     /**
@@ -1436,20 +1534,22 @@ class NumModule
     public function type_num_non_negative($value)
     {
         if ( ! $this->type_num($value)->isOk([ &$valueNum, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueNum < 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be num, non negative', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueNum);
+        return Ret::ok(null, $valueNum);
     }
 
     /**
@@ -1458,20 +1558,22 @@ class NumModule
     public function type_num_non_positive($value)
     {
         if ( ! $this->type_num($value)->isOk([ &$valueNum, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueNum > 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be num, non positive', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueNum);
+        return Ret::ok(null, $valueNum);
     }
 
     /**
@@ -1480,20 +1582,22 @@ class NumModule
     public function type_num_negative($value)
     {
         if ( ! $this->type_num($value)->isOk([ &$valueNum, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueNum >= 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be num, negative', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueNum);
+        return Ret::ok(null, $valueNum);
     }
 
     /**
@@ -1502,20 +1606,22 @@ class NumModule
     public function type_num_positive($value)
     {
         if ( ! $this->type_num($value)->isOk([ &$valueNum, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueNum <= 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be num, positive', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueNum);
+        return Ret::ok(null, $valueNum);
     }
 
 
@@ -1525,7 +1631,7 @@ class NumModule
     public function type_int($value)
     {
         if ( is_int($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( false
@@ -1537,14 +1643,16 @@ class NumModule
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || (Nil::is($value))
         ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be int', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! $this->type_numeric($value, true, [ &$split ])->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1553,10 +1661,11 @@ class NumModule
         $valueInt = $this->castNumericToInt($valueNumeric, ...$split);
 
         if ( false !== $valueInt ) {
-            return Ret::val($valueInt);
+            return Ret::ok(null, $valueInt);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be int', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1568,20 +1677,22 @@ class NumModule
     public function type_int_non_zero($value)
     {
         if ( ! $this->type_int($value)->isOk([ &$valueInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( 0 === $valueInt ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be int, non-zero', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueInt);
+        return Ret::ok(null, $valueInt);
     }
 
     /**
@@ -1590,20 +1701,22 @@ class NumModule
     public function type_int_non_negative($value)
     {
         if ( ! $this->type_int($value)->isOk([ &$valueInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueInt < 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be int, non negative', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueInt);
+        return Ret::ok(null, $valueInt);
     }
 
     /**
@@ -1612,20 +1725,22 @@ class NumModule
     public function type_int_non_positive($value)
     {
         if ( ! $this->type_int($value)->isOk([ &$valueInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueInt > 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be int, non positive', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueInt);
+        return Ret::ok(null, $valueInt);
     }
 
     /**
@@ -1634,20 +1749,22 @@ class NumModule
     public function type_int_negative($value)
     {
         if ( ! $this->type_int($value)->isOk([ &$valueInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueInt >= 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be int, negative', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueInt);
+        return Ret::ok(null, $valueInt);
     }
 
     /**
@@ -1656,20 +1773,22 @@ class NumModule
     public function type_int_positive($value)
     {
         if ( ! $this->type_int($value)->isOk([ &$valueInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueInt <= 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be int, positive', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueInt);
+        return Ret::ok(null, $valueInt);
     }
 
     /**
@@ -1678,24 +1797,26 @@ class NumModule
     public function type_int_positive_or_minus_one($value)
     {
         if ( ! $this->type_int($value)->isOk([ &$valueInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( -1 === $valueInt ) {
-            return Ret::val($valueInt);
+            return Ret::ok(null, $valueInt);
         }
 
         if ( $valueInt <= 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be int, positive or minus one', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueInt);
+        return Ret::ok(null, $valueInt);
     }
 
     /**
@@ -1704,20 +1825,22 @@ class NumModule
     public function type_int_non_negative_or_minus_one($value)
     {
         if ( ! $this->type_int($value)->isOk([ &$valueInt, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueInt < -1 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be int, negative or minus one', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueInt);
+        return Ret::ok(null, $valueInt);
     }
 
 
@@ -1727,24 +1850,25 @@ class NumModule
     public function type_float($value)
     {
         if ( is_int($value) ) {
-            return Ret::val((float) $value);
+            return Ret::ok(null, (float) $value);
         }
 
         if ( is_float($value) ) {
             if ( ! is_finite($value) ) {
                 // > NAN, INF, -INF is float, but should not be parsed
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be float, non finite is not', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
             if ( -0.0 === $value ) {
-                return Ret::val(0.0);
+                return Ret::ok(null, 0.0);
             }
 
             if ( abs($value) >= _NUM_PHP_FLOAT_MAX_FLOAT_DIG ) {
-                return Ret::val(
+                return Ret::ok(null,
                     ($value > 0)
                         ? _NUM_PHP_FLOAT_MAX_FLOAT_DIG
                         : -_NUM_PHP_FLOAT_MAX_FLOAT_DIG
@@ -1761,7 +1885,7 @@ class NumModule
             //     );
             // }
 
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( false
@@ -1779,14 +1903,16 @@ class NumModule
             // > ARRAY is not float
             // > RESOURCE is not float
             // > NIL is not float
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be float', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! $this->type_numeric($value, true, [ &$split ])->isOk([ &$valueNumeric, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1795,10 +1921,11 @@ class NumModule
         $valueFloat = $this->castNumericToFloat($valueNumeric, ...$split);
 
         if ( false !== $valueFloat ) {
-            return Ret::val($valueFloat);
+            return Ret::ok(null, $valueFloat);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be float', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1810,20 +1937,22 @@ class NumModule
     public function type_float_non_zero($value)
     {
         if ( ! $this->type_float($value)->isOk([ &$valueFloat, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( 0 == $valueFloat ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be float, non zero', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueFloat);
+        return Ret::ok(null, $valueFloat);
     }
 
     /**
@@ -1832,20 +1961,22 @@ class NumModule
     public function type_float_non_negative($value)
     {
         if ( ! $this->type_float($value)->isOk([ &$valueFloat, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueFloat < 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be float, non negative', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueFloat);
+        return Ret::ok(null, $valueFloat);
     }
 
     /**
@@ -1854,20 +1985,22 @@ class NumModule
     public function type_float_non_positive($value)
     {
         if ( ! $this->type_float($value)->isOk([ &$valueFloat, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueFloat > 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be float, non-positive', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueFloat);
+        return Ret::ok(null, $valueFloat);
     }
 
     /**
@@ -1876,20 +2009,22 @@ class NumModule
     public function type_float_negative($value)
     {
         if ( ! $this->type_float($value)->isOk([ &$valueFloat, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueFloat >= 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be float, negative', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueFloat);
+        return Ret::ok(null, $valueFloat);
     }
 
     /**
@@ -1898,20 +2033,22 @@ class NumModule
     public function type_float_positive($value)
     {
         if ( ! $this->type_float($value)->isOk([ &$valueFloat, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $valueFloat <= 0 ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be float, positive', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueFloat);
+        return Ret::ok(null, $valueFloat);
     }
 
 
@@ -1926,14 +2063,16 @@ class NumModule
             [ $ratioW, $ratioH ] = explode('/', $ratioStringNotEmpty) + [ 0, 0 ];
 
             if ( ! $theType->numeric_int_positive($ratioW)->isOk([ 1 => &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
             }
 
             if ( ! $theType->numeric_int_positive($ratioH)->isOk([ 1 => &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -1941,10 +2080,11 @@ class NumModule
 
             $ratioString = "{$ratioW}/{$ratioH}";
 
-            return Ret::val($ratioString);
+            return Ret::ok(null, $ratioString);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be ratio', $value ],
             [ __FILE__, __LINE__ ]
         );

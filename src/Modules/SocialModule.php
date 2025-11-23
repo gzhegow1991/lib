@@ -119,13 +119,14 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid email, that passes filter checks', $value, $filters ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($email);
+        return Ret::ok(null, $email);
     }
 
     /**
@@ -169,13 +170,14 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid email (fake), that passes filter checks', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($email);
+        return Ret::ok(null, $email);
     }
 
     /**
@@ -220,13 +222,14 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid email, that passes filter checks', $value, $filters ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($email);
+        return Ret::ok(null, $email);
     }
 
 
@@ -270,13 +273,14 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid phone', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($phone);
+        return Ret::ok(null, $phone);
     }
 
     /**
@@ -316,13 +320,14 @@ class SocialModule
             );
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid phone (fake)', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($phone);
+        return Ret::ok(null, $phone);
     }
 
     /**
@@ -365,13 +370,14 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid phone (non-fake)', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($phone);
+        return Ret::ok(null, $phone);
     }
 
     /**
@@ -422,13 +428,14 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid email, that match passed region', $value, $region ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($phone);
+        return Ret::ok(null, $phone);
     }
 
 
@@ -466,13 +473,14 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid tel', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($tel);
+        return Ret::ok(null, $tel);
     }
 
     /**
@@ -509,13 +517,14 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid tel (fake)', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($tel);
+        return Ret::ok(null, $tel);
     }
 
     /**
@@ -552,13 +561,14 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid tel (non-fake)', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($tel);
+        return Ret::ok(null, $tel);
     }
 
     /**
@@ -603,12 +613,13 @@ class SocialModule
             throw $e;
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid tel, that match passed region', $value, $region ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($tel);
+        return Ret::ok(null, $tel);
     }
 }

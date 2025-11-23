@@ -208,10 +208,11 @@ class PhpModule
     public function type_empty($value)
     {
         if ( empty($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be empty', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -223,10 +224,11 @@ class PhpModule
     public function type_any_not_empty($value)
     {
         if ( ! empty($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be not empty', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -256,17 +258,18 @@ class PhpModule
             // > EMPTY ARRAY is blank (can appear from HTML forms with no checkbox/radio/select items choosen)
             || ([] === $value)
         ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         // > COUNTABLE w/ ZERO SIZE is blank
         if ( $this->type_countable($value)->isOk([ &$valueCountable ]) ) {
             if ( 0 === count($valueCountable) ) {
-                return Ret::val($value);
+                return Ret::ok(null, $value);
             }
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be blank', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -278,10 +281,11 @@ class PhpModule
     public function type_any_not_blank($value)
     {
         if ( ! $this->type_blank($value)->isOk() ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be not blank', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -312,10 +316,11 @@ class PhpModule
             // > NIL is clearable (NIL should be replaced with NULL later or perform deleting actions)
             || Nil::is($value)
         ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be nullable', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -327,10 +332,11 @@ class PhpModule
     public function type_any_not_nullable($value)
     {
         if ( ! $this->type_nullable($value)->isOk() ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be not nullable', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -345,7 +351,7 @@ class PhpModule
     public function type_passed($value)
     {
         if ( $this->type_nil($value)->isOk() ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( false
@@ -367,13 +373,14 @@ class PhpModule
             // > RESOURCE not passed (user cannot send resource)
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
         ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be passed by user', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($value);
+        return Ret::ok(null, $value);
     }
 
     /**
@@ -382,10 +389,11 @@ class PhpModule
     public function type_any_not_passed($value)
     {
         if ( ! $this->type_passed($value)->isOk() ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be not passed by user', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -405,10 +413,11 @@ class PhpModule
     public function type_nil($value)
     {
         if ( Nil::is($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be nil', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -420,10 +429,11 @@ class PhpModule
     public function type_any_not_nil($value)
     {
         if ( ! Nil::is($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be not nil', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -436,10 +446,11 @@ class PhpModule
     public function type_null($value)
     {
         if ( null === $value ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be null', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -451,10 +462,11 @@ class PhpModule
     public function type_any_not_null($value)
     {
         if ( null !== $value ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be not null', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -467,10 +479,11 @@ class PhpModule
     public function type_false($value)
     {
         if ( false === $value ) {
-            return Ret::val(false);
+            return Ret::ok(null, false);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be false', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -484,10 +497,11 @@ class PhpModule
     public function type_any_not_false($value)
     {
         if ( false !== $value ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be not false', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -502,10 +516,11 @@ class PhpModule
     public function type_true($value)
     {
         if ( true === $value ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be true', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -519,10 +534,11 @@ class PhpModule
     public function type_any_not_true($value)
     {
         if ( true !== $value ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be not true', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -535,33 +551,36 @@ class PhpModule
     public function type_bool($value)
     {
         if ( null === $value ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be bool, null is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( is_bool($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( is_int($value) ) {
-            return Ret::val(0 !== $value);
+            return Ret::ok(null, 0 !== $value);
         }
 
         if ( is_float($value) ) {
             if ( is_nan($value) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be bool, nan is not', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Ret::val(0.0 !== $value);
+            return Ret::ok(null, 0.0 !== $value);
         }
 
         if ( $this->type_nil($value)->isOk() ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be bool, nil is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -570,40 +589,41 @@ class PhpModule
         if ( is_string($value) ) {
             if ( '' === $value ) {
                 // > EMPTY STRING is false
-                return Ret::val(false);
+                return Ret::ok(null, false);
             }
 
-            return Ret::val(true);
+            return Ret::ok(null, true);
         }
 
         if ( is_array($value) ) {
             if ( [] === $value ) {
                 // > EMPTY ARRAY is false
-                return Ret::val(false);
+                return Ret::ok(null, false);
             }
 
-            return Ret::val(true);
+            return Ret::ok(null, true);
         }
 
         if ( is_resource($value) ) {
-            return Ret::val(true);
+            return Ret::ok(null, true);
 
         } elseif ( 'resource (closed)' === gettype($value) ) {
-            return Ret::val(false);
+            return Ret::ok(null, false);
         }
 
         if ( is_object($value) ) {
             if ( $this->type_countable($value)->isOk([ &$valueCountable ]) ) {
                 if ( 0 === count($valueCountable) ) {
                     // > EMPTY COUNTABLE is false
-                    return Ret::val(false);
+                    return Ret::ok(null, false);
                 }
             }
 
-            return Ret::val(true);
+            return Ret::ok(null, true);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be bool', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -615,17 +635,19 @@ class PhpModule
     public function type_boolfalse($value)
     {
         if ( ! $this->type_bool($value)->isOk([ &$valueBool, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( false === $valueBool ) {
-            return Ret::val(false);
+            return Ret::ok(null, false);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be bool, false', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -637,17 +659,19 @@ class PhpModule
     public function type_booltrue($value)
     {
         if ( ! $this->type_bool($value)->isOk([ &$valueBool, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( true === $valueBool ) {
-            return Ret::val(true);
+            return Ret::ok(null, true);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be bool, true', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -660,29 +684,31 @@ class PhpModule
     public function type_userbool($value)
     {
         if ( null === $value ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be userbool, null is not', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( is_bool($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( is_int($value) ) {
-            return Ret::val(0 !== $value);
+            return Ret::ok(null, 0 !== $value);
         }
 
         if ( is_float($value) ) {
             if ( is_nan($value) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be userbool, nan is not', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Ret::val(0.0 !== $value);
+            return Ret::ok(null, 0.0 !== $value);
         }
 
         if ( is_string($value) ) {
@@ -704,11 +730,12 @@ class PhpModule
             $valueLower = strtolower($value);
 
             if ( isset($map[$valueLower]) ) {
-                return Ret::val($map[$valueLower]);
+                return Ret::ok(null, $map[$valueLower]);
             }
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be userbool', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -720,17 +747,19 @@ class PhpModule
     public function type_userfalse($value)
     {
         if ( ! $this->type_userbool($value)->isOk([ &$valueUserbool, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( false === $valueUserbool ) {
-            return Ret::val(false);
+            return Ret::ok(null, false);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be userbool, false', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -742,17 +771,19 @@ class PhpModule
     public function type_usertrue($value)
     {
         if ( ! $this->type_userbool($value)->isOk([ &$valueUserbool, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( true === $valueUserbool ) {
-            return Ret::val(true);
+            return Ret::ok(null, true);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be userbool, true', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -765,10 +796,11 @@ class PhpModule
     public function type_array($value)
     {
         if ( is_array($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be array', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -780,10 +812,11 @@ class PhpModule
     public function type_array_empty($value)
     {
         if ( [] === $value ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be array, empty', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -795,10 +828,11 @@ class PhpModule
     public function type_array_not_empty($value)
     {
         if ( is_array($value) && ([] !== $value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be array, not empty', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -810,10 +844,11 @@ class PhpModule
     public function type_any_not_array_empty($value)
     {
         if ( [] !== $value ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should not be empty array', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -825,10 +860,11 @@ class PhpModule
     public function type_any_not_array($value)
     {
         if ( ! is_array($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should not be array', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -841,10 +877,11 @@ class PhpModule
     public function type_object($value)
     {
         if ( is_object($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be object', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -856,10 +893,11 @@ class PhpModule
     public function type_any_not_object($value)
     {
         if ( ! is_object($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should not be empty array', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -872,10 +910,11 @@ class PhpModule
     public function type_stdclass($value)
     {
         if ( $value instanceof \stdClass ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be instance of \stdClass', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -887,10 +926,11 @@ class PhpModule
     public function type_any_not_stdclass($value)
     {
         if ( ! ($value instanceof \stdClass) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should not be instance of \stdClass', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -904,24 +944,26 @@ class PhpModule
     {
         if ( PHP_VERSION_ID >= 70300 ) {
             if ( is_countable($value) ) {
-                return Ret::val($value);
+                return Ret::ok(null, $value);
             }
 
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be countable', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( is_array($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( $value instanceof \Countable ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be countable', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -933,7 +975,8 @@ class PhpModule
     public function type_countable_object($value)
     {
         if ( ! is_object($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be object', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -941,20 +984,22 @@ class PhpModule
 
         if ( PHP_VERSION_ID >= 70300 ) {
             if ( ! is_countable($value) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be countable object', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( $value instanceof \Countable ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be countable object', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -969,14 +1014,15 @@ class PhpModule
         $theStr = Lib::str();
 
         if ( $this->type_countable($value)->isOk() ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( $theStr->type_string($value)->isOk() ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be sizeable', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1005,21 +1051,24 @@ class PhpModule
             $class = ltrim($valueStringNotEmpty, '\\');
 
             if ( '' === $class ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be valid class', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
         } else {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing class or object', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '__PHP_Incomplete_Class' === $class ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing class or object', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1028,12 +1077,12 @@ class PhpModule
         if ( $flags & _PHP_STRUCT_TYPE_CLASS ) {
             if ( PHP_VERSION_ID >= 80100 ) {
                 if ( class_exists($class) && ! enum_exists($class) ) {
-                    return Ret::val($class);
+                    return Ret::ok(null, $class);
                 }
 
             } else {
                 if ( class_exists($class) ) {
-                    return Ret::val($class);
+                    return Ret::ok(null, $class);
                 }
             }
         }
@@ -1041,7 +1090,7 @@ class PhpModule
         if ( $flags & _PHP_STRUCT_TYPE_ENUM ) {
             if ( PHP_VERSION_ID >= 80100 ) {
                 if ( enum_exists($class) ) {
-                    return Ret::val($class);
+                    return Ret::ok(null, $class);
                 }
             }
         }
@@ -1049,18 +1098,19 @@ class PhpModule
         if ( ! $isObject ) {
             if ( $flags & _PHP_STRUCT_TYPE_INTERFACE ) {
                 if ( interface_exists($class) ) {
-                    return Ret::val($class);
+                    return Ret::ok(null, $class);
                 }
             }
 
             if ( $flags & _PHP_STRUCT_TYPE_TRAIT ) {
                 if ( trait_exists($class) ) {
-                    return Ret::val($class);
+                    return Ret::ok(null, $class);
                 }
             }
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be struct, existing', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1099,7 +1149,8 @@ class PhpModule
             }
 
             if ( $cnt > 1 ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `flags` conflict in group: ' . $groupName, $flags ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1130,7 +1181,8 @@ class PhpModule
 
         } else {
             if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -1139,7 +1191,8 @@ class PhpModule
             $class = ltrim($valueStringNotEmpty, '\\');
 
             if ( '' === $class ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be valid class', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1147,7 +1200,8 @@ class PhpModule
         }
 
         if ( '__PHP_Incomplete_Class' === $class ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing class or object', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1159,21 +1213,23 @@ class PhpModule
                 ?? $this->type_struct_exists($class, $flagsInt)->isOk([ &$classString ]);
 
             if ( $isExists && $isFlagExistsFalse ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be non-existing struct', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
             if ( (! $isExists) && $isFlagExistsTrue ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be existing struct', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
             if ( $isExists && $isFlagExistsTrue ) {
-                return Ret::val($class);
+                return Ret::ok(null, $class);
             }
         }
 
@@ -1187,11 +1243,12 @@ class PhpModule
             $isValid = (bool) $isValid;
 
             if ( $isValid ) {
-                return Ret::val($class);
+                return Ret::ok(null, $class);
             }
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be struct', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -1220,13 +1277,14 @@ class PhpModule
         }
 
         if ( ! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($struct);
+        return Ret::ok(null, $struct);
     }
 
     /**
@@ -1248,13 +1306,14 @@ class PhpModule
         }
 
         if ( ! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($struct);
+        return Ret::ok(null, $struct);
     }
 
     /**
@@ -1273,13 +1332,14 @@ class PhpModule
         }
 
         if ( ! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($struct);
+        return Ret::ok(null, $struct);
     }
 
     /**
@@ -1305,13 +1365,14 @@ class PhpModule
         }
 
         if ( ! $this->type_struct($value, $flagsInt)->isOk([ &$struct, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($struct);
+        return Ret::ok(null, $struct);
     }
 
 
@@ -1325,7 +1386,8 @@ class PhpModule
     public function type_struct_fqcn($value, ?int $flags = null)
     {
         if ( ! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1333,7 +1395,7 @@ class PhpModule
 
         $valueStruct = '\\' . $valueStruct;
 
-        return Ret::val($valueStruct);
+        return Ret::ok(null, $valueStruct);
     }
 
     /**
@@ -1342,7 +1404,8 @@ class PhpModule
     public function type_struct_namespace($value, ?int $flags = null)
     {
         if ( ! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1351,13 +1414,14 @@ class PhpModule
         $valueNamespace = $this->dirname($valueStruct, '\\');
 
         if ( null === $valueNamespace ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be struct namespace', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueNamespace);
+        return Ret::ok(null, $valueNamespace);
     }
 
     /**
@@ -1366,7 +1430,8 @@ class PhpModule
     public function type_struct_basename($value, ?int $flags = null)
     {
         if ( ! $this->type_struct($value, $flags)->isOk([ &$valueStruct, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1375,13 +1440,14 @@ class PhpModule
         $valueBasename = $this->basename($valueStruct, '\\');
 
         if ( null === $valueBasename ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be struct basename', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueBasename);
+        return Ret::ok(null, $valueBasename);
     }
 
 
@@ -1392,20 +1458,21 @@ class PhpModule
     {
         if ( is_resource($value) ) {
             if ( null === $resourceType ) {
-                return Ret::val($value);
+                return Ret::ok(null, $value);
 
             } else {
                 if ( $resourceType === get_resource_type($value) ) {
-                    return Ret::val($value);
+                    return Ret::ok(null, $value);
                 }
             }
         }
 
         if ( 'resource (closed)' === gettype($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be resource, opened or closed' ],
             [ __FILE__, __LINE__ ]
         );
@@ -1418,16 +1485,17 @@ class PhpModule
     {
         if ( is_resource($value) ) {
             if ( null === $resourceType ) {
-                return Ret::val($value);
+                return Ret::ok(null, $value);
 
             } else {
                 if ( $resourceType === get_resource_type($value) ) {
-                    return Ret::val($value);
+                    return Ret::ok(null, $value);
                 }
             }
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be resource, opened' ],
             [ __FILE__, __LINE__ ]
         );
@@ -1439,10 +1507,11 @@ class PhpModule
     public function type_resource_closed($value)
     {
         if ( 'resource (closed)' === gettype($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be resource, closed' ],
             [ __FILE__, __LINE__ ]
         );
@@ -1457,10 +1526,11 @@ class PhpModule
             || is_resource($value)
             || ('resource (closed)' === gettype($value))
         ) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be any not opened or closed resource' ],
             [ __FILE__, __LINE__ ]
         );
@@ -1476,10 +1546,11 @@ class PhpModule
             || is_a($value, '\CurlHandle')
             || $this->type_resource_opened($value, 'curl')->isOk()
         ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be curl resource, opened' ],
             [ __FILE__, __LINE__ ]
         );
@@ -1499,7 +1570,8 @@ class PhpModule
         $hasEnumClass = false;
         if ( null !== $enumClass ) {
             if ( ! is_subclass_of($enumClass, '\UnitEnum') ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `enumClass` should extend \UnitEnum', $enumClass ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1514,12 +1586,13 @@ class PhpModule
                 : is_subclass_of($value, '\UnitEnum');
 
             if ( $status ) {
-                return Ret::val($value);
+                return Ret::ok(null, $value);
             }
         }
 
         if ( ! $hasEnumClass ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'Cannot obtain `enumClass` from given data', $value, $enumClass ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1529,7 +1602,8 @@ class PhpModule
             || is_int($value)
             || is_string($value)
         ) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be int or string, cause Enums only support two types', $value, $enumClass ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1539,17 +1613,19 @@ class PhpModule
             $enumCase = $enumClass::tryFrom($value);
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( null !== $enumCase ) {
-            return Ret::val($enumCase);
+            return Ret::ok(null, $enumCase);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be enum case', $value, $enumClass ],
             [ __FILE__, __LINE__ ]
         );
@@ -1738,7 +1814,8 @@ class PhpModule
         $refPathInfo = null;
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1749,14 +1826,15 @@ class PhpModule
                 $refPathInfo = $this->pathinfo($valueStringNotEmpty);
             }
             catch ( \Throwable $e ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $e,
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
     /**
@@ -1778,7 +1856,8 @@ class PhpModule
         $refPathInfo = null;
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1788,7 +1867,8 @@ class PhpModule
             $pathNormalized = $this->path_normalize($valueStringNotEmpty, $separator);
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
@@ -1799,14 +1879,15 @@ class PhpModule
                 $refPathInfo = $this->pathinfo($pathNormalized);
             }
             catch ( \Throwable $e ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     $e,
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
 

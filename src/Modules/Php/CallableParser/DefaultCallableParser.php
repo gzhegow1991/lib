@@ -33,7 +33,8 @@ class DefaultCallableParser implements CallableParserInterface
             ?? $this->parseMethodArrayFromString($value);
 
         if ( null === $methodArray ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be method (object, array or string)', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -42,7 +43,8 @@ class DefaultCallableParser implements CallableParserInterface
         [ /* $anObject */, $aClass, $aMethod, $aMagic ] = $methodArray;
 
         if ( $aMethod && $aMagic ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be real (not magic) method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -55,10 +57,11 @@ class DefaultCallableParser implements CallableParserInterface
                 $refMethodArray = [ $aClass, '__invoke' ];
                 $refMethodString = "{$aClass}->__invoke";
 
-                return Ret::val(true);
+                return Ret::ok(null, true);
             }
 
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -73,7 +76,7 @@ class DefaultCallableParser implements CallableParserInterface
                 $refMethodArray = [ $aClass, $aMethod ];
                 $refMethodString = "{$aClass}->{$aMethod}";
 
-                return Ret::val(true);
+                return Ret::ok(null, true);
             }
 
             if ( false
@@ -82,7 +85,7 @@ class DefaultCallableParser implements CallableParserInterface
                 $refMethodArray = [ $aClass, $aMethod ];
                 $refMethodString = "{$aClass}::{$aMethod}";
 
-                return Ret::val(true);
+                return Ret::ok(null, true);
             }
 
             try {
@@ -91,7 +94,8 @@ class DefaultCallableParser implements CallableParserInterface
                 $isStatic = $rm->isStatic();
             }
             catch ( \Throwable $e ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be existing method', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -102,10 +106,11 @@ class DefaultCallableParser implements CallableParserInterface
                 ? "{$aClass}::{$aMethod}"
                 : "{$aClass}->{$aMethod}";
 
-            return Ret::val(true);
+            return Ret::ok(null, true);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be valid method', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -117,13 +122,14 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeMethodArray($value)
     {
         if ( ! $this->typeMethod($value, [ &$refMethodArray ])->isOk([ 1 => &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($refMethodArray);
+        return Ret::ok(null, $refMethodArray);
     }
 
     /**
@@ -132,13 +138,14 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeMethodString($value)
     {
         if ( ! $this->typeMethod($value, [ 1 => &$refMethodString ])->isOk([ 1 => &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($refMethodString);
+        return Ret::ok(null, $refMethodString);
     }
 
 
@@ -150,25 +157,26 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeCallable($value, $newScope = 'static')
     {
         if ( ! $this->isCallable($value, $newScope) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be callable in passed scope', $value, $newScope ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( PHP_VERSION_ID >= 80000 ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( is_object($value) ) {
             // > \Closure or invokable
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         $function = $this->parseFunction($value);
         if ( null !== $function ) {
             // > plain function
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         $methodArray = null
@@ -176,7 +184,8 @@ class DefaultCallableParser implements CallableParserInterface
             ?? $this->parseMethodArrayFromString($value);
 
         if ( null === $methodArray ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be method (array or string)', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -186,14 +195,14 @@ class DefaultCallableParser implements CallableParserInterface
 
         if ( $anObject ) {
             // > array with object
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( false
             || ($aMethod === '__callStatic')
             || ($aMagic === '__callStatic')
         ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
         if ( false
@@ -202,7 +211,8 @@ class DefaultCallableParser implements CallableParserInterface
             || ($aMagic === '__invoke')
             || ($aMagic === '__call')
         ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be real (not magic and not invoke) method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -212,20 +222,22 @@ class DefaultCallableParser implements CallableParserInterface
             $rm = new \ReflectionMethod($aClass, $aMethod);
 
             if ( ! $rm->isStatic() ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be static method', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing method', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($value);
+        return Ret::ok(null, $value);
     }
 
 
@@ -235,21 +247,23 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeCallableObject($value, $newScope = 'static')
     {
         if ( ! is_object($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be object', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $this->typeCallableObjectClosure($value, $newScope)->isOk([ &$valueCallableObjectClosure ]) ) {
-            return Ret::val($valueCallableObjectClosure);
+            return Ret::ok(null, $valueCallableObjectClosure);
         }
 
         if ( $this->typeCallableObjectInvokable($value, $newScope)->isOk([ &$valueCallableObjectInvokable ]) ) {
-            return Ret::val($valueCallableObjectInvokable);
+            return Ret::ok(null, $valueCallableObjectInvokable);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be callable, object', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -261,20 +275,22 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeCallableObjectClosure($value, $newScope = 'static')
     {
         if ( ! ($value instanceof \Closure) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be \Closure', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! $this->isCallable($value, $newScope) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` \Closure is not callable in passed scope', $value, $newScope ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($value);
+        return Ret::ok(null, $value);
     }
 
     /**
@@ -284,20 +300,22 @@ class DefaultCallableParser implements CallableParserInterface
     {
         $invokable = $this->parseInvokable($value);
         if ( null === $invokable ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be invokable object', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! $this->isCallable($invokable, $newScope) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` invokable is not callable in passed scope', $value, $newScope ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($invokable);
+        return Ret::ok(null, $invokable);
     }
 
 
@@ -309,17 +327,19 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeCallableArray($value, $newScope = 'static')
     {
         if ( ! is_array($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $this->typeCallableArrayMethod($value, $newScope)->isOk([ &$valueCallableArrayMethod ]) ) {
-            return Ret::val($valueCallableArrayMethod);
+            return Ret::ok(null, $valueCallableArrayMethod);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be callable array', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -333,7 +353,8 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeCallableArrayMethod($value, $newScope = 'static')
     {
         if ( ! is_array($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -341,7 +362,8 @@ class DefaultCallableParser implements CallableParserInterface
 
         $methodArray = $this->parseMethodArrayFromArray($value);
         if ( null === $methodArray ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array with method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -350,7 +372,8 @@ class DefaultCallableParser implements CallableParserInterface
         [ $anObject, $aClass, $aMethod, $aMagic ] = $methodArray;
 
         if ( null === $aMethod ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array with method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -365,13 +388,14 @@ class DefaultCallableParser implements CallableParserInterface
             }
 
             if ( ! $this->isCallable($callableMethodPublicMagic ?? $callableMethodPublic, $newScope) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` method is not callable in passed scope', $value, $newScope ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Ret::val($callableMethodPublic);
+            return Ret::ok(null, $callableMethodPublic);
         }
 
         if ( false
@@ -380,7 +404,8 @@ class DefaultCallableParser implements CallableParserInterface
             || ($aMagic === '__invoke')
             || ($aMagic === '__call')
         ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be real (not magic and not invoke) method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -398,40 +423,44 @@ class DefaultCallableParser implements CallableParserInterface
             || ($aMagic === '__callStatic')
         ) {
             if ( ! $this->isCallable($callableMethodStaticMagic ?? $callableMethodStatic, $newScope) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` method is not callable in passed scope', $value, $newScope ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Ret::val($callableMethodStatic);
+            return Ret::ok(null, $callableMethodStatic);
         }
 
         try {
             $rm = new \ReflectionMethod($aClass, $aMethod);
 
             if ( ! $rm->isStatic() ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be static method', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing method', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! $this->isCallable($callableMethodStatic, $newScope) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` method is not callable in passed scope', $value, $newScope ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($callableMethodStatic);
+        return Ret::ok(null, $callableMethodStatic);
     }
 
     /**
@@ -442,7 +471,8 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeCallableArrayMethodStatic($value, $newScope = 'static')
     {
         if ( ! is_array($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -450,7 +480,8 @@ class DefaultCallableParser implements CallableParserInterface
 
         $methodArray = $this->parseMethodArrayFromArray($value);
         if ( null === $methodArray ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array with method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -459,7 +490,8 @@ class DefaultCallableParser implements CallableParserInterface
         [ /* $anObject */, $aClass, $aMethod, $aMagic ] = $methodArray;
 
         if ( null === $aMethod ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array with method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -471,7 +503,8 @@ class DefaultCallableParser implements CallableParserInterface
             || ($aMagic === '__invoke')
             || ($aMagic === '__call')
         ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be real (not magic and not invoke) method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -489,40 +522,44 @@ class DefaultCallableParser implements CallableParserInterface
             || ($aMagic === '__callStatic')
         ) {
             if ( ! $this->isCallable($callableMethodStaticMagic ?? $callableMethodStatic, $newScope) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` method is not callable in passed scope', $value, $newScope ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Ret::val($callableMethodStatic);
+            return Ret::ok(null, $callableMethodStatic);
         }
 
         try {
             $rm = new \ReflectionMethod($aClass, $aMethod);
 
             if ( ! $rm->isStatic() ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be static method', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing method', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! $this->isCallable($callableMethodStatic, $newScope) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` method is not callable in passed scope', $value, $newScope ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($callableMethodStatic);
+        return Ret::ok(null, $callableMethodStatic);
     }
 
     /**
@@ -533,7 +570,8 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeCallableArrayMethodNonStatic($value, $newScope = 'static')
     {
         if ( ! is_array($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -541,7 +579,8 @@ class DefaultCallableParser implements CallableParserInterface
 
         $methodArray = $this->parseMethodArrayFromArray($value);
         if ( null === $methodArray ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array with method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -550,7 +589,8 @@ class DefaultCallableParser implements CallableParserInterface
         [ $anObject, $aClass, $aMethod, $aMagic ] = $methodArray;
 
         if ( null === $aMethod ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array with method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -560,14 +600,16 @@ class DefaultCallableParser implements CallableParserInterface
             || ($aMethod === '__callStatic')
             || ($aMagic === '__callStatic')
         ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array with non-static method', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( null === $anObject ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array with non-static method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -581,34 +623,37 @@ class DefaultCallableParser implements CallableParserInterface
             || ($aMagic === '__invoke')
             || ($aMagic === '__call')
         ) {
-            return Ret::val($callableMethodPublic);
+            return Ret::ok(null, $callableMethodPublic);
         }
 
         try {
             $rm = new \ReflectionMethod($aClass, $aMethod);
 
             if ( $rm->isStatic() ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be non static method', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing method', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! $this->isCallable($callableMethodPublic, $newScope) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` method is not callable in passed scope', $value, $newScope ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($callableMethodPublic);
+        return Ret::ok(null, $callableMethodPublic);
     }
 
 
@@ -618,21 +663,23 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeCallableString($value, $newScope = 'static')
     {
         if ( ! is_string($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $this->typeCallableStringFunction($value)->isOk([ &$valueCallableStringFunction ]) ) {
-            return Ret::val($valueCallableStringFunction);
+            return Ret::ok(null, $valueCallableStringFunction);
         }
 
         if ( $this->typeCallableStringMethodStatic($value, $newScope)->isOk([ &$valueCallableStringMethodStatic ]) ) {
-            return Ret::val($valueCallableStringMethodStatic);
+            return Ret::ok(null, $valueCallableStringMethodStatic);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be callable string', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -644,17 +691,19 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeCallableStringFunction($value)
     {
         if ( ! is_string($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( function_exists($value) ) {
-            return Ret::val($value);
+            return Ret::ok(null, $value);
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be callable string function', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -666,7 +715,8 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeCallableStringFunctionInternal($value)
     {
         if ( ! is_string($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be string', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -676,17 +726,19 @@ class DefaultCallableParser implements CallableParserInterface
             $rf = new \ReflectionFunction($value);
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing function name', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( $rf->isInternal() ) {
-            return Ret::val($rf->getName());
+            return Ret::ok(null, $rf->getName());
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be internal function name', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -698,7 +750,8 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeCallableStringFunctionNonInternal($value)
     {
         if ( ! is_string($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be string', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -708,17 +761,19 @@ class DefaultCallableParser implements CallableParserInterface
             $rf = new \ReflectionFunction($value);
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing function name', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! $rf->isInternal() ) {
-            return Ret::val($rf->getName());
+            return Ret::ok(null, $rf->getName());
         }
 
-        return Ret::err(
+        return Ret::throw(
+            null,
             [ 'The `value` should be non-internal function name', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -730,7 +785,8 @@ class DefaultCallableParser implements CallableParserInterface
     public function typeCallableStringMethodStatic($value, $newScope = 'static')
     {
         if ( ! is_string($value) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be string', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -738,7 +794,8 @@ class DefaultCallableParser implements CallableParserInterface
 
         $methodArray = $this->parseMethodArrayFromString($value);
         if ( null === $methodArray ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be string with method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -747,7 +804,8 @@ class DefaultCallableParser implements CallableParserInterface
         [ /* $anObject */, $aClass, $aMethod, $aMagic ] = $methodArray;
 
         if ( null === $aMethod ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be array with method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -765,13 +823,14 @@ class DefaultCallableParser implements CallableParserInterface
             || ($aMagic === '__callStatic')
         ) {
             if ( ! $this->isCallable($callableMethodStaticMagic ?? $callableMethodStatic, $newScope) ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` method is not callable in passed scope', $value, $newScope ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Ret::val($callableMethodStatic);
+            return Ret::ok(null, $callableMethodStatic);
         }
 
         if ( false
@@ -780,7 +839,8 @@ class DefaultCallableParser implements CallableParserInterface
             || ($aMagic === '__invoke')
             || ($aMagic === '__call')
         ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be real (not magic and not invoke) method', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -790,27 +850,30 @@ class DefaultCallableParser implements CallableParserInterface
             $rm = new \ReflectionMethod($aClass, $aMethod);
 
             if ( ! $rm->isStatic() ) {
-                return Ret::err(
+                return Ret::throw(
+                    null,
                     [ 'The `value` should be static method', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be existing method', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( ! $this->isCallable($callableMethodStatic, $newScope) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` method is not callable in passed scope', $value, $newScope ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($callableMethodStatic);
+        return Ret::ok(null, $callableMethodStatic);
     }
 
 

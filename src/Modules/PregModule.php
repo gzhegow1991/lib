@@ -28,7 +28,8 @@ class PregModule
         $theType = Lib::type();
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -43,20 +44,22 @@ class PregModule
             );
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid regex', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( false === $isMatch ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid regex', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
     /**
@@ -68,7 +71,8 @@ class PregModule
         $theType = Lib::type();
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -81,20 +85,22 @@ class PregModule
             );
         }
         catch ( \Throwable $e ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid regexp', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( false === $isMatch ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid regexp', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
 

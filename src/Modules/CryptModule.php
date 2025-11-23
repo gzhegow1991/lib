@@ -70,7 +70,8 @@ class CryptModule
         $theType = Lib::type();
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -79,13 +80,14 @@ class CryptModule
         $alphabetValid = $theType->alphabet($alphabet)->orThrow();
 
         if ( preg_match($alphabetValid->getRegexNot(), $valueStringNotEmpty) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid base of given alphabet', $value, $alphabet ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
     /**
@@ -96,20 +98,22 @@ class CryptModule
         $theType = Lib::type();
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( preg_match('~[^01]~', $valueStringNotEmpty) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid binary string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
     /**
@@ -120,20 +124,22 @@ class CryptModule
         $theType = Lib::type();
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( preg_match('~[^01234567]~', $valueStringNotEmpty) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid octal string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
     /**
@@ -144,20 +150,22 @@ class CryptModule
         $theType = Lib::type();
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( preg_match('~[^0123456789]~', $valueStringNotEmpty) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid decimal string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
     /**
@@ -168,20 +176,22 @@ class CryptModule
         $theType = Lib::type();
 
         if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( preg_match('~[^0123456789ABCDEF]~', $valueStringNotEmpty) ) {
-            return Ret::err(
+            return Ret::throw(
+                null,
                 [ 'The `value` should be valid hexademical string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::val($valueStringNotEmpty);
+        return Ret::ok(null, $valueStringNotEmpty);
     }
 
 
