@@ -4,56 +4,11 @@
 // > некоторые CMS сами по себе применяют настройки глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
 \Gzhegow\Lib\Lib::entrypoint()
-    //
-    // ->isLocked($refFileLine)
-    // ->lock(true)
-    //
-    // ->setAllInitial()
-    // ->setAllRecommended()
-    //
-    // ->has{DirRoot}($refValue)
-    // ->set{DirRoot}($value, $replace = false)
-    //
-    // ->useAll($lock = true)
-    // ->useAllRecommended($lock = true)
-    //
-    // ->use{DirRoot}($refLast)
-    // ->useRecommended{DirRoot}($refLast)
+    ->useAllRecommended($lock = false)
     //
     ->setDirRoot(__DIR__ . '/..')
-    ->setTimezoneDefault('UTC')
     //
-    ->useErrorHandler()
-    ->useErrorHandlerOnShutdown()
-    //
-    ->useExceptionHandler()
-    ->useThrowableHandler()
-    //
-    ->useErrorReporting()
-    ->useErrorLog()
-    ->useLogErrors()
-    ->useDisplayErrors()
-    //
-    ->useMemoryLimit()
-    //
-    ->useMaxExecutionTime()
-    ->useMaxInputTime()
-    //
-    ->useTimezoneDefault()
-    //
-    ->usePrecision()
-    //
-    ->useUmask()
-    //
-    ->usePostMaxSize()
-    //
-    ->useSessionCookieParams()
-    ->useSessionSavePath()
-    //
-    ->useUploadMaxFilesize()
-    ->useUploadTmpDir()
-    //
-    ->useRetCollectTrace()
+    ->useAll($lock = true)
 ;
 
 

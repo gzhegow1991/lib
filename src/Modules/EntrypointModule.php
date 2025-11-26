@@ -547,7 +547,7 @@ class EntrypointModule
     }
 
     /**
-     * @param bool|false|null $value
+     * @param bool|null $value
      *
      * @return static
      */
@@ -620,7 +620,7 @@ class EntrypointModule
     }
 
     /**
-     * @param bool|false|null $value
+     * @param bool|null $value
      *
      * @return static
      */
@@ -1515,7 +1515,7 @@ class EntrypointModule
     }
 
     /**
-     * @param callable|false|null $value
+     * @param bool|null $value
      *
      * @return static
      */
