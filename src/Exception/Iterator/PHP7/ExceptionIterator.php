@@ -2,37 +2,42 @@
 
 namespace Gzhegow\Lib\Exception\Iterator\PHP7;
 
-use Gzhegow\Lib\Exception\AggregateExceptionInterface;
+use Gzhegow\Lib\Exception\ExceptInterface;
+use Gzhegow\Lib\Exception\Interfaces\HasPreviousListInterface;
 
 
 class ExceptionIterator implements \RecursiveIterator
 {
     /**
-     * @var \Throwable[]
+     * @var (\Throwable|ExceptInterface)[]
      */
     protected $items = [];
     /**
-     * @var array<string, \Throwable>
+     * @var array<string, (\Throwable|ExceptInterface)>
      */
     protected $track = [];
 
 
     /**
-     * @param \Throwable[] $items
-     * @param \Throwable[] $track
+     * @param (\Throwable|ExceptInterface)[] $items
+     * @param (\Throwable|ExceptInterface)[] $track
      */
     public function __construct(array $items, array $track = [])
     {
-        $_items = $items;
-        foreach ( $_items as $e ) {
-            if ( ! ($e instanceof \Throwable) ) {
+        $itemsCurrent = $items;
+        foreach ( $itemsCurrent as $e ) {
+            if ( ! (false
+                || $e instanceof \Throwable
+                || $e instanceof ExceptInterface
+            ) ) {
                 throw new \LogicException(
-                    'Each of `items` should be an instance of: ' . \Throwable::class
+                    'Each of `items` should be an instance one of: '
+                    . '[ ' . implode(' ][ ', [ \Throwable::class, ExceptInterface::class ]) . ' ]'
                 );
             }
         }
 
-        $_track = [];
+        $trackCurrent = [];
         foreach ( $track as $i => $e ) {
             $iString = (string) $i;
 
@@ -42,22 +47,26 @@ class ExceptionIterator implements \RecursiveIterator
                 );
             }
 
-            if ( ! ($e instanceof \Throwable) ) {
+            if ( ! (false
+                || $e instanceof \Throwable
+                || $e instanceof ExceptInterface
+            ) ) {
                 throw new \LogicException(
-                    'Each of `track` should be an instance of: ' . \Throwable::class
+                    'Each of `track` should be an instance one of: '
+                    . '[ ' . implode(' ][ ', [ \Throwable::class, ExceptInterface::class ]) . ' ]'
                 );
             }
 
-            $_track[$i] = $e;
+            $trackCurrent[$i] = $e;
         }
 
-        $this->items = $_items;
-        $this->track = $_track;
+        $this->items = $itemsCurrent;
+        $this->track = $trackCurrent;
     }
 
 
     /**
-     * @return \Throwable[]
+     * @return (\Throwable|ExceptInterface)[]
      */
     public function current()
     {
@@ -105,7 +114,7 @@ class ExceptionIterator implements \RecursiveIterator
     {
         $current = current($this->items);
 
-        if ( $current instanceof AggregateExceptionInterface ) {
+        if ( $current instanceof HasPreviousListInterface ) {
             return count($current->getPreviousList()) > 0;
         }
 
@@ -121,7 +130,7 @@ class ExceptionIterator implements \RecursiveIterator
 
         $list = [];
 
-        if ( $current instanceof AggregateExceptionInterface ) {
+        if ( $current instanceof HasPreviousListInterface ) {
             $list = $current->getPreviousList();
 
         } elseif ( $ePrev = $current->getPrevious() ) {

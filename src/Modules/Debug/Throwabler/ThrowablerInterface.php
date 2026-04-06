@@ -49,8 +49,6 @@ interface ThrowablerInterface
      * @param class-string<T> $throwableClass
      *
      * @return T|null
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     public function catchPrevious(\Throwable $throwable, string $throwableClass = '') : ?\Throwable;
 
@@ -82,7 +80,7 @@ interface ThrowablerInterface
     public function getThrowableInfoLines(\Throwable $throwable, ?int $flags = null) : array;
 
 
-    public function getThrowableTraceArray(\Throwable $e, ?int $flags = null) : array;
+    public function getThrowableTraceArray(\Throwable $throwable, ?int $flags = null) : array;
 
     /**
      * @return string[]

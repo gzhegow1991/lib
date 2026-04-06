@@ -5,6 +5,7 @@
 /composer.lock
 
 /.ignore/
+/.old/
 
 /.generator/
 /generator.php

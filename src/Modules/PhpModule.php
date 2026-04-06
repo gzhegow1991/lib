@@ -6,6 +6,7 @@ use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Php\Nil;
 use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\ExceptInterface;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
@@ -1755,7 +1756,7 @@ class PhpModule
 
 
     /**
-     * @return Ret<callable|callable-string>
+     * @return Ret<callable|string>
      */
     public function type_callable_string($value, $newScope = 'static')
     {
@@ -1763,7 +1764,7 @@ class PhpModule
     }
 
     /**
-     * @return Ret<callable|callable-string>
+     * @return Ret<callable|string>
      */
     public function type_callable_string_function($value)
     {
@@ -1771,7 +1772,7 @@ class PhpModule
     }
 
     /**
-     * @return Ret<callable|callable-string>
+     * @return Ret<callable|string>
      */
     public function type_callable_string_function_internal($value)
     {
@@ -1779,7 +1780,7 @@ class PhpModule
     }
 
     /**
-     * @return Ret<callable|callable-string>
+     * @return Ret<callable|string>
      */
     public function type_callable_string_function_non_internal($value)
     {
@@ -1787,7 +1788,7 @@ class PhpModule
     }
 
     /**
-     * @return Ret<callable|callable-string>
+     * @return Ret<callable|string>
      */
     public function type_callable_string_method_static($value, $newScope = 'static')
     {
@@ -2123,7 +2124,7 @@ class PhpModule
             // || ('' === $value)
             // || (is_bool($value))
             // || (is_array($value))
-            || (is_float($value) && (! is_nan($value)))
+            || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || (Nil::is($value))
         ) {
@@ -2170,7 +2171,7 @@ class PhpModule
             // || ('' === $value)
             // || (is_bool($value))
             // || (is_array($value))
-            || (is_float($value) && (! is_nan($value)))
+            || (is_float($value) && (! is_finite($value)))
             || (is_resource($value) || ('resource (closed)' === gettype($value)))
             || (Nil::is($value))
         ) {
@@ -2211,76 +2212,15 @@ class PhpModule
     }
 
 
-    /**
-     * @param callable $fnAssert
-     */
-    public function to_list(
-        $value, array $options = [],
-        $fnAssert = null, array $fnAssertArgs = [], $fnAssertValueKey = 0
-    ) : array
+    public function to_list($value, array $options = []) : array
     {
         if ( null === $value ) {
             return [];
         }
 
-        $theFunc = Lib::func();
-        $theType = Lib::type();
+        $it = $this->to_list_it($value, $options);
 
-        $hasAssert = (null !== $fnAssert);
-
-        $fnArgs = [];
-        if ( $hasAssert ) {
-            [ $fnArgs ] = $theFunc->func_args_unique([ $fnAssertValueKey => null ], $fnAssertArgs);
-        }
-
-        $listValid = null;
-
-        if ( $value instanceof ToListInterface ) {
-            $list = $value->toList($options);
-
-        } elseif ( is_array($value) ) {
-            if ( $hasAssert ) {
-                $fnArgs[$fnAssertValueKey] = $value;
-
-                $status = (bool) call_user_func_array($fnAssert, $fnArgs);
-
-                if ( $status ) {
-                    $listValid = [ $value ];
-                }
-            }
-
-            if ( null === $listValid ) {
-                if ( $theType->list($value)->isOk([ &$valueList ]) ) {
-                    $list = $valueList;
-
-                } else {
-                    $list = [ $value ];
-                }
-            }
-
-        } else {
-            $list = [ $value ];
-        }
-
-        if ( null !== $listValid ) {
-            return $listValid;
-        }
-
-        if ( [] !== $list ) {
-            if ( $hasAssert ) {
-                foreach ( $list as $i => $v ) {
-                    $fnArgs[$fnAssertValueKey] = $v;
-
-                    $status = (bool) call_user_func_array($fnAssert, $fnArgs);
-
-                    if ( ! $status ) {
-                        throw new LogicException(
-                            [ 'Each of `value` (if array) should pass `fnAssert` check', $v, $i ]
-                        );
-                    }
-                }
-            }
-        }
+        $list = iterator_to_array($it);
 
         return $list;
     }
@@ -2301,8 +2241,6 @@ class PhpModule
             }
 
         } elseif ( is_array($value) ) {
-            yield $value;
-
             if ( $theType->list($value)->isOk([ &$valueList ]) ) {
                 foreach ( $valueList as $v ) {
                     yield $v;
@@ -2314,6 +2252,25 @@ class PhpModule
         }
 
         return true;
+    }
+
+
+    public function to_index($value, $options = []) : array
+    {
+        $valueArray = $this->to_array($value, $options);
+
+        $result = [];
+
+        foreach ( $valueArray as $key => $val ) {
+            if ( is_bool($val) ) {
+                $result[$key] = $val;
+
+            } else {
+                $result[$val] = true;
+            }
+        }
+
+        return $result;
     }
 
 
@@ -2731,6 +2688,7 @@ class PhpModule
         }
 
         $fnIsCallable = null;
+
         if ( null !== $newScope ) {
             $fnIsCallable = (static function ($callable) {
                 return is_callable($callable);
@@ -2784,7 +2742,7 @@ class PhpModule
 
         $normalized = $this->path_normalize($pathStringNotEmpty, '/');
 
-        $dirname = ltrim($normalized, '/');
+        $dirname = rtrim($normalized, '/');
         $basename = basename($normalized);
 
         $pi = [];
@@ -2867,7 +2825,7 @@ class PhpModule
 
         $normalized = $this->path_normalize($pathStringNotEmpty, '/');
 
-        $dirname = ltrim($normalized, '/');
+        $dirname = rtrim($normalized, '/');
 
         if ( false === strpos($dirname, '/') ) {
             $dirname = null;
@@ -3447,7 +3405,10 @@ class PhpModule
                 continue;
             }
 
-            if ( $arg instanceof \Throwable ) {
+            if ( false
+                || $arg instanceof \Throwable
+                || $arg instanceof ExceptInterface
+            ) {
                 $previousList[$i] = $arg;
 
                 continue;
@@ -3495,11 +3456,11 @@ class PhpModule
                 ?? (([] !== $codeStringList) ? reset($codeStringList) : null)
                 ?? null
             ),
-            'messageData'   => (([] !== $messageDataList) ? reset($messageDataList) : []),
+            'messageData'   => (([] !== $messageDataList) ? reset($messageDataList) : null),
             'messageObject' => (([] !== $messageObjectList) ? reset($messageObjectList) : null),
             //
-            'code'          => (([] !== $codeIntegerList) ? reset($codeIntegerList) : -1),
-            'codeString'    => (([] !== $codeStringList) ? reset($codeStringList) : ''),
+            'code'          => (([] !== $codeIntegerList) ? reset($codeIntegerList) : null),
+            'codeString'    => (([] !== $codeStringList) ? reset($codeStringList) : null),
             //
             'previous'      => (([] !== $previousList) ? reset($previousList) : null),
             //

@@ -420,9 +420,9 @@ class TestCase
                 }
 
                 $e = new RuntimeException([ $message, $diffString ]);
-                $e->setTrace($trace);
-                $e->setFile($traceFile);
-                $e->setLine($traceLine);
+                $e->setFileOverride($traceFile);
+                $e->setLineOverride($traceLine);
+                $e->setTraceOverride($trace);
 
                 $eArray[] = $e;
             }
@@ -490,9 +490,9 @@ class TestCase
                 }
 
                 $e = new RuntimeException(implode(' | ', array_filter($message)));
-                $e->setTrace($trace);
-                $e->setFile($traceFile);
-                $e->setLine($traceLine);
+                $e->setFileOverride($traceFile);
+                $e->setLineOverride($traceLine);
+                $e->setTraceOverride($trace);
 
                 $eArray[] = $e;
             }
@@ -519,9 +519,9 @@ class TestCase
                 }
 
                 $e = new RuntimeException([ $message, $diffString ]);
-                $e->setTrace($trace);
-                $e->setFile($traceFile);
-                $e->setLine($traceLine);
+                $e->setFileOverride($traceFile);
+                $e->setLineOverride($traceLine);
+                $e->setTraceOverride($trace);
 
                 $eArray[] = $e;
             }
@@ -545,9 +545,9 @@ class TestCase
                 }
 
                 $e = new RuntimeException([ $message, $messageCase ]);
-                $e->setTrace($trace);
-                $e->setFile($traceFile);
-                $e->setLine($traceLine);
+                $e->setFileOverride($traceFile);
+                $e->setLineOverride($traceLine);
+                $e->setTraceOverride($trace);
 
                 $eArray[] = $e;
             }

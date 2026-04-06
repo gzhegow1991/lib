@@ -1389,13 +1389,24 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: null, 1?: Ret<null> } $r
+	 * @param array{ 0?: array, 1?: Ret<array> } $r
 	 */
-	public function filter_key_not_exists(array $r, $key, array $array): bool
+	public function filter_keys_exists(array $r, $keys, array $array): bool
 	{
 		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
 		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
-		return ($refRet = Lib::arr()->type_key_not_exists($key, $array))->isOk([ &$refValue ]);
+		return ($refRet = Lib::arr()->type_keys_exists($keys, $array))->isOk([ &$refValue ]);
+	}
+
+
+	/**
+	 * @param array{ 0?: array, 1?: Ret<array> } $r
+	 */
+	public function filter_keys_not_exists(array $r, $keys, array $array): bool
+	{
+		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
+		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
+		return ($refRet = Lib::arr()->type_keys_not_exists($keys, $array))->isOk([ &$refValue ]);
 	}
 
 
@@ -2460,7 +2471,7 @@ trait FilterTrait
 	{
 		if (array_key_exists(0, $r)) $refValue = &$r[ 0 ];
 		if (array_key_exists(1, $r)) $refRet = &$r[ 1 ];
-		return ($refRet = Lib::php()->type_callable_object($value, $newScope))->isOk([ &$refValue ]);
+		return ($refRet = Lib::php()->type_callable($value, $newScope))->isOk([ &$refValue ]);
 	}
 
 
@@ -2550,7 +2561,7 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: callable|callable-string, 1?: Ret<callable|callable-string> } $r
+	 * @param array{ 0?: callable|string, 1?: Ret<callable|string> } $r
 	 */
 	public function filter_callable_string(array $r, $value, $newScope = 'static'): bool
 	{
@@ -2561,7 +2572,7 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: callable|callable-string, 1?: Ret<callable|callable-string> } $r
+	 * @param array{ 0?: callable|string, 1?: Ret<callable|string> } $r
 	 */
 	public function filter_callable_string_function(array $r, $value): bool
 	{
@@ -2572,7 +2583,7 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: callable|callable-string, 1?: Ret<callable|callable-string> } $r
+	 * @param array{ 0?: callable|string, 1?: Ret<callable|string> } $r
 	 */
 	public function filter_callable_string_function_internal(array $r, $value): bool
 	{
@@ -2583,7 +2594,7 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: callable|callable-string, 1?: Ret<callable|callable-string> } $r
+	 * @param array{ 0?: callable|string, 1?: Ret<callable|string> } $r
 	 */
 	public function filter_callable_string_function_non_internal(array $r, $value): bool
 	{
@@ -2594,7 +2605,7 @@ trait FilterTrait
 
 
 	/**
-	 * @param array{ 0?: callable|callable-string, 1?: Ret<callable|callable-string> } $r
+	 * @param array{ 0?: callable|string, 1?: Ret<callable|string> } $r
 	 */
 	public function filter_callable_string_method_static(array $r, $value, $newScope = 'static'): bool
 	{

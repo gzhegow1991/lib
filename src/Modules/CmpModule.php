@@ -677,7 +677,7 @@ class CmpModule
 
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|float
      *
@@ -702,7 +702,7 @@ class CmpModule
 
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|float
      *
@@ -727,7 +727,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -757,7 +757,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -801,7 +801,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -850,7 +850,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -902,7 +902,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -985,7 +985,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -1080,7 +1080,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -1169,7 +1169,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -1227,7 +1227,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -1266,7 +1266,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -1338,7 +1338,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -1377,7 +1377,7 @@ class CmpModule
 
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -1459,7 +1459,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -1513,7 +1513,7 @@ class CmpModule
     }
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
      *
@@ -1580,7 +1580,7 @@ class CmpModule
 
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return int|float
      *
@@ -1825,7 +1825,7 @@ class CmpModule
 
 
     /**
-     * @param callable|callable-string|null $refFnCmpName
+     * @param callable|string|null $refFnCmpName
      *
      * @return int|float
      *

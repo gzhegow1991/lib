@@ -776,9 +776,15 @@ trait IsTrait
 	}
 
 
-	public function is_key_not_exists($key, array $array): bool
+	public function is_keys_exists($keys, array $array): bool
 	{
-		return Lib::arr()->type_key_not_exists($key, $array)->isOk();
+		return Lib::arr()->type_keys_exists($keys, $array)->isOk();
+	}
+
+
+	public function is_keys_not_exists($keys, array $array): bool
+	{
+		return Lib::arr()->type_keys_not_exists($keys, $array)->isOk();
 	}
 
 
@@ -1400,7 +1406,7 @@ trait IsTrait
 	 */
 	public function is_callable($value, $newScope = 'static'): bool
 	{
-		return Lib::php()->type_callable_object($value, $newScope)->isOk();
+		return Lib::php()->type_callable($value, $newScope)->isOk();
 	}
 
 

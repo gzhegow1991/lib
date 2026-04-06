@@ -13,55 +13,68 @@ class Exception extends \Exception implements
     use ExceptionTrait;
 
 
+    public static function fromExcept(ExceptInterface $e)
+    {
+        $ex = new static(
+            $e->getMessage(),
+            $e->getCode(),
+            $e->getPrevious(),
+        );
+
+        $ex->fileOverride = $e->getFile();
+        $ex->lineOverride = $e->getLine();
+
+        $ex->traceOverride = ($e->hasTrace() ? $e->getTrace() : null);
+
+        $ex->messageList = $e->getMessageList();
+        $ex->messageObjectList = $e->getMessageObjectList();
+
+        $ex->previousList = $e->getPreviousList();
+
+        return $ex;
+    }
+
+
     public function __construct(...$throwableArgs)
     {
-        $theDebug = Lib::debug();
         $thePhp = Lib::php();
 
-        $args = $thePhp->throwable_args(...$throwableArgs);
+        $eArgs = $thePhp->throwable_args(...$throwableArgs);
 
-        $message = $args['message'] ?? '[ NO MESSAGE ]';
-        $messageList = array_values($args['messageList']) ?: [ $message ];
-        $messageObjectList = array_values($args['messageObjectList']) ?: [ (object) [ $message ] ];
+        $eArgsMessage = $eArgs['message'] ?? '[ NO MESSAGE ]';
+        $eArgsCode = $eArgs['code'] ?? -1;
+        $eArgsPrevious = $eArgs['previous'];
 
-        $this->messageList = $messageList;
-        $this->messageObjectList = $messageObjectList;
+        $eArgsPreviousList = array_values($eArgs['previousList']);
 
-        $file = $args['file'];
-        $line = $args['line'];
-        $hasFileLine = (null !== $file);
+        $eArgsFile = $eArgs['file'];
+        $eArgsLine = $eArgs['line'];
 
-        $previous = $args['previous'];
-        $hasPrevious = (null !== $previous);
+        $eArgsMessageList = array_values($eArgs['messageList']) ?: [ $eArgsMessage ];
+        $eArgsMessageObjectList = array_values($eArgs['messageObjectList']) ?: [ (object) [ $eArgsMessage ] ];
 
-        $errorsCount = count($messageList);
-
-        if ( $hasPrevious ) {
-            $previousList = array_values($args['previousList']);
-
-            $this->previousList = $previousList;
+        $cnt = count($eArgsMessageList);
+        if ( $cnt > 1 ) {
+            $eArgsMessage = "[ MULTIPLE ERRORS: {$cnt} ]";
         }
 
-        if ( $errorsCount > 1 ) {
-            $message = "Multiple errors occured: {$errorsCount} total";
+        if ( $eArgsPrevious instanceof ExceptInterface ) {
+            $eArgsPrevious = Exception::fromExcept($eArgsPrevious);
         }
 
         parent::__construct(
-            $message,
-            $args['code'],
-            $args['previous']
+            $eArgsMessage,
+            $eArgsCode,
+            $eArgsPrevious
         );
 
-        if ( $hasPrevious ) {
-            $theDebugThrowabler = $theDebug->throwabler();
+        $this->fileOverride = $eArgsFile;
+        $this->lineOverride = $eArgsLine;
 
-            $this->previousMessageList = $theDebugThrowabler->getPreviousMessageFirstList($this);
-        }
+        $this->messageList = $eArgsMessageList;
+        $this->messageObjectList = $eArgsMessageObjectList;
 
-        if ( $hasFileLine ) {
-            $this->file = $file;
-            $this->line = $line;
-        }
+        $this->previousList = $eArgsPreviousList;
     }
 
 

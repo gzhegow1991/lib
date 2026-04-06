@@ -73,7 +73,7 @@ class StrModule
     protected $slugger;
 
     /**
-     * @var array<string, callable|callable-string>
+     * @var array<string, callable|string>
      */
     protected $mbstringFuncMap = [];
 
@@ -185,7 +185,7 @@ class StrModule
     }
 
     /**
-     * @param callable|callable-string $fn
+     * @param callable|string $fn
      *
      * @return callable
      *
@@ -1429,15 +1429,15 @@ class StrModule
     /**
      * > заменяет все буквы на малые
      */
-    public function lower(string $string, ?string $mb_encoding = null) : string
+    public function lower(string $str, ?string $mb_encoding = null) : string
     {
         if ( $this->staticMbstring() ) {
             $result = (null !== $mb_encoding)
-                ? mb_strtolower($string, $mb_encoding)
-                : mb_strtolower($string);
+                ? mb_strtolower($str, $mb_encoding)
+                : mb_strtolower($str);
 
         } else {
-            if ( $this->is_utf8($string) ) {
+            if ( $this->is_utf8($str) ) {
                 throw new RuntimeException(
                     [
                         ''
@@ -1447,7 +1447,7 @@ class StrModule
                 );
             }
 
-            $result = strtolower($string);
+            $result = strtolower($str);
         }
 
         return $result;
@@ -1456,15 +1456,15 @@ class StrModule
     /**
      * > заменяет все буквы на большие
      */
-    public function upper(string $string, ?string $mb_encoding = null) : string
+    public function upper(string $str, ?string $mb_encoding = null) : string
     {
         if ( $this->staticMbstring() ) {
             $result = (null !== $mb_encoding)
-                ? mb_strtoupper($string, $mb_encoding)
-                : mb_strtoupper($string);
+                ? mb_strtoupper($str, $mb_encoding)
+                : mb_strtoupper($str);
 
         } else {
-            if ( $this->is_utf8($string) ) {
+            if ( $this->is_utf8($str) ) {
                 throw new RuntimeException(
                     [
                         ''
@@ -1474,7 +1474,7 @@ class StrModule
                 );
             }
 
-            $result = strtoupper($string);
+            $result = strtoupper($str);
         }
 
         return $result;
@@ -1484,15 +1484,15 @@ class StrModule
     /**
      * > пишет слово с малой буквы
      */
-    public function lcfirst(string $string, ?string $mb_encoding = null) : string
+    public function lcfirst(string $str, ?string $mb_encoding = null) : string
     {
         $theMb = Lib::mb();
 
         if ( $this->staticMbstring() ) {
-            $result = $theMb->lcfirst($string, $mb_encoding);
+            $result = $theMb->lcfirst($str, $mb_encoding);
 
         } else {
-            if ( $this->is_utf8($string) ) {
+            if ( $this->is_utf8($str) ) {
                 throw new RuntimeException(
                     [
                         ''
@@ -1502,7 +1502,7 @@ class StrModule
                 );
             }
 
-            $result = lcfirst($string);
+            $result = lcfirst($str);
         }
 
         return $result;
@@ -1511,15 +1511,15 @@ class StrModule
     /**
      * > пишет слово с большой буквы
      */
-    public function ucfirst(string $string, ?string $mb_encoding = null) : string
+    public function ucfirst(string $str, ?string $mb_encoding = null) : string
     {
         $theMb = Lib::mb();
 
         if ( $this->staticMbstring() ) {
-            $result = $theMb->ucfirst($string, $mb_encoding);
+            $result = $theMb->ucfirst($str, $mb_encoding);
 
         } else {
-            if ( $this->is_utf8($string) ) {
+            if ( $this->is_utf8($str) ) {
                 throw new RuntimeException(
                     [
                         ''
@@ -1529,7 +1529,7 @@ class StrModule
                 );
             }
 
-            $result = ucfirst($string);
+            $result = ucfirst($str);
         }
 
         return $result;
@@ -1539,7 +1539,7 @@ class StrModule
     /**
      * > пишет каждое слово в предложении с малой буквы
      */
-    public function lcwords(string $string, ?string $separators = null, ?string $mb_encoding = null) : string
+    public function lcwords(string $str, ?string $separators = null, ?string $mb_encoding = null) : string
     {
         $separators = $separators ?? " \t\r\n\f\v";
 
@@ -1556,7 +1556,7 @@ class StrModule
 
                 return "{$first}{$last}";
             },
-            $string
+            $str
         );
 
         return $result;
@@ -1565,7 +1565,7 @@ class StrModule
     /**
      * > пишет каждое слово в предложении с большой буквы
      */
-    public function ucwords(string $string, ?string $separators = null, ?string $mb_encoding = null) : string
+    public function ucwords(string $str, ?string $separators = null, ?string $mb_encoding = null) : string
     {
         $separators = $separators ?? " \t\r\n\f\v";
 
@@ -1582,14 +1582,14 @@ class StrModule
 
                 return "{$first}{$last}";
             },
-            $string
+            $str
         );
 
         return $result;
     }
 
 
-    public function str_split(string $string, ?int $length = null, ?string $mb_encoding = null) : array
+    public function str_split(string $str, ?int $length = null, ?string $mb_encoding = null) : array
     {
         $length = $length ?? 1;
 
@@ -1599,10 +1599,10 @@ class StrModule
         $lengthInt = $theType->int_positive($length)->orThrow();
 
         if ( $this->staticMbstring() ) {
-            $result = $theMb->str_split($string, $lengthInt, $mb_encoding);
+            $result = $theMb->str_split($str, $lengthInt, $mb_encoding);
 
         } else {
-            $result = preg_split("/(?<=.{{$length}})/u", $string, -1, PREG_SPLIT_NO_EMPTY);
+            $result = preg_split("/(?<=.{{$length}})/u", $str, -1, PREG_SPLIT_NO_EMPTY);
         }
 
         return $result;
@@ -1610,7 +1610,7 @@ class StrModule
 
 
     public function str_starts(
-        string $string, string $needle, ?bool $ignoreCase = null,
+        string $str, string $needle, ?bool $ignoreCase = null,
         array $refs = []
     ) : bool
     {
@@ -1622,9 +1622,9 @@ class StrModule
 
         $ignoreCase = $ignoreCase ?? true;
 
-        if ( '' === $string ) return false;
+        if ( '' === $str ) return false;
         if ( '' === $needle ) {
-            $refSubstr = $string;
+            $refSubstr = $str;
 
             return true;
         }
@@ -1635,11 +1635,11 @@ class StrModule
             ? $this->mb_func('stripos')
             : $this->mb_func('strpos');
 
-        $pos = $fnStrpos($string, $needle);
+        $pos = $fnStrpos($str, $needle);
         $status = (0 === $pos);
 
         if ( $status && $withSubstr ) {
-            $refSubstr = $fnSubstr($string, $fnStrlen($needle));
+            $refSubstr = $fnSubstr($str, $fnStrlen($needle));
         }
 
         unset($refSubstr);
@@ -1648,7 +1648,7 @@ class StrModule
     }
 
     public function str_ends(
-        string $string, string $needle, ?bool $ignoreCase = null,
+        string $str, string $needle, ?bool $ignoreCase = null,
         array $refs = []
     ) : bool
     {
@@ -1660,9 +1660,9 @@ class StrModule
 
         $ignoreCase = $ignoreCase ?? true;
 
-        if ( '' === $string ) return false;
+        if ( '' === $str ) return false;
         if ( '' === $needle ) {
-            $refSubstr = $string;
+            $refSubstr = $str;
 
             return false;
         }
@@ -1673,11 +1673,11 @@ class StrModule
             ? $this->mb_func('strripos')
             : $this->mb_func('strrpos');
 
-        $pos = $fnStrrpos($string, $needle);
-        $status = ($pos === $fnStrlen($string) - $fnStrlen($needle));
+        $pos = $fnStrrpos($str, $needle);
+        $status = ($pos === $fnStrlen($str) - $fnStrlen($needle));
 
         if ( $status && $withSubstr ) {
-            $refSubstr = $fnSubstr($string, 0, $pos);
+            $refSubstr = $fnSubstr($str, 0, $pos);
         }
 
         unset($refSubstr);
@@ -1687,125 +1687,334 @@ class StrModule
 
 
     /**
-     * > обрезает у строки подстроку с начала (ltrim, только для строк а не букв)
+     * > обрезает у строки подстроку с начала (ltrim, только для строк, а не букв)
      */
-    public function lcrop(string $string, string $needle, ?bool $ignoreCase = null, ?int $limit = null) : string
-    {
-        $limit = $limit ?? -1;
-        $ignoreCase = $ignoreCase ?? true;
-
-        if ( '' === $string ) return $string;
-        if ( '' === $needle ) return $string;
-        if ( 0 === $limit ) return $string;
-
-        if ( $limit < -1 ) {
-            throw new LogicException(
-                'The `limit` should be GTE -1',
-                $limit
-            );
-        }
-
-        $result = $string;
-
-        $fnStrlen = $this->mb_func('strlen');
-        $fnSubstr = $this->mb_func('substr');
-        $fnStrpos = $ignoreCase
-            ? $this->mb_func('stripos')
-            : $this->mb_func('strpos');
-
-        $pos = $fnStrpos($result, $needle);
-
-        while ( $pos === 0 ) {
-            if ( 0 === $limit-- ) {
-                break;
-            }
-
-            $result = $fnSubstr($result,
-                $fnStrlen($needle)
-            );
-
-            $pos = $fnStrpos($result, $needle);
-        }
-
-        return $result;
-    }
-
-    /**
-     * > обрезает у строки подстроку с конца (rtrim, только для строк а не букв)
-     */
-    public function rcrop(string $string, string $needle, ?bool $ignoreCase = null, ?int $limit = null) : string
-    {
-        $limit = $limit ?? -1;
-        $ignoreCase = $ignoreCase ?? true;
-
-        if ( '' === $string ) return $string;
-        if ( '' === $needle ) return $string;
-        if ( 0 === $limit ) return $string;
-
-        if ( $limit < -1 ) {
-            throw new LogicException(
-                'The `limit` should be GTE -1',
-                $limit
-            );
-        }
-
-        $result = $string;
-
-        $fnStrlen = $this->mb_func('strlen');
-        $fnSubstr = $this->mb_func('substr');
-        $fnStrrpos = $ignoreCase
-            ? $this->mb_func('strripos')
-            : $this->mb_func('strrpos');
-
-        $pos = $fnStrrpos($result, $needle);
-
-        while ( $pos === ($fnStrlen($result) - $fnStrlen($needle)) ) {
-            if ( 0 === $limit-- ) {
-                break;
-            }
-
-            $result = $fnSubstr($result, 0, $pos);
-
-            $pos = $fnStrrpos($result, $needle);
-        }
-
-        return $result;
-    }
-
-    /**
-     * > обрезает у строки подстроки с обеих сторон (trim, только для строк а не букв)
-     */
-    public function crop(string $string, $crops, ?bool $ignoreCase = null, $limits = null) : string
+    public function lcrop(string $str, $needleList = [], $ignoreList = []) : string
     {
         $thePhp = Lib::php();
 
-        $cropsList = $thePhp->to_list($crops);
-        $limitsList = $thePhp->to_list($limits ?? [ -1 ]);
+        $needleList = $needleList ?: [];
+        $ignoreList = $ignoreList ?: [];
 
-        if ( [] === $cropsList ) {
-            return $string;
+        if ( [] !== $needleList ) {
+            $needleIndex = $thePhp->to_index($needleList);
+
+        } else {
+            $needleIndex = [
+                "\0"       => true, // > NUL
+                //
+                " "        => true, // > SPACE
+                "\u{00A0}" => true, // > Z-SPACE
+                //
+                "\t"       => true, // > TAB
+                "\v"       => true, // > V-TAB
+                //
+                "\r"       => true, // > CARRIAGE-RETURN
+                "\n"       => true, // > NEWLINE
+            ];
         }
 
-        if ( [] === $limitsList ) {
-            throw new LogicException(
-                'The `limits` should be array of integers or be null',
-                $limits
-            );
+        $needleIndex = array_filter($needleIndex);
+
+        unset($needleIndex['']);
+
+        if ( [] !== $ignoreList ) {
+            $ignoreIndex = $thePhp->to_index($ignoreList);
+            $ignoreIndex = array_filter($ignoreIndex);
+
+            foreach ( $ignoreIndex as $key => $devnull ) {
+                unset($needleIndex[$key]);
+            }
         }
 
-        $needleLcrop = array_shift($cropsList);
-        $needleRcrop = ([] !== $cropsList)
-            ? array_shift($cropsList)
-            : $needleLcrop;
+        if ( [] === $needleIndex ) {
+            return $str;
+        }
 
-        $limitLcrop = array_shift($limitsList);
-        $limitRcrop = ([] !== $limitsList)
-            ? array_shift($limitsList)
-            : $limitLcrop;
+        $fnStrlen = $this->mb_func('strlen');
+        $fnStrpos = $this->mb_func('strpos');
+        $fnSubstr = $this->mb_func('substr');
 
-        $result = $string;
-        $result = $this->lcrop($result, $needleLcrop, $ignoreCase, $limitLcrop);
-        $result = $this->rcrop($result, $needleRcrop, $ignoreCase, $limitRcrop);
+        foreach ( $needleIndex as $needle => $devnull ) {
+            $needleIndex[$needle] = $fnStrlen($needle);
+        }
+
+        uksort($needleIndex,
+            function ($a, $b) use ($fnStrlen) {
+                return $fnStrlen($b) <=> $fnStrlen($a);
+            }
+        );
+
+        $result = $str;
+
+        $found = true;
+        while ( $found
+            && ($result !== '')
+        ) {
+            $found = false;
+
+            foreach ( $needleIndex as $needle => $needleLen ) {
+                if ( 0 === $fnStrpos($result, $needle) ) {
+                    $result = $fnSubstr($result, $needleLen);
+
+                    $found = true;
+
+                    break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * > обрезает у строки подстроку с конца (rtrim, только для строк, а не букв)
+     */
+    public function rcrop(string $str, $needleList = [], $ignoreList = []) : string
+    {
+        $thePhp = Lib::php();
+
+        $needleList = $needleList ?: [];
+        $ignoreList = $ignoreList ?: [];
+
+        if ( [] !== $needleList ) {
+            $needleIndex = $thePhp->to_index($needleList);
+
+        } else {
+            $needleIndex = [
+                "\0"       => true, // > NUL
+                //
+                " "        => true, // > SPACE
+                "\u{00A0}" => true, // > Z-SPACE
+                //
+                "\t"       => true, // > TAB
+                "\v"       => true, // > V-TAB
+                //
+                "\r"       => true, // > CARRIAGE-RETURN
+                "\n"       => true, // > NEWLINE
+            ];
+        }
+
+        $needleIndex = array_filter($needleIndex);
+
+        unset($needleIndex['']);
+
+        if ( [] !== $ignoreList ) {
+            $ignoreIndex = $thePhp->to_index($ignoreList);
+            $ignoreIndex = array_filter($ignoreIndex);
+
+            foreach ( $ignoreIndex as $key => $devnull ) {
+                unset($needleIndex[$key]);
+            }
+        }
+
+        if ( [] === $needleIndex ) {
+            return $str;
+        }
+
+        $fnStrlen = $this->mb_func('strlen');
+        $fnSubstr = $this->mb_func('substr');
+        $fnStrpos = $this->mb_func('strpos');
+
+        foreach ( $needleIndex as $needle => $devnull ) {
+            $needleIndex[$needle] = $fnStrlen($needle);
+        }
+
+        uksort($needleIndex,
+            function ($a, $b) use ($fnStrlen) {
+                return $fnStrlen($b) <=> $fnStrlen($a);
+            }
+        );
+
+        $result = $str;
+
+        $currentLen = $fnStrlen($result);
+
+        $found = true;
+        while ( $found
+            && ($result !== '')
+        ) {
+            $found = false;
+
+            foreach ( $needleIndex as $needle => $needleLen ) {
+                $offset = $currentLen - $needleLen;
+
+                if ( ($offset >= 0)
+                    && ($offset === $fnStrpos($result, $needle, $offset))
+                ) {
+                    $result = $fnSubstr($result, 0, $offset);
+
+                    $currentLen = $offset;
+
+                    $found = true;
+
+                    break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * > обрезает у строки подстроки с обеих сторон (trim, только для строк, а не букв)
+     */
+    public function crop(string $str, $needleList = [], $ignoreList = []) : string
+    {
+        $thePhp = Lib::php();
+
+        $needleList = $needleList ?: [];
+        $ignoreList = $ignoreList ?: [];
+
+        if ( [] !== $needleList ) {
+            $needleIndex = $thePhp->to_index($needleList);
+
+        } else {
+            $needleIndex = [
+                "\0"       => true, // > NUL
+                //
+                " "        => true, // > SPACE
+                "\u{00A0}" => true, // > Z-SPACE
+                //
+                "\t"       => true, // > TAB
+                "\v"       => true, // > V-TAB
+                //
+                "\r"       => true, // > CARRIAGE-RETURN
+                "\n"       => true, // > NEWLINE
+            ];
+        }
+
+        $needleIndex = array_filter($needleIndex);
+
+        unset($needleIndex['']);
+
+        if ( [] !== $ignoreList ) {
+            $ignoreIndex = $thePhp->to_index($ignoreList);
+            $ignoreIndex = array_filter($ignoreIndex);
+
+            foreach ( $ignoreIndex as $key => $devnull ) {
+                unset($needleIndex[$key]);
+            }
+        }
+
+        if ( [] === $needleIndex ) {
+            return $str;
+        }
+
+        $fnStrlen = $this->mb_func('strlen');
+        $fnSubstr = $this->mb_func('substr');
+        $fnStrpos = $this->mb_func('strpos');
+
+        foreach ( $needleIndex as $needle => $devnull ) {
+            $needleIndex[$needle] = $fnStrlen($needle);
+        }
+
+        uksort($needleIndex,
+            function ($a, $b) use ($fnStrlen) {
+                return $fnStrlen($b) <=> $fnStrlen($a);
+            }
+        );
+
+        $result = $str;
+
+        $currentLen = $fnStrlen($result);
+
+        $found = true;
+        while ( $found
+            && ($result !== '')
+        ) {
+            $found = false;
+
+            foreach ( $needleIndex as $needle => $needleLen ) {
+                if ( 0 === $fnStrpos($result, $needle) ) {
+                    $result = $fnSubstr($result, $needleLen);
+
+                    $currentLen -= $needleLen;
+
+                    $found = true;
+
+                    break;
+                }
+
+                $offset = $currentLen - $needleLen;
+
+                if ( ($offset >= 0)
+                    && ($offset === $fnStrpos($result, $needle, $offset))
+                ) {
+                    $result = $fnSubstr($result, 0, $offset);
+
+                    $currentLen = $offset;
+
+                    $found = true;
+
+                    break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * > заменяет по списку подстроки внутри строки на один пробел (mtrim, только для строк, а не букв)
+     */
+    public function mcrop(string $str, $needleList = [], $ignoreList = []) : string
+    {
+        $thePhp = Lib::php();
+
+        $needleList = $needleList ?: [];
+        $ignoreList = $ignoreList ?: [];
+
+        if ( [] !== $needleList ) {
+            $needleIndex = $thePhp->to_index($needleList);
+
+        } else {
+            $needleIndex = [
+                "\0"       => true, // > NUL
+                //
+                " "        => true, // > SPACE
+                "\u{00A0}" => true, // > Z-SPACE
+                //
+                "\t"       => true, // > TAB
+                "\v"       => true, // > V-TAB
+                //
+                "\r"       => true, // > CARRIAGE-RETURN
+                "\n"       => true, // > NEWLINE
+            ];
+        }
+
+        $needleIndex = array_filter($needleIndex);
+
+        unset($needleIndex['']);
+
+        if ( [] !== $ignoreList ) {
+            $ignoreIndex = $thePhp->to_index($ignoreList);
+            $ignoreIndex = array_filter($ignoreIndex);
+
+            foreach ( $ignoreIndex as $key => $devnull ) {
+                unset($needleIndex[$key]);
+            }
+        }
+
+        if ( [] === $needleIndex ) {
+            return $str;
+        }
+
+        $fnStrlen = $this->mb_func('strlen');
+
+        uksort($needleIndex,
+            function ($a, $b) use ($fnStrlen) {
+                return $fnStrlen($b) <=> $fnStrlen($a);
+            }
+        );
+
+        $result = str_replace(
+            array_keys($needleIndex),
+            ' ',
+            $str
+        );
+
+        $result = preg_replace('/\s+/u', ' ', $result);
 
         return $result;
     }
@@ -1814,13 +2023,12 @@ class StrModule
     /**
      * > добавляет подстроку в начало строки, если её уже там нет
      */
-    public function unlcrop(string $string, string $needle, ?int $times = null, ?bool $isIgnoreCase = null) : string
+    public function unlcrop(string $str, string $needle, ?int $times = null) : string
     {
         $times = $times ?? 1;
-        $isIgnoreCase = $isIgnoreCase ?? true;
 
-        if ( '' === $needle ) return $string;
-        if ( 0 === $times ) return $string;
+        if ( '' === $needle ) return $str;
+        if ( 0 === $times ) return $str;
 
         if ( $times < 1 ) {
             throw new LogicException(
@@ -1829,8 +2037,8 @@ class StrModule
             );
         }
 
-        $result = $string;
-        $result = $this->lcrop($result, $needle, $isIgnoreCase, -1);
+        $result = $str;
+        $result = $this->lcrop($result, [ $needle => true ]);
         $result = str_repeat($needle, $times) . $result;
 
         return $result;
@@ -1839,13 +2047,12 @@ class StrModule
     /**
      * > добавляет подстроку в конец строки, если её уже там нет
      */
-    public function unrcrop(string $string, string $needle, ?int $times = null, ?bool $isIgnoreCase = null) : string
+    public function unrcrop(string $str, string $needle, ?int $times = null) : string
     {
         $times = $times ?? 1;
-        $isIgnoreCase = $isIgnoreCase ?? true;
 
-        if ( '' === $needle ) return $string;
-        if ( 0 === $times ) return $string;
+        if ( '' === $needle ) return $str;
+        if ( 0 === $times ) return $str;
 
         if ( $times < 1 ) {
             throw new LogicException(
@@ -1854,8 +2061,8 @@ class StrModule
             );
         }
 
-        $result = $string;
-        $result = $this->rcrop($result, $needle, $isIgnoreCase, -1);
+        $result = $str;
+        $result = $this->rcrop($result, [ $needle => true ]);
         $result = $result . str_repeat($needle, $times);
 
         return $result;
@@ -1863,41 +2070,24 @@ class StrModule
 
     /**
      * > оборачивает строку в подстроки, если их уже там нет
-     *
-     * @param string|string[] $crops
-     * @param int|int[]       $times
      */
-    public function uncrop(string $string, $crops, $times = null, ?bool $ignoreCase = null) : string
+    public function uncrop(string $str, string $needle, ?int $times = null) : string
     {
-        $thePhp = Lib::php();
+        $times = $times ?? 1;
 
-        $cropsList = $thePhp->to_list($crops);
-        $timesList = $thePhp->to_list($times ?? [ 1 ]);
+        if ( '' === $needle ) return $str;
+        if ( 0 === $times ) return $str;
 
-        if ( [] === $cropsList ) {
-            return $string;
-        }
-
-        if ( [] === $timesList ) {
+        if ( $times < 1 ) {
             throw new LogicException(
-                'The `times` should be array of integers or be null',
+                'The `times` should be GTE 1',
                 $times
             );
         }
 
-        $needleLcrop = array_shift($cropsList);
-        $needleRcrop = ([] !== $cropsList)
-            ? array_shift($cropsList)
-            : $needleLcrop;
-
-        $timesLcrop = array_shift($timesList);
-        $timesRcrop = ([] !== $timesList)
-            ? array_shift($timesList)
-            : $timesLcrop;
-
-        $result = $string;
-        $result = $this->unlcrop($result, $needleLcrop, $timesLcrop, $ignoreCase);
-        $result = $this->unrcrop($result, $needleRcrop, $timesRcrop, $ignoreCase);
+        $result = $str;
+        $result = $this->crop($result, [ $needle => true ]);
+        $result = str_repeat($needle, $times) . $result . str_repeat($needle, $times);
 
         return $result;
     }
@@ -2526,17 +2716,14 @@ class StrModule
         if ( null !== $delimiter ) {
             $delimiterChar = $theType->char($delimiter)->orThrow();
 
-            $theType->key_not_exists($delimiterChar, $dictionary)->orThrow();
+            $theType->keys_not_exists([ $delimiterChar ], $dictionary)->orThrow();
         }
 
         $gen = $thePhp->to_list_it($ignoreSymbols);
 
         $ignoreSymbolsIndex = [];
         foreach ( $gen as $str ) {
-            if ( is_array($str) ) {
-                continue;
-
-            } elseif ( $theType->letter($str)->isOk([ &$letter ]) ) {
+            if ( $theType->letter($str)->isOk([ &$letter ]) ) {
                 $letterLower = mb_strtolower($letter);
 
                 $ignoreSymbolsIndex[$letterLower] = true;

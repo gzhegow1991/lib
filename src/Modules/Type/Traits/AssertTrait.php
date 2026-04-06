@@ -1743,16 +1743,30 @@ trait AssertTrait
 
 
 	/**
-	 * @return null
+	 * @return array
 	 */
-	public function assert_key_not_exists($key, array $array)
+	public function assert_keys_exists($keys, array $array)
 	{
-		if (Lib::arr()->type_key_not_exists($key, $array)->isOk([ &$ref ])) return $ref;
+		if (Lib::arr()->type_keys_exists($keys, $array)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
 
-		throw new LogicException($t, [ 'Assert `key_not_exists` is failed', [ $key, $array ] ]);
+		throw new LogicException($t, [ 'Assert `keys_exists` is failed', [ $keys, $array ] ]);
+	}
+
+
+	/**
+	 * @return array
+	 */
+	public function assert_keys_not_exists($keys, array $array)
+	{
+		if (Lib::arr()->type_keys_not_exists($keys, $array)->isOk([ &$ref ])) return $ref;
+
+		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
+		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
+
+		throw new LogicException($t, [ 'Assert `keys_not_exists` is failed', [ $keys, $array ] ]);
 	}
 
 
@@ -3063,7 +3077,7 @@ trait AssertTrait
 	 */
 	public function assert_callable($value, $newScope = 'static')
 	{
-		if (Lib::php()->type_callable_object($value, $newScope)->isOk([ &$ref ])) return $ref;
+		if (Lib::php()->type_callable($value, $newScope)->isOk([ &$ref ])) return $ref;
 
 		$t = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1)[0];
 		$t = [ $t['file'] ?? '{{file}}', $t['line'] ?? -1 ];
@@ -3179,7 +3193,7 @@ trait AssertTrait
 
 
 	/**
-	 * @return callable|callable-string
+	 * @return callable|string
 	 */
 	public function assert_callable_string($value, $newScope = 'static')
 	{
@@ -3193,7 +3207,7 @@ trait AssertTrait
 
 
 	/**
-	 * @return callable|callable-string
+	 * @return callable|string
 	 */
 	public function assert_callable_string_function($value)
 	{
@@ -3207,7 +3221,7 @@ trait AssertTrait
 
 
 	/**
-	 * @return callable|callable-string
+	 * @return callable|string
 	 */
 	public function assert_callable_string_function_internal($value)
 	{
@@ -3221,7 +3235,7 @@ trait AssertTrait
 
 
 	/**
-	 * @return callable|callable-string
+	 * @return callable|string
 	 */
 	public function assert_callable_string_function_non_internal($value)
 	{
@@ -3235,7 +3249,7 @@ trait AssertTrait
 
 
 	/**
-	 * @return callable|callable-string
+	 * @return callable|string
 	 */
 	public function assert_callable_string_method_static($value, $newScope = 'static')
 	{

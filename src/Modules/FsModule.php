@@ -2183,10 +2183,6 @@ class FsModule
                 fwrite($output, $startTrim . "\n");
 
                 foreach ( $thePhp->to_list_it($lines) as $line ) {
-                    if ( is_array($line) ) {
-                        continue;
-                    }
-
                     $line = rtrim($line);
 
                     fwrite($output, $line . "\n");
@@ -2204,10 +2200,6 @@ class FsModule
             fwrite($output, $startTrim . "\n");
 
             foreach ( $thePhp->to_list_it($lines) as $line ) {
-                if ( is_array($line) ) {
-                    continue;
-                }
-
                 $line = trim($line);
 
                 fwrite($output, $line . "\n");

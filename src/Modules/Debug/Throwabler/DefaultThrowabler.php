@@ -1,9 +1,12 @@
 <?php
 
+/** @noinspection PhpComposerExtensionStubsInspection */
+
 namespace Gzhegow\Lib\Modules\Debug\Throwabler;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\ExceptInterface;
 use Gzhegow\Lib\Exception\Iterator\ExceptionIterator;
 use Gzhegow\Lib\Exception\Interfaces\HasMessageListInterface;
 use Gzhegow\Lib\Exception\Interfaces\HasTraceOverrideInterface;
@@ -13,16 +16,14 @@ use Gzhegow\Lib\Exception\Iterator\PHP7\ExceptionIterator as ExceptionIteratorPH
 class DefaultThrowabler implements ThrowablerInterface
 {
     /**
-     * @template-covariant T of \Throwable
+     * @template-covariant T of (\Throwable|ExceptInterface)
      *
-     * @param \Throwable           $throwable
-     * @param class-string<T>|null $throwableClass
+     * @param \Throwable|ExceptInterface $throwable
+     * @param class-string<T>|null       $throwableClass
      *
      * @return T|null
-     *
-     * @noinspection PhpDocSignatureInspection
      */
-    public function catchPrevious(\Throwable $throwable, ?string $throwableClass = null) : ?\Throwable
+    public function catchPrevious($throwable, ?string $throwableClass = null) : ?\Throwable
     {
         if ( null === $throwableClass ) {
             return $throwable;
@@ -41,9 +42,9 @@ class DefaultThrowabler implements ThrowablerInterface
 
 
     /**
-     * @return array<string, \Throwable>
+     * @return array<string, \Throwable|ExceptInterface>
      */
-    public function getPreviousArray(\Throwable $throwable) : array
+    public function getPreviousArray($throwable) : array
     {
         $it = $this->getPreviousIterator($throwable);
 
@@ -57,9 +58,9 @@ class DefaultThrowabler implements ThrowablerInterface
     }
 
     /**
-     * @return \Generator<string, \Throwable[]>
+     * @return \Generator<string, (\Throwable|ExceptInterface)[]>
      */
-    public function getPreviousIterator(\Throwable $throwable) : \Generator
+    public function getPreviousIterator($throwable) : \Generator
     {
         $it = $this->getPreviousTrackIterator($throwable);
 
@@ -79,9 +80,11 @@ class DefaultThrowabler implements ThrowablerInterface
     }
 
     /**
-     * @return \Traversable<string, \Throwable[]>
+     * @param \Throwable|ExceptInterface $throwable
+     *
+     * @return \Traversable<string, (\Throwable|ExceptInterface)[]>
      */
-    public function getPreviousTrackIterator(\Throwable $throwable) : \Traversable
+    public function getPreviousTrackIterator($throwable) : \Traversable
     {
         $it = (PHP_VERSION_ID >= 80000)
             ? new ExceptionIterator([ $throwable ])
@@ -94,9 +97,11 @@ class DefaultThrowabler implements ThrowablerInterface
 
 
     /**
+     * @param \Throwable|ExceptInterface $throwable
+     *
      * @return string[]
      */
-    public function getPreviousMessageFirstList(\Throwable $throwable, ?int $flags = null) : array
+    public function getPreviousMessageFirstList($throwable, ?int $flags = null) : array
     {
         $messagesList = [];
 
@@ -110,9 +115,11 @@ class DefaultThrowabler implements ThrowablerInterface
     }
 
     /**
+     * @param \Throwable|ExceptInterface $throwable
+     *
      * @return string[]
      */
-    public function getPreviousMessageFirstLines(\Throwable $throwable, ?int $flags = null) : array
+    public function getPreviousMessageFirstLines($throwable, ?int $flags = null) : array
     {
         $lines = [];
 
@@ -150,9 +157,11 @@ class DefaultThrowabler implements ThrowablerInterface
 
 
     /**
+     * @param \Throwable|ExceptInterface $throwable
+     *
      * @return string[]
      */
-    public function getPreviousMessagesAllDict(\Throwable $throwable, ?int $flags = null) : array
+    public function getPreviousMessagesAllDict($throwable, ?int $flags = null) : array
     {
         $messagesLists = [];
 
@@ -166,9 +175,11 @@ class DefaultThrowabler implements ThrowablerInterface
     }
 
     /**
+     * @param \Throwable|ExceptInterface $throwable
+     *
      * @return string[]
      */
-    public function getPreviousMessagesAllLines(\Throwable $throwable, ?int $flags = null) : array
+    public function getPreviousMessagesAllLines($throwable, ?int $flags = null) : array
     {
         $flags = $this->flagsDefault($flags);
 
@@ -193,22 +204,24 @@ class DefaultThrowabler implements ThrowablerInterface
             $messagesWithInfoAndTraceLines = $messagesLines;
 
             if ( $isWithInfo ) {
-                $infoLines = $this->getThrowableInfoLines($e, $flags);
+                $linesInfo = $this->getThrowableInfoLines($e, $flags);
 
-                $messagesWithInfoAndTraceLines = array_merge($messagesWithInfoAndTraceLines, $infoLines);
+                $messagesWithInfoAndTraceLines = array_merge($messagesWithInfoAndTraceLines, $linesInfo);
             }
 
             if ( $isWithTrace ) {
-                $infoLines = $this->getThrowableTraceLines($e, $flags);
+                $linesTrace = $this->getThrowableTraceLines($e, $flags);
 
-                $messagesWithInfoAndTraceLines = array_merge(
-                    $messagesWithInfoAndTraceLines,
-                    [
-                        '',
-                        'Trace: ',
-                    ],
-                    $infoLines
-                );
+                if ( [] !== $linesTrace ) {
+                    $messagesWithInfoAndTraceLines = array_merge(
+                        $messagesWithInfoAndTraceLines,
+                        [
+                            '',
+                            'Trace: ',
+                        ],
+                        $linesTrace
+                    );
+                }
             }
 
             $messagesWithInfoLinesCnt = count($messagesWithInfoAndTraceLines);
@@ -249,8 +262,10 @@ class DefaultThrowabler implements ThrowablerInterface
     }
 
 
-
-    public function getThrowableMessageFirstString(\Throwable $throwable, ?int $flags = null) : string
+    /**
+     * @param \Throwable|ExceptInterface $throwable
+     */
+    public function getThrowableMessageFirstString($throwable, ?int $flags = null) : string
     {
         $eMessage = $throwable->getMessage();
 
@@ -262,9 +277,11 @@ class DefaultThrowabler implements ThrowablerInterface
     }
 
     /**
+     * @param \Throwable|ExceptInterface $throwable
+     *
      * @return string[]
      */
-    public function getThrowableMessageFirstLines(\Throwable $throwable, ?int $flags = null) : array
+    public function getThrowableMessageFirstLines($throwable, ?int $flags = null) : array
     {
         $flags = $this->flagsDefault($flags);
 
@@ -300,14 +317,16 @@ class DefaultThrowabler implements ThrowablerInterface
         if ( $isWithTrace ) {
             $linesTrace = $this->getThrowableTraceLines($throwable, $flags);
 
-            $lines = array_merge(
-                $lines,
-                [
-                    '',
-                    'Trace:',
-                ],
-                $linesTrace
-            );
+            if ( [] !== $linesTrace ) {
+                $lines = array_merge(
+                    $lines,
+                    [
+                        '',
+                        'Trace:',
+                    ],
+                    $linesTrace
+                );
+            }
         }
 
         return $lines;
@@ -315,9 +334,11 @@ class DefaultThrowabler implements ThrowablerInterface
 
 
     /**
+     * @param \Throwable|ExceptInterface $throwable
+     *
      * @return string[]
      */
-    public function getThrowableMessagesAllList(\Throwable $throwable, ?int $flags = null) : array
+    public function getThrowableMessagesAllList($throwable, ?int $flags = null) : array
     {
         if ( $throwable instanceof HasMessageListInterface ) {
             $throwableMap = array_fill_keys($throwable->getMessageList(), $throwable);
@@ -332,9 +353,11 @@ class DefaultThrowabler implements ThrowablerInterface
     }
 
     /**
+     * @param \Throwable|ExceptInterface $throwable
+     *
      * @return string[]
      */
-    public function getThrowableMessagesAllLines(\Throwable $throwable, ?int $flags = null) : array
+    public function getThrowableMessagesAllLines($throwable, ?int $flags = null) : array
     {
         $flags = $this->flagsDefault($flags);
 
@@ -376,21 +399,25 @@ class DefaultThrowabler implements ThrowablerInterface
         if ( $isWithTrace ) {
             $linesTrace = $this->getThrowableTraceLines($throwable, $flags);
 
-            $lines = array_merge(
-                $lines,
-                [
-                    '',
-                    'Trace:',
-                ],
-                $linesTrace
-            );
+            if ( [] !== $linesTrace ) {
+                $lines = array_merge(
+                    $lines,
+                    [
+                        '',
+                        'Trace:',
+                    ],
+                    $linesTrace
+                );
+            }
         }
 
         return $lines;
     }
 
-
-    public function getThrowableInfoArray(\Throwable $throwable, ?int $flags = null) : array
+    /**
+     * @param \Throwable|ExceptInterface $throwable
+     */
+    public function getThrowableInfoArray($throwable, ?int $flags = null) : array
     {
         $theDebug = Lib::debug();
         $theFs = Lib::fs();
@@ -444,9 +471,11 @@ class DefaultThrowabler implements ThrowablerInterface
     }
 
     /**
+     * @param \Throwable|ExceptInterface $throwable
+     *
      * @return string[]
      */
-    public function getThrowableInfoLines(\Throwable $throwable, ?int $flags = null) : array
+    public function getThrowableInfoLines($throwable, ?int $flags = null) : array
     {
         $flags = $this->flagsInfoDefault($flags);
 
@@ -519,15 +548,17 @@ class DefaultThrowabler implements ThrowablerInterface
         return $lines;
     }
 
-
-    public function getThrowableTraceArray(\Throwable $e, ?int $flags = null) : array
+    /**
+     * @param \Throwable|ExceptInterface $throwable
+     */
+    public function getThrowableTraceArray($throwable, ?int $flags = null) : array
     {
         $theDebug = Lib::debug();
         $theFs = Lib::fs();
 
-        $eTrace = $e instanceof HasTraceOverrideInterface
-            ? $e->getTraceOverride()
-            : $e->getTrace();
+        $eTrace = $throwable instanceof HasTraceOverrideInterface
+            ? $throwable->getTraceOverride()
+            : $throwable->getTrace();
 
         $dirRoot = $theDebug->staticDirRoot();
 
@@ -544,7 +575,7 @@ class DefaultThrowabler implements ThrowablerInterface
                         '/'
                     );
                 }
-                catch ( \Throwable $e ) {
+                catch ( \Throwable $throwable ) {
                     $tFileRelative = $t['file'];
                 }
 
@@ -556,9 +587,11 @@ class DefaultThrowabler implements ThrowablerInterface
     }
 
     /**
+     * @param \Throwable|ExceptInterface $throwable
+     *
      * @return string[]
      */
-    public function getThrowableTraceLines(\Throwable $throwable, ?int $flags = null) : array
+    public function getThrowableTraceLines($throwable, ?int $flags = null) : array
     {
         $lines = [];
 
@@ -585,9 +618,12 @@ class DefaultThrowabler implements ThrowablerInterface
 
 
     /**
-     * @param array<string, \Throwable> $throwableMap
+     * @param array<string, \Throwable|ExceptInterface> $throwableMap
      *
      * @return string[]
+     *
+     * @noinspection PhpDocSignatureInspection
+     * @noinspection PhpUnusedParameterInspection
      */
     protected function extractMessagesUtf8FromThrowableMap(array $throwableMap, ?int $flags = null) : array
     {

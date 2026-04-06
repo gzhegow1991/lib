@@ -85,54 +85,92 @@ class ArrModule
         );
     }
 
+
     /**
      * @return Ret<mixed>
      */
     public function type_key_exists($key, array $array)
     {
-        if ( isset($array[$key]) ) {
-            return Ret::ok(null, $array[$key]);
+        if ( ! (false
+            || (isset($array[$key]))
+            || (true
+                && $this->type_key($key)->isOk([ &$keyValid ])
+                && array_key_exists($keyValid, $array)
+            )
+        ) ) {
+            return Ret::throw(
+                null,
+                [ 'The `key` should be existing key in `array`', $key, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
 
-        } else {
-            if ( $this->type_key($key)->isOk([ &$keyValid ]) ) {
-                if ( array_key_exists($keyValid, $array) ) {
-                    return Ret::ok(null, $array[$keyValid]);
-                }
+        return Ret::ok(null, $array[$key]);
+    }
+
+
+    /**
+     * @return Ret<array>
+     */
+    public function type_keys_exists($keys, array $array)
+    {
+        if ( ! is_array($keys) ) {
+            return Ret::throw(
+                null,
+                [ 'The `keys` should be array', $keys ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        foreach ( $keys as $key ) {
+            if ( ! (false
+                || (isset($array[$key]))
+                || (true
+                    && $this->type_key($key)->isOk([ &$keyValid ])
+                    && array_key_exists($keyValid, $array)
+                )
+            ) ) {
+                return Ret::throw(
+                    null,
+                    [ 'The `keys` should exists in `array`', $key, $keys, $array ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        return Ret::throw(
-            null,
-            [ 'The `key` should be existing key in `array`', $key, $array ],
-            [ __FILE__, __LINE__ ]
-        );
+        return Ret::ok(null, $array);
     }
 
     /**
-     * @return Ret<null>
+     * @return Ret<array>
      */
-    public function type_key_not_exists($key, array $array)
+    public function type_keys_not_exists($keys, array $array)
     {
-        if ( isset($array[$key]) ) {
+        if ( ! is_array($keys) ) {
             return Ret::throw(
                 null,
-                [ 'The `key` should be missing key in `array`', $key, $array ],
+                [ 'The `keys` should be array', $keys ],
                 [ __FILE__, __LINE__ ]
             );
+        }
 
-        } else {
-            if ( $this->type_key($key)->isOk([ &$keyValid ]) ) {
-                if ( array_key_exists($keyValid, $array) ) {
-                    return Ret::throw(
-                        null,
-                        [ 'The `key` should be missing key in `array`', $key, $array ],
-                        [ __FILE__, __LINE__ ]
-                    );
-                }
+        foreach ( $keys as $key ) {
+            if ( false
+                || (isset($array[$key]))
+                || (true
+                    && $this->type_key($key)->isOk([ &$keyValid ])
+                    && array_key_exists($keyValid, $array)
+                )
+            ) {
+                return Ret::throw(
+                    null,
+                    [ 'The `keys` should not exists in `array`', $key, $keys, $array ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
-        return Ret::ok(null, null);
+        return Ret::ok(null, $array);
     }
 
 
@@ -2254,75 +2292,6 @@ class ArrModule
 
             foreach ( (array) $groupNames as $groupName ) {
                 $result[$groupName][$key] = $val;
-            }
-        }
-
-        return $result;
-    }
-
-
-    /**
-     * > строит индекс ключей (int)
-     * > [ 0 => 1, 2 => true, 3 => false ] -> [ 1 => true, 2 => true, 3 => false ]
-     *
-     * @return array<int, bool>
-     */
-    public function index_int(array $array, array ...$arrays) : array
-    {
-        array_unshift($arrays, $array);
-
-        $index = array_merge(...$arrays);
-
-        $result = [];
-
-        foreach ( $index as $k => $v ) {
-            if ( is_int($v) ) {
-                $key = $v;
-
-                $result[$key] = true;
-
-            } elseif ( ! isset($result[$k]) ) {
-                $key = $k;
-
-                $v = (bool) $v;
-
-                if ( $v ) {
-                    $result[$key] = true;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * > строит индекс ключей (string)
-     * > [ 0 => 'key1', 'key2' => true, 'key3' => false ] -> [ 'key1' => true, 'key2' => true, 'key3' => false ]
-     *
-     * @return array<string, bool>
-     */
-    public function index_string(array $array, array ...$arrays) : array
-    {
-        array_unshift($arrays, $array);
-
-        $index = array_merge(...$arrays);
-
-        $result = [];
-
-        foreach ( $index as $k => $v ) {
-            if ( is_string($k) && ($k !== '') ) {
-                $key = $k;
-
-                $v = (bool) $v;
-
-                if ( $v ) {
-                    $result[$key] = true;
-                }
-
-            } elseif ( is_string($v) && ! isset($result[$v]) ) {
-                $key = $v;
-
-                $result[$key] = true;
             }
         }
 

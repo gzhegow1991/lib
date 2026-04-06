@@ -22,14 +22,12 @@ php test.php
 // > настраиваем PHP
 // > некоторые CMS сами по себе применяют настройки глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
-\Gzhegow\Lib\Lib::entrypoint()
-    ->useAllRecommended($lock = false)
+($ent = \Gzhegow\Lib\Lib::entrypoint())
+    ->setAllRecommended()
+    ->setValue($ent::OPT_CUSTOM_DIR_ROOT, __DIR__ . '/..')
     //
-    ->setDirRoot(__DIR__ . '/..')
-    //
-    ->useAll($lock = true)
+    ->useAll()
 ;
-
 
 
 // > добавляем несколько функций для тестирования
@@ -360,25 +358,18 @@ $fn = function () use ($ffn) {
         // > [ bool, bool ]
         [
             $ret->getStatus(),
-            $ret[0],
         ],
         // > [ mixed|throw, mixed|null, mixed|null ]
         [
-            $ret->getValue($fallback = []),
-            $ret->getValue($fallback = [ null ]),
-            $ret[1],
+            $ret->getValue(),
         ],
         // > [ \stdClass[]|array[], \stdClass[] ]
         [
             $ret->getErrors($isAssociative = true),
-            $ret[2],
         ],
         // > [ mixed|throw, mixed|NAN, mixed|throw, mixed|NAN ]
         [
-            $ret->orFallback($fallback = []),
             $ret->orFallback($fallback = [ NAN ]),
-            $ret($fallback = []),
-            $ret($fallback = [ NAN ]),
         ],
     ], 4);
 
@@ -391,29 +382,19 @@ $fn = function () use ($ffn) {
         // > [ bool, bool ]
         [
             $ret->getStatus(),
-            $ret[0],
         ],
         // > [ 0: mixed|throw, 1: mixed|null, 2: mixed|null ]
         [
             // > commented, needs try/catch around otherwise
-            // $ret->getValue($fallback = []), // 0
-            //
-            $ret->getValue($fallback = [ null ]), // 1
-            $ret[1], // 2
+            // $ret->getValue(),
         ],
         // > [ \stdClass[]|array[], \stdClass[] ]
         [
             $ret->getErrors($isAssociative = true),
-            $ret[2],
         ],
         // > [ 0: mixed|throw, 1: mixed|throw, 2: mixed|NAN, 3: mixed|NAN ]
         [
-            // > commented, needs try/catch around otherwise
-            // $ret->orFallback($fallback = []), // 0
-            // $ret($fallback = []), // 1
-            //
-            $ret->orFallback($fallback = [ NAN ]), // 2
-            $ret($fallback = [ NAN ]), // 3
+            $ret->orFallback($fallback = [ NAN ]),
         ],
     ], 4);
 };
@@ -421,57 +402,40 @@ $test = $ffn->test($fn);
 $test->expectStdoutIf(PHP_VERSION_ID >= 80200, '
 "[ Ret ]"
 
-{ object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
+{ object # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
 ###
 [
   [
-    TRUE,
     TRUE
   ],
   [
-    "{ object(serializable) # DateTimeZone }",
-    "{ object(serializable) # DateTimeZone }",
     "{ object(serializable) # DateTimeZone }"
   ],
   [
-    [],
     []
   ],
   [
-    "{ object(serializable) # DateTimeZone }",
-    "{ object(serializable) # DateTimeZone }",
-    "{ object(serializable) # DateTimeZone }",
     "{ object(serializable) # DateTimeZone }"
   ]
 ]
 ###
 
-{ object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
+{ object # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
 ###
 [
   [
-    FALSE,
     FALSE
   ],
-  [
-    NULL,
-    NULL
-  ],
+  [],
   [
     [
       [
         "The `timezoneOrNameOrAbbr` should be valid timezone",
         "[ INVALID_TIMEZONE ]"
       ]
-    ],
-    [
-      [
-        1 => "{ object # stdClass }"
-      ]
     ]
   ],
   [
-    NAN,
     NAN
   ]
 ]
@@ -480,57 +444,40 @@ $test->expectStdoutIf(PHP_VERSION_ID >= 80200, '
 $test->expectStdoutIf(((PHP_VERSION_ID >= 80000) && (PHP_VERSION_ID < 80200)), '
 "[ Ret ]"
 
-{ object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
+{ object # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
 ###
 [
   [
-    TRUE,
     TRUE
   ],
   [
-    "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }",
     "{ object # DateTimeZone }"
   ],
   [
-    [],
     []
   ],
   [
-    "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }",
     "{ object # DateTimeZone }"
   ]
 ]
 ###
 
-{ object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
+{ object # Gzhegow\Lib\Modules\Type\Ret\PHP8\Ret }
 ###
 [
   [
-    FALSE,
     FALSE
   ],
-  [
-    NULL,
-    NULL
-  ],
+  [],
   [
     [
       [
         "The `timezoneOrNameOrAbbr` should be valid timezone",
         "[ INVALID_TIMEZONE ]"
       ]
-    ],
-    [
-      [
-        1 => "{ object # stdClass }"
-      ]
     ]
   ],
   [
-    NAN,
     NAN
   ]
 ]
@@ -539,64 +486,46 @@ $test->expectStdoutIf(((PHP_VERSION_ID >= 80000) && (PHP_VERSION_ID < 80200)), '
 $test->expectStdoutIf(PHP_VERSION_ID < 80000, '
 "[ Ret ]"
 
-{ object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP7\Ret }
+{ object # Gzhegow\Lib\Modules\Type\Ret\PHP7\Ret }
 ###
 [
   [
-    TRUE,
     TRUE
   ],
   [
-    "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }",
     "{ object # DateTimeZone }"
   ],
   [
-    [],
     []
   ],
   [
-    "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }",
-    "{ object # DateTimeZone }",
     "{ object # DateTimeZone }"
   ]
 ]
 ###
 
-{ object(invokable) # Gzhegow\Lib\Modules\Type\Ret\PHP7\Ret }
+{ object # Gzhegow\Lib\Modules\Type\Ret\PHP7\Ret }
 ###
 [
   [
-    FALSE,
     FALSE
   ],
-  [
-    NULL,
-    NULL
-  ],
+  [],
   [
     [
       [
         "The `timezoneOrNameOrAbbr` should be valid timezone",
         "[ INVALID_TIMEZONE ]"
       ]
-    ],
-    [
-      [
-        1 => "{ object # stdClass }"
-      ]
     ]
   ],
   [
-    NAN,
     NAN
   ]
 ]
 ###
 ');
 $test->run();
-
 
 
 // >>> TEST
@@ -616,9 +545,11 @@ $fn = function () use ($ffn) {
     $previousList = [ $ee1, $ee2 ];
     $e0 = new \Gzhegow\Lib\Exception\RuntimeException('e', 0, ...$previousList);
 
-    $messages = \Gzhegow\Lib\Lib::debugThrowabler()->getPreviousMessagesAllLines($e0, 0
-        | _DEBUG_THROWABLER_INFO_WITHOUT_FILE
-    );
+    $messages = \Gzhegow\Lib\Lib::debugThrowabler()
+        ->getPreviousMessagesAllLines($e0, 0
+            | _DEBUG_THROWABLER_INFO_WITHOUT_FILE
+        )
+    ;
 
     echo implode("\n", $messages);
 };

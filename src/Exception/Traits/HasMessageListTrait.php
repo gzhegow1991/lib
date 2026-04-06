@@ -6,8 +6,6 @@ use Gzhegow\Lib\Exception\Interfaces\HasMessageListInterface;
 
 
 /**
- * @mixin \Throwable
- *
  * @see HasMessageListInterface
  */
 trait HasMessageListTrait

@@ -1015,6 +1015,7 @@ trait TypeTrait
         return Lib::arr()->type_key($key);
     }
 
+
     /**
      * @return Ret<mixed>
      */
@@ -1023,12 +1024,21 @@ trait TypeTrait
         return Lib::arr()->type_key_exists($key, $array);
     }
 
+
     /**
-     * @return Ret<null>
+     * @return Ret<array>
      */
-    public function key_not_exists($key, array $array)
+    public function keys_exists($keys, array $array)
     {
-        return Lib::arr()->type_key_not_exists($key, $array);
+        return Lib::arr()->type_keys_exists($keys, $array);
+    }
+
+    /**
+     * @return Ret<array>
+     */
+    public function keys_not_exists($keys, array $array)
+    {
+        return Lib::arr()->type_keys_not_exists($keys, $array);
     }
 
 
@@ -1839,7 +1849,7 @@ trait TypeTrait
      */
     public function callable($value, $newScope = 'static')
     {
-        return Lib::php()->type_callable_object($value, $newScope);
+        return Lib::php()->type_callable($value, $newScope);
     }
 
     /**
@@ -1907,7 +1917,7 @@ trait TypeTrait
     }
 
     /**
-     * @return Ret<callable|callable-string>
+     * @return Ret<callable|string>
      */
     public function callable_string($value, $newScope = 'static')
     {
@@ -1915,7 +1925,7 @@ trait TypeTrait
     }
 
     /**
-     * @return Ret<callable|callable-string>
+     * @return Ret<callable|string>
      */
     public function callable_string_function($value)
     {
@@ -1923,7 +1933,7 @@ trait TypeTrait
     }
 
     /**
-     * @return Ret<callable|callable-string>
+     * @return Ret<callable|string>
      */
     public function callable_string_function_internal($value)
     {
@@ -1931,7 +1941,7 @@ trait TypeTrait
     }
 
     /**
-     * @return Ret<callable|callable-string>
+     * @return Ret<callable|string>
      */
     public function callable_string_function_non_internal($value)
     {
@@ -1939,7 +1949,7 @@ trait TypeTrait
     }
 
     /**
-     * @return Ret<callable|callable-string>
+     * @return Ret<callable|string>
      */
     public function callable_string_method_static($value, $newScope = 'static')
     {

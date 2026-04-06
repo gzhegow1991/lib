@@ -22,13 +22,14 @@ class DefaultSluggerPreset implements SluggerPresetInterface
     {
         return [
             'ый' => [ 'ы' => 'i', 'й' => 'y' ],
-            'ех' => [ 'е' => 'c', 'х' => 'kh' ],
-            'сх' => [ 'с' => 'c', 'х' => 'kh' ],
+            'ех' => [ 'е' => 'e', 'х' => 'kh' ],
+            'сх' => [ 'с' => 's', 'х' => 'kh' ],
             'цх' => [ 'ц' => 'c', 'х' => 'kh' ],
             //
             'ẚ'  => [ 'ẚ' => 'a' ], // > ẚ -> [lower]: ẚ -> [upper]: Aʾ
             //
             'ß'  => [ 'ß' => 'ss' ], // > ß -> [lower]: ß -> [upper]: SS
+            //
             'ſ'  => [ 'ſ' => 's' ], // > ſ -> [lower]: ſ -> [upper]: S
         ];
     }
@@ -136,6 +137,7 @@ class DefaultSluggerPreset implements SluggerPresetInterface
                 'ġ' => true,
                 'ģ' => true,
                 'г' => true,
+                'ґ' => true,
             ],
             'h' => [
                 'ĥ' => true,
@@ -171,8 +173,10 @@ class DefaultSluggerPreset implements SluggerPresetInterface
             'k' => [
                 'ķ' => true,
                 'ĸ' => true,
-                'Ǩ' => true,
+                'ƙ' => true,
+                'ǩ' => true,
                 'κ' => true,
+                'к' => true,
             ],
             'l' => [
                 'ĺ' => true,
@@ -293,11 +297,24 @@ class DefaultSluggerPreset implements SluggerPresetInterface
                 'ự' => true,
             ],
             'v' => [ 'в' => true ],
-            'w' => [ 'ŵ' => true ],
+            'w' => [
+                'ŵ' => true,
+                'ẁ' => true,
+                'ẃ' => true,
+                'ẅ' => true,
+                'ẇ' => true,
+                'ẉ' => true,
+            ],
             'y' => [
                 'ý' => true,
                 'ÿ' => true,
                 'ŷ' => true,
+                'ȳ' => true,
+                'ẏ' => true,
+                'ỳ' => true,
+                'ỵ' => true,
+                'ỷ' => true,
+                'ỹ' => true,
             ],
             'z' => [
                 'ź' => true,
