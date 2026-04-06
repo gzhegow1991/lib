@@ -229,7 +229,7 @@ class EntrypointModule
 
     public function setAllRecommended()
     {
-        foreach ( $this->drivers as $opt => $driver ) {
+        foreach ( $this->drivers as $driver ) {
             $valueRecommended = $driver->getRecommended();
 
             $driver->setValue($valueRecommended, $this->configCurrent);
