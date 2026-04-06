@@ -16,7 +16,7 @@ class Except implements
     /**
      * @var bool
      */
-    protected static $shouldTrace = true;
+    protected static $shouldTrace = false;
 
     /**
      * @param int|false|null $shouldTrace

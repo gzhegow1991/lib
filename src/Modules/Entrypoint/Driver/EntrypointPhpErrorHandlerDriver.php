@@ -44,8 +44,8 @@ class EntrypointPhpErrorHandlerDriver extends AbstractEntrypointDriver
     {
         $theEntrypoint = Lib::entrypoint();
 
-        $fnCustomErrorHandlerOnShutdown = $theEntrypoint->get($theEntrypoint::OPT_CUSTOM_ERROR_HANDLER_ON_SHUTDOWN);
-        $fnPhpErrorHandler = $theEntrypoint->get($theEntrypoint::OPT_PHP_ERROR_HANDLER);
+        $fnCustomErrorHandlerOnShutdown = $theEntrypoint->getOpt($theEntrypoint::OPT_CUSTOM_ERROR_HANDLER_ON_SHUTDOWN);
+        $fnPhpErrorHandler = $theEntrypoint->getOpt($theEntrypoint::OPT_PHP_ERROR_HANDLER);
 
         $devnull = null
             ?? ($fnCustomErrorHandlerOnShutdown ? $fnCustomErrorHandlerOnShutdown($errno, $errstr, $errfile, $errline) : null)

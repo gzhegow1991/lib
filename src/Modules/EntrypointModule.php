@@ -291,7 +291,8 @@ class EntrypointModule
         return $this;
     }
 
-    public function get(string $opt)
+
+    public function getOpt(string $opt)
     {
         $theType = Lib::type();
 
@@ -300,8 +301,7 @@ class EntrypointModule
         return $value;
     }
 
-
-    public function setValue(string $opt, $value)
+    public function setOpt(string $opt, $value)
     {
         $valueNew = $value;
 
@@ -311,7 +311,7 @@ class EntrypointModule
         return $this;
     }
 
-    public function unsetValue(string $opt)
+    public function unsetOpt(string $opt)
     {
         $valueInitial = $this->configInitial[$opt];
 

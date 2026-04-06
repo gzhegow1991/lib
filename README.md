@@ -24,7 +24,7 @@ php test.php
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
 ($ent = \Gzhegow\Lib\Lib::entrypoint())
     ->setAllRecommended()
-    ->setValue($ent::OPT_CUSTOM_DIR_ROOT, __DIR__ . '/..')
+    ->setOpt($ent::OPT_CUSTOM_DIR_ROOT, __DIR__ . '/..')
     //
     ->useAll()
 ;

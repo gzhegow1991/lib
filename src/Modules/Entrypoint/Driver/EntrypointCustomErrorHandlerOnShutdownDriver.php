@@ -48,7 +48,7 @@ class EntrypointCustomErrorHandlerOnShutdownDriver extends AbstractEntrypointDri
 
         $theEntrypoint = Lib::entrypoint();
 
-        $isEnableThrowablesOnShutdown = $theEntrypoint->get($theEntrypoint::OPT_CUSTOM_ENABLE_THROWABLES_ON_SHUTDOWN);
+        $isEnableThrowablesOnShutdown = $theEntrypoint->getOpt($theEntrypoint::OPT_CUSTOM_ENABLE_THROWABLES_ON_SHUTDOWN);
         if ( ! $isEnableThrowablesOnShutdown ) {
             return null;
         }
