@@ -1007,13 +1007,13 @@ trait TypeTrait
 	}
 
 
-	/**
-	 * @return Ret<string>
-	 */
-	public function ratio_decimal($value)
-	{
-		return Lib::num()->type_ratio_decimal(null, $value);
-	}
+    /**
+     * @return Ret<string>
+     */
+    public function ratio_numeric($value)
+    {
+        return Lib::num()->type_ratio_numeric(null, $value);
+    }
 
 
 	/**

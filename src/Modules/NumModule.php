@@ -2438,7 +2438,7 @@ class NumModule
     /**
      * @return Ret<string>|string
      */
-    public function type_ratio_decimal($fb, $value)
+    public function type_ratio_numeric($fb, $value)
     {
         $ret = $this->type_numeric_float(null, $value);
 

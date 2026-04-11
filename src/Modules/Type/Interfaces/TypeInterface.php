@@ -576,7 +576,7 @@ interface TypeInterface
     /**
      * @return Ret<string>
      */
-    public function ratio_decimal($value);
+    public function ratio_numeric($value);
 
     /**
      * @return Ret<Bcnumber>

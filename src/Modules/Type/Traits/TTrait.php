@@ -1010,9 +1010,9 @@ trait TTrait
 	/**
 	 * @return Ret<string>|string
 	 */
-	public function ratio_decimal($fb, $value)
+	public function ratio_numeric($fb, $value)
 	{
-		return Lib::num()->type_ratio_decimal($fb, $value);
+		return Lib::num()->type_ratio_numeric($fb, $value);
 	}
 
 
