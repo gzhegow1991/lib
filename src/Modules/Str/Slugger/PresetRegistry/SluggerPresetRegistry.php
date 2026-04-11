@@ -173,9 +173,11 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
 
 
     /**
-     * @param array<string, bool> $refKnownSymbolMap
+     * @param array<string, bool>|null $refKnownSymbolMap
      *
      * @return array<string, bool>
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     protected function prepareIgnoreSymbolMap(
         array $ignoreSymbols,
@@ -215,9 +217,11 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
     }
 
     /**
-     * @param array<string, bool> $refKnownSymbolMap
+     * @param array<string, bool>|null $refKnownSymbolMap
      *
      * @return array<string, string>
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     protected function prepareSequenceMap(
         array $sequenceMap, array $ignoreSymbolMap,
@@ -247,8 +251,8 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
             foreach ( $aList as $i => $a ) {
                 $aLetter = $theType->letter($a)->orThrow();
 
-                $aLower = mb_strtolower($aLetter);
-                $aUpper = mb_strtoupper($aLetter);
+                $aLower = $theMb->mb_strtolower($aLetter);
+                $aUpper = $theMb->mb_strtoupper($aLetter);
 
                 if ( false
                     || isset($ignoreSymbolMap[$aLower])
@@ -270,8 +274,8 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
 
             $bCase = [];
             foreach ( $bList as $i => $b ) {
-                $bCase[$i][] = mb_strtolower($b);
-                $bCase[$i][] = mb_strtoupper($b);
+                $bCase[$i][] = $theMb->mb_strtolower($b);
+                $bCase[$i][] = $theMb->mb_strtoupper($b);
             }
 
             $aGen = $theItertools->product_it(...$aCase);
@@ -307,9 +311,11 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
     }
 
     /**
-     * @param array<string, bool> $refKnownSymbolMap
+     * @param array<string, bool>|null $refKnownSymbolMap
      *
      * @return array<string, string>
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     protected function prepareSymbolMap(
         array $symbolMap, array $ignoreSymbolMap,
@@ -323,8 +329,8 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
         $result = [];
 
         foreach ( $symbolMap as $a => $b ) {
-            $aLower = mb_strtolower($a);
-            $aUpper = mb_strtoupper($a);
+            $aLower = $theMb->mb_strtolower($a);
+            $aUpper = $theMb->mb_strtoupper($a);
 
             if (
                 isset($ignoreSymbolMap[$aLower])
@@ -363,16 +369,16 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
             }
 
             foreach ( $list as $bb ) {
-                $bbLower = mb_strtolower($bb);
-                $bbUpper = mb_strtoupper($bb);
+                $bbLower = $theMb->mb_strtolower($bb);
+                $bbUpper = $theMb->mb_strtoupper($bb);
 
                 $bbSize = strlen($bb);
                 $bbLowerSize = strlen($bbLower);
                 $bbUpperSize = strlen($bbUpper);
 
-                $bbLen = mb_strlen($bb);
-                $bbLowerLen = mb_strlen($bbLower);
-                $bbUpperLen = mb_strlen($bbLower);
+                $bbLen = $theMb->mb_strlen($bb);
+                $bbLowerLen = $theMb->mb_strlen($bbLower);
+                $bbUpperLen = $theMb->mb_strlen($bbLower);
 
                 // > example size/length difference when change case: `ß` -> `SS`
                 if ( false

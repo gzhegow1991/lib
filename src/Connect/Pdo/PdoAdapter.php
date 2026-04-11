@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @noinspection PhpComposerExtensionStubsInspection
+ */
+
 namespace Gzhegow\Lib\Connect\Pdo;
 
 use Gzhegow\Lib\Lib;
@@ -137,9 +141,9 @@ class PdoAdapter
 
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function from($from, ?array $fallback = null)
+    public static function from($from, $fb = null)
     {
         $ret = Ret::new();
 
@@ -148,56 +152,60 @@ class PdoAdapter
             ?? static::fromPdo($from)->orNull($ret)
             ?? static::fromArray($from)->orNull($ret);
 
-        if ( $ret->isFail() ) {
-            return Ret::throw($fallback, $ret);
+        if ( ! $ret->isOk() ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromStatic($from, ?array $fallback = null)
+    public static function fromStatic($from, $fb = null)
     {
         if ( $from instanceof static ) {
-            return Ret::ok($fallback, $from);
+            return Ret::ok($fb, $from);
         }
 
         return Ret::throw(
-            $fallback,
+            $fb,
             [ 'The `from` should be an instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromPdo($from, ?array $fallback = null)
+    public static function fromPdo($from, $fb = null)
     {
         if ( $from instanceof \PDO ) {
             $instance = new static();
             $instance->configPdo = $from;
 
-            return Ret::ok($fallback, $instance);
+            return Ret::ok($fb, $instance);
         }
 
         return Ret::throw(
-            $fallback,
+            $fb,
             [ 'The `from` should be an instance of: ' . \PDO::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromArray($from, ?array $fallback = null)
+    public static function fromArray($from, $fb = null)
     {
         if ( ! is_array($from) ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `from` should be array', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -251,7 +259,7 @@ class PdoAdapter
                 && (null !== $password)
             ) ) {
                 return Ret::throw(
-                    $fallback,
+                    $fb,
                     [ 'The `from[1]` (`username`) and `from[2]` (`password`) is required if `from[0]` (`dsn`) is present', $from ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -299,7 +307,7 @@ class PdoAdapter
         if ( $isPdo ) {
             if ( ! ($pdo instanceof \PDO) ) {
                 return Ret::throw(
-                    $fallback,
+                    $fb,
                     [ 'The `pdo` should be instance of: ' . \PDO::class, $pdo ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -312,8 +320,14 @@ class PdoAdapter
             $sock = null;
 
         } elseif ( $isDsn ) {
-            if ( ! $theType->dsn_pdo($dsn, [ &$dsnParams, &$parseUrl ])->isOk([ &$dsn, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->dsn_pdo($dsn, [ &$dsnParams, &$parseUrl ]);
+
+            if ( ! $ret->isOk([ &$dsn ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             $driver = $from['driver'] ?? $parseUrl['scheme'] ?? null;
@@ -335,7 +349,7 @@ class PdoAdapter
 
         } else {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [
                     ''
                     . 'The `from` should contain at least one of: '
@@ -348,60 +362,126 @@ class PdoAdapter
         }
 
         if ( $isPdo ) {
-            if ( ! $theType->string_not_empty($driver)->isOk([ &$driver, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->string_not_empty($driver);
+
+            if ( ! $ret->isOk([ &$driver ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
         } else {
             if ( $isDsn || $isHost ) {
-                if ( ! $theType->string_not_empty($driver)->isOk([ &$driver, &$ret ]) ) {
-                    return Ret::throw($fallback, $ret);
+                $ret = $theType->string_not_empty($driver);
+
+                if ( ! $ret->isOk([ &$driver ]) ) {
+                    return Ret::throw(
+                        $fb,
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
 
-                if ( ! $theType->string_not_empty($host)->isOk([ &$host, &$ret ]) ) {
-                    return Ret::throw($fallback, $ret);
+                $ret = $theType->string_not_empty($host);
+
+                if ( ! $ret->isOk([ &$host ]) ) {
+                    return Ret::throw(
+                        $fb,
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
 
-                if ( ! $theType->int_positive($port)->isOk([ &$port, &$ret ]) ) {
-                    return Ret::throw($fallback, $ret);
+                $ret = $theType->int_positive($port);
+
+                if ( ! $ret->isOk([ &$port ]) ) {
+                    return Ret::throw(
+                        $fb,
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
 
             } elseif ( $isSock ) {
-                if ( ! $theType->string_not_empty($sock)->isOk([ &$sock, &$ret ]) ) {
-                    return Ret::throw($fallback, $ret);
+                $ret = $theType->string_not_empty($sock);
+
+                if ( ! $ret->isOk([ &$sock ]) ) {
+                    return Ret::throw(
+                        $fb,
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
             }
 
-            if ( ! $theType->string_not_empty($username)->isOk([ &$username, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->string_not_empty($username);
+
+            if ( ! $ret->isOk([ &$username ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
-            if ( ! $theType->string($password)->isOk([ &$password, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->string($password);
+
+            if ( ! $ret->isOk([ &$password ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
         if ( null !== $database ) {
-            if ( ! $theType->string_not_empty($database)->isOk([ &$database, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->string_not_empty($database);
+
+            if ( ! $ret->isOk([ &$database ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
         if ( null !== $charset ) {
-            if ( ! $theType->string_not_empty($charset)->isOk([ &$charset, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->string_not_empty($charset);
+
+            if ( ! $ret->isOk([ &$charset ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
         if ( null !== $collate ) {
-            if ( ! $theType->string_not_empty($collate)->isOk([ &$collate, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->string_not_empty($collate);
+
+            if ( ! $ret->isOk([ &$collate ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
         if ( null !== $timezone ) {
-            if ( ! $theType->string_not_empty($timezone)->isOk([ &$timezone, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->string_not_empty($timezone);
+
+            if ( ! $ret->isOk([ &$timezone ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
@@ -443,7 +523,7 @@ class PdoAdapter
                 foreach ( $readList as $i => $rConfig ) {
                     if ( ! is_array($rConfig) ) {
                         return Ret::throw(
-                            $fallback,
+                            $fb,
                             [ 'Each of `from[read]` should be array', $from, $rConfig, $i ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -451,7 +531,7 @@ class PdoAdapter
 
                     if ( $diff = array_diff_key($rConfig, $configDefault) ) {
                         return Ret::throw(
-                            $fallback,
+                            $fb,
                             [
                                 ''
                                 . 'The `from[read]` item contains unexpected keys: '
@@ -473,7 +553,7 @@ class PdoAdapter
                 foreach ( $writeList as $i => $wConfig ) {
                     if ( ! is_array($wConfig) ) {
                         return Ret::throw(
-                            $fallback,
+                            $fb,
                             [ 'Each of `from[write]` should be array', $from, $wConfig, $i ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -481,7 +561,7 @@ class PdoAdapter
 
                     if ( $diff = array_diff_key($wConfig, $configDefault) ) {
                         return Ret::throw(
-                            $fallback,
+                            $fb,
                             [
                                 ''
                                 . 'The `from[write]` item contains unexpected keys: '
@@ -500,7 +580,7 @@ class PdoAdapter
             }
         }
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
 
@@ -934,10 +1014,9 @@ class PdoAdapter
 
     protected function sqlEnsureCharset(\PDO $pdo, array $configValid) : string
     {
-        $sql = '';
-
-        $sql .= $this->sqlEnsureCharsetDriver($pdo, $configValid);
-        $sql .= $this->sqlEnsureCharsetUser($pdo, $configValid);
+        $sql = ''
+            . $this->sqlEnsureCharsetDriver($pdo, $configValid)
+            . $this->sqlEnsureCharsetUser($pdo, $configValid);
 
         return $sql;
     }

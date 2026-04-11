@@ -8,9 +8,18 @@ use Gzhegow\Lib\Modules\Bcmath\Number;
 use Gzhegow\Lib\Modules\Bcmath\Bcnumber;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
-use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
+/**
+ * @method bcadd(...$args)
+ * @method bccomp(...$args)
+ * @method bcdiv(...$args)
+ * @method bcmod(...$args)
+ * @method bcmul(...$args)
+ * @method bcpow(...$args)
+ * @method bcscale(...$args)
+ * @method bcsub(...$args)
+ */
 class BcmathModule
 {
     /**
@@ -52,30 +61,42 @@ class BcmathModule
 
     public function __initialize()
     {
-        if ( ! extension_loaded('bcmath') ) {
-            throw new ExtensionException(
-                [ 'Missing PHP extension: bcmath' ]
-            );
-        }
+        $theType = Lib::type();
+
+        $theType->is_extension_loaded('bcmath')->orThrow();
 
         return $this;
     }
 
 
+    public function __call($name, $arguments)
+    {
+        if ( 'bc' === substr($name, 0, 2) ) {
+            if ( function_exists($name) ) {
+                return call_user_func_array($name, $arguments);
+            }
+        }
+
+        throw new RuntimeException([ 'Method not found: ' . $name ]);
+    }
+
+
     /**
-     * @return Ret<Bcnumber>
+     * @return Ret<Bcnumber>|Bcnumber
      */
-    public function type_bcnumber($value)
+    public function type_bcnumber($fb, $value)
     {
         if ( $value instanceof Bcnumber ) {
-            return Ret::ok(null, $value);
+            return Ret::ok($fb, $value);
         }
 
         $theType = Lib::type();
 
-        if ( ! $theType->numeric($value, false, [ &$split ])->isOk([ 1 => &$ret ]) ) {
+        $ret = $theType->numeric($value, false, [ &$split ]);
+
+        if ( ! $ret->isOk() ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -88,23 +109,23 @@ class BcmathModule
             $scale = strlen($frac) - 1;
         }
 
-        Bcnumber::fromValidArray([
+        $ret = Bcnumber::fromValidArray([
             'original' => $value,
             'sign'     => $split[0],
             'int'      => $split[1],
             'frac'     => $split[2],
             'scale'    => $scale,
-        ])->isOk([ &$bcnumber, &$ret ]);
+        ]);
 
-        if ( $ret->isFail() ) {
+        if ( ! $ret->isOk([ &$bcnumber ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $bcnumber);
+        return Ret::ok($fb, $bcnumber);
     }
 
 
@@ -206,7 +227,7 @@ class BcmathModule
     }
 
 
-    public function bccomp($num1, $num2, ?int $scale = null) : int
+    public function bc_comp($num1, $num2, ?int $scale = null) : int
     {
         $theType = Lib::type();
 
@@ -228,7 +249,7 @@ class BcmathModule
     }
 
 
-    public function bcabs($number) : Bcnumber
+    public function bc_abs($number) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -241,7 +262,7 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcceil($number) : Bcnumber
+    public function bc_ceil($number) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -270,7 +291,7 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcfloor($number) : Bcnumber
+    public function bc_floor($number) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -313,7 +334,7 @@ class BcmathModule
      * > -1.05 -> -1
      * > -1.5 -> -2
      */
-    public function bcmathround(
+    public function bc_mathround(
         $number, ?int $scale = null,
         ?int $flags = null, ?int $flagsNegative = null
     ) : Bcnumber
@@ -419,7 +440,7 @@ class BcmathModule
             ? ((string) pow(10, $scaleMax))
             : '1';
 
-        $refBcScaledAbs = $this->bcmul($bcnumber->getValueAbsolute(), $factor);
+        $refBcScaledAbs = $this->bc_mul($bcnumber->getValueAbsolute(), $factor);
 
         $scaledAbsInt = intval($refBcScaledAbs->getValueAbsoluteInt());
         $scaledAbsFrac = $refBcScaledAbs->getFrac();
@@ -483,10 +504,10 @@ class BcmathModule
                 $b = (0 === ($a % 2)) ? $a : ($a - 1);
                 $c = $b + 2;
 
-                $diff1 = $this->bcabs($this->bcsub($refBcScaledAbs, $b));
-                $diff2 = $this->bcabs($this->bcsub($c, $refBcScaledAbs));
+                $diff1 = $this->bc_abs($this->bc_sub($refBcScaledAbs, $b));
+                $diff2 = $this->bc_abs($this->bc_sub($c, $refBcScaledAbs));
 
-                $isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0);
+                $isLessThanOrEqual = ($this->bc_comp($diff1, $diff2) <= 0);
                 $scaledAbs = $isLessThanOrEqual ? $b : $c;
 
             } elseif ( $isRoundOdd ) {
@@ -494,10 +515,10 @@ class BcmathModule
                 $b = ($a % 2) ? $a : ($a - 1);
                 $c = $b + 2;
 
-                $diff1 = $this->bcabs($this->bcsub($refBcScaledAbs, $b));
-                $diff2 = $this->bcabs($this->bcsub($c, $refBcScaledAbs));
+                $diff1 = $this->bc_abs($this->bc_sub($refBcScaledAbs, $b));
+                $diff2 = $this->bc_abs($this->bc_sub($c, $refBcScaledAbs));
 
-                $isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0);
+                $isLessThanOrEqual = ($this->bc_comp($diff1, $diff2) <= 0);
                 $scaledAbs = $isLessThanOrEqual ? $b : $c;
 
             } else {
@@ -509,7 +530,7 @@ class BcmathModule
 
         $result = $isNegative ? "-{$scaledAbs}" : $scaledAbs;
 
-        $bcresult = $this->bcdiv($result, $factor, $scaleMax);
+        $bcresult = $this->bc_div($result, $factor, $scaleMax);
 
         return $bcresult;
     }
@@ -520,9 +541,9 @@ class BcmathModule
      * > -1.05 -> -2
      * > -2.5 -> -2
      */
-    public function bcmathround_even($number, ?int $scale = null) : Bcnumber
+    public function bc_mathround_even($number, ?int $scale = null) : Bcnumber
     {
-        return $this->bcmathround(
+        return $this->bc_mathround(
             $number, $scale,
             _NUM_ROUND_EVEN, _NUM_ROUND_EVEN
         );
@@ -534,9 +555,9 @@ class BcmathModule
      * > -1.05 -> -1
      * > -2.5 -> -3
      */
-    public function bcmathround_odd($number, ?int $scale = null) : Bcnumber
+    public function bc_mathround_odd($number, ?int $scale = null) : Bcnumber
     {
-        return $this->bcmathround(
+        return $this->bc_mathround(
             $number, $scale,
             _NUM_ROUND_ODD, _NUM_ROUND_ODD
         );
@@ -555,7 +576,7 @@ class BcmathModule
      * > -1.05 -> -2
      * > -1.5 -> -2
      */
-    public function bcmoneyround(
+    public function bc_moneyround(
         $number, ?int $scale = null,
         ?int $flags = null, ?int $flagsNegative = null
     ) : Bcnumber
@@ -661,7 +682,7 @@ class BcmathModule
             ? ((string) pow(10, $scaleMax))
             : '1';
 
-        $refBcScaledAbs = $this->bcmul($bcnumber->getValueAbsolute(), $factor);
+        $refBcScaledAbs = $this->bc_mul($bcnumber->getValueAbsolute(), $factor);
 
         $scaledAbsInt = intval($refBcScaledAbs->getValueAbsoluteInt());
         $scaledAbsFrac = $refBcScaledAbs->getFrac();
@@ -697,10 +718,10 @@ class BcmathModule
                 $b = (0 === ($a % 2)) ? $a : ($a - 1);
                 $c = $b + 2;
 
-                $diff1 = $this->bcabs($this->bcsub($refBcScaledAbs, $b));
-                $diff2 = $this->bcabs($this->bcsub($c, $refBcScaledAbs));
+                $diff1 = $this->bc_abs($this->bc_sub($refBcScaledAbs, $b));
+                $diff2 = $this->bc_abs($this->bc_sub($c, $refBcScaledAbs));
 
-                $isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0);
+                $isLessThanOrEqual = ($this->bc_comp($diff1, $diff2) <= 0);
                 $scaledAbs = $isLessThanOrEqual ? $b : $c;
 
             } elseif ( $isRoundOdd ) {
@@ -708,10 +729,10 @@ class BcmathModule
                 $b = ($a % 2) ? $a : ($a - 1);
                 $c = $b + 2;
 
-                $diff1 = $this->bcabs($this->bcsub($refBcScaledAbs, $b));
-                $diff2 = $this->bcabs($this->bcsub($c, $refBcScaledAbs));
+                $diff1 = $this->bc_abs($this->bc_sub($refBcScaledAbs, $b));
+                $diff2 = $this->bc_abs($this->bc_sub($c, $refBcScaledAbs));
 
-                $isLessThanOrEqual = ($this->bccomp($diff1, $diff2) <= 0);
+                $isLessThanOrEqual = ($this->bc_comp($diff1, $diff2) <= 0);
                 $scaledAbs = $isLessThanOrEqual ? $b : $c;
 
             } else {
@@ -723,7 +744,7 @@ class BcmathModule
 
         $result = $isNegative ? "-{$scaledAbs}" : $scaledAbs;
 
-        $bcresult = $this->bcdiv($result, $factor, $scaleMax);
+        $bcresult = $this->bc_div($result, $factor, $scaleMax);
 
         return $bcresult;
     }
@@ -734,9 +755,9 @@ class BcmathModule
      * > -1.05 -> -1
      * > -1.5 -> -1
      */
-    public function bcmoneytrunc($number, ?int $scale = null) : Bcnumber
+    public function bc_moneytrunc($number, ?int $scale = null) : Bcnumber
     {
-        return $this->bcmoneyround(
+        return $this->bc_moneyround(
             $number, $scale,
             _NUM_ROUND_TOWARD_ZERO, _NUM_ROUND_TOWARD_ZERO
         );
@@ -748,9 +769,9 @@ class BcmathModule
      * > -1.05 -> -1
      * > -1.5 -> -1
      */
-    public function bcmoneyceil($number, ?int $scale = null) : Bcnumber
+    public function bc_moneyceil($number, ?int $scale = null) : Bcnumber
     {
-        return $this->bcmoneyround(
+        return $this->bc_moneyround(
             $number, $scale,
             _NUM_ROUND_TO_POSITIVE_INF, _NUM_ROUND_TO_POSITIVE_INF
         );
@@ -762,16 +783,16 @@ class BcmathModule
      * > -1.05 -> -2
      * > -1.5 -> -2
      */
-    public function bcmoneyfloor($number, ?int $scale = null) : Bcnumber
+    public function bc_moneyfloor($number, ?int $scale = null) : Bcnumber
     {
-        return $this->bcmoneyround(
+        return $this->bc_moneyround(
             $number, $scale,
             _NUM_ROUND_TO_NEGATIVE_INF, _NUM_ROUND_TO_NEGATIVE_INF
         );
     }
 
 
-    public function bcadd($num1, $num2, ?int $scale = null) : Bcnumber
+    public function bc_add($num1, $num2, ?int $scale = null) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -794,7 +815,7 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcsub($num1, $num2, ?int $scale = null) : Bcnumber
+    public function bc_sub($num1, $num2, ?int $scale = null) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -817,7 +838,7 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcmul($num1, $num2, ?int $scale = null) : Bcnumber
+    public function bc_mul($num1, $num2, ?int $scale = null) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -851,7 +872,7 @@ class BcmathModule
     /**
      * > поскольку при делении число дробных знаков может увелится, параметр $scale сделан обязательным
      */
-    public function bcdiv($num1, $num2, int $scale) : Bcnumber
+    public function bc_div($num1, $num2, int $scale) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -875,7 +896,7 @@ class BcmathModule
     }
 
 
-    public function bcmod($num1, $num2) : Bcnumber
+    public function bc_mod($num1, $num2) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -893,7 +914,7 @@ class BcmathModule
         return $bcresult;
     }
 
-    public function bcfmod($num1, $num2, int $scale) : Bcnumber
+    public function bc_fmod($num1, $num2, int $scale) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -925,7 +946,7 @@ class BcmathModule
     }
 
 
-    public function bcpow($num, int $exponent, ?int $scale = null) : Bcnumber
+    public function bc_pow($num, int $exponent, ?int $scale = null) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -954,7 +975,7 @@ class BcmathModule
     }
 
 
-    public function bcsqrt($num, int $scale) : Bcnumber
+    public function bc_sqrt($num, int $scale) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -976,7 +997,7 @@ class BcmathModule
     /**
      * > Greatest Common Divisor
      */
-    public function bcgcd($num1, $num2) : Bcnumber
+    public function bc_gcd($num1, $num2) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -1002,7 +1023,7 @@ class BcmathModule
     /**
      * > Lowest Common Multiplier
      */
-    public function bclcm($num1, $num2) : Bcnumber
+    public function bc_lcm($num1, $num2) : Bcnumber
     {
         $theType = Lib::type();
 
@@ -1014,7 +1035,7 @@ class BcmathModule
 
         $result = bcmul($abs1, $abs2, 0);
 
-        $bcGcd = $this->bcgcd($abs1, $abs2);
+        $bcGcd = $this->bc_gcd($abs1, $abs2);
 
         $absGcd = $bcGcd->getValueAbsolute();
 

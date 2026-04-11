@@ -8,21 +8,21 @@ use Gzhegow\Lib\Modules\Type\Ret;
 interface PromiseManagerInterface
 {
     /**
-     * @return Promise|Ret<Promise>
+     * @return Ret<Promise>|Promise
      */
-    public function from($from, ?array $fallback = null);
+    public function from($from, $fb = null);
 
     /**
-     * @return Promise|Ret<Promise>
+     * @return Ret<Promise>|Promise
      */
-    public function fromValue($from, ?array $fallback = null);
+    public function fromValue($from, $fb = null);
 
     /**
      * @param callable $from
      *
-     * @return Promise|Ret<Promise>
+     * @return Ret<Promise>|Promise
      */
-    public function fromCallable($from, ?array $fallback = null);
+    public function fromCallable($from, $fb = null);
 
 
     /**
@@ -84,6 +84,8 @@ interface PromiseManagerInterface
 
     /**
      * @param array<int, mixed> $curlOptions
-     */
+     *
+     * @noinspection PhpDocSignatureInspection
+     * */
     public function fetchCurl(string $url, array $curlOptions = []) : Promise;
 }

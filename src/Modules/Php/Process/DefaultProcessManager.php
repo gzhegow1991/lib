@@ -101,7 +101,7 @@ class DefaultProcessManager implements ProcessManagerInterface
         if ( $this->useSymfonyProcess ) {
             $proc->spawnUsingSymfonyProcess();
 
-        } elseif ( $thePhp->is_windows() ) {
+        } elseif ( $thePhp->is_os_windows() ) {
             $proc->spawnUsingProcOpenWindows();
 
         } else {
@@ -123,7 +123,7 @@ class DefaultProcessManager implements ProcessManagerInterface
         if ( $this->useSymfonyProcess ) {
             $proc->spawnUsingSymfonyProcess();
 
-        } elseif ( $thePhp->is_windows() ) {
+        } elseif ( $thePhp->is_os_windows() ) {
             $proc->spawnUsingProcOpenWindows();
 
         } else {
@@ -145,7 +145,7 @@ class DefaultProcessManager implements ProcessManagerInterface
         if ( $this->useSymfonyProcess ) {
             $proc->spawnUsingSymfonyProcess();
 
-        } elseif ( $thePhp->is_windows() ) {
+        } elseif ( $thePhp->is_os_windows() ) {
             $proc->spawnUsingProcOpenWindows();
 
         } else {

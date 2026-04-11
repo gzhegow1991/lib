@@ -116,19 +116,17 @@ class FormatJson
 
 
     /**
-     * @param array{ 0?: mixed }|null $fallback # Pass `null` to return Ret<T> or pass `[]` to throw exception
-     *
-     * @return mixed|Ret<mixed>
+     * @return Ret<mixed>|mixed
      */
     public function json_decode(
-        ?array $fallback,
+        $fb,
         $json, ?bool $isAssociative = null,
         ?int $depth = null, ?int $flags = null
     )
     {
         if ( null === $json ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `json` should be not null', $json ],
                 [ __FILE__, __LINE__ ]
             );
@@ -150,7 +148,7 @@ class FormatJson
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
@@ -158,29 +156,27 @@ class FormatJson
 
         if ( null === $result ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'Unable to `json_decode` due to invalid JSON', $json ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fallback, $result);
+        return Ret::ok($fb, $result);
     }
 
     /**
-     * @param array{ 0?: mixed }|null $fallback # Pass `null` to return Ret<T> or pass `[]` to throw exception
-     *
-     * @return mixed|Ret<mixed>
+     * @return Ret<mixed>|mixed
      */
     public function jsonc_decode(
-        ?array $fallback,
+        $fb,
         $jsonc, ?bool $isAssociative = null,
         ?int $depth = null, ?int $flags = null
     )
     {
         if ( null === $jsonc ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `jsonc` should be not null', $jsonc ],
                 [ __FILE__, __LINE__ ]
             );
@@ -192,8 +188,14 @@ class FormatJson
         $theFunc = Lib::func();
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($jsonc)->isOk([ &$jsoncStringNotEmpty, &$ret ]) ) {
-            return Ret::throw($fallback, $ret);
+        $ret = $theType->string_not_empty($jsonc);
+
+        if ( ! $ret->isOk([ &$jsoncStringNotEmpty ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $regexes = [];
@@ -217,7 +219,7 @@ class FormatJson
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
@@ -225,21 +227,21 @@ class FormatJson
 
         if ( null === $result ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'Unable to `jsonc_decode` due to invalid JSON', $jsonc ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fallback, $result);
+        return Ret::ok($fb, $result);
     }
 
 
     /**
-     * @return string|Ret<string>
+     * @return Ret<string>|string
      */
     public function json_encode(
-        ?array $fallback,
+        $fb,
         $value, ?bool $isAllowNull = null,
         ?int $flags = null, ?int $depth = null
     )
@@ -252,13 +254,13 @@ class FormatJson
         if ( null === $value ) {
             if ( ! $isAllowNull ) {
                 return Ret::throw(
-                    $fallback,
+                    $fb,
                     [ 'The value `NULL` cannot be encoded to JSON when `allowsNull` is set to FALSE', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Ret::ok($fallback, 'NULL');
+            return Ret::ok($fb, 'NULL');
         }
 
         if ( false
@@ -266,7 +268,7 @@ class FormatJson
             || ($theType->resource($value)->isOk())
         ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The value `NAN` or values of type `resource` cannot be encoded to JSON', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -283,20 +285,20 @@ class FormatJson
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fallback, $result);
+        return Ret::ok($fb, $result);
     }
 
     /**
-     * @return string|Ret<string>
+     * @return Ret<string>|string
      */
     public function json_print(
-        ?array $fallback,
+        $fb,
         $value, ?bool $isAllowNull = null,
         ?int $flags = null, ?int $depth = null
     )
@@ -309,13 +311,13 @@ class FormatJson
         if ( null === $value ) {
             if ( ! $isAllowNull ) {
                 return Ret::throw(
-                    $fallback,
+                    $fb,
                     [ 'Unable to `json_encode`', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            return Ret::ok($fallback, 'NULL');
+            return Ret::ok($fb, 'NULL');
         }
 
         if ( false
@@ -323,7 +325,7 @@ class FormatJson
             || ($theType->resource($value)->isOk())
         ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The value `NAN` or values of type `resource` cannot be encoded to JSON', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -346,12 +348,12 @@ class FormatJson
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fallback, $result);
+        return Ret::ok($fb, $result);
     }
 }

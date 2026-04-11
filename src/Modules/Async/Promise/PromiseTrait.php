@@ -12,14 +12,18 @@ use Gzhegow\Lib\Modules\Type\Ret;
 trait PromiseTrait
 {
     /**
-     * @return Promise|Ret<Promise>
+     * @return Ret<Promise>|Promise
      */
-    public static function from($from, ?array $fallback = null)
+    public static function from($from, $fb = null)
     {
         $ret = static::getInstance()->from($from);
 
-        if ( $ret->isFail() ) {
-            return Ret::throw($fallback, $ret);
+        if ( ! $ret->isOk() ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $p = $ret->getValue();
@@ -30,18 +34,22 @@ trait PromiseTrait
             $p->debugInfo = $theDebug->file_line();
         }
 
-        return Ret::ok($fallback, $ret);
+        return Ret::ok($fb, $ret);
     }
 
     /**
-     * @return Promise|Ret<Promise>
+     * @return Ret<Promise>|Promise
      */
-    public static function fromValue($from, ?array $fallback = null)
+    public static function fromValue($from, $fb = null)
     {
         $ret = static::getInstance()->fromValue($from);
 
-        if ( $ret->isFail() ) {
-            return Ret::throw($fallback, $ret);
+        if ( ! $ret->isOk() ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $p = $ret->getValue();
@@ -52,20 +60,24 @@ trait PromiseTrait
             $p->debugInfo = $theDebug->file_line();
         }
 
-        return Ret::ok($fallback, $ret);
+        return Ret::ok($fb, $ret);
     }
 
     /**
      * @param callable $from
      *
-     * @return Promise|Ret<Promise>
+     * @return Ret<Promise>|Promise
      */
-    public static function fromCallable($from, ?array $fallback = null)
+    public static function fromCallable($from, $fb = null)
     {
         $ret = static::getInstance()->fromCallable($from);
 
-        if ( $ret->isFail() ) {
-            return Ret::throw($fallback, $ret);
+        if ( ! $ret->isOk() ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $p = $ret->getValue();
@@ -76,7 +88,7 @@ trait PromiseTrait
             $p->debugInfo = $theDebug->file_line();
         }
 
-        return Ret::ok($fallback, $ret);
+        return Ret::ok($fb, $ret);
     }
 
 

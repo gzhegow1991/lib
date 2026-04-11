@@ -40,9 +40,9 @@ class HttpHeader implements ToStringInterface
 
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function from($from, ?array $fallback = null)
+    public static function from($from, $fb = null)
     {
         $ret = Ret::new();
 
@@ -51,40 +51,44 @@ class HttpHeader implements ToStringInterface
             ?? static::fromArray($from)->orNull($ret)
             ?? static::fromString($from)->orNull($ret);
 
-        if ( $ret->isFail() ) {
-            return Ret::throw($fallback, $ret);
+        if ( ! $ret->isOk() ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromStatic($from, ?array $fallback = null)
+    public static function fromStatic($from, $fb = null)
     {
         if ( $from instanceof static ) {
-            return Ret::ok($fallback, $from);
+            return Ret::ok($fb, $from);
         }
 
         return Ret::throw(
-            $fallback,
+            $fb,
             [ 'The `from` should be instance of ' . static::class, $from ],
             [ __FILE__, __LINE__ ],
         );
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromArray($from, ?array $fallback = null)
+    public static function fromArray($from, $fb = null)
     {
         $theStr = Lib::str();
         $theType = Lib::type();
 
         if ( ! is_array($from) ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `from` should be array', $from ],
                 [ __FILE__, __LINE__ ],
             );
@@ -94,9 +98,11 @@ class HttpHeader implements ToStringInterface
         $value = $from['value'] ?? $from[1] ?? null;
         $params = $from['params'] ?? $from[2] ?? [];
 
-        if ( ! $theType->string_not_empty($name)->isOk([ &$nameStringNotEmpty ]) ) {
+        $ret = $theType->string_not_empty($name);
+
+        if ( ! $ret->isOk([ &$nameStringNotEmpty ]) ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `from[name]` or `from[0]` should be a non-empty string', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -104,9 +110,11 @@ class HttpHeader implements ToStringInterface
 
         $nameUpper = $theStr->upper($nameStringNotEmpty);
 
-        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty ]) ) {
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `from[value]` or `from[1]` should be a non-empty string', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -114,7 +122,7 @@ class HttpHeader implements ToStringInterface
 
         if ( ! is_array($params) ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `from[params]` or `from[2]` should be array', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -122,9 +130,11 @@ class HttpHeader implements ToStringInterface
 
         $paramsLower = [];
         foreach ( $params as $param => $value ) {
-            if ( ! $theType->trim($param)->isOk([ &$paramStringNotEmpty ]) ) {
+            $ret = $theType->trim($param);
+
+            if ( ! $ret->isOk([ &$paramStringNotEmpty ]) ) {
                 return Ret::throw(
-                    $fallback,
+                    $fb,
                     [ "Each of `params` keys should be a non-empty string", $params ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -150,19 +160,25 @@ class HttpHeader implements ToStringInterface
 
         $instance->raw = $raw;
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromString($from, ?array $fallback = null)
+    public static function fromString($from, $fb = null)
     {
         $theStr = Lib::str();
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($from)->isOk([ &$fromStringNotEmpty, &$ret ]) ) {
-            return Ret::throw($fallback, $ret);
+        $ret = $theType->string_not_empty($from);
+
+        if ( ! $ret->isOk([ &$fromStringNotEmpty ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $raw = $fromStringNotEmpty;
@@ -174,7 +190,7 @@ class HttpHeader implements ToStringInterface
 
         if ( false === $partsFirst ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `parts[0]` is required', $parts ],
                 [ __FILE__, __LINE__ ]
             );
@@ -185,17 +201,21 @@ class HttpHeader implements ToStringInterface
 
         [ $name, $value ] = $partsNameValue;
 
-        if ( ! $theType->string_not_empty($name)->isOk([ &$nameStringNotEmpty ]) ) {
+        $ret = $theType->string_not_empty($name);
+
+        if ( ! $ret->isOk([ &$nameStringNotEmpty ]) ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `partsFirst[0]` should be a non-empty string', $partsFirst ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty ]) ) {
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `partsFirst[1]` should be a non-empty string', $partsFirst ],
                 [ __FILE__, __LINE__ ]
             );
@@ -205,9 +225,11 @@ class HttpHeader implements ToStringInterface
         foreach ( $parts as $i => $part ) {
             [ $param, $value ] = explode('=', $part) + [ '', true ];
 
-            if ( ! $theType->trim($param)->isOk([ &$paramTrim ]) ) {
+            $ret = $theType->trim($param);
+
+            if ( ! $ret->isOk([ &$paramTrim ]) ) {
                 return Ret::throw(
-                    $fallback,
+                    $fb,
                     [ "The `parts[{$i}][0]` should be a non-empty string", $parts ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -226,7 +248,7 @@ class HttpHeader implements ToStringInterface
         $instance->value = $valueStringNotEmpty;
         $instance->headerParams = $paramsLower;
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
 

@@ -80,9 +80,9 @@ class SocialModule
     /**
      * @param array{ 0?: string, 1?: string } $refs
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_email(
+    public function type_email($fb,
         $value,
         ?array $filters = null,
         array $refs = []
@@ -100,9 +100,9 @@ class SocialModule
         }
         $refEmailName = null;
 
-        $theEmailParser = $this->emailParser();
-
         try {
+            $theEmailParser = $this->emailParser();
+
             $email = $theEmailParser->parseEmail(
                 $value, $filters,
                 $emailDomain, $emailName
@@ -120,21 +120,21 @@ class SocialModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid email, that passes filter checks', $value, $filters ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $email);
+        return Ret::ok($fb, $email);
     }
 
     /**
      * @param array{ 0?: string, 1?: string } $refs
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_email_fake(
+    public function type_email_fake($fb,
         $value,
         array $refs = []
     )
@@ -151,9 +151,9 @@ class SocialModule
         }
         $refEmailName = null;
 
-        $theEmailParser = $this->emailParser();
-
         try {
+            $theEmailParser = $this->emailParser();
+
             $email = $theEmailParser->parseEmailFake(
                 $value,
                 $emailDomain, $emailName
@@ -171,21 +171,21 @@ class SocialModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid email (fake), that passes filter checks', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $email);
+        return Ret::ok($fb, $email);
     }
 
     /**
      * @param array{ 0?: string, 1?: string } $refs
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_email_non_fake(
+    public function type_email_non_fake($fb,
         $value,
         ?array $filters = null,
         array $refs = []
@@ -203,9 +203,9 @@ class SocialModule
         }
         $refEmailDomain = null;
 
-        $theEmailParser = $this->emailParser();
-
         try {
+            $theEmailParser = $this->emailParser();
+
             $email = $theEmailParser->parseEmailNonFake(
                 $value, $filters,
                 $emailDomain, $emailName
@@ -223,22 +223,74 @@ class SocialModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid email, that passes filter checks', $value, $filters ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $email);
+        return Ret::ok($fb, $email);
+    }
+
+    /**
+     * @param array{ 0?: string, 1?: string } $refs
+     *
+     * @return Ret<string>|string
+     */
+    public function type_email_maybe_fake($fb,
+        $value,
+        ?array $filters = null,
+        array $refs = []
+    )
+    {
+        $withEmailDomain = array_key_exists(0, $refs);
+        if ( $withEmailDomain ) {
+            $refEmailDomain =& $refs[0];
+        }
+        $refEmailDomain = null;
+
+        $withEmailName = array_key_exists(1, $refs);
+        if ( $withEmailName ) {
+            $refEmailName =& $refs[1];
+        }
+        $refEmailName = null;
+
+        try {
+            $theEmailParser = $this->emailParser();
+
+            $email = $theEmailParser->parseEmailMaybeFake(
+                $value, $filters,
+                $emailDomain, $emailName
+            );
+
+            if ( $withEmailDomain ) {
+                $refEmailDomain = $emailDomain;
+            }
+            if ( $withEmailName ) {
+                $refEmailName = $emailName;
+            }
+        }
+        catch ( ComposerException $e ) {
+            throw $e;
+        }
+        catch ( \Throwable $e ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be valid email, that passes filter checks', $value, $filters ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $email);
     }
 
 
     /**
      * @param array{ 0?: string, 1?: string, 2?: string } $refs
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_phone(
+    public function type_phone($fb,
         $value,
         array $refs = []
     )
@@ -274,21 +326,21 @@ class SocialModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid phone', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $phone);
+        return Ret::ok($fb, $phone);
     }
 
     /**
      * @param array{ 0?: string, 1?: string, 2?: string } $refs
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_phone_fake(
+    public function type_phone_fake($fb,
         $value,
         array $refs = []
     )
@@ -321,21 +373,21 @@ class SocialModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid phone (fake)', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $phone);
+        return Ret::ok($fb, $phone);
     }
 
     /**
      * @param array{ 0?: string, 1?: string, 2?: string } $refs
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_phone_non_fake(
+    public function type_phone_non_fake($fb,
         $value,
         array $refs = []
     )
@@ -361,7 +413,7 @@ class SocialModule
         try {
             $phoneManager = $this->phoneManager();
 
-            $phone = $phoneManager->parsePhoneNonFake(
+            $phone = $phoneManager->parsePhone(
                 $value,
                 $refTel, $refTelDigits, $refTelPlus
             );
@@ -371,21 +423,73 @@ class SocialModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid phone (non-fake)', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $phone);
+        return Ret::ok($fb, $phone);
     }
 
     /**
+     * @param array{ 0?: string, 1?: string, 2?: string } $refs
+     *
+     * @return Ret<string>|string
+     */
+    public function type_phone_maybe_fake($fb,
+        $value,
+        array $refs = []
+    )
+    {
+        $withTel = array_key_exists(0, $refs);
+        if ( $withTel ) {
+            $refTel =& $refs[0];
+        }
+        $refTel = null;
+
+        $withTelDigits = array_key_exists(1, $refs);
+        if ( $withTelDigits ) {
+            $refTelDigits =& $refs[1];
+        }
+        $refTelDigits = null;
+
+        $withTelPlus = array_key_exists(2, $refs);
+        if ( $withTelPlus ) {
+            $refTelPlus =& $refs[2];
+        }
+        $refTelPlus = null;
+
+        try {
+            $phoneManager = $this->phoneManager();
+
+            $phone = $phoneManager->parsePhoneMaybeFake(
+                $value,
+                $refTel, $refTelDigits, $refTelPlus
+            );
+        }
+        catch ( ComposerException $e ) {
+            throw $e;
+        }
+        catch ( \Throwable $e ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be valid phone', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $phone);
+    }
+
+    /**
+     * > использует библиотеку libphonenumber, чтобы убедится, что телефон соответствует стандартам Google
+     *
      * @param array{ 0?: string, 1?: string, 2?: string, 3?: string } $refs
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_phone_real(
+    public function type_phone_real($fb,
         $value,
         ?string $region = '',
         array $refs = []
@@ -415,9 +519,9 @@ class SocialModule
         }
         $refTelPlus = null;
 
-        $thePhoneManager = $this->phoneManager();
-
         try {
+            $thePhoneManager = $this->phoneManager();
+
             $phone = $thePhoneManager->parsePhoneReal(
                 $value, $region,
                 $refRegionDetected,
@@ -429,22 +533,22 @@ class SocialModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid email, that match passed region', $value, $region ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $phone);
+        return Ret::ok($fb, $phone);
     }
 
 
     /**
      * @param array{ 0?: string, 1?: string } $refs
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_tel(
+    public function type_tel($fb,
         $value,
         array $refs = []
     )
@@ -461,9 +565,9 @@ class SocialModule
         }
         $refTelPlus = null;
 
-        $thePhoneManager = $this->phoneManager();
-
         try {
+            $thePhoneManager = $this->phoneManager();
+
             $tel = $thePhoneManager->parseTel(
                 $value,
                 $refTelDigits, $refTelPlus
@@ -474,21 +578,21 @@ class SocialModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid tel', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $tel);
+        return Ret::ok($fb, $tel);
     }
 
     /**
      * @param array{ 0?: string, 1?: string } $refs
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_tel_fake(
+    public function type_tel_fake($fb,
         $value,
         array $refs = []
     )
@@ -505,9 +609,9 @@ class SocialModule
         }
         $refTelPlus = null;
 
-        $thePhoneManager = $this->phoneManager();
-
         try {
+            $thePhoneManager = $this->phoneManager();
+
             $tel = $thePhoneManager->parseTelFake(
                 $value,
                 $refTelDigits, $refTelPlus
@@ -518,21 +622,21 @@ class SocialModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid tel (fake)', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $tel);
+        return Ret::ok($fb, $tel);
     }
 
     /**
      * @param array{ 0?: string, 1?: string, 2?: string } $refs
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_tel_non_fake(
+    public function type_tel_non_fake($fb,
         $value,
         array $refs = []
     )
@@ -549,10 +653,10 @@ class SocialModule
         }
         $refTelPlus = null;
 
-        $thePhoneManager = $this->phoneManager();
-
         try {
-            $tel = $thePhoneManager->parseTelNonFake(
+            $thePhoneManager = $this->phoneManager();
+
+            $tel = $thePhoneManager->parseTel(
                 $value,
                 $refTelDigits, $refTelPlus
             );
@@ -562,21 +666,67 @@ class SocialModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid tel (non-fake)', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $tel);
+        return Ret::ok($fb, $tel);
     }
 
     /**
+     * @param array{ 0?: string, 1?: string } $refs
+     *
+     * @return Ret<string>|string
+     */
+    public function type_tel_maybe_fake($fb,
+        $value,
+        array $refs = []
+    )
+    {
+        $withTelDigits = array_key_exists(0, $refs);
+        if ( $withTelDigits ) {
+            $refTelDigits =& $refs[0];
+        }
+        $refTelDigits = null;
+
+        $withTelPlus = array_key_exists(1, $refs);
+        if ( $withTelPlus ) {
+            $refTelPlus =& $refs[1];
+        }
+        $refTelPlus = null;
+
+        try {
+            $thePhoneManager = $this->phoneManager();
+
+            $tel = $thePhoneManager->parseTelMaybeFake(
+                $value,
+                $refTelDigits, $refTelPlus
+            );
+        }
+        catch ( ComposerException $e ) {
+            throw $e;
+        }
+        catch ( \Throwable $e ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be valid tel', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $tel);
+    }
+
+    /**
+     * > использует библиотеку libphonenumber, чтобы убедится, что телефон соответствует стандартам Google
+     *
      * @param array{ 0?: string, 1?: string, 2?: string } $refs
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_tel_real(
+    public function type_tel_real($fb,
         $value,
         ?string $region = '',
         array $refs = []
@@ -614,12 +764,12 @@ class SocialModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid tel, that match passed region', $value, $region ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $tel);
+        return Ret::ok($fb, $tel);
     }
 }

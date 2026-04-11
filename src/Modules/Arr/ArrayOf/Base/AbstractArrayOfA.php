@@ -29,7 +29,9 @@ abstract class AbstractArrayOfA extends AbstractArrayOf
     {
         $theType = Lib::type();
 
-        if ( ! $theType->struct_exists($className)->isOk([ &$classNameValid ]) ) {
+        $ret = $theType->struct_exists($className);
+
+        if ( ! $ret->isOk([ &$classNameValid ]) ) {
             throw new LogicException(
                 [ 'Struct not exists: ' . $className ]
             );

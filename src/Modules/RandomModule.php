@@ -1,6 +1,6 @@
 <?php
-
 /**
+ * @noinspection PhpComposerExtensionStubsInspection
  * @noinspection PhpFullyQualifiedNameUsageInspection
  */
 
@@ -73,7 +73,7 @@ class RandomModule
             if ( $val === PHP_INT_MAX ) {
                 $theBcmath = Lib::bcmath();
 
-                $val = bcadd($val, 1);
+                $val = $theBcmath->bcadd($val, 1);
 
             } else {
                 $val++;
@@ -90,7 +90,7 @@ class RandomModule
             ) {
                 $theBcmath = Lib::bcmath();
 
-                $val = bcadd($val, 1);
+                $val = $theBcmath->bcadd($val, 1);
 
             } else {
                 $val = ((int) $val) + 1;
@@ -131,36 +131,32 @@ class RandomModule
 
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_uuid($value)
+    public function type_uuid($fb, $value)
     {
-        if ( ! is_string($value) ) {
-            return Ret::throw(
-                null,
-                [ 'The `value` should be string', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
+        $theType = Lib::type();
 
-        if ( '' === $value ) {
+        $ret = $theType->string_not_empty($value);
+
+        if ( $ret->isOk([ &$valueString ]) ) {
             return Ret::throw(
-                null,
-                [ 'The `value` should be string, not-empty', $value ],
+                $fb,
+                $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         $regex = '/^[0-9A-F]{8}-[0-9A-F]{4}-4[0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i';
-        if ( ! preg_match($regex, $value) ) {
+        if ( ! preg_match($regex, $valueString) ) {
             return Ret::throw(
-                null,
-                [ 'The `value` should be valid uuid', $value ],
+                $fb,
+                [ 'The `value` should be valid uuid', $valueString ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $valueString);
     }
 
 
@@ -219,7 +215,7 @@ class RandomModule
     {
         $array = unpack('H*', $this->random_bytes($len));
 
-        $result = array_shift($array);
+        $result = reset($array);
 
         return $result;
     }

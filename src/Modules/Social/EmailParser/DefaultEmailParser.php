@@ -97,20 +97,7 @@ class DefaultEmailParser implements EmailParserInterface
         ?string &$refEmailDomain = null, ?string &$refEmailName = null
     ) : string
     {
-        $filters = $filters ?? [ 'filter' => true ];
-
-        [
-            $emailString,
-            $refEmailDomain,
-            $refEmailName,
-        ] = $this->parseEmailDomain($value);
-
-        $this->parseEmailFilters(
-            $emailString, $refEmailDomain, $refEmailName,
-            $filters
-        );
-
-        return $emailString;
+        return $this->parseEmailNonFake($value, $filters, $refEmailDomain, $refEmailName);
     }
 
     public function parseEmailFake(
@@ -177,6 +164,27 @@ class DefaultEmailParser implements EmailParserInterface
                 );
             }
         }
+
+        $this->parseEmailFilters(
+            $emailString, $refEmailDomain, $refEmailName,
+            $filters
+        );
+
+        return $emailString;
+    }
+
+    public function parseEmailMaybeFake(
+        $value, ?array $filters = null,
+        ?string &$refEmailDomain = null, ?string &$refEmailName = null
+    ) : string
+    {
+        $filters = $filters ?? [ 'filter' => true ];
+
+        [
+            $emailString,
+            $refEmailDomain,
+            $refEmailName,
+        ] = $this->parseEmailDomain($value);
 
         $this->parseEmailFilters(
             $emailString, $refEmailDomain, $refEmailName,

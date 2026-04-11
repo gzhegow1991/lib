@@ -160,13 +160,13 @@ class DebugModule
 
 
     /**
-     * @return Ret<array{ 0: string, 1: int }>
+     * @return Ret<array{ 0: string, 1: int }>|array{ 0: string, 1: int }
      */
-    public function type_fileline($value)
+    public function type_fileline($fb, $value)
     {
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -180,7 +180,7 @@ class DebugModule
 
             if ( false === $fileRealpath ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `value[0]` should be realpath', $file, $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -192,14 +192,14 @@ class DebugModule
         if ( -1 !== $line ) {
             if ( ! (is_int($line) && ($line > 0)) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `value[1]` should be positive integer', $line, $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::ok(null, [ $file, $line ]);
+        return Ret::ok($fb, [ $file, $line ]);
     }
 
 
@@ -1106,7 +1106,7 @@ class DebugModule
 
             foreach ( $gen as $path => &$value ) {
                 if ( false
-                    || is_object($value)
+                    || $theType->object($value)->isOk()
                     || $theType->resource($value)->isOk()
                 ) {
                     // > ! recursion
@@ -1272,7 +1272,9 @@ class DebugModule
                     $result = "[]";
 
                 } else {
-                    $isListSorted = $theType->list_sorted($var)->isOk();
+                    $ret = $theType->list_sorted($var);
+
+                    $isListSorted = $ret->isOk();
 
                     $lines = [];
                     foreach ( $var as $key => $value ) {

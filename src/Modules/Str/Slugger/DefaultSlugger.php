@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @noinspection PhpComposerExtensionStubsInspection
  * @noinspection PhpFullyQualifiedNameUsageInspection
  * @noinspection PhpUndefinedClassInspection
  * @noinspection PhpUndefinedNamespaceInspection
@@ -57,7 +58,9 @@ class DefaultSlugger implements SluggerInterface
         ?SluggerPresetRegistryInterface $registry = null
     )
     {
-        Lib::mb(); // initialize
+        $theType = Lib::type();
+
+        $theType->is_extension_loaded('mbstring')->orThrow();
 
         $this->registry = $registry ?? new SluggerPresetRegistry();
 
@@ -303,6 +306,7 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
+        $theMb = Lib::mb();
         $theType = Lib::type();
 
         if ( null === $delimiter ) {
@@ -317,7 +321,7 @@ class DefaultSlugger implements SluggerInterface
             $delimiterLetter, $ignoreSymbols, $locale
         );
 
-        $delimiterAndSpaceRegex = sprintf('\x{%X}', mb_ord($delimiterLetter));
+        $delimiterAndSpaceRegex = sprintf('\x{%X}', $theMb->mb_ord($delimiterLetter));
         $delimiterAndSpaceRegex = '/[' . $delimiterAndSpaceRegex . ' ]+/iu';
 
         $slug = preg_replace($delimiterAndSpaceRegex, $delimiterLetter, $slug);
@@ -578,14 +582,16 @@ class DefaultSlugger implements SluggerInterface
             yield [ $string, '' ];
 
         } else {
-            $len = mb_strlen($string);
+            $theMb = Lib::mb();
+
+            $len = $theMb->mb_strlen($string);
 
             $prev = 0;
             for ( $i = 0; $i < $len; $i++ ) {
-                $letter = mb_substr($string, $i, 1);
+                $letter = $theMb->mb_substr($string, $i, 1);
 
                 if ( isset($ignoreSymbolMap[$letter]) ) {
-                    $chunk = mb_substr($string, $prev, $i - $prev);
+                    $chunk = $theMb->mb_substr($string, $prev, $i - $prev);
 
                     yield [ $chunk, $letter ];
 
@@ -594,7 +600,7 @@ class DefaultSlugger implements SluggerInterface
             }
 
             if ( $prev < $len ) {
-                $chunk = mb_substr($string, $prev);
+                $chunk = $theMb->mb_substr($string, $prev);
 
                 yield [ $chunk, '' ];
             }

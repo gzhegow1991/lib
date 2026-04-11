@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Modules\Fs\FileSafe;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
@@ -65,7 +64,7 @@ class FileSafe
     /**
      * @param resource $resource
      *
-     * @return closed-resource|bool
+     * @return resource|bool
      */
     public function fclose($resource)
     {
@@ -83,7 +82,7 @@ class FileSafe
     /**
      * @param resource $resource
      *
-     * @return closed-resource|bool
+     * @return resource|bool
      */
     public function fclosef($resource)
     {
@@ -311,7 +310,7 @@ class FileSafe
     /**
      * @param resource $resource
      *
-     * @return closed-resource|false
+     * @return resource|false
      */
     public function frelease_fclose($resource)
     {
@@ -337,7 +336,7 @@ class FileSafe
     /**
      * @param resource $resource
      *
-     * @return closed-resource|false
+     * @return resource|false
      */
     public function freleasef_fclosef($resource)
     {
@@ -467,13 +466,13 @@ class FileSafe
      * @param resource $resource
      * @param string   $file
      *
-     * @return closed-resource|false
+     * @return resource|false
      */
     public function frelease_fclose_unlink($resource, $file)
     {
         $thePhp = Lib::php();
 
-        $isWindows = $thePhp->is_windows();
+        $isWindows = $thePhp->is_os_windows();
 
         if ( ! $isWindows ) {
             $status = unlink($file);
@@ -518,7 +517,7 @@ class FileSafe
      * @param resource $resource
      * @param string   $file
      *
-     * @return closed-resource|false
+     * @return resource|false
      */
     public function freleasef_fclosef_unlinkf($resource, $file)
     {
@@ -527,7 +526,7 @@ class FileSafe
 
         $resourceValid = $theType->resource($resource)->orThrow();
 
-        $isWindows = $thePhp->is_windows();
+        $isWindows = $thePhp->is_os_windows();
 
         $isFile = is_file($file);
 
@@ -681,9 +680,6 @@ class FileSafe
 
         $size = fpassthru($resource);
 
-        /**
-         * @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection
-         */
         if ( false === $size ) {
             return false;
         }
@@ -927,7 +923,9 @@ class FileSafe
     {
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($symlink)->isOk([ &$symlinkString ]) ) {
+        $ret = $theType->string_not_empty($symlink);
+
+        if ( ! $ret->isOk([ &$symlinkString ]) ) {
             return false;
         }
 
@@ -943,11 +941,13 @@ class FileSafe
         $thePhp = Lib::php();
         $theType = Lib::type();
 
-        if ( ! $thePhp->is_windows() ) {
+        if ( ! $thePhp->is_os_windows() ) {
             return false;
         }
 
-        if ( ! $theType->string_not_empty($junction)->isOk([ &$junctionString ]) ) {
+        $ret = $theType->string_not_empty($junction);
+
+        if ( ! $ret->isOk([ &$junctionString ]) ) {
             return false;
         }
 
@@ -966,7 +966,7 @@ class FileSafe
         // > S_ISDIR test (S_IFDIR is 0x4000, S_IFMT is 0xF000 bitmask)
         $result = true
             && is_array($stat)
-            && 0x4000 !== ($stat['mode'] & 0xF000);
+            && (0x4000 !== ($stat['mode'] & 0xF000));
 
         return $result;
     }
@@ -2149,9 +2149,6 @@ class FileSafe
 
         $size = fpassthru($fh);
 
-        /**
-         * @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection
-         */
         if ( false === $size ) {
             return false;
         }
@@ -2191,9 +2188,6 @@ class FileSafe
 
         $size = fpassthru($resource);
 
-        /**
-         * @noinspection PhpStrictComparisonWithOperandsOfDifferentTypesInspection
-         */
         if ( false === $size ) {
             return false;
         }

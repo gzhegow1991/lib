@@ -60,26 +60,28 @@ class ArrModule
 
 
     /**
-     * @return Ret<int|string>
+     * @return Ret<int|string>|int|string
      */
-    public function type_key($key)
+    public function type_key($fb, $key)
     {
         $theType = Lib::type();
 
         if ( is_int($key) ) {
-            return Ret::ok(null, $key);
+            return Ret::ok($fb, $key);
 
         } elseif ( is_string($key) ) {
-            return Ret::ok(null, $key);
+            return Ret::ok($fb, $key);
 
         } else {
-            if ( $theType->string($key)->isOk([ &$keyString ]) ) {
-                return Ret::ok(null, $keyString);
+            $ret = $theType->string($key);
+
+            if ( $ret->isOk([ &$keyString ]) ) {
+                return Ret::ok($fb, $keyString);
             }
         }
 
         return Ret::throw(
-            null,
+            $fb,
             [ 'The `key` should be int or string', $key ],
             [ __FILE__, __LINE__ ]
         );
@@ -87,103 +89,115 @@ class ArrModule
 
 
     /**
-     * @return Ret<mixed>
+     * @return Ret<mixed>|mixed
      */
-    public function type_key_exists($key, array $array)
+    public function type_key_exists($fb, $key, array $array)
     {
-        if ( ! (false
-            || (isset($array[$key]))
-            || (true
-                && $this->type_key($key)->isOk([ &$keyValid ])
-                && array_key_exists($keyValid, $array)
-            )
-        ) ) {
-            return Ret::throw(
-                null,
-                [ 'The `key` should be existing key in `array`', $key, $array ],
-                [ __FILE__, __LINE__ ]
-            );
+        if ( isset($array[$key]) ) {
+            return Ret::ok($fb, $array[$key]);
         }
 
-        return Ret::ok(null, $array[$key]);
-    }
+        $ret = $this->type_key(null, $key);
 
-
-    /**
-     * @return Ret<array>
-     */
-    public function type_keys_exists($keys, array $array)
-    {
-        if ( ! is_array($keys) ) {
-            return Ret::throw(
-                null,
-                [ 'The `keys` should be array', $keys ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        foreach ( $keys as $key ) {
-            if ( ! (false
-                || (isset($array[$key]))
-                || (true
-                    && $this->type_key($key)->isOk([ &$keyValid ])
-                    && array_key_exists($keyValid, $array)
-                )
-            ) ) {
-                return Ret::throw(
-                    null,
-                    [ 'The `keys` should exists in `array`', $key, $keys, $array ],
-                    [ __FILE__, __LINE__ ]
-                );
+        if ( $ret->isOk([ &$keyValid ]) ) {
+            if ( array_key_exists($keyValid, $array) ) {
+                return Ret::ok($fb, $array[$key]);
             }
         }
 
-        return Ret::ok(null, $array);
+        return Ret::throw(
+            $fb,
+            [ 'The `key` should be existing key in `array`', $key, $array ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
+
     /**
-     * @return Ret<array>
+     * @return Ret<array>|array
      */
-    public function type_keys_not_exists($keys, array $array)
+    public function type_keys_exists($fb, $keys, array $array)
     {
         if ( ! is_array($keys) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `keys` should be array', $keys ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         foreach ( $keys as $key ) {
-            if ( false
-                || (isset($array[$key]))
-                || (true
-                    && $this->type_key($key)->isOk([ &$keyValid ])
-                    && array_key_exists($keyValid, $array)
-                )
-            ) {
+            if ( isset($array[$key]) ) {
+                continue;
+            }
+
+            $ret = $this->type_key(null, $key);
+
+            if ( $ret->isOk([ &$keyValid ]) ) {
+                if ( array_key_exists($keyValid, $array) ) {
+                    continue;
+                }
+            }
+
+            return Ret::throw(
+                $fb,
+                [ 'The `keys` should exists in `array`', $key, $keys, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $array);
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_keys_not_exists($fb, $keys, array $array)
+    {
+        if ( ! is_array($keys) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `keys` should be array', $keys ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        foreach ( $keys as $key ) {
+            if ( isset($array[$key]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `keys` should not exists in `array`', $key, $keys, $array ],
                     [ __FILE__, __LINE__ ]
                 );
             }
+
+            $ret = $this->type_key(null, $key);
+
+            if ( $ret->isOk([ &$keyValid ]) ) {
+                if ( array_key_exists($keyValid, $array) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `keys` should not exists in `array`', $key, $keys, $array ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+            }
         }
 
-        return Ret::ok(null, $array);
+        return Ret::ok($fb, $array);
     }
 
 
     /**
-     * @return Ret<array>
+     * @return Ret<array>|array
      */
-    public function type_array_plain($value, ?int $plainMaxDepth = null)
+    public function type_array_plain($fb, $value, ?int $plainMaxDepth = null)
     {
         $plainMaxDepth = $plainMaxDepth ?? 1;
 
         if ( $plainMaxDepth < 1 ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `maxDepth` should be greater than 1', $plainMaxDepth ],
                 [ __FILE__, __LINE__ ]
             );
@@ -191,21 +205,21 @@ class ArrModule
 
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( [] === $value ) {
-            return Ret::ok(null, $value);
+            return Ret::ok($fb, $value);
         }
 
         if ( 1 === $plainMaxDepth ) {
             foreach ( $value as $v ) {
                 if ( is_array($v) ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -226,47 +240,49 @@ class ArrModule
 
                 foreach ( array_reverse($child) as $v ) {
                     if ( is_array($v) ) {
-                        if ( ($level + 1) > $plainMaxDepth ) {
+                        $levelNew = $level + 1;
+
+                        if ( $levelNew > $plainMaxDepth ) {
                             return Ret::throw(
-                                null,
+                                $fb,
                                 [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                                 [ __FILE__, __LINE__ ]
                             );
                         }
 
-                        $queue[] = [ $v, $level + 1 ];
+                        $queue[] = [ $v, $levelNew ];
                     }
                 }
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
 
     /**
-     * @return Ret<array>
+     * @return Ret<array>|array
      */
-    public function type_list($value, ?int $plainMaxDepth = null)
+    public function type_list($fb, $value, ?int $plainMaxDepth = null)
     {
         $hasMaxDepth = (null !== $plainMaxDepth);
 
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( [] === $value ) {
-            return Ret::ok(null, $value);
+            return Ret::ok($fb, $value);
         }
 
         if ( $hasMaxDepth ) {
             if ( $plainMaxDepth < 1 ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -276,7 +292,7 @@ class ArrModule
                 foreach ( $value as $key => $v ) {
                     if ( is_string($key) ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `value` should be array without string keys', $value ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -284,7 +300,7 @@ class ArrModule
 
                     if ( is_array($v) ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -306,22 +322,24 @@ class ArrModule
                     foreach ( array_reverse($child, true) as $key => $v ) {
                         if ( is_string($key) ) {
                             return Ret::throw(
-                                null,
+                                $fb,
                                 [ 'The `value` should be array without string keys', $value ],
                                 [ __FILE__, __LINE__ ]
                             );
                         }
 
                         if ( is_array($v) ) {
-                            if ( ($level + 1) > $plainMaxDepth ) {
+                            $levelNew = $level + 1;
+
+                            if ( $levelNew > $plainMaxDepth ) {
                                 return Ret::throw(
-                                    null,
+                                    $fb,
                                     [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                                     [ __FILE__, __LINE__ ]
                                 );
                             }
 
-                            $queue[] = [ $v, $level + 1 ];
+                            $queue[] = [ $v, $levelNew ];
                         }
                     }
                 }
@@ -331,7 +349,7 @@ class ArrModule
             foreach ( array_keys($value) as $key ) {
                 if ( is_string($key) ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `value` should be array without string keys', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -339,26 +357,26 @@ class ArrModule
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
     /**
-     * @return Ret<array>
+     * @return Ret<array>|array
      */
-    public function type_list_sorted($value, ?int $plainMaxDepth = null)
+    public function type_list_sorted($fb, $value, ?int $plainMaxDepth = null)
     {
         $hasMaxDepth = (null !== $plainMaxDepth);
 
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( [] === $value ) {
-            return Ret::ok(null, $value);
+            return Ret::ok($fb, $value);
         }
 
         $prev = -1;
@@ -366,7 +384,7 @@ class ArrModule
         if ( $hasMaxDepth ) {
             if ( $plainMaxDepth < 1 ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -376,7 +394,7 @@ class ArrModule
                 foreach ( $value as $key => $v ) {
                     if ( is_string($key) ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `value` should be array without string keys', $value ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -384,7 +402,7 @@ class ArrModule
 
                     if ( ($key - $prev) !== 1 ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `value` should be sorted array', $value ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -392,7 +410,7 @@ class ArrModule
 
                     if ( is_array($v) ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -416,7 +434,7 @@ class ArrModule
                     foreach ( array_reverse($child, true) as $key => $v ) {
                         if ( is_string($key) ) {
                             return Ret::throw(
-                                null,
+                                $fb,
                                 [ 'The `value` should be array without string keys', $value ],
                                 [ __FILE__, __LINE__ ]
                             );
@@ -424,22 +442,24 @@ class ArrModule
 
                         if ( ($key - $prev) !== 1 ) {
                             return Ret::throw(
-                                null,
+                                $fb,
                                 [ 'The `value` should be sorted array', $value ],
                                 [ __FILE__, __LINE__ ]
                             );
                         }
 
                         if ( is_array($v) ) {
-                            if ( ($level + 1) > $plainMaxDepth ) {
+                            $levelNew = $level + 1;
+
+                            if ( $levelNew > $plainMaxDepth ) {
                                 return Ret::throw(
-                                    null,
+                                    $fb,
                                     [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                                     [ __FILE__, __LINE__ ]
                                 );
                             }
 
-                            $queue[] = [ $v, $level + 1 ];
+                            $queue[] = [ $v, $levelNew ];
                         }
 
                         $prev = $key;
@@ -451,7 +471,7 @@ class ArrModule
             foreach ( array_keys($value) as $key ) {
                 if ( is_string($key) ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `value` should be array without string keys', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -459,7 +479,7 @@ class ArrModule
 
                 if ( ($key - $prev) !== 1 ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `value` should be sorted array', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -469,33 +489,33 @@ class ArrModule
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
 
     /**
-     * @return Ret<array>
+     * @return Ret<array>|array
      */
-    public function type_dict($value, ?int $plainMaxDepth = null)
+    public function type_dict($fb, $value, ?int $plainMaxDepth = null)
     {
         $hasMaxDepth = (null !== $plainMaxDepth);
 
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( [] === $value ) {
-            return Ret::ok(null, $value);
+            return Ret::ok($fb, $value);
         }
 
         if ( $hasMaxDepth ) {
             if ( $plainMaxDepth < 1 ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -505,7 +525,7 @@ class ArrModule
                 foreach ( $value as $key => $v ) {
                     if ( is_int($key) ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `value` should be array without int keys', $value ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -513,7 +533,7 @@ class ArrModule
 
                     if ( is_array($v) ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -535,22 +555,24 @@ class ArrModule
                     foreach ( array_reverse($child, true) as $key => $v ) {
                         if ( is_int($key) ) {
                             return Ret::throw(
-                                null,
+                                $fb,
                                 [ 'The `value` should be array without int keys', $value ],
                                 [ __FILE__, __LINE__ ]
                             );
                         }
 
                         if ( is_array($v) ) {
-                            if ( ($level + 1) > $plainMaxDepth ) {
+                            $levelNew = $level + 1;
+
+                            if ( $levelNew > $plainMaxDepth ) {
                                 return Ret::throw(
-                                    null,
+                                    $fb,
                                     [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                                     [ __FILE__, __LINE__ ]
                                 );
                             }
 
-                            $queue[] = [ $v, $level + 1 ];
+                            $queue[] = [ $v, $levelNew ];
                         }
                     }
                 }
@@ -560,7 +582,7 @@ class ArrModule
             foreach ( array_keys($value) as $key ) {
                 if ( is_int($key) ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `value` should be array without int keys', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -568,15 +590,15 @@ class ArrModule
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
     /**
      * @param callable $fnSortCmp
      *
-     * @return Ret<array>
+     * @return Ret<array>|array
      */
-    public function type_dict_sorted($value, ?int $plainMaxDepth = null, $fnSortCmp = null)
+    public function type_dict_sorted($fb, $value, ?int $plainMaxDepth = null, $fnSortCmp = null)
     {
         $hasMaxDepth = (null !== $plainMaxDepth);
 
@@ -584,14 +606,14 @@ class ArrModule
 
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( [] === $value ) {
-            return Ret::ok(null, $value);
+            return Ret::ok($fb, $value);
         }
 
         $prev = '';
@@ -599,7 +621,7 @@ class ArrModule
         if ( $hasMaxDepth ) {
             if ( $plainMaxDepth < 1 ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -609,7 +631,7 @@ class ArrModule
                 foreach ( $value as $key => $v ) {
                     if ( is_int($key) ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `value` should be array without int keys', $value ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -617,7 +639,7 @@ class ArrModule
 
                     if ( is_array($v) ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -627,7 +649,7 @@ class ArrModule
 
                     if ( ! is_int($cmp) ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `fnSortCmp` should return integer', $fnSortCmp ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -635,7 +657,7 @@ class ArrModule
 
                     if ( $cmp < 0 ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `value` should be sorted array', $value ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -661,7 +683,7 @@ class ArrModule
                     foreach ( array_reverse($child, true) as $key => $v ) {
                         if ( is_int($key) ) {
                             return Ret::throw(
-                                null,
+                                $fb,
                                 [ 'The `value` should be array without int keys', $value ],
                                 [ __FILE__, __LINE__ ]
                             );
@@ -671,7 +693,7 @@ class ArrModule
 
                         if ( ! is_int($cmp) ) {
                             return Ret::throw(
-                                null,
+                                $fb,
                                 [ 'The `fnSortCmp` should return integer', $fnSortCmp ],
                                 [ __FILE__, __LINE__ ]
                             );
@@ -679,22 +701,24 @@ class ArrModule
 
                         if ( $cmp < 0 ) {
                             return Ret::throw(
-                                null,
+                                $fb,
                                 [ 'The `value` should be sorted array', $value ],
                                 [ __FILE__, __LINE__ ]
                             );
                         }
 
                         if ( is_array($v) ) {
-                            if ( ($level + 1) > $plainMaxDepth ) {
+                            $levelNew = $level + 1;
+
+                            if ( $levelNew > $plainMaxDepth ) {
                                 return Ret::throw(
-                                    null,
+                                    $fb,
                                     [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
                                     [ __FILE__, __LINE__ ]
                                 );
                             }
 
-                            $queue[] = [ $v, $level + 1 ];
+                            $queue[] = [ $v, $levelNew ];
                         }
 
                         $prev = $key;
@@ -706,7 +730,7 @@ class ArrModule
             foreach ( array_keys($value) as $key ) {
                 if ( is_int($key) ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `value` should be array without int keys', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -716,7 +740,7 @@ class ArrModule
 
                 if ( ! is_int($cmp) ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `fnSortCmp` should return integer', $fnSortCmp ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -724,7 +748,7 @@ class ArrModule
 
                 if ( $cmp < 0 ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `value` should be sorted array', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -734,18 +758,18 @@ class ArrModule
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
 
     /**
-     * @return Ret<array>
+     * @return Ret<array>|array
      */
-    public function type_table($value)
+    public function type_table($fb, $value)
     {
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -754,7 +778,7 @@ class ArrModule
         for ( $i = 0; $i < count($value); $i++ ) {
             if ( ! is_array($value[$i]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `value` should be array of arrays', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -765,65 +789,69 @@ class ArrModule
     }
 
     /**
-     * @return Ret<array>
+     * @return Ret<array>|array
      */
-    public function type_matrix($value)
+    public function type_matrix($fb, $value)
     {
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         for ( $i = 0; $i < count($value); $i++ ) {
-            if ( ! $this->type_list($value[$i])->isOk() ) {
+            $ret = $this->type_list(null, $value[$i]);
+
+            if ( ! $ret->isOk() ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `value` should be array of lists', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
     /**
-     * @return Ret<array>
+     * @return Ret<array>|array
      */
-    public function type_matrix_strict($value)
+    public function type_matrix_strict($fb, $value)
     {
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         for ( $i = 0; $i < count($value); $i++ ) {
-            if ( ! $this->type_list_sorted($value[$i])->isOk() ) {
+            $ret = $this->type_list_sorted(null, $value[$i]);
+
+            if ( ! $ret->isOk() ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `value` should be array of sorted lists', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
 
     /**
-     * @return Ret<ArrPath>
+     * @return Ret<ArrPath>|ArrPath
      */
-    public function type_arrpath($value)
+    public function type_arrpath($fb, $value)
     {
         if ( $value instanceof ArrPath ) {
-            return Ret::ok(null, $value);
+            return Ret::ok($fb, $value);
         }
 
         try {
@@ -831,30 +859,32 @@ class ArrModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid arrpath', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ( ! ArrPath::fromValidArray($array)->isOk([ &$arrpathObject, &$ret ]) ) {
+        $ret = ArrPath::fromValidArray($array);
+
+        if ( ! $ret->isOk([ &$arrpathObject ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $arrpathObject);
+        return Ret::ok($fb, $arrpathObject);
     }
 
     /**
-     * @return Ret<ArrPath>
+     * @return Ret<ArrPath>|ArrPath
      */
-    public function type_arrpath_dot($value, ?string $dot = '.')
+    public function type_arrpath_dot($fb, $value, ?string $dot = '.')
     {
         if ( $value instanceof ArrPath ) {
-            return Ret::ok(null, $value);
+            return Ret::ok($fb, $value);
         }
 
         try {
@@ -864,32 +894,34 @@ class ArrModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid arrpath_dot', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ( ! ArrPath::fromValidArray($array)->isOk([ &$arrpathObject, &$ret ]) ) {
+        $ret = ArrPath::fromValidArray($array);
+
+        if ( ! $ret->isOk([ &$arrpathObject ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $arrpathObject);
+        return Ret::ok($fb, $arrpathObject);
     }
 
 
     /**
-     * @return Ret<array>
+     * @return Ret<array>|array
      */
-    public function type_array_of_type($value, string $type)
+    public function type_array_of_type($fb, $value, string $type)
     {
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -916,7 +948,7 @@ class ArrModule
 
         if ( ! isset($mapTypes[$type]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [
                     ''
                     . 'The `type` should be one of: '
@@ -931,24 +963,24 @@ class ArrModule
         foreach ( $value as $i => $v ) {
             if ( $type !== gettype($v) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'Each of `value` should be passed type', $v, $i, $type ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
     /**
-     * @return Ret<array>
+     * @return Ret<array>|array
      */
-    public function type_array_of_resource_type($value, string $resourceType)
+    public function type_array_of_resource_type($fb, $value, string $resourceType)
     {
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -957,7 +989,7 @@ class ArrModule
         foreach ( $value as $i => $v ) {
             if ( ! is_resource($v) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'Each of `value` should be opened resource', $v, $i, $resourceType ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -965,14 +997,14 @@ class ArrModule
 
             if ( $resourceType !== get_resource_type($v) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'Each of `value` should be opened resource of type', $v, $i, $resourceType ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
     /**
@@ -980,13 +1012,13 @@ class ArrModule
      *
      * @param class-string<T> $className
      *
-     * @return Ret<T[]>
+     * @return Ret<T[]>|T[]
      */
-    public function type_array_of_a($value, string $className)
+    public function type_array_of_a($fb, $value, string $className)
     {
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -994,9 +1026,11 @@ class ArrModule
 
         $theType = Lib::type();
 
-        if ( ! $theType->struct_exists($className)->isOk([ &$classNameValid, &$ret ]) ) {
+        $ret = $theType->struct_exists($className);
+
+        if ( ! $ret->isOk([ &$classNameValid ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1005,14 +1039,14 @@ class ArrModule
         foreach ( $value as $i => $v ) {
             if ( ! is_a($v, $classNameValid) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'Each of `value` should be instance of passed `className`', $v, $i, $className ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
     /**
@@ -1020,13 +1054,13 @@ class ArrModule
      *
      * @param class-string<T> $className
      *
-     * @return Ret<T[]>
+     * @return Ret<T[]>|T[]
      */
-    public function type_array_of_class($value, string $className)
+    public function type_array_of_class($fb, $value, string $className)
     {
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1034,9 +1068,11 @@ class ArrModule
 
         $theType = Lib::type();
 
-        if ( ! $theType->struct_exists($className)->isOk([ &$classNameValid, &$ret ]) ) {
+        $ret = $theType->struct_exists($className);
+
+        if ( $ret->isOk([ &$classNameValid ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1045,7 +1081,7 @@ class ArrModule
         foreach ( $value as $i => $v ) {
             if ( ! is_object($v) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'Each of `value` should be object', $v, $i ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1053,14 +1089,14 @@ class ArrModule
 
             if ( $className !== get_class($v) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'Each of `value` should be object of passed class (exact match)', $v, $i, $className ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
     /**
@@ -1068,13 +1104,13 @@ class ArrModule
      *
      * @param class-string<T> $className
      *
-     * @return Ret<T[]>
+     * @return Ret<T[]>|T[]
      */
-    public function type_array_of_subclass($value, string $className)
+    public function type_array_of_subclass($fb, $value, string $className)
     {
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1082,9 +1118,11 @@ class ArrModule
 
         $theType = Lib::type();
 
-        if ( ! $theType->struct_exists($className)->isOk([ &$classNameValid, &$ret ]) ) {
+        $ret = $theType->struct_exists($className);
+
+        if ( ! $ret->isOk([ &$classNameValid ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1093,28 +1131,28 @@ class ArrModule
         foreach ( $value as $i => $v ) {
             if ( ! is_subclass_of($v, $className) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'Each of `value` should be instance of passed subclass `className`', $v, $i, $className ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
     /**
      * @param callable $fn
      *
-     * @return Ret<array>
+     * @return Ret<array>|array
      *
      * @noinspection PhpDocSignatureIsNotCompleteInspection
      */
-    public function type_array_of_callback($value, callable $fn, array $fnArgs = [])
+    public function type_array_of_callback($fb, $value, callable $fn, array $fnArgs = [])
     {
         if ( ! is_array($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be array', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1125,14 +1163,14 @@ class ArrModule
 
             if ( ! call_user_func_array($fn, $vArgs) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'Each of `value` should pass passed `fn` check', $v, $i, $fn, $fnArgs ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::ok(null, $value);
+        return Ret::ok($fb, $value);
     }
 
 
@@ -1154,7 +1192,9 @@ class ArrModule
             return false;
         }
 
-        if ( ! $theType->string($key)->isOk([ &$keyString ]) ) {
+        $ret = $theType->string($key);
+
+        if ( ! $ret->isOk([ &$keyString ]) ) {
             return false;
         }
 
@@ -1405,7 +1445,9 @@ class ArrModule
 
         $arrpath = [];
         foreach ( $gen as $p ) {
-            if ( $theType->string($p)->isOk([ &$pString ]) ) {
+            $ret = $theType->string($p);
+
+            if ( $ret->isOk([ &$pString ]) ) {
                 $arrpath[] = $pString;
             }
         }
@@ -1432,7 +1474,9 @@ class ArrModule
 
         $arrpath = [];
         foreach ( $gen as $p ) {
-            if ( $theType->string($p)->isOk([ &$pString ]) ) {
+            $ret = $theType->string($p);
+
+            if ( $ret->isOk([ &$pString ]) ) {
                 if ( '' === $pString ) {
                     $arrpath[] = $pString;
 
@@ -1514,18 +1558,24 @@ class ArrModule
 
     public function has(array $arr, $path, ?string $dot = '.', array $refs = []) : bool
     {
-        if ( ! $this->type_arrpath_dot($path, $dot)->isOk([ &$pathObject ]) ) {
+        $ret = $this->type_arrpath_dot(null, $path, $dot);
+
+        if ( ! $ret->isOk([ &$pathObject ]) ) {
             return false;
         }
 
-        return $this->has_path($arr, $pathObject, $refs);
+        $bool = $this->has_path($arr, $pathObject, $refs);
+
+        return $bool;
     }
 
     public function has_path(array $array, $path, array $refs = []) : bool
     {
         /** @var ArrPath $pathObject */
 
-        if ( ! $this->type_arrpath($path)->isOk([ &$pathObject ]) ) {
+        $ret = $this->type_arrpath(null, $path);
+
+        if ( ! $ret->isOk([ &$pathObject ]) ) {
             return false;
         }
 
@@ -1590,7 +1640,7 @@ class ArrModule
      */
     public function &fetch(array &$arr, $path, ?string $dot = '.')
     {
-        $pathObject = $this->type_arrpath_dot($path, $dot)->orThrow();
+        $pathObject = $this->type_arrpath_dot([], $path, $dot);
 
         return $this->fetch_path($arr, $pathObject);
     }
@@ -1600,7 +1650,7 @@ class ArrModule
      */
     public function &fetch_path(array &$refArray, $path)
     {
-        $pathObject = $this->type_arrpath($path)->orThrow();
+        $pathObject = $this->type_arrpath([], $path);
 
         $pathArray = $pathObject->toArray();
 
@@ -1641,9 +1691,11 @@ class ArrModule
      */
     public function get(array $arr, $path, array $fallback = [], ?string $dot = '.')
     {
-        $pathObject = $this->type_arrpath_dot($path, $dot)->orFallback($fallback);
+        $pathObject = $this->type_arrpath_dot($fallback, $path, $dot);
 
-        return $this->get_path($arr, $pathObject, $fallback);
+        $res = $this->get_path($arr, $pathObject, $fallback);
+
+        return $res;
     }
 
     /**
@@ -1674,9 +1726,11 @@ class ArrModule
      */
     public function &put(array &$arr, $path, $val, ?string $dot = '.')
     {
-        $pathObject = $this->type_arrpath_dot($path, $dot)->orThrow();
+        $pathObject = $this->type_arrpath_dot([], $path, $dot);
 
-        return $this->put_path($arr, $pathObject, $val);
+        $ref = $this->put_path($arr, $pathObject, $val);
+
+        return $ref;
     }
 
     /**
@@ -1684,9 +1738,11 @@ class ArrModule
      */
     public function &set(array &$arr, $path, $val, ?string $dot = '.')
     {
-        $pathObject = $this->type_arrpath_dot($path, $dot)->orThrow();
+        $pathObject = $this->type_arrpath_dot([], $path, $dot);
 
-        return $this->put_path($arr, $pathObject, $val);
+        $ref = $this->put_path($arr, $pathObject, $val);
+
+        return $ref;
     }
 
     /**
@@ -1694,7 +1750,7 @@ class ArrModule
      */
     public function &put_path(array &$refArray, $path, $value)
     {
-        $pathObject = $this->type_arrpath($path)->orThrow();
+        $pathObject = $this->type_arrpath([], $path);
 
         $pathArray = $pathObject->getPath();
 
@@ -1734,7 +1790,9 @@ class ArrModule
     {
         /** @var ArrPath $pathObject */
 
-        if ( ! $this->type_arrpath_dot($path, $dot)->isOk([ &$pathObject ]) ) {
+        $ret = $this->type_arrpath_dot(null, $path, $dot);
+
+        if ( ! $ret->isOk([ &$pathObject ]) ) {
             return false;
         }
 
@@ -1748,7 +1806,9 @@ class ArrModule
     {
         /** @var ArrPath $pathObject */
 
-        if ( ! $this->type_arrpath($path)->isOk([ &$pathObject ]) ) {
+        $ret = $this->type_arrpath(null, $path);
+
+        if ( ! $ret->isOk([ &$pathObject ]) ) {
             return false;
         }
 
@@ -2961,7 +3021,11 @@ class ArrModule
 
             $isArray = is_array($cur0);
 
-            $isLeaf = $isEmptyArray = $isParent = $isList = $isDict = false;
+            $isLeaf =
+            $isEmptyArray =
+            $isParent =
+            $isList =
+            $isDict = false;
 
             if ( ! $isArray ) {
                 $isLeaf = true;
@@ -2971,10 +3035,14 @@ class ArrModule
 
             } elseif ( (! $isRoot) && ([] !== $cur0) ) {
                 if ( $isWithLists ) {
-                    $isList = $this->type_list($cur0, 1)->isOk();
+                    $ret = $this->type_list(null, $cur0, 1);
+
+                    $isList = $ret->isOk();
                 }
                 if ( $isWithDicts ) {
-                    $isDict = $this->type_dict($cur0, 1)->isOk();
+                    $ret = $this->type_dict(null, $cur0, 1);
+
+                    $isDict = $ret->isOk();
                 }
 
                 $isParent = ! ($isList || $isDict);

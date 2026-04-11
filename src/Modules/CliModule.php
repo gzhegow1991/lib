@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Exception\RuntimeException;
 
 
 class CliModule
@@ -14,14 +13,6 @@ class CliModule
 
     public function __initialize()
     {
-        $thePhp = Lib::php();
-
-        if ( ! $thePhp->is_terminal() ) {
-            throw new RuntimeException(
-                [ 'Function must be called only in CLI mode' ]
-            );
-        }
-
         return $this;
     }
 
@@ -30,6 +21,9 @@ class CliModule
     {
         $theDebug = Lib::debug();
         $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $theType->is_sapi_terminal()->orThrow();
 
         if ( null !== $var ) {
             $theDebugDumper = $theDebug->dumper();
@@ -47,6 +41,10 @@ class CliModule
 
     public function stop(...$vars) : void
     {
+        $theType = Lib::type();
+
+        $theType->is_sapi_terminal()->orThrow();
+
         $this->pause(...$vars);
 
         exit(1);
@@ -56,6 +54,9 @@ class CliModule
     public function readln() : string
     {
         $thePhp = Lib::php();
+        $theType = Lib::type();
+
+        $theType->is_sapi_terminal()->orThrow();
 
         $h = $thePhp->stdin();
 
@@ -66,8 +67,11 @@ class CliModule
 
     public function cin(?string $delimiter = null) : string
     {
-        $theStr = Lib::str();
         $thePhp = Lib::php();
+        $theStr = Lib::str();
+        $theType = Lib::type();
+
+        $theType->is_sapi_terminal()->orThrow();
 
         $delimiter = $delimiter ?? '```';
 
@@ -115,6 +119,10 @@ class CliModule
 
     public function yes(string $message, ?string &$refAnswer = null) : bool
     {
+        $theType = Lib::type();
+
+        $theType->is_sapi_terminal()->orThrow();
+
         $refAnswer = $refAnswer ?? 'n';
 
         $isYes = ('y' === $refAnswer) || ('yy' === $refAnswer);

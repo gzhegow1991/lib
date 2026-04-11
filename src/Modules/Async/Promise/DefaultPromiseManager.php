@@ -65,9 +65,9 @@ class DefaultPromiseManager implements PromiseManagerInterface
 
 
     /**
-     * @return Promise|Ret<Promise>
+     * @return Ret<Promise>|Promise
      */
-    public function from($from, ?array $fallback = null)
+    public function from($from, $fb = null)
     {
         $ret = Ret::new();
 
@@ -76,17 +76,21 @@ class DefaultPromiseManager implements PromiseManagerInterface
             ?? $this->fromCallable($from)->orNull($ret)
             ?? $this->fromValueResolved($from)->orNull($ret);
 
-        if ( $ret->isFail() ) {
-            return Ret::throw($fallback, $ret);
+        if ( ! $ret->isOk() ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
     /**
-     * @return Promise|Ret<Promise>
+     * @return Ret<Promise>|Promise
      */
-    public function fromValue($from, ?array $fallback = null)
+    public function fromValue($from, $fb = null)
     {
         $ret = Ret::new();
 
@@ -94,17 +98,21 @@ class DefaultPromiseManager implements PromiseManagerInterface
             ?? $this->fromInstance($from)->orNull($ret)
             ?? $this->fromValueResolved($from)->orNull($ret);
 
-        if ( $ret->isFail() ) {
-            return Ret::throw($fallback, $ret);
+        if ( ! $ret->isOk() ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
     /**
-     * @return Promise|Ret<Promise>
+     * @return Ret<Promise>|Promise
      */
-    public function fromCallable($from, ?array $fallback = null)
+    public function fromCallable($from, $fb = null)
     {
         $ret = Ret::new();
 
@@ -112,66 +120,70 @@ class DefaultPromiseManager implements PromiseManagerInterface
             ?? $this->fromInstance($from)->orNull($ret)
             ?? $this->fromCallableExecutor($from)->orNull($ret);
 
-        if ( $ret->isFail() ) {
-            return Ret::throw($fallback, $ret);
+        if ( ! $ret->isOk() ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
 
     /**
-     * @return Promise|Ret<Promise>
+     * @return Ret<Promise>|Promise
      */
-    protected function fromInstance($from, ?array $fallback = null)
+    protected function fromInstance($from, $fb = null)
     {
         if ( $from instanceof Promise ) {
-            return Ret::ok($fallback, $from);
+            return Ret::ok($fb, $from);
         }
 
         return Ret::throw(
-            $fallback,
+            $fb,
             [ 'The `from` should be an instance of: ' . Promise::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return Promise|Ret<Promise>
+     * @return Ret<Promise>|Promise
      */
-    protected function fromValueResolved($from, ?array $fallback = null)
+    protected function fromValueResolved($from, $fb = null)
     {
         try {
             $instance = Promise::newResolved($this, $this->loopManager, $from);
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
     /**
-     * @return Promise|Ret<Promise>
+     * @return Ret<Promise>|Promise
      */
-    protected function fromCallableExecutor($from, ?array $fallback = null)
+    protected function fromCallableExecutor($from, $fb = null)
     {
         try {
             $instance = Promise::newPromise($this, $this->loopManager, $from);
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
 
@@ -652,13 +664,17 @@ class DefaultPromiseManager implements PromiseManagerInterface
 
                     $reasonThrowable = new RuntimeException($rejectReason);
 
-                } elseif ( $theType->string_not_empty($rejectReason)->isOk([ &$rejectReasonStringNotEmpty ]) ) {
-                    $reasonThrowable = new RuntimeException(
-                        [ $rejectReasonStringNotEmpty, $timeoutMs ]
-                    );
-
                 } else {
-                    $reasonThrowable = new RuntimeException("Timeout: {$timeoutMs}ms");
+                    $ret = $theType->string_not_empty($rejectReason);
+
+                    if ( $ret->isOk([ &$rejectReasonStringNotEmpty ]) ) {
+                        $reasonThrowable = new RuntimeException(
+                            [ $rejectReasonStringNotEmpty, $timeoutMs ]
+                        );
+
+                    } else {
+                        $reasonThrowable = new RuntimeException("Timeout: {$timeoutMs}ms");
+                    }
                 }
 
                 call_user_func($fnRejectTimeout, $reasonThrowable);
@@ -678,6 +694,8 @@ class DefaultPromiseManager implements PromiseManagerInterface
 
     /**
      * @param array<int, mixed> $curlOptions
+     *
+     * @noinspection PhpDocSignatureInspection
      */
     public function fetchCurl(string $url, array $curlOptions = [], ?int $timeoutMs = null) : Promise
     {

@@ -41,7 +41,7 @@ class FileSafeContext
         [ , $this->files ] = [ $this->files, [] ];
         [ $filesToUnlink, $this->filesToUnlink ] = [ $this->filesToUnlink, [] ];
 
-        $isWindows = $thePhp->is_windows();
+        $isWindows = $thePhp->is_os_windows();
 
         $isResource = [];
 

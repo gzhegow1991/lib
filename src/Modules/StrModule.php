@@ -188,8 +188,6 @@ class StrModule
      * @param callable|string $fn
      *
      * @return callable
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     public function mb_func(string $fn)
     {
@@ -206,63 +204,63 @@ class StrModule
 
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_a_string($value)
+    public function type_php_string($fb, $value)
     {
         if ( is_string($value) ) {
-            return Ret::ok(null, $value);
+            return Ret::ok($fb, $value);
         }
 
         return Ret::throw(
-            null,
+            $fb,
             [ 'The `value` should be string', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_a_string_empty($value)
+    public function type_php_string_empty($fb, $value)
     {
         if ( '' === $value ) {
-            return Ret::ok(null, $value);
+            return Ret::ok($fb, $value);
         }
 
         return Ret::throw(
-            null,
+            $fb,
             [ 'The `value` should be string, empty', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_a_string_not_empty($value)
+    public function type_php_string_not_empty($fb, $value)
     {
         if ( is_string($value) && ('' !== $value) ) {
-            return Ret::ok(null, $value);
+            return Ret::ok($fb, $value);
         }
 
         return Ret::throw(
-            null,
+            $fb,
             [ 'The `value` should be string, non empty', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_a_trim($value, ?string $characters = null)
+    public function type_php_trim($fb, $value, ?string $characters = null)
     {
         $characters = $characters ?? " \n\r\t\v\0";
 
         if ( ! is_string($value) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be string', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -271,11 +269,11 @@ class StrModule
         $valueTrim = trim($value, $characters);
 
         if ( '' !== $valueTrim ) {
-            return Ret::ok(null, $valueTrim);
+            return Ret::ok($fb, $valueTrim);
         }
 
         return Ret::throw(
-            null,
+            $fb,
             [ 'The `value` should be trim', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -283,12 +281,12 @@ class StrModule
 
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_string($value)
+    public function type_string($fb, $value)
     {
         if ( is_string($value) ) {
-            return Ret::ok(null, $value);
+            return Ret::ok($fb, $value);
         }
 
         if ( false
@@ -309,7 +307,7 @@ class StrModule
             // > NIL is not string
 
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be string', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -318,7 +316,7 @@ class StrModule
         if ( is_object($value) ) {
             if ( ! method_exists($value, '__toString') ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `value` unable to be converted to string', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -330,73 +328,79 @@ class StrModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` is unable to be converted to string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $valueString);
+        return Ret::ok($fb, $valueString);
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_string_empty($value)
+    public function type_string_empty($fb, $value)
     {
-        if ( ! $this->type_string($value)->isOk([ &$valueString, &$ret ]) ) {
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
             return Ret::throw(
-                null,
-                $ret,
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        if ( '' === $valueString ) {
-            return Ret::ok(null, '');
-        }
-
-        return Ret::throw(
-            null,
-            [ 'The `value` should be empty string', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<string>
-     */
-    public function type_string_not_empty($value)
-    {
-        if ( ! $this->type_string($value)->isOk([ &$valueString, &$ret ]) ) {
-            return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( '' !== $valueString ) {
-            return Ret::ok(null, $valueString);
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be empty string', $value ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::throw(
-            null,
-            [ 'The `value` should be string, non empty', $value ],
-            [ __FILE__, __LINE__ ]
-        );
+        return Ret::ok($fb, '');
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_trim($value, ?string $characters = null)
+    public function type_string_not_empty($fb, $value)
+    {
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( '' === $valueString ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, non empty', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_trim($fb, $value, ?string $characters = null)
     {
         $characters = $characters ?? " \n\r\t\v\0";
 
-        if ( ! $this->type_string($value)->isOk([ &$valueString, &$ret ]) ) {
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString, &$ret ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -405,11 +409,11 @@ class StrModule
         $valueString = trim($valueString, $characters);
 
         if ( '' !== $valueString ) {
-            return Ret::ok(null, $valueString);
+            return Ret::ok($fb, $valueString);
         }
 
         return Ret::throw(
-            null,
+            $fb,
             [ 'The `value` should be trim', $value ],
             [ __FILE__, __LINE__ ]
         );
@@ -417,61 +421,67 @@ class StrModule
 
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_char($value)
+    public function type_char($fb, $value)
     {
-        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $this->type_string_not_empty(null, $value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( 1 === strlen($valueStringNotEmpty) ) {
-            return Ret::ok(null, $valueStringNotEmpty);
+            return Ret::ok($fb, $valueStringNotEmpty);
         }
 
         return Ret::throw(
-            null,
+            $fb,
             [ 'The `value` should be char', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_letter($value)
+    public function type_letter($fb, $value)
     {
-        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $this->type_string_not_empty(null, $value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( 1 === $this->strlen($valueStringNotEmpty) ) {
-            return Ret::ok(null, $valueStringNotEmpty);
+            return Ret::ok($fb, $valueStringNotEmpty);
         }
 
         return Ret::throw(
-            null,
+            $fb,
             [ 'The `value` should be letter', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_word($value)
+    public function type_word($fb, $value)
     {
-        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $this->type_string_not_empty(null, $value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -480,27 +490,33 @@ class StrModule
         preg_replace('/\s+/', '', $valueStringNotEmpty, 1, $count);
         if ( $count > 0 ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should not contain any whitespaces', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         return Ret::throw(
-            null,
+            $fb,
             [ 'The `value` should be word', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return Ret<Alphabet>
+     * @return Ret<Alphabet>|Alphabet
      */
-    public function type_alphabet($value)
+    public function type_alphabet($fb, $value)
     {
-        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        if ( $value instanceof Alphabet ) {
+            return Ret::ok($fb, $value);
+        }
+
+        $ret = $this->type_string_not_empty(null, $value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -509,7 +525,7 @@ class StrModule
         preg_replace('/\s+/', '', $valueStringNotEmpty, 1, $count);
         if ( $count > 0 ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should not contain any whitespaces', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -520,7 +536,7 @@ class StrModule
         $len = $fnStrlen($valueStringNotEmpty);
         if ( $len <= 1 ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should contain at least two letters', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -537,7 +553,7 @@ class StrModule
 
             if ( isset($seen[$letter]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `value` should contain unique letters', $value ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -559,18 +575,20 @@ class StrModule
             $regexNot
         );
 
-        return Ret::ok(null, $alphabet);
+        return Ret::ok($fb, $alphabet);
     }
 
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_ctype_digit($value)
+    public function type_ctype_digit($fb, $value)
     {
-        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $this->type_string_not_empty(null, $value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -578,11 +596,11 @@ class StrModule
 
         if ( extension_loaded('ctype') ) {
             if ( ctype_digit($valueStringNotEmpty) ) {
-                return Ret::ok(null, $valueStringNotEmpty);
+                return Ret::ok($fb, $valueStringNotEmpty);
             }
 
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should pass `ctype_digit` check', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -590,25 +608,27 @@ class StrModule
 
         if ( ! preg_match('~[^0-9]~', $valueStringNotEmpty) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should contain only digits', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $valueStringNotEmpty);
+        return Ret::ok($fb, $valueStringNotEmpty);
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_ctype_alpha($value, ?bool $allowUpperCase = null)
+    public function type_ctype_alpha($fb, $value, ?bool $allowUpperCase = null)
     {
         $allowUpperCase = $allowUpperCase ?? true;
 
-        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $this->type_string_not_empty(null, $value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -618,7 +638,7 @@ class StrModule
             if ( ! $allowUpperCase ) {
                 if ( strtolower($valueStringNotEmpty) !== $valueStringNotEmpty ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `value` should not contain upper case letters', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -626,11 +646,11 @@ class StrModule
             }
 
             if ( ctype_alpha($valueStringNotEmpty) ) {
-                return Ret::ok(null, $valueStringNotEmpty);
+                return Ret::ok($fb, $valueStringNotEmpty);
             }
 
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should pass `ctype_alpha` check', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -642,25 +662,27 @@ class StrModule
 
         if ( preg_match('~[^a-z]~' . $regexFlags, $valueStringNotEmpty) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should contain only [a-z] letters', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $valueStringNotEmpty);
+        return Ret::ok($fb, $valueStringNotEmpty);
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_ctype_alnum($value, ?bool $allowUpperCase = null)
+    public function type_ctype_alnum($fb, $value, ?bool $allowUpperCase = null)
     {
         $allowUpperCase = $allowUpperCase ?? true;
 
-        if ( ! $this->type_string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $this->type_string_not_empty(null, $value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -670,7 +692,7 @@ class StrModule
             if ( ! $allowUpperCase ) {
                 if ( strtolower($valueStringNotEmpty) !== $valueStringNotEmpty ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `value` should not contain upper case letters', $value ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -678,11 +700,11 @@ class StrModule
             }
 
             if ( ctype_alnum($valueStringNotEmpty) ) {
-                return Ret::ok(null, $valueStringNotEmpty);
+                return Ret::ok($fb, $valueStringNotEmpty);
             }
 
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should pass `ctype_alnum` check', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -694,13 +716,13 @@ class StrModule
 
         if ( preg_match('~[^0-9a-z]~' . $regexFlags, $valueStringNotEmpty) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should contain only [a-z0-9] letters', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $valueStringNotEmpty);
+        return Ret::ok($fb, $valueStringNotEmpty);
     }
 
 
@@ -1127,32 +1149,32 @@ class StrModule
         $theMb = Lib::mb();
 
         $list = [
-            // mb_chr(0x0020, 'UTF-8') => '\u{0020}', // > \u{0020}	// Space // Обычный пробел (между словами).
+            // $theMb->mb_chr(0x0020, 'UTF-8') => '\u{0020}', // > \u{0020}	// Space // Обычный пробел (между словами).
             //
-            mb_chr(0x00A0, 'UTF-8') => '\u{00A0}', // > \u{00A0} // No-Break Space (NBSP) // Неразрывный пробел, предотвращает перенос строки.
-            mb_chr(0x2000, 'UTF-8') => '\u{2000}', // > \u{2000} // En Quad // Пробел шириной с букву "N".
-            mb_chr(0x2001, 'UTF-8') => '\u{2001}', // > \u{2001} // Em Quad // Пробел шириной с букву "M".
-            mb_chr(0x2002, 'UTF-8') => '\u{2002}', // > \u{2002} // En Space // Половина ширины Em-пробела.
-            mb_chr(0x2003, 'UTF-8') => '\u{2003}', // > \u{2003} // Em Space // Ширина примерно как буква "M".
-            mb_chr(0x2004, 'UTF-8') => '\u{2004}', // > \u{2004} // Three-Per-Em Space // Треть от Em-пробела.
-            mb_chr(0x2005, 'UTF-8') => '\u{2005}', // > \u{2005} // Four-Per-Em Space // Четверть от Em-пробела.
-            mb_chr(0x2006, 'UTF-8') => '\u{2006}', // > \u{2006} // Six-Per-Em Space // Одна шестая Em-пробела.
-            mb_chr(0x2007, 'UTF-8') => '\u{2007}', // > \u{2007} // Figure Space // Ширина цифры в шрифте с фиксированной шириной.
-            mb_chr(0x2008, 'UTF-8') => '\u{2008}', // > \u{2008} // Punctuation Space // Ширина типографского знака препинания.
-            mb_chr(0x2009, 'UTF-8') => '\u{2009}', // > \u{2009} // Thin Space // Узкий пробел.
-            mb_chr(0x200A, 'UTF-8') => '\u{200A}', // > \u{200A} // Hair Space // Ещё более узкий пробел.
-            mb_chr(0x200B, 'UTF-8') => '\u{200B}', // > \u{200B} // Zero Width Space // Невидимый пробел (нулевая ширина).
-            mb_chr(0x200C, 'UTF-8') => '\u{200C}', // > \u{200C} // Zero Width Non-Joiner (ZWNJ) // Запрещает лигатуры между буквами.
-            mb_chr(0x200D, 'UTF-8') => '\u{200D}', // > \u{200D} // Zero Width Joiner (ZWJ) // Объединяет символы, создавая лигатуры.
-            mb_chr(0x200E, 'UTF-8') => '\u{200E}', // > \u{200E} // Left-to-Right Mark (LRM) // Управляет направлением текста (слева направо).
-            mb_chr(0x200F, 'UTF-8') => '\u{200F}', // > \u{200F} // Right-to-Left Mark (RLM) // Управляет направлением текста (справа налево).
-            mb_chr(0x202F, 'UTF-8') => '\u{202F}', // > \u{202F} // Narrow No-Break Space // Узкий неразрывный пробел.
-            mb_chr(0x205F, 'UTF-8') => '\u{205F}', // > \u{205F} // Medium Mathematical Space // Средний математический пробел.
-            mb_chr(0x2060, 'UTF-8') => '\u{2060}', // > \u{2060} // Word Joiner (WJ) // Запрещает разрывы слов, аналог NBSP, но нулевой ширины.
-            mb_chr(0x3000, 'UTF-8') => '\u{3000}', // > \u{3000} // Ideographic Space // Широкий пробел в китайском/японском тексте.
-            mb_chr(0xFEFF, 'UTF-8') => '\u{FEFF}', // > \u{FEFF} // Byte Order Mark (BOM) // Метка порядка байтов, часто используется для UTF-8.
-            mb_chr(0x2800, 'UTF-8') => '\u{2800}', // > \u{2800} // Braille Pattern Blank // Пробел в системе Брайля.
-            mb_chr(0x3164, 'UTF-8') => '\u{3164}', // > \u{3164} // Hangul Filler // Невидимый символ в корейском языке.
+            $theMb->mb_chr(0x00A0, 'UTF-8') => '\u{00A0}', // > \u{00A0} // No-Break Space (NBSP) // Неразрывный пробел, предотвращает перенос строки.
+            $theMb->mb_chr(0x2000, 'UTF-8') => '\u{2000}', // > \u{2000} // En Quad // Пробел шириной с букву "N".
+            $theMb->mb_chr(0x2001, 'UTF-8') => '\u{2001}', // > \u{2001} // Em Quad // Пробел шириной с букву "M".
+            $theMb->mb_chr(0x2002, 'UTF-8') => '\u{2002}', // > \u{2002} // En Space // Половина ширины Em-пробела.
+            $theMb->mb_chr(0x2003, 'UTF-8') => '\u{2003}', // > \u{2003} // Em Space // Ширина примерно как буква "M".
+            $theMb->mb_chr(0x2004, 'UTF-8') => '\u{2004}', // > \u{2004} // Three-Per-Em Space // Треть от Em-пробела.
+            $theMb->mb_chr(0x2005, 'UTF-8') => '\u{2005}', // > \u{2005} // Four-Per-Em Space // Четверть от Em-пробела.
+            $theMb->mb_chr(0x2006, 'UTF-8') => '\u{2006}', // > \u{2006} // Six-Per-Em Space // Одна шестая Em-пробела.
+            $theMb->mb_chr(0x2007, 'UTF-8') => '\u{2007}', // > \u{2007} // Figure Space // Ширина цифры в шрифте с фиксированной шириной.
+            $theMb->mb_chr(0x2008, 'UTF-8') => '\u{2008}', // > \u{2008} // Punctuation Space // Ширина типографского знака препинания.
+            $theMb->mb_chr(0x2009, 'UTF-8') => '\u{2009}', // > \u{2009} // Thin Space // Узкий пробел.
+            $theMb->mb_chr(0x200A, 'UTF-8') => '\u{200A}', // > \u{200A} // Hair Space // Ещё более узкий пробел.
+            $theMb->mb_chr(0x200B, 'UTF-8') => '\u{200B}', // > \u{200B} // Zero Width Space // Невидимый пробел (нулевая ширина).
+            $theMb->mb_chr(0x200C, 'UTF-8') => '\u{200C}', // > \u{200C} // Zero Width Non-Joiner (ZWNJ) // Запрещает лигатуры между буквами.
+            $theMb->mb_chr(0x200D, 'UTF-8') => '\u{200D}', // > \u{200D} // Zero Width Joiner (ZWJ) // Объединяет символы, создавая лигатуры.
+            $theMb->mb_chr(0x200E, 'UTF-8') => '\u{200E}', // > \u{200E} // Left-to-Right Mark (LRM) // Управляет направлением текста (слева направо).
+            $theMb->mb_chr(0x200F, 'UTF-8') => '\u{200F}', // > \u{200F} // Right-to-Left Mark (RLM) // Управляет направлением текста (справа налево).
+            $theMb->mb_chr(0x202F, 'UTF-8') => '\u{202F}', // > \u{202F} // Narrow No-Break Space // Узкий неразрывный пробел.
+            $theMb->mb_chr(0x205F, 'UTF-8') => '\u{205F}', // > \u{205F} // Medium Mathematical Space // Средний математический пробел.
+            $theMb->mb_chr(0x2060, 'UTF-8') => '\u{2060}', // > \u{2060} // Word Joiner (WJ) // Запрещает разрывы слов, аналог NBSP, но нулевой ширины.
+            $theMb->mb_chr(0x3000, 'UTF-8') => '\u{3000}', // > \u{3000} // Ideographic Space // Широкий пробел в китайском/японском тексте.
+            $theMb->mb_chr(0xFEFF, 'UTF-8') => '\u{FEFF}', // > \u{FEFF} // Byte Order Mark (BOM) // Метка порядка байтов, часто используется для UTF-8.
+            $theMb->mb_chr(0x2800, 'UTF-8') => '\u{2800}', // > \u{2800} // Braille Pattern Blank // Пробел в системе Брайля.
+            $theMb->mb_chr(0x3164, 'UTF-8') => '\u{3164}', // > \u{3164} // Hangul Filler // Невидимый символ в корейском языке.
         ];
 
         return $list;
@@ -2369,17 +2391,17 @@ class StrModule
 
         $testUnique = [];
         if ( $hasWildcardSeparatorSymbol ) {
-            $wildcardSeparatorSymbolString = $this->type_char($wildcardSeparatorSymbol)->orThrow();
+            $wildcardSeparatorSymbolString = $this->type_char([], $wildcardSeparatorSymbol);
 
             $testUnique[] = $wildcardSeparatorSymbolString;
         }
         if ( $hasWildcardSequenceSymbol ) {
-            $wildcardSequenceSymbolString = $this->type_char($wildcardSequenceSymbol)->orThrow();
+            $wildcardSequenceSymbolString = $this->type_char([], $wildcardSequenceSymbol);
 
             $testUnique[] = $wildcardSequenceSymbolString;
         }
         if ( $hasWildcardSingleSymbol ) {
-            $wildcardSingleSymbolString = $this->type_char($wildcardSingleSymbol)->orThrow();
+            $wildcardSingleSymbolString = $this->type_char([], $wildcardSingleSymbol);
 
             $testUnique[] = $wildcardSingleSymbolString;
         }
@@ -2661,7 +2683,8 @@ class StrModule
             return '';
         }
 
-        $theMb = Lib::mb();
+        Lib::mb();
+
         $thePhp = Lib::php();
         $thePreg = Lib::preg();
         $theType = Lib::type();
@@ -2723,7 +2746,12 @@ class StrModule
 
         $ignoreSymbolsIndex = [];
         foreach ( $gen as $str ) {
-            if ( $theType->letter($str)->isOk([ &$letter ]) ) {
+            $letter = $str;
+
+            if ( true
+                && (is_string($letter))
+                && (mb_strlen($letter) === 1)
+            ) {
                 $letterLower = mb_strtolower($letter);
 
                 $ignoreSymbolsIndex[$letterLower] = true;

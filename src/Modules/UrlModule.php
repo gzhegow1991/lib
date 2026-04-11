@@ -62,9 +62,9 @@ class UrlModule
      * @param string|false|array|null $query
      * @param string|false|null       $fragment
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_url(
+    public function type_url($fb,
         $url, $query = null, $fragment = null,
         ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null,
         array $refs = []
@@ -87,15 +87,17 @@ class UrlModule
 
         if ( null === $url ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `url` should not be null', $url ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ( ! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($url);
+
+        if ( ! $ret->isOk([ &$urlStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -112,7 +114,7 @@ class UrlModule
 
         if ( $hasQuery && (null === $_query) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `query` should be a string, an array or a false', $query ],
                 [ __FILE__, __LINE__ ]
             );
@@ -120,7 +122,7 @@ class UrlModule
 
         if ( $hasFragment && (null === $_fragment) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `fragment` should be a string or the FALSE', $fragment ],
                 [ __FILE__, __LINE__ ]
             );
@@ -132,7 +134,7 @@ class UrlModule
 
         if ( ! $wasHost ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `url` requires a host', $url, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
             );
@@ -149,7 +151,7 @@ class UrlModule
 
                 if ( false === $utf8 ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'Cannot encode `url` host to UTF8 using `idn_to_utf8`', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -162,7 +164,7 @@ class UrlModule
 
                 if ( $theHttp->idn_to_utf8($test) !== $test ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `url` host should be valid UTF8 idn', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -173,7 +175,7 @@ class UrlModule
 
                 if ( $theHttp->idn_to_ascii($test) !== $test ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `url` host should be valid ASCII idn', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -184,7 +186,7 @@ class UrlModule
 
                 if ( false === $ascii ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'Cannot encode `url` host to ASCII using `idn_to_ascii`', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -199,7 +201,7 @@ class UrlModule
 
             if ( urlencode($test) !== $test ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `url` path should already be URL-encoded', $url ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -250,7 +252,7 @@ class UrlModule
 
         $result = $this->url_build($refParseUrl);
 
-        return Ret::ok(null, $result);
+        return Ret::ok($fb, $result);
     }
 
     /**
@@ -258,9 +260,9 @@ class UrlModule
      * @param string|false|array|null $query
      * @param string|false|null       $fragment
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_uri(
+    public function type_uri($fb,
         $url, $query = null, $fragment = null,
         ?int $isHostIdnaAscii = null, ?int $isLinkUrlencoded = null,
         array $refs = []
@@ -283,15 +285,17 @@ class UrlModule
 
         if ( null === $url ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `url` should not be null', $url ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ( ! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($url);
+
+        if ( ! $ret->isOk([ &$urlStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -308,7 +312,7 @@ class UrlModule
 
         if ( $hasQuery && (null === $_query) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `query` should be a string, an array or a false', $query ],
                 [ __FILE__, __LINE__ ]
             );
@@ -316,7 +320,7 @@ class UrlModule
 
         if ( $hasFragment && (null === $_fragment) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `fragment` should be a string or the FALSE', $fragment ],
                 [ __FILE__, __LINE__ ]
             );
@@ -329,7 +333,7 @@ class UrlModule
 
         if ( ! ($wasHost || $wasPath) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `url` requires at least one `host` or `path`' ],
                 [ __FILE__, __LINE__ ]
             );
@@ -347,7 +351,7 @@ class UrlModule
 
                     if ( false === $utf8 ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'Cannot encode `url` host to UTF8 using `idn_to_utf8`', $url ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -360,7 +364,7 @@ class UrlModule
 
                     if ( $theHttp->idn_to_utf8($test) !== $test ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `url` host should be valid UTF8 idn', $url ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -371,7 +375,7 @@ class UrlModule
 
                     if ( $theHttp->idn_to_ascii($test) !== $test ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'The `url` host should be valid ASCII idn', $url ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -382,7 +386,7 @@ class UrlModule
 
                     if ( false === $ascii ) {
                         return Ret::throw(
-                            null,
+                            $fb,
                             [ 'Cannot encode `url` host to ASCII using `idn_to_ascii`', $url ],
                             [ __FILE__, __LINE__ ]
                         );
@@ -399,7 +403,7 @@ class UrlModule
 
                 if ( urlencode($test) !== $test ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `url` path should already be URL-encoded', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -453,15 +457,15 @@ class UrlModule
             ? $this->url_build($refParseUrl)
             : $this->link_build($refParseUrl);
 
-        return Ret::ok(null, $result);
+        return Ret::ok($fb, $result);
     }
 
     /**
      * @param string|true $url
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_host(
+    public function type_host($fb,
         $url,
         ?int $isHostIdnaAscii = null,
         array $refs = []
@@ -480,15 +484,17 @@ class UrlModule
 
         if ( null === $url ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `url` should not be null', $url ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ( ! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($url);
+
+        if ( ! $ret->isOk([ &$urlStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -500,7 +506,7 @@ class UrlModule
 
         if ( ! $wasHost ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `url` requires a host', $url, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
             );
@@ -517,7 +523,7 @@ class UrlModule
 
                 if ( false === $utf8 ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'Cannot encode `url` host to UTF8 using `idn_to_utf8`', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -530,7 +536,7 @@ class UrlModule
 
                 if ( $theHttp->idn_to_utf8($test) !== $test ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `url` host should be valid UTF8 idn', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -541,7 +547,7 @@ class UrlModule
 
                 if ( $theHttp->idn_to_ascii($test) !== $test ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `url` host should be valid ASCII idn', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -552,7 +558,7 @@ class UrlModule
 
                 if ( false === $ascii ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'Cannot encode `url` host to ASCII using `idn_to_ascii`', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -564,15 +570,15 @@ class UrlModule
 
         $result = $this->host_build($refParseUrl);
 
-        return Ret::ok(null, $result);
+        return Ret::ok($fb, $result);
     }
 
     /**
      * @param string|true $url
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_domain(
+    public function type_domain($fb,
         $url,
         ?int $isHostIdnaAscii = null,
         array $refs = []
@@ -591,15 +597,17 @@ class UrlModule
 
         if ( null === $url ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `url` should not be null', $url ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ( ! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($url);
+
+        if ( ! $ret->isOk([ &$urlStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -611,7 +619,7 @@ class UrlModule
 
         if ( ! $wasHost ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `url` requires a host', $url, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
             );
@@ -628,7 +636,7 @@ class UrlModule
 
                 if ( false === $utf8 ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'Cannot encode `url` host to UTF8 using `idn_to_utf8`', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -641,7 +649,7 @@ class UrlModule
 
                 if ( $theHttp->idn_to_utf8($test) !== $test ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `url` host should be valid UTF8 idn', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -652,7 +660,7 @@ class UrlModule
 
                 if ( $theHttp->idn_to_ascii($test) !== $test ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'The `url` host should be valid ASCII idn', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -663,7 +671,7 @@ class UrlModule
 
                 if ( false === $ascii ) {
                     return Ret::throw(
-                        null,
+                        $fb,
                         [ 'Cannot encode `url` host to ASCII using `idn_to_ascii`', $url ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -675,7 +683,7 @@ class UrlModule
 
         $result = $this->domain_build($refParseUrl);
 
-        return Ret::ok(null, $result);
+        return Ret::ok($fb, $result);
     }
 
     /**
@@ -683,9 +691,9 @@ class UrlModule
      * @param string|false|array|null $query
      * @param string|false|null       $fragment
      *
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_link(
+    public function type_link($fb,
         $url, $query = null, $fragment = null,
         ?int $isLinkUrlencoded = null,
         array $refs = []
@@ -707,15 +715,17 @@ class UrlModule
 
         if ( null === $url ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `url` should not be null', $url ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ( ! $theType->string_not_empty($url)->isOk([ &$urlStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($url);
+
+        if ( ! $ret->isOk([ &$urlStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -733,7 +743,7 @@ class UrlModule
 
         if ( $hasQuery && (null === $_query) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `query` should be a string, an array or a false', $query ],
                 [ __FILE__, __LINE__ ]
             );
@@ -741,7 +751,7 @@ class UrlModule
 
         if ( $hasFragment && (null === $_fragment) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `fragment` should be a string or the FALSE', $fragment ],
                 [ __FILE__, __LINE__ ]
             );
@@ -753,7 +763,7 @@ class UrlModule
 
         if ( ! $wasPath ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `url` should have path', $url ],
                 [ __FILE__, __LINE__ ]
             );
@@ -764,7 +774,7 @@ class UrlModule
 
             if ( urlencode($test) !== $test ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `url` path should already be URL-encoded', $url ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -815,14 +825,17 @@ class UrlModule
 
         $result = $this->link_build($refParseUrl);
 
-        return Ret::ok(null, $result);
+        return Ret::ok($fb, $result);
     }
 
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_dsn_pdo($dsn, array $refs = [])
+    public function type_dsn_pdo($fb,
+        $dsn,
+        array $refs = []
+    )
     {
         $theType = Lib::type();
 
@@ -838,9 +851,11 @@ class UrlModule
         }
         $refParseUrl = null;
 
-        if ( ! $theType->string_not_empty($dsn)->isOk([ &$dsnStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($dsn);
+
+        if ( ! $ret->isOk([ &$dsnStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -853,7 +868,7 @@ class UrlModule
 
         if ( ! $wasScheme ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dsn` requires a `scheme`', $dsn, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
             );
@@ -861,7 +876,7 @@ class UrlModule
 
         if ( ! $wasPath ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dsn` requires a `path`', $dsn, $refParseUrl ],
                 [ __FILE__, __LINE__ ]
             );
@@ -874,9 +889,11 @@ class UrlModule
         foreach ( $params as $p ) {
             [ $key, $value ] = explode('=', $p, 2) + [ '', '' ];
 
-            if ( ! $theType->string_not_empty($key)->isOk([ &$keyString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($key);
+
+            if ( ! $ret->isOk([ &$keyString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -887,7 +904,7 @@ class UrlModule
 
         $result = $this->dsn_pdo_build($refParseUrl);
 
-        return Ret::ok(null, $result);
+        return Ret::ok($fb, $result);
     }
 
 
@@ -944,7 +961,7 @@ class UrlModule
             $refs,
         ];
 
-        $result = $this->type_url(...$args)->orThrow();
+        $result = $this->type_url([], ...$args);
 
         return $result;
     }
@@ -990,7 +1007,7 @@ class UrlModule
             $refs,
         ];
 
-        $result = $this->type_uri(...$args)->orThrow();
+        $result = $this->type_uri([], ...$args);
 
         return $result;
     }
@@ -1043,7 +1060,7 @@ class UrlModule
             $refs,
         ];
 
-        $result = $this->type_host(...$args)->orThrow();
+        $result = $this->type_host([], ...$args);
 
         return $result;
     }
@@ -1096,7 +1113,7 @@ class UrlModule
             $refs,
         ];
 
-        $result = $this->type_domain(...$args)->orThrow();
+        $result = $this->type_domain([], ...$args);
 
         return $result;
     }
@@ -1141,7 +1158,7 @@ class UrlModule
             $refs,
         ];
 
-        $result = $this->type_link(...$args)->orThrow();
+        $result = $this->type_link([], ...$args);
 
         return $result;
     }
@@ -1381,7 +1398,8 @@ class UrlModule
         }
         $refParseUrl = null;
 
-        $refParseUrl = $parseUrlResult = $this->parse_url_array($parseUrlResultOriginal);
+        $refParseUrl = $this->parse_url_array($parseUrlResultOriginal);
+        // $refParseUrl = $parseUrlResult = $this->parse_url_array($parseUrlResultOriginal);
 
         // unset(
         //     // $parseUrlResult['scheme'],

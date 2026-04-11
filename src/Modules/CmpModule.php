@@ -680,8 +680,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpTypesStrict(
         $a, $b,
@@ -705,8 +703,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpValuesNan(
         $a, $b,
@@ -730,8 +726,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpValuesNil(
         $a, $b,
@@ -760,8 +754,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpValuesNull(
         $a, $b,
@@ -804,8 +796,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpValuesBoolean(
         $a, $b,
@@ -853,8 +843,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpValuesInteger(
         $a, $b,
@@ -905,8 +893,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpValuesFloat(
         $a, $b,
@@ -988,8 +974,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpValuesNumeric(
         $a, $b,
@@ -1083,8 +1067,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpValuesString(
         $a, $b,
@@ -1172,8 +1154,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpValuesArray(
         $a, $b,
@@ -1230,8 +1210,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpValuesDate(
         $a, $b,
@@ -1269,8 +1247,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpValuesObject(
         $a, $b,
@@ -1303,7 +1279,7 @@ class CmpModule
                 $isCountableB = $theType->countable($b)->isOk([ &$bCountable ]);
 
                 if ( $isCountableA && $isCountableB ) {
-                    $resultCnt = count($a) <=> count($b);
+                    $resultCnt = (count($a) <=> count($b));
 
                     if ( 0 !== $resultCnt ) {
                         $refFnCmpName = __FUNCTION__;
@@ -1341,8 +1317,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpValuesResource(
         $a, $b,
@@ -1380,8 +1354,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpSizesString(
         $a, $b,
@@ -1462,8 +1434,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpSizesArray(
         $a, $b,
@@ -1516,8 +1486,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return null|int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpSizesObject(
         $a, $b,
@@ -1583,8 +1551,6 @@ class CmpModule
      * @param callable|string|null $refFnCmpName
      *
      * @return int|float
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpPeriodsDate(
         \DateTimeInterface $aStart,
@@ -1830,8 +1796,6 @@ class CmpModule
      * @return int|float
      *
      * @throws RuntimeException
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     protected function cmpResultUnknown(
         $result,

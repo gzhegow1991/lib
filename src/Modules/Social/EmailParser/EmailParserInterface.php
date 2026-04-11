@@ -30,4 +30,9 @@ interface EmailParserInterface
         $value, ?array $filters = null,
         ?string &$refEmailDomain = null, ?string &$refEmailName = null
     ) : string;
+
+    public function parseEmailMaybeFake(
+        $value, ?array $filters = null,
+        ?string &$refEmailDomain = null, ?string &$refEmailName = null
+    ) : string;
 }

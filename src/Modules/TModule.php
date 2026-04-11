@@ -2,13 +2,13 @@
 
 namespace Gzhegow\Lib\Modules;
 
-use Gzhegow\Lib\Modules\Type\Traits\TypeTrait;
-use Gzhegow\Lib\Modules\Type\Interfaces\TypeInterface;
+use Gzhegow\Lib\Modules\Type\Traits\TTrait;
+use Gzhegow\Lib\Modules\Type\Interfaces\TInterface;
 
 
-class TypeModule implements TypeInterface
+class TModule implements TInterface
 {
-    use TypeTrait;
+    use TTrait;
 
 
     // public function __construct()

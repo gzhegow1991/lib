@@ -1,12 +1,30 @@
 <?php
 
+/**
+ * @noinspection PhpComposerExtensionStubsInspection
+ */
+
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\Runtime\ExtensionException;
+use Gzhegow\Lib\Exception\RuntimeException;
 
 
+/**
+ * @method mb_chr(...$args)
+ * @method mb_convert_encoding(...$args)
+ * @method mb_detect_encoding(...$args)
+ * @method mb_detect_order(...$args)
+ * @method mb_list_encodings(...$args)
+ * @method mb_ord(...$args)
+ * @method mb_str_split(...$args)
+ * @method mb_strlen(...$args)
+ * @method mb_strpos(...$args)
+ * @method mb_strtolower(...$args)
+ * @method mb_strtoupper(...$args)
+ * @method mb_substr(...$args)
+ */
 class MbModule
 {
     public function __construct()
@@ -15,13 +33,23 @@ class MbModule
 
     public function __initialize()
     {
-        if ( ! extension_loaded('mbstring') ) {
-            throw new ExtensionException(
-                [ 'Missing PHP extension: mbstring' ]
-            );
-        }
+        $theType = Lib::type();
+
+        $theType->is_extension_loaded('mbstring')->orThrow();
 
         return $this;
+    }
+
+
+    public function __call($name, $arguments)
+    {
+        if ( 'mb_' === substr($name, 0, 3) ) {
+            if ( function_exists($name) ) {
+                return call_user_func_array($name, $arguments);
+            }
+        }
+
+        throw new RuntimeException([ 'Method not found: ' . $name ]);
     }
 
 
@@ -75,7 +103,7 @@ class MbModule
         if ( ! isset($cache[$cacheKey]) ) {
             $encsList = mb_list_encodings();
 
-            if ( $thePhp->is_windows() ) {
+            if ( $thePhp->is_os_windows() ) {
                 $encsList[] = 'CP1251';
                 $encsList[] = 'Windows-1251';
             }

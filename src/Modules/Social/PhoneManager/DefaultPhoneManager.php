@@ -288,25 +288,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
     public function parsePhone($value, ?string &$refTel = null, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
     {
-        $refTel = null;
-
-        $telParsed = $this->parseTel($value, $refTelDigits, $refTelPlus);
-
-        $allowedSymbolsRegex = ''
-            . '[^'
-            . '0-9'
-            . preg_quote(' ()-', '/')
-            . ']';
-
-        $phone = preg_replace("/{$allowedSymbolsRegex}/", '', $value);
-
-        if ( $refTelPlus ) {
-            $phone = '+' . $phone;
-        }
-
-        $refTel = $telParsed;
-
-        return $phone;
+        return $this->parsePhoneNonFake($value, $refTel, $refTelDigits, $refTelPlus);
     }
 
     public function parsePhoneFake($value, ?string &$refTel = null, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
@@ -336,7 +318,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
     {
         $refTel = null;
 
-        $telNonFake = $this->parseTelNonFake($value, $refTelDigits, $refTelPlus);
+        $telNonFake = $this->parseTel($value, $refTelDigits, $refTelPlus);
 
         $allowedSymbolsRegex = ''
             . '[^'
@@ -355,6 +337,29 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $phoneNonFake;
     }
 
+    public function parsePhoneMaybeFake($value, ?string &$refTel = null, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
+    {
+        $refTel = null;
+
+        $telParsed = $this->parseTelMaybeFake($value, $refTelDigits, $refTelPlus);
+
+        $allowedSymbolsRegex = ''
+            . '[^'
+            . '0-9'
+            . preg_quote(' ()-', '/')
+            . ']';
+
+        $phone = preg_replace("/{$allowedSymbolsRegex}/", '', $value);
+
+        if ( $refTelPlus ) {
+            $phone = '+' . $phone;
+        }
+
+        $refTel = $telParsed;
+
+        return $phone;
+    }
+
     public function parsePhoneReal(
         $value, ?string $region = '',
         ?string &$refRegionDetected = null,
@@ -363,7 +368,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
     {
         $refTel = null;
 
-        $telNonFake = $this->parseTelNonFake(
+        $telNonFake = $this->parseTel(
             $value,
             $refTelDigits, $refTelPlus
         );
@@ -382,6 +387,86 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
 
     public function parseTel($value, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
+    {
+        return $this->parseTelNonFake($value, $refTelDigits, $refTelPlus);
+    }
+
+    public function parseTelFake($value, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
+    {
+        $telString = $this->parseTelMaybeFake($value, $refTelDigits, $refTelPlus);
+
+        $isFake = null;
+
+        foreach ( $this->phoneFakeRegexIndex as $regexp => $bool ) {
+            if ( preg_match($regexp, $telString) ) {
+                $isFake = true;
+
+                break;
+            }
+        }
+
+        if ( null === $isFake ) {
+            if ( $this->usePhoneFakeDatelike ) {
+                try {
+                    $dt = \DateTime::createFromFormat('YmdHis', $refTelDigits);
+
+                    if ( false !== $dt ) {
+                        $isFake = true;
+                    }
+                }
+                catch ( \Throwable $e ) {
+                }
+            }
+        }
+
+        if ( null === $isFake ) {
+            throw new RuntimeException(
+                [
+                    'The `value` should be a fake phone number',
+                    $value,
+                ]
+            );
+        }
+
+        return $telString;
+    }
+
+    public function parseTelNonFake($value, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
+    {
+        $telString = $this->parseTelMaybeFake($value, $refTelDigits, $refTelPlus);
+
+        foreach ( $this->phoneFakeRegexIndex as $regexp => $bool ) {
+            if ( preg_match($regexp, $telString) ) {
+                throw new RuntimeException(
+                    [
+                        'The `value` must not match any of `phoneFakeRegexIndex` items',
+                        $value,
+                    ]
+                );
+            }
+        }
+
+        if ( $this->usePhoneFakeDatelike ) {
+            try {
+                $dt = \DateTime::createFromFormat('+YmdHis', $telString);
+
+                if ( false !== $dt ) {
+                    throw new RuntimeException(
+                        [
+                            'The `value` should not be a datelike phone',
+                            $value,
+                        ]
+                    );
+                }
+            }
+            catch ( \Throwable $e ) {
+            }
+        }
+
+        return $telString;
+    }
+
+    public function parseTelMaybeFake($value, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
     {
         $refTelDigits = null;
         $refTelPlus = null;
@@ -429,88 +514,13 @@ class DefaultPhoneManager implements PhoneManagerInterface
         return $tel;
     }
 
-    public function parseTelFake($value, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
-    {
-        $telString = $this->parseTel($value, $refTelDigits, $refTelPlus);
-
-        $isFake = null;
-
-        foreach ( $this->phoneFakeRegexIndex as $regexp => $bool ) {
-            if ( preg_match($regexp, $telString) ) {
-                $isFake = true;
-
-                break;
-            }
-        }
-
-        if ( null === $isFake ) {
-            if ( $this->usePhoneFakeDatelike ) {
-                try {
-                    $dt = \DateTime::createFromFormat('YmdHis', $refTelDigits);
-
-                    if ( false !== $dt ) {
-                        $isFake = true;
-                    }
-                }
-                catch ( \Throwable $e ) {
-                }
-            }
-        }
-
-        if ( null === $isFake ) {
-            throw new RuntimeException(
-                [
-                    'The `value` should be a fake phone number',
-                    $value,
-                ]
-            );
-        }
-
-        return $telString;
-    }
-
-    public function parseTelNonFake($value, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string
-    {
-        $telString = $this->parseTel($value, $refTelDigits, $refTelPlus);
-
-        foreach ( $this->phoneFakeRegexIndex as $regexp => $bool ) {
-            if ( preg_match($regexp, $telString) ) {
-                throw new RuntimeException(
-                    [
-                        'The `value` must not match any of `phoneFakeRegexIndex` items',
-                        $value,
-                    ]
-                );
-            }
-        }
-
-        if ( $this->usePhoneFakeDatelike ) {
-            try {
-                $dt = \DateTime::createFromFormat('+YmdHis', $telString);
-
-                if ( false !== $dt ) {
-                    throw new RuntimeException(
-                        [
-                            'The `value` should not be a datelike phone',
-                            $value,
-                        ]
-                    );
-                }
-            }
-            catch ( \Throwable $e ) {
-            }
-        }
-
-        return $telString;
-    }
-
     public function parseTelReal(
         $value, ?string $region = '',
         ?string &$refRegionDetected = null,
         ?string &$refTelDigits = null, ?string &$refTelPlus = null
     ) : string
     {
-        $telNonFake = $this->parseTelNonFake(
+        $telNonFake = $this->parseTel(
             $value,
             $refTelDigits, $refTelPlus
         );
@@ -528,8 +538,6 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
     /**
      * @return object|\libphonenumber\PhoneNumber
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     public function parsePhoneNumber(
         $value, ?string $region = '',
@@ -546,7 +554,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
         } else {
             $thePhoneNumberUtil = $this->getGiggseyPhoneNumberUtil();
 
-            $phoneString = $this->parsePhone($value, $tel, $telDigits);
+            $phoneString = $this->parsePhoneMaybeFake($value, $tel, $telDigits);
 
             if ( '' === $region ) {
                 $regionString = null;
@@ -665,7 +673,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             $phoneNumberObject = $phoneNumber;
 
         } else {
-            $tel = $this->parseTelNonFake($phoneNumber);
+            $tel = $this->parseTel($phoneNumber);
 
             $phoneNumberObject = $this->parsePhoneNumber(
                 $tel, $region
@@ -689,7 +697,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             $phoneNumberObject = $phoneNumber;
 
         } else {
-            $tel = $this->parseTelNonFake($phoneNumber);
+            $tel = $this->parseTel($phoneNumber);
 
             $phoneNumberObject = $this->parsePhoneNumber(
                 $tel, $region
@@ -713,7 +721,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             $phoneNumberObject = $phoneNumber;
 
         } else {
-            $tel = $this->parseTelNonFake($phoneNumber);
+            $tel = $this->parseTel($phoneNumber);
 
             $phoneNumberObject = $this->parsePhoneNumber(
                 $tel, $region
@@ -737,7 +745,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
             $phoneNumberObject = $phoneNumber;
 
         } else {
-            $tel = $this->parseTelNonFake($phoneNumber);
+            $tel = $this->parseTel($phoneNumber);
 
             $phoneNumberObject = $this->parsePhoneNumber(
                 $tel, $region
@@ -755,7 +763,7 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
     public function detectRegion($phone) : string
     {
-        $tel = $this->parseTelNonFake($phone, $telDigits);
+        $tel = $this->parseTel($phone, $telDigits);
 
         $regionString = null;
 

@@ -24,7 +24,7 @@ class EntrypointPhpErrorReportingDriver extends AbstractEntrypointDriver
         $theType = Lib::type();
 
         $bool = (0 === ($value & ~(E_ALL | E_DEPRECATED | E_USER_DEPRECATED)));
-        $theType->true($bool)->orThrow();
+        $theType->bool_true($bool)->orThrow();
 
         $configCurrent[EntrypointModule::OPT_PHP_ERROR_REPORTING] = $value;
     }

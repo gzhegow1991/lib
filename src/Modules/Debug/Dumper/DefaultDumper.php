@@ -119,8 +119,6 @@ class DefaultDumper implements DumperInterface
      * @param null|object|\Symfony\Component\VarDumper\Cloner\ClonerInterface $symfonyCloner
      *
      * @return object
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     public function withSymfonyCloner(?object $symfonyCloner) : object
     {
@@ -183,8 +181,6 @@ class DefaultDumper implements DumperInterface
      * @param null|object|\Symfony\Component\VarDumper\Dumper\CliDumper $symfonyCliDumper
      *
      * @return object
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     public function withSymfonyCliDumper(?object $symfonyCliDumper) : object
     {
@@ -239,8 +235,6 @@ class DefaultDumper implements DumperInterface
      * @param null|object|\Symfony\Component\VarDumper\Dumper\HtmlDumper $symfonyHtmlDumper
      *
      * @return object
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     public function withSymfonyHtmlDumper(?object $symfonyHtmlDumper) : object
     {
@@ -407,7 +401,7 @@ class DefaultDumper implements DumperInterface
     {
         $thePhp = Lib::php();
 
-        return $thePhp->is_terminal()
+        return $thePhp->is_sapi_terminal()
             ? $this->printerPrint_symfony_cli(...$vars)
             : $this->printerPrint_symfony_html(...$vars);
     }
@@ -445,7 +439,7 @@ class DefaultDumper implements DumperInterface
                 break;
 
             case '':
-                if ( $thePhp->is_terminal() ) {
+                if ( $thePhp->is_sapi_terminal() ) {
                     $dumper->setColors(true);
 
                 } elseif ( $theHttp->is_api() ) {
@@ -520,7 +514,7 @@ class DefaultDumper implements DumperInterface
                 break;
 
             case '':
-                if ( $thePhp->is_terminal() ) {
+                if ( $thePhp->is_sapi_terminal() ) {
                     $dumper->setColors(true);
 
                 } elseif ( $theHttp->is_api() ) {
@@ -694,7 +688,7 @@ class DefaultDumper implements DumperInterface
     {
         $thePhp = Lib::php();
 
-        $thePhp->is_terminal()
+        $thePhp->is_sapi_terminal()
             ? $this->dumperDump_echo_text(...$vars)
             : $this->dumperDump_echo_html(...$vars);
     }

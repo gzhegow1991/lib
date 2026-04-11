@@ -9,13 +9,9 @@ use Gzhegow\Lib\Modules\Type\Ret;
 class FormatSerialize
 {
     /**
-     * @param array{ 0?: mixed }|null $fallback # Pass `null` to return Ret<T> or pass `[]` to throw exception
-     *
-     * @param mixed                   $data
-     *
-     * @return string|Ret<string>
+     * @return Ret<string>|string
      */
-    public function serialize(?array $fallback, $data)
+    public function serialize($fb, $data)
     {
         $theFunc = Lib::func();
 
@@ -26,32 +22,40 @@ class FormatSerialize
             );
         }
         catch ( \Throwable $e ) {
-            return Ret::throw($fallback, $e);
+            return Ret::throw(
+                $fb,
+                $e,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if ( ! is_string($result) ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `serialize` returned non-string, serialization is failed', $result ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fallback, $result);
+        return Ret::ok($fb, $result);
     }
 
     /**
-     * @param array{ 0?: mixed }|null $fallback # Pass `null` to return Ret<T> or pass `[]` to throw exception
-     *
-     * @return mixed|Ret<mixed>
+     * @return Ret<mixed>|mixed
      */
-    public function unserialize(?array $fallback, $serialized)
+    public function unserialize($fb, $serialized)
     {
         $theFunc = Lib::func();
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($serialized)->isOk([ &$serializedString, &$ret ]) ) {
-            return Ret::throw($fallback, $ret);
+        $ret = $theType->string_not_empty($serialized);
+
+        if ( ! $ret->isOk([ &$serializedString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         try {
@@ -61,17 +65,21 @@ class FormatSerialize
             );
         }
         catch ( \Throwable $e ) {
-            return Ret::throw($fallback, $e);
+            return Ret::throw(
+                $fb,
+                $e,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if ( is_object($result) && (get_class($result) === '__PHP_Incomplete_Class') ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `unserialize` returned object of class that was not loaded in current PHP script', $result ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fallback, $result);
+        return Ret::ok($fb, $result);
     }
 }

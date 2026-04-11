@@ -58,7 +58,7 @@ class DefaultCookies implements CookiesInterface
 
             $httpCookie = HttpCookie::fromObjectHttpHeader($httpHeader)->orThrow();
 
-            $this->registerCookie($httpCookie, $alreadySent = true);
+            $this->registerCookie($httpCookie, true);
         }
     }
 

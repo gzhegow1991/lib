@@ -1,10 +1,15 @@
 <?php
 
+/**
+ * @noinspection PhpComposerExtensionStubsInspection
+ */
+
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class PregModule
@@ -15,21 +20,35 @@ class PregModule
 
     public function __initialize()
     {
+        if ( ! extension_loaded('mbstring') ) {
+            throw new ExtensionException(
+                [ 'Missing PHP extension: mbstring' ]
+            );
+        }
+
+        if ( ! extension_loaded('pcre') ) {
+            throw new ExtensionException(
+                [ 'Missing PHP extension: pcre' ]
+            );
+        }
+
         return $this;
     }
 
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_regex($value)
+    public function type_regex($fb, $value)
     {
         $theFunc = Lib::func();
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -45,7 +64,7 @@ class PregModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid regex', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -53,26 +72,28 @@ class PregModule
 
         if ( false === $isMatch ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid regex', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $valueStringNotEmpty);
+        return Ret::ok($fb, $valueStringNotEmpty);
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_regexp($value, string $enclosure = '/', ?string $flags = null)
+    public function type_regexp($fb, $value, string $enclosure = '/', ?string $flags = null)
     {
         $theFunc = Lib::func();
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -86,7 +107,7 @@ class PregModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid regexp', $value ],
                 [ __FILE__, __LINE__ ]
             );
@@ -94,13 +115,13 @@ class PregModule
 
         if ( false === $isMatch ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid regexp', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $valueStringNotEmpty);
+        return Ret::ok($fb, $valueStringNotEmpty);
     }
 
 
@@ -112,11 +133,11 @@ class PregModule
 
         $result = '';
         for ( $i = 0; $i < $len; $i++ ) {
-            $letter = mb_substr($string, $i, 1);
+            $letter = $theMb->mb_substr($string, $i, 1);
 
             $code = (null !== $mb_encoding)
-                ? mb_ord($letter, $mb_encoding)
-                : mb_ord($letter);
+                ? $theMb->mb_ord($letter, $mb_encoding)
+                : $theMb->mb_ord($letter);
 
             $result .= sprintf('\\x{%X}', $code);
         }

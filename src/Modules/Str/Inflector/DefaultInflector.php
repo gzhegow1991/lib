@@ -49,8 +49,6 @@ class DefaultInflector implements InflectorInterface
      * @param null|object|\Symfony\Component\String\Inflector\InflectorInterface $doctrineInflector
      *
      * @return object
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     public function withDoctrineInflector(?object $doctrineInflector) : object
     {
@@ -120,8 +118,6 @@ class DefaultInflector implements InflectorInterface
      * @param null|object|\Symfony\Component\String\Inflector\InflectorInterface $symfonyInflector
      *
      * @return object
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     public function withSymfonyInflector(?object $symfonyInflector) : object
     {

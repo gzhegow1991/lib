@@ -22,9 +22,9 @@ class ArrStrict implements
 
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromValid($from, ?array $fallback = null)
+    public static function fromValid($from, $fb = null)
     {
         $ret = Ret::new();
 
@@ -32,43 +32,47 @@ class ArrStrict implements
             ?? static::fromStatic($from)->orNull($ret)
             ?? static::fromValidArray($from)->orNull($ret);
 
-        if ( $ret->isFail() ) {
-            return Ret::throw($fallback, $ret);
+        if ( ! $ret->isOk() ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromStatic($from, ?array $fallback = null)
+    public static function fromStatic($from, $fb = null)
     {
         if ( $from instanceof static ) {
-            return Ret::ok($fallback, $from);
+            return Ret::ok($fb, $from);
         }
 
         return Ret::throw(
-            $fallback,
+            $fb,
             [ 'The `from` should be an instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromValidArray($from, ?array $fallback = null)
+    public static function fromValidArray($from, $fb = null)
     {
         if ( is_array($from) ) {
             $instance = new static();
             $instance->array = $from;
 
-            return Ret::ok($fallback, $instance);
+            return Ret::ok($fb, $instance);
         }
 
         return Ret::throw(
-            $fallback,
+            $fb,
             [ 'The `from` should be an array', $from ],
             [ __FILE__, __LINE__ ]
         );

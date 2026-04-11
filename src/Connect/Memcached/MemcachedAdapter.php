@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @noinspection PhpComposerExtensionStubsInspection
+ */
+
 namespace Gzhegow\Lib\Connect\Memcached;
 
 use Gzhegow\Lib\Lib;
@@ -77,9 +81,9 @@ class MemcachedAdapter
 
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function from($from, ?array $fallback = null)
+    public static function from($from, $fb = null)
     {
         $ret = Ret::new();
 
@@ -88,56 +92,60 @@ class MemcachedAdapter
             ?? static::fromMemcached($from)->orNull($ret)
             ?? static::fromArray($from)->orNull($ret);
 
-        if ( $ret->isFail() ) {
-            return Ret::throw($fallback, $ret);
+        if ( ! $ret->isOk() ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromStatic($from, ?array $fallback = null)
+    public static function fromStatic($from, $fb = null)
     {
         if ( $from instanceof static ) {
-            return Ret::ok($fallback, $from);
+            return Ret::ok($fb, $from);
         }
 
         return Ret::throw(
-            $fallback,
+            $fb,
             [ 'The `from` should be an instance of: ' . static::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromMemcached($from, ?array $fallback = null)
+    public static function fromMemcached($from, $fb = null)
     {
         if ( $from instanceof \Memcached ) {
             $instance = new static();
             $instance->memcached = $from;
 
-            return Ret::ok($fallback, $instance);
+            return Ret::ok($fb, $instance);
         }
 
         return Ret::throw(
-            $fallback,
+            $fb,
             [ 'The `from` should be an instance of: ' . \Memcached::class, $from ],
             [ __FILE__, __LINE__ ]
         );
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromArray($from, ?array $fallback = null)
+    public static function fromArray($from, $fb = null)
     {
         if ( ! is_array($from) ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `from` should be array', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -207,7 +215,7 @@ class MemcachedAdapter
         if ( $isMemcached ) {
             if ( ! ($memcached instanceof \Memcached) ) {
                 return Ret::throw(
-                    $fallback,
+                    $fb,
                     [ 'The `redis` should be instance of: ' . \Redis::class, $memcached ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -218,14 +226,18 @@ class MemcachedAdapter
             $sock = null;
 
         } elseif ( $isDsn ) {
-            $status = $theType->url(
+            $ret = $theType->url(
                 $dsn, null, null,
                 0, 0,
                 [ &$parseUrl ]
-            )->isOk([ &$dsn, &$ret ]);
+            );
 
-            if ( false === $status ) {
-                return Ret::throw($fallback, $ret);
+            if ( ! $ret->isOk([ &$dsn ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             $host = $host ?? $parseUrl['host'] ?? null;
@@ -252,7 +264,7 @@ class MemcachedAdapter
 
         } else {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [
                     ''
                     . 'The `from` should contain at least one of: '
@@ -271,31 +283,61 @@ class MemcachedAdapter
             //
 
         } elseif ( $isDsn || $isHost ) {
-            if ( ! $theType->string_not_empty($host)->isOk([ &$host, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->string_not_empty($host);
+
+            if ( ! $ret->isOk([ &$host ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
             $port = $port ?: 11211;
 
-            if ( ! $theType->int_positive($port)->isOk([ &$port, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->int_positive($port);
+
+            if ( ! $ret->isOk([ &$port ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
 
         } elseif ( $isSock ) {
-            if ( ! $theType->string_not_empty($sock)->isOk([ &$sock, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->string_not_empty($sock);
+
+            if ( ! $ret->isOk([ &$sock ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
         $weight = $weight ?: 0;
 
-        if ( ! $theType->int_non_negative($weight)->isOk([ &$weight, &$ret ]) ) {
-            return Ret::throw($fallback, $ret);
+        $ret = $theType->int_non_negative($weight);
+
+        if ( ! $ret->isOk([ &$weight ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if ( null !== $namespace ) {
-            if ( ! $theType->string_not_empty($namespace)->isOk([ &$namespace, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->string_not_empty($namespace);
+
+            if ( ! $ret->isOk([ &$namespace ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
@@ -304,16 +346,28 @@ class MemcachedAdapter
             $connectionStr = $memcachedOptionsNew['connection_str'] ?? null;
 
             if ( null !== $persistentId ) {
-                if ( ! $theType->string_not_empty($persistentId)->isOk([ &$persistentId, &$ret ]) ) {
-                    return Ret::throw($fallback, $ret);
+                $ret = $theType->string_not_empty($persistentId);
+
+                if ( ! $ret->isOk([ &$persistentId ]) ) {
+                    return Ret::throw(
+                        $fb,
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
 
                 $memcachedOptionsNew['persistent_id'] = $persistentId;
             }
 
             if ( null !== $connectionStr ) {
-                if ( ! $theType->string_not_empty($connectionStr)->isOk([ &$connectionStr, &$ret ]) ) {
-                    return Ret::throw($fallback, $ret);
+                $ret = $theType->string_not_empty($connectionStr);
+
+                if ( ! $ret->isOk([ &$connectionStr ]) ) {
+                    return Ret::throw(
+                        $fb,
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
 
                 $memcachedOptionsNew['connection_str'] = $connectionStr;
@@ -346,7 +400,7 @@ class MemcachedAdapter
             foreach ( $shardList as $i => $r ) {
                 if ( ! is_array($r) ) {
                     return Ret::throw(
-                        $fallback,
+                        $fb,
                         [ 'Each of `from[shard]` should be array', $from, $r, $i ],
                         [ __FILE__, __LINE__ ]
                     );
@@ -354,7 +408,7 @@ class MemcachedAdapter
 
                 if ( $diff = array_diff_key($r, $configDefault) ) {
                     return Ret::throw(
-                        $fallback,
+                        $fb,
                         [
                             ''
                             . 'The `from[shard]` item contains unexpected keys: '
@@ -372,7 +426,7 @@ class MemcachedAdapter
             $instance->configShardList = $shardList;
         }
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
 

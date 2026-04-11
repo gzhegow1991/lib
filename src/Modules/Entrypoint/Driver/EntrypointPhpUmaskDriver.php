@@ -28,7 +28,7 @@ class EntrypointPhpUmaskDriver extends AbstractEntrypointDriver
         $theType = Lib::type();
 
         $bool = (($value >= 0) && ($value <= 0777));
-        $theType->true($bool)->orThrow();
+        $theType->bool_true($bool)->orThrow();
 
         $configCurrent[EntrypointModule::OPT_PHP_UMASK] = $value;
     }

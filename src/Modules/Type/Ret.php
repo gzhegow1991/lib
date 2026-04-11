@@ -73,12 +73,12 @@ class Ret
 
 
     /**
-     * @param static|mixed $fallback
-     * @param T            $value
+     * @param static|array{ 0: mixed }|string|null $fb
+     * @param T                                    $value
      *
      * @return T|static<T>
      */
-    public static function ok($fallback, $value)
+    public static function ok($fb, $value)
     {
         if ( $value instanceof self ) {
             throw new LogicException(
@@ -86,59 +86,73 @@ class Ret
             );
         }
 
-        $theRet = static::new();
-        $theRet->value = [ $value ];
+        if ( null === $fb ) {
+            $theRet = static::new();
+            $theRet->value = [ $value ];
 
-        if ( null === $fallback ) {
             return $theRet;
 
-        } elseif ( $fallback instanceof self ) {
-            $fallback->mergeFrom($theRet);
+        } elseif ( is_bool($fb) ) {
+            return $fb->getStatus();
 
-            return $fallback->isOk();
+        } elseif ( is_array($fb) ) {
+            return $value;
+
+        } elseif ( $fb instanceof self ) {
+            $theRet = static::new();
+            $theRet->value = [ $value ];
+
+            $fb->mergeFrom($theRet);
+
+            return $fb->getStatus();
         }
 
         return $value;
     }
 
     /**
-     * @param static|mixed $fallback
-     * @param static|mixed $errArg
+     * @param static|array{ 0: mixed }|string|null $fb
+     * @param static|mixed                         $err
      *
      * @return T|static<T>
      */
-    public static function throw($fallback, $errArg, array $fileLine = [], ...$errArgs)
+    public static function throw($fb, $err, array $fileLine = [], ...$errArgs)
     {
         $theRet = static::new();
 
-        if ( $errArg instanceof self ) {
-            $theRet->mergeFrom($errArg);
+        if ( $err instanceof self ) {
+            $theRet->mergeFrom($err);
 
             if ( [] !== $errArgs ) {
                 $theRet->_addError(null, $fileLine, ...$errArgs);
 
-            } elseif ( ([] !== $fileLine) && ([] !== $errArg->errorsRaw) ) {
-                $errorLast = end($errArg->errorsRaw);
+            } elseif ( ([] !== $fileLine) && ([] !== $err->errorsRaw) ) {
+                $errorLast = end($err->errorsRaw);
 
                 $theRet->_addError($errorLast['trace'], $fileLine, ...$errorLast['throwable_args']);
             }
 
         } else {
-            $theRet->_addError(null, $fileLine, $errArg, $errArgs);
+            $theRet->_addError(null, $fileLine, $err, $errArgs);
         }
 
-        if ( null === $fallback ) {
+        if ( null === $fb ) {
             return $theRet;
 
-        } elseif ( is_array($fallback) ) {
-            if ( array_key_exists(0, $fallback) ) {
-                return $fallback[0];
+        } elseif ( is_bool($fb) ) {
+            return $fb->getStatus();
+
+        } elseif ( is_array($fb) ) {
+            if ( array_key_exists(0, $fb) ) {
+                return $fb[0];
             }
 
-        } elseif ( $fallback instanceof self ) {
-            $fallback->mergeFrom($theRet);
+            return $theRet->throwErrors();
 
-            return $fallback->isOk();
+        } elseif ( $fb instanceof self ) {
+            $fb->mergeFrom($theRet);
+
+            return $fb->getStatus();
         }
 
         $theRet->throwErrors();
@@ -150,6 +164,17 @@ class Ret
         return [] !== $this->value;
     }
 
+    public function isTrue() : bool
+    {
+        return [] !== $this->value;
+    }
+
+    public function isFalse() : bool
+    {
+        return [] === $this->value;
+    }
+
+
     /**
      * @return T
      */
@@ -157,7 +182,7 @@ class Ret
     {
         if ( [] === $this->value ) {
             throw new RuntimeException(
-                [ 'The `value` should exists', $this ]
+                [ 'The `value` is undefined', $this ]
             );
         }
 
@@ -347,38 +372,38 @@ class Ret
      *
      * @return T
      */
-    public function orThrow($errArg = null, array $fileLine = [], ...$errArgs)
+    public function orThrow($err = null, array $fileLine = [], ...$errArgs)
     {
         if ( [] !== $this->value ) {
             return $this->value[0];
         }
 
-        if ( null !== $errArg ) {
-            $this->_addError(null, $fileLine, $errArg, ...$errArgs);
+        if ( null !== $err ) {
+            $this->_addError(null, $fileLine, $err, ...$errArgs);
         }
 
         $this->throwErrors();
     }
 
     /**
-     * @param array{ 0?: mixed }         $fallback
+     * @param array{ 0?: mixed }         $fb
      *
      * @param array{ 0: string, 1: int } $fileLine
      *
      * @return T|mixed
      */
-    public function orFallback(array $fallback = [], $errArg = null, array $fileLine = [], ...$errArgs)
+    public function orFallback(array $fb, $err = null, array $fileLine = [], ...$errArgs)
     {
         if ( [] !== $this->value ) {
             return $this->value[0];
         }
 
-        if ( [] !== $fallback ) {
-            return $fallback[0];
+        if ( [] !== $fb ) {
+            return $fb[0];
         }
 
-        if ( null !== $errArg ) {
-            $this->_addError(null, $fileLine, $errArg, ...$errArgs);
+        if ( null !== $err ) {
+            $this->_addError(null, $fileLine, $err, ...$errArgs);
         }
 
         $this->throwErrors();
@@ -524,7 +549,7 @@ class Ret
         }
     }
 
-    protected function throwErrors() : void
+    protected function throwErrors()
     {
         $errorsRaw = $this->errorsRaw;
 

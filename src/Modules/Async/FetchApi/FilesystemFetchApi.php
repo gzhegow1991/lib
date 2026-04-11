@@ -1,10 +1,13 @@
 <?php
 
+/**
+ * @noinspection PhpComposerExtensionStubsInspection
+ */
+
 namespace Gzhegow\Lib\Modules\Async\FetchApi;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class FilesystemFetchApi implements FetchApiInterface
@@ -56,13 +59,9 @@ class FilesystemFetchApi implements FetchApiInterface
 
     public function __construct(array $config = [])
     {
-        if ( ! extension_loaded('curl') ) {
-            throw new ExtensionException(
-                [ 'Missing PHP extension: curl' ]
-            );
-        }
-
         $theType = Lib::type();
+
+        $theType->is_extension_loaded('curl')->orThrow();
 
         $binDirDefault = $theType->realpath(__DIR__ . '/../../../../bin/php/')->orThrow();
         $binDirRealpath = '';

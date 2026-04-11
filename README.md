@@ -958,29 +958,29 @@ $fn = function () use ($ffn) {
 
     $tag = 'tag';
 
-    \Gzhegow\Lib\Lib::benchmark(0, $tag);
+    \Gzhegow\Lib\Lib::mt(0, $tag);
 
     for ( $i = 0; $i < 2; $i++ ) {
         $ttag = 'tag' . $i;
 
-        \Gzhegow\Lib\Lib::benchmark(0, $ttag);
+        \Gzhegow\Lib\Lib::mt(0, $ttag);
 
         for ( $ii = 0; $ii < 2; $ii++ ) {
             $tttag = 'tag' . $i . $ii;
 
-            \Gzhegow\Lib\Lib::benchmark(0, $tttag);
+            \Gzhegow\Lib\Lib::mt(0, $tttag);
 
             usleep(1e4);
 
-            \Gzhegow\Lib\Lib::benchmark(1, $tttag);
+            \Gzhegow\Lib\Lib::mt(1, $tttag);
         }
 
-        \Gzhegow\Lib\Lib::benchmark(1, $ttag);
+        \Gzhegow\Lib\Lib::mt(1, $ttag);
     }
 
-    \Gzhegow\Lib\Lib::benchmark(1, $tag);
+    \Gzhegow\Lib\Lib::mt(1, $tag);
 
-    $report = \Gzhegow\Lib\Lib::benchmark();
+    $report = \Gzhegow\Lib\Lib::mt();
 
     $expect = [
         'tag'   => (4 * 1e-4),
@@ -1177,27 +1177,27 @@ $fn = function () use ($ffn) {
     $arr3 = [ [ [ true ] ] ];
 
     $status = [];
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr0, 1)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr0, 2)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr0, 3)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr0, 1)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr0, 2)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr0, 3)->isOk();
     $ffn->print(...$status);
 
     $status = [];
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr1, 1)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr1, 2)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr1, 3)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr1, 1)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr1, 2)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr1, 3)->isOk();
     $ffn->print(...$status);
 
     $status = [];
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr2, 1)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr2, 2)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr2, 3)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr2, 1)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr2, 2)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr2, 3)->isOk();
     $ffn->print(...$status);
 
     $status = [];
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr3, 1)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr3, 2)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain($arr3, 3)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr3, 1)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr3, 2)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr3, 3)->isOk();
     $ffn->print(...$status);
 
     echo "\n";
@@ -1591,61 +1591,61 @@ $fn = function () use ($ffn) {
     $ffn->print('[ BcmathModule ]');
     echo "\n";
 
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('0');
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_ceil('0');
     $ffn->print('bcabs', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005');
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_ceil('1.005');
     $ffn->print('bcabs', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005');
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_ceil('-1.005');
     $ffn->print('bcabs', (string) $result, $result);
     echo "\n";
 
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('0');
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_ceil('0');
     $ffn->print('bcceil', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('1.005');
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_ceil('1.005');
     $ffn->print('bcceil', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcceil('-1.005');
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_ceil('-1.005');
     $ffn->print('bcceil', (string) $result, $result);
     echo "\n";
 
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('0');
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_floor('0');
     $ffn->print('bcfloor', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('1.005');
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_floor('1.005');
     $ffn->print('bcfloor', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcfloor('-1.005');
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_floor('-1.005');
     $ffn->print('bcfloor', (string) $result, $result);
     echo "\n";
 
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(5.75, 2);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_mod(5.75, 2);
     $ffn->print('bcmod', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(-5.75, 2);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_mod(-5.75, 2);
     $ffn->print('bcmod', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(5.75, 2.25);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_mod(5.75, 2.25);
     $ffn->print('bcmod', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcmod(-5.75, 2.25);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_mod(-5.75, 2.25);
     $ffn->print('bcmod', (string) $result, $result);
     echo "\n";
 
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcfmod(5.75, 2, 2);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_fmod(5.75, 2, 2);
     $ffn->print('bcfmod', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcfmod(-5.75, 2, 2);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_fmod(-5.75, 2, 2);
     $ffn->print('bcfmod', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcfmod(5.75, 2.25, 2);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_fmod(5.75, 2.25, 2);
     $ffn->print('bcfmod', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcfmod(-5.75, 2.25, 2);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_fmod(-5.75, 2.25, 2);
     $ffn->print('bcfmod', (string) $result, $result);
     echo "\n";
 
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcgcd(8, 12);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_gcd(8, 12);
     $ffn->print('bcgcd', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bcgcd(7, 13);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_gcd(7, 13);
     $ffn->print('bcgcd', (string) $result, $result);
     echo "\n";
 
-    $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 6);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_lcm(8, 6);
     $ffn->print('bclcm', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 5);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_lcm(8, 5);
     $ffn->print('bclcm', (string) $result, $result);
-    $result = \Gzhegow\Lib\Lib::bcmath()->bclcm(8, 10);
+    $result = \Gzhegow\Lib\Lib::bcmath()->bc_lcm(8, 10);
     $ffn->print('bclcm', (string) $result, $result);
     echo "\n";
 
@@ -1740,7 +1740,7 @@ $fn = function () use ($ffn) {
 
                     $nString = ".{$precision}|{$n}";
 
-                    $res = \Gzhegow\Lib\Lib::bcmath()->bcmathround(
+                    $res = \Gzhegow\Lib\Lib::bcmath()->bc_mathround(
                         $v, $precision,
                         $f, $f
                     );
@@ -1772,7 +1772,7 @@ $fn = function () use ($ffn) {
 
                     $nString = ".{$precision}|{$n}";
 
-                    $res = \Gzhegow\Lib\Lib::bcmath()->bcmoneyround(
+                    $res = \Gzhegow\Lib\Lib::bcmath()->bc_moneyround(
                         $v, $precision,
                         $f, $f
                     );
@@ -2614,155 +2614,155 @@ $fn = function () use ($ffn) {
     date_default_timezone_set('UTC');
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone('+0100')->isOk([ &$dateTimezone ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone(null, '+0100')->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone('EET')->isOk([ &$dateTimezone ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone(null, 'EET')->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone('Europe/Minsk')->isOk([ &$dateTimezone ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone(null, 'Europe/Minsk')->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone(new \DateTimeZone('UTC'))->isOk([ &$dateTimezone ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone(null, new \DateTimeZone('UTC'))->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone(new \DateTime('now', new \DateTimeZone('UTC')))->isOk([ &$dateTimezone ]);
-    $ffn->print($status, $dateTimezone);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset('+0100')->isOk([ &$dateTimezone ]);
-    $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset(new \DateTimeZone('+0100'))->isOk([ &$dateTimezone ]);
-    $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset(new \DateTime('now', new \DateTimeZone('+0100')))->isOk([ &$dateTimezone ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone(null, new \DateTime('now', new \DateTimeZone('UTC')))->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr('EET')->isOk([ &$dateTimezone ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset(null, '+0100')->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr(new \DateTimeZone('EET'))->isOk([ &$dateTimezone ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset(null, new \DateTimeZone('+0100'))->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr(new \DateTime('now', new \DateTimeZone('EET')))->isOk([ &$dateTimezone ]);
-    $ffn->print($status, $dateTimezone);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name('Europe/Minsk')->isOk([ &$dateTimezone ]);
-    $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name(new \DateTimeZone('Europe/Minsk'))->isOk([ &$dateTimezone ]);
-    $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name(new \DateTime('now', new \DateTimeZone('Europe/Minsk')))->isOk([ &$dateTimezone ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_offset(null, new \DateTime('now', new \DateTimeZone('+0100')))->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr('EET')->isOk([ &$dateTimezone ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr(null, 'EET')->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr('Europe/Minsk')->isOk([ &$dateTimezone ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr(null, new \DateTimeZone('EET'))->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr(new \DateTimeZone('EET'))->isOk([ &$dateTimezone ]);
-    $ffn->print($status, $dateTimezone);
-    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr(new \DateTime('now', new \DateTimeZone('Europe/Minsk')))->isOk([ &$dateTimezone ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_abbr(null, new \DateTime('now', new \DateTimeZone('EET')))->isOk([ &$dateTimezone ]);
     $ffn->print($status, $dateTimezone);
     echo "\n";
 
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name(null, 'Europe/Minsk')->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name(null, new \DateTimeZone('Europe/Minsk'))->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_name(null, new \DateTime('now', new \DateTimeZone('Europe/Minsk')))->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
     echo "\n";
 
-
-    $status = \Gzhegow\Lib\Lib::date()->type_interval('P1D')->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval('P1.5D')->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval('+100 seconds')->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval(new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval(\DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration('P1D')->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration('P1.5D')->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration(new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration(\DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring('+100 seconds')->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring(new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring(\DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime('123.456')->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime(new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime(\DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago(new \DateTime('tomorrow midnight'), new \DateTime('now midnight'))->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago(new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
-    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago(\DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
-    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr(null, 'EET')->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr(null, 'Europe/Minsk')->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr(null, new \DateTimeZone('EET'))->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
+    $status = \Gzhegow\Lib\Lib::date()->type_timezone_nameabbr(null, new \DateTime('now', new \DateTimeZone('Europe/Minsk')))->isOk([ &$dateTimezone ]);
+    $ffn->print($status, $dateTimezone);
     echo "\n";
 
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 midnight')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval(null, 'P1D')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval(null, 'P1.5D')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval(null, '+100 seconds')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval(null, new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval(null, \DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration(null, 'P1D')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration(null, 'P1.5D')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration(null, new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_duration(null, \DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring(null, '+100 seconds')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring(null, new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_datestring(null, \DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime(null, '123.456')->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime(null, new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_microtime(null, \DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago(null, new \DateTime('tomorrow midnight'), new \DateTime('now midnight'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago(null, new \DateInterval('P1D'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    $status = \Gzhegow\Lib\Lib::date()->type_interval_ago(null, \DateInterval::createFromDateString('+100 seconds'))->isOk([ &$dateInterval ]);
+    $ffn->print($status, $dateInterval);
+    echo "\n";
+
+    echo "\n";
+
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate(null, '1970-01-01 midnight')->isOk([ &$dateObject ]);
     $dateAtomString1 = $dateObject->format(DATE_ATOM);
     $ffn->print($status, $dateObject);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateObject)->isOk([ &$dateObject2 ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate(null, $dateObject)->isOk([ &$dateObject2 ]);
     $dateAtomString2 = $dateObject2->format(DATE_ATOM);
     $ffn->print($status, $dateObject2, $dateAtomString1 === $dateAtomString2);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate($dateAtomString1)->isOk([ &$dateObject3 ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate(null, $dateAtomString1)->isOk([ &$dateObject3 ]);
     $dateAtomString3 = $dateObject3->format(DATE_ATOM);
     $ffn->print($status, $dateObject3, $dateAtomString1 === $dateAtomString3);
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_idate('1970-01-01 midnight')->isOk([ &$dateImmutableObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_idate(null, '1970-01-01 midnight')->isOk([ &$dateImmutableObject ]);
     $dateAtomString1 = $dateImmutableObject->format(DATE_ATOM);
     $ffn->print($status, $dateImmutableObject);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateObject)->isOk([ &$dateImmutableObject2 ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_idate(null, $dateObject)->isOk([ &$dateImmutableObject2 ]);
     $dateAtomString2 = $dateImmutableObject2->format(DATE_ATOM);
     $ffn->print($status, $dateImmutableObject2, $dateAtomString1 === $dateAtomString2);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_idate($dateAtomString1)->isOk([ &$dateImmutableObject3 ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_idate(null, $dateAtomString1)->isOk([ &$dateImmutableObject3 ]);
     $dateAtomString3 = $dateImmutableObject3->format(DATE_ATOM);
     $ffn->print($status, $dateImmutableObject3, $dateAtomString1 === $dateAtomString3);
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_date('1970-01-01 midnight')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_date(null, '1970-01-01 midnight')->isOk([ &$dateObject ]);
     $dateAtomString1 = $dateObject->format(DATE_ATOM);
     $ffn->print($status, $dateObject);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_date($dateObject)->isOk([ &$dateObject2 ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_date(null, $dateObject)->isOk([ &$dateObject2 ]);
     $dateAtomString2 = $dateObject2->format(DATE_ATOM);
     $ffn->print($status, $dateObject2, $dateAtomString1 === $dateAtomString2);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_idate($from = $dateObject)->isOk([ &$dateImmutableObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_idate(null, $from = $dateObject)->isOk([ &$dateImmutableObject ]);
     $dateAtomString3 = $dateImmutableObject->format(DATE_ATOM);
     $ffn->print($status, $dateImmutableObject, $dateAtomString1 === $dateAtomString3);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_date($dateImmutableObject)->isOk([ &$dateImmutableObject2 ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_date(null, $dateImmutableObject)->isOk([ &$dateImmutableObject2 ]);
     $dateAtomString4 = $dateImmutableObject2->format(DATE_ATOM);
     $ffn->print($status, $dateImmutableObject2, $dateAtomString1 === $dateAtomString4);
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 midnight')->isOk([ &$dateObject1 ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate(null, '1970-01-01 midnight')->isOk([ &$dateObject1 ]);
     $dateAtomString = $dateObject1->format(DATE_ATOM);
     $ffn->print($status, $dateObject1);
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 midnight', 'EET')->isOk([ &$dateObject2 ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate(null, '1970-01-01 midnight', 'EET')->isOk([ &$dateObject2 ]);
     $dateAtomString2 = $dateObject2->format(DATE_ATOM);
     $ffn->print($status, $dateObject2, $dateAtomString !== $dateAtomString2);
     echo "\n";
@@ -2770,73 +2770,73 @@ $fn = function () use ($ffn) {
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.7')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate(null, '1970-01-01 12:34:56.7')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.78')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate(null, '1970-01-01 12:34:56.78')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.789')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate(null, '1970-01-01 12:34:56.789')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate('1970-01-01 12:34:56.7890', 'EET')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56.7')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56.78 +0100')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56.789 EET')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz('1970-01-01 12:34:56.7890 Europe/Minsk')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate(null, '1970-01-01 12:34:56.7890', 'EET')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.7', 'UTC')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz(null, '1970-01-01 12:34:56.7')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.78 +0100', 'UTC')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz(null, '1970-01-01 12:34:56.78 +0100')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.789 EET', 'UTC')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz(null, '1970-01-01 12:34:56.789 EET')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz('1970-01-01 12:34:56.7890 Europe/Minsk', 'UTC')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 12:34:56.7', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 12:34:56.78 +0100', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 12:34:56.789 EET', 'Y-m-d H:i:s.u T')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted('1970-01-01 12:34:56.7890 Europe/Minsk', 'Y-m-d H:i:s.u e')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz(null, '1970-01-01 12:34:56.7890 Europe/Minsk')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 12:34:56.7', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz(null, '1970-01-01 12:34:56.7', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 12:34:56.78 +0100', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz(null, '1970-01-01 12:34:56.78 +0100', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 12:34:56.789 EET', 'Y-m-d H:i:s.u T')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz(null, '1970-01-01 12:34:56.789 EET', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted('1970-01-01 12:34:56.7890 Europe/Minsk', 'Y-m-d H:i:s.u e')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    echo "\n";
-
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.7', 'Y-m-d H:i:s.u', 'UTC')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.78 +0100', 'Y-m-d H:i:s.u O', 'UTC')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.789 EET', 'Y-m-d H:i:s.u T', 'UTC')->isOk([ &$dateObject ]);
-    $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted('1970-01-01 12:34:56.7890 Europe/Minsk', 'Y-m-d H:i:s.u e', 'UTC')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz(null, '1970-01-01 12:34:56.7890 Europe/Minsk', 'UTC')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime('0')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted(null, '1970-01-01 12:34:56.7', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime('123')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted(null, '1970-01-01 12:34:56.78 +0100', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime('123.456')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted(null, '1970-01-01 12:34:56.789 EET', 'Y-m-d H:i:s.u T')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
-    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime('123.456', 'EET')->isOk([ &$dateObject ]);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_formatted(null, '1970-01-01 12:34:56.7890 Europe/Minsk', 'Y-m-d H:i:s.u e')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted(null, '1970-01-01 12:34:56.7', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted(null, '1970-01-01 12:34:56.78 +0100', 'Y-m-d H:i:s.u O')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted(null, '1970-01-01 12:34:56.789 EET', 'Y-m-d H:i:s.u T')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_tz_formatted(null, '1970-01-01 12:34:56.7890 Europe/Minsk', 'Y-m-d H:i:s.u e')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted(null, '1970-01-01 12:34:56.7', 'Y-m-d H:i:s.u', 'UTC')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted(null, '1970-01-01 12:34:56.78 +0100', 'Y-m-d H:i:s.u O', 'UTC')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted(null, '1970-01-01 12:34:56.789 EET', 'Y-m-d H:i:s.u T', 'UTC')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_no_tz_formatted(null, '1970-01-01 12:34:56.7890 Europe/Minsk', 'Y-m-d H:i:s.u e', 'UTC')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    echo "\n";
+
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime(null, '0')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime(null, '123')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime(null, '123.456')->isOk([ &$dateObject ]);
+    $ffn->print($status, $dateObject);
+    $status = \Gzhegow\Lib\Lib::date()->type_adate_microtime(null, '123.456', 'EET')->isOk([ &$dateObject ]);
     $ffn->print($status, $dateObject);
     echo "\n";
 
@@ -4122,10 +4122,10 @@ $fn = function () use ($ffn) {
     ];
 
     foreach ( $ipV4List as $ip ) {
-        \Gzhegow\Lib\Lib::net()->type_address_ip_v4($ip)->isOk([ &$addressIpV4 ]);
+        \Gzhegow\Lib\Lib::net()->type_address_ip_v4(null, $ip)->isOk([ &$addressIpV4 ]);
 
         foreach ( $subnetV4List as $subnet ) {
-            \Gzhegow\Lib\Lib::net()->type_subnet_v4($subnet)->isOk([ &$subnetV4 ]);
+            \Gzhegow\Lib\Lib::net()->type_subnet_v4(null, $subnet)->isOk([ &$subnetV4 ]);
 
             $status1 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet($addressIpV4, $subnetV4);
             $status2 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet_v4($addressIpV4, $subnetV4);
@@ -4152,10 +4152,10 @@ $fn = function () use ($ffn) {
     ];
 
     foreach ( $ipV6List as $ip ) {
-        \Gzhegow\Lib\Lib::net()->type_address_ip_v6($ip)->isOk([ &$addressIpV6 ]);
+        \Gzhegow\Lib\Lib::net()->type_address_ip_v6(null, $ip)->isOk([ &$addressIpV6 ]);
 
         foreach ( $subnetV6List as $subnet ) {
-            \Gzhegow\Lib\Lib::net()->type_subnet_v6($subnet)->isOk([ &$subnetV6 ]);
+            \Gzhegow\Lib\Lib::net()->type_subnet_v6(null, $subnet)->isOk([ &$subnetV6 ]);
 
             $status1 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet($addressIpV6, $subnetV6);
             $status2 = \Gzhegow\Lib\Lib::net()->is_ip_in_subnet_v6($addressIpV6, $subnetV6);
@@ -4627,55 +4627,55 @@ $fn = function () use ($ffn) {
     foreach ( $sources as $src ) {
         $tableRow = $ffn->value($src);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_method_string($src)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_method_string(null, $src)->isOk([ &$result ]);
         $table1[$tableRow]['method_string'] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_method_array($src)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_method_array(null, $src)->isOk([ &$result ]);
         $table1[$tableRow]['method_array'] = $ffn->value($result);
 
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable($src, null)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable(null, $src, null)->isOk([ &$result ]);
         $table2[$tableRow]['callable'] = $ffn->value($result);
         $table3[$tableRow]['callable'] = $ffn->value($result);
         $table4[$tableRow]['callable'] = $ffn->value($result);
 
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_object($src, null)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_object(null, $src, null)->isOk([ &$result ]);
         $table2[$tableRow]['callable_object'] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_object_closure($src, null)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_object_closure(null, $src, null)->isOk([ &$result ]);
         $table2[$tableRow]['callable_object_closure'] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_object_invokable($src, null)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_object_invokable(null, $src, null)->isOk([ &$result ]);
         $table2[$tableRow]['callable_object_invokable'] = $ffn->value($result);
 
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_array($src, null)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_array(null, $src, null)->isOk([ &$result ]);
         $table3[$tableRow]['callable_array'] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method($src, null)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method(null, $src, null)->isOk([ &$result ]);
         $table3[$tableRow]['callable_array_method'] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_static($src, null)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_static(null, $src, null)->isOk([ &$result ]);
         $table3[$tableRow]['callable_array_method_static'] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_non_static($src, null)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_non_static(null, $src, null)->isOk([ &$result ]);
         $table3[$tableRow]['callable_array_method_non_static'] = $ffn->value($result);
 
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_string($src, null)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_string(null, $src, null)->isOk([ &$result ]);
         $table4[$tableRow]['callable_string'] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function($src)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function(null, $src)->isOk([ &$result ]);
         $table4[$tableRow]['callable_string_function'] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_internal($src)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_internal(null, $src)->isOk([ &$result ]);
         $table4[$tableRow]['callable_string_function_internal'] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_non_internal($src)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_non_internal(null, $src)->isOk([ &$result ]);
         $table4[$tableRow]['callable_string_function_non_internal'] = $ffn->value($result);
 
-        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static($src, null)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static(null, $src, null)->isOk([ &$result ]);
         $table4[$tableRow]['callable_string_method_static'] = $ffn->value($result);
     }
     // dd(\Gzhegow\Lib\Lib::debug()->print_table($table1, 1));
@@ -4757,10 +4757,10 @@ $fn = function () use ($ffn) {
             foreach ( $aa as $src ) {
                 $tableRow = $ffn->value($src);
 
-                $status = \Gzhegow\Lib\Lib::php()->type_method_array($src)->isOk([ &$result ]);
+                $status = \Gzhegow\Lib\Lib::php()->type_method_array(null, $src)->isOk([ &$result ]);
                 $table[$tableRow]['method_array'] = $ffn->value($result);
 
-                $status = \Gzhegow\Lib\Lib::php()->type_method_string($src)->isOk([ &$result ]);
+                $status = \Gzhegow\Lib\Lib::php()->type_method_string(null, $src)->isOk([ &$result ]);
                 $table[$tableRow]['method_string'] = $ffn->value($result);
             }
         }
@@ -4787,60 +4787,60 @@ $fn = function () use ($ffn) {
 
                 foreach ( $sourceScopes as $scopeKey => $scope ) {
                     $tableCol = $ffn->values(' / ', 'callable', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable($src, $scope)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable(null, $src, $scope)->isOk([ &$result ]);
                     $table1[$tableRow][$tableCol] = $ffn->value($status);
                     $table2[$tableRow][$tableCol] = $ffn->value($status);
                     $table3[$tableRow][$tableCol] = $ffn->value($status);
 
 
                     $tableCol = $ffn->values(' / ', 'callable_object', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_object($src, $scope)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_object(null, $src, $scope)->isOk([ &$result ]);
                     $table1[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_object_closure', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_object_closure($src, $scope)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_object_closure(null, $src, $scope)->isOk([ &$result ]);
                     $table1[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_object_invokable', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_object_invokable($src, $scope)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_object_invokable(null, $src, $scope)->isOk([ &$result ]);
                     $table1[$tableRow][$tableCol] = $ffn->value($result);
 
 
                     $tableCol = $ffn->values(' / ', 'callable_array', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array($src, $scope)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array(null, $src, $scope)->isOk([ &$result ]);
                     $table2[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_array_method', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method($src, $scope)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method(null, $src, $scope)->isOk([ &$result ]);
                     $table2[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_array_method_static', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_static($src, $scope)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_static(null, $src, $scope)->isOk([ &$result ]);
                     $table2[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_array_method_non_static', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_non_static($src, $scope)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_array_method_non_static(null, $src, $scope)->isOk([ &$result ]);
                     $table2[$tableRow][$tableCol] = $ffn->value($result);
 
 
                     $tableCol = $ffn->values(' / ', 'callable_string', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string($src, $scope)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string(null, $src, $scope)->isOk([ &$result ]);
                     $table3[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_string_function', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function($src)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function(null, $src)->isOk([ &$result ]);
                     $table3[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_string_function_internal', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_internal($src)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_internal(null, $src)->isOk([ &$result ]);
                     $table3[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_string_function_non_internal', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_non_internal($src)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_function_non_internal(null, $src)->isOk([ &$result ]);
                     $table3[$tableRow][$tableCol] = $ffn->value($result);
 
                     $tableCol = $ffn->values(' / ', 'callable_string_method_static', $scopeKey);
-                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static($src, $scope)->isOk([ &$result ]);
+                    $status = \Gzhegow\Lib\Lib::php()->type_callable_string_method_static(null, $src, $scope)->isOk([ &$result ]);
                     $table3[$tableRow][$tableCol] = $ffn->value($result);
                 }
             }
@@ -4917,7 +4917,7 @@ $fn = function () use ($ffn) {
     echo "\n";
 
     $uuid = \Gzhegow\Lib\Lib::random()->uuid();
-    $status = \Gzhegow\Lib\Lib::random()->type_uuid($uuid)->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::random()->type_uuid(null, $uuid)->isOk([ &$result ]);
     $ffn->print(strlen($uuid), $status);
 
     echo "\n";
@@ -5015,37 +5015,37 @@ $fn = function () use ($ffn) {
     $ffn->print('[ SocialModule ]');
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::social()->type_email('example@gmail.com')->isOk([ &$email ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email(null, 'example@gmail.com')->isOk([ &$email ]);
     $ffn->print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email('example@привет.рф')->isOk([ &$email ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email(null, 'example@привет.рф')->isOk([ &$email ]);
     $ffn->print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email('example@привет.рф', $filters = [ 'filter_unicode' ])->isOk([ &$email ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email(null, 'example@привет.рф', $filters = [ 'filter_unicode' ])->isOk([ &$email ]);
     $ffn->print($status, $email);
     try {
-        $status = \Gzhegow\Lib\Lib::social()->type_email('example@привет.рф', $filters = [ 'rfc' ])->isOk([ &$email ]);
+        $status = \Gzhegow\Lib\Lib::social()->type_email(null, 'example@привет.рф', $filters = [ 'rfc' ])->isOk([ &$email ]);
     }
     catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake('example@gmail.com')->isOk([ &$email ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake(null, 'example@gmail.com')->isOk([ &$email ]);
     $ffn->print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake('example@привет.рф')->isOk([ &$email ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake(null, 'example@привет.рф')->isOk([ &$email ]);
     $ffn->print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake('example@привет.рф', $filters = [ 'filter_unicode' ])->isOk([ &$email ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake(null, 'example@привет.рф', $filters = [ 'filter_unicode' ])->isOk([ &$email ]);
     $ffn->print($status, $email);
     try {
-        $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake('example@привет.рф', $filters = [ 'rfc' ])->isOk([ &$email ]);
+        $status = \Gzhegow\Lib\Lib::social()->type_email_non_fake(null, 'example@привет.рф', $filters = [ 'rfc' ])->isOk([ &$email ]);
     }
     catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
         $ffn->print('[ CATCH ] ' . $e->getMessage());
     }
     echo "\n";
 
-    $status = \Gzhegow\Lib\Lib::social()->type_email_fake('no-reply@gmail.com')->isOk([ &$email ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email_fake(null, 'no-reply@gmail.com')->isOk([ &$email ]);
     $ffn->print($status, $email);
-    $status = \Gzhegow\Lib\Lib::social()->type_email_fake('email@example.com')->isOk([ &$email ]);
+    $status = \Gzhegow\Lib\Lib::social()->type_email_fake(null, 'email@example.com')->isOk([ &$email ]);
     $ffn->print($status, $email);
     echo "\n";
 
@@ -5091,27 +5091,27 @@ $fn = function () use ($ffn) {
     ];
 
     foreach ( $phones as $phone ) {
-        $status = \Gzhegow\Lib\Lib::social()->type_phone($phone)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::social()->type_phone(null, $phone)->isOk([ &$result ]);
         $ffn->print($phone, $status, $result);
 
-        $status = \Gzhegow\Lib\Lib::social()->type_phone_non_fake($phone)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::social()->type_phone_non_fake(null, $phone)->isOk([ &$result ]);
         $ffn->print($phone, $status, $result);
 
         try {
-            $status = \Gzhegow\Lib\Lib::social()->type_phone_real($phone, '')->isOk([ &$result ]);
+            $status = \Gzhegow\Lib\Lib::social()->type_phone_real(null, $phone, '')->isOk([ &$result ]);
         }
         catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
             $ffn->print('[ CATCH ] ' . $e->getMessage());
         }
 
-        $status = \Gzhegow\Lib\Lib::social()->type_tel($phone)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::social()->type_tel(null, $phone)->isOk([ &$result ]);
         $ffn->print($phone, $status, $result);
 
-        $status = \Gzhegow\Lib\Lib::social()->type_tel_non_fake($phone)->isOk([ &$result ]);
+        $status = \Gzhegow\Lib\Lib::social()->type_tel_non_fake(null, $phone)->isOk([ &$result ]);
         $ffn->print($phone, $status, $result);
 
         try {
-            $status = \Gzhegow\Lib\Lib::social()->type_tel_real($phone, '')->isOk([ &$result ]);
+            $status = \Gzhegow\Lib\Lib::social()->type_tel_real(null, $phone, '')->isOk([ &$result ]);
         }
         catch ( \Gzhegow\Lib\Exception\Runtime\ComposerException $e ) {
             $ffn->print('[ CATCH ] ' . $e->getMessage());
@@ -5124,13 +5124,13 @@ $fn = function () use ($ffn) {
     $phoneManager->usePhoneFakeDatelike(true);
 
     foreach ( $fakePhones as $phone ) {
-        $result = $phoneManager->parsePhone($phone);
+        $result = $phoneManager->parsePhoneMaybeFake($phone);
         $ffn->print($phone, $result);
 
         $result = $phoneManager->parsePhoneFake($phone);
         $ffn->print($phone, $result);
 
-        $result = $phoneManager->parseTel($phone);
+        $result = $phoneManager->parseTelMaybeFake($phone);
         $ffn->print($phone, $result);
 
         $result = $phoneManager->parseTelFake($phone);
@@ -5612,93 +5612,76 @@ $fn = function () use ($ffn) {
     $_SERVER['QUERY_STRING'] = '';
 
 
-    $status = \Gzhegow\Lib\Lib::url()->type_url($src = 'https://google.com/hello/world')->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_url(null, $src = 'https://google.com/hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_url($src = ':hello/world')->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_url(null, $src = ':hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_url($src = '/')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    echo "\n";
-
-
-    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = 'https://google.com/hello/world')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = ':hello/world')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = '/')->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_url(null, $src = '/')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::url()->type_host($src = 'https://google.com/hello/world')->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_uri(null, $src = 'https://google.com/hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_host($src = ':hello/world')->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_uri(null, $src = ':hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_host($src = '/')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    echo "\n";
-
-
-    $status = \Gzhegow\Lib\Lib::url()->type_domain($src = 'https://google.com/hello/world')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_domain($src = ':hello/world')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_domain($src = '/')->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_uri(null, $src = '/')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
     echo "\n";
 
 
-    $status = \Gzhegow\Lib\Lib::url()->type_link($src = 'https://google.com/hello/world')->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_host(null, $src = 'https://google.com/hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_link($src = ':hello/world')->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_host(null, $src = ':hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_link($src = '/')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    echo "\n";
-
-
-    $status = \Gzhegow\Lib\Lib::url()->type_url($src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_uri($src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_host($src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
-    $ffn->print($src, $status, $result);
-
-    $status = \Gzhegow\Lib\Lib::url()->type_link($src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_host(null, $src = '/')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
     echo "\n";
 
 
-    $src = 'https://привет.рф/hello/текст';
-
-    $status = \Gzhegow\Lib\Lib::url()->type_url($src, null, null, 1, 1)->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_domain(null, $src = 'https://google.com/hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_uri($src, null, null, 1)->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_domain(null, $src = ':hello/world')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_host($src, 1)->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_domain(null, $src = '/')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_link($src, null, null, 1)->isOk([ &$result ]);
+    echo "\n";
+
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link(null, $src = 'https://google.com/hello/world')->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link(null, $src = ':hello/world')->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link(null, $src = '/')->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    echo "\n";
+
+
+    $status = \Gzhegow\Lib\Lib::url()->type_url(null, $src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_uri(null, $src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_host(null, $src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link(null, $src = 'https://привет.рф/hello/текст')->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
     echo "\n";
@@ -5706,16 +5689,33 @@ $fn = function () use ($ffn) {
 
     $src = 'https://привет.рф/hello/текст';
 
-    $status = \Gzhegow\Lib\Lib::url()->type_url($src, null, null, 2, 2)->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_url(null, $src, null, null, 1, 1)->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_uri($src, null, null, 2, 2)->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_uri(null, $src, null, null, 1)->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_host($src, 2)->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_host(null, $src, 1)->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
-    $status = \Gzhegow\Lib\Lib::url()->type_link($src, null, null, 2)->isOk([ &$result ]);
+    $status = \Gzhegow\Lib\Lib::url()->type_link(null, $src, null, null, 1)->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    echo "\n";
+
+
+    $src = 'https://привет.рф/hello/текст';
+
+    $status = \Gzhegow\Lib\Lib::url()->type_url(null, $src, null, null, 2, 2)->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_uri(null, $src, null, null, 2, 2)->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_host(null, $src, 2)->isOk([ &$result ]);
+    $ffn->print($src, $status, $result);
+
+    $status = \Gzhegow\Lib\Lib::url()->type_link(null, $src, null, null, 2)->isOk([ &$result ]);
     $ffn->print($src, $status, $result);
 
 

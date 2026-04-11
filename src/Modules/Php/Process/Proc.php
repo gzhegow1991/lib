@@ -299,16 +299,24 @@ class Proc
         } elseif ( is_iterable($stdin) ) {
             $this->stdinIterable = $stdin;
 
-        } elseif ( $theType->filepath_realpath($stdin, true)->isOk([ &$stdinFilepathRealpath ]) ) {
-            $this->stdinFile = $stdinFilepathRealpath;
-
-        } elseif ( $theType->string($stdin)->isOk([ &$stdinString ]) ) {
-            $this->stdinIterable = [ $stdinString ];
-
         } else {
-            throw new LogicException(
-                [ 'The `stdin` should be a resource, a filepath or a string', $stdin ]
-            );
+            $ret = $theType->filepath_realpath($stdin, true);
+
+            if ( $ret->isOk([ &$stdinFilepathRealpath ]) ) {
+                $this->stdinFile = $stdinFilepathRealpath;
+
+            } else {
+                $ret = $theType->string($stdin);
+
+                if ( $ret->isOk([ &$stdinString ]) ) {
+                    $this->stdinIterable = [ $stdinString ];
+
+                } else {
+                    throw new LogicException(
+                        [ 'The `stdin` should be a resource, a filepath or a string', $stdin ]
+                    );
+                }
+            }
         }
 
         return $this;

@@ -162,59 +162,59 @@ class DefaultBacktracer implements BacktracerInterface
     {
         $theType = Lib::type();
 
-        $_filterFile = $filter['file'] ?? $filter[0] ?? [];
-        $_filterClass = $filter['class'] ?? $filter[1] ?? [];
-        $_filterFunction = $filter['function'] ?? $filter[2] ?? [];
+        $filterFile = $filter['file'] ?? $filter[0] ?? [];
+        $filterClass = $filter['class'] ?? $filter[1] ?? [];
+        $filterFunction = $filter['function'] ?? $filter[2] ?? [];
 
-        $_filterType = $filter['type'] ?? [];
-        $_filterLine = $filter['line'] ?? [];
-        $_filterObject = $filter['object'] ?? [];
+        $filterType = $filter['type'] ?? [];
+        $filterLine = $filter['line'] ?? [];
+        $filterObject = $filter['object'] ?? [];
 
 
-        $_filterFunction = null
-            ?? (is_array($_filterFunction) ? $_filterFunction : null)
-            ?? ($theType->string_not_empty($_filterFunction)->isOk([ &$ref ]) ? [ $ref ] : null)
+        $filterFunction = null
+            ?? (is_array($filterFunction) ? $filterFunction : null)
+            ?? ($theType->string_not_empty($filterFunction)->orNull())
             ?? [];
 
-        $_filterClass = null
-            ?? (is_array($_filterClass) ? $_filterClass : null)
-            ?? ($theType->string_not_empty($_filterClass)->isOk([ &$ref ]) ? [ $ref ] : null)
+        $filterClass = null
+            ?? (is_array($filterClass) ? $filterClass : null)
+            ?? ($theType->string_not_empty($filterClass)->orNull())
             ?? [];
 
-        $_filterFile = null
-            ?? (is_array($_filterFile) ? $_filterFile : null)
-            ?? ($theType->string_not_empty($_filterFile)->isOk([ &$ref ]) ? [ $ref ] : null)
-            ?? [];
-
-
-        $_filterType = null
-            ?? (is_array($_filterType) ? $_filterType : null)
-            ?? ($theType->string_not_empty($_filterType)->isOk([ &$ref ]) ? [ $ref ] : null)
-            ?? [];
-
-        $_filterLine = null
-            ?? (is_array($_filterLine) ? $_filterLine : null)
-            ?? ($theType->numeric_int_positive($_filterLine)->isOk([ &$ref ]) ? [ $ref ] : null)
-            ?? [];
-
-        $_filterObject = null
-            ?? (is_array($_filterObject) ? $_filterObject : null)
-            ?? ($theType->object($_filterObject)->isOk([ &$ref ]) ? [ $ref ] : null)
+        $filterFile = null
+            ?? (is_array($filterFile) ? $filterFile : null)
+            ?? ($theType->string_not_empty($filterFile)->orNull())
             ?? [];
 
 
-        $_filter = [];
+        $filterType = null
+            ?? (is_array($filterType) ? $filterType : null)
+            ?? ($theType->string_not_empty($filterType)->orNull())
+            ?? [];
 
-        $_filter['function'] = array_map('strval', $_filterFunction);
-        $_filter['class'] = array_map('strval', $_filterClass);
-        $_filter['file'] = array_map('strval', $_filterFile);
+        $filterLine = null
+            ?? (is_array($filterLine) ? $filterLine : null)
+            ?? ($theType->int_positive($filterLine)->orNull())
+            ?? [];
 
-        $_filter['type'] = array_map('strval', $_filterType);
-        $_filter['line'] = array_map('intval', $_filterLine);
-        $_filter['object'] = $_filterObject;
+        $filterObject = null
+            ?? (is_array($filterObject) ? $filterObject : null)
+            ?? ($theType->object($filterObject)->orNull())
+            ?? [];
 
 
-        $this->filter = $_filter;
+        $filterValid = [];
+
+        $filterValid['function'] = array_map('strval', $filterFunction);
+        $filterValid['class'] = array_map('strval', $filterClass);
+        $filterValid['file'] = array_map('strval', $filterFile);
+
+        $filterValid['type'] = array_map('strval', $filterType);
+        $filterValid['line'] = array_map('intval', $filterLine);
+        $filterValid['object'] = $filterObject;
+
+
+        $this->filter = $filterValid;
 
         return $this;
     }
@@ -281,59 +281,59 @@ class DefaultBacktracer implements BacktracerInterface
     {
         $theType = Lib::type();
 
-        $_filterFile = $filter['file'] ?? $filter[0] ?? [];
-        $_filterClass = $filter['class'] ?? $filter[1] ?? [];
-        $_filterFunction = $filter['function'] ?? $filter[2] ?? [];
+        $filterFile = $filter['file'] ?? $filter[0] ?? [];
+        $filterClass = $filter['class'] ?? $filter[1] ?? [];
+        $filterFunction = $filter['function'] ?? $filter[2] ?? [];
 
-        $_filterType = $filter['type'] ?? [];
-        $_filterLine = $filter['line'] ?? [];
-        $_filterObject = $filter['object'] ?? [];
+        $filterType = $filter['type'] ?? [];
+        $filterLine = $filter['line'] ?? [];
+        $filterObject = $filter['object'] ?? [];
 
 
-        $_filterFunction = null
-            ?? (is_array($_filterFunction) ? $_filterFunction : null)
-            ?? ($theType->string_not_empty($_filterFunction)->isOk([ &$ref ]) ? [ $ref ] : null)
+        $filterFunction = null
+            ?? (is_array($filterFunction) ? $filterFunction : null)
+            ?? ($theType->string_not_empty($filterFunction)->orNull())
             ?? [];
 
-        $_filterClass = null
-            ?? (is_array($_filterClass) ? $_filterClass : null)
-            ?? ($theType->string_not_empty($_filterClass)->isOk([ &$ref ]) ? [ $ref ] : null)
+        $filterClass = null
+            ?? (is_array($filterClass) ? $filterClass : null)
+            ?? ($theType->string_not_empty($filterClass)->orNull())
             ?? [];
 
-        $_filterFile = null
-            ?? (is_array($_filterFile) ? $_filterFile : null)
-            ?? ($theType->string_not_empty($_filterFile)->isOk([ &$ref ]) ? [ $ref ] : null)
-            ?? [];
-
-
-        $_filterType = null
-            ?? (is_array($_filterType) ? $_filterType : null)
-            ?? ($theType->string_not_empty($_filterType)->isOk([ &$ref ]) ? [ $ref ] : null)
-            ?? [];
-
-        $_filterLine = null
-            ?? (is_array($_filterLine) ? $_filterLine : null)
-            ?? ($theType->numeric_int_positive($_filterLine)->isOk([ &$ref ]) ? [ $ref ] : null)
-            ?? [];
-
-        $_filterObject = null
-            ?? (is_array($_filterObject) ? $_filterObject : null)
-            ?? ($theType->object($_filterObject)->isOk([ &$ref ]) ? [ $ref ] : null)
+        $filterFile = null
+            ?? (is_array($filterFile) ? $filterFile : null)
+            ?? ($theType->string_not_empty($filterFile)->orNull())
             ?? [];
 
 
-        $_filter = [];
+        $filterType = null
+            ?? (is_array($filterType) ? $filterType : null)
+            ?? ($theType->string_not_empty($filterType)->orNull())
+            ?? [];
 
-        $_filter['function'] = array_map('strval', $_filterFunction);
-        $_filter['class'] = array_map('strval', $_filterClass);
-        $_filter['file'] = array_map('strval', $_filterFile);
+        $filterLine = null
+            ?? (is_array($filterLine) ? $filterLine : null)
+            ?? ($theType->int_positive($filterLine)->orNull())
+            ?? [];
 
-        $_filter['type'] = array_map('strval', $_filterType);
-        $_filter['line'] = array_map('intval', $_filterLine);
-        $_filter['object'] = $_filterObject;
+        $filterObject = null
+            ?? (is_array($filterObject) ? $filterObject : null)
+            ?? ($theType->object($filterObject)->orNull())
+            ?? [];
 
 
-        $this->filterNot = $_filter;
+        $filterValid = [];
+
+        $filterValid['function'] = array_map('strval', $filterFunction);
+        $filterValid['class'] = array_map('strval', $filterClass);
+        $filterValid['file'] = array_map('strval', $filterFile);
+
+        $filterValid['type'] = array_map('strval', $filterType);
+        $filterValid['line'] = array_map('intval', $filterLine);
+        $filterValid['object'] = $filterObject;
+
+
+        $this->filterNot = $filterValid;
 
         return $this;
     }

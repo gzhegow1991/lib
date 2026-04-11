@@ -158,7 +158,7 @@ class HttpModule
     {
         $thePhp = Lib::php();
 
-        if ( $thePhp->is_terminal() ) {
+        if ( $thePhp->is_sapi_terminal() ) {
             return false;
         }
 
@@ -180,7 +180,7 @@ class HttpModule
     {
         $thePhp = Lib::php();
 
-        if ( $thePhp->is_terminal() ) {
+        if ( $thePhp->is_sapi_terminal() ) {
             return false;
         }
 
@@ -391,16 +391,20 @@ class HttpModule
             if ( is_array($q) ) {
                 continue;
 
-            } elseif ( $theType->string_not_empty($q)->isOk([ &$qString ]) ) {
-                $queryArray = [];
-                parse_str($q, $queryArray);
-
-                $queries[$idx] = $queryArray;
-
             } else {
-                throw new LogicException(
-                    [ 'Each of `queries` should be a string or an array', $query, $idx ]
-                );
+                $ret = $theType->string_not_empty($q);
+
+                if ( $ret->isOk([ &$qString ]) ) {
+                    $queryArray = [];
+                    parse_str($q, $queryArray);
+
+                    $queries[$idx] = $queryArray;
+
+                } else {
+                    throw new LogicException(
+                        [ 'Each of `queries` should be a string or an array', $query, $idx ]
+                    );
+                }
             }
         }
 
@@ -414,9 +418,6 @@ class HttpModule
     }
 
 
-    /**
-     * @noinspection PhpStrFunctionsInspection
-     */
     public function http_accept_match(string $httpAccept, array $acceptAnd = [], array ...$orAcceptAnd) : array
     {
         $theType = Lib::type();

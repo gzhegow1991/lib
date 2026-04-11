@@ -154,9 +154,9 @@ class DateModule
 
 
     /**
-     * @return Ret<\DateTimeZone>
+     * @return Ret<\DateTimeZone>|\DateTimeZone
      */
-    public function type_timezone($timezone, ?array $allowedTimezoneTypes = null)
+    public function type_timezone($fb, $timezone, ?array $allowedTimezoneTypes = null)
     {
         $dateTimeZone = null;
 
@@ -176,31 +176,31 @@ class DateModule
 
         if ( null === $dateTimeZone ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `timezone` should be valid timezone', $timezone ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_type($dateTimeZone);
+            $timezoneType = $this->timezone_extract_type($dateTimeZone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `timezone` should be timezone of one of the allowed types', $timezone, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
             }
         }
 
-        return Ret::ok(null, $dateTimeZone);
+        return Ret::ok($fb, $dateTimeZone);
     }
 
     /**
-     * @return Ret<\DateTimeZone>
+     * @return Ret<\DateTimeZone>|\DateTimeZone
      */
-    public function type_timezone_offset($timezoneOrOffset)
+    public function type_timezone_offset($fb, $timezoneOrOffset)
     {
         $dateTimeZone = null;
 
@@ -220,29 +220,29 @@ class DateModule
 
         if ( null === $dateTimeZone ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `timezoneOrOffset` should be valid timezone', $timezoneOrOffset ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $timezoneType = $this->timezone_type($dateTimeZone);
+        $timezoneType = $this->timezone_extract_type($dateTimeZone);
 
         if ( $timezoneType !== 1 ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `timezoneOrOffset` should be offset timezone', $timezoneOrOffset ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $dateTimeZone);
+        return Ret::ok($fb, $dateTimeZone);
     }
 
     /**
-     * @return Ret<\DateTimeZone>
+     * @return Ret<\DateTimeZone>|\DateTimeZone
      */
-    public function type_timezone_abbr($timezoneOrAbbr)
+    public function type_timezone_abbr($fb, $timezoneOrAbbr)
     {
         $dateTimeZone = null;
 
@@ -262,29 +262,29 @@ class DateModule
 
         if ( null === $dateTimeZone ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `timezoneOrAbbr` should be valid timezone', $timezoneOrAbbr ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $timezoneType = $this->timezone_type($dateTimeZone);
+        $timezoneType = $this->timezone_extract_type($dateTimeZone);
 
         if ( $timezoneType !== 2 ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `timezoneOrAbbr` should be abbr timezone', $timezoneOrAbbr ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $dateTimeZone);
+        return Ret::ok($fb, $dateTimeZone);
     }
 
     /**
-     * @return Ret<\DateTimeZone>
+     * @return Ret<\DateTimeZone>|\DateTimeZone
      */
-    public function type_timezone_name($timezoneOrName)
+    public function type_timezone_name($fb, $timezoneOrName)
     {
         $dateTimeZone = null;
 
@@ -304,29 +304,29 @@ class DateModule
 
         if ( null === $dateTimeZone ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `timezoneOrName` should be valid timezone', $timezoneOrName ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $timezoneType = $this->timezone_type($dateTimeZone);
+        $timezoneType = $this->timezone_extract_type($dateTimeZone);
 
         if ( $timezoneType !== 3 ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `timezoneOrName` should be name timezone', $timezoneOrName ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $dateTimeZone);
+        return Ret::ok($fb, $dateTimeZone);
     }
 
     /**
-     * @return Ret<\DateTimeZone>
+     * @return Ret<\DateTimeZone>|\DateTimeZone
      */
-    public function type_timezone_nameabbr($timezoneOrNameOrAbbr)
+    public function type_timezone_nameabbr($fb, $timezoneOrNameOrAbbr)
     {
         $dateTimeZone = null;
 
@@ -346,71 +346,71 @@ class DateModule
 
         if ( null === $dateTimeZone ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `timezoneOrNameOrAbbr` should be valid timezone', $timezoneOrNameOrAbbr ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $timezoneType = $this->timezone_type($dateTimeZone);
+        $timezoneType = $this->timezone_extract_type($dateTimeZone);
 
-        if ( ! (
-            ($timezoneType === 2)
+        if ( ! (false
+            || ($timezoneType === 2)
             || ($timezoneType === 3)
         ) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `timezoneOrName` should be name or abbr timezone', $timezoneOrNameOrAbbr ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $dateTimeZone);
+        return Ret::ok($fb, $dateTimeZone);
     }
 
 
     /**
-     * @return Ret<\DateInterval>
+     * @return Ret<\DateInterval>|\DateInterval
      */
-    public function type_interval($interval)
+    public function type_interval($fb, $interval)
     {
         if ( $interval instanceof \DateInterval ) {
-            return Ret::ok(null, $interval);
+            return Ret::ok($fb, $interval);
         }
 
         $ret = Ret::new();
 
-        $dateInterval = null
-            ?? $this->type_interval_duration($interval)->orNull($ret)
-            ?? $this->type_interval_datestring($interval)->orNull($ret)
+        $statusInterval = false
+            || $this->type_interval_duration($ret, $interval)
+            || $this->type_interval_datestring($ret, $interval)
             //
-            // > commented, autoparsing integers is bad practice
-            // ?? $this->type_interval_microtime($interval)->orNull($ret)
+            // > commented, `autoparsing integers` is bad practice
+            // || $this->type_interval_microtime($ret, $interval)
         ;
 
-        if ( $ret->isFail() ) {
+        if ( ! $ret->isOk([ &$dateInterval ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $dateInterval);
+        return Ret::ok($fb, $dateInterval);
     }
 
     /**
-     * @return Ret<\DateInterval>
+     * @return Ret<\DateInterval>|\DateInterval
      */
-    public function type_interval_duration($duration)
+    public function type_interval_duration($fb, $duration)
     {
         if ( $duration instanceof \DateInterval ) {
-            return Ret::ok(null, $duration);
+            return Ret::ok($fb, $duration);
         }
 
         if ( ! (is_string($duration) && ('' !== $duration)) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `duration` should be string, not empty', $duration ],
                 [ __FILE__, __LINE__ ]
             );
@@ -421,27 +421,35 @@ class DateModule
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $dateInterval);
+        if ( ! $dateInterval ) {
+            return Ret::throw(
+                $fb,
+                [ 'Cannot encode `duration` to intervel', $duration ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $dateInterval);
     }
 
     /**
-     * @return Ret<\DateInterval>
+     * @return Ret<\DateInterval>|\DateInterval
      */
-    public function type_interval_datestring($datestring)
+    public function type_interval_datestring($fb, $datestring)
     {
         if ( $datestring instanceof \DateInterval ) {
-            return Ret::ok(null, $datestring);
+            return Ret::ok($fb, $datestring);
         }
 
         if ( ! (is_string($datestring) && ('' !== $datestring)) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be string, not empty', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -449,66 +457,65 @@ class DateModule
 
         try {
             $dateInterval = \DateInterval::createFromDateString($datestring);
-
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ( false !== $dateInterval ) {
-            return Ret::ok(null, $dateInterval);
-        }
-
-        return Ret::throw(
-            null,
-            [ 'Cannot encode `datestring` to intervel', $datestring ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<\DateInterval>
-     */
-    public function type_interval_microtime($microtime)
-    {
-        if ( $microtime instanceof \DateInterval ) {
-            return Ret::ok(null, $microtime);
-        }
-
-        $theType = Lib::type();
-
-        if ( ! $theType->numeric($microtime, false)->isOk([ 1 => &$ret ]) ) {
+        if ( ! $dateInterval ) {
             return Ret::throw(
-                null,
-                $ret,
+                $fb,
+                [ 'Cannot encode `datestring` to intervel', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $microtimeNumeric = $ret->getValue();
+        return Ret::ok($fb, $dateInterval);
+    }
+
+    /**
+     * @return Ret<\DateInterval>|\DateInterval
+     */
+    public function type_interval_microtime($fb, $microtime)
+    {
+        if ( $microtime instanceof \DateInterval ) {
+            return Ret::ok($fb, $microtime);
+        }
+
+        $theType = Lib::type();
+
+        $ret = $theType->numeric($microtime, false);
+
+        if ( ! $ret->isOk([ &$microtimeNumeric ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
 
         try {
             $dateInterval = $this->interval_decode("PT{$microtimeNumeric}S");
         }
         catch ( \Throwable $e ) {
             return Ret::throw(
-                null,
+                $fb,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $dateInterval);
+        return Ret::ok($fb, $dateInterval);
     }
 
     /**
-     * @return Ret<\DateInterval>
+     * @return Ret<\DateInterval>|\DateInterval
      */
-    public function type_interval_ago($date, ?\DateTimeInterface $from = null, ?bool $reverse = null)
+    public function type_interval_ago($fb, $date, ?\DateTimeInterface $from = null, ?bool $reverse = null)
     {
         $reverse = $reverse ?? false;
 
@@ -516,7 +523,7 @@ class DateModule
         // $isUntil = (true === $reverse);
 
         if ( $date instanceof \DateInterval ) {
-            return Ret::ok(null, $date);
+            return Ret::ok($fb, $date);
         }
 
         if ( $date instanceof \DateTimeInterface ) {
@@ -530,11 +537,11 @@ class DateModule
                 $date = $date->diff($fromDate);
             }
 
-            return Ret::ok(null, $date);
+            return Ret::ok($fb, $date);
         }
 
         return Ret::throw(
-            null,
+            $fb,
             [ 'The `date` should be interval', $date ],
             [ __FILE__, __LINE__ ]
         );
@@ -542,9 +549,9 @@ class DateModule
 
 
     /**
-     * @return Ret<\DateTimeInterface>
+     * @return Ret<\DateTimeInterface>|\DateTimeInterface
      */
-    public function type_date($datestring, $timezoneFallback = null)
+    public function type_date($fb, $datestring, $timezoneFallback = null)
     {
         $theType = Lib::type();
 
@@ -554,9 +561,11 @@ class DateModule
             $dateTime = $datestring;
 
         } else {
-            if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($datestring);
+
+            if ( ! $ret->isOk([ &$datestringString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -564,7 +573,7 @@ class DateModule
 
             $timezoneFallbackObject = null;
             if ( null !== $timezoneFallback ) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+                $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
             }
 
             try {
@@ -579,7 +588,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be valid datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -587,13 +596,13 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTime>
+     * @return Ret<\DateTime>|\DateTime
      */
-    public function type_adate($datestring, $timezoneFallback = null)
+    public function type_adate($fb, $datestring, $timezoneFallback = null)
     {
         $theType = Lib::type();
 
@@ -603,9 +612,11 @@ class DateModule
             $dateTime = $datestring;
 
         } else {
-            if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($datestring);
+
+            if ( ! $ret->isOk([ &$datestringString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -613,7 +624,7 @@ class DateModule
 
             $timezoneFallbackObject = null;
             if ( null !== $timezoneFallback ) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+                $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
             }
 
             try {
@@ -628,7 +639,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be valid datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -636,13 +647,13 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTimeImmutable>
+     * @return Ret<\DateTimeImmutable>|\DateTimeImmutable
      */
-    public function type_idate($datestring, $timezoneFallback = null)
+    public function type_idate($fb, $datestring, $timezoneFallback = null)
     {
         $theType = Lib::type();
 
@@ -652,9 +663,11 @@ class DateModule
             $dateTimeImmutable = $datestring;
 
         } else {
-            if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($datestring);
+
+            if ( ! $ret->isOk([ &$datestringString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -662,7 +675,7 @@ class DateModule
 
             $timezoneFallbackObject = null;
             if ( null !== $timezoneFallback ) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+                $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
             }
 
             try {
@@ -677,7 +690,7 @@ class DateModule
 
         if ( null === $dateTimeImmutable ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be valid datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -685,14 +698,14 @@ class DateModule
 
         $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-        return Ret::ok(null, $dateTimeImmutableClone);
+        return Ret::ok($fb, $dateTimeImmutableClone);
     }
 
 
     /**
-     * @return Ret<\DateTimeInterface>
+     * @return Ret<\DateTimeInterface>|\DateTimeInterface
      */
-    public function type_date_formatted($dateFormatted, $formats, $timezoneFallback = null)
+    public function type_date_formatted($fb, $dateFormatted, $formats, $timezoneFallback = null)
     {
         $thePhp = Lib::php();
         $theType = Lib::type();
@@ -703,15 +716,18 @@ class DateModule
             $dateTime = $dateFormatted;
 
         } else {
-            if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($dateFormatted);
+
+            if ( ! $ret->isOk([ &$dateFormattedString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
             }
 
             $formatsList = $thePhp->to_list($formats);
+
             $formatsList = $theType->array_not_empty($formatsList)->orThrow();
 
             foreach ( $formatsList as $i => $format ) {
@@ -722,7 +738,7 @@ class DateModule
 
             $timezoneFallbackObject = null;
             if ( null !== $timezoneFallback ) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+                $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
             }
 
             foreach ( $formatsList as $format ) {
@@ -749,7 +765,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -757,13 +773,13 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTime>
+     * @return Ret<\DateTime>|\DateTime
      */
-    public function type_adate_formatted($dateFormatted, $formats, $timezoneFallback = null)
+    public function type_adate_formatted($fb, $dateFormatted, $formats, $timezoneFallback = null)
     {
         $thePhp = Lib::php();
         $theType = Lib::type();
@@ -774,15 +790,18 @@ class DateModule
             $dateTime = $dateFormatted;
 
         } else {
-            if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($dateFormatted);
+
+            if ( ! $ret->isOk([ &$dateFormattedString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
             }
 
             $formatsList = $thePhp->to_list($formats);
+
             $formatsList = $theType->array_not_empty($formatsList)->orThrow();
 
             foreach ( $formatsList as $i => $format ) {
@@ -793,7 +812,7 @@ class DateModule
 
             $timezoneFallbackObject = null;
             if ( null !== $timezoneFallback ) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+                $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
             }
 
             foreach ( $formatsList as $format ) {
@@ -820,7 +839,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -828,13 +847,13 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTimeImmutable>
+     * @return Ret<\DateTimeImmutable>|\DateTimeImmutable
      */
-    public function type_idate_formatted($dateFormatted, $formats, $timezoneFallback = null)
+    public function type_idate_formatted($fb, $dateFormatted, $formats, $timezoneFallback = null)
     {
         $thePhp = Lib::php();
         $theType = Lib::type();
@@ -845,15 +864,18 @@ class DateModule
             $dateTimeImmutable = $dateFormatted;
 
         } else {
-            if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($dateFormatted);
+
+            if ( ! $ret->isOk([ &$dateFormattedString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
             }
 
             $formatsList = $thePhp->to_list($formats);
+
             $formatsList = $theType->array_not_empty($formatsList)->orThrow();
 
             foreach ( $formatsList as $i => $format ) {
@@ -864,7 +886,7 @@ class DateModule
 
             $timezoneFallbackObject = null;
             if ( null !== $timezoneFallback ) {
-                $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+                $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
             }
 
             foreach ( $formatsList as $format ) {
@@ -891,7 +913,7 @@ class DateModule
 
         if ( null === $dateTimeImmutable ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -899,14 +921,14 @@ class DateModule
 
         $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-        return Ret::ok(null, $dateTimeImmutableClone);
+        return Ret::ok($fb, $dateTimeImmutableClone);
     }
 
 
     /**
-     * @return Ret<\DateTimeInterface>
+     * @return Ret<\DateTimeInterface>|\DateTimeInterface
      */
-    public function type_date_tz($datestring, ?array $allowedTimezoneTypes = null)
+    public function type_date_tz($fb, $datestring, ?array $allowedTimezoneTypes = null)
     {
         $theType = Lib::type();
 
@@ -918,9 +940,11 @@ class DateModule
             $dateTime = $datestring;
 
         } else {
-            if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($datestring);
+
+            if ( ! $ret->isOk([ &$datestringString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -938,7 +962,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be valid date or datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -948,18 +972,18 @@ class DateModule
 
         if ( $timezone->getName() === $timezoneNil->getName() ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be date with timezone', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_type($timezone);
+            $timezoneType = $this->timezone_extract_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `datestring` should be date with timezone of one of the allowed types', $datestring, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -968,13 +992,13 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTime>
+     * @return Ret<\DateTime>|\DateTime
      */
-    public function type_adate_tz($datestring, ?array $allowedTimezoneTypes = null)
+    public function type_adate_tz($fb, $datestring, ?array $allowedTimezoneTypes = null)
     {
         $theType = Lib::type();
 
@@ -986,9 +1010,11 @@ class DateModule
             $dateTime = $datestring;
 
         } else {
-            if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($datestring);
+
+            if ( ! $ret->isOk([ &$datestringString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -1006,7 +1032,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be valid date or datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1016,18 +1042,18 @@ class DateModule
 
         if ( $timezone->getName() === $timezoneNil->getName() ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be date with timezone', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_type($timezone);
+            $timezoneType = $this->timezone_extract_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `datestring` should be date with timezone of one of the allowed types', $datestring, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1036,13 +1062,13 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTimeImmutable>
+     * @return Ret<\DateTimeImmutable>|\DateTimeImmutable
      */
-    public function type_idate_tz($datestring, ?array $allowedTimezoneTypes = null)
+    public function type_idate_tz($fb, $datestring, ?array $allowedTimezoneTypes = null)
     {
         $theType = Lib::type();
 
@@ -1054,9 +1080,11 @@ class DateModule
             $dateTimeImmutable = $datestring;
 
         } else {
-            if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($datestring);
+
+            if ( ! $ret->isOk([ &$datestringString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
@@ -1074,7 +1102,7 @@ class DateModule
 
         if ( null === $dateTimeImmutable ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be valid date or datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1084,18 +1112,18 @@ class DateModule
 
         if ( $timezone->getName() === $timezoneNil->getName() ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be date with timezone', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_type($timezone);
+            $timezoneType = $this->timezone_extract_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `datestring` should be date with timezone of one of the allowed types', $datestring, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1104,14 +1132,14 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTimeImmutable);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
 
     /**
-     * @return Ret<\DateTimeInterface>
+     * @return Ret<\DateTimeInterface>|\DateTimeInterface
      */
-    public function type_date_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
+    public function type_date_tz_formatted($fb, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
     {
         $thePhp = Lib::php();
         $theType = Lib::type();
@@ -1124,15 +1152,18 @@ class DateModule
             $dateTime = $dateFormatted;
 
         } else {
-            if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($dateFormatted);
+
+            if ( ! $ret->isOk([ &$dateFormattedString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
             }
 
             $formatsList = $thePhp->to_list($formats);
+
             $formatsList = $theType->array_not_empty($formatsList)->orThrow();
 
             foreach ( $formatsList as $i => $format ) {
@@ -1165,7 +1196,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1175,18 +1206,18 @@ class DateModule
 
         if ( $timezone->getName() === $timezoneNil->getName() ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be date with timezone', $dateFormatted ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_type($timezone);
+            $timezoneType = $this->timezone_extract_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `dateFormatted` should be date with timezone of one of the allowed types', $dateFormatted, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1195,13 +1226,13 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTime>
+     * @return Ret<\DateTime>|\DateTime
      */
-    public function type_adate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
+    public function type_adate_tz_formatted($fb, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
     {
         $thePhp = Lib::php();
         $theType = Lib::type();
@@ -1214,15 +1245,18 @@ class DateModule
             $dateTime = $dateFormatted;
 
         } else {
-            if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($dateFormatted);
+
+            if ( ! $ret->isOk([ &$dateFormattedString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
             }
 
             $formatsList = $thePhp->to_list($formats);
+
             $formatsList = $theType->array_not_empty($formatsList)->orThrow();
 
             foreach ( $formatsList as $i => $format ) {
@@ -1255,7 +1289,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1265,18 +1299,18 @@ class DateModule
 
         if ( $timezone->getName() === $timezoneNil->getName() ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be date with timezone', $dateFormatted ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_type($timezone);
+            $timezoneType = $this->timezone_extract_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `dateFormatted` should be date with timezone of one of the allowed types', $dateFormatted, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1285,13 +1319,13 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTimeImmutable>
+     * @return Ret<\DateTimeImmutable>|\DateTimeImmutable
      */
-    public function type_idate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
+    public function type_idate_tz_formatted($fb, $dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
     {
         $thePhp = Lib::php();
         $theType = Lib::type();
@@ -1304,15 +1338,18 @@ class DateModule
             $dateTimeImmutable = $dateFormatted;
 
         } else {
-            if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+            $ret = $theType->string_not_empty($dateFormatted);
+
+            if ( ! $ret->isOk([ &$dateFormattedString ]) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     $ret,
                     [ __FILE__, __LINE__ ]
                 );
             }
 
             $formatsList = $thePhp->to_list($formats);
+
             $formatsList = $theType->array_not_empty($formatsList)->orThrow();
 
             foreach ( $formatsList as $i => $format ) {
@@ -1345,7 +1382,7 @@ class DateModule
 
         if ( null === $dateTimeImmutable ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1355,18 +1392,18 @@ class DateModule
 
         if ( $timezone->getName() === $timezoneNil->getName() ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be date with timezone', $dateFormatted ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_type($timezone);
+            $timezoneType = $this->timezone_extract_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
-                    null,
+                    $fb,
                     [ 'The `dateFormatted` should be date with timezone of one of the allowed types', $dateFormatted, $allowedTimezoneTypes ],
                     [ __FILE__, __LINE__ ]
                 );
@@ -1375,14 +1412,14 @@ class DateModule
 
         $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-        return Ret::ok(null, $dateTimeImmutableClone);
+        return Ret::ok($fb, $dateTimeImmutableClone);
     }
 
 
     /**
-     * @return Ret<\DateTimeInterface>
+     * @return Ret<\DateTimeInterface>|\DateTimeInterface
      */
-    public function type_date_no_tz($datestring, $timezoneFallback = null)
+    public function type_date_no_tz($fb, $datestring, $timezoneFallback = null)
     {
         $timezoneFallback = $timezoneFallback ?? $this->the_timezone_utc();
 
@@ -1390,9 +1427,11 @@ class DateModule
 
         $dateTime = null;
 
-        if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+        $ret = $theType->string_not_empty($datestring);
+
+        if ( ! $ret->isOk([ &$datestringString ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1411,7 +1450,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be valid date or datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1421,13 +1460,13 @@ class DateModule
 
         if ( $timezone->getName() !== $timezoneNil->getName() ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be date without timezone', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+        $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
 
         try {
             $dateTime = new \DateTime(
@@ -1440,13 +1479,13 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTime>
+     * @return Ret<\DateTime>|\DateTime
      */
-    public function type_adate_no_tz($datestring, $timezoneFallback = null)
+    public function type_adate_no_tz($fb, $datestring, $timezoneFallback = null)
     {
         $timezoneFallback = $timezoneFallback ?? $this->the_timezone_utc();
 
@@ -1454,9 +1493,11 @@ class DateModule
 
         $dateTime = null;
 
-        if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+        $ret = $theType->string_not_empty($datestring);
+
+        if ( ! $ret->isOk([ &$datestringString ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1475,7 +1516,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be valid date or datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1485,13 +1526,13 @@ class DateModule
 
         if ( $timezone->getName() !== $timezoneNil->getName() ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be date without timezone', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+        $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
 
         try {
             $dateTime = new \DateTime(
@@ -1504,13 +1545,13 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTimeImmutable>
+     * @return Ret<\DateTimeImmutable>|\DateTimeImmutable
      */
-    public function type_idate_no_tz($datestring, $timezoneFallback = null)
+    public function type_idate_no_tz($fb, $datestring, $timezoneFallback = null)
     {
         $timezoneFallback = $timezoneFallback ?? $this->the_timezone_utc();
 
@@ -1518,9 +1559,11 @@ class DateModule
 
         $dateTimeImmutable = null;
 
-        if ( ! $theType->string_not_empty($datestring)->isOk([ &$datestringString, &$ret ]) ) {
+        $ret = $theType->string_not_empty($datestring);
+
+        if ( ! $ret->isOk([ &$datestringString ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1539,7 +1582,7 @@ class DateModule
 
         if ( null === $dateTimeImmutable ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be valid date or datestring', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1549,13 +1592,13 @@ class DateModule
 
         if ( $timezone->getName() !== $timezoneNil->getName() ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `datestring` should be date without timezone', $datestring ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+        $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
 
         try {
             $dateTimeImmutable = new \DateTimeImmutable(
@@ -1568,14 +1611,14 @@ class DateModule
 
         $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-        return Ret::ok(null, $dateTimeImmutableClone);
+        return Ret::ok($fb, $dateTimeImmutableClone);
     }
 
 
     /**
-     * @return Ret<\DateTimeInterface>
+     * @return Ret<\DateTimeInterface>|\DateTimeInterface
      */
-    public function type_date_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
+    public function type_date_no_tz_formatted($fb, $dateFormatted, $formats, $timezoneFallback = null)
     {
         $timezoneFallback = $timezoneFallback ?? $this->the_timezone_utc();
 
@@ -1584,15 +1627,18 @@ class DateModule
 
         $dateTime = null;
 
-        if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+        $ret = $theType->string_not_empty($dateFormatted);
+
+        if ( ! $ret->isOk([ &$dateFormattedString ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         $formatsList = $thePhp->to_list($formats);
+
         $formatsList = $theType->array_not_empty($formatsList)->orThrow();
 
         foreach ( $formatsList as $i => $format ) {
@@ -1626,7 +1672,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1636,13 +1682,13 @@ class DateModule
 
         if ( $timezone->getName() !== $timezoneNil->getName() ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be date without timezone', $dateFormatted ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+        $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
 
         foreach ( $formatsList as $format ) {
             try {
@@ -1663,13 +1709,13 @@ class DateModule
 
         $dateTimeClone = $this->cloneToDate($dateTime);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTime>
+     * @return Ret<\DateTime>|\DateTime
      */
-    public function type_adate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
+    public function type_adate_no_tz_formatted($fb, $dateFormatted, $formats, $timezoneFallback = null)
     {
         $timezoneFallback = $timezoneFallback ?? $this->the_timezone_utc();
 
@@ -1678,15 +1724,18 @@ class DateModule
 
         $dateTime = null;
 
-        if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+        $ret = $theType->string_not_empty($dateFormatted);
+
+        if ( ! $ret->isOk([ &$dateFormattedString ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         $formatsList = $thePhp->to_list($formats);
+
         $formatsList = $theType->array_not_empty($formatsList)->orThrow();
 
         foreach ( $formatsList as $i => $format ) {
@@ -1720,7 +1769,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1730,13 +1779,13 @@ class DateModule
 
         if ( $timezone->getName() !== $timezoneNil->getName() ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be date without timezone', $dateFormatted ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+        $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
 
         foreach ( $formatsList as $format ) {
             try {
@@ -1757,13 +1806,13 @@ class DateModule
 
         $dateTimeClone = $this->cloneToADate($dateTime);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTimeImmutable>
+     * @return Ret<\DateTimeImmutable>|\DateTimeImmutable
      */
-    public function type_idate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
+    public function type_idate_no_tz_formatted($fb, $dateFormatted, $formats, $timezoneFallback = null)
     {
         $timezoneFallback = $timezoneFallback ?? $this->the_timezone_utc();
 
@@ -1772,15 +1821,18 @@ class DateModule
 
         $dateTimeImmutable = null;
 
-        if ( ! $theType->string_not_empty($dateFormatted)->isOk([ &$dateFormattedString, &$ret ]) ) {
+        $ret = $theType->string_not_empty($dateFormatted);
+
+        if ( ! $ret->isOk([ &$dateFormattedString ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
         $formatsList = $thePhp->to_list($formats);
+
         $formatsList = $theType->array_not_empty($formatsList)->orThrow();
 
         foreach ( $formatsList as $i => $format ) {
@@ -1814,7 +1866,7 @@ class DateModule
 
         if ( null === $dateTimeImmutable ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be valid date of passed format', $dateFormatted, $formats ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1824,13 +1876,13 @@ class DateModule
 
         if ( $timezone->getName() !== $timezoneNil->getName() ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `dateFormatted` should be date without timezone', $dateFormatted ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+        $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
 
         foreach ( $formatsList as $format ) {
             try {
@@ -1851,14 +1903,14 @@ class DateModule
 
         $dateTimeImmutableClone = $this->cloneToIDate($dateTimeImmutable);
 
-        return Ret::ok(null, $dateTimeImmutableClone);
+        return Ret::ok($fb, $dateTimeImmutableClone);
     }
 
 
     /**
-     * @return Ret<\DateTimeInterface>
+     * @return Ret<\DateTimeInterface>|\DateTimeInterface
      */
-    public function type_date_microtime($microtime, $timezoneSet = null)
+    public function type_date_microtime($fb, $microtime, $timezoneSet = null)
     {
         $timezoneSet = $timezoneSet ?? date_default_timezone_get();
 
@@ -1866,11 +1918,13 @@ class DateModule
 
         $dateTime = null;
 
-        $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
+        $timezoneSetObject = $this->type_timezone([], $timezoneSet);
 
-        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
+        $ret = $theType->numeric($microtime, false, [ &$split ]);
+
+        if ( ! $ret->isOk([ &$microtimeNumeric ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1909,7 +1963,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `microtime` should be valid microtime', $microtime ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1919,13 +1973,13 @@ class DateModule
 
         $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTime>
+     * @return Ret<\DateTime>|\DateTime
      */
-    public function type_adate_microtime($microtime, $timezoneSet = null)
+    public function type_adate_microtime($fb, $microtime, $timezoneSet = null)
     {
         $timezoneSet = $timezoneSet ?? date_default_timezone_get();
 
@@ -1933,11 +1987,13 @@ class DateModule
 
         $dateTime = null;
 
-        $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
+        $timezoneSetObject = $this->type_timezone([], $timezoneSet);
 
-        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
+        $ret = $theType->numeric($microtime, false, [ &$split ]);
+
+        if ( ! $ret->isOk([ &$microtimeNumeric ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -1976,7 +2032,7 @@ class DateModule
 
         if ( null === $dateTime ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `microtime` should be valid microtime', $microtime ],
                 [ __FILE__, __LINE__ ]
             );
@@ -1986,13 +2042,13 @@ class DateModule
 
         $dateTimeClone = $dateTimeClone->setTimezone($timezoneSetObject);
 
-        return Ret::ok(null, $dateTimeClone);
+        return Ret::ok($fb, $dateTimeClone);
     }
 
     /**
-     * @return Ret<\DateTimeImmutable>
+     * @return Ret<\DateTimeImmutable>|\DateTimeImmutable
      */
-    public function type_idate_microtime($microtime, $timezoneSet = null)
+    public function type_idate_microtime($fb, $microtime, $timezoneSet = null)
     {
         $timezoneSet = $timezoneSet ?? date_default_timezone_get();
 
@@ -2000,11 +2056,13 @@ class DateModule
 
         $dateTimeImmutable = null;
 
-        $timezoneSetObject = $this->type_timezone($timezoneSet)->orThrow();
+        $timezoneSetObject = $this->type_timezone([], $timezoneSet);
 
-        if ( ! $theType->numeric($microtime, false, [ &$split ])->isOk([ &$microtimeNumeric, &$ret ]) ) {
+        $ret = $theType->numeric($microtime, false, [ &$split ]);
+
+        if ( ! $ret->isOk([ &$microtimeNumeric ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -2043,7 +2101,7 @@ class DateModule
 
         if ( null === $dateTimeImmutable ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `microtime` should be valid microtime', $microtime ],
                 [ __FILE__, __LINE__ ]
             );
@@ -2053,7 +2111,7 @@ class DateModule
 
         $dateTimeImmutableClone = $dateTimeImmutableClone->setTimezone($timezoneSetObject);
 
-        return Ret::ok(null, $dateTimeImmutableClone);
+        return Ret::ok($fb, $dateTimeImmutableClone);
     }
 
 
@@ -2061,17 +2119,16 @@ class DateModule
      * @param string|\DateTimeInterface|\DateTimeZone $a
      * @param string|\DateTimeInterface|\DateTimeZone $b
      */
-    public function timezone_same($a, $b) : bool
+    public function is_timezones_equal($a, $b) : bool
     {
-        $theType = Lib::type();
-
-        $aObject = $theType->timezone($a)->orThrow();
-        $bObject = $theType->timezone($b)->orThrow();
+        $aObject = $this->type_timezone([], $a);
+        $bObject = $this->type_timezone([], $b);
 
         return $aObject->getName() === $bObject->getName();
     }
 
-    public function timezone_type(\DateTimeZone $timezone) : int
+
+    public function timezone_extract_type(\DateTimeZone $timezone) : int
     {
         return (PHP_VERSION_ID >= 70400)
             ? json_decode(json_encode($timezone))->timezone_type
@@ -2112,8 +2169,6 @@ class DateModule
      * @param class-string<T>|null $intervalClass
      *
      * @return T
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     public function interval_decode(string $duration, ?string $intervalClass = null) : \DateInterval
     {
@@ -2250,9 +2305,7 @@ class DateModule
     {
         $timezoneSet = $timezoneSet ?? date_default_timezone_get();
 
-        $theType = Lib::type();
-
-        $timezoneSetObject = $theType->timezone($timezoneSet)->orThrow();
+        $timezoneSetObject = $this->type_timezone([], $timezoneSet);
 
         $clone = $this->cloneToDate($date);
 
@@ -2265,9 +2318,7 @@ class DateModule
     {
         $timezoneSet = $timezoneSet ?? date_default_timezone_get();
 
-        $theType = Lib::type();
-
-        $timezoneSetObject = $theType->timezone($timezoneSet)->orThrow();
+        $timezoneSetObject = $this->type_timezone([], $timezoneSet);
 
         $clone = $this->cloneToADate($date);
 
@@ -2280,9 +2331,7 @@ class DateModule
     {
         $timezoneSet = $timezoneSet ?? date_default_timezone_get();
 
-        $theType = Lib::type();
-
-        $timezoneSetObject = $theType->timezone($timezoneSet)->orThrow();
+        $timezoneSetObject = $this->type_timezone([], $timezoneSet);
 
         $clone = $this->cloneToIDate($date);
 
@@ -2296,7 +2345,7 @@ class DateModule
     {
         $timezoneFallbackObject = null;
         if ( null !== $timezoneFallback ) {
-            $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+            $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
         }
 
         try {
@@ -2313,7 +2362,7 @@ class DateModule
     {
         $timezoneFallbackObject = null;
         if ( null !== $timezoneFallback ) {
-            $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+            $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
         }
 
         try {
@@ -2331,7 +2380,7 @@ class DateModule
     {
         $timezoneFallbackObject = null;
         if ( null !== $timezoneFallback ) {
-            $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+            $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
         }
 
         try {
@@ -2348,7 +2397,7 @@ class DateModule
     {
         $timezoneFallbackObject = null;
         if ( null !== $timezoneFallback ) {
-            $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+            $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
         }
 
         try {
@@ -2366,7 +2415,7 @@ class DateModule
     {
         $timezoneFallbackObject = null;
         if ( null !== $timezoneFallback ) {
-            $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+            $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
         }
 
         try {
@@ -2383,7 +2432,7 @@ class DateModule
     {
         $timezoneFallbackObject = null;
         if ( null !== $timezoneFallback ) {
-            $timezoneFallbackObject = $this->type_timezone($timezoneFallback)->orThrow();
+            $timezoneFallbackObject = $this->type_timezone([], $timezoneFallback);
         }
 
         try {
@@ -2711,7 +2760,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
 
         } else {
             $formatted[] = $this->format_sql_non_utc($dateTime);
@@ -2719,7 +2768,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_type($timezone);
+            $formatted[] = $this->timezone_extract_type($timezone);
         }
 
         return $formatted;
@@ -2739,7 +2788,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
 
         } else {
             $formatted[] = $this->format_sql_sec_non_utc($dateTime);
@@ -2747,7 +2796,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_type($timezone);
+            $formatted[] = $this->timezone_extract_type($timezone);
         }
 
         return $formatted;
@@ -2767,7 +2816,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
 
         } else {
             $formatted[] = $this->format_sql_msec_non_utc($dateTime);
@@ -2775,7 +2824,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_type($timezone);
+            $formatted[] = $this->timezone_extract_type($timezone);
         }
 
         return $formatted;
@@ -2795,7 +2844,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
 
         } else {
             $formatted[] = $this->format_sql_usec_non_utc($dateTime);
@@ -2803,7 +2852,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_type($timezone);
+            $formatted[] = $this->timezone_extract_type($timezone);
         }
 
         return $formatted;
@@ -2910,7 +2959,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
 
         } else {
             $formatted[] = $this->format_javascript($dateTime);
@@ -2918,7 +2967,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_type($timezone);
+            $formatted[] = $this->timezone_extract_type($timezone);
         }
 
         return $formatted;
@@ -2938,7 +2987,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
 
         } else {
             $formatted[] = $this->format_javascript_sec($dateTime);
@@ -2946,7 +2995,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_type($timezone);
+            $formatted[] = $this->timezone_extract_type($timezone);
         }
 
         return $formatted;
@@ -2966,7 +3015,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
 
         } else {
             $formatted[] = $this->format_javascript_msec($dateTime);
@@ -2974,7 +3023,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_type($timezone);
+            $formatted[] = $this->timezone_extract_type($timezone);
         }
 
         return $formatted;
@@ -2994,7 +3043,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
 
         } else {
             $formatted[] = $this->format_javascript_usec($dateTime);
@@ -3002,7 +3051,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_type($timezone);
+            $formatted[] = $this->timezone_extract_type($timezone);
         }
 
         return $formatted;
@@ -3012,6 +3061,8 @@ class DateModule
 
     public function format_locale_month(\DateTimeInterface $dateTime, string $locale) : string
     {
+        $theMb = Lib::mb();
+
         $formatter = new \IntlDateFormatter(
             $locale,
             \IntlDateFormatter::NONE,
@@ -3023,13 +3074,15 @@ class DateModule
 
         $content = $formatter->format($dateTime);
 
-        $content = mb_strtolower($content);
+        $content = $theMb->mb_strtolower($content);
 
         return $content;
     }
 
     public function format_locale_month_short(\DateTimeInterface $dateTime, string $locale) : string
     {
+        $theMb = Lib::mb();
+
         $formatter = new \IntlDateFormatter(
             $locale,
             \IntlDateFormatter::NONE,
@@ -3041,7 +3094,7 @@ class DateModule
 
         $content = $formatter->format($dateTime);
 
-        $content = mb_strtolower($content);
+        $content = $theMb->mb_strtolower($content);
 
         return $content;
     }
@@ -3049,6 +3102,8 @@ class DateModule
 
     public function format_locale_day(\DateTimeInterface $dateTime, string $locale) : string
     {
+        $theMb = Lib::mb();
+
         $formatter = new \IntlDateFormatter(
             $locale,
             \IntlDateFormatter::NONE,
@@ -3060,13 +3115,15 @@ class DateModule
 
         $content = $formatter->format($dateTime);
 
-        $content = mb_strtolower($content);
+        $content = $theMb->mb_strtolower($content);
 
         return $content;
     }
 
     public function format_locale_day_short(\DateTimeInterface $dateTime, string $locale) : string
     {
+        $theMb = Lib::mb();
+
         $formatter = new \IntlDateFormatter(
             $locale,
             \IntlDateFormatter::NONE,
@@ -3078,7 +3135,7 @@ class DateModule
 
         $content = $formatter->format($dateTime);
 
-        $content = mb_strtolower($content);
+        $content = $theMb->mb_strtolower($content);
 
         return $content;
     }
@@ -3086,6 +3143,8 @@ class DateModule
 
     public function get_locale_months(string $locale) : array
     {
+        $theMb = Lib::mb();
+
         $formatter = new \IntlDateFormatter(
             $locale,
             \IntlDateFormatter::NONE,
@@ -3099,7 +3158,7 @@ class DateModule
 
         for ( $i = 1; $i <= 12; $i++ ) {
             $content = $formatter->format($date);
-            $content = mb_strtolower($content);
+            $content = $theMb->mb_strtolower($content);
 
             $days[] = $content;
 
@@ -3111,6 +3170,8 @@ class DateModule
 
     public function get_locale_months_short(string $locale) : array
     {
+        $theMb = Lib::mb();
+
         $formatter = new \IntlDateFormatter(
             $locale,
             \IntlDateFormatter::NONE,
@@ -3124,7 +3185,7 @@ class DateModule
 
         for ( $i = 1; $i <= 12; $i++ ) {
             $content = $formatter->format($date);
-            $content = mb_strtolower($content);
+            $content = $theMb->mb_strtolower($content);
 
             $days[] = $content;
 
@@ -3137,6 +3198,8 @@ class DateModule
 
     public function get_locale_days(string $locale) : array
     {
+        $theMb = Lib::mb();
+
         $formatter = new \IntlDateFormatter(
             $locale,
             \IntlDateFormatter::NONE,
@@ -3150,7 +3213,7 @@ class DateModule
 
         for ( $i = 1; $i <= 7; $i++ ) {
             $content = $formatter->format($date);
-            $content = mb_strtolower($content);
+            $content = $theMb->mb_strtolower($content);
 
             $days[] = $content;
 
@@ -3162,6 +3225,8 @@ class DateModule
 
     public function get_locale_days_short(string $locale) : array
     {
+        $theMb = Lib::mb();
+
         $formatter = new \IntlDateFormatter(
             $locale,
             \IntlDateFormatter::NONE,
@@ -3175,7 +3240,7 @@ class DateModule
 
         for ( $i = 1; $i <= 7; $i++ ) {
             $content = $formatter->format($date);
-            $content = mb_strtolower($content);
+            $content = $theMb->mb_strtolower($content);
 
             $days[] = $content;
 

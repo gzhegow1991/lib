@@ -2,13 +2,13 @@
 
 namespace Gzhegow\Lib\Modules;
 
-use Gzhegow\Lib\Modules\Async\Promise\DefaultPromiseManager;
 use Gzhegow\Lib\Modules\Async\Loop\DefaultLoopManager;
 use Gzhegow\Lib\Modules\Async\Clock\DefaultClockManager;
 use Gzhegow\Lib\Modules\Async\Loop\LoopManagerInterface;
 use Gzhegow\Lib\Modules\Async\FetchApi\FetchApiInterface;
 use Gzhegow\Lib\Modules\Async\FetchApi\FilesystemFetchApi;
 use Gzhegow\Lib\Modules\Async\Clock\ClockManagerInterface;
+use Gzhegow\Lib\Modules\Async\Promise\DefaultPromiseManager;
 use Gzhegow\Lib\Modules\Async\Promise\PromiseManagerInterface;
 use Gzhegow\Lib\Modules\Async\Promise\Pooling\DefaultPromisePoolingFactory;
 use Gzhegow\Lib\Modules\Async\Promise\Pooling\PromisePoolingFactoryInterface;

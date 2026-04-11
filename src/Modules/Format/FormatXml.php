@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @noinspection PhpComposerExtensionStubsInspection
+ */
+
 namespace Gzhegow\Lib\Modules\Format;
 
 use Gzhegow\Lib\Lib;
@@ -26,19 +30,25 @@ class FormatXml
 
 
     /**
-     * @return \SimpleXMLElement|Ret<\SimpleXMLElement>
+     * @return Ret<\SimpleXMLElement>|\SimpleXMLElement
      */
-    public function parse_xml_sxe(?array $fallback, $xml)
+    public function parse_xml_sxe($fb, $xml)
     {
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($xml)->isOk([ &$xmlStringNotEmpty, &$ret ]) ) {
-            return Ret::throw($fallback, $ret);
+        $ret = $theType->string_not_empty($xml);
+
+        if ( ! $ret->isOk([ &$xmlStringNotEmpty ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if ( false === strpos($xmlStringNotEmpty, '<') ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `xml` should contain at least one symbol `<`', $xml ],
                 [ __FILE__, __LINE__ ]
             );
@@ -53,7 +63,7 @@ class FormatXml
             || (preg_match('/<\w+:(\w+)[^>]*>|xmlns:/i', $xml))
         ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `xml` cannot be parsed using SimpleXmlElement due to it contains complex XML', $xml ],
                 [ __FILE__, __LINE__ ]
             );
@@ -93,37 +103,50 @@ class FormatXml
                 );
             }
 
-            if ( $ret->isFail() ) {
-                return Ret::throw($fallback, $ret);
+            if ( ! $ret->isOk() ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                //
+                // > commented, cause: without duplicate
+                // [ __FILE__, __LINE__ ]
+                // < commented, cause: without duplicate
+                );
             }
         }
 
         if ( $e ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fallback, $sxe);
+        return Ret::ok($fb, $sxe);
     }
 
 
     /**
-     * @return \DOMDocument|Ret<\DOMDocument>
+     * @return Ret<\DOMDocument>|\DOMDocument
      */
-    public function parse_xml_dom_document(?array $fallback, $xml)
+    public function parse_xml_dom_document($fb, $xml)
     {
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($xml)->isOk([ &$xmlStringNotEmpty, &$ret ]) ) {
-            return Ret::throw($fallback, $ret);
+        $ret = $theType->string_not_empty($xml);
+
+        if ( ! $ret->isOk([ &$xmlStringNotEmpty ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         if ( false === strpos($xmlStringNotEmpty, '<') ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `xml` should contain at least one symbol `<`', $xml ],
                 [ __FILE__, __LINE__ ]
             );
@@ -164,19 +187,26 @@ class FormatXml
                 );
             }
 
-            if ( $ret->isFail() ) {
-                return Ret::throw($fallback, $ret);
+            if ( ! $ret->isOk() ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                //
+                // > commented, cause: without duplicate
+                // [ __FILE__, __LINE__ ]
+                // < commented, cause: without duplicate
+                );
             }
         }
 
         if ( $e ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 $e,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fallback, $ddoc);
+        return Ret::ok($fb, $ddoc);
     }
 }

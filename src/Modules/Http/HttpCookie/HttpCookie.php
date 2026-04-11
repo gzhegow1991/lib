@@ -65,13 +65,20 @@ class HttpCookie implements
 
         $cookieExpiresString = $this->cookieParams['expires'] ?? '';
 
+        $ret = $theType->idate_formatted($cookieExpiresString, 'D, d M Y H:i:s T');
+
         $cookieExpires = -99999;
-        if ( $theType->idate_formatted($cookieExpiresString, 'D, d M Y H:i:s T')->isOk([ &$cookieExpiresDate ]) ) {
+        if ( $ret->isOk([ &$cookieExpiresDate ]) ) {
             $now = $theDate->idate_now();
+
             $cookieExpires = $cookieExpiresDate->getTimestamp() - $now->getTimestamp();
 
-        } elseif ( $theType->int($cookieExpiresString)->isOk([ &$cookieExpiresInt ]) ) {
-            $cookieExpires = $cookieExpiresInt;
+        } else {
+            $ret = $theType->int($cookieExpiresString);
+
+            if ( $ret->isOk([ &$cookieExpiresInt ]) ) {
+                $cookieExpires = $cookieExpiresInt;
+            }
         }
 
         $cookieOptions = [
@@ -91,9 +98,9 @@ class HttpCookie implements
 
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function from($from, ?array $fallback = null)
+    public static function from($from, $fb = null)
     {
         $ret = Ret::new();
 
@@ -103,39 +110,43 @@ class HttpCookie implements
             ?? static::fromArraySetrawcookieArgs($from)->orNull($ret)
             ?? static::fromString($from)->orNull($ret);
 
-        if ( $ret->isFail() ) {
-            return Ret::throw($fallback, $ret);
+        if ( ! $ret->isOk() ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromStatic($from, ?array $fallback = null)
+    public static function fromStatic($from, $fb = null)
     {
         if ( $from instanceof static ) {
-            return Ret::ok($fallback, $from);
+            return Ret::ok($fb, $from);
         }
 
         return Ret::throw(
-            $fallback,
+            $fb,
             [ 'The `from` should be instance of ' . static::class, $from ],
             [ __FILE__, __LINE__ ],
         );
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromObjectHttpHeader($from, ?array $fallback = null)
+    public static function fromObjectHttpHeader($from, $fb = null)
     {
         $theType = Lib::type();
 
         if ( ! ($from instanceof HttpHeader) ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `from` should be instance of ' . HttpHeader::class, $from ],
                 [ __FILE__, __LINE__ ],
             );
@@ -145,7 +156,7 @@ class HttpCookie implements
 
         if ( 'SET-COOKIE' !== $header->getName() ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `header` name should be SET-COOKIE', $header ],
                 [ __FILE__, __LINE__ ],
             );
@@ -158,8 +169,14 @@ class HttpCookie implements
 
         [ $cookieName, $cookieValue ] = $headerArray;
 
-        if ( ! $theType->string_not_empty($cookieName)->isOk([ &$cookieNameString, &$ret ]) ) {
-            return Ret::throw($fallback, $ret);
+        $ret = $theType->string_not_empty($cookieName);
+
+        if ( ! $ret->isOk([ &$cookieNameString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $cookieValueRawurlencode = rawurlencode($cookieValue);
@@ -179,19 +196,19 @@ class HttpCookie implements
         $instance->domain = $cookieDomain;
         $instance->cookieParams = $headerParams;
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromArraySetrawcookieArgs($from, ?array $fallback = null)
+    public static function fromArraySetrawcookieArgs($from, $fb = null)
     {
         $theType = Lib::type();
 
         if ( ! is_array($from) ) {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `from` should be array', $from ],
                 [ __FILE__, __LINE__ ],
             );
@@ -201,8 +218,14 @@ class HttpCookie implements
         $value = $from['value'] ?? $from[1] ?? '';
         $expiresOrOptions = $from['expires_or_options'] ?? $from[2] ?? null;
 
-        if ( ! $theType->string_not_empty($name)->isOk([ 1 => &$ret ]) ) {
-            return Ret::throw($fallback, $ret);
+        $ret = $theType->string_not_empty($name);
+
+        if ( ! $ret->isOk() ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $valueRawurlencode = rawurlencode($value);
@@ -231,7 +254,7 @@ class HttpCookie implements
 
         } else {
             return Ret::throw(
-                $fallback,
+                $fb,
                 [ 'The `from[expires_or_options]` or `from[2]` should be an array or an integer', $from ],
                 [ __FILE__, __LINE__ ]
             );
@@ -244,18 +267,36 @@ class HttpCookie implements
 
         $secure = $secure ?? false;
 
-        if ( ! $theType->int($expires)->isOk([ &$expiresInt, &$ret ]) ) {
-            return Ret::throw($fallback, $ret);
+        $ret = $theType->int($expires);
+
+        if ( ! $ret->isOk([ &$expiresInt ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ( ! $theType->string_not_empty($path)->isOk([ &$pathStringNotEmpty, &$ret ]) ) {
-            return Ret::throw($fallback, $ret);
+        $ret = $theType->string_not_empty($path);
+
+        if ( ! $ret->isOk([ &$pathStringNotEmpty ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
         $domainString = null;
         if ( null !== $domain ) {
-            if ( ! $theType->string_not_empty($domain)->isOk([ &$domainStringNotEmpty, &$ret ]) ) {
-                return Ret::throw($fallback, $ret);
+            $ret = $theType->string_not_empty($domain);
+
+            if ( ! $ret->isOk([ &$domainStringNotEmpty ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
@@ -275,23 +316,35 @@ class HttpCookie implements
         $instance->domain = $domainString;
         $instance->cookieParams = $optionsLower;
 
-        return Ret::ok($fallback, $instance);
+        return Ret::ok($fb, $instance);
     }
 
     /**
-     * @return static|Ret<static>
+     * @return Ret<static>|static
      */
-    public static function fromString($from, ?array $fallback = null)
+    public static function fromString($from, $fb = null)
     {
-        if ( ! HttpHeader::fromString($from)->isOk([ &$httpHeaderObject, &$ret ]) ) {
-            return Ret::throw($fallback, $ret);
+        $ret = HttpHeader::fromString($from);
+
+        if ( ! $ret->isOk([ &$httpHeaderObject ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        if ( ! static::fromObjectHttpHeader($httpHeaderObject)->isOk([ &$httpCookieObject, &$ret ]) ) {
-            return Ret::throw($fallback, $ret);
+        $ret = static::fromObjectHttpHeader($httpHeaderObject);
+
+        if ( ! $ret->isOk([ &$httpCookieObject ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::ok($fallback, $httpCookieObject);
+        return Ret::ok($fb, $httpCookieObject);
     }
 
 

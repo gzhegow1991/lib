@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @noinspection PhpComposerExtensionStubsInspection
+ * @noinspection PhpElementIsNotAvailableInCurrentPhpVersionInspection
+ */
+
 namespace Gzhegow\Lib\Modules\Fs\SocketSafe;
 
 use Gzhegow\Lib\Lib;
@@ -22,6 +27,10 @@ class SocketSafeProxy
 
     public function __construct(SocketSafe $inner)
     {
+        $theType = Lib::type();
+
+        $theType->is_extension_loaded('sockets')->orThrow();
+
         $this->inner = $inner;
     }
 

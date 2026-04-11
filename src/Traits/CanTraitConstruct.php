@@ -15,7 +15,9 @@ trait CanTraitConstruct
         $traits = $thePhp->class_uses_with_parents($this, true);
 
         foreach ( $traits as $trait ) {
-            if ( ! $theType->struct_basename($trait)->isOk([ &$traitBasename ]) ) {
+            $ret = $theType->struct_basename($trait);
+
+            if ( ! $ret->isOk([ &$traitBasename ]) ) {
                 continue;
             }
 

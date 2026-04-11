@@ -6,8 +6,10 @@
 
 namespace Gzhegow\Lib;
 
+use Gzhegow\Lib\Modules\TModule;
 use Gzhegow\Lib\Modules\FsModule;
 use Gzhegow\Lib\Modules\MbModule;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Modules\ArrModule;
 use Gzhegow\Lib\Modules\CliModule;
 use Gzhegow\Lib\Modules\CmpModule;
@@ -294,7 +296,6 @@ class Lib
     }
 
 
-
     /**
      * @var FsModule
      */
@@ -481,6 +482,16 @@ class Lib
     }
 
     /**
+     * @var TModule
+     */
+    public static $t;
+
+    public static function t()
+    {
+        return static::$t = static::$t ?? (new TModule())->__initialize();
+    }
+
+    /**
      * @var TestModule
      */
     public static $test;
@@ -512,27 +523,51 @@ class Lib
 
 
     /**
-     * > фабрика для Pipe - задать этапы задачи в наглядом виде без деталей
+     * > фабрика для ErrorBag - добавить теги ошибкам, чтобы потом сохранить в несколько отчетов
+     *
+     * @param ErrorBag $ref
+     *
+     * @return ErrorBag
      */
-    public static function pipe(?Pipe &$refP = null) : Pipe
+    public static function errorBag(&$ref = null)
     {
-        return $refP = Lib::func()->newPipe();
+        return $ref = Lib::php()->newErrorBag();
     }
 
     /**
-     * > фабрика для ErrorBag - добавить теги ошибкам, чтобы потом сохранить в несколько отчетов
+     * > фабрика для Pipe - задать этапы задачи в наглядом виде без деталей
+     *
+     * @param Pipe $ref
+     *
+     * @return Pipe
      */
-    public static function errorBag(?ErrorBag &$refB = null) : ErrorBag
+    public static function pipe(&$ref = null)
     {
-        return $refB = Lib::php()->newErrorBag();
+        return $ref = Lib::func()->newPipe();
+    }
+
+    /**
+     * > фабрика для Ret - собирать ошибки из цепочек if/else
+     *
+     * @param Ret $ref
+     *
+     * @return Ret
+     */
+    public static function ret(&$ref = null)
+    {
+        return $ref = Ret::new();
     }
 
     /**
      * > фабрика для TestCase - быстро создать тест, проверяющий вывод, возврат, затраты времени и памяти
+     *
+     * @param TestCase $ref
+     *
+     * @return TestCase
      */
-    public static function testCase(?TestCase &$refT = null) : TestCase
+    public static function testCase(&$ref = null)
     {
-        return $refT = Lib::test()->newTestCase();
+        return $ref = Lib::test()->newTestCase();
     }
 
 
@@ -637,7 +672,7 @@ class Lib
      *
      * @return array|float
      */
-    public static function benchmark($clear = null, ?string $tag = null)
+    public static function mt($clear = null, ?string $tag = null)
     {
         /** @var float $microtime */
 
@@ -835,7 +870,9 @@ class Lib
         if ( $hasKeyOrClassT ) {
             $theType = Lib::type();
 
-            $hasClassT = $theType->struct_exists($keyOrClassT)->isOk();
+            $ret = $theType->struct_exists($keyOrClassT);
+
+            $hasClassT = $ret->isOk();
         }
 
         if ( $hasKeyOrClassT && $hasKey ) {

@@ -58,20 +58,26 @@ class CryptModule
 
     public function __initialize()
     {
+        $theType = Lib::type();
+
+        $theType->is_extension_loaded('mcrypt')->orThrow();
+
         return $this;
     }
 
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_base($value, $alphabet)
+    public function type_base($fb, $value, $alphabet)
     {
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -81,25 +87,27 @@ class CryptModule
 
         if ( preg_match($alphabetValid->getRegexNot(), $valueStringNotEmpty) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid base of given alphabet', $value, $alphabet ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $valueStringNotEmpty);
+        return Ret::ok($fb, $valueStringNotEmpty);
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_base_bin($value)
+    public function type_base_bin($fb, $value)
     {
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -107,25 +115,27 @@ class CryptModule
 
         if ( preg_match('~[^01]~', $valueStringNotEmpty) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid binary string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $valueStringNotEmpty);
+        return Ret::ok($fb, $valueStringNotEmpty);
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_base_oct($value)
+    public function type_base_oct($fb, $value)
     {
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -133,25 +143,27 @@ class CryptModule
 
         if ( preg_match('~[^01234567]~', $valueStringNotEmpty) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid octal string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $valueStringNotEmpty);
+        return Ret::ok($fb, $valueStringNotEmpty);
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_base_dec($value)
+    public function type_base_dec($fb, $value)
     {
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -159,25 +171,27 @@ class CryptModule
 
         if ( preg_match('~[^0123456789]~', $valueStringNotEmpty) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid decimal string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $valueStringNotEmpty);
+        return Ret::ok($fb, $valueStringNotEmpty);
     }
 
     /**
-     * @return Ret<string>
+     * @return Ret<string>|string
      */
-    public function type_base_hex($value)
+    public function type_base_hex($fb, $value)
     {
         $theType = Lib::type();
 
-        if ( ! $theType->string_not_empty($value)->isOk([ &$valueStringNotEmpty, &$ret ]) ) {
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueStringNotEmpty ]) ) {
             return Ret::throw(
-                null,
+                $fb,
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
@@ -185,13 +199,13 @@ class CryptModule
 
         if ( preg_match('~[^0123456789ABCDEF]~', $valueStringNotEmpty) ) {
             return Ret::throw(
-                null,
+                $fb,
                 [ 'The `value` should be valid hexademical string', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok(null, $valueStringNotEmpty);
+        return Ret::ok($fb, $valueStringNotEmpty);
     }
 
 
@@ -623,6 +637,7 @@ class CryptModule
             return '';
         }
 
+        $theBcmath = Lib::bcmath();
         $theType = Lib::type();
 
         $alphabetToObject = $theType->alphabet($alphabetTo)->orThrow();
@@ -643,24 +658,24 @@ class CryptModule
             $ordString = (string) $ord;
 
             for ( $ii = 0; $ii < $digitsCnt; $ii++ ) {
-                $digits[$ii] = bcmul($digits[$ii], '256', 0);
+                $digits[$ii] = $theBcmath->bcmul($digits[$ii], '256', 0);
             }
 
-            $digits[0] = bcadd($digits[0], $ordString);
+            $digits[0] = $theBcmath->bcadd($digits[0], $ordString);
 
             $overflow = '0';
             for ( $ii = 0; $ii < $digitsCnt; $ii++ ) {
-                $digits[$ii] = bcadd($digits[$ii], $overflow, 0);
+                $digits[$ii] = $theBcmath->bcadd($digits[$ii], $overflow, 0);
 
-                $overflow = bcdiv($digits[$ii], $baseToString, 0);
+                $overflow = $theBcmath->bcdiv($digits[$ii], $baseToString, 0);
 
-                $digits[$ii] = bcmod($digits[$ii], $baseToString, 0);
+                $digits[$ii] = $theBcmath->bcmod($digits[$ii], $baseToString, 0);
             }
 
-            while ( bccomp($overflow, '0', 1) > 0 ) {
-                $digits[] = bcmod($overflow, $baseToString, 0);
+            while ( $theBcmath->bccomp($overflow, '0', 1) > 0 ) {
+                $digits[] = $theBcmath->bcmod($overflow, $baseToString, 0);
 
-                $overflow = bcdiv($overflow, $baseToString, 0);
+                $overflow = $theBcmath->bcdiv($overflow, $baseToString, 0);
             }
         }
 
@@ -686,50 +701,52 @@ class CryptModule
             return '';
         }
 
+        $theBcmath = Lib::bcmath();
+        $theMb = Lib::mb();
         $theType = Lib::type();
 
         $baseStringValid = $theType->base($baseString, $alphabetFrom)->orThrow();
 
-        $alphabetFromLen = mb_strlen($alphabetFrom);
-        $alphabetFromZero = mb_substr($alphabetFrom, 0, 1);
+        $alphabetFromLen = $theMb->mb_strlen($alphabetFrom);
+        $alphabetFromZero = $theMb->mb_substr($alphabetFrom, 0, 1);
 
         $baseFrom = $alphabetFromLen;
         $baseFromString = (string) $baseFrom;
 
-        $numbaseStringLen = mb_strlen($baseStringValid);
+        $numbaseStringLen = $theMb->mb_strlen($baseStringValid);
 
         $bytes = [ '0' ];
         for ( $i = 0; $i < $numbaseStringLen; $i++ ) {
             $bytesCnt = count($bytes);
 
-            $chr = mb_substr($baseStringValid, $i, 1);
+            $chr = $theMb->mb_substr($baseStringValid, $i, 1);
 
             for ( $ii = 0; $ii < $bytesCnt; $ii++ ) {
-                $bytes[$ii] = bcmul($bytes[$ii], $baseFromString, 0);
+                $bytes[$ii] = $theBcmath->bcmul($bytes[$ii], $baseFromString, 0);
             }
 
-            $idx = mb_strpos($alphabetFrom, $chr);
+            $idx = $theMb->mb_strpos($alphabetFrom, $chr);
 
-            $bytes[0] = bcadd($bytes[0], $idx, 0);
+            $bytes[0] = $theBcmath->bcadd($bytes[0], $idx, 0);
 
             $overflow = '0';
             for ( $ii = 0; $ii < $bytesCnt; $ii++ ) {
-                $bytes[$ii] = bcadd($bytes[$ii], $overflow, 0);
+                $bytes[$ii] = $theBcmath->bcadd($bytes[$ii], $overflow, 0);
 
-                $overflow = bcdiv($bytes[$ii], '256', 0);
+                $overflow = $theBcmath->bcdiv($bytes[$ii], '256', 0);
 
-                $bytes[$ii] = bcmod($bytes[$ii], '256', 0);
+                $bytes[$ii] = $theBcmath->bcmod($bytes[$ii], '256', 0);
             }
 
-            while ( bccomp($overflow, '0', 1) > 0 ) {
-                $bytes[] = bcmod($overflow, '256', 0);
+            while ( $theBcmath->bccomp($overflow, '0', 1) > 0 ) {
+                $bytes[] = $theBcmath->bcmod($overflow, '256', 0);
 
-                $overflow = bcdiv($overflow, '256', 0);
+                $overflow = $theBcmath->bcdiv($overflow, '256', 0);
             }
         }
 
         for ( $i = 0; $i < $numbaseStringLen; $i++ ) {
-            $chr = mb_substr($baseString, $i, 1);
+            $chr = $theMb->mb_substr($baseString, $i, 1);
 
             if ( $chr !== $alphabetFromZero ) {
                 break;
@@ -779,18 +796,18 @@ class CryptModule
             yield $baseLetter;
         }
 
-        $bytesPerBlock = $theBcmath->bclcm('8', $bytesCnt);
-        $bytesPerBlock = bcdiv($bytesPerBlock, '8');
+        $bytesPerBlock = $theBcmath->bc_lcm('8', $bytesCnt);
+        $bytesPerBlock = $theBcmath->bcdiv($bytesPerBlock, '8');
 
         $padCnt = $binaryLen;
-        $padCnt = bcmod($padCnt, $bytesPerBlock, 0);
-        $padCnt = bcsub($bytesPerBlock, $padCnt, 0);
-        $padCnt = bcmod($padCnt, $bytesPerBlock, 0);
+        $padCnt = $theBcmath->bcmod($padCnt, $bytesPerBlock, 0);
+        $padCnt = $theBcmath->bcsub($bytesPerBlock, $padCnt, 0);
+        $padCnt = $theBcmath->bcmod($padCnt, $bytesPerBlock, 0);
 
-        while ( bccomp($padCnt, '0', 1) > 0 ) {
+        while ( $theBcmath->bccomp($padCnt, '0', 1) > 0 ) {
             yield '=';
 
-            $padCnt = bcsub($padCnt, '1', 0);
+            $padCnt = $theBcmath->bcsub($padCnt, '1', 0);
         }
     }
 
@@ -857,6 +874,7 @@ class CryptModule
      */
     public function bin2base_it($binaries, $alphabetTo) : \Generator
     {
+        $theBcmath = Lib::bcmath();
         $thePhp = Lib::php();
         $theType = Lib::type();
 
@@ -884,13 +902,13 @@ class CryptModule
 
         $bitsLeft = $bitsCnt;
         foreach ( $binariesIt as $binary ) {
-            $binaryValid = $this->type_base_bin($binary)->orThrow();
+            $binaryValid = $this->type_base_bin([], $binary);
 
             $binarySize = strlen($binaryValid);
 
             for ( $ii = 0; $ii < $binarySize; $ii++ ) {
                 $binaryBuff .= $binaryValid[$ii];
-                $binarySizeTotal = bcadd($binarySizeTotal, '1', 0);
+                $binarySizeTotal = $theBcmath->bcadd($binarySizeTotal, '1', 0);
 
                 $bitsLeft--;
 
@@ -909,7 +927,7 @@ class CryptModule
 
         if ( '' !== $binaryBuff ) {
             $binaryBuff = str_pad($binaryBuff, $bitsCnt, '0', STR_PAD_RIGHT);
-            $binarySizeTotal = bcadd($binarySizeTotal, '1', 0);
+            $binarySizeTotal = $theBcmath->bcadd($binarySizeTotal, '1', 0);
 
             $baseLetterIdx = bindec($binaryBuff);
             $baseLetter = $alphabetToValue[$baseLetterIdx];
@@ -968,10 +986,10 @@ class CryptModule
 
             $_baseString = $baseString;
 
-            $baseStringLen = mb_strlen($_baseString);
+            $baseStringLen = $theMb->mb_strlen($_baseString);
 
             for ( $i = 0; $i < $baseStringLen; $i++ ) {
-                $idx = mb_strpos($alphabetFromValid, $_baseString[$i]);
+                $idx = $theMb->mb_strpos($alphabetFromValid, $_baseString[$i]);
 
                 $bin = decbin($idx);
 
@@ -1002,7 +1020,8 @@ class CryptModule
     {
         $theType = Lib::type();
 
-        $binaryValid = $this->type_base_bin($binary)->orThrow();
+        $binaryValid = $this->type_base_bin([], $binary);
+
         $alphabetToValid = $theType->alphabet($alphabetTo)->orThrow();
 
         $alphabetToValue = $alphabetToValid->getValue();
@@ -1062,10 +1081,10 @@ class CryptModule
     {
         $theMb = Lib::mb();
 
-        $binbaseStringValid = $this->type_base($binbaseString, $alphabetFrom)->orThrow();
+        $binbaseStringValid = $this->type_base([], $binbaseString, $alphabetFrom);
 
-        $binbaseStringLen = mb_strlen($binbaseStringValid);
-        $alphabetFromLen = mb_strlen($alphabetFrom);
+        $binbaseStringLen = $theMb->mb_strlen($binbaseStringValid);
+        $alphabetFromLen = $theMb->mb_strlen($alphabetFrom);
 
         $baseFrom = $alphabetFromLen;
         if ( ! $this->isPowOf2($baseFrom) ) {
@@ -1084,7 +1103,7 @@ class CryptModule
         $buff = '';
         $left = 8;
         for ( $i = 0; $i < $binbaseStringLen; $i++ ) {
-            $idx = mb_strpos($alphabetFrom, $binbaseStringValid[$i]);
+            $idx = $theMb->mb_strpos($alphabetFrom, $binbaseStringValid[$i]);
 
             $bin = decbin($idx);
 
@@ -1115,9 +1134,11 @@ class CryptModule
     public function dec2numbase(string $decString, $alphabetTo, ?bool $isOneBasedTo = null) : string
     {
         $theBcmath = Lib::bcmath();
+        $theMb = Lib::mb();
         $theType = Lib::type();
 
-        $decStringValid = $this->type_base_dec($decString)->orThrow();
+        $decStringValid = $this->type_base_dec([], $decString);
+
         $alphabetToValid = $theType->alphabet($alphabetTo)->orThrow();
 
         $alphabetToValue = $alphabetToValid->getValue();
@@ -1138,7 +1159,7 @@ class CryptModule
 
         $left = $decStringValid;
         if ( $_oneBasedTo ) {
-            if ( bccomp($left, '0', 1) === 0 ) {
+            if ( $theBcmath->bccomp($left, '0', 1) === 0 ) {
                 throw new RuntimeException(
                     [
                         'The `decInteger` should be GT 0 due to `oneBasedTo` is set to TRUE',
@@ -1151,15 +1172,15 @@ class CryptModule
 
         do {
             if ( $_oneBasedTo ) {
-                $left = bcsub($left, '1', 0);
+                $left = $theBcmath->bcsub($left, '1', 0);
             }
 
-            $mod = bcmod($left, $baseToString, 0);
+            $mod = $theBcmath->bcmod($left, $baseToString, 0);
 
-            $result = mb_substr($alphabetToValid, (int) $mod, 1) . $result;
+            $result = $theMb->mb_substr($alphabetToValid, (int) $mod, 1) . $result;
 
-            $left = bcdiv($left, $baseToString, 0);
-        } while ( bccomp($left, '0', 1) > 0 );
+            $left = $theBcmath->bcdiv($left, $baseToString, 0);
+        } while ( $theBcmath->bccomp($left, '0', 1) > 0 );
 
         return $result;
     }
@@ -1173,7 +1194,7 @@ class CryptModule
         $theBcmath = Lib::bcmath();
         $theMb = Lib::mb();
 
-        $numbaseStringValid = $this->type_base($numbaseString, $alphabetFrom)->orThrow();
+        $numbaseStringValid = $this->type_base([], $numbaseString, $alphabetFrom);
 
         if ( $alphabetFrom === '0123456789' ) {
             return $numbaseStringValid;
@@ -1183,9 +1204,9 @@ class CryptModule
             ?? $isOneBasedFrom
             ?? ($alphabetFrom[0] !== '0');
 
-        $numbaseStringLen = mb_strlen($numbaseStringValid);
+        $numbaseStringLen = $theMb->mb_strlen($numbaseStringValid);
 
-        $alphabetFromLen = mb_strlen($alphabetFrom);
+        $alphabetFromLen = $theMb->mb_strlen($alphabetFrom);
 
         $baseFrom = $alphabetFromLen;
         $baseFromString = (string) $baseFrom;
@@ -1193,9 +1214,9 @@ class CryptModule
         $result = '0';
 
         for ( $i = 1; $i <= $numbaseStringLen; $i++ ) {
-            $chr = mb_substr($numbaseStringValid, $i - 1, 1);
+            $chr = $theMb->mb_substr($numbaseStringValid, $i - 1, 1);
 
-            $mod = mb_strpos($alphabetFrom, $chr);
+            $mod = $theMb->mb_strpos($alphabetFrom, $chr);
             if ( false === $mod ) {
                 throw new LogicException(
                     [ 'The `baseInteger` contains char that is outside `alphabetFrom`: ' . $chr, $chr ]
@@ -1203,14 +1224,14 @@ class CryptModule
             }
 
             $mod = $_oneBasedFrom
-                ? bcadd($mod, '1', 0)
+                ? $theBcmath->bcadd($mod, '1', 0)
                 : $mod;
 
-            $pow = bcpow($baseFromString, ($numbaseStringLen - $i), 0);
+            $pow = $theBcmath->bcpow($baseFromString, ($numbaseStringLen - $i), 0);
 
-            $digit = bcmul($mod, $pow, 0);
+            $digit = $theBcmath->bcmul($mod, $pow, 0);
 
-            $result = bcadd($result, $digit, 0);
+            $result = $theBcmath->bcadd($result, $digit, 0);
         }
 
         return $result;
@@ -1227,7 +1248,8 @@ class CryptModule
     {
         $theType = Lib::type();
 
-        $numbaseStringValid = $this->type_base($numbaseString, $alphabetFrom)->orThrow();
+        $numbaseStringValid = $this->type_base([], $numbaseString, $alphabetFrom);
+
         $alphabetToValid = $theType->alphabet($alphabetTo)->orThrow();
 
         $result = null;

@@ -44,6 +44,8 @@ interface PhoneManagerInterface
 
     public function parsePhoneNonFake($value, ?string &$refTel = null, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string;
 
+    public function parsePhoneMaybeFake($value, ?string &$refTel = null, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string;
+
     public function parsePhoneReal(
         $value, ?string $region = '',
         ?string &$refRegionDetected = null,
@@ -57,6 +59,8 @@ interface PhoneManagerInterface
 
     public function parseTelNonFake($value, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string;
 
+    public function parseTelMaybeFake($value, ?string &$refTelDigits = null, ?string &$refTelPlus = null) : string;
+
     public function parseTelReal(
         $value, ?string $region = '',
         ?string &$refRegionDetected = null,
@@ -66,8 +70,6 @@ interface PhoneManagerInterface
 
     /**
      * @return object|\libphonenumber\PhoneNumber
-     *
-     * @noinspection PhpDocSignatureInspection
      */
     public function parsePhoneNumber(
         $value, ?string $region = '',
