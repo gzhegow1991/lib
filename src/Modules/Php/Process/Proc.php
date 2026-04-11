@@ -305,17 +305,13 @@ class Proc
             if ( $ret->isOk([ &$stdinFilepathRealpath ]) ) {
                 $this->stdinFile = $stdinFilepathRealpath;
 
+            } elseif ( $theType->string($stdin)->isOk([ &$stdinString ]) ) {
+                $this->stdinIterable = [ $stdinString ];
+
             } else {
-                $ret = $theType->string($stdin);
-
-                if ( $ret->isOk([ &$stdinString ]) ) {
-                    $this->stdinIterable = [ $stdinString ];
-
-                } else {
-                    throw new LogicException(
-                        [ 'The `stdin` should be a resource, a filepath or a string', $stdin ]
-                    );
-                }
+                throw new LogicException(
+                    [ 'The `stdin` should be a resource, a filepath or a string', $stdin ]
+                );
             }
         }
 

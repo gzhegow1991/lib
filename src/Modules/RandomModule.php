@@ -139,7 +139,7 @@ class RandomModule
 
         $ret = $theType->string_not_empty($value);
 
-        if ( $ret->isOk([ &$valueString ]) ) {
+        if ( ! $ret->isOk([ &$valueString ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,

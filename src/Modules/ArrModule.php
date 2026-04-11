@@ -1070,7 +1070,7 @@ class ArrModule
 
         $ret = $theType->struct_exists($className);
 
-        if ( $ret->isOk([ &$classNameValid ]) ) {
+        if ( ! $ret->isOk([ &$classNameValid ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
