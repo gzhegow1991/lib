@@ -981,6 +981,24 @@ trait TypeTrait
 
 
 	/**
+	 * @return Ret<int>|int
+	 */
+	public function exponent($value)
+	{
+		return Lib::num()->type_exponent(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<int>
+	 */
+	public function scale($value)
+	{
+		return Lib::num()->type_scale(null, $value);
+	}
+
+
+	/**
 	 * @return Ret<int>
 	 */
 	public function percent($value)
@@ -1007,13 +1025,13 @@ trait TypeTrait
 	}
 
 
-    /**
-     * @return Ret<string>
-     */
-    public function ratio_numeric($value)
-    {
-        return Lib::num()->type_ratio_numeric(null, $value);
-    }
+	/**
+	 * @return Ret<string>
+	 */
+	public function ratio_numeric($value)
+	{
+		return Lib::num()->type_ratio_numeric(null, $value);
+	}
 
 
 	/**

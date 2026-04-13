@@ -559,6 +559,16 @@ interface TypeInterface
     public function number($value, ?bool $isAllowExp = null);
 
     /**
+     * @return Ret<int>|int
+     */
+    public function exponent($value);
+
+    /**
+     * @return Ret<int>
+     */
+    public function scale($value);
+
+    /**
      * @return Ret<int>
      */
     public function percent($value);

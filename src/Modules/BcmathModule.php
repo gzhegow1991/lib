@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @noinspection PhpComposerExtensionStubsInspection
+ */
+
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
@@ -22,39 +26,6 @@ use Gzhegow\Lib\Exception\RuntimeException;
  */
 class BcmathModule
 {
-    /**
-     * @var int
-     */
-    protected static $scaleLimit = 16;
-
-    /**
-     * @param int|false|null $scaleLimit
-     */
-    public static function staticScaleLimit($scaleLimit = null) : int
-    {
-        $last = static::$scaleLimit;
-
-        if ( null !== $scaleLimit ) {
-            if ( false === $scaleLimit ) {
-                static::$scaleLimit = 16;
-
-            } else {
-                if ( $scaleLimit < 0 ) {
-                    throw new LogicException(
-                        [ 'The `scaleLimit` should be a non-negative integer', $scaleLimit ]
-                    );
-                }
-
-                static::$scaleLimit = $scaleLimit;
-            }
-        }
-
-        static::$scaleLimit = static::$scaleLimit ?? 16;
-
-        return $last;
-    }
-
-
     // public function __construct()
     // {
     // }
@@ -130,97 +101,82 @@ class BcmathModule
 
 
     /**
-     * @param (int|float|string|Number|Bcnumber)[] ...$numbers
+     * @param (int|float|string|Number|Bcnumber)[] $scales
+     * @param (int|float|string|Number|Bcnumber)[] $numbers
      *
      * @return int[]
      */
-    public function scales(...$numbers) : array
-    {
-        $theType = Lib::type();
-
-        $scaleList = [];
-
-        foreach ( $numbers as $number ) {
-            $bcnumber = $theType->bcnumber($number)->orThrow();
-
-            $scaleList[] = $bcnumber->getScale();
-        }
-
-        return $scaleList;
-    }
-
-
-    public function scale_min(?int $scale = null, ...$numbers) : ?int
+    public function scales(array $scales = [], array $numbers = []) : array
     {
         $theType = Lib::type();
 
         $scaleIntList = [];
 
-        $scaleLimit = $this->staticScaleLimit();
+        foreach ( $scales as $scale ) {
+            if ( null === $scale ) {
+                $scaleValid = 0;
 
-        if ( null !== $scale ) {
-            $scaleInt = $theType->int_non_negative($scale)->orThrow();
+            } else {
+                $scaleValid = $theType->scale($scale)->orThrow();
+            }
 
-            $scaleIntList[] = $scaleInt;
+            $scaleIntList[] = $scaleValid;
         }
 
-        if ( [] !== $numbers ) {
-            $scaleIntList = array_merge(
-                $scaleIntList,
-                $this->scales(...$numbers)
-            );
+        foreach ( $numbers as $number ) {
+            if ( null === $number ) {
+                $scaleIntList[] = 0;
+
+            } else {
+                $bcnumber = $theType->bcnumber($number)->orThrow();
+
+                $scaleIntList[] = $bcnumber->getScale();
+            }
         }
+
+        return $scaleIntList;
+    }
+
+
+    public function scale_min(array $scales = [], array $numbers = []) : ?int
+    {
+        $theNum = Lib::num();
+
+        $scaleLimit = $theNum->staticScaleLimit();
+
+        $scaleIntList = $this->scales($scales, $numbers);
 
         if ( [] === $scaleIntList ) {
             return null;
-        }
 
-        $scaleMin = min($scaleIntList);
+        } else {
+            $scaleMin = min($scaleIntList);
 
-        if ( $scaleMin > $scaleLimit ) {
-            throw new RuntimeException(
-                [
-                    'The result `scaleMin` is bigger than allowed maximum',
-                    $scaleMin,
-                    $scaleLimit,
-                ]
-            );
+            if ( $scaleMin > $scaleLimit ) {
+                $scaleMin = null;
+            }
         }
 
         return $scaleMin;
     }
 
-    public function scale_max(?int $scale = null, ...$numbers) : ?int
+    public function scale_max(array $scales = [], array $numbers = []) : ?int
     {
-        $theType = Lib::type();
+        $theNum = Lib::num();
 
-        $scaleIntList = [];
+        $scaleLimit = $theNum->staticScaleLimit();
 
-        $scaleLimit = $this->staticScaleLimit();
-
-        if ( null !== $scale ) {
-            $scaleInt = $theType->int_non_negative($scale)->orThrow();
-
-            $scaleIntList[] = $scaleInt;
-        }
-
-        if ( [] !== $numbers ) {
-            $scaleIntList = array_merge(
-                $scaleIntList,
-                $this->scales(...$numbers)
-            );
-        }
+        $scaleIntList = $this->scales($scales, $numbers);
 
         if ( [] === $scaleIntList ) {
-            return null;
-        }
+            $scaleMax = null;
 
-        $scaleMax = max($scaleIntList);
+        } else {
+            $scaleMax = max($scaleIntList);
 
-        if ( $scaleMax > $scaleLimit ) {
-            throw new RuntimeException(
-                [ 'The result `scaleMax` is bigger than allowed maximum', $scaleMax, $scaleLimit ]
-            );
+            if ( $scaleMax > $scaleLimit ) {
+                $scaleMax = null;
+            }
         }
 
         return $scaleMax;
@@ -234,15 +190,17 @@ class BcmathModule
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
 
-        $scaleMax = null
-            ?? $this->scale_max($scale)
-            ?? $this->scale_max(null, $bcnum1, $bcnum2)
-            ?? $this->scale_max(bcscale());
+        $scaleMax = $this->scale_max([], [ $bcnum1, $bcnum2 ]);
+
+        $scaleValid = null
+            ?? $theType->scale($scale)->orNull()
+            ?? $theType->scale($scaleMax)->orNull()
+            ?? $theType->scale(bcscale())->orNull();
 
         $result = bccomp(
             $bcnum1,
             $bcnum2,
-            $scaleMax
+            $scaleValid
         );
 
         return $result;
@@ -329,12 +287,60 @@ class BcmathModule
      * > Середина определяется по первому не-нулевому разряду (для 1.005 при округлении до 2 знаков решение будет приниматься по третьему знаку 5)
      * > К середине применяется режим округления, выше середины - правило всегда "от нуля", ниже середины - правило "к нулю"
      *
-     * > 1.5 -> 2
-     * > 1.05 -> 1
-     * > -1.05 -> -1
-     * > -1.5 -> -2
+     * > bc_mathround(1.5) -> 2
+     * > bc_mathround(1.05) -> 1
+     * > bc_mathround(1.005) -> 1
+     * > bc_mathround(-1.005) -> -1
+     * > bc_mathround(-1.05) -> -1
+     * > bc_mathround(-1.5) -> -2
      */
     public function bc_mathround(
+        $number, ?int $scale = null,
+        ?int $flags = null, ?int $flagsNegative = null
+    ) : Bcnumber
+    {
+        // $flags = $flags ?? _NUM_ROUND_AWAY_FROM_ZERO;
+        // $flagsNegative = $flagsNegative ?? _NUM_ROUND_AWAY_FROM_ZERO;
+
+        return $this->_bc_mathround(
+            $number, $scale,
+            $flags, $flagsNegative
+        );
+    }
+
+    /**
+     * > bc_mathround_even(2.5) -> 2
+     * > bc_mathround_even(1.05) -> 1
+     * > bc_mathround_even(1.005) -> 1
+     * > bc_mathround_even(-1.005) -> -1
+     * > bc_mathround_even(-1.05) -> -1
+     * > bc_mathround_even(-2.5) -> -2
+     */
+    public function bc_mathround_even($number, ?int $scale = null) : Bcnumber
+    {
+        return $this->_bc_mathround(
+            $number, $scale,
+            _NUM_ROUND_EVEN, _NUM_ROUND_EVEN
+        );
+    }
+
+    /**
+     * > bc_mathround_odd(2.5) -> 3
+     * > bc_mathround_odd(1.05) -> 1
+     * > bc_mathround_odd(1.005) -> 1
+     * > bc_mathround_odd(-1.005) -> -1
+     * > bc_mathround_odd(-1.05) -> -1
+     * > bc_mathround_odd(-2.5) -> -3
+     */
+    public function bc_mathround_odd($number, ?int $scale = null) : Bcnumber
+    {
+        return $this->_bc_mathround(
+            $number, $scale,
+            _NUM_ROUND_ODD, _NUM_ROUND_ODD
+        );
+    }
+
+    protected function _bc_mathround(
         $number, ?int $scale = null,
         ?int $flags = null, ?int $flagsNegative = null
     ) : Bcnumber
@@ -344,15 +350,13 @@ class BcmathModule
         $theType = Lib::type();
 
         $bcnumber = $theType->bcnumber($number)->orThrow();
-        $scaleInt = $theType->int_non_negative($scale)->orThrow();
+        $scaleInt = $theType->scale($scale)->orThrow();
 
         if ( $bcnumber->isZero() ) {
             return clone $bcnumber;
         }
 
-        $scaleMax = $this->scale_max(
-            $scaleInt
-        );
+        $scaleMax = $scaleInt;
 
         $isNegative = $bcnumber->isNegative();
 
@@ -535,34 +539,6 @@ class BcmathModule
         return $bcresult;
     }
 
-    /**
-     * > 2.5 -> 2
-     * > 1.05 -> 2
-     * > -1.05 -> -2
-     * > -2.5 -> -2
-     */
-    public function bc_mathround_even($number, ?int $scale = null) : Bcnumber
-    {
-        return $this->bc_mathround(
-            $number, $scale,
-            _NUM_ROUND_EVEN, _NUM_ROUND_EVEN
-        );
-    }
-
-    /**
-     * > 2.5 -> 3
-     * > 1.05 -> 1
-     * > -1.05 -> -1
-     * > -2.5 -> -3
-     */
-    public function bc_mathround_odd($number, ?int $scale = null) : Bcnumber
-    {
-        return $this->bc_mathround(
-            $number, $scale,
-            _NUM_ROUND_ODD, _NUM_ROUND_ODD
-        );
-    }
-
 
     /**
      * > Денежное округление
@@ -571,12 +547,76 @@ class BcmathModule
      * > Участвует всё число
      * > Режим округления применяется к числу, у которого "есть дробная часть, даже минимальная"
      *
-     * > 1.5 -> 2
-     * > 1.05 -> 2
-     * > -1.05 -> -2
-     * > -1.5 -> -2
+     * > bc_moneyround(1.5, 1) -> 1.5
+     * > bc_moneyround(1.05, 1) -> 1.1
+     * > bc_moneyround(1.005, 1) -> 1.1
+     * > bc_moneyround(-1.005, 1) -> -1.1
+     * > bc_moneyround(-1.05, 1) -> -1.1
+     * > bc_moneyround(-1.5, 1) -> -1.5
      */
     public function bc_moneyround(
+        $number, ?int $scale = null,
+        ?int $flags = null, ?int $flagsNegative = null
+    ) : Bcnumber
+    {
+        // $flags = $flags ?? _NUM_ROUND_AWAY_FROM_ZERO;
+        // $flagsNegative = $flagsNegative ?? _NUM_ROUND_AWAY_FROM_ZERO;
+
+        return $this->_bc_moneyround(
+            $number, $scale,
+            $flags, $flagsNegative
+        );
+    }
+
+    /**
+     * > bc_moneytrunc(1.5, 1) -> 1.5
+     * > bc_moneytrunc(1.05, 1) -> 1
+     * > bc_moneytrunc(1.005, 1) -> 1
+     * > bc_moneytrunc(-1.005, 1) -> -1
+     * > bc_moneytrunc(-1.05, 1) -> -1
+     * > bc_moneytrunc(-1.5, 1) -> -1.5
+     */
+    public function bc_moneytrunc($number, ?int $scale = null) : Bcnumber
+    {
+        return $this->_bc_moneyround(
+            $number, $scale,
+            _NUM_ROUND_TOWARD_ZERO, _NUM_ROUND_TOWARD_ZERO
+        );
+    }
+
+    /**
+     * > bc_moneyceil(1.5, 1) -> 1.5
+     * > bc_moneyceil(1.05, 1) -> 1.1
+     * > bc_moneyceil(1.005, 1) -> 1.1
+     * > bc_moneyceil(-1.005, 1) -> -1
+     * > bc_moneyceil(-1.05, 1) -> -1
+     * > bc_moneyceil(-1.5, 1) -> -1.5
+     */
+    public function bc_moneyceil($number, ?int $scale = null) : Bcnumber
+    {
+        return $this->_bc_moneyround(
+            $number, $scale,
+            _NUM_ROUND_TO_POSITIVE_INF, _NUM_ROUND_TO_POSITIVE_INF
+        );
+    }
+
+    /**
+     * > bc_moneyfloor(1.5, 1) -> 1.5
+     * > bc_moneyfloor(1.05, 1) -> 1
+     * > bc_moneyfloor(1.005, 1) -> 1
+     * > bc_moneyfloor(-1.005, 1) -> -1.1
+     * > bc_moneyfloor(-1.05, 1) -> -1.1
+     * > bc_moneyfloor(-1.5, 1) -> -1.5
+     */
+    public function bc_moneyfloor($number, ?int $scale = null) : Bcnumber
+    {
+        return $this->_bc_moneyround(
+            $number, $scale,
+            _NUM_ROUND_TO_NEGATIVE_INF, _NUM_ROUND_TO_NEGATIVE_INF
+        );
+    }
+
+    protected function _bc_moneyround(
         $number, ?int $scale = null,
         ?int $flags = null, ?int $flagsNegative = null
     ) : Bcnumber
@@ -586,15 +626,13 @@ class BcmathModule
         $theType = Lib::type();
 
         $bcnumber = $theType->bcnumber($number)->orThrow();
-        $scaleInt = $theType->int_non_negative($scale)->orThrow();
+        $scaleInt = $theType->scale($scale)->orThrow();
 
         if ( $bcnumber->isZero() ) {
             return clone $bcnumber;
         }
 
-        $scaleMax = $this->scale_max(
-            $scaleInt
-        );
+        $scaleMax = $scaleInt;
 
         $isNegative = $bcnumber->isNegative();
 
@@ -749,103 +787,152 @@ class BcmathModule
         return $bcresult;
     }
 
-    /**
-     * > 1.5 -> 1
-     * > 1.05 -> 1
-     * > -1.05 -> -1
-     * > -1.5 -> -1
-     */
-    public function bc_moneytrunc($number, ?int $scale = null) : Bcnumber
-    {
-        return $this->bc_moneyround(
-            $number, $scale,
-            _NUM_ROUND_TOWARD_ZERO, _NUM_ROUND_TOWARD_ZERO
-        );
-    }
 
     /**
-     * > 1.5 -> 2
-     * > 1.05 -> 2
-     * > -1.05 -> -1
-     * > -1.5 -> -1
+     * > поскольку при сложении число дробных знаков может увелится до наибольшего числа знаков в одном из чисел, параметр $scale желателен
      */
-    public function bc_moneyceil($number, ?int $scale = null) : Bcnumber
+    public function bc_add($num1, $num2, ?int $scale = null, array $refs = []) : Bcnumber
     {
-        return $this->bc_moneyround(
-            $number, $scale,
-            _NUM_ROUND_TO_POSITIVE_INF, _NUM_ROUND_TO_POSITIVE_INF
-        );
-    }
+        $withRefFrac = array_key_exists(0, $refs);
+        if ( $withRefFrac ) {
+            $refFrac =& $refs[0];
+        }
+        $refFrac = null;
 
-    /**
-     * > 1.5 -> 1
-     * > 1.05 -> 1
-     * > -1.05 -> -2
-     * > -1.5 -> -2
-     */
-    public function bc_moneyfloor($number, ?int $scale = null) : Bcnumber
-    {
-        return $this->bc_moneyround(
-            $number, $scale,
-            _NUM_ROUND_TO_NEGATIVE_INF, _NUM_ROUND_TO_NEGATIVE_INF
-        );
-    }
-
-
-    public function bc_add($num1, $num2, ?int $scale = null) : Bcnumber
-    {
         $theType = Lib::type();
+
+        $hasScale = (null !== $scale);
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
 
-        $scaleMax = null
-            ?? $this->scale_max($scale)
-            ?? $this->scale_max(null, $bcnum1, $bcnum2)
-            ?? $this->scale_max(bcscale());
+        $scaleInt = $theType->scale($scale)->orNull();
+
+        $scaleMax = null;
+        if ( $withRefFrac || (! $hasScale) ) {
+            $scaleMax = $this->scale_max([], [ $bcnum1, $bcnum2 ]);
+
+            $scaleMax = $theType->scale($scaleMax)->orNull();
+        }
+
+        $scaleValid = null
+            ?? $scaleInt
+            ?? $scaleMax
+            ?? $theType->scale(bcscale())->orNull();
 
         $result = bcadd(
             $bcnum1,
             $bcnum2,
-            $scaleMax
+            $scaleValid
         );
+
+        if ( $withRefFrac ) {
+            $theNum = Lib::num();
+
+            $scaleFrac = $theNum->staticScaleFrac();
+            $scaleLimit = $theNum->staticScaleLimit();
+
+            $scaleFullValid = null
+                ?? $scaleMax
+                ?? ((null !== $scaleInt) ? $theType->scale($scaleInt + $scaleFrac)->orNull() : null)
+                ?? $scaleLimit;
+
+            $resultFull = bcadd(
+                $bcnum1,
+                $bcnum2,
+                $scaleFullValid
+            );
+
+            $refFrac = bcsub($resultFull, $result, $scaleFullValid);
+        }
 
         $bcresult = $theType->bcnumber($result)->orThrow();
 
         return $bcresult;
     }
 
-    public function bc_sub($num1, $num2, ?int $scale = null) : Bcnumber
+    /**
+     * > поскольку при вычитании число дробных знаков может увелится до наибольшего числа знаков в одном из чисел, параметр $scale желателен
+     */
+    public function bc_sub($num1, $num2, ?int $scale = null, array $refs = []) : Bcnumber
     {
+        $withRefFrac = array_key_exists(0, $refs);
+        if ( $withRefFrac ) {
+            $refFrac =& $refs[0];
+        }
+        $refFrac = null;
+
         $theType = Lib::type();
+
+        $hasScale = (null !== $scale);
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
 
-        $scaleMax = null
-            ?? $this->scale_max($scale)
-            ?? $this->scale_max(null, $bcnum1, $bcnum2)
-            ?? $this->scale_max(bcscale());
+        $scaleInt = $theType->scale($scale)->orNull();
+
+        $scaleMax = null;
+        if ( $withRefFrac || (! $hasScale) ) {
+            $scaleMax = $this->scale_max([], [ $bcnum1, $bcnum2 ]);
+
+            $scaleMax = $theType->scale($scaleMax)->orNull();
+        }
+
+        $scaleValid = null
+            ?? $scaleInt
+            ?? $scaleMax
+            ?? $theType->scale(bcscale())->orNull();
 
         $result = bcsub(
             $bcnum1,
             $bcnum2,
-            $scaleMax
+            $scaleValid
         );
+
+        if ( $withRefFrac ) {
+            $theNum = Lib::num();
+
+            $scaleFrac = $theNum->staticScaleFrac();
+            $scaleLimit = $theNum->staticScaleLimit();
+
+            $scaleFullValid = null
+                ?? $scaleMax
+                ?? ((null !== $scaleInt) ? $theType->scale($scaleInt + $scaleFrac)->orNull() : null)
+                ?? $scaleLimit;
+
+            $resultFull = bcsub(
+                $bcnum1,
+                $bcnum2,
+                $scaleFullValid
+            );
+
+            $refFrac = bcsub($resultFull, $result, $scaleFullValid);
+        }
 
         $bcresult = $theType->bcnumber($result)->orThrow();
 
         return $bcresult;
     }
 
-    public function bc_mul($num1, $num2, ?int $scale = null) : Bcnumber
+    /**
+     * > поскольку при умножении число дробных знаков может увелится до суммы знаков обоих чисел, параметр $scale желателен
+     */
+    public function bc_mul($num1, $num2, ?int $scale = null, array $refs = []) : Bcnumber
     {
+        $withRefFrac = array_key_exists(0, $refs);
+        if ( $withRefFrac ) {
+            $refFrac =& $refs[0];
+        }
+        $refFrac = null;
+
         $theType = Lib::type();
+
+        $hasScale = (null !== $scale);
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
 
-        if ( null === $scale ) {
+        if ( ! $hasScale ) {
             if ( $bcnum1->getFrac() && $bcnum2->getFrac() ) {
                 throw new LogicException(
                     [ 'The `scale` should be passed if both arguments have fractional parts', $num1, $num2 ]
@@ -853,16 +940,47 @@ class BcmathModule
             }
         }
 
-        $scaleMax = null
-            ?? $this->scale_max($scale)
-            ?? $this->scale_max(null, $bcnum1, $bcnum2)
-            ?? $this->scale_max(bcscale());
+        $scaleInt = $theType->scale($scale)->orNull();
+
+        $scaleMax = null;
+        if ( $withRefFrac || (! $hasScale) ) {
+            $scaleMax = array_sum(
+                $this->scales([], [ $bcnum1, $bcnum2 ])
+            );
+
+            $scaleMax = $theType->scale($scaleMax)->orNull();
+        }
+
+        $scaleValid = null
+            ?? $scaleInt
+            ?? $scaleMax
+            ?? $theType->scale(bcscale())->orNull();
 
         $result = bcmul(
             $bcnum1,
             $bcnum2,
-            $scaleMax
+            $scaleValid
         );
+
+        if ( $withRefFrac ) {
+            $theNum = Lib::num();
+
+            $scaleFrac = $theNum->staticScaleFrac();
+            $scaleLimit = $theNum->staticScaleLimit();
+
+            $scaleFullValid = null
+                ?? $scaleMax
+                ?? ((null !== $scaleInt) ? $theType->scale($scaleInt + $scaleFrac)->orNull() : null)
+                ?? $scaleLimit;
+
+            $resultFull = bcmul(
+                $bcnum1,
+                $bcnum2,
+                $scaleFullValid
+            );
+
+            $refFrac = bcsub($resultFull, $result, $scaleFullValid);
+        }
 
         $bcresult = $theType->bcnumber($result)->orThrow();
 
@@ -872,23 +990,161 @@ class BcmathModule
     /**
      * > поскольку при делении число дробных знаков может увелится, параметр $scale сделан обязательным
      */
-    public function bc_div($num1, $num2, int $scale) : Bcnumber
+    public function bc_div($num1, $num2, int $scale, array $refs = []) : Bcnumber
     {
+        $withRefFrac = array_key_exists(0, $refs);
+        if ( $withRefFrac ) {
+            $refFrac =& $refs[0];
+        }
+        $refFrac = null;
+
         $theType = Lib::type();
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
-        $scaleInt = $theType->int_non_negative($scale)->orThrow();
 
-        $scaleMax = $this->scale_max(
-            $scaleInt
-        );
+        $scaleInt = $theType->scale($scale)->orThrow();
+
+        $scaleValid = $scaleInt;
 
         $result = bcdiv(
             $bcnum1,
             $bcnum2,
-            $scaleMax
+            $scaleValid
         );
+
+        if ( $withRefFrac ) {
+            $theNum = Lib::num();
+
+            $scaleFrac = $theNum->staticScaleFrac();
+            $scaleLimit = $theNum->staticScaleLimit();
+
+            $scaleFullValid = null
+                ?? $theType->scale($scaleInt + $scaleFrac)->orNull()
+                ?? $scaleLimit;
+
+            $resultFull = bcdiv(
+                $bcnum1,
+                $bcnum2,
+                $scaleFullValid
+            );
+
+            $refFrac = bcsub($resultFull, $result, $scaleFullValid);
+        }
+
+        $bcresult = $theType->bcnumber($result)->orThrow();
+
+        return $bcresult;
+    }
+
+
+    public function bc_pow($num, int $exponent, ?int $scale = null, array $refs = []) : Bcnumber
+    {
+        $withRefFrac = array_key_exists(0, $refs);
+        if ( $withRefFrac ) {
+            $refFrac =& $refs[0];
+        }
+        $refFrac = null;
+
+        $theType = Lib::type();
+
+        $hasScale = (null !== $scale);
+
+        $bcnum = $theType->bcnumber($num)->orThrow();
+        $exponentInt = $theType->exponent($exponent)->orThrow();
+
+        if ( ! $hasScale ) {
+            if ( $bcnum->hasFrac() ) {
+                throw new LogicException(
+                    [ 'The `scale` should be passed if `num` has fractional part', $num ]
+                );
+            }
+        }
+
+        $scaleInt = $theType->scale($scale)->orNull();
+
+        $scaleMax = null;
+        if ( $withRefFrac || (! $hasScale) ) {
+            if ( $exponent >= 0 ) {
+                $scaleMax = $this->scales([], [ $bcnum ])[0];
+                $scaleMax = $scaleMax * $exponentInt;
+                $scaleMax = $theType->scale($scaleMax)->orNull();
+            }
+        }
+
+        $scaleValid = null
+            ?? $scaleInt
+            ?? $scaleMax
+            ?? $theType->scale(bcscale())->orNull();
+
+        $result = bcpow(
+            $bcnum,
+            $exponentInt,
+            $scaleValid
+        );
+
+        if ( $withRefFrac ) {
+            $theNum = Lib::num();
+
+            $scaleFrac = $theNum->staticScaleFrac();
+            $scaleLimit = $theNum->staticScaleLimit();
+
+            $scaleFullValid = null
+                ?? $scaleMax
+                ?? ((null !== $scaleInt) ? $theType->scale($scaleInt + $scaleFrac)->orNull() : null)
+                ?? $scaleLimit;
+
+            $resultFull = bcpow(
+                $bcnum,
+                $exponentInt,
+                $scaleFullValid
+            );
+
+            $refFrac = bcsub($resultFull, $result, $scaleFullValid);
+        }
+
+        $bcresult = $theType->bcnumber($result)->orThrow();
+
+        return $bcresult;
+    }
+
+    public function bc_sqrt($num, int $scale, array $refs = []) : Bcnumber
+    {
+        $withRefFrac = array_key_exists(0, $refs);
+        if ( $withRefFrac ) {
+            $refFrac =& $refs[0];
+        }
+        $refFrac = null;
+
+        $theType = Lib::type();
+
+        $bcnum = $theType->bcnumber($num)->orThrow();
+        $scaleInt = $theType->scale($scale)->orThrow();
+
+        $scaleValid = $scaleInt;
+
+        $result = bcsqrt(
+            $bcnum,
+            $scaleValid
+        );
+
+        if ( $withRefFrac ) {
+            $theNum = Lib::num();
+
+            $scaleFrac = $theNum->staticScaleFrac();
+            $scaleLimit = $theNum->staticScaleLimit();
+
+            $scaleFullValid = null
+                ?? $theType->scale($scaleInt + $scaleFrac)->orNull()
+                ?? $scaleLimit;
+
+            $resultFull = bcsqrt(
+                $bcnum,
+                $scaleFullValid
+            );
+
+            $refFrac = bcsub($resultFull, $result, $scaleFullValid);
+        }
 
         $bcresult = $theType->bcnumber($result)->orThrow();
 
@@ -920,11 +1176,9 @@ class BcmathModule
 
         $bcnum1 = $theType->bcnumber($num1)->orThrow();
         $bcnum2 = $theType->bcnumber($num2)->orThrow();
-        $scaleInt = $theType->int_non_negative($scale)->orThrow();
+        $scaleInt = $theType->scale($scale)->orThrow();
 
-        $scaleMax = $this->scale_max(
-            $scaleInt
-        );
+        $scaleMax = $scaleInt;
 
         $result = bcdiv(
             $bcnum1,
@@ -939,54 +1193,6 @@ class BcmathModule
         $result = bcmul($result, $bcnum2, $scaleMax);
 
         $result = bcsub($bcnum1, $result, $scaleInt);
-
-        $bcresult = $theType->bcnumber($result)->orThrow();
-
-        return $bcresult;
-    }
-
-
-    public function bc_pow($num, int $exponent, ?int $scale = null) : Bcnumber
-    {
-        $theType = Lib::type();
-
-        $bcnum = $theType->bcnumber($num)->orThrow();
-
-        if ( null === $scale ) {
-            if ( $bcnum->hasFrac() ) {
-                throw new LogicException(
-                    [ 'The `scale` should be passed if `num` has fractional part', $num ]
-                );
-            }
-        }
-
-        $exponentString = (string) $exponent;
-
-        $scaleMax = null
-            ?? $this->scale_max($scale)
-            ?? $this->scale_max(null, $bcnum)
-            ?? $this->scale_max(bcscale());
-
-        $result = bcpow($bcnum, $exponentString, $scaleMax);
-
-        $bcresult = $theType->bcnumber($result)->orThrow();
-
-        return $bcresult;
-    }
-
-
-    public function bc_sqrt($num, int $scale) : Bcnumber
-    {
-        $theType = Lib::type();
-
-        $bcnum = $theType->bcnumber($num)->orThrow();
-        $scaleInt = $theType->int_non_negative($scale)->orThrow();
-
-        $scaleMax = $this->scale_max(
-            $scaleInt
-        );
-
-        $result = bcsqrt($bcnum, $scaleMax);
 
         $bcresult = $theType->bcnumber($result)->orThrow();
 

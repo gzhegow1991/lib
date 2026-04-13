@@ -561,6 +561,16 @@ interface TInterface
     /**
      * @return Ret<int>|int
      */
+    public function exponent($fb, $value);
+
+    /**
+     * @return Ret<int>|int
+     */
+    public function scale($fb, $value);
+
+    /**
+     * @return Ret<int>|int
+     */
     public function percent($fb, $value);
 
     /**

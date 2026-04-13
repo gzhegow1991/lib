@@ -12,6 +12,156 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 class NumModule
 {
+    /**
+     * @var int
+     */
+    protected static $scaleDefault = 0;
+
+    /**
+     * @var int
+     */
+    protected static $scaleFrac = 4;
+
+    /**
+     * @var int
+     */
+    protected static $scaleLimit = 16;
+
+    /**
+     * @param int|false|null $scaleDefault
+     *
+     * @noinspection PhpComposerExtensionStubsInspection
+     */
+    public static function staticScaleDefault($scaleDefault = null) : int
+    {
+        $hasBcmath = extension_loaded('bcmath');
+
+        $last = static::$scaleLimit;
+
+        if ( null !== $scaleDefault ) {
+            if ( false === $scaleDefault ) {
+                static::$scaleDefault = $hasBcmath ? bcscale() : 0;
+
+            } else {
+                if ( $scaleDefault < 0 ) {
+                    throw new LogicException(
+                        [ 'The `scaleDefault` should be a non-negative integer', $scaleDefault ]
+                    );
+                }
+
+                static::$scaleDefault = $scaleDefault;
+            }
+        }
+
+        $scaleDefaultNew = null
+            ?? static::$scaleDefault
+            ?? ($hasBcmath ? bcscale() : 0);
+
+        if ( $last !== $scaleDefaultNew ) {
+            $scaleLimit = static::$scaleLimit;
+
+            if ( $scaleDefaultNew > $scaleLimit ) {
+                throw new LogicException(
+                    [ 'The `scaleDefault` is bigger than allowed maximum', $scaleDefaultNew, $scaleLimit ]
+                );
+            }
+
+            if ( $hasBcmath ) {
+                bcscale($scaleDefaultNew);
+            }
+        }
+
+        static::$scaleDefault = $scaleDefaultNew;
+
+        return $last;
+    }
+
+    /**
+     * @param int|false|null $scaleFrac
+     */
+    public static function staticScaleFrac($scaleFrac = null) : int
+    {
+        $last = static::$scaleFrac;
+
+        if ( null !== $scaleFrac ) {
+            if ( false === $scaleFrac ) {
+                static::$scaleFrac = 4;
+
+            } else {
+                if ( $scaleFrac < 0 ) {
+                    throw new LogicException(
+                        [ 'The `scaleFrac` should be a non-negative integer', $scaleFrac ]
+                    );
+                }
+
+                static::$scaleFrac = $scaleFrac;
+            }
+        }
+
+        $scaleFracNew = static::$scaleFrac ?? 4;
+
+        if ( $last !== $scaleFracNew ) {
+            $scaleLimit = static::$scaleLimit;
+
+            if ( $scaleFracNew > $scaleLimit ) {
+                throw new LogicException(
+                    [ 'The `scaleFrac` is bigger than allowed maximum', $scaleFracNew, $scaleLimit ]
+                );
+            }
+        }
+
+        static::$scaleFrac = $scaleFracNew;
+
+        return $last;
+    }
+
+    /**
+     * @param int|false|null $scaleLimit
+     */
+    public static function staticScaleLimit($scaleLimit = null) : int
+    {
+        $last = static::$scaleLimit;
+
+        if ( null !== $scaleLimit ) {
+            if ( false === $scaleLimit ) {
+                static::$scaleLimit = 16;
+
+            } else {
+                if ( $scaleLimit < 0 ) {
+                    throw new LogicException(
+                        [ 'The `scaleLimit` should be a non-negative integer', $scaleLimit ]
+                    );
+                }
+
+                static::$scaleLimit = $scaleLimit;
+            }
+        }
+
+        $scaleLimitNew = static::$scaleLimit ?? 16;
+
+        if ( $last !== $scaleLimitNew ) {
+            $scaleDefault = static::$scaleDefault;
+            $scaleFrac = static::$scaleFrac;
+
+            if ( $scaleDefault > $scaleLimitNew ) {
+                throw new LogicException(
+                    [ 'The `scaleDefault` is bigger than allowed maximum', $scaleDefault, $scaleLimitNew ]
+                );
+            }
+
+            if ( $scaleFrac > $scaleLimitNew ) {
+                throw new LogicException(
+                    [ 'The `scaleFrac` is bigger than allowed maximum', $scaleFrac, $scaleLimitNew ]
+                );
+            }
+        }
+
+        static::$scaleLimit = $scaleLimitNew;
+
+        return $last;
+    }
+
+
     // public function __construct()
     // {
     // }
@@ -2353,6 +2503,61 @@ class NumModule
     /**
      * @return Ret<int>|int
      */
+    public function type_exponent($fb, $value)
+    {
+        $theType = Lib::type();
+
+        $ret = $theType->int($value);
+
+        if ( ! $ret->isOk([ &$exponentInt ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $exponentInt);
+    }
+
+    /**
+     * @return Ret<int>|int
+     */
+    public function type_scale($fb, $value)
+    {
+        $theType = Lib::type();
+
+        $ret = $theType->int_non_negative($value);
+
+        if ( ! $ret->isOk([ &$scaleInt ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $scaleLimit = $this->staticScaleLimit();
+
+        if ( $scaleInt > $scaleLimit ) {
+            return Ret::throw(
+                $fb,
+                [
+                    'The result `scaleMin` is bigger than allowed maximum',
+                    $scaleInt,
+                    $scaleLimit,
+                ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $scaleInt);
+    }
+
+
+    /**
+     * @return Ret<int>|int
+     */
     public function type_percent($fb, $value)
     {
         $ret = $this->type_int(null, $value);
@@ -2468,23 +2673,73 @@ class NumModule
      * > Математическое округление
      *
      * > Точка принятия решения - "дробная часть равна .5/.05/.005 и тд"
+     * > Участвует только 1 разряд свыше указанного, как в математике (если число 1.005, а округляем до 1 знака, то 5 не участвует в решении, число будет 1.00)
+     * > Середина определяется по первому не-нулевому разряду (для 1.005 при округлении до 2 знаков решение будет приниматься по третьему знаку 5)
      * > К середине применяется режим округления, выше середины - правило всегда "от нуля", ниже середины - правило "к нулю"
      *
-     * > 1.5 -> 2
-     * > 1.05 -> 1
-     * > -1.05 -> -1
-     * > -1.5 -> -2
+     * > mathround(1.5) -> 2
+     * > mathround(1.05) -> 1
+     * > mathround(1.005) -> 1
+     * > mathround(-1.005) -> -1
+     * > mathround(-1.05) -> -1
+     * > mathround(-1.5) -> -2
      */
     public function mathround(
-        $number, ?int $precision = null,
+        $number, ?int $scale = null,
         ?int $flags = null, ?int $flagsNegative = null
     ) : float
     {
-        $precision = $precision ?? 0;
+        // $flags = $flags ?? _NUM_ROUND_AWAY_FROM_ZERO;
+        // $flagsNegative = $flagsNegative ?? _NUM_ROUND_AWAY_FROM_ZERO;
 
-        if ( $precision < 0 ) {
+        return $this->_mathround(
+            $number, $scale,
+            $flags, $flagsNegative
+        );
+    }
+
+    /**
+     * > mathround(1.5) -> 2
+     * > mathround(1.05) -> 1
+     * > mathround(1.005) -> 1
+     * > mathround(-1.005) -> -1
+     * > mathround(-1.05) -> -1
+     * > mathround(-1.5) -> -2
+     */
+    public function mathround_even($number, ?int $scale = null) : float
+    {
+        return $this->_mathround(
+            $number, $scale,
+            _NUM_ROUND_EVEN, _NUM_ROUND_EVEN
+        );
+    }
+
+    /**
+     * > mathround(1.5) -> 3
+     * > mathround(1.05) -> 1
+     * > mathround(1.005) -> 1
+     * > mathround(-1.005) -> -1
+     * > mathround(-1.05) -> -1
+     * > mathround(-1.5) -> -3
+     */
+    public function mathround_odd($number, ?int $scale = null) : float
+    {
+        return $this->_mathround(
+            $number, $scale,
+            _NUM_ROUND_ODD, _NUM_ROUND_ODD
+        );
+    }
+
+    protected function _mathround(
+        $number, ?int $scale = null,
+        ?int $flags = null, ?int $flagsNegative = null
+    ) : float
+    {
+        $scale = $scale ?? 0;
+
+        if ( $scale < 0 ) {
             throw new LogicException(
-                [ 'The `precision` should be a non-negative integer', $precision ]
+                [ 'The `precision` should be a non-negative integer', $scale ]
             );
         }
 
@@ -2576,8 +2831,8 @@ class NumModule
             $isRoundOdd = true;
         }
 
-        $factor = ($precision > 0)
-            ? ((int) pow(10, $precision))
+        $factor = ($scale > 0)
+            ? ((int) pow(10, $scale))
             : 1;
 
         $scaledAbs = $numberValid->getValueAbsolute() * $factor;
@@ -2673,44 +2928,93 @@ class NumModule
         return $result;
     }
 
-    public function mathround_even($number, ?int $precision = null) : float
-    {
-        return $this->mathround(
-            $number, $precision,
-            _NUM_ROUND_EVEN, _NUM_ROUND_EVEN
-        );
-    }
-
-    public function mathround_odd($number, ?int $precision = null) : float
-    {
-        return $this->mathround(
-            $number, $precision,
-            _NUM_ROUND_ODD, _NUM_ROUND_ODD
-        );
-    }
-
 
     /**
      * > Денежное округление
      *
      * > Точка принятия решения - "наличие дробной части", если есть - округляем, если нет - обрезаем
+     * > Участвует всё число
      * > Режим округления применяется к числу, у которого "есть дробная часть, даже минимальная"
      *
-     * > 1.5 -> 2
-     * > 1.05 -> 2
-     * > -1.05 -> -2
-     * > -1.5 -> -2
+     * > moneyround(1.5, 1) -> 1.5
+     * > moneyround(1.05, 1) -> 1.1
+     * > moneyround(1.005, 1) -> 1.1
+     * > moneyround(-1.005, 1) -> -1.1
+     * > moneyround(-1.05, 1) -> -1.1
+     * > moneyround(-1.5, 1) -> -1.5
      */
     public function moneyround(
-        $number, ?int $precision = null,
+        $number, ?int $scale = null,
         ?int $flags = null, ?int $flagsNegative = null
     ) : float
     {
-        $precision = $precision ?? 0;
+        // $flags = $flags ?? _NUM_ROUND_AWAY_FROM_ZERO;
+        // $flagsNegative = $flagsNegative ?? _NUM_ROUND_AWAY_FROM_ZERO;
 
-        if ( $precision < 0 ) {
+        return $this->_moneyround(
+            $number, $scale,
+            $flags, $flagsNegative
+        );
+    }
+
+    /**
+     * > moneytrunc(1.5, 1) -> 1.5
+     * > moneytrunc(1.05, 1) -> 1
+     * > moneytrunc(1.005, 1) -> 1
+     * > moneytrunc(-1.005, 1) -> -1
+     * > moneytrunc(-1.05, 1) -> -1
+     * > moneytrunc(-1.5, 1) -> -1.5
+     */
+    public function moneytrunc($number, ?int $scale = null) : float
+    {
+        return $this->_moneyround(
+            $number, $scale,
+            _NUM_ROUND_TOWARD_ZERO, _NUM_ROUND_TOWARD_ZERO
+        );
+    }
+
+    /**
+     * > moneyceil(1.5, 1) -> 1.5
+     * > moneyceil(1.05, 1) -> 1.1
+     * > moneyceil(1.005, 1) -> 1.1
+     * > moneyceil(-1.005, 1) -> -1
+     * > moneyceil(-1.05, 1) -> -1
+     * > moneyceil(-1.5, 1) -> -1.5
+     */
+    public function moneyceil($number, ?int $scale = null) : float
+    {
+        return $this->_moneyround(
+            $number, $scale,
+            _NUM_ROUND_TO_POSITIVE_INF, _NUM_ROUND_TO_POSITIVE_INF
+        );
+    }
+
+    /**
+     * > moneyfloor(1.5, 1) -> 1.5
+     * > moneyfloor(1.05, 1) -> 1
+     * > moneyfloor(1.005, 1) -> 1
+     * > moneyfloor(-1.005, 1) -> -1.1
+     * > moneyfloor(-1.05, 1) -> -1.1
+     * > moneyfloor(-1.5, 1) -> -1.5
+     */
+    public function moneyfloor($number, ?int $scale = null) : float
+    {
+        return $this->_moneyround(
+            $number, $scale,
+            _NUM_ROUND_TO_NEGATIVE_INF, _NUM_ROUND_TO_NEGATIVE_INF
+        );
+    }
+
+    protected function _moneyround(
+        $number, ?int $scale = null,
+        ?int $flags = null, ?int $flagsNegative = null
+    ) : float
+    {
+        $scale = $scale ?? 0;
+
+        if ( $scale < 0 ) {
             throw new LogicException(
-                [ 'The `precision` should be a non-negative integer', $precision ]
+                [ 'The `precision` should be a non-negative integer', $scale ]
             );
         }
 
@@ -2802,8 +3106,8 @@ class NumModule
             $isRoundOdd = true;
         }
 
-        $factor = ($precision > 0)
-            ? ((int) pow(10, $precision))
+        $factor = ($scale > 0)
+            ? ((int) pow(10, $scale))
             : 1;
 
         $scaledAbs = $numberValid->getValueAbsolute() * $factor;
@@ -2869,48 +3173,6 @@ class NumModule
         $result = $result / $factor;
 
         return $result;
-    }
-
-    /**
-     * > 1.5 -> 1
-     * > 1.05 -> 1
-     * > -1.05 -> -1
-     * > -1.5 -> -1
-     */
-    public function moneytrunc($number, ?int $precision = null) : float
-    {
-        return $this->moneyround(
-            $number, $precision,
-            _NUM_ROUND_TOWARD_ZERO, _NUM_ROUND_TOWARD_ZERO
-        );
-    }
-
-    /**
-     * > 1.5 -> 2
-     * > 1.05 -> 2
-     * > -1.05 -> -1
-     * > -1.5 -> -1
-     */
-    public function moneyceil($number, ?int $precision = null) : float
-    {
-        return $this->moneyround(
-            $number, $precision,
-            _NUM_ROUND_TO_POSITIVE_INF, _NUM_ROUND_TO_POSITIVE_INF
-        );
-    }
-
-    /**
-     * > 1.5 -> 1
-     * > 1.05 -> 1
-     * > -1.05 -> -2
-     * > -1.5 -> -2
-     */
-    public function moneyfloor($number, ?int $precision = null) : float
-    {
-        return $this->moneyround(
-            $number, $precision,
-            _NUM_ROUND_TO_NEGATIVE_INF, _NUM_ROUND_TO_NEGATIVE_INF
-        );
     }
 
 

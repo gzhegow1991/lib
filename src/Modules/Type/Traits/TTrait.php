@@ -983,6 +983,24 @@ trait TTrait
 	/**
 	 * @return Ret<int>|int
 	 */
+	public function exponent($fb, $value)
+	{
+		return Lib::num()->type_exponent($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<int>|int
+	 */
+	public function scale($fb, $value)
+	{
+		return Lib::num()->type_scale($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<int>|int
+	 */
 	public function percent($fb, $value)
 	{
 		return Lib::num()->type_percent($fb, $value);
