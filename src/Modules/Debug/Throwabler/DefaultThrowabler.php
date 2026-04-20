@@ -160,12 +160,6 @@ class DefaultThrowabler implements ThrowablerInterface
         $array = $this->getPreviousTreeIterator($throwable);
 
         foreach ( $array as $dotpath => $e ) {
-            if ( $isWithInfo || $isWithTrace ) {
-                if ( [] !== $lines ) {
-                    $lines[] = '';
-                }
-            }
-
             $messagesLines = $this->getThrowableMessagesLines($e, $flags);
 
             if ( [] === $messagesLines ) {
@@ -180,7 +174,7 @@ class DefaultThrowabler implements ThrowablerInterface
                 );
 
             } else {
-                $messagesLines[0] = "[ {$dotpath} ] {$messagesLines[ 0 ]}";
+                $messagesLines = [ "[ {$dotpath} ] {$messagesLines[ 0 ]}" ];
             }
 
             if ( $isWithInfo ) {
@@ -205,6 +199,12 @@ class DefaultThrowabler implements ThrowablerInterface
                         $messagesLines,
                         $linesTrace
                     );
+                }
+            }
+
+            if ( $isWithInfo || $isWithTrace ) {
+                if ( [] !== $lines ) {
+                    array_unshift($messagesLines, '');
                 }
             }
 
