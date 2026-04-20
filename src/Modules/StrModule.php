@@ -13,7 +13,6 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Str\Slugger\DefaultSlugger;
 use Gzhegow\Lib\Modules\Str\Slugger\SluggerInterface;
-use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 use Gzhegow\Lib\Modules\Str\Inflector\DefaultInflector;
 use Gzhegow\Lib\Modules\Str\Inflector\InflectorInterface;
 use Gzhegow\Lib\Modules\Str\Interpolator\DefaultInterpolator;
@@ -42,11 +41,9 @@ class StrModule
                 $mbstringBool = (bool) $mbstring;
 
                 if ( $mbstringBool ) {
-                    if ( ! extension_loaded('mbstring') ) {
-                        throw new ExtensionException(
-                            [ 'Missing PHP extension: mbstring' ]
-                        );
-                    }
+                    $theType = Lib::type();
+
+                    $theType->is_extension_loaded('mbstring')->orThrow();
                 }
 
                 static::$mbstring = $mbstringBool;
@@ -2990,11 +2987,9 @@ class StrModule
      */
     public function utf8_encode(string $string, ?string $encoding = null) : ?string
     {
-        if ( ! \function_exists('iconv') ) {
-            throw new ExtensionException(
-                [ 'Missing PHP extension: iconv' ]
-            );
-        }
+        $theType = Lib::type();
+
+        $theType->is_extension_loaded('iconv')->orThrow();
 
         $encodingString = null
             ?? $encoding

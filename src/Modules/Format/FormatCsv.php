@@ -4,18 +4,15 @@ namespace Gzhegow\Lib\Modules\Format;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
-use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class FormatCsv
 {
     public function __construct()
     {
-        if ( ! extension_loaded('fileinfo') ) {
-            throw new ExtensionException(
-                [ 'Missing PHP extension: fileinfo' ]
-            );
-        }
+        $theType = Lib::type();
+
+        $theType->is_extension_loaded('fileinfo')->orThrow();
     }
 
 

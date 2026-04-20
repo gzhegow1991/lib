@@ -43,7 +43,7 @@ class EntrypointPhpExceptionHandlerDriver extends AbstractEntrypointDriver
     {
         $theDebugThrowabler = Lib::debugThrowabler();
 
-        $lines = $theDebugThrowabler->getPreviousMessagesAllLines(
+        $lines = $theDebugThrowabler->getLines(
             $e,
             0
             //

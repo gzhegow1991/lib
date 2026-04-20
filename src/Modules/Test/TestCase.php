@@ -380,10 +380,10 @@ class TestCase
         $hasResource = (null !== $h);
 
         false
-        || $this->hasTrace($trace)
+        || ($this->hasTrace($trace))
         || ($trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 
-        $traceFile = $trace[0]['file'] ?? '{file}';
+        $traceFile = $trace[0]['file'] ?? '{{file}}';
         $traceLine = $trace[0]['line'] ?? -1;
 
         $memoryBytesBefore = memory_get_usage();

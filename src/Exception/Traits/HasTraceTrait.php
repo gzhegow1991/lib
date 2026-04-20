@@ -123,7 +123,7 @@ trait HasTraceTrait
                     //
                     $index,
                     //
-                    $frame['file'] ?? '{file}', // > filename
+                    $frame['file'] ?? '{{file}}', // > filename
                     $frame['line'] ?? -1,
                     $frame['class'] ?? '', // > className
                     $frame['type'] ?? '',  // > "->" or "::"

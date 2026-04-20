@@ -39,7 +39,7 @@ class ErrorException extends \ErrorException implements
 
         $cnt = count($eArgsMessageList);
         if ( $cnt > 1 ) {
-            $eArgsMessage = "[ MULTIPLE ERRORS: {$cnt} ]";
+            $eArgsMessage = "[ MULTIPLE ERRORS # {$cnt} ]";
         }
 
         if ( $eArgsPrevious instanceof ExceptInterface ) {
@@ -71,6 +71,6 @@ class ErrorException extends \ErrorException implements
     {
         $theDebugThrowabler = Lib::debugThrowabler();
 
-        return $theDebugThrowabler->getPreviousTrackIterator($this);
+        return $theDebugThrowabler->getPreviousIterator($this);
     }
 }

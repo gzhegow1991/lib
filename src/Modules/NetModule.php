@@ -9,7 +9,6 @@ use Gzhegow\Lib\Modules\Net\SubnetV6;
 use Gzhegow\Lib\Modules\Net\AddressIpV4;
 use Gzhegow\Lib\Modules\Net\AddressIpV6;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class NetModule
@@ -20,11 +19,9 @@ class NetModule
 
     public function __initialize()
     {
-        if ( ! extension_loaded('filter') ) {
-            throw new ExtensionException(
-                [ 'Missing PHP extension: filter' ]
-            );
-        }
+        $theType = Lib::type();
+
+        $theType->is_extension_loaded('filter')->orThrow();
 
         return $this;
     }

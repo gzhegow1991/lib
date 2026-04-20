@@ -45,7 +45,7 @@ trait HasPreviousListTrait
         if ( null === $this->previousMessageList ) {
             $theDebugThrowabler = Lib::debugThrowabler();
 
-            $previousMessageList = $theDebugThrowabler->getPreviousMessageFirstList($this);
+            $previousMessageList = $theDebugThrowabler->getMessagesArray($this);
 
             $this->previousMessageList = $previousMessageList;
         }

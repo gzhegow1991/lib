@@ -5,7 +5,6 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class DateModule
@@ -132,11 +131,9 @@ class DateModule
 
     public function __initialize()
     {
-        if ( ! extension_loaded('date') ) {
-            throw new ExtensionException(
-                [ 'Missing PHP extension: date' ]
-            );
-        }
+        $theType = Lib::type();
+
+        $theType->is_extension_loaded('date')->orThrow();
 
         return $this;
     }

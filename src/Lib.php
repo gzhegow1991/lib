@@ -572,6 +572,98 @@ class Lib
 
 
     /**
+     * @return array{
+     *     file: string,
+     *     line: int
+     * }|array{
+     *      0: string,
+     *      1: int
+     * }
+     */
+    public static function file_line(?int $shift = null, ?array $trace = null, ?bool $withKeys = null) : array
+    {
+        $withKeys = $withKeys ?? false;
+
+        if ( null === $trace ) {
+            $ex = new \Exception();
+            $exTrace = $ex->getTrace();
+
+        } else {
+            $exTrace = $trace;
+        }
+
+        while ( $shift > 0 ) {
+            next($exTrace);
+
+            $shift--;
+        }
+
+        $eTrace = array_values($exTrace);
+
+        $eFile = $eTrace[0]['file'] ?? '{{file}}';
+        $eLine = $eTrace[0]['line'] ?? -1;
+
+        if ( $withKeys ) {
+            $eFileLine = [
+                'file' => $eFile,
+                'line' => $eLine,
+            ];
+
+        } else {
+            $eFileLine = [
+                $eFile,
+                $eLine,
+            ];
+        }
+
+        return $eFileLine;
+    }
+
+    /**
+     * @return array[]
+     */
+    public static function trace(?int $shift = null, ?array $trace = null, ?bool $withKeys = null) : array
+    {
+        $withKeys = $withKeys ?? true;
+
+        $exTrace = $trace;
+
+        if ( null === $trace ) {
+            $ex = new \Exception();
+            $exTrace = $ex->getTrace();
+        }
+
+        while ( $shift > 0 ) {
+            next($exTrace);
+
+            $shift--;
+        }
+
+        $eTrace = array_values($exTrace);
+
+        foreach ( $eTrace as $i => $eFrame ) {
+            $eTrace[$i] = []
+                + $eFrame
+                + [
+                    'function' => null,
+                    'line'     => null,
+                    'file'     => null,
+                    'class'    => null,
+                    'object'   => null,
+                    'type'     => null,
+                    'args'     => null,
+                ];
+        }
+
+        if ( ! $withKeys ) {
+            $eTrace = array_map('array_values', $eTrace);
+        }
+
+        return $eTrace;
+    }
+
+
+    /**
      * > время в секундах
      */
     public static function time(?\DateTimeInterface $date = null) : string

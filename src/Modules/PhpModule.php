@@ -9,6 +9,7 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Php\Nil;
 use Gzhegow\Lib\Modules\Type\Ret;
+use Gzhegow\Lib\Exception\Except;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\ExceptInterface;
 use Gzhegow\Lib\Exception\RuntimeException;
@@ -3370,9 +3371,11 @@ class PhpModule
         $messageObjectList = [];
         $codeIntegerList = [];
         $codeStringList = [];
-        $previousList = [];
         $fileList = [];
         $lineList = [];
+
+        $previous = null;
+        $previousList = [];
 
         $__unresolved = [];
 
@@ -3475,6 +3478,8 @@ class PhpModule
                     $fileList[$i] = $previous->getFile();
                     $lineList[$i] = $previous->getLine();
                 }
+
+                $previousList = [];
             }
         }
 
@@ -3491,9 +3496,17 @@ class PhpModule
         $result['messageObjectList'] = $messageObjectList;
         $result['codeIntegerList'] = $codeIntegerList;
         $result['codeStringList'] = $codeStringList;
-        $result['previousList'] = $previousList;
         $result['fileList'] = $fileList;
         $result['lineList'] = $lineList;
+
+        $result['previousList'] = $previousList;
+
+        if ( count($previousList) > 1 ) {
+            $previous = new Except(...$previousList);
+
+        } elseif ( [] !== $previousList ) {
+            $previous = reset($previousList);
+        }
 
         $result += [
             'message'       => (null
@@ -3507,10 +3520,10 @@ class PhpModule
             'code'          => (([] !== $codeIntegerList) ? reset($codeIntegerList) : null),
             'codeString'    => (([] !== $codeStringList) ? reset($codeStringList) : null),
             //
-            'previous'      => (([] !== $previousList) ? reset($previousList) : null),
-            //
             'file'          => (([] !== $fileList) ? reset($fileList) : null),
             'line'          => (([] !== $lineList) ? reset($lineList) : null),
+            //
+            'previous'      => $previous,
         ];
 
         $result['__unresolved'] = $__unresolved;

@@ -8,24 +8,16 @@ namespace Gzhegow\Lib\Modules\Format;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
-use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class FormatXml
 {
     public function __construct()
     {
-        if ( ! extension_loaded('dom') ) {
-            throw new ExtensionException(
-                [ 'Missing PHP extension: dom' ]
-            );
-        }
+        $theType = Lib::type();
 
-        if ( ! extension_loaded('simplexml') ) {
-            throw new ExtensionException(
-                [ 'Missing PHP extension: simplexml' ]
-            );
-        }
+        $theType->is_extension_loaded('dom')->orThrow();
+        $theType->is_extension_loaded('simplexml')->orThrow();
     }
 
 

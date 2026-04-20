@@ -515,10 +515,13 @@ $fn = function () use ($ffn) {
     $ffn->print('[ Exception ]');
     echo "\n";
 
+    $theDebugThrowabler = \Gzhegow\Lib\Lib::debugThrowabler();
+
     $eeee1 = new \Exception('eeee1', 0);
     $eeee2 = new \Exception('eeee2', 0);
 
-    $eee0 = new \Gzhegow\Lib\Exception\LogicException('eee', $eeee1, $eeee2);
+    $previousList = [ $eeee1, $eeee2 ];
+    $eee0 = new \Gzhegow\Lib\Exception\LogicException('eee', ...$previousList);
 
     $ee1 = new \Exception('ee1', 0, $previous = $eee0);
     $ee2 = new \Exception('ee2', 0, $previous = $eee0);
@@ -526,8 +529,10 @@ $fn = function () use ($ffn) {
     $previousList = [ $ee1, $ee2 ];
     $e0 = new \Gzhegow\Lib\Exception\RuntimeException('e', 0, ...$previousList);
 
-    $messages = \Gzhegow\Lib\Lib::debugThrowabler()
-        ->getPreviousMessagesAllLines($e0, 0
+    $messages = $theDebugThrowabler
+        ->getMessagesLines(
+            $e0,
+            0
             | _DEBUG_THROWABLER_INFO_WITHOUT_FILE
         )
     ;
@@ -539,34 +544,16 @@ $test->expectStdout('
 "[ Exception ]"
 
 [ 0 ] e
-{ object # Gzhegow\Lib\Exception\RuntimeException }
---
 -- [ 0.0 ] ee1
--- { object # Exception }
-----
 ---- [ 0.0.0 ] eee
----- { object # Gzhegow\Lib\Exception\LogicException }
-------
 ------ [ 0.0.0.0 ] eeee1
------- { object # Exception }
-------
 ------ [ 0.0.0.1 ] eeee2
------- { object # Exception }
---
 -- [ 0.1 ] ee2
--- { object # Exception }
-----
 ---- [ 0.1.0 ] eee
----- { object # Gzhegow\Lib\Exception\LogicException }
-------
 ------ [ 0.1.0.0 ] eeee1
------- { object # Exception }
-------
 ------ [ 0.1.0.1 ] eeee2
------- { object # Exception }
 ');
 $test->run();
-
 
 
 // >>> TEST

@@ -1,6 +1,6 @@
 <?php
 
-namespace Gzhegow\Lib\Exception\Iterator\PHP7;
+namespace Gzhegow\Lib\Exception\Iterator\PHP8;
 
 use Gzhegow\Lib\Exception\ExceptInterface;
 use Gzhegow\Lib\Exception\Interfaces\HasPreviousListInterface;
@@ -25,7 +25,7 @@ class ExceptionIterator implements \RecursiveIterator
     public function __construct(array $items, array $track = [])
     {
         $itemsCurrent = $items;
-        foreach ( $itemsCurrent as $e ) {
+        foreach ( $items as $e ) {
             if ( ! (false
                 || $e instanceof \Throwable
                 || $e instanceof ExceptInterface
@@ -43,7 +43,7 @@ class ExceptionIterator implements \RecursiveIterator
 
             if ( '' === $iString ) {
                 throw new \LogicException(
-                    'Each of keys of `track` should be an non-empty string'
+                    'Each of keys of `track` should be a non-empty string'
                 );
             }
 
@@ -68,7 +68,7 @@ class ExceptionIterator implements \RecursiveIterator
     /**
      * @return (\Throwable|ExceptInterface)[]
      */
-    public function current()
+    public function current() : mixed
     {
         $track = $this->track;
 
@@ -84,7 +84,7 @@ class ExceptionIterator implements \RecursiveIterator
     /**
      * @return string
      */
-    public function key()
+    public function key() : mixed
     {
         $key = ([] !== $this->track)
             ? array_key_last($this->track) . '.' . key($this->items)

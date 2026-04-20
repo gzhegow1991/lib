@@ -33,7 +33,7 @@ class LogicException extends \LogicException implements
 
         $cnt = count($eArgsMessageList);
         if ( $cnt > 1 ) {
-            $eArgsMessage = "[ MULTIPLE ERRORS: {$cnt} ]";
+            $eArgsMessage = "[ MULTIPLE ERRORS # {$cnt} ]";
         }
 
         if ( $eArgsPrevious instanceof ExceptInterface ) {
@@ -63,6 +63,6 @@ class LogicException extends \LogicException implements
     {
         $theDebugThrowabler = Lib::debugThrowabler();
 
-        return $theDebugThrowabler->getPreviousTrackIterator($this);
+        return $theDebugThrowabler->getPreviousIterator($this);
     }
 }

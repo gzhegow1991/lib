@@ -7,7 +7,6 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Http\HttpHeader\HttpHeader;
 use Gzhegow\Lib\Modules\Http\Cookies\DefaultCookies;
-use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 use Gzhegow\Lib\Modules\Http\Cookies\CookiesInterface;
 use Gzhegow\Lib\Modules\Http\Session\SessionSafe\SessionSafe;
 use Gzhegow\Lib\Modules\Http\Session\SessionSafe\SessionSafeProxy;
@@ -495,14 +494,14 @@ class HttpModule
 
     /**
      * @return string|false
+     *
+     * @noinspection PhpComposerExtensionStubsInspection
      */
     public function idn_to_ascii(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
     {
-        if ( ! extension_loaded('intl') ) {
-            throw new ExtensionException(
-                [ 'Missing PHP extension: intl' ]
-            );
-        }
+        $theType = Lib::type();
+
+        $theType->is_extension_loaded('intl')->orThrow();
 
         $flags = $flags ?? IDNA_DEFAULT;
         $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
@@ -520,14 +519,14 @@ class HttpModule
 
     /**
      * @return string|false
+     *
+     * @noinspection PhpComposerExtensionStubsInspection
      */
     public function idn_to_utf8(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
     {
-        if ( ! extension_loaded('intl') ) {
-            throw new ExtensionException(
-                [ 'Missing PHP extension: intl' ]
-            );
-        }
+        $theType = Lib::type();
+
+        $theType->is_extension_loaded('intl')->orThrow();
 
         $flags = $flags ?? IDNA_DEFAULT;
         $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;

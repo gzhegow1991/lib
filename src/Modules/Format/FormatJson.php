@@ -5,7 +5,6 @@ namespace Gzhegow\Lib\Modules\Format;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\Runtime\ExtensionException;
 
 
 class FormatJson
@@ -107,11 +106,9 @@ class FormatJson
 
     public function __construct()
     {
-        if ( ! extension_loaded('json') ) {
-            throw new ExtensionException(
-                [ 'Missing PHP extension: json' ]
-            );
-        }
+        $theType = Lib::type();
+
+        $theType->is_extension_loaded('json')->orThrow();
     }
 
 

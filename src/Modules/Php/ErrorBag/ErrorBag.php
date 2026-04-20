@@ -52,7 +52,7 @@ class ErrorBag
         }
 
         if ( [] !== $trace ) {
-            $errorItem->trace['file'] = $trace['file'] ?? $trace[0] ?? '{file}';
+            $errorItem->trace['file'] = $trace['file'] ?? $trace[0] ?? '{{file}}';
             $errorItem->trace['line'] = $trace['line'] ?? $trace[1] ?? -1;
         }
 

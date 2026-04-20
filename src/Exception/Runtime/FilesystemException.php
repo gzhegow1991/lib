@@ -7,5 +7,4 @@ use Gzhegow\Lib\Exception\RuntimeException;
 
 class FilesystemException extends RuntimeException
 {
-
 }

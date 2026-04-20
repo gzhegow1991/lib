@@ -16,20 +16,20 @@ class Ret
     /**
      * @var array{ 0?: T }
      */
-    public $value = [];
+    protected $value = [];
 
     /**
-     * @var \stdClass[]
-     */
-    public $errors = [];
-    /**
      * @var array{
-     *     args: array,
+     *     throwable_args: array,
      *     file_line: array{ 0: string, 1: int },
      *     trace: array[],
-     * }[]
+     * }[][]
      */
-    protected $errorsRaw = [];
+    protected $errors = [];
+    /**
+     * @var \stdClass[][]
+     */
+    protected $errorsStd = [];
 
 
     /**
@@ -123,12 +123,20 @@ class Ret
         if ( $err instanceof self ) {
             $theRet->mergeFrom($err);
 
-            if ( [] !== $errArgs ) {
+            $hasErrors = ([] !== $theRet->errors);
+            $hasArgs = ([] !== $errArgs);
+            $hasFileLine = ([] !== $fileLine);
+
+            if ( $hasArgs ) {
+                $theRet->_addLayer();
                 $theRet->_addError(null, $fileLine, ...$errArgs);
 
-            } elseif ( ([] !== $fileLine) && ([] !== $err->errorsRaw) ) {
-                $errorLast = end($err->errorsRaw);
+            } elseif ( $hasErrors && $hasFileLine ) {
+                $idx = array_key_last($theRet->errors);
 
+                $errorLast = end($theRet->errors[$idx]);
+
+                $theRet->_addLayer();
                 $theRet->_addError($errorLast['trace'], $fileLine, ...$errorLast['throwable_args']);
             }
 
@@ -207,16 +215,20 @@ class Ret
         $result = [];
 
         if ( $isAssociative ) {
-            foreach ( $this->errors as $stdClasses ) {
-                foreach ( $stdClasses as $stdClass ) {
-                    $result[] = (array) $stdClass;
+            foreach ( $this->errorsStd as $layer ) {
+                foreach ( $layer as $stdClasses ) {
+                    foreach ( $stdClasses as $stdClass ) {
+                        $result[] = (array) $stdClass;
+                    }
                 }
             }
 
         } else {
-            foreach ( $this->errors as $stdClasses ) {
-                foreach ( $stdClasses as $stdClass ) {
-                    $result[] = $stdClass;
+            foreach ( $this->errorsStd as $layer ) {
+                foreach ( $layer as $stdClasses ) {
+                    foreach ( $stdClasses as $stdClass ) {
+                        $result[] = $stdClass;
+                    }
                 }
             }
         }
@@ -238,6 +250,7 @@ class Ret
     }
 
     /**
+     * @param null|array[]                    $trace
      * @param null|array{ 0: string, 1: int } $fileLine
      *
      * @return static
@@ -247,16 +260,31 @@ class Ret
         $eTrace = ($trace ?: null);
         $eFileLine = ($fileLine ?: null);
 
-        if ( (null === $eTrace) && static::staticShouldTrace() ) {
-            $traceArray = $this->getTrace(2);
+        $getTrace = null;
+        if ( static::staticShouldTrace() ) {
+            if ( null === $eTrace ) {
+                $getTrace = $getTrace ?? Lib::trace(2);
 
-            $eTrace = $traceArray['trace'];
+                $eTrace = $getTrace['trace'];
+            }
 
             if ( null === $eFileLine ) {
+                $getTrace = $getTrace ?? Lib::trace(2);
+
                 $eFileLine = [];
-                $eFileLine['file'] = $traceArray['file_line']['file'];
-                $eFileLine['line'] = $traceArray['file_line']['line'];
+                $eFileLine['file'] = $getTrace['file_line']['file'];
+                $eFileLine['line'] = $getTrace['file_line']['line'];
             }
+        }
+
+        if ( null !== $eFileLine ) {
+            $eFileLine['file'] = $eFileLine['file'] ?? $eFileLine[0] ?? '{{file}}';
+            $eFileLine['line'] = $eFileLine['line'] ?? $eFileLine[1] ?? -1;
+
+            $eFileLine = [
+                'file' => $eFileLine['file'],
+                'line' => $eFileLine['line'],
+            ];
         }
 
         foreach ( $errArgs as $i => $t ) {
@@ -265,17 +293,31 @@ class Ret
             }
         }
 
-        $eArgs = array_values($errArgs);
+        $eThrowableArgs = array_values($errArgs);
 
         if ( null !== $errArg ) {
-            array_unshift($eArgs, $errArg);
+            array_unshift($eThrowableArgs, $errArg);
         }
 
-        $this->errorsRaw[] = [
-            'throwable_args' => $eArgs,
+        if ( [] === $this->errors ) {
+            $this->errors = [ [] ];
+        }
+
+        $idx = array_key_last($this->errors);
+
+        $this->errors[$idx][] = [
+            'throwable_args' => $eThrowableArgs,
+            //
             'file_line'      => $eFileLine,
             'trace'          => $eTrace,
         ];
+
+        return $this;
+    }
+
+    protected function _addLayer()
+    {
+        $this->errors[] = [];
 
         return $this;
     }
@@ -290,10 +332,17 @@ class Ret
             $this->value = $retFrom->value;
         }
 
-        if ( [] !== $retFrom->errorsRaw ) {
-            $this->errorsRaw = array_merge(
-                $this->errorsRaw,
-                $retFrom->errorsRaw
+        if ( [] !== $retFrom->errors ) {
+            if ( [] === $this->errors ) {
+                $this->errors = [ [] ];
+            }
+
+            $idx = array_key_last($this->errors);
+            $idxFrom = array_key_last($retFrom->errors);
+
+            $this->errors[$idx] = array_merge(
+                $this->errors[$idx],
+                $retFrom->errors[$idxFrom]
             );
         }
 
@@ -309,10 +358,17 @@ class Ret
             $retTo->value = $this->value;
         }
 
-        if ( [] !== $this->errorsRaw ) {
-            $retTo->errorsRaw = array_merge(
-                $retTo->errorsRaw,
-                $this->errorsRaw
+        if ( [] !== $this->errors ) {
+            if ( [] === $retTo->errors ) {
+                $retTo->errors = [ [] ];
+            }
+
+            $idxTo = array_key_last($retTo->errors);
+            $idx = array_key_last($this->errors);
+
+            $retTo->errors[$idxTo] = array_merge(
+                $retTo->errors[$idxTo],
+                $this->errors[$idx]
             );
         }
 
@@ -379,6 +435,7 @@ class Ret
         }
 
         if ( null !== $err ) {
+            $this->_addLayer();
             $this->_addError(null, $fileLine, $err, ...$errArgs);
         }
 
@@ -403,6 +460,7 @@ class Ret
         }
 
         if ( null !== $err ) {
+            $this->_addLayer();
             $this->_addError(null, $fileLine, $err, ...$errArgs);
         }
 
@@ -525,85 +583,53 @@ class Ret
     }
 
 
-    protected function prepareErrors() : void
+    protected function prepareErrors()
     {
         $thePhp = Lib::php();
 
-        $errorsRaw = $this->errorsRaw;
+        if ( [] !== $this->errors ) {
+            foreach ( $this->errors as $i => $errors ) {
+                foreach ( $errors as $ii => $err ) {
+                    if ( isset($this->errorsStd[$i][$ii]) ) {
+                        continue;
+                    }
 
-        if ( [] !== $errorsRaw ) {
-            foreach ( $errorsRaw as $i => $err ) {
-                if ( isset($this->errors[$i]) ) {
-                    continue;
+                    $eFileLine = $err['file_line'];
+                    $eArgs = $err['throwable_args'];
+
+                    $throwableArgsArray = $thePhp->throwable_args($eFileLine, ...$eArgs);
+
+                    $this->errorsStd[$i][$ii] = $throwableArgsArray['messageObjectList'];
                 }
-
-                [
-                    'throwable_args' => $eArgs,
-                    'file_line'      => $eFileLine,
-                ] = $err;
-
-                $throwableArgsArray = $thePhp->throwable_args($eFileLine, ...$eArgs);
-
-                $this->errors[$i] = $throwableArgsArray['messageObjectList'];
             }
         }
+
+        return $this;
     }
 
     protected function throwErrors()
     {
-        $errorsRaw = $this->errorsRaw;
-
         $previousList = [];
 
-        while ( [] !== $errorsRaw ) {
-            [
-                'throwable_args' => $eArgs,
-                'file_line'      => $eFileLine,
-                'trace'          => $eTrace,
-            ] = array_pop($errorsRaw);
+        foreach ( $this->errors as $errors ) {
+            $previousListLayer = [];
 
-            $previous = new Except(...$eArgs);
-            $previous->setFile($eFileLine[0]);
-            $previous->setLine($eFileLine[1]);
-            $previous->setTrace($eTrace);
+            foreach ( $errors as $err ) {
+                $eArgs = $err['throwable_args'];
+                $eFileLine = $err['file_line'];
+                $eTrace = $err['trace'];
 
-            $previousList[] = $previous;
+                $previous = new Except(...$eArgs);
+                $previous->setFile($eFileLine['file']);
+                $previous->setLine($eFileLine['line']);
+                $previous->setTrace($eTrace);
+
+                $previousListLayer[] = $previous;
+            }
+
+            $previousList[] = new LogicException(...$previousListLayer);
         }
 
         throw new LogicException(...$previousList);
-    }
-
-
-    protected function getTrace(int $shift = 0, ?array $trace = null) : array
-    {
-        $exTrace = $trace;
-        if ( null === $trace ) {
-            $ex = new \Exception();
-            $exTrace = $ex->getTrace();
-        }
-
-        while ( $shift > 0 ) {
-            next($exTrace);
-
-            $shift--;
-        }
-
-        $eTrace = [];
-        for ( $i = key($exTrace); $i < count($exTrace); $i++ ) {
-            $eTrace[] = $exTrace[$i];
-        }
-
-        $eFile = $eTrace[0]['file'] ?? '{file}';
-        $eLine = $eTrace[0]['line'] ?? -1;
-
-        $eFileLine = [
-            'file' => $eFile,
-            'line' => $eLine,
-        ];
-
-        return [
-            'file_line' => $eFileLine,
-            'trace'     => $eTrace,
-        ];
     }
 }

@@ -58,9 +58,9 @@ class Except implements
         $messageList = array_values($eArgs['messageList']) ?: [ $message ];
         $messageObjectList = array_values($eArgs['messageObjectList']) ?: [ (object) [ $message ] ];
 
-        $errorsCount = count($messageList);
-        if ( $errorsCount > 1 ) {
-            $message = "[ MULTIPLE ERRORS: {$errorsCount} ]";
+        $cnt = count($messageList);
+        if ( $cnt > 1 ) {
+            $message = "[ MULTIPLE ERRORS # {$cnt} ]";
         }
 
         $trace = null;
@@ -71,7 +71,7 @@ class Except implements
             $exTraceShift = array_shift($exTrace);
 
             $trace = $exTrace;
-            $file = $file ?? $exTrace[0]['file'] ?? $exTraceShift['file'] ?? '{file}';
+            $file = $file ?? $exTrace[0]['file'] ?? $exTraceShift['file'] ?? '{{file}}';
             $line = $line ?? $exTrace[0]['line'] ?? $exTraceShift['line'] ?? -1;
         }
 
@@ -110,6 +110,6 @@ class Except implements
     {
         $theDebugThrowabler = Lib::debugThrowabler();
 
-        return $theDebugThrowabler->getPreviousTrackIterator($this);
+        return $theDebugThrowabler->getPreviousIterator($this);
     }
 }
