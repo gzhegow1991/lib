@@ -20,6 +20,13 @@ interface ThrowablerInterface
      *
      * @return \Traversable<int, array<string, (\Throwable|ExceptInterface)[]>>
      */
+    public function getPreviousTreeIterator($throwable) : \Traversable;
+
+    /**
+     * @param \Throwable|ExceptInterface $throwable
+     *
+     * @return \Traversable<int, array<string, (\Throwable|ExceptInterface)[]>>
+     */
     public function getPreviousTrackIterator($throwable) : \Traversable;
 
 
