@@ -300,7 +300,7 @@ class Ret
         }
 
         if ( [] === $this->errors ) {
-            $this->errors = [ [] ];
+            $this->_addLayer();
         }
 
         $idx = array_key_last($this->errors);
@@ -334,7 +334,7 @@ class Ret
 
         if ( [] !== $retFrom->errors ) {
             if ( [] === $this->errors ) {
-                $this->errors = [ [] ];
+                $this->_addLayer();
             }
 
             $idx = array_key_last($this->errors);
@@ -360,7 +360,7 @@ class Ret
 
         if ( [] !== $this->errors ) {
             if ( [] === $retTo->errors ) {
-                $retTo->errors = [ [] ];
+                $retTo->_addLayer();
             }
 
             $idxTo = array_key_last($retTo->errors);
@@ -609,12 +609,12 @@ class Ret
 
     protected function throwErrors()
     {
-        $previousList = [];
+        $current = null;
 
-        foreach ( $this->errors as $errors ) {
-            $previousListLayer = [];
+        foreach ( $this->errors as $layer ) {
+            $previousList = [];
 
-            foreach ( $errors as $err ) {
+            foreach ( $layer as $err ) {
                 $eArgs = $err['throwable_args'];
                 $eFileLine = $err['file_line'];
                 $eTrace = $err['trace'];
@@ -624,12 +624,12 @@ class Ret
                 $previous->setLine($eFileLine['line']);
                 $previous->setTrace($eTrace);
 
-                $previousListLayer[] = $previous;
+                $previousList[] = $previous;
             }
 
-            $previousList[] = new LogicException(...$previousListLayer);
+            $current = new Except($current, ...$previousList);
         }
 
-        throw new LogicException(...$previousList);
+        throw new LogicException($current);
     }
 }
