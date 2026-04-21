@@ -104,7 +104,7 @@ class Ret
 
             if ( $hasArgs ) {
                 $eTrace = null;
-                $eFileLine = null;
+                $eFileLine = $fileLine;
                 if ( DebugModule::staticShouldTrace() ) {
                     $refs = [];
                     $eTrace = Lib::trace($refs, 1);
@@ -122,14 +122,16 @@ class Ret
 
                     $errorLast = end($theRet->errors[$idx]);
 
+                    $eFileLine = $fileLine;
+
                     $theRet->_addLayer();
-                    $theRet->_addError($errorLast['trace'], $fileLine, ...$errorLast['throwable_args']);
+                    $theRet->_addError($errorLast['trace'], $eFileLine, ...$errorLast['throwable_args']);
                 }
             }
 
         } else {
             $eTrace = null;
-            $eFileLine = null;
+            $eFileLine = $fileLine;
             if ( DebugModule::staticShouldTrace() ) {
                 $refs = [];
                 $eTrace = Lib::trace($refs, 1);
