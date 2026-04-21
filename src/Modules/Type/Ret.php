@@ -258,7 +258,7 @@ class Ret
         $eTrace = $trace ?? [];
         $eFileLine = $fileLine ?? [];
 
-        if ( null !== $eFileLine ) {
+        if ( [] !== $eFileLine ) {
             $eFileLine['file'] = $eFileLine['file'] ?? $eFileLine[0] ?? '{{file}}';
             $eFileLine['line'] = $eFileLine['line'] ?? $eFileLine[1] ?? -1;
 
