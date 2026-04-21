@@ -812,7 +812,7 @@ interface TInterface
     /**
      * @return Ret<array{ 0: string, 1: int }>|array{ 0: string, 1: int }
      */
-    public function fileline($fb, $value);
+    public function file_line($fb, $value);
 
     /**
      * @return Ret<string>|string

@@ -20,10 +20,6 @@ class DebugModule
      * @var string
      */
     protected static $dirRoot;
-    /**
-     * @var array
-     */
-    protected static $varDumpOptions = [];
 
     /**
      * @param string|false|null $dirRoot
@@ -49,6 +45,39 @@ class DebugModule
 
         return $last;
     }
+
+
+    /**
+     * @var bool
+     */
+    protected static $shouldTrace = false;
+
+    /**
+     * @param int|false|null $shouldTrace
+     */
+    public static function staticShouldTrace(?bool $shouldTrace = null) : bool
+    {
+        $last = static::$shouldTrace;
+
+        if ( null !== $shouldTrace ) {
+            if ( false === $shouldTrace ) {
+                static::$shouldTrace = false;
+
+            } else {
+                static::$shouldTrace = (bool) $shouldTrace;
+            }
+        }
+
+        static::$shouldTrace = static::$shouldTrace ?? false;
+
+        return $last;
+    }
+
+
+    /**
+     * @var array
+     */
+    protected static $varDumpOptions = [];
 
     /**
      * @param array|false|null $varDumpOptions
@@ -162,7 +191,7 @@ class DebugModule
     /**
      * @return Ret<array{ 0: string, 1: int }>|array{ 0: string, 1: int }
      */
-    public function type_fileline($fb, $value)
+    public function type_file_line($fb, $value)
     {
         if ( ! is_array($value) ) {
             return Ret::throw(
@@ -230,14 +259,14 @@ class DebugModule
 
     public function dp($var, ...$vars) : string
     {
-        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $fileLine = Lib::file_line([], 1);
 
-        return $this->dumper()->dp($debugBacktraceOverride, $var, ...$vars);
+        return $this->dumper()->dp($fileLine, $var, ...$vars);
     }
 
-    public function fnDP(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    public function fnDP(?int $traceShift = null, ?array $trace = null) : \Closure
     {
-        return $this->dumper()->fnDP($limit, $debugBacktraceOverride);
+        return $this->dumper()->fnDP($traceShift, $trace);
     }
 
 
@@ -246,9 +275,9 @@ class DebugModule
      */
     public function d($var, ...$vars)
     {
-        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $fileLine = Lib::file_line([], 1);
 
-        return $this->dumper()->d($debugBacktraceOverride, $var, ...$vars);
+        return $this->dumper()->d($fileLine, $var, ...$vars);
     }
 
     /**
@@ -256,9 +285,9 @@ class DebugModule
      */
     public function dd(...$vars)
     {
-        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $fileLine = Lib::file_line([], 1);
 
-        return $this->dumper()->dd($debugBacktraceOverride, ...$vars);
+        return $this->dumper()->dd($fileLine, ...$vars);
     }
 
     /**
@@ -266,25 +295,25 @@ class DebugModule
      */
     public function ddd(?int $times, $var, ...$vars)
     {
-        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $fileLine = Lib::file_line([], 1);
 
-        return $this->dumper()->ddd($debugBacktraceOverride, $times, $var, ...$vars);
+        return $this->dumper()->ddd($fileLine, $times, $var, ...$vars);
     }
 
 
-    public function fnD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    public function fnD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
-        return $this->dumper()->fnD($limit, $debugBacktraceOverride);
+        return $this->dumper()->fnD($traceShift, $trace);
     }
 
-    public function fnDD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    public function fnDD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
-        return $this->dumper()->fnDD($limit, $debugBacktraceOverride);
+        return $this->dumper()->fnDD($traceShift, $trace);
     }
 
-    public function fnDDD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    public function fnDDD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
-        return $this->dumper()->fnDDD($limit, $debugBacktraceOverride);
+        return $this->dumper()->fnDDD($traceShift, $trace);
     }
 
 
@@ -293,14 +322,14 @@ class DebugModule
      */
     public function td(int $throttleMs, $var, ...$vars)
     {
-        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $fileLine = Lib::file_line([], 1);
 
-        return $this->dumper()->td($debugBacktraceOverride, $throttleMs, $var, ...$vars);
+        return $this->dumper()->td($fileLine, $throttleMs, $var, ...$vars);
     }
 
-    public function fnTD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    public function fnTD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
-        return $this->dumper()->fnTd($limit, $debugBacktraceOverride);
+        return $this->dumper()->fnTd($traceShift, $trace);
     }
 
 
@@ -315,7 +344,7 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
-            + $this->staticVarDumpOptions()
+            + static::staticVarDumpOptions()
             + [
                 'array_level_max'  => 1,
                 'multiline_escape' => '###',
@@ -361,7 +390,7 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
-            + $this->staticVarDumpOptions()
+            + static::staticVarDumpOptions()
             + [
                 'array_level_max'  => 1,
                 'multiline_escape' => '###',
@@ -411,7 +440,7 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
-            + $this->staticVarDumpOptions()
+            + static::staticVarDumpOptions()
             + [
                 'array_level_max'  => 1,
                 'multiline_escape' => '###',
@@ -460,7 +489,7 @@ class DebugModule
                 'array_newline' => "\n",
             ]
             + $options
-            + $this->staticVarDumpOptions()
+            + static::staticVarDumpOptions()
             + [
                 'array_level_max'  => 0,
                 'multiline_escape' => '###',
@@ -518,7 +547,7 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
-            + $this->staticVarDumpOptions()
+            + static::staticVarDumpOptions()
             + [
                 'array_level_max'  => 0,
                 'multiline_escape' => '###',
@@ -593,7 +622,7 @@ class DebugModule
                 'array_newline' => "\n",
             ]
             + $options
-            + $this->staticVarDumpOptions()
+            + static::staticVarDumpOptions()
             + [
                 'array_level_max'  => 0,
                 'multiline_escape' => '###',
@@ -759,7 +788,7 @@ class DebugModule
     {
         $options = []
             + $options
-            + $this->staticVarDumpOptions()
+            + static::staticVarDumpOptions()
             + [
                 'with_type'        => true,
                 'with_id'          => true,

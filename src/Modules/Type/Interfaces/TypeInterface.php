@@ -812,7 +812,7 @@ interface TypeInterface
     /**
      * @return Ret<array{ 0: string, 1: int }>
      */
-    public function fileline($value);
+    public function file_line($value);
 
     /**
      * @return Ret<string>

@@ -72,12 +72,12 @@ class DefaultThrowabler implements ThrowablerInterface
         $visitedMap = new \SplObjectStorage();
 
         foreach ( $iit as $track ) {
-            foreach ( $track as $e ) {
+            foreach ( $track as $dotpath => $e ) {
                 if ( $visitedMap->contains($e) ) {
                     continue;
                 }
 
-                yield $e;
+                yield $dotpath => $e;
 
                 $visitedMap->attach($e);
             }
@@ -435,7 +435,7 @@ class DefaultThrowabler implements ThrowablerInterface
     {
         $theDebug = Lib::debug();
 
-        $dirRoot = $theDebug->staticDirRoot();
+        $dirRoot = $theDebug::staticDirRoot();
 
         if ( $throwable instanceof HasTraceOverrideInterface ) {
             $eFile = $throwable->getFileOverride($dirRoot);
@@ -475,11 +475,10 @@ class DefaultThrowabler implements ThrowablerInterface
 
         $theDebug = Lib::debug();
 
-        $dirRoot = $theDebug->staticDirRoot();
+        $dirRoot = $theDebug::staticDirRoot();
 
 
         $lines = [];
-
 
         if ( $isWithObjectClass ) {
             $eObjectClass = get_class($throwable);
@@ -512,7 +511,6 @@ class DefaultThrowabler implements ThrowablerInterface
             $lines[] = $line;
         }
 
-
         return $lines;
     }
 
@@ -524,7 +522,7 @@ class DefaultThrowabler implements ThrowablerInterface
     {
         $theDebug = Lib::debug();
 
-        $dirRoot = $theDebug->staticDirRoot();
+        $dirRoot = $theDebug::staticDirRoot();
 
         $array = ($throwable instanceof HasTraceOverrideInterface)
             ? $throwable->getTraceOverride($dirRoot)

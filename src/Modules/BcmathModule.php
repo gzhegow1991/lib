@@ -142,7 +142,7 @@ class BcmathModule
     {
         $theNum = Lib::num();
 
-        $scaleLimit = $theNum->staticScaleLimit();
+        $scaleLimit = $theNum::staticScaleLimit();
 
         $scaleIntList = $this->scales($scales, $numbers);
 
@@ -164,7 +164,7 @@ class BcmathModule
     {
         $theNum = Lib::num();
 
-        $scaleLimit = $theNum->staticScaleLimit();
+        $scaleLimit = $theNum::staticScaleLimit();
 
         $scaleIntList = $this->scales($scales, $numbers);
 
@@ -829,8 +829,8 @@ class BcmathModule
         if ( $withRefFrac ) {
             $theNum = Lib::num();
 
-            $scaleFrac = $theNum->staticScaleFrac();
-            $scaleLimit = $theNum->staticScaleLimit();
+            $scaleFrac = $theNum::staticScaleFrac();
+            $scaleLimit = $theNum::staticScaleLimit();
 
             $scaleFullValid = null
                 ?? $scaleMax
@@ -892,8 +892,8 @@ class BcmathModule
         if ( $withRefFrac ) {
             $theNum = Lib::num();
 
-            $scaleFrac = $theNum->staticScaleFrac();
-            $scaleLimit = $theNum->staticScaleLimit();
+            $scaleFrac = $theNum::staticScaleFrac();
+            $scaleLimit = $theNum::staticScaleLimit();
 
             $scaleFullValid = null
                 ?? $scaleMax
@@ -965,8 +965,8 @@ class BcmathModule
         if ( $withRefFrac ) {
             $theNum = Lib::num();
 
-            $scaleFrac = $theNum->staticScaleFrac();
-            $scaleLimit = $theNum->staticScaleLimit();
+            $scaleFrac = $theNum::staticScaleFrac();
+            $scaleLimit = $theNum::staticScaleLimit();
 
             $scaleFullValid = null
                 ?? $scaleMax
@@ -1016,8 +1016,8 @@ class BcmathModule
         if ( $withRefFrac ) {
             $theNum = Lib::num();
 
-            $scaleFrac = $theNum->staticScaleFrac();
-            $scaleLimit = $theNum->staticScaleLimit();
+            $scaleFrac = $theNum::staticScaleFrac();
+            $scaleLimit = $theNum::staticScaleLimit();
 
             $scaleFullValid = null
                 ?? $theType->scale($scaleInt + $scaleFrac)->orNull()
@@ -1086,8 +1086,8 @@ class BcmathModule
         if ( $withRefFrac ) {
             $theNum = Lib::num();
 
-            $scaleFrac = $theNum->staticScaleFrac();
-            $scaleLimit = $theNum->staticScaleLimit();
+            $scaleFrac = $theNum::staticScaleFrac();
+            $scaleLimit = $theNum::staticScaleLimit();
 
             $scaleFullValid = null
                 ?? $scaleMax
@@ -1131,8 +1131,8 @@ class BcmathModule
         if ( $withRefFrac ) {
             $theNum = Lib::num();
 
-            $scaleFrac = $theNum->staticScaleFrac();
-            $scaleLimit = $theNum->staticScaleLimit();
+            $scaleFrac = $theNum::staticScaleFrac();
+            $scaleLimit = $theNum::staticScaleLimit();
 
             $scaleFullValid = null
                 ?? $theType->scale($scaleInt + $scaleFrac)->orNull()

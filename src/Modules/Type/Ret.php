@@ -4,7 +4,9 @@ namespace Gzhegow\Lib\Modules\Type;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\Except;
+use Gzhegow\Lib\Modules\DebugModule;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\AggregateExcept;
 use Gzhegow\Lib\Exception\RuntimeException;
 
 
@@ -30,33 +32,6 @@ class Ret
      * @var \stdClass[][]
      */
     protected $errorsStd = [];
-
-
-    /**
-     * @var bool
-     */
-    protected static $shouldTrace = false;
-
-    /**
-     * @param int|false|null $shouldTrace
-     */
-    public static function staticShouldTrace(?bool $shouldTrace = null) : bool
-    {
-        $last = static::$shouldTrace;
-
-        if ( null !== $shouldTrace ) {
-            if ( false === $shouldTrace ) {
-                static::$shouldTrace = false;
-
-            } else {
-                static::$shouldTrace = (bool) $shouldTrace;
-            }
-        }
-
-        static::$shouldTrace = static::$shouldTrace ?? false;
-
-        return $last;
-    }
 
 
     /**
@@ -116,32 +91,51 @@ class Ret
      *
      * @return T|static<T>
      */
-    public static function throw($fb, $err, array $fileLine = [], ...$errArgs)
+    public static function throw($fb, $err, ?array $fileLine = null, ...$errArgs)
     {
         $theRet = static::new();
 
         if ( $err instanceof self ) {
             $theRet->mergeFrom($err);
 
-            $hasErrors = ([] !== $theRet->errors);
+            $hasFileLine = (null !== $fileLine);
             $hasArgs = ([] !== $errArgs);
-            $hasFileLine = ([] !== $fileLine);
 
             if ( $hasArgs ) {
+                $eTrace = null;
+                $eFileLine = null;
+                if ( DebugModule::staticShouldTrace() ) {
+                    $refs = [];
+                    $eTrace = Lib::trace($refs, 1);
+                    $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
+                }
+
                 $theRet->_addLayer();
-                $theRet->_addError(null, $fileLine, ...$errArgs);
+                $theRet->_addError($eTrace, $eFileLine, ...$errArgs);
 
-            } elseif ( $hasErrors && $hasFileLine ) {
-                $idx = array_key_last($theRet->errors);
+            } elseif ( $hasFileLine ) {
+                $hasErrors = ([] !== $theRet->errors);
 
-                $errorLast = end($theRet->errors[$idx]);
+                if ( $hasErrors ) {
+                    $idx = array_key_last($theRet->errors);
 
-                $theRet->_addLayer();
-                $theRet->_addError($errorLast['trace'], $fileLine, ...$errorLast['throwable_args']);
+                    $errorLast = end($theRet->errors[$idx]);
+
+                    $theRet->_addLayer();
+                    $theRet->_addError($errorLast['trace'], $fileLine, ...$errorLast['throwable_args']);
+                }
             }
 
         } else {
-            $theRet->_addError(null, $fileLine, $err, $errArgs);
+            $eTrace = null;
+            $eFileLine = null;
+            if ( DebugModule::staticShouldTrace() ) {
+                $refs = [];
+                $eTrace = Lib::trace($refs, 1);
+                $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
+            }
+
+            $theRet->_addError($eTrace, $eFileLine, $err, $errArgs);
         }
 
         if ( null === $fb ) {
@@ -238,44 +232,30 @@ class Ret
 
 
     /**
-     * @param array{ 0: string, 1: int } $fileLine
-     *
      * @return static
      */
-    public function addError($errArg, array $fileLine = [], ...$errArgs)
+    public function addError($errArg, ?array $fileLine = null, ...$errArgs)
     {
-        $this->_addError(null, $fileLine, $errArg, $errArgs);
+        $eTrace = null;
+        $eFileLine = null;
+        if ( DebugModule::staticShouldTrace() ) {
+            $refs = [];
+            $eTrace = Lib::trace($refs, 1);
+            $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
+        }
+
+        $this->_addError($eTrace, $eFileLine, $errArg, $errArgs);
 
         return $this;
     }
 
     /**
-     * @param null|array[]                    $trace
-     * @param null|array{ 0: string, 1: int } $fileLine
-     *
      * @return static
      */
     protected function _addError(?array $trace, ?array $fileLine, $errArg, ...$errArgs)
     {
-        $eTrace = ($trace ?: null);
-        $eFileLine = ($fileLine ?: null);
-
-        $getTrace = null;
-        if ( static::staticShouldTrace() ) {
-            if ( null === $eTrace ) {
-                $getTrace = $getTrace ?? Lib::trace(2);
-
-                $eTrace = $getTrace['trace'];
-            }
-
-            if ( null === $eFileLine ) {
-                $getTrace = $getTrace ?? Lib::trace(2);
-
-                $eFileLine = [];
-                $eFileLine['file'] = $getTrace['file_line']['file'];
-                $eFileLine['line'] = $getTrace['file_line']['line'];
-            }
-        }
+        $eTrace = $trace ?? [];
+        $eFileLine = $fileLine ?? [];
 
         if ( null !== $eFileLine ) {
             $eFileLine['file'] = $eFileLine['file'] ?? $eFileLine[0] ?? '{{file}}';
@@ -424,32 +404,36 @@ class Ret
 
 
     /**
-     * @param array{ 0: string, 1: int } $fileLine
-     *
      * @return T
      */
-    public function orThrow($err = null, array $fileLine = [], ...$errArgs)
+    public function orThrow($err = null, ?array $fileLine = null, ...$errArgs)
     {
         if ( [] !== $this->value ) {
             return $this->value[0];
         }
 
         if ( null !== $err ) {
+            $eTrace = null;
+            $eFileLine = null;
+            if ( DebugModule::staticShouldTrace() ) {
+                $refs = [];
+                $eTrace = Lib::trace($refs, 1);
+                $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
+            }
+
             $this->_addLayer();
-            $this->_addError(null, $fileLine, $err, ...$errArgs);
+            $this->_addError($eTrace, $eFileLine, $err, ...$errArgs);
         }
 
         $this->throwErrors();
     }
 
     /**
-     * @param array{ 0?: mixed }         $fb
-     *
-     * @param array{ 0: string, 1: int } $fileLine
+     * @param array{ 0?: mixed } $fb
      *
      * @return T|mixed
      */
-    public function orFallback(array $fb, $err = null, array $fileLine = [], ...$errArgs)
+    public function orFallback(array $fb, $err = null, ?array $fileLine = null, ...$errArgs)
     {
         if ( [] !== $this->value ) {
             return $this->value[0];
@@ -460,8 +444,16 @@ class Ret
         }
 
         if ( null !== $err ) {
+            $eTrace = null;
+            $eFileLine = null;
+            if ( DebugModule::staticShouldTrace() ) {
+                $refs = [];
+                $eTrace = Lib::trace($refs, 1);
+                $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
+            }
+
             $this->_addLayer();
-            $this->_addError(null, $fileLine, $err, ...$errArgs);
+            $this->_addError($eTrace, $eFileLine, $err, ...$errArgs);
         }
 
         $this->throwErrors();
@@ -612,24 +604,46 @@ class Ret
         $current = null;
 
         foreach ( $this->errors as $layer ) {
-            $previousList = [];
+            if ( [] === $layer ) {
+                continue;
+            }
 
-            foreach ( $layer as $err ) {
+            $previous = $current;
+
+            if ( count($layer) > 1 ) {
+                $previousList = [];
+
+                foreach ( $layer as $err ) {
+                    $eArgs = $err['throwable_args'];
+                    $eFileLine = $err['file_line'];
+                    $eTrace = $err['trace'];
+
+                    $previous = new Except(...$eArgs);
+                    $previous->setFile($eFileLine['file']);
+                    $previous->setLine($eFileLine['line']);
+                    $previous->setTrace($eTrace);
+
+                    $previousList[] = $previous;
+                }
+
+                $current = new AggregateExcept($previousList);
+
+            } else {
+                $err = reset($layer);
+
                 $eArgs = $err['throwable_args'];
                 $eFileLine = $err['file_line'];
                 $eTrace = $err['trace'];
 
-                $previous = new Except(...$eArgs);
-                $previous->setFile($eFileLine['file']);
-                $previous->setLine($eFileLine['line']);
-                $previous->setTrace($eTrace);
-
-                $previousList[] = $previous;
+                $current = new Except(...$eArgs);
+                $current->setFile($eFileLine['file']);
+                $current->setLine($eFileLine['line']);
+                $current->setTrace($eTrace);
             }
 
-            $current = new Except($current, ...$previousList);
+            $current->setPreviousOverride($previous);
         }
 
-        throw new LogicException($current);
+        throw new LogicException($current->getMessage(), $current);
     }
 }

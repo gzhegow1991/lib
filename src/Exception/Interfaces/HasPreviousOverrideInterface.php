@@ -2,7 +2,6 @@
 
 namespace Gzhegow\Lib\Exception\Interfaces;
 
-
 use Gzhegow\Lib\Exception\ExceptInterface;
 
 

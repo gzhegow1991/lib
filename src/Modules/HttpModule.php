@@ -102,7 +102,7 @@ class HttpModule
             return $this->cookies;
         }
 
-        $cookiesClass = $this->staticCookiesClass();
+        $cookiesClass = static::staticCookiesClass();
 
         $instance = $cookiesClass::getInstance();
 

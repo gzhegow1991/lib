@@ -482,16 +482,6 @@ class Lib
     }
 
     /**
-     * @var TModule
-     */
-    public static $t;
-
-    public static function t()
-    {
-        return static::$t = static::$t ?? (new TModule())->__initialize();
-    }
-
-    /**
      * @var TestModule
      */
     public static $test;
@@ -500,6 +490,17 @@ class Lib
     {
         return static::$test = static::$test ?? (new TestModule())->__initialize();
     }
+
+    /**
+     * @var UrlModule
+     */
+    public static $url;
+
+    public static function url()
+    {
+        return static::$url = static::$url ?? (new UrlModule())->__initialize();
+    }
+
 
     /**
      * @var TypeModule
@@ -512,13 +513,13 @@ class Lib
     }
 
     /**
-     * @var UrlModule
+     * @var TModule
      */
-    public static $url;
+    public static $t;
 
-    public static function url()
+    public static function t()
     {
-        return static::$url = static::$url ?? (new UrlModule())->__initialize();
+        return static::$t = static::$t ?? (new TModule())->__initialize();
     }
 
 
@@ -572,36 +573,22 @@ class Lib
 
 
     /**
-     * @return array{
-     *     file: string,
-     *     line: int
-     * }|array{
-     *      0: string,
-     *      1: int
-     * }
+     * @return array{ file: string, line: int }|array{ 0: string, 1: int }
      */
-    public static function file_line(?int $shift = null, ?array $trace = null, ?bool $withKeys = null) : array
+    public static function file_line(array $refs = [], ?int $traceShift = null, ?bool $withKeys = null) : array
     {
+        $refTrace =& $refs[0];
+
+        $refTrace = $refTrace ?? (new \Exception())->getTrace();
+        $traceShift = $traceShift ?? 0;
         $withKeys = $withKeys ?? false;
 
-        if ( null === $trace ) {
-            $ex = new \Exception();
-            $exTrace = $ex->getTrace();
+        if ( $traceShift < 0 ) $traceShift = 0;
 
-        } else {
-            $exTrace = $trace;
-        }
+        $eTrace = array_slice($refTrace, $traceShift);
 
-        while ( $shift > 0 ) {
-            next($exTrace);
-
-            $shift--;
-        }
-
-        $eTrace = array_values($exTrace);
-
-        $eFile = $eTrace[0]['file'] ?? '{{file}}';
-        $eLine = $eTrace[0]['line'] ?? -1;
+        $eFile = $eTrace[0]['file'] ?? $eTrace[0][0] ?? '{{file}}';
+        $eLine = $eTrace[0]['line'] ?? $eTrace[0][1] ?? -1;
 
         if ( $withKeys ) {
             $eFileLine = [
@@ -622,24 +609,17 @@ class Lib
     /**
      * @return array[]
      */
-    public static function trace(?int $shift = null, ?array $trace = null, ?bool $withKeys = null) : array
+    public static function trace(array $refs = [], ?int $traceShift = null, ?bool $withKeys = null) : array
     {
+        $refTrace =& $refs[0];
+
+        $refTrace = $refTrace ?? (new \Exception())->getTrace();
+        $traceShift = $traceShift ?? 0;
         $withKeys = $withKeys ?? true;
 
-        $exTrace = $trace;
+        if ( $traceShift < 0 ) $traceShift = 0;
 
-        if ( null === $trace ) {
-            $ex = new \Exception();
-            $exTrace = $ex->getTrace();
-        }
-
-        while ( $shift > 0 ) {
-            next($exTrace);
-
-            $shift--;
-        }
-
-        $eTrace = array_values($exTrace);
+        $eTrace = array_slice($refTrace, $traceShift);
 
         foreach ( $eTrace as $i => $eFrame ) {
             $eTrace[$i] = []
@@ -660,6 +640,61 @@ class Lib
         }
 
         return $eTrace;
+    }
+
+    /**
+     * @return array[]
+     */
+    public static function file_line_trace(array $refs = [], ?int $traceShift = null, ?bool $withKeys = null) : array
+    {
+        $refTrace =& $refs[0];
+
+        $refTrace = $refTrace ?? (new \Exception())->getTrace();
+        $traceShift = $traceShift ?? 0;
+        $withKeys = $withKeys ?? true;
+
+        if ( $traceShift < 0 ) $traceShift = 0;
+
+        $eTrace = array_slice($refTrace, $traceShift);
+
+        $eFile = $eTrace[0]['file'] ?? $eTrace[0][0] ?? '{{file}}';
+        $eLine = $eTrace[0]['line'] ?? $eTrace[0][1] ?? -1;
+
+        if ( $withKeys ) {
+            $eFileLine = [
+                'file' => $eFile,
+                'line' => $eLine,
+            ];
+
+        } else {
+            $eFileLine = [
+                $eFile,
+                $eLine,
+            ];
+        }
+
+        foreach ( $eTrace as $i => $eFrame ) {
+            $eTrace[$i] = []
+                + $eFrame
+                + [
+                    'function' => null,
+                    'line'     => null,
+                    'file'     => null,
+                    'class'    => null,
+                    'object'   => null,
+                    'type'     => null,
+                    'args'     => null,
+                ];
+        }
+
+        if ( ! $withKeys ) {
+            $eTrace = array_map('array_values', $eTrace);
+        }
+
+        return [
+            'file_line' => $eFileLine,
+            'trace'     => $eTrace,
+        ];
     }
 
 
@@ -840,14 +875,14 @@ class Lib
 
     public static function dp($var, ...$vars) : string
     {
-        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $fileLine = Lib::file_line(1);
 
-        return Lib::debug()->dumper()->dp($debugBacktraceOverride, $var, ...$vars);
+        return Lib::debug()->dumper()->dp($fileLine, $var, ...$vars);
     }
 
-    public static function fnDP(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    public static function fnDP(?int $traceShift = null, ?array $trace = null) : \Closure
     {
-        return Lib::debug()->fnDP($limit, $debugBacktraceOverride);
+        return Lib::debug()->dumper()->fnDP($traceShift, $trace);
     }
 
 
@@ -856,9 +891,9 @@ class Lib
      */
     public static function d($var, ...$vars)
     {
-        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $fileLine = Lib::file_line(1);
 
-        return Lib::debug()->dumper()->d($debugBacktraceOverride, $var, ...$vars);
+        return Lib::debug()->dumper()->d($fileLine, $var, ...$vars);
     }
 
     /**
@@ -866,9 +901,9 @@ class Lib
      */
     public static function dd(...$vars)
     {
-        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $fileLine = Lib::file_line(1);
 
-        return Lib::debug()->dumper()->dd($debugBacktraceOverride, ...$vars);
+        return Lib::debug()->dumper()->dd($fileLine, ...$vars);
     }
 
     /**
@@ -876,25 +911,25 @@ class Lib
      */
     public static function ddd(?int $limit, $var, ...$vars)
     {
-        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $fileLine = Lib::file_line(1);
 
-        return Lib::debug()->dumper()->ddd($debugBacktraceOverride, $limit, $var, ...$vars);
+        return Lib::debug()->dumper()->ddd($fileLine, $limit, $var, ...$vars);
     }
 
 
-    public static function fnD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    public static function fnD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
-        return Lib::debug()->fnD($limit, $debugBacktraceOverride);
+        return Lib::debug()->dumper()->fnD($traceShift, $trace);
     }
 
-    public static function fnDD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    public static function fnDD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
-        return Lib::debug()->fnDD($limit, $debugBacktraceOverride);
+        return Lib::debug()->dumper()->fnDD($traceShift, $trace);
     }
 
-    public static function fnDDD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    public static function fnDDD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
-        return Lib::debug()->fnDDD($limit, $debugBacktraceOverride);
+        return Lib::debug()->dumper()->fnDDD($traceShift, $trace);
     }
 
 
@@ -903,14 +938,14 @@ class Lib
      */
     public function td(int $throttleMs, $var, ...$vars)
     {
-        $debugBacktraceOverride = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
+        $fileLine = Lib::file_line(1);
 
-        return Lib::debug()->dumper()->td($debugBacktraceOverride, $throttleMs, $var, ...$vars);
+        return Lib::debug()->dumper()->td($fileLine, $throttleMs, $var, ...$vars);
     }
 
-    public static function fnTD(?int $limit = null, ?array $debugBacktraceOverride = null) : \Closure
+    public static function fnTD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
-        return Lib::debug()->fnTD($limit, $debugBacktraceOverride);
+        return Lib::debug()->dumper()->fnTD($traceShift, $trace);
     }
 
 

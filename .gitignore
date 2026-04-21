@@ -4,8 +4,7 @@
 /vendor/
 /composer.lock
 
-/.ignore/
-/.old/
+/_old/
 
 /.generator/
 /generator.php

@@ -1087,7 +1087,7 @@ class FileSafe
     {
         $theFs = Lib::fs();
 
-        $returnTargetPath = $returnTargetPath ?? $theFs->staticRealpathReturnTargetPath();
+        $returnTargetPath = $returnTargetPath ?? $theFs::staticRealpathReturnTargetPath();
         $returnTargetPath = (bool) $returnTargetPath;
 
         if ( $returnTargetPath ) {
@@ -1447,7 +1447,7 @@ class FileSafe
     {
         $theFs = Lib::fs();
 
-        $permissions = $permissions ?? $theFs->staticDirChmod();
+        $permissions = $permissions ?? $theFs::staticDirChmod();
         $recursive = $recursive ?? false;
 
         $status = (null !== $context)
@@ -1481,7 +1481,7 @@ class FileSafe
         $theFs = Lib::fs();
 
         if ( ! is_dir($directory) ) {
-            $permissions = $permissions ?? $theFs->staticDirChmod();
+            $permissions = $permissions ?? $theFs::staticDirChmod();
             $recursive = $recursive ?? true;
 
             $status = (null !== $context)

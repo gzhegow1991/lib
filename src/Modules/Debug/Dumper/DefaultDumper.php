@@ -877,22 +877,22 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    public function dp(?array $trace, $var, ...$vars) : string
+    public function dp(?array $fileLine, $var, ...$vars) : string
     {
-        $t = $t ?? Lib::file_line(null, $trace);
+        $fileLine = $fileLine ?? Lib::file_line([], 1);
 
-        return $this->doPrinterPrintTrace([ $t ], $var, ...$vars);
+        return $this->doPrinterPrintTrace($fileLine, $var, ...$vars);
     }
 
-    public function fnDP(?int $shift = null, ?array $trace = null) : \Closure
+    public function fnDP(?int $traceShift = null, ?array $trace = null) : \Closure
     {
         /**
          * @return string
          */
-        return function ($var, ...$vars) use ($shift, $trace) {
-            $t = Lib::file_line($shift, $trace);
+        return function ($var, ...$vars) use ($traceShift, $trace) {
+            $fileLine = Lib::file_line([ $trace ], $traceShift);
 
-            return $this->dp([ $t ], $var, ...$vars);
+            return $this->dp($fileLine, $var, ...$vars);
         };
     }
 
@@ -900,11 +900,11 @@ class DefaultDumper implements DumperInterface
     /**
      * @return mixed
      */
-    public function d(?array $trace, $var, ...$vars)
+    public function d(?array $fileLine, $var, ...$vars)
     {
-        $t = $t ?? Lib::file_line(null, $trace);
+        $fileLine = $fileLine ?? Lib::file_line([], 1);
 
-        $this->doDumperEchoTrace([ $t ], $var, ...$vars);
+        $this->doDumperEchoTrace($fileLine, $var, ...$vars);
 
         return $var;
     }
@@ -914,11 +914,11 @@ class DefaultDumper implements DumperInterface
      *
      * @noinspection PhpReturnDocTypeMismatchInspection
      */
-    public function dd(?array $trace, ...$vars)
+    public function dd(?array $fileLine, ...$vars)
     {
-        $t = $t ?? Lib::file_line(null, $trace);
+        $fileLine = $fileLine ?? Lib::file_line([], 1);
 
-        $this->doDumperEchoTrace([ $t ], ...$vars);
+        $this->doDumperEchoTrace($fileLine, ...$vars);
 
         die();
     }
@@ -928,8 +928,10 @@ class DefaultDumper implements DumperInterface
      *
      * @noinspection PhpReturnDocTypeMismatchInspection
      */
-    public function ddd(?array $trace, int $times, $var, ...$vars)
+    public function ddd(?array $fileLine, int $times, $var, ...$vars)
     {
+        $fileLine = $fileLine ?? Lib::file_line([], 1);
+
         if ( $times < 1 ) {
             throw new LogicException(
                 [ 'The `times` should be positive integer', $times ]
@@ -940,9 +942,7 @@ class DefaultDumper implements DumperInterface
 
         $current = $current ?? $times;
 
-        $t = $t ?? Lib::file_line(null, $trace);
-
-        $this->doDumperEchoTrace([ $t ], $var, ...$vars);
+        $this->doDumperEchoTrace($fileLine, $var, ...$vars);
 
         if ( 0 === --$current ) {
             die();
@@ -952,39 +952,39 @@ class DefaultDumper implements DumperInterface
     }
 
 
-    public function fnD(?int $shift = null, ?array $trace = null) : \Closure
+    public function fnD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
         /**
          * @return mixed
          */
-        return function ($var, ...$vars) use ($shift, $trace) {
-            $t = Lib::file_line($shift, $trace);
+        return function ($var, ...$vars) use ($traceShift, $trace) {
+            $fileLine = Lib::file_line([ $trace ], $traceShift);
 
-            return $this->d([ $t ], $var, ...$vars);
+            return $this->d($fileLine, $var, ...$vars);
         };
     }
 
-    public function fnDD(?int $shift = null, ?array $trace = null) : \Closure
+    public function fnDD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
         /**
          * @return mixed|void
          */
-        return function (...$vars) use ($shift, $trace) {
-            $t = Lib::file_line($shift, $trace);
+        return function (...$vars) use ($traceShift, $trace) {
+            $fileLine = Lib::file_line([ $trace ], $traceShift);
 
-            return $this->dd([ $t ], ...$vars);
+            return $this->dd($fileLine, ...$vars);
         };
     }
 
-    public function fnDDD(?int $shift = null, ?array $trace = null) : \Closure
+    public function fnDDD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
         /**
          * @return mixed|void
          */
-        return function (?int $times, $var, ...$vars) use ($shift, $trace) {
-            $t = Lib::file_line($shift, $trace);
+        return function (?int $times, $var, ...$vars) use ($traceShift, $trace) {
+            $fileLine = Lib::file_line([ $trace ], $traceShift);
 
-            return $this->ddd([ $t ], $times, $var, ...$vars);
+            return $this->ddd($fileLine, $times, $var, ...$vars);
         };
     }
 
@@ -992,8 +992,10 @@ class DefaultDumper implements DumperInterface
     /**
      * @return mixed|void
      */
-    public function td(?array $trace, int $throttleMs, $var, ...$vars)
+    public function td(?array $fileLine, int $throttleMs, $var, ...$vars)
     {
+        $fileLine = $fileLine ?? Lib::file_line([], 1);
+
         if ( $throttleMs < 0 ) {
             throw new LogicException(
                 [ 'The `throttleMs` should be a non-negative integer', $throttleMs ]
@@ -1004,9 +1006,7 @@ class DefaultDumper implements DumperInterface
 
         $last = $last ?? [];
 
-        $t = Lib::file_line(null, $trace);
-
-        $key = implode(':', $t);
+        $key = implode(':', $fileLine);
 
         $now = microtime(true);
 
@@ -1015,55 +1015,45 @@ class DefaultDumper implements DumperInterface
         if ( ($now - $last[$key]) > ($throttleMs / 1000) ) {
             $last[$key] = $now;
 
-            $this->doDumperEchoTrace([ $t ], $var, ...$vars);
+            $this->doDumperEchoTrace($fileLine, $var, ...$vars);
         }
 
         return $var;
     }
 
-    public function fnTD(?int $shift = null, ?array $trace = null) : \Closure
+    public function fnTD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
         /**
          * @return mixed|void
          */
-        return function (int $throttleMs, $var, ...$vars) use ($shift, $trace) {
-            $t = Lib::file_line(null, $trace);
+        return function (int $throttleMs, $var, ...$vars) use ($traceShift, $trace) {
+            $fileLine = Lib::file_line([ $trace ], $traceShift);
 
-            return $this->td([ $t ], $throttleMs, $var, ...$vars);
+            return $this->td($fileLine, $throttleMs, $var, ...$vars);
         };
     }
 
 
-    protected function doPrinterPrintTrace(array $debugBacktrace, ...$vars) : string
+    protected function doPrinterPrintTrace(array $fileLine, ...$vars) : string
     {
-        if ( ! (isset($debugBacktrace[0]) && is_array($debugBacktrace[0])) ) {
-            throw new LogicException(
-                [ 'The `debugBacktrace` should be valid result of `debug_backtrace` function', $debugBacktrace ]
-            );
-        }
+        $theType = Lib::type();
 
-        $traceFile = $debugBacktrace[0]['file'] ?? $debugBacktrace[0][0] ?? '{{file}}';
-        $traceLine = $debugBacktrace[0]['line'] ?? $debugBacktrace[0][1] ?? -1;
+        $fileLineValid = $theType->file_line($fileLine)->orThrow();
 
-        $traceWhereIs = "[ {$traceFile} ({$traceLine}) ]";
+        $traceWhereIs = "[ {$fileLineValid[0]} ({$fileLineValid[1]}) ]";
 
         $content = $this->printerPrint($traceWhereIs, ...$vars);
 
         return $content;
     }
 
-    protected function doDumperEchoTrace(array $debugBacktrace, ...$vars) : void
+    protected function doDumperEchoTrace(array $fileLine, ...$vars) : void
     {
-        if ( ! (isset($debugBacktrace[0]) && is_array($debugBacktrace[0])) ) {
-            throw new LogicException(
-                [ 'The `debugBacktrace` should be valid result of `debug_backtrace` function', $debugBacktrace ]
-            );
-        }
+        $theType = Lib::type();
 
-        $traceFile = $debugBacktrace[0]['file'] ?? $debugBacktrace[0][0] ?? '{{file}}';
-        $traceLine = $debugBacktrace[0]['line'] ?? $debugBacktrace[0][1] ?? -1;
+        $fileLineValid = $theType->file_line($fileLine)->orThrow();
 
-        $traceWhereIs = "[ {$traceFile} ({$traceLine}) ]";
+        $traceWhereIs = "[ {$fileLineValid[0]} ({$fileLineValid[1]}) ]";
 
         $this->dumperDump($traceWhereIs, ...$vars);
     }

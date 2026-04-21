@@ -129,8 +129,8 @@ class FormatJson
             );
         }
 
-        $depth = $depth ?? $this->staticJsonDepth();
-        $flags = $flags ?? $this->staticJsonDecodeFlags();
+        $depth = $depth ?? static::staticJsonDepth();
+        $flags = $flags ?? static::staticJsonDecodeFlags();
 
         $theFunc = Lib::func();
         $theType = Lib::type();
@@ -179,8 +179,8 @@ class FormatJson
             );
         }
 
-        $depth = $depth ?? $this->staticJsonDepth();
-        $flags = $flags ?? $this->staticJsonDecodeFlags();
+        $depth = $depth ?? static::staticJsonDepth();
+        $flags = $flags ?? static::staticJsonDecodeFlags();
 
         $theFunc = Lib::func();
         $theType = Lib::type();
@@ -271,8 +271,8 @@ class FormatJson
             );
         }
 
-        $flags = $flags ?? $this->staticJsonEncodeFlags();
-        $depth = $depth ?? $this->staticJsonDepth();
+        $flags = $flags ?? static::staticJsonEncodeFlags();
+        $depth = $depth ?? static::staticJsonDepth();
 
         try {
             $result = $theFunc->safe_call(
@@ -328,14 +328,14 @@ class FormatJson
             );
         }
 
-        $flags = $flags ?? $this->staticJsonEncodeFlags();
+        $flags = $flags ?? static::staticJsonEncodeFlags();
         $flags = $flags
             | JSON_PRETTY_PRINT
             | JSON_UNESCAPED_LINE_TERMINATORS
             | JSON_UNESCAPED_SLASHES
             | JSON_UNESCAPED_UNICODE;
 
-        $depth = $depth ?? $this->staticJsonDepth();
+        $depth = $depth ?? static::staticJsonDepth();
 
         try {
             $result = $theFunc->safe_call(

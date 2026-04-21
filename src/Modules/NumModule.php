@@ -2537,7 +2537,7 @@ class NumModule
             );
         }
 
-        $scaleLimit = $this->staticScaleLimit();
+        $scaleLimit = static::staticScaleLimit();
 
         if ( $scaleInt > $scaleLimit ) {
             return Ret::throw(

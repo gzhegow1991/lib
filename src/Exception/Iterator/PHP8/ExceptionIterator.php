@@ -3,7 +3,8 @@
 namespace Gzhegow\Lib\Exception\Iterator\PHP8;
 
 use Gzhegow\Lib\Exception\ExceptInterface;
-use Gzhegow\Lib\Exception\Interfaces\HasPreviousListInterface;
+use Gzhegow\Lib\Exception\AggregateExcept;
+use Gzhegow\Lib\Exception\AggregateException;
 
 
 class ExceptionIterator implements \RecursiveIterator
@@ -114,8 +115,11 @@ class ExceptionIterator implements \RecursiveIterator
     {
         $current = current($this->items);
 
-        if ( $current instanceof HasPreviousListInterface ) {
-            $bool = count($current->getPreviousList()) > 0;
+        if ( false
+            || $current instanceof AggregateException
+            || $current instanceof AggregateExcept
+        ) {
+            $bool = (count($current->getThrowables()) > 0);
 
         } else {
             $bool = (null !== $current->getPrevious());
@@ -133,23 +137,35 @@ class ExceptionIterator implements \RecursiveIterator
 
         $list = [];
 
-        if ( $current instanceof HasPreviousListInterface ) {
-            $list = $current->getPreviousList();
+        if ( false
+            || $current instanceof AggregateException
+            || $current instanceof AggregateExcept
+        ) {
+            $list = $current->getThrowables();
 
-        } elseif ( $ePrev = $current->getPrevious() ) {
-            $list[] = $ePrev;
+        } else {
+            $previous = $current->getPrevious();
+
+            if ( false
+                || $previous instanceof AggregateException
+                || $previous instanceof AggregateExcept
+            ) {
+                $list = $previous->getThrowables();
+
+            } else {
+                $list[] = $previous;
+            }
         }
 
         $it = null;
 
         if ( [] !== $list ) {
             $fulltrack = $this->track;
-
-            $key = ([] !== $this->track)
+            $fullkey = ([] !== $this->track)
                 ? array_key_last($this->track) . '.' . key($this->items)
                 : key($this->items);
 
-            $fulltrack[$key] = $current;
+            $fulltrack[$fullkey] = $current;
 
             $it = new static($list, $fulltrack);
         }

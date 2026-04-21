@@ -13,54 +13,29 @@ class Exception extends \Exception implements
     use ExceptionTrait;
 
 
-    public static function fromExcept(ExceptInterface $e)
-    {
-        $ex = new static(
-            $e->getMessage(),
-            $e->getCode(),
-            $e->getPrevious(),
-        );
-
-        $ex->fileOverride = $e->getFile();
-        $ex->lineOverride = $e->getLine();
-
-        $ex->traceOverride = ($e->hasTrace() ? $e->getTrace() : null);
-
-        $ex->messageList = $e->getMessageList();
-        $ex->messageObjectList = $e->getMessageObjectList();
-
-        $ex->previousList = $e->getPreviousList();
-
-        return $ex;
-    }
-
-
     public function __construct(...$throwableArgs)
     {
         $thePhp = Lib::php();
 
         $eArgs = $thePhp->throwable_args(...$throwableArgs);
 
-        $eArgsMessage = $eArgs['message'] ?? '[ NO MESSAGE ]';
-        $eArgsCode = $eArgs['code'] ?? -1;
-        $eArgsPrevious = $eArgs['previous'];
-
-        $eArgsPreviousList = array_values($eArgs['previousList']);
+        $eArgsMessage = $eArgs['message'];
+        $eArgsCode = $eArgs['code'];
 
         $eArgsFile = $eArgs['file'];
         $eArgsLine = $eArgs['line'];
 
-        $eArgsMessageList = array_values($eArgs['messageList']) ?: [ $eArgsMessage ];
-        $eArgsMessageObjectList = array_values($eArgs['messageObjectList']) ?: [ (object) [ $eArgsMessage ] ];
+        $eArgsPrevious = $eArgs['previous'];
+        $eArgsPreviousList = array_values($eArgs['previousList']);
+        if ( ! $eArgsPrevious && $eArgsPreviousList ) {
+            $eArgsPrevious = new AggregateException($eArgsPreviousList);
 
-        $cnt = count($eArgsMessageList);
-        if ( $cnt > 1 ) {
-            $eArgsMessage = "[ MULTIPLE ERRORS # {$cnt} ]";
-        }
-
-        if ( $eArgsPrevious instanceof ExceptInterface ) {
+        } elseif ( $eArgsPrevious instanceof ExceptInterface ) {
             $eArgsPrevious = Exception::fromExcept($eArgsPrevious);
         }
+
+        $eArgsMessageList = array_values($eArgs['messageList']) ?: [ $eArgsMessage ];
+        $eArgsMessageObjectList = array_values($eArgs['messageObjectList']) ?: [ (object) [ $eArgsMessage ] ];
 
         parent::__construct(
             $eArgsMessage,
@@ -73,8 +48,6 @@ class Exception extends \Exception implements
 
         $this->messageList = $eArgsMessageList;
         $this->messageObjectList = $eArgsMessageObjectList;
-
-        $this->previousList = $eArgsPreviousList;
     }
 
 

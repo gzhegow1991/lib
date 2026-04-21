@@ -23,38 +23,38 @@ interface DumperInterface
     public function dumperDump(...$vars) : void;
 
 
-    public function dp(?array $trace, $var, ...$vars) : string;
+    public function dp(?array $fileLine, $var, ...$vars) : string;
 
-    public function fnDP(?int $shift = null, ?array $trace = null) : \Closure;
+    public function fnDP(?int $traceShift = null, ?array $trace = null) : \Closure;
 
 
     /**
      * @return mixed
      */
-    public function d(?array $trace, $var, ...$vars);
+    public function d(?array $fileLine, $var, ...$vars);
 
     /**
      * @return mixed|void
      */
-    public function dd(?array $trace, ...$vars);
+    public function dd(?array $fileLine, ...$vars);
 
     /**
      * @return mixed|void
      */
-    public function ddd(?array $trace, int $times, $var, ...$vars);
+    public function ddd(?array $fileLine, int $times, $var, ...$vars);
 
 
-    public function fnD(?int $shift = null, ?array $trace = null) : \Closure;
+    public function fnD(?int $traceShift = null, ?array $trace = null) : \Closure;
 
-    public function fnDD(?int $shift = null, ?array $trace = null) : \Closure;
+    public function fnDD(?int $traceShift = null, ?array $trace = null) : \Closure;
 
-    public function fnDDD(?int $shift = null, ?array $trace = null) : \Closure;
+    public function fnDDD(?int $traceShift = null, ?array $trace = null) : \Closure;
 
 
     /**
      * @return mixed|void
      */
-    public function td(?array $trace, int $throttleMs, $var, ...$vars);
+    public function td(?array $fileLine, int $throttleMs, $var, ...$vars);
 
-    public function fnTD(?int $shift = null, ?array $trace = null) : \Closure;
+    public function fnTD(?int $traceShift = null, ?array $trace = null) : \Closure;
 }

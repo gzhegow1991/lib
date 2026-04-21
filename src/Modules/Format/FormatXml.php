@@ -183,10 +183,7 @@ class FormatXml
                 return Ret::throw(
                     $fb,
                     $ret,
-                //
-                // > commented, cause: without duplicate
-                // [ __FILE__, __LINE__ ]
-                // < commented, cause: without duplicate
+                // [ __FILE__, __LINE__ ] // > commented, cause: without duplicate
                 );
             }
         }

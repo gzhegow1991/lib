@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Exception;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\DebugModule;
 
 
 class Except implements
@@ -13,80 +14,53 @@ class Except implements
     use ExceptTrait;
 
 
-    /**
-     * @var bool
-     */
-    protected static $shouldTrace = false;
-
-    /**
-     * @param int|false|null $shouldTrace
-     */
-    public static function staticShouldTrace(?bool $shouldTrace = null) : bool
-    {
-        $last = static::$shouldTrace;
-
-        if ( null !== $shouldTrace ) {
-            if ( false === $shouldTrace ) {
-                static::$shouldTrace = false;
-
-            } else {
-                static::$shouldTrace = (bool) $shouldTrace;
-            }
-        }
-
-        static::$shouldTrace = static::$shouldTrace ?? false;
-
-        return $last;
-    }
-
-
     public function __construct(...$throwableArgs)
     {
         $thePhp = Lib::php();
 
         $eArgs = $thePhp->throwable_args(...$throwableArgs);
 
-        $message = $eArgs['message'] ?? '[ NO MESSAGE ]';
-        $code = $eArgs['code'] ?? -1;
-        $previous = $eArgs['previous'];
+        $eArgsMessage = $eArgs['message'];
+        $eArgsCode = $eArgs['code'];
 
-        $previousList = array_values($eArgs['previousList']);
+        $eArgsFile = $eArgs['file'];
+        $eArgsLine = $eArgs['line'];
 
-        $file = $eArgs['file'];
-        $line = $eArgs['line'];
+        $eArgsPrevious = $eArgs['previous'];
+        $eArgsPreviousList = array_values($eArgs['previousList']);
+        if ( ! $eArgsPrevious && $eArgsPreviousList ) {
+            $eArgsPrevious = new AggregateException($eArgsPreviousList);
 
-        $messageList = array_values($eArgs['messageList']) ?: [ $message ];
-        $messageObjectList = array_values($eArgs['messageObjectList']) ?: [ (object) [ $message ] ];
-
-        $cnt = count($messageList);
-        if ( $cnt > 1 ) {
-            $message = "[ MULTIPLE ERRORS # {$cnt} ]";
+        } elseif ( $eArgsPrevious instanceof ExceptInterface ) {
+            $eArgsPrevious = Exception::fromExcept($eArgsPrevious);
         }
 
-        $trace = null;
-        if ( static::staticShouldTrace() ) {
+        $eArgsMessageList = array_values($eArgs['messageList']) ?: [ $eArgsMessage ];
+        $eArgsMessageObjectList = array_values($eArgs['messageObjectList']) ?: [ (object) [ $eArgsMessage ] ];
+
+        $eArgsTrace = null;
+        if ( DebugModule::staticShouldTrace() ) {
             $ex = new \Exception();
             $exTrace = $ex->getTrace();
-
             $exTraceShift = array_shift($exTrace);
 
-            $trace = $exTrace;
-            $file = $file ?? $exTrace[0]['file'] ?? $exTraceShift['file'] ?? '{{file}}';
-            $line = $line ?? $exTrace[0]['line'] ?? $exTraceShift['line'] ?? -1;
+            $eArgsTrace = $exTrace;
         }
 
-        $this->message = $message;
-        $this->code = $code;
-        $this->previous = $previous;
+        $eArgsFile = $eArgsFile ?? $exTrace[0]['file'] ?? $exTraceShift['file'] ?? '{{file}}';
+        $eArgsLine = $eArgsLine ?? $exTrace[0]['line'] ?? $exTraceShift['line'] ?? -1;
 
-        $this->file = $file;
-        $this->line = $line;
-        $this->trace = $trace;
+        $this->message = $eArgsMessage;
+        $this->code = $eArgsCode;
+        $this->previous = $eArgsPrevious;
 
-        $this->messageList = $messageList;
-        $this->messageObjectList = $messageObjectList;
+        $this->file = $eArgsFile;
+        $this->line = $eArgsLine;
 
-        $this->previousList = $previousList;
+        $this->trace = $eArgsTrace;
+
+        $this->messageList = $eArgsMessageList;
+        $this->messageObjectList = $eArgsMessageObjectList;
     }
 
 

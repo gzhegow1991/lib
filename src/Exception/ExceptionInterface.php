@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Exception;
 
 use Gzhegow\Lib\Exception\Interfaces\HasMessageListInterface;
-use Gzhegow\Lib\Exception\Interfaces\HasPreviousListInterface;
 use Gzhegow\Lib\Exception\Interfaces\HasTraceOverrideInterface;
 use Gzhegow\Lib\Exception\Interfaces\HasPreviousOverrideInterface;
 
@@ -17,7 +16,6 @@ interface ExceptionInterface extends
     HasPreviousOverrideInterface,
     HasTraceOverrideInterface,
     //
-    HasMessageListInterface,
-    HasPreviousListInterface
+    HasMessageListInterface
 {
 }

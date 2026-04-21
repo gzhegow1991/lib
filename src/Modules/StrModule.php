@@ -188,7 +188,7 @@ class StrModule
      */
     public function mb_func(string $fn)
     {
-        if ( ! $this->staticMbstring() ) {
+        if ( ! static::staticMbstring() ) {
             return $fn;
         }
 
@@ -1414,7 +1414,7 @@ class StrModule
             return 0;
         }
 
-        $len = $this->staticMbstring()
+        $len = static::staticMbstring()
             ? ((null !== $mb_encoding)
                 ? mb_strlen($value, $mb_encoding)
                 : mb_strlen($value)
@@ -1450,7 +1450,7 @@ class StrModule
      */
     public function lower(string $str, ?string $mb_encoding = null) : string
     {
-        if ( $this->staticMbstring() ) {
+        if ( static::staticMbstring() ) {
             $result = (null !== $mb_encoding)
                 ? mb_strtolower($str, $mb_encoding)
                 : mb_strtolower($str);
@@ -1477,7 +1477,7 @@ class StrModule
      */
     public function upper(string $str, ?string $mb_encoding = null) : string
     {
-        if ( $this->staticMbstring() ) {
+        if ( static::staticMbstring() ) {
             $result = (null !== $mb_encoding)
                 ? mb_strtoupper($str, $mb_encoding)
                 : mb_strtoupper($str);
@@ -1507,7 +1507,7 @@ class StrModule
     {
         $theMb = Lib::mb();
 
-        if ( $this->staticMbstring() ) {
+        if ( static::staticMbstring() ) {
             $result = $theMb->lcfirst($str, $mb_encoding);
 
         } else {
@@ -1534,7 +1534,7 @@ class StrModule
     {
         $theMb = Lib::mb();
 
-        if ( $this->staticMbstring() ) {
+        if ( static::staticMbstring() ) {
             $result = $theMb->ucfirst($str, $mb_encoding);
 
         } else {
@@ -1617,7 +1617,7 @@ class StrModule
 
         $lengthInt = $theType->int_positive($length)->orThrow();
 
-        if ( $this->staticMbstring() ) {
+        if ( static::staticMbstring() ) {
             $result = $theMb->str_split($str, $lengthInt, $mb_encoding);
 
         } else {
@@ -2880,7 +2880,7 @@ class StrModule
 
         $theStr = Lib::str();
 
-        $isUnicodeAllowed = $theStr->staticMbstring();
+        $isUnicodeAllowed = $theStr::staticMbstring();
 
         $_string = $isUnicodeAllowed
             ? preg_replace('/(?:[^\w]|[_])+/u', '', $string)

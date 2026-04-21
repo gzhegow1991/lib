@@ -107,7 +107,7 @@ class RandomModule
 
     public function uuid() : string
     {
-        $fn = $this->staticFnUuid();
+        $fn = static::staticFnUuid();
 
         $uuid = call_user_func($fn);
 

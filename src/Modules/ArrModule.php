@@ -1985,7 +1985,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->staticFnMode()
+            ?? static::staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -2019,7 +2019,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->staticFnMode()
+            ?? static::staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -2061,7 +2061,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->staticFnMode()
+            ?? static::staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -2100,7 +2100,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->staticFnMode()
+            ?? static::staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -2144,7 +2144,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->staticFnMode()
+            ?? static::staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -2185,7 +2185,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->staticFnMode()
+            ?? static::staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -2223,7 +2223,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->staticFnMode()
+            ?? static::staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -2293,7 +2293,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->staticFnMode()
+            ?? static::staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
@@ -2333,7 +2333,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? $this->staticFnMode()
+            ?? static::staticFnMode()
             ?? _ARR_FN_USE_VALUE;
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);

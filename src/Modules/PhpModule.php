@@ -3302,7 +3302,7 @@ class PhpModule
     {
         $hasFnCatch = (null !== $fnCatch);
 
-        $tickUsleep = $tickUsleep ?? $this->staticPoolingTickUsleep();
+        $tickUsleep = $tickUsleep ?? static::staticPoolingTickUsleep();
 
         if ( $tickUsleep <= 0 ) {
             throw new LogicException(
@@ -3369,8 +3369,7 @@ class PhpModule
         $messageList = [];
         $messageDataList = [];
         $messageObjectList = [];
-        $codeIntegerList = [];
-        $codeStringList = [];
+        $codeList = [];
         $fileList = [];
         $lineList = [];
 
@@ -3383,21 +3382,13 @@ class PhpModule
             $arg = $throwableArgs[$i];
 
             if ( is_int($arg) ) {
-                $codeIntegerList[$i] = $arg;
+                $codeList[$i] = $arg;
 
                 continue;
             }
 
             if ( is_string($arg) && ('' !== $arg) ) {
-                if ( true
-                    && (false === strpos($arg, ' '))
-                    && preg_match('/^[A-Z0-9_]+$/', $arg)
-                ) {
-                    $codeStringList[$i] = $arg;
-
-                } else {
-                    $messageList[$i] = $arg;
-                }
+                $messageList[$i] = $arg;
 
                 continue;
             }
@@ -3441,15 +3432,7 @@ class PhpModule
                     if ( null !== $messageString ) {
                         unset($messageDataArray[0]);
 
-                        if ( true
-                            && (false === strpos($messageString, ' '))
-                            && preg_match('/^[A-Z0-9_]+$/', $messageString)
-                        ) {
-                            $codeStringList[$i] = $messageString;
-
-                        } else {
-                            $messageList[$i] = $messageString;
-                        }
+                        $messageList[$i] = $messageString;
                     }
                 }
 
@@ -3470,61 +3453,50 @@ class PhpModule
             $__unresolved[$i] = $arg;
         }
 
-        if ( [] !== $previousList ) {
-            if ( [] === $messageList ) {
-                foreach ( $previousList as $i => $previous ) {
-                    $messageList[$i] = $previous->getMessage();
-                    $codeIntegerList[$i] = $previous->getCode();
-                    $fileList[$i] = $previous->getFile();
-                    $lineList[$i] = $previous->getLine();
-                }
-
-                $previousList = [];
-            }
-        }
-
         foreach ( $messageList as $i => $messageString ) {
             $messageData = $messageDataList[$i] ?? [];
 
             $messageObjectList[$i] = (object) ([ $messageString ] + $messageData);
         }
 
+        $cntMessageList = count($messageList);
+        $cntCodeIntegerList = count($codeList);
+        $cntPreviousList = count($previousList);
+
         $result = [];
 
         $result['messageList'] = $messageList;
         $result['messageDataList'] = $messageDataList;
         $result['messageObjectList'] = $messageObjectList;
-        $result['codeIntegerList'] = $codeIntegerList;
-        $result['codeStringList'] = $codeStringList;
+        $result['codeIntegerList'] = $codeList;
         $result['fileList'] = $fileList;
         $result['lineList'] = $lineList;
 
-        $result['previousList'] = $previousList;
-
-        if ( count($previousList) > 1 ) {
-            $previous = new Except(...$previousList);
-
-        } elseif ( [] !== $previousList ) {
-            $previous = reset($previousList);
-        }
-
         $result += [
             'message'       => (null
+                ?? (($cntMessageList > 1) ? "[ MULTIPLE ERRORS # {$cntMessageList} ]" : null)
                 ?? (([] !== $messageList) ? reset($messageList) : null)
-                ?? (([] !== $codeStringList) ? reset($codeStringList) : null)
-                ?? null
+                ?? '[ NO MESSAGE ]'
             ),
             'messageData'   => (([] !== $messageDataList) ? reset($messageDataList) : null),
             'messageObject' => (([] !== $messageObjectList) ? reset($messageObjectList) : null),
             //
-            'code'          => (([] !== $codeIntegerList) ? reset($codeIntegerList) : null),
-            'codeString'    => (([] !== $codeStringList) ? reset($codeStringList) : null),
+            'code'          => (null
+                ?? (($cntCodeIntegerList > 1) ? -1 : null)
+                ?? (([] !== $codeList) ? reset($codeList) : null)
+                ?? -1
+            ),
             //
             'file'          => (([] !== $fileList) ? reset($fileList) : null),
             'line'          => (([] !== $lineList) ? reset($lineList) : null),
-            //
-            'previous'      => $previous,
         ];
+
+        if ( $cntPreviousList === 1 ) {
+            $previous = reset($previousList);
+        }
+
+        $result['previous'] = $previous;
+        $result['previousList'] = $previousList;
 
         $result['__unresolved'] = $__unresolved;
 

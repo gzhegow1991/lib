@@ -1422,9 +1422,9 @@ trait TTrait
 	/**
 	 * @return Ret<array{ 0: string, 1: int }>|array{ 0: string, 1: int }
 	 */
-	public function fileline($fb, $value)
+	public function file_line($fb, $value)
 	{
-		return Lib::debug()->type_fileline($fb, $value);
+		return Lib::debug()->type_file_line($fb, $value);
 	}
 
 
