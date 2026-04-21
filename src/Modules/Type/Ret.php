@@ -619,10 +619,13 @@ class Ret
                     $eFileLine = $err['file_line'];
                     $eTrace = $err['trace'];
 
+                    $eFile = $eFileLine['file'] ?? null;
+                    $eLine = $eFileLine['line'] ?? null;
+
                     $previous = new Except(...$eArgs);
 
-                    $previous->setFileOverride($eFileLine['file']);
-                    $previous->setLineOverride($eFileLine['line']);
+                    $previous->setFileOverride($eFile);
+                    $previous->setLineOverride($eLine);
                     $previous->setTraceOverride($eTrace);
 
                     $previousList[] = $previous;
@@ -637,11 +640,14 @@ class Ret
                 $eFileLine = $err['file_line'];
                 $eTrace = $err['trace'];
 
+                $eFile = $eFileLine['file'] ?? null;
+                $eLine = $eFileLine['line'] ?? null;
+
                 $current = new Except(...$eArgs);
 
-                $current->setFileOverride($eFileLine['file']);
-                $current->setLineOverride($eFileLine['line']);
                 $current->setTraceOverride($eTrace);
+                $current->setFileOverride($eFile);
+                $current->setLineOverride($eLine);
             }
 
             $current->setPreviousOverride($previous);
