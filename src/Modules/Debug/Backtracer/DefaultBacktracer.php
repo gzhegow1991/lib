@@ -432,10 +432,8 @@ class DefaultBacktracer implements BacktracerInterface
     protected function execute() : array
     {
         $theDebug = Lib::debug();
-        $theFs = Lib::fs();
 
         $dirRoot = $theDebug::staticDirRoot();
-        $hasDirRoot = (null !== $dirRoot);
 
         $trace = $this->trace;
 
@@ -650,8 +648,12 @@ class DefaultBacktracer implements BacktracerInterface
                 }
             }
 
-            if ( $hasDirRoot ) {
-                $t['file'] = $theFs->path_relative($t['file'], $dirRoot);
+            if ( null !== $dirRoot ) {
+                $t['file'] = str_replace(
+                    $dirRoot . DIRECTORY_SEPARATOR,
+                    '',
+                    $t['file']
+                );
             }
 
             $t += [

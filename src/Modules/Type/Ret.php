@@ -5,6 +5,7 @@ namespace Gzhegow\Lib\Modules\Type;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\Except;
 use Gzhegow\Lib\Modules\DebugModule;
+use Gzhegow\Lib\Exception\Exception;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\AggregateExcept;
 use Gzhegow\Lib\Exception\RuntimeException;
@@ -646,6 +647,6 @@ class Ret
             $current->setPreviousOverride($previous);
         }
 
-        throw new LogicException($current->getMessage(), $current);
+        throw RuntimeException::fromExcept($current);
     }
 }

@@ -41,15 +41,11 @@ trait HasTraceOverrideTrait
         $file = $this->fileOverride ?? $this->getFile();
 
         if ( null !== $dirRoot ) {
-            if ( '{{file}}' !== $file ) {
-                $theFs = Lib::fs();
-
-                $file = $theFs->path_relative(
-                    $file,
-                    $dirRoot,
-                    '/'
-                );
-            }
+            $file = str_replace(
+                $dirRoot . DIRECTORY_SEPARATOR,
+                '',
+                $file
+            );
         }
 
         return $file;
@@ -142,18 +138,6 @@ trait HasTraceOverrideTrait
                     $file = $frame['file'] ?? '{{file}}';
                     $line = $frame['line'] ?? -1;
 
-                    if ( null !== $dirRoot ) {
-                        if ( '{{file}}' !== $file ) {
-                            $theFs = $theFs ?? Lib::fs();
-
-                            $file = $theFs->path_relative(
-                                $file,
-                                $dirRoot,
-                                '/'
-                            );
-                        }
-                    }
-
                     if ( isset($frame['args']) ) {
                         $args = [];
 
@@ -238,15 +222,11 @@ trait HasTraceOverrideTrait
                 foreach ( $trace as $i => $frame ) {
                     $file = $frame['file'] ?? '{{file}}';
 
-                    if ( '{{file}}' !== $file ) {
-                        $theFs = $theFs ?? Lib::fs();
-
-                        $file = $theFs->path_relative(
-                            $file,
-                            $dirRoot,
-                            '/'
-                        );
-                    }
+                    $file = str_replace(
+                        $dirRoot . DIRECTORY_SEPARATOR,
+                        '',
+                        $file
+                    );
 
                     $trace[$i]['file'] = $file;
                 }
