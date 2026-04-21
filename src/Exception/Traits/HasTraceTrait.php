@@ -22,22 +22,11 @@ trait HasTraceTrait
     protected $trace;
 
 
-    public function hasFile() : bool
-    {
-        return null !== $this->file;
-    }
-
     public function getFile() : string
     {
         $file = $this->file ?? '{{file}}';
 
         return $file;
-    }
-
-
-    public function hasLine() : bool
-    {
-        return null !== $this->line;
     }
 
     public function getLine() : int
@@ -47,11 +36,6 @@ trait HasTraceTrait
         return $line;
     }
 
-
-    public function hasTrace() : bool
-    {
-        return null !== $this->trace;
-    }
 
     public function getTrace() : array
     {

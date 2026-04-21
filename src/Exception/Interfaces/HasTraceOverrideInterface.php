@@ -21,9 +21,9 @@ interface HasTraceOverrideInterface
 
     public function hasTraceOverride() : bool;
 
-    public function getTraceOverride(?string $dirRoot = null) : array;
+    public function getTraceOverride(?string $dirRoot = null) : ?array;
 
-    public function getTraceAsStringOverride(?string $dirRoot = null) : string;
+    public function getTraceAsStringOverride(?string $dirRoot = null) : ?string;
 
     public function setTraceOverride(?array $trace);
 }

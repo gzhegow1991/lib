@@ -27,10 +27,10 @@ trait ExceptionTrait
             $e->getPreviousOverride(),
         );
 
-        $ex->fileOverride = $e->getFileOverride();
-        $ex->lineOverride = $e->getLineOverride();
+        $ex->fileOverride = $e->getFileOverride() ?? $e->getFile();
+        $ex->lineOverride = $e->getLineOverride() ?? $e->getLine();
 
-        $ex->traceOverride = $e->getTraceOverride();
+        $ex->traceOverride = $e->getTraceOverride() ?? $e->getTrace();
 
         $ex->messageList = $e->getMessageList();
         $ex->messageObjectList = $e->getMessageObjectList();
