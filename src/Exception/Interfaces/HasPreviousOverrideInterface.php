@@ -12,7 +12,7 @@ interface HasPreviousOverrideInterface
     /**
      * @return \Throwable|ExceptInterface
      */
-    public function getPreviousOverride() : object;
+    public function getPreviousOverride() : ?object;
 
     public function setPreviousOverride(?object $previous);
 }

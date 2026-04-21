@@ -7,16 +7,12 @@ interface HasTraceInterface
 {
     public function hasFile() : bool;
 
-    public function getFile() : ?string;
-
-    public function setFile(?string $file);
+    public function getFile() : string;
 
 
     public function hasLine() : bool;
 
-    public function getLine() : ?int;
-
-    public function setLine(?int $line);
+    public function getLine() : int;
 
 
     public function hasTrace() : bool;
@@ -24,6 +20,4 @@ interface HasTraceInterface
     public function getTrace() : array;
 
     public function getTraceAsString() : string;
-
-    public function setTrace(?array $trace);
 }

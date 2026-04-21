@@ -23,13 +23,14 @@ trait ExceptionTrait
         $ex = new static(
             $e->getMessage(),
             $e->getCode(),
-            $e->getPrevious(),
+            //
+            $e->getPreviousOverride(),
         );
 
-        $ex->fileOverride = $e->getFile();
-        $ex->lineOverride = $e->getLine();
+        $ex->fileOverride = $e->getFileOverride();
+        $ex->lineOverride = $e->getLineOverride();
 
-        $ex->traceOverride = ($e->hasTrace() ? $e->getTrace() : null);
+        $ex->traceOverride = $e->getTraceOverride();
 
         $ex->messageList = $e->getMessageList();
         $ex->messageObjectList = $e->getMessageObjectList();

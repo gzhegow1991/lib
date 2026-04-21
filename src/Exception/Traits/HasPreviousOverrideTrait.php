@@ -25,7 +25,7 @@ trait HasPreviousOverrideTrait
     /**
      * @return null|\Throwable|ExceptInterface
      */
-    public function getPreviousOverride() : object
+    public function getPreviousOverride() : ?object
     {
         $previous = $this->previousOverride ?? $this->getPrevious();
 

@@ -27,19 +27,11 @@ trait HasTraceTrait
         return null !== $this->file;
     }
 
-    public function getFile() : ?string
+    public function getFile() : string
     {
-        return $this->file;
-    }
+        $file = $this->file ?? '{{file}}';
 
-    /**
-     * @return static
-     */
-    public function setFile(?string $file)
-    {
-        $this->file = $file;
-
-        return $this;
+        return $file;
     }
 
 
@@ -48,16 +40,11 @@ trait HasTraceTrait
         return null !== $this->line;
     }
 
-    public function getLine() : ?int
+    public function getLine() : int
     {
-        return $this->line;
-    }
+        $line = $this->line ?? -1;
 
-    public function setLine(?int $line)
-    {
-        $this->line = $line;
-
-        return $this;
+        return $line;
     }
 
 
@@ -68,7 +55,9 @@ trait HasTraceTrait
 
     public function getTrace() : array
     {
-        return $this->trace ?? [];
+        $trace = $this->trace ?? [];
+
+        return $trace;
     }
 
     public function getTraceAsString() : string
@@ -82,8 +71,11 @@ trait HasTraceTrait
 
         } else {
             $index = 0;
-            foreach ( $this->getTrace() as $frame ) {
+            foreach ( $trace as $frame ) {
                 $args = "";
+
+                $file = $frame['file'] ?? '{{file}}';
+                $line = $frame['line'] ?? -1;
 
                 if ( isset($frame['args']) ) {
                     $args = [];
@@ -123,8 +115,9 @@ trait HasTraceTrait
                     //
                     $index,
                     //
-                    $frame['file'] ?? '{{file}}', // > filename
-                    $frame['line'] ?? -1,
+                    $file,
+                    $line,
+                    //
                     $frame['class'] ?? '', // > className
                     $frame['type'] ?? '',  // > "->" or "::"
                     $frame['function'],    // > function_name
@@ -137,15 +130,5 @@ trait HasTraceTrait
         }
 
         return $traceAsString;
-    }
-
-    /**
-     * @return static
-     */
-    public function setTrace(?array $trace)
-    {
-        $this->trace = $trace;
-
-        return $this;
     }
 }

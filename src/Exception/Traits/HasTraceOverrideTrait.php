@@ -38,16 +38,18 @@ trait HasTraceOverrideTrait
             $dirRoot = $theDebug::staticDirRoot();
         }
 
-        $theFs = Lib::fs();
-
         $file = $this->fileOverride ?? $this->getFile();
 
         if ( null !== $dirRoot ) {
-            $file = $theFs->path_relative(
-                $file,
-                $dirRoot,
-                '/'
-            );
+            if ( '{{file}}' !== $file ) {
+                $theFs = Lib::fs();
+
+                $file = $theFs->path_relative(
+                    $file,
+                    $dirRoot,
+                    '/'
+                );
+            }
         }
 
         return $file;
@@ -97,9 +99,9 @@ trait HasTraceOverrideTrait
 
     public function getTraceOverride(?string $dirRoot = null) : array
     {
-        $this->prepareTraceOverride($dirRoot);
+        $trace = $this->prepareTraceOverride($dirRoot);
 
-        return $this->traceOverride;
+        return $trace;
     }
 
     public function getTraceAsStringOverride(?string $dirRoot = null) : string
@@ -110,34 +112,47 @@ trait HasTraceOverrideTrait
             $dirRoot = $theDebug::staticDirRoot();
         }
 
-        if ( null === $this->traceOverride ) {
+        $trace = $this->traceOverride;
+        $traceAsString = '';
+
+        if ( null === $trace ) {
             $traceAsString = $this->getTraceAsString();
 
             if ( null !== $dirRoot ) {
-                $fileRootRealpath = realpath($dirRoot);
-                if ( false === $fileRootRealpath ) {
-                    throw new \LogicException('The `dirRoot` should be realpath: ' . $dirRoot);
-                }
+                $theType = Lib::type();
+
+                $dirRootRealpath = $theType->realpath($dirRoot)->orThrow();
 
                 $traceAsString = str_replace(
-                    $fileRootRealpath . DIRECTORY_SEPARATOR,
+                    $dirRootRealpath . DIRECTORY_SEPARATOR,
                     '',
                     $traceAsString
                 );
             }
 
         } else {
-            $traceAsString = "";
-
-            $trace = $this->getTrace();
-
             if ( [] === $trace ) {
                 $traceAsString = "#0 {main}";
 
             } else {
                 $index = 0;
-                foreach ( $this->getTrace() as $frame ) {
+                foreach ( $trace as $frame ) {
                     $args = "";
+
+                    $file = $frame['file'] ?? '{{file}}';
+                    $line = $frame['line'] ?? -1;
+
+                    if ( null !== $dirRoot ) {
+                        if ( '{{file}}' !== $file ) {
+                            $theFs = $theFs ?? Lib::fs();
+
+                            $file = $theFs->path_relative(
+                                $file,
+                                $dirRoot,
+                                '/'
+                            );
+                        }
+                    }
 
                     if ( isset($frame['args']) ) {
                         $args = [];
@@ -177,8 +192,9 @@ trait HasTraceOverrideTrait
                         //
                         $index,
                         //
-                        $frame['file'] ?? '{{file}}', // > filename
-                        $frame['line'] ?? -1,
+                        $file,
+                        $line,
+                        //
                         $frame['class'] ?? '', // > className
                         $frame['type'] ?? '',  // > "->" or "::"
                         $frame['function'],    // > function_name
@@ -205,7 +221,7 @@ trait HasTraceOverrideTrait
     }
 
 
-    protected function prepareTraceOverride(?string $dirRoot = null) : void
+    protected function prepareTraceOverride(?string $dirRoot = null) : array
     {
         if ( null === $dirRoot ) {
             $theDebug = Lib::debug();
@@ -213,26 +229,30 @@ trait HasTraceOverrideTrait
             $dirRoot = $theDebug::staticDirRoot();
         }
 
-        if ( null === $this->traceOverride ) {
+        $trace = $this->traceOverride;
+
+        if ( null === $trace ) {
             $trace = $this->getTrace();
 
             if ( null !== $dirRoot ) {
-                $theFs = Lib::fs();
-
                 foreach ( $trace as $i => $frame ) {
-                    if ( ! isset($frame['file']) ) {
-                        continue;
+                    $file = $frame['file'] ?? '{{file}}';
+
+                    if ( '{{file}}' !== $file ) {
+                        $theFs = $theFs ?? Lib::fs();
+
+                        $file = $theFs->path_relative(
+                            $file,
+                            $dirRoot,
+                            '/'
+                        );
                     }
 
-                    $trace[$i]['file'] = $theFs->path_relative(
-                        $frame['file'],
-                        $dirRoot,
-                        '/'
-                    );
+                    $trace[$i]['file'] = $file;
                 }
             }
-
-            $this->traceOverride = $trace;
         }
+
+        return $trace;
     }
 }
