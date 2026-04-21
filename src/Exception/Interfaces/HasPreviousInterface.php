@@ -7,6 +7,8 @@ use Gzhegow\Lib\Exception\ExceptInterface;
 
 interface HasPreviousInterface
 {
+    public function hasPrevious() : bool;
+
     /**
      * @return null|\Throwable|ExceptInterface
      */

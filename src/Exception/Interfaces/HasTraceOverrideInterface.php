@@ -7,14 +7,14 @@ interface HasTraceOverrideInterface
 {
     public function hasFileOverride() : bool;
 
-    public function getFileOverride(?string $dirRoot = null) : string;
+    public function getFileOverride(?string $dirRoot = null) : ?string;
 
     public function setFileOverride(?string $file);
 
 
     public function hasLineOverride() : bool;
 
-    public function getLineOverride() : int;
+    public function getLineOverride() : ?int;
 
     public function setLineOverride(?int $line);
 

@@ -22,16 +22,15 @@ class AggregateException extends \RuntimeException implements
     public function __construct(array $throwables)
     {
         if ( [] === $throwables ) {
-            throw new RuntimeException([ 'The `throwables` should be array, non empty', $throwables ]);
+            throw new RuntimeException(
+                [ 'The `throwables` should be array, non empty', $throwables ]
+            );
         }
 
         $throwables = array_values($throwables);
 
         $throwablesCnt = count($throwables);
 
-        // $message = ($throwablesCnt > 1)
-        //     ? "[ MULTIPLE ERRORS # {$throwablesCnt} ]"
-        //     : $throwables[0]->getMessage();
         $message = "[ MULTIPLE ERRORS # {$throwablesCnt} ]";
 
         parent::__construct(

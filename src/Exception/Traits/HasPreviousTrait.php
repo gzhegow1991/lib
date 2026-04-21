@@ -16,6 +16,11 @@ trait HasPreviousTrait
     protected $previous;
 
 
+    public function hasPrevious() : bool
+    {
+        return (null !== $this->previous);
+    }
+
     /**
      * @return null|\Throwable|ExceptInterface
      */

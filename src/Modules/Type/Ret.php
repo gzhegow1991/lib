@@ -255,16 +255,13 @@ class Ret
      */
     protected function _addError(?array $trace, ?array $fileLine, $errArg, ...$errArgs)
     {
-        $eTrace = $trace ?? [];
-        $eFileLine = $fileLine ?? [];
+        $eTrace = $trace ?: null;
+        $eFileLine = $fileLine ?: null;
 
-        if ( [] !== $eFileLine ) {
-            $eFileLine['file'] = $eFileLine['file'] ?? $eFileLine[0] ?? '{{file}}';
-            $eFileLine['line'] = $eFileLine['line'] ?? $eFileLine[1] ?? -1;
-
+        if ( null !== $eFileLine ) {
             $eFileLine = [
-                'file' => $eFileLine['file'],
-                'line' => $eFileLine['line'],
+                'file' => $eFileLine['file'] ?? $eFileLine[0] ?? '{{file}}',
+                'line' => $eFileLine['line'] ?? $eFileLine[1] ?? -1,
             ];
         }
 
@@ -653,6 +650,8 @@ class Ret
             $current->setPreviousOverride($previous);
         }
 
-        throw RuntimeException::fromExcept($current);
+        $ex = RuntimeException::fromExcept($current);
+
+        throw $ex;
     }
 }

@@ -30,7 +30,7 @@ trait HasTraceOverrideTrait
         return null !== $this->fileOverride;
     }
 
-    public function getFileOverride(?string $dirRoot = null) : string
+    public function getFileOverride(?string $dirRoot = null) : ?string
     {
         if ( null === $dirRoot ) {
             $theDebug = Lib::debug();
@@ -38,9 +38,11 @@ trait HasTraceOverrideTrait
             $dirRoot = $theDebug::staticDirRoot();
         }
 
-        $file = $this->fileOverride ?? $this->getFile();
+        $file = null
+            ?? ($this->fileOverride)
+            ?? ($this->hasFile() ? $this->getFile() : null);
 
-        if ( null !== $dirRoot ) {
+        if ( (null !== $dirRoot) && (null !== $file) ) {
             $file = str_replace(
                 $dirRoot . DIRECTORY_SEPARATOR,
                 '',
@@ -70,9 +72,11 @@ trait HasTraceOverrideTrait
     /**
      * @return int
      */
-    public function getLineOverride() : int
+    public function getLineOverride() : ?int
     {
-        $line = $this->lineOverride ?? $this->getLine();
+        $line = null
+            ?? ($this->lineOverride)
+            ?? ($this->hasLine() ? $this->getLine() : null);
 
         return $line;
     }
