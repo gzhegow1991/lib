@@ -21,7 +21,7 @@ class EntrypointPhpSessionSavePathDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
@@ -32,17 +32,20 @@ class EntrypointPhpSessionSavePathDriver extends AbstractEntrypointDriver
             $valueValid = $theType->dirpath($value, true)->orThrow();
         }
 
-        $configCurrent[EntrypointModule::OPT_PHP_SESSION_SAVE_PATH] = $valueValid;
+        $configSet[EntrypointModule::OPT_PHP_SESSION_SAVE_PATH] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         $theHttpSession = Lib::httpSession();
 
-        if ( null !== $value ) {
+        if ( is_string($value) ) {
             $theFsFile = Lib::fsFile();
-
-            $theFsFile->mkdirp($value, 0775, true);
+            $theFsFile->call_safe(static function ($ctx, $dirname) {
+                if ( ! is_dir($dirname) ) {
+                    mkdir($dirname, 0775, true);
+                }
+            }, [ $dirname = $value ]);
         }
 
         $theHttpSession->session_save_path($value);

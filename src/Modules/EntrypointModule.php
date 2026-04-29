@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointPhpUmaskDriver;
 use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointDriverInterface;
 use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointPhpErrorLogDriver;
@@ -28,6 +29,76 @@ use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointCustomErrorHandlerOnShutdown
 use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointCustomEnableThrowablesOnShutdownDriver;
 
 
+/**
+ * @method mixed getCustomDirRoot()
+ * @method mixed getCustomEnableThrowablesOnShutdown()
+ * @method mixed getCustomErrorHandlerOnShutdown()
+ * @method mixed getCustomShouldTrace()
+ * @method mixed getPhpDateTimezoneDefault()
+ * @method mixed getPhpDisplayErrors()
+ * @method mixed getPhpDisplayStartupErrors()
+ * @method mixed getPhpErrorHandler()
+ * @method mixed getPhpErrorLog()
+ * @method mixed getPhpErrorReporting()
+ * @method mixed getPhpExceptionHandler()
+ * @method mixed getPhpLogErrors()
+ * @method mixed getPhpMaxExecutionTime()
+ * @method mixed getPhpMaxInputTime()
+ * @method mixed getPhpMemoryLimit()
+ * @method mixed getPhpPostMaxSize()
+ * @method mixed getPhpPrecision()
+ * @method mixed getPhpSessionCookieParams()
+ * @method mixed getPhpSessionSavePath()
+ * @method mixed getPhpUmask()
+ * @method mixed getPhpUploadMaxFilesize()
+ * @method mixed getPhpUploadTmpDir()
+ *
+ * @method self setCustomDirRoot($value, bool|null $force = null, array $refs = [])
+ * @method self setCustomEnableThrowablesOnShutdown($value, bool|null $force = null, array $refs = [])
+ * @method self setCustomErrorHandlerOnShutdown($value, bool|null $force = null, array $refs = [])
+ * @method self setCustomShouldTrace($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpDateTimezoneDefault($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpDisplayErrors($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpDisplayStartupErrors($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpErrorHandler($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpErrorLog($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpErrorReporting($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpExceptionHandler($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpLogErrors($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpMaxExecutionTime($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpMaxInputTime($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpMemoryLimit($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpPostMaxSize($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpPrecision($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpSessionCookieParams($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpSessionSavePath($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpUmask($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpUploadMaxFilesize($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpUploadTmpDir($value, bool|null $force = null, array $refs = [])
+ *
+ * @method self unsetCustomDirRoot(bool|null $force = null, array $refs = [])
+ * @method self unsetCustomEnableThrowablesOnShutdown(bool|null $force = null, array $refs = [])
+ * @method self unsetCustomErrorHandlerOnShutdown(bool|null $force = null, array $refs = [])
+ * @method self unsetCustomShouldTrace(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpDateTimezoneDefault(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpDisplayErrors(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpDisplayStartupErrors(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpErrorHandler(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpErrorLog(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpErrorReporting(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpExceptionHandler(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpLogErrors(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpMaxExecutionTime(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpMaxInputTime(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpMemoryLimit(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpPostMaxSize(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpPrecision(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpSessionCookieParams(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpSessionSavePath(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpUmask(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpUploadMaxFilesize(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpUploadTmpDir(bool|null $force = null, array $refs = [])
+ */
 class EntrypointModule
 {
     const OPT_PHP_ERROR_HANDLER     = 'PHP_ERROR_HANDLER';
@@ -115,7 +186,16 @@ class EntrypointModule
     /**
      * @var array<string, mixed>
      */
+    protected $configSet = [];
+    /**
+     * @var array<string, mixed>
+     */
     protected $configCurrent = [];
+
+    /**
+     * @var array{ 0: string, 1: int }
+     */
+    protected $isLocked = [];
 
     /**
      * @var array
@@ -185,12 +265,118 @@ class EntrypointModule
     }
 
 
-    public function setAllInitial()
+    public function __call($name, $arguments)
     {
+        $prefix = substr($name, 0, 3);
+        $postfix = substr($name, 3);
+
+        $isGet = ('get' === $prefix);
+        $isSet = ('set' === $prefix);
+        $isUnset = ('unset' === $prefix);
+
+        if ( false
+            || $isGet
+            || $isSet
+            || $isUnset
+        ) {
+            $map = [
+                'CustomDirRoot'                    => static::OPT_CUSTOM_DIR_ROOT,
+                'CustomEnableThrowablesOnShutdown' => static::OPT_CUSTOM_ENABLE_THROWABLES_ON_SHUTDOWN,
+                'CustomErrorHandlerOnShutdown'     => static::OPT_CUSTOM_ERROR_HANDLER_ON_SHUTDOWN,
+                'CustomShouldTrace'                => static::OPT_CUSTOM_SHOULD_TRACE,
+                'PhpDateTimezoneDefault'           => static::OPT_PHP_DATE_TIMEZONE_DEFAULT,
+                'PhpDisplayErrors'                 => static::OPT_PHP_DISPLAY_ERRORS,
+                'PhpDisplayStartupErrors'          => static::OPT_PHP_DISPLAY_STARTUP_ERRORS,
+                'PhpErrorHandler'                  => static::OPT_PHP_ERROR_HANDLER,
+                'PhpErrorLog'                      => static::OPT_PHP_ERROR_LOG,
+                'PhpErrorReporting'                => static::OPT_PHP_ERROR_REPORTING,
+                'PhpExceptionHandler'              => static::OPT_PHP_EXCEPTION_HANDLER,
+                'PhpLogErrors'                     => static::OPT_PHP_LOG_ERRORS,
+                'PhpMaxExecutionTime'              => static::OPT_PHP_MAX_EXECUTION_TIME,
+                'PhpMaxInputTime'                  => static::OPT_PHP_MAX_INPUT_TIME,
+                'PhpMemoryLimit'                   => static::OPT_PHP_MEMORY_LIMIT,
+                'PhpPostMaxSize'                   => static::OPT_PHP_POST_MAX_SIZE,
+                'PhpPrecision'                     => static::OPT_PHP_PRECISION,
+                'PhpSessionCookieParams'           => static::OPT_PHP_SESSION_COOKIE_PARAMS,
+                'PhpSessionSavePath'               => static::OPT_PHP_SESSION_SAVE_PATH,
+                'PhpUmask'                         => static::OPT_PHP_UMASK,
+                'PhpUploadMaxFilesize'             => static::OPT_PHP_UPLOAD_MAX_FILESIZE,
+                'PhpUploadTmpDir'                  => static::OPT_PHP_UPLOAD_TMP_DIR,
+            ];
+
+            if ( isset($map[$postfix]) ) {
+                $constName = $map[$postfix];
+
+                switch ( true ):
+                    case $isGet:
+                        $value = $this->getOpt($constName);
+
+                        return $value;
+
+                    case $isSet:
+                        $value = $arguments[0];
+                        $force = $arguments[1] ?? null;
+                        $refs = $arguments[2] ?? [];
+
+                        $this->setOpt($constName, $value, $force, $refs);
+
+                        return $this;
+
+                    case $isUnset:
+                        $force = $arguments[0] ?? null;
+                        $refs = $arguments[1] ?? [];
+
+                        $this->unsetOpt($constName, $force, $refs);
+
+                        return $this;
+
+                endswitch;
+            }
+        }
+
+        throw new RuntimeException(
+            [ 'The `method` not found: ' . $name, $name, $arguments ]
+        );
+    }
+
+
+    public function lock()
+    {
+        $this->isLocked = Lib::file_line();
+
+        return $this;
+    }
+
+    public function unlock()
+    {
+        $this->isLocked = [];
+
+        return $this;
+    }
+
+
+    public function setAllInitial(?bool $force = null, array $refs = [])
+    {
+        $force = $force ?? false;
+
+        if ( (! $force) && $this->isLocked ) {
+            throw new RuntimeException(
+                [ "The entrypoint is locked at: {$this->isLocked[0]} ({$this->isLocked[1]})", $this->isLocked ]
+            );
+        }
+
+        $last =& $refs[0];
+        $last = $this->configCurrent;
+
         foreach ( $this->drivers as $opt => $driver ) {
             $valueInitial = $this->configInitial[$opt];
 
-            $driver->setValue($valueInitial, $this->configCurrent);
+            $driver->setValue(
+                $valueInitial,
+                //
+                $this->configCurrent,
+                $this->configInitial,
+            );
         }
 
         return $this;
@@ -201,7 +387,12 @@ class EntrypointModule
         foreach ( $this->drivers as $opt => $driver ) {
             $valueInitial = $this->configInitial[$opt];
 
-            $driver->useValue($valueInitial, $this->configCurrent);
+            $driver->useValue(
+                $valueInitial,
+                //
+                $this->configCurrent,
+                $this->configInitial,
+            );
         }
 
         return $this;
@@ -212,7 +403,12 @@ class EntrypointModule
         $valueInitial = $this->configInitial[$opt];
 
         $driver = $this->drivers[$opt];
-        $driver->useValue($valueInitial, $this->configCurrent);
+        $driver->useValue(
+            $valueInitial,
+            //
+            $this->configCurrent,
+            $this->configInitial,
+        );
 
         return $this;
     }
@@ -227,12 +423,28 @@ class EntrypointModule
     }
 
 
-    public function setAllRecommended()
+    public function setAllRecommended(?bool $force = null, array $refs = [])
     {
+        $force = $force ?? false;
+
+        if ( (! $force) && $this->isLocked ) {
+            throw new RuntimeException(
+                [ "The entrypoint is locked at: {$this->isLocked[0]} ({$this->isLocked[1]})", $this->isLocked ]
+            );
+        }
+
+        $last =& $refs[0];
+        $last = $this->configCurrent;
+
         foreach ( $this->drivers as $driver ) {
             $valueRecommended = $driver->getRecommended();
 
-            $driver->setValue($valueRecommended, $this->configCurrent);
+            $driver->setValue(
+                $valueRecommended,
+                //
+                $this->configCurrent,
+                $this->configInitial,
+            );
         }
 
         return $this;
@@ -243,7 +455,12 @@ class EntrypointModule
         foreach ( $this->drivers as $driver ) {
             $valueRecommended = $driver->getRecommended();
 
-            $driver->useValue($valueRecommended, $this->configCurrent);
+            $driver->useValue(
+                $valueRecommended,
+                //
+                $this->configCurrent,
+                $this->configInitial,
+            );
         }
 
         return $this;
@@ -255,7 +472,12 @@ class EntrypointModule
 
         $valueRecommended = $driver->getRecommended();
 
-        $driver->useValue($valueRecommended, $this->configCurrent);
+        $driver->useValue(
+            $valueRecommended,
+            //
+            $this->configCurrent,
+            $this->configInitial,
+        );
 
         return $this;
     }
@@ -275,7 +497,12 @@ class EntrypointModule
         foreach ( $this->drivers as $opt => $driver ) {
             $valueCurrent = $this->configCurrent[$opt];
 
-            $driver->useValue($valueCurrent, $this->configCurrent);
+            $driver->useValue(
+                $valueCurrent,
+                //
+                $this->configCurrent,
+                $this->configInitial,
+            );
         }
 
         return $this;
@@ -286,7 +513,13 @@ class EntrypointModule
         $valueCurrent = $this->configCurrent[$opt];
 
         $driver = $this->drivers[$opt];
-        $driver->useValue($valueCurrent, $this->configCurrent);
+
+        $driver->useValue(
+            $valueCurrent,
+            //
+            $this->configCurrent,
+            $this->configInitial,
+        );
 
         return $this;
     }
@@ -301,22 +534,68 @@ class EntrypointModule
         return $value;
     }
 
-    public function setOpt(string $opt, $value)
+    public function setOpt(string $opt, $value, ?bool $force = null, array $refs = [])
     {
+        $force = $force ?? false;
+
+        if ( (! $force) && $this->isLocked ) {
+            throw new RuntimeException(
+                [ "The entrypoint is locked at: {$this->isLocked[0]} ({$this->isLocked[1]})", $this->isLocked ]
+            );
+        }
+
+        $last =& $refs[0];
+        $last = null
+            ?? $this->configSet[$opt]
+            ?? $this->configInitial[$opt];
+
         $valueNew = $value;
 
         $driver = $this->drivers[$opt];
-        $driver->setValue($valueNew, $this->configCurrent);
+
+        $driver->setValue(
+            $valueNew,
+            //
+            $this->configSet,
+            $this->configInitial,
+        );
+
+        $this->configCurrent[$opt] = null
+            ?? $this->configSet[$opt]
+            ?? $this->configInitial[$opt];
 
         return $this;
     }
 
-    public function unsetOpt(string $opt)
+    public function unsetOpt(string $opt, ?bool $force = null, array $refs = [])
     {
+        $force = $force ?? false;
+
+        if ( (! $force) && $this->isLocked ) {
+            throw new RuntimeException(
+                [ "The entrypoint is locked at: {$this->isLocked[0]} ({$this->isLocked[1]})", $this->isLocked ]
+            );
+        }
+
+        $last =& $refs[0];
+        $last = null
+            ?? $this->configSet[$opt]
+            ?? $this->configInitial[$opt];
+
         $valueInitial = $this->configInitial[$opt];
 
         $driver = $this->drivers[$opt];
-        $driver->setValue($valueInitial, $this->configCurrent);
+
+        $driver->setValue(
+            $valueInitial,
+            //
+            $this->configSet,
+            $this->configInitial,
+        );
+
+        $this->configCurrent[$opt] = null
+            ?? $this->configSet[$opt]
+            ?? $this->configInitial[$opt];
 
         return $this;
     }
@@ -332,6 +611,7 @@ class EntrypointModule
     {
         if ( ! in_array($callable, $this->functionsOnShutdown, true) ) {
             $theType = Lib::type();
+
             $theType->callable($callable, null)->orThrow();
 
             $this->functionsOnShutdown[] = $callable;

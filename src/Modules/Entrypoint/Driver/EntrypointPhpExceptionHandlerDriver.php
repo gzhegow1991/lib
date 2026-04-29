@@ -19,7 +19,7 @@ class EntrypointPhpExceptionHandlerDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
@@ -30,10 +30,10 @@ class EntrypointPhpExceptionHandlerDriver extends AbstractEntrypointDriver
             $valueValid = $theType->callable($value, null)->orThrow();
         }
 
-        $configCurrent[EntrypointModule::OPT_PHP_EXCEPTION_HANDLER] = $valueValid;
+        $configSet[EntrypointModule::OPT_PHP_EXCEPTION_HANDLER] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         set_exception_handler($value);
     }
@@ -43,18 +43,22 @@ class EntrypointPhpExceptionHandlerDriver extends AbstractEntrypointDriver
     {
         $theDebugThrowabler = Lib::debugThrowabler();
 
-        $lines = $theDebugThrowabler->getLines(
-            $e,
-            0
-            //
-            | _DEBUG_THROWABLER_WITH_CODE
-            | _DEBUG_THROWABLER_WITH_INFO
-            | _DEBUG_THROWABLER_WITH_TRACE
-            //
-            | _DEBUG_THROWABLER_INFO_WITH_FILE
-            | _DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS
-            | _DEBUG_THROWABLER_INFO_WITHOUT_OBJECT_ID
-        );
+        try {
+            $lines = $theDebugThrowabler->getLines(
+                $e,
+                0
+                //
+                | _DEBUG_THROWABLER_WITH_CODE
+                | _DEBUG_THROWABLER_WITH_INFO
+                | _DEBUG_THROWABLER_WITH_TRACE
+                //
+                | _DEBUG_THROWABLER_INFO_WITH_FILE
+                | _DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS
+                | _DEBUG_THROWABLER_INFO_WITHOUT_OBJECT_ID
+            );
+        } catch (\Throwable $e) {
+            dd($e);
+        }
 
         echo "\n" . implode("\n", $lines) . "\n";
     }

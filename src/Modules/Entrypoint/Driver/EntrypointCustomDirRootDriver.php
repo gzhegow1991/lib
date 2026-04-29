@@ -11,16 +11,16 @@ class EntrypointCustomDirRootDriver extends AbstractEntrypointDriver
 {
     public function getInitial()
     {
-        return getcwd();
+        return null;
     }
 
     public function getRecommended()
     {
-        return null;
+        return getcwd();
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
@@ -31,10 +31,10 @@ class EntrypointCustomDirRootDriver extends AbstractEntrypointDriver
             $valueValid = $theType->dirpath_realpath($value)->orThrow();
         }
 
-        $configCurrent[EntrypointModule::OPT_CUSTOM_DIR_ROOT] = $valueValid;
+        $configSet[EntrypointModule::OPT_CUSTOM_DIR_ROOT] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         if ( null === $value ) {
             DebugModule::staticDirRoot(false);

@@ -20,16 +20,16 @@ class EntrypointCustomEnableThrowablesOnShutdownDriver extends AbstractEntrypoin
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
         $valueValid = $theType->bool($value)->orThrow();
 
-        $configCurrent[EntrypointModule::OPT_CUSTOM_ENABLE_THROWABLES_ON_SHUTDOWN] = $valueValid;
+        $configSet[EntrypointModule::OPT_CUSTOM_ENABLE_THROWABLES_ON_SHUTDOWN] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         $theEntrypoint = Lib::entrypoint();
 

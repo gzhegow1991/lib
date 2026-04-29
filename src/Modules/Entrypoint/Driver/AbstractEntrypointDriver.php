@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Entrypoint\Driver;
 
+
 abstract class AbstractEntrypointDriver implements EntrypointDriverInterface
 {
     /**
@@ -21,12 +22,12 @@ abstract class AbstractEntrypointDriver implements EntrypointDriverInterface
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         //
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         //
     }

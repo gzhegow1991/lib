@@ -19,17 +19,17 @@ class EntrypointPhpLogErrorsDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
         $valueValid = $theType->bool($value)->orThrow();
         $valueValid = (int) $valueValid;
 
-        $configCurrent[EntrypointModule::OPT_PHP_LOG_ERRORS] = $valueValid;
+        $configSet[EntrypointModule::OPT_PHP_LOG_ERRORS] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         ini_set('log_errors', $value);
     }

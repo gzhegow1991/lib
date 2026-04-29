@@ -22,11 +22,14 @@ php test.php
 // > настраиваем PHP
 // > некоторые CMS сами по себе применяют настройки глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
-($ent = \Gzhegow\Lib\Lib::entrypoint())
+\Gzhegow\Lib\Lib::entrypoint()
     ->setAllRecommended()
-    ->setOpt($ent::OPT_CUSTOM_DIR_ROOT, __DIR__ . '/..')
+    //
+    ->setCustomDirRoot(__DIR__ . '/..')
     //
     ->useAll()
+    //
+    ->lock()
 ;
 
 

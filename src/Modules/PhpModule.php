@@ -3476,7 +3476,7 @@ class PhpModule
             'message'       => (null
                 ?? (($cntMessageList > 1) ? "[ MULTIPLE ERRORS # {$cntMessageList} ]" : null)
                 ?? (([] !== $messageList) ? reset($messageList) : null)
-                ?? '[ NO MESSAGE ]'
+                ?? null
             ),
             'messageData'   => (([] !== $messageDataList) ? reset($messageDataList) : null),
             'messageObject' => (([] !== $messageObjectList) ? reset($messageObjectList) : null),
@@ -3493,6 +3493,15 @@ class PhpModule
 
         if ( $cntPreviousList === 1 ) {
             $previous = reset($previousList);
+        }
+
+        if ( null === $result['message'] ) {
+            if ( null !== $previous ) {
+                $result['message'] = '[ PREVIOUS ] ' . $previous->getMessage();
+
+            } else {
+                $result['message'] = '[ NO MESSAGE ]';
+            }
         }
 
         $result['previous'] = $previous;

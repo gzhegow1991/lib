@@ -23,17 +23,17 @@ class EntrypointPhpUmaskDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
         $bool = (($value >= 0) && ($value <= 0777));
         $theType->bool_true($bool)->orThrow();
 
-        $configCurrent[EntrypointModule::OPT_PHP_UMASK] = $value;
+        $configSet[EntrypointModule::OPT_PHP_UMASK] = $value;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         umask($value);
     }

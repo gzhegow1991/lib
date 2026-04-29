@@ -19,16 +19,16 @@ class EntrypointPhpMaxInputTimeDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
         $valueValid = $theType->int_non_negative_or_minus_one($value)->orThrow();
 
-        $configCurrent[EntrypointModule::OPT_PHP_MAX_INPUT_TIME] = $valueValid;
+        $configSet[EntrypointModule::OPT_PHP_MAX_INPUT_TIME] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         ini_set('max_input_time', $value);
     }

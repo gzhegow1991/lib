@@ -19,17 +19,17 @@ class EntrypointPhpErrorReportingDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
         $bool = (0 === ($value & ~(E_ALL | E_DEPRECATED | E_USER_DEPRECATED)));
         $theType->bool_true($bool)->orThrow();
 
-        $configCurrent[EntrypointModule::OPT_PHP_ERROR_REPORTING] = $value;
+        $configSet[EntrypointModule::OPT_PHP_ERROR_REPORTING] = $value;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         if ( null === $value ) return;
 

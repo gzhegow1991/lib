@@ -19,7 +19,7 @@ class EntrypointPhpUploadTmpDirDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
@@ -30,15 +30,18 @@ class EntrypointPhpUploadTmpDirDriver extends AbstractEntrypointDriver
             $valueValid = $theType->dirpath($value, true)->orThrow();
         }
 
-        $configCurrent[EntrypointModule::OPT_PHP_UPLOAD_TMP_DIR] = $valueValid;
+        $configSet[EntrypointModule::OPT_PHP_UPLOAD_TMP_DIR] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
-        if ( null !== $value ) {
+        if ( is_string($value) ) {
             $theFsFile = Lib::fsFile();
-
-            $theFsFile->mkdirp($value, 0775, true);
+            $theFsFile->call_safe(static function ($ctx, $dirname) {
+                if ( ! is_dir($dirname) ) {
+                    mkdir($dirname, 0775, true);
+                }
+            }, [ $dirname = $value ]);
         }
 
         ini_set('upload_tmp_dir', $value);

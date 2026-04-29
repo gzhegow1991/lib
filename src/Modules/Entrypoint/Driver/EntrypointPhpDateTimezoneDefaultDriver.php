@@ -27,16 +27,16 @@ class EntrypointPhpDateTimezoneDefaultDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
         $valueValid = $theType->timezone($value)->orThrow();
 
-        $configCurrent[EntrypointModule::OPT_PHP_DATE_TIMEZONE_DEFAULT] = $valueValid;
+        $configSet[EntrypointModule::OPT_PHP_DATE_TIMEZONE_DEFAULT] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         date_default_timezone_set($value->getName());
     }

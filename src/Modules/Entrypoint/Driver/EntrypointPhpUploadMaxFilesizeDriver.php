@@ -19,7 +19,7 @@ class EntrypointPhpUploadMaxFilesizeDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theFormat = Lib::format();
 
@@ -27,10 +27,10 @@ class EntrypointPhpUploadMaxFilesizeDriver extends AbstractEntrypointDriver
         $valueValid = $theFormat->bytes_decode([], $valueValid);
         $valueValid = $theFormat->bytes_encode([], $valueValid, 0, 1);
 
-        $configCurrent[EntrypointModule::OPT_PHP_UPLOAD_MAX_FILESIZE] = $valueValid;
+        $configSet[EntrypointModule::OPT_PHP_UPLOAD_MAX_FILESIZE] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         ini_set('upload_max_filesize', $value);
     }

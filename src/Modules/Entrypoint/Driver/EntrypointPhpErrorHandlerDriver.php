@@ -20,7 +20,7 @@ class EntrypointPhpErrorHandlerDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
@@ -31,10 +31,10 @@ class EntrypointPhpErrorHandlerDriver extends AbstractEntrypointDriver
             $valueValid = $theType->callable($value, null)->orThrow();
         }
 
-        $configCurrent[EntrypointModule::OPT_PHP_ERROR_HANDLER] = $valueValid;
+        $configSet[EntrypointModule::OPT_PHP_ERROR_HANDLER] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         set_error_handler([ $this, 'fnErrorHandler' ]);
     }

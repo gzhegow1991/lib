@@ -28,7 +28,7 @@ class EntrypointPhpSessionCookieParamsDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
@@ -47,10 +47,10 @@ class EntrypointPhpSessionCookieParamsDriver extends AbstractEntrypointDriver
         $valueValidKeys = array_keys($valueValidScheme);
         $valueValid = $theType->keys_exists($valueValidKeys, $valueValid)->orThrow();
 
-        $configCurrent[EntrypointModule::OPT_PHP_SESSION_COOKIE_PARAMS] = $valueValid;
+        $configSet[EntrypointModule::OPT_PHP_SESSION_COOKIE_PARAMS] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         $theHttpSession = Lib::httpSession();
 

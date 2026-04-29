@@ -19,7 +19,7 @@ class EntrypointPhpErrorLogDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
@@ -30,11 +30,20 @@ class EntrypointPhpErrorLogDriver extends AbstractEntrypointDriver
             $valueValid = $theType->filepath($value, true)->orThrow();
         }
 
-        $configCurrent[EntrypointModule::OPT_PHP_ERROR_LOG] = $valueValid;
+        $configSet[EntrypointModule::OPT_PHP_ERROR_LOG] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
+        if ( is_string($value) ) {
+            $theFsFile = Lib::fsFile();
+            $theFsFile->call_safe(static function ($ctx, $dirname) {
+                if ( ! is_dir($dirname) ) {
+                    mkdir($dirname, 0775, true);
+                }
+            }, [ $dirname = dirname($value) ]);
+        }
+
         ini_set('error_log', $value);
     }
 }

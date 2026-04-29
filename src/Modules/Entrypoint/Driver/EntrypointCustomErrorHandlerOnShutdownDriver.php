@@ -20,7 +20,7 @@ class EntrypointCustomErrorHandlerOnShutdownDriver extends AbstractEntrypointDri
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
@@ -31,10 +31,10 @@ class EntrypointCustomErrorHandlerOnShutdownDriver extends AbstractEntrypointDri
             $valueValid = $theType->callable($value, null)->orThrow();
         }
 
-        $configCurrent[EntrypointModule::OPT_CUSTOM_ERROR_HANDLER_ON_SHUTDOWN] = $valueValid;
+        $configSet[EntrypointModule::OPT_CUSTOM_ERROR_HANDLER_ON_SHUTDOWN] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         // > works with PhpErrorHandler driver
     }
@@ -53,9 +53,11 @@ class EntrypointCustomErrorHandlerOnShutdownDriver extends AbstractEntrypointDri
             return null;
         }
 
-        $isErrorHeadersAlreadySent = (false !== strpos($errstr, 'Cannot modify header information'));
+        $isErrorCannotModifyHeaderInformation = (false !== stripos($errstr, 'cannot modify header information'));
+        $isErrorHeadersHaveAlreadyBeenSent = (false !== stripos($errstr, 'headers have already been sent'));
         if ( ! (false
-            || $isErrorHeadersAlreadySent
+            || $isErrorCannotModifyHeaderInformation
+            || $isErrorHeadersHaveAlreadyBeenSent
         ) ) {
             return null;
         }

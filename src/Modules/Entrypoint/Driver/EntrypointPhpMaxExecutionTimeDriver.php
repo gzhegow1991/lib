@@ -19,16 +19,16 @@ class EntrypointPhpMaxExecutionTimeDriver extends AbstractEntrypointDriver
     }
 
 
-    public function setValue($value, array &$configCurrent) : void
+    public function setValue($value, array &$configSet, array $configInitial) : void
     {
         $theType = Lib::type();
 
         $valueValid = $theType->int_non_negative($value)->orThrow();
 
-        $configCurrent[EntrypointModule::OPT_PHP_MAX_EXECUTION_TIME] = $valueValid;
+        $configSet[EntrypointModule::OPT_PHP_MAX_EXECUTION_TIME] = $valueValid;
     }
 
-    public function useValue($value, array $configCurrent) : void
+    public function useValue($value, array $configCurrent, array $configInitial) : void
     {
         ini_set('max_execution_time', $value);
     }
