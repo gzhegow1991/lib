@@ -108,7 +108,7 @@ trait HasTraceOverrideTrait
         if ( null !== $trace ) {
             if ( null !== $dirRoot ) {
                 foreach ( $trace as $i => $frame ) {
-                    $file = $frame['file'] ?? '{{file}}';
+                    $file = (($frame['file'] ?? null) ?: '{{file}}');
 
                     $file = str_replace(
                         $dirRoot . DIRECTORY_SEPARATOR,
@@ -144,8 +144,8 @@ trait HasTraceOverrideTrait
                 foreach ( $trace as $frame ) {
                     $args = "";
 
-                    $file = $frame['file'] ?? '{{file}}';
-                    $line = $frame['line'] ?? -1;
+                    $file = (($frame['file'] ?? null) ?: '{{file}}');
+                    $line = (($frame['line'] ?? null) ?: -1);
 
                     if ( null !== $dirRoot ) {
                         $file = str_replace(

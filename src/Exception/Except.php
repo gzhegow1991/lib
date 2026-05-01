@@ -45,8 +45,8 @@ class Except implements
             $exTraceShift = array_shift($exTrace);
 
             $eArgsTrace = $exTrace;
-            $eArgsFile = $eArgsFile ?? $exTrace[0]['file'] ?? $exTraceShift['file'] ?? '{{file}}';
-            $eArgsLine = $eArgsLine ?? $exTrace[0]['line'] ?? $exTraceShift['line'] ?? -1;
+            $eArgsFile = (($eArgsFile ?? $exTrace[0]['file'] ?? $exTraceShift['file'] ?? null) ?: '{{file}}');
+            $eArgsLine = (($eArgsLine ?? $exTrace[0]['line'] ?? $exTraceShift['line'] ?? null) ?: -1);
         }
 
         $this->message = $eArgsMessage;

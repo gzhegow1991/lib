@@ -547,8 +547,8 @@ class DefaultThrowabler implements ThrowablerInterface
         );
 
         foreach ( $trace as $traceItem ) {
-            $phpFile = $traceItem['file'] ?? '{{file}}';
-            $phpLine = $traceItem['line'] ?? -1;
+            $phpFile = (($traceItem['file'] ?? null) ?: '{{file}}');
+            $phpLine = (($traceItem['line'] ?? null) ?: -1);
 
             $phpClass = $traceItem['class'] ?? '';
             $phpType = $traceItem['type'] ?? '';

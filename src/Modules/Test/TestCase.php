@@ -383,8 +383,8 @@ class TestCase
         || ($this->hasTrace($trace))
         || ($trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 
-        $traceFile = $trace[0]['file'] ?? '{{file}}';
-        $traceLine = $trace[0]['line'] ?? -1;
+        $traceFile = (($trace[0]['file'] ?? null) ?: '{{file}}');
+        $traceLine = (($trace[0]['line'] ?? null) ?: -1);
 
         $memoryBytesBefore = memory_get_usage();
         $secondsBefore = microtime(true);

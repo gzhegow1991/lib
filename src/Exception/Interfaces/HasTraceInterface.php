@@ -7,7 +7,6 @@ interface HasTraceInterface
 {
     public function getFile() : string;
 
-
     public function getLine() : int;
 
 

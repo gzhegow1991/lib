@@ -201,8 +201,8 @@ class DebugModule
             );
         }
 
-        $file = $value['file'] ?? $value[0] ?? '{{file}}';
-        $line = $value['line'] ?? $value[1] ?? -1;
+        $file = (($value['file'] ?? $value[0] ?? null) ?: '{{file}}');
+        $line = (($value['line'] ?? $value[1] ?? null) ?: -1);
 
         if ( '{{file}}' !== $file ) {
             $fileRealpath = realpath($file);

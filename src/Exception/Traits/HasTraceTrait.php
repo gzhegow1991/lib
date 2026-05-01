@@ -24,14 +24,14 @@ trait HasTraceTrait
 
     public function getFile() : string
     {
-        $file = $this->file ?? '{{file}}';
+        $file = $this->file ?: '{{file}}';
 
         return $file;
     }
 
     public function getLine() : int
     {
-        $line = $this->line ?? -1;
+        $line = $this->line ?: -1;
 
         return $line;
     }
@@ -58,8 +58,8 @@ trait HasTraceTrait
             foreach ( $trace as $frame ) {
                 $args = "";
 
-                $file = $frame['file'] ?? '{{file}}';
-                $line = $frame['line'] ?? -1;
+                $file = (($frame['file'] ?? null) ?: '{{file}}');
+                $line = (($frame['line'] ?? null) ?: -1);
 
                 if ( isset($frame['args']) ) {
                     $args = [];

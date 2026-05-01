@@ -39,8 +39,8 @@ class AggregateExcept implements
             $exTraceShift = array_shift($exTrace);
 
             $eTrace = $exTrace;
-            $eFile = $exTrace[0]['file'] ?? $exTraceShift['file'] ?? '{{file}}';
-            $eLine = $exTrace[0]['line'] ?? $exTraceShift['line'] ?? -1;
+            $eFile = (($exTrace[0]['file'] ?? $exTraceShift['file'] ?? null) ?: '{{file}}');
+            $eLine = (($exTrace[0]['line'] ?? $exTraceShift['line'] ?? null) ?: -1);
         }
 
         $throwablesCnt = count($throwables);

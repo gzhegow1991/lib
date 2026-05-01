@@ -262,8 +262,8 @@ class Ret
 
         if ( null !== $eFileLine ) {
             $eFileLine = [
-                'file' => $eFileLine['file'] ?? $eFileLine[0] ?? '{{file}}',
-                'line' => $eFileLine['line'] ?? $eFileLine[1] ?? -1,
+                'file' => (($eFileLine['file'] ?? $eFileLine[0] ?? null) ?: '{{file}}'),
+                'line' => (($eFileLine['line'] ?? $eFileLine[1] ?? null) ?: -1),
             ];
         }
 

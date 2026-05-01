@@ -587,8 +587,8 @@ class Lib
 
         $eTrace = array_slice($refTrace, $traceShift);
 
-        $eFile = $eTrace[0]['file'] ?? $eTrace[0][0] ?? '{{file}}';
-        $eLine = $eTrace[0]['line'] ?? $eTrace[0][1] ?? -1;
+        $eFile = (($eTrace[0]['file'] ?? $eTrace[0][0] ?? null) ?: '{{file}}');
+        $eLine = (($eTrace[0]['line'] ?? $eTrace[0][1] ?? null) ?: -1);
 
         if ( $withKeys ) {
             $eFileLine = [
@@ -657,8 +657,8 @@ class Lib
 
         $eTrace = array_slice($refTrace, $traceShift);
 
-        $eFile = $eTrace[0]['file'] ?? $eTrace[0][0] ?? '{{file}}';
-        $eLine = $eTrace[0]['line'] ?? $eTrace[0][1] ?? -1;
+        $eFile = (($eTrace[0]['file'] ?? $eTrace[0][0] ?? null) ?: '{{file}}');
+        $eLine = (($eTrace[0]['line'] ?? $eTrace[0][1] ?? null) ?: -1);
 
         if ( $withKeys ) {
             $eFileLine = [
