@@ -1235,27 +1235,72 @@ trait TTrait
 	/**
 	 * @return Ret<mixed>|mixed
 	 */
-	public function key_exists($fb, $key, array $array)
+	public function key_exists($fb, array $array, $key)
 	{
-		return Lib::arr()->type_key_exists($fb, $key, $array);
+		return Lib::arr()->type_key_exists($fb, $array, $key);
+	}
+
+
+	/**
+	 * @return Ret<mixed>|mixed
+	 */
+	public function value_in_array($fb, array $array, $key, ?bool $strict = null)
+	{
+		return Lib::arr()->type_value_in_array($fb, $array, $key, $strict);
+	}
+
+
+	/**
+	 * @return Ret<int|string>|int|string
+	 */
+	public function value_in_array_key($fb, array $array, $key, ?bool $strict = null)
+	{
+		return Lib::arr()->type_value_in_array_key($fb, $array, $key, $strict);
+	}
+
+
+	/**
+	 * @return Ret<int>|int
+	 */
+	public function value_in_array_pos($fb, array $array, $key, ?bool $strict = null)
+	{
+		return Lib::arr()->type_value_in_array_pos($fb, $array, $key, $strict);
 	}
 
 
 	/**
 	 * @return Ret<array>|array
 	 */
-	public function keys_exists($fb, $keys, array $array)
+	public function keys_exists($fb, array $array, $keys)
 	{
-		return Lib::arr()->type_keys_exists($fb, $keys, $array);
+		return Lib::arr()->type_keys_exists($fb, $array, $keys);
 	}
 
 
 	/**
 	 * @return Ret<array>|array
 	 */
-	public function keys_not_exists($fb, $keys, array $array)
+	public function keys_not_exists($fb, array $array, $keys)
 	{
-		return Lib::arr()->type_keys_not_exists($fb, $keys, $array);
+		return Lib::arr()->type_keys_not_exists($fb, $array, $keys);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function values_in_array($fb, array $array, $keys, ?bool $strict = null)
+	{
+		return Lib::arr()->type_values_in_array($fb, $array, $keys, $strict);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function values_not_in_array($fb, array $array, $keys, ?bool $strict = null)
+	{
+		return Lib::arr()->type_values_not_in_array($fb, $array, $keys, $strict);
 	}
 
 
@@ -1325,9 +1370,9 @@ trait TTrait
 	/**
 	 * @return Ret<array>|array
 	 */
-	public function matrix_strict($fb, $value)
+	public function matrix_sorted($fb, $value)
 	{
-		return Lib::arr()->type_matrix_strict($fb, $value);
+		return Lib::arr()->type_matrix_sorted($fb, $value);
 	}
 
 

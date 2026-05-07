@@ -82,7 +82,7 @@ class ArrModule
 
         return Ret::throw(
             $fb,
-            [ 'The `key` should be int or string', $key ],
+            [ 'The `key` should be valid array key', $key ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -91,18 +91,14 @@ class ArrModule
     /**
      * @return Ret<mixed>|mixed
      */
-    public function type_key_exists($fb, $key, array $array)
+    public function type_key_exists($fb, array $array, $key)
     {
         if ( isset($array[$key]) ) {
             return Ret::ok($fb, $array[$key]);
         }
 
-        $ret = $this->type_key(null, $key);
-
-        if ( $ret->isOk([ &$keyValid ]) ) {
-            if ( array_key_exists($keyValid, $array) ) {
-                return Ret::ok($fb, $array[$key]);
-            }
+        if ( array_key_exists($key, $array) ) {
+            return Ret::ok($fb, $array[$key]);
         }
 
         return Ret::throw(
@@ -114,14 +110,77 @@ class ArrModule
 
 
     /**
-     * @return Ret<array>|array
+     * @return Ret<mixed>|mixed
      */
-    public function type_keys_exists($fb, $keys, array $array)
+    public function type_value_in_array($fb, array $array, $value, ?bool $strict = null)
     {
-        if ( ! is_array($keys) ) {
+        if ( ! in_array($value, $array, $strict) ) {
             return Ret::throw(
                 $fb,
-                [ 'The `keys` should be array', $keys ],
+                [ 'The `value` should exists in `array`', $value, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $value);
+    }
+
+    /**
+     * @return Ret<int|string>|int|string
+     */
+    public function type_value_in_array_key($fb, array $array, $value, ?bool $strict = null)
+    {
+        $key = array_search($value, $array, $strict);
+
+        if ( false === $key ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should exists in `array`', $value, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $key);
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_value_in_array_pos($fb, array $array, $value, ?bool $strict = null)
+    {
+        $copy = array_values($array);
+
+        $pos = array_search($value, $copy, $strict);
+
+        if ( false === $pos ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should exists in `array`', $value, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $pos);
+    }
+
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_keys_exists($fb, array $array, $keys)
+    {
+        $keys = (array) $keys;
+
+        if ( [] === $keys ) {
+            throw new LogicException(
+                [ 'The `keys` should be array, non-empty', $keys ],
+            );
+        }
+
+        if ( [] === $array ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `keys` should exists in `array`', $keys, $array ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -131,12 +190,8 @@ class ArrModule
                 continue;
             }
 
-            $ret = $this->type_key(null, $key);
-
-            if ( $ret->isOk([ &$keyValid ]) ) {
-                if ( array_key_exists($keyValid, $array) ) {
-                    continue;
-                }
+            if ( array_key_exists($key, $array) ) {
+                continue;
             }
 
             return Ret::throw(
@@ -152,13 +207,17 @@ class ArrModule
     /**
      * @return Ret<array>|array
      */
-    public function type_keys_not_exists($fb, $keys, array $array)
+    public function type_keys_not_exists($fb, array $array, $keys)
     {
-        if ( ! is_array($keys) ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `keys` should be array', $keys ],
-                [ __FILE__, __LINE__ ]
+        if ( [] === $array ) {
+            return Ret::ok($fb, $array);
+        }
+
+        $keys = (array) $keys;
+
+        if ( [] === $keys ) {
+            throw new LogicException(
+                [ 'The `keys` should be array, non-empty', $keys ],
             );
         }
 
@@ -171,16 +230,79 @@ class ArrModule
                 );
             }
 
-            $ret = $this->type_key(null, $key);
+            if ( array_key_exists($key, $array) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `keys` should not exists in `array`', $key, $keys, $array ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
 
-            if ( $ret->isOk([ &$keyValid ]) ) {
-                if ( array_key_exists($keyValid, $array) ) {
-                    return Ret::throw(
-                        $fb,
-                        [ 'The `keys` should not exists in `array`', $key, $keys, $array ],
-                        [ __FILE__, __LINE__ ]
-                    );
-                }
+        return Ret::ok($fb, $array);
+    }
+
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_values_in_array($fb, array $array, $values, ?bool $strict = null)
+    {
+        $values = (array) $values;
+
+        if ( [] === $values ) {
+            throw new LogicException(
+                [ 'The `values` should be array, non-empty', $values ],
+            );
+        }
+
+        if ( [] === $array ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `values` should exists in `array`', $values, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        foreach ( $values as $value ) {
+            if ( in_array($value, $values, $strict) ) {
+                continue;
+            }
+
+            return Ret::throw(
+                $fb,
+                [ 'The `values` should exists in `array`', $value, $values, $array, $strict ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $array);
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_values_not_in_array($fb, array $array, $values, ?bool $strict = null)
+    {
+        if ( [] === $array ) {
+            return Ret::ok($fb, $array);
+        }
+
+        $values = (array) $values;
+
+        if ( [] === $values ) {
+            throw new LogicException(
+                [ 'The `values` should be array, non-empty', $values ],
+            );
+        }
+
+        foreach ( $values as $value ) {
+            if ( in_array($value, $values, $strict) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `values` should not exists in `array`', $value, $values, $array, $strict ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
         }
 
@@ -196,10 +318,8 @@ class ArrModule
         $plainMaxDepth = $plainMaxDepth ?? 1;
 
         if ( $plainMaxDepth < 1 ) {
-            return Ret::throw(
-                $fb,
+            throw new LogicException(
                 [ 'The `maxDepth` should be greater than 1', $plainMaxDepth ],
-                [ __FILE__, __LINE__ ]
             );
         }
 
@@ -267,6 +387,14 @@ class ArrModule
     {
         $hasMaxDepth = (null !== $plainMaxDepth);
 
+        if ( $hasMaxDepth ) {
+            if ( $plainMaxDepth < 1 ) {
+                throw new LogicException(
+                    [ 'The `maxDepth` should be greater than 1', $plainMaxDepth ],
+                );
+            }
+        }
+
         if ( ! is_array($value) ) {
             return Ret::throw(
                 $fb,
@@ -280,14 +408,6 @@ class ArrModule
         }
 
         if ( $hasMaxDepth ) {
-            if ( $plainMaxDepth < 1 ) {
-                return Ret::throw(
-                    $fb,
-                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-
             if ( 1 === $plainMaxDepth ) {
                 foreach ( $value as $key => $v ) {
                     if ( is_string($key) ) {
@@ -763,6 +883,8 @@ class ArrModule
 
 
     /**
+     * > проверить, является ли значение таблицей - массивом массивов
+     *
      * @return Ret<array>|array
      */
     public function type_table($fb, $value)
@@ -788,7 +910,10 @@ class ArrModule
         return Ret::ok(null, $value);
     }
 
+
     /**
+     * > проверить, является ли значение матрицей - массивом второго уровня, все ключи которого цифровые
+     *
      * @return Ret<array>|array
      */
     public function type_matrix($fb, $value)
@@ -819,7 +944,7 @@ class ArrModule
     /**
      * @return Ret<array>|array
      */
-    public function type_matrix_strict($fb, $value)
+    public function type_matrix_sorted($fb, $value)
     {
         if ( ! is_array($value) ) {
             return Ret::throw(
@@ -1174,266 +1299,6 @@ class ArrModule
     }
 
 
-    public function has_key($array, $key, array $refs = []) : bool
-    {
-        $theType = Lib::type();
-
-        $withValue = array_key_exists(0, $refs);
-        if ( $withValue ) {
-            $refValue =& $refs[0];
-        }
-        $refValue = null;
-
-        if ( ! is_array($array) ) {
-            return false;
-        }
-
-        if ( [] === $array ) {
-            return false;
-        }
-
-        $ret = $theType->string($key);
-
-        if ( ! $ret->isOk([ &$keyString ]) ) {
-            return false;
-        }
-
-        if ( ! array_key_exists($keyString, $array) ) {
-            return false;
-        }
-
-        $refValue = $array[$keyString];
-
-        return true;
-    }
-
-    /**
-     * @throws \RuntimeException
-     */
-    public function get_key(array $array, $key, array $fallback = [])
-    {
-        $status = $this->has_key($array, $key, [ &$value ]);
-
-        if ( ! $status ) {
-            if ( $fallback ) {
-                [ $fallback ] = $fallback;
-
-                return $fallback;
-            }
-
-            throw new RuntimeException(
-                [ 'Missing key in array', $key ]
-            );
-        }
-
-        return $value;
-    }
-
-
-    /**
-     * @return int|string|null
-     */
-    public function key_first(array $array)
-    {
-        if ( PHP_VERSION_ID >= 70300 ) {
-            return array_key_first($array);
-
-        } else {
-            reset($array);
-
-            return key($array);
-        }
-    }
-
-    /**
-     * @throws \RuntimeException
-     */
-    public function first(array $array, array $fallback = [])
-    {
-        if ( [] === $array ) {
-            if ( $fallback ) {
-                [ $fallback ] = $fallback;
-
-                return $fallback;
-            }
-
-            throw new RuntimeException(
-                'Missing first element in array'
-            );
-        }
-
-        if ( PHP_VERSION_ID >= 70300 ) {
-            return $array[array_key_first($array)];
-        }
-
-        $first = reset($array);
-
-        return $first;
-    }
-
-
-    /**
-     * @return int|string|null
-     */
-    public function key_last(array $array)
-    {
-        if ( PHP_VERSION_ID >= 70300 ) {
-            return array_key_last($array);
-
-        } else {
-            end($array);
-
-            return key($array);
-        }
-    }
-
-    /**
-     * @throws \RuntimeException
-     */
-    public function last(array $array, array $fallback = [])
-    {
-        if ( [] === $array ) {
-            if ( $fallback ) {
-                [ $fallback ] = $fallback;
-
-                return $fallback;
-            }
-
-            throw new RuntimeException(
-                'Missing first element in array'
-            );
-        }
-
-        if ( PHP_VERSION_ID >= 70300 ) {
-            return $array[array_key_last($array)];
-        }
-
-        $last = end($array);
-
-        return $last;
-    }
-
-
-    public function key_push(array $src) : int
-    {
-        $arr = array_fill_keys(
-            array_keys($src),
-            true
-        );
-
-        $arr[] = true;
-
-        if ( PHP_VERSION_ID >= 70300 ) {
-            $lastKey = array_key_last($arr);
-
-        } else {
-            end($src);
-
-            $lastKey = key($arr);
-        }
-
-        return $lastKey;
-    }
-
-
-    public function has_pos(
-        $array, $pos,
-        array $refs = []
-    ) : bool
-    {
-        $withValue = array_key_exists(0, $refs);
-        if ( $withValue ) {
-            $refValue =& $refs[0];
-        }
-        $refValue = null;
-
-        $withKey = array_key_exists(1, $refs);
-        if ( $withKey ) {
-            $refKey =& $refs[1];
-        }
-        $refKey = null;
-
-        if ( ! is_array($array) ) {
-            return false;
-        }
-
-        if ( ! is_int($pos) ) {
-            return false;
-        }
-
-        $isNegativePos = ($pos < 0);
-
-        $copyArray = $array;
-
-        if ( $isNegativePos ) {
-            end($copyArray);
-
-            $abs = abs($pos) - 1;
-
-        } else {
-            reset($copyArray);
-
-            $abs = abs($pos);
-        }
-
-        while ( null !== ($k = key($copyArray)) ) {
-            if ( 0 === $abs ) {
-                $refValue = $array[$k];
-                $refKey = $k;
-
-                unset($refValue);
-                unset($refKey);
-
-                return true;
-            }
-
-            $isNegativePos
-                ? prev($copyArray)
-                : next($copyArray);
-
-            $abs--;
-        }
-
-        return false;
-    }
-
-    /**
-     * @return int|string|null
-     */
-    public function key_pos(array $array, int $pos)
-    {
-        $status = $this->has_pos($array, $pos, [ 1 => &$key ]);
-
-        if ( $status ) {
-            return $key;
-        }
-
-        return null;
-    }
-
-    /**
-     * @throws \RuntimeException
-     */
-    public function get_pos(array $array, int $pos, array $fallback = [])
-    {
-        $status = $this->has_pos($array, $pos, [ &$value, &$key ]);
-
-        if ( ! $status ) {
-            if ( $fallback ) {
-                [ $fallback ] = $fallback;
-
-                return $fallback;
-            }
-
-            throw new RuntimeException(
-                'Missing pos in array: ' . $pos
-            );
-        }
-
-        return $value;
-    }
-
-
     /**
      * @return string[]
      */
@@ -1534,25 +1399,259 @@ class ArrModule
     }
 
 
-    public function arrdepth(array $array) : int
+    public function has_key($array, $key, array $refs = []) : bool
     {
-        $depth = 0;
+        $withValue = array_key_exists(0, $refs);
+        if ( $withValue ) {
+            $refValue =& $refs[0];
+        }
+        $refValue = null;
 
-        $queue = [ [ $array, 1 ] ];
-
-        while ( [] !== $queue ) {
-            [ $child, $level ] = array_pop($queue);
-
-            $depth = max($depth, $level);
-
-            foreach ( $child as $v ) {
-                if ( is_array($v) ) {
-                    $queue[] = [ $v, $level + 1 ];
-                }
-            }
+        if ( ! is_array($array) ) {
+            return false;
         }
 
-        return $depth;
+        if ( [] === $array ) {
+            return false;
+        }
+
+        try {
+            $keyString = (string) $key;
+        }
+        catch ( \Throwable $e ) {
+            return false;
+        }
+
+        if ( ! array_key_exists($keyString, $array) ) {
+            return false;
+        }
+
+        $refValue = $array[$keyString];
+
+        return true;
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    public function get_key(array $array, $key, array $fallback = [])
+    {
+        $status = $this->has_key($array, $key, [ &$value ]);
+
+        if ( ! $status ) {
+            if ( $fallback ) {
+                [ $fallback ] = $fallback;
+
+                return $fallback;
+            }
+
+            throw new RuntimeException(
+                [ 'Missing key in array', $key ]
+            );
+        }
+
+        return $value;
+    }
+
+
+    /**
+     * @return int|string|null
+     */
+    public function key_first(array $array)
+    {
+        if ( PHP_VERSION_ID >= 70300 ) {
+            return array_key_first($array);
+        }
+
+        reset($array);
+
+        return key($array);
+    }
+
+    /**
+     * @return int|string|null
+     */
+    public function key_last(array $array)
+    {
+        if ( PHP_VERSION_ID >= 70300 ) {
+            return array_key_last($array);
+        }
+
+        end($array);
+
+        return key($array);
+    }
+
+    public function key_next(array $src) : int
+    {
+        $copy = array_fill_keys(
+            array_keys($src),
+            true
+        );
+
+        $copy[] = true;
+
+        if ( PHP_VERSION_ID >= 70300 ) {
+            $lastKey = array_key_last($copy);
+
+        } else {
+            end($src);
+
+            $lastKey = key($copy);
+        }
+
+        return $lastKey;
+    }
+
+
+    /**
+     * @throws \RuntimeException
+     */
+    public function first(array $array, array $fallback = [])
+    {
+        if ( [] === $array ) {
+            if ( $fallback ) {
+                [ $fallback ] = $fallback;
+
+                return $fallback;
+            }
+
+            throw new RuntimeException(
+                [ 'Missing `fallback[0]` array element', $fallback ]
+            );
+        }
+
+        if ( PHP_VERSION_ID >= 70300 ) {
+            return $array[array_key_first($array)];
+        }
+
+        $first = reset($array);
+
+        return $first;
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    public function last(array $array, array $fallback = [])
+    {
+        if ( [] === $array ) {
+            if ( $fallback ) {
+                [ $fallback ] = $fallback;
+
+                return $fallback;
+            }
+
+            throw new RuntimeException(
+                [ 'Missing `fallback[0]` array element', $fallback ]
+            );
+        }
+
+        if ( PHP_VERSION_ID >= 70300 ) {
+            return $array[array_key_last($array)];
+        }
+
+        $last = end($array);
+
+        return $last;
+    }
+
+
+    public function has_pos(
+        $array, $pos,
+        array $refs = []
+    ) : bool
+    {
+        $withValue = array_key_exists(0, $refs);
+        if ( $withValue ) {
+            $refValue =& $refs[0];
+        }
+        $refValue = null;
+
+        $withKey = array_key_exists(1, $refs);
+        if ( $withKey ) {
+            $refKey =& $refs[1];
+        }
+        $refKey = null;
+
+        if ( ! is_array($array) ) {
+            return false;
+        }
+
+        if ( ! is_int($pos) ) {
+            return false;
+        }
+
+        $isNegativePos = ($pos < 0);
+
+        $copyArray = $array;
+
+        if ( $isNegativePos ) {
+            end($copyArray);
+
+            $abs = abs($pos) - 1;
+
+        } else {
+            reset($copyArray);
+
+            $abs = abs($pos);
+        }
+
+        while ( null !== ($k = key($copyArray)) ) {
+            if ( 0 === $abs ) {
+                $refValue = $array[$k];
+                $refKey = $k;
+
+                unset($refValue);
+                unset($refKey);
+
+                return true;
+            }
+
+            $isNegativePos
+                ? prev($copyArray)
+                : next($copyArray);
+
+            $abs--;
+        }
+
+        return false;
+    }
+
+    /**
+     * @return int|string|null
+     */
+    public function key_pos(array $array, int $pos)
+    {
+        $status = $this->has_pos($array, $pos, [ 1 => &$key ]);
+
+        if ( $status ) {
+            return $key;
+        }
+
+        return null;
+    }
+
+    /**
+     * @throws \RuntimeException
+     */
+    public function get_pos(array $array, int $pos, array $fallback = [])
+    {
+        $status = $this->has_pos($array, $pos, [ &$value, &$key ]);
+
+        if ( ! $status ) {
+            if ( $fallback ) {
+                [ $fallback ] = $fallback;
+
+                return $fallback;
+            }
+
+            throw new RuntimeException(
+                'Missing pos in array: ' . $pos
+            );
+        }
+
+        return $value;
     }
 
 
@@ -1862,6 +1961,73 @@ class ArrModule
     }
 
 
+    public function is_array_depth($array, int $maxdepth) : bool
+    {
+        if ( ! is_array($array) ) {
+            return false;
+        }
+
+        if ( $maxdepth <= 0 ) {
+            throw new LogicException(
+                [ 'The `maxdepth` should be greater than 1', $maxdepth ]
+            );
+        }
+
+        if ( $maxdepth === 1 ) {
+            return true;
+        }
+
+        $depth = 0;
+
+        $queue = [
+            [ $array, 1 ],
+        ];
+
+        while ( [] !== $queue ) {
+            [ $child, $level ] = array_pop($queue);
+
+            $depth = max($depth, $level);
+
+            foreach ( $child as $v ) {
+                if ( is_array($v) ) {
+                    $levelNew = $level + 1;
+
+                    if ( $levelNew === $maxdepth ) {
+                        return true;
+                    }
+
+                    $queue[] = [ $v, $levelNew ];
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function array_depth(array $array) : int
+    {
+        $depth = 0;
+
+        $queue = [
+            [ $array, 1 ],
+        ];
+
+        while ( [] !== $queue ) {
+            [ $child, $level ] = array_pop($queue);
+
+            $depth = max($depth, $level);
+
+            foreach ( $child as $v ) {
+                if ( is_array($v) ) {
+                    $queue[] = [ $v, $level + 1 ];
+                }
+            }
+        }
+
+        return $depth;
+    }
+
+
     /**
      * > создать массив из ключей и заполнить значениями, если значение не передать заполнит цифрами по порядку
      */
@@ -1871,9 +2037,13 @@ class ArrModule
             return [];
         }
 
-        $hasNew = ([] !== $new);
+        if ( [] !== $new ) {
+            if ( ! array_key_exists(0, $new) ) {
+                throw new LogicException(
+                    [ 'Missing `new[0]` array key', $new ]
+                );
+            }
 
-        if ( $hasNew ) {
             $result = array_fill_keys($keys, $new[0]);
 
         } else {
@@ -1892,59 +2062,171 @@ class ArrModule
     /**
      * > выбросить/заменить указанные ключи
      */
-    public function drop_keys(array $src, $keys, array $new = []) : array
+    public function drop_keys(array $src, $keys, array $replace = []) : array
     {
+        if ( [] === $src ) {
+            return $src;
+        }
+
         $keys = (array) $keys;
 
         if ( [] === $keys ) {
             return $src;
         }
 
-        $hasNew = ([] !== $new);
+        $hasReplace = ([] !== $replace);
+
+        $copy = $src;
 
         foreach ( (array) $keys as $key ) {
             if ( ! array_key_exists($key, $src) ) {
                 continue;
             }
 
-            if ( $hasNew ) {
-                $src[$key] = $new[0];
+            if ( $hasReplace ) {
+                $copy[$key] = $replace[0];
 
             } else {
-                unset($src[$key]);
+                unset($copy[$key]);
             }
         }
 
-        return $src;
+        return $copy;
     }
+
+    /**
+     * > выбросить значения по фильтру, по сути array_filter(!function)
+     *
+     * @param callable|null $fn
+     */
+    public function drop(array $src, $fn = null, array $replace = [], ?int $flags = null) : array
+    {
+        if ( null === $fn ) {
+            return $src;
+        }
+
+        if ( [] === $src ) {
+            return $src;
+        }
+
+        $mode = null
+            ?? $flags
+            ?? static::staticFnMode()
+            ?? _ARR_FN_USE_VALUE;
+
+        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
+        $isUseKey = ($mode & _ARR_FN_USE_KEY);
+        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
+        $hasReplace = array_key_exists(0, $replace);
+
+        $copy = $src;
+
+        foreach ( $copy as $key => $val ) {
+            $args = [];
+            if ( $isUseValue ) $args[] = $val;
+            if ( $isUseKey ) $args[] = $key;
+            if ( $isUseSrc ) $args[] = $copy;
+
+            if ( call_user_func_array($fn, $args) ) {
+                if ( $hasReplace ) {
+                    $copy[$key] = $replace[0];
+
+                } else {
+                    unset($copy[$key]);
+                }
+            }
+        }
+
+        return $copy;
+    }
+
 
     /**
      * > оставить в массиве указанные ключи, остальные заменить
      */
-    public function keep_keys(array $src, $keys, array $new = []) : array
+    public function keep_keys(array $src, $keys, array $replace = []) : array
     {
+        if ( [] === $src ) {
+            return $src;
+        }
+
         $keys = (array) $keys;
 
         if ( [] === $keys ) {
             return [];
         }
 
-        $hasNew = ([] !== $new);
+        $hasReplace = array_key_exists(0, $replace);
 
-        $keysToKeep = array_flip($keys);
+        $copy = $src;
 
-        foreach ( $src as $key => $val ) {
+        $keysToKeep = array_fill_keys(
+            array_flip($keys),
+            true
+        );
+
+        foreach ( $copy as $key => $val ) {
             if ( ! isset($keysToKeep[$key]) ) {
-                if ( $hasNew ) {
-                    $src[$key] = $new[0];
+                if ( $hasReplace ) {
+                    $copy[$key] = $replace[0];
 
                 } else {
-                    unset($src[$key]);
+                    unset($copy[$key]);
                 }
             }
         }
 
-        return $src;
+        return $copy;
+    }
+
+    /**
+     * > оставить в массиве значения, что прошли фильтр, остальные выбросить. По сути array_filter()
+     *
+     * @param callable|null $fn
+     */
+    public function keep(array $src, $fn = null, array $replace = [], ?int $flags = null) : array
+    {
+        if ( null === $fn ) {
+            return [];
+        }
+
+        if ( [] === $src ) {
+            return [];
+        }
+
+        $mode = null
+            ?? $flags
+            ?? static::staticFnMode()
+            ?? _ARR_FN_USE_VALUE;
+
+        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
+        $isUseKey = ($mode & _ARR_FN_USE_KEY);
+        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
+        $hasReplace = array_key_exists(0, $replace);
+
+        $copy = $src;
+
+        foreach ( $copy as $key => $val ) {
+            $args = [];
+            if ( $isUseValue ) $args[] = $val;
+            if ( $isUseKey ) $args[] = $key;
+            if ( $isUseSrc ) $args[] = $copy;
+
+            if ( call_user_func_array($fn, $args) ) {
+                continue;
+            }
+
+            if ( $hasReplace ) {
+                $copy[$key] = $replace[0];
+
+            } else {
+                unset($copy[$key]);
+            }
+        }
+
+        return $copy;
     }
 
 
@@ -1960,27 +2242,7 @@ class ArrModule
         }
 
         if ( [] === $src ) {
-            return [];
-        }
-
-        $filtered = $this->keep($src, $fn, $flags);
-
-        return $filtered;
-    }
-
-    /**
-     * > выполнить array_map с учетом _array_fn_mode()
-     *
-     * @param callable|null $fn
-     */
-    public function tap(array $src, $fn = null, ?int $flags = null) : void
-    {
-        if ( null === $fn ) {
-            return;
-        }
-
-        if ( [] === $src ) {
-            return;
+            return $src;
         }
 
         $mode = null
@@ -1992,14 +2254,22 @@ class ArrModule
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
         $isUseSrc = ($mode & _ARR_FN_USE_SRC);
 
-        foreach ( $src as $key => $val ) {
+        $copy = $src;
+
+        foreach ( $copy as $key => $val ) {
             $args = [];
             if ( $isUseValue ) $args[] = $val;
             if ( $isUseKey ) $args[] = $key;
-            if ( $isUseSrc ) $args[] = $src;
+            if ( $isUseSrc ) $args[] = $copy;
 
-            call_user_func_array($fn, $args);
+            if ( call_user_func_array($fn, $args) ) {
+                continue;
+            }
+
+            unset($copy[$key]);
         }
+
+        return $copy;
     }
 
     /**
@@ -2014,7 +2284,7 @@ class ArrModule
         }
 
         if ( [] === $src ) {
-            return [];
+            return $src;
         }
 
         $mode = null
@@ -2026,16 +2296,56 @@ class ArrModule
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
         $isUseSrc = ($mode & _ARR_FN_USE_SRC);
 
-        foreach ( $src as $key => $val ) {
+        $copy = $src;
+
+        foreach ( $copy as $key => $val ) {
             $args = [];
             if ( $isUseValue ) $args[] = $val;
             if ( $isUseKey ) $args[] = $key;
             if ( $isUseSrc ) $args[] = $src;
 
-            $src[$key] = call_user_func_array($fn, $args);
+            $copy[$key] = call_user_func_array($fn, $args);
         }
 
-        return $src;
+        return $copy;
+    }
+
+    /**
+     * > выполнить обход/map, не изменяя значения в массиве, с учетом _array_fn_mode()
+     *
+     * @param callable|null $fn
+     */
+    public function tap(array $src, $fn = null, ?int $flags = null)
+    {
+        if ( null === $fn ) {
+            return $src;
+        }
+
+        if ( [] === $src ) {
+            return $src;
+        }
+
+        $mode = null
+            ?? $flags
+            ?? static::staticFnMode()
+            ?? _ARR_FN_USE_VALUE;
+
+        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
+        $isUseKey = ($mode & _ARR_FN_USE_KEY);
+        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
+
+        $copy = $src;
+
+        foreach ( $copy as $key => $val ) {
+            $args = [];
+            if ( $isUseValue ) $args[] = $val;
+            if ( $isUseKey ) $args[] = $key;
+            if ( $isUseSrc ) $args[] = $copy;
+
+            call_user_func_array($fn, $args);
+        }
+
+        return $copy;
     }
 
     /**
@@ -2068,180 +2378,20 @@ class ArrModule
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
         $isUseSrc = ($mode & _ARR_FN_USE_SRC);
 
+        $copy = $src;
+
         $current = $initial;
-        foreach ( $src as $key => $val ) {
+        foreach ( $copy as $key => $val ) {
             $args = [];
             $args[] = $current;
             if ( $isUseValue ) $args[] = $val;
             if ( $isUseKey ) $args[] = $key;
-            if ( $isUseSrc ) $args[] = $src;
+            if ( $isUseSrc ) $args[] = $copy;
 
             $current = call_user_func_array($fn, $args);
         }
 
         return $current;
-    }
-
-
-    /**
-     * > оставить в массиве значения, что прошли фильтр, остальные выбросить. По сути array_filter()
-     *
-     * @param callable|null $fn
-     */
-    public function keep(array $src, $fn = null, ?int $flags = null) : array
-    {
-        if ( null === $fn ) {
-            return [];
-        }
-
-        if ( [] === $src ) {
-            return [];
-        }
-
-        $mode = null
-            ?? $flags
-            ?? static::staticFnMode()
-            ?? _ARR_FN_USE_VALUE;
-
-        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
-        $isUseKey = ($mode & _ARR_FN_USE_KEY);
-        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
-
-        foreach ( $src as $key => $val ) {
-            $args = [];
-            if ( $isUseValue ) $args[] = $val;
-            if ( $isUseKey ) $args[] = $key;
-            if ( $isUseSrc ) $args[] = $src;
-
-            if ( call_user_func_array($fn, $args) ) {
-                continue;
-            }
-
-            unset($src[$key]);
-        }
-
-        return $src;
-    }
-
-    /**
-     * > оставить в массиве значения, что прошли фильтр, остальные заменить. По сути array_filter() с заменой на NULL
-     *
-     * @param callable|null $fn
-     */
-    public function keep_new(array $src, $new = null, $fn = null, ?int $flags = null) : array
-    {
-        if ( [] === $src ) {
-            return [];
-        }
-
-        if ( null === $fn ) {
-            foreach ( $src as $key => $val ) {
-                $src[$key] = $new;
-            }
-
-            return $src;
-        }
-
-        $mode = null
-            ?? $flags
-            ?? static::staticFnMode()
-            ?? _ARR_FN_USE_VALUE;
-
-        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
-        $isUseKey = ($mode & _ARR_FN_USE_KEY);
-        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
-
-        foreach ( $src as $key => $val ) {
-            $args = [];
-            if ( $isUseValue ) $args[] = $val;
-            if ( $isUseKey ) $args[] = $key;
-            if ( $isUseSrc ) $args[] = $src;
-
-            if ( call_user_func_array($fn, $args) ) {
-                continue;
-            }
-
-            $src[$key] = $new;
-        }
-
-        return $src;
-    }
-
-
-    /**
-     * > выбросить значения по фильтру, по сути array_filter(!function)
-     *
-     * @param callable|null $fn
-     */
-    public function drop(array $src, $fn = null, ?int $flags = null) : array
-    {
-        if ( null === $fn ) {
-            return $src;
-        }
-
-        if ( [] === $src ) {
-            return [];
-        }
-
-        $mode = null
-            ?? $flags
-            ?? static::staticFnMode()
-            ?? _ARR_FN_USE_VALUE;
-
-        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
-        $isUseKey = ($mode & _ARR_FN_USE_KEY);
-        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
-
-        foreach ( $src as $key => $val ) {
-            $args = [];
-            if ( $isUseValue ) $args[] = $val;
-            if ( $isUseKey ) $args[] = $key;
-            if ( $isUseSrc ) $args[] = $src;
-
-            if ( call_user_func_array($fn, $args) ) {
-                unset($src[$key]);
-            }
-        }
-
-        return $src;
-    }
-
-    /**
-     * > заменить значения по фильтру, по сути array_filter(!function) с заменой на null
-     *
-     * @param callable|null $fn
-     */
-    public function drop_new(array $src, $new = null, $fn = null, ?int $flags = null) : array
-    {
-        if ( null === $fn ) {
-            return $src;
-        }
-
-        if ( [] === $src ) {
-            return [];
-        }
-
-        $mode = null
-            ?? $flags
-            ?? static::staticFnMode()
-            ?? _ARR_FN_USE_VALUE;
-
-        $isUseValue = ($mode & _ARR_FN_USE_VALUE);
-        $isUseKey = ($mode & _ARR_FN_USE_KEY);
-        $isUseSrc = ($mode & _ARR_FN_USE_SRC);
-
-        foreach ( $src as $key => $val ) {
-            $args = [];
-            if ( $isUseValue ) $args[] = $val;
-            if ( $isUseKey ) $args[] = $key;
-            if ( $isUseSrc ) $args[] = $src;
-
-            if ( call_user_func_array($fn, $args) ) {
-                $src[$key] = $new;
-            }
-        }
-
-        return $src;
     }
 
 

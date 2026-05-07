@@ -701,17 +701,42 @@ interface TInterface
     /**
      * @return Ret<mixed>|mixed
      */
-    public function key_exists($fb, $key, array $array);
+    public function key_exists($fb, array $array, $key);
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function value_in_array($fb, array $array, $key, ?bool $strict = null);
+
+    /**
+     * @return Ret<int|string>|int|string
+     */
+    public function value_in_array_key($fb, array $array, $key, ?bool $strict = null);
+
+    /**
+     * @return Ret<int>|int
+     */
+    public function value_in_array_pos($fb, array $array, $key, ?bool $strict = null);
 
     /**
      * @return Ret<array>|array
      */
-    public function keys_exists($fb, $keys, array $array);
+    public function keys_exists($fb, array $array, $keys);
 
     /**
      * @return Ret<array>|array
      */
-    public function keys_not_exists($fb, $keys, array $array);
+    public function keys_not_exists($fb, array $array, $keys);
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function values_in_array($fb, array $array, $keys, ?bool $strict = null);
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function values_not_in_array($fb, array $array, $keys, ?bool $strict = null);
 
     /**
      * @return Ret<array>|array
@@ -751,7 +776,7 @@ interface TInterface
     /**
      * @return Ret<array>|array
      */
-    public function matrix_strict($fb, $value);
+    public function matrix_sorted($fb, $value);
 
     /**
      * @return Ret<ArrPath>|ArrPath

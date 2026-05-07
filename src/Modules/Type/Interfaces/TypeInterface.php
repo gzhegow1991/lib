@@ -701,17 +701,42 @@ interface TypeInterface
     /**
      * @return Ret<mixed>
      */
-    public function key_exists($key, array $array);
+    public function key_exists(array $array, $key);
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function value_in_array(array $array, $key, ?bool $strict = null);
+
+    /**
+     * @return Ret<int|string>
+     */
+    public function value_in_array_key(array $array, $key, ?bool $strict = null);
+
+    /**
+     * @return Ret<int>
+     */
+    public function value_in_array_pos(array $array, $key, ?bool $strict = null);
 
     /**
      * @return Ret<array>
      */
-    public function keys_exists($keys, array $array);
+    public function keys_exists(array $array, $keys);
 
     /**
      * @return Ret<array>
      */
-    public function keys_not_exists($keys, array $array);
+    public function keys_not_exists(array $array, $keys);
+
+    /**
+     * @return Ret<array>
+     */
+    public function values_in_array(array $array, $keys, ?bool $strict = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function values_not_in_array(array $array, $keys, ?bool $strict = null);
 
     /**
      * @return Ret<array>
@@ -751,7 +776,7 @@ interface TypeInterface
     /**
      * @return Ret<array>
      */
-    public function matrix_strict($value);
+    public function matrix_sorted($value);
 
     /**
      * @return Ret<ArrPath>

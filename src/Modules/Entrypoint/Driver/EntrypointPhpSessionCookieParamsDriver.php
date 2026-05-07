@@ -45,7 +45,8 @@ class EntrypointPhpSessionCookieParamsDriver extends AbstractEntrypointDriver
         $valueValid = array_intersect_key($valueValid, $valueValidScheme);
 
         $valueValidKeys = array_keys($valueValidScheme);
-        $valueValid = $theType->keys_exists($valueValidKeys, $valueValid)->orThrow();
+
+        $valueValid = $theType->keys_exists($valueValid, $valueValidKeys)->orThrow();
 
         $configSet[EntrypointModule::OPT_PHP_SESSION_COOKIE_PARAMS] = $valueValid;
     }

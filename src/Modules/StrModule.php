@@ -2736,7 +2736,7 @@ class StrModule
         if ( null !== $delimiter ) {
             $delimiterChar = $theType->char($delimiter)->orThrow();
 
-            $theType->keys_not_exists([ $delimiterChar ], $dictionary)->orThrow();
+            $theType->keys_not_exists($dictionary, [ $delimiterChar ])->orThrow();
         }
 
         $gen = $thePhp->to_list_it($ignoreSymbols);

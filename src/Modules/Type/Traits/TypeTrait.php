@@ -1235,27 +1235,72 @@ trait TypeTrait
 	/**
 	 * @return Ret<mixed>
 	 */
-	public function key_exists($key, array $array)
+	public function key_exists(array $array, $key)
 	{
-		return Lib::arr()->type_key_exists(null, $key, $array);
+		return Lib::arr()->type_key_exists(null, $array, $key);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function value_in_array(array $array, $key, ?bool $strict = null)
+	{
+		return Lib::arr()->type_value_in_array(null, $array, $key, $strict);
+	}
+
+
+	/**
+	 * @return Ret<int|string>
+	 */
+	public function value_in_array_key(array $array, $key, ?bool $strict = null)
+	{
+		return Lib::arr()->type_value_in_array_key(null, $array, $key, $strict);
+	}
+
+
+	/**
+	 * @return Ret<int>
+	 */
+	public function value_in_array_pos(array $array, $key, ?bool $strict = null)
+	{
+		return Lib::arr()->type_value_in_array_pos(null, $array, $key, $strict);
 	}
 
 
 	/**
 	 * @return Ret<array>
 	 */
-	public function keys_exists($keys, array $array)
+	public function keys_exists(array $array, $keys)
 	{
-		return Lib::arr()->type_keys_exists(null, $keys, $array);
+		return Lib::arr()->type_keys_exists(null, $array, $keys);
 	}
 
 
 	/**
 	 * @return Ret<array>
 	 */
-	public function keys_not_exists($keys, array $array)
+	public function keys_not_exists(array $array, $keys)
 	{
-		return Lib::arr()->type_keys_not_exists(null, $keys, $array);
+		return Lib::arr()->type_keys_not_exists(null, $array, $keys);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function values_in_array(array $array, $keys, ?bool $strict = null)
+	{
+		return Lib::arr()->type_values_in_array(null, $array, $keys, $strict);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function values_not_in_array(array $array, $keys, ?bool $strict = null)
+	{
+		return Lib::arr()->type_values_not_in_array(null, $array, $keys, $strict);
 	}
 
 
@@ -1325,9 +1370,9 @@ trait TypeTrait
 	/**
 	 * @return Ret<array>
 	 */
-	public function matrix_strict($value)
+	public function matrix_sorted($value)
 	{
-		return Lib::arr()->type_matrix_strict(null, $value);
+		return Lib::arr()->type_matrix_sorted(null, $value);
 	}
 
 
