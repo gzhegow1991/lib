@@ -114,6 +114,8 @@ class ArrModule
      */
     public function type_value_in_array($fb, array $array, $value, ?bool $strict = null)
     {
+        $strict = $strict ?? false;
+
         if ( ! in_array($value, $array, $strict) ) {
             return Ret::throw(
                 $fb,
@@ -130,6 +132,8 @@ class ArrModule
      */
     public function type_value_in_array_key($fb, array $array, $value, ?bool $strict = null)
     {
+        $strict = $strict ?? false;
+
         $key = array_search($value, $array, $strict);
 
         if ( false === $key ) {
@@ -148,6 +152,8 @@ class ArrModule
      */
     public function type_value_in_array_pos($fb, array $array, $value, ?bool $strict = null)
     {
+        $strict = $strict ?? false;
+
         $copy = array_values($array);
 
         $pos = array_search($value, $copy, $strict);
@@ -248,6 +254,8 @@ class ArrModule
      */
     public function type_values_in_array($fb, array $array, $values, ?bool $strict = null)
     {
+        $strict = $strict ?? false;
+
         $values = (array) $values;
 
         if ( [] === $values ) {
@@ -284,6 +292,8 @@ class ArrModule
      */
     public function type_values_not_in_array($fb, array $array, $values, ?bool $strict = null)
     {
+        $strict = $strict ?? false;
+
         if ( [] === $array ) {
             return Ret::ok($fb, $array);
         }
