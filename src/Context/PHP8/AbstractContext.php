@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @noinspection PhpHierarchyChecksInspection
+ * @noinspection PhpSignatureMismatchDuringInheritanceInspection
+ * @noinspection PhpUndefinedClassInspection
+ */
+
 namespace Gzhegow\Lib\Context\PHP8;
 
 use Gzhegow\Lib\Lib;

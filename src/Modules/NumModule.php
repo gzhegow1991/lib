@@ -881,6 +881,36 @@ class NumModule
     /**
      * @return Ret<string>|string
      */
+    public function type_numeric_zero_plus_minus_one($fb, $value, ?bool $isAllowExp = null, array $refs = [])
+    {
+        $ret = $this->type_numeric(null, $value, $isAllowExp, $refs);
+
+        if ( ! $ret->isOk([ &$valueNumeric ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( ! (false
+            || ($valueNumeric == -1)
+            || ($valueNumeric == 0)
+            || ($valueNumeric == 1)
+        ) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be numeric, zero, plus one or minus one', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueNumeric);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
     public function type_numeric_non_negative_or_minus_one($fb, $value, ?bool $isAllowExp = null, array $refs = [])
     {
         $ret = $this->type_numeric(null, $value, $isAllowExp, $refs);
@@ -1490,6 +1520,36 @@ class NumModule
     /**
      * @return Ret<int|float>|int|float
      */
+    public function type_num_zero_plus_minus_one($fb, $value)
+    {
+        $ret = $this->type_num(null, $value);
+
+        if ( ! $ret->isOk([ &$valueNum ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( ! (false
+            || ($valueNum == -1)
+            || ($valueNum == 0)
+            || ($valueNum == 1)
+        ) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be num, zero, plus one or minus one', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueNum);
+    }
+
+    /**
+     * @return Ret<int|float>|int|float
+     */
     public function type_num_non_negative_or_minus_one($fb, $value)
     {
         $ret = $this->type_num(null, $value);
@@ -1729,7 +1789,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -1737,7 +1797,7 @@ class NumModule
             );
         }
 
-        if ( ! ($valueNum == 0) ) {
+        if ( ! ($valueInt == 0) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, non-zero', $value ],
@@ -1745,7 +1805,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
     }
 
     /**
@@ -1755,7 +1815,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -1763,7 +1823,7 @@ class NumModule
             );
         }
 
-        if ( ! ($valueNum >= 0) ) {
+        if ( ! ($valueInt >= 0) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, non-negative', $value ],
@@ -1771,7 +1831,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
     }
 
     /**
@@ -1781,7 +1841,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -1789,7 +1849,7 @@ class NumModule
             );
         }
 
-        if ( ! ($valueNum <= 0) ) {
+        if ( ! ($valueInt <= 0) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, non-positive', $value ],
@@ -1797,7 +1857,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
     }
 
     /**
@@ -1807,7 +1867,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -1815,7 +1875,7 @@ class NumModule
             );
         }
 
-        if ( ! ($valueNum < 0) ) {
+        if ( ! ($valueInt < 0) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, negative', $value ],
@@ -1823,7 +1883,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
     }
 
     /**
@@ -1833,7 +1893,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -1841,7 +1901,7 @@ class NumModule
             );
         }
 
-        if ( ! ($valueNum > 0) ) {
+        if ( ! ($valueInt > 0) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, positive', $value ],
@@ -1849,7 +1909,37 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
+    }
+
+    /**
+     * @return Ret<int>|int
+     */
+    public function type_int_zero_plus_minus_one($fb, $value)
+    {
+        $ret = $this->type_int(null, $value);
+
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( ! (false
+            || ($valueInt == -1)
+            || ($valueInt == 0)
+            || ($valueInt == 1)
+        ) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be num, zero, plus one or minus one', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueInt);
     }
 
     /**
@@ -1859,7 +1949,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -1868,8 +1958,8 @@ class NumModule
         }
 
         if ( ! (false
-            || ($valueNum >= 0)
-            || ($valueNum == -1)
+            || ($valueInt >= 0)
+            || ($valueInt == -1)
         ) ) {
             return Ret::throw(
                 $fb,
@@ -1878,7 +1968,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
     }
 
     /**
@@ -1888,7 +1978,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -1897,8 +1987,8 @@ class NumModule
         }
 
         if ( ! (false
-            || ($valueNum > 0)
-            || ($valueNum == -1)
+            || ($valueInt > 0)
+            || ($valueInt == -1)
         ) ) {
             return Ret::throw(
                 $fb,
@@ -1907,7 +1997,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
     }
 
     /**
@@ -1917,7 +2007,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -1927,7 +2017,7 @@ class NumModule
 
         $gtNum = $this->type_num([], $gt);
 
-        if ( ! ($valueNum > $gtNum) ) {
+        if ( ! ($valueInt > $gtNum) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, GT ' . $gtNum, $value, $gt ],
@@ -1935,7 +2025,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
     }
 
     /**
@@ -1945,7 +2035,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -1955,7 +2045,7 @@ class NumModule
 
         $gteNum = $this->type_num([], $gte);
 
-        if ( ! ($valueNum >= $gteNum) ) {
+        if ( ! ($valueInt >= $gteNum) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, GTE ' . $gteNum, $value, $gte ],
@@ -1963,7 +2053,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
     }
 
     /**
@@ -1973,7 +2063,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -1983,7 +2073,7 @@ class NumModule
 
         $ltNum = $this->type_num([], $lt);
 
-        if ( ! ($valueNum < $ltNum) ) {
+        if ( ! ($valueInt < $ltNum) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, LT ' . $ltNum, $value, $lt ],
@@ -1991,7 +2081,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
     }
 
     /**
@@ -2001,7 +2091,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2011,7 +2101,7 @@ class NumModule
 
         $lteNum = $this->type_num([], $lte);
 
-        if ( ! ($valueNum <= $lteNum) ) {
+        if ( ! ($valueInt <= $lteNum) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, LT ' . $lteNum, $value, $lte ],
@@ -2019,7 +2109,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
     }
 
     /**
@@ -2029,7 +2119,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2041,8 +2131,8 @@ class NumModule
         $toNum = $this->type_num([], $to);
 
         if ( ! (true
-            && ($fromNum >= $valueNum)
-            && ($valueNum <= $toNum)
+            && ($fromNum >= $valueInt)
+            && ($valueInt <= $toNum)
         ) ) {
             return Ret::throw(
                 $fb,
@@ -2051,7 +2141,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
     }
 
     /**
@@ -2061,7 +2151,7 @@ class NumModule
     {
         $ret = $this->type_int(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueInt ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2073,8 +2163,8 @@ class NumModule
         $toNum = $this->type_num([], $to);
 
         if ( ! (true
-            && ($fromNum > $valueNum)
-            && ($valueNum < $toNum)
+            && ($fromNum > $valueInt)
+            && ($valueInt < $toNum)
         ) ) {
             return Ret::throw(
                 $fb,
@@ -2083,7 +2173,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueInt);
     }
 
 
@@ -2094,7 +2184,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2102,7 +2192,7 @@ class NumModule
             );
         }
 
-        if ( ! ($valueNum == 0) ) {
+        if ( ! ($valueFloat == 0) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, non-zero', $value ],
@@ -2110,7 +2200,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
     }
 
     /**
@@ -2120,7 +2210,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2128,7 +2218,7 @@ class NumModule
             );
         }
 
-        if ( ! ($valueNum >= 0) ) {
+        if ( ! ($valueFloat >= 0) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, non-negative', $value ],
@@ -2136,7 +2226,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
     }
 
     /**
@@ -2146,7 +2236,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2154,7 +2244,7 @@ class NumModule
             );
         }
 
-        if ( ! ($valueNum <= 0) ) {
+        if ( ! ($valueFloat <= 0) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, non-positive', $value ],
@@ -2162,7 +2252,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
     }
 
     /**
@@ -2172,7 +2262,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2180,7 +2270,7 @@ class NumModule
             );
         }
 
-        if ( ! ($valueNum < 0) ) {
+        if ( ! ($valueFloat < 0) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, negative', $value ],
@@ -2188,7 +2278,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
     }
 
     /**
@@ -2198,7 +2288,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2206,7 +2296,7 @@ class NumModule
             );
         }
 
-        if ( ! ($valueNum > 0) ) {
+        if ( ! ($valueFloat > 0) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, positive', $value ],
@@ -2214,7 +2304,37 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
+    }
+
+    /**
+     * @return Ret<float>|float
+     */
+    public function type_float_zero_plus_minus_one($fb, $value)
+    {
+        $ret = $this->type_float(null, $value);
+
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( ! (false
+            || ($valueFloat == -1)
+            || ($valueFloat == 0)
+            || ($valueFloat == 1)
+        ) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be num, zero, plus one or minus one', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueFloat);
     }
 
     /**
@@ -2224,7 +2344,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2233,8 +2353,8 @@ class NumModule
         }
 
         if ( ! (false
-            || ($valueNum >= 0)
-            || ($valueNum == -1)
+            || ($valueFloat >= 0)
+            || ($valueFloat == -1)
         ) ) {
             return Ret::throw(
                 $fb,
@@ -2243,7 +2363,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
     }
 
     /**
@@ -2253,7 +2373,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2262,8 +2382,8 @@ class NumModule
         }
 
         if ( ! (false
-            || ($valueNum > 0)
-            || ($valueNum == -1)
+            || ($valueFloat > 0)
+            || ($valueFloat == -1)
         ) ) {
             return Ret::throw(
                 $fb,
@@ -2272,7 +2392,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
     }
 
     /**
@@ -2282,7 +2402,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2292,7 +2412,7 @@ class NumModule
 
         $gtNum = $this->type_num([], $gt);
 
-        if ( ! ($valueNum > $gtNum) ) {
+        if ( ! ($valueFloat > $gtNum) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, GT ' . $gtNum, $value, $gt ],
@@ -2300,7 +2420,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
     }
 
     /**
@@ -2310,7 +2430,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2320,7 +2440,7 @@ class NumModule
 
         $gteNum = $this->type_num([], $gte);
 
-        if ( ! ($valueNum >= $gteNum) ) {
+        if ( ! ($valueFloat >= $gteNum) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, GTE ' . $gteNum, $value, $gte ],
@@ -2328,7 +2448,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
     }
 
     /**
@@ -2338,7 +2458,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2348,7 +2468,7 @@ class NumModule
 
         $ltNum = $this->type_num([], $lt);
 
-        if ( ! ($valueNum < $ltNum) ) {
+        if ( ! ($valueFloat < $ltNum) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, LT ' . $ltNum, $value, $lt ],
@@ -2356,7 +2476,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
     }
 
     /**
@@ -2366,7 +2486,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2376,7 +2496,7 @@ class NumModule
 
         $lteNum = $this->type_num([], $lte);
 
-        if ( ! ($valueNum <= $lteNum) ) {
+        if ( ! ($valueFloat <= $lteNum) ) {
             return Ret::throw(
                 $fb,
                 [ 'The `value` should be num, LT ' . $lteNum, $value, $lte ],
@@ -2384,7 +2504,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
     }
 
     /**
@@ -2394,7 +2514,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2406,8 +2526,8 @@ class NumModule
         $toNum = $this->type_num([], $to);
 
         if ( ! (true
-            && ($fromNum >= $valueNum)
-            && ($valueNum <= $toNum)
+            && ($fromNum >= $valueFloat)
+            && ($valueFloat <= $toNum)
         ) ) {
             return Ret::throw(
                 $fb,
@@ -2416,7 +2536,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
     }
 
     /**
@@ -2426,7 +2546,7 @@ class NumModule
     {
         $ret = $this->type_float(null, $value);
 
-        if ( ! $ret->isOk([ &$valueNum ]) ) {
+        if ( ! $ret->isOk([ &$valueFloat ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -2438,8 +2558,8 @@ class NumModule
         $toNum = $this->type_num([], $to);
 
         if ( ! (true
-            && ($fromNum > $valueNum)
-            && ($valueNum < $toNum)
+            && ($fromNum > $valueFloat)
+            && ($valueFloat < $toNum)
         ) ) {
             return Ret::throw(
                 $fb,
@@ -2448,7 +2568,7 @@ class NumModule
             );
         }
 
-        return Ret::ok($fb, $valueNum);
+        return Ret::ok($fb, $valueFloat);
     }
 
 

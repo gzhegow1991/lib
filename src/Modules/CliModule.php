@@ -28,8 +28,7 @@ class CliModule
         if ( null !== $var ) {
             $theDebugDumper = $theDebug->dumper();
 
-            $trace = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-            $theDebugDumper->d($trace, $var, ...$vars);
+            $theDebugDumper->d(null, $var, ...$vars);
         }
 
         echo '> Press ENTER to continue...' . "\n";

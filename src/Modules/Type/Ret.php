@@ -5,7 +5,6 @@ namespace Gzhegow\Lib\Modules\Type;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\Except;
 use Gzhegow\Lib\Modules\DebugModule;
-use Gzhegow\Lib\Exception\Exception;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\AggregateExcept;
 use Gzhegow\Lib\Exception\RuntimeException;
@@ -63,18 +62,26 @@ class Ret
         }
 
         if ( null === $fb ) {
+            // > ret object
+
             $theRet = static::new();
             $theRet->value = [ $value ];
 
             return $theRet;
 
         } elseif ( is_bool($fb) ) {
+            // > boolean
+
             return $fb->getStatus();
 
         } elseif ( is_array($fb) ) {
+            // > value
+
             return $value;
 
         } elseif ( $fb instanceof self ) {
+            // > boolean
+
             $theRet = static::new();
             $theRet->value = [ $value ];
 
@@ -122,10 +129,16 @@ class Ret
 
                     $errorLast = end($theRet->errors[$idx]);
 
+                    $eTrace = null;
                     $eFileLine = $fileLine;
+                    if ( DebugModule::staticShouldTrace() ) {
+                        $refs = [];
+                        $eTrace = Lib::trace($refs, 1);
+                        $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
+                    }
 
                     $theRet->_addLayer();
-                    $theRet->_addError($errorLast['trace'], $eFileLine, ...$errorLast['throwable_args']);
+                    $theRet->_addError($eTrace, $eFileLine, ...$errorLast['throwable_args']);
                 }
             }
 
@@ -142,25 +155,35 @@ class Ret
         }
 
         if ( null === $fb ) {
+            // > ret object
             return $theRet;
 
         } elseif ( is_bool($fb) ) {
+            // > boolean
+
             return $fb->getStatus();
 
         } elseif ( is_array($fb) ) {
+            // > default/throw
+
             if ( array_key_exists(0, $fb) ) {
                 return $fb[0];
             }
 
-            return $theRet->throwErrors();
+            $theRet->throwErrors();
 
         } elseif ( $fb instanceof self ) {
+            // > boolean
+
             $fb->mergeFrom($theRet);
 
             return $fb->getStatus();
-        }
 
-        $theRet->throwErrors();
+        } else {
+            // > throw
+
+            $theRet->throwErrors();
+        }
     }
 
 
@@ -181,6 +204,23 @@ class Ret
 
 
     /**
+     * @return bool
+     */
+    public function hasValue(array $refs = [])
+    {
+        $refValue =& $refs[0];
+        $refValue = null;
+
+        if ( [] === $this->value ) {
+            return false;
+        }
+
+        $refValue = $this->value[0];
+
+        return true;
+    }
+
+    /**
      * @return T
      */
     public function getValue()
@@ -196,13 +236,16 @@ class Ret
 
 
     /**
-     * @return \stdClass[]
+     * @return \stdClass[]|array[]
      */
     public function getErrors(?bool $isAssociative = null) : array
     {
         return $this->_getErrors($isAssociative);
     }
 
+    /**
+     * @return \stdClass[]|array[]
+     */
     protected function _getErrors(?bool $isAssociative = null) : array
     {
         $isAssociative = $isAssociative ?? false;
@@ -240,7 +283,7 @@ class Ret
     public function addError($errArg, ?array $fileLine = null, ...$errArgs)
     {
         $eTrace = null;
-        $eFileLine = null;
+        $eFileLine = $fileLine;
         if ( DebugModule::staticShouldTrace() ) {
             $refs = [];
             $eTrace = Lib::trace($refs, 1);
@@ -309,7 +352,9 @@ class Ret
     public function mergeFrom(self $retFrom)
     {
         if ( [] !== $retFrom->value ) {
-            $this->value = $retFrom->value;
+            if ( [] === $this->value ) {
+                $this->value = $retFrom->value;
+            }
         }
 
         if ( [] !== $retFrom->errors ) {
@@ -335,7 +380,9 @@ class Ret
     public function mergeTo(self $retTo)
     {
         if ( [] !== $this->value ) {
-            $retTo->value = $this->value;
+            if ( [] === $retTo->value ) {
+                $retTo->value = $this->value;
+            }
         }
 
         if ( [] !== $this->errors ) {
@@ -414,7 +461,7 @@ class Ret
 
         if ( null !== $err ) {
             $eTrace = null;
-            $eFileLine = null;
+            $eFileLine = $fileLine;
             if ( DebugModule::staticShouldTrace() ) {
                 $refs = [];
                 $eTrace = Lib::trace($refs, 1);
@@ -445,7 +492,7 @@ class Ret
 
         if ( null !== $err ) {
             $eTrace = null;
-            $eFileLine = null;
+            $eFileLine = $fileLine;
             if ( DebugModule::staticShouldTrace() ) {
                 $refs = [];
                 $eTrace = Lib::trace($refs, 1);

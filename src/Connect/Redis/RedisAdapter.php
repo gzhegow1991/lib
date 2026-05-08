@@ -311,45 +311,44 @@ class RedisAdapter
             );
         }
 
-        if ( $isRedis ) {
-            //
+        if ( ! $isRedis ) {
+            if ( $isDsn || $isHost ) {
+                $ret = $theType->string_not_empty($host);
 
-        } elseif ( $isDsn || $isHost ) {
-            $ret = $theType->string_not_empty($host);
+                if ( ! $ret->isOk([ &$host ]) ) {
+                    return Ret::throw(
+                        $fb,
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
 
-            if ( ! $ret->isOk([ &$host ]) ) {
-                return Ret::throw(
-                    $fb,
-                    $ret,
-                    [ __FILE__, __LINE__ ]
-                );
-            }
+                $port = $port ?: 6379;
 
-            $port = $port ?: 6379;
+                $ret = $theType->int_positive($port);
 
-            $ret = $theType->int_positive($port);
+                if ( ! $ret->isOk([ &$port ]) ) {
+                    return Ret::throw(
+                        $fb,
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
 
-            if ( ! $ret->isOk([ &$port ]) ) {
-                return Ret::throw(
-                    $fb,
-                    $ret,
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-
-        } elseif ( $isSock ) {
-            $ret = $theType->string_not_empty($sock);
-            if ( ! $ret->isOk([ &$sock ]) ) {
-                return Ret::throw(
-                    $fb,
-                    $ret,
-                    [ __FILE__, __LINE__ ]
-                );
+            } elseif ( $isSock ) {
+                $ret = $theType->string_not_empty($sock);
+                if ( ! $ret->isOk([ &$sock ]) ) {
+                    return Ret::throw(
+                        $fb,
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
             }
         }
 
         if ( null !== $credentials ) {
-            $ret = $theType->list_sorted($credentials);
+            $ret = $theType->list_sorted($credentials, true);
 
             if ( ! $ret->isOk([ &$credentials ]) ) {
                 return Ret::throw(

@@ -4,7 +4,6 @@ namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
-use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper;
 use Gzhegow\Lib\Modules\Debug\Dumper\DumperInterface;
@@ -1222,16 +1221,14 @@ class DebugModule
                     $result = "[]";
 
                 } else {
-                    $ret = $theType->list_sorted($var);
-
-                    $isListSorted = $ret->isOk();
+                    $isShort = (array_keys($var) === range(0, count($var) - 1));
 
                     $lines = [];
                     foreach ( $var as $key => $value ) {
                         $rowIndent = str_repeat($indent, $level + 1);
 
                         $keyString = '';
-                        if ( ! $isListSorted ) {
+                        if ( ! $isShort ) {
                             $keyString = is_string($key)
                                 ? "\"{$key}\" => "
                                 : "{$key} => ";

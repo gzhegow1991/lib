@@ -1086,10 +1086,10 @@ class PdoAdapter
 
     protected function sqlEnsureDatabase(\PDO $pdo, array $configValid) : string
     {
-        $sql = '';
-
-        $sql .= $this->sqlEnsureDatabaseDriver($pdo, $configValid);
-        $sql .= $this->sqlEnsureDatabaseUser($pdo, $configValid);
+        $sql = implode('', [
+            $this->sqlEnsureDatabaseDriver($pdo, $configValid),
+            $this->sqlEnsureDatabaseUser($pdo, $configValid),
+        ]);
 
         return $sql;
     }
@@ -1139,10 +1139,10 @@ class PdoAdapter
 
     protected function sqlEnsureTimezone(\PDO $pdo, array $configValid) : string
     {
-        $sql = '';
-
-        $sql .= $this->sqlEnsureTimezoneDriver($pdo, $configValid);
-        $sql .= $this->sqlEnsureTimezoneUser($pdo, $configValid);
+        $sql = implode('', [
+            $this->sqlEnsureTimezoneDriver($pdo, $configValid),
+            $this->sqlEnsureTimezoneUser($pdo, $configValid),
+        ]);
 
         return $sql;
     }

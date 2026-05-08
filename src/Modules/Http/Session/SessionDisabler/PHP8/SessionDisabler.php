@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @noinspection PhpHierarchyChecksInspection
+ * @noinspection PhpSignatureMismatchDuringInheritanceInspection
+ * @noinspection PhpUndefinedClassInspection
+ */
+
 namespace Gzhegow\Lib\Modules\Http\Session\SessionDisabler\PHP8;
 
 use Gzhegow\Lib\Modules\HttpModule;

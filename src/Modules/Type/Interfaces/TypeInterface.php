@@ -49,12 +49,12 @@ interface TypeInterface
      *
      * @return Ret<mixed>
      */
-    public function client($value);
+    public function passed($value);
 
     /**
      * @return Ret<mixed>
      */
-    public function any_not_client($value);
+    public function any_not_passed($value);
 
     /**
      * > Специальный тип-синоним NULL, переданный пользователем через API, например '{N}'
@@ -142,26 +142,6 @@ interface TypeInterface
      * @return Ret<false>
      */
     public function userbool_true($value);
-
-    /**
-     * @return Ret<array>
-     */
-    public function array($value);
-
-    /**
-     * @return Ret<array>
-     */
-    public function array_empty($value);
-
-    /**
-     * @return Ret<array>
-     */
-    public function array_not_empty($value);
-
-    /**
-     * @return Ret<mixed>
-     */
-    public function any_not_array($value);
 
     /**
      * @return Ret<object>
@@ -306,6 +286,11 @@ interface TypeInterface
     /**
      * @return Ret<string>
      */
+    public function numeric_zero_plus_minus_one($value, ?bool $isAllowExp = null, array $refs = []);
+
+    /**
+     * @return Ret<string>
+     */
     public function numeric_non_negative_or_minus_one($value, ?bool $isAllowExp = null, array $refs = []);
 
     /**
@@ -386,6 +371,11 @@ interface TypeInterface
     /**
      * @return Ret<int|float>
      */
+    public function num_zero_plus_minus_one($value);
+
+    /**
+     * @return Ret<int|float>
+     */
     public function num_non_negative_or_minus_one($value);
 
     /**
@@ -451,6 +441,11 @@ interface TypeInterface
     /**
      * @return Ret<int>
      */
+    public function int_zero_plus_minus_one($value);
+
+    /**
+     * @return Ret<int>
+     */
     public function int_non_negative_or_minus_one($value);
 
     /**
@@ -512,6 +507,11 @@ interface TypeInterface
      * @return Ret<float>
      */
     public function float_positive($value);
+
+    /**
+     * @return Ret<float>
+     */
+    public function float_zero_plus_minus_one($value);
 
     /**
      * @return Ret<float>
@@ -694,99 +694,48 @@ interface TypeInterface
     public function base_hex($value);
 
     /**
-     * @return Ret<int|string>
+     * @return Ret<array>
      */
-    public function key($key);
+    public function php_array($value);
+
+    /**
+     * @return Ret<array>
+     */
+    public function php_array_empty($value);
+
+    /**
+     * @return Ret<array>
+     */
+    public function php_array_not_empty($value);
 
     /**
      * @return Ret<mixed>
      */
-    public function key_exists(array $array, $key);
-
-    /**
-     * @return Ret<mixed>
-     */
-    public function value_in_array(array $array, $key, ?bool $strict = null);
-
-    /**
-     * @return Ret<int|string>
-     */
-    public function value_in_array_key(array $array, $key, ?bool $strict = null);
-
-    /**
-     * @return Ret<int>
-     */
-    public function value_in_array_pos(array $array, $key, ?bool $strict = null);
+    public function any_not_php_array($value);
 
     /**
      * @return Ret<array>
      */
-    public function keys_exists(array $array, $keys);
+    public function array($value, ?bool $isPlain = null);
 
     /**
      * @return Ret<array>
      */
-    public function keys_not_exists(array $array, $keys);
+    public function array_recursive($value, ?int $maxDepth = null);
 
     /**
+     * @param callable $fnSortKeysCmp
+     *
      * @return Ret<array>
      */
-    public function values_in_array(array $array, $keys, ?bool $strict = null);
+    public function array_sorted($value, ?bool $isPlain = null, $fnSortKeysCmp = null);
 
     /**
+     * @param callable $fnSortKeysCmp
+     *
      * @return Ret<array>
      */
-    public function values_not_in_array(array $array, $keys, ?bool $strict = null);
-
-    /**
-     * @return Ret<array>
-     */
-    public function array_plain($value, ?int $maxDepth = null);
-
-    /**
-     * @return Ret<array>
-     */
-    public function list($value, ?int $plainMaxDepth = null);
-
-    /**
-     * @return Ret<array>
-     */
-    public function list_sorted($value, ?int $plainMaxDepth = null);
-
-    /**
-     * @return Ret<array>
-     */
-    public function dict($value, ?int $plainMaxDepth = null);
-
-    /**
-     * @return Ret<array>
-     */
-    public function dict_sorted($value, ?int $plainMaxDepth = null, $fnSortCmp = null);
-
-    /**
-     * @return Ret<array>
-     */
-    public function table($value);
-
-    /**
-     * @return Ret<array>
-     */
-    public function matrix($value);
-
-    /**
-     * @return Ret<array>
-     */
-    public function matrix_sorted($value);
-
-    /**
-     * @return Ret<ArrPath>
-     */
-    public function arrpath($path);
-
-    /**
-     * @return Ret<ArrPath>
-     */
-    public function arrpath_dot($path, ?string $dot = '.');
+    public function array_sorted_recursive($value, ?int $maxDepth = null, $fnSortKeysCmp = null);
 
     /**
      * @return Ret<array>
@@ -794,7 +743,7 @@ interface TypeInterface
     public function array_of_type($value, string $type);
 
     /**
-     * @return Ret<resource[]>
+     * @return Ret<array>
      */
     public function array_of_resource_type($value, string $resourceType);
 
@@ -803,7 +752,7 @@ interface TypeInterface
      *
      * @param class-string<T> $className
      *
-     * @return Ret<T[]>
+     * @return Ret<T[]>|T[]
      */
     public function array_of_a($value, string $className);
 
@@ -812,7 +761,7 @@ interface TypeInterface
      *
      * @param class-string<T> $className
      *
-     * @return Ret<T[]>
+     * @return Ret<T[]>|T[]
      */
     public function array_of_class($value, string $className);
 
@@ -821,18 +770,139 @@ interface TypeInterface
      *
      * @param class-string<T> $className
      *
-     * @return Ret<T[]>
+     * @return Ret<T[]>|T[]
      */
     public function array_of_subclass($value, string $className);
 
     /**
      * @param callable $fn
      *
-     * @return Ret<array>
+     * @return Ret<array>|array
      *
      * @noinspection PhpDocSignatureIsNotCompleteInspection
      */
-    public function array_of_callback($value, callable $fn, array $args = []);
+    public function array_of_callback($value, callable $fn, array $fnArgs = []);
+
+    /**
+     * @return Ret<int|string>
+     */
+    public function array_key($key);
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function array_key_exists(array $array, $key);
+
+    /**
+     * @return Ret<mixed>
+     */
+    public function value_in_array(array $array, $value, ?bool $isStrict = null);
+
+    /**
+     * @return Ret<int|string>
+     */
+    public function value_in_array_key(array $array, $value, ?bool $isStrict = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function value_in_array_pos(array $array, $value, ?bool $isStrict = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function array_keys_exists(array $array, $keys);
+
+    /**
+     * @return Ret<array>
+     */
+    public function array_keys_not_exists(array $array, $keys);
+
+    /**
+     * @return Ret<array>
+     */
+    public function values_in_array(array $array, $values, ?bool $strict = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function values_not_in_array(array $array, $values, ?bool $strict = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function list($value, ?bool $isPlain = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function list_recursive($value, ?int $maxDepth = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function list_sorted($value, ?bool $isPlain = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function list_sorted_recursive($value, ?int $maxDepth = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function dict($value, ?bool $isPlain = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function dict_recursive($value, ?int $maxDepth = null);
+
+    /**
+     * @param callable $fnSortKeysCmp
+     *
+     * @return Ret<array>
+     */
+    public function dict_sorted($value, ?bool $isPlain = null, $fnSortKeysCmp = null);
+
+    /**
+     * @param callable $fnSortKeysCmp
+     *
+     * @return Ret<array>
+     */
+    public function dict_sorted_recursive($value, ?int $maxDepth = null, $fnSortKeysCmp = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function table($value, ?int $isListOrDict = null, ?bool $isChildrenPlain = null);
+
+    /**
+     * @param callable $fnSortKeysCmp
+     *
+     * @return Ret<array>
+     */
+    public function table_sorted($value, ?int $isListOrDict = null, ?bool $isChildrenPlain = null, $fnSortKeysCmp = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function matrix($value, ?bool $isChildrenPlain = null);
+
+    /**
+     * @return Ret<array>
+     */
+    public function matrix_recursive($value, ?int $maxDepth = null);
+
+    /**
+     * @return Ret<ArrPath>
+     */
+    public function arrpath($value);
+
+    /**
+     * @return Ret<ArrPath>
+     */
+    public function arrpath_dot($value, ?string $dot = '.');
 
     /**
      * @return Ret<array{ 0: string, 1: int }>

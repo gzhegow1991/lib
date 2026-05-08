@@ -34,7 +34,7 @@ class FormatCsv
         }
         $refLength = 0;
 
-        $ret = $theType->array_not_empty($rows);
+        $ret = $theType->php_array_not_empty($rows);
 
         if ( ! $ret->isOk() ) {
             return Ret::throw(
@@ -44,7 +44,7 @@ class FormatCsv
             );
         }
 
-        $ret = $theType->list($rows);
+        $ret = $theType->table($rows);
 
         if ( ! $ret->isOk() ) {
             return Ret::throw(
@@ -52,18 +52,6 @@ class FormatCsv
                 $ret,
                 [ __FILE__, __LINE__ ]
             );
-        }
-
-        foreach ( $rows as $row ) {
-            $ret = $theType->array_not_empty($row);
-
-            if ( ! $ret->isOk() ) {
-                return Ret::throw(
-                    $fb,
-                    $ret,
-                    [ __FILE__, __LINE__ ]
-                );
-            }
         }
 
         $separatorChar = $theType->char($separator ?? ';')->orThrow();
@@ -113,7 +101,7 @@ class FormatCsv
         }
         $refLength = 0;
 
-        $ret = $theType->array_not_empty($row);
+        $ret = $theType->php_array_not_empty($row);
 
         if ( ! $ret->isOk() ) {
             return Ret::throw(

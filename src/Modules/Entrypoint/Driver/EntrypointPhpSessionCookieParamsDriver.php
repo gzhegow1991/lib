@@ -32,7 +32,7 @@ class EntrypointPhpSessionCookieParamsDriver extends AbstractEntrypointDriver
     {
         $theType = Lib::type();
 
-        $valueValid = $theType->array($value)->orThrow();
+        $valueValid = $theType->php_array($value)->orThrow();
 
         $valueValidScheme = [
             'lifetime' => true,
@@ -46,7 +46,7 @@ class EntrypointPhpSessionCookieParamsDriver extends AbstractEntrypointDriver
 
         $valueValidKeys = array_keys($valueValidScheme);
 
-        $valueValid = $theType->keys_exists($valueValid, $valueValidKeys)->orThrow();
+        $valueValid = $theType->array_keys_exists($valueValid, $valueValidKeys)->orThrow();
 
         $configSet[EntrypointModule::OPT_PHP_SESSION_COOKIE_PARAMS] = $valueValid;
     }

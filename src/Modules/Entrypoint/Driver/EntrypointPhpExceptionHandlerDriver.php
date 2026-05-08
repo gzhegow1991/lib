@@ -43,22 +43,18 @@ class EntrypointPhpExceptionHandlerDriver extends AbstractEntrypointDriver
     {
         $theDebugThrowabler = Lib::debugThrowabler();
 
-        try {
-            $lines = $theDebugThrowabler->getLines(
-                $e,
-                0
-                //
-                | _DEBUG_THROWABLER_WITH_CODE
-                | _DEBUG_THROWABLER_WITH_INFO
-                | _DEBUG_THROWABLER_WITH_TRACE
-                //
-                | _DEBUG_THROWABLER_INFO_WITH_FILE
-                | _DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS
-                | _DEBUG_THROWABLER_INFO_WITHOUT_OBJECT_ID
-            );
-        } catch (\Throwable $e) {
-            dd($e);
-        }
+        $lines = $theDebugThrowabler->getLines(
+            $e,
+            0
+            //
+            | _DEBUG_THROWABLER_WITH_CODE
+            | _DEBUG_THROWABLER_WITH_INFO
+            | _DEBUG_THROWABLER_WITH_TRACE
+            //
+            | _DEBUG_THROWABLER_INFO_WITH_FILE
+            | _DEBUG_THROWABLER_INFO_WITH_OBJECT_CLASS
+            | _DEBUG_THROWABLER_INFO_WITHOUT_OBJECT_ID
+        );
 
         echo "\n" . implode("\n", $lines) . "\n";
     }

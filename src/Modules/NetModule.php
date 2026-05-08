@@ -171,7 +171,7 @@ class NetModule
     {
         $ret = Ret::new();
 
-        $statusSubnet = false
+        $devnull = false
             || $this->type_subnet_v4($ret, $value, $ipFallback)
             || $this->type_subnet_v6($ret, $value, $ipFallback);
 

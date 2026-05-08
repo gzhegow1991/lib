@@ -10,6 +10,8 @@ class ExceptionIterator
     /**
      * @param (\Throwable|ExceptInterface)[] $items
      * @param (\Throwable|ExceptInterface)[] $track
+     *
+     * @noinspection PhpUnnecessaryFullyQualifiedNameInspection
      */
     public static function new(array $items, array $track = []) : object
     {
@@ -18,6 +20,9 @@ class ExceptionIterator
             : new \Gzhegow\Lib\Exception\Iterator\PHP7\ExceptionIterator($items, $track);
     }
 
+    /**
+     * @noinspection PhpUnnecessaryFullyQualifiedNameInspection
+     */
     public static function is($instance) : bool
     {
         return false

@@ -580,10 +580,13 @@ class Lib
         $refTrace =& $refs[0];
 
         $refTrace = $refTrace ?? (new \Exception())->getTrace();
+
         $traceShift = $traceShift ?? 0;
         $withKeys = $withKeys ?? false;
 
-        if ( $traceShift < 0 ) $traceShift = 0;
+        if ( $traceShift < 0 ) {
+            $traceShift = 0;
+        }
 
         $eTrace = array_slice($refTrace, $traceShift);
 
@@ -614,10 +617,13 @@ class Lib
         $refTrace =& $refs[0];
 
         $refTrace = $refTrace ?? (new \Exception())->getTrace();
+
         $traceShift = $traceShift ?? 0;
         $withKeys = $withKeys ?? true;
 
-        if ( $traceShift < 0 ) $traceShift = 0;
+        if ( $traceShift < 0 ) {
+            $traceShift = 0;
+        }
 
         $eTrace = array_slice($refTrace, $traceShift);
 
@@ -650,10 +656,13 @@ class Lib
         $refTrace =& $refs[0];
 
         $refTrace = $refTrace ?? (new \Exception())->getTrace();
+
         $traceShift = $traceShift ?? 0;
         $withKeys = $withKeys ?? true;
 
-        if ( $traceShift < 0 ) $traceShift = 0;
+        if ( $traceShift < 0 ) {
+            $traceShift = 0;
+        }
 
         $eTrace = array_slice($refTrace, $traceShift);
 
@@ -875,7 +884,7 @@ class Lib
 
     public static function dp($var, ...$vars) : string
     {
-        $fileLine = Lib::file_line(1);
+        $fileLine = Lib::file_line([], 1);
 
         return Lib::debug()->dumper()->dp($fileLine, $var, ...$vars);
     }
@@ -891,7 +900,7 @@ class Lib
      */
     public static function d($var, ...$vars)
     {
-        $fileLine = Lib::file_line(1);
+        $fileLine = Lib::file_line([], 1);
 
         return Lib::debug()->dumper()->d($fileLine, $var, ...$vars);
     }
@@ -901,7 +910,7 @@ class Lib
      */
     public static function dd(...$vars)
     {
-        $fileLine = Lib::file_line(1);
+        $fileLine = Lib::file_line([], 1);
 
         return Lib::debug()->dumper()->dd($fileLine, ...$vars);
     }
@@ -911,7 +920,7 @@ class Lib
      */
     public static function ddd(?int $limit, $var, ...$vars)
     {
-        $fileLine = Lib::file_line(1);
+        $fileLine = Lib::file_line([], 1);
 
         return Lib::debug()->dumper()->ddd($fileLine, $limit, $var, ...$vars);
     }
@@ -938,7 +947,7 @@ class Lib
      */
     public function td(int $throttleMs, $var, ...$vars)
     {
-        $fileLine = Lib::file_line(1);
+        $fileLine = Lib::file_line([], 1);
 
         return Lib::debug()->dumper()->td($fileLine, $throttleMs, $var, ...$vars);
     }

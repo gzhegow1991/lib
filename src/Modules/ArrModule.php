@@ -60,279 +60,75 @@ class ArrModule
 
 
     /**
-     * @return Ret<int|string>|int|string
+     * @return Ret<array>|array
      */
-    public function type_key($fb, $key)
+    public function type_php_array($fb, $value)
     {
-        $theType = Lib::type();
-
-        if ( is_int($key) ) {
-            return Ret::ok($fb, $key);
-
-        } elseif ( is_string($key) ) {
-            return Ret::ok($fb, $key);
-
-        } else {
-            $ret = $theType->string($key);
-
-            if ( $ret->isOk([ &$keyString ]) ) {
-                return Ret::ok($fb, $keyString);
-            }
+        if ( is_array($value) ) {
+            return Ret::ok($fb, $value);
         }
 
         return Ret::throw(
             $fb,
-            [ 'The `key` should be valid array key', $key ],
+            [ 'The `value` should be array', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_php_array_empty($fb, $value)
+    {
+        if ( [] === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be array, empty', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_php_array_not_empty($fb, $value)
+    {
+        if ( is_array($value) && ([] !== $value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be array, not empty', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_any_not_php_array($fb, $value)
+    {
+        if ( ! is_array($value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should not be array', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
 
 
     /**
-     * @return Ret<mixed>|mixed
-     */
-    public function type_key_exists($fb, array $array, $key)
-    {
-        if ( isset($array[$key]) ) {
-            return Ret::ok($fb, $array[$key]);
-        }
-
-        if ( array_key_exists($key, $array) ) {
-            return Ret::ok($fb, $array[$key]);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `key` should be existing key in `array`', $key, $array ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-
-    /**
-     * @return Ret<mixed>|mixed
-     */
-    public function type_value_in_array($fb, array $array, $value, ?bool $strict = null)
-    {
-        $strict = $strict ?? false;
-
-        if ( ! in_array($value, $array, $strict) ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should exists in `array`', $value, $array ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        return Ret::ok($fb, $value);
-    }
-
-    /**
-     * @return Ret<int|string>|int|string
-     */
-    public function type_value_in_array_key($fb, array $array, $value, ?bool $strict = null)
-    {
-        $strict = $strict ?? false;
-
-        $key = array_search($value, $array, $strict);
-
-        if ( false === $key ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should exists in `array`', $value, $array ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        return Ret::ok($fb, $key);
-    }
-
-    /**
      * @return Ret<array>|array
      */
-    public function type_value_in_array_pos($fb, array $array, $value, ?bool $strict = null)
+    public function type_array($fb, $value, ?bool $isPlain = null)
     {
-        $strict = $strict ?? false;
-
-        $copy = array_values($array);
-
-        $pos = array_search($value, $copy, $strict);
-
-        if ( false === $pos ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should exists in `array`', $value, $array ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        return Ret::ok($fb, $pos);
-    }
-
-
-    /**
-     * @return Ret<array>|array
-     */
-    public function type_keys_exists($fb, array $array, $keys)
-    {
-        $keys = (array) $keys;
-
-        if ( [] === $keys ) {
-            throw new LogicException(
-                [ 'The `keys` should be array, non-empty', $keys ],
-            );
-        }
-
-        if ( [] === $array ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `keys` should exists in `array`', $keys, $array ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        foreach ( $keys as $key ) {
-            if ( isset($array[$key]) ) {
-                continue;
-            }
-
-            if ( array_key_exists($key, $array) ) {
-                continue;
-            }
-
-            return Ret::throw(
-                $fb,
-                [ 'The `keys` should exists in `array`', $key, $keys, $array ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        return Ret::ok($fb, $array);
-    }
-
-    /**
-     * @return Ret<array>|array
-     */
-    public function type_keys_not_exists($fb, array $array, $keys)
-    {
-        if ( [] === $array ) {
-            return Ret::ok($fb, $array);
-        }
-
-        $keys = (array) $keys;
-
-        if ( [] === $keys ) {
-            throw new LogicException(
-                [ 'The `keys` should be array, non-empty', $keys ],
-            );
-        }
-
-        foreach ( $keys as $key ) {
-            if ( isset($array[$key]) ) {
-                return Ret::throw(
-                    $fb,
-                    [ 'The `keys` should not exists in `array`', $key, $keys, $array ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-
-            if ( array_key_exists($key, $array) ) {
-                return Ret::throw(
-                    $fb,
-                    [ 'The `keys` should not exists in `array`', $key, $keys, $array ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-        }
-
-        return Ret::ok($fb, $array);
-    }
-
-
-    /**
-     * @return Ret<array>|array
-     */
-    public function type_values_in_array($fb, array $array, $values, ?bool $strict = null)
-    {
-        $strict = $strict ?? false;
-
-        $values = (array) $values;
-
-        if ( [] === $values ) {
-            throw new LogicException(
-                [ 'The `values` should be array, non-empty', $values ],
-            );
-        }
-
-        if ( [] === $array ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `values` should exists in `array`', $values, $array ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        foreach ( $values as $value ) {
-            if ( in_array($value, $values, $strict) ) {
-                continue;
-            }
-
-            return Ret::throw(
-                $fb,
-                [ 'The `values` should exists in `array`', $value, $values, $array, $strict ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        return Ret::ok($fb, $array);
-    }
-
-    /**
-     * @return Ret<array>|array
-     */
-    public function type_values_not_in_array($fb, array $array, $values, ?bool $strict = null)
-    {
-        $strict = $strict ?? false;
-
-        if ( [] === $array ) {
-            return Ret::ok($fb, $array);
-        }
-
-        $values = (array) $values;
-
-        if ( [] === $values ) {
-            throw new LogicException(
-                [ 'The `values` should be array, non-empty', $values ],
-            );
-        }
-
-        foreach ( $values as $value ) {
-            if ( in_array($value, $values, $strict) ) {
-                return Ret::throw(
-                    $fb,
-                    [ 'The `values` should not exists in `array`', $value, $values, $array, $strict ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-        }
-
-        return Ret::ok($fb, $array);
-    }
-
-
-    /**
-     * @return Ret<array>|array
-     */
-    public function type_array_plain($fb, $value, ?int $plainMaxDepth = null)
-    {
-        $plainMaxDepth = $plainMaxDepth ?? 1;
-
-        if ( $plainMaxDepth < 1 ) {
-            throw new LogicException(
-                [ 'The `maxDepth` should be greater than 1', $plainMaxDepth ],
-            );
-        }
-
         if ( ! is_array($value) ) {
             return Ret::throw(
                 $fb,
@@ -345,43 +141,21 @@ class ArrModule
             return Ret::ok($fb, $value);
         }
 
-        if ( 1 === $plainMaxDepth ) {
+        if ( null !== $isPlain ) {
             foreach ( $value as $v ) {
-                if ( is_array($v) ) {
+                if ( ($isPlain) && (is_array($v)) ) {
                     return Ret::throw(
                         $fb,
-                        [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
+                        [ 'The `value` should be array, plain', $value ],
                         [ __FILE__, __LINE__ ]
                     );
-                }
-            }
 
-        } else {
-            $depth = 0;
-
-            $queue = [
-                [ array_reverse($value), 1 ],
-            ];
-
-            while ( [] !== $queue ) {
-                [ $child, $level ] = array_pop($queue);
-
-                $depth = max($depth, $level);
-
-                foreach ( array_reverse($child) as $v ) {
-                    if ( is_array($v) ) {
-                        $levelNew = $level + 1;
-
-                        if ( $levelNew > $plainMaxDepth ) {
-                            return Ret::throw(
-                                $fb,
-                                [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
-                                [ __FILE__, __LINE__ ]
-                            );
-                        }
-
-                        $queue[] = [ $v, $levelNew ];
-                    }
+                } elseif ( (! $isPlain) && (! is_array($v)) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be array, non-plain', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
                 }
             }
         }
@@ -389,246 +163,34 @@ class ArrModule
         return Ret::ok($fb, $value);
     }
 
-
     /**
      * @return Ret<array>|array
      */
-    public function type_list($fb, $value, ?int $plainMaxDepth = null)
+    public function type_array_recursive($fb, $value, ?int $maxDepth = null)
     {
-        $hasMaxDepth = (null !== $plainMaxDepth);
+        $hasMaxDepth = (null !== $maxDepth);
 
         if ( $hasMaxDepth ) {
-            if ( $plainMaxDepth < 1 ) {
+            if ( $maxDepth < 1 ) {
                 throw new LogicException(
-                    [ 'The `maxDepth` should be greater than 1', $plainMaxDepth ],
+                    [ 'The `maxDepth` should be greater than 1', $maxDepth ],
                 );
             }
         }
 
-        if ( ! is_array($value) ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should be array', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
+        if ( 1 === $maxDepth ) {
+            $ret = $this->type_array($fb, $value, true);
 
-        if ( [] === $value ) {
-            return Ret::ok($fb, $value);
-        }
-
-        if ( $hasMaxDepth ) {
-            if ( 1 === $plainMaxDepth ) {
-                foreach ( $value as $key => $v ) {
-                    if ( is_string($key) ) {
-                        return Ret::throw(
-                            $fb,
-                            [ 'The `value` should be array without string keys', $value ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                    if ( is_array($v) ) {
-                        return Ret::throw(
-                            $fb,
-                            [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-                }
-
-            } else {
-                $depth = 0;
-
-                $queue = [
-                    [ array_reverse($value, true), 1 ],
-                ];
-
-                while ( [] !== $queue ) {
-                    [ $child, $level ] = array_pop($queue);
-
-                    $depth = max($depth, $level);
-
-                    foreach ( array_reverse($child, true) as $key => $v ) {
-                        if ( is_string($key) ) {
-                            return Ret::throw(
-                                $fb,
-                                [ 'The `value` should be array without string keys', $value ],
-                                [ __FILE__, __LINE__ ]
-                            );
-                        }
-
-                        if ( is_array($v) ) {
-                            $levelNew = $level + 1;
-
-                            if ( $levelNew > $plainMaxDepth ) {
-                                return Ret::throw(
-                                    $fb,
-                                    [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
-                                    [ __FILE__, __LINE__ ]
-                                );
-                            }
-
-                            $queue[] = [ $v, $levelNew ];
-                        }
-                    }
-                }
-            }
-
-        } else {
-            foreach ( array_keys($value) as $key ) {
-                if ( is_string($key) ) {
-                    return Ret::throw(
-                        $fb,
-                        [ 'The `value` should be array without string keys', $value ],
-                        [ __FILE__, __LINE__ ]
-                    );
-                }
-            }
-        }
-
-        return Ret::ok($fb, $value);
-    }
-
-    /**
-     * @return Ret<array>|array
-     */
-    public function type_list_sorted($fb, $value, ?int $plainMaxDepth = null)
-    {
-        $hasMaxDepth = (null !== $plainMaxDepth);
-
-        if ( ! is_array($value) ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should be array', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        if ( [] === $value ) {
-            return Ret::ok($fb, $value);
-        }
-
-        $prev = -1;
-
-        if ( $hasMaxDepth ) {
-            if ( $plainMaxDepth < 1 ) {
+            if ( ! $ret->isOk([ &$valueList ]) ) {
                 return Ret::throw(
                     $fb,
-                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
+                    $ret,
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if ( 1 === $plainMaxDepth ) {
-                foreach ( $value as $key => $v ) {
-                    if ( is_string($key) ) {
-                        return Ret::throw(
-                            $fb,
-                            [ 'The `value` should be array without string keys', $value ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                    if ( ($key - $prev) !== 1 ) {
-                        return Ret::throw(
-                            $fb,
-                            [ 'The `value` should be sorted array', $value ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                    if ( is_array($v) ) {
-                        return Ret::throw(
-                            $fb,
-                            [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-                }
-
-            } else {
-                $depth = 0;
-
-                $queue = [
-                    [ array_reverse($value, true), 1 ],
-                ];
-
-                while ( [] !== $queue ) {
-                    [ $child, $level ] = array_pop($queue);
-
-                    $depth = max($depth, $level);
-
-                    $prev = -1;
-
-                    foreach ( array_reverse($child, true) as $key => $v ) {
-                        if ( is_string($key) ) {
-                            return Ret::throw(
-                                $fb,
-                                [ 'The `value` should be array without string keys', $value ],
-                                [ __FILE__, __LINE__ ]
-                            );
-                        }
-
-                        if ( ($key - $prev) !== 1 ) {
-                            return Ret::throw(
-                                $fb,
-                                [ 'The `value` should be sorted array', $value ],
-                                [ __FILE__, __LINE__ ]
-                            );
-                        }
-
-                        if ( is_array($v) ) {
-                            $levelNew = $level + 1;
-
-                            if ( $levelNew > $plainMaxDepth ) {
-                                return Ret::throw(
-                                    $fb,
-                                    [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
-                                    [ __FILE__, __LINE__ ]
-                                );
-                            }
-
-                            $queue[] = [ $v, $levelNew ];
-                        }
-
-                        $prev = $key;
-                    }
-                }
-            }
-
-        } else {
-            foreach ( array_keys($value) as $key ) {
-                if ( is_string($key) ) {
-                    return Ret::throw(
-                        $fb,
-                        [ 'The `value` should be array without string keys', $value ],
-                        [ __FILE__, __LINE__ ]
-                    );
-                }
-
-                if ( ($key - $prev) !== 1 ) {
-                    return Ret::throw(
-                        $fb,
-                        [ 'The `value` should be sorted array', $value ],
-                        [ __FILE__, __LINE__ ]
-                    );
-                }
-
-                $prev = $key;
-            }
+            return Ret::ok($fb, $valueList);
         }
-
-        return Ret::ok($fb, $value);
-    }
-
-
-    /**
-     * @return Ret<array>|array
-     */
-    public function type_dict($fb, $value, ?int $plainMaxDepth = null)
-    {
-        $hasMaxDepth = (null !== $plainMaxDepth);
 
         if ( ! is_array($value) ) {
             return Ret::throw(
@@ -642,80 +204,28 @@ class ArrModule
             return Ret::ok($fb, $value);
         }
 
-        if ( $hasMaxDepth ) {
-            if ( $plainMaxDepth < 1 ) {
-                return Ret::throw(
-                    $fb,
-                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
+        $queue = [
+            [ array_reverse($value), 1 ],
+        ];
 
-            if ( 1 === $plainMaxDepth ) {
-                foreach ( $value as $key => $v ) {
-                    if ( is_int($key) ) {
-                        return Ret::throw(
-                            $fb,
-                            [ 'The `value` should be array without int keys', $value ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
+        while ( [] !== $queue ) {
+            [ $child, $level ] = array_pop($queue);
 
-                    if ( is_array($v) ) {
-                        return Ret::throw(
-                            $fb,
-                            [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-                }
+            foreach ( array_reverse($child) as $v ) {
+                if ( is_array($v) ) {
+                    $levelNew = $level + 1;
 
-            } else {
-                $depth = 0;
-
-                $queue = [
-                    [ array_reverse($value, true), 1 ],
-                ];
-
-                while ( [] !== $queue ) {
-                    [ $child, $level ] = array_pop($queue);
-
-                    $depth = max($depth, $level);
-
-                    foreach ( array_reverse($child, true) as $key => $v ) {
-                        if ( is_int($key) ) {
+                    if ( $hasMaxDepth ) {
+                        if ( $levelNew > $maxDepth ) {
                             return Ret::throw(
                                 $fb,
-                                [ 'The `value` should be array without int keys', $value ],
+                                [ 'The `value` should be array, max depth is passed as `maxDepth`', $value, $maxDepth ],
                                 [ __FILE__, __LINE__ ]
                             );
                         }
-
-                        if ( is_array($v) ) {
-                            $levelNew = $level + 1;
-
-                            if ( $levelNew > $plainMaxDepth ) {
-                                return Ret::throw(
-                                    $fb,
-                                    [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
-                                    [ __FILE__, __LINE__ ]
-                                );
-                            }
-
-                            $queue[] = [ $v, $levelNew ];
-                        }
                     }
-                }
-            }
 
-        } else {
-            foreach ( array_keys($value) as $key ) {
-                if ( is_int($key) ) {
-                    return Ret::throw(
-                        $fb,
-                        [ 'The `value` should be array without int keys', $value ],
-                        [ __FILE__, __LINE__ ]
-                    );
+                    $queue[] = [ $v, $levelNew ];
                 }
             }
         }
@@ -723,21 +233,20 @@ class ArrModule
         return Ret::ok($fb, $value);
     }
 
+
     /**
-     * @param callable $fnSortCmp
+     * @param callable $fnSortKeysCmp
      *
      * @return Ret<array>|array
      */
-    public function type_dict_sorted($fb, $value, ?int $plainMaxDepth = null, $fnSortCmp = null)
+    public function type_array_sorted($fb, $value, ?bool $isPlain = null, $fnSortKeysCmp = null)
     {
-        $hasMaxDepth = (null !== $plainMaxDepth);
-
-        $fnSortCmp = $fnSortCmp ?? 'strcmp';
+        $fnSortKeysCmp = $fnSortKeysCmp ?? 'strcmp';
 
         if ( ! is_array($value) ) {
             return Ret::throw(
                 $fb,
-                [ 'The `value` should be array', $value ],
+                [ 'The `value` should be dict, array without integer keys, sorted', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
@@ -748,131 +257,106 @@ class ArrModule
 
         $prev = '';
 
-        if ( $hasMaxDepth ) {
-            if ( $plainMaxDepth < 1 ) {
+        foreach ( $value as $key => $v ) {
+            $cmp = call_user_func($fnSortKeysCmp, $prev, $key);
+
+            if ( ! is_int($cmp) ) {
+                throw new RuntimeException(
+                    [ 'The `fnSortCmp` should return integer', $fnSortKeysCmp ],
+                );
+            }
+
+            if ( $cmp < 0 ) {
                 return Ret::throw(
                     $fb,
-                    [ 'The `plainMaxDepth` should be greater than 1', $plainMaxDepth ],
+                    [ 'The `value` should be dict, array without integer keys, sorted', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            if ( 1 === $plainMaxDepth ) {
-                foreach ( $value as $key => $v ) {
-                    if ( is_int($key) ) {
-                        return Ret::throw(
-                            $fb,
-                            [ 'The `value` should be array without int keys', $value ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                    if ( is_array($v) ) {
-                        return Ret::throw(
-                            $fb,
-                            [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                    $cmp = call_user_func($fnSortCmp, $prev, $key);
-
-                    if ( ! is_int($cmp) ) {
-                        return Ret::throw(
-                            $fb,
-                            [ 'The `fnSortCmp` should return integer', $fnSortCmp ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                    if ( $cmp < 0 ) {
-                        return Ret::throw(
-                            $fb,
-                            [ 'The `value` should be sorted array', $value ],
-                            [ __FILE__, __LINE__ ]
-                        );
-                    }
-
-                    $prev = $key;
-                }
-
-            } else {
-                $depth = 0;
-
-                $queue = [
-                    [ array_reverse($value, true), 1 ],
-                ];
-
-                while ( [] !== $queue ) {
-                    [ $child, $level ] = array_pop($queue);
-
-                    $depth = max($depth, $level);
-
-                    $prev = -1;
-
-                    foreach ( array_reverse($child, true) as $key => $v ) {
-                        if ( is_int($key) ) {
-                            return Ret::throw(
-                                $fb,
-                                [ 'The `value` should be array without int keys', $value ],
-                                [ __FILE__, __LINE__ ]
-                            );
-                        }
-
-                        $cmp = call_user_func($fnSortCmp, $prev, $key);
-
-                        if ( ! is_int($cmp) ) {
-                            return Ret::throw(
-                                $fb,
-                                [ 'The `fnSortCmp` should return integer', $fnSortCmp ],
-                                [ __FILE__, __LINE__ ]
-                            );
-                        }
-
-                        if ( $cmp < 0 ) {
-                            return Ret::throw(
-                                $fb,
-                                [ 'The `value` should be sorted array', $value ],
-                                [ __FILE__, __LINE__ ]
-                            );
-                        }
-
-                        if ( is_array($v) ) {
-                            $levelNew = $level + 1;
-
-                            if ( $levelNew > $plainMaxDepth ) {
-                                return Ret::throw(
-                                    $fb,
-                                    [ 'The `value` should be array of depth that is passed to `plainMaxDepth`', $value, $plainMaxDepth ],
-                                    [ __FILE__, __LINE__ ]
-                                );
-                            }
-
-                            $queue[] = [ $v, $levelNew ];
-                        }
-
-                        $prev = $key;
-                    }
-                }
-            }
-
-        } else {
-            foreach ( array_keys($value) as $key ) {
-                if ( is_int($key) ) {
+            if ( null !== $isPlain ) {
+                if ( ($isPlain) && (is_array($v)) ) {
                     return Ret::throw(
                         $fb,
-                        [ 'The `value` should be array without int keys', $value ],
+                        [ 'The `value` should be dict, array without integer keys, sorted, plain', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+
+                } elseif ( (! $isPlain) && (! is_array($v)) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be dict, array without integer keys, sorted, non-plain', $value ],
                         [ __FILE__, __LINE__ ]
                     );
                 }
+            }
 
-                $cmp = call_user_func($fnSortCmp, $prev, $key);
+            $prev = $key;
+        }
+
+        return Ret::ok($fb, $value);
+    }
+
+    /**
+     * @param callable $fnSortKeysCmp
+     *
+     * @return Ret<array>|array
+     */
+    public function type_array_sorted_recursive($fb, $value, ?int $maxDepth = null, $fnSortKeysCmp = null)
+    {
+        $fnSortKeysCmp = $fnSortKeysCmp ?? 'strcmp';
+
+        $hasMaxDepth = (null !== $maxDepth);
+
+        if ( $hasMaxDepth ) {
+            if ( $maxDepth < 1 ) {
+                throw new LogicException(
+                    [ 'The `maxDepth` should be greater than 1', $maxDepth ],
+                );
+            }
+        }
+
+        if ( 1 === $maxDepth ) {
+            $ret = $this->type_array_sorted($fb, $value, true, $fnSortKeysCmp);
+
+            if ( ! $ret->isOk([ &$valueList ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            return Ret::ok($fb, $valueList);
+        }
+
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be dict, array without integer keys, sorted', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( [] === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        $queue = [
+            [ array_reverse($value, true), 1 ],
+        ];
+
+        while ( [] !== $queue ) {
+            [ $child, $level ] = array_pop($queue);
+
+            $prev = '';
+
+            foreach ( array_reverse($child, true) as $key => $v ) {
+                $cmp = call_user_func($fnSortKeysCmp, $prev, $key);
 
                 if ( ! is_int($cmp) ) {
-                    return Ret::throw(
-                        $fb,
-                        [ 'The `fnSortCmp` should return integer', $fnSortCmp ],
-                        [ __FILE__, __LINE__ ]
+                    throw new RuntimeException(
+                        [ 'The `fnSortCmp` should return integer', $fnSortKeysCmp ],
                     );
                 }
 
@@ -884,168 +368,27 @@ class ArrModule
                     );
                 }
 
+                if ( is_array($v) ) {
+                    $levelNew = $level + 1;
+
+                    if ( $hasMaxDepth ) {
+                        if ( $levelNew > $maxDepth ) {
+                            return Ret::throw(
+                                $fb,
+                                [ 'The `value` should be dict, array without integer keys, sorted, max depth is passed as `maxDepth`', $value, $maxDepth ],
+                                [ __FILE__, __LINE__ ]
+                            );
+                        }
+                    }
+
+                    $queue[] = [ $v, $levelNew ];
+                }
+
                 $prev = $key;
             }
         }
 
         return Ret::ok($fb, $value);
-    }
-
-
-    /**
-     * > проверить, является ли значение таблицей - массивом массивов
-     *
-     * @return Ret<array>|array
-     */
-    public function type_table($fb, $value)
-    {
-        if ( ! is_array($value) ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should be array', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        for ( $i = 0; $i < count($value); $i++ ) {
-            if ( ! is_array($value[$i]) ) {
-                return Ret::throw(
-                    $fb,
-                    [ 'The `value` should be array of arrays', $value ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-        }
-
-        return Ret::ok(null, $value);
-    }
-
-
-    /**
-     * > проверить, является ли значение матрицей - массивом второго уровня, все ключи которого цифровые
-     *
-     * @return Ret<array>|array
-     */
-    public function type_matrix($fb, $value)
-    {
-        if ( ! is_array($value) ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should be array', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        for ( $i = 0; $i < count($value); $i++ ) {
-            $ret = $this->type_list(null, $value[$i]);
-
-            if ( ! $ret->isOk() ) {
-                return Ret::throw(
-                    $fb,
-                    [ 'The `value` should be array of lists', $value ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-        }
-
-        return Ret::ok($fb, $value);
-    }
-
-    /**
-     * @return Ret<array>|array
-     */
-    public function type_matrix_sorted($fb, $value)
-    {
-        if ( ! is_array($value) ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should be array', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        for ( $i = 0; $i < count($value); $i++ ) {
-            $ret = $this->type_list_sorted(null, $value[$i]);
-
-            if ( ! $ret->isOk() ) {
-                return Ret::throw(
-                    $fb,
-                    [ 'The `value` should be array of sorted lists', $value ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
-        }
-
-        return Ret::ok($fb, $value);
-    }
-
-
-    /**
-     * @return Ret<ArrPath>|ArrPath
-     */
-    public function type_arrpath($fb, $value)
-    {
-        if ( $value instanceof ArrPath ) {
-            return Ret::ok($fb, $value);
-        }
-
-        try {
-            $array = $this->arrpath($value);
-        }
-        catch ( \Throwable $e ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should be valid arrpath', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        $ret = ArrPath::fromValidArray($array);
-
-        if ( ! $ret->isOk([ &$arrpathObject ]) ) {
-            return Ret::throw(
-                $fb,
-                $ret,
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        return Ret::ok($fb, $arrpathObject);
-    }
-
-    /**
-     * @return Ret<ArrPath>|ArrPath
-     */
-    public function type_arrpath_dot($fb, $value, ?string $dot = '.')
-    {
-        if ( $value instanceof ArrPath ) {
-            return Ret::ok($fb, $value);
-        }
-
-        try {
-            $array = (null === $dot)
-                ? $this->arrpath($dot, $value)
-                : $this->arrpath_dot($dot, $value);
-        }
-        catch ( \Throwable $e ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should be valid arrpath_dot', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        $ret = ArrPath::fromValidArray($array);
-
-        if ( ! $ret->isOk([ &$arrpathObject ]) ) {
-            return Ret::throw(
-                $fb,
-                $ret,
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        return Ret::ok($fb, $arrpathObject);
     }
 
 
@@ -1306,6 +649,1249 @@ class ArrModule
         }
 
         return Ret::ok($fb, $value);
+    }
+
+
+    /**
+     * @return Ret<int|string>|int|string
+     */
+    public function type_array_key($fb, $key)
+    {
+        $theType = Lib::type();
+
+        if ( is_int($key) ) {
+            return Ret::ok($fb, $key);
+
+        } elseif ( is_string($key) ) {
+            return Ret::ok($fb, $key);
+
+        } else {
+            $ret = $theType->string($key);
+
+            if ( $ret->isOk([ &$keyString ]) ) {
+                return Ret::ok($fb, $keyString);
+            }
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `key` should be valid array key', $key ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_array_key_exists($fb, array $array, $key)
+    {
+        if ( isset($array[$key]) ) {
+            return Ret::ok($fb, $array[$key]);
+        }
+
+        if ( array_key_exists($key, $array) ) {
+            return Ret::ok($fb, $array[$key]);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `key` should be existing key in `array`', $key, $array ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_value_in_array($fb, array $array, $value, ?bool $isStrict = null)
+    {
+        $isStrict = $isStrict ?? false;
+
+        if ( ! in_array($value, $array, $isStrict) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should exists in `array`', $value, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $value);
+    }
+
+    /**
+     * @return Ret<int|string>|int|string
+     */
+    public function type_value_in_array_key($fb, array $array, $value, ?bool $isStrict = null)
+    {
+        $isStrict = $isStrict ?? false;
+
+        $key = array_search($value, $array, $isStrict);
+
+        if ( false === $key ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should exists in `array`', $value, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $key);
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_value_in_array_pos($fb, array $array, $value, ?bool $isStrict = null)
+    {
+        $isStrict = $isStrict ?? false;
+
+        $copy = array_values($array);
+
+        $pos = array_search($value, $copy, $isStrict);
+
+        if ( false === $pos ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should exists in `array`', $value, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $pos);
+    }
+
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_array_keys_exists($fb, array $array, $keys)
+    {
+        $keys = (array) $keys;
+
+        if ( [] === $keys ) {
+            throw new LogicException(
+                [ 'The `keys` should be array, non-empty', $keys ],
+            );
+        }
+
+        if ( [] === $array ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `keys` should exists in `array`', $keys, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        foreach ( $keys as $key ) {
+            if ( isset($array[$key]) ) {
+                continue;
+            }
+
+            if ( array_key_exists($key, $array) ) {
+                continue;
+            }
+
+            return Ret::throw(
+                $fb,
+                [ 'The `keys` should exists in `array`', $key, $keys, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $array);
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_array_keys_not_exists($fb, array $array, $keys)
+    {
+        if ( [] === $array ) {
+            return Ret::ok($fb, $array);
+        }
+
+        $keys = (array) $keys;
+
+        if ( [] === $keys ) {
+            throw new LogicException(
+                [ 'The `keys` should be array, non-empty', $keys ],
+            );
+        }
+
+        foreach ( $keys as $key ) {
+            if ( isset($array[$key]) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `keys` should not exists in `array`', $key, $keys, $array ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            if ( array_key_exists($key, $array) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `keys` should not exists in `array`', $key, $keys, $array ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        return Ret::ok($fb, $array);
+    }
+
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_values_in_array($fb, array $array, $values, ?bool $strict = null)
+    {
+        $strict = $strict ?? false;
+
+        $values = (array) $values;
+
+        if ( [] === $values ) {
+            throw new LogicException(
+                [ 'The `values` should be array, non-empty', $values ],
+            );
+        }
+
+        if ( [] === $array ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `values` should exists in `array`', $values, $array ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        foreach ( $values as $value ) {
+            if ( in_array($value, $values, $strict) ) {
+                continue;
+            }
+
+            return Ret::throw(
+                $fb,
+                [ 'The `values` should exists in `array`', $value, $values, $array, $strict ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $array);
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_values_not_in_array($fb, array $array, $values, ?bool $strict = null)
+    {
+        $strict = $strict ?? false;
+
+        if ( [] === $array ) {
+            return Ret::ok($fb, $array);
+        }
+
+        $values = (array) $values;
+
+        if ( [] === $values ) {
+            throw new LogicException(
+                [ 'The `values` should be array, non-empty', $values ],
+            );
+        }
+
+        foreach ( $values as $value ) {
+            if ( in_array($value, $values, $strict) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `values` should not exists in `array`', $value, $values, $array, $strict ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        return Ret::ok($fb, $array);
+    }
+
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_list($fb, $value, ?bool $isPlain = null)
+    {
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be list, array without string keys', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( [] === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        foreach ( $value as $key => $v ) {
+            if ( is_string($key) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should be list, array without string keys', $key, $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            if ( null !== $isPlain ) {
+                if ( ($isPlain) && (is_array($v)) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be list, array without string keys, plain', $key, $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+
+                } elseif ( (! $isPlain) && (! is_array($v)) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be list, array without string keys, non-plain', $key, $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+            }
+        }
+
+        return Ret::ok($fb, $value);
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_list_recursive($fb, $value, ?int $maxDepth = null)
+    {
+        $hasMaxDepth = (null !== $maxDepth);
+
+        if ( $hasMaxDepth ) {
+            if ( $maxDepth < 1 ) {
+                throw new LogicException(
+                    [ 'The `maxDepth` should be greater than 1', $maxDepth ],
+                );
+            }
+        }
+
+        if ( 1 === $maxDepth ) {
+            $ret = $this->type_list($fb, $value, true);
+
+            if ( ! $ret->isOk([ &$valueList ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            return Ret::ok($fb, $valueList);
+        }
+
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be list, array without string keys', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( [] === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        $depth = 0;
+
+        $queue = [
+            [ array_reverse($value, true), 1 ],
+        ];
+
+        while ( [] !== $queue ) {
+            [ $child, $level ] = array_pop($queue);
+
+            if ( $level > $depth ) {
+                $depth = $level;
+            }
+
+            foreach ( array_reverse($child, true) as $key => $v ) {
+                if ( is_string($key) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be list, array without string keys', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+                if ( is_array($v) ) {
+                    $levelNew = $level + 1;
+
+                    if ( $hasMaxDepth ) {
+                        if ( $levelNew > $maxDepth ) {
+                            return Ret::throw(
+                                $fb,
+                                [ 'The `value` should be list, array without string keys, max depth is passed as `maxDepth`', $value, $maxDepth ],
+                                [ __FILE__, __LINE__ ]
+                            );
+                        }
+                    }
+
+                    $queue[] = [ $v, $levelNew ];
+                }
+            }
+        }
+
+        return Ret::ok($fb, $value);
+    }
+
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_list_sorted($fb, $value, ?bool $isPlain = null)
+    {
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be list, array without string keys, sorted', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( [] === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        $prev = null;
+
+        foreach ( $value as $key => $v ) {
+            if ( is_string($key) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should be list, array without string keys, sorted', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            if ( null !== $prev ) {
+                if ( ($key - $prev) !== 1 ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be list, array without string keys, sorted', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+            }
+
+            if ( null !== $isPlain ) {
+                if ( ($isPlain) && (is_array($v)) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be list, array without string keys, plain, sorted', $key, $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+
+                } elseif ( (! $isPlain) && (! is_array($v)) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be list, array without string keys, non-plain, sorted', $key, $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+            }
+
+            $prev = $key;
+        }
+
+        return Ret::ok($fb, $value);
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_list_sorted_recursive($fb, $value, ?int $maxDepth = null)
+    {
+        $hasMaxDepth = (null !== $maxDepth);
+
+        if ( $hasMaxDepth ) {
+            if ( $maxDepth < 1 ) {
+                throw new LogicException(
+                    [ 'The `maxDepth` should be greater than 1', $maxDepth ],
+                );
+            }
+        }
+
+        if ( 1 === $maxDepth ) {
+            $ret = $this->type_list_sorted($fb, $value, true);
+
+            if ( ! $ret->isOk([ &$valueList ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            return Ret::ok($fb, $valueList);
+        }
+
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be list, array without string keys, sorted', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( [] === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        $queue = [
+            [ array_reverse($value, true), 1 ],
+        ];
+
+        while ( [] !== $queue ) {
+            [ $child, $level ] = array_pop($queue);
+
+            $prev = null;
+
+            foreach ( array_reverse($child, true) as $key => $v ) {
+                if ( is_string($key) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be list, array without string keys, sorted', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+                if ( null !== $prev ) {
+                    if ( ($key - $prev) !== 1 ) {
+                        return Ret::throw(
+                            $fb,
+                            [ 'The `value` should be list, array without string keys, sorted', $value ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
+                }
+
+                if ( is_array($v) ) {
+                    $levelNew = $level + 1;
+
+                    if ( $hasMaxDepth ) {
+                        if ( $levelNew > $maxDepth ) {
+                            return Ret::throw(
+                                $fb,
+                                [ 'The `value` should be list, array without string keys, sorted, max depth is passed as `maxDepth`', $value, $maxDepth ],
+                                [ __FILE__, __LINE__ ]
+                            );
+                        }
+                    }
+
+                    $queue[] = [ $v, $levelNew ];
+                }
+
+                $prev = $key;
+            }
+        }
+
+        return Ret::ok($fb, $value);
+    }
+
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_dict($fb, $value, ?bool $isPlain = null)
+    {
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be dict, array without integer keys', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( [] === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        foreach ( $value as $key => $v ) {
+            if ( is_int($key) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should be dict, array without integer keys', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            if ( null !== $isPlain ) {
+                if ( ($isPlain) && (is_array($v)) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be dict, array without integer keys, plain', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+
+                } elseif ( (! $isPlain) && (! is_array($v)) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be dict, array without integer keys, plain', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+            }
+        }
+
+        return Ret::ok($fb, $value);
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_dict_recursive($fb, $value, ?int $maxDepth = null)
+    {
+        $hasMaxDepth = (null !== $maxDepth);
+
+        if ( $hasMaxDepth ) {
+            if ( $maxDepth < 1 ) {
+                throw new LogicException(
+                    [ 'The `maxDepth` should be greater than 1', $maxDepth ],
+                );
+            }
+        }
+
+        if ( 1 === $maxDepth ) {
+            $ret = $this->type_dict($fb, $value, true);
+
+            if ( ! $ret->isOk([ &$valueList ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            return Ret::ok($fb, $valueList);
+        }
+
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be dict, array without integer keys', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( [] === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        $queue = [
+            [ array_reverse($value, true), 1 ],
+        ];
+
+        while ( [] !== $queue ) {
+            [ $child, $level ] = array_pop($queue);
+
+            foreach ( array_reverse($child, true) as $key => $v ) {
+                if ( is_int($key) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be dict, array without integer keys', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+                if ( is_array($v) ) {
+                    $levelNew = $level + 1;
+
+                    if ( $hasMaxDepth ) {
+                        if ( $levelNew > $maxDepth ) {
+                            return Ret::throw(
+                                $fb,
+                                [ 'The `value` should be dict, array without integer keys, max depth is passed as `maxDepth`', $value, $maxDepth ],
+                                [ __FILE__, __LINE__ ]
+                            );
+                        }
+                    }
+
+                    $queue[] = [ $v, $levelNew ];
+                }
+            }
+        }
+
+        return Ret::ok($fb, $value);
+    }
+
+
+    /**
+     * @param callable $fnSortKeysCmp
+     *
+     * @return Ret<array>|array
+     */
+    public function type_dict_sorted($fb, $value, ?bool $isPlain = null, $fnSortKeysCmp = null)
+    {
+        $fnSortKeysCmp = $fnSortKeysCmp ?? 'strcmp';
+
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be dict, array without integer keys, sorted', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( [] === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        $prev = '';
+
+        foreach ( $value as $key => $v ) {
+            if ( is_int($key) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should be dict, array without integer keys, sorted', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $cmp = call_user_func($fnSortKeysCmp, $prev, $key);
+
+            if ( ! is_int($cmp) ) {
+                throw new RuntimeException(
+                    [ 'The `fnSortCmp` should return integer', $fnSortKeysCmp ],
+                );
+            }
+
+            if ( $cmp < 0 ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should be dict, array without integer keys, sorted', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            if ( null !== $isPlain ) {
+                if ( ($isPlain) && (is_array($v)) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be dict, array without integer keys, sorted, plain', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+
+                } elseif ( (! $isPlain) && (! is_array($v)) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be dict, array without integer keys, sorted, non-plain', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+            }
+
+            $prev = $key;
+        }
+
+        return Ret::ok($fb, $value);
+    }
+
+    /**
+     * @param callable $fnSortKeysCmp
+     *
+     * @return Ret<array>|array
+     */
+    public function type_dict_sorted_recursive($fb, $value, ?int $maxDepth = null, $fnSortKeysCmp = null)
+    {
+        $fnSortKeysCmp = $fnSortKeysCmp ?? 'strcmp';
+
+        $hasMaxDepth = (null !== $maxDepth);
+
+        if ( $hasMaxDepth ) {
+            if ( $maxDepth < 1 ) {
+                throw new LogicException(
+                    [ 'The `maxDepth` should be greater than 1', $maxDepth ],
+                );
+            }
+        }
+
+        if ( 1 === $maxDepth ) {
+            $ret = $this->type_dict_sorted($fb, $value, true, $fnSortKeysCmp);
+
+            if ( ! $ret->isOk([ &$valueList ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            return Ret::ok($fb, $valueList);
+        }
+
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be dict, array without integer keys, sorted', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( [] === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        $queue = [
+            [ array_reverse($value, true), 1 ],
+        ];
+
+        while ( [] !== $queue ) {
+            [ $child, $level ] = array_pop($queue);
+
+            $prev = '';
+
+            foreach ( array_reverse($child, true) as $key => $v ) {
+                if ( is_int($key) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be dict, array without integer keys, sorted', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+                $cmp = call_user_func($fnSortKeysCmp, $prev, $key);
+
+                if ( ! is_int($cmp) ) {
+                    throw new RuntimeException(
+                        [ 'The `fnSortCmp` should return integer', $fnSortKeysCmp ],
+                    );
+                }
+
+                if ( $cmp < 0 ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be sorted array', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+                if ( is_array($v) ) {
+                    $levelNew = $level + 1;
+
+                    if ( $hasMaxDepth ) {
+                        if ( $levelNew > $maxDepth ) {
+                            return Ret::throw(
+                                $fb,
+                                [ 'The `value` should be dict, array without integer keys, sorted, max depth is passed as `maxDepth`', $value, $maxDepth ],
+                                [ __FILE__, __LINE__ ]
+                            );
+                        }
+                    }
+
+                    $queue[] = [ $v, $levelNew ];
+                }
+
+                $prev = $key;
+            }
+        }
+
+        return Ret::ok($fb, $value);
+    }
+
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_table($fb, $value, ?int $isListOrDict = null, ?bool $isChildrenPlain = null)
+    {
+        $isListOrDict = $isListOrDict ?? 0;
+
+        $isListOrDict = max(-1, min($isListOrDict, 1));
+
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be table, array of arrays', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $lenRows = count($value);
+
+        for ( $i = 0; $i < $lenRows; $i++ ) {
+            if ( ! array_key_exists($i, $value) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should be table, array of arrays', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $v = $value[$i];
+
+            $ret = null;
+
+            if ( -1 === $isListOrDict ) {
+                $ret = $this->type_list(null, $v, $isChildrenPlain);
+
+            } elseif ( 0 === $isListOrDict ) {
+                $ret = $this->type_array(null, $v, $isChildrenPlain);
+
+            } elseif ( 1 === $isListOrDict ) {
+                $ret = $this->type_dict(null, $v, $isChildrenPlain);
+
+            }
+
+            if ( ! $ret ) {
+                throw new RuntimeException(
+                    [ 'The `ret` should be instance of: ' . Ret::class, $ret ],
+                );
+            }
+
+            if ( ! $ret->isOk() ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should be table, array of arrays', $v, $i, $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        return Ret::ok(null, $value);
+    }
+
+    /**
+     * @param callable $fnSortKeysCmp
+     *
+     * @return Ret<array>|array
+     */
+    public function type_table_sorted($fb, $value, ?int $isListOrDict = null, ?bool $isChildrenPlain = null, $fnSortKeysCmp = null)
+    {
+        $isListOrDict = $isListOrDict ?? 0;
+        $fnSortKeysCmp = $fnSortKeysCmp ?? 'strcmp';
+
+        $isListOrDict = max(-1, min($isListOrDict, 1));
+
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be table, array of arrays', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $lenRows = count($value);
+
+        for ( $i = 0; $i < $lenRows; $i++ ) {
+            if ( ! array_key_exists($i, $value) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should be table, array of arrays', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $v = $value[$i];
+
+            $ret = null;
+
+            if ( -1 === $isListOrDict ) {
+                $ret = $this->type_list_sorted(null, $v, $isChildrenPlain);
+
+            } elseif ( 0 === $isListOrDict ) {
+                $ret = $this->type_array_sorted(null, $v, $isChildrenPlain, $fnSortKeysCmp);
+
+            } elseif ( 1 === $isListOrDict ) {
+                $ret = $this->type_dict_sorted(null, $v, $isChildrenPlain, $fnSortKeysCmp);
+
+            }
+
+            if ( ! $ret ) {
+                throw new RuntimeException(
+                    [ 'The `ret` should be instance of: ' . Ret::class, $ret ],
+                );
+            }
+
+            if ( ! $ret->isOk() ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should be table, array of arrays', $v, $i, $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        return Ret::ok(null, $value);
+    }
+
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_matrix($fb, $value, ?bool $isChildrenPlain = null)
+    {
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be array', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $copy = [];
+
+        $lenX = null;
+        $lenY = count($value);
+
+        for ( $i = 0; $i < $lenY; $i++ ) {
+            if ( ! array_key_exists($i, $value) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should be matrix, list of lists', $i, $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $v = $value[$i];
+
+            if ( ! is_array($v) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should be matrix, list of lists', $i, $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            $lenXCurrent = count($v);
+            if ( null === $lenX ) {
+                $lenX = $lenXCurrent;
+
+            } else {
+                if ( $lenX !== $lenXCurrent ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be matrix, list of lists', $i, $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+            }
+
+            for ( $ii = 0; $ii < $lenX; $ii++ ) {
+                if ( ! array_key_exists($ii, $v) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be matrix, list of lists', $ii, $i, $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+                $vv = $v[$ii];
+
+                if ( null !== $isChildrenPlain ) {
+                    if ( ($isChildrenPlain) && (is_array($vv)) ) {
+                        return Ret::throw(
+                            $fb,
+                            [ 'The `value` should be matrix, list of lists, plain', $ii, $i, $value ],
+                            [ __FILE__, __LINE__ ]
+                        );
+
+                    } elseif ( (! $isChildrenPlain) && (! is_array($vv)) ) {
+                        return Ret::throw(
+                            $fb,
+                            [ 'The `value` should be matrix, list of lists, non-plain', $ii, $i, $value ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
+                }
+
+                $copy[$i][$ii] = $vv;
+            }
+        }
+
+        return Ret::ok($fb, $copy);
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_matrix_recursive($fb, $value, ?int $maxDepth = null)
+    {
+        $hasMaxDepth = (null !== $maxDepth);
+
+        if ( $hasMaxDepth ) {
+            if ( $maxDepth < 1 ) {
+                throw new LogicException(
+                    [ 'The `maxDepth` should be greater than 1', $maxDepth ],
+                );
+            }
+        }
+
+        if ( 1 === $maxDepth ) {
+            $ret = $this->type_matrix($fb, $value, true);
+
+            if ( ! $ret->isOk([ &$valueMatrix ]) ) {
+                return Ret::throw(
+                    $fb,
+                    $ret,
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+
+            return Ret::ok($fb, $valueMatrix);
+        }
+
+        if ( ! is_array($value) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be matrix, list of lists', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( [] === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        $lenList = [ null ];
+
+        $queue = [
+            [ array_reverse($value, true), 1 ],
+        ];
+
+        while ( [] !== $queue ) {
+            [ $item, $level ] = array_pop($queue);
+
+            $lenParent = count($item);
+
+            $lenList[$level] = $lenList[$level] ?? $lenParent;
+
+            for ( $i = ($lenParent - 1); $i >= 0; $i-- ) {
+                if ( ! array_key_exists($i, $item) ) {
+                    return Ret::throw(
+                        $fb,
+                        [ 'The `value` should be matrix, list of lists', $value ],
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
+
+                $v = $item[$i];
+
+                $isArray = is_array($v);
+
+                if ( 1 === $level ) {
+                    if ( ! $isArray ) {
+                        return Ret::throw(
+                            $fb,
+                            [ 'The `value` should be matrix, list of lists', $i, $value ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
+                }
+
+                if ( ! $isArray ) {
+                    continue;
+                }
+
+                $levelNew = $level + 1;
+
+                if ( $hasMaxDepth ) {
+                    if ( $levelNew > $maxDepth ) {
+                        return Ret::throw(
+                            $fb,
+                            [ 'The `value` should be matrix, list of lists, max depth is passed as `maxDepth`', $value, $maxDepth ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
+                }
+
+                $lenChild = count($v);
+                $lenChildPrev = $lenList[$levelNew] ?? null;
+                if ( null === $lenChildPrev ) {
+                    $lenList[$levelNew] = $lenChild;
+
+                } else {
+                    if ( $lenChild !== $lenChildPrev ) {
+                        return Ret::throw(
+                            $fb,
+                            [ 'The `value` should be matrix, list of lists, max depth is passed as `maxDepth`', $value, $maxDepth ],
+                            [ __FILE__, __LINE__ ]
+                        );
+                    }
+                }
+
+                $queue[] = [ $v, $levelNew ];
+            }
+        }
+
+        return Ret::ok($fb, $value);
+    }
+
+
+    /**
+     * @return Ret<ArrPath>|ArrPath
+     */
+    public function type_arrpath($fb, $value)
+    {
+        if ( $value instanceof ArrPath ) {
+            return Ret::ok($fb, $value);
+        }
+
+        try {
+            $array = $this->arrpath($value);
+        }
+        catch ( \Throwable $e ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be valid arrpath', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $ret = ArrPath::fromValidArray($array);
+
+        if ( ! $ret->isOk([ &$arrpathObject ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $arrpathObject);
+    }
+
+    /**
+     * @return Ret<ArrPath>|ArrPath
+     */
+    public function type_arrpath_dot($fb, $value, ?string $dot = '.')
+    {
+        if ( $value instanceof ArrPath ) {
+            return Ret::ok($fb, $value);
+        }
+
+        try {
+            $array = (null === $dot)
+                ? $this->arrpath($dot, $value)
+                : $this->arrpath_dot($dot, $value);
+        }
+        catch ( \Throwable $e ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be valid arrpath_dot', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $ret = ArrPath::fromValidArray($array);
+
+        if ( ! $ret->isOk([ &$arrpathObject ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $arrpathObject);
     }
 
 
@@ -1971,19 +2557,19 @@ class ArrModule
     }
 
 
-    public function is_array_depth($array, int $maxdepth) : bool
+    public function is_array_depth($array, int $maxDepth) : bool
     {
         if ( ! is_array($array) ) {
             return false;
         }
 
-        if ( $maxdepth <= 0 ) {
+        if ( $maxDepth < 1 ) {
             throw new LogicException(
-                [ 'The `maxdepth` should be greater than 1', $maxdepth ]
+                [ 'The `maxdepth` should be greater than 1', $maxDepth ]
             );
         }
 
-        if ( $maxdepth === 1 ) {
+        if ( $maxDepth === 1 ) {
             return true;
         }
 
@@ -2002,7 +2588,7 @@ class ArrModule
                 if ( is_array($v) ) {
                     $levelNew = $level + 1;
 
-                    if ( $levelNew === $maxdepth ) {
+                    if ( $levelNew === $maxDepth ) {
                         return true;
                     }
 
@@ -2025,7 +2611,9 @@ class ArrModule
         while ( [] !== $queue ) {
             [ $child, $level ] = array_pop($queue);
 
-            $depth = max($depth, $level);
+            if ( $level > $depth ) {
+                $depth = $level;
+            }
 
             foreach ( $child as $v ) {
                 if ( is_array($v) ) {

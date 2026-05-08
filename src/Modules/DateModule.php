@@ -377,7 +377,7 @@ class DateModule
 
         $ret = Ret::new();
 
-        $statusInterval = false
+        $devnull = false
             || $this->type_interval_duration($ret, $interval)
             || $this->type_interval_datestring($ret, $interval)
             //
@@ -725,7 +725,7 @@ class DateModule
 
             $formatsList = $thePhp->to_list($formats);
 
-            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+            $formatsList = $theType->php_array_not_empty($formatsList)->orThrow();
 
             foreach ( $formatsList as $i => $format ) {
                 $formatValid = $theType->string_not_empty($format)->orThrow();
@@ -799,7 +799,7 @@ class DateModule
 
             $formatsList = $thePhp->to_list($formats);
 
-            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+            $formatsList = $theType->php_array_not_empty($formatsList)->orThrow();
 
             foreach ( $formatsList as $i => $format ) {
                 $formatValid = $theType->string_not_empty($format)->orThrow();
@@ -873,7 +873,7 @@ class DateModule
 
             $formatsList = $thePhp->to_list($formats);
 
-            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+            $formatsList = $theType->php_array_not_empty($formatsList)->orThrow();
 
             foreach ( $formatsList as $i => $format ) {
                 $formatValid = $theType->string_not_empty($format)->orThrow();
@@ -1161,7 +1161,7 @@ class DateModule
 
             $formatsList = $thePhp->to_list($formats);
 
-            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+            $formatsList = $theType->php_array_not_empty($formatsList)->orThrow();
 
             foreach ( $formatsList as $i => $format ) {
                 $formatValid = $theType->string_not_empty($format)->orThrow();
@@ -1254,7 +1254,7 @@ class DateModule
 
             $formatsList = $thePhp->to_list($formats);
 
-            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+            $formatsList = $theType->php_array_not_empty($formatsList)->orThrow();
 
             foreach ( $formatsList as $i => $format ) {
                 $formatValid = $theType->string_not_empty($format)->orThrow();
@@ -1347,7 +1347,7 @@ class DateModule
 
             $formatsList = $thePhp->to_list($formats);
 
-            $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+            $formatsList = $theType->php_array_not_empty($formatsList)->orThrow();
 
             foreach ( $formatsList as $i => $format ) {
                 $formatValid = $theType->string_not_empty($format)->orThrow();
@@ -1636,7 +1636,7 @@ class DateModule
 
         $formatsList = $thePhp->to_list($formats);
 
-        $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+        $formatsList = $theType->php_array_not_empty($formatsList)->orThrow();
 
         foreach ( $formatsList as $i => $format ) {
             $formatValid = $theType->string_not_empty($format)->orThrow();
@@ -1733,7 +1733,7 @@ class DateModule
 
         $formatsList = $thePhp->to_list($formats);
 
-        $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+        $formatsList = $theType->php_array_not_empty($formatsList)->orThrow();
 
         foreach ( $formatsList as $i => $format ) {
             $formatValid = $theType->string_not_empty($format)->orThrow();
@@ -1830,7 +1830,7 @@ class DateModule
 
         $formatsList = $thePhp->to_list($formats);
 
-        $formatsList = $theType->array_not_empty($formatsList)->orThrow();
+        $formatsList = $theType->php_array_not_empty($formatsList)->orThrow();
 
         foreach ( $formatsList as $i => $format ) {
             $formatValid = $theType->string_not_empty($format)->orThrow();

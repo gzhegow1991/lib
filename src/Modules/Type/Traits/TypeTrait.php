@@ -67,18 +67,18 @@ trait TypeTrait
 	 *
 	 * @return Ret<mixed>
 	 */
-	public function client($value)
+	public function passed($value)
 	{
-		return Lib::php()->type_client(null, $value);
+		return Lib::php()->type_passed(null, $value);
 	}
 
 
 	/**
 	 * @return Ret<mixed>
 	 */
-	public function any_not_client($value)
+	public function any_not_passed($value)
 	{
-		return Lib::php()->type_any_not_client(null, $value);
+		return Lib::php()->type_any_not_passed(null, $value);
 	}
 
 
@@ -230,42 +230,6 @@ trait TypeTrait
 	public function userbool_true($value)
 	{
 		return Lib::php()->type_userbool_true(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function array($value)
-	{
-		return Lib::php()->type_array(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function array_empty($value)
-	{
-		return Lib::php()->type_array_empty(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function array_not_empty($value)
-	{
-		return Lib::php()->type_array_not_empty(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<mixed>
-	 */
-	public function any_not_array($value)
-	{
-		return Lib::php()->type_any_not_array(null, $value);
 	}
 
 
@@ -524,6 +488,15 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
+	public function numeric_zero_plus_minus_one($value, ?bool $isAllowExp = null, array $refs = [])
+	{
+		return Lib::num()->type_numeric_zero_plus_minus_one(null, $value, $isAllowExp, $refs);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
 	public function numeric_non_negative_or_minus_one($value, ?bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_non_negative_or_minus_one(null, $value, $isAllowExp, $refs);
@@ -668,6 +641,15 @@ trait TypeTrait
 	/**
 	 * @return Ret<int|float>
 	 */
+	public function num_zero_plus_minus_one($value)
+	{
+		return Lib::num()->type_num_zero_plus_minus_one(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<int|float>
+	 */
 	public function num_non_negative_or_minus_one($value)
 	{
 		return Lib::num()->type_num_non_negative_or_minus_one(null, $value);
@@ -785,6 +767,15 @@ trait TypeTrait
 	/**
 	 * @return Ret<int>
 	 */
+	public function int_zero_plus_minus_one($value)
+	{
+		return Lib::num()->type_int_zero_plus_minus_one(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<int>
+	 */
 	public function int_non_negative_or_minus_one($value)
 	{
 		return Lib::num()->type_int_non_negative_or_minus_one(null, $value);
@@ -896,6 +887,15 @@ trait TypeTrait
 	public function float_positive($value)
 	{
 		return Lib::num()->type_float_positive(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<float>
+	 */
+	public function float_zero_plus_minus_one($value)
+	{
+		return Lib::num()->type_float_zero_plus_minus_one(null, $value);
 	}
 
 
@@ -1224,173 +1224,78 @@ trait TypeTrait
 
 
 	/**
-	 * @return Ret<int|string>
+	 * @return Ret<array>
 	 */
-	public function key($key)
+	public function php_array($value)
 	{
-		return Lib::arr()->type_key(null, $key);
+		return Lib::arr()->type_php_array(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function php_array_empty($value)
+	{
+		return Lib::arr()->type_php_array_empty(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function php_array_not_empty($value)
+	{
+		return Lib::arr()->type_php_array_not_empty(null, $value);
 	}
 
 
 	/**
 	 * @return Ret<mixed>
 	 */
-	public function key_exists(array $array, $key)
+	public function any_not_php_array($value)
 	{
-		return Lib::arr()->type_key_exists(null, $array, $key);
-	}
-
-
-	/**
-	 * @return Ret<mixed>
-	 */
-	public function value_in_array(array $array, $key, ?bool $strict = null)
-	{
-		return Lib::arr()->type_value_in_array(null, $array, $key, $strict);
-	}
-
-
-	/**
-	 * @return Ret<int|string>
-	 */
-	public function value_in_array_key(array $array, $key, ?bool $strict = null)
-	{
-		return Lib::arr()->type_value_in_array_key(null, $array, $key, $strict);
-	}
-
-
-	/**
-	 * @return Ret<int>
-	 */
-	public function value_in_array_pos(array $array, $key, ?bool $strict = null)
-	{
-		return Lib::arr()->type_value_in_array_pos(null, $array, $key, $strict);
+		return Lib::arr()->type_any_not_php_array(null, $value);
 	}
 
 
 	/**
 	 * @return Ret<array>
 	 */
-	public function keys_exists(array $array, $keys)
+	public function array($value, ?bool $isPlain = null)
 	{
-		return Lib::arr()->type_keys_exists(null, $array, $keys);
+		return Lib::arr()->type_array(null, $value, $isPlain);
 	}
 
 
 	/**
 	 * @return Ret<array>
 	 */
-	public function keys_not_exists(array $array, $keys)
+	public function array_recursive($value, ?int $maxDepth = null)
 	{
-		return Lib::arr()->type_keys_not_exists(null, $array, $keys);
+		return Lib::arr()->type_array_recursive(null, $value, $maxDepth);
 	}
 
 
 	/**
+	 * @param callable $fnSortKeysCmp
+	 *
 	 * @return Ret<array>
 	 */
-	public function values_in_array(array $array, $keys, ?bool $strict = null)
+	public function array_sorted($value, ?bool $isPlain = null, $fnSortKeysCmp = null)
 	{
-		return Lib::arr()->type_values_in_array(null, $array, $keys, $strict);
+		return Lib::arr()->type_array_sorted(null, $value, $isPlain, $fnSortKeysCmp);
 	}
 
 
 	/**
+	 * @param callable $fnSortKeysCmp
+	 *
 	 * @return Ret<array>
 	 */
-	public function values_not_in_array(array $array, $keys, ?bool $strict = null)
+	public function array_sorted_recursive($value, ?int $maxDepth = null, $fnSortKeysCmp = null)
 	{
-		return Lib::arr()->type_values_not_in_array(null, $array, $keys, $strict);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function array_plain($value, ?int $maxDepth = null)
-	{
-		return Lib::arr()->type_array_plain(null, $value, $maxDepth);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function list($value, ?int $plainMaxDepth = null)
-	{
-		return Lib::arr()->type_list(null, $value, $plainMaxDepth);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function list_sorted($value, ?int $plainMaxDepth = null)
-	{
-		return Lib::arr()->type_list_sorted(null, $value, $plainMaxDepth);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function dict($value, ?int $plainMaxDepth = null)
-	{
-		return Lib::arr()->type_dict(null, $value, $plainMaxDepth);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function dict_sorted($value, ?int $plainMaxDepth = null, $fnSortCmp = null)
-	{
-		return Lib::arr()->type_dict_sorted(null, $value, $plainMaxDepth, $fnSortCmp);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function table($value)
-	{
-		return Lib::arr()->type_table(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function matrix($value)
-	{
-		return Lib::arr()->type_matrix(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function matrix_sorted($value)
-	{
-		return Lib::arr()->type_matrix_sorted(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<ArrPath>
-	 */
-	public function arrpath($path)
-	{
-		return Lib::arr()->type_arrpath(null, $path);
-	}
-
-
-	/**
-	 * @return Ret<ArrPath>
-	 */
-	public function arrpath_dot($path, ?string $dot = '.')
-	{
-		return Lib::arr()->type_arrpath_dot(null, $path, $dot);
+		return Lib::arr()->type_array_sorted_recursive(null, $value, $maxDepth, $fnSortKeysCmp);
 	}
 
 
@@ -1404,7 +1309,7 @@ trait TypeTrait
 
 
 	/**
-	 * @return Ret<resource[]>
+	 * @return Ret<array>
 	 */
 	public function array_of_resource_type($value, string $resourceType)
 	{
@@ -1417,7 +1322,7 @@ trait TypeTrait
 	 *
 	 * @param class-string<T> $className
 	 *
-	 * @return Ret<T[]>
+	 * @return Ret<T[]>|T[]
 	 */
 	public function array_of_a($value, string $className)
 	{
@@ -1430,7 +1335,7 @@ trait TypeTrait
 	 *
 	 * @param class-string<T> $className
 	 *
-	 * @return Ret<T[]>
+	 * @return Ret<T[]>|T[]
 	 */
 	public function array_of_class($value, string $className)
 	{
@@ -1443,7 +1348,7 @@ trait TypeTrait
 	 *
 	 * @param class-string<T> $className
 	 *
-	 * @return Ret<T[]>
+	 * @return Ret<T[]>|T[]
 	 */
 	public function array_of_subclass($value, string $className)
 	{
@@ -1454,13 +1359,226 @@ trait TypeTrait
 	/**
 	 * @param callable $fn
 	 *
-	 * @return Ret<array>
+	 * @return Ret<array>|array
 	 *
 	 * @noinspection PhpDocSignatureIsNotCompleteInspection
 	 */
-	public function array_of_callback($value, callable $fn, array $args = [])
+	public function array_of_callback($value, callable $fn, array $fnArgs = [])
 	{
-		return Lib::arr()->type_array_of_callback(null, $value, $fn, $args);
+		return Lib::arr()->type_array_of_callback(null, $value, $fn, $fnArgs);
+	}
+
+
+	/**
+	 * @return Ret<int|string>
+	 */
+	public function array_key($key)
+	{
+		return Lib::arr()->type_array_key(null, $key);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function array_key_exists(array $array, $key)
+	{
+		return Lib::arr()->type_array_key_exists(null, $array, $key);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function value_in_array(array $array, $value, ?bool $isStrict = null)
+	{
+		return Lib::arr()->type_value_in_array(null, $array, $value, $isStrict);
+	}
+
+
+	/**
+	 * @return Ret<int|string>
+	 */
+	public function value_in_array_key(array $array, $value, ?bool $isStrict = null)
+	{
+		return Lib::arr()->type_value_in_array_key(null, $array, $value, $isStrict);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function value_in_array_pos(array $array, $value, ?bool $isStrict = null)
+	{
+		return Lib::arr()->type_value_in_array_pos(null, $array, $value, $isStrict);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function array_keys_exists(array $array, $keys)
+	{
+		return Lib::arr()->type_array_keys_exists(null, $array, $keys);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function array_keys_not_exists(array $array, $keys)
+	{
+		return Lib::arr()->type_array_keys_not_exists(null, $array, $keys);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function values_in_array(array $array, $values, ?bool $strict = null)
+	{
+		return Lib::arr()->type_values_in_array(null, $array, $values, $strict);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function values_not_in_array(array $array, $values, ?bool $strict = null)
+	{
+		return Lib::arr()->type_values_not_in_array(null, $array, $values, $strict);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function list($value, ?bool $isPlain = null)
+	{
+		return Lib::arr()->type_list(null, $value, $isPlain);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function list_recursive($value, ?int $maxDepth = null)
+	{
+		return Lib::arr()->type_list_recursive(null, $value, $maxDepth);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function list_sorted($value, ?bool $isPlain = null)
+	{
+		return Lib::arr()->type_list_sorted(null, $value, $isPlain);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function list_sorted_recursive($value, ?int $maxDepth = null)
+	{
+		return Lib::arr()->type_list_sorted_recursive(null, $value, $maxDepth);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function dict($value, ?bool $isPlain = null)
+	{
+		return Lib::arr()->type_dict(null, $value, $isPlain);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function dict_recursive($value, ?int $maxDepth = null)
+	{
+		return Lib::arr()->type_dict_recursive(null, $value, $maxDepth);
+	}
+
+
+	/**
+	 * @param callable $fnSortKeysCmp
+	 *
+	 * @return Ret<array>
+	 */
+	public function dict_sorted($value, ?bool $isPlain = null, $fnSortKeysCmp = null)
+	{
+		return Lib::arr()->type_dict_sorted(null, $value, $isPlain, $fnSortKeysCmp);
+	}
+
+
+	/**
+	 * @param callable $fnSortKeysCmp
+	 *
+	 * @return Ret<array>
+	 */
+	public function dict_sorted_recursive($value, ?int $maxDepth = null, $fnSortKeysCmp = null)
+	{
+		return Lib::arr()->type_dict_sorted_recursive(null, $value, $maxDepth, $fnSortKeysCmp);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function table($value, ?int $isListOrDict = null, ?bool $isChildrenPlain = null)
+	{
+		return Lib::arr()->type_table(null, $value, $isListOrDict, $isChildrenPlain);
+	}
+
+
+	/**
+	 * @param callable $fnSortKeysCmp
+	 *
+	 * @return Ret<array>
+	 */
+	public function table_sorted($value, ?int $isListOrDict = null, ?bool $isChildrenPlain = null, $fnSortKeysCmp = null)
+	{
+		return Lib::arr()->type_table_sorted(null, $value, $isListOrDict, $isChildrenPlain, $fnSortKeysCmp);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function matrix($value, ?bool $isChildrenPlain = null)
+	{
+		return Lib::arr()->type_matrix(null, $value, $isChildrenPlain);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function matrix_recursive($value, ?int $maxDepth = null)
+	{
+		return Lib::arr()->type_matrix_recursive(null, $value, $maxDepth);
+	}
+
+
+	/**
+	 * @return Ret<ArrPath>
+	 */
+	public function arrpath($value)
+	{
+		return Lib::arr()->type_arrpath(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<ArrPath>
+	 */
+	public function arrpath_dot($value, ?string $dot = '.')
+	{
+		return Lib::arr()->type_arrpath_dot(null, $value, $dot);
 	}
 
 

@@ -632,6 +632,7 @@ class FilesystemFetchApi implements FetchApiInterface
     ) : void
     {
         // > метод не должен вызываться, чтобы поднять несколько демонов, для этого есть daemonSpawn
+        // > очищаем список задач, т.к. это первый и единственный запуск фонового процесса, после чего начинается регистрация задач
         $this->taskClearResults();
 
         $this->daemonSpawn($timeoutMs, $lockWaitTimeoutMs);

@@ -67,18 +67,18 @@ trait TTrait
 	 *
 	 * @return Ret<mixed>|mixed
 	 */
-	public function client($fb, $value)
+	public function passed($fb, $value)
 	{
-		return Lib::php()->type_client($fb, $value);
+		return Lib::php()->type_passed($fb, $value);
 	}
 
 
 	/**
 	 * @return Ret<mixed>|mixed
 	 */
-	public function any_not_client($fb, $value)
+	public function any_not_passed($fb, $value)
 	{
-		return Lib::php()->type_any_not_client($fb, $value);
+		return Lib::php()->type_any_not_passed($fb, $value);
 	}
 
 
@@ -230,42 +230,6 @@ trait TTrait
 	public function userbool_true($fb, $value)
 	{
 		return Lib::php()->type_userbool_true($fb, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>|array
-	 */
-	public function array($fb, $value)
-	{
-		return Lib::php()->type_array($fb, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>|array
-	 */
-	public function array_empty($fb, $value)
-	{
-		return Lib::php()->type_array_empty($fb, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>|array
-	 */
-	public function array_not_empty($fb, $value)
-	{
-		return Lib::php()->type_array_not_empty($fb, $value);
-	}
-
-
-	/**
-	 * @return Ret<mixed>|mixed
-	 */
-	public function any_not_array($fb, $value)
-	{
-		return Lib::php()->type_any_not_array($fb, $value);
 	}
 
 
@@ -524,6 +488,15 @@ trait TTrait
 	/**
 	 * @return Ret<string>|string
 	 */
+	public function numeric_zero_plus_minus_one($fb, $value, ?bool $isAllowExp = null, array $refs = [])
+	{
+		return Lib::num()->type_numeric_zero_plus_minus_one($fb, $value, $isAllowExp, $refs);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
 	public function numeric_non_negative_or_minus_one($fb, $value, ?bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_non_negative_or_minus_one($fb, $value, $isAllowExp, $refs);
@@ -668,6 +641,15 @@ trait TTrait
 	/**
 	 * @return Ret<int|float>|int|float
 	 */
+	public function num_zero_plus_minus_one($fb, $value)
+	{
+		return Lib::num()->type_num_zero_plus_minus_one($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<int|float>|int|float
+	 */
 	public function num_non_negative_or_minus_one($fb, $value)
 	{
 		return Lib::num()->type_num_non_negative_or_minus_one($fb, $value);
@@ -785,6 +767,15 @@ trait TTrait
 	/**
 	 * @return Ret<int>|int
 	 */
+	public function int_zero_plus_minus_one($fb, $value)
+	{
+		return Lib::num()->type_int_zero_plus_minus_one($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<int>|int
+	 */
 	public function int_non_negative_or_minus_one($fb, $value)
 	{
 		return Lib::num()->type_int_non_negative_or_minus_one($fb, $value);
@@ -896,6 +887,15 @@ trait TTrait
 	public function float_positive($fb, $value)
 	{
 		return Lib::num()->type_float_positive($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<float>|float
+	 */
+	public function float_zero_plus_minus_one($fb, $value)
+	{
+		return Lib::num()->type_float_zero_plus_minus_one($fb, $value);
 	}
 
 
@@ -1224,173 +1224,78 @@ trait TTrait
 
 
 	/**
-	 * @return Ret<int|string>|int|string
+	 * @return Ret<array>|array
 	 */
-	public function key($fb, $key)
+	public function php_array($fb, $value)
 	{
-		return Lib::arr()->type_key($fb, $key);
+		return Lib::arr()->type_php_array($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function php_array_empty($fb, $value)
+	{
+		return Lib::arr()->type_php_array_empty($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function php_array_not_empty($fb, $value)
+	{
+		return Lib::arr()->type_php_array_not_empty($fb, $value);
 	}
 
 
 	/**
 	 * @return Ret<mixed>|mixed
 	 */
-	public function key_exists($fb, array $array, $key)
+	public function any_not_php_array($fb, $value)
 	{
-		return Lib::arr()->type_key_exists($fb, $array, $key);
-	}
-
-
-	/**
-	 * @return Ret<mixed>|mixed
-	 */
-	public function value_in_array($fb, array $array, $key, ?bool $strict = null)
-	{
-		return Lib::arr()->type_value_in_array($fb, $array, $key, $strict);
-	}
-
-
-	/**
-	 * @return Ret<int|string>|int|string
-	 */
-	public function value_in_array_key($fb, array $array, $key, ?bool $strict = null)
-	{
-		return Lib::arr()->type_value_in_array_key($fb, $array, $key, $strict);
-	}
-
-
-	/**
-	 * @return Ret<int>|int
-	 */
-	public function value_in_array_pos($fb, array $array, $key, ?bool $strict = null)
-	{
-		return Lib::arr()->type_value_in_array_pos($fb, $array, $key, $strict);
+		return Lib::arr()->type_any_not_php_array($fb, $value);
 	}
 
 
 	/**
 	 * @return Ret<array>|array
 	 */
-	public function keys_exists($fb, array $array, $keys)
+	public function array($fb, $value, ?bool $isPlain = null)
 	{
-		return Lib::arr()->type_keys_exists($fb, $array, $keys);
+		return Lib::arr()->type_array($fb, $value, $isPlain);
 	}
 
 
 	/**
 	 * @return Ret<array>|array
 	 */
-	public function keys_not_exists($fb, array $array, $keys)
+	public function array_recursive($fb, $value, ?int $maxDepth = null)
 	{
-		return Lib::arr()->type_keys_not_exists($fb, $array, $keys);
+		return Lib::arr()->type_array_recursive($fb, $value, $maxDepth);
 	}
 
 
 	/**
+	 * @param callable $fnSortKeysCmp
+	 *
 	 * @return Ret<array>|array
 	 */
-	public function values_in_array($fb, array $array, $keys, ?bool $strict = null)
+	public function array_sorted($fb, $value, ?bool $isPlain = null, $fnSortKeysCmp = null)
 	{
-		return Lib::arr()->type_values_in_array($fb, $array, $keys, $strict);
+		return Lib::arr()->type_array_sorted($fb, $value, $isPlain, $fnSortKeysCmp);
 	}
 
 
 	/**
+	 * @param callable $fnSortKeysCmp
+	 *
 	 * @return Ret<array>|array
 	 */
-	public function values_not_in_array($fb, array $array, $keys, ?bool $strict = null)
+	public function array_sorted_recursive($fb, $value, ?int $maxDepth = null, $fnSortKeysCmp = null)
 	{
-		return Lib::arr()->type_values_not_in_array($fb, $array, $keys, $strict);
-	}
-
-
-	/**
-	 * @return Ret<array>|array
-	 */
-	public function array_plain($fb, $value, ?int $maxDepth = null)
-	{
-		return Lib::arr()->type_array_plain($fb, $value, $maxDepth);
-	}
-
-
-	/**
-	 * @return Ret<array>|array
-	 */
-	public function list($fb, $value, ?int $plainMaxDepth = null)
-	{
-		return Lib::arr()->type_list($fb, $value, $plainMaxDepth);
-	}
-
-
-	/**
-	 * @return Ret<array>|array
-	 */
-	public function list_sorted($fb, $value, ?int $plainMaxDepth = null)
-	{
-		return Lib::arr()->type_list_sorted($fb, $value, $plainMaxDepth);
-	}
-
-
-	/**
-	 * @return Ret<array>|array
-	 */
-	public function dict($fb, $value, ?int $plainMaxDepth = null)
-	{
-		return Lib::arr()->type_dict($fb, $value, $plainMaxDepth);
-	}
-
-
-	/**
-	 * @return Ret<array>|array
-	 */
-	public function dict_sorted($fb, $value, ?int $plainMaxDepth = null, $fnSortCmp = null)
-	{
-		return Lib::arr()->type_dict_sorted($fb, $value, $plainMaxDepth, $fnSortCmp);
-	}
-
-
-	/**
-	 * @return Ret<array>|array
-	 */
-	public function table($fb, $value)
-	{
-		return Lib::arr()->type_table($fb, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>|array
-	 */
-	public function matrix($fb, $value)
-	{
-		return Lib::arr()->type_matrix($fb, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>|array
-	 */
-	public function matrix_sorted($fb, $value)
-	{
-		return Lib::arr()->type_matrix_sorted($fb, $value);
-	}
-
-
-	/**
-	 * @return Ret<ArrPath>|ArrPath
-	 */
-	public function arrpath($fb, $path)
-	{
-		return Lib::arr()->type_arrpath($fb, $path);
-	}
-
-
-	/**
-	 * @return Ret<ArrPath>|ArrPath
-	 */
-	public function arrpath_dot($fb, $path, ?string $dot = '.')
-	{
-		return Lib::arr()->type_arrpath_dot($fb, $path, $dot);
+		return Lib::arr()->type_array_sorted_recursive($fb, $value, $maxDepth, $fnSortKeysCmp);
 	}
 
 
@@ -1404,7 +1309,7 @@ trait TTrait
 
 
 	/**
-	 * @return Ret<resource[]>|resource[]
+	 * @return Ret<array>|array
 	 */
 	public function array_of_resource_type($fb, $value, string $resourceType)
 	{
@@ -1458,9 +1363,227 @@ trait TTrait
 	 *
 	 * @noinspection PhpDocSignatureIsNotCompleteInspection
 	 */
-	public function array_of_callback($fb, $value, callable $fn, array $args = [])
+	public function array_of_callback($fb, $value, callable $fn, array $fnArgs = [])
 	{
-		return Lib::arr()->type_array_of_callback($fb, $value, $fn, $args);
+		return Lib::arr()->type_array_of_callback($fb, $value, $fn, $fnArgs);
+	}
+
+
+	/**
+	 * @return Ret<int|string>|int|string
+	 */
+	public function array_key($fb, $key)
+	{
+		return Lib::arr()->type_array_key($fb, $key);
+	}
+
+
+	/**
+	 * @return Ret<mixed>|mixed
+	 */
+	public function array_key_exists($fb, array $array, $key)
+	{
+		return Lib::arr()->type_array_key_exists($fb, $array, $key);
+	}
+
+
+	/**
+	 * @return Ret<mixed>|mixed
+	 */
+	public function value_in_array($fb, array $array, $value, ?bool $isStrict = null)
+	{
+		return Lib::arr()->type_value_in_array($fb, $array, $value, $isStrict);
+	}
+
+
+	/**
+	 * @return Ret<int|string>|int|string
+	 */
+	public function value_in_array_key($fb, array $array, $value, ?bool $isStrict = null)
+	{
+		return Lib::arr()->type_value_in_array_key($fb, $array, $value, $isStrict);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function value_in_array_pos($fb, array $array, $value, ?bool $isStrict = null)
+	{
+		return Lib::arr()->type_value_in_array_pos($fb, $array, $value, $isStrict);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function array_keys_exists($fb, array $array, $keys)
+	{
+		return Lib::arr()->type_array_keys_exists($fb, $array, $keys);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function array_keys_not_exists($fb, array $array, $keys)
+	{
+		return Lib::arr()->type_array_keys_not_exists($fb, $array, $keys);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function values_in_array($fb, array $array, $values, ?bool $strict = null)
+	{
+		return Lib::arr()->type_values_in_array($fb, $array, $values, $strict);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function values_not_in_array($fb, array $array, $values, ?bool $strict = null)
+	{
+		return Lib::arr()->type_values_not_in_array($fb, $array, $values, $strict);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function list($fb, $value, ?bool $isPlain = null)
+	{
+		return Lib::arr()->type_list($fb, $value, $isPlain);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function list_recursive($fb, $value, ?int $maxDepth = null)
+	{
+		return Lib::arr()->type_list_recursive($fb, $value, $maxDepth);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function list_sorted($fb, $value, ?bool $isPlain = null)
+	{
+		return Lib::arr()->type_list_sorted($fb, $value, $isPlain);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function list_sorted_recursive($fb, $value, ?int $maxDepth = null)
+	{
+		return Lib::arr()->type_list_sorted_recursive($fb, $value, $maxDepth);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function dict($fb, $value, ?bool $isPlain = null)
+	{
+		return Lib::arr()->type_dict($fb, $value, $isPlain);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function dict_recursive($fb, $value, ?int $maxDepth = null)
+	{
+		return Lib::arr()->type_dict_recursive($fb, $value, $maxDepth);
+	}
+
+
+	/**
+	 * @param callable $fnSortKeysCmp
+	 *
+	 * @return Ret<array>|array
+	 */
+	public function dict_sorted($fb, $value, ?bool $isPlain = null, $fnSortKeysCmp = null)
+	{
+		return Lib::arr()->type_dict_sorted($fb, $value, $isPlain, $fnSortKeysCmp);
+	}
+
+
+	/**
+	 * @param callable $fnSortKeysCmp
+	 *
+	 * @return Ret<array>|array
+	 */
+	public function dict_sorted_recursive($fb, $value, ?int $maxDepth = null, $fnSortKeysCmp = null)
+	{
+		return Lib::arr()->type_dict_sorted_recursive($fb, $value, $maxDepth, $fnSortKeysCmp);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function table($fb, $value, ?int $isListOrDict = null, ?bool $isChildrenPlain = null)
+	{
+		return Lib::arr()->type_table($fb, $value, $isListOrDict, $isChildrenPlain);
+	}
+
+
+	/**
+	 * @param callable $fnSortKeysCmp
+	 *
+	 * @return Ret<array>|array
+	 */
+	public function table_sorted(
+		$fb,
+		$value,
+		?int $isListOrDict = null,
+		?bool $isChildrenPlain = null,
+		$fnSortKeysCmp = null
+	) {
+		return Lib::arr()->type_table_sorted($fb, $value, $isListOrDict, $isChildrenPlain, $fnSortKeysCmp);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function matrix($fb, $value, ?bool $isChildrenPlain = null)
+	{
+		return Lib::arr()->type_matrix($fb, $value, $isChildrenPlain);
+	}
+
+
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function matrix_recursive($fb, $value, ?int $maxDepth = null)
+	{
+		return Lib::arr()->type_matrix_recursive($fb, $value, $maxDepth);
+	}
+
+
+	/**
+	 * @return Ret<ArrPath>|ArrPath
+	 */
+	public function arrpath($fb, $value)
+	{
+		return Lib::arr()->type_arrpath($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<ArrPath>|ArrPath
+	 */
+	public function arrpath_dot($fb, $value, ?string $dot = '.')
+	{
+		return Lib::arr()->type_arrpath_dot($fb, $value, $dot);
 	}
 
 
@@ -2145,8 +2268,8 @@ trait TTrait
 	/**
 	 * > метод не всегда callable, поскольку строка 'class->method' не является callable
 	 * > метод не всегда callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
-	 * > используйте type_callable_string, если собираетесь вызывать метод
-	 * > используйте type_callable_array, если собираетесь вызывать метод
+	 * > используйте callable_string, если собираетесь вызывать метод
+	 * > используйте callable_array, если собираетесь вызывать метод
 	 *
 	 * @param array{ 0?: array{ 0: class-string, 1: string }, 1?: string } $refs
 	 *

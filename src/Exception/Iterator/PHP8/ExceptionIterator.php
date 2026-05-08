@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * @noinspection PhpHierarchyChecksInspection
+ * @noinspection PhpSignatureMismatchDuringInheritanceInspection
+ * @noinspection PhpUndefinedClassInspection
+ */
+
 namespace Gzhegow\Lib\Exception\Iterator\PHP8;
 
 use Gzhegow\Lib\Exception\ExceptInterface;

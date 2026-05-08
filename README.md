@@ -320,16 +320,16 @@ $test->run();
 //
 //     $p1 = \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl('https://google.com');
 //     $p1->then(function ($result) use ($ffn) {
-//         $url = $result[ 'url' ];
-//         $httpCode = $result[ 'http_code' ];
+//         $url = $result['url'];
+//         $httpCode = $result['http_code'];
 //
 //         $ffn->print("{$url} - HTTP: {$httpCode}");
 //     });
 //
 //     $p2 = \Gzhegow\Lib\Modules\Async\Promise\Promise::fetchCurl('https://yandex.ru');
 //     $p2->then(function ($result) use ($ffn) {
-//         $url = $result[ 'url' ];
-//         $httpCode = $result[ 'http_code' ];
+//         $url = $result['url'];
+//         $httpCode = $result['http_code'];
 //
 //         $ffn->print("{$url} - HTTP: {$httpCode}");
 //     });
@@ -531,6 +531,7 @@ $test->expectStdoutIf(PHP_VERSION_ID < 80000, '
 $test->run();
 
 
+
 // >>> TEST
 // > тесты Exception
 $fn = function () use ($ffn) {
@@ -576,6 +577,7 @@ $test->expectStdout('
 ------ [ 0.1.0.1 ] eeee2
 ');
 $test->run();
+
 
 
 // >>> TEST
@@ -1167,27 +1169,27 @@ $fn = function () use ($ffn) {
     $arr3 = [ [ [ true ] ] ];
 
     $status = [];
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr0, 1)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr0, 2)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr0, 3)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_recursive(null, $arr0, 1)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_recursive(null, $arr0, 2)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_recursive(null, $arr0, 3)->isOk();
     $ffn->print(...$status);
 
     $status = [];
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr1, 1)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr1, 2)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr1, 3)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_recursive(null, $arr1, 1)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_recursive(null, $arr1, 2)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_recursive(null, $arr1, 3)->isOk();
     $ffn->print(...$status);
 
     $status = [];
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr2, 1)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr2, 2)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr2, 3)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_recursive(null, $arr2, 1)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_recursive(null, $arr2, 2)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_recursive(null, $arr2, 3)->isOk();
     $ffn->print(...$status);
 
     $status = [];
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr3, 1)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr3, 2)->isOk();
-    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_plain(null, $arr3, 3)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_recursive(null, $arr3, 1)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_recursive(null, $arr3, 2)->isOk();
+    $status[] = \Gzhegow\Lib\Lib::arr()->type_array_recursive(null, $arr3, 3)->isOk();
     $ffn->print(...$status);
 
     echo "\n";

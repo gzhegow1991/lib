@@ -9,7 +9,6 @@ namespace Gzhegow\Lib\Modules;
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Php\Nil;
 use Gzhegow\Lib\Modules\Type\Ret;
-use Gzhegow\Lib\Exception\Except;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\ExceptInterface;
 use Gzhegow\Lib\Exception\RuntimeException;
@@ -330,7 +329,7 @@ class PhpModule
      *
      * @return Ret<mixed>|mixed
      */
-    public function type_client($fb, $value)
+    public function type_passed($fb, $value)
     {
         $ret = $this->type_nil(null, $value);
 
@@ -370,9 +369,9 @@ class PhpModule
     /**
      * @return Ret<mixed>|mixed
      */
-    public function type_any_not_client($fb, $value)
+    public function type_any_not_passed($fb, $value)
     {
-        $ret = $this->type_client(null, $value);
+        $ret = $this->type_passed(null, $value);
 
         if ( ! $ret->isOk() ) {
             return Ret::ok($fb, $value);
@@ -820,71 +819,6 @@ class PhpModule
         return Ret::throw(
             $fb,
             [ 'The `value` should be userbool, true', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-
-    /**
-     * @return Ret<array>|array
-     */
-    public function type_array($fb, $value)
-    {
-        if ( is_array($value) ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be array', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<array>|array
-     */
-    public function type_array_empty($fb, $value)
-    {
-        if ( [] === $value ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be array, empty', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<array>|array
-     */
-    public function type_array_not_empty($fb, $value)
-    {
-        if ( is_array($value) && ([] !== $value) ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be array, not empty', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<mixed>|mixed
-     */
-    public function type_any_not_array($fb, $value)
-    {
-        if ( ! is_array($value) ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should not be array', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -3092,7 +3026,7 @@ class PhpModule
 
         $partsValid = (array) $parts;
 
-        $partsValid = $theType->array_not_empty($partsValid)->orThrow();
+        $partsValid = $theType->php_array_not_empty($partsValid)->orThrow();
         $separatorString = $theType->char($separator ?? '/')->orThrow();
 
         $partsPlain = [];
@@ -3117,7 +3051,7 @@ class PhpModule
             }
         );
 
-        $partsPlain = $theType->array_not_empty($partsPlain)->orThrow();
+        $partsPlain = $theType->php_array_not_empty($partsPlain)->orThrow();
 
         $join = implode($separatorString, $partsPlain);
 

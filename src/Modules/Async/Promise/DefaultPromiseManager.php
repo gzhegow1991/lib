@@ -777,7 +777,6 @@ class DefaultPromiseManager implements PromiseManagerInterface
 
             $fnPooling = static function ($ctx) use ($theFetchApi) {
                 /** @var PromisePoolingContext $ctx */
-
                 if ( ! $theFetchApi->daemonIsAwake() ) {
                     return;
                 }

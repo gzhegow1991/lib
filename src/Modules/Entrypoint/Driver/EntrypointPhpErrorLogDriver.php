@@ -41,7 +41,7 @@ class EntrypointPhpErrorLogDriver extends AbstractEntrypointDriver
                 if ( ! is_dir($dirname) ) {
                     mkdir($dirname, 0775, true);
                 }
-            }, [ $dirname = dirname($value) ]);
+            }, [ dirname($value) ]);
         }
 
         ini_set('error_log', $value);

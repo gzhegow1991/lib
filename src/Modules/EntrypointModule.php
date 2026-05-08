@@ -417,7 +417,7 @@ class EntrypointModule
     {
         $theType = Lib::type();
 
-        $value = $theType->key_exists($this->configInitial, $opt)->orThrow();
+        $value = $theType->array_key_exists($this->configInitial, $opt)->orThrow();
 
         return $value;
     }
@@ -529,7 +529,7 @@ class EntrypointModule
     {
         $theType = Lib::type();
 
-        $value = $theType->key_exists($this->configCurrent, $opt)->orThrow();
+        $value = $theType->array_key_exists($this->configCurrent, $opt)->orThrow();
 
         return $value;
     }

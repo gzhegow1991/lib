@@ -1415,7 +1415,8 @@ class FsModule
         $theFsFile = $this->fileSafe();
 
         $fileFreepath = $this->type_freepath([], $file);
-        $fileDir = $this->type_dirpath_realpath([], dirname($fileFreepath));
+
+        $this->type_dirpath_realpath([], dirname($fileFreepath));
 
         $fileIn = "{$fileFreepath}.in";
         $fileInLock = "{$fileFreepath}.in.lock";
@@ -1448,7 +1449,8 @@ class FsModule
         $theFsFile = $this->fileSafe();
 
         $fileFreepath = $this->type_freepath([], $file);
-        $fileDir = $this->type_dirpath_realpath([], dirname($fileFreepath));
+
+        $this->type_dirpath_realpath([], dirname($fileFreepath));
 
         $fileIn = "{$fileFreepath}.in";
         $fileInLock = "{$fileFreepath}.in.lock";
@@ -1481,7 +1483,8 @@ class FsModule
         $theFsFile = $this->fileSafe();
 
         $fileFreepath = $this->type_freepath([], $file);
-        $fileDir = $this->type_dirpath_realpath([], dirname($fileFreepath));
+
+        $this->type_dirpath_realpath([], dirname($fileFreepath));
 
         $fileIn = "{$fileFreepath}.in";
         $fileInLock = "{$fileFreepath}.in.lock";
@@ -1514,7 +1517,8 @@ class FsModule
         $theFsFile = $this->fileSafe();
 
         $fileFreepath = $this->type_freepath([], $file);
-        $fileDir = $this->type_dirpath_realpath([], dirname($fileFreepath));
+
+        $this->type_dirpath_realpath([], dirname($fileFreepath));
 
         $fileIn = "{$fileFreepath}.in";
         $fileInLock = "{$fileFreepath}.in.lock";
@@ -1549,7 +1553,8 @@ class FsModule
         $theFsFile = $this->fileSafe();
 
         $fileFreepath = $this->type_freepath([], $file);
-        $fileDir = $this->type_dirpath_realpath([], dirname($fileFreepath));
+
+        $this->type_dirpath_realpath([], dirname($fileFreepath));
 
         $fileIn = "{$fileFreepath}.in";
         $fileOut = "{$fileFreepath}.lpop";
@@ -1632,7 +1637,8 @@ class FsModule
         $theFsFile = $this->fileSafe();
 
         $fileFreepath = $this->type_freepath([], $file);
-        $fileDir = $this->type_dirpath_realpath([], dirname($fileFreepath));
+
+        $this->type_dirpath_realpath([], dirname($fileFreepath));
 
         $fileIn = "{$fileFreepath}.in";
         $fileOut = "{$fileFreepath}.lpop";
@@ -1736,7 +1742,8 @@ class FsModule
         $theFsFile = $this->fileSafe();
 
         $fileFreepath = $this->type_freepath([], $file);
-        $fileDir = $this->type_dirpath_realpath([], dirname($fileFreepath));
+
+        $this->type_dirpath_realpath([], dirname($fileFreepath));
 
         $fileIn = "{$fileFreepath}.in";
         $fileOut = "{$fileFreepath}.rpop";
@@ -1824,7 +1831,8 @@ class FsModule
         $theFsFile = $this->fileSafe();
 
         $fileFreepath = $this->type_freepath([], $file);
-        $fileDir = $this->type_dirpath_realpath([], dirname($fileFreepath));
+
+        $this->type_dirpath_realpath([], dirname($fileFreepath));
 
         $fileIn = "{$fileFreepath}.in";
         $fileOut = "{$fileFreepath}.rpop";

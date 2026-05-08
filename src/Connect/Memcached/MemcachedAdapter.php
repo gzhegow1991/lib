@@ -279,41 +279,40 @@ class MemcachedAdapter
             );
         }
 
-        if ( $isMemcached ) {
-            //
+        if ( ! $isMemcached ) {
+            if ( $isDsn || $isHost ) {
+                $ret = $theType->string_not_empty($host);
 
-        } elseif ( $isDsn || $isHost ) {
-            $ret = $theType->string_not_empty($host);
+                if ( ! $ret->isOk([ &$host ]) ) {
+                    return Ret::throw(
+                        $fb,
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
 
-            if ( ! $ret->isOk([ &$host ]) ) {
-                return Ret::throw(
-                    $fb,
-                    $ret,
-                    [ __FILE__, __LINE__ ]
-                );
-            }
+                $port = $port ?: 11211;
 
-            $port = $port ?: 11211;
+                $ret = $theType->int_positive($port);
 
-            $ret = $theType->int_positive($port);
+                if ( ! $ret->isOk([ &$port ]) ) {
+                    return Ret::throw(
+                        $fb,
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
 
-            if ( ! $ret->isOk([ &$port ]) ) {
-                return Ret::throw(
-                    $fb,
-                    $ret,
-                    [ __FILE__, __LINE__ ]
-                );
-            }
+            } elseif ( $isSock ) {
+                $ret = $theType->string_not_empty($sock);
 
-        } elseif ( $isSock ) {
-            $ret = $theType->string_not_empty($sock);
-
-            if ( ! $ret->isOk([ &$sock ]) ) {
-                return Ret::throw(
-                    $fb,
-                    $ret,
-                    [ __FILE__, __LINE__ ]
-                );
+                if ( ! $ret->isOk([ &$sock ]) ) {
+                    return Ret::throw(
+                        $fb,
+                        $ret,
+                        [ __FILE__, __LINE__ ]
+                    );
+                }
             }
         }
 
