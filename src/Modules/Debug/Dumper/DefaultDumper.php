@@ -1036,11 +1036,7 @@ class DefaultDumper implements DumperInterface
 
     protected function doPrinterPrintTrace(array $fileLine, ...$vars) : string
     {
-        $theType = Lib::type();
-
-        $fileLineValid = $theType->file_line($fileLine)->orThrow();
-
-        $traceWhereIs = "[ {$fileLineValid[0]} ({$fileLineValid[1]}) ]";
+        $traceWhereIs = "[ {$fileLine[0]} ({$fileLine[1]}) ]";
 
         $content = $this->printerPrint($traceWhereIs, ...$vars);
 
@@ -1049,11 +1045,7 @@ class DefaultDumper implements DumperInterface
 
     protected function doDumperEchoTrace(array $fileLine, ...$vars) : void
     {
-        $theType = Lib::type();
-
-        $fileLineValid = $theType->file_line($fileLine)->orThrow();
-
-        $traceWhereIs = "[ {$fileLineValid[0]} ({$fileLineValid[1]}) ]";
+        $traceWhereIs = "[ {$fileLine[0]} ({$fileLine[1]}) ]";
 
         $this->dumperDump($traceWhereIs, ...$vars);
     }
