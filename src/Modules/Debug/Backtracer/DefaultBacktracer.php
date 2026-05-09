@@ -16,11 +16,11 @@ class DefaultBacktracer implements BacktracerInterface
     /**
      * @var int
      */
-    protected $options = DEBUG_BACKTRACE_IGNORE_ARGS;
+    protected $debugBacktraceOptions = DEBUG_BACKTRACE_IGNORE_ARGS;
     /**
      * @var int
      */
-    protected $limit = 0;
+    protected $debugBacktraceLimit = 0;
 
     /**
      * @var array
@@ -74,7 +74,7 @@ class DefaultBacktracer implements BacktracerInterface
             }
         }
 
-        $this->options = $options ?? DEBUG_BACKTRACE_IGNORE_ARGS;
+        $this->debugBacktraceOptions = $options ?? DEBUG_BACKTRACE_IGNORE_ARGS;
 
         return $this;
     }
@@ -92,7 +92,7 @@ class DefaultBacktracer implements BacktracerInterface
             }
         }
 
-        $this->limit = $limit ?? 0;
+        $this->debugBacktraceLimit = $limit ?? 0;
 
         return $this;
     }
@@ -437,20 +437,20 @@ class DefaultBacktracer implements BacktracerInterface
 
         $trace = $this->trace;
 
-        $options = null;
+        $debugBacktraceOptions = null;
         if ( null === $trace ) {
-            $skip = 2;
+            $debugBacktraceOptions = $this->debugBacktraceOptions;
+            $debugBacktraceLimit = $this->debugBacktraceLimit;
 
-            $options = $this->options;
-            $limit = $this->limit;
+            $traceShift = 2;
 
-            if ( $limit > 0 ) {
-                $limit += $skip;
+            if ( $debugBacktraceLimit > 0 ) {
+                $debugBacktraceLimit += $traceShift;
             }
 
-            $trace = debug_backtrace($options, $limit);
+            $trace = debug_backtrace($debugBacktraceOptions, $debugBacktraceLimit);
 
-            array_splice($trace, 0, $skip);
+            array_splice($trace, 0, $traceShift);
         }
 
         $hasOf = (null !== ($of = $this->of));
@@ -461,12 +461,18 @@ class DefaultBacktracer implements BacktracerInterface
         $hasFilterNotStartsWith = (null !== ($filterNotStartsWith = $this->filterNotStartsWith));
 
         foreach ( $trace as $i => $t ) {
-            $t['file'] = $t['file'] ?? null;
-            $t['line'] = $t['line'] ?? null;
-            $t['class'] = $t['class'] ?? null;
-            $t['function'] = $t['function'] ?? null;
-            $t['type'] = $t['type'] ?? null;
-            $t['object'] = $t['object'] ?? null;
+            $t += [
+                'file'     => null,
+                'line'     => null,
+                'class'    => null,
+                'function' => null,
+                'type'     => null,
+                'object'   => null,
+                'args'     => null,
+            ];
+
+            $t['file'] = $t['file'] ?: '{{file}}';
+            $t['line'] = $t['line'] ?: -1;
 
             if ( $hasOf || $hasOfStartsWith ) {
                 $tFile = $t['file'];
@@ -480,8 +486,8 @@ class DefaultBacktracer implements BacktracerInterface
                     $hasObject = (null !== $of['object']);
 
                     if ( $hasObject
-                        && (null !== $options)
-                        && ! ($options & DEBUG_BACKTRACE_PROVIDE_OBJECT)
+                        && (null !== $debugBacktraceOptions)
+                        && ! ($debugBacktraceOptions & DEBUG_BACKTRACE_PROVIDE_OBJECT)
                     ) {
                         throw new RuntimeException(
                             'Unable to `of` by object if DEBUG_BACKTRACE_PROVIDE_OBJECT is not in `options`'
@@ -522,8 +528,8 @@ class DefaultBacktracer implements BacktracerInterface
                 $hasObject = ([] !== $filter['object']);
 
                 if ( $hasObject
-                    && (null !== $options)
-                    && ! ($options & DEBUG_BACKTRACE_PROVIDE_OBJECT)
+                    && (null !== $debugBacktraceOptions)
+                    && ! ($debugBacktraceOptions & DEBUG_BACKTRACE_PROVIDE_OBJECT)
                 ) {
                     throw new RuntimeException(
                         'Unable to `filter` by object if DEBUG_BACKTRACE_PROVIDE_OBJECT is not in `options`'
@@ -594,8 +600,8 @@ class DefaultBacktracer implements BacktracerInterface
                 $hasObject = ([] !== $filterNot['object']);
 
                 if ( $hasObject
-                    && (null !== $options)
-                    && ! ($options & DEBUG_BACKTRACE_PROVIDE_OBJECT)
+                    && (null !== $debugBacktraceOptions)
+                    && ! ($debugBacktraceOptions & DEBUG_BACKTRACE_PROVIDE_OBJECT)
                 ) {
                     throw new RuntimeException(
                         'Unable to `filterNot` by object if DEBUG_BACKTRACE_PROVIDE_OBJECT is not in `options`'
@@ -649,22 +655,16 @@ class DefaultBacktracer implements BacktracerInterface
             }
 
             if ( null !== $dirRoot ) {
-                $t['file'] = str_replace(
+                $tFile = $t['file'];
+
+                $tFile = str_replace(
                     $dirRoot . DIRECTORY_SEPARATOR,
                     '',
-                    $t['file']
+                    $tFile
                 );
-            }
 
-            $t += [
-                'file'     => null,
-                'line'     => null,
-                'class'    => null,
-                'function' => null,
-                'type'     => null,
-                'object'   => null,
-                'args'     => null,
-            ];
+                $t['file'] = $tFile;
+            }
 
             $trace[$i] = $t;
         }

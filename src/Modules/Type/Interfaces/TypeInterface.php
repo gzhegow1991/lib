@@ -905,11 +905,6 @@ interface TypeInterface
     public function arrpath_dot($value, ?string $dot = '.');
 
     /**
-     * @return Ret<array{ 0: string, 1: int }>
-     */
-    public function file_line($value);
-
-    /**
      * @return Ret<string>
      */
     public function html_tag($value);

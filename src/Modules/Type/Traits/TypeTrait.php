@@ -1583,15 +1583,6 @@ trait TypeTrait
 
 
 	/**
-	 * @return Ret<array{ 0: string, 1: int }>
-	 */
-	public function file_line($value)
-	{
-		return Lib::debug()->type_file_line(null, $value);
-	}
-
-
-	/**
 	 * @return Ret<string>
 	 */
 	public function html_tag($value)

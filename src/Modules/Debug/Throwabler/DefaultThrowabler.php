@@ -433,12 +433,8 @@ class DefaultThrowabler implements ThrowablerInterface
      */
     public function getThrowableInfoArray($throwable, ?int $flags = null) : array
     {
-        $theDebug = Lib::debug();
-
-        $dirRoot = $theDebug::staticDirRoot();
-
         if ( $throwable instanceof HasTraceOverrideInterface ) {
-            $eFile = $throwable->getFileOverride($dirRoot) ?? $throwable->getFile();
+            $eFile = $throwable->getFileOverride() ?? $throwable->getFile();
             $eLine = $throwable->getLineOverride() ?? $throwable->getLine();
 
         } else {
@@ -492,12 +488,8 @@ class DefaultThrowabler implements ThrowablerInterface
         }
 
         if ( $isWithFile ) {
-            $theDebug = Lib::debug();
-
-            $dirRoot = $theDebug::staticDirRoot();
-
             if ( $throwable instanceof HasTraceOverrideInterface ) {
-                $eFile = $throwable->getFileOverride($dirRoot) ?? $throwable->getFile();
+                $eFile = $throwable->getFileOverride() ?? $throwable->getFile();
                 $eLine = $throwable->getLineOverride() ?? $throwable->getLine();
 
             } else {
@@ -519,12 +511,8 @@ class DefaultThrowabler implements ThrowablerInterface
      */
     public function getThrowableTraceArray($throwable, ?int $flags = null) : array
     {
-        $theDebug = Lib::debug();
-
-        $dirRoot = $theDebug::staticDirRoot();
-
         if ( $throwable instanceof HasTraceOverrideInterface ) {
-            $array = $throwable->getTraceOverride($dirRoot) ?? $throwable->getTrace();
+            $array = $throwable->getTraceOverride() ?? $throwable->getTrace();
 
         } else {
             $array = $throwable->getTrace();

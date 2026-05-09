@@ -188,46 +188,189 @@ class DebugModule
 
 
     /**
-     * @return Ret<array{ 0: string, 1: int }>|array{ 0: string, 1: int }
+     * @return array{ file: string, line: int }|array{ 0: string, 1: int }
      */
-    public function type_file_line($fb, $value)
+    public function file_line(array $refs = [], ?int $traceShift = null, ?bool $withKeys = null) : array
     {
-        if ( ! is_array($value) ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should be array', $value ],
-                [ __FILE__, __LINE__ ]
-            );
+        $refTrace =& $refs[0];
+
+        $refTrace = $refTrace ?? (new \Exception())->getTrace();
+
+        $traceShift = $traceShift ?? 0;
+        $withKeys = $withKeys ?? false;
+
+        if ( $traceShift < 0 ) {
+            $traceShift = 0;
         }
 
-        $file = (($value['file'] ?? $value[0] ?? null) ?: '{{file}}');
-        $line = (($value['line'] ?? $value[1] ?? null) ?: -1);
+        $eTrace = array_slice($refTrace, $traceShift);
 
-        if ( '{{file}}' !== $file ) {
-            $fileRealpath = realpath($file);
+        $eFile = (($eTrace[0]['file'] ?? $eTrace[0][0] ?? null) ?: '{{file}}');
+        $eLine = (($eTrace[0]['line'] ?? $eTrace[0][1] ?? null) ?: -1);
 
-            if ( false === $fileRealpath ) {
-                return Ret::throw(
-                    $fb,
-                    [ 'The `value[0]` should be realpath', $file, $value ],
-                    [ __FILE__, __LINE__ ]
-                );
-            }
+        if ( '{{file}}' !== $eFile ) {
+            $theDebug = Lib::debug();
 
-            $file = $fileRealpath;
-        }
+            $dirRoot = $theDebug::staticDirRoot();
 
-        if ( -1 !== $line ) {
-            if ( ! (is_int($line) && ($line > 0)) ) {
-                return Ret::throw(
-                    $fb,
-                    [ 'The `value[1]` should be positive integer', $line, $value ],
-                    [ __FILE__, __LINE__ ]
+            if ( null !== $dirRoot ) {
+                $eFile = str_replace(
+                    $dirRoot . DIRECTORY_SEPARATOR,
+                    '',
+                    $eFile
                 );
             }
         }
 
-        return Ret::ok($fb, [ $file, $line ]);
+        if ( $withKeys ) {
+            $eFileLine = [
+                'file' => $eFile,
+                'line' => $eLine,
+            ];
+
+        } else {
+            $eFileLine = [
+                $eFile,
+                $eLine,
+            ];
+        }
+
+        return $eFileLine;
+    }
+
+    /**
+     * @return array[]
+     */
+    public function trace(array $refs = [], ?int $traceShift = null, ?bool $withKeys = null) : array
+    {
+        $refTrace =& $refs[0];
+
+        $refTrace = $refTrace ?? (new \Exception())->getTrace();
+
+        $traceShift = $traceShift ?? 0;
+        $withKeys = $withKeys ?? true;
+
+        if ( $traceShift < 0 ) {
+            $traceShift = 0;
+        }
+
+        $eTrace = array_slice($refTrace, $traceShift);
+
+        foreach ( $eTrace as $i => $eFrame ) {
+            $eFrame += [
+                'function' => null,
+                'line'     => null,
+                'file'     => null,
+                'class'    => null,
+                'object'   => null,
+                'type'     => null,
+                'args'     => null,
+            ];
+
+            $eFrameFile = $eFrame['file'] ?: '{{file}}';
+            $eFrameLine = $eFrame['line'] ?: -1;
+
+            if ( '{{file}}' !== $eFrameFile ) {
+                $theDebug = Lib::debug();
+
+                $dirRoot = $theDebug::staticDirRoot();
+
+                if ( null !== $dirRoot ) {
+                    $eFrameFile = str_replace(
+                        $dirRoot . DIRECTORY_SEPARATOR,
+                        '',
+                        $eFrameFile
+                    );
+                }
+            }
+
+            $eFrame['file'] = $eFrameFile;
+            $eFrame['line'] = $eFrameLine;
+
+            $eTrace[$i] = $eFrame;
+        }
+
+        if ( ! $withKeys ) {
+            $eTrace = array_map('array_values', $eTrace);
+        }
+
+        return $eTrace;
+    }
+
+    /**
+     * @return array[]
+     */
+    public function file_line_trace(array $refs = [], ?int $traceShift = null, ?bool $withKeys = null) : array
+    {
+        $refTrace =& $refs[0];
+
+        $refTrace = $refTrace ?? (new \Exception())->getTrace();
+
+        $traceShift = $traceShift ?? 0;
+        $withKeys = $withKeys ?? true;
+
+        if ( $traceShift < 0 ) {
+            $traceShift = 0;
+        }
+
+        $eTrace = array_slice($refTrace, $traceShift);
+
+        foreach ( $eTrace as $i => $eFrame ) {
+            $eFrame += [
+                'function' => null,
+                'line'     => null,
+                'file'     => null,
+                'class'    => null,
+                'object'   => null,
+                'type'     => null,
+                'args'     => null,
+            ];
+
+            $eFrameFile = $eFrame['file'] ?: '{{file}}';
+            $eFrameLine = $eFrame['line'] ?: -1;
+
+            if ( '{{file}}' !== $eFrameFile ) {
+                $theDebug = Lib::debug();
+
+                $dirRoot = $theDebug::staticDirRoot();
+
+                if ( null !== $dirRoot ) {
+                    $eFrameFile = str_replace(
+                        $dirRoot . DIRECTORY_SEPARATOR,
+                        '',
+                        $eFrameFile
+                    );
+
+                }
+            }
+
+            $eFrame['file'] = $eFrameFile;
+            $eFrame['line'] = $eFrameLine;
+
+            $eTrace[$i] = $eFrame;
+        }
+
+        $eFile = $eTrace[0]['file'];
+        $eLine = $eTrace[0]['line'];
+
+        if ( $withKeys ) {
+            $eFileLine = [
+                'file' => $eFile,
+                'line' => $eLine,
+            ];
+
+        } else {
+            $eTrace = array_map('array_values', $eTrace);
+            $eFileLine = [
+                $eFile,
+                $eLine,
+            ];
+        }
+
+        return [
+            'file_line' => $eFileLine,
+            'trace'     => $eTrace,
+        ];
     }
 
 

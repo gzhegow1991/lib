@@ -42,11 +42,25 @@ trait HasTraceOverrideTrait
 
         if ( null !== $file ) {
             if ( null !== $dirRoot ) {
-                $file = str_replace(
-                    $dirRoot . DIRECTORY_SEPARATOR,
-                    '',
-                    $file
-                );
+                $refCount = 0;
+
+                if ( 0 === $refCount ) {
+                    $file = str_replace(
+                        $dirRoot . DIRECTORY_SEPARATOR,
+                        '',
+                        $file,
+                        //
+                        $refCount
+                    );
+                }
+
+                if ( 0 === $refCount ) {
+                    $file = str_replace(
+                        str_replace([ '/', '\\' ], '/', $dirRoot) . '/',
+                        '',
+                        str_replace([ '/', '\\' ], '/', $file)
+                    );
+                }
             }
         }
 
@@ -107,16 +121,33 @@ trait HasTraceOverrideTrait
 
         if ( null !== $trace ) {
             if ( null !== $dirRoot ) {
-                foreach ( $trace as $i => $frame ) {
-                    $file = (($frame['file'] ?? null) ?: '{{file}}');
+                foreach ( $trace as $i => $t ) {
+                    $tFile = (($t['file'] ?? null) ?: '{{file}}');
+                    $tLine = (($t['line'] ?? null) ?: -1);
 
-                    $file = str_replace(
-                        $dirRoot . DIRECTORY_SEPARATOR,
-                        '',
-                        $file
-                    );
+                    if ( '{{file}}' !== $tFile ) {
+                        $refCount = 0;
 
-                    $trace[$i]['file'] = $file;
+                        if ( 0 === $refCount ) {
+                            $tFile = str_replace(
+                                $dirRoot . DIRECTORY_SEPARATOR,
+                                '',
+                                $tFile,
+                                $refCount
+                            );
+                        }
+
+                        if ( 0 === $refCount ) {
+                            $tFile = str_replace(
+                                str_replace([ '/', '\\' ], '/', $dirRoot) . '/',
+                                '',
+                                str_replace([ '/', '\\' ], '/', $tFile)
+                            );
+                        }
+                    }
+
+                    $trace[$i]['file'] = $tFile;
+                    $trace[$i]['line'] = $tLine;
                 }
             }
         }
@@ -141,24 +172,39 @@ trait HasTraceOverrideTrait
 
             } else {
                 $index = 0;
-                foreach ( $trace as $frame ) {
+                foreach ( $trace as $t ) {
                     $args = "";
 
-                    $file = (($frame['file'] ?? null) ?: '{{file}}');
-                    $line = (($frame['line'] ?? null) ?: -1);
+                    $tFile = (($t['file'] ?? null) ?: '{{file}}');
+                    $tLine = (($t['line'] ?? null) ?: -1);
 
-                    if ( null !== $dirRoot ) {
-                        $file = str_replace(
-                            $dirRoot . DIRECTORY_SEPARATOR,
-                            '',
-                            $file
-                        );
+                    if ( '{{file}}' !== $tFile ) {
+                        if ( null !== $dirRoot ) {
+                            $refCount = 0;
+
+                            if ( 0 === $refCount ) {
+                                $tFile = str_replace(
+                                    $dirRoot . DIRECTORY_SEPARATOR,
+                                    '',
+                                    $tFile,
+                                    $refCount
+                                );
+                            }
+
+                            if ( 0 === $refCount ) {
+                                $tFile = str_replace(
+                                    str_replace([ '/', '\\' ], '/', $dirRoot) . '/',
+                                    '',
+                                    str_replace([ '/', '\\' ], '/', $tFile)
+                                );
+                            }
+                        }
                     }
 
-                    if ( isset($frame['args']) ) {
+                    if ( isset($t['args']) ) {
                         $args = [];
 
-                        foreach ( $frame['args'] as $arg ) {
+                        foreach ( $t['args'] as $arg ) {
                             if ( is_null($arg) ) {
                                 $args[] = '{ NULL }';
 
@@ -193,12 +239,12 @@ trait HasTraceOverrideTrait
                         //
                         $index,
                         //
-                        $file,
-                        $line,
+                        $tFile,
+                        $tLine,
                         //
-                        $frame['class'] ?? '', // > className
-                        $frame['type'] ?? '',  // > "->" or "::"
-                        $frame['function'],    // > function_name
+                        $t['class'] ?? '', // > className
+                        $t['type'] ?? '',  // > "->" or "::"
+                        $t['function'],    // > function_name
                         //
                         $args
                     );
