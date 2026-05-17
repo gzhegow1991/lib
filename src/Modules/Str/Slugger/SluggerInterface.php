@@ -15,6 +15,11 @@ interface SluggerInterface
     /**
      * @return static
      */
+    public function useDefault();
+
+    /**
+     * @return static
+     */
     public function usePresets(?bool $usePresets = null);
 
     /**
@@ -29,12 +34,23 @@ interface SluggerInterface
 
 
     /**
-     * @return static
+     * @return array<string, SluggerPresetInterface>
      */
-    public function selectPresets(array $presets);
+    public function getPresets() : array;
 
     /**
      * @return static
      */
     public function registerPreset(string $name, SluggerPresetInterface $preset);
+
+
+    /**
+     * @return array<string, bool>
+     */
+    public function getPresetsSelected() : array;
+
+    /**
+     * @return static
+     */
+    public function selectPresets(array $presets);
 }

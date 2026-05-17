@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection PhpDocSignatureInspection */
+
 namespace Gzhegow\Lib\Modules\Str\Slugger\PresetRegistry;
 
 use Gzhegow\Lib\Lib;
@@ -30,6 +32,58 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
     protected $symbolMaps;
 
 
+    public function getPresets() : array
+    {
+        return $this->presets;
+    }
+
+    /**
+     * @param array<string, SluggerPresetInterface> $presets
+     *
+     * @return static
+     */
+    public function registerPresets(array $presets)
+    {
+        $this->presets = [];
+
+        foreach ( $presets as $presetName => $preset ) {
+            $this->registerPreset($presetName, $preset);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function registerPreset(string $name, SluggerPresetInterface $preset)
+    {
+        if ( '' === $name ) {
+            throw new LogicException(
+                [ 'The `name` is should be a non-empty string' ]
+            );
+        }
+
+        if ( isset($this->presets[$name]) ) {
+            throw new RuntimeException(
+                [ 'The `name` is already registered', $name ]
+            );
+        }
+
+        $this->presets[$name] = $preset;
+
+        return $this;
+    }
+
+
+    /**
+     * @return array<string, bool>
+     */
+    public function getPresetsSelected() : array
+    {
+        return $this->presetsSelected;
+    }
+
     /**
      * @return static
      */
@@ -52,11 +106,6 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
         return $this;
     }
 
-    public function getPresetsSelected() : array
-    {
-        return $this->presetsSelected;
-    }
-
     public function getSymbolMapsForPresetsSelected() : array
     {
         if ( [] === $this->presetsSelected ) {
@@ -66,6 +115,8 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
         if ( null === $this->symbolMaps ) {
             $presets = [];
             foreach ( $this->presetsSelected as $preset => $bool ) {
+                if ( ! $bool ) continue;
+
                 $presets[$preset] = $this->presets[$preset];
             }
 
@@ -73,29 +124,6 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
         }
 
         return $this->symbolMaps;
-    }
-
-
-    /**
-     * @return static
-     */
-    public function registerPreset(string $name, SluggerPresetInterface $preset)
-    {
-        if ( '' === $name ) {
-            throw new LogicException(
-                [ 'The `name` is should be a non-empty string' ]
-            );
-        }
-
-        if ( isset($this->presets[$name]) ) {
-            throw new RuntimeException(
-                [ 'The `name` is already registered', $name ]
-            );
-        }
-
-        $this->presets[$name] = $preset;
-
-        return $this;
     }
 
 
@@ -124,6 +152,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
                 );
 
                 $ignoreSymbolMap += $ignoreSymbolMapPreparedPreset;
+
                 $knownSymbolMap += $knownSymbolMapPreset;
             }
         }
@@ -135,12 +164,14 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
             if ( [] !== $sequenceMapPreset ) {
                 $knownSymbolMapPreset = [];
 
-                $ignoreSymbolMapPreparedPreset = $this->prepareSequenceMap(
+                $sequenceMapPreparedPreset = $this->prepareSequenceMap(
                     $sequenceMapPreset,
+                    $ignoreSymbolMap,
                     $knownSymbolMapPreset
                 );
 
-                $ignoreSymbolMap += $ignoreSymbolMapPreparedPreset;
+                $sequenceMap += $sequenceMapPreparedPreset;
+
                 $knownSymbolMap += $knownSymbolMapPreset;
             }
 
@@ -149,12 +180,14 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
             if ( [] !== $symbolMapPreset ) {
                 $knownSymbolMapPreset = [];
 
-                $ignoreSymbolMapPreparedPreset = $this->prepareSymbolMap(
+                $symbolMapPreparedPreset = $this->prepareSymbolMap(
                     $symbolMapPreset,
+                    $ignoreSymbolMap,
                     $knownSymbolMapPreset
                 );
 
-                $ignoreSymbolMap += $ignoreSymbolMapPreparedPreset;
+                $symbolMap += $symbolMapPreparedPreset;
+
                 $knownSymbolMap += $knownSymbolMapPreset;
             }
         }
@@ -372,20 +405,20 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
                 $bbLower = $theMb->mb_strtolower($bb);
                 $bbUpper = $theMb->mb_strtoupper($bb);
 
-                $bbSize = strlen($bb);
-                $bbLowerSize = strlen($bbLower);
-                $bbUpperSize = strlen($bbUpper);
+                $bbStrsize = strlen($bb);
+                $bbLowerStrsize = strlen($bbLower);
+                $bbUpperStrsize = strlen($bbUpper);
 
-                $bbLen = $theMb->mb_strlen($bb);
-                $bbLowerLen = $theMb->mb_strlen($bbLower);
-                $bbUpperLen = $theMb->mb_strlen($bbLower);
+                $bbStrlen = $theMb->mb_strlen($bb);
+                $bbLowerStrlen = $theMb->mb_strlen($bbLower);
+                $bbUpperStrlen = $theMb->mb_strlen($bbLower);
 
                 // > example size/length difference when change case: `ß` -> `SS`
                 if ( false
-                    || ($bbSize !== $bbLowerSize)
-                    || ($bbSize !== $bbUpperSize)
-                    || ($bbLen !== $bbLowerLen)
-                    || ($bbLen !== $bbUpperLen)
+                    || ($bbStrsize !== $bbLowerStrsize)
+                    || ($bbStrsize !== $bbUpperStrsize)
+                    || ($bbStrlen !== $bbLowerStrlen)
+                    || ($bbStrlen !== $bbUpperStrlen)
                 ) {
                     throw new LogicException(
                         [

@@ -58,17 +58,17 @@ class DefaultSlugger implements SluggerInterface
         ?SluggerPresetRegistryInterface $registry = null
     )
     {
+        $registry = $registry ?? new SluggerPresetRegistry();
+
         $theType = Lib::type();
 
         $theType->is_extension_loaded('mbstring')->orThrow();
 
-        $this->registry = $registry ?? new SluggerPresetRegistry();
+        $this->registry = $registry;
 
-        $this->registryDefault = clone $this->registry;
-        $this->registryDefault->registerPreset('default', new DefaultSluggerPreset());
+        $this->registryDefault = clone $registry;
+        $this->registryDefault->registerPresets([ 'default' => new DefaultSluggerPreset() ]);
         $this->registryDefault->selectPresets([ 'default' ]);
-
-        $this->useIntlTransliterator(null);
     }
 
     public function __clone()
@@ -145,11 +145,25 @@ class DefaultSlugger implements SluggerInterface
     /**
      * @return static
      */
+    public function useDefault()
+    {
+        $this->usePresets = false;
+        $this->useSymfonySlugger = false;
+        $this->useIntlTransliterator = false;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
     public function usePresets(?bool $usePresets = null)
     {
         $usePresets = $usePresets ?? false;
 
         $this->usePresets = $usePresets;
+        $this->useSymfonySlugger = false;
+        $this->useIntlTransliterator = false;
 
         return $this;
     }
@@ -178,7 +192,9 @@ class DefaultSlugger implements SluggerInterface
             }
         }
 
+        $this->usePresets = false;
         $this->useSymfonySlugger = $useSymfonySlugger;
+        $this->useIntlTransliterator = false;
 
         return $this;
     }
@@ -199,13 +215,15 @@ class DefaultSlugger implements SluggerInterface
                 throw new ComposerException(
                     [
                         ''
-                        . 'Missing php extension of function does not exist: '
+                        . 'Missing php extension or function does not exist: '
                         . '[ ' . implode(' ][ ', [ 'ext-intl', 'transliterator_transliterate' ]) . ' ]',
                     ]
                 );
             }
         }
 
+        $this->usePresets = false;
+        $this->useSymfonySlugger = false;
         $this->useIntlTransliterator = $useIntlTransliterator;
 
         return $this;
@@ -213,15 +231,11 @@ class DefaultSlugger implements SluggerInterface
 
 
     /**
-     * @return static
+     * @return array<string, SluggerPresetInterface>
      */
-    public function selectPresets(array $presets)
+    public function getPresets() : array
     {
-        $this->usePresets = true;
-
-        $this->registry->selectPresets($presets);
-
-        return $this;
+        return $this->registry->getPresets();
     }
 
     /**
@@ -230,6 +244,25 @@ class DefaultSlugger implements SluggerInterface
     public function registerPreset(string $name, SluggerPresetInterface $preset)
     {
         $this->registry->registerPreset($name, $preset);
+
+        return $this;
+    }
+
+
+    /**
+     * @return array<string, bool>
+     */
+    public function getPresetsSelected() : array
+    {
+        return $this->registry->getPresetsSelected();
+    }
+
+    /**
+     * @return static
+     */
+    public function selectPresets(array $presets)
+    {
+        $this->registry->selectPresets($presets);
 
         return $this;
     }
@@ -358,6 +391,7 @@ class DefaultSlugger implements SluggerInterface
             }
 
             $ignoreSymbolString = $theType->string_not_empty($ignoreSymbol)->orThrow();
+
             $ignoreSymbolUserMap[$ignoreSymbolString] = true;
         }
 
@@ -395,52 +429,11 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
-        $thePreg = Lib::preg();
-
-        $presets = $this->registry->getPresetsSelected();
-
-        if ( [] === $presets ) {
-            throw new RuntimeException(
-                [ 'Unable to ' . __FUNCTION__ . ' | No presets was selected' ]
-            );
-        }
-
-        [
-            $ignoreSymbolMap,
-            $sequnceMap,
-            $symbolMap,
-            $knownSymbolMap,
-        ] = $this->registry->getSymbolMapsForPresetsSelected();
-
-        if ( [] !== $ignoreSymbolUserMap ) {
-            $ignoreSymbolMap += $ignoreSymbolUserMap;
-            $knownSymbolMap += $ignoreSymbolUserMap;
-        }
-
-        $gen = $this->translit_it($string, $ignoreSymbolMap);
-
-        $translit = '';
-        foreach ( $gen as [$chunk, $chunkDelimiter] ) {
-            $chunk = str_replace(
-                array_keys($sequnceMap),
-                array_values($sequnceMap),
-                $chunk
-            );
-
-            $chunk = str_replace(
-                array_keys($symbolMap),
-                array_values($symbolMap),
-                $chunk
-            );
-
-            $translit .= "{$chunk}{$chunkDelimiter}";
-        }
-
-        $knownSymbolMapRegex = array_keys($knownSymbolMap);
-        $knownSymbolMapRegex = implode('', $knownSymbolMapRegex);
-        $knownSymbolMapRegex = '/[^' . $thePreg->preg_quote_ord($knownSymbolMapRegex) . 'a-z0-9 ]/iu';
-
-        $translit = preg_replace($knownSymbolMapRegex, $delimiter, $translit);
+        $translit = $this->translitRegistry(
+            $this->registry,
+            $string, $delimiter,
+            $ignoreSymbolUserMap
+        );
 
         return $translit;
     }
@@ -533,6 +526,33 @@ class DefaultSlugger implements SluggerInterface
             return '';
         }
 
+        $translit = $this->translitRegistry(
+            $this->registryDefault,
+            $string, $delimiter,
+            $ignoreSymbolUserMap
+        );
+
+        return $translit;
+    }
+
+    protected function translitRegistry(
+        SluggerPresetRegistryInterface $registry,
+        string $string, string $delimiter,
+        array $ignoreSymbolUserMap
+    ) : string
+    {
+        if ( '' === $string ) {
+            return '';
+        }
+
+        $presets = $registry->getPresetsSelected();
+
+        if ( [] === $presets ) {
+            throw new RuntimeException(
+                [ 'Unable to ' . __FUNCTION__ . ' | No presets was selected' ]
+            );
+        }
+
         $thePreg = Lib::preg();
 
         [
@@ -540,7 +560,7 @@ class DefaultSlugger implements SluggerInterface
             $sequnceMap,
             $symbolMap,
             $knownSymbolMap,
-        ] = $this->registryDefault->getSymbolMapsForPresetsSelected();
+        ] = $registry->getSymbolMapsForPresetsSelected();
 
         if ( [] !== $ignoreSymbolUserMap ) {
             $ignoreSymbolMap += $ignoreSymbolUserMap;

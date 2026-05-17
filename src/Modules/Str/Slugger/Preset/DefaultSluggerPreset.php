@@ -6,43 +6,52 @@ namespace Gzhegow\Lib\Modules\Str\Slugger\Preset;
 class DefaultSluggerPreset implements SluggerPresetInterface
 {
     /**
+     * > эти символы не будут транслитерироваться вовсе
+     *
      * @return array<string, bool>
      */
     public function getIgnoreSymbolMap() : array
     {
         return [
-            // 'a' => true,
+            // '-' => true,
         ];
     }
 
     /**
+     * > эти символы не будут транслитерироваться по слогам, при этом каждую букву стоит указать отдельно для поддержки `ignoreCase`
+     *
      * @return array<string, array<string, string>>
      */
     public function getSequenceMap() : array
     {
         return [
+            // > syllables
             'ый' => [ 'ы' => 'i', 'й' => 'y' ],
             'ех' => [ 'е' => 'e', 'х' => 'kh' ],
             'сх' => [ 'с' => 's', 'х' => 'kh' ],
             'цх' => [ 'ц' => 'c', 'х' => 'kh' ],
             //
-            'ẚ'  => [ 'ẚ' => 'a' ], // > ẚ -> [lower]: ẚ -> [upper]: Aʾ
-            //
-            'ß'  => [ 'ß' => 'ss' ], // > ß -> [lower]: ß -> [upper]: SS
-            //
-            'ſ'  => [ 'ſ' => 's' ], // > ſ -> [lower]: ſ -> [upper]: S
+            // > the lower/upper version has a different length in bytes
+            'ſ'  => [ 'ſ' => 's' ],
         ];
     }
 
     /**
+     * > эти символы будут транслитерироваться один к одному
+     *
      * @return array<string, array<string, bool>>
      */
     public function getSymbolMap() : array
     {
         return [
             '' => [
-                'ъ' => true,
-                'ь' => true,
+                '\'' => true,
+                //
+                '`'  => true,
+                'ъ'  => true,
+                'ь'  => true,
+                '’'  => true,
+                '′'  => true,
             ],
 
             'a' => [
@@ -67,6 +76,7 @@ class DefaultSluggerPreset implements SluggerPresetInterface
                 'ȧ' => true,
                 'а' => true,
                 'ḁ' => true,
+                'ẚ' => true,
                 'ạ' => true,
                 'ả' => true,
                 'ấ' => true,
@@ -186,7 +196,9 @@ class DefaultSluggerPreset implements SluggerPresetInterface
                 'ł' => true,
                 'л' => true,
             ],
-            'm' => [ 'м' => true ],
+            'm' => [
+                'м' => true,
+            ],
             'n' => [
                 'ñ' => true,
                 'ń' => true,
@@ -296,7 +308,9 @@ class DefaultSluggerPreset implements SluggerPresetInterface
                 'ữ' => true,
                 'ự' => true,
             ],
-            'v' => [ 'в' => true ],
+            'v' => [
+                'в' => true,
+            ],
             'w' => [
                 'ŵ' => true,
                 'ẁ' => true,
@@ -328,6 +342,7 @@ class DefaultSluggerPreset implements SluggerPresetInterface
             'eh'   => [ 'э' => true ],
             'ij'   => [ 'ĳ' => true ],
             'oe'   => [ 'œ' => true ],
+            'ss'   => [ 'ß' => true ],
             'sh'   => [ 'ш' => true ],
             'shch' => [ 'щ' => true ],
             'ue'   => [ 'ü' => true ],
