@@ -1097,7 +1097,7 @@ class NumModule
         $toNum = $this->type_num([], $to);
 
         if ( ! (true
-            && ($fromNum >= $valueNumeric)
+            && ($fromNum <= $valueNumeric)
             && ($valueNumeric <= $toNum)
         ) ) {
             return Ret::throw(
@@ -1129,7 +1129,7 @@ class NumModule
         $toNum = $this->type_num([], $to);
 
         if ( ! (true
-            && ($fromNum > $valueNumeric)
+            && ($fromNum < $valueNumeric)
             && ($valueNumeric < $toNum)
         ) ) {
             return Ret::throw(
@@ -1736,7 +1736,7 @@ class NumModule
         $toNum = $this->type_num([], $to);
 
         if ( ! (true
-            && ($fromNum >= $valueNum)
+            && ($fromNum <= $valueNum)
             && ($valueNum <= $toNum)
         ) ) {
             return Ret::throw(
@@ -1768,7 +1768,7 @@ class NumModule
         $toNum = $this->type_num([], $to);
 
         if ( ! (true
-            && ($fromNum > $valueNum)
+            && ($fromNum < $valueNum)
             && ($valueNum < $toNum)
         ) ) {
             return Ret::throw(
@@ -2131,7 +2131,7 @@ class NumModule
         $toNum = $this->type_num([], $to);
 
         if ( ! (true
-            && ($fromNum >= $valueInt)
+            && ($fromNum <= $valueInt)
             && ($valueInt <= $toNum)
         ) ) {
             return Ret::throw(
@@ -2163,7 +2163,7 @@ class NumModule
         $toNum = $this->type_num([], $to);
 
         if ( ! (true
-            && ($fromNum > $valueInt)
+            && ($fromNum < $valueInt)
             && ($valueInt < $toNum)
         ) ) {
             return Ret::throw(
@@ -2526,7 +2526,7 @@ class NumModule
         $toNum = $this->type_num([], $to);
 
         if ( ! (true
-            && ($fromNum >= $valueFloat)
+            && ($fromNum <= $valueFloat)
             && ($valueFloat <= $toNum)
         ) ) {
             return Ret::throw(
@@ -2558,7 +2558,7 @@ class NumModule
         $toNum = $this->type_num([], $to);
 
         if ( ! (true
-            && ($fromNum > $valueFloat)
+            && ($fromNum < $valueFloat)
             && ($valueFloat < $toNum)
         ) ) {
             return Ret::throw(
