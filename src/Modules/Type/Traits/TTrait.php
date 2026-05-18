@@ -1791,6 +1791,33 @@ trait TTrait
 
 
 	/**
+	 * @return Ret<string>|string
+	 */
+	public function uuid_v4($fb, $value)
+	{
+		return Lib::random()->type_uuid_v4($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function uuid_v5($fb, $value)
+	{
+		return Lib::random()->type_uuid_v5($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function uuid_v7($fb, $value)
+	{
+		return Lib::random()->type_uuid_v7($fb, $value);
+	}
+
+
+	/**
 	 * @return Ret<array|\Countable>|array|\Countable
 	 */
 	public function countable($fb, $value)

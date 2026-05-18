@@ -1018,6 +1018,21 @@ interface TInterface
     public function uuid($fb, $value);
 
     /**
+     * @return Ret<string>|string
+     */
+    public function uuid_v4($fb, $value);
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function uuid_v5($fb, $value);
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function uuid_v7($fb, $value);
+
+    /**
      * @return Ret<array|\Countable>|array|\Countable
      */
     public function countable($fb, $value);

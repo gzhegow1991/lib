@@ -1784,6 +1784,33 @@ trait TypeTrait
 
 
 	/**
+	 * @return Ret<string>
+	 */
+	public function uuid_v4($value)
+	{
+		return Lib::random()->type_uuid_v4(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function uuid_v5($value)
+	{
+		return Lib::random()->type_uuid_v5(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function uuid_v7($value)
+	{
+		return Lib::random()->type_uuid_v7(null, $value);
+	}
+
+
+	/**
 	 * @return Ret<array|\Countable>
 	 */
 	public function countable($value)

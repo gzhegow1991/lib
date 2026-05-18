@@ -1018,6 +1018,21 @@ interface TypeInterface
     public function uuid($value);
 
     /**
+     * @return Ret<string>
+     */
+    public function uuid_v4($value);
+
+    /**
+     * @return Ret<string>
+     */
+    public function uuid_v5($value);
+
+    /**
+     * @return Ret<string>
+     */
+    public function uuid_v7($value);
+
+    /**
      * @return Ret<array|\Countable>
      */
     public function countable($value);

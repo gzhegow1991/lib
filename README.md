@@ -19,6 +19,8 @@ php test.php
 ```php
 <?php
 
+/** @noinspection PhpComposerExtensionStubsInspection */
+
 // > настраиваем PHP
 // > некоторые CMS сами по себе применяют настройки глубоко в ядре
 // > с помощью этого класса можно указать при загрузке свои собственные и вызвав методы ->use{smtg}() вернуть указанные
@@ -4943,9 +4945,26 @@ $fn = function () use ($ffn) {
     $ffn->print('[ RandomModule ]');
     echo "\n";
 
-    $uuid = \Gzhegow\Lib\Lib::random()->uuid();
-    $status = \Gzhegow\Lib\Lib::random()->type_uuid(null, $uuid)->isOk([ &$result ]);
-    $ffn->print(strlen($uuid), $status);
+    $uuidV4 = \Gzhegow\Lib\Lib::random()->uuidV4();
+    $uuidV7 = \Gzhegow\Lib\Lib::random()->uuidV7();
+
+    $status1 = \Gzhegow\Lib\Lib::random()->type_uuid_v4(null, $uuidV4)->isOk([ &$result ]);
+    $status2 = \Gzhegow\Lib\Lib::random()->type_uuid_v7(null, $uuidV7)->isOk([ &$result ]);
+    $ffn->print(strlen($uuidV4), $status1);
+    $ffn->print(strlen($uuidV7), $status2);
+
+    echo "\n";
+
+
+    $uuidV5Namespace = \Gzhegow\Lib\Lib::random()->uuidV4();
+    $uuidV5a = \Gzhegow\Lib\Lib::random()->uuidV5($uuidV5Namespace, 'hello');
+    $uuidV5b = \Gzhegow\Lib\Lib::random()->uuidV5($uuidV5Namespace, 'hello');
+
+    $status1 = \Gzhegow\Lib\Lib::random()->type_uuid_v5(null, $uuidV5a)->isOk([ &$result ]);
+    $status2 = \Gzhegow\Lib\Lib::random()->type_uuid_v5(null, $uuidV5b)->isOk([ &$result ]);
+    $ffn->print(strlen($uuidV5a), $status1);
+    $ffn->print(strlen($uuidV5b), $status2);
+    $ffn->print($uuidV5a === $uuidV5b);
 
     echo "\n";
 
@@ -5020,6 +5039,11 @@ $test->expectStdout('
 "[ RandomModule ]"
 
 36 | TRUE
+36 | TRUE
+
+36 | TRUE
+36 | TRUE
+TRUE
 
 16 | TRUE
 32 | TRUE

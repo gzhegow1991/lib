@@ -3107,6 +3107,25 @@ class ArrModule
     }
 
 
+    public function slice(array $array, int $offset, ?int $length, ?bool $preserve_keys = null) : array
+    {
+        $slice = array_slice($array, $offset, $length, $preserve_keys);
+
+        return $slice;
+    }
+
+    public function splice(array &$array, int $offset, ?int $length, ?bool $preserve_keys = null) : array
+    {
+        $removed = array_slice($array, $offset, $length, $preserve_keys);
+
+        foreach ( $removed as $key => $value ) {
+            unset($array[$key]);
+        }
+
+        return $removed;
+    }
+
+
     public function is_unique_keys(array ...$arrays) : bool
     {
         $seen = [];
