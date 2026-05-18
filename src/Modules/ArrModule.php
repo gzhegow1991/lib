@@ -3109,6 +3109,8 @@ class ArrModule
 
     public function slice(array $array, int $offset, ?int $length, ?bool $preserve_keys = null) : array
     {
+        $preserve_keys = $preserve_keys ?? true;
+
         $slice = array_slice($array, $offset, $length, $preserve_keys);
 
         return $slice;
@@ -3116,6 +3118,8 @@ class ArrModule
 
     public function splice(array &$array, int $offset, ?int $length, ?bool $preserve_keys = null) : array
     {
+        $preserve_keys = $preserve_keys ?? true;
+
         $removed = array_slice($array, $offset, $length, $preserve_keys);
 
         foreach ( $removed as $key => $value ) {
