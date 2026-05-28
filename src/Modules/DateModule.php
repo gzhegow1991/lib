@@ -1,10 +1,14 @@
 <?php
+/**
+ * @noinspection PhpComposerExtensionStubsInspection
+ */
 
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
+use Gzhegow\Lib\Exception\RuntimeException;
 
 
 class DateModule
@@ -20,109 +24,138 @@ class DateModule
     const FORMAT_SQL_DATE_YEAR  = 'Y-00-00';
     const FORMAT_SQL_DATE_MONTH = 'Y-m-00';
     const FORMAT_SQL_DATE_DAY   = 'Y-m-d';
+    //
+    const FORMAT_SQL       = self::FORMAT_SQL_NO_OFFSET;
+    const FORMAT_SQL_YEAR  = self::FORMAT_SQL_NO_OFFSET_YEAR;
+    const FORMAT_SQL_MONTH = self::FORMAT_SQL_NO_OFFSET_MONTH;
+    const FORMAT_SQL_DAY   = self::FORMAT_SQL_NO_OFFSET_DAY;
+    const FORMAT_SQL_HOUR  = self::FORMAT_SQL_NO_OFFSET_HOUR;
+    const FORMAT_SQL_MIN   = self::FORMAT_SQL_NO_OFFSET_MIN;
+    const FORMAT_SQL_SEC   = self::FORMAT_SQL_NO_OFFSET_SEC;
+    const FORMAT_SQL_MSEC  = self::FORMAT_SQL_NO_OFFSET_MSEC;
+    const FORMAT_SQL_USEC  = self::FORMAT_SQL_NO_OFFSET_USEC;
+    //
+    const FORMAT_SQL_OFFSET       = self::FORMAT_SQL_OFFSET_SEC;
+    const FORMAT_SQL_OFFSET_YEAR  = 'Y-00-00 00:00:00P';
+    const FORMAT_SQL_OFFSET_MONTH = 'Y-m-00 00:00:00P';
+    const FORMAT_SQL_OFFSET_DAY   = 'Y-m-d 00:00:00P';
+    const FORMAT_SQL_OFFSET_HOUR  = 'Y-m-d H:00:00P';
+    const FORMAT_SQL_OFFSET_MIN   = 'Y-m-d H:i:00P';
+    const FORMAT_SQL_OFFSET_SEC   = 'Y-m-d H:i:sP';
+    const FORMAT_SQL_OFFSET_MSEC  = 'Y-m-d H:i:s.vP';
+    const FORMAT_SQL_OFFSET_USEC  = 'Y-m-d H:i:s.uP';
+    //
+    const FORMAT_SQL_NO_OFFSET       = self::FORMAT_SQL_NO_OFFSET_SEC;
+    const FORMAT_SQL_NO_OFFSET_YEAR  = 'Y-00-00 00:00:00';
+    const FORMAT_SQL_NO_OFFSET_MONTH = 'Y-m-00 00:00:00';
+    const FORMAT_SQL_NO_OFFSET_DAY   = 'Y-m-d 00:00:00';
+    const FORMAT_SQL_NO_OFFSET_HOUR  = 'Y-m-d H:00:00';
+    const FORMAT_SQL_NO_OFFSET_MIN   = 'Y-m-d H:i:00';
+    const FORMAT_SQL_NO_OFFSET_SEC   = 'Y-m-d H:i:s';
+    const FORMAT_SQL_NO_OFFSET_MSEC  = 'Y-m-d H:i:s.v';
+    const FORMAT_SQL_NO_OFFSET_USEC  = 'Y-m-d H:i:s.u';
 
-    const FORMAT_SQL       = self::FORMAT_SQL_SEC;
-    const FORMAT_SQL_YEAR  = 'Y-00-00 00:00:00';
-    const FORMAT_SQL_MONTH = 'Y-m-00 00:00:00';
-    const FORMAT_SQL_DAY   = 'Y-m-d 00:00:00';
-    const FORMAT_SQL_HOUR  = 'Y-m-d H:00:00';
-    const FORMAT_SQL_MIN   = 'Y-m-d H:i:00';
-    const FORMAT_SQL_SEC   = 'Y-m-d H:i:s';
-    const FORMAT_SQL_MSEC  = 'Y-m-d H:i:s.v';
-    const FORMAT_SQL_USEC  = 'Y-m-d H:i:s.u';
+    const FORMAT_SQL_TIME      = self::FORMAT_SQL_TIME_NO_OFFSET;
+    const FORMAT_SQL_TIME_HOUR = self::FORMAT_SQL_TIME_NO_OFFSET_HOUR;
+    const FORMAT_SQL_TIME_MIN  = self::FORMAT_SQL_TIME_NO_OFFSET_MIN;
+    const FORMAT_SQL_TIME_SEC  = self::FORMAT_SQL_TIME_NO_OFFSET_SEC;
+    const FORMAT_SQL_TIME_MSEC = self::FORMAT_SQL_TIME_NO_OFFSET_MSEC;
+    const FORMAT_SQL_TIME_USEC = self::FORMAT_SQL_TIME_NO_OFFSET_USEC;
+    //
+    const FORMAT_SQL_TIME_OFFSET      = self::FORMAT_SQL_TIME_OFFSET_SEC;
+    const FORMAT_SQL_TIME_OFFSET_HOUR = 'H:00:00P';
+    const FORMAT_SQL_TIME_OFFSET_MIN  = 'H:i:00P';
+    const FORMAT_SQL_TIME_OFFSET_SEC  = 'H:i:sP';
+    const FORMAT_SQL_TIME_OFFSET_MSEC = 'H:i:s.vP';
+    const FORMAT_SQL_TIME_OFFSET_USEC = 'H:i:s.uP';
+    //
+    const FORMAT_SQL_TIME_NO_OFFSET      = self::FORMAT_SQL_TIME_NO_OFFSET_SEC;
+    const FORMAT_SQL_TIME_NO_OFFSET_HOUR = 'H:00:00';
+    const FORMAT_SQL_TIME_NO_OFFSET_MIN  = 'H:i:00';
+    const FORMAT_SQL_TIME_NO_OFFSET_SEC  = 'H:i:s';
+    const FORMAT_SQL_TIME_NO_OFFSET_MSEC = 'H:i:s.v';
+    const FORMAT_SQL_TIME_NO_OFFSET_USEC = 'H:i:s.u';
 
-    const FORMAT_SQL_TIME      = self::FORMAT_SQL_TIME_SEC;
-    const FORMAT_SQL_TIME_HOUR = 'H:00:00';
-    const FORMAT_SQL_TIME_MIN  = 'H:i:00';
-    const FORMAT_SQL_TIME_SEC  = 'H:i:s';
-    const FORMAT_SQL_TIME_MSEC = 'H:i:s.v';
-    const FORMAT_SQL_TIME_USEC = 'H:i:s.u';
-
-    const FORMAT_JAVASCRIPT                = self::FORMAT_JAVASCRIPT_SEC;
-    const FORMAT_JAVASCRIPT_SEC            = "Y-m-d\TH:i:sP";
-    const FORMAT_JAVASCRIPT_MSEC           = "Y-m-d\TH:i:s.vP";
-    const FORMAT_JAVASCRIPT_USEC           = "Y-m-d\TH:i:s.uP";
+    const FORMAT_JAVASCRIPT      = self::FORMAT_JAVASCRIPT_SEC;
+    const FORMAT_JAVASCRIPT_SEC  = self::FORMAT_JAVASCRIPT_OFFSET_SEC;
+    const FORMAT_JAVASCRIPT_MSEC = self::FORMAT_JAVASCRIPT_OFFSET_MSEC;
+    const FORMAT_JAVASCRIPT_USEC = self::FORMAT_JAVASCRIPT_OFFSET_USEC;
+    //
+    const FORMAT_JAVASCRIPT_OFFSET      = self::FORMAT_JAVASCRIPT_OFFSET_SEC;
+    const FORMAT_JAVASCRIPT_OFFSET_SEC  = "Y-m-d\TH:i:sP";
+    const FORMAT_JAVASCRIPT_OFFSET_MSEC = "Y-m-d\TH:i:s.vP";
+    const FORMAT_JAVASCRIPT_OFFSET_USEC = "Y-m-d\TH:i:s.uP";
+    //
     const FORMAT_JAVASCRIPT_NO_OFFSET      = self::FORMAT_JAVASCRIPT_NO_OFFSET_SEC;
     const FORMAT_JAVASCRIPT_NO_OFFSET_SEC  = "Y-m-d\TH:i:s";
     const FORMAT_JAVASCRIPT_NO_OFFSET_MSEC = "Y-m-d\TH:i:s.v";
     const FORMAT_JAVASCRIPT_NO_OFFSET_USEC = "Y-m-d\TH:i:s.u";
-    const FORMAT_JAVASCRIPT_Z              = self::FORMAT_JAVASCRIPT_Z_SEC;
-    const FORMAT_JAVASCRIPT_Z_SEC          = "Y-m-d\TH:i:s\Z";
-    const FORMAT_JAVASCRIPT_Z_MSEC         = "Y-m-d\TH:i:s.v\Z";
-    const FORMAT_JAVASCRIPT_Z_USEC         = "Y-m-d\TH:i:s.u\Z";
+    //
+    const FORMAT_JAVASCRIPT_Z      = self::FORMAT_JAVASCRIPT_Z_SEC;
+    const FORMAT_JAVASCRIPT_Z_SEC  = "Y-m-d\TH:i:s\Z";
+    const FORMAT_JAVASCRIPT_Z_MSEC = "Y-m-d\TH:i:s.v\Z";
+    const FORMAT_JAVASCRIPT_Z_USEC = "Y-m-d\TH:i:s.u\Z";
 
     const FORMAT_FILENAME_DATE       = self::FORMAT_FILENAME_DATE_DAY;
     const FORMAT_FILENAME_DATE_YEAR  = 'y0000';
     const FORMAT_FILENAME_DATE_MONTH = 'ym00';
     const FORMAT_FILENAME_DATE_DAY   = 'ymd';
+    //
+    const FORMAT_FILENAME       = self::FORMAT_FILENAME_NO_OFFSET;
+    const FORMAT_FILENAME_YEAR  = self::FORMAT_FILENAME_NO_OFFSET_YEAR;
+    const FORMAT_FILENAME_MONTH = self::FORMAT_FILENAME_NO_OFFSET_MONTH;
+    const FORMAT_FILENAME_DAY   = self::FORMAT_FILENAME_NO_OFFSET_DAY;
+    const FORMAT_FILENAME_HOUR  = self::FORMAT_FILENAME_NO_OFFSET_HOUR;
+    const FORMAT_FILENAME_MIN   = self::FORMAT_FILENAME_NO_OFFSET_MIN;
+    const FORMAT_FILENAME_SEC   = self::FORMAT_FILENAME_NO_OFFSET_SEC;
+    const FORMAT_FILENAME_MSEC  = self::FORMAT_FILENAME_NO_OFFSET_MSEC;
+    const FORMAT_FILENAME_USEC  = self::FORMAT_FILENAME_NO_OFFSET_USEC;
+    //
+    const FORMAT_FILENAME_OFFSET       = self::FORMAT_FILENAME_OFFSET_SEC;
+    const FORMAT_FILENAME_OFFSET_YEAR  = 'y0000_000000_O';
+    const FORMAT_FILENAME_OFFSET_MONTH = 'ym00_000000_O';
+    const FORMAT_FILENAME_OFFSET_DAY   = 'ymd_000000_O';
+    const FORMAT_FILENAME_OFFSET_HOUR  = 'ymd_H0000_O';
+    const FORMAT_FILENAME_OFFSET_MIN   = 'ymd_Hi00_O';
+    const FORMAT_FILENAME_OFFSET_SEC   = 'ymd_His_O';
+    const FORMAT_FILENAME_OFFSET_MSEC  = 'ymd_His_v_O';
+    const FORMAT_FILENAME_OFFSET_USEC  = 'ymd_His_u_O';
+    //
+    const FORMAT_FILENAME_NO_OFFSET       = self::FORMAT_FILENAME_NO_OFFSET_SEC;
+    const FORMAT_FILENAME_NO_OFFSET_YEAR  = 'y0000_000000';
+    const FORMAT_FILENAME_NO_OFFSET_MONTH = 'ym00_000000';
+    const FORMAT_FILENAME_NO_OFFSET_DAY   = 'ymd_000000';
+    const FORMAT_FILENAME_NO_OFFSET_HOUR  = 'ymd_H0000';
+    const FORMAT_FILENAME_NO_OFFSET_MIN   = 'ymd_Hi00';
+    const FORMAT_FILENAME_NO_OFFSET_SEC   = 'ymd_His';
+    const FORMAT_FILENAME_NO_OFFSET_MSEC  = 'ymd_His_v';
+    const FORMAT_FILENAME_NO_OFFSET_USEC  = 'ymd_His_u';
 
-    const FORMAT_FILENAME       = self::FORMAT_FILENAME_SEC;
-    const FORMAT_FILENAME_YEAR  = 'y0000_000000';
-    const FORMAT_FILENAME_MONTH = 'ym00_000000';
-    const FORMAT_FILENAME_DAY   = 'ymd_000000';
-    const FORMAT_FILENAME_HOUR  = 'ymd_H0000';
-    const FORMAT_FILENAME_MIN   = 'ymd_Hi00';
-    const FORMAT_FILENAME_SEC   = 'ymd_His';
-    const FORMAT_FILENAME_MSEC  = 'ymd_His_v';
-    const FORMAT_FILENAME_USEC  = 'ymd_His_u';
-
-    const FORMAT_HUMAN_DATE = "D, d M Y P e";
-    const FORMAT_HUMAN      = "D, d M Y H:i:s P e";
-
-
-    const LIST_INTERVAL = [
-        self::INTERVAL_MINUTE => true,
-        self::INTERVAL_HOUR   => true,
-        self::INTERVAL_DAY    => true,
-        self::INTERVAL_WEEK   => true,
-        self::INTERVAL_MONTH  => true,
-        self::INTERVAL_YEAR   => true,
-    ];
-
-    const LIST_FORMAT = [
-        self::FORMAT_SQL_DATE_YEAR  => true,
-        self::FORMAT_SQL_DATE_MONTH => true,
-        self::FORMAT_SQL_DATE_DAY   => true,
-
-        self::FORMAT_SQL_YEAR  => true,
-        self::FORMAT_SQL_MONTH => true,
-        self::FORMAT_SQL_DAY   => true,
-        self::FORMAT_SQL_HOUR  => true,
-        self::FORMAT_SQL_MIN   => true,
-        self::FORMAT_SQL_SEC   => true,
-        self::FORMAT_SQL_MSEC  => true,
-        self::FORMAT_SQL_USEC  => true,
-
-        self::FORMAT_SQL_TIME_HOUR => true,
-        self::FORMAT_SQL_TIME_MIN  => true,
-        self::FORMAT_SQL_TIME_SEC  => true,
-        self::FORMAT_SQL_TIME_MSEC => true,
-        self::FORMAT_SQL_TIME_USEC => true,
-
-        self::FORMAT_JAVASCRIPT_SEC  => true,
-        self::FORMAT_JAVASCRIPT_MSEC => true,
-        self::FORMAT_JAVASCRIPT_USEC => true,
-
-        self::FORMAT_JAVASCRIPT_NO_OFFSET_SEC  => true,
-        self::FORMAT_JAVASCRIPT_NO_OFFSET_MSEC => true,
-        self::FORMAT_JAVASCRIPT_NO_OFFSET_USEC => true,
-
-        self::FORMAT_FILENAME_DATE_YEAR  => true,
-        self::FORMAT_FILENAME_DATE_MONTH => true,
-        self::FORMAT_FILENAME_DATE_DAY   => true,
-
-        self::FORMAT_FILENAME_YEAR  => true,
-        self::FORMAT_FILENAME_MONTH => true,
-        self::FORMAT_FILENAME_DAY   => true,
-        self::FORMAT_FILENAME_HOUR  => true,
-        self::FORMAT_FILENAME_MIN   => true,
-        self::FORMAT_FILENAME_SEC   => true,
-        self::FORMAT_FILENAME_MSEC  => true,
-        self::FORMAT_FILENAME_USEC  => true,
-
-        self::FORMAT_HUMAN_DATE => true,
-        self::FORMAT_HUMAN      => true,
-    ];
+    const FORMAT_HUMAN_DATE       = self::FORMAT_HUMAN_DATE_DAY;
+    const FORMAT_HUMAN_DATE_YEAR  = "Y";
+    const FORMAT_HUMAN_DATE_MONTH = "M Y";
+    const FORMAT_HUMAN_DATE_DAY   = "D, d M Y";
+    //
+    const FORMAT_HUMAN      = self::FORMAT_HUMAN_OFFSET;
+    const FORMAT_HUMAN_HOUR = self::FORMAT_HUMAN_OFFSET_HOUR;
+    const FORMAT_HUMAN_MIN  = self::FORMAT_HUMAN_OFFSET_MIN;
+    const FORMAT_HUMAN_SEC  = self::FORMAT_HUMAN_OFFSET_SEC;
+    const FORMAT_HUMAN_MSEC = self::FORMAT_HUMAN_OFFSET_MSEC;
+    const FORMAT_HUMAN_USEC = self::FORMAT_HUMAN_OFFSET_USEC;
+    //
+    const FORMAT_HUMAN_OFFSET      = self::FORMAT_HUMAN_OFFSET_SEC;
+    const FORMAT_HUMAN_OFFSET_HOUR = "D, d M Y H:00 P e";
+    const FORMAT_HUMAN_OFFSET_MIN  = "D, d M Y H:i P e";
+    const FORMAT_HUMAN_OFFSET_SEC  = "D, d M Y H:i:s P e";
+    const FORMAT_HUMAN_OFFSET_MSEC = "D, d M Y H:i:s.v P e";
+    const FORMAT_HUMAN_OFFSET_USEC = "D, d M Y H:i:s.u P e";
+    //
+    const FORMAT_HUMAN_NO_OFFSET      = self::FORMAT_HUMAN_NO_OFFSET_SEC;
+    const FORMAT_HUMAN_NO_OFFSET_HOUR = "D, d M Y H:00";
+    const FORMAT_HUMAN_NO_OFFSET_MIN  = "D, d M Y H:i";
+    const FORMAT_HUMAN_NO_OFFSET_SEC  = "D, d M Y H:i:s";
+    const FORMAT_HUMAN_NO_OFFSET_MSEC = "D, d M Y H:i:s.v";
+    const FORMAT_HUMAN_NO_OFFSET_USEC = "D, d M Y H:i:s.u";
 
 
     // public function __construct()
@@ -131,10 +164,6 @@ class DateModule
 
     public function __initialize()
     {
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('date')->orThrow();
-
         return $this;
     }
 
@@ -180,7 +209,7 @@ class DateModule
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_extract_type($dateTimeZone);
+            $timezoneType = $this->timezone_type($dateTimeZone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
@@ -223,7 +252,7 @@ class DateModule
             );
         }
 
-        $timezoneType = $this->timezone_extract_type($dateTimeZone);
+        $timezoneType = $this->timezone_type($dateTimeZone);
 
         if ( $timezoneType !== 1 ) {
             return Ret::throw(
@@ -265,7 +294,7 @@ class DateModule
             );
         }
 
-        $timezoneType = $this->timezone_extract_type($dateTimeZone);
+        $timezoneType = $this->timezone_type($dateTimeZone);
 
         if ( $timezoneType !== 2 ) {
             return Ret::throw(
@@ -307,7 +336,7 @@ class DateModule
             );
         }
 
-        $timezoneType = $this->timezone_extract_type($dateTimeZone);
+        $timezoneType = $this->timezone_type($dateTimeZone);
 
         if ( $timezoneType !== 3 ) {
             return Ret::throw(
@@ -349,7 +378,7 @@ class DateModule
             );
         }
 
-        $timezoneType = $this->timezone_extract_type($dateTimeZone);
+        $timezoneType = $this->timezone_type($dateTimeZone);
 
         if ( ! (false
             || ($timezoneType === 2)
@@ -976,7 +1005,7 @@ class DateModule
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_extract_type($timezone);
+            $timezoneType = $this->timezone_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
@@ -1046,7 +1075,7 @@ class DateModule
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_extract_type($timezone);
+            $timezoneType = $this->timezone_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
@@ -1116,7 +1145,7 @@ class DateModule
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_extract_type($timezone);
+            $timezoneType = $this->timezone_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
@@ -1210,7 +1239,7 @@ class DateModule
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_extract_type($timezone);
+            $timezoneType = $this->timezone_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
@@ -1303,7 +1332,7 @@ class DateModule
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_extract_type($timezone);
+            $timezoneType = $this->timezone_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
@@ -1396,7 +1425,7 @@ class DateModule
         }
 
         if ( null !== $allowedTimezoneTypes ) {
-            $timezoneType = $this->timezone_extract_type($timezone);
+            $timezoneType = $this->timezone_type($timezone);
 
             if ( ! in_array($timezoneType, $allowedTimezoneTypes, true) ) {
                 return Ret::throw(
@@ -2112,6 +2141,7 @@ class DateModule
     }
 
 
+
     /**
      * @param string|\DateTimeInterface|\DateTimeZone $a
      * @param string|\DateTimeInterface|\DateTimeZone $b
@@ -2125,12 +2155,13 @@ class DateModule
     }
 
 
-    public function timezone_extract_type(\DateTimeZone $timezone) : int
+    public function timezone_type(\DateTimeZone $timezone) : int
     {
         return (PHP_VERSION_ID >= 70400)
             ? json_decode(json_encode($timezone))->timezone_type
             : get_object_vars($timezone)['timezone_type'];
     }
+
 
 
     public function interval_encode(\DateInterval $interval) : string
@@ -2298,6 +2329,7 @@ class DateModule
     }
 
 
+
     public function date_remote(\DateTimeInterface $date, $timezoneSet = null) : \DateTimeInterface
     {
         $timezoneSet = $timezoneSet ?? date_default_timezone_get();
@@ -2336,6 +2368,7 @@ class DateModule
 
         return $clone;
     }
+
 
 
     public function adate_now($timezoneFallback = null) : \DateTime
@@ -2441,6 +2474,7 @@ class DateModule
 
         return $dateTimeImmutable;
     }
+
 
 
     public function startof_year(\DateTimeInterface $date) : \DateTimeInterface
@@ -2606,88 +2640,222 @@ class DateModule
     }
 
 
-    public function format_timestamp(\DateTimeInterface $dateTime) : string
+
+    public function format_timestamp(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
-        return (string) $dateTime->getTimestamp();
+        return $this->format_timestamp_utc($dateTime, $withOffset);
     }
 
-    public function format_timestamp_non_utc(\DateTimeInterface $dateTime) : string
+    public function format_timestamp_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
-        return (string) ($dateTime->getTimestamp() + $dateTime->getOffset());
+        $timestamp = $dateTime->getTimestamp();
+
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
+
+        return "{$timestamp}{$offset}";
+    }
+
+    public function format_timestamp_non_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        $timestamp = $dateTime->getTimestamp() + $dateTime->getOffset();
+
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
+
+        return "{$timestamp}{$offset}";
     }
 
 
-    public function format_sec(\DateTimeInterface $dateTime) : string
+
+    public function format_sec(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
-        return (string) $dateTime->getTimestamp();
+        return $this->format_sec_utc($dateTime, $withOffset);
     }
 
-    public function format_msec(\DateTimeInterface $dateTime) : string
+    public function format_msec(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        return $this->format_msec_utc($dateTime, $withOffset);
+    }
+
+    public function format_usec(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        return $this->format_usec_utc($dateTime, $withOffset);
+    }
+
+
+    public function format_sec_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        $seconds = $dateTime->getTimestamp();
+
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
+
+        return "{$seconds}{$offset}";
+    }
+
+    public function format_msec_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
         $seconds = (string) $dateTime->getTimestamp();
 
         $milliseconds = $dateTime->format('v');
         $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
 
-        return "{$seconds}.{$milliseconds}";
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
+
+        return "{$seconds}.{$milliseconds}{$offset}";
     }
 
-    public function format_usec(\DateTimeInterface $dateTime) : string
+    public function format_usec_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
         $seconds = (string) $dateTime->getTimestamp();
 
         $microseconds = $dateTime->format('u');
         $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
 
-        return "{$seconds}.{$microseconds}";
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
+
+        return "{$seconds}.{$microseconds}{$offset}";
     }
 
 
-    public function format_sec_non_utc(\DateTimeInterface $dateTime) : string
+    public function format_sec_non_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
-        return (string) ($dateTime->getTimestamp() + $dateTime->getOffset());
+        $seconds = $dateTime->getTimestamp() + $dateTime->getOffset();
+
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
+
+        return "{$seconds}{$offset}";
     }
 
-    public function format_msec_non_utc(\DateTimeInterface $dateTime) : string
+    public function format_msec_non_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
         $seconds = (string) ($dateTime->getTimestamp() + $dateTime->getOffset());
 
         $milliseconds = $dateTime->format('v');
         $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
 
-        return "{$seconds}.{$milliseconds}";
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
+
+        return "{$seconds}.{$milliseconds}{$offset}";
     }
 
-    public function format_usec_non_utc(\DateTimeInterface $dateTime) : string
+    public function format_usec_non_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
         $seconds = (string) ($dateTime->getTimestamp() + $dateTime->getOffset());
 
         $microseconds = $dateTime->format('u');
         $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
 
-        return "{$seconds}.{$microseconds}";
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
+
+        return "{$seconds}.{$microseconds}{$offset}";
     }
 
 
-    public function format_sql(\DateTimeInterface $dateTime) : string
+
+    public function format_sql(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        return $this->format_sql_utc($dateTime, $withOffset);
+    }
+
+    public function format_sql_sec(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        return $this->format_sql_sec_utc($dateTime, $withOffset);
+    }
+
+    public function format_sql_msec(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        return $this->format_sql_msec_utc($dateTime, $withOffset);
+    }
+
+    public function format_sql_usec(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        return $this->format_sql_usec_utc($dateTime, $withOffset);
+    }
+
+
+    public function format_sql_non_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        return $this->format_sql_sec_non_utc($dateTime, $withOffset);
+    }
+
+    public function format_sql_sec_non_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        return $withOffset
+            ? $dateTime->format(static::FORMAT_SQL_OFFSET_SEC)
+            : $dateTime->format(static::FORMAT_SQL_NO_OFFSET_SEC);
+    }
+
+    public function format_sql_msec_non_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        $formatted = $dateTime->format(static::FORMAT_SQL_SEC);
+
+        $milliseconds = $dateTime->format('v');
+        $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
+
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
+
+        return "{$formatted}.{$milliseconds}{$offset}";
+    }
+
+    public function format_sql_usec_non_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        $formatted = $dateTime->format(static::FORMAT_SQL_SEC);
+
+        $microseconds = $dateTime->format('v');
+        $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
+
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
+
+        return "{$formatted}.{$microseconds}{$offset}";
+    }
+
+
+    public function format_sql_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        return $this->format_sql_sec_utc($dateTime, $withOffset);
+    }
+
+    public function format_sql_sec_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
         $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
 
-        $formatted = $clone->format(static::FORMAT_SQL);
+        $formatted = $withOffset
+            ? $clone->format(static::FORMAT_SQL_OFFSET_SEC)
+            : $clone->format(static::FORMAT_SQL_NO_OFFSET_SEC);
 
         return $formatted;
     }
 
-    public function format_sql_sec(\DateTimeInterface $dateTime) : string
-    {
-        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
-
-        $formatted = $clone->format(static::FORMAT_SQL_SEC);
-
-        return $formatted;
-    }
-
-    public function format_sql_msec(\DateTimeInterface $dateTime) : string
+    public function format_sql_msec_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
         $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
 
@@ -2696,10 +2864,15 @@ class DateModule
         $milliseconds = $clone->format('v');
         $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
 
-        return "{$formatted}.{$milliseconds}";
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
+
+        return "{$formatted}.{$milliseconds}{$offset}";
     }
 
-    public function format_sql_usec(\DateTimeInterface $dateTime) : string
+    public function format_sql_usec_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
         $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
 
@@ -2708,38 +2881,12 @@ class DateModule
         $microseconds = $clone->format('v');
         $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
 
-        return "{$formatted}.{$microseconds}";
-    }
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
 
-
-    public function format_sql_non_utc(\DateTimeInterface $dateTime) : string
-    {
-        return $dateTime->format(static::FORMAT_SQL);
-    }
-
-    public function format_sql_sec_non_utc(\DateTimeInterface $dateTime) : string
-    {
-        return $dateTime->format(static::FORMAT_SQL_SEC);
-    }
-
-    public function format_sql_msec_non_utc(\DateTimeInterface $dateTime) : string
-    {
-        $formatted = $dateTime->format(static::FORMAT_SQL_SEC);
-
-        $milliseconds = $dateTime->format('v');
-        $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
-
-        return "{$formatted}.{$milliseconds}";
-    }
-
-    public function format_sql_usec_non_utc(\DateTimeInterface $dateTime) : string
-    {
-        $formatted = $dateTime->format(static::FORMAT_SQL_SEC);
-
-        $microseconds = $dateTime->format('v');
-        $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
-
-        return "{$formatted}.{$microseconds}";
+        return "{$formatted}.{$microseconds}{$offset}";
     }
 
 
@@ -2757,7 +2904,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         } else {
             $formatted[] = $this->format_sql_non_utc($dateTime);
@@ -2765,7 +2912,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_extract_type($timezone);
+            $formatted[] = $this->timezone_type($timezone);
         }
 
         return $formatted;
@@ -2785,7 +2932,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         } else {
             $formatted[] = $this->format_sql_sec_non_utc($dateTime);
@@ -2793,7 +2940,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_extract_type($timezone);
+            $formatted[] = $this->timezone_type($timezone);
         }
 
         return $formatted;
@@ -2813,7 +2960,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         } else {
             $formatted[] = $this->format_sql_msec_non_utc($dateTime);
@@ -2821,7 +2968,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_extract_type($timezone);
+            $formatted[] = $this->timezone_type($timezone);
         }
 
         return $formatted;
@@ -2841,7 +2988,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         } else {
             $formatted[] = $this->format_sql_usec_non_utc($dateTime);
@@ -2849,76 +2996,112 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_extract_type($timezone);
+            $formatted[] = $this->timezone_type($timezone);
         }
 
         return $formatted;
     }
 
 
-    public function format_javascript(\DateTimeInterface $dateTime) : string
+
+    public function format_javascript(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
-        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
-
-        $offset = $dateTime->format('P');
-
-        return "{$formatted}{$offset}";
+        return $this->format_javascript_non_utc($dateTime, $withOffset);
     }
 
-    public function format_javascript_sec(\DateTimeInterface $dateTime) : string
+    public function format_javascript_sec(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
-        $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
-
-        $offset = $dateTime->format('P');
-
-        return "{$formatted}{$offset}";
+        return $this->format_javascript_sec_non_utc($dateTime, $withOffset);
     }
 
-    public function format_javascript_msec(\DateTimeInterface $dateTime) : string
+    public function format_javascript_msec(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
+        return $this->format_javascript_msec_non_utc($dateTime, $withOffset);
+    }
+
+    public function format_javascript_usec(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        return $this->format_javascript_usec_non_utc($dateTime, $withOffset);
+    }
+
+
+    public function format_javascript_non_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        return $this->format_javascript_sec_non_utc($dateTime, $withOffset);
+    }
+
+    public function format_javascript_sec_non_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        $withOffset = $withOffset ?? true;
+
+        return $withOffset
+            ? $dateTime->format(static::FORMAT_JAVASCRIPT_OFFSET_SEC)
+            : $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
+    }
+
+    public function format_javascript_msec_non_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
+    {
+        $withOffset = $withOffset ?? true;
+
         $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
 
         $milliseconds = $dateTime->format('v');
         $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
 
-        $offset = $dateTime->format('P');
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
 
         return "{$formatted}.{$milliseconds}{$offset}";
     }
 
-    public function format_javascript_usec(\DateTimeInterface $dateTime) : string
+    public function format_javascript_usec_non_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null) : string
     {
+        $withOffset = $withOffset ?? true;
+
         $formatted = $dateTime->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
 
         $microseconds = $dateTime->format('u');
         $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
 
-        $offset = $dateTime->format('P');
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $dateTime->format('P');
+        }
 
         return "{$formatted}.{$microseconds}{$offset}";
     }
 
 
-    public function format_javascript_utc(\DateTimeInterface $dateTime) : string
+    public function format_javascript_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null, ?bool $withZ = null) : string
     {
-        $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
-
-        $formatted = $clone->format(static::FORMAT_JAVASCRIPT_NO_OFFSET);
-
-        return "{$formatted}Z";
+        return $this->format_javascript_sec_utc($dateTime, $withOffset, $withZ);
     }
 
-    public function format_javascript_sec_utc(\DateTimeInterface $dateTime) : string
+    public function format_javascript_sec_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null, ?bool $withZ = null) : string
     {
+        $withOffset = $withOffset ?? true;
+        $withZ = $withZ ?? true;
+
         $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
 
-        $formatted = $clone->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
+        $formatted = $withOffset
+            ? $clone->format(static::FORMAT_JAVASCRIPT_OFFSET_SEC)
+            : $clone->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
 
-        return "{$formatted}Z";
+        if ( ! $withOffset && $withZ ) {
+            $formatted .= 'Z';
+        }
+
+        return $formatted;
     }
 
-    public function format_javascript_msec_utc(\DateTimeInterface $dateTime) : string
+    public function format_javascript_msec_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null, ?bool $withZ = null) : string
     {
+        $withOffset = $withOffset ?? true;
+        $withZ = $withZ ?? true;
+
         $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
 
         $formatted = $clone->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
@@ -2926,11 +3109,22 @@ class DateModule
         $milliseconds = $clone->format('v');
         $milliseconds = str_pad($milliseconds, 3, '0', STR_PAD_RIGHT);
 
-        return "{$formatted}.{$milliseconds}Z";
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $clone->format('P');
+
+        } elseif ( $withZ ) {
+            $offset = 'Z';
+        }
+
+        return "{$formatted}.{$milliseconds}{$offset}";
     }
 
-    public function format_javascript_usec_utc(\DateTimeInterface $dateTime) : string
+    public function format_javascript_usec_utc(\DateTimeInterface $dateTime, ?bool $withOffset = null, ?bool $withZ = null) : string
     {
+        $withOffset = $withOffset ?? true;
+        $withZ = $withZ ?? true;
+
         $clone = (clone $dateTime)->setTimezone($this->the_timezone_utc());
 
         $formatted = $clone->format(static::FORMAT_JAVASCRIPT_NO_OFFSET_SEC);
@@ -2938,7 +3132,15 @@ class DateModule
         $microseconds = $clone->format('u');
         $microseconds = str_pad($microseconds, 6, '0', STR_PAD_RIGHT);
 
-        return "{$formatted}.{$microseconds}Z";
+        $offset = '';
+        if ( $withOffset ) {
+            $offset = $clone->format('P');
+
+        } elseif ( $withZ ) {
+            $offset = 'Z';
+        }
+
+        return "{$formatted}.{$microseconds}{$offset}";
     }
 
 
@@ -2956,7 +3158,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         } else {
             $formatted[] = $this->format_javascript($dateTime);
@@ -2964,7 +3166,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_extract_type($timezone);
+            $formatted[] = $this->timezone_type($timezone);
         }
 
         return $formatted;
@@ -2984,7 +3186,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         } else {
             $formatted[] = $this->format_javascript_sec($dateTime);
@@ -2992,7 +3194,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_extract_type($timezone);
+            $formatted[] = $this->timezone_type($timezone);
         }
 
         return $formatted;
@@ -3012,7 +3214,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         } else {
             $formatted[] = $this->format_javascript_msec($dateTime);
@@ -3020,7 +3222,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_extract_type($timezone);
+            $formatted[] = $this->timezone_type($timezone);
         }
 
         return $formatted;
@@ -3040,7 +3242,7 @@ class DateModule
             $formatted['timezone_name'] = $timezone->getName();
             $formatted['timezone_offset_integer'] = $dateTime->getOffset();
             $formatted['timezone_offset_string'] = $dateTime->format('P');
-            $formatted['timezone_type'] = $this->timezone_extract_type($timezone);
+            $formatted['timezone_type'] = $this->timezone_type($timezone);
 
         } else {
             $formatted[] = $this->format_javascript_usec($dateTime);
@@ -3048,7 +3250,7 @@ class DateModule
             $formatted[] = $timezone->getName();
             $formatted[] = $dateTime->format('P');
             $formatted[] = $dateTime->getOffset();
-            $formatted[] = $this->timezone_extract_type($timezone);
+            $formatted[] = $this->timezone_type($timezone);
         }
 
         return $formatted;
@@ -3136,6 +3338,7 @@ class DateModule
 
         return $content;
     }
+
 
 
     public function get_locale_months(string $locale) : array

@@ -23,254 +23,1017 @@ use Gzhegow\Lib\Modules\Type\Ret;
 trait TypeTrait
 {
 	/**
-	 * > Специальный тип, который значит, что значение можно отбросить или не учитывать, т.к. оно не несёт информации
+	 * @return Ret<array>
+	 */
+	public function php_array($value)
+	{
+		return Lib::arr()->type_php_array(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function php_array_empty($value)
+	{
+		return Lib::arr()->type_php_array_empty(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function php_array_not_empty($value)
+	{
+		return Lib::arr()->type_php_array_not_empty(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function not_php_array($value)
+	{
+		return Lib::arr()->type_not_php_array(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function array($value, bool $isPlain = null)
+	{
+		return Lib::arr()->type_array(null, $value, $isPlain);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function array_recursive($value, int $maxDepth = null)
+	{
+		return Lib::arr()->type_array_recursive(null, $value, $maxDepth);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function array_empty($value)
+	{
+		return Lib::arr()->type_array_empty(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function array_not_empty($value)
+	{
+		return Lib::arr()->type_array_not_empty(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function not_array($value)
+	{
+		return Lib::arr()->type_not_array(null, $value);
+	}
+
+
+	/**
+	 * @param callable $fnSortKeysCmp
 	 *
-	 * @return Ret<string|array|\Countable|null>
+	 * @return Ret<array>
 	 */
-	public function blank($value)
+	public function array_sorted($value, bool $isPlain = null, $fnSortKeysCmp = null)
 	{
-		return Lib::php()->type_blank(null, $value);
+		return Lib::arr()->type_array_sorted(null, $value, $isPlain, $fnSortKeysCmp);
 	}
 
 
 	/**
-	 * @return Ret<mixed>
-	 */
-	public function any_not_blank($value)
-	{
-		return Lib::php()->type_any_not_blank(null, $value);
-	}
-
-
-	/**
-	 * > Специальный тип, который значит, что значение можно заменить NULL-ом
+	 * @param callable $fnSortKeysCmp
 	 *
-	 * @return Ret<mixed>
+	 * @return Ret<array>
 	 */
-	public function nullable($value)
+	public function array_sorted_recursive($value, int $maxDepth = null, $fnSortKeysCmp = null)
 	{
-		return Lib::php()->type_nullable(null, $value);
+		return Lib::arr()->type_array_sorted_recursive(null, $value, $maxDepth, $fnSortKeysCmp);
 	}
 
 
 	/**
-	 * @return Ret<mixed>
+	 * @return Ret<array>
 	 */
-	public function any_not_nullable($value)
+	public function array_of_type($value, string $type)
 	{
-		return Lib::php()->type_any_not_nullable(null, $value);
+		return Lib::arr()->type_array_of_type(null, $value, $type);
 	}
 
 
 	/**
-	 * > Специальный тип, который значит, что значение было отправлено пользователем, а не появилось из PHP
+	 * @return Ret<array>
+	 */
+	public function array_of_resource_type($value, string $resourceType)
+	{
+		return Lib::arr()->type_array_of_resource_type(null, $value, $resourceType);
+	}
+
+
+	/**
+	 * @template T
 	 *
-	 * @return Ret<mixed>
-	 */
-	public function passed($value)
-	{
-		return Lib::php()->type_passed(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<mixed>
-	 */
-	public function any_not_passed($value)
-	{
-		return Lib::php()->type_any_not_passed(null, $value);
-	}
-
-
-	/**
-	 * > Специальный тип-синоним NULL, переданный пользователем через API, например '{N}'
-	 * > в случаях, когда NULL интерпретируется как "не трогать", а NIL как "очистить"
+	 * @param class-string<T> $className
 	 *
-	 * > NAN не равен ничему даже самому себе
-	 * > NIL равен только самому себе
-	 * > NULL означает пустоту и им можно заменить значения '', [], `resource (closed)`, NIL, но нельзя заменить NAN
+	 * @return Ret<T[]>
+	 */
+	public function array_of_a($value, string $className)
+	{
+		return Lib::arr()->type_array_of_a(null, $value, $className);
+	}
+
+
+	/**
+	 * @template T
 	 *
-	 * @return Ret<string|Nil>
+	 * @param class-string<T> $className
+	 *
+	 * @return Ret<T[]>
 	 */
-	public function nil($value)
+	public function array_of_class($value, string $className)
 	{
-		return Lib::php()->type_nil(null, $value);
+		return Lib::arr()->type_array_of_class(null, $value, $className);
+	}
+
+
+	/**
+	 * @template T
+	 *
+	 * @param class-string<T> $className
+	 *
+	 * @return Ret<T[]>
+	 */
+	public function array_of_subclass($value, string $className)
+	{
+		return Lib::arr()->type_array_of_subclass(null, $value, $className);
+	}
+
+
+	/**
+	 * @param callable $fn
+	 *
+	 * @return Ret<array>
+	 *
+	 * @noinspection PhpDocSignatureIsNotCompleteInspection
+	 */
+	public function array_of_callback($value, callable $fn, array $fnArgs = [])
+	{
+		return Lib::arr()->type_array_of_callback(null, $value, $fn, $fnArgs);
+	}
+
+
+	/**
+	 * @return Ret<int|string>
+	 */
+	public function array_key($key)
+	{
+		return Lib::arr()->type_array_key(null, $key);
 	}
 
 
 	/**
 	 * @return Ret<mixed>
 	 */
-	public function any_not_nil($value)
+	public function array_key_exists(array $array, $key)
 	{
-		return Lib::php()->type_any_not_nil(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<null>
-	 */
-	public function null($value)
-	{
-		return Lib::php()->type_null(null, $value);
+		return Lib::arr()->type_array_key_exists(null, $array, $key);
 	}
 
 
 	/**
 	 * @return Ret<mixed>
 	 */
-	public function any_not_null($value)
+	public function value_in_array(array $array, $value, bool $isStrict = null)
 	{
-		return Lib::php()->type_any_not_null(null, $value);
+		return Lib::arr()->type_value_in_array(null, $array, $value, $isStrict);
 	}
 
 
 	/**
-	 * @return Ret<bool>
+	 * @return Ret<int|string>
 	 */
-	public function php_bool($value)
+	public function value_in_array_key(array $array, $value, bool $isStrict = null)
 	{
-		return Lib::php()->type_php_bool(null, $value);
+		return Lib::arr()->type_value_in_array_key(null, $array, $value, $isStrict);
 	}
 
 
 	/**
-	 * @return Ret<mixed>
+	 * @return Ret<array>
 	 */
-	public function any_not_php_bool($value)
+	public function value_in_array_pos(array $array, $value, bool $isStrict = null)
 	{
-		return Lib::php()->type_any_not_php_bool(null, $value);
+		return Lib::arr()->type_value_in_array_pos(null, $array, $value, $isStrict);
 	}
 
 
 	/**
-	 * @return Ret<false>
+	 * @return Ret<array>
 	 */
-	public function php_bool_false($value)
+	public function array_keys_exists(array $array, $keys)
 	{
-		return Lib::php()->type_php_bool_false(null, $value);
+		return Lib::arr()->type_array_keys_exists(null, $array, $keys);
 	}
 
 
 	/**
-	 * @return Ret<mixed>
+	 * @return Ret<array>
 	 */
-	public function any_not_php_bool_false($value)
+	public function array_keys_not_exists(array $array, $keys)
 	{
-		return Lib::php()->type_any_not_php_bool_false(null, $value);
+		return Lib::arr()->type_array_keys_not_exists(null, $array, $keys);
 	}
 
 
 	/**
-	 * @return Ret<true>
+	 * @return Ret<array>
 	 */
-	public function php_bool_true($value)
+	public function values_in_array(array $array, $values, bool $strict = null)
 	{
-		return Lib::php()->type_php_bool_true(null, $value);
+		return Lib::arr()->type_values_in_array(null, $array, $values, $strict);
 	}
 
 
 	/**
-	 * @return Ret<mixed>
+	 * @return Ret<array>
 	 */
-	public function any_not_php_bool_true($value)
+	public function values_not_in_array(array $array, $values, bool $strict = null)
 	{
-		return Lib::php()->type_any_not_php_bool_true(null, $value);
+		return Lib::arr()->type_values_not_in_array(null, $array, $values, $strict);
 	}
 
 
 	/**
-	 * @return Ret<bool>
+	 * @return Ret<array>
 	 */
-	public function bool($value)
+	public function list($value, bool $isPlain = null)
 	{
-		return Lib::php()->type_bool(null, $value);
+		return Lib::arr()->type_list(null, $value, $isPlain);
 	}
 
 
 	/**
-	 * @return Ret<false>
+	 * @return Ret<array>
 	 */
-	public function bool_false($value)
+	public function list_recursive($value, int $maxDepth = null)
 	{
-		return Lib::php()->type_bool_false(null, $value);
+		return Lib::arr()->type_list_recursive(null, $value, $maxDepth);
 	}
 
 
 	/**
-	 * @return Ret<true>
+	 * @return Ret<array>
 	 */
-	public function bool_true($value)
+	public function list_sorted($value, bool $isPlain = null)
 	{
-		return Lib::php()->type_bool_true(null, $value);
+		return Lib::arr()->type_list_sorted(null, $value, $isPlain);
 	}
 
 
 	/**
-	 * @return Ret<bool>
+	 * @return Ret<array>
 	 */
-	public function userbool($value)
+	public function list_sorted_recursive($value, int $maxDepth = null)
 	{
-		return Lib::php()->type_userbool(null, $value);
+		return Lib::arr()->type_list_sorted_recursive(null, $value, $maxDepth);
 	}
 
 
 	/**
-	 * @return Ret<false>
+	 * @return Ret<array>
 	 */
-	public function userbool_false($value)
+	public function dict($value, bool $isPlain = null)
 	{
-		return Lib::php()->type_userbool_false(null, $value);
+		return Lib::arr()->type_dict(null, $value, $isPlain);
 	}
 
 
 	/**
-	 * @return Ret<false>
+	 * @return Ret<array>
 	 */
-	public function userbool_true($value)
+	public function dict_recursive($value, int $maxDepth = null)
 	{
-		return Lib::php()->type_userbool_true(null, $value);
+		return Lib::arr()->type_dict_recursive(null, $value, $maxDepth);
 	}
 
 
 	/**
-	 * @return Ret<object>
+	 * @param callable $fnSortKeysCmp
+	 *
+	 * @return Ret<array>
 	 */
-	public function object($value)
+	public function dict_sorted($value, bool $isPlain = null, $fnSortKeysCmp = null)
 	{
-		return Lib::php()->type_object(null, $value);
+		return Lib::arr()->type_dict_sorted(null, $value, $isPlain, $fnSortKeysCmp);
 	}
 
 
 	/**
-	 * @return Ret<mixed>
+	 * @param callable $fnSortKeysCmp
+	 *
+	 * @return Ret<array>
 	 */
-	public function any_not_object($value)
+	public function dict_sorted_recursive($value, int $maxDepth = null, $fnSortKeysCmp = null)
 	{
-		return Lib::php()->type_any_not_object(null, $value);
+		return Lib::arr()->type_dict_sorted_recursive(null, $value, $maxDepth, $fnSortKeysCmp);
 	}
 
 
 	/**
-	 * @return Ret<\stdClass>
+	 * @return Ret<array>
 	 */
-	public function stdclass($value)
+	public function table($value, int $isListOrDict = null, bool $isChildrenPlain = null)
 	{
-		return Lib::php()->type_stdclass(null, $value);
+		return Lib::arr()->type_table(null, $value, $isListOrDict, $isChildrenPlain);
 	}
 
 
 	/**
-	 * @return Ret<mixed>
+	 * @param callable $fnSortKeysCmp
+	 *
+	 * @return Ret<array>
 	 */
-	public function any_not_stdclass($value)
+	public function table_sorted($value, int $isListOrDict = null, bool $isChildrenPlain = null, $fnSortKeysCmp = null)
 	{
-		return Lib::php()->type_any_not_stdclass(null, $value);
+		return Lib::arr()->type_table_sorted(null, $value, $isListOrDict, $isChildrenPlain, $fnSortKeysCmp);
 	}
 
 
 	/**
-	 * @return Ret<float>
+	 * @return Ret<array>
+	 */
+	public function matrix($value, bool $isChildrenPlain = null)
+	{
+		return Lib::arr()->type_matrix(null, $value, $isChildrenPlain);
+	}
+
+
+	/**
+	 * @return Ret<array>
+	 */
+	public function matrix_recursive($value, int $maxDepth = null)
+	{
+		return Lib::arr()->type_matrix_recursive(null, $value, $maxDepth);
+	}
+
+
+	/**
+	 * @return Ret<ArrPath>
+	 */
+	public function arrpath($value)
+	{
+		return Lib::arr()->type_arrpath(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<ArrPath>
+	 */
+	public function arrpath_dot($value, ?string $dot = '.')
+	{
+		return Lib::arr()->type_arrpath_dot(null, $value, $dot);
+	}
+
+
+	/**
+	 * > проверка на число, затем приведение к decimal, сначала делает numeric, потом приводит через moneytrunc
+	 *
+	 * @return Ret<string>
+	 */
+	public function decimal_moneytrunc($value, ?int $scale, array $refs = [])
+	{
+		return Lib::bcmath()->type_decimal_moneytrunc(null, $value, $scale, $refs);
+	}
+
+
+	/**
+	 * > проверка на число, затем приведение к decimal, сначала делает numeric, потом округляет через moneygrow
+	 *
+	 * @return Ret<string>
+	 */
+	public function decimal_moneygrow($value, ?int $scale, array $refs = [])
+	{
+		return Lib::bcmath()->type_decimal_moneygrow(null, $value, $scale, $refs);
+	}
+
+
+	/**
+	 * > проверка на число, затем приведение к decimal, сначала делает numeric, потом округляет через moneyceil
+	 *
+	 * @return Ret<string>
+	 */
+	public function decimal_moneyceil($value, ?int $scale, array $refs = [])
+	{
+		return Lib::bcmath()->type_decimal_moneyceil(null, $value, $scale, $refs);
+	}
+
+
+	/**
+	 * > проверка на число, затем приведение к decimal, сначала делает numeric, потом округляет через moneyfloor
+	 *
+	 * @return Ret<string>
+	 */
+	public function decimal_moneyfloor($value, ?int $scale, array $refs = [])
+	{
+		return Lib::bcmath()->type_decimal_moneyfloor(null, $value, $scale, $refs);
+	}
+
+
+	/**
+	 * @return Ret<Bcnumber>
+	 */
+	public function bcnumber($value)
+	{
+		return Lib::bcmath()->type_bcnumber(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function base($value, $alphabet)
+	{
+		return Lib::crypt()->type_base(null, $value, $alphabet);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function base_bin($value)
+	{
+		return Lib::crypt()->type_base_bin(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function base_oct($value)
+	{
+		return Lib::crypt()->type_base_oct(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function base_dec($value)
+	{
+		return Lib::crypt()->type_base_dec(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function base_hex($value)
+	{
+		return Lib::crypt()->type_base_hex(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeZone>
+	 */
+	public function timezone($timezone, array $allowedTimezoneTypes = null)
+	{
+		return Lib::date()->type_timezone(null, $timezone, $allowedTimezoneTypes);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeZone>
+	 */
+	public function timezone_offset($timezoneOrOffset)
+	{
+		return Lib::date()->type_timezone_offset(null, $timezoneOrOffset);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeZone>
+	 */
+	public function timezone_abbr($timezoneOrAbbr)
+	{
+		return Lib::date()->type_timezone_abbr(null, $timezoneOrAbbr);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeZone>
+	 */
+	public function timezone_name($timezoneOrName)
+	{
+		return Lib::date()->type_timezone_name(null, $timezoneOrName);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeZone>
+	 */
+	public function timezone_nameabbr($timezoneOrNameOrAbbr)
+	{
+		return Lib::date()->type_timezone_nameabbr(null, $timezoneOrNameOrAbbr);
+	}
+
+
+	/**
+	 * @return Ret<\DateInterval>
+	 */
+	public function interval($interval)
+	{
+		return Lib::date()->type_interval(null, $interval);
+	}
+
+
+	/**
+	 * @return Ret<\DateInterval>
+	 */
+	public function interval_duration($duration)
+	{
+		return Lib::date()->type_interval_duration(null, $duration);
+	}
+
+
+	/**
+	 * @return Ret<\DateInterval>
+	 */
+	public function interval_datestring($datestring)
+	{
+		return Lib::date()->type_interval_datestring(null, $datestring);
+	}
+
+
+	/**
+	 * @return Ret<\DateInterval>
+	 */
+	public function interval_microtime($microtime)
+	{
+		return Lib::date()->type_interval_microtime(null, $microtime);
+	}
+
+
+	/**
+	 * @return Ret<\DateInterval>
+	 */
+	public function interval_ago($date, \DateTimeInterface $from = null, bool $reverse = null)
+	{
+		return Lib::date()->type_interval_ago(null, $date, $from, $reverse);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeInterface>
+	 */
+	public function date($datestring, $timezoneFallback = null)
+	{
+		return Lib::date()->type_date(null, $datestring, $timezoneFallback);
+	}
+
+
+	/**
+	 * @return Ret<\DateTime>
+	 */
+	public function adate($datestring, $timezoneFallback = null)
+	{
+		return Lib::date()->type_adate(null, $datestring, $timezoneFallback);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeImmutable>
+	 */
+	public function idate($datestring, $timezoneFallback = null)
+	{
+		return Lib::date()->type_idate(null, $datestring, $timezoneFallback);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeInterface>
+	 */
+	public function date_formatted($dateFormatted, $formats, $timezoneFallback = null)
+	{
+		return Lib::date()->type_date_formatted(null, $dateFormatted, $formats, $timezoneFallback);
+	}
+
+
+	/**
+	 * @return Ret<\DateTime>
+	 */
+	public function adate_formatted($dateFormatted, $formats, $timezoneFallback = null)
+	{
+		return Lib::date()->type_adate_formatted(null, $dateFormatted, $formats, $timezoneFallback);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeImmutable>
+	 */
+	public function idate_formatted($dateFormatted, $formats, $timezoneFallback = null)
+	{
+		return Lib::date()->type_idate_formatted(null, $dateFormatted, $formats, $timezoneFallback);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeInterface>
+	 */
+	public function date_tz($datestring, array $allowedTimezoneTypes = null)
+	{
+		return Lib::date()->type_date_tz(null, $datestring, $allowedTimezoneTypes);
+	}
+
+
+	/**
+	 * @return Ret<\DateTime>
+	 */
+	public function adate_tz($datestring, array $allowedTimezoneTypes = null)
+	{
+		return Lib::date()->type_adate_tz(null, $datestring, $allowedTimezoneTypes);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeImmutable>
+	 */
+	public function idate_tz($datestring, array $allowedTimezoneTypes = null)
+	{
+		return Lib::date()->type_idate_tz(null, $datestring, $allowedTimezoneTypes);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeInterface>
+	 */
+	public function date_tz_formatted($dateFormatted, $formats, array $allowedTimezoneTypes = null)
+	{
+		return Lib::date()->type_date_tz_formatted(null, $dateFormatted, $formats, $allowedTimezoneTypes);
+	}
+
+
+	/**
+	 * @return Ret<\DateTime>
+	 */
+	public function adate_tz_formatted($dateFormatted, $formats, array $allowedTimezoneTypes = null)
+	{
+		return Lib::date()->type_adate_tz_formatted(null, $dateFormatted, $formats, $allowedTimezoneTypes);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeImmutable>
+	 */
+	public function idate_tz_formatted($dateFormatted, $formats, array $allowedTimezoneTypes = null)
+	{
+		return Lib::date()->type_idate_tz_formatted(null, $dateFormatted, $formats, $allowedTimezoneTypes);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeInterface>
+	 */
+	public function date_no_tz($datestring, $timezoneFallback = null)
+	{
+		return Lib::date()->type_date_no_tz(null, $datestring, $timezoneFallback);
+	}
+
+
+	/**
+	 * @return Ret<\DateTime>
+	 */
+	public function adate_no_tz($datestring, $timezoneFallback = null)
+	{
+		return Lib::date()->type_adate_no_tz(null, $datestring, $timezoneFallback);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeImmutable>
+	 */
+	public function idate_no_tz($datestring, $timezoneFallback = null)
+	{
+		return Lib::date()->type_idate_no_tz(null, $datestring, $timezoneFallback);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeInterface>
+	 */
+	public function date_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
+	{
+		return Lib::date()->type_date_no_tz_formatted(null, $dateFormatted, $formats, $timezoneFallback);
+	}
+
+
+	/**
+	 * @return Ret<\DateTime>
+	 */
+	public function adate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
+	{
+		return Lib::date()->type_adate_no_tz_formatted(null, $dateFormatted, $formats, $timezoneFallback);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeImmutable>
+	 */
+	public function idate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
+	{
+		return Lib::date()->type_idate_no_tz_formatted(null, $dateFormatted, $formats, $timezoneFallback);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeInterface>
+	 */
+	public function date_microtime($microtime, $timezoneSet = null)
+	{
+		return Lib::date()->type_date_microtime(null, $microtime, $timezoneSet);
+	}
+
+
+	/**
+	 * @return Ret<\DateTime>
+	 */
+	public function adate_microtime($microtime, $timezoneSet = null)
+	{
+		return Lib::date()->type_adate_microtime(null, $microtime, $timezoneSet);
+	}
+
+
+	/**
+	 * @return Ret<\DateTimeImmutable>
+	 */
+	public function idate_microtime($microtime, $timezoneSet = null)
+	{
+		return Lib::date()->type_idate_microtime(null, $microtime, $timezoneSet);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function html_tag($value)
+	{
+		return Lib::format()->type_html_tag(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function xml_tag($value)
+	{
+		return Lib::format()->type_xml_tag(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function xml_nstag($value)
+	{
+		return Lib::format()->type_xml_nstag(null, $value);
+	}
+
+
+	/**
+	 * @param string $value
+	 *
+	 * @return Ret<int>
+	 */
+	public function chmod($value)
+	{
+		return Lib::fs()->type_chmod(null, $value);
+	}
+
+
+	/**
+	 * @param array{ 0: array|null } $refs
+	 *
+	 * @return Ret<string>
+	 */
+	public function realpath($value, bool $isAllowSymlink = null, array $refs = [])
+	{
+		return Lib::fs()->type_realpath(null, $value, $isAllowSymlink, $refs);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function freepath($value, array $refs = [])
+	{
+		return Lib::fs()->type_freepath(null, $value, $refs);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function freepath_normalized($value, string $separator = null, array $refs = [])
+	{
+		return Lib::fs()->type_freepath_normalized(null, $value, $separator, $refs);
+	}
+
+
+	/**
+	 * @param array{ 0: array|null } $refs
+	 *
+	 * @return Ret<string>
+	 */
+	public function dirpath($value, ?bool $isAllowExists, bool $isAllowSymlink = null, array $refs = [])
+	{
+		return Lib::fs()->type_dirpath(null, $value, $isAllowExists, $isAllowSymlink, $refs);
+	}
+
+
+	/**
+	 * @param array{ 0: array|null } $refs
+	 *
+	 * @return Ret<string>
+	 */
+	public function dirpath_realpath($value, bool $isAllowSymlink = null, array $refs = [])
+	{
+		return Lib::fs()->type_dirpath_realpath(null, $value, $isAllowSymlink, $refs);
+	}
+
+
+	/**
+	 * @param array{ 0: array|null } $refs
+	 *
+	 * @return Ret<string>
+	 */
+	public function filepath($value, ?bool $isAllowExists, bool $isAllowSymlink = null, array $refs = [])
+	{
+		return Lib::fs()->type_filepath(null, $value, $isAllowExists, $isAllowSymlink, $refs);
+	}
+
+
+	/**
+	 * @param array{ 0: array|null } $refs
+	 *
+	 * @return Ret<string>
+	 */
+	public function filepath_realpath($value, bool $isAllowSymlink = null, array $refs = [])
+	{
+		return Lib::fs()->type_filepath_realpath(null, $value, $isAllowSymlink, $refs);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function filename($value)
+	{
+		return Lib::fs()->type_filename(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<\SplFileInfo>
+	 */
+	public function file(
+		$value,
+		array $extensions = null,
+		array $mimeTypes = null,
+		array $filters = null,
+		array $refs = []
+	) {
+		return Lib::fs()->type_file(null, $value, $extensions, $mimeTypes, $filters, $refs);
+	}
+
+
+	/**
+	 * @return Ret<\SplFileInfo>
+	 */
+	public function image(
+		$value,
+		array $extensions = null,
+		array $mimeTypes = null,
+		array $filters = null,
+		array $refs = []
+	) {
+		return Lib::fs()->type_image(null, $value, $extensions, $mimeTypes, $filters, $refs);
+	}
+
+
+	/**
+	 * @return Ret<resource|\Socket>
+	 */
+	public function socket($value)
+	{
+		return Lib::fs()->type_socket(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<resource>
+	 */
+	public function stream($value)
+	{
+		return Lib::fs()->type_stream(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<AddressIpV4|AddressIpV6>
+	 */
+	public function address_ip($value)
+	{
+		return Lib::net()->type_address_ip(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<AddressIpV4>
+	 */
+	public function address_ip_v4($value)
+	{
+		return Lib::net()->type_address_ip_v4(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<AddressIpV6>
+	 */
+	public function address_ip_v6($value)
+	{
+		return Lib::net()->type_address_ip_v6(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function address_mac($value)
+	{
+		return Lib::net()->type_address_mac(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<SubnetV4|SubnetV6>
+	 */
+	public function subnet($value, string $ipFallback = null)
+	{
+		return Lib::net()->type_subnet(null, $value, $ipFallback);
+	}
+
+
+	/**
+	 * @return Ret<SubnetV4>
+	 */
+	public function subnet_v4($value, string $ipFallback = null)
+	{
+		return Lib::net()->type_subnet_v4(null, $value, $ipFallback);
+	}
+
+
+	/**
+	 * @return Ret<SubnetV6>
+	 */
+	public function subnet_v6($value, string $ipFallback = null)
+	{
+		return Lib::net()->type_subnet_v6(null, $value, $ipFallback);
+	}
+
+
+	/**
+	 * @return Ret<int>
+	 */
+	protected function subnet_v4_iplike($value)
+	{
+		return Lib::net()->type_subnet_v4_iplike(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<int|float>
+	 */
+	public function php_num($value)
+	{
+		return Lib::num()->type_php_num(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<int>
 	 */
 	public function php_int($value)
 	{
@@ -299,18 +1062,18 @@ trait TypeTrait
 	/**
 	 * @return Ret<float>
 	 */
-	public function float_not_nan($value)
+	public function php_float_not_nan($value)
 	{
-		return Lib::num()->type_float_not_nan(null, $value);
+		return Lib::num()->type_php_float_not_nan(null, $value);
 	}
 
 
 	/**
 	 * @return Ret<float>
 	 */
-	public function float_maybe_nan($value)
+	public function float_not_nan($value)
 	{
-		return Lib::num()->type_float_maybe_nan(null, $value);
+		return Lib::num()->type_float_not_nan(null, $value);
 	}
 
 
@@ -326,36 +1089,18 @@ trait TypeTrait
 	/**
 	 * @return Ret<float>
 	 */
-	public function finite($value)
-	{
-		return Lib::num()->type_finite(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<float>
-	 */
-	public function float_not_finite($value)
-	{
-		return Lib::num()->type_float_not_finite(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<mixed>
-	 */
-	public function any_not_finite($value)
-	{
-		return Lib::num()->type_any_not_finite(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<float>
-	 */
 	public function infinite($value)
 	{
 		return Lib::num()->type_infinite(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<float>
+	 */
+	public function php_float_not_infinite($value)
+	{
+		return Lib::num()->type_php_float_not_infinite(null, $value);
 	}
 
 
@@ -374,6 +1119,42 @@ trait TypeTrait
 	public function any_not_infinite($value)
 	{
 		return Lib::num()->type_any_not_infinite(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<float>
+	 */
+	public function finite($value)
+	{
+		return Lib::num()->type_finite(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<float>
+	 */
+	public function php_float_not_finite($value)
+	{
+		return Lib::num()->type_php_float_not_finite(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<float>
+	 */
+	public function float_not_finite($value)
+	{
+		return Lib::num()->type_float_not_finite(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function any_not_finite($value)
+	{
+		return Lib::num()->type_any_not_finite(null, $value);
 	}
 
 
@@ -407,7 +1188,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric($value, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric($value, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric(null, $value, $isAllowExp, $refs);
 	}
@@ -434,16 +1215,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function decimal($value, int $scale = 0, array $refs = [])
-	{
-		return Lib::num()->type_decimal(null, $value, $scale, $refs);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function numeric_non_zero($value, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_non_zero($value, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_non_zero(null, $value, $isAllowExp, $refs);
 	}
@@ -452,7 +1224,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_non_negative($value, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_non_negative($value, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_non_negative(null, $value, $isAllowExp, $refs);
 	}
@@ -461,7 +1233,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_non_positive($value, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_non_positive($value, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_non_positive(null, $value, $isAllowExp, $refs);
 	}
@@ -470,7 +1242,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_negative($value, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_negative($value, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_negative(null, $value, $isAllowExp, $refs);
 	}
@@ -479,7 +1251,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_positive($value, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_positive($value, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_positive(null, $value, $isAllowExp, $refs);
 	}
@@ -488,7 +1260,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_zero_plus_minus_one($value, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_zero_plus_minus_one($value, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_zero_plus_minus_one(null, $value, $isAllowExp, $refs);
 	}
@@ -497,7 +1269,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_non_negative_or_minus_one($value, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_non_negative_or_minus_one($value, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_non_negative_or_minus_one(null, $value, $isAllowExp, $refs);
 	}
@@ -506,7 +1278,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_positive_or_minus_one($value, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_positive_or_minus_one($value, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_positive_or_minus_one(null, $value, $isAllowExp, $refs);
 	}
@@ -515,7 +1287,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_gt($value, $gt, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_gt($value, $gt, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_gt(null, $value, $gt, $isAllowExp, $refs);
 	}
@@ -524,7 +1296,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_gte($value, $gte, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_gte($value, $gte, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_gte(null, $value, $gte, $isAllowExp, $refs);
 	}
@@ -533,7 +1305,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_lt($value, $lt, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_lt($value, $lt, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_lt(null, $value, $lt, $isAllowExp, $refs);
 	}
@@ -542,7 +1314,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_lte($value, $lte, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_lte($value, $lte, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_lte(null, $value, $lte, $isAllowExp, $refs);
 	}
@@ -551,7 +1323,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_between($value, $from, $to, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_between($value, $from, $to, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_between(null, $value, $from, $to, $isAllowExp, $refs);
 	}
@@ -560,7 +1332,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function numeric_inside($value, $from, $to, ?bool $isAllowExp = null, array $refs = [])
+	public function numeric_inside($value, $from, $to, bool $isAllowExp = null, array $refs = [])
 	{
 		return Lib::num()->type_numeric_inside(null, $value, $from, $to, $isAllowExp, $refs);
 	}
@@ -972,16 +1744,31 @@ trait TypeTrait
 
 
 	/**
+	 * > проверка на decimal, строгая. Если число представлено вида 1.12317239871927391273 и стоит ограничение 2 знака - не преобразует, а бросит ошибку
+	 *
+	 * 1.5 -> (2) -> '1.50'
+	 * 1.500 -> (2) -> '1.50'
+	 * 1.501 -> (2) -> [ERROR]
+	 *
+	 * @return Ret<string>
+	 */
+	public function decimal($value, ?int $scale, array $refs = [])
+	{
+		return Lib::num()->type_decimal(null, $value, $scale, $refs);
+	}
+
+
+	/**
 	 * @return Ret<Number>
 	 */
-	public function number($value, ?bool $isAllowExp = null)
+	public function number($value, bool $isAllowExp = null)
 	{
 		return Lib::num()->type_number(null, $value, $isAllowExp);
 	}
 
 
 	/**
-	 * @return Ret<int>|int
+	 * @return Ret<int>
 	 */
 	public function exponent($value)
 	{
@@ -1035,778 +1822,273 @@ trait TypeTrait
 
 
 	/**
-	 * @return Ret<Bcnumber>
+	 * > Специальный тип-синоним NULL, переданный пользователем через API, например '{N}'
+	 * > в случаях, когда NULL интерпретируется как "не трогать", а NIL как "очистить"
+	 *
+	 * > NAN не равен ничему даже самому себе
+	 * > NIL равен только самому себе
+	 * > NULL означает пустоту и им можно заменить значения '', [], `resource (closed)`, NIL, но нельзя заменить NAN
+	 *
+	 * @return Ret<string|Nil>
 	 */
-	public function bcnumber($value)
+	public function nil($value)
 	{
-		return Lib::bcmath()->type_bcnumber(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function php_string($value)
-	{
-		return Lib::str()->type_php_string(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function php_string_empty($value)
-	{
-		return Lib::str()->type_php_string_empty(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function php_string_not_empty($value)
-	{
-		return Lib::str()->type_php_string_not_empty(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function php_trim($value)
-	{
-		return Lib::str()->type_php_trim(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function string($value)
-	{
-		return Lib::str()->type_string(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function string_empty($value)
-	{
-		return Lib::str()->type_string_empty(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function string_not_empty($value)
-	{
-		return Lib::str()->type_string_not_empty(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function trim($value, ?string $characters = null)
-	{
-		return Lib::str()->type_trim(null, $value, $characters);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function char($value)
-	{
-		return Lib::str()->type_char(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function letter($value)
-	{
-		return Lib::str()->type_letter(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function word($value)
-	{
-		return Lib::str()->type_word(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<Alphabet>
-	 */
-	public function alphabet($value)
-	{
-		return Lib::str()->type_alphabet(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function ctype_digit($value)
-	{
-		return Lib::str()->type_ctype_digit(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function ctype_alpha($value, ?bool $allowUpperCase = null)
-	{
-		return Lib::str()->type_ctype_alpha(null, $value, $allowUpperCase);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function ctype_alnum($value, ?bool $allowUpperCase = null)
-	{
-		return Lib::str()->type_ctype_alnum(null, $value, $allowUpperCase);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function base($value, $alphabet)
-	{
-		return Lib::crypt()->type_base(null, $value, $alphabet);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function base_bin($value)
-	{
-		return Lib::crypt()->type_base_bin(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function base_oct($value)
-	{
-		return Lib::crypt()->type_base_oct(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function base_dec($value)
-	{
-		return Lib::crypt()->type_base_dec(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function base_hex($value)
-	{
-		return Lib::crypt()->type_base_hex(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function php_array($value)
-	{
-		return Lib::arr()->type_php_array(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function php_array_empty($value)
-	{
-		return Lib::arr()->type_php_array_empty(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function php_array_not_empty($value)
-	{
-		return Lib::arr()->type_php_array_not_empty(null, $value);
+		return Lib::php()->type_nil(null, $value);
 	}
 
 
 	/**
 	 * @return Ret<mixed>
 	 */
-	public function any_not_php_array($value)
+	public function not_nil($value)
 	{
-		return Lib::arr()->type_any_not_php_array(null, $value);
+		return Lib::php()->type_not_nil(null, $value);
 	}
 
 
 	/**
-	 * @return Ret<array>
+	 * @return Ret<null>
 	 */
-	public function array($value, ?bool $isPlain = null)
+	public function null($value)
 	{
-		return Lib::arr()->type_array(null, $value, $isPlain);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function array_recursive($value, ?int $maxDepth = null)
-	{
-		return Lib::arr()->type_array_recursive(null, $value, $maxDepth);
-	}
-
-
-	/**
-	 * @param callable $fnSortKeysCmp
-	 *
-	 * @return Ret<array>
-	 */
-	public function array_sorted($value, ?bool $isPlain = null, $fnSortKeysCmp = null)
-	{
-		return Lib::arr()->type_array_sorted(null, $value, $isPlain, $fnSortKeysCmp);
-	}
-
-
-	/**
-	 * @param callable $fnSortKeysCmp
-	 *
-	 * @return Ret<array>
-	 */
-	public function array_sorted_recursive($value, ?int $maxDepth = null, $fnSortKeysCmp = null)
-	{
-		return Lib::arr()->type_array_sorted_recursive(null, $value, $maxDepth, $fnSortKeysCmp);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function array_of_type($value, string $type)
-	{
-		return Lib::arr()->type_array_of_type(null, $value, $type);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function array_of_resource_type($value, string $resourceType)
-	{
-		return Lib::arr()->type_array_of_resource_type(null, $value, $resourceType);
-	}
-
-
-	/**
-	 * @template T
-	 *
-	 * @param class-string<T> $className
-	 *
-	 * @return Ret<T[]>|T[]
-	 */
-	public function array_of_a($value, string $className)
-	{
-		return Lib::arr()->type_array_of_a(null, $value, $className);
-	}
-
-
-	/**
-	 * @template T
-	 *
-	 * @param class-string<T> $className
-	 *
-	 * @return Ret<T[]>|T[]
-	 */
-	public function array_of_class($value, string $className)
-	{
-		return Lib::arr()->type_array_of_class(null, $value, $className);
-	}
-
-
-	/**
-	 * @template T
-	 *
-	 * @param class-string<T> $className
-	 *
-	 * @return Ret<T[]>|T[]
-	 */
-	public function array_of_subclass($value, string $className)
-	{
-		return Lib::arr()->type_array_of_subclass(null, $value, $className);
-	}
-
-
-	/**
-	 * @param callable $fn
-	 *
-	 * @return Ret<array>|array
-	 *
-	 * @noinspection PhpDocSignatureIsNotCompleteInspection
-	 */
-	public function array_of_callback($value, callable $fn, array $fnArgs = [])
-	{
-		return Lib::arr()->type_array_of_callback(null, $value, $fn, $fnArgs);
-	}
-
-
-	/**
-	 * @return Ret<int|string>
-	 */
-	public function array_key($key)
-	{
-		return Lib::arr()->type_array_key(null, $key);
+		return Lib::php()->type_null(null, $value);
 	}
 
 
 	/**
 	 * @return Ret<mixed>
 	 */
-	public function array_key_exists(array $array, $key)
+	public function not_null($value)
 	{
-		return Lib::arr()->type_array_key_exists(null, $array, $key);
+		return Lib::php()->type_not_null(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<null>
+	 */
+	public function empty($value)
+	{
+		return Lib::php()->type_empty(null, $value);
 	}
 
 
 	/**
 	 * @return Ret<mixed>
 	 */
-	public function value_in_array(array $array, $value, ?bool $isStrict = null)
+	public function not_empty($value)
 	{
-		return Lib::arr()->type_value_in_array(null, $array, $value, $isStrict);
+		return Lib::php()->type_not_empty(null, $value);
 	}
 
 
 	/**
-	 * @return Ret<int|string>
-	 */
-	public function value_in_array_key(array $array, $value, ?bool $isStrict = null)
-	{
-		return Lib::arr()->type_value_in_array_key(null, $array, $value, $isStrict);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function value_in_array_pos(array $array, $value, ?bool $isStrict = null)
-	{
-		return Lib::arr()->type_value_in_array_pos(null, $array, $value, $isStrict);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function array_keys_exists(array $array, $keys)
-	{
-		return Lib::arr()->type_array_keys_exists(null, $array, $keys);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function array_keys_not_exists(array $array, $keys)
-	{
-		return Lib::arr()->type_array_keys_not_exists(null, $array, $keys);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function values_in_array(array $array, $values, ?bool $strict = null)
-	{
-		return Lib::arr()->type_values_in_array(null, $array, $values, $strict);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function values_not_in_array(array $array, $values, ?bool $strict = null)
-	{
-		return Lib::arr()->type_values_not_in_array(null, $array, $values, $strict);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function list($value, ?bool $isPlain = null)
-	{
-		return Lib::arr()->type_list(null, $value, $isPlain);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function list_recursive($value, ?int $maxDepth = null)
-	{
-		return Lib::arr()->type_list_recursive(null, $value, $maxDepth);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function list_sorted($value, ?bool $isPlain = null)
-	{
-		return Lib::arr()->type_list_sorted(null, $value, $isPlain);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function list_sorted_recursive($value, ?int $maxDepth = null)
-	{
-		return Lib::arr()->type_list_sorted_recursive(null, $value, $maxDepth);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function dict($value, ?bool $isPlain = null)
-	{
-		return Lib::arr()->type_dict(null, $value, $isPlain);
-	}
-
-
-	/**
-	 * @return Ret<array>
-	 */
-	public function dict_recursive($value, ?int $maxDepth = null)
-	{
-		return Lib::arr()->type_dict_recursive(null, $value, $maxDepth);
-	}
-
-
-	/**
-	 * @param callable $fnSortKeysCmp
+	 * > Специальный тип, который значит, что значение можно отбросить или не учитывать, т.к. оно не несёт информации
 	 *
-	 * @return Ret<array>
+	 * @return Ret<string|array|\Countable|null>
 	 */
-	public function dict_sorted($value, ?bool $isPlain = null, $fnSortKeysCmp = null)
+	public function blank($value)
 	{
-		return Lib::arr()->type_dict_sorted(null, $value, $isPlain, $fnSortKeysCmp);
+		return Lib::php()->type_blank(null, $value);
 	}
 
 
 	/**
-	 * @param callable $fnSortKeysCmp
+	 * @return Ret<mixed>
+	 */
+	public function not_blank($value)
+	{
+		return Lib::php()->type_not_blank(null, $value);
+	}
+
+
+	/**
+	 * > Специальный тип, который значит, что значение можно заменить NULL-ом
 	 *
-	 * @return Ret<array>
+	 * @return Ret<mixed>
 	 */
-	public function dict_sorted_recursive($value, ?int $maxDepth = null, $fnSortKeysCmp = null)
+	public function nullable($value)
 	{
-		return Lib::arr()->type_dict_sorted_recursive(null, $value, $maxDepth, $fnSortKeysCmp);
+		return Lib::php()->type_nullable(null, $value);
 	}
 
 
 	/**
-	 * @return Ret<array>
+	 * @return Ret<mixed>
 	 */
-	public function table($value, ?int $isListOrDict = null, ?bool $isChildrenPlain = null)
+	public function not_nullable($value)
 	{
-		return Lib::arr()->type_table(null, $value, $isListOrDict, $isChildrenPlain);
+		return Lib::php()->type_not_nullable(null, $value);
 	}
 
 
 	/**
-	 * @param callable $fnSortKeysCmp
+	 * > Специальный тип, который значит, что значение было отправлено клиентом, а не появилось из PHP
 	 *
-	 * @return Ret<array>
+	 * @return Ret<mixed>
 	 */
-	public function table_sorted($value, ?int $isListOrDict = null, ?bool $isChildrenPlain = null, $fnSortKeysCmp = null)
+	public function passed($value)
 	{
-		return Lib::arr()->type_table_sorted(null, $value, $isListOrDict, $isChildrenPlain, $fnSortKeysCmp);
+		return Lib::php()->type_passed(null, $value);
 	}
 
 
 	/**
-	 * @return Ret<array>
+	 * @return Ret<mixed>
 	 */
-	public function matrix($value, ?bool $isChildrenPlain = null)
+	public function not_passed($value)
 	{
-		return Lib::arr()->type_matrix(null, $value, $isChildrenPlain);
+		return Lib::php()->type_not_passed(null, $value);
 	}
 
 
 	/**
-	 * @return Ret<array>
-	 */
-	public function matrix_recursive($value, ?int $maxDepth = null)
-	{
-		return Lib::arr()->type_matrix_recursive(null, $value, $maxDepth);
-	}
-
-
-	/**
-	 * @return Ret<ArrPath>
-	 */
-	public function arrpath($value)
-	{
-		return Lib::arr()->type_arrpath(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<ArrPath>
-	 */
-	public function arrpath_dot($value, ?string $dot = '.')
-	{
-		return Lib::arr()->type_arrpath_dot(null, $value, $dot);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function html_tag($value)
-	{
-		return Lib::format()->type_html_tag(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function xml_tag($value)
-	{
-		return Lib::format()->type_xml_tag(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function xml_nstag($value)
-	{
-		return Lib::format()->type_xml_nstag(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function regex($value)
-	{
-		return Lib::preg()->type_regex(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function regexp($value)
-	{
-		return Lib::preg()->type_regexp(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<AddressIpV4|AddressIpV6>
-	 */
-	public function address_ip($value)
-	{
-		return Lib::net()->type_address_ip(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<AddressIpV4>
-	 */
-	public function address_ip_v4($value)
-	{
-		return Lib::net()->type_address_ip_v4(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<AddressIpV6>
-	 */
-	public function address_ip_v6($value)
-	{
-		return Lib::net()->type_address_ip_v6(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
-	public function address_mac($value)
-	{
-		return Lib::net()->type_address_mac(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<SubnetV4|SubnetV6>
-	 */
-	public function subnet($value, ?string $ipFallback = null)
-	{
-		return Lib::net()->type_subnet(null, $value, $ipFallback);
-	}
-
-
-	/**
-	 * @return Ret<SubnetV4>
-	 */
-	public function subnet_v4($value, ?string $ipFallback = null)
-	{
-		return Lib::net()->type_subnet_v4(null, $value, $ipFallback);
-	}
-
-
-	/**
-	 * @return Ret<SubnetV6>
-	 */
-	public function subnet_v6($value, ?string $ipFallback = null)
-	{
-		return Lib::net()->type_subnet_v6(null, $value, $ipFallback);
-	}
-
-
-	/**
-	 * @param string|true             $value
-	 * @param string|false|array|null $query
-	 * @param string|false|null       $fragment
+	 * @return Ret<bool>
 	 *
-	 * @return Ret<string>
+	 * @noinspection PhpConditionAlreadyCheckedInspection
 	 */
-	public function url(
-		$value,
-		$query = null,
-		$fragment = null,
-		?int $isHostIdnaAscii = null,
-		?int $isLinkUrlencoded = null,
-		array $refs = []
-	) {
-		return Lib::url()->type_url(null, $value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs);
+	public function php_bool($value)
+	{
+		return Lib::php()->type_php_bool(null, $value);
 	}
 
 
 	/**
-	 * @param string|true             $value
-	 * @param string|false|array|null $query
-	 * @param string|false|null       $fragment
+	 * @return Ret<false>
+	 */
+	public function php_bool_false($value)
+	{
+		return Lib::php()->type_php_bool_false(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<true>
 	 *
-	 * @return Ret<string>
+	 * @noinspection PhpConditionAlreadyCheckedInspection
 	 */
-	public function uri(
-		$value,
-		$query = null,
-		$fragment = null,
-		?int $isHostIdnaAscii = null,
-		?int $isLinkUrlencoded = null,
-		array $refs = []
-	) {
-		return Lib::url()->type_uri(null, $value, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs);
+	public function php_bool_true($value)
+	{
+		return Lib::php()->type_php_bool_true(null, $value);
 	}
 
 
 	/**
-	 * @param string|true $value
+	 * @return Ret<mixed>
 	 *
-	 * @return Ret<string>
+	 * @noinspection PhpConditionAlreadyCheckedInspection
 	 */
-	public function host($value, ?int $isHostIdnaAscii = null, array $refs = [])
+	public function not_php_bool($value)
 	{
-		return Lib::url()->type_host(null, $value, $isHostIdnaAscii, $refs);
+		return Lib::php()->type_not_php_bool(null, $value);
 	}
 
 
 	/**
-	 * @param string|true $value
-	 *
-	 * @return Ret<string>
+	 * @return Ret<bool>
 	 */
-	public function domain($value, ?int $isHostIdnaAscii = null, array $refs = [])
+	public function bool($value)
 	{
-		return Lib::url()->type_domain(null, $value, $isHostIdnaAscii, $refs);
+		return Lib::php()->type_bool(null, $value);
 	}
 
 
 	/**
-	 * @param string|true             $value
-	 * @param string|false|array|null $query
-	 * @param string|false|null       $fragment
-	 *
-	 * @return Ret<string>
+	 * @return Ret<false>
 	 */
-	public function link($value, $query = null, $fragment = null, ?int $isLinkUrlencoded = null, array $refs = [])
+	public function bool_false($value)
 	{
-		return Lib::url()->type_link(null, $value, $query, $fragment, $isLinkUrlencoded, $refs);
+		return Lib::php()->type_bool_false(null, $value);
 	}
 
 
 	/**
-	 * @param string $value
-	 *
-	 * @return Ret<string>
+	 * @return Ret<true>
 	 */
-	public function dsn_pdo($value, array $refs = [])
+	public function bool_true($value)
 	{
-		return Lib::url()->type_dsn_pdo(null, $value, $refs);
+		return Lib::php()->type_bool_true(null, $value);
 	}
 
 
 	/**
-	 * @return Ret<string>
+	 * @return Ret<bool>
 	 */
-	public function uuid($value)
+	public function not_bool($value)
 	{
-		return Lib::random()->type_uuid(null, $value);
+		return Lib::php()->type_not_bool(null, $value);
 	}
 
 
 	/**
-	 * @return Ret<string>
+	 * @return Ret<bool>
 	 */
-	public function uuid_v4($value)
+	public function userbool($value)
 	{
-		return Lib::random()->type_uuid_v4(null, $value);
+		return Lib::php()->type_userbool(null, $value);
 	}
 
 
 	/**
-	 * @return Ret<string>
+	 * @return Ret<false>
 	 */
-	public function uuid_v5($value)
+	public function userbool_false($value)
 	{
-		return Lib::random()->type_uuid_v5(null, $value);
+		return Lib::php()->type_userbool_false(null, $value);
 	}
 
 
 	/**
-	 * @return Ret<string>
+	 * @return Ret<false>
 	 */
-	public function uuid_v7($value)
+	public function userbool_true($value)
 	{
-		return Lib::random()->type_uuid_v7(null, $value);
+		return Lib::php()->type_userbool_true(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<bool>
+	 */
+	public function not_userbool($value)
+	{
+		return Lib::php()->type_not_userbool(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<object>
+	 */
+	public function object($value)
+	{
+		return Lib::php()->type_object(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function not_object($value)
+	{
+		return Lib::php()->type_not_object(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<\stdClass>
+	 */
+	public function stdclass($value)
+	{
+		return Lib::php()->type_stdclass(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function not_stdclass($value)
+	{
+		return Lib::php()->type_not_stdclass(null, $value);
 	}
 
 
@@ -1829,290 +2111,11 @@ trait TypeTrait
 
 
 	/**
-	 * @return Ret<string|array|\Countable>
+	 * @return Ret<array|\Countable>
 	 */
 	public function sizeable($value)
 	{
 		return Lib::php()->type_sizeable(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeZone>
-	 */
-	public function timezone($timezone, ?array $allowedTimezoneTypes = null)
-	{
-		return Lib::date()->type_timezone(null, $timezone, $allowedTimezoneTypes);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeZone>
-	 */
-	public function timezone_offset($timezoneOrOffset)
-	{
-		return Lib::date()->type_timezone_offset(null, $timezoneOrOffset);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeZone>
-	 */
-	public function timezone_abbr($timezoneOrAbbr)
-	{
-		return Lib::date()->type_timezone_abbr(null, $timezoneOrAbbr);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeZone>
-	 */
-	public function timezone_name($timezoneOrName)
-	{
-		return Lib::date()->type_timezone_name(null, $timezoneOrName);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeZone>
-	 */
-	public function timezone_nameabbr($timezoneOrNameOrAbbr)
-	{
-		return Lib::date()->type_timezone_nameabbr(null, $timezoneOrNameOrAbbr);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeInterface>
-	 */
-	public function date($datestring, $timezoneFallback = null)
-	{
-		return Lib::date()->type_date(null, $datestring, $timezoneFallback);
-	}
-
-
-	/**
-	 * @return Ret<\DateTime>
-	 */
-	public function adate($datestring, $timezoneFallback = null)
-	{
-		return Lib::date()->type_adate(null, $datestring, $timezoneFallback);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeImmutable>
-	 */
-	public function idate($datestring, $timezoneFallback = null)
-	{
-		return Lib::date()->type_idate(null, $datestring, $timezoneFallback);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeInterface>
-	 */
-	public function date_formatted($dateFormatted, $formats, $timezoneFallback = null)
-	{
-		return Lib::date()->type_date_formatted(null, $dateFormatted, $formats, $timezoneFallback);
-	}
-
-
-	/**
-	 * @return Ret<\DateTime>
-	 */
-	public function adate_formatted($dateFormatted, $formats, $timezoneFallback = null)
-	{
-		return Lib::date()->type_adate_formatted(null, $dateFormatted, $formats, $timezoneFallback);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeImmutable>
-	 */
-	public function idate_formatted($dateFormatted, $formats, $timezoneFallback = null)
-	{
-		return Lib::date()->type_idate_formatted(null, $dateFormatted, $formats, $timezoneFallback);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeInterface>
-	 */
-	public function date_tz($datestring, ?array $allowedTimezoneTypes = null)
-	{
-		return Lib::date()->type_date_tz(null, $datestring, $allowedTimezoneTypes);
-	}
-
-
-	/**
-	 * @return Ret<\DateTime>
-	 */
-	public function adate_tz($datestring, ?array $allowedTimezoneTypes = null)
-	{
-		return Lib::date()->type_adate_tz(null, $datestring, $allowedTimezoneTypes);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeImmutable>
-	 */
-	public function idate_tz($datestring, ?array $allowedTimezoneTypes = null)
-	{
-		return Lib::date()->type_idate_tz(null, $datestring, $allowedTimezoneTypes);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeInterface>
-	 */
-	public function date_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
-	{
-		return Lib::date()->type_date_tz_formatted(null, $dateFormatted, $formats, $allowedTimezoneTypes);
-	}
-
-
-	/**
-	 * @return Ret<\DateTime>
-	 */
-	public function adate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
-	{
-		return Lib::date()->type_adate_tz_formatted(null, $dateFormatted, $formats, $allowedTimezoneTypes);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeImmutable>
-	 */
-	public function idate_tz_formatted($dateFormatted, $formats, ?array $allowedTimezoneTypes = null)
-	{
-		return Lib::date()->type_idate_tz_formatted(null, $dateFormatted, $formats, $allowedTimezoneTypes);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeInterface>
-	 */
-	public function date_no_tz($datestring, $timezoneFallback = null)
-	{
-		return Lib::date()->type_date_no_tz(null, $datestring, $timezoneFallback);
-	}
-
-
-	/**
-	 * @return Ret<\DateTime>
-	 */
-	public function adate_no_tz($datestring, $timezoneFallback = null)
-	{
-		return Lib::date()->type_adate_no_tz(null, $datestring, $timezoneFallback);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeImmutable>
-	 */
-	public function idate_no_tz($datestring, $timezoneFallback = null)
-	{
-		return Lib::date()->type_idate_no_tz(null, $datestring, $timezoneFallback);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeInterface>
-	 */
-	public function date_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
-	{
-		return Lib::date()->type_date_no_tz_formatted(null, $dateFormatted, $formats, $timezoneFallback);
-	}
-
-
-	/**
-	 * @return Ret<\DateTime>
-	 */
-	public function adate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
-	{
-		return Lib::date()->type_adate_no_tz_formatted(null, $dateFormatted, $formats, $timezoneFallback);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeImmutable>
-	 */
-	public function idate_no_tz_formatted($dateFormatted, $formats, $timezoneFallback = null)
-	{
-		return Lib::date()->type_idate_no_tz_formatted(null, $dateFormatted, $formats, $timezoneFallback);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeInterface>
-	 */
-	public function date_microtime($microtime, $timezoneSet = null)
-	{
-		return Lib::date()->type_date_microtime(null, $microtime, $timezoneSet);
-	}
-
-
-	/**
-	 * @return Ret<\DateTime>
-	 */
-	public function adate_microtime($microtime, $timezoneSet = null)
-	{
-		return Lib::date()->type_adate_microtime(null, $microtime, $timezoneSet);
-	}
-
-
-	/**
-	 * @return Ret<\DateTimeImmutable>
-	 */
-	public function idate_microtime($microtime, $timezoneSet = null)
-	{
-		return Lib::date()->type_idate_microtime(null, $microtime, $timezoneSet);
-	}
-
-
-	/**
-	 * @return Ret<\DateInterval>
-	 */
-	public function interval($interval)
-	{
-		return Lib::date()->type_interval(null, $interval);
-	}
-
-
-	/**
-	 * @return Ret<\DateInterval>
-	 */
-	public function interval_duration($duration)
-	{
-		return Lib::date()->type_interval_duration(null, $duration);
-	}
-
-
-	/**
-	 * @return Ret<\DateInterval>
-	 */
-	public function interval_datestring($datestring)
-	{
-		return Lib::date()->type_interval_datestring(null, $datestring);
-	}
-
-
-	/**
-	 * @return Ret<\DateInterval>
-	 */
-	public function interval_microtime($microtime)
-	{
-		return Lib::date()->type_interval_microtime(null, $microtime);
-	}
-
-
-	/**
-	 * @return Ret<\DateInterval>
-	 */
-	public function interval_ago($date, ?\DateTimeInterface $from = null, ?bool $reverse = null)
-	{
-		return Lib::date()->type_interval_ago(null, $date, $from, $reverse);
 	}
 
 
@@ -2123,7 +2126,7 @@ trait TypeTrait
 	 *
 	 * @return Ret<class-string<T>>|class-string<T>
 	 */
-	public function struct_exists($value, ?int $flags = null)
+	public function struct_exists($value, int $flags = null)
 	{
 		return Lib::php()->type_struct_exists(null, $value, $flags);
 	}
@@ -2136,7 +2139,7 @@ trait TypeTrait
 	 *
 	 * @return Ret<class-string<T>>|class-string<T>
 	 */
-	public function struct($value, ?int $flags = null)
+	public function struct($value, int $flags = null)
 	{
 		return Lib::php()->type_struct(null, $value, $flags);
 	}
@@ -2149,7 +2152,7 @@ trait TypeTrait
 	 *
 	 * @return Ret<class-string<T>>|class-string<T>
 	 */
-	public function struct_class($value, ?int $flags = null)
+	public function struct_class($value, int $flags = null)
 	{
 		return Lib::php()->type_struct_class(null, $value, $flags);
 	}
@@ -2158,7 +2161,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<class-string>
 	 */
-	public function struct_interface($value, ?int $flags = null)
+	public function struct_interface($value, int $flags = null)
 	{
 		return Lib::php()->type_struct_interface(null, $value, $flags);
 	}
@@ -2167,7 +2170,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<class-string>
 	 */
-	public function struct_trait($value, ?int $flags = null)
+	public function struct_trait($value, int $flags = null)
 	{
 		return Lib::php()->type_struct_trait(null, $value, $flags);
 	}
@@ -2180,7 +2183,7 @@ trait TypeTrait
 	 *
 	 * @return Ret<class-string<T>>|class-string<T>
 	 */
-	public function struct_enum($value, ?int $flags = null)
+	public function struct_enum($value, int $flags = null)
 	{
 		return Lib::php()->type_struct_enum(null, $value, $flags);
 	}
@@ -2193,7 +2196,7 @@ trait TypeTrait
 	 *
 	 * @return Ret<class-string<T>>|class-string<T>
 	 */
-	public function struct_fqcn($value, ?int $flags = null)
+	public function struct_fqcn($value, int $flags = null)
 	{
 		return Lib::php()->type_struct_fqcn(null, $value, $flags);
 	}
@@ -2202,7 +2205,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function struct_namespace($value, ?int $flags = null)
+	public function struct_namespace($value, int $flags = null)
 	{
 		return Lib::php()->type_struct_namespace(null, $value, $flags);
 	}
@@ -2211,7 +2214,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function struct_basename($value, ?int $flags = null)
+	public function struct_basename($value, int $flags = null)
 	{
 		return Lib::php()->type_struct_basename(null, $value, $flags);
 	}
@@ -2220,7 +2223,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<resource>
 	 */
-	public function resource($value, ?string $resourceType = null)
+	public function resource($value, string $resourceType = null)
 	{
 		return Lib::php()->type_resource(null, $value, $resourceType);
 	}
@@ -2229,7 +2232,7 @@ trait TypeTrait
 	/**
 	 * @return Ret<resource>
 	 */
-	public function resource_opened($value, ?string $resourceType = null)
+	public function resource_opened($value, string $resourceType = null)
 	{
 		return Lib::php()->type_resource_opened(null, $value, $resourceType);
 	}
@@ -2247,9 +2250,9 @@ trait TypeTrait
 	/**
 	 * @return Ret<resource>
 	 */
-	public function any_not_resource($value)
+	public function not_resource($value)
 	{
-		return Lib::php()->type_any_not_resource(null, $value);
+		return Lib::php()->type_not_resource(null, $value);
 	}
 
 
@@ -2268,9 +2271,9 @@ trait TypeTrait
 	 * @param T|int|string         $value
 	 * @param class-string<T>|null $enumClass
 	 *
-	 * @return Ret<T>|T
+	 * @return Ret<T>
 	 */
-	public function enum_case($value, ?string $enumClass = null)
+	public function enum_case($value, string $enumClass = null)
 	{
 		return Lib::php()->type_enum_case(null, $value, $enumClass);
 	}
@@ -2293,6 +2296,11 @@ trait TypeTrait
 
 
 	/**
+	 * > метод не всегда callable, поскольку строка 'class->method' не является callable
+	 * > метод не всегда callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
+	 * > используйте type_callable_string, если собираетесь вызывать метод
+	 * > используйте type_callable_array, если собираетесь вызывать метод
+	 *
 	 * @return Ret<array{ 0: class-string, 1: string }>
 	 */
 	public function method_array($value)
@@ -2302,6 +2310,11 @@ trait TypeTrait
 
 
 	/**
+	 * > метод не всегда callable, поскольку строка 'class->method' не является callable
+	 * > метод не всегда callable, поскольку массив [ 'class', 'method' ] не является callable, если метод публичный
+	 * > используйте type_callable_string, если собираетесь вызывать метод
+	 * > используйте type_callable_array, если собираетесь вызывать метод
+	 *
 	 * @return Ret<string>
 	 */
 	public function method_string($value)
@@ -2311,6 +2324,9 @@ trait TypeTrait
 
 
 	/**
+	 * > в версиях PHP до 8.0.0 публичный метод считался callable, если его проверить даже на имени класса
+	 * > при этом вызвать MyClass::publicMethod было нельзя, т.к. вызываемым является только MyClass::publicStaticMethod
+	 *
 	 * @param string|object $newScope
 	 *
 	 * @return Ret<callable>
@@ -2453,24 +2469,18 @@ trait TypeTrait
 	 *
 	 * @return Ret<string>
 	 */
-	public function path_normalized($value, ?string $separator = null, array $refs = [])
+	public function path_normalized($value, string $separator = null, array $refs = [])
 	{
 		return Lib::php()->type_path_normalized(null, $value, $separator, $refs);
 	}
 
 
-	/**
-	 * @return Ret<true>
-	 */
 	public function is_os_windows()
 	{
 		return Lib::php()->type_is_os_windows(null);
 	}
 
 
-	/**
-	 * @return Ret<true>
-	 */
 	public function is_sapi_terminal()
 	{
 		return Lib::php()->type_is_sapi_terminal(null);
@@ -2480,148 +2490,63 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function is_extension_loaded($extension)
+	public function locale($value)
 	{
-		return Lib::php()->type_is_extension_loaded(null, $extension);
-	}
-
-
-	/**
-	 * @return Ret<int>
-	 */
-	public function chmod($value)
-	{
-		return Lib::fs()->type_chmod(null, $value);
-	}
-
-
-	/**
-	 * @param array{ 0: array|null } $refs
-	 *
-	 * @return Ret<string>
-	 */
-	public function realpath($value, ?bool $isAllowSymlink = null, array $refs = [])
-	{
-		return Lib::fs()->type_realpath(null, $value, $isAllowSymlink, $refs);
-	}
-
-
-	/**
-	 * @param array{ 0: array|null } $refs
-	 *
-	 * @return Ret<string>
-	 */
-	public function freepath($value, array $refs = [])
-	{
-		return Lib::fs()->type_freepath(null, $value, $refs);
+		return Lib::php()->type_locale(null, $value);
 	}
 
 
 	/**
 	 * @return Ret<string>
 	 */
-	public function freepath_normalized($value, ?string $separator = null, array $refs = [])
+	public function regex($value)
 	{
-		return Lib::fs()->type_freepath_normalized(null, $value, $separator, $refs);
-	}
-
-
-	/**
-	 * @param array{ 0: array|null } $refs
-	 *
-	 * @return Ret<string>
-	 */
-	public function dirpath($value, ?bool $isAllowExists, ?bool $isAllowSymlink = null, array $refs = [])
-	{
-		return Lib::fs()->type_dirpath(null, $value, $isAllowExists, $isAllowSymlink, $refs);
-	}
-
-
-	/**
-	 * @param array{ 0: array|null } $refs
-	 *
-	 * @return Ret<string>
-	 */
-	public function filepath($value, ?bool $isAllowExists, ?bool $isAllowSymlink = null, array $refs = [])
-	{
-		return Lib::fs()->type_filepath(null, $value, $isAllowExists, $isAllowSymlink, $refs);
-	}
-
-
-	/**
-	 * @param array{ 0: array|null } $refs
-	 *
-	 * @return Ret<string>
-	 */
-	public function dirpath_realpath($value, ?bool $isAllowSymlink = null, array $refs = [])
-	{
-		return Lib::fs()->type_dirpath_realpath(null, $value, $isAllowSymlink, $refs);
-	}
-
-
-	/**
-	 * @param array{ 0: array|null } $refs
-	 *
-	 * @return Ret<string>
-	 */
-	public function filepath_realpath($value, ?bool $isAllowSymlink = null, array $refs = [])
-	{
-		return Lib::fs()->type_filepath_realpath(null, $value, $isAllowSymlink, $refs);
+		return Lib::preg()->type_regex(null, $value);
 	}
 
 
 	/**
 	 * @return Ret<string>
 	 */
-	public function filename($value)
+	public function regexp($value, string $enclosure = '/', string $flags = null)
 	{
-		return Lib::fs()->type_filename(null, $value);
+		return Lib::preg()->type_regexp(null, $value, $enclosure, $flags);
 	}
 
 
 	/**
-	 * @return Ret<\SplFileInfo>
+	 * @return Ret<string>
 	 */
-	public function file(
-		$value,
-		?array $extensions = null,
-		?array $mimeTypes = null,
-		?array $filters = null,
-		array $refs = []
-	) {
-		return Lib::fs()->type_file(null, $value, $extensions, $mimeTypes, $filters, $refs);
-	}
-
-
-	/**
-	 * @return Ret<\SplFileInfo>
-	 */
-	public function image(
-		$value,
-		?array $extensions = null,
-		?array $mimeTypes = null,
-		?array $filters = null,
-		array $refs = []
-	) {
-		return Lib::fs()->type_image(null, $value, $extensions, $mimeTypes, $filters, $refs);
-	}
-
-
-	/**
-	 * @return Ret<resource|\Socket>
-	 */
-	public function socket($value)
+	public function uuid($value)
 	{
-		return Lib::fs()->type_socket(null, $value);
+		return Lib::random()->type_uuid(null, $value);
 	}
 
 
 	/**
-	 * @return Ret<resource>
+	 * @return Ret<string>
 	 */
-	public function stream($value)
+	public function uuid_v4($value)
 	{
-		return Lib::fs()->type_stream(null, $value);
+		return Lib::random()->type_uuid_v4(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function uuid_v5($value)
+	{
+		return Lib::random()->type_uuid_v5(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function uuid_v7($value)
+	{
+		return Lib::random()->type_uuid_v7(null, $value);
 	}
 
 
@@ -2630,7 +2555,7 @@ trait TypeTrait
 	 *
 	 * @return Ret<string>
 	 */
-	public function email($value, ?array $filters = null, array $refs = [])
+	public function email($value, array $filters = null, array $refs = [])
 	{
 		return Lib::social()->type_email(null, $value, $filters, $refs);
 	}
@@ -2652,7 +2577,7 @@ trait TypeTrait
 	 *
 	 * @return Ret<string>
 	 */
-	public function email_non_fake($value, ?array $filters = null, array $refs = [])
+	public function email_non_fake($value, array $filters = null, array $refs = [])
 	{
 		return Lib::social()->type_email_non_fake(null, $value, $filters, $refs);
 	}
@@ -2663,7 +2588,7 @@ trait TypeTrait
 	 *
 	 * @return Ret<string>
 	 */
-	public function email_maybe_fake($value, ?array $filters = null, array $refs = [])
+	public function email_maybe_fake($value, array $filters = null, array $refs = [])
 	{
 		return Lib::social()->type_email_maybe_fake(null, $value, $filters, $refs);
 	}
@@ -2714,6 +2639,8 @@ trait TypeTrait
 
 
 	/**
+	 * > использует библиотеку libphonenumber, чтобы убедится, что телефон соответствует стандартам Google
+	 *
 	 * @param array{ 0?: string, 1?: string, 2?: string, 3?: string } $refs
 	 *
 	 * @return Ret<string>
@@ -2758,7 +2685,7 @@ trait TypeTrait
 
 
 	/**
-	 * @param array{ 0?: string, 1?: string, 2?: string } $refs
+	 * @param array{ 0?: string, 1?: string } $refs
 	 *
 	 * @return Ret<string>
 	 */
@@ -2769,6 +2696,8 @@ trait TypeTrait
 
 
 	/**
+	 * > использует библиотеку libphonenumber, чтобы убедится, что телефон соответствует стандартам Google
+	 *
 	 * @param array{ 0?: string, 1?: string, 2?: string } $refs
 	 *
 	 * @return Ret<string>
@@ -2776,5 +2705,222 @@ trait TypeTrait
 	public function tel_real($value, ?string $region = '', array $refs = [])
 	{
 		return Lib::social()->type_tel_real(null, $value, $region, $refs);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function php_string($value)
+	{
+		return Lib::str()->type_php_string(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function php_string_empty($value)
+	{
+		return Lib::str()->type_php_string_empty(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function php_string_not_empty($value)
+	{
+		return Lib::str()->type_php_string_not_empty(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function php_trim($value, string $characters = null)
+	{
+		return Lib::str()->type_php_trim(null, $value, $characters);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function string($value)
+	{
+		return Lib::str()->type_string(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function string_empty($value)
+	{
+		return Lib::str()->type_string_empty(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function string_not_empty($value)
+	{
+		return Lib::str()->type_string_not_empty(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function trim($value, string $characters = null)
+	{
+		return Lib::str()->type_trim(null, $value, $characters);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function char($value)
+	{
+		return Lib::str()->type_char(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function letter($value)
+	{
+		return Lib::str()->type_letter(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function word($value)
+	{
+		return Lib::str()->type_word(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<Alphabet>
+	 */
+	public function alphabet($value)
+	{
+		return Lib::str()->type_alphabet(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function ctype_digit($value)
+	{
+		return Lib::str()->type_ctype_digit(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function ctype_alpha($value, bool $allowUpperCase = null)
+	{
+		return Lib::str()->type_ctype_alpha(null, $value, $allowUpperCase);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function ctype_alnum($value, bool $allowUpperCase = null)
+	{
+		return Lib::str()->type_ctype_alnum(null, $value, $allowUpperCase);
+	}
+
+
+	/**
+	 * @param string|true             $url
+	 * @param string|false|array|null $query
+	 * @param string|false|null       $fragment
+	 *
+	 * @return Ret<string>
+	 */
+	public function url(
+		$url,
+		$query = null,
+		$fragment = null,
+		int $isHostIdnaAscii = null,
+		int $isLinkUrlencoded = null,
+		array $refs = []
+	) {
+		return Lib::url()->type_url(null, $url, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs);
+	}
+
+
+	/**
+	 * @param string|true             $url
+	 * @param string|false|array|null $query
+	 * @param string|false|null       $fragment
+	 *
+	 * @return Ret<string>
+	 */
+	public function uri(
+		$url,
+		$query = null,
+		$fragment = null,
+		int $isHostIdnaAscii = null,
+		int $isLinkUrlencoded = null,
+		array $refs = []
+	) {
+		return Lib::url()->type_uri(null, $url, $query, $fragment, $isHostIdnaAscii, $isLinkUrlencoded, $refs);
+	}
+
+
+	/**
+	 * @param string|true $url
+	 *
+	 * @return Ret<string>
+	 */
+	public function host($url, int $isHostIdnaAscii = null, array $refs = [])
+	{
+		return Lib::url()->type_host(null, $url, $isHostIdnaAscii, $refs);
+	}
+
+
+	/**
+	 * @param string|true $url
+	 *
+	 * @return Ret<string>
+	 */
+	public function domain($url, int $isHostIdnaAscii = null, array $refs = [])
+	{
+		return Lib::url()->type_domain(null, $url, $isHostIdnaAscii, $refs);
+	}
+
+
+	/**
+	 * @param string|true             $url
+	 * @param string|false|array|null $query
+	 * @param string|false|null       $fragment
+	 *
+	 * @return Ret<string>
+	 */
+	public function link($url, $query = null, $fragment = null, int $isLinkUrlencoded = null, array $refs = [])
+	{
+		return Lib::url()->type_link(null, $url, $query, $fragment, $isLinkUrlencoded, $refs);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function dsn_pdo($dsn, array $refs = [])
+	{
+		return Lib::url()->type_dsn_pdo(null, $dsn, $refs);
 	}
 }

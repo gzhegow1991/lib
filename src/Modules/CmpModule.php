@@ -1,6 +1,7 @@
 <?php
 
 /**
+ * @noinspection PhpComposerExtensionStubsInspection
  * @noinspection PhpIfWithCommonPartsInspection
  */
 
@@ -1122,6 +1123,7 @@ class CmpModule
                 }
 
                 $result = null
+                    ?? (($flagsMode & _CMP_MODE_STRING_VS_COLLATOR_COMPARE) ? (new \Collator(''))->compare($aString, $bString) : null)
                     ?? (($flagsMode & _CMP_MODE_STRING_VS_STRNATCASECMP) ? strnatcasecmp($aString, $bString) : null)
                     ?? (($flagsMode & _CMP_MODE_STRING_VS_STRCASECMP) ? strcasecmp($aString, $bString) : null)
                     ?? (($flagsMode & _CMP_MODE_STRING_VS_STRNATCMP) ? strnatcmp($aString, $bString) : null)

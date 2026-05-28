@@ -41,9 +41,11 @@ class StrModule
                 $mbstringBool = (bool) $mbstring;
 
                 if ( $mbstringBool ) {
-                    $theType = Lib::type();
-
-                    $theType->is_extension_loaded('mbstring')->orThrow();
+                    if ( ! extension_loaded('mbstring') ) {
+                        throw new RuntimeException(
+                            [ 'The extension missing: mbstring' ]
+                        );
+                    }
                 }
 
                 static::$mbstring = $mbstringBool;
@@ -591,27 +593,15 @@ class StrModule
             );
         }
 
-        if ( extension_loaded('ctype') ) {
-            if ( ctype_digit($valueStringNotEmpty) ) {
-                return Ret::ok($fb, $valueStringNotEmpty);
-            }
-
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should pass `ctype_digit` check', $value ],
-                [ __FILE__, __LINE__ ]
-            );
+        if ( ctype_digit($valueStringNotEmpty) ) {
+            return Ret::ok($fb, $valueStringNotEmpty);
         }
 
-        if ( ! preg_match('~[^0-9]~', $valueStringNotEmpty) ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should contain only digits', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        return Ret::ok($fb, $valueStringNotEmpty);
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should pass `ctype_digit` check', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
@@ -631,41 +621,25 @@ class StrModule
             );
         }
 
-        if ( extension_loaded('ctype') ) {
-            if ( ! $allowUpperCase ) {
-                if ( strtolower($valueStringNotEmpty) !== $valueStringNotEmpty ) {
-                    return Ret::throw(
-                        $fb,
-                        [ 'The `value` should not contain upper case letters', $value ],
-                        [ __FILE__, __LINE__ ]
-                    );
-                }
+        if ( ! $allowUpperCase ) {
+            if ( strtolower($valueStringNotEmpty) !== $valueStringNotEmpty ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should not contain upper case letters', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
-
-            if ( ctype_alpha($valueStringNotEmpty) ) {
-                return Ret::ok($fb, $valueStringNotEmpty);
-            }
-
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should pass `ctype_alpha` check', $value ],
-                [ __FILE__, __LINE__ ]
-            );
         }
 
-        $regexFlags = $allowUpperCase
-            ? 'i'
-            : '';
-
-        if ( preg_match('~[^a-z]~' . $regexFlags, $valueStringNotEmpty) ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should contain only [a-z] letters', $value ],
-                [ __FILE__, __LINE__ ]
-            );
+        if ( ctype_alpha($valueStringNotEmpty) ) {
+            return Ret::ok($fb, $valueStringNotEmpty);
         }
 
-        return Ret::ok($fb, $valueStringNotEmpty);
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should pass `ctype_alpha` check', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
     /**
@@ -685,41 +659,25 @@ class StrModule
             );
         }
 
-        if ( extension_loaded('ctype') ) {
-            if ( ! $allowUpperCase ) {
-                if ( strtolower($valueStringNotEmpty) !== $valueStringNotEmpty ) {
-                    return Ret::throw(
-                        $fb,
-                        [ 'The `value` should not contain upper case letters', $value ],
-                        [ __FILE__, __LINE__ ]
-                    );
-                }
+        if ( ! $allowUpperCase ) {
+            if ( strtolower($valueStringNotEmpty) !== $valueStringNotEmpty ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` should not contain upper case letters', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
             }
-
-            if ( ctype_alnum($valueStringNotEmpty) ) {
-                return Ret::ok($fb, $valueStringNotEmpty);
-            }
-
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should pass `ctype_alnum` check', $value ],
-                [ __FILE__, __LINE__ ]
-            );
         }
 
-        $regexFlags = $allowUpperCase
-            ? 'i'
-            : '';
-
-        if ( preg_match('~[^0-9a-z]~' . $regexFlags, $valueStringNotEmpty) ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should contain only [a-z0-9] letters', $value ],
-                [ __FILE__, __LINE__ ]
-            );
+        if ( ctype_alnum($valueStringNotEmpty) ) {
+            return Ret::ok($fb, $valueStringNotEmpty);
         }
 
-        return Ret::ok($fb, $valueStringNotEmpty);
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should pass `ctype_alnum` check', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 
@@ -2987,9 +2945,11 @@ class StrModule
      */
     public function utf8_encode(string $string, ?string $encoding = null) : ?string
     {
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('iconv')->orThrow();
+        if ( ! extension_loaded('iconv') ) {
+            throw new RuntimeException(
+                [ 'The extension missing: iconv' ]
+            );
+        }
 
         $encodingString = null
             ?? $encoding

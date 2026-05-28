@@ -120,16 +120,12 @@ class FsModule
     protected $streamSafe;
 
 
-    public function __construct()
-    {
-    }
+    // public function __construct()
+    // {
+    // }
 
     public function __initialize()
     {
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('fileinfo')->orThrow();
-
         return $this;
     }
 

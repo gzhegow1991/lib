@@ -9,6 +9,7 @@ use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointDriverInterface;
 use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointPhpErrorLogDriver;
 use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointPhpLogErrorsDriver;
 use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointPhpPrecisionDriver;
+use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointPhpIntlLocaleDriver;
 use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointCustomDirRootDriver;
 use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointPhpMemoryLimitDriver;
 use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointPhpPostMaxSizeDriver;
@@ -41,6 +42,7 @@ use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointCustomEnableThrowablesOnShut
  * @method mixed getPhpErrorLog()
  * @method mixed getPhpErrorReporting()
  * @method mixed getPhpExceptionHandler()
+ * @method mixed getPhpIntlLocaleDefault()
  * @method mixed getPhpLogErrors()
  * @method mixed getPhpMaxExecutionTime()
  * @method mixed getPhpMaxInputTime()
@@ -64,6 +66,7 @@ use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointCustomEnableThrowablesOnShut
  * @method self setPhpErrorLog($value, bool|null $force = null, array $refs = [])
  * @method self setPhpErrorReporting($value, bool|null $force = null, array $refs = [])
  * @method self setPhpExceptionHandler($value, bool|null $force = null, array $refs = [])
+ * @method self setPhpIntlLocaleDefault($value, bool|null $force = null, array $refs = [])
  * @method self setPhpLogErrors($value, bool|null $force = null, array $refs = [])
  * @method self setPhpMaxExecutionTime($value, bool|null $force = null, array $refs = [])
  * @method self setPhpMaxInputTime($value, bool|null $force = null, array $refs = [])
@@ -87,6 +90,7 @@ use Gzhegow\Lib\Modules\Entrypoint\Driver\EntrypointCustomEnableThrowablesOnShut
  * @method self unsetPhpErrorLog(bool|null $force = null, array $refs = [])
  * @method self unsetPhpErrorReporting(bool|null $force = null, array $refs = [])
  * @method self unsetPhpExceptionHandler(bool|null $force = null, array $refs = [])
+ * @method self unsetPhpIntlLocaleDefault(bool|null $force = null, array $refs = [])
  * @method self unsetPhpLogErrors(bool|null $force = null, array $refs = [])
  * @method self unsetPhpMaxExecutionTime(bool|null $force = null, array $refs = [])
  * @method self unsetPhpMaxInputTime(bool|null $force = null, array $refs = [])
@@ -119,6 +123,8 @@ class EntrypointModule
 
     const OPT_PHP_MAX_EXECUTION_TIME = 'PHP_MAX_EXECUTION_TIME';
     const OPT_PHP_MAX_INPUT_TIME     = 'PHP_MAX_INPUT_TIME';
+
+    const OPT_PHP_INTL_LOCALE_DEFAULT = 'PHP_INTL_LOCALE_DEFAULT';
 
     const OPT_PHP_DATE_TIMEZONE_DEFAULT = 'PHP_DATE_TIMEZONE_DEFAULT';
 
@@ -155,6 +161,8 @@ class EntrypointModule
         //
         self::OPT_PHP_MAX_EXECUTION_TIME               => true,
         self::OPT_PHP_MAX_INPUT_TIME                   => true,
+        //
+        self::OPT_PHP_INTL_LOCALE_DEFAULT              => true,
         //
         self::OPT_PHP_DATE_TIMEZONE_DEFAULT            => true,
         //
@@ -235,6 +243,8 @@ class EntrypointModule
         $this->drivers[self::OPT_PHP_MAX_EXECUTION_TIME] = new EntrypointPhpMaxExecutionTimeDriver();
         $this->drivers[self::OPT_PHP_MAX_INPUT_TIME] = new EntrypointPhpMaxInputTimeDriver();
         //
+        $this->drivers[self::OPT_PHP_INTL_LOCALE_DEFAULT] = new EntrypointPhpIntlLocaleDriver();
+        //
         $this->drivers[self::OPT_PHP_DATE_TIMEZONE_DEFAULT] = new EntrypointPhpDateTimezoneDefaultDriver();
         //
         $this->drivers[self::OPT_PHP_PRECISION] = new EntrypointPhpPrecisionDriver();
@@ -291,6 +301,7 @@ class EntrypointModule
                 'PhpErrorLog'                      => static::OPT_PHP_ERROR_LOG,
                 'PhpErrorReporting'                => static::OPT_PHP_ERROR_REPORTING,
                 'PhpExceptionHandler'              => static::OPT_PHP_EXCEPTION_HANDLER,
+                'PhpIntlLocaleDefault'             => static::OPT_PHP_INTL_LOCALE_DEFAULT,
                 'PhpLogErrors'                     => static::OPT_PHP_LOG_ERRORS,
                 'PhpMaxExecutionTime'              => static::OPT_PHP_MAX_EXECUTION_TIME,
                 'PhpMaxInputTime'                  => static::OPT_PHP_MAX_INPUT_TIME,

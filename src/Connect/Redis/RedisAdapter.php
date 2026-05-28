@@ -82,9 +82,11 @@ class RedisAdapter
 
     private function __construct()
     {
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('redis')->orThrow();
+        if ( ! extension_loaded('redis') ) {
+            throw new RuntimeException(
+                [ 'The extension missing: redis' ]
+            );
+        }
     }
 
 

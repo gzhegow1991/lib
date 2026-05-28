@@ -2,13 +2,12 @@
 
 namespace Gzhegow\Lib\Modules;
 
-use Gzhegow\Lib\Modules\Type\Traits\TTrait;
-use Gzhegow\Lib\Modules\Type\Interfaces\TInterface;
+use Gzhegow\Lib\Modules\Type\Traits\RetTrait;
 
 
-class TModule implements TInterface
+class RetModule
 {
-    use TTrait;
+    use RetTrait;
 
 
     // public function __construct()

@@ -2,12 +2,12 @@
 
 namespace Gzhegow\Lib\Modules;
 
-use Gzhegow\Lib\Modules\Type\Traits\TypeTrait;
+use Gzhegow\Lib\Modules\Type\Traits\BoolTrait;
 
 
-class TypeModule
+class BoolModule
 {
-    use TypeTrait;
+    use BoolTrait;
 
 
     // public function __construct()

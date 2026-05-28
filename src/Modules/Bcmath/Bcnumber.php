@@ -126,11 +126,11 @@ class Bcnumber implements
         return $this->value === "{$this->sign}{$this->int}";
     }
 
-    public function isDecimal() : bool
+    public function isNonInteger() : bool
     {
         return true
-            && ($this->value === "{$this->sign}{$this->int}{$this->frac}")
-            && ($this->value !== "{$this->sign}{$this->int}");
+            && ($this->value !== "{$this->sign}{$this->int}")
+            && ($this->value === "{$this->sign}{$this->int}{$this->frac}");
     }
 
 
@@ -225,6 +225,16 @@ class Bcnumber implements
     public function getFrac() : string
     {
         return $this->frac;
+    }
+
+
+    public function getSplit() : array
+    {
+        return [
+            $this->sign ?? '',
+            $this->int ?? '',
+            $this->frac ?? '',
+        ];
     }
 
 

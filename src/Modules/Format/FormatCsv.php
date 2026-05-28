@@ -4,18 +4,11 @@ namespace Gzhegow\Lib\Modules\Format;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
+use Gzhegow\Lib\Exception\RuntimeException;
 
 
 class FormatCsv
 {
-    public function __construct()
-    {
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('fileinfo')->orThrow();
-    }
-
-
     /**
      * @return Ret<string>|string
      */

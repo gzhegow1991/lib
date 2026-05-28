@@ -583,12 +583,282 @@ $test->run();
 
 
 // >>> TEST
+// > тесты ArrayOf
+$fn = function () use ($ffn) {
+    $ffn->print('[ ArrayOf ]');
+    echo "\n";
+
+
+    $notAnObject = 1;
+    $objectStdClass = new \stdClass();
+    $objectArrayObject = new ArrayObject();
+    $objectAnonymousStdClass = new class extends \stdClass {
+    };
+
+
+    // > осторожно, `ArrayOf` не проверяет типы при добавлении, для этого есть `ArrayOfType` или `ArrayOfClass`
+    // > этот объект сделан для того, чтобы убедится, что другой разработчик создал его с правильным типом
+    // > при этом он может положить туда что захочет, это похоже на указание PHPDoc
+    $theArrayOf = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::new('object');
+    $theArrayOf[] = $notAnObject;
+    $ffn->print($theArrayOf);
+    $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
+
+    echo "\n";
+
+
+    $theArrayOf = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::new('object');
+    $theArrayOf[] = $objectStdClass;
+    $theArrayOf[] = $objectArrayObject;
+
+    try {
+        $theArrayOf[] = $notAnObject;
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+    $ffn->print($theArrayOf);
+    $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
+
+    echo "\n";
+
+
+    $theArrayOf = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::new(\stdClass::class);
+    $theArrayOf[] = $objectStdClass;
+
+    try {
+        $theArrayOf[] = $objectArrayObject;
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+
+    try {
+        $theArrayOf[] = $objectAnonymousStdClass;
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+
+    try {
+        $theArrayOf[] = $notAnObject;
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+    $ffn->print($theArrayOf);
+    $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
+
+    echo "\n";
+
+
+    /**
+     * @var \Gzhegow\Lib\Modules\Arr\Map\PHP8\Map $theMap
+     */
+    $theMap = \Gzhegow\Lib\Modules\Arr\Map\Map::new();
+    $theMap[$stdClass = new \stdClass()] = 1;
+    $theMap[$array = [ 1, 2, 3 ]] = 1;
+    $ffn->print($theMap);
+    $ffn->print(isset($theMap[$stdClass]), isset($theMap[$array]));
+    $ffn->print_array($theMap->keys(), 1);
+    $ffn->print_array($theMap->values(), 2);
+};
+$test = $ffn->test($fn);
+$test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
+"[ ArrayOf ]"
+
+{ object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOf }
+TRUE | [ 1 ]
+
+"[ CATCH ] The `value` should be a value of type: object"
+{ object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOfType }
+TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable serializable) # ArrayObject }" ]
+
+"[ CATCH ] The `value` should be an instance of the class: stdClass"
+"[ CATCH ] The `value` should be an instance of the class: stdClass"
+"[ CATCH ] The `value` should be an object"
+{ object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOfClass }
+TRUE | [ "{ object # stdClass }" ]
+
+{ object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\Map\PHP8\Map }
+TRUE | TRUE
+[ "{ object # stdClass }", "{ array(3) }" ]
+[ 1, 1 ]
+');
+$test->expectStdoutIf(PHP_VERSION_ID < 80000, '
+"[ ArrayOf ]"
+
+{ object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf }
+TRUE | [ 1 ]
+
+"[ CATCH ] The `value` should be a value of type: object"
+{ object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfType }
+TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable serializable) # ArrayObject }" ]
+
+"[ CATCH ] The `value` should be an instance of the class: stdClass"
+"[ CATCH ] The `value` should be an instance of the class: stdClass"
+"[ CATCH ] The `value` should be an object"
+{ object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfClass }
+TRUE | [ "{ object # stdClass }" ]
+
+{ object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\Map\PHP7\Map }
+TRUE | TRUE
+[ "{ object # stdClass }", "{ array(3) }" ]
+[ 1, 1 ]
+');
+$test->run();
+
+
+
+// >>> TEST
+// > тесты Config
+$fn = function () use ($ffn) {
+    $ffn->print('[ Config ]');
+    echo "\n";
+
+    /**
+     * @property \TestConfigChild $child
+     */
+    class TestConfig extends \Gzhegow\Lib\Config\AbstractConfig
+    {
+        protected $child;
+
+        public function __construct()
+        {
+            $this->child = new \TestConfigChild();
+
+            parent::__construct();
+        }
+    }
+
+    /**
+     * @property string $foo
+     */
+    class TestConfigChild extends \Gzhegow\Lib\Config\AbstractConfig
+    {
+        protected $foo = 'bar';
+    }
+
+    /**
+     * @property \TestConfigChildValidate $child
+     */
+    class ConfigValidateDummy extends \Gzhegow\Lib\Config\AbstractConfig
+    {
+        protected $child;
+
+        public function __construct()
+        {
+            $this->child = new \TestConfigChildValidate();
+
+            parent::__construct();
+        }
+    }
+
+    /**
+     * @property int $foo
+     * @property int $foo2
+     */
+    class TestConfigChildValidate extends \Gzhegow\Lib\Config\AbstractConfig
+    {
+        protected $foo = 1;
+        protected $foo2;
+
+        protected function validation(array $context = []) : bool
+        {
+            if ( $this->foo2 !== $this->foo ) {
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+
+    $config = new \TestConfig();
+
+    $configChildDefault = $config->child;
+
+    $configChildNewFooValue = 'baz';
+    $configChildNew = new \TestConfigChild();
+    $configChildNew->foo = $configChildNewFooValue;
+
+    $config->child = $configChildNew;
+
+    $ffn->print($config);
+    $ffn->print($config->child, $config->child === $configChildDefault);
+    $ffn->print($config->child->foo, $config->child->foo === $configChildNew->foo);
+
+    echo "\n";
+
+
+    $config = new \TestConfig();
+    $configChildDefault = $config->child;
+
+    $configChildNewFooValue = 'baz';
+    $config->load(
+        [
+            'hello' => 'world',
+            'foo'   => 'bar',
+            'child' => [
+                'foo' => $configChildNewFooValue,
+            ],
+        ]
+    );
+
+    $ffn->print($config);
+    $ffn->print($config->child, $config->child === $configChildDefault);
+    $ffn->print($config->child->foo, $config->child->foo === $configChildNewFooValue);
+
+    echo "\n";
+
+
+    $configArray = $config->toArray();
+    $config->load($configArray);
+
+    $ffn->print($config);
+    $ffn->print($config->child, $config->child === $configChildDefault);
+    $ffn->print($config->child->foo, $config->child->foo === $configChildNewFooValue);
+
+    echo "\n";
+
+
+    $config = new \ConfigValidateDummy();
+    try {
+        $config->validate();
+    }
+    catch ( \Throwable $e ) {
+        $ffn->print('[ CATCH ] ' . $e->getMessage());
+    }
+};
+$test = $ffn->test($fn);
+$test->expectStdout('
+"[ Config ]"
+
+{ object # TestConfig }
+{ object # TestConfigChild } | TRUE
+"baz" | TRUE
+
+{ object # TestConfig }
+{ object # TestConfigChild } | TRUE
+"baz" | TRUE
+
+{ object # TestConfig }
+{ object # TestConfigChild } | TRUE
+"baz" | TRUE
+
+"[ CATCH ] Configuration is invalid"
+');
+$test->run();
+
+
+
+// >>> TEST
 // > тесты ErrorBag
 $fn = function () use ($ffn) {
     $ffn->print('[ ErrorBag ]');
     echo "\n";
 
-    \Gzhegow\Lib\Lib::errorBag($b);
+    \Gzhegow\Lib\Lib::newErrorBag($b);
 
     for ( $i = 0; $i < 2; $i++ ) {
         $tag = 'tag' . $i;
@@ -635,6 +905,79 @@ $test->expectStdout('
     "[ Error ] 1.1.0",
     "{ object # Gzhegow\Lib\Modules\Php\ErrorBag\Error }"
   ]
+]
+###
+');
+$test->run();
+
+
+
+// >>> TEST
+// > тесты Microtimer
+$fn = function () use ($ffn) {
+    $ffn->print('[ Microtimer ]');
+    echo "\n";
+
+
+    $mt = \Gzhegow\Lib\Lib::newMicrotimer();
+
+    $tag = 'tag';
+
+    $mt($tag);
+
+    for ( $i = 0; $i < 2; $i++ ) {
+        $ttag = 'ttag_' . $i;
+
+        $mt($ttag);
+
+        for ( $ii = 0; $ii < 2; $ii++ ) {
+            $tttag = 'tttag_' . $i . '_' . $ii;
+
+            $mt($tttag);
+
+            usleep(1e4);
+
+            $mt($tttag, 1);
+        }
+
+        $mt($ttag, 1);
+    }
+
+    $mt($tag, 1);
+
+    $report = $mt();
+
+    $expect = [
+        'tag'       => (4 * 1e-4),
+        //
+        'ttag_0'    => (2 * 1e-4),
+        'ttag_1'    => (2 * 1e-4),
+        //
+        'tttag_0_0' => (1e-4),
+        'tttag_0_1' => (1e-4),
+        'tttag_1_0' => (1e-4),
+        'tttag_1_1' => (1e-4),
+    ];
+
+    foreach ( $report as $tag => $floats ) {
+        $report[$tag] = ($expect[$tag] < array_sum($floats));
+    }
+
+    $ffn->print_array_multiline($report, 2);
+};
+$test = $ffn->test($fn);
+$test->expectStdout('
+"[ Microtimer ]"
+
+###
+[
+  "tag" => TRUE,
+  "ttag_0" => TRUE,
+  "tttag_0_0" => TRUE,
+  "tttag_0_1" => TRUE,
+  "ttag_1" => TRUE,
+  "tttag_1_0" => TRUE,
+  "tttag_1_1" => TRUE
 ]
 ###
 ');
@@ -811,348 +1154,6 @@ NULL
 > fnMiddlewareStep2
 > fnMiddleware::after
 "new_result12"
-');
-$test->run();
-
-
-
-// >>> TEST
-// > тесты ArrayOf
-$fn = function () use ($ffn) {
-    $ffn->print('[ ArrayOf ]');
-    echo "\n";
-
-
-    $notAnObject = 1;
-    $objectStdClass = new \stdClass();
-    $objectArrayObject = new ArrayObject();
-    $objectAnonymousStdClass = new class extends \stdClass {
-    };
-
-
-    // > осторожно, `ArrayOf` не проверяет типы при добавлении, для этого есть `ArrayOfType` или `ArrayOfClass`
-    // > этот объект сделан для того, чтобы убедится, что другой разработчик создал его с правильным типом
-    // > при этом он может положить туда что захочет, это похоже на указание PHPDoc
-    $theArrayOf = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOf::new('object');
-    $theArrayOf[] = $notAnObject;
-    $ffn->print($theArrayOf);
-    $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
-
-    echo "\n";
-
-
-    $theArrayOf = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfType::new('object');
-    $theArrayOf[] = $objectStdClass;
-    $theArrayOf[] = $objectArrayObject;
-
-    try {
-        $theArrayOf[] = $notAnObject;
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-    $ffn->print($theArrayOf);
-    $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
-
-    echo "\n";
-
-
-    $theArrayOf = \Gzhegow\Lib\Modules\Arr\ArrayOf\ArrayOfClass::new(\stdClass::class);
-    $theArrayOf[] = $objectStdClass;
-
-    try {
-        $theArrayOf[] = $objectArrayObject;
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-
-    try {
-        $theArrayOf[] = $objectAnonymousStdClass;
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-
-    try {
-        $theArrayOf[] = $notAnObject;
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-    $ffn->print($theArrayOf);
-    $ffn->print($theArrayOf->isOfType('object'), $theArrayOf->getValues());
-
-    echo "\n";
-
-
-    /**
-     * @var \Gzhegow\Lib\Modules\Arr\Map\PHP8\Map $theMap
-     */
-    $theMap = \Gzhegow\Lib\Modules\Arr\Map\Map::new();
-    $theMap[$stdClass = new \stdClass()] = 1;
-    $theMap[$array = [ 1, 2, 3 ]] = 1;
-    $ffn->print($theMap);
-    $ffn->print(isset($theMap[$stdClass]), isset($theMap[$array]));
-    $ffn->print_array($theMap->keys(), 1);
-    $ffn->print_array($theMap->values(), 2);
-};
-$test = $ffn->test($fn);
-$test->expectStdoutIf(PHP_VERSION_ID >= 80000, '
-"[ ArrayOf ]"
-
-{ object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOf }
-TRUE | [ 1 ]
-
-"[ CATCH ] The `value` should be a value of type: object"
-{ object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOfType }
-TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable serializable) # ArrayObject }" ]
-
-"[ CATCH ] The `value` should be an instance of the class: stdClass"
-"[ CATCH ] The `value` should be an instance of the class: stdClass"
-"[ CATCH ] The `value` should be an object"
-{ object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP8\ArrayOfClass }
-TRUE | [ "{ object # stdClass }" ]
-
-{ object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\Map\PHP8\Map }
-TRUE | TRUE
-[ "{ object # stdClass }", "{ array(3) }" ]
-[ 1, 1 ]
-');
-$test->expectStdoutIf(PHP_VERSION_ID < 80000, '
-"[ ArrayOf ]"
-
-{ object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOf }
-TRUE | [ 1 ]
-
-"[ CATCH ] The `value` should be a value of type: object"
-{ object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfType }
-TRUE | [ "{ object # stdClass }", "{ object(countable(0) iterable serializable) # ArrayObject }" ]
-
-"[ CATCH ] The `value` should be an instance of the class: stdClass"
-"[ CATCH ] The `value` should be an instance of the class: stdClass"
-"[ CATCH ] The `value` should be an object"
-{ object(countable(1) iterable serializable) # Gzhegow\Lib\Modules\Arr\ArrayOf\PHP7\ArrayOfClass }
-TRUE | [ "{ object # stdClass }" ]
-
-{ object(countable(2) iterable serializable) # Gzhegow\Lib\Modules\Arr\Map\PHP7\Map }
-TRUE | TRUE
-[ "{ object # stdClass }", "{ array(3) }" ]
-[ 1, 1 ]
-');
-$test->run();
-
-
-
-// >>> TEST
-// > тесты Benchmark
-$fn = function () use ($ffn) {
-    $ffn->print('[ Benchmark ]');
-    echo "\n";
-
-    $tag = 'tag';
-
-    \Gzhegow\Lib\Lib::mt(0, $tag);
-
-    for ( $i = 0; $i < 2; $i++ ) {
-        $ttag = 'tag' . $i;
-
-        \Gzhegow\Lib\Lib::mt(0, $ttag);
-
-        for ( $ii = 0; $ii < 2; $ii++ ) {
-            $tttag = 'tag' . $i . $ii;
-
-            \Gzhegow\Lib\Lib::mt(0, $tttag);
-
-            usleep(1e4);
-
-            \Gzhegow\Lib\Lib::mt(1, $tttag);
-        }
-
-        \Gzhegow\Lib\Lib::mt(1, $ttag);
-    }
-
-    \Gzhegow\Lib\Lib::mt(1, $tag);
-
-    $report = \Gzhegow\Lib\Lib::mt();
-
-    $expect = [
-        'tag'   => (4 * 1e-4),
-        //
-        'tag0'  => (2 * 1e-4),
-        'tag1'  => (2 * 1e-4),
-        //
-        'tag00' => (1e-4),
-        'tag01' => (1e-4),
-        'tag10' => (1e-4),
-        'tag11' => (1e-4),
-    ];
-
-    $reportIndex = array_keys($report);
-
-    foreach ( $report as $tag => $floats ) {
-        $report[$tag] = $expect[$tag] < array_sum($floats);
-    }
-
-    $ffn->print_array_multiline($report, 2);
-};
-$test = $ffn->test($fn);
-$test->expectStdout('
-"[ Benchmark ]"
-
-###
-[
-  "tag" => TRUE,
-  "tag0" => TRUE,
-  "tag00" => TRUE,
-  "tag01" => TRUE,
-  "tag1" => TRUE,
-  "tag10" => TRUE,
-  "tag11" => TRUE
-]
-###
-');
-$test->run();
-
-
-
-// >>> TEST
-// > тесты Config
-$fn = function () use ($ffn) {
-    $ffn->print('[ Config ]');
-    echo "\n";
-
-    /**
-     * @property \TestConfigChild $child
-     */
-    class TestConfig extends \Gzhegow\Lib\Config\AbstractConfig
-    {
-        protected $child;
-
-        public function __construct()
-        {
-            $this->child = new \TestConfigChild();
-
-            parent::__construct();
-        }
-    }
-
-    /**
-     * @property string $foo
-     */
-    class TestConfigChild extends \Gzhegow\Lib\Config\AbstractConfig
-    {
-        protected $foo = 'bar';
-    }
-
-    /**
-     * @property \TestConfigChildValidate $child
-     */
-    class ConfigValidateDummy extends \Gzhegow\Lib\Config\AbstractConfig
-    {
-        protected $child;
-
-        public function __construct()
-        {
-            $this->child = new \TestConfigChildValidate();
-
-            parent::__construct();
-        }
-    }
-
-    /**
-     * @property int $foo
-     * @property int $foo2
-     */
-    class TestConfigChildValidate extends \Gzhegow\Lib\Config\AbstractConfig
-    {
-        protected $foo = 1;
-        protected $foo2;
-
-        protected function validation(array $context = []) : bool
-        {
-            if ( $this->foo2 !== $this->foo ) {
-                return false;
-            }
-
-            return true;
-        }
-    }
-
-
-    $config = new \TestConfig();
-
-    $configChildDefault = $config->child;
-
-    $configChildNewFooValue = 'baz';
-    $configChildNew = new \TestConfigChild();
-    $configChildNew->foo = $configChildNewFooValue;
-
-    $config->child = $configChildNew;
-
-    $ffn->print($config);
-    $ffn->print($config->child, $config->child === $configChildDefault);
-    $ffn->print($config->child->foo, $config->child->foo === $configChildNew->foo);
-
-    echo "\n";
-
-
-    $config = new \TestConfig();
-    $configChildDefault = $config->child;
-
-    $configChildNewFooValue = 'baz';
-    $config->load(
-        [
-            'hello' => 'world',
-            'foo'   => 'bar',
-            'child' => [
-                'foo' => $configChildNewFooValue,
-            ],
-        ]
-    );
-
-    $ffn->print($config);
-    $ffn->print($config->child, $config->child === $configChildDefault);
-    $ffn->print($config->child->foo, $config->child->foo === $configChildNewFooValue);
-
-    echo "\n";
-
-
-    $configArray = $config->toArray();
-    $config->load($configArray);
-
-    $ffn->print($config);
-    $ffn->print($config->child, $config->child === $configChildDefault);
-    $ffn->print($config->child->foo, $config->child->foo === $configChildNewFooValue);
-
-    echo "\n";
-
-
-    $config = new \ConfigValidateDummy();
-    try {
-        $config->validate();
-    }
-    catch ( \Throwable $e ) {
-        $ffn->print('[ CATCH ] ' . $e->getMessage());
-    }
-};
-$test = $ffn->test($fn);
-$test->expectStdout('
-"[ Config ]"
-
-{ object # TestConfig }
-{ object # TestConfigChild } | TRUE
-"baz" | TRUE
-
-{ object # TestConfig }
-{ object # TestConfigChild } | TRUE
-"baz" | TRUE
-
-{ object # TestConfig }
-{ object # TestConfigChild } | TRUE
-"baz" | TRUE
-
-"[ CATCH ] Configuration is invalid"
 ');
 $test->run();
 

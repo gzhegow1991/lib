@@ -33,9 +33,11 @@ class MbModule
 
     public function __initialize()
     {
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('mbstring')->orThrow();
+        if ( ! extension_loaded('mbstring') ) {
+            throw new RuntimeException(
+                [ 'The extension missing: mbstring' ]
+            );
+        }
 
         return $this;
     }

@@ -102,7 +102,7 @@ class ArrModule
 
         return Ret::throw(
             $fb,
-            [ 'The `value` should be array, not empty', $value ],
+            [ 'The `value` should be array, non-empty', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -110,7 +110,7 @@ class ArrModule
     /**
      * @return Ret<mixed>|mixed
      */
-    public function type_any_not_php_array($fb, $value)
+    public function type_not_php_array($fb, $value)
     {
         if ( ! is_array($value) ) {
             return Ret::ok($fb, $value);
@@ -231,6 +231,54 @@ class ArrModule
         }
 
         return Ret::ok($fb, $value);
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_array_empty($fb, $value)
+    {
+        if ( is_array($value) && ([] !== $value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be array, empty', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_array_not_empty($fb, $value)
+    {
+        if ( [] === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be array, non-empty', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<array>|array
+     */
+    public function type_not_array($fb, $value)
+    {
+        if ( ! is_array($value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should not be array', $value ],
+            [ __FILE__, __LINE__ ]
+        );
     }
 
 

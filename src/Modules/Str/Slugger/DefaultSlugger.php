@@ -58,11 +58,13 @@ class DefaultSlugger implements SluggerInterface
         ?SluggerPresetRegistryInterface $registry = null
     )
     {
+        if ( ! extension_loaded('mbstring') ) {
+            throw new RuntimeException(
+                [ 'The extension missing: mbstring' ]
+            );
+        }
+
         $registry = $registry ?? new SluggerPresetRegistry();
-
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('mbstring')->orThrow();
 
         $this->registry = $registry;
 

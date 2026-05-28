@@ -32,9 +32,11 @@ class BcmathModule
 
     public function __initialize()
     {
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('bcmath')->orThrow();
+        if ( ! extension_loaded('bcmath') ) {
+            throw new RuntimeException(
+                [ 'The extension missing: bcmath' ]
+            );
+        }
 
         return $this;
     }
@@ -43,12 +45,310 @@ class BcmathModule
     public function __call($name, $arguments)
     {
         if ( 'bc' === substr($name, 0, 2) ) {
-            if ( function_exists($name) ) {
-                return call_user_func_array($name, $arguments);
-            }
+            return call_user_func_array($name, $arguments);
         }
 
         throw new RuntimeException([ 'Method not found: ' . $name ]);
+    }
+
+
+    /**
+     * > проверка на число, затем приведение к decimal, сначала делает numeric, потом приводит через moneytrunc
+     *
+     * @return Ret<string>|string
+     */
+    public function type_decimal_moneytrunc($fb, $value, ?int $scale, array $refs = [])
+    {
+        /** @var Bcnumber $valueBcnumber */
+
+        $scale = $scale ?? 0;
+
+        $withSplit = array_key_exists(0, $refs);
+        if ( $withSplit ) {
+            $refSplit =& $refs[0];
+        }
+        $refSplit = null;
+
+        $theType = Lib::type();
+
+        $scaleValid = $theType->scale($scale)->orThrow();
+
+        $ret = $this->type_bcnumber(null, $value);
+
+        if ( ! $ret->isOk([ &$valueBcnumber ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $frac = $valueBcnumber->getFrac();
+
+        $valueScale = ('' === $frac)
+            ? 0
+            : (strlen($frac) - 1);
+
+        if ( $valueScale < $scaleValid ) {
+            if ( '' === $frac ) {
+                $frac = '.';
+            }
+
+            $frac = str_pad($frac, $scaleValid + 1, '0', STR_PAD_RIGHT);
+
+        } elseif ( $valueScale > $scaleValid ) {
+            $valueBcnumber = $this->bc_add($valueBcnumber, '0', $scaleValid);
+
+            $frac = '';
+            if ( $valueBcnumber->hasFrac($res) ) {
+                $frac = $res;
+            }
+        }
+
+        [ $sign, $int ] = [ $valueBcnumber->getSign(), $valueBcnumber->getInt() ];
+
+        $exp = '';
+
+        $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
+
+        if ( $withSplit ) {
+            $refSplit = [];
+            $refSplit[0] = $sign;
+            $refSplit[1] = $int;
+            $refSplit[2] = $frac;
+            $refSplit[3] = $exp;
+        }
+
+        return Ret::ok($fb, $valueNumeric);
+    }
+
+    /**
+     * > проверка на число, затем приведение к decimal, сначала делает numeric, потом округляет через moneygrow
+     *
+     * @return Ret<string>|string
+     */
+    public function type_decimal_moneygrow($fb, $value, ?int $scale, array $refs = [])
+    {
+        /** @var Bcnumber $valueBcnumber */
+
+        $scale = $scale ?? 0;
+
+        $withSplit = array_key_exists(0, $refs);
+        if ( $withSplit ) {
+            $refSplit =& $refs[0];
+        }
+        $refSplit = null;
+
+        $theType = Lib::type();
+
+        $scaleValid = $theType->scale($scale)->orThrow();
+
+        $ret = $this->type_bcnumber(null, $value);
+
+        if ( ! $ret->isOk([ &$valueBcnumber ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $frac = $valueBcnumber->getFrac();
+
+        $valueScale = ('' === $frac)
+            ? 0
+            : (strlen($frac) - 1);
+
+        if ( $valueScale < $scaleValid ) {
+            if ( '' === $frac ) {
+                $frac = '.';
+            }
+
+            $frac = str_pad($frac, $scaleValid + 1, '0', STR_PAD_RIGHT);
+
+        } elseif ( $valueScale > $scaleValid ) {
+            $shift = str_repeat('0', $scaleValid);
+            $shift = '1' . $shift;
+
+            $valueBcnumber = $this->bc_mul($valueBcnumber, $shift, $valueScale);
+
+            $valueBcnumber = $valueBcnumber->isNegative()
+                ? $this->bc_floor($valueBcnumber)
+                : $this->bc_ceil($valueBcnumber);
+
+            $valueBcnumber = $this->bc_div($valueBcnumber, $shift, $scaleValid);
+
+            $frac = '';
+            if ( $valueBcnumber->hasFrac($res) ) {
+                $frac = $res;
+            }
+        }
+
+        [ $sign, $int ] = [ $valueBcnumber->getSign(), $valueBcnumber->getInt() ];
+
+        $exp = '';
+
+        $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
+
+        if ( $withSplit ) {
+            $refSplit = [];
+            $refSplit[0] = $sign;
+            $refSplit[1] = $int;
+            $refSplit[2] = $frac;
+            $refSplit[3] = $exp;
+        }
+
+        return Ret::ok($fb, $valueNumeric);
+    }
+
+    /**
+     * > проверка на число, затем приведение к decimal, сначала делает numeric, потом округляет через moneyceil
+     *
+     * @return Ret<string>|string
+     */
+    public function type_decimal_moneyceil($fb, $value, ?int $scale, array $refs = [])
+    {
+        /** @var Bcnumber $valueBcnumber */
+
+        $scale = $scale ?? 0;
+
+        $withSplit = array_key_exists(0, $refs);
+        if ( $withSplit ) {
+            $refSplit =& $refs[0];
+        }
+        $refSplit = null;
+
+        $theType = Lib::type();
+
+        $scaleValid = $theType->scale($scale)->orThrow();
+
+        $ret = $this->type_bcnumber(null, $value);
+
+        if ( ! $ret->isOk([ &$valueBcnumber ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $frac = $valueBcnumber->getFrac();
+
+        $valueScale = ('' === $frac)
+            ? 0
+            : (strlen($frac) - 1);
+
+        if ( $valueScale < $scaleValid ) {
+            if ( '' === $frac ) {
+                $frac = '.';
+            }
+
+            $frac = str_pad($frac, $scaleValid + 1, '0', STR_PAD_RIGHT);
+
+        } elseif ( $valueScale > $scaleValid ) {
+            $shift = str_repeat('0', $scaleValid);
+            $shift = '1' . $shift;
+
+            $valueBcnumber = $this->bc_mul($valueBcnumber, $shift, $valueScale);
+            $valueBcnumber = $this->bc_ceil($valueBcnumber);
+            $valueBcnumber = $this->bc_div($valueBcnumber, $shift, $scaleValid);
+
+            $frac = '';
+            if ( $valueBcnumber->hasFrac($res) ) {
+                $frac = $res;
+            }
+        }
+
+        [ $sign, $int ] = [ $valueBcnumber->getSign(), $valueBcnumber->getInt() ];
+
+        $exp = '';
+
+        $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
+
+        if ( $withSplit ) {
+            $refSplit = [];
+            $refSplit[0] = $sign;
+            $refSplit[1] = $int;
+            $refSplit[2] = $frac;
+            $refSplit[3] = $exp;
+        }
+
+        return Ret::ok($fb, $valueNumeric);
+    }
+
+    /**
+     * > проверка на число, затем приведение к decimal, сначала делает numeric, потом округляет через moneyfloor
+     *
+     * @return Ret<string>|string
+     */
+    public function type_decimal_moneyfloor($fb, $value, ?int $scale, array $refs = [])
+    {
+        /** @var Bcnumber $valueBcnumber */
+
+        $scale = $scale ?? 0;
+
+        $withSplit = array_key_exists(0, $refs);
+        if ( $withSplit ) {
+            $refSplit =& $refs[0];
+        }
+        $refSplit = null;
+
+        $theType = Lib::type();
+
+        $scaleValid = $theType->scale($scale)->orThrow();
+
+        $ret = $this->type_bcnumber(null, $value);
+
+        if ( ! $ret->isOk([ &$valueBcnumber ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $frac = $valueBcnumber->getFrac();
+
+        $valueScale = ('' === $frac)
+            ? 0
+            : (strlen($frac) - 1);
+
+        if ( $valueScale < $scaleValid ) {
+            if ( '' === $frac ) {
+                $frac = '.';
+            }
+
+            $frac = str_pad($frac, $scaleValid + 1, '0', STR_PAD_RIGHT);
+
+        } elseif ( $valueScale > $scaleValid ) {
+            $shift = str_repeat('0', $scaleValid);
+            $shift = '1' . $shift;
+
+            $valueBcnumber = $this->bc_mul($valueBcnumber, $shift, $valueScale);
+            $valueBcnumber = $this->bc_floor($valueBcnumber);
+            $valueBcnumber = $this->bc_div($valueBcnumber, $shift, $scaleValid);
+
+            $frac = '';
+            if ( $valueBcnumber->hasFrac($res) ) {
+                $frac = $res;
+            }
+        }
+
+        [ $sign, $int ] = [ $valueBcnumber->getSign(), $valueBcnumber->getInt() ];
+
+        $exp = '';
+
+        $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
+
+        if ( $withSplit ) {
+            $refSplit = [];
+            $refSplit[0] = $sign;
+            $refSplit[1] = $int;
+            $refSplit[2] = $frac;
+            $refSplit[3] = $exp;
+        }
+
+        return Ret::ok($fb, $valueNumeric);
     }
 
 
@@ -547,12 +847,12 @@ class BcmathModule
      * > Участвует всё число
      * > Режим округления применяется к числу, у которого "есть дробная часть, даже минимальная"
      *
-     * > bc_moneyround(1.5, 1) -> 1.5
-     * > bc_moneyround(1.05, 1) -> 1.1
-     * > bc_moneyround(1.005, 1) -> 1.1
-     * > bc_moneyround(-1.005, 1) -> -1.1
-     * > bc_moneyround(-1.05, 1) -> -1.1
-     * > bc_moneyround(-1.5, 1) -> -1.5
+     * > bc_moneyround(1.2, 1) -> 1.2
+     * > bc_moneyround(1.02, 1) -> 1.1
+     * > bc_moneyround(1.002, 1) -> 1.1
+     * > bc_moneyround(-1.002, 1) -> -1.1
+     * > bc_moneyround(-1.02, 1) -> -1.1
+     * > bc_moneyround(-1.2, 1) -> -1.2
      */
     public function bc_moneyround(
         $number, ?int $scale = null,
@@ -569,12 +869,12 @@ class BcmathModule
     }
 
     /**
-     * > bc_moneytrunc(1.5, 1) -> 1.5
-     * > bc_moneytrunc(1.05, 1) -> 1
-     * > bc_moneytrunc(1.005, 1) -> 1
-     * > bc_moneytrunc(-1.005, 1) -> -1
-     * > bc_moneytrunc(-1.05, 1) -> -1
-     * > bc_moneytrunc(-1.5, 1) -> -1.5
+     * > bc_moneytrunc(1.2, 1) -> 1.2
+     * > bc_moneytrunc(1.02, 1) -> 1
+     * > bc_moneytrunc(1.002, 1) -> 1
+     * > bc_moneytrunc(-1.002, 1) -> -1
+     * > bc_moneytrunc(-1.02, 1) -> -1
+     * > bc_moneytrunc(-1.2, 1) -> -1.2
      */
     public function bc_moneytrunc($number, ?int $scale = null) : Bcnumber
     {
@@ -585,12 +885,30 @@ class BcmathModule
     }
 
     /**
-     * > bc_moneyceil(1.5, 1) -> 1.5
-     * > bc_moneyceil(1.05, 1) -> 1.1
-     * > bc_moneyceil(1.005, 1) -> 1.1
-     * > bc_moneyceil(-1.005, 1) -> -1
-     * > bc_moneyceil(-1.05, 1) -> -1
-     * > bc_moneyceil(-1.5, 1) -> -1.5
+     * > alias for bc_moneyround() (opposite of bc_moneytrunc())
+     *
+     * > bc_moneygrow(1.2, 1) -> 1.2
+     * > bc_moneygrow(1.02, 1) -> 1.1
+     * > bc_moneygrow(1.002, 1) -> 1.1
+     * > bc_moneygrow(-1.002, 1) -> -1.1
+     * > bc_moneygrow(-1.02, 1) -> -1.1
+     * > bc_moneygrow(-1.2, 1) -> -1.2
+     */
+    public function bc_moneygrow($number, ?int $scale = null) : Bcnumber
+    {
+        return $this->_bc_moneyround(
+            $number, $scale,
+            _NUM_ROUND_AWAY_FROM_ZERO, _NUM_ROUND_AWAY_FROM_ZERO
+        );
+    }
+
+    /**
+     * > bc_moneyceil(1.2, 1) -> 1.2
+     * > bc_moneyceil(1.02, 1) -> 1.1
+     * > bc_moneyceil(1.002, 1) -> 1.1
+     * > bc_moneyceil(-1.002, 1) -> -1
+     * > bc_moneyceil(-1.02, 1) -> -1
+     * > bc_moneyceil(-1.2, 1) -> -1.2
      */
     public function bc_moneyceil($number, ?int $scale = null) : Bcnumber
     {
@@ -601,12 +919,12 @@ class BcmathModule
     }
 
     /**
-     * > bc_moneyfloor(1.5, 1) -> 1.5
-     * > bc_moneyfloor(1.05, 1) -> 1
-     * > bc_moneyfloor(1.005, 1) -> 1
-     * > bc_moneyfloor(-1.005, 1) -> -1.1
-     * > bc_moneyfloor(-1.05, 1) -> -1.1
-     * > bc_moneyfloor(-1.5, 1) -> -1.5
+     * > bc_moneyfloor(1.2, 1) -> 1.2
+     * > bc_moneyfloor(1.02, 1) -> 1
+     * > bc_moneyfloor(1.002, 1) -> 1
+     * > bc_moneyfloor(-1.002, 1) -> -1.1
+     * > bc_moneyfloor(-1.02, 1) -> -1.1
+     * > bc_moneyfloor(-1.2, 1) -> -1.2
      */
     public function bc_moneyfloor($number, ?int $scale = null) : Bcnumber
     {

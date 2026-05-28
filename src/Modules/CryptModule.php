@@ -58,9 +58,11 @@ class CryptModule
 
     public function __initialize()
     {
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('mcrypt')->orThrow();
+        if ( ! extension_loaded('mcrypt') ) {
+            throw new RuntimeException(
+                [ 'The extension missing: mcrypt' ]
+            );
+        }
 
         return $this;
     }

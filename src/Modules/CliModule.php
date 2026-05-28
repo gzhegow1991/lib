@@ -17,6 +17,9 @@ class CliModule
     }
 
 
+    /**
+     * @return mixed
+     */
     public function pause($var = null, ...$vars)
     {
         $theDebug = Lib::debug();

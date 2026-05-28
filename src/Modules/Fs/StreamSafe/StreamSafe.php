@@ -14,14 +14,6 @@ class StreamSafe
     protected $context;
 
 
-    public function __construct()
-    {
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('fileinfo')->orThrow();
-    }
-
-
     public function setContext(?StreamSafeContext $context) : ?StreamSafeContext
     {
         $last = $this->context;

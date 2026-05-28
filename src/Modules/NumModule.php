@@ -173,7 +173,23 @@ class NumModule
 
 
     /**
-     * @return Ret<float>|float
+     * @return Ret<int|float>|int|float
+     */
+    public function type_php_num($fb, $value)
+    {
+        if ( is_int($value) || is_float($value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be php-num', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<int>|int
      */
     public function type_php_int($fb, $value)
     {
@@ -183,7 +199,7 @@ class NumModule
 
         return Ret::throw(
             $fb,
-            [ 'The `value` should be int', $value ],
+            [ 'The `value` should be php-int', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -199,7 +215,7 @@ class NumModule
 
         return Ret::throw(
             $fb,
-            [ 'The `value` should be float', $value ],
+            [ 'The `value` should be php-float', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -224,7 +240,7 @@ class NumModule
     /**
      * @return Ret<float>|float
      */
-    public function type_float_not_nan($fb, $value)
+    public function type_php_float_not_nan($fb, $value)
     {
         if ( is_float($value) && ! is_nan($value) ) {
             return Ret::ok($fb, $value);
@@ -240,15 +256,15 @@ class NumModule
     /**
      * @return Ret<float>|float
      */
-    public function type_float_maybe_nan($fb, $value)
+    public function type_float_not_nan($fb, $value)
     {
-        if ( is_float($value) ) {
+        if ( is_float($value) && ! is_nan($value) ) {
             return Ret::ok($fb, $value);
         }
 
         return Ret::throw(
             $fb,
-            [ 'The `value` should be float', $value ],
+            [ 'The `value` should be float not nan', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -264,56 +280,7 @@ class NumModule
 
         return Ret::throw(
             $fb,
-            [ 'The `value` should be not nan', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-
-    /**
-     * @return Ret<float>|float
-     */
-    public function type_finite($fb, $value)
-    {
-        if ( is_float($value) && is_finite($value) ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be finite', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<float>|float
-     */
-    public function type_float_not_finite($fb, $value)
-    {
-        if ( is_float($value) && ! is_finite($value) ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be float not finite', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<mixed>|mixed
-     */
-    public function type_any_not_finite($fb, $value)
-    {
-        if ( ! (is_float($value) && is_finite($value)) ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be not finite', $value ],
+            [ 'The `value` should be any, not nan', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -331,6 +298,22 @@ class NumModule
         return Ret::throw(
             $fb,
             [ 'The `value` should be infinite', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<float>|float
+     */
+    public function type_php_float_not_infinite($fb, $value)
+    {
+        if ( is_float($value) && ! is_infinite($value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be bool, null is not', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -362,7 +345,72 @@ class NumModule
 
         return Ret::throw(
             $fb,
-            [ 'The `value` should be not infinite', $value ],
+            [ 'The `value` should be any, not infinite', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * @return Ret<float>|float
+     */
+    public function type_finite($fb, $value)
+    {
+        if ( is_float($value) && is_finite($value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be finite', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<float>|float
+     */
+    public function type_php_float_not_finite($fb, $value)
+    {
+        if ( is_float($value) && ! is_finite($value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be float not finite', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<float>|float
+     */
+    public function type_float_not_finite($fb, $value)
+    {
+        if ( is_float($value) && ! is_finite($value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be float not finite', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_any_not_finite($fb, $value)
+    {
+        if ( ! (is_float($value) && is_finite($value)) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be any, not finite', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -441,7 +489,7 @@ class NumModule
 
         return Ret::throw(
             $fb,
-            [ 'The `value` should be not equal to `float_min`', $value ],
+            [ 'The `value` should be any, not equal to `float_min`', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -681,67 +729,6 @@ class NumModule
 
         if ( '0' === $valueNumeric ) {
             return Ret::ok($fb, '0.0');
-        }
-
-        return Ret::ok($fb, $valueNumeric);
-    }
-
-    /**
-     * 1.5 -> (2) -> '1.50'
-     * 1.500 -> (2) -> '1.50'
-     * 1.501 -> (2) -> [ERROR]
-     *
-     * @return Ret<string>|string
-     */
-    public function type_decimal($fb, $value, int $scale = 0, array $refs = [])
-    {
-        if ( $scale < 0 ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `scale` should be positive', $scale ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        $withSplit = array_key_exists(0, $refs);
-        $refSplit =& $refs[0];
-
-        $ret = $this->type_numeric(null, $value, false, $refs);
-
-        if ( ! $ret->isOk([ &$valueNumeric ]) ) {
-            return Ret::throw(
-                $fb,
-                $ret,
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        [ $sign, $int, $frac ] = $refSplit;
-
-        $valueScale = ('' === $frac)
-            ? 0
-            : (strlen($frac) - 1);
-
-        if ( $valueScale > $scale ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` scale should be less than limited scale', $scale ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        if ( $valueScale < $scale ) {
-            if ( '' === $frac ) {
-                $frac = '.';
-            }
-
-            $frac = str_pad($frac, $scale + 1, '0', STR_PAD_RIGHT);
-
-            $valueNumeric = "{$sign}{$int}{$frac}";
-
-            if ( $withSplit ) {
-                $refSplit[3] = $frac;
-            }
         }
 
         return Ret::ok($fb, $valueNumeric);
@@ -2573,6 +2560,68 @@ class NumModule
 
 
     /**
+     * > проверка на decimal, строгая. Если число представлено вида 1.12317239871927391273 и стоит ограничение 2 знака - не преобразует, а бросит ошибку
+     *
+     * 1.5 -> (2) -> '1.50'
+     * 1.500 -> (2) -> '1.50'
+     * 1.501 -> (2) -> [ERROR]
+     *
+     * @return Ret<string>|string
+     */
+    public function type_decimal($fb, $value, ?int $scale, array $refs = [])
+    {
+        $scale = $scale ?? 0;
+
+        $withSplit = array_key_exists(0, $refs);
+        $refSplit =& $refs[0];
+
+        $scaleValid = $this->type_scale([], $scale);
+
+        $ret = $this->type_numeric(null, $value, false, $refs);
+
+        if ( ! $ret->isOk([ &$valueNumeric ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        [ 2 => $frac ] = $refSplit;
+
+        $valueScale = ('' === $frac)
+            ? 0
+            : (strlen($frac) - 1);
+
+        if ( $valueScale > $scaleValid ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` scale should be less than limited scale', $scaleValid ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        if ( $valueScale < $scaleValid ) {
+            if ( '' === $frac ) {
+                $frac = '.';
+            }
+
+            $frac = str_pad($frac, $scaleValid + 1, '0', STR_PAD_RIGHT);
+
+            [ $sign, $int ] = $refSplit;
+
+            $valueNumeric = "{$sign}{$int}{$frac}";
+
+            if ( $withSplit ) {
+                $refSplit[3] = $frac;
+            }
+        }
+
+        return Ret::ok($fb, $valueNumeric);
+    }
+
+
+    /**
      * @return Ret<Number>|Number
      */
     public function type_number($fb, $value, ?bool $isAllowExp = null)
@@ -3056,12 +3105,12 @@ class NumModule
      * > Участвует всё число
      * > Режим округления применяется к числу, у которого "есть дробная часть, даже минимальная"
      *
-     * > moneyround(1.5, 1) -> 1.5
-     * > moneyround(1.05, 1) -> 1.1
-     * > moneyround(1.005, 1) -> 1.1
-     * > moneyround(-1.005, 1) -> -1.1
-     * > moneyround(-1.05, 1) -> -1.1
-     * > moneyround(-1.5, 1) -> -1.5
+     * > moneyround(1.2, 1) -> 1.2
+     * > moneyround(1.02, 1) -> 1.1
+     * > moneyround(1.002, 1) -> 1.1
+     * > moneyround(-1.002, 1) -> -1.1
+     * > moneyround(-1.02, 1) -> -1.1
+     * > moneyround(-1.2, 1) -> -1.2
      */
     public function moneyround(
         $number, ?int $scale = null,
@@ -3078,12 +3127,12 @@ class NumModule
     }
 
     /**
-     * > moneytrunc(1.5, 1) -> 1.5
-     * > moneytrunc(1.05, 1) -> 1
-     * > moneytrunc(1.005, 1) -> 1
-     * > moneytrunc(-1.005, 1) -> -1
-     * > moneytrunc(-1.05, 1) -> -1
-     * > moneytrunc(-1.5, 1) -> -1.5
+     * > moneytrunc(1.2, 1) -> 1.2
+     * > moneytrunc(1.02, 1) -> 1
+     * > moneytrunc(1.002, 1) -> 1
+     * > moneytrunc(-1.002, 1) -> -1
+     * > moneytrunc(-1.02, 1) -> -1
+     * > moneytrunc(-1.2, 1) -> -1.2
      */
     public function moneytrunc($number, ?int $scale = null) : float
     {
@@ -3094,12 +3143,30 @@ class NumModule
     }
 
     /**
-     * > moneyceil(1.5, 1) -> 1.5
-     * > moneyceil(1.05, 1) -> 1.1
-     * > moneyceil(1.005, 1) -> 1.1
-     * > moneyceil(-1.005, 1) -> -1
-     * > moneyceil(-1.05, 1) -> -1
-     * > moneyceil(-1.5, 1) -> -1.5
+     * > alias for moneyround() (opposite of moneytrunc())
+     *
+     * > moneygrow(1.2, 1) -> 1.2
+     * > moneygrow(1.02, 1) -> 1.1
+     * > moneygrow(1.002, 1) -> 1.1
+     * > moneygrow(-1.002, 1) -> -1.1
+     * > moneygrow(-1.02, 1) -> -1.1
+     * > moneygrow(-1.2, 1) -> -1.2
+     */
+    public function moneygrow($number, ?int $scale = null) : float
+    {
+        return $this->_moneyround(
+            $number, $scale,
+            _NUM_ROUND_AWAY_FROM_ZERO, _NUM_ROUND_AWAY_FROM_ZERO
+        );
+    }
+
+    /**
+     * > moneyceil(1.2, 1) -> 1.2
+     * > moneyceil(1.02, 1) -> 1.1
+     * > moneyceil(1.002, 1) -> 1.1
+     * > moneyceil(-1.002, 1) -> -1
+     * > moneyceil(-1.02, 1) -> -1
+     * > moneyceil(-1.2, 1) -> -1.2
      */
     public function moneyceil($number, ?int $scale = null) : float
     {
@@ -3110,12 +3177,12 @@ class NumModule
     }
 
     /**
-     * > moneyfloor(1.5, 1) -> 1.5
-     * > moneyfloor(1.05, 1) -> 1
-     * > moneyfloor(1.005, 1) -> 1
-     * > moneyfloor(-1.005, 1) -> -1.1
-     * > moneyfloor(-1.05, 1) -> -1.1
-     * > moneyfloor(-1.5, 1) -> -1.5
+     * > moneyfloor(1.2, 1) -> 1.2
+     * > moneyfloor(1.02, 1) -> 1
+     * > moneyfloor(1.002, 1) -> 1
+     * > moneyfloor(-1.002, 1) -> -1.1
+     * > moneyfloor(-1.02, 1) -> -1.1
+     * > moneyfloor(-1.2, 1) -> -1.2
      */
     public function moneyfloor($number, ?int $scale = null) : float
     {
@@ -3465,6 +3532,7 @@ class NumModule
 
         return $valueFloat;
     }
+
 
     // /**
     //  * > практическая польза почти нулевая, но для проверки дополнительный вызов и куча работы со строками

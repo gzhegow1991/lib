@@ -208,6 +208,112 @@ class PhpModule
 
 
     /**
+     * > Специальный тип-синоним NULL, переданный пользователем через API, например '{N}'
+     * > в случаях, когда NULL интерпретируется как "не трогать", а NIL как "очистить"
+     *
+     * > NAN не равен ничему даже самому себе
+     * > NIL равен только самому себе
+     * > NULL означает пустоту и им можно заменить значения '', [], `resource (closed)`, NIL, но нельзя заменить NAN
+     *
+     * @return Ret<string|Nil>|string|Nil
+     */
+    public function type_nil($fb, $value)
+    {
+        if ( Nil::is($value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be nil', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_not_nil($fb, $value)
+    {
+        if ( ! Nil::is($value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be not nil', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * @return Ret<null>|null
+     */
+    public function type_null($fb, $value)
+    {
+        if ( null === $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be null', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_not_null($fb, $value)
+    {
+        if ( null !== $value ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be not null', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
+     * @return Ret<null>|null
+     */
+    public function type_empty($fb, $value)
+    {
+        if ( empty($value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be empty', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_not_empty($fb, $value)
+    {
+        if ( ! empty($value) ) {
+            return Ret::ok($fb, $value);
+        }
+
+        return Ret::throw(
+            $fb,
+            [ 'The `value` should be not empty', $value ],
+            [ __FILE__, __LINE__ ]
+        );
+    }
+
+
+    /**
      * > Специальный тип, который значит, что значение можно отбросить или не учитывать, т.к. оно не несёт информации
      *
      * @return Ret<string|array|\Countable|null>|string|array|\Countable|null
@@ -255,7 +361,7 @@ class PhpModule
     /**
      * @return Ret<mixed>|mixed
      */
-    public function type_any_not_blank($fb, $value)
+    public function type_not_blank($fb, $value)
     {
         $ret = $this->type_blank(null, $value);
 
@@ -308,7 +414,7 @@ class PhpModule
     /**
      * @return Ret<mixed>|mixed
      */
-    public function type_any_not_nullable($fb, $value)
+    public function type_not_nullable($fb, $value)
     {
         $ret = $this->type_nullable(null, $value);
 
@@ -369,7 +475,7 @@ class PhpModule
     /**
      * @return Ret<mixed>|mixed
      */
-    public function type_any_not_passed($fb, $value)
+    public function type_not_passed($fb, $value)
     {
         $ret = $this->type_passed(null, $value);
 
@@ -380,79 +486,6 @@ class PhpModule
         return Ret::throw(
             $fb,
             [ 'The `value` should be not passed by user', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-
-    /**
-     * > Специальный тип-синоним NULL, переданный пользователем через API, например '{N}'
-     * > в случаях, когда NULL интерпретируется как "не трогать", а NIL как "очистить"
-     *
-     * > NAN не равен ничему даже самому себе
-     * > NIL равен только самому себе
-     * > NULL означает пустоту и им можно заменить значения '', [], `resource (closed)`, NIL, но нельзя заменить NAN
-     *
-     * @return Ret<string|Nil>|string|Nil
-     */
-    public function type_nil($fb, $value)
-    {
-        if ( Nil::is($value) ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be nil', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<mixed>|mixed
-     */
-    public function type_any_not_nil($fb, $value)
-    {
-        if ( ! Nil::is($value) ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be not nil', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-
-    /**
-     * @return Ret<null>|null
-     */
-    public function type_null($fb, $value)
-    {
-        if ( null === $value ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be null', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<mixed>|mixed
-     */
-    public function type_any_not_null($fb, $value)
-    {
-        if ( null !== $value ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be not null', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -471,29 +504,10 @@ class PhpModule
 
         return Ret::throw(
             $fb,
-            [ 'The `value` should be bool', $value ],
+            [ 'The `value` should be php-bool', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
-
-    /**
-     * @return Ret<mixed>|mixed
-     *
-     * @noinspection PhpConditionAlreadyCheckedInspection
-     */
-    public function type_any_not_php_bool($fb, $value)
-    {
-        if ( ! is_bool($value) ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be not bool', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
 
     /**
      * @return Ret<false>|false
@@ -510,25 +524,6 @@ class PhpModule
             [ __FILE__, __LINE__ ]
         );
     }
-
-    /**
-     * @return Ret<mixed>|mixed
-     *
-     * @noinspection PhpConditionAlreadyCheckedInspection
-     */
-    public function type_any_not_php_bool_false($fb, $value)
-    {
-        if ( false !== $value ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be not false', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
 
     /**
      * @return Ret<true>|true
@@ -553,15 +548,15 @@ class PhpModule
      *
      * @noinspection PhpConditionAlreadyCheckedInspection
      */
-    public function type_any_not_php_bool_true($fb, $value)
+    public function type_not_php_bool($fb, $value)
     {
-        if ( true !== $value ) {
+        if ( ! is_bool($value) ) {
             return Ret::ok($fb, $value);
         }
 
         return Ret::throw(
             $fb,
-            [ 'The `value` should be not true', $value ],
+            [ 'The `value` should be not php-bool', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -707,6 +702,24 @@ class PhpModule
         );
     }
 
+    /**
+     * @return Ret<bool>|bool
+     */
+    public function type_not_bool($fb, $value)
+    {
+        $ret = $this->type_bool(null, $value);
+
+        if ( $ret->isOk([ &$valueBool ]) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be not bool', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueBool);
+    }
+
 
     /**
      * @return Ret<bool>|bool
@@ -823,6 +836,24 @@ class PhpModule
         );
     }
 
+    /**
+     * @return Ret<bool>|bool
+     */
+    public function type_not_userbool($fb, $value)
+    {
+        $ret = $this->type_userbool(null, $value);
+
+        if ( $ret->isOk([ &$valueUserbool ]) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be not userbool', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueUserbool);
+    }
+
 
     /**
      * @return Ret<object>|object
@@ -843,7 +874,7 @@ class PhpModule
     /**
      * @return Ret<mixed>|mixed
      */
-    public function type_any_not_object($fb, $value)
+    public function type_not_object($fb, $value)
     {
         if ( ! is_object($value) ) {
             return Ret::ok($fb, $value);
@@ -876,7 +907,7 @@ class PhpModule
     /**
      * @return Ret<mixed>|mixed
      */
-    public function type_any_not_stdclass($fb, $value)
+    public function type_not_stdclass($fb, $value)
     {
         if ( ! ($value instanceof \stdClass) ) {
             return Ret::ok($fb, $value);
@@ -1499,7 +1530,7 @@ class PhpModule
     /**
      * @return Ret<resource>|resource
      */
-    public function type_any_not_resource($fb, $value)
+    public function type_not_resource($fb, $value)
     {
         if ( ! (false
             || is_resource($value)
@@ -1913,25 +1944,39 @@ class PhpModule
     }
 
 
-    public function type_is_extension_loaded($fb, $extension)
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_locale($fb, $value)
     {
-        if ( ! is_string($extension) ) {
+        $theType = Lib::type();
+
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
             return Ret::throw(
                 $fb,
-                [ 'Missing PHP extension', $extension ],
+                $ret,
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        if ( ! extension_loaded($extension) ) {
+        $localeParsed = null;
+        try {
+            $localeParsed = \Locale::parseLocale($valueString);
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ( empty($localeParsed) ) {
             return Ret::throw(
                 $fb,
-                [ 'Missing PHP extension: ' . $extension, $extension ],
+                [ 'The `value` should be valid intl locale', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fb, $extension);
+        return Ret::ok($fb, $valueString);
     }
 
 

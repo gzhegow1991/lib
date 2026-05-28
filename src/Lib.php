@@ -6,7 +6,6 @@
 
 namespace Gzhegow\Lib;
 
-use Gzhegow\Lib\Modules\TModule;
 use Gzhegow\Lib\Modules\FsModule;
 use Gzhegow\Lib\Modules\MbModule;
 use Gzhegow\Lib\Modules\Type\Ret;
@@ -18,12 +17,14 @@ use Gzhegow\Lib\Modules\NumModule;
 use Gzhegow\Lib\Modules\PhpModule;
 use Gzhegow\Lib\Modules\StrModule;
 use Gzhegow\Lib\Modules\UrlModule;
+use Gzhegow\Lib\Modules\RetModule;
 use Gzhegow\Lib\Modules\DateModule;
 use Gzhegow\Lib\Modules\FuncModule;
 use Gzhegow\Lib\Modules\HttpModule;
 use Gzhegow\Lib\Modules\PregModule;
 use Gzhegow\Lib\Modules\TestModule;
 use Gzhegow\Lib\Modules\TypeModule;
+use Gzhegow\Lib\Modules\BoolModule;
 use Gzhegow\Lib\Modules\AsyncModule;
 use Gzhegow\Lib\Modules\CryptModule;
 use Gzhegow\Lib\Modules\DebugModule;
@@ -45,6 +46,7 @@ use Gzhegow\Lib\Modules\Format\FormatBaseN;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
 use Gzhegow\Lib\Modules\Format\FormatSerialize;
 use Gzhegow\Lib\Modules\Fs\FileSafe\FileSafeProxy;
+use Gzhegow\Lib\Modules\Php\Microtimer\Microtimer;
 use Gzhegow\Lib\Modules\Debug\Dumper\DumperInterface;
 use Gzhegow\Lib\Modules\Str\Slugger\SluggerInterface;
 use Gzhegow\Lib\Modules\Fs\SocketSafe\SocketSafeProxy;
@@ -503,6 +505,26 @@ class Lib
 
 
     /**
+     * @var RetModule
+     */
+    public static $bool;
+
+    public static function bool()
+    {
+        return static::$bool = static::$bool ?? (new BoolModule())->__initialize();
+    }
+
+    /**
+     * @var RetModule
+     */
+    public static $ret;
+
+    public static function ret()
+    {
+        return static::$ret = static::$ret ?? (new RetModule())->__initialize();
+    }
+
+    /**
      * @var TypeModule
      */
     public static $type;
@@ -510,16 +532,6 @@ class Lib
     public static function type()
     {
         return static::$type = static::$type ?? (new TypeModule())->__initialize();
-    }
-
-    /**
-     * @var TModule
-     */
-    public static $t;
-
-    public static function t()
-    {
-        return static::$t = static::$t ?? (new TModule())->__initialize();
     }
 
 
@@ -530,9 +542,21 @@ class Lib
      *
      * @return ErrorBag
      */
-    public static function errorBag(&$ref = null)
+    public static function newErrorBag(&$ref = null)
     {
         return $ref = Lib::php()->newErrorBag();
+    }
+
+    /**
+     * > фабрика для Microtimer - замерять время выполнения кода
+     *
+     * @param Microtimer $ref
+     *
+     * @return Microtimer
+     */
+    public static function newMicrotimer(&$ref = null)
+    {
+        return $ref = new Microtimer();
     }
 
     /**
@@ -542,7 +566,7 @@ class Lib
      *
      * @return Pipe
      */
-    public static function pipe(&$ref = null)
+    public static function newPipe(&$ref = null)
     {
         return $ref = Lib::func()->newPipe();
     }
@@ -554,7 +578,7 @@ class Lib
      *
      * @return Ret
      */
-    public static function ret(&$ref = null)
+    public static function newRet(&$ref = null)
     {
         return $ref = Ret::new();
     }
@@ -566,7 +590,7 @@ class Lib
      *
      * @return TestCase
      */
-    public static function testCase(&$ref = null)
+    public static function newTestCase(&$ref = null)
     {
         return $ref = Lib::test()->newTestCase();
     }
@@ -803,68 +827,28 @@ class Lib
     }
 
 
-    /**
-     * > простой замерщик времени между вызовами - сразу несколько таймеров для замера
-     *
-     * @return array|float
-     */
-    public static function mt($clear = null, ?string $tag = null)
-    {
-        /** @var float $microtime */
-
-        $microtime = microtime(true);
-
-        static $current;
-
-        $tag = $tag ?? '';
-
-        if ( null !== $clear ) {
-            $clear = (bool) $clear;
-
-        } else {
-            $last = $current;
-
-            $current = null;
-
-            // ! return
-            return $last->report ?? [];
-        }
-
-        if ( null === $current ) {
-            $current = new class {
-                /**
-                 * @var float[][]
-                 */
-                public $report = [];
-                /**
-                 * @var float[]
-                 */
-                public $microtimes = [];
-            };
-        }
-
-        if ( ! isset($current->report[$tag]) ) {
-            $current->report[$tag] = [];
-        }
-
-        if ( isset($current->microtimes[$tag]) ) {
-            $current->report[$tag][] = $microtime - $current->microtimes[$tag];
-        }
-
-        if ( $clear ) {
-            unset($current->microtimes[$tag]);
-
-        } else {
-            $current->microtimes[$tag] = $microtime;
-        }
-
-        return $microtime;
-    }
-
-
     public static function dumper($dumper = null, $printer = null) : DumperInterface
     {
-        $theDebugDumper = Lib::debugDumper();
+        $theDebugDumper = Lib::debugDumper(false);
+
+        if ( null !== $dumper ) {
+            $dumperArray = (array) $dumper;
+
+            $theDebugDumper->selectDumper(...$dumperArray);
+        }
+
+        if ( null !== $printer ) {
+            $printerArray = (array) $printer;
+
+            $theDebugDumper->selectPrinter(...$printerArray);
+        }
+
+        return $theDebugDumper;
+    }
+
+    public static function newDumper($dumper = null, $printer = null) : DumperInterface
+    {
+        $theDebugDumper = Lib::debugDumper(true);
 
         if ( null !== $dumper ) {
             $dumperArray = (array) $dumper;

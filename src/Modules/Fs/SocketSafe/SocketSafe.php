@@ -20,9 +20,11 @@ class SocketSafe
 
     public function __construct()
     {
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('sockets')->orThrow();
+        if ( ! extension_loaded('sockets') ) {
+            throw new RuntimeException(
+                [ 'The extension missing: sockets' ]
+            );
+        }
     }
 
 

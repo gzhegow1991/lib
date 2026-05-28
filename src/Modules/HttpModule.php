@@ -494,14 +494,14 @@ class HttpModule
 
     /**
      * @return string|false
-     *
-     * @noinspection PhpComposerExtensionStubsInspection
      */
     public function idn_to_ascii(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
     {
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('intl')->orThrow();
+        if ( ! extension_loaded('intl') ) {
+            throw new RuntimeException(
+                [ 'The extension missing: intl' ]
+            );
+        }
 
         $flags = $flags ?? IDNA_DEFAULT;
         $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
@@ -524,9 +524,11 @@ class HttpModule
      */
     public function idn_to_utf8(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
     {
-        $theType = Lib::type();
-
-        $theType->is_extension_loaded('intl')->orThrow();
+        if ( ! extension_loaded('intl') ) {
+            throw new RuntimeException(
+                [ 'The extension missing: intl' ]
+            );
+        }
 
         $flags = $flags ?? IDNA_DEFAULT;
         $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;

@@ -42,8 +42,11 @@
     "ext-date": "*",
     "ext-fileinfo": "*",
     "ext-filter": "*",
+    "ext-hash": "*",
     "ext-json": "*",
-    "ext-pcre": "*"
+    "ext-pcre": "*",
+    "ext-session": "*",
+    "ext-spl": "*"
   },
   "suggest": {
     "ext-bcmath": "*",
