@@ -111,6 +111,8 @@ class BcmathModule
 
         $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
 
+        $valueNumeric = number_format($valueNumeric, $scaleValid, '.', '');
+
         if ( $withSplit ) {
             $refSplit = [];
             $refSplit[0] = $sign;
@@ -190,6 +192,8 @@ class BcmathModule
 
         $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
 
+        $valueNumeric = number_format($valueNumeric, $scaleValid, '.', '');
+
         if ( $withSplit ) {
             $refSplit = [];
             $refSplit[0] = $sign;
@@ -265,6 +269,8 @@ class BcmathModule
 
         $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
 
+        $valueNumeric = number_format($valueNumeric, $scaleValid, '.', '');
+
         if ( $withSplit ) {
             $refSplit = [];
             $refSplit[0] = $sign;
@@ -339,6 +345,8 @@ class BcmathModule
         $exp = '';
 
         $valueNumeric = "{$sign}{$int}{$frac}{$exp}";
+
+        $valueNumeric = number_format($valueNumeric, $scaleValid, '.', '');
 
         if ( $withSplit ) {
             $refSplit = [];

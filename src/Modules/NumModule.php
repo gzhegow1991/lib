@@ -2608,14 +2608,16 @@ class NumModule
 
             $frac = str_pad($frac, $scaleValid + 1, '0', STR_PAD_RIGHT);
 
-            [ $sign, $int ] = $refSplit;
-
-            $valueNumeric = "{$sign}{$int}{$frac}";
-
             if ( $withSplit ) {
                 $refSplit[3] = $frac;
             }
         }
+
+        [ $sign, $int ] = $refSplit;
+
+        $valueNumeric = "{$sign}{$int}{$frac}";
+
+        $valueNumeric = number_format($valueNumeric, $scaleValid, '.', '');
 
         return Ret::ok($fb, $valueNumeric);
     }
