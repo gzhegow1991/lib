@@ -9,7 +9,6 @@ use Gzhegow\Lib\Modules\Net\SubnetV6;
 use Gzhegow\Lib\Modules\Net\AddressIpV4;
 use Gzhegow\Lib\Modules\Net\AddressIpV6;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\RuntimeException;
 
 
 class NetModule
@@ -166,7 +165,7 @@ class NetModule
      */
     public function type_subnet($fb, $value, ?string $ipFallback = null)
     {
-        $ret = Ret::new();
+        $ret = Lib::newRet();
 
         $devnull = false
             || $this->type_subnet_v4($ret, $value, $ipFallback)
@@ -220,7 +219,7 @@ class NetModule
                 );
             }
 
-            $ret = Ret::new();
+            $ret = Lib::newRet();
 
             $subnetInt = null
                 ?? $this->type_subnet_v4_iplike(null, $subnetPart)->orNull($ret)

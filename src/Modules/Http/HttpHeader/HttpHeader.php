@@ -24,7 +24,7 @@ class HttpHeader implements ToStringInterface
     /**
      * @var array<string, string>
      */
-    protected $headerParams = [];
+    protected $params = [];
 
 
     public function __toString()
@@ -44,7 +44,7 @@ class HttpHeader implements ToStringInterface
      */
     public static function from($from, $fb = null)
     {
-        $ret = Ret::new();
+        $ret = Lib::newRet();
 
         $instance = null
             ?? static::fromStatic($from)->orNull($ret)
@@ -130,17 +130,17 @@ class HttpHeader implements ToStringInterface
 
         $paramsLower = [];
         foreach ( $params as $param => $value ) {
-            $ret = $theType->trim($param);
+            $paramTrim = $theType->trim($param)->orThrow();
 
-            if ( ! $ret->isOk([ &$paramStringNotEmpty ]) ) {
+            if ( ! $ret->isOk([ &$paramTrim ]) ) {
                 return Ret::throw(
                     $fb,
-                    [ "Each of `params` keys should be a non-empty string", $params ],
+                    [ "Each of `params` keys should be trim", $params ],
                     [ __FILE__, __LINE__ ]
                 );
             }
 
-            $paramLower = $theStr->lower($paramStringNotEmpty);
+            $paramLower = $theStr->lower($paramTrim);
 
             $paramsLower[$paramLower] = $value;
         }
@@ -148,7 +148,7 @@ class HttpHeader implements ToStringInterface
         $instance = new static();
         $instance->name = $nameUpper;
         $instance->value = $valueStringNotEmpty;
-        $instance->headerParams = $paramsLower;
+        $instance->params = $paramsLower;
 
         $raw = "{$nameUpper}: {$value}";
 
@@ -225,12 +225,12 @@ class HttpHeader implements ToStringInterface
         foreach ( $parts as $i => $part ) {
             [ $param, $value ] = explode('=', $part) + [ '', true ];
 
-            $ret = $theType->trim($param);
+            $paramTrim = $theType->trim($param)->orThrow();
 
             if ( ! $ret->isOk([ &$paramTrim ]) ) {
                 return Ret::throw(
                     $fb,
-                    [ "The `parts[{$i}][0]` should be a non-empty string", $parts ],
+                    [ "The `parts[{$i}][0]` should be trim", $parts ],
                     [ __FILE__, __LINE__ ]
                 );
             }
@@ -246,7 +246,7 @@ class HttpHeader implements ToStringInterface
         $instance->raw = $raw;
         $instance->name = $nameUpper;
         $instance->value = $valueStringNotEmpty;
-        $instance->headerParams = $paramsLower;
+        $instance->params = $paramsLower;
 
         return Ret::ok($fb, $instance);
     }
@@ -270,6 +270,6 @@ class HttpHeader implements ToStringInterface
 
     public function getParams() : array
     {
-        return $this->headerParams;
+        return $this->params;
     }
 }

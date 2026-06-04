@@ -14,38 +14,37 @@ class ArrModule
     /**
      * @var int
      */
-    protected static $fnMode = _ARR_FN_USE_VALUE;
+    protected $stateFnMode;
 
     /**
-     * @param int|false|null $fnMode
+     * @param int|false $fnMode
      */
-    public static function staticFnMode($fnMode = null) : ?int
+    public function stateFnMode($fnMode = null) : ?int
     {
-        $last = static::$fnMode;
+        $last = null;
 
-        if ( null !== $fnMode ) {
+        if ( $isChange = (null !== $fnMode) ) {
+            $last = $this->stateFnMode;
+
             if ( false === $fnMode ) {
-                static::$fnMode = _ARR_FN_USE_VALUE;
+                $this->stateFnMode = null;
 
             } else {
                 if ( 0 === ($fnMode & ~_ARR_FN_USE_ALL) ) {
                     throw new LogicException(
-                        [
-                            'The `fn_mode` should be a valid sequence of flags',
-                            //
-                            $fnMode,
-                            _ARR_FN_USE_ALL,
-                        ]
+                        [ 'The `fn_mode` should be a valid sequence of flags', $fnMode, _ARR_FN_USE_ALL ]
                     );
                 }
 
-                static::$fnMode = $fnMode;
+                $this->stateFnMode = $fnMode;
             }
         }
 
-        static::$fnMode = static::$fnMode ?? _ARR_FN_USE_VALUE;
+        if ( null === $this->stateFnMode ) {
+            $this->stateFnMode = _ARR_FN_USE_VALUE;
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateFnMode;
     }
 
 
@@ -2757,8 +2756,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? static::staticFnMode()
-            ?? _ARR_FN_USE_VALUE;
+            ?? $this->stateFnMode();
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -2843,8 +2841,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? static::staticFnMode()
-            ?? _ARR_FN_USE_VALUE;
+            ?? $this->stateFnMode();
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -2893,8 +2890,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? static::staticFnMode()
-            ?? _ARR_FN_USE_VALUE;
+            ?? $this->stateFnMode();
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -2935,8 +2931,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? static::staticFnMode()
-            ?? _ARR_FN_USE_VALUE;
+            ?? $this->stateFnMode();
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -2973,8 +2968,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? static::staticFnMode()
-            ?? _ARR_FN_USE_VALUE;
+            ?? $this->stateFnMode();
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -3017,8 +3011,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? static::staticFnMode()
-            ?? _ARR_FN_USE_VALUE;
+            ?? $this->stateFnMode();
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -3089,8 +3082,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? static::staticFnMode()
-            ?? _ARR_FN_USE_VALUE;
+            ?? $this->stateFnMode();
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);
@@ -3129,8 +3121,7 @@ class ArrModule
 
         $mode = null
             ?? $flags
-            ?? static::staticFnMode()
-            ?? _ARR_FN_USE_VALUE;
+            ?? $this->stateFnMode();
 
         $isUseValue = ($mode & _ARR_FN_USE_VALUE);
         $isUseKey = ($mode & _ARR_FN_USE_KEY);

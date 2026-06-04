@@ -29,7 +29,7 @@ class EntrypointPhpIntlLocaleDriver extends AbstractEntrypointDriver
             $valueValid = null;
 
         } else {
-            $valueValid = $theType->locale($value)->orThrow();
+            $valueValid = $theType->locale_posix($value)->orThrow();
         }
 
         $configSet[EntrypointModule::OPT_PHP_INTL_LOCALE_DEFAULT] = $valueValid;

@@ -24,9 +24,8 @@ class CliModule
     {
         $theDebug = Lib::debug();
         $thePhp = Lib::php();
-        $theType = Lib::type();
 
-        $theType->is_sapi_terminal()->orThrow();
+        $thePhp->assert_sapi_terminal();
 
         if ( null !== $var ) {
             $theDebugDumper = $theDebug->dumper();
@@ -43,9 +42,9 @@ class CliModule
 
     public function stop(...$vars) : void
     {
-        $theType = Lib::type();
+        $thePhp = Lib::php();
 
-        $theType->is_sapi_terminal()->orThrow();
+        $thePhp->assert_sapi_terminal();
 
         $this->pause(...$vars);
 
@@ -56,9 +55,8 @@ class CliModule
     public function readln() : string
     {
         $thePhp = Lib::php();
-        $theType = Lib::type();
 
-        $theType->is_sapi_terminal()->orThrow();
+        $thePhp->assert_sapi_terminal();
 
         $h = $thePhp->stdin();
 
@@ -71,14 +69,13 @@ class CliModule
     {
         $thePhp = Lib::php();
         $theStr = Lib::str();
-        $theType = Lib::type();
 
-        $theType->is_sapi_terminal()->orThrow();
+        $thePhp->assert_sapi_terminal();
 
         $delimiter = $delimiter ?? '```';
 
         echo '> Enter text separating lines by pressing ENTER' . "\n";
-        echo '> Write when you\'re done: ' . $delimiter . "\n";
+        echo '> Write [ ' . $delimiter . ' ] when done.' . "\n";
 
         $fnStrlen = $theStr->mb_func('strlen');
         $fnStrrpos = $theStr->mb_func('strrpos');
@@ -90,7 +87,7 @@ class CliModule
             $line = trim($line);
 
             if ( '' === $line ) {
-                echo '> Write `' . $delimiter . '` when done...' . "\n";
+                echo '> Write [ ' . $delimiter . ' ] when done...' . "\n";
 
                 continue;
             }
@@ -121,9 +118,9 @@ class CliModule
 
     public function yes(string $message, ?string &$refAnswer = null) : bool
     {
-        $theType = Lib::type();
+        $thePhp = Lib::php();
 
-        $theType->is_sapi_terminal()->orThrow();
+        $thePhp->assert_sapi_terminal();
 
         $refAnswer = $refAnswer ?? 'n';
 

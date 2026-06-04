@@ -512,6 +512,24 @@ trait RetTrait
 
 
 	/**
+	 * @return Ret<resource|\CurlHandle>|resource|\CurlHandle
+	 */
+	public function curl($fb, $value)
+	{
+		return Lib::curl()->type_curl($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<resource|\CurlMultiHandle>|resource|\CurlMultiHandle
+	 */
+	public function curl_multi($fb, $value)
+	{
+		return Lib::curl()->type_curl_multi($fb, $value);
+	}
+
+
+	/**
 	 * @return Ret<\DateTimeZone>|\DateTimeZone
 	 */
 	public function timezone($fb, $timezone, array $allowedTimezoneTypes = null)
@@ -955,6 +973,15 @@ trait RetTrait
 	public function stream($fb, $value)
 	{
 		return Lib::fs()->type_stream($fb, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function http_method($fb, $value)
+	{
+		return Lib::http()->type_http_method($fb, $value);
 	}
 
 
@@ -2100,6 +2127,62 @@ trait RetTrait
 
 
 	/**
+	 * @template-covariant T
+	 *
+	 * @param object          $value
+	 * @param class-string<T> $className
+	 *
+	 * @return Ret<T>|T
+	 */
+	public function instance_of($fb, $value, string $className, array $refs = [])
+	{
+		return Lib::php()->type_instance_of($fb, $value, $className, $refs);
+	}
+
+
+	/**
+	 * @template-covariant T
+	 *
+	 * @param object|class-string $value
+	 * @param class-string<T>     $className
+	 *
+	 * @return Ret<T>|T
+	 */
+	public function is_a($fb, $value, string $className, bool $allowString = null, $refs = [])
+	{
+		return Lib::php()->type_is_a($fb, $value, $className, $allowString, $refs);
+	}
+
+
+	/**
+	 * @template-covariant T
+	 *
+	 * @param object|class-string $value
+	 * @param class-string<T>     $className
+	 *
+	 * @return Ret<T>|T
+	 */
+	public function is_subclass_of($fb, $value, string $className, bool $allowString = null, array $refs = [])
+	{
+		return Lib::php()->type_is_subclass_of($fb, $value, $className, $allowString, $refs);
+	}
+
+
+	/**
+	 * @template-covariant T
+	 *
+	 * @param object|class-string $value
+	 * @param class-string<T>     $className
+	 *
+	 * @return Ret<T>|T
+	 */
+	public function is_class_of($fb, $value, string $className, bool $allowString = null, array $refs = [])
+	{
+		return Lib::php()->type_is_class_of($fb, $value, $className, $allowString, $refs);
+	}
+
+
+	/**
 	 * @return Ret<array|\Countable>|array|\Countable
 	 */
 	public function countable($fb, $value)
@@ -2118,7 +2201,7 @@ trait RetTrait
 
 
 	/**
-	 * @return Ret<array|\Countable>|array|\Countable
+	 * @return Ret<array|\Countable|string>|array|\Countable|string
 	 */
 	public function sizeable($fb, $value)
 	{
@@ -2260,15 +2343,6 @@ trait RetTrait
 	public function not_resource($fb, $value)
 	{
 		return Lib::php()->type_not_resource($fb, $value);
-	}
-
-
-	/**
-	 * @return Ret<resource|\CurlHandle>|resource|\CurlHandle
-	 */
-	public function curl($fb, $value)
-	{
-		return Lib::php()->type_curl($fb, $value);
 	}
 
 
@@ -2482,24 +2556,84 @@ trait RetTrait
 	}
 
 
-	public function is_os_windows($fb)
+	/**
+	 * @return Ret<array>|array
+	 */
+	public function locale($fb, $value, array $refs = [])
 	{
-		return Lib::php()->type_is_os_windows($fb);
-	}
-
-
-	public function is_sapi_terminal($fb)
-	{
-		return Lib::php()->type_is_sapi_terminal($fb);
+		return Lib::php()->type_locale($fb, $value, $refs);
 	}
 
 
 	/**
 	 * @return Ret<string>|string
 	 */
-	public function locale($fb, $value)
+	public function locale_ietf($fb, $value, array $refs = [])
 	{
-		return Lib::php()->type_locale($fb, $value);
+		return Lib::php()->type_locale_ietf($fb, $value, $refs);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function locale_posix($fb, $value, array $refs = [])
+	{
+		return Lib::php()->type_locale_posix($fb, $value, $refs);
+	}
+
+
+	/**
+	 * @return Ret<mixed>|mixed
+	 */
+	public function count_gt($fb, $value, $gt)
+	{
+		return Lib::php()->type_count_gt($fb, $value, $gt);
+	}
+
+
+	/**
+	 * @return Ret<mixed>|mixed
+	 */
+	public function count_gte($fb, $value, $gte)
+	{
+		return Lib::php()->type_count_gte($fb, $value, $gte);
+	}
+
+
+	/**
+	 * @return Ret<mixed>|mixed
+	 */
+	public function count_lt($fb, $value, $lt)
+	{
+		return Lib::php()->type_count_lt($fb, $value, $lt);
+	}
+
+
+	/**
+	 * @return Ret<mixed>|mixed
+	 */
+	public function count_lte($fb, $value, $lte)
+	{
+		return Lib::php()->type_count_lte($fb, $value, $lte);
+	}
+
+
+	/**
+	 * @return Ret<mixed>|mixed
+	 */
+	public function count_between($fb, $value, $from, $to)
+	{
+		return Lib::php()->type_count_between($fb, $value, $from, $to);
+	}
+
+
+	/**
+	 * @return Ret<mixed>|mixed
+	 */
+	public function count_inside($fb, $value, $from, $to)
+	{
+		return Lib::php()->type_count_inside($fb, $value, $from, $to);
 	}
 
 
@@ -2745,15 +2879,6 @@ trait RetTrait
 	/**
 	 * @return Ret<string>|string
 	 */
-	public function php_trim($fb, $value, string $characters = null)
-	{
-		return Lib::str()->type_php_trim($fb, $value, $characters);
-	}
-
-
-	/**
-	 * @return Ret<string>|string
-	 */
 	public function string($fb, $value)
 	{
 		return Lib::str()->type_string($fb, $value);
@@ -2781,9 +2906,174 @@ trait RetTrait
 	/**
 	 * @return Ret<string>|string
 	 */
+	public function strlen_gt($fb, $value, $gt)
+	{
+		return Lib::str()->type_strlen_gt($fb, $value, $gt);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function strlen_gte($fb, $value, $gte)
+	{
+		return Lib::str()->type_strlen_gte($fb, $value, $gte);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function strlen_lt($fb, $value, $lt)
+	{
+		return Lib::str()->type_strlen_lt($fb, $value, $lt);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function strlen_lte($fb, $value, $lte)
+	{
+		return Lib::str()->type_strlen_lte($fb, $value, $lte);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function strlen_between($fb, $value, $from, $to)
+	{
+		return Lib::str()->type_strlen_between($fb, $value, $from, $to);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function strlen_inside($fb, $value, $from, $to)
+	{
+		return Lib::str()->type_strlen_inside($fb, $value, $from, $to);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function strsize_gt($fb, $value, $gt)
+	{
+		return Lib::str()->type_strsize_gt($fb, $value, $gt);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function strsize_gte($fb, $value, $gte)
+	{
+		return Lib::str()->type_strsize_gte($fb, $value, $gte);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function strsize_lt($fb, $value, $lt)
+	{
+		return Lib::str()->type_strsize_lt($fb, $value, $lt);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function strsize_lte($fb, $value, $lte)
+	{
+		return Lib::str()->type_strsize_lte($fb, $value, $lte);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function strsize_between($fb, $value, $from, $to)
+	{
+		return Lib::str()->type_strsize_between($fb, $value, $from, $to);
+	}
+
+
+	/**
+	 * @return Ret<string>|string
+	 */
+	public function strsize_inside($fb, $value, $from, $to)
+	{
+		return Lib::str()->type_strsize_inside($fb, $value, $from, $to);
+	}
+
+
+	/**
+	 * > применяет ltrim к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 *
+	 * @return Ret<string>|string
+	 */
+	public function ltrim($fb, $value, string $characters = null)
+	{
+		return Lib::str()->type_ltrim($fb, $value, $characters);
+	}
+
+
+	/**
+	 * > применяет rtrim к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 *
+	 * @return Ret<string>|string
+	 */
+	public function rtrim($fb, $value, string $characters = null)
+	{
+		return Lib::str()->type_rtrim($fb, $value, $characters);
+	}
+
+
+	/**
+	 * > применяет trim к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 *
+	 * @return Ret<string>|string
+	 */
 	public function trim($fb, $value, string $characters = null)
 	{
 		return Lib::str()->type_trim($fb, $value, $characters);
+	}
+
+
+	/**
+	 * > применяет lcrop к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 *
+	 * @return Ret<string>|string
+	 */
+	public function lcrop($fb, $value, $needleList = null)
+	{
+		return Lib::str()->type_lcrop($fb, $value, $needleList);
+	}
+
+
+	/**
+	 * > применяет rcrop к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 *
+	 * @return Ret<string>|string
+	 */
+	public function rcrop($fb, $value, $needleList = null)
+	{
+		return Lib::str()->type_rcrop($fb, $value, $needleList);
+	}
+
+
+	/**
+	 * > применяет crop к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 *
+	 * @return Ret<string>|string
+	 */
+	public function crop($fb, $value, $needleList = null)
+	{
+		return Lib::str()->type_crop($fb, $value, $needleList);
 	}
 
 

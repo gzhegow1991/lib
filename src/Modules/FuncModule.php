@@ -27,6 +27,12 @@ class FuncModule
     }
 
 
+    public function newPipe() : Pipe
+    {
+        return Pipe::new();
+    }
+
+
     public function newInvoker() : InvokerInterface
     {
         $instance = new DefaultInvoker();
@@ -45,17 +51,6 @@ class FuncModule
             ?? $invoker
             ?? $this->invoker
             ?? $this->newInvoker();
-    }
-
-
-    /**
-     * @return Pipe
-     */
-    public function newPipe()
-    {
-        $instance = new Pipe();
-
-        return $instance;
     }
 
 

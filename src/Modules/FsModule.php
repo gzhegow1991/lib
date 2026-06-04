@@ -24,85 +24,101 @@ class FsModule
     /**
      * @var bool
      */
-    protected static $realpathReturnTargetPath = true;
+    protected $stateRealpathReturnTargetPath;
     /**
      * @var int
      */
-    protected static $dirChmod = 0775;
+    protected $stateDirChmod;
     /**
      * @var int
      */
-    protected static $fileChmod = 0664;
+    protected $stateFileChmod;
 
     /**
-     * @param int|false|null $realpath_return_target_path
+     * @param bool|false|null $realpathReturnTargetPath
      */
-    public static function staticRealpathReturnTargetPath($realpath_return_target_path = null) : bool
+    public function stateRealpathReturnTargetPath($realpathReturnTargetPath = null) : ?bool
     {
-        $last = static::$realpathReturnTargetPath;
+        $last = null;
 
-        if ( null !== $realpath_return_target_path ) {
-            if ( false === $realpath_return_target_path ) {
-                static::$realpathReturnTargetPath = true;
+        if ( $isChange = (null !== $realpathReturnTargetPath) ) {
+            $last = $this->stateRealpathReturnTargetPath;
+
+            if ( false === $realpathReturnTargetPath ) {
+                $this->stateRealpathReturnTargetPath = null;
 
             } else {
-                static::$realpathReturnTargetPath = (bool) $realpath_return_target_path;
+                $theType = Lib::type();
+
+                $realpathReturnTargetPathValid = $theType->bool($realpathReturnTargetPath)->orThrow();
+
+                $this->stateRealpathReturnTargetPath = $realpathReturnTargetPathValid;
             }
         }
 
-        static::$realpathReturnTargetPath = static::$realpathReturnTargetPath ?? true;
+        if ( null === $this->stateRealpathReturnTargetPath ) {
+            $this->stateRealpathReturnTargetPath = true;
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateRealpathReturnTargetPath;
     }
 
     /**
      * @param int|string|false|null $dirChmod
      */
-    public static function staticDirChmod($dirChmod = null) : int
+    public function stateDirChmod($dirChmod = null) : ?int
     {
-        $last = static::$dirChmod;
+        $last = null;
 
-        if ( null !== $dirChmod ) {
+        if ( $isChange = (null !== $dirChmod) ) {
+            $last = $this->stateDirChmod;
+
             if ( false === $dirChmod ) {
-                static::$dirChmod = 0775;
+                $this->stateDirChmod = null;
 
             } else {
                 $theType = Lib::type();
 
                 $dirChmodValid = $theType->chmod($dirChmod)->orThrow();
 
-                static::$dirChmod = $dirChmodValid;
+                $this->stateDirChmod = $dirChmodValid;
             }
         }
 
-        static::$dirChmod = static::$dirChmod ?? 0775;
+        if ( null === $this->stateDirChmod ) {
+            $this->stateDirChmod = 0775;
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateDirChmod;
     }
 
     /**
      * @param int|string|false|null $fileChmod
      */
-    public static function staticFileChmod($fileChmod = null) : int
+    public function stateFileChmod($fileChmod = null) : ?int
     {
-        $last = static::$fileChmod;
+        $last = null;
 
-        if ( null !== $fileChmod ) {
+        if ( $isChange = (null !== $fileChmod) ) {
+            $last = $this->stateFileChmod;
+
             if ( false === $fileChmod ) {
-                static::$fileChmod = 0664;
+                $this->stateFileChmod = null;
 
             } else {
                 $theType = Lib::type();
 
                 $fileChmodValid = $theType->chmod($fileChmod)->orThrow();
 
-                static::$fileChmod = $fileChmodValid;
+                $this->stateFileChmod = $fileChmodValid;
             }
         }
 
-        static::$fileChmod = static::$fileChmod ?? 0664;
+        if ( null === $this->stateFileChmod ) {
+            $this->stateFileChmod = 0664;
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateFileChmod;
     }
 
 

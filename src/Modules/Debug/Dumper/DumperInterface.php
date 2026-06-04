@@ -38,17 +38,9 @@ interface DumperInterface
      */
     public function dd(?array $fileLine, ...$vars);
 
-    /**
-     * @return mixed|void
-     */
-    public function ddd(?array $fileLine, int $times, $var, ...$vars);
-
-
     public function fnD(?int $traceShift = null, ?array $trace = null) : \Closure;
 
     public function fnDD(?int $traceShift = null, ?array $trace = null) : \Closure;
-
-    public function fnDDD(?int $traceShift = null, ?array $trace = null) : \Closure;
 
 
     /**
@@ -57,4 +49,12 @@ interface DumperInterface
     public function td(?array $fileLine, int $throttleMs, $var, ...$vars);
 
     public function fnTD(?int $traceShift = null, ?array $trace = null) : \Closure;
+
+
+    /**
+     * @return mixed|void
+     */
+    public function zd(?array $fileLine, int $zTimes, $var, ...$vars);
+
+    public function fnZD(?int $traceShift = null, ?array $trace = null) : \Closure;
 }

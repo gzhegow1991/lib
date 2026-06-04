@@ -45,6 +45,7 @@ class DefaultCookies implements CookiesInterface
         $this->registerShutdownFunction();
     }
 
+
     protected function loadCookiesList() : void
     {
         $theHttp = Lib::http();

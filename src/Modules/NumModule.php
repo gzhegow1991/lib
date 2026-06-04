@@ -15,150 +15,148 @@ class NumModule
     /**
      * @var int
      */
-    protected static $scaleDefault = 0;
+    protected $stateScaleDefault;
 
     /**
      * @var int
      */
-    protected static $scaleFrac = 4;
+    protected $stateScaleFrac;
 
     /**
      * @var int
      */
-    protected static $scaleLimit = 16;
+    protected $stateScaleLimit;
 
     /**
      * @param int|false|null $scaleDefault
      *
      * @noinspection PhpComposerExtensionStubsInspection
      */
-    public static function staticScaleDefault($scaleDefault = null) : int
+    public function stateScaleDefault($scaleDefault = null) : ?int
     {
         $hasBcmath = extension_loaded('bcmath');
 
-        $last = static::$scaleLimit;
+        $last = null;
 
-        if ( null !== $scaleDefault ) {
+        if ( $isChange = (null !== $scaleDefault) ) {
+            $last = $this->stateScaleDefault;
+
             if ( false === $scaleDefault ) {
-                static::$scaleDefault = $hasBcmath ? bcscale() : 0;
+                $this->stateScaleDefault = null;
 
             } else {
-                if ( $scaleDefault < 0 ) {
-                    throw new LogicException(
-                        [ 'The `scaleDefault` should be a non-negative integer', $scaleDefault ]
-                    );
-                }
+                $theType = Lib::type();
 
-                static::$scaleDefault = $scaleDefault;
+                $scaleDefaultValid = $theType->int_non_negative($scaleDefault)->orThrow();
+
+                $this->stateScaleDefault = $scaleDefaultValid;
             }
         }
 
-        $scaleDefaultNew = null
-            ?? static::$scaleDefault
-            ?? ($hasBcmath ? bcscale() : 0);
+        if ( null === $this->stateScaleDefault ) {
+            $this->stateScaleDefault = 0;
+        }
 
-        if ( $last !== $scaleDefaultNew ) {
-            $scaleLimit = static::$scaleLimit;
+        if ( $last !== $this->stateScaleDefault ) {
+            $scaleLimit = $this->stateScaleLimit();
 
-            if ( $scaleDefaultNew > $scaleLimit ) {
+            if ( $this->stateScaleDefault > $scaleLimit ) {
                 throw new LogicException(
-                    [ 'The `scaleDefault` is bigger than allowed maximum', $scaleDefaultNew, $scaleLimit ]
+                    [ 'The `scaleDefault` is bigger than allowed maximum', $this->stateScaleDefault, $scaleLimit ]
                 );
             }
 
             if ( $hasBcmath ) {
-                bcscale($scaleDefaultNew);
+                bcscale($this->stateScaleDefault);
             }
         }
 
-        static::$scaleDefault = $scaleDefaultNew;
-
-        return $last;
+        return $isChange ? $last : $this->stateScaleDefault;
     }
 
     /**
      * @param int|false|null $scaleFrac
      */
-    public static function staticScaleFrac($scaleFrac = null) : int
+    public function stateScaleFrac($scaleFrac = null) : ?int
     {
-        $last = static::$scaleFrac;
+        $last = null;
 
-        if ( null !== $scaleFrac ) {
+        if ( $isChange = (null !== $scaleFrac) ) {
+            $last = $this->stateScaleFrac;
+
             if ( false === $scaleFrac ) {
-                static::$scaleFrac = 4;
+                $this->stateScaleFrac = null;
 
             } else {
-                if ( $scaleFrac < 0 ) {
-                    throw new LogicException(
-                        [ 'The `scaleFrac` should be a non-negative integer', $scaleFrac ]
-                    );
-                }
+                $theType = Lib::type();
 
-                static::$scaleFrac = $scaleFrac;
+                $scaleFracValid = $theType->int_non_negative($scaleFrac)->orThrow();
+
+                $this->stateScaleFrac = $scaleFracValid;
             }
         }
 
-        $scaleFracNew = static::$scaleFrac ?? 4;
+        if ( null === $this->stateScaleFrac ) {
+            $this->stateScaleFrac = 4;
+        }
 
-        if ( $last !== $scaleFracNew ) {
-            $scaleLimit = static::$scaleLimit;
+        if ( $last !== $this->stateScaleFrac ) {
+            $scaleLimit = $this->stateScaleLimit();
 
-            if ( $scaleFracNew > $scaleLimit ) {
+            if ( $this->stateScaleFrac > $scaleLimit ) {
                 throw new LogicException(
-                    [ 'The `scaleFrac` is bigger than allowed maximum', $scaleFracNew, $scaleLimit ]
+                    [ 'The `scaleFrac` is bigger than allowed maximum', $this->stateScaleFrac, $scaleLimit ]
                 );
             }
         }
 
-        static::$scaleFrac = $scaleFracNew;
-
-        return $last;
+        return $isChange ? $last : $this->stateScaleFrac;
     }
 
     /**
      * @param int|false|null $scaleLimit
      */
-    public static function staticScaleLimit($scaleLimit = null) : int
+    public function stateScaleLimit($scaleLimit = null) : ?int
     {
-        $last = static::$scaleLimit;
+        $last = null;
 
-        if ( null !== $scaleLimit ) {
+        if ( $isChange = (null !== $scaleLimit) ) {
+            $last = $this->stateScaleLimit;
+
             if ( false === $scaleLimit ) {
-                static::$scaleLimit = 16;
+                $this->stateScaleLimit = null;
 
             } else {
-                if ( $scaleLimit < 0 ) {
-                    throw new LogicException(
-                        [ 'The `scaleLimit` should be a non-negative integer', $scaleLimit ]
-                    );
-                }
+                $theType = Lib::type();
 
-                static::$scaleLimit = $scaleLimit;
+                $scaleLimitValid = $theType->int_non_negative($scaleLimit)->orThrow();
+
+                $this->stateScaleLimit = $scaleLimitValid;
             }
         }
 
-        $scaleLimitNew = static::$scaleLimit ?? 16;
+        if ( null === $this->stateScaleLimit ) {
+            $this->stateScaleLimit = 16;
+        }
 
-        if ( $last !== $scaleLimitNew ) {
-            $scaleDefault = static::$scaleDefault;
-            $scaleFrac = static::$scaleFrac;
+        if ( $last !== $this->stateScaleLimit ) {
+            $scaleDefault = $this->stateScaleDefault;
+            $scaleFrac = $this->stateScaleFrac;
 
-            if ( $scaleDefault > $scaleLimitNew ) {
+            if ( $scaleDefault > $this->stateScaleLimit ) {
                 throw new LogicException(
-                    [ 'The `scaleDefault` is bigger than allowed maximum', $scaleDefault, $scaleLimitNew ]
+                    [ 'The `scaleDefault` is bigger than allowed maximum', $scaleDefault, $this->stateScaleLimit ]
                 );
             }
 
-            if ( $scaleFrac > $scaleLimitNew ) {
+            if ( $scaleFrac > $this->stateScaleLimit ) {
                 throw new LogicException(
-                    [ 'The `scaleFrac` is bigger than allowed maximum', $scaleFrac, $scaleLimitNew ]
+                    [ 'The `scaleFrac` is bigger than allowed maximum', $scaleFrac, $this->stateScaleLimit ]
                 );
             }
         }
 
-        static::$scaleLimit = $scaleLimitNew;
-
-        return $last;
+        return $isChange ? $last : $this->stateScaleLimit;
     }
 
 
@@ -577,7 +575,7 @@ class NumModule
             if ( ! $ret->isOk([ &$valueTrim ]) ) {
                 return Ret::throw(
                     $fb,
-                    [ 'The `value` should be numeric, empty trim is not', $value ],
+                    [ 'The `value` should be numeric', $value ],
                     [ __FILE__, __LINE__ ]
                 );
             }
@@ -2708,7 +2706,7 @@ class NumModule
             );
         }
 
-        $scaleLimit = static::staticScaleLimit();
+        $scaleLimit = $this->stateScaleLimit();
 
         if ( $scaleInt > $scaleLimit ) {
             return Ret::throw(

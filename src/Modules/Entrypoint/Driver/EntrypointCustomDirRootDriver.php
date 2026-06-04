@@ -36,11 +36,13 @@ class EntrypointCustomDirRootDriver extends AbstractEntrypointDriver
 
     public function useValue($value, array $configCurrent, array $configInitial) : void
     {
+        $theDebug = Lib::debug();
+
         if ( null === $value ) {
-            DebugModule::staticDirRoot(false);
+            $theDebug->stateDirRoot(false);
 
         } else {
-            DebugModule::staticDirRoot($value);
+            $theDebug->stateDirRoot($value);
         }
     }
 }

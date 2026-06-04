@@ -25,6 +25,7 @@ use Gzhegow\Lib\Modules\PregModule;
 use Gzhegow\Lib\Modules\TestModule;
 use Gzhegow\Lib\Modules\TypeModule;
 use Gzhegow\Lib\Modules\BoolModule;
+use Gzhegow\Lib\Modules\CurlModule;
 use Gzhegow\Lib\Modules\AsyncModule;
 use Gzhegow\Lib\Modules\CryptModule;
 use Gzhegow\Lib\Modules\DebugModule;
@@ -40,6 +41,7 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Modules\EntrypointModule;
 use Gzhegow\Lib\Modules\Format\FormatCsv;
 use Gzhegow\Lib\Modules\Format\FormatXml;
+use Gzhegow\Lib\Modules\Curl\CurlProcess;
 use Gzhegow\Lib\Modules\Format\FormatJson;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Format\FormatBaseN;
@@ -117,6 +119,17 @@ class Lib
     public static function cli()
     {
         return static::$cli = static::$cli ?? (new CliModule())->__initialize();
+    }
+
+
+    /**
+     * @var CurlModule
+     */
+    public static $curl;
+
+    public static function curl()
+    {
+        return static::$curl = static::$curl ?? (new CurlModule())->__initialize();
     }
 
 
@@ -536,6 +549,31 @@ class Lib
 
 
     /**
+     * > фабрика для Ret - собирать ошибки из цепочек if/else
+     *
+     * @param Ret $ref
+     *
+     * @return Ret
+     */
+    public static function newRet(&$ref = null)
+    {
+        return $ref = Ret::new();
+    }
+
+
+    /**
+     * > фабрика для Curl - выполнить запросы cURL с помощью генератора пачками по несколько штук
+     *
+     * @param CurlProcess $ref
+     *
+     * @return CurlProcess
+     */
+    public static function newCurl(&$ref = null)
+    {
+        return $ref = Lib::curl()->newCurlProcess();
+    }
+
+    /**
      * > фабрика для ErrorBag - добавить теги ошибкам, чтобы потом сохранить в несколько отчетов
      *
      * @param ErrorBag $ref
@@ -556,11 +594,11 @@ class Lib
      */
     public static function newMicrotimer(&$ref = null)
     {
-        return $ref = new Microtimer();
+        return $ref = Lib::php()->newMicrotimer();
     }
 
     /**
-     * > фабрика для Pipe - задать этапы задачи в наглядом виде без деталей
+     * > фабрика для Pipe - конвеер колбэков, удобно применять в контроллерах при сложной логике
      *
      * @param Pipe $ref
      *
@@ -569,18 +607,6 @@ class Lib
     public static function newPipe(&$ref = null)
     {
         return $ref = Lib::func()->newPipe();
-    }
-
-    /**
-     * > фабрика для Ret - собирать ошибки из цепочек if/else
-     *
-     * @param Ret $ref
-     *
-     * @return Ret
-     */
-    public static function newRet(&$ref = null)
-    {
-        return $ref = Ret::new();
     }
 
     /**
@@ -593,6 +619,60 @@ class Lib
     public static function newTestCase(&$ref = null)
     {
         return $ref = Lib::test()->newTestCase();
+    }
+
+
+    public function to_bool($value, array $options = []) : bool
+    {
+        return Lib::php()->to_bool($value, $options);
+    }
+
+    public function to_int($value, array $options = []) : int
+    {
+        return Lib::php()->to_int($value, $options);
+    }
+
+    public function to_float($value, array $options = []) : float
+    {
+        return Lib::php()->to_float($value, $options);
+    }
+
+    public function to_string($value, array $options = []) : string
+    {
+        return Lib::php()->to_string($value, $options);
+    }
+
+
+    public function to_array($value, array $options = []) : array
+    {
+        return Lib::php()->to_array($value, $options);
+    }
+
+    public function to_stdclass($value, array $options = []) : \stdClass
+    {
+        return Lib::php()->to_stdclass($value, $options);
+    }
+
+    public function to_iterable($value, array $options = []) : iterable
+    {
+        return Lib::php()->to_iterable($value, $options);
+    }
+
+
+    public function to_index($value, $options = []) : array
+    {
+        return Lib::php()->to_index($value, $options);
+    }
+
+
+    public function to_list($value, array $options = []) : array
+    {
+        return Lib::php()->to_list($value, $options);
+    }
+
+    public function to_list_it($value, array $options = []) : \Generator
+    {
+        return Lib::php()->to_list_it($value, $options);
     }
 
 
@@ -899,17 +979,6 @@ class Lib
         return Lib::debug()->dumper()->dd($fileLine, ...$vars);
     }
 
-    /**
-     * @return mixed|void
-     */
-    public static function ddd(?int $limit, $var, ...$vars)
-    {
-        $fileLine = Lib::file_line([], 1);
-
-        return Lib::debug()->dumper()->ddd($fileLine, $limit, $var, ...$vars);
-    }
-
-
     public static function fnD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
         return Lib::debug()->dumper()->fnD($traceShift, $trace);
@@ -918,11 +987,6 @@ class Lib
     public static function fnDD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
         return Lib::debug()->dumper()->fnDD($traceShift, $trace);
-    }
-
-    public static function fnDDD(?int $traceShift = null, ?array $trace = null) : \Closure
-    {
-        return Lib::debug()->dumper()->fnDDD($traceShift, $trace);
     }
 
 
@@ -939,6 +1003,22 @@ class Lib
     public static function fnTD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
         return Lib::debug()->dumper()->fnTD($traceShift, $trace);
+    }
+
+
+    /**
+     * @return mixed|void
+     */
+    public static function zd(?int $zTimes, $var, ...$vars)
+    {
+        $fileLine = Lib::file_line([], 1);
+
+        return Lib::debug()->dumper()->zd($fileLine, $zTimes, $var, ...$vars);
+    }
+
+    public static function fnZD(?int $traceShift = null, ?array $trace = null) : \Closure
+    {
+        return Lib::debug()->dumper()->fnZD($traceShift, $trace);
     }
 
 

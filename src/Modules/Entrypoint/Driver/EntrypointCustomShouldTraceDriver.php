@@ -31,6 +31,6 @@ class EntrypointCustomShouldTraceDriver extends AbstractEntrypointDriver
 
     public function useValue($value, array $configCurrent, array $configInitial) : void
     {
-        DebugModule::staticShouldTrace($value);
+        Lib::debug()->stateShouldTrace($value);
     }
 }

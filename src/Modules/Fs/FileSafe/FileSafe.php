@@ -4,7 +4,6 @@ namespace Gzhegow\Lib\Modules\Fs\FileSafe;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Exception\LogicException;
-use Gzhegow\Lib\Exception\RuntimeException;
 
 
 class FileSafe
@@ -1084,7 +1083,7 @@ class FileSafe
     {
         $theFs = Lib::fs();
 
-        $returnTargetPath = $returnTargetPath ?? $theFs::staticRealpathReturnTargetPath();
+        $returnTargetPath = $returnTargetPath ?? $theFs->stateRealpathReturnTargetPath();
         $returnTargetPath = (bool) $returnTargetPath;
 
         if ( $returnTargetPath ) {
@@ -1444,7 +1443,7 @@ class FileSafe
     {
         $theFs = Lib::fs();
 
-        $permissions = $permissions ?? $theFs::staticDirChmod();
+        $permissions = $permissions ?? $theFs->stateDirChmod();
         $recursive = $recursive ?? false;
 
         $status = (null !== $context)
@@ -1475,10 +1474,10 @@ class FileSafe
      */
     public function mkdirp($directory, $permissions = null, $recursive = null, $context = null)
     {
-        $theFs = Lib::fs();
-
         if ( ! is_dir($directory) ) {
-            $permissions = $permissions ?? $theFs::staticDirChmod();
+            $theFs = Lib::fs();
+
+            $permissions = $permissions ?? $theFs->stateDirChmod();
             $recursive = $recursive ?? true;
 
             $status = (null !== $context)

@@ -85,6 +85,12 @@ class TestCase
     }
 
 
+    public static function new()
+    {
+        return new static();
+    }
+
+
     /**
      * @return static
      */
@@ -489,7 +495,10 @@ class TestCase
                     fwrite($h, '------' . "\n");
                 }
 
-                $e = new RuntimeException(implode(' | ', array_filter($message)));
+                $messageString = array_filter($message);
+                $messageString = implode(' | ', $messageString);
+
+                $e = new RuntimeException($messageString);
                 $e->setFileOverride($traceFile);
                 $e->setLineOverride($traceLine);
                 $e->setTraceOverride($trace);

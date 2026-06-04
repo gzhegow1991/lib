@@ -16,6 +16,7 @@ class Except implements
 
     public function __construct(...$throwableArgs)
     {
+        $theDebug = Lib::debug();
         $thePhp = Lib::php();
 
         $eArgs = $thePhp->throwable_args(...$throwableArgs);
@@ -39,7 +40,7 @@ class Except implements
         $eArgsMessageObjectList = array_values($eArgs['messageObjectList']) ?: [ (object) [ $eArgsMessage ] ];
 
         $eArgsTrace = null;
-        if ( DebugModule::staticShouldTrace() ) {
+        if ( $theDebug->stateShouldTrace() ) {
             $ex = new \Exception();
             $exTrace = $ex->getTrace();
             $exTraceShift = array_shift($exTrace);

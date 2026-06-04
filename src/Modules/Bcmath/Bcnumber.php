@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Bcmath;
 
+use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
@@ -59,7 +60,7 @@ class Bcnumber implements
      */
     public static function fromValid($from, $fb = null)
     {
-        $ret = Ret::new();
+        $ret = Lib::newRet();
 
         $instance = null
             ?? static::fromStatic($from)->orNull($ret)

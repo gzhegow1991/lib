@@ -17,28 +17,30 @@ class RandomModule
     /**
      * @var callable
      */
-    protected static $fnUuidV4;
+    protected $stateFnUuidV4;
     /**
      * @var callable
      */
-    protected static $fnUuidV5;
+    protected $stateFnUuidV5;
     /**
      * @var callable
      */
-    protected static $fnUuidV7;
+    protected $stateFnUuidV7;
 
     /**
      * @param callable|false|null $fnUuidV4
      *
-     * @return callable
+     * @return callable|null
      */
-    public static function staticFnUuidV4($fnUuidV4 = null)
+    public function stateFnUuidV4($fnUuidV4 = null)
     {
-        $last = static::$fnUuidV4;
+        $last = null;
 
-        if ( null !== $fnUuidV4 ) {
+        if ( $isChange = (null !== $fnUuidV4) ) {
+            $last = $this->stateFnUuidV4;
+
             if ( false === $fnUuidV4 ) {
-                static::$fnUuidV4 = null;
+                $this->stateFnUuidV4 = null;
 
             } else {
                 if ( ! is_callable($fnUuidV4) ) {
@@ -47,27 +49,31 @@ class RandomModule
                     );
                 }
 
-                static::$fnUuidV4 = $fnUuidV4;
+                $this->stateFnUuidV4 = $fnUuidV4;
             }
         }
 
-        static::$fnUuidV4 = static::$fnUuidV4 ?? null;
+        if ( null === $this->stateFnUuidV4 ) {
+            $this->stateFnUuidV4 = [ $this, 'fnUuidV4' ];
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateFnUuidV4;
     }
 
     /**
      * @param callable|false|null $fnUuidV5
      *
-     * @return callable
+     * @return callable|null
      */
-    public static function staticFnUuidV5($fnUuidV5 = null)
+    public function stateFnUuidV5($fnUuidV5 = null)
     {
-        $last = static::$fnUuidV5;
+        $last = null;
 
-        if ( null !== $fnUuidV5 ) {
+        if ( $isChange = (null !== $fnUuidV5) ) {
+            $last = $this->stateFnUuidV5;
+
             if ( false === $fnUuidV5 ) {
-                static::$fnUuidV5 = null;
+                $this->stateFnUuidV5 = null;
 
             } else {
                 if ( ! is_callable($fnUuidV5) ) {
@@ -76,27 +82,31 @@ class RandomModule
                     );
                 }
 
-                static::$fnUuidV4 = $fnUuidV5;
+                $this->stateFnUuidV5 = $fnUuidV5;
             }
         }
 
-        static::$fnUuidV5 = static::$fnUuidV5 ?? null;
+        if ( null === $this->stateFnUuidV5 ) {
+            $this->stateFnUuidV5 = [ $this, 'fnUuidV5' ];
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateFnUuidV5;
     }
 
     /**
      * @param callable|false|null $fnUuidV7
      *
-     * @return callable
+     * @return callable|null
      */
-    public static function staticFnUuidV7($fnUuidV7 = null)
+    public function stateFnUuidV7($fnUuidV7 = null)
     {
-        $last = static::$fnUuidV7;
+        $last = null;
 
-        if ( null !== $fnUuidV7 ) {
+        if ( $isChange = (null !== $fnUuidV7) ) {
+            $last = $this->stateFnUuidV7;
+
             if ( false === $fnUuidV7 ) {
-                static::$fnUuidV7 = null;
+                $this->stateFnUuidV7 = null;
 
             } else {
                 if ( ! is_callable($fnUuidV7) ) {
@@ -105,22 +115,21 @@ class RandomModule
                     );
                 }
 
-                static::$fnUuidV7 = $fnUuidV7;
+                $this->stateFnUuidV7 = $fnUuidV7;
             }
         }
 
-        static::$fnUuidV7 = static::$fnUuidV7 ?? null;
+        if ( null === $this->stateFnUuidV7 ) {
+            $this->stateFnUuidV7 = [ $this, 'fnUuidV7' ];
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateFnUuidV7;
     }
 
 
-    public function __construct()
-    {
-        static::$fnUuidV4 = static::$fnUuidV4 ?? [ $this, 'fnUuidV4' ];
-        static::$fnUuidV5 = static::$fnUuidV5 ?? [ $this, 'fnUuidV5' ];
-        static::$fnUuidV7 = static::$fnUuidV7 ?? [ $this, 'fnUuidV7' ];
-    }
+    // public function __construct()
+    // {
+    // }
 
     public function __initialize()
     {
@@ -175,7 +184,7 @@ class RandomModule
 
     public function uuidV4() : string
     {
-        $fn = static::staticFnUuidV4();
+        $fn = $this->stateFnUuidV4();
 
         $uuid = $fn();
 
@@ -188,7 +197,7 @@ class RandomModule
     {
         $this->type_uuid([], $namespaceUuid);
 
-        $fn = static::staticFnUuidV5();
+        $fn = $this->stateFnUuidV5();
 
         $uuid = $fn($namespaceUuid, $name);
 
@@ -199,7 +208,7 @@ class RandomModule
 
     public function uuidV7() : string
     {
-        $fn = static::staticFnUuidV7();
+        $fn = $this->stateFnUuidV7();
 
         $uuid = $fn();
 

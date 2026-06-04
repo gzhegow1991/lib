@@ -68,7 +68,7 @@ abstract class AbstractConfig implements
      */
     public static function from($from, $fb = null)
     {
-        $ret = Ret::new();
+        $ret = Lib::newRet();
 
         $instance = null
             ?? static::fromStatic($from)->orNull($ret)

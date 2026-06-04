@@ -3,6 +3,7 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
+use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Http\HttpHeader\HttpHeader;
@@ -16,63 +17,78 @@ use Gzhegow\Lib\Modules\Http\Session\SessionDisabler\SessionDisabler;
 class HttpModule
 {
     /**
-     * @var class-string<DefaultCookies>
+     * @var class-string<CookiesInterface>
      */
-    protected static $cookiesClass = DefaultCookies::class;
+    protected $stateCookiesClass;
 
     /**
      * @var bool
      */
-    protected static $isApi = null;
+    protected $stateIsApi = null;
 
     /**
      * @param class-string<CookiesInterface>|false|null $cookiesClass
      *
-     * @return class-string<CookiesInterface>
+     * @return class-string<CookiesInterface>|null
      */
-    public static function staticCookiesClass($cookiesClass = null) : string
+    public function stateCookiesClass($cookiesClass = null) : ?string
     {
-        $last = static::$cookiesClass;
+        $last = null;
 
-        if ( null !== $cookiesClass ) {
+        if ( $isChange = (null !== $cookiesClass) ) {
+            $last = $this->stateCookiesClass;
+
             if ( false === $cookiesClass ) {
-                static::$cookiesClass = DefaultCookies::class;
+                $this->stateCookiesClass = null;
 
             } else {
-                if ( ! is_subclass_of($cookiesClass, CookiesInterface::class) ) {
-                    throw new LogicException(
-                        [ 'The `cookiesClass` should be subclass of: ' . CookiesInterface::class, $cookiesClass ]
-                    );
-                }
+                $theType = Lib::type();
 
-                static::$cookiesClass = $cookiesClass;
+                $theType->is_subclass_of(
+                    $cookiesClass,
+                    CookiesInterface::class,
+                    true,
+                    [ &$cookiesClassFqcn ]
+                )->orThrow();
+
+                $this->stateCookiesClass = $cookiesClassFqcn;
             }
         }
 
-        static::$cookiesClass = static::$cookiesClass ?? DefaultCookies::class;
+        if ( null === $this->stateCookiesClass ) {
+            $this->stateCookiesClass = '\\' . DefaultCookies::class;
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateCookiesClass;
     }
 
     /**
      * @param int|false|null $isApi
      */
-    public static function staticIsApi($isApi = null) : ?bool
+    public function stateIsApi($isApi = null) : ?bool
     {
-        $last = static::$isApi;
+        $last = null;
 
-        if ( null !== $isApi ) {
+        if ( $isChange = (null !== $isApi) ) {
+            $last = $this->stateIsApi;
+
             if ( false === $isApi ) {
-                static::$isApi = null;
+                $this->stateIsApi = null;
 
             } else {
-                static::$isApi = (bool) $isApi;
+                $theType = Lib::type();
+
+                $isApiValid = $theType->bool($isApi)->orThrow();
+
+                $this->stateIsApi = $isApiValid;
             }
         }
 
-        static::$isApi = static::$isApi ?? null;
+        if ( null === $this->stateIsApi ) {
+            $this->stateIsApi = false;
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateIsApi;
     }
 
 
@@ -102,7 +118,7 @@ class HttpModule
             return $this->cookies;
         }
 
-        $cookiesClass = static::staticCookiesClass();
+        $cookiesClass = $this->stateCookiesClass();
 
         $instance = $cookiesClass::getInstance();
 
@@ -139,6 +155,27 @@ class HttpModule
         return $proxy;
     }
 
+    public function disableSession()
+    {
+        if ( isset($_SESSION) ) {
+            if ( SessionDisabler::is($_SESSION) ) {
+                return $this;
+            }
+
+            if ( [] !== $_SESSION ) {
+                throw new RuntimeException(
+                    [ 'Unable to disable non-empty $_SESSION' ]
+                );
+            }
+        }
+
+        $sessionDisablerObject = SessionDisabler::new();
+
+        $_SESSION =& $sessionDisablerObject;
+
+        return $this;
+    }
+
     protected function createSessionSafe() : SessionSafe
     {
         $instance = new SessionSafe();
@@ -150,6 +187,49 @@ class HttpModule
     {
         return $this->sessionSafe = $this->sessionSafe
             ?? $this->createSessionSafe();
+    }
+
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_http_method($fb, $value)
+    {
+        $theType = Lib::type();
+
+        $ret = $theType->string($value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $index = [
+            'GET'     => true,
+            'POST'    => true,
+            'PUT'     => true,
+            'PATCH'   => true,
+            'DELETE'  => true,
+            'HEAD'    => true,
+            'OPTIONS' => true,
+            'TRACE'   => true,
+            'CONNECT' => true,
+        ];
+
+        $valueStringUpper = strtoupper($valueString);
+
+        if ( ! isset($index[$valueStringUpper]) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be http header', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueStringUpper);
     }
 
 
@@ -183,12 +263,10 @@ class HttpModule
             return false;
         }
 
-        $isApi = static::staticIsApi();
-        if ( true === $isApi ) {
-            return true;
+        $isApi = $this->stateIsApi();
 
-        } elseif ( false === $isApi ) {
-            return false;
+        if ( is_bool($isApi) ) {
+            return $isApi;
         }
 
         if ( ! headers_sent() ) {
@@ -207,38 +285,13 @@ class HttpModule
             || (false !== stripos($headersConcat, '[ Content-Type: text/xhtml'))
         );
 
-        static::staticIsApi(! $isHeadersSentAndContentTypeIsHtml);
+        $this->stateIsApi(! $isHeadersSentAndContentTypeIsHtml);
 
         if ( ! $isHeadersSentAndContentTypeIsHtml ) {
             return true;
         }
 
         return false;
-    }
-
-
-    /**
-     * @return static
-     */
-    public function disableSession()
-    {
-        if ( isset($_SESSION) ) {
-            if ( SessionDisabler::is($_SESSION) ) {
-                return $this;
-            }
-
-            if ( [] !== $_SESSION ) {
-                throw new RuntimeException(
-                    [ 'Unable to disable non-empty $_SESSION' ]
-                );
-            }
-        }
-
-        $sessionDisablerObject = SessionDisabler::new();
-
-        $_SESSION =& $sessionDisablerObject;
-
-        return $this;
     }
 
 
@@ -294,13 +347,13 @@ class HttpModule
     /**
      * @return static
      */
-    public function header_remove(?string $name)
+    public function header_remove(?string $header)
     {
         $theFunc = Lib::func();
 
         $theFunc->safe_call(
-            static function () use ($name) {
-                header_remove($name);
+            static function () use ($header) {
+                header_remove($header);
             }
         );
 
@@ -366,50 +419,6 @@ class HttpModule
         );
 
         return $this;
-    }
-
-
-    public function http_build_query_array($query, ...$queries) : array
-    {
-        $theType = Lib::type();
-
-        if ( [] !== $queries ) {
-            array_unshift($queries, $query);
-
-        } else {
-            $queries = [ $query ];
-        }
-
-        foreach ( $queries as $idx => $q ) {
-            if ( null === $q ) {
-                unset($queries[$idx]);
-            }
-        }
-
-        foreach ( $queries as $idx => $q ) {
-            if ( is_array($q) ) {
-                continue;
-
-            } elseif ( $theType->string_not_empty($q)->isOk([ &$qString ]) ) {
-                $queryArray = [];
-                parse_str($q, $queryArray);
-
-                $queries[$idx] = $queryArray;
-
-            } else {
-                throw new LogicException(
-                    [ 'Each of `queries` should be a string|array', $query, $idx ]
-                );
-            }
-        }
-
-        $result = [];
-
-        if ( [] !== $queries ) {
-            $result = $this->data_merge(...$queries);
-        }
-
-        return $result;
     }
 
 
@@ -492,58 +501,98 @@ class HttpModule
     }
 
 
-    /**
-     * @return string|false
-     */
-    public function idn_to_ascii(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
+    public function http_build_query_array($query, ...$queries) : array
     {
-        if ( ! extension_loaded('intl') ) {
-            throw new RuntimeException(
-                [ 'The extension missing: intl' ]
-            );
+        $theType = Lib::type();
+
+        if ( [] !== $queries ) {
+            array_unshift($queries, $query);
+
+        } else {
+            $queries = [ $query ];
         }
 
-        $flags = $flags ?? IDNA_DEFAULT;
-        $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
-
-        $withIdnaInfo = array_key_exists(0, $refs);
-        if ( $withIdnaInfo ) {
-            $refIdnaInfo =& $refs[0];
+        foreach ( $queries as $idx => $q ) {
+            if ( null === $q ) {
+                unset($queries[$idx]);
+            }
         }
-        $refIdnaInfo = null;
 
-        return $withIdnaInfo
-            ? idn_to_ascii($domain, $flags, $variant, $refIdnaInfo)
-            : idn_to_ascii($domain, $flags, $variant);
+        foreach ( $queries as $idx => $q ) {
+            if ( is_array($q) ) {
+                continue;
+
+            } elseif ( $theType->string_not_empty($q)->isOk([ &$qString ]) ) {
+                $queryArray = [];
+                parse_str($q, $queryArray);
+
+                $queries[$idx] = $queryArray;
+
+            } else {
+                throw new LogicException(
+                    [ 'Each of `queries` should be a string|array', $query, $idx ]
+                );
+            }
+        }
+
+        $result = [];
+
+        if ( [] !== $queries ) {
+            $result = $this->data_merge(...$queries);
+        }
+
+        return $result;
     }
 
-    /**
-     * @return string|false
-     *
-     * @noinspection PhpComposerExtensionStubsInspection
-     */
-    public function idn_to_utf8(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
+
+    public function data_merge(?array $dataArray, ?array ...$dataArrays) : array
     {
-        if ( ! extension_loaded('intl') ) {
-            throw new RuntimeException(
-                [ 'The extension missing: intl' ]
-            );
+        $theArr = Lib::arr();
+
+        if ( $dataArray ) {
+            array_unshift($dataArrays, $dataArray);
         }
 
-        $flags = $flags ?? IDNA_DEFAULT;
-        $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
-
-        $withIdnaInfo = array_key_exists(0, $refs);
-        if ( $withIdnaInfo ) {
-            $refIdnaInfo =& $refs[0];
+        foreach ( $dataArrays as $idx => $_dataArray ) {
+            if ( null === $_dataArray ) {
+                unset($dataArrays[$idx]);
+            }
         }
-        $refIdnaInfo = null;
 
-        return $withIdnaInfo
-            ? idn_to_utf8($domain, $flags, $variant, $refIdnaInfo)
-            : idn_to_utf8($domain, $flags, $variant);
+        $dataArraysKeys = array_keys($dataArrays);
+
+        foreach (
+            $theArr->walk_collect_it(
+                $dataArrays,
+                _ARR_WALK_WITH_EMPTY_ARRAYS,
+                [ null ]
+            ) as $path => $values
+        ) {
+            $last = end($values);
+
+            if ( false === $last ) {
+                foreach ( $dataArraysKeys as $key ) {
+                    $theArr->unset_path($dataArrays[$key], $path);
+                }
+            }
+        }
+
+        foreach (
+            $theArr->walk_it(
+                $dataArrays,
+                _ARR_WALK_WITH_EMPTY_ARRAYS
+            )
+            as $path => $value
+        ) {
+            if ( [] === $value ) {
+                $theArr->unset_path($dataArrays, $path);
+            }
+        }
+
+        $result = array_merge_recursive(...$dataArrays);
+
+        return $result;
     }
-
 
     public function data_replace(?array $dataArray, ?array ...$dataArrays) : array
     {
@@ -594,52 +643,54 @@ class HttpModule
         return $result;
     }
 
-    public function data_merge(?array $dataArray, ?array ...$dataArrays) : array
+
+    /**
+     * @return string|false
+     */
+    public function idn_to_ascii(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
     {
-        $theArr = Lib::arr();
-
-        if ( $dataArray ) {
-            array_unshift($dataArrays, $dataArray);
+        if ( ! extension_loaded('intl') ) {
+            throw new RuntimeException(
+                [ 'The extension missing: intl' ]
+            );
         }
 
-        foreach ( $dataArrays as $idx => $_dataArray ) {
-            if ( null === $_dataArray ) {
-                unset($dataArrays[$idx]);
-            }
+        $flags = $flags ?? IDNA_DEFAULT;
+        $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
+
+        $withIdnaInfo = array_key_exists(0, $refs);
+        if ( $withIdnaInfo ) {
+            $refIdnaInfo =& $refs[0];
+        }
+        $refIdnaInfo = null;
+
+        return $withIdnaInfo
+            ? idn_to_ascii($domain, $flags, $variant, $refIdnaInfo)
+            : idn_to_ascii($domain, $flags, $variant);
+    }
+
+    /**
+     * @return string|false
+     */
+    public function idn_to_utf8(string $domain, ?int $flags = null, ?int $variant = null, array $refs = [])
+    {
+        if ( ! extension_loaded('intl') ) {
+            throw new RuntimeException(
+                [ 'The extension missing: intl' ]
+            );
         }
 
-        $dataArraysKeys = array_keys($dataArrays);
+        $flags = $flags ?? IDNA_DEFAULT;
+        $variant = $variant ?? INTL_IDNA_VARIANT_UTS46;
 
-        foreach (
-            $theArr->walk_collect_it(
-                $dataArrays,
-                _ARR_WALK_WITH_EMPTY_ARRAYS,
-                [ null ]
-            ) as $path => $values
-        ) {
-            $last = end($values);
-
-            if ( false === $last ) {
-                foreach ( $dataArraysKeys as $key ) {
-                    $theArr->unset_path($dataArrays[$key], $path);
-                }
-            }
+        $withIdnaInfo = array_key_exists(0, $refs);
+        if ( $withIdnaInfo ) {
+            $refIdnaInfo =& $refs[0];
         }
+        $refIdnaInfo = null;
 
-        foreach (
-            $theArr->walk_it(
-                $dataArrays,
-                _ARR_WALK_WITH_EMPTY_ARRAYS
-            )
-            as $path => $value
-        ) {
-            if ( [] === $value ) {
-                $theArr->unset_path($dataArrays, $path);
-            }
-        }
-
-        $result = array_merge_recursive(...$dataArrays);
-
-        return $result;
+        return $withIdnaInfo
+            ? idn_to_utf8($domain, $flags, $variant, $refIdnaInfo)
+            : idn_to_utf8($domain, $flags, $variant);
     }
 }

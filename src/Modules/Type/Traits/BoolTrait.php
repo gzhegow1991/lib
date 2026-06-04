@@ -364,6 +364,18 @@ trait BoolTrait
 	}
 
 
+	public function curl($value): bool
+	{
+		return Lib::curl()->type_curl(null, $value)->isOk();
+	}
+
+
+	public function curl_multi($value): bool
+	{
+		return Lib::curl()->type_curl_multi(null, $value)->isOk();
+	}
+
+
 	public function timezone($timezone, array $allowedTimezoneTypes = null): bool
 	{
 		return Lib::date()->type_timezone(null, $timezone, $allowedTimezoneTypes)->isOk();
@@ -671,6 +683,12 @@ trait BoolTrait
 	public function stream($value): bool
 	{
 		return Lib::fs()->type_stream(null, $value)->isOk();
+	}
+
+
+	public function http_method($value): bool
+	{
+		return Lib::http()->type_http_method(null, $value)->isOk();
 	}
 
 
@@ -1451,6 +1469,54 @@ trait BoolTrait
 	}
 
 
+	/**
+	 * @template-covariant T
+	 *
+	 * @param object          $value
+	 * @param class-string<T> $className
+	 */
+	public function instance_of($value, string $className, array $refs = []): bool
+	{
+		return Lib::php()->type_instance_of(null, $value, $className, $refs)->isOk();
+	}
+
+
+	/**
+	 * @template-covariant T
+	 *
+	 * @param object|class-string $value
+	 * @param class-string<T>     $className
+	 */
+	public function is_a($value, string $className, bool $allowString = null, $refs = []): bool
+	{
+		return Lib::php()->type_is_a(null, $value, $className, $allowString, $refs)->isOk();
+	}
+
+
+	/**
+	 * @template-covariant T
+	 *
+	 * @param object|class-string $value
+	 * @param class-string<T>     $className
+	 */
+	public function is_subclass_of($value, string $className, bool $allowString = null, array $refs = []): bool
+	{
+		return Lib::php()->type_is_subclass_of(null, $value, $className, $allowString, $refs)->isOk();
+	}
+
+
+	/**
+	 * @template-covariant T
+	 *
+	 * @param object|class-string $value
+	 * @param class-string<T>     $className
+	 */
+	public function is_class_of($value, string $className, bool $allowString = null, array $refs = []): bool
+	{
+		return Lib::php()->type_is_class_of(null, $value, $className, $allowString, $refs)->isOk();
+	}
+
+
 	public function countable($value): bool
 	{
 		return Lib::php()->type_countable(null, $value)->isOk();
@@ -1569,12 +1635,6 @@ trait BoolTrait
 	public function not_resource($value): bool
 	{
 		return Lib::php()->type_not_resource(null, $value)->isOk();
-	}
-
-
-	public function curl($value): bool
-	{
-		return Lib::php()->type_curl(null, $value)->isOk();
 	}
 
 
@@ -1742,21 +1802,57 @@ trait BoolTrait
 	}
 
 
-	public function is_os_windows(): bool
+	public function locale($value, array $refs = []): bool
 	{
-		return Lib::php()->type_is_os_windows(null)->isOk();
+		return Lib::php()->type_locale(null, $value, $refs)->isOk();
 	}
 
 
-	public function is_sapi_terminal(): bool
+	public function locale_ietf($value, array $refs = []): bool
 	{
-		return Lib::php()->type_is_sapi_terminal(null)->isOk();
+		return Lib::php()->type_locale_ietf(null, $value, $refs)->isOk();
 	}
 
 
-	public function locale($value): bool
+	public function locale_posix($value, array $refs = []): bool
 	{
-		return Lib::php()->type_locale(null, $value)->isOk();
+		return Lib::php()->type_locale_posix(null, $value, $refs)->isOk();
+	}
+
+
+	public function count_gt($value, $gt): bool
+	{
+		return Lib::php()->type_count_gt(null, $value, $gt)->isOk();
+	}
+
+
+	public function count_gte($value, $gte): bool
+	{
+		return Lib::php()->type_count_gte(null, $value, $gte)->isOk();
+	}
+
+
+	public function count_lt($value, $lt): bool
+	{
+		return Lib::php()->type_count_lt(null, $value, $lt)->isOk();
+	}
+
+
+	public function count_lte($value, $lte): bool
+	{
+		return Lib::php()->type_count_lte(null, $value, $lte)->isOk();
+	}
+
+
+	public function count_between($value, $from, $to): bool
+	{
+		return Lib::php()->type_count_between(null, $value, $from, $to)->isOk();
+	}
+
+
+	public function count_inside($value, $from, $to): bool
+	{
+		return Lib::php()->type_count_inside(null, $value, $from, $to)->isOk();
 	}
 
 
@@ -1944,12 +2040,6 @@ trait BoolTrait
 	}
 
 
-	public function php_trim($value, string $characters = null): bool
-	{
-		return Lib::str()->type_php_trim(null, $value, $characters)->isOk();
-	}
-
-
 	public function string($value): bool
 	{
 		return Lib::str()->type_string(null, $value)->isOk();
@@ -1968,9 +2058,129 @@ trait BoolTrait
 	}
 
 
+	public function strlen_gt($value, $gt): bool
+	{
+		return Lib::str()->type_strlen_gt(null, $value, $gt)->isOk();
+	}
+
+
+	public function strlen_gte($value, $gte): bool
+	{
+		return Lib::str()->type_strlen_gte(null, $value, $gte)->isOk();
+	}
+
+
+	public function strlen_lt($value, $lt): bool
+	{
+		return Lib::str()->type_strlen_lt(null, $value, $lt)->isOk();
+	}
+
+
+	public function strlen_lte($value, $lte): bool
+	{
+		return Lib::str()->type_strlen_lte(null, $value, $lte)->isOk();
+	}
+
+
+	public function strlen_between($value, $from, $to): bool
+	{
+		return Lib::str()->type_strlen_between(null, $value, $from, $to)->isOk();
+	}
+
+
+	public function strlen_inside($value, $from, $to): bool
+	{
+		return Lib::str()->type_strlen_inside(null, $value, $from, $to)->isOk();
+	}
+
+
+	public function strsize_gt($value, $gt): bool
+	{
+		return Lib::str()->type_strsize_gt(null, $value, $gt)->isOk();
+	}
+
+
+	public function strsize_gte($value, $gte): bool
+	{
+		return Lib::str()->type_strsize_gte(null, $value, $gte)->isOk();
+	}
+
+
+	public function strsize_lt($value, $lt): bool
+	{
+		return Lib::str()->type_strsize_lt(null, $value, $lt)->isOk();
+	}
+
+
+	public function strsize_lte($value, $lte): bool
+	{
+		return Lib::str()->type_strsize_lte(null, $value, $lte)->isOk();
+	}
+
+
+	public function strsize_between($value, $from, $to): bool
+	{
+		return Lib::str()->type_strsize_between(null, $value, $from, $to)->isOk();
+	}
+
+
+	public function strsize_inside($value, $from, $to): bool
+	{
+		return Lib::str()->type_strsize_inside(null, $value, $from, $to)->isOk();
+	}
+
+
+	/**
+	 * > применяет ltrim к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 */
+	public function ltrim($value, string $characters = null): bool
+	{
+		return Lib::str()->type_ltrim(null, $value, $characters)->isOk();
+	}
+
+
+	/**
+	 * > применяет rtrim к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 */
+	public function rtrim($value, string $characters = null): bool
+	{
+		return Lib::str()->type_rtrim(null, $value, $characters)->isOk();
+	}
+
+
+	/**
+	 * > применяет trim к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 */
 	public function trim($value, string $characters = null): bool
 	{
 		return Lib::str()->type_trim(null, $value, $characters)->isOk();
+	}
+
+
+	/**
+	 * > применяет lcrop к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 */
+	public function lcrop($value, $needleList = null): bool
+	{
+		return Lib::str()->type_lcrop(null, $value, $needleList)->isOk();
+	}
+
+
+	/**
+	 * > применяет rcrop к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 */
+	public function rcrop($value, $needleList = null): bool
+	{
+		return Lib::str()->type_rcrop(null, $value, $needleList)->isOk();
+	}
+
+
+	/**
+	 * > применяет crop к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 */
+	public function crop($value, $needleList = null): bool
+	{
+		return Lib::str()->type_crop(null, $value, $needleList)->isOk();
 	}
 
 

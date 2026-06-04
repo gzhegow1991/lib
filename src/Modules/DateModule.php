@@ -404,7 +404,7 @@ class DateModule
             return Ret::ok($fb, $interval);
         }
 
-        $ret = Ret::new();
+        $ret = Lib::newRet();
 
         $devnull = false
             || $this->type_interval_duration($ret, $interval)

@@ -298,7 +298,7 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $len = file_put_contents($taskResultFile, $serialized);
 
-        $statusSave = false !== $len;
+        $statusSave = (false !== $len);
 
         return $statusSave;
     }
@@ -318,17 +318,22 @@ class FilesystemFetchApi implements FetchApiInterface
 
         $ch = curl_init($taskUrl);
 
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
-
-        curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+        //
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 3);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        //
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_MAXREDIRS, 10);
-
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-
+        //
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 2);
+        //
+        curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
+        //
+        curl_setopt($ch, CURLOPT_USERAGENT, 'API/1.0');
+        //
+        curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
 
         if ( [] !== $taskCurlOptions ) {

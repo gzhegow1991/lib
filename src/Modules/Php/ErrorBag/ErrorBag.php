@@ -14,6 +14,12 @@ class ErrorBag
     protected $errors = [];
 
 
+    public static function new()
+    {
+        return new static();
+    }
+
+
     /**
      * @return static
      */

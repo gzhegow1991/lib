@@ -507,6 +507,24 @@ trait TypeTrait
 
 
 	/**
+	 * @return Ret<resource|\CurlHandle>
+	 */
+	public function curl($value)
+	{
+		return Lib::curl()->type_curl(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<resource|\CurlMultiHandle>
+	 */
+	public function curl_multi($value)
+	{
+		return Lib::curl()->type_curl_multi(null, $value);
+	}
+
+
+	/**
 	 * @return Ret<\DateTimeZone>
 	 */
 	public function timezone($timezone, array $allowedTimezoneTypes = null)
@@ -948,6 +966,15 @@ trait TypeTrait
 	public function stream($value)
 	{
 		return Lib::fs()->type_stream(null, $value);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function http_method($value)
+	{
+		return Lib::http()->type_http_method(null, $value);
 	}
 
 
@@ -2093,6 +2120,62 @@ trait TypeTrait
 
 
 	/**
+	 * @template-covariant T
+	 *
+	 * @param object          $value
+	 * @param class-string<T> $className
+	 *
+	 * @return Ret<T>
+	 */
+	public function instance_of($value, string $className, array $refs = [])
+	{
+		return Lib::php()->type_instance_of(null, $value, $className, $refs);
+	}
+
+
+	/**
+	 * @template-covariant T
+	 *
+	 * @param object|class-string $value
+	 * @param class-string<T>     $className
+	 *
+	 * @return Ret<T>
+	 */
+	public function is_a($value, string $className, bool $allowString = null, $refs = [])
+	{
+		return Lib::php()->type_is_a(null, $value, $className, $allowString, $refs);
+	}
+
+
+	/**
+	 * @template-covariant T
+	 *
+	 * @param object|class-string $value
+	 * @param class-string<T>     $className
+	 *
+	 * @return Ret<T>
+	 */
+	public function is_subclass_of($value, string $className, bool $allowString = null, array $refs = [])
+	{
+		return Lib::php()->type_is_subclass_of(null, $value, $className, $allowString, $refs);
+	}
+
+
+	/**
+	 * @template-covariant T
+	 *
+	 * @param object|class-string $value
+	 * @param class-string<T>     $className
+	 *
+	 * @return Ret<T>
+	 */
+	public function is_class_of($value, string $className, bool $allowString = null, array $refs = [])
+	{
+		return Lib::php()->type_is_class_of(null, $value, $className, $allowString, $refs);
+	}
+
+
+	/**
 	 * @return Ret<array|\Countable>
 	 */
 	public function countable($value)
@@ -2111,7 +2194,7 @@ trait TypeTrait
 
 
 	/**
-	 * @return Ret<array|\Countable>
+	 * @return Ret<array|\Countable|string>
 	 */
 	public function sizeable($value)
 	{
@@ -2253,15 +2336,6 @@ trait TypeTrait
 	public function not_resource($value)
 	{
 		return Lib::php()->type_not_resource(null, $value);
-	}
-
-
-	/**
-	 * @return Ret<resource|\CurlHandle>
-	 */
-	public function curl($value)
-	{
-		return Lib::php()->type_curl(null, $value);
 	}
 
 
@@ -2475,24 +2549,84 @@ trait TypeTrait
 	}
 
 
-	public function is_os_windows()
+	/**
+	 * @return Ret<array>
+	 */
+	public function locale($value, array $refs = [])
 	{
-		return Lib::php()->type_is_os_windows(null);
-	}
-
-
-	public function is_sapi_terminal()
-	{
-		return Lib::php()->type_is_sapi_terminal(null);
+		return Lib::php()->type_locale(null, $value, $refs);
 	}
 
 
 	/**
 	 * @return Ret<string>
 	 */
-	public function locale($value)
+	public function locale_ietf($value, array $refs = [])
 	{
-		return Lib::php()->type_locale(null, $value);
+		return Lib::php()->type_locale_ietf(null, $value, $refs);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function locale_posix($value, array $refs = [])
+	{
+		return Lib::php()->type_locale_posix(null, $value, $refs);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function count_gt($value, $gt)
+	{
+		return Lib::php()->type_count_gt(null, $value, $gt);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function count_gte($value, $gte)
+	{
+		return Lib::php()->type_count_gte(null, $value, $gte);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function count_lt($value, $lt)
+	{
+		return Lib::php()->type_count_lt(null, $value, $lt);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function count_lte($value, $lte)
+	{
+		return Lib::php()->type_count_lte(null, $value, $lte);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function count_between($value, $from, $to)
+	{
+		return Lib::php()->type_count_between(null, $value, $from, $to);
+	}
+
+
+	/**
+	 * @return Ret<mixed>
+	 */
+	public function count_inside($value, $from, $to)
+	{
+		return Lib::php()->type_count_inside(null, $value, $from, $to);
 	}
 
 
@@ -2738,15 +2872,6 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
-	public function php_trim($value, string $characters = null)
-	{
-		return Lib::str()->type_php_trim(null, $value, $characters);
-	}
-
-
-	/**
-	 * @return Ret<string>
-	 */
 	public function string($value)
 	{
 		return Lib::str()->type_string(null, $value);
@@ -2774,9 +2899,174 @@ trait TypeTrait
 	/**
 	 * @return Ret<string>
 	 */
+	public function strlen_gt($value, $gt)
+	{
+		return Lib::str()->type_strlen_gt(null, $value, $gt);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function strlen_gte($value, $gte)
+	{
+		return Lib::str()->type_strlen_gte(null, $value, $gte);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function strlen_lt($value, $lt)
+	{
+		return Lib::str()->type_strlen_lt(null, $value, $lt);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function strlen_lte($value, $lte)
+	{
+		return Lib::str()->type_strlen_lte(null, $value, $lte);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function strlen_between($value, $from, $to)
+	{
+		return Lib::str()->type_strlen_between(null, $value, $from, $to);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function strlen_inside($value, $from, $to)
+	{
+		return Lib::str()->type_strlen_inside(null, $value, $from, $to);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function strsize_gt($value, $gt)
+	{
+		return Lib::str()->type_strsize_gt(null, $value, $gt);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function strsize_gte($value, $gte)
+	{
+		return Lib::str()->type_strsize_gte(null, $value, $gte);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function strsize_lt($value, $lt)
+	{
+		return Lib::str()->type_strsize_lt(null, $value, $lt);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function strsize_lte($value, $lte)
+	{
+		return Lib::str()->type_strsize_lte(null, $value, $lte);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function strsize_between($value, $from, $to)
+	{
+		return Lib::str()->type_strsize_between(null, $value, $from, $to);
+	}
+
+
+	/**
+	 * @return Ret<string>
+	 */
+	public function strsize_inside($value, $from, $to)
+	{
+		return Lib::str()->type_strsize_inside(null, $value, $from, $to);
+	}
+
+
+	/**
+	 * > применяет ltrim к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 *
+	 * @return Ret<string>
+	 */
+	public function ltrim($value, string $characters = null)
+	{
+		return Lib::str()->type_ltrim(null, $value, $characters);
+	}
+
+
+	/**
+	 * > применяет rtrim к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 *
+	 * @return Ret<string>
+	 */
+	public function rtrim($value, string $characters = null)
+	{
+		return Lib::str()->type_rtrim(null, $value, $characters);
+	}
+
+
+	/**
+	 * > применяет trim к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 *
+	 * @return Ret<string>
+	 */
 	public function trim($value, string $characters = null)
 	{
 		return Lib::str()->type_trim(null, $value, $characters);
+	}
+
+
+	/**
+	 * > применяет lcrop к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 *
+	 * @return Ret<string>
+	 */
+	public function lcrop($value, $needleList = null)
+	{
+		return Lib::str()->type_lcrop(null, $value, $needleList);
+	}
+
+
+	/**
+	 * > применяет rcrop к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 *
+	 * @return Ret<string>
+	 */
+	public function rcrop($value, $needleList = null)
+	{
+		return Lib::str()->type_rcrop(null, $value, $needleList);
+	}
+
+
+	/**
+	 * > применяет crop к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+	 *
+	 * @return Ret<string>
+	 */
+	public function crop($value, $needleList = null)
+	{
+		return Lib::str()->type_crop(null, $value, $needleList);
 	}
 
 

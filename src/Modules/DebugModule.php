@@ -3,7 +3,6 @@
 namespace Gzhegow\Lib\Modules;
 
 use Gzhegow\Lib\Lib;
-use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Debug\Dumper\DefaultDumper;
 use Gzhegow\Lib\Modules\Debug\Dumper\DumperInterface;
@@ -18,85 +17,94 @@ class DebugModule
     /**
      * @var string
      */
-    protected static $dirRoot;
+    protected $stateDirRoot;
+    /**
+     * @var bool
+     */
+    protected $stateShouldTrace;
+    /**
+     * @var array
+     */
+    protected $stateVarDumpOptions;
 
     /**
      * @param string|false|null $dirRoot
      */
-    public static function staticDirRoot($dirRoot = null) : ?string
+    public function stateDirRoot($dirRoot = null) : ?string
     {
-        $last = static::$dirRoot;
+        $last = null;
 
-        if ( null !== $dirRoot ) {
+        if ( $isChange = (null !== $dirRoot) ) {
+            $last = $this->stateDirRoot;
+
             if ( false === $dirRoot ) {
-                static::$dirRoot = null;
+                $this->stateDirRoot = null;
 
             } else {
                 $theType = Lib::type();
 
                 $dirRootRealpath = $theType->dirpath_realpath($dirRoot)->orThrow();
 
-                static::$dirRoot = $dirRootRealpath;
+                $this->stateDirRoot = $dirRootRealpath;
             }
         }
 
-        static::$dirRoot = static::$dirRoot ?? null;
+        // if (null === $this->stateDirRoot) {
+        //     $this->stateDirRoot = null;
+        // }
 
-        return $last;
+        return $isChange ? $last : $this->stateDirRoot;
     }
 
-
-    /**
-     * @var bool
-     */
-    protected static $shouldTrace = false;
-
-    /**
-     * @param int|false|null $shouldTrace
-     */
-    public static function staticShouldTrace(?bool $shouldTrace = null) : bool
+    public function stateShouldTrace(?bool $shouldTrace = null) : ?bool
     {
-        $last = static::$shouldTrace;
+        $last = null;
 
-        if ( null !== $shouldTrace ) {
+        if ( $isChange = (null !== $shouldTrace) ) {
+            $last = $this->stateShouldTrace;
+
             if ( false === $shouldTrace ) {
-                static::$shouldTrace = false;
+                $this->stateShouldTrace = false;
 
             } else {
-                static::$shouldTrace = (bool) $shouldTrace;
+                $this->stateShouldTrace = (bool) $shouldTrace;
             }
         }
 
-        static::$shouldTrace = static::$shouldTrace ?? false;
+        if ( null === $this->stateShouldTrace ) {
+            $this->stateShouldTrace = false;
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateShouldTrace;
     }
-
-
-    /**
-     * @var array
-     */
-    protected static $varDumpOptions = [];
 
     /**
      * @param array|false|null $varDumpOptions
      */
-    public static function staticVarDumpOptions($varDumpOptions = null) : array
+    public function stateVarDumpOptions($varDumpOptions = null) : ?array
     {
-        $last = static::$varDumpOptions;
+        $last = null;
 
-        if ( null !== $varDumpOptions ) {
+        if ( $isChange = (null !== $varDumpOptions) ) {
+            $last = $this->stateVarDumpOptions;
+
             if ( false === $varDumpOptions ) {
-                static::$varDumpOptions = [];
+                $this->stateVarDumpOptions = [];
 
             } else {
-                static::$varDumpOptions = $varDumpOptions;
+                $theType = Lib::type();
+
+                $theType->array($varDumpOptions)->orThrow();
+
+                $this->stateVarDumpOptions = $varDumpOptions;
             }
         }
 
-        static::$varDumpOptions = static::$varDumpOptions ?? [];
+        if ( null === $this->stateVarDumpOptions ) {
+            $this->stateVarDumpOptions = [];
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateVarDumpOptions;
     }
 
 
@@ -211,7 +219,7 @@ class DebugModule
         if ( '{{file}}' !== $eFile ) {
             $theDebug = Lib::debug();
 
-            $dirRoot = $theDebug::staticDirRoot();
+            $dirRoot = $theDebug->stateDirRoot();
 
             if ( null !== $dirRoot ) {
                 $eFile = str_replace(
@@ -273,7 +281,7 @@ class DebugModule
             if ( '{{file}}' !== $eFrameFile ) {
                 $theDebug = Lib::debug();
 
-                $dirRoot = $theDebug::staticDirRoot();
+                $dirRoot = $theDebug->stateDirRoot();
 
                 if ( null !== $dirRoot ) {
                     $eFrameFile = str_replace(
@@ -332,7 +340,7 @@ class DebugModule
             if ( '{{file}}' !== $eFrameFile ) {
                 $theDebug = Lib::debug();
 
-                $dirRoot = $theDebug::staticDirRoot();
+                $dirRoot = $theDebug->stateDirRoot();
 
                 if ( null !== $dirRoot ) {
                     $eFrameFile = str_replace(
@@ -432,17 +440,6 @@ class DebugModule
         return $this->dumper()->dd($fileLine, ...$vars);
     }
 
-    /**
-     * @return mixed|void
-     */
-    public function ddd(?int $times, $var, ...$vars)
-    {
-        $fileLine = Lib::file_line([], 1);
-
-        return $this->dumper()->ddd($fileLine, $times, $var, ...$vars);
-    }
-
-
     public function fnD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
         return $this->dumper()->fnD($traceShift, $trace);
@@ -451,11 +448,6 @@ class DebugModule
     public function fnDD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
         return $this->dumper()->fnDD($traceShift, $trace);
-    }
-
-    public function fnDDD(?int $traceShift = null, ?array $trace = null) : \Closure
-    {
-        return $this->dumper()->fnDDD($traceShift, $trace);
     }
 
 
@@ -475,6 +467,22 @@ class DebugModule
     }
 
 
+    /**
+     * @return mixed|void
+     */
+    public function zd(?int $zTimes, $var, ...$vars)
+    {
+        $fileLine = Lib::file_line([], 1);
+
+        return $this->dumper()->zd($fileLine, $zTimes, $var, ...$vars);
+    }
+
+    public function fnZD(?int $traceShift = null, ?array $trace = null) : \Closure
+    {
+        return $this->dumper()->fnZD($traceShift, $trace);
+    }
+
+
     public function dump_type($value, array $options = [], array &$refContext = []) : string
     {
         $options = []
@@ -486,7 +494,7 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
-            + static::staticVarDumpOptions()
+            + $this->stateVarDumpOptions()
             + [
                 'array_level_max'  => 1,
                 'multiline_escape' => '###',
@@ -532,7 +540,7 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
-            + static::staticVarDumpOptions()
+            + $this->stateVarDumpOptions()
             + [
                 'array_level_max'  => 1,
                 'multiline_escape' => '###',
@@ -582,7 +590,7 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
-            + static::staticVarDumpOptions()
+            + $this->stateVarDumpOptions()
             + [
                 'array_level_max'  => 1,
                 'multiline_escape' => '###',
@@ -631,7 +639,7 @@ class DebugModule
                 'array_newline' => "\n",
             ]
             + $options
-            + static::staticVarDumpOptions()
+            + $this->stateVarDumpOptions()
             + [
                 'array_level_max'  => 0,
                 'multiline_escape' => '###',
@@ -689,7 +697,7 @@ class DebugModule
                 'array_newline' => ' ',
             ]
             + $options
-            + static::staticVarDumpOptions()
+            + $this->stateVarDumpOptions()
             + [
                 'array_level_max'  => 0,
                 'multiline_escape' => '###',
@@ -764,7 +772,7 @@ class DebugModule
                 'array_newline' => "\n",
             ]
             + $options
-            + static::staticVarDumpOptions()
+            + $this->stateVarDumpOptions()
             + [
                 'array_level_max'  => 0,
                 'multiline_escape' => '###',
@@ -930,7 +938,7 @@ class DebugModule
     {
         $options = []
             + $options
-            + static::staticVarDumpOptions()
+            + $this->stateVarDumpOptions()
             + [
                 'with_type'        => true,
                 'with_id'          => true,

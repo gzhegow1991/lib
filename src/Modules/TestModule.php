@@ -19,8 +19,6 @@ class TestModule
 
     public function newTestCase() : TestCase
     {
-        $instance = new TestCase();
-
-        return $instance;
+        return TestCase::new();
     }
 }

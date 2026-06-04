@@ -13,15 +13,16 @@ use Gzhegow\Lib\Exception\LogicException;
 use Gzhegow\Lib\Exception\ExceptInterface;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
+use Gzhegow\Lib\Modules\Php\Microtimer\Microtimer;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToListInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToBoolInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToFloatInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToArrayInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToStringInterface;
-use Gzhegow\Lib\Modules\Php\Interfaces\ToObjectInterface;
 use Gzhegow\Lib\Modules\Php\Pooling\DefaultPoolingFactory;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIntegerInterface;
 use Gzhegow\Lib\Modules\Php\Process\DefaultProcessManager;
+use Gzhegow\Lib\Modules\Php\Interfaces\ToStdclassInterface;
 use Gzhegow\Lib\Modules\Php\Interfaces\ToIterableInterface;
 use Gzhegow\Lib\Modules\Php\Pooling\PoolingFactoryInterface;
 use Gzhegow\Lib\Modules\Php\Process\ProcessManagerInterface;
@@ -32,62 +33,22 @@ use Gzhegow\Lib\Modules\Php\CallableParser\CallableParserInterface;
 class PhpModule
 {
     /**
-     * @var class-string<\LogicException|\RuntimeException>
-     */
-    protected static $throwableClass = RuntimeException::class;
-    /**
      * @var int
      */
-    protected static $poolingTickUsleep = 1000;
-
-    /**
-     * @param class-string<\LogicException|\RuntimeException>|false|null $throwableClass
-     *
-     * @return class-string<\LogicException|\RuntimeException>
-     */
-    public static function staticThrowableClass($throwableClass = null) : string
-    {
-        $last = static::$throwableClass;
-
-        if ( null !== $throwableClass ) {
-            if ( false === $throwableClass ) {
-                static::$throwableClass = RuntimeException::class;
-
-            } else {
-                if ( ! (false
-                    || is_subclass_of($throwableClass, \LogicException::class)
-                    || is_subclass_of($throwableClass, \RuntimeException::class)
-                ) ) {
-                    throw new LogicException(
-                        [
-                            ''
-                            . 'The `throwableClass` should be a class-string that is subclass one of: '
-                            . '[ ' . implode(' ][ ', [ \LogicException::class, \RuntimeException::class ]) . ' ]',
-                            //
-                            $throwableClass,
-                        ]
-                    );
-                }
-
-                static::$throwableClass = $throwableClass;
-            }
-        }
-
-        static::$throwableClass = static::$throwableClass ?? RuntimeException::class;
-
-        return $last;
-    }
+    protected $statePoolingTickUsleep;
 
     /**
      * @param int|false|null $poolingTickUsleep
      */
-    public static function staticPoolingTickUsleep($poolingTickUsleep = null) : int
+    public function statePoolingTickUsleep($poolingTickUsleep = null) : ?int
     {
-        $last = static::$poolingTickUsleep;
+        $last = null;
 
-        if ( null !== $poolingTickUsleep ) {
+        if ( $isChange = (null !== $poolingTickUsleep) ) {
+            $last = $this->statePoolingTickUsleep;
+
             if ( false === $poolingTickUsleep ) {
-                static::$poolingTickUsleep = 1000;
+                $this->statePoolingTickUsleep = null;
 
             } else {
                 if ( $poolingTickUsleep < 1 ) {
@@ -96,13 +57,15 @@ class PhpModule
                     );
                 }
 
-                static::$poolingTickUsleep = $poolingTickUsleep;
+                $this->statePoolingTickUsleep = $poolingTickUsleep;
             }
         }
 
-        static::$poolingTickUsleep = static::$poolingTickUsleep ?? 1000;
+        if ( null === $this->statePoolingTickUsleep ) {
+            $this->statePoolingTickUsleep = 1000;
+        }
 
-        return $last;
+        return $isChange ? $last : $this->statePoolingTickUsleep;
     }
 
 
@@ -131,14 +94,14 @@ class PhpModule
     }
 
 
-    /**
-     * @return ErrorBag
-     */
-    public function newErrorBag()
+    public function newErrorBag() : ErrorBag
     {
-        $instance = new ErrorBag();
+        return ErrorBag::new();
+    }
 
-        return $instance;
+    public function newMicrotimer() : Microtimer
+    {
+        return Microtimer::new();
     }
 
 
@@ -922,6 +885,165 @@ class PhpModule
 
 
     /**
+     * @template-covariant T
+     *
+     * @param object          $value
+     * @param class-string<T> $className
+     *
+     * @return Ret<T>|T
+     */
+    public function type_instance_of($fb, $value, string $className, array $refs = [])
+    {
+        if ( array_key_exists(0, $refs) ) $refFqcn =& $refs[0];
+        $refFqcn = null;
+
+        if ( ! ($value instanceof $className) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be instance of: ' . $className, $value, $className ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $refFqcn = '\\' . get_class($value);
+
+        return Ret::ok($fb, $value);
+    }
+
+    /**
+     * @template-covariant T
+     *
+     * @param object|class-string $value
+     * @param class-string<T>     $className
+     *
+     * @return Ret<T>|T
+     */
+    public function type_is_a($fb, $value, string $className, ?bool $allowString = null, $refs = [])
+    {
+        if ( array_key_exists(0, $refs) ) $refFqcn =& $refs[0];
+        $refFqcn = null;
+
+        $allowString = $allowString ?? false;
+
+        if ( ! $allowString ) {
+            if ( ! is_object($value) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` must be object', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        if ( ! (is_a($value, $className, $allowString)) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be object of: ' . $className, $value, $className ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $refFqcn = is_object($value)
+            ? '\\' . get_class($value)
+            : '\\' . ltrim($value, '\\');
+
+        return Ret::ok($fb, $value);
+    }
+
+    /**
+     * @template-covariant T
+     *
+     * @param object|class-string $value
+     * @param class-string<T>     $className
+     *
+     * @return Ret<T>|T
+     */
+    public function type_is_subclass_of($fb, $value, string $className, ?bool $allowString = null, array $refs = [])
+    {
+        if ( array_key_exists(0, $refs) ) $refFqcn =& $refs[0];
+        $refFqcn = null;
+
+        $allowString = $allowString ?? false;
+
+        if ( ! $allowString ) {
+            if ( ! is_object($value) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` must be object', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        if ( ! (is_subclass_of($value, $className, $allowString)) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be subclass of: ' . $className, $value, $className ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $refFqcn = is_object($value)
+            ? '\\' . get_class($value)
+            : '\\' . ltrim($value, '\\');
+
+        return Ret::ok($fb, $value);
+    }
+
+    /**
+     * @template-covariant T
+     *
+     * @param object|class-string $value
+     * @param class-string<T>     $className
+     *
+     * @return Ret<T>|T
+     */
+    public function type_is_class_of($fb, $value, string $className, ?bool $allowString = null, array $refs = [])
+    {
+        if ( array_key_exists(0, $refs) ) $refFqcn =& $refs[0];
+        $refFqcn = null;
+
+        $allowString = $allowString ?? false;
+
+        $theType = Lib::type();
+
+        if ( ! $allowString ) {
+            if ( ! is_object($value) ) {
+                return Ret::throw(
+                    $fb,
+                    [ 'The `value` must be object', $value ],
+                    [ __FILE__, __LINE__ ]
+                );
+            }
+        }
+
+        $ret = $theType->struct_fqcn($value);
+
+        if ( ! $ret->isOk([ &$valueFqcn ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $classNameFqcn = $theType->struct_fqcn($className)->orThrow();
+
+        if ( $valueFqcn !== $classNameFqcn ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be class of: ' . $className, $value, $className ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $refFqcn = $valueFqcn;
+
+        return Ret::ok($fb, $value);
+    }
+
+
+    /**
      * @return Ret<array|\Countable>|array|\Countable
      */
     public function type_countable($fb, $value)
@@ -991,7 +1113,7 @@ class PhpModule
 
 
     /**
-     * @return Ret<array|\Countable>|array|\Countable
+     * @return Ret<array|\Countable|string>|array|\Countable|string
      */
     public function type_sizeable($fb, $value)
     {
@@ -1548,29 +1670,6 @@ class PhpModule
 
 
     /**
-     * @return Ret<resource|\CurlHandle>|resource|\CurlHandle
-     */
-    public function type_curl($fb, $value)
-    {
-        if ( is_a($value, '\CurlHandle') ) {
-            return Ret::ok($fb, $value);
-        }
-
-        $ret = $this->type_resource_opened(null, $value, 'curl');
-
-        if ( $ret->isOk() ) {
-            return Ret::ok($fb, $value);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be curl resource, opened' ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-
-    /**
      * @template-covariant T of \UnitEnum
      *
      * @param T|int|string         $value
@@ -1909,17 +2008,15 @@ class PhpModule
         return $current = $current ?? ('WIN' === strtoupper(substr(PHP_OS, 0, 3)));
     }
 
-    public function type_is_os_windows($fb)
+    public function assert_os_windows()
     {
         if ( ! $this->is_os_windows() ) {
-            return Ret::throw(
-                $fb,
+            throw new RuntimeException(
                 [ 'This function is working only on Windows' ],
-                [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fb, true);
+        return true;
     }
 
 
@@ -1930,25 +2027,28 @@ class PhpModule
         return $current = $current ?? in_array(\PHP_SAPI, [ 'cli', 'phpdbg' ]);
     }
 
-    public function type_is_sapi_terminal($fb)
+    public function assert_sapi_terminal()
     {
         if ( ! $this->is_sapi_terminal() ) {
-            return Ret::throw(
-                $fb,
+            throw new RuntimeException(
                 [ 'This function is working only in Terminal' ],
-                [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fb, true);
+        return true;
     }
 
 
     /**
-     * @return Ret<string>|string
+     * @return Ret<array>|array
      */
-    public function type_locale($fb, $value)
+    public function type_locale($fb, $value, array $refs = [])
     {
+        if ( array_key_exists(0, $refs) ) $refLocalePosix =& $refs[0];
+        if ( array_key_exists(1, $refs) ) $refLocaleIetf =& $refs[1];
+        $refLocalePosix = null;
+        $refLocaleIetf = null;
+
         $theType = Lib::type();
 
         $ret = $theType->string_not_empty($value);
@@ -1961,9 +2061,13 @@ class PhpModule
             );
         }
 
+        $localeIETF = null;
+        $localePOSIX = null;
         $localeParsed = null;
         try {
-            $localeParsed = \Locale::parseLocale($valueString);
+            $localeIETF = $valueString;
+            $localePOSIX = \Locale::canonicalize($localeIETF);
+            $localeParsed = \Locale::parseLocale($localePOSIX);
         }
         catch ( \Throwable $e ) {
         }
@@ -1971,12 +2075,323 @@ class PhpModule
         if ( empty($localeParsed) ) {
             return Ret::throw(
                 $fb,
-                [ 'The `value` should be valid intl locale', $value ],
+                [ 'The `value` should be intl locale', $value ],
                 [ __FILE__, __LINE__ ]
             );
         }
 
-        return Ret::ok($fb, $valueString);
+        if ( $localeIETF === $localePOSIX ) {
+            $refLocalePosix = $localePOSIX;
+
+        } else {
+            $refLocaleIetf = $localeIETF;
+        }
+
+        return Ret::ok($fb, $localeParsed);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_locale_ietf($fb, $value, array $refs = [])
+    {
+        if ( array_key_exists(0, $refs) ) $refLocaleParsed =& $refs[0];
+        $refLocaleParsed = null;
+
+        $theType = Lib::type();
+
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $localeIETF = null;
+        $localeParsed = null;
+        try {
+            $localeIETF = $valueString;
+            $localeParsed = \Locale::parseLocale($localeIETF);
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ( ! empty($localeParsed) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be intl locale, IETF', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $localeIETF = null;
+        $localePOSIX = null;
+        $localeParsed = null;
+        try {
+            $localeIETF = $valueString;
+            $localePOSIX = \Locale::canonicalize($localeIETF);
+            $localeParsed = \Locale::parseLocale($localePOSIX);
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ( empty($localeParsed) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be intl locale, IETF', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $refLocaleParsed = $localeParsed;
+
+        return Ret::ok($fb, $localeIETF);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_locale_posix($fb, $value, array $refs = [])
+    {
+        if ( array_key_exists(0, $refs) ) $refLocaleParsed =& $refs[0];
+        $refLocaleParsed = null;
+
+        $theType = Lib::type();
+
+        $ret = $theType->string_not_empty($value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $localePOSIX = null;
+        $localeParsed = null;
+        try {
+            $localePOSIX = $valueString;
+            $localeParsed = \Locale::parseLocale($localePOSIX);
+        }
+        catch ( \Throwable $e ) {
+        }
+
+        if ( empty($localeParsed) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be intl locale, POSIX', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $refLocaleParsed = $localeParsed;
+
+        return Ret::ok($fb, $localePOSIX);
+    }
+
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_count_gt($fb, $value, $gt)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_countable(null, $value);
+
+        if ( ! $ret->isOk([ &$valueCountable ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $gtInt = $theType->int($gt)->orThrow();
+
+        $valueLength = count($valueCountable);
+
+        if ( ! ($valueLength > $gtInt) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be countable, count GT ' . $gtInt, $value, $gt ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueCountable);
+    }
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_count_gte($fb, $value, $gte)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_countable(null, $value);
+
+        if ( ! $ret->isOk([ &$valueCountable ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $gteInt = $theType->int($gte)->orThrow();
+
+        $valueLength = count($valueCountable);
+
+        if ( ! ($valueLength >= $gteInt) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be countable, count GTE ' . $gteInt, $value, $gte ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueCountable);
+    }
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_count_lt($fb, $value, $lt)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_countable(null, $value);
+
+        if ( ! $ret->isOk([ &$valueCountable ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $ltInt = $theType->int($lt)->orThrow();
+
+        $valueLength = count($valueCountable);
+
+        if ( ! ($valueLength < $ltInt) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be countable, count LT ' . $ltInt, $value, $lt ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueCountable);
+    }
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_count_lte($fb, $value, $lte)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_countable(null, $value);
+
+        if ( ! $ret->isOk([ &$valueCountable ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $lteInt = $theType->int($lte)->orThrow();
+
+        $valueLength = count($valueCountable);
+
+        if ( ! ($valueLength <= $lteInt) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be countable, count LTE ' . $lteInt, $value, $lte ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueCountable);
+    }
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_count_between($fb, $value, $from, $to)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_countable(null, $value);
+
+        if ( ! $ret->isOk([ &$valueCountable ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $fromInt = $theType->int($from)->orThrow();
+        $toInt = $theType->int($to)->orThrow();
+
+        $valueLength = count($valueCountable);
+
+        if ( ! (true
+            && ($fromInt <= $valueLength)
+            && ($valueLength <= $toInt)
+        ) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be countable, count BTW (' . $fromInt . ', ' . $toInt . ')', $value, $from, $to ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueCountable);
+    }
+
+    /**
+     * @return Ret<mixed>|mixed
+     */
+    public function type_count_inside($fb, $value, $from, $to)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_countable(null, $value);
+
+        if ( ! $ret->isOk([ &$valueCountable ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $fromInt = $theType->int($from)->orThrow();
+        $toInt = $theType->int($to)->orThrow();
+
+        $valueLength = count($valueCountable);
+
+        if ( ! (true
+            && ($fromInt < $valueLength)
+            && ($valueLength < $toInt)
+        ) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be countable, count INS (' . $fromInt . ', ' . $toInt . ')', $value, $from, $to ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueCountable);
     }
 
 
@@ -2071,10 +2486,7 @@ class PhpModule
         if ( is_float($value) ) {
             if ( ! is_finite($value) ) {
                 throw new LogicException(
-                    [
-                        'Unable to parse value while converting to float',
-                        $value,
-                    ]
+                    [ 'The `value` should be valid float, finite', $value ]
                 );
             }
 
@@ -2116,6 +2528,10 @@ class PhpModule
 
     public function to_array($value, array $options = []) : array
     {
+        if ( null === $value ) {
+            return [];
+        }
+
         if ( is_array($value) ) {
             return $value;
         }
@@ -2125,8 +2541,8 @@ class PhpModule
                 return $value->toArray($options);
             }
 
-            if ( $value instanceof ToObjectInterface ) {
-                return (array) $value->toObject($options);
+            if ( $value instanceof ToStdclassInterface ) {
+                return (array) $value->toStdclass($options);
             }
 
             $isStdClass = (get_class($value) === \stdClass::class);
@@ -2163,11 +2579,15 @@ class PhpModule
         return $valueArray;
     }
 
-    public function to_object($value, array $options = []) : \stdClass
+    public function to_stdclass($value, array $options = []) : \stdClass
     {
+        if ( null === $value ) {
+            return new \stdClass();
+        }
+
         if ( is_object($value) ) {
-            if ( $value instanceof ToObjectInterface ) {
-                return $value->toObject($options);
+            if ( $value instanceof ToStdclassInterface ) {
+                return $value->toStdclass($options);
             }
 
             if ( $value instanceof ToArrayInterface ) {
@@ -2199,7 +2619,7 @@ class PhpModule
         ) {
             throw new LogicException(
                 [
-                    'Unable to parse value while converting to string',
+                    'Unable to parse value while converting to stdclass',
                     $value,
                 ]
             );
@@ -2231,6 +2651,25 @@ class PhpModule
         }
 
         return [ $value ];
+    }
+
+
+    public function to_index($value, $options = []) : array
+    {
+        $valueArray = $this->to_array($value, $options);
+
+        $result = [];
+
+        foreach ( $valueArray as $key => $val ) {
+            if ( is_bool($val) ) {
+                $result[$key] = $val;
+
+            } else {
+                $result[$val] = true;
+            }
+        }
+
+        return $result;
     }
 
 
@@ -2269,6 +2708,9 @@ class PhpModule
                 foreach ( $valueList as $v ) {
                     yield $v;
                 }
+
+            } else {
+                yield $value;
             }
 
         } else {
@@ -2276,25 +2718,6 @@ class PhpModule
         }
 
         return true;
-    }
-
-
-    public function to_index($value, $options = []) : array
-    {
-        $valueArray = $this->to_array($value, $options);
-
-        $result = [];
-
-        foreach ( $valueArray as $key => $val ) {
-            if ( is_bool($val) ) {
-                $result[$key] = $val;
-
-            } else {
-                $result[$val] = true;
-            }
-        }
-
-        return $result;
     }
 
 
@@ -2307,6 +2730,30 @@ class PhpModule
 
         if ( $ret->isOk([ &$valueCountable ]) ) {
             return count($valueCountable);
+        }
+
+        return NAN;
+    }
+
+    /**
+     * @return int|float
+     */
+    public function length($value) // : int|NAN
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_countable(null, $value);
+
+        if ( $ret->isOk([ &$valueCountable ]) ) {
+            return count($valueCountable);
+        }
+
+        $ret = $theType->string($value);
+
+        if ( $ret->isOk([ &$valueString ]) ) {
+            $theStr = Lib::str();
+
+            return $theStr->strlen($valueString);
         }
 
         return NAN;
@@ -2329,29 +2776,6 @@ class PhpModule
 
         if ( $ret->isOk([ &$valueString ]) ) {
             return strlen($valueString);
-        }
-
-        return NAN;
-    }
-
-    /**
-     * @return int|float
-     */
-    public function length($value) // : int|NAN
-    {
-        $theStr = Lib::str();
-        $theType = Lib::type();
-
-        $ret = $this->type_countable(null, $value);
-
-        if ( $ret->isOk([ &$valueCountable ]) ) {
-            return count($valueCountable);
-        }
-
-        $ret = $theType->string($value);
-
-        if ( $ret->isOk([ &$valueString ]) ) {
-            return $theStr->strlen($valueString);
         }
 
         return NAN;
@@ -3201,9 +3625,12 @@ class PhpModule
         $currentStringNotEmpty = $theType->string_not_empty($current)->orThrow();
         $dotChar = $theType->char($dot ?? '.')->orThrow();
 
-        $isDot = ($dotChar === $path[0]);
+        $isStartsWithDot = (true
+            && ($dotChar === $path[0])
+            && ($dotChar !== $path[1])
+        );
 
-        if ( $isDot ) {
+        if ( $isStartsWithDot ) {
             $pathResolved = $this->path_absolute(
                 $pathStringNotEmpty,
                 $currentStringNotEmpty,
@@ -3212,59 +3639,13 @@ class PhpModule
             );
 
         } else {
-            $pathResolved = $this->path_normalize($pathStringNotEmpty, $separator);
+            $pathResolved = $this->path_normalize(
+                $pathStringNotEmpty,
+                $separator
+            );
         }
 
         return $pathResolved;
-    }
-
-
-    /**
-     * @param mixed $data
-     */
-    public function serialize($data) : ?string
-    {
-        $theFunc = Lib::func();
-
-        try {
-            $result = $theFunc->safe_call(
-                'serialize',
-                [ $data ]
-            );
-        }
-        catch ( \Throwable $e ) {
-            $result = null;
-        }
-
-        if ( ! is_string($result) ) {
-            $result = null;
-        }
-
-        return $result;
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function unserialize(string $data)
-    {
-        $theFunc = Lib::func();
-
-        try {
-            $result = $theFunc->safe_call(
-                'unserialize',
-                [ $data ]
-            );
-        }
-        catch ( \Throwable $e ) {
-            $result = null;
-        }
-
-        if ( is_object($result) && (get_class($result) === '__PHP_Incomplete_Class') ) {
-            $result = null;
-        }
-
-        return $result;
     }
 
 
@@ -3281,7 +3662,7 @@ class PhpModule
     {
         $hasFnCatch = (null !== $fnCatch);
 
-        $tickUsleep = $tickUsleep ?? static::staticPoolingTickUsleep();
+        $tickUsleep = $tickUsleep ?? $this->statePoolingTickUsleep();
 
         if ( $tickUsleep <= 0 ) {
             throw new LogicException(

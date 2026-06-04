@@ -110,9 +110,11 @@ class Ret
             $hasArgs = ([] !== $errArgs);
 
             if ( $hasArgs ) {
+                $theDebug = Lib::debug();
+
                 $eTrace = null;
                 $eFileLine = $fileLine;
-                if ( DebugModule::staticShouldTrace() ) {
+                if ( $theDebug->stateShouldTrace() ) {
                     $refs = [];
                     $eTrace = Lib::trace($refs, 1);
                     $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
@@ -125,13 +127,15 @@ class Ret
                 $hasErrors = ([] !== $theRet->errors);
 
                 if ( $hasErrors ) {
+                    $theDebug = Lib::debug();
+
                     $idx = array_key_last($theRet->errors);
 
                     $errorLast = end($theRet->errors[$idx]);
 
                     $eTrace = null;
                     $eFileLine = $fileLine;
-                    if ( DebugModule::staticShouldTrace() ) {
+                    if ( $theDebug->stateShouldTrace() ) {
                         $refs = [];
                         $eTrace = Lib::trace($refs, 1);
                         $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
@@ -143,9 +147,11 @@ class Ret
             }
 
         } else {
+            $theDebug = Lib::debug();
+
             $eTrace = null;
             $eFileLine = $fileLine;
-            if ( DebugModule::staticShouldTrace() ) {
+            if ( $theDebug->stateShouldTrace() ) {
                 $refs = [];
                 $eTrace = Lib::trace($refs, 1);
                 $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
@@ -282,9 +288,11 @@ class Ret
      */
     public function addError($errArg, ?array $fileLine = null, ...$errArgs)
     {
+        $theDebug = Lib::debug();
+
         $eTrace = null;
         $eFileLine = $fileLine;
-        if ( DebugModule::staticShouldTrace() ) {
+        if ( $theDebug->stateShouldTrace() ) {
             $refs = [];
             $eTrace = Lib::trace($refs, 1);
             $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
@@ -460,9 +468,11 @@ class Ret
         }
 
         if ( null !== $err ) {
+            $theDebug = Lib::debug();
+
             $eTrace = null;
             $eFileLine = $fileLine;
-            if ( DebugModule::staticShouldTrace() ) {
+            if ( $theDebug->stateShouldTrace() ) {
                 $refs = [];
                 $eTrace = Lib::trace($refs, 1);
                 $eFileLine = $fileLine ?? Lib::file_line($refs, 1);
@@ -491,9 +501,11 @@ class Ret
         }
 
         if ( null !== $err ) {
+            $theDebug = Lib::debug();
+
             $eTrace = null;
             $eFileLine = $fileLine;
-            if ( DebugModule::staticShouldTrace() ) {
+            if ( $theDebug->stateShouldTrace() ) {
                 $refs = [];
                 $eTrace = Lib::trace($refs, 1);
                 $eFileLine = $fileLine ?? Lib::file_line($refs, 1);

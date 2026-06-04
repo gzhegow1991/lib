@@ -86,7 +86,7 @@ class FormatXml
         libxml_use_internal_errors(false);
 
         if ( [] !== $errorsArray ) {
-            $ret = Ret::new();
+            $ret = Lib::newRet();
 
             $lines = preg_split('/\R/', $xml);
 
@@ -170,7 +170,7 @@ class FormatXml
         libxml_use_internal_errors(false);
 
         if ( [] !== $errorsArray ) {
-            $ret = Ret::new();
+            $ret = Lib::newRet();
 
             $lines = preg_split('/\R/', $xml);
 

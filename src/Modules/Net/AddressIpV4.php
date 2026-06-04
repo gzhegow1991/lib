@@ -2,6 +2,7 @@
 
 namespace Gzhegow\Lib\Modules\Net;
 
+use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\Type\Ret;
 
 
@@ -29,7 +30,7 @@ class AddressIpV4
      */
     public static function fromValid($from, $fb = null)
     {
-        $ret = Ret::new();
+        $ret = Lib::newRet();
 
         $instance = null
             ?? static::fromStatic($from)->orNull($ret)

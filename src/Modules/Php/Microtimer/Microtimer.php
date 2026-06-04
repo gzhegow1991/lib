@@ -15,6 +15,12 @@ class Microtimer
     public $report = [];
 
 
+    public static function new()
+    {
+        return new static();
+    }
+
+
     public function __invoke($stringTag = null, $isDiff = null)
     {
         if ( null === $stringTag ) {

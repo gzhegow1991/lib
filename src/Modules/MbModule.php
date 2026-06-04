@@ -27,9 +27,9 @@ use Gzhegow\Lib\Exception\RuntimeException;
  */
 class MbModule
 {
-    public function __construct()
-    {
-    }
+    // public function __construct()
+    // {
+    // }
 
     public function __initialize()
     {

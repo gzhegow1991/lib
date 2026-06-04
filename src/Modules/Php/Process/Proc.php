@@ -212,14 +212,18 @@ class Proc
      */
     public function setCmd($cmd)
     {
+        $cmd = $cmd ?? null;
+
+        $cmd = ((array) $cmd) ?: [];
+
         $theType = Lib::type();
 
         $cmdList = [];
 
-        foreach ( (array) $cmd as $c ) {
-            $cString = $theType->trim($c)->orThrow();
+        foreach ( $cmd as $c ) {
+            $cTrim = $theType->trim($c)->orThrow();
 
-            $cmdList[] = $cString;
+            $cmdList[] = $cTrim;
         }
 
         $this->cmd = $cmdList;

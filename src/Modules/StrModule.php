@@ -24,18 +24,20 @@ class StrModule
     /**
      * @var bool
      */
-    protected static $mbstring;
+    protected $stateMbstring;
 
     /**
-     * @param int|false|null $mbstring
+     * @param bool|false|null $mbstring
      */
-    public static function staticMbstring($mbstring = null) : bool
+    public function stateMbstring($mbstring = null) : ?bool
     {
-        $last = static::$mbstring;
+        $last = null;
 
-        if ( null !== $mbstring ) {
+        if ( $isChange = (null !== $mbstring) ) {
+            $last = $this->stateMbstring;
+
             if ( false === $mbstring ) {
-                static::$mbstring = extension_loaded('mbstring');
+                $this->stateMbstring = null;
 
             } else {
                 $mbstringBool = (bool) $mbstring;
@@ -48,13 +50,15 @@ class StrModule
                     }
                 }
 
-                static::$mbstring = $mbstringBool;
+                $this->stateMbstring = $mbstringBool;
             }
         }
 
-        static::$mbstring = static::$mbstring ?? extension_loaded('mbstring');
+        if ( null === $this->stateMbstring ) {
+            $this->stateMbstring = extension_loaded('mbstring');
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateMbstring;
     }
 
 
@@ -79,9 +83,7 @@ class StrModule
 
     public function __construct()
     {
-        static::$mbstring = static::$mbstring ?? extension_loaded('mbstring');
-
-        if ( static::$mbstring ) {
+        if ( $this->stateMbstring() ) {
             $theMb = Lib::mb();
 
             $this->mbstringFuncMap['lcfirst'] = [ $theMb, 'lcfirst' ];
@@ -190,7 +192,7 @@ class StrModule
      */
     public function mb_func(string $fn)
     {
-        if ( ! static::staticMbstring() ) {
+        if ( ! $this->stateMbstring() ) {
             return $fn;
         }
 
@@ -246,34 +248,6 @@ class StrModule
         return Ret::throw(
             $fb,
             [ 'The `value` should be string, non empty', $value ],
-            [ __FILE__, __LINE__ ]
-        );
-    }
-
-    /**
-     * @return Ret<string>|string
-     */
-    public function type_php_trim($fb, $value, ?string $characters = null)
-    {
-        $characters = $characters ?? " \n\r\t\v\0";
-
-        if ( ! is_string($value) ) {
-            return Ret::throw(
-                $fb,
-                [ 'The `value` should be string', $value ],
-                [ __FILE__, __LINE__ ]
-            );
-        }
-
-        $valueTrim = trim($value, $characters);
-
-        if ( '' !== $valueTrim ) {
-            return Ret::ok($fb, $valueTrim);
-        }
-
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be trim', $value ],
             [ __FILE__, __LINE__ ]
         );
     }
@@ -388,16 +362,17 @@ class StrModule
         return Ret::ok($fb, $valueString);
     }
 
+
     /**
      * @return Ret<string>|string
      */
-    public function type_trim($fb, $value, ?string $characters = null)
+    public function type_strlen_gt($fb, $value, $gt)
     {
-        $characters = $characters ?? " \n\r\t\v\0";
+        $theType = Lib::type();
 
         $ret = $this->type_string(null, $value);
 
-        if ( ! $ret->isOk([ &$valueString, &$ret ]) ) {
+        if ( ! $ret->isOk([ &$valueString ]) ) {
             return Ret::throw(
                 $fb,
                 $ret,
@@ -405,17 +380,570 @@ class StrModule
             );
         }
 
-        $valueString = trim($valueString, $characters);
+        $gtInt = $theType->int($gt)->orThrow();
 
-        if ( '' !== $valueString ) {
-            return Ret::ok($fb, $valueString);
+        $valueLength = $this->strlen($valueString);
+
+        if ( ! ($valueLength > $gtInt) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, strlen GT ' . $gtInt, $value, $gt ],
+                [ __FILE__, __LINE__ ]
+            );
         }
 
-        return Ret::throw(
-            $fb,
-            [ 'The `value` should be trim', $value ],
-            [ __FILE__, __LINE__ ]
-        );
+        return Ret::ok($fb, $valueString);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_strlen_gte($fb, $value, $gte)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $gteInt = $theType->int($gte)->orThrow();
+
+        $valueLength = $this->strlen($valueString);
+
+        if ( ! ($valueLength >= $gteInt) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, strlen GTE ' . $gteInt, $value, $gte ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_strlen_lt($fb, $value, $lt)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $ltInt = $theType->int($lt)->orThrow();
+
+        $valueLength = $this->strlen($valueString);
+
+        if ( ! ($valueLength < $ltInt) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, strlen LT ' . $ltInt, $value, $lt ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_strlen_lte($fb, $value, $lte)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $lteInt = $theType->int($lte)->orThrow();
+
+        $valueLength = $this->strlen($valueString);
+
+        if ( ! ($valueLength <= $lteInt) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, strlen LTE ' . $lteInt, $value, $lte ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_strlen_between($fb, $value, $from, $to)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $fromInt = $theType->int($from)->orThrow();
+        $toInt = $theType->int($to)->orThrow();
+
+        $valueLength = $this->strlen($valueString);
+
+        if ( ! (true
+            && ($fromInt <= $valueLength)
+            && ($valueLength <= $toInt)
+        ) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, strlen BTW (' . $fromInt . ', ' . $toInt . ')', $value, $from, $to ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_strlen_inside($fb, $value, $from, $to)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $fromInt = $theType->int($from)->orThrow();
+        $toInt = $theType->int($to)->orThrow();
+
+        $valueLength = $this->strlen($valueString);
+
+        if ( ! (true
+            && ($fromInt < $valueLength)
+            && ($valueLength < $toInt)
+        ) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, strlen INS (' . $fromInt . ', ' . $toInt . ')', $value, $from, $to ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_strsize_gt($fb, $value, $gt)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $gtInt = $theType->int($gt)->orThrow();
+
+        $valueLength = $this->strsize($valueString);
+
+        if ( ! ($valueLength > $gtInt) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, strsize GT ' . $gtInt, $value, $gt ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_strsize_gte($fb, $value, $gte)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $gteInt = $theType->int($gte)->orThrow();
+
+        $valueLength = $this->strsize($valueString);
+
+        if ( ! ($valueLength >= $gteInt) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, strsize GTE ' . $gteInt, $value, $gte ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_strsize_lt($fb, $value, $lt)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $ltInt = $theType->int($lt)->orThrow();
+
+        $valueLength = $this->strsize($valueString);
+
+        if ( ! ($valueLength < $ltInt) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, strsize LT ' . $ltInt, $value, $lt ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_strsize_lte($fb, $value, $lte)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $lteInt = $theType->int($lte)->orThrow();
+
+        $valueLength = $this->strsize($valueString);
+
+        if ( ! ($valueLength <= $lteInt) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, strsize LTE ' . $lteInt, $value, $lte ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_strsize_between($fb, $value, $from, $to)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $fromInt = $theType->int($from)->orThrow();
+        $toInt = $theType->int($to)->orThrow();
+
+        $valueLength = $this->strsize($valueString);
+
+        if ( ! (true
+            && ($fromInt <= $valueLength)
+            && ($valueLength <= $toInt)
+        ) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, strsize BTW (' . $fromInt . ', ' . $toInt . ')', $value, $from, $to ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+    /**
+     * @return Ret<string>|string
+     */
+    public function type_strsize_inside($fb, $value, $from, $to)
+    {
+        $theType = Lib::type();
+
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $fromInt = $theType->int($from)->orThrow();
+        $toInt = $theType->int($to)->orThrow();
+
+        $valueLength = $this->strsize($valueString);
+
+        if ( ! (true
+            && ($fromInt < $valueLength)
+            && ($valueLength < $toInt)
+        ) ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be string, strsize INS (' . $fromInt . ', ' . $toInt . ')', $value, $from, $to ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueString);
+    }
+
+
+    /**
+     * > применяет ltrim к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+     *
+     * @return Ret<string>|string
+     */
+    public function type_ltrim($fb, $value, ?string $characters = null)
+    {
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $valueTrim = $this->ltrim($valueString, $characters);
+
+        if ( '' === $valueTrim ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be ltrim', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueTrim);
+    }
+
+    /**
+     * > применяет rtrim к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+     *
+     * @return Ret<string>|string
+     */
+    public function type_rtrim($fb, $value, ?string $characters = null)
+    {
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $valueTrim = $this->rtrim($valueString, $characters);
+
+        if ( '' === $valueTrim ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be rtrim', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueTrim);
+    }
+
+    /**
+     * > применяет trim к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+     *
+     * @return Ret<string>|string
+     */
+    public function type_trim($fb, $value, ?string $characters = null)
+    {
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $valueTrim = $this->trim($valueString, $characters);
+
+        if ( '' === $valueTrim ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be trim', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueTrim);
+    }
+
+
+    /**
+     * > применяет lcrop к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+     *
+     * @return Ret<string>|string
+     */
+    public function type_lcrop($fb, $value, $needleList = null)
+    {
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $valueCrop = $this->lcrop($valueString, $needleList);
+
+        if ( '' === $valueCrop ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be lcrop', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueCrop);
+    }
+
+    /**
+     * > применяет rcrop к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+     *
+     * @return Ret<string>|string
+     */
+    public function type_rcrop($fb, $value, $needleList = null)
+    {
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $valueCrop = $this->rcrop($valueString, $needleList);
+
+        if ( '' === $valueCrop ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be rcrop', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueCrop);
+    }
+
+    /**
+     * > применяет crop к переменной (приводит к строке), после чего проверяет не стала ли переменная пустой строкой
+     *
+     * @return Ret<string>|string
+     */
+    public function type_crop($fb, $value, $needleList = null)
+    {
+        $ret = $this->type_string(null, $value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return Ret::throw(
+                $fb,
+                $ret,
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        $valueCrop = $this->crop($valueString, $needleList);
+
+        if ( '' === $valueCrop ) {
+            return Ret::throw(
+                $fb,
+                [ 'The `value` should be crop', $value ],
+                [ __FILE__, __LINE__ ]
+            );
+        }
+
+        return Ret::ok($fb, $valueCrop);
     }
 
 
@@ -501,6 +1029,7 @@ class StrModule
             [ __FILE__, __LINE__ ]
         );
     }
+
 
     /**
      * @return Ret<Alphabet>|Alphabet
@@ -1364,20 +1893,28 @@ class StrModule
      */
     public function strlen($value, ?string $mb_encoding = null) // : int|NAN
     {
-        if ( ! is_string($value) ) {
-            return NAN;
-        }
-
         if ( '' === $value ) {
             return 0;
         }
 
-        $len = static::staticMbstring()
-            ? ((null !== $mb_encoding)
-                ? mb_strlen($value, $mb_encoding)
-                : mb_strlen($value)
-            )
-            : count(preg_split('//u', $value, -1, PREG_SPLIT_NO_EMPTY));
+        $theType = Lib::type();
+
+        $ret = $theType->string($value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return NAN;
+        }
+
+        if ( $this->stateMbstring() ) {
+            $len = ((null !== $mb_encoding)
+                ? mb_strlen($valueString, $mb_encoding)
+                : mb_strlen($valueString)
+            );
+
+        } else {
+            $len = preg_split('//u', $valueString, -1, PREG_SPLIT_NO_EMPTY);
+            $len = count($len);
+        }
 
         return $len;
     }
@@ -1389,17 +1926,449 @@ class StrModule
      */
     public function strsize($value) // : int|NAN
     {
-        if ( ! is_string($value) ) {
-            return NAN;
-        }
-
         if ( '' === $value ) {
             return 0;
         }
 
-        $size = strlen($value);
+        $theType = Lib::type();
+
+        $ret = $theType->string($value);
+
+        if ( ! $ret->isOk([ &$valueString ]) ) {
+            return NAN;
+        }
+
+        $size = strlen($valueString);
 
         return $size;
+    }
+
+
+    public function ltrim(string $string, ?string $characters = null) : string
+    {
+        $characters = $characters ?? " \n\r\t\v\0\u{00A0}";
+
+        $stringValid = $this->type_string([], $string);
+
+        return ltrim($stringValid, $characters);
+    }
+
+    public function rtrim(string $string, ?string $characters = null) : string
+    {
+        $characters = $characters ?? " \n\r\t\v\0";
+
+        $stringValid = $this->type_string([], $string);
+
+        return rtrim($stringValid, $characters);
+    }
+
+    public function trim(string $string, ?string $characters = null) : string
+    {
+        $characters = $characters ?? " \n\r\t\v\0";
+
+        return trim($string, $characters);
+    }
+
+    public function mtrim(string $string, ?string $characters = null) : string
+    {
+        $characters = $characters ?? " \n\r\t\v\0";
+
+        $stringValid = $this->type_string([], $string);
+
+        $charactersSplit = str_split($characters);
+
+        $result = str_replace(
+            $charactersSplit,
+            ' ',
+            $stringValid
+        );
+
+        $result = preg_replace('/\s+/u', ' ', $result);
+
+        return $result;
+    }
+
+
+    /**
+     * > обычный трим завернутый в генератор
+     *
+     * @return \Generator<string>
+     */
+    public function ltrim_it($strings, ?string $characters = null) : \Generator
+    {
+        $thePhp = Lib::php();
+
+        foreach ( $thePhp->to_iterable($strings) as $string ) {
+            if ( ! is_string($string) ) {
+                throw new LogicException(
+                    [ 'Each of `strings` should be a string', $string ]
+                );
+            }
+
+            yield $this->ltrim($string, $characters);
+        }
+    }
+
+    /**
+     * > обычный трим завернутый в генератор
+     *
+     * @return \Generator<string>
+     */
+    public function rtrim_it($strings, ?string $characters = null) : \Generator
+    {
+        $thePhp = Lib::php();
+
+        foreach ( $thePhp->to_iterable($strings) as $string ) {
+            if ( ! is_string($string) ) {
+                throw new LogicException(
+                    [ 'Each of `strings` should be a string', $string ]
+                );
+            }
+
+            yield $this->rtrim($string, $characters);
+        }
+    }
+
+    /**
+     * > обычный трим завернутый в генератор
+     *
+     * @return \Generator<string>
+     */
+    public function trim_it($strings, ?string $characters = null) : \Generator
+    {
+        $thePhp = Lib::php();
+
+        foreach ( $thePhp->to_iterable($strings) as $string ) {
+            if ( ! is_string($string) ) {
+                throw new LogicException(
+                    [ 'Each of `strings` should be a string', $string ]
+                );
+            }
+
+            yield $this->trim($string, $characters);
+        }
+    }
+
+    /**
+     * > обычный трим завернутый в генератор
+     *
+     * @return \Generator<string>
+     */
+    public function mtrim_it($strings, ?string $characters = null) : \Generator
+    {
+        $thePhp = Lib::php();
+
+        foreach ( $thePhp->to_iterable($strings) as $string ) {
+            if ( ! is_string($string) ) {
+                throw new LogicException(
+                    [ 'Each of `strings` should be a string', $string ]
+                );
+            }
+
+            yield $this->mtrim($string, $characters);
+        }
+    }
+
+
+    /**
+     * > обрезает у строки подстроку с начала (ltrim, только для строк, а не букв)
+     */
+    public function lcrop(string $string, $needleList = []) : string
+    {
+        $needleList = $needleList ?? [ " ", "\n", "\r", "\t", "\v", "\0", "\u{00A0}" ];
+
+        $needleList = (array) ($needleList) ?: [];
+
+        $needleList = array_filter($needleList, 'strlen');
+        $needleList = array_values($needleList);
+
+        if ( [] === $needleList ) {
+            return $string;
+        }
+
+        $fnStrlen = $this->mb_func('strlen');
+        $fnSubstr = $this->mb_func('substr');
+        $fnStrpos = $this->mb_func('strpos');
+
+        $needleIndex = [];
+        foreach ( $needleList as $needle ) {
+            $needleIndex[$needle] = $fnStrlen($needle);
+        }
+
+        uksort($needleList,
+            function ($a, $b) use ($fnStrlen) {
+                return 0
+                    ?: ($fnStrlen($b) <=> $fnStrlen($a))
+                        ?: (strlen($b) <=> strlen($a));
+            }
+        );
+
+        $result = $string;
+
+        $found = true;
+        while ( $found
+            && ($result !== '')
+        ) {
+            $found = false;
+
+            foreach ( $needleIndex as $needle => $needleLen ) {
+                if ( 0 === $fnStrpos($result, $needle) ) {
+                    $result = $fnSubstr($result, $needleLen);
+
+                    $found = true;
+
+                    break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * > обрезает у строки подстроку с конца (rtrim, только для строк, а не букв)
+     */
+    public function rcrop(string $string, $needleList = null) : string
+    {
+        $needleList = $needleList ?? [ " ", "\n", "\r", "\t", "\v", "\0", "\u{00A0}" ];
+
+        $needleList = (array) ($needleList) ?: [];
+
+        $needleList = array_filter($needleList, 'strlen');
+        $needleList = array_values($needleList);
+
+        if ( [] === $needleList ) {
+            return $string;
+        }
+
+        $fnStrlen = $this->mb_func('strlen');
+        $fnSubstr = $this->mb_func('substr');
+        $fnStrpos = $this->mb_func('strpos');
+
+        $needleIndex = [];
+        foreach ( $needleList as $needle ) {
+            $needleIndex[$needle] = $fnStrlen($needle);
+        }
+
+        uksort($needleList,
+            function ($a, $b) use ($fnStrlen) {
+                return 0
+                    ?: ($fnStrlen($b) <=> $fnStrlen($a))
+                        ?: (strlen($b) <=> strlen($a));
+            }
+        );
+
+        $result = $string;
+
+        $currentLen = $fnStrlen($result);
+
+        $found = true;
+        while ( $found
+            && ($result !== '')
+        ) {
+            $found = false;
+
+            foreach ( $needleIndex as $needle => $needleLen ) {
+                $offset = $currentLen - $needleLen;
+
+                if ( ($offset >= 0)
+                    && ($offset === $fnStrpos($result, $needle, $offset))
+                ) {
+                    $result = $fnSubstr($result, 0, $offset);
+
+                    $currentLen = $offset;
+
+                    $found = true;
+
+                    break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * > обрезает у строки подстроки с обеих сторон (trim, только для строк, а не букв)
+     */
+    public function crop(string $string, $needleList = null) : string
+    {
+        $needleList = $needleList ?? [ " ", "\n", "\r", "\t", "\v", "\0", "\u{00A0}" ];
+
+        $needleList = (array) ($needleList) ?: [];
+
+        $needleList = array_filter($needleList, 'strlen');
+        $needleList = array_values($needleList);
+
+        if ( [] === $needleList ) {
+            return $string;
+        }
+
+        $fnStrlen = $this->mb_func('strlen');
+        $fnSubstr = $this->mb_func('substr');
+        $fnStrpos = $this->mb_func('strpos');
+
+        $needleIndex = [];
+        foreach ( $needleList as $needle ) {
+            $needleIndex[$needle] = $fnStrlen($needle);
+        }
+
+        uksort($needleList,
+            function ($a, $b) use ($fnStrlen) {
+                return 0
+                    ?: ($fnStrlen($b) <=> $fnStrlen($a))
+                        ?: (strlen($b) <=> strlen($a));
+            }
+        );
+
+        $result = $string;
+
+        $currentLen = $fnStrlen($result);
+
+        $found = true;
+        while ( $found
+            && ($result !== '')
+        ) {
+            $found = false;
+
+            foreach ( $needleIndex as $needle => $needleLen ) {
+                if ( 0 === $fnStrpos($result, $needle) ) {
+                    $result = $fnSubstr($result, $needleLen);
+
+                    $currentLen -= $needleLen;
+
+                    $found = true;
+
+                    break;
+                }
+
+                $offset = $currentLen - $needleLen;
+
+                if ( ($offset >= 0)
+                    && ($offset === $fnStrpos($result, $needle, $offset))
+                ) {
+                    $result = $fnSubstr($result, 0, $offset);
+
+                    $currentLen = $offset;
+
+                    $found = true;
+
+                    break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * > заменяет по списку подстроки внутри строки на один пробел (mtrim, только для строк, а не букв)
+     */
+    public function mcrop(string $string, $needleList = null) : string
+    {
+        $needleList = $needleList ?? [ " ", "\n", "\r", "\t", "\v", "\0", "\u{00A0}" ];
+
+        $needleList = (array) ($needleList) ?: [];
+
+        $needleList = array_filter($needleList, 'strlen');
+        $needleList = array_values($needleList);
+
+        if ( [] === $needleList ) {
+            return $string;
+        }
+
+        $fnStrlen = $this->mb_func('strlen');
+
+        uksort($needleList,
+            function ($a, $b) use ($fnStrlen) {
+                return 0
+                    ?: ($fnStrlen($b) <=> $fnStrlen($a))
+                        ?: (strlen($b) <=> strlen($a));
+            }
+        );
+
+        $result = str_replace(
+            $needleList,
+            ' ',
+            $string
+        );
+
+        $result = preg_replace('/\s+/u', ' ', $result);
+
+        return $result;
+    }
+
+
+    /**
+     * > добавляет подстроку в начало строки, если её уже там нет
+     */
+    public function unlcrop(string $str, string $needle, ?int $times = null) : string
+    {
+        $times = $times ?? 1;
+
+        if ( '' === $needle ) return $str;
+        if ( 0 === $times ) return $str;
+
+        if ( $times < 1 ) {
+            throw new LogicException(
+                'The `times` should be GTE 1',
+                $times
+            );
+        }
+
+        $result = $str;
+        $result = $this->lcrop($result, [ $needle ]);
+        $result = str_repeat($needle, $times) . $result;
+
+        return $result;
+    }
+
+    /**
+     * > добавляет подстроку в конец строки, если её уже там нет
+     */
+    public function unrcrop(string $str, string $needle, ?int $times = null) : string
+    {
+        $times = $times ?? 1;
+
+        if ( '' === $needle ) return $str;
+        if ( 0 === $times ) return $str;
+
+        if ( $times < 1 ) {
+            throw new LogicException(
+                'The `times` should be GTE 1',
+                $times
+            );
+        }
+
+        $result = $str;
+        $result = $this->rcrop($result, [ $needle ]);
+        $result = $result . str_repeat($needle, $times);
+
+        return $result;
+    }
+
+    /**
+     * > оборачивает строку в подстроки, если их уже там нет
+     */
+    public function uncrop(string $str, string $needle, ?int $times = null) : string
+    {
+        $times = $times ?? 1;
+
+        if ( '' === $needle ) return $str;
+        if ( 0 === $times ) return $str;
+
+        if ( $times < 1 ) {
+            throw new LogicException(
+                'The `times` should be GTE 1',
+                $times
+            );
+        }
+
+        $result = $str;
+        $result = $this->crop($result, [ $needle ]);
+        $result = str_repeat($needle, $times) . $result . str_repeat($needle, $times);
+
+        return $result;
     }
 
 
@@ -1408,7 +2377,7 @@ class StrModule
      */
     public function lower(string $str, ?string $mb_encoding = null) : string
     {
-        if ( static::staticMbstring() ) {
+        if ( $this->stateMbstring() ) {
             $result = (null !== $mb_encoding)
                 ? mb_strtolower($str, $mb_encoding)
                 : mb_strtolower($str);
@@ -1419,7 +2388,7 @@ class StrModule
                     [
                         ''
                         . 'The `string` contains UTF-8 symbols'
-                        . 'but `staticMbstring()` returned that multibyte features is disabled',
+                        . 'but `stateMbstring()` returned that multibyte features is disabled',
                     ]
                 );
             }
@@ -1435,7 +2404,7 @@ class StrModule
      */
     public function upper(string $str, ?string $mb_encoding = null) : string
     {
-        if ( static::staticMbstring() ) {
+        if ( $this->stateMbstring() ) {
             $result = (null !== $mb_encoding)
                 ? mb_strtoupper($str, $mb_encoding)
                 : mb_strtoupper($str);
@@ -1446,7 +2415,7 @@ class StrModule
                     [
                         ''
                         . 'The `string` contains UTF-8 symbols'
-                        . 'but `staticMbstring()` returned that multibyte features is disabled',
+                        . 'but `stateMbstring()` returned that multibyte features is disabled',
                     ]
                 );
             }
@@ -1463,9 +2432,9 @@ class StrModule
      */
     public function lcfirst(string $str, ?string $mb_encoding = null) : string
     {
-        $theMb = Lib::mb();
+        if ( $this->stateMbstring() ) {
+            $theMb = Lib::mb();
 
-        if ( static::staticMbstring() ) {
             $result = $theMb->lcfirst($str, $mb_encoding);
 
         } else {
@@ -1474,7 +2443,7 @@ class StrModule
                     [
                         ''
                         . 'The `string` contains UTF-8 symbols'
-                        . 'but `staticMbstring()` returned that multibyte features is disabled',
+                        . 'but `stateMbstring()` returned that multibyte features is disabled',
                     ]
                 );
             }
@@ -1490,9 +2459,9 @@ class StrModule
      */
     public function ucfirst(string $str, ?string $mb_encoding = null) : string
     {
-        $theMb = Lib::mb();
+        if ( $this->stateMbstring() ) {
+            $theMb = Lib::mb();
 
-        if ( static::staticMbstring() ) {
             $result = $theMb->ucfirst($str, $mb_encoding);
 
         } else {
@@ -1501,7 +2470,7 @@ class StrModule
                     [
                         ''
                         . 'The `string` contains UTF-8 symbols'
-                        . 'but `staticMbstring()` returned that multibyte features is disabled',
+                        . 'but `stateMbstring()` returned that multibyte features is disabled',
                     ]
                 );
             }
@@ -1570,12 +2539,13 @@ class StrModule
     {
         $length = $length ?? 1;
 
-        $theMb = Lib::mb();
         $theType = Lib::type();
 
         $lengthInt = $theType->int_positive($length)->orThrow();
 
-        if ( static::staticMbstring() ) {
+        if ( $this->stateMbstring() ) {
+            $theMb = Lib::mb();
+
             $result = $theMb->str_split($str, $lengthInt, $mb_encoding);
 
         } else {
@@ -1599,7 +2569,9 @@ class StrModule
 
         $ignoreCase = $ignoreCase ?? true;
 
-        if ( '' === $str ) return false;
+        if ( '' === $str ) {
+            return false;
+        }
         if ( '' === $needle ) {
             $refSubstr = $str;
 
@@ -1637,7 +2609,9 @@ class StrModule
 
         $ignoreCase = $ignoreCase ?? true;
 
-        if ( '' === $str ) return false;
+        if ( '' === $str ) {
+            return false;
+        }
         if ( '' === $needle ) {
             $refSubstr = $str;
 
@@ -1651,7 +2625,7 @@ class StrModule
             : $this->mb_func('strrpos');
 
         $pos = $fnStrrpos($str, $needle);
-        $status = ($pos === $fnStrlen($str) - $fnStrlen($needle));
+        $status = ($pos === ($fnStrlen($str) - $fnStrlen($needle)));
 
         if ( $status && $withSubstr ) {
             $refSubstr = $fnSubstr($str, 0, $pos);
@@ -1660,413 +2634,6 @@ class StrModule
         unset($refSubstr);
 
         return $status;
-    }
-
-
-    /**
-     * > обрезает у строки подстроку с начала (ltrim, только для строк, а не букв)
-     */
-    public function lcrop(string $str, $needleList = [], $ignoreList = []) : string
-    {
-        $thePhp = Lib::php();
-
-        $needleList = $needleList ?: [];
-        $ignoreList = $ignoreList ?: [];
-
-        if ( [] !== $needleList ) {
-            $needleIndex = $thePhp->to_index($needleList);
-
-        } else {
-            $needleIndex = [
-                "\0"       => true, // > NUL
-                //
-                " "        => true, // > SPACE
-                "\u{00A0}" => true, // > Z-SPACE
-                //
-                "\t"       => true, // > TAB
-                "\v"       => true, // > V-TAB
-                //
-                "\r"       => true, // > CARRIAGE-RETURN
-                "\n"       => true, // > NEWLINE
-            ];
-        }
-
-        $needleIndex = array_filter($needleIndex);
-
-        unset($needleIndex['']);
-
-        if ( [] !== $ignoreList ) {
-            $ignoreIndex = $thePhp->to_index($ignoreList);
-            $ignoreIndex = array_filter($ignoreIndex);
-
-            foreach ( $ignoreIndex as $key => $devnull ) {
-                unset($needleIndex[$key]);
-            }
-        }
-
-        if ( [] === $needleIndex ) {
-            return $str;
-        }
-
-        $fnStrlen = $this->mb_func('strlen');
-        $fnStrpos = $this->mb_func('strpos');
-        $fnSubstr = $this->mb_func('substr');
-
-        foreach ( $needleIndex as $needle => $devnull ) {
-            $needleIndex[$needle] = $fnStrlen($needle);
-        }
-
-        uksort($needleIndex,
-            function ($a, $b) use ($fnStrlen) {
-                return $fnStrlen($b) <=> $fnStrlen($a);
-            }
-        );
-
-        $result = $str;
-
-        $found = true;
-        while ( $found
-            && ($result !== '')
-        ) {
-            $found = false;
-
-            foreach ( $needleIndex as $needle => $needleLen ) {
-                if ( 0 === $fnStrpos($result, $needle) ) {
-                    $result = $fnSubstr($result, $needleLen);
-
-                    $found = true;
-
-                    break;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * > обрезает у строки подстроку с конца (rtrim, только для строк, а не букв)
-     */
-    public function rcrop(string $str, $needleList = [], $ignoreList = []) : string
-    {
-        $thePhp = Lib::php();
-
-        $needleList = $needleList ?: [];
-        $ignoreList = $ignoreList ?: [];
-
-        if ( [] !== $needleList ) {
-            $needleIndex = $thePhp->to_index($needleList);
-
-        } else {
-            $needleIndex = [
-                "\0"       => true, // > NUL
-                //
-                " "        => true, // > SPACE
-                "\u{00A0}" => true, // > Z-SPACE
-                //
-                "\t"       => true, // > TAB
-                "\v"       => true, // > V-TAB
-                //
-                "\r"       => true, // > CARRIAGE-RETURN
-                "\n"       => true, // > NEWLINE
-            ];
-        }
-
-        $needleIndex = array_filter($needleIndex);
-
-        unset($needleIndex['']);
-
-        if ( [] !== $ignoreList ) {
-            $ignoreIndex = $thePhp->to_index($ignoreList);
-            $ignoreIndex = array_filter($ignoreIndex);
-
-            foreach ( $ignoreIndex as $key => $devnull ) {
-                unset($needleIndex[$key]);
-            }
-        }
-
-        if ( [] === $needleIndex ) {
-            return $str;
-        }
-
-        $fnStrlen = $this->mb_func('strlen');
-        $fnSubstr = $this->mb_func('substr');
-        $fnStrpos = $this->mb_func('strpos');
-
-        foreach ( $needleIndex as $needle => $devnull ) {
-            $needleIndex[$needle] = $fnStrlen($needle);
-        }
-
-        uksort($needleIndex,
-            function ($a, $b) use ($fnStrlen) {
-                return $fnStrlen($b) <=> $fnStrlen($a);
-            }
-        );
-
-        $result = $str;
-
-        $currentLen = $fnStrlen($result);
-
-        $found = true;
-        while ( $found
-            && ($result !== '')
-        ) {
-            $found = false;
-
-            foreach ( $needleIndex as $needle => $needleLen ) {
-                $offset = $currentLen - $needleLen;
-
-                if ( ($offset >= 0)
-                    && ($offset === $fnStrpos($result, $needle, $offset))
-                ) {
-                    $result = $fnSubstr($result, 0, $offset);
-
-                    $currentLen = $offset;
-
-                    $found = true;
-
-                    break;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * > обрезает у строки подстроки с обеих сторон (trim, только для строк, а не букв)
-     */
-    public function crop(string $str, $needleList = [], $ignoreList = []) : string
-    {
-        $thePhp = Lib::php();
-
-        $needleList = $needleList ?: [];
-        $ignoreList = $ignoreList ?: [];
-
-        if ( [] !== $needleList ) {
-            $needleIndex = $thePhp->to_index($needleList);
-
-        } else {
-            $needleIndex = [
-                "\0"       => true, // > NUL
-                //
-                " "        => true, // > SPACE
-                "\u{00A0}" => true, // > Z-SPACE
-                //
-                "\t"       => true, // > TAB
-                "\v"       => true, // > V-TAB
-                //
-                "\r"       => true, // > CARRIAGE-RETURN
-                "\n"       => true, // > NEWLINE
-            ];
-        }
-
-        $needleIndex = array_filter($needleIndex);
-
-        unset($needleIndex['']);
-
-        if ( [] !== $ignoreList ) {
-            $ignoreIndex = $thePhp->to_index($ignoreList);
-            $ignoreIndex = array_filter($ignoreIndex);
-
-            foreach ( $ignoreIndex as $key => $devnull ) {
-                unset($needleIndex[$key]);
-            }
-        }
-
-        if ( [] === $needleIndex ) {
-            return $str;
-        }
-
-        $fnStrlen = $this->mb_func('strlen');
-        $fnSubstr = $this->mb_func('substr');
-        $fnStrpos = $this->mb_func('strpos');
-
-        foreach ( $needleIndex as $needle => $devnull ) {
-            $needleIndex[$needle] = $fnStrlen($needle);
-        }
-
-        uksort($needleIndex,
-            function ($a, $b) use ($fnStrlen) {
-                return $fnStrlen($b) <=> $fnStrlen($a);
-            }
-        );
-
-        $result = $str;
-
-        $currentLen = $fnStrlen($result);
-
-        $found = true;
-        while ( $found
-            && ($result !== '')
-        ) {
-            $found = false;
-
-            foreach ( $needleIndex as $needle => $needleLen ) {
-                if ( 0 === $fnStrpos($result, $needle) ) {
-                    $result = $fnSubstr($result, $needleLen);
-
-                    $currentLen -= $needleLen;
-
-                    $found = true;
-
-                    break;
-                }
-
-                $offset = $currentLen - $needleLen;
-
-                if ( ($offset >= 0)
-                    && ($offset === $fnStrpos($result, $needle, $offset))
-                ) {
-                    $result = $fnSubstr($result, 0, $offset);
-
-                    $currentLen = $offset;
-
-                    $found = true;
-
-                    break;
-                }
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * > заменяет по списку подстроки внутри строки на один пробел (mtrim, только для строк, а не букв)
-     */
-    public function mcrop(string $str, $needleList = [], $ignoreList = []) : string
-    {
-        $thePhp = Lib::php();
-
-        $needleList = $needleList ?: [];
-        $ignoreList = $ignoreList ?: [];
-
-        if ( [] !== $needleList ) {
-            $needleIndex = $thePhp->to_index($needleList);
-
-        } else {
-            $needleIndex = [
-                "\0"       => true, // > NUL
-                //
-                " "        => true, // > SPACE
-                "\u{00A0}" => true, // > Z-SPACE
-                //
-                "\t"       => true, // > TAB
-                "\v"       => true, // > V-TAB
-                //
-                "\r"       => true, // > CARRIAGE-RETURN
-                "\n"       => true, // > NEWLINE
-            ];
-        }
-
-        $needleIndex = array_filter($needleIndex);
-
-        unset($needleIndex['']);
-
-        if ( [] !== $ignoreList ) {
-            $ignoreIndex = $thePhp->to_index($ignoreList);
-            $ignoreIndex = array_filter($ignoreIndex);
-
-            foreach ( $ignoreIndex as $key => $devnull ) {
-                unset($needleIndex[$key]);
-            }
-        }
-
-        if ( [] === $needleIndex ) {
-            return $str;
-        }
-
-        $fnStrlen = $this->mb_func('strlen');
-
-        uksort($needleIndex,
-            function ($a, $b) use ($fnStrlen) {
-                return $fnStrlen($b) <=> $fnStrlen($a);
-            }
-        );
-
-        $result = str_replace(
-            array_keys($needleIndex),
-            ' ',
-            $str
-        );
-
-        $result = preg_replace('/\s+/u', ' ', $result);
-
-        return $result;
-    }
-
-
-    /**
-     * > добавляет подстроку в начало строки, если её уже там нет
-     */
-    public function unlcrop(string $str, string $needle, ?int $times = null) : string
-    {
-        $times = $times ?? 1;
-
-        if ( '' === $needle ) return $str;
-        if ( 0 === $times ) return $str;
-
-        if ( $times < 1 ) {
-            throw new LogicException(
-                'The `times` should be GTE 1',
-                $times
-            );
-        }
-
-        $result = $str;
-        $result = $this->lcrop($result, [ $needle => true ]);
-        $result = str_repeat($needle, $times) . $result;
-
-        return $result;
-    }
-
-    /**
-     * > добавляет подстроку в конец строки, если её уже там нет
-     */
-    public function unrcrop(string $str, string $needle, ?int $times = null) : string
-    {
-        $times = $times ?? 1;
-
-        if ( '' === $needle ) return $str;
-        if ( 0 === $times ) return $str;
-
-        if ( $times < 1 ) {
-            throw new LogicException(
-                'The `times` should be GTE 1',
-                $times
-            );
-        }
-
-        $result = $str;
-        $result = $this->rcrop($result, [ $needle => true ]);
-        $result = $result . str_repeat($needle, $times);
-
-        return $result;
-    }
-
-    /**
-     * > оборачивает строку в подстроки, если их уже там нет
-     */
-    public function uncrop(string $str, string $needle, ?int $times = null) : string
-    {
-        $times = $times ?? 1;
-
-        if ( '' === $needle ) return $str;
-        if ( 0 === $times ) return $str;
-
-        if ( $times < 1 ) {
-            throw new LogicException(
-                'The `times` should be GTE 1',
-                $times
-            );
-        }
-
-        $result = $str;
-        $result = $this->crop($result, [ $needle => true ]);
-        $result = str_repeat($needle, $times) . $result . str_repeat($needle, $times);
-
-        return $result;
     }
 
 
@@ -2748,73 +3315,6 @@ class StrModule
 
 
     /**
-     * > обычный трим завернутый в генератор
-     *
-     * @return \Generator<string>
-     */
-    public function trim_it($strings, ?string $characters = null) : \Generator
-    {
-        $characters = $characters ?? " \n\r\t\v\0";
-
-        $thePhp = Lib::php();
-
-        foreach ( $thePhp->to_iterable($strings) as $string ) {
-            if ( ! is_string($string) ) {
-                throw new LogicException(
-                    [ 'Each of `strings` should be a string', $string ]
-                );
-            }
-
-            yield trim($string, $characters);
-        }
-    }
-
-    /**
-     * > обычный трим завернутый в генератор
-     *
-     * @return \Generator<string>
-     */
-    public function ltrim_it($strings, ?string $characters = null) : \Generator
-    {
-        $characters = $characters ?? " \n\r\t\v\0";
-
-        $thePhp = Lib::php();
-
-        foreach ( $thePhp->to_iterable($strings) as $string ) {
-            if ( ! is_string($string) ) {
-                throw new LogicException(
-                    [ 'Each of `strings` should be a string', $string ]
-                );
-            }
-
-            yield ltrim($string, $characters);
-        }
-    }
-
-    /**
-     * > обычный трим завернутый в генератор
-     *
-     * @return \Generator<string>
-     */
-    public function rtrim_it($strings, ?string $characters = null) : \Generator
-    {
-        $characters = $characters ?? " \n\r\t\v\0";
-
-        $thePhp = Lib::php();
-
-        foreach ( $thePhp->to_iterable($strings) as $string ) {
-            if ( ! is_string($string) ) {
-                throw new LogicException(
-                    [ 'Each of `strings` should be a string', $string ]
-                );
-            }
-
-            yield rtrim($string, $characters);
-        }
-    }
-
-
-    /**
      * > урезает английское слово до префикса из нескольких букв - когда имя индекса в бд слишком длинное
      * > оставляет одну гласную
      *
@@ -2838,7 +3338,7 @@ class StrModule
 
         $theStr = Lib::str();
 
-        $isUnicodeAllowed = $theStr::staticMbstring();
+        $isUnicodeAllowed = $theStr->stateMbstring();
 
         $_string = $isUnicodeAllowed
             ? preg_replace('/(?:[^\w]|[_])+/u', '', $string)

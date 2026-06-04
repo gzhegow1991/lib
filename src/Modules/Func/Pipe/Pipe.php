@@ -41,6 +41,12 @@ class Pipe
     protected $fnCallUserFuncArgs;
 
 
+    public static function new()
+    {
+        return new static();
+    }
+
+
     public function __invoke($input = null, ?PipeContext $context = null, ...$args)
     {
         return $this->invoke($input, $context, $args);

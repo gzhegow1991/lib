@@ -923,34 +923,6 @@ class DefaultDumper implements DumperInterface
         die();
     }
 
-    /**
-     * @return mixed|void
-     *
-     * @noinspection PhpReturnDocTypeMismatchInspection
-     */
-    public function ddd(?array $fileLine, int $times, $var, ...$vars)
-    {
-        $fileLine = $fileLine ?? Lib::file_line([], 1);
-
-        if ( $times < 1 ) {
-            throw new LogicException(
-                [ 'The `times` should be positive integer', $times ]
-            );
-        }
-
-        static $current;
-
-        $current = $current ?? $times;
-
-        $this->doDumperEchoTrace($fileLine, $var, ...$vars);
-
-        if ( 0 === --$current ) {
-            die();
-        }
-
-        return $var;
-    }
-
 
     public function fnD(?int $traceShift = null, ?array $trace = null) : \Closure
     {
@@ -973,18 +945,6 @@ class DefaultDumper implements DumperInterface
             $fileLine = Lib::file_line([ $trace ], $traceShift);
 
             return $this->dd($fileLine, ...$vars);
-        };
-    }
-
-    public function fnDDD(?int $traceShift = null, ?array $trace = null) : \Closure
-    {
-        /**
-         * @return mixed|void
-         */
-        return function (?int $times, $var, ...$vars) use ($traceShift, $trace) {
-            $fileLine = Lib::file_line([ $trace ], $traceShift);
-
-            return $this->ddd($fileLine, $times, $var, ...$vars);
         };
     }
 
@@ -1030,6 +990,47 @@ class DefaultDumper implements DumperInterface
             $fileLine = Lib::file_line([ $trace ], $traceShift);
 
             return $this->td($fileLine, $throttleMs, $var, ...$vars);
+        };
+    }
+
+
+    /**
+     * @return mixed|void
+     *
+     * @noinspection PhpReturnDocTypeMismatchInspection
+     */
+    public function zd(?array $fileLine, int $zTimes, $var, ...$vars)
+    {
+        $fileLine = $fileLine ?? Lib::file_line([], 1);
+
+        if ( $zTimes < 1 ) {
+            throw new LogicException(
+                [ 'The `times` should be positive integer', $zTimes ]
+            );
+        }
+
+        static $current;
+
+        $current = $current ?? $zTimes;
+
+        $this->doDumperEchoTrace($fileLine, $var, ...$vars);
+
+        if ( 0 === --$current ) {
+            die();
+        }
+
+        return $var;
+    }
+
+    public function fnZD(?int $traceShift = null, ?array $trace = null) : \Closure
+    {
+        /**
+         * @return mixed|void
+         */
+        return function (?int $times, $var, ...$vars) use ($traceShift, $trace) {
+            $fileLine = Lib::file_line([ $trace ], $traceShift);
+
+            return $this->zd($fileLine, $times, $var, ...$vars);
         };
     }
 

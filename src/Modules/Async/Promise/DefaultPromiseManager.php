@@ -69,7 +69,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
      */
     public function from($from, $fb = null)
     {
-        $ret = Ret::new();
+        $ret = Lib::newRet();
 
         $instance = null
             ?? $this->fromInstance($from)->orNull($ret)
@@ -92,7 +92,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
      */
     public function fromValue($from, $fb = null)
     {
-        $ret = Ret::new();
+        $ret = Lib::newRet();
 
         $instance = null
             ?? $this->fromInstance($from)->orNull($ret)
@@ -114,7 +114,7 @@ class DefaultPromiseManager implements PromiseManagerInterface
      */
     public function fromCallable($from, $fb = null)
     {
-        $ret = Ret::new();
+        $ret = Lib::newRet();
 
         $instance = null
             ?? $this->fromInstance($from)->orNull($ret)

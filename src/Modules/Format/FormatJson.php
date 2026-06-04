@@ -13,95 +13,101 @@ class FormatJson
     /**
      * @var int
      */
-    protected static $jsonDepth = 512;
+    protected $stateJsonDepth;
     /**
      * @var int
      */
-    protected static $jsonEncodeFlags = 0;
+    protected $stateJsonEncodeFlags;
     /**
      * @var int
      */
-    protected static $jsonDecodeFlags = 0;
+    protected $stateJsonDecodeFlags;
 
     /**
      * @param int|false|null $jsonDepth
      */
-    public static function staticJsonDepth($jsonDepth = null) : int
+    public function stateJsonDepth($jsonDepth = null) : ?int
     {
-        $last = static::$jsonDepth;
+        $last = null;
 
-        if ( null !== $jsonDepth ) {
+        if ( $isChange = (null !== $jsonDepth) ) {
+            $last = $this->stateJsonDepth;
+
             if ( false === $jsonDepth ) {
-                static::$jsonDepth = 512;
+                $this->stateJsonDepth = null;
 
             } else {
-                if ( $jsonDepth < 0 ) {
-                    throw new LogicException(
-                        [ 'The `jsonDepth` should be a non-negative integer', $jsonDepth ]
-                    );
-                }
+                $theType = Lib::type();
 
-                static::$jsonDepth = $jsonDepth;
+                $jsonDepthValid = $theType->int_non_negative($jsonDepth)->orThrow();
+
+                $this->stateJsonDepth = $jsonDepthValid;
             }
         }
 
-        static::$jsonDepth = static::$jsonDepth ?? 512;
+        if ( null === $this->stateJsonDepth ) {
+            $this->stateJsonDepth = 512;
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateJsonDepth;
     }
 
     /**
      * @param int|false|null $jsonEncodeFlags
      */
-    public static function staticJsonEncodeFlags($jsonEncodeFlags = null) : int
+    public function stateJsonEncodeFlags($jsonEncodeFlags = null) : ?int
     {
-        $last = static::$jsonEncodeFlags;
+        $last = null;
 
-        if ( null !== $jsonEncodeFlags ) {
+        if ( $isChange = (null !== $jsonEncodeFlags) ) {
+            $last = $this->stateJsonEncodeFlags;
+
             if ( false === $jsonEncodeFlags ) {
-                static::$jsonEncodeFlags = 0;
+                $this->stateJsonEncodeFlags = null;
 
             } else {
-                if ( $jsonEncodeFlags < 0 ) {
-                    throw new LogicException(
-                        [ 'The `jsonEncodeFlags` should be a non-negative integer', $jsonEncodeFlags ]
-                    );
-                }
+                $theType = Lib::type();
 
-                static::$jsonEncodeFlags = $jsonEncodeFlags;
+                $jsonEncodeFlagsValid = $theType->int_non_negative($jsonEncodeFlags)->orThrow();
+
+                $this->stateJsonEncodeFlags = $jsonEncodeFlagsValid;
             }
         }
 
-        static::$jsonEncodeFlags = static::$jsonEncodeFlags ?? 0;
+        if ( null === $this->stateJsonEncodeFlags ) {
+            $this->stateJsonEncodeFlags = 0;
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateJsonEncodeFlags;
     }
 
     /**
      * @param int|false|null $jsonDecodeFlags
      */
-    public static function staticJsonDecodeFlags($jsonDecodeFlags = null) : int
+    public function stateJsonDecodeFlags($jsonDecodeFlags = null) : ?int
     {
-        $last = static::$jsonDecodeFlags;
+        $last = null;
 
-        if ( null !== $jsonDecodeFlags ) {
+        if ( $isChange = (null !== $jsonDecodeFlags) ) {
+            $last = $this->stateJsonDecodeFlags;
+
             if ( false === $jsonDecodeFlags ) {
-                static::$jsonDecodeFlags = 0;
+                $this->stateJsonDecodeFlags = null;
 
             } else {
-                if ( $jsonDecodeFlags < 0 ) {
-                    throw new LogicException(
-                        [ 'The `jsonDecodeFlags` should be a non-negative integer', $jsonDecodeFlags ]
-                    );
-                }
+                $theType = Lib::type();
 
-                static::$jsonDecodeFlags = $jsonDecodeFlags;
+                $jsonDecodeFlagsValid = $theType->int_non_negative($jsonDecodeFlags)->orThrow();
+
+                $this->stateJsonDecodeFlags = $jsonDecodeFlagsValid;
             }
         }
 
-        static::$jsonDecodeFlags = static::$jsonDecodeFlags ?? 0;
+        if ( null === $this->stateJsonDecodeFlags ) {
+            $this->stateJsonDecodeFlags = 0;
+        }
 
-        return $last;
+        return $isChange ? $last : $this->stateJsonDecodeFlags;
     }
 
 
@@ -122,8 +128,8 @@ class FormatJson
             );
         }
 
-        $depth = $depth ?? static::staticJsonDepth();
-        $flags = $flags ?? static::staticJsonDecodeFlags();
+        $depth = $depth ?? $this->stateJsonDepth();
+        $flags = $flags ?? $this->stateJsonDecodeFlags();
 
         $theFunc = Lib::func();
         $theType = Lib::type();
@@ -172,8 +178,8 @@ class FormatJson
             );
         }
 
-        $depth = $depth ?? static::staticJsonDepth();
-        $flags = $flags ?? static::staticJsonDecodeFlags();
+        $depth = $depth ?? $this->stateJsonDepth();
+        $flags = $flags ?? $this->stateJsonDecodeFlags();
 
         $theFunc = Lib::func();
         $theType = Lib::type();
@@ -264,8 +270,8 @@ class FormatJson
             );
         }
 
-        $flags = $flags ?? static::staticJsonEncodeFlags();
-        $depth = $depth ?? static::staticJsonDepth();
+        $flags = $flags ?? $this->stateJsonEncodeFlags();
+        $depth = $depth ?? $this->stateJsonDepth();
 
         try {
             $result = $theFunc->safe_call(
@@ -321,14 +327,14 @@ class FormatJson
             );
         }
 
-        $flags = $flags ?? static::staticJsonEncodeFlags();
+        $flags = $flags ?? $this->stateJsonEncodeFlags();
         $flags = $flags
             | JSON_PRETTY_PRINT
             | JSON_UNESCAPED_LINE_TERMINATORS
             | JSON_UNESCAPED_SLASHES
             | JSON_UNESCAPED_UNICODE;
 
-        $depth = $depth ?? static::staticJsonDepth();
+        $depth = $depth ?? $this->stateJsonDepth();
 
         try {
             $result = $theFunc->safe_call(

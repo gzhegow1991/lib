@@ -120,7 +120,7 @@ class GenericCallable implements
      */
     public static function from($from, array $context = [], $fb = null)
     {
-        $ret = Ret::new();
+        $ret = Lib::newRet();
 
         $instance = null
             ?? static::fromInstance($from)->orNull($ret)

@@ -30,10 +30,12 @@ class AggregateExcept implements
 
         $throwables = array_values($throwables);
 
+        $theDebug = Lib::debug();
+
         $eFile = null;
         $eLine = null;
         $eTrace = null;
-        if ( DebugModule::staticShouldTrace() ) {
+        if ( $theDebug->stateShouldTrace() ) {
             $ex = new \Exception();
             $exTrace = $ex->getTrace();
             $exTraceShift = array_shift($exTrace);
