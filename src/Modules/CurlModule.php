@@ -239,7 +239,7 @@ class CurlModule
      *
      * @return \Generator<string, AbstractOnCurlEvent>
      */
-    public function execBatch(array $curlItems, int $batchSize) : \Generator
+    public function execBatch(int $batchSize, array $curlItems) : \Generator
     {
         $cp = $this->newCurlProcess();
 

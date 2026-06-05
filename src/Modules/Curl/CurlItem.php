@@ -79,7 +79,10 @@ class CurlItem
      * @var array
      */
     protected $chData = [
-        'httpHeaders' => [],
+        'httpCode'            => null,
+        'httpEffectiveUrl'    => null,
+        'httpEffectiveMethod' => null,
+        'httpHeaders'         => null,
     ];
 
 
@@ -536,7 +539,17 @@ class CurlItem
     {
         $ch = $this->ch;
 
+        if ( null !== $ch ) {
+            curl_close($this->ch);
+        }
+
         $this->ch = null;
+        $this->chData = [
+            'httpCode'            => null,
+            'httpEffectiveUrl'    => null,
+            'httpEffectiveMethod' => null,
+            'httpHeaders'         => null,
+        ];
 
         return $ch;
     }
@@ -546,7 +559,19 @@ class CurlItem
      */
     public function freshCurlHandle()
     {
+        $ch = $this->ch;
+
+        if ( null !== $ch ) {
+            curl_close($this->ch);
+        }
+
         $this->ch = $this->makeCurlHandle();
+        $this->chData = [
+            'httpCode'            => null,
+            'httpEffectiveUrl'    => null,
+            'httpEffectiveMethod' => null,
+            'httpHeaders'         => null,
+        ];
 
         return $this->ch;
     }
@@ -558,6 +583,12 @@ class CurlItem
     {
         if ( null === $this->ch ) {
             $this->ch = $this->makeCurlHandle();
+            $this->chData = [
+                'httpCode'            => null,
+                'httpEffectiveUrl'    => null,
+                'httpEffectiveMethod' => null,
+                'httpHeaders'         => null,
+            ];
         }
 
         return $this->ch;
@@ -780,6 +811,28 @@ class CurlItem
         return $ch;
     }
 
+
+    public function setCurlHandleData(array $data)
+    {
+        $chData = array_intersect_key($data, $this->chData);
+
+        $this->chData = $chData + $this->chData;
+
+        return $this;
+    }
+
+    public function addCurlHandleData(array $data)
+    {
+        $chData = array_intersect_key($data, $this->chData);
+
+        foreach ( $chData as $key => $val ) {
+            if ( null === $this->chData[$key] ) {
+                $this->chData[$key] = $val;
+            }
+        }
+
+        return $this;
+    }
 
     public function getCurlHandleData() : array
     {

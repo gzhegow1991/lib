@@ -39,11 +39,6 @@ class CurlProcess
      */
     protected $curlQueueChunk;
 
-    /**
-     * @var resource|\CurlMultiHandle
-     */
-    protected $mh;
-
 
     public static function new()
     {
@@ -178,9 +173,8 @@ class CurlProcess
      */
     public function execSingle() : \Generator
     {
-        $this->curlQueueBatch = new \SplQueue();
+        $this->curlQueueBatch = null;
         $this->curlQueueChunk = null;
-        $this->mh = null;
 
         $this->curlQueueBatch = $curlQueue = new \SplQueue();
 
@@ -189,32 +183,39 @@ class CurlProcess
         }
 
         while ( ! $curlQueue->isEmpty() ) {
+            /**
+             * @var CurlItem[] $curlItemsBatch
+             */
             $curlItemsBatch = [];
+
             while ( ! $curlQueue->isEmpty() ) {
                 $curlItemsBatch[] = $curlQueue->dequeue();
             }
 
-            $curlEvent = new OnCurlBatchStartEvent($curlItemsBatch);
-            yield 'onCurlBatchStart' => $curlEvent;
-            if ( $curlEvent->isSkipped() ) {
-                $this->handleSkippedCurlEvent($curlEvent);
-                $this->skipCurlItems($curlItemsBatch);
+            $curlEvent = null;
 
-                continue;
+            try {
+                $curlEvent = new OnCurlBatchStartEvent($curlItemsBatch);
+                yield 'onCurlBatchStart' => $curlEvent;
+                if ( $curlEvent->isSkipped() ) {
+                    continue;
+                }
+
+                yield from $this->processSingle($curlItemsBatch);
+
+                $curlEvent = new OnCurlBatchEndEvent($curlItemsBatch);
+                yield 'onCurlBatchEnd' => $curlEvent;
+                if ( $curlEvent->isSkipped() ) {
+                    continue;
+                }
             }
-
-            yield from $this->processSingle($curlItemsBatch);
-
-            $curlEvent = new OnCurlBatchEndEvent($curlItemsBatch);
-            yield 'onCurlBatchEnd' => $curlEvent;
-            if ( $curlEvent->isSkipped() ) {
-                $this->handleSkippedCurlEvent($curlEvent);
-                $this->skipCurlItems($curlItemsBatch);
-
-                continue;
+            finally {
+                if ( null !== $curlEvent ) {
+                    if ( $curlEvent->isSkipped() ) {
+                        $this->onCurlEventHandleSkip($curlEvent);
+                    }
+                }
             }
-
-            unset($curlItemsBatch);
         }
     }
 
@@ -225,7 +226,6 @@ class CurlProcess
     {
         $this->curlQueueBatch = null;
         $this->curlQueueChunk = null;
-        $this->mh = null;
 
         $this->curlQueueBatch = $curlQueue = new \SplQueue();
 
@@ -234,32 +234,39 @@ class CurlProcess
         }
 
         while ( ! $curlQueue->isEmpty() ) {
+            /**
+             * @var CurlItem[] $curlItemsBatch
+             */
             $curlItemsBatch = [];
+
             while ( ! $curlQueue->isEmpty() ) {
                 $curlItemsBatch[] = $curlQueue->dequeue();
             }
 
-            $curlEvent = new OnCurlBatchStartEvent($curlItemsBatch);
-            yield 'onCurlBatchStart' => $curlEvent;
-            if ( $curlEvent->isSkipped() ) {
-                $this->handleSkippedCurlEvent($curlEvent);
-                $this->skipCurlItems($curlItemsBatch);
+            $curlEvent = null;
 
-                continue;
+            try {
+                $curlEvent = new OnCurlBatchStartEvent($curlItemsBatch);
+                yield 'onCurlBatchStart' => $curlEvent;
+                if ( $curlEvent->isSkipped() ) {
+                    continue;
+                }
+
+                yield from $this->processMulti($curlItemsBatch);
+
+                $curlEvent = new OnCurlBatchEndEvent($curlItemsBatch);
+                yield 'onCurlBatchEnd' => $curlEvent;
+                if ( $curlEvent->isSkipped() ) {
+                    continue;
+                }
             }
-
-            yield from $this->processMulti($curlItemsBatch);
-
-            $curlEvent = new OnCurlBatchEndEvent($curlItemsBatch);
-            yield 'onCurlBatchEnd' => $curlEvent;
-            if ( $curlEvent->isSkipped() ) {
-                $this->handleSkippedCurlEvent($curlEvent);
-                $this->skipCurlItems($curlItemsBatch);
-
-                continue;
+            finally {
+                if ( null !== $curlEvent ) {
+                    if ( $curlEvent->isSkipped() ) {
+                        $this->onCurlEventHandleSkip($curlEvent);
+                    }
+                }
             }
-
-            unset($curlItemsBatch);
         }
     }
 
@@ -274,7 +281,6 @@ class CurlProcess
 
         $this->curlQueueBatch = null;
         $this->curlQueueChunk = null;
-        $this->mh = null;
 
         $this->curlQueueBatch = $curlQueue = new \SplQueue();
 
@@ -283,8 +289,12 @@ class CurlProcess
         }
 
         while ( ! $curlQueue->isEmpty() ) {
-            $counter = 0;
+            /**
+             * @var CurlItem[] $curlItemsBatch
+             */
             $curlItemsBatch = [];
+
+            $counter = 0;
             while ( ! $curlQueue->isEmpty() ) {
                 $curlItemsBatch[] = $curlQueue->dequeue();
 
@@ -294,27 +304,30 @@ class CurlProcess
                 }
             }
 
-            $curlEvent = new OnCurlBatchStartEvent($curlItemsBatch);
-            yield 'onCurlBatchStart' => $curlEvent;
-            if ( $curlEvent->isSkipped() ) {
-                $this->handleSkippedCurlEvent($curlEvent);
-                $this->skipCurlItems($curlItemsBatch);
+            $curlEvent = null;
 
-                continue;
+            try {
+                $curlEvent = new OnCurlBatchStartEvent($curlItemsBatch);
+                yield 'onCurlBatchStart' => $curlEvent;
+                if ( $curlEvent->isSkipped() ) {
+                    continue;
+                }
+
+                yield from $this->processMulti($curlItemsBatch);
+
+                $curlEvent = new OnCurlBatchEndEvent($curlItemsBatch);
+                yield 'onCurlBatchEnd' => $curlEvent;
+                if ( $curlEvent->isSkipped() ) {
+                    continue;
+                }
             }
-
-            yield from $this->processMulti($curlItemsBatch);
-
-            $curlEvent = new OnCurlBatchEndEvent($curlItemsBatch);
-            yield 'onCurlBatchEnd' => $curlEvent;
-            if ( $curlEvent->isSkipped() ) {
-                $this->handleSkippedCurlEvent($curlEvent);
-                $this->skipCurlItems($curlItemsBatch);
-
-                continue;
+            finally {
+                if ( null !== $curlEvent ) {
+                    if ( $curlEvent->isSkipped() ) {
+                        $this->onCurlEventHandleSkip($curlEvent);
+                    }
+                }
             }
-
-            unset($curlItemsBatch);
         }
     }
 
@@ -327,149 +340,40 @@ class CurlProcess
         /**
          * @var \SplQueue<CurlItem> $curlQueue
          */
-        $curlQueue = new \SplQueue();
-
-        foreach ( $curlItems as $curlItem ) {
-            $ch = $curlItem->flushCurlHandle();
-
-            if ( null !== $ch ) {
-                curl_close($ch);
-            }
-
-            $curlQueue->enqueue($curlItem);
-        }
-
-        while ( ! $curlQueue->isEmpty() ) {
-            $curlItem = $curlQueue->dequeue();
-
-            $ch = $curlItem->freshCurlHandle();
-
-            $curlEvent = new OnCurlSingleInitEvent(
-                $curlItem
-            );
-            yield 'onCurlInit' => $curlEvent;
-            if ( $curlEvent->isSkipped() ) {
-                $this->handleSkippedCurlEvent($curlEvent);
-                $this->skipCurlItem($curlItem);
-
-                continue;
-            }
-
-            curl_exec($ch);
-
-            $curlEvent = new OnCurlSingleExecEvent(
-                $curlItem
-            );
-            yield 'onCurlExec' => $curlEvent;
-            if ( $curlEvent->isSkipped() ) {
-                $this->handleSkippedCurlEvent($curlEvent);
-                $this->skipCurlItem($curlItem);
-
-                continue;
-            }
-
-            $curlErrno = curl_errno($ch);
-
-            if ( CURLE_OK !== $curlErrno ) {
-                $curlError = curl_error($ch);
-
-                $curlEvent = new OnCurlErrorEvent(
-                    $curlItem,
-                    $curlErrno, $curlError
-                );
-                yield 'onCurlError' => $curlEvent;
-                if ( $curlEvent->isSkipped() ) {
-                    $this->handleSkippedCurlEvent($curlEvent);
-                    $this->skipCurlItem($curlItem);
-
-                    continue;
-                }
-            }
-
-            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-            $httpEffectiveUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
-            $httpEffectiveMethod = null;
-
-            if ( PHP_VERSION_ID >= 80200 ) {
-                $httpEffectiveMethod = curl_getinfo($ch, CURLINFO_EFFECTIVE_METHOD);
-            }
-
-            $curlEvent = new OnCurlDoneEvent(
-                $curlItem,
-                $httpCode, $httpEffectiveUrl, $httpEffectiveMethod
-            );
-            yield 'onCurlDone' => $curlEvent;
-            if ( $curlEvent->isSkipped() ) {
-                $this->handleSkippedCurlEvent($curlEvent);
-                $this->skipCurlItem($curlItem);
-
-                continue;
-            }
-
-            curl_close($ch);
-        }
-    }
-
-    protected function processMulti(array $curlItems) : \Generator
-    {
         $this->curlQueueChunk = $curlQueue = new \SplQueue();
 
         foreach ( $curlItems as $curlItem ) {
-            $ch = $curlItem->flushCurlHandle();
-
-            if ( null !== $ch ) {
-                curl_close($ch);
-            }
-
             $curlQueue->enqueue($curlItem);
         }
 
         while ( ! $curlQueue->isEmpty() ) {
             /**
-             * @var CurlItem[] $curlItemsChunk
+             * @var CurlItem $curlItem
              */
-            $curlItemsChunk = [];
+            $curlItem = $curlQueue->dequeue();
 
-            $this->mh = $mh = curl_multi_init();
+            $ch = $curlItem->freshCurlHandle();
 
-            while ( ! $curlQueue->isEmpty() ) {
-                $curlItem = $curlQueue->dequeue();
-                $curlItemsChunk[] = $curlItem;
+            $curlEvent = null;
 
-                $ch = $curlItem->resetCurlHandle();
-
-                curl_multi_add_handle($mh, $ch);
-            }
-
-            $curlEvent = new OnCurlMultiInitEvent($curlItemsChunk);
-            yield 'onCurlMultiInit' => $curlEvent;
-            if ( $curlEvent->isSkipped() ) {
-                $this->handleSkippedCurlEvent($curlEvent);
-                $this->skipCurlItems($curlItemsChunk);
-
-                continue;
-            }
-
-            $running = null;
-            do {
-                $status = curl_multi_exec($mh, $running);
-
-                if ( $running > 0 ) {
-                    curl_multi_select($mh);
+            try {
+                $curlEvent = new OnCurlSingleInitEvent(
+                    $curlItem
+                );
+                yield 'onCurlInit' => $curlEvent;
+                if ( $curlEvent->isSkipped() ) {
+                    continue;
                 }
-            } while ( ($running > 0) && ($status === CURLM_OK) );
 
-            $curlEvent = new OnCurlMultiExecEvent($curlItemsChunk);
-            yield 'onCurlMultiExec' => $curlEvent;
-            if ( $curlEvent->isSkipped() ) {
-                $this->handleSkippedCurlEvent($curlEvent);
-                $this->skipCurlItems($curlItemsChunk);
+                curl_exec($ch);
 
-                continue;
-            }
-
-            foreach ( $curlItemsChunk as $curlItem ) {
-                $ch = $curlItem->getCurlHandle();
+                $curlEvent = new OnCurlSingleExecEvent(
+                    $curlItem
+                );
+                yield 'onCurlExec' => $curlEvent;
+                if ( $curlEvent->isSkipped() ) {
+                    continue;
+                }
 
                 $curlErrno = curl_errno($ch);
 
@@ -481,12 +385,8 @@ class CurlProcess
                         $curlErrno, $curlError
                     );
                     yield 'onCurlError' => $curlEvent;
-                    if ( $curlEvent->isSkipped() ) {
-                        $this->handleSkippedCurlEvent($curlEvent);
-                        $this->skipCurlItem($curlItem);
 
-                        continue;
-                    }
+                    continue;
                 }
 
                 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -497,30 +397,153 @@ class CurlProcess
                     $httpEffectiveMethod = curl_getinfo($ch, CURLINFO_EFFECTIVE_METHOD);
                 }
 
+                $curlItem->addCurlHandleData([
+                    'httpCode'            => $httpCode,
+                    'httpEffectiveUrl'    => $httpEffectiveUrl,
+                    'httpEffectiveMethod' => $httpEffectiveMethod,
+                ]);
+
                 $curlEvent = new OnCurlDoneEvent(
                     $curlItem,
                     $httpCode, $httpEffectiveUrl, $httpEffectiveMethod
                 );
                 yield 'onCurlDone' => $curlEvent;
                 if ( $curlEvent->isSkipped() ) {
-                    $this->handleSkippedCurlEvent($curlEvent);
-                    $this->skipCurlItem($curlItem);
+                    continue;
+                }
+            }
+            finally {
+                if ( null !== $curlEvent ) {
+                    if ( $curlEvent->isSkipped() ) {
+                        $this->onCurlEventHandleSkip($curlEvent);
+                    }
+                }
 
+                curl_close($ch);
+            }
+        }
+    }
+
+    /**
+     * @noinspection PhpUnnecessaryStopStatementInspection
+     */
+    protected function processMulti(array $curlItems) : \Generator
+    {
+        /**
+         * @var \SplQueue<CurlItem> $curlQueue
+         */
+        $this->curlQueueChunk = $curlQueue = new \SplQueue();
+
+        foreach ( $curlItems as $curlItem ) {
+            $curlQueue->enqueue($curlItem);
+        }
+
+        while ( ! $curlQueue->isEmpty() ) {
+            /**
+             * @var CurlItem[] $curlItemsChunk
+             */
+            $curlItemsChunk = [];
+
+            $mh = curl_multi_init();
+            $chh = [];
+
+            while ( ! $curlQueue->isEmpty() ) {
+                /**
+                 * @var CurlItem $curlItem
+                 */
+                $curlItem = $curlQueue->dequeue();
+                $curlItemsChunk[] = $curlItem;
+
+                $ch = $curlItem->freshCurlHandle();
+                $chh[] = $ch;
+
+                curl_multi_add_handle($mh, $ch);
+            }
+
+            $curlEvent = null;
+
+            try {
+                $curlEvent = new OnCurlMultiInitEvent($curlItemsChunk);
+                yield 'onCurlMultiInit' => $curlEvent;
+                if ( $curlEvent->isSkipped() ) {
                     continue;
                 }
 
-                curl_multi_remove_handle($mh, $ch);
-                curl_close($ch);
+                $running = null;
+                do {
+                    $status = curl_multi_exec($mh, $running);
+
+                    if ( $running > 0 ) {
+                        curl_multi_select($mh);
+                    }
+                } while ( ($running > 0) && ($status === CURLM_OK) );
+
+                $curlEvent = new OnCurlMultiExecEvent($curlItemsChunk);
+                yield 'onCurlMultiExec' => $curlEvent;
+                if ( $curlEvent->isSkipped() ) {
+                    continue;
+                }
+
+                foreach ( $curlItemsChunk as $curlItem ) {
+                    $ch = $curlItem->getCurlHandle();
+
+                    $curlErrno = curl_errno($ch);
+
+                    if ( CURLE_OK !== $curlErrno ) {
+                        $curlError = curl_error($ch);
+
+                        $curlEvent = new OnCurlErrorEvent(
+                            $curlItem,
+                            $curlErrno, $curlError
+                        );
+                        yield 'onCurlError' => $curlEvent;
+
+                        continue;
+                    }
+
+                    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+                    $httpEffectiveUrl = curl_getinfo($ch, CURLINFO_EFFECTIVE_URL);
+                    $httpEffectiveMethod = null;
+
+                    if ( PHP_VERSION_ID >= 80200 ) {
+                        $httpEffectiveMethod = curl_getinfo($ch, CURLINFO_EFFECTIVE_METHOD);
+                    }
+
+                    $curlItem->addCurlHandleData([
+                        'httpCode'            => $httpCode,
+                        'httpEffectiveUrl'    => $httpEffectiveUrl,
+                        'httpEffectiveMethod' => $httpEffectiveMethod,
+                    ]);
+
+                    $curlEvent = new OnCurlDoneEvent(
+                        $curlItem,
+                        $httpCode, $httpEffectiveUrl, $httpEffectiveMethod
+                    );
+                    yield 'onCurlDone' => $curlEvent;
+                    if ( $curlEvent->isSkipped() ) {
+                        continue;
+                    }
+                }
             }
+            finally {
+                if ( null !== $curlEvent ) {
+                    if ( $curlEvent->isSkipped() ) {
+                        $this->onCurlEventHandleSkip($curlEvent);
+                    }
+                }
 
-            curl_multi_close($mh);
+                foreach ( $chh as $ch ) {
+                    curl_multi_remove_handle($mh, $ch);
+                    curl_close($ch);
+                }
 
-            unset($curlItemsChunk);
+                curl_multi_close($mh);
+            }
         }
     }
 
 
-    protected function handleSkippedCurlEvent(AbstractOnCurlEvent $curlEvent) : void
+    protected function onCurlEventHandleSkip(AbstractOnCurlEvent $curlEvent) : void
     {
         if ( ! $curlEvent->isSkipped() ) {
             return;
@@ -549,41 +572,6 @@ class CurlProcess
 
         foreach ( $pushAfterBatch as $pa ) {
             $this->curlQueueBatch->push($pa);
-        }
-    }
-
-
-    /**
-     * @param CurlItem[] $curlItems
-     */
-    protected function skipCurlItems(array $curlItems) : void
-    {
-        foreach ( $curlItems as $curlItem ) {
-            $ch = $curlItem->getCurlHandle();
-
-            if ( null !== $ch ) {
-                if ( null !== $this->mh ) {
-                    curl_multi_remove_handle($this->mh, $ch);
-                }
-
-                curl_close($ch);
-            }
-        }
-    }
-
-    /**
-     * @param CurlItem $curlItem
-     */
-    protected function skipCurlItem(CurlItem $curlItem) : void
-    {
-        $ch = $curlItem->getCurlHandle();
-
-        if ( null !== $ch ) {
-            if ( null !== $this->mh ) {
-                curl_multi_remove_handle($this->mh, $ch);
-            }
-
-            curl_close($ch);
         }
     }
 }
