@@ -4,6 +4,7 @@ namespace Gzhegow\Lib\Modules\Entrypoint\Driver;
 
 use Gzhegow\Lib\Lib;
 use Gzhegow\Lib\Modules\EntrypointModule;
+use Gzhegow\Lib\Exception\RuntimeException;
 
 
 class EntrypointPhpSessionCookieParamsDriver extends AbstractEntrypointDriver
@@ -42,11 +43,12 @@ class EntrypointPhpSessionCookieParamsDriver extends AbstractEntrypointDriver
             'httponly' => true,
             'samesite' => true,
         ];
-        $valueValid = array_intersect_key($valueValid, $valueValidScheme);
 
-        $valueValidKeys = array_keys($valueValidScheme);
-
-        $valueValid = $theType->array_keys_exists($valueValid, $valueValidKeys)->orThrow();
+        if ( array_diff_key($valueValid, $valueValidScheme) ) {
+            throw new RuntimeException(
+                [ 'The `value` should be with keys by scheme', $valueValid, $valueValidScheme ]
+            );
+        }
 
         $configSet[EntrypointModule::OPT_PHP_SESSION_COOKIE_PARAMS] = $valueValid;
     }

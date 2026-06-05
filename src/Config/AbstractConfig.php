@@ -156,7 +156,7 @@ abstract class AbstractConfig implements
     {
         $result = [];
 
-        foreach ( array_keys($this->__keys) as $key ) {
+        foreach ( $this->__keys as $key => $devnull ) {
             if ( isset($this->__children[$key]) ) {
                 $result[$key] = $this->{$key}->toArray();
 
@@ -179,7 +179,7 @@ abstract class AbstractConfig implements
 
             $this->__validate = false;
 
-            foreach ( array_keys($this->__keys) as $key ) {
+            foreach ( $this->__keys as $key => $devnull ) {
                 if ( isset($this->__children[$key]) ) {
                     $this->{$key}->__validate = false;
                 }
@@ -187,7 +187,7 @@ abstract class AbstractConfig implements
 
             call_user_func_array($fn, [ $this, $context ]);
 
-            foreach ( array_keys($this->__keys) as $key ) {
+            foreach ( $this->__keys as $key => $devnull ) {
                 if ( isset($this->__children[$key]) ) {
                     $this->{$key}->__validate = true;
                 }

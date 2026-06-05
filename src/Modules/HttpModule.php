@@ -553,13 +553,11 @@ class HttpModule
             array_unshift($dataArrays, $dataArray);
         }
 
-        foreach ( $dataArrays as $idx => $_dataArray ) {
-            if ( null === $_dataArray ) {
+        foreach ( $dataArrays as $idx => $da ) {
+            if ( null === $da ) {
                 unset($dataArrays[$idx]);
             }
         }
-
-        $dataArraysKeys = array_keys($dataArrays);
 
         foreach (
             $theArr->walk_collect_it(
@@ -571,7 +569,7 @@ class HttpModule
             $last = end($values);
 
             if ( false === $last ) {
-                foreach ( $dataArraysKeys as $key ) {
+                foreach ( $dataArrays as $key => $devnull ) {
                     $theArr->unset_path($dataArrays[$key], $path);
                 }
             }
@@ -608,8 +606,6 @@ class HttpModule
             }
         }
 
-        $dataArraysKeys = array_keys($dataArrays);
-
         foreach (
             $theArr->walk_collect_it(
                 $dataArrays,
@@ -620,7 +616,7 @@ class HttpModule
             $last = end($values);
 
             if ( false === $last ) {
-                foreach ( $dataArraysKeys as $key ) {
+                foreach ( $dataArrays as $key => $devnull ) {
                     $theArr->unset_path($dataArrays[$key], $path);
                 }
             }

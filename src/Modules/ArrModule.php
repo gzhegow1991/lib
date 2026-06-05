@@ -2298,6 +2298,54 @@ class ArrModule
     }
 
 
+    /**
+     * @return mixed|null
+     */
+    public function shift(array &$array)
+    {
+        return array_shift($array);
+    }
+
+    /**
+     * @return mixed|null
+     */
+    public function shift_unset(array &$array)
+    {
+        if ( [] === $array ) {
+            return null;
+        }
+
+        $key = array_key_first($array);
+
+        $value = $array[$key];
+
+        unset($array[$key]);
+
+        return $value;
+    }
+
+
+    public function unshift(array &$array, ...$values) : int
+    {
+        return array_unshift($array, ...$values);
+    }
+
+    public function unshift_replace(array &$array, ...$values) : int
+    {
+        foreach ( $values as $i => $val ) {
+            if ( array_key_exists($i, $array) ) {
+                throw new RuntimeException(
+                    [ 'The `idx` is already exists', $i ]
+                );
+            }
+        }
+
+        $array = $values + $array;
+
+        return count($array);
+    }
+
+
     public function has(array $arr, $path, ?string $dot = '.', array $refs = []) : bool
     {
         $ret = $this->type_arrpath_dot(null, $path, $dot);
@@ -3178,7 +3226,7 @@ class ArrModule
                 continue;
             }
 
-            foreach ( array_keys($arr) as $k ) {
+            foreach ( $arr as $k => $devnull ) {
                 if ( isset($seen[$k]) ) {
                     return false;
                 }
@@ -3205,7 +3253,7 @@ class ArrModule
         sort($src);
 
         foreach ( $arrays as $array ) {
-            foreach ( array_keys($array) as $ii ) {
+            foreach ( $array as $ii => $devnull ) {
                 if ( ! array_key_exists($ii, $src) ) {
                     return true;
                 }
@@ -3278,7 +3326,7 @@ class ArrModule
         sort($src);
 
         foreach ( $arrays as $array ) {
-            foreach ( array_keys($array) as $ii ) {
+            foreach ( $array as $ii => $devnull ) {
                 if ( array_key_exists($ii, $src) ) {
                     return true;
                 }
@@ -3371,12 +3419,12 @@ class ArrModule
 
         $src = array_shift($arrays);
 
-        foreach ( array_keys($arrays) as $i ) {
+        foreach ( $arrays as $i => $devnull ) {
             sort($arrays[$i]);
         }
 
         foreach ( $src as $i => $v ) {
-            foreach ( array_keys($arrays) as $ii ) {
+            foreach ( $arrays as $ii => $devnull ) {
                 if ( in_array($v, $arrays[$ii], true) ) {
                     unset($src[$i]);
 
@@ -3441,12 +3489,12 @@ class ArrModule
 
         $src = array_shift($arrays);
 
-        foreach ( array_keys($arrays) as $i ) {
+        foreach ( $arrays as $i => $devnull ) {
             sort($arrays[$i]);
         }
 
         foreach ( $src as $i => $v ) {
-            foreach ( array_keys($arrays) as $ii ) {
+            foreach ( $arrays as $ii => $devnull ) {
                 if ( in_array($v, $arrays[$ii], true) ) {
                     continue 2;
                 }
@@ -3886,7 +3934,8 @@ class ArrModule
 
                 $keys = [];
                 if ( $isModeDepthFirst ) {
-                    $keys = array_reverse(array_keys($children));
+                    $keys = array_keys($children);
+                    $keys = array_reverse($keys);
 
                 } elseif ( $isModeBreadthFirst ) {
                     $keys = array_keys($children);
@@ -3989,17 +4038,18 @@ class ArrModule
 
         $generators = [];
         foreach ( $keyList as $key ) {
-            if ( ! is_array($arrayList[$key]) ) {
+            if ( ! is_array($arrayList[ $key ]) ) {
                 throw new LogicException(
                     [
                         'Each of `arrayList` should be an array',
-                        $arrayList[$key],
-                        $key,
+                        $val,
+                        $arrayList[ $key ],
+                        $arrayList,
                     ]
                 );
             }
 
-            $generators[$key] = $this->walk_it($arrayList[$key], $arrayWalkFlags);
+            $generators[$key] = $this->walk_it($val, $arrayWalkFlags);
         }
 
         $result = [];

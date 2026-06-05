@@ -1622,14 +1622,11 @@ class DebugModule
         foreach ( $rowKeys as $rowKey => $bool ) {
             if ( ! is_array($table[$rowKey]) ) {
                 throw new RuntimeException(
-                    [
-                        'The `table` should be array of arrays',
-                        $table[$rowKey],
-                    ]
+                    [ 'The `table` should be array of arrays', $table[$rowKey] ]
                 );
             }
 
-            foreach ( array_keys($table[$rowKey]) as $colKey ) {
+            foreach ( $table[$rowKey] as $colKey => $devnull ) {
                 if ( ! isset($colKeys[$colKey]) ) {
                     $colKeys[$colKey] = true;
                 }

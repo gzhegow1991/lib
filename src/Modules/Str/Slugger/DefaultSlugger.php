@@ -130,7 +130,7 @@ class DefaultSlugger implements SluggerInterface
 
         if ( null !== $ignoreSymbolMap ) {
             $symbolMapSymfony = [];
-            foreach ( array_keys($ignoreSymbolMap) as $letter ) {
+            foreach ( $ignoreSymbolMap as $letter => $devnull ) {
                 $symbolMapSymfony[$letter] = $letter;
             }
 
@@ -573,17 +573,8 @@ class DefaultSlugger implements SluggerInterface
 
         $translit = '';
         foreach ( $gen as [$chunk, $chunkDelimiter] ) {
-            $chunk = str_replace(
-                array_keys($sequnceMap),
-                array_values($sequnceMap),
-                $chunk
-            );
-
-            $chunk = str_replace(
-                array_keys($symbolMap),
-                array_values($symbolMap),
-                $chunk
-            );
+            $chunk = strtr($chunk, $sequnceMap);
+            $chunk = strtr($chunk, $symbolMap);
 
             $translit .= "{$chunk}{$chunkDelimiter}";
         }

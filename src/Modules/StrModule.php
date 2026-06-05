@@ -3302,11 +3302,7 @@ class StrModule
             $stringLower
         );
 
-        $result = str_replace(
-            array_keys($dictionary),
-            array_values($dictionary),
-            $result
-        );
+        $result = strtr($result, $dictionary);
 
         $result = trim($result, ' ');
 
@@ -3365,7 +3361,10 @@ class StrModule
         $vowels = '';
         $vowelsArray = $this->loadVowels();
         foreach ( $vowelsArray as $vowelIndex ) {
-            $vowels .= implode('', array_keys($vowelIndex));
+            $vowelIndex = array_keys($vowelIndex);
+            $vowelIndex = implode('', $vowelIndex);
+
+            $vowels .= $vowelIndex;
         }
 
         $sourceConsonants = [];
@@ -3537,10 +3536,10 @@ class StrModule
                 $asciiControlsOnlyTrims[$i] .= $i;
             }
         }
-        $result = str_replace(
-            array_keys($asciiControlsOnlyTrims),
-            array_values($asciiControlsOnlyTrims),
-            $result
+
+        $result = strtr(
+            $result,
+            $asciiControlsOnlyTrims
         );
 
         return $result;

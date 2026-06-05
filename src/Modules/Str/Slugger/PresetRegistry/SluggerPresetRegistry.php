@@ -277,11 +277,11 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
         // ]
 
         foreach ( $sequenceMap as $sequence ) {
-            $aList = array_keys($sequence);
-            $bList = array_values($sequence);
-
             $aCase = [];
-            foreach ( $aList as $i => $a ) {
+            $bCase = [];
+
+            $i = 0;
+            foreach ( $sequence as $a => $b ) {
                 $aLetter = $theType->letter($a)->orThrow();
 
                 $aLower = $theMb->mb_strtolower($aLetter);
@@ -291,24 +291,29 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
                     || isset($ignoreSymbolMap[$aLower])
                     || isset($ignoreSymbolMap[$aUpper])
                 ) {
-                    throw new RuntimeException(
-                        [
-                            'Letter has conflict with `ignoreSymbolMap`',
-                            $aLower,
-                            $aUpper,
-                            $ignoreSymbolMap,
-                        ]
-                    );
+                    throw new RuntimeException([
+                        'Letter has conflict with `ignoreSymbolMap`',
+                        //
+                        $aLower,
+                        $aUpper,
+                        $ignoreSymbolMap,
+                    ]);
                 }
 
-                $aCase[$i][] = $aLower;
-                $aCase[$i][] = $aUpper;
-            }
+                $bLower = $theMb->mb_strtolower($b);
+                $bUpper = $theMb->mb_strtoupper($b);
 
-            $bCase = [];
-            foreach ( $bList as $i => $b ) {
-                $bCase[$i][] = $theMb->mb_strtolower($b);
-                $bCase[$i][] = $theMb->mb_strtoupper($b);
+                $aCase[$i] = [
+                    $aLower,
+                    $aUpper,
+                ];
+
+                $bCase[$i] = [
+                    $bLower,
+                    $bUpper,
+                ];
+
+                $i++;
             }
 
             $aGen = $theItertools->product_it(...$aCase);
@@ -317,7 +322,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
             $aProductArray = iterator_to_array($aGen);
             $bProductArray = iterator_to_array($bGen);
 
-            foreach ( array_keys($aProductArray) as $i ) {
+            foreach ( $aProductArray as $i => $devnull ) {
                 $search = implode('', $aProductArray[$i]);
                 $replacement = implode('', $bProductArray[$i]);
 
@@ -372,6 +377,7 @@ class SluggerPresetRegistry implements SluggerPresetRegistryInterface
                 throw new RuntimeException(
                     [
                         'Letter has conflict with `ignoreSymbolMap`',
+                        //
                         $aLower,
                         $aUpper,
                         $ignoreSymbolMap,

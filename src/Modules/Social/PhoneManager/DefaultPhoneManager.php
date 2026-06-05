@@ -818,11 +818,10 @@ class DefaultPhoneManager implements PhoneManagerInterface
 
                 $wildcards[$wildcard] = true;
             }
-            $wildcards = array_keys($wildcards);
 
             foreach ( $timezones as $i => $timezoneName ) {
                 $isMatch = false;
-                foreach ( $wildcards as $wildcard ) {
+                foreach ( $wildcards as $wildcard => $devnull ) {
                     if ( false !== strpos($timezoneName, $wildcard) ) {
                         $isMatch = true;
 

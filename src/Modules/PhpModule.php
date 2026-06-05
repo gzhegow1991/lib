@@ -3408,14 +3408,12 @@ class PhpModule
          * @noinspection PhpDuplicateArrayKeysInspection
          */
         $separators = [
-            DIRECTORY_SEPARATOR => true,
-            '\\'                => true,
-            '/'                 => true,
-            $separatorString    => true,
+            DIRECTORY_SEPARATOR => $separatorString,
+            '\\'                => $separatorString,
+            '/'                 => $separatorString,
         ];
-        $separators = array_keys($separators);
 
-        $normalized = str_replace($separators, $separatorString, $pathStringNotEmpty);
+        $normalized = strtr($pathStringNotEmpty, $separators);
 
         return $normalized;
     }
