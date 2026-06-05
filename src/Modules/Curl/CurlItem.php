@@ -530,6 +530,28 @@ class CurlItem
 
 
     /**
+     * @return resource|\CurlHandle|null
+     */
+    public function clearCurlHandle()
+    {
+        $ch = $this->ch;
+
+        $this->ch = null;
+
+        return $ch;
+    }
+
+    /**
+     * @return resource|\CurlHandle
+     */
+    public function freshCurlHandle()
+    {
+        $this->ch = $this->makeCurlHandle();
+
+        return $this->ch;
+    }
+
+    /**
      * @return resource|\CurlHandle
      */
     public function getCurlHandle()
@@ -539,28 +561,6 @@ class CurlItem
         }
 
         return $this->ch;
-    }
-
-    /**
-     * @return resource|\CurlHandle
-     */
-    public function resetCurlHandle()
-    {
-        $this->ch = $this->makeCurlHandle();
-
-        return $this->ch;
-    }
-
-    /**
-     * @return resource|\CurlHandle|null
-     */
-    public function flushCurlHandle()
-    {
-        $ch = $this->ch;
-
-        $this->ch = null;
-
-        return $ch;
     }
 
     /**

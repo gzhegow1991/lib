@@ -142,6 +142,36 @@ class CurlProcess
         return $instance;
     }
 
+    public function addHead(string $url)
+    {
+        $instance = $this->newCurlItem();
+        $instance->setUrl($url);
+
+        $this->curlItems[] = $instance;
+
+        return $instance;
+    }
+
+    public function addConnect(string $url)
+    {
+        $instance = $this->newCurlItem();
+        $instance->setUrl($url);
+
+        $this->curlItems[] = $instance;
+
+        return $instance;
+    }
+
+    public function addTrace(string $url)
+    {
+        $instance = $this->newCurlItem();
+        $instance->setUrl($url);
+
+        $this->curlItems[] = $instance;
+
+        return $instance;
+    }
+
 
     /**
      * @return \Generator<string, AbstractOnCurlEvent>
@@ -312,7 +342,7 @@ class CurlProcess
         while ( ! $curlQueue->isEmpty() ) {
             $curlItem = $curlQueue->dequeue();
 
-            $ch = $curlItem->resetCurlHandle();
+            $ch = $curlItem->freshCurlHandle();
 
             $curlEvent = new OnCurlSingleInitEvent(
                 $curlItem
@@ -529,7 +559,7 @@ class CurlProcess
     protected function skipCurlItems(array $curlItems) : void
     {
         foreach ( $curlItems as $curlItem ) {
-            $ch = $curlItem->flushCurlHandle();
+            $ch = $curlItem->getCurlHandle();
 
             if ( null !== $ch ) {
                 if ( null !== $this->mh ) {
@@ -546,7 +576,7 @@ class CurlProcess
      */
     protected function skipCurlItem(CurlItem $curlItem) : void
     {
-        $ch = $curlItem->flushCurlHandle();
+        $ch = $curlItem->getCurlHandle();
 
         if ( null !== $ch ) {
             if ( null !== $this->mh ) {
