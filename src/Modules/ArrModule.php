@@ -4034,11 +4034,9 @@ class ArrModule
      */
     public function walk_collect_it(array $arrayList, ?int $arrayWalkFlags = null, array $fallback = []) : \Generator
     {
-        $keyList = array_keys($arrayList);
-
         $generators = [];
         foreach ( $arrayList as $key => $arr ) {
-            if ( ! is_array($arrayList[ $key ]) ) {
+            if ( ! is_array($arr) ) {
                 throw new LogicException(
                     [
                         'Each of `arrayList` should be an array',
@@ -4049,7 +4047,7 @@ class ArrModule
                 );
             }
 
-            $generators[$key] = $this->walk_it($arr, $arrayWalkFlags);
+            $generators[$key] = $this->walk_it($arrayList[$key], $arrayWalkFlags);
         }
 
         $result = [];
@@ -4072,9 +4070,9 @@ class ArrModule
                         $yield = false;
 
                         $values = [];
-                        foreach ( $keyList as $idx => $key ) {
+                        foreach ( $arrayList as $key => $arr ) {
                             $isFound = $this->has_path(
-                                $arrayList[$idx], $path,
+                                $arrayList[$key], $path,
                                 [ &$value ]
                             );
 
