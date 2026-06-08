@@ -3418,7 +3418,7 @@ class StrModule
         return $lines;
     }
 
-    public function eol(string $text, $eol = null, array $refs = []) : string
+    public function eol($lines, $eol = null, array $refs = []) : string
     {
         $withLines = array_key_exists(0, $refs);
         if ( $withLines ) {
@@ -3426,12 +3426,27 @@ class StrModule
         }
         $refLines = null;
 
-        $_eol = $eol ?? "\n";
-        $_eol = (string) $_eol;
+        $lines = $lines ?? [];
+        $eol = $eol ?? "\n";
 
-        $refLines = $this->lines($text);
+        $lines = (array) $lines;
+        $eol = (string) $eol;
 
-        $output = implode($_eol, $refLines);
+        $theType = Lib::type();
+
+        $refLines = [];
+        foreach ( $lines as $l ) {
+            $lString = $theType->string($l)->orThrow();
+
+            $linesArray = $this->lines($lString);
+
+            $refLines = array_merge(
+                $refLines,
+                $linesArray
+            );
+        }
+
+        $output = implode($eol, $refLines);
 
         unset($refLines);
 

@@ -126,7 +126,6 @@ class FormatXml
         return Ret::ok($fb, $sxe);
     }
 
-
     /**
      * @return Ret<\DOMDocument>|\DOMDocument
      */

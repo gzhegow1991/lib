@@ -43,6 +43,7 @@ use Gzhegow\Lib\Modules\Format\FormatCsv;
 use Gzhegow\Lib\Modules\Format\FormatXml;
 use Gzhegow\Lib\Modules\Curl\CurlProcess;
 use Gzhegow\Lib\Modules\Format\FormatJson;
+use Gzhegow\Lib\Modules\Format\FormatHtml;
 use Gzhegow\Lib\Exception\RuntimeException;
 use Gzhegow\Lib\Modules\Format\FormatBaseN;
 use Gzhegow\Lib\Modules\Php\ErrorBag\ErrorBag;
@@ -194,6 +195,13 @@ class Lib
         return $clone
             ? Lib::format()->cloneJson()
             : Lib::format()->json();
+    }
+
+    public static function formatHtml(?bool $clone = null) : FormatHtml
+    {
+        return $clone
+            ? Lib::format()->cloneHtml()
+            : Lib::format()->html();
     }
 
     public static function formatSerialize(?bool $clone = null) : FormatSerialize

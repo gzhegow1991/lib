@@ -7,6 +7,7 @@ use Gzhegow\Lib\Modules\Type\Ret;
 use Gzhegow\Lib\Modules\Format\FormatCsv;
 use Gzhegow\Lib\Modules\Format\FormatXml;
 use Gzhegow\Lib\Modules\Format\FormatJson;
+use Gzhegow\Lib\Modules\Format\FormatHtml;
 use Gzhegow\Lib\Modules\Format\FormatBaseN;
 use Gzhegow\Lib\Modules\Format\FormatSerialize;
 
@@ -74,6 +75,24 @@ class FormatModule
     public function json() : FormatJson
     {
         return $this->newJson();
+    }
+
+
+    public function newHtml() : FormatHtml
+    {
+        $instance = new FormatHtml();
+
+        return $instance;
+    }
+
+    public function cloneHtml() : FormatHtml
+    {
+        return clone $this->html();
+    }
+
+    public function html() : FormatHtml
+    {
+        return $this->newHtml();
     }
 
 

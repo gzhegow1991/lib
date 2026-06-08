@@ -4026,7 +4026,7 @@ class ArrModule
      * @template TKey of int|string
      * @template TValue
      *
-     * @return \Iterator<array<TKey>, array<TValue>>|\Generator<array<TKey>, array<TValue>>
+     * @return \Generator<array<TKey>, array<TValue>>
      *
      * @throws \LogicException
      *
@@ -4037,19 +4037,19 @@ class ArrModule
         $keyList = array_keys($arrayList);
 
         $generators = [];
-        foreach ( $keyList as $key ) {
+        foreach ( $arrayList as $key => $arr ) {
             if ( ! is_array($arrayList[ $key ]) ) {
                 throw new LogicException(
                     [
                         'Each of `arrayList` should be an array',
-                        $val,
-                        $arrayList[ $key ],
+                        $arr,
+                        $key,
                         $arrayList,
                     ]
                 );
             }
 
-            $generators[$key] = $this->walk_it($val, $arrayWalkFlags);
+            $generators[$key] = $this->walk_it($arr, $arrayWalkFlags);
         }
 
         $result = [];
